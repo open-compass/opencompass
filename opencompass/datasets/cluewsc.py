@@ -1,0 +1,57 @@
+import json
+
+from datasets import Dataset, load_dataset
+
+from opencompass.registry import LOAD_DATASET
+
+from .base import BaseDataset
+
+
+@LOAD_DATASET.register_module()
+class CluewscDataset(BaseDataset):
+
+    @staticmethod
+    def load(**kwargs):
+
+        dataset = load_dataset(**kwargs)
+
+        def preprocess(example):
+            text_list = list(example['text'])
+            # span1 may have 1 or more than 1 words
+            # span2 is the pronoun and has only 1 word
+            text_list[example['target']
+                      ['span2_index']] = example['target']['span1_text']
+            example['new_text'] = ''.join(text_list)
+            if example['label'] == 'true':
+                example['answer'] = 1
+            else:
+                example['answer'] = 0
+            example['span1'] = example['target']['span1_text']
+            example['span2'] = example['target']['span2_text']
+            del example['target']
+            return example
+
+        dataset = dataset.map(preprocess)
+        return dataset
+
+
+@LOAD_DATASET.register_module()
+class CluewscDataset_V2(BaseDataset):
+
+    @staticmethod
+    def load(path):
+        data = []
+        with open(path, 'r') as f:
+            for line in f:
+                line = json.loads(line)
+                item = {
+                    'span1': line['target']['span1_text'],
+                    'span2': line['target']['span2_text'],
+                    'text': line['text'],
+                    'label': {
+                        'true': 'A',
+                        'false': 'B'
+                    }[line['label']],
+                }
+                data.append(item)
+        return Dataset.from_list(data)
