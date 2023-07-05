@@ -52,7 +52,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
     </tr>
     <tr valign="top">
       <td>
-<details>
+<details open>
 <summary><b>字词释义</b></summary>
 
 - WiC
@@ -60,14 +60,14 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>成语习语</b></summary>
 
 - CHID
 
 </details>
 
-<details>
+<details open>
 <summary><b>语义相似度</b></summary>
 
 - AFQMC
@@ -75,7 +75,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>指代消解</b></summary>
 
 - CLUEWSC
@@ -84,7 +84,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>翻译</b></summary>
 
 - Flores
@@ -92,7 +92,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 </details>
       </td>
       <td>
-<details>
+<details open>
 <summary><b>知识问答</b></summary>
 
 - BoolQ
@@ -102,7 +102,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>多语种问答</b></summary>
 
 - TyDi-QA
@@ -110,7 +110,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 </details>
       </td>
       <td>
-<details>
+<details open>
 <summary><b>文本蕴含</b></summary>
 
 - CMNLI
@@ -123,7 +123,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>常识推理</b></summary>
 
 - StoryCloze
@@ -136,7 +136,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>数学推理</b></summary>
 
 - MATH
@@ -144,14 +144,14 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>定理应用</b></summary>
 
 - TheoremQA
 
 </details>
 
-<details>
+<details open>
 <summary><b>代码</b></summary>
 
 - HumanEval
@@ -159,7 +159,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>综合推理</b></summary>
 
 - BBH
@@ -167,7 +167,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 </details>
       </td>
       <td>
-<details>
+<details open>
 <summary><b>初中、高中、大学、职业考试</b></summary>
 
 - GAOKAO-2023
@@ -181,7 +181,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 </details>
       </td>
       <td>
-<details>
+<details open>
 <summary><b>阅读理解</b></summary>
 
 - C3
@@ -192,7 +192,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>内容总结</b></summary>
 
 - CSL
@@ -201,7 +201,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 </details>
 
-<details>
+<details open>
 <summary><b>内容分析</b></summary>
 
 - EPRSTMT
