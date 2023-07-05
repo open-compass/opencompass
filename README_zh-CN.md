@@ -1,6 +1,7 @@
 <div align="center">
   <img src="docs/zh_cn/_static/image/logo.svg" width="500px"/>
   <br />
+  <br />
 
 [![docs](https://readthedocs.org/projects/opencompass/badge/?version=dev-1.x)](https://opencompass.readthedocs.io/en/dev-1.x/?badge=dev-1.x)
 [![license](https://img.shields.io/github/license/IntenLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
