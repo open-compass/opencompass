@@ -1,4 +1,4 @@
-import os.path as osp
+from os.path import exists
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -44,7 +44,7 @@ bbh_free_form_sets = [
 bbh_datasets = []
 for _name in bbh_multiple_choice_sets:
     _hint = None
-    if osp.exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
+    if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
         _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
     bbh_infer_cfg = dict(
         prompt_template=dict(
@@ -76,7 +76,7 @@ for _name in bbh_multiple_choice_sets:
 
 for _name in bbh_free_form_sets:
     _hint = None
-    if osp.exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
+    if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
         _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
     bbh_infer_cfg = dict(
         prompt_template=dict(
