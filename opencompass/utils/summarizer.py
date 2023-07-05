@@ -88,10 +88,11 @@ class Summarizer:
         dataset_eval_mode = {}
         for dataset in dataset_cfgs:
             inferencer = dataset.get('infer_cfg', {}).get('inferencer', {}).get('type', '')
+            inferencer = inferencer if isinstance(inferencer, str) else inferencer.__name__
             dataset_abbr = dataset_abbr_from_cfg(dataset)
-            if inferencer == 'GenInferencer':
+            if 'GenInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'gen'
-            elif inferencer == 'PPLInferencer':
+            elif 'PPLInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'ppl'
             else:
                 dataset_eval_mode[dataset_abbr] = 'unknown'
@@ -130,7 +131,7 @@ class Summarizer:
                 else:
                     raw_results[model_abbr][sg['name']] = {'error': 'missing datasets: {}'.format(set(sg['subsets']) - set(results.keys()))}
 
-        prompt_version = {dataset_abbr_from_cfg(d): get_prompt_hash(d) for d in dataset_cfgs}
+        prompt_version = {dataset_abbr_from_cfg(d): get_prompt_hash(d)[:6] for d in dataset_cfgs}
 
         # format table
         summarizer_dataset_abbrs = []
