@@ -29,7 +29,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 ## 模型能力排名
 
-## 能力维度 & 模型支持
+## 数据集支持
 
 <table align="center">
   <tbody>
@@ -175,7 +175,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 - AGIEval
 - MMLU
 - GAOKAO-Bench
-- MMLU-CN(即将上线)
+- MMLU-CN (即将上线)
 - ARC
 
 </details>
@@ -215,6 +215,44 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
     </tr>
   </tbody>
 </table>
+
+## 模型支持
+
+<details close>
+<summary><b>Huggingface 模型</b></summary>
+
+- LLaMA
+- Vicuna
+- Alpaca
+- Baichuan
+- WizardLM
+- ChatGLM-6B
+- ChatGLM2-6B
+- MPT
+- Falcon
+- TigerBot
+- MOSS
+- ……
+
+</details>
+
+<details close>
+<summary><b>API 模型</b></summary>
+
+- OpenAI
+- Claude (即将推出)
+- PaLM (即将推出)
+- ……
+
+</details>
+
+<details close>
+<summary><b>用户自定义模型</b></summary>
+
+- GLM
+- ……
+
+</details>
 
 ## 安装
 
