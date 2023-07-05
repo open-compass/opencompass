@@ -31,7 +31,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 ## 能力维度 & 模型支持
 
-<table align="left">
+<table align="center">
   <tbody>
     <tr align="center" valign="bottom">
       <td>
