@@ -2,7 +2,7 @@ import getpass
 from abc import abstractmethod
 from typing import Any, Dict, List, Tuple
 
-from mmengine.config import ConfigDict, Config
+from mmengine.config import Config, ConfigDict
 
 from opencompass.utils import LarkReporter, get_logger
 
@@ -65,16 +65,18 @@ class BaseRunner:
         if self.lark_reporter:
             num_succeeded = len(status) - len(failed_logs)
             if len(failed_logs) > 0:
-                content = f'{getpass.getuser()} 的 '
-                content += f'{self.task_cfg.type} 任务已完成，'
-                content += f'成功任务 {num_succeeded} 个，'
-                content += f'失败 {len(failed_logs)} 个。以下为失败的任务列表：'
-                content += '\n' + '\n'.join(failed_logs)
-                self.lark_reporter.post(title=f'悲报：您有{len(failed_logs)}个'
-                                        '任务炸了',
+                content = f'{getpass.getuser()} \'s '
+                content += f'{self.task_cfg.type} tasks finished. '
+                content += f'{num_succeeded} tasks succeeded, '
+                content += f'{len(failed_logs)} tasks failed. Failed tasks are'
+                content += ':\n' + '\n'.join(failed_logs)
+                self.lark_reporter.post(title=f'Bad news: {len(failed_logs)} '
+                                        'failed.',
                                         content=content)
             else:
-                content = f'{getpass.getuser()} 的 '
-                content += f'{self.task_cfg.type} 任务已完成，'
-                content += f'成功任务 {num_succeeded} 个。'
-                self.lark_reporter.post(title='喜报：全部任务完成', content=content)
+                content = f'{getpass.getuser()}\'s '
+                content += f'{self.task_cfg.type} tasks finished. '
+                content += f'{num_succeeded} tasks succeeded.'
+                self.lark_reporter.post(title='Great news: all tasks '
+                                        'finished!',
+                                        content=content)
