@@ -2,13 +2,13 @@
 
 OpenCompass 使用 OpenMMLab 新式风格的配置文件。如果你之前熟悉 OpenMMLab 风格的配置文件，可以直接阅读
 [纯 Python 风格的配置文件（Beta）](https://mmengine.readthedocs.io/zh_CN/latest/advanced_tutorials/config.html#python-beta)
-了解新式配置文件与原配置文件的区别。如果你之前没有接触过 OpenMMLab 风格的配置文件，下面我将会用一个简单的例子来介绍配置文件的使用。
-请确保你安装了最新版本的 MMEngine (>=0.8.1)，以支持新式风格的配置文件。
+了解新式配置文件与原配置文件的区别。如果你之前没有接触过 OpenMMLab 风格的配置文件，
+下面我将会用一个简单的例子来介绍配置文件的使用。请确保你安装了最新版本的 MMEngine (>=0.8.1)，以支持新式风格的配置文件。
 
 ## 基本格式
 
-OpenCompass 的配置文件都是 Python 格式的，遵从基本的 Python 语法，通过定义变量的形式指定每个配置项。比如在定
-义模型时，我们使用如下配置：
+OpenCompass 的配置文件都是 Python 格式的，遵从基本的 Python 语法，通过定义变量的形式指定每个配置项。
+比如在定义模型时，我们使用如下配置：
 
 ```python
 # model_cfg.py
@@ -39,15 +39,15 @@ models = [
 
 ## 继承机制
 
-OpenCompass 的配置文件使用了 Python 的 import 机制进行配置文件的继承。需要注意的是，我们需要在继承配置文件时使
-用 `read_base` 上下文管理器。
+OpenCompass 的配置文件使用了 Python 的 import 机制进行配置文件的继承。需要注意的是，
+我们需要在继承配置文件时使用 `read_base` 上下文管理器。
 
 ```python
 # inherit.py
 from mmengine.config import read_base
 
 with read_base():
-    from .model_cfg import models
+    from .model_cfg import models  # model_cfg.py 中的 models 被继承到本配置文件
 ```
 
 使用 `Config.fromfile` 解析配置文件：
@@ -95,14 +95,12 @@ models = [
 
 ## 数据集配置文件示例
 
-以上示例配置文件中，我们直接以继承的方式获取了数据集相关的配置。接下来，我们会以 PIQA 数据集配置文件为示例，展
-示如何数据集配置文件中各个字段的含义。如果你不打算修改模型测试的 prompt，或者添加新的数据集，则可以跳过这一节
-的介绍。
+以上示例配置文件中，我们直接以继承的方式获取了数据集相关的配置。接下来，
+我们会以 PIQA 数据集配置文件为示例，展示如何数据集配置文件中各个字段的含义。
+如果你不打算修改模型测试的 prompt，或者添加新的数据集，则可以跳过这一节的介绍。
 
-PIQA 数据集 [配置文件](https://github.com/InternLM/opencompass/blob/main/configs/datasets/piqa/piqa_ppl_788dbe.py)
+PIQA 数据集 [配置文件](https://github.com/InternLM/opencompass/blob/main/configs/datasets/piqa/piqa_ppl_1cf9f0.py)
 如下，这是一个基于 PPL（困惑度）进行评测的配置，并且不使用上下文学习方法（In-Context Learning）。
-
-完整配置文件如下：
 
 ```python
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -155,11 +153,12 @@ piqa_datasets = [
 
 ## 进阶评测配置
 
-在 OpenCompass 中，我们支持了任务划分器（Partitioner）、运行后端（Runner）等配置项，用于更加灵活、高效的利用计算
-资源。
+在 OpenCompass 中，我们支持了任务划分器（Partitioner）、运行后端（Runner）等配置项，
+用于更加灵活、高效的利用计算资源。
 
-默认情况下，我们会使用基于样本数的方式对推理任务进行划分，你可以在启动任务时使用 `--max-partition-size` 指定进
-行任务划分的样本数阈值。同时，我们默认使用本地资源进行推理和评估任务，如果你希望使用 Slurm 集群资源，可以在启
-动任务时使用 `--slurm` 参数和 `--partition` 参数指定 slurm 运行后端。
+默认情况下，我们会使用基于样本数的方式对推理任务进行划分，你可以在启动任务时使用
+`--max-partition-size` 指定进行任务划分的样本数阈值。同时，我们默认使用本地资源进行推理和评估任务，
+如果你希望使用 Slurm 集群资源，可以在启动任务时使用 `--slurm` 参数和 `--partition` 参数指定 slurm 运行后端。
 
-进一步地，如果以上功能无法满足你的任务划分和运行后端配置需求，你可以在配置文件中进行更详细的配置。参见[高效评测](./evaluation.md)。
+进一步地，如果以上功能无法满足你的任务划分和运行后端配置需求，你可以在配置文件中进行更详细的配置。
+参见[高效评测](./evaluation.md)。
