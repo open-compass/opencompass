@@ -17,7 +17,7 @@
 
 OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公平、公开、可复现的大模型评测基准方案。其主要特点如下：
 
-- **模型及数据集的全方位支持**：预支持 20+ HuggingFace 及 API 模型，并提供 50+ 个数据集约 30 万题的的模型评测方案，6 大维度的能力全面评测。
+- **模型及数据集的全方位支持**：预支持 20+ HuggingFace 及 API 模型，50+ 个数据集约 30 万题的的模型评测方案，五大维度全面评估模型能力。
 
 - **高效分布式评测**：一行命令实现任务分割和分布式评测，数小时即可完成千亿模型全量评测\*。
 
@@ -31,6 +31,191 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 ## 能力维度 & 模型支持
 
+<table align="left">
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>语言</b>
+      </td>
+      <td>
+        <b>知识</b>
+      </td>
+      <td>
+        <b>推理</b>
+      </td>
+      <td>
+        <b>考试</b>
+      </td>
+      <td>
+        <b>理解</b>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>
+<details>
+<summary><b>字词释义</b></summary>
+
+- WiC
+- SummEdits
+
+</details>
+
+<details>
+<summary><b>成语习语</b></summary>
+
+- CHID
+
+</details>
+
+<details>
+<summary><b>语义相似度</b></summary>
+
+- AFQMC
+- BUSTM
+
+</details>
+
+<details>
+<summary><b>指代消解</b></summary>
+
+- CLUEWSC
+- WSC
+- WinoGrande
+
+</details>
+
+<details>
+<summary><b>翻译</b></summary>
+
+- Flores
+
+</details>
+      </td>
+      <td>
+<details>
+<summary><b>知识问答</b></summary>
+
+- BoolQ
+- CommonSenseQA
+- NaturalQuestion
+- TrivialQA
+
+</details>
+
+<details>
+<summary><b>多语种问答</b></summary>
+
+- TyDi-QA
+
+</details>
+      </td>
+      <td>
+<details>
+<summary><b>文本蕴含</b></summary>
+
+- CMNLI
+- OCNLI
+- OCNLI_FC
+- AX-b
+- AX-g
+- CB
+- RTE
+
+</details>
+
+<details>
+<summary><b>常识推理</b></summary>
+
+- StoryCloze
+- StoryCloze-CN（即将上线）
+- COPA
+- ReCoRD
+- HellaSwag
+- PIQA
+- SIQA
+
+</details>
+
+<details>
+<summary><b>数学推理</b></summary>
+
+- MATH
+- GSM8K
+
+</details>
+
+<details>
+<summary><b>定理应用</b></summary>
+
+- TheoremQA
+
+</details>
+
+<details>
+<summary><b>代码</b></summary>
+
+- HumanEval
+- MBPP
+
+</details>
+
+<details>
+<summary><b>综合推理</b></summary>
+
+- BBH
+
+</details>
+      </td>
+      <td>
+<details>
+<summary><b>初中、高中、大学、职业考试</b></summary>
+
+- GAOKAO-2023
+- CEval
+- AGIEval
+- MMLU
+- GAOKAO-Bench
+- MMLU-CN(即将上线)
+- ARC
+
+</details>
+      </td>
+      <td>
+<details>
+<summary><b>阅读理解</b></summary>
+
+- C3
+- CMRC
+- DRCD
+- MultiRC
+- RACE
+
+</details>
+
+<details>
+<summary><b>内容总结</b></summary>
+
+- CSL
+- LCSTS
+- XSum
+
+</details>
+
+<details>
+<summary><b>内容分析</b></summary>
+
+- EPRSTMT
+- LAMBADA
+- TNEWS
+
+</details>
+      </td>
+    </tr>
+</td>
+    </tr>
+  </tbody>
+</table>
+
 ## 安装
 
 下面展示了快速安装的步骤。有部分第三方功能可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_cn/latest/get_started.html)。
@@ -40,7 +225,6 @@ conda create --name opencompass python=3.8 pytorch torchvision -c pytorch -y
 conda activate opencompass
 git clone https://github.com/InternLM/opencompass opencompass
 cd opencompass
-pip install -r requirements/runtime.txt
 pip install -e .
 # 下载数据集到 data/ 处
 # TODO: ....
@@ -50,7 +234,7 @@ pip install -e .
 
 请阅读[快速上手](https://opencompass.readthedocs.io/zh_cn/latest/get_started.html)了解如何运行一个评测任务。
 
-## 致谢
+## 致谢
 
 该项目部分的代码引用并修改自 [OpenICL](https://github.com/Shark-NLP/OpenICL)。
 
