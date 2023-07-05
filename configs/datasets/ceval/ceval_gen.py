@@ -1,4 +1,4 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .ceval_gen_ee2cb0 import ceval_datasets  # noqa: F401, F403
+    from .ceval_gen_5f30c7 import ceval_datasets  # noqa: F401, F403
