@@ -41,7 +41,7 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
         <b>Knowledge</b>
       </td>
       <td>
-        <b>Inference</b>
+        <b>Reasoning</b>
       </td>
       <td>
         <b>Exam</b>
