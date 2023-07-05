@@ -214,7 +214,7 @@ def exec_infer_runner(tasks, args, cfg):
     else:
         runner = LocalRunner(
             task=dict(type='OpenICLInferTask'),
-            # max_num_workers = args.max_num_workers,
+            max_num_workers = args.max_num_workers,
             debug=args.debug,
             lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)
@@ -240,7 +240,7 @@ def exec_eval_runner(tasks, args, cfg):
     else:
         runner = LocalRunner(
             task=dict(type='OpenICLEvalTask'),
-            # max_num_workers = args.max_num_workers,
+            max_num_workers = args.max_num_workers,
             debug=args.debug,
             lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)

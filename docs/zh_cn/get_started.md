@@ -17,7 +17,6 @@ conda install pytorch torchvision -c pytorch
 ```bash
 git clone https://github.com/opencompass/opencompass
 cd opencompass
-pip install -r requirments/runtime.txt
 pip install -e .
 ```
 
