@@ -29,8 +29,6 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
 
 - **完善的实验记录及上报机制**：使用配置文件完整记录每一次实验，关键信息有迹可循；支持结果实时上报，第一时间知晓实验情况。
 
-## 模型能力排名
-
 ## 数据集支持
 
 <table align="center">
@@ -170,7 +168,7 @@ OpenCompass 是面向大模型评测的一站式平台，旨在提供一套公�
       </td>
       <td>
 <details open>
-<summary><b>初中、高中、大学、职业考试</b></summary>
+<summary><b>初中/高中/大学/职业考试</b></summary>
 
 - GAOKAO-2023
 - CEval
