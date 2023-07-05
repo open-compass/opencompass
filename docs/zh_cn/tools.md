@@ -2,27 +2,29 @@
 
 ## Prompt Viewer
 
-本工具允许你在不启动完整训练流程的情况下，直接查看模型会接收到的 prompt。
+本工具允许你在不启动完整训练流程的情况下，直接查看生成的 prompt。如果传入的配置仅为数据集配置（如 `configs/datasets/nq/nq_gen_3dcea1.py`），则展示数据集配置中定义的原始 prompt。若为完整的评测配置（包含模型和数据集），则会展示所选模型运行时实际接收到的 prompt。
 
 运行方式：
 
 ```bash
-python tools/prompt_viewer.py [CONFIG_PATH]
+python tools/prompt_viewer.py CONFIG_PATH [-n] [-a] [-p PATTERN]
 ```
+
+- `-n`: 不进入交互模式，默认选择第一个 model （如有）和 dataset。
+- `-a`: 查看配置中所有模型和所有数据集组合接收到的 prompt。
+- `-p PATTERN`: 不进入交互模式，选择所有与传入正则表达式匹配的数据集。
 
 ## Case Analyzer
 
-本工具在已有评测结果的基础上，产出推理错误样本以及带有标注信息的全量样本
+本工具在已有评测结果的基础上，产出推理错误样本以及带有标注信息的全量样本。
 
 运行方式：
 
 ```bash
-python tools/case_analyzer.py [CONFIG_PATH] [-w WORK_DIR]
+python tools/case_analyzer.py CONFIG_PATH [-w WORK_DIR]
 ```
 
 - `-w`：工作路径，默认为 `'./outputs/default'`。
-
-更多细节见 [飞书文档](https://aicarrier.feishu.cn/docx/SgrLdwinion00Kxkzh2czz29nIh)
 
 ## Lark Bot
 
@@ -52,15 +54,15 @@ python tools/case_analyzer.py [CONFIG_PATH] [-w WORK_DIR]
 - 为了避免机器人频繁发消息形成骚扰，默认运行时状态不会自动上报。有需要时，可以通过 `-l` 或 `--lark` 启动状态上报：
 
   ```bash
-  python run.py configs/eval_demo.py -p {PARTITION} -l
+  python run.py configs/eval_demo.py -l
   ```
 
-## API Model Tests
+## API Model Tester
 
-本工具可以快速测试 API Wrapper 的功能是否正常。
+本工具可以快速测试 API 模型的功能是否正常。
 
 运行方式：
 
 ```bash
-python tools/test_api_model.py [CONFIG_PATH]
+python tools/test_api_model.py [CONFIG_PATH] -n
 ```
