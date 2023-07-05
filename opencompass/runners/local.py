@@ -61,7 +61,6 @@ class LocalRunner(BaseRunner):
             gpus = np.ones(torch.cuda.device_count(), dtype=np.bool_)
             pbar = tqdm(total=len(tasks))
             lock = Lock()
-            logger = get_logger()
 
             def submit(task, index):
                 task = TASKS.build(dict(type=self.task_cfg.type, cfg=task))
@@ -113,8 +112,8 @@ class LocalRunner(BaseRunner):
 
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_{index}_params.json'
-        mmengine.dump(task.cfg, param_file)
+        param_file = f'tmp/{os.getpid()}_{index}_params.py'
+        task.cfg.dump(param_file)
 
         # Build up slurm command
         task_cmd_template = task.get_command_template()
@@ -127,12 +126,9 @@ class LocalRunner(BaseRunner):
         logger.debug(f'Running command: {cmd}')
 
         # Run command
-        if self.debug:
-            stdout = None
-        else:
-            out_path = task.get_log_path(file_extension='out')
-            mmengine.mkdir_or_exist(osp.split(out_path)[0])
-            stdout = open(out_path, 'w', encoding='utf-8')
+        out_path = task.get_log_path(file_extension='out')
+        mmengine.mkdir_or_exist(osp.split(out_path)[0])
+        stdout = open(out_path, 'w', encoding='utf-8')
 
         result = subprocess.run(cmd,
                                 shell=True,
