@@ -41,7 +41,7 @@ body:
     attributes:
       label: Environment
       description: |
-        Please run `python -c "import opencompass.utils;import pprint;pprint.pp(dict(opencompass.utils.collect_env()))"` to collect necessary environment information and paste it here.
+        Please run `python -c "import opencompass.utils;import pprint;pprint.pprint(dict(opencompass.utils.collect_env()))"` to collect necessary environment information and paste it here.
       placeholder: |
         ```python
         # The output the above command

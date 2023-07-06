@@ -42,7 +42,7 @@ body:
     attributes:
       label: 环境信息
       description: |
-        请运行指令 `python -c "import opencompass.utils;import pprint;pprint.pp(dict(opencompass.utils.collect_env()))"` 来收集必要的环境信息，并贴在下方。
+        请运行指令 `python -c "import opencompass.utils;import pprint;pprint.pprint(dict(opencompass.utils.collect_env()))"` 来收集必要的环境信息，并贴在下方。
       placeholder: |
         ```python
         # 上述命令的输出
