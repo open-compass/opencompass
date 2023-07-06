@@ -245,7 +245,8 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
     </tr>
     <tr valign="top">
       <td>
-
+        
+- InternLM
 - LLaMA
 - Vicuna
 - Alpaca
