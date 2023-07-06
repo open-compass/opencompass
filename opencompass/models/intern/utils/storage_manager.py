@@ -18,7 +18,7 @@ import torch
 # from utils.checkpoint_utils import Boto3Saver
 from boto3.s3.transfer import TransferConfig
 from botocore.response import StreamingBody
-from InternLM.internlm.utils.common import SingletonMeta
+from internlm.utils.common import SingletonMeta
 
 from .utils import try_import_petrel_client
 
@@ -553,7 +553,7 @@ class StorageManager(metaclass=SingletonMeta):
             if f.split('.')[-1] == 'tmpfile':
                 try:
                     os.remove(f)
-                except BaseException:
+                except BaseException as e:
                     # There is a race on multi-process delete, we don't throw any exceptions.
                     pass
                 else:
