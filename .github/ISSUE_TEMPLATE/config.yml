@@ -1,0 +1,12 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 📚 OpenCompass Documentation (官方文档)
+    url: https://opencompass.readthedocs.io/en/latest/
+    about: Check if your question is answered in docs
+  - name: 💬 General questions (寻求帮助)
+    url: https://github.com/InternLM/OpenCompass/discussions
+    about: Ask general usage questions and discuss with other OpenCompass community members
+  - name: 🌐 Explore OpenCompass (官网)
+    url: https://opencompass.org.cn/
+    about: Get know more about OpenCompass
