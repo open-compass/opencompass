@@ -39,8 +39,6 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 
 [![image](https://github.com/InternLM/OpenCompass/assets/7881589/6b56c297-77c0-4e1a-9acc-24a45c5a734a)](https://opencompass.org.cn/rank)
 
-
-
 ## Dataset Support
 
 <table align="center">
@@ -245,7 +243,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
     </tr>
     <tr valign="top">
       <td>
-        
+
 - InternLM
 - LLaMA
 - Vicuna

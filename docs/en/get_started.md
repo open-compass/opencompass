@@ -107,7 +107,7 @@ models = [llama_7b]
 </details>
 
 <details>
-<summary>Lauch Evalution</summary>
+<summary>Launch Evaluation</summary>
 
 First, we can start the task in **debug mode** to check for any exceptions in model loading, dataset reading, or incorrect cache usage.
 
