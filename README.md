@@ -7,6 +7,7 @@
 [![license](https://img.shields.io/github/license/IntenLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
 [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/)
 
+[🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/en/latest/) |
 [🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started/install.html) |
 [🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
