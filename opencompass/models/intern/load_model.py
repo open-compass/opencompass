@@ -4,12 +4,11 @@ import os
 import os.path as osp
 from typing import Optional
 
+import internlm
 import torch
 from fairscale.nn.model_parallel.initialize import initialize_model_parallel
-from InternLM import internlm
-from InternLM.internlm.core.context import ParallelMode
-from InternLM.internlm.core.context.parallel_context import \
-    global_context as gpc
+from internlm.core.context import ParallelMode
+from internlm.core.context import global_context as gpc
 from sentencepiece import SentencePieceProcessor
 
 from .generation_tools import LLMGenerator, LLMTokenizer
@@ -39,21 +38,25 @@ def load_llm(checkpoint,
              max_seq_len=2048,
              tokenizer_path: Optional[str] = None,
              tokenizer_type: Optional[str] = None,
-             module=None):
+             module=None,
+             model_config_path=None):
     proxy_off()
     client = Client()
 
     # init colossalai paralleling config
     WORLD_SIZE = os.getenv('WORLD_SIZE')
-    if WORLD_SIZE == None:
+    if WORLD_SIZE is None:
         print('Supposed to launch with torchrun!')
         exit()
-    TP = int(WORLD_SIZE)
+    # TP = int(WORLD_SIZE)
     ckpts = checkpoint.split(';')
     assert ckpts
     ckpt = str(ckpts[0])
-    # parameter spliting:
-    if 's3://' in ckpt:
+    # parameter splitting:
+    if model_config_path is not None:
+        model_name = osp.realpath(ckpt).split('/')[-1]
+        cur_iter = None
+    elif 's3://' in ckpt:
         # We assume that the path looks like the following:
         # opennlplab_hdd:s3://opennlplab_hdd/llm_it/0419/sft_7132k_flan64_8196/1399
         model_name, cur_iter = osp.realpath(ckpt).split('/')[-2:]
@@ -70,8 +73,8 @@ def load_llm(checkpoint,
             if ckpt.startswith('/cpfs01/'):
                 cur_iter = 0
             else:
-                print('Haha, read the code.')
-                exit()
+                print('Something mistakes')
+                exit(-1)
 
         # 'model_tp0_pp*.pt' ~ 'model_tp7_pp*.pt'
         save_tp = 0
@@ -80,7 +83,14 @@ def load_llm(checkpoint,
                 save_tp = max(save_tp, int(file[8:].split('_')[0]))
         save_tp += 1
 
-    internlm.launch_from_torch(config={'parallel': dict(zero1=1, )}, seed=42)
+    # internlm.launch_from_torch(
+    #     config={
+    #         "parallel": dict(
+    #             zero1=1,
+    #         )
+    #     }, seed=42)
+    print(model_config_path)
+    internlm.launch_from_torch(config=model_config_path, seed=42)
 
     # print args info
     tp_rank = gpc.get_local_rank(ParallelMode.TENSOR)
@@ -92,14 +102,19 @@ def load_llm(checkpoint,
         # TODO: delete these hardcoded mapping
         tokenizer_path, tokenizer_type = model_name2tokenizer_info(model_name)
         if 'llamav4.model' in tokenizer_path:
-            tokenizer_path = '/mnt/petrelfs/share_data/yanhang/tokenizes/llamav4.model'  # tmp change
+            tokenizer_path = \
+                '/mnt/petrelfs/share_data/yanhang/tokenizes/llamav4.model'
     tokenizer.load(tokenizer_path)
     tokenizer = LLMTokenizer(tokenizer,
                              max_seq_len=max_seq_len,
                              tokenizer_type=tokenizer_type)
 
-    if cur_iter == None:
-        # local origin llama
+    if model_config_path is not None:
+        print('Beginning to load model_config', flush=True)
+        update_config = gpc.config.model
+        print('Config done!', flush=True)
+    elif cur_iter is None:
+        print('Beginning to load model_config', flush=True)
         assert ckpt.startswith('/mnt/petrelfs/share_data/llm_llama/')
         config_path = os.path.join(ckpt, 'params.json')
         with open(config_path, 'r') as f:

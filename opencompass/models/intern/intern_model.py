@@ -19,6 +19,7 @@ class intern_model(BaseModel):
                  max_seq_len: int = 2048,
                  tokenizer_only: bool = False,
                  tokenizer_path: Optional[str] = None,
+                 model_config: Optional[str] = None,
                  tokenizer_type: Optional[str] = None,
                  meta_template: Optional[Dict] = None):
         if tokenizer_only:
@@ -29,7 +30,8 @@ class intern_model(BaseModel):
             self._load_model(path=path,
                              max_seq_len=max_seq_len,
                              tokenizer_path=tokenizer_path,
-                             tokenizer_type=tokenizer_type)
+                             tokenizer_type=tokenizer_type,
+                             model_config=model_config)
         self.template_parser = LMTemplateParser(meta_template)
         self.eos_token_id = None
         if meta_template and 'eos_token_id' in meta_template:
@@ -39,21 +41,20 @@ class intern_model(BaseModel):
                     path: str,
                     max_seq_len: int,
                     tokenizer_path: Optional[str] = None,
-                    tokenizer_type: Optional[str] = None):
+                    tokenizer_type: Optional[str] = None,
+                    model_config: Optional[str] = None):
 
         from internlm.model import build_model_with_cfg
 
         from opencompass.models.intern.load_model import load_llm
-
-        # module = MODEL_INITIALIZER.get_module("INTERNLM")
-        module = build_model_with_cfg
 
         self.model, self.tokenizer, self.generator, _ = load_llm(
             path,
             max_seq_len,
             tokenizer_path=tokenizer_path,
             tokenizer_type=tokenizer_type,
-            module=module)
+            module=build_model_with_cfg,
+            model_config_path=model_config)
 
     def _load_tokenizer(self, tokenizer_path: str, tokenizer_type: str,
                         max_seq_len: int):

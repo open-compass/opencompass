@@ -3,9 +3,8 @@ import os
 import re
 
 import torch
-from InternLM.internlm.core.context import IS_TENSOR_PARALLEL, ParallelMode
-from InternLM.internlm.core.context.parallel_context import \
-    global_context as gpc
+from internlm.core.context import ParallelMode
+from internlm.core.context import global_context as gpc
 
 from .storage_manager import get_storage_manager
 from .utils import try_import_petrel_client
