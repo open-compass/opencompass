@@ -93,7 +93,7 @@ class CLPInferencer:
                   output_json_filename: Optional[str] = None,
                   normalizing_str: Optional[str] = None) -> List:
         # 1. Preparation for output logs
-        output_handler = PPLInferencerOutputHandler(self.accelerator)
+        output_handler = PPLInferencerOutputHandler()
 
         ice = []
 
@@ -122,9 +122,17 @@ class CLPInferencer:
             choice_target_ids = []
             # TODO: Hard code temperaily, need to modified here
             choices = retriever.test_ds[0]['choices']
-            choice_ids = [
-                self.model.tokenizer.encode(c, False, False) for c in choices
-            ]
+            try:
+                choice_ids = [
+                    self.model.tokenizer.encode(c, False, False)
+                    for c in choices
+                ]
+            except ValueError:
+                choice_ids = [self.model.tokenizer.encode(c) for c in choices]
+                if self.model.tokenizer.add_bos_token:
+                    choice_ids = [c[1:] for c in choice_ids]
+                if self.model.tokenizer.add_eos_token:
+                    choice_ids = [c[:-1] for c in choice_ids]
             if isinstance(choice_ids[0], list):
                 # in case tokenizer returns list for single token
                 choice_ids = list(itertools.chain(*choice_ids))
@@ -185,15 +193,10 @@ class CLPInferencer:
                     index = index + 1
 
         # 5. Output
-        os.makedirs(output_json_filepath, exist_ok=True)
-        output_handler.subprocess_write_to_json(output_json_filepath,
-                                                output_json_filename)
-        if self.accelerator is not None:
-            self.accelerator.wait_for_everyone()
-        output_handler.merge_to_main_process(output_json_filepath,
-                                             output_json_filename)
-        output_handler.write_to_json(output_json_filepath,
-                                     output_json_filename)
+        if self.is_main_process:
+            os.makedirs(output_json_filepath, exist_ok=True)
+            output_handler.write_to_json(output_json_filepath,
+                                         output_json_filename)
 
         return [
             sample['prediction']
@@ -206,8 +209,10 @@ class CLPInferencer:
                         choice_ids,
                         mask_length=None):
         # TODO: support multiple tokens
-        outputs, _ = self.model.generator.get_logits(input_texts)
-
+        try:
+            outputs, _ = self.model.generator.get_logits(input_texts)
+        except AttributeError:
+            outputs, _ = self.model.get_logits(input_texts)
         shift_logits = outputs[..., :-1, :].contiguous()
 
         shift_logits = F.log_softmax(shift_logits, dim=-1)

@@ -1,4 +1,4 @@
-from datasets import load_dataset
+from datasets import Dataset, DatasetDict, load_dataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -11,7 +11,17 @@ class RealToxicPromptsDataset(BaseDataset):
     @staticmethod
     def load(**kwargs):
         challenging_subset = kwargs.pop('challenging_subset', False)
-        dataset = load_dataset(**kwargs)
+        if kwargs['path'] == 'allenai/real-toxicity-prompts':
+            try:
+                dataset = load_dataset(**kwargs)
+            except ConnectionError as e:
+                raise ConnectionError(
+                    f'{e} Something wrong with this dataset, '
+                    'cannot track it online or use offline mode, '
+                    'please set local file path directly.')
+        else:
+            dataset = Dataset.from_file(kwargs.pop('path'))
+            dataset = DatasetDict(train=dataset)
 
         def preprocess(example):
 

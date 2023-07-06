@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import BleuEvaluator
 from opencompass.datasets import SummScreenDataset
+from opencompass.utils.text_postprocessors import general_cn_postprocess
 
 summscreen_reader_cfg = dict(
     input_columns='content',
@@ -33,8 +34,8 @@ summscreen_infer_cfg = dict(
 summscreen_eval_cfg = dict(
     evaluator=dict(type=BleuEvaluator),
     pred_role='BOT',
-    pred_postprocessor=dict(type='general_cn'),
-    dataset_postprocessor=dict(type='general_cn'))
+    pred_postprocessor=dict(type=general_cn_postprocess),
+    dataset_postprocessor=dict(type=general_cn_postprocess))
 
 summscreen_datasets = [
     dict(

@@ -33,12 +33,11 @@ class HumanEvaluator(BaseEvaluator):
         with tempfile.TemporaryDirectory() as tmp_dir:
             out_dir = osp.join(tmp_dir, 'human_eval.json')
             self.write_jsonl(out_dir, predictions)
-            score = self.eval(
-                out_dir,
-                self.k,
-                n_workers=4,
-                timeout=3.0,
-                problem_file=self.HUMAN_EVAL)
+            score = self.eval(out_dir,
+                              self.k,
+                              n_workers=4,
+                              timeout=3.0,
+                              problem_file=self.HUMAN_EVAL)
             return {f'humaneval_{k}': score[k] * 100 for k in score}
 
 
@@ -47,7 +46,7 @@ def humaneval_postprocess(text: str) -> str:
     text = text.split('\n\n')[0]
     if '```' in text:
         text = text.split('```')[1]
-    if text.startswith('def'):
+    if text.strip().startswith('def'):
         text = '\n'.join(text.split('\n')[1:])
     if not text.startswith('    '):
         if text.startswith(' '):

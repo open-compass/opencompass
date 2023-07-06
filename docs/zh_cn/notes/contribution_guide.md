@@ -48,7 +48,7 @@ yapf和isort的样式配置可以在[setup.cfg](https://github.com/OpenCompass/b
 ## 预提交钩子 (Pre-commit Hook)
 
 我们使用[预提交钩子](https://pre-commit.com/)用于在每次提交时自动检查与格式化`flake8`、`yapf`、`isort`、`trailing whitespaces`、`markdown files`，
-修复`end-of-files`、`double-quoted-strings`、`python-encoding-pragma`、`mixed-line-ending`，并自动排序`requirments.txt`。预提交钩子的配置存储在[.pre-commit-config]()中。
+修复`end-of-files`、`double-quoted-strings`、`python-encoding-pragma`、`mixed-line-ending`，并自动排序`requirements.txt`。预提交钩子的配置存储在[.pre-commit-config](<>)中。
 
 在你克隆仓库后，你需要安装并初始化预提交钩子。
 

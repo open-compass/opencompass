@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import MDLRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import commonsenseqaDataset
+from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 commonsenseqa_reader_cfg = dict(
     input_columns=["question", "A", "B", "C", "D", "E"],
@@ -44,7 +45,7 @@ commonsenseqa_infer_cfg = dict(
 
 commonsenseqa_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_postprocessor=dict(type="first-capital"),
+    pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 commonsenseqa_datasets = [

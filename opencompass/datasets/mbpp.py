@@ -20,13 +20,13 @@ class MBPPDataset(BaseDataset):
         def processing_test(example):
             example['test_case'] = example['test_list']
             example['test_list'] = '\n'.join(example['test_list'])
+            example['test_list_2'] = example['test_list']
             return example
 
-        train = load_dataset(
-            'json', data_files=path, split='train[:10]').map(processing_test)
-        test = load_dataset(
-            'json', data_files=path,
-            split='train[10:510]').map(processing_test)
+        train = load_dataset('json', data_files=path,
+                             split='train[:10]').map(processing_test)
+        test = load_dataset('json', data_files=path,
+                            split='train[10:510]').map(processing_test)
         return DatasetDict({'train': train, 'test': test})
 
 

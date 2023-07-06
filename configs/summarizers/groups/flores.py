@@ -23,3 +23,9 @@ for _lang_serie in _flores_lang_map:
         'name': f'flores_100_English_{_lang_serie}',
         'subsets': [f'flores_100_eng-{lang_name}' for lang_name in _flores_lang_map[_lang_serie]]
     })
+
+flores_summary_groups.append({
+    'name': 'flores_100',
+    'subsets': [f'flores_100_{lang_name}-eng' for lang_name in sum(_flores_lang_map.values(), [])] + \
+               [f'flores_100_eng-{lang_name}' for lang_name in sum(_flores_lang_map.values(), [])]
+})

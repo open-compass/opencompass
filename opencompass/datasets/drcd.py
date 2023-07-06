@@ -2,7 +2,7 @@ import json
 
 from datasets import Dataset
 
-from opencompass.registry import LOAD_DATASET
+from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from .base import BaseDataset
 
@@ -38,3 +38,10 @@ class DRCDDataset(BaseDataset):
         })
 
         return dataset
+
+
+@TEXT_POSTPROCESSORS.register_module('drcd')
+def drcd_postprocess(text: str) -> str:
+    if '答案是' in text:
+        text = text.split('答案是')[1]
+    return text

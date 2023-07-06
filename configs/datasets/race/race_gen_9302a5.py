@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import RaceDataset
+from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 race_reader_cfg = dict(
     input_columns=['article', 'question', 'A', 'B', 'C', 'D'],
@@ -18,7 +19,7 @@ race_infer_cfg = dict(
 
 race_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_postprocessor=dict(type='first-capital'))
+    pred_postprocessor=dict(type=first_capital_postprocess))
 
 race_datasets = [
     dict(

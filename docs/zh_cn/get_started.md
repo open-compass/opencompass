@@ -24,7 +24,7 @@ pip install -e .
 ```
 git clone https://github.com/openai/human-eval.git
 cd human-eval
-pip install -r requirments.txt
+pip install -r requirements.txt
 pip install -e .
 cd ..
 ```

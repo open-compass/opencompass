@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import CEvalDataset
+from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 ceval_subject_mapping = {
     "computer_network":
@@ -166,7 +167,7 @@ for _split in ["val", "test"]:
 
         ceval_eval_cfg = dict(
             evaluator=dict(type=AccEvaluator),
-            pred_postprocessor=dict(type='first-capital'))
+            pred_postprocessor=dict(type=first_capital_postprocess))
 
         ceval_datasets.append(
             dict(

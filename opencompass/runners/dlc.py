@@ -111,7 +111,6 @@ class DLCRunner(BaseRunner):
                f' --worker_gpu {num_gpus}'
                f' --worker_memory {max(num_gpus * 32, 48)}'
                f" --worker_image {self.aliyun_cfg['worker_image']}"
-               ' --priority 3'
                ' --interactive')
 
         logger = get_logger()

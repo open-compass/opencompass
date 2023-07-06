@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import siqaDataset_V2
+from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 siqa_reader_cfg = dict(
     input_columns=["context", "question", "answerA", "answerB", "answerC"],
@@ -28,7 +29,7 @@ siqa_infer_cfg = dict(
 siqa_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
     pred_role="BOT",
-    pred_postprocessor=dict(type="first-capital"),
+    pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 siqa_datasets = [

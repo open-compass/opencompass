@@ -4,7 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MBPPDataset, MBPPEvaluator
 
 mbpp_reader_cfg = dict(
-    input_columns=['text', 'test_list'], output_column='code')
+    input_columns=['text', 'test_list'], output_column='test_list_2')
 
 mbpp_infer_cfg = dict(
     prompt_template=dict(
