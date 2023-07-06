@@ -296,7 +296,7 @@ unzip OpenCompassData.zip
 
 ## 评测
 
-请阅读[快速上手](https://opencompass.readthedocs.io/zh_cn/latest/get_started.html)了解如何运行一个评测任务。
+请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id2)了解如何运行一个评测任务。
 
 ## 致谢
 
