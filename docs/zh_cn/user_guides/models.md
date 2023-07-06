@@ -15,8 +15,8 @@
 如下，为一个示例的 HuggingFace 模型配置文件：
 
 ```python
-# 使用 HuggingFace 评测 HuggingFace 中 AutoModel 支持的模型
-# 使用 HuggingFaceCausalLM 评测 HuggingFace 中 AutoModelForCausalLM 支持的模型
+# 使用 `HuggingFace` 评测 HuggingFace 中 AutoModel 支持的模型
+# 使用 `HuggingFaceCausalLM` 评测 HuggingFace 中 AutoModelForCausalLM 支持的模型
 from opencompass.models import HuggingFaceCausalLM
 
 models = [
@@ -27,6 +27,7 @@ models = [
         tokenizer_path='huggyllama/llama-7b',
         tokenizer_kwargs=dict(padding_side='left', truncation_side='left'),
         max_seq_len=2048,
+        batch_padding=False,
         # 以下参数为各类模型都有的参数，非 `HuggingFaceCausalLM` 的初始化参数
         abbr='llama-7b',            # 模型简称，用于结果展示
         max_out_len=100,            # 最长生成 token 数
@@ -38,15 +39,31 @@ models = [
 
 对以上一些参数的说明：
 
+- `batch_padding=False`：如为 False，会对一个批次的样本进行逐一推理；如为 True，则会对一个批次的样本进行填充，
+  组成一个 batch 进行推理。对于部分模型，这样的填充可能导致意料之外的结果；如果评测的模型支持样本填充，
+  则可以将该参数设为 True，以加速推理。
 - `padding_side='left'`：在左侧进行填充，因为不是所有模型都支持填充，在右侧进行填充可能会干扰模型的输出。
-- `truncation_side='left'`：在左侧进行截断，评测输入的 prompt 通常包括上下文样本 prompt 和输入 prompt 两部分，如果截断右侧的输入 prompt，可能导致生成模型的输入和预期格式不符，因此如有必要，应对左侧进行截断。
+- `truncation_side='left'`：在左侧进行截断，评测输入的 prompt 通常包括上下文样本 prompt 和输入 prompt 两部分，
+  如果截断右侧的输入 prompt，可能导致生成模型的输入和预期格式不符，因此如有必要，应对左侧进行截断。
+
+在评测时，OpenCompass 会使用配置文件中的 `type` 与各个初始化参数实例化用于评测的模型，
+其他参数则用于推理及总结等过程中，与模型相关的配置。例如上述配置文件，我们会在评测时进行如下实例化过程：
+
+```python
+model = HuggingFaceCausalLM(
+    path='huggyllama/llama-7b',
+    tokenizer_path='huggyllama/llama-7b',
+    tokenizer_kwargs=dict(padding_side='left', truncation_side='left'),
+    max_seq_len=2048,
+)
+```
 
 # 基于 API 的模型
 
 OpenCompass 目前支持以下基于 API 的模型推理：
 
 - OpenAI（`opencompass.models.OpenAI`）
-- Comming soon
+- Coming soon
 
 以下，我们以 OpenAI 的配置文件为例，模型如何在配置文件中使用基于 API 的模型。
 
