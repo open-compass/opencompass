@@ -3,7 +3,7 @@
 OpenCompass 使用 OpenMMLab 新式风格的配置文件。如果你之前熟悉 OpenMMLab 风格的配置文件，可以直接阅读
 [纯 Python 风格的配置文件（Beta）](https://mmengine.readthedocs.io/zh_CN/latest/advanced_tutorials/config.html#python-beta)
 了解新式配置文件与原配置文件的区别。如果你之前没有接触过 OpenMMLab 风格的配置文件，
-下面我将会用一个简单的例子来介绍配置文件的使用。请确保你安装了最新版本的 MMEngine (>=0.8.1)，以支持新式风格的配置文件。
+下面我将会用一个简单的例子来介绍配置文件的使用。请确保你安装了最新版本的 MMEngine，以支持新式风格的配置文件。
 
 ## 基本格式
 
@@ -28,13 +28,13 @@ models = [
 ]
 ```
 
-当读取配置文件时，使用 MMEngine 中的 `Config.fromfile` 进行解析：
+当读取配置文件时，使用 MMEngine 中的 `Config.fromfile` 进行解析。
 
 ```python
 >>> from mmengine.config import Config
 >>> cfg = Config.fromfile('./model_cfg.py')
->>> print(cfg.models[0].type)
-<class 'opencompass.models.huggingface.HuggingFaceCausalLM'>
+>>> print(cfg.models[0])
+{'type': HuggingFaceCausalLM, 'path': 'huggyllama/llama-7b', 'model_kwargs': {'device_map': 'auto'}, ...}
 ```
 
 ## 继承机制
@@ -55,8 +55,8 @@ with read_base():
 ```python
 >>> from mmengine.config import Config
 >>> cfg = Config.fromfile('./inherit.py')
->>> print(cfg.models[0].type)
-<class 'opencompass.models.huggingface.HuggingFaceCausalLM'>
+>>> print(cfg.models[0])
+{'type': HuggingFaceCausalLM, 'path': 'huggyllama/llama-7b', 'model_kwargs': {'device_map': 'auto'}, ...}
 ```
 
 ## 评测配置文件示例
@@ -84,7 +84,7 @@ models = [
         tokenizer_path='huggyllama/llama-7b',
         tokenizer_kwargs=dict(padding_side='left', truncation_side='left'),
         max_seq_len=2048,
-        # 以下参数为各类模型都有的参数，非 HuggingFaceCausalLM 的初始化参数
+        # 以下参数为各类模型都必须设定的参数，非 HuggingFaceCausalLM 的初始化参数
         abbr='llama-7b',            # 模型简称，用于结果展示
         max_out_len=100,            # 最长生成 token 数
         batch_size=16,              # 批次大小
@@ -96,7 +96,7 @@ models = [
 ## 数据集配置文件示例
 
 以上示例配置文件中，我们直接以继承的方式获取了数据集相关的配置。接下来，
-我们会以 PIQA 数据集配置文件为示例，展示如何数据集配置文件中各个字段的含义。
+我们会以 PIQA 数据集配置文件为示例，展示数据集配置文件中各个字段的含义。
 如果你不打算修改模型测试的 prompt，或者添加新的数据集，则可以跳过这一节的介绍。
 
 PIQA 数据集 [配置文件](https://github.com/InternLM/opencompass/blob/main/configs/datasets/piqa/piqa_ppl_1cf9f0.py)
@@ -147,6 +147,7 @@ piqa_datasets = [
         reader_cfg=piqa_reader_cfg,
         infer_cfg=piqa_infer_cfg,
         eval_cfg=piqa_eval_cfg)
+]
 ```
 
 其中 **Prompt 生成配置** 的详细配置方式，可以参见 [Prompt 模板](../prompt/prompt_template.md)。

@@ -1,11 +1,11 @@
 # Learn About Config
 
 OpenCompass uses the OpenMMLab modern style configuration files. If you are familiar with the OpenMMLab style
-configuration files, you can directly refer to 
+configuration files, you can directly refer to
 [A Pure Python style Configuration File (Beta)](https://mmengine.readthedocs.io/en/latest/advanced_tutorials/config.html#a-pure-python-style-configuration-file-beta)
 to understand the differences between the new-style and original configuration files. If you have not
 encountered OpenMMLab style configuration files before, I will explain the usage of configuration files using
-a simple example. Make sure you have installed the latest version of MMEngine (>=0.8.1) to support the
+a simple example. Make sure you have installed the latest version of MMEngine to support the
 new-style configuration files.
 
 ## Basic Format
@@ -36,8 +36,8 @@ When reading the configuration file, use `Config.fromfile` from MMEngine for par
 ```python
 >>> from mmengine.config import Config
 >>> cfg = Config.fromfile('./model_cfg.py')
->>> print(cfg.models[0].type)
-<class 'opencompass.models.huggingface.HuggingFaceCausalLM'>
+>>> print(cfg.models[0])
+{'type': HuggingFaceCausalLM, 'path': 'huggyllama/llama-7b', 'model_kwargs': {'device_map': 'auto'}, ...}
 ```
 
 ## Inheritance Mechanism
@@ -58,8 +58,8 @@ Parse the configuration file using `Config.fromfile`:
 ```python
 >>> from mmengine.config import Config
 >>> cfg = Config.fromfile('./inherit.py')
->>> print(cfg.models[0].type)
-<class 'opencompass.models.huggingface.HuggingFaceCausalLM'>
+>>> print(cfg.models[0])
+{'type': HuggingFaceCausalLM, 'path': 'huggyllama/llama-7b', 'model_kwargs': {'device_map': 'auto'}, ...}
 ```
 
 ## Evaluation Configuration Example
