@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import RougeEvaluator
-from opencompass.datasets import XLSUMDataset
+from opencompass.datasets import XLSUMDataset, Xsum_postprocess
 
 XLSum_reader_cfg = dict(input_columns=['text'], output_column='summary')
 
@@ -16,7 +16,7 @@ XLSum_infer_cfg = dict(
 
 XLSum_eval_cfg = dict(
     evaluator=dict(type=RougeEvaluator),
-    pred_postprocessor=dict(type='Xsum'),
+    pred_postprocessor=dict(type=Xsum_postprocess),
 )
 
 XLSum_datasets = [

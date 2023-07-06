@@ -1,0 +1,59 @@
+name: 🐞 报告 Bug
+description: 报告你在使用中遇到的不合预期的情况
+labels: ["bug"]
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        我们推荐使用英语模板 Bug report，以便你的问题帮助更多人。
+
+        如果你已经有了解决方案，我们非常欢迎你直接创建一个新的 PR 来解决这个问题。创建 PR 的流程可以参考[文档](https://opencompass.readthedocs.io/zh_CN/master/community/CONTRIBUTING.html)。
+        如果你需要我们的帮助，请填写以下内容帮助我们定位 Bug。
+
+
+  - type: textarea
+    id: describe
+    validations:
+      required: true
+    attributes:
+      label: 描述该错误
+      description: |
+        请简要说明你遇到的错误。如果可以的话，请提供一个简短的代码片段帮助我们复现这一错误。
+      placeholder: |
+        问题的简要说明
+
+        ```python
+        # 复现错误的代码片段
+        ```
+
+        ```shell
+        # 发生错误时你的运行命令
+        ```
+
+        ```
+        错误信息和日志，请展示全部的错误日志和 traceback
+        ```
+
+  - type: textarea
+    id: environment
+    validations:
+      required: true
+    attributes:
+      label: 环境信息
+      description: |
+        请运行指令 `python -c "import opencompass.utils;import pprint;pprint.pprint(dict(opencompass.utils.collect_env()))"` 来收集必要的环境信息，并贴在下方。
+      placeholder: |
+        ```python
+        # 上述命令的输出
+        ```
+
+  - type: textarea
+    id: other
+    attributes:
+      label: 其他信息
+      description: |
+        告诉我们其他有价值的信息。
+
+        1. 你是否对代码或配置文件做了任何改动？
+        2. 你认为可能的原因是什么？

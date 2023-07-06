@@ -21,10 +21,10 @@ pip install -e .
 
 If you want to perform evaluations on the humaneval dataset, follow these steps.
 
-```
+```bash
 git clone https://github.com/openai/human-eval.git
 cd human-eval
-pip install -r requirments.txt
+pip install -r requirements.txt
 pip install -e .
 cd ..
 ```
@@ -39,11 +39,30 @@ resources that meet the minimum requirements for LLaMA-7B.
 
 ## Prepare the Dataset
 
-Create a `data` folder in the repository directory and place the dataset files in the `data` folder.
+To start a simple evaluation task using OpenCompass, you generally need to follow three steps:
 
-## Prepare the Evaluation Configuration File
+1. **Prepare dataset configurations** - [`configs/datasets`](https://github.com/open-mmlab/OpenCompass/tree/main/configs/datasets) provides over 50 datasets supported by OpenCompass.
+2. **Prepare model configurations** - The [`configs/models`](https://github.com/open-mmlab/OpenCompass/tree/main/configs/models) contains sample configuration files for already supported large models including those based on HuggingFace and similar APIs like ChatGPT.
+3. **Use the 'run' script to launch** - Supported commands include running locally or on Slurm, testing multiple datasets and models at once.
 
-Create the following configuration file `configs/llama.py`:
+In this example, we will demonstrate how to test the performance of pre-trained base models from LLaMA-7B on two benchmark tasks, SIQA and PIQA. Before proceeding, ensure that you have installed OpenCompass and have access to sufficient computing resources with GPU support that meet the minimum requirements for LLaMA-7B.
+
+To initiate the evaluation task on your local machine, use the following command:
+
+```bash
+python run.py configs/eval_llama_7b.py --debug
+```
+
+Here's a detailed step-by-step explanation of this case study:
+
+## Step by step
+
+<details>
+<summary>prepare datasets</summary>
+
+The SiQA and PiQA benchmarks can be automatically downloaded through their respective links here and here, so no manual downloading is required here. However, some other datasets may require manual downloads. Please refer to the documentation [Prepare Datasets](docs/zh_cn/user_guides/dataset_prepare.md) for more information.
+
+Create a '.py' configuration file and add the following content:
 
 ```python
 from mmengine.config import read_base
@@ -55,12 +74,20 @@ with read_base():
 
 # Concatenate the datasets to be evaluated into the datasets field
 datasets = [*piqa_datasets, *siqa_datasets]
+```
 
+</details>
+
+<details>
+<summary>prepare models</summary>
+
+The pretrained model 'huggyllama/llama-7b' from HuggingFace supports automatic downloading. Add the following line to your configuration file:
+
+```python
 # Evaluate models supported by HuggingFace's `AutoModelForCausalLM` using `HuggingFaceCausalLM`
 from opencompass.models import HuggingFaceCausalLM
 
-models = [
-    dict(
+llama_7b = dict(
         type=HuggingFaceCausalLM,
         # Initialization parameters for `HuggingFaceCausalLM`
         path='huggyllama/llama-7b',
@@ -73,10 +100,14 @@ models = [
         batch_size=16,
         run_cfg=dict(num_gpus=1),   # Run configuration for specifying resource requirements
     )
-]
+
+models = [llama_7b]
 ```
 
-## Start the Evaluation
+</details>
+
+<details>
+<summary>Lauch Evalution</summary>
 
 First, we can start the task in **debug mode** to check for any exceptions in model loading, dataset reading, or incorrect cache usage.
 
@@ -109,6 +140,8 @@ If you are not performing the evaluation on your local machine but using a Slurm
 - `--partition my_part`: Slurm cluster partition.
 - `--retry 2`: Number of retries for failed tasks.
 
+</details>
+
 ## Obtaining Evaluation Results
 
 After the evaluation is complete, the evaluation results table will be printed as follows:
@@ -120,4 +153,26 @@ piqa       1cf9f0     accuracy  ppl          77.75
 siqa       e78df3     accuracy  gen          36.08
 ```
 
-Additionally, the text and CSV format result files will be saved in the `summary` folder of the result directory.
+All run outputs will default to `outputs/default/` directory with following structure:
+
+```markdown
+outputs/default/
+├── 20200220_120000
+├── ...
+├── 20230220_183030
+│   ├── configs
+│   ├── logs
+│   │   ├── eval
+│   │   └── infer
+│   ├── predictions
+│   │   └── MODEL1
+│   └── results
+│       └── MODEL1
+```
+
+Inside each timestamp folder there would be below items:
+
+- configs folder, used for storing configuration files corresponding to this output dir using current time stamp;
+- logs folder, used for storing inference and evaluation log files of different models;
+- predictions folder, used for storing inference json result file(s), grouped by model;
+- results folder, used for storing evaluation json result file(s), grouped by model.

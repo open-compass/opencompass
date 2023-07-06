@@ -18,10 +18,9 @@ race_infer_cfg = dict(
                     prompt=
                     "Read the article, and answer the question by replying A, B, C or D.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}"
                 ),
-                dict(role="BOT", prompt=ans_token),
+                dict(role="BOT", prompt=f'A: {ans}'),
             ])
-            for ans, ans_token in [["A", "{A}"], ["B", "{B}"], ["C", "{C}"],
-                                   ["D", "{D}"]]
+            for ans in ['A', 'B', 'C', 'D']
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

@@ -7,6 +7,7 @@ from datetime import datetime
 from mmengine.config import Config
 
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
+from opencompass.registry import PARTITIONERS, RUNNERS
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.utils import LarkReporter, Summarizer, get_logger
 
@@ -14,20 +15,21 @@ from opencompass.utils import LarkReporter, Summarizer, get_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Run an evaluation task')
     parser.add_argument('config', help='Train config file path')
-    # add mutually exclusive args `--slurm` `--dlc`, default to local runner
-    luach_method = parser.add_mutually_exclusive_group()
-    luach_method.add_argument('--slurm',
-                              action='store_true',
-                              default=False,
-                              help='Whether to use srun to launch tasks, if '
-                              'True, `--partition(-p)` must be set. Defaults'
-                              ' to False')
-    luach_method.add_argument('--dlc',
-                              action='store_true',
-                              default=False,
-                              help='Whether to use dlc to launch tasks, if '
-                              'True, `--aliyun-cfg` must be set. Defaults'
-                              ' to False')
+    # add mutually exclusive args `--slurm` `--dlc`, defaults to local runner
+    # if "infer" or "eval" not specified
+    launch_method = parser.add_mutually_exclusive_group()
+    launch_method.add_argument('--slurm',
+                               action='store_true',
+                               default=False,
+                               help='Whether to force tasks to run with srun. '
+                               'If True, `--partition(-p)` must be set. '
+                               'Defaults to False')
+    launch_method.add_argument('--dlc',
+                               action='store_true',
+                               default=False,
+                               help='Whether to force tasks to run on dlc. If '
+                               'True, `--aliyun-cfg` must be set. Defaults'
+                               ' to False')
     # add general args
     parser.add_argument('--debug',
                         help='Debug mode, in which scheduler will run tasks '
@@ -56,10 +58,11 @@ def parse_args():
                         'also be a specific timestamp, e.g. 20230516_144254'),
     parser.add_argument('-w',
                         '--work-dir',
-                        help='Work path, all the outputs will be saved in '
-                        'this path, including the slurm logs, the evaluation'
-                        ' results, the summary results, etc. If not specified,'
-                        ' the work_dir will be set to None',
+                        help='Work path, all the outputs will be '
+                        'saved in this path, including the slurm logs, '
+                        'the evaluation results, the summary results, etc.'
+                        'If not specified, the work_dir will be set to '
+                        './outputs/default.',
                         default=None,
                         type=str)
     parser.add_argument('-l',
@@ -68,21 +71,26 @@ def parse_args():
                         action='store_true',
                         default=False)
     parser.add_argument('--max-partition-size',
-                        help='The maximum size of a task.',
+                        help='The maximum size of an infer task. Only '
+                        'effective when "infer" is missing from the config.',
                         type=int,
                         default=2000),
     parser.add_argument(
         '--gen-task-coef',
-        help='The dataset cost measurement coefficient for generation tasks',
+        help='The dataset cost measurement coefficient for generation tasks, '
+        'Only effective when "infer" is missing from the config.',
         type=int,
         default=20)
     parser.add_argument('--max-num-workers',
-                        help='Max number of workers to run in parallel.',
+                        help='Max number of workers to run in parallel. '
+                        'Will be overrideen by the "max_num_workers" argument '
+                        'in the config.',
                         type=int,
                         default=32)
     parser.add_argument(
         '--retry',
-        help='Number of retries if the job failed when using slurm or dlc.',
+        help='Number of retries if the job failed when using slurm or dlc. '
+        'Will be overrideen by the "retry" argument in the config.',
         type=int,
         default=2)
     # set srun args
@@ -97,14 +105,14 @@ def parse_args():
             '--partition(-p) must be set if you want to use slurm')
     if args.dlc:
         assert os.path.exists(args.aliyun_cfg), (
-            'When luaching tasks using dlc, it needs to be configured'
+            'When launching tasks using dlc, it needs to be configured '
             'in "~/.aliyun.cfg", or use "--aliyun-cfg $ALiYun-CFG_Path"'
             ' to specify a new path.')
     return args
 
 
 def parse_slurm_args(slurm_parser):
-    """these args are all for slurm launch."""
+    """These args are all for slurm launch."""
     slurm_parser.add_argument('-p',
                               '--partition',
                               help='Slurm partition name',
@@ -113,12 +121,12 @@ def parse_slurm_args(slurm_parser):
     slurm_parser.add_argument('-q',
                               '--quotatype',
                               help='Slurm quota type',
-                              default='auto',
+                              default=None,
                               type=str)
 
 
 def parse_dlc_args(dlc_parser):
-    """these args are all for dlc launch."""
+    """These args are all for dlc launch."""
     dlc_parser.add_argument('--aliyun-cfg',
                             help='The config path for aliyun config',
                             default='~/.aliyun.cfg',
@@ -141,9 +149,12 @@ def main():
     cfg_time_str = dir_time_str = datetime.now().strftime('%Y%m%d_%H%M%S')
     if args.reuse:
         if args.reuse == 'latest':
-            dirs = os.listdir(cfg.work_dir)
-            assert len(dirs) > 0, 'No previous results to reuse!'
-            dir_time_str = sorted(dirs)[-1]
+            if not os.path.exists(cfg.work_dir) or not os.listdir(
+                    cfg.work_dir):
+                logger.warning('No previous results to reuse!')
+            else:
+                dirs = os.listdir(cfg.work_dir)
+                dir_time_str = sorted(dirs)[-1]
         else:
             dir_time_str = args.reuse
         logger.info(f'Reusing experiements from {dir_time_str}')
@@ -171,22 +182,81 @@ def main():
         LarkReporter(cfg['lark_bot_url']).post(content)
 
     if args.mode in ['all', 'infer']:
-        # Use SizePartitioner to split into subtasks
-        partitioner = SizePartitioner(osp.join(cfg['work_dir'],
-                                               'predictions/'),
-                                      max_task_size=args.max_partition_size,
-                                      gen_task_coef=args.gen_task_coef)
-        tasks = partitioner(cfg)
-        # execute the infer subtasks
-        exec_infer_runner(tasks, args, cfg)
+        # When user have specified --slurm or --dlc, or have not set
+        # "infer" in config, we will provide a default configuration
+        # for infer
+        if (args.dlc or args.slurm) and cfg.get('infer', None):
+            logger.warning('You have set "infer" in the config, but '
+                           'also specified --slurm or --dlc. '
+                           'The "infer" configuration will be overridden by '
+                           'your runtime arguments.')
+        if args.dlc or args.slurm or cfg.get('infer', None) is None:
+            # Use SizePartitioner to split into subtasks
+            partitioner = SizePartitioner(
+                osp.join(cfg['work_dir'], 'predictions/'),
+                max_task_size=args.max_partition_size,
+                gen_task_coef=args.gen_task_coef)
+            tasks = partitioner(cfg)
+            # execute the infer subtasks
+            exec_infer_runner(tasks, args, cfg)
+        # If they have specified "infer" in config and haven't used --slurm
+        # or --dlc, just follow the config
+        else:
+            if args.partition is not None:
+                if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
+                    cfg.infer.runner.partition = args.partition
+                    cfg.infer.runner.quotatype = args.quotatype
+            else:
+                logger.warning('SlurmRunner is not used, so the partition '
+                               'argument is ignored.')
+            if args.debug:
+                cfg.infer.runner.debug = True
+            if args.lark:
+                cfg.infer.runner.lark_bot_url = cfg['lark_bot_url']
+            cfg.infer.partitioner['out_dir'] = osp.join(
+                cfg['work_dir'], 'predictions/')
+            partitioner = PARTITIONERS.build(cfg.infer.partitioner)
+            tasks = partitioner(cfg)
+            runner = RUNNERS.build(cfg.infer.runner)
+            runner(tasks)
 
     # evaluate
     if args.mode in ['all', 'eval']:
-        # Use NaivePartitioner，not split
-        partitioner = NaivePartitioner(osp.join(cfg['work_dir'], 'results/'))
-        tasks = partitioner(cfg)
-        # execute the eval tasks
-        exec_eval_runner(tasks, args, cfg)
+        # When user have specified --slurm or --dlc, or have not set
+        # "eval" in config, we will provide a default configuration
+        # for eval
+        if (args.dlc or args.slurm) and cfg.get('eval', None):
+            logger.warning('You have set "eval" in the config, but '
+                           'also specified --slurm or --dlc. '
+                           'The "eval" configuration will be overridden by '
+                           'your runtime arguments.')
+        if args.dlc or args.slurm or cfg.get('eval', None) is None:
+            # Use NaivePartitioner，not split
+            partitioner = NaivePartitioner(
+                osp.join(cfg['work_dir'], 'results/'))
+            tasks = partitioner(cfg)
+            # execute the eval tasks
+            exec_eval_runner(tasks, args, cfg)
+        # If they have specified "eval" in config and haven't used --slurm
+        # or --dlc, just follow the config
+        else:
+            if args.partition is not None:
+                if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
+                    cfg.eval.runner.partition = args.partition
+                    cfg.eval.runner.quotatype = args.quotatype
+                else:
+                    logger.warning('SlurmRunner is not used, so the partition '
+                                   'argument is ignored.')
+            if args.debug:
+                cfg.eval.runner.debug = True
+            if args.lark:
+                cfg.eval.runner.lark_bot_url = cfg['lark_bot_url']
+            cfg.eval.partitioner['out_dir'] = osp.join(cfg['work_dir'],
+                                                       'results/')
+            partitioner = PARTITIONERS.build(cfg.eval.partitioner)
+            tasks = partitioner(cfg)
+            runner = RUNNERS.build(cfg.eval.runner)
+            runner(tasks)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
@@ -212,11 +282,10 @@ def exec_infer_runner(tasks, args, cfg):
                            debug=args.debug,
                            lark_bot_url=cfg['lark_bot_url'])
     else:
-        runner = LocalRunner(
-            task=dict(type='OpenICLInferTask'),
-            max_num_workers = args.max_num_workers,
-            debug=args.debug,
-            lark_bot_url=cfg['lark_bot_url'])
+        runner = LocalRunner(task=dict(type='OpenICLInferTask'),
+                             max_num_workers=args.max_num_workers,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)
 
 
@@ -238,11 +307,10 @@ def exec_eval_runner(tasks, args, cfg):
                            debug=args.debug,
                            lark_bot_url=cfg['lark_bot_url'])
     else:
-        runner = LocalRunner(
-            task=dict(type='OpenICLEvalTask'),
-            max_num_workers = args.max_num_workers,
-            debug=args.debug,
-            lark_bot_url=cfg['lark_bot_url'])
+        runner = LocalRunner(task=dict(type='OpenICLEvalTask'),
+                             max_num_workers=args.max_num_workers,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)
 
 

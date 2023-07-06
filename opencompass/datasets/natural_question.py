@@ -1,6 +1,5 @@
 import csv
 import os.path as osp
-import re
 
 from datasets import Dataset, DatasetDict
 
@@ -43,16 +42,19 @@ class NQEvaluator(BaseEvaluator):
                 'error': 'predictions and references have different '
                 'length'
             }
-        predictions = [
-            re.split(r'[\n]', prediction, 1)[0].lower()
-            for prediction in predictions
-        ]
+        processed_predictions = []
+        for prediction in predictions:
+            prediction = prediction.split('\n')[0].lower()
+            if 'answer is' in prediction:
+                prediction = prediction.split('answer is')[-1]
+            prediction = general_postprocess(prediction)
+            processed_predictions.append(prediction)
         processed_answers = [[general_postprocess(j).lower() for j in i]
                              for i in references]
 
         cnt = 0
-        for pred, cand_ans in zip(predictions, processed_answers):
-            cnt += int(any([cand in pred for cand in cand_ans]))
+        for pred, cand_ans in zip(processed_predictions, processed_answers):
+            cnt += int(any([cand == pred for cand in cand_ans]))
         score = cnt / len(predictions) * 100
 
         return {'score': score}

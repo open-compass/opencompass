@@ -13,7 +13,7 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
                                model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
 
-METRIC_WHITELIST = ['score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
+METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
 METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
 
 class Summarizer:
