@@ -15,6 +15,10 @@ English | [简体中文](README_zh-CN.md)
 
 </div>
 
+Welcome to **OpenCompass**! 
+
+Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
+
 ## Introduction
 
 OpenCompass is a one-stop platform for large model evaluation, aiming to provide a fair, open, and reproducible benchmark for large model evaluation. Its main features includes:
@@ -28,6 +32,14 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 - **Modular design with high extensibility**: Want to add new models or datasets, customize an advanced task division strategy, or even support a new cluster management system? Everything about OpenCompass can be easily expanded!
 
 - **Experiment management and reporting mechanism**: Use config files to fully record each experiment, support real-time reporting of results.
+
+## Leaderboard
+
+We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
+
+[![image](https://github.com/InternLM/OpenCompass/assets/7881589/6b56c297-77c0-4e1a-9acc-24a45c5a734a)](https://opencompass.org.cn/rank)
+
+
 
 ## Dataset Support
 
