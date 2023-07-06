@@ -91,7 +91,7 @@ html_theme_options = {
     'menu': [
         {
             'name': 'GitHub',
-            'url': 'https://github.com/opencompass'
+            'url': 'https://github.com/InternLM/opencompass'
         },
     ],
     # Specify the language of shared menu
