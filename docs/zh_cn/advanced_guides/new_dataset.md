@@ -4,7 +4,7 @@
 
 1. 在 `opencompass/datasets` 文件夹新增数据集脚本 `mydataset.py`, 该脚本需要包含：
     
-    - 数据集及其加载方式，需要定义一个 `MyDataset` 类，实现数据集加载方法 `load` ，该方法为静态方法，需要返回 `datasets.Dataset` 类型的数据。这里我们使用 huggingface dataset 作为数据集的统一接口，避免引入额外的逻辑。具体示例如下：
+    - 数据集及其加载方式，需要定义一个 `MyDataset` 类，实现数据集加载方法 `load`，该方法为静态方法，需要返回 `datasets.Dataset` 类型的数据。这里我们使用 huggingface dataset 作为数据集的统一接口，避免引入额外的逻辑。具体示例如下：
 
     ```python
     import datasets
@@ -17,10 +17,9 @@
             pass
     ```
 
-    - （可选）如果OpenCompass已有的evaluator不能满足需要，需要用户定义 `MyDatasetlEvaluator` 类，实现评分方法 `score` ，需要根据输入的 `predictions` 和 `references` 列表，得到需要的字典。由于一个数据集可能存在多种metric，需要返回一个 metrics 以及对应 scores 的相关字典。具体示例如下：
+    - （可选）如果 OpenCompass 已有的评测器不能满足需要，需要用户定义 `MyDatasetlEvaluator` 类，实现评分方法 `score`，需要根据输入的 `predictions` 和 `references` 列表，得到需要的字典。由于一个数据集可能存在多种 metric，需要返回一个 metrics 以及对应 scores 的相关字典。具体示例如下：
 
     ```python
-
     from opencompass.openicl.icl_evaluator import BaseEvaluator
 
     class MyDatasetlEvaluator(BaseEvaluator):
@@ -30,14 +29,14 @@
 
     ```
 
-    - （可选）如果 OpenCompass 已有的 postprocesser 不能满足需要，需要用户定义 `mydataset_postprocess` 方法，根据输入的字符串得到相应后处理的结果。具体示例如下：
+    - （可选）如果 OpenCompass 已有的后处理方法不能满足需要，需要用户定义 `mydataset_postprocess` 方法，根据输入的字符串得到相应后处理的结果。具体示例如下：
 
     ```python
     def mydataset_postprocess(text: str) -> str:
         pass
     ```
 
-2. 在定义好数据集加载，数据后处理以及 `evaluator` 等方法之后，需要在配置文件中新增以下配置：
+2. 在定义好数据集加载、评测以及数据后处理等方法之后，需要在配置文件中新增以下配置：
 
     ```python
     from opencompass.datasets import MyDataset, MyDatasetlEvaluator, mydataset_postprocess
@@ -56,5 +55,4 @@
     ]
     ```
 
-    配置好数据集之后，其他需要的配置文件直接参考如何启动评测任务教程即可。
-    
+    配置好数据集之后，其他需要的配置文件直接参考[快速上手](../get_started.md)教程即可。
