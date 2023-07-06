@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import TheoremQADataset
+from opencompass.datasets import TheoremQADataset, TheoremQA_postprocess
 
 TheoremQA_reader_cfg = dict(
     input_columns=['Question', 'Answer_type'],
@@ -23,11 +23,11 @@ TheoremQA_infer_cfg = dict(
         type=PromptTemplate,
         template=TheoremQA_prompt2),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer))
+    inferencer=dict(type=GenInferencer, max_out_len=512))
 
 TheoremQA_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_postprocessor=dict(type='TheoremQA'))
+    pred_postprocessor=dict(type=TheoremQA_postprocess))
 
 TheoremQA_datasets = [
     dict(

@@ -17,11 +17,10 @@ class TheoremQADataset(BaseDataset):
 
 @TEXT_POSTPROCESSORS.register_module('TheoremQA')
 def TheoremQA_postprocess(text: str) -> str:
-
-    text = text.strip().split('\n')[0].strip()
-    matches = re.findall(r'answer is (.*)', text)
+    text = text.strip()
+    matches = re.findall(r'answer is ([^\s]+)', text)
     if len(matches) == 0:
         return text
     else:
-        text = matches[0].strip()[:-1]
+        text = matches[0].strip().strip('.,?!\"\';:')
         return text

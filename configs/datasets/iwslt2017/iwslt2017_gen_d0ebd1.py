@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import BM25Retriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import BleuEvaluator
 from opencompass.datasets import IWSLT2017Dataset
+from opencompass.utils.text_postprocessors import general_cn_postprocess
 
 iwslt2017_reader_cfg = dict(
     input_columns='en', output_column='de', train_split='validation')
@@ -22,10 +23,10 @@ iwslt2017_infer_cfg = dict(
     inferencer=dict(type=GenInferencer))
 
 iwslt2017_eval_cfg = dict(
-    evaluator=dict(type=BleuEvaluator), 
-    pred_role='BOT', 
-    pred_postprocessor=dict(type='general_cn'),
-    dataset_postprocessor=dict(type='general_cn'))
+    evaluator=dict(type=BleuEvaluator),
+    pred_role='BOT',
+    pred_postprocessor=dict(type=general_cn_postprocess),
+    dataset_postprocessor=dict(type=general_cn_postprocess))
 
 iwslt2017_datasets = [
     dict(

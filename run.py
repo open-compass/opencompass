@@ -141,9 +141,12 @@ def main():
     cfg_time_str = dir_time_str = datetime.now().strftime('%Y%m%d_%H%M%S')
     if args.reuse:
         if args.reuse == 'latest':
-            dirs = os.listdir(cfg.work_dir)
-            assert len(dirs) > 0, 'No previous results to reuse!'
-            dir_time_str = sorted(dirs)[-1]
+            if not os.path.exists(cfg.work_dir) or not os.listdir(
+                    cfg.work_dir):
+                logger.warning('No previous results to reuse!')
+            else:
+                dirs = os.listdir(cfg.work_dir)
+                dir_time_str = sorted(dirs)[-1]
         else:
             dir_time_str = args.reuse
         logger.info(f'Reusing experiements from {dir_time_str}')
@@ -212,11 +215,10 @@ def exec_infer_runner(tasks, args, cfg):
                            debug=args.debug,
                            lark_bot_url=cfg['lark_bot_url'])
     else:
-        runner = LocalRunner(
-            task=dict(type='OpenICLInferTask'),
-            max_num_workers = args.max_num_workers,
-            debug=args.debug,
-            lark_bot_url=cfg['lark_bot_url'])
+        runner = LocalRunner(task=dict(type='OpenICLInferTask'),
+                             max_num_workers=args.max_num_workers,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)
 
 
@@ -238,11 +240,10 @@ def exec_eval_runner(tasks, args, cfg):
                            debug=args.debug,
                            lark_bot_url=cfg['lark_bot_url'])
     else:
-        runner = LocalRunner(
-            task=dict(type='OpenICLEvalTask'),
-            max_num_workers = args.max_num_workers,
-            debug=args.debug,
-            lark_bot_url=cfg['lark_bot_url'])
+        runner = LocalRunner(task=dict(type='OpenICLEvalTask'),
+                             max_num_workers=args.max_num_workers,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)
 
 

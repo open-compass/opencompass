@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import OBQADataset
+from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 _input_columns = [
     ["question_stem", "A", "B", "C", "D"],
@@ -54,7 +55,7 @@ for _i in range(2):
     obqa_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
         pred_role="BOT",
-        pred_postprocessor=dict(type="first-capital"),
+        pred_postprocessor=dict(type=first_capital_postprocess),
     )
 
     obqa_datasets[_i]["reader_cfg"] = obqa_reader_cfg

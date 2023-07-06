@@ -6,7 +6,7 @@ from opencompass.datasets import crowspairsDataset
 
 crowspairs_reader_cfg = dict(
     input_columns=['sent_more', 'sent_less'],
-    output_column='id',
+    output_column='label',
     train_split='test',
     test_split='test')
 

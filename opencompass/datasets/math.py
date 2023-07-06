@@ -3,7 +3,8 @@ import json
 from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
-from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
+                                  TEXT_POSTPROCESSORS)
 
 from .base import BaseDataset
 
@@ -65,12 +66,12 @@ class MATHDataset(BaseDataset):
         return dataset
 
 
-@TEXT_POSTPROCESSORS.register_module('math')
+@TEXT_POSTPROCESSORS.register_module('math_postprocess')
 def math_postprocess(text: str) -> str:
     SUBSTITUTIONS = [('an ', ''), ('a ', ''), ('.$', '$'), ('\\$', ''),
                      (r'\ ', ''), (' ', ''), ('mbox', 'text'),
                      (',\\text{and}', ','), ('\\text{and}', ','),
-                     ('\\text{m}', '\\text{}'), ('\le', '<')]
+                     ('\\text{m}', '\\text{}'), ('\\le', '<')]
     REMOVED_EXPRESSIONS = [
         'square', 'ways', 'integers', 'dollars', 'mph', 'inches', 'ft',
         'hours', 'km', 'units', '\\ldots', 'sue', 'points', 'feet', 'minutes',
@@ -96,7 +97,9 @@ def math_postprocess(text: str) -> str:
         final_answer = re.sub(r'(\\textbf\{)(.*?)(\})', '\\2', final_answer)
         final_answer = re.sub(r'(\\overline\{)(.*?)(\})', '\\2', final_answer)
         final_answer = re.sub(r'(\\boxed\{)(.*)(\})', '\\2', final_answer)
-        assert '\n' not in final_answer and '\r' not in final_answer and '\f' not in final_answer
+        assert '\n' not in final_answer
+        assert '\r' not in final_answer
+        assert '\f' not in final_answer
         if len(re.findall(r'finalansweris(.*)', final_answer)) > 0:
             final_answer = re.findall(r'finalansweris(.*)', final_answer)[-1]
 
