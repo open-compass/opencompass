@@ -179,6 +179,9 @@ def main():
         LarkReporter(cfg['lark_bot_url']).post(content)
 
     if args.mode in ['all', 'infer']:
+        # When user have specified --slurm or --dlc, or have not set
+        # "infer" in config, we will provide a default configuration
+        # for infer
         if (args.dlc or args.slurm) and cfg.get('infer', None):
             logger.warning('You have set "infer" in the config, but '
                            'also specified --slurm or --dlc. '
@@ -193,6 +196,8 @@ def main():
             tasks = partitioner(cfg)
             # execute the infer subtasks
             exec_infer_runner(tasks, args, cfg)
+        # If they have specified "infer" in config and haven't used --slurm
+        # or --dlc, just follow the config
         else:
             if args.partition is not None:
                 if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
@@ -214,6 +219,9 @@ def main():
 
     # evaluate
     if args.mode in ['all', 'eval']:
+        # When user have specified --slurm or --dlc, or have not set
+        # "eval" in config, we will provide a default configuration
+        # for eval
         if (args.dlc or args.slurm) and cfg.get('eval', None):
             logger.warning('You have set "eval" in the config, but '
                            'also specified --slurm or --dlc. '
@@ -226,6 +234,8 @@ def main():
             tasks = partitioner(cfg)
             # execute the eval tasks
             exec_eval_runner(tasks, args, cfg)
+        # If they have specified "eval" in config and haven't used --slurm
+        # or --dlc, just follow the config
         else:
             if args.partition is not None:
                 if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
