@@ -8,34 +8,26 @@
 
 ```
 configs/datasets/
-├── ChineseUniversal  # 能力维度
-│   ├── CLUE_afqmc  # 该维度下的数据集
-│   │   ├── CLUE_afqmc_gen_db509b.py  # 该数据集的不同配置文件
-│   │   ├── CLUE_afqmc_gen.py
-│   │   ├── CLUE_afqmc_ppl_00b348.py
-│   │   ├── CLUE_afqmc_ppl_2313cf.py
-│   │   └── CLUE_afqmc_ppl.py
-│   ├── CLUE_C3
-│   │   ├── ...
-│   ├── ...
-├── Coding
-├── collections
-├── Completion
-├── EnglishUniversal
-├── Exam
-├── glm
-├── LongText
-├── MISC
-├── NLG
-├── QA
-├── Reasoning
-├── Security
-└── Translation
+├── agieval
+├── apps
+├── ARC_c
+├── ...
+├── CLUE_afqmc  # 数据集
+│   ├── CLUE_afqmc_gen_901306.py  # 不同版本数据集配置文件
+│   ├── CLUE_afqmc_gen.py
+│   ├── CLUE_afqmc_ppl_378c5b.py
+│   ├── CLUE_afqmc_ppl_6507d7.py
+│   ├── CLUE_afqmc_ppl_7b0c1e.py
+│   └── CLUE_afqmc_ppl.py
+├── ...
+├── XLSum
+├── Xsum
+└── z_bench
 ```
 
-在 `configs/datasets` 目录结构下，我们主要以能力维度对数据集划分了十余项维度，例如：中英文通用、考试、问答、推理、安全等等。每一项维度又包含了一系列数据集，在各个数据集对应的文件夹下存在多个数据集配置。
+在 `configs/datasets` 目录结构下，我们直接展平所有数据集，在各个数据集对应的文件夹下存在多个数据集配置。
 
-数据集配置文件名由以下命名方式构成 `{数据集名称}_{评测方式}_{prompt版本号}.py`，以 `ChineseUniversal/CLUE_afqmc/CLUE_afqmc_gen_db509b.py` 为例，该配置文件则为中文通用能力下的 `CLUE_afqmc` 数据集，对应的评测方式为 `gen`，即生成式评测，对应的prompt版本号为 `db509b`；同样的， `CLUE_afqmc_ppl_00b348.py` 指评测方式为`ppl`即判别式评测，prompt版本号为 `00b348` 。
+数据集配置文件名由以下命名方式构成 `{数据集名称}_{评测方式}_{prompt版本号}.py`，以 `CLUE_afqmc/CLUE_afqmc_gen_db509b.py` 为例，该配置文件则为中文通用能力下的 `CLUE_afqmc` 数据集，对应的评测方式为 `gen`，即生成式评测，对应的prompt版本号为 `db509b`；同样的， `CLUE_afqmc_ppl_00b348.py` 指评测方式为`ppl`即判别式评测，prompt版本号为 `00b348` 。
 
 除此之外，不带版本号的文件，例如： `CLUE_afqmc_gen.py` 则指向该评测方式最新的prompt配置文件，通常来说会是精度最高的prompt。
 
@@ -49,13 +41,13 @@ OpenCompass 支持的数据集主要包括两个部分：
 
 2. OpenCompass 自建数据集
 
-除了支持 Huggingface 已有的数据集， OpenCompass 还提供了一些自建CN数据集，未来将会提供一个数据集相关的Repo供用户下载使用。按照文档指示将数据集统一放置在`./data`目录下即可完成数据集准备。
+除了支持 Huggingface 已有的数据集， OpenCompass 还提供了一些自建CN数据集，未来将会提供一个数据集相关的链接供用户下载使用。按照文档指示将数据集统一放置在`./data`目录下即可完成数据集准备。
 
 需要注意的是，Repo中不仅包含自建的数据集，为了方便也加入了部分HF已支持的数据集方便测试。
 
 ## 数据集选择
 
-在各个数据集配置文件中，数据集将会被定义在 `{}_datasets` 变量当中，例如下面 `ChineseUniversal/CLUE_afqmc/CLUE_afqmc_gen_db509b.py` 中的 `afqmc_datasets`。
+在各个数据集配置文件中，数据集将会被定义在 `{}_datasets` 变量当中，例如下面 `CLUE_afqmc/CLUE_afqmc_gen_db509b.py` 中的 `afqmc_datasets`。
 
 ```python
 afqmc_datasets = [
@@ -70,7 +62,7 @@ afqmc_datasets = [
 ]
 ```
 
-以及 `ChineseUniversal/CLUE_cmnli/CLUE_cmnli_ppl_b78ad4.py` 中的 `afqmc_datasets`。
+以及 `CLUE_cmnli/CLUE_cmnli_ppl_b78ad4.py` 中的 `cmnli_datasets`。
 
 ```python
 cmnli_datasets = [

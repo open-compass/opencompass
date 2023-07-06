@@ -8,34 +8,26 @@ First, let's introduce the structure under the `configs/datasets` directory in O
 
 ```
 configs/datasets/
-├── ChineseUniversal  # Ability dimension
-│   ├── CLUE_afqmc  # Dataset under this dimension
-│   │   ├── CLUE_afqmc_gen_db509b.py  # Different configuration files for this dataset
-│   │   ├── CLUE_afqmc_gen.py
-│   │   ├── CLUE_afqmc_ppl_00b348.py
-│   │   ├── CLUE_afqmc_ppl_2313cf.py
-│   │   └── CLUE_afqmc_ppl.py
-│   ├── CLUE_C3
-│   │   ├── ...
-│   ├── ...
-├── Coding
-├── collections
-├── Completion
-├── EnglishUniversal
-├── Exam
-├── glm
-├── LongText
-├── MISC
-├── NLG
-├── QA
-├── Reasoning
-├── Security
-└── Translation
+├── agieval
+├── apps
+├── ARC_c
+├── ...
+├── CLUE_afqmc  # dataset
+│   ├── CLUE_afqmc_gen_901306.py  # different version of config
+│   ├── CLUE_afqmc_gen.py
+│   ├── CLUE_afqmc_ppl_378c5b.py
+│   ├── CLUE_afqmc_ppl_6507d7.py
+│   ├── CLUE_afqmc_ppl_7b0c1e.py
+│   └── CLUE_afqmc_ppl.py
+├── ...
+├── XLSum
+├── Xsum
+└── z_bench
 ```
 
-In the `configs/datasets` directory structure, we have divided the datasets into over ten dimensions based on ability dimensions, such as: Chinese and English Universal, Exam, QA, Reasoning, Security, etc. Each dimension contains a series of datasets, and there are multiple dataset configurations in the corresponding folder of each dataset.
+In the `configs/datasets` directory structure, we flatten all datasets directly, and there are multiple dataset configurations within the corresponding folders for each dataset.
 
-The naming of the dataset configuration file is made up of `{dataset name}_{evaluation method}_{prompt version number}.py`. For example, `ChineseUniversal/CLUE_afqmc/CLUE_afqmc_gen_db509b.py`, this configuration file is the `CLUE_afqmc` dataset under the Chinese universal ability, the corresponding evaluation method is `gen`, i.e., generative evaluation, and the corresponding prompt version number is `db509b`; similarly, `CLUE_afqmc_ppl_00b348.py` indicates that the evaluation method is `ppl`, i.e., discriminative evaluation, and the prompt version number is `00b348`.
+The naming of the dataset configuration file is made up of `{dataset name}_{evaluation method}_{prompt version number}.py`. For example, `CLUE_afqmc/CLUE_afqmc_gen_db509b.py`, this configuration file is the `CLUE_afqmc` dataset under the Chinese universal ability, the corresponding evaluation method is `gen`, i.e., generative evaluation, and the corresponding prompt version number is `db509b`; similarly, `CLUE_afqmc_ppl_00b348.py` indicates that the evaluation method is `ppl`, i.e., discriminative evaluation, and the prompt version number is `00b348`.
 
 In addition, files without a version number, such as: `CLUE_afqmc_gen.py`, point to the latest prompt configuration file of that evaluation method, which is usually the most accurate prompt.
 
@@ -49,13 +41,13 @@ The datasets supported by OpenCompass mainly include two parts:
 
 2. OpenCompass Self-built Datasets
 
-In addition to supporting Huggingface's existing datasets, OpenCompass also provides some self-built CN datasets. In the future, a dataset-related Repo will be provided for users to download and use. Following the instructions in the document to place the datasets uniformly in the `./data` directory can complete dataset preparation.
+In addition to supporting Huggingface's existing datasets, OpenCompass also provides some self-built CN datasets. In the future, a dataset-related link will be provided for users to download and use. Following the instructions in the document to place the datasets uniformly in the `./data` directory can complete dataset preparation.
 
 It is important to note that the Repo not only contains self-built datasets, but also includes some HF-supported datasets for testing convenience.
 
 ## Dataset Selection
 
-In each dataset configuration file, the dataset will be defined in the `{}_datasets` variable, such as `afqmc_datasets` in `ChineseUniversal/CLUE_afqmc/CLUE_afqmc_gen_db509b.py`.
+In each dataset configuration file, the dataset will be defined in the `{}_datasets` variable, such as `afqmc_datasets` in `CLUE_afqmc/CLUE_afqmc_gen_db509b.py`.
 
 ```python
 afqmc_datasets = [
@@ -70,7 +62,7 @@ afqmc_datasets = [
 ]
 ```
 
-And `afqmc_datasets` in `ChineseUniversal/CLUE_cmnli/CLUE_cmnli_ppl_b78ad4.py`.
+And `cmnli_datasets` in `CLUE_cmnli/CLUE_cmnli_ppl_b78ad4.py`.
 
 ```python
 cmnli_datasets = [
