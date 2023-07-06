@@ -5,8 +5,15 @@
 评测任务的程序入口为 `run.py`，使用方法如下：
 
 ```shell
-run.py [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l LARK] config
+run.py {--slrum | --dlc | None} $Config [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l LARK]
 ```
+
+启动方式：
+
+- 本地机器运行: `run.py $Config`，$Config 中不包含 `eval` 和 `infer` 字段。
+- srun运行: `run.py $Config --slurm -p $PARTITION_name`。
+- dlc运行： `run.py $Config --dlc --aliyun-cfg $AliYun_Cfg`， 后续会有教程。
+- 定制化启动: `run.py $Config` $Config 中包含 `eval` 和 `infer` 字段，参考 [评估文档](./evaluation.md)。
 
 参数解释如下：
 
@@ -18,13 +25,11 @@ run.py [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDI
 - -w 指定工作路径，默认为 ./outputs/default
 - -l 打开飞书机器人状态上报。
 
-
 以运行模式`-m all`为例，整体运行流如下：
 
 1. 读取配置文件，解析出模型、数据集、评估器等配置信息
 2. 评测任务主要分为推理 infer、评测 eval 和可视化 viz 三个阶段，其中推理和评测经过 Partitioner 进行任务切分后，交由 Runner 负责并行执行。单个推理和评测任务则被抽象成 OpenICLInferTask 和 OpenICLEvalTask。
 3. 两阶段分别结束后，可视化阶段会读取 results 中的评测结果，生成可视化报告。
-
 
 ## 任务监控：飞书机器人
 
@@ -64,7 +69,7 @@ run.py [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDI
 
 所有运行结果会默认放在`outputs/default/`目录下，目录结构如下所示：
 
-```
+```text
 outputs/default/
 ├── 20200220_120000
 ├── ...
@@ -80,6 +85,7 @@ outputs/default/
 ```
 
 其中，每一个时间戳中存在以下内容：
+
 - configs文件夹，用于存放以这个时间戳为输出目录的每次运行对应的配置文件；
 - logs文件夹，用于存放推理和评测两个阶段的输出日志文件，各个文件夹内会以模型为子文件夹存放日志；
 - predicitions文件夹，用于存放推理json结果，以模型为子文件夹；
