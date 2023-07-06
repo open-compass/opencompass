@@ -15,6 +15,10 @@ English | [简体中文](README_zh-CN.md)
 
 </div>
 
+Welcome to **OpenCompass**! 
+
+Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
+
 ## Introduction
 
 OpenCompass is a one-stop platform for large model evaluation, aiming to provide a fair, open, and reproducible benchmark for large model evaluation. Its main features includes:
