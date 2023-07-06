@@ -262,7 +262,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 </td>
 <td>
 
-- OpenAI (coming soon)
+- OpenAI
 - Claude (coming soon)
 - PaLM (coming soon)
 - ……
