@@ -69,7 +69,7 @@ run.py {--slrum | --dlc | None} $Config [-p PARTITION] [-q QUOTATYPE] [--debug] 
 
 所有运行结果会默认放在`outputs/default/`目录下，目录结构如下所示：
 
-```{text}
+```text
 outputs/default/
 ├── 20200220_120000
 ├── ...
