@@ -1,4 +1,4 @@
-# Meta Prompt
+# Meta Template
 
 ## 背景
 
@@ -27,7 +27,7 @@ models = [
 ```
 
 接下来，我们会介绍 Meta Template 在两种模型上的配置方法。
-本文主要介绍 meta prompt 的用法。如果需要调试 prompt，建议在准备好配置文件后，使用 `tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读 此处 了解更多
+本文主要介绍 meta prompt 的用法。如果需要调试 prompt，建议在准备好配置文件后，使用 `tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读[这里](../tools.md#prompt-viewer)了解更多
 
 ```{note}
 在某些情况下（例如对基座的测试），我们并不需要在正常对话中注入任何的指令，此时我们可以将 meta template 置空。在这种情况下，模型接收到的 prompt 仅由数据集配置定义，是一个普通的字符串。若数据集配置使用的是对话式模板，不同角色的发言将会由 \n 拼接而成。
