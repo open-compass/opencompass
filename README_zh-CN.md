@@ -17,6 +17,7 @@
 </div>
 
 欢迎来到OpenCompass！
+
 就像指南针在我们的旅程中为我们导航一样，我们希望OpenCompass能够帮助你穿越评估大型语言模型的重重迷雾。OpenCompass提供丰富的算法和功能支持，期待OpenCompass能够帮助社区更便捷地对NLP模型的性能进行公平全面的评估。
 
 ## 介绍
