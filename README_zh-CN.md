@@ -263,7 +263,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 </td>
 <td>
 
-- OpenAI (即将推出)
+- OpenAI
 - Claude (即将推出)
 - PaLM (即将推出)
 - ……
