@@ -11,9 +11,9 @@ roadmap we have created for the library:
 
     - For some basic usage, we suggest users read the UserGuides_.
 
-    - If you want to customize the algorithm, we have provided the AdvancedGuides_.
+   - If you want to adjust the prompts, you can browse the Prompt_.
 
-    - If you want to adjust the prompts, you can browse the Prompt_.
+    - If you want to customize the algorithm, we have provided the AdvancedGuides_.
 
     - We also offer the Tools_.
 
@@ -31,13 +31,11 @@ We always welcome *PRs* and *Issues* for the betterment of MMPretrain.
    :maxdepth: 1
    :caption: UserGuides
 
-   user_guides/framework_overview.md
    user_guides/config.md
    user_guides/dataset_prepare.md
    user_guides/models.md
    user_guides/evaluation.md
    user_guides/experimentation.md
-   user_guides/metrics.md
 
 .. _AdvancedGuides:
 .. toctree::
@@ -52,7 +50,6 @@ We always welcome *PRs* and *Issues* for the betterment of MMPretrain.
    :maxdepth: 1
    :caption: Prompt
 
-   prompt/overview.md
    prompt/few_shot.md
    prompt/prompt_template.md
    prompt/meta_template.md
