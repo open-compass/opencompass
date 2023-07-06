@@ -43,9 +43,7 @@ class OpenICLInferTask(BaseTask):
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
-            print('start building model')
             self.model = build_model_from_cfg(model_cfg)
-            print('end building model')
 
             for dataset_cfg in dataset_cfgs:
                 self.model_cfg = model_cfg
