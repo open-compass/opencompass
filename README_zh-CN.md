@@ -1,4 +1,4 @@
-![image](https://github.com/InternLM/OpenCompass/assets/7881589/13e73e0a-b537-48bb-84be-b98aea3f00c3)<div align="center">
+<div align="center">
   <img src="docs/zh_cn/_static/image/logo.svg" width="500px"/>
   <br />
   <br />
