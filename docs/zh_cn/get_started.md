@@ -55,7 +55,7 @@ python run.py configs/eval_llama_7b.py --debug
 <details>
 <summary>准备数据集及其配置</summary>
 
-因为 [siqa](https://huggingface.co/datasets/siqa)， [piqa](https://huggingface.co/datasets/piqa) 支持自动下载，所以这里不需要手动下载数据集，但有部分数据集可能需要手动下载，详细查看文档 [准备数据集](docs/zh_cn/user_guides/dataset_prepare.md).
+因为 [siqa](https://huggingface.co/datasets/siqa)， [piqa](https://huggingface.co/datasets/piqa) 支持自动下载，所以这里不需要手动下载数据集，但有部分数据集可能需要手动下载，详细查看文档 [准备数据集](./user_guides/dataset_prepare.md).
 
 创建一个 '.py' 配置文件， 添加以下内容：
 
@@ -66,7 +66,7 @@ with read_base():
     # 直接从预设数据集配置中读取需要的数据集配置
     from .datasets.piqa.piqa_ppl import piqa_datasets
     from .datasets.siqa.siqa_gen import siqa_datasets
-                                          
+
 datasets = [*piqa_datasets, *siqa_datasets]          # 最后 config 需要包含所需的评测数据集列表 datasets
 ```
 
@@ -97,7 +97,7 @@ llama_7b = dict(
         batch_size=16,              # 批次大小
         run_cfg=dict(num_gpus=1),   # 运行配置，用于指定资源需求
     )
- 
+
 models = [llama_7b]                                     # 最后 config 需要包含所需的模型列表 models
 ```
 

@@ -39,9 +39,15 @@ OpenCompass 支持的数据集主要包括两个部分：
 
 [Huggingface Dataset](https://huggingface.co/datasets) 提供了大量的数据集。OpenCompass 已经支持了大多数常用于性能比较的数据集，具体支持的数据集列表请直接在 `configs/dataset` 下进行查找。
 
-2. OpenCompass 自建数据集
+2. 第三方数据集
 
-除了支持 Huggingface 已有的数据集， OpenCompass 还提供了一些自建CN数据集，未来将会提供一个数据集相关的链接供用户下载使用。按照文档指示将数据集统一放置在`./data`目录下即可完成数据集准备。
+除了支持 Huggingface 已有的数据集， OpenCompass 还提供了一些第三方数据集及自建CN数据集。运行以下命令，将数据集统一下载并放置在`./data`目录下即可完成数据集准备。
+
+```bash
+# 在 OpenCompass 目录下运行
+wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+unzip OpenCompassData.zip
+```
 
 需要注意的是，Repo中不仅包含自建的数据集，为了方便也加入了部分HF已支持的数据集方便测试。
 
