@@ -40,7 +40,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 我们将陆续提供开源模型和API模型的具体性能榜单，请见 [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
 
-![image](https://github.com/InternLM/OpenCompass/assets/7881589/fddc8ab4-d2bd-429d-89f0-4ca90606599a)
+[![image](https://github.com/InternLM/OpenCompass/assets/7881589/93f215f4-7ea1-49d0-889f-2fde7d952ff6)](https://opencompass.org.cn/rank)
 
 ## 数据集支持
 
@@ -263,7 +263,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 </td>
 <td>
 
-- OpenAI (即将推出)
+- OpenAI
 - Claude (即将推出)
 - PaLM (即将推出)
 - ……
