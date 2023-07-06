@@ -290,8 +290,13 @@ git clone https://github.com/InternLM/opencompass opencompass
 cd opencompass
 pip install -e .
 # 下载数据集到 data/ 处
-# TODO: ....
+wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+unzip OpenCompassData.zip
 ```
+
+# TODO: ....
+
+````
 
 ## 评测
 
@@ -310,4 +315,4 @@ pip install -e .
     howpublished = {\url{https://github.com/InternLM/OpenCompass}},
     year={2023}
 }
-```
+````

@@ -15,7 +15,7 @@ English | [简体中文](README_zh-CN.md)
 
 </div>
 
-Welcome to **OpenCompass**! 
+Welcome to **OpenCompass**!
 
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
@@ -36,7 +36,6 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 ## Leaderboard
 
 We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
-
 
 [![image](https://github.com/InternLM/OpenCompass/assets/7881589/475b0c8e-28b8-43e9-b2fd-4dd558e22491)](https://opencompass.org.cn/rank)
 
@@ -289,7 +288,8 @@ git clone https://github.com/InternLM/opencompass opencompass
 cd opencompass
 pip install -e .
 # Download dataset to data/ folder
-# TODO: ....
+wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+unzip OpenCompassData.zip
 ```
 
 ## Evaluation

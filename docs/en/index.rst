@@ -29,7 +29,7 @@ We always welcome *PRs* and *Issues* for the betterment of MMPretrain.
 .. _UserGuides:
 .. toctree::
    :maxdepth: 1
-   :caption: UserGuides
+   :caption: User Guides
 
    user_guides/config.md
    user_guides/dataset_prepare.md
@@ -40,7 +40,7 @@ We always welcome *PRs* and *Issues* for the betterment of MMPretrain.
 .. _AdvancedGuides:
 .. toctree::
    :maxdepth: 1
-   :caption: AdvancedGuides
+   :caption: Advanced Guides
 
    advanced_guides/new_dataset.md
    advanced_guides/new_model.md

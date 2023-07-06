@@ -39,11 +39,17 @@ The datasets supported by OpenCompass mainly include two parts:
 
 [Huggingface Dataset](https://huggingface.co/datasets) provides a large number of datasets. OpenCompass has supported most of the datasets commonly used for performance comparison, please refer to `configs/dataset` for the specific list of supported datasets.
 
-2. OpenCompass Self-built Datasets
+2. Third-party Datasets
 
-In addition to supporting Huggingface's existing datasets, OpenCompass also provides some self-built CN datasets. In the future, a dataset-related link will be provided for users to download and use. Following the instructions in the document to place the datasets uniformly in the `./data` directory can complete dataset preparation.
+In addition to supporting Huggingface's existing datasets, OpenCompass also provides some third-party and self-built datasets. Run the following commands to download and place the datasets in the `./data` directory can complete dataset preparation.
 
-It is important to note that the Repo not only contains self-built datasets, but also includes some HF-supported datasets for testing convenience.
+```bash
+# Run in the OpenCompass directory
+wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+unzip OpenCompassData.zip
+```
+
+Note that the Repo not only contains self-built datasets, but also includes some HF-supported datasets for testing convenience.
 
 ## Dataset Selection
 
