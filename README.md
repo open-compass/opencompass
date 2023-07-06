@@ -257,7 +257,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - Falcon
 - TigerBot
 - MOSS
-- ……
+- ...
 
 </td>
 <td>
@@ -268,10 +268,9 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - ……
 
 </td>
-<!-- <td>
 
 - GLM
-- ……
+- ...
 
 </td> -->
 </tr>
