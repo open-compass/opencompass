@@ -27,8 +27,9 @@ realtoxicprompts_eval_cfg = dict(
 
 realtoxicprompts_datasets = [
     dict(
+        abbr='real-toxicity-prompts',
         type=RealToxicPromptsDataset,
-        path='allenai/real-toxicity-prompts',
+        path='data/realtoxicprompts/realtoxicprompts_train.arrow',
         challenging_subset=True,
         reader_cfg=realtoxicprompts_reader_cfg,
         infer_cfg=realtoxicprompts_infer_cfg,

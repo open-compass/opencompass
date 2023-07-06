@@ -33,8 +33,8 @@ for _l in lang:
         dict(
             abbr=f'jigsaw_multilingual_{_l}',
             type=JigsawMultilingualDataset,
-            path='data/test.csv',
-            label='data/test_labels.csv',
+            path='data/jigsawmultilingual/test.csv',
+            label='data/jigsawmultilingual/test_labels.csv',
             lang=_l,
             reader_cfg=jigsawmultilingual_reader_cfg,
             infer_cfg=jigsawmultilingual_infer_cfg,

@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import HFDataset
+from opencompass.datasets import HFDataset, strategyqa_pred_postprocess, strategyqa_dataset_postprocess
 
 strategyqa_reader_cfg = dict(
     input_columns=['question'],
@@ -44,8 +44,8 @@ Q: {question}{answer}
 
 strategyqa_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_postprocessor=dict(type='strategyqa'),
-    dataset_postprocessor=dict(type='strategyqa_dataset'))
+    pred_postprocessor=dict(type=strategyqa_pred_postprocess),
+    dataset_postprocessor=dict(type=strategyqa_dataset_postprocess))
 
 strategyqa_datasets = [
     dict(

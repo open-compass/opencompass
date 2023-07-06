@@ -1,7 +1,9 @@
 from opencompass.models import HuggingFaceCausalLM
 
+from mmengine.config import read_base
+
 with read_base():
-    from .datasets.piqa.piqa_ppl import piqa_datasets 
+    from .datasets.piqa.piqa_ppl import piqa_datasets
 
 datasets = piqa_datasets
 
@@ -24,5 +26,3 @@ models = [
        run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
-
-

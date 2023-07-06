@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import AGIEvalDataset_v2, AGIEvalEvaluator
+from opencompass.utils.text_postprocessors import first_capital_postprocess, first_capital_postprocess_multi
 
 agieval_reader_cfg = dict(
     input_columns=['question', 'options'], output_column='label')
@@ -82,7 +83,7 @@ for _name in agieval_single_choice_sets:
 
     agieval_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
-        pred_postprocessor=dict(type='first-capital'))
+        pred_postprocessor=dict(type=first_capital_postprocess))
 
     agieval_datasets.append(
         dict(
@@ -111,7 +112,7 @@ for _name in agieval_multiple_choices_sets:
 
     agieval_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
-        pred_postprocessor=dict(type='first-capital-multi'))
+        pred_postprocessor=dict(type=first_capital_postprocess_multi))
 
     agieval_datasets.append(
         dict(

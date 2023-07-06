@@ -3,10 +3,11 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import crowspairsDataset_V2
+from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 crowspairs_reader_cfg = dict(
     input_columns=['sent_more', 'sent_less'],
-    output_column='id',
+    output_column='label',
     train_split='test',
     test_split='test')
 
@@ -26,7 +27,7 @@ crowspairs_infer_cfg = dict(
 crowspairs_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
     pred_role="BOT",
-    pred_postprocessor=dict(type="first-capital"),
+    pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 crowspairs_datasets = [

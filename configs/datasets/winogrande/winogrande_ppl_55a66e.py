@@ -15,9 +15,9 @@ winogrande_infer_cfg = dict(
         type=PromptTemplate,
         template={
             i: dict(round=[
-                dict(role="HUMAN", prompt=f"Good sentence: {{opt{i+1}}}"),
+                dict(role="HUMAN", prompt=f"Good sentence: {{opt{i}}}"),
             ])
-            for i in range(2)
+            for i in range(1, 3)
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

@@ -45,11 +45,10 @@ We use the following tools for linting and formatting:
 
 Style configurations of yapf and isort can be found in [setup.cfg](https://github.com/open-mmlab/OpenCompass/blob/main/setup.cfg).
 
-
 ## Pre-commit Hook
 
 We use [pre-commit hook](https://pre-commit.com/) that checks and formats for `flake8`, `yapf`, `isort`, `trailing whitespaces`, `markdown files`,
-fixes `end-of-files`, `double-quoted-strings`, `python-encoding-pragma`, `mixed-line-ending`, sorts `requirments.txt` automatically on every commit.
+fixes `end-of-files`, `double-quoted-strings`, `python-encoding-pragma`, `mixed-line-ending`, sorts `requirements.txt` automatically on every commit.
 The config for a pre-commit hook is stored in [.pre-commit-config](xxxxxxx).
 
 After you clone the repository, you will need to install initialize pre-commit hook.

@@ -11,7 +11,7 @@ with read_base():
 summarizer = dict(
     dataset_abbrs = [
         '--- Exam ---',
-        'mmlu-all-set',
+        'mmlu',
         "ceval",
         "bbh",
         '--- ChineseUniversal ---',
