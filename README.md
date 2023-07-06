@@ -15,10 +15,6 @@ English | [简体中文](README_zh-CN.md)
 
 </div>
 
-Welcome to **OpenCompass**! 
-
-Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
-
 ## Introduction
 
 OpenCompass is a one-stop platform for large model evaluation, aiming to provide a fair, open, and reproducible benchmark for large model evaluation. Its main features includes:
@@ -222,8 +218,21 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 
 ## Model Support
 
-<details close>
-<summary><b>Huggingface Models</b></summary>
+<table align="center">
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>HuggingFace Models</b>
+      </td>
+      <td>
+        <b>API Models</b>
+      </td>
+      <td>
+        <b>Custom Models</b>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>
 
 - LLaMA
 - Vicuna
@@ -236,27 +245,26 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 - Falcon
 - TigerBot
 - MOSS
-- ...
+- ……
 
-</details>
-
-<details close>
-<summary><b>API Models</b></summary>
+</td>
+<td>
 
 - OpenAI
 - Claude (coming soon)
 - PaLM (coming soon)
-- ...
+- ……
 
-</details>
-
-<details close>
-<summary><b>User-Defined Models</b></summary>
+</td>
+<td>
 
 - GLM
-- ...
+- ……
 
-</details>
+</td>
+</tr>
+  </tbody>
+</table>
 
 ## Installation
 

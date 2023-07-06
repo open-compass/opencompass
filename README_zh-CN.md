@@ -225,8 +225,21 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 ## 模型支持
 
-<details close>
-<summary><b>Huggingface 模型</b></summary>
+<table align="center">
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>HuggingFace 模型</b>
+      </td>
+      <td>
+        <b>API 模型</b>
+      </td>
+      <td>
+        <b>自定义模型</b>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>
 
 - LLaMA
 - Vicuna
@@ -241,27 +254,26 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 - MOSS
 - ……
 
-</details>
-
-<details close>
-<summary><b>API 模型</b></summary>
+</td>
+<td>
 
 - OpenAI
 - Claude (即将推出)
 - PaLM (即将推出)
 - ……
 
-</details>
-
-<details close>
-<summary><b>用户自定义模型</b></summary>
+</td>
+<td>
 
 - GLM
 - ……
 
-</details>
+</td>
+</tr>
+  </tbody>
+</table>
 
-## 安装
+# 安装
 
 下面展示了快速安装的步骤。有部分第三方功能可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_cn/latest/get_started.html)。
 
