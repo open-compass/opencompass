@@ -15,22 +15,15 @@ from opencompass.utils import LarkReporter, Summarizer, get_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Run an evaluation task')
     parser.add_argument('config', help='Train config file path')
-    # add mutually exclusive args `--slurm` `--dlc`, default to local runner
+    # add mutually exclusive args `--slurm` `--dlc`, defaults to local runner
+    # if "infer" or "eval" not specified
     launch_method = parser.add_mutually_exclusive_group()
-    launch_method.add_argument(
-        '--local',
-        action='store_true',
-        default=False,
-        help='Whether to force tasks to launch locally. '
-        'Defaults to False')
-    launch_method.add_argument(
-        '--slurm',
-        action='store_true',
-        default=False,
-        help='Whether to force tasks to run with srun. '
-        #   help='Whether to force tasks to launch locally. '
-        'If True, `--partition(-p)` must be set. '
-        'Defaults to False')
+    launch_method.add_argument('--slurm',
+                               action='store_true',
+                               default=False,
+                               help='Whether to force tasks to run with srun. '
+                               'If True, `--partition(-p)` must be set. '
+                               'Defaults to False')
     launch_method.add_argument('--dlc',
                                action='store_true',
                                default=False,
@@ -78,23 +71,26 @@ def parse_args():
                         action='store_true',
                         default=False)
     parser.add_argument('--max-partition-size',
-                        help='The maximum size of a task. Only effective '
-                        'when either of --local, --slurm or --dlc is '
-                        'specified',
+                        help='The maximum size of an infer task. Only '
+                        'effective when "infer" is missing from the config.',
                         type=int,
                         default=2000),
     parser.add_argument(
         '--gen-task-coef',
-        help='The dataset cost measurement coefficient for generation tasks',
+        help='The dataset cost measurement coefficient for generation tasks, '
+        'Only effective when "infer" is missing from the config.',
         type=int,
         default=20)
     parser.add_argument('--max-num-workers',
-                        help='Max number of workers to run in parallel.',
+                        help='Max number of workers to run in parallel. '
+                        'Will be overrideen by the "max_num_workers" argument '
+                        'in the config.',
                         type=int,
                         default=32)
     parser.add_argument(
         '--retry',
-        help='Number of retries if the job failed when using slurm or dlc.',
+        help='Number of retries if the job failed when using slurm or dlc. '
+        'Will be overrideen by the "retry" argument in the config.',
         type=int,
         default=2)
     # set srun args
@@ -183,12 +179,12 @@ def main():
         LarkReporter(cfg['lark_bot_url']).post(content)
 
     if args.mode in ['all', 'infer']:
-        if cfg.get('infer', None) and (args.dlc or args.slurm or args.local):
+        if (args.dlc or args.slurm) and cfg.get('infer', None):
             logger.warning('You have set "infer" in the config, but '
-                           'also specified --local, --slurm or --dlc. '
+                           'also specified --slurm or --dlc. '
                            'The "infer" configuration will be overridden by '
-                           'your arguments.')
-        if args.dlc or args.slurm or args.local:
+                           'your runtime arguments.')
+        if args.dlc or args.slurm or cfg.get('infer', None) is None:
             # Use SizePartitioner to split into subtasks
             partitioner = SizePartitioner(
                 osp.join(cfg['work_dir'], 'predictions/'),
@@ -218,12 +214,12 @@ def main():
 
     # evaluate
     if args.mode in ['all', 'eval']:
-        if cfg.get('eval', None) and (args.dlc or args.slurm or args.local):
+        if (args.dlc or args.slurm) and cfg.get('eval', None):
             logger.warning('You have set "eval" in the config, but '
-                           'also specified --local, --slurm or --dlc. '
+                           'also specified --slurm or --dlc. '
                            'The "eval" configuration will be overridden by '
-                           'your arguments.')
-        if args.dlc or args.slurm or args.local:
+                           'your runtime arguments.')
+        if args.dlc or args.slurm or cfg.get('eval', None) is None:
             # Use NaivePartitioner，not split
             partitioner = NaivePartitioner(
                 osp.join(cfg['work_dir'], 'results/'))
