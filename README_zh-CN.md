@@ -36,6 +36,14 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 - **灵活化拓展**：想增加新模型或数据集？想要自定义更高级的任务分割策略，甚至接入新的集群管理系统？OpenCompass 的一切均可轻松扩展！
 
+## 性能榜单
+
+我们将陆续提供开源模型和API模型的具体性能榜单，请见 [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
+
+
+![image](https://github.com/InternLM/OpenCompass/assets/7881589/fddc8ab4-d2bd-429d-89f0-4ca90606599a)
+
+
 ## 数据集支持
 
 <table align="center">
