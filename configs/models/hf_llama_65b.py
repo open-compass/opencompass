@@ -2,11 +2,12 @@ from opencompass.models import HuggingFaceCausalLM
 
 
 models = [
-    # LLaMA 7B
+    # LLaMA 65B
     dict(
         type=HuggingFaceCausalLM,
-        path="decapoda-research/llama-7b-hf",
-        tokenizer_path='decapoda-research/llama-7b-hf',
+        abbr='llama-65b-hf',
+        path="decapoda-research/llama-65b-hf",
+        tokenizer_path='decapoda-research/llama-65b-hf',
         tokenizer_kwargs=dict(padding_side='left',
                               truncation_side='left',
                               use_fast=False,
@@ -15,8 +16,7 @@ models = [
         max_seq_len=2048,
         batch_size=8,
         model_kwargs=dict(device_map='auto'),
-        batch_padding=False, # if false, inference with for-loop without batch padding 
-        run_cfg=dict(num_gpus=2, num_procs=1),
+        batch_padding=False, # if false, inference with for-loop without batch padding
+        run_cfg=dict(num_gpus=8, num_procs=1),
     )
-
 ]
