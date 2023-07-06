@@ -269,10 +269,12 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 
 </td>
 
+<!--
 - GLM
 - ...
 
 </td> -->
+
 </tr>
   </tbody>
 </table>
