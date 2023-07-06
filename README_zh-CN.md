@@ -1,4 +1,4 @@
-<div align="center">
+![image](https://github.com/InternLM/OpenCompass/assets/7881589/13e73e0a-b537-48bb-84be-b98aea3f00c3)<div align="center">
   <img src="docs/zh_cn/_static/image/logo.svg" width="500px"/>
   <br />
   <br />
@@ -15,6 +15,9 @@
 [English](/README.md) | 简体中文
 
 </div>
+
+欢迎来到OpenCompass！
+就像指南针在我们的旅程中为我们导航一样，我们希望OpenCompass能够帮助你穿越评估大型语言模型的重重迷雾。OpenCompass提供丰富的算法和功能支持，期待OpenCompass能够帮助社区更便捷地对NLP模型的性能进行公平全面的评估。
 
 ## 介绍
 
