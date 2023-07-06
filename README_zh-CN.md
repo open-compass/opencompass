@@ -294,10 +294,6 @@ wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompass
 unzip OpenCompassData.zip
 ```
 
-# TODO: ....
-
-````
-
 ## 评测
 
 请阅读[快速上手](https://opencompass.readthedocs.io/zh_cn/latest/get_started.html)了解如何运行一个评测任务。
@@ -315,4 +311,4 @@ unzip OpenCompassData.zip
     howpublished = {\url{https://github.com/InternLM/OpenCompass}},
     year={2023}
 }
-````
+```
