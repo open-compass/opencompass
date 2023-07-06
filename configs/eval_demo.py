@@ -1,3 +1,4 @@
+from mmengine.config import read_base
 from opencompass.models import HuggingFaceCausalLM
 
 from mmengine.config import read_base
