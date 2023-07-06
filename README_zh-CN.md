@@ -59,7 +59,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
         <b>推理</b>
       </td>
       <td>
-        <b>考试</b>
+        <b>学科</b>
       </td>
       <td>
         <b>理解</b>
@@ -237,14 +237,14 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
   <tbody>
     <tr align="center" valign="bottom">
       <td>
-        <b>HuggingFace 模型</b>
+        <b>开源模型</b>
       </td>
       <td>
         <b>API 模型</b>
       </td>
-      <td>
+      <!-- <td>
         <b>自定义模型</b>
-      </td>
+      </td> -->
     </tr>
     <tr valign="top">
       <td>
@@ -265,18 +265,18 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 </td>
 <td>
 
-- OpenAI
+- OpenAI (即将推出)
 - Claude (即将推出)
 - PaLM (即将推出)
 - ……
 
 </td>
-<td>
+<!-- <td>
 
 - GLM
 - ……
 
-</td>
+</td> -->
 </tr>
   </tbody>
 </table>
