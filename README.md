@@ -56,7 +56,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
         <b>Reasoning</b>
       </td>
       <td>
-        <b>Exam</b>
+        <b>Comprehensive Examination</b>
       </td>
       <td>
         <b>Understanding</b>
@@ -234,14 +234,14 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
   <tbody>
     <tr align="center" valign="bottom">
       <td>
-        <b>HuggingFace Models</b>
+        <b>Open-source Models</b>
       </td>
       <td>
         <b>API Models</b>
       </td>
-      <td>
+      <!-- <td>
         <b>Custom Models</b>
-      </td>
+      </td> -->
     </tr>
     <tr valign="top">
       <td>
@@ -263,18 +263,18 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 </td>
 <td>
 
-- OpenAI
+- OpenAI (coming soon)
 - Claude (coming soon)
 - PaLM (coming soon)
 - ……
 
 </td>
-<td>
+<!-- <td>
 
 - GLM
 - ……
 
-</td>
+</td> -->
 </tr>
   </tbody>
 </table>
