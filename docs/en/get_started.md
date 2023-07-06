@@ -60,7 +60,7 @@ Here's a detailed step-by-step explanation of this case study:
 <details>
 <summary>prepare datasets</summary>
 
-The SiQA and PiQA benchmarks can be automatically downloaded through their respective links here and here, so no manual downloading is required here. However, some other datasets may require manual downloads. Please refer to the documentation [Prepare Datasets](docs/zh_cn/user_guides/dataset_prepare.md) for more information.
+The SiQA and PiQA benchmarks can be automatically downloaded through their respective links here and here, so no manual downloading is required here. However, some other datasets may require manual downloads. Please refer to the documentation [Prepare Datasets](./user_guides/dataset_prepare.md) for more information.
 
 Create a '.py' configuration file and add the following content:
 
