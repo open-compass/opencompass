@@ -2,13 +2,15 @@ import argparse
 import getpass
 import os
 import os.path as osp
+import sys
 from datetime import datetime
 
 from mmengine.config import Config
 
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.registry import PARTITIONERS, RUNNERS
-from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
+from opencompass.runners import (DLCRunner, LocalRunner, MMSlurmRunner,
+                                 SlurmRunner)
 from opencompass.utils import LarkReporter, Summarizer, get_logger
 
 
@@ -99,6 +101,14 @@ def parse_args():
         'Will be overrideen by the "retry" argument in the config.',
         type=int,
         default=2)
+
+    # add multimodal eval args
+    parser.add_argument('--mm-eval',
+                        default=False,
+                        action='store_true',
+                        help='Whether or '
+                        'not evaluate multimodal models.')
+
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -143,10 +153,27 @@ def main():
     args = parse_args()
     if args.dry_run:
         args.debug = True
+        
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
     cfg = Config.fromfile(args.config, format_python_code=False)
+
+    # multimodal evaluation
+    if args.mm_eval:
+        if args.slurm:
+            runner = MMSlurmRunner(
+                max_num_workers=args.max_num_workers,
+                partition=args.partition,
+                quotatype=args.quotatype,
+                retry=args.retry,
+                debug=args.debug,
+            )
+        runner(cfg.tasks, args)
+        # after finish multimodal evaluation, exit without running
+        # language model evaluation
+        sys.exit()
+
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
