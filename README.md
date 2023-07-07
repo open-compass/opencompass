@@ -89,7 +89,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 <details open>
 <summary><b>Coreference Resolution</b></summary>
 
-- CLUEWSCS
+- CLUEWSC
 - WSC
 - WinoGrande
 
