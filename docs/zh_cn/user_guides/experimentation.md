@@ -5,7 +5,7 @@
 评测任务的程序入口为 `run.py`，使用方法如下：
 
 ```shell
-run.py $Config {--slrum | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [--lark]
+python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l]
 ```
 
 启动方式：

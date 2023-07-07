@@ -5,7 +5,7 @@
 The program entry for the assessment task is `run.py`, its usage is as follows:
 
 ```shell
-run.py $Config {--slrum | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [--lark]
+python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l]
 ```
 
 Starting method:
