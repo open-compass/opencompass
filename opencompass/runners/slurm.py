@@ -99,7 +99,7 @@ class SlurmRunner(BaseRunner):
             tmpl += f' --quotatype={self.quotatype}'
         if num_gpus > 0:
             tmpl += f' --gres=gpu:{num_gpus}'
-        tmpl += f" -N1 -J '{task_name[:512]}'" + '{task_cmd}'
+        tmpl += f" -N1 -J '{task_name[:512]}'" + ' {task_cmd}'
         get_cmd = partial(task.get_command, cfg_path=param_file, template=tmpl)
         cmd = get_cmd()
 
