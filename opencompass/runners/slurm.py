@@ -1,9 +1,9 @@
-import inspect
 import os
 import os.path as osp
 import random
 import subprocess
 import time
+from functools import partial
 from typing import Any, Dict, List, Tuple
 
 import mmengine
@@ -85,7 +85,6 @@ class SlurmRunner(BaseRunner):
         task = task_type(task_cfg)
         num_gpus = task.num_gpus
         task_name = task.name
-        script_path = inspect.getsourcefile(task_type)
 
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
@@ -93,18 +92,17 @@ class SlurmRunner(BaseRunner):
         task_cfg.dump(param_file)
 
         # Build up slurm command
-        task_cmd_template = task.get_command_template()
-        task_cmd = task_cmd_template.replace('{SCRIPT_PATH}',
-                                             script_path).replace(
-                                                 '{CFG_PATH}', param_file)
-        cmd = 'srun'
+        tmpl = 'srun'
         if self.partition:
-            cmd += f' -p {self.partition}'
+            tmpl += f' -p {self.partition}'
         if self.quotatype:
-            cmd += f' --quotatype={self.quotatype}'
+            tmpl += f' --quotatype={self.quotatype}'
         if num_gpus > 0:
-            cmd += f' --gres=gpu:{num_gpus}'
-        cmd += f" -N1 -J '{task_name[:512]}' {task_cmd}"
+            tmpl += f' --gres=gpu:{num_gpus}'
+        tmpl += f" -N1 -J '{task_name[:512]}'" + '{task_cmd}'
+        get_cmd = partial(task.get_command, cfg_path=param_file, template=tmpl)
+        cmd = get_cmd()
+
         logger = get_logger()
         logger.debug(f'Running command: {cmd}')
 
@@ -130,6 +128,8 @@ class SlurmRunner(BaseRunner):
             retry -= 1
             if random_sleep:
                 time.sleep(random.randint(0, 10))
+            # Re-generate command to refresh ports.
+            cmd = get_cmd()
             result = subprocess.run(cmd,
                                     shell=True,
                                     text=True,

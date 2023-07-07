@@ -31,13 +31,24 @@ class OpenICLInferTask(BaseTask):
         self.num_gpus = run_cfg.get('num_gpus', 0)
         self.num_procs = run_cfg.get('num_procs', 1)
 
-    def get_command_template(self):
+    def get_command(self, cfg_path, template):
+        """Get the command template for the task.
+
+        Args:
+            cfg_path (str): The path to the config file of the task.
+            template (str): The template which have '{task_cmd}' to format
+                the command.
+        """
+        script_path = __file__
         if self.num_gpus > 0:
-            return (f'torchrun --master_port={random.randint(12000, 32000)} '
-                    f'--nproc_per_node {self.num_procs} '
-                    '{SCRIPT_PATH} {CFG_PATH}')
+            port = random.randint(12000, 32000)
+            command = (f'torchrun --master_port={port} '
+                       f'--nproc_per_node {self.num_procs} '
+                       f'{script_path} {cfg_path}')
         else:
-            return ('python {SCRIPT_PATH} {CFG_PATH}')
+            command = 'python {script_path} {cfg_path}'
+
+        return template.format(task_cmd=command)
 
     def run(self):
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):

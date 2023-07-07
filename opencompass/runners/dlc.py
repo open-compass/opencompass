@@ -1,9 +1,9 @@
-import inspect
 import os
 import os.path as osp
 import random
 import subprocess
 import time
+from functools import partial
 from typing import Any, Dict, List, Tuple
 
 import mmengine
@@ -82,7 +82,6 @@ class DLCRunner(BaseRunner):
         task = task_type(task_cfg)
         num_gpus = task.num_gpus
         task_name = task.name
-        script_path = inspect.getsourcefile(task_type)
 
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
@@ -90,28 +89,26 @@ class DLCRunner(BaseRunner):
         task_cfg.dump(param_file)
 
         # Build up DLC command
-        task_cmd_template = task.get_command_template()
-        task_cmd = task_cmd_template.replace('{SCRIPT_PATH}',
-                                             script_path).replace(
-                                                 '{CFG_PATH}', param_file)
         pwd = os.getcwd()
         shell_cmd = (f'source {self.aliyun_cfg["bashrc_path"]}; '
                      f'conda activate {self.aliyun_cfg["conda_env_name"]}; '
                      f'cd {pwd}; '
-                     f'{task_cmd}')
+                     '{task_cmd}')
 
-        cmd = ('dlc create job'
-               f" --command '{shell_cmd}'"
-               f' --name {task_name[:512]}'
-               ' --kind BatchJob'
-               f" -c {self.aliyun_cfg['dlc_config_path']}"
-               f" --workspace_id {self.aliyun_cfg['workspace_id']}"
-               ' --worker_count 1'
-               f' --worker_cpu {max(num_gpus * 6, 8)}'
-               f' --worker_gpu {num_gpus}'
-               f' --worker_memory {max(num_gpus * 32, 48)}'
-               f" --worker_image {self.aliyun_cfg['worker_image']}"
-               ' --interactive')
+        tmpl = ('dlc create job'
+                f" --command '{shell_cmd}'"
+                f' --name {task_name[:512]}'
+                ' --kind BatchJob'
+                f" -c {self.aliyun_cfg['dlc_config_path']}"
+                f" --workspace_id {self.aliyun_cfg['workspace_id']}"
+                ' --worker_count 1'
+                f' --worker_cpu {max(num_gpus * 6, 8)}'
+                f' --worker_gpu {num_gpus}'
+                f' --worker_memory {max(num_gpus * 32, 48)}'
+                f" --worker_image {self.aliyun_cfg['worker_image']}"
+                ' --interactive')
+        get_cmd = partial(task.get_command, cfg_path=param_file, template=tmpl)
+        cmd = get_cmd()
 
         logger = get_logger()
         logger.debug(f'Running command: {cmd}')
@@ -138,6 +135,8 @@ class DLCRunner(BaseRunner):
             retry -= 1
             if random_sleep:
                 time.sleep(random.randint(0, 10))
+            # Re-generate command to refresh ports.
+            cmd = get_cmd()
             result = subprocess.run(cmd,
                                     shell=True,
                                     text=True,
