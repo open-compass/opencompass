@@ -1,6 +1,6 @@
 # 安装
 
-1. 使用以下命令准备 OpenCompass 环境：
+1. 准备 OpenCompass 运行环境：
 
 ```bash
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
@@ -19,7 +19,10 @@ pip install -e .
 
 3. 安装 humaneval（可选）
 
-如果你需要在 humaneval 数据集上进行评估，请执行此步骤，否则忽略这一步。
+如果你需要**在 humaneval 数据集上评估模型代码能力**，请执行此步骤，否则忽略这一步。
+
+<details>
+<summary><b>点击查看详细</b></summary>
 
 ```bash
 git clone https://github.com/openai/human-eval.git
@@ -31,11 +34,30 @@ cd ..
 
 请仔细阅读 `human_eval/execution.py` **第48-57行**的注释，了解执行模型生成的代码可能存在的风险，如果接受这些风险，请取消**第58行**的注释，启用代码执行评测。
 
+</details>
+
+# 数据集准备
+
+OpenCompass 支持的数据集主要包括两个部分：
+
+1. Huggingface 数据集： [Huggingface Dataset](https://huggingface.co/datasets) 提供了大量的数据集，这部分数据集运行时会**自动下载**。
+
+2. 自建数据集：OpenCompass 还提供了一些第三方数据集及自建**中文**数据集。运行以下命令**手动下载解压**至`${OpenCompass}/data`目录。
+
+在 OpenCompass 目录下运行下面命令：
+
+```bash
+wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+unzip OpenCompassData.zip
+```
+
+OpenCompass 已经支持了大多数常用于性能比较的数据集，具体支持的数据集列表请直接在 `configs/dataset` 下进行查找。
+
 # 快速上手
 
-启动一个简单评测任务一般需要三个步骤：
+完成安装以及数据集的准备后，启动一个简单评测任务一般需要三个步骤：
 
-1. **准备数据集及其配置**， [`configs/datasets`](https://github.com/open-mmlab/OpenCompass/tree/main/configs/datasets) 提供了 OpenCompass 已经支持的 50 多种数据集。
+1. **准备数据集配置**， [`configs/datasets`](https://github.com/open-mmlab/OpenCompass/tree/main/configs/datasets) 提供了 OpenCompass 已经支持的 50 多种数据集。
 2. **准备模型配置**，[`configs/models`](https://github.com/open-mmlab/OpenCompass/tree/main/configs/models) 提供已经支持的大模型样例， 包括基于 HuggingFace 的模型以及类似 ChatGPT 的 API 模型。
 3. **使用 `run` 脚本启动**， 支持一行命令在本地或者 slurm 上启动评测，支持一次测试多个数据集，多个模型。
 

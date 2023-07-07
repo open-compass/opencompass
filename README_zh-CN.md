@@ -3,13 +3,13 @@
   <br />
   <br />
 
-[![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/zh_CN)
+[![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/zh_CN/latest/index.html)
 [![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
 [🌐Website](https://opencompass.org.cn/) |
-[📘Documentation](https://opencompass.readthedocs.io/en/latest/) |
-[🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started/install.html) |
+[📘Documentation](https://opencompass.readthedocs.io/zh_CN/latest/index.html) |
+[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html) |
 [🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
 
 [English](/README.md) | 简体中文
@@ -279,7 +279,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
   </tbody>
 </table>
 
-# 安装
+## 安装
 
 下面展示了快速安装的步骤。有部分第三方功能可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_cn/latest/get_started.html)。
 
