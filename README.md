@@ -3,7 +3,7 @@
   <br />
   <br />
 
-[![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/en/latest/index.html)
+[![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/en)
 [![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
@@ -89,7 +89,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 <details open>
 <summary><b>Coreference Resolution</b></summary>
 
-- CLUEWSC
+- CLUEWSCS
 - WSC
 - WinoGrande
 

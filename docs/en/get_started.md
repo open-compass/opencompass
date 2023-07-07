@@ -197,8 +197,6 @@ winograd   b6c7ed     accuracy  ppl         51.23      49.82
 
 All run outputs will default to `outputs/default/` directory with following structure:
 
-Here's the translation:
-
 ```text
 outputs/default/
 ├── 20200220_120000
