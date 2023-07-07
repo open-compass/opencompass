@@ -31,8 +31,10 @@ class OpenICLEvalTask(BaseTask):
         self.num_gpus = 0
         self.logger = get_logger()
 
-    def get_command_template(self):
-        return 'python3 {SCRIPT_PATH} {CFG_PATH}'
+    def get_command(self, cfg_path, template):
+        script_path = __file__
+        command = f'python3 {script_path} {cfg_path}'
+        return template.format(task_cmd=command)
 
     def run(self):
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):

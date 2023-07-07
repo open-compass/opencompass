@@ -1,9 +1,9 @@
-import inspect
 import os
 import os.path as osp
 import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 from threading import Lock
 from typing import Any, Dict, List, Tuple
 
@@ -108,7 +108,6 @@ class LocalRunner(BaseRunner):
         """
 
         task_name = task.name
-        script_path = inspect.getsourcefile(type(task))
 
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
@@ -116,12 +115,11 @@ class LocalRunner(BaseRunner):
         task.cfg.dump(param_file)
 
         # Build up slurm command
-        task_cmd_template = task.get_command_template()
-        task_cmd = task_cmd_template.replace('{SCRIPT_PATH}',
-                                             script_path).replace(
-                                                 '{CFG_PATH}', param_file)
-        cmd = 'CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids) + ' '
-        cmd += task_cmd
+        tmpl = 'CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
+        tmpl += ' {task_cmd}'
+        get_cmd = partial(task.get_command, cfg_path=param_file, template=tmpl)
+        cmd = get_cmd()
+
         logger = get_logger()
         logger.debug(f'Running command: {cmd}')
 

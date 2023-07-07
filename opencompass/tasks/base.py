@@ -10,7 +10,7 @@ from opencompass.utils import get_infer_output_path, task_abbr_from_cfg
 class BaseTask:
     """Base class for all tasks. There are two ways to run the task:
     1. Directly by calling the `run` method.
-    2. Calling the `get_command_template` method to get the command template,
+    2. Calling the `get_command` method to get the command,
         and then run the command in the shell.
 
     Args:
@@ -35,15 +35,13 @@ class BaseTask:
         """Run the task."""
 
     @abstractmethod
-    def get_command_template(self) -> str:
+    def get_command(self, cfg_path, template) -> str:
         """Get the command template for the task.
 
-        The command template should
-        contain the following placeholders:
-        1. ``{SCRIPT_PATH}``: This placeholder will be replaced by the path to
-            the script file of the task.
-        2. ``{CFG_PATH}`` This placeholder will be replaced by the
-            path to the config file of the task.
+        Args:
+            cfg_path (str): The path to the config file of the task.
+            template (str): The template which have '{task_cmd}' to format
+                the command.
         """
 
     @property
