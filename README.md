@@ -38,7 +38,7 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 
 We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
-[![image](https://github.com/InternLM/OpenCompass/assets/7881589/475b0c8e-28b8-43e9-b2fd-4dd558e22491)](https://opencompass.org.cn/rank)
+[![image](https://github.com/InternLM/opencompass/assets/13503330/80c5a42c-ddf0-4c6f-b39e-c175711ac381)](https://opencompass.org.cn/rank)
 
 ## Dataset Support
 
