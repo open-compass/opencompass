@@ -1,12 +1,19 @@
 # Task Execution and Monitoring
 
-## Initiation of Assessment Task 
+## Initiation of Assessment Task
 
 The program entry for the assessment task is `run.py`, its usage is as follows:
 
 ```shell
-run.py [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l LARK] config
+run.py $Config {--slrum | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [--lark]
 ```
+
+Starting method:
+
+- Local machine `run.py $Config`, where `$Config` does not contain fields 'eval' and 'infer'.
+- Running with slurm: `run.py $Config --slurm -p $PARTITION_name`.
+- ALiYun DLC run: `run.py $Config --dlc --aliyun-cfg $AliYun_Cfg`, tutorial will come later.
+- Customized run: `run.py $Config`, where `$Config` contains fields 'eval' and 'infer', see [Evaluation document](./evaluation.md).
 
 The parameter explanation is as follows:
 

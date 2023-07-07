@@ -36,7 +36,7 @@ Please read the comments in `human_eval/execution.py` **lines 48-57** to underst
 
 </details>
 
-## Dataset Preparation
+# Dataset Preparation
 
 The datasets supported by OpenCompass mainly include two parts:
 
