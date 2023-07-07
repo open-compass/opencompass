@@ -12,7 +12,7 @@ If you want to customize the PyTorch version or related CUDA version, please ref
 2. Install OpenCompass:
 
 ```bash
-git clone https://github.com/opencompass/opencompass
+git clone https://github.com/InternLM/opencompass.git
 cd opencompass
 pip install -e .
 ```
@@ -58,7 +58,7 @@ Here's a detailed step-by-step explanation of this case study:
 ## Step by step
 
 <details>
-<summary>prepare datasets</summary>
+<summary><b>prepare datasets</b></summary>
 
 The SiQA and PiQA benchmarks can be automatically downloaded through their respective links here and here, so no manual downloading is required here. However, some other datasets may require manual downloads. Please refer to the documentation [Prepare Datasets](./user_guides/dataset_prepare.md) for more information.
 
@@ -79,7 +79,7 @@ datasets = [*piqa_datasets, *siqa_datasets]
 </details>
 
 <details>
-<summary>prepare models</summary>
+<summary><b>prepare models</b></summary>
 
 The pretrained model 'huggyllama/llama-7b' from HuggingFace supports automatic downloading. Add the following line to your configuration file:
 
@@ -107,7 +107,7 @@ models = [llama_7b]
 </details>
 
 <details>
-<summary>Launch Evaluation</summary>
+<summary><b>Launch Evaluation</b></summary>
 
 First, we can start the task in **debug mode** to check for any exceptions in model loading, dataset reading, or incorrect cache usage.
 
@@ -155,24 +155,24 @@ siqa       e78df3     accuracy  gen          36.08
 
 All run outputs will default to `outputs/default/` directory with following structure:
 
-```markdown
+Here's the translation:
+
+```text
 outputs/default/
 ├── 20200220_120000
-├── ...
-├── 20230220_183030
-│   ├── configs
-│   ├── logs
+├── 20230220_183030     # one experiment pre folder
+│   ├── configs         # replicable config files
+│   ├── logs            # log files for both inference and evaluation stages
 │   │   ├── eval
 │   │   └── infer
-│   ├── predictions
-│   │   └── MODEL1
-│   └── results
-│       └── MODEL1
+│   ├── predictions     # json format of per data point inference result
+│   └── results         # numerical conclusions of each evaluation session
+├── ...
 ```
 
-Inside each timestamp folder there would be below items:
+Each timestamp folder represents one experiment with the following contents:
 
-- configs folder, used for storing configuration files corresponding to this output dir using current time stamp;
-- logs folder, used for storing inference and evaluation log files of different models;
-- predictions folder, used for storing inference json result file(s), grouped by model;
-- results folder, used for storing evaluation json result file(s), grouped by model.
+- `configs`: configuration file storage;
+- `logs`: log file storage for both **inference** and **evaluation** stages;
+- `predictions`: json format output of inference result per data points;
+- `results`: json format output of numerical conclusion on each evaluation session.

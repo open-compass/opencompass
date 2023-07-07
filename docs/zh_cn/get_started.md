@@ -12,7 +12,7 @@ conda activate opencompass
 2. 安装 OpenCompass：
 
 ```bash
-git clone https://github.com/opencompass/opencompass
+git clone https://github.com/InternLM/opencompass.git
 cd opencompass
 pip install -e .
 ```
@@ -53,7 +53,7 @@ python run.py configs/eval_llama_7b.py --debug
 ## 详细步骤
 
 <details>
-<summary>准备数据集及其配置</summary>
+<summary><b>准备数据集及其配置</b></summary>
 
 因为 [siqa](https://huggingface.co/datasets/siqa)， [piqa](https://huggingface.co/datasets/piqa) 支持自动下载，所以这里不需要手动下载数据集，但有部分数据集可能需要手动下载，详细查看文档 [准备数据集](./user_guides/dataset_prepare.md).
 
@@ -75,7 +75,7 @@ datasets = [*piqa_datasets, *siqa_datasets]          # 最后 config 需要包�
 </details>
 
 <details>
-<summary>准备模型</summary>
+<summary><b>准备模型</b></summary>
 
 [configs/models](https://github.com/InternLM/OpenCompass/blob/main/configs/models) 包含多种已经支持的模型案案例，如 gpt3.5, hf_llama 等。
 
@@ -104,7 +104,7 @@ models = [llama_7b]                                     # 最后 config 需要�
 </details>
 
 <details>
-<summary>启动评测</summary>
+<summary><b>启动评测</b></summary>
 
 首先，我们可以使用 debug 模式启动任务，以检查模型加载、数据集读取是否出现异常，如未正确读取缓存等。
 
@@ -154,21 +154,19 @@ siqa       e78df3     accuracy  gen          36.08
 ```text
 outputs/default/
 ├── 20200220_120000
-├── ...
-├── 20230220_183030
-│   ├── configs
-│   ├── logs
+├── 20230220_183030   # 一次实验
+│   ├── configs       # 可复现 config
+│   ├── logs          # 日志
 │   │   ├── eval
 │   │   └── infer
-│   ├── predictions
-│   │   └── MODEL1
-│   └── results
-│       └── MODEL1
+│   ├── predictions   # 推理结果，每一条数据推理结果
+│   └── results       # 评估结论，一个评估实验的数值结论
+├── ...
 ```
 
-其中，每一个时间戳中存在以下内容：
+其中，每一个时间戳文件夹代表一次实验中存在以下内容：
 
-- configs文件夹，用于存放以这个时间戳为输出目录的每次运行对应的配置文件；
-- logs文件夹，用于存放推理和评测两个阶段的输出日志文件，各个文件夹内会以模型为子文件夹存放日志；
-- predicitions文件夹，用于存放推理json结果，以模型为子文件夹；
-- results文件夹，用于存放评测json结果，以模型为子文件夹
+- 'configs':用于存放配置文件；
+- 'logs':用于存放**推理**和**评测**两个阶段的日志文件
+- 'predicitions':用于存放推理结果，格式为json；
+- 'results': 用于存放评测json结果。
