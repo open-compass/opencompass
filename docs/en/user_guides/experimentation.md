@@ -40,6 +40,7 @@ Configuration method:
 
 1. Open the `configs/lark.py` file, and add the following line:
 
+<<<<<<< HEAD
    ```python
    lark_bot_url = 'YOUR_WEBHOOK_URL'
    ```
@@ -61,6 +62,33 @@ Typically, the Webhook URL is formatted like this: https://open.feishu.cn/open-a
    ```bash
    python run.py configs/eval_demo.py -p {PARTITION} -l
    ```
+=======
+```python
+lark_bot_url = 'YOUR_WEBHOOK_URL'
+```
+
+Typically, the Webhook URL is formatted like this: https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx .
+
+2. Inherit this file in the complete evaluation configuration:
+
+```python
+  from mmengine.config import read_base
+
+  with read_base():
+      from .lark import lark_bot_url
+
+```
+
+3. To avoid frequent messages from the bot becoming a nuisance, status updates are not automatically reported by default. You can start status reporting using `-l` or `--lark` when needed:
+
+```bash
+python run.py configs/eval_demo.py -p {PARTITION} -l
+```
+
+## Introduction of Summerizer
+
+It is mainly used to visualize evaluation results.
+>>>>>>> [Feature]: Add minigpt-4
 
 ## Run Results
 
