@@ -4,7 +4,7 @@
   <br />
 
 [![docs](https://readthedocs.org/projects/opencompass/badge/?version=dev-1.x)](https://opencompass.readthedocs.io/en/dev-1.x/?badge=dev-1.x)
-[![license](https://img.shields.io/github/license/IntenLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
+[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
 [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/)
 
 [🌐Website](https://opencompass.org.cn/) |
