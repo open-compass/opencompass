@@ -17,7 +17,7 @@ from mmengine.model.wrappers import MMDistributedDataParallel
 from mmengine.runner import Runner
 from mmengine.utils import track_iter_progress
 
-from opencompass.registry import MODELS
+from opencompass.registry import MM_MODELS
 
 
 def parse_args():
@@ -34,7 +34,7 @@ def parse_args():
 
 
 def build_model(cfg):
-    model = MODELS.build(cfg['model'])
+    model = MM_MODELS.build(cfg['model'])
     load_from = cfg.get('load_from', None)
     if load_from is not None:
         state_dict = torch.load(cfg['load_from'], map_location='cpu')

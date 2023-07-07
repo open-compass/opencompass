@@ -10,8 +10,8 @@ from mmengine.config import Config
 from opencompass.partitioners import (MultimodalNaivePartitioner,
                                       NaivePartitioner, SizePartitioner)
 from opencompass.registry import PARTITIONERS, RUNNERS
-from opencompass.runners import (DLCRunner, LocalRunner, MMSlurmRunner,
-                                 SlurmRunner)
+from opencompass.runners import (DLCRunner, LocalRunner, MMLocalRunner,
+                                 MMSlurmRunner, SlurmRunner)
 from opencompass.utils import LarkReporter, Summarizer, get_logger
 
 
