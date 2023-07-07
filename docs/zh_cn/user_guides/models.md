@@ -2,9 +2,68 @@
 
 要在 OpenCompass 中支持新模型的评测，有以下几种方式：
 
-1. 基于 HuggingFace 的模型
-2. 基于 API 的模型
-3. 自定义模型
+1. 基于internLM 的模型
+2. 基于 HuggingFace 的模型
+3. 基于 API 的模型
+4. 自定义模型
+
+## 基于 internLM 的模型
+
+在 OpenCompass 中，我们支持加载internLM中的模型进行评测。
+
+如下，为一个示例的 internLM 模型配置文件：
+
+```python
+from opencompass.models.intern import intern_model
+
+models = [
+    dict(
+        type=intern_model,
+        path="/program/model/model_test/",
+        tokenizer_path='/program/tokenizers/V7.model',
+        tokenizer_type='v7',
+        model_config = "/program/model/model_config.py",
+        max_out_len=100,
+        max_seq_len=2048,
+        batch_size=16,
+        run_cfg=dict(num_gpus=1, num_procs=1))
+]
+
+```
+
+对以上一些参数的说明：
+
+- `path`：为internLM权重的路径，OpenCompass会从该路径中加载权重。
+- `tokenizer_path`：为tokenizer的路径，OpenCompass根据该路径加载tokenizer。
+- `tokenizer_type`：指定tokenizer的类型，可选类型有llama，v4，v6，v7。
+- `model_config`：传入的模型配置路径，会根据该文件中的的配置加载模型的config。
+
+下面是一个model_config的具体例子：
+
+```python
+model = dict(
+    checkpoint = False,
+    num_chunks = 1,
+    num_attention_heads = 32,
+    embed_split_hidden = True,
+    vocab_size = 103168,
+    embed_grad_scale = 1,
+    parallel_output = True,
+    hidden_size = 4096,
+    num_layers = 32,
+    mlp_ratio = 2.6666666666666665,
+    apply_post_layer_norm = False,
+    no_bias = True,
+    deepnorm = False,
+    dtype = "torch.bfloat16",
+    norm_type = 'rmsnorm',
+    layer_norm_epsilon = 1e-05
+)
+parallel = dict(
+    zero1=1,
+)
+```
+parallel不做变动，始终指定zero1=1,model根据需求更改相应的参数即可。
 
 ## 基于 HuggingFace 的模型
 
