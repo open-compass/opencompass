@@ -2,9 +2,66 @@
 
 To support the evaluation of new models in OpenCompass, there are several ways:
 
-1. HuggingFace-based models
-2. API-based models
-3. Custom models
+1. InternLM-based models
+2. HuggingFace-based models
+3. API-based models
+4. Custom models
+
+## InternLM-based Models
+
+In OpenCompass, we support loading models from internLM for evaluation.
+Here is an example internLM model configuration file:
+
+```python
+from opencompass.models.intern import intern_model
+
+models = [
+    dict(
+        type=intern_model,
+        path="/program/model/model_test/",
+        tokenizer_path='/program/tokenizers/V7.model',
+        tokenizer_type='v7',
+        model_config = "/program/model/model_config.py",
+        max_out_len=100,
+        max_seq_len=2048,
+        batch_size=16,
+        run_cfg=dict(num_gpus=1, num_procs=1))
+]
+
+```
+
+Explanation of some of the parameters:
+
+- `path`: The path for internLM weights, from which OpenCompass will load weights.
+- `tokenizer_path`: is the path of the tokenizer, and OpenCompass loads the tokenizer based on this path.
+- `tokenizer_type`: specifies the type of tokenizer. Option type include llama, v4, v6, and v7.
+- `model_config`: The passed in model configuration path will load the model's config based on the configuration in the file.
+Here is a model_ Specific examples of config:
+
+```python
+model = dict(
+    checkpoint = False,
+    num_chunks = 1,
+    num_attention_heads = 32,
+    embed_split_hidden = True,
+    vocab_size = 103168,
+    embed_grad_scale = 1,
+    parallel_output = True,
+    hidden_size = 4096,
+    num_layers = 32,
+    mlp_ratio = 2.6666666666666665,
+    apply_post_layer_norm = False,
+    no_bias = True,
+    deepnorm = False,
+    dtype = "torch.bfloat16",
+    norm_type = 'rmsnorm',
+    layer_norm_epsilon = 1e-05
+)
+parallel = dict(
+    zero1=1,
+)
+```
+The parallel remains unchanged, always specifying zero1=1, and the model can change the corresponding parameters according to the requirements.
 
 ## HuggingFace-based Models
 
