@@ -1,4 +1,5 @@
 from typing import List
+
 import evaluate
 
 from opencompass.registry import ICL_EVALUATORS
@@ -54,9 +55,12 @@ class HuggingfaceEvaluator(BaseEvaluator):
             dict: calculated scores.
         """
         if len(predictions) != len(references):
-            return {'error': 'predictions and references have different '
+            return {
+                'error':
+                'predictions and references have different '
                 f'length. len(predictions): {len(predictions)}, '
-                f'len(references): {len(references)}'}
+                f'len(references): {len(references)}'
+            }
         metric = evaluate.load(self.metric)
         scores = metric.compute(**self._preprocess(predictions, references))
         return self._postprocess(scores)
@@ -103,13 +107,13 @@ class AccEvaluator(HuggingfaceEvaluator):
         Returns:
             dict: postprocessed scores.
         """
-        scores["accuracy"] *= 100
+        scores['accuracy'] *= 100
         return scores
 
 
 @ICL_EVALUATORS.register_module()
 class RougeEvaluator(HuggingfaceEvaluator):
-    """Rouge evaluator."""
+    """Rogue evaluator."""
 
     def __init__(self) -> None:
         super().__init__(metric='rouge')
@@ -150,7 +154,7 @@ class MccEvaluator(AccEvaluator):
         Returns:
             dict: postprocessed scores.
         """
-        scores["matthews_correlation"] *= 100
+        scores['matthews_correlation'] *= 100
         return scores
 
 

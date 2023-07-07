@@ -1,6 +1,6 @@
 # Task Execution and Monitoring
 
-## Initiation of Assessment Task 
+## Initiation of Assessment Task
 
 The program entry for the assessment task is `run.py`, its usage is as follows:
 
@@ -32,27 +32,27 @@ Configuration method:
 
 1. Open the `configs/lark.py` file, and add the following line:
 
-  ```python
-  lark_bot_url = 'YOUR_WEBHOOK_URL'
-  ```
+```python
+lark_bot_url = 'YOUR_WEBHOOK_URL'
+```
 
-  Typically, the Webhook URL is formatted like this: https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx .
+Typically, the Webhook URL is formatted like this: https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx .
 
 2. Inherit this file in the complete evaluation configuration:
 
-  ```python
-    from mmengine.config import read_base
+```python
+  from mmengine.config import read_base
 
-    with read_base():
-        from .lark import lark_bot_url
+  with read_base():
+      from .lark import lark_bot_url
 
-  ```
+```
 
 3. To avoid frequent messages from the bot becoming a nuisance, status updates are not automatically reported by default. You can start status reporting using `-l` or `--lark` when needed:
 
-  ```bash
-  python run.py configs/eval_demo.py -p {PARTITION} -l
-  ```
+```bash
+python run.py configs/eval_demo.py -p {PARTITION} -l
+```
 
 ## Introduction of Summerizer
 
@@ -78,6 +78,7 @@ outputs/default/
 ```
 
 Each timestamp contains the following content:
+
 - configs folder, which stores the configuration files corresponding to each run with this timestamp as the output directory;
 - logs folder, which stores the output log files of the inference and evaluation phases, each folder will store logs in subfolders by model;
 - predictions folder, which stores the inferred json results, with a model subfolder;
