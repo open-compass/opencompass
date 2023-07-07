@@ -9,8 +9,8 @@ from mmengine.config import Config
 
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.registry import PARTITIONERS, RUNNERS
-from opencompass.runners import (DLCRunner, LocalRunner, MMSlurmRunner,
-                                 SlurmRunner)
+from opencompass.runners import (DLCRunner, LocalRunner, MMLocalRunner,
+                                 MMSlurmRunner, SlurmRunner)
 from opencompass.utils import LarkReporter, Summarizer, get_logger
 
 
@@ -150,13 +150,15 @@ def main():
     # multimodal evaluation
     if args.mm_eval:
         if args.slurm:
-            runner = MMSlurmRunner(
-                max_num_workers=args.max_num_workers,
-                partition=args.partition,
-                quotatype=args.quotatype,
-                retry=args.retry,
-                debug=args.debug,
-            )
+            runner = MMSlurmRunner(max_num_workers=args.max_num_workers,
+                                   partition=args.partition,
+                                   quotatype=args.quotatype,
+                                   retry=args.retry,
+                                   debug=args.debug,
+                                   gpus_per_task=cfg.gpus_per_task)
+        else:
+            runner = MMLocalRunner(retry=args.retry,
+                                   gpus_per_task=cfg.gpus_per_task)
         runner(cfg.tasks, args)
         # after finish multimodal evaluation, exit without running
         # language model evaluation
