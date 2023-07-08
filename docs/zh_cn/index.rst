@@ -71,8 +71,8 @@ OpenCompass 上手路线
 .. toctree::
    :caption: 切换语言
 
-   English <https://mmpretrain.readthedocs.io/en/latest/>
-   简体中文 <https://mmpretrain.readthedocs.io/zh_CN/latest/>
+   English <https://OpenCompass.readthedocs.io/en/latest/>
+   简体中文 <https://OpenCompass.readthedocs.io/zh_CN/latest/>
 
 
 索引与表格
