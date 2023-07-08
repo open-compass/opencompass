@@ -14,7 +14,7 @@ val_pipeline = [
          ])
 ]
 
-dataset = dict(type='opencompass.OmniMMBench',
+dataset = dict(type='opencompass.OmniMMBenchDataset',
                data_file='data/mm_benchmark/mmagi_v030_full_inferin.tsv',
                pipeline=val_pipeline)
 
@@ -26,7 +26,7 @@ dataloader = dict(batch_size=1,
 
 # model settings
 model = dict(
-    type='visualglm-6b-omnimmbench',
+    type='visualglm-omnimmbench',
     path='/mnt/petrelfs/share_data/yuanyike/visualglm-6b',  # optional
     max_new_tokens=50,
     num_beams=5,
@@ -38,6 +38,6 @@ model = dict(
 # evaluation settings
 evaluator = [
     dict(
-        type='mm_benchmark.MMDump',
+        type='opencompass.DumpResults',
         save_path='work_dirs/visualglm-6b-omnimmbench.xlsx')
 ]

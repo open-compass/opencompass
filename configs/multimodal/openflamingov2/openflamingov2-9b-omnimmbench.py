@@ -17,7 +17,7 @@ val_pipeline = [
          ])
 ]
 
-dataset = dict(type='opencompass.OmniMMBench',
+dataset = dict(type='opencompass.OmniMMBenchDataset',
                data_file='data/mm_benchmark/mmagi_v030_full_inferin.tsv',
                pipeline=val_pipeline)
 
@@ -46,7 +46,7 @@ model = dict(
 # evaluation settings
 evaluator = [
     dict(
-        type='mm_benchmark.MMDump',
+        type='opencompass.DumpResults',
         save_path=  # noqa: E251
         'work_dirs/openflamingov2-9b-omnimmbench.xlsx'
     )

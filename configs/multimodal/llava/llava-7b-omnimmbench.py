@@ -18,7 +18,7 @@ val_pipeline = [
     ),
 ]
 
-dataset = dict(type='opencompass.OmniMMBench',
+dataset = dict(type='opencompass.OmniMMBenchDataset',
                data_file='data/mm_benchmark/mmagi_v030_full_inferin.tsv',
                pipeline=val_pipeline)
 
@@ -42,6 +42,6 @@ following: https://github.com/haotian-liu/LLaVA/blob/main/README.md#llava-weight
 
 # evaluation settings
 evaluator = [
-    dict(type='mm_benchmark.MMDump',
+    dict(type='opencompass.DumpResults',
          save_path='work_dirs/llava-7b-omnimmbench.xlsx')
 ]
