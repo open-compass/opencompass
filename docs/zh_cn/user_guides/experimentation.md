@@ -39,27 +39,27 @@ python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--
 
 1. 打开 `configs/lark.py` 文件，并在文件中加入以下行：
 
-```python
-lark_bot_url = 'YOUR_WEBHOOK_URL'
-```
+   ```python
+   lark_bot_url = 'YOUR_WEBHOOK_URL'
+   ```
 
-通常， Webhook URL 格式如 https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx 。
+   通常， Webhook URL 格式如 https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx 。
 
 2. 在完整的评测配置中继承该文件：
 
-```python
-  from mmengine.config import read_base
+   ```python
+     from mmengine.config import read_base
 
-  with read_base():
-      from .lark import lark_bot_url
+     with read_base():
+         from .lark import lark_bot_url
 
-```
+   ```
 
 3. 为了避免机器人频繁发消息形成骚扰，默认运行时状态不会自动上报。有需要时，可以通过 `-l` 或 `--lark` 启动状态上报：
 
-```bash
-python run.py configs/eval_demo.py -p {PARTITION} -l
-```
+   ```bash
+   python run.py configs/eval_demo.py -p {PARTITION} -l
+   ```
 
 ## 运行结果
 
