@@ -58,7 +58,7 @@ OpenCompass has supported most of the datasets commonly used for performance com
 The evaluation of OpenCompass relies on configuration files which must contain fields **`datasets`** and **`models`**.
 The configurations specify the models and datasets to evaluate using **"run.py"**.
 
-We will demonstrate some basic features of OpenCompass through evaluating pretrained models [OPT-125M](<(https://huggingface.co/facebook/opt-125m)>) and [OPT-350M](https://huggingface.co/facebook/opt-350m) on both [SIQA](https://huggingface.co/datasets/social_i_qa) and [Winograd](https://huggingface.co/datasets/winogrande) benchmark tasks with their config file located at [configs/eval_demo.py](https://github.com/InternLM/opencompass/blob/main/configs/eval_demo.py).
+We will demonstrate some basic features of OpenCompass through evaluating pretrained models [OPT-125M](https://huggingface.co/facebook/opt-125m) and [OPT-350M](https://huggingface.co/facebook/opt-350m) on both [SIQA](https://huggingface.co/datasets/social_i_qa) and [Winograd](https://huggingface.co/datasets/winogrande) benchmark tasks with their config file located at [configs/eval_demo.py](https://github.com/InternLM/opencompass/blob/main/configs/eval_demo.py).
 
 Before running this experiment, please make sure you have installed OpenCompass locally and it should run successfully under one _GTX-1660-6G_ GPU.
 For larger parameterized models like Llama-7B, refer to other examples provided in the [configs directory](https://github.com/InternLM/opencompass/tree/main/configs).
