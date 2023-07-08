@@ -5,6 +5,7 @@
 
 [![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/en)
 [![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
+
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
 [🌐Website](https://opencompass.org.cn/) |
@@ -284,7 +285,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 Below are the steps for quick installation. Some third-party features may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
 
 ```Python
-conda create --name opencompass python=3.8 pytorch torchvision -c pytorch -y
+conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
 conda activate opencompass
 git clone https://github.com/InternLM/opencompass opencompass
 cd opencompass
