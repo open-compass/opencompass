@@ -101,12 +101,15 @@ class InstructBlipInferencer(Blip2Base):
 
         self.qformer_text_input = qformer_text_input
 
+<<<<<<< HEAD
     def forward(self, batch):
         if self.mode == 'generation':
             return self.generate(batch)
         else:
             raise RuntimeError(f'Invalid mode "{self.mode}".')
 
+=======
+>>>>>>> [Feature]: Add instructblip
     def concat_text_input_output(self, input_ids, input_atts, output_ids,
                                  output_atts):
         input_part_targets_len = []
@@ -151,6 +154,7 @@ class InstructBlipInferencer(Blip2Base):
         temperature=1,
     ):
         inputs = self.pack_inputs(batch)
+<<<<<<< HEAD
         inputs = self.prompt_constructor(inputs)
         image = inputs['image']
         prompt = inputs['prompt']
@@ -158,6 +162,33 @@ class InstructBlipInferencer(Blip2Base):
 
         self.llm_tokenizer.padding_side = 'left'
 
+=======
+        image = inputs.pop('image')
+        data_samples = inputs['data_samples']
+        samples = {'image': image}
+        questions = [
+            data_sample.get('question') for data_sample in data_samples
+        ]
+        options = [data_sample.get('options') for data_sample in data_samples]
+        if data_samples[0].get('context') is not None:
+            contexts = [
+                data_sample.get('context') for data_sample in data_samples
+            ]
+            prompt = [
+                context + ' ' + question + ' ' + option for context, question,
+                option in zip(contexts, questions, options)
+            ]
+        else:
+            prompt = [
+                question + ' ' + option
+                for question, option in zip(questions, options)
+            ]
+
+        self.llm_tokenizer.padding_side = 'left'
+
+        image = samples['image']
+
+>>>>>>> [Feature]: Add instructblip
         bs = image.size(0)
 
         if isinstance(prompt, str):
@@ -234,6 +265,7 @@ class InstructBlipInferencer(Blip2Base):
                 length_penalty=length_penalty,
                 num_return_sequences=num_captions,
             )
+<<<<<<< HEAD
 
         for i, data_sample in enumerate(data_samples):
             output_token = outputs[i]
@@ -241,3 +273,26 @@ class InstructBlipInferencer(Blip2Base):
             data_sample.pred_answer = output_text
             data_samples[i] = data_sample
         return data_samples
+=======
+        outputs[outputs == 0] = 2  # convert output id 0 to 2 (eos_token_id)
+        output_text = self.llm_tokenizer.batch_decode(outputs,
+                                                      skip_special_tokens=True)
+        output_text = [text.strip() for text in output_text]
+        output_text = self.post_process(output_text[0])
+        data_sample = data_samples[0]
+        data_sample.pred_answer = output_text
+
+        return data_sample
+
+    def post_process(self, output_text):
+        output_text = output_text.split('###')[0]
+        output_text = output_text.split('Assistant:')[-1].strip()
+        output_text = output_text.strip('</s><s>')
+        output_text = output_text.strip('</Img>')
+        output_text = output_text.strip()
+        pattern = re.compile(r'([A-Z]\.)')
+        res = pattern.findall(output_text)
+        if len(res) > 0:
+            output_text = res[0][:-1]
+        return output_text
+>>>>>>> [Feature]: Add instructblip
