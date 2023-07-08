@@ -118,7 +118,7 @@ opt350m = dict(
        max_seq_len=2048,
        # 下参数为各类模型都有的参数，非 HuggingFaceCausalLM 的初始化参数
        abbr='opt350m',                    # 模型简称，用于结果展示
-       max_out_len=100,                   # 最长生成 token 数        
+       max_out_len=100,                   # 最长生成 token 数
        batch_size=64,                     # 批次大小
        run_cfg=dict(num_gpus=1),          # 运行配置，用于指定资源需求
     )
@@ -138,7 +138,7 @@ opt125m = dict(
        max_seq_len=2048,
        # 下参数为各类模型都有的参数，非 HuggingFaceCausalLM 的初始化参数
        abbr='opt125m',                # 模型简称，用于结果展示
-       max_out_len=100,               # 最长生成 token 数  
+       max_out_len=100,               # 最长生成 token 数
        batch_size=128,                # 批次大小
        run_cfg=dict(num_gpus=1),      # 运行配置，用于指定资源需求
     )
@@ -180,6 +180,12 @@ python run.py configs/eval_demo.py -w outputs/demo
 - `--slurm`: 使用 slurm 在集群提交任务
 - `--partition(-p) my_part`: slurm 集群分区
 - `--retry 2`: 任务出错重试次数
+
+The entry also supports submitting tasks to Alibaba Deep Learning Center (DLC), and more customized evaluation strategies. Please refer to [Launching an Evaluation Task](./user_guides/experimentation.md#launching-an-evaluation-task) for details.
+
+```{tip}
+这个脚本同样支持将任务提交到阿里云深度学习中心（DLC）上运行，以及更多定制化的评测策略。请参考 [评测任务发起](./user_guides/experimentation.md#评测任务发起) 了解更多细节。
+```
 
 </details>
 

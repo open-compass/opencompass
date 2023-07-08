@@ -58,7 +58,7 @@ OpenCompass has supported most of the datasets commonly used for performance com
 The evaluation of OpenCompass relies on configuration files which must contain fields **`datasets`** and **`models`**.
 The configurations specify the models and datasets to evaluate using **"run.py"**.
 
-We will demonstrate some basic features of OpenCompass through evaluating pretrained models [OPT-125M]((https://huggingface.co/facebook/opt-125m)) and [OPT-350M](https://huggingface.co/facebook/opt-350m) on both [SIQA](https://huggingface.co/datasets/social_i_qa) and [Winograd](https://huggingface.co/datasets/winogrande) benchmark tasks with their config file located at [configs/eval_demo.py](https://github.com/InternLM/opencompass/blob/main/configs/eval_demo.py).
+We will demonstrate some basic features of OpenCompass through evaluating pretrained models [OPT-125M](<(https://huggingface.co/facebook/opt-125m)>) and [OPT-350M](https://huggingface.co/facebook/opt-350m) on both [SIQA](https://huggingface.co/datasets/social_i_qa) and [Winograd](https://huggingface.co/datasets/winogrande) benchmark tasks with their config file located at [configs/eval_demo.py](https://github.com/InternLM/opencompass/blob/main/configs/eval_demo.py).
 
 Before running this experiment, please make sure you have installed OpenCompass locally and it should run successfully under one _GTX-1660-6G_ GPU.
 For larger parameterized models like Llama-7B, refer to other examples provided in the [configs directory](https://github.com/InternLM/opencompass/tree/main/configs).
@@ -77,7 +77,7 @@ While running the demo, let's go over the details of the configuration content a
 <summary><b>Learn about `datasets`</b></summary>
 
 ```python
-from mmengine.config import read_base              
+from mmengine.config import read_base
 
 with read_base():
     # Read the required dataset configurations directly from the preset dataset configurations
@@ -87,8 +87,8 @@ with read_base():
 datasets = [*siqa_datasets, *winograd_datasets]   # Concatenate the datasets to be evaluated into the datasets field
 ```
 
-Various dataset configurations are available in [configs/datasets](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets). 
-Some datasets have two types of configuration files within their folders named `'ppl'` and `'gen'`, representing different evaluation methods. Specifically, `'ppl'` represents discriminative evaluation, while `'gen'` stands for generative evaluation. 
+Various dataset configurations are available in [configs/datasets](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets).
+Some datasets have two types of configuration files within their folders named `'ppl'` and `'gen'`, representing different evaluation methods. Specifically, `'ppl'` represents discriminative evaluation, while `'gen'` stands for generative evaluation.
 
 [configs/datasets/collections](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets/collections) contains various collections of datasets for comprehensive evaluation purposes.
 
@@ -118,7 +118,7 @@ opt350m = dict(
        max_seq_len=2048,
        # Common parameters for all models, not specific to HuggingFaceCausalLM's initialization parameters
        abbr='opt350m',                    # Model abbreviation for result display
-       max_out_len=100,                   # Maximum number of generated tokens       
+       max_out_len=100,                   # Maximum number of generated tokens
        batch_size=64,                     # batchsize
        run_cfg=dict(num_gpus=1),          # Run configuration for specifying resource requirements
     )
@@ -138,7 +138,7 @@ opt125m = dict(
        max_seq_len=2048,
        # Common parameters for all models, not specific to HuggingFaceCausalLM's initialization parameters
        abbr='opt125m',                # Model abbreviation for result display
-       max_out_len=100,               # Maximum number of generated tokens  
+       max_out_len=100,               # Maximum number of generated tokens
        batch_size=128,                # batchsize
        run_cfg=dict(num_gpus=1),      # Run configuration for specifying resource requirements
     )
@@ -181,6 +181,10 @@ If you are not performing the evaluation on your local machine but using a Slurm
 - `--slurm`: Submit tasks using Slurm on the cluster.
 - `--partition(-p) my_part`: Slurm cluster partition.
 - `--retry 2`: Number of retries for failed tasks.
+
+```{tip}
+The entry also supports submitting tasks to Alibaba Deep Learning Center (DLC), and more customized evaluation strategies. Please refer to [Launching an Evaluation Task](./user_guides/experimentation.md#launching-an-evaluation-task) for details.
+```
 
 </details>
 
