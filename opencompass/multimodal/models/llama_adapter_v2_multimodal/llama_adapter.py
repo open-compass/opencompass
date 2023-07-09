@@ -5,7 +5,7 @@ from pathlib import Path
 import clip
 import mmengine
 import torch
-import torch.nn as nn
+import torch.nn as nn 
 from llama_adapter_v2_multimodal7b.llama.llama import ModelArgs, Transformer
 from llama_adapter_v2_multimodal7b.llama.tokenizer import Tokenizer
 from llama_adapter_v2_multimodal7b.llama.utils import sample_top_p
