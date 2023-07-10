@@ -20,7 +20,7 @@ class intern_model(BaseModel):
                  tokenizer_only: bool = False,
                  tokenizer_path: Optional[str] = None,
                  model_config: Optional[str] = None,
-                 tokenizer_type: Optional[str] = None,
+                 tokenizer_type: Optional[str] = 'v7',
                  meta_template: Optional[Dict] = None):
         if tokenizer_only:
             self._load_tokenizer(tokenizer_path=tokenizer_path,
@@ -60,7 +60,8 @@ class intern_model(BaseModel):
                         max_seq_len: int):
         from sentencepiece import SentencePieceProcessor
 
-        from .generation_tools import LLMTokenizer
+        from opencompass.models.intern.utils.generation_tools import \
+            LLMTokenizer
         tokenizer = SentencePieceProcessor()
         tokenizer.load(tokenizer_path)
         tokenizer = LLMTokenizer(tokenizer,

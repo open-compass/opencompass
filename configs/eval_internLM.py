@@ -6,7 +6,7 @@ with read_base():
     from .datasets.nq.nq_gen import nq_datasets
 datasets = []
 datasets += piqa_datasets
-datasets += nq_datasets
+# datasets += nq_datasets
 
 models = [
     dict(
@@ -20,6 +20,25 @@ models = [
         batch_size=16,
         run_cfg=dict(num_gpus=1, num_procs=1))
 ]
+work_dir = './outputs/2023_07_10/'
+infer = dict(
+    partitioner=dict(type='SizePartitioner', max_task_size=3000, gen_task_coef=10),
+    # partitioner=dict(type='NaivePartitioner'),
+    runner=dict(
+        type='SlurmRunner',
+        max_num_workers=32,
+        task=dict(type='OpenICLInferTask'),
+        retry=2),
+)
+
+eval = dict(
+    partitioner=dict(type='NaivePartitioner'),
+    runner=dict(
+        type='SlurmRunner',
+        max_num_workers=64,
+        task=dict(type='OpenICLEvalTask'),
+        retry=2),
+)
 
 
 

@@ -1,5 +1,4 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
-# This software may be used and distributed according to the terms of the GNU General Public License version 3.
 
 import os
 import re
@@ -7,9 +6,8 @@ from typing import List, Union
 
 import torch
 
-from .generation import _no_beam_search_generate
+from opencompass.models.intern.utils.generation import _no_beam_search_generate
 
-# TODO: find out why reserved 40G, allocated 80G
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
 
 
@@ -127,7 +125,6 @@ class LLMGenerator:
                      'max_gen_len': 100,
                      'eos_token_id': None
                  }):
-        prompt_len = [len(i) for i in inputs]
         tokenized_data = self.tokenizer(inputs,
                                         padding=True,
                                         right_align=True,
@@ -161,7 +158,6 @@ class LLMGenerator:
                 pass
             return text
 
-        # TODO: fix this hack
         if generation_kwargs.get('eos_token_id') is not None:
             results_text = [trunc_eos(t) for t in results_text]
         return results_text
