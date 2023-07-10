@@ -1,7 +1,6 @@
-import sys
 import os
-
 import re
+import sys
 
 import torch
 import torch.nn as nn
@@ -9,11 +8,13 @@ from mmengine.device import get_device
 from transformers import StoppingCriteriaList
 
 from opencompass.registry import MM_MODELS
+
 from .utils import StoppingCriteriaSub
 
 
 class LayerNorm(nn.LayerNorm):
     """Subclass torch's LayerNorm to handle fp16."""
+
     def forward(self, x: torch.Tensor):
         orig_type = x.dtype
         ret = super().forward(x.type(torch.float32))
@@ -39,14 +40,15 @@ MiniGPT4 = load_package()
 @MM_MODELS.register_module('minigpt-4-omnimmbench')
 class MiniGPT4OmniMMBench(MiniGPT4):
     """Inference code of MiniGPT-4 on OmniMMBench.
-    
+
     Args:
         llama_model (str): The path of vicuna path.
-        sys_prompt (str): The prompt added to the begining
+        sys_prompt (str): The prompt added to the beginning
             of each query. Defaults to ''.
         low_resource (bool): Whether loaded in low precision.
             Defaults to False.
     """
+
     def __init__(self,
                  llama_model: str,
                  sys_prompt: str = '',

@@ -6,9 +6,10 @@ import re
 import torch
 import torch.nn as nn
 from lavis.models.blip2_models.blip2 import Blip2Base, disabled_train
-from opencompass.registry import MM_MODELS
 from mmengine.device import get_device
 from transformers import LlamaForCausalLM, LlamaTokenizer
+
+from opencompass.registry import MM_MODELS
 
 
 @MM_MODELS.register_module('blip2-vicuna-instruct-omnimmbench')
