@@ -6,8 +6,6 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-__all__ = ['SequenceGenerator']
-
 
 class InferenceParams:
 
@@ -36,7 +34,7 @@ class InferenceParams:
             key_value_memory_dict = {}
         self.key_value_memory_dict: dict = key_value_memory_dict
         self.fused_ft_kernel: bool = False
-        self.lengths_per_sample = lengths_per_sample  # 在 fused_ft_kernel 为 True 时会用到
+        self.lengths_per_sample = lengths_per_sample
         self.attention_mask = attention_mask
 
     def reorder_state(self, indices):
@@ -96,13 +94,12 @@ def _no_beam_search_generate(decoder,
         bos_pos = torch.where(bos_sum.eq(bos_sum[:, -1:]), 0, 1)
         to_atten_x = bos_pos[:, :, None]
         to_atten_y = bos_pos[:, None, :]
-        # attention_mask = torch.einsum('bno,bom->bnm', to_atten_x, to_atten_y).eq(1)
+
     else:
         bos_pos = torch.where(tokens.eq(bos_token_id), 1, 0)
         to_atten_x = bos_pos[:, :, None]
         to_atten_y = bos_pos[:, None, :]
-        # attention_mask = torch.einsum('bno,bom->bnm', to_atten_x, to_atten_y).eq(1)
-    # import pdb; pdb.set_trace()
+
     attention_mask = torch.logical_or(to_atten_x, to_atten_y).eq(1)
     if inference_params is None:
         inference_params = InferenceParams(max_sequence_len=max_length,
@@ -164,12 +161,10 @@ def _no_beam_search_generate(decoder,
             bos_pos = torch.where(bos_sum.eq(bos_sum[:, -1:]), 0, 1)
             to_atten_x = bos_pos[:, :, None]
             to_atten_y = bos_pos[:, None, :]
-            # attention_mask = torch.einsum('bno,bom->bnm', to_atten_x, to_atten_y).eq(1)
         else:
             bos_pos = torch.where(token_ids.eq(bos_token_id), 1, 0)
             to_atten_x = bos_pos[:, :, None]
             to_atten_y = bos_pos[:, None, :]
-            # attention_mask = torch.einsum('bno,bom->bnm', to_atten_x, to_atten_y).eq(1)
         # import pdb; pdb.set_trace()
         attention_mask = torch.logical_or(to_atten_x, to_atten_y).eq(1)
         # import pdb
@@ -210,7 +205,7 @@ def _no_beam_search_generate(decoder,
             lt_zero_mask = token_scores.lt(0).float()
             ge_zero_mask = lt_zero_mask.eq(0).float()
             token_scores = lt_zero_mask * repetition_penalty * token_scores + \
-                           ge_zero_mask / repetition_penalty * token_scores
+                           ge_zero_mask / repetition_penalty * token_scores  # noqa: E127 E501
             scores.scatter_(dim=1, index=token_ids, src=token_scores)
 
         if eos_token_id is not None and length_penalty != 1.0:
@@ -256,13 +251,6 @@ def _no_beam_search_generate(decoder,
         if dones.min() == 1:
             break
 
-    # if eos_token_id is not None:
-    #     # 将最大长度位置设置为eos
-    #     tokens.scatter(index=max_lengths[:, None], dim=1, value=eos_token_id)
-    # if cur_len == max_length:
-    #     # 若到最长长度仍未到EOS，则强制将最后一个词替换成eos
-    #     token_ids[:, -1].masked_fill_(~dones, eos_token_id)
-    # TODO 这里直接在中间扩展了一维，只是为了暂时在接口上同一，之后还是需要真实的能够返回多个结果
     return token_ids[:, None]
 
 

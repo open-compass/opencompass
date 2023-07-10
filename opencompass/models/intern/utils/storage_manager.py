@@ -272,24 +272,6 @@ class Boto3Client(StorageClient):
 class PetrelClient(StorageClient):
 
     def __init__(self) -> None:
-        """petreloss.conf".
-
-        [DEFAULT]
-        default_cluster = Sproject_ssd
-        [Sproject_ssd]
-        boto = True
-        access_key = 6NCK54JB694QJMRFAMW0
-        secret_key = 4swerr2g7hrniaiAjZExyNHcbznWxG0XExfNG0CG
-        # host_base = http://172.30.1.75:7480
-        host_base = http://10.140.14.254:80
-
-        [Sproject_hdd]
-        boto = True
-        access_key = NGGJ11M5DVGWDZYHIA0B
-        secret_key = SJZ6LD6wCQxhvEtt6IUksbOoiYDc6QuEjvGIBgtm
-        # host_base = http://10.140.2.204:80
-        host_base = http://10.140.14.204:80
-        """
         try:
             self.client = Client()
         except botocore.exceptions.EndpointConnectionError:
@@ -325,7 +307,6 @@ class PetrelClient(StorageClient):
             raise e
 
     def sync_upload_fileobj(self, fp, states):
-        # TODO(wgt): should we re-calculate md5 here?
         # self.gen_and_upload_md5(local_nvme_path, fp)
         try:
             with io.BytesIO() as f:
@@ -707,7 +688,6 @@ class StorageManager(metaclass=SingletonMeta):
                         .format(socket.gethostname(), self._step_counter,
                                 self._to_be_del_files[file_id], error_msg))
 
-                    # TODO(wgt): ReDO upload, in sync mode.
                     # self._get_client(file_name).sync_upload_fileobj()
                     raise RuntimeError(
                         f"{socket.gethostname()}, Step:{self._step_counter} upload file:\"{self._to_be_del_files[file_id]}\" failed: \"{error_msg}\""
