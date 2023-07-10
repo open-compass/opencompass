@@ -1,6 +1,15 @@
+import sys
+import os
+
+current_file_path = os.path.abspath(__file__)
+current_folder_path = os.path.dirname(current_file_path)
+
+sys.path.append(os.path.join(current_folder_path, 'MiniGPT-4'))
+sys.path.append(os.path.join(current_folder_path, 'MiniGPT-4/minigpt4/models'))
+
+
 import contextlib
 import logging
-import os
 import re
 
 import torch
@@ -10,9 +19,9 @@ from transformers import BertTokenizer, LlamaTokenizer, StoppingCriteriaList
 
 from opencompass.registry import MM_MODELS
 
-from .eva_vit import create_eva_vit_g
-from .modelling_llama import LlamaForCausalLM
-from .Qformer import BertConfig, BertLMHeadModel
+from eva_vit import create_eva_vit_g
+from modeling_llama import LlamaForCausalLM
+from Qformer import BertConfig, BertLMHeadModel
 from .utils import StoppingCriteriaSub, download_cached_file, is_url
 
 
