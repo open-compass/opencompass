@@ -27,10 +27,6 @@ dataloader = dict(batch_size=1,
 # model settings
 model = dict(
     type='minigpt-4-omnimmbench',
-    freeze_vit=True,
-    freeze_qformer=True,
-    max_txt_len=160,
-    end_sym='###',
     low_resource=False,
     llama_model='/mnt/petrelfs/share_data/ouyanglinke/vicuna-7b/',
     sys_prompt=  # noqa: E251
