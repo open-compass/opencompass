@@ -44,7 +44,7 @@ OpenCompass 支持的数据集主要包括两个部分：
 
 2. 自建以及第三方数据集：OpenCompass 还提供了一些第三方数据集及自建**中文**数据集。运行以下命令**手动下载解压**。
 
-在 OpenCompass 项目根目录下运行下面命令，将数据集准备至 '${OpenCompass}/data' 目录下：
+在 OpenCompass 项目根目录下运行下面命令，将数据集准备至 `${OpenCompass}/data` 目录下：
 
 ```bash
 wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
@@ -66,47 +66,47 @@ OpenCompass 的评测以配置文件为中心，必须包含 `datasets` 和 `mod
 使用以下命令在本地启动评测任务(运行中需要联网自动下载数据集和模型，模型下载较慢)：
 
 ```bash
-python run.py configs/eval_demo.py
+python run.py configs/eval_demo.py -w outputs/demo
 ```
 
-运行 demo 期间，我们来仔细解本案例中的配置内容以及启动选项。
+运行 demo 期间，我们来介绍一下本案例中的配置内容以及启动选项。
 
 ## 步骤详解
 
-<details>
-<summary><b>数据集列表`datasets`</b></summary>
+### 数据集列表 `datasets`
+
+以下为 `configs/eval_demo.py` 中与数据集相关的配置片段：
 
 ```python
-from mmengine.config import read_base                # 使用 mmengine 的 config 机制
+from mmengine.config import read_base  # 使用 mmengine.read_base() 读取基础配置
 
 with read_base():
     # 直接从预设数据集配置中读取需要的数据集配置
-    from .datasets.winograd.winograd_ppl import winograd_datasets
-    from .datasets.siqa.siqa_gen import siqa_datasets
+    from .datasets.winograd.winograd_ppl import winograd_datasets  # 读取 Winograd 的配置，基于 PPL (perplexity) 进行评测
+    from .datasets.siqa.siqa_gen import siqa_datasets  # 读取 SIQA 的配置，基于生成式进行评测
 
 datasets = [*siqa_datasets, *winograd_datasets]       # 最后 config 需要包含所需的评测数据集列表 datasets
 ```
 
 [configs/datasets](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets) 包含各种数据集预先定义好的配置文件；
 部分数据集文件夹下有 'ppl' 和 'gen' 两类配置文件，表示使用的评估方式，其中 `ppl` 表示使用判别式评测， `gen` 表示使用生成式评测。
+
 [configs/datasets/collections](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets/collections) 存放了各类数据集集合，方便做综合评测。
 
-更多信息可查看 [配置数据集](./user_guides/dataset_prepare.md)
+更多介绍可查看 [数据集配置](./user_guides/dataset_prepare.md)。
 
-</details>
+### 模型列表 `models`
 
-<details>
-<summary><b>模型列表`models`</b></summary>
-
-HuggingFace 中的 'facebook/opt-350m' 以及 'facebook/opt-125m' 支持自动下载权重，所以不需要额外下载权重：
+OpenCompass 支持直接在配置中指定待测试的模型列表，对于 HuggingFace 模型来说，用户通常无需添加代码。下面为相关的配置片段：
 
 ```python
-from opencompass.models import HuggingFaceCausalLM    # 提供直接使用 HuggingFaceCausalLM 模型的接口
+# 提供直接使用 HuggingFaceCausalLM 模型的接口
+from opencompass.models import HuggingFaceCausalLM
 
 # OPT-350M
 opt350m = dict(
        type=HuggingFaceCausalLM,
-       # 以下参数为 HuggingFaceCausalLM 的初始化参数
+       # 以下参数为 HuggingFaceCausalLM 相关的初始化参数
        path='facebook/opt-350m',
        tokenizer_path='facebook/opt-350m',
        tokenizer_kwargs=dict(
@@ -115,9 +115,9 @@ opt350m = dict(
            proxies=None,
            trust_remote_code=True),
        model_kwargs=dict(device_map='auto'),
-       max_seq_len=2048,
-       # 下参数为各类模型都有的参数，非 HuggingFaceCausalLM 的初始化参数
+       # 下列参数为所有模型均需设定的初始化参数，非 HuggingFaceCausalLM 独有
        abbr='opt350m',                    # 模型简称，用于结果展示
+       max_seq_len=2048,              # 模型能接受的最大序列长度
        max_out_len=100,                   # 最长生成 token 数
        batch_size=64,                     # 批次大小
        run_cfg=dict(num_gpus=1),          # 运行配置，用于指定资源需求
@@ -135,9 +135,9 @@ opt125m = dict(
            proxies=None,
            trust_remote_code=True),
        model_kwargs=dict(device_map='auto'),
-       max_seq_len=2048,
-       # 下参数为各类模型都有的参数，非 HuggingFaceCausalLM 的初始化参数
+       # 下列参数为所有模型均需设定的初始化参数，非 HuggingFaceCausalLM 独有
        abbr='opt125m',                # 模型简称，用于结果展示
+       max_seq_len=2048,              # 模型能接受的最大序列长度
        max_out_len=100,               # 最长生成 token 数
        batch_size=128,                # 批次大小
        run_cfg=dict(num_gpus=1),      # 运行配置，用于指定资源需求
@@ -146,12 +146,13 @@ opt125m = dict(
 models = [opt350m, opt125m]
 ```
 
-</details>
+HuggingFace 中的 'facebook/opt-350m' 以及 'facebook/opt-125m' 权重会在运行时自动下载。
 
-<details>
-<summary><b>启动评测</b></summary>
+关于模型配置的更多介绍可阅读 [准备模型](./user_guides/models.md)。
 
-首先，我们可以使用 debug 模式启动任务，以检查模型加载、数据集读取是否出现异常，如未正确读取缓存等。
+### 启动评测
+
+配置文件准备完毕后，我们可以使用 debug 模式启动任务，以检查模型加载、数据集读取是否出现异常，如未正确读取缓存等。
 
 ```shell
 python run.py configs/eval_demo.py -w outputs/demo --debug
@@ -165,7 +166,7 @@ python run.py configs/eval_demo.py -w outputs/demo
 
 以下是一些与评测相关的参数，可以帮助你根据自己的环境情况配置更高效的推理任务。
 
-- `-w outputs/demo`: 评测日志及结果保存目录
+- `-w outputs/demo`: 评测日志及结果保存目录。若不指定，则默认为 `outputs/default`
 - `-r`: 重启上一次（中断的）评测
 - `--mode all`: 指定进行某一阶段的任务
   - all: 进行全阶段评测，包括推理和评估
@@ -181,13 +182,9 @@ python run.py configs/eval_demo.py -w outputs/demo
 - `--partition(-p) my_part`: slurm 集群分区
 - `--retry 2`: 任务出错重试次数
 
-The entry also supports submitting tasks to Alibaba Deep Learning Center (DLC), and more customized evaluation strategies. Please refer to [Launching an Evaluation Task](./user_guides/experimentation.md#launching-an-evaluation-task) for details.
-
 ```{tip}
 这个脚本同样支持将任务提交到阿里云深度学习中心（DLC）上运行，以及更多定制化的评测策略。请参考 [评测任务发起](./user_guides/experimentation.md#评测任务发起) 了解更多细节。
 ```
-
-</details>
 
 ## 评测结果
 
@@ -200,33 +197,28 @@ siqa       e78df3     accuracy  gen         21.55      12.44
 winograd   b6c7ed     accuracy  ppl         51.23      49.82
 ```
 
-所有过程的日志，预测，以及最终结果会默认放在`outputs/default/`目录下。目录结构如下所示：
+所有过程的日志，预测，以及最终结果会放在 `outputs/demo/` 目录下。目录结构如下所示：
 
 ```text
 outputs/default/
 ├── 20200220_120000
 ├── 20230220_183030   # 一次实验
-│   ├── configs       # 可复现 config
-│   ├── logs          # 日志
+│   ├── configs       # 每次实验都会在此处存下用于追溯的 config
+│   ├── logs          # 运行日志
 │   │   ├── eval
 │   │   └── infer
-│   ├── predictions   # 推理结果，每一条数据推理结果
-│   └── results       # 评估结论，一个评估实验的数值结论
+│   ├── predictions   # 储存了每个任务的推理结果
+│   ├── results       # 储存了每个任务的评测结果
+│   └── summary       # 汇总每次实验的所有评测结果
 ├── ...
 ```
-
-其中，每一个时间戳文件夹代表一次实验中存在以下内容：
-
-- 'configs':用于存放可复现配置文件；
-- 'logs':用于存放**推理**和**评测**两个阶段的日志文件
-- 'predicitions':用于存放推理结果，格式为json；
-- 'results': 用于存放评测最终结果总结。
 
 ## 更多教程
 
 想要更多了解 OpenCompass, 可以点击下列链接学习。
 
-- [如何配置数据集](./user_guides/dataset_prepare.md)
-- [如何定制模型](./user_guides/models.md)
-- [深入了解启动实验](./user_guides/experimentation.md)
+- [数据集配置](./user_guides/dataset_prepare.md)
+- [准备模型](./user_guides/models.md)
+- [任务运行和监控](./user_guides/experimentation.md)
 - [如何调Prompt](./prompt/overview.md)
+- [学习配置文件](./user_guides/config.md)

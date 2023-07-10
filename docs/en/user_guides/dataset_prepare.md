@@ -1,4 +1,4 @@
-# Configure DataSets
+# Prepare Datasets
 
 This section of the tutorial mainly focuses on how to prepare the datasets supported by OpenCompass and build configuration files to complete dataset selection.
 

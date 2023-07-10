@@ -1,23 +1,22 @@
 Welcome to OpenCompass' documentation!
 ==========================================
 
-Hands-on Roadmap of OpenCompass
+Getting started with OpenCompass
 -------------------------------
 
-To help users quickly utilize OpenCompass, we recommend following the hands-on
-roadmap we have created for the library:
+To help you quickly familiarized with OpenCompass, we recommend you to walk through the following documents in order:
 
-   - For users who want to use OpenCompass, we recommend reading the GetStarted_ section first to set up the environment.
+- First read the GetStarted_ section set up the environment, and run a mini experiment.
 
-   - For some basic usage, we suggest users read the UserGuides_.
+- Then learn its basic usage through the UserGuides_.
 
-   - If you want to adjust the prompts, you can browse the Prompt_.
+- If you want to tune the prompts, refer to the Prompt_.
 
-   - If you want to customize the algorithm, we have provided the AdvancedGuides_.
+- If you want to customize some modules, like adding a new dataset or model, we have provided the AdvancedGuides_.
 
-   - We also offer the Tools_.
+- There are more handy tools, such as prompt viewer and lark bot reporter, all presented in Tools_.
 
-We always welcome *PRs* and *Issues* for the betterment of MMPretrain.
+We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
 
 .. _GetStarted:
 .. toctree::
@@ -67,13 +66,6 @@ We always welcome *PRs* and *Issues* for the betterment of MMPretrain.
    :caption: Notes
 
    notes/contribution_guide.md
-
-.. toctree::
-   :caption: switch language
-
-   English <https://OpenCompass.readthedocs.io/en/latest/>
-   简体中文 <https://OpenCompass.readthedocs.io/zh_CN/latest/>
-
 
 Indexes & Tables
 ==================
