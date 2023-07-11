@@ -11,9 +11,9 @@ _meta_template = dict(
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='internlm-chat-7b-hf',
-        path="internlm/internlm-chat-7b",
-        tokenizer_path='internlm/internlm-chat-7b',
+        abbr='internlm-chat-7b-8k-hf',
+        path="internlm/internlm-chat-7b-8k",
+        tokenizer_path='internlm/internlm-chat-7b-8k',
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
