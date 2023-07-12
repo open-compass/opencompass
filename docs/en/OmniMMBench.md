@@ -128,4 +128,4 @@ If there are any questions with fewer than four options, simply leave those fiel
 
 
 
-**If you have any questions, feel free to comment this doc ~**
+**If you have any questions, feel free to comment this doc.**
