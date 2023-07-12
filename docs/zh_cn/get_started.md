@@ -69,7 +69,14 @@ OpenCompass 的评测以配置文件为中心，必须包含 `datasets` 和 `mod
 python run.py configs/eval_demo.py -w outputs/demo --debug
 ```
 
-当确认没有问题后（屏幕上顺利出现 `Starting inference process` 字样），就可以使用 `ctrl+c` 中断 debug 模式的执行，并运行以下命令进行并行评测了：
+如果一切正常，屏幕上会出现 "Starting inference process"：
+
+```bash
+Loading cached processed dataset at .cache/huggingface/datasets/social_i_qa/default/0.1.0/674d85e42ac7430d3dcd4de7007feaffcb1527c535121e09bab2803fbcc925f8/cache-742512eab30e8c9c.arrow
+[2023-07-12 18:23:55,076] [opencompass.openicl.icl_inferencer.icl_gen_inferencer] [INFO] Starting inference process...
+```
+
+此时可以使用 `ctrl+c` 中断 debug 模式的执行，并运行以下命令进行并行评测：
 
 ```bash
 python run.py configs/eval_demo.py -w outputs/demo

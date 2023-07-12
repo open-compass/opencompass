@@ -69,7 +69,13 @@ Since OpenCompass launches evaluation processes in parallel by default, we can s
 python run.py configs/eval_demo.py -w outputs/demo --debug
 ```
 
-After confirming that everything is bug-free (You should see `Starting inference process` on screen), you can press `ctrl+c` to interrupt the program, and then run the following command to start the parallel evaluation:
+If everything is fine, you should see "Starting inference process" on screen:
+
+```bash
+[2023-07-12 18:23:55,076] [opencompass.openicl.icl_inferencer.icl_gen_inferencer] [INFO] Starting inference process...
+```
+
+Then you can press `ctrl+c` to interrupt the program, and then run the following command to start the parallel evaluation:
 
 ```bash
 python run.py configs/eval_demo.py -w outputs/demo
