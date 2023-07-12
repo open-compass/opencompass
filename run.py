@@ -139,7 +139,7 @@ def main():
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
-    cfg = Config.fromfile(args.config)
+    cfg = Config.fromfile(args.config, format_python_code=False)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
@@ -172,7 +172,7 @@ def main():
     cfg.dump(output_config_path)
     # Config is intentally reloaded here to avoid initialized
     # types cannot be serialized
-    cfg = Config.fromfile(output_config_path)
+    cfg = Config.fromfile(output_config_path, format_python_code=False)
 
     # report to lark bot if specify --lark
     if not args.lark:
