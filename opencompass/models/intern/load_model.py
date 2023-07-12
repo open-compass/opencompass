@@ -106,6 +106,13 @@ def load_llm(checkpoint,
 
     torch.distributed.barrier()
     use_mask = False
-    generator = LLMGenerator(model, tokenizer, use_mask)
+    generator = LLMGenerator(model,
+                             tokenizer,
+                             use_mask,
+                             forward_kwargs={
+                                 'feat_mask': None,
+                                 'ffn_mask': None,
+                                 'layer_mask': None
+                             })
 
     return model, tokenizer, generator, tp_rank
