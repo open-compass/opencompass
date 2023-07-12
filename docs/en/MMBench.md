@@ -3,7 +3,7 @@
 
 ## Intro to each data sample in MMBench
 
-OmniMMBecnh is split into **dev** and **test** split, and each data sample in each split contains the following field:
+MMBecnh is split into **dev** and **test** split, and each data sample in each split contains the following field:
 
 ```
 img: the raw data of an image
