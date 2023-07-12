@@ -38,7 +38,6 @@ def decode_base64_to_image(base64_string):
 class MMAGIBenchDataset(Dataset):
     def __init__(self,
                  data_file,
-                 pipeline,
                  sys_prompt='There are several options:'):
         self.df = pd.read_csv(data_file, sep='\t')
         self.sys_prompt = sys_prompt
@@ -105,7 +104,7 @@ C. Digital art
 D. Photo
 
 <div align=center>
-<img src="https://user-images.githubusercontent.com/56866854/252847545-ea829a95-b063-492f-8760-d27143b5c834.jpg" width="70%"/>
+<img src="https://user-images.githubusercontent.com/56866854/252847545-ea829a95-b063-492f-8760-d27143b5c834.jpg" width="30%"/>
 </div>
 
 
@@ -135,4 +134,4 @@ If there are any questions with fewer than four options, simply leave those fiel
 
 
 
-**If you have any questions, feel free to comment this doc.**
+
