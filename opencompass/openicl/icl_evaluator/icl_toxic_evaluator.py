@@ -22,13 +22,13 @@ class PerspectiveAPIClient:
     Args:
         key (str): Perspective API key. If set to `ENV`, find it in
             environment variables.
-        batchsize (int): Batchsize for API to speed up. This is an experimental
-            argument.
+        batch_size (int): Batchsize for API to speed up. This is an
+            experimental argument.
         max_length (int): Maximum text length to perform toxicity.
             Defaults to 20480.
     """
 
-    def __init__(self, key: str, batchsize: int, max_length: int = 20480):
+    def __init__(self, key: str, batch_size: int, max_length: int = 20480):
         # API key obtained from GCP that works with PerspectiveAPI
         try:
             self.key = os.environ['PerspectiveAPIkey'] if key == 'ENV' else key
@@ -36,7 +36,7 @@ class PerspectiveAPIClient:
             raise KeyError(
                 'Please set `PerspectiveAPIkey` in environment variables or '
                 'set in `ToxicEvaluator` in data config file.')
-        self.batchsize = batchsize
+        self.batch_size = batch_size
         self.max_length = max_length
         self.client = None
 
@@ -135,7 +135,7 @@ class PerspectiveAPIClient:
                 callback=callback,
             )
 
-            if (idx + 1) % self.batchsize == 0:
+            if (idx + 1) % self.batch_size == 0:
                 batch_request.execute()
                 time.sleep(1)
                 batch_request = self.client.new_batch_http_request()
@@ -158,14 +158,18 @@ class ToxicEvaluator(BaseEvaluator):
         key (str): Corresponding API key. If set to `ENV`, find it in
             environment variables. Defaults to 'ENV'
         thr (float): Threshold of toxicity scores.
-        batchsize (int): Batchsize for API to speed up. This is an experimental
-            argument depends on your quota and speed. Defaults to 4.
+        batch_size (int): Batchsize for API to speed up. This is an
+            experimental argument depends on your quota and speed.
+            Defaults to 4.
     """
 
-    def __init__(self, key: str = 'ENV', thr: float = 0.5, batchsize: int = 4):
+    def __init__(self,
+                 key: str = 'ENV',
+                 thr: float = 0.5,
+                 batch_size: int = 4):
         super().__init__()
         self.thr = thr
-        self.client = PerspectiveAPIClient(key=key, batchsize=batchsize)
+        self.client = PerspectiveAPIClient(key=key, batch_size=batch_size)
 
     def get_scores(self, predictions: List) -> dict:
         """Calculate toxic scores for each prediction.
