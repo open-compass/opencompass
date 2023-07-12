@@ -63,13 +63,19 @@ We will demonstrate some basic features of OpenCompass through evaluating pretra
 Before running this experiment, please make sure you have installed OpenCompass locally and it should run successfully under one _GTX-1660-6G_ GPU.
 For larger parameterized models like Llama-7B, refer to other examples provided in the [configs directory](https://github.com/InternLM/opencompass/tree/main/configs).
 
-To start the evaluation task, use the following command:
+Since OpenCompass launches evaluation processes in parallel by default, we can start the evaluation for the first run and check if there is any prblem. In debugging mode, the tasks will be executed sequentially and the status will be printed in real time.
+
+```bash
+python run.py configs/eval_demo.py -w outputs/demo --debug
+```
+
+After confirming that everything is bug-free (You should see `Starting inference process` on screen), you can press `ctrl+c` to interrupt the program, and then run the following command to start the parallel evaluation:
 
 ```bash
 python run.py configs/eval_demo.py -w outputs/demo
 ```
 
-While running the demo, let's go over the configuration file and the launch options used in this case.
+Now let's go over the configuration file and the launch options used in this case.
 
 ## Explanations
 
@@ -158,7 +164,7 @@ When the config file is ready, we can start the task in **debug mode** to check 
 python run.py configs/eval_demo.py -w outputs/demo --debug
 ```
 
-However, in `--debug` mode, tasks are executed sequentially. When you believe that everything is correct, you
+However, in `--debug` mode, tasks are executed sequentially. After confirming that everything is correct, you
 can disable the `--debug` mode to fully utilize multiple GPUs.
 
 ```shell

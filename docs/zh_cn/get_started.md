@@ -63,7 +63,13 @@ OpenCompass 的评测以配置文件为中心，必须包含 `datasets` 和 `mod
 运行前确保已经安装了 OpenCompass，本实验可以在单张 _GTX-1660-6G_ 显卡上成功运行。
 更大参数的模型，如 Llama-7B, 可参考 [configs](https://github.com/InternLM/opencompass/tree/main/configs) 中其他例子。
 
-使用以下命令在本地启动评测任务(运行中需要联网自动下载数据集和模型，模型下载较慢)：
+由于 OpenCompass 默认使用并行的方式进行评测，为了便于及时发现问题，我们可以在首次启动时使用 debug 模式运行，该模式会将任务串行执行，并会实时输出任务的执行进度。
+
+```bash
+python run.py configs/eval_demo.py -w outputs/demo --debug
+```
+
+当确认没有问题后（屏幕上顺利出现 `Starting inference process` 字样），就可以使用 `ctrl+c` 中断 debug 模式的执行，并运行以下命令进行并行评测了：
 
 ```bash
 python run.py configs/eval_demo.py -w outputs/demo

@@ -32,7 +32,7 @@ OpenCompass 上手路线
    :caption: 教程
 
    user_guides/config.md
-   user_guides/dataset_prepare.md
+   user_guides/datasets.md
    user_guides/models.md
    user_guides/evaluation.md
    user_guides/experimentation.md

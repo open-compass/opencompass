@@ -31,7 +31,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :caption: User Guides
 
    user_guides/config.md
-   user_guides/dataset_prepare.md
+   user_guides/datasets.md
    user_guides/models.md
    user_guides/evaluation.md
    user_guides/experimentation.md
