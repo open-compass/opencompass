@@ -26,7 +26,7 @@ class OpenAI(BaseAPIModel):
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
         retry (int): Number of retires if the API call fails. Defaults to 2.
-        key (str or List[str], optional): OpenAI key(s). In particular, when it
+        key (str or List[str]): OpenAI key(s). In particular, when it
             is set to "ENV", the key will be fetched from the environment
             variable $OPENAI_API_KEY, as how openai defaults to be. If it's a
             list, the keys will be used in round-robin manner. Defaults to
@@ -173,6 +173,7 @@ class OpenAI(BaseAPIModel):
                                              headers=header,
                                              data=json.dumps(data))
             except requests.ConnectionError:
+                self.logger.error('Got connection error, retrying...')
                 continue
             try:
                 response = raw_response.json()
@@ -187,7 +188,9 @@ class OpenAI(BaseAPIModel):
                                       str(response['error']))
             max_num_retries += 1
 
-        raise RuntimeError(response)
+        raise RuntimeError('Calling OpenAI failed after retrying for '
+                           f'{max_num_retries} times. Check the logs for '
+                           'details.')
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese
