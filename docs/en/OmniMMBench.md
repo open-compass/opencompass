@@ -104,6 +104,13 @@ B. Sketch
 C. Digital art
 D. Photo
 
+<div align=center>
+<img src="https://user-images.githubusercontent.com/56866854/252847545-ea829a95-b063-492f-8760-d27143b5c834.jpg" width="70%"/>
+</div>
+
+
+
+
 ```
 prompt = ###Human: Question: Which category does this image belong to? There are several options: A. Oil Paiting, B. Sketch, C. Digital art, D. Photo ###Assistant:
 ```
