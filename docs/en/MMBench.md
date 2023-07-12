@@ -1,7 +1,7 @@
-# Evalation pipeline on OmniMMBench
+# Evalation pipeline on MMBench
 
 
-## Intro to each data sample in OmniMMBench
+## Intro to each data sample in MMBench
 
 OmniMMBecnh is split into **dev** and **test** split, and each data sample in each split contains the following field:
 
@@ -18,8 +18,8 @@ answer: the target answer to current question. (only exists in the dev split, an
 ```
 
 
-## Load OmniMMBench
-We provide a code snippet as an example of loading OmniMMBench
+## Load MMBench
+We provide a code snippet as an example of loading MMBench
 
 ```python
 import base64
@@ -35,7 +35,7 @@ def decode_base64_to_image(base64_string):
     image = Image.open(io.BytesIO(image_data))
     return image
 
-class MMAGIBenchDataset(Dataset):
+class MMBenchDataset(Dataset):
     def __init__(self,
                  data_file,
                  sys_prompt='There are several options:'):
