@@ -5,12 +5,13 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='internlm-7b-hf',
-        path="internlm-7b",
-        tokenizer_path='internlm-7b',
+        path="internlm/internlm-7b",
+        tokenizer_path='internlm/internlm-7b',
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
             use_fast=False,
+            trust_remote_code=True,
         ),
         max_out_len=100,
         max_seq_len=2048,

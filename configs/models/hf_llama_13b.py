@@ -5,6 +5,7 @@ models = [
     # LLaMA 13B
     dict(
         type=HuggingFaceCausalLM,
+        abbr='llama-13b-hf',
         path="decapoda-research/llama-13b-hf",
         tokenizer_path='decapoda-research/llama-13b-hf',
         tokenizer_kwargs=dict(padding_side='left',

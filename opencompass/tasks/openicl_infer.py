@@ -46,7 +46,7 @@ class OpenICLInferTask(BaseTask):
                        f'--nproc_per_node {self.num_procs} '
                        f'{script_path} {cfg_path}')
         else:
-            command = 'python {script_path} {cfg_path}'
+            command = f'python {script_path} {cfg_path}'
 
         return template.format(task_cmd=command)
 
