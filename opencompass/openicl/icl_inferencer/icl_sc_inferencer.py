@@ -1,4 +1,4 @@
-"""Direct Generation Inferencer."""
+"""Self-Consistency Generation Inferencer."""
 
 import os
 import os.path as osp
@@ -22,7 +22,7 @@ logger = get_logger(__name__)
 
 @ICL_INFERENCERS.register_module()
 class SCInferencer(BaseInferencer):
-    """Self-Consistency Inferencer class to evaluate by multiple generation.
+    """Self-Consistency Inferencer class to evaluate by multiple generations.
 
     Attributes:
         model (:obj:`BaseModelWrapper`, optional): The module to inference.
@@ -126,7 +126,7 @@ class SCInferencer(BaseInferencer):
         # 5. Inference for prompts in each batch
         logger.info('Starting inference process...')
         for entry in tqdm(dataloader, disable=not self.is_main_process):
-             # TODO: add more types of COT method
+             # TODO: add more types of CoT method
             # 5-1. Inference sc_size times with local model
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
