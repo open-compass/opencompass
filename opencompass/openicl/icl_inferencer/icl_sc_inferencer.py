@@ -22,7 +22,7 @@ logger = get_logger(__name__)
 
 @ICL_INFERENCERS.register_module()
 class SCInferencer(BaseInferencer):
-    """Generation Inferencer class to directly evaluate by generation.
+    """Self-Consistency Inferencer class to evaluate by multiple generation.
 
     Attributes:
         model (:obj:`BaseModelWrapper`, optional): The module to inference.
@@ -41,7 +41,7 @@ class SCInferencer(BaseInferencer):
         generation_kwargs (:obj:`Dict`, optional): Parameters for the
             :obj:`model.generate()` method.
         sc_size (:obj:`int`, optional): Sample size for Self-Consistency
-        infer_type (:obj:`str`, optional): Infer type for 
+        infer_type (:obj:`str`, optional): Infer CoT type for 
             :obj:`inference()` method.
     """
 
@@ -126,6 +126,7 @@ class SCInferencer(BaseInferencer):
         # 5. Inference for prompts in each batch
         logger.info('Starting inference process...')
         for entry in tqdm(dataloader, disable=not self.is_main_process):
+             # TODO: add more types of COT method
             # 5-1. Inference sc_size times with local model
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
@@ -134,7 +135,6 @@ class SCInferencer(BaseInferencer):
                     results = self.model.generate_from_template(
                         entry, max_out_len=self.max_out_len, **self.generation_kwargs)
                     sc_results.append(results)
-                    # finial_results = self.get_vote_out(sc_results)
                 sc_prediction = list(map(list,zip(*sc_results)))
                 generated = sc_prediction
                 print(generated)
