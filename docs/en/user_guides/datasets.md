@@ -1,6 +1,6 @@
-# Configure DataSets
+# Configure Datasets
 
-This section of the tutorial mainly focuses on how to prepare the datasets supported by OpenCompass and build configuration files to complete dataset selection.
+This tutorial mainly focuses on selecting datasets supported by OpenCompass and preparing their configs files. Please make sure you have downloaded the datasets following the steps in [Dataset Preparation](../get_started.md#dataset-preparation).
 
 ## Directory Structure of Dataset Configuration Files
 
@@ -30,26 +30,6 @@ In the `configs/datasets` directory structure, we flatten all datasets directly,
 The naming of the dataset configuration file is made up of `{dataset name}_{evaluation method}_{prompt version number}.py`. For example, `CLUE_afqmc/CLUE_afqmc_gen_db509b.py`, this configuration file is the `CLUE_afqmc` dataset under the Chinese universal ability, the corresponding evaluation method is `gen`, i.e., generative evaluation, and the corresponding prompt version number is `db509b`; similarly, `CLUE_afqmc_ppl_00b348.py` indicates that the evaluation method is `ppl`, i.e., discriminative evaluation, and the prompt version number is `00b348`.
 
 In addition, files without a version number, such as: `CLUE_afqmc_gen.py`, point to the latest prompt configuration file of that evaluation method, which is usually the most accurate prompt.
-
-## Dataset Preparation
-
-The datasets supported by OpenCompass mainly include two parts:
-
-1. Huggingface Dataset
-
-[Huggingface Dataset](https://huggingface.co/datasets) provides a large number of datasets. OpenCompass has supported most of the datasets commonly used for performance comparison, please refer to `configs/dataset` for the specific list of supported datasets.
-
-2. Third-party Datasets
-
-In addition to supporting Huggingface's existing datasets, OpenCompass also provides some third-party and self-built datasets. Run the following commands to download and place the datasets in the `./data` directory can complete dataset preparation.
-
-```bash
-# Run in the OpenCompass directory
-wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
-unzip OpenCompassData.zip
-```
-
-Note that the Repo not only contains self-built datasets, but also includes some HF-supported datasets for testing convenience.
 
 ## Dataset Selection
 
