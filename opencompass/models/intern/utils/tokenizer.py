@@ -1,14 +1,7 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-
-import os
 import re
 from typing import List, Union
 
 import torch
-
-from opencompass.models.intern.utils.generation import _no_beam_search_generate
-
-os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
 
 
 class LLMTokenizer(object):
@@ -39,7 +32,6 @@ class LLMTokenizer(object):
                  right_align=False,
                  return_tensors='pt',
                  truncation=True):
-        # import pdb; pdb.set_trace()
         if self.tokenizer_type == 'v4':
             tokens = [[0] + self.encode(x, False, False) for x in prompts]
         elif self.tokenizer_type in ['llama', 'v7']:
@@ -109,78 +101,3 @@ class LLMTokenizer(object):
 
     def decode(self, t: List[int]) -> str:
         return self.tokenizer.decode(t)
-
-
-class LLMGenerator:
-
-    def __init__(self, model, tokenizer, use_mask=False, forward_kwargs=None):
-        self.model = model
-        self.tokenizer = tokenizer
-        self.use_mask = use_mask
-        self.forward_kwargs = forward_kwargs
-
-    def generate(self,
-                 inputs,
-                 generation_kwargs={
-                     'max_gen_len': 100,
-                     'eos_token_id': None
-                 }):
-        tokenized_data = self.tokenizer(inputs,
-                                        padding=True,
-                                        right_align=True,
-                                        return_tensors='pt')
-        tokenized_data_len = tokenized_data['tokens'].shape[1]
-        padding_data = self.tokenizer.tokenizer.decode(
-            tokenized_data['tokens'].tolist())
-        eos_token_id = generation_kwargs.get('eos_token_id')
-        if not eos_token_id:
-            eos_token_id = self.tokenizer.eos_token_id
-        results = _no_beam_search_generate(
-            self.model,
-            tokenized_data['tokens'][..., ],
-            do_sample=False,
-            max_length=generation_kwargs['max_gen_len'] + tokenized_data_len,
-            bos_token_id=self.tokenizer.bos_token_id,
-            eos_token_id=eos_token_id,
-            pad_token_id=eos_token_id,
-            **self.forward_kwargs)
-        results = results.squeeze(1).tolist()
-        results_text = [
-            self.tokenizer.tokenizer.decode(results[i])[len(padding_data[i]):]
-            for i in range(len(inputs))
-        ]
-
-        def trunc_eos(text):
-            eos_text = self.tokenizer.tokenizer.decode([eos_token_id])
-            try:
-                text = text[:text.index(eos_text)]
-            except ValueError:
-                pass
-            return text
-
-        if generation_kwargs.get('eos_token_id') is not None:
-            results_text = [trunc_eos(t) for t in results_text]
-        return results_text
-
-    def get_logits(self, inputs):
-        inputs = self.tokenizer(inputs,
-                                padding=True,
-                                return_tensors='pt',
-                                truncation=True)
-        if self.use_mask:
-            outputs = self.model(input_ids=inputs['tokens'],
-                                 **self.forward_kwargs)
-        else:
-            outputs = self.model(input_ids=inputs['tokens'])
-        return outputs, inputs
-
-
-def sample_top_p(probs, p):
-    probs_sort, probs_idx = torch.sort(probs, dim=-1, descending=True)
-    probs_sum = torch.cumsum(probs_sort, dim=-1)
-    mask = probs_sum - probs_sort > p
-    probs_sort[mask] = 0.0
-    probs_sort.div_(probs_sort.sum(dim=-1, keepdim=True))
-    next_token = torch.multinomial(probs_sort, num_samples=1)
-    next_token = torch.gather(probs_idx, -1, next_token)
-    return next_token

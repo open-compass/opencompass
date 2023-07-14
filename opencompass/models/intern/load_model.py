@@ -10,10 +10,10 @@ from internlm.core.context import ParallelMode
 from internlm.core.context import global_context as gpc
 from sentencepiece import SentencePieceProcessor
 
-from .utils.checkpoint_utils import merge_pp_within_tp
-from .utils.generation_tools import LLMGenerator, LLMTokenizer
-from .utils.utils import (basic_config, convert2run, proxy_off,
-                          try_import_petrel_client)
+from .utils.generation import LLMGenerator
+from .utils.tokenizer import LLMTokenizer
+from .utils.utils import (basic_config, convert2run, merge_pp_within_tp,
+                          proxy_off, try_import_petrel_client)
 
 Client = try_import_petrel_client()
 
@@ -48,8 +48,7 @@ def load_llm(checkpoint,
     ckpt = str(ckpts[0])
     # parameter splitting:
     if model_config_path is None:
-        internlm.launch_from_torch(config={'parallel': dict(zero1=1, )},
-                                   seed=42)
+        internlm.launch_from_torch(config={'parallel': dict(zero1=1)}, seed=42)
     else:
         internlm.launch_from_torch(config=model_config_path, seed=42)
 
