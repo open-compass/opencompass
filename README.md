@@ -17,12 +17,17 @@ English | [简体中文](README_zh-CN.md)
 
 </div>
 
+<p align="center">
+    👋 join us on <a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> and <a href="https://github.com/InternLM/InternLM/assets/25839884/a6aad896-7232-4220-ac84-9e070c2633ce" target="_blank">WeChat</a>
+</p>
+
 Welcome to **OpenCompass**!
 
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
 ## News
-- **[2023.07.13]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models 🔥🔥🔥.
+
+- **\[2023.07.13\]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models 🔥🔥🔥.
 
 ## Introduction
 
