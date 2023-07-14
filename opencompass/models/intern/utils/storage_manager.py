@@ -6,23 +6,14 @@ import os
 import pickle
 import socket
 import threading
-import time
 from asyncio import InvalidStateError
 from asyncio.tasks import ALL_COMPLETED
 from datetime import datetime
 from typing import Awaitable, Callable, Dict, List
 
-import boto3
-import botocore
 import torch
-# from utils.checkpoint_utils import Boto3Saver
-from boto3.s3.transfer import TransferConfig
-from botocore.response import StreamingBody
 from internlm.utils.common import SingletonMeta
 
-from .utils import try_import_petrel_client
-
-Client = try_import_petrel_client()
 MB = 1024**2
 
 
@@ -78,49 +69,6 @@ class StorageClient:
 
     def get_fns(self, folder):
         raise NotImplementedError
-
-
-class Boto3ObjectStream:
-
-    def __init__(self, client, bucket_name, object_name, metadata) -> None:
-        self.byte_size = int(
-            metadata['ResponseMetadata']['HTTPHeaders']['content-length'])
-        self.left_byte_size = self.byte_size
-        self._bucket_name = bucket_name
-        self._object_name = object_name
-        self._client = client
-        self.stream: StreamingBody = None
-        self.start = 0
-
-    def set_start(self, start: int):
-        """设置 stream 读取的起始位置.
-
-        Args:
-            start (int): 流的起始字节偏移量
-        """
-        if self.stream:
-            self.stream.close()
-        self.start = start
-        self.stream = \
-        self._client.get_object(Bucket=self._bucket_name, Key=self._object_name, Range=f'bytes={self.start}-')['Body']
-
-    def size(self) -> int:
-        """返回对象的真实字节大小(不考虑 start 的偏移量)"""
-        return self.byte_size
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.stream:
-            self.stream.close()
-
-    def read(self, amt: int = None):
-        """从流中读取amt个字节的数据, 如果amt为None,则读取全部数据."""
-        if self.stream is None:
-            self.stream = self._client.get_object(
-                Bucket=self._bucket_name, Key=self._object_name)['Body']
-        return self.stream.read(amt=amt)
 
 
 class LocalClient(StorageClient):
@@ -225,11 +173,6 @@ class StorageManager(metaclass=SingletonMeta):
         )  # Used to synchronize the monitoring thread and the main thread.
         self._task_peeding = False  # Mark whether there is a peeding asynchronous task.
 
-        if 'http_proxy' in os.environ or 'https_proxy' in os.environ or 'HTTP_PROXY' in os.environ or 'HTTPS_PROXY' in os.environ:
-            raise RuntimeError(
-                'If you use s3 as storage backend, please do not set any proxy.'
-            )
-
         self.logger = logger if logger is not None else PrintLogger()
 
         if self.async_mode:
@@ -267,67 +210,16 @@ class StorageManager(metaclass=SingletonMeta):
     def set_logger(self, logger):
         self.logger = logger
 
-    def simulate_updownload_async(self, s3_path):
-        if self.tmp_local_folder:
-            check_tmp_folder_accessibility(self.tmp_local_folder)
-            states = {
-                'a': torch.ones(64, 1),
-                'b': torch.ones(64, 1),
-                'c': torch.ones(1)
-            }
-            test_fn_path1 = os.path.join(s3_path, 'test',
-                                         f'{str(os.getpid())}-test-dict1.pt')
-            self.save(-1, test_fn_path1, states)
-            self.set_finish_flag(-1)
-            self.wait()
-            lstates = self.load(test_fn_path1)
-            assert lstates['a'].size() == torch.Size([64, 1])
-            assert lstates['b'].size() == torch.Size([64, 1])
-            assert lstates['c'].size() == torch.Size([1])
-            self.logger.info('The simulated upload/load was successful')
-
-    def simulate_updownload_sync(self, s3_path):
-        # Do not name files with timestamps, thereby reducing the number of files.
-        fb_path = os.path.join(s3_path, 'test',
-                               f'{str(os.getpid())}-test-sync.pt')
-        states = {
-            'a': torch.ones(64, 1),
-            'b': torch.ones(8, 1),
-            'c': torch.ones(1)
-        }
-        retry_count = 3
-        error = None
-        while retry_count > 0:
-            try:
-                self._get_client(s3_path).sync_upload_fileobj(fb_path, states)
-                time.sleep(0.5)
-                lstates = self._get_client(fb_path).load(fb_path)
-                assert lstates['a'].size() == torch.Size([64, 1])
-                assert lstates['b'].size() == torch.Size([8, 1])
-                assert lstates['c'].size() == torch.Size([1])
-            except Exception as e:
-                retry_count -= 1
-                error = e
-                time.sleep(5)
-                self.logger.info(
-                    f'Storage ping failed for {e}, remaining retries:{retry_count}'
-                )
-            else:
-                return
-
-        raise error
-
     def try_delete_tmpfile(self, path: str):
         for f in os.listdir(path):
             if f.split('.')[-1] == 'tmpfile':
                 try:
                     os.remove(f)
-                except BaseException as e:
+                except BaseException:
                     # There is a race on multi-process delete, we don't throw any exceptions.
                     pass
                 else:
                     self.logger.info(f'Delete tmpfile: {f}, in folder:{path}')
-
 
     def _get_local_cli(self):
         return LocalClient()
@@ -393,13 +285,6 @@ class StorageManager(metaclass=SingletonMeta):
             raise RuntimeError(
                 "Async checkpoint saving is failed! can't load checkpoint")
 
-    def open_range_obj(self, fp: str):
-        if self.wait():
-            return self._get_boto3_cli(fp)._s3_object_stream(fp)
-        else:
-            raise RuntimeError(
-                "Async checkpoint saving is failed! can't load checkpoint")
-
     async def _sync_tasks(self) -> Awaitable[None]:
         if self._async_stack:
             await asyncio.wait(self._async_stack, return_when=ALL_COMPLETED)
@@ -436,12 +321,12 @@ class StorageManager(metaclass=SingletonMeta):
 
     def wait(self) -> bool:
         # If there is no task that is peeding, return directly
-        if self._task_peeding == False:
+        if self._task_peeding is False:
             return True
 
         with self._lock_task_peeding:
             # Double-check, if someone completes the wait, it will return directly.
-            if self._task_peeding == False:
+            if self._task_peeding is False:
                 return True
 
             if self._async_loop:
@@ -469,15 +354,6 @@ class StorageManager(metaclass=SingletonMeta):
                 f'Step:{self._step_counter} all asynchronous uploads succeeded!'
             )
         return True
-
-    @staticmethod
-    def get_meta(fp: str):
-        assert fp.startswith('s3://')
-        parts = fp.lstrip('s3://').split(os.path.sep)
-        s3_bucket = parts[0]
-        _fp = os.path.sep.join(parts[1:])
-        assert len(_fp) != 0, f'fp:{fp} has no file name.'
-        return s3_bucket, _fp
 
     def __del__(self):
         if self.async_mode:

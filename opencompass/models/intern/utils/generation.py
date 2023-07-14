@@ -1,10 +1,73 @@
-r"""
-
-"""
+import os
 
 import torch
 import torch.nn.functional as F
-from torch import nn
+
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
+
+
+class LLMGenerator:
+
+    def __init__(self, model, tokenizer, use_mask=False, forward_kwargs=None):
+        self.model = model
+        self.tokenizer = tokenizer
+        self.use_mask = use_mask
+        self.forward_kwargs = forward_kwargs
+
+    def generate(self,
+                 inputs,
+                 generation_kwargs={
+                     'max_gen_len': 100,
+                     'eos_token_id': None
+                 }):
+        tokenized_data = self.tokenizer(inputs,
+                                        padding=True,
+                                        right_align=True,
+                                        return_tensors='pt')
+        tokenized_data_len = tokenized_data['tokens'].shape[1]
+        padding_data = self.tokenizer.tokenizer.decode(
+            tokenized_data['tokens'].tolist())
+        eos_token_id = generation_kwargs.get('eos_token_id')
+        if not eos_token_id:
+            eos_token_id = self.tokenizer.eos_token_id
+        results = _no_beam_search_generate(
+            self.model,
+            tokenized_data['tokens'][..., ],
+            do_sample=False,
+            max_length=generation_kwargs['max_gen_len'] + tokenized_data_len,
+            bos_token_id=self.tokenizer.bos_token_id,
+            eos_token_id=eos_token_id,
+            pad_token_id=eos_token_id,
+            **self.forward_kwargs)
+        results = results.squeeze(1).tolist()
+        results_text = [
+            self.tokenizer.tokenizer.decode(results[i])[len(padding_data[i]):]
+            for i in range(len(inputs))
+        ]
+
+        def trunc_eos(text):
+            eos_text = self.tokenizer.tokenizer.decode([eos_token_id])
+            try:
+                text = text[:text.index(eos_text)]
+            except ValueError:
+                pass
+            return text
+
+        if generation_kwargs.get('eos_token_id') is not None:
+            results_text = [trunc_eos(t) for t in results_text]
+        return results_text
+
+    def get_logits(self, inputs):
+        inputs = self.tokenizer(inputs,
+                                padding=True,
+                                return_tensors='pt',
+                                truncation=True)
+        if self.use_mask:
+            outputs = self.model(input_ids=inputs['tokens'],
+                                 **self.forward_kwargs)
+        else:
+            outputs = self.model(input_ids=inputs['tokens'])
+        return outputs, inputs
 
 
 class InferenceParams:
@@ -17,8 +80,7 @@ class InferenceParams:
                  key_value_memory_dict: dict = None,
                  lengths_per_sample=None,
                  attention_mask=None) -> None:
-        """推理相关的中间 cache 对象.
-
+        """
         :param max_sequence_len: 最大长度
         :param max_batch_size: batch_size
         :param sequence_len_offset: _description_, defaults to 0
@@ -38,29 +100,12 @@ class InferenceParams:
         self.attention_mask = attention_mask
 
     def reorder_state(self, indices):
-        # 在 beam search 期间会会涉及到重排的操作
         if self.lengths_per_sample is not None:
             self.lengths_per_sample = self.lengths_per_sample.index_select(
                 index=indices, dim=0)
         for key, value in list(self.key_value_memory_dict.items()):
             value = value.index_select(index=indices, dim=0)
             self.key_value_memory_dict[key] = value
-
-
-def _get_model_device(model):
-    r"""
-    传入一个nn.Module的模型，获取它所在的device
-
-    :param model: nn.Module
-    :return: torch.device,None 如果返回值为None，说明这个模型没有任何参数。
-    """
-    assert isinstance(model, nn.Module)
-
-    parameters = list(model.parameters())
-    if len(parameters) == 0:
-        return None
-    else:
-        return parameters[0].device
 
 
 @torch.no_grad()
@@ -109,9 +154,6 @@ def _no_beam_search_generate(decoder,
                                            key_value_memory_dict=None,
                                            lengths_per_sample=None,
                                            attention_mask=attention_mask)
-
-    # 主要是为了update state
-
     if layer_mask is None:
         if feat_mask is None and ffn_mask is None:
             scores = decoder(**{
@@ -140,13 +182,12 @@ def _no_beam_search_generate(decoder,
         scores = scores[0]
     scores = scores[:, -1].float()
     inference_params.sequence_len_offset += tokens.size(1)
-    if _eos_token_id != -1:  # 防止第一个位置为结束
+    if _eos_token_id != -1:
         scores[:, _eos_token_id] = -1e12
     next_tokens = scores.argmax(dim=-1, keepdim=True)
     token_ids = torch.cat([tokens, next_tokens], dim=1)
     cur_len = token_ids.size(1)
     dones = token_ids.new_zeros(batch_size).eq(1)
-    # tokens = tokens[:, -1:]
 
     real_max_length = max_length
     max_lengths = tokens.new_full((tokens.size(0), ),
@@ -165,10 +206,7 @@ def _no_beam_search_generate(decoder,
             bos_pos = torch.where(token_ids.eq(bos_token_id), 1, 0)
             to_atten_x = bos_pos[:, :, None]
             to_atten_y = bos_pos[:, None, :]
-        # import pdb; pdb.set_trace()
         attention_mask = torch.logical_or(to_atten_x, to_atten_y).eq(1)
-        # import pdb
-        # pdb.set_trace()
         inference_params.attention_mask = attention_mask
         if layer_mask is None:
             if feat_mask is None and ffn_mask is None:
@@ -214,7 +252,6 @@ def _no_beam_search_generate(decoder,
             eos_mask = scores.new_ones(scores.size(1))
             eos_mask[eos_token_id] = 0
             eos_mask = eos_mask.unsqueeze(0).eq(1)
-            # 也即除了eos，其他词的分数经过了放大/缩小
             scores = scores.masked_scatter(eos_mask, token_scores)
 
         if do_sample:
@@ -225,7 +262,6 @@ def _no_beam_search_generate(decoder,
                                            top_k,
                                            top_p,
                                            min_tokens_to_keep=2)
-            # 加上1e-12是为了避免https://github.com/pytorch/pytorch/pull/27523
             probs = F.softmax(scores, dim=-1) + 1e-12
 
             next_tokens = torch.multinomial(probs, num_samples=1).squeeze(
@@ -233,12 +269,10 @@ def _no_beam_search_generate(decoder,
         else:
             next_tokens = torch.argmax(scores, dim=-1)  # batch_size
 
-        # 如果已经达到对应的sequence长度了，就直接填为eos了
         if _eos_token_id != -1:
             next_tokens = next_tokens.masked_fill(max_lengths.eq(cur_len + 1),
                                                   _eos_token_id)
-        next_tokens = next_tokens.masked_fill(
-            dones, pad_token_id)  # 对已经搜索完成的sample做padding
+        next_tokens = next_tokens.masked_fill(dones, pad_token_id)
         tokens = next_tokens.unsqueeze(1)
 
         token_ids = torch.cat([token_ids, tokens],
@@ -259,14 +293,14 @@ def top_k_top_p_filtering(logits,
                           top_p=1.0,
                           filter_value=-float('Inf'),
                           min_tokens_to_keep=1):
-    """根据top_k, top_p的值，将不满足的值置为filter_value的值。
+    """Set values that do not satisfy the top_k and top_p conditions to the
+    filter_value.
 
     :param torch.Tensor logits: bsz, vocab_size
-    :param int top_k: 如果大于0，则只保留最 top_k 的词汇的概率，剩下的位置被置为
-        filter_value
-    :param int top_p: 根据(http://arxiv.org/abs/1904.09751)设置的筛选方式
+    :param int top_k: If greater than 0, keep only the probabilities of the top_k vocabulary, and set the rest to filter_value.  # noqa: E501
+    :param int top_p: Filtering method based on (http://arxiv.org/abs/1904.09751).  # noqa: E501
     :param float filter_value:
-    :param int min_tokens_to_keep: 每个sample返回的分布中有概率的词不会低于这个值
+    :param int min_tokens_to_keep: The number of tokens in the distribution returned for each sample should not be lower than this value.  # noqa: E501
     :return:
     """
     if top_k > 0:

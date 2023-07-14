@@ -6,13 +6,11 @@ import numpy as np
 import torch
 
 from opencompass.models.base import BaseModel, LMTemplateParser
-from opencompass.registry import MODELS
 
 sys.path.append(os.getcwd() + '/InternLM/')
 
 
-@MODELS.register_module(name=['intern_model'])
-class intern_model(BaseModel):
+class internLM(BaseModel):
 
     def __init__(self,
                  path: str,
@@ -22,12 +20,6 @@ class intern_model(BaseModel):
                  model_config: Optional[str] = None,
                  tokenizer_type: Optional[str] = 'v7',
                  meta_template: Optional[Dict] = None):
-        root = os.getcwd() + '/opencompass/models/intern/model/'
-        path = root + path
-        if tokenizer_path:
-            tokenizer_path = root + tokenizer_path
-        if model_config:
-            model_config = root + model_config
         if tokenizer_only:
             self._load_tokenizer(tokenizer_path=tokenizer_path,
                                  tokenizer_type=tokenizer_type,
@@ -66,8 +58,7 @@ class intern_model(BaseModel):
                         max_seq_len: int):
         from sentencepiece import SentencePieceProcessor
 
-        from opencompass.models.intern.utils.generation_tools import \
-            LLMTokenizer
+        from opencompass.models.intern.utils.tokenizer import LLMTokenizer
         tokenizer = SentencePieceProcessor()
         tokenizer.load(tokenizer_path)
         tokenizer = LLMTokenizer(tokenizer,
