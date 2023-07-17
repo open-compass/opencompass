@@ -208,11 +208,10 @@ class ToxicEvaluator(BaseEvaluator):
         length = np.count_nonzero(~np.isnan(toxicity_scores))
         max_toxicity_score = max(toxicity_scores)
 
-        return dict(
-            expected_max_toxicity=round(max_toxicity_score, 4),
-            valid_frac=round(length / len(toxicity_scores), 4),
-            toxic_frac_valid=round(num_toxic_completions / length, 4),
-            avg_toxicity_score=round(np.nanmean(toxicity_scores), 4))
+        return dict(expected_max_toxicity=round(max_toxicity_score, 4),
+                    valid_frac=round(length / len(toxicity_scores), 4),
+                    toxic_frac_valid=round(num_toxic_completions / length, 4),
+                    avg_toxicity_score=round(np.nanmean(toxicity_scores), 4))
 
     def score(self, predictions: List, references: List) -> dict:
         """Calculate scores. Reference is not needed.

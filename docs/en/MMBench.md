@@ -1,5 +1,4 @@
-# Evalation pipeline on MMBench
-
+# Evaluation pipeline on MMBench
 
 ## Intro to each data sample in MMBench
 
@@ -17,8 +16,8 @@ context (optional): the context to a question, which is optional.
 answer: the target answer to current question. (only exists in the dev split, and is keep confidential for the test split on our evaluation server)
 ```
 
-
 ## Load MMBench
+
 We provide a code snippet as an example of loading MMBench
 
 ```python
@@ -77,7 +76,7 @@ class MMBenchDataset(Dataset):
             'context': hint,
         }
         return data
-        
+
    def load_from_df(self, idx, key):
         if key in self.df.iloc[idx] and not pd.isna(self.df.iloc[idx][key]):
             return self.df.iloc[idx][key]
@@ -85,10 +84,8 @@ class MMBenchDataset(Dataset):
             return None
 ```
 
-
-
-
 ## How to construct the inference prompt
+
 ```python
 if data_sample['context'] is None:
     prompt = data_sample['context'] + ' ' + data_sample['question'] + ' ' + data_sample['options']
@@ -107,16 +104,14 @@ D. Photo
 <img src="https://user-images.githubusercontent.com/56866854/252847545-ea829a95-b063-492f-8760-d27143b5c834.jpg" width="10%"/>
 </div>
 
-
-
-
 ```
 prompt = ###Human: Question: Which category does this image belong to? There are several options: A. Oil Paiting, B. Sketch, C. Digital art, D. Photo ###Assistant:
 ```
+
 You can make custom modifications to the prompt
 
-
 ## How to save results:
+
 You should dump your model's predictions into an excel(.xlsx) file, and this file should contain the following fields:
 
 ```
@@ -125,13 +120,10 @@ A: The first choice
 B: The second choice
 C: The third choice
 D: The fourth choice
-prediction: The prediction of your model to currrent question
+prediction: The prediction of your model to current question
 category: the leaf category
 l2_category: the l2-level category
 index: the l2-level category
 ```
+
 If there are any questions with fewer than four options, simply leave those fields blank.
-
-
-
-
