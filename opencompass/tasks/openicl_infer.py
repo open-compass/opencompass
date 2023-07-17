@@ -76,7 +76,8 @@ class OpenICLInferTask(BaseTask):
                 self._inference()
 
     def _inference(self):
-        self.logger.info(f'Start inference {task_abbr_from_cfg(self.sub_cfg)}')
+        self.logger.info(
+            f'Start inferencing {task_abbr_from_cfg(self.sub_cfg)}')
 
         assert hasattr(self.infer_cfg, 'ice_template') or hasattr(self.infer_cfg, 'prompt_template'), \
             'Both ice_template and prompt_template cannot be None simultaneously.'  # noqa: E501
