@@ -142,7 +142,8 @@ class HuggingFace(BaseModel):
         tokens = self.tokenizer.batch_encode_plus(inputs,
                                                   padding=True,
                                                   truncation=True,
-                                                  max_length=self.max_seq_len - max_out_len)
+                                                  max_length=self.max_seq_len -
+                                                  max_out_len)
         tokens = {
             k: torch.tensor(np.array(tokens[k]), device=self.model.device)
             for k in tokens if k in ['input_ids', 'attention_mask']
@@ -180,10 +181,10 @@ class HuggingFace(BaseModel):
 
         input_ids = self.tokenizer(inputs,
                                    truncation=True,
-                                   max_length=self.max_seq_len - max_out_len)['input_ids']
+                                   max_length=self.max_seq_len -
+                                   max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
-        outputs = self.model.generate(input_ids,
-                                      max_new_tokens=max_out_len)
+        outputs = self.model.generate(input_ids, max_new_tokens=max_out_len)
 
         if not self.extract_pred_after_decode:
             outputs = outputs[:, input_ids.shape[1]:]

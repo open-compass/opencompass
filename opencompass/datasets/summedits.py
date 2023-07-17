@@ -3,6 +3,7 @@ import json
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+
 from .base import BaseDataset
 
 

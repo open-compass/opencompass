@@ -6,10 +6,9 @@ from datasets import Dataset
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
+from ..base import BaseDataset
 from .math_equivalence import is_equiv
 from .post_process import parse_math_answer
-
-from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
