@@ -5,7 +5,7 @@
 评测任务的程序入口为 `run.py`，使用方法如下：
 
 ```shell
-python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l]
+python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l] [--dry-run]
 ```
 
 启动方式：
@@ -24,6 +24,7 @@ python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--
 - `-r`: 重用已有的推理结果。如果后面跟有时间戳，则会复用工作路径下该时间戳的结果；否则则复用指定工作路径下的最新结果。
 - `-w`: 指定工作路径，默认为 `./outputs/default`
 - `-l`: 打开飞书机器人状态上报。
+- `--dry-run`: 开启时，推理和评测任务仅会分发但不会真正运行，便于调试；
 
 以运行模式`-m all`为例，整体运行流如下：
 
