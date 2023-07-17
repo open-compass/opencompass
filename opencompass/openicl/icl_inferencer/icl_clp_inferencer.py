@@ -98,8 +98,8 @@ class CLPInferencer(BaseInferencer):
         # 3. Generate in-context examples for testing inputs
         for idx in range(len(ice_idx_list)):
             ice.append(
-                retriever.generate_ice(
-                    ice_idx_list[idx], ice_template=ice_template))
+                retriever.generate_ice(ice_idx_list[idx],
+                                       ice_template=ice_template))
         output_handler.save_ice(ice)
 
         # 4. Collect prompts and calculate conditional log probs
@@ -165,11 +165,10 @@ class CLPInferencer(BaseInferencer):
                 choice_target_ids.append(prompt_token_num - 1)
 
             logger.info('Calculating conditional log probability for prompts.')
-            for idx in trange(
-                    0,
-                    len(prompt_list),
-                    self.batch_size,
-                    disable=not self.is_main_process):
+            for idx in trange(0,
+                              len(prompt_list),
+                              self.batch_size,
+                              disable=not self.is_main_process):
                 sub_prompt_list = prompt_list[idx:idx + self.batch_size]
                 sub_choice_target_ids = choice_target_ids[idx:idx +
                                                           self.batch_size]
