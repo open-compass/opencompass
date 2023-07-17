@@ -11,7 +11,8 @@ from opencompass.registry import (ICL_INFERENCERS, ICL_PROMPT_TEMPLATES,
                                   ICL_RETRIEVERS, TASKS)
 from opencompass.tasks.base import BaseTask
 from opencompass.utils import (build_dataset_from_cfg, build_model_from_cfg,
-                               get_infer_output_path, get_logger)
+                               get_infer_output_path, get_logger,
+                               task_abbr_from_cfg)
 
 
 @TASKS.register_module(force=(__name__ == '__main__'))  # A hack for script run
@@ -30,6 +31,7 @@ class OpenICLInferTask(BaseTask):
         run_cfg = self.model_cfgs[0].get('run_cfg', {})
         self.num_gpus = run_cfg.get('num_gpus', 0)
         self.num_procs = run_cfg.get('num_procs', 1)
+        self.logger = get_logger()
 
     def get_command(self, cfg_path, template):
         """Get the command template for the task.
@@ -51,6 +53,7 @@ class OpenICLInferTask(BaseTask):
         return template.format(task_cmd=command)
 
     def run(self):
+        self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
@@ -61,6 +64,10 @@ class OpenICLInferTask(BaseTask):
                 self.dataset_cfg = dataset_cfg
                 self.infer_cfg = self.dataset_cfg['infer_cfg']
                 self.dataset = build_dataset_from_cfg(self.dataset_cfg)
+                self.sub_cfg = {
+                    'models': [self.model_cfg],
+                    'datasets': [[self.dataset_cfg]],
+                }
                 out_path = get_infer_output_path(
                     self.model_cfg, self.dataset_cfg,
                     osp.join(self.work_dir, 'predictions'))
@@ -69,6 +76,8 @@ class OpenICLInferTask(BaseTask):
                 self._inference()
 
     def _inference(self):
+        self.logger.info(
+            f'Start inferencing {task_abbr_from_cfg(self.sub_cfg)}')
 
         assert hasattr(self.infer_cfg, 'ice_template') or hasattr(self.infer_cfg, 'prompt_template'), \
             'Both ice_template and prompt_template cannot be None simultaneously.'  # noqa: E501
