@@ -95,7 +95,7 @@ else:
 
 For example:
 Question: Which category does this image belong to?
-A. Oil Paiting
+A. Oil Painting
 B. Sketch
 C. Digital art
 D. Photo
@@ -105,7 +105,7 @@ D. Photo
 </div>
 
 ```
-prompt = ###Human: Question: Which category does this image belong to? There are several options: A. Oil Paiting, B. Sketch, C. Digital art, D. Photo ###Assistant:
+prompt = ###Human: Question: Which category does this image belong to? There are several options: A. Oil Painting, B. Sketch, C. Digital art, D. Photo ###Assistant:
 ```
 
 You can make custom modifications to the prompt
