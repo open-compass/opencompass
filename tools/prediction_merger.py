@@ -34,10 +34,6 @@ class PredictionMerger:
         self.model_cfg = copy.deepcopy(self.cfg['model'])
         self.dataset_cfg = copy.deepcopy(self.cfg['dataset'])
         self.work_dir = self.cfg.get('work_dir')
-        # Load Dataset
-        self.eval_cfg = self.dataset_cfg.get('eval_cfg')
-        self.ds_split = self.eval_cfg.get('ds_split', None)
-        self.ds_column = self.eval_cfg.get('ds_column')
 
     def run(self):
         filename = get_infer_output_path(
