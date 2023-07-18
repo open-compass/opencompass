@@ -1,5 +1,7 @@
-from datasets import load_dataset
 import re
+
+from datasets import load_dataset
+
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
