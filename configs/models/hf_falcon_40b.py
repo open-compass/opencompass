@@ -1,3 +1,4 @@
+# Only torch >=2.0 is supported for falcon-40b
 from opencompass.models import HuggingFaceCausalLM
 
 models = [
