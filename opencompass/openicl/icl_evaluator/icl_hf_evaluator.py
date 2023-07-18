@@ -113,7 +113,7 @@ class AccEvaluator(HuggingfaceEvaluator):
 
 @ICL_EVALUATORS.register_module()
 class RougeEvaluator(HuggingfaceEvaluator):
-    """Rogue evaluator."""
+    """Rouge evaluator."""  # noqa
 
     def __init__(self) -> None:
         super().__init__(metric='rouge')
