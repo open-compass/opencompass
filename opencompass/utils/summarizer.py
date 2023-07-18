@@ -13,6 +13,8 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
                                model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
 
+import shutil
+
 METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
 METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
 
@@ -231,3 +233,13 @@ class Summarizer:
         with open(output_csv_path, 'w') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
+        destination_directory = "../../static"
+
+        # Create the absolute path of the destination directory
+        destination_directory = osp.abspath(destination_directory)
+
+        # Create the destination file path with the new filename
+        destination_file_path = osp.join(destination_directory, "sample.csv")
+
+        # Copy the file to the destination directory
+        shutil.copy2(osp.abspath(output_csv_path), destination_file_path)
