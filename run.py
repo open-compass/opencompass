@@ -153,7 +153,7 @@ def main():
     args = parse_args()
     if args.dry_run:
         args.debug = True
-        
+
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
