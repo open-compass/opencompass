@@ -13,6 +13,7 @@ class DownloadNLTK(install):
 with open('README_zh-CN.md') as f:
     readme = f.read()
 
+
 def parse_requirements(fname='requirements.txt', with_version=True):
     """Parse the package dependencies listed in a requirements file but strips
     specific versioning information.
@@ -91,11 +92,13 @@ def parse_requirements(fname='requirements.txt', with_version=True):
     packages = list(gen_packages_items())
     return packages
 
+
 def get_version():
     version_file = 'opencompass/__init__.py'
     with open(version_file, 'r', encoding='utf-8') as f:
         exec(compile(f.read(), version_file, 'exec'))
     return locals()['__version__']
+
 
 def do_setup():
     setup(

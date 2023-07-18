@@ -107,7 +107,8 @@ class HuggingFace(BaseModel):
             self.model.config.eos_token_id = 2
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
-    def generate(self, inputs: List[str], max_out_len: int, **kwargs) -> List[str]:
+    def generate(self, inputs: List[str], max_out_len: int,
+                 **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
@@ -118,14 +119,16 @@ class HuggingFace(BaseModel):
             List[str]: A list of generated strings.
         """
         if self.batch_padding and len(inputs) > 1:
-            return self._batch_generate(inputs=inputs, max_out_len=max_out_len, **kwargs)
+            return self._batch_generate(inputs=inputs,
+                                        max_out_len=max_out_len,
+                                        **kwargs)
         else:
-            return sum((self._single_generate(inputs=[input_],
-                                              max_out_len=max_out_len, **kwargs)
+            return sum((self._single_generate(
+                inputs=[input_], max_out_len=max_out_len, **kwargs)
                         for input_ in inputs), [])
 
-    def _batch_generate(self, inputs: List[str],
-                        max_out_len: int, **kwargs) -> List[str]:
+    def _batch_generate(self, inputs: List[str], max_out_len: int,
+                        **kwargs) -> List[str]:
         """Support for batch prompts inference.
 
         Args:
@@ -142,14 +145,17 @@ class HuggingFace(BaseModel):
         tokens = self.tokenizer.batch_encode_plus(inputs,
                                                   padding=True,
                                                   truncation=True,
-                                                  max_length=self.max_seq_len - max_out_len)
+                                                  max_length=self.max_seq_len -
+                                                  max_out_len)
         tokens = {
             k: torch.tensor(np.array(tokens[k]), device=self.model.device)
             for k in tokens if k in ['input_ids', 'attention_mask']
         }
 
         # step-2: conduct model forward to generate output
-        outputs = self.model.generate(**tokens, max_new_tokens=max_out_len, **kwargs)
+        outputs = self.model.generate(**tokens,
+                                      max_new_tokens=max_out_len,
+                                      **kwargs)
 
         if not self.extract_pred_after_decode:
             outputs = outputs[:, tokens['input_ids'].shape[1]:]
@@ -164,8 +170,8 @@ class HuggingFace(BaseModel):
 
         return decodeds
 
-    def _single_generate(self, inputs: List[str],
-                         max_out_len: int, **kwargs) -> List[str]:
+    def _single_generate(self, inputs: List[str], max_out_len: int,
+                         **kwargs) -> List[str]:
         """Support for single prompt inference.
 
         Args:
@@ -180,10 +186,12 @@ class HuggingFace(BaseModel):
 
         input_ids = self.tokenizer(inputs,
                                    truncation=True,
-                                   max_length=self.max_seq_len - max_out_len)['input_ids']
+                                   max_length=self.max_seq_len -
+                                   max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
         outputs = self.model.generate(input_ids,
-                                      max_new_tokens=max_out_len, **kwargs)
+                                      max_new_tokens=max_out_len,
+                                      **kwargs)
 
         if not self.extract_pred_after_decode:
             outputs = outputs[:, input_ids.shape[1]:]

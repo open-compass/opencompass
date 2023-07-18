@@ -37,6 +37,12 @@ def parse_args():
                         'redirected to files',
                         action='store_true',
                         default=False)
+    parser.add_argument('--dry-run',
+                        help='Dry run mode, in which the scheduler will not '
+                        'actually run the tasks, but only print the commands '
+                        'to run',
+                        action='store_true',
+                        default=False)
     parser.add_argument('-m',
                         '--mode',
                         help='Running mode. You can choose "infer" if you '
@@ -135,7 +141,8 @@ def parse_dlc_args(dlc_parser):
 
 def main():
     args = parse_args()
-
+    if args.dry_run:
+        args.debug = True
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
@@ -197,6 +204,8 @@ def main():
                 max_task_size=args.max_partition_size,
                 gen_task_coef=args.gen_task_coef)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             # execute the infer subtasks
             exec_infer_runner(tasks, args, cfg)
         # If they have specified "infer" in config and haven't used --slurm
@@ -217,6 +226,8 @@ def main():
                 cfg['work_dir'], 'predictions/')
             partitioner = PARTITIONERS.build(cfg.infer.partitioner)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             runner = RUNNERS.build(cfg.infer.runner)
             runner(tasks)
 
@@ -235,6 +246,8 @@ def main():
             partitioner = NaivePartitioner(
                 osp.join(cfg['work_dir'], 'results/'))
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             # execute the eval tasks
             exec_eval_runner(tasks, args, cfg)
         # If they have specified "eval" in config and haven't used --slurm
@@ -255,6 +268,8 @@ def main():
                                                        'results/')
             partitioner = PARTITIONERS.build(cfg.eval.partitioner)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             runner = RUNNERS.build(cfg.eval.runner)
             runner(tasks)
 

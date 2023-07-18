@@ -16,8 +16,9 @@ class FloresFirst100Dataset(BaseDataset):
             'dev':
             load_dataset(path='facebook/flores', name=name, split='dev'),
             'devtest':
-            load_dataset(
-                path='facebook/flores', name=name, split='devtest[:100]')
+            load_dataset(path='facebook/flores',
+                         name=name,
+                         split='devtest[:100]')
         })
 
 

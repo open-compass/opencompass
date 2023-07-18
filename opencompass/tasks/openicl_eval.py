@@ -1,8 +1,8 @@
 import argparse
 import os.path as osp
 import time
-from typing import Optional
 from collections import Counter
+from typing import Optional
 
 import mmengine
 from mmengine.config import Config, ConfigDict
@@ -77,10 +77,11 @@ class OpenICLEvalTask(BaseTask):
         # in case the prediction is partial
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
-        
+
         # Get sc_size if use Self-Consistency
-        sc_size = self.eval_cfg['sc_size'] if self.eval_cfg.get('sc_size') is not None else -1
-        
+        sc_size = self.eval_cfg['sc_size'] if self.eval_cfg.get(
+            'sc_size') is not None else -1
+
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
             result = {'error': 'No predictions found.'}
@@ -112,12 +113,15 @@ class OpenICLEvalTask(BaseTask):
                 if sc_size > 0:
                     for pred in pred_strs:
                         if not isinstance(pred, list):
-                            raise TypeError('The prediction for Self-Consistency must be list.')
+                            raise TypeError(
+                                'The prediction for Self-Consistency'
+                                'must be list.')
                         pred_strs.append([
-                            self._extract_role_pred(sc_pred, role.get('begin', None),
+                            self._extract_role_pred(sc_pred,
+                                                    role.get('begin', None),
                                                     role.get('end', None))
                             for sc_pred in pred
-                            ])
+                        ])
                 else:
                     pred_strs = [
                         self._extract_role_pred(pred, role.get('begin', None),
@@ -130,7 +134,9 @@ class OpenICLEvalTask(BaseTask):
                 proc = TEXT_POSTPROCESSORS.get(
                     self.eval_cfg['pred_postprocessor']['type'])
                 if sc_size > 0:
-                    pred_strs = [self._get_vote_out(proc,  s) for s in pred_strs]
+                    pred_strs = [
+                        self._get_vote_out(proc, s) for s in pred_strs
+                    ]
                 else:
                     pred_strs = [proc(s) for s in pred_strs]
 
@@ -142,6 +148,8 @@ class OpenICLEvalTask(BaseTask):
             self.logger.error(
                 f'Task {task_abbr_from_cfg(self.cfg)}: {result["error"]}')
             return
+        else:
+            self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}: {result}')
 
         # Save result
         out_path = get_infer_output_path(self.model_cfg, self.dataset_cfg,
@@ -179,13 +187,15 @@ class OpenICLEvalTask(BaseTask):
 
         return s[start:end]
 
-
-    def _get_vote_out(self, proc:Optional[callable], 
-                    sc_prediction:Optional[list],)->str:
+    def _get_vote_out(
+        self,
+        proc: Optional[callable],
+        sc_prediction: Optional[list],
+    ) -> str:
         counter = Counter([proc(prediction) for prediction in sc_prediction])
         return counter.most_common(1)[0][0]
-    
-    
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Score Calculator')
     parser.add_argument('config', help='Config file path')

@@ -2,6 +2,35 @@
 
 OpenCompass 支持自定义评测任务的任务划分器（`Partitioner`），实现评测任务的灵活切分；同时配合 `Runner` 控制任务执行的平台，如本机及集群。通过二者的组合，OpenCompass 可以将大评测任务分割到大量计算节点上运行，高效利用计算资源，从而大大加速评测流程。
 
+默认情况下，OpenCompass 向用户隐藏了这些细节，并自动选择推荐的执行策略。但是，用户仍然可以根据自己需求定制其策略，只需向配置文件中添加 `infer` 和/或 `eval` 字段即可：
+
+```python
+from opencompass.partitioners import SizePartitioner, NaivePartitioner
+from opencompass.runners import SlurmRunner
+from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
+
+infer = dict(
+    partitioner=dict(type=SizePartitioner, max_task_size=5000),
+    runner=dict(
+        type=SlurmRunner,
+        max_num_workers=64,
+        task=dict(type=OpenICLInferTask),
+        retry=5),
+)
+
+eval = dict(
+    partitioner=dict(type=NaivePartitioner),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=32,
+        task=dict(type=OpenICLEvalTask)),
+)
+```
+
+上面的例子演示了如何为推理和评估阶段配置执行策略。在推理阶段，任务将被划分成若干个子任务，每个子任务包含5000个样本，然后提交到 Slurm 集群进行执行，其中最多有64个任务并行运行。在评估阶段，每个单一的模型-数据集对形成一个任务，并在本地启动32个进程来计算指标。
+
+以下章节将详细介绍里面涉及的模块。
+
 ## 任务划分 (Partitioner)
 
 由于大语言模型的推理耗时长，评测的数据集量大，因此串行运行一次评测任务的时间开销往往很大。
@@ -15,7 +44,7 @@ OpenCompass 支持通过自定义评测任务的任务划分器（`Partitioner`�
 from opencompass.partitioners import NaivePartitioner
 
 infer = dict(
-    partitioner=dict(type=SizePartitioner)
+    partitioner=dict(type=NaivePartitioner)
     # ...
 )
 ```
@@ -23,7 +52,7 @@ infer = dict(
 ### `SizePartitioner`
 
 ```{warning}
-该划分器不适用于评测阶段的任务（OpenEvalTask）。
+该划分器目前不适用于评测阶段的任务（`OpenICLEvalTask`）。
 ```
 
 该划分器会根据数据集的大小，乘上一个扩张系数，估算该数据集的推理成本（耗时）。然后会通过切分大数据集、合并小数据集的方式创建任务，尽可能保证各个子任务推理成本均等。
@@ -55,7 +84,7 @@ infer = dict(
 
 ### `LocalRunner`
 
-`LocalRunner` 为最基本的运行器，可以将任务在本机串行运行。
+`LocalRunner` 为最基本的运行器，可以将任务在本机并行运行。
 
 ```python
 from opencompass.runners import LocalRunner
@@ -65,12 +94,15 @@ infer = dict(
     # ...
     runner=dict(
         type=LocalRunner,
+        max_num_workers=16,  # 最大并行运行进程数
         task=dict(type=OpenICLEvalTask),  # 待运行的任务
     )
 )
 ```
 
-在未来，我们计划提升 `LocalRunner` 的能力，实现单机多卡资源的高效利用。
+```{note}
+实际的运行任务数受到可用 GPU 资源和 `max_num_workers` 的限制。
+```
 
 ### `SlurmRunner`
 
@@ -86,8 +118,6 @@ infer = dict(
         type=SlurmRunner,
         task=dict(type=OpenICLEvalTask),  # 待运行任务
         max_num_workers=16,  # 最大同时评测任务数
-        partition='lm',  # 运行任务的 Slurm 分区
-        quotatype='auto',  # （仅在某些 Slurm 中支持，可以不设置）运行任务的优先级
         retry=2,  # 任务失败的重试次数，可以避免意外发生的错误
     ),
 )
@@ -129,3 +159,17 @@ infer = dict(
 )
 
 ```
+
+## 任务 (Task)
+
+任务（Task）是 OpenCompass 中的一个基础模块，本身是一个独立的脚本，用于执行计算密集的操作。每个任务都通过配置文件确定参数设置，且可以通过两种不同的方式执行：
+
+1. 实例化一个任务对象，然后调用 `task.run()` 方法。
+2. 调用 `get_command` 方法，并传入配置路径和包含 `{task_cmd}` 占位符的命令模板字符串（例如 `srun {task_cmd}`）。返回的命令字符串将是完整的命令，可以直接执行。
+
+目前，OpenCompass 支持以下任务类型：
+
+- `OpenICLInferTask`：基于 OpenICL 框架执行语言模型（LM）推断任务。
+- `OpenICLEvalTask`：基于 OpenEval 框架执行语言模型（LM）评估任务。
+
+未来，OpenCompass 将支持更多类型的任务。
