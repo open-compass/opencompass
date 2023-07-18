@@ -1,31 +1,28 @@
 import re
 from collections import Counter
 
-from datasets import  load_dataset
+from datasets import load_dataset
 
-from opencompass.registry import LOAD_DATASET, EVALUATORS
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
 
 
-@LOAD_DATASET.register_module()
-class tydiqaDataset(BaseDataset):
+class TydiQADataset(BaseDataset):
 
     @staticmethod
     def load(**kwargs):
         dataset = load_dataset(**kwargs)
 
         def pre_process(example):
-            example["answer"] = example['answers']['text']
+            example['answer'] = example['answers']['text']
             return example
-            
+
         dataset = dataset.map(pre_process).remove_columns(['id', 'answers'])
         return dataset
 
 
-@EVALUATORS.register_module()
 class TydiQAEvaluator(BaseEvaluator):
     # This evaluation class is edited from:
     #  https://github.com/allenai/bi-att-flow/blob/master/squad/evaluate-v1.1.py
@@ -42,10 +39,11 @@ class TydiQAEvaluator(BaseEvaluator):
         return f1
 
     def exact_match_score(self, prediction, ground_truth):
-        return (general_postprocess(prediction) == general_postprocess(ground_truth))
+        return (general_postprocess(prediction) == general_postprocess(
+            ground_truth))
 
-    def metric_max_over_ground_truths(self, metric_fn, 
-                                      prediction, ground_truths):
+    def metric_max_over_ground_truths(self, metric_fn, prediction,
+                                      ground_truths):
         scores_for_ground_truths = []
         for ground_truth in ground_truths:
             score = metric_fn(prediction, ground_truth)
@@ -55,15 +53,17 @@ class TydiQAEvaluator(BaseEvaluator):
     def score(self, predictions, references):
         f1 = exact_match = total = 0
         if len(predictions) != len(references):
-            return {'error': 'predictions and references have different '
-                             'length'}
+            return {
+                'error': 'predictions and references have different '
+                'length'
+            }
         for prediction, reference in zip(predictions, references):
             prediction = re.split(r'[\n]', prediction, 1)[0].lower()
             exact_match += self.metric_max_over_ground_truths(
                 self.exact_match_score, prediction, reference)
-            f1 += self.metric_max_over_ground_truths(
-                self.f1_score, prediction, reference)
-            total+=1
+            f1 += self.metric_max_over_ground_truths(self.f1_score, prediction,
+                                                     reference)
+            total += 1
 
         exact_match = 100.0 * exact_match / total
         f1 = 100.0 * f1 / total
