@@ -3,13 +3,12 @@
 import os
 import os.path as osp
 from typing import List, Optional
-from collections import Counter
 
 import mmengine
 import torch
 from tqdm import tqdm
 
-from opencompass.models.base import  BaseModel
+from opencompass.models.base import BaseModel
 from opencompass.registry import ICL_INFERENCERS
 
 from ..icl_prompt_template import PromptTemplate
@@ -41,7 +40,7 @@ class SCInferencer(BaseInferencer):
         generation_kwargs (:obj:`Dict`, optional): Parameters for the
             :obj:`model.generate()` method.
         sc_size (:obj:`int`, optional): Sample size for Self-Consistency
-        infer_type (:obj:`str`, optional): Infer CoT type for 
+        infer_type (:obj:`str`, optional): Infer CoT type for
             :obj:`inference()` method.
     """
 
@@ -78,8 +77,7 @@ class SCInferencer(BaseInferencer):
         if self.model.is_api and save_every is None:
             save_every = 1
         self.save_every = save_every
-        
-        
+
     def inference(self,
                   retriever: BaseRetriever,
                   ice_template: Optional[PromptTemplate] = None,
@@ -126,16 +124,18 @@ class SCInferencer(BaseInferencer):
         # 5. Inference for prompts in each batch
         logger.info('Starting inference process...')
         for entry in tqdm(dataloader, disable=not self.is_main_process):
-             # TODO: add more types of CoT method
+            # TODO: add more types of CoT method
             # 5-1. Inference sc_size times with local model
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
                 sc_results = []
                 for _ in range(self.sc_size):
                     results = self.model.generate_from_template(
-                        entry, max_out_len=self.max_out_len, **self.generation_kwargs)
+                        entry,
+                        max_out_len=self.max_out_len,
+                        **self.generation_kwargs)
                     sc_results.append(results)
-                sc_prediction = list(map(list,zip(*sc_results)))
+                sc_prediction = list(map(list, zip(*sc_results)))
                 generated = sc_prediction
                 print(generated)
 
@@ -148,7 +148,7 @@ class SCInferencer(BaseInferencer):
             if (self.save_every is not None and index % self.save_every == 0
                     and self.is_main_process):
                 output_handler.write_to_json(output_json_filepath,
-                                                'tmp_' + output_json_filename)
+                                             'tmp_' + output_json_filename)
 
         # 6. Output
         if self.is_main_process:
