@@ -12,8 +12,8 @@ from transformers import LlamaForCausalLM, LlamaTokenizer
 from opencompass.registry import MM_MODELS
 
 
-@MM_MODELS.register_module('blip2-vicuna-instruct-omnimmbench')
-class Blip2VicunaInstructOmniMMBench(Blip2Base):
+@MM_MODELS.register_module('blip2-vicuna-instruct-mmbench')
+class Blip2VicunaInstructMMBench(Blip2Base):
 
     def __init__(
         self,

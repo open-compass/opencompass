@@ -14,8 +14,8 @@ val_pipeline = [
          ])
 ]
 
-dataset = dict(type='opencompass.OmniMMBench',
-               data_file='data/mm_benchmark/mmagi_v030_full_inferin.tsv',
+dataset = dict(type='opencompass.MMBench',
+               data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
 dataloader = dict(batch_size=1,
@@ -26,10 +26,10 @@ dataloader = dict(batch_size=1,
 
 # model settings
 model = dict(
-    type='blip2-vicuna-instruct-omnimmbench',
+    type='blip2-vicuna-instruct-mmbench',
     freeze_vit=True,
     low_resource=False,
-    llm_model='/mnt/petrelfs/share_data/ouyanglinke/vicuna-7b/',
+    llm_model='/path/to/vicuna-7b/',
     sys_prompt=  # noqa: E251
     '###Human: What is the capital of China? There are several options:\nA. Beijing\nB. Shanghai\nC. Guangzhou\nD. Shenzhen\n###Assistant: A\n'
 )
@@ -39,7 +39,7 @@ evaluator = [
     dict(
         type='opencompass.DumpResults',
         save_path=  # noqa: E251
-        'work_dirs/instructblip_vicuna7b/instructblipvicuna_mmagibench.xlsx')
+        'work_dirs/instructblip_vicuna7b/instructblipvicuna_mmbench.xlsx')
 ]
 
-load_from = '/mnt/petrelfs/share_data/liuyuan/llm_weights/instructblip_vicuna_7b/instruct_blip_vicuna7b_trimmed.pth'  # noqa
+load_from = '/path/to/instruct_blip_vicuna7b_trimmed.pth'  # noqa

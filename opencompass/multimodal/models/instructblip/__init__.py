@@ -1,3 +1,3 @@
-from .blip2_vicuna_instruct import Blip2VicunaInstructOmniMMBench
+from .blip2_vicuna_instruct import Blip2VicunaInstructMMBench
 
-__all__ = ['Blip2VicunaInstructOmniMMBench']
+__all__ = ['Blip2VicunaInstructMMBench']
