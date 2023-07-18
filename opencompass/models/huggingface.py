@@ -25,6 +25,9 @@ class HuggingFace(BaseModel):
         tokenizer_path (str): The path to the tokenizer. Defaults to None.
         tokenizer_kwargs (dict): Keyword arguments for the tokenizer.
             Defaults to {}.
+        peft_path (str, optional): The name or path to the HuggingFace's PEFT
+            model. If None, the original model will not be converted to PEFT.
+            Defaults to None.
         tokenizer_only (bool): If True, only the tokenizer will be initialized.
             Defaults to False.
         model_kwargs (dict): Keyword arguments for the model, used in loader.
@@ -330,6 +333,9 @@ class HuggingFaceCausalLM(HuggingFace):
         tokenizer_path (str): The path to the tokenizer. Defaults to None.
         tokenizer_kwargs (dict): Keyword arguments for the tokenizer.
             Defaults to {}.
+        peft_path (str, optional): The name or path to the HuggingFace's PEFT
+            model. If None, the original model will not be converted to PEFT.
+            Defaults to None.
         tokenizer_only (bool): If True, only the tokenizer will be initialized.
             Defaults to False.
         model_kwargs (dict): Keyword arguments for the model, used in loader.
