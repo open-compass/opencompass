@@ -89,7 +89,7 @@ class MMSlurmRunner(BaseRunner):
             args.work_dir, f'{osp.splitext(osp.basename(config_file))[0]}.out')
         task_name = f'{osp.splitext(osp.basename(config_file))[0]}'
         mmengine.mkdir_or_exist(osp.split(out_path)[0])
-        err_path = out_path.replace('.out', '.err')
+        err_path = out_path
         mmengine.mkdir_or_exist(osp.split(err_path)[0])
         stdout = open(out_path, 'w')
         stderr = open(err_path, 'w')
