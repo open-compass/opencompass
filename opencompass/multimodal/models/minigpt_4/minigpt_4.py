@@ -37,9 +37,9 @@ def load_package():
 MiniGPT4 = load_package()
 
 
-@MM_MODELS.register_module('minigpt-4-omnimmbench')
-class MiniGPT4OmniMMBench(MiniGPT4):
-    """Inference code of MiniGPT-4 on OmniMMBench.
+@MM_MODELS.register_module('minigpt-4-mmbench')
+class MiniGPT4MMBench(MiniGPT4):
+    """Inference code of MiniGPT-4 on MMBench.
 
     Args:
         llama_model (str): The path of vicuna path.

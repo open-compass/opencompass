@@ -18,8 +18,8 @@ def decode_base64_to_image(base64_string) -> Image:
 
 
 @DATASETS.register_module()
-class OmniMMBenchDataset(Dataset):
-    """Dataset to load OmniMMBench dataset.
+class MMBenchDataset(Dataset):
+    """Dataset to load MMBench dataset.
 
     Args:
         data_file (str): The path of the dataset.

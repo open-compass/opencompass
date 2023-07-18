@@ -1,3 +1,3 @@
-from .omnimmbench import OmniMMBenchDataset
+from .mmbench import MMBenchDataset
 
-__all__ = ['OmniMMBenchDataset']
+__all__ = ['MMBenchDataset']

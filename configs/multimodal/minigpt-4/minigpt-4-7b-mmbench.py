@@ -14,8 +14,8 @@ val_pipeline = [
          ])
 ]
 
-dataset = dict(type='opencompass.OmniMMBenchDataset',
-               data_file='data/mm_benchmark/mmagi_v030_full_inferin.tsv',
+dataset = dict(type='opencompass.MMBenchDataset',
+               data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
 dataloader = dict(batch_size=1,
@@ -26,9 +26,9 @@ dataloader = dict(batch_size=1,
 
 # model settings
 model = dict(
-    type='minigpt-4-omnimmbench',
+    type='minigpt-4-mmbench',
     low_resource=False,
-    llama_model='/mnt/petrelfs/share_data/ouyanglinke/vicuna-7b/',
+    llama_model='/path/to/vicuna-7b/',
     sys_prompt=  # noqa: E251
     '###Human: What is the capital of China? There are several options:\nA. Beijing\nB. Shanghai\nC. Guangzhou\nD. Shenzhen\n###Assistant: A\n'
 )
@@ -36,7 +36,7 @@ model = dict(
 # evaluation settings
 evaluator = [
     dict(type='opencompass.DumpResults',
-         save_path='work_dirs/minigpt-4-7b-omnimmbench.xlsx')
+         save_path='work_dirs/minigpt-4-7b-mmbench.xlsx')
 ]
 
-load_from = '/mnt/petrelfs/share_data/liuyuan/llm_weights/minigpt4-7b/prerained_minigpt4_7b.pth'  # noqa
+load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa

@@ -1,3 +1,3 @@
-from .minigpt_4 import MiniGPT4OmniMMBench
+from .minigpt_4 import MiniGPT4MMBench
 
-__all__ = ['MiniGPT4OmniMMBench']
+__all__ = ['MiniGPT4MMBench']
