@@ -55,6 +55,7 @@ from .tnews import *  # noqa: F401, F403
 from .triviaqa import *  # noqa: F401, F403
 from .triviaqarc import *  # noqa: F401, F403
 from .truthfulqa import *  # noqa: F401, F403
+from .tydiqa import *  # noqa: F401, F403
 from .wic import *  # noqa: F401, F4
 from .winograd import *  # noqa: F401, F403
 from .winogrande import *  # noqa: F401, F403
