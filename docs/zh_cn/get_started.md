@@ -2,54 +2,58 @@
 
 1. 准备 OpenCompass 运行环境：
 
-```bash
-conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
-conda activate opencompass
-```
+   ```bash
+   conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
+   conda activate opencompass
+   ```
 
-如果你希望自定义 PyTorch 版本或相关的 CUDA 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
+   如果你希望自定义 PyTorch 版本或相关的 CUDA 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
 
 2. 安装 OpenCompass：
 
-```bash
-git clone https://github.com/InternLM/opencompass.git
-cd opencompass
-pip install -e .
-```
+   ```bash
+   git clone https://github.com/InternLM/opencompass.git
+   cd opencompass
+   pip install -e .
+   ```
 
 3. 安装 humaneval（可选）：
 
-如果你需要**在 humaneval 数据集上评估模型代码能力**，请执行此步骤，否则忽略这一步。
+   如果你需要**在 humaneval 数据集上评估模型代码能力**，请执行此步骤，否则忽略这一步。
 
-<details>
-<summary><b>点击查看详细</b></summary>
+   <details>
+   <summary><b>点击查看详细</b></summary>
 
-```bash
-git clone https://github.com/openai/human-eval.git
-cd human-eval
-pip install -r requirements.txt
-pip install -e .
-cd ..
-```
+   ```bash
+   git clone https://github.com/openai/human-eval.git
+   cd human-eval
+   pip install -r requirements.txt
+   pip install -e .
+   cd ..
+   ```
 
-请仔细阅读 `human_eval/execution.py` **第48-57行**的注释，了解执行模型生成的代码可能存在的风险，如果接受这些风险，请取消**第58行**的注释，启用代码执行评测。
+   请仔细阅读 `human_eval/execution.py` **第48-57行**的注释，了解执行模型生成的代码可能存在的风险，如果接受这些风险，请取消**第58行**的注释，启用代码执行评测。
 
-4. 安装 llama（可选）：
+   </details>
 
-如果你需要**使用官方实现评测 llama / llama-2 / llama-2-chat 模型**，请执行此步骤，否则忽略这一步。
+4. 安装 Llama（可选）：
 
-<details>
-<summary><b>点击查看详细</b></summary>
+   如果你需要**使用官方实现评测 Llama / Llama-2 / Llama-2-chat 模型**，请执行此步骤，否则忽略这一步。
 
-```bash
-git clone https://github.com/facebookresearch/llama.git
-cd llama
-pip install -r requirements.txt
-pip install -e .
-cd ..
-```
+   <details>
+   <summary><b>点击查看详细</b></summary>
 
-</details>
+   ```bash
+   git clone https://github.com/facebookresearch/llama.git
+   cd llama
+   pip install -r requirements.txt
+   pip install -e .
+   cd ..
+   ```
+
+   你可以在 `configs/models` 下找到所有 Llama / Llama-2 / Llama-2-chat 模型的配置文件示例。([示例](https://github.com/InternLM/opencompass/blob/eb4822a94d624a4e16db03adeb7a59bbd10c2012/configs/models/llama2_7b_chat.py))
+
+   </details>
 
 # 数据集准备
 
