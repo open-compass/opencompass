@@ -18,7 +18,7 @@ api_meta_template = dict(
 
 models = [
     dict(
-        abbr="LLaMA-2-70B-Chat",
+        abbr="llama-2-70b-chat",
         type=LLaMA2Chat,
         path="./models/llama2/llama/llama-2-70b-chat/",
         tokenizer_path="./models/llama2/llama/tokenizer.model",

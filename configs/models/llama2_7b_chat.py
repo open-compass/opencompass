@@ -18,14 +18,14 @@ api_meta_template = dict(
 
 models = [
     dict(
-        abbr="LLaMA-2-13B-Chat",
+        abbr="llama-2-7b-chat",
         type=LLaMA2Chat,
-        path="./models/llama2/llama/llama-2-13b-chat/",
+        path="./models/llama2/llama/llama-2-7b-chat/",
         tokenizer_path="./models/llama2/llama/tokenizer.model",
         meta_template=api_meta_template,
         max_out_len=100,
         max_seq_len=2048,
         batch_size=16,
-        run_cfg=dict(num_gpus=2, num_procs=2),
+        run_cfg=dict(num_gpus=1, num_procs=1),
     ),
 ]
