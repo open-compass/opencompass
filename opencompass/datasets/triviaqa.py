@@ -32,6 +32,27 @@ class TriviaQADataset(BaseDataset):
         return dataset
 
 
+class TriviaQADataset_V2(BaseDataset):
+
+    @staticmethod
+    def load(path: str):
+        dataset = DatasetDict()
+        for split in ['dev', 'test']:
+            filename = osp.join(path, f'trivia-{split}.qa.csv')
+            with open(filename) as f:
+                reader = csv.reader(f, delimiter='\t')
+                raw_data = []
+                for row in reader:
+                    assert len(row) == 2
+                    question = row[0]
+                    answers = eval(row[1])
+                    if split == 'dev':
+                        answers = answers[0]
+                    raw_data.append({'question': question, 'answer': answers})
+                dataset[split] = Dataset.from_list(raw_data)
+        return dataset
+
+
 @ICL_EVALUATORS.register_module()
 class TriviaQAEvaluator(BaseEvaluator):
 
