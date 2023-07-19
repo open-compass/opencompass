@@ -27,6 +27,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## News
 
+- **\[2023.07.19\]** We add LLaMA-2 LLM models.
 - **\[2023.07.13\]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models 🔥🔥🔥.
 
 ## Introduction
