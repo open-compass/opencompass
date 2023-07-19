@@ -27,6 +27,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## News
 
+- **\[2023.07.19\]** We have supported [Llama 2](https://ai.meta.com/llama/)! Its performance report will be available soon. \[[doc](./docs/en/get_started.md#Installation)\]
 - **\[2023.07.13\]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models 🔥🔥🔥.
 
 ## Introduction
