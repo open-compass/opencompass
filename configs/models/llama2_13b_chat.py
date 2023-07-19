@@ -1,4 +1,4 @@
-from opencompass.models import LLaMA2Chat
+from opencompass.models import Llama2Chat
 
 # Please follow the instruction in the Meta AI website https://github.com/facebookresearch/llama
 # and download the LLaMA-2-Chat model and tokenizer to the path './models/llama2/llama/'.
@@ -19,7 +19,7 @@ api_meta_template = dict(
 models = [
     dict(
         abbr="llama-2-13b-chat",
-        type=LLaMA2Chat,
+        type=Llama2Chat,
         path="./models/llama2/llama/llama-2-13b-chat/",
         tokenizer_path="./models/llama2/llama/tokenizer.model",
         meta_template=api_meta_template,

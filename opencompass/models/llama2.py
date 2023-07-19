@@ -2,15 +2,13 @@ from typing import Dict, List, Optional, Union
 
 from opencompass.models.base import BaseModel
 from opencompass.models.base_api import APITemplateParser
-from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
 
 PromptType = Union[PromptList, str]
 
 
-@MODELS.register_module()
-class LLaMA2Chat(BaseModel):
+class Llama2Chat(BaseModel):
     """LLaMA-2 chat model wrapper
     https://github.com/facebookresearch/llama/tree/main.
 
