@@ -27,7 +27,7 @@
 
 ## 更新
 
-- **\[2023.07.19\]** 新增了 🤗[Llama 2](https://ai.meta.com/llama/)！我们近期将会公布其评测结果。
+- **\[2023.07.19\]** 新增了 🤗[Llama 2](https://ai.meta.com/llama/)！我们近期将会公布其评测结果。[安装方法](./docs/zh_cn/get_started.md#安装) [配置文件](./configs/models/llama2_7b_chat.py)
 - **\[2023.07.13\]** 发布了 [MMBench](https://opencompass.org.cn/MMBench)，该数据集经过细致整理，用于评测多模态模型全方位能力 🔥🔥🔥。
 
 ## 介绍

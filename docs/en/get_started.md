@@ -36,6 +36,23 @@ Please read the comments in `human_eval/execution.py` **lines 48-57** to underst
 
 </details>
 
+4. Install llama (Optional)
+
+If you want to **evaluate llama / llama-2 / llama-2-chat with its official implement**, execute this step otherwise skip it.
+
+<details>
+<summary><b>click to show the details</b></summary>
+
+```bash
+git clone https://github.com/facebookresearch/llama.git
+cd llama
+pip install -r requirements.txt
+pip install -e .
+cd ..
+```
+
+</details>
+
 # Dataset Preparation
 
 The datasets supported by OpenCompass mainly include two parts:

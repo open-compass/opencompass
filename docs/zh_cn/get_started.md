@@ -34,6 +34,21 @@ cd ..
 
 请仔细阅读 `human_eval/execution.py` **第48-57行**的注释，了解执行模型生成的代码可能存在的风险，如果接受这些风险，请取消**第58行**的注释，启用代码执行评测。
 
+4. 安装 llama（可选）：
+
+如果你需要**使用官方实现评测 llama / llama-2 / llama-2-chat 模型**，请执行此步骤，否则忽略这一步。
+
+<details>
+<summary><b>点击查看详细</b></summary>
+
+```bash
+git clone https://github.com/facebookresearch/llama.git
+cd llama
+pip install -r requirements.txt
+pip install -e .
+cd ..
+```
+
 </details>
 
 # 数据集准备
