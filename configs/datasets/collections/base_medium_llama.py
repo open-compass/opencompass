@@ -49,8 +49,8 @@ with read_base():
     from ..strategyqa.strategyqa_gen_1180a7 import strategyqa_datasets
     from ..winogrande.winogrande_ppl_55a66e import winogrande_datasets
     from ..obqa.obqa_ppl_6aac9e import obqa_datasets
-    from ..nq.nq_gen_7b86cb import nq_datasets
-    from ..triviaqa.triviaqa_gen_7b86cb import triviaqa_datasets
+    from ..nq.nq_gen_0356ec import nq_datasets
+    from ..triviaqa.triviaqa_gen_0356ec import triviaqa_datasets
     from ..flores.flores_gen_806ede import flores_datasets
     from ..crowspairs.crowspairs_ppl_e811e1 import crowspairs_datasets
 

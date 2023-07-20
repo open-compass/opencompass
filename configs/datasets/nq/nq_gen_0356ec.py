@@ -1,16 +1,15 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import TriviaQADataset_V2, TriviaQAEvaluator
+from opencompass.datasets import NaturalQuestionDataset, NQEvaluator
 
-
-triviaqa_datasets = []
+nq_datasets = []
 for k in [0, 1, 5]:
-    triviaqa_reader_cfg = dict(
+    nq_reader_cfg = dict(
         input_columns=['question'], output_column='answer', train_split='dev')
 
     if k == 0:
-        triviaqa_infer_cfg = dict(
+        nq_infer_cfg = dict(
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
@@ -24,12 +23,12 @@ for k in [0, 1, 5]:
             inferencer=dict(type=GenInferencer, max_out_len=50)
         )
     else:
-        triviaqa_infer_cfg = dict(
+        nq_infer_cfg = dict(
             ice_template=dict(
                 type=PromptTemplate,
                 template=dict(
                     round=[
-                        dict(role='HUMAN', prompt='Answer the question, your answer should be as simple as possible, start your answer with the prompt \'The answer is \'.\Q: {question}?'),
+                        dict(role='HUMAN', prompt='Answer the question, your answer should be as simple as possible, start your answer with the prompt \'The answer is \'.\nQ: {question}?'),
                         dict(role='BOT', prompt='A: The answer is {answer}.\n'),
                     ]
                 ),
@@ -39,7 +38,7 @@ for k in [0, 1, 5]:
                 template=dict(
                     begin="</E>",
                     round=[
-                        dict(role='HUMAN', prompt='Answer the question, your answer should be as simple as possible, start your answer with the prompt \'The answer is \'.\Q: {question}?'),
+                        dict(role='HUMAN', prompt='Answer the question, your answer should be as simple as possible, start your answer with the prompt \'The answer is \'.\nQ: {question}?'),
                         dict(role='BOT', prompt='A:'),
                     ]
                 ),
@@ -49,14 +48,14 @@ for k in [0, 1, 5]:
             inferencer=dict(type=GenInferencer, max_out_len=50, fix_id_list=list(range(k))),
         )
 
-    triviaqa_eval_cfg = dict(evaluator=dict(type=TriviaQAEvaluator), pred_role="BOT")
+    nq_eval_cfg = dict(evaluator=dict(type=NQEvaluator), pred_role="BOT")
 
-    triviaqa_datasets.append(
+    nq_datasets.append(
         dict(
-            type=TriviaQADataset_V2,
-            abbr='triviaqa' if k == 0 else f'triviaqa_{k}shot',
-            path='./data/triviaqa/',
-            reader_cfg=triviaqa_reader_cfg,
-            infer_cfg=triviaqa_infer_cfg,
-            eval_cfg=triviaqa_eval_cfg)
+            type=NaturalQuestionDataset,
+            abbr='nq' if k == 0 else f'nq_{k}shot',
+            path='./data/nq/',
+            reader_cfg=nq_reader_cfg,
+            infer_cfg=nq_infer_cfg,
+            eval_cfg=nq_eval_cfg)
     )
