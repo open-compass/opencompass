@@ -1,13 +1,9 @@
-import os
-import sys
 from typing import Dict, List, Optional
 
 import numpy as np
 import torch
 
 from opencompass.models.base import BaseModel, LMTemplateParser
-
-sys.path.append(os.getcwd() + '/InternLM/')
 
 
 class internLM(BaseModel):
@@ -42,9 +38,8 @@ class internLM(BaseModel):
                     tokenizer_type: Optional[str] = None,
                     model_config: Optional[str] = None):
 
+        from internlm.load.load_model import load_llm
         from internlm.model import build_model_with_cfg
-
-        from opencompass.models.intern.load_model import load_llm
 
         self.model, self.tokenizer, self.generator, _ = load_llm(
             path,
@@ -56,9 +51,8 @@ class internLM(BaseModel):
 
     def _load_tokenizer(self, tokenizer_path: str, tokenizer_type: str,
                         max_seq_len: int):
+        from internlm.load.tokenizer import LLMTokenizer
         from sentencepiece import SentencePieceProcessor
-
-        from opencompass.models.intern.utils.tokenizer import LLMTokenizer
         tokenizer = SentencePieceProcessor()
         tokenizer.load(tokenizer_path)
         tokenizer = LLMTokenizer(tokenizer,
