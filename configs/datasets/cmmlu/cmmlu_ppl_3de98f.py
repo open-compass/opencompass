@@ -1,6 +1,6 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import CMMLUDataset
 from opencompass.utils.text_postprocessors import first_capital_postprocess
@@ -111,12 +111,12 @@ for _name in cmmlu_all_sets:
             type=CMMLUDataset,
             path="./data/cmmlu/",
             name=_name,
-            abbr="cmmlu-{_name}",
+            abbr=f"cmmlu-{_name}",
             reader_cfg=dict(
                 input_columns=["question", "A", "B", "C", "D"],
                 output_column="answer",
                 train_split="dev",
-                test_split=_split),
+                test_split='test'),
             infer_cfg=cmmlu_infer_cfg,
             eval_cfg=cmmlu_eval_cfg,
         ))

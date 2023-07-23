@@ -1,7 +1,7 @@
 import csv
 import os.path as osp
 
-from datasets import DatasetDict, load_dataset
+from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
 
@@ -13,11 +13,13 @@ class CMMLUDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        dataset = DatasetDict()
         for split in ['dev', 'test']:
             raw_data = []
             filename = osp.join(path, split, f'{name}.csv')
             with open(filename, encoding='utf-8') as f:
                 reader = csv.reader(f)
+                headers = next(reader) # skip the header
                 for row in reader:
                     assert len(row) == 7
                     raw_data.append({

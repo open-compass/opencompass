@@ -110,12 +110,12 @@ for _name in cmmlu_all_sets:
             type=CMMLUDataset,
             path="./data/cmmlu/",
             name=_name,
-            abbr="cmmlu-{_name}",
+            abbr=f"cmmlu-{_name}",
             reader_cfg=dict(
                 input_columns=["question", "A", "B", "C", "D"],
                 output_column="answer",
                 train_split="dev",
-                test_split=_split),
+                test_split='test'),
             infer_cfg=cmmlu_infer_cfg,
             eval_cfg=cmmlu_eval_cfg,
         ))
