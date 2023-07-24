@@ -106,8 +106,8 @@ D. Photo
 
 ```python
 prompt = """
-###Human: Question: Which category does this image belong to? 
-There are several options: A. Oil Painting, B. Sketch, C. Digital art, D. Photo 
+###Human: Question: Which category does this image belong to?
+There are several options: A. Oil Painting, B. Sketch, C. Digital art, D. Photo
 ###Assistant:
 """
 ```
