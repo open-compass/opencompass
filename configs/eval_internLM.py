@@ -7,6 +7,7 @@ with read_base():
 
 datasets = [*nq_datasets]
 
+
 models = [
     dict(
         type=internLM,
