@@ -328,6 +328,5 @@ def exec_eval_runner(tasks, args, cfg):
                              lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)
 
-
 if __name__ == '__main__':
     main()
