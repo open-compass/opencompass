@@ -1,9 +1,6 @@
 from mmengine.config import read_base
 
 from opencompass.models import internLM
-from opencompass.partitioners import SizePartitioner, NaivePartitioner
-from opencompass.runners import DLCRunner, LocalRunner
-from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 
 with read_base():
     from .datasets.nq.nq_gen import nq_datasets
@@ -23,22 +20,3 @@ models = [
         batch_size=16,
         run_cfg=dict(num_gpus=1, num_procs=1))
 ]
-work_dir = './outputs/2023_07_20_02/'
-infer = dict(
-    partitioner=dict(type=SizePartitioner, max_task_size=2000, gen_task_coef=10),
-    # partitioner=dict(type='NaivePartitioner'),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=32,
-        task=dict(type=OpenICLInferTask),
-        ),
-)
-
-eval = dict(
-    partitioner=dict(type=NaivePartitioner),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=64,
-        task=dict(type=OpenICLEvalTask),
-        ),
-)
