@@ -4,10 +4,8 @@ from opencompass.models import internLM
 
 with read_base():
     from .datasets.nq.nq_gen import nq_datasets
-    from .datasets.gsm8k.gsm8k_gen import gsm8k_datasets
+
 datasets = [*nq_datasets]
-# datasets += piqa_datasets
-# datasets += nq_datasets
 
 models = [
     dict(
