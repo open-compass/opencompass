@@ -104,8 +104,12 @@ D. Photo
 <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/34324155/255581681-1364ef43-bd27-4eb5-b9e5-241327b1f920.png" width="50%"/>
 </div>
 
-```
-prompt = ###Human: Question: Which category does this image belong to? There are several options: A. Oil Painting, B. Sketch, C. Digital art, D. Photo ###Assistant:
+```python
+prompt = """
+###Human: Question: Which category does this image belong to? 
+There are several options: A. Oil Painting, B. Sketch, C. Digital art, D. Photo 
+###Assistant:
+"""
 ```
 
 You can make custom modifications to the prompt
