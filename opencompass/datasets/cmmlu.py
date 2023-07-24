@@ -19,7 +19,7 @@ class CMMLUDataset(BaseDataset):
             filename = osp.join(path, split, f'{name}.csv')
             with open(filename, encoding='utf-8') as f:
                 reader = csv.reader(f)
-                headers = next(reader)  # skip the header
+                _ = next(reader)  # skip the header
                 for row in reader:
                     assert len(row) == 7
                     raw_data.append({
