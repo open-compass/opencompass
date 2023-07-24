@@ -1,3 +1,0 @@
-# Prompt Template
-
-Coming soon.
