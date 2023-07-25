@@ -25,6 +25,11 @@
 
 就像指南针在我们的旅程中为我们导航一样，我们希望OpenCompass能够帮助你穿越评估大型语言模型的重重迷雾。OpenCompass提供丰富的算法和功能支持，期待OpenCompass能够帮助社区更便捷地对NLP模型的性能进行公平全面的评估。
 
+## 更新
+
+- **\[2023.07.19\]** 新增了 [Llama 2](https://ai.meta.com/llama/)！我们近期将会公布其评测结果。\[[文档](./docs/zh_cn/get_started.md#安装)\]
+- **\[2023.07.13\]** 发布了 [MMBench](https://opencompass.org.cn/MMBench)，该数据集经过细致整理，用于评测多模态模型全方位能力 🔥🔥🔥。
+
 ## 介绍
 
 OpenCompass 是面向大模型评测的一站式平台。其主要特点如下：

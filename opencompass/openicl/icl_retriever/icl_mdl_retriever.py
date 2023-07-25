@@ -7,7 +7,7 @@ import torch
 import tqdm
 from transformers import AutoModelForCausalLM
 
-from opencompass.openicl import PromptTemplate
+from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever.icl_topk_retriever import TopkRetriever
 from opencompass.openicl.utils.logging import get_logger
 from opencompass.registry import ICL_PROMPT_TEMPLATES, ICL_RETRIEVERS
