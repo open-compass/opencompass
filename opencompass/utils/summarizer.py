@@ -205,7 +205,7 @@ class Summarizer:
 
         output_dir = osp.split(output_path)[0]
         mmengine.mkdir_or_exist(output_dir)
-        with open(output_path, 'w') as f:
+        with open(output_path, 'w', encoding='utf-8') as f:
             f.write(time_str + '\n')
             f.write('tabulate format\n')
             f.write('^' * 128 + '\n')
@@ -228,6 +228,6 @@ class Summarizer:
             content += f'详细评测汇总已输出至 {osp.abspath(output_path)}'
             self.lark_reporter.post(content)
 
-        with open(output_csv_path, 'w') as f:
+        with open(output_csv_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')

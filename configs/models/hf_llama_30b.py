@@ -1,13 +1,12 @@
 from opencompass.models import HuggingFaceCausalLM
 
-
 models = [
     # LLaMA 30B
     dict(
         type=HuggingFaceCausalLM,
         abbr='llama-30b-hf',
-        path="decapoda-research/llama-30b-hf",
-        tokenizer_path='decapoda-research/llama-30b-hf',
+        path="huggyllama/llama-30b",
+        tokenizer_path='huggyllama/llama-30b',
         tokenizer_kwargs=dict(padding_side='left',
                               truncation_side='left',
                               use_fast=False,
