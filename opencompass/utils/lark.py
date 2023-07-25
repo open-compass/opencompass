@@ -1,3 +1,4 @@
+import argparse
 import json
 from typing import Dict, List, Optional, Union
 
@@ -37,3 +38,21 @@ class LarkReporter:
                 }
             }
         requests.post(self.url, data=json.dumps(msg))
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Lark bot reporter')
+    parser.add_argument('url', help='Lark bot url')
+    parser.add_argument('content', type=str, help='Content')
+    parser.add_argument('--title', type=str, help='Title', default=None)
+    args = parser.parse_args()
+    return args
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    lark = LarkReporter(args.url)
+    if args.title:
+        lark.post(args.content, args.title)
+    else:
+        lark.post(args.content)
