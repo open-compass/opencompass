@@ -1,6 +1,7 @@
 import re
-from datasets import load_dataset
 from typing import List
+
+from datasets import load_dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
@@ -38,7 +39,7 @@ class crowspairsDataset_V2(BaseDataset):
 
 
 def crowspairs_postprocess(text: str) -> str:
-    """Cannot cover all the cases, try to be as accurate as possibile."""
+    """Cannot cover all the cases, try to be as accurate as possible."""
     if re.search('Neither', text) or re.search('Both', text):
         return 'invalid'
 
@@ -56,8 +57,8 @@ def crowspairs_postprocess(text: str) -> str:
 
 
 class CrowspairsEvaluator(BaseEvaluator):
-    """Calculate accuracy and valid accuracy according the prediction
-        for crows-pairs dataset."""
+    """Calculate accuracy and valid accuracy according the prediction for
+    crows-pairs dataset."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -91,7 +92,6 @@ class CrowspairsEvaluator(BaseEvaluator):
         accuracy = round(all_match / len(predictions), 4) * 100
         valid_accuracy = round(valid_match / valid_length, 4) * 100
         valid_frac = round(valid_length / len(predictions), 4) * 100
-        return dict(
-            accuracy=accuracy,
-            valid_accuracy=valid_accuracy,
-            valid_frac=valid_frac)
+        return dict(accuracy=accuracy,
+                    valid_accuracy=valid_accuracy,
+                    valid_frac=valid_frac)
