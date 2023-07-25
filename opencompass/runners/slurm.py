@@ -28,6 +28,7 @@ class SlurmRunner(BaseRunner):
         retry (int): Number of retries if the job failed. Defaults to 2.
         partition (str): Slurm partition name. Defaults to None.
         quotatype (str): Slurm quota type. Defaults to None.
+        qos (str): Slurm quality of service. Defaults to None.
         debug (bool): Whether to run in debug mode. Defaults to False.
         lark_bot_url (str): Lark bot url. Defaults to None.
     """
@@ -38,6 +39,7 @@ class SlurmRunner(BaseRunner):
                  retry: int = 2,
                  partition: str = None,
                  quotatype: str = None,
+                 qos: str = None,
                  debug: bool = False,
                  lark_bot_url: str = None):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
@@ -45,6 +47,7 @@ class SlurmRunner(BaseRunner):
         self.retry = retry
         self.partition = partition
         self.quotatype = quotatype
+        self.qos = qos
 
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
         """Launch multiple tasks.
@@ -97,6 +100,8 @@ class SlurmRunner(BaseRunner):
             tmpl += f' -p {self.partition}'
         if self.quotatype:
             tmpl += f' --quotatype={self.quotatype}'
+        if self.qos:
+            tmpl += f' --qos={self.qos}'
         if num_gpus > 0:
             tmpl += f' --gres=gpu:{num_gpus}'
         tmpl += f" -N1 -J '{task_name[:512]}'" + ' {task_cmd}'
