@@ -1,7 +1,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_inferencer import PPLInferencer
+from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import XiezhiDataset, XiezhiRetriever
+from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 xiezhi_datasets = []
 
@@ -20,22 +21,22 @@ for split in ["spec_eng", "spec_chn", "inter_eng", "inter_chn"]:
     xiezhi_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
-            template={
-                answer: dict(
-                    begin="</E>",
-                    round=[
-                        dict(role="HUMAN", prompt=f"{q_hint}: {{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}"),
-                        dict(role="BOT", prompt=f"{a_hint}: {answer}"),
-                    ])
-                for answer in ["A", "B", "C", "D"]
-            },
+            template=dict(
+                begin="</E>",
+                round=[
+                    dict(role="HUMAN", prompt=f"{q_hint}: {{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n{a_hint}: "),
+                    dict(role="BOT", prompt="{answer}"),
+                ]
+            ),
             ice_token="</E>",
         ),
         retriever=dict(type=XiezhiRetriever, ice_num=3),
-        inferencer=dict(type=PPLInferencer),
+        inferencer=dict(type=GenInferencer),
     )
 
-    xiezhi_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
+    xiezhi_eval_cfg = dict(evaluator=dict(type=AccEvaluator),
+                           pred_role="BOT",
+                           pred_postprocessor=dict(type=first_capital_postprocess))
 
     xiezhi_datasets.append(
         dict(
