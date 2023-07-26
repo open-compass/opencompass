@@ -1,0 +1,14 @@
+assign:
+  issues: enabled
+  pull_requests: disabled
+  strategy:
+    # random
+    daily-shift-based
+  scedule:
+    '*/1 * * * *'
+  assignees:
+    - Leymore
+    - gaotongxiao
+    - yingfhu
+    - Ezra-Yu
+    - tonysy
