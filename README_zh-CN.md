@@ -310,7 +310,7 @@ unzip OpenCompassData.zip
 
 确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id3)了解如何运行一个评测任务。
 
-更多更全面的教程，请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
+更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
 
 ## 致谢
 
