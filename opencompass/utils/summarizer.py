@@ -233,7 +233,7 @@ class Summarizer:
         with open(output_csv_path, 'w') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
-        destination_directory = "../../static"
+        destination_directory = "../../../../static"
 
         # Create the absolute path of the destination directory
         destination_directory = osp.abspath(destination_directory)
