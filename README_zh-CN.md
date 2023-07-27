@@ -10,7 +10,7 @@
 
 [🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/zh_CN/latest/index.html) |
-[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html) |
+[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id1) |
 [🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
 
 [English](/README.md) | 简体中文

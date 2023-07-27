@@ -10,7 +10,7 @@
 
 [🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/en/latest/) |
-[🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started/install.html) |
+[🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started.html#installation) |
 [🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
 
 English | [简体中文](README_zh-CN.md)
@@ -308,7 +308,7 @@ Some third-party features, like Humaneval and Llama, may require additional step
 
 ## Evaluation
 
-Make sure you have installed OpenCompass correctly and preparing your dataset according to the above steps. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html#quick-start) to learn how to run an evaluation task.
+Make sure you have installed OpenCompass correctly and prepared your datasets according to the above steps. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html#quick-start) to learn how to run an evaluation task.
 
 For more tutorials, please check our [Documentation](https://opencompass.readthedocs.io/en/latest/index.html).
 
