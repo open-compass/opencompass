@@ -6,7 +6,7 @@ import torch
 from opencompass.models.base import BaseModel, LMTemplateParser
 
 
-class internLM(BaseModel):
+class InternLM(BaseModel):
 
     def __init__(self,
                  path: str,
