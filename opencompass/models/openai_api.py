@@ -23,6 +23,9 @@ class OpenAI(BaseAPIModel):
         max_seq_len (int): The maximum allowed sequence length of a model.
             Note that the length of prompt + generated tokens shall not exceed
             this value. Defaults to 2048.
+        temperature (float, optional): What sampling temperature to use.
+            If not None, will override the temperature in the `generate()`
+            call. Defaults to None.
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
         retry (int): Number of retires if the API call fails. Defaults to 2.
@@ -45,16 +48,17 @@ class OpenAI(BaseAPIModel):
     is_api: bool = True
 
     def __init__(
-        self,
-        path: str,
-        max_seq_len: int = 2048,
-        query_per_second: int = 1,
-        retry: int = 2,
-        key: Union[str, List[str]] = 'ENV',
-        org: Optional[Union[str, List[str]]] = None,
-        meta_template: Optional[Dict] = None,
-        openai_api_base: str = 'https://api.openai.com/v1/chat/completions'
-    ):  # noqa
+            self,
+            path: str,
+            max_seq_len: int = 2048,
+            temperature: Optional[float] = None,
+            query_per_second: int = 1,
+            retry: int = 2,
+            key: Union[str, List[str]] = 'ENV',
+            org: Optional[Union[str, List[str]]] = None,
+            meta_template: Optional[Dict] = None,
+            openai_api_base: str = 'https://api.openai.com/v1/chat/completions'
+    ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template,
@@ -62,6 +66,7 @@ class OpenAI(BaseAPIModel):
                          retry=retry)
         import tiktoken
         self.tiktoken = tiktoken
+        self.temperature = temperature
 
         if isinstance(key, str):
             self.keys = [os.getenv('OPENAI_API_KEY') if key == 'ENV' else key]
@@ -96,6 +101,9 @@ class OpenAI(BaseAPIModel):
         Returns:
             List[str]: A list of generated strings.
         """
+        if self.temperature is not None:
+            temperature = self.temperature
+
         with ThreadPoolExecutor() as executor:
             results = list(
                 executor.map(self._generate, inputs,
