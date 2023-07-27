@@ -3,11 +3,6 @@ from .base_api import APITemplateParser, BaseAPIModel  # noqa
 from .glm import GLM130B  # noqa: F401, F403
 from .huggingface import HuggingFace  # noqa: F401, F403
 from .huggingface import HuggingFaceCausalLM  # noqa: F401, F403
-<<<<<<< HEAD
 from .intern_model import InternLM  # noqa: F401, F403
-from .llama2 import Llama2Chat  # noqa: F401, F403
-=======
->>>>>>> 36030eb (support internLM)
-from .intern_model import internLM  # noqa: F401, F403
 from .llama2 import Llama2Chat  # noqa: F401, F403
 from .openai_api import OpenAI  # noqa: F401
