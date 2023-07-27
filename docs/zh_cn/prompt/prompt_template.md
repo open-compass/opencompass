@@ -41,12 +41,7 @@ infer_cfg=dict(
 
 本文档中，我们将会主要介绍 `ice_template`、`prompt_template`、`inferencer` 的定义方法。对于 `retriever` 的介绍请参考其他章节。
 
-我们先会介绍 prompt 的基本语法。
-
-<!-- - template 基本语法
-- 根据 `inferencer` 决定 `prompt_template` 的构建方法
-- `prompt_template` 与 `ice_template` 的关系
-- 最佳实践 -->
+我们首先介绍 prompt 的基本语法。
 
 ## 字符串式 prompt
 
@@ -198,11 +193,12 @@ PromptList([
 
 另外与字符串式的模板不同，经过对话式模板所生成的 prompt 从固定的字符串变成了一个中间结构 PromptList。这个结构会进一步与模型侧的 [meta template](./meta_template.md) 相结合，拼装完成得到最终的提示词。如果不指定 meta template，PromptList 中各项的 prompt 则会直接按行拼接成字符串。
 
-```{tip}
+```{note}
 上面例子中 PromptList 中的内容并非模型最终的输入，而取决于 meta template 的处理。一个容易误解的地方是，在生成式的评测中，最后一个 `BOT` 角色的 prompt `Answer: ` **不会**实际输入到模型。这是由于 API 模型通常并无法自定义模型回复的开头，因此这一设定保持了语言模型与 API 模型在评测上行为的一致。更多信息可以参考 [meta template](./meta_template.md) 的文档。
 ```
 
-对话式模板的完整参数介绍如下：
+<details>
+<summary>点击查看完整参数介绍</summary>：
 
 - `begin`，`end` ：(list，可选) prompt 的开头和结尾，通常是一些系统级别的指令。里面的每一项**允许是一个字典或字符串**。
 
@@ -216,7 +212,9 @@ PromptList([
 
 - `prompt` (str) : 角色的对话内容。
 
-## `prompt_template` 与 `inferencer`
+</details>
+
+## Prompt 模板 与 `inferencer`
 
 在明白了 prompt 模板的基础定义方式后，我们还要根据 `inferencer` 的类型组织 prompt 模板。
 
@@ -310,7 +308,7 @@ prompt_template=dict(
 
 `````
 
-则模型的推理结果将会是 `template` 的四个 key 之一 ("A" / "B" / "C" / "UNK")
+此时模型的推理结果将会是 `template` 的四个 key 之一 ("A" / "B" / "C" / "UNK")
 
 ## `ice_template` 与 `prompt_template`
 
