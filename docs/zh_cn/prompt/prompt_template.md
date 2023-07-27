@@ -194,11 +194,11 @@ PromptList([
 另外与字符串式的模板不同，经过对话式模板所生成的 prompt 从固定的字符串变成了一个中间结构 PromptList。这个结构会进一步与模型侧的 [meta template](./meta_template.md) 相结合，拼装完成得到最终的提示词。如果不指定 meta template，PromptList 中各项的 prompt 则会直接按行拼接成字符串。
 
 ```{note}
-上面例子中 PromptList 中的内容并非模型最终的输入，而取决于 meta template 的处理。一个容易误解的地方是，在生成式的评测中，最后一个 `BOT` 角色的 prompt `Answer: ` **不会**实际输入到模型。这是由于 API 模型通常并无法自定义模型回复的开头，因此这一设定保持了语言模型与 API 模型在评测上行为的一致。更多信息可以参考 [meta template](./meta_template.md) 的文档。
+上面例子中 PromptList 中的内容并非模型最终的输入，而取决于 meta template 的处理。一个容易产生误解的地方是，在生成式的评测中，最后一个 `BOT` 角色的 prompt `Answer: ` **不会**实际输入到模型。这是由于 API 模型通常并无法自定义模型回复的开头，因此这一设定保持了语言模型与 API 模型在评测上行为的一致。更多信息可以参考 [meta template](./meta_template.md) 的文档。
 ```
 
 <details>
-<summary>点击查看完整参数介绍</summary>：
+<summary>点击查看完整参数介绍</summary>
 
 - `begin`，`end` ：(list，可选) prompt 的开头和结尾，通常是一些系统级别的指令。里面的每一项**允许是一个字典或字符串**。
 
