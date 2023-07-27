@@ -291,7 +291,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 
 ## Installation
 
-Below are the steps for quick installation. Some third-party features may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
+Below are the steps for quick installation and dataset dataset preparation.
 
 ```Python
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
@@ -304,9 +304,13 @@ wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompass
 unzip OpenCompassData.zip
 ```
 
+Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
+
 ## Evaluation
 
-Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
+Make sure you have installed OpenCompass correctly and preparing your dataset according to the above steps. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html#quick-start) to learn how to run an evaluation task.
+
+For more comprehensive tutorials, please check our [Documentation](https://opencompass.readthedocs.io/en/latest/index.html).
 
 ## Acknowledgements
 
