@@ -2,389 +2,482 @@
 
 ## 背景
 
-Prompt 模板定义了将原始数据集转化成提示词的过程，它一般会被放置于 dataset 的 `infer_cfg` 字段。一个典型的 `infer_cfg` 如下所示:
+在语言模型的评测中，我们常会将原始数据集以一定的规则构造成 prompt，以便模型能够按照要求回答问题。
 
-```python
-datasets = [
-    dict(
-        infer_cfg=dict(
-            ice_template=dict(  # 用于构造 In Context Example (ice) 的模板
-                type=PromptTemplate,
-                template=dict(
-                    round=[
-                        dict(role="HUMAN", prompt="Q: {question}"),
-                        dict(role="BOT", prompt="A: {answer}"),
-                    ]
-                )
-            ),
-            prompt_template=dict(  # 用于构造主干 prompt 的模板
-                type=PromptTemplate,
-                template=dict(
-                    begin=[
-                        dict(role="HUMAN", prompt="Suppose you are a student in the colledge entrance examination, answer the following questions."),
-                        dict(role="BOT", prompt="OK, I am ready."),
-                        "</E>",
-                    ],
-                    round=[
-                        dict(role="HUMAN", prompt="Q: {question}"),
-                        dict(role="BOT", prompt="A: {answer}"),
-                    ]
-                ),
-                ice_token="</E>"
-            ),
-            retriever=dict(type=FixKRetriever),  # 构造 in context example 的编号是如何获取的
-            inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4]),  # 使用何种方式推理得到 prediction
-        )
-    ),
-]
+通常，我们会在 prompt 开头放入指令，几个 in-context example（上下文样例），再在最后放入题目。例如：
+
+```text
+Solve the following questions.
+1+1=?
+2
+3+9=?
+12
+5+6=?
 ```
 
-本文档中，我们将会主要讨论 `ice_template` 和 `prompt_template` 的相关使用方法。
+大量的实验表明，即便测试的原始题目相同，对于 prompt 的不同构造方式会对模型的表现产生影响。可能影响的因素包括：
+
+- Prompt 本身的构成方式，包括指令、in-context example、题目的写法；
+- in-context example 的选择，包括了选择的数量和方式；
+- 对 prompt 的使用方式。是让模型基于 prompt 进行补全，还是从候选的 prompt 中选择一个最好的作为答案？
+
+OpenCompass 将 prompt 的构建策略定义在了数据集配置中的 `infer_cfg` 部分。一个典型的 `infer_cfg` 如下所示:
+
+```python
+infer_cfg=dict(
+    ice_template=dict(  # 用于构造 In Context Example (ice) 的模板
+        type=PromptTemplate,
+        template='{question}\n{answer}'
+    ),
+    prompt_template=dict(  # 用于构造主干 prompt 的模板
+        type=PromptTemplate,
+        template='Solve the following questions.\n</E>{question}\n{answer}',
+        ice_token="</E>"
+    ),
+    retriever=dict(type=FixKRetriever),  # 定义 in context example 的获取方式
+    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1]),  # 使用何种方式推理得到 prediction
+)
+```
+
+本文档中，我们将会主要介绍 `ice_template`、`prompt_template`、`inferencer` 的定义方法。对于 `retriever` 的介绍请参考其他章节。
+
+我们先会介绍 prompt 的基本语法。
+
+<!-- - template 基本语法
+- 根据 `inferencer` 决定 `prompt_template` 的构建方法
+- `prompt_template` 与 `ice_template` 的关系
+- 最佳实践 -->
+
+## 字符串式 prompt
+
+字符串式的模板是比较经典的模板形式，考虑下面的模板：
+
+```python
+prompt_template=dict(
+    type=PromptTemplate,
+    template="{anything}\nQuestion: {question}\nAnswer: {answer}"
+)
+```
+
+运行时，花括号`{}`内的字段会被替换成数据样本内的对应字段。如果数据样本中没有对应的字段，则会保持原样输出。
+
+例如我们有一个数据 example 如下:
+
+```python
+example = {
+    'question': '1+1=?',
+    'answer': '2',  # 假设 answer 被写在了 reader_cfg.output_column 中
+    'irrelavent_infos': 'blabla',
+}
+```
+
+则填入模板后的结果为：
+
+```text
+{anything}
+Question: 1+1=?
+Answer:
+```
+
+可以看到，问题的实际答案 `answer` 并没有出现在生成的结果中。这是因为 OpenCompass 会遮盖被写在 `reader_cfg.output_column` 中的字段，避免答案泄露。关于 `reader_cfg` 的详细说明，请参考介绍数据集配置的相关文档。
+
+## 对话式 prompt
+
+在实际的测试中，简单的补全式测试并不能很好地测试出对话式的模型的性能，因此我们更希望 prompt 能以对话的格式输入到模型中。另外，不同的模型对对话的格式定义也不一样，因此我们也需要数据集侧产生的 prompt 更加通用，在测试时再结合具体模型生成符合需求的提示词。
+
+因此，OpenCompass 在字符串式模板之上，增加了对对话式模板的支持。对话式模板更加灵活，它可以结合模型侧不同的 [meta_template](./meta_template.md) 生成不同对话形式的提示词，同时适用于基座和对话模型，但定义也相对复杂。
+
+现在，让我们假设有一个数据样本如下：
+
+```python
+example = {
+    'question': '1+1=?',
+    'answer': '2',  # 假设 answer 被写在了 reader_cfg.output_column 中
+    'irrelavent_infos': 'blabla',
+}
+```
+
+接下来，我们来展示几个例子：
+
+`````{tabs}
+
+````{tab} 普通对话
+```python
+prompt_template=dict(
+    type=PromptTemplate,
+    template=dict(
+        round=[
+            dict(role="HUMAN", prompt="Question: {question}"),
+            dict(role="BOT", prompt="Answer: {answer}"),
+        ]
+    )
+)
+```
+
+OpenCompass 把数据填入模板后得到的中间结果为：
+
+```python
+PromptList([
+    dict(role='HUMAN', prompt='Question: 1+1=?'),
+    dict(role='BOT', prompt='Answer: '),
+])
+```
+
+````
+
+````{tab} 多轮对话
+```python
+prompt_template=dict(
+    type=PromptTemplate,
+    template=dict(
+        round=[
+            dict(role="HUMAN", prompt="Question: 2+2=?"),
+            dict(role="BOT", prompt="Answer: 4"),
+            dict(role="HUMAN", prompt="Question: 3+3=?"),
+            dict(role="BOT", prompt="Answer: 6"),
+            dict(role="HUMAN", prompt="Question: {question}"),
+            dict(role="BOT", prompt="Answer: {answer}"),
+        ]
+    )
+)
+```
+
+OpenCompass 把数据填入模板后得到的中间结果为：
+
+```python
+PromptList([
+    dict(role='HUMAN', prompt='Question: 2+2=?'),
+    dict(role='BOT', prompt='Answer: 4'),
+    dict(role='HUMAN', prompt='Question: 3+3=?'),
+    dict(role='BOT', prompt='Answer: 6'),
+    dict(role='HUMAN', prompt='Question: 1+1=?'),
+    dict(role='BOT', prompt='Answer: '),
+])
+```
+````
+
+
+````{tab} 带 SYSTEM 的对话
+
+```python
+prompt_template=dict(
+    type=PromptTemplate,
+    template=dict(
+        begin=[
+            dict(role='SYSTEM', fallback_role='HUMAN', prompt='Solve the following questions.'),
+        ],
+        round=[
+            dict(role="HUMAN", prompt="Question: {question}"),
+            dict(role="BOT", prompt="Answer: {answer}"),
+        ]
+    )
+)
+```
+
+OpenCompass 把数据填入模板后得到的中间结果为：
+
+```python
+PromptList([
+    dict(role='SYSTEM', fallback_role='HUMAN', prompt='Solve the following questions.'),
+    dict(role='HUMAN', prompt='Question: 1+1=?'),
+    dict(role='BOT', prompt='Answer: '),
+])
+```
+
+在具体的 meta template 中处理时，如果定义中存在 SYSTEM 角色，则会调用 SYSTEM 的模板进行处理。否则，会调用 fallback_role 角色的模板进行处理，也就是这个例子中的 HUMAN 角色。
+
+````
+
+`````
+
+可以见到，在对话式的模板中，prompt 是以不同角色 `role` 的对话为形式进行组织的。在当前 OpenCompass 的预定义数据集配置中，一个 prompt 中常有的角色有：
+
+- `HUMAN`：人类，通常为提问的一方
+- `BOT`：语言模型，通常为回答的一方
+- `SYSTEM`：系统，通常用在提示词的开头，负责下达指令。
+
+另外与字符串式的模板不同，经过对话式模板所生成的 prompt 从固定的字符串变成了一个中间结构 PromptList。这个结构会进一步与模型侧的 [meta template](./meta_template.md) 相结合，拼装完成得到最终的提示词。如果不指定 meta template，PromptList 中各项的 prompt 则会直接按行拼接成字符串。
+
+```{tip}
+上面例子中 PromptList 中的内容并非模型最终的输入，而取决于 meta template 的处理。一个容易误解的地方是，在生成式的评测中，最后一个 `BOT` 角色的 prompt `Answer: ` **不会**实际输入到模型。这是由于 API 模型通常并无法自定义模型回复的开头，因此这一设定保持了语言模型与 API 模型在评测上行为的一致。更多信息可以参考 [meta template](./meta_template.md) 的文档。
+```
+
+对话式模板的完整参数介绍如下：
+
+- `begin`，`end` ：(list，可选) prompt 的开头和结尾，通常是一些系统级别的指令。里面的每一项**允许是一个字典或字符串**。
+
+- `round`：(list) 对话的模板格式。列表的每一项**只允许是一个字典**。
+
+每一个字典的参数如下：
+
+- `role`（str）: 参与对话的角色名，用于与 `meta_template` 中的名称进行关联，不会影响实际生成的 prompt。
+
+- `fallback_role` (str) : 缺省角色名，假设 `meta_template` 中找不到 `role`，则会尝试使用 `fallback_role` 进行关联。默认为 `None`
+
+- `prompt` (str) : 角色的对话内容。
 
 ## `prompt_template` 与 `inferencer`
 
-`prompt_template` 首先需要与 `inferencer` 的类型契合。
+在明白了 prompt 模板的基础定义方式后，我们还要根据 `inferencer` 的类型组织 prompt 模板。
 
 OpenCompass 中主要支持了两种 Infernecer：`GenInferencer` 和 `PPLInferencer`，它们对应着两种不同的推理方式。
 
 `GenInferencer` 对应生成式的推理。在推理时，模型被要求以输入的提示词为基准，继续往下续写。此时，`template` 则单一地表示这一句话对应的模板，例如:
 
+`````{tabs}
+
+````{group-tab} 字符串式模板
 ```python
-ice_template=dict(
+prompt_template=dict(
+    type=PromptTemplate,
+    template='Solve the following questions.\n{question}\n{answer}'
+)
+```
+````
+
+````{group-tab} 对话式模板
+```python
+prompt_template=dict(
     type=PromptTemplate,
     template=dict(
+        begin=[
+            dict(role='SYSTEM', fallback_role='HUMAN', prompt='Solve the following questions.'),
+        ],
         round=[
-            dict(role="HUMAN", prompt="Question: {question}\nAnswer: ")
+            dict(role="HUMAN", prompt="{question}"),
+            dict(role="BOT", prompt="{answer}"),
         ]
     )
 )
 ```
+````
+
+`````
 
 则模型的推理结果将会是往下续写的字符串。
 
-`PPLInferencer` 对应判别式推理。在推理时，模型被要求计算多个输入字符串各自的混淆度 (PerPLexity / ppl)，并将其中 ppl 最小的项作为模型的推理结果。此时 `template` 是一个 `dict`，表示每一句话所对应的模板，例如:
+而 `PPLInferencer` 对应判别式推理。在推理时，模型被要求计算多个输入字符串各自的混淆度 (PerPLexity / ppl)，并将其中 ppl 最小的项作为模型的推理结果。此时 `template` 是一个 `dict`，表示每一句话所对应的模板，例如:
 
+`````{tabs}
+
+````{group-tab} 字符串式模板
 ```python
-ice_template=dict(
+prompt_template=dict(
     type=PromptTemplate,
     template=dict(
-        "A": dict(round=[dict(role="HUMAN", prompt="Question: Which is true?\nA. {A}\nB. {B}\nC. {C}\nAnswer: A")]),
-        "B": dict(round=[dict(role="HUMAN", prompt="Question: Which is true?\nA. {A}\nB. {B}\nC. {C}\nAnswer: B")]),
-        "C": dict(round=[dict(role="HUMAN", prompt="Question: Which is true?\nA. {A}\nB. {B}\nC. {C}\nAnswer: C")]),
-        "UNK": dict(round=[dict(role="HUMAN", prompt="Question: Which is true?\nA. {A}\nB. {B}\nC. {C}\nAnswer: None of them is true.")]),
+        "A": "Question: Which is true?\nA. {A}\nB. {B}\nC. {C}\nAnswer: A",
+        "B": "Question: Which is true?\nA. {A}\nB. {B}\nC. {C}\nAnswer: B",
+        "C": "Question: Which is true?\nA. {A}\nB. {B}\nC. {C}\nAnswer: C",
+        "UNK": "Question: Which is true?\nA. {A}\nB. {B}\nC. {C}\nAnswer: None of them is true.",
     )
 )
 ```
+````
+
+````{group-tab} 对话式模板
+```python
+prompt_template=dict(
+    type=PromptTemplate,
+    template=dict(
+        "A": dict(
+            round=[
+                dict(role="HUMAN", prompt="Question: Which is true?\nA. {A}\nB. {B}\nC. {C}"),
+                dict(role="BOT", prompt="Answer: A"),
+            ]
+        ),
+        "B": dict(
+            round=[
+                dict(role="HUMAN", prompt="Question: Which is true?\nA. {A}\nB. {B}\nC. {C}"),
+                dict(role="BOT", prompt="Answer: B"),
+            ]
+        ),
+        "C": dict(
+            round=[
+                dict(role="HUMAN", prompt="Question: Which is true?\nA. {A}\nB. {B}\nC. {C}"),
+                dict(role="BOT", prompt="Answer: C"),
+            ]
+        ),
+        "UNK": dict(
+            round=[
+                dict(role="HUMAN", prompt="Question: Which is true?\nA. {A}\nB. {B}\nC. {C}"),
+                dict(role="BOT", prompt="Answer: None of them is true."),
+            ]
+        ),
+    )
+)
+```
+````
+
+`````
 
 则模型的推理结果将会是 `template` 的四个 key 之一 ("A" / "B" / "C" / "UNK")
 
-## `prompt_template` 与 `meta_template`
-
-一句话对应的模板可以是一个字符串，也可以是一个符合 [meta_template](./meta_template.md) 规范的字典。
-
-### 字符串式模板
-
-我们首先来看字符串的例子:
-
-```python
-ice_template=dict(
-    type=PromptTemplate,
-    template="Question: {question}\nAnswer: {answer}"
-)
-```
-
-我们会使用 python 中 `.format` 的方法填入模板。例如我们有一个数据 example 如下:
-
-```python
-example = {
-    'question': '1+1=?',
-    'answer': '2',  # 假设 answer 被写在了 reader_cfg.output_column 中
-    'irrelavent_infos': 'blabla',
-}
-```
-
-则填入模板后的结果为：
-
-```text
-Question: 1+1=?\nAnswer:
-```
-
-注意，由于 `answer` 被写到了 `reader_cfg.output_column` 中，因此它是不会在主干 `template` 中被替换掉的 (但仍然会在 ice template 中被替换掉)，也因此无需考虑答案泄漏的问题。
-
-```{warning}
-纯字符串模板只适用于模型 meta_template 为空的状况。
-```
-
-### 对话式模板
-
-我们再看一个 符合 [meta_template](./meta_template.md) 规范的 `dict` 的例子:
-
-```python
-ice_template=dict(
-    type=PromptTemplate,
-    template=dict(
-        round=[
-            dict(role="HUMAN", prompt="Q: {question}"),
-            dict(role="BOT", prompt="A: {answer}"),
-        ]
-    )
-)
-```
-
-对话式模板中的各项，我们仍然会使用类似于 python 中 `.format` 的方法填入模板。例如我们有一个数据 example 如下:
-
-```python
-example = {
-    'question': '1+1=?',
-    'answer': '2',  # 假设 answer 被写在了 reader_cfg.output_column 中
-    'irrelavent_infos': 'blabla',
-}
-```
-
-则填入模板后的结果为：
-
-```python
-PromptList([
-    dict(role='HUMAN', prompt='Q: 1+1=?'),
-    dict(role='BOT', prompt='A: '),
-])
-```
-
-该结果会进一步与 meta template 机制相结合，最终拼装完成得到最终送入模型的字符串。若有 `meta_template` 如下:
-
-```python
-meta_template=dict(
-    begin='Meta instruction: You are now a helpful and harmless AI assistant.\n',
-    round=[
-        dict(role='HUMAN', begin='<HUMAN>: ', end=''),
-        dict(role='BOT', begin='', end='<eob>\n', generate=True),
-    ],
-    end='end of conversation',
-)
-```
-
-则填入模板后的结果 `PromptList` 会根据 `role` 依次找到 `meta_template` 里 `round` 的对应条目 (注意 `meta_template` 中 `round` 对应的 `role` 是不会重复的)，并将 `prompt` 带入进去，得到一个新的 `PromptList`
-
-```python
-PromptList([
-    '<HUMAN>: Q: 1+1=?<eoh>\n',
-    '<BOT>: A: ',
-])
-```
-
-最终联合上 `meta_template` 的 `begin` 与 `end` 字段，得到以下字符串
-
-```text
-Meta instruction: You are now a helpful and harmless AI assistant.
-<HUMAN>: Q: 1+1=?<eoh>
-<BOT>: A:
-```
-
-有以下示意图：
-
-![](https://user-images.githubusercontent.com/22607038/251195073-85808807-6359-44df-8a19-9f5d00c591ec.png)
-
-对话式模板的完整参数介绍如下：
-
-- `role`（str）: 参与对话的角色名，用于与 `meta_template` 中的名称进行关联，不会影响实际生成的 prompt。
-- `fallback_role` (str) : 缺省角色名，假设 `meta_template` 中找不到 `role`，则会尝试使用 `fallback_role` 进行关联。默认为 `None`
-- `prompt` (str) : 角色的对话内容。
-
 ## `ice_template` 与 `prompt_template`
 
-`ice_template` 和 `prompt_template` 一起组成拼装数据集所需的模板。`ice_template` 中的 `ice` 意为上下文学习样例 (In Context Example)。`ice_template` 负责构成上下文学习中的样例所对应的 prompt (few shot)。而 `prompt_template` 负责构成主干部分的 prompt。
+在 OpenCompass 中，对于 0-shot 的评测，我们通常只需要定义 `prompt_template` 字段，即可完成 prompt 的构造。但对于 few shot 的评测，我们还需要定义 `ice_template` 字段，管理上下文学习中样例所对应的 prompt 模板。
 
-完整 prompt 的构造流程可以使用如下的伪代码进行表示：
+`ice_template` 和 `prompt_template` 两者遵循的语法和规则一致，完整 prompt 的构造流程可以使用如下的伪代码进行表示：
 
 ```python
 def build_prompt():
     ice = ice_template.format(*ice_example)
-    prompt = prompt_template.replace(ice_token, ice).format(*prompt_example)
+    prompt = prompt_template.replace(prompt_template.ice_token, ice).format(*prompt_example)
     return prompt
 ```
 
-### 字符串式模板案例
-
-一个字符串式模板的样例如下：
+现在，让我们假设有两个训练数据 (ex1, ex2) 和一个测试数据 (ex3):
 
 ```python
-datasets = [
-    dict(
-        infer_cfg=dict(
-            ice_template=dict(
-                type=PromptTemplate,
-                template="Q: {question}\nA: {answer}",
-            ),
-            prompt_template=dict(
-                type=PromptTemplate,
-                template="Suppose you are a math expert, answer the following question:\n</E>Q: {question}\nA: {answer}",
-                ice_token="</E>"
-            ),
-            retriever=dict(type=FixKRetriever),
-            inferencer=dict(type=GenInferencer, fix_id_list=[0, 1]),
-        )
+ex1 = {
+    'question': '2+2=?',
+    'answer': '4',
+    'irrelavent_infos': 'blabla',
+}
+ex2 = {
+    'question': '3+3=?',
+    'answer': '6',
+    'irrelavent_infos': 'blabla',
+}
+ex3 = {
+    'question': '1+1=?',
+    'answer': '2',  # 假设 answer 被写在了 reader_cfg.output_column 中
+    'irrelavent_infos': 'blabla',
+}
+```
+
+接下来，我们看一下不同的 prompt 构造方法对应的实际效果：
+
+`````{tabs}
+
+````{group-tab} 字符串式模板
+
+模板配置如下：
+
+```python
+infer_cfg=dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template='{question}\n{answer}'
     ),
-]
-```
-
-假设此时有
-
-```python
-ice_examples=[
-    {"question": "1+1=?", "answer": "2"},
-    {"question": "1-1=?", "answer": "0"},
-]
-example={"question": "54321**2+12345*67890=?", "answer": "3788873091"}
-```
-
-则最终输出的 prompt 是
-
-```text
-Suppose you are a math expert, answer the following question:
-Q: 1+1=?
-A: 2
-Q: 1-1=?
-A: 0
-Q: 54321**2+12345*67890=?
-A:
-```
-
-### 对话式模板案例
-
-另外有对话式模板的样例如下：
-
-```python
-datasets = [
-    dict(
-        infer_cfg=dict(
-            ice_template=dict(
-                type=PromptTemplate,
-                template=dict(
-                    round=[
-                        dict(role="HUMAN", prompt="Q: {question}"),
-                        dict(role="BOT", prompt="A: {answer}"),
-                    ]
-                )
-            ),
-            prompt_template=dict(
-                type=PromptTemplate,
-                template=dict(
-                    begin=[
-                        dict(role="HUMAN", prompt="Suppose you are a math expert, answer the following question:"),
-                        "</E>",
-                    ],
-                    round=[
-                        dict(role="HUMAN", prompt="Q: {question}"),
-                        dict(role="BOT", prompt="A: {answer}"),
-                    ]
-                ),
-                ice_token="</E>"
-            ),
-            retriever=dict(type=FixKRetriever),
-            inferencer=dict(type=GenInferencer, fix_id_list=[0, 1]),
-        )
-    ),
-]
-```
-
-假设此时有
-
-```python
-ice_examples=[
-    {"question": "1+1=?", "answer": "2"},
-    {"question": "1-1=?", "answer": "0"},
-]
-example={"question": "54321**2+12345*67890=?", "answer": "3788873091"}
-```
-
-则输出的 `PromptList` 将会是
-
-```python
-PromptList([
-    dict(role='SYSTEM', fallback_role='HUMAN', prompt='Suppose you are a math expert, answer the following question:'),
-    PromptList([
-        dict(role="HUMAN", prompt="Q: 1+1=?"),
-        dict(role="BOT", prompt="A: 2"),
-        dict(role="HUMAN", prompt="Q: 1-1=?"),
-        dict(role="BOT", prompt="A: 0"),
-    ]),  # 对应 </E>
-    dict(role="HUMAN", prompt="Q: 54321**2+12345*67890=?"),
-    dict(role='BOT', prompt='A: '),
-])
-```
-
-若有 `meta_template` 如下:
-
-```python
-meta_template=dict(
-    begin='Meta instruction: You are now a helpful and harmless AI assistant.\n',
-    round=[
-        dict(role='HUMAN', begin='<HUMAN>: ', end=''),
-        dict(role='BOT', begin='', end='<eob>\n', generate=True),
-    ],
-    end='end of conversation',
+    prompt_template=dict(
+        type=PromptTemplate,
+        template='Solve the following questions.\n</E>{question}\n{answer}'
+        ice_token='</E>',
+    )
 )
 ```
 
-则最终组合生成得到的字符串如下：
+会得到以下字符串：
 
 ```text
-Meta instruction: You are now a helpful and harmless AI assistant.
-<HUMAN>: Suppose you are a math expert, answer the following question:<eoh>
-<HUMAN>: Q: 1+1=?<eoh>
-<BOT>: A: 2<eob>
-<HUMAN>: Q: 1-1=?<eoh>
-<BOT>: A: 0<eob>
-<HUMAN>: Q: 54321**2+12345*67890=?<eoh>
-<BOT>: A:
+Solve the following questions.
+2+2=?
+4
+3+3=?
+6
+1+1=?
+
 ```
 
-有以下几点需要特别说明：
+````
 
-* prompt_template 支持 `begin` / `round` / `end` 成员变量，分别表示对话开始时 / 过程中 / 结束时所用的 prompt。三者的类型均为 `list`。
-* `begin` 和 `end` 的 `list` 中支持 `dict` 和 `str` 混合表示。
+````{group-tab} 对话式模板
+
+模板配置如下：
+
+```python
+infer_cfg=dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            round=[
+                dict(role="HUMAN", prompt="{question}"),
+                dict(role="BOT", prompt="{answer}"),
+            ]
+        )
+    ),
+    prompt_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin=[
+                dict(role='SYSTEM', fallback_role='HUMAN', prompt='Solve the following questions.'),
+                '</E>',
+            ],
+            round=[
+                dict(role="HUMAN", prompt="{question}"),
+                dict(role="BOT", prompt="{answer}"),
+            ],
+        ),
+        ice_token='</E>',
+    )
+)
+```
+
+OpenCompass 把数据填入模板后得到的中间结果为：
+
+```python
+PromptList([
+    dict(role='SYSTEM', fallback_role='HUMAN', prompt='Solve the following questions.'),
+    dict(role='HUMAN', prompt='2+2=?'),
+    dict(role='BOT', prompt='4'),
+    dict(role='HUMAN', prompt='3+3=?'),
+    dict(role='BOT', prompt='6'),
+    dict(role='HUMAN', prompt='1+1=?'),
+    dict(role='BOT', prompt=''),
+])
+```
+````
+
+`````
 
 ### 省略式使用方法
 
-值得一提的是，为了简便配置文件，`prompt_template` 这一字段是可被省略的。当 `prompt_template` 字段被省略时，`ice_template` 会同时被作为 `prompt_template`，用于拼装得到完整的 prompt。以下两份配置文件是等价的：
+值得一提的是，为了简便配置文件，`prompt_template` 这一字段是可被省略的。当 `prompt_template` 字段被省略时，`ice_template` 会同时被作为 `prompt_template`，用于拼装得到完整的 prompt。以下两份 `infer_cfg` 是等价的：
+
+<table class="docutils">
+  <thead>
+  <tr>
+      <th>完整写法</th>
+      <th>省略写法</th>
+  <tbody>
+  <tr>
+  <td>
 
 ```python
-datasets = [
-    dict(
-        infer_cfg=dict(
-            ice_template=dict(
-                type=PromptTemplate,
-                template="</E>Q: {question}\nA: {answer}",
-                ice_token="</E>",
-            ),
-            retriever=dict(type=FixKRetriever),
-            inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4]),
-        )
+infer_cfg=dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template="Q: {question}\nA: {answer}",
     ),
-]
+    prompt_template=dict(
+        type=PromptTemplate,
+        template="</E>Q: {question}\nA: {answer}",
+        ice_token="</E>",
+    ),
+    # ...
+)
 ```
+
+</td>
+  <td>
 
 ```python
-datasets = [
-    dict(
-        infer_cfg=dict(
-            ice_template=dict(
-                type=PromptTemplate,
-                template="Q: {question}\nA: {answer}",
-            ),
-            meta_template=dict(
-                type=PromptTemplate,
-                template="</E>Q: {question}\nA: {answer}",
-                ice_token="</E>",
-            )
-            retriever=dict(type=FixKRetriever),
-            inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4]),
-        )
+infer_cfg=dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template="</E>Q: {question}\nA: {answer}",
+        ice_token="</E>",
     ),
-]
+    # ...
+)
 ```
 
-更一般地，当不存在 `ice` 或使用 `ZeroRetriver` 时，`prompt_template` 被省略的机制依然是会运作的，因此会有如下配置：
+</td>
+  </tr>
+  </thead>
+  </table>
+
+更一般地，即便在 0-shot learning 的情况下（即 `retriever` 为 `ZeroRetriver`）时，这一机制依然生效。因此以下配置也是合法的：
 
 ```python
 datasets = [
@@ -400,8 +493,6 @@ datasets = [
     ),
 ]
 ```
-
-这也是前述文档中我们使用 `ice_template` 而不是 `prompt_template` 作为案例的原因。
 
 ## 使用建议
 
