@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from typing import Dict, List, Optional, Union
@@ -180,10 +181,14 @@ class OpenAI(BaseAPIModel):
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
+                continue
             try:
                 return response['choices'][0]['message']['content'].strip()
             except KeyError:
                 if 'error' in response:
+                    if response['error']['code'] == 'rate_limit_exceeded':
+                        time.sleep(1)
+                        continue
                     self.logger.error('Find error message in response: ',
                                       str(response['error']))
             max_num_retries += 1
