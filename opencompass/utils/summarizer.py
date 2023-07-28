@@ -233,13 +233,17 @@ class Summarizer:
         with open(output_csv_path, 'w') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
-        destination_directory = "../../../../static"
+        destination_directory = "../../../static"
 
         # Create the absolute path of the destination directory
         destination_directory = osp.abspath(destination_directory)
 
         # Create the destination file path with the new filename
         destination_file_path = osp.join(destination_directory, "sample.csv")
+
+        print(f"{output_csv_path=}")
+        print(f"{osp.abspath(output_csv_path)=}")
+        print(f"{destination_file_path=}")
 
         # Copy the file to the destination directory
         shutil.copy2(osp.abspath(output_csv_path), destination_file_path)
