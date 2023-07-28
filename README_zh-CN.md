@@ -5,20 +5,30 @@
 
 [![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/zh_CN)
 [![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
+
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
 [🌐Website](https://opencompass.org.cn/) |
-[📘Documentation](https://opencompass.readthedocs.io/en/latest/) |
-[🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started/install.html) |
+[📘Documentation](https://opencompass.readthedocs.io/zh_CN/latest/index.html) |
+[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id1) |
 [🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
 
 [English](/README.md) | 简体中文
 
 </div>
 
+<p align="center">
+    👋 加入我们的<a href="https://twitter.com/intern_lm" target="_blank">推特</a>、<a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> 和 <a href="https://r.vansin.top/?r=internwx" target="_blank">微信社区</a>
+</p>
+
 欢迎来到OpenCompass！
 
 就像指南针在我们的旅程中为我们导航一样，我们希望OpenCompass能够帮助你穿越评估大型语言模型的重重迷雾。OpenCompass提供丰富的算法和功能支持，期待OpenCompass能够帮助社区更便捷地对NLP模型的性能进行公平全面的评估。
+
+## 更新
+
+- **\[2023.07.19\]** 新增了 [Llama 2](https://ai.meta.com/llama/)！我们近期将会公布其评测结果。\[[文档](./docs/zh_cn/get_started.md#安装)\]
+- **\[2023.07.13\]** 发布了 [MMBench](https://opencompass.org.cn/MMBench)，该数据集经过细致整理，用于评测多模态模型全方位能力 🔥🔥🔥。
 
 ## 介绍
 
@@ -279,12 +289,12 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
   </tbody>
 </table>
 
-# 安装
+## 安装
 
-下面展示了快速安装的步骤。有部分第三方功能可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_cn/latest/get_started.html)。
+下面展示了快速安装以及准备数据集的步骤。
 
 ```Python
-conda create --name opencompass python=3.8 pytorch torchvision -c pytorch -y
+conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
 conda activate opencompass
 git clone https://github.com/InternLM/opencompass opencompass
 cd opencompass
@@ -294,9 +304,13 @@ wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompass
 unzip OpenCompassData.zip
 ```
 
+有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html)。
+
 ## 评测
 
-请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id2)了解如何运行一个评测任务。
+确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id3)了解如何运行一个评测任务。
+
+更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
 
 ## 致谢
 

@@ -17,7 +17,7 @@ class MMLUDataset(BaseDataset):
         for split in ['dev', 'test']:
             raw_data = []
             filename = osp.join(path, split, f'{name}_{split}.csv')
-            with open(filename) as f:
+            with open(filename, encoding='utf-8') as f:
                 reader = csv.reader(f)
                 for row in reader:
                     assert len(row) == 6

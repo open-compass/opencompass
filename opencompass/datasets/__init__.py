@@ -11,12 +11,14 @@ from .ceval import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
 from .civilcomments import *  # noqa: F401, F403
 from .cluewsc import *  # noqa: F401, F403
+from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .copa import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
 from .csl import *  # noqa: F401, F403
+from .cvalues import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
@@ -55,6 +57,7 @@ from .tnews import *  # noqa: F401, F403
 from .triviaqa import *  # noqa: F401, F403
 from .triviaqarc import *  # noqa: F401, F403
 from .truthfulqa import *  # noqa: F401, F403
+from .tydiqa import *  # noqa: F401, F403
 from .wic import *  # noqa: F401, F4
 from .winograd import *  # noqa: F401, F403
 from .winogrande import *  # noqa: F401, F403

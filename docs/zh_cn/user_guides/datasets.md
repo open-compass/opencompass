@@ -1,12 +1,12 @@
-# 数据集准备和选择
+# 配置数据集
 
-本节教程主要关注如何准备 OpenCompass 已支持的数据集，并构建需要的配置文件完成数据集的选择。
+本节教程主要关注如何选择和配置所需要的数据集。请确保你已按照[数据集准备](../get_started.md#数据集准备)中的步骤下载好数据集。
 
 ## 数据集配置文件目录结构
 
 首先简单介绍一下 OpenCompass `configs/datasets` 目录下的结构，如下所示：
 
-```
+```text
 configs/datasets/
 ├── agieval
 ├── apps
@@ -30,26 +30,6 @@ configs/datasets/
 数据集配置文件名由以下命名方式构成 `{数据集名称}_{评测方式}_{prompt版本号}.py`，以 `CLUE_afqmc/CLUE_afqmc_gen_db509b.py` 为例，该配置文件则为中文通用能力下的 `CLUE_afqmc` 数据集，对应的评测方式为 `gen`，即生成式评测，对应的prompt版本号为 `db509b`；同样的， `CLUE_afqmc_ppl_00b348.py` 指评测方式为`ppl`即判别式评测，prompt版本号为 `00b348` 。
 
 除此之外，不带版本号的文件，例如： `CLUE_afqmc_gen.py` 则指向该评测方式最新的prompt配置文件，通常来说会是精度最高的prompt。
-
-## 数据集准备
-
-OpenCompass 支持的数据集主要包括两个部分：
-
-1. Huggingface 数据集
-
-[Huggingface Dataset](https://huggingface.co/datasets) 提供了大量的数据集。OpenCompass 已经支持了大多数常用于性能比较的数据集，具体支持的数据集列表请直接在 `configs/dataset` 下进行查找。
-
-2. 第三方数据集
-
-除了支持 Huggingface 已有的数据集， OpenCompass 还提供了一些第三方数据集及自建CN数据集。运行以下命令，将数据集统一下载并放置在`./data`目录下即可完成数据集准备。
-
-```bash
-# 在 OpenCompass 目录下运行
-wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
-unzip OpenCompassData.zip
-```
-
-需要注意的是，Repo中不仅包含自建的数据集，为了方便也加入了部分HF已支持的数据集方便测试。
 
 ## 数据集选择
 

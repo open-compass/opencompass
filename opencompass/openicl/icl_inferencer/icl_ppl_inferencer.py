@@ -25,7 +25,7 @@ class PPLInferencer(BaseInferencer):
         model (:obj:`BaseModel`, optional): The module to inference.
         max_seq_len (:obj:`int`): Maximum number of tokenized words allowed by
             the LM.
-        batch_size (:obj:`int`, optional): Batch size for the :obj:`DataLoader`.
+        batch_size (:obj:`int`, optional): Batch size for the :obj:`DataLoader`
         output_json_filepath (:obj:`str`, optional): File path for output
             `JSON` file.
         output_json_filename (:obj:`str`, optional): File name for output
@@ -126,7 +126,7 @@ class PPLInferencer(BaseInferencer):
                             label,
                             ice_template=ice_template,
                             prompt_template=prompt_template)
-                        prompt_token_num = self.model.get_token_len_from_template(
+                        prompt_token_num = self.model.get_token_len_from_template(  # noqa
                             prompt, mode='ppl')  # noqa
 
                 if normalizing_str is not None:

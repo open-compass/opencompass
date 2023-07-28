@@ -6,10 +6,9 @@ from datasets import Dataset
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
+from ..base import BaseDataset
 from .math_equivalence import is_equiv
 from .post_process import parse_math_answer
-
-from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
@@ -40,7 +39,7 @@ class AGIEvalDataset_v2(BaseDataset):
     def load(path: str, name: str, setting_name: str):
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
         filename = osp.join(path, name + '.jsonl')
-        with open(filename) as f:
+        with open(filename, encoding='utf-8') as f:
             _data = [json.loads(line.strip()) for line in f]
         data = []
         for _d in _data:

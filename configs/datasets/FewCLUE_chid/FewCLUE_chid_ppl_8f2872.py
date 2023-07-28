@@ -21,7 +21,7 @@ chid_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))
 
-chid_eval_cfg = dict(evaluator=dict(type=AccEvaluator), pred_role="BOT")
+chid_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 chid_datasets = [
     dict(

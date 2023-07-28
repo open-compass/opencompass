@@ -66,3 +66,15 @@ python tools/case_analyzer.py CONFIG_PATH [-w WORK_DIR]
 ```bash
 python tools/test_api_model.py [CONFIG_PATH] -n
 ```
+
+## Prediction Merger
+
+本工具可以合并由于 `partitioner` 而产生的分片推理结果。
+
+运行方式：
+
+```bash
+python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
+```
+
+- `-w`：工作路径，默认为 `'./outputs/default'`。
