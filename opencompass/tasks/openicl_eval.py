@@ -125,6 +125,8 @@ class OpenICLEvalTask(BaseTask):
             self.logger.error(
                 f'Task {task_abbr_from_cfg(self.cfg)}: {result["error"]}')
             return
+        else:
+            self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}: {result}')
 
         # Save result
         out_path = get_infer_output_path(self.model_cfg, self.dataset_cfg,

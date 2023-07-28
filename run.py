@@ -37,6 +37,12 @@ def parse_args():
                         'redirected to files',
                         action='store_true',
                         default=False)
+    parser.add_argument('--dry-run',
+                        help='Dry run mode, in which the scheduler will not '
+                        'actually run the tasks, but only print the commands '
+                        'to run',
+                        action='store_true',
+                        default=False)
     parser.add_argument('-m',
                         '--mode',
                         help='Running mode. You can choose "infer" if you '
@@ -123,6 +129,10 @@ def parse_slurm_args(slurm_parser):
                               help='Slurm quota type',
                               default=None,
                               type=str)
+    slurm_parser.add_argument('--qos',
+                              help='Slurm quality of service',
+                              default=None,
+                              type=str)
 
 
 def parse_dlc_args(dlc_parser):
@@ -135,11 +145,12 @@ def parse_dlc_args(dlc_parser):
 
 def main():
     args = parse_args()
-
+    if args.dry_run:
+        args.debug = True
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
-    cfg = Config.fromfile(args.config)
+    cfg = Config.fromfile(args.config, format_python_code=False)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
@@ -172,7 +183,7 @@ def main():
     cfg.dump(output_config_path)
     # Config is intentally reloaded here to avoid initialized
     # types cannot be serialized
-    cfg = Config.fromfile(output_config_path)
+    cfg = Config.fromfile(output_config_path, format_python_code=False)
 
     # report to lark bot if specify --lark
     if not args.lark:
@@ -197,6 +208,8 @@ def main():
                 max_task_size=args.max_partition_size,
                 gen_task_coef=args.gen_task_coef)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             # execute the infer subtasks
             exec_infer_runner(tasks, args, cfg)
         # If they have specified "infer" in config and haven't used --slurm
@@ -217,6 +230,8 @@ def main():
                 cfg['work_dir'], 'predictions/')
             partitioner = PARTITIONERS.build(cfg.infer.partitioner)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             runner = RUNNERS.build(cfg.infer.runner)
             runner(tasks)
 
@@ -235,6 +250,8 @@ def main():
             partitioner = NaivePartitioner(
                 osp.join(cfg['work_dir'], 'results/'))
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             # execute the eval tasks
             exec_eval_runner(tasks, args, cfg)
         # If they have specified "eval" in config and haven't used --slurm
@@ -255,6 +272,8 @@ def main():
                                                        'results/')
             partitioner = PARTITIONERS.build(cfg.eval.partitioner)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             runner = RUNNERS.build(cfg.eval.runner)
             runner(tasks)
 
@@ -271,6 +290,7 @@ def exec_infer_runner(tasks, args, cfg):
                              max_num_workers=args.max_num_workers,
                              partition=args.partition,
                              quotatype=args.quotatype,
+                             qos=args.qos,
                              retry=args.retry,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])
@@ -296,6 +316,7 @@ def exec_eval_runner(tasks, args, cfg):
                              max_num_workers=args.max_num_workers,
                              partition=args.partition,
                              quotatype=args.quotatype,
+                             qos=args.qos,
                              retry=args.retry,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])

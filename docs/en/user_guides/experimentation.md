@@ -5,7 +5,7 @@
 The program entry for the evaluation task is `run.py`, its usage is as follows:
 
 ```shell
-python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l]
+python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l] [--dry-run]
 ```
 
 Here are some examples for launching the task in different environments:
@@ -24,6 +24,7 @@ The parameter explanation is as follows:
 - `-r`: Reuse existing inference results, and skip the finished tasks. If followed by a timestamp, the result under that timestamp in the workspace path will be reused; otherwise, the latest result in the specified workspace path will be reused.
 - `-w`: Specify the working path, default is `./outputs/default`.
 - `-l`: Enable status reporting via Lark bot.
+- `--dry-run`: When enabled, inference and evaluation tasks will be dispatched but won't actually run for debugging.
 
 Using run mode `-m all` as an example, the overall execution flow is as follows:
 

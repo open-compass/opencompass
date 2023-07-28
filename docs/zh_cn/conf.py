@@ -29,14 +29,12 @@ author = 'OpenCompass Authors'
 # The full version, including alpha/beta/rc tags
 # version_file = '../../opencompass/version.py'
 
-
 # def get_version():
 #     with open(version_file, 'r') as f:
 #         exec(compile(f.read(), version_file, 'exec'))
 #     return locals()['__version__']
 
-
-release = "0.5.0"
+release = '0.5.0'
 
 # -- General configuration ---------------------------------------------------
 
@@ -141,14 +139,16 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (root_doc, 'opencompass.tex', 'OpenCompass Documentation', author, 'manual'),
+    (root_doc, 'opencompass.tex', 'OpenCompass Documentation', author,
+     'manual'),
 ]
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(root_doc, 'opencompass', 'OpenCompass Documentation', [author], 1)]
+man_pages = [(root_doc, 'opencompass', 'OpenCompass Documentation', [author],
+              1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -156,8 +156,9 @@ man_pages = [(root_doc, 'opencompass', 'OpenCompass Documentation', [author], 1)
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (root_doc, 'opencompass', 'OpenCompass Documentation', author, 'OpenCompass Authors',
-     'AGI evaluation toolbox and benchmark.', 'Miscellaneous'),
+    (root_doc, 'opencompass', 'OpenCompass Documentation', author,
+     'OpenCompass Authors', 'AGI evaluation toolbox and benchmark.',
+     'Miscellaneous'),
 ]
 
 # -- Options for Epub output -------------------------------------------------

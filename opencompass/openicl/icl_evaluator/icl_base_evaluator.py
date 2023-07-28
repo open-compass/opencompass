@@ -1,8 +1,8 @@
 """Base Evaluator."""
-from typing import List
 
 
 class BaseEvaluator:
+
     def __init__(self) -> None:
         pass
 

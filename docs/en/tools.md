@@ -57,3 +57,15 @@ Running method:
 ```bash
 python tools/test_api_model.py [CONFIG_PATH] -n
 ```
+
+## Prediction Merger
+
+This tool can merge patitioned predictions.
+
+Running method:
+
+```bash
+python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
+```
+
+- `-w`: Work path, default is `'./outputs/default'`.
