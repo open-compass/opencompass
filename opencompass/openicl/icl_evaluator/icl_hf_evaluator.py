@@ -21,8 +21,7 @@ class HuggingfaceEvaluator(BaseEvaluator):
 
     def __init__(self, metric: str, seed: int = 0) -> None:
         self.metric = metric
-        random.seed(seed)
-        np.random.seed(seed)
+        self.seed = seed
         super().__init__()
 
     def _preprocess(self, predictions: List, references: List) -> dict:
@@ -61,6 +60,8 @@ class HuggingfaceEvaluator(BaseEvaluator):
         Returns:
             dict: calculated scores.
         """
+        random.seed(self.seed)
+        np.random.seed(self.seed)
         if len(predictions) != len(references):
             return {
                 'error':
