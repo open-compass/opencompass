@@ -1,6 +1,6 @@
 from .afqmcd import *  # noqa: F401, F403
 from .agieval import *  # noqa: F401, F403
-from .anli import *  # noqa: F401, F403
+from .anli import AnliDataset  # noqa: F401, F403
 from .arc import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
@@ -49,7 +49,7 @@ from .realtoxicprompts import *  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
-from .squad20 import *  # noqa: F401, F403
+from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403
 from .strategyqa import *  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
@@ -65,6 +65,6 @@ from .winograd import *  # noqa: F401, F403
 from .winogrande import *  # noqa: F401, F403
 from .wsc import *  # noqa: F401, F403
 from .xcopa import *  # noqa: F401, F403
-from .xiezhi import *  # noqa: F401, F403
+from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
 from .xlsum import *  # noqa: F401, F403
 from .xsum import *  # noqa: F401, F403
