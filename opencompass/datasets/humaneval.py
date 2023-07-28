@@ -1,4 +1,5 @@
 import os.path as osp
+import re
 import tempfile
 from typing import List
 
@@ -43,9 +44,14 @@ class HumanEvaluator(BaseEvaluator):
 
 @TEXT_POSTPROCESSORS.register_module('humaneval')
 def humaneval_postprocess(text: str) -> str:
-    text = text.split('\n\n')[0]
     if '```' in text:
-        text = text.split('```')[1]
+        text = re.findall(r'```(.*?)```', text, re.DOTALL)[0]
+        if not text.startswith('\n'):  # in case starting with ```python
+            text = text[max(text.find('\n') + 1, 0):]
+    if text.strip().startswith('from') or text.strip().startswith('import'):
+        def_idx = text.find('def')
+        if def_idx != -1:
+            text = text[max(text.find('\n', def_idx) + 1, 0):]
     if text.strip().startswith('def'):
         text = '\n'.join(text.split('\n')[1:])
     if not text.startswith('    '):
