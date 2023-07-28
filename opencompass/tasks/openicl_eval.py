@@ -1,6 +1,7 @@
 import argparse
 import os.path as osp
 import time
+from collections import Counter
 from typing import Optional
 
 import mmengine
@@ -77,6 +78,9 @@ class OpenICLEvalTask(BaseTask):
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
 
+        # Get sc_size if use Self-Consistency
+        sc_size = self.eval_cfg.get('sc_size')
+
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
             result = {'error': 'No predictions found.'}
@@ -105,17 +109,35 @@ class OpenICLEvalTask(BaseTask):
                 from opencompass.models.base import LMTemplateParser
                 parser = LMTemplateParser(self.model_cfg['meta_template'])
                 role = parser.roles[self.eval_cfg['pred_role']]
-                pred_strs = [
-                    self._extract_role_pred(pred, role.get('begin', None),
-                                            role.get('end', None))
-                    for pred in pred_strs
-                ]
+                if sc_size is not None:
+                    for pred in pred_strs:
+                        if not isinstance(pred, list):
+                            raise TypeError(
+                                'The prediction for Self-Consistency'
+                                'must be list.')
+                        pred_strs.append([
+                            self._extract_role_pred(sc_pred,
+                                                    role.get('begin', None),
+                                                    role.get('end', None))
+                            for sc_pred in pred
+                        ])
+                else:
+                    pred_strs = [
+                        self._extract_role_pred(pred, role.get('begin', None),
+                                                role.get('end', None))
+                        for pred in pred_strs
+                    ]
 
             # Postprocess predictions if necessary
             if 'pred_postprocessor' in self.eval_cfg:
                 proc = TEXT_POSTPROCESSORS.get(
                     self.eval_cfg['pred_postprocessor']['type'])
-                pred_strs = [proc(s) for s in pred_strs]
+                if sc_size is not None:
+                    pred_strs = [
+                        self._get_vote_out(proc, s) for s in pred_strs
+                    ]
+                else:
+                    pred_strs = [proc(s) for s in pred_strs]
 
             icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
             result = icl_evaluator.score(
@@ -163,6 +185,14 @@ class OpenICLEvalTask(BaseTask):
                 end = end_idx
 
         return s[start:end]
+
+    def _get_vote_out(
+        self,
+        proc: Optional[callable],
+        sc_prediction: Optional[list],
+    ) -> str:
+        counter = Counter([proc(prediction) for prediction in sc_prediction])
+        return counter.most_common(1)[0][0]
 
 
 def parse_args():
