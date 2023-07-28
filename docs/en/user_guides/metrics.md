@@ -2,7 +2,7 @@
 
 In the evaluation phase, we typically select the corresponding evaluation metric strategy based on the characteristics of the dataset itself. The main criterion is the **type of standard answer**, generally including the following types:
 
-- **Options**: Common in classification tasks, judgment questions, and multiple-choice questions. Currently, this type of question dataset occupies the largest proportion, with datasets such as MMLU, CEval, etc. Accuracy is usually used as the evaluation standard-- `ACCEvaluator`.
+- **Choice**: Common in classification tasks, judgment questions, and multiple-choice questions. Currently, this type of question dataset occupies the largest proportion, with datasets such as MMLU, CEval, etc. Accuracy is usually used as the evaluation standard-- `ACCEvaluator`.
 - **Phrase**: Common in Q&A and reading comprehension tasks. This type of dataset mainly includes CLUE_CMRC, CLUE_DRCD, DROP datasets, etc. Matching rate is usually used as the evaluation standard--`EMEvaluator`.
 - **Sentence**: Common in translation and generating pseudocode/command-line tasks, mainly including Flores, Summscreen, Govrepcrs, Iwdlt2017 datasets, etc. BLEU (Bilingual Evaluation Understudy) is usually used as the evaluation standard--`BleuEvaluator`.
 - **Paragraph**: Common in text summary generation tasks, commonly used datasets mainly include Lcsts, TruthfulQA, Xsum datasets, etc. ROUGE (Recall-Oriented Understudy for Gisting Evaluation) is usually used as the evaluation standard--`RougeEvaluator`.
@@ -14,18 +14,20 @@ There is also a type of **scoring-type** evaluation task without standard answer
 
 Currently, in OpenCompass, commonly used Evaluators are mainly located in the [`opencompass/openicl/icl_evaluator`](https://github.com/InternLM/opencompass/tree/main/opencompass/openicl/icl_evaluator) folder. There are also some dataset-specific indicators that are placed in parts of [`opencompass/datasets`](https://github.com/InternLM/opencompass/tree/main/opencompass/datasets). Below is a summary:
 
-| Evaluation Strategy | Evaluation Metrics  | Common Postprocessing Method | Datasets                                                             |
-| ------------------- | ------------------- | ---------------------------- | -------------------------------------------------------------------- |
-| `ACCEvaluator`      | Accuracy            | `first_capital_postprocess`  | agieval, ARC, bbh, mmlu, ceval, commonsenseqa, crowspairs, hellaswag |
-| `EMEvaluator`       | Match Rate          | None, dataset-specific       | drop, CLUE_CMRC, CLUE_DRCD                                           |
-| `BleuEvaluator`     | BLEU                | None, `flores`               | flores, iwslt2017, summscreen, govrepcrs                             |
-| `RougeEvaluator`    | ROUGE               | None, dataset-specific       | lcsts, truthfulqa, Xsum, XLSum                                       |
-| `HumanEvaluator`    | pass@k              | `humaneval_postprocess`      | humaneval_postprocess                                                |
-| `MBPPEvaluator`     | Execution Pass Rate | None                         | mbpp                                                                 |
-| `ToxicEvaluator`    | PerspectiveAPI      | None                         | realtoxicityprompts                                                  |
-| `AGIEvalEvaluator`  | Accuracy            | None                         | agieval                                                              |
-| `AUCROCEvaluator`   | AUC-ROC             | None                         | jigsawmultilingual, civilcomments                                    |
-| `MATHEvaluator`     | Accuracy            | `math_postprocess`           | math                                                                 |
+| Evaluation Strategy | Evaluation Metrics   | Common Postprocessing Method | Datasets                                                             |
+| ------------------- | -------------------- | ---------------------------- | -------------------------------------------------------------------- |
+| `ACCEvaluator`      | Accuracy             | `first_capital_postprocess`  | agieval, ARC, bbh, mmlu, ceval, commonsenseqa, crowspairs, hellaswag |
+| `EMEvaluator`       | Match Rate           | None, dataset-specific       | drop, CLUE_CMRC, CLUE_DRCD                                           |
+| `BleuEvaluator`     | BLEU                 | None, `flores`               | flores, iwslt2017, summscreen, govrepcrs                             |
+| `RougeEvaluator`    | ROUGE                | None, dataset-specific       | lcsts, truthfulqa, Xsum, XLSum                                       |
+| `HumanEvaluator`    | pass@k               | `humaneval_postprocess`      | humaneval_postprocess                                                |
+| `MBPPEvaluator`     | Execution Pass Rate  | None                         | mbpp                                                                 |
+| `ToxicEvaluator`    | PerspectiveAPI       | None                         | realtoxicityprompts                                                  |
+| `AGIEvalEvaluator`  | Accuracy             | None                         | agieval                                                              |
+| `AUCROCEvaluator`   | AUC-ROC              | None                         | jigsawmultilingual, civilcomments                                    |
+| `MATHEvaluator`     | Accuracy             | `math_postprocess`           | math                                                                 |
+| `MccEvaluator`      | Matthews Correlation | None                         | --                                                                   |
+| `SquadEvaluator`    | F1-scores            | None                         | --                                                                   |
 
 ## How to Configure
 

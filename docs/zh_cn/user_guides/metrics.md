@@ -14,18 +14,20 @@
 
 目前 OpenCompass 中，常用的 Evaluator 主要放在 [`opencompass/openicl/icl_evaluator`](https://github.com/InternLM/opencompass/tree/main/opencompass/openicl/icl_evaluator)文件夹下， 还有部分数据集特有指标的放在 [`opencompass/datasets`](https://github.com/InternLM/opencompass/tree/main/opencompass/datasets) 的部分文件中。以下是汇总：
 
-| 评估指标           | 评估策略       | 常用后处理方式              | 数据集                                                               |
-| ------------------ | -------------- | --------------------------- | -------------------------------------------------------------------- |
-| `ACCEvaluator`     | 正确率         | `first_capital_postprocess` | agieval, ARC, bbh, mmlu, ceval, commonsenseqa, crowspairs, hellaswag |
-| `EMEvaluator`      | 匹配率         | None, dataset_specification | drop, CLUE_CMRC, CLUE_DRCD                                           |
-| `BleuEvaluator`    | BLEU           | None, `flores`              | flores, iwslt2017, summscreen, govrepcrs                             |
-| `RougeEvaluator`   | ROUGE          | None, dataset_specification | lcsts, truthfulqa, Xsum, XLSum                                       |
-| `HumanEvaluator`   | pass@k         | `humaneval_postprocess`     | humaneval_postprocess                                                |
-| `MBPPEvaluator`    | 执行通过率     | None                        | mbpp                                                                 |
-| `ToxicEvaluator`   | PerspectiveAPI | None                        | realtoxicityprompts                                                  |
-| `AGIEvalEvaluator` | 正确率         | None                        | agieval                                                              |
-| `AUCROCEvaluator`  | AUC-ROC        | None                        | jigsawmultilingual, civilcomments                                    |
-| `MATHEvaluator`    | 正确率         | `math_postprocess`          | math                                                                 |
+| 评估指标           | 评估策略             | 常用后处理方式              | 数据集                                                               |
+| ------------------ | -------------------- | --------------------------- | -------------------------------------------------------------------- |
+| `ACCEvaluator`     | 正确率               | `first_capital_postprocess` | agieval, ARC, bbh, mmlu, ceval, commonsenseqa, crowspairs, hellaswag |
+| `EMEvaluator`      | 匹配率               | None, dataset_specification | drop, CLUE_CMRC, CLUE_DRCD                                           |
+| `BleuEvaluator`    | BLEU                 | None, `flores`              | flores, iwslt2017, summscreen, govrepcrs                             |
+| `RougeEvaluator`   | ROUGE                | None, dataset_specification | lcsts, truthfulqa, Xsum, XLSum                                       |
+| `HumanEvaluator`   | pass@k               | `humaneval_postprocess`     | humaneval_postprocess                                                |
+| `MBPPEvaluator`    | 执行通过率           | None                        | mbpp                                                                 |
+| `ToxicEvaluator`   | PerspectiveAPI       | None                        | realtoxicityprompts                                                  |
+| `AGIEvalEvaluator` | 正确率               | None                        | agieval                                                              |
+| `AUCROCEvaluator`  | AUC-ROC              | None                        | jigsawmultilingual, civilcomments                                    |
+| `MATHEvaluator`    | 正确率               | `math_postprocess`          | math                                                                 |
+| `MccEvaluator`     | Matthews Correlation | None                        | --                                                                   |
+| `SquadEvaluator`   | F1-scores            | None                        | --                                                                   |
 
 ## 如何配置
 
