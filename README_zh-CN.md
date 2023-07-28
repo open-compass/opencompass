@@ -10,7 +10,7 @@
 
 [🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/zh_CN/latest/index.html) |
-[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html) |
+[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id1) |
 [🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
 
 [English](/README.md) | 简体中文
@@ -18,7 +18,7 @@
 </div>
 
 <p align="center">
-    👋 加入我们的 <a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> 和 <a href="https://github.com/InternLM/InternLM/assets/25839884/a6aad896-7232-4220-ac84-9e070c2633ce" target="_blank">微信社区</a>
+    👋 加入我们的<a href="https://twitter.com/intern_lm" target="_blank">推特</a>、<a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> 和 <a href="https://r.vansin.top/?r=internwx" target="_blank">微信社区</a>
 </p>
 
 欢迎来到OpenCompass！
@@ -291,7 +291,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 ## 安装
 
-下面展示了快速安装的步骤。有部分第三方功能可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_cn/latest/get_started.html)。
+下面展示了快速安装以及准备数据集的步骤。
 
 ```Python
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
@@ -304,9 +304,13 @@ wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompass
 unzip OpenCompassData.zip
 ```
 
+有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html)。
+
 ## 评测
 
-请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id2)了解如何运行一个评测任务。
+确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id3)了解如何运行一个评测任务。
+
+更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
 
 ## 致谢
 
