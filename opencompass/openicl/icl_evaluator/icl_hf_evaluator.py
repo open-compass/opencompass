@@ -208,3 +208,52 @@ class SquadEvaluator(HuggingfaceEvaluator):
             dict: postprocessed scores.
         """
         return scores['f1']
+
+
+@ICL_EVALUATORS.register_module()
+class EDAccEvaluator(AccEvaluator):
+    """Edit distance based accuracy evaluator.
+
+    This implementation requires the un-postprocessed outputs from the model,
+    and the reference list where each item is structured as:
+
+    .. code-block:: python
+
+        {
+            'candidates': [],  # a list of informative answer candidates
+            'label': 0,  # the index of the gold answer
+        }
+
+    It always matches the model's output to a valid answer with the citerion
+    as the minimum editing distance.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        from rapidfuzz.distance import Levenshtein
+        self.dist = Levenshtein.distance
+
+    def _preprocess(self, predictions: List, references: List) -> dict:
+        """Preprocess the final predictions and references to needed format.
+
+        Args:
+            predictions (List): List of predictions of each sample.
+            references (List): List of targets for each sample.
+
+        Returns:
+            dict: preprocessed results.
+        """
+
+        preds = []
+        golds = []
+
+        for i in range(len(predictions)):
+            pred, ref = predictions[i], references[i]
+            dists = [self.dist(pred, cand) for cand in ref['candidates']]
+            preds.append(np.argmin(dists))
+            golds.append(ref['label'])
+
+        return {
+            'predictions': preds,
+            'references': golds,
+        }
