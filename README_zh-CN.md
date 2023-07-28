@@ -27,7 +27,9 @@
 
 ## 更新
 
-- **\[2023.07.19\]** 新增了 [Llama 2](https://ai.meta.com/llama/)！我们近期将会公布其评测结果。\[[文档](./docs/zh_cn/get_started.md#安装)\]
+- **\[2023.07.27\]** 新增了 [CMMLU](https://github.com/haonan-li/CMMLU)! 欢迎更多的数据集加入 OpenCompass. 🔥🔥🔥.
+- **\[2023.07.21\]** Llama-2 的评测结果已更新在 OpenCompass [大语言模型评测榜单](https://opencompass.org.cn/leaderboard-llm)!  🔥🔥🔥.
+- **\[2023.07.19\]** 新增了 [Llama-2](https://ai.meta.com/llama/)！我们近期将会公布其评测结果。\[[文档](./docs/zh_cn/get_started.md#安装)\] 🔥🔥🔥。
 - **\[2023.07.13\]** 发布了 [MMBench](https://opencompass.org.cn/MMBench)，该数据集经过细致整理，用于评测多模态模型全方位能力 🔥🔥🔥。
 
 ## 介绍
@@ -198,7 +200,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 - AGIEval
 - MMLU
 - GAOKAO-Bench
-- MMLU-CN (即将上线)
+- CMMLU
 - ARC
 
 </details>
@@ -300,7 +302,7 @@ git clone https://github.com/InternLM/opencompass opencompass
 cd opencompass
 pip install -e .
 # 下载数据集到 data/ 处
-wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 

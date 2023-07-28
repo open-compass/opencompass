@@ -26,9 +26,10 @@ Welcome to **OpenCompass**!
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
 ## News
+
 - **\[2023.07.27\]** We have supported [CMMLU](https://github.com/haonan-li/CMMLU)! More datasets are welcomed to join OpenCompass. 🔥🔥🔥.
-- **\[2023.07.21\]** Performances of Llama-2 are avaliable in [OpenCompass leaderboard](https://opencompass.org.cn/leaderboard-llm)!  🔥🔥🔥.
-- **\[2023.07.19\]** We have supported [Llama 2](https://ai.meta.com/llama/)! Its performance report will be available soon. \[[Doc](./docs/en/get_started.md#Installation)\] 🔥🔥🔥.
+- **\[2023.07.21\]** Performances of Llama-2 are available in [OpenCompass leaderboard](https://opencompass.org.cn/leaderboard-llm)!  🔥🔥🔥.
+- **\[2023.07.19\]** We have supported [Llama-2](https://ai.meta.com/llama/)! Its performance report will be available soon. \[[Doc](./docs/en/get_started.md#Installation)\] 🔥🔥🔥.
 - **\[2023.07.13\]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models 🔥🔥🔥.
 
 ## Introduction
