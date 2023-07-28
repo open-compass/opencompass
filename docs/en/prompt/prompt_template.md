@@ -45,7 +45,7 @@ Let's start by introducing the basic syntax of the prompt.
 
 ## String-Based Prompt
 
-String-based templates are a classic form of templates, and consider the following template:
+String-based prompt is a classic form of template. Consider the following template:
 
 ```python
 prompt_template=dict(
@@ -78,9 +78,9 @@ As you can see, the actual answer for the question, represented by the field `an
 
 ## Dialogue-Based Prompt
 
-In practical testing, simple completions may not effectively test the performance of dialogue-based models. Therefore, we prefer prompts that take the form of dialogues. Additionally, different models have varying definitions of dialogue formats. Hence, we need prompts generated from the dataset to be more versatile, and the specific prompts required by each model can be generated during testing.
+In practical testing, making models perform simple completions may not effectively test the performance of chat-based models. Therefore, we prefer prompts that take the form of dialogues. Additionally, different models have varying definitions of dialogue formats. Hence, we need prompts generated from the dataset to be more versatile, and the specific prompts required by each model can be generated during testing.
 
-To achieve this, OpenCompass extends the string-based template to support dialogue-based templates. Dialogue-based templates are more flexible, as they can combine with different [meta_templates](./meta_template.md) on the model side to generate prompts in various dialogue formats. They are applicable to both base and chat models, but their definitions are relatively complex.
+To achieve this, OpenCompass extends the string-based prompt to dialogue-based prompt. Dialogue-based prompt is more flexible, as it can combine with different [meta_templates](./meta_template.md) on the model side to generate prompts in various dialogue formats. It is applicable to both base and chat models, but their definitions are relatively complex.
 
 Now, let's assume we have a data sample as follows:
 
@@ -96,7 +96,7 @@ Next, let's showcase a few examples:
 
 `````{tabs}
 
-````{tab} Single Round Dialogue
+````{tab} Single-round Dialogue
 ```python
 prompt_template=dict(
     type=PromptTemplate,
@@ -120,7 +120,7 @@ PromptList([
 
 ````
 
-````{tab} Multiple Rounds Dialogue
+````{tab} Multi-round Dialogue
 ```python
 prompt_template=dict(
     type=PromptTemplate,
@@ -152,7 +152,7 @@ PromptList([
 ````
 
 
-````{tab} Dialogue with SYSTEM
+````{tab} Dialogue with sys instruction
 
 ```python
 prompt_template=dict(
@@ -224,7 +224,7 @@ OpenCompass mainly supports two types of inferencers: `GenInferencer` and `PPLIn
 
 `````{tabs}
 
-````{group-tab} String-based templates
+````{group-tab} String-based Prompt
 ```python
 prompt_template=dict(
     type=PromptTemplate,
@@ -258,7 +258,7 @@ For `PPLInferencer`, it corresponds to discriminative inference. During inferenc
 
 `````{tabs}
 
-````{group-tab} String-based templates
+````{group-tab} String-based Prompt
 ```python
 prompt_template=dict(
     type=PromptTemplate,
@@ -347,7 +347,7 @@ Next, let's take a look at the actual effects of different prompt construction m
 
 `````{tabs}
 
-````{group-tab} String-based templates
+````{group-tab} String-based Prompt
 
 Template configurations are as follows:
 
@@ -476,6 +476,21 @@ infer_cfg=dict(
   </table>
 
 More generally, even in the case of 0-shot learning (i.e., when `retriever` is `ZeroRetriver`), this mechanism still applies. Therefore, the following configuration is also valid:
+
+```python
+datasets = [
+    dict(
+        infer_cfg=dict(
+            ice_template=dict(
+                type=PromptTemplate,
+                template="Q: {question}\nA: {answer}",
+            ),
+            retriever=dict(type=ZeroRetriever),
+            inferencer=dict(type=GenInferencer),
+        )
+    ),
+]
+```
 
 # Usage Suggestion
 
