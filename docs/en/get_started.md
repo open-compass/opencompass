@@ -66,7 +66,7 @@ Run the following commands to download and place the datasets in the `${OpenComp
 
 ```bash
 # Run in the OpenCompass directory
-wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 
