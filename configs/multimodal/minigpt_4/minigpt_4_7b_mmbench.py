@@ -18,25 +18,25 @@ dataset = dict(type='opencompass.MMBenchDataset',
                data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
-dataloader = dict(batch_size=1,
-                  num_workers=4,
-                  dataset=dataset,
-                  collate_fn=dict(type='pseudo_collate'),
-                  sampler=dict(type='DefaultSampler', shuffle=False))
+minigpt_4_dataloader = dict(batch_size=1,
+                            num_workers=4,
+                            dataset=dataset,
+                            collate_fn=dict(type='pseudo_collate'),
+                            sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-model = dict(
+minigpt_4_model = dict(
     type='minigpt-4-mmbench',
-    low_resource=False,
-    llama_model='/path/to/vicuna-7b/',
+    low_resource=True,
+    llama_model='/mnt/petrelfs/share_data/ouyanglinke/vicuna-7b/',
     sys_prompt=  # noqa: E251
     '###Human: What is the capital of China? There are several options:\nA. Beijing\nB. Shanghai\nC. Guangzhou\nD. Shenzhen\n###Assistant: A\n'
 )
 
 # evaluation settings
-evaluator = [
+minigpt_4_evaluator = [
     dict(type='opencompass.DumpResults',
          save_path='work_dirs/minigpt-4-7b-mmbench.xlsx')
 ]
 
-load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
+minigpt_4_load_from = '/mnt/petrelfs/share_data/liuyuan/llm_weights/minigpt4-7b/prerained_minigpt4_7b.pth'  # noqa

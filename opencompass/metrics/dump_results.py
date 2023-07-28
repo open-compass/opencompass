@@ -36,7 +36,6 @@ class DumpResults(BaseMetric):
             result = dict()
 
             result['question'] = data_sample.get('question')
-            result['answer'] = data_sample.get('answer')
             result.update(data_sample.get('options_dict'))
             result['prediction'] = data_sample.get('pred_answer')
             if data_sample.get('category') is not None:

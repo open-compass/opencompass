@@ -2,15 +2,14 @@ import argparse
 import getpass
 import os
 import os.path as osp
-import sys
 from datetime import datetime
 
 from mmengine.config import Config
 
-from opencompass.partitioners import NaivePartitioner, SizePartitioner
+from opencompass.partitioners import (MultimodalNaivePartitioner,
+                                      NaivePartitioner, SizePartitioner)
 from opencompass.registry import PARTITIONERS, RUNNERS
-from opencompass.runners import (DLCRunner, LocalRunner, MMLocalRunner,
-                                 MMSlurmRunner, SlurmRunner)
+from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.utils import LarkReporter, Summarizer, get_logger
 
 
@@ -37,6 +36,10 @@ def parse_args():
                         help='Debug mode, in which scheduler will run tasks '
                         'in the single process, and output will not be '
                         'redirected to files',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('--mm-eval',
+                        help='Whether or not enable multimodal evaluation',
                         action='store_true',
                         default=False)
     parser.add_argument('--dry-run',
@@ -101,14 +104,6 @@ def parse_args():
         'Will be overrideen by the "retry" argument in the config.',
         type=int,
         default=2)
-
-    # add multimodal eval args
-    parser.add_argument('--mm-eval',
-                        default=False,
-                        action='store_true',
-                        help='Whether or '
-                        'not evaluate multimodal models.')
-
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -139,6 +134,10 @@ def parse_slurm_args(slurm_parser):
                               help='Slurm quota type',
                               default=None,
                               type=str)
+    slurm_parser.add_argument('--qos',
+                              help='Slurm quality of service',
+                              default=None,
+                              type=str)
 
 
 def parse_dlc_args(dlc_parser):
@@ -153,29 +152,10 @@ def main():
     args = parse_args()
     if args.dry_run:
         args.debug = True
-
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
     cfg = Config.fromfile(args.config, format_python_code=False)
-
-    # multimodal evaluation
-    if args.mm_eval:
-        if args.slurm:
-            runner = MMSlurmRunner(max_num_workers=args.max_num_workers,
-                                   partition=args.partition,
-                                   quotatype=args.quotatype,
-                                   retry=args.retry,
-                                   debug=args.debug,
-                                   gpus_per_task=cfg.gpus_per_task)
-        else:
-            runner = MMLocalRunner(retry=args.retry,
-                                   gpus_per_task=cfg.gpus_per_task)
-        runner(cfg.tasks, args)
-        # after finish multimodal evaluation, exit without running
-        # language model evaluation
-        sys.exit()
-
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
@@ -226,7 +206,14 @@ def main():
                            'also specified --slurm or --dlc. '
                            'The "infer" configuration will be overridden by '
                            'your runtime arguments.')
-        if args.dlc or args.slurm or cfg.get('infer', None) is None:
+        # Check whether run multimodal evaluation
+        if args.mm_eval:
+            partitioner = MultimodalNaivePartitioner(
+                osp.join(cfg['work_dir'], 'predictions/'))
+            tasks = partitioner(cfg)
+            exec_mm_infer_runner(tasks, args, cfg)
+            return
+        elif args.dlc or args.slurm or cfg.get('infer', None) is None:
             # Use SizePartitioner to split into subtasks
             partitioner = SizePartitioner(
                 osp.join(cfg['work_dir'], 'predictions/'),
@@ -308,6 +295,27 @@ def main():
         summarizer.summarize(time_str=cfg_time_str)
 
 
+def exec_mm_infer_runner(tasks, args, cfg):
+    """execute multimodal infer runner according to args."""
+    if args.slurm:
+        runner = SlurmRunner(dict(type='MultimodalInferTask'),
+                             max_num_workers=args.max_num_workers,
+                             partition=args.partition,
+                             quotatype=args.quotatype,
+                             retry=args.retry,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
+    elif args.dlc:
+        raise NotImplementedError('Currently, we do not support evaluating \
+                             multimodal models on dlc.')
+    else:
+        runner = LocalRunner(task=dict(type='MultimodalInferTask'),
+                             max_num_workers=args.max_num_workers,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
+    runner(tasks)
+
+
 def exec_infer_runner(tasks, args, cfg):
     """execute infer runner according to args."""
     if args.slurm:
@@ -315,6 +323,7 @@ def exec_infer_runner(tasks, args, cfg):
                              max_num_workers=args.max_num_workers,
                              partition=args.partition,
                              quotatype=args.quotatype,
+                             qos=args.qos,
                              retry=args.retry,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])
@@ -340,6 +349,7 @@ def exec_eval_runner(tasks, args, cfg):
                              max_num_workers=args.max_num_workers,
                              partition=args.partition,
                              quotatype=args.quotatype,
+                             qos=args.qos,
                              retry=args.retry,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])

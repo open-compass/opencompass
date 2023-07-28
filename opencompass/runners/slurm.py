@@ -78,7 +78,6 @@ class SlurmRunner(BaseRunner):
         Returns:
             tuple[str, int]: Task name and exit code.
         """
-
         task_type = self.task_cfg.type
         if isinstance(self.task_cfg.type, str):
             task_type = TASKS.get(task_type)

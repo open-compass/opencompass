@@ -45,7 +45,6 @@ class MMBenchDataset(Dataset):
         image = self.df.iloc[idx]['image']
         image = decode_base64_to_image(image)
         question = self.df.iloc[idx]['question']
-        answer = self.df.iloc[idx]['answer']
         catetory = self.df.iloc[idx]['category']
         l2_catetory = self.df.iloc[idx]['l2-category']
 
@@ -63,7 +62,6 @@ class MMBenchDataset(Dataset):
         data = {
             'img': image,
             'question': question,
-            'answer': answer,
             'options': options_prompt,
             'category': catetory,
             'l2-category': l2_catetory,
