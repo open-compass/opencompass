@@ -79,8 +79,7 @@ class OpenICLEvalTask(BaseTask):
         partial_filename = root + '_0' + ext
 
         # Get sc_size if use Self-Consistency
-        sc_size = self.eval_cfg['sc_size'] if self.eval_cfg.get(
-            'sc_size') is not None else -1
+        sc_size = self.eval_cfg.get('sc_size')
 
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
@@ -110,7 +109,7 @@ class OpenICLEvalTask(BaseTask):
                 from opencompass.models.base import LMTemplateParser
                 parser = LMTemplateParser(self.model_cfg['meta_template'])
                 role = parser.roles[self.eval_cfg['pred_role']]
-                if sc_size > 0:
+                if sc_size is not None:
                     for pred in pred_strs:
                         if not isinstance(pred, list):
                             raise TypeError(
@@ -133,7 +132,7 @@ class OpenICLEvalTask(BaseTask):
             if 'pred_postprocessor' in self.eval_cfg:
                 proc = TEXT_POSTPROCESSORS.get(
                     self.eval_cfg['pred_postprocessor']['type'])
-                if sc_size > 0:
+                if sc_size is not None:
                     pred_strs = [
                         self._get_vote_out(proc, s) for s in pred_strs
                     ]

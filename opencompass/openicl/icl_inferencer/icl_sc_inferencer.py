@@ -9,7 +9,6 @@ import torch
 from tqdm import tqdm
 
 from opencompass.models.base import BaseModel
-from opencompass.registry import ICL_INFERENCERS
 
 from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
@@ -19,7 +18,6 @@ from .icl_base_inferencer import BaseInferencer, GenInferencerOutputHandler
 logger = get_logger(__name__)
 
 
-@ICL_INFERENCERS.register_module()
 class SCInferencer(BaseInferencer):
     """Self-Consistency Inferencer class to evaluate by multiple generations.
 
