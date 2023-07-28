@@ -1,6 +1,8 @@
+import random
 from typing import List
 
 import evaluate
+import numpy as np
 
 from opencompass.registry import ICL_EVALUATORS
 
@@ -12,10 +14,15 @@ class HuggingfaceEvaluator(BaseEvaluator):
 
     Args:
         metric (str): Metric name in evaluate module.
+        seed (int): There exists some randomness during the calculation of some
+            metrics, thus we set a fixed random seed for reproducing. Defaults
+            to 0.
     """
 
-    def __init__(self, metric: str) -> None:
+    def __init__(self, metric: str, seed: int = 0) -> None:
         self.metric = metric
+        random.seed(seed)
+        np.random.seed(seed)
         super().__init__()
 
     def _preprocess(self, predictions: List, references: List) -> dict:
