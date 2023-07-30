@@ -61,7 +61,7 @@
 
    <details>
    <summary><b>点击查看详细</b></summary>
-   
+
    安装InternLM-Lite
    在你的根目录下安装该库
 
@@ -69,23 +69,25 @@
    git clone https://gitlab.pjlab.org.cn/chenkeyu1/internlm-lite.git
    pip install -e internlm-lite
    ```
+
    之后，可以建立一个软链接，用于关联模型权重等文件至你指定的文件夹下，例如在`configs/models/internlm_7b.py`中的**internData**
-   
+
    ```bash
    ln -s /path/data ./internData
    ```
-   
+
    自然，也可以提供绝对路径而不是软链接的形式，这样更简单。（模型权重也就是**path**参数只需给出权重所在的目录即可，其余两者需直接给出完整路径）
    这里，你需要提供三种文件:
+
    - 模型权重
    - 模型配置
    - **Tokenizer**
-   目前开源的模型权重为InternLM-7b，网址：[Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b)，下载代码为
-   
+     目前开源的模型权重为InternLM-7b，网址：[Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b)，下载代码为
+
    ```bash
    wegt https://download.openxlab.org.cn/models/OpenLMLab/InternLM-7b/weight/model_tp0_pp0.pt
    ```
-   
+
    后两种文件在InternLM-Lite库中的data文件夹下，完整的config配置如下：
 
    ```bash
@@ -96,7 +98,7 @@
         model_config="./internData/model_config.py",
         max_out_len=100,max_seq_len=2048,batch_size=16,run_cfg=dict(num_gpus=1, num_procs=1))
    ```
-   
+
    </details>
 
 # 数据集准备

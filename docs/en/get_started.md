@@ -61,7 +61,7 @@
 
    <details>
    <summary><b>click to show the details</b></summary>
-   
+
    Install InternLM-Lite
    Install this library in your root directory
 
@@ -69,25 +69,27 @@
    git clone https://gitlab.pjlab.org.cn/chenkeyu1/internlm-lite.git
    pip install -e internlm-lite
    ```
+
    After that, you can create a symbolic link to associate the model weights and other files with the folder you specify. For example, in configs/models/internlm_7b.py, use the internData directory:
-   
+
    ```bash
    ln -s /path/data ./internData
    ```
-   
-   After that, you can create a symbolic link to associate the model weights and other files with the folder you specify. 
+
+   After that, you can create a symbolic link to associate the model weights and other files with the folder you specify.
    For example, in configs/models/internlm_7b.py, use the internData directory:
    Here, you need to provide three types of files:
+
    - Model weights
    - Model configuration
    - **Tokenizer**
-   Currently, the open-source model weights available are for InternLM-7b, and can be downloaded from the following URL:[Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b),
-   Use the following code to download the model weights
-   
+     Currently, the open-source model weights available are for InternLM-7b, and can be downloaded from the following URL:[Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b),
+     Use the following code to download the model weights
+
    ```bash
    wegt https://download.openxlab.org.cn/models/OpenLMLab/InternLM-7b/weight/model_tp0_pp0.pt
    ```
-   
+
    The other two files can be found in the data folder of the InternLM-Lite library. The complete configuration is as follows:
 
    ```bash
@@ -98,7 +100,7 @@
         model_config="./internData/model_config.py",
         max_out_len=100,max_seq_len=2048,batch_size=16,run_cfg=dict(num_gpus=1, num_procs=1))
    ```
-   
+
    </details>
 
 # Dataset Preparation
