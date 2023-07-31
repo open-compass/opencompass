@@ -46,7 +46,13 @@ class AGIEvalDataset_v2(BaseDataset):
             passage = _d['passage'] if _d['passage'] else ''
             question = passage + _d['question']
             options = '\n'.join(_d['options']) if _d['options'] else ''
-            label = _d['label'] if _d['label'] else _d['answer']
+            if _d['label']:
+                if isinstance(_d['label'], list):
+                    label = ''.join(_d['label'])
+                else:
+                    label = _d['label']
+            else:
+                label = _d['answer']
             d = {'question': question, 'options': options, 'label': label}
             data.append(d)
         dataset = Dataset.from_list(data)
