@@ -27,7 +27,9 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## News
 
-- **\[2023.07.19\]** We have supported [Llama 2](https://ai.meta.com/llama/)! Its performance report will be available soon. \[[doc](./docs/en/get_started.md#Installation)\]
+- **\[2023.07.27\]** We have supported [CMMLU](https://github.com/haonan-li/CMMLU)! More datasets are welcomed to join OpenCompass. 🔥🔥🔥.
+- **\[2023.07.21\]** Performances of Llama-2 are available in [OpenCompass leaderboard](https://opencompass.org.cn/leaderboard-llm)!  🔥🔥🔥.
+- **\[2023.07.19\]** We have supported [Llama-2](https://ai.meta.com/llama/)! Its performance report will be available soon. \[[Doc](./docs/en/get_started.md#Installation)\] 🔥🔥🔥.
 - **\[2023.07.13\]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models 🔥🔥🔥.
 
 ## Introduction
@@ -196,7 +198,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - AGIEval
 - MMLU
 - GAOKAO-Bench
-- MMLU-CN (coming soon)
+- CMMLU
 - ARC
 
 </details>
@@ -300,7 +302,7 @@ git clone https://github.com/InternLM/opencompass opencompass
 cd opencompass
 pip install -e .
 # Download dataset to data/ folder
-wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 
