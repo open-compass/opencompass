@@ -1,6 +1,7 @@
 import copy
 import math
 import os.path as osp
+from fnmatch import fnmatch
 from typing import List, Tuple, Union
 
 import mmengine
@@ -134,6 +135,30 @@ class SizePartitioner(BasePartitioner):
             split_configs.append(cfg)
         return split_configs
 
+    def get_factor(self, dataset: ConfigDict) -> int:
+        infer_cfg = dataset.infer_cfg
+        template = (infer_cfg.prompt_template.template if 'prompt_template'
+                    in infer_cfg else infer_cfg.ice_template.template)
+        # If it's the Gen template, the dataset size will be multiplied by the
+        # self.gen_task_coef
+        factor = self.gen_task_coef
+        # If it's the PPL template, the dataset size will be multiplied by the
+        # number of labels
+        if isinstance(template, dict):
+            ctr = sum(key in template for key in ('begin', 'round', 'end'))
+            if ctr != len(template.keys()):
+                factor = len(template.keys())
+
+        dataset_abbr = dataset_abbr_from_cfg(dataset)
+        if any(
+                fnmatch(dataset_abbr, pattern)
+                for pattern in ('bbh*', 'gsm8k*', 'math*', 'strategyqa*',
+                                'agieval-jec*', 'agieval-gaokao-mathcloze',
+                                'agieval-math')):
+            factor *= 10
+
+        return factor
+
     def get_cost(self,
                  dataset: ConfigDict,
                  get_raw_factors: bool = False) -> Union[int, Tuple[int, int]]:
@@ -150,19 +175,8 @@ class SizePartitioner(BasePartitioner):
         """
         dataset_abbr = dataset_abbr_from_cfg(dataset)
 
-        # If it's the PPL template, the dataset size will be multiplied by the
-        # number of labels
-        infer_cfg = dataset.infer_cfg
         test_range = dataset.reader_cfg.get('test_range', '')
-        template = (infer_cfg.prompt_template.template if 'prompt_template'
-                    in infer_cfg else infer_cfg.ice_template.template)
-        # If it's the Gen template, the dataset size will be multiplied by the
-        # self.gen_task_coef
-        factor = self.gen_task_coef
-        if isinstance(template, dict):
-            ctr = sum(key in template for key in ('begin', 'round', 'end'))
-            if ctr != len(template.keys()):
-                factor = len(template.keys())
+        factor = self.get_factor(dataset)
 
         if dataset_abbr in self.dataset_size:
             actual_size = eval('len(range(self.dataset_size[dataset_abbr])'

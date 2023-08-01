@@ -25,6 +25,9 @@ class HuggingFace(BaseModel):
         tokenizer_path (str): The path to the tokenizer. Defaults to None.
         tokenizer_kwargs (dict): Keyword arguments for the tokenizer.
             Defaults to {}.
+        peft_path (str, optional): The name or path to the HuggingFace's PEFT
+            model. If None, the original model will not be converted to PEFT.
+            Defaults to None.
         tokenizer_only (bool): If True, only the tokenizer will be initialized.
             Defaults to False.
         model_kwargs (dict): Keyword arguments for the model, used in loader.
@@ -51,6 +54,7 @@ class HuggingFace(BaseModel):
                  max_seq_len: int = 2048,
                  tokenizer_path: Optional[str] = None,
                  tokenizer_kwargs: dict = dict(),
+                 peft_path: Optional[str] = None,
                  tokenizer_only: bool = False,
                  model_kwargs: dict = dict(device_map='auto'),
                  meta_template: Optional[Dict] = None,
@@ -71,7 +75,9 @@ class HuggingFace(BaseModel):
         self.batch_padding = batch_padding
         self.extract_pred_after_decode = extract_pred_after_decode
         if not tokenizer_only:
-            self._load_model(path=path, model_kwargs=model_kwargs)
+            self._load_model(path=path,
+                             model_kwargs=model_kwargs,
+                             peft_path=peft_path)
 
     def _load_tokenizer(self, path: str, tokenizer_path: Optional[str],
                         tokenizer_kwargs: dict):
@@ -94,11 +100,19 @@ class HuggingFace(BaseModel):
             self.tokenizer.eos_token = '</s>'
             self.tokenizer.pad_token_id = 0
 
-    def _load_model(self, path: str, model_kwargs: dict):
+    def _load_model(self,
+                    path: str,
+                    model_kwargs: dict,
+                    peft_path: Optional[str] = None):
         from transformers import AutoModel
 
         model_kwargs.setdefault('torch_dtype', torch.float16)
         self.model = AutoModel.from_pretrained(path, **model_kwargs)
+        if peft_path is not None:
+            from peft import PeftModel
+            self.model = PeftModel.from_pretrained(self.model,
+                                                   peft_path,
+                                                   is_trainable=False)
         self.model.eval()
 
         # A patch for llama when batch_padding = True
@@ -107,7 +121,8 @@ class HuggingFace(BaseModel):
             self.model.config.eos_token_id = 2
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
-    def generate(self, inputs: List[str], max_out_len: int) -> List[str]:
+    def generate(self, inputs: List[str], max_out_len: int,
+                 **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
@@ -118,14 +133,16 @@ class HuggingFace(BaseModel):
             List[str]: A list of generated strings.
         """
         if self.batch_padding and len(inputs) > 1:
-            return self._batch_generate(inputs=inputs, max_out_len=max_out_len)
+            return self._batch_generate(inputs=inputs,
+                                        max_out_len=max_out_len,
+                                        **kwargs)
         else:
-            return sum((self._single_generate(inputs=[input_],
-                                              max_out_len=max_out_len)
+            return sum((self._single_generate(
+                inputs=[input_], max_out_len=max_out_len, **kwargs)
                         for input_ in inputs), [])
 
-    def _batch_generate(self, inputs: List[str],
-                        max_out_len: int) -> List[str]:
+    def _batch_generate(self, inputs: List[str], max_out_len: int,
+                        **kwargs) -> List[str]:
         """Support for batch prompts inference.
 
         Args:
@@ -150,7 +167,9 @@ class HuggingFace(BaseModel):
         }
 
         # step-2: conduct model forward to generate output
-        outputs = self.model.generate(**tokens, max_new_tokens=max_out_len)
+        outputs = self.model.generate(**tokens,
+                                      max_new_tokens=max_out_len,
+                                      **kwargs)
 
         if not self.extract_pred_after_decode:
             outputs = outputs[:, tokens['input_ids'].shape[1]:]
@@ -165,8 +184,8 @@ class HuggingFace(BaseModel):
 
         return decodeds
 
-    def _single_generate(self, inputs: List[str],
-                         max_out_len: int) -> List[str]:
+    def _single_generate(self, inputs: List[str], max_out_len: int,
+                         **kwargs) -> List[str]:
         """Support for single prompt inference.
 
         Args:
@@ -184,7 +203,9 @@ class HuggingFace(BaseModel):
                                    max_length=self.max_seq_len -
                                    max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
-        outputs = self.model.generate(input_ids, max_new_tokens=max_out_len)
+        outputs = self.model.generate(input_ids,
+                                      max_new_tokens=max_out_len,
+                                      **kwargs)
 
         if not self.extract_pred_after_decode:
             outputs = outputs[:, input_ids.shape[1]:]
@@ -318,6 +339,9 @@ class HuggingFaceCausalLM(HuggingFace):
         tokenizer_path (str): The path to the tokenizer. Defaults to None.
         tokenizer_kwargs (dict): Keyword arguments for the tokenizer.
             Defaults to {}.
+        peft_path (str, optional): The name or path to the HuggingFace's PEFT
+            model. If None, the original model will not be converted to PEFT.
+            Defaults to None.
         tokenizer_only (bool): If True, only the tokenizer will be initialized.
             Defaults to False.
         model_kwargs (dict): Keyword arguments for the model, used in loader.
@@ -329,10 +353,17 @@ class HuggingFaceCausalLM(HuggingFace):
             without batch padding.
     """
 
-    def _load_model(self, path: str, model_kwargs: dict):
+    def _load_model(self,
+                    path: str,
+                    model_kwargs: dict,
+                    peft_path: Optional[str] = None):
         from transformers import AutoModelForCausalLM
 
         model_kwargs.setdefault('torch_dtype', torch.float16)
         self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
-
+        if peft_path is not None:
+            from peft import PeftModel
+            self.model = PeftModel.from_pretrained(self.model,
+                                                   peft_path,
+                                                   is_trainable=False)
         self.model.eval()

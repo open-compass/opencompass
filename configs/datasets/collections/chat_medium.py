@@ -52,6 +52,6 @@ with read_base():
     from ..nq.nq_gen_c788f6 import nq_datasets
     from ..triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
     from ..flores.flores_gen_806ede import flores_datasets
-    from ..crowspairs.crowspairs_gen_02b6c1 import crowspairs_datasets
+    from ..crowspairs.crowspairs_gen_21f7cb import crowspairs_datasets
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

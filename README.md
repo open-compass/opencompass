@@ -10,7 +10,7 @@
 
 [🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/en/latest/) |
-[🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started/install.html) |
+[🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started.html#installation) |
 [🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
 
 English | [简体中文](README_zh-CN.md)
@@ -18,7 +18,7 @@ English | [简体中文](README_zh-CN.md)
 </div>
 
 <p align="center">
-    👋 join us on <a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> and <a href="https://github.com/InternLM/InternLM/assets/25839884/a6aad896-7232-4220-ac84-9e070c2633ce" target="_blank">WeChat</a>
+    👋 join us on <a href="https://twitter.com/intern_lm" target="_blank">Twitter</a>, <a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> and <a href="https://r.vansin.top/?r=internwx" target="_blank">WeChat</a>
 </p>
 
 Welcome to **OpenCompass**!
@@ -27,6 +27,9 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## News
 
+- **\[2023.07.27\]** We have supported [CMMLU](https://github.com/haonan-li/CMMLU)! More datasets are welcomed to join OpenCompass. 🔥🔥🔥.
+- **\[2023.07.21\]** Performances of Llama-2 are available in [OpenCompass leaderboard](https://opencompass.org.cn/leaderboard-llm)!  🔥🔥🔥.
+- **\[2023.07.19\]** We have supported [Llama-2](https://ai.meta.com/llama/)! Its performance report will be available soon. \[[Doc](./docs/en/get_started.md#Installation)\] 🔥🔥🔥.
 - **\[2023.07.13\]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models 🔥🔥🔥.
 
 ## Introduction
@@ -195,7 +198,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - AGIEval
 - MMLU
 - GAOKAO-Bench
-- MMLU-CN (coming soon)
+- CMMLU
 - ARC
 
 </details>
@@ -290,7 +293,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 
 ## Installation
 
-Below are the steps for quick installation. Some third-party features may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
+Below are the steps for quick installation and datasets preparation.
 
 ```Python
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
@@ -299,13 +302,17 @@ git clone https://github.com/InternLM/opencompass opencompass
 cd opencompass
 pip install -e .
 # Download dataset to data/ folder
-wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 
+Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
+
 ## Evaluation
 
-Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
+Make sure you have installed OpenCompass correctly and prepared your datasets according to the above steps. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html#quick-start) to learn how to run an evaluation task.
+
+For more tutorials, please check our [Documentation](https://opencompass.readthedocs.io/en/latest/index.html).
 
 ## Acknowledgements
 

@@ -129,6 +129,10 @@ def parse_slurm_args(slurm_parser):
                               help='Slurm quota type',
                               default=None,
                               type=str)
+    slurm_parser.add_argument('--qos',
+                              help='Slurm quality of service',
+                              default=None,
+                              type=str)
 
 
 def parse_dlc_args(dlc_parser):
@@ -286,6 +290,7 @@ def exec_infer_runner(tasks, args, cfg):
                              max_num_workers=args.max_num_workers,
                              partition=args.partition,
                              quotatype=args.quotatype,
+                             qos=args.qos,
                              retry=args.retry,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])
@@ -311,6 +316,7 @@ def exec_eval_runner(tasks, args, cfg):
                              max_num_workers=args.max_num_workers,
                              partition=args.partition,
                              quotatype=args.quotatype,
+                             qos=args.qos,
                              retry=args.retry,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])

@@ -94,7 +94,7 @@ models = [
 ]
 ```
 
-# Custom Models
+## Custom Models
 
 If the above methods do not support your model evaluation requirements, you can refer to
 [Supporting New Models](../advanced_guides/new_model.md) to add support for new models in OpenCompass.
