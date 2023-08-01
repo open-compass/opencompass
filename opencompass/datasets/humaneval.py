@@ -45,13 +45,18 @@ class HumanEvaluator(BaseEvaluator):
 @TEXT_POSTPROCESSORS.register_module('humaneval')
 def humaneval_postprocess(text: str) -> str:
     if '```' in text:
-        text = re.findall(r'```(.*?)```', text, re.DOTALL)[0]
-        if not text.startswith('\n'):  # in case starting with ```python
-            text = text[max(text.find('\n') + 1, 0):]
+        blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+        if len(blocks) == 0:
+            text = text.split('```')[1]  # fall back to default strategy
+        else:
+            text = blocks[0]  # fetch the first code block
+            if not text.startswith('\n'):  # in case starting with ```python
+                text = text[max(text.find('\n') + 1, 0):]
     if text.strip().startswith('from') or text.strip().startswith('import'):
         def_idx = text.find('def')
         if def_idx != -1:
             text = text[max(text.find('\n', def_idx) + 1, 0):]
+    text = text.split('\n\n\n')[0]
     if text.strip().startswith('def'):
         text = '\n'.join(text.split('\n')[1:])
     if not text.startswith('    '):
