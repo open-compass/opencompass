@@ -57,47 +57,39 @@
 
 5. Install InternLM (Optional)
 
-   Evaluate the InternLM model by following the provided examples and the steps below.
+   If you need to run the native InternLM model (non-Huggingface version), you can follow the provided example and proceed with the following steps.
 
    <details>
    <summary><b>click to show the details</b></summary>
 
-   Install InternLM-Lite
-   Install this library in your root directory
+   Install InternLM-Lite. Install this library in your root directory
 
    ```bash
    git clone https://gitlab.pjlab.org.cn/chenkeyu1/internlm-lite.git
    pip install -e internlm-lite
    ```
 
-   After that, you can create a symbolic link to associate the model weights and other files with the folder you specify. For example, in configs/models/internlm_7b.py, use the internData directory:
+   Download the model weights for the current open-source version of InternLM, which is InternLM-7b, from the following URL: [Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b)
 
    ```bash
-   ln -s /path/data ./internData
+   cd internlm-lite/data/internlm_7b
+   wegt https://download.openxlab.org.cn/models/OpenLMLab/InternLM-7b/weight/model_tp0_pp0.pt
    ```
 
-   After that, you can create a symbolic link to associate the model weights and other files with the folder you specify.
-   For example, in configs/models/internlm_7b.py, use the internData directory:
    Here, you need to provide three types of files:
 
    - Model weights
    - Model configuration
    - **Tokenizer**
-     Currently, the open-source model weights available are for InternLM-7b, and can be downloaded from the following URL:[Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b),
-     Use the following code to download the model weights
 
-   ```bash
-   wegt https://download.openxlab.org.cn/models/OpenLMLab/InternLM-7b/weight/model_tp0_pp0.pt
-   ```
-
-   The other two files can be found in the data folder of the InternLM-Lite library. The complete configuration is as follows:
+   The complete configuration is as follows:
 
    ```bash
    dict(
         type=InternLM,
-        path="./internData/",
-        tokenizer_path='./internData/V7.model',
-        model_config="./internData/model_config.py",
+        path="./internlm-lite/data/internlm_7b/",
+        tokenizer_path='./internlm-lite/data/internlm_7b/V7.model',
+        model_config="./internlm-lite/data/internlm_7b/model_config.py",
         max_out_len=100,max_seq_len=2048,batch_size=16,run_cfg=dict(num_gpus=1, num_procs=1))
    ```
 
