@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import MDLRetriever, ZeroRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import CommonsenseQADataset_CN
@@ -15,7 +15,7 @@ _ice_template = dict(
         ans: dict(
             begin='</E>',
             round=[
-                dict(role="HUMAN", prompt="Question: {question}\nAnswer: "),
+                dict(role="HUMAN", prompt="问题: {question}\n答案: "),
                 dict(role="BOT", prompt=ans_token),
             ])
         for ans, ans_token in [["A", "{A}"], ["B", "{B}"],
