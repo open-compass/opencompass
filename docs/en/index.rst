@@ -35,6 +35,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    user_guides/models.md
    user_guides/evaluation.md
    user_guides/experimentation.md
+   user_guides/metrics.md
 
 .. _AdvancedGuides:
 .. toctree::
