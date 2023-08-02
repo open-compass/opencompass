@@ -66,7 +66,7 @@ class LocalRunner(BaseRunner):
             if 'CUDA_VISIBLE_DEVICES' in os.environ:
                 all_gpu_ids = [
                     int(i) for i in re.findall(
-                        '(?<!-)\d+', os.getenv('CUDA_VISIBLE_DEVICES'))
+                        r'(?<!-)\d+', os.getenv('CUDA_VISIBLE_DEVICES'))
                 ]
             else:
                 all_gpu_ids = list(range(torch.cuda.device_count()))
