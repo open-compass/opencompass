@@ -318,6 +318,8 @@ unzip OpenCompassData.zip
 
 该项目部分的代码引用并修改自 [OpenICL](https://github.com/Shark-NLP/OpenICL)。
 
+该项目部分的数据集和提示词实现修改自 [chain-of-thought-hub](https://github.com/FranxYao/chain-of-thought-hub), [instruct-eval](https://github.com/declare-lab/instruct-eval)
+
 ## 引用
 
 ```bibtex
