@@ -318,7 +318,7 @@ For more tutorials, please check our [Documentation](https://opencompass.readthe
 
 Some code in this project is cited and modified from [OpenICL](https://github.com/Shark-NLP/OpenICL).
 
-Some dataset and prompt implement is modified from [chain-of-thought-hub](https://github.com/FranxYao/chain-of-thought-hub) and [instruct-eval](https://github.com/declare-lab/instruct-eval)
+Some datasets and prompt implementations are modified from [chain-of-thought-hub](https://github.com/FranxYao/chain-of-thought-hub) and [instruct-eval](https://github.com/declare-lab/instruct-eval).
 
 ## Citation
 
