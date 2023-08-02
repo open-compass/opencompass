@@ -69,6 +69,7 @@
    pip install -e internlm-lite
    ```
 
+   (**internlm-lite**具体依赖安装请查看该库教程)
    下载模型权重。目前开源的模型权重为InternLM-7b，网址：[Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b)，下载代码为
 
    ```bash

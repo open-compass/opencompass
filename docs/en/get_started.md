@@ -69,6 +69,7 @@
    pip install -e internlm-lite
    ```
 
+   (For specific installation dependencies of **internlm-lite**, please refer to the library tutorial)
    Download the model weights for the current open-source version of InternLM, which is InternLM-7b, from the following URL: [Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b)
 
    ```bash
