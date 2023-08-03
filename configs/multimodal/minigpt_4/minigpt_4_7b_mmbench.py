@@ -28,7 +28,7 @@ minigpt_4_dataloader = dict(batch_size=1,
 minigpt_4_model = dict(
     type='minigpt-4-mmbench',
     low_resource=True,
-    llama_model='/mnt/petrelfs/share_data/ouyanglinke/vicuna-7b/',
+    llama_model='/path/to/vicuna',
     sys_prompt=  # noqa: E251
     '###Human: What is the capital of China? There are several options:\nA. Beijing\nB. Shanghai\nC. Guangzhou\nD. Shenzhen\n###Assistant: A\n'
 )
@@ -39,4 +39,4 @@ minigpt_4_evaluator = [
          save_path='work_dirs/minigpt-4-7b-mmbench.xlsx')
 ]
 
-minigpt_4_load_from = '/mnt/petrelfs/share_data/liuyuan/llm_weights/minigpt4-7b/prerained_minigpt4_7b.pth'  # noqa
+minigpt_4_load_from = '/path/to/minigpt-4'  # noqa
