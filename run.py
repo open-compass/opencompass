@@ -6,7 +6,8 @@ from datetime import datetime
 
 from mmengine.config import Config
 
-from opencompass.partitioners import NaivePartitioner, SizePartitioner
+from opencompass.partitioners import (MultimodalNaivePartitioner,
+                                      NaivePartitioner, SizePartitioner)
 from opencompass.registry import PARTITIONERS, RUNNERS
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.utils import LarkReporter, Summarizer, get_logger
@@ -35,6 +36,10 @@ def parse_args():
                         help='Debug mode, in which scheduler will run tasks '
                         'in the single process, and output will not be '
                         'redirected to files',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('--mm-eval',
+                        help='Whether or not enable multimodal evaluation',
                         action='store_true',
                         default=False)
     parser.add_argument('--dry-run',
@@ -201,7 +206,14 @@ def main():
                            'also specified --slurm or --dlc. '
                            'The "infer" configuration will be overridden by '
                            'your runtime arguments.')
-        if args.dlc or args.slurm or cfg.get('infer', None) is None:
+        # Check whether run multimodal evaluation
+        if args.mm_eval:
+            partitioner = MultimodalNaivePartitioner(
+                osp.join(cfg['work_dir'], 'predictions/'))
+            tasks = partitioner(cfg)
+            exec_mm_infer_runner(tasks, args, cfg)
+            return
+        elif args.dlc or args.slurm or cfg.get('infer', None) is None:
             # Use SizePartitioner to split into subtasks
             partitioner = SizePartitioner(
                 osp.join(cfg['work_dir'], 'predictions/'),
@@ -281,6 +293,27 @@ def main():
     if args.mode in ['all', 'eval', 'viz']:
         summarizer = Summarizer(cfg)
         summarizer.summarize(time_str=cfg_time_str)
+
+
+def exec_mm_infer_runner(tasks, args, cfg):
+    """execute multimodal infer runner according to args."""
+    if args.slurm:
+        runner = SlurmRunner(dict(type='MultimodalInferTask'),
+                             max_num_workers=args.max_num_workers,
+                             partition=args.partition,
+                             quotatype=args.quotatype,
+                             retry=args.retry,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
+    elif args.dlc:
+        raise NotImplementedError('Currently, we do not support evaluating \
+                             multimodal models on dlc.')
+    else:
+        runner = LocalRunner(task=dict(type='MultimodalInferTask'),
+                             max_num_workers=args.max_num_workers,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
+    runner(tasks)
 
 
 def exec_infer_runner(tasks, args, cfg):

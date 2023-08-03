@@ -76,7 +76,6 @@ class MMBenchDataset(Dataset):
             'context': hint,
         }
         return data
-
    def load_from_df(self, idx, key):
         if key in self.df.iloc[idx] and not pd.isna(self.df.iloc[idx][key]):
             return self.df.iloc[idx][key]
