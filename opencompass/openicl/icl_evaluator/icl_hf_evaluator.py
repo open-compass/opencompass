@@ -60,6 +60,9 @@ class HuggingfaceEvaluator(BaseEvaluator):
         Returns:
             dict: calculated scores.
         """
+        random_state = random.getstate()
+        np_random_state = np.random.get_state()
+
         random.seed(self.seed)
         np.random.seed(self.seed)
         if len(predictions) != len(references):
@@ -71,7 +74,10 @@ class HuggingfaceEvaluator(BaseEvaluator):
             }
         metric = evaluate.load(self.metric)
         scores = metric.compute(**self._preprocess(predictions, references))
-        return self._postprocess(scores)
+        result = self._postprocess(scores)
+        random.setstate(random_state)
+        np.random.set_state(np_random_state)
+        return result
 
 
 @ICL_EVALUATORS.register_module()
