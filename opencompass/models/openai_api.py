@@ -146,7 +146,9 @@ class OpenAI(BaseAPIModel):
                 messages.append(msg)
 
         # max num token for gpt-3.5-turbo is 4097
-        max_out_len = min(max_out_len, 4000 - self.get_token_len(str(input)))
+        max_out_len = min(
+            max_out_len,
+            self.max_seq_len - 50 - self.get_token_len(str(input)))
         if max_out_len <= 0:
             return ''
 
