@@ -388,7 +388,7 @@ def parse_args():
                         help='The path to your inference result. ')
     parser.add_argument('--meta',
                         type=str,
-                        default='mmbench_dev_20230712.tsv',
+                        default='data/mmbench_dev_20230712.tsv',
                         help=('The path to your meta file (dev). '
                               'Downloaded from MMBench website. '))
     args = parser.parse_args()
