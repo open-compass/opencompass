@@ -28,6 +28,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 ## News
 
 - **\[2023.08.07\]** We have added a [script](tools/eval_mmbench.py) for users to evaluate the inference results of [MMBench](https://opencompass.org.cn/MMBench)-dev. 🔥🔥🔥.
+- **\[2023.08.05\]** We have supported [GPT-4](https://openai.com/gpt-4) and [Qwen-7B](https://github.com/QwenLM/Qwen-7B)! Go to our [leaderboard](https://opencompass.org.cn/leaderboard-llm) for more results! More models are welcome to join OpenCompass. 🔥🔥🔥.
 - **\[2023.07.27\]** We have supported [CMMLU](https://github.com/haonan-li/CMMLU)! More datasets are welcome to join OpenCompass. 🔥🔥🔥.
 - **\[2023.07.21\]** Performances of Llama-2 are available in [OpenCompass leaderboard](https://opencompass.org.cn/leaderboard-llm)!  🔥🔥🔥.
 - **\[2023.07.19\]** We have supported [Llama-2](https://ai.meta.com/llama/)! Its performance report will be available soon. \[[Doc](./docs/en/get_started.md#Installation)\] 🔥🔥🔥.
