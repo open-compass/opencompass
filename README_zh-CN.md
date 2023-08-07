@@ -27,6 +27,8 @@
 
 ## 更新
 
+- **\[2023.08.07\]** 新增了 [MMBench 评测脚本](tools/eval_mmbench.py) 以支持用户自行获取 [MMBench](https://opencompass.org.cn/MMBench)-dev 的测试结果. 🔥🔥🔥.
+- **\[2023.08.05\]** [GPT-4](https://openai.com/gpt-4) 与 [Qwen-7B](https://github.com/QwenLM/Qwen-7B) 的评测结果已更新在 OpenCompass [大语言模型评测榜单](https://opencompass.org.cn/leaderboard-llm)! 🔥🔥🔥.
 - **\[2023.07.27\]** 新增了 [CMMLU](https://github.com/haonan-li/CMMLU)! 欢迎更多的数据集加入 OpenCompass. 🔥🔥🔥.
 - **\[2023.07.21\]** Llama-2 的评测结果已更新在 OpenCompass [大语言模型评测榜单](https://opencompass.org.cn/leaderboard-llm)!  🔥🔥🔥.
 - **\[2023.07.19\]** 新增了 [Llama-2](https://ai.meta.com/llama/)！我们近期将会公布其评测结果。\[[文档](./docs/zh_cn/get_started.md#安装)\] 🔥🔥🔥。
