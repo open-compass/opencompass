@@ -1,5 +1,5 @@
 from mmengine.config import read_base
-from opencompass.models.turbomind import TurboBindModel
+from opencompass.models.turbomind import TurboMindModel
 
 with read_base():
     # choose a list of datasets
@@ -19,7 +19,7 @@ _meta_template = dict(
 
 models = [
     dict(
-        type=TurboBindModel,
+        type=TurboMindModel,
         abbr='internlm-chat-7b-tb',
         path="internlm-chat-7b",
         model_path='./workspace',

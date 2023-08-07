@@ -21,7 +21,7 @@ def valid_str(string, coding='utf-8'):
     return ret
 
 
-class TurboBindModel(BaseModel):
+class TurboMindModel(BaseModel):
     """Model wrapper for TurboMind API.
 
     Args:
