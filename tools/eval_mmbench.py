@@ -1,88 +1,19 @@
-# Evaluate Inference Results of MMBench DEV SPLIT
 # Usage: python eval_mmbench.py mmbench_dev_inference_result.xlsx
-# To use this script, you need to manually set the following variables:
-# meta_pth [global], proxy [global], openai_key [arg of OpenAIWrapperInternal]
-
+import argparse
 import json
-import os
 import os.path as osp
 import pickle
 import random as rd
 import string
-import sys
-import time
 from collections import defaultdict
 
 import numpy as np
-import openai
 import pandas as pd
 from tqdm import tqdm
 
+from opencompass.models import OpenAI
+
 fout = None
-# The path of inference input file (dev), downloaded from the MMBench website
-meta_pth = '/path/to/your/mmbench_dev_20230712.tsv'
-# A temporary directory that you have writing access
-tmp_dir = '/tmp'
-# The URL of your proxy. If not required, set to None.
-proxy = 'YOUR_PROXY_URL'
-
-
-# OpenAIWrapperInternal
-class OpenAIWrapperInternal:
-
-    def __init__(self,
-                 model: str = 'gpt-3.5-turbo-0613',
-                 openai_key: str = None,
-                 max_seq_len: int = 2048,
-                 retry: int = 8,
-                 wait: int = 5,
-                 verbose: bool = False):
-        self.model = model
-        self.max_seq_len = max_seq_len
-        self.retry = retry
-        self.wait = wait
-        self.openai_key = openai_key
-        self.verbose = verbose
-        for env in ['http_proxy', 'https_proxy', 'HTTP_PROXY', 'HTTPS_PROXY']:
-            if proxy is not None:
-                os.environ[env] = proxy
-
-        openai.api_key = openai_key
-
-    def generate_inner(self,
-                       question: str,
-                       max_out_len: int = 1024,
-                       temperature: float = 0) -> str:
-        input_msgs = []
-        input_msgs.append(dict(role='user', content=question))
-
-        try:
-            response = openai.ChatCompletion.create(model=self.model,
-                                                    messages=input_msgs,
-                                                    max_tokens=max_out_len,
-                                                    n=1,
-                                                    stop=None,
-                                                    temperature=temperature)
-
-            result = response.choices[0].message.content.strip()
-            return result
-        except:  # noqa: E722
-            _ = 1 / 0
-
-    def generate(self,
-                 question: str,
-                 max_out_len: int = 1024,
-                 temperature: float = 0) -> str:
-        for i in range(self.retry):
-            try:
-                return self.generate_inner(question, max_out_len, temperature)
-            except:  # noqa: E722
-                if i != self.retry - 1:
-                    if self.verbose:
-                        print(f'Try #{i} failed, retrying...')
-                    time.sleep(self.wait)
-                pass
-        return 'Failed to obtain answer via API. '
 
 
 # Utils
@@ -312,7 +243,7 @@ def extract_answer_from_item(model, item):
         return ret, item['prediction']
 
     while retry:
-        ans = model.generate(prompt)
+        ans = model.generate([prompt])[0]
         if 'Failed to obtain answer via API' in ans:
             msg = 'GPT API failed to answer. '
             double_log(msg, fout)
@@ -362,10 +293,11 @@ def eval_sub_data(model, sub_data, answer_map):
 
 
 # Evaluate Results
-def eval_result(eval_file, eval_method):
+def eval_result(eval_file, eval_method, meta_file):
     rd.seed(2680)
     assert eval_method == 'openai'
-    model = OpenAIWrapperInternal()
+    # Set a large retry number to avoid failure
+    model = OpenAI('gpt-3.5-turbo-0613', retry=99)
 
     double_log(f'Evaluating {eval_file}', fout)
 
@@ -380,7 +312,7 @@ def eval_result(eval_file, eval_method):
     for k in data.keys():
         data[k.lower() if k not in 'ABCD' else k] = data.pop(k)
 
-    meta = load(meta_pth)
+    meta = load(meta_file)
 
     data_main = data[data['index'] < int(1e6)]
     cate_map = {i: c for i, c in zip(meta['index'], meta['category'])}
@@ -415,8 +347,8 @@ def eval_result(eval_file, eval_method):
             double_log((f'Evaluating {eval_file}: {i + 1}/{lt}, '
                         f'Acc: {hit / tot * 100: .2f}%. '), fout)
 
-    dump(data_main, f'{tmp_dir}/tmp.xlsx')
-    data_main = load(f'{tmp_dir}/tmp.xlsx')
+    dump(data_main, 'tmp.xlsx')
+    data_main = load('tmp.xlsx')
 
     res = load(result_file)
     indices = data_main['index']
@@ -448,10 +380,24 @@ def eval_result(eval_file, eval_method):
     return overall, l2, leaf
 
 
-if __name__ == '__main__':
-    eval_file = sys.argv[1]
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Evaluate Inference Results of MMBench-DEV SPLIT. ')
+    parser.add_argument('result',
+                        type=str,
+                        help='The path to your inference result. ')
+    parser.add_argument('--meta',
+                        type=str,
+                        default='mmbench_dev_20230712.tsv',
+                        help=('The path to your meta file (dev). '
+                              'Downloaded from MMBench website. '))
+    args = parser.parse_args()
+    return args
 
-    log_pth = eval_file.replace('.xlsx', '_openai_eval.log')
+
+if __name__ == '__main__':
+    args = parse_args()
+    log_pth = args.result.replace('.xlsx', '_openai_eval.log')
     fout = open(log_pth, 'a')
 
-    acc, l2, leaf = eval_result(eval_file, 'openai')
+    acc, l2, leaf = eval_result(args.result, 'openai', args.meta)
