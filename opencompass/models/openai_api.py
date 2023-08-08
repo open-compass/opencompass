@@ -50,8 +50,8 @@ class OpenAI(BaseAPIModel):
     is_api: bool = True
 
     def __init__(self,
-                 path: str,
-                 max_seq_len: int = 2048,
+                 path: str = 'gpt-3.5-turbo',
+                 max_seq_len: int = 4096,
                  query_per_second: int = 1,
                  retry: int = 2,
                  key: Union[str, List[str]] = 'ENV',
@@ -146,7 +146,9 @@ class OpenAI(BaseAPIModel):
                 messages.append(msg)
 
         # max num token for gpt-3.5-turbo is 4097
-        max_out_len = min(max_out_len, 4000 - self.get_token_len(str(input)))
+        max_out_len = min(
+            max_out_len,
+            self.max_seq_len - 50 - self.get_token_len(str(input)))
         if max_out_len <= 0:
             return ''
 
