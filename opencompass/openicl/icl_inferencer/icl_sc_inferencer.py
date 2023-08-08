@@ -135,7 +135,6 @@ class SCInferencer(BaseInferencer):
                     sc_results.append(results)
                 sc_prediction = list(map(list, zip(*sc_results)))
                 generated = sc_prediction
-                print(generated)
 
             # 5-3. Save current output
             for prompt, prediction in zip(parsed_entries, generated):
