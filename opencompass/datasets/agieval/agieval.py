@@ -40,22 +40,22 @@ class AGIEvalDataset_v2(BaseDataset):
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
         filename = osp.join(path, name + '.jsonl')
         with open(filename, encoding='utf-8') as f:
-            _data = [json.loads(line.strip()) for line in f]
-        data = []
-        for _d in _data:
-            passage = _d['passage'] if _d['passage'] else ''
-            question = passage + _d['question']
-            options = '\n'.join(_d['options']) if _d['options'] else ''
-            if _d['label']:
-                if isinstance(_d['label'], list):
-                    label = ''.join(_d['label'])
+            data = [json.loads(line.strip()) for line in f]
+        dataset = []
+        for item in data:
+            passage = item['passage'] if item['passage'] else ''
+            question = passage + item['question']
+            options = '\n'.join(item['options']) if item['options'] else ''
+            if item['label']:
+                if isinstance(item['label'], list):
+                    label = ''.join(item['label'])
                 else:
-                    label = _d['label']
+                    label = item['label']
             else:
-                label = _d['answer']
+                label = item['answer']
             d = {'question': question, 'options': options, 'label': label}
-            data.append(d)
-        dataset = Dataset.from_list(data)
+            dataset.append(d)
+        dataset = Dataset.from_list(dataset)
         return dataset
 
 
