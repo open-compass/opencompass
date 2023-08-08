@@ -245,11 +245,14 @@ class LMTemplateParser:
                         section_stack.append((item['section'], i + 1))
                     else:
                         raise ValueError(f'Invalid pos {item["pos"]}')
+                # if in "begin" or "end" section
                 elif section_stack[-1][0] in ['begin', 'end']:
                     role_dict = self._update_role_dict(item)
-                    new_str, generate = self._prompt2str(item,
-                                                         role_dict,
-                                                         for_gen=mode == 'gen')
+                    new_str, generate = self._prompt2str(
+                        item,
+                        role_dict,
+                        # never stop generation
+                        for_gen=False)
                     prompt += new_str
 
             prompt = self.meta_template.get('begin', '') + prompt
