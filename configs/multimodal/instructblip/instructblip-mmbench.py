@@ -9,7 +9,7 @@ val_pipeline = [
          std=(0.26862954, 0.26130258, 0.27577711)),
     dict(type='mmpretrain.PackInputs',
          algorithm_keys=[
-             'question', 'answer', 'category', 'l2-category', 'context',
+             'question', 'category', 'l2-category', 'context',
              'index', 'options_dict', 'options', 'split'
          ])
 ]

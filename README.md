@@ -21,18 +21,22 @@ English | [简体中文](README_zh-CN.md)
     👋 join us on <a href="https://twitter.com/intern_lm" target="_blank">Twitter</a>, <a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> and <a href="https://r.vansin.top/?r=internwx" target="_blank">WeChat</a>
 </p>
 
-Welcome to **OpenCompass**!
+## 🧭	Welcome
+
+to **OpenCompass**!
 
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
-## News
+## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **\[2023.07.27\]** We have supported [CMMLU](https://github.com/haonan-li/CMMLU)! More datasets are welcomed to join OpenCompass. 🔥🔥🔥.
+- **\[2023.08.07\]** We have added a [script](tools/eval_mmbench.py) for users to evaluate the inference results of [MMBench](https://opencompass.org.cn/MMBench)-dev. 🔥🔥🔥.
+- **\[2023.08.05\]** We have supported [GPT-4](https://openai.com/gpt-4) and [Qwen-7B](https://github.com/QwenLM/Qwen-7B)! Go to our [leaderboard](https://opencompass.org.cn/leaderboard-llm) for more results! More models are welcome to join OpenCompass. 🔥🔥🔥.
+- **\[2023.07.27\]** We have supported [CMMLU](https://github.com/haonan-li/CMMLU)! More datasets are welcome to join OpenCompass. 🔥🔥🔥.
 - **\[2023.07.21\]** Performances of Llama-2 are available in [OpenCompass leaderboard](https://opencompass.org.cn/leaderboard-llm)!  🔥🔥🔥.
 - **\[2023.07.19\]** We have supported [Llama-2](https://ai.meta.com/llama/)! Its performance report will be available soon. \[[Doc](./docs/en/get_started.md#Installation)\] 🔥🔥🔥.
 - **\[2023.07.13\]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models 🔥🔥🔥.
 
-## Introduction
+## ✨ Introduction
 
 OpenCompass is a one-stop platform for large model evaluation, aiming to provide a fair, open, and reproducible benchmark for large model evaluation. Its main features includes:
 
@@ -46,13 +50,13 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 
 - **Experiment management and reporting mechanism**: Use config files to fully record each experiment, support real-time reporting of results.
 
-## Leaderboard
+## 📊 Leaderboard
 
 We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
-[![image](https://github.com/InternLM/opencompass/assets/13503330/80c5a42c-ddf0-4c6f-b39e-c175711ac381)](https://opencompass.org.cn/rank)
+<p align="right"><a href="#top">🔝Back to top</a></p>
 
-## Dataset Support
+## 📖 Dataset Support
 
 <table align="center">
   <tbody>
@@ -239,7 +243,9 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
   </tbody>
 </table>
 
-## Model Support
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
+## 📖 Model Support
 
 <table align="center">
   <tbody>
@@ -291,7 +297,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
   </tbody>
 </table>
 
-## Installation
+## 🛠️ Installation
 
 Below are the steps for quick installation and datasets preparation.
 
@@ -308,19 +314,21 @@ unzip OpenCompassData.zip
 
 Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
 
-## Evaluation
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
+## 🏗️ ️Evaluation
 
 Make sure you have installed OpenCompass correctly and prepared your datasets according to the above steps. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html#quick-start) to learn how to run an evaluation task.
 
 For more tutorials, please check our [Documentation](https://opencompass.readthedocs.io/en/latest/index.html).
 
-## Acknowledgements
+## 🤝 Acknowledgements
 
 Some code in this project is cited and modified from [OpenICL](https://github.com/Shark-NLP/OpenICL).
 
 Some datasets and prompt implementations are modified from [chain-of-thought-hub](https://github.com/FranxYao/chain-of-thought-hub) and [instruct-eval](https://github.com/declare-lab/instruct-eval).
 
-## Citation
+## 🖊️ Citation
 
 ```bibtex
 @misc{2023opencompass,
@@ -330,3 +338,5 @@ Some datasets and prompt implementations are modified from [chain-of-thought-hub
     year={2023}
 }
 ```
+
+<p align="right"><a href="#top">🔝Back to top</a></p>

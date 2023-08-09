@@ -64,6 +64,20 @@ class MultimodalInferTask:
         evaluator_name = self.evaluator[0]['type']
         return f'{model_name}-{dataset_name}-{evaluator_name}'
 
+    def get_log_path(self, file_extension: str = 'json') -> str:
+        """Get the path to the log file.
+
+        Args:
+            file_extension (str): The file extension of the log file.
+                Default: 'json'.
+        """
+        model_name = self.model['type']
+        dataset_name = self.dataloader['dataset']['type']
+        evaluator_name = self.evaluator[0]['type']
+
+        return osp.join(model_name,
+                        f'{dataset_name}-{evaluator_name}.{file_extension}')
+
     def get_command(self, cfg_path, template):
         """Get the command template for the task.
 
