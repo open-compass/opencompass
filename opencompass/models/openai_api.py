@@ -80,6 +80,7 @@ class OpenAI(BaseAPIModel):
             self.orgs = org
         self.org_ctr = 0
         self.url = openai_api_base
+        self.path = path
 
     def generate(
         self,
@@ -146,9 +147,17 @@ class OpenAI(BaseAPIModel):
                 messages.append(msg)
 
         # max num token for gpt-3.5-turbo is 4097
+        context_window = 4096
+        if '32k' in self.path:
+            context_window = 32768
+        elif '16k' in self.path:
+            context_window = 16384
+        elif 'gpt-4' in self.path:
+            context_window = 8192
+
+        # Hold out 100 tokens due to potential errors in tiktoken calculation
         max_out_len = min(
-            max_out_len,
-            self.max_seq_len - 50 - self.get_token_len(str(input)))
+            max_out_len, context_window - self.get_token_len(str(input)) - 100)
         if max_out_len <= 0:
             return ''
 
