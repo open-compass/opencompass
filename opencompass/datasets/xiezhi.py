@@ -33,6 +33,7 @@ class XiezhiDataset(BaseDataset):
                     if len(options) != 4:
                         continue
                     answer = 'ABCD'[options.index(data['answer'])]
+                    # The longer the label, the more fine-grained the concept
                     labels = sorted(
                         data['labels' if 'chn' in name else 'label'],
                         key=lambda x: len(x),
@@ -60,6 +61,14 @@ class XiezhiRetriever(BaseRetriever):
         super().__init__(dataset, ice_separator, ice_eos_token, ice_num)
 
     def retrieve(self):
+        """Retrieve in-context examples for each test case.
+
+        For each one of the in-context example, there is a list of label,
+        indicating the categories to which the example is related. For each one
+        of the test case, there is also a list of label, indicating the
+        categories. This retriever will retrieve the in-context examples that
+        share at least one label with the test case.
+        """
         label2indice = {}
         for index, item in enumerate(self.index_ds):
             for label in item['labels']:
