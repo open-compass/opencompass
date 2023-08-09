@@ -1,7 +1,7 @@
 import os
-import re
 import sys
 
+import mmengine
 import torch
 import torch.nn as nn
 from mmengine.device import get_device
@@ -43,15 +43,16 @@ class MiniGPT4MMBench(MiniGPT4):
 
     Args:
         llama_model (str): The path of vicuna path.
-        sys_prompt (str): The prompt added to the beginning
-            of each query. Defaults to ''.
+        prompt_constructor (dict): The config of prompt constructor.
+        post_processor (dict): The config of post processor.
         low_resource (bool): Whether loaded in low precision.
             Defaults to False.
     """
 
     def __init__(self,
                  llama_model: str,
-                 sys_prompt: str = '',
+                 prompt_constructor: dict,
+                 post_processor: dict,
                  low_resource: bool = False) -> None:
         super().__init__(llama_model=llama_model, low_resource=low_resource)
 
@@ -62,7 +63,10 @@ class MiniGPT4MMBench(MiniGPT4):
         ]
         self.stopping_criteria = StoppingCriteriaList(
             [StoppingCriteriaSub(stops=stop_words_ids)])
-        self.sys_prompt = sys_prompt
+        self.prompt_constructor = mmengine.registry.build_from_cfg(
+            prompt_constructor, MM_MODELS)
+        self.post_processor = mmengine.registry.build_from_cfg(
+            post_processor, MM_MODELS)
 
     def encode_img(self, image):
         device = image.device
@@ -96,38 +100,13 @@ class MiniGPT4MMBench(MiniGPT4):
 
     def generate(self, batch):
         inputs = self.pack_inputs(batch)
-        image = inputs.pop('image')
+        inputs = self.prompt_constructor(inputs)
+        image = inputs['image']
+        prompt = inputs['prompt']
         data_samples = inputs['data_samples']
-        samples = {'image': image}
-        question = [
-            data_sample.get('question') for data_sample in data_samples
-        ]
-        options = [data_sample.get('options') for data_sample in data_samples]
-        samples.update({'question': question[0]})
-        samples.update({'options': options[0]})
-        if data_samples[0].get('context') is not None:
-            context = [
-                data_sample.get('context') for data_sample in data_samples
-            ]
-            samples.update({'context': context})
-        data_sample = data_samples[0]
-        img_prompt = '###Human: <Img><ImageHere></Img> '
-        if 'context' in samples:
-            context_prompt = samples['context'][0]
 
-        question = samples['question']
-        options = samples['options']
-        if 'context' in samples:
-            prompt = img_prompt + ' ' + context_prompt + ' ' + question + ' ' + options  # noqa
-        else:
-            prompt = img_prompt + ' ' + question + ' ' + options
-
-        # prompt = self.sys_prompt + prompt
-        prompt = prompt + '###Assistant:'
-
-        image = samples['image']
+        # The main process of generation
         img_embeds, _ = self.encode_img(image)
-
         prompt_segs = prompt.split('<ImageHere>')
         prompt_seg_tokens = [
             self.llama_tokenizer(seg,
@@ -157,25 +136,10 @@ class MiniGPT4MMBench(MiniGPT4):
             stopping_criteria=self.stopping_criteria,
             num_return_sequences=1)
 
-        output_token = outputs[0]
-        if output_token[0] == 0:
-            output_token = output_token[1:]
-        if output_token[0] == 1:
-            output_token = output_token[1:]
-        output_text = self.llama_tokenizer.decode(output_token,
-                                                  add_special_tokens=False)
-        output_text = self.post_process(output_text)
-        data_sample.pred_answer = output_text
-        return data_sample
-
-    def post_process(self, output_text):
-        output_text = output_text.split('###')[0]
-        output_text = output_text.split('Assistant:')[-1].strip()
-        output_text = output_text.strip('</s><s>')
-        output_text = output_text.strip('</Img>')
-        output_text = output_text.strip()
-        pattern = re.compile(r'([A-Z]\.)')
-        res = pattern.findall(output_text)
-        if len(res) > 0:
-            output_text = res[0][:-1]
-        return output_text
+        for i, data_sample in enumerate(data_samples):
+            output_token = outputs[i]
+            output_text = self.post_processor(output_token,
+                                              self.llama_tokenizer)
+            data_sample.pred_answer = output_text
+            data_samples[i] = data_sample
+        return data_samples

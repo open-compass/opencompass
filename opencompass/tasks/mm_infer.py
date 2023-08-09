@@ -4,7 +4,7 @@ import os
 import os.path as osp
 import random
 import time
-from typing import Sequence
+from typing import List, Sequence
 
 import torch
 import torch.distributed as dist
@@ -77,6 +77,22 @@ class MultimodalInferTask:
 
         return osp.join(model_name,
                         f'{dataset_name}-{evaluator_name}.{file_extension}')
+
+    def get_output_paths(self, file_extension: str = 'json') -> List[str]:
+        """Get the path to the output file.
+
+        Args:
+            file_extension (str): The file extension of the log file.
+                Default: 'json'.
+        """
+        model_name = self.model['type']
+        dataset_name = self.dataloader['dataset']['type']
+        evaluator_name = self.evaluator[0]['type']
+
+        return [
+            osp.join(model_name, dataset_name,
+                     f'{evaluator_name}.{file_extension}')
+        ]
 
     def get_command(self, cfg_path, template):
         """Get the command template for the task.
