@@ -14,7 +14,7 @@ numpy==1.23.4
 openai
 pandas<2.0.0
 rank_bm25==0.2.2
-requests==2.28.1
+requests==2.31.0
 rouge_score
 scikit_learn==1.2.1
 sentence_transformers==2.2.2
