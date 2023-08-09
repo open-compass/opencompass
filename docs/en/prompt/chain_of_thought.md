@@ -52,6 +52,7 @@ Question: {question}\nLet's think step by step:\n{answer}
 The SC (Self-Consistency) method is proposed in [this paper](https://arxiv.org/abs/2203.11171), which will sample multiple reasoning paths for the question, and make majority voting to the generated answers for LLMs. This method displays remarkable proficiency among reasoning tasks with high accuracy but may consume more time and resources when inferencing, because of the majority voting strategy. In OpenCompass, You can easily implement the SC method by replacing GenInferencer with SCInferencer in the dataset configuration and setting the corresponding parameters like:
 
 ```python
+# This SC gsm8k config can be found at: opencompass.configs.datasets.gsm8k.gsm8k_gen_a3e34a.py
 gsm8k_infer_cfg = dict(
     inferencer=dict(
         type=SCInferencer, # Replace GenInferencer with SCInferencer.
