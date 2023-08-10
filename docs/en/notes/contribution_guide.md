@@ -102,7 +102,7 @@ git checkout main -b branchname
   ```
 
 - Create a PR
-  ![avatar](https://user-images.githubusercontent.com/22607038/195053564-71bd3cb4-b8d4-4ed9-9075-051e138b7fd4.png)
+  ![avatar](https://github.com/InternLM/opencompass/assets/22607038/08feb221-b145-4ea8-8e20-05f143081604)
 
 - Revise PR message template to describe your motivation and modifications made in this PR. You can also link the related issue to the PR manually in the PR message (For more information, checkout the [official guidance](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)).
 

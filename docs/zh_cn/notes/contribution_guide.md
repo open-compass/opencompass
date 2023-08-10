@@ -103,7 +103,7 @@ git checkout main -b branchname
 
 - 创建一个拉取请求
 
-  ![avatar](https://user-images.githubusercontent.com/22607038/195053564-71bd3cb4-b8d4-4ed9-9075-051e138b7fd4.png)
+  ![avatar](https://github.com/InternLM/opencompass/assets/22607038/08feb221-b145-4ea8-8e20-05f143081604)
 
 - 修改拉取请求信息模板，描述修改原因和修改内容。还可以在 PR 描述中，手动关联到相关的议题 (issue),（更多细节，请参考[官方文档](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)）。
 
