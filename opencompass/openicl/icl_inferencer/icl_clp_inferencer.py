@@ -13,7 +13,7 @@ from opencompass.registry import ICL_INFERENCERS
 from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
 from ..utils import get_logger
-from .icl_base_inferencer import BaseInferencer, PPLInferencerOutputHandler
+from .icl_base_inferencer import BaseInferencer, CLPInferencerOutputHandler
 
 logger = get_logger(__name__)
 
@@ -79,7 +79,7 @@ class CLPInferencer(BaseInferencer):
                   output_json_filename: Optional[str] = None,
                   normalizing_str: Optional[str] = None) -> List:
         # 1. Preparation for output logs
-        output_handler = PPLInferencerOutputHandler()
+        output_handler = CLPInferencerOutputHandler()
 
         ice = []
 
@@ -87,6 +87,20 @@ class CLPInferencer(BaseInferencer):
             output_json_filepath = self.output_json_filepath
         if output_json_filename is None:
             output_json_filename = self.output_json_filename
+
+        # CLP cannot infer with log probability for api models
+        # unless model provided such options which needs specific
+        # implementation, open an issue if you encounter the case.
+        if self.model.is_api:
+            # Write empty file in case always rerun for this model
+            if self.is_main_process:
+                os.makedirs(output_json_filepath, exist_ok=True)
+                err_msg = 'API model is not supported for conditional log '\
+                    'probability inference and skip this exp.'
+                output_handler.results_dict = {'error': err_msg}
+                output_handler.write_to_json(output_json_filepath,
+                                             output_json_filename)
+            raise ValueError(err_msg)
 
         # 2. Get results of retrieval process
         if self.fix_id_list:
@@ -117,7 +131,7 @@ class CLPInferencer(BaseInferencer):
                 choice_ids = [self.model.tokenizer.encode(c) for c in choices]
                 if self.model.tokenizer.__class__.__name__ == 'ChatGLMTokenizer':  # noqa
                     choice_ids = [c[2:] for c in choice_ids]
-                else:
+                elif hasattr(self.model.tokenizer, 'add_bos_token'):
                     if self.model.tokenizer.add_bos_token:
                         choice_ids = [c[1:] for c in choice_ids]
                     if self.model.tokenizer.add_eos_token:
@@ -135,6 +149,7 @@ class CLPInferencer(BaseInferencer):
                     ice[idx],
                     ice_template=ice_template,
                     prompt_template=prompt_template)
+                prompt = self.model.parse_template(prompt, mode='ppl')
                 if self.max_seq_len is not None:
                     prompt_token_num = get_token_len(prompt)
                     # add one because additional token will be added in the end

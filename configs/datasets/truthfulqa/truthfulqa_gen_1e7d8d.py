@@ -11,9 +11,7 @@ truthfulqa_reader_cfg = dict(
 
 # TODO: allow empty output-column
 truthfulqa_infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template='{question}'),
+    prompt_template=dict(type=PromptTemplate, template='{question}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
@@ -31,6 +29,7 @@ truthfulqa_eval_cfg = dict(
 
 truthfulqa_datasets = [
     dict(
+        abbr='truthful_qa',
         type=TruthfulQADataset,
         path='truthful_qa',
         name='generation',

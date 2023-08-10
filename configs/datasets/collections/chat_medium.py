@@ -53,5 +53,9 @@ with read_base():
     from ..triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
     from ..flores.flores_gen_806ede import flores_datasets
     from ..crowspairs.crowspairs_gen_21f7cb import crowspairs_datasets
+    from ..civilcomments.civilcomments_ppl_a3c5fd import civilcomments_datasets
+    from ..jigsawmultilingual.jigsawmultilingual_ppl_fe50d8 import jigsawmultilingual_datasets
+    from ..realtoxicprompts.realtoxicprompts_gen_7605e4 import realtoxicprompts_datasets
+    from ..truthfulqa.truthfulqa_gen_5ddc62 import truthfulqa_datasets
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

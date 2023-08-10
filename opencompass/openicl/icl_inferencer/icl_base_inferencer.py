@@ -147,6 +147,23 @@ class PPLInferencerOutputHandler:
         self.results_dict[str(idx)]['label: ' + str(label)]['prompt'] = prompt
         self.results_dict[str(idx)]['label: ' + str(label)]['PPL'] = ppl
 
+
+class CLPInferencerOutputHandler:
+    results_dict = {}
+
+    def __init__(self) -> None:
+        self.results_dict = {}
+
+    def write_to_json(self, save_dir: str, filename: str):
+        """Dump the result to a json file."""
+        dump_results_dict(self.results_dict, Path(save_dir) / filename)
+
+    def save_ice(self, ice):
+        for idx, example in enumerate(ice):
+            if str(idx) not in self.results_dict.keys():
+                self.results_dict[str(idx)] = {}
+            self.results_dict[str(idx)]['in-context examples'] = example
+
     def save_prompt_and_condprob(self, input, prompt, cond_prob, idx, choices):
         if str(idx) not in self.results_dict.keys():
             self.results_dict[str(idx)] = {}
