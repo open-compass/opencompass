@@ -128,8 +128,7 @@ class TurboMindModel(BaseModel):
         assert type(
             input
         ) is str, 'We only support string for TurboMind Python API now'
-        # import pdb;pdb.set_trace()
-        # prompt = self.model.get_prompt('', sequence_start=True)
+
         intput_token_ids = self.tokenizer.encode(input)
 
         for _ in range(self.retry):
