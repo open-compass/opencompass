@@ -1,3 +1,6 @@
+from opencompass.multimodal.models.minigpt_4 import (
+    MiniGPT4MMBenchPromptConstructor, MiniGPT4PostProcessor)
+
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.torchvision/Resize',
@@ -9,8 +12,8 @@ val_pipeline = [
          std=(0.26862954, 0.26130258, 0.27577711)),
     dict(type='mmpretrain.PackInputs',
          algorithm_keys=[
-             'question', 'category', 'l2-category', 'context',
-             'index', 'options_dict', 'options', 'split'
+             'question', 'category', 'l2-category', 'context', 'index',
+             'options_dict', 'options', 'split'
          ])
 ]
 
@@ -27,11 +30,12 @@ minigpt_4_dataloader = dict(batch_size=1,
 # model settings
 minigpt_4_model = dict(
     type='minigpt-4-mmbench',
-    low_resource=True,
-    llama_model='/path/to/vicuna',
-    sys_prompt=  # noqa: E251
-    '###Human: What is the capital of China? There are several options:\nA. Beijing\nB. Shanghai\nC. Guangzhou\nD. Shenzhen\n###Assistant: A\n'
-)
+    low_resource=False,
+    llama_model='/path/to/vicuna-7b/',
+    prompt_constructor=dict(type=MiniGPT4MMBenchPromptConstructor,
+                            image_prompt='###Human: <Img><ImageHere></Img>',
+                            reply_prompt='###Assistant:'),
+    post_processor=dict(type=MiniGPT4PostProcessor))
 
 # evaluation settings
 minigpt_4_evaluator = [
@@ -39,4 +43,4 @@ minigpt_4_evaluator = [
          save_path='work_dirs/minigpt-4-7b-mmbench.xlsx')
 ]
 
-minigpt_4_load_from = '/path/to/minigpt-4'  # noqa
+minigpt_4_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
