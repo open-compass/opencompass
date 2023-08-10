@@ -183,8 +183,10 @@ class OpenAI(BaseAPIModel):
                     if self.keys[self.key_ctr] not in self.invalid_keys:
                         break
 
+                key = self.keys[self.key_ctr]
+
             header = {
-                'Authorization': f'Bearer {self.keys[self.key_ctr]}',
+                'Authorization': f'Bearer {key}',
                 'content-type': 'application/json',
             }
 
@@ -224,7 +226,8 @@ class OpenAI(BaseAPIModel):
                         time.sleep(1)
                         continue
                     elif response['error']['code'] == 'insufficient_quota':
-                        self.invalid_keys.add(self.keys[self.key_ctr])
+                        self.invalid_keys.add(key)
+                        self.logger.error(f'insufficient_quota key: {key}')
                         continue
 
                     self.logger.error('Find error message in response: ',
