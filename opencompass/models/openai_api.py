@@ -227,7 +227,7 @@ class OpenAI(BaseAPIModel):
                         continue
                     elif response['error']['code'] == 'insufficient_quota':
                         self.invalid_keys.add(key)
-                        self.logger.error(f'insufficient_quota key: {key}')
+                        self.logger.warn(f'insufficient_quota key: {key}')
                         continue
 
                     self.logger.error('Find error message in response: ',
