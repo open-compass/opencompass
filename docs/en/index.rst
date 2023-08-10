@@ -44,6 +44,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
 
    advanced_guides/new_dataset.md
    advanced_guides/new_model.md
+   advanced_guides/evaluation_turbomind.md
 
 .. _Prompt:
 .. toctree::
