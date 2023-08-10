@@ -37,7 +37,7 @@ class LocalRunner(BaseRunner):
                  task: ConfigDict,
                  max_num_workers: int = 16,
                  debug: bool = False,
-                 max_workers_per_gpu=1,
+                 max_workers_per_gpu: int = 1,
                  lark_bot_url: str = None):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.max_num_workers = max_num_workers
