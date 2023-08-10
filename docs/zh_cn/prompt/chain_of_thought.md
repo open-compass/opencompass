@@ -65,7 +65,7 @@ gsm8k_eval_cfg = dict(sc_size=SAMPLE_SIZE)
 ```
 
 ```{note}
-注意，OpenCompass 默认使用默认使用 argmax 的方式采样下一个 token，因此若不指定采样参数，模型每次的推理结果将会是完全一致的，多轮评测将会失效。
+注意，OpenCompass 默认使用 argmax 的方式采样下一个 token，因此若不指定采样参数，模型每次的推理结果将会是完全一致的，多轮评测将会失效。
 ```
 
 其中 `SAMPLE_SIZE` 是推理路径的数量，较高的值通常会带来更高的性能。SC方法的原论文中展示了不同推理任务间推理路径数量与性能之间的关系：
