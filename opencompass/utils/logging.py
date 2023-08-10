@@ -50,7 +50,7 @@ class FilterDuplicateMessage(logging.Filter):
         super().__init__(name)
         self.seen: set = set()
 
-        if isinstance(str):
+        if isinstance(filter_duplicate_level, str):
             filter_duplicate_level = filter_duplicate_level.split(',')
 
         self.filter_duplicate_level = []
