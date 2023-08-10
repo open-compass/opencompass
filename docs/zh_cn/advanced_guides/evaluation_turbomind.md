@@ -6,7 +6,7 @@
 
 ## 安装OpenCompass
 
-请根据OpenCompass[安装指南](https://github.com/InternLM/opencompass#installation) 来安装算法库和准备数据集。
+请根据OpenCompass[安装指南](https://opencompass.readthedocs.io/en/latest/get_started.html) 来安装算法库和准备数据集。
 
 ## 安装LMDeploy
 
