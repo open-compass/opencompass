@@ -73,6 +73,11 @@ class OpenAI(BaseAPIModel):
             self.keys = [os.getenv('OPENAI_API_KEY') if key == 'ENV' else key]
         else:
             self.keys = key
+
+        # record invalid keys and skip them when requesting API
+        # - keys have insufficient_quota
+        self.invalid_keys = set()
+
         self.key_ctr = 0
         if isinstance(org, str):
             self.orgs = [org]
@@ -164,15 +169,27 @@ class OpenAI(BaseAPIModel):
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.wait()
-            if hasattr(self, 'keys'):
-                with Lock():
+
+            with Lock():
+                if len(self.invalid_keys) == len(self.keys):
+                    raise RuntimeError('All keys have insufficient quota.')
+
+                # find the next valid key
+                while True:
                     self.key_ctr += 1
                     if self.key_ctr == len(self.keys):
                         self.key_ctr = 0
-                header = {
-                    'Authorization': f'Bearer {self.keys[self.key_ctr]}',
-                    'content-type': 'application/json',
-                }
+
+                    if self.keys[self.key_ctr] not in self.invalid_keys:
+                        break
+
+                key = self.keys[self.key_ctr]
+
+            header = {
+                'Authorization': f'Bearer {key}',
+                'content-type': 'application/json',
+            }
+
             if self.orgs:
                 with Lock():
                     self.org_ctr += 1
@@ -208,6 +225,11 @@ class OpenAI(BaseAPIModel):
                     if response['error']['code'] == 'rate_limit_exceeded':
                         time.sleep(1)
                         continue
+                    elif response['error']['code'] == 'insufficient_quota':
+                        self.invalid_keys.add(key)
+                        self.logger.warn(f'insufficient_quota key: {key}')
+                        continue
+
                     self.logger.error('Find error message in response: ',
                                       str(response['error']))
             max_num_retries += 1
