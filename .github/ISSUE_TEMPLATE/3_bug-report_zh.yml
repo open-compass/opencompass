@@ -11,42 +11,77 @@ body:
         如果你已经有了解决方案，我们非常欢迎你直接创建一个新的 PR 来解决这个问题。创建 PR 的流程可以参考[文档](https://opencompass.readthedocs.io/zh_CN/master/community/CONTRIBUTING.html)。
         如果你需要我们的帮助，请填写以下内容帮助我们定位 Bug。
 
+  - type: checkboxes
+    attributes:
+      label: 先决条件
+      description: 在创建新问题之前，请检查以下项目。
+      options:
+      - label: 我已经搜索过 [问题](https://github.com/InternLM/opencompass/issues/) 和 [讨论](https://github.com/InternLM/opencompass/discussions) 但未得到预期的帮助。
+        required: true
+      - label: 错误在 [最新版本](https://github.com/InternLM/opencompass) 中尚未被修复。
+        required: true
 
-  - type: textarea
-    id: describe
+  - type: dropdown
+    id: task
+    attributes:
+      label: 问题类型
+      description: 问题出现时
+      options:
+        - 我正在使用官方支持的任务/模型/数据集进行评估。
+        - 我修改了代码（配置不视为代码），或者我正在处理我自己的任务/模型/数据集。
     validations:
       required: true
-    attributes:
-      label: 描述该错误
-      description: |
-        请简要说明你遇到的错误。如果可以的话，请提供一个简短的代码片段帮助我们复现这一错误。
-      placeholder: |
-        问题的简要说明
-
-        ```python
-        # 复现错误的代码片段
-        ```
-
-        ```shell
-        # 发生错误时你的运行命令
-        ```
-
-        ```
-        错误信息和日志，请展示全部的错误日志和 traceback
-        ```
 
   - type: textarea
     id: environment
     validations:
       required: true
     attributes:
-      label: 环境信息
+      label: 环境
       description: |
-        请运行指令 `python -c "import opencompass.utils;import pprint;pprint.pprint(dict(opencompass.utils.collect_env()))"` 来收集必要的环境信息，并贴在下方。
+        请运行 `python -c "import opencompass.utils;import pprint;pprint.pprint(dict(opencompass.utils.collect_env()))"` 来收集必要的环境信息并粘贴在此处。
       placeholder: |
         ```python
         # 上述命令的输出
         ```
+
+  - type: textarea
+    attributes:
+      label: 重现问题 - 代码/配置示例
+      description: |
+        请提供重现您遇到的问题的代码或配置示例。它可以是一个Colab链接或仅仅是一个代码片段。
+      placeholder: |
+        ```python
+        # 重现问题的示例代码
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 重现问题 - 命令或脚本
+      description: |
+        您运行了什么命令或脚本？
+      placeholder: |
+        ```shell
+        您运行的命令或脚本。
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 重现问题 - 错误信息
+      description: |
+        请提供您收到的错误消息或日志，并提供完整的追溯。
+
+        提示：您可以通过拖放图片或日志文件到文本区域来附加它们。
+      placeholder: |
+        ```
+        您收到的错误消息或日志，带有完整的追溯。
+        ```
+    validations:
+      required: true
 
   - type: textarea
     id: other
