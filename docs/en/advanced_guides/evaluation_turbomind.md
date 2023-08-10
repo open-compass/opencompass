@@ -2,13 +2,13 @@
 
 We now support evaluation of models accelerated by the [LMDeploy](https://github.com/InternLM/lmdeploy). LMDeploy is a toolkit designed for compressing, deploying, and serving LLM. **TurboMind** is an efficient inference engine proposed by LMDeploy. OpenCompass is compatible with TurboMind. We now illustrate how to evaluate a model with the support of TurboMind in OpenCompass.
 
-# Setup
+## Setup
 
-## Install OpenCompass
+### Install OpenCompass
 
 Please follow the [instructions](https://opencompass.readthedocs.io/en/latest/get_started.html) to install the OpenCompass and prepare the evaluation datasets.
 
-## Install LMDeploy
+### Install LMDeploy
 
 Install lmdeploy via pip (python 3.8+)
 
@@ -16,11 +16,11 @@ Install lmdeploy via pip (python 3.8+)
 pip install lmdeploy
 ```
 
-# Evaluation
+## Evaluation
 
 We take the InternLM as example.
 
-## Step-1: Get InternLM model
+### Step-1: Get InternLM model
 
 ```shell
 # 1. Download InternLM model(or use the cached model's checkpoint)
@@ -38,13 +38,13 @@ python3 -m lmdeploy.serve.turbomind.deploy internlm-chat-7b /path/to/internlm-ch
 
 ```
 
-## Step-2: Verify the Converted Model
+### Step-2: Verify the Converted Model
 
 ```shell
 python -m lmdeploy.turbomind.chat ./workspace
 ```
 
-## Step-3: Evaluate the Converted Model
+### Step-3: Evaluate the Converted Model
 
 In the home folder of OpenCompass
 
