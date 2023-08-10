@@ -44,6 +44,7 @@ OpenCompass 上手路线
    :caption: 提示词
 
    prompt/few_shot.md
+   prompt/chain_of_thought.md
    prompt/prompt_template.md
    prompt/meta_template.md
 

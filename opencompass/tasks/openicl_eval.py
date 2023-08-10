@@ -133,11 +133,16 @@ class OpenICLEvalTask(BaseTask):
                 proc = TEXT_POSTPROCESSORS.get(
                     self.eval_cfg['pred_postprocessor']['type'])
                 if sc_size is not None:
-                    pred_strs = [
-                        self._get_vote_out(proc, s) for s in pred_strs
-                    ]
+                    pred_strs = [[proc(s) for s in preds]
+                                 for preds in pred_strs]
                 else:
                     pred_strs = [proc(s) for s in pred_strs]
+
+            # Get majority voting predictions if use self-consistency
+            if sc_size is not None:
+                pred_strs = [
+                    Counter(s).most_common(1)[0][0] for s in pred_strs
+                ]
 
             icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
             result = icl_evaluator.score(
@@ -185,14 +190,6 @@ class OpenICLEvalTask(BaseTask):
                 end = end_idx
 
         return s[start:end]
-
-    def _get_vote_out(
-        self,
-        proc: Optional[callable],
-        sc_prediction: Optional[list],
-    ) -> str:
-        counter = Counter([proc(prediction) for prediction in sc_prediction])
-        return counter.most_common(1)[0][0]
 
 
 def parse_args():

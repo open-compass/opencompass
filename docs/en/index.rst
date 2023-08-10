@@ -52,6 +52,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :caption: Prompt
 
    prompt/few_shot.md
+   prompt/chain_of_thought.md
    prompt/prompt_template.md
    prompt/meta_template.md
 

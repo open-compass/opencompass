@@ -49,13 +49,14 @@ Question: {question}\nLet's think step by step:\n{answer}
 
 ## 3. Self-Consistency
 
-SC (Self-Consistency) 方法是在 [此文章](https://arxiv.org/abs/2203.11171) 中提出的，该方法会为问题生成多个不同的推理路径，并对生成的答案进行众数投票。这种方法在复杂推理任务中表现出了显著的能力，但由于需要推理多次来采样多条推理链，所以可能会消耗很多的时间和资源。在 OpenCompass 中，您可以在数据集配置中简单地设置 SC 方法，例如：
+SC (Self-Consistency) 方法是在 [此文章](https://arxiv.org/abs/2203.11171) 中提出的，该方法会为问题生成多个不同的推理路径，并对生成的答案进行众数投票。这种方法在复杂推理任务中表现出了显著的能力，但由于需要推理多次来采样多条推理链，所以可能会消耗很多的时间和资源。在 OpenCompass 中，您可以通过在数据集配置中将 `GenInferencer` 替换为 `SCInferencer` 并设置相应的参数参数来简单地实现 SC 方法，例如：
 
 ```python
+# 此SC版gsm8k测试配置可以在： opencompass.configs.datasets.gsm8k.gsm8k_gen_a3e34a.py 中找到。
 gsm8k_infer_cfg = dict(
     inferencer=dict(
-        type=SCInferencer,
-        generation_kwargs=dict(do_sample=True, temperature=0.7, top_k=40),  # 设置采样参数以确保模型生成不同的输出
+        type=SCInferencer, # 替换 GenInferencer 为 SCInferencer
+        generation_kwargs=dict(do_sample=True, temperature=0.7, top_k=40),  # 设置采样参数以确保模型生成不同的输出，目前仅适用于从HuggingFace加载的模型。
         infer_type='SC',
         sc_size = SAMPLE_SIZE
     )
@@ -64,9 +65,11 @@ gsm8k_eval_cfg = dict(sc_size=SAMPLE_SIZE)
 ```
 
 ```{note}
-注意，OpenCompass 默认使用默认使用 argmax 的方式采样下一个 token，因此若不指定采样参数，模型每次的推理结果将会是完全一致的，多轮评测将会失效。
+注意，OpenCompass 默认使用 argmax 的方式采样下一个 token，因此若不指定采样参数，模型每次的推理结果将会是完全一致的，多轮评测将会失效。
 ```
 
-其中 `SAMPLE_SIZE` 是推理路径的数量，较高的值通常会带来更高的性能。文章中展示了不同推理任务间推理路径数量与性能之间的关系：
+其中 `SAMPLE_SIZE` 是推理路径的数量，较高的值通常会带来更高的性能。SC方法的原论文中展示了不同推理任务间推理路径数量与性能之间的关系：
+
 ![image](https://github.com/InternLM/opencompass/assets/28834990/05c7d850-7076-43ca-b165-e6251f9b3001)
+
 从图中可以看出，在不同的推理任务中，随着推理路径数量的增加，性能呈现出增长的趋势。但是，对于某些任务，增加推理路径的数量可能达到一个极限，进一步增加推理路径的数量可能不会带来更多的性能提升。因此，需要在具体任务中进行实验和调整，找到最适合任务的推理路径数量。

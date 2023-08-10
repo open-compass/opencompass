@@ -49,13 +49,14 @@ Question: {question}\nLet's think step by step:\n{answer}
 
 ## 3. Self-Consistency
 
-The SC (Self-Consistency) method is proposed in [this paper](https://arxiv.org/abs/2203.11171), which will sample multiple reasoning paths for the question, and make majority voting to the generated answers for LLMs. This method displays remarkable proficiency among reasoning tasks with high accuracy but may consume more time and resources when inferencing, because of the majority voting strategy. In OpenCompass, you can simply set SC method in the dataset config like:
+The SC (Self-Consistency) method is proposed in [this paper](https://arxiv.org/abs/2203.11171), which will sample multiple reasoning paths for the question, and make majority voting to the generated answers for LLMs. This method displays remarkable proficiency among reasoning tasks with high accuracy but may consume more time and resources when inferencing, because of the majority voting strategy. In OpenCompass, You can easily implement the SC method by replacing `GenInferencer` with `SCInferencer` in the dataset configuration and setting the corresponding parameters like:
 
 ```python
+# This SC gsm8k config can be found at: opencompass.configs.datasets.gsm8k.gsm8k_gen_a3e34a.py
 gsm8k_infer_cfg = dict(
     inferencer=dict(
-        type=SCInferencer,
-        generation_kwargs=dict(do_sample=True, temperature=0.7, top_k=40),  # Set sample parameters to make sure model generate various output
+        type=SCInferencer, # Replace GenInferencer with SCInferencer.
+        generation_kwargs=dict(do_sample=True, temperature=0.7, top_k=40),  # Set sample parameters to make sure model generate various output, only works for models load from HuggingFace now.
         infer_type='SC',
         sc_size = SAMPLE_SIZE
     )
@@ -64,9 +65,11 @@ gsm8k_eval_cfg = dict(sc_size=SAMPLE_SIZE)
 ```
 
 ```{note}
-注意，OpenCompass 默认使用默认使用 argmax 的方式采样下一个 token，因此若不指定采样参数，模型每次的推理结果将会是完全一致的，多轮评测将会失效。
+OpenCompass defaults to use argmax for sampling the next token. Therefore, if the sampling parameters are not specified, the model's inference results will be completely consistent each time, and multiple rounds of evaluation will be ineffective.
 ```
 
-Where `SAMPLE_SIZE` is the number of reasoning paths in Self-Consistency, higher value usually outcome higher performance. The following figure from the paper demonstrates the relation between reasoning paths and performance in several reasoning tasks:
+Where `SAMPLE_SIZE` is the number of reasoning paths in Self-Consistency, higher value usually outcome higher performance. The following figure from the original SC paper demonstrates the relation between reasoning paths and performance in several reasoning tasks:
+
 ![image](https://github.com/InternLM/opencompass/assets/28834990/05c7d850-7076-43ca-b165-e6251f9b3001)
+
 From the figure, it can be seen that in different reasoning tasks, performance tends to improve as the number of reasoning paths increases. However, for some tasks, increasing the number of reasoning paths may reach a limit, and further increasing the number of paths may not bring significant performance improvement. Therefore, it is necessary to conduct experiments and adjustments on specific tasks to find the optimal number of reasoning paths that best suit the task.
