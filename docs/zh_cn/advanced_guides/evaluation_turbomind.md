@@ -1,6 +1,6 @@
 # 评测LMDeploy模型
 
-我们支持评测使用[LMDeploy](https://github.com/InternLM/lmdeploy)加速过的大语言模型。LMDeploy 由 MMDeploy 和 MMRazor 团队联合开发，是涵盖了 LLM 任务的全套轻量化、部署和服务解决方案。 **TurboMind** 是LMDeploy推出的高效推理引擎。OpenCompass对TurboMind进行了适配，本教程将介绍如何使用OpenCompass来对TurboMind加速后的模型进行评测。
+我们支持评测使用[LMDeploy](https://github.com/InternLM/lmdeploy)加速过的大语言模型。LMDeploy 由 MMDeploy 和 MMRazor 团队联合开发，是涵盖了 LLM 任务的全套轻量化、部署和服务解决方案。 **TurboMind** 是 LMDeploy 推出的高效推理引擎。OpenCompass 对 TurboMind 进行了适配，本教程将介绍如何使用 OpenCompass 来对 TurboMind 加速后的模型进行评测。
 
 # 环境配置
 
