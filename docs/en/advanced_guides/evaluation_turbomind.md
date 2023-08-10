@@ -10,7 +10,7 @@ Please follow the [instructions](https://github.com/InternLM/opencompass#install
 
 ## Install LMDeploy
 
-Install lmdeploy via pip ( python 3.8+)
+Install lmdeploy via pip (python 3.8+)
 
 ```shell
 pip install lmdeploy
