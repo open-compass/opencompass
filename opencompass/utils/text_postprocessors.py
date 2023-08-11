@@ -69,7 +69,6 @@ def first_option_postprocess(text: str, options) -> str:
             outputs = match.group(0)
             for i in options:
                 if i in outputs:
-                    print(i)
                     return i
     return ''
 
