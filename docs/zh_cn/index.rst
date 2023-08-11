@@ -43,10 +43,10 @@ OpenCompass 上手路线
    :maxdepth: 1
    :caption: 提示词
 
-   prompt/few_shot.md
-   prompt/chain_of_thought.md
+   prompt/overview.md
    prompt/prompt_template.md
    prompt/meta_template.md
+   prompt/chain_of_thought.md
 
 .. _进阶教程:
 .. toctree::

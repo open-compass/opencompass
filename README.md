@@ -324,6 +324,10 @@ Make sure you have installed OpenCompass correctly and prepared your datasets ac
 
 For more tutorials, please check our [Documentation](https://opencompass.readthedocs.io/en/latest/index.html).
 
+## 👷‍♂️ Contributing
+
+We appreciate all contributions to improve OpenCompass. Please refer to the [contributing guideline](https://opencompass.readthedocs.io/en/latest/notes/contribution_guide.html) for the best practice.
+
 ## 🤝 Acknowledgements
 
 Some code in this project is cited and modified from [OpenICL](https://github.com/Shark-NLP/OpenICL).

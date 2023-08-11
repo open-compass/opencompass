@@ -325,6 +325,10 @@ unzip OpenCompassData.zip
 
 更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
 
+## 👷‍♂️ 贡献
+
+我们感谢所有的贡献者为改进和提升 OpenCompass 所作出的努力。请参考[贡献指南](https://opencompass.readthedocs.io/zh_CN/latest/notes/contribution_guide.html)来了解参与项目贡献的相关指引。
+
 ## 🤝 致谢
 
 该项目部分的代码引用并修改自 [OpenICL](https://github.com/Shark-NLP/OpenICL)。
