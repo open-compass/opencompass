@@ -3,13 +3,15 @@ from .post_processor import (MiniGPT4COCOCaptionPostProcessor,
                              MiniGPT4MMBenchPostProcessor,
                              MiniGPT4ScienceQAPostProcessor,
                              MiniGPT4VQAPostProcessor,
-                             MiniGPT4VSRPostProcessor)
+                             MiniGPT4VSRPostProcessor,
+                             MiniGPT4PostProcessorMME)
 from .prompt_constructor import (MiniGPT4COCOCaotionPromptConstructor,
                                  MiniGPT4MMBenchPromptConstructor,
                                  MiniGPT4ScienceQAPromptConstructor,
                                  MiniGPT4SEEDBenchPromptConstructor,
                                  MiniGPT4VQAPromptConstructor,
-                                 MiniGPT4VSRPromptConstructor)
+                                 MiniGPT4VSRPromptConstructor,
+                                 MiniGPT4MMEPromptConstructor)
 
 __all__ = [
     'MiniGPT4Inferencer', 'MiniGPT4MMBenchPostProcessor',
@@ -17,5 +19,5 @@ __all__ = [
     'MiniGPT4COCOCaptionPostProcessor', 'MiniGPT4ScienceQAPromptConstructor',
     'MiniGPT4ScienceQAPostProcessor', 'MiniGPT4VQAPromptConstructor',
     'MiniGPT4VQAPostProcessor', 'MiniGPT4VSRPostProcessor',
-    'MiniGPT4VSRPromptConstructor', 'MiniGPT4SEEDBenchPromptConstructor'
-]
+    'MiniGPT4VSRPromptConstructor', 'MiniGPT4SEEDBenchPromptConstructor',
+    'MiniGPT4PostProcessorMME', 'MiniGPT4MMEPromptConstructor']
