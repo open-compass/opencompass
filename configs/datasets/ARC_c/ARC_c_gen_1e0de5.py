@@ -28,7 +28,7 @@ ARC_c_infer_cfg = dict(
 ARC_c_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
     pred_role="BOT",
-    pred_postprocessor=dict(type=first_option_postprocess),
+    pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'),
 )
 
 ARC_c_datasets = [
