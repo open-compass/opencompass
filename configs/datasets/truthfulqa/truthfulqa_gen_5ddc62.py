@@ -31,6 +31,7 @@ truthfulqa_eval_cfg = dict(
 
 truthfulqa_datasets = [
     dict(
+        abbr='truthful_qa',
         type=TruthfulQADataset,
         path='truthful_qa',
         name='generation',
