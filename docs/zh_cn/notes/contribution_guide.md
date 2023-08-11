@@ -81,6 +81,14 @@ git checkout main -b branchname
   pre-commit install
   ```
 
+  ````{tip}
+  对于中国地区的用户，由于网络原因，安装 pre-commit hook 可能会失败。可以尝试以下命令切换为国内镜像源：
+  ```{bash}
+  pre-commit install -c .pre-commit-config-zh-cn.yaml
+  pre-commit run –all-files -c .pre-commit-config-zh-cn.yaml
+  ```
+  ````
+
 - 提交修改。在每次提交前，pre-commit hooks 都会被触发并规范化你的代码格式。
 
   ```bash
