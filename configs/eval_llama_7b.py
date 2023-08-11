@@ -1,8 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .datasets.piqa.piqa_ppl import piqa_datasets
-    from .datasets.siqa.siqa_gen import siqa_datasets
+    from .datasets.collections.base_medium_llama import piqa_datasets, siqa_datasets
     from .models.hf_llama_7b import models
 
 
