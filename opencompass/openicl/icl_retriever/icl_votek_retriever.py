@@ -42,7 +42,7 @@ class VotekRetriever(TopkRetriever):
                      vote_file=None):
         n = len(embeddings)
         if vote_file is not None and os.path.isfile(vote_file):
-            with open(vote_file) as f:
+            with open(vote_file, encoding='utf-8') as f:
                 vote_stat = json.load(f)
         else:
             vote_stat = defaultdict(list)

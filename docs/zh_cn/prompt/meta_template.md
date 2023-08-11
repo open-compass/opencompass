@@ -26,8 +26,7 @@ models = [
 ]
 ```
 
-接下来，我们会介绍 Meta Template 在两种模型上的配置方法。
-本文主要介绍 meta prompt 的用法。如果需要调试 prompt，建议在准备好配置文件后，使用 `tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读[这里](../tools.md#prompt-viewer)了解更多
+接下来，我们会介绍 Meta Template 在两种模型上的配置方法。建议读者在阅读本章前，先了解[对话式模板](./prompt_template.md#对话式-prompt)的基本语法。
 
 ```{note}
 在某些情况下（例如对基座的测试），我们并不需要在正常对话中注入任何的指令，此时我们可以将 meta template 置空。在这种情况下，模型接收到的 prompt 仅由数据集配置定义，是一个普通的字符串。若数据集配置使用的是对话式模板，不同角色的发言将会由 \n 拼接而成。
@@ -41,13 +40,15 @@ models = [
 
 我们将会结合几个例子讲解 meta template 的定义方式。
 
-假设根据数据集的对话式模板，产生了这么一段对话：
+假设根据数据集的对话式模板，产生了下面的 PromptList：
 
-```Plain
-HUMAN: 1+1=?
-BOT: 2
-HUMAN: 2+2=?
-BOT: 4
+```python
+PromptList([
+    dict(role='HUMAN', prompt='1+1=?'),
+    dict(role='BOT', prompt='2'),
+    dict(role='HUMAN', prompt='2+2=?'),
+    dict(role='BOT', prompt='4'),
+])
 ```
 
 我们希望把这段对话传到一个已经经过 SFT 的模型。模型约定的对话中不同的角色的发言以`<角色名>:`开头，并固定以一个特殊 token 和 \\n 结尾。以下是模型期望接收到的完整字符串：
@@ -75,12 +76,14 @@ ______________________________________________________________________
 
 有的数据集中可能会引入 SYSTEM 级别的角色：
 
-```Plain
-SYSTEM: Solve the following math questions
-HUMAN: 1+1=?
-BOT: 2
-HUMAN: 2+2=?
-BOT: 4
+```python
+PromptList([
+    dict(role='SYSTEM', fallback_role='HUMAN', prompt='Solve the following math questions'),
+    dict(role='HUMAN', prompt='1+1=?'),
+    dict(role='BOT', prompt='2'),
+    dict(role='HUMAN', prompt='2+2=?'),
+    dict(role='BOT', prompt='4'),
+])
 ```
 
 假设模型同样接受 SYSTEM 这个角色，且期望输入为：
@@ -254,3 +257,7 @@ meta_template=dict(
 据此 OpenCompass 为 API 模型预设了三个 `api_role`：`HUMAN`, `BOT`, `SYSTEM`，同时约定 API 模型接受的输入除了普通字符串外，还有一种以 `PromptList` 结构表示对话的中间格式。API 模型会将对话重新以多轮对话格式打包，发送至后端。但要激活此功能，需要用户使用上面的 meta template 中把数据集 prompt 模板中的角色 `role` 映射到对应的 `api_role` 中。下图展示了 API 模型接受的输入与 Prompt Template 、Meta Template 之间的关系。
 
 ![](https://user-images.githubusercontent.com/22607038/251195872-63aa7d30-045a-4837-84b5-11b09f07fb18.png)
+
+## 调试
+
+如果需要调试 prompt，建议在准备好配置文件后，使用 `tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读[这里](../tools.md#prompt-viewer)了解更多。

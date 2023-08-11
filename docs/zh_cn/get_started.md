@@ -66,7 +66,7 @@ OpenCompass 支持的数据集主要包括两个部分：
 在 OpenCompass 项目根目录下运行下面命令，将数据集准备至 `${OpenCompass}/data` 目录下：
 
 ```bash
-wget https://github.com/InternLM/opencompass/releases/download/0.1.0/OpenCompassData.zip
+wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 

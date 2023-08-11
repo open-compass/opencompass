@@ -27,7 +27,7 @@ models = [
 ```
 
 Next, we will introduce how to configure Meta Template on two types of models.
-This article mainly introduces the usage of meta prompt. If you need to debug the prompt, it is recommended to use the `tools/prompt_viewer.py` script to preview the actual prompt received by the model after preparing the configuration file. Read [here](../tools.md#prompt-viewer) for more.
+You are recommended to read [here](./prompt_template.md#dialogue-prompt) for the basic syntax of the dialogue template before reading this chapter.
 
 ```{note}
 In some cases (such as testing the base station), we don't need to inject any instructions into the normal dialogue, in which case we can leave the meta template empty. In this case, the prompt received by the model is defined only by the dataset configuration and is a regular string. If the dataset configuration uses a dialogue template, speeches from different roles will be concatenated with \n.
@@ -43,11 +43,13 @@ We will explain how to define the meta template with several examples.
 
 Suppose that according to the dialogue template of the dataset, the following dialogue was produced:
 
-```Plain
-HUMAN: 1+1=?
-BOT: 2
-HUMAN: 2+2=?
-BOT: 4
+```python
+PromptList([
+    dict(role='HUMAN', prompt='1+1=?'),
+    dict(role='BOT', prompt='2'),
+    dict(role='HUMAN', prompt='2+2=?'),
+    dict(role='BOT', prompt='4'),
+])
 ```
 
 We want to pass this dialogue to a model that has already gone through SFT. The model's agreed dialogue begins with the speech of different roles with `<Role Name>:` and ends with a special token and \\n. Here is the complete string the model expects to receive:
@@ -75,12 +77,14 @@ ______________________________________________________________________
 
 Some datasets may introduce SYSTEM-level roles:
 
-```
-SYSTEM: Solve the following math questions
-HUMAN: 1+1=?
-BOT: 2
-HUMAN: 2+2=?
-BOT: 4
+```python
+PromptList([
+    dict(role='SYSTEM', fallback_role='HUMAN', prompt='Solve the following math questions'),
+    dict(role='HUMAN', prompt='1+1=?'),
+    dict(role='BOT', prompt='2'),
+    dict(role='HUMAN', prompt='2+2=?'),
+    dict(role='BOT', prompt='4'),
+])
 ```
 
 Assuming the model also accepts the SYSTEM role, and expects the input to be:
@@ -253,3 +257,7 @@ Even though different API models accept different data structures, there are com
 In this regard, OpenCompass has preset three `api_role` values for API models: `HUMAN`, `BOT`, `SYSTEM`, and stipulates that in addition to regular strings, the input accepted by API models includes a middle format of dialogue represented by `PromptList`. The API model will repackage the dialogue in a multi-turn dialogue format and send it to the backend. However, to activate this feature, users need to map the roles `role` in the dataset prompt template to the corresponding `api_role` in the above meta template. The following figure illustrates the relationship between the input accepted by the API model and the Prompt Template and Meta Template.
 
 ![](https://user-images.githubusercontent.com/22607038/251195872-63aa7d30-045a-4837-84b5-11b09f07fb18.png)
+
+## Debugging
+
+If you need to debug the prompt, it is recommended to use the `tools/prompt_viewer.py` script to preview the actual prompt received by the model after preparing the configuration file. Read [here](../tools.md#prompt-viewer) for more.

@@ -76,7 +76,6 @@ class MMBenchDataset(Dataset):
             'context': hint,
         }
         return data
-
    def load_from_df(self, idx, key):
         if key in self.df.iloc[idx] and not pd.isna(self.df.iloc[idx][key]):
             return self.df.iloc[idx][key]
@@ -87,7 +86,7 @@ class MMBenchDataset(Dataset):
 ## How to construct the inference prompt
 
 ```python
-if data_sample['context'] is None:
+if data_sample['context'] is not None:
     prompt = data_sample['context'] + ' ' + data_sample['question'] + ' ' + data_sample['options']
 else:
     prompt = data_sample['question'] + ' ' + data_sample['options']
@@ -101,11 +100,15 @@ C. Digital art
 D. Photo
 
 <div align=center>
-<img src="https://user-images.githubusercontent.com/56866854/252847545-ea829a95-b063-492f-8760-d27143b5c834.jpg" width="10%"/>
+<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/34324155/255581681-1364ef43-bd27-4eb5-b9e5-241327b1f920.png" width="50%"/>
 </div>
 
-```
-prompt = ###Human: Question: Which category does this image belong to? There are several options: A. Oil Painting, B. Sketch, C. Digital art, D. Photo ###Assistant:
+```python
+prompt = """
+###Human: Question: Which category does this image belong to?
+There are several options: A. Oil Painting, B. Sketch, C. Digital art, D. Photo
+###Assistant:
+"""
 ```
 
 You can make custom modifications to the prompt
