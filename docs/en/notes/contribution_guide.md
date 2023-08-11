@@ -112,7 +112,7 @@ git checkout main -b branchname
 
 - Modify your codes according to reviewers' suggestions and then push your changes.
 
-### 6.  Merge your branch to `main` branch and delete the branch
+### 6. Merge your branch to `main` branch and delete the branch
 
 - After the PR is merged by the maintainer, you can delete the branch you created in your forked repository.
 
