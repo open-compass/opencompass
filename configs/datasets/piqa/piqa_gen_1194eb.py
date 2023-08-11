@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import piqaDataset_V2
-from opencompass.utils.text_postprocessors import first_capital_postprocess
+from opencompass.utils.text_postprocessors import first_option_postprocess
 
 piqa_reader_cfg = dict(
     input_columns=["goal", "sol1", "sol2"],
@@ -15,7 +15,9 @@ piqa_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role="HUMAN", prompt="{goal}\nA. {sol1}\nB. {sol2}\nAnswer:")
+                dict(
+                    role="HUMAN",
+                    prompt="{goal}\nA. {sol1}\nB. {sol2}\nAnswer:")
             ], ),
     ),
     retriever=dict(type=ZeroRetriever),
@@ -25,7 +27,7 @@ piqa_infer_cfg = dict(
 piqa_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
     pred_role="BOT",
-    pred_postprocessor=dict(type=first_capital_postprocess),
+    pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 piqa_datasets = [

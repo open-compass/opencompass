@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import OBQADataset
-from opencompass.utils.text_postprocessors import first_capital_postprocess
+from opencompass.utils.text_postprocessors import first_option_postprocess
 
 _input_columns = [
     ["question_stem", "A", "B", "C", "D"],
@@ -14,14 +14,16 @@ _template = [
         round=[
             dict(
                 role="HUMAN",
-                prompt="Question: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:"
+                prompt=
+                "Question: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:"
             ),
         ], ),
     dict(
         round=[
             dict(
                 role="HUMAN",
-                prompt="Given the fact: {fact1}\nQuestion: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:",
+                prompt=
+                "Given the fact: {fact1}\nQuestion: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:",
             ),
         ], ),
 ]
@@ -46,16 +48,14 @@ for _i in range(2):
     obqa_reader_cfg = dict(
         input_columns=_input_columns[_i], output_column="answerKey")
     obqa_infer_cfg = dict(
-        prompt_template=dict(
-            type=PromptTemplate,
-            template=_template[_i]),
+        prompt_template=dict(type=PromptTemplate, template=_template[_i]),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer),
     )
     obqa_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
         pred_role="BOT",
-        pred_postprocessor=dict(type=first_capital_postprocess),
+        pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'),
     )
 
     obqa_datasets[_i]["reader_cfg"] = obqa_reader_cfg
