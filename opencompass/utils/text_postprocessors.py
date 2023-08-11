@@ -48,7 +48,7 @@ def first_capital_postprocess(text: str) -> str:
     return ''
 
 
-def first_option_postprocess(text: str, options) -> str:
+def first_option_postprocess(text: str, options: str) -> str:
     """Find first valid option for text."""
 
     patterns = [
