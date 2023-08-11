@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import AXDataset_V2
-from opencompass.utils.text_postprocessors import first_capital_postprocess
+from opencompass.utils.text_postprocessors import first_option_postprocess
 
 AX_g_reader_cfg = dict(
     input_columns=["hypothesis", "premise"],
@@ -28,7 +28,7 @@ AX_g_infer_cfg = dict(
 AX_g_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
     pred_role="BOT",
-    pred_postprocessor=dict(type=first_capital_postprocess),
+    pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 AX_g_datasets = [
