@@ -1,5 +1,6 @@
 from .afqmcd import *  # noqa: F401, F403
 from .agieval import *  # noqa: F401, F403
+from .anli import AnliDataset  # noqa: F401, F403
 from .arc import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
@@ -34,6 +35,24 @@ from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
+from .LEval_coursera import *  # noqa: F401, F403
+from .LEval_financial_qa import *  # noqa: F401, F403
+from .LEval_gov_report_summ import *  # noqa: F401, F403
+from .LEval_gsm100 import *  # noqa: F401, F403
+from .LEval_legal_contract_qa import *  # noqa: F401, F403
+from .LEval_meeting_summ import *  # noqa: F401, F403
+from .LEval_multidoc_qa import *  # noqa: F401, F403
+from .LEval_narrattive_qa import *  # noqa: F401, F403
+from .LEval_natural_question import *  # noqa: F401, F403
+from .LEval_news_summ import *  # noqa: F401, F403
+from .LEval_paper_assistant import *  # noqa: F401, F403
+from .LEval_patent_summ import *  # noqa: F401, F403
+from .LEval_quality import *  # noqa: F401, F403
+from .LEval_review_summ import *  # noqa: F401, F403
+from .LEval_scientific_qa import *  # noqa: F401, F403
+from .LEval_topic_retrieval import *  # noqa: F401, F403
+from .LEval_tpo import *  # noqa: F401, F403
+from .LEval_tvshow_summ import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
@@ -49,6 +68,7 @@ from .realtoxicprompts import *  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
+from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403
 from .strategyqa import *  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
@@ -64,5 +84,6 @@ from .winograd import *  # noqa: F401, F403
 from .winogrande import *  # noqa: F401, F403
 from .wsc import *  # noqa: F401, F403
 from .xcopa import *  # noqa: F401, F403
+from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
 from .xlsum import *  # noqa: F401, F403
 from .xsum import *  # noqa: F401, F403

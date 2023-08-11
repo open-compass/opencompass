@@ -7,3 +7,5 @@ In OpenCompass, we split the template into two parts: the data-side template and
 The data-side template is referred to as [prompt_template](./prompt_template.md), which represents the process of converting the fields in the dataset into prompts.
 
 The model-side template is referred to as [meta_template](./meta_template.md), which represents how the model transforms these prompts into its expected input.
+
+We also offer some prompting examples regarding [Chain of Thought](./chain_of_thought.md).

@@ -15,7 +15,6 @@ agieval_single_choice_sets = [
     'gaokao-history',
     'gaokao-biology',
     'gaokao-chemistry',
-    'gaokao-physics',
     'gaokao-mathqa',
     'logiqa-zh',
     'lsat-ar',
@@ -28,8 +27,9 @@ agieval_single_choice_sets = [
     'aqua-rat',
 ]
 agieval_multiple_choices_sets = [
-    # 'jec-qa-kd',  # 数据需要额外处理
-    # 'jec-qa-ca',  # 数据需要额外处理
+    'gaokao-physics',
+    'jec-qa-kd',
+    'jec-qa-ca',
 ]
 agieval_cloze_sets = ['gaokao-mathcloze', 'math']
 
@@ -58,7 +58,7 @@ for name in agieval_single_choice_sets:
             infer_cfg=agieval_infer_cfg.copy(),
             eval_cfg=agieval_eval_cfg.copy()))
 
-for name in agieval_cloze_sets:
+for name in agieval_multiple_choices_sets + agieval_cloze_sets:
     agieval_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,

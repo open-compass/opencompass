@@ -1,12 +1,11 @@
 import os.path as osp
+import re
 import tempfile
 from typing import List
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
-from opencompass.registry import ICL_EVALUATORS, TEXT_POSTPROCESSORS
 
 
-@ICL_EVALUATORS.register_module()
 class HumanEvaluator(BaseEvaluator):
     """Evaluator for human eval."""
 
@@ -41,11 +40,46 @@ class HumanEvaluator(BaseEvaluator):
             return {f'humaneval_{k}': score[k] * 100 for k in score}
 
 
-@TEXT_POSTPROCESSORS.register_module('humaneval')
 def humaneval_postprocess(text: str) -> str:
-    text = text.split('\n\n')[0]
     if '```' in text:
-        text = text.split('```')[1]
+        blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+        if len(blocks) == 0:
+            text = text.split('```')[1]  # fall back to default strategy
+        else:
+            text = blocks[0]  # fetch the first code block
+            if not text.startswith('\n'):  # in case starting with ```python
+                text = text[max(text.find('\n') + 1, 0):]
+    if text.strip().startswith('from') or text.strip().startswith('import'):
+        def_idx = text.find('def')
+        if def_idx != -1:
+            text = text[max(text.find('\n', def_idx) + 1, 0):]
+    text = text.split('\n\n')[0]
+    if text.strip().startswith('def'):
+        text = '\n'.join(text.split('\n')[1:])
+    if not text.startswith('    '):
+        if text.startswith(' '):
+            text = '    ' + text.lstrip()
+        else:
+            text = '\n'.join(['    ' + line for line in text.split('\n')])
+    return text
+
+
+def humaneval_gpt_postprocess(text: str) -> str:
+    """Better answer postprocessor for better instruction-aligned models like
+    GPT."""
+    if '```' in text:
+        blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+        if len(blocks) == 0:
+            text = text.split('```')[1]  # fall back to default strategy
+        else:
+            text = blocks[0]  # fetch the first code block
+            if not text.startswith('\n'):  # in case starting with ```python
+                text = text[max(text.find('\n') + 1, 0):]
+    if text.strip().startswith('from') or text.strip().startswith('import'):
+        def_idx = text.find('def')
+        if def_idx != -1:
+            text = text[max(text.find('\n', def_idx) + 1, 0):]
+    text = text.split('\n\n\n')[0]
     if text.strip().startswith('def'):
         text = '\n'.join(text.split('\n')[1:])
     if not text.startswith('    '):

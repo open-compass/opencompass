@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import ARCDataset
-from opencompass.utils.text_postprocessors import first_capital_postprocess
+from opencompass.utils.text_postprocessors import first_option_postprocess
 
 ARC_e_reader_cfg = dict(
     input_columns=["question", "textA", "textB", "textC", "textD"],
@@ -28,7 +28,7 @@ ARC_e_infer_cfg = dict(
 ARC_e_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
     pred_role="BOT",
-    pred_postprocessor=dict(type=first_capital_postprocess),
+    pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'),
 )
 
 ARC_e_datasets = [

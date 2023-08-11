@@ -27,14 +27,16 @@ copyright = '2023, OpenCompass'
 author = 'OpenCompass Authors'
 
 # The full version, including alpha/beta/rc tags
-# version_file = '../../opencompass/version.py'
+version_file = '../../opencompass/__init__.py'
 
-# def get_version():
-#     with open(version_file, 'r') as f:
-#         exec(compile(f.read(), version_file, 'exec'))
-#     return locals()['__version__']
 
-release = '0.5.0'
+def get_version():
+    with open(version_file, 'r') as f:
+        exec(compile(f.read(), version_file, 'exec'))
+    return locals()['__version__']
+
+
+release = get_version()
 
 # -- General configuration ---------------------------------------------------
 

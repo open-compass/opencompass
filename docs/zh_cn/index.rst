@@ -43,9 +43,10 @@ OpenCompass 上手路线
    :maxdepth: 1
    :caption: 提示词
 
-   prompt/few_shot.md
+   prompt/overview.md
    prompt/prompt_template.md
    prompt/meta_template.md
+   prompt/chain_of_thought.md
 
 .. _进阶教程:
 .. toctree::
@@ -54,6 +55,7 @@ OpenCompass 上手路线
 
    advanced_guides/new_dataset.md
    advanced_guides/new_model.md
+   advanced_guides/evaluation_turbomind.md
 
 .. _工具:
 .. toctree::

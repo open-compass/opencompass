@@ -44,15 +44,17 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
 
    advanced_guides/new_dataset.md
    advanced_guides/new_model.md
+   advanced_guides/evaluation_turbomind.md
 
 .. _Prompt:
 .. toctree::
    :maxdepth: 1
    :caption: Prompt
 
-   prompt/few_shot.md
+   prompt/overview.md
    prompt/prompt_template.md
    prompt/meta_template.md
+   prompt/chain_of_thought.md
 
 .. _Tools:
 .. toctree::

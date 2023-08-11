@@ -98,6 +98,11 @@ def parse_args():
                         'in the config.',
                         type=int,
                         default=32)
+    parser.add_argument('--max-workers-per-gpu',
+                        help='Max task to run in parallel on one GPU. '
+                        'It will only be used in the local runner.',
+                        type=int,
+                        default=32)
     parser.add_argument(
         '--retry',
         help='Number of retries if the job failed when using slurm or dlc. '
@@ -337,6 +342,7 @@ def exec_infer_runner(tasks, args, cfg):
     else:
         runner = LocalRunner(task=dict(type='OpenICLInferTask'),
                              max_num_workers=args.max_num_workers,
+                             max_workers_per_gpu=args.max_workers_per_gpu,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)
