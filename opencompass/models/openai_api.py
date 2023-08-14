@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from litellm import completion
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from typing import Dict, List, Optional, Union
@@ -206,18 +207,12 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
                 )
-                raw_response = requests.post(self.url,
-                                             headers=header,
-                                             data=json.dumps(data))
+                response = completion(**data, api_key=key, org=self.orgs[self.org_ctr])
+
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')
                 continue
-            try:
-                response = raw_response.json()
-            except requests.JSONDecodeError:
-                self.logger.error('JsonDecode error, got',
-                                  str(raw_response.content))
-                continue
+
             try:
                 return response['choices'][0]['message']['content'].strip()
             except KeyError:
