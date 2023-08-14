@@ -101,7 +101,7 @@ Use heuristic methods to evaluate the contribution of each generated reasoning c
 
 Based on the methods of generating and evaluating reasoning content, select an appropriate search algorithm. For example, you can use breadth-first search (BFS) or depth-first search (DFS) algorithms to systematically explore the thought tree, conducting lookahead and backtracking.
 
-In OpenCompass, ToT parameters need to be set according to the requirements. Below is an example configuration for the 24-Point game from the official paper. Currently, ToT inference is supported only with Huggingface models:
+In OpenCompass, ToT parameters need to be set according to the requirements. Below is an example configuration for the 24-Point game from the [official paper](https://arxiv.org/pdf/2305.10601.pdf). Currently, ToT inference is supported only with Huggingface models:
 
 ```python
 # This ToT Game24 config can be found at: opencompass/configs/datasets/game24/game24_gen_8dfde3.py.

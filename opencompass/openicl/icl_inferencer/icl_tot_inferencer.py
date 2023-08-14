@@ -25,6 +25,10 @@ logger = get_logger(__name__)
 class ToTInferencer(GenInferencer):
     """Tree-of-Thought Inferencer class to evaluate by tree style reasoning
     paths.
+    Doc: https://opencompass.readthedocs.io/en/latest/prompt/
+         chain_of_thought.html
+    Official paper: https://arxiv.org/pdf/2305.10601.pdf
+
 
     Attributes:
         model (:obj:`BaseModelWrapper`, optional): The module to inference.
