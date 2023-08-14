@@ -21,7 +21,7 @@ dataset = dict(type='opencompass.MMEDataset',
                data_dir='/path/to/MME',
                pipeline=val_pipeline)
 
-minigpt_4_dataloader = dict(batch_size=1,
+minigpt_4_mme_dataloader = dict(batch_size=1,
                             num_workers=4,
                             dataset=dataset,
                             collate_fn=dict(type='pseudo_collate'),

@@ -43,8 +43,6 @@ class MMEMetric(BaseMetric):
             result['task'] = data_sample['task']
             result['pred'] = 1 if data_sample['answer'].lower(
             ) == data_sample['pred_answer'].lower() else 0
-            print(result['pred'], data_sample['pred_answer'],
-                  data_sample['answer'])
             self.results.append(result)
 
     def compute_metrics(self, results: list) -> dict:

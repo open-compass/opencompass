@@ -13,7 +13,7 @@ class MMEDataset(Dataset):
 
     Args:
         data_dir (str): The path of the dataset.
-        pipeline (dict): The data augmentation.
+        pipeline (List[dict]): The data augmentation.
     """
     tasks = [
         'artwork', 'celebrity', 'code_reasoning', 'color',
@@ -27,7 +27,7 @@ class MMEDataset(Dataset):
         self.pipeline = Compose(pipeline)
         self.load_data(data_dir)
 
-    def load_data(self, data_dir):
+    def load_data(self, data_dir: str):
         self.data_list = []
         image_dir, question_dir = self.sub_dir_name
         for task in self.tasks:
@@ -68,7 +68,7 @@ class MMEDataset(Dataset):
     def __len__(self) -> None:
         return len(self.data_list)
 
-    def __getitem__(self, idx: str) -> dict:
+    def __getitem__(self, idx: int) -> dict:
         data_sample = self.data_list[idx]
         data_sample = self.pipeline(data_sample)
         return data_sample

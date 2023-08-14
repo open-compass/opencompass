@@ -7,8 +7,8 @@ class MiniGPT4MMBenchPromptConstructor:
     """Prompt constructor for MiniGPT-4 on MMBench.
 
     Args:
-        image_prompt (str): Image prompt.
-        reply_prompt (str): Reply prompt.
+        image_prompt (str): Image prompt. Defaults to `''`.
+        reply_prompt (str): Reply prompt. Defaults to `''`.
     """
 
     def __init__(self, image_prompt: str = '', reply_prompt: str = '') -> None:
