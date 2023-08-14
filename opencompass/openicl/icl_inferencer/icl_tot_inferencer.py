@@ -27,7 +27,7 @@ class ToTInferencer(GenInferencer):
     paths.
     Doc: https://opencompass.readthedocs.io/en/latest/prompt/
          chain_of_thought.html
-    Official paper: https://arxiv.org/pdf/2305.10601.pdf
+    Official tot paper: https://arxiv.org/pdf/2305.10601.pdf
 
 
     Attributes:
@@ -116,14 +116,12 @@ class ToTInferencer(GenInferencer):
         value_prompt = self.task.value_prompt_wrap(x, y)
         if cache_value and value_prompt in self.task.value_cache:
             return self.task.value_cache[value_prompt]
-        print('## value_prompt ##\n' + value_prompt + '\n')
         value_outputs = self.model.generate_from_template(
             [value_prompt],
             max_out_len=self.max_out_len,
             num_beams=n_evaluate_sample,
             num_return_sequences=n_evaluate_sample,
             **self.generation_kwargs)
-        print('## value_outputs ##\n' + str(value_outputs) + '\n')
         value = self.task.value_outputs_unwrap(x, y, value_outputs)
         if cache_value:
             self.task.value_cache[value_prompt] = value
@@ -157,14 +155,12 @@ class ToTInferencer(GenInferencer):
 
     def get_proposals(self, x, y):
         propose_prompt = self.task.propose_prompt_wrap(x, y)
-        print('## propose_prompt ##\n' + propose_prompt + '\n')
         proposals = self.model.generate_from_template(
             [propose_prompt],
             max_out_len=self.max_out_len,
             num_beams=1,
             num_return_sequences=1,
             **self.generation_kwargs)[0].split('\n')
-        print('## proposals ##\n' + str(proposals) + '\n')
         return [y + _ + '\n' for _ in proposals]
 
     def get_samples(self, x, y, n_generate_sample, prompt_sample):
