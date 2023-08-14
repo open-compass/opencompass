@@ -49,7 +49,7 @@ Question: {question}\nLet's think step by step:\n{answer}
 
 ## 3. Self-Consistency
 
-SC (Self-Consistency) 方法是在 [此文章](https://arxiv.org/abs/2203.11171) 中提出的，该方法会为同一个问题生成多个答案，并对生成的答案进行众数投票。这种方法在复杂推理任务中表现出了显著的能力，但由于需要推理多次来采样多条推理链，所以可能会消耗很多的时间和资源。在 OpenCompass 中，您可以通过在数据集配置中将 `GenInferencer` 替换为 `SCInferencer` 并设置相应的参数参数来简单地实现 SC 方法，例如：
+SC (Self-Consistency) 方法是在 [此文章](https://arxiv.org/abs/2203.11171) 中提出的，该方法会为问题生成多条不同的推理路径，并对生成的答案进行众数投票。这种方法在复杂推理任务中表现出了显著的能力，但由于需要推理多次来采样多条推理链，所以可能会消耗很多的时间和资源。在 OpenCompass 中，您可以通过在数据集配置中将 `GenInferencer` 替换为 `SCInferencer` 并设置相应的参数参数来简单地实现 SC 方法，例如：
 
 ```python
 # 此SC版gsm8k测试配置可以在： opencompass.configs.datasets.gsm8k.gsm8k_gen_a3e34a.py 中找到。
