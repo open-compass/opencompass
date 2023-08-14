@@ -49,9 +49,6 @@ class MMEMetric(BaseMetric):
 
     def compute_metrics(self, results: list) -> dict:
 
-        import pdb
-        pdb.set_trace()
-
         # reorganize results
         record = dict()
         for task in (self.task_dict['Perception'] +
@@ -59,8 +56,6 @@ class MMEMetric(BaseMetric):
             record[task] = defaultdict(int)
         for sample in results:
             record[sample['task']][sample['img_path']] += sample['pred']
-
-        pdb.set_trace()
 
         # compute subtask score
         metric = dict()
