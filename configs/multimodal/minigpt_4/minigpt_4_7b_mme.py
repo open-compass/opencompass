@@ -38,7 +38,7 @@ minigpt_4_model = dict(
     post_processor=dict(type=MiniGPT4PostProcessorMME))
 
 # evaluation settings
-minigpt_4_evaluator = [
+minigpt_4_mme_evaluator = [
     dict(type='opencompass.MMEMetric')
 ]
 
