@@ -1,3 +1,5 @@
+# Prompt and utils of Game24 dataset, edited from:
+# https://github.com/princeton-nlp/tree-of-thought-llm/blob/master/src/tot/tasks/game24.py
 import re
 from typing import List
 
@@ -162,8 +164,8 @@ class Game24Dataset(BaseDataset):
     @staticmethod
     def load(path: str):
         data = list(pd.read_csv(path)['Puzzles'])
-        data = [{'input': i} for i in data]
-        return Dataset.from_list(data[900:950])
+        data = [{'input': i, 'output': i} for i in data]
+        return Dataset.from_list(data[900:1000])
 
 
 class Game24Wrapper():

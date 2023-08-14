@@ -73,3 +73,58 @@ gsm8k_eval_cfg = dict(sc_size=SAMPLE_SIZE)
 ![image](https://github.com/InternLM/opencompass/assets/28834990/05c7d850-7076-43ca-b165-e6251f9b3001)
 
 从图中可以看出，在不同的推理任务中，随着推理路径数量的增加，性能呈现出增长的趋势。但是，对于某些任务，增加推理路径的数量可能达到一个极限，进一步增加推理路径的数量可能不会带来更多的性能提升。因此，需要在具体任务中进行实验和调整，找到最适合任务的推理路径数量。
+
+## 4. Tree-of-Thoughts
+
+相比一般的CoT方法采样一条推理路径，ToT(Tree-of-Thoughts)允许语言模型同时考虑多种不同的推理路径，通过对推理过程进行自我评估，以及在必要时进行前瞻或回溯以做出全局选择，如下图右所示：
+
+![image](https://github.com/InternLM/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
+
+具体的，主要分为下面的四个阶段：
+
+**1. 问题分解 (Thought Decomposition)**
+
+根据问题的特点，将问题分解成多个中间步骤。每个步骤可以是短语、算式或写作计划，这取决于问题的性质。
+
+**2. 推理过程生成 (Thought Generation)**
+
+假设解决问题需要k个步骤，有两种方法生成推理内容：
+
+- 独立采样：对于每个状态，模型会独立地从CoT提示中完整抽取k个推理内容，不依赖于其他的推理内容。
+- 顺序生成：顺序地使用“提示”来逐步引导推理内容生成，每个推理内容都可能依赖于前一个推理内容。
+
+**3. 启发式评估 (Heuristic Evaluation)**
+
+使用启发式方法评估每个生成的推理内容对问题解决的贡献，这种自我评估基于语言模型的自我反馈，如设计Prompt让模型对多个生成结果进行打分。
+
+**4. 选择搜索算法 (Search Algorithm)**
+
+根据生成和评估推理内容的方法，选择适当的搜索算法。例如，可以使用广度优先搜索（BFS）或深度优先搜索（DFS）等算法来系统地探索思考树，并进行前瞻和回溯。
+
+在OpenCompass中，需要根据需要设置ToT参数，以下是[ToT论文](https://arxiv.org/pdf/2305.10601.pdf)中24点游戏的样例配置，目前支持Huggingface模型进行ToT推理：
+
+```python
+# 此 ToT Game24 配置可以在以下路径找到：opencompass/configs/datasets/game24/game24_gen_8dfde3.py。
+from opencompass.datasets import (Game24Dataset, game24_postprocess,
+                                  Game24Evaluator, Game24Wrapper)
+
+generation_kwargs = dict(do_sample=False, temperature=0.7)
+
+game24_infer_cfg = dict(
+        prompt_template=dict(
+        type=PromptTemplate,
+        template='''{input}'''), #直接传入input内容，因为Prompt需要分段指定
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=ToTInferencer, # 替换GenInferencer为ToTInferencer
+                    generation_kwargs=generation_kwargs,
+                    method_generate='propose',  # 生成推理内容的方法，可以是独立采样（sample）或顺序生成（propose）
+                    method_evaluate='value', # 评估推理内容的方法，可以是投票 （vote）或打分（value）
+                    method_select='greedy', # 选择推理内容的方法，可以是贪心（greedy）或随机（sample）
+                    n_evaluate_sample=3,
+                    n_select_sample=5,
+                    task_wrapper=dict(type=Game24Wrapper) # 该Wrapper类包含每个步骤的Prompt和推理内容的生成及评估方法，需要根据任务进行自定义
+                    ))
+
+```
+
+如果要在自定义的数据集上使用ToT方法，相比普通评测方式，需要在`opencompass.datasets.YourDataConfig.py`中额外设置`YourData24Wrapper`类，以进行ToT中的推理生成和启发式评估。对于类似游戏24点的推理任务，具体可以参考`opencompass/datasets/game24.py`。
