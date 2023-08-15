@@ -12,10 +12,22 @@ from .base import BaseDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 
+
+_LANGUAGE_NAME_DICT = {
+   "cpp"        : "CPP",
+   "go"         : "Go",
+   "java"       : "Java",
+   "js"         : "JavaScript",
+   "python"     : "Python",
+   "rust"       : "Rust", 
+}
+
 class HumanevalXDataset(BaseDataset):
 
     @staticmethod
-    def load(path, language='python', **kwargs):
+    def load(path, language, **kwargs):
+        assert language in _LANGUAGE_NAME_DICT.keys(), (
+            f"language must be in {list(_LANGUAGE_NAME_DICT.keys())}")
         file_path = osp.join(path, f"humanevalx_{language}.jsonl.gz")
         dataset = HumanevalXDataset._stream_jsonl_all(file_path)
         return Dataset.from_list(dataset)
@@ -34,27 +46,28 @@ class HumanevalXDataset(BaseDataset):
 
         return results
 
-_LANGUAGE_NAME_DICT = {
-   "cpp"        : "CPP",
-   "go"         : "Go",
-   "java"       : "Java",
-   "js"         : "JavaScript",
-   "python"     : "Python",
-   "rust"       : "Rust", 
-}
-
 
 class HumanevalXEvaluator(BaseEvaluator):
     """Evaluator for humanevalx.
 
     Before you use this Evaluator, lauch a code eval service according
-    to to readme of https://github.com/Ezra-Yu/code-evaluator .
+    to to readme of https://github.com/Ezra-Yu/code-evaluator.
     Set `ip_adress` and `port` according your environment. 
-    
+
+    Args:
+        language (str): the program language to evaluate.
+        ip_adress (str): The IP Adress of HumanevalX code evaluate service. 
+            refer to https://github.com/Ezra-Yu/code-evaluator to lauch a 
+            code evaluate service. Defaults to 'localhost'.
+        port (int): The port of HumanevalX code evaluate service.
+            Defaults to 5000.
+        timeout (int): Maximum wait time when accessing the service, Defaults to 5000..
+
     TODO: support 'k' of pass@k.
     """
-
-    def __init__(self, language='python', ip_adress="localhost", port=5000, timeout=100) -> None:
+    def __init__(self, language, ip_adress="localhost", port=5000, timeout=100) -> None:
+        assert language in _LANGUAGE_NAME_DICT.keys(), (
+            f"language must be in {list(_LANGUAGE_NAME_DICT.keys())}")
         self.language = language
         self.ip_adress = ip_adress
         self.port = port
@@ -84,10 +97,11 @@ class HumanevalXEvaluator(BaseEvaluator):
             result_file_path = os.path.join("outputs", f'humanevalx_{self.language}.json')
             copyfile(tmp_out_path, result_file_path)
             raise Exception(
-                    f"Call CodeEvalService Error, please refer to {ref_url} for help."
-                    f"\nGet Error : {output}\n"
-                    f"The result have been saved in path('{result_file_path}'), "
-                    "you can also manually submit and test the final result."
+                    f"Call CodeEvalService Error in `HumanevalXEvaluator`, The results "
+                    f"have been saved in path '{result_file_path}', You need to check that" 
+                    "your code evaluate service is lauched and the network to service "
+                    f"is connected, you can also get results directly by using `curl` command"
+                    f" refer to {ref_url}. \nError Information: {output}"
             )           
     
     def _code_eval_service(self, file_path):
@@ -100,8 +114,6 @@ class HumanevalXEvaluator(BaseEvaluator):
             timeout=self.timeout, 
             capture_output=True)
 
-        
-        assert re.match("\"{.*:.*}\"", exec_result.stdout.decode("utf-8")), f"-{exec_result.stdout.decode('utf-8')}-"
         if exec_result.returncode == 0 and re.match("\"{.*:.*}\"", exec_result.stdout.decode("utf-8")):
             return True, json.loads(exec_result.stdout.decode("utf-8"))
         else:
@@ -118,9 +130,7 @@ class HumanevalXEvaluator(BaseEvaluator):
             return False, err
 
 def _clean_up_code(text: str, language_type: str) -> str:
-    """
-    Cleans up the generated code.
-    """
+    """Cleans up the generated code."""
     if language_type.lower() == "python":
         text_splits = text.split("\n")
         is_empty_line = False
