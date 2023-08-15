@@ -92,3 +92,16 @@ class MiniGPT4ScienceQAPromptConstructor(MiniGPT4MMBenchPromptConstructor):
         context = contexts[0]
         prompt = self.image_prompt + ' ' + context + ' ' + question + ' ' + choice + self.reply_prompt + ' ' + 'The answer is'  # noqa
         return prompt
+
+
+class MiniGPT4VQAPromptConstructor(MiniGPT4MMBenchPromptConstructor):
+    """Prompt constructor for MiniGPT-4 on VQA."""
+
+    def _process(self, data_samples: List[DataSample]) -> str:
+        assert len(data_samples) == 1, 'Only support batch size 1.'
+        questions = [
+            data_sample.get('question') for data_sample in data_samples
+        ]
+        question = questions[0]
+        prompt = self.image_prompt + ' ' + question + ' ' + 'Answer this question in a single word.' + ' ' + self.reply_prompt  # noqa
+        return prompt

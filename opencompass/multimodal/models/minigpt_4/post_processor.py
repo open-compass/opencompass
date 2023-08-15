@@ -80,3 +80,22 @@ class MiniGPT4ScienceQAPostProcessor:
         else:
             output_text = output_text[0]
         return output_text
+
+
+class MiniGPT4VQAPostProcessor:
+    """"Post processor for MiniGPT-4 on VQA."""
+
+    def __init__(self) -> None:
+        pass
+
+    def __call__(self, output_token: torch.tensor, tokenizer) -> str:
+
+        if output_token[0] == 0:
+            output_token = output_token[1:]
+        if output_token[0] == 1:
+            output_token = output_token[1:]
+        output_text = tokenizer.decode(output_token,
+                                       add_special_tokens=False)  # noqa
+        output_text = output_text.split('###')[0]
+        output_text = output_text.split('Assistant:')[-1].strip()
+        return output_text

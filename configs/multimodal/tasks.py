@@ -5,11 +5,19 @@ with read_base():
                                                  minigpt_4_evaluator,
                                                  minigpt_4_load_from,
                                                  minigpt_4_model)
+    from .minigpt_4.minigpt_4_7b_vqav2 import (minigpt_4_vqav2_dataloader,
+                                               minigpt_4_vqav2_evaluator,
+                                               minigpt_4_vqav2_load_from,
+                                               minigpt_4_vqav2_model)
 
-models = [minigpt_4_model]
-datasets = [minigpt_4_dataloader]
-evaluators = [minigpt_4_evaluator]
-load_froms = [minigpt_4_load_from]
-num_gpus = 8
-num_procs = 8
+# models = [minigpt_4_model]
+# datasets = [minigpt_4_dataloader]
+# evaluators = [minigpt_4_evaluator]
+# load_froms = [minigpt_4_load_from]
+models = [minigpt_4_vqav2_model]
+datasets = [minigpt_4_vqav2_dataloader]
+evaluators = [minigpt_4_vqav2_evaluator]
+load_froms = [minigpt_4_vqav2_load_from]
+num_gpus = 1
+num_procs = 1
 launcher = 'pytorch'
