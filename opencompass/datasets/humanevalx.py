@@ -131,6 +131,20 @@ class HumanevalXEvaluator(BaseEvaluator):
 
 def _clean_up_code(text: str, language_type: str) -> str:
     """Cleans up the generated code."""
+    def extract_block(code):
+        l_count, r_count = 0, 0
+        for i, c in enumerate(code):
+            if c == "{":
+                l_count += 1
+            elif c == "}":
+                r_count += 1
+                if (l_count) + 1 == r_count:
+                    return code[:i+1]
+            else:
+                pass
+        
+        return code
+
     if language_type.lower() == "python":
         text_splits = text.split("\n")
         is_empty_line = False
@@ -161,11 +175,13 @@ def _clean_up_code(text: str, language_type: str) -> str:
         if '}' in text:
             text = text[:text.rfind('}')] + '}'
     elif language_type.lower() == "cpp":
+        code = extract_block(code)
         if "\nint main()" in text:
             text = text[:text.rfind("int main()")]
         if '}' in text:
             text = text[:text.rfind('}')] + '}'
     elif language_type.lower() == "js":
+        code = extract_block(code)
         if '}' in text:
             text = text[:text.rfind('}')] + '}'
     elif language_type.lower() == "rust":
