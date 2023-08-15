@@ -99,3 +99,23 @@ class MiniGPT4VQAPostProcessor:
         output_text = output_text.split('###')[0]
         output_text = output_text.split('Assistant:')[-1].strip()
         return output_text
+
+
+class MiniGPT4VSRPostProcessor:
+    """"Post processor for MiniGPT-4 on VSR."""
+
+    def __init__(self) -> None:
+        pass
+
+    def __call__(self, output_token: torch.tensor, tokenizer) -> str:
+
+        if output_token[0] == 0:
+            output_token = output_token[1:]
+        if output_token[0] == 1:
+            output_token = output_token[1:]
+        output_text = tokenizer.decode(output_token, add_special_tokens=False)
+        pattern = r'yes|no|Yes|No'
+        output_text = re.findall(pattern, output_text)
+        if len(output_text) > 0:
+            output_text = output_text[0].lower()
+        return output_text

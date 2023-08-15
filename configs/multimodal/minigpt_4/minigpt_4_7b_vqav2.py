@@ -40,7 +40,7 @@ minigpt_4_vqav2_dataloader = dict(batch_size=1,
 # model settings
 minigpt_4_vqav2_model = dict(
     type='minigpt-4',
-    low_resource=True,
+    low_resource=False,
     img_size=224,
     max_length=10,
     llama_model='/path/to/vicuna-7b/',
