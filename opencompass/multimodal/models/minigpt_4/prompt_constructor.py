@@ -53,3 +53,12 @@ class MiniGPT4MMBenchPromptConstructor:
         else:
             prompt = self.image_prompt + ' ' + question + ' ' + option + ' ' + self.reply_prompt  # noqa
         return prompt
+
+
+class MiniGPT4COCOCaotionPromptConstructor(MiniGPT4MMBenchPromptConstructor):
+    """Prompt constructor for MiniGPT-4 on COCO Caption."""
+
+    def _process(self, data_samples: List[DataSample]) -> str:
+        assert len(data_samples) == 1, 'Only support batch size 1.'
+        prompt = self.image_prompt + ' ' + 'a photo of' + self.reply_prompt
+        return prompt
