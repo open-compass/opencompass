@@ -1,5 +1,5 @@
 from opencompass.multimodal.models.minigpt_4 import (
-    MiniGPT4MMBenchPromptConstructor, MiniGPT4PostProcessor)
+    MiniGPT4MMBenchPromptConstructor, MiniGPT4MMBenchPostProcessor)
 
 # dataloader settings
 val_pipeline = [
@@ -29,13 +29,13 @@ minigpt_4_dataloader = dict(batch_size=1,
 
 # model settings
 minigpt_4_model = dict(
-    type='minigpt-4-mmbench',
+    type='minigpt-4',
     low_resource=False,
     llama_model='/path/to/vicuna-7b/',
     prompt_constructor=dict(type=MiniGPT4MMBenchPromptConstructor,
                             image_prompt='###Human: <Img><ImageHere></Img>',
                             reply_prompt='###Assistant:'),
-    post_processor=dict(type=MiniGPT4PostProcessor))
+    post_processor=dict(type=MiniGPT4MMBenchPostProcessor))
 
 # evaluation settings
 minigpt_4_evaluator = [

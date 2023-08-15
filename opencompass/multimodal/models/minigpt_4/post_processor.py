@@ -3,7 +3,7 @@ import re
 import torch
 
 
-class MiniGPT4PostProcessor:
+class MiniGPT4MMBenchPostProcessor:
     """"Post processor for MiniGPT-4 on MMBench."""
 
     def __init__(self) -> None:
