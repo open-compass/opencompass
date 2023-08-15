@@ -54,6 +54,7 @@ class SEEDBenchDataset(Dataset):
             ]
             self.ann_file = image_ann_file
         if not only_image:
+            raise NotImplementedError
             self.video_pipeline = Compose(video_pipeline)
 
     def __len__(self) -> None:
