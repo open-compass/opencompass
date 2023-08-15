@@ -1,10 +1,11 @@
 import argparse
+import fnmatch
 import getpass
 import os
 import os.path as osp
 from datetime import datetime
 
-from mmengine.config import Config
+from mmengine.config import Config, DictAction
 
 from opencompass.partitioners import (MultimodalNaivePartitioner,
                                       NaivePartitioner, SizePartitioner)
@@ -15,7 +16,8 @@ from opencompass.utils import LarkReporter, Summarizer, get_logger
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run an evaluation task')
-    parser.add_argument('config', help='Train config file path')
+    parser.add_argument('config', nargs='?', help='Train config file path')
+
     # add mutually exclusive args `--slurm` `--dlc`, defaults to local runner
     # if "infer" or "eval" not specified
     launch_method = parser.add_mutually_exclusive_group()
@@ -31,15 +33,19 @@ def parse_args():
                                help='Whether to force tasks to run on dlc. If '
                                'True, `--aliyun-cfg` must be set. Defaults'
                                ' to False')
+    # multi-modal support
+    parser.add_argument('--mm-eval',
+                        help='Whether or not enable multimodal evaluation',
+                        action='store_true',
+                        default=False)
+    # Add shortcut parameters (models and datasets)
+    parser.add_argument('--models', nargs='+', help='', default=None)
+    parser.add_argument('--datasets', nargs='+', help='', default=None)
     # add general args
     parser.add_argument('--debug',
                         help='Debug mode, in which scheduler will run tasks '
                         'in the single process, and output will not be '
                         'redirected to files',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--mm-eval',
-                        help='Whether or not enable multimodal evaluation',
                         action='store_true',
                         default=False)
     parser.add_argument('--dry-run',
@@ -115,6 +121,9 @@ def parse_args():
     # set dlc args
     dlc_parser = parser.add_argument_group('dlc_args')
     parse_dlc_args(dlc_parser)
+    # set hf args
+    hf_parser = parser.add_argument_group('hf_args')
+    parse_hf_args(hf_parser)
     args = parser.parse_args()
     if args.slurm:
         assert args.partition is not None, (
@@ -153,6 +162,28 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
+def parse_hf_args(hf_parser):
+    """These args are all for the quick construction of HuggingFace models."""
+    hf_parser.add_argument('--hf-path', type=str, help='')
+    hf_parser.add_argument('--peft-path', type=str, help='')
+    hf_parser.add_argument('--tokenizer-path', type=str, help='')
+    hf_parser.add_argument('--model-kwargs',
+                           nargs='+',
+                           action=DictAction,
+                           help='')
+    hf_parser.add_argument('--tokenizer-kwargs',
+                           nargs='+',
+                           action=DictAction,
+                           help='')
+    hf_parser.add_argument('--max-out-len', type=int, help='')
+    hf_parser.add_argument('--max-seq-len', type=int, help='')
+    hf_parser.add_argument('--no-batch-padding',
+                           action='store_true',
+                           default=False)
+    hf_parser.add_argument('--batch-size', type=int, help='')
+    hf_parser.add_argument('--num-gpus', type=int, help='')
+
+
 def main():
     args = parse_args()
     if args.dry_run:
@@ -160,7 +191,8 @@ def main():
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
-    cfg = Config.fromfile(args.config, format_python_code=False)
+    # cfg = Config.fromfile(args.config, format_python_code=False)
+    cfg = get_config_from_arg(args)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
@@ -298,6 +330,82 @@ def main():
     if args.mode in ['all', 'eval', 'viz']:
         summarizer = Summarizer(cfg)
         summarizer.summarize(time_str=cfg_time_str)
+
+
+def match_cfg_file(workdir: str, pattern: str) -> str:
+    """Match the config file in workdir recursively given the pattern.
+
+    Additionally, if the pattern itself points to an existing file, it will be
+    directly returned.
+    """
+    pattern = pattern if pattern.endswith('.py') else pattern + '.py'
+    if osp.exists(pattern):
+        return pattern
+    matched = None
+    for root, _, files in os.walk(workdir):
+        for file in files:
+            if fnmatch.fnmatch(file, pattern):
+                if matched:
+                    raise ValueError('More than one config file matched, '
+                                     'please specify the config file path '
+                                     f'manually. Matched files: {matched}\n'
+                                     f'{os.path.join(root, file)}')
+                matched = os.path.join(root, file)
+    if matched is None:
+        raise ValueError('No config file matched, please verify your pattern: '
+                         f'{osp.join(workdir, pattern)}')
+    get_logger().info(f'Loading {matched}')
+    return matched
+
+
+def get_config_from_arg(args) -> Config:
+    """Get the config object given args.
+
+    Only a few argument combinations are accepted (priority from high to low)
+    1. args.config
+    2. args.models and args.datasets
+    3. Huggingface parameter groups and args.datasets
+    """
+    if args.config:
+        return Config.fromfile(args.config, format_python_code=False)
+    if args.datasets is None:
+        raise ValueError('You must specify "--datasets" if you do not specify '
+                         'a config file path.')
+    datasets = []
+    for dataset in args.datasets:
+        cfg = Config.fromfile(match_cfg_file('configs/datasets/', dataset))
+        for k in cfg.keys():
+            if k.endswith('_datasets'):
+                datasets += cfg[k]
+    if not args.models and not args.hf_path:
+        raise ValueError('You must specify a config file path, '
+                         'or specify --models and --datasets, or '
+                         'specify HuggingFace model parameters and '
+                         '--datasets.')
+    models = []
+    if args.models:
+        for model in args.models:
+            cfg = Config.fromfile(match_cfg_file('configs/models/', model))
+            if 'models' not in cfg:
+                raise ValueError(
+                    f'Config file {model} does not contain "models" field')
+            models += cfg['models']
+    else:
+        from opencompass.models import HuggingFace
+        model = dict(type=f'{HuggingFace.__module__}.{HuggingFace.__name__}',
+                     path=args.hf_path,
+                     peft_path=args.peft_path,
+                     tokenizer_path=args.tokenizer_path,
+                     model_kwargs=args.model_kwargs,
+                     tokenizer_kwargs=args.tokenizer_kwargs,
+                     max_seq_len=args.max_seq_len,
+                     max_out_len=args.max_out_len,
+                     batch_padding=not args.no_batch_padding,
+                     batch_size=args.batch_size,
+                     run_cfg=dict(num_gpus=args.num_gpus))
+        models.append(model)
+    return Config(dict(models=models, datasets=datasets),
+                  format_python_code=False)
 
 
 def exec_mm_infer_runner(tasks, args, cfg):
