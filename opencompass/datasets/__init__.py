@@ -30,6 +30,7 @@ from .gsm8k import *  # noqa: F401, F403
 from .hellaswag import *  # noqa: F401, F403
 from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
+from .humanevalx import *  # noqa: F401, F403
 from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
@@ -86,4 +87,3 @@ from .xcopa import *  # noqa: F401, F403
 from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
 from .xlsum import *  # noqa: F401, F403
 from .xsum import *  # noqa: F401, F403
-from .humanevalx import *  # noqa: F401, F403
