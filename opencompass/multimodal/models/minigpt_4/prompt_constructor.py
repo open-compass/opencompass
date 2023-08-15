@@ -62,3 +62,33 @@ class MiniGPT4COCOCaotionPromptConstructor(MiniGPT4MMBenchPromptConstructor):
         assert len(data_samples) == 1, 'Only support batch size 1.'
         prompt = self.image_prompt + ' ' + 'a photo of' + self.reply_prompt
         return prompt
+
+
+class MiniGPT4ScienceQAPromptConstructor(MiniGPT4MMBenchPromptConstructor):
+    """Prompt constructor for MiniGPT-4 on ScienceQA."""
+
+    choice_mapping = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F'}
+
+    def _process(self, data_samples: List[DataSample]) -> str:
+        assert len(data_samples) == 1, 'Only support batch size 1.'
+        questions = [
+            'Question: ' + data_sample.get('question') + '\n'
+            for data_sample in data_samples
+        ]  # noqa
+        choices = [data_sample.get('choices') for data_sample in data_samples]
+        choices = [[
+            f'({self.choice_mapping[i]}) ' + item
+            for i, item in enumerate(choice)
+        ] for choice in choices]
+        choices = [
+            'Choices: ' + ' '.join(choice) + '\n' for choice in choices
+        ]  # noqa
+        contexts = [
+            'Context: ' + data_sample.get('hint') + '\n'
+            for data_sample in data_samples
+        ]  # noqa
+        question = questions[0]
+        choice = choices[0]
+        context = contexts[0]
+        prompt = self.image_prompt + ' ' + context + ' ' + question + ' ' + choice + self.reply_prompt + ' ' + 'The answer is'  # noqa
+        return prompt
