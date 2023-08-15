@@ -55,13 +55,8 @@ class MiniGPT4MMBenchPromptConstructor:
         return prompt
 
 
-<<<<<<< HEAD
 class MiniGPT4COCOCaotionPromptConstructor(MiniGPT4MMBenchPromptConstructor):
     """Prompt constructor for MiniGPT-4 on COCO Caption."""
-=======
-class MiniGPT4SEEDBenchPromptConstructor:
-    """Prompt constructor for MiniGPT-4 on SEED-Bench.
->>>>>>> update docstrings
 
     def _process(self, data_samples: List[DataSample]) -> str:
         assert len(data_samples) == 1, 'Only support batch size 1.'

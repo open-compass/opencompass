@@ -84,8 +84,8 @@ class MiniGPT4Inferencer(MiniGPT4):
         with self.maybe_autocast():
             image_embeds = self.ln_vision(
                 self.visual_encoder(image)).to(device)
-            image_atts = torch.ones(image_embeds.size()[:-1],
-                                    dtype=torch.long).to(device)
+            image_atts = torch.ones(
+                image_embeds.size()[:-1], dtype=torch.long).to(device)
 
             query_tokens = self.query_tokens.expand(image_embeds.shape[0], -1,
                                                     -1)
@@ -97,8 +97,8 @@ class MiniGPT4Inferencer(MiniGPT4):
             )
 
             inputs_llama = self.llama_proj(query_output.last_hidden_state)
-            atts_llama = torch.ones(inputs_llama.size()[:-1],
-                                    dtype=torch.long).to(image.device)
+            atts_llama = torch.ones(
+                inputs_llama.size()[:-1], dtype=torch.long).to(image.device)
         return inputs_llama, atts_llama
 
     def pack_inputs(self, batch):
@@ -119,9 +119,8 @@ class MiniGPT4Inferencer(MiniGPT4):
         img_embeds, _ = self.encode_img(image)
         prompt_segs = prompt.split('<ImageHere>')
         prompt_seg_tokens = [
-            self.llama_tokenizer(seg,
-                                 return_tensors='pt',
-                                 add_special_tokens=i == 0).
+            self.llama_tokenizer(
+                seg, return_tensors='pt', add_special_tokens=i == 0).
             to(self.llama_model.model.embed_tokens.weight.device).input_ids
             for i, seg in enumerate(prompt_segs)
         ]
@@ -157,7 +156,7 @@ class MiniGPT4Inferencer(MiniGPT4):
 
 @MM_MODELS.register_module('minigpt-4-seedbench')
 class MiniGPT4SEEDBench(MiniGPT4):
-    """Inference code of MiniGPT-4 on MMBench.
+    """Inference code of MiniGPT-4 on SEED-Bench.
 
     Args:
         llama_model (str): The path of vicuna path.
@@ -194,8 +193,9 @@ class MiniGPT4SEEDBench(MiniGPT4):
                     this_frame = image[:, :, j, :, :]
                     frame_embeds = self.ln_vision(
                         self.visual_encoder(this_frame))
-                    frame_atts = torch.ones(frame_embeds.size()[:-1],
-                                            dtype=torch.long).to(image.device)
+                    frame_atts = torch.ones(
+                        frame_embeds.size()[:-1],
+                        dtype=torch.long).to(image.device)
 
                     query_tokens = self.query_tokens.expand(
                         frame_embeds.shape[0], -1, -1)
@@ -209,9 +209,9 @@ class MiniGPT4SEEDBench(MiniGPT4):
                     frame_inputs_t5 = self.llama_proj(
                         frame_query_output.last_hidden_state[:, :query_tokens.
                                                              size(1), :])
-                    frame_atts_t5 = torch.ones(frame_inputs_t5.size()[:-1],
-                                               dtype=torch.long).to(
-                                                   image.device)
+                    frame_atts_t5 = torch.ones(
+                        frame_inputs_t5.size()[:-1],
+                        dtype=torch.long).to(image.device)
                     inputs_llama.append(frame_inputs_t5)
                     atts_llama.append(frame_atts_t5)
                 inputs_llama = torch.cat(inputs_llama, dim=1)
@@ -219,8 +219,8 @@ class MiniGPT4SEEDBench(MiniGPT4):
             else:
                 image_embeds = self.ln_vision(
                     self.visual_encoder(image)).to(device)
-                image_atts = torch.ones(image_embeds.size()[:-1],
-                                        dtype=torch.long).to(device)
+                image_atts = torch.ones(
+                    image_embeds.size()[:-1], dtype=torch.long).to(device)
 
                 query_tokens = self.query_tokens.expand(
                     image_embeds.shape[0], -1, -1)
@@ -232,8 +232,9 @@ class MiniGPT4SEEDBench(MiniGPT4):
                 )
 
                 inputs_llama = self.llama_proj(query_output.last_hidden_state)
-                atts_llama = torch.ones(inputs_llama.size()[:-1],
-                                        dtype=torch.long).to(image.device)
+                atts_llama = torch.ones(
+                    inputs_llama.size()[:-1],
+                    dtype=torch.long).to(image.device)
         return inputs_llama, atts_llama
 
     def generate(self, batch):

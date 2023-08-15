@@ -11,14 +11,16 @@ from opencompass.registry import DATASETS
 
 @DATASETS.register_module()
 class SEEDBenchDataset(Dataset):
-    """Dataset to load MMBench dataset.
+    """Dataset to load SEED-Bench dataset.
 
     Args:
-        data_file (str): The path of the dataset.
-        pipeline (dict): The data augmentation.
-        sys_prompt (str): The system prompt added to the head
-            of these options. Defaults to
-            There are several options:
+        ann_file (str): The path of the annotation file.
+        cc3m_path (str): The data path of the image dimension(1-9).
+        sthv2_path (str): The data path of the dimention 10.
+        epic_kitchens_path (str): The data path of the dimention 11.
+        breakfast_path (str): The data path of the dimention 12.
+        image_pipeline (List[dict]): The data transforms for image.
+        video_pipeline (List[dict]): The data transforms for video.
     """
 
     def __init__(
@@ -39,7 +41,7 @@ class SEEDBenchDataset(Dataset):
         self.epic_kitchens_path = epic_kitchens_path
         self.breakfast_path = breakfast_path
         self.image_pipeline = Compose(image_pipeline)
-        self.video_pipeline = Compose(video_pipeline)
+        # self.video_pipeline = Compose(video_pipeline)
 
     def __len__(self) -> None:
         return len(self.ann_file)
