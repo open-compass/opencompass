@@ -18,13 +18,10 @@ image_pipeline = [
         ])
 ]
 video_pipeline = [
+    dict(type='mmaction.Resize', scale=(224, 224), interpolation='bicubic'),
+    dict(type='mmaction.CenterCrop', crop_size=224),
     dict(
-        type='mmpretrain.torchvision/GroupScale',
-        size=(224, 224),
-        interpolation=3),
-    dict(type='mmpretrain.torchvision/GroupCenterCrop'),
-    dict(
-        type='mmpretrain.torchvision/Normalize',
+        type='Normalize',
         mean=(0.48145466, 0.4578275, 0.40821073),
         std=(0.26862954, 0.26130258, 0.27577711)),
     dict(
