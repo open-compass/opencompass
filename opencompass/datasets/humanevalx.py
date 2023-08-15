@@ -1,4 +1,4 @@
-from typing import Iterable, Dict, List
+from typing import Iterable, Dict
 import os.path as osp
 import gzip
 import tempfile
@@ -6,16 +6,12 @@ import json
 import re
 import os
 from datasets import Dataset
-import requests
 import subprocess
-
+from shutil import copyfile
 from .base import BaseDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
-from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
-from opencompass.openicl.icl_evaluator import BaseEvaluator
 
-@LOAD_DATASET.register_module()
 class HumanevalXDataset(BaseDataset):
 
     @staticmethod
@@ -49,15 +45,21 @@ _LANGUAGE_NAME_DICT = {
 
 
 class HumanevalXEvaluator(BaseEvaluator):
-    """Evaluator for human eval."""
+    """Evaluator for humanevalx.
 
-    def __init__(self, language='python', k: List[int] = [1, 10, 100]) -> None:
-        self.k = k
+    Before you use this Evaluator, lauch a code eval service according
+    to to readme of https://github.com/Ezra-Yu/code-evaluator .
+    Set `ip_adress` and `port` according your environment. 
+    
+    TODO: support 'k' of pass@k.
+    """
+
+    def __init__(self, language='python', ip_adress="localhost", port=5000, timeout=100) -> None:
         self.language = language
+        self.ip_adress = ip_adress
+        self.port = port
+        self.timeout = timeout
         super().__init__()
-
-        if not os.path.exists("evals"):
-            os.makedirs("evals")
 
     def score(self, predictions, references):
         predictions = [{
@@ -65,32 +67,43 @@ class HumanevalXEvaluator(BaseEvaluator):
             'generation': _clean_up_code(pred, self.language),
         } for i, pred in enumerate(predictions)]
         with tempfile.TemporaryDirectory() as tmp_dir:
-            out_path = osp.join("evals", f'humanevalx_{self.language}.json')
-            with open(out_path, "w") as f:
+            tmp_out_path = osp.join(tmp_dir, f'humanevalx_{self.language}.json')
+            with open(tmp_out_path, "w") as f:
                 for pred in predictions:
                     f.write(json.dumps(pred) + "\n")
 
-            self._code_eval_service(file_path=out_path)
+            succeed, output = self._code_eval_service(file_path=tmp_out_path)
+        
+            if succeed:
+                if isinstance(output, str):
+                    return json.loads(output)
+                elif isinstance(output, dict):
+                    return output
 
-        if self.language == "python":
-            return {f'humaneval_{self.language}': len(predictions)}
-        elif self.language == "cpp":
-            return {f'humaneval_{self.language}': 90}
-        elif self.language == "go":
-            return {f'humaneval_{self.language}': 80}
-        elif self.language == "js":
-            return {f'humaneval_{self.language}': 70}
-        else:
-            return {f'humaneval_{self.language}': 60}
+            ref_url = "https://github.com/Ezra-Yu/code-evaluator"
+            result_file_path = os.path.join("outputs", f'humanevalx_{self.language}.json')
+            copyfile(tmp_out_path, result_file_path)
+            raise Exception(
+                    f"Call CodeEvalService Error, please refer to {ref_url} for help."
+                    f"\nGet Error : {output}\n"
+                    f"The result have been saved in path('{result_file_path}'), "
+                    "you can also manually submit and test the final result."
+            )           
     
-    def _code_eval_service(self, file_path, timeout=60):
-        exec_result = subprocess.run(
-            ["curl", "-X", "POST", "-F", f"file=@{file_path}", "-F", f"dataset=humanevalx/{self.language}", "10.1.52.19:5000/evaluate"], 
-            timeout=timeout, 
+    def _code_eval_service(self, file_path):
+        exec_result = subprocess.run([
+                "curl", "-X", "POST", 
+                "-F", f"file=@{file_path}", 
+                "-F", f"dataset=humanevalx/{self.language}", 
+                f"{self.ip_adress}:{self.port}/evaluate"
+            ], 
+            timeout=self.timeout, 
             capture_output=True)
 
-        if exec_result.returncode == 0:
-            print(exec_result)
+        
+        assert re.match("\"{.*:.*}\"", exec_result.stdout.decode("utf-8")), f"-{exec_result.stdout.decode('utf-8')}-"
+        if exec_result.returncode == 0 and re.match("\"{.*:.*}\"", exec_result.stdout.decode("utf-8")):
+            return True, json.loads(exec_result.stdout.decode("utf-8"))
         else:
             if exec_result.stderr:
                 try:
@@ -102,6 +115,7 @@ class HumanevalXEvaluator(BaseEvaluator):
                     err = exec_result.stdout.decode()
                 except:
                     err = exec_result.stdout
+            return False, err
 
 def _clean_up_code(text: str, language_type: str) -> str:
     """
