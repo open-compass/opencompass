@@ -21,6 +21,6 @@ models = [
         batch_size=8,
         model_kwargs=dict(trust_remote_code=True, device_map='auto'),
         run_cfg=dict(num_gpus=1, num_procs=1),
-        generate_cfg = dict(temperature=0.2, top_p=0.95,)
+        # generate_cfg = dict(temperature=0.2, top_p=0.95,)
     )
 ]
