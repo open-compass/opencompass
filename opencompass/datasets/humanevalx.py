@@ -5,6 +5,7 @@ import tempfile
 import json
 import re
 import os
+import time
 from datasets import Dataset
 import subprocess
 from shutil import copyfile
@@ -20,6 +21,15 @@ _LANGUAGE_NAME_DICT = {
    "js"         : "JavaScript",
    "python"     : "Python",
    "rust"       : "Rust", 
+}
+
+_LANGUAGE_SLEEP_DICT = {
+   "cpp"        : 10,
+   "go"         : 60,
+   "java"       : 30,
+   "js"         : 2,
+   "python"     : 0,
+   "rust"       : 120, 
 }
 
 class HumanevalXDataset(BaseDataset):
@@ -75,6 +85,7 @@ class HumanevalXEvaluator(BaseEvaluator):
         super().__init__()
 
     def score(self, predictions, references):
+        self._seelp_towards_lang() # used to avoid running multiple tasks simultaneously
         predictions = [{
             'task_id': f'{_LANGUAGE_NAME_DICT[self.language]}/{i}',
             'generation': _clean_up_code(pred, self.language),
@@ -128,23 +139,15 @@ class HumanevalXEvaluator(BaseEvaluator):
                 except:
                     err = exec_result.stdout
             return False, err
+    
+    def _seelp_towards_lang(self):
+        """Since code-eval-service cannot handle concurrent situations at present, 
+        we use the most primitive sleep method here to offset these tasks submission."""
+        time_to_sleep = _LANGUAGE_SLEEP_DICT[self.language]
+        time.sleep(time_to_sleep)
 
 def _clean_up_code(text: str, language_type: str) -> str:
     """Cleans up the generated code."""
-    def extract_block(code):
-        l_count, r_count = 0, 0
-        for i, c in enumerate(code):
-            if c == "{":
-                l_count += 1
-            elif c == "}":
-                r_count += 1
-                if (l_count) + 1 == r_count:
-                    return code[:i+1]
-            else:
-                pass
-        
-        return code
-
     if language_type.lower() == "python":
         text_splits = text.split("\n")
         is_empty_line = False
@@ -175,13 +178,11 @@ def _clean_up_code(text: str, language_type: str) -> str:
         if '}' in text:
             text = text[:text.rfind('}')] + '}'
     elif language_type.lower() == "cpp":
-        code = extract_block(code)
         if "\nint main()" in text:
             text = text[:text.rfind("int main()")]
         if '}' in text:
             text = text[:text.rfind('}')] + '}'
     elif language_type.lower() == "js":
-        code = extract_block(code)
         if '}' in text:
             text = text[:text.rfind('}')] + '}'
     elif language_type.lower() == "rust":

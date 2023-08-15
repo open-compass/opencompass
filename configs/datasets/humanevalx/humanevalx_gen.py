@@ -1,37 +1,4 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import HumanevalXDataset, HumanevalXEvaluator
+from mmengine.config import read_base
 
-humanevalx_reader_cfg = dict(
-    input_columns=['prompt'], output_column='task_id', train_split='test')
-
-humanevalx_infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template='{prompt}'),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=512))
-
-humanevalx_eval_cfg_dict = {
-    lang : dict(
-            evaluator=dict(
-                type=HumanevalXEvaluator, 
-                language=lang, 
-                ip_adress="localhost",    # replace to your code_eval_server ip_adress, port
-                port=5000),               # refer to https://github.com/Ezra-Yu/code-evaluator to lauch a server
-            pred_role='BOT')
-    for lang in ['python', 'cpp', 'go', 'java', 'js', 'rust']
-}
-
-humanevalx_datasets = [
-    dict(
-        type=HumanevalXDataset,
-        abbr=f'humanevalx-{lang}',
-        language=lang,
-        path='./data/humanevalx',
-        reader_cfg=humanevalx_reader_cfg,
-        infer_cfg=humanevalx_infer_cfg,
-        eval_cfg=humanevalx_eval_cfg_dict[lang])
-    for lang in ['python', 'cpp', 'go', 'java', 'js', 'rust']
-]
+with read_base():
+    from .humanevalx_gen_fd5822 import humaneval_datasets  # noqa: F401, F403
