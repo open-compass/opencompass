@@ -45,6 +45,9 @@ class MiniGPT4Inferencer(MiniGPT4):
         llama_model (str): The path of vicuna path.
         prompt_constructor (dict): The config of prompt constructor.
         post_processor (dict): The config of post processor.
+        do_sample (bool): Whether use sampling. Defaults to False.
+        max_length (int): The max length of output. Defaults to 30.
+        img_size (int): The size of image. Defaults to 224.
         low_resource (bool): Whether loaded in low precision.
             Defaults to False.
     """
@@ -53,8 +56,13 @@ class MiniGPT4Inferencer(MiniGPT4):
                  llama_model: str,
                  prompt_constructor: dict,
                  post_processor: dict,
+                 do_sample: bool = False,
+                 max_length: int = 30,
+                 img_size: int = 224,
                  low_resource: bool = False) -> None:
-        super().__init__(llama_model=llama_model, low_resource=low_resource)
+        super().__init__(llama_model=llama_model,
+                         low_resource=low_resource,
+                         img_size=img_size)
 
         cur_device = get_device()
         stop_words_ids = [
@@ -67,6 +75,8 @@ class MiniGPT4Inferencer(MiniGPT4):
             prompt_constructor, MM_MODELS)
         self.post_processor = mmengine.registry.build_from_cfg(
             post_processor, MM_MODELS)
+        self.do_sample = do_sample
+        self.max_length = max_length
 
     def encode_img(self, image):
         device = image.device
@@ -125,9 +135,9 @@ class MiniGPT4Inferencer(MiniGPT4):
         # generate output
         outputs = self.llama_model.generate(
             inputs_embeds=prompt_embs,
-            max_new_tokens=20,
+            max_length=self.max_length,
             num_beams=5,
-            do_sample=False,
+            do_sample=self.do_sample,
             min_length=1,
             top_p=0.9,
             repetition_penalty=1.0,

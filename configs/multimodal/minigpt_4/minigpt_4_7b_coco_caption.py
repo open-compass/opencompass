@@ -33,7 +33,8 @@ minigpt_4_coco_caption_dataloader = dict(
 # model settings
 minigpt_4_coco_caption_model = dict(
     type='minigpt-4',
-    low_resource=False,
+    low_resource=True,
+    img_size=384,
     llama_model='/path/to/vicuna-7b/',
     prompt_constructor=dict(type=MiniGPT4COCOCaotionPromptConstructor,
                             image_prompt='###Human: <Img><ImageHere></Img>',

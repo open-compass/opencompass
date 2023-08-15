@@ -50,4 +50,7 @@ class MiniGPT4COCOCaptionPostProcessor:
                                        add_special_tokens=False)  # noqa
         output_text = output_text.split('###')[0]
         output_text = output_text.split('Assistant:')[-1].strip()
+        output_text = output_text.split('. ')[0]
+        output_text = output_text.strip('<Img>')
+        output_text = output_text.strip()
         return output_text
