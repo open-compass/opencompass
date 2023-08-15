@@ -41,7 +41,8 @@ dataset = dict(
     'PATH_TO_EPIC-KITCHENS/3h91syskeag572hl6tvuovwv4d/videos/test',
     breakfast_path='data/seedbench/BreakfastII_15fps_qvga_sync',
     image_pipeline=image_pipeline,
-    video_pipeline=video_pipeline)
+    video_pipeline=video_pipeline,
+    only_image=True)
 
 minigpt_4_dataloader = dict(
     batch_size=1,
