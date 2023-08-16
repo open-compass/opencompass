@@ -10,8 +10,8 @@ Build the Docker image:
 
 ```shell
 git clone https://github.com/Ezra-Yu/code-evaluator.git
-cd code-evaluator/docker 
-sudo docker build -t code-eval:latest . 
+cd code-evaluator/docker
+sudo docker build -t code-eval:latest .
 ```
 
 After obtaining the image, create a container with the following commands:
@@ -63,8 +63,8 @@ humanevalx_infer_cfg = dict(
 humanevalx_eval_cfg_dict = {
     lang : dict(
             evaluator=dict(
-                type=HumanevalXEvaluator, 
-                language=lang, 
+                type=HumanevalXEvaluator,
+                language=lang,
                 ip_address="localhost",    # replace to your code_eval_server ip_address, port
                 port=5000),               # refer to https://github.com/Ezra-Yu/code-evaluator to launch a server
             pred_role='BOT')

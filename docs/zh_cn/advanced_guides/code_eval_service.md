@@ -10,8 +10,8 @@
 
 ```shell
 git clone https://github.com/Ezra-Yu/code-evaluator.git
-cd code-evaluator/docker 
-sudo docker build -t code-eval:latest . 
+cd code-evaluator/docker
+sudo docker build -t code-eval:latest .
 ```
 
 获取镜像后，使用以下命令创建容器：
@@ -35,7 +35,7 @@ telnet your_service_ip_address your_service_port
 ```
 
 ```note
-如果运算节点不能连接到评估服务，也可直接运行 `python run.py xxx...`，代码生成结果会保存在 'outputs' 文件夹下，迁移后直接使用 [code-evaluator](https://github.com/Ezra-Yu/code-evaluator) 评测得到结果（不需要考虑后面 eval_cfg 的配置）。 
+如果运算节点不能连接到评估服务，也可直接运行 `python run.py xxx...`，代码生成结果会保存在 'outputs' 文件夹下，迁移后直接使用 [code-evaluator](https://github.com/Ezra-Yu/code-evaluator) 评测得到结果（不需要考虑后面 eval_cfg 的配置）。
 ```
 
 ## 配置文件
@@ -64,8 +64,8 @@ humanevalx_infer_cfg = dict(
 humanevalx_eval_cfg_dict = {
     lang : dict(
             evaluator=dict(
-                type=HumanevalXEvaluator, 
-                language=lang, 
+                type=HumanevalXEvaluator,
+                language=lang,
                 ip_address="localhost",    # replace to your code_eval_server ip_address, port
                 port=5000),               # refer to https://github.com/Ezra-Yu/code-evaluator to launch a server
             pred_role='BOT')
