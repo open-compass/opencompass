@@ -45,6 +45,12 @@ class KeywordsStoppingCriteria(StoppingCriteria):
 
 @MM_MODELS.register_module('llava-7b-mmbench')
 class LLaVA(nn.Module):
+    """Inference code of LLaVA on MMBench. Need to clone LLaVA official repo
+    first. Please check out the README in config.
+
+    Args:
+        model_path (str): The path of llava checkpoint.
+    """
 
     def __init__(self, model_path: str) -> None:
         super().__init__()

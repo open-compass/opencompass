@@ -8,11 +8,14 @@ DEFAULT_IM_END_TOKEN = '<im_end>'
 
 
 class LLaVAMMBenchPromptConstructor:
-    """Prompt constructor for MiniGPT-4 on MMBench.
+    """Prompt constructor for LLaVA on MMBench.
 
     Args:
-        image_prompt (str): Image prompt.
-        reply_prompt (str): Reply prompt.
+        conv_templates: Conversation class to build prompt.
+        conv_mode: Version control args for different version of LLaVA.
+        image_token_len: Number of tokens per image.
+        mm_use_im_start_end:
+            Config arg. Use start and end token when build prompt or not.
     """
 
     def __init__(self, conv_templates: Any, conv_mode: str,
