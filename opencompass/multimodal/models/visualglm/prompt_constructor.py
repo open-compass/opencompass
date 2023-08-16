@@ -1,11 +1,13 @@
-from typing import List
 import torch
 
 from opencompass.registry import MM_MODELS
+
+
 @MM_MODELS.register_module('visualglm-promptconstructor')
 class VisualGLMPromptConstructor:
     """Prompt constructor for VisualGLM.
-    The overall prompt will be formulated as 
+
+    The overall prompt will be formulated as
     "system_prompt"+"human_prompt"+"image_prompt"+question+"assistant+prompt".
     Args:
         system_prompt (str): System prompt.
@@ -14,7 +16,11 @@ class VisualGLMPromptConstructor:
         assistant_prompt (str): Assistant prompt.
     """
 
-    def __init__(self, system_prompt: str = '', human_prompt:str = 'Q:', image_prompt: str = '<img></img>', assistant_prompt: str = 'A:') -> None:
+    def __init__(self,
+                 system_prompt: str = '',
+                 human_prompt: str = 'Q:',
+                 image_prompt: str = '<img></img>',
+                 assistant_prompt: str = 'A:') -> None:
         self.image_prompt = image_prompt
         self.system_prompt = system_prompt
         self.human_prompt = human_prompt
@@ -39,10 +45,12 @@ class VisualGLMPromptConstructor:
 
         # generate text prompt
         prompt = [
-            '{}{}{}{}{}{}'.format(self.system_prompt, self.image_prompt, self.human_prompt, question, option, self.assistant_prompt)
+            '{}{}{}{}{}{}'.format(self.system_prompt, self.image_prompt,
+                                  self.human_prompt, question, option,
+                                  self.assistant_prompt)
             for question, option in zip(questions, options)
         ]
-        
+
         image_position = 5
 
         return images, prompt, data_samples, image_position

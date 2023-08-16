@@ -1,22 +1,26 @@
+from typing import Optional
+
 import mmengine
-from transformers import AutoTokenizer, AutoModel
 import torch
 import torch.nn as nn
 from mmengine.device import get_device
-from typing import Optional
+from transformers import AutoModel, AutoTokenizer
 
 from opencompass.registry import MM_MODELS
+
 
 @MM_MODELS.register_module('visualglm-mmbench')
 class VisualGLM(nn.Module):
     """Inference code of VisualGLM.
+
     We load the visualGLM model via Huggingface.
     Args:
-        pretrained_path (str): Path to your downloaded visualGLM checkpoint or Huggingface repo id.
+        pretrained_path (str): Path to visualGLM checkpoint or repo id.
         prompt_constructor (dict): The config of prompt constructor.
         post_processor (dict): The config of post processor.
         gen_kwargs (dict): Customize generate function arguments.
     """
+
     def __init__(self,
                  pretrained_path: str,
                  prompt_constructor: dict,
@@ -31,7 +35,7 @@ class VisualGLM(nn.Module):
             prompt_constructor, MM_MODELS)
         self.post_processor = mmengine.registry.build_from_cfg(
             post_processor, MM_MODELS)
-        
+
         if gen_kwargs:
             self.gen_kwargs = gen_kwargs
         else:
@@ -63,7 +67,8 @@ class VisualGLM(nn.Module):
 
     def generate(self, batch):
         # process input
-        image, prompt, data_sample, image_position = self.prompt_constructor(batch)
+        image, prompt, data_sample, image_position = self.prompt_constructor(
+            batch)
         image = image.to(self.model.dtype).to(get_device())
 
         # tokenize
@@ -84,6 +89,7 @@ class VisualGLM(nn.Module):
         # format output
         outputs = outputs.tolist()
         for i, sample in enumerate(data_sample):
-            data_sample[i].pred_answer = self.post_processor(outputs[i], self.tokenizer, input_all.shape[1])
-        
+            data_sample[i].pred_answer = self.post_processor(
+                outputs[i], self.tokenizer, input_all.shape[1])
+
         return data_sample

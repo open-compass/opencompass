@@ -1,5 +1,3 @@
 from .llava import LLaVA
 
-__all__ = [
-    'LLaVA'
-]
+__all__ = ['LLaVA']

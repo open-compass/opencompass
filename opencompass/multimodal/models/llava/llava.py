@@ -1,18 +1,16 @@
+import importlib
 import os
 import sys
-import importlib
 
 import torch
 import torch.nn as nn
-import mmengine
 from mmengine.device import get_device
-from transformers import (AutoConfig, AutoTokenizer, CLIPImageProcessor,
-                          StoppingCriteria)
+from transformers import StoppingCriteria
 
 from opencompass.registry import MM_MODELS
+
 from .prompt_constructor import LLaVAMMBenchPromptConstructor
 
-import re
 
 def load_package():
     """Load required packages from LLaVA."""
@@ -20,10 +18,11 @@ def load_package():
     current_folder_path = os.path.dirname(current_file_path)
 
     sys.path.append(os.path.join(current_folder_path, 'LLaVA'))  # noqa
-    return 
+    return
 
 
 class KeywordsStoppingCriteria(StoppingCriteria):
+
     def __init__(self, keywords, tokenizer, input_ids):
         self.keywords = keywords
         self.tokenizer = tokenizer
@@ -46,10 +45,11 @@ class KeywordsStoppingCriteria(StoppingCriteria):
 
 @MM_MODELS.register_module('llava-7b-mmbench')
 class LLaVA(nn.Module):
+
     def __init__(self, model_path: str) -> None:
         super().__init__()
         self.device, self.dtype = get_device(), torch.float16
-        
+
         # load LLaVA modules
         load_package()
         mm_utils = importlib.import_module('llava.mm_utils')
@@ -57,10 +57,11 @@ class LLaVA(nn.Module):
         conversation = importlib.import_module('llava.conversation')
         self.SeparatorStyle = conversation.SeparatorStyle
         self.conv_templates = conversation.conv_templates
-        
+
         # load pretrained LLaVA
         model_name = mm_utils.get_model_name_from_path(model_path)
-        tokenizer, model, _, _ = builder.load_pretrained_model(model_path, None, model_name)
+        tokenizer, model, _, _ = builder.load_pretrained_model(
+            model_path, None, model_name)
 
         # load prompt constructor and post processor
         if 'v1' in model_path.lower():
@@ -69,28 +70,33 @@ class LLaVA(nn.Module):
             conv_mode = 'mpt_multimodal'
         else:
             conv_mode = 'multimodal'
-        mm_use_im_start_end = getattr(model.config, "mm_use_im_start_end", False)
-            
+        mm_use_im_start_end = getattr(model.config, 'mm_use_im_start_end',
+                                      False)
+
         self.model = model
         self.tokenizer = tokenizer
-        self.prompt_constructor = LLaVAMMBenchPromptConstructor(conv_templates=conversation.conv_templates, conv_mode=conv_mode, image_token_len=256, mm_use_im_start_end=mm_use_im_start_end)
+        self.prompt_constructor = LLaVAMMBenchPromptConstructor(
+            conv_templates=conversation.conv_templates,
+            conv_mode=conv_mode,
+            image_token_len=256,
+            mm_use_im_start_end=mm_use_im_start_end)
 
     def generate(self, batch):
-        
+
         prompt, stop_str = self.prompt_constructor(batch)
-        keywords = [stop_str] 
-        
+        keywords = [stop_str]
+
         inputs = self.tokenizer([prompt])
         input_ids = torch.as_tensor(inputs.input_ids).to(self.device)
         data_sample = batch['data_samples'][0]
-        
+
         self.model = self.model.to(self.device)
         image = batch['inputs'][0].unsqueeze(0)
         if image is not None:
             images = image.to(self.device)
         else:
             images = None
-            
+
         stopping_criteria = KeywordsStoppingCriteria(keywords, self.tokenizer,
                                                      input_ids)
 
@@ -109,7 +115,7 @@ class LLaVA(nn.Module):
                                output_ids[:, :input_token_len]).sum().item()
         if n_diff_input_output > 0:
             print(
-                f'[Warning] {n_diff_input_output} output_ids are not the same as the input_ids'
+                f'[Warning] {n_diff_input_output} output_ids are not the same as the input_ids'  # noqa
             )
         outputs = self.tokenizer.batch_decode(output_ids[:, input_token_len:],
                                               skip_special_tokens=True)[0]
