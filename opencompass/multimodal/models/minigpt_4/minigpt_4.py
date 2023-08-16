@@ -59,10 +59,15 @@ class MiniGPT4Inferencer(MiniGPT4):
                  do_sample: bool = False,
                  max_length: int = 30,
                  img_size: int = 224,
-                 low_resource: bool = False) -> None:
-        super().__init__(llama_model=llama_model,
-                         low_resource=low_resource,
-                         img_size=img_size)
+                 low_resource: bool = False,
+                 mode: str = 'generation',
+                 n_segments: int = 1) -> None:
+        super().__init__(
+            llama_model=llama_model,
+            low_resource=low_resource,
+            img_size=img_size)
+        self.mode = mode
+        self.n_segments = n_segments
 
         cur_device = get_device()
         stop_words_ids = [
@@ -71,34 +76,75 @@ class MiniGPT4Inferencer(MiniGPT4):
         ]
         self.stopping_criteria = StoppingCriteriaList(
             [StoppingCriteriaSub(stops=stop_words_ids)])
+
         self.prompt_constructor = mmengine.registry.build_from_cfg(
             prompt_constructor, MM_MODELS)
-        self.post_processor = mmengine.registry.build_from_cfg(
-            post_processor, MM_MODELS)
+        if post_processor is not None:
+            self.post_processor = mmengine.registry.build_from_cfg(
+                post_processor, MM_MODELS)
         self.do_sample = do_sample
         self.max_length = max_length
+
+    def forward(self, batch):
+        if self.mode == 'generation':
+            return self.generate(batch)
+        elif self.mode == 'loss':
+            return self.loss(batch)
+        else:
+            raise RuntimeError(f'Invalid mode "{self.mode}".')
 
     def encode_img(self, image):
         device = image.device
 
         with self.maybe_autocast():
-            image_embeds = self.ln_vision(
-                self.visual_encoder(image)).to(device)
-            image_atts = torch.ones(image_embeds.size()[:-1],
-                                    dtype=torch.long).to(device)
+            if image.dim() == 5:
+                inputs_llama, atts_llama = [], []
+                for j in range(image.size(2)):
+                    this_frame = image[:, :, j, :, :]
+                    frame_embeds = self.ln_vision(
+                        self.visual_encoder(this_frame))
+                    frame_atts = torch.ones(
+                        frame_embeds.size()[:-1],
+                        dtype=torch.long).to(image.device)
 
-            query_tokens = self.query_tokens.expand(image_embeds.shape[0], -1,
-                                                    -1)
-            query_output = self.Qformer.bert(
-                query_embeds=query_tokens,
-                encoder_hidden_states=image_embeds,
-                encoder_attention_mask=image_atts,
-                return_dict=True,
-            )
+                    query_tokens = self.query_tokens.expand(
+                        frame_embeds.shape[0], -1, -1)
+                    frame_query_output = self.Qformer.bert(
+                        query_embeds=query_tokens,
+                        encoder_hidden_states=frame_embeds,
+                        encoder_attention_mask=frame_atts,
+                        return_dict=True,
+                    )
 
-            inputs_llama = self.llama_proj(query_output.last_hidden_state)
-            atts_llama = torch.ones(inputs_llama.size()[:-1],
-                                    dtype=torch.long).to(image.device)
+                    frame_inputs_llama = self.llama_proj(
+                        frame_query_output.last_hidden_state[:, :query_tokens.
+                                                             size(1), :])
+                    frame_atts_llama = torch.ones(
+                        frame_inputs_llama.size()[:-1],
+                        dtype=torch.long).to(image.device)
+                    inputs_llama.append(frame_inputs_llama)
+                    atts_llama.append(frame_atts_llama)
+                inputs_llama = torch.cat(inputs_llama, dim=1)
+                atts_llama = torch.cat(atts_llama, dim=1)
+            else:
+                image_embeds = self.ln_vision(
+                    self.visual_encoder(image)).to(device)
+                image_atts = torch.ones(
+                    image_embeds.size()[:-1], dtype=torch.long).to(device)
+
+                query_tokens = self.query_tokens.expand(
+                    image_embeds.shape[0], -1, -1)
+                query_output = self.Qformer.bert(
+                    query_embeds=query_tokens,
+                    encoder_hidden_states=image_embeds,
+                    encoder_attention_mask=image_atts,
+                    return_dict=True,
+                )
+
+                inputs_llama = self.llama_proj(query_output.last_hidden_state)
+                atts_llama = torch.ones(
+                    inputs_llama.size()[:-1],
+                    dtype=torch.long).to(image.device)
         return inputs_llama, atts_llama
 
     def pack_inputs(self, batch):
@@ -119,9 +165,8 @@ class MiniGPT4Inferencer(MiniGPT4):
         img_embeds, _ = self.encode_img(image)
         prompt_segs = prompt.split('<ImageHere>')
         prompt_seg_tokens = [
-            self.llama_tokenizer(seg,
-                                 return_tensors='pt',
-                                 add_special_tokens=i == 0).
+            self.llama_tokenizer(
+                seg, return_tensors='pt', add_special_tokens=i == 0).
             to(self.llama_model.model.embed_tokens.weight.device).input_ids
             for i, seg in enumerate(prompt_segs)
         ]
@@ -154,89 +199,7 @@ class MiniGPT4Inferencer(MiniGPT4):
             data_samples[i] = data_sample
         return data_samples
 
-
-@MM_MODELS.register_module('minigpt-4-seedbench')
-class MiniGPT4SEEDBench(MiniGPT4):
-    """Inference code of MiniGPT-4 on SEED-Bench.
-
-    Args:
-        llama_model (str): The path of vicuna path.
-        prompt_constructor (dict): The config of prompt constructor.
-        low_resource (bool): Whether loaded in low precision.
-            Defaults to False.
-    """
-
-    def __init__(self,
-                 llama_model: str,
-                 prompt_constructor: dict,
-                 low_resource: bool = False,
-                 n_segments: int = 1) -> None:
-        super().__init__(llama_model=llama_model, low_resource=low_resource)
-        self.n_segments = n_segments
-
-        self.prompt_constructor = mmengine.registry.build_from_cfg(
-            prompt_constructor, MM_MODELS)
-
-    def pack_inputs(self, batch):
-        images = [image.unsqueeze(0) for image in batch['inputs']]
-        data_samples = [data_sample for data_sample in batch['data_samples']]
-        images = torch.cat(images, dim=0).to(get_device())
-        inputs = {'image': images, 'data_samples': data_samples}
-        return inputs
-
-    def encode_img(self, image):
-        device = image.device
-
-        with self.maybe_autocast():
-            if image.dim() == 5:
-                inputs_llama, atts_llama = [], []
-                for j in range(image.size(2)):
-                    this_frame = image[:, :, j, :, :]
-                    frame_embeds = self.ln_vision(
-                        self.visual_encoder(this_frame))
-                    frame_atts = torch.ones(frame_embeds.size()[:-1],
-                                            dtype=torch.long).to(image.device)
-
-                    query_tokens = self.query_tokens.expand(
-                        frame_embeds.shape[0], -1, -1)
-                    frame_query_output = self.Qformer.bert(
-                        query_embeds=query_tokens,
-                        encoder_hidden_states=frame_embeds,
-                        encoder_attention_mask=frame_atts,
-                        return_dict=True,
-                    )
-
-                    frame_inputs_t5 = self.llama_proj(
-                        frame_query_output.last_hidden_state[:, :query_tokens.
-                                                             size(1), :])
-                    frame_atts_t5 = torch.ones(frame_inputs_t5.size()[:-1],
-                                               dtype=torch.long).to(
-                                                   image.device)
-                    inputs_llama.append(frame_inputs_t5)
-                    atts_llama.append(frame_atts_t5)
-                inputs_llama = torch.cat(inputs_llama, dim=1)
-                atts_llama = torch.cat(atts_llama, dim=1)
-            else:
-                image_embeds = self.ln_vision(
-                    self.visual_encoder(image)).to(device)
-                image_atts = torch.ones(image_embeds.size()[:-1],
-                                        dtype=torch.long).to(device)
-
-                query_tokens = self.query_tokens.expand(
-                    image_embeds.shape[0], -1, -1)
-                query_output = self.Qformer.bert(
-                    query_embeds=query_tokens,
-                    encoder_hidden_states=image_embeds,
-                    encoder_attention_mask=image_atts,
-                    return_dict=True,
-                )
-
-                inputs_llama = self.llama_proj(query_output.last_hidden_state)
-                atts_llama = torch.ones(inputs_llama.size()[:-1],
-                                        dtype=torch.long).to(image.device)
-        return inputs_llama, atts_llama
-
-    def generate(self, batch):
+    def loss(self, batch):
         inputs = self.pack_inputs(batch)
         inputs = self.prompt_constructor(inputs)
         image = inputs['image']

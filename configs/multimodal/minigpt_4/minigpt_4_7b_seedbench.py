@@ -36,15 +36,14 @@ dataset = dict(
     type='opencompass.SEEDBenchDataset',
     ann_file='data/seedbench/SEED-Bench.json',
     cc3m_path='data/seedbench/SEED-Bench-image',
-    sthv2_path='s3://openmmlab/datasets/action/sthv2/videos',
-    epic_kitchens_path=  # noqa
-    'PATH_TO_EPIC-KITCHENS/3h91syskeag572hl6tvuovwv4d/videos/test',
+    sthv2_path='data/seedbench/sthv2/videos',
+    epic_kitchens_path='data/seedbench/3h91syskeag572hl6tvuovwv4d/videos/test',
     breakfast_path='data/seedbench/BreakfastII_15fps_qvga_sync',
     image_pipeline=image_pipeline,
     video_pipeline=video_pipeline,
     only_image=True)
 
-minigpt_4_dataloader = dict(
+minigpt_4_seedbench_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -52,16 +51,18 @@ minigpt_4_dataloader = dict(
     sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-minigpt_4_model = dict(
-    type='minigpt-4-seedbench',
+minigpt_4_seedbench_model = dict(
+    type='minigpt-4-mmbench',
     low_resource=False,
-    llama_model='/mnt/petrelfs/share_data/ouyanglinke/vicuna-7b/',
+    llama_model='/path/to/vicuna/',
     prompt_constructor=dict(
         type=MiniGPT4SEEDBenchPromptConstructor,
         image_prompt='###Human: <Img><ImageHere></Img>',
-        reply_prompt='###Assistant:'))
+        reply_prompt='###Assistant:'),
+    post_processor=None,
+    mode='loss')
 
 # evaluation settings
-minigpt_4_evaluator = [dict(type='opencompass.SEEDBenchAcc')]
+minigpt_4_seedbench_evaluator = [dict(type='opencompass.SEEDBenchAcc')]
 
-minigpt_4_load_from = '/mnt/petrelfs/fangyixiao/codes/MiniGPT-4/minigpt4/output/datav4_30e-clip/20230803132/checkpoint_29.pth'  # noqa
+minigpt_4_load_from = '/path/to/prerained_minigpt4_7b.pth'
