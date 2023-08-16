@@ -5,7 +5,6 @@ import os.path as osp
 import re
 import subprocess
 import tempfile
-import time
 from shutil import copyfile
 from typing import Dict, Iterable
 
@@ -23,16 +22,6 @@ _LANGUAGE_NAME_DICT = {
     'python': 'Python',
     'rust': 'Rust',
 }
-
-_LANGUAGE_SLEEP_DICT = {
-    'cpp': 10,
-    'go': 60,
-    'java': 30,
-    'js': 2,
-    'python': 0,
-    'rust': 120,
-}
-
 
 class HumanevalXDataset(BaseDataset):
 
@@ -58,7 +47,6 @@ class HumanevalXDataset(BaseDataset):
 
         return results
 
-
 class HumanevalXEvaluator(BaseEvaluator):
     """Evaluator for humanevalx.
 
@@ -76,16 +64,18 @@ class HumanevalXEvaluator(BaseEvaluator):
         timeout (int): Maximum wait time when accessing the service,
             Defaults to 100.
 
-    TODO: support 'k' of pass@k.
+    TODO: support 'k' of pass@k. default to use k = [1, 10, 100]
     """
 
     def __init__(self,
                  language,
                  ip_address='localhost',
                  port=5000,
-                 timeout=100) -> None:
+                 timeout=180) -> None:
         assert language in _LANGUAGE_NAME_DICT.keys(), (
             f'language must be in {list(_LANGUAGE_NAME_DICT.keys())}')
+        if language == "rust":
+            timeout *= 10    # rust need more time
         self.language = language
         self.ip_address = ip_address
         self.port = port
@@ -93,8 +83,6 @@ class HumanevalXEvaluator(BaseEvaluator):
         super().__init__()
 
     def score(self, predictions, references):
-        self._seelp_towards_lang(
-        )  # used to avoid running multiple tasks simultaneously
         predictions = [{
             'task_id': f'{_LANGUAGE_NAME_DICT[self.language]}/{i}',
             'generation': _clean_up_code(pred, self.language),
@@ -120,7 +108,7 @@ class HumanevalXEvaluator(BaseEvaluator):
             copyfile(tmp_out_path, result_file_path)
             raise Exception(
                 f'Call CodeEvalService Error in `HumanevalXEvaluator`, The '
-                f"results  have been saved in path '{result_file_path}', You "
+                f"results have been saved in path '{result_file_path}', You "
                 'need to check that your code evaluate service is launched and'
                 f' the network to service is connected, you can also get '
                 f'results directly by using `curl` command refer to {ref_url}.'
@@ -150,14 +138,6 @@ class HumanevalXEvaluator(BaseEvaluator):
                 except Exception:
                     err = exec_result.stdout
             return False, err
-
-    def _seelp_towards_lang(self):
-        """Since code-eval-service cannot handle concurrent situations at
-        present, we use the most primitive sleep method here to offset these
-        tasks submission."""
-        time_to_sleep = _LANGUAGE_SLEEP_DICT[self.language]
-        time.sleep(time_to_sleep)
-
 
 def _clean_up_code(text: str, language_type: str) -> str:
     """Cleans up the generated code."""
