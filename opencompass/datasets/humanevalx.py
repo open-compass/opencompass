@@ -23,6 +23,7 @@ _LANGUAGE_NAME_DICT = {
     'rust': 'Rust',
 }
 
+
 class HumanevalXDataset(BaseDataset):
 
     @staticmethod
@@ -46,6 +47,7 @@ class HumanevalXDataset(BaseDataset):
         fp.close()
 
         return results
+
 
 class HumanevalXEvaluator(BaseEvaluator):
     """Evaluator for humanevalx.
@@ -74,8 +76,8 @@ class HumanevalXEvaluator(BaseEvaluator):
                  timeout=180) -> None:
         assert language in _LANGUAGE_NAME_DICT.keys(), (
             f'language must be in {list(_LANGUAGE_NAME_DICT.keys())}')
-        if language == "rust":
-            timeout *= 10    # rust need more time
+        if language == 'rust':
+            timeout *= 10  # rust need more time
         self.language = language
         self.ip_address = ip_address
         self.port = port
@@ -138,6 +140,7 @@ class HumanevalXEvaluator(BaseEvaluator):
                 except Exception:
                     err = exec_result.stdout
             return False, err
+
 
 def _clean_up_code(text: str, language_type: str) -> str:
     """Cleans up the generated code."""
