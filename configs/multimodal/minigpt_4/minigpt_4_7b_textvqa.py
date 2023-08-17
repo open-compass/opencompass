@@ -30,7 +30,7 @@ dataset = dict(
     data_prefix='images/train_images',
 )
 
-minigpt_4_vqav2_dataloader = dict(batch_size=1,
+minigpt_4_textvqa_dataloader = dict(batch_size=1,
                                   num_workers=4,
                                   dataset=dataset,
                                   collate_fn=dict(type='pseudo_collate'),
@@ -38,7 +38,7 @@ minigpt_4_vqav2_dataloader = dict(batch_size=1,
                                                shuffle=False))
 
 # model settings
-minigpt_4_vqav2_model = dict(
+minigpt_4_textvqa_model = dict(
     type='minigpt-4',
     low_resource=False,
     img_size=224,
@@ -50,6 +50,6 @@ minigpt_4_vqav2_model = dict(
     post_processor=dict(type=MiniGPT4VQAPostProcessor))
 
 # evaluation settings
-minigpt_4_vqav2_evaluator = [dict(type='mmpretrain.VQAAcc')]
+minigpt_4_textvqa_evaluator = [dict(type='mmpretrain.VQAAcc')]
 
-minigpt_4_vqav2_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
+minigpt_4_textvqa_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa

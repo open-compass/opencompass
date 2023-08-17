@@ -21,24 +21,21 @@ val_pipeline = [
     )
 ]
 
-dataset = dict(
-    type='mmpretrain.COCOVQA',
-    data_root='data/okvqa',
-    question_file='annotations/OpenEnded_mscoco_val2014_questions.json',
-    ann_file='annotations/mscoco_val2014_annotations.json',
-    pipeline=val_pipeline,
-    data_prefix='images/val2014',
-)
+dataset = dict(type='mmpretrain.VizWiz',
+               data_root='data/vizwiz/',
+               data_prefix='Images/val',
+               ann_file='Annotations/val.json',
+               pipeline=val_pipeline)
 
-minigpt_4_ok_vqa_dataloader = dict(batch_size=1,
-                                  num_workers=4,
-                                  dataset=dataset,
-                                  collate_fn=dict(type='pseudo_collate'),
-                                  sampler=dict(type='DefaultSampler',
-                                               shuffle=False))
+minigpt_4_vizwiz_dataloader = dict(batch_size=1,
+                                   num_workers=4,
+                                   dataset=dataset,
+                                   collate_fn=dict(type='pseudo_collate'),
+                                   sampler=dict(type='DefaultSampler',
+                                                shuffle=False))
 
 # model settings
-minigpt_4_ok_vqa_model = dict(
+minigpt_4_vizwiz_model = dict(
     type='minigpt-4',
     low_resource=False,
     img_size=224,
@@ -50,6 +47,6 @@ minigpt_4_ok_vqa_model = dict(
     post_processor=dict(type=MiniGPT4VQAPostProcessor))
 
 # evaluation settings
-minigpt_4_ok_vqa_evaluator = [dict(type='mmpretrain.VQAAcc')]
+minigpt_4_vizwiz_evaluator = [dict(type='mmpretrain.VQAAcc')]
 
-minigpt_4_ok_vqa_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
+minigpt_4_vizwiz_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
