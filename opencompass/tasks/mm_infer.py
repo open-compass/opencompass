@@ -127,9 +127,9 @@ class MultimodalInferTask:
 
         for batch in track_iter_progress(dataloader):
             if dist.is_initialized():
-                data_samples = model.module.generate(batch)
+                data_samples = model.module.forward(batch)
             else:
-                data_samples = model.generate(batch)
+                data_samples = model.forward(batch)
             if not isinstance(data_samples, Sequence):
                 data_samples = [data_samples]
             evaluator.process(data_samples)

@@ -118,3 +118,23 @@ class MiniGPT4VSRPromptConstructor(MiniGPT4MMBenchPromptConstructor):
         question = questions[0]
         prompt = self.image_prompt + ' ' + question + ' ' + 'Is the above description correct? Answer yes or no.' + ' ' + self.reply_prompt  # noqa
         return prompt
+
+
+class MiniGPT4SEEDBenchPromptConstructor(MiniGPT4MMBenchPromptConstructor):
+
+    def _process(self, data_samples: List[DataSample]) -> str:
+        """Process data sample to prompt.
+
+        Args:
+            data_samples (List[DataSample]): A list of data_samples.
+
+        Returns:
+            str: Prompt.
+        """
+        assert len(data_samples) == 1, 'Only support batch size 1.'
+        questions = [
+            data_sample.get('question') for data_sample in data_samples
+        ]
+        question = questions[0]
+        prompt = self.image_prompt + ' ' + question + ' ' + self.reply_prompt
+        return prompt

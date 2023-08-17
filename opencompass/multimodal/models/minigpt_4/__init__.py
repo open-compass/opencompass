@@ -7,6 +7,7 @@ from .post_processor import (MiniGPT4COCOCaptionPostProcessor,
 from .prompt_constructor import (MiniGPT4COCOCaotionPromptConstructor,
                                  MiniGPT4MMBenchPromptConstructor,
                                  MiniGPT4ScienceQAPromptConstructor,
+                                 MiniGPT4SEEDBenchPromptConstructor,
                                  MiniGPT4VQAPromptConstructor,
                                  MiniGPT4VSRPromptConstructor)
 
@@ -16,5 +17,5 @@ __all__ = [
     'MiniGPT4COCOCaptionPostProcessor', 'MiniGPT4ScienceQAPromptConstructor',
     'MiniGPT4ScienceQAPostProcessor', 'MiniGPT4VQAPromptConstructor',
     'MiniGPT4VQAPostProcessor', 'MiniGPT4VSRPostProcessor',
-    'MiniGPT4VSRPromptConstructor'
+    'MiniGPT4VSRPromptConstructor', 'MiniGPT4SEEDBenchPromptConstructor'
 ]
