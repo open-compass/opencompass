@@ -52,7 +52,7 @@ minigpt_4_seedbench_dataloader = dict(
 
 # model settings
 minigpt_4_seedbench_model = dict(
-    type='minigpt-4-mmbench',
+    type='minigpt-4',
     low_resource=False,
     llama_model='/path/to/vicuna/',
     prompt_constructor=dict(
