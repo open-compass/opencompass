@@ -56,6 +56,7 @@ OpenCompass 上手路线
    advanced_guides/new_dataset.md
    advanced_guides/new_model.md
    advanced_guides/evaluation_turbomind.md
+   advanced_guides/code_eval_service.md
 
 .. _工具:
 .. toctree::
