@@ -7,9 +7,9 @@ from .post_processor import (MiniGPT4COCOCaptionPostProcessor,
 from .prompt_constructor import (MiniGPT4COCOCaotionPromptConstructor,
                                  MiniGPT4MMBenchPromptConstructor,
                                  MiniGPT4ScienceQAPromptConstructor,
+                                 MiniGPT4SEEDBenchPromptConstructor,
                                  MiniGPT4VQAPromptConstructor,
-                                 MiniGPT4VSRPromptConstructor,
-                                 MiniGPT4SEEDBenchPromptConstructor)
+                                 MiniGPT4VSRPromptConstructor)
 
 __all__ = [
     'MiniGPT4Inferencer', 'MiniGPT4MMBenchPostProcessor',
