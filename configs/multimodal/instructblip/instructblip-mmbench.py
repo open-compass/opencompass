@@ -1,3 +1,6 @@
+from opencompass.multimodal.models.instructblip import (
+    MiniGPT4MMBenchPromptConstructor, MiniGPT4MMBenchPostProcessor)
+
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.torchvision/Resize',
@@ -9,8 +12,8 @@ val_pipeline = [
          std=(0.26862954, 0.26130258, 0.27577711)),
     dict(type='mmpretrain.PackInputs',
          algorithm_keys=[
-             'question', 'category', 'l2-category', 'context',
-             'index', 'options_dict', 'options', 'split'
+             'question', 'category', 'l2-category', 'context', 'index',
+             'options_dict', 'options', 'split'
          ])
 ]
 
