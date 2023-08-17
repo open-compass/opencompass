@@ -17,7 +17,8 @@ class LLaVAMMBenchPromptConstructor:
             Config arg. Use start and end token when build prompt or not.
     """
 
-    def __init__(self, conv_templates: Any, conv_mode: str, mm_use_im_start_end: bool) -> None:
+    def __init__(self, conv_templates: Any, conv_mode: str,
+                 mm_use_im_start_end: bool) -> None:
         self.conv_templates = conv_templates
         self.conv_mode = conv_mode
         self.mm_use_im_start_end = mm_use_im_start_end
@@ -39,11 +40,10 @@ class LLaVAMMBenchPromptConstructor:
         options = data_samples[0].get('options')
         prompt = question + ' ' + options
         if self.mm_use_im_start_end:
-            prompt = (DEFAULT_IM_START_TOKEN +
-                      DEFAULT_IMAGE_TOKEN +
-                      DEFAULT_IM_END_TOKEN + "\n" + prompt)
+            prompt = (DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN +
+                      DEFAULT_IM_END_TOKEN + '\n' + prompt)
         else:
-            prompt = DEFAULT_IMAGE_TOKEN + "\n" + prompt  # noqa
+            prompt = DEFAULT_IMAGE_TOKEN + '\n' + prompt  # noqa
 
         conv = self.conv_templates[self.conv_mode].copy()
         conv.append_message(conv.roles[0], prompt)

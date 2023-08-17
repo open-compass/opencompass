@@ -2,6 +2,7 @@ from typing import Any
 
 import torch
 
+
 class VisualGLMPostProcessor:
     """"Post processor for VisualGLM on MMBench."""
 

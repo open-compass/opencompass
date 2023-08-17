@@ -13,6 +13,7 @@ from .prompt_constructor import LLaVAMMBenchPromptConstructor
 
 IMAGE_TOKEN_INDEX = -200
 
+
 def load_package():
     """Load required packages from LLaVA."""
     current_file_path = os.path.abspath(__file__)
@@ -104,10 +105,12 @@ class LLaVA(nn.Module):
             images = image.to(get_device())
         else:
             images = None
-        
-        mm_utils = importlib.import_module('llava.mm_utils')    
-        input_ids = mm_utils.tokenizer_image_token(prompt, self.tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).to(get_device())
-        
+
+        mm_utils = importlib.import_module('llava.mm_utils')
+        input_ids = mm_utils.tokenizer_image_token(
+            prompt, self.tokenizer, IMAGE_TOKEN_INDEX,
+            return_tensors='pt').unsqueeze(0).to(get_device())
+
         stopping_criteria = KeywordsStoppingCriteria(keywords, self.tokenizer,
                                                      input_ids)
 
