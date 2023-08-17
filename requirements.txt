@@ -24,3 +24,4 @@ tokenizers>=0.13.3
 torch>=1.13.1
 tqdm==4.64.1
 transformers>=4.29.1
+litellm
