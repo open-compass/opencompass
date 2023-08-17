@@ -11,6 +11,7 @@ from opencompass.registry import MM_MODELS
 
 from .prompt_constructor import LLaVAMMBenchPromptConstructor
 
+IMAGE_TOKEN_INDEX = -200
 
 def load_package():
     """Load required packages from LLaVA."""
@@ -22,6 +23,7 @@ def load_package():
 
 
 class KeywordsStoppingCriteria(StoppingCriteria):
+    """Keyword stopping criteria implemented for llava."""
 
     def __init__(self, keywords, tokenizer, input_ids):
         self.keywords = keywords
@@ -43,7 +45,7 @@ class KeywordsStoppingCriteria(StoppingCriteria):
         return False
 
 
-@MM_MODELS.register_module('llava-7b-mmbench')
+@MM_MODELS.register_module('llava')
 class LLaVA(nn.Module):
     """Inference code of LLaVA on MMBench. Need to clone LLaVA official repo
     first. Please check out the README in config.
@@ -54,7 +56,7 @@ class LLaVA(nn.Module):
 
     def __init__(self, model_path: str) -> None:
         super().__init__()
-        self.device, self.dtype = get_device(), torch.float16
+        self.dtype = torch.float16
 
         # load LLaVA modules
         load_package()
@@ -65,9 +67,14 @@ class LLaVA(nn.Module):
         self.conv_templates = conversation.conv_templates
 
         # load pretrained LLaVA
+        # Note: When encounters with device related errors,
+        # try setting `low_cpu_mem_usage` in `load_pretrained_model` as False
         model_name = mm_utils.get_model_name_from_path(model_path)
         tokenizer, model, _, _ = builder.load_pretrained_model(
             model_path, None, model_name)
+        vision_tower = model.get_vision_tower()
+        vision_tower.to(device=get_device(), dtype=self.dtype)
+        model.to(device=get_device(), dtype=self.dtype)
 
         # load prompt constructor and post processor
         if 'v1' in model_path.lower():
@@ -84,25 +91,23 @@ class LLaVA(nn.Module):
         self.prompt_constructor = LLaVAMMBenchPromptConstructor(
             conv_templates=conversation.conv_templates,
             conv_mode=conv_mode,
-            image_token_len=256,
             mm_use_im_start_end=mm_use_im_start_end)
 
     def generate(self, batch):
 
         prompt, stop_str = self.prompt_constructor(batch)
         keywords = [stop_str]
-
-        inputs = self.tokenizer([prompt])
-        input_ids = torch.as_tensor(inputs.input_ids).to(self.device)
         data_sample = batch['data_samples'][0]
 
-        self.model = self.model.to(self.device)
         image = batch['inputs'][0].unsqueeze(0)
         if image is not None:
-            images = image.to(self.device)
+            images = image.to(get_device())
         else:
             images = None
-
+        
+        mm_utils = importlib.import_module('llava.mm_utils')    
+        input_ids = mm_utils.tokenizer_image_token(prompt, self.tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).to(get_device())
+        
         stopping_criteria = KeywordsStoppingCriteria(keywords, self.tokenizer,
                                                      input_ids)
 

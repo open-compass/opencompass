@@ -9,7 +9,7 @@ from transformers import AutoModel, AutoTokenizer
 from opencompass.registry import MM_MODELS
 
 
-@MM_MODELS.register_module('visualglm-mmbench')
+@MM_MODELS.register_module('visualglm')
 class VisualGLM(nn.Module):
     """Inference code of VisualGLM.
 

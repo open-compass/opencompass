@@ -1,19 +1,16 @@
 import torch
 
-from opencompass.registry import MM_MODELS
 
-
-@MM_MODELS.register_module('visualglm-promptconstructor')
 class VisualGLMPromptConstructor:
     """Prompt constructor for VisualGLM.
 
     The overall prompt will be formulated as
     "system_prompt"+"human_prompt"+"image_prompt"+question+"assistant+prompt".
     Args:
-        system_prompt (str): System prompt.
-        human_prompt (str): Human prompt.
-        image_prompt (str): Image prompt.
-        assistant_prompt (str): Assistant prompt.
+        system_prompt (str): System prompt. (Default: '')
+        human_prompt (str): Human prompt. (Default: 'Q:')
+        image_prompt (str): Image prompt. (Default: '<img></img>')
+        assistant_prompt (str): Assistant prompt. (Default: 'A:')
     """
 
     def __init__(self,

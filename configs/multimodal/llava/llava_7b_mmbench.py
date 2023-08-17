@@ -32,13 +32,9 @@ mmbench_dataloader = dict(
 
 # model settings
 llava_model = dict(
-    type='llava-7b-mmbench',
+    type='llava',
     model_path='/path/to/llava',
 )  # noqa
-"""
-You can download llava's weights to your own path, remember you need to convert the delta weights to full model weights
-following: https://github.com/haotian-liu/LLaVA/blob/main/README.md#llava-weights
-"""
 
 # evaluation settings
 mmbench_evaluator = [

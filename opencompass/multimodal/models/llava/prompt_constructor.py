@@ -11,18 +11,15 @@ class LLaVAMMBenchPromptConstructor:
     """Prompt constructor for LLaVA on MMBench.
 
     Args:
-        conv_templates: Conversation class to build prompt.
-        conv_mode: Version control args for different version of LLaVA.
-        image_token_len: Number of tokens per image.
-        mm_use_im_start_end:
+        conv_templates (Any): Conversation class to build prompt.
+        conv_mode (str): Version control args for different version of LLaVA.
+        mm_use_im_start_end (bool):
             Config arg. Use start and end token when build prompt or not.
     """
 
-    def __init__(self, conv_templates: Any, conv_mode: str,
-                 image_token_len: int, mm_use_im_start_end: bool) -> None:
+    def __init__(self, conv_templates: Any, conv_mode: str, mm_use_im_start_end: bool) -> None:
         self.conv_templates = conv_templates
         self.conv_mode = conv_mode
-        self.image_token_len = image_token_len
         self.mm_use_im_start_end = mm_use_im_start_end
         conversation = importlib.import_module('llava.conversation')
         self.SeparatorStyle = conversation.SeparatorStyle
@@ -42,11 +39,11 @@ class LLaVAMMBenchPromptConstructor:
         options = data_samples[0].get('options')
         prompt = question + ' ' + options
         if self.mm_use_im_start_end:
-            prompt = (prompt + '\n' + DEFAULT_IM_START_TOKEN +
-                      DEFAULT_IMAGE_PATCH_TOKEN * self.image_token_len +
-                      DEFAULT_IM_END_TOKEN)
+            prompt = (DEFAULT_IM_START_TOKEN +
+                      DEFAULT_IMAGE_TOKEN +
+                      DEFAULT_IM_END_TOKEN + "\n" + prompt)
         else:
-            prompt = prompt + '\n' + DEFAULT_IMAGE_PATCH_TOKEN * self.image_token_len  # noqa
+            prompt = DEFAULT_IMAGE_TOKEN + "\n" + prompt  # noqa
 
         conv = self.conv_templates[self.conv_mode].copy()
         conv.append_message(conv.roles[0], prompt)

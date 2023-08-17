@@ -2,10 +2,6 @@ from typing import Any
 
 import torch
 
-from opencompass.registry import MM_MODELS
-
-
-@MM_MODELS.register_module('visualglm-postprocessor')
 class VisualGLMPostProcessor:
     """"Post processor for VisualGLM on MMBench."""
 
