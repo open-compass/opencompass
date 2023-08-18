@@ -140,3 +140,6 @@ class LLaVA(nn.Module):
 
         data_sample.pred_answer = output_text
         return data_sample
+
+    def forward(self, batch):
+        return self.generate(batch)

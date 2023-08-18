@@ -93,3 +93,6 @@ class VisualGLM(nn.Module):
                 outputs[i], self.tokenizer, input_all.shape[1])
 
         return data_sample
+
+    def forward(self, batch):
+        return self.generate(batch)

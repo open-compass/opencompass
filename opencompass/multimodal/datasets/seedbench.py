@@ -2,7 +2,7 @@ import json
 import os.path as osp
 from typing import List
 
-import av
+import importlib
 import numpy as np
 import torch
 from decord import VideoReader, cpu
@@ -116,6 +116,7 @@ class SEEDBenchDataset(Dataset):
 
             if use_pyav:
                 # using pyav for videos in evaluation dimension 12
+                av = importlib.importmodule('av')
                 reader = av.open(data_path)
                 frames = [
                     torch.from_numpy(f.to_rgb().to_ndarray())
