@@ -1,3 +1,4 @@
+absl-py
 accelerate>=0.19.0
 boto3
 colossalai
@@ -7,13 +8,15 @@ evaluate>=0.3.0
 fairscale
 faiss_gpu==1.7.2
 jieba
-mmengine
+mmengine>=0.8.2
 nltk==3.8
 numpy==1.23.4
 openai
 pandas<2.0.0
 rank_bm25==0.2.2
+rapidfuzz
 requests==2.31.0
+rouge_score
 scikit_learn==1.2.1
 sentence_transformers==2.2.2
 tabulate
