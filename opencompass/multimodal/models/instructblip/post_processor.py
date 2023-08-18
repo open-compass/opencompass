@@ -13,8 +13,9 @@ class InstructBlipMMBenchPostProcessor:
 
         output_text = tokenizer.decode(output_token,
                                        add_special_tokens=False)  # noqa
-        output_text = [text.strip() for text in output_text]
-        output_text = self._extract_key_words(output_text)
+        output_text = [
+            self._extract_key_words(text.strip()) for text in output_text
+        ]
         return output_text
 
     def _extract_key_words(self, output_text: str) -> str:

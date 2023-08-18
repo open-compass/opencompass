@@ -1,5 +1,5 @@
 from opencompass.multimodal.models.instructblip import (
-    MiniGPT4MMBenchPromptConstructor, MiniGPT4MMBenchPostProcessor)
+    InstructBlipMMBenchPromptConstructor, InstructBlipMMBenchPostProcessor)
 
 # dataloader settings
 val_pipeline = [
@@ -17,32 +17,35 @@ val_pipeline = [
          ])
 ]
 
-dataset = dict(type='opencompass.MMBench',
+dataset = dict(type='opencompass.MMBenchDataset',
                data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
-dataloader = dict(batch_size=1,
-                  num_workers=4,
-                  dataset=dataset,
-                  collate_fn=dict(type='pseudo_collate'),
-                  sampler=dict(type='DefaultSampler', shuffle=False))
+instruct_blip_dataloader = dict(batch_size=1,
+                                num_workers=4,
+                                dataset=dataset,
+                                collate_fn=dict(type='pseudo_collate'),
+                                sampler=dict(type='DefaultSampler',
+                                             shuffle=False))
 
 # model settings
-model = dict(
-    type='blip2-vicuna-instruct-mmbench',
+instruct_blip_model = dict(
+    type='blip2-vicuna-instruct',
+    prompt_constructor=dict(type=InstructBlipMMBenchPromptConstructor),
+    post_processor=dict(type=InstructBlipMMBenchPostProcessor),
     freeze_vit=True,
     low_resource=False,
-    llm_model='/path/to/vicuna-7b/',
+    llm_model='/mnt/petrelfs/share_data/ouyanglinke/vicuna-7b/',
     sys_prompt=  # noqa: E251
     '###Human: What is the capital of China? There are several options:\nA. Beijing\nB. Shanghai\nC. Guangzhou\nD. Shenzhen\n###Assistant: A\n'
 )
 
 # evaluation settings
-evaluator = [
+instruct_blip_evaluator = [
     dict(
         type='opencompass.DumpResults',
         save_path=  # noqa: E251
         'work_dirs/instructblip_vicuna7b/instructblipvicuna_mmbench.xlsx')
 ]
 
-load_from = '/path/to/instruct_blip_vicuna7b_trimmed.pth'  # noqa
+instruct_blip_load_from = '/mnt/petrelfs/share_data/liuyuan/llm_weights/instructblip_vicuna_7b/instruct_blip_vicuna7b_trimmed.pth'  # noqa
