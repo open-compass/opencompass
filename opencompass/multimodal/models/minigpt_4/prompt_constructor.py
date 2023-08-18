@@ -142,22 +142,25 @@ class MiniGPT4SEEDBenchPromptConstructor(MiniGPT4MMBenchPromptConstructor):
 
 class MiniGPT4MMEPromptConstructor:
     """Prompt constructor for MiniGPT-4 on MME.
-    
+
     Args:
         image_prompt (str): Image prompt. Defaults to `''`.
         reply_prompt (str): Reply prompt. Defaults to `''`.
     """
 
-    def __init__(self, image_prompt: str = '', reply_prompt: str = '') -> None:
-        self.image_prompt = image_prompt
-        self.reply_prompt = reply_prompt
+    def __init__(self) -> None:
+        self.system_prompt = (
+            'Give the following image: <Img>ImageContent</Img>.'
+            'You will be able to see the image once I provide it to you.'
+            'Please answer my questions.')
+        self.sep = '###'
 
     def __call__(self, inputs: dict) -> dict:
         """Construct prompt.
-        
+
         Args:
             inputs (dict): Input data containing image and data_samples.
-        
+
         Returns:
             dict: A dict containing prompt, images and data_samples.
         """
@@ -169,14 +172,16 @@ class MiniGPT4MMEPromptConstructor:
 
     def _process(self, data_samples: List[DataSample]) -> str:
         """Process data sample to prompt.
-        
+
         Args:
             data_samples (List[DataSample]): A list of data_samples.
-        
+
         Returns:
             str: Prompt.
         """
         assert len(data_samples) == 1, 'Only support batch size 1.'
         question = data_samples[0].get('question')
-        prompt = self.image_prompt + ' ' + question + ' ' + self.reply_prompt  # noqa
+        prompt = self.system_prompt + self.sep
+        prompt += 'Human: ' + question + ' ' + '<Img><ImageHere></Img>' + ' ' + self.sep  # noqa
+        prompt += 'Assistant: '
         return prompt

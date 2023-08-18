@@ -120,11 +120,12 @@ class MiniGPT4VSRPostProcessor:
             output_text = output_text[0].lower()
         return output_text
 
-class MiniGPT4PostProcessorMME(MiniGPT4PostProcessor):
+
+class MiniGPT4MMEPostProcessor(MiniGPT4MMBenchPostProcessor):
     """"Post processor for MiniGPT-4 on MME."""
 
     def __init__(self) -> None:
-        pass
+        super().__init__()
 
     def __call__(self, output_token: torch.tensor, tokenizer) -> str:
         response = super().__call__(output_token, tokenizer)
