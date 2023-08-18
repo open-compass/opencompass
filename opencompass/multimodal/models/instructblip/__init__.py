@@ -1,6 +1,6 @@
 from .blip2_vicuna_instruct import InstructBlipInferencer
-from .prompt_constructor import InstructBlipMMBenchPromptConstructor
 from .post_processor import InstructBlipMMBenchPostProcessor
+from .prompt_constructor import InstructBlipMMBenchPromptConstructor
 
 __all__ = [
     'InstructBlipInferencer', 'InstructBlipMMBenchPromptConstructor',
