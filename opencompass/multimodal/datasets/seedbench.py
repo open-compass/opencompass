@@ -1,8 +1,8 @@
+import importlib
 import json
 import os.path as osp
 from typing import List
 
-import importlib
 import numpy as np
 import torch
 from decord import VideoReader, cpu
