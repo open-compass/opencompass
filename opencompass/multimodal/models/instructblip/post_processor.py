@@ -10,12 +10,11 @@ class InstructBlipMMBenchPostProcessor:
         pass
 
     def __call__(self, output_token: torch.tensor, tokenizer) -> str:
-
+        # convert output id 0 to 2 (eos_token_id)
+        output_token[output_token == 0] = 2
         output_text = tokenizer.decode(output_token,
                                        add_special_tokens=False)  # noqa
-        output_text = [
-            self._extract_key_words(text.strip()) for text in output_text
-        ]
+        output_text = self._extract_key_words(output_text.strip())
         return output_text
 
     def _extract_key_words(self, output_text: str) -> str:

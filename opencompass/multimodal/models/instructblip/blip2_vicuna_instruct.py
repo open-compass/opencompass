@@ -33,8 +33,10 @@ class InstructBlipInferencer(Blip2Base):
         max_output_txt_len: int = 256,
         qformer_text_input: bool = True,
         low_resource: bool = False,
+        mode: str = 'generation',
     ):
         super().__init__()
+        self.mode = mode
         self.prompt_constructor = mmengine.registry.build_from_cfg(
             prompt_constructor, MM_MODELS)
         self.post_processor = mmengine.registry.build_from_cfg(
@@ -98,6 +100,12 @@ class InstructBlipInferencer(Blip2Base):
         self._lemmatizer = None
 
         self.qformer_text_input = qformer_text_input
+
+    def forward(self, batch):
+        if self.mode == 'generation':
+            return self.generate(batch)
+        else:
+            raise RuntimeError(f'Invalid mode "{self.mode}".')
 
     def concat_text_input_output(self, input_ids, input_atts, output_ids,
                                  output_atts):
@@ -227,7 +235,6 @@ class InstructBlipInferencer(Blip2Base):
                 num_return_sequences=num_captions,
             )
 
-        outputs[outputs == 0] = 2  # convert output id 0 to 2 (eos_token_id)
         for i, data_sample in enumerate(data_samples):
             output_token = outputs[i]
             output_text = self.post_processor(output_token, self.llm_tokenizer)
