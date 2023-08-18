@@ -5,11 +5,13 @@ from .post_processor import (MiniGPT4COCOCaptionPostProcessor,
                              MiniGPT4ScienceQAPostProcessor,
                              MiniGPT4VQAPostProcessor,
                              MiniGPT4VSRPostProcessor)
-from .prompt_constructor import (
-    MiniGPT4COCOCaotionPromptConstructor, MiniGPT4MMBenchPromptConstructor,
-    MiniGPT4MMEPromptConstructor, MiniGPT4ScienceQAPromptConstructor,
-    MiniGPT4SEEDBenchPromptConstructor, MiniGPT4VQAPromptConstructor,
-    MiniGPT4VSRPromptConstructor)
+from .prompt_constructor import MiniGPT4VSRPromptConstructor  # noqa
+from .prompt_constructor import (MiniGPT4COCOCaotionPromptConstructor,
+                                 MiniGPT4MMBenchPromptConstructor,
+                                 MiniGPT4MMEPromptConstructor,
+                                 MiniGPT4ScienceQAPromptConstructor,
+                                 MiniGPT4SEEDBenchPromptConstructor,
+                                 MiniGPT4VQAPromptConstructor)
 
 __all__ = [
     'MiniGPT4Inferencer', 'MiniGPT4MMBenchPostProcessor',
