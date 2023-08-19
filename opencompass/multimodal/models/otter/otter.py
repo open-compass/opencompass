@@ -6,12 +6,11 @@ import torch.nn as nn
 from mmengine.device import get_device
 from transformers import CLIPImageProcessor
 
-from mm_benchmark.registry import MODELS
+from opencompass.registry import MM_MODELS
 
 from .modeling_otter import OtterForConditionalGeneration
 
-
-@MODELS.register_module("otter-9b")
+@MM_MODELS.register_module("otter-9b")
 class Otter(nn.Module):
     """Inference code of OTTER.
     Model details:
