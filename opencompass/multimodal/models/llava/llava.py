@@ -48,8 +48,8 @@ class KeywordsStoppingCriteria(StoppingCriteria):
 
 @MM_MODELS.register_module('llava')
 class LLaVA(nn.Module):
-    """Inference code of LLaVA on MMBench. Need to clone LLaVA official repo
-    first. Please check out the README in config.
+    """Inference code of LLaVA. Need to clone LLaVA official repo first. Please
+    check out the README in config.
 
     Args:
         model_path (str): The path of llava checkpoint.
