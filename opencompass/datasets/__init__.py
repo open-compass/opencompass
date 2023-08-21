@@ -54,6 +54,7 @@ from .LEval_scientific_qa import *  # noqa: F401, F403
 from .LEval_topic_retrieval import *  # noqa: F401, F403
 from .LEval_tpo import *  # noqa: F401, F403
 from .LEval_tvshow_summ import *  # noqa: F401, F403
+from .longbench import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403

@@ -7,6 +7,7 @@ datasets>=2.12.0
 evaluate>=0.3.0
 fairscale
 faiss_gpu==1.7.2
+fuzzywuzzy
 jieba
 mmengine>=0.8.2
 nltk==3.8
@@ -16,6 +17,7 @@ pandas<2.0.0
 rank_bm25==0.2.2
 rapidfuzz
 requests==2.31.0
+rouge
 rouge_score
 scikit_learn==1.2.1
 sentence_transformers==2.2.2
