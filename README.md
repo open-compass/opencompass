@@ -373,6 +373,23 @@ Through the command line or configuration files, OpenCompass also supports evalu
 - [ ] Robustness
   - [ ] Support various attack method
 
+## 🔜 Roadmap
+
+- [ ] Subjective Evaluation
+  - [ ] Release CompassAreana
+  - [ ] Subjective evaluation dataset.
+- [ ] Long-context
+  - [ ] Long-context evaluation with extensive datasets.
+  - [ ] Long-context leaderboard.
+- [ ] Coding
+  - [ ] Coding evaluation leaderdboard.
+  - [ ] Non-python language evaluation service.
+- [ ] Agent
+  - [ ] Support various agenet framework.
+  - [ ] Evaluation of tool use of the LLMs.
+- [ ] Robustness
+  - [ ] Support various attack method
+
 ## 👷‍♂️ Contributing
 
 We appreciate all contributions to improve OpenCompass. Please refer to the [contributing guideline](https://opencompass.readthedocs.io/en/latest/notes/contribution_guide.html) for the best practice.
