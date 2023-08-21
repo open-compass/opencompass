@@ -245,6 +245,8 @@ outputs/default/
 ├── ...
 ```
 
+More information about obtaining evaluation results can be found in [Results Summary](./user_guides/summarizer.md).
+
 ## Additional Tutorials
 
 To learn more about using OpenCompass, explore the following tutorials:
@@ -253,4 +255,5 @@ To learn more about using OpenCompass, explore the following tutorials:
 - [Prepare Models](./user_guides/models.md)
 - [Task Execution and Monitoring](./user_guides/experimentation.md)
 - [Understand Prompts](./prompt/overview.md)
+- [Results Summary](./user_guides/summarizer.md)
 - [Learn about Config](./user_guides/config.md)

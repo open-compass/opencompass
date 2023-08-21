@@ -245,6 +245,8 @@ outputs/default/
 ├── ...
 ```
 
+关于评测结果输出的更多介绍可阅读 [结果展示](./user_guides/summarizer.md)。
+
 ## 更多教程
 
 想要更多了解 OpenCompass, 可以点击下列链接学习。
@@ -253,4 +255,5 @@ outputs/default/
 - [准备模型](./user_guides/models.md)
 - [任务运行和监控](./user_guides/experimentation.md)
 - [如何调Prompt](./prompt/overview.md)
+- [结果展示](./user_guides/summarizer.md)
 - [学习配置文件](./user_guides/config.md)

@@ -39,6 +39,11 @@ In addition, the output consists of multiple columns:
 - The `mode` column indicates how the inference result is obtained. Possible values are `ppl` / `gen`. For items in `summarizer.summary_groups`, if the methods of obtaining `subsets` are consistent, its value will be the same as subsets, otherwise it will be `mixed`.
 - The subsequent columns represent different models.
 
+```note
+If summarizer appears in the definition of config, the evaluation results will be output according to the aforementioned logic.
+If summarizer does not appear in the definition of config, the evaluation results will be output in the order they appear in the `dataset` config.
+```
+
 ## Field Description
 
 The fields of summarizer are explained as follows:
@@ -51,3 +56,5 @@ The fields in `summary_groups` are:
 - `name`: (str) Name of the aggregated metric.
 - `subsets`: (list) Names of the metrics that are aggregated. Note that it can not only be the original `dataset_abbr` but also the name of another aggregated metric.
 - `weights`: (list, optional) Weights of the metrics being aggregated. If omitted, the default is to use unweighted averaging.
+
+Please note that we have stored the summary groups of datasets like MMLU, C-Eval, etc., under the `configs/summarizers/groups` path. It's recommended to consider using them first.

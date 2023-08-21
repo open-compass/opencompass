@@ -39,6 +39,11 @@ summarizer 会以 config 中的 `models`, `datasets` 为全集，去尝试读取
 - `mode` 列是指这个推理结果的获取方式，可能的值有 `ppl` / `gen`。对于 `summarizer.summary_groups` 的项，若被 `subsets` 的获取方式都一致，则其值也跟 `subsets` 一致，否则即为 `mixed`
 - 其后若干列，一列代表一个模型
 
+```note
+如果 summarizer 出现在了 config 的定义中，则评测结果输出会按照上述逻辑进行。
+如果 summarizer 没有出现在 config 的定义中，则评测结果会按照 `dataset` 中出现的顺序进行输出。
+```
+
 ## 完整字段说明
 
 summarizer 字段说明如下
@@ -51,3 +56,5 @@ summarizer 字段说明如下
 - `name`: (str) 汇总指标的名称。
 - `subsets`: (list) 被汇总指标的名称。注意它不止可以是原始的 `dataset_abbr`，也可以是另一个汇总指标的名称。
 - `weights`: (list，可选) 被汇总指标的权重。若该项省略，则默认使用不加权的求平均方法。
+
+注意，我们在 `configs/summarizers/groups` 路径下存放了 MMLU, C-Eval 等数据集的评测结果汇总，建议优先考虑使用。
