@@ -1,5 +1,4 @@
 import argparse
-import fnmatch
 import getpass
 import os
 import os.path as osp
@@ -10,8 +9,10 @@ from mmengine.config import Config, DictAction
 from opencompass.partitioners import (MultimodalNaivePartitioner,
                                       NaivePartitioner, SizePartitioner)
 from opencompass.registry import PARTITIONERS, RUNNERS
-from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
+from opencompass.runners import SlurmRunner
 from opencompass.utils import LarkReporter, Summarizer, get_logger
+from opencompass.utils.run import (exec_eval_runner, exec_infer_runner,
+                                   exec_mm_infer_runner, get_config_from_arg)
 
 
 def parse_args():
@@ -164,24 +165,18 @@ def parse_dlc_args(dlc_parser):
 
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
-    hf_parser.add_argument('--hf-path', type=str, help='')
-    hf_parser.add_argument('--peft-path', type=str, help='')
-    hf_parser.add_argument('--tokenizer-path', type=str, help='')
-    hf_parser.add_argument('--model-kwargs',
-                           nargs='+',
-                           action=DictAction,
-                           help='')
-    hf_parser.add_argument('--tokenizer-kwargs',
-                           nargs='+',
-                           action=DictAction,
-                           help='')
-    hf_parser.add_argument('--max-out-len', type=int, help='')
-    hf_parser.add_argument('--max-seq-len', type=int, help='')
+    hf_parser.add_argument('--hf-path', type=str)
+    hf_parser.add_argument('--peft-path', type=str)
+    hf_parser.add_argument('--tokenizer-path', type=str)
+    hf_parser.add_argument('--model-kwargs', nargs='+', action=DictAction)
+    hf_parser.add_argument('--tokenizer-kwargs', nargs='+', action=DictAction)
+    hf_parser.add_argument('--max-out-len', type=int)
+    hf_parser.add_argument('--max-seq-len', type=int)
     hf_parser.add_argument('--no-batch-padding',
                            action='store_true',
                            default=False)
-    hf_parser.add_argument('--batch-size', type=int, help='')
-    hf_parser.add_argument('--num-gpus', type=int, help='')
+    hf_parser.add_argument('--batch-size', type=int)
+    hf_parser.add_argument('--num-gpus', type=int)
 
 
 def main():
@@ -191,7 +186,6 @@ def main():
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
-    # cfg = Config.fromfile(args.config, format_python_code=False)
     cfg = get_config_from_arg(args)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
@@ -330,156 +324,6 @@ def main():
     if args.mode in ['all', 'eval', 'viz']:
         summarizer = Summarizer(cfg)
         summarizer.summarize(time_str=cfg_time_str)
-
-
-def match_cfg_file(workdir: str, pattern: str) -> str:
-    """Match the config file in workdir recursively given the pattern.
-
-    Additionally, if the pattern itself points to an existing file, it will be
-    directly returned.
-    """
-    pattern = pattern if pattern.endswith('.py') else pattern + '.py'
-    if osp.exists(pattern):
-        return pattern
-    matched = None
-    for root, _, files in os.walk(workdir):
-        for file in files:
-            if fnmatch.fnmatch(file, pattern):
-                if matched:
-                    raise ValueError('More than one config file matched, '
-                                     'please specify the config file path '
-                                     f'manually. Matched files: {matched}\n'
-                                     f'{os.path.join(root, file)}')
-                matched = os.path.join(root, file)
-    if matched is None:
-        raise ValueError('No config file matched, please verify your pattern: '
-                         f'{osp.join(workdir, pattern)}')
-    get_logger().info(f'Loading {matched}')
-    return matched
-
-
-def get_config_from_arg(args) -> Config:
-    """Get the config object given args.
-
-    Only a few argument combinations are accepted (priority from high to low)
-    1. args.config
-    2. args.models and args.datasets
-    3. Huggingface parameter groups and args.datasets
-    """
-    if args.config:
-        return Config.fromfile(args.config, format_python_code=False)
-    if args.datasets is None:
-        raise ValueError('You must specify "--datasets" if you do not specify '
-                         'a config file path.')
-    datasets = []
-    for dataset in args.datasets:
-        cfg = Config.fromfile(match_cfg_file('configs/datasets/', dataset))
-        for k in cfg.keys():
-            if k.endswith('_datasets'):
-                datasets += cfg[k]
-    if not args.models and not args.hf_path:
-        raise ValueError('You must specify a config file path, '
-                         'or specify --models and --datasets, or '
-                         'specify HuggingFace model parameters and '
-                         '--datasets.')
-    models = []
-    if args.models:
-        for model in args.models:
-            cfg = Config.fromfile(match_cfg_file('configs/models/', model))
-            if 'models' not in cfg:
-                raise ValueError(
-                    f'Config file {model} does not contain "models" field')
-            models += cfg['models']
-    else:
-        from opencompass.models import HuggingFace
-        model = dict(type=f'{HuggingFace.__module__}.{HuggingFace.__name__}',
-                     path=args.hf_path,
-                     peft_path=args.peft_path,
-                     tokenizer_path=args.tokenizer_path,
-                     model_kwargs=args.model_kwargs,
-                     tokenizer_kwargs=args.tokenizer_kwargs,
-                     max_seq_len=args.max_seq_len,
-                     max_out_len=args.max_out_len,
-                     batch_padding=not args.no_batch_padding,
-                     batch_size=args.batch_size,
-                     run_cfg=dict(num_gpus=args.num_gpus))
-        models.append(model)
-    return Config(dict(models=models, datasets=datasets),
-                  format_python_code=False)
-
-
-def exec_mm_infer_runner(tasks, args, cfg):
-    """execute multimodal infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        raise NotImplementedError('Currently, we do not support evaluating \
-                             multimodal models on dlc.')
-    else:
-        runner = LocalRunner(task=dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
-
-
-def exec_infer_runner(tasks, args, cfg):
-    """execute infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='OpenICLInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             qos=args.qos,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        runner = DLCRunner(dict(type='OpenICLInferTask'),
-                           max_num_workers=args.max_num_workers,
-                           aliyun_cfg=Config.fromfile(args.aliyun_cfg),
-                           retry=args.retry,
-                           debug=args.debug,
-                           lark_bot_url=cfg['lark_bot_url'])
-    else:
-        runner = LocalRunner(task=dict(type='OpenICLInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             max_workers_per_gpu=args.max_workers_per_gpu,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
-
-
-def exec_eval_runner(tasks, args, cfg):
-    """execute infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='OpenICLEvalTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             qos=args.qos,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        runner = DLCRunner(dict(type='OpenICLEvalTask'),
-                           max_num_workers=args.max_num_workers,
-                           aliyun_cfg=Config.fromfile(args.aliyun_cfg),
-                           retry=args.retry,
-                           debug=args.debug,
-                           lark_bot_url=cfg['lark_bot_url'])
-    else:
-        runner = LocalRunner(task=dict(type='OpenICLEvalTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
 
 
 if __name__ == '__main__':

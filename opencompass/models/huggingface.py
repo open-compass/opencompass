@@ -14,7 +14,7 @@ PromptType = Union[PromptList, str]
 
 @MODELS.register_module()
 class HuggingFace(BaseModel):
-    """Model wrapper around HuggingFace general models.
+    """Model wrapper around HuggingFace models.
 
     Args:
         path (str): The name or path to HuggingFace's model.
@@ -104,10 +104,15 @@ class HuggingFace(BaseModel):
                     path: str,
                     model_kwargs: dict,
                     peft_path: Optional[str] = None):
-        from transformers import AutoModel
+        from transformers import AutoModel, AutoModelForCausalLM
 
         model_kwargs.setdefault('torch_dtype', torch.float16)
-        self.model = AutoModel.from_pretrained(path, **model_kwargs)
+        try:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                path, **model_kwargs)
+        except ValueError:
+            self.model = AutoModel.from_pretrained(path, **model_kwargs)
+
         if peft_path is not None:
             from peft import PeftModel
             self.model = PeftModel.from_pretrained(self.model,
