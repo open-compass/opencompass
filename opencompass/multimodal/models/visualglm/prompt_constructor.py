@@ -39,13 +39,15 @@ class VisualGLMPromptConstructor:
         data_samples = batch.pop('data_samples')
         questions = [sample.get('question') for sample in data_samples]
         options = [sample.get('options') for sample in data_samples]
+        contexts = [sample.get('context') for sample in data_samples]
+        contexts = [c if c else '' for c in contexts]
 
         # generate text prompt
         prompt = [
-            '{}{}{}{}{}{}'.format(self.system_prompt, self.image_prompt,
-                                  self.human_prompt, question, option,
-                                  self.assistant_prompt)
-            for question, option in zip(questions, options)
+            '{}{}{}{}{}{}{}'.format(self.system_prompt, self.image_prompt,
+                                    self.human_prompt, context, question,
+                                    option, self.assistant_prompt)
+            for context, question, option in zip(contexts, questions, options)
         ]
 
         image_position = 5

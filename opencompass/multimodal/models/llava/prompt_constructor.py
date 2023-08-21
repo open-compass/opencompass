@@ -38,7 +38,11 @@ class LLaVAMMBenchPromptConstructor:
         assert len(data_samples) == 1
         question = data_samples[0].get('question')
         options = data_samples[0].get('options')
-        prompt = question + ' ' + options
+        context = data_samples[0].get('context')
+        if context is not None:
+            prompt = context + ' ' + question + ' ' + options
+        else:
+            prompt = question + ' ' + options
         if self.mm_use_im_start_end:
             prompt = (DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN +
                       DEFAULT_IM_END_TOKEN + '\n' + prompt)
