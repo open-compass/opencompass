@@ -49,6 +49,7 @@ class ToTInferencer(GenInferencer):
         fix_id_list (:obj:`List[int]`, optional): List of indices to fix
         naive_run (:obj:`bool`): if True, run naive IO/CoT sampling instead of
             ToT + BFS.
+        prompt_wrapper (:obj:`dict`): wrapper for prompts
         prompt_sample (:obj:`str`): (choices=[standard, cot]) sampling prompt
         method_generate (:obj:`str`): (choices=[sample, propose])
             thought generator,whether to sample independent thoughts (used in
@@ -77,7 +78,7 @@ class ToTInferencer(GenInferencer):
             save_every: Optional[int] = None,
             fix_id_list: Optional[List[int]] = None,
             naive_run: bool = False,
-            task_wrapper: dict = {},
+            prompt_wrapper: dict = {},
             prompt_sample: str = 'standard',
             method_generate: str = 'sample',
             method_evaluate: str = 'value',
@@ -101,7 +102,7 @@ class ToTInferencer(GenInferencer):
             **kwargs,
         )
         self.max_out_len = max_out_len
-        self.task = TOT_WRAPPER.build(task_wrapper)
+        self.prompt_wrapper = TOT_WRAPPER.build(prompt_wrapper)
         self.naive_run = naive_run
         self.prompt_sample = prompt_sample
         self.method_generate = method_generate
@@ -112,22 +113,53 @@ class ToTInferencer(GenInferencer):
         self.n_select_sample = n_select_sample
         self.generation_kwargs = generation_kwargs
 
-    def get_value(self, x, y, n_evaluate_sample, cache_value=True):
-        value_prompt = self.task.value_prompt_wrap(x, y)
-        if cache_value and value_prompt in self.task.value_cache:
-            return self.task.value_cache[value_prompt]
+    def get_value(self,
+                  x: str,
+                  y: str,
+                  n_evaluate_sample: int,
+                  cache_value: bool = True) -> str:
+        """Get evaluation value of a partial output.
+
+        Args:
+            x (str): The input text to be evaluated.
+            y (str): The partial output to be evaluated.
+            n_evaluate_sample (int): _description_
+            cache_value (bool): _description_. Defaults to True.
+
+        Returns:
+            str: Value of evaluated partial outputs.
+        """
+        value_prompt = self.prompt_wrapper.value_prompt_wrap(x, y)
+        if cache_value and value_prompt in self.prompt_wrapper.value_cache:
+            return self.prompt_wrapper.value_cache[value_prompt]
         value_outputs = self.model.generate_from_template(
             [value_prompt],
             max_out_len=self.max_out_len,
             num_beams=n_evaluate_sample,
             num_return_sequences=n_evaluate_sample,
             **self.generation_kwargs)
-        value = self.task.value_outputs_unwrap(x, y, value_outputs)
+        value = self.prompt_wrapper.value_outputs_unwrap(x, y, value_outputs)
         if cache_value:
-            self.task.value_cache[value_prompt] = value
+            self.prompt_wrapper.value_cache[value_prompt] = value
         return value
 
-    def get_values(self, x, ys, n_evaluate_sample, cache_value=True):
+    def get_values(self,
+                   x: str,
+                   ys: List[str],
+                   n_evaluate_sample: int,
+                   cache_value: bool = True) -> List[str]:
+        """Get evaluation values of partial outputs.
+
+        Args:
+            x (str): The input text to be solved.
+            ys (List[str]): The partial outputs to be evaluated.
+            n_evaluate_sample (int): Times to evaluate each partial output.
+            cache_value (bool): Cache to avoid duplicate candidates.
+                Defaults to True.
+
+        Returns:
+            List[str]: Values of evaluated partial outputs.
+        """
         values = []
         local_value_cache = {}
         for y in ys:  # each partial output
@@ -142,19 +174,39 @@ class ToTInferencer(GenInferencer):
             values.append(value)
         return values
 
-    def get_votes(self, x, ys, n_evaluate_sample):
-        vote_prompt = self.task.vote_prompt_wrap(x, ys)
+    def get_votes(self, x: str, ys: List[str],
+                  n_evaluate_sample: int) -> List[str]:
+        """Get votes of partial outputs.
+
+        Args:
+            x (str): The input text to be solved.
+            ys (List[str]): The partial outputs to be evaluated.
+            n_evaluate_sample (int): Times to evaluate each partial output.
+
+        Returns:
+            List[str]: Values of evaluated partial outputs.
+        """
+        vote_prompt = self.prompt_wrapper.vote_prompt_wrap(x, ys)
         vote_outputs = self.model.generate_from_template(
             [vote_prompt],
             max_out_len=self.max_out_len,
             num_beams=n_evaluate_sample,
             num_return_sequences=n_evaluate_sample,
             **self.generation_kwargs)
-        values = self.task.vote_outputs_unwrap(vote_outputs, len(ys))
+        values = self.prompt_wrapper.vote_outputs_unwrap(vote_outputs, len(ys))
         return values
 
-    def get_proposals(self, x, y):
-        propose_prompt = self.task.propose_prompt_wrap(x, y)
+    def get_proposals(self, x: str, y: str) -> List[str]:
+        """Get proposal prompts.
+
+        Args:
+            x (str): The input text to be solved.
+            y (str): The partial output.
+
+        Returns:
+            List[str]: Proposal prompts.
+        """
+        propose_prompt = self.prompt_wrapper.propose_prompt_wrap(x, y)
         proposals = self.model.generate_from_template(
             [propose_prompt],
             max_out_len=self.max_out_len,
@@ -163,11 +215,23 @@ class ToTInferencer(GenInferencer):
             **self.generation_kwargs)[0].split('\n')
         return [y + _ + '\n' for _ in proposals]
 
-    def get_samples(self, x, y, n_generate_sample, prompt_sample):
+    def get_samples(self, x: str, y: str, n_generate_sample: int,
+                    prompt_sample: str):
+        """Get samples from a partial output.
+
+        Args:
+            x (str): The input text to be solved.
+            y (str): The partial output.
+            n_generate_sample (int): Times to generate samples.
+            prompt_sample (str): (choices=[standard, cot]) sampling prompt
+
+        Returns:
+            List[str]: Samples from a partial output.
+        """
         if prompt_sample == 'standard':
-            prompt = self.task.standard_prompt_wrap(x, y)
+            prompt = self.prompt_wrapper.standard_prompt_wrap(x, y)
         elif prompt_sample == 'cot':
-            prompt = self.task.cot_prompt_wrap(x, y)
+            prompt = self.prompt_wrapper.cot_prompt_wrap(x, y)
         else:
             raise ValueError(f'prompt_sample {prompt_sample} not recognized')
         samples = self.model.generate_from_template(
@@ -178,10 +242,18 @@ class ToTInferencer(GenInferencer):
             **self.generation_kwargs)
         return [y + _ for _ in samples]
 
-    def tot_solve(self, x):
+    def tot_solve(self, x: str) -> str:
+        """Solve a problem using Tree-of-Thought algorithm.
+
+        Args:
+            x (str): The input text to be solved.
+
+        Returns:
+            str: Final answer of the problem.
+        """
         ys = ['']  # current output candidates
         infos = []
-        for step in range(self.task.steps):
+        for step in range(self.prompt_wrapper.steps):
             logger.info(f'\n-- step {str(step)} --\n')
             # generation
             if self.method_generate == 'sample':

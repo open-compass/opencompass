@@ -4,6 +4,8 @@
 
 During the process of reasoning, CoT (Chain of Thought) method is an efficient way to help LLMs deal complex questions, for example: math problem and relation inference. In OpenCompass, we support multiple types of CoT method.
 
+![image](https://github.com/InternLM/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
+
 ## 1. Zero Shot CoT
 
 You can change the `PromptTemplate` of the dataset config, by simply add *Let's think step by step* to realize a Zero-Shot CoT prompt for your evaluation:
@@ -76,11 +78,7 @@ From the figure, it can be seen that in different reasoning tasks, performance t
 
 ## 4. Tree-of-Thoughts
 
-In contrast to the conventional CoT approach that considers only a single reasoning path, Tree-of-Thoughts (ToT) allows the language model to explore multiple diverse reasoning paths simultaneously. The model evaluates the reasoning process through self-assessment and makes global choices by conducting lookahead or backtracking when necessary, as depicted in the diagram right below:
-
-![image](https://github.com/InternLM/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
-
-Specifically, this process is divided into the following four stages:
+In contrast to the conventional CoT approach that considers only a single reasoning path, Tree-of-Thoughts (ToT) allows the language model to explore multiple diverse reasoning paths simultaneously. The model evaluates the reasoning process through self-assessment and makes global choices by conducting lookahead or backtracking when necessary. Specifically, this process is divided into the following four stages:
 
 **1. Thought Decomposition**
 

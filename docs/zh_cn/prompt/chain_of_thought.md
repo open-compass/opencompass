@@ -4,6 +4,8 @@
 
 CoT（思维链）是帮助大型语言模型解决如数学问题和关系推理问题等复杂问题的有效方式，在OpenCompass中，我们支持多种类型的CoT方法。
 
+![image](https://github.com/InternLM/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
+
 ## 1. 零样本思维链
 
 可以通过在数据集配置中简单地添加 “Let's think step by step"，来更改数据集配置的 PromptTemplate，从而实现 零样本 CoT prompt 以进行评估：
@@ -76,11 +78,7 @@ gsm8k_eval_cfg = dict(sc_size=SAMPLE_SIZE)
 
 ## 4. Tree-of-Thoughts
 
-相比一般的CoT方法采样一条推理路径，ToT(Tree-of-Thoughts)允许语言模型同时考虑多种不同的推理路径，通过对推理过程进行自我评估，以及在必要时进行前瞻或回溯以做出全局选择，如下图右所示：
-
-![image](https://github.com/InternLM/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
-
-具体的，主要分为下面的四个阶段：
+相比一般的CoT方法采样一条推理路径，ToT(Tree-of-Thoughts)允许语言模型同时考虑多种不同的推理路径，通过对推理过程进行自我评估，以及在必要时进行前瞻或回溯以做出全局选择。具体的，分为下面四个阶段：
 
 **1. 问题分解 (Thought Decomposition)**
 
@@ -113,7 +111,7 @@ generation_kwargs = dict(do_sample=False, temperature=0.7)
 game24_infer_cfg = dict(
         prompt_template=dict(
         type=PromptTemplate,
-        template='''{input}'''), #直接传入input内容，因为Prompt需要分段指定
+        template='{input}'), #直接传入input内容，因为Prompt需要分段指定
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=ToTInferencer, # 替换GenInferencer为ToTInferencer
                     generation_kwargs=generation_kwargs,

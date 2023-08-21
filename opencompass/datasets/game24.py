@@ -165,10 +165,10 @@ class Game24Dataset(BaseDataset):
     def load(path: str):
         data = list(pd.read_csv(path)['Puzzles'])
         data = [{'input': i, 'output': i} for i in data]
-        return Dataset.from_list(data[900:1000])
+        return Dataset.from_list(data[900:905])
 
 
-class Game24Wrapper():
+class Game24PromptWrapper:
 
     def __init__(self):
         self.value_cache = {}
