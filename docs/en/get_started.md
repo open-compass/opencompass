@@ -245,6 +245,8 @@ outputs/default/
 ├── ...
 ```
 
+The summarization process can be further customized in configuration and output the averaged score of some benchmarks (MMLU, C-Eval, etc.).
+
 More information about obtaining evaluation results can be found in [Results Summary](./user_guides/summarizer.md).
 
 ## Additional Tutorials

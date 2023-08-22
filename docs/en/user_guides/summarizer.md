@@ -2,6 +2,11 @@
 
 After the evaluation is complete, the results need to be printed on the screen or saved. This process is controlled by the summarizer.
 
+```note
+If the summarizer appears in the overall config, all the evaluation results will be output according to the following logic.
+If the summarizer does not appear in the overall config, the evaluation results will be output in the order they appear in the `dataset` config.
+```
+
 ## Example
 
 A typical summarizer configuration file is as follows:
@@ -38,11 +43,6 @@ In addition, the output consists of multiple columns:
 - The `metric` column indicates the evaluation method of this metric. For specific details, [metrics](./metrics.md).
 - The `mode` column indicates how the inference result is obtained. Possible values are `ppl` / `gen`. For items in `summarizer.summary_groups`, if the methods of obtaining `subsets` are consistent, its value will be the same as subsets, otherwise it will be `mixed`.
 - The subsequent columns represent different models.
-
-```note
-If summarizer appears in the definition of config, the evaluation results will be output according to the aforementioned logic.
-If summarizer does not appear in the definition of config, the evaluation results will be output in the order they appear in the `dataset` config.
-```
 
 ## Field Description
 

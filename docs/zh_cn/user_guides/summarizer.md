@@ -2,6 +2,11 @@
 
 在评测完成后，评测的结果需要被打印到屏幕或者被保存下来，该过程是由 summarizer 控制的。
 
+```note
+如果 summarizer 出现在了 config 中，则评测结果输出会按照下述逻辑进行。
+如果 summarizer 没有出现在 config 中，则评测结果会按照 `dataset` 中出现的顺序进行输出。
+```
+
 ## 样例
 
 一个典型的 summerizer 配置文件如下：
@@ -38,11 +43,6 @@ summarizer 会以 config 中的 `models`, `datasets` 为全集，去尝试读取
 - `metric` 列是指这个指标的评测方式，具体说明见 [metrics](./metrics.md)
 - `mode` 列是指这个推理结果的获取方式，可能的值有 `ppl` / `gen`。对于 `summarizer.summary_groups` 的项，若被 `subsets` 的获取方式都一致，则其值也跟 `subsets` 一致，否则即为 `mixed`
 - 其后若干列，一列代表一个模型
-
-```note
-如果 summarizer 出现在了 config 的定义中，则评测结果输出会按照上述逻辑进行。
-如果 summarizer 没有出现在 config 的定义中，则评测结果会按照 `dataset` 中出现的顺序进行输出。
-```
 
 ## 完整字段说明
 
