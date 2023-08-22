@@ -16,7 +16,7 @@ val_pipeline = [
 ]
 
 dataset = dict(
-    type="opencompass.MMBenchDataset", data_file="/home/luodian/azure_storage/otter/mimicit/mmbench/mmbench_test_20230712.tsv", pipeline=val_pipeline
+    type="opencompass.MMBenchDataset", data_file="/path/to/mmbench/mmbench_test_20230712.tsv", pipeline=val_pipeline
 )
 
 otter_9b_mmbench_dataloader = dict(
@@ -36,5 +36,3 @@ otter_9b_mmbench_model = dict(
 
 # evaluation settings
 otter_9b_mmbench_evaluator = [dict(type="opencompass.DumpResults", save_path="work_dirs/otter-9b-mmbench.xlsx")]
-
-otter_9b_mmbench_load_from = ""  # load otter from huggingface model hub, no need to load from local file
