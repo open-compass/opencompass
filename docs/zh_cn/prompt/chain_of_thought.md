@@ -104,9 +104,9 @@ gsm8k_eval_cfg = dict(sc_size=SAMPLE_SIZE)
 ```python
 # 此 ToT Game24 配置可以在以下路径找到：opencompass/configs/datasets/game24/game24_gen_8dfde3.py。
 from opencompass.datasets import (Game24Dataset, game24_postprocess,
-                                  Game24Evaluator, Game24Wrapper)
+                                  Game24Evaluator, Game24PromptWrapper)
 
-generation_kwargs = dict(do_sample=False, temperature=0.7)
+generation_kwargs = dict(temperature=0.7)
 
 game24_infer_cfg = dict(
         prompt_template=dict(
@@ -120,9 +120,9 @@ game24_infer_cfg = dict(
                     method_select='greedy', # 选择推理内容的方法，可以是贪心（greedy）或随机（sample）
                     n_evaluate_sample=3,
                     n_select_sample=5,
-                    task_wrapper=dict(type=Game24Wrapper) # 该Wrapper类包含每个步骤的Prompt和推理内容的生成及评估方法，需要根据任务进行自定义
+                    task_wrapper=dict(type=Game24PromptWrapper) # 该Wrapper类包含每个步骤的Prompt和推理内容的生成及评估方法，需要根据任务进行自定义
                     ))
 
 ```
 
-如果要在自定义的数据集上使用ToT方法，相比普通评测方式，需要在`opencompass.datasets.YourDataConfig.py`中额外设置`YourData24Wrapper`类，以进行ToT中的推理生成和启发式评估。对于类似游戏24点的推理任务，具体可以参考`opencompass/datasets/game24.py`。
+如果要在自定义的数据集上使用ToT方法，相比普通评测方式，需要在`opencompass.datasets.YourDataConfig.py`中额外设置`YourDataPromptWrapper`类，以进行ToT中的推理生成和启发式评估。对于类似游戏24点的推理任务，具体可以参考`opencompass/datasets/game24.py`。
