@@ -115,7 +115,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 ```
 
 ```{tip}
-关于 `run.py` 支持的所有 HuggingFace 相关参数，请阅读 [相关文档]()。
+关于 `run.py` 支持的所有 HuggingFace 相关参数，请阅读 [评测任务发起](./user_guides/experimentation.md#评测任务发起)。
 ```
 
 
@@ -202,7 +202,7 @@ opt350m = dict(
        max_seq_len=2048,              # 模型能接受的最大序列长度
        max_out_len=100,                   # 最长生成 token 数
        batch_size=64,                     # 批次大小
-       run_cfg=dict(num_gpus=1),          # 运行配置，用于指定资源需求
+       run_cfg=dict(num_gpus=1),          # 运行模型所需的gpu数
     )
 ```
 
@@ -219,7 +219,7 @@ python run.py \
 --max-seq-len 2048 \  # 模型能接受的最大序列长度
 --max-out-len 100 \  # 最长生成 token 数
 --batch-size 64  \  # 批次大小
---num-gpus 1  # 运行配置，用于指定资源需求
+--num-gpus 1  # 运行模型所需的gpu数
 ```
 
 HuggingFace 中的 'facebook/opt-350m' 以及 'facebook/opt-125m' 权重会在运行时自动下载。

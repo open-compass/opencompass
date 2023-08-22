@@ -78,3 +78,21 @@ python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
 ```
 
 - `-w`：工作路径，默认为 `'./outputs/default'`。
+
+## List Configs
+
+本工具可以列出或搜索所有可用的模型和数据集配置，且支持模糊搜索，便于结合 `run.py` 使用。
+
+运行方式：
+
+```bash
+python tools/list_configs.py [PATTERN1] [PATTERN2] [...]
+```
+
+若运行时不加任何参数，则默认列出所有在 `configs/models` 和 `configs/dataset` 下的模型配置。
+
+用户同样可以传入任意数量的参数，脚本会列出所有跟传入字符串相关的配置，支持模糊搜索及 * 号匹配。如下面的命令会列出所有跟 `mmlu` 和 `llama` 相关的配置：
+
+```bash
+python tools/list_configs.py mmlu llama
+```
