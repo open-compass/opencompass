@@ -1,10 +1,12 @@
 import json
 import os
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from typing import Dict, List, Optional, Union
 
+import jieba
 import requests
 
 from opencompass.registry import MODELS
@@ -42,6 +44,9 @@ class OpenAI(BaseAPIModel):
             wrapping of any meta instructions.
         openai_api_base (str): The base url of OpenAI's API. Defaults to
             'https://api.openai.com/v1/chat/completions'.
+        mode (str, optional): The method of input truncation when input length
+            exceeds max_seq_len. 'front','mid' and 'rear' represents the part
+            of input to truncate. Defaults to 'none'.
         temperature (float, optional): What sampling temperature to use.
             If not None, will override the temperature in the `generate()`
             call. Defaults to None.
@@ -58,6 +63,7 @@ class OpenAI(BaseAPIModel):
                  org: Optional[Union[str, List[str]]] = None,
                  meta_template: Optional[Dict] = None,
                  openai_api_base: str = OPENAI_API_BASE,
+                 mode: str = 'none',
                  temperature: Optional[float] = None):
 
         super().__init__(path=path,
@@ -68,6 +74,8 @@ class OpenAI(BaseAPIModel):
         import tiktoken
         self.tiktoken = tiktoken
         self.temperature = temperature
+        assert mode in ['none', 'front', 'mid', 'rear']
+        self.mode = mode
 
         if isinstance(key, str):
             self.keys = [os.getenv('OPENAI_API_KEY') if key == 'ENV' else key]
@@ -137,6 +145,20 @@ class OpenAI(BaseAPIModel):
         """
         assert isinstance(input, (str, PromptList))
 
+        # max num token for gpt-3.5-turbo is 4097
+        context_window = 4096
+        if '32k' in self.path:
+            context_window = 32768
+        elif '16k' in self.path:
+            context_window = 16384
+        elif 'gpt-4' in self.path:
+            context_window = 8192
+
+        # will leave 100 tokens as prompt buffer, triggered if input is str
+        if isinstance(input, str) and self.mode != 'none':
+            context_window = self.max_seq_len
+            input = self.bin_trim(input, context_window - 100 - max_out_len)
+
         if isinstance(input, str):
             messages = [{'role': 'user', 'content': input}]
         else:
@@ -150,15 +172,6 @@ class OpenAI(BaseAPIModel):
                 elif item['role'] == 'SYSTEM':
                     msg['role'] = 'system'
                 messages.append(msg)
-
-        # max num token for gpt-3.5-turbo is 4097
-        context_window = 4096
-        if '32k' in self.path:
-            context_window = 32768
-        elif '16k' in self.path:
-            context_window = 16384
-        elif 'gpt-4' in self.path:
-            context_window = 8192
 
         # Hold out 100 tokens due to potential errors in tiktoken calculation
         max_out_len = min(
@@ -251,3 +264,47 @@ class OpenAI(BaseAPIModel):
         """
         enc = self.tiktoken.encoding_for_model(self.path)
         return len(enc.encode(prompt))
+
+    def bin_trim(self, prompt: str, num_token: int) -> str:
+        """Get a suffix of prompt which is no longer than num_token tokens.
+
+        Args:
+            prompt (str): Input string.
+            num_token (int): The upper bound of token numbers.
+
+        Returns:
+            str: The trimmed prompt.
+        """
+        token_len = self.get_token_len(prompt)
+        if token_len <= num_token:
+            return prompt
+        pattern = re.compile(r'[\u4e00-\u9fa5]')
+        if pattern.search(prompt):
+            words = list(jieba.cut(prompt, cut_all=False))
+            sep = ''
+        else:
+            words = prompt.split(' ')
+            sep = ' '
+
+        l, r = 1, len(words)
+        while l + 2 < r:
+            mid = (l + r) // 2
+            if self.mode == 'front':
+                cur_prompt = sep.join(words[-mid:])
+            elif self.mode == 'mid':
+                cur_prompt = sep.join(words[:mid]) + sep.join(words[-mid:])
+            elif self.mode == 'rear':
+                cur_prompt = sep.join(words[:mid])
+
+            if self.get_token_len(cur_prompt) <= num_token:
+                l = mid  # noqa: E741
+            else:
+                r = mid
+
+        if self.mode == 'front':
+            prompt = sep.join(words[-l:])
+        elif self.mode == 'mid':
+            prompt = sep.join(words[:l]) + sep.join(words[-l:])
+        elif self.mode == 'rear':
+            prompt = sep.join(words[:l])
+        return prompt

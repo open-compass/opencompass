@@ -119,3 +119,24 @@ class MiniGPT4VSRPostProcessor:
         if len(output_text) > 0:
             output_text = output_text[0].lower()
         return output_text
+
+
+class MiniGPT4MMEPostProcessor(MiniGPT4MMBenchPostProcessor):
+    """"Post processor for MiniGPT-4 on MME."""
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def __call__(self, output_token: torch.tensor, tokenizer) -> str:
+        response = super().__call__(output_token, tokenizer)
+        # extract yes or no, copy from MME official evaluation script
+        prefix_pred_ans = response[:4].lower()
+
+        if 'yes' in prefix_pred_ans:
+            pred_label = 'yes'
+        elif 'no' in prefix_pred_ans:
+            pred_label = 'no'
+        else:
+            pred_label = 'other'
+
+        return pred_label

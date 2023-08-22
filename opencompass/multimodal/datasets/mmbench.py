@@ -40,7 +40,7 @@ class MMBenchDataset(Dataset):
     def __len__(self) -> None:
         return len(self.df)
 
-    def __getitem__(self, idx: str) -> dict:
+    def __getitem__(self, idx: int) -> dict:
         index = self.df.iloc[idx]['index']
         image = self.df.iloc[idx]['image']
         image = decode_base64_to_image(image)
