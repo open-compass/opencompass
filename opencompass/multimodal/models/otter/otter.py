@@ -8,7 +8,7 @@ from transformers import CLIPImageProcessor
 
 from opencompass.registry import MM_MODELS
 
-from .modeling_otter import OtterForConditionalGeneration
+from .Otter.models.otter.modeling_otter import OtterForConditionalGeneration
 
 @MM_MODELS.register_module("otter-9b")
 class Otter(nn.Module):

@@ -16,7 +16,7 @@ val_pipeline = [
 ]
 
 dataset = dict(
-    type="opencompass.MMBenchDataset", data_file="data/mmbench/mmbench_test_20230712.tsv", pipeline=val_pipeline
+    type="opencompass.MMBenchDataset", data_file="/home/luodian/azure_storage/otter/mimicit/mmbench/mmbench_test_20230712.tsv", pipeline=val_pipeline
 )
 
 otter_9b_mmbench_dataloader = dict(
