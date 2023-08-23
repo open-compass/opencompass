@@ -2,7 +2,7 @@
 
 在评测完成后，评测的结果需要被打印到屏幕或者被保存下来，该过程是由 summarizer 控制的。
 
-```note
+```{note}
 如果 summarizer 出现在了 config 中，则评测结果输出会按照下述逻辑进行。
 如果 summarizer 没有出现在 config 中，则评测结果会按照 `dataset` 中出现的顺序进行输出。
 ```

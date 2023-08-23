@@ -2,7 +2,7 @@
 
 After the evaluation is complete, the results need to be printed on the screen or saved. This process is controlled by the summarizer.
 
-```note
+```{note}
 If the summarizer appears in the overall config, all the evaluation results will be output according to the following logic.
 If the summarizer does not appear in the overall config, the evaluation results will be output in the order they appear in the `dataset` config.
 ```
