@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING
 
-from transformers.utils import OptionalDependencyNotAvailable, _LazyModule, is_torch_available
-
-from .otter import Otter
+from transformers.utils import (OptionalDependencyNotAvailable,
+                                is_torch_available)
 
 if TYPE_CHECKING:
     try:
@@ -10,5 +9,3 @@ if TYPE_CHECKING:
             raise OptionalDependencyNotAvailable()
     except OptionalDependencyNotAvailable:
         pass
-    else:
-        from .Otter.models.otter.modeling_otter import OtterForConditionalGeneration, OtterModel, OtterPreTrainedModel
