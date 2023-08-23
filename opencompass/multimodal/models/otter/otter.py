@@ -1,5 +1,3 @@
-import re
-
 import mmengine
 import torch
 import torch.nn as nn
@@ -35,11 +33,8 @@ class Otter(nn.Module):
             prompt_constructor, MM_MODELS)
 
     def post_process(self, output_text):
-        pattern = re.compile(r'([A-Z]\.)')
-        res = pattern.findall(output_text)
-        if len(res) > 0:
-            output_text = res[0][:-1]
-        output_text = output_text.strip()
+        output_text = (output_text.split('<answer>')[-1].lstrip().rstrip().
+                       split('<|endofchunk|>')[0].lstrip().rstrip())
         return output_text
 
     def generate(self, batch):
@@ -62,12 +57,8 @@ class Otter(nn.Module):
             no_repeat_ngram_size=3,
         )
         output = self.model.text_tokenizer.decode(generated_text[0])
-        output = [x for x in output.split(' ') if not x.startswith('<')]
-        try:
-            out_label = output.index('GPT:')
-        except Exception:
-            out_label = output.index('GPT')
-        output_text = ' '.join(output[out_label + 1:])
+        # output = [x for x in output.split(' ') if not x.startswith('<')]
+        output_text = self.post_process(output)
 
         data_sample.pred_answer = output_text
         return data_sample
