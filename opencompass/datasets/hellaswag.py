@@ -1,4 +1,6 @@
-from datasets import load_dataset
+import json
+
+from datasets import Dataset, load_dataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -38,4 +40,25 @@ class hellaswagDataset_V2(BaseDataset):
             return example
 
         dataset = dataset.map(preprocess).remove_columns(['endings'])
+        return dataset
+
+
+@LOAD_DATASET.register_module()
+class hellaswagDataset_V3(BaseDataset):
+
+    @staticmethod
+    def load(path):
+        dataset = []
+        with open(path, 'r') as f:
+            for line in f:
+                data = json.loads(line)
+                dataset.append({
+                    'query': data['query'],
+                    'A': data['choices'][0],
+                    'B': data['choices'][1],
+                    'C': data['choices'][2],
+                    'D': data['choices'][3],
+                    'gold': data['gold'],
+                })
+        dataset = Dataset.from_list(dataset)
         return dataset

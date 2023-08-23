@@ -10,6 +10,7 @@ configs/datasets/log.json
 configs/eval_debug*.py
 configs/viz_*.py
 data
+work_dirs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

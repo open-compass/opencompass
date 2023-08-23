@@ -106,7 +106,7 @@ class BaseModel:
         return self.get_ppl(inputs, mask_length)
 
     def generate_from_template(self, templates: List[PromptType],
-                               max_out_len: int):
+                               max_out_len: int, **kwargs):
         """Generate completion from a list of templates.
 
         Args:
@@ -114,7 +114,7 @@ class BaseModel:
             max_out_len (int): The maximum length of the output.
         """
         inputs = self.parse_template(templates, mode='gen')
-        return self.generate(inputs, max_out_len=max_out_len)
+        return self.generate(inputs, max_out_len=max_out_len, **kwargs)
 
     def get_token_len_from_template(
             self,
@@ -245,11 +245,14 @@ class LMTemplateParser:
                         section_stack.append((item['section'], i + 1))
                     else:
                         raise ValueError(f'Invalid pos {item["pos"]}')
+                # if in "begin" or "end" section
                 elif section_stack[-1][0] in ['begin', 'end']:
                     role_dict = self._update_role_dict(item)
-                    new_str, generate = self._prompt2str(item,
-                                                         role_dict,
-                                                         for_gen=mode == 'gen')
+                    new_str, generate = self._prompt2str(
+                        item,
+                        role_dict,
+                        # never stop generation
+                        for_gen=False)
                     prompt += new_str
 
             prompt = self.meta_template.get('begin', '') + prompt

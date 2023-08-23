@@ -1,3 +1,4 @@
+import copy
 import os
 from abc import abstractmethod
 from typing import List
@@ -25,6 +26,7 @@ class BaseTask:
     output_subdir: str = None
 
     def __init__(self, cfg: ConfigDict):
+        cfg = copy.deepcopy(cfg)
         self.cfg = cfg
         self.model_cfgs = cfg['models']
         self.dataset_cfgs = cfg['datasets']

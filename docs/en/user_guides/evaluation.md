@@ -2,7 +2,36 @@
 
 OpenCompass supports custom task partitioners (`Partitioner`), which enable flexible division of evaluation tasks. In conjunction with `Runner`, which controls the platform for task execution, such as a local machine or a cluster, OpenCompass can distribute large evaluation tasks to a vast number of computing nodes. This helps utilize computational resources efficiently and significantly accelerates the evaluation process.
 
-## Task Division (Partitioner)
+By default, OpenCompass hides these details from users and automatically selects the recommended execution strategies. But users can still customize these strategies of the workflows according to their needs, just by adding the `infer` and/or `eval` fields to the configuration file:
+
+```python
+from opencompass.partitioners import SizePartitioner, NaivePartitioner
+from opencompass.runners import SlurmRunner
+from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
+
+infer = dict(
+    partitioner=dict(type=SizePartitioner, max_task_size=5000),
+    runner=dict(
+        type=SlurmRunner,
+        max_num_workers=64,
+        task=dict(type=OpenICLInferTask),
+        retry=5),
+)
+
+eval = dict(
+    partitioner=dict(type=NaivePartitioner),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=32,
+        task=dict(type=OpenICLEvalTask)),
+)
+```
+
+The example above demonstrates the way to configure the execution strategies for the inference and evaluation stages. At the inference stage, the task will be divided into several sub-tasks, each of 5000 samples, and then submitted to the Slurm cluster for execution, where there are at most 64 tasks running in parallel. At the evaluation stage, each single model-dataset pair forms a task, and 32 processes are launched locally to compute the metrics.
+
+The following sections will introduce the involved modules in detail.
+
+## Task Partition (Partitioner)
 
 Due to the long inference time of large language models and the vast amount of evaluation datasets, serial execution of a single evaluation task can be quite time-consuming. OpenCompass allows custom task partitioners (`Partitioner`) to divide large evaluation tasks into numerous independent smaller tasks, thus fully utilizing computational resources via parallel execution. Users can configure the task partitioning strategies for the inference and evaluation stages via `infer.partitioner` and `eval.partitioner`. Below, we will introduce all the partitioning strategies supported by OpenCompass.
 
@@ -14,7 +43,7 @@ This partitioner dispatches each combination of a model and dataset as an indepe
 from opencompass.partitioners import NaivePartitioner
 
 infer = dict(
-    partitioner=dict(type=SizePartitioner)
+    partitioner=dict(type=NaivePartitioner)
     # ...
 )
 ```
@@ -22,10 +51,10 @@ infer = dict(
 ### `SizePartitioner`
 
 ```{warning}
-This partitioner is not suitable for evaluation stage tasks (OpenEvalTask).
+For now, this partitioner is not suitable for evaluation tasks (`OpenICLEvalTask`).
 ```
 
-This partitioner estimates the inference cost (time) of a dataset according to its size, multiplied by an expansion coefficient. It then creates tasks by splitting larger datasets and merging smaller ones to ensure the inference costs of each sub-task are as equal as possible.
+This partitioner estimates the inference cost (time) of a dataset according to its size, multiplied by an empirical expansion coefficient. It then creates tasks by splitting larger datasets and merging smaller ones to ensure the inference costs of each sub-task are as equal as possible.
 
 The commonly used parameters for this partitioner are as follows:
 
@@ -35,7 +64,7 @@ from opencompass.partitioners import SizePartitioner
 infer = dict(
     partitioner=dict(
         type=SizePartitioner,
-        max_task_size: int = 2000,  # Maximum length of a single task
+        max_task_size: int = 2000,  # Maximum size of each task
         gen_task_coef: int = 20,  # Expansion coefficient for generative tasks
     ),
     # ...
@@ -54,7 +83,7 @@ In a multi-card, multi-machine cluster environment, if we want to implement para
 
 ### `LocalRunner`
 
-`LocalRunner` is the most basic runner that can run tasks in serial on the local machine.
+`LocalRunner` is the most basic runner that can run tasks parallelly on the local machine.
 
 ```python
 from opencompass.runners import LocalRunner
@@ -64,12 +93,15 @@ infer = dict(
     # ...
     runner=dict(
         type=LocalRunner,
+        max_num_workers=16,  # Maximum number of processes to run in parallel
         task=dict(type=OpenICLEvalTask),  # Task to be run
     )
 )
 ```
 
-In the future, we plan to enhance the capabilities of `LocalRunner` to effectively utilize multi-card resources on a single machine.
+```{note}
+The actual number of running tasks are both limited by the actual available GPU resources and the number of workers.
+```
 
 ### `SlurmRunner`
 
@@ -85,8 +117,6 @@ infer = dict(
         type=SlurmRunner,
         task=dict(type=OpenICLEvalTask),  # Task to be run
         max_num_workers=16,  # Maximum concurrent evaluation task count
-        partition='lm',  # The Slurm partition for running tasks
-        quotatype='auto',  # (Supported only in some Slurm, can be left unset) The priority for running tasks
         retry=2,  # Retry count for failed tasks, can prevent accidental errors
     ),
 )
@@ -127,3 +157,17 @@ infer = dict(
     ),
 )
 ```
+
+## Task
+
+A Task is a fundamental module in OpenCompass, a standalone script that executes the computationally intensive operations. Each task is designed to load a configuration file to determine parameter settings, and it can be executed in two distinct ways:
+
+2. Instantiate a Task object, then call `task.run()`.
+3. Call `get_command` method by passing in the config path and the command template string that contains `{task_cmd}` as a placeholder (e.g. `srun {task_cmd}`). The returned command string will be the full command and can be executed directly.
+
+As of now, OpenCompass supports the following task types:
+
+- `OpenICLInferTask`: Perform LM Inference task based on OpenICL framework.
+- `OpenICLEvalTask`: Perform LM Evaluation task based on OpenEval framework.
+
+In the future, more task types will be supported.

@@ -12,7 +12,6 @@ agieval_single_choice_sets = [
     'gaokao-history',
     'gaokao-biology',
     'gaokao-chemistry',
-    'gaokao-physics',
     'gaokao-mathqa',
     'logiqa-zh',
     'lsat-ar',
@@ -25,6 +24,7 @@ agieval_single_choice_sets = [
     'aqua-rat',
 ]
 agieval_multiple_choices_sets = [
+    'gaokao-physics',
     'jec-qa-kd',
     'jec-qa-ca',
 ]

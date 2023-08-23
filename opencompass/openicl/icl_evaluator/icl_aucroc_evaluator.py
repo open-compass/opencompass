@@ -1,4 +1,5 @@
 from typing import List
+
 import numpy as np
 from sklearn.metrics import roc_auc_score
 
@@ -10,7 +11,7 @@ from .icl_base_evaluator import BaseEvaluator
 @ICL_EVALUATORS.register_module()
 class AUCROCEvaluator(BaseEvaluator):
     """Calculate AUC-ROC scores and accuracy according the prediction.
-    
+
     For some dataset, the accuracy cannot reveal the difference between
     models because of the saturation. AUC-ROC scores can further exam
     model abilities to distinguish different labels. More details can refer to

@@ -1,6 +1,7 @@
 import argparse
 import os.path as osp
 import time
+from collections import Counter
 from typing import Optional
 
 import mmengine
@@ -57,13 +58,11 @@ class OpenICLEvalTask(BaseTask):
         test_set = build_dataset_from_cfg(self.dataset_cfg).test
         # Postprocess dataset if necessary
         if 'dataset_postprocessor' in self.eval_cfg:
-            TEXT_POSTPROCESSORS.get(
+            proc = TEXT_POSTPROCESSORS.get(
                 self.eval_cfg['dataset_postprocessor']['type'])
 
             def postprocess(sample):
                 s = sample[self.output_column]
-                proc = TEXT_POSTPROCESSORS.get(
-                    self.eval_cfg['dataset_postprocessor']['type'])
                 sample[self.output_column] = proc(s)
                 return sample
 
@@ -76,6 +75,9 @@ class OpenICLEvalTask(BaseTask):
         # in case the prediction is partial
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
+
+        # Get sc_size if use Self-Consistency
+        sc_size = self.eval_cfg.get('sc_size')
 
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
@@ -105,17 +107,40 @@ class OpenICLEvalTask(BaseTask):
                 from opencompass.models.base import LMTemplateParser
                 parser = LMTemplateParser(self.model_cfg['meta_template'])
                 role = parser.roles[self.eval_cfg['pred_role']]
-                pred_strs = [
-                    self._extract_role_pred(pred, role.get('begin', None),
-                                            role.get('end', None))
-                    for pred in pred_strs
-                ]
+                if sc_size is not None:
+                    for pred in pred_strs:
+                        if not isinstance(pred, list):
+                            raise TypeError(
+                                'The prediction for Self-Consistency'
+                                'must be list.')
+                        pred_strs.append([
+                            self._extract_role_pred(sc_pred,
+                                                    role.get('begin', None),
+                                                    role.get('end', None))
+                            for sc_pred in pred
+                        ])
+                else:
+                    pred_strs = [
+                        self._extract_role_pred(pred, role.get('begin', None),
+                                                role.get('end', None))
+                        for pred in pred_strs
+                    ]
 
             # Postprocess predictions if necessary
             if 'pred_postprocessor' in self.eval_cfg:
-                proc = TEXT_POSTPROCESSORS.get(
-                    self.eval_cfg['pred_postprocessor']['type'])
-                pred_strs = [proc(s) for s in pred_strs]
+                kwargs = self.eval_cfg['pred_postprocessor']
+                proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+                if sc_size is not None:
+                    pred_strs = [[proc(s, **kwargs) for s in preds]
+                                 for preds in pred_strs]
+                else:
+                    pred_strs = [proc(s, **kwargs) for s in pred_strs]
+
+            # Get majority voting predictions if use self-consistency
+            if sc_size is not None:
+                pred_strs = [
+                    Counter(s).most_common(1)[0][0] for s in pred_strs
+                ]
 
             icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
             result = icl_evaluator.score(
@@ -125,6 +150,8 @@ class OpenICLEvalTask(BaseTask):
             self.logger.error(
                 f'Task {task_abbr_from_cfg(self.cfg)}: {result["error"]}')
             return
+        else:
+            self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}: {result}')
 
         # Save result
         out_path = get_infer_output_path(self.model_cfg, self.dataset_cfg,

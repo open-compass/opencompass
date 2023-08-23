@@ -11,7 +11,7 @@ def _check_type_list(obj, typelist: List):
         elif isinstance(obj, _type):
             return obj
     raise TypeError(
-        f'Expected an object in {[_.__name__ if _ is not None else None for _ in typelist]} type, but got {obj}'
+        f'Expected an object in {[_.__name__ if _ is not None else None for _ in typelist]} type, but got {obj}'  # noqa
     )
 
 
@@ -20,7 +20,7 @@ def _check_dataset(obj) -> Union[Dataset, DatasetDict]:
         return obj
     else:
         raise TypeError(
-            f'Expected a datasets.Dataset or a datasets.DatasetDict object, but got {obj}'
+            f'Expected a datasets.Dataset or a datasets.DatasetDict object, but got {obj}'  # noqa
         )
 
 

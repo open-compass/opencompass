@@ -2,7 +2,7 @@ from mmengine.config import read_base
 
 with read_base():
     from ..ceval.ceval_ppl_578f8d import ceval_datasets
-    from ..bbh.bbh_gen_5b92b0 import bbh_datasets
+    from ..bbh.bbh_gen_6bd693 import bbh_datasets
     from ..CLUE_CMRC.CLUE_CMRC_gen_1bd3c8 import CMRC_datasets
     from ..CLUE_DRCD.CLUE_DRCD_gen_1bd3c8 import DRCD_datasets
     from ..CLUE_afqmc.CLUE_afqmc_ppl_6507d7 import afqmc_datasets

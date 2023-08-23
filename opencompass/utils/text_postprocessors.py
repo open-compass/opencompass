@@ -48,6 +48,31 @@ def first_capital_postprocess(text: str) -> str:
     return ''
 
 
+def first_option_postprocess(text: str, options: str) -> str:
+    """Find first valid option for text."""
+
+    patterns = [
+        f'[Tt]he answer is [{options}]',
+        f'[Tt]he correct answer is [{options}]',
+        f'答案是(.*?)[{options}]',
+        f'答案为(.*?)[{options}]',
+        f'固选(.*?)[{options}]',
+        f'答案应该是(.*?)[{options}]',
+        f'(\s|^)[{options}][\s。，,\.$]',  # noqa
+        f'[{options}]',
+    ]
+
+    regexes = [re.compile(pattern) for pattern in patterns]
+    for regex in regexes:
+        match = regex.search(text)
+        if match:
+            outputs = match.group(0)
+            for i in options:
+                if i in outputs:
+                    return i
+    return ''
+
+
 @TEXT_POSTPROCESSORS.register_module('first-capital-multi')
 def first_capital_postprocess_multi(text: str) -> str:
     match = re.search(r'([A-D]+)', text)

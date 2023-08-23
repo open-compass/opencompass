@@ -27,16 +27,16 @@ copyright = '2023, OpenCompass'
 author = 'OpenCompass Authors'
 
 # The full version, including alpha/beta/rc tags
-# version_file = '../../opencompass/version.py'
+version_file = '../../opencompass/__init__.py'
 
 
-# def get_version():
-#     with open(version_file, 'r') as f:
-#         exec(compile(f.read(), version_file, 'exec'))
-#     return locals()['__version__']
+def get_version():
+    with open(version_file, 'r') as f:
+        exec(compile(f.read(), version_file, 'exec'))
+    return locals()['__version__']
 
 
-release = "0.5.0"
+release = get_version()
 
 # -- General configuration ---------------------------------------------------
 
@@ -67,7 +67,7 @@ source_suffix = {
     '.md': 'markdown',
 }
 
-language = 'en'
+language = 'cn'
 
 # The master toctree document.
 root_doc = 'index'
@@ -97,7 +97,7 @@ html_theme_options = {
         },
     ],
     # Specify the language of shared menu
-    'menu_lang': 'en',
+    'menu_lang': 'cn',
     # Disable the default edit on GitHub
     'default_edit_on_github': False,
 }
@@ -141,14 +141,16 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (root_doc, 'opencompass.tex', 'OpenCompass Documentation', author, 'manual'),
+    (root_doc, 'opencompass.tex', 'OpenCompass Documentation', author,
+     'manual'),
 ]
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(root_doc, 'opencompass', 'OpenCompass Documentation', [author], 1)]
+man_pages = [(root_doc, 'opencompass', 'OpenCompass Documentation', [author],
+              1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -156,8 +158,9 @@ man_pages = [(root_doc, 'opencompass', 'OpenCompass Documentation', [author], 1)
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (root_doc, 'opencompass', 'OpenCompass Documentation', author, 'OpenCompass Authors',
-     'AGI evaluation toolbox and benchmark.', 'Miscellaneous'),
+    (root_doc, 'opencompass', 'OpenCompass Documentation', author,
+     'OpenCompass Authors', 'AGI evaluation toolbox and benchmark.',
+     'Miscellaneous'),
 ]
 
 # -- Options for Epub output -------------------------------------------------

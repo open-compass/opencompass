@@ -1,5 +1,8 @@
+import random
 from typing import List
+
 import evaluate
+import numpy as np
 
 from opencompass.registry import ICL_EVALUATORS
 
@@ -11,10 +14,14 @@ class HuggingfaceEvaluator(BaseEvaluator):
 
     Args:
         metric (str): Metric name in evaluate module.
+        seed (int): There exists some randomness during the calculation of some
+            metrics, thus we set a fixed random seed for reproducing. Defaults
+            to 0.
     """
 
-    def __init__(self, metric: str) -> None:
+    def __init__(self, metric: str, seed: int = 0) -> None:
         self.metric = metric
+        self.seed = seed
         super().__init__()
 
     def _preprocess(self, predictions: List, references: List) -> dict:
@@ -53,13 +60,24 @@ class HuggingfaceEvaluator(BaseEvaluator):
         Returns:
             dict: calculated scores.
         """
+        random_state = random.getstate()
+        np_random_state = np.random.get_state()
+
+        random.seed(self.seed)
+        np.random.seed(self.seed)
         if len(predictions) != len(references):
-            return {'error': 'predictions and references have different '
+            return {
+                'error':
+                'predictions and references have different '
                 f'length. len(predictions): {len(predictions)}, '
-                f'len(references): {len(references)}'}
+                f'len(references): {len(references)}'
+            }
         metric = evaluate.load(self.metric)
         scores = metric.compute(**self._preprocess(predictions, references))
-        return self._postprocess(scores)
+        result = self._postprocess(scores)
+        random.setstate(random_state)
+        np.random.set_state(np_random_state)
+        return result
 
 
 @ICL_EVALUATORS.register_module()
@@ -103,13 +121,13 @@ class AccEvaluator(HuggingfaceEvaluator):
         Returns:
             dict: postprocessed scores.
         """
-        scores["accuracy"] *= 100
+        scores['accuracy'] *= 100
         return scores
 
 
 @ICL_EVALUATORS.register_module()
 class RougeEvaluator(HuggingfaceEvaluator):
-    """Rouge evaluator."""
+    """Rouge evaluator."""  # noqa
 
     def __init__(self) -> None:
         super().__init__(metric='rouge')
@@ -150,7 +168,7 @@ class MccEvaluator(AccEvaluator):
         Returns:
             dict: postprocessed scores.
         """
-        scores["matthews_correlation"] *= 100
+        scores['matthews_correlation'] *= 100
         return scores
 
 
@@ -197,3 +215,52 @@ class SquadEvaluator(HuggingfaceEvaluator):
             dict: postprocessed scores.
         """
         return scores['f1']
+
+
+@ICL_EVALUATORS.register_module()
+class EDAccEvaluator(AccEvaluator):
+    """Edit distance based accuracy evaluator.
+
+    This implementation requires the un-postprocessed outputs from the model,
+    and the reference list where each item is structured as:
+
+    .. code-block:: python
+
+        {
+            'candidates': [],  # a list of informative answer candidates
+            'label': 0,  # the index of the gold answer
+        }
+
+    It always matches the model's output to a valid answer with the citerion
+    as the minimum editing distance.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        from rapidfuzz.distance import Levenshtein
+        self.dist = Levenshtein.distance
+
+    def _preprocess(self, predictions: List, references: List) -> dict:
+        """Preprocess the final predictions and references to needed format.
+
+        Args:
+            predictions (List): List of predictions of each sample.
+            references (List): List of targets for each sample.
+
+        Returns:
+            dict: preprocessed results.
+        """
+
+        preds = []
+        golds = []
+
+        for i in range(len(predictions)):
+            pred, ref = predictions[i], references[i]
+            dists = [self.dist(pred, cand) for cand in ref['candidates']]
+            preds.append(np.argmin(dists))
+            golds.append(ref['label'])
+
+        return {
+            'predictions': preds,
+            'references': golds,
+        }

@@ -6,7 +6,8 @@ from datetime import datetime
 
 from mmengine.config import Config
 
-from opencompass.partitioners import NaivePartitioner, SizePartitioner
+from opencompass.partitioners import (MultimodalNaivePartitioner,
+                                      NaivePartitioner, SizePartitioner)
 from opencompass.registry import PARTITIONERS, RUNNERS
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.utils import LarkReporter, Summarizer, get_logger
@@ -35,6 +36,16 @@ def parse_args():
                         help='Debug mode, in which scheduler will run tasks '
                         'in the single process, and output will not be '
                         'redirected to files',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('--mm-eval',
+                        help='Whether or not enable multimodal evaluation',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('--dry-run',
+                        help='Dry run mode, in which the scheduler will not '
+                        'actually run the tasks, but only print the commands '
+                        'to run',
                         action='store_true',
                         default=False)
     parser.add_argument('-m',
@@ -87,6 +98,11 @@ def parse_args():
                         'in the config.',
                         type=int,
                         default=32)
+    parser.add_argument('--max-workers-per-gpu',
+                        help='Max task to run in parallel on one GPU. '
+                        'It will only be used in the local runner.',
+                        type=int,
+                        default=1)
     parser.add_argument(
         '--retry',
         help='Number of retries if the job failed when using slurm or dlc. '
@@ -123,6 +139,10 @@ def parse_slurm_args(slurm_parser):
                               help='Slurm quota type',
                               default=None,
                               type=str)
+    slurm_parser.add_argument('--qos',
+                              help='Slurm quality of service',
+                              default=None,
+                              type=str)
 
 
 def parse_dlc_args(dlc_parser):
@@ -135,11 +155,12 @@ def parse_dlc_args(dlc_parser):
 
 def main():
     args = parse_args()
-
+    if args.dry_run:
+        args.debug = True
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
-    cfg = Config.fromfile(args.config)
+    cfg = Config.fromfile(args.config, format_python_code=False)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
@@ -172,7 +193,7 @@ def main():
     cfg.dump(output_config_path)
     # Config is intentally reloaded here to avoid initialized
     # types cannot be serialized
-    cfg = Config.fromfile(output_config_path)
+    cfg = Config.fromfile(output_config_path, format_python_code=False)
 
     # report to lark bot if specify --lark
     if not args.lark:
@@ -190,13 +211,22 @@ def main():
                            'also specified --slurm or --dlc. '
                            'The "infer" configuration will be overridden by '
                            'your runtime arguments.')
-        if args.dlc or args.slurm or cfg.get('infer', None) is None:
+        # Check whether run multimodal evaluation
+        if args.mm_eval:
+            partitioner = MultimodalNaivePartitioner(
+                osp.join(cfg['work_dir'], 'predictions/'))
+            tasks = partitioner(cfg)
+            exec_mm_infer_runner(tasks, args, cfg)
+            return
+        elif args.dlc or args.slurm or cfg.get('infer', None) is None:
             # Use SizePartitioner to split into subtasks
             partitioner = SizePartitioner(
                 osp.join(cfg['work_dir'], 'predictions/'),
                 max_task_size=args.max_partition_size,
                 gen_task_coef=args.gen_task_coef)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             # execute the infer subtasks
             exec_infer_runner(tasks, args, cfg)
         # If they have specified "infer" in config and haven't used --slurm
@@ -217,6 +247,8 @@ def main():
                 cfg['work_dir'], 'predictions/')
             partitioner = PARTITIONERS.build(cfg.infer.partitioner)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             runner = RUNNERS.build(cfg.infer.runner)
             runner(tasks)
 
@@ -235,6 +267,8 @@ def main():
             partitioner = NaivePartitioner(
                 osp.join(cfg['work_dir'], 'results/'))
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             # execute the eval tasks
             exec_eval_runner(tasks, args, cfg)
         # If they have specified "eval" in config and haven't used --slurm
@@ -255,6 +289,8 @@ def main():
                                                        'results/')
             partitioner = PARTITIONERS.build(cfg.eval.partitioner)
             tasks = partitioner(cfg)
+            if args.dry_run:
+                return
             runner = RUNNERS.build(cfg.eval.runner)
             runner(tasks)
 
@@ -264,6 +300,27 @@ def main():
         summarizer.summarize(time_str=cfg_time_str)
 
 
+def exec_mm_infer_runner(tasks, args, cfg):
+    """execute multimodal infer runner according to args."""
+    if args.slurm:
+        runner = SlurmRunner(dict(type='MultimodalInferTask'),
+                             max_num_workers=args.max_num_workers,
+                             partition=args.partition,
+                             quotatype=args.quotatype,
+                             retry=args.retry,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
+    elif args.dlc:
+        raise NotImplementedError('Currently, we do not support evaluating \
+                             multimodal models on dlc.')
+    else:
+        runner = LocalRunner(task=dict(type='MultimodalInferTask'),
+                             max_num_workers=args.max_num_workers,
+                             debug=args.debug,
+                             lark_bot_url=cfg['lark_bot_url'])
+    runner(tasks)
+
+
 def exec_infer_runner(tasks, args, cfg):
     """execute infer runner according to args."""
     if args.slurm:
@@ -271,6 +328,7 @@ def exec_infer_runner(tasks, args, cfg):
                              max_num_workers=args.max_num_workers,
                              partition=args.partition,
                              quotatype=args.quotatype,
+                             qos=args.qos,
                              retry=args.retry,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])
@@ -284,6 +342,7 @@ def exec_infer_runner(tasks, args, cfg):
     else:
         runner = LocalRunner(task=dict(type='OpenICLInferTask'),
                              max_num_workers=args.max_num_workers,
+                             max_workers_per_gpu=args.max_workers_per_gpu,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])
     runner(tasks)
@@ -296,6 +355,7 @@ def exec_eval_runner(tasks, args, cfg):
                              max_num_workers=args.max_num_workers,
                              partition=args.partition,
                              quotatype=args.quotatype,
+                             qos=args.qos,
                              retry=args.retry,
                              debug=args.debug,
                              lark_bot_url=cfg['lark_bot_url'])

@@ -1,6 +1,13 @@
+import json
 import os
+import re
+import time
 from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 from typing import Dict, List, Optional, Union
+
+import jieba
+import requests
 
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
@@ -8,6 +15,7 @@ from opencompass.utils.prompt import PromptList
 from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
+OPENAI_API_BASE = 'https://api.openai.com/v1/chat/completions'
 
 
 @MODELS.register_module()
@@ -22,39 +30,70 @@ class OpenAI(BaseAPIModel):
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
         retry (int): Number of retires if the API call fails. Defaults to 2.
-        key (str): OpenAI key. In particular, when it is set to "ENV", the key
-            will be fetched from the environment variable $OPENAI_API_KEY, as
-            how openai defaults to be. Defaults to 'ENV'
+        key (str or List[str]): OpenAI key(s). In particular, when it
+            is set to "ENV", the key will be fetched from the environment
+            variable $OPENAI_API_KEY, as how openai defaults to be. If it's a
+            list, the keys will be used in round-robin manner. Defaults to
+            'ENV'.
+        org (str or List[str], optional): OpenAI organization(s). If not
+            specified, OpenAI uses the default organization bound to each API
+            key. If specified, the orgs will be posted with each request in
+            round-robin manner. Defaults to None.
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
         openai_api_base (str): The base url of OpenAI's API. Defaults to
-            'https://api.openai.com/v1'.
+            'https://api.openai.com/v1/chat/completions'.
+        mode (str, optional): The method of input truncation when input length
+            exceeds max_seq_len. 'front','mid' and 'rear' represents the part
+            of input to truncate. Defaults to 'none'.
+        temperature (float, optional): What sampling temperature to use.
+            If not None, will override the temperature in the `generate()`
+            call. Defaults to None.
     """
 
     is_api: bool = True
 
     def __init__(self,
-                 path: str,
-                 max_seq_len: int = 2048,
+                 path: str = 'gpt-3.5-turbo',
+                 max_seq_len: int = 4096,
                  query_per_second: int = 1,
                  retry: int = 2,
-                 key: str = 'ENV',
+                 key: Union[str, List[str]] = 'ENV',
+                 org: Optional[Union[str, List[str]]] = None,
                  meta_template: Optional[Dict] = None,
-                 openai_api_base: str = 'https://api.openai.com/v1'):
+                 openai_api_base: str = OPENAI_API_BASE,
+                 mode: str = 'none',
+                 temperature: Optional[float] = None):
+
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template,
                          query_per_second=query_per_second,
                          retry=retry)
-        import openai
         import tiktoken
-        self.openai = openai
         self.tiktoken = tiktoken
+        self.temperature = temperature
+        assert mode in ['none', 'front', 'mid', 'rear']
+        self.mode = mode
 
-        self.openai.api_key = os.getenv(
-            'OPENAI_API_KEY') if key == 'ENV' else key
-        self.openai.api_rase = openai_api_base
+        if isinstance(key, str):
+            self.keys = [os.getenv('OPENAI_API_KEY') if key == 'ENV' else key]
+        else:
+            self.keys = key
+
+        # record invalid keys and skip them when requesting API
+        # - keys have insufficient_quota
+        self.invalid_keys = set()
+
+        self.key_ctr = 0
+        if isinstance(org, str):
+            self.orgs = [org]
+        else:
+            self.orgs = org
+        self.org_ctr = 0
+        self.url = openai_api_base
+        self.path = path
 
     def generate(
         self,
@@ -77,6 +116,9 @@ class OpenAI(BaseAPIModel):
         Returns:
             List[str]: A list of generated strings.
         """
+        if self.temperature is not None:
+            temperature = self.temperature
+
         with ThreadPoolExecutor() as executor:
             results = list(
                 executor.map(self._generate, inputs,
@@ -104,7 +146,18 @@ class OpenAI(BaseAPIModel):
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097
-        max_out_len = min(max_out_len, 4000 - self.get_token_len(str(input)))
+        context_window = 4096
+        if '32k' in self.path:
+            context_window = 32768
+        elif '16k' in self.path:
+            context_window = 16384
+        elif 'gpt-4' in self.path:
+            context_window = 8192
+
+        # will leave 100 tokens as prompt buffer, triggered if input is str
+        if isinstance(input, str) and self.mode != 'none':
+            context_window = self.max_seq_len
+            input = self.bin_trim(input, context_window - 100 - max_out_len)
 
         if isinstance(input, str):
             messages = [{'role': 'user', 'content': input}]
@@ -120,11 +173,45 @@ class OpenAI(BaseAPIModel):
                     msg['role'] = 'system'
                 messages.append(msg)
 
+        # Hold out 100 tokens due to potential errors in tiktoken calculation
+        max_out_len = min(
+            max_out_len, context_window - self.get_token_len(str(input)) - 100)
+        if max_out_len <= 0:
+            return ''
+
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.wait()
+
+            with Lock():
+                if len(self.invalid_keys) == len(self.keys):
+                    raise RuntimeError('All keys have insufficient quota.')
+
+                # find the next valid key
+                while True:
+                    self.key_ctr += 1
+                    if self.key_ctr == len(self.keys):
+                        self.key_ctr = 0
+
+                    if self.keys[self.key_ctr] not in self.invalid_keys:
+                        break
+
+                key = self.keys[self.key_ctr]
+
+            header = {
+                'Authorization': f'Bearer {key}',
+                'content-type': 'application/json',
+            }
+
+            if self.orgs:
+                with Lock():
+                    self.org_ctr += 1
+                    if self.org_ctr == len(self.orgs):
+                        self.org_ctr = 0
+                header['OpenAI-Organization'] = self.orgs[self.org_ctr]
+
             try:
-                response = self.openai.ChatCompletion.create(
+                data = dict(
                     model=self.path,
                     messages=messages,
                     max_tokens=max_out_len,
@@ -132,12 +219,37 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
                 )
-            except self.openai.error.RateLimitError:
-                max_num_retries -= 1
+                raw_response = requests.post(self.url,
+                                             headers=header,
+                                             data=json.dumps(data))
+            except requests.ConnectionError:
+                self.logger.error('Got connection error, retrying...')
+                continue
+            try:
+                response = raw_response.json()
+            except requests.JSONDecodeError:
+                self.logger.error('JsonDecode error, got',
+                                  str(raw_response.content))
+                continue
+            try:
+                return response['choices'][0]['message']['content'].strip()
+            except KeyError:
+                if 'error' in response:
+                    if response['error']['code'] == 'rate_limit_exceeded':
+                        time.sleep(1)
+                        continue
+                    elif response['error']['code'] == 'insufficient_quota':
+                        self.invalid_keys.add(key)
+                        self.logger.warn(f'insufficient_quota key: {key}')
+                        continue
+
+                    self.logger.error('Find error message in response: ',
+                                      str(response['error']))
             max_num_retries += 1
 
-        result = response.choices[0].message.content.strip()
-        return result
+        raise RuntimeError('Calling OpenAI failed after retrying for '
+                           f'{max_num_retries} times. Check the logs for '
+                           'details.')
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese
@@ -152,3 +264,47 @@ class OpenAI(BaseAPIModel):
         """
         enc = self.tiktoken.encoding_for_model(self.path)
         return len(enc.encode(prompt))
+
+    def bin_trim(self, prompt: str, num_token: int) -> str:
+        """Get a suffix of prompt which is no longer than num_token tokens.
+
+        Args:
+            prompt (str): Input string.
+            num_token (int): The upper bound of token numbers.
+
+        Returns:
+            str: The trimmed prompt.
+        """
+        token_len = self.get_token_len(prompt)
+        if token_len <= num_token:
+            return prompt
+        pattern = re.compile(r'[\u4e00-\u9fa5]')
+        if pattern.search(prompt):
+            words = list(jieba.cut(prompt, cut_all=False))
+            sep = ''
+        else:
+            words = prompt.split(' ')
+            sep = ' '
+
+        l, r = 1, len(words)
+        while l + 2 < r:
+            mid = (l + r) // 2
+            if self.mode == 'front':
+                cur_prompt = sep.join(words[-mid:])
+            elif self.mode == 'mid':
+                cur_prompt = sep.join(words[:mid]) + sep.join(words[-mid:])
+            elif self.mode == 'rear':
+                cur_prompt = sep.join(words[:mid])
+
+            if self.get_token_len(cur_prompt) <= num_token:
+                l = mid  # noqa: E741
+            else:
+                r = mid
+
+        if self.mode == 'front':
+            prompt = sep.join(words[-l:])
+        elif self.mode == 'mid':
+            prompt = sep.join(words[:l]) + sep.join(words[-l:])
+        elif self.mode == 'rear':
+            prompt = sep.join(words[:l])
+        return prompt

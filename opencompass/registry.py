@@ -1,3 +1,6 @@
+from mmengine.registry import DATASETS as MMENGINE_DATASETS
+from mmengine.registry import METRICS as MMENGINE_METRICS
+from mmengine.registry import MODELS as MMENGINE_MODELS
 from mmengine.registry import Registry
 
 PARTITIONERS = Registry('partitioner', locations=['opencompass.partitioners'])
@@ -22,3 +25,13 @@ ICL_PROMPT_TEMPLATES = Registry(
     locations=['opencompass.openicl.icl_prompt_template'])
 ICL_EVALUATORS = Registry('icl_evaluators',
                           locations=['opencompass.openicl.icl_evaluator'])
+DATASETS = Registry('mm_datasets',
+                    parent=MMENGINE_DATASETS,
+                    locations=['opencompass.multimodal.datasets'])
+METRICS = Registry('metric',
+                   parent=MMENGINE_METRICS,
+                   locations=['opencompass.metrics'])
+MM_MODELS = Registry('mm_model',
+                     parent=MMENGINE_MODELS,
+                     locations=['opencompass.multimodal.models'])
+TOT_WRAPPER = Registry('tot_wrapper', locations=['opencompass.datasets'])
