@@ -33,7 +33,7 @@ dataloader = dict(
 # model settings
 model = dict(
     type='mplug_owl-7b-mm-benchmark',
-    model_path='/mnt/petrelfs/share_data/liuyuan/llm_weights/mplug-owl-llama-7b-ft',
+    model_path='/mplug-owl-llama-7b-ft',
 )  # noqa
 
 # evaluation settings

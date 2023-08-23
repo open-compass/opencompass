@@ -44,7 +44,7 @@ Configuration method:
    lark_bot_url = 'YOUR_WEBHOOK_URL'
    ```
 
-   Typically, the Webhook URL is formatted like this: https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx .
+Typically, the Webhook URL is formatted like this: https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx .
 
 2. Inherit this file in the complete evaluation configuration:
 
