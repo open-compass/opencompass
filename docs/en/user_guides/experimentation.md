@@ -40,10 +40,11 @@ Configuration method:
 
 1. Open the `configs/lark.py` file, and add the following line:
 
-<<<<<<< HEAD
-   ```python
-   lark_bot_url = 'YOUR_WEBHOOK_URL'
-   ```
+\<\<\<\<\<\<\< HEAD
+
+```python
+lark_bot_url = 'YOUR_WEBHOOK_URL'
+```
 
 Typically, the Webhook URL is formatted like this: https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxxxxxxxxxxxx .
 
@@ -62,7 +63,9 @@ Typically, the Webhook URL is formatted like this: https://open.feishu.cn/open-a
    ```bash
    python run.py configs/eval_demo.py -p {PARTITION} -l
    ```
-=======
+
+\=======
+
 ```python
 lark_bot_url = 'YOUR_WEBHOOK_URL'
 ```
@@ -88,7 +91,12 @@ python run.py configs/eval_demo.py -p {PARTITION} -l
 ## Introduction of Summerizer
 
 It is mainly used to visualize evaluation results.
+<<<<<<< HEAD
 >>>>>>> [Feature]: Add minigpt-4
+=======
+
+> > > > > > > 02f962c4b6b8f98c915aaeeb29a50c632bb5ecba
+>>>>>>> lint
 
 ## Run Results
 
