@@ -14,7 +14,7 @@ val_pipeline = [
          ])
 ]
 
-dataset = dict(type='opencompass.OmniMMBench',
+dataset = dict(type='opencompass.MMBenchDataset',
                data_file='data/mm_benchmark/mmagi_v030_full_inferin.tsv',
                pipeline=val_pipeline)
 
