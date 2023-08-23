@@ -3,18 +3,18 @@ import re
 import torch
 import torch.nn as nn
 from mmengine.device import get_device
-from transformers import CLIPImageProcessor
+# Load via Huggingface Style
+from mplug_owl.modeling_mplug_owl import MplugOwlForConditionalGeneration
+from mplug_owl.processing_mplug_owl import (MplugOwlImageProcessor,
+                                            MplugOwlProcessor)
+from mplug_owl.tokenization_mplug_owl import MplugOwlTokenizer
 
 from opencompass.registry import MM_MODELS
-
-# Load via Huggingface Style
-from .modeling_mplug_owl import MplugOwlForConditionalGeneration
-from .processing_mplug_owl import MplugOwlImageProcessor, MplugOwlProcessor
-from .tokenization_mplug_owl import MplugOwlTokenizer
 
 
 @MM_MODELS.register_module('mplug_owl-7b-mm-benchmark')
 class Owl(nn.Module):
+
     def __init__(self, model_path='MAGAer13/mplug-owl-llama-7b') -> None:
         super().__init__()
         pretrained_ckpt = model_path
@@ -73,7 +73,10 @@ class Owl(nn.Module):
             prompt = question + ' ' + options
 
         data_sample = data_samples[0]
-        owl_template = """The following is a conversation between a curious human and AI assistant. The assistant gives helpful, detailed, and polite answers to the user's questions.
+        owl_template = """The following is a conversation
+        between a curious human and AI assistant.
+        The assistant gives helpful, detailed, and
+        polite answers to the user's questions.
         Human: <image>
         Human: {text_input}
         AI: """
