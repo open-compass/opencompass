@@ -1,5 +1,4 @@
 import importlib
-from typing import Any
 
 DEFAULT_IMAGE_TOKEN = '<image>'
 DEFAULT_IMAGE_PATCH_TOKEN = '<im_patch>'
@@ -7,22 +6,20 @@ DEFAULT_IM_START_TOKEN = '<im_start>'
 DEFAULT_IM_END_TOKEN = '<im_end>'
 
 
-class LLaVAMMBenchPromptConstructor:
-    """Prompt constructor for LLaVA on MMBench.
+class LLaVABasePromptConstructor:
+    """Base prompt constructor for LLaVA.
 
     Args:
-        conv_templates (Any): Conversation class to build prompt.
         conv_mode (str): Version control args for different version of LLaVA.
         mm_use_im_start_end (bool):
             Config arg. Use start and end token when build prompt or not.
     """
 
-    def __init__(self, conv_templates: Any, conv_mode: str,
-                 mm_use_im_start_end: bool) -> None:
-        self.conv_templates = conv_templates
+    def __init__(self, conv_mode: str, mm_use_im_start_end: bool) -> None:
+        conversation = importlib.import_module('llava.conversation')
+        self.conv_templates = conversation.conv_templates
         self.conv_mode = conv_mode
         self.mm_use_im_start_end = mm_use_im_start_end
-        conversation = importlib.import_module('llava.conversation')
         self.SeparatorStyle = conversation.SeparatorStyle
 
     def __call__(self, inputs: dict) -> tuple:
@@ -36,13 +33,7 @@ class LLaVAMMBenchPromptConstructor:
         """
         data_samples = inputs['data_samples']
         assert len(data_samples) == 1
-        question = data_samples[0].get('question')
-        options = data_samples[0].get('options')
-        context = data_samples[0].get('context')
-        if context is not None:
-            prompt = context + ' ' + question + ' ' + options
-        else:
-            prompt = question + ' ' + options
+        prompt = self._build_prompt(data_samples[0])
         if self.mm_use_im_start_end:
             prompt = (DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN +
                       DEFAULT_IM_END_TOKEN + '\n' + prompt)
@@ -57,3 +48,29 @@ class LLaVAMMBenchPromptConstructor:
         stop_str = conv.sep if conv.sep_style != self.SeparatorStyle.TWO else conv.sep2  # noqa
 
         return output_prompt, stop_str
+
+    def _build_prompt(self, data_sample):
+        return ''
+
+
+class LLaVAMMBenchPromptConstructor(LLaVABasePromptConstructor):
+    """MMBench prompt constructor for LLaVA.
+
+    Args:
+        conv_mode (str): Version control args for different version of LLaVA.
+        mm_use_im_start_end (bool):
+            Config arg. Use start and end token when build prompt or not.
+    """
+
+    def __init__(self, conv_mode: str, mm_use_im_start_end: bool) -> None:
+        super().__init__(conv_mode, mm_use_im_start_end)
+
+    def _build_prompt(self, data_sample):
+        question = data_sample.get('question')
+        options = data_sample.get('options')
+        context = data_sample.get('context')
+        if context is not None:
+            prompt = context + ' ' + question + ' ' + options
+        else:
+            prompt = question + ' ' + options
+        return prompt
