@@ -1,5 +1,6 @@
 # dataloader settings
-
+from opencompass.multimodal.models.otter import (
+    OTTERMMBenchPromptConstructor)
 
 val_pipeline = [
     dict(type="mmpretrain.torchvision/Resize", size=(224, 224), interpolation=3),
@@ -32,6 +33,9 @@ otter_9b_mmbench_model = dict(
     type="otter-9b",
     model_path="luodian/OTTER-Image-MPT7B",  # noqa
     load_bit="bf16",
+    prompt_constructor=dict(type=OTTERMMBenchPromptConstructor,
+                            model_label='GPT',
+                            user_label='User'),
 )
 
 # evaluation settings
