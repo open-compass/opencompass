@@ -1,22 +1,21 @@
 import json
 import os
-import re
 from pathlib import Path
 
 import clip
 import torch
 import torch.nn as nn
+from llama_adapter_v2_multimodal7b.llama.llama import ModelArgs, Transformer
+from llama_adapter_v2_multimodal7b.llama.tokenizer import Tokenizer
+from llama_adapter_v2_multimodal7b.llama.utils import sample_top_p
 from mmengine.device import get_device
 from timm.models.vision_transformer import Block
 
 from opencompass.registry import MM_MODELS
 
-from .llama import ModelArgs, Transformer
-from .tokenizer import Tokenizer
-from .utils import _download, sample_top_p
-
 
 class LLaMA_adapter(nn.Module):
+
     def __init__(self,
                  llama_ckpt_dir,
                  llama_tokenizer,
@@ -238,16 +237,13 @@ class LLaMA_adapter(nn.Module):
                             self.tokenizer.pad_id).cuda().long()
 
         # import pdb;pdb.set_trace()
-        try:
-            for k, t in enumerate(prompts):
-                if len(t) <= total_len:
-                    tokens[k, :len(t)] = torch.tensor(t).cuda().long()
-                else:
-                    tokens[k, :total_len] = torch.tensor(
-                        t[:total_len]).cuda().long()
-        except:
-            import pdb
-            pdb.set_trace()
+        for k, t in enumerate(prompts):
+            if len(t) <= total_len:
+                tokens[k, :len(t)] = torch.tensor(t).cuda().long()
+            else:
+                tokens[k, :total_len] = torch.tensor(
+                    t[:total_len]).cuda().long()
+
         input_text_mask = tokens != self.tokenizer.pad_id
         start_pos = min_prompt_size
         prev_pos = 0
@@ -289,7 +285,7 @@ class LLaMA_adapter(nn.Module):
 
 _MODELS = {
     'BIAS-7B':
-    'https://github.com/ZrrSkywalker/LLaMA-Adapter/releases/download/v.2.0.0/7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',
+    'https://github.com/ZrrSkywalker/LLaMA-Adapter/releases/download/v.2.0.0/7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',  # noqa: E501
     # "LORA16-7B": "",
     # "PARTIAL-7B": ""
 }
@@ -313,7 +309,7 @@ def LLaMA_adapter_v2(llama_dir,
     # load llama_adapter weights and model_cfg
     print(f'Loading LLaMA-Adapter from {llama_dir}')
     ckpt = torch.load(
-        f'{llama_dir}/7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',
+        f'{llama_dir}/7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',  # noqa: E501
         map_location='cpu')
     model_cfg = ckpt.get('config', {})
 
@@ -333,4 +329,4 @@ def LLaMA_adapter_v2(llama_dir,
                           lora_rank=model_cfg.get('lora_rank', 16))
 
     model.load_state_dict(ckpt['model'], strict=False)
-    return model.to(device)  #, model.clip_transform
+    return model.to(device)
