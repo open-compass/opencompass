@@ -111,7 +111,7 @@ generation_kwargs = dict(temperature=0.7)
 game24_infer_cfg = dict(
         prompt_template=dict(
         type=PromptTemplate,
-        template='''{input}'''), # Directly pass the input content, as the Prompt needs to be specified in steps
+        template='{input}'), # Directly pass the input content, as the Prompt needs to be specified in steps
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=ToTInferencer, # Replace GenInferencer with ToTInferencer
                     generation_kwargs=generation_kwargs,
