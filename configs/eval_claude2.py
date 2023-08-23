@@ -13,7 +13,7 @@ with read_base():
 models = [
     dict(abbr='Claude2',
         type=Claude,
-        path='claude-1',
+        path='claude-2',
         key='YOUR_CLAUDE_KEY',
         query_per_second=1,
         max_out_len=2048, max_seq_len=2048, batch_size=2),
