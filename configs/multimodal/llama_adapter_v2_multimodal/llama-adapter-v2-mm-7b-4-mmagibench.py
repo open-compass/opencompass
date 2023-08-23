@@ -28,7 +28,7 @@ dataloader = dict(batch_size=1,
 model = dict(
     type='LLaMA-adapter-v2-mm-benchmark',
     llama_dir=  # noqa
-    '/mnt/petrelfs/share_data/zhangyuanhan/llama_adapter_v2_multimodal',
+    '/llama_adapter_v2_multimodal',
 )
 
 # evaluation settings
@@ -38,5 +38,3 @@ evaluator = [
         save_path='work_dirs/llama-adapter-v2-multimodal-mmagibench-v0.1.0.xlsx'
     )
 ]
-
-# load_from = '/mnt/cache/liuyuan/research/NLP/MiniGPT-4/minigpt4-7b/prerained_minigpt4_7b.pth'  # noqa
