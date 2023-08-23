@@ -15,7 +15,7 @@ val_pipeline = [
 ]
 
 dataset = dict(type='opencompass.OmniMMBenchDataset',
-               data_file='data/mm_benchmark/mmagi_v030_full_inferin.tsv',
+               data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
 dataloader = dict(batch_size=1,
