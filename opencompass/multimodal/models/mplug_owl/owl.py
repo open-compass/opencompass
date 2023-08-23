@@ -18,6 +18,7 @@ class Owl(nn.Module):
     def __init__(self, model_path='MAGAer13/mplug-owl-llama-7b') -> None:
         super().__init__()
         pretrained_ckpt = model_path
+        # import pdb;pdb.set_trace()
         self.model = MplugOwlForConditionalGeneration.from_pretrained(
             pretrained_ckpt,
             torch_dtype=torch.bfloat16,
