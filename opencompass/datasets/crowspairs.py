@@ -43,15 +43,16 @@ def crowspairs_postprocess(text: str) -> str:
     if re.search('Neither', text) or re.search('Both', text):
         return 'invalid'
 
-    first_option = text[0]
-    if first_option.isupper() and first_option in 'AB':
-        return first_option
+    if text != '':
+        first_option = text[0]
+        if first_option.isupper() and first_option in 'AB':
+            return first_option
 
-    if re.search(' A ', text) or re.search('A.', text):
-        return 'A'
+        if re.search(' A ', text) or re.search('A.', text):
+            return 'A'
 
-    if re.search(' B ', text) or re.search('B.', text):
-        return 'B'
+        if re.search(' B ', text) or re.search('B.', text):
+            return 'B'
 
     return 'invalid'
 
