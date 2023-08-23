@@ -37,6 +37,7 @@ OpenCompass 上手路线
    user_guides/evaluation.md
    user_guides/experimentation.md
    user_guides/metrics.md
+   user_guides/summarizer.md
 
 .. _提示词:
 .. toctree::
