@@ -203,7 +203,9 @@ class HuggingFace(BaseModel):
                                    max_length=self.max_seq_len -
                                    max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
-        outputs = self.model.generate(input_ids,
+        # To accommodate the PeftModel, parameters should be passed in
+        # the key-value format for generate.
+        outputs = self.model.generate(input_ids=input_ids,
                                       max_new_tokens=max_out_len,
                                       **kwargs)
 
