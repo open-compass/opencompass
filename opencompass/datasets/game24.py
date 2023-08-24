@@ -4,7 +4,6 @@ import re
 from typing import List
 
 import pandas as pd
-import sympy
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
@@ -234,6 +233,8 @@ def game24_postprocess(output: str):
 class Game24Evaluator(BaseEvaluator):
 
     def __init__(self) -> None:
+        import sympy
+        self.sympy = sympy
         super().__init__()
 
     def check_nums(self, prediction, reference):
@@ -242,7 +243,7 @@ class Game24Evaluator(BaseEvaluator):
         if sorted(numbers) != sorted(problem_numbers):
             return 0
         try:
-            return int(sympy.simplify(prediction) == 24)
+            return int(self.sympy.simplify(prediction) == 24)
         except Exception:
             return 0
 
