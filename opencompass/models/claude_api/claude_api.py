@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Union
 from opencompass.registry import MODELS
 from opencompass.utils import PromptList
 
-from .base_api import BaseAPIModel
+from ..base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
 

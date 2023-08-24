@@ -1,4 +1,5 @@
 import argparse
+import fnmatch
 import os.path as osp
 import time
 from collections import Counter
@@ -11,8 +12,9 @@ from mmengine.utils import mkdir_or_exist
 from opencompass.registry import (ICL_EVALUATORS, MODELS, TASKS,
                                   TEXT_POSTPROCESSORS)
 from opencompass.tasks.base import BaseTask
-from opencompass.utils import (build_dataset_from_cfg, get_infer_output_path,
-                               get_logger, task_abbr_from_cfg)
+from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
+                               get_infer_output_path, get_logger,
+                               task_abbr_from_cfg)
 
 
 @TASKS.register_module(force=(__name__ == '__main__'))  # A hack for script run
@@ -46,6 +48,16 @@ class OpenICLEvalTask(BaseTask):
                 # Load Dataset
                 self.eval_cfg = self.dataset_cfg.get('eval_cfg')
                 self.output_column = dataset_cfg['reader_cfg']['output_column']
+
+                # overwrite postprocessor if the model has specified one
+                ds_abbr = dataset_abbr_from_cfg(self.dataset_cfg)
+                model_postprocessors = self.model_cfg.pred_postprocessor
+                for pattern in model_postprocessors.keys():
+                    if fnmatch.fnmatch(ds_abbr, pattern):
+                        self.eval_cfg[
+                            'pred_postprocessor'] = model_postprocessors[
+                                pattern]  # noqa
+                        break
 
                 out_path = get_infer_output_path(
                     self.model_cfg, self.dataset_cfg,

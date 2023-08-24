@@ -79,3 +79,10 @@ def first_capital_postprocess_multi(text: str) -> str:
     if match:
         return match.group(1)
     return ''
+
+
+def last_option_postprocess(text: str, options: str) -> str:
+    match = re.findall(rf'([{options}])', text)
+    if match:
+        return match[-1]
+    return ''
