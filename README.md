@@ -27,6 +27,12 @@ to **OpenCompass**!
 
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
+
+> **🔥 Attention**<br />
+> We launch the OpenCompass Collabration project, welcome to support diverse evaluation benchmarks into OpenCompass!
+> Clike [Issue](https://github.com/InternLM/opencompass/issues/248) for more information.
+> Let's work together to build a more powerful OpenCompass toolkit!
+
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
 - **\[2023.08.21\]** [**Lagent**](https://github.com/InternLM/lagent) has been released, which is a lightweight framework for building LLM-based agents. We are working with Lagent team to support the evaluation of general tool-use capability, stay tuned! 🔥🔥🔥.
