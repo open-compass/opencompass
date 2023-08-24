@@ -39,7 +39,11 @@ class Claude(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
+        try:
+            from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic
+        except ImportError:
+            raise ImportError('Import anthropic failed. Please install it '
+                              'with "pip install anthropic" and try again.')
 
         self.anthropic = Anthropic(api_key=key)
         self.model = path
