@@ -2,7 +2,6 @@ import argparse
 import getpass
 import os
 import os.path as osp
-import sys
 from datetime import datetime
 
 from mmengine.config import Config
@@ -10,8 +9,7 @@ from mmengine.config import Config
 from opencompass.partitioners import (MultimodalNaivePartitioner,
                                       NaivePartitioner, SizePartitioner)
 from opencompass.registry import PARTITIONERS, RUNNERS
-from opencompass.runners import (DLCRunner, LocalRunner, MMLocalRunner,
-                                 MMSlurmRunner, SlurmRunner)
+from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.utils import LarkReporter, Summarizer, get_logger
 
 
