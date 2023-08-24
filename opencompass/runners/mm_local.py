@@ -56,7 +56,8 @@ class MMLocalRunner(BaseRunner):
         command = (f'NCCL_SOCKET_IFNAME=eth0 '
                    f'bash opencompass/multimodal/inference_local.sh '
                    f'{config_file} {self.gpus_per_task}')
-        args.work_dir = args.work_dir if args.work_dir is not None else './work_dirs'  # noqa E501
+        args.work_dir = args.work_dir if args.work_dir is not None \
+            else './work_dirs'
         out_path = osp.join(
             args.work_dir, f'{osp.splitext(osp.basename(config_file))[0]}.out')
         task_name = f'{osp.splitext(osp.basename(config_file))[0]}'
