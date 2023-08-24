@@ -109,6 +109,6 @@ class Claude(BaseAPIModel):
                 return completion.completion
             except Exception as e:
                 print(e)
-                if num_retries == self.retry - 1:
-                    raise e
             num_retries += 1
+        raise RuntimeError('Calling Claude API failed after retrying for '
+                           f'{self.retry} times. Check the logs for details.')
