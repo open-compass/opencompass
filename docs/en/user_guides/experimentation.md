@@ -91,12 +91,13 @@ python run.py configs/eval_demo.py -p {PARTITION} -l
 ## Introduction of Summerizer
 
 It is mainly used to visualize evaluation results.
-<<<<<<< HEAD
->>>>>>> [Feature]: Add minigpt-4
-=======
+\<\<\<\<\<\<\< HEAD
+
+> > > > > > > \[Feature\]: Add minigpt-4
+> > > > > > > \=======
 
 > > > > > > > 02f962c4b6b8f98c915aaeeb29a50c632bb5ecba
->>>>>>> lint
+> > > > > > > lint
 
 ## Run Results
 
