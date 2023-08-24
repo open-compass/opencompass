@@ -2,7 +2,6 @@ import argparse
 import getpass
 import os
 import os.path as osp
-import sys
 from datetime import datetime
 
 from mmengine.config import Config, DictAction
