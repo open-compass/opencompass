@@ -13,14 +13,19 @@ class LLaVABasePromptConstructor:
         conv_mode (str): Version control args for different version of LLaVA.
         mm_use_im_start_end (bool):
             Config arg. Use start and end token when build prompt or not.
+        reply_prompt (str): Reply prompt added at the end. (Default: '')
     """
 
-    def __init__(self, conv_mode: str, mm_use_im_start_end: bool) -> None:
+    def __init__(self,
+                 conv_mode: str,
+                 mm_use_im_start_end: bool,
+                 reply_prompt: str = '') -> None:
         conversation = importlib.import_module('llava.conversation')
         self.conv_templates = conversation.conv_templates
         self.conv_mode = conv_mode
         self.mm_use_im_start_end = mm_use_im_start_end
         self.SeparatorStyle = conversation.SeparatorStyle
+        self.reply_prompt = reply_prompt
 
     def __call__(self, inputs: dict) -> tuple:
         """Construct prompt.
@@ -50,7 +55,7 @@ class LLaVABasePromptConstructor:
         return output_prompt, stop_str
 
     def _build_prompt(self, data_sample):
-        return ''
+        return self.reply_prompt
 
 
 class LLaVAMMBenchPromptConstructor(LLaVABasePromptConstructor):
@@ -60,10 +65,14 @@ class LLaVAMMBenchPromptConstructor(LLaVABasePromptConstructor):
         conv_mode (str): Version control args for different version of LLaVA.
         mm_use_im_start_end (bool):
             Config arg. Use start and end token when build prompt or not.
+        reply_prompt (str): Reply prompt added at the end. (Default: '')
     """
 
-    def __init__(self, conv_mode: str, mm_use_im_start_end: bool) -> None:
-        super().__init__(conv_mode, mm_use_im_start_end)
+    def __init__(self,
+                 conv_mode: str,
+                 mm_use_im_start_end: bool,
+                 reply_prompt: str = '') -> None:
+        super().__init__(conv_mode, mm_use_im_start_end, reply_prompt)
 
     def _build_prompt(self, data_sample):
         question = data_sample.get('question')
@@ -73,4 +82,58 @@ class LLaVAMMBenchPromptConstructor(LLaVABasePromptConstructor):
             prompt = context + ' ' + question + ' ' + options
         else:
             prompt = question + ' ' + options
+        prompt += self.reply_prompt
+        return prompt
+
+
+class LLaVAVQAPromptConstructor(LLaVABasePromptConstructor):
+    """VQA prompt constructor for LLaVA.
+
+    Args:
+        conv_mode (str): Version control args for different version of LLaVA.
+        mm_use_im_start_end (bool):
+            Config arg. Use start and end token when build prompt or not.
+        reply_prompt (str): Reply prompt added at the end. (Default: '')
+    """
+
+    def __init__(self,
+                 conv_mode: str,
+                 mm_use_im_start_end: bool,
+                 reply_prompt: str = '') -> None:
+        super().__init__(conv_mode, mm_use_im_start_end, reply_prompt)
+
+    def _build_prompt(self, data_sample):
+        prompt = data_sample.get('question')
+        prompt += self.reply_prompt
+        return prompt
+
+
+class LLaVAScienceQAPromptConstructor(LLaVABasePromptConstructor):
+    """ScienceQA prompt constructor for LLaVA.
+
+    Args:
+        conv_mode (str): Version control args for different version of LLaVA.
+        mm_use_im_start_end (bool):
+            Config arg. Use start and end token when build prompt or not.
+        reply_prompt (str): Reply prompt added at the end. (Default: '')
+    """
+
+    choice_mapping = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F'}
+
+    def __init__(self,
+                 conv_mode: str,
+                 mm_use_im_start_end: bool,
+                 reply_prompt: str = '') -> None:
+        super().__init__(conv_mode, mm_use_im_start_end, reply_prompt)
+
+    def _build_prompt(self, data_sample):
+        question = data_sample.get('question')
+        choices = data_sample.get('choices')
+        choices = [
+            f'({self.choice_mapping[i]}) ' + item
+            for i, item in enumerate(choices)
+        ]
+        choices = 'Choices: ' + ' '.join(choices) + '\n'
+        context = 'Context: ' + data_sample.get('hint') + '\n'
+        prompt = context + question + choices + self.reply_prompt
         return prompt
