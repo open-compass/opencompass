@@ -39,7 +39,7 @@ minigpt_4_gqa_model = dict(type='minigpt-4',
                            low_resource=False,
                            img_size=224,
                            max_length=10,
-                           llama_model='/path/to/vicuna-7b/',
+                           llama_model='/mnt/petrelfs/share_data/liuyuan/llm_weights/vicuna_weights_7b/',
                            prompt_constructor=dict(
                                type=MiniGPT4VQAPromptConstructor,
                                image_prompt='###Human: <Img><ImageHere></Img>',
@@ -49,4 +49,4 @@ minigpt_4_gqa_model = dict(type='minigpt-4',
 # evaluation settings
 minigpt_4_gqa_evaluator = [dict(type='mmpretrain.GQAAcc')]
 
-minigpt_4_gqa_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
+minigpt_4_gqa_load_from = '/mnt/cache/liuyuan/research/NLP/MiniGPT-4/minigpt4-7b/prerained_minigpt4_7b.pth'  # noqa

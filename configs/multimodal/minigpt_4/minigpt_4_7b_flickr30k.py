@@ -36,7 +36,7 @@ minigpt_4_flickr30k_model = dict(
     type='minigpt-4',
     low_resource=False,
     img_size=384,
-    llama_model='/path/to/vicuna-7b/',
+    llama_model='/mnt/petrelfs/share_data/liuyuan/llm_weights/vicuna_weights_7b/',
     prompt_constructor=dict(type=MiniGPT4COCOCaotionPromptConstructor,
                             image_prompt='###Human: <Img><ImageHere></Img>',
                             reply_prompt='###Assistant:'),
@@ -46,8 +46,8 @@ minigpt_4_flickr30k_model = dict(
 minigpt_4_flickr30k_evaluator = [
     dict(
         type='mmpretrain.COCOCaption',
-        ann_file='data/coco/annotations/coco_karpathy_val_gt.json',
+        ann_file='data/flickr30k/annotations/flickr30k_val_gt.json',
     )  # noqa
 ]
 
-minigpt_4_flickr30k_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
+minigpt_4_flickr30k_load_from = '/mnt/cache/liuyuan/research/NLP/MiniGPT-4/minigpt4-7b/prerained_minigpt4_7b.pth'  # noqa

@@ -21,35 +21,33 @@ val_pipeline = [
     )
 ]
 
-dataset = dict(
-    type='mmpretrain.COCOVQA',
-    data_root='data/okvqa',
-    question_file='annotations/OpenEnded_mscoco_val2014_questions.json',
-    ann_file='annotations/mscoco_val2014_annotations.json',
-    pipeline=val_pipeline,
-    data_prefix='images/val2014',
-)
+dataset = dict(type='mmpretrain.OCRVQA',
+               data_root='data/ocrvqa',
+               ann_file='annotations/dataset.json',
+               split='test',
+               data_prefix='images',
+               pipeline=val_pipeline)
 
-minigpt_4_ok_vqa_dataloader = dict(batch_size=1,
-                                  num_workers=4,
-                                  dataset=dataset,
-                                  collate_fn=dict(type='pseudo_collate'),
-                                  sampler=dict(type='DefaultSampler',
-                                               shuffle=False))
+minigpt_4_ocr_vqa_dataloader = dict(batch_size=1,
+                                    num_workers=4,
+                                    dataset=dataset,
+                                    collate_fn=dict(type='pseudo_collate'),
+                                    sampler=dict(type='DefaultSampler',
+                                                 shuffle=False))
 
 # model settings
-minigpt_4_ok_vqa_model = dict(
+minigpt_4_ocr_vqa_model = dict(
     type='minigpt-4',
     low_resource=False,
     img_size=224,
     max_length=10,
-    llama_model='/path/to/vicuna-7b/',
+    llama_model='/mnt/petrelfs/share_data/liuyuan/llm_weights/vicuna_weights_7b/',
     prompt_constructor=dict(type=MiniGPT4VQAPromptConstructor,
                             image_prompt='###Human: <Img><ImageHere></Img>',
                             reply_prompt='###Assistant:'),
     post_processor=dict(type=MiniGPT4VQAPostProcessor))
 
 # evaluation settings
-minigpt_4_ok_vqa_evaluator = [dict(type='mmpretrain.VQAAcc')]
+minigpt_4_ocr_vqa_evaluator = [dict(type='mmpretrain.VQAAcc')]
 
-minigpt_4_ok_vqa_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
+minigpt_4_ocr_vqa_load_from = '/mnt/cache/liuyuan/research/NLP/MiniGPT-4/minigpt4-7b/prerained_minigpt4_7b.pth'  # noqa
