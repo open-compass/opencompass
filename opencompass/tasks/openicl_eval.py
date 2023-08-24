@@ -58,13 +58,11 @@ class OpenICLEvalTask(BaseTask):
         test_set = build_dataset_from_cfg(self.dataset_cfg).test
         # Postprocess dataset if necessary
         if 'dataset_postprocessor' in self.eval_cfg:
-            TEXT_POSTPROCESSORS.get(
+            proc = TEXT_POSTPROCESSORS.get(
                 self.eval_cfg['dataset_postprocessor']['type'])
 
             def postprocess(sample):
                 s = sample[self.output_column]
-                proc = TEXT_POSTPROCESSORS.get(
-                    self.eval_cfg['dataset_postprocessor']['type'])
                 sample[self.output_column] = proc(s)
                 return sample
 
@@ -130,13 +128,13 @@ class OpenICLEvalTask(BaseTask):
 
             # Postprocess predictions if necessary
             if 'pred_postprocessor' in self.eval_cfg:
-                proc = TEXT_POSTPROCESSORS.get(
-                    self.eval_cfg['pred_postprocessor']['type'])
+                kwargs = self.eval_cfg['pred_postprocessor']
+                proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
                 if sc_size is not None:
-                    pred_strs = [[proc(s) for s in preds]
+                    pred_strs = [[proc(s, **kwargs) for s in preds]
                                  for preds in pred_strs]
                 else:
-                    pred_strs = [proc(s) for s in pred_strs]
+                    pred_strs = [proc(s, **kwargs) for s in pred_strs]
 
             # Get majority voting predictions if use self-consistency
             if sc_size is not None:

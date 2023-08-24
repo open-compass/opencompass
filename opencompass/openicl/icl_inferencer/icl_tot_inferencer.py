@@ -123,9 +123,9 @@ class ToTInferencer(GenInferencer):
         Args:
             x (str): The input text to be evaluated.
             y (str): The partial output to be evaluated.
-            n_evaluate_sample (int): _description_
-            cache_value (bool): _description_. Defaults to True.
-
+            n_evaluate_sample (int): Times to evaluate each partial output.
+            cache_value (bool): Cache to avoid duplicate candidates.
+                Defaults to True.
         Returns:
             str: Value of evaluated partial outputs.
         """

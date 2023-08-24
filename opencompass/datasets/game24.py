@@ -169,6 +169,15 @@ class Game24Dataset(BaseDataset):
 
 
 class Game24PromptWrapper:
+    """Wrapper for Game24 prompts and outputs.
+
+    standard_prompt_wrap、cot_prompt_wrap、propose_prompt_wrap:
+       Get prompts for different sample method.
+    value_prompt_wrap:
+       Get prompts for value-based evaluation method.
+    value_outputs_unwrap:
+       Calculate total value score for value outputs.
+    """
 
     def __init__(self):
         self.value_cache = {}

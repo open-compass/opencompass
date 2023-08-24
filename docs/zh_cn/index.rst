@@ -37,6 +37,7 @@ OpenCompass 上手路线
    user_guides/evaluation.md
    user_guides/experimentation.md
    user_guides/metrics.md
+   user_guides/summarizer.md
 
 .. _提示词:
 .. toctree::
@@ -56,6 +57,7 @@ OpenCompass 上手路线
    advanced_guides/new_dataset.md
    advanced_guides/new_model.md
    advanced_guides/evaluation_turbomind.md
+   advanced_guides/code_eval_service.md
 
 .. _工具:
 .. toctree::

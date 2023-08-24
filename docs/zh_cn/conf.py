@@ -67,7 +67,7 @@ source_suffix = {
     '.md': 'markdown',
 }
 
-language = 'en'
+language = 'cn'
 
 # The master toctree document.
 root_doc = 'index'
@@ -97,7 +97,7 @@ html_theme_options = {
         },
     ],
     # Specify the language of shared menu
-    'menu_lang': 'en',
+    'menu_lang': 'cn',
     # Disable the default edit on GitHub
     'default_edit_on_github': False,
 }

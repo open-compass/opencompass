@@ -104,14 +104,14 @@ In OpenCompass, ToT parameters need to be set according to the requirements. Bel
 ```python
 # This ToT Game24 config can be found at: opencompass/configs/datasets/game24/game24_gen_8dfde3.py.
 from opencompass.datasets import (Game24Dataset, game24_postprocess,
-                                  Game24Evaluator, Game24Wrapper)
+                                  Game24Evaluator, Game24PromptWrapper)
 
-generation_kwargs = dict(do_sample=False, temperature=0.7)
+generation_kwargs = dict(temperature=0.7)
 
 game24_infer_cfg = dict(
         prompt_template=dict(
         type=PromptTemplate,
-        template='''{input}'''), # Directly pass the input content, as the Prompt needs to be specified in steps
+        template='{input}'), # Directly pass the input content, as the Prompt needs to be specified in steps
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=ToTInferencer, # Replace GenInferencer with ToTInferencer
                     generation_kwargs=generation_kwargs,
@@ -120,8 +120,8 @@ game24_infer_cfg = dict(
                     method_select='greedy', # Method for selecting reasoning content, can be greedy (greedy) or random (sample)
                     n_evaluate_sample=3,
                     n_select_sample=5,
-                    task_wrapper=dict(type=Game24Wrapper) # This Wrapper class includes the prompts for each step and methods for generating and evaluating reasoning content, needs customization according to the task
+                    task_wrapper=dict(type=Game24PromptWrapper) # This Wrapper class includes the prompts for each step and methods for generating and evaluating reasoning content, needs customization according to the task
                     ))
 ```
 
-If you want to use the ToT method on a custom dataset, you'll need to make additional configurations in the `opencompass.datasets.YourDataConfig.py` file to set up the `YourData24Wrapper` class. This is required for handling the thought generation and heuristic evaluation step within the ToT framework. For reasoning tasks similar to the game 24-Point, you can refer to the implementation in `opencompass/datasets/game24.py` for guidance.
+If you want to use the ToT method on a custom dataset, you'll need to make additional configurations in the `opencompass.datasets.YourDataConfig.py` file to set up the `YourDataPromptWrapper` class. This is required for handling the thought generation and heuristic evaluation step within the ToT framework. For reasoning tasks similar to the game 24-Point, you can refer to the implementation in `opencompass/datasets/game24.py` for guidance.

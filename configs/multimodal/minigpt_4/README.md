@@ -8,3 +8,19 @@ git clone https://github.com/Vision-CAIR/MiniGPT-4.git
 ```
 
 Then prepare the environement according to this [doc](https://github.com/Vision-CAIR/MiniGPT-4)
+
+### Start evaluation
+
+#### Slurm
+
+```sh
+cd $root
+python run.py configs/multimodal/tasks.py --mm-eval --slurm -p $PARTITION
+```
+
+#### PyTorch
+
+```sh
+cd $root
+python run.py configs/multimodal/tasks.py
+```
