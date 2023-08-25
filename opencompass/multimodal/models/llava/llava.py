@@ -54,6 +54,8 @@ class LLaVA(nn.Module):
         model_path (str): The path of llava checkpoint.
         prompt_constructor (dict): The config of prompt constructor.
         post_processor (dict): The config of post processor.
+        is_caption_task (bool): Whether the task is caption task.
+            Defaults to False.
     """
 
     def __init__(
@@ -61,9 +63,11 @@ class LLaVA(nn.Module):
         model_path: str,
         prompt_constructor: dict,
         post_processor: dict,
+        is_caption_task: bool = False,
     ) -> None:
         super().__init__()
         self.dtype = torch.float16
+        self.is_caption_task = is_caption_task
 
         # load LLaVA modules
         load_package()
@@ -142,7 +146,10 @@ class LLaVA(nn.Module):
 
         output_text = self.post_processor(outputs, stop_str)
 
-        data_sample.pred_answer = output_text
+        if self.is_caption_task:
+            data_sample.pred_caption = output_text
+        else:
+            data_sample.pred_answer = output_text
         return data_sample
 
     def forward(self, batch):

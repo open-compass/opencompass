@@ -32,6 +32,7 @@ visualglm_flickr30k_dataloader = dict(batch_size=1,
 visualglm_flickr30k_model = dict(
     type='visualglm',
     pretrained_path='/path/to/visualglm',  # or Huggingface repo id
+    is_caption_task=True,
     prompt_constructor=dict(type=VisualGLMBasePromptConstructor),
     post_processor=dict(type=VisualGLMBasePostProcessor)
 )

@@ -35,6 +35,7 @@ llava_coco_caption_dataloader = dict(
 llava_coco_caption_model = dict(
     type='llava',
     model_path='/path/to/llava',
+    is_caption_task=True,
     prompt_constructor=dict(type=LLaVABasePromptConstructor),
     post_processor=dict(type=LLaVABasePostProcessor)
 )  # noqa

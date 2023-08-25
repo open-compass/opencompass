@@ -36,6 +36,7 @@ llava_flickr30k_dataloader = dict(
 llava_flickr30k_model = dict(
     type='llava',
     model_path='/path/to/llava',
+    is_caption_task=True,
     prompt_constructor=dict(type=LLaVABasePromptConstructor),
     post_processor=dict(type=LLaVABasePostProcessor)
 )  # noqa
