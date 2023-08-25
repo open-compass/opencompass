@@ -13,7 +13,8 @@ from opencompass.utils import (Menu, build_dataset_from_cfg,
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Run an evaluation task')
+    parser = argparse.ArgumentParser(
+        description='View generated prompts based on datasets (and models)')
     parser.add_argument('config', help='Train config file path')
     parser.add_argument('-n', '--non-interactive', action='store_true')
     parser.add_argument('-a', '--all', action='store_true')
