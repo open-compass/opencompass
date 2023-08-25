@@ -6,6 +6,7 @@ import torch
 
 class MiniGPT4MMBenchPostProcessor:
     """"Post processor for MiniGPT-4 on MMBench."""
+
     def __init__(self) -> None:
         pass
 
@@ -36,6 +37,7 @@ class MiniGPT4MMBenchPostProcessor:
 
 class MiniGPT4COCOCaptionPostProcessor:
     """"Post processor for MiniGPT-4 on COCO Caption."""
+
     def __init__(self) -> None:
         pass
 
@@ -57,6 +59,7 @@ class MiniGPT4COCOCaptionPostProcessor:
 
 class MiniGPT4ScienceQAPostProcessor:
     """"Post processor for MiniGPT-4 on ScienceQA."""
+
     def __init__(self) -> None:
         pass
 
@@ -81,6 +84,7 @@ class MiniGPT4ScienceQAPostProcessor:
 
 class MiniGPT4VQAPostProcessor:
     """"Post processor for MiniGPT-4 on VQA."""
+
     def __init__(self) -> None:
         pass
 
@@ -99,6 +103,7 @@ class MiniGPT4VQAPostProcessor:
 
 class MiniGPT4VSRPostProcessor:
     """"Post processor for MiniGPT-4 on VSR."""
+
     def __init__(self) -> None:
         pass
 
@@ -118,6 +123,7 @@ class MiniGPT4VSRPostProcessor:
 
 class MiniGPT4MMEPostProcessor(MiniGPT4MMBenchPostProcessor):
     """"Post processor for MiniGPT-4 on MME."""
+
     def __init__(self) -> None:
         super().__init__()
 

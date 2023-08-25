@@ -35,8 +35,8 @@ minigpt_4_coco_caption_model = dict(
     type='minigpt-4',
     low_resource=False,
     img_size=384,
-    llama_model=
-    '/mnt/petrelfs/share_data/liuyuan/llm_weights/vicuna_weights_7b/',
+    llama_model='/path/to/vicuna_weights_7b/',
+    is_caption_task=True,
     prompt_constructor=dict(type=MiniGPT4COCOCaotionPromptConstructor,
                             image_prompt='###Human: <Img><ImageHere></Img>',
                             reply_prompt='###Assistant:'),
@@ -50,4 +50,4 @@ minigpt_4_coco_caption_evaluator = [
     )  # noqa
 ]
 
-minigpt_4_coco_caption_load_from = '/mnt/cache/liuyuan/research/NLP/MiniGPT-4/minigpt4-7b/prerained_minigpt4_7b.pth'  # noqa
+minigpt_4_coco_caption_load_from = '/path/to/prerained_minigpt4_7b.pth'  # noqa
