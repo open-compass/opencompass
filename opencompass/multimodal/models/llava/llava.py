@@ -2,14 +2,13 @@ import importlib
 import os
 import sys
 
+import mmengine
 import torch
 import torch.nn as nn
 from mmengine.device import get_device
 from transformers import StoppingCriteria
 
 from opencompass.registry import MM_MODELS
-
-from .prompt_constructor import LLaVAMMBenchPromptConstructor
 
 IMAGE_TOKEN_INDEX = -200
 
@@ -53,19 +52,27 @@ class LLaVA(nn.Module):
 
     Args:
         model_path (str): The path of llava checkpoint.
+        prompt_constructor (dict): The config of prompt constructor.
+        post_processor (dict): The config of post processor.
+        is_caption_task (bool): Whether the task is caption task.
+            Defaults to False.
     """
 
-    def __init__(self, model_path: str) -> None:
+    def __init__(
+        self,
+        model_path: str,
+        prompt_constructor: dict,
+        post_processor: dict,
+        is_caption_task: bool = False,
+    ) -> None:
         super().__init__()
         self.dtype = torch.float16
+        self.is_caption_task = is_caption_task
 
         # load LLaVA modules
         load_package()
         mm_utils = importlib.import_module('llava.mm_utils')
         builder = importlib.import_module('llava.model.builder')
-        conversation = importlib.import_module('llava.conversation')
-        self.SeparatorStyle = conversation.SeparatorStyle
-        self.conv_templates = conversation.conv_templates
 
         # load pretrained LLaVA
         # Note: When encounters with device related errors,
@@ -86,13 +93,16 @@ class LLaVA(nn.Module):
             conv_mode = 'multimodal'
         mm_use_im_start_end = getattr(model.config, 'mm_use_im_start_end',
                                       False)
-
+        prompt_constructor.update({
+            'conv_mode': conv_mode,
+            'mm_use_im_start_end': mm_use_im_start_end
+        })
+        self.prompt_constructor = mmengine.registry.build_from_cfg(
+            prompt_constructor, MM_MODELS)
+        self.post_processor = mmengine.registry.build_from_cfg(
+            post_processor, MM_MODELS)
         self.model = model
         self.tokenizer = tokenizer
-        self.prompt_constructor = LLaVAMMBenchPromptConstructor(
-            conv_templates=conversation.conv_templates,
-            conv_mode=conv_mode,
-            mm_use_im_start_end=mm_use_im_start_end)
 
     def generate(self, batch):
 
@@ -133,12 +143,13 @@ class LLaVA(nn.Module):
             )
         outputs = self.tokenizer.batch_decode(output_ids[:, input_token_len:],
                                               skip_special_tokens=True)[0]
-        outputs = outputs.strip()
-        if outputs.endswith(stop_str):
-            outputs = outputs[:-len(stop_str)]
-        output_text = outputs.strip()
 
-        data_sample.pred_answer = output_text
+        output_text = self.post_processor(outputs, stop_str)
+
+        if self.is_caption_task:
+            data_sample.pred_caption = output_text
+        else:
+            data_sample.pred_answer = output_text
         return data_sample
 
     def forward(self, batch):

@@ -1,7 +1,9 @@
-from opencompass.multimodal.models.llava import LLaVAMMBenchPromptConstructor, LLaVABasePostProcessor
+from opencompass.multimodal.models.llava import LLaVAVQAPromptConstructor, LLaVABasePostProcessor
 
 # dataloader settings
 val_pipeline = [
+    dict(type='mmpretrain.LoadImageFromFile'),
+    dict(type='mmpretrain.ToPIL', to_rgb=True),
     dict(type='mmpretrain.torchvision/Resize',
          size=(224, 224),
          interpolation=3),
@@ -13,18 +15,18 @@ val_pipeline = [
     ),
     dict(
         type='mmpretrain.PackInputs',
-        algorithm_keys=[
-            'question', 'category', 'l2-category', 'context', 'index',
-             'options_dict', 'options', 'split'
-        ],
-    ),
+        algorithm_keys=['question', 'gt_answer', 'gt_answer_weight'],
+        meta_keys=['question_id', 'image_id'],
+    )
 ]
 
-dataset = dict(type='opencompass.MMBenchDataset',
-               data_file='data/mmbench/mmbench_test_20230712.tsv',
+dataset = dict(type='mmpretrain.VizWiz',
+               data_root='data/vizwiz/',
+               data_prefix='Images/val',
+               ann_file='Annotations/val.json',
                pipeline=val_pipeline)
 
-mmbench_dataloader = dict(
+llava_vizwiz_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -33,15 +35,14 @@ mmbench_dataloader = dict(
 )
 
 # model settings
-llava_model = dict(
+llava_vizwiz_model = dict(
     type='llava',
     model_path='/path/to/llava',
-    prompt_constructor=dict(type=LLaVAMMBenchPromptConstructor),
+    prompt_constructor=dict(type=LLaVAVQAPromptConstructor),
     post_processor=dict(type=LLaVABasePostProcessor)
 )  # noqa
 
 # evaluation settings
-mmbench_evaluator = [
-    dict(type='opencompass.DumpResults',
-         save_path='work_dirs/llava-7b-mmbench.xlsx')
-]
+llava_vizwiz_evaluator = [dict(type='mmpretrain.VQAAcc')]
+
+
