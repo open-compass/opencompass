@@ -329,13 +329,13 @@ unzip OpenCompassData.zip
 python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
 ```
 
-OpenCompass 预定义了许多模型和数据集的配置，你可以通过 [工具](<>) 列出所有可用的模型和数据集配置。
+OpenCompass 预定义了许多模型和数据集的配置，你可以通过 [工具](./docs/zh_cn/tools.md#ListConfigs) 列出所有可用的模型和数据集配置。
 
 ```bash
 # 列出所有配置
 python tools/list_configs.py
 # 列出所有跟 llama 及 mmlu 相关的配置
-python tools/list_config.py llama mmlu
+python tools/list_configs.py llama mmlu
 ```
 
 你也可以通过命令行去评测其它 HuggingFace 模型。同样以 LLaMA-7b 为例：
