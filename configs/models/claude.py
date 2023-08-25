@@ -60,5 +60,5 @@ models = [
         query_per_second=1,
         max_out_len=2048, max_seq_len=2048, batch_size=2,
         pred_postprocessor=claude_postprocessors,
-        ),
+    ),
 ]

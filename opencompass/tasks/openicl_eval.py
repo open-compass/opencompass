@@ -51,7 +51,8 @@ class OpenICLEvalTask(BaseTask):
 
                 # overwrite postprocessor if the model has specified one
                 ds_abbr = dataset_abbr_from_cfg(self.dataset_cfg)
-                model_postprocessors = self.model_cfg.pred_postprocessor
+                model_postprocessors = self.model_cfg.get(
+                    'pred_postprocessor', {})
                 for pattern in model_postprocessors.keys():
                     if fnmatch.fnmatch(ds_abbr, pattern):
                         self.eval_cfg[
