@@ -64,6 +64,7 @@ def mbpp_postprocess(text: str) -> str:
             text = blocks[0]  # fetch the first code block
             if not text.startswith('\n'):  # in case starting with ```python
                 text = text[max(text.find('\n') + 1, 0):]
+    return text
 
 
 def strategyqa_pred_postprocess(text: str) -> str:
