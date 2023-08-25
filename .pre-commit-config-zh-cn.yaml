@@ -22,6 +22,10 @@ repos:
     rev: v2.2.1
     hooks:
       - id: codespell
+        exclude: >
+            (?x)^(
+                .*\.jsonl
+            )$
   - repo: https://gitee.com/openmmlab/mirrors-pre-commit-hooks
     rev: v4.3.0
     hooks:
