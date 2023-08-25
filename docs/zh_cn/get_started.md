@@ -101,7 +101,7 @@ python tools/list_configs.py
 python tools/list_configs.py llama mmlu
 ```
 
-其样例输出如下：
+部分样例输出如下：
 
 ```text
 +-----------------+-----------------------------------+
@@ -109,33 +109,18 @@ python tools/list_configs.py llama mmlu
 |-----------------+-----------------------------------|
 | hf_llama2_13b   | configs/models/hf_llama2_13b.py   |
 | hf_llama2_70b   | configs/models/hf_llama2_70b.py   |
-| hf_llama2_7b    | configs/models/hf_llama2_7b.py    |
-| hf_llama_13b    | configs/models/hf_llama_13b.py    |
-| hf_llama_30b    | configs/models/hf_llama_30b.py    |
-| hf_llama_65b    | configs/models/hf_llama_65b.py    |
-| hf_llama_7b     | configs/models/hf_llama_7b.py     |
-| llama2_13b_chat | configs/models/llama2_13b_chat.py |
-| llama2_70b_chat | configs/models/llama2_70b_chat.py |
-| llama2_7b_chat  | configs/models/llama2_7b_chat.py  |
+| ...             | ...                               |
 +-----------------+-----------------------------------+
 +-------------------+---------------------------------------------------+
 | Dataset           | Config Path                                       |
 |-------------------+---------------------------------------------------|
 | cmmlu_gen         | configs/datasets/cmmlu/cmmlu_gen.py               |
 | cmmlu_gen_ffe7c0  | configs/datasets/cmmlu/cmmlu_gen_ffe7c0.py        |
-| cmmlu_ppl         | configs/datasets/cmmlu/cmmlu_ppl.py               |
-| cmmlu_ppl_fd1f2f  | configs/datasets/cmmlu/cmmlu_ppl_fd1f2f.py        |
-| mmlu_gen          | configs/datasets/mmlu/mmlu_gen.py                 |
-| mmlu_gen_23a9a9   | configs/datasets/mmlu/mmlu_gen_23a9a9.py          |
-| mmlu_gen_5d1409   | configs/datasets/mmlu/mmlu_gen_5d1409.py          |
-| mmlu_gen_79e572   | configs/datasets/mmlu/mmlu_gen_79e572.py          |
-| mmlu_gen_a484b3   | configs/datasets/mmlu/mmlu_gen_a484b3.py          |
-| mmlu_ppl          | configs/datasets/mmlu/mmlu_ppl.py                 |
-| mmlu_ppl_ac766d   | configs/datasets/mmlu/mmlu_ppl_ac766d.py          |
+| ...               | ...                                               |
 +-------------------+---------------------------------------------------+
 ```
 
-用户可以按照第一列中的名称去作为 `python run.py` 中 `--models` 和 `--datasets` 的传入参数。在数据集部分，相同名称但不同后缀的数据集一般表示意味着其提示词或评测方式是不一样的。
+用户可以按照第一列中的名称去作为 `python run.py` 中 `--models` 和 `--datasets` 的传入参数。在数据集部分，相同名称但不同后缀的数据集一般意味着其提示词或评测方式是不一样的。
 
 对于 HuggingFace 模型，用户可以直接通过命令行设定模型参数，而无需额外配置文件。例如，对于 `facebook/opt-125m` 模型，可以通过以下命令进行评测：
 
