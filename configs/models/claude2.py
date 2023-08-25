@@ -1,16 +1,6 @@
-from mmengine.config import read_base
 from opencompass.models.claude_api.claude_api import Claude
-from opencompass.partitioners import NaivePartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLInferTask
 from opencompass.utils.text_postprocessors import last_option_postprocess
 from opencompass.models.claude_api.postprocessors import gsm8k_postprocess, humaneval_postprocess, lcsts_postprocess, mbpp_postprocess, strategyqa_pred_postprocess
-
-with read_base():
-    # choose a list of datasets
-    from .datasets.collections.chat_medium import datasets
-    # and output the results in a choosen format
-    from .summarizers.medium import summarizer
 
 agieval_single_choice_sets = [
     'gaokao-chinese',
@@ -72,12 +62,3 @@ models = [
         pred_postprocessor=claude_postprocessors,
         ),
 ]
-
-
-infer = dict(
-    partitioner=dict(type=NaivePartitioner),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=8,
-        task=dict(type=OpenICLInferTask)),
-)
