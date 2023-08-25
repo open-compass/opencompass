@@ -27,10 +27,17 @@
 
 就像指南针在我们的旅程中为我们导航一样，我们希望OpenCompass能够帮助你穿越评估大型语言模型的重重迷雾。OpenCompass提供丰富的算法和功能支持，期待OpenCompass能够帮助社区更便捷地对NLP模型的性能进行公平全面的评估。
 
+> **🔥 关注**<br />
+> 我们正式启动OpenCompass共建计划，诚邀社区用户为OpenCompass提供更具代表性和可信度的客观评测数据集!
+> 点击 [Issue](https://github.com/InternLM/opencompass/issues/248) 获取更多数据集.
+> 让我们携手共进，打造功能强大易用的大模型评测平台！
+
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.08.25\]**  欢迎 [**TigerBot**](https://github.com/TigerResearch/TigerBot) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。
+  🔥🔥🔥.
 - **\[2023.08.21\]** [**Lagent**](https://github.com/InternLM/lagent) 正式发布，它是一个轻量级、开源的基于大语言模型的智能体（agent）框架。我们正与Lagent团队紧密合作，推进支持基于Lagent的大模型工具能力评测 ! 🔥🔥🔥.
-- **\[2023.08.18\]** OpenCompass现已支持**多模态评测**，支持10+多模态评测数据集，包括 **MMBench, SEED-Bench, COCO-Caption, Flickr-30K, OCR-VQA, ScienceQA** 等. 多模态评测榜单即将上线，敬请! 🔥🔥🔥.
+- **\[2023.08.18\]** OpenCompass现已支持**多模态评测**，支持10+多模态评测数据集，包括 **MMBench, SEED-Bench, COCO-Caption, Flickr-30K, OCR-VQA, ScienceQA** 等. 多模态评测榜单即将上线，敬请!
 - **\[2023.08.18\]** [数据集页面](https://opencompass.org.cn/dataset-detail/MMLU) 现已在OpenCompass官网上线，欢迎更多社区评测数据集加入OpenCompass !
 - **\[2023.08.11\]** 官网榜单上新增了[模型对比](https://opencompass.org.cn/model-compare/GPT-4,ChatGPT,LLaMA-2-70B,LLaMA-65B)功能，希望该功能可以协助提供更多发现！
 - **\[2023.08.11\]** 新增了 [LEval](https://github.com/OpenLMLab/LEval) 评测支持.
