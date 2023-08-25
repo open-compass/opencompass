@@ -13,7 +13,7 @@ from opencompass.utils import build_dataset_from_cfg, get_infer_output_path
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Run an evaluation task')
+    parser = argparse.ArgumentParser(description='Run case analyzer')
     parser.add_argument('config', help='Train config file path')
     parser.add_argument(
         '-f',
