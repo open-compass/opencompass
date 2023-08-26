@@ -39,7 +39,7 @@ minigpt_4_gqa_model = dict(type='minigpt-4',
                            low_resource=False,
                            img_size=224,
                            max_length=10,
-                           llama_model='/path/to/vicuna-7b/',
+                           llama_model='/path/to/vicuna_weights_7b/',
                            prompt_constructor=dict(
                                type=MiniGPT4VQAPromptConstructor,
                                image_prompt='###Human: <Img><ImageHere></Img>',

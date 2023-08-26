@@ -43,7 +43,7 @@ minigpt_4_textvqa_model = dict(
     low_resource=False,
     img_size=224,
     max_length=10,
-    llama_model='/path/to/vicuna-7b/',
+    llama_model='/path/to/vicuna_weights_7b/',
     prompt_constructor=dict(type=MiniGPT4VQAPromptConstructor,
                             image_prompt='###Human: <Img><ImageHere></Img>',
                             reply_prompt='###Assistant:'),

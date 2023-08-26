@@ -18,13 +18,17 @@ class VisualGLM(nn.Module):
         pretrained_path (str): Path to visualGLM checkpoint or repo id.
         prompt_constructor (dict): The config of prompt constructor.
         post_processor (dict): The config of post processor.
+        is_caption_task (bool): Whether the task is caption task.
+            Defaults to False.
         gen_kwargs (dict): Customize generate function arguments.
+            Defaults to None.
     """
 
     def __init__(self,
                  pretrained_path: str,
                  prompt_constructor: dict,
                  post_processor: dict,
+                 is_caption_task: bool = False,
                  gen_kwargs: Optional[dict] = None) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(pretrained_path,
@@ -40,6 +44,7 @@ class VisualGLM(nn.Module):
             self.gen_kwargs = gen_kwargs
         else:
             self.gen_kwargs = dict()
+        self.is_caption_task = is_caption_task
 
     def encode_by_tokenizer(self, multi_prompts, image_position):
         input_ids = []
@@ -89,8 +94,12 @@ class VisualGLM(nn.Module):
         # format output
         outputs = outputs.tolist()
         for i, sample in enumerate(data_sample):
-            data_sample[i].pred_answer = self.post_processor(
-                outputs[i], self.tokenizer, input_all.shape[1])
+            answer = self.post_processor(outputs[i], self.tokenizer,
+                                         input_all.shape[1])
+            if self.is_caption_task:
+                data_sample[i].pred_caption = answer
+            else:
+                data_sample[i].pred_answer = answer
 
         return data_sample
 

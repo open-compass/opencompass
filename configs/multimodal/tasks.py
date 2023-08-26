@@ -10,10 +10,10 @@ with read_base():
                                          otter_9b_mmbench_load_from,
                                          otter_9b_mmbench_model,)
 
-models = [minigpt_4_mmbench_model, otter_9b_mmbench_model]
-datasets = [minigpt_4_mmbench_dataloader, otter_9b_mmbench_dataloader]
-evaluators = [minigpt_4_mmbench_evaluator, otter_9b_mmbench_evaluator]
-load_froms = [minigpt_4_mmbench_load_from, otter_9b_mmbench_load_from]
+models = [minigpt_4_mmbench_model]
+datasets = [minigpt_4_mmbench_dataloader]
+evaluators = [minigpt_4_mmbench_evaluator]
+load_froms = [minigpt_4_mmbench_load_from]
 num_gpus = 8
 num_procs = 8
 launcher = 'pytorch'

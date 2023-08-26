@@ -34,3 +34,4 @@ METRICS = Registry('metric',
 MM_MODELS = Registry('mm_model',
                      parent=MMENGINE_MODELS,
                      locations=['opencompass.multimodal.models'])
+TOT_WRAPPER = Registry('tot_wrapper', locations=['opencompass.datasets'])

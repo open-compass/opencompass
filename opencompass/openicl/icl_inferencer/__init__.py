@@ -3,3 +3,4 @@ from .icl_clp_inferencer import CLPInferencer  # noqa
 from .icl_gen_inferencer import GenInferencer  # noqa
 from .icl_ppl_inferencer import PPLInferencer  # noqa
 from .icl_sc_inferencer import SCInferencer  # noqa
+from .icl_tot_inferencer import ToTInferencer  # noqa
