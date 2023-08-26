@@ -36,11 +36,6 @@ class Otter(nn.Module):
             self.post_processor = mmengine.registry.build_from_cfg(
                 post_processor, MM_MODELS)
 
-    def post_process(self, output_text):
-        output_text = (output_text.split('<answer>')[-1].lstrip().rstrip().
-                       split('<|endofchunk|>')[0].lstrip().rstrip())
-        return output_text
-
     def generate(self, batch):
         inputs = self.prompt_constructor(batch)
         image = inputs['image']
