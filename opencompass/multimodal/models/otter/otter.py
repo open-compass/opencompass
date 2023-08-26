@@ -21,7 +21,8 @@ class Otter(nn.Module):
         load_bit (str): The bit of OTTER model, can be "fp32" or "bf16".
     """
 
-    def __init__(self, model_path, load_bit, prompt_constructor) -> None:
+    def __init__(self, model_path, load_bit, prompt_constructor,
+                 post_processor) -> None:
         super().__init__()
         torch_dtype = torch.bfloat16 if load_bit == 'bf16' else torch.float32
         self.model = OtterForConditionalGeneration.from_pretrained(
@@ -31,6 +32,9 @@ class Otter(nn.Module):
         self.model_dtype = next(self.model.parameters()).dtype
         self.prompt_constructor = mmengine.registry.build_from_cfg(
             prompt_constructor, MM_MODELS)
+        if post_processor is not None:
+            self.post_processor = mmengine.registry.build_from_cfg(
+                post_processor, MM_MODELS)
 
     def post_process(self, output_text):
         output_text = (output_text.split('<answer>')[-1].lstrip().rstrip().
@@ -42,7 +46,6 @@ class Otter(nn.Module):
         image = inputs['image']
         prompt = inputs['prompt']
         data_samples = inputs['data_samples']
-        data_sample = data_samples[0]
         vision_x = image.unsqueeze(1).unsqueeze(0).to(dtype=self.model_dtype)
         lang_x = self.model.text_tokenizer([prompt], return_tensors='pt')
         bad_words_id = self.model.text_tokenizer(['User:', 'GPT:']).input_ids
@@ -56,9 +59,10 @@ class Otter(nn.Module):
             bad_words_ids=bad_words_id,
             no_repeat_ngram_size=3,
         )
-        output = self.model.text_tokenizer.decode(generated_text[0])
-        # output = [x for x in output.split(' ') if not x.startswith('<')]
-        output_text = self.post_process(output)
+        for i, data_sample in enumerate(data_samples):
+            output_text = self.post_processor(generated_text[i],
+                                              self.model.text_tokenizer)
+            data_sample.pred_answer = output_text
+            data_samples[i] = data_sample
 
-        data_sample.pred_answer = output_text
-        return data_sample
+        return data_samples
