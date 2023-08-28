@@ -24,11 +24,11 @@ repos:
     rev: v2.2.1
     hooks:
       - id: codespell
-        exclude: >
+        exclude: |
             (?x)^(
                 .*\.jsonl|
                 configs/
-            )$
+            )
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
     hooks:
@@ -66,6 +66,7 @@ repos:
           - mdformat-openmmlab
           - mdformat_frontmatter
           - linkify-it-py
+        exclude: configs/
   - repo: https://github.com/myint/docformatter
     rev: v1.3.1
     hooks:
