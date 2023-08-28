@@ -1,12 +1,53 @@
 #!/usr/bin/env python3
+import argparse
 import glob
+import hashlib
+import json
 import os
 import re
 from multiprocessing import Pool
+from typing import List, Union
 
-from mmengine.config import Config
+from mmengine.config import Config, ConfigDict
 
-from opencompass.utils import get_prompt_hash
+
+# from opencompass.utils import get_prompt_hash
+# copied from opencompass.utils.get_prompt_hash, for easy use in ci
+def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
+    """Get the hash of the prompt configuration.
+
+    Args:
+        dataset_cfg (ConfigDict or list[ConfigDict]): The dataset
+            configuration.
+
+    Returns:
+        str: The hash of the prompt configuration.
+    """
+    if isinstance(dataset_cfg, list):
+        if len(dataset_cfg) == 1:
+            dataset_cfg = dataset_cfg[0]
+        else:
+            hashes = ','.join([get_prompt_hash(cfg) for cfg in dataset_cfg])
+            hash_object = hashlib.sha256(hashes.encode())
+            return hash_object.hexdigest()
+    if 'reader_cfg' in dataset_cfg.infer_cfg:
+        # new config
+        reader_cfg = dict(type='DatasetReader',
+                          input_columns=dataset_cfg.reader_cfg.input_columns,
+                          output_column=dataset_cfg.reader_cfg.output_column)
+        dataset_cfg.infer_cfg.reader = reader_cfg
+        if 'train_split' in dataset_cfg.infer_cfg.reader_cfg:
+            dataset_cfg.infer_cfg.retriever[
+                'index_split'] = dataset_cfg.infer_cfg['reader_cfg'][
+                    'train_split']
+        if 'test_split' in dataset_cfg.infer_cfg.reader_cfg:
+            dataset_cfg.infer_cfg.retriever[
+                'test_split'] = dataset_cfg.infer_cfg.reader_cfg.test_split
+        for k, v in dataset_cfg.infer_cfg.items():
+            dataset_cfg.infer_cfg[k]['type'] = v['type'].split('.')[-1]
+    d_json = json.dumps(dataset_cfg.infer_cfg.to_dict(), sort_keys=True)
+    hash_object = hashlib.sha256(d_json.encode())
+    return hash_object.hexdigest()
 
 
 # Assuming get_hash is a function that computes the hash of a file
@@ -52,15 +93,24 @@ def update_imports(data):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('python_files', nargs='*')
+    args = parser.parse_args()
+
     root_folder = 'configs/datasets'
-    python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
+    if args.python_files:
+        python_files = [
+            i for i in args.python_files if i.startswith(root_folder)
+        ]
+    else:
+        python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
+
     # Use multiprocessing to speed up the check and rename process
     with Pool(16) as p:
         name_pairs = p.map(check_and_rename, python_files)
     name_pairs = [pair for pair in name_pairs if pair[0] is not None]
     with Pool(16) as p:
         p.starmap(os.rename, name_pairs)
-    python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
     update_data = [(python_file, name_pairs) for python_file in python_files]
     with Pool(16) as p:
         p.map(update_imports, update_data)
