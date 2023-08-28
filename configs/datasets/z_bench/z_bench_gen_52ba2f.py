@@ -4,20 +4,17 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import HFDataset
 
 z_bench_reader_cfg = dict(
-    ds_size=4,
-    input_columns=['text'],
-    output_column='category',
-    train_split='test')
+    input_columns=['text'], output_column='category', train_split='test')
 
 z_bench_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=dict(round=[dict(role="HUMAN", prompt="{text}")]),
+        template='{text}',
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
-z_bench_dataset = dict(
+z_bench_datasets = dict(
     type=HFDataset,
     path=
     '/mnt/petrelfs/gaotong/llm_eval/openagieval_dataset/eval_datasets/z_bench',
