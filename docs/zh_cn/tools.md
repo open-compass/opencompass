@@ -78,3 +78,13 @@ python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
 ```
 
 - `-w`：工作路径，默认为 `'./outputs/default'`。
+
+## Suffix Updater
+
+本工具可以快速修改 `configs/dataset` 目录下的配置文件后缀，使其符合提示词哈希命名规范。
+
+运行方式：
+
+```bash
+python tools/update_suffix.py
+```
