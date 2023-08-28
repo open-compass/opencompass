@@ -70,12 +70,12 @@ python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
 
 - `-w`: Work path, default is `'./outputs/default'`.
 
-## Suffix Updater
+## Dataset Suffix Updater
 
 This tool can quickly modify the suffixes of configuration files located under the `configs/dataset` directory, aligning them with the naming conventions based on prompt hash.
 
 How to run:
 
 ```bash
-python tools/update_suffix.py
+python tools/update_dataset_suffix.py
 ```
