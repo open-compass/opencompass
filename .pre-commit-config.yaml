@@ -26,7 +26,8 @@ repos:
       - id: codespell
         exclude: >
             (?x)^(
-                .*\.jsonl
+                .*\.jsonl|
+                configs/
             )$
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
@@ -35,17 +36,20 @@ repos:
         exclude: |
             (?x)^(
               dicts/|
-              projects/.*?/dicts/
+              projects/.*?/dicts/|
+              configs/
             )
       - id: check-yaml
       - id: end-of-file-fixer
         exclude: |
             (?x)^(
               dicts/|
-              projects/.*?/dicts/
+              projects/.*?/dicts/|
+              configs/
             )
       - id: requirements-txt-fixer
       - id: double-quote-string-fixer
+        exclude: configs/
       - id: check-merge-conflict
       - id: fix-encoding-pragma
         args: ["--remove"]
