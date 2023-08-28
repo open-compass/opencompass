@@ -12,7 +12,6 @@ from opencompass.utils import get_prompt_hash
 # Assuming get_hash is a function that computes the hash of a file
 # from get_hash import get_hash
 def get_hash(path):
-    print(path)
     cfg = Config.fromfile(path)
     for k in cfg.keys():
         if k.endswith('_datasets'):
@@ -55,16 +54,15 @@ def update_imports(data):
 def main():
     root_folder = 'configs/datasets'
     python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
-    # python_files = sys.argv[1:]
     # Use multiprocessing to speed up the check and rename process
-    with Pool(1) as p:
+    with Pool(16) as p:
         name_pairs = p.map(check_and_rename, python_files)
     name_pairs = [pair for pair in name_pairs if pair[0] is not None]
-    with Pool(1) as p:
+    with Pool(16) as p:
         p.starmap(os.rename, name_pairs)
     python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
     update_data = [(python_file, name_pairs) for python_file in python_files]
-    with Pool(1) as p:
+    with Pool(16) as p:
         p.map(update_imports, update_data)
 
 
