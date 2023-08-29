@@ -2,7 +2,7 @@ from opencompass.models import HuggingFaceCausalLM
 
 # Please note that we have specified the revision here. Recently (on 20230827),
 # during our evaluations, we found that the newer revision models have a drop
-# of more than 5 points on datasets like GaokaoBench/mbpp.
+# of more than 5 points on datasets like GaokaoBench / mbpp.
 # We are not yet sure whether this drop is due to incorrect logic in OpenCompass
 # calling qwen or some other reasons. We would like to highlight this.
 
