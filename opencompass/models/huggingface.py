@@ -85,9 +85,13 @@ class HuggingFace(BaseModel):
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_path if tokenizer_path else path, **tokenizer_kwargs)
         if self.tokenizer.pad_token_id is None:
-            self.logger.warning('pad_token_id is not set for the tokenizer. '
-                                'Using eos_token_id as pad_token_id.')
-            self.tokenizer.pad_token = self.tokenizer.eos_token
+            self.logger.warning('pad_token_id is not set for the tokenizer.')
+            if self.tokenizer.eos_token is not None:
+                self.logger.warning('Using eos_token_id as pad_token_id.')
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+            else:
+                self.logger.warning('Using the last token as pad_token.')
+                self.tokenizer.pad_token_id = self.tokenizer.vocab_size - 1
 
         # A patch for llama when batch_padding = True
         if 'decapoda-research/llama' in path or \
@@ -298,7 +302,7 @@ class HuggingFace(BaseModel):
         """
 
         outputs, inputs = self.get_logits(inputs)
-        shift_logits = outputs[..., :-1, :].contiguous()
+        shift_logits = outputs[..., :-1, :].contiguous().float()
 
         shift_labels = inputs['tokens']['input_ids'][..., 1:].contiguous()
 
