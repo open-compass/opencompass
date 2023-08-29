@@ -1,14 +1,12 @@
-from typing import Any
-
-
 class QwenMMBenchPromptConstructor:
     """MMBench prompt constructor for Qwen-VL.
-    
+
     The output is a dict following the input format of Qwen-VL tokenizer.
     """
+
     def __init__(self) -> None:
         pass
-    
+
     def __call__(self, inputs: dict) -> str:
         data_samples = inputs['data_samples']
         assert len(data_samples) == 1
@@ -21,7 +19,11 @@ class QwenMMBenchPromptConstructor:
         else:
             prompt = question + ' ' + options
         format_input = [
-            {'image': 'This_is_path_to_an_image.'}, # Just placeholder for Image Tokens
-            {'text': prompt},
+            {
+                'image': 'This_is_path_to_an_image.'
+            },  # Just placeholder for Image Tokens
+            {
+                'text': prompt
+            },
         ]
         return format_input

@@ -29,8 +29,8 @@ qwen_mmbench_dataloader = dict(batch_size=1,
 
 # model settings
 qwen_model = dict(
-    type='qwen',
-    pretrained_path='Qwen/Qwen-VL',  # or Huggingface repo id
+    type='qwen-vl-chat',
+    pretrained_path='Qwen/Qwen-VL-Chat',  # or Huggingface repo id
     prompt_constructor=dict(type=QwenMMBenchPromptConstructor),
     post_processor=dict()
 )
@@ -38,5 +38,5 @@ qwen_model = dict(
 # evaluation settings
 qwen_mmbench_evaluator = [
     dict(type='opencompass.DumpResults',
-         save_path='work_dirs/qwen-7b-mmbench.xlsx')
+         save_path='work_dirs/qwenvl-chat-7b-mmbench.xlsx')
 ]

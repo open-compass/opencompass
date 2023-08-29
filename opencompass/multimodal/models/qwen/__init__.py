@@ -1,4 +1,4 @@
-from .qwen import Qwen
 from .prompt_constructor import QwenMMBenchPromptConstructor
+from .qwen import QwenVLBase, QwenVLChat
 
-__all__ = ['Qwen', 'QwenMMBenchPromptConstructor']
+__all__ = ['QwenVLBase', 'QwenVLChat', 'QwenMMBenchPromptConstructor']
