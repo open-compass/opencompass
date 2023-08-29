@@ -208,7 +208,7 @@ def main():
             dataset = list(dataset2cfg.keys())[0]
         model_cfg = model2cfg[model]
         dataset_cfg = dataset2cfg[dataset]
-        print_prompts(model_cfg, dataset_cfg)
+        print_prompts(model_cfg, dataset_cfg, args.count)
     else:
         for model_abbr, model_cfg in model2cfg.items():
             for dataset_abbr, dataset_cfg in dataset2cfg.items():
