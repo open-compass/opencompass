@@ -177,6 +177,7 @@ def parse_hf_args(hf_parser):
                            default=False)
     hf_parser.add_argument('--batch-size', type=int)
     hf_parser.add_argument('--num-gpus', type=int)
+    hf_parser.add_argument('--pad-token-id', type=int)
 
 
 def main():

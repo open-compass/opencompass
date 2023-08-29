@@ -90,6 +90,7 @@ def get_config_from_arg(args) -> Config:
                      max_out_len=args.max_out_len,
                      batch_padding=not args.no_batch_padding,
                      batch_size=args.batch_size,
+                     pad_token_id=args.pad_token_id,
                      run_cfg=dict(num_gpus=args.num_gpus))
         models.append(model)
     return Config(dict(models=models, datasets=datasets),
