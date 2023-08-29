@@ -36,6 +36,14 @@ class Otter(nn.Module):
             self.post_processor = mmengine.registry.build_from_cfg(
                 post_processor, MM_MODELS)
 
+    def forward(self, batch):
+        if self.mode == 'generation':
+            return self.generate(batch)
+        elif self.mode == 'loss':
+            return self.loss(batch)
+        else:
+            raise RuntimeError(f'Invalid mode "{self.mode}".')
+
     def generate(self, batch):
         inputs = self.prompt_constructor(batch)
         image = inputs['image']

@@ -31,7 +31,7 @@ otter_9b_mmbench_dataloader = dict(
 # model settings
 otter_9b_mmbench_model = dict(
     type="otter-9b",
-    model_path="luodian/OTTER-Image-MPT7B",  # noqa
+    model_path="/path/to/OTTER-Image-MPT7B/",  # noqa
     load_bit="bf16",
     prompt_constructor=dict(type=OTTERMMBenchPromptConstructor,
                             model_label='GPT',
