@@ -9,6 +9,8 @@ with read_base():
     from .groups.GaokaoBench import GaokaoBench_summary_groups
     from .groups.flores import flores_summary_groups
     from .groups.jigsaw_multilingual import jigsaw_multilingual_summary_groups
+    from .groups.tydiqa import tydiqa_summary_groups
+    from .groups.xiezhi import xiezhi_summary_groups
 
 summarizer = dict(
     dataset_abbrs=[

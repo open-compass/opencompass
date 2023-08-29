@@ -5,7 +5,7 @@ with read_base():
     from ..ceval.ceval_ppl_578f8d import ceval_datasets
     from ..agieval.agieval_mixed_2f14ad import agieval_datasets
     from ..GaokaoBench.GaokaoBench_mixed_f2038e import GaokaoBench_datasets
-    from ..bbh.bbh_gen_5b92b0 import bbh_datasets
+    from ..bbh.bbh_gen_6bd693 import bbh_datasets
     from ..humaneval.humaneval_gen_a82cae import humaneval_datasets
     from ..mbpp.mbpp_gen_1e1056 import mbpp_datasets
     from ..CLUE_C3.CLUE_C3_ppl_e24a31 import C3_datasets
