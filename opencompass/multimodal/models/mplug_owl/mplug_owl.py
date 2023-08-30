@@ -11,7 +11,7 @@ from mplug_owl.tokenization_mplug_owl import MplugOwlTokenizer
 from opencompass.registry import MM_MODELS
 
 
-@MM_MODELS.register_module('mplug_owl')
+@MM_MODELS.register_module('mplug_owl-7b')
 class MplugOwl(nn.Module):
 
     def __init__(self,

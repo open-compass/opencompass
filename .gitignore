@@ -86,6 +86,3 @@ docs/zh_cn/_build/
 
 # .zip
 *.zip
-
-# workdir
-work_dirs
