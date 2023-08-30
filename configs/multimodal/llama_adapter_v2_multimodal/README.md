@@ -20,5 +20,5 @@ python run.py configs/multimodal/tasks.py --mm-eval --slurm -p $PARTITION
 
 ```sh
 cd $root
-python run.py configs/multimodal/tasks.py
+python run.py configs/multimodal/tasks.py --mm-eval
 ```

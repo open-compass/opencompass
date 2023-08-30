@@ -32,7 +32,6 @@ class LLaMA_adapter(nn.Module):
                  w_bias=False,
                  w_lora=False,
                  lora_rank=16,
-                 mode='generation',
                  prompt_constructor=None,
                  post_processor=None):
         super().__init__()
@@ -91,8 +90,6 @@ class LLaMA_adapter(nn.Module):
             self.post_processor = mmengine.registry.build_from_cfg(
                 post_processor, MM_MODELS)
 
-        self.mode = mode
-
     def clip_encode_image(self, x):
         # modified from CLIP
         x = self.clip.visual.conv1(x)  # shape = [*, width, grid, grid]
@@ -136,7 +133,7 @@ class LLaMA_adapter(nn.Module):
         return visual_query
 
     @torch.inference_mode()
-    def forward_internal(self, visual_query, tokens, start_pos: int):
+    def forward(self, visual_query, tokens, start_pos: int):
         _bsz, seqlen = tokens.shape
         h = self.llama.tok_embeddings(tokens)
         freqs_cis = self.llama.freqs_cis.to(h.device)
@@ -171,10 +168,6 @@ class LLaMA_adapter(nn.Module):
         images = torch.cat(images, dim=0).to(get_device())
         inputs = {'image': images, 'data_samples': data_samples}
         return inputs
-
-    def forward(self, batch):
-        if self.mode == 'generation':
-            return self.generate(batch)
 
     @torch.inference_mode()
     def generate(self, batch):
@@ -227,9 +220,8 @@ class LLaMA_adapter(nn.Module):
         prev_pos = 0
         for cur_pos in range(start_pos, total_len):
             with torch.cuda.amp.autocast():
-                logits = self.forward_internal(visual_query,
-                                               tokens[:, prev_pos:cur_pos],
-                                               prev_pos)
+                logits = self.forward(visual_query,
+                                      tokens[:, prev_pos:cur_pos], prev_pos)
             if temperature > 0:
                 probs = torch.softmax(logits / temperature, dim=-1)
                 next_token = sample_top_p(probs, top_p)
@@ -275,45 +267,52 @@ def available_models():
 
 
 @MM_MODELS.register_module('LLaMA-adapter-v2')
-def LLaMA_adapter_v2(llama_dir,
-                     prompt_constructor: dict,
-                     post_processor: dict,
-                     mode: str = 'generation',
-                     device='cuda' if torch.cuda.is_available() else 'cpu',
-                     download_root='ckpts'):
-    name = 'BIAS-7B'
+class LLaMA_adapter_v2(nn.Module):
 
-    # BIAS-7B or https://xxx/sha256_BIAS-7B.pth -> 7B
-    llama_type = name.split('.')[0].split('-')[-1]
-    llama_ckpt_dir = os.path.join(llama_dir, llama_type)
-    llama_tokenzier_path = os.path.join(llama_dir, 'tokenizer.model')
+    def __init__(self,
+                 llama_dir,
+                 prompt_constructor: dict,
+                 post_processor: dict,
+                 mode: str = 'generation',
+                 device='cuda' if torch.cuda.is_available() else 'cpu',
+                 download_root='ckpts'):
+        super().__init__()
+        name = 'BIAS-7B'
 
-    # load llama_adapter weights and model_cfg
-    print(f'Loading LLaMA-Adapter from {llama_dir}')
-    ckpt = torch.load(
-        f'{llama_dir}/7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',  # noqa: E501
-        map_location='cpu')
-    model_cfg = ckpt.get('config', {})
+        # BIAS-7B or https://xxx/sha256_BIAS-7B.pth -> 7B
+        llama_type = name.split('.')[0].split('-')[-1]
+        llama_ckpt_dir = os.path.join(llama_dir, llama_type)
+        llama_tokenzier_path = os.path.join(llama_dir, 'tokenizer.model')
 
-    model = LLaMA_adapter(
-        llama_ckpt_dir,
-        llama_tokenzier_path,
-        max_seq_len=512,
-        max_batch_size=1,
-        clip_model='ViT-L/14',
-        v_embed_dim=768,
-        v_depth=8,
-        v_num_heads=16,
-        v_mlp_ratio=4.0,
-        query_len=10,
-        query_layer=31,
-        w_bias=model_cfg.get('w_bias', False),
-        w_lora=model_cfg.get('w_lora', False),
-        lora_rank=model_cfg.get('lora_rank', 16),
-        mode=mode,
-        prompt_constructor=prompt_constructor,
-        post_processor=post_processor,
-    )
+        # load llama_adapter weights and model_cfg
+        print(f'Loading LLaMA-Adapter from {llama_dir}')
+        ckpt = torch.load(
+            f'{llama_dir}/7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',  # noqa: E501
+            map_location='cpu')
+        model_cfg = ckpt.get('config', {})
 
-    model.load_state_dict(ckpt['model'], strict=False)
-    return model.to(device)
+        self.model = LLaMA_adapter(
+            llama_ckpt_dir,
+            llama_tokenzier_path,
+            max_seq_len=512,
+            max_batch_size=1,
+            clip_model='ViT-L/14',
+            v_embed_dim=768,
+            v_depth=8,
+            v_num_heads=16,
+            v_mlp_ratio=4.0,
+            query_len=10,
+            query_layer=31,
+            w_bias=model_cfg.get('w_bias', False),
+            w_lora=model_cfg.get('w_lora', False),
+            lora_rank=model_cfg.get('lora_rank', 16),
+            prompt_constructor=prompt_constructor,
+            post_processor=post_processor,
+        )
+
+        self.model.load_state_dict(ckpt['model'], strict=False)
+        self.mode = mode
+
+    def forward(self, batch):
+        if self.mode == 'generation':
+            return self.model.generate(batch)
