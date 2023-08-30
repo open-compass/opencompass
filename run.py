@@ -4,18 +4,21 @@ import os
 import os.path as osp
 from datetime import datetime
 
-from mmengine.config import Config
+from mmengine.config import Config, DictAction
 
 from opencompass.partitioners import (MultimodalNaivePartitioner,
                                       NaivePartitioner, SizePartitioner)
 from opencompass.registry import PARTITIONERS, RUNNERS
-from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
+from opencompass.runners import SlurmRunner
 from opencompass.utils import LarkReporter, Summarizer, get_logger
+from opencompass.utils.run import (exec_eval_runner, exec_infer_runner,
+                                   exec_mm_infer_runner, get_config_from_arg)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run an evaluation task')
-    parser.add_argument('config', help='Train config file path')
+    parser.add_argument('config', nargs='?', help='Train config file path')
+
     # add mutually exclusive args `--slurm` `--dlc`, defaults to local runner
     # if "infer" or "eval" not specified
     launch_method = parser.add_mutually_exclusive_group()
@@ -31,15 +34,19 @@ def parse_args():
                                help='Whether to force tasks to run on dlc. If '
                                'True, `--aliyun-cfg` must be set. Defaults'
                                ' to False')
+    # multi-modal support
+    parser.add_argument('--mm-eval',
+                        help='Whether or not enable multimodal evaluation',
+                        action='store_true',
+                        default=False)
+    # Add shortcut parameters (models and datasets)
+    parser.add_argument('--models', nargs='+', help='', default=None)
+    parser.add_argument('--datasets', nargs='+', help='', default=None)
     # add general args
     parser.add_argument('--debug',
                         help='Debug mode, in which scheduler will run tasks '
                         'in the single process, and output will not be '
                         'redirected to files',
-                        action='store_true',
-                        default=False)
-    parser.add_argument('--mm-eval',
-                        help='Whether or not enable multimodal evaluation',
                         action='store_true',
                         default=False)
     parser.add_argument('--dry-run',
@@ -115,6 +122,9 @@ def parse_args():
     # set dlc args
     dlc_parser = parser.add_argument_group('dlc_args')
     parse_dlc_args(dlc_parser)
+    # set hf args
+    hf_parser = parser.add_argument_group('hf_args')
+    parse_hf_args(hf_parser)
     args = parser.parse_args()
     if args.slurm:
         assert args.partition is not None, (
@@ -153,6 +163,22 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
+def parse_hf_args(hf_parser):
+    """These args are all for the quick construction of HuggingFace models."""
+    hf_parser.add_argument('--hf-path', type=str)
+    hf_parser.add_argument('--peft-path', type=str)
+    hf_parser.add_argument('--tokenizer-path', type=str)
+    hf_parser.add_argument('--model-kwargs', nargs='+', action=DictAction)
+    hf_parser.add_argument('--tokenizer-kwargs', nargs='+', action=DictAction)
+    hf_parser.add_argument('--max-out-len', type=int)
+    hf_parser.add_argument('--max-seq-len', type=int)
+    hf_parser.add_argument('--no-batch-padding',
+                           action='store_true',
+                           default=False)
+    hf_parser.add_argument('--batch-size', type=int)
+    hf_parser.add_argument('--num-gpus', type=int)
+
+
 def main():
     args = parse_args()
     if args.dry_run:
@@ -160,7 +186,7 @@ def main():
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
-    cfg = Config.fromfile(args.config, format_python_code=False)
+    cfg = get_config_from_arg(args)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
@@ -298,80 +324,6 @@ def main():
     if args.mode in ['all', 'eval', 'viz']:
         summarizer = Summarizer(cfg)
         summarizer.summarize(time_str=cfg_time_str)
-
-
-def exec_mm_infer_runner(tasks, args, cfg):
-    """execute multimodal infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        raise NotImplementedError('Currently, we do not support evaluating \
-                             multimodal models on dlc.')
-    else:
-        runner = LocalRunner(task=dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
-
-
-def exec_infer_runner(tasks, args, cfg):
-    """execute infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='OpenICLInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             qos=args.qos,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        runner = DLCRunner(dict(type='OpenICLInferTask'),
-                           max_num_workers=args.max_num_workers,
-                           aliyun_cfg=Config.fromfile(args.aliyun_cfg),
-                           retry=args.retry,
-                           debug=args.debug,
-                           lark_bot_url=cfg['lark_bot_url'])
-    else:
-        runner = LocalRunner(task=dict(type='OpenICLInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             max_workers_per_gpu=args.max_workers_per_gpu,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
-
-
-def exec_eval_runner(tasks, args, cfg):
-    """execute infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='OpenICLEvalTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             qos=args.qos,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        runner = DLCRunner(dict(type='OpenICLEvalTask'),
-                           max_num_workers=args.max_num_workers,
-                           aliyun_cfg=Config.fromfile(args.aliyun_cfg),
-                           retry=args.retry,
-                           debug=args.debug,
-                           lark_bot_url=cfg['lark_bot_url'])
-    else:
-        runner = LocalRunner(task=dict(type='OpenICLEvalTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
 
 
 if __name__ == '__main__':

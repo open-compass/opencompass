@@ -1,3 +1,5 @@
+from opencompass.multimodal.models.llava import LLaVAMMBenchPromptConstructor, LLaVABasePostProcessor
+
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.torchvision/Resize',
@@ -34,6 +36,8 @@ mmbench_dataloader = dict(
 llava_model = dict(
     type='llava',
     model_path='/path/to/llava',
+    prompt_constructor=dict(type=LLaVAMMBenchPromptConstructor),
+    post_processor=dict(type=LLaVABasePostProcessor)
 )  # noqa
 
 # evaluation settings

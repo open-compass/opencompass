@@ -10,6 +10,7 @@ models = [minigpt_4_mmbench_model]
 datasets = [minigpt_4_mmbench_dataloader]
 evaluators = [minigpt_4_mmbench_evaluator]
 load_froms = [minigpt_4_mmbench_load_from]
+
 num_gpus = 8
 num_procs = 8
 launcher = 'pytorch'
