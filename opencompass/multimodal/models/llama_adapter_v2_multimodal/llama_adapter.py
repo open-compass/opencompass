@@ -133,7 +133,7 @@ class LLaMA_adapter(nn.Module):
         return visual_query
 
     @torch.inference_mode()
-    def forward_internal(self, visual_query, tokens, start_pos: int):
+    def forward(self, visual_query, tokens, start_pos: int):
         _bsz, seqlen = tokens.shape
         h = self.llama.tok_embeddings(tokens)
         freqs_cis = self.llama.freqs_cis.to(h.device)
@@ -220,9 +220,8 @@ class LLaMA_adapter(nn.Module):
         prev_pos = 0
         for cur_pos in range(start_pos, total_len):
             with torch.cuda.amp.autocast():
-                logits = self.forward_internal(visual_query,
-                                               tokens[:, prev_pos:cur_pos],
-                                               prev_pos)
+                logits = self.forward(visual_query,
+                                      tokens[:, prev_pos:cur_pos], prev_pos)
             if temperature > 0:
                 probs = torch.softmax(logits / temperature, dim=-1)
                 next_token = sample_top_p(probs, top_p)
