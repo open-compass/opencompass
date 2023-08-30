@@ -1,3 +1,6 @@
+from opencompass.multimodal.models.mplug_owl import (
+    MplugOwlMMBenchPostProcessor, MplugOwlMMBenchPromptConstructor)
+
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.torchvision/Resize',
@@ -22,7 +25,7 @@ dataset = dict(type='opencompass.MMBenchDataset',
                data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
-dataloader = dict(
+mplug_owl_mmbench_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -31,13 +34,15 @@ dataloader = dict(
 )
 
 # model settings
-model = dict(
-    type='mplug_owl-7b-mm-benchmark',
+mplug_owl_mmbench_model = dict(
+    type='mplug_owl-7b',
     model_path='/mplug-owl-llama-7b-ft',
+    prompt_constructor=dict(type=MplugOwlMMBenchPromptConstructor),
+    post_processor=dict(type=MplugOwlMMBenchPostProcessor)
 )  # noqa
 
 # evaluation settings
-evaluator = [
+mplug_owl_mmbench_evaluator = [
     dict(type='opencompass.DumpResults',
          save_path='work_dirs/mplug_owl-7b-mmagibench-v0.1.0.xlsx')
 ]

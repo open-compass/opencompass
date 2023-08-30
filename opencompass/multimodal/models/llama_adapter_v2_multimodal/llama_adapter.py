@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import clip
+import mmengine
 import torch
 import torch.nn as nn
 from llama_adapter_v2_multimodal7b.llama.llama import ModelArgs, Transformer
@@ -30,7 +31,10 @@ class LLaMA_adapter(nn.Module):
                  query_layer=31,
                  w_bias=False,
                  w_lora=False,
-                 lora_rank=16):
+                 lora_rank=16,
+                 mode='generation',
+                 prompt_constructor=None,
+                 post_processor=None):
         super().__init__()
 
         self.device = get_device()
@@ -81,6 +85,14 @@ class LLaMA_adapter(nn.Module):
             ckpt = torch.load(ckpt, map_location='cpu')
             self.llama.load_state_dict(ckpt, strict=False)
 
+        self.prompt_constructor = mmengine.registry.build_from_cfg(
+            prompt_constructor, MM_MODELS)
+        if post_processor is not None:
+            self.post_processor = mmengine.registry.build_from_cfg(
+                post_processor, MM_MODELS)
+
+        self.mode = mode
+
     def clip_encode_image(self, x):
         # modified from CLIP
         x = self.clip.visual.conv1(x)  # shape = [*, width, grid, grid]
@@ -124,7 +136,7 @@ class LLaMA_adapter(nn.Module):
         return visual_query
 
     @torch.inference_mode()
-    def forward(self, visual_query, tokens, start_pos: int):
+    def forward_internal(self, visual_query, tokens, start_pos: int):
         _bsz, seqlen = tokens.shape
         h = self.llama.tok_embeddings(tokens)
         freqs_cis = self.llama.freqs_cis.to(h.device)
@@ -160,15 +172,9 @@ class LLaMA_adapter(nn.Module):
         inputs = {'image': images, 'data_samples': data_samples}
         return inputs
 
-    def post_process(self, output_text):
-        if len(output_text) >= 2:
-            if output_text[1] == '.':
-                output_text = output_text[2:].strip()
-        # pattern = re.compile(r'([A-Z]\.)')
-        # res = pattern.findall(output_text)
-        # if len(res) > 0:
-        #     output_text = res[0][:-1]
-        return output_text
+    def forward(self, batch):
+        if self.mode == 'generation':
+            return self.generate(batch)
 
     @torch.inference_mode()
     def generate(self, batch):
@@ -176,47 +182,19 @@ class LLaMA_adapter(nn.Module):
         temperature = 0.1
         top_p = 0.75
         inputs = self.pack_inputs(batch)
-        image = inputs.pop('image')
+        inputs = self.prompt_constructor(inputs)
+        image = inputs['image']
+        prompts = inputs['prompt']
         data_samples = inputs['data_samples']
-        samples = {'image': image}
-        # import pdb;pdb.set_trace()
-        question = [
-            data_sample.get('question') for data_sample in data_samples
-        ]
-        options = [data_sample.get('options') for data_sample in data_samples]
-        samples.update({'question': question[0]})
-        samples.update({'options': options[0]})
-        if data_samples[0].get('context') is not None:
-            context = [
-                data_sample.get('context') for data_sample in data_samples
-            ]
-            samples.update({'context': context})
+
         data_sample = data_samples[0]
-        if 'context' in samples:
-            context_prompt = samples['context'][0]
-
-        question = samples['question']
-        options = samples['options']
-        # import pdb;pdb.set_trace()
-        if 'context' in samples:
-            prompts = context_prompt + ' ' + question + ' ' + options  # noqa
-        else:
-            prompts = question + ' ' + options
-
-        # system_message = " Only one option is true, return A,B,C or D."
-
-        # prompts = [prompts+system_message]
 
         prompts = [prompts]
-
-        imgs = samples['image']
+        imgs = image
 
         # import pdb;pdb.set_trace()
         bsz = len(imgs)
         params = self.llama.params
-        # assert bsz <= params.max_batch_size, (bsz, params.max_batch_size)
-        # assert len(imgs) == len(prompts)
-        # imgs = torch.zeros_like(imgs)
 
         with torch.cuda.amp.autocast():
             visual_query = self.forward_visual(imgs)
@@ -249,8 +227,9 @@ class LLaMA_adapter(nn.Module):
         prev_pos = 0
         for cur_pos in range(start_pos, total_len):
             with torch.cuda.amp.autocast():
-                logits = self.forward(visual_query,
-                                      tokens[:, prev_pos:cur_pos], prev_pos)
+                logits = self.forward_internal(visual_query,
+                                               tokens[:, prev_pos:cur_pos],
+                                               prev_pos)
             if temperature > 0:
                 probs = torch.softmax(logits / temperature, dim=-1)
                 next_token = sample_top_p(probs, top_p)
@@ -278,7 +257,7 @@ class LLaMA_adapter(nn.Module):
                 pass
             decoded.append(self.tokenizer.decode(t))
 
-        output_text = self.post_process(decoded[0])
+        output_text = self.post_processor(decoded[0])
         data_sample.pred_answer = output_text
         return data_sample
 
@@ -295,8 +274,11 @@ def available_models():
     return list(_MODELS.keys())
 
 
-@MM_MODELS.register_module('LLaMA-adapter-v2-mm-benchmark')
+@MM_MODELS.register_module('LLaMA-adapter-v2')
 def LLaMA_adapter_v2(llama_dir,
+                     prompt_constructor: dict,
+                     post_processor: dict,
+                     mode: str = 'generation',
                      device='cuda' if torch.cuda.is_available() else 'cpu',
                      download_root='ckpts'):
     name = 'BIAS-7B'
@@ -313,20 +295,25 @@ def LLaMA_adapter_v2(llama_dir,
         map_location='cpu')
     model_cfg = ckpt.get('config', {})
 
-    model = LLaMA_adapter(llama_ckpt_dir,
-                          llama_tokenzier_path,
-                          max_seq_len=512,
-                          max_batch_size=1,
-                          clip_model='ViT-L/14',
-                          v_embed_dim=768,
-                          v_depth=8,
-                          v_num_heads=16,
-                          v_mlp_ratio=4.0,
-                          query_len=10,
-                          query_layer=31,
-                          w_bias=model_cfg.get('w_bias', False),
-                          w_lora=model_cfg.get('w_lora', False),
-                          lora_rank=model_cfg.get('lora_rank', 16))
+    model = LLaMA_adapter(
+        llama_ckpt_dir,
+        llama_tokenzier_path,
+        max_seq_len=512,
+        max_batch_size=1,
+        clip_model='ViT-L/14',
+        v_embed_dim=768,
+        v_depth=8,
+        v_num_heads=16,
+        v_mlp_ratio=4.0,
+        query_len=10,
+        query_layer=31,
+        w_bias=model_cfg.get('w_bias', False),
+        w_lora=model_cfg.get('w_lora', False),
+        lora_rank=model_cfg.get('lora_rank', 16),
+        mode=mode,
+        prompt_constructor=prompt_constructor,
+        post_processor=post_processor,
+    )
 
     model.load_state_dict(ckpt['model'], strict=False)
     return model.to(device)

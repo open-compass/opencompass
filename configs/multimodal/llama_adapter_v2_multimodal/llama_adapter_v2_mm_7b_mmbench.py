@@ -1,3 +1,6 @@
+from opencompass.multimodal.models.llama_adapter_v2_multimodal import (
+    LlamaAadapterMMBenchPostProcessor, LlamaAadapterMMBenchPromptConstructor)
+
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.torchvision/Resize',
@@ -18,21 +21,23 @@ dataset = dict(type='opencompass.MMBenchDataset',
                data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
-dataloader = dict(batch_size=1,
+llama_adapter_mmbench_dataloader = dict(batch_size=1,
                   num_workers=4,
                   dataset=dataset,
                   collate_fn=dict(type='pseudo_collate'),
                   sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-model = dict(
-    type='LLaMA-adapter-v2-mm-benchmark',
+llama_adapter_model = dict(
+    type='LLaMA-adapter-v2',
     llama_dir=  # noqa
     '/llama_adapter_v2_multimodal',
+    prompt_constructor=dict(type=LlamaAadapterMMBenchPromptConstructor),
+    post_processor=dict(type=LlamaAadapterMMBenchPostProcessor))
 )
 
 # evaluation settings
-evaluator = [
+llama_adapter_evaluator = [
     dict(
         type='opencompass.DumpResults',
         save_path='work_dirs/llama-adapter-v2-multimodal-mmagibench-v0.1.0.xlsx'

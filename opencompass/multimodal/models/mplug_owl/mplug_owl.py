@@ -1,5 +1,4 @@
-import re
-
+import mmengine
 import torch
 import torch.nn as nn
 from mmengine.device import get_device
@@ -12,10 +11,14 @@ from mplug_owl.tokenization_mplug_owl import MplugOwlTokenizer
 from opencompass.registry import MM_MODELS
 
 
-@MM_MODELS.register_module('mplug_owl-7b-mm-benchmark')
-class Owl(nn.Module):
+@MM_MODELS.register_module('mplug_owl-7b')
+class MplugOwl(nn.Module):
 
-    def __init__(self, model_path='MAGAer13/mplug-owl-llama-7b') -> None:
+    def __init__(self,
+                 prompt_constructor: dict,
+                 post_processor: dict,
+                 model_path='MAGAer13/mplug-owl-llama-7b',
+                 mode: str = 'generation') -> None:
         super().__init__()
         pretrained_ckpt = model_path
         # import pdb;pdb.set_trace()
@@ -35,42 +38,27 @@ class Owl(nn.Module):
             'num_beams': 3,
         }
 
-    def post_process(self, output_text):
-        pattern = re.compile(r'([A-Z]\.)')
-        res = pattern.findall(output_text)
-        if len(res) > 0:
-            output_text = res[0][:-1]
-        return output_text
+        self.prompt_constructor = mmengine.registry.build_from_cfg(
+            prompt_constructor, MM_MODELS)
+        if post_processor is not None:
+            self.post_processor = mmengine.registry.build_from_cfg(
+                post_processor, MM_MODELS)
+
+        self.mode = mode
+
+    def forward(self, batch):
+        if self.mode == 'generation':
+            return self.generate(batch)
 
     def generate(self, batch):
         images = [image.unsqueeze(0) for image in batch['inputs']]
         data_samples = [data_sample for data_sample in batch['data_samples']]
         images = torch.cat(images, dim=0).to(get_device())
         inputs = {'image': images, 'data_samples': data_samples}
-        image = inputs.pop('image')
+        inputs = self.prompt_constructor(inputs)
+        image = inputs['image']
+        prompt = inputs['prompt']
         data_samples = inputs['data_samples']
-        samples = {'image': image}
-        question = [
-            data_sample.get('question') for data_sample in data_samples
-        ]
-        options = [data_sample.get('options') for data_sample in data_samples]
-        samples.update({'question': question[0]})
-        samples.update({'options': options[0]})
-        if data_samples[0].get('context') is not None:
-            context = [
-                data_sample.get('context') for data_sample in data_samples
-            ]
-            samples.update({'context': context})
-
-        if 'context' in samples:
-            context_prompt = samples['context'][0]
-
-        question = samples['question']
-        options = samples['options']
-        if 'context' in samples:
-            prompt = context_prompt + ' ' + question + ' ' + options  # noqa
-        else:
-            prompt = question + ' ' + options
 
         data_sample = data_samples[0]
         owl_template = """The following is a conversation
@@ -82,7 +70,7 @@ class Owl(nn.Module):
         AI: """
         prompt = owl_template.format(text_input=prompt)
         inputs = self.processor(text=[prompt], return_tensors='pt')
-        inputs['pixel_values'] = samples['image']
+        inputs['pixel_values'] = image
         # inputs['pixel_values'] = torch.zeros_like(samples['image'])
         inputs = {
             k: v.bfloat16() if v.dtype == torch.float else v
@@ -93,6 +81,6 @@ class Owl(nn.Module):
             res = self.model.generate(**inputs, **self.generate_kwargs)
         output_text = self.tokenizer.decode(res.tolist()[0],
                                             skip_special_tokens=True)
-        output_text = self.post_process(output_text)
+        output_text = self.post_processor(output_text)
         data_sample.pred_answer = output_text
         return data_sample
