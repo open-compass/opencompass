@@ -52,7 +52,7 @@ launcher = 'pytorch'
 
 ### Details of Task
 
-Here is an example of MiniGPT-4 with MMBench and we provide some comments for 
+Here is an example of MiniGPT-4 with MMBench and we provide some comments for
 users to understand the meaning of the keys in config.
 
 ```python
