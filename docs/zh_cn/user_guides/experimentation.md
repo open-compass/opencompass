@@ -5,15 +5,56 @@
 评测任务的程序入口为 `run.py`，使用方法如下：
 
 ```shell
-python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l] [--dry-run]
+python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l] [--dry-run]
 ```
+
+任务配置 (`$EXP`)：
+
+- `run.py` 允许接受一个 .py 配置文件作为任务相关参数，里面需要包含 `datasets` 和 `models` 字段。
+
+  ```bash
+  python run.py configs/eval_demo.py
+  ```
+
+- 如果不传入配置文件，用户也可以通过 `--models MODEL1 MODEL2 ...` 和 `--datasets DATASET1 DATASET2 ...` 来指定模型和数据集:
+
+  ```bash
+  python run.py --models hf_opt_350m hf_opt_125m --datasets siqa_gen winograd_ppl
+  ```
+
+- 对于 HuggingFace 相关模型，用户也可以通过 HuggingFace 参数快速在命令行中定义一个模型，再通过 `--datasets DATASET1 DATASET2 ...` 定义数据集。
+
+  ```bash
+  python run.py --datasets siqa_gen winograd_ppl \
+  --hf-path huggyllama/llama-7b \  # HuggingFace 模型地址
+  --model-kwargs device_map='auto' \  # 构造 model 的参数
+  --tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # 构造 tokenizer 的参数
+  --max-out-len 100 \  # 模型能接受的最大序列长度
+  --max-seq-len 2048 \  # 最长生成 token 数
+  --batch-size 8 \  # 批次大小
+  --no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
+  --num-gpus 1  # 所需 gpu 数
+  ```
+
+  HuggingFace 全量参数介绍如下：
+
+  - `--hf-path`:  HuggingFace 模型地址
+  - `--peft-path`: PEFT 模型地址
+  - `--tokenizer-path`: HuggingFace tokenizer 地址（如与模型地址相同，可省略）
+  - `--model-kwargs`: 构造 model 的参数
+  - `--tokenizer-kwargs`: 构造 tokenizer 的参数
+  - `--max-out-len`: 最长生成 token 数
+  - `--max-seq-len`: 模型能接受的最大序列长度
+  - `--no-batch-padding`: 不打开 batch padding，通过 for loop 推理，避免精度损失
+  - `--batch-size`: 批次大小
+  - `--num-gpus`: 运行模型所需的gpu数
 
 启动方式：
 
-- 本地机器运行: `run.py $Config`，$Config 中不包含 `eval` 和 `infer` 字段。
-- srun运行: `run.py $Config --slurm -p $PARTITION_name`。
-- dlc运行： `run.py $Config --dlc --aliyun-cfg $AliYun_Cfg`， 后续会有教程。
-- 定制化启动: `run.py $Config` $Config 中包含 `eval` 和 `infer` 字段，参考 [评估文档](./evaluation.md)。
+- 本地机器运行: `run.py $EXP`。
+- srun运行: `run.py $EXP --slurm -p $PARTITION_name`。
+- dlc运行： `run.py $EXP --dlc --aliyun-cfg $AliYun_Cfg`
+- 定制化启动: `run.py $EXP`。这里 $EXP 为配置文件，且里面包含 `eval` 和 `infer` 字段，详细配置请参考 [高效评测](./evaluation.md)。
 
 参数解释如下：
 
@@ -26,7 +67,7 @@ python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--
 - `-l`: 打开飞书机器人状态上报。
 - `--dry-run`: 开启时，推理和评测任务仅会分发但不会真正运行，便于调试；
 
-以运行模式`-m all`为例，整体运行流如下：
+以运行模式 `-m all` 为例，整体运行流如下：
 
 1. 读取配置文件，解析出模型、数据集、评估器等配置信息
 2. 评测任务主要分为推理 `infer`、评测 `eval` 和可视化 `viz` 三个阶段，其中推理和评测经过 Partitioner 进行任务切分后，交由 Runner 负责并行执行。单个推理和评测任务则被抽象成 `OpenICLInferTask` 和 `OpenICLEvalTask`。

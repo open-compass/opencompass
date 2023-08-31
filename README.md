@@ -325,9 +325,36 @@ Some third-party features, like Humaneval and Llama, may require additional step
 
 ## 🏗️ ️Evaluation
 
-Make sure you have installed OpenCompass correctly and prepared your datasets according to the above steps. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html#quick-start) to learn how to run an evaluation task.
+After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared, you can evaluate the performance of the LLaMA-7b model on the MMLU and C-Eval datasets using the following command:
 
-For more tutorials, please check our [Documentation](https://opencompass.readthedocs.io/en/latest/index.html).
+```bash
+python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
+```
+
+OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
+
+```bash
+# List all configurations
+python tools/list_configs.py
+# List all configurations related to llama and mmlu
+python tools/list_configs.py llama mmlu
+```
+
+You can also evaluate other HuggingFace models via command line. Taking LLaMA-7b as an example:
+
+```bash
+python run.py --datasets ceval_ppl mmlu_ppl \
+--hf-path huggyllama/llama-7b \  # HuggingFace model path
+--model-kwargs device_map='auto' \  # Arguments for model construction
+--tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # Arguments for tokenizer construction
+--max-out-len 100 \  # Maximum number of tokens generated
+--max-seq-len 2048 \  # Maximum sequence length the model can accept
+--batch-size 8 \  # Batch size
+--no-batch-padding \  # Don't enable batch padding, infer through for loop to avoid performance loss
+--num-gpus 1  # Number of required GPUs
+```
+
+Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
 
 ## 🔜 Roadmap
 
