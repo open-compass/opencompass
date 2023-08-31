@@ -84,7 +84,7 @@ class Llama2(BaseModel):
         # forward
         outputs = self.model.forward(tokens, 0)
         # compute ppl
-        shift_logits = outputs[..., :-1, :].contiguous()
+        shift_logits = outputs[..., :-1, :].contiguous().float()
         shift_labels = tokens[..., 1:].contiguous()
         shift_logits = shift_logits.view(-1, shift_logits.size(-1))
         shift_labels = shift_labels.view(-1)

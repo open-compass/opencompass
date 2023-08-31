@@ -215,7 +215,7 @@ class CLPInferencer(BaseInferencer):
         else:
             outputs, _ = self.model.get_logits(input_texts)
 
-        shift_logits = outputs[..., :-1, :].contiguous()
+        shift_logits = outputs[..., :-1, :].contiguous().float()
 
         shift_logits = F.log_softmax(shift_logits, dim=-1)
         log_probs = []
