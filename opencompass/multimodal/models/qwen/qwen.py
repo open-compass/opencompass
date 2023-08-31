@@ -29,8 +29,8 @@ class QwenVLBase(nn.Module):
 
     def __init__(self,
                  pretrained_path: str,
-                 prompt_constructor: dict,
-                 post_processor: dict,
+                 prompt_constructor: dict = None,
+                 post_processor: dict = None,
                  is_caption_task: bool = False) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(pretrained_path,
@@ -39,8 +39,12 @@ class QwenVLBase(nn.Module):
             pretrained_path, device_map=get_device(), trust_remote_code=True)
         self.model.generation_config = GenerationConfig.from_pretrained(
             pretrained_path, trust_remote_code=True)
-        self.prompt_constructor = mmengine.registry.build_from_cfg(
-            prompt_constructor, MM_MODELS)
+        if prompt_constructor is not None:
+            self.prompt_constructor = mmengine.registry.build_from_cfg(
+                prompt_constructor, MM_MODELS)
+        if post_processor is not None:
+            self.post_processor = mmengine.registry.build_from_cfg(
+                post_processor, MM_MODELS)
         self.is_caption_task = is_caption_task
         self.model.transformer.forward = types.MethodType(
             forward_hack, self.model.transformer)
@@ -78,10 +82,7 @@ class QwenVLBase(nn.Module):
                                    inputs_embeds=inputs_embeds,
                                    attention_mask=attention_mask,
                                    token_type_ids=token_type_ids)
-        pred = pred.cpu()[0]
-
-        response = self.tokenizer.decode(pred)[len(query):]
-        response = response.replace('<|endoftext|>', '').strip()
+        response = self.post_processor(pred.cpu()[0])
 
         data_sample = batch['data_samples'][0]
         if self.is_caption_task:
@@ -109,8 +110,8 @@ class QwenVLChat(QwenVLBase):
 
     def __init__(self,
                  pretrained_path: str,
-                 prompt_constructor: dict,
-                 post_processor: dict,
+                 prompt_constructor: dict = None,
+                 post_processor: dict = None,
                  is_caption_task: bool = False) -> None:
         super().__init__(pretrained_path, prompt_constructor, post_processor,
                          is_caption_task)
@@ -128,8 +129,6 @@ class QwenVLChat(QwenVLBase):
             chat_format=self.model.generation_config.chat_format,
         )
 
-        # stop_words_ids = get_stop_words_ids(
-        #     self.model.generation_config.chat_format, self.tokenizer)
         input_ids = torch.tensor([context_tokens]).to(get_device())
 
         inputs_embeds = self._build_embeds(images, input_ids)
@@ -153,22 +152,20 @@ class QwenVLChat(QwenVLBase):
         return data_sample
 
 
-def forward_hack(
-    self,
-    input_ids: Optional[torch.LongTensor] = None,
-    past_key_values: Optional[Tuple[Tuple[torch.Tensor]]] = None,
-    attention_mask: Optional[torch.FloatTensor] = None,
-    token_type_ids: Optional[torch.LongTensor] = None,
-    position_ids: Optional[torch.LongTensor] = None,
-    head_mask: Optional[torch.FloatTensor] = None,
-    inputs_embeds: Optional[torch.FloatTensor] = None,
-    encoder_hidden_states: Optional[torch.Tensor] = None,
-    encoder_attention_mask: Optional[torch.FloatTensor] = None,
-    use_cache: Optional[bool] = None,
-    output_attentions: Optional[bool] = None,
-    output_hidden_states: Optional[bool] = None,
-    return_dict: Optional[bool] = None,
-):
+def forward_hack(self,
+                 input_ids: Optional[torch.LongTensor] = None,
+                 past_key_values: Optional[Tuple[Tuple[torch.Tensor]]] = None,
+                 attention_mask: Optional[torch.FloatTensor] = None,
+                 token_type_ids: Optional[torch.LongTensor] = None,
+                 position_ids: Optional[torch.LongTensor] = None,
+                 head_mask: Optional[torch.FloatTensor] = None,
+                 inputs_embeds: Optional[torch.FloatTensor] = None,
+                 encoder_hidden_states: Optional[torch.Tensor] = None,
+                 encoder_attention_mask: Optional[torch.FloatTensor] = None,
+                 use_cache: Optional[bool] = None,
+                 output_attentions: Optional[bool] = None,
+                 output_hidden_states: Optional[bool] = None,
+                 return_dict: Optional[bool] = None):
     if past_key_values is None and input_ids is not None and torch.any(
             input_ids == self.config.visual['image_start_id']):
         bos_pos = torch.where(
