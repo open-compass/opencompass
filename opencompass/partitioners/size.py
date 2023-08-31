@@ -154,7 +154,7 @@ class SizePartitioner(BasePartitioner):
                 fnmatch(dataset_abbr, pattern)
                 for pattern in ('bbh*', 'gsm8k*', 'math*', 'strategyqa*',
                                 'agieval-jec*', 'agieval-gaokao-mathcloze',
-                                'agieval-math')):
+                                'agieval-math', '*professional_law')):
             factor *= 10
 
         return factor

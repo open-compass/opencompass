@@ -8,9 +8,9 @@ with read_base():
     from .groups.bbh import bbh_summary_groups
     from .groups.GaokaoBench import GaokaoBench_summary_groups
     from .groups.flores import flores_summary_groups
-    from .groups.jigsaw_multilingual import jigsaw_multilingual_summary_groups
     from .groups.tydiqa import tydiqa_summary_groups
     from .groups.xiezhi import xiezhi_summary_groups
+
 
 summarizer = dict(
     dataset_abbrs=[
@@ -19,63 +19,32 @@ summarizer = dict(
         "ceval",
         'agieval',
         'mmlu',
+        'cmmlu',
         "GaokaoBench",
         'ARC-c',
+        'ARC-e',
         '--------- 语言 Language ---------',  # category
         # '字词释义', # subcategory
         'WiC',
-        'summedits',
         # '成语习语', # subcategory
         'chid-dev',
         # '语义相似度', # subcategory
         'afqmc-dev',
-        'bustm-dev',
         # '指代消解', # subcategory
-        'cluewsc-dev',
         'WSC',
-        'winogrande',
+        # '多语种问答', # subcategory
+        'tydiqa-goldp',
         # '翻译', # subcategory
         'flores_100',
         '--------- 知识 Knowledge ---------',  # category
         # '知识问答', # subcategory
         'BoolQ',
         'commonsense_qa',
-        'nq',
         'triviaqa',
-        # '多语种问答', # subcategory
-        '--------- 推理 Reasoning ---------',  # category
-        # '文本蕴含', # subcategory
-        'cmnli',
-        'ocnli',
-        'ocnli_fc-dev',
-        'AX_b',
-        'AX_g',
-        'CB',
-        'RTE',
-        # '常识推理', # subcategory
-        'story_cloze',
-        'COPA',
-        'ReCoRD',
-        'hellaswag',
-        'piqa',
-        'siqa',
-        'strategyqa',
-        # '数学推理', # subcategory
-        'math',
-        'gsm8k',
-        # '定理应用', # subcategory
-        'TheoremQA',
-        # '代码', # subcategory
-        'openai_humaneval',
-        'mbpp',
-        # '综合推理', # subcategory
-        "bbh",
+        'nq',
         '--------- 理解 Understanding ---------',  # category
         # '阅读理解', # subcategory
         'C3',
-        'CMRC_dev',
-        'DRCD_dev',
-        'MultiRC',
         'race-middle',
         'race-high',
         'openbookqa_fact',
@@ -86,18 +55,30 @@ summarizer = dict(
         # '内容分析', # subcategory
         'eprstmt-dev',
         'lambada',
-        'tnews-dev',
-        '--------- 安全 Safety ---------',  # category
-        # '偏见', # subcategory
-        'crows_pairs',
-        # '有毒性（判别）', # subcategory
-        'civil_comments',
-        # '有毒性（判别）多语言', # subcategory
-        'jigsaw_multilingual',
-        # '有毒性（生成）', # subcategory
-        'real-toxicity-prompts',
-        # '真实性/有用性', # subcategory
-        'truthful_qa',
+        '--------- 推理 Reasoning ---------',  # category
+        # '文本蕴含', # subcategory
+        'cmnli',
+        'ocnli',
+        'AX_b',
+        'AX_g',
+        'RTE',
+        # '常识推理', # subcategory
+        'COPA',
+        'ReCoRD',
+        'hellaswag',
+        'piqa',
+        'siqa',
+        # '数学推理', # subcategory
+        'math',
+        'gsm8k',
+        # '定理应用', # subcategory
+        # '阅读理解', # subcategory
+        'drop',
+        # '代码', # subcategory
+        'openai_humaneval',
+        'mbpp',
+        # '综合推理', # subcategory
+        "bbh",
     ],
     summary_groups=sum(
         [v for k, v in locals().items() if k.endswith("_summary_groups")], []),
