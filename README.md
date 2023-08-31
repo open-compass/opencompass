@@ -18,7 +18,7 @@ English | [简体中文](README_zh-CN.md)
 </div>
 
 <p align="center">
-    👋 join us on <a href="https://twitter.com/intern_lm" target="_blank">Twitter</a>, <a href="https://discord.gg/xa29JuW87d" target="_blank">Discord</a> and <a href="https://r.vansin.top/?r=internwx" target="_blank">WeChat</a>
+    👋 join us on <a href="https://discord.gg/KKwfEbFj7U" target="_blank">Discord</a> and <a href="https://r.vansin.top/?r=opencompass" target="_blank">WeChat</a>
 </p>
 
 ## 🧭	Welcome
@@ -27,18 +27,21 @@ to **OpenCompass**!
 
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
+> **🔥 Attention**<br />
+> We launch the OpenCompass Collabration project, welcome to support diverse evaluation benchmarks into OpenCompass!
+> Clike [Issue](https://github.com/InternLM/opencompass/issues/248) for more information.
+> Let's work together to build a more powerful OpenCompass toolkit!
+
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **\[2023.08.11\]** [Model comparison](https://opencompass.org.cn/model-compare/GPT-4,ChatGPT,LLaMA-2-70B,LLaMA-65B) is now online. We hope this feature offers deeper insights! 🔥🔥🔥.
-- **\[2023.08.11\]** We have supported [LEval](https://github.com/OpenLMLab/LEval). 🔥🔥🔥.
-- **\[2023.08.10\]** OpenCompass is compatible with [LMDeploy](https://github.com/InternLM/lmdeploy). Now you can follow this [instruction](https://opencompass.readthedocs.io/en/latest/advanced_guides/evaluation_turbomind.html#) to evaluate the accelerated models provide by the **Turbomind**.
-- **\[2023.08.10\]** We have supported [Qwen-7B](https://github.com/QwenLM/Qwen-7B) and [XVERSE-13B](https://github.com/xverse-ai/XVERSE-13B) ! Go to our [leaderboard](https://opencompass.org.cn/leaderboard-llm) for more results! More models are welcome to join OpenCompass.
-- **\[2023.08.09\]** Several new datasets(**CMMLU, TydiQA, SQuAD2.0, DROP**) are updated on our [leaderboard](https://opencompass.org.cn/leaderboard-llm)! More datasets are welcomed to join OpenCompass.
-- **\[2023.08.07\]** We have added a [script](tools/eval_mmbench.py) for users to evaluate the inference results of [MMBench](https://opencompass.org.cn/MMBench)-dev.
-- **\[2023.08.05\]** We have supported [GPT-4](https://openai.com/gpt-4)! Go to our [leaderboard](https://opencompass.org.cn/leaderboard-llm) for more results! More models are welcome to join OpenCompass.
-- **\[2023.07.27\]** We have supported [CMMLU](https://github.com/haonan-li/CMMLU)! More datasets are welcome to join OpenCompass.
-- **\[2023.07.21\]** Performances of Llama-2 are available in [OpenCompass leaderboard](https://opencompass.org.cn/leaderboard-llm)!
-- **\[2023.07.13\]** We release [MMBench](https://opencompass.org.cn/MMBench), a meticulously curated dataset to comprehensively evaluate different abilities of multimodality models.
+- **\[2023.08.25\]**  [**TigerBot**](https://github.com/TigerResearch/TigerBot) team adpots OpenCompass to evaluate their models systematically. We deeply appreciate the community's dedication to transparency and reproducibility in LLM evaluation.
+- **\[2023.08.21\]** [**Lagent**](https://github.com/InternLM/lagent) has been released, which is a lightweight framework for building LLM-based agents. We are working with Lagent team to support the evaluation of general tool-use capability, stay tuned! 🔥🔥🔥.
+- **\[2023.08.18\]** We have supported evaluation for **multi-modality learning**, include **MMBench, SEED-Bench, COCO-Caption, Flickr-30K, OCR-VQA, ScienceQA** and so on. Leaderboard is on the road. Feel free to try multi-modality evaluation with  OpenCompass ! 🔥🔥🔥.
+- **\[2023.08.18\]** [Dataset card](https://opencompass.org.cn/dataset-detail/MMLU) is now online. Welcome new evaluation benchmark  OpenCompass !
+- **\[2023.08.11\]** [Model comparison](https://opencompass.org.cn/model-compare/GPT-4,ChatGPT,LLaMA-2-70B,LLaMA-65B) is now online. We hope this feature offers deeper insights!
+- **\[2023.08.11\]** We have supported [LEval](https://github.com/OpenLMLab/LEval).
+
+> [More](docs/en/notes/news.md)
 
 ## ✨ Introduction
 
@@ -352,6 +355,23 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 ```
 
 Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
+
+## 🔜 Roadmap
+
+- [ ] Subjective Evaluation
+  - [ ] Release CompassAreana
+  - [ ] Subjective evaluation dataset.
+- [ ] Long-context
+  - [ ] Long-context evaluation with extensive datasets.
+  - [ ] Long-context leaderboard.
+- [ ] Coding
+  - [ ] Coding evaluation leaderdboard.
+  - [ ] Non-python language evaluation service.
+- [ ] Agent
+  - [ ] Support various agenet framework.
+  - [ ] Evaluation of tool use of the LLMs.
+- [ ] Robustness
+  - [ ] Support various attack method
 
 ## 👷‍♂️ Contributing
 

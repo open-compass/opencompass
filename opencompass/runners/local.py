@@ -59,7 +59,18 @@ class LocalRunner(BaseRunner):
             for task in tasks:
                 task = TASKS.build(dict(type=self.task_cfg.type, cfg=task))
                 task_name = task.name
-                task.run()
+                # get cmd
+                mmengine.mkdir_or_exist('tmp/')
+                param_file = f'tmp/{os.getpid()}_params.py'
+                task.cfg.dump(param_file)
+                cmd = task.get_command(cfg_path=param_file,
+                                       template='{task_cmd}')
+                # run in subprocess if starts with torchrun etc.
+                if cmd.startswith('python'):
+                    task.run()
+                else:
+                    subprocess.run(cmd, shell=True, text=True)
+                os.remove(param_file)
                 status.append((task_name, 0))
         else:
             import torch

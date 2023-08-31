@@ -1,8 +1,8 @@
 """Requires Transformer 4.28 and above, implementation may change according the
 Llama implementation."""
 import logging
-import re
 
+import mmengine
 import torch
 import torch.nn as nn
 from lavis.models.blip2_models.blip2 import Blip2Base, disabled_train
@@ -12,27 +12,36 @@ from transformers import LlamaForCausalLM, LlamaTokenizer
 from opencompass.registry import MM_MODELS
 
 
-@MM_MODELS.register_module('blip2-vicuna-instruct-mmbench')
-class Blip2VicunaInstructMMBench(Blip2Base):
+@MM_MODELS.register_module('blip2-vicuna-instruct')
+class InstructBlipInferencer(Blip2Base):
 
     def __init__(
         self,
-        vit_model='eva_clip_g',
-        img_size=224,
-        drop_path_rate=0,
-        use_grad_checkpoint=False,
-        vit_precision='fp16',
-        freeze_vit=True,
-        num_query_token=32,
-        llm_model='',
-        sys_prompt='',
-        prompt='',
-        max_txt_len=128,
-        max_output_txt_len=256,
-        qformer_text_input=True,
-        low_resource=False,
+        prompt_constructor: dict,
+        post_processor: dict,
+        vit_model: str = 'eva_clip_g',
+        img_size: int = 224,
+        drop_path_rate: float = 0,
+        use_grad_checkpoint: bool = False,
+        vit_precision: str = 'fp16',
+        freeze_vit: bool = True,
+        num_query_token: int = 32,
+        llm_model: str = '',
+        sys_prompt: str = '',
+        prompt: str = '',
+        max_txt_len: int = 128,
+        max_output_txt_len: int = 256,
+        qformer_text_input: bool = True,
+        low_resource: bool = False,
+        mode: str = 'generation',
     ):
         super().__init__()
+        self.mode = mode
+        self.prompt_constructor = mmengine.registry.build_from_cfg(
+            prompt_constructor, MM_MODELS)
+        self.post_processor = mmengine.registry.build_from_cfg(
+            post_processor, MM_MODELS)
+
         self.tokenizer = self.init_tokenizer(truncation_side='left')
 
         self.visual_encoder, self.ln_vision = self.init_vision_encoder(
@@ -92,6 +101,12 @@ class Blip2VicunaInstructMMBench(Blip2Base):
 
         self.qformer_text_input = qformer_text_input
 
+    def forward(self, batch):
+        if self.mode == 'generation':
+            return self.generate(batch)
+        else:
+            raise RuntimeError(f'Invalid mode "{self.mode}".')
+
     def concat_text_input_output(self, input_ids, input_atts, output_ids,
                                  output_atts):
         input_part_targets_len = []
@@ -136,30 +151,12 @@ class Blip2VicunaInstructMMBench(Blip2Base):
         temperature=1,
     ):
         inputs = self.pack_inputs(batch)
-        image = inputs.pop('image')
+        inputs = self.prompt_constructor(inputs)
+        image = inputs['image']
+        prompt = inputs['prompt']
         data_samples = inputs['data_samples']
-        samples = {'image': image}
-        questions = [
-            data_sample.get('question') for data_sample in data_samples
-        ]
-        options = [data_sample.get('options') for data_sample in data_samples]
-        if data_samples[0].get('context') is not None:
-            contexts = [
-                data_sample.get('context') for data_sample in data_samples
-            ]
-            prompt = [
-                context + ' ' + question + ' ' + option for context, question,
-                option in zip(contexts, questions, options)
-            ]
-        else:
-            prompt = [
-                question + ' ' + option
-                for question, option in zip(questions, options)
-            ]
 
         self.llm_tokenizer.padding_side = 'left'
-
-        image = samples['image']
 
         bs = image.size(0)
 
@@ -237,24 +234,10 @@ class Blip2VicunaInstructMMBench(Blip2Base):
                 length_penalty=length_penalty,
                 num_return_sequences=num_captions,
             )
-        outputs[outputs == 0] = 2  # convert output id 0 to 2 (eos_token_id)
-        output_text = self.llm_tokenizer.batch_decode(outputs,
-                                                      skip_special_tokens=True)
-        output_text = [text.strip() for text in output_text]
-        output_text = self.post_process(output_text[0])
-        data_sample = data_samples[0]
-        data_sample.pred_answer = output_text
 
-        return data_sample
-
-    def post_process(self, output_text):
-        output_text = output_text.split('###')[0]
-        output_text = output_text.split('Assistant:')[-1].strip()
-        output_text = output_text.strip('</s><s>')
-        output_text = output_text.strip('</Img>')
-        output_text = output_text.strip()
-        pattern = re.compile(r'([A-Z]\.)')
-        res = pattern.findall(output_text)
-        if len(res) > 0:
-            output_text = res[0][:-1]
-        return output_text
+        for i, data_sample in enumerate(data_samples):
+            output_token = outputs[i]
+            output_text = self.post_processor(output_token, self.llm_tokenizer)
+            data_sample.pred_answer = output_text
+            data_samples[i] = data_sample
+        return data_samples

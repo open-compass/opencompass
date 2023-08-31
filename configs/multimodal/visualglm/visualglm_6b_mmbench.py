@@ -1,4 +1,4 @@
-from opencompass.multimodal.models.visualglm import (VisualGLMPostProcessor, VisualGLMPromptConstructor)
+from opencompass.multimodal.models.visualglm import (VisualGLMBasePostProcessor, VisualGLMMMBenchPromptConstructor)
 
 # dataloader settings
 val_pipeline = [
@@ -30,8 +30,8 @@ mmbench_dataloader = dict(batch_size=1,
 visualglm_model = dict(
     type='visualglm',
     pretrained_path='/path/to/visualglm',  # or Huggingface repo id
-    prompt_constructor=dict(type=VisualGLMPromptConstructor),
-    post_processor=dict(type=VisualGLMPostProcessor)
+    prompt_constructor=dict(type=VisualGLMMMBenchPromptConstructor),
+    post_processor=dict(type=VisualGLMBasePostProcessor)
 )
 
 # evaluation settings

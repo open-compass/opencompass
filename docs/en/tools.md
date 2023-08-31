@@ -121,3 +121,13 @@ Its output could be:
 | mmlu_ppl_ac766d   | configs/datasets/mmlu/mmlu_ppl_ac766d.py          |
 +-------------------+---------------------------------------------------+
 ```
+
+## Dataset Suffix Updater
+
+This tool can quickly modify the suffixes of configuration files located under the `configs/dataset` directory, aligning them with the naming conventions based on prompt hash.
+
+How to run:
+
+```bash
+python tools/update_dataset_suffix.py
+```

@@ -1,3 +1,8 @@
-from .blip2_vicuna_instruct import Blip2VicunaInstructMMBench
+from .blip2_vicuna_instruct import InstructBlipInferencer
+from .post_processor import InstructBlipMMBenchPostProcessor
+from .prompt_constructor import InstructBlipMMBenchPromptConstructor
 
-__all__ = ['Blip2VicunaInstructMMBench']
+__all__ = [
+    'InstructBlipInferencer', 'InstructBlipMMBenchPromptConstructor',
+    'InstructBlipMMBenchPostProcessor'
+]
