@@ -326,7 +326,7 @@ unzip OpenCompassData.zip
 
 ## 🏗️ ️评测
 
-确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，可以通过以下命令评测 LLaMA-7b 模型在 MMLU 和 CEval 数据集上的性能：
+确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，可以通过以下命令评测 LLaMA-7b 模型在 MMLU 和 C-Eval 数据集上的性能：
 
 ```bash
 python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl

@@ -325,7 +325,7 @@ Some third-party features, like Humaneval and Llama, may require additional step
 
 ## 🏗️ ️Evaluation
 
-After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared, you can evaluate the performance of the LLaMA-7b model on the MMLU and CEval datasets using the following command:
+After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared, you can evaluate the performance of the LLaMA-7b model on the MMLU and C-Eval datasets using the following command:
 
 ```bash
 python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
