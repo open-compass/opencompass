@@ -4,7 +4,7 @@ from mmpretrain.structures import DataSample
 
 
 class LlamaAadapterMMBenchPromptConstructor:
-    """Prompt constructor for Llama Aadapter on MMBench.
+    """Prompt constructor for Llama Adapter v2 on MMBench.
 
     Args:
         image_prompt (str): Image prompt. Defaults to `''`.

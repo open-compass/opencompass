@@ -2,7 +2,7 @@ import torch
 
 
 class LlamaAadapterMMBenchPostProcessor:
-    """"Post processor for Llama Aadapter   on MMBench."""
+    """"Post processor for Llama Aadapter V2 on MMBench."""
 
     def __init__(self) -> None:
         pass

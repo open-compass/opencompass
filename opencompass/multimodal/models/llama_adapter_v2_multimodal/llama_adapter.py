@@ -254,18 +254,6 @@ class LLaMA_adapter(nn.Module):
         return data_sample
 
 
-_MODELS = {
-    'BIAS-7B':
-    'https://github.com/ZrrSkywalker/LLaMA-Adapter/releases/download/v.2.0.0/7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',  # noqa: E501
-    # "LORA16-7B": "",
-    # "PARTIAL-7B": ""
-}
-
-
-def available_models():
-    return list(_MODELS.keys())
-
-
 @MM_MODELS.register_module('LLaMA-adapter-v2')
 class LLaMA_adapter_v2(nn.Module):
 
