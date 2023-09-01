@@ -17,6 +17,7 @@ python tools/prompt_viewer.py CONFIG_PATH [-n] [-a] [-p PATTERN]
 ## Case Analyzer (To be updated)
 
 Based on existing evaluation results, this tool produces inference error samples and full samples with annotation information.
+h
 
 Running method:
 
