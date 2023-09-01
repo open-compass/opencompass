@@ -10,11 +10,11 @@ with read_base():
 
 from opencompass.models.lagent import LagentAgent
 from lagent.llms import GPTAPI
-from lagent.agents.react import ReAct, CALL_PROTOCOL_EN, FORCE_STOP_PROMPT_EN, ReActProtocol
+from lagent.agents.react import ReAct, ReActProtocol
 from lagent.actions import PythonInterpreter
 
+FORCE_STOP_PROMPT_EN = """You should directly give results based on history information."""
 
-ZEROSHOT_INSTRUCTION = CALL_PROTOCOL_EN
 FEWSHOT_INSTRUCTION = """\
 You are a assistant who can utilize external tools.
 {tool_description}
