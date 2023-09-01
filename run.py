@@ -115,14 +115,6 @@ def parse_args():
         'Will be overrideen by the "retry" argument in the config.',
         type=int,
         default=2)
-
-    # add multimodal eval args
-    parser.add_argument('--mm-eval',
-                        default=False,
-                        action='store_true',
-                        help='Whether or '
-                        'not evaluate multimodal models.')
-
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
