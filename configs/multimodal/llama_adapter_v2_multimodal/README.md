@@ -1,4 +1,4 @@
-# MiniGPT-4
+# Llama Adapter V2
 
 ### Prepare the environment
 

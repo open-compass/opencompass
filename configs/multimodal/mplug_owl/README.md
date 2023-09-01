@@ -1,4 +1,4 @@
-# MiniGPT-4
+# MplugOwl
 
 ### Prepare the environment
 
