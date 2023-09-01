@@ -70,6 +70,24 @@ def gpt_python_postprocess(ori_prompt: str, text: str) -> str:
     return text
 
 
+def wizardcoder_postprocess(text: str) -> str:
+    """Postprocess for WizardCoder Models."""
+    if '```' in text:
+        blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+        if len(blocks) == 0:
+            text = text.split('```')[1]  # fall back to default strategy
+        else:
+            text = blocks[0]  # fetch the first code block
+            if not text.startswith('\n'):  # in case starting with ```python
+                text = text[max(text.find('\n') + 1, 0):]
+    else:
+        match = re.search(r'Here(.*?)\n', text)
+        if match:
+            text = re.sub('Here(.*?)\n', '', text, count=1)
+
+    return text
+
+
 def collect_preds(filename: str):
     # in case the prediction is partial
     root, ext = osp.splitext(filename)
@@ -147,7 +165,18 @@ def main():
                     break
 
             # special postprocess for GPT
-            if 'CodeLlama' not in model_abbr and lang == 'python':
+            if model_abbr in [
+                    'WizardCoder-1B-V1.0',
+                    'WizardCoder-3B-V1.0',
+                    'WizardCoder-15B-V1.0',
+                    'WizardCoder-Python-13B-V1.0',
+                    'WizardCoder-Python-34B-V1.0',
+            ]:
+                predictions = [{
+                    'task_id': f'{task}/{i}',
+                    'generation': wizardcoder_postprocess(pred),
+                } for i, pred in enumerate(pred_strs)]
+            elif 'CodeLlama' not in model_abbr and lang == 'python':
                 predictions = [{
                     'task_id':
                     f'{task}/{i}',
