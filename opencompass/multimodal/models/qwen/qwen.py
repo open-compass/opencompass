@@ -25,20 +25,30 @@ class QwenVLBase(nn.Module):
         post_processor (dict): The config of post processor.
         is_caption_task (bool): Whether the task is caption task.
             Defaults to False.
+        commit_id (str): Use given version of Qwen-VL.
+            Warning: the latest version may have some conflicts.
+            Recommend to use the given default version.
     """
 
-    def __init__(self,
-                 pretrained_path: str,
-                 prompt_constructor: dict = None,
-                 post_processor: dict = None,
-                 is_caption_task: bool = False) -> None:
+    def __init__(
+            self,
+            pretrained_path: str,
+            prompt_constructor: dict = None,
+            post_processor: dict = None,
+            is_caption_task: bool = False,
+            commit_id: str = '548275c8b99de56dec203c0e793be18e030f2f4c'
+    ) -> None:
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(pretrained_path,
-                                                       trust_remote_code=True)
+                                                       trust_remote_code=True,
+                                                       revision=commit_id)
         self.model = AutoModelForCausalLM.from_pretrained(
-            pretrained_path, device_map=get_device(), trust_remote_code=True)
+            pretrained_path,
+            device_map=get_device(),
+            trust_remote_code=True,
+            revision=commit_id)
         self.model.generation_config = GenerationConfig.from_pretrained(
-            pretrained_path, trust_remote_code=True)
+            pretrained_path, trust_remote_code=True, revision=commit_id)
         if prompt_constructor is not None:
             self.prompt_constructor = mmengine.registry.build_from_cfg(
                 prompt_constructor, MM_MODELS)
