@@ -6,13 +6,12 @@ from datetime import datetime
 
 from mmengine.config import Config, DictAction
 
-from opencompass.partitioners import (MultimodalNaivePartitioner,
-                                      NaivePartitioner, SizePartitioner)
+from opencompass.partitioners import MultimodalNaivePartitioner
 from opencompass.registry import PARTITIONERS, RUNNERS
 from opencompass.runners import SlurmRunner
 from opencompass.utils import LarkReporter, Summarizer, get_logger
-from opencompass.utils.run import (exec_eval_runner, exec_infer_runner,
-                                   exec_mm_infer_runner, get_config_from_arg)
+from opencompass.utils.run import (exec_mm_infer_runner, fill_eval_cfg,
+                                   fill_infer_cfg, get_config_from_arg)
 
 
 def parse_args():
@@ -245,39 +244,29 @@ def main():
             tasks = partitioner(cfg)
             exec_mm_infer_runner(tasks, args, cfg)
             return
-        elif args.dlc or args.slurm or cfg.get('infer', None) is None:
-            # Use SizePartitioner to split into subtasks
-            partitioner = SizePartitioner(
-                osp.join(cfg['work_dir'], 'predictions/'),
-                max_task_size=args.max_partition_size,
-                gen_task_coef=args.gen_task_coef)
-            tasks = partitioner(cfg)
-            if args.dry_run:
-                return
-            # execute the infer subtasks
-            exec_infer_runner(tasks, args, cfg)
-        # If they have specified "infer" in config and haven't used --slurm
-        # or --dlc, just follow the config
+
+        if args.dlc or args.slurm or cfg.get('infer', None) is None:
+            fill_infer_cfg(cfg, args)
+
+        if args.partition is not None:
+            if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
+                cfg.infer.runner.partition = args.partition
+                cfg.infer.runner.quotatype = args.quotatype
         else:
-            if args.partition is not None:
-                if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
-                    cfg.infer.runner.partition = args.partition
-                    cfg.infer.runner.quotatype = args.quotatype
-            else:
-                logger.warning('SlurmRunner is not used, so the partition '
-                               'argument is ignored.')
-            if args.debug:
-                cfg.infer.runner.debug = True
-            if args.lark:
-                cfg.infer.runner.lark_bot_url = cfg['lark_bot_url']
-            cfg.infer.partitioner['out_dir'] = osp.join(
-                cfg['work_dir'], 'predictions/')
-            partitioner = PARTITIONERS.build(cfg.infer.partitioner)
-            tasks = partitioner(cfg)
-            if args.dry_run:
-                return
-            runner = RUNNERS.build(cfg.infer.runner)
-            runner(tasks)
+            logger.warning('SlurmRunner is not used, so the partition '
+                           'argument is ignored.')
+        if args.debug:
+            cfg.infer.runner.debug = True
+        if args.lark:
+            cfg.infer.runner.lark_bot_url = cfg['lark_bot_url']
+        cfg.infer.partitioner['out_dir'] = osp.join(cfg['work_dir'],
+                                                    'predictions/')
+        partitioner = PARTITIONERS.build(cfg.infer.partitioner)
+        tasks = partitioner(cfg)
+        if args.dry_run:
+            return
+        runner = RUNNERS.build(cfg.infer.runner)
+        runner(tasks)
 
     # evaluate
     if args.mode in ['all', 'eval']:
@@ -289,37 +278,28 @@ def main():
                            'also specified --slurm or --dlc. '
                            'The "eval" configuration will be overridden by '
                            'your runtime arguments.')
+
         if args.dlc or args.slurm or cfg.get('eval', None) is None:
-            # Use NaivePartitioner，not split
-            partitioner = NaivePartitioner(
-                osp.join(cfg['work_dir'], 'results/'))
-            tasks = partitioner(cfg)
-            if args.dry_run:
-                return
-            # execute the eval tasks
-            exec_eval_runner(tasks, args, cfg)
-        # If they have specified "eval" in config and haven't used --slurm
-        # or --dlc, just follow the config
-        else:
-            if args.partition is not None:
-                if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
-                    cfg.eval.runner.partition = args.partition
-                    cfg.eval.runner.quotatype = args.quotatype
-                else:
-                    logger.warning('SlurmRunner is not used, so the partition '
-                                   'argument is ignored.')
-            if args.debug:
-                cfg.eval.runner.debug = True
-            if args.lark:
-                cfg.eval.runner.lark_bot_url = cfg['lark_bot_url']
-            cfg.eval.partitioner['out_dir'] = osp.join(cfg['work_dir'],
-                                                       'results/')
-            partitioner = PARTITIONERS.build(cfg.eval.partitioner)
-            tasks = partitioner(cfg)
-            if args.dry_run:
-                return
-            runner = RUNNERS.build(cfg.eval.runner)
-            runner(tasks)
+            fill_eval_cfg(cfg, args)
+
+        if args.partition is not None:
+            if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
+                cfg.eval.runner.partition = args.partition
+                cfg.eval.runner.quotatype = args.quotatype
+            else:
+                logger.warning('SlurmRunner is not used, so the partition '
+                               'argument is ignored.')
+        if args.debug:
+            cfg.eval.runner.debug = True
+        if args.lark:
+            cfg.eval.runner.lark_bot_url = cfg['lark_bot_url']
+        cfg.eval.partitioner['out_dir'] = osp.join(cfg['work_dir'], 'results/')
+        partitioner = PARTITIONERS.build(cfg.eval.partitioner)
+        tasks = partitioner(cfg)
+        if args.dry_run:
+            return
+        runner = RUNNERS.build(cfg.eval.runner)
+        runner(tasks)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
