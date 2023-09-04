@@ -43,7 +43,7 @@ class TriviaQAEvaluator(BaseEvaluator):
             }
         processed_predictions = []
         for prediction in predictions:
-            prediction = prediction.split('\n')[0].lower()
+            prediction = prediction.strip().split('\n')[0].lower()
             if 'answer is' in prediction:
                 prediction = prediction.split('answer is')[-1]
             prediction = general_postprocess(prediction)
