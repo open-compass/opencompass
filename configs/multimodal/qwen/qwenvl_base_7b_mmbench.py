@@ -1,4 +1,4 @@
-from opencompass.multimodal.models.qwen import QwenVLMMBenchPromptConstructor, QwenBasePostProcessor
+from opencompass.multimodal.models.qwen import QwenVLMMBenchPromptConstructor, QwenVLBasePostProcessor
 
 # dataloader settings
 val_pipeline = [
@@ -31,7 +31,7 @@ qwen_model = dict(
     type='qwen-vl-base',
     pretrained_path='Qwen/Qwen-VL',  # or Huggingface repo id
     prompt_constructor=dict(type=QwenMMBenchPromptConstructor),
-    post_processor=dict(type=QwenBasePostProcessor)
+    post_processor=dict(type=QwenVLBasePostProcessor)
 )
 
 # evaluation settings

@@ -1,8 +1,8 @@
-from .post_processor import QwenBasePostProcessor
+from .post_processor import QwenVLBasePostProcessor
 from .prompt_constructor import QwenVLMMBenchPromptConstructor
 from .qwen import QwenVLBase, QwenVLChat
 
 __all__ = [
-    'QwenVLBase', 'QwenVLChat', 'QwenBasePostProcessor',
+    'QwenVLBase', 'QwenVLChat', 'QwenVLBasePostProcessor',
     'QwenVLMMBenchPromptConstructor'
 ]
