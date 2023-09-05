@@ -22,7 +22,7 @@ class ZeroRetriever(BaseRetriever):
     def __init__(self, dataset, ice_eos_token: Optional[str] = '') -> None:
         super().__init__(dataset, '', ice_eos_token, 0)
 
-    def retrieve(self, id_list: List[int]) -> List[List]:
+    def retrieve(self, id_list: List[int]=[]) -> List[List]:
         if id_list:
             get_logger().warning('id_list is not empty, but will be ignored.')
         rtr_idx_list = [[] for _ in range(len(self.test_ds))]
