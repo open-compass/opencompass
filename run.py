@@ -91,7 +91,7 @@ def parse_args():
                         help='The maximum size of an infer task. Only '
                         'effective when "infer" is missing from the config.',
                         type=int,
-                        default=2000),
+                        default=40000),
     parser.add_argument(
         '--gen-task-coef',
         help='The dataset cost measurement coefficient for generation tasks, '
