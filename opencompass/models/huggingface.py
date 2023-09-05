@@ -14,7 +14,7 @@ PromptType = Union[PromptList, str]
 
 @MODELS.register_module()
 class HuggingFace(BaseModel):
-    """Model wrapper around HuggingFace general models.
+    """Model wrapper around HuggingFace models.
 
     Args:
         path (str): The name or path to HuggingFace's model.
@@ -40,6 +40,8 @@ class HuggingFace(BaseModel):
             prediction tokens before decoding. Defaults to False.
         batch_padding (bool): If False, inference with be performed in for-loop
             without batch padding.
+        pad_token_id (int): The id of the padding token. Defaults to None. Use
+            (#vocab + pad_token_id) if get negative value.
 
     Note:
         About ``extract_pred_after_decode``: Commonly, we should extract the
@@ -59,7 +61,8 @@ class HuggingFace(BaseModel):
                  model_kwargs: dict = dict(device_map='auto'),
                  meta_template: Optional[Dict] = None,
                  extract_pred_after_decode: bool = False,
-                 batch_padding: bool = False):
+                 batch_padding: bool = False,
+                 pad_token_id: Optional[int] = None):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          tokenizer_only=tokenizer_only,
@@ -69,6 +72,7 @@ class HuggingFace(BaseModel):
             hf_cache_dir = os.getenv('HF_MODEL_HUB', None)
         patch_hf_auto_model(hf_cache_dir)
         self.logger = get_logger()
+        self.pad_token_id = pad_token_id
         self._load_tokenizer(path=path,
                              tokenizer_path=tokenizer_path,
                              tokenizer_kwargs=tokenizer_kwargs)
@@ -84,10 +88,31 @@ class HuggingFace(BaseModel):
         from transformers import AutoTokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_path if tokenizer_path else path, **tokenizer_kwargs)
-        if self.tokenizer.pad_token_id is None:
-            self.logger.warning('pad_token_id is not set for the tokenizer. '
-                                'Using eos_token_id as pad_token_id.')
-            self.tokenizer.pad_token = self.tokenizer.eos_token
+
+        # A patch for some models without pad_token_id
+        if self.pad_token_id is not None:
+            if self.pad_token_id < 0:
+                self.pad_token_id += self.tokenizer.vocab_size
+            if self.tokenizer.pad_token_id is None:
+                self.logger.warning(
+                    f'Using {self.pad_token_id} as pad_token_id')
+            elif self.tokenizer.pad_token_id != self.pad_token_id:
+                self.logger.warning(
+                    f'pad_token_id is not consistent with the tokenizer. Using {self.pad_token_id} as pad_token_id'  # noqa
+                )
+            self.tokenizer.pad_token_id = self.pad_token_id
+        elif self.tokenizer.pad_token_id is None:
+            self.logger.warning('pad_token_id is not set for the tokenizer.')
+            if self.tokenizer.eos_token is not None:
+                self.logger.warning('Using eos_token_id as pad_token_id.')
+                self.logger.warning(
+                    f'{self.tokenizer.eos_token} la {self.tokenizer.eos_token is None}'  # noqa
+                )
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+            else:
+                raise ValueError(
+                    'pad_token_id is not set for this tokenizer. Try to set pad_token_id via passing `pad_token_id={PAD_TOKEN_ID}` in model_cfg. You may find pad_token_id in `generation.json`'  # noqa
+                )
 
         # A patch for llama when batch_padding = True
         if 'decapoda-research/llama' in path or \
@@ -104,10 +129,15 @@ class HuggingFace(BaseModel):
                     path: str,
                     model_kwargs: dict,
                     peft_path: Optional[str] = None):
-        from transformers import AutoModel
+        from transformers import AutoModel, AutoModelForCausalLM
 
         model_kwargs.setdefault('torch_dtype', torch.float16)
-        self.model = AutoModel.from_pretrained(path, **model_kwargs)
+        try:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                path, **model_kwargs)
+        except ValueError:
+            self.model = AutoModel.from_pretrained(path, **model_kwargs)
+
         if peft_path is not None:
             from peft import PeftModel
             self.model = PeftModel.from_pretrained(self.model,
@@ -203,7 +233,9 @@ class HuggingFace(BaseModel):
                                    max_length=self.max_seq_len -
                                    max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
-        outputs = self.model.generate(input_ids,
+        # To accommodate the PeftModel, parameters should be passed in
+        # key-value format for generate.
+        outputs = self.model.generate(input_ids=input_ids,
                                       max_new_tokens=max_out_len,
                                       **kwargs)
 
@@ -291,7 +323,7 @@ class HuggingFace(BaseModel):
         """
 
         outputs, inputs = self.get_logits(inputs)
-        shift_logits = outputs[..., :-1, :].contiguous()
+        shift_logits = outputs[..., :-1, :].contiguous().float()
 
         shift_labels = inputs['tokens']['input_ids'][..., 1:].contiguous()
 

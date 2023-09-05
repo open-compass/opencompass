@@ -59,7 +59,20 @@ class LocalRunner(BaseRunner):
             for task in tasks:
                 task = TASKS.build(dict(type=self.task_cfg.type, cfg=task))
                 task_name = task.name
-                task.run()
+                # get cmd
+                mmengine.mkdir_or_exist('tmp/')
+                param_file = f'tmp/{os.getpid()}_params.py'
+                try:
+                    task.cfg.dump(param_file)
+                    cmd = task.get_command(cfg_path=param_file,
+                                           template='{task_cmd}')
+                    # run in subprocess if starts with torchrun etc.
+                    if cmd.startswith('python'):
+                        task.run()
+                    else:
+                        subprocess.run(cmd, shell=True, text=True)
+                finally:
+                    os.remove(param_file)
                 status.append((task_name, 0))
         else:
             import torch
@@ -130,31 +143,34 @@ class LocalRunner(BaseRunner):
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
         param_file = f'tmp/{os.getpid()}_{index}_params.py'
-        task.cfg.dump(param_file)
+        try:
+            task.cfg.dump(param_file)
 
-        # Build up slurm command
-        tmpl = 'CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
-        tmpl += ' {task_cmd}'
-        get_cmd = partial(task.get_command, cfg_path=param_file, template=tmpl)
-        cmd = get_cmd()
+            # Build up slurm command
+            tmpl = 'CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
+            tmpl += ' {task_cmd}'
+            get_cmd = partial(task.get_command,
+                              cfg_path=param_file,
+                              template=tmpl)
+            cmd = get_cmd()
 
-        logger = get_logger()
-        logger.debug(f'Running command: {cmd}')
+            logger = get_logger()
+            logger.debug(f'Running command: {cmd}')
 
-        # Run command
-        out_path = task.get_log_path(file_extension='out')
-        mmengine.mkdir_or_exist(osp.split(out_path)[0])
-        stdout = open(out_path, 'w', encoding='utf-8')
+            # Run command
+            out_path = task.get_log_path(file_extension='out')
+            mmengine.mkdir_or_exist(osp.split(out_path)[0])
+            stdout = open(out_path, 'w', encoding='utf-8')
 
-        result = subprocess.run(cmd,
-                                shell=True,
-                                text=True,
-                                stdout=stdout,
-                                stderr=stdout)
+            result = subprocess.run(cmd,
+                                    shell=True,
+                                    text=True,
+                                    stdout=stdout,
+                                    stderr=stdout)
 
-        if result.returncode != 0:
-            logger.warning(f'task {task_name} fail, see\n{out_path}')
-
-        # Clean up
-        os.remove(param_file)
+            if result.returncode != 0:
+                logger.warning(f'task {task_name} fail, see\n{out_path}')
+        finally:
+            # Clean up
+            os.remove(param_file)
         return task_name, result.returncode

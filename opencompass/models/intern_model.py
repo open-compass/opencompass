@@ -104,7 +104,7 @@ class InternLM(BaseModel):
         """
         outputs, inputs = self.generator.get_logits(input_texts)
 
-        shift_logits = outputs[..., :-1, :].contiguous()
+        shift_logits = outputs[..., :-1, :].contiguous().float()
         shift_labels = inputs['tokens'][..., 1:].contiguous()
 
         loss_fct = torch.nn.CrossEntropyLoss(

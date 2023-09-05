@@ -74,13 +74,107 @@ OpenCompass 已经支持了大多数常用于性能比较的数据集，具体�
 
 # 快速上手
 
-OpenCompass 的评测以配置文件为中心，必须包含 `datasets` 和 `models` 字段，配置需要评测的模型以及数据集，使用入口 'run.py' 启动。
-
 我们会以测试 [OPT-125M](https://huggingface.co/facebook/opt-125m) 以及 [OPT-350M](https://huggingface.co/facebook/opt-350m) 预训练基座模型在 [SIQA](https://huggingface.co/datasets/social_i_qa) 和 [Winograd](https://huggingface.co/datasets/winogrande) 上的性能为例，带领你熟悉 OpenCompass 的一些基本功能。
-本次的测试的配置文件为[configs/eval_demo.py](https://github.com/InternLM/opencompass/blob/main/configs/eval_demo.py)。
 
 运行前确保已经安装了 OpenCompass，本实验可以在单张 _GTX-1660-6G_ 显卡上成功运行。
 更大参数的模型，如 Llama-7B, 可参考 [configs](https://github.com/InternLM/opencompass/tree/main/configs) 中其他例子。
+
+## 配置任务
+
+OpenCompass 中，每个评测任务都由待评测的模型和数据集组成，而评测的入口为 `run.py`。用户可以通过命令行或配置文件的方式去选择待测的模型和数据集。
+
+`````{tabs}
+
+````{tab} 命令行形式
+用户可以通过 `--models` 和 `--datasets` 组合待测试的模型和数据集。
+
+```bash
+python run.py --models opt_125m opt_350m --datasets siqa_gen winograd_ppl
+```
+
+模型和数据集以配置文件的形式预先存放在 `configs/models` 和 `configs/datasets` 下。用户可以通过 `tools/list_configs.py` 查看或筛选当前可用的模型和数据集配置。
+
+```bash
+# 列出所有配置
+python tools/list_configs.py
+# 列出所有跟 llama 及 mmlu 相关的配置
+python tools/list_configs.py llama mmlu
+```
+
+部分样例输出如下：
+
+```text
++-----------------+-----------------------------------+
+| Model           | Config Path                       |
+|-----------------+-----------------------------------|
+| hf_llama2_13b   | configs/models/hf_llama2_13b.py   |
+| hf_llama2_70b   | configs/models/hf_llama2_70b.py   |
+| ...             | ...                               |
++-----------------+-----------------------------------+
++-------------------+---------------------------------------------------+
+| Dataset           | Config Path                                       |
+|-------------------+---------------------------------------------------|
+| cmmlu_gen         | configs/datasets/cmmlu/cmmlu_gen.py               |
+| cmmlu_gen_ffe7c0  | configs/datasets/cmmlu/cmmlu_gen_ffe7c0.py        |
+| ...               | ...                                               |
++-------------------+---------------------------------------------------+
+```
+
+用户可以按照第一列中的名称去作为 `python run.py` 中 `--models` 和 `--datasets` 的传入参数。在数据集部分，相同名称但不同后缀的数据集一般意味着其提示词或评测方式是不一样的。
+
+对于 HuggingFace 模型，用户可以直接通过命令行设定模型参数，而无需额外配置文件。例如，对于 `facebook/opt-125m` 模型，可以通过以下命令进行评测：
+
+```bash
+python run.py --datasets siqa_gen winograd_ppl \
+--hf-model facebook/opt-125m \
+--model-kwargs device_map='auto' \
+--tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \
+--max-seq-len 2048 \
+--max-out-len 100 \
+--batch-size 128  \
+--num-gpus 1
+```
+
+```{tip}
+关于 `run.py` 支持的所有 HuggingFace 相关参数，请阅读 [评测任务发起](./user_guides/experimentation.md#评测任务发起)。
+```
+
+
+````
+
+````{tab} 配置形式
+
+除了通过在命令行中对实验进行配置，OpenCompass 也支持用户把实验全量配置写入一份配置文件中，并直接通过 `run.py` 运行。这样的配置方式允许用户方便地修改实验参数，对实验进行更灵活的配置，也让运行命令更为简洁。配置文件以 Python 格式组织，且必须包含 `datasets` 和 `models` 字段。
+
+本次的测试的配置文件为 [configs/eval_demo.py](/configs/eval_demo.py)。该配置通过[继承机制](./user_guides/config.md#继承机制)引入了所需的数据集和模型配置，并按照格式组合了 `datasets` 和 `models` 字段。
+
+```python
+from mmengine.config import read_base
+
+with read_base():
+    from .datasets.siqa.siqa_gen import siqa_datasets
+    from .datasets.winograd.winograd_ppl import winograd_datasets
+    from .models.hf_opt_125m import opt125m
+    from .models.hf_opt_350m import opt350m
+
+datasets = [*siqa_datasets, *winograd_datasets]
+models = [opt125m, opt350m]
+
+```
+
+在运行任务时，我们只需要往 `run.py` 传入配置文件的路径即可：
+
+```bash
+python run.py configs/eval_demo.py
+```
+
+````
+
+`````
+
+配置文件评测方式较为简洁，下文将以该方式为例讲解其余功能。
+
+## 运行评测
 
 由于 OpenCompass 默认使用并行的方式进行评测，为了便于及时发现问题，我们可以在首次启动时使用 debug 模式运行，该模式会将任务串行执行，并会实时输出任务的执行进度。
 
@@ -103,9 +197,61 @@ python run.py configs/eval_demo.py -w outputs/demo
 
 运行 demo 期间，我们来介绍一下本案例中的配置内容以及启动选项。
 
-## 步骤详解
+## 配置详解
+
+### 模型列表 `models`
+
+OpenCompass 在 `configs/models` 下提供了一系列预定义好的模型配置。下面为 [opt-350m](/configs/models/hf_opt_350m.py) (`configs/models/hf_opt_350m.py`) 相关的配置片段：
+
+```python
+# 提供直接使用 HuggingFaceCausalLM 模型的接口
+from opencompass.models import HuggingFaceCausalLM
+
+# OPT-350M
+opt350m = dict(
+       type=HuggingFaceCausalLM,
+       # 以下参数为 HuggingFaceCausalLM 相关的初始化参数
+       path='facebook/opt-350m',  # HuggingFace 模型地址
+       tokenizer_path='facebook/opt-350m',
+       tokenizer_kwargs=dict(
+           padding_side='left',
+           truncation_side='left',
+           trust_remote_code=True),
+       model_kwargs=dict(device_map='auto'),  # 构造 model 的参数
+       # 下列参数为所有模型均需设定的初始化参数，非 HuggingFaceCausalLM 独有
+       abbr='opt350m',                    # 模型简称，用于结果展示
+       max_seq_len=2048,              # 模型能接受的最大序列长度
+       max_out_len=100,                   # 最长生成 token 数
+       batch_size=64,                     # 批次大小
+       run_cfg=dict(num_gpus=1),          # 运行模型所需的gpu数
+    )
+```
+
+在使用配置时，我们可以通过在命令行参数中使用 `--models` 指定相关文件，也可以通过继承机制在实验配置文件中导入模型配置，并加入到 `models` 列表中。
+
+如果你想要测试的 HuggingFace 模型不在其中，也可以在命令行中直接指定相关参数。
+
+```bash
+python run.py \
+--hf-model facebook/opt-350m \  # HuggingFace 模型地址
+--tokenizer-path facebook/opt-350m \  # HuggingFace tokenizer 地址（如与模型地址相同，可省略）
+--tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # 构造 tokenizer 的参数
+--model-kwargs device_map='auto' \  # 构造 model 的参数
+--max-seq-len 2048 \  # 模型能接受的最大序列长度
+--max-out-len 100 \  # 最长生成 token 数
+--batch-size 64  \  # 批次大小
+--num-gpus 1  # 运行模型所需的gpu数
+```
+
+HuggingFace 中的 'facebook/opt-350m' 以及 'facebook/opt-125m' 权重会在运行时自动下载。
+
+```{note}
+如果需要了解更多参数的说明，或 API 模型及自定义模型的测试，可阅读 [准备模型](./user_guides/models.md)。
+```
 
 ### 数据集列表 `datasets`
+
+与模型类似，数据集的配置文件都提供在 `configs/datasets` 下，用户可以在命令行中通过 `--datasets` ，或在配置文件中通过继承导入相关配置。
 
 以下为 `configs/eval_demo.py` 中与数据集相关的配置片段：
 
@@ -120,67 +266,17 @@ with read_base():
 datasets = [*siqa_datasets, *winograd_datasets]       # 最后 config 需要包含所需的评测数据集列表 datasets
 ```
 
-[configs/datasets](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets) 包含各种数据集预先定义好的配置文件；
-部分数据集文件夹下有 'ppl' 和 'gen' 两类配置文件，表示使用的评估方式，其中 `ppl` 表示使用判别式评测， `gen` 表示使用生成式评测。
+数据集的配置通常为 'ppl' 和 'gen' 两类配置文件，表示使用的评估方式。其中 `ppl` 表示使用判别式评测， `gen` 表示使用生成式评测。
 
-[configs/datasets/collections](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets/collections) 存放了各类数据集集合，方便做综合评测。
+此外，[configs/datasets/collections](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets/collections) 存放了各类数据集集合，方便做综合评测。OpenCompass 常用 [`base_medium.py`](/configs/datasets/collections/base_medium.py) 对模型进行全量测试。若需要复现结果，直接导入该文件即可。如：
 
-更多介绍可查看 [数据集配置](./user_guides/dataset_prepare.md)。
-
-### 模型列表 `models`
-
-OpenCompass 支持直接在配置中指定待测试的模型列表，对于 HuggingFace 模型来说，用户通常无需添加代码。下面为相关的配置片段：
-
-```python
-# 提供直接使用 HuggingFaceCausalLM 模型的接口
-from opencompass.models import HuggingFaceCausalLM
-
-# OPT-350M
-opt350m = dict(
-       type=HuggingFaceCausalLM,
-       # 以下参数为 HuggingFaceCausalLM 相关的初始化参数
-       path='facebook/opt-350m',
-       tokenizer_path='facebook/opt-350m',
-       tokenizer_kwargs=dict(
-           padding_side='left',
-           truncation_side='left',
-           proxies=None,
-           trust_remote_code=True),
-       model_kwargs=dict(device_map='auto'),
-       # 下列参数为所有模型均需设定的初始化参数，非 HuggingFaceCausalLM 独有
-       abbr='opt350m',                    # 模型简称，用于结果展示
-       max_seq_len=2048,              # 模型能接受的最大序列长度
-       max_out_len=100,                   # 最长生成 token 数
-       batch_size=64,                     # 批次大小
-       run_cfg=dict(num_gpus=1),          # 运行配置，用于指定资源需求
-    )
-
-# OPT-125M
-opt125m = dict(
-       type=HuggingFaceCausalLM,
-       # 以下参数为 HuggingFaceCausalLM 的初始化参数
-       path='facebook/opt-125m',
-       tokenizer_path='facebook/opt-125m',
-       tokenizer_kwargs=dict(
-           padding_side='left',
-           truncation_side='left',
-           proxies=None,
-           trust_remote_code=True),
-       model_kwargs=dict(device_map='auto'),
-       # 下列参数为所有模型均需设定的初始化参数，非 HuggingFaceCausalLM 独有
-       abbr='opt125m',                # 模型简称，用于结果展示
-       max_seq_len=2048,              # 模型能接受的最大序列长度
-       max_out_len=100,               # 最长生成 token 数
-       batch_size=128,                # 批次大小
-       run_cfg=dict(num_gpus=1),      # 运行配置，用于指定资源需求
-    )
-
-models = [opt350m, opt125m]
+```bash
+python run.py --models hf_llama_7b --datasets base_medium
 ```
 
-HuggingFace 中的 'facebook/opt-350m' 以及 'facebook/opt-125m' 权重会在运行时自动下载。
-
-关于模型配置的更多介绍可阅读 [准备模型](./user_guides/models.md)。
+```{note}
+更多介绍可查看 [数据集配置](./user_guides/dataset_prepare.md)。
+```
 
 ### 启动评测
 
@@ -245,6 +341,10 @@ outputs/default/
 ├── ...
 ```
 
+打印评测结果的过程可被进一步定制化，用于输出一些数据集的平均分 (例如 MMLU, C-Eval 等)。
+
+关于评测结果输出的更多介绍可阅读 [结果展示](./user_guides/summarizer.md)。
+
 ## 更多教程
 
 想要更多了解 OpenCompass, 可以点击下列链接学习。
@@ -253,4 +353,5 @@ outputs/default/
 - [准备模型](./user_guides/models.md)
 - [任务运行和监控](./user_guides/experimentation.md)
 - [如何调Prompt](./prompt/overview.md)
+- [结果展示](./user_guides/summarizer.md)
 - [学习配置文件](./user_guides/config.md)

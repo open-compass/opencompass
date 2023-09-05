@@ -37,10 +37,10 @@ minigpt_4_vsr_dataloader = dict(batch_size=1,
 # model settings
 minigpt_4_vsr_model = dict(
     type='minigpt-4',
-    low_resource=True,
+    low_resource=False,
     img_size=224,
     max_length=10,
-    llama_model='/path/to/vicuna-7b/',
+    llama_model='/path/to/vicuna_weights_7b/',
     prompt_constructor=dict(type=MiniGPT4VSRPromptConstructor,
                             image_prompt='###Human: <Img><ImageHere></Img>',
                             reply_prompt='###Assistant:'),
