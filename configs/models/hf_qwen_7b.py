@@ -19,6 +19,7 @@ models = [
             use_fast=False,
             revision='39fc5fdcb95c8c367bbdb3bfc0db71d96266de09'
         ),
+        pad_token_id=151643,
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,
