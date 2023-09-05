@@ -154,14 +154,9 @@ class AttackInferencer(BaseInferencer):
             proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
             pred_strs = [proc(s, **kwargs) for s in pred_strs]
 
-        # TODO: Move to dataset
-        gt_dict = {
-            1: 'A',
-            0: 'B',
-        }
         icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
         result = icl_evaluator.score(
-            predictions=pred_strs, references=[gt_dict[i] for i in label_list])
+            predictions=pred_strs, references=label_list)
         return result['accuracy'] / 100
 
     def get_generation_prompt_list_from_retriever_indices(
