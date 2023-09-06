@@ -23,4 +23,5 @@ from .openflamingo import *  # noqa: F401, F403
 if osp.exists('opencompass/multimodal/models/otter/Otter'):
     from .otter import *  # noqa: F401, F403
 
+from .qwen import *  # noqa: F401, F403
 from .visualglm import *  # noqa: F401, F403
