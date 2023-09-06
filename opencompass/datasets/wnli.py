@@ -12,12 +12,13 @@ class wnliDataset(BaseDataset):
     def load(**kwargs):
 
         dataset = load_dataset(**kwargs)
-        dataset = dataset['validation']
+        # dataset = dataset['validation']
         gt_dict = {
             1: 'A',
             0: 'B',
             -1: -1,
         }
+
         def preprocess(example):
             example['label_option'] = gt_dict[example['label']]
             return example
