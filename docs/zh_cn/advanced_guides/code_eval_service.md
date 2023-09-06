@@ -134,7 +134,7 @@ curl -X POST -F 'file=@./examples/humanevalx/python.json' -F 'dataset=humanevalx
 得到结果：
 
 ```
-"{\"pass@1\": 37.19512195121951}"%
+"{\"pass@1\": 37.19512195121951%}"
 ```
 
 另外我们额外提供了 `with-prompt` 选项（默认为True），由于有些模型生成结果包含完整的代码（如WizardCoder），不需要 prompt + prediciton 的形式进行拼接，可以参考以下命令进行评测。

@@ -1,6 +1,6 @@
 # Code Evaluation Tutorial
 
-To complete LLM code capability evaluation, we need to set up an independent evaluation environment to avoid executing erroneous codes on development environments which would cause unavoidable losses. The current Code Evaluation Service used in OpenCompass refers to the project [code-evaluator](https://github.com/Ezra-Yu/code-evaluator), which has already supported evaluating datasets for multiple programming languages [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x). The following tutorials will introduce how to conduct code review services under different requirements.
+To complete LLM code capability evaluation, we need to set up an independent evaluation environment to avoid executing erroneous codes on development environments which would cause unavoidable losses. The current Code Evaluation Service used in OpenCompass refers to the project [code-evaluator](https://github.com/open-compass/code-evaluator.git), which has already supported evaluating datasets for multiple programming languages [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x). The following tutorials will introduce how to conduct code review services under different requirements.
 
 ## Launching the Code Evaluation Service
 
@@ -8,7 +8,7 @@ To complete LLM code capability evaluation, we need to set up an independent eva
 2. Pull the source code of the code evaluation service project and build the Docker image.
 
 ```shell
-git clone https://github.com/Ezra-Yu/code-evaluator.git
+git clone https://github.com/open-compass/code-evaluator.git
 cd code-evaluator/docker
 sudo docker build -t code-eval:latest .
 ```
@@ -121,7 +121,7 @@ workdir/humanevalx
 
 ### Code Evaluation
 
-Make sure your code evaluation serive is started, and use `curl` to request:
+Make sure your code evaluation service is started, and use `curl` to request:
 
 ```shell
 curl -X POST -F 'file=@{result_absolute_path}' -F 'dataset={dataset/language}' {your_service_ip_address}:{your_service_port}/evaluate
@@ -136,7 +136,7 @@ curl -X POST -F 'file=@./examples/humanevalx/python.json' -F 'dataset=humanevalx
 The we have:
 
 ```
-"{\"pass@1\": 37.19512195121951}"%
+"{\"pass@1\": 37.19512195121951%}"
 ```
 
 Additionally, we offer an extra option named `with_prompt`(Defaults to `True`), since some models(like `WizardCoder`) generate complete codes without requiring the form of concatenating prompt and prediction. You may refer to the following commands for evaluation.
@@ -161,7 +161,7 @@ Please refer to the [tutorial on supporting new datasets](./new_dataset.md).
 
 ### Debugging Code Evaluation Service
 
-When modifying either support for new datasets or post-processing, it is possible that modifications need to be made to the original code evaluation service. Please make changes according to your needs to the following sections:
+When supporting new datasets or modifying post-processors, it is possible that modifications need to be made to the original code evaluation service. Please make changes based on the following steps:
 
 1. Remove the installation of the `code-evaluator` in `Dockerfile`, mount the `code-evaluator` when starting the container instead:
 
