@@ -1,6 +1,6 @@
 # 代码评测教程
 
-为了完成LLM代码能力评测，我们需要搭建一套独立的评测环境，避免在开发环境执行错误代码从而造成不可避免的损失。目前 OpenCompass 使用的代码评测服务可参考[code-evaluator](https://github.com/Ezra-Yu/code-evaluator)项目，并已经支持评测多编程语言的数据集 [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x)。接下来将围绕代码评测服务介绍不同需要下的评测教程。
+为了完成LLM代码能力评测，我们需要搭建一套独立的评测环境，避免在开发环境执行错误代码从而造成不可避免的损失。目前 OpenCompass 使用的代码评测服务可参考[code-evaluator](https://github.com/open-compass/code-evaluator)项目，并已经支持评测多编程语言的数据集 [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x)。接下来将围绕代码评测服务介绍不同需要下的评测教程。
 
 ## 启动代码评测服务
 
@@ -8,7 +8,7 @@
 2. 拉取代码评测服务项目，并构建 docker 镜像
 
 ```shell
-git clone https://github.com/Ezra-Yu/code-evaluator.git
+git clone https://github.com/open-compass/code-evaluator.git
 cd code-evaluator/docker
 sudo docker build -t code-eval:latest .
 ```
@@ -64,7 +64,7 @@ humanevalx_eval_cfg_dict = {
                 type=HumanevalXEvaluator,
                 language=lang,
                 ip_address="localhost",    # replace to your code_eval_server ip_address, port
-                port=5000),               # refer to https://github.com/Ezra-Yu/code-evaluator to launch a server
+                port=5000),               # refer to https://github.com/open-compass/code-evaluator to launch a server
             pred_role='BOT')
     for lang in ['python', 'cpp', 'go', 'java', 'js']   # do not support rust now
 }
