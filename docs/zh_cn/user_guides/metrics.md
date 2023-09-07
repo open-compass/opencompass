@@ -12,7 +12,7 @@
 
 ## 已支持评估指标
 
-目前 OpenCompass 中，常用的 Evaluator 主要放在 [`opencompass/openicl/icl_evaluator`](https://github.com/InternLM/opencompass/tree/main/opencompass/openicl/icl_evaluator)文件夹下， 还有部分数据集特有指标的放在 [`opencompass/datasets`](https://github.com/InternLM/opencompass/tree/main/opencompass/datasets) 的部分文件中。以下是汇总：
+目前 OpenCompass 中，常用的 Evaluator 主要放在 [`opencompass/openicl/icl_evaluator`](https://github.com/open-compass/opencompass/tree/main/opencompass/openicl/icl_evaluator)文件夹下， 还有部分数据集特有指标的放在 [`opencompass/datasets`](https://github.com/open-compass/opencompass/tree/main/opencompass/datasets) 的部分文件中。以下是汇总：
 
 | 评估指标           | 评估策略             | 常用后处理方式              | 数据集                                                               |
 | ------------------ | -------------------- | --------------------------- | -------------------------------------------------------------------- |
@@ -33,7 +33,7 @@
 
 评估标准配置一般放在数据集配置文件中，最终的 xxdataset_eval_cfg 会传给 `dataset.infer_cfg` 作为实例化的一个参数。
 
-下面是 `govrepcrs_eval_cfg` 的定义， 具体可查看 [configs/datasets/govrepcrs](https://github.com/InternLM/opencompass/tree/main/configs/datasets/govrepcrs)。
+下面是 `govrepcrs_eval_cfg` 的定义， 具体可查看 [configs/datasets/govrepcrs](https://github.com/open-compass/opencompass/tree/main/configs/datasets/govrepcrs)。
 
 ```python
 from opencompass.openicl.icl_evaluator import BleuEvaluator
