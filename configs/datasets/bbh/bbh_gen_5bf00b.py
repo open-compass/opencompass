@@ -1,4 +1,4 @@
-from os.path import exists
+import os
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -6,8 +6,6 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import BBHDataset, BBHEvaluator, bbh_mcq_postprocess
 
 bbh_reader_cfg = dict(input_columns=["input"], output_column="target")
-
-_path_prefix = "./data/BBH"
 
 bbh_multiple_choice_sets = [
     'temporal_sequences',
@@ -43,9 +41,8 @@ bbh_free_form_sets = [
 
 bbh_datasets = []
 for _name in bbh_multiple_choice_sets:
-    _hint = None
-    if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
-        _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
+    with open(os.path.join(os.path.dirname(__file__), 'lib_prompt', f'{_name}.txt'), 'r') as f:
+        _hint = f.read()
     bbh_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -53,7 +50,7 @@ for _name in bbh_multiple_choice_sets:
                 dict(
                     role="HUMAN",
                     prompt=
-                    f"Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: Let's think step by step."
+                    f"Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: "
                 )
             ])),
         retriever=dict(type=ZeroRetriever),
@@ -67,7 +64,7 @@ for _name in bbh_multiple_choice_sets:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path=f"{_path_prefix}/data",
+            path=f"./data/BBH/data",
             name=_name,
             abbr='bbh-' + _name,
             reader_cfg=bbh_reader_cfg,
@@ -75,9 +72,8 @@ for _name in bbh_multiple_choice_sets:
             eval_cfg=bbh_eval_cfg.copy()))
 
 for _name in bbh_free_form_sets:
-    _hint = None
-    if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
-        _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
+    with open(os.path.join(os.path.dirname(__file__), 'lib_prompt', f'{_name}.txt'), 'r') as f:
+        _hint = f.read()
     bbh_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -85,7 +81,7 @@ for _name in bbh_free_form_sets:
                 dict(
                     role="HUMAN",
                     prompt=
-                    f"Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: Let's think step by step."
+                    f"Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: "
                 )
             ])),
         retriever=dict(type=ZeroRetriever),
@@ -95,11 +91,9 @@ for _name in bbh_free_form_sets:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path=f"{_path_prefix}/data",
+            path=f"./data/BBH/data",
             name=_name,
             abbr='bbh-' + _name,
             reader_cfg=bbh_reader_cfg,
             infer_cfg=bbh_infer_cfg.copy(),
             eval_cfg=bbh_eval_cfg.copy()))
-
-del _name, _hint, _path_prefix
