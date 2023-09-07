@@ -30,6 +30,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :maxdepth: 1
    :caption: User Guides
 
+   user_guides/framework_overview.md
    user_guides/config.md
    user_guides/datasets.md
    user_guides/models.md

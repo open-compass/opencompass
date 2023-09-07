@@ -10,7 +10,7 @@ The primary evaluation targets of this algorithm library are large language mode
 
 ## Tool Architecture
 
-![framework-cn](https://github.com/tonysy/opencompass/assets/7881589/374d9cec-2ebc-442a-ab11-191a7d5cf5e9)
+![framework-en](https://github.com/open-compass/opencompass/assets/17680578/b4d4bf4b-a673-4efe-b522-9337d4f7391a)
 
 - Model Layer: This encompasses the primary model categories involved in large model evaluations. OpenCompass focuses on base models and chat models for in-depth evaluations.
 - Capability Layer: OpenCompass evaluates models based on general capabilities and special features. In terms of general capabilities, models are evaluated on language, knowledge, understanding, reasoning, safety, and other dimensions. In terms of special capabilities, evaluations are based on long texts, code, tools, and knowledge enhancement.
