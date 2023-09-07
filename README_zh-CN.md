@@ -4,14 +4,14 @@
   <br />
 
 [![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/zh_CN)
-[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
+[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/open-compass/opencompass/blob/main/LICENSE)
 
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
 [🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/zh_CN/latest/index.html) |
 [🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id1) |
-[🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
+[🤔Reporting Issues](https://github.com/open-compass/opencompass/issues/new/choose)
 
 [English](/README.md) | 简体中文
 
@@ -29,7 +29,7 @@
 
 > **🔥 注意**<br />
 > 我们正式启动 OpenCompass 共建计划，诚邀社区用户为 OpenCompass 提供更具代表性和可信度的客观评测数据集!
-> 点击 [Issue](https://github.com/InternLM/opencompass/issues/248) 获取更多数据集.
+> 点击 [Issue](https://github.com/open-compass/opencompass/issues/248) 获取更多数据集.
 > 让我们携手共进，打造功能强大易用的大模型评测平台！
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
@@ -312,11 +312,11 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 ```Python
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
 conda activate opencompass
-git clone https://github.com/InternLM/opencompass opencompass
+git clone https://github.com/open-compass/opencompass opencompass
 cd opencompass
 pip install -e .
 # 下载数据集到 data/ 处
-wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 
@@ -392,7 +392,7 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 @misc{2023opencompass,
     title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
     author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/InternLM/OpenCompass}},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
     year={2023}
 }
 ```

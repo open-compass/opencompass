@@ -103,7 +103,7 @@ use the PIQA dataset configuration file as an example to demonstrate the meaning
 configuration file. If you do not intend to modify the prompt for model testing or add new datasets, you can
 skip this section.
 
-The PIQA dataset [configuration file](https://github.com/InternLM/opencompass/blob/main/configs/datasets/piqa/piqa_ppl_1cf9f0.py) is as follows.
+The PIQA dataset [configuration file](https://github.com/open-compass/opencompass/blob/main/configs/datasets/piqa/piqa_ppl_1cf9f0.py) is as follows.
 It is a configuration for evaluating based on perplexity (PPL) and does not use In-Context Learning.
 
 ```python

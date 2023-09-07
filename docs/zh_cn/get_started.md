@@ -12,7 +12,7 @@
 2. 安装 OpenCompass：
 
    ```bash
-   git clone https://github.com/InternLM/opencompass.git
+   git clone https://github.com/open-compass/opencompass.git
    cd opencompass
    pip install -e .
    ```
@@ -51,7 +51,7 @@
    cd ..
    ```
 
-   你可以在 `configs/models` 下找到所有 Llama / Llama-2 / Llama-2-chat 模型的配置文件示例。([示例](https://github.com/InternLM/opencompass/blob/eb4822a94d624a4e16db03adeb7a59bbd10c2012/configs/models/llama2_7b_chat.py))
+   你可以在 `configs/models` 下找到所有 Llama / Llama-2 / Llama-2-chat 模型的配置文件示例。([示例](https://github.com/open-compass/opencompass/blob/eb4822a94d624a4e16db03adeb7a59bbd10c2012/configs/models/llama2_7b_chat.py))
 
    </details>
 
@@ -66,7 +66,7 @@ OpenCompass 支持的数据集主要包括两个部分：
 在 OpenCompass 项目根目录下运行下面命令，将数据集准备至 `${OpenCompass}/data` 目录下：
 
 ```bash
-wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 
@@ -77,7 +77,7 @@ OpenCompass 已经支持了大多数常用于性能比较的数据集，具体�
 我们会以测试 [OPT-125M](https://huggingface.co/facebook/opt-125m) 以及 [OPT-350M](https://huggingface.co/facebook/opt-350m) 预训练基座模型在 [SIQA](https://huggingface.co/datasets/social_i_qa) 和 [Winograd](https://huggingface.co/datasets/winogrande) 上的性能为例，带领你熟悉 OpenCompass 的一些基本功能。
 
 运行前确保已经安装了 OpenCompass，本实验可以在单张 _GTX-1660-6G_ 显卡上成功运行。
-更大参数的模型，如 Llama-7B, 可参考 [configs](https://github.com/InternLM/opencompass/tree/main/configs) 中其他例子。
+更大参数的模型，如 Llama-7B, 可参考 [configs](https://github.com/open-compass/opencompass/tree/main/configs) 中其他例子。
 
 ## 配置任务
 
@@ -268,7 +268,7 @@ datasets = [*siqa_datasets, *winograd_datasets]       # 最后 config 需要包�
 
 数据集的配置通常为 'ppl' 和 'gen' 两类配置文件，表示使用的评估方式。其中 `ppl` 表示使用判别式评测， `gen` 表示使用生成式评测。
 
-此外，[configs/datasets/collections](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets/collections) 存放了各类数据集集合，方便做综合评测。OpenCompass 常用 [`base_medium.py`](/configs/datasets/collections/base_medium.py) 对模型进行全量测试。若需要复现结果，直接导入该文件即可。如：
+此外，[configs/datasets/collections](https://github.com/open-compass/opencompass/blob/main/configs/datasets/collections) 存放了各类数据集集合，方便做综合评测。OpenCompass 常用 [`base_medium.py`](/configs/datasets/collections/base_medium.py) 对模型进行全量测试。若需要复现结果，直接导入该文件即可。如：
 
 ```bash
 python run.py --models hf_llama_7b --datasets base_medium
