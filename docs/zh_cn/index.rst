@@ -31,6 +31,7 @@ OpenCompass 上手路线
    :maxdepth: 1
    :caption: 教程
 
+   user_guides/framework_overview.md
    user_guides/config.md
    user_guides/datasets.md
    user_guides/models.md
