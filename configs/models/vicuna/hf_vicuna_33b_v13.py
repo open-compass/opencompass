@@ -4,9 +4,9 @@ from opencompass.models import HuggingFaceCausalLM
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='vicuna-7b-hf',
-        path="lmsys/vicuna-7b-v1.3",
-        tokenizer_path='lmsys/vicuna-7b-v1.3',
+        abbr='vicuna-33b-v1.3-hf',
+        path="lmsys/vicuna-33b-v1.3",
+        tokenizer_path='lmsys/vicuna-33b-v1.3',
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
@@ -17,6 +17,6 @@ models = [
         batch_size=8,
         model_kwargs=dict(device_map='auto'),
         batch_padding=False, # if false, inference with for-loop without batch padding
-        run_cfg=dict(num_gpus=1, num_procs=1)
+        run_cfg=dict(num_gpus=4, num_procs=1)
     )
 ]

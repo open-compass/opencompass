@@ -23,7 +23,7 @@ models = [
         max_seq_len=2048,
         batch_size=8,
         meta_template=_meta_template,
-        model_kwargs=dict(trust_remote_code=True, device_map='auto', revision='0ba4d6fc479bdedd6a3f8d4d3425025c5f501800'),
+        model_kwargs=dict(trust_remote_code=True, device_map='auto'),
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
