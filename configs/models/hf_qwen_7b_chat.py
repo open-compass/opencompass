@@ -19,6 +19,7 @@ models = [
             truncation_side='left',
             trust_remote_code=True,
             use_fast=False,),
+        pad_token_id=151643,
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,

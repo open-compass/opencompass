@@ -29,7 +29,7 @@ class SizePartitioner(BasePartitioner):
 
     def __init__(self,
                  out_dir: str,
-                 max_task_size: int = 2000,
+                 max_task_size: int = 40000,
                  gen_task_coef: int = 20,
                  dataset_size_path: str = '.cache/dataset_size.json'):
         super().__init__(out_dir)

@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         我们推荐使用英语模板 Bug report，以便你的问题帮助更多人。
-        如果需要询问一般性的问题或者想法，请在我们的[**论坛**](https://github.com/InternLM/opencompass/discussions)讨论。
+        如果需要询问一般性的问题或者想法，请在我们的[**论坛**](https://github.com/open-compass/opencompass/discussions)讨论。
         如果你已经有了解决方案，我们非常欢迎你直接创建一个新的 PR 来解决这个问题。创建 PR 的流程可以参考[文档](https://opencompass.readthedocs.io/zh_CN/master/community/CONTRIBUTING.html)。
         如果你需要我们的帮助，请填写以下内容帮助我们定位 Bug。
 
@@ -16,9 +16,9 @@ body:
       label: 先决条件
       description: 在创建新问题之前，请检查以下项目。
       options:
-      - label: 我已经搜索过 [问题](https://github.com/InternLM/opencompass/issues/) 和 [讨论](https://github.com/InternLM/opencompass/discussions) 但未得到预期的帮助。
+      - label: 我已经搜索过 [问题](https://github.com/open-compass/opencompass/issues/) 和 [讨论](https://github.com/open-compass/opencompass/discussions) 但未得到预期的帮助。
         required: true
-      - label: 错误在 [最新版本](https://github.com/InternLM/opencompass) 中尚未被修复。
+      - label: 错误在 [最新版本](https://github.com/open-compass/opencompass) 中尚未被修复。
         required: true
 
   - type: dropdown

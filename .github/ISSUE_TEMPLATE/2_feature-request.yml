@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        For general questions or idea discussions, please post it to our [**Forum**](https://github.com/InternLM/opencompass/discussions).
+        For general questions or idea discussions, please post it to our [**Forum**](https://github.com/open-compass/opencompass/discussions).
         If you have already implemented the feature, we strongly appreciate you creating a new PR according to [the tutorial](https://opencompass.readthedocs.io/en/master/community/CONTRIBUTING.html)!
 
   - type: textarea

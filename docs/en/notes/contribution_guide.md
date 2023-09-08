@@ -43,7 +43,7 @@ Pull requests let you tell others about changes you have pushed to a branch in a
 - When you work on your first PR
 
   Fork the OpenCompass repository: click the **fork** button at the top right corner of Github page
-  ![avatar](https://github.com/InternLM/opencompass/assets/22607038/851ed33d-02db-49c9-bf94-7c62eee89eb2)
+  ![avatar](https://github.com/open-compass/opencompass/assets/22607038/851ed33d-02db-49c9-bf94-7c62eee89eb2)
 
   Clone forked repository to local
 
@@ -102,7 +102,7 @@ git checkout main -b branchname
   ```
 
 - Create a PR
-  ![avatar](https://github.com/InternLM/opencompass/assets/22607038/08feb221-b145-4ea8-8e20-05f143081604)
+  ![avatar](https://github.com/open-compass/opencompass/assets/22607038/08feb221-b145-4ea8-8e20-05f143081604)
 
 - Revise PR message template to describe your motivation and modifications made in this PR. You can also link the related issue to the PR manually in the PR message (For more information, checkout the [official guidance](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)).
 

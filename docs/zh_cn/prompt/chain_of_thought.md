@@ -4,7 +4,7 @@
 
 CoT（思维链）是帮助大型语言模型解决如数学问题和关系推理问题等复杂问题的有效方式，在OpenCompass中，我们支持多种类型的CoT方法。
 
-![image](https://github.com/InternLM/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
+![image](https://github.com/open-compass/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
 
 ## 1. 零样本思维链
 
@@ -72,7 +72,7 @@ gsm8k_eval_cfg = dict(sc_size=SAMPLE_SIZE)
 
 其中 `SAMPLE_SIZE` 是推理路径的数量，较高的值通常会带来更高的性能。SC方法的原论文中展示了不同推理任务间推理路径数量与性能之间的关系：
 
-![image](https://github.com/InternLM/opencompass/assets/28834990/05c7d850-7076-43ca-b165-e6251f9b3001)
+![image](https://github.com/open-compass/opencompass/assets/28834990/05c7d850-7076-43ca-b165-e6251f9b3001)
 
 从图中可以看出，在不同的推理任务中，随着推理路径数量的增加，性能呈现出增长的趋势。但是，对于某些任务，增加推理路径的数量可能达到一个极限，进一步增加推理路径的数量可能不会带来更多的性能提升。因此，需要在具体任务中进行实验和调整，找到最适合任务的推理路径数量。
 
