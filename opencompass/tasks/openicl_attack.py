@@ -130,30 +130,27 @@ class OpenICLAttackTask(BaseTask):
         inferencer.ice_template = ice_template
         inferencer.output_json_filepath = out_dir
         inferencer.output_json_filename = out_file
-        goal_function = PromptGoalFunction(inference=inferencer,
-                                           query_budget=100,
-                                           logger=self.logger,
-                                           model_wrapper=None,
-                                           verbose='True')
-        self.cfg.dataset = 'wnli'
-        self.cfg.attack = 'textfooler'
-        self.cfg.save_file_name = 'tempfile'
-        attack = create_attack(self.cfg, goal_function)
+        goal_function = PromptGoalFunction(
+            inference=inferencer,
+            query_budget=self.cfg['attack'].query_budget,
+            logger=self.logger,
+            model_wrapper=None,
+            verbose='True')
+        attack = create_attack(self.cfg['attack'], goal_function)
 
         prompts = self.infer_cfg['inferencer']['original_prompt_list']
-        # prompts = prompts[:1]
         sorted_prompts = self.prompt_selection(inferencer, prompts)
         if True:
             # if args.prompt_selection:
             for prompt, acc in sorted_prompts:
                 self.logger.info('Prompt: {}, acc: {:.2f}%\n'.format(
                     prompt, acc * 100))
-                with open(out_dir + self.cfg.save_file_name + '.txt',
-                          'a+') as f:
+                with open(out_dir + 'attacklog.txt', 'a+') as f:
                     f.write('Prompt: {}, acc: {:.2f}%\n'.format(
                         prompt, acc * 100))
 
-        for init_prompt, init_acc in sorted_prompts[:1]:
+        for init_prompt, init_acc in sorted_prompts[:self.cfg['attack'].
+                                                    prompt_topk]:
             if init_acc > 0:
                 init_acc, attacked_prompt, attacked_acc, dropped_acc = attack.attack(  # noqa
                     init_prompt)
@@ -164,8 +161,7 @@ class OpenICLAttackTask(BaseTask):
                     'Original acc: {:.2f}%, attacked acc: {:.2f}%, dropped acc: {:.2f}%'  # noqa
                     .format(init_acc * 100, attacked_acc * 100,
                             dropped_acc * 100))
-                with open(out_dir + self.cfg.save_file_name + '.txt',
-                          'a+') as f:
+                with open(out_dir + 'attacklog.txt', 'a+') as f:
                     f.write('Original prompt: {}\n'.format(init_prompt))
                     f.write('Attacked prompt: {}\n'.format(
                         attacked_prompt.encode('utf-8')))
@@ -174,8 +170,7 @@ class OpenICLAttackTask(BaseTask):
                         .format(init_acc * 100, attacked_acc * 100,
                                 dropped_acc * 100))
             else:
-                with open(out_dir + self.cfg.save_file_name + '.txt',
-                          'a+') as f:
+                with open(out_dir + 'attacklog.txt', 'a+') as f:
                     f.write('Init acc is 0, skip this prompt\n')
                     f.write('Original prompt: {}\n'.format(init_prompt))
                     f.write('Original acc: {:.2f}% \n\n'.format(init_acc *
