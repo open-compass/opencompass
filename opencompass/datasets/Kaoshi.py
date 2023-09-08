@@ -10,9 +10,10 @@ from .base import BaseDataset
 
 
 def get_number(options):
+
     result_string = ''
     for i, percentage in enumerate(options,
-                                   start=65):  # 使用ASCII码值作为序号，从大写字母'A'开始
+                                   start=65):
         result_string += f'{chr(i)}. {percentage}\n'
     return result_string
 
@@ -35,8 +36,8 @@ class KaoshiDataset(BaseDataset):
 
 
 valid_kaoshi__question_types = [
-    'single_choice', 'multi_choice', 'multi_question_choice',
-    'five_out_of_seven', 'cloze', 'subjective', 'correction'
+    'single_choice', 'multi_choice',
+    'five_out_of_seven', 'cloze', 'correction'
 ]
 
 
