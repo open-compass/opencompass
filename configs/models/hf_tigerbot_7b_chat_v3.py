@@ -3,17 +3,17 @@ from opencompass.models import HuggingFaceCausalLM
 
 _meta_template = dict(
     round=[
-        dict(role='HUMAN', begin='\n\n### Instruction:\n:'),
-        dict(role='BOT', begin='\n\n### Response:\n:', generate=True),
+        dict(role='HUMAN', begin='\n\n### Instruction:\n'),
+        dict(role='BOT', begin='\n\n### Response:\n', generate=True),
     ],
 )
 
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='tigerbot-sft-7b-hf',
-        path="TigerResearch/tigerbot-7b-sft",
-        tokenizer_path='TigerResearch/tigerbot-7b-sft',
+        abbr='tigerbot-7b-chat-v3-hf',
+        path="TigerResearch/tigerbot-7b-chat",
+        tokenizer_path='TigerResearch/tigerbot-7b-chat',
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',

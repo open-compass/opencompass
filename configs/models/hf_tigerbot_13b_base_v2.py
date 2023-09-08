@@ -4,9 +4,9 @@ from opencompass.models import HuggingFaceCausalLM
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='tigerbot-base-7b-hf',
-        path='TigerResearch/tigerbot-7b-base',
-        tokenizer_path='TigerResearch/tigerbot-7b-base',
+        abbr='tigerbot-13b-base-v2-hf',
+        path='TigerResearch/tigerbot-13b-base',
+        tokenizer_path='TigerResearch/tigerbot-13b-base',
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
@@ -16,6 +16,6 @@ models = [
         max_seq_len=2048,
         batch_size=8,
         model_kwargs=dict(trust_remote_code=True, device_map='auto'),
-        run_cfg=dict(num_gpus=1, num_procs=1),
+        run_cfg=dict(num_gpus=2, num_procs=1),
     ),
 ]

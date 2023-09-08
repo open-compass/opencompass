@@ -1,29 +1,29 @@
 from opencompass.models import HuggingFaceCausalLM
 
-
 _meta_template = dict(
     round=[
-        dict(role='HUMAN', begin='\n\n### Instruction:\n:'),
-        dict(role='BOT', begin='\n\n### Response:\n:', generate=True),
+        dict(role='HUMAN', begin='<reserved_106>'),
+        dict(role='BOT', begin='<reserved_107>', generate=True),
     ],
 )
 
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='tigerbot-sft-7b-hf',
-        path="TigerResearch/tigerbot-7b-sft",
-        tokenizer_path='TigerResearch/tigerbot-7b-sft',
+        abbr='baichuan2-7b-chat-hf',
+        path="baichuan-inc/Baichuan2-7B-Chat",
+        tokenizer_path='baichuan-inc/Baichuan2-7B-Chat',
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
             trust_remote_code=True,
+            use_fast=False,
         ),
+        meta_template=_meta_template,
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,
-        meta_template=_meta_template,
-        model_kwargs=dict(trust_remote_code=True, device_map='auto'),
+        model_kwargs=dict(device_map='auto', trust_remote_code=True),
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
