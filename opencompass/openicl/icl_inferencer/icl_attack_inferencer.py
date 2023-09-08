@@ -155,8 +155,8 @@ class AttackInferencer(BaseInferencer):
             pred_strs = [proc(s, **kwargs) for s in pred_strs]
 
         icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
-        result = icl_evaluator.score(
-            predictions=pred_strs, references=label_list)
+        result = icl_evaluator.score(predictions=pred_strs,
+                                     references=label_list)
         return result['accuracy'] / 100
 
     def get_generation_prompt_list_from_retriever_indices(
