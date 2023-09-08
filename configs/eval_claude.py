@@ -8,7 +8,7 @@ with read_base():
     from .datasets.collections.chat_medium import datasets
     # and output the results in a choosen format
     from .summarizers.medium import summarizer
-    from .models.claude import models
+    from .models.claude.claude import models
 
 infer = dict(
     partitioner=dict(type=NaivePartitioner),
