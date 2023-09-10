@@ -1,7 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .models.hf_qwen_7b import models
+    from .models.qwen.hf_qwen_7b import models
     from .datasets.collections.leaderboard.qwen import datasets
     from .summarizers.leaderboard import summarizer
 
