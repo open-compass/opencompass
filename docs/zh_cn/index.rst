@@ -25,6 +25,7 @@ OpenCompass 上手路线
    :caption: 开始你的第一步
 
    get_started.md
+   faq.md
 
 .. _教程:
 .. toctree::
