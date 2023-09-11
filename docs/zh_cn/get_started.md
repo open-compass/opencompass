@@ -126,7 +126,7 @@ python tools/list_configs.py llama mmlu
 
 ```bash
 python run.py --datasets siqa_gen winograd_ppl \
---hf-model facebook/opt-125m \
+--hf-path facebook/opt-125m \
 --model-kwargs device_map='auto' \
 --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \
 --max-seq-len 2048 \
@@ -233,7 +233,7 @@ opt350m = dict(
 
 ```bash
 python run.py \
---hf-model facebook/opt-350m \  # HuggingFace 模型地址
+--hf-path facebook/opt-350m \  # HuggingFace 模型地址
 --tokenizer-path facebook/opt-350m \  # HuggingFace tokenizer 地址（如与模型地址相同，可省略）
 --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # 构造 tokenizer 的参数
 --model-kwargs device_map='auto' \  # 构造 model 的参数
