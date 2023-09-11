@@ -182,6 +182,10 @@ HuggingFace 中的 'facebook/opt-350m' 以及 'facebook/opt-125m' 权重会在�
 
 关于模型配置的更多介绍可阅读 [准备模型](./user_guides/models.md)。
 
+```{warning}
+OpenCompass 在运行时通常需要依赖网络连接 HuggingFace 服务器 (https://huggingface.co/) 下载模型或数据集。如果连接遇到问题，或者需要离线运行评测，可以参考 [FAQ - Network - Q1](./faq.md#network)。
+```
+
 ### 启动评测
 
 配置文件准备完毕后，我们可以使用 debug 模式启动任务，以检查模型加载、数据集读取是否出现异常，如未正确读取缓存等。
