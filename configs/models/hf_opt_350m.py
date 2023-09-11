@@ -19,3 +19,5 @@ opt350m = dict(
        batch_size=64,
        run_cfg=dict(num_gpus=1),    # Run configuration for specifying resource requirements
     )
+
+models = [opt350m]
