@@ -6,7 +6,7 @@ OpenCompass 支持[PromptBench](https://github.com/microsoft/promptbench)的提�
 
 提示词攻击需要依赖 `PromptBench` 中的组件，所以需要先配置好环境。
 
-```
+```shell
 git clone https://github.com/microsoft/promptbench.git
 pip install textattack==0.3.8
 export PYTHONPATH=$PYTHONPATH:promptbench/

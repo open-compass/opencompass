@@ -6,7 +6,7 @@ We support prompt attack following the idea of [PromptBench](https://github.com/
 
 Some components are necessary to prompt attack experiment, therefore we need to set up environments.
 
-```
+```shell
 git clone https://github.com/microsoft/promptbench.git
 pip install textattack==0.3.8
 export PYTHONPATH=$PYTHONPATH:promptbench/
