@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        For general questions or idea discussions, please post it to our [**Forum**](https://github.com/InternLM/opencompass/discussions).
+        For general questions or idea discussions, please post it to our [**Forum**](https://github.com/open-compass/opencompass/discussions).
         If you have already identified the reason, we strongly appreciate you creating a new PR according to [the tutorial](https://opencompass.readthedocs.io/en/master/community/CONTRIBUTING.html)!
         If you need our help, please fill in the following form to help us to identify the bug.
 
@@ -15,9 +15,9 @@ body:
       label: Prerequisite
       description: Please check the following items before creating a new issue.
       options:
-      - label: I have searched [Issues](https://github.com/InternLM/opencompass/issues/) and [Discussions](https://github.com/InternLM/opencompass/discussions) but cannot get the expected help.
+      - label: I have searched [Issues](https://github.com/open-compass/opencompass/issues/) and [Discussions](https://github.com/open-compass/opencompass/discussions) but cannot get the expected help.
         required: true
-      - label: The bug has not been fixed in the [latest version](https://github.com/InternLM/opencompass).
+      - label: The bug has not been fixed in the [latest version](https://github.com/open-compass/opencompass).
         required: true
 
   - type: dropdown

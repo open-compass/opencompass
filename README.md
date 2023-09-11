@@ -4,14 +4,14 @@
   <br />
 
 [![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/en)
-[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/InternLM/opencompass/blob/main/LICENSE)
+[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/open-compass/opencompass/blob/main/LICENSE)
 
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
 [🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/en/latest/) |
 [🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started.html#installation) |
-[🤔Reporting Issues](https://github.com/InternLM/opencompass/issues/new/choose)
+[🤔Reporting Issues](https://github.com/open-compass/opencompass/issues/new/choose)
 
 English | [简体中文](README_zh-CN.md)
 
@@ -29,14 +29,17 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 > **🔥 Attention**<br />
 > We launch the OpenCompass Collabration project, welcome to support diverse evaluation benchmarks into OpenCompass!
-> Clike [Issue](https://github.com/InternLM/opencompass/issues/248) for more information.
+> Clike [Issue](https://github.com/open-compass/opencompass/issues/248) for more information.
 > Let's work together to build a more powerful OpenCompass toolkit!
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.09.08\]** We update the leaderboard with Baichuan-2/Tigerbot-2/Vicuna-v1.5, welcome to our [homepage](https://opencompass.org.cn) for more details. 🔥🔥🔥.
+- **\[2023.09.06\]**  [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) team adpots OpenCompass to evaluate their models systematically. We deeply appreciate the community's dedication to transparency and reproducibility in LLM evaluation. 🔥🔥🔥.
+- **\[2023.09.02\]** We have supported the evaluation of [Qwen-VL](https://github.com/QwenLM/Qwen-VL) in OpenCompass.
 - **\[2023.08.25\]**  [**TigerBot**](https://github.com/TigerResearch/TigerBot) team adpots OpenCompass to evaluate their models systematically. We deeply appreciate the community's dedication to transparency and reproducibility in LLM evaluation.
-- **\[2023.08.21\]** [**Lagent**](https://github.com/InternLM/lagent) has been released, which is a lightweight framework for building LLM-based agents. We are working with Lagent team to support the evaluation of general tool-use capability, stay tuned! 🔥🔥🔥.
-- **\[2023.08.18\]** We have supported evaluation for **multi-modality learning**, include **MMBench, SEED-Bench, COCO-Caption, Flickr-30K, OCR-VQA, ScienceQA** and so on. Leaderboard is on the road. Feel free to try multi-modality evaluation with  OpenCompass ! 🔥🔥🔥.
+- **\[2023.08.21\]** [**Lagent**](https://github.com/InternLM/lagent) has been released, which is a lightweight framework for building LLM-based agents. We are working with Lagent team to support the evaluation of general tool-use capability, stay tuned!
+- **\[2023.08.18\]** We have supported evaluation for **multi-modality learning**, include **MMBench, SEED-Bench, COCO-Caption, Flickr-30K, OCR-VQA, ScienceQA** and so on. Leaderboard is on the road. Feel free to try multi-modality evaluation with  OpenCompass !
 - **\[2023.08.18\]** [Dataset card](https://opencompass.org.cn/dataset-detail/MMLU) is now online. Welcome new evaluation benchmark  OpenCompass !
 - **\[2023.08.11\]** [Model comparison](https://opencompass.org.cn/model-compare/GPT-4,ChatGPT,LLaMA-2-70B,LLaMA-65B) is now online. We hope this feature offers deeper insights!
 - **\[2023.08.11\]** We have supported [LEval](https://github.com/OpenLMLab/LEval).
@@ -311,11 +314,11 @@ Below are the steps for quick installation and datasets preparation.
 ```Python
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
 conda activate opencompass
-git clone https://github.com/InternLM/opencompass opencompass
+git clone https://github.com/open-compass/opencompass opencompass
 cd opencompass
 pip install -e .
 # Download dataset to data/ folder
-wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 
@@ -389,7 +392,7 @@ Some datasets and prompt implementations are modified from [chain-of-thought-hub
 @misc{2023opencompass,
     title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
     author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/InternLM/OpenCompass}},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
     year={2023}
 }
 ```

@@ -12,7 +12,7 @@
 2. Install OpenCompass:
 
    ```bash
-   git clone https://github.com/InternLM/opencompass.git
+   git clone https://github.com/open-compass/opencompass.git
    cd opencompass
    pip install -e .
    ```
@@ -51,7 +51,7 @@
    cd ..
    ```
 
-   You can find example configs in `configs/models`. ([example](https://github.com/InternLM/opencompass/blob/eb4822a94d624a4e16db03adeb7a59bbd10c2012/configs/models/llama2_7b_chat.py))
+   You can find example configs in `configs/models`. ([example](https://github.com/open-compass/opencompass/blob/eb4822a94d624a4e16db03adeb7a59bbd10c2012/configs/models/llama2_7b_chat.py))
 
    </details>
 
@@ -66,7 +66,7 @@ Run the following commands to download and place the datasets in the `${OpenComp
 
 ```bash
 # Run in the OpenCompass directory
-wget https://github.com/InternLM/opencompass/releases/download/0.1.1/OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
 unzip OpenCompassData.zip
 ```
 
@@ -74,10 +74,10 @@ OpenCompass has supported most of the datasets commonly used for performance com
 
 # Quick Start
 
-We will demonstrate some basic features of OpenCompass through evaluating pretrained models [OPT-125M](https://huggingface.co/facebook/opt-125m) and [OPT-350M](https://huggingface.co/facebook/opt-350m) on both [SIQA](https://huggingface.co/datasets/social_i_qa) and [Winograd](https://huggingface.co/datasets/winogrande) benchmark tasks with their config file located at [configs/eval_demo.py](https://github.com/InternLM/opencompass/blob/main/configs/eval_demo.py).
+We will demonstrate some basic features of OpenCompass through evaluating pretrained models [OPT-125M](https://huggingface.co/facebook/opt-125m) and [OPT-350M](https://huggingface.co/facebook/opt-350m) on both [SIQA](https://huggingface.co/datasets/social_i_qa) and [Winograd](https://huggingface.co/datasets/winogrande) benchmark tasks with their config file located at [configs/eval_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_demo.py).
 
 Before running this experiment, please make sure you have installed OpenCompass locally and it should run successfully under one _GTX-1660-6G_ GPU.
-For larger parameterized models like Llama-7B, refer to other examples provided in the [configs directory](https://github.com/InternLM/opencompass/tree/main/configs).
+For larger parameterized models like Llama-7B, refer to other examples provided in the [configs directory](https://github.com/open-compass/opencompass/tree/main/configs).
 
 ## Configure an Evaluation Task
 
@@ -127,7 +127,7 @@ For HuggingFace models, users can set model parameters directly through the comm
 
 ```bash
 python run.py --datasets siqa_gen winograd_ppl \
---hf-model facebook/opt-125m \
+--hf-path facebook/opt-125m \
 --model-kwargs device_map='auto' \
 --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \
 --max-seq-len 2048 \
@@ -155,8 +155,8 @@ from mmengine.config import read_base
 with read_base():
     from .datasets.siqa.siqa_gen import siqa_datasets
     from .datasets.winograd.winograd_ppl import winograd_datasets
-    from .models.hf_opt_125m import opt125m
-    from .models.hf_opt_350m import opt350m
+    from .models.opt.hf_opt_125m import opt125m
+    from .models.opt.hf_opt_350m import opt350m
 
 datasets = [*siqa_datasets, *winograd_datasets]
 models = [opt125m, opt350m]
@@ -233,7 +233,7 @@ If the HuggingFace model you want to test is not among them, you can also direct
 
 ```bash
 python run.py \
---hf-model facebook/opt-350m \  # HuggingFace model path
+--hf-path facebook/opt-350m \  # HuggingFace model path
 --tokenizer-path facebook/opt-350m \  # HuggingFace tokenizer path (if the same as the model path, can be omitted)
 --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # Arguments to construct the tokenizer
 --model-kwargs device_map='auto' \  # Arguments to construct the model
@@ -270,7 +270,7 @@ datasets = [*siqa_datasets, *winograd_datasets]       # The final config needs t
 
 Dataset configurations are typically of two types: 'ppl' and 'gen', indicating the evaluation method used. Where `ppl` means discriminative evaluation and `gen` means generative evaluation.
 
-Moreover, [configs/datasets/collections](https://github.com/InternLM/OpenCompass/blob/main/configs/datasets/collections) houses various dataset collections, making it convenient for comprehensive evaluations. OpenCompass often uses [`base_medium.py`](/configs/datasets/collections/base_medium.py) for full-scale model testing. To replicate results, simply import that file, for example:
+Moreover, [configs/datasets/collections](https://github.com/open-compass/opencompass/blob/main/configs/datasets/collections) houses various dataset collections, making it convenient for comprehensive evaluations. OpenCompass often uses [`base_medium.py`](/configs/datasets/collections/base_medium.py) for full-scale model testing. To replicate results, simply import that file, for example:
 
 ```bash
 python run.py --models hf_llama_7b --datasets base_medium

@@ -99,7 +99,7 @@ models = [
 我们会以 PIQA 数据集配置文件为示例，展示数据集配置文件中各个字段的含义。
 如果你不打算修改模型测试的 prompt，或者添加新的数据集，则可以跳过这一节的介绍。
 
-PIQA 数据集 [配置文件](https://github.com/InternLM/opencompass/blob/main/configs/datasets/piqa/piqa_ppl_1cf9f0.py)
+PIQA 数据集 [配置文件](https://github.com/open-compass/opencompass/blob/main/configs/datasets/piqa/piqa_ppl_1cf9f0.py)
 如下，这是一个基于 PPL（困惑度）进行评测的配置，并且不使用上下文学习方法（In-Context Learning）。
 
 ```python

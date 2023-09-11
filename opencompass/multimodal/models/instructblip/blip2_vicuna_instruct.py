@@ -34,6 +34,7 @@ class InstructBlipInferencer(Blip2Base):
         qformer_text_input: bool = True,
         low_resource: bool = False,
         mode: str = 'generation',
+        is_caption_task=False,
     ):
         super().__init__()
         self.mode = mode
@@ -96,6 +97,7 @@ class InstructBlipInferencer(Blip2Base):
         self.max_output_txt_len = max_output_txt_len
         self.sys_prompt = sys_prompt
         self.prompt = prompt
+        self.is_caption_task = is_caption_task
 
         self._lemmatizer = None
 
@@ -228,7 +230,7 @@ class InstructBlipInferencer(Blip2Base):
                 top_p=top_p,
                 temperature=temperature,
                 num_beams=num_beams,
-                max_length=max_length,
+                max_length=self.max_output_txt_len,
                 min_length=min_length,
                 repetition_penalty=repetition_penalty,
                 length_penalty=length_penalty,
@@ -238,6 +240,9 @@ class InstructBlipInferencer(Blip2Base):
         for i, data_sample in enumerate(data_samples):
             output_token = outputs[i]
             output_text = self.post_processor(output_token, self.llm_tokenizer)
-            data_sample.pred_answer = output_text
+            if self.is_caption_task:
+                data_sample.pred_caption = output_text
+            else:
+                data_sample.pred_answer = output_text
             data_samples[i] = data_sample
         return data_samples
