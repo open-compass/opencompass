@@ -2,6 +2,16 @@
 
 OpenCompass 支持[PromptBench](https://github.com/microsoft/promptbench)的提示词攻击。其主要想法是评估提示指令的鲁棒性，也就是说，当攻击或修改提示以指导任务时，希望该任务能尽可能表现的像像原始任务一样好。
 
+## 环境安装
+
+提示词攻击需要依赖 `PromptBench` 中的组件，所以需要先配置好环境。
+
+```
+git clone https://github.com/microsoft/promptbench.git
+pip install textattack==0.3.8
+export PYTHONPATH=$PYTHONPATH:promptbench/
+```
+
 ## 如何攻击
 
 ### 增加数据集配置文件
@@ -80,7 +90,7 @@ attack = dict(
 请当运行攻击实验的时候请使用 `--mode infer` 选项，并需要指定`PYTHONPATH`。
 
 ```shell
-PYTHONPATH=$PYTHONPATH:./:promptbench/.python run.py configs/eval_attack.py --mode infer
+python run.py configs/eval_attack.py --mode infer
 ```
 
 所有结果都将保存在名为“attack”的文件夹中。

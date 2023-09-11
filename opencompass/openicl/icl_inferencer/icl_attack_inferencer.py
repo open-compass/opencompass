@@ -26,6 +26,11 @@ class AttackInferencer(BaseInferencer):
 
     Attributes:
         model (:obj:`BaseModelWrapper`, optional): The module to inference.
+        max_out_len (:obj:`int`, optional): Maximum number of tokenized words
+            of the output.
+        adv_key (:obj:`str`): Prompt key in template to be attacked.
+        metric_key (:obj:`str`): Metric key to be returned and compared.
+            Defaults to `accuracy`.
         max_seq_len (:obj:`int`, optional): Maximum number of tokenized words
             allowed by the LM.
         batch_size (:obj:`int`, optional): Batch size for the
@@ -46,7 +51,8 @@ class AttackInferencer(BaseInferencer):
             self,
             model: BaseModel,
             max_out_len: int,
-            adv_key: Optional[str] = None,
+            adv_key: str,
+            metric_key: str = 'accuracy',
             max_seq_len: Optional[int] = None,
             batch_size: Optional[int] = 1,
             gen_field_replace_token: Optional[str] = '',
@@ -66,6 +72,7 @@ class AttackInferencer(BaseInferencer):
         )
 
         self.adv_key = adv_key
+        self.metric_key = metric_key
         self.dataset_cfg = dataset_cfg
         self.eval_cfg = dataset_cfg['eval_cfg']
         self.output_column = dataset_cfg['reader_cfg']['output_column']
@@ -157,7 +164,9 @@ class AttackInferencer(BaseInferencer):
         icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
         result = icl_evaluator.score(predictions=pred_strs,
                                      references=label_list)
-        return result['accuracy'] / 100
+        score = result.get(self.metric_key)
+        # try to shrink score to range 0-1
+        return score / 100 if score > 1 else score
 
     def get_generation_prompt_list_from_retriever_indices(
             self,

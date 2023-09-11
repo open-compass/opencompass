@@ -31,7 +31,8 @@ squad20_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=AttackInferencer, max_out_len=50,
         original_prompt_list=original_prompt_list,
-        adv_key='adv_prompt'))
+        adv_key='adv_prompt',
+        metric_key='score'))
 
 squad20_eval_cfg = dict(
     evaluator=dict(type=SQuAD20Evaluator), pred_role='BOT')
@@ -39,7 +40,7 @@ squad20_eval_cfg = dict(
 squad20_datasets = [
     dict(
         type=SQuAD20Dataset,
-        abbr='squad2.0',
+        abbr='squad_v2',
         path='./data/SQuAD2.0/dev-v2.0.json',
         reader_cfg=squad20_reader_cfg,
         infer_cfg=squad20_infer_cfg,

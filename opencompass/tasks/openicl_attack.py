@@ -123,6 +123,7 @@ class OpenICLAttackTask(BaseTask):
         out_dir, out_file = osp.split(out_path)
         mkdir_or_exist(out_dir)
 
+        from config import LABEL_SET
         from prompt_attack.attack import create_attack
         from prompt_attack.goal_function import PromptGoalFunction
 
@@ -137,6 +138,9 @@ class OpenICLAttackTask(BaseTask):
             logger=self.logger,
             model_wrapper=None,
             verbose='True')
+        if self.cfg['attack']['dataset'] not in LABEL_SET:
+            # set default
+            self.cfg['attack']['dataset'] = 'mmlu'
         attack = create_attack(self.cfg['attack'], goal_function)
 
         prompts = self.infer_cfg['inferencer']['original_prompt_list']

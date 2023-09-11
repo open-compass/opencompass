@@ -2,6 +2,16 @@
 
 We support prompt attack following the idea of [PromptBench](https://github.com/microsoft/promptbench). The main purpose here is to evaluate the robustness of prompt instruction, which means when attack/modify the prompt to instruct the task, how well can this task perform as the original task.
 
+## Set up environment
+
+Some components are necessary to prompt attack experiment, therefore we need to set up environments.
+
+```
+git clone https://github.com/microsoft/promptbench.git
+pip install textattack==0.3.8
+export PYTHONPATH=$PYTHONPATH:promptbench/
+```
+
 ## How to attack
 
 ### Add a dataset config
@@ -80,7 +90,7 @@ attack = dict(
 Please use `--mode infer` when run the attack experiment, and set `PYTHONPATH` env.
 
 ```shell
-PYTHONPATH=$PYTHONPATH:./:promptbench/.python run.py configs/eval_attack.py --mode infer
+python run.py configs/eval_attack.py --mode infer
 ```
 
 All the results will be saved in `attack` folder.

@@ -36,7 +36,8 @@ iwslt2017_infer_cfg = dict(
     inferencer=dict(
         type=AttackInferencer,
         original_prompt_list=original_prompt_list,
-        adv_key='adv_prompt'))
+        adv_key='adv_prompt',
+        metric_key='score'))
 
 iwslt2017_eval_cfg = dict(
     evaluator=dict(type=BleuEvaluator),
