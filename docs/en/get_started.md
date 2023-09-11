@@ -127,7 +127,7 @@ For HuggingFace models, users can set model parameters directly through the comm
 
 ```bash
 python run.py --datasets siqa_gen winograd_ppl \
---hf-model facebook/opt-125m \
+--hf-path facebook/opt-125m \
 --model-kwargs device_map='auto' \
 --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \
 --max-seq-len 2048 \
@@ -233,7 +233,7 @@ If the HuggingFace model you want to test is not among them, you can also direct
 
 ```bash
 python run.py \
---hf-model facebook/opt-350m \  # HuggingFace model path
+--hf-path facebook/opt-350m \  # HuggingFace model path
 --tokenizer-path facebook/opt-350m \  # HuggingFace tokenizer path (if the same as the model path, can be omitted)
 --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # Arguments to construct the tokenizer
 --model-kwargs device_map='auto' \  # Arguments to construct the model
