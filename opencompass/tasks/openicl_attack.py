@@ -99,6 +99,7 @@ class OpenICLAttackTask(BaseTask):
             ice_template = ICL_PROMPT_TEMPLATES.build(
                 self.infer_cfg['ice_template'])
 
+        prompt_template = None
         if hasattr(self.infer_cfg, 'prompt_template'):
             prompt_template = ICL_PROMPT_TEMPLATES.build(
                 self.infer_cfg['prompt_template'])
@@ -122,8 +123,8 @@ class OpenICLAttackTask(BaseTask):
         out_dir, out_file = osp.split(out_path)
         mkdir_or_exist(out_dir)
 
-        from promptbench.prompt_attack.attack import create_attack
-        from promptbench.prompt_attack.goal_function import PromptGoalFunction
+        from prompt_attack.attack import create_attack
+        from prompt_attack.goal_function import PromptGoalFunction
 
         inferencer.retriever = retriever
         inferencer.prompt_template = prompt_template

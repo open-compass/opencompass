@@ -46,6 +46,7 @@ iwslt2017_eval_cfg = dict(
 
 iwslt2017_datasets = [
     dict(
+        abbr='iwslt',
         type=IWSLT2017Dataset,
         path='iwslt2017',
         name='iwslt2017-en-de',

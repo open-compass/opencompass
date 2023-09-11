@@ -77,10 +77,10 @@ attack = dict(
 
 ### Run the experiment
 
-Please use `--mode infer` when run the attack experiment.
+Please use `--mode infer` when run the attack experiment, and set `PYTHONPATH` env.
 
 ```shell
-python run.py configs/eval_attack.py --mode infer
+PYTHONPATH=$PYTHONPATH:./:promptbench/.python run.py configs/eval_attack.py --mode infer
 ```
 
 All the results will be saved in `attack` folder.

@@ -17,12 +17,11 @@ infer = dict(
     runner=dict(
         type=LocalRunner,
         max_num_workers=8,
-        task=dict(type=OpenICLAttackTask),
-        retry=0),
+        task=dict(type=OpenICLAttackTask)),
 )
 
 attack = dict(
     attack='textfooler',
     query_budget=100,
-    prompt_topk=2,
+    prompt_topk=1,
 )
