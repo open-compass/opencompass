@@ -89,7 +89,7 @@ OpenCompass 中，每个评测任务都由待评测的模型和数据集组成�
 用户可以通过 `--models` 和 `--datasets` 组合待测试的模型和数据集。
 
 ```bash
-python run.py --models opt_125m opt_350m --datasets siqa_gen winograd_ppl
+python run.py --models hf_opt_125m hf_opt_350m --datasets siqa_gen winograd_ppl
 ```
 
 模型和数据集以配置文件的形式预先存放在 `configs/models` 和 `configs/datasets` 下。用户可以通过 `tools/list_configs.py` 查看或筛选当前可用的模型和数据集配置。

@@ -19,3 +19,5 @@ opt125m = dict(
        batch_size=128,
        run_cfg=dict(num_gpus=1),   # Run configuration for specifying resource requirements
     )
+
+models = [opt125m]

@@ -90,7 +90,7 @@ In OpenCompass, each evaluation task consists of the model to be evaluated and t
 Users can combine the models and datasets they want to test using `--models` and `--datasets`.
 
 ```bash
-python run.py --models opt_125m opt_350m --datasets siqa_gen winograd_ppl
+python run.py --models hf_opt_125m hf_opt_350m --datasets siqa_gen winograd_ppl
 ```
 
 The models and datasets are pre-stored in the form of configuration files in `configs/models` and `configs/datasets`. Users can view or filter the currently available model and dataset configurations using `tools/list_configs.py`.
