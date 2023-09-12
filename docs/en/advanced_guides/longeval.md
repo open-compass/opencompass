@@ -37,7 +37,7 @@ L-Eval is a long context dataset built by OpenLMLab, consisting of 18 subtasks, 
 LongBench is a long context dataset built by THUDM, consisting of 21 subtasks with a total of 4750 test cases. This dataset is the first long context dataset that includes both English and Chinese texts, with an average English text length of 6711 words and an average Chinese text length of 13386 characters. The 21 subtasks are divided into 6 types, providing a more comprehensive evaluation of the model's capabilities in various aspects.
 
 <div align="center">
-![LongBenchIntro](https://github.com/open-compass/opencompass/assets/75252858/4555e937-c519-4e9c-ad8d-7370430d466a)
+<img src=https://github.com/open-compass/opencompass/assets/75252858/4555e937-c519-4e9c-ad8d-7370430d466a>
 </div>
 
 ## Evaluation Method
@@ -49,8 +49,8 @@ Due to the different maximum input lengths accepted by different models, in orde
 In the LongBench and L-Eval ability rankings, we select the average ranking **(The lower the better)** of each model in the subtask as the standard. It can be seen that GPT-4 and GPT-3.5-turbo-16k still occupy a leading position in long context tasks, while models like ChatGLM2-6B-32k also show significant improvement in long context ability after extrapolating the length based on ChatGLM2-6B.
 
 <div align="center">
-![L-EvalAverageRank](https://github.com/open-compass/opencompass/assets/75252858/29b5ad12-d9a3-4255-be0a-f770923fe514)
-![LongBenchAverageRank](https://github.com/open-compass/opencompass/assets/75252858/680b4cda-c2b1-45d1-8c33-196dee1a38f3)
+<img src=https://github.com/open-compass/opencompass/assets/75252858/29b5ad12-d9a3-4255-be0a-f770923fe514>
+<img src=https://github.com/open-compass/opencompass/assets/75252858/680b4cda-c2b1-45d1-8c33-196dee1a38f3>
 </div>
 
 The original scores are available at [L-Eval Scores](https://github.com/open-compass/opencompass/docs/en/advanced_guides/result_leval.md) and [LongBench Scores](https://github.com/open-compass/opencompass/docs/en/advanced_guides/result_longbench.md).
