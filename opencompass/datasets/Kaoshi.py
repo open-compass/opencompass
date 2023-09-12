@@ -34,9 +34,8 @@ class KaoshiDataset(BaseDataset):
                 data_list.append(data)
         return Dataset.from_list(data_list)
 
-
-valid_kaoshi__question_types = [
-    'single_choice', 'multi_choice', 'multi_question_choice'
+valid_kaoshi_question_types = [
+    'single_choice', 'multi_choice', 'multi_question_choice',
     'five_out_of_seven', 'cloze', 'judgment'
 ]
 
@@ -45,7 +44,7 @@ class KaoshiEvaluator(BaseEvaluator):
 
     def __init__(self, question_type) -> None:
         super().__init__()
-        assert question_type in valid_kaoshi__question_types
+        assert question_type in valid_kaoshi_question_types
         self.question_type = question_type
 
     def do_predictions_postprocess(self, model_output, answer_lenth=None):
@@ -93,7 +92,7 @@ class KaoshiEvaluator(BaseEvaluator):
                 for k in range(min(5, len(temp))):
                     model_answer.append(temp[k])
         
-        elif self.question_type == 'judgment':
+        elif self.question_type in ['cloze', 'judgment']:
             model_answer = []
             temp = re.findall(r'【答案】(.*?) ', model_output)
             if len(temp) > 0:
@@ -107,10 +106,7 @@ class KaoshiEvaluator(BaseEvaluator):
         return ['Z'] * len(refr)
 
     def score(self, predictions, references):
-        if self.question_type not in [
-                'single_choice', 'multi_choice', 'multi_question_choice',
-                'five_out_of_seven'
-        ]:
+        if self.question_type not in valid_kaoshi_question_types:
             return {'score': 0}
         elif self.question_type == 'multi_choice':
             correct_score, total_score = 0, 0
@@ -135,7 +131,7 @@ class KaoshiEvaluator(BaseEvaluator):
                     pred = self.do_predictions_postprocess(pred, len(refr))
                 else:
                     pred = self.do_predictions_postprocess(pred)
-                if self.question_type == 'judgment':
+                if self.question_type in ['cloze', 'judgment']:
                     refr = [refr]
                 pred = self.ensure_same_length(pred, refr)
                 for p, r in zip(pred, refr):
@@ -145,11 +141,11 @@ class KaoshiEvaluator(BaseEvaluator):
             return {'score': correct_score / total_score * 100}
 
 
-for question_type in valid_kaoshi__question_types:
+for question_type in valid_kaoshi_question_types:
     # fix classic closure problem
     def _kaoshi_register(question_type):
         ICL_EVALUATORS.register_module(
-            name='KaoshiEvaluator' + '_' + question_type,
+            name='KaoshiEvaluator' + "_" + question_type,
             module=lambda *args, **kwargs: KaoshiEvaluator(
                 question_type=question_type, *args, **kwargs))
 
