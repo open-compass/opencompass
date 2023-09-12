@@ -196,6 +196,10 @@ python run.py configs/eval_demo.py -w outputs/demo
 
 Now let's go over the configuration file and the launch options used in this case.
 
+```{warning}
+OpenCompass usually assumes network is available. If you encounter network issues or wish to run OpenCompass in an offline environment, please refer to [FAQ - Network - Q1](./faq.md#network) for solutions.
+```
+
 ## Explanations
 
 ### Model list - `models`
