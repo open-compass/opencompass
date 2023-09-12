@@ -24,6 +24,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :caption: Get Started
 
    get_started.md
+   faq.md
 
 .. _UserGuides:
 .. toctree::
