@@ -16,7 +16,7 @@
 
 ### XGen-7B-8k
 
-XGen-7B-8k是使用标准的注意力机制训练的，训练文本最长为8K，总计1.5T个token。为了减少训练时间开销, XGen-7B-8k在不同阶段逐步增加输入文本长度. 首先, 模型在序列长度为2k的文本上训练总计800B的token, 随后在长度为4k的文本上训练总计400B的token, 最后, 在长度为8k的文本上训练总计300B的token。
+XGen-7B-8k是使用标准的注意力机制训练的，训练文本最长为8K，总计1.5T个token。为了减少训练时间开销, XGen-7B-8k在不同阶段逐步增加输入文本长度。首先, 模型在序列长度为2k的文本上训练总计800B的token, 随后在长度为4k的文本上训练总计400B的token, 最后, 在长度为8k的文本上训练总计300B的token。
 
 ### Vicuna-7b-v1.5-16k
 
@@ -46,13 +46,13 @@ LongBench是由THUDM构建的长文本数据集，由21个子任务构成，总�
 
 由于不同模型能够接受的最大输入长度不同，为了更加公平地比较这些大模型，在输入长度超过模型最大输入限制时，我们将裁剪输入文本的中间部分，从而避免提示词缺失的情况。
 
-## Long Context Ability Ranking
+## 长文本能力榜单
 
-在LongBench和L-Eval能力榜单中，我们选取各模型在子任务上排名的平均值 **(排名数值越低越好)** 作为标准。可以看到GPT-4和GPT-3.5-turbo-16k在长文本任务中仍然占据领先地位，而例如ChatGLM2-6B-32k在基于ChatGLM2-6B使用长度外推后在长文本能力方面也有明显提升。
+在LongBench和L-Eval能力榜单中，我们选取各模型在子任务上排名的平均值 **(排名数值越低越好)** 作为标准。可以看到GPT-4和GPT-3.5-turbo-16k在长文本任务中仍然占据领先地位，而例如ChatGLM2-6B-32k在基于ChatGLM2-6B使用位置插值后在长文本能力方面也有明显提升。
 
 <div align="center">
 <img src=https://github.com/open-compass/opencompass/assets/75252858/29b5ad12-d9a3-4255-be0a-f770923fe514>
 <img src=https://github.com/open-compass/opencompass/assets/75252858/680b4cda-c2b1-45d1-8c33-196dee1a38f3>
 </div>
 
-原始分数请点击[L-Eval分数](https://github.com/open-compass/opencompass/docs/en/advanced_guides/result_leval.md)和[LongBench分数](https://github.com/open-compass/opencompass/docs/en/advanced_guides/result_longbench.md)查看.
+原始分数请点击[L-Eval分数](https://github.com/open-compass/opencompass/docs/en/advanced_guides/result_leval.md)和[LongBench分数](https://github.com/open-compass/opencompass/docs/en/advanced_guides/result_longbench.md)查看。
