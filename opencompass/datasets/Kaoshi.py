@@ -22,13 +22,13 @@ def get_number(options):
 class KaoshiDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
+    def load(path: str, name: str):
         data_list = []
         _type = path.split('/')[-1].replace('.jsonl', '')
         with open(path, encoding='utf-8') as f:
             for line in f:
                 data = json.loads(line)
-                if _type in ['单选题', '多选题']:
+                if name in ['single_choice', 'multi_choice']:
                     data['question'] = data['question'].strip(
                     ) + '\n' + get_number(data['options'])
                 data_list.append(data)
@@ -36,8 +36,8 @@ class KaoshiDataset(BaseDataset):
 
 
 valid_kaoshi__question_types = [
-    'single_choice', 'multi_choice',
-    'five_out_of_seven', 'cloze', 'correction'
+    'single_choice', 'multi_choice', 'multi_question_choice'
+    'five_out_of_seven', 'cloze', 'judgment'
 ]
 
 
@@ -92,6 +92,12 @@ class KaoshiEvaluator(BaseEvaluator):
             if len(temp) > 0:
                 for k in range(min(5, len(temp))):
                     model_answer.append(temp[k])
+        
+        elif self.question_type == 'judgment':
+            model_answer = []
+            temp = re.findall(r'【答案】(.*?) ', model_output)
+            if len(temp) > 0:
+                model_answer.append(temp[0])
 
         return model_answer
 
@@ -129,6 +135,8 @@ class KaoshiEvaluator(BaseEvaluator):
                     pred = self.do_predictions_postprocess(pred, len(refr))
                 else:
                     pred = self.do_predictions_postprocess(pred)
+                if self.question_type == 'judgment':
+                    refr = [refr]
                 pred = self.ensure_same_length(pred, refr)
                 for p, r in zip(pred, refr):
                     if p == r:
