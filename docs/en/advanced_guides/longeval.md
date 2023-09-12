@@ -1,8 +1,10 @@
+# Long Context Evaluation Guidance
+
 ## Introduction
 
 Although large-scale language models (LLMs) such as GPT-4 have demonstrated significant advantages in handling natural language tasks, most current open-source models can only handle texts with a length of a few thousand tokens, which limits their ability to process long contexts such as reading books and writing text summaries. To explore the performance of models in dealing with long contexts, we use the [L-Eval](https://github.com/OpenLMLab/LEval) and [LongBench](https://github.com/THUDM/LongBench) datasets to test the model's ability to handle long contexts.
 
-## Existing Algorithms
+## Existing Algorithms and models
 
 When dealing with long context inputs, the two main challenges faced by large models are the inference time cost and catastrophic forgetting. Recently, a large amount of research has been devoted to extending the model length, focusing on three improvement directions:
 
@@ -14,19 +16,19 @@ Next, we will introduce some algorithms adopted by long context language models 
 
 ### XGen-7B-8k
 
-XGen-7B-8k is trained with standard dense attention on up to 8K sequence length for up to 1.5T tokens. To mitigate slow training, they introduce training in stages with increasing sequence length. First, 800B tokens with sequence length of 2k tokens are observed, then 400B tokens with 4k, finally, 300B tokens with 8k length.
+XGen-7B-8k is trained with standard dense attention on up to 8k sequence length for up to 1.5T tokens. To mitigate slow training, XGen-7B-8k introduces training in stages with increasing sequence length. First, 800B tokens with sequence length of 2k tokens are observed, then 400B tokens with 4k, finally, 300B tokens with 8k length.
 
 ### Vicuna-7b-v1.5-16k
 
-Vicuna-7b-v1.5-16k uses LLaMA 2 as the base model. It provides 16K context length versions using linear rotary position embedding(RoPE) scaling. RoPE is a type of positional embedding used in LLaMA that injects the information of position in Transformer. It comes with valuable properties such as flexibility of being expand  to any sequence lengths, decaying inter-token dependency with increasing relative distances, and capability of equipping the linear self-attention with relative position encoding.
+Vicuna-7b-v1.5-16k uses LLaMA 2 as the base model. It provides 16K context length versions using linear rotary position embedding(RoPE) scaling. RoPE is a type of positional embedding used in LLaMA that injects the information of position in Transformer. It comes with valuable properties such as flexibility of being expand to any sequence lengths, decaying inter-token dependency with increasing relative distances, and capability of equipping the linear self-attention with relative position encoding.
 
 ### LongChat-7b-v1.5-32k
 
-LongChat-7b-v1.5-32k is finetuned from LLaMA 2 models, which were originally pretrained with 4k context length. The training recipe can be conceptually described in two steps. The first step is condensing RoPE. Since the LLaMA model has not observed scenarios where position_ids > 2048 during the pre-training phase, LongChat condenses position_ids > 2048 to be within 0 to 2048. The second step is finetuning LongChat model on curated conversation data. In this step, the data is cleaned using FastChat data pipeline and truncated to the maximum length of model.
+LongChat-7b-v1.5-32k is finetuned from LLaMA 2 models, which were originally pretrained with 4k context length. The training recipe can be conceptually described in two steps. The first step is condensing RoPE. Since the LLaMA model has not observed scenarios where position_ids > 4096 during the pre-training phase, LongChat condenses position_ids > 4096 to be within 0 to 4096. The second step is finetuning LongChat model on curated conversation data. In this step, the data is cleaned using FastChat data pipeline and truncated to the maximum length of model.
 
 ### ChatGLM2-6B-32k
 
-ChatGLM2-6B-32k is trained based on ChatGLM2-6B, with a 32k context length during alignment and position interpolation. The key idea of position interpolation is directly down-scale the position indices so that the maximum position index matches the previous context window limit in the pre-training stage. In other words, to accommodate more input tokens, the algorithm interpolates position encodings at neighboring integer positions,utilizing the fact that position encodings can be applied on non-integer positions,  as opposed toextrapolating outside the trained positions, which may lead to catastrophic values. The algorithm requires only a very short period of fine-tuning for the model to fully adapt to greatly extended context windows.
+ChatGLM2-6B-32k is trained based on ChatGLM2-6B, with a 32k context length during alignment and position interpolation. The key idea of position interpolation is directly down-scale the position indices so that the maximum position index matches the previous context window limit in the pre-training stage. In other words, to accommodate more input tokens, the algorithm interpolates position encodings at neighboring integer positions,utilizing the fact that position encodings can be applied on non-integer positions, as opposed to extrapolating outside the trained positions, which may lead to catastrophic values. The algorithm requires only a very short period of fine-tuning for the model to fully adapt to greatly extended context windows.
 
 ## [L-Eval](https://github.com/OpenLMLab/LEval)
 
