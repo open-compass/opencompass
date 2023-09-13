@@ -12,8 +12,7 @@ from .base import BaseDataset
 def get_number(options):
 
     result_string = ''
-    for i, percentage in enumerate(options,
-                                   start=65):
+    for i, percentage in enumerate(options, start=65):
         result_string += f'{chr(i)}. {percentage}\n'
     return result_string
 
@@ -33,6 +32,7 @@ class KaoshiDataset(BaseDataset):
                     ) + '\n' + get_number(data['options'])
                 data_list.append(data)
         return Dataset.from_list(data_list)
+
 
 valid_kaoshi_question_types = [
     'single_choice', 'multi_choice', 'multi_question_choice',
@@ -91,7 +91,7 @@ class KaoshiEvaluator(BaseEvaluator):
             if len(temp) > 0:
                 for k in range(min(5, len(temp))):
                     model_answer.append(temp[k])
-        
+
         elif self.question_type in ['cloze', 'judgment']:
             model_answer = []
             temp = re.findall(r'【答案】(.*?) ', model_output)
@@ -107,7 +107,7 @@ class KaoshiEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         if self.question_type not in valid_kaoshi_question_types:
-            return {'score': 0}
+            return {'score': 100}
         elif self.question_type == 'multi_choice':
             correct_score, total_score = 0, 0
             for pred, refr in zip(predictions, references):
@@ -145,7 +145,7 @@ for question_type in valid_kaoshi_question_types:
     # fix classic closure problem
     def _kaoshi_register(question_type):
         ICL_EVALUATORS.register_module(
-            name='KaoshiEvaluator' + "_" + question_type,
+            name='KaoshiEvaluator' + '_' + question_type,
             module=lambda *args, **kwargs: KaoshiEvaluator(
                 question_type=question_type, *args, **kwargs))
 

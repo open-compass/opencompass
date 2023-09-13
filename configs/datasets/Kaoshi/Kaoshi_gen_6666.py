@@ -19,7 +19,7 @@ splits_with_type = {'单选题': ['职业-消防', '职业-测绘', '考研-经�
                     '判断题': ['职业-证券'], 
                     '填空题': ['考研-数学']}
 
-zh2en = {'单选题': 'single_choice', '多选题': 'multiple_choice', '完形填空': 'multi_question_choice', '判断题': 'judgment', '填空题': 'cloze', '七选五': 'five_out_of_seven'}
+zh2en = {'单选题': 'single_choice', '多选题': 'multi_choice', '完形填空': 'multi_question_choice', '判断题': 'judgment', '填空题': 'cloze', '七选五': 'five_out_of_seven'}
 
 Kaoshi_datasets = []
 
