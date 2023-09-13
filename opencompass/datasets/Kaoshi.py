@@ -12,8 +12,8 @@ from .base import BaseDataset
 def get_number(options):
 
     result_string = ''
-    for i, percentage in enumerate(options, start=65):
-        result_string += f'{chr(i)}. {percentage}\n'
+    for i, option in enumerate(options, start=65):
+        result_string += f'{chr(i)}. {option}\n'
     return result_string
 
 
@@ -23,7 +23,6 @@ class KaoshiDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         data_list = []
-        _type = path.split('/')[-1].replace('.jsonl', '')
         with open(path, encoding='utf-8') as f:
             for line in f:
                 data = json.loads(line)
