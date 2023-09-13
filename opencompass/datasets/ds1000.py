@@ -231,9 +231,6 @@ class DS1000Evaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         total = len(predictions)
-        import debugpy
-        debugpy.listen(('0.0.0.0', 5678))
-        debugpy.wait_for_client()
 
         # Each process changes cwd, need to use multi-processing
         with ProcessPoolExecutor(self.num_workers) as executor:
