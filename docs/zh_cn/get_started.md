@@ -101,7 +101,8 @@ python tools/list_configs.py
 python tools/list_configs.py llama mmlu
 ```
 
-部分样例输出如下：
+<details>
+<summary><b>点击查看部分样例输出</b></summary>
 
 ```text
 +-----------------+-----------------------------------+
@@ -121,6 +122,8 @@ python tools/list_configs.py llama mmlu
 ```
 
 用户可以按照第一列中的名称去作为 `python run.py` 中 `--models` 和 `--datasets` 的传入参数。在数据集部分，相同名称但不同后缀的数据集一般意味着其提示词或评测方式是不一样的。
+
+</details>
 
 对于 HuggingFace 模型，用户可以直接通过命令行设定模型参数，而无需额外配置文件。例如，对于 `facebook/opt-125m` 模型，可以通过以下命令进行评测：
 
@@ -144,7 +147,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 
 ````{tab} 配置形式
 
-除了通过在命令行中对实验进行配置，OpenCompass 也支持用户把实验全量配置写入一份配置文件中，并直接通过 `run.py` 运行。这样的配置方式允许用户方便地修改实验参数，对实验进行更灵活的配置，也让运行命令更为简洁。配置文件以 Python 格式组织，且必须包含 `datasets` 和 `models` 字段。
+除了通过在命令行中对实验进行配置，OpenCompass 也支持用户把实验全量配置写入一份配置文件中，并直接通过 `run.py` 运行。配置文件以 Python 格式组织，且必须包含 `datasets` 和 `models` 字段。
 
 本次的测试的配置文件为 [configs/eval_demo.py](/configs/eval_demo.py)。该配置通过[继承机制](./user_guides/config.md#继承机制)引入了所需的数据集和模型配置，并按照格式组合了 `datasets` 和 `models` 字段。
 
@@ -171,6 +174,10 @@ python run.py configs/eval_demo.py
 ````
 
 `````
+
+```{warning}
+OpenCompass 在运行时通常需要依赖网络连接 HuggingFace 服务器 (https://huggingface.co/) 下载模型或数据集。如果连接遇到问题，或者需要离线运行评测，可以参考 [FAQ - Network - Q1](./faq.md#network)。
+```
 
 配置文件评测方式较为简洁，下文将以该方式为例讲解其余功能。
 
@@ -276,10 +283,6 @@ python run.py --models hf_llama_7b --datasets base_medium
 
 ```{note}
 更多介绍可查看 [数据集配置](./user_guides/dataset_prepare.md)。
-```
-
-```{warning}
-OpenCompass 在运行时通常需要依赖网络连接 HuggingFace 服务器 (https://huggingface.co/) 下载模型或数据集。如果连接遇到问题，或者需要离线运行评测，可以参考 [FAQ - Network - Q1](./faq.md#network)。
 ```
 
 ### 启动评测

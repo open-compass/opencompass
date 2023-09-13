@@ -102,7 +102,9 @@ python tools/list_configs.py
 python tools/list_configs.py llama mmlu
 ```
 
-Some sample outputs are:
+<details>
+<summary><b>Click for sample output</b></summary>
+
 
 ```text
 +-----------------+-----------------------------------+
@@ -122,6 +124,8 @@ Some sample outputs are:
 ```
 
 Users can use the names in the first column as input parameters for `--models` and `--datasets` in `python run.py`. For datasets, the same name with different suffixes generally indicates that its prompts or evaluation methods are different.
+
+</details>
 
 For HuggingFace models, users can set model parameters directly through the command line without additional configuration files. For instance, for the `facebook/opt-125m` model, you can evaluate it with the following command:
 
@@ -145,7 +149,7 @@ For all HuggingFace related parameters supported by `run.py`, please read [Initi
 
 ````{tab} Configuration File
 
-In addition to configuring the experiment through the command line, OpenCompass also allows users to write the full configuration of the experiment in a configuration file and run it directly through `run.py`. This method of configuration allows users to easily modify experimental parameters, provides a more flexible configuration, and simplifies the run command. The configuration file is organized in Python format and must include the `datasets` and `models` fields.
+In addition to configuring the experiment through the command line, OpenCompass also allows users to write the full configuration of the experiment in a configuration file and run it directly through `run.py`. The configuration file is organized in Python format and must include the `datasets` and `models` fields.
 
 The test configuration for this time is [configs/eval_demo.py](/configs/eval_demo.py). This configuration introduces the required dataset and model configurations through the [inheritance mechanism](./user_guides/config.md#inheritance-mechanism) and combines the `datasets` and `models` fields in the required format.
 
@@ -172,6 +176,10 @@ python run.py configs/eval_demo.py
 
 `````
 
+```{warning}
+OpenCompass usually assumes network is available. If you encounter network issues or wish to run OpenCompass in an offline environment, please refer to [FAQ - Network - Q1](./faq.md#network) for solutions.
+```
+
 The configuration file evaluation method is more concise. The following sections will use this method as an example to explain the other features.
 
 ## Run Evaluation
@@ -195,10 +203,6 @@ python run.py configs/eval_demo.py -w outputs/demo
 ```
 
 Now let's go over the configuration file and the launch options used in this case.
-
-```{warning}
-OpenCompass usually assumes network is available. If you encounter network issues or wish to run OpenCompass in an offline environment, please refer to [FAQ - Network - Q1](./faq.md#network) for solutions.
-```
 
 ## Explanations
 
