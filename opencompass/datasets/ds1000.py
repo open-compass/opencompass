@@ -122,6 +122,7 @@ def ds1000_postprocess(text: str) -> str:
 
 @TEXT_POSTPROCESSORS.register_module('ds1000_matplotlib')
 def ds1000_matplotlib_postprocess(text: str) -> str:
+    text = ds1000_postprocess(text)
     code_lines = text.split('\n')
     postprocessed_lines = []
     for line in code_lines:
