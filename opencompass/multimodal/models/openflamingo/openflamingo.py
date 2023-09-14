@@ -21,14 +21,13 @@ class OpenFlamingoInferencer(Flamingo):
     """
 
     def __init__(self,
-                 prompt_constructor: Optional[dict] = None,
+                 prompt_constructor: dict,
                  post_processor: Optional[dict] = None,
                  mode: str = 'generation',
                  **kwargs):
         super().__init__(**kwargs)
-        if prompt_constructor is not None:
-            self.prompt_constructor = mmengine.registry.build_from_cfg(
-                prompt_constructor, MM_MODELS)
+        self.prompt_constructor = mmengine.registry.build_from_cfg(
+            prompt_constructor, MM_MODELS)
         if post_processor is not None:
             self.post_processor = mmengine.registry.build_from_cfg(
                 post_processor, MM_MODELS)
@@ -46,16 +45,7 @@ class OpenFlamingoInferencer(Flamingo):
         Returns:
             List[DataSample]: Return list of data samples.
         """
-        prompts = []
-        for sample in data_samples:
-            question = sample.get('question')
-            option = sample.get('options')
-
-            prompt = '<image>' + question + ' ' + option + ' ' + 'Answer:'
-            if data_samples[0].get('context') is not None:
-                prompt = sample.get('context') + ' ' + prompt
-
-            prompts.append(prompt)
+        prompts = self.prompt_constructor(data_samples)
 
         self.tokenizer.padding_side = 'left'
         input_text = self.tokenizer(
@@ -78,4 +68,5 @@ class OpenFlamingoInferencer(Flamingo):
         batch = self.data_preprocessor(batch, False)
         images = batch['images']
         data_samples = batch['data_samples']
-        return self.predict(images, data_samples)
+        response = self.predict(images, data_samples)
+        return response

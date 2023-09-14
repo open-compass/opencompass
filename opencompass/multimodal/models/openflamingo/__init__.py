@@ -1,3 +1,4 @@
 from .openflamingo import OpenFlamingoInferencer
+from .prompt_constructor import OpenFlamingoMMBenchPromptConstructor, OpenFlamingoCaptionPromptConstructor, OpenFlamingoVQAPromptConstructor, OpenFlamingoScienceQAPromptConstructor
 
-__all__ = ['OpenFlamingoInferencer']
+__all__ = ['OpenFlamingoInferencer', 'OpenFlamingoMMBenchPromptConstructor', 'OpenFlamingoCaptionPromptConstructor', 'OpenFlamingoVQAPromptConstructor', 'OpenFlamingoScienceQAPromptConstructor']

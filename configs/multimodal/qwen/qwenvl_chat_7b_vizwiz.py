@@ -1,11 +1,11 @@
-from opencompass.multimodal.models.visualglm import (VisualGLMVSRPostProcessor, VisualGLMVQAPromptConstructor)
+from opencompass.multimodal.models.qwen import QwenVLChatVQAPromptConstructor
 
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.LoadImageFromFile'),
     dict(type='mmpretrain.ToPIL', to_rgb=True),
     dict(type='mmpretrain.torchvision/Resize',
-         size=(224, 224),
+         size=(448, 448),
          interpolation=3),
     dict(type='mmpretrain.torchvision/ToTensor'),
     dict(type='mmpretrain.torchvision/Normalize',
@@ -18,26 +18,24 @@ val_pipeline = [
     )
 ]
 
-
-dataset = dict(type='mmpretrain.VSR',
-               data_root='data/vsr/',
-               data_prefix='images/',
-               ann_file='annotations/test.json',
+dataset = dict(type='mmpretrain.VizWiz',
+               data_root='data/vizwiz/',
+               data_prefix='Images/val',
+               ann_file='Annotations/val.json',
                pipeline=val_pipeline)
 
-visualglm_vsr_dataloader = dict(batch_size=1,
+qwen_vizwiz_dataloader = dict(batch_size=1,
                   num_workers=4,
                   dataset=dataset,
                   collate_fn=dict(type='pseudo_collate'),
                   sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-visualglm_vsr_model = dict(
-    type='visualglm',
-    pretrained_path='/mnt/petrelfs/share_data/yuanyike/visualglm-6b',  # or Huggingface repo id
-    prompt_constructor=dict(type=VisualGLMVQAPromptConstructor),
-    post_processor=dict(type=VisualGLMVSRPostProcessor)
+qwen_vizwiz_model = dict(
+    type='qwen-vl-chat',
+    pretrained_path='Qwen/Qwen-VL-Chat',  # or Huggingface repo id
+    prompt_constructor=dict(type=QwenVLChatVQAPromptConstructor)
 )
 
 # evaluation settings
-visualglm_vsr_evaluator = [dict(type='mmpretrain.GQAAcc')]
+qwen_vizwiz_evaluator = [dict(type='mmpretrain.VQAAcc')]

@@ -1,9 +1,9 @@
-from opencompass.multimodal.models.visualglm import (VisualGLMBasePostProcessor, VisualGLMMMBenchPromptConstructor)
+from opencompass.multimodal.models.qwen import QwenVLMMBenchPromptConstructor
 
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.torchvision/Resize',
-         size=(224, 224),
+         size=(448, 448),
          interpolation=3),
     dict(type='mmpretrain.torchvision/ToTensor'),
     dict(type='mmpretrain.torchvision/Normalize',
@@ -17,25 +17,25 @@ val_pipeline = [
 ]
 
 dataset = dict(type='opencompass.MMBenchDataset',
-               data_file='data/mmbench/mmbench_test_20230712.tsv',
-               pipeline=val_pipeline)
+               data_file='/mnt/petrelfs/share_data/yuanyike/cnbench_v010_rolling.tsv',
+               pipeline=val_pipeline, 
+               sys_prompt='请从以下选项中选择一个正确选项。')
 
-visualglm_mmbench_dataloader = dict(batch_size=1,
+qwen_mmbench_dataloader = dict(batch_size=1,
                   num_workers=4,
                   dataset=dataset,
                   collate_fn=dict(type='pseudo_collate'),
                   sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-visualglm_mmbench_model = dict(
-    type='visualglm',
-    pretrained_path='/mnt/petrelfs/share_data/yuanyike/visualglm-6b',  # or Huggingface repo id
-    prompt_constructor=dict(type=VisualGLMMMBenchPromptConstructor),
-    post_processor=dict(type=VisualGLMBasePostProcessor)
+qwen_model = dict(
+    type='qwen-vl-chat',
+    pretrained_path='Qwen/Qwen-VL-Chat',  # or Huggingface repo id
+    prompt_constructor=dict(type=QwenVLMMBenchPromptConstructor)
 )
 
 # evaluation settings
-visualglm_mmbench_evaluator = [
+qwen_mmbench_evaluator = [
     dict(type='opencompass.DumpResults',
-         save_path='work_dirs/visualglm-6b-mmbench.xlsx')
+         save_path='work_dirs/qwenvl-chat-7b-cnbench-v010.xlsx')
 ]

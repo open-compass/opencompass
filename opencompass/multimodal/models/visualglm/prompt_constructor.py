@@ -81,9 +81,7 @@ class VisualGLMBasePromptConstructor:
         data_samples = batch.pop('data_samples')
 
         # generate text prompt
-        img_prompt = '<img></img>'
-        prompt = img_prompt + self.prompt
-        image_position = prompt.rfind('<img>') + 5
+        prompt = ['<img></img>' + self.prompt for i in range(images.shape[0])]
 
         image_position = 5
 

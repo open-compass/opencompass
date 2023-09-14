@@ -1,25 +1,29 @@
-from opencompass.multimodal.models.openflamingo import OpenFlamingoMMBenchPromptConstructor
+from opencompass.multimodal.models.openflamingo import OpenFlamingoVQAPromptConstructor
 
 # dataloader settings
 val_pipeline = [
-    dict(type='mmpretrain.PILToNumpy'),
+    dict(type='LoadImageFromFile'),
     dict(type='mmpretrain.ResizeEdge',
          scale=224,
          interpolation='bicubic',
          backend='pillow'),
     dict(type='CenterCrop', crop_size=(224, 224)),
-    dict(type='mmpretrain.PackInputs',
-         algorithm_keys=[
-             'question', 'options', 'category', 'l2-category', 'index',
-             'context', 'options_dict'
-         ])
+    dict(
+        type='mmpretrain.PackInputs',
+        algorithm_keys=['question', 'gt_answer', 'gt_answer_weight'],
+        meta_keys=['question_id', 'image_id'],
+    )
 ]
 
-dataset = dict(type='opencompass.MMBenchDataset',
-               data_file='data/mmbench/mmbench_test_20230712.tsv',
-               pipeline=val_pipeline)
+dataset = dict(
+    type='mmpretrain.TextVQA',
+    data_root='data/textvqa',
+    ann_file='annotations/TextVQA_0.5.1_val.json',
+    pipeline=val_pipeline,
+    data_prefix='images/train_images',
+)
 
-openflamingo_mmbench_dataloader = dict(
+openflamingo_textvqa_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -29,7 +33,7 @@ openflamingo_mmbench_dataloader = dict(
 )
 
 # model settings
-openflamingo_mmbench_model = dict(
+openflamingo_textvqa_model = dict(
     type='openflamingo',
     data_preprocessor=dict(
         type='mmpretrain.MultiModalDataPreprocessor',
@@ -61,17 +65,12 @@ openflamingo_mmbench_model = dict(
                      cross_attn_every_n_layers=4,
                      use_media_placement_augmentation=False),
     ),
-    task='vqa'
+    task='vqa',
     generation_cfg=dict(num_beams=3, max_new_tokens=20, length_penalty=-2.0),
-    prompt_constructor=dict(type=OpenFlamingoMMBenchPromptConstructor)
+    prompt_constructor=dict(type=OpenFlamingoVQAPromptConstructor)
 )
 
 # evaluation settings
-openflamingo_mmbench_evaluator = [
-    dict(
-        type='opencompass.DumpResults',
-        save_path=  # noqa: E251
-        'work_dirs/9b-flamingo/9b-flamingo-mmbench.xlsx')
-]
+openflamingo_textvqa_evaluator = [dict(type='mmpretrain.VQAAcc')]
 
 openflamingo_load_from = '/mnt/petrelfs/share_data/zhaowangbo/openflamingo-9b-adapter_20230505-554310c8.pth'  # noqa

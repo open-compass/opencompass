@@ -1,25 +1,24 @@
-from opencompass.multimodal.models.openflamingo import OpenFlamingoMMBenchPromptConstructor
+from opencompass.multimodal.models.openflamingo import OpenFlamingoCaptionPromptConstructor
 
 # dataloader settings
 val_pipeline = [
-    dict(type='mmpretrain.PILToNumpy'),
+    dict(type='LoadImageFromFile'),
     dict(type='mmpretrain.ResizeEdge',
          scale=224,
          interpolation='bicubic',
          backend='pillow'),
     dict(type='CenterCrop', crop_size=(224, 224)),
-    dict(type='mmpretrain.PackInputs',
-         algorithm_keys=[
-             'question', 'options', 'category', 'l2-category', 'index',
-             'context', 'options_dict'
-         ])
+    dict(type='mmpretrain.PackInputs', algorithm_keys=['image_id'])
 ]
 
-dataset = dict(type='opencompass.MMBenchDataset',
-               data_file='data/mmbench/mmbench_test_20230712.tsv',
+dataset = dict(type='mmpretrain.Flickr30kCaption',
+               data_root='data/flickr30k',
+               ann_file='annotations/dataset_flickr30k.json',
+               data_prefix='images',
+               split='val',
                pipeline=val_pipeline)
 
-openflamingo_mmbench_dataloader = dict(
+openflamingo_flickr30k_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -29,7 +28,7 @@ openflamingo_mmbench_dataloader = dict(
 )
 
 # model settings
-openflamingo_mmbench_model = dict(
+openflamingo_flickr30k_model = dict(
     type='openflamingo',
     data_preprocessor=dict(
         type='mmpretrain.MultiModalDataPreprocessor',
@@ -61,17 +60,17 @@ openflamingo_mmbench_model = dict(
                      cross_attn_every_n_layers=4,
                      use_media_placement_augmentation=False),
     ),
-    task='vqa'
+    task='caption',
     generation_cfg=dict(num_beams=3, max_new_tokens=20, length_penalty=-2.0),
-    prompt_constructor=dict(type=OpenFlamingoMMBenchPromptConstructor)
+    prompt_constructor=dict(type=OpenFlamingoCaptionPromptConstructor)
 )
 
 # evaluation settings
-openflamingo_mmbench_evaluator = [
+openflamingo_flickr30k_evaluator = [
     dict(
-        type='opencompass.DumpResults',
-        save_path=  # noqa: E251
-        'work_dirs/9b-flamingo/9b-flamingo-mmbench.xlsx')
+        type='mmpretrain.COCOCaption',
+        ann_file='data/flickr30k/annotations/flickr30k_val_gt.json',
+    )  # noqa
 ]
 
 openflamingo_load_from = '/mnt/petrelfs/share_data/zhaowangbo/openflamingo-9b-adapter_20230505-554310c8.pth'  # noqa
