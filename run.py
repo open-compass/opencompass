@@ -266,6 +266,11 @@ def main():
         if args.dry_run:
             return
         runner = RUNNERS.build(cfg.infer.runner)
+        # Add extra attack config if exists
+        if hasattr(cfg, 'attack'):
+            for task in tasks:
+                cfg.attack.dataset = task.datasets[0][0].abbr
+                task.attack = cfg.attack
         runner(tasks)
 
     # evaluate

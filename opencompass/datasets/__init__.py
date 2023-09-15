@@ -70,6 +70,7 @@ from .tydiqa import *  # noqa: F401, F403
 from .wic import *  # noqa: F401, F403
 from .winograd import *  # noqa: F401, F403
 from .winogrande import *  # noqa: F401, F403
+from .wnli import wnliDataset  # noqa: F401, F403
 from .wsc import *  # noqa: F401, F403
 from .xcopa import *  # noqa: F401, F403
 from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
