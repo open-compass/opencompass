@@ -31,10 +31,12 @@ ds1000_eval_cfg = dict(
     pred_postprocessor=dict(type=ds1000_postprocess),
 )
 
+# The DS-1000 dataset can be downloaded from
+# https://github.com/HKUNLP/DS-1000/blob/main/ds1000_data.zip
 ds1000_datasets = [
     dict(
         abbr=f"ds1000_{lib}",
-        type=DS1000Dataset,  # bustm share the same format with AFQMC
+        type=DS1000Dataset,
         path="ds1000_data/",
         libs=f"{lib}",
         reader_cfg=ds1000_reader_cfg,
@@ -52,7 +54,7 @@ ds1000_datasets = [
 ds1000_datasets.append(
     dict(
         abbr="ds1000_Matplotlib",
-        type=DS1000Dataset,  # bustm share the same format with AFQMC
+        type=DS1000Dataset,
         path="ds1000_data/",
         libs="Matplotlib",
         reader_cfg=ds1000_reader_cfg,

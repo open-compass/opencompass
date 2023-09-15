@@ -23,6 +23,11 @@ from .base import BaseDataset
 
 @LOAD_DATASET.register_module()
 class DS1000Dataset(BaseDataset):
+    """DS1000 dataset.
+
+    The DS-1000 dataset can be downloaded from
+    https://github.com/HKUNLP/DS-1000/blob/main/ds1000_data.zip
+    """
 
     ALL_LIBS = [
         'Pandas',
@@ -35,6 +40,7 @@ class DS1000Dataset(BaseDataset):
     ]
 
     def get_data(self, problem_path: str) -> dict:
+        """Get necessary data from problem path."""
 
         problem_path = Path(problem_path)
         data = dict()
@@ -62,7 +68,6 @@ class DS1000Dataset(BaseDataset):
             with open(problem_path / file_name, 'r', encoding='UTF-8') as f:
                 data[file_name.split('.')[0]] = f.read()
 
-        # TODO: move necessary to test
         data['test_column'] = dict(
             problem_path=str(problem_path),
             code_context=data.pop('code_context'),
@@ -75,6 +80,15 @@ class DS1000Dataset(BaseDataset):
              path: str,
              libs: Optional[Union[str, list]] = None,
              mode: str = 'Insertion'):
+        """Load dataset.
+
+        Args:
+            path(str): Data path of the dataset.
+            libs(Optional[Union[str, list]]): All the libraries to be
+                tested. Defaults to None, which means all.
+            mode(str): Dataset mode. Only `Insertion` and `Completion`
+                are supported. Defaults to `Insertion`.
+        """
 
         if isinstance(libs, str):
             libs = [libs]
