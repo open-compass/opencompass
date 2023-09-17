@@ -1,18 +1,34 @@
 import json
 import os
+import sys
 from pathlib import Path
 
 import clip
 import mmengine
 import torch
 import torch.nn as nn
-from llama_adapter_v2_multimodal7b.llama.llama import ModelArgs, Transformer
-from llama_adapter_v2_multimodal7b.llama.tokenizer import Tokenizer
-from llama_adapter_v2_multimodal7b.llama.utils import sample_top_p
 from mmengine.device import get_device
 from timm.models.vision_transformer import Block
 
 from opencompass.registry import MM_MODELS
+
+
+def load_package():
+    """Load required packages from llama_adapter_v2_multimodal7b."""
+    current_file_path = os.path.abspath(__file__)
+    current_folder_path = os.path.dirname(current_file_path)
+
+    sys.path.append(os.path.join(current_folder_path, 'LLaMA-Adapter'))  # noqa
+    from llama_adapter_v2_multimodal7b.llama.llama import (ModelArgs,
+                                                           Transformer)
+    from llama_adapter_v2_multimodal7b.llama.tokenizer import Tokenizer
+    from llama_adapter_v2_multimodal7b.llama.utils import sample_top_p
+    sys.path.pop(-1)
+
+    return ModelArgs, Transformer, Tokenizer, sample_top_p
+
+
+ModelArgs, Transformer, Tokenizer, sample_top_p = load_package()
 
 
 class LLaMA_adapter(nn.Module):
@@ -182,7 +198,6 @@ class LLaMA_adapter(nn.Module):
 
         data_sample = data_samples[0]
 
-        prompts = [prompts]
         imgs = image
 
         # import pdb;pdb.set_trace()

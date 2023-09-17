@@ -48,8 +48,15 @@ class MplugOwlMMBenchPromptConstructor:
                 data_sample.get('context') for data_sample in data_samples
             ]
         else:
-            context = ''
-
-        prompts = context + ' ' + question + ' ' + options  # noqa
+            context = [''] * len(data_samples)
+        # print("context", context)
+        # print("question", question)
+        # print("options", options)
+        # import pdb;pdb.set_trace()
+        prompts = []
+        for cur_context, cur_question, cur_options in zip(
+                context, question, options):
+            prompts.append(cur_context + ' ' + cur_question + ' ' +
+                           cur_options)  # noqa
 
         return prompts
