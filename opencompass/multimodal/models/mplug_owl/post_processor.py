@@ -9,7 +9,7 @@ class MplugOwlMMBenchPostProcessor:
     def __init__(self) -> None:
         pass
 
-    def __call__(self, output_token: torch.tensor, tokenizer) -> str:
+    def __call__(self, output_token: torch.tensor) -> str:
         pattern = re.compile(r'([A-Z]\.)')
         res = pattern.findall(output_token)
         if len(res) > 0:
