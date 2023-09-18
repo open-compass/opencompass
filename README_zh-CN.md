@@ -34,7 +34,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **\[2023.09.12\]** 我们发布了[长文本评测指引](docs/zh_cn/advanced_guides/longeval.md).🔥🔥🔥.
+- **\[2023.09.18\]** 我们发布了[长文本评测指引](docs/zh_cn/advanced_guides/longeval.md).🔥🔥🔥.
 - **\[2023.09.08\]** 我们在评测榜单上更新了Baichuan-2/Tigerbot-2/Vicuna-v1.5, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情🔥🔥🔥.
 - **\[2023.09.06\]** 欢迎 [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。🔥🔥🔥.
 - **\[2023.09.02\]** 我们加入了[Qwen-VL](https://github.com/QwenLM/Qwen-VL)的评测支持。

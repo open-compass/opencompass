@@ -60,6 +60,9 @@ OpenCompass 上手路线
    advanced_guides/new_model.md
    advanced_guides/evaluation_turbomind.md
    advanced_guides/code_eval_service.md
+   advanced_guides/longeval.md
+   advanced_guides/result_leval.md
+   advanced_guides/result_longbench.md
 
 .. _工具:
 .. toctree::
