@@ -50,7 +50,7 @@ openflamingo_vizwiz_model = dict(
         final_norm=False,
         out_type='raw',
         pretrained=  # noqa: E251
-        '/mnt/petrelfs/share_data/zhaowangbo/vit-large-p14_clip-openai-pre_3rdparty_20230517-95e2af0b.pth',  # noqa
+        '/path/to/vision/encoder',  # noqa
     ),
     lang_encoder=dict(
         base=dict(type='mmpretrain.AutoModelForCausalLM',
@@ -71,4 +71,4 @@ openflamingo_vizwiz_model = dict(
 openflamingo_vizwiz_evaluator = [dict(type='mmpretrain.VQAAcc')]
 
 
-openflamingo_load_from = '/mnt/petrelfs/share_data/zhaowangbo/openflamingo-9b-adapter_20230505-554310c8.pth'  # noqa
+openflamingo_load_from = '/path/to/pretrained/weights'  # noqa
