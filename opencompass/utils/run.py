@@ -98,8 +98,9 @@ def get_config_from_arg(args) -> Config:
     
     summarizer = None
     if args.summarizer:
-        cfg = Config.fromfile(args.summarizer)
-        print(f"Loading summarizer config from {args.summarizer}")
+        s = match_cfg_file('configs/summarizers/', [args.summarizer])[0]
+        get_logger().info(f'Loading {s[0]}: {s[1]}')
+        cfg = Config.fromfile(s[1])
         summarizer = cfg['summarizer']
 
     return Config(dict(models=models, datasets=datasets, summarizer=summarizer),
