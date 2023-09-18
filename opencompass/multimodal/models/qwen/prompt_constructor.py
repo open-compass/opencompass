@@ -27,14 +27,14 @@ class QwenVLMMBenchPromptConstructor:
             },
         ]
         return format_input
-    
+
+
 class QwenVLChatPromptConstructor:
-    """Prompt constructorfor Qwen-VL-Chat.
-    """
-    
+    """Prompt constructorfor Qwen-VL-Chat."""
+
     def __init__(self, prompt='') -> None:
         self.prompt = prompt
-    
+
     def __call__(self, inputs: dict) -> list:
         assert len(inputs['data_samples']) == 1
         format_input = [
@@ -46,13 +46,14 @@ class QwenVLChatPromptConstructor:
             },
         ]
         return format_input
-    
+
+
 class QwenVLChatVQAPromptConstructor:
-    """VQA prompt constructor for Qwen-VL-Chat.
-    """
+    """VQA prompt constructor for Qwen-VL-Chat."""
+
     def __init__(self, prompt='') -> None:
         self.prompt = prompt
-    
+
     def __call__(self, inputs: dict) -> list:
         data_samples = inputs['data_samples']
         assert len(data_samples) == 1
@@ -67,15 +68,15 @@ class QwenVLChatVQAPromptConstructor:
             },
         ]
         return format_input
-    
+
+
 class QwenVLChatScienceQAPromptConstructor:
-    """ScienceQA prompt constructor for Qwen-VL-Chat.
-    """
+    """ScienceQA prompt constructor for Qwen-VL-Chat."""
     choice_mapping = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F'}
-    
+
     def __init__(self, prompt='') -> None:
         self.prompt = prompt
-    
+
     def __call__(self, inputs: dict) -> list:
         data_samples = inputs['data_samples']
         assert len(data_samples) == 1

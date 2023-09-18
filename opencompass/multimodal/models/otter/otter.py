@@ -1,7 +1,8 @@
+import importlib
+
 import mmengine
 import torch
 import torch.nn as nn
-import importlib
 from mmengine.device import get_device
 
 from opencompass.registry import MM_MODELS
@@ -22,13 +23,17 @@ class Otter(nn.Module):
         mode (str): The mode of inference. Defaults to 'generation'.
     """
 
-    def __init__(self, model_path, load_bit, prompt_constructor,
-                 post_processor, mode='generation') -> None:
+    def __init__(self,
+                 model_path,
+                 load_bit,
+                 prompt_constructor,
+                 post_processor,
+                 mode='generation') -> None:
         super().__init__()
         torch_dtype = torch.bfloat16 if load_bit == 'bf16' else torch.float32
         otter_ai = importlib.import_module('otter_ai')
         self.model = otter_ai.OtterForConditionalGeneration.from_pretrained(
-            model_path, torch_dtype=torch_dtype, device_map = get_device())
+            model_path, torch_dtype=torch_dtype, device_map=get_device())
         self.tokenizer = self.model.text_tokenizer
         self.tokenizer.padding_side = 'left'
         self.model_dtype = next(self.model.parameters()).dtype

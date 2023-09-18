@@ -11,7 +11,9 @@ if TYPE_CHECKING:
         pass
 
 from .otter import Otter
-from .prompt_constructor import OTTERMMBenchPromptConstructor
 from .post_processor import OTTERMMBenchPostProcessor
+from .prompt_constructor import OTTERMMBenchPromptConstructor
 
-__all__ = ['Otter', 'OTTERMMBenchPromptConstructor', 'OTTERMMBenchPostProcessor']
+__all__ = [
+    'Otter', 'OTTERMMBenchPromptConstructor', 'OTTERMMBenchPostProcessor'
+]

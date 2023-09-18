@@ -1,9 +1,11 @@
-from mmpretrain.structures import DataSample
 from typing import Optional
 
+from mmpretrain.structures import DataSample
+
+
 class OpenFlamingoMMBenchPromptConstructor:
-    """MMBench prompt constructor for OpenFlamingo.
-    """
+    """MMBench prompt constructor for OpenFlamingo."""
+
     def __init__(self) -> None:
         pass
 
@@ -29,17 +31,19 @@ class OpenFlamingoMMBenchPromptConstructor:
         prompts.append(prompt)
 
         return prompts
-    
-class OpenFlamingoCaptionPromptConstructor:
-    """Caption prompt constructor for OpenFlamingo.
-    """
 
-    def __init__(self, shot_prompt:Optional[str]=None) -> None:
+
+class OpenFlamingoCaptionPromptConstructor:
+    """Caption prompt constructor for OpenFlamingo."""
+
+    def __init__(self, shot_prompt: Optional[str] = None) -> None:
         if shot_prompt:
             self.shot_prompt = shot_prompt
         else:
-            self.shot_prompt = ("Output:A child holding a flowered umbrella and petting a yak.<|endofchunk|>"
-            "Output:The child is holding a brush close to his mouth.<|endofchunk|>")
+            self.shot_prompt = (
+                'Output:A child holding a flowered umbrella and petting a yak.<|endofchunk|>'  # noqa
+                'Output:The child is holding a brush close to his mouth.<|endofchunk|>'  # noqa
+            )  # noqa
 
     def __call__(self, data_samples: DataSample) -> tuple:
         """Construct prompt.
@@ -55,18 +59,19 @@ class OpenFlamingoCaptionPromptConstructor:
         prompt = '<image>Output:'
         prompts.append(self.shot_prompt + prompt)
         return prompts
-    
-class OpenFlamingoVQAPromptConstructor:
-    """VQA prompt constructor for OpenFlamingo.
-    """
 
-    def __init__(self, shot_prompt:Optional[str]=None) -> None:
+
+class OpenFlamingoVQAPromptConstructor:
+    """VQA prompt constructor for OpenFlamingo."""
+
+    def __init__(self, shot_prompt: Optional[str] = None) -> None:
         if shot_prompt:
             self.shot_prompt = shot_prompt
         else:
-            self.shot_prompt = ('Question:Is the sky dark? Short Answer:yes<|endofchunk|>'  # noqa: E501
-            'Question:What is on the white wall? Short Answer:pipe<|endofchunk|>'  # noqa: E501
-            )
+            self.shot_prompt = (
+                'Question:Is the sky dark? Short Answer:yes<|endofchunk|>'  # noqa: E501
+                'Question:What is on the white wall? Short Answer:pipe<|endofchunk|>'  # noqa: E501
+            )  # noqa
 
     def __call__(self, data_samples: DataSample) -> tuple:
         """Construct prompt.
@@ -76,27 +81,28 @@ class OpenFlamingoVQAPromptConstructor:
 
         Returns:
             Raw text input (str).
-        """        
+        """
         prompts = []
         for sample in data_samples:
             question = sample.get('question')
             prompt = '<image>Question:{} Short Answer:'.format(question)
             prompts.append(self.shot_prompt + prompt)
         return prompts
-    
+
+
 class OpenFlamingoScienceQAPromptConstructor:
-    """ScienceQA prompt constructor for OpenFlamingo.
-    """
+    """ScienceQA prompt constructor for OpenFlamingo."""
     choice_mapping = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F'}
-    
-    def __init__(self, shot_prompt:Optional[str]=None) -> None:
+
+    def __init__(self, shot_prompt: Optional[str] = None) -> None:
         if shot_prompt:
             self.shot_prompt = shot_prompt
         else:
-            self.shot_prompt = ("Context:Question:Which of these states is farthest north? Choices:['(A) West Virginia' '(B) Louisiana' '(C) Arizona' '(D) Oklahoma'] Answer with a single character: A<|endofchunk|>"
-            'Context:The diagrams below show two pure samples of gas in identical closed, rigid containers. Each colored ball represents one gas particle. Both samples have the same number of particles.'
-            "Question:Compare the average  kinetic energies of the particles in each sample. Which sample has the higher temperature? Choices:'[(A) neither' '(B) sample A' '(C) sample B'] Answer with a single character: C<|endofchunk|>"
-            )
+            self.shot_prompt = (
+                "Context:Question:Which of these states is farthest north? Choices:['(A) West Virginia' '(B) Louisiana' '(C) Arizona' '(D) Oklahoma'] Answer with a single character: A<|endofchunk|>"  # noqa
+                'Context:The diagrams below show two pure samples of gas in identical closed, rigid containers. Each colored ball represents one gas particle. Both samples have the same number of particles.'  # noqa
+                "Question:Compare the average  kinetic energies of the particles in each sample. Which sample has the higher temperature? Choices:'[(A) neither' '(B) sample A' '(C) sample B'] Answer with a single character: C<|endofchunk|>"  # noqa
+            )  # noqa
 
     def __call__(self, data_samples: DataSample) -> tuple:
         """Construct prompt.
@@ -117,6 +123,8 @@ class OpenFlamingoScienceQAPromptConstructor:
         ]
         hint = sample.get('hint')
         prompts = []
-        prompt = '<image>Context:{} Question:{} Choices:{} Answer with a single character:'.format(hint, question, choices)
+        prompt = '<image>Context:{} Question:{} Choices:{}'.format(
+            hint, question, choices)
+        prompt += ' Answer with a single character:'
         prompts.append(self.shot_prompt + prompt)
         return prompts

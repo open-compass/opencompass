@@ -1,8 +1,8 @@
+import re
 from typing import List, Optional, Union
 
 import mmengine
 import torch
-import re
 from mmpretrain.models.multimodal import Flamingo
 from mmpretrain.structures import DataSample
 
@@ -59,7 +59,7 @@ class OpenFlamingoInferencer(Flamingo):
             max_length=2000,
         ).to(device)
         return input_text
-    
+
     def post_process(
             self, outputs: torch.Tensor,
             data_samples: Optional[List[DataSample]]) -> List[DataSample]:
@@ -73,8 +73,8 @@ class OpenFlamingoInferencer(Flamingo):
         Returns:
             List[DataSample]: Return list of data samples.
         """
-        outputs = self.tokenizer.batch_decode(
-            outputs, skip_special_tokens=True)
+        outputs = self.tokenizer.batch_decode(outputs,
+                                              skip_special_tokens=True)
 
         if data_samples is None:
             data_samples = [DataSample() for _ in range(len(outputs))]
@@ -85,12 +85,14 @@ class OpenFlamingoInferencer(Flamingo):
                 data_sample.pred_caption = re.split('Output', output,
                                                     1)[0].replace('"', '')
                 if self.post_processor:
-                    data_sample.pred_caption = self.post_processor(data_sample.pred_caption)
+                    data_sample.pred_caption = self.post_processor(
+                        data_sample.pred_caption)
             elif self.task == 'vqa':
                 data_sample.pred_answer = re.split('Question|Answer', output,
                                                    1)[0]
                 if self.post_processor:
-                    data_sample.pred_answer = self.post_processor(data_sample.pred_answer)
+                    data_sample.pred_answer = self.post_processor(
+                        data_sample.pred_answer)
 
         return data_samples
 

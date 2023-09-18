@@ -15,6 +15,7 @@ class QwenVLBasePostProcessor:
         response = response.replace('<|endoftext|>', '').strip()
         return response
 
+
 class QwenVLChatVSRPostProcessor:
     """VSR post processor for Qwen-VL-Chat."""
 
