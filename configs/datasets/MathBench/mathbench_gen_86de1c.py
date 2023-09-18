@@ -6,7 +6,6 @@ from opencompass.datasets import MathBenchDataset, mathbench_postprocess
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 
-
 single_choice_prompts = {
     "single_choice_cn_with_reasoning": "以下是一道关于数学的单项选择题，请你一步一步推理并得到最终的答案选项。回答格式为如下：\n答案选项：A、B、C、D中你认为正确的一个选项\n计算过程：根据题目得到选项答案的一步步过程\n请严格按照上面的格式回答问题，下面是你要回答的题目：\n{question}\n答案选项：",
     "single_choice_cn": "以下是一道关于数学的单项选择题，请你直接给出正确的答案选项。回答格式为如下：\n答案选项：A、B、C、D中你认为正确的选项\n下面是你要回答的题目：\n{question}\n答案选项：",
@@ -96,12 +95,12 @@ for _split in list(mathbench_sets.keys()):
 
         mathbench_eval_cfg = dict(
             evaluator=dict(type=CircularEvaluator if 'choice' in _name  else AccEvaluator),
-            pred_postprocessor=dict(type=first_capital_postprocess ) if 'single_choice' in _name else dict(type=mathbench_postprocess, name=_name),)
+            pred_postprocessor=dict(type=first_capital_postprocess ) if 'single_choice' in _name else dict(type=mathbench_postprocess, name=_name))
 
         mathbench_datasets.append(
             dict(
                 type=MathBenchDataset,
-                path=f"./data/mathbench/version_1/{_split}",
+                path=f"./data/mathbench/{_split}",
                 name=_name,
                 abbr="mathbench-" + _split + '-' + _name, 
                 reader_cfg=dict(
