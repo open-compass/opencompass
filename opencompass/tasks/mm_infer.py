@@ -122,6 +122,7 @@ class MultimodalInferTask:
         dataloader = Runner.build_dataloader(self.dataloader)
         # build model
         model = build_model(self.cfg)
+        model.eval()
         # build evaluator
         evaluator = Evaluator(self.evaluator)
 
