@@ -62,8 +62,6 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    advanced_guides/code_eval_service.md
    advanced_guides/prompt_attack.md
    advanced_guides/longeval.md
-   advanced_guides/result_leval.md
-   advanced_guides/result_longbench.md
 
 .. _Tools:
 .. toctree::
