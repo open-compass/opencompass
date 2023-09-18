@@ -1,4 +1,4 @@
-from opencompass.multimodal.models.openflamingo import OpenFlamingoVQAPromptConstructor
+from opencompass.multimodal.models.openflamingo import OpenFlamingoVQAPromptConstructor, OpenFlamingoVSRPostProcessor
 # dataloader settings
 val_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -21,7 +21,7 @@ dataset = dict(type='mmpretrain.VSR',
                pipeline=val_pipeline)
 
 openflamingo_vsr_dataloader = dict(
-    batch_size=1,
+    batch_size=8,
     num_workers=4,
     dataset=dataset,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -64,7 +64,9 @@ openflamingo_vsr_model = dict(
     ),
     task='vqa',
     generation_cfg=dict(num_beams=3, max_new_tokens=20, length_penalty=-2.0),
-    prompt_constructor=dict(type=OpenFlamingoVQAPromptConstructor)
+    prompt_constructor=dict(type=OpenFlamingoVQAPromptConstructor, shot_prompt=('The cat is behind the laptop. Short Answer:yes<|endofchunk|>'  # noqa: E501
+        'The cow is ahead of the person. Short Answer:no<|endofchunk|>')),
+    post_processor=dict(type=OpenFlamingoVSRPostProcessor)
 )
 
 # evaluation settings

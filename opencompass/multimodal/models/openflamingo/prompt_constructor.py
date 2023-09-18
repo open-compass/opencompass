@@ -76,13 +76,12 @@ class OpenFlamingoVQAPromptConstructor:
 
         Returns:
             Raw text input (str).
-        """
-        assert len(data_samples) == 1
-        sample = data_samples[0]
-        question = sample.get('question')
+        """        
         prompts = []
-        prompt = '<image>Question:{} Short Answer:'.format(question)
-        prompts.append(prompt)
+        for sample in data_samples:
+            question = sample.get('question')
+            prompt = '<image>Question:{} Short Answer:'.format(question)
+            prompts.append(self.shot_prompt + prompt)
         return prompts
     
 class OpenFlamingoScienceQAPromptConstructor:
@@ -118,6 +117,6 @@ class OpenFlamingoScienceQAPromptConstructor:
         ]
         hint = sample.get('hint')
         prompts = []
-        prompt = '<image>Context:{hint} Question:{question} Choices:{choices} Answer with a single character:'.format(hint, question, choices)
-        prompts.append(prompt)
+        prompt = '<image>Context:{} Question:{} Choices:{} Answer with a single character:'.format(hint, question, choices)
+        prompts.append(self.shot_prompt + prompt)
         return prompts

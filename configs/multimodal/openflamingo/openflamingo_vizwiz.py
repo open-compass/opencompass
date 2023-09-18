@@ -21,7 +21,7 @@ dataset = dict(type='mmpretrain.VizWiz',
                pipeline=val_pipeline)
 
 openflamingo_vizwiz_dataloader = dict(
-    batch_size=1,
+    batch_size=8,
     num_workers=4,
     dataset=dataset,
     sampler=dict(type='DefaultSampler', shuffle=False),

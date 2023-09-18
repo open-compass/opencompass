@@ -22,7 +22,7 @@ dataset = dict(type='mmpretrain.GQA',
                pipeline=val_pipeline)
 
 openflamingo_gqa_dataloader = dict(
-    batch_size=1,
+    batch_size=8,
     num_workers=4,
     dataset=dataset,
     sampler=dict(type='DefaultSampler', shuffle=False),

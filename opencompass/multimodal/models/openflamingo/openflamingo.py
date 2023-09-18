@@ -2,6 +2,7 @@ from typing import List, Optional, Union
 
 import mmengine
 import torch
+import re
 from mmpretrain.models.multimodal import Flamingo
 from mmpretrain.structures import DataSample
 
@@ -31,6 +32,8 @@ class OpenFlamingoInferencer(Flamingo):
         if post_processor is not None:
             self.post_processor = mmengine.registry.build_from_cfg(
                 post_processor, MM_MODELS)
+        else:
+            self.post_processor = None
         self.mode = mode
 
     def preprocess_text(self, data_samples: List[DataSample],
@@ -56,6 +59,40 @@ class OpenFlamingoInferencer(Flamingo):
             max_length=2000,
         ).to(device)
         return input_text
+    
+    def post_process(
+            self, outputs: torch.Tensor,
+            data_samples: Optional[List[DataSample]]) -> List[DataSample]:
+        """Perform post process for outputs for different task.
+
+        Args:
+            outputs (torch.Tensor): The generated outputs.
+            data_samples (List[DataSample], optional): The annotation
+                data of every samples.
+
+        Returns:
+            List[DataSample]: Return list of data samples.
+        """
+        outputs = self.tokenizer.batch_decode(
+            outputs, skip_special_tokens=True)
+
+        if data_samples is None:
+            data_samples = [DataSample() for _ in range(len(outputs))]
+
+        for output, data_sample in zip(outputs, data_samples):
+            # remove text pattern
+            if self.task == 'caption':
+                data_sample.pred_caption = re.split('Output', output,
+                                                    1)[0].replace('"', '')
+                if self.post_processor:
+                    data_sample.pred_caption = self.post_processor(data_sample.pred_caption)
+            elif self.task == 'vqa':
+                data_sample.pred_answer = re.split('Question|Answer', output,
+                                                   1)[0]
+                if self.post_processor:
+                    data_sample.pred_answer = self.post_processor(data_sample.pred_answer)
+
+        return data_samples
 
     def forward(self, batch: dict) -> Union[DataSample, List[DataSample]]:
 
