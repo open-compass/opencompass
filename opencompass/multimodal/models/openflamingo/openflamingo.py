@@ -68,5 +68,4 @@ class OpenFlamingoInferencer(Flamingo):
         batch = self.data_preprocessor(batch, False)
         images = batch['images']
         data_samples = batch['data_samples']
-        response = self.predict(images, data_samples)
-        return response
+        return self.predict(images, data_samples)

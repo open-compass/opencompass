@@ -31,7 +31,8 @@ visualglm_mmbench_model = dict(
     type='visualglm',
     pretrained_path='/mnt/petrelfs/share_data/yuanyike/visualglm-6b',  # or Huggingface repo id
     prompt_constructor=dict(type=VisualGLMMMBenchPromptConstructor),
-    post_processor=dict(type=VisualGLMBasePostProcessor)
+    post_processor=dict(type=VisualGLMBasePostProcessor),
+    gen_kwargs=dict(max_new_tokens=50,num_beams=5,do_sample=False,repetition_penalty=1.0,length_penalty=-1.0)
 )
 
 # evaluation settings

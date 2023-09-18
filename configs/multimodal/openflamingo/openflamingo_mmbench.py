@@ -61,7 +61,7 @@ openflamingo_mmbench_model = dict(
                      cross_attn_every_n_layers=4,
                      use_media_placement_augmentation=False),
     ),
-    task='vqa'
+    task='vqa',
     generation_cfg=dict(num_beams=3, max_new_tokens=20, length_penalty=-2.0),
     prompt_constructor=dict(type=OpenFlamingoMMBenchPromptConstructor)
 )

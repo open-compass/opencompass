@@ -3,11 +3,8 @@
 ### Prepare the environment
 
 ```sh
-cd opencompass/multimodal/models/otter
-git clone https://github.com/Luodian/Otter.git
+pip install otter_ai
 ```
-
-Then create a new conda environment and prepare the environement according to this [doc](https://github.com/Luodian/Otter)
 
 ### Start evaluation
 
