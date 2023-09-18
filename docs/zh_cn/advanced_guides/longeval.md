@@ -30,10 +30,30 @@ RoPE被应用于许多LLM模型，包括LLaMA、LLaMA 2和Vicuna-7b-v1.5-16k。
 
 尽管RoPE和其他替代原始位置编码的方法（如T5 bias）改善了外推能力，但它们的速度比原始方法慢得多，并且使用了额外的内存和参数。因此，作者引入了具有线性偏置的注意力（ALiBi）来促进高效的外推。
 
-对于长度为L的输入子序列，注意力子层在每个head中计算第i个query $q\_{i} \\in R^{1\\times d}, (1\\leq i\\leq L)$的注意力分数，给定前i个键$K \\in R^{i\\times d}$，其中d是head维度。
-$$softmax(q\_{i}K^{T})$$
+对于长度为L的输入子序列，注意力子层在每个head中计算第i个query
+
+```{math}
+q_{i} \in R^{1 \times d}, (1 \leq i \leq L)
+```
+
+的注意力分数，给定前i个键
+
+```{math}
+K \in R^{i \times d}
+```
+
+其中d是head维度。
+
+```{math}
+softmax(q_{i}K^{T})
+```
+
 ALiBi通过与相关key和query之间的距离成比例的线性递减惩罚来负向偏置注意力分数。它唯一的修改是在query-key点积之后，在其中添加了一个静态的、非学习的偏置。
-$$softmax(q\_{i}K^{T}+m\\cdot\[-(i-1),...,-2,-1,0\])$$
+
+```{math}
+softmax(q_{i}K^{T}+m\cdot[-(i-1),...,-2,-1,0])
+```
+
 其中m是在训练之前固定的head特定的斜率。
 
 ALiBi去除了位置嵌入部分，它与原始位置编码方法一样快。它被用于包括mpt-7b-storywriter在内的大语言模型，该模型能够处理非常长的输入。

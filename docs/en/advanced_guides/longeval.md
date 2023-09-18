@@ -30,10 +30,30 @@ RoPE is adopted in many LLMs including LLaMA, LLaMA 2 and Vicuna-7b-v1.5-16k.
 
 Though RoPE and other alternatives to the original sinusoidal position method(like T5 bias) have improved extrapolation, they are considerably slower than the sinusoidal approach and use extra memory and parameter. Therefore, Attention with Linear Biases (ALiBi) is introduced to facilitate efficient extrapolation.
 
-For an input subsequence of length L, the attention sublayer computes the attention scores for the ith query $q\_{i} \\in R^{1\\times d}, (1\\leq i\\leq L)$ in each head, given the first i keys $K \\in R^{i\\times d}$, where d is the head dimension.
-$$softmax(q\_{i}K^{T})$$
+For an input subsequence of length L, the attention sublayer computes the attention scores for the ith query
+
+```{math}
+q_{i} \in R^{1 \times d}, (1 \leq i \leq L)
+```
+
+in each head, given the first i keys
+
+```{math}
+K \in R^{i \times d}
+```
+
+where d is the head dimension.
+
+```{math}
+softmax(q_{i}K^{T})
+```
+
 ALiBi negatively biases attention scores with a linearly decreasing penalty proportional to the distance between the relevant key and query.  The only modification it applies is after the query-key dot product, where it adds a static, non-learned bias.
-$$softmax(q\_{i}K^{T}+m\\cdot\[-(i-1),...,-2,-1,0\])$$
+
+```{math}
+softmax(q_{i}K^{T}+m\cdot[-(i-1),...,-2,-1,0])
+```
+
 where scalar m is a head-specific slope fixed before training.
 
 ALiBi eliminates position embeddings and it is as fast as the sinusoidal approach. It is used in LLMs including mpt-7b-storywriter, which is prepared to handle extremely long inputs.
