@@ -3,7 +3,6 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import HFDataset
-from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 
 wikitext_infer_cfg = dict(
@@ -15,13 +14,7 @@ wikitext_infer_cfg = dict(
     inferencer=dict(type=GenInferencer), # need a new ppl inferencer
 )
 
-# wikitext_eval_cfg = dict(
-#     evaluator=dict(type=AccEvaluator),
-#     pred_role="BOT",
-#     pred_postprocessor=dict(type=first_capital_postprocess),
-# )
-wikitext_eval_cfg = dict()
-
+wikitext_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
 wikitext_103_raw_datasets = []
 for _split in ["validation", "test"]:
