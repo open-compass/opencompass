@@ -49,7 +49,6 @@ class MplugOwlMMBenchPromptConstructor:
             ]
         else:
             context = [''] * len(data_samples)
-
         prompts = []
         for cur_context, cur_question, cur_options in zip(
                 context, question, options):
