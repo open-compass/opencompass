@@ -38,9 +38,10 @@ def parse_args():
                         help='Whether or not enable multimodal evaluation',
                         action='store_true',
                         default=False)
-    # Add shortcut parameters (models and datasets)
+    # Add shortcut parameters (models, datasets and summarizer)
     parser.add_argument('--models', nargs='+', help='', default=None)
     parser.add_argument('--datasets', nargs='+', help='', default=None)
+    parser.add_argument('--summarizer', help='', default=None)
     # add general args
     parser.add_argument('--debug',
                         help='Debug mode, in which scheduler will run tasks '
