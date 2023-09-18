@@ -40,6 +40,7 @@ from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
+from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
