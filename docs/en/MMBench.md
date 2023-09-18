@@ -126,7 +126,7 @@ D: The fourth choice
 prediction: The prediction of your model to current question
 category: the leaf category
 l2_category: the l2-level category
-index: the l2-level category
+index: the question index
 ```
 
 If there are any questions with fewer than four options, simply leave those fields blank.

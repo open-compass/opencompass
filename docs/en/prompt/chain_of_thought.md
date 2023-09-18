@@ -4,7 +4,7 @@
 
 During the process of reasoning, CoT (Chain of Thought) method is an efficient way to help LLMs deal complex questions, for example: math problem and relation inference. In OpenCompass, we support multiple types of CoT method.
 
-![image](https://github.com/InternLM/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
+![image](https://github.com/open-compass/opencompass/assets/28834990/45d60e0e-02a1-49aa-b792-40a1f95f9b9e)
 
 ## 1. Zero Shot CoT
 
@@ -72,7 +72,7 @@ OpenCompass defaults to use argmax for sampling the next token. Therefore, if th
 
 Where `SAMPLE_SIZE` is the number of reasoning paths in Self-Consistency, higher value usually outcome higher performance. The following figure from the original SC paper demonstrates the relation between reasoning paths and performance in several reasoning tasks:
 
-![image](https://github.com/InternLM/opencompass/assets/28834990/05c7d850-7076-43ca-b165-e6251f9b3001)
+![image](https://github.com/open-compass/opencompass/assets/28834990/05c7d850-7076-43ca-b165-e6251f9b3001)
 
 From the figure, it can be seen that in different reasoning tasks, performance tends to improve as the number of reasoning paths increases. However, for some tasks, increasing the number of reasoning paths may reach a limit, and further increasing the number of paths may not bring significant performance improvement. Therefore, it is necessary to conduct experiments and adjustments on specific tasks to find the optimal number of reasoning paths that best suit the task.
 

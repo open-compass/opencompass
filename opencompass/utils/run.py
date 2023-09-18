@@ -3,7 +3,9 @@ from typing import List, Union
 import tabulate
 from mmengine.config import Config
 
+from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
+from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
 
 
@@ -90,6 +92,7 @@ def get_config_from_arg(args) -> Config:
                      max_out_len=args.max_out_len,
                      batch_padding=not args.no_batch_padding,
                      batch_size=args.batch_size,
+                     pad_token_id=args.pad_token_id,
                      run_cfg=dict(num_gpus=args.num_gpus))
         models.append(model)
     return Config(dict(models=models, datasets=datasets),
@@ -117,54 +120,61 @@ def exec_mm_infer_runner(tasks, args, cfg):
     runner(tasks)
 
 
-def exec_infer_runner(tasks, args, cfg):
-    """execute infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='OpenICLInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             qos=args.qos,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        runner = DLCRunner(dict(type='OpenICLInferTask'),
-                           max_num_workers=args.max_num_workers,
-                           aliyun_cfg=Config.fromfile(args.aliyun_cfg),
-                           retry=args.retry,
-                           debug=args.debug,
-                           lark_bot_url=cfg['lark_bot_url'])
-    else:
-        runner = LocalRunner(task=dict(type='OpenICLInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             max_workers_per_gpu=args.max_workers_per_gpu,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
+def get_config_type(obj) -> str:
+    return f'{obj.__module__}.{obj.__name__}'
 
 
-def exec_eval_runner(tasks, args, cfg):
-    """execute infer runner according to args."""
+def fill_infer_cfg(cfg, args):
+    new_cfg = dict(infer=dict(
+        partitioner=dict(type=get_config_type(SizePartitioner),
+                         max_task_size=args.max_partition_size,
+                         gen_task_coef=args.gen_task_coef),
+        runner=dict(
+            max_num_workers=args.max_num_workers,
+            debug=args.debug,
+            task=dict(type=get_config_type(OpenICLInferTask)),
+            lark_bot_url=cfg['lark_bot_url'],
+        )), )
     if args.slurm:
-        runner = SlurmRunner(dict(type='OpenICLEvalTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             qos=args.qos,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
+        new_cfg['infer']['runner']['type'] = get_config_type(SlurmRunner)
+        new_cfg['infer']['runner']['partition'] = args.partition
+        new_cfg['infer']['runner']['quotatype'] = args.quotatype
+        new_cfg['infer']['runner']['qos'] = args.qos
+        new_cfg['infer']['runner']['retry'] = args.retry
     elif args.dlc:
-        runner = DLCRunner(dict(type='OpenICLEvalTask'),
-                           max_num_workers=args.max_num_workers,
-                           aliyun_cfg=Config.fromfile(args.aliyun_cfg),
-                           retry=args.retry,
-                           debug=args.debug,
-                           lark_bot_url=cfg['lark_bot_url'])
+        new_cfg['infer']['runner']['type'] = get_config_type(DLCRunner)
+        new_cfg['infer']['runner']['aliyun_cfg'] = Config.fromfile(
+            args.aliyun_cfg)
+        new_cfg['infer']['runner']['retry'] = args.retry
     else:
-        runner = LocalRunner(task=dict(type='OpenICLEvalTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
+        new_cfg['infer']['runner']['type'] = get_config_type(LocalRunner)
+        new_cfg['infer']['runner'][
+            'max_workers_per_gpu'] = args.max_workers_per_gpu
+    cfg.merge_from_dict(new_cfg)
+
+
+def fill_eval_cfg(cfg, args):
+    new_cfg = dict(
+        eval=dict(partitioner=dict(type=get_config_type(NaivePartitioner)),
+                  runner=dict(
+                      max_num_workers=args.max_num_workers,
+                      debug=args.debug,
+                      task=dict(type=get_config_type(OpenICLEvalTask)),
+                      lark_bot_url=cfg['lark_bot_url'],
+                  )))
+    if args.slurm:
+        new_cfg['eval']['runner']['type'] = get_config_type(SlurmRunner)
+        new_cfg['eval']['runner']['partition'] = args.partition
+        new_cfg['eval']['runner']['quotatype'] = args.quotatype
+        new_cfg['eval']['runner']['qos'] = args.qos
+        new_cfg['eval']['runner']['retry'] = args.retry
+    elif args.dlc:
+        new_cfg['eval']['runner']['type'] = get_config_type(DLCRunner)
+        new_cfg['eval']['runner']['aliyun_cfg'] = Config.fromfile(
+            args.aliyun_cfg)
+        new_cfg['eval']['runner']['retry'] = args.retry
+    else:
+        new_cfg['eval']['runner']['type'] = get_config_type(LocalRunner)
+        new_cfg['eval']['runner'][
+            'max_workers_per_gpu'] = args.max_workers_per_gpu
+    cfg.merge_from_dict(new_cfg)

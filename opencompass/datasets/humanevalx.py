@@ -145,6 +145,13 @@ class HumanevalXEvaluator(BaseEvaluator):
 def _clean_up_code(text: str, language_type: str) -> str:
     """Cleans up the generated code."""
     if language_type.lower() == 'python':
+        # we need to take care of the first line
+        # append extra space for first line for correct indentation
+        for c_index, c in enumerate(text[:5]):
+            if c != ' ':
+                text = ' ' * (4 - c_index) + text
+                break
+
         text_splits = text.split('\n')
         is_empty_line = False
         ind_empty_line = None

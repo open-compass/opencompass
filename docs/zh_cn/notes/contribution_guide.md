@@ -43,7 +43,7 @@
 - 当你第一次提 PR 时
 
   复刻 OpenCompass 原代码库，点击 GitHub 页面右上角的 **Fork** 按钮即可
-  ![avatar](https://github.com/InternLM/opencompass/assets/22607038/851ed33d-02db-49c9-bf94-7c62eee89eb2)
+  ![avatar](https://github.com/open-compass/opencompass/assets/22607038/851ed33d-02db-49c9-bf94-7c62eee89eb2)
 
   克隆复刻的代码库到本地
 
@@ -111,7 +111,7 @@ git checkout main -b branchname
 
 - 创建一个拉取请求
 
-  ![avatar](https://github.com/InternLM/opencompass/assets/22607038/08feb221-b145-4ea8-8e20-05f143081604)
+  ![avatar](https://github.com/open-compass/opencompass/assets/22607038/08feb221-b145-4ea8-8e20-05f143081604)
 
 - 修改拉取请求信息模板，描述修改原因和修改内容。还可以在 PR 描述中，手动关联到相关的议题 (issue),（更多细节，请参考[官方文档](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)）。
 

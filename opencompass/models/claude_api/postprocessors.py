@@ -1,5 +1,10 @@
 import re
 
+from opencompass.datasets.humaneval import humaneval_gpt_postprocess
+from opencompass.datasets.record import ReCoRD_postprocess
+from opencompass.datasets.xsum import Xsum_postprocess
+from opencompass.utils.text_postprocessors import first_option_postprocess
+
 
 def gsm8k_postprocess(text: str) -> str:
     text = text.split(' ')[::-1]
@@ -75,3 +80,32 @@ def strategyqa_pred_postprocess(text: str) -> str:
     if match:
         return match.group(1)
     return ''
+
+
+def record_postprocess(text: str) -> str:
+    match = re.search(r'(?<=refers to )[^.]+', text)
+
+    if match:
+        return match.group().strip()  # Outputs: abc def
+
+    return ReCoRD_postprocess(text)
+
+
+def humaneval_claude2_postprocess(text: str) -> str:
+    if text.startswith('Here'):
+        text = '\n\n'.join(text.split('\n\n')[1:])
+    return humaneval_gpt_postprocess(text)
+
+
+def xsum_postprocess(text: str) -> str:
+    if text.startswith('Here'):
+        text = '\n\n'.join(text.split('\n\n')[1:])
+    return Xsum_postprocess(text)
+
+
+def yes_no_postprocess(text: str) -> str:
+    if 'yes' in text.lower():
+        return 'A'
+    elif 'no' in text.lower():
+        return 'B'
+    return first_option_postprocess(text, 'AB')

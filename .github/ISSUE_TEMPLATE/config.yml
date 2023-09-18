@@ -5,7 +5,7 @@ contact_links:
     url: https://opencompass.readthedocs.io/en/latest/
     about: Check if your question is answered in docs
   - name: 💬 General questions (寻求帮助)
-    url: https://github.com/InternLM/OpenCompass/discussions
+    url: https://github.com/open-compass/opencompass/discussions
     about: Ask general usage questions and discuss with other OpenCompass community members
   - name: 🌐 Explore OpenCompass (官网)
     url: https://opencompass.org.cn/
