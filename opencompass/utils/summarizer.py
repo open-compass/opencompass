@@ -36,7 +36,7 @@ class Summarizer:
 
         model_cfgs = self.cfg['models']
         dataset_cfgs = self.cfg['datasets']
-        summarizer_cfg = self.cfg.get('summarizer', {})
+        summarizer_cfg = self.cfg.get('summarizer', {}) or {} # avoid 'summarizer' is in cfg but None
         work_dir = self.cfg['work_dir']
 
         # pick up results
