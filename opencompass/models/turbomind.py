@@ -3,7 +3,7 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
-from opencompass.models.base import BaseModel
+from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.models.base_api import TokenBucket
 from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
@@ -53,7 +53,6 @@ class TurboMindModel(BaseModel):
         path: str,
         tis_addr: str = '0.0.0.0:33337',
         max_seq_len: int = 2048,
-        concurrency: int = 32,
         meta_template: Optional[Dict] = None,
     ):
 
@@ -61,13 +60,15 @@ class TurboMindModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         self.logger = get_logger()
-        self.template_parser = APITemplateParser(meta_template)
+        self.template_parser = LMTemplateParser(meta_template)
+        self.eos_token_id = None
+        if meta_template and 'eos_token_id' in meta_template:
+            self.eos_token_id = meta_template['eos_token_id']
         self.tis_addr = tis_addr
-        self.concurrency = concurrency
         chatbot = Chatbot(self.tis_addr)
         self.model_name = chatbot.model_name
         self.chat_template = MODELS.get(self.model_name)()
-        self.logger.warning(f'model_name: {self.model_name}')
+
 
     def generate(
         self,
@@ -90,48 +91,12 @@ class TurboMindModel(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
-        results = []        
-        dialogs = []
-        for input in inputs:
-            assert isinstance(input, (str, PromptList))
-            if isinstance(input, str):
-                dialog = [{'role': 'user', 'content': input}]
-            else:
-                dialog = []
-                for item in input:
-                    msg = {'content': item['prompt']}
-                    if item['role'] == 'HUMAN':
-                        msg['role'] = 'user'
-                    elif item['role'] == 'BOT':
-                        msg['role'] = 'assistant'
-                    elif item['role'] == 'SYSTEM':
-                        msg['role'] = 'system'
-                    dialog.append(msg)
-            dialogs.append(dialog)
-            
-            
-        # chatbot = Chatbot(self.tis_addr, temperature=temperature, capability='completion', log_level=logging.ERROR)
-        # tid = threading.currentThread().ident
-        
-        # for dialog in dialogs:
-        #     prompt = self.chat_template.messages2prompt(dialog)
-        #     for status, text, n_token in chatbot.stream_infer(
-        #                 session_id=tid,
-        #                 prompt=prompt,
-        #                 request_output_len=max_out_len,
-        #                 sequence_start=True, 
-        #                 sequence_end=True):
-        #             continue
-       
-    
+
         with ThreadPoolExecutor() as executor:
             results = list(
-                executor.map(self._generate, dialogs,
-                             [max_out_len] * len(dialogs),
-                             [temperature] * len(dialogs)))
-            # response = valid_str(text)
-            # self.logger.error(f'****prompt: {prompt}\n\n****response: {response}')
-            # results.append(text)
+                executor.map(self._generate, inputs,
+                             [max_out_len] * len(inputs),
+                             [temperature] * len(inputs)))
         return results
 
     def wait(self):
@@ -158,17 +123,15 @@ class TurboMindModel(BaseModel):
         Returns:
             str: The generated string.
         """
-        # assert isinstance(prompt, (str, PromptList)), f'prompt type: {type(prompt)}'
-
-        # assert type(
-        #     prompt
-        # ) is str, 'We only support string for TurboMind Python API now'
+        assert type(
+            prompt
+        ) is str, 'We only support string for TurboMind RPC API'
         chatbot = Chatbot(self.tis_addr, 
                           temperature=temperature, 
                           capability='completion',
                           top_k=1,
                           log_level=logging.ERROR)
-        prompt = self.chat_template.messages2prompt(prompt)
+
         for status, text, n_token in chatbot.stream_infer(
                     session_id=threading.currentThread().ident,
                     prompt=prompt,
@@ -177,4 +140,5 @@ class TurboMindModel(BaseModel):
                     sequence_end=True):
                 continue
         response = valid_str(text)
+        response = response.replace('<eoa>', '')
         return response
