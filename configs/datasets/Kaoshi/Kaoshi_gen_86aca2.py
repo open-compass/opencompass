@@ -21,7 +21,7 @@ splits_with_type = {'单选题': ['职业-消防', '职业-测绘', '考研-经�
 
 zh2en = {'单选题': 'single_choice', '多选题': 'multi_choice', '完形填空': 'multi_question_choice', '判断题': 'judgment', '填空题': 'cloze', '七选五': 'five_out_of_seven'}
 
-Kaoshi_datasets = []
+kaoshi_datasets = []
 
 for _type in list(splits_with_type.keys()):
     for _split in splits_with_type[_type]:
@@ -52,7 +52,8 @@ for _type in list(splits_with_type.keys()):
         }
         _eval_cfg = {
             "evaluator": {
-                "type": "KaoshiEvaluator" + "_" + zh2en[_type],
+                "type": "KaoshiEvaluator",
+                  "question_type": zh2en[_type],
             },
             "pred_role": "BOT",
         }
@@ -67,7 +68,7 @@ for _type in list(splits_with_type.keys()):
             "eval_cfg": _eval_cfg,
         }
 
-        Kaoshi_datasets.append(_dataset)
+        kaoshi_datasets.append(_dataset)
 
 _temporary_variables = [k for k in globals() if k.startswith('_')]
 for _t in _temporary_variables:

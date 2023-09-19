@@ -4,7 +4,6 @@ import re
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
-from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
 from .base import BaseDataset
 
@@ -17,7 +16,6 @@ def get_number(options):
     return result_string
 
 
-@LOAD_DATASET.register_module()
 class KaoshiDataset(BaseDataset):
 
     @staticmethod
@@ -138,14 +136,3 @@ class KaoshiEvaluator(BaseEvaluator):
                         correct_score += 1
                     total_score += 1
             return {'score': correct_score / total_score * 100}
-
-
-for question_type in valid_kaoshi_question_types:
-    # fix classic closure problem
-    def _kaoshi_register(question_type):
-        ICL_EVALUATORS.register_module(
-            name='KaoshiEvaluator' + '_' + question_type,
-            module=lambda *args, **kwargs: KaoshiEvaluator(
-                question_type=question_type, *args, **kwargs))
-
-    _kaoshi_register(question_type)
