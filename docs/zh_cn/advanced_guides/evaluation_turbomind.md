@@ -38,11 +38,13 @@ python3 -m lmdeploy.serve.turbomind.deploy internlm-chat-7b /path/to/internlm-ch
 
 ```
 
-### 第二步: 验证转换后的模型
+### 第二步: 启动 TurboMind 的 Triton Inference Server
 
 ```shell
-python -m lmdeploy.turbomind.chat ./workspace
+bash ./workspace/service_docker_up.sh
 ```
+
+**注：** turbomind 的实现中，推理是“永驻”的。销毁操作会导致意想不到的问题发生。因此，我们暂时使用服务接口对接模型评测，待 turbomind 支持“销毁”之后，再提供 python API对接方式。
 
 ### 第三步: 评测转换后的模型
 
@@ -53,3 +55,5 @@ python run.py configs/eval_internlm_chat_7b_turbomind.py -w outputs/turbomind
 ```
 
 当模型完成推理和指标计算后，我们便可获得模型的评测结果。
+
+**注：** `eval_internlm_chat_7b_turbomind.py` 中，配置的 triton inference server(TIS) 地址是 `tis_addr='0.0.0.0:63337'`。如果不在同一台机器上执行`run.py`，那么请把配置中的`tis_addr`修改为server所在机器的ip地址。

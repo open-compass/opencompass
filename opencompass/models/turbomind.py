@@ -1,20 +1,13 @@
-import os.path as osp
-import random
+import logging
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
+from lmdeploy.serve.turbomind.chatbot import Chatbot
+
 from opencompass.models.base import BaseModel, LMTemplateParser
-from opencompass.models.base_api import TokenBucket
-from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
-from opencompass.models.base_api import APITemplateParser
-
-from lmdeploy.serve.turbomind.chatbot import Chatbot
-from lmdeploy.model import MODELS
-
-import threading
-import logging
 
 PromptType = Union[PromptList, str]
 
@@ -65,10 +58,6 @@ class TurboMindModel(BaseModel):
         if meta_template and 'eos_token_id' in meta_template:
             self.eos_token_id = meta_template['eos_token_id']
         self.tis_addr = tis_addr
-        chatbot = Chatbot(self.tis_addr)
-        self.model_name = chatbot.model_name
-        self.chat_template = MODELS.get(self.model_name)()
-
 
     def generate(
         self,
@@ -124,21 +113,20 @@ class TurboMindModel(BaseModel):
             str: The generated string.
         """
         assert type(
-            prompt
-        ) is str, 'We only support string for TurboMind RPC API'
-        chatbot = Chatbot(self.tis_addr, 
-                          temperature=temperature, 
+            prompt) is str, 'We only support string for TurboMind RPC API'
+        chatbot = Chatbot(self.tis_addr,
+                          temperature=temperature,
                           capability='completion',
                           top_k=1,
                           log_level=logging.ERROR)
 
         for status, text, n_token in chatbot.stream_infer(
-                    session_id=threading.currentThread().ident,
-                    prompt=prompt,
-                    request_output_len=max_out_len,
-                    sequence_start=True, 
-                    sequence_end=True):
-                continue
+                session_id=threading.currentThread().ident,
+                prompt=prompt,
+                request_output_len=max_out_len,
+                sequence_start=True,
+                sequence_end=True):
+            continue
         response = valid_str(text)
         response = response.replace('<eoa>', '')
         return response
