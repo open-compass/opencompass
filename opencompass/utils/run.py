@@ -95,7 +95,7 @@ def get_config_from_arg(args) -> Config:
                      pad_token_id=args.pad_token_id,
                      run_cfg=dict(num_gpus=args.num_gpus))
         models.append(model)
-    
+
     summarizer = None
     if args.summarizer:
         s = match_cfg_file('configs/summarizers/', [args.summarizer])[0]
@@ -103,7 +103,8 @@ def get_config_from_arg(args) -> Config:
         cfg = Config.fromfile(s[1])
         summarizer = cfg['summarizer']
 
-    return Config(dict(models=models, datasets=datasets, summarizer=summarizer),
+    return Config(dict(models=models, datasets=datasets,
+                       summarizer=summarizer),
                   format_python_code=False)
 
 
