@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import KaoshiDataset
+from opencompass.datasets import KaoshiDataset, KaoshiEvaluator
 
 prompts = {
         "单选题" : "请你做一道单项选择题\n请你一步一步思考并将思考过程写在【解析】和<eoe>之间。你将从A，B，C，D中选出正确的答案，并写在【答案】和<eoa>之间，答案应只包含最终结果，不要添加额外词语。\n例如：【答案】: A <eoa>\n完整的题目回答的格式如下：\n【解析】 ... <eoe>\n【答案】 ... <eoa>\n请你严格按照上述格式作答。\n题目如下：",
@@ -52,7 +52,7 @@ for _type in list(splits_with_type.keys()):
         }
         _eval_cfg = {
             "evaluator": {
-                "type": "KaoshiEvaluator",
+                "type": KaoshiEvaluator,
                   "question_type": zh2en[_type],
             },
             "pred_role": "BOT",
