@@ -35,8 +35,8 @@ mplug_owl_mmbench_dataloader = dict(
 
 # model settings
 mplug_owl_mmbench_model = dict(
-    type='mplug_owl-7b',
-    model_path='/mplug-owl-llama-7b-ft',
+    type='mplug_owl_7b',
+    model_path='/mplug-owl-llama-7b-ft/',
     prompt_constructor=dict(type=MplugOwlMMBenchPromptConstructor),
     post_processor=dict(type=MplugOwlMMBenchPostProcessor)
 )  # noqa
@@ -46,3 +46,5 @@ mplug_owl_mmbench_evaluator = [
     dict(type='opencompass.DumpResults',
          save_path='work_dirs/mplug_owl-7b-mmagibench-v0.1.0.xlsx')
 ]
+
+mplug_owl_mmbench_load_from = None

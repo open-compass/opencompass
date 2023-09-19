@@ -1,18 +1,35 @@
 import json
 import os
+import os.path as osp
+import sys
 from pathlib import Path
 
 import clip
 import mmengine
 import torch
 import torch.nn as nn
-from llama_adapter_v2_multimodal7b.llama.llama import ModelArgs, Transformer
-from llama_adapter_v2_multimodal7b.llama.tokenizer import Tokenizer
-from llama_adapter_v2_multimodal7b.llama.utils import sample_top_p
 from mmengine.device import get_device
 from timm.models.vision_transformer import Block
 
 from opencompass.registry import MM_MODELS
+
+
+def load_package():
+    """Load required packages from llama_adapter_v2_multimodal7b."""
+    current_file_path = os.path.abspath(__file__)
+    current_folder_path = os.path.dirname(current_file_path)
+
+    sys.path.append(os.path.join(current_folder_path, 'LLaMA-Adapter'))  # noqa
+    from llama_adapter_v2_multimodal7b.llama.llama import (ModelArgs,
+                                                           Transformer)
+    from llama_adapter_v2_multimodal7b.llama.tokenizer import Tokenizer
+    from llama_adapter_v2_multimodal7b.llama.utils import sample_top_p
+    sys.path.pop(-1)
+
+    return ModelArgs, Transformer, Tokenizer, sample_top_p
+
+
+ModelArgs, Transformer, Tokenizer, sample_top_p = load_package()
 
 
 class LLaMA_adapter(nn.Module):
@@ -182,7 +199,6 @@ class LLaMA_adapter(nn.Module):
 
         data_sample = data_samples[0]
 
-        prompts = [prompts]
         imgs = image
 
         # import pdb;pdb.set_trace()
@@ -261,12 +277,14 @@ class LLaMA_adapter_v2(nn.Module):
                  llama_dir,
                  prompt_constructor: dict,
                  post_processor: dict,
+                 model_path: str = 'llama_adapter_v2_multimodal7b',
+                 name: str = 'LORA-BIAS-7B',
                  mode: str = 'generation',
                  device='cuda' if torch.cuda.is_available() else 'cpu',
                  download_root='ckpts'):
         super().__init__()
-        name = 'BIAS-7B'
 
+        assert name in ['LORA-BIAS-7B', 'BIAS-7B', 'CAPTION-7B']
         # BIAS-7B or https://xxx/sha256_BIAS-7B.pth -> 7B
         llama_type = name.split('.')[0].split('-')[-1]
         llama_ckpt_dir = os.path.join(llama_dir, llama_type)
@@ -274,9 +292,22 @@ class LLaMA_adapter_v2(nn.Module):
 
         # load llama_adapter weights and model_cfg
         print(f'Loading LLaMA-Adapter from {llama_dir}')
-        ckpt = torch.load(
-            f'{llama_dir}/7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',  # noqa: E501
-            map_location='cpu')
+
+        current_file_path = os.path.abspath(__file__)
+        current_folder_path = os.path.dirname(current_file_path)
+        model_path = osp.join(current_folder_path, 'LLaMA-Adapter', model_path)
+        ckpt_root = osp.join(model_path, download_root)
+        ckpt_map = {
+            'LORA-BIAS-7B':
+            '1bcbffc43484332672092e0024a8699a6eb5f558161aebf98a7c6b1db67224d1_LORA-BIAS-7B.pth',  # noqa: E501
+            'BIAS-7B':
+            '7fa55208379faf2dd862565284101b0e4a2a72114d6490a95e432cf9d9b6c813_BIAS-7B.pth',  # noqa: E501
+            'CAPTION-7B':
+            '5088aeb63a89746b90bcfd5cb819e1c7411b2771b267c6d131ce73e250a8abf0_CAPTION-7B.pth'  # noqa: E501
+        }
+        ckpt = torch.load(osp.join(ckpt_root, ckpt_map[name]),
+                          map_location='cpu')
+
         model_cfg = ckpt.get('config', {})
 
         self.model = LLaMA_adapter(

@@ -7,7 +7,7 @@ class LlamaAadapterMMBenchPostProcessor:
     def __init__(self) -> None:
         pass
 
-    def __call__(self, output_token: torch.tensor, tokenizer) -> str:
+    def __call__(self, output_token: torch.tensor) -> str:
 
         if len(output_token) >= 2:
             if output_token[1] == '.':
