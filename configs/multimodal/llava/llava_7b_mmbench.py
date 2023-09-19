@@ -24,7 +24,7 @@ dataset = dict(type='opencompass.MMBenchDataset',
                data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
-mmbench_dataloader = dict(
+llava_mmbench_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -33,7 +33,7 @@ mmbench_dataloader = dict(
 )
 
 # model settings
-llava_model = dict(
+llava_mmbench_model = dict(
     type='llava',
     model_path='/path/to/llava',
     prompt_constructor=dict(type=LLaVAMMBenchPromptConstructor),
@@ -41,7 +41,7 @@ llava_model = dict(
 )  # noqa
 
 # evaluation settings
-mmbench_evaluator = [
+llava_mmbench_evaluator = [
     dict(type='opencompass.DumpResults',
          save_path='work_dirs/llava-7b-mmbench.xlsx')
 ]

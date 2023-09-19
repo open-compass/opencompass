@@ -53,9 +53,9 @@ class OTTERMMBenchPromptConstructor:
         context = data_sample.get('context')
         # e.g. <image>User: What is the color of the sky? A: Blue B: Red C: Green D: Yellow GPT:<answer>  # noqa
         if context is not None:
-            prompt = f'{self.image_token}{self.user_label} {context[i]} {question[i]} {options[i]} {self.model_label}:{self.reply_token}'  # noqa
+            prompt = f'{self.image_token}{self.user_label} {context} {question} {options} {self.model_label}:{self.reply_token}'  # noqa
         else:
-            prompt = f'{self.image_token}{self.user_label} {question[i]} {options[i]} {self.model_label}:{self.reply_token}'  # noqa
+            prompt = f'{self.image_token}{self.user_label} {question} {options} {self.model_label}:{self.reply_token}'  # noqa
 
         return prompt
 

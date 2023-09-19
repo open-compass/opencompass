@@ -55,6 +55,8 @@ class QwenVLBase(nn.Module):
         if post_processor is not None:
             self.post_processor = mmengine.registry.build_from_cfg(
                 post_processor, MM_MODELS)
+        else:
+            self.post_processor = None
         self.is_caption_task = is_caption_task
         self.model.transformer.forward = types.MethodType(
             forward_hack, self.model.transformer)
@@ -153,6 +155,9 @@ class QwenVLChat(QwenVLBase):
             chat_format=self.model.generation_config.chat_format,
             verbose=False,
             errors='replace')
+
+        if self.post_processor:
+            response = self.post_processor(response)
 
         data_sample = batch['data_samples'][0]
         if self.is_caption_task:

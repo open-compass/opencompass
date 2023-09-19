@@ -1,26 +1,27 @@
-from opencompass.multimodal.models.openflamingo import OpenFlamingoMMBenchPromptConstructor
-
+from opencompass.multimodal.models.openflamingo import OpenFlamingoVQAPromptConstructor
 # dataloader settings
 val_pipeline = [
-    dict(type='mmpretrain.PILToNumpy'),
+    dict(type='LoadImageFromFile'),
     dict(type='mmpretrain.ResizeEdge',
          scale=224,
          interpolation='bicubic',
          backend='pillow'),
     dict(type='CenterCrop', crop_size=(224, 224)),
-    dict(type='mmpretrain.PackInputs',
-         algorithm_keys=[
-             'question', 'options', 'category', 'l2-category', 'index',
-             'context', 'options_dict'
-         ])
+    dict(
+        type='mmpretrain.PackInputs',
+        algorithm_keys=['question', 'gt_answer', 'gt_answer_weight'],
+        meta_keys=['question_id', 'image_id'],
+    )
 ]
 
-dataset = dict(type='opencompass.MMBenchDataset',
-               data_file='data/mmbench/mmbench_test_20230712.tsv',
+dataset = dict(type='mmpretrain.VizWiz',
+               data_root='data/vizwiz/',
+               data_prefix='Images/val',
+               ann_file='Annotations/val.json',
                pipeline=val_pipeline)
 
-openflamingo_mmbench_dataloader = dict(
-    batch_size=1,
+openflamingo_vizwiz_dataloader = dict(
+    batch_size=8,
     num_workers=4,
     dataset=dataset,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -29,7 +30,7 @@ openflamingo_mmbench_dataloader = dict(
 )
 
 # model settings
-openflamingo_mmbench_model = dict(
+openflamingo_vizwiz_model = dict(
     type='openflamingo',
     data_preprocessor=dict(
         type='mmpretrain.MultiModalDataPreprocessor',
@@ -63,15 +64,11 @@ openflamingo_mmbench_model = dict(
     ),
     task='vqa',
     generation_cfg=dict(num_beams=3, max_new_tokens=20, length_penalty=-2.0),
-    prompt_constructor=dict(type=OpenFlamingoMMBenchPromptConstructor)
+    prompt_constructor=dict(type=OpenFlamingoVQAPromptConstructor)
 )
 
 # evaluation settings
-openflamingo_mmbench_evaluator = [
-    dict(
-        type='opencompass.DumpResults',
-        save_path=  # noqa: E251
-        'work_dirs/9b-flamingo/9b-flamingo-mmbench.xlsx')
-]
+openflamingo_vizwiz_evaluator = [dict(type='mmpretrain.VQAAcc')]
+
 
 openflamingo_load_from = '/path/to/pretrained/weights'  # noqa

@@ -1,8 +1,8 @@
-from opencompass.multimodal.models.openflamingo import OpenFlamingoMMBenchPromptConstructor
+from opencompass.multimodal.models.openflamingo import OpenFlamingoScienceQAPromptConstructor
 
 # dataloader settings
 val_pipeline = [
-    dict(type='mmpretrain.PILToNumpy'),
+    dict(type='LoadImageFromFile'),
     dict(type='mmpretrain.ResizeEdge',
          scale=224,
          interpolation='bicubic',
@@ -10,16 +10,20 @@ val_pipeline = [
     dict(type='CenterCrop', crop_size=(224, 224)),
     dict(type='mmpretrain.PackInputs',
          algorithm_keys=[
-             'question', 'options', 'category', 'l2-category', 'index',
-             'context', 'options_dict'
+             'question', 'gt_answer', 'choices', 'hint', 'lecture', 'solution'
          ])
 ]
 
-dataset = dict(type='opencompass.MMBenchDataset',
-               data_file='data/mmbench/mmbench_test_20230712.tsv',
+dataset = dict(type='mmpretrain.ScienceQA',
+               data_root='./data/scienceqa',
+               split='val',
+               split_file='pid_splits.json',
+               ann_file='problems.json',
+               image_only=True,
+               data_prefix=dict(img_path='val'),
                pipeline=val_pipeline)
 
-openflamingo_mmbench_dataloader = dict(
+openflamingo_scienceqa_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -29,7 +33,7 @@ openflamingo_mmbench_dataloader = dict(
 )
 
 # model settings
-openflamingo_mmbench_model = dict(
+openflamingo_scienceqa_model = dict(
     type='openflamingo',
     data_preprocessor=dict(
         type='mmpretrain.MultiModalDataPreprocessor',
@@ -63,15 +67,10 @@ openflamingo_mmbench_model = dict(
     ),
     task='vqa',
     generation_cfg=dict(num_beams=3, max_new_tokens=20, length_penalty=-2.0),
-    prompt_constructor=dict(type=OpenFlamingoMMBenchPromptConstructor)
+    prompt_constructor=dict(type=OpenFlamingoScienceQAPromptConstructor)
 )
 
 # evaluation settings
-openflamingo_mmbench_evaluator = [
-    dict(
-        type='opencompass.DumpResults',
-        save_path=  # noqa: E251
-        'work_dirs/9b-flamingo/9b-flamingo-mmbench.xlsx')
-]
+openflamingo_scienceqa_evaluator = [dict(type='mmpretrain.ScienceQAMetric')]
 
 openflamingo_load_from = '/path/to/pretrained/weights'  # noqa

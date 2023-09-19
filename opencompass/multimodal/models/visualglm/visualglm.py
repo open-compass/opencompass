@@ -43,7 +43,14 @@ class VisualGLM(nn.Module):
         if gen_kwargs:
             self.gen_kwargs = gen_kwargs
         else:
-            self.gen_kwargs = dict()
+            self.gen_kwargs = dict(
+                max_new_tokens=30,
+                num_beams=1,
+                do_sample=False,
+                repetition_penalty=1.0,
+                length_penalty=-1.0,
+            )
+
         self.is_caption_task = is_caption_task
 
     def encode_by_tokenizer(self, multi_prompts, image_position):

@@ -1,11 +1,11 @@
-from opencompass.multimodal.models.visualglm import (VisualGLMBasePostProcessor, VisualGLMVQAPromptConstructor)
+from opencompass.multimodal.models.qwen import QwenVLChatVQAPromptConstructor
 
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.LoadImageFromFile'),
     dict(type='mmpretrain.ToPIL', to_rgb=True),
     dict(type='mmpretrain.torchvision/Resize',
-         size=(224, 224),
+         size=(448, 448),
          interpolation=3),
     dict(type='mmpretrain.torchvision/ToTensor'),
     dict(type='mmpretrain.torchvision/Normalize',
@@ -18,25 +18,27 @@ val_pipeline = [
     )
 ]
 
-dataset = dict(type='mmpretrain.VizWiz',
-               data_root='data/vizwiz/',
-               data_prefix='Images/val',
-               ann_file='Annotations/val.json',
-               pipeline=val_pipeline)
+dataset = dict(
+    type='mmpretrain.COCOVQA',
+    data_root='data/okvqa',
+    question_file='annotations/OpenEnded_mscoco_val2014_questions.json',
+    ann_file='annotations/mscoco_val2014_annotations.json',
+    pipeline=val_pipeline,
+    data_prefix='images/val2014',
+)
 
-visualglm_vizwiz_dataloader = dict(batch_size=1,
+qwen_okvqa_dataloader = dict(batch_size=1,
                   num_workers=4,
                   dataset=dataset,
                   collate_fn=dict(type='pseudo_collate'),
                   sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-visualglm_vizwiz_model = dict(
-    type='visualglm',
-    pretrained_path='/path/to/visualglm',  # or Huggingface repo id
-    prompt_constructor=dict(type=VisualGLMVQAPromptConstructor),
-    post_processor=dict(type=VisualGLMBasePostProcessor)
+qwen_okvqa_model = dict(
+    type='qwen-vl-chat',
+    pretrained_path='Qwen/Qwen-VL-Chat',  # or Huggingface repo id
+    prompt_constructor=dict(type=QwenVLChatVQAPromptConstructor)
 )
 
 # evaluation settings
-visualglm_vizwiz_evaluator = [dict(type='mmpretrain.VQAAcc')]
+qwen_okvqa_evaluator = [dict(type='mmpretrain.VQAAcc')]
