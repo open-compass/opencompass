@@ -1,27 +1,45 @@
+import os
+import sys
+
 import mmengine
 import torch
 import torch.nn as nn
 from mmengine.device import get_device
-# Load via Huggingface Style
-from mplug_owl.modeling_mplug_owl import MplugOwlForConditionalGeneration
-from mplug_owl.processing_mplug_owl import (MplugOwlImageProcessor,
-                                            MplugOwlProcessor)
-from mplug_owl.tokenization_mplug_owl import MplugOwlTokenizer
 
 from opencompass.registry import MM_MODELS
 
 
-@MM_MODELS.register_module('mplug_owl')
+def load_package():
+    """Load required packages from llama_adapter_v2_multimodal7b."""
+    current_file_path = os.path.abspath(__file__)
+    current_folder_path = os.path.dirname(current_file_path)
+
+    sys.path.append(os.path.join(current_folder_path, 'mPLUG-Owl'))  # noqa
+    from mplug_owl.modeling_mplug_owl import MplugOwlForConditionalGeneration
+    from mplug_owl.processing_mplug_owl import (MplugOwlImageProcessor,
+                                                MplugOwlProcessor)
+    from mplug_owl.tokenization_mplug_owl import MplugOwlTokenizer
+    sys.path.pop(-1)
+
+    return MplugOwlForConditionalGeneration, MplugOwlImageProcessor, MplugOwlProcessor, MplugOwlTokenizer  # noqa
+
+
+MplugOwlForConditionalGeneration, MplugOwlImageProcessor, MplugOwlProcessor, MplugOwlTokenizer = load_package(  # noqa
+)  # noqa
+
+
+@MM_MODELS.register_module('mplug_owl_7b')
 class MplugOwl(nn.Module):
 
     def __init__(self,
                  prompt_constructor: dict,
                  post_processor: dict,
                  model_path='MAGAer13/mplug-owl-llama-7b',
-                 mode: str = 'generation') -> None:
+                 mode: str = 'generation'):
         super().__init__()
         pretrained_ckpt = model_path
         # import pdb;pdb.set_trace()
+        print(pretrained_ckpt)
         self.model = MplugOwlForConditionalGeneration.from_pretrained(
             pretrained_ckpt,
             torch_dtype=torch.bfloat16,
@@ -57,7 +75,7 @@ class MplugOwl(nn.Module):
         inputs = {'image': images, 'data_samples': data_samples}
         inputs = self.prompt_constructor(inputs)
         image = inputs['image']
-        prompt = inputs['prompt']
+        prompt = inputs['prompt'][0]
         data_samples = inputs['data_samples']
 
         data_sample = data_samples[0]

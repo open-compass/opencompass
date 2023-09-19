@@ -28,18 +28,21 @@ llama_adapter_mmbench_dataloader = dict(batch_size=1,
                   sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-llama_adapter_model = dict(
+llama_adapter_mmbench_model = dict(
     type='LLaMA-adapter-v2',
     llama_dir=  # noqa
     '/llama_adapter_v2_multimodal',
     prompt_constructor=dict(type=LlamaAadapterMMBenchPromptConstructor),
-    post_processor=dict(type=LlamaAadapterMMBenchPostProcessor))
+    post_processor=dict(type=LlamaAadapterMMBenchPostProcessor)
 )
 
 # evaluation settings
-llama_adapter_evaluator = [
+llama_adapter_mmbench_evaluator = [
     dict(
         type='opencompass.DumpResults',
         save_path='work_dirs/llama-adapter-v2-multimodal-mmagibench-v0.1.0.xlsx'
     )
 ]
+
+llama_adapter_mmbench_load_from = None  # noqa
+

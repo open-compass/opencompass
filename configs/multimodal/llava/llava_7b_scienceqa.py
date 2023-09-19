@@ -15,7 +15,7 @@ val_pipeline = [
     ),
     dict(type='mmpretrain.PackInputs',
          algorithm_keys=[
-             'question', 'gt_answer', 'choices', 'hint', 'lecture', 'solution'
+             'question', 'gt_answer', 'choices', 'hint', 'lecture', 'solution', 'has_image'
          ])
 ]
 

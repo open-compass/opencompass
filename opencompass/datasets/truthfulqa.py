@@ -39,7 +39,9 @@ class TruthfulQAEvaluator(BaseEvaluator):
 
     Args:
         truth_model (str): Truth model name. See "notes" for details.
+            Defaults to ''.
         info_model (str): Informativeness model name. See "notes" for details.
+            Defaults to ''.
         metrics (tuple): Computing needed metrics for truthfulqa dataset.
             Supported metrics are `bleurt`, `rouge`, `bleu`, `truth`, `info`.
         key (str): Corresponding API key. If set to `ENV`, find it in
@@ -67,12 +69,11 @@ class TruthfulQAEvaluator(BaseEvaluator):
         'bleu': 'bleu',
     }
 
-    def __init__(
-            self,
-            truth_model: str,  # noqa
-            info_model: str,  # noqa
-            metrics=('bleurt', 'rouge', 'bleu', 'truth', 'info'),
-            key='ENV'):
+    def __init__(self,
+                 truth_model: str = '',
+                 info_model: str = '',
+                 metrics=('bleurt', 'rouge', 'bleu', 'truth', 'info'),
+                 key='ENV'):
         self.API_MODEL = {
             'truth': truth_model,
             'info': info_model,
@@ -85,6 +86,11 @@ class TruthfulQAEvaluator(BaseEvaluator):
             if metric in self.SCORE_KEY.keys():
                 self.metrics.append(metric)
             if metric in self.API_MODEL.keys():
+                assert self.API_MODEL.get(metric), \
+                    f'`{metric}_model` should be set to perform API eval.' \
+                    'If you want to perform basic metric eval, ' \
+                    f'please refer to the docstring of {__file__} ' \
+                    'for more details.'
                 self.api_metrics.append(metric)
 
         if self.api_metrics:
