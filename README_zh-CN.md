@@ -49,6 +49,8 @@
 
 ## ✨ 介绍
 
+![image](https://github.com/open-compass/opencompass/assets/22607038/30bcb2e2-3969-4ac5-9f29-ad3f4abb4f3b)
+
 OpenCompass 是面向大模型评测的一站式平台。其主要特点如下：
 
 - **开源可复现**：提供公平、公开、可复现的大模型评测方案
