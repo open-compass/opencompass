@@ -56,4 +56,4 @@ python run.py configs/eval_internlm_chat_7b_turbomind.py -w outputs/turbomind
 
 当模型完成推理和指标计算后，我们便可获得模型的评测结果。
 
-**注：** `eval_internlm_chat_7b_turbomind.py` 中，配置的 triton inference server(TIS) 地址是 `tis_addr='0.0.0.0:63337'`。如果不在同一台机器上执行`run.py`，那么请把配置中的`tis_addr`修改为server所在机器的ip地址。
+**注：** `eval_internlm_chat_7b_turbomind.py` 中，配置的 triton inference server(TIS) 地址是 `tis_addr='0.0.0.0:63337'`。请把配置中的`tis_addr`修改为server所在机器的ip地址。

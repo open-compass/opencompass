@@ -56,4 +56,4 @@ python run.py configs/eval_internlm_chat_7b_turbomind.py -w outputs/turbomind
 
 You are expected to get the evaluation results after the inference and evaluation.
 
-\*\*Note: \*\*In `eval_internlm_chat_7b_turbomind.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:63337'`. If `run.py` is not executed on the same machine, please modify the tis_addr in the configuration to the IP address of the machine where the server is launched.
+\*\*Note: \*\*In `eval_internlm_chat_7b_turbomind.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:33337'`. Please modify `tis_addr` to the IP address of the machine where the server is launched.
