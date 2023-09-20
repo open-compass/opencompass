@@ -76,7 +76,10 @@ class HuggingfaceEvaluator(BaseEvaluator):
         # use codes pre-downloaded to opencompass repo, avoid downloading
         local_path = os.path.join(os.dirname(os.path.abspath(__file__)),
                                   'hf_metrics', self.metric + '.py')
-        metric = evaluate.load(local_path)
+        if os.path.exists(local_path):
+            metric = evaluate.load(local_path)
+        else:
+            metric = evaluate.load(self.metric)
         scores = metric.compute(**self._preprocess(predictions, references))
         result = self._postprocess(scores)
         random.setstate(random_state)
