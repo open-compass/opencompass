@@ -39,16 +39,14 @@ class MplugOwlMMBenchPromptConstructor:
         Returns:
             str: Prompt.
         """
-        questions = [
+        question = [
             data_sample.get('question') for data_sample in data_samples
         ]
         options = [data_sample.get('options') for data_sample in data_samples]
-        contexts = [data_sample.get('context') for data_sample in data_samples]
-        question = questions[0]
-        option = options[0]
-        context = contexts[0]
-        if context is not None:
-            prompt = self.image_prompt + ' ' + context + ' ' + question + ' ' + option + ' ' + self.reply_prompt  # noqa
+        if data_samples[0].get('context') is not None:
+            context = [
+                data_sample.get('context') for data_sample in data_samples
+            ]
         else:
             context = [''] * len(data_samples)
         prompts = []
@@ -56,6 +54,8 @@ class MplugOwlMMBenchPromptConstructor:
                 context, question, options):
             prompts.append(cur_context + ' ' + cur_question + ' ' +
                            cur_options)  # noqa
+
+        return prompts
 
 
 class MplugOwlCOCOCaptionPromptConstructor(MplugOwlMMBenchPromptConstructor):
