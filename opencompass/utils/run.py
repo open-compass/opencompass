@@ -60,7 +60,8 @@ def get_config_from_arg(args) -> Config:
         raise ValueError('You must specify "--datasets" if you do not specify '
                          'a config file path.')
     datasets = []
-    for dataset in match_cfg_file('configs/datasets/', args.datasets):
+    config_base_dir = args.custom_config_dir or 'configs'
+    for dataset in match_cfg_file(f'{config_base_dir}/datasets/', args.datasets):
         get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
         cfg = Config.fromfile(dataset[1])
         for k in cfg.keys():
@@ -73,7 +74,7 @@ def get_config_from_arg(args) -> Config:
                          '--datasets.')
     models = []
     if args.models:
-        for model in match_cfg_file('configs/models/', args.models):
+        for model in match_cfg_file(f'{config_base_dir}/models/', args.models):
             get_logger().info(f'Loading {model[0]}: {model[1]}')
             cfg = Config.fromfile(model[1])
             if 'models' not in cfg:
