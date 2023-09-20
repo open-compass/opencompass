@@ -17,7 +17,7 @@ val_pipeline = [
 ]
 
 dataset = dict(type='opencompass.MMBenchDataset',
-               data_file='/mnt/petrelfs/share_data/yuanyike/mmbench0901/mmbench_clean_rolling.tsv',
+               data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
 visualglm_mmbench_dataloader = dict(batch_size=1,
@@ -29,7 +29,7 @@ visualglm_mmbench_dataloader = dict(batch_size=1,
 # model settings
 visualglm_mmbench_model = dict(
     type='visualglm',
-    pretrained_path='/mnt/petrelfs/share_data/yuanyike/visualglm-6b',  # or Huggingface repo id
+    pretrained_path='/path/to/visualglm',  # or Huggingface repo id
     prompt_constructor=dict(type=VisualGLMMMBenchPromptConstructor),
     post_processor=dict(type=VisualGLMBasePostProcessor),
     gen_kwargs=dict(max_new_tokens=50,num_beams=5,do_sample=False,repetition_penalty=1.0,length_penalty=-1.0)
