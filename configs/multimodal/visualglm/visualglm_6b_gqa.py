@@ -33,7 +33,7 @@ visualglm_gqa_dataloader = dict(batch_size=1,
 # model settings
 visualglm_gqa_model = dict(
     type='visualglm',
-    pretrained_path='/path/to/visualglm',  # or Huggingface repo id
+    pretrained_path='/mnt/petrelfs/share_data/yuanyike/visualglm-6b',  # or Huggingface repo id
     prompt_constructor=dict(type=VisualGLMVQAPromptConstructor),
     post_processor=dict(type=VisualGLMBasePostProcessor)
 )
