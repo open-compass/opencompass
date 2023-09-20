@@ -99,6 +99,12 @@ class GenInferencer(BaseInferencer):
             ice_template=ice_template,
             prompt_template=prompt_template)
 
+        # 3.1 Fetch and zip prompt & gold answer if output column exists
+        ds_reader = retriever.dataset_reader
+        if ds_reader.output_column:
+            gold_ans = ds_reader.dataset['test'][ds_reader.output_column]
+            prompt_list = list(zip(prompt_list, gold_ans))
+
         # Create tmp json file for saving intermediate results and future
         # resuming
         index = 0
@@ -115,7 +121,12 @@ class GenInferencer(BaseInferencer):
 
         # 5. Inference for prompts in each batch
         logger.info('Starting inference process...')
-        for entry in tqdm(dataloader, disable=not self.is_main_process):
+        for datum in tqdm(dataloader, disable=not self.is_main_process):
+            if ds_reader.output_column:
+                entry, golds = list(zip(*datum))
+            else:
+                entry = datum
+                golds = [None for _ in range(len(entry))]
             # 5-1. Inference with local model
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
@@ -124,8 +135,12 @@ class GenInferencer(BaseInferencer):
                 generated = results
 
             # 5-3. Save current output
-            for prompt, prediction in zip(parsed_entries, generated):
-                output_handler.save_results(prompt, prediction, index)
+            for prompt, prediction, gold in zip(parsed_entries, generated,
+                                                golds):
+                output_handler.save_results(prompt,
+                                            prediction,
+                                            index,
+                                            gold=gold)
                 index = index + 1
 
             # 5-4. Save intermediate results
