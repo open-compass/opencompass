@@ -1,3 +1,4 @@
+import os
 import random
 from typing import List
 
@@ -72,7 +73,10 @@ class HuggingfaceEvaluator(BaseEvaluator):
                 f'length. len(predictions): {len(predictions)}, '
                 f'len(references): {len(references)}'
             }
-        metric = evaluate.load(self.metric)
+        # use codes pre-downloaded to opencompass repo, avoid downloading
+        local_path = os.path.join(os.dirname(os.path.abspath(__file__)),
+                                  'hf_metrics', self.metric + '.py')
+        metric = evaluate.load(local_path)
         scores = metric.compute(**self._preprocess(predictions, references))
         result = self._postprocess(scores)
         random.setstate(random_state)
