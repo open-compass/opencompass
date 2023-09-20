@@ -1,17 +1,16 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .mplug_owl.mplug_owl_7b_coco_caption import (
-        mplug_owl_coco_caption_dataloader,
-        mplug_owl_coco_caption_model,
-        mplug_owl_coco_caption_evaluator,
-    )
+    from .minigpt_4.minigpt_4_7b_mmbench import (minigpt_4_mmbench_dataloader,
+                                                 minigpt_4_mmbench_evaluator,
+                                                 minigpt_4_mmbench_load_from,
+                                                 minigpt_4_mmbench_model)
 
-models = [mplug_owl_coco_caption_model]
-datasets = [mplug_owl_coco_caption_dataloader]
-evaluators = [mplug_owl_coco_caption_evaluator]
-load_froms = [None]
+models = [minigpt_4_mmbench_model]
+datasets = [minigpt_4_mmbench_dataloader]
+evaluators = [minigpt_4_mmbench_evaluator]
+load_froms = [minigpt_4_mmbench_load_from]
 
-num_gpus = 4
-num_procs = 4
+num_gpus = 8
+num_procs = 8
 launcher = 'pytorch'
