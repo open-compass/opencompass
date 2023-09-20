@@ -15,11 +15,17 @@ class NaivePartitioner(BasePartitioner):
     model-dataset pair.
 
     Args:
-        config (ConfigDict): The full config dict.
+        out_dir (str): The output directory of tasks.
+        keep_keys (List[str]): The keys to be kept from the experiment config
+            to the task config.
     """
 
-    def partition(self, models: List[ConfigDict], datasets: List[ConfigDict],
-                  work_dir: str, out_dir: str) -> List[Dict]:
+    def partition(self,
+                  models: List[ConfigDict],
+                  datasets: List[ConfigDict],
+                  work_dir: str,
+                  out_dir: str,
+                  add_cfg: Dict = {}) -> List[Dict]:
         """Partition model-dataset pairs into tasks. Each task is defined as a
         dict and will run independently as a unit. Its structure is as
         follows:
@@ -54,7 +60,8 @@ class NaivePartitioner(BasePartitioner):
                 task = Config({
                     'models': [model],
                     'datasets': [[dataset]],
-                    'work_dir': work_dir
+                    'work_dir': work_dir,
+                    **add_cfg
                 })
                 tasks.append(task)
         return tasks
