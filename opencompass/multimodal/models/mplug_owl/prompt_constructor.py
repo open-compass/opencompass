@@ -39,14 +39,16 @@ class MplugOwlMMBenchPromptConstructor:
         Returns:
             str: Prompt.
         """
-        question = [
+        questions = [
             data_sample.get('question') for data_sample in data_samples
         ]
         options = [data_sample.get('options') for data_sample in data_samples]
-        if data_samples[0].get('context') is not None:
-            context = [
-                data_sample.get('context') for data_sample in data_samples
-            ]
+        contexts = [data_sample.get('context') for data_sample in data_samples]
+        question = questions[0]
+        option = options[0]
+        context = contexts[0]
+        if context is not None:
+            prompt = self.image_prompt + ' ' + context + ' ' + question + ' ' + option + ' ' + self.reply_prompt  # noqa
         else:
             context = [''] * len(data_samples)
         prompts = []
@@ -55,4 +57,11 @@ class MplugOwlMMBenchPromptConstructor:
             prompts.append(cur_context + ' ' + cur_question + ' ' +
                            cur_options)  # noqa
 
-        return prompts
+
+class MplugOwlCOCOCaptionPromptConstructor(MplugOwlMMBenchPromptConstructor):
+    """Prompt constructor for MplugOwl on COCO Caption."""
+
+    def _process(self, data_samples: List[DataSample]) -> str:
+        assert len(data_samples) == 1, 'Only support batch size 1.'
+        prompt = self.image_prompt + ' ' + 'a photo of' + self.reply_prompt
+        return prompt

@@ -35,7 +35,8 @@ class MplugOwl(nn.Module):
                  prompt_constructor: dict,
                  post_processor: dict,
                  model_path='MAGAer13/mplug-owl-llama-7b',
-                 mode: str = 'generation'):
+                 is_caption_task=False,
+                 mode: str = 'generation') -> None:
         super().__init__()
         pretrained_ckpt = model_path
         # import pdb;pdb.set_trace()
@@ -63,6 +64,7 @@ class MplugOwl(nn.Module):
                 post_processor, MM_MODELS)
 
         self.mode = mode
+        self.is_caption_task = is_caption_task
 
     def forward(self, batch):
         if self.mode == 'generation':
@@ -100,5 +102,8 @@ class MplugOwl(nn.Module):
         output_text = self.tokenizer.decode(res.tolist()[0],
                                             skip_special_tokens=True)
         output_text = self.post_processor(output_text)
-        data_sample.pred_answer = output_text
+        if self.is_caption_task:
+            data_sample.pred_caption = output_text
+        else:
+            data_sample.pred_answer = output_text
         return data_sample
