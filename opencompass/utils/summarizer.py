@@ -57,7 +57,7 @@ class Summarizer:
                 result = mmengine.load(filepath)
                 raw_results[model_abbr][dataset_abbr] = result
                 if 'error' in result:
-                    self.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
+                    self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
                     continue
                 else:
                     parsed_results[model_abbr][dataset_abbr] = []
