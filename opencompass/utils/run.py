@@ -1,3 +1,4 @@
+import os
 from typing import List, Union
 
 import tabulate
@@ -61,7 +62,8 @@ def get_config_from_arg(args) -> Config:
                          'a config file path.')
     datasets = []
     config_base_dir = args.custom_config_dir or 'configs'
-    for dataset in match_cfg_file(f'{config_base_dir}/datasets/', args.datasets):
+    datasets_dir = os.path.join(config_base_dir, 'datasets')
+    for dataset in match_cfg_file(datasets_dir, args.datasets):
         get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
         cfg = Config.fromfile(dataset[1])
         for k in cfg.keys():
@@ -74,7 +76,8 @@ def get_config_from_arg(args) -> Config:
                          '--datasets.')
     models = []
     if args.models:
-        for model in match_cfg_file(f'{config_base_dir}/models/', args.models):
+        model_dir = os.path.join(config_base_dir, 'models')
+        for model in match_cfg_file(model_dir, args.models):
             get_logger().info(f'Loading {model[0]}: {model[1]}')
             cfg = Config.fromfile(model[1])
             if 'models' not in cfg:
@@ -99,7 +102,8 @@ def get_config_from_arg(args) -> Config:
 
     summarizer = None
     if args.summarizer:
-        s = match_cfg_file('configs/summarizers/', [args.summarizer])[0]
+        summarizers_dir = os.path.join(config_base_dir, 'summarizers')
+        s = match_cfg_file(summarizers_dir, [args.summarizer])[0]
         get_logger().info(f'Loading {s[0]}: {s[1]}')
         cfg = Config.fromfile(s[1])
         summarizer = cfg['summarizer']
