@@ -9,9 +9,8 @@ class VisualGLMBasePostProcessor:
     def __init__(self) -> None:
         pass
 
-    def __call__(self, output_token: torch.tensor, tokenizer: Any,
-                 input_len: int) -> str:
-        return tokenizer.decode(output_token[input_len:])
+    def __call__(self, output_token: torch.tensor, tokenizer: Any) -> str:
+        return tokenizer.decode(output_token)
 
 
 class VisualGLMVSRPostProcessor(VisualGLMBasePostProcessor):
@@ -20,9 +19,8 @@ class VisualGLMVSRPostProcessor(VisualGLMBasePostProcessor):
     def __init__(self) -> None:
         super().__init__()
 
-    def __call__(self, output_token: torch.tensor, tokenizer: Any,
-                 input_len: int) -> str:
-        output_text = tokenizer.decode(output_token[input_len:])
+    def __call__(self, output_token: torch.tensor, tokenizer: Any) -> str:
+        output_text = tokenizer.decode(output_token)
         if 'yes' in output_text.lower():
             return 'yes'
         elif 'no' in output_text.lower():
