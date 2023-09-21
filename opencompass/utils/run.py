@@ -61,8 +61,7 @@ def get_config_from_arg(args) -> Config:
         raise ValueError('You must specify "--datasets" if you do not specify '
                          'a config file path.')
     datasets = []
-    config_base_dir = args.custom_config_dir or 'configs'
-    datasets_dir = os.path.join(config_base_dir, 'datasets')
+    datasets_dir = os.path.join(args.config_dir, 'datasets')
     for dataset in match_cfg_file(datasets_dir, args.datasets):
         get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
         cfg = Config.fromfile(dataset[1])
@@ -76,7 +75,7 @@ def get_config_from_arg(args) -> Config:
                          '--datasets.')
     models = []
     if args.models:
-        model_dir = os.path.join(config_base_dir, 'models')
+        model_dir = os.path.join(args.config_dir, 'models')
         for model in match_cfg_file(model_dir, args.models):
             get_logger().info(f'Loading {model[0]}: {model[1]}')
             cfg = Config.fromfile(model[1])
@@ -102,7 +101,7 @@ def get_config_from_arg(args) -> Config:
 
     summarizer = None
     if args.summarizer:
-        summarizers_dir = os.path.join(config_base_dir, 'summarizers')
+        summarizers_dir = os.path.join(args.config_dir, 'summarizers')
         s = match_cfg_file(summarizers_dir, [args.summarizer])[0]
         get_logger().info(f'Loading {s[0]}: {s[1]}')
         cfg = Config.fromfile(s[1])
