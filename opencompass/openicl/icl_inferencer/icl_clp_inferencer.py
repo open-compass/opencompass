@@ -175,22 +175,35 @@ class CLPInferencer(BaseInferencer):
                 # minus the bos token
                 choice_target_ids.append(prompt_token_num - 1)
 
+            # 4.1 Fetch and zip prompt & gold answer if output column exists
+            ds_reader = retriever.dataset_reader
+            if ds_reader.output_column:
+                gold_ans = ds_reader.dataset['test'][ds_reader.output_column]
+            else:
+                gold_ans = [None] * len(prompt_list)
+
             logger.info('Calculating conditional log probability for prompts.')
             for idx in trange(0,
                               len(prompt_list),
                               self.batch_size,
                               disable=not self.is_main_process):
                 sub_prompt_list = prompt_list[idx:idx + self.batch_size]
+                sub_golds = gold_ans[idx:idx + self.batch_size]
                 sub_choice_target_ids = choice_target_ids[idx:idx +
                                                           self.batch_size]
                 sub_res = self.__get_cond_prob(sub_prompt_list,
                                                sub_choice_target_ids,
                                                choice_ids)
 
-                for res, prompt in zip(sub_res, sub_prompt_list):
-                    output_handler.save_prompt_and_condprob(
-                        prompt.replace(ice[idx], ''), prompt, res, index,
-                        choices)
+                for res, prompt, gold in zip(sub_res, sub_prompt_list,
+                                             sub_golds):
+                    output_handler.save_prompt_and_condprob(prompt.replace(
+                        ice[idx], ''),
+                                                            prompt,
+                                                            res,
+                                                            index,
+                                                            choices,
+                                                            gold=gold)
                     index = index + 1
 
         # 5. Output

@@ -172,7 +172,13 @@ class CLPInferencerOutputHandler:
                 self.results_dict[str(idx)] = {}
             self.results_dict[str(idx)]['in-context examples'] = example
 
-    def save_prompt_and_condprob(self, input, prompt, cond_prob, idx, choices):
+    def save_prompt_and_condprob(self,
+                                 input,
+                                 prompt,
+                                 cond_prob,
+                                 idx,
+                                 choices,
+                                 gold=None):
         if str(idx) not in self.results_dict.keys():
             self.results_dict[str(idx)] = {}
         # TODO:
@@ -185,3 +191,4 @@ class CLPInferencerOutputHandler:
         self.results_dict[str(idx)]['prediction'] = cond_prob
         # set pred label in case needed
         self.results_dict[str(idx)]['pred_label'] = int(np.argmax(cond_prob))
+        self.results_dict[str(idx)]['gold'] = gold
