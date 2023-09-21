@@ -197,8 +197,8 @@ class CLPInferencer(BaseInferencer):
 
                 for res, prompt, gold in zip(sub_res, sub_prompt_list,
                                              sub_golds):
-                    output_handler.save_prompt_and_condprob(prompt.replace(
-                        ice[idx], ''),
+                    example_input = prompt.replace(ice[idx], '')
+                    output_handler.save_prompt_and_condprob(example_input,
                                                             prompt,
                                                             res,
                                                             index,
