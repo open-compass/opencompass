@@ -4,9 +4,7 @@ import re
 
 from datasets import Dataset
 
-from opencompass.openicl.icl_evaluator import BaseEvaluator
-from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
-                                  TEXT_POSTPROCESSORS)
+from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from .base import BaseDataset
 
@@ -50,17 +48,3 @@ def scibench_postprocess(text: str) -> str:
         return numbers[-1]
 
     return ans
-
-
-@ICL_EVALUATORS.register_module()
-class ScibenchEvaluator(BaseEvaluator):
-
-    def score(self, predictions, references):
-        predictions = [scibench_postprocess(pred) for pred in predictions]
-        cnt = 0
-        for pred, ref in zip(predictions, references):
-            if ref == pred:
-                cnt += 1
-
-        score = cnt / len(predictions) * 100
-        return {'score': score}
