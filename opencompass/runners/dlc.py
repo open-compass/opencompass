@@ -63,11 +63,11 @@ class DLCRunner(BaseRunner):
             status = [self._launch(task, random_sleep=False) for task in tasks]
         return status
 
-    def _launch(self, task_cfg: ConfigDict, random_sleep: bool = True):
+    def _launch(self, cfg: ConfigDict, random_sleep: bool = True):
         """Launch a single task.
 
         Args:
-            task_cfg (ConfigDict): Task config.
+            cfg (ConfigDict): Task config.
             random_sleep (bool): Whether to sleep for a random time before
                 running the command. This avoids cluster error when launching
                 multiple tasks at the same time. Default: True.
@@ -76,75 +76,77 @@ class DLCRunner(BaseRunner):
             tuple[str, int]: Task name and exit code.
         """
 
-        task_type = self.task_cfg.type
-        if isinstance(self.task_cfg.type, str):
-            task_type = TASKS.get(task_type)
-        task = task_type(task_cfg)
+        task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
         task_name = task.name
 
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
         param_file = f'tmp/{os.getpid()}_params.py'
-        task_cfg.dump(param_file)
+        try:
+            cfg.dump(param_file)
 
-        # Build up DLC command
-        pwd = os.getcwd()
-        shell_cmd = (f'source {self.aliyun_cfg["bashrc_path"]}; '
-                     f'conda activate {self.aliyun_cfg["conda_env_name"]}; '
-                     f'cd {pwd}; '
-                     '{task_cmd}')
+            # Build up DLC command
+            pwd = os.getcwd()
+            shell_cmd = (
+                f'source {self.aliyun_cfg["bashrc_path"]}; '
+                f'conda activate {self.aliyun_cfg["conda_env_name"]}; '
+                f'cd {pwd}; '
+                '{task_cmd}')
 
-        tmpl = ('dlc create job'
-                f" --command '{shell_cmd}'"
-                f' --name {task_name[:512]}'
-                ' --kind BatchJob'
-                f" -c {self.aliyun_cfg['dlc_config_path']}"
-                f" --workspace_id {self.aliyun_cfg['workspace_id']}"
-                ' --worker_count 1'
-                f' --worker_cpu {max(num_gpus * 6, 8)}'
-                f' --worker_gpu {num_gpus}'
-                f' --worker_memory {max(num_gpus * 32, 48)}'
-                f" --worker_image {self.aliyun_cfg['worker_image']}"
-                ' --interactive')
-        get_cmd = partial(task.get_command, cfg_path=param_file, template=tmpl)
-        cmd = get_cmd()
+            tmpl = ('dlc create job'
+                    f" --command '{shell_cmd}'"
+                    f' --name {task_name[:512]}'
+                    ' --kind BatchJob'
+                    f" -c {self.aliyun_cfg['dlc_config_path']}"
+                    f" --workspace_id {self.aliyun_cfg['workspace_id']}"
+                    ' --worker_count 1'
+                    f' --worker_cpu {max(num_gpus * 6, 8)}'
+                    f' --worker_gpu {num_gpus}'
+                    f' --worker_memory {max(num_gpus * 32, 48)}'
+                    f" --worker_image {self.aliyun_cfg['worker_image']}"
+                    ' --interactive')
+            get_cmd = partial(task.get_command,
+                              cfg_path=param_file,
+                              template=tmpl)
+            cmd = get_cmd()
 
-        logger = get_logger()
-        logger.debug(f'Running command: {cmd}')
+            logger = get_logger()
+            logger.debug(f'Running command: {cmd}')
 
-        # Run command with retry
-        if self.debug:
-            stdout = None
-        else:
-            out_path = task.get_log_path(file_extension='out')
-            mmengine.mkdir_or_exist(osp.split(out_path)[0])
-            stdout = open(out_path, 'w', encoding='utf-8')
+            # Run command with retry
+            if self.debug:
+                stdout = None
+            else:
+                out_path = task.get_log_path(file_extension='out')
+                mmengine.mkdir_or_exist(osp.split(out_path)[0])
+                stdout = open(out_path, 'w', encoding='utf-8')
 
-        if random_sleep:
-            time.sleep(random.randint(0, 10))
-        result = subprocess.run(cmd,
-                                shell=True,
-                                text=True,
-                                stdout=stdout,
-                                stderr=stdout)
-
-        retry = self.retry
-        output_paths = task.get_output_paths()
-        while self._job_failed(result.returncode, output_paths) and retry > 0:
-            retry -= 1
             if random_sleep:
                 time.sleep(random.randint(0, 10))
-            # Re-generate command to refresh ports.
-            cmd = get_cmd()
             result = subprocess.run(cmd,
                                     shell=True,
                                     text=True,
                                     stdout=stdout,
                                     stderr=stdout)
 
-        # Clean up
-        os.remove(param_file)
+            retry = self.retry
+            output_paths = task.get_output_paths()
+            while self._job_failed(result.returncode,
+                                   output_paths) and retry > 0:
+                retry -= 1
+                if random_sleep:
+                    time.sleep(random.randint(0, 10))
+                # Re-generate command to refresh ports.
+                cmd = get_cmd()
+                result = subprocess.run(cmd,
+                                        shell=True,
+                                        text=True,
+                                        stdout=stdout,
+                                        stderr=stdout)
+        finally:
+            # Clean up
+            os.remove(param_file)
         return task_name, result.returncode
 
     def _job_failed(self, return_code: int, output_paths: List[str]) -> bool:

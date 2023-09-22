@@ -45,9 +45,12 @@ class MBPPEvaluator(BaseEvaluator):
         for test_case, pred in zip(references, predictions):
             programs = self._process_test(test_case, pred)
             try:
+                # Add exec globals to prevent the exec to raise
+                # unnecessary NameError for correct answer
+                exec_globals = {}
                 with self.swallow_io():
                     with self.time_limit(2):
-                        exec(programs)
+                        exec(programs, exec_globals)
                 result['pass'] += 1
             except TimeOutException:
                 result['timeout'] += 1
@@ -118,3 +121,41 @@ class MBPPEvaluator(BaseEvaluator):
 
     class redirect_stdin(contextlib._RedirectStream):  # type: ignore
         _stream = 'stdin'
+
+
+@ICL_EVALUATORS.register_module()
+class MBPPEvaluator2(MBPPEvaluator):
+    """Better use for WizardCoder evaluation."""
+
+    def _process_answer(self, text):
+        if '```' in text:
+            blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+            if len(blocks) == 0:
+                text = text.split('```')[1]  # fall back to default strategy
+            else:
+                text = blocks[0]  # fetch the first code block
+                if not text.startswith(
+                        '\n'):  # in case starting with ```python
+                    text = text[max(text.find('\n') + 1, 0):]
+        else:
+            match = re.search(r'Here(.*?)\n', text)
+            if match:
+                text = re.sub('Here(.*?)\n', '', text, count=1)
+
+        # remove test in generation
+        test_list = ['# Test', '#Test', '#test', '# test']
+        for s in test_list:
+            if s in text:
+                text = text[:text.find(s)]
+
+        text = text.strip()
+        match = re.search(r"('\s*|)(\[DONE\]|DONE)", text)
+        if match:
+            text = text[:match.start()]
+        match = re.search(r"(\[BEGIN\]|BEGIN)('\s*|)", text)
+        if match:
+            text = text[match.end():]
+        text = text.strip()
+        if text.startswith("'"):
+            text = text[1:]
+        return text

@@ -2,7 +2,7 @@ import copy
 import math
 import os.path as osp
 from fnmatch import fnmatch
-from typing import List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import mmengine
 from mmengine.config import Config, ConfigDict
@@ -25,20 +25,27 @@ class SizePartitioner(BasePartitioner):
         gen_task_coef (int): The dataset cost measurement coefficient for
             generation tasks.
         dataset_size_path (str): The path to the dataset size cache file.
+        keep_keys (list[str]): The keys to be kept from the experiment config
+            to the task config.
     """
 
     def __init__(self,
                  out_dir: str,
-                 max_task_size: int = 2000,
+                 max_task_size: int = 40000,
                  gen_task_coef: int = 20,
-                 dataset_size_path: str = '.cache/dataset_size.json'):
-        super().__init__(out_dir)
+                 dataset_size_path: str = '.cache/dataset_size.json',
+                 keep_keys: List[str] = ['eval.runner.task.judge_cfg']):
+        super().__init__(out_dir=out_dir, keep_keys=keep_keys)
         self.max_task_size = max_task_size
         self.gen_task_coef = gen_task_coef
         self.dataset_size_path = dataset_size_path
 
-    def partition(self, models: List[ConfigDict], datasets: List[ConfigDict],
-                  work_dir: str, out_dir: str) -> List[ConfigDict]:
+    def partition(self,
+                  models: List[ConfigDict],
+                  datasets: List[ConfigDict],
+                  work_dir: str,
+                  out_dir: str,
+                  add_cfg: Dict = {}) -> List[ConfigDict]:
         """Partition model-dataset pairs into tasks. Each task is defined as a
         dict and will run independently as a unit. Its structure is as
         follows:
@@ -50,6 +57,7 @@ class SizePartitioner(BasePartitioner):
                 'datasets': [[]],  # a nested list of dataset configs, each
                                     list corresponds to a model
                 'work_dir': '',  # the work dir
+                **add_cfg  # other keys to be kept in the config
             }
 
         Args:
@@ -59,6 +67,8 @@ class SizePartitioner(BasePartitioner):
             out_dir (str): The full output path for the task, intended for
                 Partitioners to check whether the task is finished via the
                 existency of result file in this directory.
+            add_cfg (dict): Other common keys to be added in the task config,
+                used to share the same config among tasks. Defaults to {}.
 
         Returns:
             List[ConfigDict]: A list of tasks.
@@ -72,7 +82,8 @@ class SizePartitioner(BasePartitioner):
             task = Config({
                 'models': [model],
                 'datasets': [[]],
-                'work_dir': work_dir
+                'work_dir': work_dir,
+                **add_cfg
             })
             num_data = 0
             for dataset in datasets:
@@ -91,7 +102,8 @@ class SizePartitioner(BasePartitioner):
                                 Config({
                                     'models': [model],
                                     'datasets': [[dataset_split]],
-                                    'work_dir': work_dir
+                                    'work_dir': work_dir,
+                                    **add_cfg
                                 }))
                 else:
                     if num_data + dataset_size > self.max_task_size:
@@ -99,7 +111,8 @@ class SizePartitioner(BasePartitioner):
                         task = Config({
                             'models': [model],
                             'datasets': [[]],
-                            'work_dir': work_dir
+                            'work_dir': work_dir,
+                            **add_cfg
                         })
                         num_data = 0
                     task['datasets'][0].append(dataset)
@@ -154,7 +167,7 @@ class SizePartitioner(BasePartitioner):
                 fnmatch(dataset_abbr, pattern)
                 for pattern in ('bbh*', 'gsm8k*', 'math*', 'strategyqa*',
                                 'agieval-jec*', 'agieval-gaokao-mathcloze',
-                                'agieval-math')):
+                                'agieval-math', '*professional_law')):
             factor *= 10
 
         return factor

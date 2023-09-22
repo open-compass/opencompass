@@ -1,0 +1,17 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: The wave function $\Psi_2(1,2)$ given by Equation 9.39 is not normalized as it stands. Determine the normalization constant of $\Psi_2(1,2)$ given that the "1s" parts are normalized.
+Answer: The answer is \boxed{0.70710678}.
+
+Promblem 2: Find the bonding and antibonding Hückel molecular orbitals for ethene.
+Answer: The answer is \boxed{0.70710678}.
+
+Promblem 3: Given that the work function for sodium metal is $2.28 \mathrm{eV}$, what is the threshold frequency $v_0$ for sodium?
+Answer: The answer is \boxed{5.51}.
+
+Promblem 4: Calculate the de Broglie wavelength of an electron traveling at $1.00 \%$ of the speed of light.
+Answer: The answer is \boxed{243}.
+
+Promblem 5: To a good approximation, the microwave spectrum of $\mathrm{H}^{35} \mathrm{Cl}$ consists of a series of equally spaced lines, separated by $6.26 \times 10^{11} \mathrm{~Hz}$. Calculate the bond length of $\mathrm{H}^{35} \mathrm{Cl}$.
+Answer: The answer is \boxed{129}.
+

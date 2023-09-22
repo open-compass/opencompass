@@ -41,12 +41,11 @@ class MMBenchDataset(Dataset):
         return len(self.df)
 
     def __getitem__(self, idx: int) -> dict:
+        # Mandatory Fields Begin
         index = self.df.iloc[idx]['index']
         image = self.df.iloc[idx]['image']
         image = decode_base64_to_image(image)
         question = self.df.iloc[idx]['question']
-        catetory = self.df.iloc[idx]['category']
-        l2_catetory = self.df.iloc[idx]['l2-category']
 
         option_candidate = ['A', 'B', 'C', 'D', 'E']
         options = {
@@ -57,13 +56,19 @@ class MMBenchDataset(Dataset):
         options_prompt = f'{self.sys_prompt}\n'
         for key, item in options.items():
             options_prompt += f'{key}. {item}\n'
+        # Mandatory Fields End
 
+        # Optional Fields Begin
         hint = self.load_from_df(idx, 'hint')
+        category = self.load_from_df(idx, 'category')
+        l2_catetory = self.load_from_df(idx, 'l2-category')
+        # Optional Fields End
+
         data = {
             'img': image,
             'question': question,
             'options': options_prompt,
-            'category': catetory,
+            'category': category,
             'l2-category': l2_catetory,
             'options_dict': options,
             'index': index,

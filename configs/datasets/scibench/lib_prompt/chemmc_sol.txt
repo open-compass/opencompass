@@ -1,0 +1,108 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: Calculate the probability that a particle in a one-dimensional box of length $a$ is found between 0 and $a / 2$.
+Explanation for Problem 1: The probability that the particle will be found between 0 and $a / 2$ is
+$$
+\operatorname{Prob}(0 \leq x \leq a / 2)=\int_0^{a / 2} \psi^*(x) \psi(x) d x=\frac{2}{a} \int_0^{a / 2} \sin ^2 \frac{n \pi x}{a} d x
+$$
+If we let $n \pi x / a$ be $z$, then we find
+
+$$
+\begin{aligned}
+\operatorname{Prob}(0 \leq x \leq a / 2) & =\frac{2}{n \pi} \int_0^{n \pi / 2} \sin ^2 z d z=\frac{2}{n \pi}\left|\frac{z}{2}-\frac{\sin 2 z}{4}\right|_0^{n \pi / 2} \\
+& =\frac{2}{n \pi}\left(\frac{n \pi}{4}-\frac{\sin n \pi}{4}\right)=\frac{1}{2} \quad \text { (for all } n \text { ) }
+\end{aligned}
+$$
+Thus, the probability that the particle lies in one-half of the interval $0 \leq x \leq a$ is $\frac{1}{2}$.
+Therefore, the answer is \boxed{0.5}.
+
+Promblem 2: Calculate the de Broglie wavelength of an electron traveling at $1.00 \%$ of the speed of light.
+Explanation for Problem 2: The mass of an electron is $9.109 \times 10^{-31} \mathrm{~kg}$. One percent of the speed of light is
+$$
+v=(0.0100)\left(2.998 \times 10^8 \mathrm{~m} \cdot \mathrm{s}^{-1}\right)=2.998 \times 10^6 \mathrm{~m} \cdot \mathrm{s}^{-1}
+$$
+The momentum of the electron is given by
+$$
+\begin{aligned}
+p=m_{\mathrm{e}} v & =\left(9.109 \times 10^{-31} \mathrm{~kg}\right)\left(2.998 \times 10^6 \mathrm{~m} \cdot \mathrm{s}^{-1}\right) \\
+& =2.73 \times 10^{-24} \mathrm{~kg} \cdot \mathrm{m} \cdot \mathrm{s}^{-1}
+\end{aligned}
+$$
+The de Broglie wavelength of this electron is
+$$
+\begin{aligned}
+\lambda=\frac{h}{p} & =\frac{6.626 \times 10^{-34} \mathrm{~J} \cdot \mathrm{s}}{2.73 \times 10^{-24} \mathrm{~kg} \cdot \mathrm{m} \cdot \mathrm{s}^{-1}}=2.43 \times 10^{-10} \mathrm{~m} \\
+& =243 \mathrm{pm}
+\end{aligned}
+$$
+This wavelength is of atomic dimensions.
+
+Therefore, the answer is \boxed{243}.
+
+Promblem 3: Find the bonding and antibonding Hückel molecular orbitals for ethene.
+Explanation for Problem 3: The equations for $c_1$ and $c_2$ associated with Equation 11.7 are
+$$
+c_1(\alpha-E)+c_2 \beta=0 \quad \text { and } \quad c_1 \beta+c_2(\alpha-E)=0
+$$
+For $E=\alpha+\beta$, either equation yields $c_1=c_2$. Thus,
+$$
+\psi_{\mathrm{b}}=c_1\left(2 p_{z 1}+2 p_{z 2}\right)
+$$
+
+The value of $c_1$ can be found by requiring that the wave function be normalized. The normalization condition on $\psi_\pi$ gives $c_1^2(1+2 S+1)=1$. Using the Hückel assumption that $S=0$, we find that $c_1=1 / \sqrt{2}$.
+
+Substituting $E=\alpha-\beta$ into either of the equations for $c_1$ and $c_2$ yields $c_1=-c_2$, or
+$$
+\psi_{\mathrm{a}}=c_1\left(2 p_{z 1}-2 p_{z 2}\right)
+$$
+The normalization condition gives $c^2(1-2 S+1)=1$, or $c_1=1 / \sqrt{2}$.
+
+Therefore, the answer is \boxed{0.70710678}.
+
+Promblem 4: The wave function $\Psi_2(1,2)$ given by Equation 9.39 is not normalized as it stands. Determine the normalization constant of $\Psi_2(1,2)$ given that the "1s" parts are normalized.
+Explanation for Problem 4: We want to find the constant $c$ such that
+$$
+I=c^2\left\langle\Psi_2(1,2) \mid \Psi_2(1,2)\right\rangle=1
+$$
+First notice that $\Psi_2(1,2)$ can be factored into the product of a spatial part and a spin part:
+$$
+\begin{aligned}
+\Psi_2(1,2) & =1 s(1) 1 s(2)[\alpha(1) \beta(2)-\alpha(2) \beta(1)] \\
+& =1 s\left(\mathbf{r}_1\right) 1 s\left(\mathbf{r}_2\right)\left[\alpha\left(\sigma_1\right) \beta\left(\sigma_2\right)-\alpha\left(\sigma_2\right) \beta\left(\sigma_1\right)\right]
+\end{aligned}
+$$
+The normalization integral becomes the product of three integrals:
+$$
+I=c^2\langle 1 s(1) \mid 1 s(1)\rangle\langle 1 s(2) \mid 1 s(2)\rangle\langle\alpha(1) \beta(1)-\alpha(2) \beta(1) \mid \alpha(1) \beta(2)-\alpha(2) \beta(1)\rangle
+$$
+The spatial integrals are equal to 1 because we have taken the $1 s$ orbitals to be normalized. Now let's look at the spin integrals. When the two terms in the integrand of the spin integral are multiplied, we get four integrals. One of them is
+$$
+\begin{aligned}
+\iint \alpha^*\left(\sigma_1\right) \beta^*\left(\sigma_2\right) \alpha\left(\sigma_1\right) \beta\left(\sigma_2\right) d \sigma_1 d \sigma_2 & =\langle\alpha(1) \beta(2) \mid \alpha(1) \beta(2)\rangle \\
+& =\langle\alpha(1) \mid \alpha(1)\rangle\langle\beta(2) \mid \beta(2)\rangle=1
+\end{aligned}
+$$
+where once again we point out that integrating over $\sigma_1$ and $\sigma_2$ is purely symbolic; $\sigma_1$ and $\sigma_2$ are discrete variables. Another is
+$$
+\langle\alpha(1) \beta(2) \mid \alpha(2) \beta(1)\rangle=\langle\alpha(1) \mid \beta(1)\rangle\langle\beta(2) \mid \alpha(2)\rangle=0
+$$
+The other two are equal to 1 and 0 , and so
+$$
+I=c^2\left\langle\Psi_2(1,2) \mid \Psi_2(1,2)\right\rangle=2 c^2=1
+$$
+or $c=1 / \sqrt{2}$.
+Therefore, the answer is \boxed{0.70710678}.
+
+Promblem 5: Given that the work function for sodium metal is $2.28 \mathrm{eV}$, what is the threshold frequency $v_0$ for sodium?
+Explanation for Problem 5: We must first convert $\phi$ from electron volts to joules.
+$$
+\begin{aligned}
+\phi & =2.28 \mathrm{eV}=(2.28 \mathrm{eV})\left(1.602 \times 10^{-19} \mathrm{~J} \cdot \mathrm{eV}^{-1}\right) \\
+& =3.65 \times 10^{-19} \mathrm{~J}
+\end{aligned}
+$$
+Using Equation 1.11, we have
+$$
+v_0=\frac{3.65 \times 10^{-19} \mathrm{~J}}{6.626 \times 10^{-34} \mathrm{~J} \cdot \mathrm{s}}=5.51 \times 10^{14} \mathrm{~Hz}$$
+Therefore, the answer is \boxed{5.51}.
+

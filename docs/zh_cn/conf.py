@@ -93,7 +93,7 @@ html_theme_options = {
     'menu': [
         {
             'name': 'GitHub',
-            'url': 'https://github.com/InternLM/opencompass'
+            'url': 'https://github.com/open-compass/opencompass'
         },
     ],
     # Specify the language of shared menu
@@ -219,3 +219,11 @@ autodoc_typehints = 'none'
 
 # The not found page
 notfound_template = '404.html'
+
+
+def builder_inited_handler(app):
+    subprocess.run(['./cp_origin_docs.sh'])
+
+
+def setup(app):
+    app.connect('builder-inited', builder_inited_handler)

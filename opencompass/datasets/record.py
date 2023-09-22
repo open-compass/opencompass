@@ -43,6 +43,33 @@ class ReCoRDDataset(BaseDataset):
             return dataset
 
 
+class ReCoRDDataset_V2(BaseDataset):
+
+    @staticmethod
+    def load(path: str):
+        with open(path, 'r', errors='ignore') as in_f:
+            rows = []
+            for i, line in enumerate(in_f):
+                sample = json.loads(line.strip())
+                text = sample['passage']['text'].replace('@highlight',
+                                                         '').replace(
+                                                             '\n\n', '\n')
+                for qas_dict in sample['qas']:
+                    query = qas_dict['query'].replace('@placeholder', '____')
+                    answers = [
+                        answer_dict['text']
+                        for answer_dict in qas_dict['answers']
+                    ]
+                    rows.append({
+                        'text': text,
+                        'question': query,
+                        'answers': answers
+                    })
+
+            dataset = Dataset.from_list(rows)
+            return dataset
+
+
 @TEXT_POSTPROCESSORS.register_module('ReCoRD')
 def ReCoRD_postprocess(text: str) -> str:
     text = text.strip().split('\n')[0].replace('Answer: ', '').strip()

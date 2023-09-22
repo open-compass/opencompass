@@ -22,9 +22,12 @@ def get_logger(log_level='INFO', filter_duplicate_level=None) -> MMLogger:
         log_level (str): The log level. Default: 'INFO'. Choices are 'DEBUG',
             'INFO', 'WARNING', 'ERROR', 'CRITICAL'.
     """
-    logger = MMLogger.get_instance('OpenCompass',
-                                   logger_name='OpenCompass',
-                                   log_level=log_level)
+    if not MMLogger.check_instance_created('OpenCompass'):
+        logger = MMLogger.get_instance('OpenCompass',
+                                       logger_name='OpenCompass',
+                                       log_level=log_level)
+    else:
+        logger = MMLogger.get_instance('OpenCompass')
 
     if filter_duplicate_level is None:
         # export OPENCOMPASS_FILTER_DUPLICATE_LEVEL=error

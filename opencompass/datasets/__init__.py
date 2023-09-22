@@ -2,6 +2,7 @@ from .advglue import *  # noqa: F401, F403
 from .afqmcd import *  # noqa: F401, F403
 from .agieval import *  # noqa: F401, F403
 from .anli import AnliDataset  # noqa: F401, F403
+from .anthropics_evals import *  # noqa: F401, F403
 from .arc import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
@@ -13,6 +14,7 @@ from .ceval import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
 from .civilcomments import *  # noqa: F401, F403
 from .cluewsc import *  # noqa: F401, F403
+from .cmb import *  # noqa: F401, F403
 from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
@@ -23,6 +25,7 @@ from .csl import *  # noqa: F401, F403
 from .cvalues import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
+from .ds1000 import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
@@ -35,6 +38,7 @@ from .humaneval import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
+from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
@@ -53,6 +57,7 @@ from .race import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
+from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
 from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403
@@ -68,6 +73,7 @@ from .tydiqa import *  # noqa: F401, F403
 from .wic import *  # noqa: F401, F403
 from .winograd import *  # noqa: F401, F403
 from .winogrande import *  # noqa: F401, F403
+from .wnli import wnliDataset  # noqa: F401, F403
 from .wsc import *  # noqa: F401, F403
 from .xcopa import *  # noqa: F401, F403
 from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403

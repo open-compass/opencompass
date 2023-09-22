@@ -1,3 +1,5 @@
+from opencompass.multimodal.models.openflamingo import OpenFlamingoMMBenchPromptConstructor
+
 # dataloader settings
 val_pipeline = [
     dict(type='mmpretrain.PILToNumpy'),
@@ -17,7 +19,7 @@ dataset = dict(type='opencompass.MMBenchDataset',
                data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
-openflamingo_dataloader = dict(
+openflamingo_mmbench_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -27,7 +29,7 @@ openflamingo_dataloader = dict(
 )
 
 # model settings
-openflamingo_model = dict(
+openflamingo_mmbench_model = dict(
     type='openflamingo',
     data_preprocessor=dict(
         type='mmpretrain.MultiModalDataPreprocessor',
@@ -59,11 +61,13 @@ openflamingo_model = dict(
                      cross_attn_every_n_layers=4,
                      use_media_placement_augmentation=False),
     ),
+    task='vqa',
     generation_cfg=dict(num_beams=3, max_new_tokens=20, length_penalty=-2.0),
+    prompt_constructor=dict(type=OpenFlamingoMMBenchPromptConstructor)
 )
 
 # evaluation settings
-openflamingo_evaluator = [
+openflamingo_mmbench_evaluator = [
     dict(
         type='opencompass.DumpResults',
         save_path=  # noqa: E251

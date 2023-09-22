@@ -1,0 +1,17 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: The region $\mathscr{R}$ enclosed by the curves $y=x$ and $y=x^2$ is rotated about the $x$-axis. Find the volume of the resulting solid.
+Answer: The answer is \boxed{0.41887902047}.
+
+Promblem 2: Find the average value of the function $f(x)=1+x^2$ on the interval $[-1,2]$.
+Answer: The answer is \boxed{2}.
+
+Promblem 3: Find the length of the cardioid $r=1+\sin \theta$.
+Answer: The answer is \boxed{8}.
+
+Promblem 4: How large should we take $n$ in order to guarantee that the Trapezoidal and Midpoint Rule approximations for $\int_1^2(1 / x) d x$ are accurate to within 0.0001 ?
+Answer: The answer is \boxed{41}.
+
+Promblem 5: A force of $40 \mathrm{~N}$ is required to hold a spring that has been stretched from its natural length of $10 \mathrm{~cm}$ to a length of $15 \mathrm{~cm}$. How much work is done in stretching the spring from $15 \mathrm{~cm}$ to $18 \mathrm{~cm}$ ?
+Answer: The answer is \boxed{1.56}.
+

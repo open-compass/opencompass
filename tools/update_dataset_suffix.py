@@ -111,9 +111,11 @@ def main():
     with Pool(16) as p:
         name_pairs = p.map(check_and_rename, python_files)
     name_pairs = [pair for pair in name_pairs if pair[0] is not None]
+    if not name_pairs:
+        return
     with Pool(16) as p:
         p.starmap(os.rename, name_pairs)
-    # python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
+    python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
     update_data = [(python_file, name_pairs) for python_file in python_files]
     with Pool(16) as p:
         p.map(update_imports, update_data)

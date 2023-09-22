@@ -13,7 +13,7 @@ val_pipeline = [
          std=(0.26862954, 0.26130258, 0.27577711)),
     dict(type='mmpretrain.PackInputs',
          algorithm_keys=[
-             'question', 'gt_answer', 'choices', 'hint', 'lecture', 'solution'
+             'question', 'gt_answer', 'choices', 'hint', 'lecture', 'solution', 'has_image'
          ])
 ]
 
@@ -26,7 +26,7 @@ dataset = dict(type='mmpretrain.ScienceQA',
                data_prefix=dict(img_path='val'),
                pipeline=val_pipeline)
 
-visualglm_vizwiz_dataloader = dict(batch_size=1,
+visualglm_scienceqa_dataloader = dict(batch_size=1,
                   num_workers=4,
                   dataset=dataset,
                   collate_fn=dict(type='pseudo_collate'),

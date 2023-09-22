@@ -24,12 +24,14 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :caption: Get Started
 
    get_started.md
+   faq.md
 
 .. _UserGuides:
 .. toctree::
    :maxdepth: 1
    :caption: User Guides
 
+   user_guides/framework_overview.md
    user_guides/config.md
    user_guides/datasets.md
    user_guides/models.md
@@ -59,6 +61,8 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    advanced_guides/evaluation_turbomind.md
    advanced_guides/code_eval_service.md
    advanced_guides/multimodal_eval.md
+   advanced_guides/prompt_attack.md
+   advanced_guides/longeval.md
 
 .. _Tools:
 .. toctree::

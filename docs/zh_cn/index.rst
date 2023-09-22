@@ -25,12 +25,14 @@ OpenCompass 上手路线
    :caption: 开始你的第一步
 
    get_started.md
+   faq.md
 
 .. _教程:
 .. toctree::
    :maxdepth: 1
    :caption: 教程
 
+   user_guides/framework_overview.md
    user_guides/config.md
    user_guides/datasets.md
    user_guides/models.md
@@ -59,6 +61,8 @@ OpenCompass 上手路线
    advanced_guides/evaluation_turbomind.md
    advanced_guides/code_eval_service.md
    advanced_guides/multimodal_eval.md
+   advanced_guides/prompt_attack.md
+   advanced_guides/longeval.md
 
 .. _工具:
 .. toctree::

@@ -1,3 +1,4 @@
+import re
 from typing import List, Optional, Union
 
 import mmengine
@@ -21,17 +22,18 @@ class OpenFlamingoInferencer(Flamingo):
     """
 
     def __init__(self,
-                 prompt_constructor: Optional[dict] = None,
+                 prompt_constructor: dict,
                  post_processor: Optional[dict] = None,
                  mode: str = 'generation',
                  **kwargs):
         super().__init__(**kwargs)
-        if prompt_constructor is not None:
-            self.prompt_constructor = mmengine.registry.build_from_cfg(
-                prompt_constructor, MM_MODELS)
+        self.prompt_constructor = mmengine.registry.build_from_cfg(
+            prompt_constructor, MM_MODELS)
         if post_processor is not None:
             self.post_processor = mmengine.registry.build_from_cfg(
                 post_processor, MM_MODELS)
+        else:
+            self.post_processor = None
         self.mode = mode
 
     def preprocess_text(self, data_samples: List[DataSample],
@@ -46,16 +48,7 @@ class OpenFlamingoInferencer(Flamingo):
         Returns:
             List[DataSample]: Return list of data samples.
         """
-        prompts = []
-        for sample in data_samples:
-            question = sample.get('question')
-            option = sample.get('options')
-
-            prompt = '<image>' + question + ' ' + option + ' ' + 'Answer:'
-            if data_samples[0].get('context') is not None:
-                prompt = sample.get('context') + ' ' + prompt
-
-            prompts.append(prompt)
+        prompts = self.prompt_constructor(data_samples)
 
         self.tokenizer.padding_side = 'left'
         input_text = self.tokenizer(
@@ -66,6 +59,42 @@ class OpenFlamingoInferencer(Flamingo):
             max_length=2000,
         ).to(device)
         return input_text
+
+    def post_process(
+            self, outputs: torch.Tensor,
+            data_samples: Optional[List[DataSample]]) -> List[DataSample]:
+        """Perform post process for outputs for different task.
+
+        Args:
+            outputs (torch.Tensor): The generated outputs.
+            data_samples (List[DataSample], optional): The annotation
+                data of every samples.
+
+        Returns:
+            List[DataSample]: Return list of data samples.
+        """
+        outputs = self.tokenizer.batch_decode(outputs,
+                                              skip_special_tokens=True)
+
+        if data_samples is None:
+            data_samples = [DataSample() for _ in range(len(outputs))]
+
+        for output, data_sample in zip(outputs, data_samples):
+            # remove text pattern
+            if self.task == 'caption':
+                data_sample.pred_caption = re.split('Output', output,
+                                                    1)[0].replace('"', '')
+                if self.post_processor:
+                    data_sample.pred_caption = self.post_processor(
+                        data_sample.pred_caption)
+            elif self.task == 'vqa':
+                data_sample.pred_answer = re.split('Question|Answer', output,
+                                                   1)[0]
+                if self.post_processor:
+                    data_sample.pred_answer = self.post_processor(
+                        data_sample.pred_answer)
+
+        return data_samples
 
     def forward(self, batch: dict) -> Union[DataSample, List[DataSample]]:
 
