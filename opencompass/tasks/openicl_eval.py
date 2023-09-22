@@ -3,6 +3,7 @@ import fnmatch
 import os.path as osp
 import time
 from collections import Counter
+from inspect import signature
 from typing import Optional
 
 import mmengine
@@ -71,8 +72,9 @@ class OpenICLEvalTask(BaseTask):
         test_set = build_dataset_from_cfg(self.dataset_cfg).test
         # Postprocess dataset if necessary
         if 'dataset_postprocessor' in self.eval_cfg:
-            proc = TEXT_POSTPROCESSORS.get(
-                self.eval_cfg['dataset_postprocessor']['type'])
+            proc = self.eval_cfg['dataset_postprocessor']['type']
+            if isinstance(proc, str):
+                proc = TEXT_POSTPROCESSORS.get(proc)
 
             def postprocess(sample):
                 s = sample[self.output_column]
@@ -98,20 +100,21 @@ class OpenICLEvalTask(BaseTask):
         else:
             if osp.exists(osp.realpath(filename)):
                 preds = mmengine.load(filename)
-                pred_strs = [
-                    preds[str(i)]['prediction'] for i in range(len(preds))
-                ]
+                preds = [preds[str(i)] for i in range(len(preds))]
             else:
                 filename = partial_filename
-                pred_strs = []
+                preds = []
                 i = 1
                 while osp.exists(osp.realpath(filename)):
-                    preds = mmengine.load(filename)
+                    sub_preds = mmengine.load(filename)
+                    preds.extend(
+                        [sub_preds[str(i)] for i in range(len(sub_preds))])
                     filename = root + f'_{i}' + ext
                     i += 1
-                    pred_strs += [
-                        preds[str(i)]['prediction'] for i in range(len(preds))
-                    ]
+
+            preds = {k: [pred[k] for pred in preds] for k in preds[0]}
+
+            pred_strs = preds.pop('prediction')
 
             if ('pred_role' in self.eval_cfg
                     and 'meta_template' in self.model_cfg
@@ -142,7 +145,9 @@ class OpenICLEvalTask(BaseTask):
             # Postprocess predictions if necessary
             if 'pred_postprocessor' in self.eval_cfg:
                 kwargs = self.eval_cfg['pred_postprocessor']
-                proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+                proc = kwargs.pop('type')
+                if isinstance(proc, str):
+                    proc = TEXT_POSTPROCESSORS.get(proc)
                 if sc_size is not None:
                     pred_strs = [[proc(s, **kwargs) for s in preds]
                                  for preds in pred_strs]
@@ -156,8 +161,13 @@ class OpenICLEvalTask(BaseTask):
                 ]
 
             icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
-            result = icl_evaluator.score(
-                predictions=pred_strs, references=test_set[self.output_column])
+            preds['predictions'] = pred_strs
+            preds['references'] = test_set[self.output_column]
+            preds = {
+                k: preds[k]
+                for k in signature(icl_evaluator.score).parameters
+            }
+            result = icl_evaluator.score(**preds)
 
         if 'error' in result:
             self.logger.error(
