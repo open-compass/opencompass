@@ -1,0 +1,17 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: Calculate the time needed for a spacecraft to make a Hohmann transfer from Earth to Mars
+Answer: The answer is \boxed{2.24}.
+
+Promblem 2: Next, we treat projectile motion in two dimensions, first without considering air resistance. Let the muzzle velocity of the projectile be $v_0$ and the angle of elevation be $\theta$ (Figure 2-7). Calculate the projectile's range.
+Answer: The answer is \boxed{72}.
+
+Promblem 3: Consider the first stage of a Saturn $V$ rocket used for the Apollo moon program. The initial mass is $2.8 \times 10^6 \mathrm{~kg}$, and the mass of the first-stage fuel is $2.1 \times 10^6$ kg. Assume a mean thrust of $37 \times 10^6 \mathrm{~N}$. The exhaust velocity is $2600 \mathrm{~m} / \mathrm{s}$. Calculate the final speed of the first stage at burnout. 
+Answer: The answer is \boxed{2.16}.
+
+Promblem 4: A particle of mass $m$ starts at rest on top of a smooth fixed hemisphere of radius $a$. Determine the angle at which the particle leaves the hemisphere.
+Answer: The answer is \boxed{48.189685}.
+
+Promblem 5: If the coefficient of static friction between the block and plane in the previous example is $\mu_s=0.4$, at what angle $\theta$ will the block start sliding if it is initially at rest?
+Answer: The answer is \boxed{22}.
+

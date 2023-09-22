@@ -1,0 +1,169 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: If the coefficient of static friction between the block and plane in the previous example is $\mu_s=0.4$, at what angle $\theta$ will the block start sliding if it is initially at rest?
+Explanation for Problem 1: We need a new sketch to indicate the additional frictional force $f$ (see Figure 2-2b). The static frictional force has the approximate maximum value
+$$
+f_{\max }=\mu_s N
+$$
+and Equation 2.7 becomes, in component form, $y$-direction
+$$
+-F_g \cos \theta+N=0
+$$
+$x$-direction
+$$
+-f_s+F_g \sin \theta=m \ddot{x}
+$$
+The static frictional force $f_s$ will be some value $f_s \leq f_{\max }$ required to keep $\ddot{x}=0$ -that is, to keep the block at rest. However, as the angle $\theta$ of the plane increases, eventually the static frictional force will be unable to keep the block at rest. At that angle $\theta^{\prime}, f_s$ becomes
+$$
+f_s\left(\theta=\theta^{\prime}\right)=f_{\max }=\mu_s N=\mu_s F_g \cos \theta
+$$
+and
+$$
+\begin{aligned}
+m \ddot{x} & =F_g \sin \theta-f_{\max } \\
+m \ddot{x} & =F_g \sin \theta-\mu_s F_g \cos \theta \\
+\ddot{x} & =g\left(\sin \theta-\mu_s \cos \theta\right)
+\end{aligned}
+$$
+Just before the block starts to slide, the acceleration $\ddot{x}=0$, so
+$$
+\begin{aligned}
+\sin \theta-\mu_s \cos \theta & =0 \\
+\tan \theta=\mu_s & =0.4 \\
+\theta=\tan ^{-1}(0.4) & =22^{\circ}
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{22}.
+
+Promblem 2: Consider the first stage of a Saturn $V$ rocket used for the Apollo moon program. The initial mass is $2.8 \times 10^6 \mathrm{~kg}$, and the mass of the first-stage fuel is $2.1 \times 10^6$ kg. Assume a mean thrust of $37 \times 10^6 \mathrm{~N}$. The exhaust velocity is $2600 \mathrm{~m} / \mathrm{s}$. Calculate the final speed of the first stage at burnout. 
+Explanation for Problem 2: From the thrust (Equation 9.157), we can determine the fuel burn rate:
+$$
+\frac{d m}{d t}=\frac{\text { thrust }}{-u}=\frac{37 \times 10^6 \mathrm{~N}}{-2600 \mathrm{~m} / \mathrm{s}}=-1.42 \times 10^4 \mathrm{~kg} / \mathrm{s}
+$$
+9.11 ROCKET MOTION
+377
+The final rocket mass is $\left(2.8 \times 10^6 \mathrm{~kg}-2.1 \times 10^6 \mathrm{~kg}\right)$ or $0.7 \times 10^6 \mathrm{~kg}$. We can determine the rocket speed at burnout $\left(v_b\right)$ using Equation 9.163.
+$$
+\begin{aligned}
+v_b & =-\frac{9.8 \mathrm{~m} / \mathrm{s}^2\left(2.1 \times 10^6 \mathrm{~kg}\right)}{1.42 \times 10^4 \mathrm{~kg} / \mathrm{s}}+(2600 \mathrm{~m} / \mathrm{s}) \ln \left[\frac{2.8 \times 10^6 \mathrm{~kg}}{0.7 \times 10^6 \mathrm{~kg}}\right] \\
+v_b & =2.16 \times 10^3 \mathrm{~m} / \mathrm{s}
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{2.16}.
+
+Promblem 3: Halley's comet, which passed around the sun early in 1986, moves in a highly elliptical orbit with an eccentricity of 0.967 and a period of 76 years. Calculate its minimum  distances from the Sun.
+Explanation for Problem 3: Equation 8.49 relates the period of motion with the semimajor axes. Because $m$ (Halley's comet) $\ll m_{\text {Sun }}$
+$$
+\begin{aligned}
+a & =\left(\frac{G m_{\text {Sun }} \tau^2}{4 \pi^2}\right)^{1 / 3} \\
+& =\left[\frac{\left.\left(6.67 \times 10^{-11} \frac{\mathrm{Nm}^2}{\mathrm{~kg}^2}\right)\left(1.99 \times 10^{30} \mathrm{~kg}\right)\left(76 \mathrm{yr} \frac{365 \mathrm{day}}{\mathrm{yr}} \frac{24 \mathrm{hr}}{\mathrm{day}} \frac{3600 \mathrm{~s}}{\mathrm{hr}}\right)^2\right]}{4 \pi^2}\right]^{1 / 3} \\
+a & =2.68 \times 10^{12} \mathrm{m}
+\end{aligned}
+$$
+Using Equation 8.44 , we can determine $r_{\min }$ and $r_{\max }$
+$$
+\begin{aligned}
+& r_{\min }=2.68 \times 10^{12} \mathrm{~m}(1-0.967)=8.8 \times 10^{10} \mathrm{~m} \\
+\end{aligned}
+$$
+Therefore, the answer is \boxed{8.8}.
+
+Promblem 4: Calculate the maximum height change in the ocean tides caused by the Moon.
+Explanation for Problem 4:  We continue to use our simple model of the ocean surrounding Earth. Newton proposed a solution to this calculation by imagining that two wells be dug, one along the direction of high tide (our $x$-axis) and one along the direction of low tide (our $y$-axis). If the tidal height change we want to determine is $h$, then the difference in potential energy of mass $m$ due to the height difference is $m g h$. Let's calculate the difference in work if we move the mass $m$ from point $c$ in Figure 5-12 to the center of Earth and then to point $a$. This work $W$ done by gravity must equal the potential energy change $m g h$. The work $W$ is
+$$
+W=\int_{r+\delta_1}^0 F_{T_y} d y+\int_0^{r+\delta_2} F_{T_x} d x
+$$
+where we use the tidal forces $F_{T_y}$ and $F_{T x}$ of Equations 5.54. The small distances $\delta_1$ and $\delta_2$ are to account for the small variations from a spherical Earth, but these values are so small they can be henceforth neglected. The value for $W$ becomes
+$$
+\begin{aligned}
+W & =\frac{G m M_m}{D^3}\left[\int_r^0(-y) d y+\int_0^r 2 x d x\right] \\
+& =\frac{G m M_m}{D^3}\left(\frac{r^2}{2}+r^2\right)=\frac{3 G m M_m r^2}{2 D^3}
+\end{aligned}
+$$
+Because this work is equal to $m g h$, we have
+$$
+\begin{aligned}
+m g h & =\frac{3 G m M_m r^2}{2 D^3} \\
+h & =\frac{3 G M_m r^2}{2 g D^3}
+\end{aligned}
+$$
+Note that the mass $m$ cancels, and the value of $h$ does not depend on $m$. Nor does it depend on the substance, so to the extent Earth is plastic, similar tidal effects should be (and are) observed for the surface land. If we insert the known values of the constants into Equation 5.55, we find
+$$
+h=\frac{3\left(6.67 \times 10^{-11} \mathrm{~m}^3 / \mathrm{kg} \cdot \mathrm{s}^2\right)\left(7.350 \times 10^{22} \mathrm{~kg}\right)\left(6.37 \times 10^6 \mathrm{~m}\right)^2}{2\left(9.80 \mathrm{~m} / \mathrm{s}^2\right)\left(3.84 \times 10^8 \mathrm{~m}\right)^3}=0.54 \mathrm{~m}
+$$
+
+Therefore, the answer is \boxed{0.54}.
+
+Promblem 5: Next, we treat projectile motion in two dimensions, first without considering air resistance. Let the muzzle velocity of the projectile be $v_0$ and the angle of elevation be $\theta$ (Figure 2-7). Calculate the projectile's range.
+Explanation for Problem 5: Next, we treat projectile motion in two dimensions, first without considering air resistance. Let the muzzle velocity of the projectile be $v_0$ and the angle of elevation be $\theta$ (Figure 2-7). Calculate the projectile's displacement, velocity, and range.
+Solution. Using $\mathbf{F}=m \mathrm{~g}$, the force components become
+$x$-direction
+$$
+0=m \ddot{x}
+$$
+y-direction
+$-m g=m \ddot{y}$
+$(2.31 b)$
+64
+2 / NEWTONIAN MECHANICS-SINGLE PARTICLE
+FIGURE 2-7 Example 2.6.
+Neglect the height of the gun, and assume $x=y=0$ at $t=0$. Then
+$$
+\begin{aligned}
+& \ddot{x}=0 \\
+& \dot{x}=v_0 \cos \theta \\
+& x=v_0 t \cos \theta \\
+& y=-\frac{-g t^2}{2}+v_0 t \sin \theta \\
+&
+\end{aligned}
+$$
+and
+$$
+\begin{aligned}
+& \ddot{y}=-g \\
+& \dot{y}=-g t+v_0 \sin \theta \\
+& y=\frac{-g t^2}{2}+v_0 t \sin \theta
+\end{aligned}
+$$
+
+We can find the range by determining the value of $x$ when the projectile falls back to ground, that is, when $y=0$.
+$$
+y=t\left(\frac{-g t}{2}+v_0 \sin \theta\right)=0
+$$
+One value of $y=0$ occurs for $t=0$ and the other one for $t=T$.
+$$
+\begin{aligned}
+\frac{-g T}{2}+v_0 \sin \theta & =0 \\
+T & =\frac{2 v_0 \sin \theta}{g}
+\end{aligned}
+$$
+2.4 THE EQUATION OF MOTION FOR A PARTICLE
+65
+The range $R$ is found from
+$$
+\begin{aligned}
+x(t=T) & =\text { range }=\frac{2 v_0^2}{g} \sin \theta \cos \theta \\
+R & =\text { range }=\frac{v_0^2}{g} \sin 2 \theta
+\end{aligned}
+$$
+Notice that the maximum range occurs for $\theta=45^{\circ}$.
+Let us use some actual numbers in these calculations. The Germans used a long-range gun named Big Bertha in World War I to bombard Paris. Its muzzle velocity was $1,450 \mathrm{~m} / \mathrm{s}$. Find its predicted range, maximum projectile height, and projectile time of flight if $\theta=55^{\circ}$. We have $v_0=1450 \mathrm{~m} / \mathrm{s}$ and $\theta=55^{\circ}$, so the range (from Equation 2.39) becomes
+$$
+R=\frac{(1450 \mathrm{~m} / \mathrm{s})^2}{9.8 \mathrm{~m} / \mathrm{s}^2}\left[\sin \left(110^{\circ}\right)\right]=202 \mathrm{~km}
+$$
+Big Bertha's actual range was $120 \mathrm{~km}$. The difference is a result of the real effect of air resistance.
+
+To find the maximum predicted height, we need to calculated $y$ for the time $T / 2$ where $T$ is the projectile time of flight:
+$$
+\begin{aligned}
+T & =\frac{(2)(1450 \mathrm{~m} / \mathrm{s})\left(\sin 55^{\circ}\right)}{9.8 \mathrm{~m} / \mathrm{s}^2}=242 \mathrm{~s} \\
+y_{\max }\left(t=\frac{T}{2}\right) & =\frac{-g T^2}{8}+\frac{v_0 T}{2} \sin \theta \\
+& =\frac{-(9.8 \mathrm{~m} / \mathrm{s})(242 \mathrm{~s})^2}{8}+\frac{(1450 \mathrm{~m} / \mathrm{s})(242 \mathrm{~s}) \sin \left(55^{\circ}\right)}{2} \\
+& =72 \mathrm{~km}
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{72}.
+

@@ -1,0 +1,21 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: Using the Planck distribution
+Compare the energy output of a black-body radiator (such as an incandescent lamp) at two different wavelengths by calculating the ratio of the energy output at $450 \mathrm{~nm}$ (blue light) to that at $700 \mathrm{~nm}$ (red light) at $298 \mathrm{~K}$.
+
+Answer: The answer is \boxed{2.10}.
+
+Promblem 2: Using the perfect gas equation
+Calculate the pressure in kilopascals exerted by $1.25 \mathrm{~g}$ of nitrogen gas in a flask of volume $250 \mathrm{~cm}^3$ at $20^{\circ} \mathrm{C}$.
+Answer: The answer is \boxed{435}.
+
+Promblem 3: Calculate the typical wavelength of neutrons after reaching thermal equilibrium with their surroundings at $373 \mathrm{~K}$. For simplicity, assume that the particles are travelling in one dimension.
+Answer: The answer is \boxed{226}.
+
+Promblem 4: Determine the energies and degeneracies of the lowest four energy levels of an ${ }^1 \mathrm{H}^{35} \mathrm{Cl}$ molecule freely rotating in three dimensions. What is the frequency of the transition between the lowest two rotational levels? The moment of inertia of an ${ }^1 \mathrm{H}^{35} \mathrm{Cl}$ molecule is $2.6422 \times 10^{-47} \mathrm{~kg} \mathrm{~m}^2$.
+
+Answer: The answer is \boxed{635.7}.
+
+Promblem 5: The single electron in a certain excited state of a hydrogenic $\mathrm{He}^{+}$ion $(Z=2)$ is described by the wavefunction $R_{3,2}(r) \times$ $Y_{2,-1}(\theta, \phi)$. What is the energy of its electron?
+Answer: The answer is \boxed{ -6.04697}.
+
