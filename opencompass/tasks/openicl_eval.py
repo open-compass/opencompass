@@ -141,7 +141,7 @@ class OpenICLEvalTask(BaseTask):
                     filename = root + f'_{i}' + ext
                     i += 1
 
-            preds = {k: [pred[k] for pred in preds] for k in preds[0]}
+            preds = {k: [pred.get(k) for pred in preds] for k in preds[0]}
 
             pred_strs = preds.pop('prediction')
 

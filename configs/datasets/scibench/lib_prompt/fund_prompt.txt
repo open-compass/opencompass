@@ -1,0 +1,20 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: The huge advantage of using the conservation of energy instead of Newton's laws of motion is that we can jump from the initial state to the final state without considering all the intermediate motion. Here is an example. In Figure, a child of mass $m$ is released from rest at the top of a water slide, at height $h=8.5 \mathrm{~m}$ above the bottom of the slide. Assuming that the slide is frictionless because of the water on it, find the child's speed at the bottom of the slide.
+Answer: The answer is \boxed{13}.
+
+Promblem 2: Let the disk in Figure start from rest at time $t=0$ and also let the tension in the massless cord be $6.0 \mathrm{~N}$ and the angular acceleration of the disk be $-24 \mathrm{rad} / \mathrm{s}^2$. What is its rotational kinetic energy $K$ at $t=2.5 \mathrm{~s}$ ?
+Answer: The answer is \boxed{90}.
+
+Promblem 3: A food shipper pushes a wood crate of cabbage heads (total mass $m=14 \mathrm{~kg}$ ) across a concrete floor with a constant horizontal force $\vec{F}$ of magnitude $40 \mathrm{~N}$. In a straight-line displacement of magnitude $d=0.50 \mathrm{~m}$, the speed of the crate decreases from $v_0=0.60 \mathrm{~m} / \mathrm{s}$ to $v=0.20 \mathrm{~m} / \mathrm{s}$. What is the increase $\Delta E_{\text {th }}$ in the thermal energy of the crate and floor?
+Answer: The answer is \boxed{22.2}.
+
+Promblem 4: A playful astronaut releases a bowling ball, of mass $m=$ $7.20 \mathrm{~kg}$, into circular orbit about Earth at an altitude $h$ of $350 \mathrm{~km}$.
+What is the mechanical energy $E$ of the ball in its orbit?
+Answer: The answer is \boxed{-214}.
+
+Promblem 5: If the particles in a system all move together, the com moves with them-no trouble there. But what happens when they move in different directions with different accelerations? Here is an example.
+
+The three particles in Figure are initially at rest. Each experiences an external force due to bodies outside the three-particle system. The directions are indicated, and the magnitudes are $F_1=6.0 \mathrm{~N}, F_2=12 \mathrm{~N}$, and $F_3=14 \mathrm{~N}$. What is the acceleration of the center of mass of the system?
+Answer: The answer is \boxed{ 1.16}.
+

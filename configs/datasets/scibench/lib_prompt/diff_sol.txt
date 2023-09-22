@@ -1,0 +1,112 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: The logistic model has been applied to the natural growth of the halibut population in certain areas of the Pacific Ocean. ${ }^{12}$ Let $y$, measured in kilograms, be the total mass, or biomass, of the halibut population at time $t$. The parameters in the logistic equation are estimated to have the values $r=0.71 /$ year and $K=80.5 \times 10^6 \mathrm{~kg}$. If the initial biomass is $y_0=0.25 K$, find the biomass 2 years later. 
+Explanation for Problem 1: It is convenient to scale the solution (11) to the carrying capacity $K$; thus we write Eq. (11) in the form
+$$
+\frac{y}{K}=\frac{y_0 / K}{\left(y_0 / K\right)+\left[1-\left(y_0 / K\right)\right] e^{-r t}}
+$$
+Using the data given in the problem, we find that
+$$
+\frac{y(2)}{K}=\frac{0.25}{0.25+0.75 e^{-1.42}} \cong 0.5797 .
+$$
+Consequently, $y(2) \cong 46.7 \times 10^6 \mathrm{~kg}$.
+
+Therefore, the answer is \boxed{46.7}.
+
+Promblem 2: For instance, suppose that one opens an individual retirement account (IRA) at age 25 and makes annual investments of $\$ 2000$ thereafter in a continuous manner. Assuming a rate of return of $8 \%$, what will be the balance in the IRA at age 65 ?
+Explanation for Problem 2: We have $S_0=0, r=0.08$, and $k=\$ 2000$, and we wish to determine $S(40)$. From Eq. (16) we have
+$$
+S(40)=(25,000)\left(e^{3.2}-1\right)=\$ 588,313
+$$
+
+Therefore, the answer is \boxed{588313}.
+
+Promblem 3: At time $t=0$ a tank contains $Q_0 \mathrm{lb}$ of salt dissolved in 100 gal of water; see Figure 2.3.1. Assume that water containing $\frac{1}{4} \mathrm{lb}$ of salt/gal is entering the tank at a rate of $r \mathrm{gal} / \mathrm{min}$ and that the well-stirred mixture is draining from the tank at the same rate. Set up the initial value problem that describes this flow process. By finding the amount of salt $Q(t)$ in the tank at any time, and the limiting amount $Q_L$ that is present after a very long time, if $r=3$ and $Q_0=2 Q_L$, find the time $T$ after which the salt level is within $2 \%$ of $Q_L$. 
+Explanation for Problem 3: We assume that salt is neither created nor destroyed in the tank. Therefore variations in the amount of salt are due solely to the flows in and out of the tank. More precisely, the rate of change of salt in the tank, $d Q / d t$, is equal to the rate at which salt is flowing in minus the rate at which it is flowing out. In symbols,
+$$
+\frac{d Q}{d t}=\text { rate in }- \text { rate out }
+$$
+The rate at which salt enters the tank is the concentration $\frac{1}{4} \mathrm{lb} / \mathrm{gal}$ times the flow rate $r \mathrm{gal} / \mathrm{min}$, or $(r / 4) \mathrm{lb} / \mathrm{min}$. To find the rate at which salt leaves the tankl we need to multiply the concentration of salt in the tank by the rate of outflow, $r \mathrm{gal} / \mathrm{min}$. Since the rates of flow in and out are equal, the volume of water in the tank remains constant at $100 \mathrm{gal}$, and since the mixture is "well-stirred," the concentration throughout the tank is the same, namely, $[Q(t) / 100] \mathrm{lb} / \mathrm{gal}$.
+ith First Order Equations
+53
+Therefore the rate at which salt leaves the tank is $[r Q(t) / 100] \mathrm{lb} / \mathrm{min}$. Thus the differential equation governing this process is
+$$
+\frac{d Q}{d t}=\frac{r}{4}-\frac{r Q}{100}
+$$
+The initial condition is
+$$
+Q(0)=Q_0
+$$
+Upon thinking about the problem physically, we might anticipate that eventually the mixture originally in the tank will be essentially replaced by the mixture flowing in, whose concentration is $\frac{1}{4} \mathrm{lb} / \mathrm{gal}$. Consequently, we might expect that ultimately the amount of salt in the tank would be very close to $25 \mathrm{lb}$. We can also find the limiting amount $Q_L=25$ by setting $d Q / d t$ equal to zero in Eq. (2) and solving the resulting algebraic equation for $Q$.
+
+To solve the initial value problem (2), (3) analytically, note that Eq. (2) is both linear and separable. Rewriting it in the standard form for a linear equation, we have
+$$
+\frac{d Q}{d t}+\frac{r Q}{100}=\frac{r}{4}
+$$
+Thus the integrating factor is $e^{r t / 100}$ and the general solution is
+$$
+Q(t)=25+c e^{-r t / 100}
+$$
+where $c$ is an arbitrary constant. To satisfy the initial condition (3), we must choose $c=Q_0-25$. Therefore the solution of the initial value problem (2),(3) is
+$$
+Q(t)=25+\left(Q_0-25\right) e^{-r t / 100}
+$$
+or
+$$
+Q(t)=25\left(1-e^{-r t / 100}\right)+Q_0 e^{-r t / 100}
+$$
+From Eq. (6) or (7), you can see that $Q(t) \rightarrow 25$ (lb) as $t \rightarrow \infty$, so the limiting value $Q_L$ is 25 , confirming our physical intuition. Further, $Q(t)$ approaches the limit more rapidly as $r$ increases. In interpreting the solution (7), note that the second term on the right side is the portion of the original salt that remains at time $t$, while the first term gives the amount of salt in the tank due to the action of the flow processes. Plots of the solution for $r=3$ and for several values of $Q_0$ are shown in Figure 2.3.2.
+Now suppose that $r=3$ and $Q_0=2 Q_L=50$; then Eq. (6) becomes
+$$
+Q(t)=25+25 e^{-0.03 t}
+$$
+Since $2 \%$ of 25 is 0.5 , we wish to find the time $T$ at which $Q(t)$ has the value 25.5. Substituting $t=T$ and $Q=25.5$ in Eq. (8) and solving for $T$, we obtain
+$$
+T=(\ln 50) / 0.03 \cong 130.400766848(\mathrm{~min}) .
+$$
+
+Therefore, the answer is \boxed{130.400766848}.
+
+Promblem 4: Suppose that a mass weighing $10 \mathrm{lb}$ stretches a spring $2 \mathrm{in}$. If the mass is displaced an additional 2 in. and is then set in motion with an initial upward velocity of $1 \mathrm{ft} / \mathrm{s}$, by determining the position of the mass at any later time, calculate the phase of the motion.
+Explanation for Problem 4: The spring constant is $k=10 \mathrm{lb} / 2 \mathrm{in} .=60 \mathrm{lb} / \mathrm{ft}$, and the mass is $m=w / g=10 / 32 \mathrm{lb} \cdot \mathrm{s}^2 / \mathrm{ft}$. Hence the equation of motion reduces to
+$$
+u^{\prime \prime}+192 u=0
+$$
+and the general solution is
+$$
+u=A \cos (8 \sqrt{3} t)+B \sin (8 \sqrt{3} t)
+$$
+The solution satisfying the initial conditions $u(0)=1 / 6 \mathrm{ft}$ and $u^{\prime}(0)=-1 \mathrm{ft} / \mathrm{s}$ is
+$$
+u=\frac{1}{6} \cos (8 \sqrt{3} t)-\frac{1}{8 \sqrt{3}} \sin (8 \sqrt{3} t)
+$$
+The natural frequency is $\omega_0=\sqrt{192} \cong 13.856 \mathrm{rad} / \mathrm{s}$, so the period is $T=2 \pi / \omega_0 \cong 0.45345 \mathrm{~s}$. The amplitude $R$ and phase $\delta$ are found from Eqs. (17). We have
+$$
+R^2=\frac{1}{36}+\frac{1}{192}=\frac{19}{576}, \quad \text { so } \quad R \cong 0.18162 \mathrm{ft}
+$$
+The second of Eqs. (17) yields $\tan \delta=-\sqrt{3} / 4$. There are two solutions of this equation, one in the second quadrant and one in the fourth. In the present problem $\cos \delta>0$ and $\sin \delta<0$, so $\delta$ is in the fourth quadrant, namely,
+$$
+\delta=-\arctan (\sqrt{3} / 4) \cong-0.40864 \mathrm{rad}
+$$
+
+Therefore, the answer is \boxed{-0.40864}.
+
+Promblem 5: Suppose that a mass weighing $10 \mathrm{lb}$ stretches a spring $2 \mathrm{in}$. If the mass is displaced an additional 2 in. and is then set in motion with an initial upward velocity of $1 \mathrm{ft} / \mathrm{s}$, by determining the position of the mass at any later time, calculate the amplitude of the motion.
+Explanation for Problem 5: The spring constant is $k=10 \mathrm{lb} / 2 \mathrm{in} .=60 \mathrm{lb} / \mathrm{ft}$, and the mass is $m=w / g=10 / 32 \mathrm{lb} \cdot \mathrm{s}^2 / \mathrm{ft}$. Hence the equation of motion reduces to
+$$
+u^{\prime \prime}+192 u=0
+$$
+and the general solution is
+$$
+u=A \cos (8 \sqrt{3} t)+B \sin (8 \sqrt{3} t)
+$$
+The solution satisfying the initial conditions $u(0)=1 / 6 \mathrm{ft}$ and $u^{\prime}(0)=-1 \mathrm{ft} / \mathrm{s}$ is
+$$
+u=\frac{1}{6} \cos (8 \sqrt{3} t)-\frac{1}{8 \sqrt{3}} \sin (8 \sqrt{3} t)
+$$
+The natural frequency is $\omega_0=\sqrt{192} \cong 13.856 \mathrm{rad} / \mathrm{s}$, so the period is $T=2 \pi / \omega_0 \cong 0.45345 \mathrm{~s}$. The amplitude $R$ and phase $\delta$ are found from Eqs. (17). We have
+$$
+R^2=\frac{1}{36}+\frac{1}{192}=\frac{19}{576}, \quad \text { so } \quad R \cong 0.18162 \mathrm{ft}
+$$
+Therefore, the answer is \boxed{0.18162}.
+

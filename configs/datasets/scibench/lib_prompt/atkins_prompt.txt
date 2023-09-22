@@ -1,0 +1,18 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: Suppose the concentration of a solute decays exponentially along the length of a container. Calculate the thermodynamic force on the solute at $25^{\circ} \mathrm{C}$ given that the concentration falls to half its value in $10 \mathrm{~cm}$.
+Answer: The answer is \boxed{17}.
+
+Promblem 2: Calculate the separation of the $\{123\}$ planes of an orthorhombic unit cell with $a=0.82 \mathrm{~nm}, b=0.94 \mathrm{~nm}$, and $c=0.75 \mathrm{~nm}$.
+Answer: The answer is \boxed{0.21}.
+
+Promblem 3: What is the mean speed, $\bar{c}$, of $\mathrm{N}_2$ molecules in air at $25^{\circ} \mathrm{C}$ ?
+Answer: The answer is \boxed{475}.
+
+Promblem 4: The data below show the temperature variation of the equilibrium constant of the reaction $\mathrm{Ag}_2 \mathrm{CO}_3(\mathrm{~s}) \rightleftharpoons \mathrm{Ag}_2 \mathrm{O}(\mathrm{s})+\mathrm{CO}_2(\mathrm{~g})$. Calculate the standard reaction enthalpy of the decomposition.
+$\begin{array}{lllll}T / \mathrm{K} & 350 & 400 & 450 & 500 \\ K & 3.98 \times 10^{-4} & 1.41 \times 10^{-2} & 1.86 \times 10^{-1} & 1.48\end{array}$
+Answer: The answer is \boxed{+80}.
+
+Promblem 5: Calculate the moment of inertia of an $\mathrm{H}_2 \mathrm{O}$ molecule around the axis defined by the bisector of the $\mathrm{HOH}$ angle (3). The $\mathrm{HOH}$ bond angle is $104.5^{\circ}$ and the bond length is $95.7 \mathrm{pm}$.
+Answer: The answer is \boxed{1.91}.
+
