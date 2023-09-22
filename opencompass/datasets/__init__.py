@@ -35,7 +35,7 @@ from .humaneval import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
-from .kaoshi import *  # noqa: F401, F403
+from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .LEval_coursera import *  # noqa: F401, F403
