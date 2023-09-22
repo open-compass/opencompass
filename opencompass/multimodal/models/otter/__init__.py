@@ -9,3 +9,11 @@ if TYPE_CHECKING:
             raise OptionalDependencyNotAvailable()
     except OptionalDependencyNotAvailable:
         pass
+
+from .otter import Otter
+from .post_processor import OTTERMMBenchPostProcessor
+from .prompt_constructor import OTTERMMBenchPromptConstructor
+
+__all__ = [
+    'Otter', 'OTTERMMBenchPromptConstructor', 'OTTERMMBenchPostProcessor'
+]

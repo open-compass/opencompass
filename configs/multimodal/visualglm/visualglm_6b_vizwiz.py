@@ -31,7 +31,7 @@ visualglm_vizwiz_dataloader = dict(batch_size=1,
                   sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-visualglm_model = dict(
+visualglm_vizwiz_model = dict(
     type='visualglm',
     pretrained_path='/path/to/visualglm',  # or Huggingface repo id
     prompt_constructor=dict(type=VisualGLMVQAPromptConstructor),
