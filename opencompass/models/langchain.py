@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 from mmengine.registry import Registry
 
@@ -6,6 +6,10 @@ REGISTRY = Registry('helper')
 
 
 class LangchainAgent:
+    """Agent wrapper for Langchain.
+
+    https://github.com/langchain-ai/langchain.
+    """
 
     def __init__(self, agent_type, llm, tools) -> None:
         from langchain.agents import initialize_agent, load_tools
@@ -17,7 +21,7 @@ class LangchainAgent:
                                       agent=agent_type,
                                       return_intermediate_steps=True)
 
-    def chat(self, user_input, ice=None) -> Tuple[str, dict]:
+    def chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
         from langchain.schema import AgentAction
         try:
             generation = self.agent(user_input)

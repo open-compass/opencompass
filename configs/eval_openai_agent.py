@@ -75,7 +75,7 @@ def solution():
     # Calculate number of frisbees and deck cards now
     frisbees_now = marbles_now / 2
     cards_now = frisbees_now - 20
-    
+
     # Calculate number of each item after buying more
     marbles_then = marbles_now + (2/5) * marbles_now
     frisbees_then = frisbees_now + (2/5) * frisbees_now
@@ -93,6 +93,21 @@ def solution():
 Begin!
 """
 
+PYTHON_INTERPRETER_DESCRIPTION = '''\
+It can run a Python code. The code must be a valid code that contains only python method, and the method' name must be 'solution' and returns a dict, which key is variable name. The libraries I recommend are sympy and scipy. the format is:
+```python
+# import packages
+import xxx
+def solution():
+    # initialize some variables
+    variable_names_with_real_meaning = xxx
+    # middle steps
+    mid_variable = func(mid_variable)
+    # final answer
+    final_answer =  func(mid_variable)
+    return final_answer
+```'''
+
 models = [
     dict(abbr='gpt-3.5-react',
          type=LagentAgent,
@@ -107,20 +122,7 @@ models = [
          ),
          actions=[
              dict(type=PythonInterpreter,
-                  description='''\
-It can run a Python code. The code must be a valid code that contains only python method, and the method' name must be 'solution' and returns a dict, which key is variable name. The libraries I recommend are sympy and scipy. the format is:
-```python
-# import packages
-import xxx
-def solution():
-    # initialize some variables
-    variable_names_with_real_meaning = xxx
-    # middle steps
-    mid_variable = func(mid_variable)
-    # final answer
-    final_answer =  func(mid_variable)
-    return final_answer
-```'''),
+                  description=PYTHON_INTERPRETER_DESCRIPTION),
          ],
          protocol=dict(
              type=ReActProtocol,

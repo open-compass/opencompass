@@ -15,6 +15,23 @@ from .icl_base_evaluator import BaseEvaluator
 DEFAULT_FAIL_WORDS = ('sorry', 'apologize', 'apology', 'unfortunately',
                       "couldn't")
 
+CHECK_SOLVE_QUERY_PROMPT = '''\
+Please check whether the answer solve the query or not.
+Query:
+{query}
+
+Answer:
+{answer}
+
+Now give your judgment of JSON to `{func_name}`, remember do not be too strict.
+'''
+
+SELECT_BEST_ANSWER_PROMPT = '''\
+For query {query}, you have the following answers in JSON format:
+{answers}
+
+I want you to select the best answer from the above answers and give the index of the answer of JSON to `{func_name}`. Now select the best answer.'''  # noqa: E501
+
 
 def extract_answer(result: dict):
     """Extract answer from toolbench format."""
@@ -61,12 +78,14 @@ def extract_answer(result: dict):
 
 
 class PassRateEvaluator(BaseEvaluator):
+    """This Evaluator can determine whether pred refuses to execute the
+    task."""
 
     def __init__(self, fail_words=DEFAULT_FAIL_WORDS) -> None:
         super().__init__()
         self.fail_words = fail_words
 
-    def score(self, predictions: List):
+    def score(self, predictions: List, references: List = None) -> dict:
         results = []
         for pred in predictions:
             if pred and self.check_real_valid(pred):
@@ -82,7 +101,22 @@ class PassRateEvaluator(BaseEvaluator):
 
 
 class WinRateEvaluator(BaseEvaluator):
-    """Follow `OpenAINormalizedEvaluator` in the `ToolBench`."""
+    # https://github.com/OpenBMB/ToolBench/blob/e18a30ed8f9afc131a7e313d0522c4371f030f31/toolbench/tooleval/evaluators/registered_cls/tooleval.py#L50
+    """Follow `OpenAINormalizedEvaluator` in the `ToolBench`.
+
+    The Evaluator will compare which call-tool process between `pred` and
+    `reference` is better.
+
+    1. Compare whether an answer can be extracted. The one that can extract an
+       answer wins.
+    2. If both can, then compare whether the answer is correct. The correct one
+       wins.
+    3. If both answers are correct, then compare the number of tool calls; the
+       one with fewer calls wins. If the number of steps is the same, the one
+       with the better-looking final answer wins.
+    4. If both answers are incorrect, then consider factors such as whether the
+       tool was successfully called and the variety of tools used.
+    """
 
     def __init__(self,
                  model='gpt-3.5-turbo-16k',
@@ -132,16 +166,9 @@ class WinRateEvaluator(BaseEvaluator):
         func_name = 'check_solve_query'
         return_key = 'is_solved'
 
-        prompt = f'''\
-Please check whether the answer solve the query or not.
-Query:
-{query}
-
-Answer:
-{answer}
-
-Now give your judgment of JSON to `{func_name}`, remember do not be too strict.
-'''
+        prompt = CHECK_SOLVE_QUERY_PROMPT.format(query=query,
+                                                 answer=answer,
+                                                 func_name=func_name)
 
         function = dict(
             name=func_name,
@@ -174,11 +201,9 @@ Now give your judgment of JSON to `{func_name}`, remember do not be too strict.
         is_reversed = random.random() > 0.5
         if is_reversed:
             answers = list(reversed(answers))
-        prompt = f'''\
-For query {query}, you have the following answers in JSON format:
-{answers}
-
-I want you to select the best answer from the above answers and give the index of the answer of JSON to `{func_name}`. Now select the best answer.'''  # noqa: E501
+        prompt = SELECT_BEST_ANSWER_PROMPT.format(query=query,
+                                                  answers=answers,
+                                                  func_name=func_name)
 
         function = dict(
             name=func_name,

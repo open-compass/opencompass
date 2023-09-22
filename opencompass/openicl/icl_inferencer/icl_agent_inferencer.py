@@ -77,6 +77,8 @@ class AgentInferencer(BaseInferencer):
                                      disable=not self.is_main_process):
             user_input = retriever.generate_prompt_for_generate_task(
                 idx, ice='', prompt_template=prompt_template)
+            gold = retriever.dataset_reader.dataset['test'][
+                retriever.dataset_reader.output_column][idx]
 
             if len(ice_indices) > 0:
                 assert ice_template is not None
@@ -90,7 +92,7 @@ class AgentInferencer(BaseInferencer):
             answer, steps = self.agent.chat(user_input=user_input, ice=ice)
 
             # Save current output
-            output_handler.save_results(user_input, answer, steps, idx)
+            output_handler.save_results(user_input, answer, steps, idx, gold)
 
             # Save intermediate results
             if (self.save_every is not None and start % self.save_every == 0
@@ -98,7 +100,7 @@ class AgentInferencer(BaseInferencer):
                 output_handler.write_to_json(output_json_filepath,
                                              'tmp_' + output_json_filename)
 
-        # 6. Output
+        # 4. Output
         if self.is_main_process:
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
@@ -121,9 +123,10 @@ class AgentInferencerOutputHandler:
         """Dump the result to a json file."""
         dump_results_dict(self.results_dict, osp.join(save_dir, filename))
 
-    def save_results(self, user_input, answer, steps, idx):
+    def save_results(self, user_input, answer, steps, idx, gold):
         self.results_dict[str(idx)] = {
             'origin_prompt': user_input,
             'prediction': answer,
             'steps': steps,
+            'gold': gold,
         }

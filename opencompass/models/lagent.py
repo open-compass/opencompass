@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 from mmengine.registry import Registry
 
@@ -6,6 +6,10 @@ REGISTRY = Registry('helper')
 
 
 class LagentAgent:
+    """Agent wrapper for Lagent.
+
+    https://github.com/InternLM/lagent.
+    """
 
     def __init__(self, agent_type, llm, actions=None, protocol=None, **kwargs):
         llm = REGISTRY.build(llm)
@@ -22,7 +26,7 @@ class LagentAgent:
 
         self.agent = REGISTRY.build(agent_cfg)
 
-    def chat(self, user_input, ice=None) -> Tuple[str, dict]:
+    def chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
         from lagent.schema import ActionReturn, AgentReturn
         generation: AgentReturn = self.agent.chat(user_input)
         self.agent._session_history = []  # clear agent history
