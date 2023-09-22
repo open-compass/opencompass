@@ -65,3 +65,16 @@ class MplugOwlCOCOCaptionPromptConstructor(MplugOwlMMBenchPromptConstructor):
         assert len(data_samples) == 1, 'Only support batch size 1.'
         prompt = self.image_prompt + ' ' + 'a photo of' + self.reply_prompt
         return prompt
+
+
+class MplugOwlVQAPromptConstructor(MplugOwlMMBenchPromptConstructor):
+    """Prompt constructor for MplugOwl on VQA."""
+
+    def _process(self, data_samples: List[DataSample]) -> str:
+        assert len(data_samples) == 1, 'Only support batch size 1.'
+        questions = [
+            data_sample.get('question') for data_sample in data_samples
+        ]
+        question = questions[0]
+        prompt = self.image_prompt + ' ' + question + ' ' + 'Answer this question in a single word.' + ' ' + self.reply_prompt  # noqa
+        return prompt

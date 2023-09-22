@@ -1,8 +1,9 @@
 from .mplug_owl_7b import MplugOwl
-from .post_processor import (MplugOwlMMBenchPostProcessor,
-                             MplugOwlBasePostProcessor)
-from .prompt_constructor import (MplugOwlMMBenchPromptConstructor,
-                                 MplugOwlCOCOCaptionPromptConstructor)
+from .post_processor import (MplugOwlBasePostProcessor,
+                             MplugOwlMMBenchPostProcessor)
+from .prompt_constructor import (MplugOwlCOCOCaptionPromptConstructor,
+                                 MplugOwlMMBenchPromptConstructor,
+                                 MplugOwlVQAPromptConstructor)
 
 __all__ = [
     'MplugOwl',
@@ -10,4 +11,5 @@ __all__ = [
     'MplugOwlMMBenchPromptConstructor',
     'MplugOwlBasePostProcessor',
     'MplugOwlCOCOCaptionPromptConstructor',
+    'MplugOwlVQAPromptConstructor',
 ]

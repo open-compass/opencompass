@@ -17,13 +17,14 @@ val_pipeline = [
     dict(type='mmpretrain.PackInputs', algorithm_keys=['image_id']),
 ]
 
-dataset = dict(type='mmpretrain.COCOCaption',
-               data_root='data/coco',
-               data_prefix=dict(img_path='images'),
-               ann_file='annotations/coco_karpathy_val.json',
+dataset = dict(type='mmpretrain.Flickr30kCaption',
+               data_root='data/flickr30k',
+               ann_file='annotations/dataset_flickr30k.json',
+               data_prefix='images',
+               split='val',
                pipeline=val_pipeline)
 
-mplug_owl_coco_caption_dataloader = dict(
+mplug_owl_flickr30k_dataloader = dict(
     batch_size=1,
     num_workers=4,
     dataset=dataset,
@@ -32,7 +33,7 @@ mplug_owl_coco_caption_dataloader = dict(
 )
 
 # model settings
-mplug_owl_coco_caption_model = dict(
+mplug_owl_flickr30k_model = dict(
     type='mplug_owl_7b',
     model_path='/path/to/mplug-owl-llama-7b-ft',
     is_caption_task=True,
@@ -40,9 +41,9 @@ mplug_owl_coco_caption_model = dict(
     post_processor=dict(type=MplugOwlBasePostProcessor))  # noqa
 
 # evaluation settings
-mplug_owl_coco_caption_evaluator = [
+mplug_owl_flickr30k_evaluator = [
     dict(
         type='mmpretrain.COCOCaption',
-        ann_file='data/coco/annotations/coco_karpathy_val_gt.json',
-    )
+        ann_file='data/flickr30k/annotations/flickr30k_val_gt.json',
+    )  # noqa
 ]

@@ -35,9 +35,8 @@ mplug_owl_mmbench_dataloader = dict(
 
 # model settings
 mplug_owl_mmbench_model = dict(
-    type='mplug_owl',
-    model_path=
-    '/mnt/petrelfs/share_data/liuyuan/llm_weights/mplug-owl-llama-7b-ft',
+    type='mplug_owl_7b',
+    model_path='/path/to/mplug-owl-llama-7b-ft',
     prompt_constructor=dict(type=MplugOwlMMBenchPromptConstructor),
     post_processor=dict(type=MplugOwlMMBenchPostProcessor))  # noqa
 
