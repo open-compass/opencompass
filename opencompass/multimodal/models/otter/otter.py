@@ -1,10 +1,11 @@
+import importlib
+
 import mmengine
 import torch
 import torch.nn as nn
+from mmengine.device import get_device
 
 from opencompass.registry import MM_MODELS
-
-from .Otter.models.otter.modeling_otter import OtterForConditionalGeneration
 
 
 @MM_MODELS.register_module('otter-9b')
@@ -19,14 +20,20 @@ class Otter(nn.Module):
         model_path (str): The path of OTTER model
         in Huggingface model hub format.
         load_bit (str): The bit of OTTER model, can be "fp32" or "bf16".
+        mode (str): The mode of inference. Defaults to 'generation'.
     """
 
-    def __init__(self, model_path, load_bit, prompt_constructor,
-                 post_processor) -> None:
+    def __init__(self,
+                 model_path,
+                 load_bit,
+                 prompt_constructor,
+                 post_processor,
+                 mode='generation') -> None:
         super().__init__()
         torch_dtype = torch.bfloat16 if load_bit == 'bf16' else torch.float32
-        self.model = OtterForConditionalGeneration.from_pretrained(
-            model_path, torch_dtype=torch_dtype)
+        otter_ai = importlib.import_module('otter_ai')
+        self.model = otter_ai.OtterForConditionalGeneration.from_pretrained(
+            model_path, torch_dtype=torch_dtype, device_map=get_device())
         self.tokenizer = self.model.text_tokenizer
         self.tokenizer.padding_side = 'left'
         self.model_dtype = next(self.model.parameters()).dtype
@@ -35,6 +42,7 @@ class Otter(nn.Module):
         if post_processor is not None:
             self.post_processor = mmengine.registry.build_from_cfg(
                 post_processor, MM_MODELS)
+        self.mode = mode
 
     def forward(self, batch):
         if self.mode == 'generation':

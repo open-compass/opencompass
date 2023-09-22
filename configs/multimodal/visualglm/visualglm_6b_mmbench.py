@@ -20,22 +20,23 @@ dataset = dict(type='opencompass.MMBenchDataset',
                data_file='data/mmbench/mmbench_test_20230712.tsv',
                pipeline=val_pipeline)
 
-mmbench_dataloader = dict(batch_size=1,
+visualglm_mmbench_dataloader = dict(batch_size=1,
                   num_workers=4,
                   dataset=dataset,
                   collate_fn=dict(type='pseudo_collate'),
                   sampler=dict(type='DefaultSampler', shuffle=False))
 
 # model settings
-visualglm_model = dict(
+visualglm_mmbench_model = dict(
     type='visualglm',
     pretrained_path='/path/to/visualglm',  # or Huggingface repo id
     prompt_constructor=dict(type=VisualGLMMMBenchPromptConstructor),
-    post_processor=dict(type=VisualGLMBasePostProcessor)
+    post_processor=dict(type=VisualGLMBasePostProcessor),
+    gen_kwargs=dict(max_new_tokens=50,num_beams=5,do_sample=False,repetition_penalty=1.0,length_penalty=-1.0)
 )
 
 # evaluation settings
-mmbench_evaluator = [
+visualglm_mmbench_evaluator = [
     dict(type='opencompass.DumpResults',
          save_path='work_dirs/visualglm-6b-mmbench.xlsx')
 ]

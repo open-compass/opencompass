@@ -45,7 +45,7 @@ with read_base():
     from ...drop.drop_gen_599f07 import drop_datasets
     from ...humaneval.humaneval_gen_a82cae import humaneval_datasets
     from ...mbpp.mbpp_gen_1e1056 import mbpp_datasets
-    from ...bbh.bbh_gen_e3d13a import bbh_datasets
+    from ...bbh.bbh_gen_5bf00b import bbh_datasets
 
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

@@ -141,6 +141,7 @@ class MDLRetriever(TopkRetriever):
         """Retrieve the in-context example index for each test example."""
         return self.topk_search()
 
+    @torch.no_grad()
     def cal_ce(self, input_texts: List[str], mask_length=None):
         if self.metric_model is None:
             logger.info(

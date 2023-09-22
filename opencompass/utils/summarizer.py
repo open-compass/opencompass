@@ -36,7 +36,7 @@ class Summarizer:
 
         model_cfgs = self.cfg['models']
         dataset_cfgs = self.cfg['datasets']
-        summarizer_cfg = self.cfg.get('summarizer', {})
+        summarizer_cfg = self.cfg.get('summarizer', {}) or {} # avoid 'summarizer' is in cfg but None
         work_dir = self.cfg['work_dir']
 
         # pick up results
@@ -57,7 +57,7 @@ class Summarizer:
                 result = mmengine.load(filepath)
                 raw_results[model_abbr][dataset_abbr] = result
                 if 'error' in result:
-                    self.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
+                    self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
                     continue
                 else:
                     parsed_results[model_abbr][dataset_abbr] = []

@@ -2,7 +2,8 @@ exclude: |
     (?x)^(
       tests/data/|
       opencompass/models/internal/|
-      opencompass/utils/internal/
+      opencompass/utils/internal/|
+      opencompass/openicl/icl_evaluator/hf_metrics/
     )
 repos:
   - repo: https://github.com/PyCQA/flake8
