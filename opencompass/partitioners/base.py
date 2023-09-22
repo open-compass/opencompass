@@ -62,7 +62,7 @@ class BasePartitioner:
                         tgt_ptr[key] = {}
                     tgt_ptr = tgt_ptr[key]
                 tgt_ptr[key_chain[-1]] = ori_ptr[key_chain[-1]]
-            except AttributeError:
+            except Exception:
                 self.logger.warning(f'Key {k} not found in config, ignored.')
 
         tasks = self.partition(models,
