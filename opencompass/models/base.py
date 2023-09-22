@@ -1,4 +1,4 @@
-from abc import abstractclassmethod
+from abc import abstractmethod
 from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -37,7 +37,7 @@ class BaseModel:
         if meta_template and 'eos_token_id' in meta_template:
             self.eos_token_id = meta_template['eos_token_id']
 
-    @abstractclassmethod
+    @abstractmethod
     def generate(self, inputs: List[str], max_out_len: int) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -48,8 +48,11 @@ class BaseModel:
         Returns:
             List[str]: A list of generated strings.
         """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' gen-based evaluation yet, try ppl-based '
+                                  'instead.')
 
-    @abstractclassmethod
+    @abstractmethod
     def get_ppl(self,
                 inputs: List[str],
                 mask_length: Optional[List[int]] = None) -> List[float]:
@@ -66,8 +69,11 @@ class BaseModel:
         Returns:
             List[float]: A list of perplexity scores.
         """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' ppl-based evaluation yet, try gen-based '
+                                  'instead.')
 
-    @abstractclassmethod
+    @abstractmethod
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.
 
@@ -192,7 +198,7 @@ class LMTemplateParser:
         Returns:
             str: The final string.
         """
-        assert isinstance(prompt_template, (str, list, PromptList))
+        assert isinstance(prompt_template, (str, list, PromptList, tuple))
         if not isinstance(prompt_template, (str, PromptList)):
             return [self.parse_template(p, mode=mode) for p in prompt_template]
 

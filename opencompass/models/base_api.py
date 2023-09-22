@@ -1,7 +1,7 @@
 import re
 import threading
 import warnings
-from abc import abstractclassmethod
+from abc import abstractmethod
 from copy import deepcopy
 from time import sleep
 from typing import Dict, List, Optional, Tuple, Union
@@ -46,7 +46,7 @@ class BaseAPIModel(BaseModel):
         self.template_parser = APITemplateParser(meta_template)
         self.logger = get_logger()
 
-    @abstractclassmethod
+    @abstractmethod
     def generate(self, inputs: List[PromptType],
                  max_out_len: int) -> List[str]:
         """Generate results given a list of inputs.
@@ -60,8 +60,11 @@ class BaseAPIModel(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' gen-based evaluation yet, try ppl-based '
+                                  'instead.')
 
-    @abstractclassmethod
+    @abstractmethod
     def get_ppl(self,
                 inputs: List[PromptType],
                 mask_length: Optional[List[int]] = None) -> List[float]:
@@ -78,6 +81,9 @@ class BaseAPIModel(BaseModel):
         Returns:
             List[float]: A list of perplexity scores.
         """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' ppl-based evaluation yet, try gen-based '
+                                  'instead.')
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese
@@ -161,7 +167,7 @@ class APITemplateParser:
         Returns:
             List[str or PromptList]: The finalized prompt or a conversation.
         """
-        assert isinstance(prompt_template, (str, list, PromptList))
+        assert isinstance(prompt_template, (str, list, PromptList, tuple))
 
         if not isinstance(prompt_template, (str, PromptList)):
             return [self.parse_template(p, mode=mode) for p in prompt_template]

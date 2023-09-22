@@ -200,7 +200,13 @@ class PPLInferencer(BaseInferencer):
             sub_predictions.append(labels[single_ppl.index(min(single_ppl))])
         output_handler.save_predictions(sub_predictions)
 
-        # 7. Output
+        # 7. Fetch gold answers if exist
+        ds_reader = retriever.dataset_reader
+        if ds_reader.output_column:
+            golds = ds_reader.dataset['test'][ds_reader.output_column]
+            output_handler.save_golds(golds)
+
+        # 8. Output
         if self.is_main_process:
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
