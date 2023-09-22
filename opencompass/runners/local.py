@@ -57,7 +57,7 @@ class LocalRunner(BaseRunner):
         status = []
         if self.debug:
             for task in tasks:
-                task = TASKS.build(dict(type=self.task_cfg.type, cfg=task))
+                task = TASKS.build(dict(cfg=task, type=self.task_cfg['type']))
                 task_name = task.name
                 # get cmd
                 mmengine.mkdir_or_exist('tmp/')
@@ -94,7 +94,7 @@ class LocalRunner(BaseRunner):
             lock = Lock()
 
             def submit(task, index):
-                task = TASKS.build(dict(type=self.task_cfg.type, cfg=task))
+                task = TASKS.build(dict(cfg=task, type=self.task_cfg['type']))
                 num_gpus = task.num_gpus
                 assert len(gpus) >= num_gpus
 

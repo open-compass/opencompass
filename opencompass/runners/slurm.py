@@ -69,11 +69,11 @@ class SlurmRunner(BaseRunner):
             status = [self._launch(task, random_sleep=False) for task in tasks]
         return status
 
-    def _launch(self, task_cfg: ConfigDict, random_sleep: bool = True):
+    def _launch(self, cfg: ConfigDict, random_sleep: bool = True):
         """Launch a single task.
 
         Args:
-            task_cfg (ConfigDict): Task config.
+            cfg (ConfigDict): Task config.
             random_sleep (bool): Whether to sleep for a random time before
                 running the command. This avoids cluster error when launching
                 multiple tasks at the same time. Default: True.
@@ -81,10 +81,7 @@ class SlurmRunner(BaseRunner):
         Returns:
             tuple[str, int]: Task name and exit code.
         """
-        task_type = self.task_cfg.type
-        if isinstance(self.task_cfg.type, str):
-            task_type = TASKS.get(task_type)
-        task = task_type(task_cfg)
+        task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
         task_name = task.name
 
@@ -92,7 +89,7 @@ class SlurmRunner(BaseRunner):
         mmengine.mkdir_or_exist('tmp/')
         param_file = f'tmp/{os.getpid()}_params.py'
         try:
-            task_cfg.dump(param_file)
+            cfg.dump(param_file)
 
             # Build up slurm command
             tmpl = 'srun'
