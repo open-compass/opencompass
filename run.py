@@ -83,6 +83,12 @@ def parse_args():
                         './outputs/default.',
                         default=None,
                         type=str)
+    parser.add_argument(
+        '--config-dir',
+        default='configs',
+        help='Use the custom config directory instead of config/ to '
+        'search the configs for datasets, models and summarizers',
+        type=str)
     parser.add_argument('-l',
                         '--lark',
                         help='Report the running status to lark bot',
