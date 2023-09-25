@@ -44,7 +44,7 @@ python3 -m lmdeploy.serve.turbomind.deploy internlm-chat-7b /path/to/internlm-ch
 bash ./workspace/service_docker_up.sh
 ```
 
-\*\*Note: \*\*In the implementation of Turbomind, inference is "persistent". Its destroy operation can lead to unexpected issues. Therefore, we temporarily use service interfaces for model evaluation. And we will integrate the Python API to opencompass when turbomind supports "destruction".
+\*\*Note: \*\*In the implementation of turbomind, inference is "persistent". The "destroy" operation can lead to unexpected issues. Therefore, we temporarily use service interfaces for model evaluation. And we will integrate the Python API to OpenCompass when turbomind supports "destroy".
 
 ### Step-3: Evaluate the Converted Model
 

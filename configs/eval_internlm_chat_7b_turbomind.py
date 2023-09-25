@@ -20,7 +20,7 @@ meta_template = dict(
 models = [
     dict(
         type=TurboMindModel,
-        abbr='llama2-chat-7b-turbomind',
+        abbr='internlm-chat-7b-turbomind',
         path="internlm-chat-7b",
         tis_addr='0.0.0.0:33337',
         max_out_len=100,
