@@ -354,8 +354,11 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 --max-seq-len 2048 \  # 模型能接受的最大序列长度
 --batch-size 8 \  # 批次大小
 --no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
---num-gpus 1  # 所需 gpu 数
+--num-gpus 1  # 运行该模型所需的最少 gpu 数
 ```
+
+> **注意**<br />
+> 若需要运行上述命令，你需要删除所有从 `# ` 开始的注释。
 
 通过命令行或配置文件，OpenCompass 还支持评测 API 或自定义模型，以及更多样化的评测策略。请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id3)了解如何运行一个评测任务。
 

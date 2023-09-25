@@ -54,6 +54,7 @@ extensions = [
     'sphinx_tabs.tabs',
     'notfound.extension',
     'sphinxcontrib.jquery',
+    'sphinx_design',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

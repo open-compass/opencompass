@@ -354,8 +354,11 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 --max-seq-len 2048 \  # Maximum sequence length the model can accept
 --batch-size 8 \  # Batch size
 --no-batch-padding \  # Don't enable batch padding, infer through for loop to avoid performance loss
---num-gpus 1  # Number of required GPUs
+--num-gpus 1  # Number of minimum required GPUs
 ```
+
+> **Note**<br />
+> To run the command above, you will need to remove the comments starting from `# ` first.
 
 Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
 

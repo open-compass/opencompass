@@ -33,7 +33,7 @@ Task Configuration (`$EXP`):
   --max-seq-len 2048 \  # Maximum generated token count
   --batch-size 8 \  # Batch size
   --no-batch-padding \  # Disable batch padding and infer through a for loop to avoid accuracy loss
-  --num-gpus 1  # Number of required GPUs
+  --num-gpus 1  # Number of minimum required GPUs for this model
   ```
 
   Complete HuggingFace parameter descriptions:
@@ -47,7 +47,7 @@ Task Configuration (`$EXP`):
   - `--max-seq-len`: Maximum sequence length the model can accept
   - `--no-batch-padding`: Disable batch padding and infer through a for loop to avoid accuracy loss
   - `--batch-size`: Batch size
-  - `--num-gpus`: Number of GPUs required to run the model
+  - `--num-gpus`: Number of GPUs required to run the model. Please note that this parameter is only used to determine the number of GPUs required to run the model, and does not affect the actual number of GPUs used for the task. Refer to [Efficient Evaluation](./evaluation.md) for more details.
 
 Starting Methods:
 
