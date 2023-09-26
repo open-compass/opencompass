@@ -71,6 +71,8 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 ## 📖 数据集支持
 
+## 📖 Dataset Support
+
 <table align="center">
   <tbody>
     <tr align="center" valign="bottom">
@@ -84,7 +86,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
         <b>推理</b>
       </td>
       <td>
-        <b>学科</b>
+        <b>考试</b>
       </td>
       <td>
         <b>理解</b>
@@ -128,6 +130,22 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 <summary><b>翻译</b></summary>
 
 - Flores
+- IWSLT2017
+
+</details>
+
+<details open>
+<summary><b>多语种问答</b></summary>
+
+- TyDi-QA
+- XCOPA
+
+</details>
+
+<details open>
+<summary><b>多语种总结</b></summary>
+
+- XLSum
 
 </details>
       </td>
@@ -137,15 +155,8 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 - BoolQ
 - CommonSenseQA
-- NaturalQuestion
-- TrivialQA
-
-</details>
-
-<details open>
-<summary><b>多语种问答</b></summary>
-
-- TyDi-QA
+- NaturalQuestions
+- TriviaQA
 
 </details>
       </td>
@@ -160,6 +171,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 - AX-g
 - CB
 - RTE
+- ANLI
 
 </details>
 
@@ -167,7 +179,6 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 <summary><b>常识推理</b></summary>
 
 - StoryCloze
-- StoryCloze-CN（即将上线）
 - COPA
 - ReCoRD
 - HellaSwag
@@ -188,14 +199,8 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 <summary><b>定理应用</b></summary>
 
 - TheoremQA
-
-</details>
-
-<details open>
-<summary><b>代码</b></summary>
-
-- HumanEval
-- MBPP
+- StrategyQA
+- SciBench
 
 </details>
 
@@ -210,13 +215,20 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 <details open>
 <summary><b>初中/高中/大学/职业考试</b></summary>
 
-- GAOKAO-2023
-- CEval
+- C-Eval
 - AGIEval
 - MMLU
 - GAOKAO-Bench
 - CMMLU
 - ARC
+- Xiezhi
+
+</details>
+
+<details open>
+<summary><b>医学考试</b></summary>
+
+- CMB
 
 </details>
       </td>
@@ -229,6 +241,9 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 - DRCD
 - MultiRC
 - RACE
+- DROP
+- OpenBookQA
+- SQuAD2.0
 
 </details>
 
@@ -238,6 +253,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 - CSL
 - LCSTS
 - XSum
+- SummScreen
 
 </details>
 
@@ -247,6 +263,68 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 - EPRSTMT
 - LAMBADA
 - TNEWS
+
+</details>
+      </td>
+    </tr>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<table align="center">
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>长文本</b>
+      </td>
+      <td>
+        <b>安全</b>
+      </td>
+      <td>
+        <b>代码</b>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>
+<details open>
+<summary><b>长文本理解</b></summary>
+
+- LEval
+- LongBench
+- GovReports
+- NarrativeQA
+- Qasper
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>安全</b></summary>
+
+- CivilComments
+- CrowsPairs
+- CValues
+- JigsawMultilingual
+- TruthfulQA
+
+</details>
+<details open>
+<summary><b>健壮性</b></summary>
+
+- AdvGLUE
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>代码</b></summary>
+
+- HumanEval
+- HumanEvalX
+- MBPP
+- APPs
+- DS1000
 
 </details>
       </td>
@@ -270,40 +348,34 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
         <b>API 模型</b>
       </td>
       <!-- <td>
-        <b>自定义模型</b>
+        <b>Custom Models</b>
       </td> -->
     </tr>
     <tr valign="top">
       <td>
 
+- InternLM
 - LLaMA
 - Vicuna
 - Alpaca
 - Baichuan
 - WizardLM
-- ChatGLM-6B
-- ChatGLM2-6B
-- MPT
+- ChatGLM2
 - Falcon
 - TigerBot
-- MOSS
-- ……
+- Qwen
+- ...
 
 </td>
 <td>
 
 - OpenAI
-- Claude (即将推出)
-- PaLM (即将推出)
+- Claude
+- PaLM (coming soon)
 - ……
 
 </td>
-<!-- <td>
 
-- GLM
-- ……
-
-</td> -->
 </tr>
   </tbody>
 </table>

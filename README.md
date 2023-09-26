@@ -126,6 +126,22 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 <summary><b>Translation</b></summary>
 
 - Flores
+- IWSLT2017
+
+</details>
+
+<details open>
+<summary><b>Multi-language Question Answering</b></summary>
+
+- TyDi-QA
+- XCOPA
+
+</details>
+
+<details open>
+<summary><b>Multi-language Summary</b></summary>
+
+- XLSum
 
 </details>
       </td>
@@ -135,15 +151,8 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 
 - BoolQ
 - CommonSenseQA
-- NaturalQuestion
-- TrivialQA
-
-</details>
-
-<details open>
-<summary><b>Multi-language Question Answering</b></summary>
-
-- TyDi-QA
+- NaturalQuestions
+- TriviaQA
 
 </details>
       </td>
@@ -158,6 +167,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - AX-g
 - CB
 - RTE
+- ANLI
 
 </details>
 
@@ -165,7 +175,6 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 <summary><b>Commonsense Reasoning</b></summary>
 
 - StoryCloze
-- StoryCloze-CN (coming soon)
 - COPA
 - ReCoRD
 - HellaSwag
@@ -186,14 +195,8 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 <summary><b>Theorem Application</b></summary>
 
 - TheoremQA
-
-</details>
-
-<details open>
-<summary><b>Code</b></summary>
-
-- HumanEval
-- MBPP
+- StrategyQA
+- SciBench
 
 </details>
 
@@ -208,13 +211,20 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 <details open>
 <summary><b>Junior High, High School, University, Professional Examinations</b></summary>
 
-- GAOKAO-2023
-- CEval
+- C-Eval
 - AGIEval
 - MMLU
 - GAOKAO-Bench
 - CMMLU
 - ARC
+- Xiezhi
+
+</details>
+
+<details open>
+<summary><b>Medical Examinations</b></summary>
+
+- CMB
 
 </details>
       </td>
@@ -227,6 +237,9 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - DRCD
 - MultiRC
 - RACE
+- DROP
+- OpenBookQA
+- SQuAD2.0
 
 </details>
 
@@ -236,6 +249,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - CSL
 - LCSTS
 - XSum
+- SummScreen
 
 </details>
 
@@ -245,6 +259,68 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - EPRSTMT
 - LAMBADA
 - TNEWS
+
+</details>
+      </td>
+    </tr>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<table align="center">
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>Long Context</b>
+      </td>
+      <td>
+        <b>Safety</b>
+      </td>
+      <td>
+        <b>Code</b>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>
+<details open>
+<summary><b>Long Context Understanding</b></summary>
+
+- LEval
+- LongBench
+- GovReports
+- NarrativeQA
+- Qasper
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>Safety</b></summary>
+
+- CivilComments
+- CrowsPairs
+- CValues
+- JigsawMultilingual
+- TruthfulQA
+
+</details>
+<details open>
+<summary><b>Robustness</b></summary>
+
+- AdvGLUE
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>Code</b></summary>
+
+- HumanEval
+- HumanEvalX
+- MBPP
+- APPs
+- DS1000
 
 </details>
       </td>
@@ -280,29 +356,21 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 - Alpaca
 - Baichuan
 - WizardLM
-- ChatGLM-6B
-- ChatGLM2-6B
-- MPT
+- ChatGLM2
 - Falcon
 - TigerBot
-- MOSS
+- Qwen
 - ...
 
 </td>
 <td>
 
 - OpenAI
-- Claude (coming soon)
+- Claude
 - PaLM (coming soon)
 - ……
 
 </td>
-
-<!--
-- GLM
-- ...
-
-</td> -->
 
 </tr>
   </tbody>
