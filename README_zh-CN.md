@@ -364,7 +364,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 - Falcon
 - TigerBot
 - Qwen
-- ...
+- ……
 
 </td>
 <td>
