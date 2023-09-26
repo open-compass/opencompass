@@ -166,7 +166,7 @@ class CLPInferencer(BaseInferencer):
                             prompt_template=prompt_template)
                         prompt_token_num = get_token_len(prompt)
                 prompt_list.append(prompt)
-                # in case prompt token num reachesfuca
+                # in case prompt token num reaches max
                 if self.max_seq_len is not None and \
                         prompt_token_num + 1 > self.max_seq_len:
                     prompt_token_num = self.max_seq_len - 1
