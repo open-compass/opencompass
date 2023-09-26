@@ -348,7 +348,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
         <b>API 模型</b>
       </td>
       <!-- <td>
-        <b>Custom Models</b>
+        <b>自定义模型</b>
       </td> -->
     </tr>
     <tr valign="top">
@@ -371,7 +371,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 - OpenAI
 - Claude
-- PaLM (coming soon)
+- PaLM (即将推出)
 - ……
 
 </td>
