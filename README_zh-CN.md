@@ -34,9 +34,10 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.09.26\]** 我们在评测榜单上更新了[Qwen](https://github.com/QwenLM/Qwen), 这是目前表现最好的开源模型之一, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
 - **\[2023.09.20\]** 我们在评测榜单上更新了[InternLM-20B](https://github.com/InternLM/InternLM), 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
-- **\[2023.09.19\]** 我们在评测榜单上更新了WeMix-LLaMA2-70B/Phi-1.5-1.3B, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
-- **\[2023.09.18\]** 我们发布了[长文本评测指引](docs/zh_cn/advanced_guides/longeval.md).🔥🔥🔥.
+- **\[2023.09.19\]** 我们在评测榜单上更新了WeMix-LLaMA2-70B/Phi-1.5-1.3B, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
+- **\[2023.09.18\]** 我们发布了[长文本评测指引](docs/zh_cn/advanced_guides/longeval.md).
 - **\[2023.09.08\]** 我们在评测榜单上更新了Baichuan-2/Tigerbot-2/Vicuna-v1.5, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情。
 - **\[2023.09.06\]** 欢迎 [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。
 - **\[2023.09.02\]** 我们加入了[Qwen-VL](https://github.com/QwenLM/Qwen-VL)的评测支持。
@@ -53,7 +54,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 - **开源可复现**：提供公平、公开、可复现的大模型评测方案
 
-- **全面的能力维度**：五大维度设计，提供 50+ 个数据集约 30 万题的的模型评测方案，全面评估模型能力
+- **全面的能力维度**：五大维度设计，提供 70+ 个数据集约 40 万题的的模型评测方案，全面评估模型能力
 
 - **丰富的模型支持**：已支持 20+ HuggingFace 及 API 模型
 
