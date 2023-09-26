@@ -82,7 +82,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
         <b>Reasoning</b>
       </td>
       <td>
-        <b>Comprehensive Examination</b>
+        <b>Examination</b>
       </td>
       <td>
         <b>Understanding</b>
