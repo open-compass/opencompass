@@ -70,9 +70,63 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
-## 📖 数据集支持
+## 🛠️ 安装
 
-## 📖 Dataset Support
+下面展示了快速安装以及准备数据集的步骤。
+
+```Python
+conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
+conda activate opencompass
+git clone https://github.com/open-compass/opencompass opencompass
+cd opencompass
+pip install -e .
+# 下载数据集到 data/ 处
+wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
+unzip OpenCompassData.zip
+```
+
+有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html)。
+
+<p align="right"><a href="#top">🔝返回顶部</a></p>
+
+## 🏗️ ️评测
+
+确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，可以通过以下命令评测 LLaMA-7b 模型在 MMLU 和 C-Eval 数据集上的性能：
+
+```bash
+python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
+```
+
+OpenCompass 预定义了许多模型和数据集的配置，你可以通过 [工具](./docs/zh_cn/tools.md#ListConfigs) 列出所有可用的模型和数据集配置。
+
+```bash
+# 列出所有配置
+python tools/list_configs.py
+# 列出所有跟 llama 及 mmlu 相关的配置
+python tools/list_configs.py llama mmlu
+```
+
+你也可以通过命令行去评测其它 HuggingFace 模型。同样以 LLaMA-7b 为例：
+
+```bash
+python run.py --datasets ceval_ppl mmlu_ppl \
+--hf-path huggyllama/llama-7b \  # HuggingFace 模型地址
+--model-kwargs device_map='auto' \  # 构造 model 的参数
+--tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # 构造 tokenizer 的参数
+--max-out-len 100 \  # 最长生成 token 数
+--max-seq-len 2048 \  # 模型能接受的最大序列长度
+--batch-size 8 \  # 批次大小
+--no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
+--num-gpus 1  # 所需 gpu 数
+```
+
+通过命令行或配置文件，OpenCompass 还支持评测 API 或自定义模型，以及更多样化的评测策略。请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id3)了解如何运行一个评测任务。
+
+更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
+
+<p align="right"><a href="#top">🔝返回顶部</a></p>
+
+## 📖 数据集支持
 
 <table align="center">
   <tbody>
@@ -88,9 +142,6 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
       </td>
       <td>
         <b>考试</b>
-      </td>
-      <td>
-        <b>理解</b>
       </td>
     </tr>
     <tr valign="top">
@@ -233,6 +284,26 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 </details>
       </td>
+    </tr>
+</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>理解</b>
+      </td>
+      <td>
+        <b>长文本</b>
+      </td>
+      <td>
+        <b>安全</b>
+      </td>
+      <td>
+        <b>代码</b>
+      </td>
+    </tr>
+    <tr valign="top">
       <td>
 <details open>
 <summary><b>阅读理解</b></summary>
@@ -267,26 +338,6 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 </details>
       </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-</table>
-
-<table align="center">
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>长文本</b>
-      </td>
-      <td>
-        <b>安全</b>
-      </td>
-      <td>
-        <b>代码</b>
-      </td>
-    </tr>
-    <tr valign="top">
       <td>
 <details open>
 <summary><b>长文本理解</b></summary>
@@ -381,59 +432,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
   </tbody>
 </table>
 
-## 🛠️ 安装
-
-下面展示了快速安装以及准备数据集的步骤。
-
-```Python
-conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
-conda activate opencompass
-git clone https://github.com/open-compass/opencompass opencompass
-cd opencompass
-pip install -e .
-# 下载数据集到 data/ 处
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
-```
-
-有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html)。
-
 <p align="right"><a href="#top">🔝返回顶部</a></p>
-
-## 🏗️ ️评测
-
-确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，可以通过以下命令评测 LLaMA-7b 模型在 MMLU 和 C-Eval 数据集上的性能：
-
-```bash
-python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
-```
-
-OpenCompass 预定义了许多模型和数据集的配置，你可以通过 [工具](./docs/zh_cn/tools.md#ListConfigs) 列出所有可用的模型和数据集配置。
-
-```bash
-# 列出所有配置
-python tools/list_configs.py
-# 列出所有跟 llama 及 mmlu 相关的配置
-python tools/list_configs.py llama mmlu
-```
-
-你也可以通过命令行去评测其它 HuggingFace 模型。同样以 LLaMA-7b 为例：
-
-```bash
-python run.py --datasets ceval_ppl mmlu_ppl \
---hf-path huggyllama/llama-7b \  # HuggingFace 模型地址
---model-kwargs device_map='auto' \  # 构造 model 的参数
---tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # 构造 tokenizer 的参数
---max-out-len 100 \  # 最长生成 token 数
---max-seq-len 2048 \  # 模型能接受的最大序列长度
---batch-size 8 \  # 批次大小
---no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
---num-gpus 1  # 所需 gpu 数
-```
-
-通过命令行或配置文件，OpenCompass 还支持评测 API 或自定义模型，以及更多样化的评测策略。请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id3)了解如何运行一个评测任务。
-
-更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
 
 ## 🔜 路线图
 

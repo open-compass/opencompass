@@ -68,6 +68,60 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
+## 🛠️ Installation
+
+Below are the steps for quick installation and datasets preparation.
+
+```Python
+conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
+conda activate opencompass
+git clone https://github.com/open-compass/opencompass opencompass
+cd opencompass
+pip install -e .
+# Download dataset to data/ folder
+wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
+unzip OpenCompassData.zip
+```
+
+Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
+## 🏗️ ️Evaluation
+
+After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared, you can evaluate the performance of the LLaMA-7b model on the MMLU and C-Eval datasets using the following command:
+
+```bash
+python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
+```
+
+OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
+
+```bash
+# List all configurations
+python tools/list_configs.py
+# List all configurations related to llama and mmlu
+python tools/list_configs.py llama mmlu
+```
+
+You can also evaluate other HuggingFace models via command line. Taking LLaMA-7b as an example:
+
+```bash
+python run.py --datasets ceval_ppl mmlu_ppl \
+--hf-path huggyllama/llama-7b \  # HuggingFace model path
+--model-kwargs device_map='auto' \  # Arguments for model construction
+--tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # Arguments for tokenizer construction
+--max-out-len 100 \  # Maximum number of tokens generated
+--max-seq-len 2048 \  # Maximum sequence length the model can accept
+--batch-size 8 \  # Batch size
+--no-batch-padding \  # Don't enable batch padding, infer through for loop to avoid performance loss
+--num-gpus 1  # Number of required GPUs
+```
+
+Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
 ## 📖 Dataset Support
 
 <table align="center">
@@ -84,9 +138,6 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
       </td>
       <td>
         <b>Examination</b>
-      </td>
-      <td>
-        <b>Understanding</b>
       </td>
     </tr>
     <tr valign="top">
@@ -229,6 +280,26 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 
 </details>
       </td>
+    </tr>
+</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>Understanding</b>
+      </td>
+      <td>
+        <b>Long Context</b>
+      </td>
+      <td>
+        <b>Safety</b>
+      </td>
+      <td>
+        <b>Code</b>
+      </td>
+    </tr>
+    <tr valign="top">
       <td>
 <details open>
 <summary><b>Reading Comprehension</b></summary>
@@ -263,26 +334,6 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
 
 </details>
       </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-</table>
-
-<table align="center">
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>Long Context</b>
-      </td>
-      <td>
-        <b>Safety</b>
-      </td>
-      <td>
-        <b>Code</b>
-      </td>
-    </tr>
-    <tr valign="top">
       <td>
 <details open>
 <summary><b>Long Context Understanding</b></summary>
@@ -377,57 +428,7 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for commun
   </tbody>
 </table>
 
-## 🛠️ Installation
-
-Below are the steps for quick installation and datasets preparation.
-
-```Python
-conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
-conda activate opencompass
-git clone https://github.com/open-compass/opencompass opencompass
-cd opencompass
-pip install -e .
-# Download dataset to data/ folder
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
-```
-
-Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
-
 <p align="right"><a href="#top">🔝Back to top</a></p>
-
-## 🏗️ ️Evaluation
-
-After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared, you can evaluate the performance of the LLaMA-7b model on the MMLU and C-Eval datasets using the following command:
-
-```bash
-python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
-```
-
-OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
-
-```bash
-# List all configurations
-python tools/list_configs.py
-# List all configurations related to llama and mmlu
-python tools/list_configs.py llama mmlu
-```
-
-You can also evaluate other HuggingFace models via command line. Taking LLaMA-7b as an example:
-
-```bash
-python run.py --datasets ceval_ppl mmlu_ppl \
---hf-path huggyllama/llama-7b \  # HuggingFace model path
---model-kwargs device_map='auto' \  # Arguments for model construction
---tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # Arguments for tokenizer construction
---max-out-len 100 \  # Maximum number of tokens generated
---max-seq-len 2048 \  # Maximum sequence length the model can accept
---batch-size 8 \  # Batch size
---no-batch-padding \  # Don't enable batch padding, infer through for loop to avoid performance loss
---num-gpus 1  # Number of required GPUs
-```
-
-Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
 
 ## 🔜 Roadmap
 
