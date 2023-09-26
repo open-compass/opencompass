@@ -119,7 +119,7 @@ For all HuggingFace related parameters supported by `run.py`, please read [Launc
 
 In addition to configuring the experiment through the command line, OpenCompass also allows users to write the full configuration of the experiment in a configuration file and run it directly through `run.py`. The configuration file is organized in Python format and must include the `datasets` and `models` fields.
 
-The test configuration for this time is [configs/eval_demo.py](/configs/eval_demo.py). This configuration introduces the required dataset and model configurations through the [inheritance mechanism](../user_guides/config.md#inheritance-mechanism) and combines the `datasets` and `models` fields in the required format.
+The test configuration for this time is [configs/eval_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_demo.py). This configuration introduces the required dataset and model configurations through the [inheritance mechanism](../user_guides/config.md#inheritance-mechanism) and combines the `datasets` and `models` fields in the required format.
 
 ```python
 from mmengine.config import read_base
@@ -214,7 +214,7 @@ You can find more information from [Dataset Preparation](../user_guides/dataset_
 `````
 
 ```{warning}
-OpenCompass usually assumes network is available. If you encounter network issues or wish to run OpenCompass in an offline environment, please refer to [FAQ - Network - Q1](./faq.md#in-evaluation-phase-im-running-into-an-error-saying-that-filenotfounderror-couldnt-find-a-module-script-at-opencompassaccuracypy-module-accuracy-doesnt-exist-on-the-hugging-face-hub-either) for solutions.
+OpenCompass usually assumes network is available. If you encounter network issues or wish to run OpenCompass in an offline environment, please refer to [FAQ - Network - Q1](./faq.md#network) for solutions.
 ```
 
 The following sections will use configuration-based method as an example to explain the other features.

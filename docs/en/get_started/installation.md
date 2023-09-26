@@ -72,4 +72,4 @@ unzip OpenCompassData.zip
 
 OpenCompass has supported most of the datasets commonly used for performance comparison, please refer to `configs/dataset` for the specific list of supported datasets.
 
-For next step, please read [Quick Start](./get_started.md).
+For next step, please read [Quick Start](./quick_start.md).
