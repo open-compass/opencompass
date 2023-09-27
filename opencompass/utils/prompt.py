@@ -57,9 +57,9 @@ def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
         for k, v in dataset_cfg.infer_cfg.items():
             dataset_cfg.infer_cfg[k]['type'] = v['type'].split('.')[-1]
     # A compromise for the hash consistency
-    if 'fix_id_list' in dataset_cfg.infer_cfg.inferencer:
-        fix_id_list = dataset_cfg.infer_cfg.inferencer.pop('fix_id_list')
-        dataset_cfg.infer_cfg.retriever['fix_id_list'] = fix_id_list
+    if 'fix_id_list' in dataset_cfg.infer_cfg.retriever:
+        fix_id_list = dataset_cfg.infer_cfg.retriever.pop('fix_id_list')
+        dataset_cfg.infer_cfg.inferencer['fix_id_list'] = fix_id_list
     d_json = json.dumps(dataset_cfg.infer_cfg.to_dict(), sort_keys=True)
     hash_object = hashlib.sha256(d_json.encode())
     return hash_object.hexdigest()
