@@ -45,7 +45,7 @@ def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
                 'test_split'] = dataset_cfg.infer_cfg.reader_cfg.test_split
         for k, v in dataset_cfg.infer_cfg.items():
             dataset_cfg.infer_cfg[k]['type'] = v['type'].split('.')[-1]
-    # A compromise for keep the backward compatibility of hash
+    # A compromise for the hash consistency
     if 'fix_id_list' in dataset_cfg.infer_cfg.retriever:
         fix_id_list = dataset_cfg.infer_cfg.retriever.pop('fix_id_list')
         dataset_cfg.infer_cfg.inferencer['fix_id_list'] = fix_id_list
