@@ -16,8 +16,7 @@ storycloze_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                "{context}\nQuestion: Which ending makes the most sense?\nA. {sentence_quiz1}\nB. {sentence_quiz2}\nYou may choose between 'A' and 'B'.\nAnswer:",
+                prompt="{context}\nQuestion: Which ending makes the most sense?\nA. {sentence_quiz1}\nB. {sentence_quiz2}\nYou may choose between 'A' and 'B'.\nAnswer:",
             ),
         ]),
     ),

@@ -14,8 +14,8 @@ mbpp_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+                prompt="""\
+Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
 ### Instruction:
 Create a Python script for this problem:

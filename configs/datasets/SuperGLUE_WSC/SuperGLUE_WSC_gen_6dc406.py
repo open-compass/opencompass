@@ -16,8 +16,7 @@ WSC_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                "{text}\nIs '{span1}' and '{span2}' refers to the same entity in the above sentence?\nA. Yes\nB. No\nAnseer:"
+                prompt="{text}\nIs '{span1}' and '{span2}' refers to the same entity in the above sentence?\nA. Yes\nB. No\nAnseer:"
             ),
         ]),
     ),

@@ -16,8 +16,7 @@ MultiRC_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '{text}\nQuestion: {question}\nAnswer: {answer}\nIs it true?\nA. Yes\nB. No\nAnswer:'
+                prompt='{text}\nQuestion: {question}\nAnswer: {answer}\nIs it true?\nA. Yes\nB. No\nAnswer:'
             ),
         ]),
     ),

@@ -16,8 +16,7 @@ WSC_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                'Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnseer:'
+                prompt='Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnseer:'
             ),
         ]),
     ),

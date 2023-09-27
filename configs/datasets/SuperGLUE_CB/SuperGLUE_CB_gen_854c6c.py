@@ -17,8 +17,7 @@ CB_infer_cfg = dict(
             round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{premise}\n{hypothesis}\nWhat is the relation between the two sentences?\nA. Contradiction\nB. Entailment\nC. Neutral\nAnswer:'
+                    prompt='{premise}\n{hypothesis}\nWhat is the relation between the two sentences?\nA. Contradiction\nB. Entailment\nC. Neutral\nAnswer:'
                 ),
             ], ),
     ),

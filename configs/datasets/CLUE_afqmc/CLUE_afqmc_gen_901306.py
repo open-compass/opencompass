@@ -16,8 +16,7 @@ afqmc_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '语句一：“{sentence1}”\n语句二：“{sentence2}”\n语句一与语句二是关于蚂蚁金融产品的疑问，两者所询问的内容是否完全一致？\nA. 不完全一致\nB. 完全一致\n请从“A”，“B”中进行选择。\n答：',
+                prompt='语句一：“{sentence1}”\n语句二：“{sentence2}”\n语句一与语句二是关于蚂蚁金融产品的疑问，两者所询问的内容是否完全一致？\nA. 不完全一致\nB. 完全一致\n请从“A”，“B”中进行选择。\n答：',
             ),
         ]),
     ),

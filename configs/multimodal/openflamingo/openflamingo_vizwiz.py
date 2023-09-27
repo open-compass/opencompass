@@ -54,8 +54,7 @@ openflamingo_vizwiz_model = dict(
     ),
     lang_encoder=dict(
         base=dict(type='mmpretrain.AutoModelForCausalLM',
-                  name_or_path=
-                  'decapoda-research/llama-7b-hf',
+                  name_or_path='decapoda-research/llama-7b-hf',
                   local_files_only=True),
         adapter=dict(type='mmpretrain.FlamingoLMAdapter',
                      vis_hidden_size=1024,

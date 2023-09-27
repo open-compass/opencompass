@@ -13,7 +13,8 @@ strategyqa_reader_cfg = dict(
 strategyqa_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template='''Yes or no: Q: Do hamsters provide food for any animals?
+        template='''\
+Yes or no: Q: Do hamsters provide food for any animals?
 A: Hamsters are prey animals. Prey are food for predators. Thus, hamsters provide food for some animals.
 So the answer is yes.
 

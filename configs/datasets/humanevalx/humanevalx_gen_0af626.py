@@ -15,8 +15,7 @@ humanevalx_infer_cfg = {
             template=dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
+                    prompt=f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
 
 ### Instruction:
@@ -35,8 +34,7 @@ humanevalx_eval_cfg_dict = {
         evaluator=dict(
             type=HumanevalXEvaluator,
             language=lang,
-            ip_address=
-            'localhost',  # replace to your code_eval_server ip_address, port
+            ip_address='localhost',  # replace to your code_eval_server ip_address, port
             port=5000
         ),  # refer to https://github.com/Ezra-Yu/code-evaluator to launch a server
         pred_role='BOT')

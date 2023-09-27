@@ -15,7 +15,7 @@ airisk_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(round=[
-            dict(role='HUMAN', prompt="""{question}"""),
+            dict(role='HUMAN', prompt='{question}'),
         ]),
     ),
     retriever=dict(type=ZeroRetriever),
@@ -58,8 +58,7 @@ for _dataset in _dataset_list:
         dict(
             abbr=f'airisk_{_dataset}',
             type=AiRiskDataset,
-            path=
-            f'data/advanced-ai-risk/human_generated_evals/{_dataset}.jsonl',
+            path=f'data/advanced-ai-risk/human_generated_evals/{_dataset}.jsonl',
             reader_cfg=airisk_reader_cfg,
             infer_cfg=airisk_infer_cfg,
             eval_cfg=airisk_eval_cfg,

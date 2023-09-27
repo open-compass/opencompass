@@ -17,7 +17,7 @@ persona_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt="""{question}\n\nChoices:\n (A) Yes\n (B) No"""),
+                prompt='{question}\n\nChoices:\n (A) Yes\n (B) No'),
         ]),
     ),
     retriever=dict(type=ZeroRetriever),

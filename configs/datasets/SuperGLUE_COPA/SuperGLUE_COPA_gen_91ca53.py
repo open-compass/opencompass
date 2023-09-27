@@ -17,8 +17,7 @@ COPA_infer_cfg = dict(
             round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{premise}\nQuestion: Which may be the {question}?\nA. {choice1}\nB. {choice2}\nAnswer:'
+                    prompt='{premise}\nQuestion: Which may be the {question}?\nA. {choice1}\nB. {choice2}\nAnswer:'
                 ),
             ], ),
     ),

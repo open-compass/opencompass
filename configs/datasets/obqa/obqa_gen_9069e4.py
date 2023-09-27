@@ -14,16 +14,14 @@ _template = [
         round=[
             dict(
                 role='HUMAN',
-                prompt=
-                'Question: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:'
+                prompt='Question: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:'
             ),
         ], ),
     dict(
         round=[
             dict(
                 role='HUMAN',
-                prompt=
-                'Given the fact: {fact1}\nQuestion: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:',
+                prompt='Given the fact: {fact1}\nQuestion: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:',
             ),
         ], ),
 ]

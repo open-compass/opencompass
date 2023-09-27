@@ -10,8 +10,7 @@ ReCoRD_reader_cfg = dict(
 ReCoRD_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=
-        'Passage:{text}\nResult:{question}\nQuestion: What entity does ____ refer to in the result?Give me the entity name:'),
+        template='Passage:{text}\nResult:{question}\nQuestion: What entity does ____ refer to in the result?Give me the entity name:'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 

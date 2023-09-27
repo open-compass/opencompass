@@ -13,8 +13,8 @@ adv_qqp_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """Please identify whether Question 1 has the same meaning as Question 2. The answer should be exactly 'A. no' or 'B. yes'.
+                prompt="""\
+Please identify whether Question 1 has the same meaning as Question 2. The answer should be exactly 'A. no' or 'B. yes'.
 Question 1: {question1}
 Question 2: {question2}
 Answer:"""),

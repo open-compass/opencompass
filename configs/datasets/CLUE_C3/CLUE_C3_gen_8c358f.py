@@ -24,8 +24,7 @@ C3_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '{content}\n问：{question}\nA. {choice0}\nB. {choice1}\nC. {choice2}\nD. {choice3}\n请从“A”，“B”，“C”，“D”中进行选择。\n答：',
+                prompt='{content}\n问：{question}\nA. {choice0}\nB. {choice1}\nC. {choice2}\nD. {choice3}\n请从“A”，“B”，“C”，“D”中进行选择。\n答：',
             ),
         ]),
     ),

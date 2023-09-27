@@ -12,8 +12,7 @@ race_reader_cfg = dict(
 race_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=
-        'Read the article, and answer the question by replying A, B, C or D.\n\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}'),
+        template='Read the article, and answer the question by replying A, B, C or D.\n\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 

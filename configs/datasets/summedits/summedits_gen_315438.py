@@ -14,8 +14,8 @@ summedits_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """Given the document below, you have to determine if "Yes" or "No", the summary is factually consistent with the document.
+                prompt="""\
+Given the document below, you have to determine if "Yes" or "No", the summary is factually consistent with the document.
 
 Document:
 {doc}

@@ -8,7 +8,8 @@ math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
 math_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template='''Problem:
+        template='''\
+Problem:
 Find the domain of the expression $\\frac{{\sqrt{{x-2}}}}{{\sqrt{{5-x}}}}$.}}
 Solution:
 The expressions inside each square root must be non-negative. Therefore, $x-2 \ge 0$, so $x\ge2$, and $5 - x \ge 0$, so $x \le 5$. Also, the denominator cannot be equal to zero, so $5-x>0$, which gives $x<5$. Therefore, the domain of the expression is $\\boxed{{[2,5)}}$.

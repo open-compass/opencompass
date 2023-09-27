@@ -12,8 +12,7 @@ Xsum_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                'Document：{dialogue}\nBased on the previous text, provide a brief single summary:'
+                prompt='Document：{dialogue}\nBased on the previous text, provide a brief single summary:'
             ),
         ]),
     ),

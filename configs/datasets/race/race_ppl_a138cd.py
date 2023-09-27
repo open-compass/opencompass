@@ -15,8 +15,7 @@ race_infer_cfg = dict(
             ans: dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    'Read the article, and answer the question by replying A, B, C or D.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}'
+                    prompt='Read the article, and answer the question by replying A, B, C or D.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}'
                 ),
                 dict(role='BOT', prompt=f'A: {ans}'),
             ])

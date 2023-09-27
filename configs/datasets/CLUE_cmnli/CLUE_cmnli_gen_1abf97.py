@@ -16,8 +16,7 @@ cmnli_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '语句一：“{sentence1}”\n语句二：“{sentence2}”\n请问这两句话是什么关系？\nA. 蕴含\nB. 矛盾\nC. 无关\n请从“A”，“B”，“C”中进行选择。\n答：'
+                prompt='语句一：“{sentence1}”\n语句二：“{sentence2}”\n请问这两句话是什么关系？\nA. 蕴含\nB. 矛盾\nC. 无关\n请从“A”，“B”，“C”中进行选择。\n答：'
             ),
         ]),
     ),

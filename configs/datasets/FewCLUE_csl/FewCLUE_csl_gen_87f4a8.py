@@ -16,8 +16,7 @@ csl_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '摘要：{abst}\n关键词：{keywords}\n上述关键词出现在学术期刊中是否恰当？\nA. 否\nB. 是\n请从”A“，”B“中进行选择。\n答：'
+                prompt='摘要：{abst}\n关键词：{keywords}\n上述关键词出现在学术期刊中是否恰当？\nA. 否\nB. 是\n请从”A“，”B“中进行选择。\n答：'
             )
         ]),
     ),

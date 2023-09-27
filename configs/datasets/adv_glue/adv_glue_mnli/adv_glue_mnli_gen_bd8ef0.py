@@ -13,8 +13,14 @@ adv_mnli_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """Please identify whether the premise entails the hypothesis. The answer should be exactly 'A. yes', 'B. maybe' or 'C. no'.
+                prompt="""\
+\
+\
+\
+\
+\
+\
+Please identify whether the premise entails the hypothesis. The answer should be exactly 'A. yes', 'B. maybe' or 'C. no'.
 premise: {premise}
 hypothesis: {hypothesis}
 Answer:"""),

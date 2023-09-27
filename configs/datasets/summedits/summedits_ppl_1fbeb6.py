@@ -17,8 +17,7 @@ summedits_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    """\nDocument:\n{doc}\nSummary:\n{summary}\nIs the summary factually consistent with the document? """
+                    prompt='\nDocument:\n{doc}\nSummary:\n{summary}\nIs the summary factually consistent with the document? '
                 ),
                 dict(role='BOT', prompt='No')
             ]),
@@ -26,8 +25,7 @@ summedits_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    """Document:\n{doc}\nSummary:\n{summary}\nIs the summary factually consistent with the document? """
+                    prompt='Document:\n{doc}\nSummary:\n{summary}\nIs the summary factually consistent with the document? '
                 ),
                 dict(role='BOT', prompt='Yes')
             ]),

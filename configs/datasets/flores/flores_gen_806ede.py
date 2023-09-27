@@ -126,8 +126,7 @@ for _flores_subtask in _flores_subtasks:
                 round=[
                     dict(
                         role='HUMAN',
-                        prompt=
-                        f'Translate the following {_src_inst} statements to {_tgt_inst}.\n{{sentence_{_flores_source}}}'
+                        prompt=f'Translate the following {_src_inst} statements to {_tgt_inst}.\n{{sentence_{_flores_source}}}'
                     ),
                     dict(role='BOT', prompt=f'{{sentence_{_flores_target}}}'),
                 ],

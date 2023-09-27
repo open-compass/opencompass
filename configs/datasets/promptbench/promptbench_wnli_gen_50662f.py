@@ -31,7 +31,8 @@ wnli_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt="""{adv_prompt}
+                prompt="""\
+{adv_prompt}
 Sentence 1: {sentence1}
 Sentence 2: {sentence2}
 Answer:"""),

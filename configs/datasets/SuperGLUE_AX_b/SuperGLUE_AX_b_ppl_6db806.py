@@ -17,8 +17,7 @@ AX_b_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{sentence1}\n{sentence2}\nIs the sentence below entailed by the sentence above?'
+                    prompt='{sentence1}\n{sentence2}\nIs the sentence below entailed by the sentence above?'
                 ),
                 dict(role='BOT', prompt='Yes'),
             ]),
@@ -26,8 +25,7 @@ AX_b_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{sentence1}\n{sentence2}\nIs the sentence below entailed by the sentence above?'
+                    prompt='{sentence1}\n{sentence2}\nIs the sentence below entailed by the sentence above?'
                 ),
                 dict(role='BOT', prompt='No'),
             ])

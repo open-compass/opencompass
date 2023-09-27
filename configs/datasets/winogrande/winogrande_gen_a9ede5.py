@@ -16,8 +16,7 @@ winogrande_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                'Which of the following is a good sentence:\nA. {opt1}\nB. {opt2}\nAnswer:'
+                prompt='Which of the following is a good sentence:\nA. {opt1}\nB. {opt2}\nAnswer:'
             ),
         ]),
     ),

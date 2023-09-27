@@ -89,8 +89,7 @@ for _name in cmmlu_all_sets:
                 round=[
                     dict(
                         role='HUMAN',
-                        prompt=
-                        f'以下是关于{_ch_name}的单项选择题，请直接给出正确答案的选项。\n题目：{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}'
+                        prompt=f'以下是关于{_ch_name}的单项选择题，请直接给出正确答案的选项。\n题目：{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}'
                     ),
                     dict(role='BOT', prompt='答案是: {answer}'),
                 ]),

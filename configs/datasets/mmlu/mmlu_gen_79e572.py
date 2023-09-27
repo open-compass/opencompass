@@ -78,13 +78,11 @@ for _name in mmlu_all_sets:
     mmlu_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
-            template=
-            '{input}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: {target}\n',
+            template='{input}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: {target}\n',
         ),
         prompt_template=dict(
             type=PromptTemplate,
-            template=
-            f'{_hint}</E>{{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer:',
+            template=f'{_hint}</E>{{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer:',
             ice_token='</E>',
         ),
         retriever=dict(type=FixKRetriever),

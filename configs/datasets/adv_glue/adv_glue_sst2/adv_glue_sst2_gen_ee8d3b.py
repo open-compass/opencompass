@@ -13,8 +13,8 @@ adv_sst2_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """For the given sentence, label the sentiment of the sentence as positive or negative. The answer should be exactly 'A. negative' or 'B. positive'.
+                prompt="""\
+For the given sentence, label the sentiment of the sentence as positive or negative. The answer should be exactly 'A. negative' or 'B. positive'.
 sentence: {sentence}
 Answer:"""),
         ]),

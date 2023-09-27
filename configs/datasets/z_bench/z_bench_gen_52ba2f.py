@@ -16,10 +16,8 @@ z_bench_infer_cfg = dict(
 
 z_bench_datasets = dict(
     type=HFDataset,
-    path=
-    '/mnt/petrelfs/gaotong/llm_eval/openagieval_dataset/eval_datasets/z_bench',
-    data_dir=
-    '/mnt/petrelfs/gaotong/llm_eval/openagieval_dataset/eval_datasets/z_bench',
+    path='/mnt/petrelfs/gaotong/llm_eval/openagieval_dataset/eval_datasets/z_bench',
+    data_dir='/mnt/petrelfs/gaotong/llm_eval/openagieval_dataset/eval_datasets/z_bench',
     name='question',
     reader_cfg=z_bench_reader_cfg,
     infer_cfg=z_bench_infer_cfg)

@@ -15,7 +15,7 @@ sycophancy_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(round=[
-            dict(role='HUMAN', prompt="""{question}"""),
+            dict(role='HUMAN', prompt='{question}'),
         ]),
     ),
     retriever=dict(type=ZeroRetriever),

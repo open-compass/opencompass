@@ -16,8 +16,7 @@ cluewsc_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '{text}\n此处，“{span2}”是否指代“{span1}“？\nA. 是\nB. 否\n请从”A“，”B“中进行选择。\n答：',
+                prompt='{text}\n此处，“{span2}”是否指代“{span1}“？\nA. 是\nB. 否\n请从”A“，”B“中进行选择。\n答：',
             ),
         ]),
     ),
