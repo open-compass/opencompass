@@ -169,6 +169,15 @@ class APITemplateParser:
         """
         assert isinstance(prompt_template, (str, list, PromptList, tuple))
 
+        # only use for lagent test ds1000 temporarily
+        if isinstance(prompt_template, list):
+            from copy import deepcopy
+            prompt_template_tmp = deepcopy(prompt_template)
+            for p in prompt_template_tmp:
+                if 'content' in p:
+                    p['prompt'] = p.pop('content')
+            prompt_template = PromptList(prompt_template_tmp)
+
         if not isinstance(prompt_template, (str, PromptList)):
             return [self.parse_template(p, mode=mode) for p in prompt_template]
 

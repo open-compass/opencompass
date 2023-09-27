@@ -119,12 +119,17 @@ class OpenAI(BaseAPIModel):
         if self.temperature is not None:
             temperature = self.temperature
 
+        single_flag = False
+        if isinstance(inputs, str):
+            single_flag = True
+            inputs = [inputs]
+
         with ThreadPoolExecutor() as executor:
             results = list(
                 executor.map(self._generate, inputs,
                              [max_out_len] * len(inputs),
                              [temperature] * len(inputs)))
-        return results
+        return results[0] if single_flag else results
 
     def _generate(self, input: str or PromptList, max_out_len: int,
                   temperature: float) -> str:

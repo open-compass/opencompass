@@ -199,6 +199,14 @@ class LMTemplateParser:
             str: The final string.
         """
         assert isinstance(prompt_template, (str, list, PromptList, tuple))
+
+        # only use for lagent test ds1000 temporarily
+        if isinstance(prompt_template, list):
+            for p in prompt_template:
+                if 'content' in p:
+                    p['prompt'] = p.pop('content')
+            prompt_template = PromptList(prompt_template)
+
         if not isinstance(prompt_template, (str, PromptList)):
             return [self.parse_template(p, mode=mode) for p in prompt_template]
 
