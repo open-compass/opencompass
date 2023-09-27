@@ -8,6 +8,7 @@ from opencompass.datasets import HFDataset
 _hint = "The following are text classification questions. \n" \
     "Please determine whether the following sentence is linguistically acceptable: " \
     "0 means unacceptable, 1 means acceptable.\n"
+
 CoLA_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
@@ -23,7 +24,7 @@ CoLA_infer_cfg = dict(
         ice_token='</E>',
     ),
     retriever=dict(type=FixKRetriever),
-    inferencer=dict(type=PPLInferencer, fix_id_list=[0, 1, 2, 3, 4]))
+    inferencer=dict(type=PPLInferencer, fix_id_list=[17, 18, 19, 20, 21]))
 
 CoLA_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
