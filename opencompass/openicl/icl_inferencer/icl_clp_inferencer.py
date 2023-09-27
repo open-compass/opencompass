@@ -142,6 +142,13 @@ class CLPInferencer(BaseInferencer):
 
             get_token_len = self.model.get_token_len
 
+            if hasattr(self.model.tokenizer, 'padding_side'):
+                # get padding_side for huggingface model
+                padding_side = self.model.tokenizer.padding_side
+            else:
+                # defaults to left for internal model
+                padding_side = 'left'
+
             # prepare in context for each example and control the length
             for idx in range(len(ice_idx_list)):
                 prompt = retriever.generate_prompt_for_generate_task(
@@ -172,7 +179,7 @@ class CLPInferencer(BaseInferencer):
                     prompt_token_num = self.max_seq_len - 1
 
                 # get the target position index
-                if self.model.tokenizer.padding_side == 'left':
+                if padding_side == 'left':
                     # always the last position
                     target_pos.append(-1)
                 else:
@@ -186,6 +193,13 @@ class CLPInferencer(BaseInferencer):
             else:
                 gold_ans = [None] * len(prompt_list)
 
+            if hasattr(self.model, 'batch_padding'):
+                # get batch padding for huggingface model
+                batch_padding = self.model.batch_padding
+            else:
+                # defaults to False for internal model
+                batch_padding = False
+
             logger.info('Calculating conditional log probability for prompts.')
             for idx in trange(0,
                               len(prompt_list),
@@ -197,13 +211,6 @@ class CLPInferencer(BaseInferencer):
                 sub_target_pos = target_pos[idx:idx + self.batch_size]
 
                 # get probability result
-                if hasattr(self.model, 'batch_padding'):
-                    # get batch padding for huggingface model
-                    batch_padding = self.model.batch_padding
-                else:
-                    # defaults to True for internal model
-                    batch_padding = True
-
                 if batch_padding and self.batch_size > 1:
                     sub_res = self._get_cond_prob(sub_prompt_list,
                                                   sub_target_pos, choice_ids)
