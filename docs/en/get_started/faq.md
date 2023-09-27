@@ -41,6 +41,8 @@ Use the cache files from other machines, as suggested in the answer to [Network-
 
 HuggingFace tries to load the metric (e.g. `accuracy`) as an module online, and it could fail if the network is unreachable. Please refer to [Network-Q1](#my-tasks-failed-with-error-connection-aborted-connectionreseterror104-connection-reset-by-peer-or-urllib3exceptionsmaxretryerror-httpsconnectionpoolhostcdn-lfshuggingfaceco-port443) for guidelines to fix your network issue.
 
+The issue has been fixed in the latest version of OpenCompass, so you might also consider pull from the latest version.
+
 ## Efficiency
 
 ### Why does OpenCompass partition each evaluation request into tasks?
