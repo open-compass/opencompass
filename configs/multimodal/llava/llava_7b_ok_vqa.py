@@ -47,5 +47,3 @@ llava_okvqa_model = dict(
 
 # evaluation settings
 llava_okvqa_evaluator = [dict(type='mmpretrain.VQAAcc')]
-
-

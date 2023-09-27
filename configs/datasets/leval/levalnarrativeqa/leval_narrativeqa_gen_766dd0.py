@@ -27,7 +27,7 @@ LEval_narrativeqa_infer_cfg = dict(
 )
 
 LEval_narrativeqa_eval_cfg = dict(
-    evaluator=dict(type=LEvalGPTEvaluator,), 
+    evaluator=dict(type=LEvalGPTEvaluator,),
     pred_role='BOT'
 )
 

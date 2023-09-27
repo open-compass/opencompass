@@ -6,18 +6,18 @@ from opencompass.datasets import winograndeDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 winogrande_reader_cfg = dict(
-    input_columns=["opt1", "opt2"],
-    output_column="label",
-    test_split="validation")
+    input_columns=['opt1', 'opt2'],
+    output_column='label',
+    test_split='validation')
 
 winogrande_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "Which of the following is a good sentence:\nA. {opt1}\nB. {opt2}\nAnswer:"
+                'Which of the following is a good sentence:\nA. {opt1}\nB. {opt2}\nAnswer:'
             ),
         ]),
     ),
@@ -27,16 +27,16 @@ winogrande_infer_cfg = dict(
 
 winogrande_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 winogrande_datasets = [
     dict(
-        abbr="winogrande",
+        abbr='winogrande',
         type=winograndeDataset_V2,
-        path="winogrande",
-        name="winogrande_xs",
+        path='winogrande',
+        name='winogrande_xs',
         reader_cfg=winogrande_reader_cfg,
         infer_cfg=winogrande_infer_cfg,
         eval_cfg=winogrande_eval_cfg,

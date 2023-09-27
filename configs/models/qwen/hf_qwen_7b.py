@@ -10,7 +10,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='qwen-7b-hf',
-        path="Qwen/Qwen-7B",
+        path='Qwen/Qwen-7B',
         tokenizer_path='Qwen/Qwen-7B',
         tokenizer_kwargs=dict(
             padding_side='left',

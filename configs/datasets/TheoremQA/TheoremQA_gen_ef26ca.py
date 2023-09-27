@@ -30,7 +30,7 @@ TheoremQA_datasets = [
     dict(
         abbr='TheoremQA',
         type=TheoremQADataset,
-        path="./data/TheoremQA/test.csv",
+        path='./data/TheoremQA/test.csv',
         reader_cfg=TheoremQA_reader_cfg,
         infer_cfg=TheoremQA_infer_cfg,
         eval_cfg=TheoremQA_eval_cfg)

@@ -18,7 +18,7 @@ val_pipeline = [
 
 dataset = dict(type='opencompass.MMBenchDataset',
                data_file='/mnt/petrelfs/share_data/yuanyike/cnbench_v010_rolling.tsv',
-               pipeline=val_pipeline, 
+               pipeline=val_pipeline,
                sys_prompt='请从以下选项中选择一个正确选项。')
 
 qwen_mmbench_dataloader = dict(batch_size=1,

@@ -13,11 +13,11 @@ _template = [
         ans: dict(
             round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "Question: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:"
+                    'Question: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:'
                 ),
-                dict(role="BOT", prompt=ans),
+                dict(role='BOT', prompt=ans),
             ], )
         for ans in ['A', 'B', 'C', 'D']
     },
@@ -25,11 +25,11 @@ _template = [
         ans: dict(
             round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "Given the fact: {fact1}\nQuestion: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:"
+                    'Given the fact: {fact1}\nQuestion: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer:'
                 ),
-                dict(role="BOT", prompt=ans),
+                dict(role='BOT', prompt=ans),
             ], )
         for ans in ['A', 'B', 'C', 'D']
     }
@@ -51,7 +51,7 @@ obqa_datasets = [
 ]
 for _i in range(2):
     obqa_reader_cfg = dict(
-        input_columns=_input_columns[_i], output_column="answerKey")
+        input_columns=_input_columns[_i], output_column='answerKey')
     obqa_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -61,6 +61,6 @@ for _i in range(2):
     )
     obqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
-    obqa_datasets[_i]["reader_cfg"] = obqa_reader_cfg
-    obqa_datasets[_i]["infer_cfg"] = obqa_infer_cfg
-    obqa_datasets[_i]["eval_cfg"] = obqa_eval_cfg
+    obqa_datasets[_i]['reader_cfg'] = obqa_reader_cfg
+    obqa_datasets[_i]['infer_cfg'] = obqa_infer_cfg
+    obqa_datasets[_i]['eval_cfg'] = obqa_eval_cfg

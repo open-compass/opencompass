@@ -47,4 +47,3 @@ llava_coco_caption_evaluator = [
         ann_file='data/coco/annotations/coco_karpathy_val_gt.json',
     )  # noqa
 ]
-

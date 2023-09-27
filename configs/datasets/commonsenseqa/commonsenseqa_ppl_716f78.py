@@ -7,11 +7,11 @@ from opencompass.datasets import commonsenseqaDataset
 _ice_template = dict(
     type=PromptTemplate,
     template={
-        'A': "</E>Answer the following question:\n{question}\nAnswer: {A}",
-        'B': "</E>Answer the following question:\n{question}\nAnswer: {B}",
-        'C': "</E>Answer the following question:\n{question}\nAnswer: {C}",
-        'D': "</E>Answer the following question:\n{question}\nAnswer: {D}",
-        'E': "</E>Answer the following question:\n{question}\nAnswer: {E}",
+        'A': '</E>Answer the following question:\n{question}\nAnswer: {A}',
+        'B': '</E>Answer the following question:\n{question}\nAnswer: {B}',
+        'C': '</E>Answer the following question:\n{question}\nAnswer: {C}',
+        'D': '</E>Answer the following question:\n{question}\nAnswer: {D}',
+        'E': '</E>Answer the following question:\n{question}\nAnswer: {E}',
     },
     ice_token='</E>')
 

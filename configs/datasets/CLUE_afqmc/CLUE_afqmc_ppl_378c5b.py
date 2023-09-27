@@ -16,14 +16,14 @@ afqmc_infer_cfg = dict(
             0:
             dict(round=[
                 dict(
-                    role="HUMAN", prompt="“{sentence1}”与“{sentence2}”不同还是相似？"),
-                dict(role="BOT", prompt="不同。")
+                    role='HUMAN', prompt='“{sentence1}”与“{sentence2}”不同还是相似？'),
+                dict(role='BOT', prompt='不同。')
             ]),
             1:
             dict(round=[
                 dict(
-                    role="HUMAN", prompt="“{sentence1}”与“{sentence2}”不同还是相似？"),
-                dict(role="BOT", prompt="相似")
+                    role='HUMAN', prompt='“{sentence1}”与“{sentence2}”不同还是相似？'),
+                dict(role='BOT', prompt='相似')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),

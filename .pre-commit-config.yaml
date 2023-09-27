@@ -38,7 +38,7 @@ repos:
             (?x)^(
               dicts/|
               projects/.*?/dicts/|
-              configs/
+              configs/.*/lib_prompt/
             )
       - id: check-yaml
       - id: end-of-file-fixer
@@ -46,11 +46,10 @@ repos:
             (?x)^(
               dicts/|
               projects/.*?/dicts/|
-              configs/
+              configs/.*/lib_prompt/
             )
       - id: requirements-txt-fixer
       - id: double-quote-string-fixer
-        exclude: configs/
       - id: check-merge-conflict
       - id: fix-encoding-pragma
         args: ["--remove"]

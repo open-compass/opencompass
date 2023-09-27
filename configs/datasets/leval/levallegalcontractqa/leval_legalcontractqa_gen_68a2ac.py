@@ -27,7 +27,7 @@ LEval_legalqa_infer_cfg = dict(
 )
 
 LEval_legalqa_eval_cfg = dict(
-    evaluator=dict(type=LEvalGPTEvaluator), 
+    evaluator=dict(type=LEvalGPTEvaluator),
     pred_role='BOT'
 )
 

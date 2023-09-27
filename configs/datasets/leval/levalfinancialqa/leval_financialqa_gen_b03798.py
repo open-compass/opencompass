@@ -27,7 +27,7 @@ LEval_financialqa_infer_cfg = dict(
 )
 
 LEval_financialqa_eval_cfg = dict(
-    evaluator=dict(type=LEvalGPTEvaluator), 
+    evaluator=dict(type=LEvalGPTEvaluator),
     pred_role='BOT'
 )
 

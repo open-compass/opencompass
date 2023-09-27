@@ -15,8 +15,8 @@ storycloze_infer_cfg = dict(
         type=PromptTemplate,
         template={
             i: dict(round=[
-                dict(role="HUMAN", prompt="{context}"),
-                dict(role="BOT", prompt=f"{{sentence_quiz{i}}}"),
+                dict(role='HUMAN', prompt='{context}'),
+                dict(role='BOT', prompt=f'{{sentence_quiz{i}}}'),
             ])
             for i in range(1, 3)
         }),

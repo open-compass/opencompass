@@ -15,7 +15,7 @@ opt350m = dict(
        max_seq_len=2048,
        # the folowing are not HuggingFaceCausalLM init parameters
        abbr='opt350m',                    # Model abbreviation
-       max_out_len=100,                   # Maximum number of generated tokens          
+       max_out_len=100,                   # Maximum number of generated tokens
        batch_size=64,
        run_cfg=dict(num_gpus=1),    # Run configuration for specifying resource requirements
     )

@@ -5,8 +5,8 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import WSCDataset
 
 WSC_reader_cfg = dict(
-    input_columns=["span1", "span2", "text", "new_text"],
-    output_column="answer",
+    input_columns=['span1', 'span2', 'text', 'new_text'],
+    output_column='answer',
 )
 
 WSC_infer_cfg = dict(
@@ -14,10 +14,10 @@ WSC_infer_cfg = dict(
         type=PromptTemplate,
         template={
             0: dict(round=[
-                dict(role="HUMAN", prompt="{text}"),
+                dict(role='HUMAN', prompt='{text}'),
             ]),
             1: dict(round=[
-                dict(role="HUMAN", prompt="{new_text}"),
+                dict(role='HUMAN', prompt='{new_text}'),
             ]),
         },
     ),
@@ -30,10 +30,10 @@ WSC_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 WSC_datasets = [
     dict(
         type=WSCDataset,
-        path="json",
-        abbr="WSC",
-        data_files="./data/SuperGLUE/WSC/val.jsonl",
-        split="train",
+        path='json',
+        abbr='WSC',
+        data_files='./data/SuperGLUE/WSC/val.jsonl',
+        split='train',
         reader_cfg=WSC_reader_cfg,
         infer_cfg=WSC_infer_cfg,
         eval_cfg=WSC_eval_cfg,

@@ -5,8 +5,8 @@ from opencompass.openicl.icl_evaluator import EMEvaluator
 from opencompass.datasets import ReCoRDDataset
 
 ReCoRD_reader_cfg = dict(
-    input_columns=["question", "text"],
-    output_column="answers",
+    input_columns=['question', 'text'],
+    output_column='answers',
 )
 
 ReCoRD_infer_cfg = dict(
@@ -14,9 +14,9 @@ ReCoRD_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "Passage: {text}\nResult: {question}\nQuestion: What entity does ____ refer to in the result? Give me the entity name:"
+                'Passage: {text}\nResult: {question}\nQuestion: What entity does ____ refer to in the result? Give me the entity name:'
             ),
         ]),
     ),
@@ -27,14 +27,14 @@ ReCoRD_infer_cfg = dict(
 ReCoRD_eval_cfg = dict(
     evaluator=dict(type=EMEvaluator),
     pred_role='BOT',
-    pred_postprocessor=dict(type="ReCoRD"),
+    pred_postprocessor=dict(type='ReCoRD'),
 )
 
 ReCoRD_datasets = [
     dict(
         type=ReCoRDDataset,
-        abbr="ReCoRD",
-        path="./data/SuperGLUE/ReCoRD/val.jsonl",
+        abbr='ReCoRD',
+        path='./data/SuperGLUE/ReCoRD/val.jsonl',
         reader_cfg=ReCoRD_reader_cfg,
         infer_cfg=ReCoRD_infer_cfg,
         eval_cfg=ReCoRD_eval_cfg,

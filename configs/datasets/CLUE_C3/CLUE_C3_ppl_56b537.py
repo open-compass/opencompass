@@ -15,10 +15,10 @@ C3_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "文章：{content}\n问题：{question}\n答案：{choice0}",
-            1: "文章：{content}\n问题：{question}\n答案：{choice1}",
-            2: "文章：{content}\n问题：{question}\n答案：{choice2}",
-            3: "文章：{content}\n问题：{question}\n答案：{choice3}"
+            0: '文章：{content}\n问题：{question}\n答案：{choice0}',
+            1: '文章：{content}\n问题：{question}\n答案：{choice1}',
+            2: '文章：{content}\n问题：{question}\n答案：{choice2}',
+            3: '文章：{content}\n问题：{question}\n答案：{choice3}'
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

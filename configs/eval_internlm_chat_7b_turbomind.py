@@ -21,7 +21,7 @@ models = [
     dict(
         type=TurboMindModel,
         abbr='internlm-chat-7b-tb',
-        path="internlm-chat-7b",
+        path='internlm-chat-7b',
         model_path='./workspace',
         max_out_len=100,
         max_seq_len=2048,

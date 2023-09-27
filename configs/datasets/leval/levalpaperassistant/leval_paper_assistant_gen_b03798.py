@@ -27,7 +27,7 @@ LEval_ps_summ_infer_cfg = dict(
 )
 
 LEval_ps_summ_eval_cfg = dict(
-    evaluator=dict(type=LEvalGPTEvaluator), 
+    evaluator=dict(type=LEvalGPTEvaluator),
     pred_role='BOT'
 )
 

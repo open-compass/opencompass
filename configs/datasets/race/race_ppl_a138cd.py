@@ -14,11 +14,11 @@ race_infer_cfg = dict(
         template={
             ans: dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "Read the article, and answer the question by replying A, B, C or D.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}"
+                    'Read the article, and answer the question by replying A, B, C or D.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}'
                 ),
-                dict(role="BOT", prompt=f'A: {ans}'),
+                dict(role='BOT', prompt=f'A: {ans}'),
             ])
             for ans in ['A', 'B', 'C', 'D']
         }),

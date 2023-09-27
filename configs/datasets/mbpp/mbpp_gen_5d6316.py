@@ -29,7 +29,7 @@ Test examples:
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer, max_out_len=512))
 
-mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator2), pred_role="BOT")
+mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator2), pred_role='BOT')
 
 mbpp_datasets = [
     dict(

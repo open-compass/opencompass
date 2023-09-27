@@ -137,7 +137,7 @@ for dataset in datasets:
     # Use AgentInferencer instead of GenInferencer
     dataset['infer_cfg']['inferencer'] = dict(type=AgentInferencer)
     # Use the question as agent input directly.
-    dataset['infer_cfg']['prompt_template']['template'] = "{question}"
+    dataset['infer_cfg']['prompt_template']['template'] = '{question}'
 
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=1000),

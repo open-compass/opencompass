@@ -46,5 +46,3 @@ llava_scienceqa_model = dict(
 
 # evaluation settings
 llava_scienceqa_evaluator = [dict(type='mmpretrain.ScienceQAMetric')]
-
-

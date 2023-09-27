@@ -15,7 +15,7 @@ winogrande_infer_cfg = dict(
         type=PromptTemplate,
         template={
             i: dict(round=[
-                dict(role="HUMAN", prompt=f"Good sentence: {{opt{i}}}"),
+                dict(role='HUMAN', prompt=f'Good sentence: {{opt{i}}}'),
             ])
             for i in range(1, 3)
         }),

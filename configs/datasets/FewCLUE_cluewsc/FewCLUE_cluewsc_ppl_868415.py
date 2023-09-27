@@ -15,16 +15,16 @@ cluewsc_infer_cfg = dict(
             0:
             dict(round=[
                 dict(
-                    role="HUMAN",
-                    prompt="{text}\n此处，代词“{span2}“被用于指代“{span1}“吗?"),
-                dict(role="BOT", prompt="否")
+                    role='HUMAN',
+                    prompt='{text}\n此处，代词“{span2}“被用于指代“{span1}“吗?'),
+                dict(role='BOT', prompt='否')
             ]),
             1:
             dict(round=[
                 dict(
-                    role="HUMAN",
-                    prompt="{text}\n此处，代词“{span2}“被用于指代“{span1}“吗?"),
-                dict(role="BOT", prompt="是")
+                    role='HUMAN',
+                    prompt='{text}\n此处，代词“{span2}“被用于指代“{span1}“吗?'),
+                dict(role='BOT', prompt='是')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),

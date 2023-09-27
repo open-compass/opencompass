@@ -5,7 +5,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='vicuna-7b-v1.5-16k-hf',
-        path="lmsys/vicuna-7b-v1.5-16k",
+        path='lmsys/vicuna-7b-v1.5-16k',
         tokenizer_path='lmsys/vicuna-7b-v1.5-16k',
         tokenizer_kwargs=dict(
             padding_side='left',

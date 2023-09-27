@@ -6,20 +6,20 @@ from opencompass.datasets import hellaswagDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 hellaswag_reader_cfg = dict(
-    input_columns=["ctx", "A", "B", "C", "D"],
-    output_column="label",
-    test_split="validation")
+    input_columns=['ctx', 'A', 'B', 'C', 'D'],
+    output_column='label',
+    test_split='validation')
 
 hellaswag_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
-                prompt=("{ctx}\nQuestion: Which ending makes the most sense?\n"
-                        "A. {A}\nB. {B}\nC. {C}\nD. {D}\n"
+                role='HUMAN',
+                prompt=('{ctx}\nQuestion: Which ending makes the most sense?\n'
+                        'A. {A}\nB. {B}\nC. {C}\nD. {D}\n'
                         "You may choose from 'A', 'B', 'C', 'D'.\n"
-                        "Answer:"),
+                        'Answer:'),
             ),
         ]),
     ),
@@ -29,14 +29,14 @@ hellaswag_infer_cfg = dict(
 
 hellaswag_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'),
 )
 
 hellaswag_datasets = [
     dict(
         type=hellaswagDataset_V2,
-        path="hellaswag",
+        path='hellaswag',
         reader_cfg=hellaswag_reader_cfg,
         infer_cfg=hellaswag_infer_cfg,
         eval_cfg=hellaswag_eval_cfg)

@@ -16,11 +16,11 @@ summarizer = dict(
     dataset_abbrs=[
         '--------- 考试 Exam ---------',  # category
         # 'Mixed', # subcategory
-        "ceval",
+        'ceval',
         'agieval',
         'mmlu',
         'cmmlu',
-        "GaokaoBench",
+        'GaokaoBench',
         'ARC-c',
         'ARC-e',
         '--------- 语言 Language ---------',  # category
@@ -78,10 +78,10 @@ summarizer = dict(
         'openai_humaneval',
         'mbpp',
         # '综合推理', # subcategory
-        "bbh",
+        'bbh',
     ],
     summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
     prompt_db=dict(
         database_path='configs/datasets/log.json',
         config_dir='configs/datasets',

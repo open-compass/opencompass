@@ -14,8 +14,8 @@ race_infer_cfg = dict(
         template={
             ans: dict(
                 round=[
-                    dict(role="HUMAN", prompt="Article:\n{article}\nQuestion:\n{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}"),
-                    dict(role="BOT", prompt=f'Answer: {ans}'),
+                    dict(role='HUMAN', prompt='Article:\n{article}\nQuestion:\n{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}'),
+                    dict(role='BOT', prompt=f'Answer: {ans}'),
                 ]
             )
             for ans in ['A', 'B', 'C', 'D']

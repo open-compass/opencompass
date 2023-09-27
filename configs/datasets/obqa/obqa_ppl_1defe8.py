@@ -9,35 +9,35 @@ _input_columns = [
     ['question_stem', 'A', 'B', 'C', 'D', 'fact1'],
 ]
 _template = [{
-    'A': "{question_stem} {A}",
-    'B': "{question_stem} {B}",
-    'C': "{question_stem} {C}",
-    'D': "{question_stem} {D}",
+    'A': '{question_stem} {A}',
+    'B': '{question_stem} {B}',
+    'C': '{question_stem} {C}',
+    'D': '{question_stem} {D}',
 }, {
-    'A': "Given the fact {fact1}, we know that {question_stem} {A}",
-    'B': "Given the fact {fact1}, we know that {question_stem} {B}",
-    'C': "Given the fact {fact1}, we know that {question_stem} {C}",
-    'D': "Given the fact {fact1}, we know that {question_stem} {D}",
+    'A': 'Given the fact {fact1}, we know that {question_stem} {A}',
+    'B': 'Given the fact {fact1}, we know that {question_stem} {B}',
+    'C': 'Given the fact {fact1}, we know that {question_stem} {C}',
+    'D': 'Given the fact {fact1}, we know that {question_stem} {D}',
 }]
 
 obqa_datasets = [
     dict(
-        abbr="openbookqa",
+        abbr='openbookqa',
         type=OBQADataset,
-        path="openbookqa",
-        split="test",
+        path='openbookqa',
+        split='test',
     ),
     dict(
-        abbr="openbookqa_fact",
+        abbr='openbookqa_fact',
         type=OBQADataset,
-        path="openbookqa",
-        name="additional",
-        split="test",
+        path='openbookqa',
+        name='additional',
+        split='test',
     ),
 ]
 for _i in range(2):
     obqa_reader_cfg = dict(
-        input_columns=_input_columns[_i], output_column="answerKey")
+        input_columns=_input_columns[_i], output_column='answerKey')
     obqa_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -47,6 +47,6 @@ for _i in range(2):
     )
     obqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
-    obqa_datasets[_i]["reader_cfg"] = obqa_reader_cfg
-    obqa_datasets[_i]["infer_cfg"] = obqa_infer_cfg
-    obqa_datasets[_i]["eval_cfg"] = obqa_eval_cfg
+    obqa_datasets[_i]['reader_cfg'] = obqa_reader_cfg
+    obqa_datasets[_i]['infer_cfg'] = obqa_infer_cfg
+    obqa_datasets[_i]['eval_cfg'] = obqa_eval_cfg

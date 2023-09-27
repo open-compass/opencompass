@@ -28,7 +28,7 @@ LEval_tr_infer_cfg = dict(
 )
 
 LEval_tr_eval_cfg = dict(
-    evaluator=dict(type=EMEvaluator), 
+    evaluator=dict(type=EMEvaluator),
     pred_postprocessor=dict(type=general_postprocess),
     pred_role='BOT'
 )

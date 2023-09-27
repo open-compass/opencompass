@@ -36,7 +36,7 @@ humanevalx_eval_cfg_dict = {
             type=HumanevalXEvaluator,
             language=lang,
             ip_address=
-            "localhost",  # replace to your code_eval_server ip_address, port
+            'localhost',  # replace to your code_eval_server ip_address, port
             port=5000
         ),  # refer to https://github.com/Ezra-Yu/code-evaluator to launch a server
         pred_role='BOT')
