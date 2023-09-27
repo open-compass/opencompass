@@ -61,7 +61,6 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
 
     infer_cfg = dataset_cfg.get('infer_cfg')
 
-    fix_id_list = infer_cfg.inferencer.get('fix_id_list', [])
     dataset = build_dataset_from_cfg(dataset_cfg)
 
     ice_template = None
@@ -76,10 +75,7 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
     infer_cfg['retriever']['dataset'] = dataset
     retriever = ICL_RETRIEVERS.build(infer_cfg['retriever'])
 
-    if fix_id_list:
-        ice_idx_list = retriever.retrieve(fix_id_list)
-    else:
-        ice_idx_list = retriever.retrieve()
+    ice_idx_list = retriever.retrieve()
 
     assert infer_cfg.inferencer.type in [PPLInferencer, GenInferencer], \
         'Only PPLInferencer and GenInferencer are supported'

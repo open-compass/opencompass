@@ -66,8 +66,11 @@ class CLPInferencer(BaseInferencer):
             **kwargs,
         )
 
-        self.fix_id_list = fix_id_list
         # TODO: support multiple token
+        if fix_id_list:
+            raise ValueError('Passing fix_id_list to Inferencer is no longer '
+                             'allowed. Please pass it to FixKRetriever '
+                             'instead.')
         assert single_token, 'Only support single token choice currently.'
         self.single_token = single_token
 
@@ -103,10 +106,7 @@ class CLPInferencer(BaseInferencer):
             raise ValueError(err_msg)
 
         # 2. Get results of retrieval process
-        if self.fix_id_list:
-            ice_idx_list = retriever.retrieve(self.fix_id_list)
-        else:
-            ice_idx_list = retriever.retrieve()
+        ice_idx_list = retriever.retrieve()
 
         # 3. Generate in-context examples for testing inputs
         for idx in range(len(ice_idx_list)):

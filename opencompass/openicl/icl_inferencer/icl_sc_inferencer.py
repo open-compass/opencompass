@@ -69,8 +69,12 @@ class SCInferencer(BaseInferencer):
         self.gen_field_replace_token = gen_field_replace_token
         self.generation_kwargs = generation_kwargs
         self.max_out_len = max_out_len
-        self.fix_id_list = fix_id_list
         self.sc_size = sc_size
+
+        if fix_id_list:
+            raise ValueError('Passing fix_id_list to Inferencer is no longer '
+                             'allowed. Please pass it to FixKRetriever '
+                             'instead.')
 
         if self.model.is_api and save_every is None:
             save_every = 1
@@ -91,10 +95,7 @@ class SCInferencer(BaseInferencer):
             output_json_filename = self.output_json_filename
 
         # 2. Get results of retrieval process
-        if 'Fix' in retriever.__class__.__name__:
-            ice_idx_list = retriever.retrieve(self.fix_id_list)
-        else:
-            ice_idx_list = retriever.retrieve()
+        ice_idx_list = retriever.retrieve()
 
         # 3. Generate prompts for testing input
         prompt_list = self.get_generation_prompt_list_from_retriever_indices(
