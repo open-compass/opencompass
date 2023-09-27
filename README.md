@@ -34,9 +34,10 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.09.26\]** We update the leaderboard with [Qwen](https://github.com/QwenLM/Qwen), one of the best-performing open-source models currently available, welcome to our [homepage](https://opencompass.org.cn) for more details. 🔥🔥🔥.
 - **\[2023.09.20\]** We update the leaderboard with [InternLM-20B](https://github.com/InternLM/InternLM), welcome to our [homepage](https://opencompass.org.cn) for more details. 🔥🔥🔥.
-- **\[2023.09.19\]** We update the leaderboard with WeMix-LLaMA2-70B/Phi-1.5-1.3B, welcome to our [homepage](https://opencompass.org.cn) for more details. 🔥🔥🔥.
-- **\[2023.09.18\]** We have released [long context evaluation guidance](docs/en/advanced_guides/longeval.md). 🔥🔥🔥.
+- **\[2023.09.19\]** We update the leaderboard with WeMix-LLaMA2-70B/Phi-1.5-1.3B, welcome to our [homepage](https://opencompass.org.cn) for more details.
+- **\[2023.09.18\]** We have released [long context evaluation guidance](docs/en/advanced_guides/longeval.md).
 - **\[2023.09.08\]** We update the leaderboard with Baichuan-2/Tigerbot-2/Vicuna-v1.5, welcome to our [homepage](https://opencompass.org.cn) for more details.
 - **\[2023.09.06\]**  [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) team adpots OpenCompass to evaluate their models systematically. We deeply appreciate the community's dedication to transparency and reproducibility in LLM evaluation.
 - **\[2023.09.02\]** We have supported the evaluation of [Qwen-VL](https://github.com/QwenLM/Qwen-VL) in OpenCompass.
@@ -51,7 +52,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 OpenCompass is a one-stop platform for large model evaluation, aiming to provide a fair, open, and reproducible benchmark for large model evaluation. Its main features includes:
 
-- **Comprehensive support for models and datasets**: Pre-support for 20+ HuggingFace and API models, a model evaluation scheme of 50+ datasets with about 300,000 questions, comprehensively evaluating the capabilities of the models in five dimensions.
+- **Comprehensive support for models and datasets**: Pre-support for 20+ HuggingFace and API models, a model evaluation scheme of 70+ datasets with about 400,000 questions, comprehensively evaluating the capabilities of the models in five dimensions.
 
 - **Efficient distributed evaluation**: One line command to implement task division and distributed evaluation, completing the full evaluation of billion-scale models in just a few hours.
 
@@ -66,247 +67,6 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
-
-## 📖 Dataset Support
-
-<table align="center">
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>Language</b>
-      </td>
-      <td>
-        <b>Knowledge</b>
-      </td>
-      <td>
-        <b>Reasoning</b>
-      </td>
-      <td>
-        <b>Comprehensive Examination</b>
-      </td>
-      <td>
-        <b>Understanding</b>
-      </td>
-    </tr>
-    <tr valign="top">
-      <td>
-<details open>
-<summary><b>Word Definition</b></summary>
-
-- WiC
-- SummEdits
-
-</details>
-
-<details open>
-<summary><b>Idiom Learning</b></summary>
-
-- CHID
-
-</details>
-
-<details open>
-<summary><b>Semantic Similarity</b></summary>
-
-- AFQMC
-- BUSTM
-
-</details>
-
-<details open>
-<summary><b>Coreference Resolution</b></summary>
-
-- CLUEWSC
-- WSC
-- WinoGrande
-
-</details>
-
-<details open>
-<summary><b>Translation</b></summary>
-
-- Flores
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Knowledge Question Answering</b></summary>
-
-- BoolQ
-- CommonSenseQA
-- NaturalQuestion
-- TrivialQA
-
-</details>
-
-<details open>
-<summary><b>Multi-language Question Answering</b></summary>
-
-- TyDi-QA
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Textual Entailment</b></summary>
-
-- CMNLI
-- OCNLI
-- OCNLI_FC
-- AX-b
-- AX-g
-- CB
-- RTE
-
-</details>
-
-<details open>
-<summary><b>Commonsense Reasoning</b></summary>
-
-- StoryCloze
-- StoryCloze-CN (coming soon)
-- COPA
-- ReCoRD
-- HellaSwag
-- PIQA
-- SIQA
-
-</details>
-
-<details open>
-<summary><b>Mathematical Reasoning</b></summary>
-
-- MATH
-- GSM8K
-
-</details>
-
-<details open>
-<summary><b>Theorem Application</b></summary>
-
-- TheoremQA
-
-</details>
-
-<details open>
-<summary><b>Code</b></summary>
-
-- HumanEval
-- MBPP
-
-</details>
-
-<details open>
-<summary><b>Comprehensive Reasoning</b></summary>
-
-- BBH
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Junior High, High School, University, Professional Examinations</b></summary>
-
-- GAOKAO-2023
-- CEval
-- AGIEval
-- MMLU
-- GAOKAO-Bench
-- CMMLU
-- ARC
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Reading Comprehension</b></summary>
-
-- C3
-- CMRC
-- DRCD
-- MultiRC
-- RACE
-
-</details>
-
-<details open>
-<summary><b>Content Summary</b></summary>
-
-- CSL
-- LCSTS
-- XSum
-
-</details>
-
-<details open>
-<summary><b>Content Analysis</b></summary>
-
-- EPRSTMT
-- LAMBADA
-- TNEWS
-
-</details>
-      </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-</table>
-
-<p align="right"><a href="#top">🔝Back to top</a></p>
-
-## 📖 Model Support
-
-<table align="center">
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>Open-source Models</b>
-      </td>
-      <td>
-        <b>API Models</b>
-      </td>
-      <!-- <td>
-        <b>Custom Models</b>
-      </td> -->
-    </tr>
-    <tr valign="top">
-      <td>
-
-- InternLM
-- LLaMA
-- Vicuna
-- Alpaca
-- Baichuan
-- WizardLM
-- ChatGLM-6B
-- ChatGLM2-6B
-- MPT
-- Falcon
-- TigerBot
-- MOSS
-- ...
-
-</td>
-<td>
-
-- OpenAI
-- Claude (coming soon)
-- PaLM (coming soon)
-- ……
-
-</td>
-
-<!--
-- GLM
-- ...
-
-</td> -->
-
-</tr>
-  </tbody>
-</table>
 
 ## 🛠️ Installation
 
@@ -359,6 +119,316 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 ```
 
 Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
+## 📖 Dataset Support
+
+<table align="center">
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>Language</b>
+      </td>
+      <td>
+        <b>Knowledge</b>
+      </td>
+      <td>
+        <b>Reasoning</b>
+      </td>
+      <td>
+        <b>Examination</b>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>
+<details open>
+<summary><b>Word Definition</b></summary>
+
+- WiC
+- SummEdits
+
+</details>
+
+<details open>
+<summary><b>Idiom Learning</b></summary>
+
+- CHID
+
+</details>
+
+<details open>
+<summary><b>Semantic Similarity</b></summary>
+
+- AFQMC
+- BUSTM
+
+</details>
+
+<details open>
+<summary><b>Coreference Resolution</b></summary>
+
+- CLUEWSC
+- WSC
+- WinoGrande
+
+</details>
+
+<details open>
+<summary><b>Translation</b></summary>
+
+- Flores
+- IWSLT2017
+
+</details>
+
+<details open>
+<summary><b>Multi-language Question Answering</b></summary>
+
+- TyDi-QA
+- XCOPA
+
+</details>
+
+<details open>
+<summary><b>Multi-language Summary</b></summary>
+
+- XLSum
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>Knowledge Question Answering</b></summary>
+
+- BoolQ
+- CommonSenseQA
+- NaturalQuestions
+- TriviaQA
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>Textual Entailment</b></summary>
+
+- CMNLI
+- OCNLI
+- OCNLI_FC
+- AX-b
+- AX-g
+- CB
+- RTE
+- ANLI
+
+</details>
+
+<details open>
+<summary><b>Commonsense Reasoning</b></summary>
+
+- StoryCloze
+- COPA
+- ReCoRD
+- HellaSwag
+- PIQA
+- SIQA
+
+</details>
+
+<details open>
+<summary><b>Mathematical Reasoning</b></summary>
+
+- MATH
+- GSM8K
+
+</details>
+
+<details open>
+<summary><b>Theorem Application</b></summary>
+
+- TheoremQA
+- StrategyQA
+- SciBench
+
+</details>
+
+<details open>
+<summary><b>Comprehensive Reasoning</b></summary>
+
+- BBH
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>Junior High, High School, University, Professional Examinations</b></summary>
+
+- C-Eval
+- AGIEval
+- MMLU
+- GAOKAO-Bench
+- CMMLU
+- ARC
+- Xiezhi
+
+</details>
+
+<details open>
+<summary><b>Medical Examinations</b></summary>
+
+- CMB
+
+</details>
+      </td>
+    </tr>
+</td>
+    </tr>
+  </tbody>
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>Understanding</b>
+      </td>
+      <td>
+        <b>Long Context</b>
+      </td>
+      <td>
+        <b>Safety</b>
+      </td>
+      <td>
+        <b>Code</b>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td>
+<details open>
+<summary><b>Reading Comprehension</b></summary>
+
+- C3
+- CMRC
+- DRCD
+- MultiRC
+- RACE
+- DROP
+- OpenBookQA
+- SQuAD2.0
+
+</details>
+
+<details open>
+<summary><b>Content Summary</b></summary>
+
+- CSL
+- LCSTS
+- XSum
+- SummScreen
+
+</details>
+
+<details open>
+<summary><b>Content Analysis</b></summary>
+
+- EPRSTMT
+- LAMBADA
+- TNEWS
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>Long Context Understanding</b></summary>
+
+- LEval
+- LongBench
+- GovReports
+- NarrativeQA
+- Qasper
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>Safety</b></summary>
+
+- CivilComments
+- CrowsPairs
+- CValues
+- JigsawMultilingual
+- TruthfulQA
+
+</details>
+<details open>
+<summary><b>Robustness</b></summary>
+
+- AdvGLUE
+
+</details>
+      </td>
+      <td>
+<details open>
+<summary><b>Code</b></summary>
+
+- HumanEval
+- HumanEvalX
+- MBPP
+- APPs
+- DS1000
+
+</details>
+      </td>
+    </tr>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
+## 📖 Model Support
+
+<table align="center">
+  <tbody>
+    <tr align="center" valign="bottom">
+      <td>
+        <b>Open-source Models</b>
+      </td>
+      <td>
+        <b>API Models</b>
+      </td>
+      <!-- <td>
+        <b>Custom Models</b>
+      </td> -->
+    </tr>
+    <tr valign="top">
+      <td>
+
+- InternLM
+- LLaMA
+- Vicuna
+- Alpaca
+- Baichuan
+- WizardLM
+- ChatGLM2
+- Falcon
+- TigerBot
+- Qwen
+- ...
+
+</td>
+<td>
+
+- OpenAI
+- Claude
+- PaLM (coming soon)
+- ……
+
+</td>
+
+</tr>
+  </tbody>
+</table>
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
 
 ## 🔜 Roadmap
 
