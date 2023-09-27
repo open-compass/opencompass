@@ -13,19 +13,20 @@ summarizer = dict(
         '--------- LongBench Summarization ---------', # category
         'LongBench_gov_report',
         'LongBench_qmsum',
+        'LongBench_multi_news',
         'LongBench_vcsum',
         '--------- LongBench Few-shot Learning ---------', # category
         'LongBench_trec',
-        'LongBench_nq',
         'LongBench_triviaqa',
+        'LongBench_samsum',
         'LongBench_lsht',
+        '--------- LongBench Synthetic Tasks ---------', # category
+        'LongBench_passage_count',
+        'LongBench_passage_retrieval_en',
+        'LongBench_passage_retrieval_zh',
         '--------- LongBench Code Completion ---------', # category
         'LongBench_lcc',
         'LongBench_repobench-p',
-        '--------- LongBench Synthetic Tasks ---------', # category
-        'LongBench_passage_retrieval_en',
-        'LongBench_passage_count',
-        'LongBench_passage_retrieval_zh',
     ],
     summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
     prompt_db=dict(

@@ -4,6 +4,7 @@ from typing import List
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
 from opencompass.utils.prompt import PromptList
+from opencompass.utils.text_postprocessors import general_postprocess
 
 
 @ICL_EVALUATORS.register_module()
@@ -106,4 +107,33 @@ class LEvalGPTEvaluator(BaseEvaluator):
                     num_samples += 2
 
         score = score / (num_samples - bad_case) * 100
+        return {'score': score}
+
+
+@ICL_EVALUATORS.register_module()
+class LEvalEMEvaluator(BaseEvaluator):
+    """Exact match evaluator."""
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def score(self, predictions, references):
+        if len(predictions) != len(references):
+            return {
+                'error': 'predictions and references have different '
+                'length'
+            }
+        predictions = [
+            general_postprocess(prediction) for prediction in predictions
+        ]
+        processed_answers = [general_postprocess(i) for i in references]
+
+        cnt = 0
+        for pred, ans, origin_ans in zip(predictions, processed_answers,
+                                         references):
+            if ans in pred or origin_ans in pred:
+                cnt += 1
+
+        score = cnt / len(predictions) * 100
+
         return {'score': score}

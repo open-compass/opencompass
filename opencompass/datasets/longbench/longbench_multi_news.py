@@ -6,7 +6,7 @@ from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class LongBenchnqDataset(BaseDataset):
+class LongBenchmulti_newsDataset(BaseDataset):
 
     @staticmethod
     def load(**kwargs):
@@ -14,13 +14,8 @@ class LongBenchnqDataset(BaseDataset):
         split = 'test'
         raw_data = []
         for i in range(len(dataset[split])):
-            question = dataset[split]['input'][i]
             context = dataset[split]['context'][i]
             answers = dataset[split]['answers'][i]
-            raw_data.append({
-                'input': question,
-                'context': context,
-                'answers': answers
-            })
+            raw_data.append({'context': context, 'answers': answers})
         dataset[split] = Dataset.from_list(raw_data)
         return dataset

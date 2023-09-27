@@ -1,3 +1,4 @@
+from .evaluators import LEvalEMEvaluator  # noqa: F401, F403
 from .evaluators import LEvalGPTEvaluator  # noqa: F401, F403
 from .leval_coursera import *  # noqa: F401, F403
 from .leval_financial_qa import *  # noqa: F401, F403
