@@ -51,7 +51,6 @@ class GenInferencer(BaseInferencer):
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
             save_every: Optional[int] = None,
-            fix_id_list: Optional[List[int]] = None,
             **kwargs) -> None:
         super().__init__(
             model=model,
@@ -64,11 +63,6 @@ class GenInferencer(BaseInferencer):
 
         self.gen_field_replace_token = gen_field_replace_token
         self.max_out_len = max_out_len
-
-        if fix_id_list:
-            raise ValueError('Passing fix_id_list to Inferencer is no longer '
-                             'allowed. Please pass it to FixKRetriever '
-                             'instead.')
 
         if self.model.is_api and save_every is None:
             save_every = 1

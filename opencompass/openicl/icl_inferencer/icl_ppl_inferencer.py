@@ -41,7 +41,6 @@ class PPLInferencer(BaseInferencer):
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
             labels: Optional[List] = None,
-            fix_id_list: Optional[List[int]] = None,
             **kwargs) -> None:
         super().__init__(
             model=model,
@@ -53,11 +52,6 @@ class PPLInferencer(BaseInferencer):
         )
 
         self.labels = labels
-
-        if fix_id_list:
-            raise ValueError('Passing fix_id_list to Inferencer is no longer '
-                             'allowed. Please pass it to FixKRetriever '
-                             'instead.')
 
     def inference(self,
                   retriever: BaseRetriever,

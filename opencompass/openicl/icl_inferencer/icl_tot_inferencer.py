@@ -46,7 +46,6 @@ class ToTInferencer(GenInferencer):
             `save_every` epochs.
         generation_kwargs (:obj:`Dict`, optional): Parameters for the
             :obj:`model.generate()` method.
-        fix_id_list (:obj:`List[int]`, optional): List of indices to fix
         naive_run (:obj:`bool`): if True, run naive IO/CoT sampling instead of
             ToT + BFS.
         prompt_wrapper (:obj:`dict`): wrapper for prompts
@@ -76,7 +75,6 @@ class ToTInferencer(GenInferencer):
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
             save_every: Optional[int] = None,
-            fix_id_list: Optional[List[int]] = None,
             naive_run: bool = False,
             prompt_wrapper: dict = {},
             prompt_sample: str = 'standard',
@@ -97,7 +95,6 @@ class ToTInferencer(GenInferencer):
             output_json_filename=output_json_filename,
             output_json_filepath=output_json_filepath,
             save_every=save_every,
-            fix_id_list=fix_id_list,
             sc_size=n_evaluate_sample,
             **kwargs,
         )

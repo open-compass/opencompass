@@ -54,7 +54,6 @@ class CLPInferencer(BaseInferencer):
             batch_size: Optional[int] = 1,
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
-            fix_id_list: Optional[List[int]] = None,
             single_token: bool = True,
             **kwargs) -> None:
         super().__init__(
@@ -67,10 +66,6 @@ class CLPInferencer(BaseInferencer):
         )
 
         # TODO: support multiple token
-        if fix_id_list:
-            raise ValueError('Passing fix_id_list to Inferencer is no longer '
-                             'allowed. Please pass it to FixKRetriever '
-                             'instead.')
         assert single_token, 'Only support single token choice currently.'
         self.single_token = single_token
 
