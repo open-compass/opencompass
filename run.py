@@ -295,7 +295,7 @@ def main():
             fill_eval_cfg(cfg, args)
 
         if args.partition is not None:
-            if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
+            if RUNNERS.get(cfg.eval.runner.type) == SlurmRunner:
                 cfg.eval.runner.partition = args.partition
                 cfg.eval.runner.quotatype = args.quotatype
             else:
