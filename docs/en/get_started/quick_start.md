@@ -8,7 +8,7 @@ OpenCompass provides a streamlined workflow for evaluating a model, which consis
 
 **Configure**: This is your starting point. Here, you'll set up the entire evaluation process, choosing the model(s) and dataset(s) to assess. You also have the option to select an evaluation strategy, the computation backend, and define how you'd like the results displayed.
 
-**Inference & Evaluation**: OpenCompass efficiently manages the heavy lifting, conducting parallel inference and evaluation on your chosen model(s) and dataset(s). The **Inference** phase is all about producing outputs from your datasets, whereas the **Evaluation** phase measures how well these outputs align with the gold standard answers. While this procedure is broken down into multiple "tasks" that run concurrently for greater efficiency, be aware that limited computational resources might introduce some overheads. For a deeper understanding, you can refer to our [FAQ: Efficiency](faq.md#efficiency).
+**Inference & Evaluation**: OpenCompass efficiently manages the heavy lifting, conducting parallel inference and evaluation on your chosen model(s) and dataset(s). The **Inference** phase is all about producing outputs from your datasets, whereas the **Evaluation** phase measures how well these outputs align with the gold standard answers. While this procedure is broken down into multiple "tasks" that run concurrently for greater efficiency, be aware that working with limited computational resources might introduce some unexpected overheads, and resulting in generally slower evaluation. To understand this issue and know how to solve it, check out [FAQ: Efficiency](faq.md#efficiency).
 
 **Visualization**: Once the evaluation is done, OpenCompass collates the results into an easy-to-read table and saves them as both CSV and TXT files. If you need real-time updates, you can activate lark reporting and get immediate status reports in your Lark clients.
 
@@ -143,7 +143,7 @@ python run.py configs/eval_demo.py
 :::{dropdown} More about `models`
 :animate: fade-in-slide-down
 
-OpenCompass provides a series of pre-defined model configurations under `configs/models`. Below is the configuration snippet related to [opt-350m](/configs/models/hf_opt_350m.py) (`configs/models/hf_opt_350m.py`):
+OpenCompass provides a series of pre-defined model configurations under `configs/models`. Below is the configuration snippet related to [opt-350m](https://github.com/open-compass/opencompass/blob/main/configs/models/opt/hf_opt_350m.py) (`configs/models/opt/hf_opt_350m.py`):
 
 ```python
 # Evaluate models supported by HuggingFace's `AutoModelForCausalLM` using `HuggingFaceCausalLM`
@@ -267,29 +267,6 @@ The entry also supports submitting tasks to Alibaba Deep Learning Center (DLC), 
 ```
 
 :::
-
-<!-- ## Explanations
-
-### Model list - `models`
-
-When using configurations, we can specify the relevant files through the command-line argument ` --models` or import the model configurations into the  `models` list in the configuration file using the inheritance mechanism.
-
-If the HuggingFace model you want to test is not among them, you can also directly specify the related parameters in the command line.
-
- -->
-
-<!-- When the config file is ready, we can start the task in **debug mode** to check for any exceptions in model loading, dataset reading, or incorrect cache usage.
-
-```shell
-python run.py configs/eval_demo.py -w outputs/demo --debug
-```
-
-However, in `--debug` mode, tasks are executed sequentially. After confirming that everything is correct, you
-can disable the `--debug` mode to fully utilize multiple GPUs.
-
-```shell
-python run.py configs/eval_demo.py -w outputs/demo
-``` -->
 
 ## Visualizing Evaluation Results
 
