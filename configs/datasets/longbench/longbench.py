@@ -7,7 +7,6 @@ with read_base():
     from .longbenchmultifieldqa_en.longbench_multifieldqa_en_gen import LongBench_multifieldqa_en_datasets
     from .longbenchmultifieldqa_zh.longbench_multifieldqa_zh_gen import LongBench_multifieldqa_zh_datasets
     from .longbenchnarrativeqa.longbench_narrativeqa_gen import LongBench_narrativeqa_datasets
-    from .longbenchnq.longbench_nq_gen import LongBench_nq_datasets
     from .longbenchqasper.longbench_qasper_gen import LongBench_qasper_datasets
     from .longbenchtriviaqa.longbench_triviaqa_gen import LongBench_triviaqa_datasets
     from .longbenchgov_report.longbench_gov_report_gen import LongBench_gov_report_datasets
@@ -21,5 +20,7 @@ with read_base():
     from .longbenchpassage_count.longbench_passage_count_gen import LongBench_passage_count_datasets
     from .longbenchtrec.longbench_trec_gen import LongBench_trec_datasets
     from .longbenchlsht.longbench_lsht_gen import LongBench_lsht_datasets
+    from .longbenchmulti_news.longbench_multi_news_gen import LongBench_multi_news_datasets
+    from .longbenchsamsum.longbench_samsum_gen import LongBench_samsum_datasets
     
 longbench_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

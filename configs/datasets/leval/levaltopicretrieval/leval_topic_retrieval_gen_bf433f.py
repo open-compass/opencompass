@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import EMEvaluator, RougeEvaluator, SquadEvaluator, AccEvaluator
-from opencompass.datasets.leval import LEvalTopicRetrievalDataset
+from opencompass.datasets.leval import LEvalTopicRetrievalDataset, LEvalEMEvaluator
 from opencompass.utils.text_postprocessors import first_capital_postprocess, first_capital_postprocess_multi, general_postprocess
 
 LEval_tr_reader_cfg = dict(
@@ -28,7 +28,7 @@ LEval_tr_infer_cfg = dict(
 )
 
 LEval_tr_eval_cfg = dict(
-    evaluator=dict(type=EMEvaluator), 
+    evaluator=dict(type=LEvalEMEvaluator), 
     pred_postprocessor=dict(type=general_postprocess),
     pred_role='BOT'
 )

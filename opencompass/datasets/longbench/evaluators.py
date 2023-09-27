@@ -189,10 +189,10 @@ class LongBenchRougeEvaluator(BaseEvaluator):
                         list(jieba.cut(reference, cut_all=False)))
 
                 rouge = Rouge()
-                if prediction != '':
+                try:
                     cur_score = rouge.get_scores([prediction], [reference],
                                                  avg=True)['rouge-l']['f']
-                else:
+                except Exception:
                     cur_score = 0.
                 task_score = max(task_score, cur_score)
 

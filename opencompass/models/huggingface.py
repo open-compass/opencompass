@@ -42,6 +42,9 @@ class HuggingFace(BaseModel):
             without batch padding.
         pad_token_id (int): The id of the padding token. Defaults to None. Use
             (#vocab + pad_token_id) if get negative value.
+        mode (str, optional): The method of input truncation when input length
+            exceeds max_seq_len. 'mid' represents the part of input to
+            truncate. Defaults to 'none'.
 
     Note:
         About ``extract_pred_after_decode``: Commonly, we should extract the
@@ -62,7 +65,8 @@ class HuggingFace(BaseModel):
                  meta_template: Optional[Dict] = None,
                  extract_pred_after_decode: bool = False,
                  batch_padding: bool = False,
-                 pad_token_id: Optional[int] = None):
+                 pad_token_id: Optional[int] = None,
+                 mode: str = 'none'):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          tokenizer_only=tokenizer_only,
@@ -73,6 +77,8 @@ class HuggingFace(BaseModel):
         patch_hf_auto_model(hf_cache_dir)
         self.logger = get_logger()
         self.pad_token_id = pad_token_id
+        assert mode in ['none', 'mid']
+        self.mode = mode
         self._load_tokenizer(path=path,
                              tokenizer_path=tokenizer_path,
                              tokenizer_kwargs=tokenizer_kwargs)
@@ -227,6 +233,18 @@ class HuggingFace(BaseModel):
         """
         if self.extract_pred_after_decode:
             prompt_lens = [len(input_) for input_ in inputs]
+
+        if self.mode == 'mid':
+            input_ids = self.tokenizer(inputs, truncation=False)['input_ids']
+            input_ids = torch.tensor(input_ids, device=self.model.device)
+            if len(input_ids[0]) > self.max_seq_len - max_out_len:
+                half = int((self.max_seq_len - max_out_len) / 2)
+                inputs = [
+                    self.tokenizer.decode(input_ids[0][:half],
+                                          skip_special_tokens=True) +
+                    self.tokenizer.decode(input_ids[0][-half:],
+                                          skip_special_tokens=True)
+                ]
 
         input_ids = self.tokenizer(inputs,
                                    truncation=True,
