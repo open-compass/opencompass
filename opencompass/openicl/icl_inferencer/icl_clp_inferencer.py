@@ -197,7 +197,14 @@ class CLPInferencer(BaseInferencer):
                 sub_target_pos = target_pos[idx:idx + self.batch_size]
 
                 # get probability result
-                if self.model.batch_padding and self.batch_size > 1:
+                if hasattr(self.model, 'batch_padding'):
+                    # get batch padding for huggingface model
+                    batch_padding = self.model.batch_padding
+                else:
+                    # defaults to True for internal model
+                    batch_padding = True
+
+                if batch_padding and self.batch_size > 1:
                     sub_res = self._get_cond_prob(sub_prompt_list,
                                                   sub_target_pos, choice_ids)
                 else:
