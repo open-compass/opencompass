@@ -8,7 +8,7 @@
 
 **配置**：这是整个工作流的起点。您需要配置整个评估过程，选择要评估的模型和数据集。此外，还可以选择评估策略、计算后端等，并定义显示结果的方式。
 
-**推理与评估**：在这个阶段，OpenCompass 将会开始对模型和数据集进行并行推理和评估。**推理**阶段主要是让模型从数据集产生输出，而**评估**阶段则是衡量这些输出与标准答案的匹配程度。这两个过程会被拆分为多个同时运行的“任务”以提高效率，但请注意，如果计算资源有限，这种策略可能会使评测变得更慢。如果需要了解该问题及解决方案，可以参考 [FAQ: 效率](faq.md#efficiency)。
+**推理与评估**：在这个阶段，OpenCompass 将会开始对模型和数据集进行并行推理和评估。**推理**阶段主要是让模型从数据集产生输出，而**评估**阶段则是衡量这些输出与标准答案的匹配程度。这两个过程会被拆分为多个同时运行的“任务”以提高效率，但请注意，如果计算资源有限，这种策略可能会使评测变得更慢。如果需要了解该问题及解决方案，可以参考 [FAQ: 效率](faq.md#效率)。
 
 **可视化**：评估完成后，OpenCompass 将结果整理成易读的表格，并将其保存为 CSV 和 TXT 文件。你也可以激活飞书状态上报功能，此后可以在飞书客户端中及时获得评测状态报告。
 
@@ -91,7 +91,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 请注意，通过这种方式，OpenCompass 一次只评估一个模型，而其他方式可以一次评估多个模型。
 
 ```{caution}
-`--num-gpus` 不代表实际用于评估的 GPU 数量，而是该模型所需的最少 GPU 数量。[更多](faq.md#how-does-opencompass-allocate-gpus)
+`--num-gpus` 不代表实际用于评估的 GPU 数量，而是该模型所需的最少 GPU 数量。[更多](faq.md#opencompass-如何分配-gpu)
 ```
 
 
@@ -110,7 +110,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 --num-gpus 1  # 运行模型所需的 GPU 数量
 ```
 ```{seealso}
-有关 `run.py` 支持的所有与 HuggingFace 相关的参数，请阅读 [启动评估任务](../user_guides/experimentation.md#launching-an-evaluation-task)。
+有关 `run.py` 支持的所有与 HuggingFace 相关的参数，请阅读 [评测任务发起](../user_guides/experimentation.md#评测任务发起)
 ```
 :::
 
@@ -120,7 +120,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 
 除了通过命令行配置实验外，OpenCompass 还允许用户在配置文件中编写实验的完整配置，并通过 `run.py` 直接运行它。配置文件是以 Python 格式组织的，并且必须包括 `datasets` 和 `models` 字段。
 
-本次测试配置在 [configs/eval_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_demo.py) 中。此配置通过 [继承机制](../user_guides/config.md#inheritance-mechanism) 引入所需的数据集和模型配置，并以所需格式组合 `datasets` 和 `models` 字段。
+本次测试配置在 [configs/eval_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_demo.py) 中。此配置通过 [继承机制](../user_guides/config.md#继承机制) 引入所需的数据集和模型配置，并以所需格式组合 `datasets` 和 `models` 字段。
 
 ```python
 from mmengine.config import read_base
@@ -205,7 +205,7 @@ python run.py --models hf_llama_7b --datasets base_medium
 ```
 
 ```{seealso}
-您可以从 [数据集准备](../user_guides/dataset_prepare.md) 中找到更多信息。
+您可以从 [配置数据集](../user_guides/datasets.md) 中找到更多信息。
 ```
 :::
 
@@ -214,9 +214,7 @@ python run.py --models hf_llama_7b --datasets base_medium
 `````
 
 ```{warning}
-OpenCompass 通常假定网络是可用的。如果您遇到网络问题或希望在离线环境中运行 OpenCompass，请参阅 [FAQ - 网络 - Q1
-
-](./faq.md#network) 寻求解决方案。
+OpenCompass 通常假定运行环境网络是可用的。如果您遇到网络问题或希望在离线环境中运行 OpenCompass，请参阅 [FAQ - 网络 - Q1](./faq.md#网络) 寻求解决方案。
 ```
 
 接下来的部分将使用基于配置的方法作为示例来解释其他特征。
@@ -255,7 +253,7 @@ python run.py configs/eval_demo.py -w outputs/demo
   - infer：在每个数据集上执行推理。
   - eval：根据推理结果进行评估。
   - viz：仅显示评估结果。
-- `--max-partition-size 2000`：数据集分片大小。一些数据集可能很大，使用此参数可以将它们分成多个子任务以有效利用资源。但是，如果分片过细，由于模型加载时间较长，整体速度可能会变慢。
+- `--max-partition-size 40000`：数据集分片大小。一些数据集可能很大，使用此参数可以将它们分成多个子任务以有效利用资源。但是，如果分片过细，由于模型加载时间较长，整体速度可能会变慢。
 - `--max-num-workers 32`：并行任务的最大数量。在如 Slurm 之类的分布式环境中，此参数指定提交任务的最大数量。在本地环境中，它指定同时执行的任务的最大数量。请注意，实际的并行任务数量取决于可用的 GPU 资源，可能不等于这个数字。
 
 如果您不是在本地机器上执行评估，而是使用 Slurm 集群，您可以指定以下参数：
@@ -265,7 +263,7 @@ python run.py configs/eval_demo.py -w outputs/demo
 - `--retry 2`：失败任务的重试次数。
 
 ```{seealso}
-入口还支持将任务提交到阿里巴巴深度学习中心（DLC），以及更多自定义评估策略。请参考 [启动评估任务](../user_guides/experimentation.md#launching-an-evaluation-task) 了解详情。
+入口还支持将任务提交到阿里巴巴深度学习中心（DLC），以及更多自定义评估策略。请参考 [评测任务发起](../user_guides/experimentation.md#评测任务发起) 了解详情。
 ```
 
 :::
@@ -299,15 +297,15 @@ outputs/default/
 
 打印评测结果的过程可被进一步定制化，用于输出一些数据集的平均分 (例如 MMLU, C-Eval 等)。
 
-关于评测结果输出的更多介绍可阅读 [结果展示](./user_guides/summarizer.md)。
+关于评测结果输出的更多介绍可阅读 [结果展示](../user_guides/summarizer.md)。
 
 ## 更多教程
 
 想要更多了解 OpenCompass, 可以点击下列链接学习。
 
-- [数据集配置](./user_guides/dataset_prepare.md)
-- [准备模型](./user_guides/models.md)
-- [任务运行和监控](./user_guides/experimentation.md)
-- [如何调Prompt](./prompt/overview.md)
-- [结果展示](./user_guides/summarizer.md)
-- [学习配置文件](./user_guides/config.md)
+- [配置数据集](../user_guides/datasets.md)
+- [准备模型](../user_guides/models.md)
+- [任务运行和监控](../user_guides/experimentation.md)
+- [如何调Prompt](../prompt/overview.md)
+- [结果展示](../user_guides/summarizer.md)
+- [学习配置文件](../user_guides/config.md)
