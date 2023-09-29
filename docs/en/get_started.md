@@ -55,6 +55,47 @@
 
    </details>
 
+5. Install InternLM (Optional)
+
+   If you need to run the native InternLM model (non-Huggingface version), you can follow the provided example and proceed with the following steps.
+
+   <details>
+   <summary><b>click to show the details</b></summary>
+
+   Install InternLM-Lite. Install this library in your root directory
+
+   ```bash
+   git clone https://gitlab.pjlab.org.cn/chenkeyu1/internlm-lite.git
+   pip install -e internlm-lite
+   ```
+
+   (For specific installation dependencies of **internlm-lite**, please refer to the library tutorial)
+   Download the model weights for the current open-source version of InternLM, which is InternLM-7b, from the following URL: [Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b)
+
+   ```bash
+   cd internlm-lite/data/internlm_7b
+   wegt https://download.openxlab.org.cn/models/OpenLMLab/InternLM-7b/weight/model_tp0_pp0.pt
+   ```
+
+   Here, you need to provide three types of files:
+
+   - Model weights
+   - Model configuration
+   - **Tokenizer**
+
+   The complete configuration is as follows:
+
+   ```bash
+   dict(
+        type=InternLM,
+        path="./internlm-lite/data/internlm_7b/",
+        tokenizer_path='./internlm-lite/data/internlm_7b/V7.model',
+        model_config="./internlm-lite/data/internlm_7b/model_config.py",
+        max_out_len=100,max_seq_len=2048,batch_size=16,run_cfg=dict(num_gpus=1, num_procs=1))
+   ```
+
+   </details>
+
 # Dataset Preparation
 
 The datasets supported by OpenCompass mainly include two parts:

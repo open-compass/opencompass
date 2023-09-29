@@ -55,6 +55,47 @@
 
    </details>
 
+5. 安装 InternLM（可选）：
+
+   如果需要运行原生 **InternLM** 模型（非 Huggingface 版），可以按照我们提供的样例并遵循如下步骤。
+
+   <details>
+   <summary><b>点击查看详细</b></summary>
+
+   安装InternLM-Lite。在你的根目录下安装该库
+
+   ```bash
+   git clone https://gitlab.pjlab.org.cn/chenkeyu1/internlm-lite.git
+   pip install -e internlm-lite
+   ```
+
+   (**internlm-lite**具体依赖安装请查看该库教程)
+   下载模型权重。目前开源的模型权重为InternLM-7b，网址：[Models-OpenXLab](https://openxlab.org.cn/models/detail/OpenLMLab/InternLM-7b)，下载代码为
+
+   ```bash
+   cd internlm-lite/data/internlm_7b
+   wegt https://download.openxlab.org.cn/models/OpenLMLab/InternLM-7b/weight/model_tp0_pp0.pt
+   ```
+
+   这里，你需要提供三种文件:
+
+   - 模型权重
+   - 模型配置
+   - **Tokenizer**
+
+   完整的config配置如下：
+
+   ```bash
+   dict(
+        type=InternLM,
+        path="./internlm-lite/data/internlm_7b/",
+        tokenizer_path='./internlm-lite/data/internlm_7b/V7.model',
+        model_config="./internlm-lite/data/internlm_7b/model_config.py",
+        max_out_len=100,max_seq_len=2048,batch_size=16,run_cfg=dict(num_gpus=1, num_procs=1))
+   ```
+
+   </details>
+
 # 数据集准备
 
 OpenCompass 支持的数据集主要包括两个部分：
