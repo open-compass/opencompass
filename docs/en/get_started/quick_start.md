@@ -204,7 +204,7 @@ python run.py --models hf_llama_7b --datasets base_medium
 ```
 
 ```{seealso}
-You can find more information from [Dataset Preparation](../user_guides/dataset_prepare.md).
+You can find more information from [Dataset Preparation](../user_guides/datasets.md).
 ```
 :::
 
@@ -303,9 +303,9 @@ More information about obtaining evaluation results can be found in [Results Sum
 
 To learn more about using OpenCompass, explore the following tutorials:
 
-- [Prepare Datasets](./user_guides/dataset_prepare.md)
-- [Prepare Models](./user_guides/models.md)
-- [Task Execution and Monitoring](./user_guides/experimentation.md)
-- [Understand Prompts](./prompt/overview.md)
-- [Results Summary](./user_guides/summarizer.md)
-- [Learn about Config](./user_guides/config.md)
+- [Prepare Datasets](../user_guides/datasets.md)
+- [Prepare Models](../user_guides/models.md)
+- [Task Execution and Monitoring](../user_guides/experimentation.md)
+- [Understand Prompts](../prompt/overview.md)
+- [Results Summary](../user_guides/summarizer.md)
+- [Learn about Config](../user_guides/config.md)
