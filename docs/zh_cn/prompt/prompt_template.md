@@ -34,8 +34,8 @@ infer_cfg=dict(
         template='Solve the following questions.\n</E>{question}\n{answer}',
         ice_token="</E>"
     ),
-    retriever=dict(type=FixKRetriever),  # 定义 in context example 的获取方式
-    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1]),  # 使用何种方式推理得到 prediction
+    retriever=dict(type=FixKRetriever, fix_id_list=[0, 1]),  # 定义 in context example 的获取方式
+    inferencer=dict(type=GenInferencer),  # 使用何种方式推理得到 prediction
 )
 ```
 

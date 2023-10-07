@@ -34,8 +34,8 @@ infer_cfg = dict(
         template='Solve the following questions.\n</E>{question}\n{answer}',
         ice_token="</E>"
     ),
-    retriever=dict(type=FixKRetriever),  # Definition of how to retrieve in-context examples.
-    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1]),  # Method used to generate predictions.
+    retriever=dict(type=FixKRetriever, fix_id_list=[0, 1]),  # Definition of how to retrieve in-context examples.
+    inferencer=dict(type=GenInferencer),  # Method used to generate predictions.
 )
 ```
 

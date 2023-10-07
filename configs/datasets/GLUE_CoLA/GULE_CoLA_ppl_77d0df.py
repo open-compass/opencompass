@@ -23,8 +23,8 @@ CoLA_infer_cfg = dict(
         },
         ice_token='</E>',
     ),
-    retriever=dict(type=FixKRetriever),
-    inferencer=dict(type=PPLInferencer, fix_id_list=[17, 18, 19, 20, 21]))
+    retriever=dict(type=FixKRetriever, fix_id_list=[17, 18, 19, 20, 21]),
+    inferencer=dict(type=PPLInferencer))
 
 CoLA_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 

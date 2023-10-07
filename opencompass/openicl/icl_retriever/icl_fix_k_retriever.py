@@ -19,6 +19,8 @@ class FixKRetriever(BaseRetriever):
     Args:
         dataset (`BaseDataset`): Any BaseDataset instances.
             Attributes of ``reader``, ``train`` and ``test`` will be used.
+        fix_id_list (List[int]): List of in-context example indices for every
+            test prompts.
         ice_separator (`Optional[str]`): The separator between each in-context
             example template when origin `PromptTemplate` is provided. Defaults
             to '\n'.
@@ -31,22 +33,19 @@ class FixKRetriever(BaseRetriever):
 
     def __init__(self,
                  dataset,
+                 fix_id_list: List[int],
                  ice_separator: Optional[str] = '\n',
                  ice_eos_token: Optional[str] = '\n',
                  ice_num: Optional[int] = 1) -> None:
         super().__init__(dataset, ice_separator, ice_eos_token, ice_num)
+        self.fix_id_list = fix_id_list
 
-    def retrieve(self, id_list: List[int]):
-        """Retrieve the in-context example index for each test example.
-
-        Args:
-            id_list (List[int]): List of in-context example indices for every
-                test prompts.
-        """
+    def retrieve(self):
+        """Retrieve the in-context example index for each test example."""
         num_idx = len(self.index_ds)
-        for idx in id_list:
+        for idx in self.fix_id_list:
             assert idx < num_idx, f'Index {idx} is out of range of {num_idx}'
         rtr_idx_list = []
         for _ in trange(len(self.test_ds), disable=not self.is_main_process):
-            rtr_idx_list.append(id_list)
+            rtr_idx_list.append(self.fix_id_list)
         return rtr_idx_list

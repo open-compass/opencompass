@@ -25,9 +25,6 @@ class BaseInferencer:
             `JSON` file.
         output_json_filename (:obj:`str`, optional): File name for output
             `JSON` file.
-        api_name (:obj:`str`, optional): Name of API service.
-        call_api (:obj:`bool`): If ``True``, an API for LM models will be used,
-            determined by :obj:`api_name`.
     """
     model = None
 
@@ -38,8 +35,15 @@ class BaseInferencer:
         batch_size: Optional[int] = 1,
         output_json_filepath: Optional[str] = './icl_inference_output',
         output_json_filename: Optional[str] = 'predictions',
+        fix_id_list: Optional[List[int]] = None,
         **kwargs,
     ) -> None:
+
+        if fix_id_list:
+            raise ValueError('Passing fix_id_list to Inferencer is no longer '
+                             'allowed. Please pass it to FixKRetriever '
+                             'instead.')
+
         self.model = model
 
         self.max_seq_len = max_seq_len

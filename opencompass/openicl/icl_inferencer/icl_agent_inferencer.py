@@ -55,10 +55,7 @@ class AgentInferencer(BaseInferencer):
             output_json_filename = self.output_json_filename
 
         # 2. Get results of retrieval process
-        if 'Fix' in retriever.__class__.__name__:
-            ice_idx_list = retriever.retrieve(self.fix_id_list)
-        else:
-            ice_idx_list = retriever.retrieve()
+        ice_idx_list = retriever.retrieve()
 
         # Create tmp json file for saving intermediate results and future
         # resuming

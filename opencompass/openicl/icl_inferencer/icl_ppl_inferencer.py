@@ -41,7 +41,6 @@ class PPLInferencer(BaseInferencer):
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
             labels: Optional[List] = None,
-            fix_id_list: Optional[List[int]] = None,
             **kwargs) -> None:
         super().__init__(
             model=model,
@@ -53,7 +52,6 @@ class PPLInferencer(BaseInferencer):
         )
 
         self.labels = labels
-        self.fix_id_list = fix_id_list
 
     def inference(self,
                   retriever: BaseRetriever,
@@ -75,10 +73,7 @@ class PPLInferencer(BaseInferencer):
             output_json_filename = self.output_json_filename
 
         # 2. Get results of retrieval process
-        if self.fix_id_list:
-            ice_idx_list = retriever.retrieve(self.fix_id_list)
-        else:
-            ice_idx_list = retriever.retrieve()
+        ice_idx_list = retriever.retrieve()
 
         # 3. Get labels of all the classes
         if self.labels is None:
