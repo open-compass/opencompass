@@ -3,30 +3,30 @@ from opencompass.models.turbomind import TurboMindModel
 
 with read_base():
     # choose a list of datasets
-    from .datasets.SuperGLUE_CB.SuperGLUE_CB_gen import CB_datasets
+    from .datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
     # and output the results in a choosen format
     from .summarizers.medium import summarizer
 
-datasets = [*CB_datasets]
+datasets = [*gsm8k_datasets]
 
 
-_meta_template = dict(
+meta_template = dict(
     round=[
-        dict(role='HUMAN', begin='<|User|>:', end='<eoh>\n'),
+        dict(role='HUMAN', begin='<|User|>:', end='\n'),
         dict(role='BOT', begin='<|Bot|>:', end='<eoa>\n', generate=True),
     ],
-)
+    eos_token_id=103028)
 
 models = [
     dict(
         type=TurboMindModel,
-        abbr='internlm-chat-7b-tb',
+        abbr='internlm-chat-7b-turbomind',
         path="internlm-chat-7b",
-        model_path='./workspace',
+        tis_addr='0.0.0.0:33337',
         max_out_len=100,
         max_seq_len=2048,
         batch_size=16,
-        meta_template=_meta_template,
+        meta_template=meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]

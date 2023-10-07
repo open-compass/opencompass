@@ -38,11 +38,13 @@ python3 -m lmdeploy.serve.turbomind.deploy internlm-chat-7b /path/to/internlm-ch
 
 ```
 
-### Step-2: Verify the Converted Model
+### Step-2: Launch Triton Inference Server
 
 ```shell
-python -m lmdeploy.turbomind.chat ./workspace
+bash ./workspace/service_docker_up.sh
 ```
+
+\*\*Note: \*\*In the implementation of turbomind, inference is "persistent". The "destroy" operation can lead to unexpected issues. Therefore, we temporarily use service interfaces for model evaluation. And we will integrate the Python API to OpenCompass when turbomind supports "destroy".
 
 ### Step-3: Evaluate the Converted Model
 
@@ -53,3 +55,5 @@ python run.py configs/eval_internlm_chat_7b_turbomind.py -w outputs/turbomind
 ```
 
 You are expected to get the evaluation results after the inference and evaluation.
+
+\*\*Note: \*\*In `eval_internlm_chat_7b_turbomind.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:33337'`. Please modify `tis_addr` to the IP address of the machine where the server is launched.

@@ -1,10 +1,11 @@
-import os.path as osp
-import random
+import logging
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
-from opencompass.models.base import BaseModel
-from opencompass.models.base_api import TokenBucket
+from lmdeploy.serve.turbomind.chatbot import Chatbot
+
+from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
 
@@ -43,10 +44,8 @@ class TurboMindModel(BaseModel):
     def __init__(
         self,
         path: str,
-        model_path: str,
+        tis_addr: str = '0.0.0.0:33337',
         max_seq_len: int = 2048,
-        query_per_second: int = 1,
-        retry: int = 2,
         meta_template: Optional[Dict] = None,
     ):
 
@@ -54,27 +53,17 @@ class TurboMindModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         self.logger = get_logger()
-
-        from lmdeploy import turbomind as tm
-        from lmdeploy.model import MODELS as LMMODELS
-        from lmdeploy.turbomind.tokenizer import Tokenizer as LMTokenizer
-
-        self.retry = retry
-
-        tokenizer_model_path = osp.join(model_path, 'triton_models',
-                                        'tokenizer')
-        self.tokenizer = LMTokenizer(tokenizer_model_path)
-        tm_model = tm.TurboMind(model_path, eos_id=self.tokenizer.eos_token_id)
-        self.model_name = tm_model.model_name
-        self.model = LMMODELS.get(self.model_name)()
-        self.generator = tm_model.create_instance()
-        self.token_bucket = TokenBucket(query_per_second)
+        self.template_parser = LMTemplateParser(meta_template)
+        self.eos_token_id = None
+        if meta_template and 'eos_token_id' in meta_template:
+            self.eos_token_id = meta_template['eos_token_id']
+        self.tis_addr = tis_addr
 
     def generate(
         self,
         inputs: List[str or PromptList],
         max_out_len: int = 512,
-        temperature: float = 0.0,
+        temperature: float = 1.0,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -91,10 +80,10 @@ class TurboMindModel(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
-        prompts = inputs
+
         with ThreadPoolExecutor() as executor:
             results = list(
-                executor.map(self._generate, prompts,
+                executor.map(self._generate, inputs,
                              [max_out_len] * len(inputs),
                              [temperature] * len(inputs)))
         return results
@@ -106,12 +95,12 @@ class TurboMindModel(BaseModel):
         """
         return self.token_bucket.get_token()
 
-    def _generate(self, input: str or PromptList, max_out_len: int,
+    def _generate(self, prompt: str or PromptList, max_out_len: int,
                   temperature: float) -> str:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            prompt (str or PromptList): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -123,39 +112,21 @@ class TurboMindModel(BaseModel):
         Returns:
             str: The generated string.
         """
-        assert isinstance(input, (str, PromptList))
-
         assert type(
-            input
-        ) is str, 'We only support string for TurboMind Python API now'
+            prompt) is str, 'We only support string for TurboMind RPC API'
+        chatbot = Chatbot(self.tis_addr,
+                          temperature=temperature,
+                          capability='completion',
+                          top_k=1,
+                          log_level=logging.ERROR)
 
-        intput_token_ids = self.tokenizer.encode(input)
-
-        for _ in range(self.retry):
-            self.wait()
-            session_id = random.randint(1, 100000)
-            nth_round = 0
-            for outputs in self.generator.stream_infer(
-                    session_id=session_id,
-                    input_ids=[intput_token_ids],
-                    stream_output=False,
-                    request_output_len=max_out_len,
-                    sequence_start=(nth_round == 0),
-                    sequence_end=False,
-                    step=0,
-                    stop=False,
-                    top_k=40,
-                    top_p=0.8,
-                    temperature=temperature,
-                    repetition_penalty=1.0,
-                    ignore_eos=False,
-                    random_seed=random.getrandbits(64)
-                    if nth_round == 0 else None):
-                pass
-
-        output_token_ids, _ = outputs[0]
-        # decode output_token_ids
-        response = self.tokenizer.decode(output_token_ids)
-        response = valid_str(response)
-
+        for status, text, n_token in chatbot.stream_infer(
+                session_id=threading.currentThread().ident,
+                prompt=prompt,
+                request_output_len=max_out_len,
+                sequence_start=True,
+                sequence_end=True):
+            continue
+        response = valid_str(text)
+        response = response.replace('<eoa>', '')
         return response
