@@ -10,7 +10,7 @@
 
 [🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/zh_CN/latest/index.html) |
-[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id1) |
+[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html) |
 [🤔Reporting Issues](https://github.com/open-compass/opencompass/issues/new/choose)
 
 [English](/README.md) | 简体中文
@@ -85,7 +85,7 @@ wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCom
 unzip OpenCompassData.zip
 ```
 
-有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html)。
+有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html)。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
@@ -123,7 +123,7 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 > **注意**<br />
 > 若需要运行上述命令，你需要删除所有从 `# ` 开始的注释。
 
-通过命令行或配置文件，OpenCompass 还支持评测 API 或自定义模型，以及更多样化的评测策略。请阅读[快速上手](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id3)了解如何运行一个评测任务。
+通过命令行或配置文件，OpenCompass 还支持评测 API 或自定义模型，以及更多样化的评测策略。请阅读[快速开始](https://opencompass.readthedocs.io/zh_CN/latest/get_started/quick_start.html)了解如何运行一个评测任务。
 
 更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
 

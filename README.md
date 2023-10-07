@@ -10,7 +10,7 @@
 
 [🌐Website](https://opencompass.org.cn/) |
 [📘Documentation](https://opencompass.readthedocs.io/en/latest/) |
-[🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started.html#installation) |
+[🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started/installation.html) |
 [🤔Reporting Issues](https://github.com/open-compass/opencompass/issues/new/choose)
 
 English | [简体中文](README_zh-CN.md)
@@ -83,7 +83,7 @@ wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCom
 unzip OpenCompassData.zip
 ```
 
-Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started.html).
+Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started/installation.html).
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -121,7 +121,7 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 > **Note**<br />
 > To run the command above, you will need to remove the comments starting from `# ` first.
 
-Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started.html) to learn how to run an evaluation task.
+Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html) to learn how to run an evaluation task.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
