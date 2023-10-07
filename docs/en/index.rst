@@ -23,8 +23,9 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :maxdepth: 1
    :caption: Get Started
 
-   get_started.md
-   faq.md
+   get_started/installation.md
+   get_started/quick_start.md
+   get_started/faq.md
 
 .. _UserGuides:
 .. toctree::
