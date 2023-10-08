@@ -3,7 +3,9 @@ exclude: |
       tests/data/|
       opencompass/models/internal/|
       opencompass/utils/internal/|
-      opencompass/openicl/icl_evaluator/hf_metrics/
+      opencompass/openicl/icl_evaluator/hf_metrics/|
+      opencompass/datasets/lawbench/utils|
+      opencompass/datasets/lawbench/evaluation_functions/
     )
 repos:
   - repo: https://github.com/PyCQA/flake8
