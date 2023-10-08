@@ -1,5 +1,5 @@
 import jieba
-from rouge import Rouge
+from rouge_chinese import Rouge
 
 from opencompass.registry import ICL_EVALUATORS
 from opencompass.utils.text_postprocessors import general_postprocess
