@@ -134,7 +134,10 @@ class AccEvaluator(HuggingfaceEvaluator):
 
 @ICL_EVALUATORS.register_module()
 class RougeEvaluator(HuggingfaceEvaluator):
-    """Rouge evaluator."""  # noqa
+    """Rouge evaluator.
+
+    Note: this evaluator is not suitable for chinese datasets.
+    """
 
     def __init__(self) -> None:
         super().__init__(metric='rouge')

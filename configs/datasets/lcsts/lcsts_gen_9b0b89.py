@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import RougeEvaluator
+from opencompass.openicl.icl_evaluator import JiebaRougeEvaluator
 from opencompass.datasets import LCSTSDataset, lcsts_postprocess
 
 lcsts_reader_cfg = dict(input_columns=['content'], output_column='abst')
@@ -13,7 +13,7 @@ lcsts_infer_cfg = dict(
     inferencer=dict(type=GenInferencer))
 
 lcsts_eval_cfg = dict(
-    evaluator=dict(type=RougeEvaluator),
+    evaluator=dict(type=JiebaRougeEvaluator),
     pred_postprocessor=dict(type=lcsts_postprocess),
 )
 
