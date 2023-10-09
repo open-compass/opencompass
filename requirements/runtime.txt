@@ -18,6 +18,7 @@ rank_bm25==0.2.2
 rapidfuzz
 requests==2.31.0
 rouge
+rouge_chinese
 rouge_score
 scikit_learn==1.2.1
 sentence_transformers==2.2.2
