@@ -30,6 +30,11 @@ class JiebaRougeEvaluator(BaseEvaluator):
         metric = Rouge()
         predictions = [' '.join(jieba.cut(i)) for i in predictions]
         references = [' '.join(jieba.cut(i)) for i in references]
+
+        # avoid raising error when empty string encountered
+        predictions = [i if i else '__PREDPLACEHOLDER__' for i in predictions]
+        references = [i if i else '__REFRPLACEHOLDER__' for i in references]
+
         score = metric.get_scores(predictions, references, avg=True)
 
         return {
