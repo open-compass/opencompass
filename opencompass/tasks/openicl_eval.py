@@ -207,7 +207,7 @@ class OpenICLEvalTask(BaseTask):
         if end_str:
             # TODO: Support calling tokenizer for the accurate eos token
             # and avoid such hardcode
-            end_idx = s.find(end_str[:1], start)
+            end_idx = s.find(end_str, start)
             if end_idx != -1:
                 end = end_idx
 
