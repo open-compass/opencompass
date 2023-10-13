@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from datasets import Dataset, DatasetDict
 
 from opencompass.datasets import BaseDataset
@@ -10,8 +8,6 @@ class LMEvalDataset(BaseDataset):
     OpenCompass's internal use."""
 
     @staticmethod
-    def load(predictions: List, references: Optional[List] = None):
-        content = {'prediction': predictions}
-        if references:
-            content['reference'] = references
+    def load(**kwargs):
+        content = {k: v for k, v in kwargs.items() if v}
         return DatasetDict(dict(test=Dataset.from_dict(content)))

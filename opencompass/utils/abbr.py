@@ -1,11 +1,13 @@
 import os.path as osp
-from typing import Dict
+from typing import Dict, List, Union
 
 from mmengine.config import ConfigDict
 
 
-def model_abbr_from_cfg(cfg: ConfigDict) -> str:
+def model_abbr_from_cfg(cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
     """Generate model abbreviation from the model's confg."""
+    if isinstance(cfg, (list, tuple)):
+        return '_'.join(model_abbr_from_cfg(c) for c in cfg)
     if 'abbr' in cfg:
         return cfg['abbr']
     model_abbr = cfg['type'] + '_' + '_'.join(

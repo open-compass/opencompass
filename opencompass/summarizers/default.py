@@ -3,6 +3,7 @@
 import getpass
 import os.path as osp
 from datetime import datetime
+from typing import List, Optional
 
 import mmengine
 import tabulate
@@ -16,13 +17,30 @@ from opencompass.utils.prompt import get_prompt_hash
 METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
 METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
 
-class Summarizer:
-    """"""
+class DefaultSummarizer:
+    """Default summarizer in OpenCompass.
 
-    def __init__(self, config: ConfigDict) -> None:
+    Args:
+        config (ConfigDict): The configuration object of the evaluation task.
+            It's expected to be filled out at runtime.
+        dataset_abbrs (list[str], optional): Dataset abbreviations to be
+            listed in the summary.
+        summary_groups (list): The dataset groups whose results need to be
+            averaged out. For example, mmlu. Each item it a dict with
+            'name' (str) and 'subsets' (list of dataset abbrs), and optionally
+            'weights' if weighted average is needed.
+        prompt_db: A deprecated field.
+    """
+
+    def __init__(self, config: ConfigDict, dataset_abbrs: Optional[List[str]] = None, summary_groups: List = [], prompt_db = None) -> None:
         self.tasks = []
         self.cfg = config
         self.logger = get_logger()
+        self.summary_groups = summary_groups
+        self.dataset_abbrs = dataset_abbrs
+        if prompt_db:
+            self.logger.warning('prompt_db is deprecated and no longer used. '
+                                'Please remove it from your config.')
 
         # Enable lark bot if lark_url is presented
         self.lark_reporter = None
@@ -36,7 +54,6 @@ class Summarizer:
 
         model_cfgs = self.cfg['models']
         dataset_cfgs = self.cfg['datasets']
-        summarizer_cfg = self.cfg.get('summarizer', {}) or {} # avoid 'summarizer' is in cfg but None
         work_dir = self.cfg['work_dir']
 
         # pick up results
@@ -99,7 +116,7 @@ class Summarizer:
                 self.logger.warning(f'unknown inferencer: {inferencer} - {dataset_abbr}')
 
         # calculate group metrics
-        summary_groups = summarizer_cfg.get('summary_groups', [])
+        summary_groups = self.summary_groups
         for sg in summary_groups:
             for model_abbr in model_abbrs:
                 results = {}
@@ -135,7 +152,7 @@ class Summarizer:
 
         # format table
         summarizer_dataset_abbrs = []
-        if summarizer_cfg.get('dataset_abbrs') is None:
+        if self.dataset_abbrs is None:
             for dataset in dataset_cfgs:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
                 if dataset_abbr in dataset_metrics:
@@ -148,7 +165,7 @@ class Summarizer:
                     if (dataset_abbr, metric) not in summarizer_dataset_abbrs:
                         summarizer_dataset_abbrs.append((dataset_abbr, metric))
         else:
-            for item in summarizer_cfg['dataset_abbrs']:
+            for item in self.dataset_abbrs:
                 if isinstance(item, str):
                     summarizer_dataset_abbrs.append((item, None))
                 elif isinstance(item, (list, tuple)):

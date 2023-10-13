@@ -60,8 +60,4 @@ summarizer = dict(
         'crows_pairs',
     ],
     summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
-    prompt_db=dict(
-        database_path='configs/datasets/log.json',
-        config_dir='configs/datasets',
-        blacklist='.promptignore'),
 )
