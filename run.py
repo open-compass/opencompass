@@ -7,9 +7,10 @@ from datetime import datetime
 from mmengine.config import Config, DictAction
 
 from opencompass.partitioners import MultimodalNaivePartitioner
-from opencompass.registry import PARTITIONERS, RUNNERS
+from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
-from opencompass.utils import LarkReporter, Summarizer, get_logger
+from opencompass.summarizers import DefaultSummarizer
+from opencompass.utils import LarkReporter, get_logger
 from opencompass.utils.run import (exec_mm_infer_runner, fill_eval_cfg,
                                    fill_infer_cfg, get_config_from_arg)
 
@@ -315,7 +316,11 @@ def main():
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
-        summarizer = Summarizer(cfg)
+        summarizer_cfg = cfg.get('summarizer', {})
+        if not summarizer_cfg or summarizer_cfg.get('type', None) is None:
+            summarizer_cfg['type'] = DefaultSummarizer
+        summarizer_cfg['config'] = cfg
+        summarizer = build_from_cfg(summarizer_cfg)
         summarizer.summarize(time_str=cfg_time_str)
 
 

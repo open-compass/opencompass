@@ -1,8 +1,6 @@
 import argparse
-import copy
 import fnmatch
 import os.path as osp
-import random
 import time
 from collections import Counter
 from inspect import signature
@@ -12,14 +10,12 @@ import mmengine
 from mmengine.config import Config, ConfigDict
 from mmengine.utils import mkdir_or_exist
 
-from opencompass.openicl.icl_evaluator.lm_evaluator import LMEvaluator
 from opencompass.registry import (ICL_EVALUATORS, MODELS, TASKS,
                                   TEXT_POSTPROCESSORS)
 from opencompass.tasks.base import BaseTask
 from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
                                get_infer_output_path, get_logger,
                                task_abbr_from_cfg)
-from opencompass.utils.types import get_type_from_cfg
 
 
 @TASKS.register_module(force=(__name__ == '__main__'))  # A hack for script run
@@ -28,9 +24,6 @@ class OpenICLEvalTask(BaseTask):
 
     This task is used to evaluate the metric between predictions and
     references.
-
-    Args:
-        cfg (ConfigDict): The configuration of the entire evaluation task.
     """
 
     name_prefix = 'OpenICLEval'
@@ -39,30 +32,12 @@ class OpenICLEvalTask(BaseTask):
 
     def __init__(self, cfg: ConfigDict):
         super().__init__(cfg)
+        self.num_gpus = 0
         self.logger = get_logger()
-        judge_cfg = cfg.eval.runner.task.get('judge_cfg', {})
-        run_cfg = judge_cfg.get('run_cfg', {})
-        self.num_gpus = run_cfg.get('num_gpus', 0)
-        self.num_procs = run_cfg.get('num_procs', 1)
-        self.judge_cfg = copy.deepcopy(judge_cfg)
 
     def get_command(self, cfg_path, template):
-        """Get the command template for the task.
-
-        Args:
-            cfg_path (str): The path to the config file of the task.
-            template (str): The template which have '{task_cmd}' to format
-                the command.
-        """
         script_path = __file__
-        if self.num_gpus > 0:
-            port = random.randint(12000, 32000)
-            command = (f'torchrun --master_port={port} '
-                       f'--nproc_per_node {self.num_procs} '
-                       f'{script_path} {cfg_path}')
-        else:
-            command = f'python {script_path} {cfg_path}'
-
+        command = f'python3 {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
     def run(self):
@@ -118,10 +93,6 @@ class OpenICLEvalTask(BaseTask):
 
         # Get sc_size if use Self-Consistency
         sc_size = self.eval_cfg.get('sc_size')
-
-        # Get out_path
-        out_path = get_infer_output_path(self.model_cfg, self.dataset_cfg,
-                                         osp.join(self.work_dir, 'results'))
 
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
@@ -189,14 +160,6 @@ class OpenICLEvalTask(BaseTask):
                     Counter(s).most_common(1)[0][0] for s in pred_strs
                 ]
 
-            if get_type_from_cfg(self.eval_cfg['evaluator']) == LMEvaluator:
-                if not self.judge_cfg:
-                    raise ValueError('Using LMEvaluator in dataset, but '
-                                     'missing "eval.runner.task.judge_cfg" '
-                                     'as the judge configuration.')
-                self.eval_cfg['evaluator']['judge_cfg'] = self.judge_cfg
-                self.eval_cfg['evaluator']['dataset_cfg'] = self.dataset_cfg
-                self.eval_cfg['evaluator']['output_path'] = out_path
             icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
             preds['predictions'] = pred_strs
             preds['references'] = (test_set[self.output_column]
@@ -215,12 +178,10 @@ class OpenICLEvalTask(BaseTask):
             self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}: {result}')
 
         # Save result
+        out_path = get_infer_output_path(self.model_cfg, self.dataset_cfg,
+                                         osp.join(self.work_dir, 'results'))
         mkdir_or_exist(osp.split(out_path)[0])
-        mmengine.dump(result,
-                      open(out_path, 'w', encoding='utf-8'),
-                      file_format='json',
-                      ensure_ascii=False,
-                      indent=4)
+        mmengine.dump(result, out_path)
 
     def _extract_role_pred(self, s: str, begin_str: Optional[str],
                            end_str: Optional[str]) -> str:

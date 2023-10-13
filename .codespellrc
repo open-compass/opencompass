@@ -2,4 +2,4 @@
 skip = *.ipynb
 count =
 quiet-level = 3
-ignore-words-list = nd, ans, ques, rouge, softwares
+ignore-words-list = nd, ans, ques, rouge, softwares, wit
