@@ -11,3 +11,5 @@ from .minimax_api import MiniMax  # noqa: F401
 from .openai_api import OpenAI  # noqa: F401
 from .xunfei_api import XunFei  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
+from .turbomind import TurboMindModel  # noqa: F401
+from .turbomind_tis import TurboMindTisModel  # noqa: F401
