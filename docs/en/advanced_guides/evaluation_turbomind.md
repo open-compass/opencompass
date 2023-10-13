@@ -13,7 +13,7 @@ Please follow the [instructions](https://opencompass.readthedocs.io/en/latest/ge
 Install lmdeploy via pip (python 3.8+)
 
 ```shell
-pip install 'lmdeploy>=0.0.11'
+pip install 'lmdeploy>0.0.10'
 ```
 
 ## Evaluation
@@ -23,13 +23,23 @@ OpenCompass integrates both turbomind's python API and gRPC API for evaluation. 
 We take the InternLM-20B as example. Please download it from huggingface and convert it to turbomind's model format:
 
 ```shell
+# 1. Download InternLM model(or use the cached model's checkpoint)
+
 # Make sure you have git-lfs installed (https://git-lfs.com)
 git lfs install
 git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
 
-# Convert InternLM model to turbomind's format, and save it under the home path of opencompass
+# 2. Convert InternLM model to turbomind's format, and save it in the home folder of opencompass
 python -m lmdeploy.serve.turbomind.deploy internlm /path/to/internlm-20b \
     --dst-path {/home/folder/of/opencompass}/turbomind
+```
+
+**Note**:
+
+If evaluating the InternLM Chat model, make sure to pass `internlm-chat` as the model name instead of `internlm` when converting the model format. The specific command is:
+
+```shell
+python -m lmdeploy.serve.turbomind.deploy internlm-chat /path/to/internlm-20b-chat
 ```
 
 ### Evaluation with Turbomind Python API (recommended)
@@ -56,4 +66,8 @@ And start evaluation by the following command:
 python run.py configs/eval_internlm_turbomind_tis.py -w outputs/turbomind-tis/internlm-20b
 ```
 
-\*\*Note: \*\*In `eval_internlm_turbomind_tis.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:33337'`. Please modify `tis_addr` to the IP address of the machine where the server is launched.
+\*\*Note: \*\*
+
+- If the InternLM Chat model is requested to be evaluated, please use config file `eval_internlm_chat_turbomind_tis.py`
+- In `eval_internlm_turbomind_tis.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:33337'`. Please modify `tis_addr` to the IP address of the machine where the server is launched.
+- If evaluating the InternLM 7B model, please modify the config file, commenting out the configuration for the 20B model and enabling the configuration for the 7B model
