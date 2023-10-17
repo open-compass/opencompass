@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
 from lmdeploy import turbomind as tm
-from lmdeploy.turbomind.tokenizer import Tokenizer
+from lmdeploy.tokenizer import Tokenizer
 
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger

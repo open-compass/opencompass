@@ -39,7 +39,8 @@ python -m lmdeploy.serve.turbomind.deploy internlm /path/to/internlm-20b \
 If evaluating the InternLM Chat model, make sure to pass `internlm-chat` as the model name instead of `internlm` when converting the model format. The specific command is:
 
 ```shell
-python -m lmdeploy.serve.turbomind.deploy internlm-chat /path/to/internlm-20b-chat
+python -m lmdeploy.serve.turbomind.deploy internlm-chat /path/to/internlm-20b-chat \
+    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
 ### Evaluation with Turbomind Python API (recommended)
@@ -51,6 +52,11 @@ python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-2
 ```
 
 You are expected to get the evaluation results after the inference and evaluation.
+
+**Note**:
+
+- If you evaluate theInternLM Chat model, please use configuration file `eval_internlm_chat_turbomind.py`
+- If you evaluate the InternLM 7B model, please modify `eval_internlm_turbomind.py` or `eval_internlm_chat_turbomind.py` by commenting out the configuration for the 20B model and enabling the configuration for the 7B model.
 
 ### Evaluation with Turbomind gPRC API (optional)
 

@@ -30,13 +30,15 @@ git lfs install
 git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
 
 # 2. Convert InternLM model to turbomind's format, and save it in the home folder of opencompass
-python -m lmdeploy.serve.turbomind.deploy internlm /path/to/internlm-20b
+python -m lmdeploy.serve.turbomind.deploy internlm /path/to/internlm-20b \
+    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
 注意：如果评测 InternLM Chat 模型，那么在转换模型格式的时候，模型名字要填写 `internlm-chat`。具体命令是：
 
 ```shell
-python -m lmdeploy.serve.turbomind.deploy internlm-chat /path/to/internlm-20b-chat
+python -m lmdeploy.serve.turbomind.deploy internlm-chat /path/to/internlm-20b-chat \
+    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
 ### 通过 TurboMind Python API 评测（推荐）
@@ -50,7 +52,7 @@ python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-2
 **注：**
 
 - 如果评测 InternLM Chat 模型，请使用配置文件 `eval_internlm_chat_turbomind.py`
-- 如果评测 InternLM 7B 模型，请修改 `eval_internlm_xxx_turbomind.py`。把 20B 模型的配置注释掉，打开 7B 模型的配置。
+- 如果评测 InternLM 7B 模型，请修改 `eval_internlm_turbomind.py` 或者 `eval_internlm_chat_turbomind.py`。把 20B 模型的配置注释掉，打开 7B 模型的配置。
 
 ### 通过 TurboMind gPRC API 评测（可选）
 
