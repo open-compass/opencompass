@@ -99,7 +99,7 @@ models = [
         concurrency=1,
         meta_template=meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
-        stop_words=[103027, 103028],
+        # stop_words=[103027, 103028],
         # w8a8=True
     )
 ]
