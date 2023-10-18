@@ -11,21 +11,50 @@ from .base import BaseDataset
 
 
 def get_number(options):
-
     result_string = ''
-    for i, option in enumerate(options, start=65):
+    for i, option in enumerate(options, start=ord('A')):
         result_string += f'{chr(i)}. {option}\n'
     return result_string
+
+
+def get_circular_example(entry, id):
+    """For given example, generate four circular examples."""
+    # Only 4 options is supported for current circular eval.
+    circular_patterns = ['ABCD', 'BCDA', 'CDAB', 'DABC']
+    data = []
+    for c in circular_patterns:
+        line = copy.deepcopy(entry)
+        options = []
+        for i in range(4):
+            options.append(line['options'][ord(c[i]) - ord('A')])
+        line['options'] = options
+        line['answer'] = {
+            c[0]: 'A',
+            c[1]: 'B',
+            c[2]: 'C',
+            c[3]: 'D'
+        }[line['answer']]
+        line['answer'] = str(id) + '--' + line['answer'] + '--' + c
+        line['question'] = line['question'].strip() + '\n' + get_number(
+            line['options'])
+        data.append(line)
+
+    return data
 
 
 @LOAD_DATASET.register_module()
 class MathBenchDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name: str):
+    def load(path: str, name: str, with_circular: bool = True):
+        """MathBenth Dataset.
 
-        circular_patterns = ['ABCD', 'BCDA', 'CDAB', 'DABC']
-
+        Args:
+            path (str): Path of the mathbench dataset.
+            name (str): Name of the target subset.
+            with_circular (bool): Whether to create circular dataset for
+                single choice question. Defaults to True.
+        """
         data = []
         filename = osp.join(path, f'{name}.jsonl')
         with open(filename, 'r') as infile:
@@ -37,24 +66,15 @@ class MathBenchDataset(BaseDataset):
                         'answer': entry['answer'].strip()
                     })
                 else:
-                    for c in circular_patterns:
-                        line = copy.deepcopy(entry)
-                        options = []
-                        for i in range(4):
-                            options.append(line['options'][ord(c[i]) -
-                                                           ord('A')])
-                        line['options'] = options
-                        line['answer'] = {
-                            c[0]: 'A',
-                            c[1]: 'B',
-                            c[2]: 'C',
-                            c[3]: 'D'
-                        }[line['answer']]
-                        line['answer'] = str(
-                            id) + '--' + line['answer'] + '--' + c
-                        line['question'] = line['question'].strip(
-                        ) + '\n' + get_number(line['options'])
-                        data.append(line)
+                    if with_circular:
+                        data.extend(get_circular_example(entry, id))
+                    else:
+                        question = entry['question'].strip(
+                        ) + '\n' + get_number(entry['options'])
+                        data.append({
+                            'question': question,
+                            'answer': entry['answer'].strip()
+                        })
 
         dataset = Dataset.from_list(data)
         return dataset

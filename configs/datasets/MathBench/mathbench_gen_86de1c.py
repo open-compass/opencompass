@@ -83,9 +83,9 @@ for _split in list(mathbench_sets.keys()):
                     round=[
                         dict(
                             role="HUMAN",
-                            prompt= single_choice_prompts[_name + "_with_reasoning"] if with_reasoning else mathbench_sets[_name],
+                            prompt=single_choice_prompts[_name + "_with_reasoning"] if with_reasoning else single_choice_prompts[_name],
                         ),
-                        dict(role="BOT", prompt="{answer}"),] if 'choice' in _name else cloze_prompts[_name],
+                        dict(role="BOT", prompt="{answer}")] if 'choice' in _name else cloze_prompts[_name],
                     ),
                 ice_token="</E>",
             ),
@@ -94,15 +94,15 @@ for _split in list(mathbench_sets.keys()):
         )
 
         mathbench_eval_cfg = dict(
-            evaluator=dict(type=CircularEvaluator if 'choice' in _name  else AccEvaluator),
-            pred_postprocessor=dict(type=first_capital_postprocess ) if 'single_choice' in _name else dict(type=mathbench_postprocess, name=_name))
+            evaluator=dict(type=CircularEvaluator if 'choice' in _name else AccEvaluator),
+            pred_postprocessor=dict(type=first_capital_postprocess) if 'single_choice' in _name else dict(type=mathbench_postprocess, name=_name))
 
         mathbench_datasets.append(
             dict(
                 type=MathBenchDataset,
                 path=f"./data/mathbench/{_split}",
                 name=_name,
-                abbr="mathbench-" + _split + '-' + _name, 
+                abbr="mathbench-" + _split + '-' + _name,
                 reader_cfg=dict(
                     input_columns=["question"],
                     output_column="answer"
