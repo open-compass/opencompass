@@ -3,7 +3,6 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
 from lmdeploy.pytorch_poc import engine as tm
-from lmdeploy.tokenizer import Tokenizer
 from transformers import AutoTokenizer
 
 from opencompass.models.base import BaseModel
@@ -11,6 +10,7 @@ from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
 from lmdeploy.pytorch_poc.messages import SamplingParam
 import random
+from opencompass.models.base_api import APITemplateParser
 
 PromptType = Union[PromptList, str]
 
@@ -44,18 +44,21 @@ class PytorchModel(BaseModel):
         concurrency: int = 8,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
+        stop_words=None,
+        # w8a8=True,
     ):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         self.logger = get_logger()
-        self.tokenizer = AutoTokenizer.from_pretrained(path)
+        self.tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
         tm_model = tm.Engine(path)
         self.generators = [
             tm_model.create_instance() for i in range(concurrency)
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
+        self.stop_words = stop_words
 
     def generate(
         self,
@@ -76,6 +79,17 @@ class PytorchModel(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
+        # B_INST, E_INST = "[INST]", "[/INST]"
+        # dialogs = []
+        # for input in inputs:
+        #     assert isinstance(input, PromptList)
+        #     dialog = ''
+        #     for item_prompt, item_answer in zip(input[::2], input[1::2]):
+        #         dialog += f"{self.tokenizer.bos_token}{B_INST} {item_prompt['prompt'].strip()} {E_INST} {item_answer['prompt'].strip()} {self.tokenizer.eos_token}"
+        #     assert input[-1]['role'] == 'HUMAN'
+        #     dialog += f"{self.tokenizer.bos_token}{B_INST} {input[-1]['prompt'].strip()} {E_INST}"
+        #     dialogs.append(dialog)
+        # inputs = dialogs
         assert isinstance(
             inputs, List), f'List(str) is expected, but got {type(inputs)}'
 
@@ -127,28 +141,15 @@ class PytorchModel(BaseModel):
         """
         assert type(
             prompt) is str, 'We only support string for TurboMind Python API'
-        b_inst='[INST]'
-        e_inst='[/INST]'
-        b_sys='<<SYS>>\n'
-        e_sys='\n<</SYS>>\n\n'
-        system="""\
-You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
-
-If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."""
-        prompt = f'{b_inst} {b_sys} {system} {e_sys} {prompt} '
-        # print(prompt)
-        # print('*' * 40)
-
-        # prompt = '<BOS>' + prompt
-        # input_ids = self.tokenizer.encode(prompt)
         input_ids = self.tokenizer.encode(prompt)
         sampling_param = SamplingParam(
             top_k=40,
             top_p=0.8,
-            temperature=0.8,
+            temperature=temperature,
             repetition_penalty=1.0,
             ignore_eos=False,
             random_seed=random.getrandbits(64),
+            stop_words=self.stop_words
         )
         response_size = 0
 
@@ -166,6 +167,4 @@ If a question does not make any sense, or is not factually coherent, explain why
             response_size += len(response_cur)
         if hasattr(generator, 'end'):
             generator.end(session_id)
-        # print(f'response_all = {response_all}' + '\n end.')
-        # assert False
         return response_all
