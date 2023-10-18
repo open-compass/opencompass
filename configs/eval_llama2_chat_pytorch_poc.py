@@ -4,8 +4,8 @@ from opencompass.models import PytorchModel
 
 with read_base():
     # choose a list of datasets
-    from .datasets.mmlu.mmlu_gen_a484b3 import mmlu_datasets
-    # from .datasets.ceval.ceval_gen_5f30c7 import ceval_datasets
+    # from .datasets.mmlu.mmlu_gen_a484b3 import mmlu_datasets
+    from .datasets.ceval.ceval_gen_5f30c7 import ceval_datasets
     # from .datasets.SuperGLUE_WiC.SuperGLUE_WiC_gen_d06864 import WiC_datasets
     # from .datasets.SuperGLUE_WSC.SuperGLUE_WSC_gen_6dc406 import WSC_datasets
     # from .datasets.triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
@@ -21,8 +21,8 @@ datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 meta_template = dict(
     round=[
-        dict(role="HUMAN", api_role="HUMAN"),
-        dict(role="BOT", api_role="BOT", generate=True),
+        dict(role="HUMAN", begin='[INST] ', end=' [/INST] '),
+        dict(role="BOT", begin="", end='', generate=True),
     ],
 )
 
@@ -99,6 +99,8 @@ models = [
         concurrency=1,
         meta_template=meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
+        stop_words=[103027, 103028],
+        # w8a8=True
     )
 ]
 
