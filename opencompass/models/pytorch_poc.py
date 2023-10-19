@@ -1,16 +1,14 @@
-import os.path as osp
+import random
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
 from lmdeploy.pytorch_poc import engine as tm
+from lmdeploy.pytorch_poc.messages import SamplingParam
 from transformers import AutoTokenizer
 
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
-from lmdeploy.pytorch_poc.messages import SamplingParam
-import random
-from opencompass.models.base_api import APITemplateParser
 
 PromptType = Union[PromptList, str]
 
@@ -44,21 +42,19 @@ class PytorchModel(BaseModel):
         concurrency: int = 8,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
-        stop_words=None,
-        # w8a8=True,
     ):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         self.logger = get_logger()
-        self.tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(path,
+                                                       trust_remote_code=True)
         tm_model = tm.Engine(path)
         self.generators = [
             tm_model.create_instance() for i in range(concurrency)
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
-        self.stop_words = stop_words
 
     def generate(
         self,
@@ -79,17 +75,6 @@ class PytorchModel(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
-        # B_INST, E_INST = "[INST]", "[/INST]"
-        # dialogs = []
-        # for input in inputs:
-        #     assert isinstance(input, PromptList)
-        #     dialog = ''
-        #     for item_prompt, item_answer in zip(input[::2], input[1::2]):
-        #         dialog += f"{self.tokenizer.bos_token}{B_INST} {item_prompt['prompt'].strip()} {E_INST} {item_answer['prompt'].strip()} {self.tokenizer.eos_token}"
-        #     assert input[-1]['role'] == 'HUMAN'
-        #     dialog += f"{self.tokenizer.bos_token}{B_INST} {input[-1]['prompt'].strip()} {E_INST}"
-        #     dialogs.append(dialog)
-        # inputs = dialogs
         assert isinstance(
             inputs, List), f'List(str) is expected, but got {type(inputs)}'
 
@@ -142,25 +127,23 @@ class PytorchModel(BaseModel):
         assert type(
             prompt) is str, 'We only support string for TurboMind Python API'
         input_ids = self.tokenizer.encode(prompt)
-        sampling_param = SamplingParam(
-            top_k=40,
-            top_p=0.8,
-            temperature=temperature,
-            repetition_penalty=1.0,
-            ignore_eos=False,
-            random_seed=random.getrandbits(64),
-            stop_words=self.stop_words
-        )
+        sampling_param = SamplingParam(top_k=40,
+                                       top_p=0.8,
+                                       temperature=temperature,
+                                       repetition_penalty=1.0,
+                                       ignore_eos=False,
+                                       random_seed=random.getrandbits(64),
+                                       stop_words=self.eos_token_id)
         response_size = 0
 
-        for outputs in generator.stream_infer(session_id=session_id,
-                                            #   input_ids=input_ids,
-                                              prompt_token_ids=input_ids,
-                                              request_output_len=max_out_len,
-                                              step=0,
-                                              sampling_param=sampling_param):
+        for outputs in generator.stream_infer(
+                session_id=session_id,
+                #   input_ids=input_ids,
+                prompt_token_ids=input_ids,
+                request_output_len=max_out_len,
+                step=0,
+                sampling_param=sampling_param):
             status, res, tokens = outputs
-            # decode res
             response_all = self.tokenizer.decode(res)
             response_cur = response_all[response_size:]
             response_all = valid_str(response_all)
