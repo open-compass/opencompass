@@ -133,7 +133,7 @@ class PytorchModel(BaseModel):
                                        repetition_penalty=1.0,
                                        ignore_eos=False,
                                        random_seed=random.getrandbits(64),
-                                       stop_words=self.eos_token_id)
+                                       stop_words=[self.eos_token_id])
         response_size = 0
 
         for outputs in generator.stream_infer(
