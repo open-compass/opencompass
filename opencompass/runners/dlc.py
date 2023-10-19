@@ -1,10 +1,13 @@
+import datetime
 import os
 import os.path as osp
 import random
+import re
 import subprocess
+import sys
 import time
 from functools import partial
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import mmengine
 from mmengine.config import ConfigDict
@@ -43,6 +46,11 @@ class DLCRunner(BaseRunner):
         self.max_num_workers = max_num_workers
         self.retry = retry
 
+        logger = get_logger()
+        logger.warning(
+            'To ensure the integrity of the log results, the log displayed '
+            f'by {self.__class__.__name__} has a 10-second delay.')
+
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
         """Launch multiple tasks.
 
@@ -63,18 +71,23 @@ class DLCRunner(BaseRunner):
             status = [self._launch(task, random_sleep=False) for task in tasks]
         return status
 
-    def _launch(self, cfg: ConfigDict, random_sleep: bool = True):
+    def _launch(self, cfg: ConfigDict, random_sleep: Optional[bool] = None):
         """Launch a single task.
 
         Args:
             cfg (ConfigDict): Task config.
             random_sleep (bool): Whether to sleep for a random time before
-                running the command. This avoids cluster error when launching
-                multiple tasks at the same time. Default: True.
+                running the command. When Aliyun has many tasks to schedule,
+                its stability decreases. Therefore, when we need to submit a
+                large number of tasks at once, we adopt the "random_sleep"
+                strategy. Tasks that would have been submitted all at once are
+                now evenly spread out over a 10-second period. Default: None.
 
         Returns:
             tuple[str, int]: Task name and exit code.
         """
+        if random_sleep is None:
+            random_sleep = (self.max_num_workers > 32)
 
         task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
@@ -116,7 +129,7 @@ class DLCRunner(BaseRunner):
 
             # Run command with retry
             if self.debug:
-                stdout = None
+                stdout = sys.stdout
             else:
                 out_path = task.get_log_path(file_extension='out')
                 mmengine.mkdir_or_exist(osp.split(out_path)[0])
@@ -124,30 +137,92 @@ class DLCRunner(BaseRunner):
 
             if random_sleep:
                 time.sleep(random.randint(0, 10))
-            result = subprocess.run(cmd,
-                                    shell=True,
-                                    text=True,
-                                    stdout=stdout,
-                                    stderr=stdout)
 
+            def _run_within_retry():
+                try:
+                    process = subprocess.Popen(cmd,
+                                               shell=True,
+                                               text=True,
+                                               stdout=subprocess.PIPE,
+                                               stderr=subprocess.PIPE)
+                    job_id = None
+                    job_allocated = False
+                    job_finished = False
+                    last_end_time = datetime.datetime.now().strftime(
+                        '%Y-%m-%dT%H:%M:%SZ')
+                    while True:
+                        if not job_allocated:
+                            line = process.stdout.readline()
+                            if not line:
+                                break
+                            match = re.search(r'(dlc[0-9a-z]+)', line)
+                            if match and job_id is None:
+                                job_id = match.group(1)
+                            stdout.write(line)
+                            match = re.search(r'Job .* is \[Running\]', line)
+                            if match:
+                                job_allocated = True
+                        else:
+                            try:
+                                process.wait(10)
+                            except subprocess.TimeoutExpired:
+                                pass
+                            else:
+                                job_finished = True
+                            if job_finished:
+                                this_end_time = datetime.datetime.now(
+                                ).strftime('%Y-%m-%dT%H:%M:%SZ')
+                            else:
+                                this_end_time = (
+                                    datetime.datetime.now() -
+                                    datetime.timedelta(seconds=10)
+                                ).strftime('%Y-%m-%dT%H:%M:%SZ')
+                            logs_cmd = (
+                                'dlc logs'
+                                f' {job_id} {job_id}-worker-0'
+                                f' --start_time {last_end_time}'
+                                f' --end_time {this_end_time}'
+                                f" -c {self.aliyun_cfg['dlc_config_path']}")
+                            log_process = subprocess.Popen(
+                                logs_cmd,
+                                shell=True,
+                                text=True,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+                            log_output, log_err = log_process.communicate()
+                            log_output = '\n'.join(log_output.split('\n')[2:])
+                            stdout.write(log_output)
+                            last_end_time = this_end_time
+                        stdout.flush()
+                        if job_finished:
+                            break
+                    process.wait()
+                    return process.returncode
+                finally:
+                    if job_id is not None:
+                        cancel_cmd = (
+                            'dlc stop job'
+                            f' {job_id}'
+                            f" -c {self.aliyun_cfg['dlc_config_path']}"
+                            ' -f')
+                        subprocess.run(cancel_cmd,
+                                       shell=True,
+                                       text=True,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+
+            return_code = _run_within_retry()
             retry = self.retry
             output_paths = task.get_output_paths()
-            while self._job_failed(result.returncode,
-                                   output_paths) and retry > 0:
+            while self._job_failed(return_code, output_paths) and retry > 0:
                 retry -= 1
-                if random_sleep:
-                    time.sleep(random.randint(0, 10))
-                # Re-generate command to refresh ports.
                 cmd = get_cmd()
-                result = subprocess.run(cmd,
-                                        shell=True,
-                                        text=True,
-                                        stdout=stdout,
-                                        stderr=stdout)
+                return_code = _run_within_retry()
         finally:
             # Clean up
             os.remove(param_file)
-        return task_name, result.returncode
+
+        return task_name, return_code
 
     def _job_failed(self, return_code: int, output_paths: List[str]) -> bool:
         return return_code != 0 or not all(
