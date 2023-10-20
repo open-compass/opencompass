@@ -5,7 +5,7 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import HFDataset, gsm8k_postprocess, gsm8k_dataset_postprocess
 
 # This config is for code interpreter
-math_example = """
+gsm8k_example = """
 <HUMAN>A group of 4 fruit baskets contains 9 apples, 15 oranges, and 14 bananas in the first three baskets and 2 less of each fruit in the fourth basket. How many fruits are there?
 <ASSISTANT>{thought} We need to calculate the total number of fruits. The total number of fruits in the first three baskets is given, while for the fourth basket, we need to subtract 2 from each fruit category. We can solve this problem using simple arithmetic.
 {action} PythonInterpreter
