@@ -13,6 +13,8 @@ class LagentAgent:
 
     def __init__(self, agent_type, llm, actions=None, protocol=None, **kwargs):
         llm = REGISTRY.build(llm)
+        # protocol illustration example
+        example = kwargs.pop('example', '')
         agent_cfg = {'type': agent_type, 'llm': llm, **kwargs}
 
         if actions is not None:
@@ -21,6 +23,10 @@ class LagentAgent:
                 [REGISTRY.build(action) for action in actions])
             agent_cfg['action_executor'] = executor
         if protocol is not None:
+            # format example in protocol if needed
+            if '{example}' in protocol['call_protocol']:
+                protocol['call_protocol'] = protocol['call_protocol'].format(
+                    example=example)
             protocol = REGISTRY.build(protocol)
             agent_cfg['protocol'] = protocol
 
