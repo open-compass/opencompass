@@ -1,12 +1,10 @@
 from mmengine.config import read_base
 from opencompass.partitioners import SizePartitioner
 from opencompass.runners import LocalRunner
-from opencompass.runners.slurm import SlurmRunner
 from opencompass.tasks import OpenICLInferTask
-from opencompass.models import OpenAI
 
 with read_base():
-    from .datasets.math.math_gen_1d3f0d import math_datasets, math_example
+    from .datasets.math.math_gen_66176f import math_datasets, math_example
     from .models.agent_template import model_template
     from .models.wizardcoder.hf_wizardcoder_python_13b import models as wizard_model
 
@@ -28,6 +26,6 @@ models = [
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=40000),
     runner=dict(
-        type=SlurmRunner, max_num_workers=16,
+        type=LocalRunner, max_num_workers=16,
         task=dict(type=OpenICLInferTask)),
 )

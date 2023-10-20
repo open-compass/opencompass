@@ -5,7 +5,7 @@ from opencompass.tasks import OpenICLInferTask
 from opencompass.models import OpenAI
 
 with read_base():
-    from .datasets.math.math_gen_1d3f0d import math_datasets, math_example
+    from .datasets.math.math_gen_66176f import math_datasets, math_example
     from .models.agent_template import model_template
 
 datasets = math_datasets
