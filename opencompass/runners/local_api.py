@@ -64,7 +64,7 @@ def redirect_std_to_file(filename: str):
     for h in logger.handlers:
         if isinstance(h, logging.StreamHandler):
             h.stream = sys.stdout
-    # specical treat for icl_gen_inferencer logger
+    # special treat for icl_gen_inferencer logger
     gen_logger = logging.getLogger(
         'opencompass.openicl.icl_inferencer.icl_gen_inferencer')
     for h in gen_logger.handlers:
@@ -82,7 +82,7 @@ def reset_std():
     for h in logger.handlers:
         if isinstance(h, logging.StreamHandler):
             h.stream = sys.stdout
-    # specical treat for icl_gen_inferencer logger
+    # special treat for icl_gen_inferencer logger
     gen_logger = logging.getLogger(
         'opencompass.openicl.icl_inferencer.icl_gen_inferencer')
     for h in gen_logger.handlers:
