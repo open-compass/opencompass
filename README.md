@@ -28,7 +28,7 @@ to **OpenCompass**!
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
 > **🔥 Attention**<br />
-> We launch the OpenCompass Collabration project, welcome to support diverse evaluation benchmarks into OpenCompass!
+> We launch the OpenCompass Collaboration project, welcome to support diverse evaluation benchmarks into OpenCompass!
 > Clike [Issue](https://github.com/open-compass/opencompass/issues/248) for more information.
 > Let's work together to build a more powerful OpenCompass toolkit!
 
