@@ -1,23 +1,25 @@
+import logging
 import os
 import os.path as osp
 import subprocess
-import time
 import sys
-from typing import Any, Dict, List, Tuple
+import time
 from multiprocessing import Manager, Pool
 from multiprocessing.managers import SyncManager
-import logging
+from typing import Any, Dict, List, Tuple
+
 import mmengine
 from mmengine.config import ConfigDict
-from opencompass.tasks.base import BaseTask
 from tqdm import tqdm
 
 from opencompass.registry import RUNNERS, TASKS
 from opencompass.tasks import OpenICLInferTask
-from .base import BaseRunner
+from opencompass.tasks.base import BaseTask
 from opencompass.utils import (build_dataset_from_cfg, build_model_from_cfg,
                                get_infer_output_path, get_logger,
                                task_abbr_from_cfg)
+
+from .base import BaseRunner
 
 
 def monkey_run(self, tokens: SyncManager.Semaphore):
@@ -189,8 +191,8 @@ class LocalAPIRunner(BaseRunner):
                 param_file = f'tmp/{os.getpid()}_params.py'
                 try:
                     task.cfg.dump(param_file)
-                    cmd = task.get_command(
-                        cfg_path=param_file, template='{task_cmd}')
+                    cmd = task.get_command(cfg_path=param_file,
+                                           template='{task_cmd}')
                     # run in subprocess if starts with torchrun etc.
                     if cmd.startswith('python'):
                         task.run()
@@ -213,15 +215,15 @@ class LocalAPIRunner(BaseRunner):
                 status = []
 
                 def update(args):
-                    """Update pbar when callback"""
+                    """Update pbar when callback."""
                     pbar_counter.value += 1
                     status.append(args)
 
                 with Pool(processes=self.max_num_workers) as pool:
                     for task in tasks:
-                        pool.apply_async(
-                            submit, (task, self.task_cfg['type'], tokens),
-                            callback=update)
+                        pool.apply_async(submit,
+                                         (task, self.task_cfg['type'], tokens),
+                                         callback=update)
 
                     while True:
                         cur_count = pbar_counter.value
