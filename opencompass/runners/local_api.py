@@ -215,7 +215,7 @@ class LocalAPIRunner(BaseRunner):
                 status = []
 
                 def update(args):
-                    """Update pbar when callback."""
+                    """Update pbar counter when callback."""
                     pbar_counter.value += 1
                     status.append(args)
 
@@ -224,7 +224,9 @@ class LocalAPIRunner(BaseRunner):
                         pool.apply_async(submit,
                                          (task, self.task_cfg['type'], tokens),
                                          callback=update)
+                    pool.close()
 
+                    # update progress bar
                     while True:
                         cur_count = pbar_counter.value
                         if cur_count > pbar.n:
@@ -236,6 +238,5 @@ class LocalAPIRunner(BaseRunner):
                         # sleep to lower the usage
                         time.sleep(1)
 
-                    pool.close()
                     pool.join()
         return status
