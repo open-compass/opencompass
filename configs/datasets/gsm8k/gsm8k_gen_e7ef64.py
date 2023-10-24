@@ -65,7 +65,7 @@ gsm8k_reader_cfg = dict(input_columns=['question'], output_column='answer')
 gsm8k_infer_cfg = dict(
     prompt_template=dict(type=PromptTemplate, template='{question}'),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=AgentInferencer))
+    inferencer=dict(type=AgentInferencer, example=gsm8k_example))
 
 gsm8k_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),

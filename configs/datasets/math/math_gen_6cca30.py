@@ -42,7 +42,7 @@ def solution():
 math_infer_cfg = dict(
     prompt_template=dict(type=PromptTemplate, template='{problem}'),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=AgentInferencer))
+    inferencer=dict(type=AgentInferencer, example=math_example))
 
 math_eval_cfg = dict(
     evaluator=dict(type=MATHEvaluator),
