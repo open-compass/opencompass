@@ -47,8 +47,6 @@ models = [
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=40000),
     runner=dict(
-        type=LocalRunner,
-        max_num_workers=16,
-        retry=0,
+        type=LocalRunner, max_num_workers=16,
         task=dict(type=OpenICLInferTask)),
 )
