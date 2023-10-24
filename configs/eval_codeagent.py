@@ -1,7 +1,6 @@
 from mmengine.config import read_base
 from opencompass.partitioners import SizePartitioner
 from opencompass.runners import LocalRunner
-from opencompass.runners import SlurmRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.models import OpenAI, HuggingFaceCausalLM
 from opencompass.models.lagent import CodeAgent
@@ -46,8 +45,10 @@ models = [
 ]
 
 infer = dict(
-    partitioner=dict(type=SizePartitioner, max_task_size=400000),
+    partitioner=dict(type=SizePartitioner, max_task_size=40000),
     runner=dict(
-        type=SlurmRunner, max_num_workers=16,
+        type=LocalRunner,
+        max_num_workers=16,
+        retry=0,
         task=dict(type=OpenICLInferTask)),
 )

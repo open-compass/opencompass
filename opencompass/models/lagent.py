@@ -1,7 +1,5 @@
 from typing import List, Tuple
 
-from lagent.actions import PythonInterpreter
-from lagent.agents.react import ReActProtocol
 from mmengine.registry import Registry
 
 from opencompass.lagent.agents.react import ReAct
@@ -111,7 +109,8 @@ class CodeAgent:
     """Agent wrapper for Lagent."""
 
     def __new__(self, llm, **kwargs):
-
+        from lagent.actions import PythonInterpreter
+        from lagent.agents.react import ReActProtocol
         agent_type = kwargs.pop('agent_type', ReAct)
         max_turn = kwargs.pop('max_turn', 3)
         actions = kwargs.pop('actions', [
