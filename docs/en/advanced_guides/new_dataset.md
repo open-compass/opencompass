@@ -54,4 +54,4 @@ Although OpenCompass has already included most commonly used datasets, users nee
    ]
    ```
 
-   Once the dataset is configured, you can refer to the instructions on [Get started](../get_started.md) for other requirements.
+   Detailed dataset configuration files and other required configuration files can be referred to in the [Configuration Files](../user_guides/config.md) tutorial. For guides on launching tasks, please refer to the [Quick Start](../get_started/quick_start.md) tutorial.
