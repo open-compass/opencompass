@@ -30,8 +30,7 @@ models = [
     dict(
         type=PytorchModel,
         abbr='internlm-chat-20b-pytorch-poc',
-        # path = '/mnt/140/InternLM/internlm-chat-7b',
-        path='/mnt/140/InternLM/20B/internlm-20b-chat',
+        path='internlm/internlm-chat-7b',
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,

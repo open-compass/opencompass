@@ -30,7 +30,7 @@ models = [
     dict(
         type=PytorchModel,
         abbr='internlm-chat-7b-pytorch-poc-w8a8',
-        path = '/nvme/caoweihan/projects/lmdeploy/work_dir',
+        path = '/nvme/caoweihan/projects/lmdeploy/work_dir',  # comming soon
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,

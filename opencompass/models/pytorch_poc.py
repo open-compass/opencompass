@@ -2,13 +2,19 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
-from lmdeploy.pytorch_poc import engine as tm
-from lmdeploy.pytorch_poc.messages import SamplingParam
 from transformers import AutoTokenizer
 
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
+
+try:
+    from lmdeploy.pytorch_poc import engine as tm
+    from lmdeploy.pytorch_poc.messages import SamplingParam
+except ImportError:
+    from opencompass.utils import get_package_placeholder, get_placeholder
+    tm = get_package_placeholder('lmdeploy')
+    SamplingParam = get_placeholder('lmdeploy')
 
 PromptType = Union[PromptList, str]
 
@@ -43,7 +49,6 @@ class PytorchModel(BaseModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
     ):
-
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
