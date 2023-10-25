@@ -3,8 +3,6 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
-from lmdeploy.serve.turbomind.chatbot import Chatbot
-
 from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
@@ -27,13 +25,11 @@ class TurboMindTisModel(BaseModel):
 
     Args:
         path (str): The name of OpenAI's model.
-        model_path (str): folder of the turbomind model's path
+        tis_addr (str): The address (ip:port format) of turbomind's
+            triton inference server
         max_seq_len (int): The maximum allowed sequence length of a model.
             Note that the length of prompt + generated tokens shall not exceed
             this value. Defaults to 2048.
-        query_per_second (int): The maximum queries allowed per second
-            between two consecutive calls of the API. Defaults to 1.
-        retry (int): Number of retires if the API call fails. Defaults to 2.
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
@@ -48,7 +44,6 @@ class TurboMindTisModel(BaseModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
     ):
-
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
@@ -114,6 +109,8 @@ class TurboMindTisModel(BaseModel):
         """
         assert type(
             prompt) is str, 'We only support string for TurboMind RPC API'
+
+        from lmdeploy.serve.turbomind.chatbot import Chatbot
         chatbot = Chatbot(self.tis_addr,
                           temperature=temperature,
                           capability='completion',

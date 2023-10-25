@@ -2,9 +2,6 @@ import os.path as osp
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
-from lmdeploy import turbomind as tm
-from lmdeploy.tokenizer import Tokenizer
-
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
@@ -27,6 +24,7 @@ class TurboMindModel(BaseModel):
 
     Args:
         path (str): path of the turbomind model
+        concurrency (int): the maximum allowed concurrency of turbomind.
         max_seq_len (int): The maximum allowed sequence length of a model.
             Note that the length of prompt + generated tokens shall not exceed
             this value. Defaults to 2048.
@@ -42,6 +40,8 @@ class TurboMindModel(BaseModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
     ):
+        from lmdeploy import turbomind as tm
+        from lmdeploy.tokenizer import Tokenizer
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,

@@ -115,4 +115,3 @@ models = [
 #         run_cfg=dict(num_gpus=1, num_procs=1),
 #     )
 # ]
-
