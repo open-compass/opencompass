@@ -133,14 +133,18 @@ class HuggingFace(BaseModel):
 
     def _set_model_kwargs_torch_dtype(self, model_kwargs):
         if 'torch_dtype' not in model_kwargs:
-            model_kwargs['torch_dtype'] = torch.float16
+            torch_dtype = torch.float16
         else:
-            model_kwargs['torch_dtype'] = {
+            torch_dtype = {
                 'torch.float16': torch.float16,
                 'torch.bfloat16': torch.bfloat16,
                 'torch.float': torch.float,
                 'auto': 'auto',
+                'None': None
             }.get(model_kwargs['torch_dtype'])
+        self.logger.debug(f'HF using torch_dtype: {torch_dtype}')
+        if torch_dtype is not None:
+            model_kwargs['torch_dtype'] = torch_dtype
 
     def _load_model(self,
                     path: str,
