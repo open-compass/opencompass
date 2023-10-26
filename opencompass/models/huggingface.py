@@ -100,36 +100,33 @@ class HuggingFace(BaseModel):
             if self.pad_token_id < 0:
                 self.pad_token_id += self.tokenizer.vocab_size
             if self.tokenizer.pad_token_id is None:
-                self.logger.warning(
-                    f'Using {self.pad_token_id} as pad_token_id')
+                self.logger.debug(f'Using {self.pad_token_id} as pad_token_id')
             elif self.tokenizer.pad_token_id != self.pad_token_id:
                 self.logger.warning(
-                    f'pad_token_id is not consistent with the tokenizer. Using {self.pad_token_id} as pad_token_id'  # noqa
-                )
+                    'pad_token_id is not consistent with the tokenizer. Using '
+                    f'{self.pad_token_id} as pad_token_id')
             self.tokenizer.pad_token_id = self.pad_token_id
         elif self.tokenizer.pad_token_id is None:
             self.logger.warning('pad_token_id is not set for the tokenizer.')
             if self.tokenizer.eos_token is not None:
-                self.logger.warning('Using eos_token_id as pad_token_id.')
                 self.logger.warning(
-                    f'{self.tokenizer.eos_token} la {self.tokenizer.eos_token is None}'  # noqa
-                )
+                    f'Using eos_token_id {self.tokenizer.eos_token} '
+                    'as pad_token_id.')
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             else:
-                raise ValueError(
-                    'pad_token_id is not set for this tokenizer. Try to set pad_token_id via passing `pad_token_id={PAD_TOKEN_ID}` in model_cfg. You may find pad_token_id in `generation.json`'  # noqa
-                )
+                from transformers.generation import GenerationConfig
+                gcfg = GenerationConfig.from_pretrained(path)
 
-        # A patch for llama when batch_padding = True
-        if 'decapoda-research/llama' in path or \
-                (tokenizer_path and
-                 'decapoda-research/llama' in tokenizer_path):
-            self.logger.warning('We set new pad_token_id for LLaMA model')
-            # keep consistent with official LLaMA repo
-            # https://github.com/google/sentencepiece/blob/master/python/sentencepiece_python_module_example.ipynb  # noqa
-            self.tokenizer.bos_token = '<s>'
-            self.tokenizer.eos_token = '</s>'
-            self.tokenizer.pad_token_id = 0
+                if gcfg.pad_token_id is not None:
+                    self.logger.warning(
+                        f'Using pad_token_id {gcfg.pad_token_id} '
+                        'as pad_token_id.')
+                    self.tokenizer.pad_token_id = gcfg.pad_token_id
+                else:
+                    raise ValueError(
+                        'pad_token_id is not set for this tokenizer. Try to '
+                        'set pad_token_id via passing '
+                        '`pad_token_id={PAD_TOKEN_ID}` in model_cfg.')
 
     def _load_model(self,
                     path: str,
@@ -150,12 +147,7 @@ class HuggingFace(BaseModel):
                                                    peft_path,
                                                    is_trainable=False)
         self.model.eval()
-
-        # A patch for llama when batch_padding = True
-        if 'decapoda-research/llama' in path:
-            self.model.config.bos_token_id = 1
-            self.model.config.eos_token_id = 2
-            self.model.config.pad_token_id = self.tokenizer.pad_token_id
+        self.model.generation_config.do_sample = False
 
     def generate(self, inputs: List[str], max_out_len: int,
                  **kwargs) -> List[str]:
@@ -417,3 +409,4 @@ class HuggingFaceCausalLM(HuggingFace):
                                                    peft_path,
                                                    is_trainable=False)
         self.model.eval()
+        self.model.generation_config.do_sample = False
