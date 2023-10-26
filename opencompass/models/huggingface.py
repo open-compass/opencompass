@@ -128,6 +128,17 @@ class HuggingFace(BaseModel):
                         'set pad_token_id via passing '
                         '`pad_token_id={PAD_TOKEN_ID}` in model_cfg.')
 
+        # A patch for llama when batch_padding = True
+        if 'decapoda-research/llama' in path or \
+                (tokenizer_path and
+                 'decapoda-research/llama' in tokenizer_path):
+            self.logger.warning('We set new pad_token_id for LLaMA model')
+            # keep consistent with official LLaMA repo
+            # https://github.com/google/sentencepiece/blob/master/python/sentencepiece_python_module_example.ipynb  # noqa
+            self.tokenizer.bos_token = '<s>'
+            self.tokenizer.eos_token = '</s>'
+            self.tokenizer.pad_token_id = 0
+
     def _load_model(self,
                     path: str,
                     model_kwargs: dict,
@@ -148,6 +159,12 @@ class HuggingFace(BaseModel):
                                                    is_trainable=False)
         self.model.eval()
         self.model.generation_config.do_sample = False
+
+        # A patch for llama when batch_padding = True
+        if 'decapoda-research/llama' in path:
+            self.model.config.bos_token_id = 1
+            self.model.config.eos_token_id = 2
+            self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
     def generate(self, inputs: List[str], max_out_len: int,
                  **kwargs) -> List[str]:
