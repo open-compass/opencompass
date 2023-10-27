@@ -1,38 +1,37 @@
-# 主观评测指引
+# Subjective Evaluation Guide
 
-## 介绍
+## Introduction
 
-主观评测旨在评估模型在符合人类偏好的能力上的表现。这种评估的黄金准则是人类喜好，但标注成本很高。
+Subjective evaluation aims to assess the model's performance in tasks that align with human preferences. The key criterion for this evaluation is human preference, but it comes with a high cost of annotation.
 
-为了探究模型的主观能力，我们采用了最先进的LLM（GPT-4）作为人类评估者的替代品（[LLM-as-a-Judge](https://arxiv.org/abs/2306.05685)）。
+To explore the model's subjective capabilities, we employ state-of-the-art LLM (GPT-4) as a substitute for human assessors ([LLM-as-a-Judge](https://arxiv.org/abs/2306.05685)).
 
-流行的评估方法是将模型的回答进行两两比较，以计算其胜率（[Chatbot Arena](https://chat.lmsys.org/)）。
+A popular evaluation method involves comparing model responses pairwise to calculate their win rate ([Chatbot Arena](https://chat.lmsys.org/)).
 
-我们基于这一方法支持了GPT4用于模型的主观能力评估。
+We support the use of GPT-4 for the subjective evaluation of models based on this method.
 
-## 数据准备
+## Data Preparation
 
-我们提供了一个基于[z-bench](https://github.com/zhenbench/z-bench)的demo测试集：[subjective_demo.xlsx](https://opencompass.openxlab.space/utils/subjective_demo.xlsx
-)。
+We provide a demo test set [subjective_demo.xlsx](https://opencompass.openxlab.space/utils/subjective_demo.xlsx) based on [z-bench](https://github.com/zhenbench/z-bench).
 
-将主观问题集以.xlsx格式存放在data/subjective/中。
+Store the set of subjective questions in .xlsx format in the data/subjective/directory.
 
-表格包括以下字段：
-- 'question'：问题描述
-- 'index'：题目序号
-- 'reference_answer'：参考答案
-- 'evaluating_guidance'：评估引导
-- 'capability'：题目所属的能力维度。
+The table includes the following fields:
+- 'question': Question description
+- 'index': Question number
+- 'reference_answer': Reference answer
+- 'evaluating_guidance': Evaluation guidance
+- 'capability': The capability dimension of the question.
 
-## 评测配置
-具体流程包括:
-1. 模型回答的推理
-2. GPT4评估比较对
-3. 生成评测报告
+## Evaluation Configuration
+The specific process includes:
+1. Model response reasoning
+2. GPT-4 evaluation comparisons
+3. Generating evaluation reports
 
-对于 config/subjective.py，我们提供了部分注释，方便用户理解配置文件的含义。
+For config/subjective.py, we provide some annotations to help users understand the configuration file's meaning.
 ```python
-# 导入数据集与主观评测summarizer
+# Import datasets and subjective evaluation summarizer
 from mmengine.config import read_base
 with read_base():
     from .datasets.subjectivity_cmp.subjectivity_cmp import subjectivity_datasets
@@ -42,14 +41,14 @@ datasets = [*subjectivity_datasets]
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
 
-#导入主观评测所需partitioner与task
+# Import partitioner and task required for subjective evaluation
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 
 
-# 定义推理和评测所需模型配置
-# 包括chatglm2-6b，qwen-7b-chat，internlm-chat-7b，gpt4
+# Define model configurations for inference and evaluation
+# Including chatglm2-6b, qwen-7b-chat, internlm-chat-7b and gpt4
 _meta_template = dict(
     round=[
         dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
@@ -72,17 +71,17 @@ api_meta_template = dict(
     ],
 )
 
-# 定义主观评测配置
+# Define the configuration for subjective evaluation
 eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
-        mode='all',  # 新参数，构建比较对时会交替构建两个
+        mode='all',  # alternately constructs two for comparisons
     ),
     runner=dict(
         type=LocalRunner,
-        max_num_workers=2,  # 支持并行比较
+        max_num_workers=2,  # Supports parallel comparisons
         task=dict(
-            type=SubjectiveEvalTask,  # 新 task，用来读入一对 model 的输入
+            type=SubjectiveEvalTask,  # Used to read inputs for a pair of models
             judge_cfg=dict(
                 abbr='GPT4',
                 type=OpenAI,
@@ -97,15 +96,15 @@ eval = dict(
 )
 ```
 
-## 启动评测
+## Launching the Evaluation
 ```shell
 python run.py config/subjective.py -r
 ```
-```-r``` 参数支持复用模型推理和GPT4评估结果。
+The ```-r``` parameter allows the reuse of model inference and GPT-4 evaluation results.
 
-## 评测报告
+## Evaluation Report
 
-评测报告会输出到output/.../summary/timestamp/report.md，包含胜率统计，对战分数与ELO。具体格式如下：
+The evaluation report will be output to output/.../summary/timestamp/report.md, which includes win rate statistics, battle scores, and ELO ratings. The specific format is as follows:
 ```markdown
 # Subjective Analysis
 A total of 30 comparisons, of which 30 comparisons are meaningful (A / B answers inconsistent)
