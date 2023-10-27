@@ -4,6 +4,7 @@ import os.path as osp
 import time
 from collections import Counter
 from inspect import signature
+from shutil import which
 from typing import Optional
 
 import mmengine
@@ -37,7 +38,8 @@ class OpenICLEvalTask(BaseTask):
 
     def get_command(self, cfg_path, template):
         script_path = __file__
-        command = f'python3 {script_path} {cfg_path}'
+        python = 'python3' if which('python3') else 'python'
+        command = f'{python} {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
     def run(self):
