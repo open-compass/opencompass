@@ -146,9 +146,17 @@ class LocalRunner(BaseRunner):
         try:
             task.cfg.dump(param_file)
 
-            # Build up slurm command
-            tmpl = 'CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
-            tmpl += ' {task_cmd}'
+            # Build up local command
+            import sys
+            if sys.platform == 'win32':  # Always return win32 for Windows
+                # use command in Windows format
+                tmpl = 'set CUDA_VISIBLE_DEVICES=' + ','.join(
+                    str(i) for i in gpu_ids)
+                tmpl += ' & {task_cmd}'
+            else:
+                tmpl = 'CUDA_VISIBLE_DEVICES=' + ','.join(
+                    str(i) for i in gpu_ids)
+                tmpl += ' {task_cmd}'
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
