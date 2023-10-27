@@ -20,6 +20,5 @@ class HeadQADataset(BaseDataset):
             example['choices'] = choices_str
             return example
 
-        dataset = dataset.map(preprocess).remove_columns(
-            ['image'])
+        dataset = dataset.map(preprocess).remove_columns(['image'])
         return dataset
