@@ -64,6 +64,7 @@ OpenCompass 上手路线
    advanced_guides/multimodal_eval.md
    advanced_guides/prompt_attack.md
    advanced_guides/longeval.md
+   advanced_guides/subjective_evaluation.md
 
 .. _工具:
 .. toctree::
