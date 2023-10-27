@@ -1,9 +1,9 @@
 from mmengine.config import read_base
 with read_base():
-    from .datasets.subjectivity_cmp.subjectivity_cmp import subjectivity_datasets
+    from .datasets.subjective_cmp.subjective_cmp import subjective_datasets
     from .summarizers.subjective import summarizer
 
-datasets = [*subjectivity_datasets]
+datasets = [*subjective_datasets]
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
@@ -35,22 +35,20 @@ models = [
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
-            trust_remote_code=True,
-            revision='b1502f4f75c71499a3d566b14463edd62620ce9f'),
+            trust_remote_code=True),
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,
         model_kwargs=dict(
             trust_remote_code=True,
-            device_map='auto',
-            revision='b1502f4f75c71499a3d566b14463edd62620ce9f'),
+            device_map='auto'),
         run_cfg=dict(num_gpus=1, num_procs=1),
     ),
     dict(
         type=HuggingFaceCausalLM,
         abbr='qwen-7b-chat-hf',
-        path="/mnt/petrelfs/share_data/duanhaodong/Qwen-7B-Chat",
-        tokenizer_path='/mnt/petrelfs/share_data/duanhaodong/Qwen-7B-Chat',
+        path="Qwen/Qwen-7B-Chat",
+        tokenizer_path='Qwen/Qwen-7B-Chat',
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
@@ -74,16 +72,14 @@ models = [
             padding_side='left',
             truncation_side='left',
             use_fast=False,
-            trust_remote_code=True,
-            revision="ed5e35564ac836710817c51e8e8d0a5d4ff03102"),
+            trust_remote_code=True),
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,
         meta_template=_meta_template2,
         model_kwargs=dict(
             trust_remote_code=True,
-            device_map='auto',
-            revision="ed5e35564ac836710817c51e8e8d0a5d4ff03102"),
+            device_map='auto'),
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
