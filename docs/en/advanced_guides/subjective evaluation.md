@@ -14,7 +14,7 @@ We support the use of GPT-4 for the subjective evaluation of models based on thi
 
 We provide a demo test set [subjective_demo.xlsx](https://opencompass.openxlab.space/utils/subjective_demo.xlsx) based on [z-bench](https://github.com/zhenbench/z-bench).
 
-Store the set of subjective questions in .xlsx format in the data/subjective/directory.
+Store the set of subjective questions in .xlsx format in the `data/subjective/directory`.
 
 The table includes the following fields:
 - 'question': Question description
@@ -29,15 +29,15 @@ The specific process includes:
 2. GPT-4 evaluation comparisons
 3. Generating evaluation reports
 
-For config/subjective.py, we provide some annotations to help users understand the configuration file's meaning.
+For `config/subjective.py`, we provide some annotations to help users understand the configuration file's meaning.
 ```python
 # Import datasets and subjective evaluation summarizer
 from mmengine.config import read_base
 with read_base():
-    from .datasets.subjectivity_cmp.subjectivity_cmp import subjectivity_datasets
+    from .datasets.subjective_cmp.subjective_cmp import subjective_datasets
     from .summarizers.subjective import summarizer
 
-datasets = [*subjectivity_datasets]
+datasets = [*subjective_datasets]
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
 
@@ -48,18 +48,8 @@ from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 
 
 # Define model configurations for inference and evaluation
-# Including chatglm2-6b, qwen-7b-chat, internlm-chat-7b and gpt4
-_meta_template = dict(
-    round=[
-        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
-        dict(
-            role="BOT",
-            begin="\n<|im_start|>assistant\n",
-            end='<|im_end|>',
-            generate=True),
-    ], )
-
-...
+# Including the inference models chatglm2-6b, qwen-7b-chat, internlm-chat-7b, and the evaluation model gpt4
+models = [...]
 
 api_meta_template = dict(
     round=[
@@ -100,11 +90,11 @@ eval = dict(
 ```shell
 python run.py config/subjective.py -r
 ```
-The ```-r``` parameter allows the reuse of model inference and GPT-4 evaluation results.
+The `-r` parameter allows the reuse of model inference and GPT-4 evaluation results.
 
 ## Evaluation Report
 
-The evaluation report will be output to output/.../summary/timestamp/report.md, which includes win rate statistics, battle scores, and ELO ratings. The specific format is as follows:
+The evaluation report will be output to `output/.../summary/timestamp/report.md`, which includes win rate statistics, battle scores, and ELO ratings. The specific format is as follows:
 ```markdown
 # Subjective Analysis
 A total of 30 comparisons, of which 30 comparisons are meaningful (A / B answers inconsistent)
@@ -137,3 +127,12 @@ A total of 30 answer comparisons, successfully extracted 30 answers from GPT-4 r
 | elo_score [Std]  |         0.621362 |              0.400226 |          0.694434 |
 
 ```
+For comparing the evaluation of models A and B, there are four choices:
+1. A is better than B.
+2. A and B are equally good.
+3. A is worse than B.
+4. Neither A nor B is good.
+
+So, `win` / `tie` / `lose` / `not bad` represent the proportions of the model winning / tying / losing / winning or being equally good, respectively.
+
+`Bootstrap ELO` is calculated as the median ELO score by comparing match results through 1000 random permutations.

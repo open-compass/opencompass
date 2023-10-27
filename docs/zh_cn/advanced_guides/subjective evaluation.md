@@ -4,18 +4,17 @@
 
 主观评测旨在评估模型在符合人类偏好的能力上的表现。这种评估的黄金准则是人类喜好，但标注成本很高。
 
-为了探究模型的主观能力，我们采用了最先进的LLM（GPT-4）作为人类评估者的替代品（[LLM-as-a-Judge](https://arxiv.org/abs/2306.05685)）。
+为了探究模型的主观能力，我们采用了最先进的 LLM（GPT-4）作为人类评估者的替代品（[LLM-as-a-Judge](https://arxiv.org/abs/2306.05685)）。
 
 流行的评估方法是将模型的回答进行两两比较，以计算其胜率（[Chatbot Arena](https://chat.lmsys.org/)）。
 
-我们基于这一方法支持了GPT4用于模型的主观能力评估。
+我们基于这一方法支持了 GPT4 用于模型的主观能力评估。
 
 ## 数据准备
 
-我们提供了一个基于[z-bench](https://github.com/zhenbench/z-bench)的demo测试集：[subjective_demo.xlsx](https://opencompass.openxlab.space/utils/subjective_demo.xlsx
-)。
+我们提供了一个基于 [z-bench](https://github.com/zhenbench/z-bench) 的 demo 测试集：[subjective_demo.xlsx](https://opencompass.openxlab.space/utils/subjective_demo.xlsx)。
 
-将主观问题集以.xlsx格式存放在data/subjective/中。
+将主观问题集以.xlsx格式存放在 `data/subjective/` 中。
 
 表格包括以下字段：
 - 'question'：问题描述
@@ -27,40 +26,30 @@
 ## 评测配置
 具体流程包括:
 1. 模型回答的推理
-2. GPT4评估比较对
+2. GPT4 评估比较对
 3. 生成评测报告
 
-对于 config/subjective.py，我们提供了部分注释，方便用户理解配置文件的含义。
+对于 `config/subjective.py`，我们提供了部分注释，方便用户理解配置文件的含义。
 ```python
-# 导入数据集与主观评测summarizer
+# 导入数据集与主观评测 summarizer
 from mmengine.config import read_base
 with read_base():
-    from .datasets.subjectivity_cmp.subjectivity_cmp import subjectivity_datasets
+    from .datasets.subjective_cmp.subjective_cmp import subjective_datasets
     from .summarizers.subjective import summarizer
 
-datasets = [*subjectivity_datasets]
+datasets = [*subjective_datasets]
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
 
-#导入主观评测所需partitioner与task
+#导入主观评测所需 partitioner 与 task
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 
 
 # 定义推理和评测所需模型配置
-# 包括chatglm2-6b，qwen-7b-chat，internlm-chat-7b，gpt4
-_meta_template = dict(
-    round=[
-        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
-        dict(
-            role="BOT",
-            begin="\n<|im_start|>assistant\n",
-            end='<|im_end|>',
-            generate=True),
-    ], )
-
-...
+# 包括推理模型 chatglm2-6b，qwen-7b-chat，internlm-chat-7b 和 评测模型 gpt4
+models = [...]
 
 api_meta_template = dict(
     round=[
@@ -101,11 +90,11 @@ eval = dict(
 ```shell
 python run.py config/subjective.py -r
 ```
-```-r``` 参数支持复用模型推理和GPT4评估结果。
+`-r` 参数支持复用模型推理和 GPT4 评估结果。
 
 ## 评测报告
 
-评测报告会输出到output/.../summary/timestamp/report.md，包含胜率统计，对战分数与ELO。具体格式如下：
+评测报告会输出到 `output/.../summary/timestamp/report.md` ，包含胜率统计，对战分数与ELO。具体格式如下：
 ```markdown
 # Subjective Analysis
 A total of 30 comparisons, of which 30 comparisons are meaningful (A / B answers inconsistent)
@@ -138,3 +127,11 @@ A total of 30 answer comparisons, successfully extracted 30 answers from GPT-4 r
 | elo_score [Std]  |         0.621362 |              0.400226 |          0.694434 |
 
 ```
+对于评估模型 A 和 B的比较对，有四种选择：
+1. A 比 B 好
+2. A 和 B 一样好
+3. A 比 B 差
+4. A 和 B 都不好
+
+故 `win` / `tie` / `lose` / `not bad` 分别指模型 胜 / 平局 / 负 / 胜或一样好 的比例 。
+`Bootstrap ELO` 是通过对比赛结果进行1000次随机顺序，计算出 ELO 分数的中位数。
