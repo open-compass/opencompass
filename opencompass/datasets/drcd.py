@@ -12,7 +12,7 @@ class DRCDDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        with open(path) as f:
+        with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         # 将原始数据转换为所需的格式
         rows = []
