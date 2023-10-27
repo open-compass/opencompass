@@ -42,7 +42,7 @@ class OpenICLInferTask(BaseTask):
                 the command.
         """
         script_path = __file__
-        if self.num_gpus > 0:
+        if False:
             port = random.randint(12000, 32000)
             command = (f'torchrun --master_port={port} '
                        f'--nproc_per_node {self.num_procs} '
