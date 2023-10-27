@@ -52,6 +52,7 @@ from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
+from .logiqa import *  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
