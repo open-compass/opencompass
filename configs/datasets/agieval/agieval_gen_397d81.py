@@ -1,9 +1,12 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import PPLInferencer, GenInferencer
+from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import AGIEvalDataset_v2, AGIEvalEvaluator, AGIEvalEvaluator_mcq
-from opencompass.utils.text_postprocessors import first_capital_postprocess_multi
+from opencompass.datasets import AGIEvalDataset_v2, AGIEvalEvaluator
+from opencompass.utils.text_postprocessors import first_capital_postprocess, first_capital_postprocess_multi
+
+agieval_reader_cfg = dict(
+    input_columns=['question', 'options'], output_column='label')
 
 agieval_single_choice_sets = [
     'gaokao-chinese',
@@ -12,6 +15,7 @@ agieval_single_choice_sets = [
     'gaokao-history',
     'gaokao-biology',
     'gaokao-chemistry',
+    'gaokao-physics',
     'gaokao-mathqa',
     'logiqa-zh',
     'lsat-ar',
@@ -24,7 +28,6 @@ agieval_single_choice_sets = [
     'aqua-rat',
 ]
 agieval_multiple_choices_sets = [
-    'gaokao-physics',
     'jec-qa-kd',
     'jec-qa-ca',
 ]
@@ -65,28 +68,22 @@ agieval_gaokao_sets = [
 
 agieval_datasets = []
 for _name in agieval_single_choice_sets:
-    if _name in ['lsat-ar', 'lsat-lr', 'lsat-rc', 'aqua-rat']:
-        _options = ['A', 'B', 'C', 'D', 'E']
-    else:
-        _options = ['A', 'B', 'C', 'D']
     if _name in agieval_chinese_sets:
-        _hint = '答案是：'
+        _hint = '答案是： '
     else:
         _hint = 'The answer is '
     agieval_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
-            template={
-                label: dict(round=[
-                    dict(role='HUMAN', prompt='{question}\n{options}'),
-                    dict(role='BOT', prompt=f'{_hint}{label}')
-                ])
-                for label in _options
-            }),
+            template=dict(round=[
+                dict(role='HUMAN', prompt=f'{{question}}\n{{options}}\n{_hint}')
+            ])),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=PPLInferencer, labels=_options))
+        inferencer=dict(type=GenInferencer, max_out_len=1024))
 
-    agieval_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
+    agieval_eval_cfg = dict(
+        evaluator=dict(type=AccEvaluator),
+        pred_postprocessor=dict(type=first_capital_postprocess))
 
     agieval_datasets.append(
         dict(
@@ -95,9 +92,7 @@ for _name in agieval_single_choice_sets:
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',
-            reader_cfg=dict(
-                input_columns=['question', 'options'] + _options,
-                output_column='label'),
+            reader_cfg=agieval_reader_cfg,
             infer_cfg=agieval_infer_cfg.copy(),
             eval_cfg=agieval_eval_cfg.copy()))
 
@@ -116,7 +111,7 @@ for _name in agieval_multiple_choices_sets:
         inferencer=dict(type=GenInferencer, max_out_len=1024))
 
     agieval_eval_cfg = dict(
-        evaluator=dict(type=AGIEvalEvaluator_mcq),
+        evaluator=dict(type=AccEvaluator),
         pred_postprocessor=dict(type=first_capital_postprocess_multi))
 
     agieval_datasets.append(
@@ -126,21 +121,20 @@ for _name in agieval_multiple_choices_sets:
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',
-            reader_cfg=dict(
-                input_columns=['question', 'options'], output_column='label'),
+            reader_cfg=agieval_reader_cfg,
             infer_cfg=agieval_infer_cfg.copy(),
             eval_cfg=agieval_eval_cfg.copy()))
 
 for _name in agieval_cloze_sets:
     if _name in agieval_chinese_sets:
-        _hint = '答案是：'
+        _hint = '答案是： '
     else:
         _hint = 'The answer is '
     agieval_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role='HUMAN', prompt=f'{{question}}{_hint}')])),
+                round=[dict(role='HUMAN', prompt=f'{{question}}\n{_hint}')])),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer, max_out_len=1024))
 
@@ -153,8 +147,7 @@ for _name in agieval_cloze_sets:
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',
-            reader_cfg=dict(
-                input_columns=['question', 'options'], output_column='label'),
+            reader_cfg=agieval_reader_cfg,
             infer_cfg=agieval_infer_cfg.copy(),
             eval_cfg=agieval_eval_cfg.copy()))
 
@@ -205,14 +198,7 @@ for _item in agieval_datasets:
         'The following is a Math question. Please select the correct answer.',
     }[_name]
     _templates = _item['infer_cfg']['prompt_template']['template']
+    _templates['round'][0][
+        'prompt'] = _intro + '\n' + _templates['round'][0]['prompt']
 
-    if _item['infer_cfg']['inferencer']['type'] == PPLInferencer:
-        for _label in _templates:
-            _templates[_label]['round'][0][
-                'prompt'] = _intro + '\n' + _templates[_label]['round'][0][
-                    'prompt']
-    else:
-        _templates['round'][0][
-            'prompt'] = _intro + '\n' + _templates['round'][0]['prompt']
-
-del _item, _intro, _templates, _label, _name, _options, _hint, agieval_infer_cfg, agieval_eval_cfg
+del _item, _intro, _templates, _name, _hint, agieval_infer_cfg, agieval_eval_cfg

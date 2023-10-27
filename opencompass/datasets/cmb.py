@@ -13,9 +13,9 @@ class CMBDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        with open(osp.join(path, 'test.json'), 'r') as f:
+        with open(osp.join(path, 'test.json'), 'r', encoding='utf-8') as f:
             test_data = json.load(f)
-        with open(osp.join(path, 'val.json'), 'r') as f:
+        with open(osp.join(path, 'val.json'), 'r', encoding='utf-8') as f:
             val_data = json.load(f)
 
         for da in test_data:

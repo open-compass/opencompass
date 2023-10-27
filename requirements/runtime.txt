@@ -25,6 +25,7 @@ requests==2.31.0
 rouge
 rouge_chinese
 rouge_score
+sacrebleu
 scikit_learn==1.2.1
 seaborn
 sentence_transformers==2.2.2

@@ -15,7 +15,8 @@ class CEvalDataset(BaseDataset):
     def load(path: str, name: str):
         dataset = {}
         for split in ['dev', 'val', 'test']:
-            with open(osp.join(path, split, f'{name}_{split}.csv')) as f:
+            filename = osp.join(path, split, f'{name}_{split}.csv')
+            with open(filename, encoding='utf-8') as f:
                 reader = csv.reader(f)
                 header = next(reader)
                 for row in reader:
