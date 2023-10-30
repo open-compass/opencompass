@@ -54,7 +54,14 @@ def get_solution_text(problem):
 
 @LOAD_DATASET.register_module()
 class TabMWPDataset(BaseDataset):
-
+    # The TabMWP dataset contains 38,431 tabular math word problems.
+    # Each question in TabMWP is aligned with a tabular context,
+    # which is presented as an image, semi-structured text, and a-
+    # structured table. There are two types of questions: free-text-
+    # and multi-choice, and each problem is annotated with gold-
+    # solutions to reveal the multi-step reasoning process.
+    # To learn more about it, please follow:
+    # https://github.com/lupantech/PromptPG/tree/main
     @staticmethod
     def load(path: str):
         dataset = DatasetDict()

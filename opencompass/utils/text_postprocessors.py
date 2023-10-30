@@ -5,8 +5,6 @@ import numpy as np
 
 from opencompass.registry import TEXT_POSTPROCESSORS
 
-random.seed(123)
-
 
 def normalize_answer(text, unit):
     # ["1,000", "123", "3/4", "56.456", "$56.4", "-3", "-10.02", "-3/2"]
@@ -83,6 +81,7 @@ def extract_prediction(output, options=None, option_inds='ABCDEFGH'):
                 if pred in option_inds:
                     ind = option_inds.index(pred)  # 1
                     if ind >= len(options):
+                        random.seed(123)
                         ind = random.choice(range(len(options)))
                     prediction = options[ind]
                     return prediction
