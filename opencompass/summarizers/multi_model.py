@@ -32,30 +32,11 @@ def format_float(v):
     return f'{v:.2f}'
 
 
-def is_float(text: str):
-    try:
-        float(text)
-        return True
-    except ValueError:
-        return False
-
-
 def to_float(text: str):
-    if len(text) >= 6:
-        return 0
     try:
         return float(text)
     except ValueError:
         return 0
-
-
-def average_acc(table: List[List[str]]) -> float:
-    all_acc = []
-    for row in table:
-        if not is_float(row[-1]):
-            continue
-        all_acc.append(float(row[-1]))
-    return np.mean(all_acc).item()
 
 
 def is_section_row(row: List[str]) -> bool:
@@ -103,10 +84,10 @@ def create_win_row(rows: List[List[str]]) -> List[str]:
     return new_row
 
 
-def highlight(row: List[str]) -> List[str]:
+def highlight(row: List[str], meta_col_count: int = META_COL_COUNT) -> List[str]:
     new_row = [_ for _ in row]
-    all_scores = [to_float(_) for _ in row]
-    best_index = np.argmax(all_scores)
+    all_scores = [to_float(_) for _ in row[meta_col_count:]]
+    best_index = np.argmax(all_scores) + meta_col_count
     new_row[best_index] = green_bold(row[best_index])
     return new_row
 
@@ -293,7 +274,7 @@ class MultiModelSummarizer:
             base_row = self.table[row_i]
             if base_row[:3] != row[:3]:
                 self.logger.warning(f'cannot merge tables with different headers: {base_row} vs {row}')
-            base_row.append(row[-1])
+            base_row.extend(row[META_COL_COUNT:])
         new_model_name = summarizer.table[0][-1]
         assert new_model_name not in self.models_summary_group_metrics
         self.models_summary_group_metrics[new_model_name] = summarizer.models_summary_group_metrics[new_model_name]
@@ -339,10 +320,11 @@ class MultiModelSummarizer:
 
             table.add_row(*highlight(new_row))
 
-        table.add_section()
-        average_row = average_rows('Naive Average', section_rows)
-        average_row = highlight(average_row)
-        table.add_row(*average_row)
+        if section_rows:
+            table.add_section()
+            average_row = average_rows('Naive Average', section_rows)
+            average_row = highlight(average_row)
+            table.add_row(*average_row)
 
         table.add_section()
         table.add_row(*highlight(create_win_row(all_rows)))
@@ -369,6 +351,6 @@ class MultiModelSummarizer:
             for summary_group_metrics in self.models_summary_group_metrics.values():
                 metric = summary_group_metrics[group][subset_name]
                 row.append(format_float(metric))
-            table.add_row(*highlight(row))
+            table.add_row(*highlight(row, meta_col_count=1))
 
         print(table)

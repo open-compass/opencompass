@@ -14,11 +14,15 @@ app = typer.Typer(add_completion=False, pretty_exceptions_show_locals=False)
 @app.command(help='Visualize the results of multiple models')
 def main(
     cfg_paths: List[Path] = Option(
-        ..., help='The path to the config file of the task'),
+        ...,
+        help='The path to the config file of the task',
+        exists=True,
+    ),
     work_dirs: List[Path] = Option(
         ...,
         help='The work dirs for the task(named by timestamp), '
         'need to ensure the order is the same as cfg_paths.',
+        exists=True,
     ),
     group: str = Option(None,
                         help='If not None, show the accuracy in the group.'),
@@ -29,7 +33,7 @@ def main(
     multi_models_summarizer = None
     for cfg, work_dir in zip(cfgs, work_dirs):
         cfg['work_dir'] = work_dir
-        summarizer_cfg = cfg['summarizer']
+        summarizer_cfg = cfg.get('summarizer', {})
         summarizer_cfg['type'] = MultiModelSummarizer
         summarizer_cfg['config'] = cfg
         summarizer = build_from_cfg(summarizer_cfg)
