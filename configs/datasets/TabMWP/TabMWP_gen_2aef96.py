@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.openicl.icl_evaluator import TabMWPEvaluator
 from opencompass.datasets import TabMWPDataset
 
 # None of the TabMWP dataset in huggingface is correctly parsed, so we use our own dataset reader
@@ -9,17 +9,17 @@ from opencompass.datasets import TabMWPDataset
 
 input_format='TQ'
 output_format='A'
-elements = {"Q": f"Question: {{question}}", 
-            "T": f"Table: {{table}}", 
-            "S": f"Solution: {{solution}}",
-            "A": f"Answer: The answer is {{answer}}.",
-            "AS": f"Answer: The answer is {{answer}}. BECAUSE: {{solution}}",
-            "SA": f"Answer: {{solution}} The answer is {{answer}}."}
+elements = {"Q": "Question: {question}", 
+            "T": "Table: {table}", 
+            "S": "Solution: {solution}",
+            "A": "Answer: The answer is {answer}.",
+            "AS": "Answer: The answer is {answer}. BECAUSE: {solution}",
+            "SA": "Answer: {solution} The answer is {answer}."}
 
 
 TabMWP_reader_cfg = dict(
     input_columns=["question", "table"],
-    output_column="answer", #choose from ["answer"，"solution"，"answer_and_solution"，"solution_and_answer"]
+    output_column="test_elements",
     train_split='dev',
     )
 
@@ -40,7 +40,7 @@ TabMWP_infer_cfg = dict(
 )
 
 TabMWP_eval_cfg = dict(
-    evaluator=dict(type=AccEvaluator),
+    evaluator=dict(type=TabMWPEvaluator)
 )
 
 TabMWP_datasets = [
