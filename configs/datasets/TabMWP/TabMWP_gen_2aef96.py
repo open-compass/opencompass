@@ -1,8 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import TabMWPEvaluator
-from opencompass.datasets import TabMWPDataset
+from opencompass.datasets import TabMWPDataset, TabMWPEvaluator
 
 # None of the TabMWP dataset in huggingface is correctly parsed, so we use our own dataset reader
 # Please download the dataset from https://github.com/lupantech/PromptPG/tree/main

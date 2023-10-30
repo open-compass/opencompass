@@ -6,8 +6,6 @@ import evaluate
 import numpy as np
 
 from opencompass.registry import ICL_EVALUATORS
-from opencompass.utils.text_postprocessors import (extract_prediction,
-                                                   normalize_answer)
 
 from .icl_base_evaluator import BaseEvaluator
 
@@ -87,63 +85,6 @@ class HuggingfaceEvaluator(BaseEvaluator):
         random.setstate(random_state)
         np.random.set_state(np_random_state)
         return result
-
-
-@ICL_EVALUATORS.register_module()
-class TabMWPEvaluator(HuggingfaceEvaluator):
-    """Accuracy evaluator."""
-
-    def __init__(self) -> None:
-        super().__init__(metric='accuracy')
-
-    def _preprocess(self, predictions: List, references: List) -> dict:
-        preds, golds = [], []
-        for idx in range(len(references)):
-            pred = predictions[idx]
-            unit = references[idx]['unit']
-            answer = references[idx]['answer']
-            choices = references[idx]['choices']
-            preds.append(
-                normalize_answer(extract_prediction(pred, choices),
-                                 unit).lower())
-            golds.append(normalize_answer(answer, unit).lower())
-        """Preprocess the final predictions and references to needed format.
-
-        Args:
-            predictions (List): List of predictions of each sample.
-            references (List): List of targets for each sample.
-
-        Returns:
-            dict: preprocessed results.
-        """
-        predictions = preds
-        references = golds
-        mapping_to_int_dict = {
-            label: idx
-            for idx, label in enumerate(set(map(str, references)))
-        }
-        pred_set = set(predictions)
-        for pred in pred_set:
-            if str(pred) not in mapping_to_int_dict.keys():
-                mapping_to_int_dict[str(pred)] = len(mapping_to_int_dict)
-        golds = [mapping_to_int_dict[str(gold)] for gold in references]
-        preds = [mapping_to_int_dict[str(pred)] for pred in predictions]
-        return {
-            'predictions': preds,
-            'references': golds,
-        }
-
-    def _postprocess(self, scores: dict) -> dict:
-        """Postprocess for final scores.
-
-        Args:
-            scores (dict): Dict of calculated scores of metrics.
-
-        Returns:
-            dict: postprocessed scores.
-        """
-        scores['accuracy'] *= 100
-        return scores
 
 
 @ICL_EVALUATORS.register_module()
