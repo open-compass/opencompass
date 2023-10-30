@@ -19,6 +19,7 @@ METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
 
 
 META_COL_COUNT = 4
+EPS = 1e-6
 
 def bold(text):
     return f'[bold]{text}[/bold]'
@@ -75,8 +76,9 @@ def create_win_row(rows: List[List[str]]) -> List[str]:
     win_count = defaultdict(int)
     for row in rows:
         all_scores = [to_float(_) for _ in row[META_COL_COUNT:]]
-        best_index = np.argmax(all_scores)
-        win_count[best_index] += 1
+        best_indeice = [i for i, s in enumerate(all_scores) if s > np.max(all_scores) - EPS]
+        for best_index in best_indeice:
+            win_count[best_index] += 1
     new_row = ['-'] * len(rows[0])
     new_row[0] = bold('Win Count')
     for i, count in win_count.items():
@@ -87,8 +89,9 @@ def create_win_row(rows: List[List[str]]) -> List[str]:
 def highlight(row: List[str], meta_col_count: int = META_COL_COUNT) -> List[str]:
     new_row = [_ for _ in row]
     all_scores = [to_float(_) for _ in row[meta_col_count:]]
-    best_index = np.argmax(all_scores) + meta_col_count
-    new_row[best_index] = green_bold(row[best_index])
+    best_indeice = [i + meta_col_count for i, s in enumerate(all_scores) if s > np.max(all_scores) - EPS]
+    for best_index in best_indeice:
+        new_row[best_index] = green_bold(row[best_index])
     return new_row
 
 
