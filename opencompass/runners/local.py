@@ -92,7 +92,7 @@ class LocalRunner(BaseRunner):
                     # debug mode, otherwise, the torchrun will use all the
                     # available resources which might cause inconsistent
                     # behavior.
-                    if len(all_gpu_ids) > num_gpus:
+                    if len(all_gpu_ids) > num_gpus and num_gpus > 0:
                         get_logger().warning(f'Only use {num_gpus} GPUs for '
                                              f'total {len(all_gpu_ids)} '
                                              'available GPUs in debug mode.')
