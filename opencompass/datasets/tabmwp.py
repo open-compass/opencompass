@@ -7,8 +7,7 @@ from typing import List
 import numpy as np
 from datasets import Dataset, DatasetDict
 
-from opencompass.openicl.icl_evaluator.icl_hf_evaluator import \
-    HuggingfaceEvaluator
+from opencompass.openicl.icl_evaluator.icl_hf_evaluator import AccEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
 from .base import BaseDataset
@@ -171,13 +170,19 @@ def extract_prediction(output, options=None, option_inds='ABCDEFGH'):
 
 
 @ICL_EVALUATORS.register_module()
-class TabMWPEvaluator(HuggingfaceEvaluator):
-    """Accuracy evaluator."""
-
-    def __init__(self) -> None:
-        super().__init__(metric='accuracy')
+class TabMWPEvaluator(AccEvaluator):
+    """Accuracy evaluator for TabMWP Dataset."""
 
     def _preprocess(self, predictions: List, references: List) -> dict:
+        """Preprocess the final predictions and references to needed format.
+
+        Args:
+            predictions (List): List of predictions of each sample.
+            references (List): List of targets for each sample.
+
+        Returns:
+            dict: preprocessed results.
+        """
         preds, golds = [], []
         for idx in range(len(references)):
             pred = predictions[idx]
@@ -188,43 +193,9 @@ class TabMWPEvaluator(HuggingfaceEvaluator):
                 normalize_answer(extract_prediction(pred, choices),
                                  unit).lower())
             golds.append(normalize_answer(answer, unit).lower())
-        """Preprocess the final predictions and references to needed format.
-
-        Args:
-            predictions (List): List of predictions of each sample.
-            references (List): List of targets for each sample.
-
-        Returns:
-            dict: preprocessed results.
-        """
         predictions = preds
         references = golds
-        mapping_to_int_dict = {
-            label: idx
-            for idx, label in enumerate(set(map(str, references)))
-        }
-        pred_set = set(predictions)
-        for pred in pred_set:
-            if str(pred) not in mapping_to_int_dict.keys():
-                mapping_to_int_dict[str(pred)] = len(mapping_to_int_dict)
-        golds = [mapping_to_int_dict[str(gold)] for gold in references]
-        preds = [mapping_to_int_dict[str(pred)] for pred in predictions]
-        return {
-            'predictions': preds,
-            'references': golds,
-        }
-
-    def _postprocess(self, scores: dict) -> dict:
-        """Postprocess for final scores.
-
-        Args:
-            scores (dict): Dict of calculated scores of metrics.
-
-        Returns:
-            dict: postprocessed scores.
-        """
-        scores['accuracy'] *= 100
-        return scores
+        return super()._preprocess(preds, golds)
 
 
 @LOAD_DATASET.register_module()
