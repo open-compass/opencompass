@@ -193,8 +193,6 @@ class TabMWPEvaluator(AccEvaluator):
                 normalize_answer(extract_prediction(pred, choices),
                                  unit).lower())
             golds.append(normalize_answer(answer, unit).lower())
-        predictions = preds
-        references = golds
         return super()._preprocess(preds, golds)
 
 
