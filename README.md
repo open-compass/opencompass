@@ -60,7 +60,7 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 
 - **Modular design with high extensibility**: Want to add new models or datasets, customize an advanced task division strategy, or even support a new cluster management system? Everything about OpenCompass can be easily expanded!
 
-- **Experiment management and reporting mechanism**: Use config files to fully record each experiment, support real-time reporting of results.
+- **Experiment management and reporting mechanism**: Use config files to fully record each experiment, and support real-time reporting of results.
 
 ## 📊 Leaderboard
 
