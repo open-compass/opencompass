@@ -187,20 +187,20 @@ learns valuable lessons, and discovers his own heroism.
 
 examples = [example1, example2, example3, example4]
 
-subjectivity_reader_cfg = dict(input_columns=[
+subjective_reader_cfg = dict(input_columns=[
     'question', 'index', 'reference_answer', 'evaluating_guidance',
     'capability'
 ],
-                               output_column=None,
-                               train_split='test')
+                             output_column=None,
+                             train_split='test')
 
-subjectivity_all_sets = [
+subjective_all_sets = [
     'sub_test',
 ]
 
 
 @LOAD_DATASET.register_module()
-class SubjectivityCmpDataset(BaseDataset):
+class SubjectiveCmpDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):

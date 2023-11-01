@@ -22,9 +22,11 @@ python-Levenshtein
 rank_bm25==0.2.2
 rapidfuzz
 requests==2.31.0
+rich
 rouge
 rouge_chinese
 rouge_score
+sacrebleu
 scikit_learn==1.2.1
 seaborn
 sentence_transformers==2.2.2
@@ -35,3 +37,4 @@ tokenizers>=0.13.3
 torch>=1.13.1
 tqdm==4.64.1
 transformers>=4.29.1
+typer

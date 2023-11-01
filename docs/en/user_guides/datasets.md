@@ -1,6 +1,6 @@
 # Configure Datasets
 
-This tutorial mainly focuses on selecting datasets supported by OpenCompass and preparing their configs files. Please make sure you have downloaded the datasets following the steps in [Dataset Preparation](../get_started.md#dataset-preparation).
+This tutorial mainly focuses on selecting datasets supported by OpenCompass and preparing their configs files. Please make sure you have downloaded the datasets following the steps in [Dataset Preparation](../get_started/installation.md#dataset-preparation).
 
 ## Directory Structure of Dataset Configuration Files
 

@@ -2,21 +2,21 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets.subjectivity_cmp import SubjectivityCmpDataset
+from opencompass.datasets.subjective_cmp import SubjectiveCmpDataset
 
-subjectivity_reader_cfg = dict(
+subjective_reader_cfg = dict(
     input_columns=['question', 'index', 'reference_answer', 'evaluating_guidance', 'capability', 'prompt'],
     output_column=None,
     train_split='test')
 
-subjectivity_all_sets = [
-    "sub_test",
+subjective_all_sets = [
+    "subjective_demo",
 ]
 
-subjectivity_datasets = []
+subjective_datasets = []
 
-for _name in subjectivity_all_sets:
-    subjectivity_infer_cfg = dict(
+for _name in subjective_all_sets:
+    subjective_infer_cfg = dict(
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(round=[
@@ -30,7 +30,7 @@ for _name in subjectivity_all_sets:
             inferencer=dict(type=GenInferencer),
         )
 
-    subjectivity_eval_cfg = dict(
+    subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
             cmp_order='both',
@@ -49,13 +49,13 @@ for _name in subjectivity_all_sets:
         pred_role="BOT",
     )
 
-    subjectivity_datasets.append(
+    subjective_datasets.append(
         dict(
             abbr=f"{_name}",
-            type=SubjectivityCmpDataset,
-            path="./data/subjectivity/",
+            type=SubjectiveCmpDataset,
+            path="./data/subjective/",
             name=_name,
-            reader_cfg=subjectivity_reader_cfg,
-            infer_cfg=subjectivity_infer_cfg,
-            eval_cfg=subjectivity_eval_cfg
+            reader_cfg=subjective_reader_cfg,
+            infer_cfg=subjective_infer_cfg,
+            eval_cfg=subjective_eval_cfg
         ))

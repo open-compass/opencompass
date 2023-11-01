@@ -23,7 +23,7 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
                  mode: str,
                  out_dir: str,
                  model_pairs: Optional[List[Tuple]] = None,
-                 keep_keys: List[str] = ['eval.runner.task.judge_cfg']):
+                 keep_keys: Optional[List[str]] = None):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
         assert mode in ['all', 'one_to_n', 'fixed']
         self.mode = mode

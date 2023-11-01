@@ -50,21 +50,21 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ![image](https://github.com/open-compass/opencompass/assets/22607038/f45fe125-4aed-4f8c-8fe8-df4efb41a8ea)
 
-OpenCompass is a one-stop platform for large model evaluation, aiming to provide a fair, open, and reproducible benchmark for large model evaluation. Its main features includes:
+OpenCompass is a one-stop platform for large model evaluation, aiming to provide a fair, open, and reproducible benchmark for large model evaluation. Its main features include:
 
 - **Comprehensive support for models and datasets**: Pre-support for 20+ HuggingFace and API models, a model evaluation scheme of 70+ datasets with about 400,000 questions, comprehensively evaluating the capabilities of the models in five dimensions.
 
 - **Efficient distributed evaluation**: One line command to implement task division and distributed evaluation, completing the full evaluation of billion-scale models in just a few hours.
 
-- **Diversified evaluation paradigms**: Support for zero-shot, few-shot, and chain-of-thought evaluations, combined with standard or dialogue type prompt templates, to easily stimulate the maximum performance of various models.
+- **Diversified evaluation paradigms**: Support for zero-shot, few-shot, and chain-of-thought evaluations, combined with standard or dialogue-type prompt templates, to easily stimulate the maximum performance of various models.
 
 - **Modular design with high extensibility**: Want to add new models or datasets, customize an advanced task division strategy, or even support a new cluster management system? Everything about OpenCompass can be easily expanded!
 
-- **Experiment management and reporting mechanism**: Use config files to fully record each experiment, support real-time reporting of results.
+- **Experiment management and reporting mechanism**: Use config files to fully record each experiment, and support real-time reporting of results.
 
 ## 📊 Leaderboard
 
-We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
+We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -449,7 +449,7 @@ Through the command line or configuration files, OpenCompass also supports evalu
   - [ ] Long-context evaluation with extensive datasets.
   - [ ] Long-context leaderboard.
 - [ ] Coding
-  - [ ] Coding evaluation leaderdboard.
+  - [ ] Coding evaluation leaderboard.
   - [ ] Non-python language evaluation service.
 - [ ] Agent
   - [ ] Support various agenet framework.
@@ -459,7 +459,7 @@ Through the command line or configuration files, OpenCompass also supports evalu
 
 ## 👷‍♂️ Contributing
 
-We appreciate all contributions to improve OpenCompass. Please refer to the [contributing guideline](https://opencompass.readthedocs.io/en/latest/notes/contribution_guide.html) for the best practice.
+We appreciate all contributions to improving OpenCompass. Please refer to the [contributing guideline](https://opencompass.readthedocs.io/en/latest/notes/contribution_guide.html) for the best practice.
 
 ## 🤝 Acknowledgements
 

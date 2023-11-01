@@ -24,7 +24,7 @@ with read_base():
     from ..SuperGLUE_RTE.SuperGLUE_RTE_gen_68aac7 import RTE_datasets
     from ..SuperGLUE_ReCoRD.SuperGLUE_ReCoRD_gen_30dea0 import ReCoRD_datasets
     from ..SuperGLUE_WiC.SuperGLUE_WiC_gen_d06864 import WiC_datasets
-    from ..SuperGLUE_WSC.SuperGLUE_WSC_gen_8a881c import WSC_datasets
+    from ..SuperGLUE_WSC.SuperGLUE_WSC_gen_fe4bf3 import WSC_datasets
     from ..race.race_gen_69ee4f import race_datasets
     from ..math.math_gen_265cce import math_datasets
     from ..gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets

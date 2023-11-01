@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import WSCDataset_V3
+from opencompass.datasets import WSCDataset_V2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 WSC_reader_cfg = dict(
@@ -17,7 +17,7 @@ WSC_infer_cfg = dict(
             dict(
                 role="HUMAN",
                 prompt=
-                "Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnseer:"
+                "{text}\nIs '{span1}' and '{span2}' refers to the same entity in the above sentence?\nA. Yes\nB. No\nAnswer:"
             ),
         ]),
     ),
@@ -34,7 +34,7 @@ WSC_eval_cfg = dict(
 WSC_datasets = [
     dict(
         abbr="WSC",
-        type=WSCDataset_V3,
+        type=WSCDataset_V2,
         path="./data/SuperGLUE/WSC/val.jsonl",
         reader_cfg=WSC_reader_cfg,
         infer_cfg=WSC_infer_cfg,

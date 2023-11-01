@@ -1,24 +1,102 @@
 # flake8: noqa
 # yapf: disable
-import getpass
 import os.path as osp
-from datetime import datetime
+from collections import defaultdict
 from typing import List, Optional
 
 import mmengine
-import tabulate
+import numpy as np
 from mmengine import ConfigDict
+from rich import print
+from rich.table import Table
 
-from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
-                               get_infer_output_path, get_logger,
-                               model_abbr_from_cfg)
+from opencompass.utils import (dataset_abbr_from_cfg, get_infer_output_path,
+                               get_logger, model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
 
 METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
 METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
 
-class DefaultSummarizer:
-    """Default summarizer in OpenCompass.
+
+META_COL_COUNT = 4
+EPS = 1e-6
+
+def bold(text):
+    return f'[bold]{text}[/bold]'
+
+
+def green_bold(text):
+    return f'[green][bold]{text}[/bold][/green]'
+
+
+def format_float(v):
+    return f'{v:.2f}'
+
+
+def to_float(text: str):
+    try:
+        return float(text)
+    except ValueError:
+        return 0
+
+
+def is_section_row(row: List[str]) -> bool:
+    # ['ceval', '-', '-', '-', '-'],
+    return row[-1] == '-' and row[0][0] == '-'
+
+
+def average_rows(name, rows: List[List[str]]) -> List[str]:
+    # name: col=0 的名字
+    new_row = ['-'] * len(rows[0])
+    new_row[0] = bold(name)
+
+    all_accs = defaultdict(list)
+    for row in rows:
+        for i, acc in enumerate(row[META_COL_COUNT:]):
+            all_accs[i].append(to_float(acc))
+
+    for i, accs in enumerate(all_accs.values()):
+        new_row[META_COL_COUNT + i] = format_float(np.mean(accs))
+    return new_row
+
+
+def create_section_row(row_i: int, row: List[str], table) -> List[str]:
+    section_name = bold('[' + row[0].replace('-', '').strip() + ']')
+
+    # TODO: 区分 acc,rouge1,score 等
+    section_rows = []
+    for next_row in table[row_i + 1 :]:
+        if is_section_row(next_row):
+            break
+        section_rows.append(next_row)
+    return average_rows(section_name, section_rows)
+
+
+def create_win_row(rows: List[List[str]]) -> List[str]:
+    win_count = defaultdict(int)
+    for row in rows:
+        all_scores = [to_float(_) for _ in row[META_COL_COUNT:]]
+        best_indeice = [i for i, s in enumerate(all_scores) if s > np.max(all_scores) - EPS]
+        for best_index in best_indeice:
+            win_count[best_index] += 1
+    new_row = ['-'] * len(rows[0])
+    new_row[0] = bold('Win Count')
+    for i, count in win_count.items():
+        new_row[META_COL_COUNT + i] = str(count)
+    return new_row
+
+
+def highlight(row: List[str], meta_col_count: int = META_COL_COUNT) -> List[str]:
+    new_row = [_ for _ in row]
+    all_scores = [to_float(_) for _ in row[meta_col_count:]]
+    best_indeice = [i + meta_col_count for i, s in enumerate(all_scores) if s > np.max(all_scores) - EPS]
+    for best_index in best_indeice:
+        new_row[best_index] = green_bold(row[best_index])
+    return new_row
+
+
+class MultiModelSummarizer:
+    """MultiModel.
 
     Args:
         config (ConfigDict): The configuration object of the evaluation task.
@@ -41,17 +119,10 @@ class DefaultSummarizer:
         if prompt_db:
             self.logger.warning('prompt_db is deprecated and no longer used. '
                                 'Please remove it from your config.')
+        self.models_summary_group_metrics = {}
+        self.table = self.load()
 
-        # Enable lark bot if lark_url is presented
-        self.lark_reporter = None
-        if self.cfg.get('lark_bot_url', None):
-            self.lark_reporter = LarkReporter(self.cfg['lark_bot_url'])
-
-    def summarize(
-        self,
-        output_path: str = None,
-        time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):  # noqa
-
+    def load( self ):  # noqa
         model_cfgs = self.cfg['models']
         dataset_cfgs = self.cfg['datasets']
         work_dir = self.cfg['work_dir']
@@ -72,7 +143,6 @@ class DefaultSummarizer:
                 if not osp.exists(filepath):
                     continue
                 result = mmengine.load(filepath)
-                result.pop('details', None)
                 raw_results[model_abbr][dataset_abbr] = result
                 if 'error' in result:
                     self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
@@ -118,6 +188,7 @@ class DefaultSummarizer:
 
         # calculate group metrics
         summary_groups = self.summary_groups
+        summary_group_metrics = {}
         for sg in summary_groups:
             for model_abbr in model_abbrs:
                 results = {}
@@ -126,6 +197,7 @@ class DefaultSummarizer:
                     if dataset_abbr in parsed_results[model_abbr]:
                         results[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][0]
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
+                summary_group_metrics[sg['name']] = results
                 if len(results) == len(sg['subsets']):
                     if 'weights' in sg:
                         numerator = sum(results[k] * sg['weights'][k] for k in sg['weights'])
@@ -196,56 +268,92 @@ class DefaultSummarizer:
                     row.append('-')
             table.append(row)
 
-        # format raw txt
-        raw_dataset_abbrs = []
-        for model_abbr in model_abbrs:
-            for dataset_abbr in raw_results[model_abbr]:
-                if dataset_abbr not in raw_dataset_abbrs:
-                    raw_dataset_abbrs.append(dataset_abbr)
-        raw_txts = []
-        for model_abbr in model_abbrs:
-            raw_txts.append('-------------------------------')
-            raw_txts.append(f'Model: {model_abbr}')
-            for dataset_abbr in raw_dataset_abbrs:
-                result = raw_results[model_abbr].get(dataset_abbr, '{}')
-                raw_txts.append(f'{dataset_abbr}: {result}')
-        raw_txts = '\n'.join(raw_txts)
+        self.models_summary_group_metrics[table[0][-1]] = summary_group_metrics
+        return table
 
-        # output to screean
-        print(tabulate.tabulate(table, headers='firstrow'))
+    def merge(self, summarizer: 'MultiModelSummarizer'):
+        assert len(self.table) == len(summarizer.table)
+        for row_i, row in enumerate(summarizer.table):
+            base_row = self.table[row_i]
+            if base_row[:3] != row[:3]:
+                self.logger.warning(f'cannot merge tables with different headers: {base_row} vs {row}')
+            base_row.extend(row[META_COL_COUNT:])
+        new_model_name = summarizer.table[0][-1]
+        assert new_model_name not in self.models_summary_group_metrics
+        self.models_summary_group_metrics[new_model_name] = summarizer.models_summary_group_metrics[new_model_name]
 
-        # output to file
-        if output_path is None:
-            output_path = osp.join(work_dir, 'summary', f'summary_{time_str}.txt')
-            output_csv_path = osp.join(work_dir, 'summary', f'summary_{time_str}.csv')
-        else:
-            output_csv_path = output_path.replace('.txt', '.csv')
+    def summarize(self):
+        """
+        Format in self.table
+        [
+            ['dataset', 'version', 'metric', 'mode', 'model_name'],
+            ['--------- 考试 Exam ---------', '-', '-', '-', '-'],
+            ['ARC-c', '1e0de5', 'accuracy', 'gen', '79.32'],
+            ['ARC-e', '1e0de5', 'accuracy', 'gen', '85.36'],
+            ['--------- 语言 Language ---------', '-', '-', '-', '-'],
+            ['WiC', 'd06864', 'accuracy', 'gen', '55.64'],
+            ['chid-dev', '211ee7', 'accuracy', 'gen', '52.97'],
+            ['--------- 知识 Knowledge ---------', '-', '-', '-', '-'],
+            ['BoolQ', '883d50', 'accuracy', 'gen', '86.06'],
+            ['--------- 理解 Understanding ---------', '-', '-', '-', '-'],
+            ['C3', '8c358f', 'accuracy', 'gen', '88.33'],
+            ['race-middle', '9a54b6', 'accuracy', 'gen', '90.32'],
+            ['--------- 推理 Reasoning ---------', '-', '-', '-', '-'],
+            ['cmnli', '1abf97', 'accuracy', 'gen', '38.26'],
+            ['ocnli', 'c4cb6c', 'accuracy', 'gen', '32.92'],
+        ]
+        """
 
-        output_dir = osp.split(output_path)[0]
-        mmengine.mkdir_or_exist(output_dir)
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(time_str + '\n')
-            f.write('tabulate format\n')
-            f.write('^' * 128 + '\n')
-            f.write(tabulate.tabulate(table, headers='firstrow') + '\n')
-            f.write('$' * 128 + '\n')
-            f.write('\n' + '-' * 128 + ' THIS IS A DIVIDER ' + '-' * 128 + '\n\n')
-            f.write('csv format\n')
-            f.write('^' * 128 + '\n')
-            f.write('\n'.join([','.join(row) for row in table]) + '\n')
-            f.write('$' * 128 + '\n')
-            f.write('\n' + '-' * 128 + ' THIS IS A DIVIDER ' + '-' * 128 + '\n\n')
-            f.write('raw format\n')
-            f.write('^' * 128 + '\n')
-            f.write(raw_txts + '\n')
-            f.write('$' * 128 + '\n')
-        self.logger.info(f'write summary to {osp.abspath(output_path)}')
+        table = Table()
+        for i, col_name in enumerate(self.table[0]):
+            table.add_column(col_name, overflow='fold', max_width=20 if i >= META_COL_COUNT else None)
 
-        if self.lark_reporter:
-            content = f'{getpass.getuser()} 的'
-            content += f'详细评测汇总已输出至 {osp.abspath(output_path)}'
-            self.lark_reporter.post(content)
+        section_rows = []
+        all_rows = []
+        for row_i, row in enumerate(self.table):
+            if row_i == 0:
+                continue
+            if is_section_row(row):
+                table.add_section()
+                new_row = create_section_row(row_i, row, self.table)
+                section_rows.append(new_row)
+            else:
+                new_row = row
+                all_rows.append(new_row)
 
-        with open(output_csv_path, 'w', encoding='utf-8') as f:
-            f.write('\n'.join([','.join(row) for row in table]) + '\n')
-        self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
+            table.add_row(*highlight(new_row))
+
+        if section_rows:
+            table.add_section()
+            average_row = average_rows('Naive Average', section_rows)
+            average_row = highlight(average_row)
+            table.add_row(*average_row)
+
+        table.add_section()
+        table.add_row(*highlight(create_win_row(all_rows)))
+        print(table)
+
+    def show_group(self, group: str):
+        table = Table(title=group)
+        table.add_column('Dataset', overflow='fold')
+
+        # summary_group_metrics 数据结构 dict[group_name][sub_group_name] = 73
+        group_metrics = None
+        for model_name, summary_group_metrics in self.models_summary_group_metrics.items():
+            if group not in summary_group_metrics:
+                self.logger.warning(f'group {group} not found in {model_name}')
+                return
+            table.add_column(model_name, overflow='fold')
+            group_metrics = summary_group_metrics[group]
+
+        for subset_name in group_metrics.keys():
+            if subset_name == 'naive_average':
+                continue
+
+            row = [subset_name]
+            for summary_group_metrics in self.models_summary_group_metrics.values():
+                metric = summary_group_metrics[group][subset_name]
+                row.append(format_float(metric))
+            table.add_row(*highlight(row, meta_col_count=1))
+
+        print(table)

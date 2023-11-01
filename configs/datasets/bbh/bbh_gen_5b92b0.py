@@ -3,7 +3,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import BBHDataset, BBHEvaluator, bbh_mcq_postprocess
+from opencompass.datasets import BBHDataset, BBHEvaluator, bbh_mcq_postprocess, BBHEvaluator_mcq
 
 bbh_reader_cfg = dict(input_columns=["input"], output_column="target")
 
@@ -56,7 +56,7 @@ for _name in bbh_multiple_choice_sets:
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer, max_out_len=512))
     bbh_eval_cfg = dict(
-        evaluator=dict(type=AccEvaluator),
+        evaluator=dict(type=BBHEvaluator_mcq),
         pred_role="BOT",
         pred_postprocessor=dict(type=bbh_mcq_postprocess),
         dataset_postprocessor=dict(type=bbh_mcq_postprocess))

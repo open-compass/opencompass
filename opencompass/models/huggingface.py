@@ -100,25 +100,33 @@ class HuggingFace(BaseModel):
             if self.pad_token_id < 0:
                 self.pad_token_id += self.tokenizer.vocab_size
             if self.tokenizer.pad_token_id is None:
-                self.logger.warning(
-                    f'Using {self.pad_token_id} as pad_token_id')
+                self.logger.debug(f'Using {self.pad_token_id} as pad_token_id')
             elif self.tokenizer.pad_token_id != self.pad_token_id:
                 self.logger.warning(
-                    f'pad_token_id is not consistent with the tokenizer. Using {self.pad_token_id} as pad_token_id'  # noqa
-                )
+                    'pad_token_id is not consistent with the tokenizer. Using '
+                    f'{self.pad_token_id} as pad_token_id')
             self.tokenizer.pad_token_id = self.pad_token_id
         elif self.tokenizer.pad_token_id is None:
             self.logger.warning('pad_token_id is not set for the tokenizer.')
             if self.tokenizer.eos_token is not None:
-                self.logger.warning('Using eos_token_id as pad_token_id.')
                 self.logger.warning(
-                    f'{self.tokenizer.eos_token} la {self.tokenizer.eos_token is None}'  # noqa
-                )
+                    f'Using eos_token_id {self.tokenizer.eos_token} '
+                    'as pad_token_id.')
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             else:
-                raise ValueError(
-                    'pad_token_id is not set for this tokenizer. Try to set pad_token_id via passing `pad_token_id={PAD_TOKEN_ID}` in model_cfg. You may find pad_token_id in `generation.json`'  # noqa
-                )
+                from transformers.generation import GenerationConfig
+                gcfg = GenerationConfig.from_pretrained(path)
+
+                if gcfg.pad_token_id is not None:
+                    self.logger.warning(
+                        f'Using pad_token_id {gcfg.pad_token_id} '
+                        'as pad_token_id.')
+                    self.tokenizer.pad_token_id = gcfg.pad_token_id
+                else:
+                    raise ValueError(
+                        'pad_token_id is not set for this tokenizer. Try to '
+                        'set pad_token_id via passing '
+                        '`pad_token_id={PAD_TOKEN_ID}` in model_cfg.')
 
         # A patch for llama when batch_padding = True
         if 'decapoda-research/llama' in path or \
@@ -131,13 +139,28 @@ class HuggingFace(BaseModel):
             self.tokenizer.eos_token = '</s>'
             self.tokenizer.pad_token_id = 0
 
+    def _set_model_kwargs_torch_dtype(self, model_kwargs):
+        if 'torch_dtype' not in model_kwargs:
+            torch_dtype = torch.float16
+        else:
+            torch_dtype = {
+                'torch.float16': torch.float16,
+                'torch.bfloat16': torch.bfloat16,
+                'torch.float': torch.float,
+                'auto': 'auto',
+                'None': None
+            }.get(model_kwargs['torch_dtype'])
+        self.logger.debug(f'HF using torch_dtype: {torch_dtype}')
+        if torch_dtype is not None:
+            model_kwargs['torch_dtype'] = torch_dtype
+
     def _load_model(self,
                     path: str,
                     model_kwargs: dict,
                     peft_path: Optional[str] = None):
         from transformers import AutoModel, AutoModelForCausalLM
 
-        model_kwargs.setdefault('torch_dtype', torch.float16)
+        self._set_model_kwargs_torch_dtype(model_kwargs)
         try:
             self.model = AutoModelForCausalLM.from_pretrained(
                 path, **model_kwargs)
@@ -150,6 +173,7 @@ class HuggingFace(BaseModel):
                                                    peft_path,
                                                    is_trainable=False)
         self.model.eval()
+        self.model.generation_config.do_sample = False
 
         # A patch for llama when batch_padding = True
         if 'decapoda-research/llama' in path:
@@ -409,7 +433,7 @@ class HuggingFaceCausalLM(HuggingFace):
                     peft_path: Optional[str] = None):
         from transformers import AutoModelForCausalLM
 
-        model_kwargs.setdefault('torch_dtype', torch.float16)
+        self._set_model_kwargs_torch_dtype(model_kwargs)
         self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
         if peft_path is not None:
             from peft import PeftModel
@@ -417,3 +441,4 @@ class HuggingFaceCausalLM(HuggingFace):
                                                    peft_path,
                                                    is_trainable=False)
         self.model.eval()
+        self.model.generation_config.do_sample = False
