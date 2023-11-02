@@ -312,7 +312,7 @@ class MATHEvaluator(BaseEvaluator):
             return str1 == str2
 
 
-class MATHAgentEvaluator(BaseEvaluator):
+class MATHAgentEvaluator(MATHEvaluator):
     """math agent evaluator for soft condition.
 
     Args:
