@@ -27,13 +27,16 @@ to **OpenCompass**!
 
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
-> **🔥 Attention**<br />
+🔥🔥🔥 We are delighted to announce that **the OpenCompass has been recommended by the Meta AI**, click [Get Started](https://ai.meta.com/llama/get-started/#validation) of Llama for more information.
+
+> **Attention**<br />
 > We launch the OpenCompass Collaboration project, welcome to support diverse evaluation benchmarks into OpenCompass!
 > Clike [Issue](https://github.com/open-compass/opencompass/issues/248) for more information.
 > Let's work together to build a more powerful OpenCompass toolkit!
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.10.24\]** We release a new benchmark for evaluating LLMs’ capabilities of having multi-turn dialogues. Welcome to [BotChat](https://github.com/open-compass/BotChat) for more details. 🔥🔥🔥.
 - **\[2023.09.26\]** We update the leaderboard with [Qwen](https://github.com/QwenLM/Qwen), one of the best-performing open-source models currently available, welcome to our [homepage](https://opencompass.org.cn) for more details. 🔥🔥🔥.
 - **\[2023.09.20\]** We update the leaderboard with [InternLM-20B](https://github.com/InternLM/InternLM), welcome to our [homepage](https://opencompass.org.cn) for more details. 🔥🔥🔥.
 - **\[2023.09.19\]** We update the leaderboard with WeMix-LLaMA2-70B/Phi-1.5-1.3B, welcome to our [homepage](https://opencompass.org.cn) for more details.
@@ -42,7 +45,6 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 - **\[2023.09.06\]**  [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) team adpots OpenCompass to evaluate their models systematically. We deeply appreciate the community's dedication to transparency and reproducibility in LLM evaluation.
 - **\[2023.09.02\]** We have supported the evaluation of [Qwen-VL](https://github.com/QwenLM/Qwen-VL) in OpenCompass.
 - **\[2023.08.25\]**  [**TigerBot**](https://github.com/TigerResearch/TigerBot) team adpots OpenCompass to evaluate their models systematically. We deeply appreciate the community's dedication to transparency and reproducibility in LLM evaluation.
-- **\[2023.08.21\]** [**Lagent**](https://github.com/InternLM/lagent) has been released, which is a lightweight framework for building LLM-based agents. We are working with the Lagent team to support the evaluation of general tool-use capability, stay tuned!
 
 > [More](docs/en/notes/news.md)
 
@@ -384,6 +386,8 @@ Through the command line or configuration files, OpenCompass also supports evalu
     </tr>
   </tbody>
 </table>
+
+## OpenCompass Ecosystem
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 

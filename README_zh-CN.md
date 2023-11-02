@@ -27,13 +27,16 @@
 
 就像指南针在我们的旅程中为我们导航一样，我们希望OpenCompass能够帮助你穿越评估大型语言模型的重重迷雾。OpenCompass提供丰富的算法和功能支持，期待OpenCompass能够帮助社区更便捷地对NLP模型的性能进行公平全面的评估。
 
-> **🔥 注意**<br />
+🔥🔥🔥 祝贺 **OpenCompass 作为大模型标准测试工具被Meta AI官方推荐**, 点击 Llama 的 [入门文档](https://ai.meta.com/llama/get-started/#validation) 获取更多信息.
+
+> **注意**<br />
 > 我们正式启动 OpenCompass 共建计划，诚邀社区用户为 OpenCompass 提供更具代表性和可信度的客观评测数据集!
 > 点击 [Issue](https://github.com/open-compass/opencompass/issues/248) 获取更多数据集.
 > 让我们携手共进，打造功能强大易用的大模型评测平台！
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.10.24\]** 我们发布了一个全新的评测集，BotChat，用于评估大语言模型的多轮对话能力，欢迎查看 [BotChat](https://github.com/open-compass/BotChat) 获取更多信息. 🔥🔥🔥.
 - **\[2023.09.26\]** 我们在评测榜单上更新了[Qwen](https://github.com/QwenLM/Qwen), 这是目前表现最好的开源模型之一, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
 - **\[2023.09.20\]** 我们在评测榜单上更新了[InternLM-20B](https://github.com/InternLM/InternLM), 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
 - **\[2023.09.19\]** 我们在评测榜单上更新了WeMix-LLaMA2-70B/Phi-1.5-1.3B, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
@@ -42,7 +45,6 @@
 - **\[2023.09.06\]** 欢迎 [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。
 - **\[2023.09.02\]** 我们加入了[Qwen-VL](https://github.com/QwenLM/Qwen-VL)的评测支持。
 - **\[2023.08.25\]** 欢迎 [**TigerBot**](https://github.com/TigerResearch/TigerBot) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。
-- **\[2023.08.21\]** [**Lagent**](https://github.com/InternLM/lagent) 正式发布，它是一个轻量级、开源的基于大语言模型的智能体（agent）框架。我们正与Lagent团队紧密合作，推进支持基于Lagent的大模型工具能力评测 !
 
 > [更多](docs/zh_cn/notes/news.md)
 
