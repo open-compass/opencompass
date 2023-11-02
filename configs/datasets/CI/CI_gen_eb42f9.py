@@ -1,27 +1,27 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_inferencer import AgentInferencer
 
 from opencompass.datasets import CIDataset, CIEvaluator
 
-cidataset_reader_cfg = dict(
+ci_reader_cfg = dict(
     input_columns=["questions"],
     output_column="references",
     train_split='test',
     test_split='test')
 
-cidataset_infer_cfg = dict(
+ci_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template="""{questions}""",
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+    inferencer=dict(type=AgentInferencer),
 )
 
 
 libs = ['Pandas', 'Matplotlib', 'Opencv', 'SciPy', 'Seaborn', 'PyTorch']
-cidataset_eval_cfg = {
+ci_eval_cfg = {
     lib: dict(
         evaluator=dict(
             type=CIEvaluator,
@@ -31,13 +31,13 @@ cidataset_eval_cfg = {
     for lib in libs
 }
 
-cidataset_datasets = [
+ci_datasets = [
     dict(
-        abbr=f"cidataset_{lib}",
+        abbr=f"ci_{lib}",
         type=CIDataset,
         path=f"backup_data/cidataset/{lib}",
-        reader_cfg=cidataset_reader_cfg,
-        infer_cfg=cidataset_infer_cfg,
-        eval_cfg=cidataset_eval_cfg[lib],
+        reader_cfg=ci_reader_cfg,
+        infer_cfg=ci_infer_cfg,
+        eval_cfg=ci_eval_cfg[lib],
     ) for lib in libs
 ]
