@@ -49,3 +49,49 @@ class Gsm8kEvaluator(BaseEvaluator):
             details.append(detail)
         result = {'accuracy': 100 * correct / count, 'details': details}
         return result
+
+
+class Gsm8kAgentEvaluator(BaseEvaluator):
+    """Gsm8k agent evaluator for soft condition.
+
+    Args:
+        action (str): Action for catching internal prediction.
+            Defaults to `PythonInterpreter`.
+    """
+
+    def __init__(self, action: str = 'PythonInterpreter'):
+        self.action = action
+
+    def soft_equal(self, pred, refer, step):
+        for s in step[::-1]:
+            if s['type'] == self.action:
+                try:
+                    soft_pred = s['result']['text']
+                    if str(int(float(soft_pred))) == refer:
+                        return True
+                except Exception:
+                    # result might not exists
+                    # text cannot convert to float
+                    print(pred, soft_pred, refer)
+                finally:
+                    break
+        return False
+
+    def score(self, predictions, references, steps):
+        """Calculate accuracy."""
+
+        correct = 0
+        soft_correct = 0
+        total = len(references)
+        for pred, refer, step in zip(predictions, references, steps):
+
+            if pred == refer:
+                correct += 1
+            else:
+                soft_correct += self.soft_equal(pred, refer, step)
+
+        result = {
+            'accuracy': 100 * correct / total,
+            'soft_acc': 100 * (correct + soft_correct) / total
+        }
+        return result

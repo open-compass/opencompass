@@ -14,7 +14,13 @@ class LagentAgent:
     https://github.com/InternLM/lagent.
     """
 
-    def __init__(self, agent_type, llm, actions=None, protocol=None, **kwargs):
+    def __init__(self,
+                 agent_type,
+                 llm,
+                 actions=None,
+                 protocol=None,
+                 mutli_rounds=False,
+                 **kwargs):
         llm = REGISTRY.build(llm)
         agent_cfg = {'type': agent_type, 'llm': llm, **kwargs}
 
@@ -28,6 +34,7 @@ class LagentAgent:
             agent_cfg['protocol'] = protocol
 
         self.agent = REGISTRY.build(agent_cfg)
+        self.mutli_rounds = mutli_rounds
 
     def add_example(self, example):
         # format example in protocol if needed
@@ -39,10 +46,9 @@ class LagentAgent:
             get_logger().warning('Protocal template does not have example'
                                  ' placeholder, please check your template.')
 
-    def chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
+    def one_round_chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
         from lagent.schema import ActionReturn, AgentReturn
         generation: AgentReturn = self.agent.chat(user_input)
-        self.agent._session_history = []  # clear agent history
         answer = generation.response
         steps = []
 
@@ -58,6 +64,18 @@ class LagentAgent:
                     errmsg=step.errmsg,
                     valid=int(step.valid),
                 ))
+        return answer, steps
+
+    def chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
+        if self.mutli_rounds:
+            steps = []
+            for single_input in user_input:
+                answer, one_round_steps = self.one_round_chat(single_input)
+                steps.append(one_round_steps)
+        else:
+            answer, steps = self.one_round_chat(user_input)
+
+        self.agent.reset()  # clear agent history
         return answer, steps
 
 
@@ -109,8 +127,11 @@ class CodeAgent:
     """Agent wrapper for Lagent."""
 
     def __new__(self, llm, **kwargs):
-        from lagent.actions import PythonInterpreter
         from lagent.agents.react import ReActProtocol
+
+        from opencompass.lagent.actions.python_interpreter import \
+            PythonInterpreter
+        mutli_rounds = kwargs.pop('mutli_rounds', False)
         agent_type = kwargs.pop('agent_type', ReAct)
         max_turn = kwargs.pop('max_turn', 3)
         actions = kwargs.pop('actions', [
@@ -130,4 +151,5 @@ class CodeAgent:
                            max_turn=max_turn,
                            actions=actions,
                            protocol=protocol,
+                           mutli_rounds=mutli_rounds,
                            **kwargs)
