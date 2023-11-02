@@ -27,7 +27,9 @@
 
 就像指南针在我们的旅程中为我们导航一样，我们希望OpenCompass能够帮助你穿越评估大型语言模型的重重迷雾。OpenCompass提供丰富的算法和功能支持，期待OpenCompass能够帮助社区更便捷地对NLP模型的性能进行公平全面的评估。
 
-> **🔥 注意**<br />
+🔥🔥🔥 祝贺 **OpenCompass 作为大模型标准测试工具被Meta AI官方推荐**, 点击 Llama 的 [入门文档](https://ai.meta.com/llama/get-started/#validation) 获取更多信息.
+
+> **注意**<br />
 > 我们正式启动 OpenCompass 共建计划，诚邀社区用户为 OpenCompass 提供更具代表性和可信度的客观评测数据集!
 > 点击 [Issue](https://github.com/open-compass/opencompass/issues/248) 获取更多数据集.
 > 让我们携手共进，打造功能强大易用的大模型评测平台！

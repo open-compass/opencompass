@@ -27,7 +27,9 @@ to **OpenCompass**!
 
 Just like a compass guides us on our journey, OpenCompass will guide you through the complex landscape of evaluating large language models. With its powerful algorithms and intuitive interface, OpenCompass makes it easy to assess the quality and effectiveness of your NLP models.
 
-> **🔥 Attention**<br />
+🔥🔥🔥 We are delighted to announce that **the OpenCompass has been recommended by the Meta AI**, click [Get Started](https://ai.meta.com/llama/get-started/#validation) of Llama for more information.
+
+> **Attention**<br />
 > We launch the OpenCompass Collaboration project, welcome to support diverse evaluation benchmarks into OpenCompass!
 > Clike [Issue](https://github.com/open-compass/opencompass/issues/248) for more information.
 > Let's work together to build a more powerful OpenCompass toolkit!
@@ -386,11 +388,6 @@ Through the command line or configuration files, OpenCompass also supports evalu
 </table>
 
 ## OpenCompass Ecosystem
-
-
-
-
-
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
