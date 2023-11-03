@@ -62,6 +62,17 @@ class ReAct(BaseAgent):
                         system_prompt = []
                 merged_prompt.append(tmp_p)
 
+            # merge if system still exists
+            if system_prompt:
+                if 'role' in merged_prompt[-1]:
+                    if merged_prompt[-1]['role'] == 'HUMAN':
+                        # append to the final human prompt
+                        merged_prompt[-1]['prompt'] += ''.join(system_prompt)
+                    else:
+                        # create a human prompt behind
+                        merged_prompt.append(
+                            dict(role='HUMAN', prompt=''.join(system_prompt)))
+
         from opencompass.utils.prompt import PromptList
         new_prompt = PromptList()
         # adapter for meta template

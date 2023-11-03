@@ -128,7 +128,7 @@ class PythonInterpreter(BaseAction):
                 res = self.runtime.eval_code(self.answer_expr)
             else:
                 self.runtime.exec_code('\n'.join(command[:-1]))
-                res = self.runtime.eval_code(command[-1])
+                res = True
         except Exception as e:
             tool_return.errmsg = repr(e)
             tool_return.type = self.name
