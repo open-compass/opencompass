@@ -27,7 +27,10 @@ def load_package():
     current_folder_path = os.path.dirname(current_file_path)
 
     sys.path.append(os.path.join(current_folder_path, 'MiniGPT-4'))  # noqa
-    from minigpt4.models.mini_gpt4 import MiniGPT4
+    # to be compatible with the latest version
+    # if you are using the old version, please use the following line
+    # from minigpt4.models.mini_gpt4 import MiniGPT4
+    from minigpt4.models.minigpt4 import MiniGPT4
 
     sys.path.pop(-1)
 
