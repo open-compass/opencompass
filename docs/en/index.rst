@@ -69,7 +69,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
 .. _Tools:
 .. toctree::
    :maxdepth: 1
-   :caption: tools
+   :caption: Tools
 
    tools.md
 

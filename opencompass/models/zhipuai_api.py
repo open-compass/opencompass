@@ -40,8 +40,8 @@ class ZhiPuAI(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        import zhipuai
-        self.zhipuai = zhipuai
+        import opencompass.models.zhipuai_api as zhipuai_api
+        self.zhipuai = zhipuai_api
         self.zhipuai.api_key = key
         self.model = path
 

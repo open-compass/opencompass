@@ -1,2 +1,2 @@
-zhipu
 websocket-client
+zhipu
