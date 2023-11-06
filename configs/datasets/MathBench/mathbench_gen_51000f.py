@@ -8,12 +8,12 @@ from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 single_choice_prompts = {
     "single_choice_cn_with_reasoning": "以下是一道关于数学的单项选择题，请你一步一步推理并得到最终的答案选项。回答格式为如下：\n答案选项：A、B、C、D中你认为正确的一个选项\n计算过程：根据题目得到选项答案的一步步过程\n请严格按照上面的格式回答问题，下面是你要回答的题目：\n{question}\n答案选项：",
-    "single_choice_cn": "以下是一道关于数学的单项选择题，请你直接给出正确的答案选项。回答格式为如下：\n答案选项：A、B、C、D中你认为正确的选项\n下面是你要回答的题目：\n{question}\n答案选项：",
+    "single_choice_cn": "以下是一道关于数学的单项选择题，请你给出正确的答案选项。\n下面是你要回答的题目：\n{question}\n答案选项：",
     "single_choice_en_with_reasoning": "Here is a multiple-choice question about mathematics. Please provide the final answer option by step-by-step reasoning. Please answer in the following format:\nAnswer option: A, B, C, or D (the option you believe is correct)\nCalculation process: Step-by-step process to derive the answer option based on the question\nPlease strictly follow the above format to answer the question. Here is the question you need to answer:\n{question}\nAnswer option:",
-    "single_choice_en": "Here is a multiple-choice question about mathematics. Please provide the correct answer option directly. Please answer in the following format:\nAnswer option: A, B, C, or D (the option you believe is correct)\nHere is the question you need to answer:\n{question}\nAnswer option:",
+    "single_choice_en": "Here is a multiple-choice question about mathematics. Please provide the correct answer option directly.\nHere is the question you need to answer:\n{question}\nAnswer option:",
 }
 
-cloze_prompts ={
+cloze_prompts={
     "cloze_cn": [
                 dict(role='HUMAN', prompt='Q: 林中有15棵树。林务工人员今天将在林中种植树木。完成后，将有21棵树。林务工人员今天种植了多少棵树？'),
                 dict(role='BOT', prompt='A: 我们从15棵树开始。后来有21棵树。差值必定是他们种植的树木数量。所以，他们必须种植了21 - 15 = 6棵树。答案是 6\n'),
@@ -61,15 +61,14 @@ mathbench_sets = {
     'college': ['single_choice_cn', 'cloze_en'],
     'high': ['single_choice_cn', 'single_choice_en'],
     'middle': ['single_choice_cn'],
-    'primary': ['single_choice_cn', 'cloze_cn'],
+    'primary': ['cloze_cn'],
 }
 
 # Generate reasoning path if set True or just generate the final answer
-with_reasoning = True
+with_reasoning = False
 
 # Use circular evaluation or not
 with_circular_eval = True
-
 
 mathbench_datasets = []
 
@@ -102,6 +101,7 @@ for _split in list(mathbench_sets.keys()):
                 type=MathBenchDataset,
                 path=f"./data/mathbench/{_split}",
                 name=_name,
+                with_circular=with_circular_eval,
                 abbr="mathbench-" + _split + '-' + _name,
                 reader_cfg=dict(
                     input_columns=["question"],
