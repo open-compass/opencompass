@@ -4,7 +4,6 @@ from typing import Dict, List, Optional, Union
 
 import requests
 
-from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
@@ -12,7 +11,6 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 
 
-@MODELS.register_module(name=['MiniMax'])
 class MiniMax(BaseAPIModel):
     """Model wrapper around MiniMax.
 

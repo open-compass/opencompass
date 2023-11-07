@@ -3,7 +3,6 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
-from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
@@ -11,7 +10,6 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 
 
-@MODELS.register_module(name=['XunFei'])
 class XunFei(BaseAPIModel):
     """Model wrapper around XunFei.
 
