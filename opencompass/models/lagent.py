@@ -128,7 +128,7 @@ def solution():
 
 
 class CodeAgent:
-    """Agent wrapper for Lagent."""
+    """Code Agent wrapper for Lagent."""
 
     def __new__(self, llm, **kwargs):
         from lagent.agents.react import ReActProtocol
