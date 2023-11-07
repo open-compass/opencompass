@@ -92,7 +92,7 @@ models = [
 
 ```bash
 configs
-├── eval_zhihu.py
+├── eval_zhipu.py
 ├── eval_xunfei.py
 └── eval_minimax.py
 ```

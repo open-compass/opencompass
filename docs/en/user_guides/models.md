@@ -100,7 +100,7 @@ We have provided several examples for API-based models. Please refer to
 
 ```bash
 configs
-├── eval_zhihu.py
+├── eval_zhipu.py
 ├── eval_xunfei.py
 └── eval_minimax.py
 ```
