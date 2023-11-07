@@ -14,7 +14,7 @@ with read_base():
 FORCE_STOP_PROMPT_EN = """You should directly give results based on history information."""
 
 FEWSHOT_INSTRUCTION = """\
-You are a assistant who can utilize external tools.
+You are an assistant who can utilize external tools.
 {tool_description}
 To use a tool, please response with the following format:
 ```

@@ -7,6 +7,7 @@ ds1000_example = """
 In the following task, you should generate code with one assertion to testify the correctness of your code.
 
 Example:
+
 <HUMAN>Problem:
 How do I get the dimensions of an array? For instance, this is (2, 2):
 a = np.array([[1,2],[3,4]])

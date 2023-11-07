@@ -88,7 +88,7 @@ FORCE_STOP_PROMPT_EN = (
 )
 
 FEWSHOT_INSTRUCTION = """\
-You are a assistant who can utilize external tools.
+You are an assistant who can utilize external tools.
 {{tool_description}}
 To use a tool, please use the following format:
 ```
