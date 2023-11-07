@@ -12,6 +12,7 @@ from .c3 import *  # noqa: F401, F403
 from .cb import *  # noqa: F401, F403
 from .ceval import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
+from .cibench import *  # noqa: F401, F403
 from .civilcomments import *  # noqa: F401, F403
 from .cluewsc import *  # noqa: F401, F403
 from .cmb import *  # noqa: F401, F403
@@ -26,6 +27,7 @@ from .cvalues import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
 from .ds1000 import *  # noqa: F401, F403
+from .ds1000_interpreter import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403

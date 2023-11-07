@@ -1,11 +1,12 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import AgentInferencer
-from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import HFDataset, gsm8k_postprocess, gsm8k_dataset_postprocess
+from opencompass.datasets import HFDataset, gsm8k_postprocess, gsm8k_dataset_postprocess, Gsm8kAgentEvaluator
 
 # This config is for code interpreter
 gsm8k_example = """
+Example:
+
 <HUMAN>A group of 4 fruit baskets contains 9 apples, 15 oranges, and 14 bananas in the first three baskets and 2 less of each fruit in the fourth basket. How many fruits are there?
 <ASSISTANT>{thought} We need to calculate the total number of fruits. The total number of fruits in the first three baskets is given, while for the fourth basket, we need to subtract 2 from each fruit category. We can solve this problem using simple arithmetic.
 {action} PythonInterpreter
@@ -68,7 +69,7 @@ gsm8k_infer_cfg = dict(
     inferencer=dict(type=AgentInferencer, example=gsm8k_example))
 
 gsm8k_eval_cfg = dict(
-    evaluator=dict(type=AccEvaluator),
+    evaluator=dict(type=Gsm8kAgentEvaluator),
     pred_postprocessor=dict(type=gsm8k_postprocess),
     dataset_postprocessor=dict(type=gsm8k_dataset_postprocess))
 
