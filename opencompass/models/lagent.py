@@ -26,6 +26,7 @@ class LagentAgent:
 
         if actions is not None:
             from lagent.actions import ActionExecutor
+
             executor = ActionExecutor(
                 [REGISTRY.build(action) for action in actions])
             agent_cfg['action_executor'] = executor
@@ -47,7 +48,9 @@ class LagentAgent:
                                  ' placeholder, please check your template.')
 
     def one_round_chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
+        """One round chat with agent."""
         from lagent.schema import ActionReturn, AgentReturn
+
         generation: AgentReturn = self.agent.chat(user_input)
         answer = generation.response
         steps = []
@@ -67,6 +70,7 @@ class LagentAgent:
         return answer, steps
 
     def chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
+        """Chat with agent."""
         if self.mutli_rounds:
             steps = []
             for single_input in user_input:
@@ -79,7 +83,9 @@ class LagentAgent:
         return answer, steps
 
 
-FORCE_STOP_PROMPT_EN = """You should directly give results based on history information."""  # noqa
+FORCE_STOP_PROMPT_EN = (
+    """You should directly give results based on history information."""  # noqa
+)
 
 FEWSHOT_INSTRUCTION = """\
 You are a assistant who can utilize external tools.
@@ -100,14 +106,12 @@ please using the following format to reply:
 {{thought}} the thought process to get the final answer
 {{finish}} final answer
 ```
-
-Example:
 {example}
 
 Begin!
-""" # noqa
+"""  # noqa
 
-PYTHON_INTERPRETER_DESCRIPTION = '''\
+PYTHON_INTERPRETER_DESCRIPTION = """\
 It can run a Python code. The code must be a valid code that contains only python method, and the method' name must be 'solution' and returns a dict, which key is variable name. The libraries I recommend are sympy and scipy. the format is:
 ```python
 # import packages
@@ -120,7 +124,7 @@ def solution():
     # final answer
     final_answer =  func(mid_variable)
     return final_answer
-```''' # noqa
+```"""  # noqa
 
 
 class CodeAgent:
@@ -131,13 +135,17 @@ class CodeAgent:
 
         from opencompass.lagent.actions.python_interpreter import \
             PythonInterpreter
+
         mutli_rounds = kwargs.pop('mutli_rounds', False)
         agent_type = kwargs.pop('agent_type', ReAct)
         max_turn = kwargs.pop('max_turn', 3)
-        actions = kwargs.pop('actions', [
-            dict(type=PythonInterpreter,
-                 description=PYTHON_INTERPRETER_DESCRIPTION),
-        ])
+        actions = kwargs.pop(
+            'actions',
+            [
+                dict(type=PythonInterpreter,
+                     description=PYTHON_INTERPRETER_DESCRIPTION),
+            ],
+        )
         protocol = kwargs.pop(
             'protocol',
             dict(
@@ -145,7 +153,8 @@ class CodeAgent:
                 call_protocol=FEWSHOT_INSTRUCTION,
                 force_stop=FORCE_STOP_PROMPT_EN,
                 finish=dict(role='FINISH', begin='Final Answer:', end='\n'),
-            ))
+            ),
+        )
         return LagentAgent(agent_type=agent_type,
                            llm=llm,
                            max_turn=max_turn,

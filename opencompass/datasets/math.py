@@ -334,7 +334,7 @@ class MATHAgentEvaluator(MATHEvaluator):
         return False
 
     def get_action(self, step):
-        for s in step:
+        for s in step[::-1]:
             if s['type'] == self.action:
                 return s
 

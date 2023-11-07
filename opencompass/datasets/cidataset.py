@@ -132,6 +132,7 @@ class CIEvaluator(BaseEvaluator):
         import base64
 
         import skimage
+
         for action in step[::-1]:
             if action['type'] == 'IPythonInterpreter':
                 if action['result']:
@@ -165,6 +166,7 @@ class CIEvaluator(BaseEvaluator):
         def check_jupytext():
             """Check requirements existence."""
             from shutil import which
+
             assert which('jupytext'), (
                 "Please install jupytext use 'pip install jupytext' to ensure"
                 'the conversion processes.')
@@ -271,9 +273,9 @@ class CIEvaluator(BaseEvaluator):
             general_accuracy = -1
 
         result = dict(
-            executable_rate=sum(passed_list) / sum(num_cells_list),
-            general_accuracy=general_accuracy,
-            visualize_similarity=visualize_similarity,
+            executable_rate=sum(passed_list) / sum(num_cells_list) * 100,
+            general_accuracy=general_accuracy * 100,
+            visualize_similarity=visualize_similarity * 100,
             num_cells_list=num_cells_list,
             num_general_list=num_general_list,
             passed_list=passed_list,

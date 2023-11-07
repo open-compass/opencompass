@@ -105,6 +105,9 @@ class ReAct(BaseAgent):
             # TODO: hard code here
             action_input = re.sub('<eoa>', '', action_input)
 
+            if 'tensorflow' in action_input:
+                # skip tensorflow currently
+                break
             action_return: ActionReturn = self._action_executor(
                 action, action_input)
             action_return.thought = thought

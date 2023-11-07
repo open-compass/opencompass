@@ -35,7 +35,7 @@ ci_datasets = [
     dict(
         abbr=f"ci_{lib}",
         type=CIDataset,
-        path=f"backup_data/cidataset/{lib}",
+        path=f"backup_data/mydatasetv2/{lib}",
         reader_cfg=ci_reader_cfg,
         infer_cfg=ci_infer_cfg,
         eval_cfg=ci_eval_cfg[lib],
