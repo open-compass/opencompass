@@ -122,7 +122,7 @@ def solution():
     # middle steps
     mid_variable = func(mid_variable)
     # final answer
-    final_answer =  func(mid_variable)
+    final_answer = func(mid_variable)
     return final_answer
 ```"""  # noqa
 

@@ -129,7 +129,8 @@ class ReAct(BaseAgent):
 
 
 class CIReAct(ReAct):
-    """An implementation of ReAct (https://arxiv.org/abs/2210.03629)
+    """Code Interpreter version of ReAct. The success state is different from
+    ReAct.
 
     Args:
         llm (BaseModel or BaseAPIModel): a LLM service which can chat

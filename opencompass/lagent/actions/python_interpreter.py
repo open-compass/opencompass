@@ -49,7 +49,7 @@ def solution():
     # 步骤 x
     mid_variable = func(mid_variable)
     # 最后结果
-    final_answer =  func(mid_variable)
+    final_answer = func(mid_variable)
     return final_answer
 ```"""
 
