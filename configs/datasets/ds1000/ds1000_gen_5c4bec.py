@@ -59,12 +59,15 @@ ds1000_eval_cfg = dict(
     pred_role="BOT",
 )
 
+# The DS-1000 dataset can be downloaded from
+# https://github.com/HKUNLP/DS-1000/blob/main/ds1000_data.zip
+
 # Matplotlib cannot fit this setting
 ds1000_datasets = [
     dict(
         abbr=f"ds1000_{lib}",
         type=DS1000Dataset_Interperter,  # bustm share the same format with AFQMC
-        path="backup_data/ds1000_data/",
+        path="./data/ds1000_data/",
         libs=f"{lib}",
         reader_cfg=ds1000_reader_cfg,
         infer_cfg=ds1000_infer_cfg,
@@ -73,7 +76,7 @@ ds1000_datasets = [
     for lib in [
         "Pandas",
         "Numpy",
-        # 'Tensorflow',
+        # 'Tensorflow',  # error using tensorflow, skipped temperarily
         "Scipy",
         "Sklearn",
         "Pytorch",
