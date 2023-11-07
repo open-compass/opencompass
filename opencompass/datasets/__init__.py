@@ -12,7 +12,7 @@ from .c3 import *  # noqa: F401, F403
 from .cb import *  # noqa: F401, F403
 from .ceval import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
-from .cidataset import *  # noqa: F401, F403
+from .cibench import *  # noqa: F401, F403
 from .civilcomments import *  # noqa: F401, F403
 from .cluewsc import *  # noqa: F401, F403
 from .cmb import *  # noqa: F401, F403
