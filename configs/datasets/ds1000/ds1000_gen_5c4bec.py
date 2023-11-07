@@ -76,7 +76,7 @@ ds1000_datasets = [
     for lib in [
         "Pandas",
         "Numpy",
-        # 'Tensorflow',  # error using tensorflow, skipped temperarily
+        # 'Tensorflow',  # error using tensorflow, skipped temporarily
         "Scipy",
         "Sklearn",
         "Pytorch",
