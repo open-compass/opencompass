@@ -34,16 +34,11 @@ class TimeoutError(Exception):
 
 
 class IPythonInterpreter(BaseAction):
-    """A IPython executor that can execute Python scripts.
+    """A IPython executor that can execute Python scripts in a jupyter manner.
 
     Args:
         description (str): The description of the action. Defaults to
             DEFAULT_DESCRIPTION.
-        answer_symbol (str, Optional): the answer symbol from LLM
-        answer_expr (str, Optional): the answer function name of the Python
-            script. Default to 'solution()'.
-        answer_from_stdout (boolean): whether the execution results is from
-            stdout.
         name (str, optional): The name of the action. If None, the name will
             be class nameDefaults to None.
         enable (bool, optional): Whether the action is enabled. Defaults to
@@ -51,6 +46,10 @@ class IPythonInterpreter(BaseAction):
         disable_description (str, optional): The description of the action when
             it is disabled. Defaults to None.
         timeout (int): Upper bound of waiting time for Python script execution.
+            Defaults to 20.
+        user_data_dir (str): Specified the user data directory for files
+            loading. If set to `ENV`, use `USER_DATA_DIR` environment variable.
+            Defaults to `ENV`.
     """
 
     _KERNEL_CLIENTS = {}
@@ -76,7 +75,7 @@ class IPythonInterpreter(BaseAction):
 
     @staticmethod
     def start_kernel():
-        # Client
+        # start the kernel and manager
         km = KernelManager()
         km.start_kernel()
         kc = km.client()
