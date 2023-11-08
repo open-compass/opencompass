@@ -7,7 +7,6 @@ from typing import List, Optional
 import numpy as np
 from datasets import Dataset
 
-from opencompass.lagent.actions.ipython_interpreter import extract_code
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 
@@ -172,7 +171,7 @@ class CIBenchEvaluator(BaseEvaluator):
                 'the conversion processes.')
 
         check_jupytext()
-
+        from opencompass.lagent.actions.ipython_interpreter import extract_code
         for idx, (example_origin_prompt,
                   example_steps) in enumerate(zip(origin_prompt, steps)):
             markdown_lines = []
