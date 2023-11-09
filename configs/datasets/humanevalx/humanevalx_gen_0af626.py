@@ -44,7 +44,7 @@ humanevalx_eval_cfg_dict = {
                  ]  # do not support rust now
 }
 
-# Please download the need `xx.jsonl.gz` from
+# Please download the needed `xx.jsonl.gz` from
 # https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx
 # and move them into `data/humanevalx/` folder
 humanevalx_datasets = [
