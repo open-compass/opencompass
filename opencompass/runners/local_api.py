@@ -4,6 +4,7 @@ import os.path as osp
 import subprocess
 import sys
 import time
+import traceback
 from multiprocessing import Manager, Pool
 from multiprocessing.managers import SyncManager
 from typing import Any, Dict, List, Tuple
@@ -122,9 +123,13 @@ def launch(task: BaseTask, tokens: SyncManager.Semaphore):
         end_time = time.time()
         logger.info(f'time elapsed: {end_time - start_time:.2f}s')
     except Exception:
+        # print trace back in target file
+        traceback.print_exc()
+        # reset stdout and stderr
+        reset_std()
         logger.warning(f'task {task_name} fail, see\n{out_path}')
         returncode = 1
-    finally:
+    else:
         # reset stdout and stderr
         reset_std()
     return task_name, returncode

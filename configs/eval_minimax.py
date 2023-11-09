@@ -1,5 +1,5 @@
 from mmengine.config import read_base
-from opencompass.models.minimax import MiniMax
+from opencompass.models import MiniMax
 from opencompass.partitioners import NaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.runners.local_api import LocalAPIRunner
