@@ -1,4 +1,7 @@
-from datasets import load_dataset
+import json
+import os
+
+from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -7,38 +10,49 @@ from .base import BaseDataset
 
 @LOAD_DATASET.register_module()
 class winograndeDataset(BaseDataset):
+    """Disconnect from Huggingface, winograndeDataset."""
 
     @staticmethod
-    def load(**kwargs):
-
-        dataset = load_dataset(**kwargs)
-
-        def preprocess(example):
-            prompt = example.pop('sentence')
-            example['opt1'] = prompt.replace('_', example.pop('option1'))
-            example['opt2'] = prompt.replace('_', example.pop('option2'))
-            return example
-
-        return dataset.map(preprocess)
+    def load(path):
+        path = os.path.join(path, 'dev.jsonl')
+        dataset_list = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = json.loads(line)
+                prompt = line['sentence']
+                dataset_list.append({
+                    'opt1':
+                    prompt.replace('_', line['option1']),
+                    'opt2':
+                    prompt.replace('_', line['option2']),
+                    'answer':
+                    line['answer']
+                })
+        dataset_list = Dataset.from_list(dataset_list)
+        return dataset_list
 
 
 @LOAD_DATASET.register_module()
 class winograndeDataset_V2(BaseDataset):
+    """Disconnect from Huggingface, winograndeDataset_V2."""
 
     @staticmethod
-    def load(**kwargs):
-
-        dataset = load_dataset(**kwargs)
-
-        def preprocess(example):
-            prompt = example.pop('sentence')
-            example['opt1'] = prompt.replace('_', example.pop('option1'))
-            example['opt2'] = prompt.replace('_', example.pop('option2'))
-            answer = example.pop('answer')
-            if answer == '':
-                example['label'] = 'NULL'
-            else:
-                example['label'] = ' AB'[int(answer)]
-            return example
-
-        return dataset.map(preprocess)
+    def load(path):
+        path = os.path.join(path, 'dev.jsonl')
+        dataset_list = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = json.loads(line)
+                prompt = line['sentence']
+                answer = line['answer']
+                answer = ' AB'[int(answer)] if answer != '' else 'NULL'
+                dataset_list.append({
+                    'opt1':
+                    prompt.replace('_', line['option1']),
+                    'opt2':
+                    prompt.replace('_', line['option2']),
+                    'answer':
+                    answer
+                })
+        dataset_list = Dataset.from_list(dataset_list)
+        return dataset_list
