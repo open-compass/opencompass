@@ -38,7 +38,6 @@ obqa_datasets = [
         abbr="openbookqa_fact",
         type=OBQADataset,
         path='./data/openbookqa/Additional/test_complete.jsonl',
-        name="additional",
     ),
 ]
 
