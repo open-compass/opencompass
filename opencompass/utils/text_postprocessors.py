@@ -98,3 +98,9 @@ def first_number_postprocess(text: str) -> float:
 
     # if a match is found, return it. Otherwise, return None.
     return float(match.group(1)) if match else None
+
+
+@TEXT_POSTPROCESSORS.register_module('multiple-select')
+def multiple_select_postprocess(text: str) -> str:
+    ret = set([t for t in text if t.isupper()])
+    return ''.join(sorted(ret))
