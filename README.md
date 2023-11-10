@@ -83,8 +83,8 @@ git clone https://github.com/open-compass/opencompass opencompass
 cd opencompass
 pip install -e .
 # Download dataset to data/ folder
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core.zip
+unzip OpenCompassData-core.zip
 ```
 
 Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started/installation.html).
