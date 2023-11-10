@@ -35,6 +35,5 @@ with read_base():
     from ..obqa.obqa_gen_9069e4 import obqa_datasets
     from ..nq.nq_gen_c788f6 import nq_datasets
     from ..triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
-    from ..crowspairs.crowspairs_gen_381af0 import crowspairs_datasets
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
