@@ -247,8 +247,8 @@ class XunFei(BaseAPIModel):
             self.release()
             if err_code == 0:
                 return msg.strip()
-            if err_code == 10014: # skip safety problem
-                return "None"
+            if err_code == 10014:  # skip safety problem
+                return 'None'
 
         if err_code == 10013:
             return err_data['header']['message']
