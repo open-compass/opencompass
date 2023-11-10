@@ -1,6 +1,7 @@
 # flake8: noqa
 # yapf: disable
 import getpass
+import math
 import os.path as osp
 from datetime import datetime
 from typing import List, Optional
@@ -127,23 +128,38 @@ class DefaultSummarizer:
                         results[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][0]
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 if len(results) == len(sg['subsets']):
-                    if 'weights' in sg:
-                        numerator = sum(results[k] * sg['weights'][k] for k in sg['weights'])
-                        denominator = sum(sg['weights'].values())
-                        metric = 'weighted_average'
-                    else:
-                        numerator = sum(results[k] for k in results)
-                        denominator = len(results)
-                        metric = 'naive_average'
-                    results[metric] = numerator / denominator
-                    eval_modes = list(set(eval_modes))
-                    eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
+                    if 'std' in sg and sg['std'] == True:
+                        _avg = sum(results[k] for k in results) / len(results)
+                        _variance = sum((results[k] - _avg)**2 for k in results) / len(results)
+                        metric = 'standard_deviation'
+                        results[metric] = math.sqrt(_variance)
+                        del _avg, _variance
 
-                    # add to global results
-                    raw_results[model_abbr][sg['name']] = results
-                    parsed_results[model_abbr][sg['name']] = [numerator / denominator]
-                    dataset_metrics[sg['name']] = [metric]
-                    dataset_eval_mode[sg['name']] = eval_mode
+                        eval_modes = list(set(eval_modes))
+                        eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
+
+                        raw_results[model_abbr][sg['name']] = results
+                        parsed_results[model_abbr][sg['name']] = [results[metric]]
+                        dataset_metrics[sg['name']] = [metric]
+                        dataset_eval_mode[sg['name']] = eval_mode
+                    else:
+                        if 'weights' in sg:
+                            numerator = sum(results[k] * sg['weights'][k] for k in sg['weights'])
+                            denominator = sum(sg['weights'].values())
+                            metric = 'weighted_average'
+                        else:
+                            numerator = sum(results[k] for k in results)
+                            denominator = len(results)
+                            metric = 'naive_average'
+                        results[metric] = numerator / denominator
+                        eval_modes = list(set(eval_modes))
+                        eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
+
+                        # add to global results
+                        raw_results[model_abbr][sg['name']] = results
+                        parsed_results[model_abbr][sg['name']] = [numerator / denominator]
+                        dataset_metrics[sg['name']] = [metric]
+                        dataset_eval_mode[sg['name']] = eval_mode
                 elif len(results) == 0:
                     continue
                 else:
