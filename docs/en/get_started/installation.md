@@ -66,15 +66,15 @@ Run the following commands to download and place the datasets in the `${OpenComp
 
 ```bash
 # Run in the OpenCompass directory
-wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core.zip
-unzip OpenCompassData-core.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
+unzip OpenCompassData-core-20231110.zip
 ```
 
 If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download it using the following command:
 
 ```bash
-wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete.zip
-unzip OpenCompassData-complete.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
+unzip OpenCompassData-complete-20231110.zip
 cd ./data
 unzip *.zip
 ```

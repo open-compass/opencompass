@@ -66,15 +66,15 @@ OpenCompass 支持的数据集主要包括两个部分：
 在 OpenCompass 项目根目录下运行下面命令，将数据集准备至 `${OpenCompass}/data` 目录下：
 
 ```bash
-wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core.zip
-unzip OpenCompassData-core.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
+unzip OpenCompassData-core-20231110.zip
 ```
 
 如果需要使用 OpenCompass 提供的更加完整的数据集 (~500M)，可以使用下述命令进行下载：
 
 ```bash
-wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete.zip
-unzip OpenCompassData-complete.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
+unzip OpenCompassData-complete-20231110.zip
 cd ./data
 unzip *.zip
 ```
