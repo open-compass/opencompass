@@ -1,22 +1,30 @@
 from opencompass.models import HuggingFaceCausalLM
 
+_meta_template = dict(
+    round=[
+        dict(role='HUMAN', begin='<|startofpiece|>', end=''),
+        dict(role='BOT', begin='<|endofpiece|>', end='</s>', generate=True),
+    ],
+    eos_token_id=2,
+)
 
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='internlm-7b-hf',
-        path="internlm/internlm-7b",
-        tokenizer_path='internlm/internlm-7b',
+        abbr='aquilachat2-7b-hf',
+        path="BAAI/AquilaChat2-7B",
+        tokenizer_path='BAAI/AquilaChat2-7B',
         model_kwargs=dict(
-            trust_remote_code=True,
             device_map='auto',
+            trust_remote_code=True,
         ),
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
-            use_fast=False,
             trust_remote_code=True,
+            use_fast=False,
         ),
+        meta_template=_meta_template,
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,

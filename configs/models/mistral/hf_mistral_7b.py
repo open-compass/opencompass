@@ -3,18 +3,17 @@ from opencompass.models import HuggingFaceCausalLM
 
 models = [
     dict(
+        abbr='mistral-7b-v0.1-hf',
         type=HuggingFaceCausalLM,
-        abbr='internlm-7b-hf',
-        path="internlm/internlm-7b",
-        tokenizer_path='internlm/internlm-7b',
+        path='mistralai/Mistral-7B-v0.1',
+        tokenizer_path='mistralai/Mistral-7B-v0.1',
         model_kwargs=dict(
-            trust_remote_code=True,
             device_map='auto',
+            trust_remote_code=True,
         ),
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
-            use_fast=False,
             trust_remote_code=True,
         ),
         max_out_len=100,

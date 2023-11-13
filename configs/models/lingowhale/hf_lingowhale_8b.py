@@ -1,20 +1,20 @@
-from opencompass.models import HuggingFaceCausalLM
+from opencompass.models import HuggingFace
 
 
 models = [
     dict(
-        type=HuggingFaceCausalLM,
-        abbr='internlm-7b-hf',
-        path="internlm/internlm-7b",
-        tokenizer_path='internlm/internlm-7b',
+        type=HuggingFace,
+        abbr='lingowhale-8b-hf',
+        path='deeplang-ai/LingoWhale-8B',
+        tokenizer_path='deeplang-ai/LingoWhale-8B',
         model_kwargs=dict(
             trust_remote_code=True,
             device_map='auto',
+            torch_dtype='auto',
         ),
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
-            use_fast=False,
             trust_remote_code=True,
         ),
         max_out_len=100,

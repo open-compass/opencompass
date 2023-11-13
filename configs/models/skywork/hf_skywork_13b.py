@@ -1,21 +1,20 @@
 from opencompass.models import HuggingFaceCausalLM
 
-
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='internlm-7b-hf',
-        path="internlm/internlm-7b",
-        tokenizer_path='internlm/internlm-7b',
+        abbr='skywork-13b-hf',
+        path="Skywork/Skywork-13B-base",
+        tokenizer_path='Skywork/Skywork-13B-base',
         model_kwargs=dict(
-            trust_remote_code=True,
             device_map='auto',
+            trust_remote_code=True,
         ),
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
-            use_fast=False,
             trust_remote_code=True,
+            use_fast=False,
         ),
         max_out_len=100,
         max_seq_len=2048,

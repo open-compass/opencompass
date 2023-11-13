@@ -66,7 +66,7 @@ class Gsm8kEvaluator(BaseEvaluator):
         count = 0
         details = []
         for i, j in zip(predictions, references):
-            detail = {'pred': i, 'answers': j, 'correct': False}
+            detail = {'pred': i, 'answer': j, 'correct': False}
             count += 1
             if i == j:
                 correct += 1

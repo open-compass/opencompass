@@ -3,27 +3,27 @@ from opencompass.models import HuggingFaceCausalLM
 
 _meta_template = dict(
     round=[
-        dict(role='HUMAN', begin='<|User|>:', end='<eoh>\n'),
-        dict(role='BOT', begin='<|Bot|>:', end='<eoa>\n', generate=True),
+        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
+        dict(role="BOT", begin="\n<|im_start|>assistant\n", end='<|im_end|>', generate=True),
     ],
 )
 
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='internlm-chat-7b-hf',
-        path="internlm/internlm-chat-7b",
-        tokenizer_path='internlm/internlm-chat-7b',
+        abbr='qwen-14b-chat-hf',
+        path="Qwen/Qwen-14B-Chat",
+        tokenizer_path='Qwen/Qwen-14B-Chat',
         model_kwargs=dict(
-            trust_remote_code=True,
             device_map='auto',
+            trust_remote_code=True
         ),
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
-            use_fast=False,
             trust_remote_code=True,
-        ),
+            use_fast=False,),
+        pad_token_id=151643,
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,
