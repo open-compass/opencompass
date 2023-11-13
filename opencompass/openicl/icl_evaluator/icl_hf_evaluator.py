@@ -266,7 +266,13 @@ class EDAccEvaluator(AccEvaluator):
 
         for i in range(len(predictions)):
             pred, ref = predictions[i], references[i]
-            dists = [self.dist(pred, cand) for cand in ref['candidates']]
+            dists = []
+            for cands in ref['candidates']:
+                if isinstance(cands, str):
+                    d = self.dist(pred, cands)
+                else:
+                    d = np.min([self.dist(pred, cand) for cand in cands])
+                dists.append(d)
             preds.append(np.argmin(dists))
             golds.append(ref['label'])
 

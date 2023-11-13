@@ -4,11 +4,18 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import EMEvaluator
 from opencompass.datasets import dropDataset
 
+drop_reader_cfg = dict(
+    input_columns=['prompt', 'question'],
+    output_column='answers',
+    train_split='validation',
+    test_split='validation',
+)
+
 drop_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=
-        '''Text: In the county, the population was spread out with 23.50% under the age of 18, 8.70% from 18 to 24, 29.70% from 25 to 44, 24.70% from 45 to 64, and 13.30% who were 65 years of age or older.
+        template='''\
+Text: In the county, the population was spread out with 23.50% under the age of 18, 8.70% from 18 to 24, 29.70% from 25 to 44, 24.70% from 45 to 64, and 13.30% who were 65 years of age or older.
 Question: How many more percent are under the age of 18 compared to the 18 to 24 group?
 Anawer: According to the text, 23.5% are under the age of 18, and 8.7% are from ages 18 to 24. 23.5%-8.7%=14.8%. So the answer is 14.8.
 
@@ -30,13 +37,8 @@ drop_datasets = [
     dict(
         abbr='drop',
         type=dropDataset,
-        path='drop',
-        reader_cfg=dict(
-            input_columns=['prompt'],
-            output_column='answers',
-            train_split='validation',
-            test_split='validation',
-        ),
+        path='./data/drop/drop_dataset_dev.json',
+        reader_cfg=drop_reader_cfg,
         infer_cfg=drop_infer_cfg,
         eval_cfg=drop_eval_cfg)
 ]

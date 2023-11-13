@@ -118,6 +118,12 @@ for _flores_subtask in _flores_subtasks:
     _, _flores_source, _src_inst, _ = flores_lang_map[_src]
     _, _flores_target, _tgt_inst, _ = flores_lang_map[_tgt]
 
+    flores_reader_cfg = dict(
+        input_columns=f"sentence_{_flores_source}",
+        output_column=f"sentence_{_flores_target}",
+        train_split="dev",
+        test_split="devtest"
+    )
     flores_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
@@ -139,16 +145,11 @@ for _flores_subtask in _flores_subtasks:
         flores_eval_cfg["dataset_postprocessor"] = dict(type="flores-chinese")
     flores_datasets.append(
         dict(
-            type=FloresFirst100Dataset,
             abbr=f"flores_100_{_src}-{_tgt}",
+            type=FloresFirst100Dataset,
+            path='./data/flores_first100',
             name=f"{_flores_source}-{_flores_target}",
-            reader_cfg=dict(
-                input_columns=f"sentence_{_flores_source}",
-                output_column=f"sentence_{_flores_target}",
-                train_split="dev",
-                test_split="devtest"),
+            reader_cfg=flores_reader_cfg.copy(),
             infer_cfg=flores_infer_cfg.copy(),
             eval_cfg=flores_eval_cfg.copy(),
         ))
-
-del _flores_lang_map, _flores_subtask, _src, _tgt, _, _flores_source, _src_inst, _flores_target, _tgt_inst

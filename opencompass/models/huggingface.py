@@ -5,6 +5,7 @@ import numpy as np
 import torch
 
 from opencompass.models.base import BaseModel
+from opencompass.models.base_api import APITemplateParser
 from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
@@ -442,3 +443,85 @@ class HuggingFaceCausalLM(HuggingFace):
                                                    is_trainable=False)
         self.model.eval()
         self.model.generation_config.do_sample = False
+
+
+class HuggingFaceChatGLM3(HuggingFace):
+    """Model wrapper around HuggingFace's ChatGLM3. Details available in
+    `https://huggingface.co/THUDM/chatglm3-6b`.
+
+    model.chat() is used for inference.
+    """
+
+    def __init__(self,
+                 path: str,
+                 hf_cache_dir: Optional[str] = None,
+                 max_seq_len: int = 2048,
+                 tokenizer_path: Optional[str] = None,
+                 tokenizer_kwargs: dict = dict(),
+                 peft_path: Optional[str] = None,
+                 tokenizer_only: bool = False,
+                 model_kwargs: dict = dict(device_map='auto'),
+                 meta_template: Optional[Dict] = None,
+                 extract_pred_after_decode: bool = False,
+                 batch_padding: bool = False,
+                 pad_token_id: Optional[int] = None,
+                 mode: str = 'none',
+                 num_extra_tokens: int = 50):
+        super().__init__(path=path,
+                         hf_cache_dir=hf_cache_dir,
+                         max_seq_len=max_seq_len,
+                         tokenizer_path=tokenizer_path,
+                         tokenizer_kwargs=tokenizer_kwargs,
+                         peft_path=peft_path,
+                         tokenizer_only=tokenizer_only,
+                         model_kwargs=model_kwargs,
+                         meta_template=meta_template,
+                         extract_pred_after_decode=extract_pred_after_decode,
+                         batch_padding=batch_padding,
+                         pad_token_id=pad_token_id,
+                         mode=mode)
+        self.template_parser = APITemplateParser(meta_template)
+        # used to compensate for #tokens occupied by sth like system prompt
+        self.num_extra_tokens = num_extra_tokens
+
+    def generate(self,
+                 inputs: List[str or PromptList],
+                 max_out_len: int = 512,
+                 temperature: float = 0.6) -> str:
+        """Generate response from input prompt.
+
+        Args:
+            inputs (list): input prompt
+            max_out_len (int): max output length
+            temperature (float): temperature for sampling
+        """
+        responses = []
+        for _input in inputs:
+            assert isinstance(_input, (str, PromptList))
+            if isinstance(_input, str):
+                history = [{'role': 'user', 'content': _input}]
+            else:
+                history = []
+                for item in _input:
+                    msg = {
+                        'content': item['prompt'],
+                        'role': {
+                            'HUMAN': 'user',
+                            'BOT': 'assistant',
+                            'SYSTEM': 'system'
+                        }[item['role']]
+                    }
+                    history.append(msg)
+            user_content = history[-1]['content']
+            history = history[:-1]
+            try:
+                response, history = self.model.chat(self.tokenizer,
+                                                    user_content,
+                                                    history=history)
+                responses.append(response)
+            except Exception:
+                responses.append('')
+        return responses
+
+    def get_token_len(self, prompt: str) -> int:
+        return len(self.tokenizer.encode(prompt)) + self.num_extra_tokens

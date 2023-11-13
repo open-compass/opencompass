@@ -89,3 +89,4 @@ docs/zh_cn/_build/
 
 # sft config ignore list
 configs/sft_cfg/*B_*
+configs/cky/

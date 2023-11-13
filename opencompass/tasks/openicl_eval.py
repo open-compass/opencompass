@@ -287,7 +287,7 @@ class OpenICLEvalTask(BaseTask):
                 result['prompt'] = origin_prediction['origin_prompt']
                 result['origin_prediction'] = pred_dicts[i]['prediction']
                 result['predictions'] = details[i]['pred']
-                result['references'] = details[i]['answers']
+                result['references'] = details[i]['answer']
                 result['correct'] = details[i]['correct']
             results[str(i)] = result
         return results
@@ -324,7 +324,7 @@ class OpenICLEvalTask(BaseTask):
             bpbs = [value['BPB'] for value in values]
             incorrect_bpb_list.append(
                 (sum(bpbs) - min(bpbs)) / (len(bpbs) - 1))
-            bpb_list.append(statistics.mean(bpbs))
+            bpb_list.append(min(bpbs))
 
         def filters(origins):
             targets = [target for target in origins if not math.isnan(target)]
