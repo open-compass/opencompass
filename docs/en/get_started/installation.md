@@ -66,9 +66,20 @@ Run the following commands to download and place the datasets in the `${OpenComp
 
 ```bash
 # Run in the OpenCompass directory
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
+unzip OpenCompassData-core-20231110.zip
 ```
+
+If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download it using the following command:
+
+```bash
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
+unzip OpenCompassData-complete-20231110.zip
+cd ./data
+unzip *.zip
+```
+
+The list of datasets included in both `.zip` can be found [here](https://github.com/open-compass/opencompass/releases/tag/0.1.8.rc1)
 
 OpenCompass has supported most of the datasets commonly used for performance comparison, please refer to `configs/dataset` for the specific list of supported datasets.
 

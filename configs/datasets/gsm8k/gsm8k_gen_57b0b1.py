@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import AgentInferencer
-from opencompass.datasets import HFDataset, gsm8k_postprocess, gsm8k_dataset_postprocess, Gsm8kAgentEvaluator
+from opencompass.datasets import GSM8KDataset, gsm8k_postprocess, gsm8k_dataset_postprocess, Gsm8kAgentEvaluator
 
 # This config is for code interpreter
 gsm8k_example = """
@@ -76,9 +76,8 @@ gsm8k_eval_cfg = dict(
 gsm8k_datasets = [
     dict(
         abbr='gsm8k',
-        type=HFDataset,
-        path='gsm8k',
-        name='main',
+        type=GSM8KDataset,
+        path='./data/gsm8k',
         reader_cfg=gsm8k_reader_cfg,
         infer_cfg=gsm8k_infer_cfg,
         eval_cfg=gsm8k_eval_cfg)
