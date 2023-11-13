@@ -104,6 +104,7 @@ def get_version():
 
 def do_setup():
     setup(name='opencompass',
+          author='OpenCompass Contributors',
           version=get_version(),
           description='A comprehensive toolkit for large model evaluation',
           url='https://github.com/open-compass/opencompass',
