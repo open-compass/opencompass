@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import HFDataset, HumanEvaluator, humaneval_postprocess
+from opencompass.datasets import HumanevalDataset, HumanEvaluator, humaneval_postprocess
 
 humaneval_reader_cfg = dict(
     input_columns=['prompt'], output_column='task_id', train_split='test')
@@ -27,8 +27,9 @@ humaneval_eval_cfg = dict(
 
 humaneval_datasets = [
     dict(
-        type=HFDataset,
-        path='openai_humaneval',
+        abbr='openai_humaneval',
+        type=HumanevalDataset,
+        path='./data/humaneval/human-eval-v2-20210705.jsonl',
         reader_cfg=humaneval_reader_cfg,
         infer_cfg=humaneval_infer_cfg,
         eval_cfg=humaneval_eval_cfg)
