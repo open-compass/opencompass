@@ -17,6 +17,7 @@ We provide a demo test set [subjective_demo.xlsx](https://opencompass.openxlab.s
 Store the set of subjective questions in .xlsx format in the `data/subjective/directory`.
 
 The table includes the following fields:
+
 - 'question': Question description
 - 'index': Question number
 - 'reference_answer': Reference answer
@@ -32,6 +33,7 @@ The specific process includes:
 3. Generating evaluation reports
 
 For `config/subjective.py`, we provide some annotations to help users understand the configuration file's meaning.
+
 ```python
 # Import datasets and subjective evaluation summarizer
 from mmengine.config import read_base
