@@ -16,9 +16,6 @@ winogrande_eval_cfg = dict(
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
-    
-_winogrande_template_choices = ["prompt_1", "prompt_2", "prompt_3"]
-
 _winogrande_prompt = dict(
     prompt_1="Which of the following is a good sentence:\nA. {opt1}\nB. {opt2}\nAnswer:",
     prompt_2="Which is a good sentence out of the following:\nA. {opt1}\nB. {opt2}\nAnswer:",
@@ -26,7 +23,7 @@ _winogrande_prompt = dict(
 )
 
 winogrande_datasets = []
-for _choice in _winogrande_template_choices:
+for _choice in _winogrande_prompt:
     winogrande_datasets.append(
         dict(
             abbr='winogrande_'+_choice,
