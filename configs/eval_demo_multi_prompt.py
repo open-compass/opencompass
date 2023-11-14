@@ -38,18 +38,7 @@ models=[
     )
 ]
 
-
-_winogrande_choices = ["prompt_1", "prompt_2", "prompt_3"]
-_winogrande_all = ['winogrande_'+choice for choice in _winogrande_choices]
-
 summarizer = dict(
-    dataset_abbrs=[
-        'winogrande_prompt_1',
-        'winogrande_prompt_2',
-        'winogrande_prompt_3',
-        'winogrande',
-        'winogrande_std',
-    ],
     summary_groups=[
         {'name': 'winogrande', 'subsets': _winogrande_all},
         {'name': 'winogrande_std', 'subsets': _winogrande_all, 'std': True},

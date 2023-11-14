@@ -28,8 +28,7 @@ for _choice in _winogrande_prompt:
         dict(
             abbr='winogrande_'+_choice,
             type=winograndeDataset_V2,
-            path="winogrande",
-            name="winogrande_xs",
+            path="./data/winogrande",
             reader_cfg=winogrande_reader_cfg,
             infer_cfg=dict(
                 prompt_template=dict(
