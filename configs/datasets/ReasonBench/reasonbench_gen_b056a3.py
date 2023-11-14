@@ -1,38 +1,42 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import PPLInferencer
+from opencompass.openicl.icl_retriever import FixKRetriever
+from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.utils.text_postprocessors import first_capital_postprocess
 from opencompass.datasets.reasonbench import TwoOptionDataset, ThreeOptionDataset, FourOptionDataset
 
 reasonbench_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_postprocessor=dict(type=first_capital_postprocess)
 )
 
-reader_cfgs, infer_cfgs = [], []
+reader_cfgs = []
 for i in range(2, 5):
     choices = ["A", "B", "C", "D"][:i]
 
     reader_cfgs.append(dict(
-    input_columns=["prompt_ppl"] + choices + ["choices"],
-    output_column="label")
+    input_columns=["prompt_ppl"],
+    output_column="label_ppl")
     )
 
-    infer_cfgs.append(dict(
-    prompt_template=dict(
+infer_cfg=dict(
+    ice_template=dict(
         type=PromptTemplate,
-        template={
-            str(id):
-            dict(
-                round=[
-                    dict(role="HUMAN", prompt="{prompt_ppl}Answer:"),
-                    dict(role="BOT", prompt=f"{choice}")
-                ], )
-            for id, choice in enumerate(choices)
-        }),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=PPLInferencer)
-    ))
+        template=dict(
+            begin="</E>",
+            round=[
+                dict(
+                    role="HUMAN",
+                    prompt="</E>{prompt_ppl}"
+                ),
+                dict(role="BOT", prompt="Answer: {label_ppl}"),
+            ]),
+        ice_token="</E>",
+        ),
+    retriever=dict(type=FixKRetriever, fix_id_list=[]),
+    inferencer=dict(type=GenInferencer)
+)
+
 
 CausalReasoningDataset = [
     dict(
@@ -40,7 +44,7 @@ CausalReasoningDataset = [
         type=TwoOptionDataset,
         path="data/reasonbench/causal.jsonl",
         reader_cfg=reader_cfgs[0],
-        infer_cfg=infer_cfgs[0],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
@@ -50,7 +54,7 @@ CommonsenseReasoningDataset = [
         type=ThreeOptionDataset,
         path="data/reasonbench/commonsense.jsonl",
         reader_cfg=reader_cfgs[1],
-        infer_cfg=infer_cfgs[1],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
@@ -60,7 +64,7 @@ AbductiveReasoningDataset = [
         type=TwoOptionDataset,
         path="data/reasonbench/abductive.jsonl",
         reader_cfg=reader_cfgs[0],
-        infer_cfg=infer_cfgs[0],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
@@ -70,7 +74,7 @@ DeductiveReasoningDataset = [
         type=ThreeOptionDataset,
         path="data/reasonbench/deductive.jsonl",
         reader_cfg=reader_cfgs[1],
-        infer_cfg=infer_cfgs[1],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
@@ -80,7 +84,7 @@ InductiveReasoningDataset = [
         type=TwoOptionDataset,
         path="data/reasonbench/inductive.jsonl",
         reader_cfg=reader_cfgs[0],
-        infer_cfg=infer_cfgs[0],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
@@ -90,7 +94,7 @@ SymbolicReasoningDataset = [
         type=FourOptionDataset,
         path="data/reasonbench/symbolic.jsonl",
         reader_cfg=reader_cfgs[2],
-        infer_cfg=infer_cfgs[2],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
@@ -100,7 +104,7 @@ own_CommonsenseReasoningDataset = [
         type=ThreeOptionDataset,
         path="data/reasonbench/cleva_commonsense.jsonl",
         reader_cfg=reader_cfgs[1],
-        infer_cfg=infer_cfgs[1],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
@@ -110,7 +114,7 @@ own_DeductiveReasoningDataset = [
         type=ThreeOptionDataset,
         path="data/reasonbench/cleva_deductive.jsonl",
         reader_cfg=reader_cfgs[1],
-        infer_cfg=infer_cfgs[1],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
@@ -120,7 +124,7 @@ own_InductiveReasoningDataset = [
         type=TwoOptionDataset,
         path="data/reasonbench/cleva_inductive.jsonl",
         reader_cfg=reader_cfgs[0],
-        infer_cfg=infer_cfgs[0],
+        infer_cfg=infer_cfg,
         eval_cfg=reasonbench_eval_cfg),
 ]
 
