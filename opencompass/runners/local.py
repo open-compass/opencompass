@@ -2,6 +2,7 @@ import os
 import os.path as osp
 import re
 import subprocess
+import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
@@ -17,6 +18,18 @@ from opencompass.registry import RUNNERS, TASKS
 from opencompass.utils import get_logger
 
 from .base import BaseRunner
+
+
+def get_command_template(gpu_ids: List[int]) -> str:
+    """Format command template given available gpu ids."""
+    if sys.platform == 'win32':  # Always return win32 for Windows
+        # use command in Windows format
+        tmpl = 'set CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
+        tmpl += ' & {task_cmd}'
+    else:
+        tmpl = 'CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
+        tmpl += ' {task_cmd}'
+    return tmpl
 
 
 @RUNNERS.register_module()
@@ -55,17 +68,36 @@ class LocalRunner(BaseRunner):
         """
 
         status = []
+        import torch
+        if 'CUDA_VISIBLE_DEVICES' in os.environ:
+            all_gpu_ids = [
+                int(i) for i in re.findall(r'(?<!-)\d+',
+                                           os.getenv('CUDA_VISIBLE_DEVICES'))
+            ]
+        else:
+            all_gpu_ids = list(range(torch.cuda.device_count()))
+
         if self.debug:
             for task in tasks:
                 task = TASKS.build(dict(cfg=task, type=self.task_cfg['type']))
                 task_name = task.name
+                num_gpus = task.num_gpus
+                assert len(all_gpu_ids) >= num_gpus
                 # get cmd
                 mmengine.mkdir_or_exist('tmp/')
                 param_file = f'tmp/{os.getpid()}_params.py'
                 try:
                     task.cfg.dump(param_file)
-                    cmd = task.get_command(cfg_path=param_file,
-                                           template='{task_cmd}')
+                    # if use torchrun, restrict it behaves the same as non
+                    # debug mode, otherwise, the torchrun will use all the
+                    # available resources which might cause inconsistent
+                    # behavior.
+                    if len(all_gpu_ids) > num_gpus and num_gpus > 0:
+                        get_logger().warning(f'Only use {num_gpus} GPUs for '
+                                             f'total {len(all_gpu_ids)} '
+                                             'available GPUs in debug mode.')
+                    tmpl = get_command_template(all_gpu_ids[:num_gpus])
+                    cmd = task.get_command(cfg_path=param_file, template=tmpl)
                     # run in subprocess if starts with torchrun etc.
                     if cmd.startswith('python'):
                         task.run()
@@ -75,15 +107,6 @@ class LocalRunner(BaseRunner):
                     os.remove(param_file)
                 status.append((task_name, 0))
         else:
-            import torch
-            if 'CUDA_VISIBLE_DEVICES' in os.environ:
-                all_gpu_ids = [
-                    int(i) for i in re.findall(
-                        r'(?<!-)\d+', os.getenv('CUDA_VISIBLE_DEVICES'))
-                ]
-            else:
-                all_gpu_ids = list(range(torch.cuda.device_count()))
-
             if len(all_gpu_ids) > 0:
                 gpus = np.zeros(max(all_gpu_ids) + 1, dtype=np.uint)
                 gpus[all_gpu_ids] = self.max_workers_per_gpu
@@ -145,10 +168,7 @@ class LocalRunner(BaseRunner):
         param_file = f'tmp/{os.getpid()}_{index}_params.py'
         try:
             task.cfg.dump(param_file)
-
-            # Build up slurm command
-            tmpl = 'CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
-            tmpl += ' {task_cmd}'
+            tmpl = get_command_template(gpu_ids)
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)

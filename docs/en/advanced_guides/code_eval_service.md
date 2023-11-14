@@ -2,6 +2,10 @@
 
 To complete LLM code capability evaluation, we need to set up an independent evaluation environment to avoid executing erroneous codes on development environments which would cause unavoidable losses. The current Code Evaluation Service used in OpenCompass refers to the project [code-evaluator](https://github.com/open-compass/code-evaluator.git), which has already supported evaluating datasets for multiple programming languages [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x). The following tutorials will introduce how to conduct code review services under different requirements.
 
+Dataset [download address](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx). Please download the needed files (xx.jsonl.gz) into `./data/humanevalx` folder.
+
+Supported languages are `python`, `cpp`, `go`, `java`, `js`.
+
 ## Launching the Code Evaluation Service
 
 1. Ensure you have installed Docker, please refer to [Docker installation document](https://docs.docker.com/engine/install/).

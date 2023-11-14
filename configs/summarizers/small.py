@@ -56,8 +56,6 @@ summarizer = dict(
         'openbookqa_fact',
         'nq',
         'triviaqa',
-        '--- Security ---',
-        'crows_pairs',
     ],
     summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
 )

@@ -33,9 +33,7 @@ obqa_datasets = [
     dict(
         abbr='openbookqa_fact',
         type=OBQADataset_V2,
-        path='openbookqa',
-        name='additional',
-        split='test',
+        path='./data/openbookqa/Additional/test_complete.jsonl',
         reader_cfg=obqa_reader_cfg,
         infer_cfg=obqa_infer_cfg,
         eval_cfg=obqa_eval_cfg,

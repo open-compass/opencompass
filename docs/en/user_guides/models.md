@@ -70,7 +70,9 @@ model = HuggingFaceCausalLM(
 Currently, OpenCompass supports API-based model inference for the following:
 
 - OpenAI (`opencompass.models.OpenAI`)
-- More coming soon
+- ChatGLM (`opencompass.models.ZhiPuAI`)
+- ABAB-Chat from MiniMax (`opencompass.models.MiniMax`)
+- XunFei from XunFei (`opencompass.models.XunFei`)
 
 Let's take the OpenAI configuration file as an example to see how API-based models are used in the
 configuration file.
@@ -92,6 +94,15 @@ models = [
         run_cfg=dict(num_gpus=0),                # Resource requirements (no GPU needed)
     ),
 ]
+```
+
+We have provided several examples for API-based models. Please refer to
+
+```bash
+configs
+├── eval_zhipu.py
+├── eval_xunfei.py
+└── eval_minimax.py
 ```
 
 ## Custom Models

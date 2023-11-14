@@ -72,6 +72,7 @@ class DefaultSummarizer:
                 if not osp.exists(filepath):
                     continue
                 result = mmengine.load(filepath)
+                result.pop('details', None)
                 raw_results[model_abbr][dataset_abbr] = result
                 if 'error' in result:
                     self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')

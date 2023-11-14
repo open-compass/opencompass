@@ -24,11 +24,18 @@ class EMEvaluator(BaseEvaluator):
                              for i in references]
 
         cnt = 0
+        details = []
         for pred, ans, origin_ans in zip(predictions, processed_answers,
                                          references):
+            answers = list(set(ans + origin_ans))
+            detail = {'pred': pred, 'answer': answers}
             if pred in ans or pred in origin_ans:
                 cnt += 1
+                detail['correct'] = True
+            else:
+                detail['correct'] = False
+            details.append(detail)
 
         score = cnt / len(predictions) * 100
 
-        return {'score': score}
+        return {'score': score, 'details': details}

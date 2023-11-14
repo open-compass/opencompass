@@ -34,7 +34,7 @@ piqa_datasets = [
     dict(
         abbr="piqa",
         type=piqaDataset_V2,
-        path="piqa",
+        path='./data/piqa',
         reader_cfg=piqa_reader_cfg,
         infer_cfg=piqa_infer_cfg,
         eval_cfg=piqa_eval_cfg)

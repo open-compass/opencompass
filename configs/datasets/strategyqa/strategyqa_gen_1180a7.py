@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import HFDataset, strategyqa_pred_postprocess, strategyqa_dataset_postprocess
+from opencompass.datasets import StrategyQADataset, strategyqa_pred_postprocess, strategyqa_dataset_postprocess
 
 strategyqa_reader_cfg = dict(
     input_columns=['question'],
@@ -86,8 +86,8 @@ strategyqa_eval_cfg = dict(
 strategyqa_datasets = [
     dict(
         abbr='strategyqa',
-        type=HFDataset,
-        path='wics/strategy-qa',
+        type=StrategyQADataset,
+        path='./data/strategyqa/strategyQA_train.json',
         reader_cfg=strategyqa_reader_cfg,
         infer_cfg=strategyqa_infer_cfg,
         eval_cfg=strategyqa_eval_cfg)

@@ -123,6 +123,12 @@ def parse_args():
         'Will be overrideen by the "retry" argument in the config.',
         type=int,
         default=2)
+    parser.add_argument(
+        '--dump-eval-details',
+        help='Whether to dump the evaluation details, including the '
+        'correctness of each sample, bpb, etc.',
+        action='store_true',
+    )
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -300,6 +306,8 @@ def main():
 
         if args.dlc or args.slurm or cfg.get('eval', None) is None:
             fill_eval_cfg(cfg, args)
+        if args.dump_eval_details:
+            cfg.eval.runner.task.dump_details = True
 
         if args.partition is not None:
             if RUNNERS.get(cfg.eval.runner.type) == SlurmRunner:

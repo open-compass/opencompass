@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from copy import deepcopy
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from mmengine.config import ConfigDict
 
@@ -13,16 +13,24 @@ class BasePartitioner:
 
     Args:
         out_dir (str): The output directory of tasks.
-        keep_keys (List[str]): The keys to be kept from the experiment config
-            to the task config.
+        keep_keys (Optional[List[str]], optional): The keys to be kept from the
+            experiment config to the task config. Defaults to None. If None,
+            the following keys will be kept:
+
+            - eval.runner.task.judge_cfg
+            - eval.runner.task.dump_details
     """
 
-    def __init__(self,
-                 out_dir: str,
-                 keep_keys: List[str] = ['eval.runner.task.judge_cfg']):
+    def __init__(self, out_dir: str, keep_keys: Optional[List[str]] = None):
         self.logger = get_logger()
         self.out_dir = out_dir
-        self.keep_keys = keep_keys
+        if keep_keys is None:
+            self.keep_keys = [
+                'eval.runner.task.judge_cfg',
+                'eval.runner.task.dump_details',
+            ]
+        else:
+            self.keep_keys = keep_keys
 
     def __call__(self, cfg: ConfigDict) -> List[Dict]:
         """Generate tasks from config. Each task is defined as a
@@ -63,7 +71,8 @@ class BasePartitioner:
                     tgt_ptr = tgt_ptr[key]
                 tgt_ptr[key_chain[-1]] = ori_ptr[key_chain[-1]]
             except Exception:
-                self.logger.warning(f'Key {k} not found in config, ignored.')
+                self.logger.debug(f'Key {k} not found in config, ignored.')
+        self.logger.debug(f'Additional config: {add_cfg}')
 
         tasks = self.partition(models,
                                datasets,

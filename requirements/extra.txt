@@ -1,0 +1,4 @@
+faiss_gpu==1.7.2
+jupyter
+lagent
+scikit-image
