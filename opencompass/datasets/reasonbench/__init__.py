@@ -1,9 +1,3 @@
-
-from .Anlg import * 
-from .Anli import * 
-from .BBHLogicalDeduction import * 
-from .BBHObjectCounting import * 
-from .corr2cause import * 
-from .DEER import * 
-from .OCNLI import * 
-from .SIQA import * 
+from .FourOptionDataset import FourOptionDataset  # noqa: F401, F403
+from .ThreeOptionDataset import ThreeOptionDataset  # noqa: F401, F403
+from .TwoOptionDataset import TwoOptionDataset  # noqa: F401, F403

@@ -1,9 +1,11 @@
-from datasets import Dataset, load_dataset
+import json
+
+from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
 
 from ..base import BaseDataset
-import json
+
 
 @LOAD_DATASET.register_module()
 class FourOptionDataset(BaseDataset):
