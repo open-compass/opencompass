@@ -51,9 +51,14 @@ class TriviaQAEvaluator(BaseEvaluator):
         processed_answers = [[general_postprocess(j).lower() for j in i]
                              for i in references]
 
+        details = []
         cnt = 0
         for pred, cand_ans in zip(processed_predictions, processed_answers):
+            detail = {'pred': pred, 'answer': cand_ans, 'correct': False}
             cnt += int(any([cand == pred for cand in cand_ans]))
+            if int(any([cand == pred for cand in cand_ans])):
+                detail['correct'] = True
+            details.append(detail)
         score = cnt / len(predictions) * 100
 
-        return {'score': score}
+        return {'score': score, 'details': details}

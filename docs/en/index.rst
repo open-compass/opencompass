@@ -64,11 +64,12 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    advanced_guides/multimodal_eval.md
    advanced_guides/prompt_attack.md
    advanced_guides/longeval.md
+   advanced_guides/subjective_evaluation.md
 
 .. _Tools:
 .. toctree::
    :maxdepth: 1
-   :caption: tools
+   :caption: Tools
 
    tools.md
 

@@ -1,6 +1,6 @@
 import json
 
-from datasets import Dataset, load_dataset
+from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -11,15 +11,20 @@ from .base import BaseDataset
 class hellaswagDataset(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        dataset = load_dataset(**kwargs)
-
-        def preprocess(example):
-            for i in range(4):
-                example[chr(ord('A') + i)] = example['endings'][i]
-            return example
-
-        dataset = dataset.map(preprocess).remove_columns(['endings'])
+    def load(path):
+        dataset = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                data = json.loads(line)
+                dataset.append({
+                    'ctx': data['query'].split(': ', 2)[-1],
+                    'A': data['choices'][0],
+                    'B': data['choices'][1],
+                    'C': data['choices'][2],
+                    'D': data['choices'][3],
+                    'label': data['gold'],
+                })
+        dataset = Dataset.from_list(dataset)
         return dataset
 
 
@@ -27,19 +32,20 @@ class hellaswagDataset(BaseDataset):
 class hellaswagDataset_V2(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        dataset = load_dataset(**kwargs)
-
-        def preprocess(example):
-            for i in range(4):
-                example[chr(ord('A') + i)] = example['endings'][i]
-            if example['label']:
-                example['label'] = 'ABCD'[int(example['label'])]
-            else:
-                example['label'] = 'NULL'
-            return example
-
-        dataset = dataset.map(preprocess).remove_columns(['endings'])
+    def load(path):
+        dataset = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                data = json.loads(line)
+                dataset.append({
+                    'ctx': data['query'].split(': ', 1)[-1],
+                    'A': data['choices'][0],
+                    'B': data['choices'][1],
+                    'C': data['choices'][2],
+                    'D': data['choices'][3],
+                    'label': 'ABCD'[data['gold']],
+                })
+        dataset = Dataset.from_list(dataset)
         return dataset
 
 
@@ -49,7 +55,7 @@ class hellaswagDataset_V3(BaseDataset):
     @staticmethod
     def load(path):
         dataset = []
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 data = json.loads(line)
                 dataset.append({

@@ -1,4 +1,4 @@
-# Subjective Evaluation Guide
+# Subjective Evaluation Guidance
 
 ## Introduction
 
@@ -24,7 +24,9 @@ The table includes the following fields:
 - 'capability': The capability dimension of the question.
 
 ## Evaluation Configuration
+
 The specific process includes:
+
 1. Model response reasoning
 2. GPT-4 evaluation comparisons
 3. Generating evaluation reports
@@ -87,47 +89,55 @@ eval = dict(
 ```
 
 ## Launching the Evaluation
+
 ```shell
-python run.py configs/subjective.py -r
+python run.py config/subjective.py -r
 ```
+
 The `-r` parameter allows the reuse of model inference and GPT-4 evaluation results.
 
 ## Evaluation Report
 
 The evaluation report will be output to `output/.../summary/timestamp/report.md`, which includes win rate statistics, battle scores, and ELO ratings. The specific format is as follows:
+
 ```markdown
 # Subjective Analysis
+
 A total of 30 comparisons, of which 30 comparisons are meaningful (A / B answers inconsistent)
 A total of 30 answer comparisons, successfully extracted 30 answers from GPT-4 replies, with an extraction success rate of 100.00%
-### Basic statistics (4 stats: win / tie / lose / not bad)
-| Dimension \ Stat [W / T / L / NB]   | chatglm2-6b-hf                | qwen-7b-chat-hf              | internlm-chat-7b-hf           |
-|-------------------------------------|-------------------------------|------------------------------|-------------------------------|
-| LANG: Overall                       | 30.0% / 40.0% / 30.0% / 30.0% | 50.0% / 0.0% / 50.0% / 50.0% | 30.0% / 40.0% / 30.0% / 30.0% |
-| LANG: CN                            | 30.0% / 40.0% / 30.0% / 30.0% | 50.0% / 0.0% / 50.0% / 50.0% | 30.0% / 40.0% / 30.0% / 30.0% |
-| LANG: EN                            | N/A                           | N/A                          | N/A                           |
-| CAPA: common                        | 30.0% / 40.0% / 30.0% / 30.0% | 50.0% / 0.0% / 50.0% / 50.0% | 30.0% / 40.0% / 30.0% / 30.0% |
 
+### Basic statistics (4 stats: win / tie / lose / not bad)
+
+| Dimension \ Stat [W / T / L / NB] | chatglm2-6b-hf                | qwen-7b-chat-hf              | internlm-chat-7b-hf           |
+| --------------------------------- | ----------------------------- | ---------------------------- | ----------------------------- |
+| LANG: Overall                     | 30.0% / 40.0% / 30.0% / 30.0% | 50.0% / 0.0% / 50.0% / 50.0% | 30.0% / 40.0% / 30.0% / 30.0% |
+| LANG: CN                          | 30.0% / 40.0% / 30.0% / 30.0% | 50.0% / 0.0% / 50.0% / 50.0% | 30.0% / 40.0% / 30.0% / 30.0% |
+| LANG: EN                          | N/A                           | N/A                          | N/A                           |
+| CAPA: common                      | 30.0% / 40.0% / 30.0% / 30.0% | 50.0% / 0.0% / 50.0% / 50.0% | 30.0% / 40.0% / 30.0% / 30.0% |
 
 ![Capabilities Dimension Classification Result](by_capa.png)
 
 ![Language Classification  Result](by_lang.png)
 
-
 ### Model scores (base score is 0, win +3, both +1, neither -1, lose -3)
-| Dimension \ Score   | chatglm2-6b-hf   | qwen-7b-chat-hf   | internlm-chat-7b-hf   |
-|---------------------|------------------|-------------------|-----------------------|
-| LANG: Overall       | -8               | 0                 | -8                    |
-| LANG: CN            | -8               | 0                 | -8                    |
-| LANG: EN            | N/A              | N/A               | N/A                   |
-| CAPA: common        | -8               | 0                 | -8                    |
-### Bootstrap ELO, Median of n=1000 times 
-|                  |   chatglm2-6b-hf |   internlm-chat-7b-hf |   qwen-7b-chat-hf |
-|------------------|------------------|-----------------------|-------------------|
-| elo_score [Mean] |       999.504    |            999.912    |       1000.26     |
-| elo_score [Std]  |         0.621362 |              0.400226 |          0.694434 |
 
+| Dimension \ Score | chatglm2-6b-hf | qwen-7b-chat-hf | internlm-chat-7b-hf |
+| ----------------- | -------------- | --------------- | ------------------- |
+| LANG: Overall     | -8             | 0               | -8                  |
+| LANG: CN          | -8             | 0               | -8                  |
+| LANG: EN          | N/A            | N/A             | N/A                 |
+| CAPA: common      | -8             | 0               | -8                  |
+
+### Bootstrap ELO, Median of n=1000 times
+
+|                  | chatglm2-6b-hf | internlm-chat-7b-hf | qwen-7b-chat-hf |
+| ---------------- | -------------- | ------------------- | --------------- |
+| elo_score [Mean] | 999.504        | 999.912             | 1000.26         |
+| elo_score [Std]  | 0.621362       | 0.400226            | 0.694434        |
 ```
+
 For comparing the evaluation of models A and B, there are four choices:
+
 1. A is better than B.
 2. A and B are equally good.
 3. A is worse than B.

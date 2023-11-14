@@ -191,8 +191,8 @@ subjective_reader_cfg = dict(input_columns=[
     'question', 'index', 'reference_answer', 'evaluating_guidance',
     'capability'
 ],
-                               output_column=None,
-                               train_split='test')
+                             output_column=None,
+                             train_split='test')
 
 subjective_all_sets = [
     'subjective_demo',

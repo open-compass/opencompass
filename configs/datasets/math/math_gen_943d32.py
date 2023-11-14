@@ -1,10 +1,12 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import AgentInferencer
-from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess
+from opencompass.datasets import MATHDataset, MATHAgentEvaluator, math_postprocess
 
 # This config is for code interpreter
 math_example = """
+Example:
+
 <HUMAN>Find the domain of the expression $\\frac{{\sqrt{{x-2}}}}{{\sqrt{{5-x}}}}$.
 <ASSISTANT>{thought} The domain restrictions are determined by:
 
@@ -45,7 +47,7 @@ math_infer_cfg = dict(
     inferencer=dict(type=AgentInferencer, example=math_example))
 
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator),
+    evaluator=dict(type=MATHAgentEvaluator),
     pred_postprocessor=dict(type=math_postprocess))
 
 math_datasets = [

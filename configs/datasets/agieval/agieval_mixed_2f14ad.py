@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer, GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import AGIEvalDataset_v2, AGIEvalEvaluator
+from opencompass.datasets import AGIEvalDataset_v2, AGIEvalEvaluator, AGIEvalEvaluator_mcq
 from opencompass.utils.text_postprocessors import first_capital_postprocess_multi
 
 agieval_single_choice_sets = [
@@ -116,7 +116,7 @@ for _name in agieval_multiple_choices_sets:
         inferencer=dict(type=GenInferencer, max_out_len=1024))
 
     agieval_eval_cfg = dict(
-        evaluator=dict(type=AccEvaluator),
+        evaluator=dict(type=AGIEvalEvaluator_mcq),
         pred_postprocessor=dict(type=first_capital_postprocess_multi))
 
     agieval_datasets.append(

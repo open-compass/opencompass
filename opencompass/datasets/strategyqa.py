@@ -1,6 +1,11 @@
+import json
 import re
 
-from opencompass.registry import TEXT_POSTPROCESSORS
+from datasets import Dataset
+
+from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+
+from .base import BaseDataset
 
 
 @TEXT_POSTPROCESSORS.register_module('strategyqa')
@@ -16,3 +21,13 @@ def strategyqa_pred_postprocess(text: str) -> str:
 @TEXT_POSTPROCESSORS.register_module('strategyqa_dataset')
 def strategyqa_dataset_postprocess(text: str) -> str:
     return 'yes' if str(text) == 'True' else 'no'
+
+
+@LOAD_DATASET.register_module()
+class StrategyQADataset(BaseDataset):
+
+    @staticmethod
+    def load(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            dataset = json.load(f)
+        return Dataset.from_list(dataset)
