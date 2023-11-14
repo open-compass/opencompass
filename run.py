@@ -175,8 +175,14 @@ def parse_hf_args(hf_parser):
     hf_parser.add_argument('--hf-path', type=str)
     hf_parser.add_argument('--peft-path', type=str)
     hf_parser.add_argument('--tokenizer-path', type=str)
-    hf_parser.add_argument('--model-kwargs', nargs='+', action=DictAction)
-    hf_parser.add_argument('--tokenizer-kwargs', nargs='+', action=DictAction)
+    hf_parser.add_argument('--model-kwargs',
+                           nargs='+',
+                           action=DictAction,
+                           default={})
+    hf_parser.add_argument('--tokenizer-kwargs',
+                           nargs='+',
+                           action=DictAction,
+                           default={})
     hf_parser.add_argument('--max-out-len', type=int)
     hf_parser.add_argument('--max-seq-len', type=int)
     hf_parser.add_argument('--no-batch-padding',
