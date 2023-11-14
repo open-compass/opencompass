@@ -1,5 +1,8 @@
 from mmengine.config import read_base
 with read_base():
+    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat
+    from .models.chatglm.hf_chatglm2_6b import models as hf_chatglm2_6b
+    from .models.hf_internlm.hf_internlm_chat_7b import models as hf_internlm_chat_7b
     from .datasets.subjective_cmp.subjective_cmp import subjective_datasets
     from .summarizers.subjective import summarizer
 
@@ -10,79 +13,7 @@ from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 
-_meta_template = dict(
-    round=[
-        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
-        dict(
-            role="BOT",
-            begin="\n<|im_start|>assistant\n",
-            end='<|im_end|>',
-            generate=True),
-    ], )
-
-_meta_template2 = dict(
-    round=[
-        dict(role='HUMAN', begin='<|User|>:', end='<eoh>\n'),
-        dict(role='BOT', begin='<|Bot|>:', end='<eoa>\n', generate=True),
-    ], )
-
-models = [
-    dict(
-        type=HuggingFace,
-        abbr='chatglm2-6b-hf',
-        path='THUDM/chatglm2-6b',
-        tokenizer_path='THUDM/chatglm2-6b',
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True),
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=8,
-        model_kwargs=dict(
-            trust_remote_code=True,
-            device_map='auto'),
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    ),
-    dict(
-        type=HuggingFaceCausalLM,
-        abbr='qwen-7b-chat-hf',
-        path="Qwen/Qwen-7B-Chat",
-        tokenizer_path='Qwen/Qwen-7B-Chat',
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True,
-            use_fast=False,
-        ),
-        pad_token_id=151643,
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=8,
-        meta_template=_meta_template,
-        model_kwargs=dict(device_map='auto', trust_remote_code=True),
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    ),
-    dict(
-        type=HuggingFaceCausalLM,
-        abbr='internlm-chat-7b-hf',
-        path="internlm/internlm-chat-7b",
-        tokenizer_path='internlm/internlm-chat-7b',
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            use_fast=False,
-            trust_remote_code=True),
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=8,
-        meta_template=_meta_template2,
-        model_kwargs=dict(
-            trust_remote_code=True,
-            device_map='auto'),
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-]
+models = [*hf_qwen_7b_chat, *hf_chatglm2_6b, *hf_internlm_chat_7b]
 
 api_meta_template = dict(
     round=[

@@ -10,7 +10,7 @@ subjective_reader_cfg = dict(
     train_split='test')
 
 subjective_all_sets = [
-    "sub_test",
+    "subjective_demo",
 ]
 
 subjective_datasets = []
