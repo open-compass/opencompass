@@ -8,7 +8,7 @@ from opencompass.utils.text_postprocessors import first_option_postprocess
 hellaswag_reader_cfg = dict(
     input_columns=["ctx", "A", "B", "C", "D"],
     output_column="label",
-    test_split="validation")
+)
 
 hellaswag_infer_cfg = dict(
     prompt_template=dict(
@@ -35,8 +35,9 @@ hellaswag_eval_cfg = dict(
 
 hellaswag_datasets = [
     dict(
+        abbr='hellaswag',
         type=hellaswagDataset_V2,
-        path="hellaswag",
+        path='./data/hellaswag/hellaswag.jsonl',
         reader_cfg=hellaswag_reader_cfg,
         infer_cfg=hellaswag_infer_cfg,
         eval_cfg=hellaswag_eval_cfg)

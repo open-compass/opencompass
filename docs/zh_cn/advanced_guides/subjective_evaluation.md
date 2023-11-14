@@ -93,7 +93,7 @@ eval = dict(
 ## 启动评测
 
 ```shell
-python run.py config/subjective.py -r
+python run.py configs/subjective.py -r
 ```
 
 `-r` 参数支持复用模型推理和 GPT4 评估结果。
