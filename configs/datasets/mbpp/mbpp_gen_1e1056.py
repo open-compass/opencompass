@@ -1,10 +1,10 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import MBPP_V2Dataset, MBPPPassKEvaluator
+from opencompass.datasets import MBPPDataset, MBPPEvaluator
 
 mbpp_reader_cfg = dict(
-    input_columns=['text', 'test_list'], output_column='test_column')
+    input_columns=['text', 'test_list'], output_column='test_list_2')
 
 mbpp_infer_cfg = dict(
     prompt_template=dict(
@@ -51,14 +51,13 @@ mbpp_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer, max_out_len=512))
 
-mbpp_eval_cfg = dict(evaluator=dict(type=MBPPPassKEvaluator), pred_role="BOT")
+mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator), pred_role="BOT")
 
 mbpp_datasets = [
     dict(
-        abbr='mbpp_pass10',
-        type=MBPP_V2Dataset,
+        type=MBPPDataset,
+        abbr='mbpp',
         path='./data/mbpp/mbpp.jsonl',
-        num_repeats=10,
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
         eval_cfg=mbpp_eval_cfg)

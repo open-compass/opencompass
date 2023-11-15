@@ -21,16 +21,15 @@ humaneval_infer_cfg = dict(
 humaneval_eval_cfg = dict(
     evaluator=dict(type=HumanEvaluator),
     pred_role='BOT',
-    k=[1, 10],  # the parameter only for humaneval
+    k=[1, 10, 100],  # the parameter only for humaneval
     pred_postprocessor=dict(type=humaneval_postprocess),
 )
 
 humaneval_datasets = [
     dict(
-        abbr='openai_humaneval_pass10',
+        abbr='openai_humaneval',
         type=HumanevalDataset,
         path='./data/humaneval/human-eval-v2-20210705.jsonl',
-        num_repeats=10,
         reader_cfg=humaneval_reader_cfg,
         infer_cfg=humaneval_infer_cfg,
         eval_cfg=humaneval_eval_cfg)

@@ -60,8 +60,14 @@ class HumanEvaluator(BaseEvaluator):
     def score(self, predictions, references):
         humaneval_preds = []
         # create json file in human_eval format
-        for pred, refer in zip(predictions, references):
-            humaneval_preds.append({'task_id': refer, 'completion': pred})
+        for preds, refer in zip(predictions, references):
+            # suits for two case
+            # 1. use repeated dataset
+            # 2. use `num_return_sequences` to generate multiple responses
+            if not isinstance(preds, list):
+                preds = [preds]
+            for pred in preds:
+                humaneval_preds.append({'task_id': refer, 'completion': pred})
         with tempfile.TemporaryDirectory() as tmp_dir:
             out_dir = osp.join(tmp_dir, 'human_eval.json')
             self.write_jsonl(out_dir, humaneval_preds)

@@ -241,36 +241,42 @@ class MBPPPassKEvaluator(MBPPEvaluator):
 
     def score(self, predictions, references):
         assert len(predictions) == len(references)
-        predictions = [self._process_answer(pred) for pred in predictions]
 
         task_pass = defaultdict(int)
         task_total = defaultdict(int)
 
         result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
-        for refer, pred in zip(references, predictions):
+        for refer, preds in zip(references, predictions):
+            # suits for two case
+            # 1. use repeated dataset
+            # 2. use `num_return_sequences` to generate multiple responses
+            if not isinstance(preds, list):
+                preds = [preds]
             test_case = refer['test_list_2']
             task_id = refer['task_id']
             # create empty task_pass in case all example failed
             if task_id not in task_pass:
                 task_pass[task_id] = 0
-            programs = self._process_test(test_case, pred)
-            try:
-                # Add exec globals to prevent the exec to raise
-                # unnecessary NameError for correct answer
-                exec_globals = {}
-                with self.swallow_io():
-                    with self.time_limit(2):
-                        exec(programs, exec_globals)
-                result['pass'] += 1
-                task_pass[task_id] += 1
-            except TimeOutException:
-                result['timeout'] += 1
-            except AssertionError:
-                result['wrong_answer'] += 1
-            except BaseException:
-                result['failed'] += 1
-            finally:
-                task_total[task_id] += 1
+            for pred in preds:
+                pred = self._process_answer(pred)
+                programs = self._process_test(test_case, pred)
+                try:
+                    # Add exec globals to prevent the exec to raise
+                    # unnecessary NameError for correct answer
+                    exec_globals = {}
+                    with self.swallow_io():
+                        with self.time_limit(2):
+                            exec(programs, exec_globals)
+                    result['pass'] += 1
+                    task_pass[task_id] += 1
+                except TimeOutException:
+                    result['timeout'] += 1
+                except AssertionError:
+                    result['wrong_answer'] += 1
+                except BaseException:
+                    result['failed'] += 1
+                finally:
+                    task_total[task_id] += 1
 
         def get_number(tasks):
             return np.array([
