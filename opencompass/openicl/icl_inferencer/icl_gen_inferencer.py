@@ -36,7 +36,7 @@ class GenInferencer(BaseInferencer):
         gen_field_replace_token (:obj:`str`, optional): Used to replace the
             generation field token when generating prompts.
         save_every (:obj:`int`, optional): Save intermediate results every
-            `save_every` epochs.
+            `save_every` iters. Defaults to 1.
         generation_kwargs (:obj:`Dict`, optional): Parameters for the
             :obj:`model.generate()` method.
     """
@@ -50,7 +50,7 @@ class GenInferencer(BaseInferencer):
             gen_field_replace_token: Optional[str] = '',
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
-            save_every: Optional[int] = None,
+            save_every: Optional[int] = 1,
             **kwargs) -> None:
         super().__init__(
             model=model,
