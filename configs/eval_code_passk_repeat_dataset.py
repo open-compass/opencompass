@@ -3,9 +3,9 @@
 from mmengine.config import read_base
 from opencompass.partitioners import SizePartitioner
 from opencompass.models import HuggingFaceCausalLM
-from opencompass.runners import SlurmSequentialRunner
-from opencompass.partitioners import SizePartitioner, NaivePartitioner
-from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
+from opencompass.runners import LocalRunner
+from opencompass.partitioners import SizePartitioner
+from opencompass.tasks import OpenICLInferTask
 from opencompass.datasets import MBPP_V2Dataset, MBPPPassKEvaluator
 
 with read_base():
@@ -58,23 +58,8 @@ models = [
 
 
 infer = dict(
-    partitioner=dict(type=SizePartitioner, max_task_size=6000),
+    partitioner=dict(type=SizePartitioner, max_task_size=600),
     runner=dict(
-        type=SlurmSequentialRunner,
-        max_num_workers=256,
-        partition="llmit",
-        quotatype="reserved",
-        task=dict(type=OpenICLInferTask),
-    ),
-)
-
-eval = dict(
-    partitioner=dict(type=NaivePartitioner, n=1),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        max_num_workers=256,
-        partition="llmit",
-        quotatype="reserved",
-        task=dict(type=OpenICLEvalTask),
-    ),
+        type=LocalRunner, max_num_workers=16,
+        task=dict(type=OpenICLInferTask)),
 )
