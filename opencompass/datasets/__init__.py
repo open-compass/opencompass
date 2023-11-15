@@ -87,3 +87,8 @@ from .xcopa import *  # noqa: F401, F403
 from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
 from .xlsum import *  # noqa: F401, F403
 from .xsum import *  # noqa: F401, F403
+from. xquad import *
+from. wisesight_senti import *
+from. limesoda import *
+from. wikilingua_doc import *
+from. massive import *
