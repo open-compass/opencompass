@@ -7,8 +7,8 @@ from opencompass.utils.text_postprocessors import first_option_postprocess
 
 winogrande_reader_cfg = dict(
     input_columns=["opt1", "opt2"],
-    output_column="label",
-    test_split="validation")
+    output_column="answer",
+)
 
 winogrande_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
@@ -19,7 +19,7 @@ winogrande_eval_cfg = dict(
 _winogrande_prompt = dict(
     prompt_1="Which of the following is a good sentence:\nA. {opt1}\nB. {opt2}\nAnswer:",
     prompt_2="Which is a good sentence out of the following:\nA. {opt1}\nB. {opt2}\nAnswer:",
-    prompt_3= "Can you identify a good sentence from the following:\nA. {opt1}\nB. {opt2}\nAnswer:",
+    prompt_3="Can you identify a good sentence from the following:\nA. {opt1}\nB. {opt2}\nAnswer:",
 )
 
 winogrande_datasets = []

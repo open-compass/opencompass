@@ -38,6 +38,8 @@ models=[
     )
 ]
 
+_winogrande_all = [ d['abbr'] for d in winogrande_datasets]
+
 summarizer = dict(
     summary_groups=[
         {'name': 'winogrande', 'subsets': _winogrande_all},

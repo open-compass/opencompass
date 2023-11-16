@@ -140,8 +140,6 @@ class DefaultSummarizer:
 
                         raw_results[model_abbr][sg['name']] = results
                         parsed_results[model_abbr][sg['name']] = [results[metric]]
-                        dataset_metrics[sg['name']] = [metric]
-                        dataset_eval_mode[sg['name']] = eval_mode
                     else:
                         if 'weights' in sg:
                             numerator = sum(results[k] * sg['weights'][k] for k in sg['weights'])
@@ -158,8 +156,9 @@ class DefaultSummarizer:
                         # add to global results
                         raw_results[model_abbr][sg['name']] = results
                         parsed_results[model_abbr][sg['name']] = [numerator / denominator]
-                        dataset_metrics[sg['name']] = [metric]
-                        dataset_eval_mode[sg['name']] = eval_mode
+
+                    dataset_metrics[sg['name']] = [metric]
+                    dataset_eval_mode[sg['name']] = eval_mode
                 elif len(results) == 0:
                     continue
                 else:
