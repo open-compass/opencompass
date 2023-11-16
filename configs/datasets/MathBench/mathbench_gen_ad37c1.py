@@ -13,7 +13,7 @@ single_choice_prompts = {
     "single_choice_en": "Here is a multiple-choice question about mathematics. Please provide the correct answer option directly.\nHere is the question you need to answer:\n{question}\nAnswer option:",
 }
 
-cloze_prompts ={
+cloze_prompts = {
     "cloze_cn": [
                 dict(role='HUMAN', prompt='Q: 林中有15棵树。林务工人员今天将在林中种植树木。完成后，将有21棵树。林务工人员今天种植了多少棵树？'),
                 dict(role='BOT', prompt='A: 我们从15棵树开始。后来有21棵树。差值必定是他们种植的树木数量。所以，他们必须种植了21 - 15 = 6棵树。答案是 6\n'),
@@ -33,7 +33,7 @@ cloze_prompts ={
                 dict(role='BOT', prompt='A: 她以每个3美元的价格买了5个百吉饼。这意味着她在百吉饼上花费了5 * 3 = 15美元。她一开始有23美元，所以现在她还剩下23 - 15 = 8美元。答案是 8\n'),
                 dict(role='HUMAN', prompt='Q: {question}'),
                 dict(role='BOT', prompt='A: {answer}'),
-                ], 
+                ],
     "cloze_en": [
                 dict(role='HUMAN', prompt='Q: There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 21 trees. How many trees did the grove workers plant today?'),
                 dict(role='BOT', prompt='A: We start with 15 trees. Later we have 21 trees. The difference must be the number of trees they planted. So, they must have planted 21 - 15 = 6 trees. The answer is 6.\n'),
@@ -61,7 +61,6 @@ mathbench_sets = {
     'middle': ['single_choice_cn'],
     'primary': ['cloze_cn']
 }
-
 
 # Generate reasoning path if set True or just generate the final answer
 with_reasoning = False
