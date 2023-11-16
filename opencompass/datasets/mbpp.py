@@ -36,7 +36,7 @@ class MBPPDataset(BaseDataset):
         return DatasetDict({'train': train, 'test': test})
 
 
-class MBPP_V2Dataset(BaseDataset):
+class MBPPDataset_V2(BaseDataset):
 
     @staticmethod
     def load(path: str, num_repeats: int = 1):
