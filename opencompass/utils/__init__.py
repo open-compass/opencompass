@@ -1,4 +1,5 @@
 from .abbr import *  # noqa
+from .auxiliary import *  # noqa
 from .build import *  # noqa
 from .collect_env import *  # noqa
 from .dependency import *  # noqa
