@@ -27,8 +27,9 @@ hellaswag_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 hellaswag_datasets = [
     dict(
+        abbr='hellaswag',
         type=hellaswagDataset,
-        path='hellaswag',
+        path='./data/hellaswag/hellaswag.jsonl',
         reader_cfg=hellaswag_reader_cfg,
         infer_cfg=hellaswag_infer_cfg,
         eval_cfg=hellaswag_eval_cfg)

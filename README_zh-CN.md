@@ -38,15 +38,15 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.11.13\]** 我们很高兴地宣布发布 OpenCompass v0.1.8 版本。此版本支持本地加载评估基准，从而无需连接互联网。请注意，随着此更新的发布，**您需要重新下载所有评估数据集**，以确保结果准确且最新。🔥🔥🔥。
 - **\[2023.11.06\]** 我们已经支持了多个基于 API 的模型，包括ChatGLM Pro@智谱清言、ABAB-Chat@MiniMax 和讯飞。欢迎查看 [模型](https://opencompass.readthedocs.io/en/latest/user_guides/models.html) 部分以获取更多详细信息。🔥🔥🔥。
 - **\[2023.10.24\]** 我们发布了一个全新的评测集，BotChat，用于评估大语言模型的多轮对话能力，欢迎查看 [BotChat](https://github.com/open-compass/BotChat) 获取更多信息. 🔥🔥🔥.
 - **\[2023.09.26\]** 我们在评测榜单上更新了[Qwen](https://github.com/QwenLM/Qwen), 这是目前表现最好的开源模型之一, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
-- **\[2023.09.20\]** 我们在评测榜单上更新了[InternLM-20B](https://github.com/InternLM/InternLM), 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
+- **\[2023.09.20\]** 我们在评测榜单上更新了[InternLM-20B](https://github.com/InternLM/InternLM), 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
 - **\[2023.09.19\]** 我们在评测榜单上更新了WeMix-LLaMA2-70B/Phi-1.5-1.3B, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
 - **\[2023.09.18\]** 我们发布了[长文本评测指引](docs/zh_cn/advanced_guides/longeval.md).
 - **\[2023.09.08\]** 我们在评测榜单上更新了Baichuan-2/Tigerbot-2/Vicuna-v1.5, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情。
 - **\[2023.09.06\]** 欢迎 [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。
-- **\[2023.09.02\]** 我们加入了[Qwen-VL](https://github.com/QwenLM/Qwen-VL)的评测支持。
 
 > [更多](docs/zh_cn/notes/news.md)
 
@@ -85,8 +85,8 @@ git clone https://github.com/open-compass/opencompass opencompass
 cd opencompass
 pip install -e .
 # 下载数据集到 data/ 处
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
+unzip OpenCompassData-core-20231110.zip
 ```
 
 有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html)。

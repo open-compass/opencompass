@@ -2,6 +2,10 @@
 
 为了完成LLM代码能力评测，我们需要搭建一套独立的评测环境，避免在开发环境执行错误代码从而造成不可避免的损失。目前 OpenCompass 使用的代码评测服务可参考[code-evaluator](https://github.com/open-compass/code-evaluator)项目，并已经支持评测多编程语言的数据集 [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x)。接下来将围绕代码评测服务介绍不同需要下的评测教程。
 
+数据集[下载地址](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx)，请下载需要评测的语言（××.jsonl.gz）文件，并放入`./data/humanevalx`文件夹。
+
+目前支持的语言有`python`, `cpp`, `go`, `java`, `js`。
+
 ## 启动代码评测服务
 
 1. 确保您已经安装了 docker，可参考[安装docker文档](https://docs.docker.com/engine/install/)

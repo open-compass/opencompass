@@ -1,4 +1,7 @@
-from datasets import DatasetDict, load_dataset
+import json
+import os
+
+from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
 
@@ -9,38 +12,39 @@ from .base import BaseDataset
 class storyclozeDataset(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        # special process
-        dataset = load_dataset(**kwargs, split='train+eval')
-
-        def preprocess(example):
-            example['context'] = ' '.join([
-                example['input_sentence_1'], example['input_sentence_2'],
-                example['input_sentence_3'], example['input_sentence_4']
-            ])
-            return example
-
-        dataset = dataset.map(preprocess)
-
-        return DatasetDict({'test': dataset})
+    def load(path, lang):
+        dataset_list = []
+        for split in ['train', 'eval']:
+            split_path = os.path.join(path, f'{lang}_{split}.jsonl')
+            with open(split_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = json.loads(line)
+                    line['context'] = ' '.join([
+                        line['input_sentence_1'], line['input_sentence_2'],
+                        line['input_sentence_3'], line['input_sentence_4']
+                    ])
+                    dataset_list.append(line)
+        dataset_list = Dataset.from_list(dataset_list)
+        return DatasetDict({'test': dataset_list})
 
 
 @LOAD_DATASET.register_module()
 class storyclozeDataset_V2(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        # special process
-        dataset = load_dataset(**kwargs, split='train+eval')
-
-        def preprocess(example):
-            example['context'] = ' '.join([
-                example['input_sentence_1'], example['input_sentence_2'],
-                example['input_sentence_3'], example['input_sentence_4']
-            ])
-            example['answer_right_ending'] = ' AB'[
-                example['answer_right_ending']]
-            return example
-
-        dataset = dataset.map(preprocess)
-        return dataset
+    def load(path, lang):
+        dataset_list = []
+        for split in ['train', 'eval']:
+            split_path = os.path.join(path, f'{lang}_{split}.jsonl')
+            with open(split_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = json.loads(line)
+                    line['context'] = ' '.join([
+                        line['input_sentence_1'], line['input_sentence_2'],
+                        line['input_sentence_3'], line['input_sentence_4']
+                    ])
+                    line['answer_right_ending'] = ' AB'[
+                        line['answer_right_ending']]
+                    dataset_list.append(line)
+        dataset_list = Dataset.from_list(dataset_list)
+        return dataset_list
