@@ -12,3 +12,4 @@ from .minimax_api import MiniMax  # noqa: F401
 from .openai_api import OpenAI  # noqa: F401
 from .xunfei_api import XunFei  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
+from .ai360_api import AI360GPT  # noqa: F401
