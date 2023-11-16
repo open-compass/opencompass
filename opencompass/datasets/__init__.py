@@ -30,6 +30,7 @@ from .drop import *  # noqa: F401, F403
 from .ds1000 import *  # noqa: F401, F403
 from .ds1000_interpreter import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
+from .ethics import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
