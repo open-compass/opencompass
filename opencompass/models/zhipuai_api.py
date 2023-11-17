@@ -67,11 +67,12 @@ class ZhiPuAI(BaseAPIModel):
         return results
 
     def flush(self):
-        """Flush stdout and stderr when concurrent resources exists.
+        """Ensure simultaneous emptying of stdout and stderr when concurrent
+        resources are available.
 
-        When use multiproessing with standard io rediected to files, need to
-        flush internal information for examination or log loss when system
-        breaks.
+        When employing multiprocessing with standard I/O redirected to files,
+        it is crucial to clear internal data for examination or prevent log
+        loss in case of system failures."
         """
         if hasattr(self, 'tokens'):
             sys.stdout.flush()

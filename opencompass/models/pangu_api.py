@@ -1,5 +1,4 @@
 import sys
-import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -12,17 +11,19 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 
 
-class AI360GPT(BaseAPIModel):
-    """Model wrapper around 360 GPT.
-
-    Documentations: https://ai.360.com/platform/docs/overview
+class PanGu(BaseAPIModel):
+    """Model wrapper around PanGu.
 
     Args:
-        path (str): Model name
-        key (str): Provide API Key
-        url (str): Provided URL
+        path (str): The name of Pangu model.
+            e.g. `pangu`
+        access_key (str): provided access_key
+        secret_key (str): secretkey in order to obtain access_token
+        url (str): provide url for requests
+        token_url (str): url of token server
+        project_name (str): project name for generate the token
         query_per_second (int): The maximum queries allowed per second
-            between two consecutive calls of the API. Defaults to 2.
+            between two consecutive calls of the API. Defaults to 1.
         max_seq_len (int): Unused here.
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
@@ -32,9 +33,12 @@ class AI360GPT(BaseAPIModel):
 
     def __init__(
         self,
-        path: str,  # model name, e.g.: 360GPT_S2_V9
-        key: str,
-        url: str = 'https://api.360.cn/v1/chat/completions',
+        path: str,
+        access_key: str,
+        secret_key: str,
+        url: str,
+        token_url: str,
+        project_name: str,
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -45,12 +49,13 @@ class AI360GPT(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        self.headers = {
-            'Authorization': f'Bearer {key}',
-            'Content-Type': 'application/json',
-        }
-        self.model = path
+
+        self.access_key = access_key
+        self.secret_key = secret_key
         self.url = url
+        self.token_url = token_url
+        self.project_name = project_name
+        self.model = path
 
     def generate(
         self,
@@ -107,6 +112,33 @@ class AI360GPT(BaseAPIModel):
         if hasattr(self, 'tokens'):
             self.tokens.release()
 
+    def _get_token(self):
+        url = self.token_url
+        payload = {
+            'auth': {
+                'identity': {
+                    'methods': ['hw_ak_sk'],
+                    'hw_ak_sk': {
+                        'access': {
+                            'key': self.access_key
+                        },
+                        'secret': {
+                            'key': self.secret_key
+                        }
+                    }
+                },
+                'scope': {
+                    'project': {
+                        'name': self.project_name
+                    }
+                }
+            }
+        }
+        headers = {'Content-Type': 'application/json'}
+
+        response = requests.request('POST', url, headers=headers, json=payload)
+        return response
+
     def _generate(
         self,
         input: str or PromptList,
@@ -134,31 +166,29 @@ class AI360GPT(BaseAPIModel):
                 if item['role'] == 'HUMAN':
                     msg['role'] = 'user'
                 elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
-                elif item['role'] == 'SYSTEM':
                     msg['role'] = 'system'
+
                 messages.append(msg)
 
-        data = {
-            'model': self.model,
-            'messages': messages,
-            'stream': False,
-            'temperature': 0.9,
-            'max_tokens': 2048,
-            'top_p': 0.5,
-            'tok_k': 0,
-            'repetition_penalty': 1.05,
-            # "num_beams": 1,
-            # "user": "OpenCompass"
-        }
+        data = {'messages': messages, 'stream': False}
+
+        token_response = self._get_token()
+        if token_response.status_code == 201:
+            token = token_response.headers['X-Subject-Token']
+            print('请求成功！')
+        else:
+            msg = 'token生成失败'
+            print(msg)
+            return ''
+
+        headers = {'Content-Type': 'application/json', 'X-Auth-Token': token}
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            # payload = json.dumps(data)
             raw_response = requests.request('POST',
                                             url=self.url,
-                                            headers=self.headers,
+                                            headers=headers,
                                             json=data)
             response = raw_response.json()
             self.release()
@@ -171,31 +201,15 @@ class AI360GPT(BaseAPIModel):
                 self.wait()
                 continue
             if raw_response.status_code == 200:
-                try:
-                    msg = response['choices'][0]['message']['content'].strip()
-                    return msg
+                # msg = json.load(response.text)
+                # response
+                msg = response['choices'][0]['message']['content']
+                return msg
 
-                except KeyError:
-                    if 'error' in response:
-                        # tpm(token per minitue) limit
-                        if response['erro']['code'] == '1005':
-                            time.sleep(1)
-                            continue
-
-                        self.logger.error('Find error message in response: ',
-                                          str(response['error']))
-
-            # sensitive content, prompt overlength, network error
-            # or illegal prompt
-            if (raw_response.status_code == 400
-                    or raw_response.status_code == 401
-                    or raw_response.status_code == 402
-                    or raw_response.status_code == 429
-                    or raw_response.status_code == 500):
-                print(raw_response.text)
-                # return ''
-                continue
-            print(raw_response)
+            if (raw_response.status_code != 200):
+                print(response['error_msg'])
+                return ''
+            print(response)
             max_num_retries += 1
 
-        raise RuntimeError(raw_response.text)
+        raise RuntimeError(response['error_msg'])
