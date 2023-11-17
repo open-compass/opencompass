@@ -1,5 +1,6 @@
 from mmengine.config import read_base
-from opencompass.models import AI360GPT
+from opencompass.models import PanGu
+
 from opencompass.partitioners import NaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.runners.local_api import LocalAPIRunner
@@ -9,27 +10,23 @@ with read_base():
     # from .datasets.collections.chat_medium import datasets
     from .summarizers.medium import summarizer
     from .datasets.ceval.ceval_gen import ceval_datasets
-    # from .datasets.ARC_c.ARC_c_gen import ARC_c_datasets
-    # from .datasets.race.race_gen import race_datasets
-    # from .datasets.commonsenseqa.commonsenseqa_gen_260dab import commonsenseqa_datasets
-    # from .datasets.winogrande.winogrande_gen import winogrande_datasets
-    # from .datasets.gsm8k.gsm8k_gen import gsm8k_datasets
 
 datasets = [
     *ceval_datasets,
-    # *ARC_c_datasets,
-    # *race_datasets,
-    # *commonsenseqa_datasets,
-    # *winogrande_datasets,
-    # *gsm8k_datasets,
 ]
 
 models = [
-    dict(
-        abbr='360GPT_S2_V9',
-        type=AI360GPT,
-        path='360GPT_S2_V9',
-        key="xxxxxxxxxxxx",
+dict(
+        abbr='pangu',
+        type=PanGu,
+        path='pangu',
+        access_key="xxxxxx",
+        secret_key="xxxxxx",
+        url = "xxxxxx",
+        # url of token sever, used for generate token, like "https://xxxxxx.myhuaweicloud.com/v3/auth/tokens",
+        token_url = "xxxxxx",
+        # scope-project-name, used for generate token
+        project_name = "xxxxxx",
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
@@ -45,4 +42,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir ="./output/360GPT_S2_V9"
+work_dir = "outputs/api_pangu/"

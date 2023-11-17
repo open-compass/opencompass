@@ -1,3 +1,5 @@
+import hashlib
+import json
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -12,17 +14,18 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 
 
-class AI360GPT(BaseAPIModel):
-    """Model wrapper around 360 GPT.
+class BaiChuan(BaseAPIModel):
+    """Model wrapper around Baichuan.
 
-    Documentations: https://ai.360.com/platform/docs/overview
+    Documentation: https://platform.baichuan-ai.com/docs/api
 
     Args:
-        path (str): Model name
-        key (str): Provide API Key
-        url (str): Provided URL
+        path (str): The name of Baichuan model.
+            e.g. `Baichuan2-53B`
+        api_key (str): Provided api key
+        secretkey (str): secretkey in order to obtain access_token
         query_per_second (int): The maximum queries allowed per second
-            between two consecutive calls of the API. Defaults to 2.
+            between two consecutive calls of the API. Defaults to 1.
         max_seq_len (int): Unused here.
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
@@ -32,9 +35,10 @@ class AI360GPT(BaseAPIModel):
 
     def __init__(
         self,
-        path: str,  # model name, e.g.: 360GPT_S2_V9
-        key: str,
-        url: str = 'https://api.360.cn/v1/chat/completions',
+        path: str,
+        api_key: str,
+        secret_key: str,
+        url: str = 'https://api.baichuan-ai.com/v1/chat',
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -45,12 +49,11 @@ class AI360GPT(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        self.headers = {
-            'Authorization': f'Bearer {key}',
-            'Content-Type': 'application/json',
-        }
-        self.model = path
+
+        self.api_key = api_key
+        self.secret_key = secret_key
         self.url = url
+        self.model = path
 
     def generate(
         self,
@@ -123,6 +126,7 @@ class AI360GPT(BaseAPIModel):
         Returns:
             str: The generated string.
         """
+
         assert isinstance(input, (str, PromptList))
 
         if isinstance(input, str):
@@ -135,30 +139,37 @@ class AI360GPT(BaseAPIModel):
                     msg['role'] = 'user'
                 elif item['role'] == 'BOT':
                     msg['role'] = 'assistant'
-                elif item['role'] == 'SYSTEM':
-                    msg['role'] = 'system'
+
                 messages.append(msg)
 
-        data = {
-            'model': self.model,
-            'messages': messages,
-            'stream': False,
-            'temperature': 0.9,
-            'max_tokens': 2048,
-            'top_p': 0.5,
-            'tok_k': 0,
-            'repetition_penalty': 1.05,
-            # "num_beams": 1,
-            # "user": "OpenCompass"
+        data = {'model': self.model, 'messages': messages}
+
+        def calculate_md5(input_string):
+            md5 = hashlib.md5()
+            md5.update(input_string.encode('utf-8'))
+            encrypted = md5.hexdigest()
+            return encrypted
+
+        json_data = json.dumps(data)
+        time_stamp = int(time.time())
+        signature = calculate_md5(self.secret_key + json_data +
+                                  str(time_stamp))
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + self.api_key,
+            'X-BC-Request-Id': 'your requestId',
+            'X-BC-Timestamp': str(time_stamp),
+            'X-BC-Signature': signature,
+            'X-BC-Sign-Algo': 'MD5',
         }
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            # payload = json.dumps(data)
             raw_response = requests.request('POST',
                                             url=self.url,
-                                            headers=self.headers,
+                                            headers=headers,
                                             json=data)
             response = raw_response.json()
             self.release()
@@ -170,32 +181,16 @@ class AI360GPT(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
-            if raw_response.status_code == 200:
-                try:
-                    msg = response['choices'][0]['message']['content'].strip()
-                    return msg
+            if raw_response.status_code == 200 and response['code'] == 0:
+                # msg = json.load(response.text)
+                # response
+                msg = response['data']['messages'][0]['content']
+                return msg
 
-                except KeyError:
-                    if 'error' in response:
-                        # tpm(token per minitue) limit
-                        if response['erro']['code'] == '1005':
-                            time.sleep(1)
-                            continue
-
-                        self.logger.error('Find error message in response: ',
-                                          str(response['error']))
-
-            # sensitive content, prompt overlength, network error
-            # or illegal prompt
-            if (raw_response.status_code == 400
-                    or raw_response.status_code == 401
-                    or raw_response.status_code == 402
-                    or raw_response.status_code == 429
-                    or raw_response.status_code == 500):
-                print(raw_response.text)
-                # return ''
-                continue
-            print(raw_response)
+            if response['code'] != 0:
+                print(response)
+                return ''
+            print(response)
             max_num_retries += 1
 
-        raise RuntimeError(raw_response.text)
+        raise RuntimeError(response)
