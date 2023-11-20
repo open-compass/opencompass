@@ -13,7 +13,7 @@ Please follow the [instructions](https://opencompass.readthedocs.io/en/latest/ge
 Install lmdeploy via pip (python 3.8+)
 
 ```shell
-pip install 'lmdeploy>0.0.10'
+pip install lmdeploy
 ```
 
 ## Evaluation
@@ -30,7 +30,7 @@ git lfs install
 git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
 
 # 2. Convert InternLM model to turbomind's format, and save it in the home folder of opencompass
-python -m lmdeploy.serve.turbomind.deploy internlm /path/to/internlm-20b \
+lmdeploy convert internlm /path/to/internlm-20b \
     --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
@@ -39,7 +39,7 @@ python -m lmdeploy.serve.turbomind.deploy internlm /path/to/internlm-20b \
 If evaluating the InternLM Chat model, make sure to pass `internlm-chat` as the model name instead of `internlm` when converting the model format. The specific command is:
 
 ```shell
-python -m lmdeploy.serve.turbomind.deploy internlm-chat /path/to/internlm-20b-chat \
+lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
     --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 

@@ -13,7 +13,7 @@
 使用 pip 安装 LMDeploy (python 3.8+)：
 
 ```shell
-pip install 'lmdeploy>0.0.10'
+pip install lmdeploy
 ```
 
 ## 评测
@@ -30,14 +30,14 @@ git lfs install
 git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
 
 # 2. Convert InternLM model to turbomind's format, and save it in the home folder of opencompass
-python -m lmdeploy.serve.turbomind.deploy internlm /path/to/internlm-20b \
+lmdeploy convert internlm /path/to/internlm-20b \
     --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
 注意：如果评测 InternLM Chat 模型，那么在转换模型格式的时候，模型名字要填写 `internlm-chat`。具体命令是：
 
 ```shell
-python -m lmdeploy.serve.turbomind.deploy internlm-chat /path/to/internlm-20b-chat \
+lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
     --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
