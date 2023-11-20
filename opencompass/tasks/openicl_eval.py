@@ -122,7 +122,7 @@ class OpenICLEvalTask(BaseTask):
             preds = {k: [pred.get(k) for pred in preds] for k in preds[0]}
 
             pred_strs = preds.pop('prediction')
-
+            pred_list_flag = isinstance(pred_strs[0], list)
             if ('pred_role' in self.eval_cfg
                     and 'meta_template' in self.model_cfg
                     and not MODELS.get(self.model_cfg['type']).is_api):
@@ -131,16 +131,16 @@ class OpenICLEvalTask(BaseTask):
                 parser = LMTemplateParser(self.model_cfg['meta_template'])
                 role = parser.roles[self.eval_cfg['pred_role']]
                 if sc_size is not None:
+                    assert pred_list_flag, (
+                        'The prediction for Self-Consistency'
+                        'must be list.')
+                if pred_list_flag:
                     for pred in pred_strs:
-                        if not isinstance(pred, list):
-                            raise TypeError(
-                                'The prediction for Self-Consistency'
-                                'must be list.')
                         pred_strs.append([
-                            self._extract_role_pred(sc_pred,
+                            self._extract_role_pred(_pred,
                                                     role.get('begin', None),
                                                     role.get('end', None))
-                            for sc_pred in pred
+                            for _pred in pred
                         ])
                 else:
                     pred_strs = [
@@ -155,7 +155,7 @@ class OpenICLEvalTask(BaseTask):
                 proc = kwargs.pop('type')
                 if isinstance(proc, str):
                     proc = TEXT_POSTPROCESSORS.get(proc)
-                if sc_size is not None:
+                if pred_list_flag:
                     pred_strs = [[proc(s, **kwargs) for s in preds]
                                  for preds in pred_strs]
                 else:

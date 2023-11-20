@@ -1,4 +1,4 @@
-# Code Evaluation Tutorial
+# Multilingual Code Evaluation Tutorial
 
 To complete LLM code capability evaluation, we need to set up an independent evaluation environment to avoid executing erroneous codes on development environments which would cause unavoidable losses. The current Code Evaluation Service used in OpenCompass refers to the project [code-evaluator](https://github.com/open-compass/code-evaluator.git), which has already supported evaluating datasets for multiple programming languages [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x). The following tutorials will introduce how to conduct code review services under different requirements.
 
