@@ -90,6 +90,8 @@ def last_option_postprocess(text: str, options: str) -> str:
 
 @TEXT_POSTPROCESSORS.register_module()
 def first_independent_capital_postprocess(text: str, options: str) -> str:
+    """Find first capital with no other letters around for text."""
+
     length = len(text)
     for i in range(length):
         if text[i].isupper() and text[i] in options:
