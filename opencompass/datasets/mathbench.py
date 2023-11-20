@@ -71,10 +71,15 @@ class MathBenchDataset(BaseDataset):
                     else:
                         question = entry['question'].strip(
                         ) + '\n' + get_number(entry['options'])
-                        data.append({
+                        info = {
                             'question': question,
                             'answer': entry['answer'].strip()
-                        })
+                        }
+                        # For PPL evaluation
+                        for i in range(4):
+                            info[chr(ord('A') +
+                                     i)] = entry['options'][i].strip()
+                        data.append(info)
 
         dataset = Dataset.from_list(data)
         return dataset
@@ -91,7 +96,7 @@ def mathbench_postprocess(text: str, name: str) -> str:
         ans = ans_line[1].strip()
 
     output = re.sub(r'(\d),(\d)', r'\1\2', ans)
-    numbers = re.findall(r'-?\d*\.?\d+|\d+', output)
+    numbers = re.findall(r'-?\d*\.?/?\d+|\d+', output)
     if numbers:
         return numbers[-1]
 
