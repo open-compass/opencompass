@@ -129,17 +129,10 @@ class DefaultSummarizer:
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 if len(results) == len(sg['subsets']):
                     if 'std' in sg and sg['std'] == True:
-                        _avg = sum(results[k] for k in results) / len(results)
-                        _variance = sum((results[k] - _avg)**2 for k in results) / len(results)
+                        avg = sum(results[k] for k in results) / len(results)
+                        variance = sum((results[k] - avg)**2 for k in results) / len(results)
                         metric = 'standard_deviation'
-                        results[metric] = math.sqrt(_variance)
-                        del _avg, _variance
-
-                        eval_modes = list(set(eval_modes))
-                        eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
-
-                        raw_results[model_abbr][sg['name']] = results
-                        parsed_results[model_abbr][sg['name']] = [results[metric]]
+                        results[metric] = math.sqrt(variance)
                     else:
                         if 'weights' in sg:
                             numerator = sum(results[k] * sg['weights'][k] for k in sg['weights'])
@@ -150,12 +143,12 @@ class DefaultSummarizer:
                             denominator = len(results)
                             metric = 'naive_average'
                         results[metric] = numerator / denominator
-                        eval_modes = list(set(eval_modes))
-                        eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
 
-                        # add to global results
-                        raw_results[model_abbr][sg['name']] = results
-                        parsed_results[model_abbr][sg['name']] = [numerator / denominator]
+                    eval_modes = list(set(eval_modes))
+                    eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
+                    # add to global results
+                    raw_results[model_abbr][sg['name']] = results
+                    parsed_results[model_abbr][sg['name']] = [results[metric]]
 
                     dataset_metrics[sg['name']] = [metric]
                     dataset_eval_mode[sg['name']] = eval_mode
