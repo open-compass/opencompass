@@ -54,6 +54,7 @@ class TurboMindModel(BaseModel):
             tm_model.create_instance() for i in range(concurrency)
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
+        self.generation_kwargs = dict()
 
     def generate(
         self,
@@ -140,4 +141,10 @@ class TurboMindModel(BaseModel):
             output_ids, _ = outputs[0]
             response = self.tokenizer.decode(output_ids.tolist())
             response = valid_str(response)
+            if len(response) < 10:
+                print(f'prompt: {prompt}')
+                print(f'input_ids: {input_ids}')
+                print(f'output_ids: {output_ids}')
+                print(f'response: {response}')
+                exit(0)
         return response
