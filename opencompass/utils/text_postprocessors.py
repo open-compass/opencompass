@@ -88,6 +88,21 @@ def last_option_postprocess(text: str, options: str) -> str:
     return ''
 
 
+@TEXT_POSTPROCESSORS.register_module()
+def first_independent_capital_postprocess(text: str, options: str) -> str:
+    length = len(text)
+    for i in range(length):
+        if text[i].isupper() and text[i] in options:
+            if i != 0:
+                if text[i - 1].encode('utf-8').isalpha():
+                    continue
+            if i != length - 1:
+                if text[i + 1].encode('utf-8').isalpha():
+                    continue
+            return text[i]
+    return ''
+
+
 def first_number_postprocess(text: str) -> float:
     """Return the first number in a string."""
     # regex pattern to match numbers (both integers and decimals)
