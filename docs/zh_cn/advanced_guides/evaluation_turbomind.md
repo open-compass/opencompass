@@ -18,42 +18,59 @@ pip install lmdeploy
 
 ## 评测
 
-我们使用 InternLM 作为例子来介绍如何评测。
+OpenCompass 支持分别通过 turbomind python API 和 gRPC API 评测数据集。我们强烈推荐使用前者进行评测。
 
-### 第一步: 获取 InternLM 模型
+下文以 InternLM-20B 模型为例，介绍如何评测。首先，从 huggingface 上下载 InternLM 模型，并转换为 turbomind 模型格式：
 
 ```shell
 # 1. Download InternLM model(or use the cached model's checkpoint)
 
 # Make sure you have git-lfs installed (https://git-lfs.com)
 git lfs install
-git clone https://huggingface.co/internlm/internlm-chat-7b /path/to/internlm-chat-7b
+git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
 
-# if you want to clone without large files – just their pointers
-# prepend your git clone with the following env var:
-GIT_LFS_SKIP_SMUDGE=1
-
-# 2. Convert InternLM model to turbomind's format, which will be in "./workspace" by default
-python3 -m lmdeploy.serve.turbomind.deploy internlm-chat-7b /path/to/internlm-chat-7b
-
+# 2. Convert InternLM model to turbomind's format, and save it in the home folder of opencompass
+lmdeploy convert internlm /path/to/internlm-20b \
+    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
-### 第二步: 启动 TurboMind 的 Triton Inference Server
+注意：如果评测 InternLM Chat 模型，那么在转换模型格式的时候，模型名字要填写 `internlm-chat`。具体命令是：
 
 ```shell
-bash ./workspace/service_docker_up.sh
+lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
+    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
-**注：** turbomind 的实现中，推理是“永驻”的。销毁操作会导致意想不到的问题发生。因此，我们暂时使用服务接口对接模型评测，待 turbomind 支持“销毁”之后，再提供 python API对接方式。
+### 通过 TurboMind Python API 评测（推荐）
 
-### 第三步: 评测转换后的模型
-
-在 OpenCompass 项目目录执行：
+在 OpenCompass 的项目目录下，执行如下命令可得到评测结果：
 
 ```shell
-python run.py configs/eval_internlm_chat_7b_turbomind.py -w outputs/turbomind
+python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-20b
 ```
 
-当模型完成推理和指标计算后，我们便可获得模型的评测结果。
+**注：**
 
-**注：** `eval_internlm_chat_7b_turbomind.py` 中，配置的 triton inference server(TIS) 地址是 `tis_addr='0.0.0.0:63337'`。请把配置中的`tis_addr`修改为server所在机器的ip地址。
+- 如果评测 InternLM Chat 模型，请使用配置文件 `eval_internlm_chat_turbomind.py`
+- 如果评测 InternLM 7B 模型，请修改 `eval_internlm_turbomind.py` 或者 `eval_internlm_chat_turbomind.py`。把 20B 模型的配置注释掉，打开 7B 模型的配置。
+
+### 通过 TurboMind gPRC API 评测（可选）
+
+在 OpenCompass 的项目目录下，启动 triton inference server：
+
+```shell
+bash turbomind/service_docker_up.sh
+```
+
+然后，执行如下命令进行评测：
+
+```shell
+python run.py configs/eval_internlm_turbomind_tis.py -w outputs/turbomind-tis/internlm-20b
+``
+
+**注：**
+
+- 如果评测 InternLM Chat 模型，请使用配置文件 `eval_internlm_chat_turbomind_tis.py`
+- 在配置文件中，triton inference server(TIS) 地址是 `tis_addr='0.0.0.0:33337'`。请把配置中的`tis_addr`修改为server所在机器的ip地址。
+- 如果评测 InternLM 7B 模型，请修改 `eval_internlm_xxx_turbomind_tis.py`。把其中 20B 模型的配置注释掉，打开 7B 模型的配置。
+```
