@@ -8,9 +8,7 @@ from .base_api import BaseAPIModel
 try:
     from volcengine.maas import ChatRole, MaasException, MaasService
 except ImportError:
-    ChatRole = None
-    MaasException = None
-    MaasService = None
+    ChatRole, MaasException, MaasService = None, None, None
 
 PromptType = Union[PromptList, str]
 

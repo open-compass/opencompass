@@ -5,22 +5,11 @@ from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    # from .datasets.collections.chat_medium import datasets
     from .summarizers.medium import summarizer
     from .datasets.ceval.ceval_gen import ceval_datasets
-    # from .datasets.ARC_c.ARC_c_gen import ARC_c_datasets
-    # from .datasets.race.race_gen import race_datasets
-    # from .datasets.commonsenseqa.commonsenseqa_gen_260dab import commonsenseqa_datasets
-    # from .datasets.winogrande.winogrande_gen import winogrande_datasets
-    # from .datasets.gsm8k.gsm8k_gen import gsm8k_datasets
 
 datasets = [
     *ceval_datasets,
-    # *ARC_c_datasets,
-    # *race_datasets,
-    # *commonsenseqa_datasets,
-    # *winogrande_datasets,
-    # *gsm8k_datasets,
 ]
 
 models = [

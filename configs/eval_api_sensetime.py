@@ -1,12 +1,10 @@
 from mmengine.config import read_base
 from opencompass.models import SenseTime
 from opencompass.partitioners import NaivePartitioner
-from opencompass.runners import LocalRunner
 from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    # from .datasets.collections.chat_medium import datasets
     from .summarizers.medium import summarizer
     from .datasets.ceval.ceval_gen import ceval_datasets
 
