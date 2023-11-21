@@ -30,8 +30,7 @@ python -m lightllm.server.api_server --model_dir /path/llama2-7B     \
 
 可以使用下面的 Python 脚本简单测试一下当前服务是否已经起成功
 
-
-```shell
+```python
 import time
 import requests
 import json

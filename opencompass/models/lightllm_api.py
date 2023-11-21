@@ -1,21 +1,23 @@
+import json
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional
+
 import requests
-import json
 
 from opencompass.registry import MODELS
-from .base_api import BaseAPIModel
 from opencompass.utils.logging import get_logger
+
+from .base_api import BaseAPIModel
 
 
 @MODELS.register_module()
-class LightllmApi(BaseAPIModel):
+class LightllmAPI(BaseAPIModel):
 
     is_api: bool = True
 
     def __init__(
         self,
-        path: str = 'LightllmApi',
+        path: str = 'LightllmAPI',
         url: str = 'http://localhost:8080/generate',
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -62,14 +64,10 @@ class LightllmApi(BaseAPIModel):
             self.wait()
             header = {'content-type': 'application/json'}
             try:
-                data = dict(
-                    inputs=input,
-                    parameters=dict(
-                        do_sample=self.do_sample,
-                        ignore_eos=self.ignore_eos,
-                        max_new_tokens=max_out_len
-                    )
-                )
+                data = dict(inputs=input,
+                            parameters=dict(do_sample=self.do_sample,
+                                            ignore_eos=self.ignore_eos,
+                                            max_new_tokens=max_out_len))
                 raw_response = requests.post(self.url,
                                              headers=header,
                                              data=json.dumps(data))
@@ -84,6 +82,6 @@ class LightllmApi(BaseAPIModel):
                                   str(raw_response.content))
             max_num_retries += 1
 
-        raise RuntimeError('Calling LightllmApi failed after retrying for '
+        raise RuntimeError('Calling LightllmAPI failed after retrying for '
                            f'{max_num_retries} times. Check the logs for '
                            'details.')
