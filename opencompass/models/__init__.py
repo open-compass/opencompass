@@ -1,3 +1,4 @@
+from .alaya import AlayaLM  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa
 from .base_api import APITemplateParser, BaseAPIModel  # noqa
 from .claude_api import Claude  # noqa: F401
