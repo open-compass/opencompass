@@ -8,6 +8,9 @@ from .base_api import BaseAPIModel
 try:
     from volcengine.maas import ChatRole, MaasException, MaasService
 except ImportError:
+    ChatRole = None
+    MaasException = None
+    MaasService = None
     print('Please use `pip install volcengine`')
 
 PromptType = Union[PromptList, str]
