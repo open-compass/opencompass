@@ -1,5 +1,8 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
+
+import requests
 
 from opencompass.utils.prompt import PromptList
 
@@ -8,11 +11,12 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 
 
-class ZhiPuAI(BaseAPIModel):
-    """Model wrapper around ZhiPuAI.
+class SenseTime(BaseAPIModel):
+    """Model wrapper around SenseTime.
 
     Args:
-        path (str): The name of OpenAI's model.
+        path (str): The name of SenseTime model.
+            e.g. `nova-ptc-xl-v1`
         key (str): Authorization key.
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
@@ -27,6 +31,7 @@ class ZhiPuAI(BaseAPIModel):
         self,
         path: str,
         key: str,
+        url: str,
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -37,9 +42,11 @@ class ZhiPuAI(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        import zhipuai
-        self.zhipuai = zhipuai
-        self.zhipuai.api_key = key
+        self.headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {key}'
+        }
+        self.url = url
         self.model = path
 
     def generate(
@@ -93,14 +100,19 @@ class ZhiPuAI(BaseAPIModel):
                     msg['role'] = 'user'
                 elif item['role'] == 'BOT':
                     msg['role'] = 'assistant'
+
                 messages.append(msg)
 
-        data = {'model': self.model, 'prompt': messages}
+        data = {'messages': messages, 'model': self.model}
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            response = self.zhipuai.model_api.invoke(**data)
+            raw_response = requests.request('POST',
+                                            url=self.url,
+                                            headers=self.headers,
+                                            json=data)
+            response = raw_response.json()
             self.release()
 
             if response is None:
@@ -110,16 +122,15 @@ class ZhiPuAI(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
-            if response['code'] == 200 and response['success']:
-                msg = response['data']['choices'][0]['content']
+            if raw_response.status_code == 200:
+                msg = response['data']['choices'][0]['message']
                 return msg
-            # sensitive content, prompt overlength, network error
-            # or illegal prompt
-            if (response['code'] == 1301 or response['code'] == 1261
-                    or response['code'] == 1234 or response['code'] == 1214):
-                print(response['msg'])
-                return ''
+
+            if (raw_response.status_code != 200):
+                print(raw_response.text)
+                time.sleep(1)
+                continue
             print(response)
             max_num_retries += 1
 
-        raise RuntimeError(response['msg'])
+        raise RuntimeError(raw_response.text)
