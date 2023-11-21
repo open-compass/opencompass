@@ -1,4 +1,5 @@
 import re
+import sys
 import threading
 import warnings
 from abc import abstractmethod
@@ -63,6 +64,38 @@ class BaseAPIModel(BaseModel):
         raise NotImplementedError(f'{self.__class__.__name__} does not support'
                                   ' gen-based evaluation yet, try ppl-based '
                                   'instead.')
+
+    def flush(self):
+        """Ensure simultaneous emptying of stdout and stderr when concurrent
+        resources are available.
+
+        When employing multiprocessing with standard I/O redirected to files,
+        it is crucial to clear internal data for examination or prevent log
+        loss in case of system failures."
+        """
+        if hasattr(self, 'tokens'):
+            sys.stdout.flush()
+            sys.stderr.flush()
+
+    def acquire(self):
+        """Acquire concurrent resources if exists.
+
+        This behavior will fall back to wait with query_per_second if there are
+        no concurrent resources.
+        """
+        if hasattr(self, 'tokens'):
+            self.tokens.acquire()
+        else:
+            self.wait()
+
+    def release(self):
+        """Release concurrent resources if acquired.
+
+        This behavior will fall back to do nothing if there are no concurrent
+        resources.
+        """
+        if hasattr(self, 'tokens'):
+            self.tokens.release()
 
     @abstractmethod
     def get_ppl(self,
