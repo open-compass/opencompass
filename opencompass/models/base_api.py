@@ -46,6 +46,7 @@ class BaseAPIModel(BaseModel):
         self.token_bucket = TokenBucket(query_per_second)
         self.template_parser = APITemplateParser(meta_template)
         self.logger = get_logger()
+        self.generation_kwargs = dict()
 
     @abstractmethod
     def generate(self, inputs: List[PromptType],
