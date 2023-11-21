@@ -96,7 +96,7 @@ class SlurmSequentialRunner(BaseRunner):
 
         try:
             parent_conns = []
-            num_workers = min(self.max_num_workers, len(tasks))
+            num_workers = max(min(self.max_num_workers, len(tasks)), 1)
             with Pool(processes=num_workers) as pool:
                 for task in tasks:
                     parent_conn, child_conn = Pipe()

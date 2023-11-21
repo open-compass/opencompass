@@ -13,6 +13,7 @@ from .cb import *  # noqa: F401, F403
 from .ceval import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
 from .cibench import *  # noqa: F401, F403
+from .circular import *  # noqa: F401, F403
 from .civilcomments import *  # noqa: F401, F403
 from .clozeTest_maxmin import *  # noqa: F401, F403
 from .cluewsc import *  # noqa: F401, F403
