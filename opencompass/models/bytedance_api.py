@@ -11,7 +11,6 @@ except ImportError:
     ChatRole = None
     MaasException = None
     MaasService = None
-    print('Please use `pip install volcengine`')
 
 PromptType = Union[PromptList, str]
 
@@ -51,6 +50,9 @@ class ByteDance(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
+        if not ChatRole:
+            print('Please install related packages via'
+                  ' `pip install volcengine`')
 
         self.accesskey = accesskey
         self.secretkey = secretkey
