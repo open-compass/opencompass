@@ -24,6 +24,7 @@ models = [
         path='Baichuan2-53B',
         api_key='xxxxxx',
         secret_key="xxxxx",
+        url="xxxxx",
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,

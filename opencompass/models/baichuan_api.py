@@ -1,6 +1,5 @@
 import hashlib
 import json
-import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
@@ -24,6 +23,7 @@ class BaiChuan(BaseAPIModel):
             e.g. `Baichuan2-53B`
         api_key (str): Provided api key
         secretkey (str): secretkey in order to obtain access_token
+        url (str): Provide url
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
         max_seq_len (int): Unused here.
@@ -38,7 +38,7 @@ class BaiChuan(BaseAPIModel):
         path: str,
         api_key: str,
         secret_key: str,
-        url: str = 'https://api.baichuan-ai.com/v1/chat',
+        url: str,
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -77,38 +77,6 @@ class BaiChuan(BaseAPIModel):
                              [max_out_len] * len(inputs)))
         self.flush()
         return results
-
-    def flush(self):
-        """Ensure simultaneous emptying of stdout and stderr when concurrent
-        resources are available.
-
-        When employing multiprocessing with standard I/O redirected to files,
-        it is crucial to clear internal data for examination or prevent log
-        loss in case of system failures."
-        """
-        if hasattr(self, 'tokens'):
-            sys.stdout.flush()
-            sys.stderr.flush()
-
-    def acquire(self):
-        """Acquire concurrent resources if exists.
-
-        This behavior will fall back to wait with query_per_second if there are
-        no concurrent resources.
-        """
-        if hasattr(self, 'tokens'):
-            self.tokens.acquire()
-        else:
-            self.wait()
-
-    def release(self):
-        """Release concurrent resources if acquired.
-
-        This behavior will fall back to do nothing if there are no concurrent
-        resources.
-        """
-        if hasattr(self, 'tokens'):
-            self.tokens.release()
 
     def _generate(
         self,

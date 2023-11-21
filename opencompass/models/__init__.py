@@ -1,5 +1,5 @@
-from .alaya import AlayaLM  # noqa: F401
 from .ai360_api import AI360GPT  # noqa: F401
+from .alaya import AlayaLM  # noqa: F401
 from .baichuan_api import BaiChuan  # noqa: F401
 from .baidu_api import ERNIEBot  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa

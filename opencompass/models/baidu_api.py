@@ -1,4 +1,3 @@
-import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
@@ -38,9 +37,7 @@ class ERNIEBot(BaseAPIModel):
         path: str,
         key: str,
         secretkey: str,
-        model_type: str = 'chat',
-        url: str = 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/'
-        'wenxinworkshop/chat/completions?access_token=',
+        url: str,
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -52,7 +49,6 @@ class ERNIEBot(BaseAPIModel):
                          meta_template=meta_template,
                          retry=retry)
         self.headers = {'Content_Type': 'application/json'}
-        self.type = model_type
         self.secretkey = secretkey
         self.key = key
         self.url = url
@@ -108,38 +104,6 @@ class ERNIEBot(BaseAPIModel):
                              [max_out_len] * len(inputs)))
         self.flush()
         return results
-
-    def flush(self):
-        """Ensure simultaneous emptying of stdout and stderr when concurrent
-        resources are available.
-
-        When employing multiprocessing with standard I/O redirected to files,
-        it is crucial to clear internal data for examination or prevent log
-        loss in case of system failures."
-        """
-        if hasattr(self, 'tokens'):
-            sys.stdout.flush()
-            sys.stderr.flush()
-
-    def acquire(self):
-        """Acquire concurrent resources if exists.
-
-        This behavior will fall back to wait with query_per_second if there are
-        no concurrent resources.
-        """
-        if hasattr(self, 'tokens'):
-            self.tokens.acquire()
-        else:
-            self.wait()
-
-    def release(self):
-        """Release concurrent resources if acquired.
-
-        This behavior will fall back to do nothing if there are no concurrent
-        resources.
-        """
-        if hasattr(self, 'tokens'):
-            self.tokens.release()
 
     def _generate(
         self,

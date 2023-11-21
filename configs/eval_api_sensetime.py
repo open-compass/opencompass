@@ -20,6 +20,7 @@ models = [
         type=SenseTime,
         path='nova-ptc-xl-v1',
         key='xxxxxxxxxxxxxx',
+        url='xxxxxxxxxxx',
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
