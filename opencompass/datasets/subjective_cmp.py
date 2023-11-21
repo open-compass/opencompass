@@ -195,7 +195,7 @@ subjective_reader_cfg = dict(input_columns=[
                              train_split='test')
 
 subjective_all_sets = [
-    'sub_test',
+    'subjective_demo',
 ]
 
 

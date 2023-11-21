@@ -45,7 +45,7 @@ for _lang in langs:
     )
 
     tydiqa_datasets.append(
-        dict(abbr=f'tyidqa-goldp_{_lang}',
+        dict(abbr=f'tydiqa-goldp_{_lang}',
             type=TydiQADataset,
             path='./data/tydiqa',
             lang=_lang,
