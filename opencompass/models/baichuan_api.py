@@ -1,5 +1,10 @@
+import hashlib
+import json
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
+
+import requests
 
 from opencompass.utils.prompt import PromptList
 
@@ -8,12 +13,17 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 
 
-class ZhiPuAI(BaseAPIModel):
-    """Model wrapper around ZhiPuAI.
+class BaiChuan(BaseAPIModel):
+    """Model wrapper around Baichuan.
+
+    Documentation: https://platform.baichuan-ai.com/docs/api
 
     Args:
-        path (str): The name of OpenAI's model.
-        key (str): Authorization key.
+        path (str): The name of Baichuan model.
+            e.g. `Baichuan2-53B`
+        api_key (str): Provided api key
+        secretkey (str): secretkey in order to obtain access_token
+        url (str): Provide url
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
         max_seq_len (int): Unused here.
@@ -26,7 +36,9 @@ class ZhiPuAI(BaseAPIModel):
     def __init__(
         self,
         path: str,
-        key: str,
+        api_key: str,
+        secret_key: str,
+        url: str,
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -37,9 +49,10 @@ class ZhiPuAI(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        import zhipuai
-        self.zhipuai = zhipuai
-        self.zhipuai.api_key = key
+
+        self.api_key = api_key
+        self.secret_key = secret_key
+        self.url = url
         self.model = path
 
     def generate(
@@ -81,6 +94,7 @@ class ZhiPuAI(BaseAPIModel):
         Returns:
             str: The generated string.
         """
+
         assert isinstance(input, (str, PromptList))
 
         if isinstance(input, str):
@@ -93,14 +107,39 @@ class ZhiPuAI(BaseAPIModel):
                     msg['role'] = 'user'
                 elif item['role'] == 'BOT':
                     msg['role'] = 'assistant'
+
                 messages.append(msg)
 
-        data = {'model': self.model, 'prompt': messages}
+        data = {'model': self.model, 'messages': messages}
+
+        def calculate_md5(input_string):
+            md5 = hashlib.md5()
+            md5.update(input_string.encode('utf-8'))
+            encrypted = md5.hexdigest()
+            return encrypted
+
+        json_data = json.dumps(data)
+        time_stamp = int(time.time())
+        signature = calculate_md5(self.secret_key + json_data +
+                                  str(time_stamp))
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + self.api_key,
+            'X-BC-Request-Id': 'your requestId',
+            'X-BC-Timestamp': str(time_stamp),
+            'X-BC-Signature': signature,
+            'X-BC-Sign-Algo': 'MD5',
+        }
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            response = self.zhipuai.model_api.invoke(**data)
+            raw_response = requests.request('POST',
+                                            url=self.url,
+                                            headers=headers,
+                                            json=data)
+            response = raw_response.json()
             self.release()
 
             if response is None:
@@ -110,16 +149,16 @@ class ZhiPuAI(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
-            if response['code'] == 200 and response['success']:
-                msg = response['data']['choices'][0]['content']
+            if raw_response.status_code == 200 and response['code'] == 0:
+                # msg = json.load(response.text)
+                # response
+                msg = response['data']['messages'][0]['content']
                 return msg
-            # sensitive content, prompt overlength, network error
-            # or illegal prompt
-            if (response['code'] == 1301 or response['code'] == 1261
-                    or response['code'] == 1234 or response['code'] == 1214):
-                print(response['msg'])
+
+            if response['code'] != 0:
+                print(response)
                 return ''
             print(response)
             max_num_retries += 1
 
-        raise RuntimeError(response['msg'])
+        raise RuntimeError(response)

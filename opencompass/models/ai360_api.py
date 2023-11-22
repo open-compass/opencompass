@@ -1,5 +1,8 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
+
+import requests
 
 from opencompass.utils.prompt import PromptList
 
@@ -8,14 +11,17 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 
 
-class ZhiPuAI(BaseAPIModel):
-    """Model wrapper around ZhiPuAI.
+class AI360GPT(BaseAPIModel):
+    """Model wrapper around 360 GPT.
+
+    Documentations: https://ai.360.com/platform/docs/overview
 
     Args:
-        path (str): The name of OpenAI's model.
-        key (str): Authorization key.
+        path (str): Model name
+        key (str): Provide API Key
+        url (str): Provided URL
         query_per_second (int): The maximum queries allowed per second
-            between two consecutive calls of the API. Defaults to 1.
+            between two consecutive calls of the API. Defaults to 2.
         max_seq_len (int): Unused here.
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
@@ -25,8 +31,9 @@ class ZhiPuAI(BaseAPIModel):
 
     def __init__(
         self,
-        path: str,
+        path: str,  # model name, e.g.: 360GPT_S2_V9
         key: str,
+        url: str = 'https://api.360.cn/v1/chat/completions',
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -37,10 +44,12 @@ class ZhiPuAI(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        import zhipuai
-        self.zhipuai = zhipuai
-        self.zhipuai.api_key = key
+        self.headers = {
+            'Authorization': f'Bearer {key}',
+            'Content-Type': 'application/json',
+        }
         self.model = path
+        self.url = url
 
     def generate(
         self,
@@ -93,14 +102,32 @@ class ZhiPuAI(BaseAPIModel):
                     msg['role'] = 'user'
                 elif item['role'] == 'BOT':
                     msg['role'] = 'assistant'
+                elif item['role'] == 'SYSTEM':
+                    msg['role'] = 'system'
                 messages.append(msg)
 
-        data = {'model': self.model, 'prompt': messages}
+        data = {
+            'model': self.model,
+            'messages': messages,
+            'stream': False,
+            'temperature': 0.9,
+            'max_tokens': 2048,
+            'top_p': 0.5,
+            'tok_k': 0,
+            'repetition_penalty': 1.05,
+            # "num_beams": 1,
+            # "user": "OpenCompass"
+        }
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            response = self.zhipuai.model_api.invoke(**data)
+            # payload = json.dumps(data)
+            raw_response = requests.request('POST',
+                                            url=self.url,
+                                            headers=self.headers,
+                                            json=data)
+            response = raw_response.json()
             self.release()
 
             if response is None:
@@ -110,16 +137,32 @@ class ZhiPuAI(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
-            if response['code'] == 200 and response['success']:
-                msg = response['data']['choices'][0]['content']
-                return msg
+            if raw_response.status_code == 200:
+                try:
+                    msg = response['choices'][0]['message']['content'].strip()
+                    return msg
+
+                except KeyError:
+                    if 'error' in response:
+                        # tpm(token per minitue) limit
+                        if response['erro']['code'] == '1005':
+                            time.sleep(1)
+                            continue
+
+                        self.logger.error('Find error message in response: ',
+                                          str(response['error']))
+
             # sensitive content, prompt overlength, network error
             # or illegal prompt
-            if (response['code'] == 1301 or response['code'] == 1261
-                    or response['code'] == 1234 or response['code'] == 1214):
-                print(response['msg'])
-                return ''
-            print(response)
+            if (raw_response.status_code == 400
+                    or raw_response.status_code == 401
+                    or raw_response.status_code == 402
+                    or raw_response.status_code == 429
+                    or raw_response.status_code == 500):
+                print(raw_response.text)
+                # return ''
+                continue
+            print(raw_response)
             max_num_retries += 1
 
-        raise RuntimeError(response['msg'])
+        raise RuntimeError(raw_response.text)

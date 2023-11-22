@@ -5,14 +5,23 @@ from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
 
+try:
+    from volcengine.maas import ChatRole, MaasException, MaasService
+except ImportError:
+    ChatRole, MaasException, MaasService = None, None, None
+
 PromptType = Union[PromptList, str]
 
 
-class ZhiPuAI(BaseAPIModel):
-    """Model wrapper around ZhiPuAI.
+class ByteDance(BaseAPIModel):
+    """Model wrapper around ByteDance.
 
     Args:
-        path (str): The name of OpenAI's model.
+        path (str): The name of ByteDance model.
+            e.g. `skylark`
+        model_type (str): The type of the model
+            e.g. `chat`
+        secretkey (str): secretkey in order to obtain access_token
         key (str): Authorization key.
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
@@ -26,7 +35,9 @@ class ZhiPuAI(BaseAPIModel):
     def __init__(
         self,
         path: str,
-        key: str,
+        accesskey: str,
+        secretkey: str,
+        url: str,
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -37,9 +48,13 @@ class ZhiPuAI(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        import zhipuai
-        self.zhipuai = zhipuai
-        self.zhipuai.api_key = key
+        if not ChatRole:
+            print('Please install related packages via'
+                  ' `pip install volcengine`')
+
+        self.accesskey = accesskey
+        self.secretkey = secretkey
+        self.url = url
         self.model = path
 
     def generate(
@@ -80,27 +95,60 @@ class ZhiPuAI(BaseAPIModel):
 
         Returns:
             str: The generated string.
+
+        messages
+        [
+                {
+                    "role": ChatRole.USER,
+                    "content": "天为什么这么蓝？"
+                }, {
+                    "role": ChatRole.ASSISTANT,
+                    "content": "因为有你"
+                }, {
+                    "role": ChatRole.USER,
+                    "content": "花儿为什么这么香？"
+                },
+        ]
         """
         assert isinstance(input, (str, PromptList))
 
         if isinstance(input, str):
-            messages = [{'role': 'user', 'content': input}]
+            messages = [{'role': ChatRole.USER, 'content': input}]
         else:
             messages = []
             for item in input:
                 msg = {'content': item['prompt']}
                 if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
+                    msg['role'] = ChatRole.USER
                 elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
+                    msg['role'] = ChatRole.ASSISTANT
+
                 messages.append(msg)
 
-        data = {'model': self.model, 'prompt': messages}
+        maas = MaasService(self.url, 'cn-beijing')
+        maas.set_ak(self.accesskey)
+        maas.set_sk(self.secretkey)
+
+        req = {
+            'model': {
+                'name': 'skylark-pro-public',
+            },
+            'messages': messages
+        }
+
+        def _chat(maas, req):
+            try:
+                resp = maas.chat(req)
+                return resp
+            except MaasException as e:
+                print(e)
+                return e
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            response = self.zhipuai.model_api.invoke(**data)
+            response = _chat(maas, req)
+
             self.release()
 
             if response is None:
@@ -110,16 +158,15 @@ class ZhiPuAI(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
-            if response['code'] == 200 and response['success']:
-                msg = response['data']['choices'][0]['content']
+            if not isinstance(response, MaasException):
+                # response
+                msg = response.choice.message.content
                 return msg
-            # sensitive content, prompt overlength, network error
-            # or illegal prompt
-            if (response['code'] == 1301 or response['code'] == 1261
-                    or response['code'] == 1234 or response['code'] == 1214):
-                print(response['msg'])
+
+            if isinstance(response, MaasException):
+                print(response)
                 return ''
             print(response)
             max_num_retries += 1
 
-        raise RuntimeError(response['msg'])
+        raise RuntimeError(response)
