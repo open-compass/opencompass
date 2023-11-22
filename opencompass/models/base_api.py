@@ -28,6 +28,8 @@ class BaseAPIModel(BaseModel):
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
+        generation_kwargs (Dict, optional): The generation kwargs for the
+            model. Defaults to dict().
     """
 
     is_api: bool = True
@@ -37,7 +39,8 @@ class BaseAPIModel(BaseModel):
                  query_per_second: int = 1,
                  retry: int = 2,
                  max_seq_len: int = 2048,
-                 meta_template: Optional[Dict] = None):
+                 meta_template: Optional[Dict] = None,
+                 generation_kwargs: Dict = dict()):
         self.path = path
         self.max_seq_len = max_seq_len
         self.meta_template = meta_template
@@ -46,6 +49,7 @@ class BaseAPIModel(BaseModel):
         self.token_bucket = TokenBucket(query_per_second)
         self.template_parser = APITemplateParser(meta_template)
         self.logger = get_logger()
+        self.generation_kwargs = generation_kwargs
 
     @abstractmethod
     def generate(self, inputs: List[PromptType],

@@ -130,7 +130,7 @@ class GenInferencer(BaseInferencer):
                     entry, max_out_len=self.max_out_len)
                 generated = results
 
-            num_return_sequences = self.model.generation_kwargs.get(
+            num_return_sequences = self.model.get('generation_kwargs', {}).get(
                 'num_return_sequences', 1)
             # 5-3. Save current output
             for prompt, prediction, gold in zip(

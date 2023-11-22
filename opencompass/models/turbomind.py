@@ -54,7 +54,6 @@ class TurboMindModel(BaseModel):
             tm_model.create_instance() for i in range(concurrency)
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
-        self.generation_kwargs = dict()
 
     def generate(
         self,
