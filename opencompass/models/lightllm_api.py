@@ -16,25 +16,22 @@ class LightllmAPI(BaseAPIModel):
     is_api: bool = True
 
     def __init__(
-        self,
-        path: str = 'LightllmAPI',
-        url: str = 'http://localhost:8080/generate',
-        max_seq_len: int = 2048,
-        meta_template: Optional[Dict] = None,
-        retry: int = 2,
-        generation_kwargs: Optional[Dict] = None,
+            self,
+            path: str = 'LightllmAPI',
+            url: str = 'http://localhost:8080/generate',
+            max_seq_len: int = 2048,
+            meta_template: Optional[Dict] = None,
+            retry: int = 2,
+            generation_kwargs: Optional[Dict] = dict(),
     ):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template,
-                         retry=retry)
+                         retry=retry,
+                         generation_kwargs=generation_kwargs)
         self.logger = get_logger()
         self.url = url
-        if generation_kwargs is not None:
-            self.generation_kwargs = generation_kwargs
-        else:
-            self.generation_kwargs = {}
         self.do_sample = self.generation_kwargs.get('do_sample', False)
         self.ignore_eos = self.generation_kwargs.get('ignore_eos', False)
 

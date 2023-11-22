@@ -53,7 +53,6 @@ class TurboMindTisModel(BaseModel):
         if meta_template and 'eos_token_id' in meta_template:
             self.eos_token_id = meta_template['eos_token_id']
         self.tis_addr = tis_addr
-        self.generation_kwargs = dict()
 
     def generate(
         self,
