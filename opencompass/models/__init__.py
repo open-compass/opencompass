@@ -14,6 +14,7 @@ from .intern_model import InternLM  # noqa: F401, F403
 from .lightllm_api import LightllmAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401, F403
 from .minimax_api import MiniMax  # noqa: F401
+from .modelscope import ModelScope, ModelScopeCausalLM  # noqa: F401, F403
 from .openai_api import OpenAI  # noqa: F401
 from .pangu_api import PanGu  # noqa: F401
 from .sensetime_api import SenseTime  # noqa: F401
