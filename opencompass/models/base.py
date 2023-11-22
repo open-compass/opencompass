@@ -19,6 +19,8 @@ class BaseModel:
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
+        generation_kwargs (Dict, optional): The generation kwargs for the
+            model. Defaults to dict().
     """
 
     is_api: bool = False
@@ -27,7 +29,8 @@ class BaseModel:
                  path: str,
                  max_seq_len: int = 2048,
                  tokenizer_only: bool = False,
-                 meta_template: Optional[Dict] = None):
+                 meta_template: Optional[Dict] = None,
+                 generation_kwargs: Optional[Dict] = dict()):
         self.path = path
         self.max_seq_len = max_seq_len
         self.tokenizer_only = tokenizer_only
@@ -36,6 +39,7 @@ class BaseModel:
         self.eos_token_id = None
         if meta_template and 'eos_token_id' in meta_template:
             self.eos_token_id = meta_template['eos_token_id']
+        self.generation_kwargs = generation_kwargs
 
     @abstractmethod
     def generate(self, inputs: List[str], max_out_len: int) -> List[str]:

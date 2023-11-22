@@ -58,3 +58,22 @@ Each task in OpenCompass represents a combination of specific model(s) and porti
 There is a tradeoff between the number of tasks and the time to load the model. For example, if we partition an request that evaluates a model against a dataset into 100 tasks, the model will be loaded 100 times in total. When resources are abundant, these 100 tasks can be executed in parallel, so the additional time spent on model loading can be ignored. However, if resources are limited, these 100 tasks will operate more sequentially, and repeated loadings can become a bottleneck in execution time.
 
 Hence, if users find that the number of tasks greatly exceeds the available GPUs, we advise setting the `--max-partition-size` to a larger value.
+
+## Model
+
+### How to use the downloaded huggingface models?
+
+If you have already download the checkpoints of the model, you can specify the local path of the model and tokenizer, and add `trust_remote_code=True` for `--model-kwargs` and `--tokenizer-kwargs`. For example
+
+```bash
+python run.py --datasets siqa_gen winograd_ppl \
+--hf-path /path/to/model \  # HuggingFace 模型地址
+--tokenizer-path /path/to/model \  # HuggingFace 模型地址
+--model-kwargs device_map='auto' trust_remote_code=True \  # 构造 model 的参数
+--tokenizer-kwargs padding_side='left' truncation='left' use_fast=False trust_remote_code=True \  # 构造 tokenizer 的参数
+--max-out-len 100 \  # 模型能接受的最大序列长度
+--max-seq-len 2048 \  # 最长生成 token 数
+--batch-size 8 \  # 批次大小
+--no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
+--num-gpus 1  # 所需 gpu 数
+```

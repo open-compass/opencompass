@@ -58,3 +58,22 @@ OpenCompass 中的每个任务代表等待评估的特定模型和数据集部�
 任务数量与加载模型的时间之间存在权衡。例如，如果我们将评估模型与数据集的请求分成 100 个任务，模型将总共加载 100 次。当资源充足时，这 100 个任务可以并行执行，所以在模型加载上花费的额外时间可以忽略。但是，如果资源有限，这 100 个任务会更加串行地执行，重复的加载可能成为执行时间的瓶颈。
 
 因此，如果用户发现任务数量远远超过可用的 GPU，我们建议将 `--max-partition-size` 设置为一个较大的值。
+
+## 模型
+
+### 如何使用本地已下好的Huggingface模型?
+
+如果您已经提前下载好Huggingface的模型文件，请手动指定模型路径，并在`--model-kwargs` 和 `--tokenizer-kwargs`中添加 `trust_remote_code=True`. 示例如下
+
+```bash
+python run.py --datasets siqa_gen winograd_ppl \
+--hf-path /path/to/model \  # HuggingFace 模型地址
+--tokenizer-path /path/to/model \  # HuggingFace 模型地址
+--model-kwargs device_map='auto' trust_remote_code=True \  # 构造 model 的参数
+--tokenizer-kwargs padding_side='left' truncation='left' use_fast=False trust_remote_code=True \  # 构造 tokenizer 的参数
+--max-out-len 100 \  # 模型能接受的最大序列长度
+--max-seq-len 2048 \  # 最长生成 token 数
+--batch-size 8 \  # 批次大小
+--no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
+--num-gpus 1  # 所需 gpu 数
+```

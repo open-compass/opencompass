@@ -5,9 +5,9 @@ cn2an
 colossalai
 cpm_kernels
 datasets>=2.12.0
+einops==0.5.0
 evaluate>=0.3.0
 fairscale
-faiss_gpu==1.7.2
 fuzzywuzzy
 jieba
 ltp

@@ -32,15 +32,12 @@ obqa_datasets = [
     dict(
         abbr="openbookqa",
         type=OBQADataset,
-        path="openbookqa",
-        split="test",
+        path='./data/openbookqa/Main/test.jsonl',
     ),
     dict(
         abbr="openbookqa_fact",
         type=OBQADataset,
-        path="openbookqa",
-        name="additional",
-        split="test",
+        path='./data/openbookqa/Additional/test_complete.jsonl',
     ),
 ]
 

@@ -37,8 +37,8 @@ storycloze_datasets = [
     dict(
         abbr="story_cloze",
         type=storyclozeDataset_V2,
-        path="juletxara/xstory_cloze",
-        name="en",
+        path='./data/xstory_cloze',
+        lang='en',
         reader_cfg=storycloze_reader_cfg,
         infer_cfg=storycloze_infer_cfg,
         eval_cfg=storycloze_eval_cfg,

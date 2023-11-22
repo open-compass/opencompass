@@ -53,9 +53,12 @@ def first_option_postprocess(text: str, options: str) -> str:
 
     patterns = [
         f'[Tt]he answer is [{options}]',
-        f'[Tt]he correct answer is [{options}]',
-        f'答案是(.*?)[{options}]',
-        f'答案为(.*?)[{options}]',
+        f'[Tt]he correct answer\s?(?:option)?\s?is [{options}]',  # noqa
+        f'答案(?:选项)?是(.*?)[{options}]',
+        f'答案(?:选项)?为(.*?)[{options}]',
+        f'答案(?:选项)?选(.*?)[{options}]',
+        f'选项[{options}]是?正确',
+        f'选项[{options}]为?正确',
         f'固选(.*?)[{options}]',
         f'答案应该是(.*?)[{options}]',
         f'(\s|^)[{options}][\s。，,\.$]',  # noqa
@@ -98,3 +101,9 @@ def first_number_postprocess(text: str) -> float:
 
     # if a match is found, return it. Otherwise, return None.
     return float(match.group(1)) if match else None
+
+
+@TEXT_POSTPROCESSORS.register_module('multiple-select')
+def multiple_select_postprocess(text: str) -> str:
+    ret = set([t for t in text if t.isupper()])
+    return ''.join(sorted(ret))

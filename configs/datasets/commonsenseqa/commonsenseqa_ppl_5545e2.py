@@ -40,11 +40,10 @@ commonsenseqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 commonsenseqa_datasets = [
     dict(
+        abbr='commonsense_qa',
         type=commonsenseqaDataset,
-        path='commonsense_qa',
+        path='./data/commonsenseqa',
         reader_cfg=commonsenseqa_reader_cfg,
         infer_cfg=commonsenseqa_infer_cfg,
         eval_cfg=commonsenseqa_eval_cfg)
 ]
-
-del _ice_template

@@ -190,7 +190,7 @@ class PPLInferencer(BaseInferencer):
                         label, prompt.replace(ice_str, ''), prompt, res, index)
                     output_handler.results_dict[str(
                         index)][f'label: {str(label)}'][
-                            'BPB'] = res * token_num_list[idx] / len(
+                            'BPB'] = res * token_num_list[index] / len(
                                 prompt.replace(ice_str, '').encode())
                     index = index + 1
             ppl.append(sub_ppl_list)
