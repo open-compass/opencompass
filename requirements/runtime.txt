@@ -11,7 +11,7 @@ fairscale
 fuzzywuzzy
 jieba
 ltp
-mmengine>=0.8.2
+mmengine-lite
 nltk==3.8
 numpy==1.23.4
 openai
