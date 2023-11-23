@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import LongBenchClassificationEvaluator, LongBenchtrecDataset
+from opencompass.datasets import LongBenchClassificationEvaluator, LongBenchtrecDataset, trec_postprocess
 
 LongBench_trec_reader_cfg = dict(
     input_columns=['context', 'input'],
@@ -23,7 +23,8 @@ LongBench_trec_infer_cfg = dict(
 
 LongBench_trec_eval_cfg = dict(
     evaluator=dict(type=LongBenchClassificationEvaluator),
-    pred_role='BOT'
+    pred_role='BOT',
+    pred_postprocessor=dict(type=trec_postprocess),
 )
 
 LongBench_trec_datasets = [
