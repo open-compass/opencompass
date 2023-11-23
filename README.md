@@ -38,15 +38,15 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.11.22\]** We have supported many API-based models, include **Baidu, ByteDance, Huawei, 360**. Welcome to [Models](https://opencompass.readthedocs.io/en/latest/user_guides/models.html) section for more details. 🔥🔥🔥.
+- **\[2023.11.20\]** Thanks [helloyongyang](https://github.com/helloyongyang) for supporting the evaluation with [LightLLM](https://github.com/ModelTC/lightllm) as backent. Welcome to [Evaluation With LightLLM](https://opencompass.readthedocs.io/en/latest/advanced_guides/evaluation_lightllm.html) for more details. 🔥🔥🔥.
 - **\[2023.11.13\]** We are delighted to announce the release of OpenCompass v0.1.8. This version enables local loading of evaluation benchmarks, thereby eliminating the need for an internet connection. Please note that with this update, **you must re-download all evaluation datasets** to ensure accurate and up-to-date results.🔥🔥🔥.
-- **\[2023.11.06\]** We have supported several API-based models, include  ChatGLM Pro@Zhipu, ABAB-Chat@MiniMax and Xunfei. Welcome to [Models](https://opencompass.readthedocs.io/en/latest/user_guides/models.html) section for more details. 🔥🔥🔥.
-- **\[2023.10.24\]** We release a new benchmark for evaluating LLMs’ capabilities of having multi-turn dialogues. Welcome to [BotChat](https://github.com/open-compass/BotChat) for more details. 🔥🔥🔥.
-- **\[2023.09.26\]** We update the leaderboard with [Qwen](https://github.com/QwenLM/Qwen), one of the best-performing open-source models currently available, welcome to our [homepage](https://opencompass.org.cn) for more details. 🔥🔥🔥.
+- **\[2023.11.06\]** We have supported several API-based models, include  **ChatGLM Pro@Zhipu, ABAB-Chat@MiniMax and Xunfei**. Welcome to [Models](https://opencompass.readthedocs.io/en/latest/user_guides/models.html) section for more details. 🔥🔥🔥.
+- **\[2023.10.24\]** We release a new benchmark for evaluating LLMs’ capabilities of having multi-turn dialogues. Welcome to [BotChat](https://github.com/open-compass/BotChat) for more details.
+- **\[2023.09.26\]** We update the leaderboard with [Qwen](https://github.com/QwenLM/Qwen), one of the best-performing open-source models currently available, welcome to our [homepage](https://opencompass.org.cn) for more details.
 - **\[2023.09.20\]** We update the leaderboard with [InternLM-20B](https://github.com/InternLM/InternLM), welcome to our [homepage](https://opencompass.org.cn) for more details.
 - **\[2023.09.19\]** We update the leaderboard with WeMix-LLaMA2-70B/Phi-1.5-1.3B, welcome to our [homepage](https://opencompass.org.cn) for more details.
 - **\[2023.09.18\]** We have released [long context evaluation guidance](docs/en/advanced_guides/longeval.md).
-- **\[2023.09.08\]** We update the leaderboard with Baichuan-2/Tigerbot-2/Vicuna-v1.5, welcome to our [homepage](https://opencompass.org.cn) for more details.
-- **\[2023.09.06\]**  [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) team adpots OpenCompass to evaluate their models systematically. We deeply appreciate the community's dedication to transparency and reproducibility in LLM evaluation.
 
 > [More](docs/en/notes/news.md)
 
@@ -76,12 +76,32 @@ We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for the co
 
 Below are the steps for quick installation and datasets preparation.
 
-```Python
+### 💻 Environment Setup
+
+#### Open-source Models with GPU
+
+```bash
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
 conda activate opencompass
 git clone https://github.com/open-compass/opencompass opencompass
 cd opencompass
 pip install -e .
+```
+
+#### API Models with CPU-only
+
+```bash
+conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
+conda activate opencompass
+git clone https://github.com/open-compass/opencompass opencompass
+cd opencompass
+pip install -e .
+# also please install requiresments packages via `pip install -r requirements/api.txt` for API models if needed.
+```
+
+### 📂 Data Preparation
+
+```bash
 # Download dataset to data/ folder
 wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
 unzip OpenCompassData-core-20231110.zip
@@ -411,16 +431,17 @@ Through the command line or configuration files, OpenCompass also supports evalu
     <tr valign="top">
       <td>
 
-- InternLM
-- LLaMA
-- Vicuna
-- Alpaca
-- Baichuan
-- WizardLM
-- ChatGLM2
-- Falcon
-- TigerBot
-- Qwen
+- [InternLM](https://github.com/InternLM/InternLM)
+- [LLaMA](https://github.com/facebookresearch/llama)
+- [Vicuna](https://github.com/lm-sys/FastChat)
+- [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
+- [Baichuan](https://github.com/baichuan-inc)
+- [WizardLM](https://github.com/nlpxucan/WizardLM)
+- [ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)
+- [ChatGLM3](https://github.com/THUDM/ChatGLM3-6B)
+- [TigerBot](https://github.com/TigerResearch/TigerBot)
+- [Qwen](https://github.com/QwenLM/Qwen)
+- [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
 - ...
 
 </td>
@@ -428,7 +449,15 @@ Through the command line or configuration files, OpenCompass also supports evalu
 
 - OpenAI
 - Claude
-- PaLM (coming soon)
+- ZhipuAI(ChatGLM)
+- Baichuan
+- ByteDance(YunQue)
+- Huawei(PanGu)
+- 360
+- Baidu(ERNIEBot)
+- MiniMax(ABAB-Chat)
+- SenseTime(nova)
+- Xunfei(Spark)
 - ……
 
 </td>
@@ -444,17 +473,17 @@ Through the command line or configuration files, OpenCompass also supports evalu
 - [ ] Subjective Evaluation
   - [ ] Release CompassAreana
   - [ ] Subjective evaluation dataset.
-- [ ] Long-context
+- [x] Long-context
   - [ ] Long-context evaluation with extensive datasets.
   - [ ] Long-context leaderboard.
 - [ ] Coding
   - [ ] Coding evaluation leaderboard.
-  - [ ] Non-python language evaluation service.
+  - [x] Non-python language evaluation service.
 - [ ] Agent
   - [ ] Support various agenet framework.
   - [ ] Evaluation of tool use of the LLMs.
-- [ ] Robustness
-  - [ ] Support various attack method
+- [x] Robustness
+  - [x] Support various attack method
 
 ## 👷‍♂️ Contributing
 

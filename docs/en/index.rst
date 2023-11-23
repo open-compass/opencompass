@@ -61,6 +61,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    advanced_guides/new_model.md
    advanced_guides/evaluation_turbomind.md
    advanced_guides/evaluation_lightllm.md
+   advanced_guides/code_eval.md
    advanced_guides/code_eval_service.md
    advanced_guides/multimodal_eval.md
    advanced_guides/prompt_attack.md
