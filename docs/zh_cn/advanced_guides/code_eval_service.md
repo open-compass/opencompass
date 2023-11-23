@@ -1,33 +1,44 @@
-# 代码评测教程
+# 代码评测Docker教程
 
-为了完成LLM代码能力评测，我们需要搭建一套独立的评测环境，避免在开发环境执行错误代码从而造成不可避免的损失。目前 OpenCompass 使用的代码评测服务可参考[code-evaluator](https://github.com/open-compass/code-evaluator)项目，并已经支持评测多编程语言的数据集 [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x)。接下来将围绕代码评测服务介绍不同需要下的评测教程。
+为了完成LLM代码能力评测，我们需要搭建一套独立的评测环境，避免在开发环境执行错误代码从而造成不可避免的损失。目前 OpenCompass 使用的代码评测服务可参考[code-evaluator](https://github.com/open-compass/code-evaluator)项目。接下来将围绕代码评测服务介绍不同需要下的评测教程。
 
+1. humaneval-x
+
+多编程语言的数据集 [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x)
 数据集[下载地址](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx)，请下载需要评测的语言（××.jsonl.gz）文件，并放入`./data/humanevalx`文件夹。
 
 目前支持的语言有`python`, `cpp`, `go`, `java`, `js`。
+
+2. DS1000
+
+Python 多算法库数据集 [ds1000](https://github.com/xlang-ai/DS-1000)
+数据集[下载地址](https://github.com/xlang-ai/DS-1000/blob/main/ds1000_data.zip)
+
+目前支持的算法库有`Pandas`, `Numpy`, `Tensorflow`, `Scipy`, `Sklearn`, `Pytorch`, `Matplotlib`。
 
 ## 启动代码评测服务
 
 1. 确保您已经安装了 docker，可参考[安装docker文档](https://docs.docker.com/engine/install/)
 2. 拉取代码评测服务项目，并构建 docker 镜像
 
+选择你需要的数据集对应的dockerfile，在下面命令中做替换 `humanevalx` 或者 `ds1000`。
+
 ```shell
 git clone https://github.com/open-compass/code-evaluator.git
-cd code-evaluator/docker
-sudo docker build -t code-eval:latest .
+sudo docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
 ```
 
 3. 使用以下命令创建容器
 
 ```shell
 # 输出日志格式
-sudo docker run -it -p 5000:5000 code-eval:latest python server.py
+sudo docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # 在后台运行程序
-# sudo docker run -itd -p 5000:5000 code-eval:latest python server.py
+# sudo docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # 使用不同的端口
-# sudo docker run -itd -p 5001:5001 code-eval:latest python server.py --port 5001
+# sudo docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
 ```
 
 4. 为了确保您能够访问服务，通过以下命令检测推理环境和评测服务访问情况。 (如果推理和代码评测在同一主机中运行服务，就跳过这个操作)
@@ -39,7 +50,7 @@ telnet your_service_ip_address your_service_port
 
 ## 本地代码评测
 
-模型推理和代码评测服务在同一主机，或者同一局域网中，可以直接进行代码推理及评测。
+模型推理和代码评测服务在同一主机，或者同一局域网中，可以直接进行代码推理及评测。**注意：DS1000暂不支持，请走异地评测**
 
 ### 配置文件
 
@@ -94,7 +105,7 @@ humanevalx_datasets = [
 
 模型推理和代码评测服务分别在不可访问的不同机器中，需要先进行模型推理，收集代码推理结果。配置文件和推理流程都可以复用上面的教程。
 
-### 收集推理结果
+### 收集推理结果（仅针对Humanevalx）
 
 OpenCompass 在 `tools` 中提供了 `collect_code_preds.py` 脚本对推理结果进行后处理并收集，我们只需要提供启动任务时的配置文件，以及指定复用对应任务的工作目录，其配置与 `run.py` 中的 `-r` 一致，细节可参考[文档](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id7)。
 
@@ -121,7 +132,11 @@ workdir/humanevalx
 ├── ...
 ```
 
+对于 DS1000 只需要拿到 `opencompasss` 对应生成的 prediction文件即可。
+
 ### 代码评测
+
+#### 以下仅支持Humanevalx
 
 确保代码评测服务启动的情况下，使用 `curl` 提交请求：
 
@@ -146,6 +161,26 @@ curl -X POST -F 'file=@./examples/humanevalx/python.json' -F 'dataset=humanevalx
 ```shell
 curl -X POST -F 'file=@./examples/humanevalx/python.json' -F 'dataset=humanevalx/python' -H 'with-prompt: False' localhost:5000/evaluate
 ```
+
+#### 以下仅支持DS1000
+
+确保代码评测服务启动的情况下，使用 `curl` 提交请求：
+
+```shell
+curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' localhost:5000/evaluate
+```
+
+DS1000支持额外 debug 参数，注意开启之后会有大量log
+
+- `full`: 额外打印每个错误样本的原始prediction，后处理后的predcition，运行程序以及最终报错。
+- `half`: 额外打印每个错误样本的运行程序以及最终报错。
+- `error`: 额外打印每个错误样本的最终报错。
+
+```shell
+curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' -F 'debug=error' localhost:5000/evaluate
+```
+
+另外还可以通过同样的方式修改`num_workers`来控制并行数。
 
 ## 进阶教程
 

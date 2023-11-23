@@ -1,33 +1,44 @@
-# Code Evaluation Tutorial
+# Code Evaluation Docker Tutorial
 
-To complete LLM code capability evaluation, we need to set up an independent evaluation environment to avoid executing erroneous codes on development environments which would cause unavoidable losses. The current Code Evaluation Service used in OpenCompass refers to the project [code-evaluator](https://github.com/open-compass/code-evaluator.git), which has already supported evaluating datasets for multiple programming languages [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x). The following tutorials will introduce how to conduct code review services under different requirements.
+To complete the LLM code capability evaluation, we need to build a separate evaluation environment to avoid executing erroneous code in the development environment, which would inevitably cause losses. The code evaluation service currently used by OpenCompass can refer to the [code-evaluator](https://github.com/open-compass/code-evaluator) project. The following will introduce evaluation tutorials around the code evaluation service.
 
-Dataset [download address](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx). Please download the needed files (xx.jsonl.gz) into `./data/humanevalx` folder.
+1. humaneval-x
 
-Supported languages are `python`, `cpp`, `go`, `java`, `js`.
+This is a multi-programming language dataset [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x).
+You can download the dataset from this [download link](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx). Please download the language file (××.jsonl.gz) that needs to be evaluated and place it in the `./data/humanevalx` folder.
+
+The currently supported languages are `python`, `cpp`, `go`, `java`, `js`.
+
+2. DS1000
+
+This is a Python multi-algorithm library dataset [ds1000](https://github.com/xlang-ai/DS-1000).
+You can download the dataset from this [download link](https://github.com/xlang-ai/DS-1000/blob/main/ds1000_data.zip).
+
+The currently supported algorithm libraries are `Pandas`, `Numpy`, `Tensorflow`, `Scipy`, `Sklearn`, `Pytorch`, `Matplotlib`.
 
 ## Launching the Code Evaluation Service
 
 1. Ensure you have installed Docker, please refer to [Docker installation document](https://docs.docker.com/engine/install/).
 2. Pull the source code of the code evaluation service project and build the Docker image.
 
+Choose the dockerfile corresponding to the dataset you need, and replace `humanevalx` or `ds1000` in the command below.
+
 ```shell
 git clone https://github.com/open-compass/code-evaluator.git
-cd code-evaluator/docker
-sudo docker build -t code-eval:latest .
+sudo docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
 ```
 
 3. Create a container with the following commands:
 
 ```shell
 # Log output format
-sudo docker run -it -p 5000:5000 code-eval:latest python server.py
+sudo docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # Run the program in the background
-# sudo docker run -itd -p 5000:5000 code-eval:latest python server.py
+# sudo docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # Using different ports
-# sudo docker run -itd -p 5001:5001 code-eval:latest python server.py --port 5001
+# sudo docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
 ```
 
 4. To ensure you have access to the service, use the following command to check the inference environment and evaluation service connection status. (If both inferences and code evaluations run on the same host, skip this step.)
@@ -39,7 +50,7 @@ telnet your_service_ip_address your_service_port
 
 ## Local Code Evaluation
 
-When the model inference and code evaluation services are running on the same host or within the same local area network, direct code reasoning and evaluation can be performed.
+When the model inference and code evaluation services are running on the same host or within the same local area network, direct code reasoning and evaluation can be performed. **Note: DS1000 is currently not supported, please proceed with remote evaluation.**
 
 ### Configuration File
 
@@ -95,7 +106,7 @@ Refer to the [Quick Start](../get_started.html)
 
 Model inference and code evaluation services located in different machines which cannot be accessed directly require prior model inference before collecting the code evaluation results. The configuration file and inference process can be reused from the previous tutorial.
 
-### Collect Inference Results
+### Collect Inference Results(Only for Humanevalx)
 
 In OpenCompass's tools folder, there is a script called `collect_code_preds.py` provided to process and collect the inference results after providing the task launch configuration file during startup along with specifying the working directory used corresponding to the task.
 It is the same with `-r` option in `run.py`. More details can be referred through the [documentation](https://opencompass.readthedocs.io/en/latest/get_started.html#launch-evaluation).
@@ -123,9 +134,13 @@ workdir/humanevalx
 ├── ...
 ```
 
+For DS1000, you just need to obtain the corresponding prediction file generated by `opencompass`.
+
 ### Code Evaluation
 
 Make sure your code evaluation service is started, and use `curl` to request:
+
+#### The following only supports Humanevalx
 
 ```shell
 curl -X POST -F 'file=@{result_absolute_path}' -F 'dataset={dataset/language}' {your_service_ip_address}:{your_service_port}/evaluate
@@ -148,6 +163,26 @@ Additionally, we offer an extra option named `with_prompt`(Defaults to `True`), 
 ```shell
 curl -X POST -F 'file=@./examples/humanevalx/python.json' -F 'dataset=humanevalx/python' -H 'with-prompt: False' localhost:5000/evaluate
 ```
+
+#### The following only supports DS1000
+
+Make sure the code evaluation service is started, then use `curl` to submit a request:
+
+```shell
+curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' localhost:5000/evaluate
+```
+
+DS1000 supports additional debug parameters. Be aware that a large amount of log will be generated when it is turned on:
+
+- `full`: Additional print out of the original prediction for each error sample, post-processing prediction, running program, and final error.
+- `half`: Additional print out of the running program and final error for each error sample.
+- `error`: Additional print out of the final error for each error sample.
+
+```shell
+curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' -F 'debug=error' localhost:5000/evaluate
+```
+
+You can also modify the `num_workers` in the same way to control the degree of parallelism.
 
 ## Advanced Tutorial
 

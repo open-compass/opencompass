@@ -30,6 +30,7 @@ from .drop import *  # noqa: F401, F403
 from .ds1000 import *  # noqa: F401, F403
 from .ds1000_interpreter import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
+from .FinanceIQ import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
@@ -71,6 +72,7 @@ from .strategyqa import *  # noqa: F401, F403
 from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
+from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
 from .TheoremQA import *  # noqa: F401, F403
 from .tnews import *  # noqa: F401, F403

@@ -63,6 +63,7 @@ class HuggingFace(BaseModel):
                  peft_path: Optional[str] = None,
                  tokenizer_only: bool = False,
                  model_kwargs: dict = dict(device_map='auto'),
+                 generation_kwargs: dict = dict(),
                  meta_template: Optional[Dict] = None,
                  extract_pred_after_decode: bool = False,
                  batch_padding: bool = False,
@@ -89,6 +90,7 @@ class HuggingFace(BaseModel):
             self._load_model(path=path,
                              model_kwargs=model_kwargs,
                              peft_path=peft_path)
+        self.generation_kwargs = generation_kwargs
 
     def _load_tokenizer(self, path: str, tokenizer_path: Optional[str],
                         tokenizer_kwargs: dict):
@@ -193,13 +195,15 @@ class HuggingFace(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
+        generation_kwargs = kwargs.copy()
+        generation_kwargs.update(self.generation_kwargs)
         if self.batch_padding and len(inputs) > 1:
             return self._batch_generate(inputs=inputs,
                                         max_out_len=max_out_len,
-                                        **kwargs)
+                                        **generation_kwargs)
         else:
             return sum((self._single_generate(
-                inputs=[input_], max_out_len=max_out_len, **kwargs)
+                inputs=[input_], max_out_len=max_out_len, **generation_kwargs)
                         for input_ in inputs), [])
 
     def _batch_generate(self, inputs: List[str], max_out_len: int,

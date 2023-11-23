@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from opencompass.models.base import BaseModel
 from opencompass.registry import ICL_INFERENCERS
+from opencompass.utils import batched
 
 from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
@@ -129,9 +130,14 @@ class GenInferencer(BaseInferencer):
                     entry, max_out_len=self.max_out_len)
                 generated = results
 
+            num_return_sequences = getattr(self.model, 'generation_kwargs',
+                                           {}).get('num_return_sequences', 1)
             # 5-3. Save current output
-            for prompt, prediction, gold in zip(parsed_entries, generated,
-                                                golds):
+            for prompt, prediction, gold in zip(
+                    parsed_entries, batched(generated, num_return_sequences),
+                    golds):
+                if num_return_sequences == 1:
+                    prediction = prediction[0]
                 output_handler.save_results(prompt,
                                             prediction,
                                             index,
