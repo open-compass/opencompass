@@ -1,3 +1,4 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -168,7 +169,8 @@ class MiniMax(BaseAPIModel):
                     or response.status_code == 1039
                     or response.status_code == 2013):
                 print(response.text)
-                return ''
+                time.sleep(1)
+                continue
             print(response)
             max_num_retries += 1
 

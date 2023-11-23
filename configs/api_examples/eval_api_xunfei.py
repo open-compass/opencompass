@@ -1,14 +1,13 @@
 from mmengine.config import read_base
 from opencompass.models.xunfei_api import XunFei
 from opencompass.partitioners import NaivePartitioner
-from opencompass.runners import LocalRunner
 from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
     # from .datasets.collections.chat_medium import datasets
-    from .summarizers.medium import summarizer
-    from .datasets.ceval.ceval_gen import ceval_datasets
+    from ..summarizers.medium import summarizer
+    from ..datasets.ceval.ceval_gen import ceval_datasets
 
 datasets = [
     *ceval_datasets,
@@ -48,3 +47,5 @@ infer = dict(
         concurrent_users=2,
         task=dict(type=OpenICLInferTask)),
 )
+
+work_dir = "outputs/api_xunfei/"

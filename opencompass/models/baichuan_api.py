@@ -150,14 +150,14 @@ class BaiChuan(BaseAPIModel):
                 self.wait()
                 continue
             if raw_response.status_code == 200 and response['code'] == 0:
-                # msg = json.load(response.text)
-                # response
+
                 msg = response['data']['messages'][0]['content']
                 return msg
 
             if response['code'] != 0:
                 print(response)
-                return ''
+                time.sleep(1)
+                continue
             print(response)
             max_num_retries += 1
 
