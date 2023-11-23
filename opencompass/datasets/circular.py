@@ -37,7 +37,7 @@ def get_all_possible_patterns(option_keys):
 
 class CircularDatasetMeta(type):
     """This Meta Class is designed to transform a class that reads datasets
-    into one that supports reading datasets required for Circular Eval. It
+    into one that supports reading datasets required for CircularEval. It
     overloads an existing load method for the original class.
 
     The Meta Class should possess the following attributes:
@@ -45,7 +45,7 @@ class CircularDatasetMeta(type):
     - `dataset_class` (class): The class for reading datasets, such as
         `CEvalDataset`.
     - `default_circular_splits` (list, optional): The default splits of the
-        dataset that need to undergo Circular Eval, like ['val', 'test']. If a
+        dataset that need to undergo CircularEval, like ['val', 'test']. If a
         `Dataset` is loaded originally, this field will be ignored.
     - `default_option_keys` (list): The keys for options in the dataset, such
         as ['A', 'B', 'C', 'D'].
@@ -278,7 +278,7 @@ class CircularEvaluator(BaseEvaluator):
         question is considered correct only if all its variations with shuffled
         options are answered correctly, calculating accuracy. perf is short for
         perfect.
-    - `more_{origin|circular|all_possible}_{num}`: According to Circular logic,
+    - `more_{num}_{origin|circular|all_possible}`: According to Circular logic,
         a question is considered correct only if the number of its variations
         answered correctly is greater than or equal to `num`, calculating
         accuracy.
@@ -341,7 +341,7 @@ class CircularEvaluator(BaseEvaluator):
                 count = sum([_details[k][index] >= j for index in _details[k]])
                 total = len(_details[k])
                 if j != len(circular_patterns[k]):
-                    metrics[f'more_{k}_{j}'] = count / total * 100
+                    metrics[f'more_{j}_{k}'] = count / total * 100
                 else:
                     metrics[f'perf_{k}'] = count / total * 100
 
