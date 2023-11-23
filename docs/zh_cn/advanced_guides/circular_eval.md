@@ -44,9 +44,9 @@ class CircularCEvalDataset(CEvalDataset, metaclass=CircularDatasetMeta):
 
 另外我们提供了一个 `CircularEvaluator` 用于替换 `AccEvaluator`，该 Evaluator 同样接受 `circular_pattern`，该参数应与上述保持一致。它会产出以下指标：
 
-- acc\_{origin|circular|all_possible}: 将打乱后选项顺序后的题目视作多道单独的题目，计算准确率
-- perf\_{origin|circular|all_possible}: 按照 circular 的逻辑，若选项打乱后的题目都回答正确，才会视为这道题正确，计算准确率
-- more\_{num}\_{origin|circular|all_possible}: 按照 circular 的逻辑，若选项打乱后的题目回答正确的数量大于等于 num，就会视为这道题正确，计算准确率
+- `acc_{origin|circular|all_possible}`: 将打乱后选项顺序后的题目视作多道单独的题目，计算准确率
+- `perf_{origin|circular|all_possible}`: 按照 circular 的逻辑，若选项打乱后的题目都回答正确，才会视为这道题正确，计算准确率
+- `more_{num}_{origin|circular|all_possible}`: 按照 circular 的逻辑，若选项打乱后的题目回答正确的数量大于等于 num，就会视为这道题正确，计算准确率
 
 OpenCompass 配置文件：
 

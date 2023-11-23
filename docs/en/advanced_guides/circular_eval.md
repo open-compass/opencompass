@@ -44,9 +44,9 @@ class CircularCEvalDataset(CEvalDataset, metaclass=CircularDatasetMeta):
 
 Additionally, we provide a `CircularEvaluator` to replace `AccEvaluator`. This Evaluator also accepts `circular_pattern`, and it should be consistent with the above. It produces the following metrics:
 
-- acc\_{origin|circular|all_possible}: Treating each question with shuffled options as separate, calculating accuracy.
-- perf\_{origin|circular|all_possible}: Following Circular logic, a question is considered correct only if all its variations with shuffled options are answered correctly, calculating accuracy.
-- more\_{num}\_{origin|circular|all_possible}: According to Circular logic, a question is deemed correct if the number of its variations answered correctly is greater than or equal to num, calculating accuracy.
+- `acc_{origin|circular|all_possible}`: Treating each question with shuffled options as separate, calculating accuracy.
+- `perf_{origin|circular|all_possible}`: Following Circular logic, a question is considered correct only if all its variations with shuffled options are answered correctly, calculating accuracy.
+- `more_{num}_{origin|circular|all_possible}`: According to Circular logic, a question is deemed correct if the number of its variations answered correctly is greater than or equal to num, calculating accuracy.
 
 OpenCompass configuration file:
 
