@@ -1,3 +1,4 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -55,6 +56,14 @@ class PanGu(BaseAPIModel):
         self.token_url = token_url
         self.project_name = project_name
         self.model = path
+
+        token_response = self._get_token()
+        if token_response.status_code == 201:
+            self.token = token_response.headers['X-Subject-Token']
+            print('请求成功！')
+        else:
+            self.token = None
+            print('token生成失败')
 
     def generate(
         self,
@@ -139,16 +148,18 @@ class PanGu(BaseAPIModel):
 
         data = {'messages': messages, 'stream': False}
 
-        token_response = self._get_token()
-        if token_response.status_code == 201:
-            token = token_response.headers['X-Subject-Token']
-            print('请求成功！')
-        else:
-            msg = 'token生成失败'
-            print(msg)
-            return ''
+        # token_response = self._get_token()
+        # if token_response.status_code == 201:
+        #     self.token = token_response.headers['X-Subject-Token']
+        #     print('请求成功！')
+        # else:
+        #     self.token = None
+        #     print('token生成失败')
 
-        headers = {'Content-Type': 'application/json', 'X-Auth-Token': token}
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Auth-Token': self.token
+        }
 
         max_num_retries = 0
         while max_num_retries < self.retry:
@@ -175,7 +186,9 @@ class PanGu(BaseAPIModel):
 
             if (raw_response.status_code != 200):
                 print(response['error_msg'])
-                return ''
+                # return ''
+                time.sleep(1)
+                continue
             print(response)
             max_num_retries += 1
 

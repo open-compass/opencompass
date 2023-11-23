@@ -11,12 +11,14 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 
 
-class SenseTime(BaseAPIModel):
-    """Model wrapper around SenseTime.
+class MoonShot(BaseAPIModel):
+    """Model wrapper around MoonShot.
+
+    Documentation:
 
     Args:
-        path (str): The name of SenseTime model.
-            e.g. `nova-ptc-xl-v1`
+        path (str): The name of MoonShot model.
+            e.g. `erniebot`
         key (str): Authorization key.
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
@@ -44,7 +46,7 @@ class SenseTime(BaseAPIModel):
                          retry=retry)
         self.headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {key}'
+            'Authorization': 'Bearer ' + key,
         }
         self.url = url
         self.model = path
@@ -103,7 +105,21 @@ class SenseTime(BaseAPIModel):
 
                 messages.append(msg)
 
-        data = {'messages': messages, 'model': self.model}
+        system = {
+            'role':
+            'system',
+            'content':
+            '你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。'
+            '你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一些涉及恐怖主义，种族歧视，'
+            '黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。'
+        }
+
+        messages.insert(0, system)
+
+        data = {
+            'model': self.model,
+            'messages': messages,
+        }
 
         max_num_retries = 0
         while max_num_retries < self.retry:
@@ -112,6 +128,7 @@ class SenseTime(BaseAPIModel):
                                             url=self.url,
                                             headers=self.headers,
                                             json=data)
+
             response = raw_response.json()
             self.release()
 
@@ -122,20 +139,25 @@ class SenseTime(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
+
             if raw_response.status_code == 200:
-                msg = response['data']['choices'][0]['message']
+                # msg = json.load(response.text)
+                # response
+                msg = response['choices'][0]['message']['content']
                 return msg
 
-            if (raw_response.status_code != 200):
-                if response['error']['code'] == 18:
-                    # security issue
-                    return 'error:unsafe'
-                else:
-                    print(raw_response.text)
-                    time.sleep(1)
-                    continue
+            if raw_response.status_code == 403:
+                print('请求被拒绝 api_key错误')
+                continue
+            elif raw_response.status_code == 400:
+                print('请求失败，状态码:', raw_response)
+                time.sleep(1)
+                continue
+            elif raw_response.status_code == 429:
+                print('请求失败，状态码:', raw_response)
+                time.sleep(3)
+                continue
 
-            print(response)
             max_num_retries += 1
 
-        raise RuntimeError(raw_response.text)
+        raise RuntimeError(raw_response)

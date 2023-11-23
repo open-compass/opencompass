@@ -1,3 +1,4 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -165,8 +166,9 @@ class ByteDance(BaseAPIModel):
 
             if isinstance(response, MaasException):
                 print(response)
-                return ''
-            print(response)
+                time.sleep(1)
+                continue
+
             max_num_retries += 1
 
         raise RuntimeError(response)
