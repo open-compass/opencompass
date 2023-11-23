@@ -4,8 +4,6 @@
 
 For multiple-choice questions, when a Language Model (LLM) provides the correct option, it does not necessarily imply a true understanding and reasoning of the question. It could be a guess. To differentiate these scenarios and reduce LLM bias towards options, CircularEval (CircularEval) can be utilized. A multiple-choice question is augmented by shuffling its options, and if the LLM correctly answers all variations of the augmented question, it is considered correct under CircularEval.
 
-TBA
-
 ## Adding Your Own CircularEval Dataset
 
 Generally, to evaluate a dataset using CircularEval, both its loading and evaluation methods need to be rewritten. Modifications are required in both the OpenCompass main library and configuration files. We will use C-Eval as an example for explanation.
