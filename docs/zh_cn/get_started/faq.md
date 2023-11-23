@@ -18,7 +18,7 @@ OpenCompass 使用称为 task (任务) 的单位处理评估请求。每个任�
 
 需求侧就是有多少 worker 在运行。由于 OpenCompass 会同时实例化多个模型去进行推理，因此我们用 `--num-gpus` 来指定每个实例使用多少 GPU。注意 `--num-gpus` 是一个 HuggingFace 模型专用的参数，非 HuggingFace 模型设置该参数是不会起作用的。同时我们使用 `--max-num-workers` 去表示最多有多少个实例在运行。最后由于 GPU 显存、负载不充分等问题，OpenCompass 也支持在同一个 GPU 上运行多个实例，这个参数是 `--max-num-workers-per-gpu`。因此可以笼统地认为，我们总共会使用 `--num-gpus` * `--max-num-workers` /  `--max-num-workers-per-gpu` 个 GPU。
 
-综上，当任务运行较慢，GPU 负载不高的时候，我们首先需要检查供给是否充足，如果不充足，可以考虑调小 `--max-partition-size` 来将任务拆分地更细；其次需要检查需求是否充足，如果不充足，可以考虑增大 `--max-num-workers` 和 `--max-num-workers-per-gpu`。一般来说，我们会将 `--num-gpus` 设定为最小的满足需求的值，并不会再进行调整。
+综上，当任务运行较慢，GPU 负载不高的时候，我们首先需要检查供给是否充足，如果不充足，可以考虑调小 `--max-partition-size` 来将任务拆分地更细；其次需要检查需求是否充足，如果不充足，可以考虑增大 `--max-num-workers` 和 `--max-num-workers-per-gpu`。一般来说，**我们会将 `--num-gpus` 设定为最小的满足需求的值，并不会再进行调整**。
 
 ### 我如何控制 OpenCompass 占用的 GPU 数量？
 
