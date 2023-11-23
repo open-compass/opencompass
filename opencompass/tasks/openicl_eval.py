@@ -172,6 +172,7 @@ class OpenICLEvalTask(BaseTask):
             preds['predictions'] = pred_strs
             preds['references'] = (test_set[self.output_column]
                                    if self.output_column else None)
+            preds['test_set'] = test_set
             preds = {
                 k: preds[k]
                 for k in signature(icl_evaluator.score).parameters
