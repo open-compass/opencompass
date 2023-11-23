@@ -2,12 +2,29 @@
 
 1. Set up the OpenCompass environment:
 
+`````{tabs}
+````{tab} Open-source Models with GPU
+
    ```bash
    conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
    conda activate opencompass
    ```
 
    If you want to customize the PyTorch version or related CUDA version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
+
+````
+````{tab} API Models with CPU-only
+
+   ```bash
+   conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
+   conda activate opencompass
+   # also please install requiresments packages via `pip install -r requirements/api.txt` for API models if needed.
+   ```
+
+   If you want to customize the PyTorch version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
+
+````
+`````
 
 2. Install OpenCompass:
 

@@ -2,12 +2,30 @@
 
 1. 准备 OpenCompass 运行环境：
 
+`````{tabs}
+````{tab} 面向开源模型的GPU环境
+
    ```bash
    conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
    conda activate opencompass
    ```
 
    如果你希望自定义 PyTorch 版本或相关的 CUDA 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
+
+````
+
+````{tab} 面向API模型测试的CPU环境
+
+   ```bash
+   conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
+   conda activate opencompass
+   # 如果需要使用各个API模型，请 `pip install -r requirements/api.txt` 安装API模型的相关依赖
+   ```
+
+   如果你希望自定义 PyTorch 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
+
+````
+`````
 
 2. 安装 OpenCompass：
 
