@@ -1,12 +1,12 @@
 from mmengine.config import read_base
-from opencompass.models import AI360GPT
+from opencompass.models import SenseTime
 from opencompass.partitioners import NaivePartitioner
 from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    from .summarizers.medium import summarizer
-    from .datasets.ceval.ceval_gen import ceval_datasets
+    from ..summarizers.medium import summarizer
+    from ..datasets.ceval.ceval_gen import ceval_datasets
 
 datasets = [
     *ceval_datasets,
@@ -14,10 +14,11 @@ datasets = [
 
 models = [
     dict(
-        abbr='360GPT_S2_V9',
-        type=AI360GPT,
-        path='360GPT_S2_V9',
-        key="xxxxxxxxxxxx",
+        abbr='nova-ptc-xl-v1',
+        type=SenseTime,
+        path='nova-ptc-xl-v1',
+        key='xxxxxxxxxxxxxx',
+        url='xxxxxxxxxxx',
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
@@ -33,4 +34,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir ="./output/360GPT_S2_V9"
+work_dir = "outputs/api_sensetime/"
