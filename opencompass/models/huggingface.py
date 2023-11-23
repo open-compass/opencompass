@@ -46,6 +46,9 @@ class HuggingFace(BaseModel):
         mode (str, optional): The method of input truncation when input length
             exceeds max_seq_len. 'mid' represents the part of input to
             truncate. Defaults to 'none'.
+        use_fastchat_template (str, optional): Whether to use fastchat to get
+            the conversation template. If True, fastchat needs to be
+            implemented first. Defaults to False.
 
     Note:
         About ``extract_pred_after_decode``: Commonly, we should extract the
@@ -68,7 +71,8 @@ class HuggingFace(BaseModel):
                  extract_pred_after_decode: bool = False,
                  batch_padding: bool = False,
                  pad_token_id: Optional[int] = None,
-                 mode: str = 'none'):
+                 mode: str = 'none',
+                 use_fastchat_template: bool = False):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          tokenizer_only=tokenizer_only,
@@ -91,6 +95,7 @@ class HuggingFace(BaseModel):
                              model_kwargs=model_kwargs,
                              peft_path=peft_path)
         self.generation_kwargs = generation_kwargs
+        self.use_fastchat_template = use_fastchat_template
 
     def _load_tokenizer(self, path: str, tokenizer_path: Optional[str],
                         tokenizer_kwargs: dict):
@@ -220,6 +225,20 @@ class HuggingFace(BaseModel):
         if self.extract_pred_after_decode:
             prompt_lens = [len(input_) for input_ in inputs]
 
+        if self.use_fastchat_template:
+            try:
+                from fastchat.model import get_conversation_template
+            except ModuleNotFoundError:
+                raise ModuleNotFoundError(
+                    'Fastchat is not implemented. You can use '
+                    '\'pip install "fschat[model_worker,webui]"\' '
+                    'to implement fastchat.')
+            for i in range(len(inputs)):
+                conv = get_conversation_template('vicuna')
+                conv.append_message(conv.roles[0], inputs[i])
+                conv.append_message(conv.roles[1], None)
+                inputs[i] = conv.get_prompt()
+
         # step-1: tokenize the input with batch_encode_plus
         tokens = self.tokenizer.batch_encode_plus(inputs,
                                                   padding=True,
@@ -262,6 +281,19 @@ class HuggingFace(BaseModel):
         """
         if self.extract_pred_after_decode:
             prompt_lens = [len(input_) for input_ in inputs]
+
+        if self.use_fastchat_template:
+            try:
+                from fastchat.model import get_conversation_template
+            except ModuleNotFoundError:
+                raise ModuleNotFoundError(
+                    'Fastchat is not implemented. You can use '
+                    '\'pip install "fschat[model_worker,webui]"\' '
+                    'to implement fastchat.')
+            conv = get_conversation_template('vicuna')
+            conv.append_message(conv.roles[0], inputs[0])
+            conv.append_message(conv.roles[1], None)
+            inputs = [conv.get_prompt()]
 
         if self.mode == 'mid':
             input_ids = self.tokenizer(inputs, truncation=False)['input_ids']
@@ -491,7 +523,8 @@ class HuggingFaceChatGLM3(HuggingFace):
     def generate(self,
                  inputs: List[str or PromptList],
                  max_out_len: int = 512,
-                 temperature: float = 0.6) -> str:
+                 temperature: float = 0.6,
+                 skip_overlength=False) -> str:
         """Generate response from input prompt.
 
         Args:
@@ -518,6 +551,20 @@ class HuggingFaceChatGLM3(HuggingFace):
                     history.append(msg)
             user_content = history[-1]['content']
             history = history[:-1]
+
+            if skip_overlength:
+                # The model will report the following error
+                # if the sequence length is greater than the maximum length:
+                # "Input length of input_ids is {INPUT_IDS},
+                # but `max_length` is set to 8192.
+                # This can lead to unexpected behavior.
+                # You should consider increasing `max_new_tokens`."
+                # The following hardcode can fix this exception.
+                len_user_content = len(self.tokenizer.encode(user_content))
+                if len_user_content > 8192:
+                    responses.append('')
+                    continue
+
             try:
                 response, history = self.model.chat(self.tokenizer,
                                                     user_content,
