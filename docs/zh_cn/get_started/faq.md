@@ -30,7 +30,7 @@ OpenCompass 使用称为 task (任务) 的单位处理评估请求。每个任�
 **如果使用 Slurm 或 DLC：**
 尽管 OpenCompass 没有直接访问资源池，但您可以调整 `--max-num-workers` 参数以限制同时提交的评估任务数量。这将间接管理 OpenCompass 使用的 GPU 数量。例如，如果每个任务需要 4 个 GPU，您希望分配总共 8 个 GPU，那么应将 `--max-num-workers` 设置为 2。
 
-### 找不到 libGL.so.1
+### 找不到 `libGL.so.1`
 
 opencv-python 依赖一些动态库，但环境中没有，最简单的解决办法是卸载 opencv-python 再安装 opencv-python-headless。
 
