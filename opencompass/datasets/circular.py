@@ -35,11 +35,37 @@ def get_all_possible_patterns(option_keys):
     return circular_patterns
 
 
-class CircularMixIN:
+class CircularDatasetMeta(type):
+    """This Meta Class is designed to transform a class that reads datasets
+    into one that supports reading datasets required for Circular Eval. It
+    overloads an existing load method for the original class.
+
+    The Meta Class should possess the following attributes:
+
+    - `dataset_class` (class): The class for reading datasets, such as
+        `CEvalDataset`.
+    - `default_circular_splits` (list, optional): The default splits of the
+        dataset that need to undergo Circular Eval, like ['val', 'test']. If a
+        `Dataset` is loaded originally, this field will be ignored.
+    - `default_option_keys` (list): The keys for options in the dataset, such
+        as ['A', 'B', 'C', 'D'].
+    - `default_answer_key` (str, optional): The key for answers in the dataset,
+        like 'answer'. This is an alternative to
+        `default_answer_key_switch_method`.
+    - `default_answer_key_switch_method` (function, optional): The method to
+        transform the key for answers in the dataset. This is an alternative to
+        `default_answer_key`.
+    """
 
     @staticmethod
-    def make_circular_items(origin_item, circular_patterns, option_keys,
-                            answer_key, answer_key_switch_method, qid):
+    def make_circular_items(
+        origin_item,
+        circular_patterns,
+        option_keys,
+        answer_key,
+        answer_key_switch_method,
+        qid,
+    ):
         items = []
         for circular_pattern in circular_patterns:
             item = copy.deepcopy(origin_item)
@@ -63,14 +89,17 @@ class CircularMixIN:
                               answer_key, answer_key_switch_method):
         circulated_items = []
         for i, item in enumerate(dataset):
-            item = CircularMixIN.make_circular_items(item, circular_patterns,
-                                                     option_keys, answer_key,
-                                                     answer_key_switch_method,
-                                                     i)
+            item = CircularDatasetMeta.make_circular_items(
+                item,
+                circular_patterns,
+                option_keys,
+                answer_key,
+                answer_key_switch_method,
+                i,
+            )
             circulated_items.extend(item)
         return Dataset.from_list(circulated_items)
 
-    @staticmethod
     def make_circular(
         dataset: Union[Dataset, DatasetDict],
         circular_splits: Optional[List[str]] = ['test'],
@@ -124,89 +153,83 @@ class CircularMixIN:
                 'either answer_key or answer_key_switch_method should be None')
 
         if isinstance(dataset, Dataset):
-            dataset = CircularMixIN.make_circular_dataset(
-                dataset, circular_patterns, option_keys, answer_key,
-                answer_key_switch_method)
+            dataset = CircularDatasetMeta.make_circular_dataset(
+                dataset,
+                circular_patterns,
+                option_keys,
+                answer_key,
+                answer_key_switch_method,
+            )
         else:
             assert isinstance(dataset, DatasetDict)
             dataset_dict = {}
             for split in dataset:
                 if circular_splits is not None and split in circular_splits:
-                    dataset_dict[split] = CircularMixIN.make_circular_dataset(
-                        dataset[split], circular_patterns, option_keys,
-                        answer_key, answer_key_switch_method)
+                    dataset_dict[
+                        split] = CircularDatasetMeta.make_circular_dataset(
+                            dataset[split],
+                            circular_patterns,
+                            option_keys,
+                            answer_key,
+                            answer_key_switch_method,
+                        )
                 else:
                     dataset_dict[split] = dataset[split]
             dataset = DatasetDict(dataset_dict)
         return dataset
 
-
-class CircularDatasetMeta(type):
-
     def __new__(cls, name, bases, dct):
         new_cls = super().__new__(cls, name, bases, dct)
 
-        def load(cls,
-                 path: str,
-                 name: str = None,
-                 circular_patterns='circular'):
-            circular_splits = cls.default_circular_splits
+        def load(cls, circular_patterns='circular', *args, **kwargs):
+            circular_splits = getattr(cls, 'default_circular_splits', None)
             option_keys = cls.default_option_keys
             answer_key = getattr(cls, 'default_answer_key', None)
             answer_key_switch_method = getattr(
                 cls, 'default_answer_key_switch_method', None)
-            if name is not None:
-                dataset = cls.dataset_class.load(path, name)
-            else:
-                dataset = cls.dataset_class.load(path)
-            return CircularMixIN.make_circular(dataset, circular_splits,
-                                               circular_patterns, option_keys,
-                                               answer_key,
-                                               answer_key_switch_method)
+            dataset = cls.dataset_class.load(*args, **kwargs)
+            return CircularDatasetMeta.make_circular(
+                dataset,
+                circular_splits,
+                circular_patterns,
+                option_keys,
+                answer_key,
+                answer_key_switch_method,
+            )
 
         setattr(new_cls, 'load', classmethod(load))
         return new_cls
 
 
-class CircularCEvalDataset(CEvalDataset,
-                           CircularMixIN,
-                           metaclass=CircularDatasetMeta):
+class CircularCEvalDataset(CEvalDataset, metaclass=CircularDatasetMeta):
     dataset_class = CEvalDataset
     default_circular_splits = ['val', 'test']
     default_option_keys = ['A', 'B', 'C', 'D']
     default_answer_key = 'answer'
 
 
-class CircularMMLUDataset(MMLUDataset,
-                          CircularMixIN,
-                          metaclass=CircularDatasetMeta):
+class CircularMMLUDataset(MMLUDataset, metaclass=CircularDatasetMeta):
     dataset_class = MMLUDataset
     default_circular_splits = ['test']
     default_option_keys = ['A', 'B', 'C', 'D']
     default_answer_key = 'target'
 
 
-class CircularCMMLUDataset(CMMLUDataset,
-                           CircularMixIN,
-                           metaclass=CircularDatasetMeta):
+class CircularCMMLUDataset(CMMLUDataset, metaclass=CircularDatasetMeta):
     dataset_class = CMMLUDataset
     default_circular_splits = ['test']
     default_option_keys = ['A', 'B', 'C', 'D']
     default_answer_key = 'answer'
 
 
-class CircularCSQADataset(commonsenseqaDataset,
-                          CircularMixIN,
-                          metaclass=CircularDatasetMeta):
+class CircularCSQADataset(commonsenseqaDataset, metaclass=CircularDatasetMeta):
     dataset_class = commonsenseqaDataset
     default_circular_splits = ['validation']
     default_option_keys = ['A', 'B', 'C', 'D', 'E']
     default_answer_key = 'answerKey'
 
 
-class CircularARCDataset(ARCDataset,
-                         CircularMixIN,
-                         metaclass=CircularDatasetMeta):
+class CircularARCDataset(ARCDataset, metaclass=CircularDatasetMeta):
     dataset_class = ARCDataset
     default_circular_splits = None
     default_option_keys = ['textA', 'textB', 'textC', 'textD']
@@ -217,36 +240,28 @@ class CircularARCDataset(ARCDataset,
         return item
 
 
-class CircularHSWAGDataset(hellaswagDataset_V2,
-                           CircularMixIN,
-                           metaclass=CircularDatasetMeta):
+class CircularHSWAGDataset(hellaswagDataset_V2, metaclass=CircularDatasetMeta):
     dataset_class = hellaswagDataset_V2
     default_circular_splits = None
     default_option_keys = ['A', 'B', 'C', 'D']
     default_answer_key = 'label'
 
 
-class CircularOBQADataset(OBQADataset,
-                          CircularMixIN,
-                          metaclass=CircularDatasetMeta):
+class CircularOBQADataset(OBQADataset, metaclass=CircularDatasetMeta):
     dataset_class = OBQADataset
     default_circular_splits = None
     default_option_keys = ['A', 'B', 'C', 'D']
     default_answer_key = 'answerKey'
 
 
-class CircularRaceDataset(RaceDataset,
-                          CircularMixIN,
-                          metaclass=CircularDatasetMeta):
+class CircularRaceDataset(RaceDataset, metaclass=CircularDatasetMeta):
     dataset_class = RaceDataset
     default_circular_splits = ['test']
     default_option_keys = ['A', 'B', 'C', 'D']
     default_answer_key = 'answer'
 
 
-class CircularXiezhiDataset(XiezhiDataset,
-                            CircularMixIN,
-                            metaclass=CircularDatasetMeta):
+class CircularXiezhiDataset(XiezhiDataset, metaclass=CircularDatasetMeta):
     dataset_class = XiezhiDataset
     default_circular_splits = None
     default_option_keys = ['A', 'B', 'C', 'D']
@@ -254,6 +269,28 @@ class CircularXiezhiDataset(XiezhiDataset,
 
 
 class CircularEvaluator(BaseEvaluator):
+    """This Evaluator assesses datasets post-Circular processing, generating
+    the following evaluation metrics:
+
+    - `acc_{origin|circular|all_possible}`: Treats each question with shuffled
+        answer options as separate, calculating accuracy.
+    - `perf_{origin|circular|all_possible}`: According Circular logic, a
+        question is considered correct only if all its variations with shuffled
+        options are answered correctly, calculating accuracy. perf is short for
+        perfect.
+    - `more_{origin|circular|all_possible}_{num}`: According to Circular logic,
+        a question is considered correct only if the number of its variations
+        answered correctly is greater than or equal to `num`, calculating
+        accuracy.
+
+    Note that when the `all_possible` method is used to shuffle option order,
+        it naturally includes the Circular method, and its metrics will also be
+        output.
+
+    Args:
+        circular_pattern: The method of shuffling options, either 'circular' or
+            'all_possible', defaulting to 'circular'.
+    """
 
     def __init__(self, circular_pattern='circular'):
         super().__init__()
