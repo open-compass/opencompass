@@ -8,6 +8,19 @@ from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
+class cmnliDataset(BaseDataset):
+
+    @staticmethod
+    def load(path):
+        data = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = json.loads(line)
+                data.append(line)
+        return Dataset.from_list(data)
+
+
+@LOAD_DATASET.register_module()
 class cmnliDataset_V2(BaseDataset):
 
     @staticmethod
