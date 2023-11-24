@@ -100,3 +100,4 @@ from .casa import *
 from .facqa import *
 from .id_am2ico import *
 from .bible_en_id import *
+from .tydiqa_id import *
