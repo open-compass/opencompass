@@ -4,14 +4,14 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import RougeEvaluator
 from opencompass.datasets.rolebench import InstructionGeneralizationChineseDataset
 
-instruction_generalization_eng_reader_cfg = dict(
+instruction_generalization_zh_reader_cfg = dict(
     input_columns=['role', 'desc', 'question'],
     output_column='answer',
     train_split='train',
     test_split='test'
 )
 
-instruction_generalization_eng_infer_cfg = dict(
+instruction_generalization_zh_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
@@ -26,16 +26,16 @@ instruction_generalization_eng_infer_cfg = dict(
     inferencer=dict(type=GenInferencer, max_out_len=512)
 )
 
-instruction_generalization_eng_eval_cfg = dict(
+instruction_generalization_zh_eval_cfg = dict(
     evaluator=dict(type=RougeEvaluator), 
     pred_role='BOT'
 )
 
-instruction_generalization_eng_datasets = [
+instruction_generalization_zh_datasets = [
     dict(
         type=InstructionGeneralizationChineseDataset,
         path='ZenMoore/RoleBench',
-        reader_cfg=instruction_generalization_eng_reader_cfg,
-        infer_cfg=instruction_generalization_eng_infer_cfg,
-        eval_cfg=instruction_generalization_eng_eval_cfg)
+        reader_cfg=instruction_generalization_zh_reader_cfg,
+        infer_cfg=instruction_generalization_zh_infer_cfg,
+        eval_cfg=instruction_generalization_zh_eval_cfg)
 ]
