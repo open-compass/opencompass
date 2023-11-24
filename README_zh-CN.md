@@ -32,7 +32,6 @@
 我们诚挚邀请各类大模型接入OpenCompass评测体系，以展示其在各个领域的性能优势。同时，也欢迎广大研究者、开发者向我们提供宝贵的意见和建议，共同推动大模型领域的发展。如有任何问题或需求，请随时[联系我们](mailto:opencompass@pjlab.org.cn)。此外，相关评测内容，性能数据，评测方法也将随榜单发布一并开源。
 
 <p>让我们共同期待OpenCompass 2023年度大模型榜单的发布，期待各大模型在榜单上的精彩表现！</p>
-
 ## 🧭	欢迎
 
 来到**OpenCompass**！
@@ -82,10 +81,9 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 ## 📊 性能榜单
 
-我们将陆续提供开源模型和API模型的具体性能榜单，请见 [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
+我们将陆续提供开源模型和API模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://opencompass.org.cn/rank) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
-
 ## 🛠️ 安装
 
 下面展示了快速安装以及准备数据集的步骤。
@@ -124,7 +122,6 @@ unzip OpenCompassData-core-20231110.zip
 有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html)。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
-
 ## 🏗️ ️评测
 
 确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，可以通过以下命令评测 LLaMA-7b 模型在 MMLU 和 C-Eval 数据集上的性能：
@@ -164,7 +161,6 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
-
 ## 📖 数据集支持
 
 <table align="center">
@@ -426,7 +422,6 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 </table>
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
-
 ## 📖 模型支持
 
 <table align="center">
@@ -481,7 +476,6 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 </table>
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
-
 ## 🔜 路线图
 
 - [ ] 主观评测

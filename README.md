@@ -80,10 +80,9 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 
 ## 📊 Leaderboard
 
-We provide [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
+We provide [OpenCompass Leaderboard](https://opencompass.org.cn/rank) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
-
 ## 🛠️ Installation
 
 Below are the steps for quick installation and datasets preparation.
@@ -122,7 +121,6 @@ unzip OpenCompassData-core-20231110.zip
 Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started/installation.html).
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
-
 ## 🏗️ ️Evaluation
 
 After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared, you can evaluate the performance of the LLaMA-7b model on the MMLU and C-Eval datasets using the following command:
@@ -160,7 +158,6 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html) to learn how to run an evaluation task.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
-
 ## 📖 Dataset Support
 
 <table align="center">
@@ -424,7 +421,6 @@ Through the command line or configuration files, OpenCompass also supports evalu
 ## OpenCompass Ecosystem
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
-
 ## 📖 Model Support
 
 <table align="center">
@@ -479,7 +475,6 @@ Through the command line or configuration files, OpenCompass also supports evalu
 </table>
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
-
 ## 🔜 Roadmap
 
 - [ ] Subjective Evaluation
