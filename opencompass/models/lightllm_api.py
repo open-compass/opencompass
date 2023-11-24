@@ -73,7 +73,10 @@ class LightllmAPI(BaseAPIModel):
                 continue
             try:
                 response = raw_response.json()
-                return response['generated_text']
+                generated_text = response['generated_text']
+                if isinstance(generated_text, list):
+                    generated_text = generated_text[0]
+                return generated_text
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
