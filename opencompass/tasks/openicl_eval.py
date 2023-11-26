@@ -171,6 +171,11 @@ class OpenICLEvalTask(BaseTask):
             preds['references'] = (test_set[self.output_column]
                                    if self.output_column else None)
             preds['test_set'] = test_set
+            if self.eval_cfg.get('analyze_contamination', False):
+                assert self.dataset_cfg['reader_cfg'].get('contamination_column', None) is not None, (
+                    'You must specify contamination_column in reader_cfg'
+                    'if you want to analyze contamination.')
+                preds['is_cleans'] = test_set[self.contamination_column]
             preds = {
                 k: preds[k]
                 for k in signature(icl_evaluator.score).parameters
