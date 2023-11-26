@@ -1,8 +1,8 @@
 from mmengine.config import read_base
 
 with read_base():
-    from ...ceval.ceval_ppl_578f8d import ceval_datasets
-    # from ...agieval.agieval_mixed_2f14ad import agieval_datasets
+    from ...ceval.ceval_gen_2daf24 import ceval_datasets
+    from ...agieval.agieval_gen_64afd3 import agieval_datasets
     # from ...mmlu.mmlu_ppl_ac766d import mmlu_datasets
     # from ...cmmlu.cmmlu_ppl_8b9c76 import cmmlu_datasets
     # from ...GaokaoBench.GaokaoBench_mixed_f2038e import GaokaoBench_datasets
