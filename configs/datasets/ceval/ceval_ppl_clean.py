@@ -2,37 +2,8 @@ from typing import List
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
-from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.openicl.icl_evaluator import AccContaminationEvaluator
 from opencompass.datasets import CEvalDatasetClean as CEvalDataset
-
-class AccContaminationEvaluator(AccEvaluator):
-    """Accuracy evaluator."""
-
-    def score(self, predictions: List, references: List, is_cleans: List) -> dict:
-        # group the predictions and references by their contamination status
-        clean_predictions, clean_references = [], []
-        input_contaminated_predictions, input_contaminated_references = [], []
-        input_and_label_contaminated_predictions, input_and_label_contaminated_references = [], []
-        for pred, ref, is_clean in zip(predictions, references, is_cleans):
-            if is_clean == 'clean':
-                clean_predictions.append(pred)
-                clean_references.append(ref)
-            elif is_clean == 'input contaminated':
-                input_contaminated_predictions.append(pred)
-                input_contaminated_references.append(ref)
-            elif is_clean == 'input-and-label contaminated':
-                input_and_label_contaminated_predictions.append(pred)
-                input_and_label_contaminated_references.append(ref)
-        clean_results = super().score(clean_predictions, clean_references)
-        input_contaminated_results = super().score(input_contaminated_predictions, input_contaminated_references)
-        input_and_label_contaminated_results = super().score(input_and_label_contaminated_predictions, input_and_label_contaminated_references)
-        
-        # rename the keys of the results, add 'clean, 'input contaminated', 'input-and-label contaminated' as prefixes
-        clean_results = {f'{k} - clean': v for k, v in clean_results.items()}
-        input_contaminated_results = {f'{k} - input contaminated': v for k, v in input_contaminated_results.items()}
-        input_and_label_contaminated_results = {f'{k} - input-and-label contaminated': v for k, v in input_and_label_contaminated_results.items()}
-
-        return {**clean_results, **input_contaminated_results, **input_and_label_contaminated_results}
 
 ceval_subject_mapping = {
     "computer_network":
@@ -209,7 +180,6 @@ for _split in ["val"]:
                 reader_cfg=dict(
                     input_columns=["question", "A", "B", "C", "D"],
                     output_column="answer",
-                    contamination_column="is_clean",
                     train_split="dev",
                     test_split=_split),
                 infer_cfg=ceval_infer_cfg,
