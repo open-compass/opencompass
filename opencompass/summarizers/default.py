@@ -147,26 +147,26 @@ class DefaultSummarizer:
                 if all(isinstance(dataset_abbr, (list, tuple)) for dataset_abbr in sg['subsets']):
                     group_metrics = [default_metric]
                     for dataset_abbr, metric in sg['subsets']:
-                        scores.setdefault(default_metric, []).append(parsed_results[model_abbr][dataset_abbr][metric])
+                        scores.setdefault(default_metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 else:
                     group_metrics = list(functools.reduce(lambda a, b: a & b, [set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']]))
                     if len(group_metrics) > 1:
                         for metric in group_metrics:
                             for dataset_abbr in sg['subsets']:
-                                scores.setdefault(metric, []).append(parsed_results[model_abbr][dataset_abbr][metric])
+                                scores.setdefault(metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
                                 eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
                     else:
                         group_metrics = [default_metric]
                         for dataset_abbr in sg['subsets']:
                             metric = dataset_metrics[dataset_abbr][0]
-                            scores.setdefault(default_metric, []).append(parsed_results[model_abbr][dataset_abbr][metric])
+                            scores.setdefault(default_metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
                             eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
 
                 result = {}
                 for metric in scores:
                     if default_metric == 'standard_deviation':
-                        avg = sum(scores[metric]) / len(scores[metric])
+                        avg = sum(scores[metric].values()) / len(scores[metric])
                         variance = sum((k - avg) ** 2 for k in scores[metric]) / len(scores[metric])
                         scores[metric] = result[metric] = math.sqrt(variance)
                     else:
@@ -174,7 +174,7 @@ class DefaultSummarizer:
                             numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'])
                             denominator = sum(sg['weights'].values())
                         else:
-                            numerator = sum(scores[metric])
+                            numerator = sum(scores[metric].values())
                             denominator = len(scores[metric])
                         scores[metric] = result[metric] = numerator / denominator
                     eval_modes = list(set(eval_modes))

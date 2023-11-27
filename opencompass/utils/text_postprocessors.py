@@ -51,19 +51,53 @@ def first_capital_postprocess(text: str) -> str:
 def first_option_postprocess(text: str, options: str) -> str:
     """Find first valid option for text."""
 
+    # yapf: disable
+    # flake8: noqa: W605
     patterns = [
-        f'[Tt]he answer is [{options}]',
-        f'[Tt]he correct answer\s?(?:option)?\s?is [{options}]',  # noqa
-        f'答案(?:选项)?是(.*?)[{options}]',
-        f'答案(?:选项)?为(.*?)[{options}]',
-        f'答案(?:选项)?选(.*?)[{options}]',
-        f'选项[{options}]是?正确',
-        f'选项[{options}]为?正确',
-        f'固选(.*?)[{options}]',
-        f'答案应该是(.*?)[{options}]',
-        f'(\s|^)[{options}][\s。，,\.$]',  # noqa
+        f'答案是?\s?([{options}])',
+        f'答案是?\s?：([{options}])',
+        f'答案是?\s?:([{options}])',
+        f'答案应该?是\s?([{options}])',
+        f'答案应该?选\s?([{options}])',
+        f'答案为\s?([{options}])',
+        f'答案选\s?([{options}])',
+        f'选择?\s?([{options}])',
+        f'只有选?项?\s?([{options}])\s?是?对',
+        f'只有选?项?\s?([{options}])\s?是?错',
+        f'只有选?项?\s?([{options}])\s?不?正确',
+        f'只有选?项?\s?([{options}])\s?错误',
+        f'说法不?对选?项?的?是\s?([{options}])',
+        f'说法不?正确选?项?的?是\s?([{options}])',
+        f'说法错误选?项?的?是\s?([{options}])',
+        f'([{options}])\s?是正确的',
+        f'([{options}])\s?是正确答案',
+        f'选项\s?([{options}])\s?正确',
+        f'所以答\s?([{options}])',
+        f'1.\s?([{options}])[.。$]?$',
+        f'所以\s?([{options}][.。$]?$)',
+        f'所有\s?([{options}][.。$]?$)',
+        f'[\s，：:,]([{options}])[。，,\.]?$',
+        f'[\s，,：:][故即]([{options}])[。\.]?$',
+        f'[\s，,：:]因此([{options}])[。\.]?$',
+        f'[是为。]\s?([{options}])[。\.]?$',
+        f'因此\s?([{options}])[。\.]?$',
+        f'显然\s?([{options}])[。\.]?$',
+        f'1.\s?(.*?)$',
+        f'答案是\s?(\S+)(?:。|$)',
+        f'答案应该是\s?(\S+)(?:。|$)',
+        f'答案为\s?(\S+)(?:。|$)',
+        f'(\s|^)[{options}][\s。，,：:\.$]',
+        f'[Tt]he answer is ([{options}])',
+        f'[Tt]he answer is option ([{options}])',
+        f'[Tt]he correct answer is ([{options}])',
+        f'[Tt]he correct answer is option ([{options}])',
+        f'[Tt]he answer to the question is ([{options}])',
+        f'([{options}]):',
+        f'(^|\s)[{options}](\s|$)',
         f'[{options}]',
     ]
+    # flake8: noqa
+    # yapf: enable
 
     regexes = [re.compile(pattern) for pattern in patterns]
     for regex in regexes:
