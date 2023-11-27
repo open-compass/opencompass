@@ -1,4 +1,5 @@
 import re
+from typing import Callable, Optional
 
 from opencompass.registry import TEXT_POSTPROCESSORS
 
@@ -141,3 +142,27 @@ def first_number_postprocess(text: str) -> float:
 def multiple_select_postprocess(text: str) -> str:
     ret = set([t for t in text if t.isupper()])
     return ''.join(sorted(ret))
+
+
+def general_eval_wrapper_postprocess(text: str,
+                                     post_process: Optional[Callable] = None,
+                                     **kwargs) -> str:
+    """Wrapper for eval text repr. Especially for chatglmpro.
+
+    Args:
+        text(str): Text to be postprocessed.
+        post_process(Callable, optional): Original post processing function.
+            Defaults to None.
+        **kwargs: Other necessary kwargs for post processing function.
+    """
+    try:
+        text = eval(text)
+    except Exception:
+        # in case empty input or other error, skip eval
+        pass
+
+    if post_process:
+        post_process = TEXT_POSTPROCESSORS.get(post_process)
+        return post_process(text, **kwargs)
+    else:
+        return text

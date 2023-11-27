@@ -13,6 +13,17 @@ datasets = [
     *ceval_datasets,
 ]
 
+# needs a special postprocessor for all
+# except 'gsm8k' and 'strategyqa'
+# from opencompass.utils import general_eval_wrapper_postprocess
+# for _dataset in datasets:
+#     if _dataset['abbr'] not in ['gsm8k', 'strategyqa']:
+#         if hasattr(_dataset['eval_cfg'], 'pred_postprocessor'):
+#             _dataset['eval_cfg']['pred_postprocessor']['post_process'] = _dataset['eval_cfg']['pred_postprocessor']['type']
+#             _dataset['eval_cfg']['pred_postprocessor']['type'] = general_eval_wrapper_postprocess
+#         else:
+#             _dataset['eval_cfg']['pred_postprocessor'] = {'type': general_eval_wrapper_postprocess}
+
 models = [
     dict(
         abbr='chatglm_pro',
