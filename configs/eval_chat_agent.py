@@ -1,17 +1,16 @@
 from mmengine.config import read_base
+from opencompass.models.openai_api import OpenAI
 from opencompass.partitioners import SizePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.openicl import AgentInferencer
 
 with read_base():
-    from .summarizers.medium import summarizer
     from .datasets.gsm8k.gsm8k_gen import gsm8k_datasets as datasets
 
 from opencompass.models.lagent import LagentAgent
-from lagent.llms import GPTAPI
-from lagent.agents.react import ReAct, ReActProtocol
-from lagent.actions import PythonInterpreter
+from lagent import PythonInterpreter, ReAct
+from lagent.agents.react import ReActProtocol
 
 FORCE_STOP_PROMPT_EN = """You should directly give results based on history information."""
 
@@ -109,28 +108,30 @@ def solution():
 ```'''
 
 models = [
-    dict(abbr='gpt-3.5-react',
-         type=LagentAgent,
-         agent_type=ReAct,
-         max_turn=3,
-         llm=dict(
-             type=GPTAPI,
-             model_type='gpt-3.5-turbo',
-             key='ENV',
-             query_per_second=1,
-             max_seq_len=4096,
-         ),
-         actions=[
-             dict(type=PythonInterpreter,
-                  description=PYTHON_INTERPRETER_DESCRIPTION),
-         ],
-         protocol=dict(
-             type=ReActProtocol,
-             call_protocol=FEWSHOT_INSTRUCTION,
-             force_stop=FORCE_STOP_PROMPT_EN,
-             finish=dict(role='FINISH', begin='Final Answer:', end='\n'),
-         ),
-         batch_size=8),
+    dict(
+        abbr='gpt-3.5-react',
+        type=LagentAgent,
+        agent_type=ReAct,
+        max_turn=3,
+        llm=dict(
+            type=OpenAI,
+            path='gpt-3.5-turbo',
+            key='ENV',
+            query_per_second=1,
+            max_seq_len=4096,
+        ),
+        actions=[
+            dict(type=PythonInterpreter,
+                 description=PYTHON_INTERPRETER_DESCRIPTION),
+        ],
+        protocol=dict(
+            type=ReActProtocol,
+            call_protocol=FEWSHOT_INSTRUCTION,
+            force_stop=FORCE_STOP_PROMPT_EN,
+            finish=dict(role='FINISH', begin='Final Answer:', end='\n'),
+        ),
+        batch_size=1,
+    ),
 ]
 
 for dataset in datasets:

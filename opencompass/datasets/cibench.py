@@ -43,7 +43,10 @@ def load_experiment(file: str) -> dict:
                     outputs.append(None)
     return dict(
         experiment=file,
-        questions=questions,
+        questions=sum(([
+            dict(role='user', content=question),
+            dict(role='assistant', content=output)
+        ] for question, output in zip(questions, outputs)), []),
         references=dict(outputs=outputs, tags=tags, experiment=file),
     )
 

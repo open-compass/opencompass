@@ -1,9 +1,7 @@
+from copy import deepcopy
 from typing import List, Tuple
 
 from mmengine.registry import Registry
-
-from opencompass.lagent.agents.react import ReAct
-from opencompass.utils import get_logger
 
 REGISTRY = Registry('helper')
 
@@ -13,45 +11,55 @@ class LagentAgent:
 
     https://github.com/InternLM/lagent.
     """
+    is_api = True
 
-    def __init__(self,
-                 agent_type,
-                 llm,
-                 actions=None,
-                 protocol=None,
-                 mutli_rounds=False,
-                 **kwargs):
+    def __init__(self, agent_type, llm, actions=None, protocol=None, **kwargs):
         llm = REGISTRY.build(llm)
         agent_cfg = {'type': agent_type, 'llm': llm, **kwargs}
 
         if actions is not None:
             from lagent.actions import ActionExecutor
-
-            executor = ActionExecutor(
-                [REGISTRY.build(action) for action in actions])
+            executor = ActionExecutor([])
+            for action in actions:
+                action = REGISTRY.build(action)
+                if 'agentlego' in type(action).__module__:
+                    action = action.to_lagent()
+                executor.add_action(action)
             agent_cfg['action_executor'] = executor
         if protocol is not None:
             protocol = REGISTRY.build(protocol)
             agent_cfg['protocol'] = protocol
 
-        self.agent = REGISTRY.build(agent_cfg)
-        self.mutli_rounds = mutli_rounds
+        from lagent import BaseAgent
+        self.agent: BaseAgent = REGISTRY.build(agent_cfg)
 
-    def add_example(self, example):
-        # format example in protocol if needed
-        call_protocol = self.agent._protocol.call_protocol
-        if '{example}' in call_protocol:
-            self.agent._protocol.call_protocol = call_protocol.format(
-                example=example)
-        else:
-            get_logger().warning('Protocal template does not have example'
-                                 ' placeholder, please check your template.')
+    def reset(self):
+        self.agent._session_history = []
+        for action in self.agent._action_executor.actions:
+            if hasattr(action, 'reset'):
+                action.reset()
 
-    def one_round_chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
-        """One round chat with agent."""
+    def set_history(self, history):
+        self.agent._session_history = deepcopy(history)
+
+    @property
+    def template_parser(self):
+        return self.agent._llm.template_parser
+
+    @template_parser.setter
+    def template_parser(self, value):
+        self.agent._llm.template_parser = value
+
+    def chat(self,
+             user_input: str,
+             history: List[dict] = None) -> Tuple[str, List[dict]]:
+        """Chat with agent."""
+        if history:
+            self.agent._session_history = history
+
         from lagent.schema import ActionReturn, AgentReturn
-
         generation: AgentReturn = self.agent.chat(user_input)
+
         answer = generation.response
         steps = []
 
@@ -67,19 +75,7 @@ class LagentAgent:
                     errmsg=step.errmsg,
                     valid=int(step.valid),
                 ))
-        return answer, steps
 
-    def chat(self, user_input, ice=None) -> Tuple[str, List[dict]]:
-        """Chat with agent."""
-        if self.mutli_rounds:
-            steps = []
-            for single_input in user_input:
-                answer, one_round_steps = self.one_round_chat(single_input)
-                steps.append(one_round_steps)
-        else:
-            answer, steps = self.one_round_chat(user_input)
-
-        self.agent.reset()  # clear agent history
         return answer, steps
 
 
@@ -88,25 +84,25 @@ FORCE_STOP_PROMPT_EN = (
 )
 
 FEWSHOT_INSTRUCTION = """\
-You are an assistant who can utilize external tools.
-{{tool_description}}
-To use a tool, please use the following format:
+You are a assistant who can utilize external tools.
+{tool_description}
+To use a tool, please response with the following format:
 ```
-{{thought}} Think what you need to solve, do you need to use tools?
-{{action}} the tool name, should be one of [{{action_names}}]
-{{action_input}} the input to the action
+{thought} Think what you need to solve, do you need to use tools?
+{action} The tool name, should be one of [{action_names}].
+{action_input} The input to the tool that you want to use.
 ```
-I will give you response after utilizing tools should using the following format:
+The tool will give you response after your response using the following format:
 ```
-{{response}} the results after call the tool.
-``
-If you already know the answer, or you do not need to use tools,
-please using the following format to reply:
+{response} the results after call the tool.
 ```
-{{thought}} the thought process to get the final answer
-{{finish}} final answer
-```
-{example}
+Therefore DO NOT generate tool response by yourself.
+
+Also please follow the guidelines:
+1. Always use code interpreter to solve the problem.
+2. The generated codes should always in a markdown code block format.
+3. The generated codes will be executed in an ipython manner and the results will be cached.
+4. Your responded code should always be simple and only solves the problem in current step.
 
 Begin!
 """  # noqa
@@ -127,16 +123,13 @@ def solution():
 ```"""  # noqa
 
 
-class CodeAgent:
+class CodeAgent(LagentAgent):
     """Code Agent wrapper for Lagent."""
 
-    def __new__(self, llm, **kwargs):
+    def __init__(self, llm, **kwargs):
+        from lagent import PythonInterpreter, ReAct
         from lagent.agents.react import ReActProtocol
 
-        from opencompass.lagent.actions.python_interpreter import \
-            PythonInterpreter
-
-        mutli_rounds = kwargs.pop('mutli_rounds', False)
         agent_type = kwargs.pop('agent_type', ReAct)
         max_turn = kwargs.pop('max_turn', 3)
         actions = kwargs.pop(
@@ -155,10 +148,9 @@ class CodeAgent:
                 finish=dict(role='FINISH', begin='Final Answer:', end='\n'),
             ),
         )
-        return LagentAgent(agent_type=agent_type,
-                           llm=llm,
-                           max_turn=max_turn,
-                           actions=actions,
-                           protocol=protocol,
-                           mutli_rounds=mutli_rounds,
-                           **kwargs)
+        super().__init__(agent_type=agent_type,
+                         llm=llm,
+                         actions=actions,
+                         protocol=protocol,
+                         max_turn=max_turn,
+                         **kwargs)
