@@ -127,7 +127,9 @@ class MBPPEvaluator(BaseEvaluator):
         predictions = [self._process_answer(pred) for pred in predictions]
 
         result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
-        for test_case, pred in zip(references, predictions):
+        details = {}
+        for index, (test_case, pred) in enumerate(zip(references,
+                                                      predictions)):
             programs = self._process_test(test_case, pred)
             try:
                 # Add exec globals to prevent the exec to raise
@@ -136,15 +138,18 @@ class MBPPEvaluator(BaseEvaluator):
                 with swallow_io():
                     with time_limit(2):
                         exec(programs, exec_globals)
-                result['pass'] += 1
+                r = 'pass'
             except TimeOutException:
-                result['timeout'] += 1
+                r = 'timeout'
             except AssertionError:
-                result['wrong_answer'] += 1
+                r = 'wrong_answer'
             except BaseException:
-                result['failed'] += 1
+                r = 'failed'
+            result[r] += 1
+            details[str(index)] = {'programs': programs, 'result': r}
 
         result['score'] = result['pass'] / len(predictions) * 100
+        result['details'] = details
         return result
 
     def _process_answer(self, text):

@@ -37,7 +37,7 @@ ds1000_datasets = [
     dict(
         abbr=f"ds1000_{lib}",
         type=DS1000Dataset,
-        path="ds1000_data/",
+        path="./data/ds1000_data/",
         libs=f"{lib}",
         reader_cfg=ds1000_reader_cfg,
         infer_cfg=ds1000_infer_cfg,
@@ -55,7 +55,7 @@ ds1000_datasets.append(
     dict(
         abbr="ds1000_Matplotlib",
         type=DS1000Dataset,
-        path="ds1000_data/",
+        path="./data/ds1000_data/",
         libs="Matplotlib",
         reader_cfg=ds1000_reader_cfg,
         infer_cfg=ds1000_infer_cfg,

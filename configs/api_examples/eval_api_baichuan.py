@@ -1,30 +1,25 @@
 from mmengine.config import read_base
-from opencompass.models import PanGu
-
+from opencompass.models import BaiChuan
 from opencompass.partitioners import NaivePartitioner
 from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    from .summarizers.medium import summarizer
-    from .datasets.ceval.ceval_gen import ceval_datasets
+    from ..summarizers.medium import summarizer
+    from ..datasets.ceval.ceval_gen import ceval_datasets
 
 datasets = [
     *ceval_datasets,
 ]
 
 models = [
-dict(
-        abbr='pangu',
-        type=PanGu,
-        path='pangu',
-        access_key="xxxxxx",
-        secret_key="xxxxxx",
-        url = "xxxxxx",
-        # url of token sever, used for generate token, like "https://xxxxxx.myhuaweicloud.com/v3/auth/tokens",
-        token_url = "xxxxxx",
-        # scope-project-name, used for generate token
-        project_name = "xxxxxx",
+    dict(
+        abbr='Baichuan2-53B',
+        type=BaiChuan,
+        path='Baichuan2-53B',
+        api_key='xxxxxx',
+        secret_key="xxxxx",
+        url="xxxxx",
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
@@ -40,4 +35,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_pangu/"
+work_dir = "outputs/api_baichuan53b/"

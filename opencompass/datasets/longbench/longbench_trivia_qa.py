@@ -1,6 +1,6 @@
 from datasets import Dataset, load_dataset
 
-from opencompass.registry import LOAD_DATASET
+from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from ..base import BaseDataset
 
@@ -24,3 +24,9 @@ class LongBenchtriviaqaDataset(BaseDataset):
             })
         dataset[split] = Dataset.from_list(raw_data)
         return dataset
+
+
+@TEXT_POSTPROCESSORS.register_module()
+def triviaqa_postprocess(text: str) -> str:
+    text = text.lstrip('\n').split('\n')[0]
+    return text

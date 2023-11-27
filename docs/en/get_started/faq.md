@@ -10,6 +10,16 @@ During evaluation, OpenCompass deploys multiple workers to execute tasks in para
 
 For instance, if you're using OpenCompass on a local machine equipped with 8 GPUs, and each task demands 4 GPUs, then by default, OpenCompass will employ all 8 GPUs to concurrently run 2 tasks. However, if you adjust the `--max-num-workers` setting to 1, then only one task will be processed at a time, utilizing just 4 GPUs.
 
+### Why doesn't the GPU behavior of HuggingFace models align with my expectations?
+
+This is a complex issue that needs to be explained from both the supply and demand sides:
+
+The supply side refers to how many tasks are being run. A task is a combination of a model and a dataset, and it primarily depends on how many models and datasets need to be tested. Additionally, since OpenCompass splits a larger task into multiple smaller tasks, the number of data entries per sub-task (`--max-partition-size`) also affects the number of tasks. (The `--max-partition-size` is proportional to the actual number of data entries, but the relationship is not 1:1).
+
+The demand side refers to how many workers are running. Since OpenCompass instantiates multiple models for inference simultaneously, we use `--num-gpus` to specify how many GPUs each instance uses. Note that `--num-gpus` is a parameter specific to HuggingFace models and setting this parameter for non-HuggingFace models will not have any effect. We also use `--max-num-workers` to indicate the maximum number of instances running at the same time. Lastly, due to issues like GPU memory and insufficient load, OpenCompass also supports running multiple instances on the same GPU, which is managed by the parameter `--max-num-workers-per-gpu`. Therefore, it can be generally assumed that we will use a total of `--num-gpus` * `--max-num-workers` / `--max-num-workers-per-gpu` GPUs.
+
+In summary, when tasks run slowly or the GPU load is low, we first need to check if the supply is sufficient. If not, consider reducing `--max-partition-size` to split the tasks into finer parts. Next, we need to check if the demand is sufficient. If not, consider increasing `--max-num-workers` and `--max-num-workers-per-gpu`. Generally, **we set `--num-gpus` to the minimum value that meets the demand and do not adjust it further.**
+
 ### How do I control the number of GPUs that OpenCompass occupies?
 
 Currently, there isn't a direct method to specify the number of GPUs OpenCompass can utilize. However, the following are some indirect strategies:
@@ -19,6 +29,22 @@ You can limit OpenCompass's GPU access by setting the `CUDA_VISIBLE_DEVICES` env
 
 **If using Slurm or DLC:**
 Although OpenCompass doesn't have direct access to the resource pool, you can adjust the `--max-num-workers` parameter to restrict the number of evaluation tasks being submitted simultaneously. This will indirectly manage the number of GPUs that OpenCompass employs. For instance, if each task requires 4 GPUs, and you wish to allocate a total of 8 GPUs, then you should set `--max-num-workers` to 2.
+
+### `libGL.so.1` not foune
+
+opencv-python depends on some dynamic libraries that are not present in the environment. The simplest solution is to uninstall opencv-python and then install opencv-python-headless.
+
+```bash
+pip uninstall opencv-python
+pip install opencv-python-headless
+```
+
+Alternatively, you can install the corresponding dependency libraries according to the error message
+
+```bash
+sudo apt-get update
+sudo apt-get install -y libgl1 libglib2.0-0
+```
 
 ## Network
 

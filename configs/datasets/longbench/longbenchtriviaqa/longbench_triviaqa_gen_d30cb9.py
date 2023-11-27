@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import LongBenchF1Evaluator, LongBenchtriviaqaDataset
+from opencompass.datasets import LongBenchF1Evaluator, LongBenchtriviaqaDataset, triviaqa_postprocess
 
 LongBench_triviaqa_reader_cfg = dict(
     input_columns=['context', 'input'],
@@ -23,7 +23,8 @@ LongBench_triviaqa_infer_cfg = dict(
 
 LongBench_triviaqa_eval_cfg = dict(
     evaluator=dict(type=LongBenchF1Evaluator),
-    pred_role='BOT'
+    pred_role='BOT',
+    pred_postprocessor=dict(type=triviaqa_postprocess),
 )
 
 LongBench_triviaqa_datasets = [

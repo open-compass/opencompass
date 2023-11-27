@@ -160,7 +160,6 @@ class AI360GPT(BaseAPIModel):
                     or raw_response.status_code == 429
                     or raw_response.status_code == 500):
                 print(raw_response.text)
-                # return ''
                 continue
             print(raw_response)
             max_num_retries += 1

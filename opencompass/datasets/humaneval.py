@@ -93,6 +93,7 @@ def humaneval_postprocess(text: str) -> str:
         if def_idx != -1:
             text = text[max(text.find('\n', def_idx) + 1, 0):]
     text = text.split('\n\n')[0]
+    text = text.lstrip('\n')
     if text.strip().startswith('def'):
         text = '\n'.join(text.split('\n')[1:])
     if not text.startswith('    '):

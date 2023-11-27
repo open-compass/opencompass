@@ -135,13 +135,11 @@ class OpenICLEvalTask(BaseTask):
                         'The prediction for Self-Consistency'
                         'must be list.')
                 if pred_list_flag:
-                    for pred in pred_strs:
-                        pred_strs.append([
-                            self._extract_role_pred(_pred,
-                                                    role.get('begin', None),
-                                                    role.get('end', None))
-                            for _pred in pred
-                        ])
+                    pred_strs = [[
+                        self._extract_role_pred(_pred, role.get('begin', None),
+                                                role.get('end', None))
+                        for _pred in pred
+                    ] for pred in pred_strs]
                 else:
                     pred_strs = [
                         self._extract_role_pred(pred, role.get('begin', None),
@@ -172,6 +170,7 @@ class OpenICLEvalTask(BaseTask):
             preds['predictions'] = pred_strs
             preds['references'] = (test_set[self.output_column]
                                    if self.output_column else None)
+            preds['test_set'] = test_set
             preds = {
                 k: preds[k]
                 for k in signature(icl_evaluator.score).parameters

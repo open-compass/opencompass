@@ -18,6 +18,7 @@ class CMBDataset(BaseDataset):
         for d in val_data:
             d['option_str'] = '\n'.join(
                 [f'{k}. {v}' for k, v in d['option'].items() if len(v) > 1])
+            d['answer'] = 'NULL'
         val_dataset = Dataset.from_list(val_data)
 
         with open(osp.join(path, 'test.json'), 'r', encoding='utf-8') as f:
@@ -25,7 +26,6 @@ class CMBDataset(BaseDataset):
         for d in test_data:
             d['option_str'] = '\n'.join(
                 [f'{k}. {v}' for k, v in d['option'].items() if len(v) > 1])
-            d['answer'] = 'NULL'
         test_dataset = Dataset.from_list(test_data)
 
         return DatasetDict({'val': val_dataset, 'test': test_dataset})

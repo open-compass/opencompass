@@ -21,6 +21,18 @@
     👋 加入我们的 <a href="https://discord.gg/KKwfEbFj7U" target="_blank">Discord</a> 和 <a href="https://r.vansin.top/?r=opencompass" target="_blank">微信社区</a>
 </p>
 
+## 📣 2023 年度榜单计划
+
+我们有幸与社区共同见证了通用人工智能在过去一年里的巨大进展，也非常高兴OpenCompass能够帮助广大大模型开发者和使用者。
+
+我们宣布将启动**OpenCompass 2023年度大模型榜单**发布计划。我们预计将于2024年1月发布大模型年度榜单，系统性评估大模型在语言、知识、推理、创作、长文本和智能体等多个能力维度的表现。
+
+届时，我们将发布开源模型和商业API模型能力榜单，以期为业界提供一份**全面、客观、中立**的参考。
+
+我们诚挚邀请各类大模型接入OpenCompass评测体系，以展示其在各个领域的性能优势。同时，也欢迎广大研究者、开发者向我们提供宝贵的意见和建议，共同推动大模型领域的发展。如有任何问题或需求，请随时[联系我们](mailto:opencompass@pjlab.org.cn)。此外，相关评测内容，性能数据，评测方法也将随榜单发布一并开源。
+
+<p>让我们共同期待OpenCompass 2023年度大模型榜单的发布，期待各大模型在榜单上的精彩表现！</p>
+
 ## 🧭	欢迎
 
 来到**OpenCompass**！
@@ -38,15 +50,15 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2023.11.22\]** 我们已经支持了多个于API的模型，包括**百度、字节跳动、华为、360**。欢迎查阅[模型](https://opencompass.readthedocs.io/en/latest/user_guides/models.html)部分以获取更多详细信息。🔥🔥🔥。
+- **\[2023.11.20\]** 感谢[helloyongyang](https://github.com/helloyongyang)支持使用[LightLLM](https://github.com/ModelTC/lightllm)作为后端进行评估。欢迎查阅[使用LightLLM进行评估](https://opencompass.readthedocs.io/en/latest/advanced_guides/evaluation_lightllm.html)以获取更多详细信息。🔥🔥🔥。
 - **\[2023.11.13\]** 我们很高兴地宣布发布 OpenCompass v0.1.8 版本。此版本支持本地加载评估基准，从而无需连接互联网。请注意，随着此更新的发布，**您需要重新下载所有评估数据集**，以确保结果准确且最新。🔥🔥🔥。
 - **\[2023.11.06\]** 我们已经支持了多个基于 API 的模型，包括ChatGLM Pro@智谱清言、ABAB-Chat@MiniMax 和讯飞。欢迎查看 [模型](https://opencompass.readthedocs.io/en/latest/user_guides/models.html) 部分以获取更多详细信息。🔥🔥🔥。
-- **\[2023.10.24\]** 我们发布了一个全新的评测集，BotChat，用于评估大语言模型的多轮对话能力，欢迎查看 [BotChat](https://github.com/open-compass/BotChat) 获取更多信息. 🔥🔥🔥.
-- **\[2023.09.26\]** 我们在评测榜单上更新了[Qwen](https://github.com/QwenLM/Qwen), 这是目前表现最好的开源模型之一, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
+- **\[2023.10.24\]** 我们发布了一个全新的评测集，BotChat，用于评估大语言模型的多轮对话能力，欢迎查看 [BotChat](https://github.com/open-compass/BotChat) 获取更多信息.
+- **\[2023.09.26\]** 我们在评测榜单上更新了[Qwen](https://github.com/QwenLM/Qwen), 这是目前表现最好的开源模型之一, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
 - **\[2023.09.20\]** 我们在评测榜单上更新了[InternLM-20B](https://github.com/InternLM/InternLM), 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
 - **\[2023.09.19\]** 我们在评测榜单上更新了WeMix-LLaMA2-70B/Phi-1.5-1.3B, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
 - **\[2023.09.18\]** 我们发布了[长文本评测指引](docs/zh_cn/advanced_guides/longeval.md).
-- **\[2023.09.08\]** 我们在评测榜单上更新了Baichuan-2/Tigerbot-2/Vicuna-v1.5, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情。
-- **\[2023.09.06\]** 欢迎 [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。
 
 > [更多](docs/zh_cn/notes/news.md)
 
@@ -70,7 +82,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 ## 📊 性能榜单
 
-我们将陆续提供开源模型和API模型的具体性能榜单，请见 [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
+我们将陆续提供开源模型和API模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://opencompass.org.cn/rank) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
@@ -78,12 +90,32 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 下面展示了快速安装以及准备数据集的步骤。
 
-```Python
+### 💻 环境配置
+
+#### 面向开源模型的GPU环境
+
+```bash
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
 conda activate opencompass
 git clone https://github.com/open-compass/opencompass opencompass
 cd opencompass
 pip install -e .
+```
+
+#### 面向API模型测试的CPU环境
+
+```bash
+conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
+conda activate opencompass
+git clone https://github.com/open-compass/opencompass opencompass
+cd opencompass
+pip install -e .
+# 如果需要使用各个API模型，请 `pip install -r requirements/api.txt` 安装API模型的相关依赖
+```
+
+### 📂 数据准备
+
+```bash
 # 下载数据集到 data/ 处
 wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
 unzip OpenCompassData-core-20231110.zip
@@ -413,16 +445,17 @@ python run.py --datasets ceval_ppl mmlu_ppl \
     <tr valign="top">
       <td>
 
-- InternLM
-- LLaMA
-- Vicuna
-- Alpaca
-- Baichuan
-- WizardLM
-- ChatGLM2
-- Falcon
-- TigerBot
-- Qwen
+- [InternLM](https://github.com/InternLM/InternLM)
+- [LLaMA](https://github.com/facebookresearch/llama)
+- [Vicuna](https://github.com/lm-sys/FastChat)
+- [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
+- [Baichuan](https://github.com/baichuan-inc)
+- [WizardLM](https://github.com/nlpxucan/WizardLM)
+- [ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)
+- [ChatGLM3](https://github.com/THUDM/ChatGLM3-6B)
+- [TigerBot](https://github.com/TigerResearch/TigerBot)
+- [Qwen](https://github.com/QwenLM/Qwen)
+- [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
 - ……
 
 </td>
@@ -430,7 +463,15 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 
 - OpenAI
 - Claude
-- PaLM (即将推出)
+- ZhipuAI(ChatGLM)
+- Baichuan
+- ByteDance(YunQue)
+- Huawei(PanGu)
+- 360
+- Baidu(ERNIEBot)
+- MiniMax(ABAB-Chat)
+- SenseTime(nova)
+- Xunfei(Spark)
 - ……
 
 </td>
@@ -446,17 +487,17 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 - [ ] 主观评测
   - [ ] 发布主观评测榜单
   - [ ] 发布主观评测数据集
-- [ ] 长文本
+- [x] 长文本
   - [ ] 支持广泛的长文本评测集
   - [ ] 发布长文本评测榜单
 - [ ] 代码能力
   - [ ] 发布代码能力评测榜单
-  - [ ] 提供非Python语言的评测服务
+  - [x] 提供非Python语言的评测服务
 - [ ] 智能体
   - [ ] 支持丰富的智能体方案
   - [ ] 提供智能体评测榜单
-- [ ] 鲁棒性
-  - [ ] 支持各类攻击方法
+- [x] 鲁棒性
+  - [x] 支持各类攻击方法
 
 ## 👷‍♂️ 贡献
 

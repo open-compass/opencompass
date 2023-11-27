@@ -127,9 +127,14 @@ class SenseTime(BaseAPIModel):
                 return msg
 
             if (raw_response.status_code != 200):
-                print(raw_response.text)
-                time.sleep(1)
-                continue
+                if response['error']['code'] == 18:
+                    # security issue
+                    return 'error:unsafe'
+                else:
+                    print(raw_response.text)
+                    time.sleep(1)
+                    continue
+
             print(response)
             max_num_retries += 1
 

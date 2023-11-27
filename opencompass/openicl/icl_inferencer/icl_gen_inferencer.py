@@ -108,9 +108,13 @@ class GenInferencer(BaseInferencer):
                                          'tmp_' + output_json_filename)
         if osp.exists(tmp_json_filepath):
             # TODO: move resume to output handler
-            tmp_result_dict = mmengine.load(tmp_json_filepath)
-            output_handler.results_dict = tmp_result_dict
-            index = len(tmp_result_dict)
+            try:
+                tmp_result_dict = mmengine.load(tmp_json_filepath)
+            except Exception:
+                pass
+            else:
+                output_handler.results_dict = tmp_result_dict
+                index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         dataloader = self.get_dataloader(prompt_list[index:], self.batch_size)
