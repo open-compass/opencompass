@@ -146,6 +146,11 @@ class HuggingFace(BaseModel):
             self.tokenizer.bos_token = '<s>'
             self.tokenizer.eos_token = '</s>'
             self.tokenizer.pad_token_id = 0
+        if "RWKV/rwkv" in path or \
+            (tokenizer_path and
+                 'RWKV/rwkv' in tokenizer_path):
+            self.logger.warning('We set new pad_token_id for RWKV model')
+            self.tokenizer.pad_token_id = 0
 
     def _set_model_kwargs_torch_dtype(self, model_kwargs):
         if 'torch_dtype' not in model_kwargs:
@@ -407,7 +412,7 @@ class HuggingFace(BaseModel):
         shift_labels = inputs['tokens']['input_ids'][..., 1:].contiguous()
 
         loss_fct = torch.nn.CrossEntropyLoss(
-            reduction='none', ignore_index=self.tokenizer.pad_token_id)
+            reduction='none', ignore_index=self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else 0)
         loss = loss_fct(shift_logits.view(-1, shift_logits.size(-1)),
                         shift_labels.view(-1)).view(shift_labels.size())
 
@@ -419,7 +424,7 @@ class HuggingFace(BaseModel):
             loss = loss * mask
 
         lens = (inputs['tokens']['input_ids'] !=
-                self.tokenizer.pad_token_id).sum(-1).cpu().numpy()
+                (self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else 0)).sum(-1).cpu().numpy()
         if mask_length is not None:
             lens -= np.array(mask_length)
         ce_loss = loss.sum(-1).cpu().detach().numpy() / lens
