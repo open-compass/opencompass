@@ -6,9 +6,7 @@ from opencompass.datasets import hellaswagDataset
 
 hellaswag_reader_cfg = dict(
     input_columns=['ctx', 'A', 'B', 'C', 'D'],
-    output_column='label',
-    train_split='validation',
-    test_split='validation')
+    output_column='label')
 
 hellaswag_infer_cfg = dict(
     prompt_template=dict(
