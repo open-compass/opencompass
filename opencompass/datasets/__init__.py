@@ -22,8 +22,10 @@ from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
+from .commonsenseqa_cn import *  # noqa: F401, F403
 from .copa import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
+from .crowspairs_cn import *  # noqa: F401, F403
 from .csl import *  # noqa: F401, F403
 from .cvalues import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
@@ -57,6 +59,7 @@ from .mmlu import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403
+from .natural_question_cn import *  # noqa: F401, F403
 from .obqa import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
