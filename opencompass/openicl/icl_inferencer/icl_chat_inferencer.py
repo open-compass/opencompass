@@ -76,7 +76,7 @@ class LMTemplateParser:
         else:
             # in case the model does not have any meta template
             last_sep = ''
-            for item in dialog:
+            for item in chat:
                 prompt += last_sep + (item.get('content') or '')
                 last_sep = '\n'
         return prompt
