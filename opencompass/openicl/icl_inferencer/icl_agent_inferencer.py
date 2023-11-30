@@ -1,124 +1,16 @@
 """Agent Inferencer."""
-import os
 import os.path as osp
-from typing import List, Optional
+import types
+from typing import List
 
-import mmengine
-from mmengine.registry import Registry
-from tqdm import tqdm
-
+from opencompass.models.lagent import LagentAgent
 from opencompass.registry import ICL_INFERENCERS
 
-from ..icl_prompt_template import PromptTemplate
-from ..icl_retriever import BaseRetriever
 from ..utils.logging import get_logger
-from .icl_base_inferencer import BaseInferencer, dump_results_dict
+from .icl_base_inferencer import dump_results_dict
+from .icl_chat_inferencer import ChatInferencer
 
 logger = get_logger(__name__)
-REGISTRY = Registry('helper')
-
-
-@ICL_INFERENCERS.register_module()
-class AgentInferencer(BaseInferencer):
-
-    def __init__(
-            self,
-            model,
-            output_json_filepath: Optional[str] = './icl_inference_output',
-            output_json_filename: Optional[str] = 'predictions',
-            save_every: Optional[int] = 1,
-            example: Optional[str] = None,
-            **kwargs) -> None:
-        super().__init__(
-            model=model,
-            output_json_filename=output_json_filename,
-            output_json_filepath=output_json_filepath,
-            **kwargs,
-        )
-        self.save_every = save_every
-        # example in agent usage for protocol illustration
-        self.example = example
-        if example:
-            self.agent.add_example(example)
-
-    @property
-    def agent(self):
-        return self.model
-
-    def inference(self,
-                  retriever: BaseRetriever,
-                  ice_template: Optional[PromptTemplate] = None,
-                  prompt_template: Optional[PromptTemplate] = None,
-                  output_json_filepath: Optional[str] = None,
-                  output_json_filename: Optional[str] = None) -> List:
-        # 1. Preparation for output logs
-        output_handler = AgentInferencerOutputHandler()
-
-        if output_json_filepath is None:
-            output_json_filepath = self.output_json_filepath
-        if output_json_filename is None:
-            output_json_filename = self.output_json_filename
-
-        # 2. Get results of retrieval process
-        ice_idx_list = retriever.retrieve()
-
-        # Create tmp json file for saving intermediate results and future
-        # resuming
-        start = 0
-        tmp_json_filepath = os.path.join(output_json_filepath,
-                                         'tmp_' + output_json_filename)
-        if osp.exists(tmp_json_filepath):
-            # TODO: move resume to output handler
-            tmp_result_dict = mmengine.load(tmp_json_filepath)
-            output_handler.results_dict = tmp_result_dict
-            start = len(tmp_result_dict)
-
-        # 3. Inference sample by sample
-        logger.info('Starting inference process...')
-        for idx, ice_indices in tqdm(enumerate(ice_idx_list[start:], start),
-                                     disable=not self.is_main_process):
-            # TODO: This will break the Prompt template
-            # get user input directly without formatting prompt
-            #
-            # user_input = retriever.generate_prompt_for_generate_task(
-            #     idx, ice='', prompt_template=prompt_template)
-            user_input = retriever.dataset_reader.dataset['test'][
-                retriever.dataset_reader.input_columns[0]][idx]
-            gold = retriever.dataset_reader.dataset['test'][
-                retriever.dataset_reader.output_column][idx]
-
-            if len(ice_indices) > 0:
-                assert ice_template is not None
-                ice = [
-                    ice_template.generate_ice_item(ice_idx)
-                    for ice_idx in ice_indices
-                ]
-            else:
-                ice = None
-
-            answer, steps = self.agent.chat(user_input=user_input, ice=ice)
-
-            # Save current output
-            output_handler.save_results(user_input, answer, steps, idx, gold)
-
-            # Save intermediate results
-            if (self.save_every is not None and start % self.save_every == 0
-                    and self.is_main_process):
-                output_handler.write_to_json(output_json_filepath,
-                                             'tmp_' + output_json_filename)
-
-        # 4. Output
-        if self.is_main_process:
-            os.makedirs(output_json_filepath, exist_ok=True)
-            output_handler.write_to_json(output_json_filepath,
-                                         output_json_filename)
-            if osp.exists(tmp_json_filepath):
-                os.remove(tmp_json_filepath)
-
-        return [
-            sample['prediction']
-            for sample in output_handler.results_dict.values()
-        ]
 
 
 class AgentInferencerOutputHandler:
@@ -130,10 +22,115 @@ class AgentInferencerOutputHandler:
         """Dump the result to a json file."""
         dump_results_dict(self.results_dict, osp.join(save_dir, filename))
 
-    def save_results(self, user_input, answer, steps, idx, gold):
-        self.results_dict[str(idx)] = {
-            'origin_prompt': user_input,
-            'prediction': answer,
+    def save_results(self,
+                     origin_prompt: list,
+                     prediction: str,
+                     steps: list,
+                     idx: int,
+                     gold: str = None):
+        result_dict = {}
+        if gold:
+            result_dict['gold'] = gold
+        result_dict.update({
+            'prediction': prediction,
+            'origin_prompt': origin_prompt,
             'steps': steps,
-            'gold': gold,
-        }
+        })
+        self.results_dict[str(idx)] = result_dict
+
+    def save_multiround_results(self,
+                                origin_prompt: list,
+                                prediction: str,
+                                steps: list,
+                                idx: int,
+                                gold: str = None):
+        result_dict = self.results_dict.get(str(idx), {
+            'gold': [],
+            'prediction': [],
+            'origin_prompt': [],
+            'steps': [],
+        })
+        result_dict['gold'].append(gold)
+        result_dict['prediction'].append(prediction)
+        result_dict['origin_prompt'].append(origin_prompt)
+        result_dict['steps'].append(steps)
+        self.results_dict[str(idx)] = result_dict
+
+
+def model_adapter(model):
+    """Modify the generate method to accept and return single item."""
+    if getattr(model, '_generate_is_wrapped', False):
+        # Avoid wrap twice.
+        return model
+
+    origin_generate = model.generate
+
+    def generate(self, inputs, *args, **kwargs):
+        return origin_generate([inputs], *args, **kwargs)[0]
+
+    model.generate = types.MethodType(generate, model)
+    setattr(model, '_generate_is_wrapped', True)
+    return model
+
+
+@ICL_INFERENCERS.register_module()
+class AgentInferencer(ChatInferencer):
+    HandlerType = AgentInferencerOutputHandler
+
+    def __init__(self, model, **kwargs) -> None:
+        model.agent._llm = model_adapter(model.agent._llm)
+        super().__init__(model, **kwargs)
+        self.model: LagentAgent
+
+    def infer_last(self, chat: List[dict], index: int, output_handler):
+        assistant_indices = [
+            i for i, item in enumerate(chat) if item['role'] == 'assistant'
+        ]
+
+        user_idx = assistant_indices[-1] - 1
+        self.model.set_history(chat[:user_idx])
+        answer, steps = self.model.chat(chat[user_idx]['content'])
+        output_handler.save_results(
+            origin_prompt=chat[user_idx]['content'],
+            prediction=answer,
+            steps=steps,
+            idx=index,
+            gold=chat[assistant_indices[-1]]['content'],
+        )
+        self.model.reset()
+
+    def infer_every(self, chat: List[dict], index: int, output_handler):
+        assistant_indices = [
+            i for i, item in enumerate(chat) if item['role'] == 'assistant'
+        ]
+
+        self.model.set_history(chat[:assistant_indices[0] - 1])
+
+        for i in assistant_indices:
+            answer, steps = self.model.chat(chat[i - 1]['content'])
+            output_handler.save_multiround_results(
+                origin_prompt=chat[i - 1]['content'],
+                prediction=answer,
+                steps=steps,
+                idx=index,
+                gold=chat[i]['content'],
+            )
+        self.model.reset()
+
+    def infer_every_with_gt(self, chat: List[dict], index: int,
+                            output_handler):
+        assistant_indices = [
+            i for i, item in enumerate(chat) if item['role'] == 'assistant'
+        ]
+
+        for i in assistant_indices:
+            self.model.set_history(chat[:i - 1])
+            answer, steps = self.model.chat(chat[i - 1]['content'])
+            output_handler.save_multiround_results(
+                origin_prompt=chat[i - 1]['content'],
+                prediction=answer,
+                steps=steps,
+                idx=index,
+                gold=chat[i]['content'],
+            )
+        self.model.reset()

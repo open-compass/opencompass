@@ -72,6 +72,8 @@ class IPythonInterpreter(BaseAction):
             user_data_dir = f"import os\nos.chdir('{user_data_dir}')"
         self.user_data_dir = user_data_dir
         self._initialized = False
+        if not os.path.exists(WORK_DIR):
+            os.mkdir(WORK_DIR)
 
     @staticmethod
     def start_kernel():
