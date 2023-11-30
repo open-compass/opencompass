@@ -54,6 +54,29 @@ def gsm8k_postprocess(text: str) -> str:
     return ret1
 
 
+@TEXT_POSTPROCESSORS.register_module('gsm8k_agent')
+def gsm8k_agent_postprocess(text: str) -> str:
+    """Accept float output."""
+    text = text.split('\n\n')[0]
+    text = text.split(' ')[::-1]
+    flag = False
+    ret = ''
+    for i in range(len(text)):
+        s = text[i]
+        for i in range(len(s)):
+            if s[i].isdigit():
+                flag = True
+                ret = s
+                break
+        if flag:
+            break
+    ret1 = ''
+    for i in range(len(ret)):
+        if ret[i].isdigit() or ret[i] == '.':
+            ret1 += ret[i]
+    return ret1.strip('.')
+
+
 class Gsm8kEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
@@ -87,15 +110,23 @@ class Gsm8kAgentEvaluator(BaseEvaluator):
     def __init__(self, action: str = 'PythonInterpreter'):
         self.action = action
 
+    def is_equal(self, pred, refer):
+        try:
+            if pred == refer or abs(float(pred) - int(refer)) < 1e-6:
+                return True
+        except Exception:
+            pass
+        return False
+
     def soft_equal(self, pred, refer, step):
         try:
             soft_pred = step['result']['text']
-            if str(int(float(soft_pred))) == refer:
+            if abs(float(soft_pred) - int(refer)) < 1e-6:
                 return True
         except Exception:
             # result might not exists
             # text cannot convert to float
-            print(pred, soft_pred, refer)
+            pass
         return False
 
     def get_action(self, step):
@@ -114,7 +145,7 @@ class Gsm8kAgentEvaluator(BaseEvaluator):
         total = len(references)
         for pred, refer, step in zip(predictions, references, steps):
             # if final answer right
-            if pred == refer:
+            if self.is_equal(pred, refer):
                 if self.get_action(step):
                     final_scope += 1
                 else:
