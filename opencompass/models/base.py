@@ -1,4 +1,4 @@
-from abc import abstractclassmethod
+from abc import abstractmethod
 from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -19,6 +19,8 @@ class BaseModel:
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
+        generation_kwargs (Dict, optional): The generation kwargs for the
+            model. Defaults to dict().
     """
 
     is_api: bool = False
@@ -27,7 +29,8 @@ class BaseModel:
                  path: str,
                  max_seq_len: int = 2048,
                  tokenizer_only: bool = False,
-                 meta_template: Optional[Dict] = None):
+                 meta_template: Optional[Dict] = None,
+                 generation_kwargs: Optional[Dict] = dict()):
         self.path = path
         self.max_seq_len = max_seq_len
         self.tokenizer_only = tokenizer_only
@@ -36,8 +39,9 @@ class BaseModel:
         self.eos_token_id = None
         if meta_template and 'eos_token_id' in meta_template:
             self.eos_token_id = meta_template['eos_token_id']
+        self.generation_kwargs = generation_kwargs
 
-    @abstractclassmethod
+    @abstractmethod
     def generate(self, inputs: List[str], max_out_len: int) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -48,8 +52,11 @@ class BaseModel:
         Returns:
             List[str]: A list of generated strings.
         """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' gen-based evaluation yet, try ppl-based '
+                                  'instead.')
 
-    @abstractclassmethod
+    @abstractmethod
     def get_ppl(self,
                 inputs: List[str],
                 mask_length: Optional[List[int]] = None) -> List[float]:
@@ -66,8 +73,11 @@ class BaseModel:
         Returns:
             List[float]: A list of perplexity scores.
         """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' ppl-based evaluation yet, try gen-based '
+                                  'instead.')
 
-    @abstractclassmethod
+    @abstractmethod
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.
 
@@ -192,7 +202,7 @@ class LMTemplateParser:
         Returns:
             str: The final string.
         """
-        assert isinstance(prompt_template, (str, list, PromptList))
+        assert isinstance(prompt_template, (str, list, PromptList, tuple))
         if not isinstance(prompt_template, (str, PromptList)):
             return [self.parse_template(p, mode=mode) for p in prompt_template]
 
@@ -245,11 +255,14 @@ class LMTemplateParser:
                         section_stack.append((item['section'], i + 1))
                     else:
                         raise ValueError(f'Invalid pos {item["pos"]}')
+                # if in "begin" or "end" section
                 elif section_stack[-1][0] in ['begin', 'end']:
                     role_dict = self._update_role_dict(item)
-                    new_str, generate = self._prompt2str(item,
-                                                         role_dict,
-                                                         for_gen=mode == 'gen')
+                    new_str, generate = self._prompt2str(
+                        item,
+                        role_dict,
+                        # never stop generation
+                        for_gen=False)
                     prompt += new_str
 
             prompt = self.meta_template.get('begin', '') + prompt

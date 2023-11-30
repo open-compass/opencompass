@@ -40,16 +40,22 @@ class AGIEvalDataset_v2(BaseDataset):
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
         filename = osp.join(path, name + '.jsonl')
         with open(filename, encoding='utf-8') as f:
-            _data = [json.loads(line.strip()) for line in f]
-        data = []
-        for _d in _data:
-            passage = _d['passage'] if _d['passage'] else ''
-            question = passage + _d['question']
-            options = '\n'.join(_d['options']) if _d['options'] else ''
-            label = _d['label'] if _d['label'] else _d['answer']
+            data = [json.loads(line.strip()) for line in f]
+        dataset = []
+        for item in data:
+            passage = item['passage'] if item['passage'] else ''
+            question = passage + item['question']
+            options = '\n'.join(item['options']) if item['options'] else ''
+            if item['label']:
+                if isinstance(item['label'], list):
+                    label = ''.join(item['label'])
+                else:
+                    label = item['label']
+            else:
+                label = item['answer']
             d = {'question': question, 'options': options, 'label': label}
-            data.append(d)
-        dataset = Dataset.from_list(data)
+            dataset.append(d)
+        dataset = Dataset.from_list(dataset)
         return dataset
 
 
@@ -58,9 +64,36 @@ class AGIEvalEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         predictions = [parse_math_answer('', pred) for pred in predictions]
+        details = []
         cnt = 0
         for pred, ref in zip(predictions, references):
+            detail = {'pred': pred, 'answer': ref, 'correct': False}
             if is_equiv(pred, ref):
                 cnt += 1
+                detail['correct'] = True
+            details.append(detail)
         score = cnt / len(predictions) * 100
-        return {'score': score}
+        return {'score': score, 'details': details}
+
+
+@ICL_EVALUATORS.register_module()
+class AGIEvalEvaluator_mcq(BaseEvaluator):
+
+    def score(self, predictions, references):
+        if len(predictions) != len(references):
+            return {
+                'error': 'predictions and references have different '
+                'length'
+            }
+        details = []
+        cnt = 0
+        for pred, ref in zip(predictions, references):
+            detail = {'pred': pred, 'answer': ref, 'correct': False}
+            if pred == ref:
+                cnt += 1
+                detail['correct'] = True
+            details.append(detail)
+
+        score = cnt / len(predictions) * 100
+
+        return {'score': score, 'details': details}

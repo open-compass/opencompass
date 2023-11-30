@@ -7,3 +7,5 @@
 数据侧的 template 被称为 [prompt_template](./prompt_template.md)，它表示了把数据集的字段转化成提示词的过程。
 
 模型侧的 template 被称为 [meta_template](./meta_template.md)，它表示了模型将这些提示词转化为自身期望的输入的过程。
+
+我们另外还提供了一些 [思维链](./chain_of_thought.md) 的 prompt 示例。

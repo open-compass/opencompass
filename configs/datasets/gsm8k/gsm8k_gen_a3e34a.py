@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import SCInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import HFDataset, gsm8k_postprocess, gsm8k_dataset_postprocess
+from opencompass.datasets import GSM8KDataset, gsm8k_postprocess, gsm8k_dataset_postprocess, Gsm8kEvaluator
 
 gsm8k_reader_cfg = dict(input_columns=['question'], output_column='answer' )
 generation_kwargs = dict(do_sample=True, temperature=0.7, top_k=40)
@@ -73,7 +73,7 @@ Question: {question}{answer}
     inferencer=dict(type=SCInferencer, max_out_len=512, generation_kwargs = generation_kwargs, infer_type='sc', sc_size = 20))
 
 gsm8k_eval_cfg = dict(
-    evaluator=dict(type=AccEvaluator),
+    evaluator=dict(type=Gsm8kEvaluator),
     pred_postprocessor=dict(type=gsm8k_postprocess),
     dataset_postprocessor=dict(type=gsm8k_dataset_postprocess),
     sc_size = 20)
@@ -81,9 +81,8 @@ gsm8k_eval_cfg = dict(
 gsm8k_datasets = [
     dict(
         abbr='gsm8k',
-        type=HFDataset,
-        path='gsm8k',
-        name='main',
+        type=GSM8KDataset,
+        path='./data/gsm8k',
         reader_cfg=gsm8k_reader_cfg,
         infer_cfg=gsm8k_infer_cfg,
         eval_cfg=gsm8k_eval_cfg)

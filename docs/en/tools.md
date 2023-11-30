@@ -69,3 +69,65 @@ python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
 ```
 
 - `-w`: Work path, default is `'./outputs/default'`.
+
+## List Configs
+
+This tool can list or search all available model and dataset configurations. It supports fuzzy search, making it convenient for use in conjunction with `run.py`.
+
+Usage:
+
+```bash
+python tools/list_configs.py [PATTERN1] [PATTERN2] [...]
+```
+
+If executed without any parameters, it will list all model configurations in the `configs/models` and `configs/dataset` directories by default.
+
+Users can also pass any number of parameters. The script will list all configurations related to the provided strings, supporting fuzzy search and the use of the * wildcard. For example, the following command will list all configurations related to `mmlu` and `llama`:
+
+```bash
+python tools/list_configs.py mmlu llama
+```
+
+Its output could be:
+
+```text
++-----------------+-----------------------------------+
+| Model           | Config Path                       |
+|-----------------+-----------------------------------|
+| hf_llama2_13b   | configs/models/hf_llama2_13b.py   |
+| hf_llama2_70b   | configs/models/hf_llama2_70b.py   |
+| hf_llama2_7b    | configs/models/hf_llama2_7b.py    |
+| hf_llama_13b    | configs/models/hf_llama_13b.py    |
+| hf_llama_30b    | configs/models/hf_llama_30b.py    |
+| hf_llama_65b    | configs/models/hf_llama_65b.py    |
+| hf_llama_7b     | configs/models/hf_llama_7b.py     |
+| llama2_13b_chat | configs/models/llama2_13b_chat.py |
+| llama2_70b_chat | configs/models/llama2_70b_chat.py |
+| llama2_7b_chat  | configs/models/llama2_7b_chat.py  |
++-----------------+-----------------------------------+
++-------------------+---------------------------------------------------+
+| Dataset           | Config Path                                       |
+|-------------------+---------------------------------------------------|
+| cmmlu_gen         | configs/datasets/cmmlu/cmmlu_gen.py               |
+| cmmlu_gen_ffe7c0  | configs/datasets/cmmlu/cmmlu_gen_ffe7c0.py        |
+| cmmlu_ppl         | configs/datasets/cmmlu/cmmlu_ppl.py               |
+| cmmlu_ppl_fd1f2f  | configs/datasets/cmmlu/cmmlu_ppl_fd1f2f.py        |
+| mmlu_gen          | configs/datasets/mmlu/mmlu_gen.py                 |
+| mmlu_gen_23a9a9   | configs/datasets/mmlu/mmlu_gen_23a9a9.py          |
+| mmlu_gen_5d1409   | configs/datasets/mmlu/mmlu_gen_5d1409.py          |
+| mmlu_gen_79e572   | configs/datasets/mmlu/mmlu_gen_79e572.py          |
+| mmlu_gen_a484b3   | configs/datasets/mmlu/mmlu_gen_a484b3.py          |
+| mmlu_ppl          | configs/datasets/mmlu/mmlu_ppl.py                 |
+| mmlu_ppl_ac766d   | configs/datasets/mmlu/mmlu_ppl_ac766d.py          |
++-------------------+---------------------------------------------------+
+```
+
+## Dataset Suffix Updater
+
+This tool can quickly modify the suffixes of configuration files located under the `configs/dataset` directory, aligning them with the naming conventions based on prompt hash.
+
+How to run:
+
+```bash
+python tools/update_dataset_suffix.py
+```

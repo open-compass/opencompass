@@ -1,3 +1,4 @@
+import os
 import random
 from typing import List
 
@@ -21,8 +22,7 @@ class HuggingfaceEvaluator(BaseEvaluator):
 
     def __init__(self, metric: str, seed: int = 0) -> None:
         self.metric = metric
-        random.seed(seed)
-        np.random.seed(seed)
+        self.seed = seed
         super().__init__()
 
     def _preprocess(self, predictions: List, references: List) -> dict:
@@ -61,6 +61,11 @@ class HuggingfaceEvaluator(BaseEvaluator):
         Returns:
             dict: calculated scores.
         """
+        random_state = random.getstate()
+        np_random_state = np.random.get_state()
+
+        random.seed(self.seed)
+        np.random.seed(self.seed)
         if len(predictions) != len(references):
             return {
                 'error':
@@ -68,9 +73,18 @@ class HuggingfaceEvaluator(BaseEvaluator):
                 f'length. len(predictions): {len(predictions)}, '
                 f'len(references): {len(references)}'
             }
-        metric = evaluate.load(self.metric)
+        # use codes pre-downloaded to opencompass repo, avoid downloading
+        local_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  'hf_metrics', self.metric + '.py')
+        if os.path.exists(local_path):
+            metric = evaluate.load(local_path)
+        else:
+            metric = evaluate.load(self.metric)
         scores = metric.compute(**self._preprocess(predictions, references))
-        return self._postprocess(scores)
+        result = self._postprocess(scores)
+        random.setstate(random_state)
+        np.random.set_state(np_random_state)
+        return result
 
 
 @ICL_EVALUATORS.register_module()
@@ -120,7 +134,10 @@ class AccEvaluator(HuggingfaceEvaluator):
 
 @ICL_EVALUATORS.register_module()
 class RougeEvaluator(HuggingfaceEvaluator):
-    """Rouge evaluator."""
+    """Rouge evaluator.
+
+    Note: this evaluator is not suitable for chinese datasets.
+    """
 
     def __init__(self) -> None:
         super().__init__(metric='rouge')
@@ -249,7 +266,13 @@ class EDAccEvaluator(AccEvaluator):
 
         for i in range(len(predictions)):
             pred, ref = predictions[i], references[i]
-            dists = [self.dist(pred, cand) for cand in ref['candidates']]
+            dists = []
+            for cands in ref['candidates']:
+                if isinstance(cands, str):
+                    d = self.dist(pred, cands)
+                else:
+                    d = np.min([self.dist(pred, cand) for cand in cands])
+                dists.append(d)
             preds.append(np.argmin(dists))
             golds.append(ref['label'])
 

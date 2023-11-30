@@ -6,9 +6,8 @@ from opencompass.datasets import TydiQADataset, TydiQAEvaluator
 # All configs are for TydiQA Goldp task
 tydiqa_reader_cfg = dict(
     input_columns=["passage_text", "question_text"],
-    output_column="answer",
-    test_split='validation',
-    train_split='validation',)
+    output_column="answer"
+)
 
 langs = ['arabic', 'bengali', 'english', 'finnish', 'indonesian', 'japanese', 'korean', 'russian', 'swahili', 'telugu', 'thai']
 
@@ -33,19 +32,25 @@ for _lang in langs:
         prompt_template=dict(
             type=PromptTemplate,
             template=f"{_hint[0]}\n\n</E>{_hint[1]}{{passage_text}}\n{_hint[2]} {{question_text}}\n{_hint[3]} {{answer}}" ,
-            ice_token='</E>'),
+            ice_token='</E>'
+        ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer), max_out_len=50)
+        inferencer=dict(type=GenInferencer), max_out_len=50
+    )
 
-    tydiqa_eval_cfg = dict(evaluator=dict(type=TydiQAEvaluator),
-                        ds_split='validation',
-                        ds_column='answer',
-                        )
+    tydiqa_eval_cfg = dict(
+        evaluator=dict(type=TydiQAEvaluator),
+        ds_split='validation',
+        ds_column='answer',
+    )
+
     tydiqa_datasets.append(
-    dict(abbr=f'tyidqa-goldp_{_lang}',
-        type=TydiQADataset,
-        path='khalidalt/tydiqa-goldp',
-        name=_lang,
-        reader_cfg=tydiqa_reader_cfg,
-        infer_cfg=tydiqa_infer_cfg,
-        eval_cfg=tydiqa_eval_cfg))
+        dict(abbr=f'tydiqa-goldp_{_lang}',
+            type=TydiQADataset,
+            path='./data/tydiqa',
+            lang=_lang,
+            reader_cfg=tydiqa_reader_cfg,
+            infer_cfg=tydiqa_infer_cfg,
+            eval_cfg=tydiqa_eval_cfg
+        )
+    )

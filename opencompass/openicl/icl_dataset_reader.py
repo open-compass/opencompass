@@ -58,7 +58,7 @@ class DatasetReader:
     def __init__(self,
                  dataset: Union[Dataset, DatasetDict, str],
                  input_columns: Union[List[str], str],
-                 output_column: str,
+                 output_column: Optional[str],
                  input_template: Optional[PromptTemplate] = None,
                  output_template: Optional[PromptTemplate] = None,
                  train_split: str = 'train',
@@ -68,7 +68,9 @@ class DatasetReader:
         self.input_columns = _check_type_list(input_columns, [List, str])
         if isinstance(self.input_columns, str):
             self.input_columns = self.input_columns.split()
-        self.output_column = _check_str(output_column)
+        self.output_column = None
+        if output_column:
+            self.output_column = _check_str(output_column)
 
         train_range = _check_type_list(train_range, [None, int, float, str])
         test_range = _check_type_list(test_range, [None, int, float, str])

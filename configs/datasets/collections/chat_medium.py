@@ -3,7 +3,7 @@ from mmengine.config import read_base
 with read_base():
     from ..mmlu.mmlu_gen_a484b3 import mmlu_datasets
     from ..ceval.ceval_gen_5f30c7 import ceval_datasets
-    from ..agieval.agieval_gen_397d81 import agieval_datasets
+    from ..agieval.agieval_gen_64afd3 import agieval_datasets
     from ..GaokaoBench.GaokaoBench_gen_5cfe9e import GaokaoBench_datasets
     from ..bbh.bbh_gen_5b92b0 import bbh_datasets
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets
@@ -33,7 +33,7 @@ with read_base():
     from ..SuperGLUE_RTE.SuperGLUE_RTE_gen_68aac7 import RTE_datasets
     from ..SuperGLUE_ReCoRD.SuperGLUE_ReCoRD_gen_30dea0 import ReCoRD_datasets
     from ..SuperGLUE_WiC.SuperGLUE_WiC_gen_d06864 import WiC_datasets
-    from ..SuperGLUE_WSC.SuperGLUE_WSC_gen_6dc406 import WSC_datasets
+    from ..SuperGLUE_WSC.SuperGLUE_WSC_gen_7902a7 import WSC_datasets
     from ..race.race_gen_69ee4f import race_datasets
     from ..Xsum.Xsum_gen_31397e import Xsum_datasets
     from ..gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
@@ -52,6 +52,5 @@ with read_base():
     from ..nq.nq_gen_c788f6 import nq_datasets
     from ..triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
     from ..flores.flores_gen_806ede import flores_datasets
-    from ..crowspairs.crowspairs_gen_21f7cb import crowspairs_datasets
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

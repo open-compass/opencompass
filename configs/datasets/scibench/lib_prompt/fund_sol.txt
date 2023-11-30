@@ -1,0 +1,135 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: A food shipper pushes a wood crate of cabbage heads (total mass $m=14 \mathrm{~kg}$ ) across a concrete floor with a constant horizontal force $\vec{F}$ of magnitude $40 \mathrm{~N}$. In a straight-line displacement of magnitude $d=0.50 \mathrm{~m}$, the speed of the crate decreases from $v_0=0.60 \mathrm{~m} / \mathrm{s}$ to $v=0.20 \mathrm{~m} / \mathrm{s}$. What is the increase $\Delta E_{\text {th }}$ in the thermal energy of the crate and floor?
+Explanation for Problem 1: 
+We can relate $\Delta E_{\text {th }}$ to the work $W$ done by $\vec{F}$ with the energy statement of Eq. 8-33 for a system that involves friction:
+$$
+W=\Delta E_{\text {mec }}+\Delta E_{\text {th }} .
+$$
+Calculations: We know the value of $W$ from (a). The change $\Delta E_{\text {mec }}$ in the crate's mechanical energy is just the change in its kinetic energy because no potential energy changes occur, so we have
+$$
+\Delta E_{\mathrm{mec}}=\Delta K=\frac{1}{2} m v^2-\frac{1}{2} m v_0^2 .
+$$
+Substituting this into Eq. 8-34 and solving for $\Delta E_{\mathrm{th}}$, we find
+$$
+\begin{aligned}
+\Delta E_{\mathrm{th}} & =W-\left(\frac{1}{2} m v^2-\frac{1}{2} m v_0^2\right)=W-\frac{1}{2} m\left(v^2-v_0^2\right) \\
+& =20 \mathrm{~J}-\frac{1}{2}(14 \mathrm{~kg})\left[(0.20 \mathrm{~m} / \mathrm{s})^2-(0.60 \mathrm{~m} / \mathrm{s})^2\right] \\
+& =22.2 \mathrm{~J} \approx 22 \mathrm{~J} .
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{22.2}.
+
+Promblem 2: If the particles in a system all move together, the com moves with them-no trouble there. But what happens when they move in different directions with different accelerations? Here is an example.
+
+The three particles in Figure are initially at rest. Each experiences an external force due to bodies outside the three-particle system. The directions are indicated, and the magnitudes are $F_1=6.0 \mathrm{~N}, F_2=12 \mathrm{~N}$, and $F_3=14 \mathrm{~N}$. What is the acceleration of the center of mass of the system?
+Explanation for Problem 2: The position of the center of mass is marked by a dot in the figure. We can treat the center of mass as if it were a real particle, with a mass equal to the system's total mass $M=16 \mathrm{~kg}$. We can also treat the three external forces as if they act at the center of mass (Fig. 9-7b).
+
+Calculations: We can now apply Newton's second law $\left(\vec{F}_{\text {net }}=m \vec{a}\right)$ to the center of mass, writing
+$$
+\vec{F}_{\text {net }}=M \vec{a}_{\mathrm{com}}
+$$
+or
+$$
+\begin{aligned}
+& \vec{F}_1+\vec{F}_2+\vec{F}_3=M \vec{a}_{\mathrm{com}} \\
+& \vec{a}_{\mathrm{com}}=\frac{\vec{F}_1+\vec{F}_2+\vec{F}_3}{M} .
+\end{aligned}
+$$
+Equation 9-20 tells us that the acceleration $\vec{a}_{\text {com }}$ of the center of mass is in the same direction as the net external force $\vec{F}_{\text {net }}$ on the system (Fig. 9-7b). Because the particles are initially at rest, the center of mass must also be at rest. As the center of mass then begins to accelerate, it must move off in the common direction of $\vec{a}_{\text {com }}$ and $\vec{F}_{\text {net }}$.
+
+We can evaluate the right side of Eq. 9-21 directly on a vector-capable calculator, or we can rewrite Eq. 9-21 in component form, find the components of $\vec{a}_{\text {com }}$, and then find $\vec{a}_{\text {com }}$. Along the $x$ axis, we have
+$$
+\begin{aligned}
+a_{\mathrm{com}, x} & =\frac{F_{1 x}+F_{2 x}+F_{3 x}}{M} \\
+& =\frac{-6.0 \mathrm{~N}+(12 \mathrm{~N}) \cos 45^{\circ}+14 \mathrm{~N}}{16 \mathrm{~kg}}=1.03 \mathrm{~m} / \mathrm{s}^2 .
+\end{aligned}
+$$
+Along the $y$ axis, we have
+$$
+\begin{aligned}
+a_{\mathrm{com}, y} & =\frac{F_{1 y}+F_{2 y}+F_{3 y}}{M} \\
+& =\frac{0+(12 \mathrm{~N}) \sin 45^{\circ}+0}{16 \mathrm{~kg}}=0.530 \mathrm{~m} / \mathrm{s}^2 .
+\end{aligned}
+$$
+From these components, we find that $\vec{a}_{\mathrm{com}}$ has the magnitude
+$$
+\begin{aligned}
+a_{\mathrm{com}} & =\sqrt{\left(a_{\mathrm{com}, x}\right)^2+\left(a_{\text {com }, y}\right)^2} \\
+& =1.16 \mathrm{~m} / \mathrm{s}^2 
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{ 1.16}.
+
+Promblem 3: While you are operating a Rotor (a large, vertical, rotating cylinder found in amusement parks), you spot a passenger in acute distress and decrease the angular velocity of the cylinder from $3.40 \mathrm{rad} / \mathrm{s}$ to $2.00 \mathrm{rad} / \mathrm{s}$ in $20.0 \mathrm{rev}$, at constant angular acceleration. (The passenger is obviously more of a "translation person" than a "rotation person.")
+What is the constant angular acceleration during this decrease in angular speed?
+Explanation for Problem 3: Because the cylinder's angular acceleration is constant, we can relate it to the angular velocity and angular displacement via the basic equations for constant angular acceleration (Eqs. 10-12 and 10-13).
+
+Calculations: Let's first do a quick check to see if we can solve the basic equations. The initial angular velocity is $\omega_0=3.40$
+$\mathrm{rad} / \mathrm{s}$, the angular displacement is $\theta-\theta_0=20.0 \mathrm{rev}$, and the angular velocity at the end of that displacement is $\omega=2.00$ $\mathrm{rad} / \mathrm{s}$. In addition to the angular acceleration $\alpha$ that we want, both basic equations also contain time $t$, which we do not necessarily want.
+
+To eliminate the unknown $t$, we use Eq. 10-12 to write
+$$
+t=\frac{\omega-\omega_0}{\alpha}
+$$
+which we then substitute into Eq. 10-13 to write
+$$
+\theta-\theta_0=\omega_0\left(\frac{\omega-\omega_0}{\alpha}\right)+\frac{1}{2} \alpha\left(\frac{\omega-\omega_0}{\alpha}\right)^2 .
+$$
+Solving for $\alpha$, substituting known data, and converting 20 rev to $125.7 \mathrm{rad}$, we find
+$$
+\begin{aligned}
+\alpha & =\frac{\omega^2-\omega_0^2}{2\left(\theta-\theta_0\right)}=\frac{(2.00 \mathrm{rad} / \mathrm{s})^2-(3.40 \mathrm{rad} / \mathrm{s})^2}{2(125.7 \mathrm{rad})} \\
+& =-0.0301 \mathrm{rad} / \mathrm{s}^2
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{-0.0301}.
+
+Promblem 4: An astronaut whose height $h$ is $1.70 \mathrm{~m}$ floats "feet down" in an orbiting space shuttle at distance $r=6.77 \times 10^6 \mathrm{~m}$ away from the center of Earth. What is the difference between the gravitational acceleration at her feet and at her head?
+Explanation for Problem 4: We can approximate Earth as a uniform sphere of mass $M_E$. Then, from Eq. 13-11, the gravitational acceleration at any distance $r$ from the center of Earth is
+$$
+a_g=\frac{G M_E}{r^2}
+$$
+We might simply apply this equation twice, first with $r=$ $6.77 \times 10^6 \mathrm{~m}$ for the location of the feet and then with $r=6.77 \times 10^6 \mathrm{~m}+1.70 \mathrm{~m}$ for the location of the head. However, a calculator may give us the same value for $a_g$ twice, and thus a difference of zero, because $h$ is so much smaller than $r$. Here's a more promising approach: Because we have a differential change $d r$ in $r$ between the astronaut's feet and head, we should differentiate Eq. 13-15 with respect to $r$.
+Calculations: The differentiation gives us
+$$
+d a_g=-2 \frac{G M_E}{r^3} d r
+$$
+where $d a_g$ is the differential change in the gravitational acceleration due to the differential change $d r$ in $r$. For the astronaut, $d r=h$ and $r=6.77 \times 10^6 \mathrm{~m}$. Substituting data into Eq.13-16, we find
+$$
+\begin{aligned}
+d a_g & =-2 \frac{\left(6.67 \times 10^{-11} \mathrm{~m}^3 / \mathrm{kg} \cdot \mathrm{s}^2\right)\left(5.98 \times 10^{24} \mathrm{~kg}\right)}{\left(6.77 \times 10^6 \mathrm{~m}\right)^3}(1.70 \mathrm{~m}) \\
+& =-4.37 \times 10^{-6} \mathrm{~m} / \mathrm{s}^2, \quad \text { (Answer) }
+\end{aligned}
+$$
+Therefore, the answer is \boxed{-4.37 }.
+
+Promblem 5: A $2.00 \mathrm{~kg}$ particle moves along an $x$ axis in one-dimensional motion while a conservative force along that axis acts on it. The potential energy $U(x)$ associated with the force is plotted in Fig. 8-10a. That is, if the particle were placed at any position between $x=0$ and $x=7.00 \mathrm{~m}$, it would have the plotted value of $U$. At $x=6.5 \mathrm{~m}$, the particle has velocity $\vec{v}_0=(-4.00 \mathrm{~m} / \mathrm{s}) \hat{\mathrm{i}}$
+From Figure, determine the particle's speed at $x_1=4.5 \mathrm{~m}$.
+Explanation for Problem 5: 
+(1) The particle's kinetic energy is given by Eq. 7-1 $\left(K=\frac{1}{2} m v^2\right)$. (2) Because only a conservative force acts on the particle, the mechanical energy $E_{\mathrm{mec}}(=K+U)$ is conserved as the particle moves. (3) Therefore, on a plot of $U(x)$ such as Fig. 8-10a, the kinetic energy is equal to the difference between $E_{\mathrm{mec}}$ and $U$.
+Calculations: At $x=6.5 \mathrm{~m}$, the particle has kinetic energy
+$$
+\begin{aligned}
+K_0 & =\frac{1}{2} m v_0^2=\frac{1}{2}(2.00 \mathrm{~kg})(4.00 \mathrm{~m} / \mathrm{s})^2 \\
+& =16.0 \mathrm{~J} .
+\end{aligned}
+$$
+Because the potential energy there is $U=0$, the mechanical energy is
+$$
+E_{\text {mec }}=K_0+U_0=16.0 \mathrm{~J}+0=16.0 \mathrm{~J} .
+$$
+This value for $E_{\mathrm{mec}}$ is plotted as a horizontal line in Fig. 8-10a. From that figure we see that at $x=4.5 \mathrm{~m}$, the potential energy is $U_1=7.0 \mathrm{~J}$. The kinetic energy $K_1$ is the difference between $E_{\text {mec }}$ and $U_1$ :
+$$
+K_1=E_{\text {mec }}-U_1=16.0 \mathrm{~J}-7.0 \mathrm{~J}=9.0 \mathrm{~J} .
+$$
+Because $K_1=\frac{1}{2} m v_1^2$, we find
+$$
+v_1=3.0 \mathrm{~m} / \mathrm{s}
+$$
+
+Therefore, the answer is \boxed{3.0}.
+

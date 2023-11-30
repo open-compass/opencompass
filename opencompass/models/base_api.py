@@ -1,7 +1,8 @@
 import re
+import sys
 import threading
 import warnings
-from abc import abstractclassmethod
+from abc import abstractmethod
 from copy import deepcopy
 from time import sleep
 from typing import Dict, List, Optional, Tuple, Union
@@ -27,6 +28,8 @@ class BaseAPIModel(BaseModel):
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
+        generation_kwargs (Dict, optional): The generation kwargs for the
+            model. Defaults to dict().
     """
 
     is_api: bool = True
@@ -36,7 +39,8 @@ class BaseAPIModel(BaseModel):
                  query_per_second: int = 1,
                  retry: int = 2,
                  max_seq_len: int = 2048,
-                 meta_template: Optional[Dict] = None):
+                 meta_template: Optional[Dict] = None,
+                 generation_kwargs: Dict = dict()):
         self.path = path
         self.max_seq_len = max_seq_len
         self.meta_template = meta_template
@@ -45,8 +49,9 @@ class BaseAPIModel(BaseModel):
         self.token_bucket = TokenBucket(query_per_second)
         self.template_parser = APITemplateParser(meta_template)
         self.logger = get_logger()
+        self.generation_kwargs = generation_kwargs
 
-    @abstractclassmethod
+    @abstractmethod
     def generate(self, inputs: List[PromptType],
                  max_out_len: int) -> List[str]:
         """Generate results given a list of inputs.
@@ -60,8 +65,43 @@ class BaseAPIModel(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' gen-based evaluation yet, try ppl-based '
+                                  'instead.')
 
-    @abstractclassmethod
+    def flush(self):
+        """Ensure simultaneous emptying of stdout and stderr when concurrent
+        resources are available.
+
+        When employing multiprocessing with standard I/O redirected to files,
+        it is crucial to clear internal data for examination or prevent log
+        loss in case of system failures."
+        """
+        if hasattr(self, 'tokens'):
+            sys.stdout.flush()
+            sys.stderr.flush()
+
+    def acquire(self):
+        """Acquire concurrent resources if exists.
+
+        This behavior will fall back to wait with query_per_second if there are
+        no concurrent resources.
+        """
+        if hasattr(self, 'tokens'):
+            self.tokens.acquire()
+        else:
+            self.wait()
+
+    def release(self):
+        """Release concurrent resources if acquired.
+
+        This behavior will fall back to do nothing if there are no concurrent
+        resources.
+        """
+        if hasattr(self, 'tokens'):
+            self.tokens.release()
+
+    @abstractmethod
     def get_ppl(self,
                 inputs: List[PromptType],
                 mask_length: Optional[List[int]] = None) -> List[float]:
@@ -78,6 +118,9 @@ class BaseAPIModel(BaseModel):
         Returns:
             List[float]: A list of perplexity scores.
         """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' ppl-based evaluation yet, try gen-based '
+                                  'instead.')
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese
@@ -161,7 +204,7 @@ class APITemplateParser:
         Returns:
             List[str or PromptList]: The finalized prompt or a conversation.
         """
-        assert isinstance(prompt_template, (str, list, PromptList))
+        assert isinstance(prompt_template, (str, list, PromptList, tuple))
 
         if not isinstance(prompt_template, (str, PromptList)):
             return [self.parse_template(p, mode=mode) for p in prompt_template]

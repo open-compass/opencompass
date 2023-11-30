@@ -1,7 +1,8 @@
+import json
 import re
 import string
 
-from datasets import DatasetDict, load_dataset
+from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
@@ -14,16 +15,12 @@ from .base import BaseDataset
 class lambadaDataset(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        dataset = load_dataset(**kwargs, split='test')
-
-        def preprocess(example):
-            prompt, target = example['text'].strip().rsplit(' ', 1)
-            example['prompt'] = prompt
-            example['label'] = target
-            return example
-
-        dataset = dataset.map(preprocess)
+    def load(path):
+        dataset = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                dataset.append(json.loads(line))
+        dataset = Dataset.from_list(dataset)
         return DatasetDict({'test': dataset})
 
 

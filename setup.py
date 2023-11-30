@@ -10,8 +10,10 @@ class DownloadNLTK(install):
         nltk.download('punkt')
 
 
-with open('README_zh-CN.md') as f:
-    readme = f.read()
+def readme():
+    with open('README.md', encoding='utf-8') as f:
+        content = f.read()
+    return content
 
 
 def parse_requirements(fname='requirements.txt', with_version=True):
@@ -101,31 +103,39 @@ def get_version():
 
 
 def do_setup():
-    setup(
-        name='opencompass',
-        version=get_version(),
-        description='A comprehensive toolkit for large model evaluation',
-        # url="",
-        # author="",
-        long_description=readme,
-        long_description_content_type='text/markdown',
-        cmdclass={'download_nltk': DownloadNLTK},
-        setup_requires=['nltk==3.8'],
-        python_requires='>=3.8.0',
-        install_requires=parse_requirements('requirements/runtime.txt'),
-        packages=find_packages(exclude=[
-            'test*',
-            'paper_test*',
-        ]),
-        keywords=['AI', 'NLP', 'in-context learning'],
-        classifiers=[
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9',
-            'Programming Language :: Python :: 3.10',
-            'Intended Audience :: Developers',
-            'Intended Audience :: Education',
-            'Intended Audience :: Science/Research',
-        ])
+    setup(name='opencompass',
+          author='OpenCompass Contributors',
+          version=get_version(),
+          description='A comprehensive toolkit for large model evaluation',
+          url='https://github.com/open-compass/opencompass',
+          long_description=readme(),
+          long_description_content_type='text/markdown',
+          maintainer='OpenCompass Authors',
+          cmdclass={'download_nltk': DownloadNLTK},
+          setup_requires=['nltk==3.8'],
+          python_requires='>=3.8.0',
+          install_requires=parse_requirements('requirements/runtime.txt'),
+          license='Apache License 2.0',
+          packages=find_packages(exclude=[
+              'test*',
+              'configs',
+              'data',
+              'docs',
+              'tools',
+              'tmp',
+          ]),
+          keywords=[
+              'AI', 'NLP', 'in-context learning', 'large language model',
+              'evaluation', 'benchmark', 'llm'
+          ],
+          classifiers=[
+              'Programming Language :: Python :: 3.8',
+              'Programming Language :: Python :: 3.9',
+              'Programming Language :: Python :: 3.10',
+              'Intended Audience :: Developers',
+              'Intended Audience :: Education',
+              'Intended Audience :: Science/Research',
+          ])
 
 
 if __name__ == '__main__':

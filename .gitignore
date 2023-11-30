@@ -10,7 +10,8 @@ configs/datasets/log.json
 configs/eval_debug*.py
 configs/viz_*.py
 data
-
+work_dirs
+configs/internal/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -85,3 +86,10 @@ docs/zh_cn/_build/
 
 # .zip
 *.zip
+
+# sft config ignore list
+configs/sft_cfg/*B_*
+configs/cky/
+
+# path of turbomind's model after runing `lmdeploy.serve.turbomind.deploy`
+turbomind/

@@ -12,28 +12,29 @@ There is also a type of **scoring-type** evaluation task without standard answer
 
 ## Supported Evaluation Metrics
 
-Currently, in OpenCompass, commonly used Evaluators are mainly located in the [`opencompass/openicl/icl_evaluator`](https://github.com/InternLM/opencompass/tree/main/opencompass/openicl/icl_evaluator) folder. There are also some dataset-specific indicators that are placed in parts of [`opencompass/datasets`](https://github.com/InternLM/opencompass/tree/main/opencompass/datasets). Below is a summary:
+Currently, in OpenCompass, commonly used Evaluators are mainly located in the [`opencompass/openicl/icl_evaluator`](https://github.com/open-compass/opencompass/tree/main/opencompass/openicl/icl_evaluator) folder. There are also some dataset-specific indicators that are placed in parts of [`opencompass/datasets`](https://github.com/open-compass/opencompass/tree/main/opencompass/datasets). Below is a summary:
 
-| Evaluation Strategy | Evaluation Metrics   | Common Postprocessing Method | Datasets                                                             |
-| ------------------- | -------------------- | ---------------------------- | -------------------------------------------------------------------- |
-| `ACCEvaluator`      | Accuracy             | `first_capital_postprocess`  | agieval, ARC, bbh, mmlu, ceval, commonsenseqa, crowspairs, hellaswag |
-| `EMEvaluator`       | Match Rate           | None, dataset-specific       | drop, CLUE_CMRC, CLUE_DRCD                                           |
-| `BleuEvaluator`     | BLEU                 | None, `flores`               | flores, iwslt2017, summscreen, govrepcrs                             |
-| `RougeEvaluator`    | ROUGE                | None, dataset-specific       | lcsts, truthfulqa, Xsum, XLSum                                       |
-| `HumanEvaluator`    | pass@k               | `humaneval_postprocess`      | humaneval_postprocess                                                |
-| `MBPPEvaluator`     | Execution Pass Rate  | None                         | mbpp                                                                 |
-| `ToxicEvaluator`    | PerspectiveAPI       | None                         | realtoxicityprompts                                                  |
-| `AGIEvalEvaluator`  | Accuracy             | None                         | agieval                                                              |
-| `AUCROCEvaluator`   | AUC-ROC              | None                         | jigsawmultilingual, civilcomments                                    |
-| `MATHEvaluator`     | Accuracy             | `math_postprocess`           | math                                                                 |
-| `MccEvaluator`      | Matthews Correlation | None                         | --                                                                   |
-| `SquadEvaluator`    | F1-scores            | None                         | --                                                                   |
+| Evaluation Strategy   | Evaluation Metrics   | Common Postprocessing Method | Datasets                                                             |
+| --------------------- | -------------------- | ---------------------------- | -------------------------------------------------------------------- |
+| `ACCEvaluator`        | Accuracy             | `first_capital_postprocess`  | agieval, ARC, bbh, mmlu, ceval, commonsenseqa, crowspairs, hellaswag |
+| `EMEvaluator`         | Match Rate           | None, dataset-specific       | drop, CLUE_CMRC, CLUE_DRCD                                           |
+| `BleuEvaluator`       | BLEU                 | None, `flores`               | flores, iwslt2017, summscreen, govrepcrs                             |
+| `RougeEvaluator`      | ROUGE                | None, dataset-specific       | truthfulqa, Xsum, XLSum                                              |
+| `JiebaRougeEvaluator` | ROUGE                | None, dataset-specific       | lcsts                                                                |
+| `HumanEvaluator`      | pass@k               | `humaneval_postprocess`      | humaneval_postprocess                                                |
+| `MBPPEvaluator`       | Execution Pass Rate  | None                         | mbpp                                                                 |
+| `ToxicEvaluator`      | PerspectiveAPI       | None                         | realtoxicityprompts                                                  |
+| `AGIEvalEvaluator`    | Accuracy             | None                         | agieval                                                              |
+| `AUCROCEvaluator`     | AUC-ROC              | None                         | jigsawmultilingual, civilcomments                                    |
+| `MATHEvaluator`       | Accuracy             | `math_postprocess`           | math                                                                 |
+| `MccEvaluator`        | Matthews Correlation | None                         | --                                                                   |
+| `SquadEvaluator`      | F1-scores            | None                         | --                                                                   |
 
 ## How to Configure
 
 The evaluation standard configuration is generally placed in the dataset configuration file, and the final xxdataset_eval_cfg will be passed to `dataset.infer_cfg` as an instantiation parameter.
 
-Below is the definition of `govrepcrs_eval_cfg`, and you can refer to [configs/datasets/govrepcrs](https://github.com/InternLM/opencompass/tree/main/configs/datasets/govrepcrs).
+Below is the definition of `govrepcrs_eval_cfg`, and you can refer to [configs/datasets/govrepcrs](https://github.com/open-compass/opencompass/tree/main/configs/datasets/govrepcrs).
 
 ```python
 from opencompass.openicl.icl_evaluator import BleuEvaluator

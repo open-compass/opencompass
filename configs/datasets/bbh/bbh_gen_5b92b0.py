@@ -1,13 +1,11 @@
-from os.path import exists
+import os
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import BBHDataset, BBHEvaluator, bbh_mcq_postprocess
+from opencompass.datasets import BBHDataset, BBHEvaluator, bbh_mcq_postprocess, BBHEvaluator_mcq
 
 bbh_reader_cfg = dict(input_columns=["input"], output_column="target")
-
-_path_prefix = "./data/BBH"
 
 bbh_multiple_choice_sets = [
     'temporal_sequences',
@@ -43,9 +41,8 @@ bbh_free_form_sets = [
 
 bbh_datasets = []
 for _name in bbh_multiple_choice_sets:
-    _hint = None
-    if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
-        _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
+    with open(os.path.join(os.path.dirname(__file__), 'lib_prompt', f'{_name}.txt'), 'r') as f:
+        _hint = f.read()
     bbh_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -59,7 +56,7 @@ for _name in bbh_multiple_choice_sets:
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer, max_out_len=512))
     bbh_eval_cfg = dict(
-        evaluator=dict(type=AccEvaluator),
+        evaluator=dict(type=BBHEvaluator_mcq),
         pred_role="BOT",
         pred_postprocessor=dict(type=bbh_mcq_postprocess),
         dataset_postprocessor=dict(type=bbh_mcq_postprocess))
@@ -67,7 +64,7 @@ for _name in bbh_multiple_choice_sets:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path=f"{_path_prefix}/data",
+            path=f"./data/BBH/data",
             name=_name,
             abbr='bbh-' + _name,
             reader_cfg=bbh_reader_cfg,
@@ -75,9 +72,8 @@ for _name in bbh_multiple_choice_sets:
             eval_cfg=bbh_eval_cfg.copy()))
 
 for _name in bbh_free_form_sets:
-    _hint = None
-    if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
-        _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
+    with open(os.path.join(os.path.dirname(__file__), 'lib_prompt', f'{_name}.txt'), 'r') as f:
+        _hint = f.read()
     bbh_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -95,11 +91,9 @@ for _name in bbh_free_form_sets:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path=f"{_path_prefix}/data",
+            path=f"./data/BBH/data",
             name=_name,
             abbr='bbh-' + _name,
             reader_cfg=bbh_reader_cfg,
             infer_cfg=bbh_infer_cfg.copy(),
             eval_cfg=bbh_eval_cfg.copy()))
-
-del _name, _hint, _path_prefix

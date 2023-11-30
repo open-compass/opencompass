@@ -93,8 +93,8 @@ for _name in mmlu_all_sets:
             },
             ice_token="</E>",
         ),
-        retriever=dict(type=FixKRetriever),
-        inferencer=dict(type=PPLInferencer, fix_id_list=[0, 1, 2, 3, 4]),
+        retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
+        inferencer=dict(type=PPLInferencer),
     )
 
     mmlu_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )

@@ -4,17 +4,21 @@ import os
 import os.path as osp
 from datetime import datetime
 
-from mmengine.config import Config
+from mmengine.config import Config, DictAction
 
-from opencompass.partitioners import NaivePartitioner, SizePartitioner
-from opencompass.registry import PARTITIONERS, RUNNERS
-from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
-from opencompass.utils import LarkReporter, Summarizer, get_logger
+from opencompass.partitioners import MultimodalNaivePartitioner
+from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
+from opencompass.runners import SlurmRunner
+from opencompass.summarizers import DefaultSummarizer
+from opencompass.utils import LarkReporter, get_logger
+from opencompass.utils.run import (exec_mm_infer_runner, fill_eval_cfg,
+                                   fill_infer_cfg, get_config_from_arg)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run an evaluation task')
-    parser.add_argument('config', help='Train config file path')
+    parser.add_argument('config', nargs='?', help='Train config file path')
+
     # add mutually exclusive args `--slurm` `--dlc`, defaults to local runner
     # if "infer" or "eval" not specified
     launch_method = parser.add_mutually_exclusive_group()
@@ -30,6 +34,15 @@ def parse_args():
                                help='Whether to force tasks to run on dlc. If '
                                'True, `--aliyun-cfg` must be set. Defaults'
                                ' to False')
+    # multi-modal support
+    parser.add_argument('--mm-eval',
+                        help='Whether or not enable multimodal evaluation',
+                        action='store_true',
+                        default=False)
+    # Add shortcut parameters (models, datasets and summarizer)
+    parser.add_argument('--models', nargs='+', help='', default=None)
+    parser.add_argument('--datasets', nargs='+', help='', default=None)
+    parser.add_argument('--summarizer', help='', default=None)
     # add general args
     parser.add_argument('--debug',
                         help='Debug mode, in which scheduler will run tasks '
@@ -71,6 +84,12 @@ def parse_args():
                         './outputs/default.',
                         default=None,
                         type=str)
+    parser.add_argument(
+        '--config-dir',
+        default='configs',
+        help='Use the custom config directory instead of config/ to '
+        'search the configs for datasets, models and summarizers',
+        type=str)
     parser.add_argument('-l',
                         '--lark',
                         help='Report the running status to lark bot',
@@ -80,7 +99,7 @@ def parse_args():
                         help='The maximum size of an infer task. Only '
                         'effective when "infer" is missing from the config.',
                         type=int,
-                        default=2000),
+                        default=40000),
     parser.add_argument(
         '--gen-task-coef',
         help='The dataset cost measurement coefficient for generation tasks, '
@@ -93,18 +112,32 @@ def parse_args():
                         'in the config.',
                         type=int,
                         default=32)
+    parser.add_argument('--max-workers-per-gpu',
+                        help='Max task to run in parallel on one GPU. '
+                        'It will only be used in the local runner.',
+                        type=int,
+                        default=1)
     parser.add_argument(
         '--retry',
         help='Number of retries if the job failed when using slurm or dlc. '
         'Will be overrideen by the "retry" argument in the config.',
         type=int,
         default=2)
+    parser.add_argument(
+        '--dump-eval-details',
+        help='Whether to dump the evaluation details, including the '
+        'correctness of each sample, bpb, etc.',
+        action='store_true',
+    )
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
     # set dlc args
     dlc_parser = parser.add_argument_group('dlc_args')
     parse_dlc_args(dlc_parser)
+    # set hf args
+    hf_parser = parser.add_argument_group('hf_args')
+    parse_hf_args(hf_parser)
     args = parser.parse_args()
     if args.slurm:
         assert args.partition is not None, (
@@ -143,6 +176,29 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
+def parse_hf_args(hf_parser):
+    """These args are all for the quick construction of HuggingFace models."""
+    hf_parser.add_argument('--hf-path', type=str)
+    hf_parser.add_argument('--peft-path', type=str)
+    hf_parser.add_argument('--tokenizer-path', type=str)
+    hf_parser.add_argument('--model-kwargs',
+                           nargs='+',
+                           action=DictAction,
+                           default={})
+    hf_parser.add_argument('--tokenizer-kwargs',
+                           nargs='+',
+                           action=DictAction,
+                           default={})
+    hf_parser.add_argument('--max-out-len', type=int)
+    hf_parser.add_argument('--max-seq-len', type=int)
+    hf_parser.add_argument('--no-batch-padding',
+                           action='store_true',
+                           default=False)
+    hf_parser.add_argument('--batch-size', type=int)
+    hf_parser.add_argument('--num-gpus', type=int)
+    hf_parser.add_argument('--pad-token-id', type=int)
+
+
 def main():
     args = parse_args()
     if args.dry_run:
@@ -150,7 +206,7 @@ def main():
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
 
-    cfg = Config.fromfile(args.config, format_python_code=False)
+    cfg = get_config_from_arg(args)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
@@ -201,39 +257,41 @@ def main():
                            'also specified --slurm or --dlc. '
                            'The "infer" configuration will be overridden by '
                            'your runtime arguments.')
+        # Check whether run multimodal evaluation
+        if args.mm_eval:
+            partitioner = MultimodalNaivePartitioner(
+                osp.join(cfg['work_dir'], 'predictions/'))
+            tasks = partitioner(cfg)
+            exec_mm_infer_runner(tasks, args, cfg)
+            return
+
         if args.dlc or args.slurm or cfg.get('infer', None) is None:
-            # Use SizePartitioner to split into subtasks
-            partitioner = SizePartitioner(
-                osp.join(cfg['work_dir'], 'predictions/'),
-                max_task_size=args.max_partition_size,
-                gen_task_coef=args.gen_task_coef)
-            tasks = partitioner(cfg)
-            if args.dry_run:
-                return
-            # execute the infer subtasks
-            exec_infer_runner(tasks, args, cfg)
-        # If they have specified "infer" in config and haven't used --slurm
-        # or --dlc, just follow the config
+            fill_infer_cfg(cfg, args)
+
+        if args.partition is not None:
+            if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
+                cfg.infer.runner.partition = args.partition
+                cfg.infer.runner.quotatype = args.quotatype
         else:
-            if args.partition is not None:
-                if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
-                    cfg.infer.runner.partition = args.partition
-                    cfg.infer.runner.quotatype = args.quotatype
-            else:
-                logger.warning('SlurmRunner is not used, so the partition '
-                               'argument is ignored.')
-            if args.debug:
-                cfg.infer.runner.debug = True
-            if args.lark:
-                cfg.infer.runner.lark_bot_url = cfg['lark_bot_url']
-            cfg.infer.partitioner['out_dir'] = osp.join(
-                cfg['work_dir'], 'predictions/')
-            partitioner = PARTITIONERS.build(cfg.infer.partitioner)
-            tasks = partitioner(cfg)
-            if args.dry_run:
-                return
-            runner = RUNNERS.build(cfg.infer.runner)
-            runner(tasks)
+            logger.warning('SlurmRunner is not used, so the partition '
+                           'argument is ignored.')
+        if args.debug:
+            cfg.infer.runner.debug = True
+        if args.lark:
+            cfg.infer.runner.lark_bot_url = cfg['lark_bot_url']
+        cfg.infer.partitioner['out_dir'] = osp.join(cfg['work_dir'],
+                                                    'predictions/')
+        partitioner = PARTITIONERS.build(cfg.infer.partitioner)
+        tasks = partitioner(cfg)
+        if args.dry_run:
+            return
+        runner = RUNNERS.build(cfg.infer.runner)
+        # Add extra attack config if exists
+        if hasattr(cfg, 'attack'):
+            for task in tasks:
+                cfg.attack.dataset = task.datasets[0][0].abbr
+                task.attack = cfg.attack
+        runner(tasks)
 
     # evaluate
     if args.mode in ['all', 'eval']:
@@ -245,94 +303,39 @@ def main():
                            'also specified --slurm or --dlc. '
                            'The "eval" configuration will be overridden by '
                            'your runtime arguments.')
+
         if args.dlc or args.slurm or cfg.get('eval', None) is None:
-            # Use NaivePartitioner，not split
-            partitioner = NaivePartitioner(
-                osp.join(cfg['work_dir'], 'results/'))
-            tasks = partitioner(cfg)
-            if args.dry_run:
-                return
-            # execute the eval tasks
-            exec_eval_runner(tasks, args, cfg)
-        # If they have specified "eval" in config and haven't used --slurm
-        # or --dlc, just follow the config
-        else:
-            if args.partition is not None:
-                if RUNNERS.get(cfg.infer.runner.type) == SlurmRunner:
-                    cfg.eval.runner.partition = args.partition
-                    cfg.eval.runner.quotatype = args.quotatype
-                else:
-                    logger.warning('SlurmRunner is not used, so the partition '
-                                   'argument is ignored.')
-            if args.debug:
-                cfg.eval.runner.debug = True
-            if args.lark:
-                cfg.eval.runner.lark_bot_url = cfg['lark_bot_url']
-            cfg.eval.partitioner['out_dir'] = osp.join(cfg['work_dir'],
-                                                       'results/')
-            partitioner = PARTITIONERS.build(cfg.eval.partitioner)
-            tasks = partitioner(cfg)
-            if args.dry_run:
-                return
-            runner = RUNNERS.build(cfg.eval.runner)
-            runner(tasks)
+            fill_eval_cfg(cfg, args)
+        if args.dump_eval_details:
+            cfg.eval.runner.task.dump_details = True
+
+        if args.partition is not None:
+            if RUNNERS.get(cfg.eval.runner.type) == SlurmRunner:
+                cfg.eval.runner.partition = args.partition
+                cfg.eval.runner.quotatype = args.quotatype
+            else:
+                logger.warning('SlurmRunner is not used, so the partition '
+                               'argument is ignored.')
+        if args.debug:
+            cfg.eval.runner.debug = True
+        if args.lark:
+            cfg.eval.runner.lark_bot_url = cfg['lark_bot_url']
+        cfg.eval.partitioner['out_dir'] = osp.join(cfg['work_dir'], 'results/')
+        partitioner = PARTITIONERS.build(cfg.eval.partitioner)
+        tasks = partitioner(cfg)
+        if args.dry_run:
+            return
+        runner = RUNNERS.build(cfg.eval.runner)
+        runner(tasks)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
-        summarizer = Summarizer(cfg)
+        summarizer_cfg = cfg.get('summarizer', {})
+        if not summarizer_cfg or summarizer_cfg.get('type', None) is None:
+            summarizer_cfg['type'] = DefaultSummarizer
+        summarizer_cfg['config'] = cfg
+        summarizer = build_from_cfg(summarizer_cfg)
         summarizer.summarize(time_str=cfg_time_str)
-
-
-def exec_infer_runner(tasks, args, cfg):
-    """execute infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='OpenICLInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             qos=args.qos,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        runner = DLCRunner(dict(type='OpenICLInferTask'),
-                           max_num_workers=args.max_num_workers,
-                           aliyun_cfg=Config.fromfile(args.aliyun_cfg),
-                           retry=args.retry,
-                           debug=args.debug,
-                           lark_bot_url=cfg['lark_bot_url'])
-    else:
-        runner = LocalRunner(task=dict(type='OpenICLInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
-
-
-def exec_eval_runner(tasks, args, cfg):
-    """execute infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='OpenICLEvalTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             qos=args.qos,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        runner = DLCRunner(dict(type='OpenICLEvalTask'),
-                           max_num_workers=args.max_num_workers,
-                           aliyun_cfg=Config.fromfile(args.aliyun_cfg),
-                           retry=args.retry,
-                           debug=args.debug,
-                           lark_bot_url=cfg['lark_bot_url'])
-    else:
-        runner = LocalRunner(task=dict(type='OpenICLEvalTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
 
 
 if __name__ == '__main__':

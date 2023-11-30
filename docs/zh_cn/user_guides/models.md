@@ -63,7 +63,9 @@ model = HuggingFaceCausalLM(
 OpenCompass 目前支持以下基于 API 的模型推理：
 
 - OpenAI（`opencompass.models.OpenAI`）
-- Coming soon
+- ChatGLM@智谱清言 (`opencompass.models.ZhiPuAI`)
+- ABAB-Chat@MiniMax (`opencompass.models.MiniMax`)
+- XunFei@科大讯飞 (`opencompass.models.XunFei`)
 
 以下，我们以 OpenAI 的配置文件为例，模型如何在配置文件中使用基于 API 的模型。
 
@@ -84,6 +86,15 @@ models = [
         batch_size=1,                            # 批次大小
     ),
 ]
+```
+
+我们也提供了API模型的评测示例，请参考
+
+```bash
+configs
+├── eval_zhipu.py
+├── eval_xunfei.py
+└── eval_minimax.py
 ```
 
 ## 自定义模型

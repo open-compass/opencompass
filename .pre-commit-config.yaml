@@ -3,25 +3,35 @@ exclude: |
       tests/data/|
       opencompass/models/internal/|
       opencompass/utils/internal/|
-      configs/
+      opencompass/openicl/icl_evaluator/hf_metrics/|
+      opencompass/datasets/lawbench/utils|
+      opencompass/datasets/lawbench/evaluation_functions/
     )
 repos:
   - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
+        exclude: configs/
   - repo: https://github.com/PyCQA/isort
     rev: 5.11.5
     hooks:
       - id: isort
+        exclude: configs/
   - repo: https://github.com/pre-commit/mirrors-yapf
     rev: v0.32.0
     hooks:
       - id: yapf
+        exclude: configs/
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.1
     hooks:
       - id: codespell
+        exclude: |
+            (?x)^(
+                .*\.jsonl|
+                configs/
+            )
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
     hooks:
@@ -29,17 +39,20 @@ repos:
         exclude: |
             (?x)^(
               dicts/|
-              projects/.*?/dicts/
+              projects/.*?/dicts/|
+              configs/
             )
       - id: check-yaml
       - id: end-of-file-fixer
         exclude: |
             (?x)^(
               dicts/|
-              projects/.*?/dicts/
+              projects/.*?/dicts/|
+              configs/
             )
       - id: requirements-txt-fixer
       - id: double-quote-string-fixer
+        exclude: configs/
       - id: check-merge-conflict
       - id: fix-encoding-pragma
         args: ["--remove"]
@@ -56,11 +69,21 @@ repos:
           - mdformat-openmmlab
           - mdformat_frontmatter
           - linkify-it-py
+        exclude: configs/
   - repo: https://github.com/myint/docformatter
     rev: v1.3.1
     hooks:
       - id: docformatter
         args: ["--in-place", "--wrap-descriptions", "79"]
+  - repo: local
+    hooks:
+    -   id: update-dataset-suffix
+        name: dataset suffix updater
+        entry: ./tools/update_dataset_suffix.py
+        language: script
+        pass_filenames: true
+        require_serial: true
+        files: ^configs/datasets
   # - repo: https://github.com/open-mmlab/pre-commit-hooks
   #   rev: v0.2.0  # Use the ref you want to point at
   #   hooks:

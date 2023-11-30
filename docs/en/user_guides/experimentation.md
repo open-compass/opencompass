@@ -2,18 +2,59 @@
 
 ## Launching an Evaluation Task
 
-The program entry for the evaluation task is `run.py`, its usage is as follows:
+The program entry for the evaluation task is `run.py`. The usage is as follows:
 
 ```shell
-python run.py $Config {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l] [--dry-run]
+python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l] [--dry-run] [--dump-eval-details]
 ```
 
-Here are some examples for launching the task in different environments:
+Task Configuration (`$EXP`):
 
-- Running locally: `run.py $Config`, where `$Config` does not contain fields 'eval' and 'infer'.
-- Running with Slurm: `run.py $Config --slurm -p $PARTITION_name`.
-- Running on ALiYun DLC: `run.py $Config --dlc --aliyun-cfg $AliYun_Cfg`, tutorial will come later.
-- Customized run: `run.py $Config`, where `$Config` contains fields 'eval' and 'infer', and you are able to customize the way how each task will be split and launched. See [Evaluation document](./evaluation.md).
+- `run.py` accepts a .py configuration file as task-related parameters, which must include the `datasets` and `models` fields.
+
+  ```bash
+  python run.py configs/eval_demo.py
+  ```
+
+- If no configuration file is provided, users can also specify models and datasets using `--models MODEL1 MODEL2 ...` and `--datasets DATASET1 DATASET2 ...`:
+
+  ```bash
+  python run.py --models hf_opt_350m hf_opt_125m --datasets siqa_gen winograd_ppl
+  ```
+
+- For HuggingFace related models, users can also define a model quickly in the command line through HuggingFace parameters and then specify datasets using `--datasets DATASET1 DATASET2 ...`.
+
+  ```bash
+  python run.py --datasets siqa_gen winograd_ppl \
+  --hf-path huggyllama/llama-7b \  # HuggingFace model path
+  --model-kwargs device_map='auto' \  # Parameters for constructing the model
+  --tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # Parameters for constructing the tokenizer
+  --max-out-len 100 \  # Maximum sequence length the model can accept
+  --max-seq-len 2048 \  # Maximum generated token count
+  --batch-size 8 \  # Batch size
+  --no-batch-padding \  # Disable batch padding and infer through a for loop to avoid accuracy loss
+  --num-gpus 1  # Number of minimum required GPUs for this model
+  ```
+
+  Complete HuggingFace parameter descriptions:
+
+  - `--hf-path`: HuggingFace model path
+  - `--peft-path`: PEFT model path
+  - `--tokenizer-path`: HuggingFace tokenizer path (if it's the same as the model path, it can be omitted)
+  - `--model-kwargs`: Parameters for constructing the model
+  - `--tokenizer-kwargs`: Parameters for constructing the tokenizer
+  - `--max-out-len`: Maximum generated token count
+  - `--max-seq-len`: Maximum sequence length the model can accept
+  - `--no-batch-padding`: Disable batch padding and infer through a for loop to avoid accuracy loss
+  - `--batch-size`: Batch size
+  - `--num-gpus`: Number of GPUs required to run the model. Please note that this parameter is only used to determine the number of GPUs required to run the model, and does not affect the actual number of GPUs used for the task. Refer to [Efficient Evaluation](./evaluation.md) for more details.
+
+Starting Methods:
+
+- Running on local machine: `run.py $EXP`.
+- Running with slurm: `run.py $EXP --slurm -p $PARTITION_name`.
+- Running with dlc: `run.py $EXP --dlc --aliyun-cfg $AliYun_Cfg`
+- Customized starting: `run.py $EXP`. Here, $EXP is the configuration file which includes the `eval` and `infer` fields. For detailed configurations, please refer to [Efficient Evaluation](./evaluation.md).
 
 The parameter explanation is as follows:
 
@@ -25,6 +66,7 @@ The parameter explanation is as follows:
 - `-w`: Specify the working path, default is `./outputs/default`.
 - `-l`: Enable status reporting via Lark bot.
 - `--dry-run`: When enabled, inference and evaluation tasks will be dispatched but won't actually run for debugging.
+- `--dump-eval-details`: When enabled，evaluation under the `results` folder will include more details, such as the correctness of each sample.
 
 Using run mode `-m all` as an example, the overall execution flow is as follows:
 

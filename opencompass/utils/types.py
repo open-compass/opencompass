@@ -1,6 +1,22 @@
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from datasets import Dataset, DatasetDict
+from mmengine.config import Config
+
+from opencompass.registry import TASKS
+
+
+def get_type_from_cfg(cfg: Union[Config, Dict]) -> Any:
+    """Get the object type given MMEngine's Config.
+
+    It loads the "type" field and return the corresponding object type.
+    """
+    type = cfg['type']
+    if isinstance(type, str):
+        # FIXME: This has nothing to do with any specific registry, to be fixed
+        # in MMEngine
+        type = TASKS.get(type)
+    return type
 
 
 def _check_type_list(obj, typelist: List):

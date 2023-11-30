@@ -23,19 +23,34 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :maxdepth: 1
    :caption: Get Started
 
-   get_started.md
+   get_started/installation.md
+   get_started/quick_start.md
+   get_started/faq.md
 
 .. _UserGuides:
 .. toctree::
    :maxdepth: 1
    :caption: User Guides
 
+   user_guides/framework_overview.md
    user_guides/config.md
    user_guides/datasets.md
    user_guides/models.md
    user_guides/evaluation.md
    user_guides/experimentation.md
    user_guides/metrics.md
+   user_guides/summarizer.md
+
+.. _Prompt:
+.. toctree::
+   :maxdepth: 1
+   :caption: Prompt
+
+   prompt/overview.md
+   prompt/prompt_template.md
+   prompt/meta_template.md
+   prompt/chain_of_thought.md
+
 
 .. _AdvancedGuides:
 .. toctree::
@@ -44,20 +59,20 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
 
    advanced_guides/new_dataset.md
    advanced_guides/new_model.md
-
-.. _Prompt:
-.. toctree::
-   :maxdepth: 1
-   :caption: Prompt
-
-   prompt/few_shot.md
-   prompt/prompt_template.md
-   prompt/meta_template.md
+   advanced_guides/evaluation_turbomind.md
+   advanced_guides/evaluation_lightllm.md
+   advanced_guides/code_eval.md
+   advanced_guides/code_eval_service.md
+   advanced_guides/multimodal_eval.md
+   advanced_guides/prompt_attack.md
+   advanced_guides/longeval.md
+   advanced_guides/subjective_evaluation.md
+   advanced_guides/circular_eval.md
 
 .. _Tools:
 .. toctree::
    :maxdepth: 1
-   :caption: tools
+   :caption: Tools
 
    tools.md
 

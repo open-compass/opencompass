@@ -27,14 +27,16 @@ copyright = '2023, OpenCompass'
 author = 'OpenCompass Authors'
 
 # The full version, including alpha/beta/rc tags
-# version_file = '../../opencompass/version.py'
+version_file = '../../opencompass/__init__.py'
 
-# def get_version():
-#     with open(version_file, 'r') as f:
-#         exec(compile(f.read(), version_file, 'exec'))
-#     return locals()['__version__']
 
-release = '1.0.0'
+def get_version():
+    with open(version_file, 'r') as f:
+        exec(compile(f.read(), version_file, 'exec'))
+    return locals()['__version__']
+
+
+release = get_version()
 
 # -- General configuration ---------------------------------------------------
 
@@ -52,6 +54,7 @@ extensions = [
     'sphinx_tabs.tabs',
     'notfound.extension',
     'sphinxcontrib.jquery',
+    'sphinx_design',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -91,7 +94,7 @@ html_theme_options = {
     'menu': [
         {
             'name': 'GitHub',
-            'url': 'https://github.com/InternLM/opencompass'
+            'url': 'https://github.com/open-compass/opencompass'
         },
     ],
     # Specify the language of shared menu
