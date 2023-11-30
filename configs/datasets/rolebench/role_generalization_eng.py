@@ -4,14 +4,14 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import RougeEvaluator
 from opencompass.datasets.rolebench import RoleGeneralizationEnglishDataset
 
-role_generalization_zh_reader_cfg = dict(
+role_generalization_eng_reader_cfg = dict(
     input_columns=['role', 'desc', 'question'],
     output_column='answer',
     train_split='train',
     test_split='test'
 )
 
-role_generalization_zh_infer_cfg = dict(
+role_generalization_eng_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
@@ -26,16 +26,16 @@ role_generalization_zh_infer_cfg = dict(
     inferencer=dict(type=GenInferencer, max_out_len=512)
 )
 
-role_generalization_zh_eval_cfg = dict(
+role_generalization_eng_eval_cfg = dict(
     evaluator=dict(type=RougeEvaluator), 
     pred_role='BOT'
 )
 
-role_generalization_zh_datasets = [
+role_generalization_eng_datasets = [
     dict(
         type=RoleGeneralizationEnglishDataset,
         path='ZenMoore/RoleBench',
-        reader_cfg=role_generalization_zh_reader_cfg,
-        infer_cfg=role_generalization_zh_infer_cfg,
-        eval_cfg=role_generalization_zh_eval_cfg)
+        reader_cfg=role_generalization_eng_reader_cfg,
+        infer_cfg=role_generalization_eng_infer_cfg,
+        eval_cfg=role_generalization_eng_eval_cfg)
 ]
