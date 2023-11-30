@@ -8,7 +8,7 @@ from opencompass.utils.text_postprocessors import first_capital_postprocess
 commonsenseqacn_reader_cfg = dict(
     input_columns=["question", "A", "B", "C", "D", "E"],
     output_column="answerKey",
-    test_split="validation"
+    test_split="validation",
 )
 
 _ice_template = dict(
@@ -18,13 +18,9 @@ _ice_template = dict(
         round=[
             dict(
                 role="HUMAN",
-                prompt=
-                "{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\n答案：",
+                prompt="{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\n答案：",
             ),
-            dict(
-                role="BOT",
-                prompt="{answerKey}",
-            ),
+            dict(role="BOT", prompt="{answerKey}"),
         ],
     ),
     ice_token="</E>",
@@ -44,6 +40,7 @@ commonsenseqacn_eval_cfg = dict(
 
 commonsenseqacn_datasets = [
     dict(
+        abbr="commonsenseqa_cn",
         type=CommonsenseQADataset_CN,
         path="./data/commonsenseqa_cn/validation.jsonl",
         reader_cfg=commonsenseqacn_reader_cfg,
@@ -51,5 +48,3 @@ commonsenseqacn_datasets = [
         eval_cfg=commonsenseqacn_eval_cfg,
     )
 ]
-
-del _ice_template
