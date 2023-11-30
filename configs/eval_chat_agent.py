@@ -8,8 +8,7 @@ from lagent import PythonInterpreter, ReAct
 from lagent.agents.react import ReActProtocol
 
 with read_base():
-    from .datasets.gsm8k.gsm8k_gen_3ac57d import gsm8k_datasets as datasets
-
+    from .datasets.gsm8k.gsm8k_agent_gen_3ac57d import gsm8k_datasets as datasets
 
 system_prompt = """You are a helpful assistant which use tools to solve mathematical reasoning questions. The code must be a function, and the function name must be 'solution'. For mathematics, please use code tool to calculate. The example format is as follows:
 ```
