@@ -49,29 +49,7 @@ def gsm8k_postprocess(text: str) -> str:
             break
     ret1 = ''
     for i in range(len(ret)):
-        if ret[i].isdigit():
-            ret1 += ret[i]
-    return ret1
-
-
-@TEXT_POSTPROCESSORS.register_module('gsm8k_agent')
-def gsm8k_agent_postprocess(text: str) -> str:
-    """Accept float output."""
-    text = text.split('\n\n')[0]
-    text = text.split(' ')[::-1]
-    flag = False
-    ret = ''
-    for i in range(len(text)):
-        s = text[i]
-        for i in range(len(s)):
-            if s[i].isdigit():
-                flag = True
-                ret = s
-                break
-        if flag:
-            break
-    ret1 = ''
-    for i in range(len(ret)):
+        # deal with potential float number
         if ret[i].isdigit() or ret[i] == '.':
             ret1 += ret[i]
     return ret1.strip('.')

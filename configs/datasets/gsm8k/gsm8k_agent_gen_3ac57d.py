@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import AgentInferencer
 from opencompass.datasets import (
     GSM8KDataset,
-    gsm8k_agent_postprocess,
+    gsm8k_postprocess,
     gsm8k_dataset_postprocess,
     Gsm8kAgentEvaluator,
 )
@@ -39,7 +39,7 @@ gsm8k_infer_cfg = dict(
 
 gsm8k_eval_cfg = dict(
     evaluator=dict(type=Gsm8kAgentEvaluator),
-    pred_postprocessor=dict(type=gsm8k_agent_postprocess),
+    pred_postprocessor=dict(type=gsm8k_postprocess),
     dataset_postprocessor=dict(type=gsm8k_dataset_postprocess),
 )
 
