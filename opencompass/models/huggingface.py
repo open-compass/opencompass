@@ -159,8 +159,7 @@ class HuggingFace(BaseModel):
                 'None': None
             }.get(model_kwargs['torch_dtype'])
         self.logger.debug(f'HF using torch_dtype: {torch_dtype}')
-        if torch_dtype is not None:
-            model_kwargs['torch_dtype'] = torch_dtype
+        model_kwargs['torch_dtype'] = torch_dtype
 
     def _load_model(self,
                     path: str,
