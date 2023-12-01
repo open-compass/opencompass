@@ -49,6 +49,9 @@ class HuggingFace(BaseModel):
         use_fastchat_template (str, optional): Whether to use fastchat to get
             the conversation template. If True, fastchat needs to be
             implemented first. Defaults to False.
+        end_str (str, optional): Whether to trim generated strings with end_str
+            if the model has special ending strings that are not handled well.
+            Defaults to None.
 
     Note:
         About ``extract_pred_after_decode``: Commonly, we should extract the
@@ -72,7 +75,8 @@ class HuggingFace(BaseModel):
                  batch_padding: bool = False,
                  pad_token_id: Optional[int] = None,
                  mode: str = 'none',
-                 use_fastchat_template: bool = False):
+                 use_fastchat_template: bool = False,
+                 end_str: Optional[str] = None):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          tokenizer_only=tokenizer_only,
@@ -96,6 +100,7 @@ class HuggingFace(BaseModel):
                              peft_path=peft_path)
         self.generation_kwargs = generation_kwargs
         self.use_fastchat_template = use_fastchat_template
+        self.end_str = end_str
 
     def _load_tokenizer(self, path: str, tokenizer_path: Optional[str],
                         tokenizer_kwargs: dict):
@@ -266,6 +271,8 @@ class HuggingFace(BaseModel):
                 token[len_:] for token, len_ in zip(decodeds, prompt_lens)
             ]
 
+        if self.end_str:
+            decodeds = [token.split(self.end_str)[0] for token in decodeds]
         return decodeds
 
     def _single_generate(self, inputs: List[str], max_out_len: int,
@@ -329,6 +336,8 @@ class HuggingFace(BaseModel):
                 token[len_:] for token, len_ in zip(decodeds, prompt_lens)
             ]
 
+        if self.end_str:
+            decodeds = [token.split(self.end_str)[0] for token in decodeds]
         return decodeds
 
     def get_logits(self, inputs: List[str]):
