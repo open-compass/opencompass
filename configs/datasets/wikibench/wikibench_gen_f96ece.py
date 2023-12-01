@@ -39,7 +39,7 @@ for _split in list(wikibench_sets.keys()):
         )
         wikibench_eval_cfg = dict(
             evaluator=dict(type=CircularEvaluator if CircularEval else AccEvaluator),
-            pred_postprocessor=dict(type=first_option_postprocess ))
+            pred_postprocessor=dict(type=first_option_postprocess, options="ABCD"))
 
         wikibench_datasets.append(
             dict(
