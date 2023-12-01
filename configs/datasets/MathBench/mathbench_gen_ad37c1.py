@@ -89,7 +89,7 @@ for _split in list(mathbench_sets.keys()):
         )
 
         mathbench_eval_cfg = dict(
-            evaluator=dict(type=CircularEvaluator if 'choice' in _name else AccEvaluator),
+            evaluator=dict(type=CircularEvaluator if 'choice' in _name and with_circular_eval else AccEvaluator),
             pred_postprocessor=dict(type=first_option_postprocess, options='ABCD') if 'single_choice' in _name else dict(type=mathbench_postprocess, name=_name))
 
         mathbench_datasets.append(
