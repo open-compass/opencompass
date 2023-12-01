@@ -11,10 +11,10 @@ single_choice_prompts = {
 }
 
 wikibench_sets = {
-    'wiki': ['single_choice_cn'],
+    "wiki": ["single_choice_cn"],
 }
 
-CircularEval = True
+do_circular = True
 
 wikibench_datasets = []
 
@@ -26,31 +26,31 @@ for _split in list(wikibench_sets.keys()):
                 template=dict(
                     begin="</E>",
                     round=[
-                        dict(
-                            role="HUMAN",
-                            prompt= single_choice_prompts[_name],
-                        ),
-                        dict(role="BOT", prompt="{answer}"),],
-                    ),
+                        dict(role="HUMAN", prompt=single_choice_prompts[_name]),
+                        dict(role="BOT", prompt="{answer}"),
+                    ],
+                ),
                 ice_token="</E>",
             ),
             retriever=dict(type=ZeroRetriever),
             inferencer=dict(type=GenInferencer),
         )
         wikibench_eval_cfg = dict(
-            evaluator=dict(type=CircularEvaluator if CircularEval else AccEvaluator),
-            pred_postprocessor=dict(type=first_option_postprocess, options="ABCD"))
+            evaluator=dict(type=CircularEvaluator if do_circular else AccEvaluator),
+            pred_postprocessor=dict(type=first_option_postprocess, options="ABCD"),
+        )
 
         wikibench_datasets.append(
             dict(
                 type=WikiBenchDataset,
                 path=f"./data/WikiBench/{_name}.jsonl",
-                name='circular_' + _name if CircularEval else _name,
-                abbr="wikibench-" + _split + '-' + _name + 'circular'if CircularEval else '',
+                name="circular_" + _name if do_circular else _name,
+                abbr="wikibench-" + _split + "-" + _name + "circular" if do_circular else "",
                 reader_cfg=dict(
                     input_columns=["question"],
-                    output_column="answer"
-                    ),
+                    output_column="answer",
+                ),
                 infer_cfg=wikibench_infer_cfg,
                 eval_cfg=wikibench_eval_cfg,
-            ))
+            )
+        )
