@@ -64,9 +64,10 @@ from .siqa import *  # noqa: F401, F403
 from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403
 from .strategyqa import *  # noqa: F401, F403
+from .subject_corev2 import *  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
-from .tabmwp import *  # noqa: F401, F403
+from .TabMWP import *  # noqa: F401, F403
 from .TheoremQA import *  # noqa: F401, F403
 from .tnews import *  # noqa: F401, F403
 from .triviaqa import *  # noqa: F401, F403
