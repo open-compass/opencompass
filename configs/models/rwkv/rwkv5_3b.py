@@ -16,9 +16,10 @@ models = [
             trust_remote_code=True,
             use_fast=False,
         ),
-        max_out_len=256,
+        max_out_len=100,
         max_seq_len=2048,
-        batch_size=1,
+        batch_padding=True,
+        batch_size=128,
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
