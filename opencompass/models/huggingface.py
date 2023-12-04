@@ -146,11 +146,6 @@ class HuggingFace(BaseModel):
             self.tokenizer.bos_token = '<s>'
             self.tokenizer.eos_token = '</s>'
             self.tokenizer.pad_token_id = 0
-        if "RWKV/rwkv" in path or \
-            (tokenizer_path and
-                 'RWKV/rwkv' in tokenizer_path):
-            self.logger.warning('We set new pad_token_id for RWKV model')
-            self.tokenizer.pad_token_id = 0
 
     def _set_model_kwargs_torch_dtype(self, model_kwargs):
         if 'torch_dtype' not in model_kwargs:
