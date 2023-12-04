@@ -2,7 +2,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import SubJudge_Dataset, Corev2Evaluator
+from opencompass.datasets import SubJudgeDataset, Corev2Evaluator
 
 cn_prefix = """
 请根据提供 评分要求，问题 以及 相应的两个回答（回答 1，回答 2），判断两个回答中哪一个更好。
@@ -237,7 +237,7 @@ judge_corev2_datasets = []
 for base in base_model_and_result:
     for compare in compare_model_and_result:
         corev2_eval_cfg = dict(evaluator=dict(type=Corev2Evaluator, base_model=base['model'], compare_model=compare['model'], judge_method='gpt4', metric='win_rate'))
-        judge_corev2_datasets.append(dict(type=SubJudge_Dataset,
+        judge_corev2_datasets.append(dict(type=SubJudgeDataset,
                                           path=base['path'],
                                           path2=compare['path'],
                                           model1=base['model'],

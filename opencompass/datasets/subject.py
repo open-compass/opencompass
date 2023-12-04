@@ -10,7 +10,7 @@ from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class SubInfer_Dataset(BaseDataset):
+class SubInferDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
@@ -37,7 +37,7 @@ class SubInfer_Dataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class SubJudge_Dataset(BaseDataset):
+class SubJudgeDataset(BaseDataset):
 
     @staticmethod
     def load(
