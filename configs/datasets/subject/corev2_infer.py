@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import Infer_COREV2_Dataset
+from opencompass.datasets import SubInfer_Dataset
 
 corev2_reader_cfg = dict(
     input_columns=["question"],
@@ -25,8 +25,8 @@ corev2_infer_cfg = dict(
 
 infer_corev2_datasets = [
     dict(
-        type=Infer_COREV2_Dataset,
-        path="./data/subject/corev2",
+        type=SubInfer_Dataset,
+        path="./data/subject/corev2/COREV2_6A.json",
         reader_cfg=corev2_reader_cfg,
         infer_cfg=corev2_infer_cfg,
         )
