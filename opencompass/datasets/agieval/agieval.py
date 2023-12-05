@@ -64,9 +64,36 @@ class AGIEvalEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         predictions = [parse_math_answer('', pred) for pred in predictions]
+        details = []
         cnt = 0
         for pred, ref in zip(predictions, references):
+            detail = {'pred': pred, 'answer': ref, 'correct': False}
             if is_equiv(pred, ref):
                 cnt += 1
+                detail['correct'] = True
+            details.append(detail)
         score = cnt / len(predictions) * 100
-        return {'score': score}
+        return {'score': score, 'details': details}
+
+
+@ICL_EVALUATORS.register_module()
+class AGIEvalEvaluator_mcq(BaseEvaluator):
+
+    def score(self, predictions, references):
+        if len(predictions) != len(references):
+            return {
+                'error': 'predictions and references have different '
+                'length'
+            }
+        details = []
+        cnt = 0
+        for pred, ref in zip(predictions, references):
+            detail = {'pred': pred, 'answer': ref, 'correct': False}
+            if pred == ref:
+                cnt += 1
+                detail['correct'] = True
+            details.append(detail)
+
+        score = cnt / len(predictions) * 100
+
+        return {'score': score, 'details': details}

@@ -99,13 +99,12 @@ def get_config_from_arg(args) -> Config:
                      run_cfg=dict(num_gpus=args.num_gpus))
         models.append(model)
 
-    summarizer = {}
-    if args.summarizer:
-        summarizers_dir = os.path.join(args.config_dir, 'summarizers')
-        s = match_cfg_file(summarizers_dir, [args.summarizer])[0]
-        get_logger().info(f'Loading {s[0]}: {s[1]}')
-        cfg = Config.fromfile(s[1])
-        summarizer = cfg['summarizer']
+    summarizer = args.summarizer if args.summarizer is not None else 'example'
+    summarizers_dir = os.path.join(args.config_dir, 'summarizers')
+    s = match_cfg_file(summarizers_dir, [summarizer])[0]
+    get_logger().info(f'Loading {s[0]}: {s[1]}')
+    cfg = Config.fromfile(s[1])
+    summarizer = cfg['summarizer']
 
     return Config(dict(models=models, datasets=datasets,
                        summarizer=summarizer),

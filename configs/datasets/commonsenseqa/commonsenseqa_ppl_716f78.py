@@ -4,6 +4,11 @@ from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import commonsenseqaDataset
 
+commonsenseqa_reader_cfg = dict(
+    input_columns=['question', 'A', 'B', 'C', 'D', 'E'],
+    output_column='answerKey',
+    test_split='validation')
+
 _ice_template = dict(
     type=PromptTemplate,
     template={
@@ -31,15 +36,10 @@ commonsenseqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 commonsenseqa_datasets = [
     dict(
+        abbr='commonsense_qa',
         type=commonsenseqaDataset,
-        path='commonsense_qa',
-        reader_cfg=dict(
-            input_columns=['question', 'A', 'B', 'C', 'D', 'E'],
-            output_column='answerKey',
-            test_split='validation',
-        ),
+        path='./data/commonsenseqa',
+        reader_cfg=commonsenseqa_reader_cfg,
         infer_cfg=commonsenseqa_infer_cfg,
         eval_cfg=commonsenseqa_eval_cfg)
 ]
-
-del _ice_template

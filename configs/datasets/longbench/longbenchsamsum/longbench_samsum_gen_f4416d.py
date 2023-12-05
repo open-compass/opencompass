@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import LongBenchRougeEvaluator, LongBenchsamsumDataset
+from opencompass.datasets import LongBenchRougeEvaluator, LongBenchsamsumDataset, samsum_postprocess
 
 LongBench_samsum_reader_cfg = dict(
     input_columns=['context', 'input'],
@@ -23,7 +23,8 @@ LongBench_samsum_infer_cfg = dict(
 
 LongBench_samsum_eval_cfg = dict(
     evaluator=dict(type=LongBenchRougeEvaluator),
-    pred_role='BOT'
+    pred_role='BOT',
+    pred_postprocessor=dict(type=samsum_postprocess),
 )
 
 LongBench_samsum_datasets = [

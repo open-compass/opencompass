@@ -2,12 +2,29 @@
 
 1. Set up the OpenCompass environment:
 
+`````{tabs}
+````{tab} Open-source Models with GPU
+
    ```bash
    conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
    conda activate opencompass
    ```
 
    If you want to customize the PyTorch version or related CUDA version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
+
+````
+````{tab} API Models with CPU-only
+
+   ```bash
+   conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
+   conda activate opencompass
+   # also please install requiresments packages via `pip install -r requirements/api.txt` for API models if needed.
+   ```
+
+   If you want to customize the PyTorch version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
+
+````
+`````
 
 2. Install OpenCompass:
 
@@ -66,9 +83,20 @@ Run the following commands to download and place the datasets in the `${OpenComp
 
 ```bash
 # Run in the OpenCompass directory
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
+unzip OpenCompassData-core-20231110.zip
 ```
+
+If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download it using the following command:
+
+```bash
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
+unzip OpenCompassData-complete-20231110.zip
+cd ./data
+unzip *.zip
+```
+
+The list of datasets included in both `.zip` can be found [here](https://github.com/open-compass/opencompass/releases/tag/0.1.8.rc1)
 
 OpenCompass has supported most of the datasets commonly used for performance comparison, please refer to `configs/dataset` for the specific list of supported datasets.
 

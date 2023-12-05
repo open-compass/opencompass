@@ -18,42 +18,62 @@ pip install lmdeploy
 
 ## Evaluation
 
-We take the InternLM as example.
+OpenCompass integrates both turbomind's python API and gRPC API for evaluation. And the former is highly recommended.
 
-### Step-1: Get InternLM model
+We take the InternLM-20B as example. Please download it from huggingface and convert it to turbomind's model format:
 
 ```shell
 # 1. Download InternLM model(or use the cached model's checkpoint)
 
 # Make sure you have git-lfs installed (https://git-lfs.com)
 git lfs install
-git clone https://huggingface.co/internlm/internlm-chat-7b /path/to/internlm-chat-7b
+git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
 
-# if you want to clone without large files – just their pointers
-# prepend your git clone with the following env var:
-GIT_LFS_SKIP_SMUDGE=1
-
-# 2. Convert InternLM model to turbomind's format, which will be in "./workspace" by default
-python3 -m lmdeploy.serve.turbomind.deploy internlm-chat-7b /path/to/internlm-chat-7b
-
+# 2. Convert InternLM model to turbomind's format, and save it in the home folder of opencompass
+lmdeploy convert internlm /path/to/internlm-20b \
+    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
-### Step-2: Launch Triton Inference Server
+**Note**:
+
+If evaluating the InternLM Chat model, make sure to pass `internlm-chat` as the model name instead of `internlm` when converting the model format. The specific command is:
 
 ```shell
-bash ./workspace/service_docker_up.sh
+lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
+    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
-\*\*Note: \*\*In the implementation of turbomind, inference is "persistent". The "destroy" operation can lead to unexpected issues. Therefore, we temporarily use service interfaces for model evaluation. And we will integrate the Python API to OpenCompass when turbomind supports "destroy".
+### Evaluation with Turbomind Python API (recommended)
 
-### Step-3: Evaluate the Converted Model
-
-In the home folder of OpenCompass
+In the home folder of OpenCompass, start evaluation by the following command:
 
 ```shell
-python run.py configs/eval_internlm_chat_7b_turbomind.py -w outputs/turbomind
+python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-20b
 ```
 
 You are expected to get the evaluation results after the inference and evaluation.
 
-\*\*Note: \*\*In `eval_internlm_chat_7b_turbomind.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:33337'`. Please modify `tis_addr` to the IP address of the machine where the server is launched.
+**Note**:
+
+- If you evaluate theInternLM Chat model, please use configuration file `eval_internlm_chat_turbomind.py`
+- If you evaluate the InternLM 7B model, please modify `eval_internlm_turbomind.py` or `eval_internlm_chat_turbomind.py` by commenting out the configuration for the 20B model and enabling the configuration for the 7B model.
+
+### Evaluation with Turbomind gPRC API (optional)
+
+In the home folder of OpenCompass, launch the Triton Inference Server:
+
+```shell
+bash turbomind/service_docker_up.sh
+```
+
+And start evaluation by the following command:
+
+```shell
+python run.py configs/eval_internlm_turbomind_tis.py -w outputs/turbomind-tis/internlm-20b
+```
+
+\*\*Note: \*\*
+
+- If the InternLM Chat model is requested to be evaluated, please use config file `eval_internlm_chat_turbomind_tis.py`
+- In `eval_internlm_turbomind_tis.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:33337'`. Please modify `tis_addr` to the IP address of the machine where the server is launched.
+- If evaluating the InternLM 7B model, please modify the config file, commenting out the configuration for the 20B model and enabling the configuration for the 7B model

@@ -11,7 +11,21 @@ from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    import traceback
+
+    traceback.print_exc()
+    raise ImportError(
+        'Import cv2 failed. Please install it with '
+        '"pip install opencv-python-headless" and try again.\n\n'
+        'If the prompt `ImportError: libGL.so.1` appears,'
+        ' you may consider one of the following two methods:\n'
+        'Method 1 - Uninstall opencv and then install opencv-headless\n'
+        'pip uninstall opencv-python; pip install opencv-python-headless\n\n'
+        'Method 2: Install the missing dynamic link libraries\n'
+        'sudo apt-get update; sudo apt-get install -y libgl1 libglib2.0-0')
 import mmengine
 import numpy as np
 import pandas as pd

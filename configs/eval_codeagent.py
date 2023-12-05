@@ -6,8 +6,8 @@ from opencompass.models import OpenAI, HuggingFaceCausalLM
 from opencompass.models.lagent import CodeAgent
 
 with read_base():
-    from .datasets.math.math_gen_6cca30 import math_datasets
-    from .datasets.gsm8k.gsm8k_gen_e7ef64 import gsm8k_datasets
+    from .datasets.math.math_gen_943d32 import math_datasets
+    from .datasets.gsm8k.gsm8k_gen_57b0b1 import gsm8k_datasets
 
 datasets = []
 datasets += gsm8k_datasets

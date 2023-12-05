@@ -1,0 +1,4 @@
+sseclient-py==1.7.2
+volcengine # bytedance
+websocket-client
+zhipuai # zhipu

@@ -82,6 +82,20 @@ def strategyqa_pred_postprocess(text: str) -> str:
     return ''
 
 
+def flores_postprocess(text: str) -> str:
+    text = text.strip().split('\n')[-1].strip()
+    return text
+
+
+def flores_postprocess_chinese(text: str) -> str:
+    text = text.strip().split('\n')[-1].strip()
+    import jieba
+    truncated_text = text.strip().split('\n')[0]
+    cleaned_text = re.sub(r'\s+', ' ', truncated_text).strip()
+    cleaned_text = ' '.join(jieba.cut(cleaned_text))
+    return cleaned_text
+
+
 def record_postprocess(text: str) -> str:
     match = re.search(r'(?<=refers to )[^.]+', text)
 

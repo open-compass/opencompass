@@ -51,8 +51,7 @@ class BaseInferencer:
         self.output_json_filepath = output_json_filepath
         self.output_json_filename = output_json_filename
         self.is_main_process = is_main_process()
-        if not os.path.exists(self.output_json_filepath):
-            os.makedirs(self.output_json_filepath)
+        os.makedirs(self.output_json_filepath, exist_ok=True)
 
     def inference(self,
                   retriever: BaseRetriever,

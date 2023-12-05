@@ -10,6 +10,16 @@ OpenCompass 使用称为 task (任务) 的单位处理评估请求。每个任�
 
 例如，如果您在配备有 8 个 GPU 的本地机器上使用 OpenCompass，每个任务要求 4 个 GPU，那么默认情况下，OpenCompass 会使用所有 8 个 GPU 同时运行 2 个任务。但是，如果您将 `--max-num-workers` 设置为 1，那么一次只会处理一个任务，只使用 4 个 GPU。
 
+### 为什么 HuggingFace 模型使用 GPU 的行为和我的预期不符？
+
+这是一个比较复杂的问题，我们需要从供给和需求两侧来说明：
+
+供给侧就是运行多少任务。任务是模型和数据集的组合，它首先取决于要测多少模型和多少数据集。另外由于 OpenCompass 会将一个较大的任务拆分成多个小任务，因此每个子任务有多少条数据 `--max-partition-size` 也会影响任务的数量。(`--max-partition-size` 与真实数据条目成正比，但并不是 1:1 的关系)。
+
+需求侧就是有多少 worker 在运行。由于 OpenCompass 会同时实例化多个模型去进行推理，因此我们用 `--num-gpus` 来指定每个实例使用多少 GPU。注意 `--num-gpus` 是一个 HuggingFace 模型专用的参数，非 HuggingFace 模型设置该参数是不会起作用的。同时我们使用 `--max-num-workers` 去表示最多有多少个实例在运行。最后由于 GPU 显存、负载不充分等问题，OpenCompass 也支持在同一个 GPU 上运行多个实例，这个参数是 `--max-num-workers-per-gpu`。因此可以笼统地认为，我们总共会使用 `--num-gpus` * `--max-num-workers` /  `--max-num-workers-per-gpu` 个 GPU。
+
+综上，当任务运行较慢，GPU 负载不高的时候，我们首先需要检查供给是否充足，如果不充足，可以考虑调小 `--max-partition-size` 来将任务拆分地更细；其次需要检查需求是否充足，如果不充足，可以考虑增大 `--max-num-workers` 和 `--max-num-workers-per-gpu`。一般来说，**我们会将 `--num-gpus` 设定为最小的满足需求的值，并不会再进行调整**。
+
 ### 我如何控制 OpenCompass 占用的 GPU 数量？
 
 目前，没有直接的方法来指定 OpenCompass 可以使用的 GPU 数量。但以下是一些间接策略：
@@ -19,6 +29,22 @@ OpenCompass 使用称为 task (任务) 的单位处理评估请求。每个任�
 
 **如果使用 Slurm 或 DLC：**
 尽管 OpenCompass 没有直接访问资源池，但您可以调整 `--max-num-workers` 参数以限制同时提交的评估任务数量。这将间接管理 OpenCompass 使用的 GPU 数量。例如，如果每个任务需要 4 个 GPU，您希望分配总共 8 个 GPU，那么应将 `--max-num-workers` 设置为 2。
+
+### 找不到 `libGL.so.1`
+
+opencv-python 依赖一些动态库，但环境中没有，最简单的解决办法是卸载 opencv-python 再安装 opencv-python-headless。
+
+```bash
+pip uninstall opencv-python
+pip install opencv-python-headless
+```
+
+也可以根据报错提示安装对应的依赖库
+
+```bash
+sudo apt-get update
+sudo apt-get install -y libgl1 libglib2.0-0
+```
 
 ## 网络
 
@@ -58,3 +84,22 @@ OpenCompass 中的每个任务代表等待评估的特定模型和数据集部�
 任务数量与加载模型的时间之间存在权衡。例如，如果我们将评估模型与数据集的请求分成 100 个任务，模型将总共加载 100 次。当资源充足时，这 100 个任务可以并行执行，所以在模型加载上花费的额外时间可以忽略。但是，如果资源有限，这 100 个任务会更加串行地执行，重复的加载可能成为执行时间的瓶颈。
 
 因此，如果用户发现任务数量远远超过可用的 GPU，我们建议将 `--max-partition-size` 设置为一个较大的值。
+
+## 模型
+
+### 如何使用本地已下好的Huggingface模型?
+
+如果您已经提前下载好Huggingface的模型文件，请手动指定模型路径，并在`--model-kwargs` 和 `--tokenizer-kwargs`中添加 `trust_remote_code=True`. 示例如下
+
+```bash
+python run.py --datasets siqa_gen winograd_ppl \
+--hf-path /path/to/model \  # HuggingFace 模型地址
+--tokenizer-path /path/to/model \  # HuggingFace 模型地址
+--model-kwargs device_map='auto' trust_remote_code=True \  # 构造 model 的参数
+--tokenizer-kwargs padding_side='left' truncation='left' use_fast=False trust_remote_code=True \  # 构造 tokenizer 的参数
+--max-out-len 100 \  # 模型能接受的最大序列长度
+--max-seq-len 2048 \  # 最长生成 token 数
+--batch-size 8 \  # 批次大小
+--no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
+--num-gpus 1  # 所需 gpu 数
+```

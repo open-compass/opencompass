@@ -84,20 +84,17 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
         if infer_cfg.inferencer.type == PPLInferencer:
             labels = retriever.get_labels(ice_template=ice_template,
                                           prompt_template=prompt_template)
-            ice = [
-                retriever.generate_ice(ice_idx_list[_idx],
-                                       ice_template=ice_template)
-                for _idx in range(len(ice_idx_list))
-            ]
+            ice = retriever.generate_ice(ice_idx_list[idx],
+                                         ice_template=ice_template)
             print('-' * 100)
             print('ICE Template:')
             print('-' * 100)
-            print(ice[0])
+            print(ice)
             print('-' * 100)
             for label in labels:
                 prompt = retriever.generate_label_prompt(
                     idx,
-                    ice[idx],
+                    ice,
                     label,
                     ice_template=ice_template,
                     prompt_template=prompt_template,
@@ -111,11 +108,11 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
                         print(f'Truncating ice {num_ice} -> {num_ice - 1}',
                               f'Number of tokens: {prompt_token_num} -> ...')
                         ice_idx_list[idx] = ice_idx_list[idx][:-1]
-                        ice[idx] = retriever.generate_ice(
-                            ice_idx_list[idx], ice_template=ice_template)
+                        ice = retriever.generate_ice(ice_idx_list[idx],
+                                                     ice_template=ice_template)
                         prompt = retriever.generate_label_prompt(
                             idx,
-                            ice[idx],
+                            ice,
                             label,
                             ice_template=ice_template,
                             prompt_template=prompt_template)

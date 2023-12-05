@@ -2,7 +2,7 @@ import copy
 import math
 import os.path as osp
 from fnmatch import fnmatch
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import mmengine
 from mmengine.config import Config, ConfigDict
@@ -24,6 +24,11 @@ class SizePartitioner(BasePartitioner):
         max_task_size (int): The maximum size of a task.
         gen_task_coef (int): The dataset cost measurement coefficient for
             generation tasks.
+        strategy (str): The partition strategy. Supported strategies are:
+            'heuristic' and 'split'. Defaults to 'heuristic'.
+            heuristic: split large datasets into several tasks, merge small
+                datasets into one task.
+            split: split large datasets into several tasks only.
         dataset_size_path (str): The path to the dataset size cache file.
         keep_keys (list[str]): The keys to be kept from the experiment config
             to the task config.
@@ -33,12 +38,17 @@ class SizePartitioner(BasePartitioner):
                  out_dir: str,
                  max_task_size: int = 40000,
                  gen_task_coef: int = 20,
+                 strategy: str = 'heuristic',
                  dataset_size_path: str = '.cache/dataset_size.json',
-                 keep_keys: List[str] = ['eval.runner.task.judge_cfg']):
+                 keep_keys: Optional[List[str]] = None):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
         self.max_task_size = max_task_size
         self.gen_task_coef = gen_task_coef
         self.dataset_size_path = dataset_size_path
+        assert strategy in ('heuristic', 'split'), \
+            f'Unsupported partition strategy: {strategy}. '\
+            'Supported strategies are: `heuristic`, `split` .'
+        self.strategy = strategy
 
     def partition(self,
                   models: List[ConfigDict],
@@ -79,47 +89,47 @@ class SizePartitioner(BasePartitioner):
                           reverse=True)
         tasks = []
         for model in models:
-            task = Config({
-                'models': [model],
-                'datasets': [[]],
-                'work_dir': work_dir,
-                **add_cfg
-            })
-            num_data = 0
+            chunks = []  # elements: tuple(size, dataset_chunk)
             for dataset in datasets:
                 filename = get_infer_output_path(model, dataset, out_dir)
-                root, ext = osp.splitext(filename)
                 # skip the task if the task output exists
                 if osp.exists(filename):
                     continue
                 dataset_size = self.get_cost(dataset)
                 if dataset_size > self.max_task_size:
+                    root, ext = osp.splitext(filename)
                     dataset_splits = self.split_dataset(dataset)
                     for i, dataset_split in enumerate(dataset_splits):
-                        # skip the task it the task output exists
                         if not osp.exists(f'{root}_{i}{ext}'):
-                            tasks.append(
-                                Config({
-                                    'models': [model],
-                                    'datasets': [[dataset_split]],
-                                    'work_dir': work_dir,
-                                    **add_cfg
-                                }))
+                            chunks.append((self.max_task_size, dataset_split))
                 else:
-                    if num_data + dataset_size > self.max_task_size:
-                        tasks.append(task)
-                        task = Config({
+                    chunks.append((dataset_size, dataset))
+
+            if self.strategy == 'heuristic':
+                chunks = sorted(chunks, key=lambda x: x[0], reverse=True)
+                current_size, current_chunks = 0, []
+                for index in range(len(chunks)):
+                    current_size += chunks[index][0]
+                    current_chunks.append(chunks[index][1])
+                    if index == len(chunks) - 1 or current_size + chunks[
+                            index + 1][0] > self.max_task_size:
+                        tasks.append(
+                            Config({
+                                'models': [model],
+                                'datasets': [current_chunks],
+                                'work_dir': work_dir,
+                                **add_cfg
+                            }))
+                        current_size, current_chunks = 0, []
+            elif self.strategy == 'split':
+                for _, dataset in chunks:
+                    tasks.append(
+                        Config({
                             'models': [model],
-                            'datasets': [[]],
+                            'datasets': [[dataset]],
                             'work_dir': work_dir,
                             **add_cfg
-                        })
-                        num_data = 0
-                    task['datasets'][0].append(dataset)
-                    num_data = num_data + dataset_size
-            if task['datasets'][0]:
-                tasks.append(task)
-
+                        }))
         return tasks
 
     @property

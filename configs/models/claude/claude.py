@@ -1,6 +1,8 @@
 from opencompass.models.claude_api.claude_api import Claude
+from opencompass.models.claude_api.postprocessors import (
+    flores_postprocess, gsm8k_postprocess, humaneval_postprocess,
+    lcsts_postprocess, mbpp_postprocess, strategyqa_pred_postprocess)
 from opencompass.utils.text_postprocessors import last_option_postprocess
-from opencompass.models.claude_api.postprocessors import gsm8k_postprocess, humaneval_postprocess, lcsts_postprocess, mbpp_postprocess, strategyqa_pred_postprocess
 
 agieval_single_choice_sets = [
     'gaokao-chinese',
@@ -47,6 +49,8 @@ claude_postprocessors = {
     'lcsts': dict(type=lcsts_postprocess),
     'mbpp': dict(type=mbpp_postprocess),
     'strategyqa': dict(type=strategyqa_pred_postprocess),
+    'commonsense_qa': dict(type=last_option_postprocess, options='ABCDE'),
+    'flores_100_*-zho_simpl': dict(type=flores_postprocess),
 }
 
 for _name in agieval_multiple_choices_sets + agieval_single_choice_sets:
