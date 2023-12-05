@@ -1,8 +1,7 @@
-# flake8: noqa: E501
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import SubJudgeDataset, Corev2Evaluator
+from opencompass.datasets import SubJudge_Dataset, Corev2Evaluator
 
 cn_prefix = """
 请根据提供 评分要求，问题 以及 相应的两个回答（回答 1，回答 2），判断两个回答中哪一个更好。
@@ -210,8 +209,8 @@ def build_prompt(nopt=4):
 
 meta_prompt = build_prompt()
 
-base_model_and_result = [{'model':'internlm7b', 'path':'model1.json'}]
-compare_model_and_result = [{'model':'internlm20b', 'path':'model2.json'}]
+base_model_and_result = [{'model':'internlm7b', 'path':'/mnt/petrelfs/caomaosong/opencompass/subject/test/infer/20231205_115519/predictions/internlm-chat-7b-hf-v11/._data_subject_corev2_COREV2_6A_test.json.json'}]
+compare_model_and_result = [{'model':'internlm20b', 'path':'/mnt/petrelfs/caomaosong/opencompass/subject/test/infer/20231205_115519/predictions/internlm-chat-20b-hf/._data_subject_corev2_COREV2_6A_test.json.json'}]
 
 corev2_reader_cfg = dict(
     input_columns=['question', 'reference_answer', 'evaluating_guidance', 'capability', 'answer1', 'answer2'],
@@ -236,13 +235,14 @@ corev2_infer_cfg = dict(
 judge_corev2_datasets = []
 for base in base_model_and_result:
     for compare in compare_model_and_result:
-        corev2_eval_cfg = dict(evaluator=dict(type=Corev2Evaluator, base_model=base['model'], compare_model=compare['model'], judge_method='gpt4', metric='win_rate'))
-        judge_corev2_datasets.append(dict(type=SubJudgeDataset,
-                                          path=base['path'],
-                                          path2=compare['path'],
-                                          model1=base['model'],
-                                          model2=compare['model'],
-                                          reader_cfg=corev2_reader_cfg,
-                                          infer_cfg=corev2_infer_cfg,
-                                          eval_cfg=corev2_eval_cfg)
-                                    )
+        if compare['model'] != base['model']:
+            corev2_eval_cfg = dict(evaluator=dict(type=Corev2Evaluator, base_model=base['model'], compare_model=compare['model'], judge_method='general', metric='win_rate'))
+            judge_corev2_datasets.append(dict(type=SubJudge_Dataset,
+                                            path=base['path'],
+                                            path2=compare['path'],
+                                            model1=base['model'],
+                                            model2=compare['model'],
+                                            reader_cfg=corev2_reader_cfg,
+                                            infer_cfg=corev2_infer_cfg,
+                                            eval_cfg=corev2_eval_cfg)
+                                        )
