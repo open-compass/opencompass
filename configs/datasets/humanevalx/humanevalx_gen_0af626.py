@@ -44,12 +44,15 @@ humanevalx_eval_cfg_dict = {
                  ]  # do not support rust now
 }
 
+# Please download the needed `xx.jsonl.gz` from
+# https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx
+# and move them into `data/humanevalx/` folder
 humanevalx_datasets = [
     dict(
         type=HumanevalXDataset,
         abbr=f'humanevalx-{lang}',
         language=lang,
-        path='./backup_data/humanevalx',
+        path='./data/humanevalx',
         reader_cfg=humanevalx_reader_cfg,
         infer_cfg=humanevalx_infer_cfg[lang],
         eval_cfg=humanevalx_eval_cfg_dict[lang])

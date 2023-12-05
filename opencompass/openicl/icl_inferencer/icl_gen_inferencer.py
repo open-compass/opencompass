@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from opencompass.models.base import BaseModel
 from opencompass.registry import ICL_INFERENCERS
+from opencompass.utils import batched
 
 from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
@@ -36,7 +37,7 @@ class GenInferencer(BaseInferencer):
         gen_field_replace_token (:obj:`str`, optional): Used to replace the
             generation field token when generating prompts.
         save_every (:obj:`int`, optional): Save intermediate results every
-            `save_every` epochs.
+            `save_every` iters. Defaults to 1.
         generation_kwargs (:obj:`Dict`, optional): Parameters for the
             :obj:`model.generate()` method.
     """
@@ -50,7 +51,7 @@ class GenInferencer(BaseInferencer):
             gen_field_replace_token: Optional[str] = '',
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
-            save_every: Optional[int] = None,
+            save_every: Optional[int] = 1,
             **kwargs) -> None:
         super().__init__(
             model=model,
@@ -107,9 +108,13 @@ class GenInferencer(BaseInferencer):
                                          'tmp_' + output_json_filename)
         if osp.exists(tmp_json_filepath):
             # TODO: move resume to output handler
-            tmp_result_dict = mmengine.load(tmp_json_filepath)
-            output_handler.results_dict = tmp_result_dict
-            index = len(tmp_result_dict)
+            try:
+                tmp_result_dict = mmengine.load(tmp_json_filepath)
+            except Exception:
+                pass
+            else:
+                output_handler.results_dict = tmp_result_dict
+                index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         dataloader = self.get_dataloader(prompt_list[index:], self.batch_size)
@@ -129,9 +134,14 @@ class GenInferencer(BaseInferencer):
                     entry, max_out_len=self.max_out_len)
                 generated = results
 
+            num_return_sequences = getattr(self.model, 'generation_kwargs',
+                                           {}).get('num_return_sequences', 1)
             # 5-3. Save current output
-            for prompt, prediction, gold in zip(parsed_entries, generated,
-                                                golds):
+            for prompt, prediction, gold in zip(
+                    parsed_entries, batched(generated, num_return_sequences),
+                    golds):
+                if num_return_sequences == 1:
+                    prediction = prediction[0]
                 output_handler.save_results(prompt,
                                             prediction,
                                             index,

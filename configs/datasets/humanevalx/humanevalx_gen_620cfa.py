@@ -24,6 +24,9 @@ humanevalx_eval_cfg_dict = {
     for lang in ['python', 'cpp', 'go', 'java', 'js']   # do not support rust now
 }
 
+# Please download the needed `xx.jsonl.gz` from
+# https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx
+# and move them into `data/humanevalx/` folder
 humanevalx_datasets = [
     dict(
         type=HumanevalXDataset,

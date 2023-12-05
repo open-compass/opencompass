@@ -1,7 +1,9 @@
+import json
+import os
 import re
 from collections import Counter
 
-from datasets import load_dataset
+from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.utils.text_postprocessors import general_postprocess
@@ -12,15 +14,16 @@ from .base import BaseDataset
 class TydiQADataset(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        dataset = load_dataset(**kwargs)
-
-        def pre_process(example):
-            example['answer'] = example['answers']['text']
-            return example
-
-        dataset = dataset.map(pre_process).remove_columns(['id', 'answers'])
-        return dataset
+    def load(path, lang):
+        path = os.path.join(path, 'dev', f'{lang}-dev.jsonl')
+        dataset_list = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = json.loads(line)
+                answer = list(set([i['text'] for i in line['answers']]))
+                line['answer'] = answer
+                dataset_list.append(line)
+        return Dataset.from_list(dataset_list)
 
 
 class TydiQAEvaluator(BaseEvaluator):

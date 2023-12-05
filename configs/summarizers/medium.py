@@ -87,17 +87,6 @@ summarizer = dict(
         'eprstmt-dev',
         'lambada',
         'tnews-dev',
-        '--------- 安全 Safety ---------',  # category
-        # '偏见', # subcategory
-        'crows_pairs',
-        # '有毒性（判别）', # subcategory
-        'civil_comments',
-        # '有毒性（判别）多语言', # subcategory
-        'jigsaw_multilingual',
-        # '有毒性（生成）', # subcategory
-        'real-toxicity-prompts',
-        # '真实性/有用性', # subcategory
-        'truthful_qa',
     ],
     summary_groups=sum(
         [v for k, v in locals().items() if k.endswith("_summary_groups")], []),

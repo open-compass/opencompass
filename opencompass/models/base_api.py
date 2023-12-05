@@ -1,4 +1,5 @@
 import re
+import sys
 import threading
 import warnings
 from abc import abstractmethod
@@ -27,6 +28,8 @@ class BaseAPIModel(BaseModel):
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
+        generation_kwargs (Dict, optional): The generation kwargs for the
+            model. Defaults to dict().
     """
 
     is_api: bool = True
@@ -36,7 +39,8 @@ class BaseAPIModel(BaseModel):
                  query_per_second: int = 1,
                  retry: int = 2,
                  max_seq_len: int = 2048,
-                 meta_template: Optional[Dict] = None):
+                 meta_template: Optional[Dict] = None,
+                 generation_kwargs: Dict = dict()):
         self.path = path
         self.max_seq_len = max_seq_len
         self.meta_template = meta_template
@@ -45,6 +49,7 @@ class BaseAPIModel(BaseModel):
         self.token_bucket = TokenBucket(query_per_second)
         self.template_parser = APITemplateParser(meta_template)
         self.logger = get_logger()
+        self.generation_kwargs = generation_kwargs
 
     @abstractmethod
     def generate(self, inputs: List[PromptType],
@@ -63,6 +68,38 @@ class BaseAPIModel(BaseModel):
         raise NotImplementedError(f'{self.__class__.__name__} does not support'
                                   ' gen-based evaluation yet, try ppl-based '
                                   'instead.')
+
+    def flush(self):
+        """Ensure simultaneous emptying of stdout and stderr when concurrent
+        resources are available.
+
+        When employing multiprocessing with standard I/O redirected to files,
+        it is crucial to clear internal data for examination or prevent log
+        loss in case of system failures."
+        """
+        if hasattr(self, 'tokens'):
+            sys.stdout.flush()
+            sys.stderr.flush()
+
+    def acquire(self):
+        """Acquire concurrent resources if exists.
+
+        This behavior will fall back to wait with query_per_second if there are
+        no concurrent resources.
+        """
+        if hasattr(self, 'tokens'):
+            self.tokens.acquire()
+        else:
+            self.wait()
+
+    def release(self):
+        """Release concurrent resources if acquired.
+
+        This behavior will fall back to do nothing if there are no concurrent
+        resources.
+        """
+        if hasattr(self, 'tokens'):
+            self.tokens.release()
 
     @abstractmethod
     def get_ppl(self,

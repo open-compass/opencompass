@@ -2,12 +2,30 @@
 
 1. 准备 OpenCompass 运行环境：
 
+`````{tabs}
+````{tab} 面向开源模型的GPU环境
+
    ```bash
    conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
    conda activate opencompass
    ```
 
    如果你希望自定义 PyTorch 版本或相关的 CUDA 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
+
+````
+
+````{tab} 面向API模型测试的CPU环境
+
+   ```bash
+   conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
+   conda activate opencompass
+   # 如果需要使用各个API模型，请 `pip install -r requirements/api.txt` 安装API模型的相关依赖
+   ```
+
+   如果你希望自定义 PyTorch 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
+
+````
+`````
 
 2. 安装 OpenCompass：
 
@@ -66,9 +84,20 @@ OpenCompass 支持的数据集主要包括两个部分：
 在 OpenCompass 项目根目录下运行下面命令，将数据集准备至 `${OpenCompass}/data` 目录下：
 
 ```bash
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
+unzip OpenCompassData-core-20231110.zip
 ```
+
+如果需要使用 OpenCompass 提供的更加完整的数据集 (~500M)，可以使用下述命令进行下载：
+
+```bash
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
+unzip OpenCompassData-complete-20231110.zip
+cd ./data
+unzip *.zip
+```
+
+两个 `.zip` 中所含数据集列表如[此处](https://github.com/open-compass/opencompass/releases/tag/0.1.8.rc1)所示。
 
 OpenCompass 已经支持了大多数常用于性能比较的数据集，具体支持的数据集列表请直接在 `configs/datasets` 下进行查找。
 

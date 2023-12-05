@@ -14,6 +14,10 @@ models = [
         abbr='qwen-7b-chat-hf',
         path="Qwen/Qwen-7B-Chat",
         tokenizer_path='Qwen/Qwen-7B-Chat',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True
+        ),
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
@@ -24,7 +28,6 @@ models = [
         max_seq_len=2048,
         batch_size=8,
         meta_template=_meta_template,
-        model_kwargs=dict(device_map='auto', trust_remote_code=True),
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]

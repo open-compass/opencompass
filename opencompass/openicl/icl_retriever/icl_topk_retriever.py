@@ -4,7 +4,6 @@ import copy
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
-import faiss
 import numpy as np
 import torch
 import tqdm
@@ -84,6 +83,8 @@ class TopkRetriever(BaseRetriever):
         self.index = self.create_index()
 
     def create_index(self):
+        import faiss
+
         self.select_datalist = self.dataset_reader.generate_input_field_corpus(
             self.index_ds)
         encode_datalist = DatasetEncoder(self.select_datalist,
