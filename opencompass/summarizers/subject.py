@@ -5,7 +5,11 @@ from datetime import datetime
 
 import mmengine
 from mmengine import ConfigDict
-from prettytable import from_csv
+
+try:
+    from prettytable import from_csv
+except ImportError:
+    from_csv = None
 
 from opencompass.utils import dataset_abbr_from_cfg
 
