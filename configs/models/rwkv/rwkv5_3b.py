@@ -19,7 +19,7 @@ models = [
         max_out_len=100,
         max_seq_len=2048,
         batch_padding=True,
-        batch_size=64,
+        batch_size=16,
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
