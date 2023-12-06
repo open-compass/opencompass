@@ -24,6 +24,7 @@ from .cmrc import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .commonsenseqa_cn import *  # noqa: F401, F403
 from .copa import *  # noqa: F401, F403
+from .corev2 import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
 from .crowspairs_cn import *  # noqa: F401, F403
 from .csl import *  # noqa: F401, F403
@@ -74,6 +75,7 @@ from .siqa import *  # noqa: F401, F403
 from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403
 from .strategyqa import *  # noqa: F401, F403
+from .subject import *  # noqa: F401, F403
 from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403

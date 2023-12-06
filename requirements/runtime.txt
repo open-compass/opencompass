@@ -16,6 +16,7 @@ numpy==1.23.4
 openai
 OpenCC
 pandas<2.0.0
+prettytable
 pypinyin
 python-Levenshtein
 rank_bm25==0.2.2
