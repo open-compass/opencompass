@@ -419,7 +419,7 @@ class HuggingFace(BaseModel):
             loss = loss * mask
 
         lens = (inputs['tokens']['input_ids'] !=
-                (self.tokenizer.pad_token_id)).sum(-1).cpu().numpy()
+                self.tokenizer.pad_token_id).sum(-1).cpu().numpy()
         if mask_length is not None:
             lens -= np.array(mask_length)
         ce_loss = loss.sum(-1).cpu().detach().numpy() / lens
