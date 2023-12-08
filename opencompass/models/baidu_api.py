@@ -32,22 +32,24 @@ class ERNIEBot(BaseAPIModel):
         retry (int): Number of retires if the API call fails. Defaults to 2.
     """
 
-    def __init__(
-        self,
-        path: str,
-        key: str,
-        secretkey: str,
-        url: str,
-        query_per_second: int = 2,
-        max_seq_len: int = 2048,
-        meta_template: Optional[Dict] = None,
-        retry: int = 2,
-    ):
+    def __init__(self,
+                 path: str,
+                 key: str,
+                 secretkey: str,
+                 url: str,
+                 query_per_second: int = 2,
+                 max_seq_len: int = 2048,
+                 meta_template: Optional[Dict] = None,
+                 retry: int = 2,
+                 generation_kwargs: Dict = {
+                     'temperature': 0.8,
+                 }):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          query_per_second=query_per_second,
                          meta_template=meta_template,
-                         retry=retry)
+                         retry=retry,
+                         generation_kwargs=generation_kwargs)
         self.headers = {'Content_Type': 'application/json'}
         self.secretkey = secretkey
         self.key = key
@@ -147,6 +149,7 @@ class ERNIEBot(BaseAPIModel):
 
                 messages.append(msg)
         data = {'messages': messages}
+        data.update(self.generation_kwargs)
 
         max_num_retries = 0
         while max_num_retries < self.retry:
