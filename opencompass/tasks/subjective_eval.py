@@ -137,8 +137,7 @@ class SubjectiveEvalTask(BaseTask):
                 kwargs = pred_postprocessor or eval_cfg['pred_postprocessor']
                 proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
                 pred_strs = [proc(s, **kwargs) for s in pred_strs]
-
-        return pred_strs
+        return {'model_name': model_cfg['abbr'], 'model_preds': pred_strs}
 
     def _score(self, model_cfg, dataset_cfg, eval_cfg, output_column):
         test_set = build_dataset_from_cfg(dataset_cfg).test
@@ -153,20 +152,16 @@ class SubjectiveEvalTask(BaseTask):
                 return sample
 
             test_set = test_set.map(postprocess)
-
         # Get out_path
         out_path = get_infer_output_path(model_cfg, dataset_cfg,
                                          osp.join(self.work_dir, 'results'))
         model_preds = self._load_model_pred(model_cfg, dataset_cfg, eval_cfg)
-
-        if get_type_from_cfg(eval_cfg['evaluator']) == LMEvaluator:
-            if not self.judge_cfg:
-                raise ValueError('Using LMEvaluator in dataset, but '
-                                 'missing "eval.runner.task.judge_cfg" '
-                                 'as the judge configuration.')
-            eval_cfg['evaluator']['judge_cfg'] = self.judge_cfg
-            eval_cfg['evaluator']['dataset_cfg'] = dataset_cfg
-            eval_cfg['evaluator']['output_path'] = out_path
+        #if get_type_from_cfg(eval_cfg['evaluator']) == LMEvaluator:
+        if not self.judge_cfg:
+            raise ValueError('missing "eval.runner.task.judge_cfg"')
+        eval_cfg['evaluator']['judge_cfg'] = self.judge_cfg
+        eval_cfg['evaluator']['dataset_cfg'] = dataset_cfg
+        eval_cfg['evaluator']['output_path'] = out_path
         icl_evaluator = ICL_EVALUATORS.build(eval_cfg['evaluator'])
         references = (test_set[output_column] if output_column else None)
         result = icl_evaluator.score(predictions=model_preds,
@@ -177,7 +172,7 @@ class SubjectiveEvalTask(BaseTask):
                 f'Task {task_abbr_from_cfg(self.cfg)}: {result["error"]}')
             return
         else:
-            self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}: {result}')
+            self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')#: {result}')
 
         # Save result
         mkdir_or_exist(osp.split(out_path)[0])

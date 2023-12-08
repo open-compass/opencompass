@@ -58,7 +58,6 @@ class NaivePartitioner(BasePartitioner):
         Returns:
             List[Dict]: A list of tasks.
         """
-
         tasks = []
         for model in models:
             chunks = []

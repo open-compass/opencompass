@@ -1,5 +1,6 @@
 import os.path as osp
 from typing import Dict, List, Optional
+import random
 
 import mmengine
 from datasets import Dataset
@@ -13,6 +14,17 @@ from opencompass.utils.logging import get_logger
 from opencompass.utils.text_postprocessors import first_number_postprocess
 from opencompass.utils.types import get_type_from_cfg
 
+def randomize_preds_and_record_references(predictions, references, random_order, seed=2680):
+    random.seed(seed)
+    list_of_preds = [[] for _ in range(len(predictions))]
+    for i in range(len(predictions[0]['model_preds'])):
+        preds = [[pred['model_preds'][i], pred['model_name']] for pred in predictions]
+        if random_order:
+            random.shuffle(preds)
+        for j in range(len(preds)):
+            list_of_preds[j].append(preds[j][0])
+            references[i][f'answer{j+1}'] = preds[j][1]
+    return list_of_preds, references
 
 class LMEvaluator:
     """Evaluate output with language model.
@@ -35,7 +47,7 @@ class LMEvaluator:
         prompt_template: ConfigDict,
         judge_cfg: ConfigDict,
         output_path: str,
-        cmp_order: Optional[str] = None,
+        random_order: Optional[bool] = False,
         dataset_cfg: Optional[ConfigDict] = None,
         postprocessor: ConfigDict = dict(type=first_number_postprocess)
     ) -> None:
@@ -57,31 +69,16 @@ class LMEvaluator:
         self.postprocessor = get_type_from_cfg(postprocessor)
         self.logger = get_logger()
         self.dataset_cfg = dataset_cfg
-        assert cmp_order in [None, 'as-is', 'reversed', 'both']
-        self.cmp_order = cmp_order
+        self.random_order = random_order
 
     def score(self, predictions, references: Optional[List] = None) -> Dict:
-        if not isinstance(predictions[0], list):
-            assert self.cmp_order is None, (
-                'cmp_order must be None when '
-                'only predictions from one model are '
-                'provided.')
-            predictions = [predictions]
-        else:
-            assert self.cmp_order, ('cmp_order must be specified when '
-                                    'predictions from multiple models are '
-                                    'provided.')
-            if self.cmp_order == 'both':
-                predictions = [
-                    a + b for a, b in zip(predictions, reversed(predictions))
-                ]
-                if references:
-                    references *= 2
-            elif self.cmp_order == 'reversed':
-                predictions.reverse()
-                if references:
-                    references.reverse()
-
+        if type(predictions) == list:
+            '''Apply to multi-model comparison'''
+            references = [{} for _ in range(len(predictions[0]['model_preds']))] if references is None else references
+            predictions, references = randomize_preds_and_record_references(predictions, references, self.random_order)
+        elif type(predictions) == dict:
+            '''Apply to single-model scoring'''
+            pass
         pred_dict = {}
         for i in range(len(predictions)):
             key = 'prediction' if i == 0 else f'prediction{i + 1}'
@@ -89,12 +86,6 @@ class LMEvaluator:
 
         if self.dataset_cfg:
             dataset = build_dataset_from_cfg(self.dataset_cfg)
-            if self.cmp_order == 'both':
-                new_ds = {
-                    k: dataset.test[k] * 2
-                    for k in dataset.test.column_names
-                }
-                dataset.reader.dataset['test'] = Dataset.from_dict(new_ds)
             for k, v in pred_dict.items():
                 dataset.reader.dataset['test'] = dataset.test.add_column(k, v)
                 dataset.reader.input_columns.append(k)
@@ -114,6 +105,8 @@ class LMEvaluator:
                 train_split='test'),
                                     reference=references,
                                     **pred_dict)
+        dataset.reader.output_column='reference'
+        #############TO DO: add remove same infer in dataset
         retriever = ZeroRetriever(dataset)
         self.inferencer.inference(retriever=retriever,
                                   prompt_template=self.prompt_tmpl)
@@ -121,29 +114,9 @@ class LMEvaluator:
         output = mmengine.load(self.output_path)
         return self.postprocess(output)
 
+
+
     def postprocess(self, output: Dict) -> Dict:
         """Postprocess output by adding necessary statistics or data into
         it."""
-        if self.cmp_order is None:
-            # Get average scores if the item is presented
-            scores = []
-            for k, v in output.items():
-                score = self.postprocessor(v['prediction'])
-                output[k]['score'] = score
-                scores.append(score)
-            try:
-                output['score'] = sum(scores) / len(scores)
-            except Exception:
-                pass
-
-        if self.cmp_order == 'both':
-            half = len(output) // 2
-            for k in list(output.keys())[:half]:
-                output[k]['cmp_order'] = 'as-is'
-            for k in list(output.keys())[half:]:
-                output[k]['cmp_order'] = 'reversed'
-        elif self.cmp_order in ['as-is', 'reversed']:
-            for k in output.keys():
-                output[k]['cmp_order'] = self.cmp_order
-
         return output

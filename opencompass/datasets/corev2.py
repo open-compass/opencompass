@@ -22,7 +22,7 @@ def match_GPT4_answer(s):
 
 
 @ICL_EVALUATORS.register_module()
-class Corev2Evaluator(BaseEvaluator):
+class Corev2Evaluator_(BaseEvaluator):
 
     def __init__(self,
                  base_model,
