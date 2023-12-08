@@ -80,6 +80,8 @@ class HumanEvaluator(BaseEvaluator):
 
 
 def humaneval_postprocess(text: str) -> str:
+    if text != '' and text[0] == '\n':
+        text = text[1:]
     if '```' in text:
         blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
         if len(blocks) == 0:
@@ -92,7 +94,7 @@ def humaneval_postprocess(text: str) -> str:
         def_idx = text.find('def')
         if def_idx != -1:
             text = text[max(text.find('\n', def_idx) + 1, 0):]
-    text = text.split('\n\n')[0]
+    text = '\n'.join(text.split('\n\n'))
     text = text.lstrip('\n')
     if text.strip().startswith('def'):
         text = '\n'.join(text.split('\n')[1:])
@@ -101,6 +103,24 @@ def humaneval_postprocess(text: str) -> str:
             text = '    ' + text.lstrip()
         else:
             text = '\n'.join(['    ' + line for line in text.split('\n')])
+    text = text.split('\n')
+    min_len = -1
+    end_len = -1
+    for i, line in enumerate(text):
+        if line.strip() == '':
+            continue
+        if line.strip()[0] in '\'\"#':
+            continue
+        text_len = len(line.rstrip()) - len(line.strip())
+        if text_len < min_len:
+            end_len = i
+            break
+        elif min_len == -1:
+            min_len = text_len
+    if min_len == -1 or end_len == -1:
+        text = '\n'.join(text)
+    else:
+        text = '\n'.join(text[:end_len])
     return text
 
 
