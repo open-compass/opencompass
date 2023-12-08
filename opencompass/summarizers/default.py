@@ -185,7 +185,7 @@ class DefaultSummarizer:
                 for metric in scores:
                     if default_metric == 'standard_deviation':
                         avg = sum(scores[metric].values()) / len(scores[metric])
-                        variance = sum((k - avg) ** 2 for k in scores[metric]) / len(scores[metric])
+                        variance = sum((scores[metric][k] - avg) ** 2 for k in scores[metric]) / len(scores[metric])
                         scores[metric] = result[metric] = math.sqrt(variance)
                     else:
                         if sg.get('weights', []):
