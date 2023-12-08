@@ -52,7 +52,6 @@ class ERNIEBot(BaseAPIModel):
         self.secretkey = secretkey
         self.key = key
         self.url = url
-        self.model = path
 
     def _generate_access_token(self):
         try:
