@@ -126,19 +126,37 @@ class DefaultSummarizer:
         summary_groups = self.summary_groups
         for sg in summary_groups:
             for model_abbr in self.model_abbrs:
-                available_count = sum(dataset_abbr in parsed_results[model_abbr] for dataset_abbr in sg['subsets'])
-                if available_count == 0:
+                available_metrics, missing_metrics = [], []
+                for i in sg['subsets']:
+                    if isinstance(i, (list, tuple)):
+                        if i[0] in parsed_results[model_abbr] and i[1] in parsed_results[model_abbr][i[0]]:
+                            available_metrics.append(i)
+                        else:
+                            missing_metrics.append(i)
+                    else:
+                        if i in parsed_results[model_abbr]:
+                            available_metrics.append(i)
+                        else:
+                            missing_metrics.append(i)
+
+                if len(available_metrics) == 0:
                     continue
-                if available_count != len(sg['subsets']):
-                    raw_results[model_abbr][sg['name']] = {'error': 'missing datasets: {}'.format(set(sg['subsets']) - set(parsed_results[model_abbr].keys()))}
+                if len(missing_metrics) != 0:
+                    raw_results[model_abbr][sg['name']] = {'error': 'missing metrics: {}'.format(missing_metrics)}
                     continue
 
-                if sg.get('std', False):
-                    default_metric = 'standard_deviation'
-                elif sg.get('weights', []):
-                    default_metric = 'weighted_average'
+                if 'metric' in sg:
+                    default_metric = sg['metric']
+                    need_smart_metric = False
                 else:
-                    default_metric = 'naive_average'
+                    need_smart_metric = True
+                    if sg.get('std', False):
+                        default_metric = 'standard_deviation'
+                    elif sg.get('weights', []):
+                        default_metric = 'weighted_average'
+                    else:
+                        default_metric = 'naive_average'
+
                 scores, eval_modes, group_metrics = {}, [], None
                 if any(isinstance(dataset_abbr, (list, tuple)) for dataset_abbr in sg['subsets']) and \
                     any(isinstance(dataset_abbr, str) for dataset_abbr in sg['subsets']):
@@ -151,7 +169,7 @@ class DefaultSummarizer:
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 else:
                     group_metrics = list(functools.reduce(lambda a, b: a & b, [set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']]))
-                    if len(group_metrics) > 1:
+                    if need_smart_metric and len(group_metrics) > 1:
                         for metric in group_metrics:
                             for dataset_abbr in sg['subsets']:
                                 scores.setdefault(metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
@@ -163,15 +181,16 @@ class DefaultSummarizer:
                             scores.setdefault(default_metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
                             eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
 
-                result = {}
+                result = parsed_results[model_abbr].get(sg['name'], {})
                 for metric in scores:
                     if default_metric == 'standard_deviation':
                         avg = sum(scores[metric].values()) / len(scores[metric])
                         variance = sum((k - avg) ** 2 for k in scores[metric]) / len(scores[metric])
                         scores[metric] = result[metric] = math.sqrt(variance)
                     else:
-                        if default_metric == 'weighted_average':
-                            numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'])
+                        if sg.get('weights', []):
+                            # check sg['weights'][k] != 0 in case of scores[metric][k] is NaN
+                            numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
                             denominator = sum(sg['weights'].values())
                         else:
                             numerator = sum(scores[metric].values())
@@ -182,7 +201,7 @@ class DefaultSummarizer:
 
                 # add to global results
                 raw_results[model_abbr][sg['name']] = scores
-                parsed_results[model_abbr][sg['name']]= result
+                parsed_results[model_abbr][sg['name']] = result
                 dataset_metrics[sg['name']] = group_metrics
                 dataset_eval_mode[sg['name']] = eval_mode
 
