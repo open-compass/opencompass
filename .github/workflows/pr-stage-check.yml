@@ -31,7 +31,7 @@ jobs:
         run: pip install torch==${{matrix.torch}}+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
       - name: Install system dependencies
         run: |
-          sed -i '$ a deb http://th.archive.ubuntu.com/ubuntu jammy main' /etc/apt/sources.list
+          sudo sed -i '$ a deb http://th.archive.ubuntu.com/ubuntu jammy main' /etc/apt/sources.list
           sudo apt-get update && sudo apt-get install -y libc6 libffi-dev libncursesw6 wget unzip
       - name: Upgrade pip
         run: python -m pip install pip --upgrade
