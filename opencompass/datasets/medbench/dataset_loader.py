@@ -29,7 +29,7 @@ def convert_zero_shot(line, dataset_name):
         return '问题：' + line['question'] + '\n答案：'
     elif dataset_name in medbench_multiple_choices_sets:
         return '问题：' + line['question'] + ' ' \
-            + '选项：' + ' '.join(line['options']) + '\n从A到G，我们应该选择' 
+            + '选项：' + ' '.join(line['options']) + '\n从A到G，我们应该选择'
     else:
         return line['question']
 
@@ -255,7 +255,7 @@ def load_dataset(dataset_name,
                                                   max_tokens,
                                                   end_of_example,
                                                   verbose=verbose)
-    
+
     if verbose:
         loaded_jsonl = tqdm(loaded_jsonl)
     for meta_idx, line in enumerate(loaded_jsonl):

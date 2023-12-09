@@ -2,7 +2,21 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import MedBenchDataset, MedBenchEvaluator, MedBenchEvaluator_Cloze, MedBenchEvaluator_IE, MedBenchEvaluator_mcq, MedBenchEvaluator_CMeEE, MedBenchEvaluator_CMeIE, MedBenchEvaluator_CHIP_CDEE, MedBenchEvaluator_CHIP_CDN, MedBenchEvaluator_CHIP_CTC, MedBenchEvaluator_NLG, MedBenchEvaluator_TF, MedBenchEvaluator_EMR
+from opencompass.datasets import (
+    MedBenchDataset,
+    MedBenchEvaluator,
+    MedBenchEvaluator_Cloze,
+    MedBenchEvaluator_IE,
+    MedBenchEvaluator_mcq,
+    MedBenchEvaluator_CMeEE,
+    MedBenchEvaluator_CMeIE,
+    MedBenchEvaluator_CHIP_CDEE,
+    MedBenchEvaluator_CHIP_CDN,
+    MedBenchEvaluator_CHIP_CTC,
+    MedBenchEvaluator_NLG,
+    MedBenchEvaluator_TF,
+    MedBenchEvaluator_EMR,
+)
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 medbench_reader_cfg = dict(
