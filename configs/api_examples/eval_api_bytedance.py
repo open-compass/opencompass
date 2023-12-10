@@ -21,6 +21,11 @@ models = [
         accesskey="xxxxxxx",
         secretkey="xxxxxxx",
         url='xxxxxx',
+        generation_kwargs={
+            'temperature': 0.7,
+            'top_p': 0.9,
+            'top_k': 0,
+        },
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,

@@ -43,12 +43,18 @@ class BaiChuan(BaseAPIModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
-    ):
+        generation_kwargs: Dict = {
+            'temperature': 0.3,
+            'top_p': 0.85,
+            'top_k': 5,
+            'with_search_enhance': False,
+        }):  # noqa E125
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          query_per_second=query_per_second,
                          meta_template=meta_template,
-                         retry=retry)
+                         retry=retry,
+                         generation_kwargs=generation_kwargs)
 
         self.api_key = api_key
         self.secret_key = secret_key
@@ -111,6 +117,7 @@ class BaiChuan(BaseAPIModel):
                 messages.append(msg)
 
         data = {'model': self.model, 'messages': messages}
+        data.update(self.generation_kwargs)
 
         def calculate_md5(input_string):
             md5 = hashlib.md5()

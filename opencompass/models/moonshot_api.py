@@ -38,6 +38,7 @@ class MoonShot(BaseAPIModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
+        system_prompt: str = '',
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -50,6 +51,7 @@ class MoonShot(BaseAPIModel):
         }
         self.url = url
         self.model = path
+        self.system_prompt = system_prompt
 
     def generate(
         self,
@@ -106,12 +108,11 @@ class MoonShot(BaseAPIModel):
                 messages.append(msg)
 
         system = {
-            'role':
-            'system',
-            'content':
-            '你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。'
-            '你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一些涉及恐怖主义，种族歧视，'
-            '黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。'
+            'role': 'system',
+            'content': self.system_prompt
+            # '你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。'
+            # '你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一些涉及恐怖主义，种族歧视，'
+            # '黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。'
         }
 
         messages.insert(0, system)
@@ -150,10 +151,12 @@ class MoonShot(BaseAPIModel):
                 print('请求被拒绝 api_key错误')
                 continue
             elif raw_response.status_code == 400:
+                print(messages, response)
                 print('请求失败，状态码:', raw_response)
                 time.sleep(1)
                 continue
             elif raw_response.status_code == 429:
+                print(messages, response)
                 print('请求失败，状态码:', raw_response)
                 time.sleep(3)
                 continue
