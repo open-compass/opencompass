@@ -25,7 +25,7 @@ class WikiBenchDataset(BaseDataset):
         circular_patterns = ['ABCD', 'BCDA', 'CDAB', 'DABC']
 
         data = []
-        with open(path, 'r') as infile:
+        with open(path, 'r', encoding='utf-8') as infile:
             for id, line in enumerate(infile):
                 entry = json.loads(line)
                 if 'cloze' in name:

@@ -10,7 +10,7 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    from .datasets.CIBench.CIBench_gen_eb42f9 import \
+    from .datasets.CIBench.CIBench_gen_8ab0dc import \
         cibench_datasets as datasets
 
 FORCE_STOP_PROMPT_EN = """You should directly give results based on history information."""
@@ -36,7 +36,21 @@ Also please follow the guidelines:
 3. The generated codes will be executed in an ipython manner and the results will be cached.
 4. Your responded code should always be simple and only solves the problem in current step.
 
-Begin!
+For example:
+
+File url: `xxxx`
+### Step 1. Load the dataset from the url into a pandas DataFrame named `df`.
+
+{thought} We should use `pandas` to solve this step.
+{action} IPythonInterpreter
+{action_input} ```python
+import pandas as pd
+url = "xxxx"
+data = pd.read_csv(url)
+```
+{response} The code is succeed without any outputs.
+
+Let us begin from here!
 """
 
 IPYTHON_INTERPRETER_DESCRIPTION = '''\
@@ -69,9 +83,6 @@ models = [
     ),
 ]
 
-for dataset in datasets:
-    # Evaluate on every assistant response
-    dataset['infer_cfg']['inferencer']['infer_mode'] = 'every'
 
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=1000),

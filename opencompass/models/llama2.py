@@ -179,12 +179,14 @@ class Llama2Chat(BaseModel):
                 dialog = []
                 for item in input:
                     msg = {'content': item['prompt']}
-                    if item['role'] == 'HUMAN':
+                    if item['role'].upper() == 'HUMAN':
                         msg['role'] = 'user'
-                    elif item['role'] == 'BOT':
+                    elif item['role'].upper() == 'BOT':
                         msg['role'] = 'assistant'
-                    elif item['role'] == 'SYSTEM':
+                    elif item['role'].upper() == 'SYSTEM':
                         msg['role'] = 'system'
+                    else:
+                        raise ValueError(f'Unknown role: {item["role"]}')
                     dialog.append(msg)
             dialogs.append(dialog)
 

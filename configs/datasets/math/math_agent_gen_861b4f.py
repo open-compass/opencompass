@@ -79,7 +79,7 @@ math_eval_cfg = dict(
 
 math_datasets = [
     dict(
-        abbr='math',
+        abbr='math-agent',
         type=MATHDataset,
         path='./data/math/math.json',
         reader_cfg=math_reader_cfg,

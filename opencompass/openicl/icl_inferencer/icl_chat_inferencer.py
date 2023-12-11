@@ -68,11 +68,11 @@ class LMTemplateParser:
         prompt = ''
         if self.roles:
             for dialog in chat:
-                role_cfg = self.roles.get(dialog['role'])
-                prompt += role_cfg['begin']
+                role_cfg = self.roles.get(dialog['role'], {})
+                prompt += (role_cfg.get('begin') or '')
                 prompt += (dialog.get('content') or '')
-                prompt += role_cfg['end']
-            prompt += self.roles['assistant']['begin']
+                prompt += (role_cfg.get('end') or '')
+            prompt += (self.roles['assistant'].get('begin') or '')
         else:
             # in case the model does not have any meta template
             last_sep = ''
@@ -227,9 +227,13 @@ class ChatInferencer(BaseInferencer):
                                          'tmp_' + output_json_filename)
         if osp.exists(tmp_json_filepath):
             # TODO: move resume to output handler
-            tmp_result_dict = mmengine.load(tmp_json_filepath)
-            output_handler.results_dict = tmp_result_dict
-            index = len(tmp_result_dict)
+            try:
+                tmp_result_dict = mmengine.load(tmp_json_filepath)
+            except Exception:
+                pass
+            else:
+                output_handler.results_dict = tmp_result_dict
+                index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         dataloader = self.get_dataloader(chat_list[index:], batch_size=1)

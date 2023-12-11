@@ -58,6 +58,7 @@ class OpenAI(BaseAPIModel):
                  path: str = 'gpt-3.5-turbo',
                  max_seq_len: int = 4096,
                  query_per_second: int = 1,
+                 rpm_verbose: bool = False,
                  retry: int = 2,
                  key: Union[str, List[str]] = 'ENV',
                  org: Optional[Union[str, List[str]]] = None,
@@ -70,6 +71,7 @@ class OpenAI(BaseAPIModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template,
                          query_per_second=query_per_second,
+                         rpm_verbose=rpm_verbose,
                          retry=retry)
         import tiktoken
         self.tiktoken = tiktoken

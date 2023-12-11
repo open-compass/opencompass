@@ -142,6 +142,6 @@ class Gsm8kAgentEvaluator(BaseEvaluator):
             reasoning_acc=100 *
             (reasoning_scope + final_scope + row_reasoning_scope) / total,
             code_acc=100 * (code_scope + final_scope) / total,
-            action_acc=100 * (action_scope + final_scope) / total,
+            action_pct=100 * (action_scope + final_scope) / total,
         )
         return result
