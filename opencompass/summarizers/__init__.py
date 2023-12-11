@@ -1,9 +1,10 @@
 from .circular import CircularSummarizer
+from .corev2 import Corev2Summarizer
+from .creationv01 import Creationv01Summarizer
 from .default import DefaultSummarizer
-from .subject import SubjectSummarizer
 from .subjective import SubjectiveSummarizer
 
 __all__ = [
     'CircularSummarizer', 'DefaultSummarizer', 'SubjectiveSummarizer',
-    'SubjectSummarizer'
+    'Corev2Summarizer', 'Creationv01Summarizer'
 ]
