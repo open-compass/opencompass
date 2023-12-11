@@ -49,7 +49,7 @@ _meta_template = dict(
 )
 
 
-judge_model =    dict(
+judge_model = dict(
         type=HuggingFaceCausalLM,
         abbr='qwen-7b-chat-hf',
         path="Qwen/Qwen-7B-Chat",
@@ -85,6 +85,7 @@ eval = dict(
         max_num_workers=256,
         task=dict(
             type=SubjectiveEvalTask,
+            judge_cfg=judge_model,
         )),
 )
 work_dir = './creation/'
