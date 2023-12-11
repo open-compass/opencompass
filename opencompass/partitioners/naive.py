@@ -29,8 +29,8 @@ class NaivePartitioner(BasePartitioner):
         self.n = n
 
     def partition(self,
-                  models: List[ConfigDict],
-                  datasets: List[ConfigDict],
+                  model_dataset_combinations: List[Dict[str,
+                                                        List[ConfigDict]]],
                   work_dir: str,
                   out_dir: str,
                   add_cfg: Dict = {}) -> List[Dict]:
@@ -48,8 +48,9 @@ class NaivePartitioner(BasePartitioner):
             }
 
         Args:
-            models (List[ConfigDict]): A list of model configs.
-            datasets (List[ConfigDict]): A list of dataset configs.
+            model_dataset_combinations (List[Dict]): List of
+                `{models: [...], datasets: [...]}` dicts. Each dict contains
+                a list of model configs and a list of dataset configs.
             work_dir (str): The work dir for the task.
             out_dir (str): The full output path for the task, intended for
                 Partitioners to check whether the task is finished via the
@@ -60,20 +61,21 @@ class NaivePartitioner(BasePartitioner):
         """
 
         tasks = []
-        for model in models:
-            chunks = []
-            for dataset in datasets:
-                filename = get_infer_output_path(model, dataset, out_dir)
-                if osp.exists(filename):
-                    continue
-                chunks.append(dataset)
+        for comb in model_dataset_combinations:
+            for model in comb['models']:
+                chunks = []
+                for dataset in comb['datasets']:
+                    filename = get_infer_output_path(model, dataset, out_dir)
+                    if osp.exists(filename):
+                        continue
+                    chunks.append(dataset)
 
-            for i in range(0, len(chunks), self.n):
-                task = Config({
-                    'models': [model],
-                    'datasets': [chunks[i:i + self.n]],
-                    'work_dir': work_dir,
-                    **add_cfg
-                })
-                tasks.append(task)
+                for i in range(0, len(chunks), self.n):
+                    task = Config({
+                        'models': [model],
+                        'datasets': [chunks[i:i + self.n]],
+                        'work_dir': work_dir,
+                        **add_cfg
+                    })
+                    tasks.append(task)
         return tasks

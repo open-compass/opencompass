@@ -50,6 +50,7 @@ The specific process includes:
 2. JudgeLLM evaluation comparisons
 3. Generating evaluation reports
 
+### Two Model Compare Configuration
 For `config/subjective_compare.py`, we provide some annotations to help users understand the configuration file's meaning.
 
 ```python
@@ -79,6 +80,7 @@ summarizer = dict(
 )
 ```
 
+### Single Model Scoring Configuration
 For `config/subjective_score.py`, it is mainly same with `config/subjective_compare.py`, and you just need to modify the eval mode to `singlescore`.
 
 ## Launching the Evaluation
