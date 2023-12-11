@@ -6,6 +6,8 @@ on:
       - 'README.md'
       - 'README_zh-CN.md'
       - 'docs/**'
+      - 'configs/**'
+      - 'tools/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
