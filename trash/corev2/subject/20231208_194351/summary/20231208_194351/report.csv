@@ -1,5 +1,0 @@
-baichuan2-7b-chat-hf_vs_qwen-7b-chat-hf,知识,知识-社会常识,推理,推理-逻辑推理能力,对齐,对齐-指令跟随性,对齐-安全
-win_both_baichuan2-7b-chat-hf,100.0,100.0,100.0,100.0,100.0,100.0,100.0
-half_draw_baichuan2-7b-chat-hf,100.0,100.0,100.0,100.0,100.0,100.0,100.0
-win_both_qwen-7b-chat-hf,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-half_draw_qwen-7b-chat-hf,0.0,0.0,0.0,0.0,0.0,0.0,0.0
