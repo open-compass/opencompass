@@ -25,6 +25,14 @@ meta_template = dict(
     ],
     eos_token_id=103028)
 
+llama2_meta_template = dict(
+            round=[
+                    dict(role='HUMAN', begin='[INST] ', end=' [/INST]'),
+                    dict(role='BOT', generate=True),
+            ],
+            eos_token_id=2,
+         )
+
 # config for internlm-chat-7b
 # models = [
 #     dict(
@@ -86,19 +94,19 @@ meta_template = dict(
 # ]
 
 # config for internlm-chat-20b-w4 model
-models = [
-    dict(
-        type=TurboMindModel,
-        abbr='internlm-chat-20b-w4-turbomind',
-        path="./turbomind",
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=16,
-        concurrency=16,
-        meta_template=meta_template,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-]
+# models = [
+#     dict(
+#         type=TurboMindModel,
+#         abbr='internlm-chat-20b-w4-turbomind',
+#         path="./turbomind",
+#         max_out_len=100,
+#         max_seq_len=2048,
+#         batch_size=16,
+#         concurrency=16,
+#         meta_template=meta_template,
+#         run_cfg=dict(num_gpus=1, num_procs=1),
+#     )
+# ]
 
 # config for internlm-chat-20b-w4kv8 model
 # models = [
@@ -114,3 +122,18 @@ models = [
 #         run_cfg=dict(num_gpus=1, num_procs=1),
 #     )
 # ]
+
+# config for llama2-chat-7b
+models = [
+    dict(
+        type=TurboMindModel,
+        abbr='llama2-chat-7b-turbomind',
+        path="./turbomind",
+        max_out_len=100,
+        max_seq_len=2048,
+        batch_size=16,
+        concurrency=32,
+        meta_template=llama2_meta_template,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+]
