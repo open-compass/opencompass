@@ -33,22 +33,26 @@ class ByteDance(BaseAPIModel):
         retry (int): Number of retires if the API call fails. Defaults to 2.
     """
 
-    def __init__(
-        self,
-        path: str,
-        accesskey: str,
-        secretkey: str,
-        url: str,
-        query_per_second: int = 2,
-        max_seq_len: int = 2048,
-        meta_template: Optional[Dict] = None,
-        retry: int = 2,
-    ):
+    def __init__(self,
+                 path: str,
+                 accesskey: str,
+                 secretkey: str,
+                 url: str,
+                 query_per_second: int = 2,
+                 max_seq_len: int = 2048,
+                 meta_template: Optional[Dict] = None,
+                 retry: int = 2,
+                 generation_kwargs: Dict = {
+                     'temperature': 0.7,
+                     'top_p': 0.9,
+                     'top_k': 0,
+                 }):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          query_per_second=query_per_second,
                          meta_template=meta_template,
-                         retry=retry)
+                         retry=retry,
+                         generation_kwargs=generation_kwargs)
         if not ChatRole:
             print('Please install related packages via'
                   ' `pip install volcengine`')
@@ -134,7 +138,8 @@ class ByteDance(BaseAPIModel):
             'model': {
                 'name': 'skylark-pro-public',
             },
-            'messages': messages
+            'messages': messages,
+            'parameters': self.generation_kwargs
         }
 
         def _chat(maas, req):

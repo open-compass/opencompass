@@ -20,14 +20,14 @@ class winograndeDataset(BaseDataset):
             for line in f:
                 line = json.loads(line)
                 prompt = line['sentence']
-                dataset_list.append({
-                    'opt1':
-                    prompt.replace('_', line['option1']),
-                    'opt2':
-                    prompt.replace('_', line['option2']),
-                    'answer':
-                    line['answer']
-                })
+                continue_prompt = prompt.split('_')
+                data_item = {
+                    'opt1': prompt.replace('_', line['option1']),
+                    'opt2': prompt.replace('_', line['option2']),
+                    'answer': line['answer'],
+                    'cont': continue_prompt[1]
+                }
+                dataset_list.append(data_item)
         dataset_list = Dataset.from_list(dataset_list)
         return dataset_list
 
@@ -46,13 +46,11 @@ class winograndeDataset_V2(BaseDataset):
                 prompt = line['sentence']
                 answer = line['answer']
                 answer = ' AB'[int(answer)] if answer != '' else 'NULL'
-                dataset_list.append({
-                    'opt1':
-                    prompt.replace('_', line['option1']),
-                    'opt2':
-                    prompt.replace('_', line['option2']),
-                    'answer':
-                    answer
-                })
+                data_item = {
+                    'opt1': prompt.replace('_', line['option1']),
+                    'opt2': prompt.replace('_', line['option2']),
+                    'answer': answer,
+                }
+                dataset_list.append(data_item)
         dataset_list = Dataset.from_list(dataset_list)
         return dataset_list

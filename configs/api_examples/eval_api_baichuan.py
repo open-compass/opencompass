@@ -20,6 +20,12 @@ models = [
         api_key='xxxxxx',
         secret_key="xxxxx",
         url="xxxxx",
+        generation_kwargs={
+            'temperature': 0.3,
+            'top_p': 0.85,
+            'top_k': 5,
+            'with_search_enhance': False,
+        },
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
