@@ -1,11 +1,12 @@
+import json
 import os.path as osp
 
-import json
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
+
 
 @LOAD_DATASET.register_module()
 class SubjectiveCmpDataset(BaseDataset):
@@ -23,7 +24,9 @@ class SubjectiveCmpDataset(BaseDataset):
                 raw_data.append({
                     'question': question,
                     'others': others,
-                    'judge':{'capability': capability}
+                    'judge': {
+                        'capability': capability
+                    }
                 })
         dataset = Dataset.from_list(raw_data)
         return dataset

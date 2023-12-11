@@ -1,7 +1,8 @@
 # flake8: noqa: E501
+import json
 import os.path as osp
 import re
-import json
+
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
@@ -99,17 +100,16 @@ cn_example_A = {
     'question':
     '蓝牙耳机坏了应该去看牙科医生还是去看耳科医生？',
     'answer1':
-    '蓝牙耳机坏了，应该联系技术支持或维修人员，而不是去看牙科医生或耳科医生。如果需要维修或更换耳机，这些专业人员通常会提供相关的服务。如果需要医疗帮助，建议前往当地的医院或诊所，寻求专业医生的帮助。',  
+    '蓝牙耳机坏了，应该联系技术支持或维修人员，而不是去看牙科医生或耳科医生。如果需要维修或更换耳机，这些专业人员通常会提供相关的服务。如果需要医疗帮助，建议前往当地的医院或诊所，寻求专业医生的帮助。',
     'answer2':
-    '如果您的蓝牙耳机出现了问题，建议您首先去看医生。具体来说，您应该去看牙科医生。虽然蓝牙耳机与听觉有关，但它主要是一种听觉补充设备，而不是专门用于听觉治疗的设备。如果您的蓝牙耳机出现了问题，牙科医生可以帮助您诊断问题并提供相应的治疗建议。如果问题仍然存在，牙科医生可能会建议您去看耳科医生。', 
+    '如果您的蓝牙耳机出现了问题，建议您首先去看医生。具体来说，您应该去看牙科医生。虽然蓝牙耳机与听觉有关，但它主要是一种听觉补充设备，而不是专门用于听觉治疗的设备。如果您的蓝牙耳机出现了问题，牙科医生可以帮助您诊断问题并提供相应的治疗建议。如果问题仍然存在，牙科医生可能会建议您去看耳科医生。',
     'reference_answer':
     '蓝牙耳机是一种电子设备，坏了不应该找医生。',
     'choice':
     'A',
     'reason':
-    '根据参考答案以及常识，蓝牙耳机是一种电子设备，坏了应该找维修人员而不是医生。回答 1 认识到了这一点，而回答 2 表示应该去看医生。因此回答 1 好，回答 2 不好，选 A'  
+    '根据参考答案以及常识，蓝牙耳机是一种电子设备，坏了应该找维修人员而不是医生。回答 1 认识到了这一点，而回答 2 表示应该去看医生。因此回答 1 好，回答 2 不好，选 A'
 }
-
 
 cn_example_B = {
     'question':
@@ -117,7 +117,7 @@ cn_example_B = {
     'answer1':
     """
 The Odyssey is an epic poem by Homer which tells the story of the Greek hero Odysseus and his decade-long journey home after the fall of Troy. Odysseus must use his wit and courage to battle gods and monsters in order to make his way back home to his wife and son. Along the way, he meets a variety of characters, learns valuable lessons, and discovers his own heroism.
-""",  
+""",
     'answer2':
     """
 《奥德赛》是古希腊诗人荷马所作的史诗之一，主要讲述了希腊英雄奥德修斯（Odysseus）在特洛伊战争结束后回到家乡伊萨卡岛的冒险旅程。故事分为24卷，其中前12卷描述了他与同伴们离开特洛伊后经历的磨难和险阻，包括遭遇塞壬女妖、被巨人波吕斐摩斯关押等；而后12卷则着重描写了他在回归家园的过程中面临的各种挑战，例如对抗女神雅典娜变成的牧猪人、解决求婚人之乱等。最终，奥德修斯克服重重困难，终于回到了自己的故乡，并夺回了王位和家庭。除此之外，《奥德赛》还涉及到了许多古代希腊社会的风俗习惯、宗教信仰和道德观念，具有很高的艺术价值和历史价值。
@@ -127,7 +127,7 @@ The Odyssey is an epic poem by Homer which tells the story of the Greek hero Ody
     'choice':
     'B',
     'reason':
-    '本题的两个回答都正确概括了奥德赛的内容，但回答 1 使用了英文回答，而回答 2 使用了中文回答。根据 回答语言应与提问语言一致 的原则，回答 1 不好，而回答 2 好，选 B'  
+    '本题的两个回答都正确概括了奥德赛的内容，但回答 1 使用了英文回答，而回答 2 使用了中文回答。根据 回答语言应与提问语言一致 的原则，回答 1 不好，而回答 2 好，选 B'
 }
 
 cn_example_C = {
@@ -149,7 +149,7 @@ cn_example_D = {
     'question':
     '麻辣螺丝钉怎么做',
     'answer1':
-    'To make a spicy and garlicky prawn kebab, begin by cleaning and deveining the prawns. Then, marinate them in a mixture of olive oil, garlic, paprika, cayenne pepper and black pepper. Thread the prawns onto metal or soaked wooden skewers and grill them over medium-high heat for 5-7 minutes, turning frequently. Serve with your favorite dipping sauce.',  
+    'To make a spicy and garlicky prawn kebab, begin by cleaning and deveining the prawns. Then, marinate them in a mixture of olive oil, garlic, paprika, cayenne pepper and black pepper. Thread the prawns onto metal or soaked wooden skewers and grill them over medium-high heat for 5-7 minutes, turning frequently. Serve with your favorite dipping sauce.',
     'answer2':
     """
 辣味螺丝钉是一道四川传统美食，以下是一份简单的麻辣螺丝钉食谱：
@@ -181,9 +181,8 @@ cn_example_D = {
     'choice':
     'D',
     'reason':
-    '根据参考答案，麻辣螺丝钉并不是一道实际存在的菜。而两个回答均给出了这样一道不存在的菜的做法，而并未告知用户这道菜不存在，违背了 Helpful 的性质。因此两个回答都不好，选 D'  
+    '根据参考答案，麻辣螺丝钉并不是一道实际存在的菜。而两个回答均给出了这样一道不存在的菜的做法，而并未告知用户这道菜不存在，违背了 Helpful 的性质。因此两个回答都不好，选 D'
 }
-
 
 
 def cn_string(s):
@@ -202,7 +201,7 @@ def build_prompt_cn(item, prompt, ics):
         if 'reference_answer' in eg:
             prompt += f"参考答案: <参考答案开始> {eg['reference_answer']} <参考答案结束>\n\n"
         if 'evaluating_guidance' in eg:
-            prompt += f"题目评分指引: <题目评分指引开始> {eg['evaluating_guidance']} <题目评分指引结束>\n\n"  
+            prompt += f"题目评分指引: <题目评分指引开始> {eg['evaluating_guidance']} <题目评分指引结束>\n\n"
         if 'choice' in eg:
             prompt += f"选择：{eg['choice']}\n"
         if 'reason' in eg:
@@ -216,20 +215,20 @@ def build_prompt_cn(item, prompt, ics):
     if 'reference_answer' in item and item['reference_answer'] != '':
         suffix += f"参考答案: <参考答案开始> {item['reference_answer']} <参考答案结束>\n\n"
     if 'evaluating_guidance' in item and item['evaluating_guidance'] != '':
-        suffix += f"题目评分指引: <题目评分指引开始> {item['evaluating_guidance']} <题目评分指引结束>\n\n"  
+        suffix += f"题目评分指引: <题目评分指引开始> {item['evaluating_guidance']} <题目评分指引结束>\n\n"
     return prefix, suffix
 
 
 def build_prompt_en(item, prompt, ics):
     for i, example in enumerate(ics):
         prompt += f'Example {i + 1}: \n'
-        prompt += f"Question: <Question Start> {example['question']} <Question End>\n\n"  
-        prompt += f"Answer 1: <Answer 1 Start> {example['answer1']} <Answer 1 End>\n\n"  
-        prompt += f"Answer 2: <Answer 2 Start> {example['answer2']} <Answer 2 End>\n\n"  
+        prompt += f"Question: <Question Start> {example['question']} <Question End>\n\n"
+        prompt += f"Answer 1: <Answer 1 Start> {example['answer1']} <Answer 1 End>\n\n"
+        prompt += f"Answer 2: <Answer 2 Start> {example['answer2']} <Answer 2 End>\n\n"
         if 'reference_answer' in example:
-            prompt += f"Reference Answer: <Reference Answer Start> {example['reference_answer']} <Reference Answer End>\n\n"  
+            prompt += f"Reference Answer: <Reference Answer Start> {example['reference_answer']} <Reference Answer End>\n\n"
         if 'evaluating_guidance' in example:
-            prompt += f"Evaluating Guidance: <Evaluating Guidance Start> {example['evaluating_guidance']} <Evaluating Guidance End>\n\n"  
+            prompt += f"Evaluating Guidance: <Evaluating Guidance Start> {example['evaluating_guidance']} <Evaluating Guidance End>\n\n"
         if 'choice' in example:
             prompt += f"Choice: {example['choice']}\n"
         if 'reason' in example:
@@ -241,9 +240,9 @@ def build_prompt_en(item, prompt, ics):
     prefix = prompt
     suffix = ''
     if 'reference_answer' in item and item['reference_answer'] != '':
-        suffix += f"Reference Answer: <Reference Answer Start> {item['reference_answer']} <Reference Answer End>\n\n"  
+        suffix += f"Reference Answer: <Reference Answer Start> {item['reference_answer']} <Reference Answer End>\n\n"
     if 'evaluating_guidance' in item and item['evaluating_guidance'] != '':
-        suffix += f"Evaluating Guidance: <Evaluating Guidance Start> {item['evaluating_guidance']} <Evaluating Guidance End>\n\n"  
+        suffix += f"Evaluating Guidance: <Evaluating Guidance Start> {item['evaluating_guidance']} <Evaluating Guidance End>\n\n"
     return prefix, suffix
 
 
@@ -262,7 +261,6 @@ def build_prompt(item, nopt=4, multi_lang=True):
         return build_prompt_cn(item, prompt, examples[:nopt])
 
 
-
 @LOAD_DATASET.register_module()
 class Corev2Dataset(SubjectiveCmpDataset):
 
@@ -270,9 +268,7 @@ class Corev2Dataset(SubjectiveCmpDataset):
         dataset = list(super().load(path, name))
         corev2_dataset = []
         for data in dataset:
-            data['prefix'], data['suffix'] = build_prompt(data['others']) 
+            data['prefix'], data['suffix'] = build_prompt(data['others'])
             corev2_dataset.append(data)
         dataset = Dataset.from_list(corev2_dataset)
         return dataset
-
-

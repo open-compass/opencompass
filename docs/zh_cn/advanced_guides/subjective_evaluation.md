@@ -13,6 +13,7 @@
 ## 数据准备
 
 对于两回答比较和单回答打分两种方法，我们各提供了一个demo测试集如下：
+
 ```python
 ###COREV2
 [
@@ -52,6 +53,7 @@
 3. 生成评测报告
 
 ### 两回答比较配置
+
 对于两回答比较，更详细的config setting请参考 `config/subjective_compare.py`，下面我们提供了部分简略版的注释，方便用户理解配置文件的含义。
 
 ```python
@@ -82,6 +84,7 @@ summarizer = dict(
 ```
 
 ### 单回答打分配置
+
 对于单回答打分，更详细的config setting请参考 `config/subjective_score.py`，该config的大部分都与两回答比较的config相同，只需要修改评测模式即可，将评测模式设置为`singlescore`。
 
 ## 启动评测

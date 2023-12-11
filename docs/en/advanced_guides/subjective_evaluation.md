@@ -13,6 +13,7 @@ We support the use of GPT-4 (or other JudgeLLM) for the subjective evaluation of
 ## Data Preparation
 
 We provide demo test set as below:
+
 ```python
 ###COREV2
 [
@@ -36,6 +37,7 @@ We provide demo test set as below:
 ```
 
 The json must includes the following fields:
+
 - 'question': Question description
 - 'capability': The capability dimension of the question.
 - 'others': Other needed information.
@@ -51,6 +53,7 @@ The specific process includes:
 3. Generating evaluation reports
 
 ### Two Model Compare Configuration
+
 For `config/subjective_compare.py`, we provide some annotations to help users understand the configuration file's meaning.
 
 ```python
@@ -72,7 +75,7 @@ eval = dict(
         compare_models = [...]
     ))
 
-work_dir = 'Your work dir' #set your workdir, in this workdir, if you use '--reuse', it will resue all existing results in this workdir automatically
+work_dir = 'Your work dir' #set your workdir, in this workdir, if you use '--reuse', it will reuse all existing results in this workdir automatically
 
 summarizer = dict(
     type=Corev2Summarizer, #Your dataset Summarizer
@@ -81,6 +84,7 @@ summarizer = dict(
 ```
 
 ### Single Model Scoring Configuration
+
 For `config/subjective_score.py`, it is mainly same with `config/subjective_compare.py`, and you just need to modify the eval mode to `singlescore`.
 
 ## Launching the Evaluation

@@ -1,9 +1,8 @@
 import os.path as osp
-from typing import Dict, List, Optional
 import random
+from typing import Dict, List, Optional
 
 import mmengine
-from datasets import Dataset
 from mmengine.config import ConfigDict
 
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -14,17 +13,23 @@ from opencompass.utils.logging import get_logger
 from opencompass.utils.text_postprocessors import first_number_postprocess
 from opencompass.utils.types import get_type_from_cfg
 
-def randomize_preds_and_record_references(predictions, references, random_order, seed=2680):
+
+def randomize_preds_and_record_references(predictions,
+                                          references,
+                                          random_order,
+                                          seed=2680):
     random.seed(seed)
     list_of_preds = [[] for _ in range(len(predictions))]
     for i in range(len(predictions[0]['model_preds'])):
-        preds = [[pred['model_preds'][i], pred['model_name']] for pred in predictions]
+        preds = [[pred['model_preds'][i], pred['model_name']]
+                 for pred in predictions]
         if random_order:
             random.shuffle(preds)
         for j in range(len(preds)):
             list_of_preds[j].append(preds[j][0])
             references[i][f'answer{j+1}'] = preds[j][1]
     return list_of_preds, references
+
 
 class LMEvaluator:
     """Evaluate output with language model.
@@ -73,12 +78,15 @@ class LMEvaluator:
 
     def score(self, predictions, references: Optional[List] = None) -> Dict:
         if type(predictions) == list:
-            '''Apply to multi-model comparison'''
-            references = [{} for _ in range(len(predictions[0]['model_preds']))] if references is None else references
-            predictions, references = randomize_preds_and_record_references(predictions, references, self.random_order)
+            """Apply to multi-model comparison."""
+            references = [{} for _ in range(len(predictions[0]['model_preds']))
+                          ] if references is None else references
+            predictions, references = randomize_preds_and_record_references(
+                predictions, references, self.random_order)
         elif type(predictions) == dict:
-            '''Apply to single-model scoring'''
-            references = [{} for _ in range(len(predictions[0]['model_preds']))] if references is None else references
+            """Apply to single-model scoring."""
+            references = [{} for _ in range(len(predictions[0]['model_preds']))
+                          ] if references is None else references
             predictions = [predictions['model_preds']]
         pred_dict = {}
         for i in range(len(predictions)):
@@ -106,16 +114,13 @@ class LMEvaluator:
                 train_split='test'),
                                     reference=references,
                                     **pred_dict)
-        dataset.reader.output_column='reference'
-        #############TO DO: add remove same infer in dataset
+        dataset.reader.output_column = 'reference'
         retriever = ZeroRetriever(dataset)
         self.inferencer.inference(retriever=retriever,
                                   prompt_template=self.prompt_tmpl)
 
         output = mmengine.load(self.output_path)
         return self.postprocess(output)
-
-
 
     def postprocess(self, output: Dict) -> Dict:
         """Postprocess output by adding necessary statistics or data into

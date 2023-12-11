@@ -7,14 +7,18 @@ from opencompass.registry import PARTITIONERS
 
 from .naive import NaivePartitioner
 
+
 def remove_duplicate_pairs(model_combinations):
     combo_dict = {}
     for i, combo in enumerate(model_combinations):
         sorted_names = tuple(sorted((combo[0]['abbr'], combo[1]['abbr'])))
         if sorted_names not in combo_dict:
             combo_dict[sorted_names] = i
-    new_model_combinations = [model_combinations[i] for i in combo_dict.values()]
+    new_model_combinations = [
+        model_combinations[i] for i in combo_dict.values()
+    ]
     return new_model_combinations
+
 
 @PARTITIONERS.register_module()
 class SubjectiveNaivePartitioner(NaivePartitioner):
@@ -43,14 +47,20 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
         self.compare_models = compare_models
         self.model_pairs = model_pairs
 
-    def get_model_combinations(self, models: List[ConfigDict], base_models: Optional[List[ConfigDict]] = [], compare_models: Optional[List[ConfigDict]] = []) -> List:
+    def get_model_combinations(
+            self,
+            models: List[ConfigDict],
+            base_models: Optional[List[ConfigDict]] = [],
+            compare_models: Optional[List[ConfigDict]] = []) -> List:
         if self.mode == 'allpair':
             assert len(models) > 1
             return combinations(models, 2)
         elif self.mode == 'm2n':
             assert len(base_models) > 0 and len(compare_models) > 0
             model_combinations = list(product(base_models, compare_models))
-            unique_combinations = remove_duplicate_pairs([combo for combo in model_combinations if combo[0] != combo[1]])
+            unique_combinations = remove_duplicate_pairs([
+                combo for combo in model_combinations if combo[0] != combo[1]
+            ])
             return unique_combinations
         elif self.mode == 'fixed':
             pass
@@ -87,7 +97,11 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
         """
         models = self.models if self.models != [] else models
         base_models, compare_models = self.base_models, self.compare_models
-        models = models if self.mode == 'singlescore' else self.get_model_combinations(models, base_models, compare_models)
+        if self.mode == 'singlescore':
+            models = models
+        else:
+            models = self.get_model_combinations(models, base_models,
+                                                 compare_models)
         return super().partition(models=models,
                                  datasets=datasets,
                                  work_dir=work_dir,

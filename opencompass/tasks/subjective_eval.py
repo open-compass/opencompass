@@ -10,13 +10,11 @@ import mmengine
 from mmengine.config import Config, ConfigDict
 from mmengine.utils import mkdir_or_exist
 
-from opencompass.openicl.icl_evaluator.lm_evaluator import LMEvaluator
 from opencompass.registry import ICL_EVALUATORS, MODELS, TEXT_POSTPROCESSORS
 from opencompass.tasks.base import BaseTask
 from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
                                get_infer_output_path, get_logger,
                                task_abbr_from_cfg)
-from opencompass.utils.types import get_type_from_cfg
 
 
 class SubjectiveEvalTask(BaseTask):
@@ -156,7 +154,6 @@ class SubjectiveEvalTask(BaseTask):
         out_path = get_infer_output_path(model_cfg, dataset_cfg,
                                          osp.join(self.work_dir, 'results'))
         model_preds = self._load_model_pred(model_cfg, dataset_cfg, eval_cfg)
-        #if get_type_from_cfg(eval_cfg['evaluator']) == LMEvaluator:
         if not self.judge_cfg:
             raise ValueError('missing "eval.runner.task.judge_cfg"')
         eval_cfg['evaluator']['judge_cfg'] = self.judge_cfg
@@ -172,7 +169,8 @@ class SubjectiveEvalTask(BaseTask):
                 f'Task {task_abbr_from_cfg(self.cfg)}: {result["error"]}')
             return
         else:
-            self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')#: {result}')
+            self.logger.info(
+                f'Task {task_abbr_from_cfg(self.cfg)}')  #: {result}')
 
         # Save result
         mkdir_or_exist(osp.split(out_path)[0])

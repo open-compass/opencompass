@@ -1,3 +1,4 @@
+# flake8: noqa: E501
 import csv
 import os
 import os.path as osp
@@ -15,6 +16,7 @@ except ImportError:
 
 from opencompass.utils import dataset_abbr_from_cfg
 
+
 def match_general_answer(s):
     temp = s[0]
     if temp in ['A', 'B', 'C', 'D']:
@@ -22,17 +24,17 @@ def match_general_answer(s):
     else:
         return None
 
+
 def match_GPT4_answer(s):
     result = re.search(r'分数：(.)', s)
     if result:
-        try:
-            return int(result.group(1))
-        except:
-            return None
+        return int(result.group(1))
     else:
         return None
 
+
 judge_map = {'smart': match_GPT4_answer, 'other': match_general_answer}
+
 
 def call_function(name, arg):
     if name in judge_map:
@@ -49,11 +51,7 @@ class Creationv01Summarizer:
             It's expected to be filled out at runtime.
     """
 
-    def __init__(
-        self,
-        config: ConfigDict,
-        match_method='smart'
-    ) -> None:
+    def __init__(self, config: ConfigDict, match_method='smart') -> None:
         self.tasks = []
         self.cfg = config
         self.match_method = match_method
@@ -78,7 +76,7 @@ class Creationv01Summarizer:
         output_dir = osp.join(osp.split(output_path)[0], f'{self.time_str}')
         mmengine.mkdir_or_exist(output_dir)
         results_folder = osp.join(work_dir, 'results')
-        fout = osp.join(output_dir,'report.csv')
+        fout = osp.join(output_dir, 'report.csv')
         for subdir in os.listdir(results_folder):
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
@@ -91,13 +89,16 @@ class Creationv01Summarizer:
                     judged_answers = []
                     references = []
                     for k, v in result.items():
-                        judged_answers.append(call_function(self.match_method, v['prediction']))
+                        judged_answers.append(
+                            call_function(self.match_method, v['prediction']))
                         references.append(v['gold'])
                     print(
                         f'Among {len(judged_answers)} judgements, successfully extracted {len(judged_answers)-judged_answers.count(None)} judgements.'
                     )
-                    model_scores, categories = defaultdict(float), defaultdict(float)
-                    for prediction, reference in zip(judged_answers, references):
+                    model_scores, categories = defaultdict(float), defaultdict(
+                        float)
+                    for prediction, reference in zip(judged_answers,
+                                                     references):
                         categories[reference['capability']] += 1
                         if prediction is not None:
                             model_scores[reference['capability']] += prediction
@@ -105,7 +106,9 @@ class Creationv01Summarizer:
                         if capability not in model_scores:
                             model_scores[capability] = 0.0
                         else:
-                            model_scores[capability] = round(model_scores[capability]/categories[capability], 2) 
+                            model_scores[capability] = round(
+                                model_scores[capability] /
+                                categories[capability], 2)
                     scores = {model: model_scores}
                     rows = list(scores.keys())
                     columns = list(scores[rows[0]].keys())
