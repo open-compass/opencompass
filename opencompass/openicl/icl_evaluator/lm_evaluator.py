@@ -78,7 +78,8 @@ class LMEvaluator:
             predictions, references = randomize_preds_and_record_references(predictions, references, self.random_order)
         elif type(predictions) == dict:
             '''Apply to single-model scoring'''
-            pass
+            references = [{} for _ in range(len(predictions[0]['model_preds']))] if references is None else references
+            predictions = [predictions['model_preds']]
         pred_dict = {}
         for i in range(len(predictions)):
             key = 'prediction' if i == 0 else f'prediction{i + 1}'

@@ -18,8 +18,7 @@ from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import Corev2Summarizer
-#models = [*hf_baichuan2_7b, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_internlm_chat_7b, *hf_qwen_14b_chat]
-models = [*hf_baichuan2_7b, *hf_qwen_7b_chat,] #*hf_chatglm3_6b, *hf_qwen_14b_chat]
+models = [*hf_baichuan2_7b, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_internlm_chat_7b, *hf_qwen_14b_chat]
 
 api_meta_template = dict(
     round=[
@@ -76,10 +75,9 @@ judge_model =    dict(
 eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
-        mode='allpair',  # 新参数
-        #models = [*hf_baichuan2_7b],#[*hf_baichuan2_7b, *hf_chatglm3_6b, *hf_internlm_chat_20b],
-        #base_models = [*hf_baichuan2_7b, *hf_chatglm3_6b],
-        #compare_models = [*hf_baichuan2_7b, *hf_qwen_7b_chat, *hf_chatglm3_6b, *hf_qwen_14b_chat]
+        mode='m2n',
+        base_models = [*hf_baichuan2_7b, *hf_chatglm3_6b],
+        compare_models = [*hf_baichuan2_7b, *hf_qwen_7b_chat, *hf_chatglm3_6b, *hf_qwen_14b_chat]
     ),
     runner=dict(
         type=SlurmSequentialRunner,
@@ -87,11 +85,11 @@ eval = dict(
         quotatype='auto',
         max_num_workers=256,
         task=dict(
-            type=SubjectiveEvalTask,  # 新 task，用来读入一对 model 的输入
+            type=SubjectiveEvalTask,
         judge_cfg=judge_model
         )),
 )
-work_dir = './trash/corev2/subject/'
+work_dir = './corev2/'
 
 summarizer = dict(
     type=Corev2Summarizer,

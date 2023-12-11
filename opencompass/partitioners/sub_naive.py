@@ -36,7 +36,7 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
                  model_pairs: Optional[List[Tuple]] = None,
                  keep_keys: Optional[List[str]] = None):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
-        assert mode in ['allpair', 'm2n', 'fixed']
+        assert mode in ['singlescore', 'allpair', 'm2n', 'fixed']
         self.mode = mode
         self.models = models
         self.base_models = base_models
@@ -87,7 +87,7 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
         """
         models = self.models if self.models != [] else models
         base_models, compare_models = self.base_models, self.compare_models
-        models = self.get_model_combinations(models, base_models, compare_models)
+        models = models if self.mode == 'singlescore' else self.get_model_combinations(models, base_models, compare_models)
         return super().partition(models=models,
                                  datasets=datasets,
                                  work_dir=work_dir,
