@@ -102,8 +102,9 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
         else:
             models = self.get_model_combinations(models, base_models,
                                                  compare_models)
-        return super().partition(models=models,
-                                 datasets=datasets,
-                                 work_dir=work_dir,
-                                 out_dir=out_dir,
-                                 add_cfg=add_cfg)
+        model_dataset_combinations = [{'models': models, 'datasets': datasets}]
+        return super().partition(
+            model_dataset_combinations=model_dataset_combinations,
+            work_dir=work_dir,
+            out_dir=out_dir,
+            add_cfg=add_cfg)
