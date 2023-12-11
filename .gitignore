@@ -11,6 +11,7 @@ configs/eval_debug*.py
 configs/viz_*.py
 data
 work_dirs
+models
 configs/internal/
 # Byte-compiled / optimized / DLL files
 __pycache__/

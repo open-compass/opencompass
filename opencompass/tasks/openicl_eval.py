@@ -121,8 +121,9 @@ class OpenICLEvalTask(BaseTask):
             pred_dicts = copy.deepcopy(preds)
             preds = {k: [pred.get(k) for pred in preds] for k in preds[0]}
 
-            pred_strs = preds.pop('prediction')
-            pred_list_flag = isinstance(pred_strs[0], list)
+            pred_strs = preds.pop('prediction', None)
+            pred_list_flag = pred_strs is not None and isinstance(
+                pred_strs[0], list)
             if ('pred_role' in self.eval_cfg
                     and 'meta_template' in self.model_cfg
                     and not MODELS.get(self.model_cfg['type']).is_api):
@@ -166,6 +167,12 @@ class OpenICLEvalTask(BaseTask):
                 ]
 
             icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
+            # need results dir to save other files
+            out_path = get_infer_output_path(
+                self.model_cfg, self.dataset_cfg,
+                osp.join(self.work_dir, 'results'))
+            icl_evaluator._out_dir = osp.splitext(out_path)[
+                0]  # strip extension
 
             preds['predictions'] = pred_strs
             preds['references'] = (test_set[self.output_column]

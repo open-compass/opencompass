@@ -4,6 +4,10 @@ from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import winograndeDataset
 
+# WARNING: This config cannot reproduce results in the paper.
+# e.g. LLAMA2-7B Winogrande 69.2 (paper) -> 62.27 (this config)
+# Please try winogrande_ppl_8be6c3
+
 winogrande_reader_cfg = dict(
     input_columns=['opt1', 'opt2'],
     output_column='answer',

@@ -13,7 +13,7 @@ from mmengine.config import ConfigDict
 from tqdm import tqdm
 
 from opencompass.registry import RUNNERS, TASKS
-from opencompass.utils import get_logger
+from opencompass.utils import batched, get_logger
 
 from .base import BaseRunner
 
@@ -131,15 +131,22 @@ class SlurmSequentialRunner(BaseRunner):
                         break
                 parent_conn.close()
 
-            for job_id in tqdm(job_ids, desc='clear sruns'):
-                if job_id is None:
-                    continue
-                cmd = f'scancel {job_id}'
-                p = subprocess.Popen(cmd,
-                                     shell=True,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.STDOUT)
-                p.wait()
+            tbar = tqdm(total=len(job_ids), desc='clear sruns')
+            for batched_job_ids in batched(job_ids, 4):
+                ps = []
+                for job_id in batched_job_ids:
+                    tbar.update()
+                    if job_id is None:
+                        continue
+                    cmd = f'scancel {job_id}'
+                    p = subprocess.Popen(cmd,
+                                         shell=True,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT)
+                    ps.append(p)
+                for p in ps:
+                    p.wait()
+            tbar.close()
 
     def _launch(self, cfg: ConfigDict, child_conn: Pipe = None):
         logger = get_logger()
