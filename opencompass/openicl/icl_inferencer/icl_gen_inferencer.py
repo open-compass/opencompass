@@ -1,5 +1,6 @@
 """Direct Generation Inferencer."""
 
+import inspect
 import os
 import os.path as osp
 from typing import List, Optional
@@ -46,6 +47,7 @@ class GenInferencer(BaseInferencer):
             self,
             model: BaseModel,
             max_out_len: int,
+            stopping_criteria: List[str] = [],
             max_seq_len: Optional[int] = None,
             batch_size: Optional[int] = 1,
             gen_field_replace_token: Optional[str] = '',
@@ -64,6 +66,7 @@ class GenInferencer(BaseInferencer):
 
         self.gen_field_replace_token = gen_field_replace_token
         self.max_out_len = max_out_len
+        self.stopping_criteria = stopping_criteria
 
         if self.model.is_api and save_every is None:
             save_every = 1
@@ -128,10 +131,14 @@ class GenInferencer(BaseInferencer):
                 entry = datum
                 golds = [None for _ in range(len(entry))]
             # 5-1. Inference with local model
+            extra_gen_kwargs = {}
+            sig = inspect.signature(self.model.generate)
+            if 'stopping_criteria' in sig.parameters:
+                extra_gen_kwargs['stopping_criteria'] = self.stopping_criteria
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
                 results = self.model.generate_from_template(
-                    entry, max_out_len=self.max_out_len)
+                    entry, max_out_len=self.max_out_len, **extra_gen_kwargs)
                 generated = results
 
             num_return_sequences = getattr(self.model, 'generation_kwargs',

@@ -12,15 +12,15 @@ PROMPT_EN = {
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:def solution():\n    mark_pointers_2 = 25 * 2\n    mark_pointers_3 = 8 * 3\n    mark_free_throws = 10 * 1\n    mark_points_scored = mark_pointers_2 + mark_pointers_3 + mark_free_throws\n    opponents_pointers_2 = mark_pointers_2 * 2\n    opponents_pointers_3 = mark_pointers_3 / 2\n    opponents_free_throws = mark_free_throws / 2\n    opponents_points_scored = opponents_pointers_2 + opponents_pointers_3 + opponents_free_throws\n    total_points_scored = mark_points_scored + opponents_points_scored\n    result = total_points_scored\n    return result'),
         dict(role='SYSTEM', prompt='Response:210'),
         dict(role='BOT', prompt='Thought: According to the response, I got the answer\nFinalAnswer: 210'),
-        
+
         dict(role='HUMAN', prompt='Bella has two times as many marbles as frisbees. She also has 20 more frisbees than deck cards. If she buys 2/5 times more of each item, what would be the total number of the items she will have if she currently has 60 marbles?'),
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:def solution():\n    marbles = 60\n    num_increased_marbles = marbles * 2 / 5\n    num_total_marbles = marbles + num_increased_marbles\n    frisbees = marbles / 2\n    num_increased_frisbees = frisbees * 2 / 5\n    num_total_frisbees = frisbees + num_increased_frisbees\n    deck_cards = frisbees - 20\n    num_increased_deck_cards = deck_cards * 2 / 5\n    num_total_deck_cards = deck_cards + num_increased_deck_cards\n    num_total = num_total_marbles + num_total_frisbees + num_total_deck_cards\n    result = num_total\n    return result'),
         dict(role='SYSTEM', prompt='Response:140'),
         dict(role='BOT', prompt='Thought: According to the response, I got the answer\nFinalAnswer: 140'),
-        
+
         dict(role='HUMAN', prompt='A group of 4 fruit baskets contains 9 apples, 15 oranges, and 14 bananas in the first three baskets and 2 less of each fruit in the fourth basket. How many fruits are there?'),
         dict(role='BOT', prompt="""Tool:PythonInterpreter\nTool Input:def solution():\n    num_fruits_per_first_three_basket = 9 + 15 + 14\n    num_fruits_first_three_basket = num_fruits_per_first_three_basket * 3\n    num_apple_fourth_basket = 9 - 2\n    num_orange_fourth_basket = 15 - 2\n    num_banana_fourth_basket = 14 - 2\n    num_fruits_fourth_basket = num_apple_fourth_basket + num_orange_fourth_basket + num_banana_fourth_basket\n    num_fruits_total = num_fruits_first_three_basket + num_fruits_fourth_basket\n    result = num_fruits_total\n    return result"""),
-        dict(role='SYSTEM', prompt='Response:146'),  
+        dict(role='SYSTEM', prompt='Response:146'),
         dict(role='BOT', prompt='Thought: According to the response, I got the answer\nFinalAnswer: 146'),
 
         dict(role='HUMAN', prompt='{question}'),
@@ -35,14 +35,14 @@ PROMPT_EN = {
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:from sympy import *\ndef solution():\n    x, y, k = symbols(\'x y k\')\n    eq1 = Eq(2**k, Rational(1, 4))\n    k_value = solve(eq1, k)[0]\n    y = x**k_value\n    result = y.subs(x, -3)\n    return result'),
         dict(role='SYSTEM', prompt='Response:1/9'),
         dict(role='BOT', prompt='Thought: The functional expression of the power function is $y=x^{{-2}}$. Substituting $x=-3$ yields $y=$\\frac{{1}}{{9}}$\nFinalAnswer: A'),
-        
+
         dict(role='HUMAN', prompt='If $3 x-y=12$, what is the value of $\\frac{8^{x}}{2^{y}} ?$\nA. The value cannot be determined from the information given.\nB. $2^{12}$\nC. 4\nD. $8^{2}$'),
-        dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:from sympy import symbols, Eq, solve\n\ndef sloution():\n   x, y = symbols(\'x y\')\n   equation = Eq(3*x - y, 12)\n\n   y_in_terms_of_x = solve(equation, y)[0]\n   expression = 8**x / 2**y_in_terms_of_x\n  result = expression.simplify()\n return result'),    
+        dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:from sympy import symbols, Eq, solve\n\ndef sloution():\n   x, y = symbols(\'x y\')\n   equation = Eq(3*x - y, 12)\n\n   y_in_terms_of_x = solve(equation, y)[0]\n   expression = 8**x / 2**y_in_terms_of_x\n  result = expression.simplify()\n return result'),
         dict(role='SYSTEM', prompt='Response:2**12'),
         dict(role='BOT', prompt='Thought: The value of $\\frac{8^{x}}{2^{y}}$ is $2^{12}$\nFinalAnswer: B'),
-        
+
         dict(role='HUMAN', prompt='{question}'),
-    ]   
+    ]
 }
 
 PROMPT_CN = {
@@ -51,17 +51,17 @@ PROMPT_CN = {
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:def solution():\n    mark_pointers_2 = 25 * 2\n    mark_pointers_3 = 8 * 3\n    mark_free_throws = 10 * 1\n    mark_points_scored = mark_pointers_2 + mark_pointers_3 + mark_free_throws\n    opponents_pointers_2 = mark_pointers_2 * 2\n    opponents_pointers_3 = mark_pointers_3 / 2\n    opponents_free_throws = mark_free_throws / 2\n    opponents_points_scored = opponents_pointers_2 + opponents_pointers_3 + opponents_free_throws\n    total_points_scored = mark_points_scored + opponents_points_scored\n    result = total_points_scored\n    return result'),
         dict(role='SYSTEM', prompt='Response:210'),
         dict(role='BOT', prompt='Thought: 根据回答，我得到了答案\nFinalAnswer: 210'),
-        
+
         dict(role='HUMAN', prompt='Bella有两倍于飞盘的弹珠。她还比卡片多20个飞盘。如果她买每种物品多2/5，她会有多少总数的物品，如果她现在有60颗弹珠？'),
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:def solution():\n    marbles = 60\n    num_increased_marbles = marbles * 2 / 5\n    num_total_marbles = marbles + num_increased_marbles\n    frisbees = marbles / 2\n    num_increased_frisbees = frisbees * 2 / 5\n    num_total_frisbees = frisbees + num_increased_frisbees\n    deck_cards = frisbees - 20\n    num_increased_deck_cards = deck_cards * 2 / 5\n    num_total_deck_cards = deck_cards + num_increased_deck_cards\n    num_total = num_total_marbles + num_total_frisbees + num_total_deck_cards\n    result = num_total\n    return result'),
         dict(role='SYSTEM', prompt='Response:140'),
         dict(role='BOT', prompt='Thought: 根据回答，我得到了答案\nFinalAnswer: 140'),
-        
+
         dict(role='HUMAN', prompt='一个有4个水果篮子，前三个篮子里有9个苹果、15个橙子和14个香蕉，第四个篮子里每种水果都少2个。总共有多少水果？'),
         dict(role='BOT', prompt="""Tool:PythonInterpreter\nTool Input:def solution():\n    num_fruits_per_first_three_basket = 9 + 15 + 14\n    num_fruits_first_three_basket = num_fruits_per_first_three_basket * 3\n    num_apple_fourth_basket = 9 - 2\n    num_orange_fourth_basket = 15 - 2\n    num_banana_fourth_basket = 14 - 2\n    num_fruits_fourth_basket = num_apple_fourth_basket + num_orange_fourth_basket + num_banana_fourth_basket\n    num_fruits_total = num_fruits_first_three_basket + num_fruits_fourth_basket\n    result = num_fruits_total\n    return result"""),
         dict(role='SYSTEM', prompt='Response:146'),
         dict(role='BOT', prompt='Thought: 根据回答，我得到了答案\nFinalAnswer: 146'),
-        
+
         dict(role='HUMAN', prompt='{question}'),
     ],
     "FEWSHOT_INSTRUCTION_CHOICE" : [
@@ -74,12 +74,12 @@ PROMPT_CN = {
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:from sympy import *\ndef solution():\n    x, y, k = symbols(\'x y k\')\n    eq1 = Eq(2**k, Rational(1, 4))\n    k_value = solve(eq1, k)[0]\n    y = x**k_value\n    result = y.subs(x, -3)\n    return result'),
         dict(role='SYSTEM', prompt='Response:1/9'),
         dict(role='BOT', prompt='Thought: 求出幂函数的函数表达式为 $y=x^{{-2}}$，代入 $x=-3$ 得到 $y=$\\frac{{1}}{{9}}$\nFinalAnswer: A'),
-        
+
         dict(role='HUMAN', prompt='如果$3 x-y=12$，则$\\frac{8^{x}}{2^{y}}$的值是多少？\nA. 无法从给定的信息中确定值。\nB. $2^{12}$\nC. 4\nD. $8^{2}$'),
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:from sympy import symbols, Eq, solve\n\ndef sloution():\n   x, y = symbols(\'x y\')\n   equation = Eq(3*x - y, 12)\n\n   y_in_terms_of_x = solve(equation, y)[0]\n   expression = 8**x / 2**y_in_terms_of_x\n  result = expression.simplify()\n return result'),
         dict(role='SYSTEM', prompt='Response:2**12'),
         dict(role='BOT', prompt='Thought: $\\frac{8^{x}}{2^{y}}$的值是$2^{12}$\nFinalAnswer: B'),
-        
+
         dict(role='HUMAN', prompt='{question}'),
     ]
 }
@@ -95,13 +95,13 @@ mathbench_sets = {
 # Use circular evaluation or not
 with_circular_eval = True
 
-mathbench_code_datasets = []
+mathbench_agent_datasets = []
 
 for _split in list(mathbench_sets.keys()):
     for _name in mathbench_sets[_split]:
         prompt_example = PROMPT_CN if '_cn' in _name else PROMPT_EN
         mathbench_infer_cfg = dict(
-            prompt_template=dict(type=PromptTemplate, 
+            prompt_template=dict(type=PromptTemplate,
                                  template=dict(
                                      round = prompt_example["FEWSHOT_INSTRUCTION_CLOZE"] if 'cloze' in _name else prompt_example["FEWSHOT_INSTRUCTION_CHOICE"])),
             retriever=dict(type=ZeroRetriever),
@@ -112,13 +112,13 @@ for _split in list(mathbench_sets.keys()):
             evaluator=dict(type=CircularEvaluator if 'choice' in _name and with_circular_eval else AccEvaluator),
             pred_postprocessor=dict(type=first_option_postprocess, options='ABCD') if 'single_choice' in _name else dict(type=mathbench_postprocess, name=_name))
 
-        mathbench_code_datasets.append(
+        mathbench_agent_datasets.append(
             dict(
+                abbr="mathbench-" + _split + '-' + _name + '-agent',
                 type=MathBenchDataset,
                 path=f"./data/mathbench/{_split}",
                 name=_name,
                 with_circular=with_circular_eval,
-                abbr="mathbench-interpreter-" + _split + '-' + _name,
                 reader_cfg=dict(
                     input_columns=["question"],
                     output_column="answer"

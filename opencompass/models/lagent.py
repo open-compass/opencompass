@@ -52,7 +52,7 @@ class LagentAgent:
 
     def chat(self,
              user_input: str,
-             history: List[dict] = None) -> Tuple[str, List[dict]]:
+             history: List[dict] = None) -> Tuple[str, List[dict], List[dict]]:
         """Chat with agent."""
         if history:
             self.agent._session_history = history
@@ -60,6 +60,7 @@ class LagentAgent:
         from lagent.schema import ActionReturn, AgentReturn
         generation: AgentReturn = self.agent.chat(user_input)
 
+        inner_steps = generation.inner_steps
         answer = generation.response
         steps = []
 
@@ -76,7 +77,7 @@ class LagentAgent:
                     valid=int(step.valid),
                 ))
 
-        return answer, steps
+        return answer, steps, inner_steps
 
 
 FORCE_STOP_PROMPT_EN = (

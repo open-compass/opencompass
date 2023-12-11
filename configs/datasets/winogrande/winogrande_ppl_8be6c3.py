@@ -1,12 +1,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import PPLInferencer
+from opencompass.openicl.icl_inferencer import LoglikelihoodInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import winograndeDataset
-
-# WARNING: This config cannot reproduce results in the paper.
-# e.g. LLAMA2-7B Winogrande 69.2 (paper) -> 62.27 (this config)
-# Please try winogrande_ppl_8be6c3
 
 winogrande_reader_cfg = dict(
     input_columns=['opt1', 'opt2'],
@@ -17,13 +13,14 @@ winogrande_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            1: "Good sentence: {opt1}",
-            2: "Good sentence: {opt2}",
-        }),
+            1: "{opt1}",
+            2: "{opt2}",
+        }
+    ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=PPLInferencer))
+    inferencer=dict(type=LoglikelihoodInferencer))
 
-winogrande_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
+winogrande_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 winogrande_datasets = [
     dict(
