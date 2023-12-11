@@ -29,7 +29,7 @@ def match_GPT4_answer(s):
     else:
         return None
 
-judge_map = {'gpt4': match_GPT4_answer, 'other': match_general_answer}
+judge_map = {'smart': match_GPT4_answer, 'other': match_general_answer}
 
 def call_function(name, arg):
     if name in judge_map:
@@ -49,11 +49,11 @@ class Corev2Summarizer:
     def __init__(
         self,
         config: ConfigDict,
-        judge_method='gpt4'
+        match_method='smart'
     ) -> None:
         self.tasks = []
         self.cfg = config
-        self.judge_method = judge_method
+        self.match_method = match_method
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
@@ -88,7 +88,7 @@ class Corev2Summarizer:
                     judged_answers = []
                     references = []
                     for k, v in result.items():
-                        judged_answers.append(call_function(self.judge_method, v['prediction']))
+                        judged_answers.append(call_function(self.match_method, v['prediction']))
                         references.append(v['gold'])
                     print(
                         f'Among {len(judged_answers)} judgements, successfully extracted {len(judged_answers)-judged_answers.count(None)} judgements.'

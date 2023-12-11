@@ -91,5 +91,5 @@ work_dir = './creation/'
 
 summarizer = dict(
     type=Creationv01Summarizer,
-    judge_method='gpt4',
+    match_method='smart',
 )

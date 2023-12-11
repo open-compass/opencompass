@@ -77,7 +77,7 @@ work_dir = 'Your work dir' #指定工作目录，在此工作目录下，若使�
 
 summarizer = dict(
     type=Corev2Summarizer, #自定义数据集Summarizer
-    judge_method='gpt4', #自定义答案提取方式
+    match_method='smart' #自定义答案提取方式
 )
 ```
 

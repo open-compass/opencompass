@@ -76,7 +76,7 @@ work_dir = 'Your work dir' #set your workdir, in this workdir, if you use '--reu
 
 summarizer = dict(
     type=Corev2Summarizer, #Your dataset Summarizer
-    judge_method='gpt4', #Your answer extract method
+    match_method='smart', #Your answer extract method
 )
 ```
 

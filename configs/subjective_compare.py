@@ -93,5 +93,5 @@ work_dir = './corev2/'
 
 summarizer = dict(
     type=Corev2Summarizer,
-    judge_method='gpt4',
+    match_method='smart',
 )
