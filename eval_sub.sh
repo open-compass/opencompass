@@ -2,7 +2,7 @@ export HF_EVALUATE_OFFLINE=1
 export HF_DATASETS_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export TRANSFORMERS_CACHE=/mnt/petrelfs/share_data/basemodel/checkpoints/llm/hf_hub
-cd ~/eval_PR/opencompass
+cd ~/new_subject/opencompass
 conda activate opencompass
 python run.py configs/subjective.py --debug #--reuse latest #--mode eval --reuse latest
 

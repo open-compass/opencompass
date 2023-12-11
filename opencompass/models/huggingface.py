@@ -531,7 +531,7 @@ class HuggingFaceChatGLM3(HuggingFace):
 
     def generate(self,
                  inputs: List[str or PromptList],
-                 max_out_len: int = 2048,
+                 max_out_len: int = 512,
                  temperature: float = 0.6,
                  skip_overlength=False) -> str:
         """Generate response from input prompt.
