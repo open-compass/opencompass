@@ -49,8 +49,8 @@ class IPythonInterpreter(BaseAction):
             Defaults to 20.
         trim_output (int, optional): Max characters restriction of ipython
             outputs. If None, do not perform any trim.
-            TODO: Notice that, this is not token len. Anf trim strategies
-            might be added later. Defaults to 1024.
+            Notice that, this is not token length but string length.
+            Trim strategies might be added later if needed. Defaults to 1024.
         user_data_dir (str): Specified the user data directory for files
             loading. If set to `ENV`, use `USER_DATA_DIR` environment variable.
             Defaults to `ENV`.
