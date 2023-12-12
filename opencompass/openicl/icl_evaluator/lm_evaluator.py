@@ -20,7 +20,7 @@ def order_preds_and_record_references(predictions,
                                       references,
                                       infer_order,
                                       seed=2680):
-    """Order predictions based on args and recording regrading references
+    """Order predictions based on args and recording regrading references.
 
     Args:
         predictions (List): List of multi model predictions.
