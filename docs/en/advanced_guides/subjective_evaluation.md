@@ -83,6 +83,10 @@ summarizer = dict(
 )
 ```
 
+In addition, you can also change the response order of the two models, please refer to `config/subjective_compare.py`,
+when `infer_order` is setting to `random`, the response will be random ordered,
+when `infer_order` is setting to `double`, the response of two models will be doubled in two ways.
+
 ### Single Model Scoring Configuration
 
 For `config/subjective_score.py`, it is mainly same with `config/subjective_compare.py`, and you just need to modify the eval mode to `singlescore`.
