@@ -23,6 +23,7 @@ class SubjectiveCmpDataset(BaseDataset):
                 others = problem['others']
                 raw_data.append({
                     'question': question,
+                    'capability': capability,
                     'others': others,
                     'judge': {
                         'capability': capability
