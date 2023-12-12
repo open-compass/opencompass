@@ -83,6 +83,10 @@ summarizer = dict(
 )
 ```
 
+此外，在数据集的配置config中，还可以选择两回答比较时的回答顺序，请参考`config/subjective_compare.py`,
+当`infer_order`设置为`random`时，将对两模型的回复顺序进行随机打乱,
+当`infer_order`设置为`double`时，将把两模型的回复按两种先后顺序进行判断。
+
 ### 单回答打分配置
 
 对于单回答打分，更详细的config setting请参考 `config/subjective_score.py`，该config的大部分都与两回答比较的config相同，只需要修改评测模式即可，将评测模式设置为`singlescore`。
