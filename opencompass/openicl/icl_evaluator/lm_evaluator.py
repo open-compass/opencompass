@@ -20,6 +20,14 @@ def order_preds_and_record_references(predictions,
                                       references,
                                       infer_order,
                                       seed=2680):
+    """Order predictions based on args and recording regrading references
+
+    Args:
+        predictions (List): List of multi model predictions.
+        references (List): List of reference based on each problem.
+        infer_order (str, optional): The mode of inference order.
+        seed (int, optional): Random seed.
+    """
     random.seed(seed)
     list_of_preds = [[] for _ in range(len(predictions))]
     for i in range(len(predictions[0]['model_preds'])):
