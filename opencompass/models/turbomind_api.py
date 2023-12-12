@@ -85,7 +85,6 @@ class TurboMindAPIModel(BaseModel):
                              [temperature] * len(inputs)))
         return results
 
-
     def get_token_len(self, prompt: str) -> int:
         input_ids, length = self.chatbot.encode(prompt)
         return length
@@ -123,7 +122,7 @@ class TurboMindAPIModel(BaseModel):
                 prompt=prompt,
                 model=self.model_name,
                 max_tokens=max_out_len,
-                temperature = temperature):
+                temperature=temperature):
             response += output['choices'][0]['text']
         response = valid_str(response)
         return response
