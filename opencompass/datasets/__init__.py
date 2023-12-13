@@ -75,6 +75,7 @@ from .siqa import *  # noqa: F401, F403
 from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403
 from .strategyqa import *  # noqa: F401, F403
+from .subject_alignmentbench import AlignmentBenchDataset  # noqa: F401, F403
 from .subject_corev2 import Corev2Dataset  # noqa: F401, F403
 from .subject_creationv01 import Creationv01Dataset  # noqa: F401, F403
 from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403

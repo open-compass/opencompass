@@ -1,3 +1,4 @@
+from .alignmentbench import AlignmentBenchSummarizer  # noqa: F401
 from .circular import CircularSummarizer  # noqa: F401
 from .corev2 import Corev2Summarizer  # noqa: F401
 from .creationv01 import Creationv01Summarizer  # noqa: F401
