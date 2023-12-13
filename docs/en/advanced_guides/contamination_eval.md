@@ -44,6 +44,12 @@ Currently, this solution only supports the GSM8K dataset. We welcome the communi
 Consider cite the following paper if you find it helpful:
 
 ```bibtex
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
 @misc{wei2023skywork,
       title={Skywork: A More Open Bilingual Foundation Model},
       author={Tianwen Wei and Liang Zhao and Lichang Zhang and Bo Zhu and Lijie Wang and Haihua Yang and Biye Li and Cheng Cheng and Weiwei Lü and Rui Hu and Chenxia Li and Liu Yang and Xilin Luo and Xuejie Wu and Lunan Liu and Wenjun Cheng and Peng Cheng and Jianhao Zhang and Xiaoyu Zhang and Lei Lin and Xiaokun Wang and Yutuan Ma and Chuanhai Dong and Yanqi Sun and Yifu Chen and Yongyi Peng and Xiaojuan Liang and Shuicheng Yan and Han Fang and Yahui Zhou},
@@ -101,6 +107,12 @@ Currently, this solution only supports the C-Eval dataset. [Contamination_Detect
 Consider cite the following paper if you find it helpful:
 
 ```bibtex
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
 @article{Li2023AnOS,
   title={An Open Source Data Contamination Report for Llama Series Models},
   author={Yucheng Li},
