@@ -40,7 +40,8 @@ ARC_c_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))
 
-ARC_c_eval_cfg = dict(evaluator=dict(type=AccContaminationEvaluator))
+ARC_c_eval_cfg = dict(evaluator=dict(type=AccContaminationEvaluator),
+                      analyze_contamination=True)
 
 ARC_c_datasets = [
     dict(

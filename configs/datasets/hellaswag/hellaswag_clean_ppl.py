@@ -21,7 +21,8 @@ hellaswag_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))
 
-hellaswag_eval_cfg = dict(evaluator=dict(type=AccContaminationEvaluator))
+hellaswag_eval_cfg = dict(evaluator=dict(type=AccContaminationEvaluator),
+                          analyze_contamination=True)
 
 hellaswag_datasets = [
     dict(

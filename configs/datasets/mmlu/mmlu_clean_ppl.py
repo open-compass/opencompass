@@ -97,7 +97,8 @@ for _name in mmlu_all_sets:
         inferencer=dict(type=PPLInferencer),
     )
 
-    mmlu_eval_cfg = dict(evaluator=dict(type=AccContaminationEvaluator), )
+    mmlu_eval_cfg = dict(evaluator=dict(type=AccContaminationEvaluator),
+                         analyze_contamination=True)
 
     mmlu_datasets.append(
         dict(
