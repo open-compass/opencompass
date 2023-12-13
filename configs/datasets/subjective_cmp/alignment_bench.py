@@ -13,7 +13,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "alignment_bench_test",
+    "alignment_bench",
 ]
 data_path =gv('WORKDIR')+"data/subjective/alignment_bench"
 

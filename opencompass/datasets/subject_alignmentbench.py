@@ -7,7 +7,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
 
-from ..subjective_cmp import SubjectiveCmpDataset
+from .subjective_cmp import SubjectiveCmpDataset
 
 
 class Config:
@@ -92,6 +92,7 @@ class AlignmentBenchDataset(SubjectiveCmpDataset):
         for data in dataset:
             dimensions, prefix = prompt_construct(data, alignmentbenchconfig)
             data['prefix'], data['suffix'] = prefix, ''
+            data['judge']['others'] = data['others']
             corev2_dataset.append(data)
         dataset = Dataset.from_list(corev2_dataset)
         return dataset

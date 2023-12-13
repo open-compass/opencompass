@@ -11,14 +11,14 @@ with read_base():
 
 datasets = [*subjective_datasets]
 
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI, HuggingFaceChatGLM3
 from opencompass.partitioners import NaivePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import Creationv01Summarizer
+from opencompass.summarizers import AlignmentBenchSummarizer
 models = [*hf_baichuan2_7b]#, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_qwen_14b_chat]
 
 api_meta_template = dict(
@@ -42,32 +42,33 @@ infer = dict(
 )
 
 
-_meta_template = dict(
+api_meta_template = dict(
     round=[
-        dict(role='HUMAN', begin='<reserved_106>'),
-        dict(role='BOT', begin='<reserved_107>', generate=True),
-    ],
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
+    ]
 )
 
 judge_model = dict(
-        type=HuggingFaceCausalLM,
-        abbr='baichuan2-7b-chat-hf',
-        path="baichuan-inc/Baichuan2-7B-Chat",
-        tokenizer_path='baichuan-inc/Baichuan2-7B-Chat',
+        type=HuggingFaceChatGLM3,
+        abbr='chatglm3-6b-hf',
+        path='THUDM/chatglm3-6b',
+        tokenizer_path='THUDM/chatglm3-6b',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',
             trust_remote_code=True,
-            use_fast=False,
         ),
-        meta_template=_meta_template,
+        meta_template=api_meta_template,
         max_out_len=100,
-        max_seq_len=2048,
-        batch_size=8,
-        model_kwargs=dict(device_map='auto', trust_remote_code=True),
-        run_cfg=dict(num_gpus=1, num_procs=1),
+        max_seq_len=4096,
+        batch_size=1,
+        run_cfg=dict(num_gpus=1, num_procs=1)
     )
-
 
 eval = dict(
     partitioner=dict(
@@ -88,6 +89,5 @@ eval = dict(
 work_dir = gv('WORKDIR')+'alignment_bench/'
 
 summarizer = dict(
-    type=Creationv01Summarizer,
-    match_method='smart',
+    type=AlignmentBenchSummarizer,
 )
