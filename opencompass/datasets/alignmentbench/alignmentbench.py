@@ -12,19 +12,23 @@ from ..subjective_cmp import SubjectiveCmpDataset
 
 class Config:
 
-    def __init__(self, config_file_name='config/multi-dimension.json') -> None:
-        script_dir = osp.dirname(osp.realpath(__file__))
-        config_file_path = osp.join(script_dir, config_file_name)
+    def __init__(self, alignment_bench_config_path,
+                 alignment_bench_config_name) -> None:
+        config_file_path = osp.join(alignment_bench_config_path,
+                                    alignment_bench_config_name + '.json')
         with open(config_file_path, 'r') as config_file:
             self.config = json.load(config_file)
             config_file.close()
 
         self.dimension_set_filepath = osp.join(
-            script_dir, self.config['Paths']['dimension_set_filepath'])
+            alignment_bench_config_path,
+            self.config['Paths']['dimension_set_filepath'])
         self.dimension_def_filepath = osp.join(
-            script_dir, self.config['Paths']['dimension_def_filepath'])
+            alignment_bench_config_path,
+            self.config['Paths']['dimension_def_filepath'])
         self.subcategory_mapping = osp.join(
-            script_dir, self.config['Paths']['subcategory_mapping'])
+            alignment_bench_config_path,
+            self.config['Paths']['subcategory_mapping'])
 
         with open(self.dimension_set_filepath, 'r') as f:
             self.category_dimension_map = json.load(f)
@@ -45,9 +49,6 @@ class Config:
 
     def category2type(self, category):
         return self.subcategory_type_map.get(category, None)
-
-
-alignmentbenchconfig = Config()
 
 
 def prompt_construct(sample, config: Config):
@@ -82,7 +83,10 @@ def prompt_construct(sample, config: Config):
 @LOAD_DATASET.register_module()
 class AlignmentBenchDataset(SubjectiveCmpDataset):
 
-    def load(self, path: str, name: str):
+    def load(self, path: str, name: str, alignment_bench_config_path: str,
+             alignment_bench_config_name: str):
+        alignmentbenchconfig = Config(alignment_bench_config_path,
+                                      alignment_bench_config_name)
         dataset = list(super().load(path, name))
         corev2_dataset = []
         for data in dataset:

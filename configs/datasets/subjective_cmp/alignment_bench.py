@@ -15,7 +15,11 @@ subjective_reader_cfg = dict(
 subjective_all_sets = [
     "alignment_bench_test",
 ]
-data_path = gv('WORKDIR')+"data/subjective/"
+data_path =gv('WORKDIR')+"data/subjective/alignment_bench"
+
+alignment_bench_config_path = gv('WORKDIR')+"data/subjective/alignment_bench/config"
+alignment_bench_config_name = 'multi-dimension'
+
 subjective_datasets = []
 
 for _name in subjective_all_sets:
@@ -55,6 +59,8 @@ for _name in subjective_all_sets:
             type=AlignmentBenchDataset,
             path=data_path,
             name=_name,
+            alignment_bench_config_path=alignment_bench_config_path,
+            alignment_bench_config_name=alignment_bench_config_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg
