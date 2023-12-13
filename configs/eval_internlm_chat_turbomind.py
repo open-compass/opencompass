@@ -10,7 +10,6 @@ with read_base():
     from .datasets.SuperGLUE_WSC.SuperGLUE_WSC_gen_7902a7 import WSC_datasets
     from .datasets.triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
     from .datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
-    from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
     from .datasets.race.race_gen_69ee4f import race_datasets
     from .datasets.crowspairs.crowspairs_gen_381af0 import crowspairs_datasets
     # and output the results in a choosen format
@@ -33,7 +32,12 @@ llama2_meta_template = dict(
             ],
             eos_token_id=2,
          )
-
+qwen_meta_template = dict(
+    round=[
+        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
+        dict(role="BOT", begin="\n<|im_start|>assistant\n", end='<|im_end|>', generate=True),
+    ],
+)
 # config for internlm-chat-7b
 # models = [
 #     dict(
@@ -125,10 +129,25 @@ llama2_meta_template = dict(
 # ]
 
 # config for llama2-chat-7b
+# models = [
+#     dict(
+#         type=TurboMindModel,
+#         abbr='llama2-chat-7b-turbomind',
+#         path="./turbomind",
+#         max_out_len=100,
+#         max_seq_len=2048,
+#         batch_size=16,
+#         concurrency=32,
+#         meta_template=llama2_meta_template,
+#         run_cfg=dict(num_gpus=1, num_procs=1),
+#     )
+# ]
+
+# config for qwen-chat-7b
 models = [
     dict(
         type=TurboMindModel,
-        abbr='llama2-chat-7b-turbomind',
+        abbr='qwen-chat-7b-turbomind',
         path="./turbomind",
         max_out_len=100,
         max_seq_len=2048,
