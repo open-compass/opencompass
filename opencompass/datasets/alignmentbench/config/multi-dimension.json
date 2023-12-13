@@ -1,0 +1,11 @@
+{
+  "OpenAI": {
+    "api_key": "",
+    "api_url": "https://api.openai.com/v1/chat/completions"
+  },
+  "Paths": {
+    "dimension_set_filepath": "config/dimension_set.json",
+    "dimension_def_filepath": "config/dimension_definition.json",
+    "subcategory_mapping": "config/subcategory_question_mapping.json"
+  }
+}

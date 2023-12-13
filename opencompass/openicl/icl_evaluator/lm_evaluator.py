@@ -100,25 +100,28 @@ class LMEvaluator:
         self.infer_order = infer_order
 
     def score(self, predictions, references: Optional[List] = None) -> Dict:
+        dup_indices = []
+
         if type(predictions) == list:
             """Apply to multi-model comparison."""
             references = [{} for _ in range(len(predictions[0]['model_preds']))
                           ] if references is None else references
             predictions, references = order_preds_and_record_references(
                 predictions, references, self.infer_order)
+
+            # calculate dupicated predictions numbers
+            total_predictions_num = len(predictions[0])
+
+            for i in range(len(predictions[0])):
+                check = [sub[i] for sub in predictions]
+                if len(set(check)) == 1:
+                    dup_indices.append(i)
+
         elif type(predictions) == dict:
             """Apply to single-model scoring."""
             references = [{} for _ in range(len(predictions[0]['model_preds']))
                           ] if references is None else references
             predictions = [predictions['model_preds']]
-
-        # calculate dupicated predictions numbers
-        total_predictions_num = len(predictions[0])
-        dup_indices = []
-        for i in range(len(predictions[0])):
-            check = [sub[i] for sub in predictions]
-            if len(set(check)) == 1:
-                dup_indices.append(i)
 
         if len(dup_indices) != 0:
             # remove dupicated predictions
