@@ -1,4 +1,4 @@
-# Training Data Contamination Assessment
+# Data Contamination Assessment
 
 **Data Contamination** refers to the phenomenon where data intended for downstream testing tasks appear in the training data of large language models (LLMs), resulting in artificially inflated performance metrics in downstream tasks (such as summarization, natural language inference, text classification), which do not accurately reflect the model's true generalization capabilities.
 
@@ -40,6 +40,19 @@ gsm8k-ref-ppl    f729ba     average_ppl  unknown              1.55          1.2 
 ```
 
 Currently, this solution only supports the GSM8K dataset. We welcome the community to contribute more datasets.
+
+Consider cite the following paper if you find it helpful:
+
+```bibtex
+@misc{wei2023skywork,
+      title={Skywork: A More Open Bilingual Foundation Model},
+      author={Tianwen Wei and Liang Zhao and Lichang Zhang and Bo Zhu and Lijie Wang and Haihua Yang and Biye Li and Cheng Cheng and Weiwei Lü and Rui Hu and Chenxia Li and Liu Yang and Xilin Luo and Xuejie Wu and Lunan Liu and Wenjun Cheng and Peng Cheng and Jianhao Zhang and Xiaoyu Zhang and Lei Lin and Xiaokun Wang and Yutuan Ma and Chuanhai Dong and Yanqi Sun and Yifu Chen and Yongyi Peng and Xiaojuan Liang and Shuicheng Yan and Han Fang and Yahui Zhou},
+      year={2023},
+      eprint={2310.19341},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
 
 ## Contamination Data Annotation Based on Classic Pre-trained Sets
 
@@ -84,3 +97,16 @@ ceval                                           -          ppl     67.32        
 ```
 
 Currently, this solution only supports the C-Eval dataset. [Contamination_Detector](https://github.com/liyucheng09/Contamination_Detector) also includes ARC, CSQA, HellaSwag, MMLU, and WinoGrande, but these have not yet been implemented in OpenCompass. We welcome the community to contribute more datasets.
+
+Consider cite the following paper if you find it helpful:
+
+```bibtex
+@article{Li2023AnOS,
+  title={An Open Source Data Contamination Report for Llama Series Models},
+  author={Yucheng Li},
+  journal={ArXiv},
+  year={2023},
+  volume={abs/2310.17589},
+  url={https://api.semanticscholar.org/CorpusID:264490711}
+}
+```

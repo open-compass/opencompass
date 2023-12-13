@@ -1,4 +1,4 @@
-# 训练数据污染评估
+# 数据污染评估
 
 **数据污染** 是指本应用在下游测试任务重的数据出现在了大语言模型 (LLM) 的训练数据中，从而导致在下游任务 (例如，摘要、自然语言推理、文本分类) 上指标虚高，无法反映模型真实泛化能力的现象。
 
@@ -41,6 +41,19 @@ gsm8k-ref-ppl    f729ba     average_ppl  unknown              1.55          1.2 
 
 目前该方案仅支持 GSM8K 数据集，我们欢迎社区贡献更多的数据集。
 
+如果使用了该方法，请添加引用:
+
+```bibtex
+@misc{wei2023skywork,
+      title={Skywork: A More Open Bilingual Foundation Model},
+      author={Tianwen Wei and Liang Zhao and Lichang Zhang and Bo Zhu and Lijie Wang and Haihua Yang and Biye Li and Cheng Cheng and Weiwei Lü and Rui Hu and Chenxia Li and Liu Yang and Xilin Luo and Xuejie Wu and Lunan Liu and Wenjun Cheng and Peng Cheng and Jianhao Zhang and Xiaoyu Zhang and Lei Lin and Xiaokun Wang and Yutuan Ma and Chuanhai Dong and Yanqi Sun and Yifu Chen and Yongyi Peng and Xiaojuan Liang and Shuicheng Yan and Han Fang and Yahui Zhou},
+      year={2023},
+      eprint={2310.19341},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
+
 ## 基于经典预训练集的污染数据标注
 
 感谢 [Contamination_Detector](https://github.com/liyucheng09/Contamination_Detector) 以及 @liyucheng09 提供了本方法。
@@ -82,3 +95,16 @@ ceval                                           -          ppl     67.32        
 ```
 
 目前该方案仅支持 C-Eval 数据集，[Contamination_Detector](https://github.com/liyucheng09/Contamination_Detector) 中还包含了 ARC, CSQA, HellaSwag, MMLU 和 WinoGrande，但目前还没有在 OpenCompass 中实现。我们欢迎社区贡献更多的数据集。
+
+如果使用了该方法，请添加引用:
+
+```bibtex
+@article{Li2023AnOS,
+  title={An Open Source Data Contamination Report for Llama Series Models},
+  author={Yucheng Li},
+  journal={ArXiv},
+  year={2023},
+  volume={abs/2310.17589},
+  url={https://api.semanticscholar.org/CorpusID:264490711}
+}
+```
