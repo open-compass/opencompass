@@ -91,7 +91,7 @@ class hellaswagDatasetClean(BaseDataset):
         with open(annotation_cache_path, 'w') as f:
             json.dump(annotations, f)
         return annotations
-    
+
     @staticmethod
     def load(path):
         dataset = []
