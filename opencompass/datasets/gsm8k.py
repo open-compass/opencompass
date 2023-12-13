@@ -21,7 +21,6 @@ class GSM8KDataset(BaseDataset):
             with open(split_path, 'r', encoding='utf-8') as f:
                 for line in f:
                     line = json.loads(line.strip())
-                    line['answer']
                     dataset.append(line)
             datasets[split] = Dataset.from_list(dataset)
         return DatasetDict(datasets)
