@@ -44,6 +44,12 @@ gsm8k-ref-ppl    f729ba     average_ppl  unknown              1.55          1.2 
 如果使用了该方法，请添加引用:
 
 ```bibtex
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
 @misc{wei2023skywork,
       title={Skywork: A More Open Bilingual Foundation Model},
       author={Tianwen Wei and Liang Zhao and Lichang Zhang and Bo Zhu and Lijie Wang and Haihua Yang and Biye Li and Cheng Cheng and Weiwei Lü and Rui Hu and Chenxia Li and Liu Yang and Xilin Luo and Xuejie Wu and Lunan Liu and Wenjun Cheng and Peng Cheng and Jianhao Zhang and Xiaoyu Zhang and Lei Lin and Xiaokun Wang and Yutuan Ma and Chuanhai Dong and Yanqi Sun and Yifu Chen and Yongyi Peng and Xiaojuan Liang and Shuicheng Yan and Han Fang and Yahui Zhou},
@@ -99,6 +105,12 @@ ceval                                           -          ppl     67.32        
 如果使用了该方法，请添加引用:
 
 ```bibtex
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
 @article{Li2023AnOS,
   title={An Open Source Data Contamination Report for Llama Series Models},
   author={Yucheng Li},
