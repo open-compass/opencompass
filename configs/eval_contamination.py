@@ -8,7 +8,7 @@ with read_base():
     from .models.yi.hf_yi_6b import models as hf_yi_6b_model
     from .models.qwen.hf_qwen_7b import models as hf_qwen_7b_model
     from .models.hf_llama.hf_llama2_7b import models as hf_llama2_7b_model
-    from .summarizers.contamination import ceval_summarizer as summarizer
+    from .summarizers.contamination import summarizer
 
 
 datasets = [*ceval_datasets]
