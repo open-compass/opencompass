@@ -21,6 +21,8 @@ WORK_DIR = os.getenv('CODE_INTERPRETER_WORK_DIR', '/tmp/workspace')
 DEFAULT_DESCRIPTION = """启动Jupter Kernel用于执行Python代码。"""
 
 START_CODE = """
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 def input(*args, **kwargs):
     raise NotImplementedError('Python input() function is disabled.')
 

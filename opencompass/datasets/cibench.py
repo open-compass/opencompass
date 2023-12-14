@@ -37,7 +37,10 @@ def load_experiment(file: str) -> dict:
                 text = ''.join(cell['source']).strip()
                 if modules:
                     _modules = modules.pop(0)
-                    text += f"Please use {' and '.join(_modules)} modules."
+                    if 'chinese' not in file:
+                        text += f"Please use {' and '.join(_modules)} modules."
+                    else:
+                        text += f"请用 {' 和 '.join(_modules)} 模块."
                 text = text.strip() + '\n'
                 # append the formatted text
                 questions.append(text)
@@ -313,23 +316,23 @@ class CIBenchEvaluator(BaseEvaluator):
         # numeric_correct: numerical correct
         # text_score: text score
         # vis_sim: visual similarity
-        result = defaultdict(list)
-        for tag, step, output in zip(tags, steps, outputs):
-            # check whether this step is valid
-            result['executable'].append(self.valid_step(step))
-            if tag != 'exec':
-                key, func = self.TAG_MAPPING[tag]
-                result[key].append(func(step, output))
 
-        # add missing metric for better analyse if not exists
+        # create empty results
+        result = dict()
         if hard_tags:
             check_tags = ['exec', 'num', 'text', 'vis']
         else:
             check_tags = ['exec', 'general', 'vis']
         for tag in check_tags:
             key = self.TAG_MAPPING[tag][0]
-            if key not in result:
-                result[key] = []
+            result[key] = []
+
+        for tag, step, output in zip(tags, steps, outputs):
+            # check whether this step is valid
+            result['executable'].append(self.valid_step(step))
+            if tag != 'exec':
+                key, func = self.TAG_MAPPING[tag]
+                result[key].append(func(step, output))
 
         return result
 
@@ -370,5 +373,7 @@ class CIBenchEvaluator(BaseEvaluator):
                 total_results[k] = total_scores[k] / total_nums[k] * 100
             else:
                 total_results[k] = -1
+            # Debug use
+            # total_results[f'{k}_total_nums'] = total_nums[k]
 
         return total_results
