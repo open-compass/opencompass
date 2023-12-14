@@ -384,7 +384,11 @@ class OpenAIAllesAPIN(OpenAI):
                 elif item['role'] == 'SYSTEM':
                     msg['role'] = 'system'
                 messages.append(msg)
+<<<<<<< HEAD
             # model can be response with user and system
+=======
+            # model can be reponse with user and system
+>>>>>>> update alignmentbench
             # when it comes with agent involved.
             assert msg['role'] in ['user', 'system']
         data = {
