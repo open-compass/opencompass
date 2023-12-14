@@ -15,7 +15,7 @@ try:
 except ImportError:
     from_csv = None
 
-from opencompass.utils import dataset_abbr_from_cfg
+from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
 
 CATEGORIES = {
     '中文推理': ['数学计算', '逻辑推理'],
@@ -91,6 +91,8 @@ class AlignmentBenchSummarizer:
     def __init__(self, config: ConfigDict) -> None:
         self.tasks = []
         self.cfg = config
+        self.eval_model_cfgs = self.cfg['eval']['partitioner']['models']
+        self.eval_model_abbrs = [model_abbr_from_cfg(model) for model in self.eval_model_cfgs]
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
@@ -116,6 +118,8 @@ class AlignmentBenchSummarizer:
         fout2 = osp.join(output_dir, 'capability.csv')
         fout_flag, fout_flag2 = 0, 0
         for subdir in os.listdir(results_folder):
+            if subdir not in self.eval_model_abbrs:
+                continue
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
                 model = subdir

@@ -1,5 +1,3 @@
-from os import getenv as gv
-
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -15,10 +13,10 @@ subjective_reader_cfg = dict(
 subjective_all_sets = [
     "alignment_bench",
 ]
-data_path =gv('WORKDIR')+"data/subjective/alignment_bench"
+data_path ="data/subjective/alignment_bench"
 
-alignment_bench_config_path = gv('WORKDIR')+"data/subjective/alignment_bench/config"
-alignment_bench_config_name = 'multi-dimension'
+alignment_bench_config_path = "data/subjective/alignment_bench/"
+alignment_bench_config_name = 'config/multi-dimension'
 
 subjective_datasets = []
 

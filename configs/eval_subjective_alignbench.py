@@ -21,6 +21,7 @@ from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import AlignmentBenchSummarizer
 models = [*hf_baichuan2_7b]#, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_qwen_14b_chat]
 
+# meta template
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),
