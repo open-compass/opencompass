@@ -312,7 +312,6 @@ class OpenAI(BaseAPIModel):
         return prompt
 
 
-
 @MODELS.register_module(name=['OpenAIAllesAPIN'])
 class OpenAIAllesAPIN(OpenAI):
     """Model wrapper around OpenAI-AllesAPIN.
@@ -385,7 +384,7 @@ class OpenAIAllesAPIN(OpenAI):
                 elif item['role'] == 'SYSTEM':
                     msg['role'] = 'system'
                 messages.append(msg)
-            # model can be reponse with user and system
+            # model can be response with user and system
             # when it comes with agent involved.
             assert msg['role'] in ['user', 'system']
         data = {

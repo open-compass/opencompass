@@ -92,7 +92,9 @@ class AlignmentBenchSummarizer:
         self.tasks = []
         self.cfg = config
         self.eval_model_cfgs = self.cfg['eval']['partitioner']['models']
-        self.eval_model_abbrs = [model_abbr_from_cfg(model) for model in self.eval_model_cfgs]
+        self.eval_model_abbrs = [
+            model_abbr_from_cfg(model) for model in self.eval_model_cfgs
+        ]
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
