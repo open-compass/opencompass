@@ -3,5 +3,7 @@ jupyter
 jupyter_client
 jupytext
 lagent
+lightgbm
 scikit-image
 sympy
+tensorflow
