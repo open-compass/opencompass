@@ -11,7 +11,7 @@ with read_base():
 
 datasets = [*subjective_datasets]
 
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI, HuggingFaceChatGLM3
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAIAllesAPIN, HuggingFaceChatGLM3
 from opencompass.partitioners import NaivePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
@@ -19,17 +19,11 @@ from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import AlignmentBenchSummarizer
-models = [*hf_baichuan2_7b]#, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_qwen_14b_chat]
 
-api_meta_template = dict(
-    round=[
-        dict(role='HUMAN', api_role='HUMAN'),
-        dict(role='BOT', api_role='BOT', generate=True)
-    ],
-    reserved_roles=[
-        dict(role='SYSTEM', api_role='SYSTEM'),
-    ],
-)
+
+# -------------Inferen Stage ----------------------------------------
+
+models = [*hf_baichuan2_7b]#, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_qwen_14b_chat]
 
 infer = dict(
     partitioner=dict(type=NaivePartitioner),
@@ -42,6 +36,10 @@ infer = dict(
 )
 
 
+# -------------Evalation Stage ----------------------------------------
+
+
+## ------------- JudgeLLM Configuration
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),
@@ -50,26 +48,18 @@ api_meta_template = dict(
 )
 
 judge_model = dict(
-        type=HuggingFaceChatGLM3,
-        abbr='chatglm3-6b-hf',
-        path='THUDM/chatglm3-6b',
-        tokenizer_path='THUDM/chatglm3-6b',
-        model_kwargs=dict(
-            device_map='auto',
-            trust_remote_code=True,
-        ),
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True,
-        ),
+        abbr='GPT4-Turbo',
+        type=OpenAIAllesAPIN, path='gpt-4-1106-preview',
+        key='xxxx',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+        url='xxxx',
         meta_template=api_meta_template,
-        max_out_len=100,
-        max_seq_len=4096,
-        batch_size=1,
-        run_cfg=dict(num_gpus=1, num_procs=1)
-    )
+        query_per_second=16,
+        max_out_len=2048,
+        max_seq_len=2048,
+        batch_size=8
+)
 
+## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
@@ -77,17 +67,16 @@ eval = dict(
         models = [*hf_baichuan2_7b]
     ),
     runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
-        max_num_workers=256,
+        type=LocalRunner,
+        max_num_workers=2,
         task=dict(
             type=SubjectiveEvalTask,
             judge_cfg=judge_model
         )),
 )
-work_dir = gv('WORKDIR')+'alignment_bench/'
 
 summarizer = dict(
     type=AlignmentBenchSummarizer,
 )
+
+work_dir = 'outputs/alignment_bench/'
