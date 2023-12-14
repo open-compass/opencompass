@@ -54,7 +54,7 @@ The specific process includes:
 
 ### Two Model Compare Configuration
 
-For `config/subjective_compare.py`, we provide some annotations to help users understand the configuration file's meaning.
+For `config/eval_subjective_compare.py`, we provide some annotations to help users understand the configuration file's meaning.
 
 ```python
 from mmengine.config import read_base
@@ -83,18 +83,18 @@ summarizer = dict(
 )
 ```
 
-In addition, you can also change the response order of the two models, please refer to `config/subjective_compare.py`,
+In addition, you can also change the response order of the two models, please refer to `config/eval_subjective_compare.py`,
 when `infer_order` is setting to `random`, the response will be random ordered,
 when `infer_order` is setting to `double`, the response of two models will be doubled in two ways.
 
 ### Single Model Scoring Configuration
 
-For `config/subjective_score.py`, it is mainly same with `config/subjective_compare.py`, and you just need to modify the eval mode to `singlescore`.
+For `config/eval_subjective_score.py`, it is mainly same with `config/eval_subjective_compare.py`, and you just need to modify the eval mode to `singlescore`.
 
 ## Launching the Evaluation
 
 ```shell
-python run.py config/subjective.py -r
+python run.py config/eval_subjective_score.py -r
 ```
 
 The `-r` parameter allows the reuse of model inference and GPT-4 evaluation results.
@@ -103,3 +103,28 @@ The `-r` parameter allows the reuse of model inference and GPT-4 evaluation resu
 
 The response of JudgeLLM will be output to `output/.../results/timestamp/xxmodel/xxdataset/.json`.
 The evaluation report will be output to `output/.../summary/timestamp/report.csv`.
+
+## AlignBench Evaluation
+
+### Dataset
+
+```bash
+mkdir -p ./data/subjective/
+
+cd ./data/subjective
+git clone https://github.com/THUDM/AlignBench.git
+
+# data format conversion
+python ../../../tools/convert_alignmentbench.py --mode json --jsonl data/data_release.jsonl
+
+```
+
+### Configuration
+
+Please edit the config `configs/eval_subjective_alignbench.py` according to your demand.
+
+### Evaluation
+
+```bash
+HF_EVALUATE_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python run.py workspace/eval_subjective_alignbench.py
+```

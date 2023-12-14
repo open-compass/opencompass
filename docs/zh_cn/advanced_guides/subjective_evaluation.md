@@ -54,7 +54,7 @@
 
 ### 两回答比较配置
 
-对于两回答比较，更详细的config setting请参考 `config/subjective_compare.py`，下面我们提供了部分简略版的注释，方便用户理解配置文件的含义。
+对于两回答比较，更详细的config setting请参考 `config/eval_subjective_compare.py`，下面我们提供了部分简略版的注释，方便用户理解配置文件的含义。
 
 ```python
 from mmengine.config import read_base
@@ -83,18 +83,18 @@ summarizer = dict(
 )
 ```
 
-此外，在数据集的配置config中，还可以选择两回答比较时的回答顺序，请参考`config/subjective_compare.py`,
+此外，在数据集的配置config中，还可以选择两回答比较时的回答顺序，请参考`config/eval_subjective_compare.py`,
 当`infer_order`设置为`random`时，将对两模型的回复顺序进行随机打乱,
 当`infer_order`设置为`double`时，将把两模型的回复按两种先后顺序进行判断。
 
 ### 单回答打分配置
 
-对于单回答打分，更详细的config setting请参考 `config/subjective_score.py`，该config的大部分都与两回答比较的config相同，只需要修改评测模式即可，将评测模式设置为`singlescore`。
+对于单回答打分，更详细的config setting请参考 `config/eval_subjective_score.py`，该config的大部分都与两回答比较的config相同，只需要修改评测模式即可，将评测模式设置为`singlescore`。
 
 ## 启动评测
 
 ```shell
-python run.py configs/subjective_score.py -r
+python run.py configs/eval_subjective_score.py -r
 ```
 
 `-r` 参数支持复用模型推理和评估结果。
@@ -103,3 +103,28 @@ python run.py configs/subjective_score.py -r
 
 JudgeLLM的评测回复会保存在 `output/.../results/timestamp/xxmodel/xxdataset/.json`
 评测报告则会输出到 `output/.../summary/timestamp/report.csv`。
+
+## AlignBench评测
+
+### 数据集
+
+```bash
+mkdir -p ./data/subjective/
+
+cd ./data/subjective
+git clone https://github.com/THUDM/AlignBench.git
+
+# data format conversion
+python ../../../tools/convert_alignmentbench.py --mode json --jsonl data/data_release.jsonl
+
+```
+
+### 配置
+
+请根据需要修改配置文件 `configs/eval_subjective_alignbench.py`
+
+### 评测
+
+```bash
+HF_EVALUATE_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python run.py workspace/eval_subjective_alignbench.py
+```
