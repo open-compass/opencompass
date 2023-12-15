@@ -2,29 +2,38 @@ import argparse
 import csv
 import json
 import os
+from glob import glob
+
+from tqdm import tqdm
 
 
-def extract_predictions_from_json(input_path, file_name):
-    for root, dirs, files in os.walk(input_path):
-        for file in files:
-            if file == f'{file_name}.json':
-                file_path = os.path.join(root, file)
-                output_csv = os.path.join(root, f'{file_name}.csv')
+def extract_predictions_from_json(input_folder):
 
-                with open(file_path, 'r', encoding='utf-8') as json_file:
-                    data = json.load(json_file)
-                    predictions = []
+    sub_folder = os.path.join(input_folder, 'submission')
+    pred_folder = os.path.join(input_folder, 'predictions')
+    if not os.path.exists(sub_folder):
+        os.makedirs(sub_folder)
 
-                    for key in data:
-                        prediction = data[key].get('prediction', '')
-                        predictions.append(prediction)
+    for model_name in os.listdir(pred_folder):
+        model_folder = os.path.join(pred_folder, model_name)
+        json_paths = glob(os.path.join(model_folder, 'alignment_bench_*.json'))
+        # sorted by index
+        json_paths = sorted(
+            json_paths, key=lambda x: int(x.split('.json')[0].split('_')[-1]))
+        all_predictions = []
+        for json_ in json_paths:
+            json_data = json.load(open(json_))
+            for _, value in json_data.items():
+                prediction = value['prediction']
+                all_predictions.append(prediction)
 
-                with open(output_csv, 'w', newline='',
-                          encoding='utf-8') as csv_file:
-                    writer = csv.writer(csv_file)
-
-                    for prediction in predictions:
-                        writer.writerow([prediction])
+        # for prediction
+        output_path = os.path.join(sub_folder, model_name + '_submission.csv')
+        with open(output_path, 'w', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            for ans in tqdm(all_predictions):
+                writer.writerow([str(ans)])
+        print('Saved {} for submission'.format(output_path))
 
 
 def process_jsonl(file_path):
@@ -61,9 +70,7 @@ def parse_args():
     parser.add_argument('--json',
                         default='your prediction file path',
                         help='The results json path')
-    parser.add_argument('--name',
-                        default='alignment_bench',
-                        help='The results json name')
+    parser.add_argument('--exp-folder', help='The results json name')
     args = parser.parse_args()
     return args
 
@@ -75,4 +82,4 @@ if __name__ == '__main__':
         processed_data = process_jsonl(args.jsonl)
         save_as_json(processed_data)
     elif mode == 'csv':
-        extract_predictions_from_json(args.json, args.name)
+        extract_predictions_from_json(args.exp_folder)
