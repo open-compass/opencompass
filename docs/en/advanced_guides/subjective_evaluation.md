@@ -6,13 +6,25 @@ Subjective evaluation aims to assess the model's performance in tasks that align
 
 To explore the model's subjective capabilities, we employ JudgeLLM as a substitute for human assessors ([LLM-as-a-Judge](https://arxiv.org/abs/2306.05685)).
 
-A popular evaluation method involves comparing model responses pairwise to calculate their win rate, another method involves calculate scores with single model response ([Chatbot Arena](https://chat.lmsys.org/)).
+A popular evaluation method involves
+
+- Compare Mode: comparing model responses pairwise to calculate their win rate
+- Score Mode: another method involves calculate scores with single model response ([Chatbot Arena](https://chat.lmsys.org/)).
 
 We support the use of GPT-4 (or other JudgeLLM) for the subjective evaluation of models based on above methods.
 
-## Data Preparation
+## Subjective Evaluation with Custom Dataset
 
-We provide demo test set as below:
+The specific process includes:
+
+1. Data preparation
+2. Model response generation
+3. Evaluate the response with a JudgeLLM
+4. Generate JudgeLLM's response and calculate the metric
+
+### Step-1: Data Preparation
+
+We provide mini test-set for **Compare Mode** and **Score Mode** as below:
 
 ```python
 ###COREV2
@@ -44,42 +56,72 @@ The json must includes the following fields:
 
 If you want to modify prompt on each single question, you can full some other information into 'others' and construct it.
 
-## Evaluation Configuration
+### Step-2: Evaluation Configuration(Compare Mode)
 
-The specific process includes:
-
-1. Model response reasoning
-2. JudgeLLM evaluation comparisons
-3. Generating evaluation reports
-
-### Two Model Compare Configuration
-
-For `config/eval_subjective_compare.py`, we provide some annotations to help users understand the configuration file's meaning.
+For `config/eval_subjective_compare.py`, we provide some annotations to help users understand the configuration file.
 
 ```python
-from mmengine.config import read_base
-with read_base():
-    from .datasets.subjective_cmp.subjective_corev2 import subjective_datasets
 
+from mmengine.config import read_base
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
+
+from opencompass.partitioners import NaivePartitioner
+from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
+from opencompass.runners import LocalRunner
+from opencompass.runners import SlurmSequentialRunner
+from opencompass.tasks import OpenICLInferTask
+from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import Corev2Summarizer
 
-datasets = [*subjective_datasets] #set dataset
-models = [...] #set models to be evaluated
-judge_model = [...] #set JudgeLLM
+with read_base():
+    # Pre-defined models
+    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat
+    from .models.chatglm.hf_chatglm3_6b import models as hf_chatglm3_6b
+    from .models.qwen.hf_qwen_14b_chat import models as hf_qwen_14b_chat
+    from .models.openai.gpt_4 import models as gpt4_model
+    from .datasets.subjective_cmp.subjective_corev2 import subjective_datasets
 
+# Evaluation datasets
+datasets = [*subjective_datasets]
+
+# Model to be evaluated
+models = [*hf_qwen_7b_chat, *hf_chatglm3_6b]
+
+# Inference configuration
+infer = dict(
+    partitioner=dict(type=NaivePartitioner),
+    runner=dict(
+        type=SlurmSequentialRunner,
+        partition='llmeval',
+        quotatype='auto',
+        max_num_workers=256,
+        task=dict(type=OpenICLInferTask)),
+)
+# Evaluation configuration
 eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
-        mode='m2n',  #choose eval mode, in m2n mode，you need to set base_models and compare_models, it will generate the pairs between base_models and compare_models
-        base_models = [...],
-        compare_models = [...]
-    ))
-
-work_dir = 'Your work dir' #set your workdir, in this workdir, if you use '--reuse', it will reuse all existing results in this workdir automatically
+        mode='m2n', # m-model v.s n-model
+        # Under m2n setting
+        # must specify base_models and compare_models, program will generate pairs between base_models compare_models.
+        base_models = [*hf_qwen_14b_chat], # Baseline model
+        compare_models = [*hf_baichuan2_7b, *hf_chatglm3_6b] # model to be evaluated
+    ),
+    runner=dict(
+        type=SlurmSequentialRunner,
+        partition='llmeval',
+        quotatype='auto',
+        max_num_workers=256,
+        task=dict(
+            type=SubjectiveEvalTask,
+        judge_cfg=gpt4_model # Judge model
+        )),
+)
+work_dir = './outputs/subjective/'
 
 summarizer = dict(
-    type=Corev2Summarizer, #Your dataset Summarizer
-    match_method='smart', #Your answer extract method
+    type=Corev2Summarizer,  # Custom summarizer
+    match_method='smart', # Answer extraction
 )
 ```
 
@@ -87,11 +129,11 @@ In addition, you can also change the response order of the two models, please re
 when `infer_order` is setting to `random`, the response will be random ordered,
 when `infer_order` is setting to `double`, the response of two models will be doubled in two ways.
 
-### Single Model Scoring Configuration
+### Step-2: Evaluation Configuration(Score Mode)
 
 For `config/eval_subjective_score.py`, it is mainly same with `config/eval_subjective_compare.py`, and you just need to modify the eval mode to `singlescore`.
 
-## Launching the Evaluation
+### Step-3: Launch the Evaluation
 
 ```shell
 python run.py config/eval_subjective_score.py -r
@@ -99,12 +141,10 @@ python run.py config/eval_subjective_score.py -r
 
 The `-r` parameter allows the reuse of model inference and GPT-4 evaluation results.
 
-## Evaluation Report
-
 The response of JudgeLLM will be output to `output/.../results/timestamp/xxmodel/xxdataset/.json`.
 The evaluation report will be output to `output/.../summary/timestamp/report.csv`.
 
-## AlignBench Evaluation
+## Practice: AlignBench Evaluation
 
 ### Dataset
 
@@ -127,4 +167,39 @@ Please edit the config `configs/eval_subjective_alignbench.py` according to your
 
 ```bash
 HF_EVALUATE_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python run.py workspace/eval_subjective_alignbench.py
+```
+
+### Submit to Official Leaderboard(Optional)
+
+If you need to submit your prediction into official leaderboard, you can use `tools/convert_alignmentbench.py` for format conversion.
+
+- Make sure you have the following results
+
+```bash
+outputs/
+└── 20231214_173632
+    ├── configs
+    ├── logs
+    ├── predictions # model's response
+    ├── results
+    └── summary
+```
+
+- Convert the data
+
+```bash
+python tools/convert_alignmentbench.py --mode csv --exp-folder outputs/20231214_173632
+```
+
+- Get `.csv`  in `submission/` for submission
+
+```bash
+outputs/
+└── 20231214_173632
+    ├── configs
+    ├── logs
+    ├── predictions
+    ├── results
+    ├── submission # 可提交文件
+    └── summary
 ```
