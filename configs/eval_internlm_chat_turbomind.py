@@ -39,6 +39,13 @@ qwen_meta_template = dict(
     ],
 )
 
+baichuan_meta_template = dict(
+    round=[
+        dict(role='HUMAN', begin='<reserved_106>'),
+        dict(role='BOT', begin='<reserved_107>', generate=True),
+    ],
+)
+
 # config for internlm-chat-7b
 # models = [
 #     dict(
@@ -100,19 +107,19 @@ qwen_meta_template = dict(
 # ]
 
 # config for internlm-chat-20b-w4 model
-models = [
-    dict(
-        type=TurboMindModel,
-        abbr='internlm-chat-20b-w4-turbomind',
-        path="./turbomind",
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=16,
-        concurrency=16,
-        meta_template=meta_template,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-]
+# models = [
+#     dict(
+#         type=TurboMindModel,
+#         abbr='internlm-chat-20b-w4-turbomind',
+#         path="./turbomind",
+#         max_out_len=100,
+#         max_seq_len=2048,
+#         batch_size=16,
+#         concurrency=16,
+#         meta_template=meta_template,
+#         run_cfg=dict(num_gpus=1, num_procs=1),
+#     )
+# ]
 
 # config for internlm-chat-20b-w4kv8 model
 # models = [
@@ -158,3 +165,18 @@ models = [
 #         run_cfg=dict(num_gpus=1, num_procs=1),
 #     )
 # ]
+
+# config for baichuan-chat-7b
+models = [
+    dict(
+        type=TurboMindModel,
+        abbr='baichuan2-chat-7b-turbomind',
+        path="./turbomind",
+        max_out_len=100,
+        max_seq_len=2048,
+        batch_size=16,
+        concurrency=32,
+        meta_template=baichuan_meta_template,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+]
