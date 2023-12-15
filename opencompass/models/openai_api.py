@@ -384,6 +384,7 @@ class OpenAIAllesAPIN(OpenAI):
                 elif item['role'] == 'SYSTEM':
                     msg['role'] = 'system'
                 messages.append(msg)
+
             # model can be response with user and system
             # when it comes with agent involved.
             assert msg['role'] in ['user', 'system']
