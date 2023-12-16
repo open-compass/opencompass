@@ -119,65 +119,6 @@ mmlu_category_weights = {
     "anatomy": {"accuracy - clean": 52, "accuracy - input contaminated": 6, "accuracy - input-and-label contaminated": 76, "accuracy - not labeled": 0},
 }
 
-mmlu_all_sets = [
-    "college_biology",
-    "college_chemistry",
-    "college_computer_science",
-    "college_mathematics",
-    "college_physics",
-    "electrical_engineering",
-    "astronomy",
-    "anatomy",
-    "abstract_algebra",
-    "machine_learning",
-    "clinical_knowledge",
-    "global_facts",
-    "management",
-    "nutrition",
-    "marketing",
-    "professional_accounting",
-    "high_school_geography",
-    "international_law",
-    "moral_scenarios",
-    "computer_security",
-    "high_school_microeconomics",
-    "professional_law",
-    "medical_genetics",
-    "professional_psychology",
-    "jurisprudence",
-    "world_religions",
-    "philosophy",
-    "virology",
-    "high_school_chemistry",
-    "public_relations",
-    "high_school_macroeconomics",
-    "human_sexuality",
-    "elementary_mathematics",
-    "high_school_physics",
-    "high_school_computer_science",
-    "high_school_european_history",
-    "business_ethics",
-    "moral_disputes",
-    "high_school_statistics",
-    "miscellaneous",
-    "formal_logic",
-    "high_school_government_and_politics",
-    "prehistory",
-    "security_studies",
-    "high_school_biology",
-    "logical_fallacies",
-    "high_school_world_history",
-    "professional_medicine",
-    "high_school_mathematics",
-    "college_medicine",
-    "high_school_us_history",
-    "sociology",
-    "econometrics",
-    "high_school_psychology",
-    "human_aging",
-    "us_foreign_policy",
-    "conceptual_physics",
-]
 
 ARC_weights = {'accuracy - clean': 836, 'accuracy - input contaminated': 53, 'accuracy - input-and-label contaminated': 283, 'accuracy - not labeled': 0}
 hellaswag_weights = {'accuracy - clean': 5169, 'accuracy - input contaminated': 37, 'accuracy - input-and-label contaminated': 673, 'accuracy - not labeled': 4163}
@@ -189,37 +130,55 @@ ceval_other = ['civil_servant', 'sports_science', 'plant_protection', 'basic_med
 ceval_hard = ['advanced_mathematics', 'discrete_mathematics', 'probability_and_statistics', 'college_chemistry', 'college_physics', 'high_school_mathematics', 'high_school_chemistry', 'high_school_physics']
 ceval_all = ceval_stem + ceval_social_science + ceval_humanities + ceval_other
 
-name_and_subsets = [
+_mmlu_humanities = ['formal_logic', 'high_school_european_history', 'high_school_us_history', 'high_school_world_history', 'international_law', 'jurisprudence', 'logical_fallacies', 'moral_disputes', 'moral_scenarios', 'philosophy', 'prehistory', 'professional_law', 'world_religions']
+_mmlu_stem = ['abstract_algebra', 'anatomy', 'astronomy', 'college_biology', 'college_chemistry', 'college_computer_science', 'college_mathematics', 'college_physics', 'computer_security', 'conceptual_physics', 'electrical_engineering', 'elementary_mathematics', 'high_school_biology', 'high_school_chemistry', 'high_school_computer_science', 'high_school_mathematics', 'high_school_physics', 'high_school_statistics', 'machine_learning']
+_mmlu_social_science = ['econometrics', 'high_school_geography', 'high_school_government_and_politics', 'high_school_macroeconomics', 'high_school_microeconomics', 'high_school_psychology', 'human_sexuality', 'professional_psychology', 'public_relations', 'security_studies', 'sociology', 'us_foreign_policy']
+_mmlu_other = ['business_ethics', 'clinical_knowledge', 'college_medicine', 'global_facts', 'human_aging', 'management', 'marketing', 'medical_genetics', 'miscellaneous', 'nutrition', 'professional_accounting', 'professional_medicine', 'virology']
+_mmlu_all = _mmlu_humanities + _mmlu_stem + _mmlu_social_science + _mmlu_other
+
+ceval_name_and_subsets = [
     ('ceval', ceval_all),
-    ('mmlu', mmlu_all_sets),
+    ('ceval-stem', ceval_stem),
+    ('ceval-social-science', ceval_social_science),
+    ('ceval-humanities', ceval_humanities),
+    ('ceval-other', ceval_other),
+    ('ceval-hard', ceval_hard)
+]
+
+mmlu_name_and_subsets = [
+    ('mmlu', _mmlu_all),
+    ('mmlu-humanities', _mmlu_humanities),
+    ('mmlu-stem', _mmlu_stem),
+    ('mmlu-social-science', _mmlu_social_science),
+    ('mmlu-other', _mmlu_other)
 ]
 
 summary_groups = []
 for metric_name in ['accuracy - clean', 'accuracy - input contaminated', 'accuracy - input-and-label contaminated']:
-    ceval_weights = {f'ceval-{i}': ceval_category_weights[i][metric_name] for i in ceval_all}
-    ceval_subsets = [[f'ceval-{i}', metric_name] for i in ceval_all]
-
-    summary_groups.append(
-        {
-            'name': 'ceval',
-            'subsets': ceval_subsets,
-            'metric': metric_name,
-            'weights': ceval_weights,
-        }
-    )
-
-    mmlu_weights = {f'lukaemon_mmlu_{i}': mmlu_category_weights[i][metric_name] for i in mmlu_all_sets}
-    mmlu_subsets = [[f'lukaemon_mmlu_{i}', metric_name] for i in mmlu_all_sets]
-
-    summary_groups.append(
-        {
-            'name': 'mmlu',
-            'subsets': mmlu_subsets,
-            'metric': metric_name,
-            'weights': mmlu_weights,
-        }
-    )
-
+    for dataset_abbr, subsets in ceval_name_and_subsets:
+        weights = {f'ceval-{i}': ceval_category_weights[i][metric_name] for i in subsets}
+        subsets = [[f'ceval-{i}', metric_name] for i in subsets]
+        summary_groups.append(
+            {
+                'name': dataset_abbr,
+                'subsets': subsets,
+                'metric': metric_name,
+                'weights': weights,
+            }
+        )
+    
+    for dataset_abbr, subsets in mmlu_name_and_subsets:
+        weights = {f'lukaemon_mmlu_{i}': mmlu_category_weights[i][metric_name] for i in subsets}
+        subsets = [[f'lukaemon_mmlu_{i}', metric_name] for i in subsets]
+        summary_groups.append(
+            {
+                'name': dataset_abbr,
+                'subsets': subsets,
+                'metric': metric_name,
+                'weights': weights,
+            }
+        )
+    
     summary_groups.append(
         {
             'name': 'hellaswag',
@@ -241,6 +200,6 @@ for metric_name in ['accuracy - clean', 'accuracy - input contaminated', 'accura
 summarizer = dict(
     type=CircularSummarizer,
     metric_types=['accuracy - clean', 'accuracy - input contaminated', 'accuracy - input-and-label contaminated'],
-    dataset_abbrs = ['ceval', 'mmlu', 'hellaswag', 'ARC-c-test'],
+    dataset_abbrs = ['ceval', 'ceval-stem', 'ceval-social-science', 'ceval-humanities', 'ceval-other', 'ceval-hard', 'mmlu', 'mmlu-humanities', 'mmlu-stem', 'mmlu-social-science', 'mmlu-other', 'hellaswag', 'ARC-c-test'],
     summary_groups=summary_groups,
 )
