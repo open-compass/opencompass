@@ -312,7 +312,6 @@ class OpenAI(BaseAPIModel):
         return prompt
 
 
-@MODELS.register_module(name=['OpenAIAllesAPIN'])
 class OpenAIAllesAPIN(OpenAI):
     """Model wrapper around OpenAI-AllesAPIN.
 
