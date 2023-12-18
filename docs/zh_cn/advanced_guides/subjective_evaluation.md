@@ -142,6 +142,13 @@ python run.py configs/eval_subjective_score.py -r
 JudgeLLM的评测回复会保存在 `output/.../results/timestamp/xxmodel/xxdataset/.json`
 评测报告则会输出到 `output/.../summary/timestamp/report.csv`。
 
+Opencompass 已经支持了很多的JudgeLLM，实际上，你可以将Opencompass中所支持的所有模型都当作JudgeLLM使用。
+我们列出目前比较流行的开源JudgeLLM：
+
+1. Auto-J，请参考 `configs/models/judge_llm/auto_j`
+2. JudgeLM，请参考 `configs/models/judge_llm/judgelm`
+3. PandaLM，请参考 `configs/models/judge_llm/pandalm`
+
 ## 实战：AlignBench 主观评测
 
 ### 数据集准备

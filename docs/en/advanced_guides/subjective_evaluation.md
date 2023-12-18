@@ -144,6 +144,13 @@ The `-r` parameter allows the reuse of model inference and GPT-4 evaluation resu
 The response of JudgeLLM will be output to `output/.../results/timestamp/xxmodel/xxdataset/.json`.
 The evaluation report will be output to `output/.../summary/timestamp/report.csv`.
 
+Opencompass has supported lots of JudgeLLM, actually, you can take any model as JudgeLLM in opencompass configs.
+And we list the popular open-source JudgeLLM here:
+
+1. Auto-J, refer to `configs/models/judge_llm/auto_j`
+2. JudgeLM, refer to `configs/models/judge_llm/judgelm`
+3. PandaLM, refer to `configs/models/judge_llm/pandalm`
+
 ## Practice: AlignBench Evaluation
 
 ### Dataset

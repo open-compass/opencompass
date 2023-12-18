@@ -1,5 +1,3 @@
-from os import getenv as gv
-
 from mmengine.config import read_base
 with read_base():
     from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat
