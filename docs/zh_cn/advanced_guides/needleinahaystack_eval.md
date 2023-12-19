@@ -1,10 +1,9 @@
 # 大海捞针(Needle In A Haystack)实验评估
 
-  
 ## 大海捞针测试简介
 
 大海捞针测试（灵感来自 [NeedleInAHaystack](https://github.com/gkamradt/LLMTest_NeedleInAHaystack/blob/main/LLMNeedleHaystackTester.py)）是指通过将关键信息随机插入一段长文本的不同位置，形成大语言模型 (LLM) 的Prompt，通过测试大模型是否能从长文本中提取出关键信息，从而测试大模型的长文本信息提取能力的一种方法，可反映模型对于长文本理解的基本能力。
- 
+
 ## 数据集介绍
 
 `Skywork/ChineseDomainModelingEval` 数据集收录了 2023 年 9 月至 10 月期间发布的高质量中文文章，涵盖了多个领域。这些文章确保了公平且具有挑战性的基准测试。
@@ -21,7 +20,6 @@
 - `zh_general.jsonl` - 综合
 
 这些文件用于评估LLM对不同特定领域的理解能力。
-
 
 ### 评估步骤
 
@@ -70,7 +68,6 @@ python opencompass/datasets/cdme/generate.py
 
 您可以在 `opencompass/datasets/cdme/generate.py` 中设置特定参数，以选择任务所需的数据集。
 
-
 ### 评估
 
 例如，使用 `internlm` 模型进行评估，可以使用以下命令：
@@ -78,8 +75,6 @@ python opencompass/datasets/cdme/generate.py
 ```bash
 python run.py configs/eval_hf_internlm_chat_20b_cdme.py --slurm -p partition_name-q auto --max-num-workers 32
 ```
-
-
 
 ### Score计算方法
 
@@ -127,7 +122,7 @@ def score(self, predictions, references):
         edit_distance = self.levenshtein_distance(prediction, reference)
         max_len = max(len(prediction), len(reference))
         score = 100 * (1 - edit_distance / max_len) if max_len != 0 else 100
-        
+
         detail = {
             "pred": prediction,
             "answer": reference,
@@ -144,20 +139,13 @@ def score(self, predictions, references):
 
 该方法首先去除预测值和参考值中的所有空白字符，然后计算它们之间的 Levenshtein 距离。得分计算为 100 减去基于编辑距离的百分比损失。最后，返回每个预测值的详细得分和平均得分。
 
-
 ### 可视化
 
 可以使用 `opencompass/datasets/cdme/visualize.py` 脚本，将 `outputs` 文件夹中的 CSV 文件进行可视化绘图。
 
-  
-
 目前该方案仅支持 CDME 数据集，我们欢迎社区贡献更多的数据集。
 
-  
-
 如果使用了该方法，请添加引用:
-
- 
 
 ```bibtex
 
@@ -169,7 +157,7 @@ def score(self, predictions, references):
 }
 
 @misc{wei2023skywork,
-      title={Skywork: A More Open Bilingual Foundation Model}, 
+      title={Skywork: A More Open Bilingual Foundation Model},
       author={Tianwen Wei and Liang Zhao and Lichang Zhang and Bo Zhu and Lijie Wang and Haihua Yang and Biye Li and Cheng Cheng and Weiwei Lü and Rui Hu and Chenxia Li and Liu Yang and Xilin Luo and Xuejie Wu and Lunan Liu and Wenjun Cheng and Peng Cheng and Jianhao Zhang and Xiaoyu Zhang and Lei Lin and Xiaokun Wang and Yutuan Ma and Chuanhai Dong and Yanqi Sun and Yifu Chen and Yongyi Peng and Xiaojuan Liang and Shuicheng Yan and Han Fang and Yahui Zhou},
       year={2023},
       eprint={2310.19341},
