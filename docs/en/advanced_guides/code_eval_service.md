@@ -41,6 +41,14 @@ sudo docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.p
 # sudo docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
 ```
 
+**Note:**
+
+- If you encounter a timeout during the evaluation of Go, please use the following command when creating the container.
+
+```shell
+docker run -it -p 5000:5000 -e GO111MODULE=on -e GOPROXY=https://goproxy.io code-eval-{your-dataset}:latest python server.py
+```
+
 4. To ensure you have access to the service, use the following command to check the inference environment and evaluation service connection status. (If both inferences and code evaluations run on the same host, skip this step.)
 
 ```shell
