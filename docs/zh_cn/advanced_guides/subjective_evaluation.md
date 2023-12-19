@@ -146,8 +146,61 @@ Opencompass 已经支持了很多的JudgeLLM，实际上，你可以将Opencompa
 我们列出目前比较流行的开源JudgeLLM：
 
 1. Auto-J，请参考 `configs/models/judge_llm/auto_j`
+
+如果使用了该方法，请添加引用:
+
+```bibtex
+@article{li2023generative,
+  title={Generative judge for evaluating alignment},
+  author={Li, Junlong and Sun, Shichao and Yuan, Weizhe and Fan, Run-Ze and Zhao, Hai and Liu, Pengfei},
+  journal={arXiv preprint arXiv:2310.05470},
+  year={2023}
+}
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
+```
+
 2. JudgeLM，请参考 `configs/models/judge_llm/judgelm`
+
+如果使用了该方法，请添加引用:
+
+```bibtex
+@article{zhu2023judgelm,
+  title={JudgeLM: Fine-tuned Large Language Models are Scalable Judges},
+  author={Zhu, Lianghui and Wang, Xinggang and Wang, Xinlong},
+  journal={arXiv preprint arXiv:2310.17631},
+  year={2023}
+}
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
+```
+
 3. PandaLM，请参考 `configs/models/judge_llm/pandalm`
+
+如果使用了该方法，请添加引用:
+
+```bibtex
+@article{wang2023pandalm,
+  title={PandaLM: An Automatic Evaluation Benchmark for LLM Instruction Tuning Optimization},
+  author={Wang, Yidong and Yu, Zhuohao and Zeng, Zhengran and Yang, Linyi and Wang, Cunxiang and Chen, Hao and Jiang, Chaoya and Xie, Rui and Wang, Jindong and Xie, Xing and others},
+  journal={arXiv preprint arXiv:2306.05087},
+  year={2023}
+}
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
+```
 
 ## 实战：AlignBench 主观评测
 
