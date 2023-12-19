@@ -66,6 +66,19 @@ def solution():
     return result"""),
                 dict(role='SYSTEM', prompt='Response:1.17'),
                 dict(role='BOT', prompt='FinalAnswer: The final answer is $1.17$. I hope it is correct.'),
+                dict(role='HUMAN', prompt="Given $\mathbf{a} = \\begin{pmatrix} -7 \\ 0 \\ 1 \end{pmatrix}$ and $\mathbf{b} = \\begin{pmatrix} 4 \\ 2 \\ -1 \end{pmatrix},$ find $\mathbf{a} - 3 \mathbf{b}.$"),
+                dict(role='BOT', prompt="""Tool:PythonInterpreter\nTool Input:import numpy as np
+
+def solution()
+    a = np.array([-7, 0, 1])
+    b = np.array([4, 2, -1])
+
+    result = a - 3 * b
+
+    result = r'\\begin{{pmatrix}} {} \ {} \ {} \end{{pmatrix}}'.format(result[0], result[1], result[2])
+    return result"""),
+                dict(role='SYSTEM', prompt='Response:\\begin{pmatrix} -19 \\ -6 \\ 4 \\end{pmatrix}'),
+                dict(role='BOT', prompt='FinalAnswer: The final answer is $\\begin{pmatrix} -19 \\ -6 \\ 4 \\end{pmatrix}$. I hope it is correct.'),
                 dict(role='HUMAN', prompt='{problem}'),
             ])),
     retriever=dict(type=ZeroRetriever),
