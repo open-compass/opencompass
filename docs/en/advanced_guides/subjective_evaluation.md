@@ -144,6 +144,64 @@ The `-r` parameter allows the reuse of model inference and GPT-4 evaluation resu
 The response of JudgeLLM will be output to `output/.../results/timestamp/xxmodel/xxdataset/.json`.
 The evaluation report will be output to `output/.../summary/timestamp/report.csv`.
 
+Opencompass has supported lots of JudgeLLM, actually, you can take any model as JudgeLLM in opencompass configs.
+And we list the popular open-source JudgeLLM here:
+
+1. Auto-J, refer to `configs/models/judge_llm/auto_j`
+
+Consider cite the following paper if you find it helpful:
+
+```bibtex
+@article{li2023generative,
+  title={Generative judge for evaluating alignment},
+  author={Li, Junlong and Sun, Shichao and Yuan, Weizhe and Fan, Run-Ze and Zhao, Hai and Liu, Pengfei},
+  journal={arXiv preprint arXiv:2310.05470},
+  year={2023}
+}
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
+```
+
+2. JudgeLM, refer to `configs/models/judge_llm/judgelm`
+
+```bibtex
+@article{zhu2023judgelm,
+  title={JudgeLM: Fine-tuned Large Language Models are Scalable Judges},
+  author={Zhu, Lianghui and Wang, Xinggang and Wang, Xinlong},
+  journal={arXiv preprint arXiv:2310.17631},
+  year={2023}
+}
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
+```
+
+3. PandaLM, refer to `configs/models/judge_llm/pandalm`
+
+Consider cite the following paper if you find it helpful:
+
+```bibtex
+@article{wang2023pandalm,
+  title={PandaLM: An Automatic Evaluation Benchmark for LLM Instruction Tuning Optimization},
+  author={Wang, Yidong and Yu, Zhuohao and Zeng, Zhengran and Yang, Linyi and Wang, Cunxiang and Chen, Hao and Jiang, Chaoya and Xie, Rui and Wang, Jindong and Xie, Xing and others},
+  journal={arXiv preprint arXiv:2306.05087},
+  year={2023}
+}
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
+```
+
 ## Practice: AlignBench Evaluation
 
 ### Dataset
