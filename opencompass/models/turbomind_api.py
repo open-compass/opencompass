@@ -122,7 +122,8 @@ class TurboMindAPIModel(BaseModel):
                 prompt=prompt,
                 model=self.model_name,
                 max_tokens=max_out_len,
-                temperature=temperature):
+                temperature=temperature,
+                top_p=0.8):
             response += output['choices'][0]['text']
         response = valid_str(response)
         return response
