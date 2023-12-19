@@ -25,20 +25,20 @@ Choose the dockerfile corresponding to the dataset you need, and replace `humane
 
 ```shell
 git clone https://github.com/open-compass/code-evaluator.git
-sudo docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
+docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
 ```
 
 3. Create a container with the following commands:
 
 ```shell
 # Log output format
-sudo docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
+docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # Run the program in the background
-# sudo docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
+# docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # Using different ports
-# sudo docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
+# docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
 ```
 
 **Note:**
@@ -213,7 +213,7 @@ When supporting new datasets or modifying post-processors, it is possible that m
 1. Remove the installation of the `code-evaluator` in `Dockerfile`, mount the `code-evaluator` when starting the container instead:
 
 ```shell
-sudo docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
+docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
 ```
 
 2. Install and start the code evaluation service locally. At this point, any necessary modifications can be made to the local copy of the `code-evaluator`.

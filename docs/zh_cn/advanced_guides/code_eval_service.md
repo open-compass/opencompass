@@ -211,7 +211,7 @@ curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' -F 'debug=er
 1. 删除 `Dockerfile` 中安装 `code-evaluator` 的部分，在启动容器时将 `code-evaluator` 挂载
 
 ```shell
-sudo docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
+docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
 ```
 
 2. 安装并启动代码评测服务，此时可以根据需要修改本地 `code-evaluator` 中的代码来进行调试
