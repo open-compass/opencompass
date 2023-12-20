@@ -57,9 +57,10 @@ class HumanEvaluator(BaseEvaluator):
                 self.HUMAN_EVAL = HUMAN_EVAL
                 self.eval = evaluate_functional_correctness
             except ImportError:
-                raise ImportError('Please install human_eval following'
-                                  'https://github.com/openai/human-eval/tree/'
-                                  'master#installation first.')
+                raise ImportError(
+                    'Please install human_eval use following steps:\n'
+                    'git clone git@github.com:open-compass/human-eval.git\n'
+                    'cd human-eval && pip install -e .')
         else:
             try:
                 from evalplus.data import write_jsonl
@@ -67,7 +68,12 @@ class HumanEvaluator(BaseEvaluator):
                 self.write_jsonl = write_jsonl
                 self.eval = evaluate
             except ImportError:
-                raise ImportError('Please install eval_plus first')
+                raise ImportError(
+                    'Please install evalplus use following steps:\n'
+                    'git clone --recurse-submodules git@github.com:open-compass/human-eval.git\n'  # noqa
+                    'cd human-eval\n'
+                    'pip install -e .\n'
+                    'pip install evalplus\n')
         self.k = k
         super().__init__()
 
