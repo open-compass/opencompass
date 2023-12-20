@@ -73,7 +73,7 @@ class HumanEvaluator(BaseEvaluator):
                     'git clone --recurse-submodules git@github.com:open-compass/human-eval.git\n'  # noqa
                     'cd human-eval\n'
                     'pip install -e .\n'
-                    'pip install evalplus\n')
+                    'pip install -e evalplus\n')
         self.k = k
         super().__init__()
 
@@ -121,7 +121,7 @@ class HumanEvaluator(BaseEvaluator):
                              i_just_wanna_run=None,
                              test_details=0.2,
                              min_time_limit=0.2,
-                             git_time_limit_factor=4.0,
+                             gt_time_limit_factor=4.0,
                              mini=None)
                 score = self.eval(flags)
                 return {f'humaneval_plus_{k}': score[k] * 100 for k in score}
