@@ -56,7 +56,7 @@ You are expected to get the evaluation results after the inference and evaluatio
 **Note**:
 
 - If you evaluate theInternLM Chat model, please use configuration file `eval_internlm_chat_turbomind.py`
-- If you evaluate the InternLM 7B model, please modify `eval_internlm_turbomind.py` or `eval_internlm_chat_turbomind.py` by commenting out the configuration for the 20B model and enabling the configuration for the 7B model.
+- If you evaluate the InternLM 7B model, please modify `eval_internlm_turbomind.py` or `eval_internlm_chat_turbomind.py` by changing to the setting `models = [internlm_7b]` in the last line.
 
 ### Evaluation with Turbomind gPRC API (optional)
 
@@ -76,4 +76,4 @@ python run.py configs/eval_internlm_turbomind_tis.py -w outputs/turbomind-tis/in
 
 - If the InternLM Chat model is requested to be evaluated, please use config file `eval_internlm_chat_turbomind_tis.py`
 - In `eval_internlm_turbomind_tis.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:33337'`. Please modify `tis_addr` to the IP address of the machine where the server is launched.
-- If evaluating the InternLM 7B model, please modify the config file, commenting out the configuration for the 20B model and enabling the configuration for the 7B model
+- If evaluating the InternLM 7B model, please modify the `models` configuration in `eval_internlm_xxx_turbomind_tis.py`.

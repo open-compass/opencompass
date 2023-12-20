@@ -174,4 +174,4 @@ baichuan2_chat_7b = dict(
     run_cfg=dict(num_gpus=1, num_procs=1),
 )
 
-models = [internlm_chat_7b]
+models = [internlm_chat_20b]

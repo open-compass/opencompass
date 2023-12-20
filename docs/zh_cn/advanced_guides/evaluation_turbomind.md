@@ -52,7 +52,7 @@ python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-2
 **注：**
 
 - 如果评测 InternLM Chat 模型，请使用配置文件 `eval_internlm_chat_turbomind.py`
-- 如果评测 InternLM 7B 模型，请修改 `eval_internlm_turbomind.py` 或者 `eval_internlm_chat_turbomind.py`。把 20B 模型的配置注释掉，打开 7B 模型的配置。
+- 如果评测 InternLM 7B 模型，请修改 `eval_internlm_turbomind.py` 或者 `eval_internlm_chat_turbomind.py`。将`models`字段配置为`models = [internlm_7b]` 。
 
 ### 通过 TurboMind gPRC API 评测（可选）
 
@@ -72,5 +72,5 @@ python run.py configs/eval_internlm_turbomind_tis.py -w outputs/turbomind-tis/in
 
 - 如果评测 InternLM Chat 模型，请使用配置文件 `eval_internlm_chat_turbomind_tis.py`
 - 在配置文件中，triton inference server(TIS) 地址是 `tis_addr='0.0.0.0:33337'`。请把配置中的`tis_addr`修改为server所在机器的ip地址。
-- 如果评测 InternLM 7B 模型，请修改 `eval_internlm_xxx_turbomind_tis.py`。把其中 20B 模型的配置注释掉，打开 7B 模型的配置。
+- 如果评测 InternLM 7B 模型，请修改 `eval_internlm_xxx_turbomind_tis.py`中`models`字段。
 ```
