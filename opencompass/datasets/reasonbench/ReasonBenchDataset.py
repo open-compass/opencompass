@@ -8,7 +8,7 @@ from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class FourOptionDataset(BaseDataset):
+class ReasonBenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
@@ -23,11 +23,8 @@ class FourOptionDataset(BaseDataset):
                 choices = line['choices']
                 tag = line['tag']
                 source = line['source']
-                A = line['A']
-                B = line['B']
-                C = line['C']
-                D = line['D']
-                raw_data.append({
+                option_content = {choice: line[choice] for choice in choices}
+                data = {
                     'prompt': prompt,
                     'label': label,
                     'prompt_ppl': prompt_ppl,
@@ -35,10 +32,8 @@ class FourOptionDataset(BaseDataset):
                     'choices': choices,
                     'tag': tag,
                     'source': source,
-                    'A': A,
-                    'B': B,
-                    'C': C,
-                    'D': D
-                })
+                }
+                data.update(option_content)
+                raw_data.append(data)
         dataset = Dataset.from_list(raw_data)
         return dataset
