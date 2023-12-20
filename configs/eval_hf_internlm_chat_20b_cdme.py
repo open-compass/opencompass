@@ -9,7 +9,7 @@ datasets = [*cdme_datasets]
 
 _meta_template = dict(
     round=[
-        dict(role='HUMAN', begin='<|User|>:', end='<eoh>\n'),
+        dict(role='HUMAN', begin='<|User|>:', end='\n'),
         dict(role='BOT', begin='<|Bot|>:', end='<eoa>\n', generate=True),
     ],
 )
