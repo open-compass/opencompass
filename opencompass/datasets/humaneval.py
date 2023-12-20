@@ -41,42 +41,84 @@ class HumanevalDataset(BaseDataset):
 
 
 class HumanEvaluator(BaseEvaluator):
-    """Evaluator for human eval."""
+    """Evaluator for HumanEval or EvalPlus."""
 
-    def __init__(self, k: List[int] = [1, 10, 100]) -> None:
-        try:
-            from human_eval.data import HUMAN_EVAL, write_jsonl
-            from human_eval.evaluation import evaluate_functional_correctness
-            self.write_jsonl = write_jsonl
-            self.HUMAN_EVAL = HUMAN_EVAL
-            self.eval = evaluate_functional_correctness
-        except ImportError:
-            raise ImportError('Please install human_eval following'
-                              'https://github.com/openai/human-eval/tree/'
-                              'master#installation first.')
+    def __init__(self,
+                 k: List[int] = [1, 10, 100],
+                 metric: str = 'HumanEval') -> None:
+        self.metric = metric
+        assert self.metric in ['HumanEval', 'EvalPlus']
+        if self.metric == 'HumanEval':
+            try:
+                from human_eval.data import HUMAN_EVAL, write_jsonl
+                from human_eval.evaluation import \
+                    evaluate_functional_correctness
+                self.write_jsonl = write_jsonl
+                self.HUMAN_EVAL = HUMAN_EVAL
+                self.eval = evaluate_functional_correctness
+            except ImportError:
+                raise ImportError('Please install human_eval following'
+                                  'https://github.com/openai/human-eval/tree/'
+                                  'master#installation first.')
+        else:
+            try:
+                from evalplus.data import write_jsonl
+                from evalplus.evaluate import evaluate
+                self.write_jsonl = write_jsonl
+                self.eval = evaluate
+            except ImportError:
+                raise ImportError('Please install eval_plus first')
         self.k = k
         super().__init__()
 
-    def score(self, predictions, references):
+    def score(self, predictions, references, test_set):
+        prompts = [item['prompt'] for item in test_set]
         humaneval_preds = []
-        # create json file in human_eval format
-        for preds, refer in zip(predictions, references):
-            # suits for two case
-            # 1. use repeated dataset
-            # 2. use `num_return_sequences` to generate multiple responses
-            if not isinstance(preds, list):
-                preds = [preds]
-            for pred in preds:
-                humaneval_preds.append({'task_id': refer, 'completion': pred})
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            out_dir = osp.join(tmp_dir, 'human_eval.json')
-            self.write_jsonl(out_dir, humaneval_preds)
-            score = self.eval(out_dir,
-                              self.k,
-                              n_workers=4,
-                              timeout=3.0,
-                              problem_file=self.HUMAN_EVAL)
-            return {f'humaneval_{k}': score[k] * 100 for k in score}
+        if self.metric == 'HumanEval':
+            # create json file in human_eval format
+            for preds, refer in zip(predictions, references):
+                # suits for two case
+                # 1. use repeated dataset
+                # 2. use `num_return_sequences` to generate multiple responses
+                if not isinstance(preds, list):
+                    preds = [preds]
+                for pred in preds:
+                    humaneval_preds.append({
+                        'task_id': refer,
+                        'completion': pred
+                    })
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                out_dir = osp.join(tmp_dir, 'human_eval.json')
+                self.write_jsonl(out_dir, humaneval_preds)
+                score = self.eval(out_dir,
+                                  self.k,
+                                  n_workers=4,
+                                  timeout=3.0,
+                                  problem_file=self.HUMAN_EVAL)
+                return {f'humaneval_{k}': score[k] * 100 for k in score}
+        else:
+            for preds, refer, prompt in zip(predictions, references, prompts):
+                if not isinstance(preds, list):
+                    preds = [preds]
+                for pred in preds:
+                    humaneval_preds.append({
+                        'task_id': refer,
+                        'solution': prompt + pred
+                    })
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                out_dir = osp.join(tmp_dir, 'human_eval.jsonl')
+                self.write_jsonl(out_dir, humaneval_preds)
+                flags = dict(dataset='humaneval',
+                             samples=out_dir,
+                             base_only=None,
+                             parallel=None,
+                             i_just_wanna_run=None,
+                             test_details=0.2,
+                             min_time_limit=0.2,
+                             git_time_limit_factor=4.0,
+                             mini=None)
+                score = self.eval(flags)
+                return {f'humaneval_plus_{k}': score[k] * 100 for k in score}
 
 
 def humaneval_postprocess(text: str) -> str:
