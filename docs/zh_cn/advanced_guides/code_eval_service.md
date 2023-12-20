@@ -25,20 +25,28 @@ Python 多算法库数据集 [ds1000](https://github.com/xlang-ai/DS-1000)
 
 ```shell
 git clone https://github.com/open-compass/code-evaluator.git
-sudo docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
+docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
 ```
 
 3. 使用以下命令创建容器
 
 ```shell
 # 输出日志格式
-sudo docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
+docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # 在后台运行程序
-# sudo docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
+# docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # 使用不同的端口
-# sudo docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
+# docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
+```
+
+**注：**
+
+- 如在评测Go的过程中遇到timeout，请在创建容器时候使用以下命令
+
+```shell
+docker run -it -p 5000:5000 -e GO111MODULE=on -e GOPROXY=https://goproxy.io code-eval-{your-dataset}:latest python server.py
 ```
 
 4. 为了确保您能够访问服务，通过以下命令检测推理环境和评测服务访问情况。 (如果推理和代码评测在同一主机中运行服务，就跳过这个操作)
@@ -203,7 +211,7 @@ curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' -F 'debug=er
 1. 删除 `Dockerfile` 中安装 `code-evaluator` 的部分，在启动容器时将 `code-evaluator` 挂载
 
 ```shell
-sudo docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
+docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
 ```
 
 2. 安装并启动代码评测服务，此时可以根据需要修改本地 `code-evaluator` 中的代码来进行调试
