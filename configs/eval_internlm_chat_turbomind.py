@@ -29,21 +29,20 @@ llama2_meta_template = dict(
         dict(role='HUMAN', begin='[INST] ', end=' [/INST]'),
         dict(role='BOT', generate=True),
     ],
-    eos_token_id=2,
-)
+    eos_token_id=2)
 
 qwen_meta_template = dict(round=[
     dict(role='HUMAN', begin='\n<|im_start|>user\n', end='<|im_end|>'),
     dict(role='BOT',
          begin='\n<|im_start|>assistant\n',
          end='<|im_end|>',
-         generate=True),
-], )
+         generate=True)
+    ])
 
 baichuan2_meta_template = dict(round=[
     dict(role='HUMAN', begin='<reserved_106>'),
-    dict(role='BOT', begin='<reserved_107>', generate=True),
-], )
+    dict(role='BOT', begin='<reserved_107>', generate=True)
+    ])
 
 # config for internlm-chat-7b
 internlm_chat_7b = dict(
