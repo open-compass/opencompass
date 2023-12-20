@@ -1,31 +1,31 @@
-# 大海捞针(Needle In A Haystack)实验评估
+# Needle In A Haystack Experiment Evaluation
 
-## 大海捞针测试简介
+## Introduction to the Needle In A Haystack Test
 
-大海捞针测试（灵感来自 [NeedleInAHaystack](https://github.com/gkamradt/LLMTest_NeedleInAHaystack/blob/main/LLMNeedleHaystackTester.py)）是指通过将关键信息随机插入一段长文本的不同位置，形成大语言模型 (LLM) 的Prompt，通过测试大模型是否能从长文本中提取出关键信息，从而测试大模型的长文本信息提取能力的一种方法，可反映LLM长文本理解的基本能力。
+The Needle In A Haystack test, inspired by [NeedleInAHaystack](https://github.com/gkamradt/LLMTest_NeedleInAHaystack/blob/main/LLMNeedleHaystackTester.py), involves embedding key information randomly in different parts of a long text to form prompts for large language models (LLMs). This test evaluates an LLM's ability to extract crucial information from lengthy texts, reflecting its fundamental capability in understanding long-form content.
 
-## 数据集介绍
+## Dataset Overview
 
-`Skywork/ChineseDomainModelingEval` 数据集收录了 2023 年 9 月至 10 月期间发布的高质量中文文章，涵盖了多个领域。这些文章确保了公平且具有挑战性的基准测试。
+The `Skywork/ChineseDomainModelingEval` dataset includes high-quality Chinese articles published between September and October 2023, covering multiple domains. These articles ensure a fair and challenging benchmark.
 
-## 文件介绍
+## File Descriptions
 
-该数据集包括特定领域的文件：
+The dataset includes files specific to different domains:
 
-- `zh_finance.jsonl` - 金融
-- `zh_game.jsonl` - 游戏
-- `zh_government.jsonl` - 政务
-- `zh_movie.jsonl` - 电影
-- `zh_tech.jsonl` - 技术
-- `zh_general.jsonl` - 综合
+- `zh_finance.jsonl` - Finance
+- `zh_game.jsonl` - Gaming
+- `zh_government.jsonl` - Government Affairs
+- `zh_movie.jsonl` - Movies
+- `zh_tech.jsonl` - Technology
+- `zh_general.jsonl` - General
 
-这些文件用于评估LLM对不同特定领域的理解能力。
+These files are used to assess the LLM’s understanding in various specific fields.
 
-### 评估步骤
+### Evaluation Steps
 
-1. 从 [Skywork/ChineseDomainModelingEval](https://huggingface.co/datasets/Skywork/ChineseDomainModelingEval/tree/main) 下载数据集。
+1. Download the dataset from [Skywork/ChineseDomainModelingEval](https://huggingface.co/datasets/Skywork/ChineseDomainModelingEval/tree/main).
 
-2. 将下载的文件放置在 `opencompass/data/CDME/` 下。`CDME` 目录中的预期文件结构如下：
+2. Place the downloaded files in `opencompass/data/CDME/`. The expected file structure in the `CDME` directory:
 
    ```
    opencompass/
@@ -45,10 +45,10 @@
    ├── opencompass
    ├── outputs
    ├── run.py
-   ├── more...
+   └── more...
    ```
 
-### 环境配置
+### Environment Setup
 
 ```bash
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
@@ -58,38 +58,38 @@ cd opencompass
 pip install -e .
 ```
 
-### 生成数据集
+### Generating the Dataset
 
-运行以下命令以生成数据集：
+Run the following command to generate the dataset:
 
 ```bash
 python tools/gen_needleinahaystack.py
 ```
 
-您可以在 `tools/gen_needleinahaystack.py` 中设置特定参数，以选择任务所需的数据集。主要参数包括：
+You can set specific parameters in `tools/gen_needleinahaystack.py` to choose the dataset needed for the task. The main parameters include:
 
-- `needle`: 要在数据集中查找的指定文本（针）。
-- `retrieval_question`: 用于提示模型检索的问题。
-- `context_lengths`: 指定不同测试场景的上下文长度（以token为单位）。
-- `document_depth_percent_intervals`: 文档深度的划分间隔，用于确定在何处插入“针”。
+- `needle`: The specific text (needle) to be found in the dataset.
+- `retrieval_question`: The question to prompt the model for retrieval.
+- `context_lengths`: Specifies the context lengths (in tokens) for different testing scenarios.
+- `document_depth_percent_intervals`: The intervals for dividing the document depth to determine where to insert the “needle”.
 
-### 评估
+### Evaluation
 
-例如，使用 `internlm` 模型进行评估，可以使用以下命令：
+For example, to evaluate using the `internlm` model, you can use the following command:
 
 ```bash
 python run.py configs/eval_hf_internlm_chat_20b_cdme.py --slurm -p partition_name-q auto --max-num-workers 32
 ```
 
-这个命令将启动评估流程，其中模型将试图在生成的数据集中找到指定的“针”。参数 `-p partition_name-q auto` 和 `--max-num-workers 32` 用于指定Slurm队列和最大工作进程数。
+This command initiates the evaluation process where the model will attempt to find the specified “needle” in the generated dataset. The parameters `-p partition_name-q auto` and `--max-num-workers 32` specify the Slurm queue and the maximum number of work processes.
 
-### Score计算方法
+### Score Calculation Method
 
-在 `CDMEEvaluator` 类中，我们使用两个主要方法来计算得分：`levenshtein_distance` 和 `score`。下面是这些方法的详细介绍和实现。
+In the `CDMEEvaluator` class, we use two main methods to calculate the score: `levenshtein_distance` and `score`. Here are detailed introductions and implementations of these methods.
 
 #### Levenshtein Distance
 
-Levenshtein 距离是一种衡量两个字符串差异的方法。它表示将一个字符串转换为另一个所需的最少单字符编辑（插入、删除或替换）的数量。
+Levenshtein distance is a method for measuring the difference between two strings. It represents the minimum number of single-character edits (insertions, deletions, or substitutions) needed to change one string into another.
 
 ```python
 def levenshtein_distance(self, s1, s2):
@@ -114,7 +114,7 @@ def levenshtein_distance(self, s1, s2):
 
 #### Score Calculation
 
-得分计算方法 `score` 接受预测值和参考值两个列表，并计算每对预测值和参考值的编辑距离和得分。
+The `score` calculation method accepts lists of predictions and references and calculates the edit distance and score for each pair of prediction and reference.
 
 ```python
 def score(self, predictions, references):
@@ -144,15 +144,17 @@ def score(self, predictions, references):
     return result
 ```
 
-该方法首先去除预测值和参考值中的所有空白字符，然后计算它们之间的 Levenshtein 距离。得分计算为 100 减去基于编辑距离的百分比损失。最后，返回每个预测值的详细得分和平均得分。
+This method first removes all whitespace characters in predictions and references and then calculates their Levenshtein distance. The score is calculated as 100 minus the percentage loss based on edit distance. Finally, it returns detailed scores and the average score for each prediction.
 
-### 可视化
+### Visualization
 
-可以使用 `tools/viz_needleinahaystack.py` 脚本，将 `outputs` 文件夹中的 CSV 文件进行可视化绘图。
+Use the `tools/viz_needleinahaystack.py` script to visualize the CSV files in the \`
 
-目前该方案仅支持 CDME 数据集，我们欢迎社区贡献更多的数据集。
+outputs\` folder.
 
-如果使用了该方法，请添加引用:
+Currently, this scheme only supports the CDME dataset, and we welcome community contributions for more datasets.
+
+If you use this method, please add a citation:
 
 ```bibtex
 
