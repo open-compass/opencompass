@@ -124,4 +124,13 @@ CLEVA_InductiveReasoningDataset = [
         eval_cfg=reasonbench_eval_cfg),
 ]
 
-reasonbench_datasets = CLEVA_CommonsenseReasoningDataset + CLEVA_DeductiveReasoningDataset + CLEVA_InductiveReasoningDataset + CausalReasoningDataset + CommonsenseReasoningDataset + AbductiveReasoningDataset + DeductiveReasoningDataset + InductiveReasoningDataset + SymbolicReasoningDataset
+reasonbench_datasets = \
+    CLEVA_CommonsenseReasoningDataset + \
+    CLEVA_DeductiveReasoningDataset + \
+    CLEVA_InductiveReasoningDataset + \
+    CausalReasoningDataset + \
+    CommonsenseReasoningDataset + \
+    AbductiveReasoningDataset + \
+    DeductiveReasoningDataset + \
+    InductiveReasoningDataset + \
+    SymbolicReasoningDataset
