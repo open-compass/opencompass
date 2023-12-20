@@ -55,8 +55,9 @@ You are expected to get the evaluation results after the inference and evaluatio
 
 **Note**:
 
-- If you evaluate theInternLM Chat model, please use configuration file `eval_internlm_chat_turbomind.py`
+- If you evaluate the InternLM Chat model, please use configuration file `eval_internlm_chat_turbomind.py`
 - If you evaluate the InternLM 7B model, please modify `eval_internlm_turbomind.py` or `eval_internlm_chat_turbomind.py` by changing to the setting `models = [internlm_7b]` in the last line.
+- If you want to evaluate other chat models like Llama2, QWen-7B, Baichuan2-7B, you could change to the setting of `models` in `eval_internlm_chat_turbomind.py`.
 
 ### Evaluation with Turbomind gPRC API (optional)
 

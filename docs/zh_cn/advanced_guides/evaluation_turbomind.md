@@ -53,6 +53,7 @@ python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-2
 
 - 如果评测 InternLM Chat 模型，请使用配置文件 `eval_internlm_chat_turbomind.py`
 - 如果评测 InternLM 7B 模型，请修改 `eval_internlm_turbomind.py` 或者 `eval_internlm_chat_turbomind.py`。将`models`字段配置为`models = [internlm_7b]` 。
+- 如果评测其他模型如 Llama2, QWen-7B, Baichuan2-7B, 请修改`eval_internlm_chat_turbomind.py`中`models`字段 。
 
 ### 通过 TurboMind gPRC API 评测（可选）
 

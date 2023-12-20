@@ -135,6 +135,32 @@ llama2_chat_7b = dict(
     run_cfg=dict(num_gpus=1, num_procs=1),
 )
 
+# config for llama2-chat-13b
+llama2_chat_13b = dict(
+    type=TurboMindModel,
+    abbr='llama2-chat-13b-turbomind',
+    path='./turbomind',
+    max_out_len=100,
+    max_seq_len=2048,
+    batch_size=16,
+    concurrency=16,
+    meta_template=llama2_meta_template,
+    run_cfg=dict(num_gpus=1, num_procs=1),
+)
+
+# config for llama2-chat-70b
+llama2_chat_70b = dict(
+    type=TurboMindModel,
+    abbr='llama2-chat-70b-turbomind',
+    path='./turbomind',
+    max_out_len=100,
+    max_seq_len=2048,
+    batch_size=8,
+    concurrency=8,
+    meta_template=llama2_meta_template,
+    run_cfg=dict(num_gpus=1, num_procs=1),
+)
+
 # config for qwen-chat-7b
 qwen_chat_7b = dict(
     type=TurboMindModel,
