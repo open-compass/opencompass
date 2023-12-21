@@ -81,7 +81,7 @@ class Creationv01Summarizer:
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
                 model, judge_model = subdir.split('_')
-                fout = osp.join(output_dir, judge_model+'-report.csv')
+                fout = osp.join(output_dir, judge_model + '-report.csv')
                 for dataset in dataset_cfgs:
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
                     filepath = os.path.join(subdir_path,

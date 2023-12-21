@@ -15,7 +15,7 @@ try:
 except ImportError:
     from_csv = None
 
-from opencompass.utils import dataset_abbr_from_cfg
+from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
 
 CATEGORIES = {
     '中文推理': ['数学计算', '逻辑推理'],
@@ -91,6 +91,10 @@ class AlignmentBenchSummarizer:
     def __init__(self, config: ConfigDict) -> None:
         self.tasks = []
         self.cfg = config
+        self.eval_model_cfgs = self.cfg['eval']['partitioner']['models']
+        self.eval_model_abbrs = [
+            model_abbr_from_cfg(model) for model in self.eval_model_cfgs
+        ]
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
@@ -112,13 +116,16 @@ class AlignmentBenchSummarizer:
         output_dir = osp.join(osp.split(output_path)[0], f'{self.time_str}')
         mmengine.mkdir_or_exist(output_dir)
         results_folder = osp.join(work_dir, 'results')
+
         fout_flag, fout_flag2 = 0, 0
         for subdir in os.listdir(results_folder):
+            if subdir not in self.eval_model_abbrs:
+                continue
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
                 model, judge_model = subdir.split('_')
-                fout = osp.join(output_dir, judge_model+'dimension.csv')
-                fout2 = osp.join(output_dir, judge_model+'capability.csv')
+                fout = osp.join(output_dir, judge_model + 'dimension.csv')
+                fout2 = osp.join(output_dir, judge_model + 'capability.csv')
                 for dataset in dataset_cfgs:
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
                     filepath = os.path.join(subdir_path,

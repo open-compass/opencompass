@@ -70,8 +70,10 @@ class SubjectiveEvalTask(BaseTask):
                 eval_cfg = dataset_cfg.get('eval_cfg')
                 output_column = dataset_cfg['reader_cfg']['output_column']
                 if type(model_cfg) == ConfigDict:
-                    model_cfg = (model_cfg,)
-                model_cfg += ({'abbr': 'judged-by--'+self.judge_cfg['abbr']},)
+                    model_cfg = (model_cfg, )
+                model_cfg += ({
+                    'abbr': 'judged-by--' + self.judge_cfg['abbr']
+                }, )
                 out_path = get_infer_output_path(
                     model_cfg, dataset_cfg, osp.join(self.work_dir, 'results'))
                 if osp.exists(out_path):
@@ -161,7 +163,8 @@ class SubjectiveEvalTask(BaseTask):
                 new_model_cfg.append(m_cfg)
         if len(new_model_cfg) == 1:
             new_model_cfg = new_model_cfg[0]
-        model_preds = self._load_model_pred(new_model_cfg, dataset_cfg, eval_cfg)
+        model_preds = self._load_model_pred(new_model_cfg, dataset_cfg,
+                                            eval_cfg)
         if not self.judge_cfg:
             raise ValueError('missing "eval.runner.task.judge_cfg"')
         eval_cfg['evaluator']['judge_cfg'] = self.judge_cfg
@@ -230,14 +233,15 @@ class SubjectiveEvalTask(BaseTask):
         for model, datasets in zip(self.model_cfgs, self.dataset_cfgs):
             for dataset in datasets:
                 if type(model) == ConfigDict:
-                    model = (model,)
-                model += ({'abbr': 'judged-by--'+self.judge_cfg['abbr']},)
+                    model = (model, )
+                model += ({'abbr': 'judged-by--' + self.judge_cfg['abbr']}, )
                 output_paths.append(
                     get_infer_output_path(
                         model, dataset,
                         osp.join(self.work_dir, self.output_subdir),
                         file_extension))
         return output_paths
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Score Calculator')
