@@ -29,7 +29,7 @@ def extract_predictions_from_json(input_folder):
 
         # for prediction
         output_path = os.path.join(sub_folder, model_name + '_submission.csv')
-        with open(output_path, 'w', encoding='utf-8') as file:
+        with open(output_path, 'w', encoding='utf-8-sig') as file:
             writer = csv.writer(file)
             for ans in tqdm(all_predictions):
                 writer.writerow([str(ans)])
