@@ -346,6 +346,8 @@ class CIBenchEvaluator(BaseEvaluator):
     def score(self, predictions: List, references: List, steps: List,
               origin_prompt: List):
         """Calculate accuracy."""
+        if len(steps) != len(references):
+            return {'error': 'steps and refrs have different length'}
         cwd = os.getcwd()
         self.get_output_dir()
         if self.output_dir:

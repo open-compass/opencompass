@@ -113,6 +113,8 @@ class Gsm8kAgentEvaluator(BaseEvaluator):
 
     def score(self, predictions, references, steps):
         """Calculate accuracy."""
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length'}
 
         row_reasoning_scope = 0
         action_scope = 0

@@ -27,6 +27,7 @@ from .copa import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
 from .crowspairs_cn import *  # noqa: F401, F403
 from .csl import *  # noqa: F401, F403
+from .custom import *  # noqa: F401, F403
 from .cvalues import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
