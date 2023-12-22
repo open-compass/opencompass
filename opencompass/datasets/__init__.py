@@ -39,6 +39,7 @@ from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
+from .gpqa import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
 from .hellaswag import *  # noqa: F401, F403
