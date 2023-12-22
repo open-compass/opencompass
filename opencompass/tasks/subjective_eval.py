@@ -69,7 +69,11 @@ class SubjectiveEvalTask(BaseTask):
                 # Load Dataset
                 eval_cfg = dataset_cfg.get('eval_cfg')
                 output_column = dataset_cfg['reader_cfg']['output_column']
-
+                if type(model_cfg) == ConfigDict:
+                    model_cfg = (model_cfg, )
+                model_cfg += ({
+                    'abbr': 'judged-by--' + self.judge_cfg['abbr']
+                }, )
                 out_path = get_infer_output_path(
                     model_cfg, dataset_cfg, osp.join(self.work_dir, 'results'))
                 if osp.exists(out_path):
@@ -153,7 +157,14 @@ class SubjectiveEvalTask(BaseTask):
         # Get out_path
         out_path = get_infer_output_path(model_cfg, dataset_cfg,
                                          osp.join(self.work_dir, 'results'))
-        model_preds = self._load_model_pred(model_cfg, dataset_cfg, eval_cfg)
+        new_model_cfg = []
+        for m_cfg in model_cfg:
+            if len(m_cfg) > 1:
+                new_model_cfg.append(m_cfg)
+        if len(new_model_cfg) == 1:
+            new_model_cfg = new_model_cfg[0]
+        model_preds = self._load_model_pred(new_model_cfg, dataset_cfg,
+                                            eval_cfg)
         if not self.judge_cfg:
             raise ValueError('missing "eval.runner.task.judge_cfg"')
         eval_cfg['evaluator']['judge_cfg'] = self.judge_cfg
@@ -209,6 +220,27 @@ class SubjectiveEvalTask(BaseTask):
                 end = end_idx
 
         return s[start:end]
+
+    def get_output_paths(self, file_extension: str = 'json') -> List[str]:
+        """Get the paths to the output files. Every file should exist if the
+        task succeeds.
+
+        Args:
+            file_extension (str): The file extension of the output files.
+                Default: 'json'.
+        """
+        output_paths = []
+        for model, datasets in zip(self.model_cfgs, self.dataset_cfgs):
+            for dataset in datasets:
+                if type(model) == ConfigDict:
+                    model = (model, )
+                model += ({'abbr': 'judged-by--' + self.judge_cfg['abbr']}, )
+                output_paths.append(
+                    get_infer_output_path(
+                        model, dataset,
+                        osp.join(self.work_dir, self.output_subdir),
+                        file_extension))
+        return output_paths
 
 
 def parse_args():

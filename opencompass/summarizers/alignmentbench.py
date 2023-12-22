@@ -116,15 +116,16 @@ class AlignmentBenchSummarizer:
         output_dir = osp.join(osp.split(output_path)[0], f'{self.time_str}')
         mmengine.mkdir_or_exist(output_dir)
         results_folder = osp.join(work_dir, 'results')
-        fout = osp.join(output_dir, 'dimension.csv')
-        fout2 = osp.join(output_dir, 'capability.csv')
+
         fout_flag, fout_flag2 = 0, 0
         for subdir in os.listdir(results_folder):
             if subdir not in self.eval_model_abbrs:
                 continue
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
-                model = subdir
+                model, judge_model = subdir.split('_')
+                fout = osp.join(output_dir, judge_model + 'dimension.csv')
+                fout2 = osp.join(output_dir, judge_model + 'capability.csv')
                 for dataset in dataset_cfgs:
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
                     filepath = os.path.join(subdir_path,
