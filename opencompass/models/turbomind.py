@@ -126,7 +126,6 @@ class TurboMindModel(BaseModel):
         assert type(
             prompt) is str, 'We only support string for TurboMind Python API'
 
-        prompt = '<BOS>' + prompt
         input_ids = self.tokenizer.encode(prompt)
 
         for outputs in generator.stream_infer(session_id=session_id,
