@@ -2,15 +2,15 @@
 
 ## Introduction to the Needle In A Haystack Test
 
-The Needle In A Haystack test, inspired by [NeedleInAHaystack](https://github.com/gkamradt/LLMTest_NeedleInAHaystack/blob/main/LLMNeedleHaystackTester.py), involves embedding key information randomly in different parts of a long text to form prompts for large language models (LLMs). This test evaluates an LLM's ability to extract crucial information from lengthy texts, reflecting its fundamental capability in understanding long-form content.
+The Needle In A Haystack test (inspired by [NeedleInAHaystack](https://github.com/gkamradt/LLMTest_NeedleInAHaystack/blob/main/LLMNeedleHaystackTester.py)) involves embedding key information randomly within a long text to form prompts for large language models (LLMs). This test evaluates the LLM's ability to extract key information from extensive text, reflecting the fundamental capabilities of LLMs in understanding long texts.
 
 ## Dataset Overview
 
-The `Skywork/ChineseDomainModelingEval` dataset includes high-quality Chinese articles published between September and October 2023, covering multiple domains. These articles ensure a fair and challenging benchmark.
+The `Skywork/ChineseDomainModelingEval` dataset includes high-quality Chinese articles published from September to October 2023, covering multiple domains. These articles ensure a fair and challenging benchmark test.
 
-## File Descriptions
+## File Description
 
-The dataset includes files specific to different domains:
+The dataset includes files specific to certain domains:
 
 - `zh_finance.jsonl` - Finance
 - `zh_game.jsonl` - Gaming
@@ -19,13 +19,13 @@ The dataset includes files specific to different domains:
 - `zh_tech.jsonl` - Technology
 - `zh_general.jsonl` - General
 
-These files are used to assess the LLM’s understanding in various specific fields.
+These files are used to evaluate the LLM's understanding capabilities in different specific areas.
 
 ### Evaluation Steps
 
 1. Download the dataset from [Skywork/ChineseDomainModelingEval](https://huggingface.co/datasets/Skywork/ChineseDomainModelingEval/tree/main).
 
-2. Place the downloaded files in `opencompass/data/CDME/`. The expected file structure in the `CDME` directory:
+2. Place the downloaded files in `opencompass/data/CDME/`. The expected file structure in the `CDME` directory is as follows:
 
    ```
    opencompass/
@@ -45,7 +45,7 @@ These files are used to assess the LLM’s understanding in various specific fie
    ├── opencompass
    ├── outputs
    ├── run.py
-   └── more...
+   ├── more...
    ```
 
 ### Environment Setup
@@ -63,15 +63,26 @@ pip install -e .
 Run the following command to generate the dataset:
 
 ```bash
-python tools/gen_needleinahaystack.py
+python tools/tools_needleinahaystack.py \
+  --processed_datasets_path './data/CDME/processed' \
+  --data_path './data/CDME' \
+  --tokenizer_model 'gpt-4' \
+  --num_records_per_file 10 \
+  --length_buffer 200 \
+  --guided True \
+  --file_list 'zh_finance.jsonl' \
+  --context_lengths 1000 2000 3000 4000 5000 6000 7000 8000 \
+  --needle '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n' \
+  --retrieval_question '小明最喜欢的实习地点是哪里？你的回答格式应该为“小明最喜欢的实习地点就是________。”' \
+  --document_depth_percent_intervals 35 \
 ```
 
-You can set specific parameters in `tools/gen_needleinahaystack.py` to choose the dataset needed for the task. The main parameters include:
+You can set specific parameters when launching `tools/tools_needleinahaystack.py` to select the datasets required for your task. Key parameters include:
 
-- `needle`: The specific text (needle) to be found in the dataset.
-- `retrieval_question`: The question to prompt the model for retrieval.
-- `context_lengths`: Specifies the context lengths (in tokens) for different testing scenarios.
-- `document_depth_percent_intervals`: The intervals for dividing the document depth to determine where to insert the “needle”.
+- `needle`: The specific text (needle) to be located within the dataset.
+- `retrieval_question`: The question used to prompt the model for retrieval.
+- `context_lengths`: Specifies the context lengths (in tokens) for different test scenarios.
+- `document_depth_percent_intervals`: The number of interval divisions for document depth to determine where to insert the "needle".
 
 ### Evaluation
 
@@ -81,15 +92,17 @@ For example, to evaluate using the `internlm` model, you can use the following c
 python run.py configs/eval_hf_internlm_chat_20b_cdme.py --slurm -p partition_name-q auto --max-num-workers 32
 ```
 
-This command initiates the evaluation process where the model will attempt to find the specified “needle” in the generated dataset. The parameters `-p partition_name-q auto` and `--max-num-workers 32` specify the Slurm queue and the maximum number of work processes.
+This command initiates the evaluation process, where the model will attempt to find the specified "needle" in the generated dataset. The parameters `-p partition_name-q auto` and `--max-num-workers 32` specify the Slurm queue and the maximum number of worker processes.
 
 ### Score Calculation Method
 
-In the `CDMEEvaluator` class, we use two main methods to calculate the score: `levenshtein_distance` and `score`. Here are detailed introductions and implementations of these methods.
+In the `CDMEEvaluator` class, we use two main methods to calculate scores: `levenshtein_distance` and `score`. Here is a detailed introduction and implementation
+
+of these methods.
 
 #### Levenshtein Distance
 
-Levenshtein distance is a method for measuring the difference between two strings. It represents the minimum number of single-character edits (insertions, deletions, or substitutions) needed to change one string into another.
+Levenshtein distance is a method for measuring the difference between two strings. It represents the minimum number of single-character edits (insertions, deletions, or substitutions) required to change one string into the other.
 
 ```python
 def levenshtein_distance(self, s1, s2):
@@ -144,15 +157,19 @@ def score(self, predictions, references):
     return result
 ```
 
-This method first removes all whitespace characters in predictions and references and then calculates their Levenshtein distance. The score is calculated as 100 minus the percentage loss based on edit distance. Finally, it returns detailed scores and the average score for each prediction.
+The method first removes all whitespace characters from the predictions and references, then calculates the Levenshtein distance between them. The score is calculated as 100 minus the percentage loss based on the edit distance. Finally, it returns detailed scores for each prediction and the average score.
 
 ### Visualization
 
-Use the `tools/viz_needleinahaystack.py` script to visualize the CSV files in the \`
+You can visualize the CSV files in the `outputs` folder using the `tools_needleinahaystack.py` script. For example:
 
-outputs\` folder.
+```bash
+python tools/tools_needleinahaystack.py \
+  --plot \
+  --csv_file_paths 'outputs/default/20231216_161457/summary/summary_20231216_161457.csv' 'outputs/default/20231217_022310/summary/summary_20231217_022310.csv'
+```
 
-Currently, this scheme only supports the CDME dataset, and we welcome community contributions for more datasets.
+Currently, this approach only supports the CDME dataset, and we welcome community contributions to more datasets.
 
 If you use this method, please add a citation:
 
@@ -174,7 +191,7 @@ If you use this method, please add a citation:
 
 @misc{wei2023skywork,
       title={Skywork: A More Open Bilingual Foundation Model},
-      author={Tianwen Wei and Liang Zhao and Lichang Zhang and Bo Zhu and Lijie Wang and Haihua Yang and Biye Li and Cheng Cheng and Weiwei Lü and Rui Hu and Chenxia Li and Liu Yang and Xilin Luo and Xuejie Wu and Lunan Liu and Wenjun Cheng and Peng Cheng and Jianhao Zhang and Xiaoyu Zhang and Lei Lin and Xiaokun Wang and Yutuan Ma and Chuanhai Dong and Yanqi Sun and Yifu Chen and Yongyi Peng and Xiaojuan Liang and Shuicheng Yan and Han Fang and Yahui Zhou},
+      author={Tianwen Wei and others},
       year={2023},
       eprint={2310.19341},
       archivePrefix={arXiv},

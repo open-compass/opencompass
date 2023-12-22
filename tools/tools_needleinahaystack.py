@@ -1,10 +1,15 @@
+import argparse
 import json
 import os
 import shutil
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import seaborn as sns
 import tiktoken
+from matplotlib.colors import LinearSegmentedColormap
 
 
 class CDMEDatasetProcessor:
@@ -137,47 +142,135 @@ class CDMEDatasetProcessor:
 class CDMEDataset():
 
     @staticmethod
-    def generate():
-        # Define the path to the processed datasets
-        processed_datasets_path = './data/CDME/processed'
-
+    def generate(processed_datasets_path, data_path, tokenizer_model,
+                 num_records_per_file, length_buffer, guided, file_list,
+                 context_lengths, needle, retrieval_question,
+                 document_depth_percent_intervals):
         # Check if the processed datasets directory exists
         if os.path.exists(processed_datasets_path):
-            # Remove the existing directory to ensure a fresh start
             shutil.rmtree(processed_datasets_path)
-            print(f'The existing processed datasets directory '
-                  f'{processed_datasets_path} has been removed'
-                  'for a fresh start.')
+            print('The existing processed datasets directory '
+                  f'{processed_datasets_path} has been '
+                  'removed for a fresh start.')
         else:
-            # Inform the user if the directory was not found
-            print(
-                f'No existing processed datasets directory found at'
-                f'{processed_datasets_path}. Starting with a fresh directory.')
+            print('No existing processed datasets directory found at'
+                  f' {processed_datasets_path}. '
+                  'Starting with a fresh directory.')
 
-        processor = CDMEDatasetProcessor(path='./data/CDME',
-                                         output_path='./data/CDME/processed',
-                                         tokenizer_model='gpt-4',
-                                         num_records_per_file=10,
-                                         length_buffer=200,
-                                         guided=True,
-                                         file_list=['zh_finance.jsonl'])
-        # Set the context lengths for the needleinahaystack test.
-        # This creates a list of different context lengths (in tokens),
-        # ranging from 1000 to 8000, incremented by 1000.
-        # Each length represents a different test scenario for the dataset.
-        context_lengths = list(range(1000, 9000, 1000))
+        processor = CDMEDatasetProcessor(
+            path=data_path,
+            output_path=processed_datasets_path,
+            tokenizer_model=tokenizer_model,
+            num_records_per_file=num_records_per_file,
+            length_buffer=length_buffer,
+            guided=guided,
+            file_list=file_list)
 
-        needle = '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n'
-        retrieval_question = '小明最喜欢的实习地点是哪里？你的回答格式应该为“小明最喜欢的实习地点就是________。”'
-        document_depth_percent_intervals = 35
-        processor.process_files(
-            context_lengths,
-            needle,
-            retrieval_question,
-            document_depth_percent_intervals,
-        )
+        processor.process_files(context_lengths, needle, retrieval_question,
+                                document_depth_percent_intervals)
 
         print('Datasets has been created.')
 
+    @staticmethod
+    def visualize(csv_file_paths):
+        for file_path in csv_file_paths:
+            df = pd.read_csv(file_path)
+            model_name = df.columns[4]
+            # Process the data
+            df['Context Length'] = df['dataset'].apply(lambda x: int(
+                x.replace('CDME_', '').split('Depth')[0].replace('Length', ''))
+                                                       )
+            df['Document Depth'] = df['dataset'].apply(
+                lambda x: float(x.replace('CDME_', '').split('Depth')[1]))
+            df = df[['Document Depth', 'Context Length', model_name]]\
+                .rename(columns={model_name: 'Score'})
 
-CDMEDataset.generate()
+            # Create pivot table
+            pivot_table = pd.pivot_table(df,
+                                         values='Score',
+                                         index=['Document Depth'],
+                                         columns=['Context Length'],
+                                         aggfunc='mean')
+
+            # Create a heatmap for visualization
+            cmap = LinearSegmentedColormap.from_list(
+                'custom_cmap', ['#F0496E', '#EBB839', '#0CD79F'])
+            plt.figure(figsize=(17.5, 8))
+            sns.heatmap(pivot_table, cmap=cmap, cbar_kws={'label': 'Score'})
+            plt.title(f'{model_name} 8K Context Performance\n'
+                      'Fact Retrieval Across'
+                      'Context Lengths ("Needle In A Haystack")')
+            plt.xlabel('Token Limit')
+            plt.ylabel('Depth Percent')
+            plt.xticks(rotation=45)
+            plt.yticks(rotation=0)
+            plt.tight_layout()
+
+            # Save the heatmap as a PNG file
+            png_file_path = file_path.replace('.csv', '.png')
+            plt.savefig(png_file_path)
+            plt.close()  # Close the plot to prevent memory leaks
+            # Print the path to the saved PNG file
+            print(f'Heatmap saved as: {png_file_path}')
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Generate CDMEDataset.')
+
+    parser.add_argument('--processed_datasets_path',
+                        type=str,
+                        default='./data/CDME/processed')
+    parser.add_argument('--data_path', type=str, default='./data/CDME')
+    parser.add_argument('--tokenizer_model', type=str, default='gpt-4')
+    parser.add_argument('--num_records_per_file', type=int, default=10)
+    parser.add_argument('--length_buffer', type=int, default=200)
+    parser.add_argument('--guided', type=bool, default=True)
+    parser.add_argument('--file_list', nargs='*', default=['zh_finance.jsonl'])
+    parser.add_argument('--context_lengths',
+                        nargs='*',
+                        type=int,
+                        default=list(range(1000, 9000, 1000)))
+    parser.add_argument('--needle',
+                        type=str,
+                        default='\n小明最喜欢的实习的地点就是上海人工智能实验室。\n')
+    parser.add_argument('--retrieval_question',
+                        type=str,
+                        default='小明最喜欢的实习地点是哪里？'
+                        '你的回答格式应该为“小明最喜欢的实习地点就是________。”')
+    parser.add_argument('--document_depth_percent_intervals',
+                        type=int,
+                        default=35)
+    parser.add_argument('--plot',
+                        action='store_true',
+                        help='Visualize the dataset results')
+    parser.add_argument('--csv_file_paths',
+                        nargs='*',
+                        default=['path/to/your/result.csv'],
+                        help='Paths to CSV files for visualization')
+
+    args = parser.parse_args()
+
+    if args.plot:
+        if not args.csv_file_paths:
+            print("Error: '--csv_file_paths' is required for visualization.")
+            exit(1)
+        CDMEDataset.visualize(args.csv_file_paths)
+
+    else:
+        doc_depth_intervals = args.document_depth_percent_intervals
+        CDMEDataset.generate(
+            processed_datasets_path=args.processed_datasets_path,
+            data_path=args.data_path,
+            tokenizer_model=args.tokenizer_model,
+            num_records_per_file=args.num_records_per_file,
+            length_buffer=args.length_buffer,
+            guided=args.guided,
+            file_list=args.file_list,
+            context_lengths=args.context_lengths,
+            needle=args.needle,
+            retrieval_question=args.retrieval_question,
+            document_depth_percent_intervals=doc_depth_intervals)
+
+
+if __name__ == '__main__':
+    main()

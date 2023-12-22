@@ -63,15 +63,26 @@ pip install -e .
 运行以下命令以生成数据集：
 
 ```bash
-python tools/gen_needleinahaystack.py
+python tools/tools_needleinahaystack.py \
+  --processed_datasets_path './data/CDME/processed' \
+  --data_path './data/CDME' \
+  --tokenizer_model 'gpt-4' \
+  --num_records_per_file 10 \
+  --length_buffer 200 \
+  --guided True \
+  --file_list 'zh_finance.jsonl' \
+  --context_lengths 1000 2000 3000 4000 5000 6000 7000 8000 \
+  --needle '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n' \
+  --retrieval_question '小明最喜欢的实习地点是哪里？你的回答格式应该为“小明最喜欢的实习地点就是________。”' \
+  --document_depth_percent_intervals 35 \
 ```
 
-您可以在 `tools/gen_needleinahaystack.py` 中设置特定参数，以选择任务所需的数据集。主要参数包括：
+您可以在启动 `tools/tools_needleinahaystack.py` 时设置特定参数，以选择任务所需的数据集。主要参数包括：
 
 - `needle`: 要在数据集中查找的指定文本（针）。
 - `retrieval_question`: 用于提示模型检索的问题。
 - `context_lengths`: 指定不同测试场景的上下文长度（以token为单位）。
-- `document_depth_percent_intervals`: 文档深度的划分间隔，用于确定在何处插入“针”。
+- `document_depth_percent_intervals`: 文档深度的划分间隔数量，用于确定在何处插入“针”。
 
 ### 评估
 
@@ -148,7 +159,13 @@ def score(self, predictions, references):
 
 ### 可视化
 
-可以使用 `tools/viz_needleinahaystack.py` 脚本，将 `outputs` 文件夹中的 CSV 文件进行可视化绘图。
+可以使用 `tools_needleinahaystack.py` 脚本，将 `outputs` 文件夹中的 CSV 文件进行可视化绘图。例如
+
+```bash
+python tools/tools_needleinahaystack.py \
+  --plot \
+  --csv_file_paths 'outputs/default/20231216_161457/summary/summary_20231216_161457.csv' 'outputs/default/20231217_022310/summary/summary_20231217_022310.csv'
+```
 
 目前该方案仅支持 CDME 数据集，我们欢迎社区贡献更多的数据集。
 
