@@ -2,6 +2,7 @@
 import json
 import os.path as osp
 import re
+from typing import Optional
 
 from datasets import Dataset, DatasetDict
 
@@ -83,16 +84,25 @@ def prompt_construct(sample, config: Config):
 @LOAD_DATASET.register_module()
 class AlignmentBenchDataset(SubjectiveCmpDataset):
 
-    def load(self, path: str, name: str, alignment_bench_config_path: str,
-             alignment_bench_config_name: str):
-        alignmentbenchconfig = Config(alignment_bench_config_path,
-                                      alignment_bench_config_name)
+    def load(self,
+             path: str,
+             name: str,
+             alignment_bench_config_path: Optional[str] = '',
+             alignment_bench_config_name: Optional[str] = ''):
+        if alignment_bench_config_path != '':
+            alignmentbenchconfig = Config(alignment_bench_config_path,
+                                          alignment_bench_config_name)
+        else:
+            alignmentbenchconfig = None
         dataset = list(super().load(path, name))
         corev2_dataset = []
         for data in dataset:
-            dimensions, prefix = prompt_construct(data, alignmentbenchconfig)
-            data['prefix'], data['suffix'] = prefix, ''
+            if alignmentbenchconfig:
+                dimensions, prefix = prompt_construct(data,
+                                                      alignmentbenchconfig)
+                data['critiquellm_prefix'] = prefix
             data['judge']['others'] = data['others']
+            data['ref'] = data['others']['reference']
             corev2_dataset.append(data)
         dataset = Dataset.from_list(corev2_dataset)
         return dataset

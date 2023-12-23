@@ -158,7 +158,7 @@ class AlignmentBenchSummarizer:
                         print('There are no results for ' + filename + ' or ' +
                               partial_filename)
                         print('*' * 100)
-                        assert len(result > 0)
+                        assert len(result) > 0
 
                     judged_answers = []
                     references = []
