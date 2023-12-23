@@ -96,8 +96,11 @@ class SubjectiveEvalTask(BaseTask):
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
         pred_strs = None
-        if osp.exists(osp.realpath(filename)) or osp.exists(
+
+        if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
+            return {'error': 'No predictions found.'}
+        else:
             if osp.exists(osp.realpath(filename)):
                 preds = mmengine.load(filename)
                 pred_strs = [
@@ -172,8 +175,12 @@ class SubjectiveEvalTask(BaseTask):
         eval_cfg['evaluator']['output_path'] = out_path
         icl_evaluator = ICL_EVALUATORS.build(eval_cfg['evaluator'])
         references = (test_set[output_column] if output_column else None)
-        result = icl_evaluator.score(predictions=model_preds,
-                                     references=references)
+
+        if 'error' not in model_preds:
+            result = icl_evaluator.score(predictions=model_preds,
+                                         references=references)
+        else:
+            result = model_preds
 
         if 'error' in result:
             self.logger.error(
