@@ -38,9 +38,7 @@ def post_process(judgment: str):
             dictionary_str = match.group(1)
             kv_pattern = r"'(.*?)': (\d+)"
             matches = re.findall(kv_pattern, dictionary_str)
-
             result_dict = {key: int(value) for key, value in matches}
-
             return result_dict
         else:
             return None
@@ -95,6 +93,7 @@ class AlignmentBenchSummarizer:
         self.eval_model_abbrs = [
             model_abbr_from_cfg(model) for model in self.eval_model_cfgs
         ]
+        self.judge_abbr = self.cfg['judge_model']['abbr']
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
@@ -106,6 +105,7 @@ class AlignmentBenchSummarizer:
         Returns:
             pd.DataFrame: The summary results.
         """
+
         dataset_cfgs = self.cfg['datasets']
         work_dir = self.cfg['work_dir']
         self.work_dir = work_dir
@@ -118,19 +118,48 @@ class AlignmentBenchSummarizer:
         results_folder = osp.join(work_dir, 'results')
 
         fout_flag, fout_flag2 = 0, 0
-        for subdir in os.listdir(results_folder):
-            if subdir not in self.eval_model_abbrs:
-                continue
+        for eval_model_abbr in self.eval_model_abbrs:
+            subdir = eval_model_abbr + '_judged-by--' + self.judge_abbr
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
-                model, judge_model = subdir.split('_')
-                fout = osp.join(output_dir, judge_model + 'dimension.csv')
-                fout2 = osp.join(output_dir, judge_model + 'capability.csv')
+                model, judge_model = eval_model_abbr, self.judge_abbr
+                fout = osp.join(output_dir,
+                                'judged-by--' + judge_model + '-dimension.csv')
+                fout2 = osp.join(
+                    output_dir,
+                    'judged-by--' + judge_model + '-capability.csv')
                 for dataset in dataset_cfgs:
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
-                    filepath = os.path.join(subdir_path,
+                    filename = os.path.join(subdir_path,
                                             dataset_abbr + '.json')
-                    result = mmengine.load(filepath)
+                    partial_filename = os.path.join(subdir_path,
+                                                    dataset_abbr + '_0.json')
+                    if osp.exists(osp.realpath(filename)):
+                        result = mmengine.load(filename)
+                    elif osp.exists(osp.realpath(partial_filename)):
+                        filename = partial_filename
+                        result = {}
+                        i = 1
+                        partial_dict_flag = 0
+                        while osp.exists(osp.realpath(filename)):
+                            res = mmengine.load(filename)
+                            for k, v in res.items():
+                                result[partial_dict_flag] = v
+                                partial_dict_flag += 1
+                            filename = os.path.join(
+                                subdir_path,
+                                dataset_abbr + '_' + str(i) + '.json')
+                            i += 1
+                    else:
+                        result = {}
+
+                    if len(result) == 0:
+                        print('*' * 100)
+                        print('There are no results for ' + filename + ' or ' +
+                              partial_filename)
+                        print('*' * 100)
+                        assert len(result > 0)
+
                     judged_answers = []
                     references = []
                     for k, v in result.items():
@@ -144,8 +173,14 @@ class AlignmentBenchSummarizer:
                     print(
                         f'Among {len(result)} judgements, successfully extracted {len(judged_answers)} judgements.'
                     )
+                    if len(judged_answers) == 0:
+                        print('*' * 100)
+                        print(
+                            'There are no extracted judgements, please change your judge model or check your prompt!!!'
+                        )
+                        print('*' * 100)
+                    assert len(judged_answers) > 0
 
-                    # 初始化一个嵌套字典用于存储模型和评分
                     dimension_ratings = defaultdict(int)
                     dimension_counts = defaultdict(int)
                     capability_ratings = defaultdict(int)
@@ -225,6 +260,8 @@ class AlignmentBenchSummarizer:
                             for sub_category in sub_categories:
                                 row.append(scores[model][sub_category])
                         writer.writerow(row)
+            else:
+                print(subdir_path + ' is not exist! please check!')
         with open(fout, 'r') as f:
             x = from_csv(f)
         print(x)

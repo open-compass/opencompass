@@ -5,6 +5,7 @@ import os.path as osp
 import re
 from collections import defaultdict
 from datetime import datetime
+from itertools import product
 
 import mmengine
 from mmengine import ConfigDict
@@ -14,6 +15,7 @@ try:
 except ImportError:
     from_csv = None
 
+from opencompass.partitioners.sub_naive import remove_duplicate_pairs
 from opencompass.utils import dataset_abbr_from_cfg
 
 
@@ -54,6 +56,9 @@ class Corev2Summarizer:
         self.tasks = []
         self.cfg = config
         self.match_method = match_method
+        self.base_models = self.cfg['eval']['partitioner']['base_models']
+        self.compare_models = self.cfg['eval']['partitioner']['compare_models']
+        self.judge_abbr = self.cfg['judge_model']['abbr']
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
@@ -76,25 +81,70 @@ class Corev2Summarizer:
         mmengine.mkdir_or_exist(output_dir)
         results_folder = osp.join(work_dir, 'results')
 
-        for subdir in os.listdir(results_folder):
+        model_combinations = list(
+            product(self.base_models, self.compare_models))
+        unique_combinations = remove_duplicate_pairs(
+            [combo for combo in model_combinations if combo[0] != combo[1]])
+
+        for model_pair in unique_combinations:
+            model1, model2, judge_model = model_pair[0]['abbr'], model_pair[1][
+                'abbr'], self.judge_abbr
+            subdir = model1 + '_' + model2 + '_judged-by--' + self.judge_abbr
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
-                model1, model2, judge_model = subdir.split('_')
-                fout = osp.join(output_dir, judge_model + '-report.csv')
+                fout = osp.join(output_dir,
+                                'judged-by--' + judge_model + '-report.csv')
                 for dataset in dataset_cfgs:
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
-                    filepath = os.path.join(subdir_path,
+                    filename = os.path.join(subdir_path,
                                             dataset_abbr + '.json')
-                    result = mmengine.load(filepath)
+                    partial_filename = os.path.join(subdir_path,
+                                                    dataset_abbr + '_0.json')
+                    if osp.exists(osp.realpath(filename)):
+                        result = mmengine.load(filename)
+                    elif osp.exists(osp.realpath(partial_filename)):
+                        filename = partial_filename
+                        result = {}
+                        i = 1
+                        partial_dict_flag = 0
+                        while osp.exists(osp.realpath(filename)):
+                            res = mmengine.load(filename)
+                            for k, v in res.items():
+                                result[partial_dict_flag] = v
+                                partial_dict_flag += 1
+                            filename = os.path.join(
+                                subdir_path,
+                                dataset_abbr + '_' + str(i) + '.json')
+                            i += 1
+                    else:
+                        result = {}
+
+                    if len(result) == 0:
+                        print('*' * 100)
+                        print('There are no results for ' + filename + ' or ' +
+                              partial_filename)
+                        print('*' * 100)
+                        assert len(result > 0)
+
                     judged_answers = []
                     references = []
                     for k, v in result.items():
                         judged_answers.append(
                             call_function(self.match_method, v['prediction']))
                         references.append(v['gold'])
+                    successful_judged_answers = len(
+                        judged_answers) - judged_answers.count(None)
                     print(
-                        f'Among {len(judged_answers)} judgements, successfully extracted {len(judged_answers)-judged_answers.count(None)} judgements.'
+                        f'Among {len(judged_answers)} judgements, successfully extracted {successful_judged_answers} judgements.'
                     )
+                    if successful_judged_answers == 0:
+                        print('*' * 100)
+                        print(
+                            'There are no extracted judgements, please change your judge model or check your prompt!!!'
+                        )
+                        print('*' * 100)
+                    assert successful_judged_answers > 0
+
                     win_both_model1, win_both_model2, half_draw_model1, half_draw_model2, categories = defaultdict(
                         float), defaultdict(float), defaultdict(
                             float), defaultdict(float), defaultdict(float)
@@ -168,6 +218,8 @@ class Corev2Summarizer:
                             writer.writerow(
                                 [row] +
                                 [scores[row][column] for column in columns])
+            else:
+                print(subdir_path + ' is not exist! please check!')
         with open(fout, 'r') as f:
             x = from_csv(f)
         print(x)
