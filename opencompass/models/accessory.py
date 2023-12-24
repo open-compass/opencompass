@@ -72,7 +72,6 @@ class LLaMA2AccessoryModel(BaseModel):
             prompts=inputs, max_gen_len=max_out_len,
             temperature=0., additional_stop_symbols=self.additional_stop_symbols
         )
-        results = [_.strip() for _ in results]
         return results
 
     def get_ppl(self,
