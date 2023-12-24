@@ -1,7 +1,5 @@
-import random
 from typing import Dict, List, Optional, Union, Iterable
 import numpy as np
-import torch.cuda
 import torch.distributed as dist
 
 from opencompass.models.base import BaseModel
