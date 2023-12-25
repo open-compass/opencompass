@@ -16,7 +16,7 @@ except ImportError:
     from_csv = None
 
 from opencompass.partitioners.sub_naive import remove_duplicate_pairs
-from opencompass.utils import dataset_abbr_from_cfg
+from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
 
 
 def match_general_answer(s):
@@ -58,7 +58,7 @@ class Corev2Summarizer:
         self.match_method = match_method
         self.base_models = self.cfg['eval']['partitioner']['base_models']
         self.compare_models = self.cfg['eval']['partitioner']['compare_models']
-        self.judge_abbr = self.cfg['judge_model']['abbr']
+        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):

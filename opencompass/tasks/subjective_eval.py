@@ -14,7 +14,7 @@ from opencompass.registry import ICL_EVALUATORS, MODELS, TEXT_POSTPROCESSORS
 from opencompass.tasks.base import BaseTask
 from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
                                get_infer_output_path, get_logger,
-                               task_abbr_from_cfg)
+                               model_abbr_from_cfg, task_abbr_from_cfg)
 
 
 class SubjectiveEvalTask(BaseTask):
@@ -65,14 +65,14 @@ class SubjectiveEvalTask(BaseTask):
             for dataset_cfg in dataset_cfgs:
                 # self.model_cfg = model_cfg
                 # self.dataset_cfg = dataset_cfg
-
                 # Load Dataset
                 eval_cfg = dataset_cfg.get('eval_cfg')
                 output_column = dataset_cfg['reader_cfg']['output_column']
                 if type(model_cfg) == ConfigDict:
                     model_cfg = (model_cfg, )
                 model_cfg += ({
-                    'abbr': 'judged-by--' + self.judge_cfg['abbr']
+                    'abbr':
+                    'judged-by--' + model_abbr_from_cfg(self.judge_cfg)
                 }, )
                 out_path = get_infer_output_path(
                     model_cfg, dataset_cfg, osp.join(self.work_dir, 'results'))
@@ -142,7 +142,10 @@ class SubjectiveEvalTask(BaseTask):
                 kwargs = pred_postprocessor or eval_cfg['pred_postprocessor']
                 proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
                 pred_strs = [proc(s, **kwargs) for s in pred_strs]
-        return {'model_name': model_cfg['abbr'], 'model_preds': pred_strs}
+        return {
+            'model_name': model_abbr_from_cfg(model_cfg),
+            'model_preds': pred_strs
+        }
 
     def _score(self, model_cfg, dataset_cfg, eval_cfg, output_column):
         test_set = build_dataset_from_cfg(dataset_cfg).test
@@ -241,7 +244,10 @@ class SubjectiveEvalTask(BaseTask):
             for dataset in datasets:
                 if type(model) == ConfigDict:
                     model = (model, )
-                model += ({'abbr': 'judged-by--' + self.judge_cfg['abbr']}, )
+                model += ({
+                    'abbr':
+                    'judged-by--' + model_abbr_from_cfg(self.judge_cfg)
+                }, )
                 output_paths.append(
                     get_infer_output_path(
                         model, dataset,
