@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union, Iterable
+from typing import Dict, Iterable, List, Optional, Union
 
 import numpy as np
 import torch.distributed as dist
@@ -12,8 +12,9 @@ PromptType = Union[PromptList, str]
 
 
 class LLaMA2AccessoryModel(BaseModel):
-    """LLaMA2-Accessory model wrapper
-    https://github.com/Alpha-VLLM/LLaMA2-Accessory.
+    """LLaMA2-Accessory model wrapper.
+
+    Project: https://github.com/Alpha-VLLM/LLaMA2-Accessory
 
     Args:
         tokenizer_only (bool): whether to load tokenizer only
@@ -25,13 +26,11 @@ class LLaMA2AccessoryModel(BaseModel):
             `accessory.MetaModel.from_pretrained` for model instantiation.
     """
 
-    def __init__(
-        self,
-        tokenizer_only: bool = False,
-        meta_template: Optional[Dict] = None,
-        additional_stop_symbols: Iterable[str] = (),
-        **from_pretrained_kwargs
-    ):
+    def __init__(self,
+                 tokenizer_only: bool = False,
+                 meta_template: Optional[Dict] = None,
+                 additional_stop_symbols: Iterable[str] = (),
+                 **from_pretrained_kwargs):
         if tokenizer_only:
             self._load_tokenizer(from_pretrained_kwargs)
         else:
@@ -56,22 +55,25 @@ class LLaMA2AccessoryModel(BaseModel):
         self.logger = get_logger()
 
     def _load_tokenizer(self, from_pretrained_kwargs):
-        from accessory.model.tokenizer import Tokenizer, probe_tokenizer_path_from_pretrained  # noqa
-        if "tokenizer_path" in from_pretrained_kwargs:
+        from accessory.model.tokenizer import (
+            Tokenizer, probe_tokenizer_path_from_pretrained)
+        if 'tokenizer_path' in from_pretrained_kwargs:
             tokenizer_path = from_pretrained_kwargs['tokenizer_path']
         else:
             pretrained_path = from_pretrained_kwargs['pretrained_path']
             if isinstance(pretrained_path, str):
                 pretrained_path = [pretrained_path]
-            tokenizer_path = probe_tokenizer_path_from_pretrained(pretrained_path[-1])  # noqa
+            tokenizer_path = probe_tokenizer_path_from_pretrained(
+                pretrained_path[-1])
 
         self.tokenizer = Tokenizer(tokenizer_path)
 
     def generate(self, inputs: List[str], max_out_len: int) -> List[str]:
         results = self.model.generate(
-            prompts=inputs, max_gen_len=max_out_len, temperature=0.,
-            additional_stop_symbols=self.additional_stop_symbols
-        )
+            prompts=inputs,
+            max_gen_len=max_out_len,
+            temperature=0.,
+            additional_stop_symbols=self.additional_stop_symbols)
         return results
 
     def get_ppl(self,
