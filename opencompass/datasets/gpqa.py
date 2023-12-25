@@ -5,7 +5,7 @@ import os
 from datasets import Dataset
 
 from opencompass.openicl import BaseEvaluator
-from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
@@ -58,15 +58,6 @@ class GPQADataset(BaseDataset):
         dataset = Dataset.from_list(data_new)
 
         return dataset
-
-
-@TEXT_POSTPROCESSORS.register_module()
-def gpqa_postprocess(text: str) -> str:
-    ans = text
-    ans_line = ans.split('answer is (')
-    if len(ans_line) != 1:
-        ans = ans_line[1][0]
-    return ans
 
 
 class GPQAEvaluator(BaseEvaluator):

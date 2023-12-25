@@ -1,7 +1,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import GPQADataset, gpqa_postprocess, GPQAEvaluator
+from opencompass.datasets import GPQADataset, GPQAEvaluator
+from opencompass.utils import first_option_postprocess
 
 gpqa_reader_cfg = dict(
     input_columns=['question', 'A', 'B', 'C', 'D'],
@@ -17,13 +18,13 @@ gpqa_infer_cfg = dict(
                                           '(B) {B}\n'
                                           '(C) {C}\n'
                                           '(D) {D}\n'
-                                          'Format your response as follows: "The correct answer is ( )".'),
+                                          'Format your response as follows: "The correct answer is ({option})".'),
             ], )),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
 gpqa_eval_cfg = dict(evaluator=dict(type=GPQAEvaluator),
-                     pred_postprocessor=dict(type=gpqa_postprocess))
+                     pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'))
 
 gpqa_datasets = []
 gpqs_subsets = {
@@ -35,7 +36,7 @@ gpqs_subsets = {
 for split in list(gpqs_subsets.keys()):
     gpqa_datasets.append(
         dict(
-            abbr='GPQA_'+ split,
+            abbr='GPQA_' + split,
             type=GPQADataset,
             path='./data/gpqa/',
             name=gpqs_subsets[split],
