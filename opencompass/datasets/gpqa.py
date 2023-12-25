@@ -66,7 +66,7 @@ def gpqa_postprocess(text: str) -> str:
     ans_line = ans.split('answer is (')
     if len(ans_line) != 1:
         ans = ans_line[1][0]
-        return ans
+    return ans
 
 
 class GPQAEvaluator(BaseEvaluator):
