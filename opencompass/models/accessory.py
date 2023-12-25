@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional, Union, Iterable
+
 import numpy as np
 import torch.distributed as dist
 
@@ -7,20 +8,21 @@ from opencompass.models.base_api import APITemplateParser
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
 
-
 PromptType = Union[PromptList, str]
 
 
 class LLaMA2AccessoryModel(BaseModel):
-    """LLaMA2-Accessory model wrapper https://github.com/Alpha-VLLM/LLaMA2-Accessory.
+    """LLaMA2-Accessory model wrapper
+    https://github.com/Alpha-VLLM/LLaMA2-Accessory.
 
     Args:
         tokenizer_only (bool): whether to load tokenizer only
         meta_template (dict): meta template for the model
-        additional_stop_symbols: (Iterable[str]): additional symbols that mark the end of generation,
-            e.g. the "###" symbol for separating turns in the chat template.
-        from_pretrained_kwargs: kwargs that will be passed to the `accessory.MetaModel.from_pretrained`
-            method for model instantiation.
+        additional_stop_symbols: (Iterable[str]): additional symbols that mark
+            the end of generation, e.g. the "###" symbol for separating turns
+            in the chat template.
+        from_pretrained_kwargs: kwargs that will be passed to
+            `accessory.MetaModel.from_pretrained` for model instantiation.
     """
 
     def __init__(
@@ -29,7 +31,7 @@ class LLaMA2AccessoryModel(BaseModel):
         meta_template: Optional[Dict] = None,
         additional_stop_symbols: Iterable[str] = (),
         **from_pretrained_kwargs
-    ):  # noqa
+    ):
         if tokenizer_only:
             self._load_tokenizer(from_pretrained_kwargs)
         else:
@@ -54,21 +56,21 @@ class LLaMA2AccessoryModel(BaseModel):
         self.logger = get_logger()
 
     def _load_tokenizer(self, from_pretrained_kwargs):
-        from accessory.model.tokenizer import Tokenizer, probe_tokenizer_path_from_pretrained
+        from accessory.model.tokenizer import Tokenizer, probe_tokenizer_path_from_pretrained  # noqa
         if "tokenizer_path" in from_pretrained_kwargs:
             tokenizer_path = from_pretrained_kwargs['tokenizer_path']
         else:
             pretrained_path = from_pretrained_kwargs['pretrained_path']
             if isinstance(pretrained_path, str):
                 pretrained_path = [pretrained_path]
-            tokenizer_path = probe_tokenizer_path_from_pretrained(pretrained_path[-1])
+            tokenizer_path = probe_tokenizer_path_from_pretrained(pretrained_path[-1])  # noqa
 
         self.tokenizer = Tokenizer(tokenizer_path)
 
     def generate(self, inputs: List[str], max_out_len: int) -> List[str]:
         results = self.model.generate(
-            prompts=inputs, max_gen_len=max_out_len,
-            temperature=0., additional_stop_symbols=self.additional_stop_symbols
+            prompts=inputs, max_gen_len=max_out_len, temperature=0.,
+            additional_stop_symbols=self.additional_stop_symbols
         )
         return results
 

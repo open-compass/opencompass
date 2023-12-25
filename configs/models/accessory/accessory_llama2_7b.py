@@ -9,12 +9,15 @@ models = [
         abbr="Accessory_llama2_7b",
         type=LLaMA2AccessoryModel,
 
-        # additional_stop_symbols=["###"],  # for models tuned with chat template
+        # additional_stop_symbols=["###"],  # for models tuned with chat template  # noqa
         additional_stop_symbols=[],
 
         # <begin> kwargs for accessory.MetaModel.from_pretrained
-        # download https://huggingface.co/meta-llama/Llama-2-7b/tree/main to `path/to/Llama-2-7b/`
-        # `path/to/Llama-2-7b/` should contain `consolidated.00.pth`, `params.json`, and `tokenizer.model`
+        # download https://huggingface.co/meta-llama/Llama-2-7b/tree/main to
+        # 'path/to/Llama-2-7b/', which should contain:
+        #   - consolidated.00.pth
+        #   - params.json
+        #   - tokenizer.model
         pretrained_path="path/to/Llama-2-7b/",
         llama_type="llama",
         llama_config="path/to/Llama-2-7b/params.json",
@@ -25,6 +28,7 @@ models = [
         # <end>
 
         batch_size=2,
-        run_cfg=dict(num_gpus=1, num_procs=1),  # LLaMA2-Accessory needs num_gpus==num_procs
+        # LLaMA2-Accessory needs num_gpus==num_procs
+        run_cfg=dict(num_gpus=1, num_procs=1),
     ),
 ]
