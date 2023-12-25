@@ -6,8 +6,7 @@ which is available on huggingface-hub:
 https://huggingface.co/GAIR/autoj-13b-GPTQ-4bits
 '''
 
-models = [
-    dict(
+models = dict(
         type=HuggingFaceCausalLM,
         abbr='autoj-13b',
         path="GAIR/autoj-13b",
@@ -22,4 +21,3 @@ models = [
         model_kwargs=dict(device_map='auto', trust_remote_code=True),
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
-]

@@ -1,8 +1,7 @@
 from opencompass.models import HuggingFaceCausalLM
 
 
-models = [
-    dict(
+models = dict(
         type=HuggingFaceCausalLM,
         abbr='autoj-scenario-classifier',
         path="GAIR/autoj-scenario-classifier",
@@ -17,4 +16,3 @@ models = [
         model_kwargs=dict(device_map='auto', trust_remote_code=True),
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
-]
