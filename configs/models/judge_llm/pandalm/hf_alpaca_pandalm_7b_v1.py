@@ -1,7 +1,7 @@
 from opencompass.models import HuggingFaceCausalLM
 
 
-models = dict(
+models = [dict(
         type=HuggingFaceCausalLM,
         abbr='alpaca-pandalm-7b-v1-hf',
         path="WeOpenML/PandaLM-Alpaca-7B-v1",
@@ -15,4 +15,4 @@ models = dict(
         batch_size=8,
         model_kwargs=dict(device_map='auto', trust_remote_code=True),
         run_cfg=dict(num_gpus=1, num_procs=1),
-    )
+    )]
