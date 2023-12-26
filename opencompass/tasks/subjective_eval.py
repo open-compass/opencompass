@@ -35,6 +35,16 @@ class SubjectiveEvalTask(BaseTask):
         super().__init__(cfg)
         self.logger = get_logger()
         judge_cfg = cfg.eval.runner.task.get('judge_cfg', {})
+        if judge_cfg != ConfigDict:
+            print('*' * 100)
+            print('Due to different Judge model needs different summarizer and'
+                  " prompts, we don't support multi judge model evaluation at "
+                  'one time, please do not use list to set your judge cfg, jus'
+                  't use a dict or list[0] should be fine. If you want to eval'
+                  'uation multi judge model in one script, we suggest you to u'
+                  'se a bash or bat script to start multi configs evaluation!')
+            print('*' * 100)
+        assert type(judge_cfg) == ConfigDict
         run_cfg = judge_cfg.get('run_cfg', {})
         self.num_gpus = run_cfg.get('num_gpus', 0)
         self.num_procs = run_cfg.get('num_procs', 1)
