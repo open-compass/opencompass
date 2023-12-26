@@ -96,7 +96,7 @@ for _name in mmlu_all_sets:
                     dict(
                         role="HUMAN",
                         prompt=
-                        f"{_hint}\nQ: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nA: "
+                        f"{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: "
                     ),
                 ],
             ),
