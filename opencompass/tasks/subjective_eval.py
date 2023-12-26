@@ -35,7 +35,7 @@ class SubjectiveEvalTask(BaseTask):
         super().__init__(cfg)
         self.logger = get_logger()
         judge_cfg = cfg.eval.runner.task.get('judge_cfg', {})
-        if judge_cfg != ConfigDict:
+        if type(judge_cfg) != ConfigDict:
             print('*' * 100)
             print('Due to different Judge model needs different summarizer and'
                   " prompts, we don't support multi judge model evaluation at "
