@@ -76,11 +76,12 @@ class Creationv01Summarizer:
         output_dir = osp.join(osp.split(output_path)[0], f'{self.time_str}')
         mmengine.mkdir_or_exist(output_dir)
         results_folder = osp.join(work_dir, 'results')
-        fout = osp.join(output_dir, 'report.csv')
+
         for subdir in os.listdir(results_folder):
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
-                model = subdir
+                model, judge_model = subdir.split('_')
+                fout = osp.join(output_dir, judge_model + '-report.csv')
                 for dataset in dataset_cfgs:
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
                     filepath = os.path.join(subdir_path,

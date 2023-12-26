@@ -1,5 +1,6 @@
+from copy import deepcopy
 
-mathbench_summary_groups = [
+naive_mathbench_summary_groups = [
     {
         'name': 'mathbench-college',
         'subsets': [
@@ -73,3 +74,15 @@ mathbench_summary_groups = [
         ],
     }
 ]
+
+agent_mathbench_summary_groups = []
+for item in naive_mathbench_summary_groups:
+    item = deepcopy(item)
+    item['name'] = item['name'] + '-agent'
+    if isinstance(item['subsets'][0], str):
+        item['subsets'] = [i + '-agent' for i in item['subsets']]
+    else:
+        item['subsets'] = [[i[0] + '-agent', i[1]] for i in item['subsets']]
+    agent_mathbench_summary_groups.append(item)
+
+mathbench_summary_groups = naive_mathbench_summary_groups + agent_mathbench_summary_groups

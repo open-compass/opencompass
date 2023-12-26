@@ -9,8 +9,8 @@ from lagent import ReAct
 from lagent.agents.react import ReActProtocol
 
 with read_base():
-    from .datasets.gsm8k.gsm8k_agent_gen_3ac57d import gsm8k_datasets
-    from .datasets.math.math_agent_gen_861b4f import math_datasets
+    from .datasets.gsm8k.gsm8k_agent_gen_be1606 import gsm8k_datasets
+    from .datasets.math.math_agent_gen_af2293 import math_datasets
     from .datasets.MathBench.mathbench_agent_gen_568903 import mathbench_agent_datasets
     from .summarizers.math_agent import summarizer
 

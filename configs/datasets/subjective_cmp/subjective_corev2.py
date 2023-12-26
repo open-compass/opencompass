@@ -30,7 +30,7 @@ for _name in subjective_all_sets:
                 ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer),
+            inferencer=dict(type=GenInferencer, max_out_len=1024),
         )
 
     subjective_eval_cfg = dict(

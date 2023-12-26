@@ -16,10 +16,21 @@ def extract_predictions_from_json(input_folder):
 
     for model_name in os.listdir(pred_folder):
         model_folder = os.path.join(pred_folder, model_name)
-        json_paths = glob(os.path.join(model_folder, 'alignment_bench_*.json'))
-        # sorted by index
-        json_paths = sorted(
-            json_paths, key=lambda x: int(x.split('.json')[0].split('_')[-1]))
+        try:
+            # when use split
+            json_paths = glob(
+                os.path.join(model_folder, 'alignment_bench_*.json'))
+            # sorted by index
+            json_paths = sorted(
+                json_paths,
+                key=lambda x: int(x.split('.json')[0].split('_')[-1]))
+        except Exception as e:
+            # when only one complete file
+            print(e)
+            json_paths = [os.path.join(model_folder, 'alignment_bench.json')]
+        else:
+            raise FileNotFoundError
+
         all_predictions = []
         for json_ in json_paths:
             json_data = json.load(open(json_))
@@ -29,7 +40,7 @@ def extract_predictions_from_json(input_folder):
 
         # for prediction
         output_path = os.path.join(sub_folder, model_name + '_submission.csv')
-        with open(output_path, 'w', encoding='utf-8') as file:
+        with open(output_path, 'w', encoding='utf-8-sig') as file:
             writer = csv.writer(file)
             for ans in tqdm(all_predictions):
                 writer.writerow([str(ans)])

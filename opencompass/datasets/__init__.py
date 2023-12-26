@@ -27,6 +27,7 @@ from .copa import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
 from .crowspairs_cn import *  # noqa: F401, F403
 from .csl import *  # noqa: F401, F403
+from .custom import *  # noqa: F401, F403
 from .cvalues import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
@@ -69,6 +70,7 @@ from .qasper import *  # noqa: F401, F403
 from .qaspercut import *  # noqa: F401, F403
 from .race import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
+from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
 from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
