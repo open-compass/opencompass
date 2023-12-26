@@ -10,7 +10,7 @@ with read_base():
     from .models.judge_llm.auto_j.hf_autoj_eng_13b import models as hf_autoj
     from .models.judge_llm.judgelm.hf_judgelm_33b_v1 import models as hf_judgelm
     from .models.judge_llm.pandalm.hf_pandalm_7b_v1 import models as hf_pandalm
-    from .datasets.subjective_alignbench.critiquellm import subjective_datasets
+    from .datasets.subjective_alignbench.alignbench_judgeby_critiquellm import subjective_datasets
 
 datasets = [*subjective_datasets]
 
