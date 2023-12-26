@@ -12,7 +12,7 @@ from .post_process import parse_math_answer, parse_qa_multiple_answer
 
 import evaluate
 from nltk.translate.bleu_score import sentence_bleu
-from bert_score import score
+# from bert_score import score
 import re
 from transformers import BasicTokenizer
 from rouge_chinese import Rouge
@@ -141,7 +141,7 @@ def process_generated_results_CMeIE(pred_file):
     structured_output = []
     for line in pred_file:
         gen_output = line
-    
+
         # 答案格式：
         #   每个关系类型占一行，格式为
         #         "具有{lab}关系的头尾实体对如下：头实体为str，尾实体为str；头实体为str，尾实体为str；"
@@ -163,7 +163,7 @@ def process_generated_results_CMeIE(pred_file):
                 head_mention_str, tail_mention_str = spo_str.split("，尾实体为")[:2]
                 head_mention_str = head_mention_str.replace("头实体为", "").strip()
                 tail_mention_str = tail_mention_str.replace("尾实体为", "").strip()
-                
+
                 list_spos.append(
                     {
                         "predicate": predicate,
@@ -179,7 +179,7 @@ def process_generated_results_CDN(pred_file):
     answer_choices = json.load(open('./data/MedBench/CHIP_CDN/CHIP-CDN_entity.json', 'r'))
     for line in pred_file:
         gen_output = line
-        
+
             # 答案格式：
             #   多个选中的标准化实体，用 ， 符号分割
 
@@ -252,7 +252,7 @@ def process_generated_results_CTC(pred_file, task_dataset):
 def process_generated_results_doc_parsing(pred_file):
     output = []
     for line in pred_file:
-        structred_output = {'体温':'', '脉搏':'', '心率':'', '收缩压':'', '舒张压':'', '呼吸':'', '上腹部深压痛':'', '腹部反跳痛':'', '上腹部肿块':''}
+        structured_output = {'体温':'', '脉搏':'', '心率':'', '收缩压':'', '舒张压':'', '呼吸':'', '上腹部深压痛':'', '腹部反跳痛':'', '上腹部肿块':''}
         sentence_list = line.strip().split('，|。|\n')
         for sentence in sentence_list:
             if '体温' in sentence:
@@ -487,7 +487,7 @@ def calc_scores_f1(dict_gt, dict_pred):
         details = []
         for gt, pred in zip(dict_gt, dict_pred):
             details.append({'pred':pred, 'answer':gt, 'correct':None})
-        
+
         precision, recall, f1 = calc_info_extract_task_scores(dict_gt, dict_pred)
         return {'F1':f1, 'details':details}
 
@@ -498,7 +498,7 @@ def calc_scores_ctc(dict_gt, dict_pred):
 
     gts = dict_gt
     preds = dict_pred
-    
+
     precision, recall, f1 = calc_cls_task_scores(
         gts,
         preds,
@@ -520,9 +520,9 @@ def calc_scores_ctc(dict_gt, dict_pred):
         return_macro=True,
     )
     return {'Macro-F1':f1, 'details':details}
-    
+
 def calc_scores_nlg(dict_gt, dict_pred):
-    
+
         # scores = {}
         scores = {'score':0, 'details':[]}
         success_flag = 1
@@ -532,7 +532,7 @@ def calc_scores_nlg(dict_gt, dict_pred):
         # if not len(gts) == len(preds):
         #     success_flag = 0
         # try:
-        return calc_nlg_task_scores(gts, preds)    
+        return calc_nlg_task_scores(gts, preds)
 
 @ICL_EVALUATORS.register_module()
 class MedBenchEvaluator_CMeEE(BaseEvaluator):
@@ -609,7 +609,7 @@ class MedBenchEvaluator_Cloze(BaseEvaluator):
 
         for pred, ref in zip(predictions, references):
             detail = {'pred':pred, 'answer':ref, 'correct':False}
-            
+
             if sum([item in pred for item in ref]) == len(ref):
                 cnt += 1
                 detail['correct'] = True
@@ -628,7 +628,7 @@ class MedBenchEvaluator_TF(BaseEvaluator):
         cnt = 0
 
         for pred, ref in zip(predictions, references):
-            
+
             if '不' in pred or '否' in pred:
                 cur_pred = '不可以'
             else:
@@ -639,7 +639,7 @@ class MedBenchEvaluator_TF(BaseEvaluator):
             if cur_pred == ref:
                 cnt += 1
                 detail['correct'] = True
-            
+
             details.append(detail)
 
         score = cnt / len(predictions) * 100
