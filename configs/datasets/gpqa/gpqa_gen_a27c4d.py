@@ -14,11 +14,11 @@ gpqa_infer_cfg = dict(
         template=dict(
             round=[
                 dict(role='HUMAN', prompt='{question}\nChoices:\n'
-                                          '(A) {A}\n'
-                                          '(B) {B}\n'
-                                          '(C) {C}\n'
-                                          '(D) {D}\n'
-                                          'Format your response as follows: "The correct answer is ({option})".'),
+                                          '(A){A}\n'
+                                          '(B){B}\n'
+                                          '(C){C}\n'
+                                          '(D){D}\n'
+                                          'Format your response as follows: "The correct answer is (insert answer here)"'),
             ], )),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
