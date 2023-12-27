@@ -44,7 +44,7 @@ mbpp_infer_cfg = dict(
                 dict(
                     role="HUMAN",
                     prompt=
-                    "你是一名专业的python程序员，以下是你的任务: {text} 你的代码应该通过这些测试:\n\n {test_list}  \n"
+                    "你是一名专业的 Python 程序员，你的任务是: {text} 你的代码应该通过这些测试:\n\n {test_list}  \n"
                 ),
                 dict(role="BOT", prompt="[BEGIN]\n"),
             ], )),
