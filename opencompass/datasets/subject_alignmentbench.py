@@ -90,16 +90,16 @@ class AlignmentBenchDataset(SubjectiveCmpDataset):
              alignment_bench_config_path: Optional[str] = '',
              alignment_bench_config_name: Optional[str] = ''):
         if alignment_bench_config_path != '':
-            alignmentbenchconfig = Config(alignment_bench_config_path,
-                                          alignment_bench_config_name)
+            alignmentbench_config = Config(alignment_bench_config_path,
+                                           alignment_bench_config_name)
         else:
-            alignmentbenchconfig = None
+            alignmentbench_config = None
         dataset = list(super().load(path, name))
         corev2_dataset = []
         for data in dataset:
-            if alignmentbenchconfig:
+            if alignmentbench_config:
                 dimensions, prefix = prompt_construct(data,
-                                                      alignmentbenchconfig)
+                                                      alignmentbench_config)
                 data['critiquellm_prefix'] = prefix
             data['judge']['others'] = data['others']
             data['ref'] = data['others']['reference']
@@ -118,5 +118,5 @@ if __name__ == '__main__':
             'question_id': 1
         }
     }
-    prefix = prompt_construct(data, alignmentbenchconfig)
+    prefix = prompt_construct(data, alignmentbench_config)
     print(prefix)

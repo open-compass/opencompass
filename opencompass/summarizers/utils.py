@@ -7,6 +7,12 @@ from opencompass.utils import dataset_abbr_from_cfg
 
 
 def get_outdir(cfg, time_str):
+    """Get out put path.
+
+    Args:
+        cfg (ConfigDict): The running config.
+        time_str (str): Current time.
+    """
     work_dir = cfg['work_dir']
     output_path = osp.join(work_dir, 'summary', f'summary_{time_str}.txt')
     output_dir = osp.join(osp.split(output_path)[0], f'{time_str}')
@@ -16,6 +22,13 @@ def get_outdir(cfg, time_str):
 
 
 def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
+    """Extract judgements (scores) and references.
+
+    Args:
+        dataset (ConfigDict): Dataset config.
+        subdir_path (str): Model path in results dir.
+        post_process (function): The pre-defined extract function.
+    """
     dataset_abbr = dataset_abbr_from_cfg(dataset)
     filename = osp.join(subdir_path, dataset_abbr + '.json')
     partial_filename = osp.join(subdir_path, dataset_abbr + '_0.json')

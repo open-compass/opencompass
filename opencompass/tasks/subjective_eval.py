@@ -73,8 +73,6 @@ class SubjectiveEvalTask(BaseTask):
         # model_cfg can be a list of model configs
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
             for dataset_cfg in dataset_cfgs:
-                # self.model_cfg = model_cfg
-                # self.dataset_cfg = dataset_cfg
                 # Load Dataset
                 eval_cfg = dataset_cfg.get('eval_cfg')
                 output_column = dataset_cfg['reader_cfg']['output_column']

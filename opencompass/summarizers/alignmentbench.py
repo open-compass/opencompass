@@ -30,6 +30,11 @@ all_dimensions = [
 
 
 def post_process(judgement: str):
+    """Input a string like below:
+
+    xxx{'事实正确性': 1, '满足用户需求': 1, '清晰度': 2, '完备性': 1, '综合得分': 1}xxx,
+    and extract each score
+    """
 
     def extract_rating(text):
         pattern = r'{(.*?)}(?![^{]*{)'  # match last brackets
@@ -83,6 +88,10 @@ def post_process(judgement: str):
 
 
 def post_process_autoj(judgement: str):
+    """Input a string like below:
+
+    xxx[[5]]xxx, and extract the score
+    """
     pattern = r'\[(\d+)\]'
     matched_result = re.findall(pattern, judgement)
     if matched_result:
@@ -93,6 +102,10 @@ def post_process_autoj(judgement: str):
 
 
 def post_process_judgelm(judgement: str):
+    """Input a string like below:
+
+    5, reason:xxx and extract the score
+    """
     if len(judgement) >= 2:
         first_two_chars = judgement[:2]
         if first_two_chars.isdigit() and first_two_chars == '10':
