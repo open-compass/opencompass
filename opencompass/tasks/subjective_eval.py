@@ -98,41 +98,41 @@ class SubjectiveEvalTask(BaseTask):
             ]
 
         pred_strs = None
-        
-        #There will be 5 situations, so we need to deal with them
-        #1.There are no partitions in infer and judge stage
-        #2.No partition in infer stage, but use partition in judge stage
-        #3.Use partition in infer stage, but not use partition in judge stage
-        #4.Use partition in both infer and judge stage, with same partition size
-        #5.Use both partition, but different partition size
 
-        #If take SubjectSizePartition, get new filename without _0
+        # There will be 5 situations, so we need to deal with them
+        # 1.There are no partitions in infer and judge stage
+        # 2.No partition in infer stage, but use partition in judge stage
+        # 3.Use partition in infer stage, but not use partition in judge stage
+        # 4.Use both partition, with same partition size
+        # 5.Use both partition, but different partition size
+
+        # If take SubjectSizePartition, get new filename without _0
         if 'test_range' in dataset_cfg['reader_cfg']:
             filename = get_infer_output_path(
                 model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
             root, ext = osp.splitext(filename)
             filename = root[:-2] + ext
-        #If take SubjectNaivePartition, get filename
+        # If take SubjectNaivePartition, get filename
         else:
             filename = get_infer_output_path(
                 model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
 
-        #Get partition name
+        # Get partition name
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
 
-        #If no predictions get in predictions dir
+        # If no predictions get in predictions dir
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
             return {'error': 'No predictions found.'}
         else:
-            #If use Naive partition in infer stage
+            # If use Naive partition in infer stage
             if osp.exists(osp.realpath(filename)):
                 preds = mmengine.load(filename)
                 pred_strs = [
                     preds[str(i)]['prediction'] for i in range(len(preds))
                 ]
-            #If use Size partition in infer stage
+            # If use Size partition in infer stage
             else:
                 filename = partial_filename
                 pred_strs = []
@@ -144,13 +144,13 @@ class SubjectiveEvalTask(BaseTask):
                     pred_strs += [
                         preds[str(i)]['prediction'] for i in range(len(preds))
                     ]
-        #Get all predictions in pred_strs
+        # Get all predictions in pred_strs
 
-        #If take SubjectSizePartition, get new pred_strs based on test_range
+        # If take SubjectSizePartition, get new pred_strs based on test_range
         if 'test_range' in dataset_cfg['reader_cfg']:
             test_range = dataset_cfg['reader_cfg']['test_range']
             pred_strs = eval('pred_strs' + test_range)
-        #If take SubjectNaivePartition, get all pred_strs
+        # If take SubjectNaivePartition, get all pred_strs
         else:
             pred_strs = pred_strs
 
