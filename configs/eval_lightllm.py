@@ -14,11 +14,12 @@ models = [
         abbr='LightllmAPI',
         type=LightllmAPI,
         url='http://localhost:8080/generate',
-        max_out_len=1024,
-        batch_size=8,
+        max_seq_len=2048,
+        batch_size=32,
         generation_kwargs=dict(
             do_sample=False,
             ignore_eos=False,
+            max_new_tokens=1024
         ),
     ),
 ]
@@ -27,7 +28,7 @@ infer = dict(
     partitioner=dict(type=NaivePartitioner),
     runner=dict(
         type=LocalRunner,
-        max_num_workers=8,
+        max_num_workers=32,
         task=dict(type=OpenICLInferTask),
     ),
 )
