@@ -27,19 +27,19 @@ gpqa_eval_cfg = dict(evaluator=dict(type=GPQAEvaluator),
                      pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'))
 
 gpqa_datasets = []
-gpqs_subsets = {
+gpqa_subsets = {
     'extended': 'gpqa_extended.csv',
     'main': 'gpqa_main.csv',
     'diamond': 'gpqa_diamond.csv'
 }
 
-for split in list(gpqs_subsets.keys()):
+for split in list(gpqa_subsets.keys()):
     gpqa_datasets.append(
         dict(
             abbr='GPQA_' + split,
             type=GPQADataset,
             path='./data/gpqa/',
-            name=gpqs_subsets[split],
+            name=gpqa_subsets[split],
             reader_cfg=gpqa_reader_cfg,
             infer_cfg=gpqa_infer_cfg,
             eval_cfg=gpqa_eval_cfg)
