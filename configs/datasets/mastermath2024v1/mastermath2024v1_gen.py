@@ -13,12 +13,12 @@ mastermath2024v1_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt='{question}\nChoices:\n'
+                dict(role='HUMAN', prompt='{question}\n选项:\n'
                                           '(A){A}\n'
                                           '(B){B}\n'
                                           '(C){C}\n'
                                           '(D){D}\n'
-                                          'Format your response as follows: "The correct answer is (insert answer here)"'),
+                                          '你的回答格式如下: "正确答案是 (在这里插入你的答案)"'),
             ], )),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
