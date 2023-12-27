@@ -4,6 +4,7 @@ outputs/
 icl_inference_output/
 .vscode/
 tmp/
+configs/eval_subjective_alignbench_test.py
 configs/openai_key.py
 configs/secrets.py
 configs/datasets/log.json
