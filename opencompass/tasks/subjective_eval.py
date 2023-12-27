@@ -98,15 +98,13 @@ class SubjectiveEvalTask(BaseTask):
             ]
 
         pred_strs = None
-
-        """
-        There will be 5 situations, so we need to deal with them
-        1.There are no partitions in infer and judge stage
-        2.No partition in infer stage, but use partition in judge stage
-        3.Use partition in infer stage, but not use partition in judge stage
-        4.Use partition in both infer and judge stage, with same partition size
-        4.Use partition in both infer and judge stage, but different partition size
-        """
+        
+        #There will be 5 situations, so we need to deal with them
+        #1.There are no partitions in infer and judge stage
+        #2.No partition in infer stage, but use partition in judge stage
+        #3.Use partition in infer stage, but not use partition in judge stage
+        #4.Use partition in both infer and judge stage, with same partition size
+        #5.Use both partition, but different partition size
 
         #If take SubjectSizePartition, get new filename without _0
         if 'test_range' in dataset_cfg['reader_cfg']:
@@ -145,7 +143,7 @@ class SubjectiveEvalTask(BaseTask):
                     i += 1
                     pred_strs += [
                         preds[str(i)]['prediction'] for i in range(len(preds))
-                    ]      
+                    ]
         #Get all predictions in pred_strs
 
         #If take SubjectSizePartition, get new pred_strs based on test_range
