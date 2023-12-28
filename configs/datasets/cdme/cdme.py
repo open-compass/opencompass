@@ -23,6 +23,7 @@ def generate_depth_percents(intervals, interval_type):
     else:
         raise ValueError('Unsupported interval type')
 
+
 cdme_reader_cfg = dict(input_columns=['prompt'], output_column='answer')
 
 cdme_infer_cfg = dict(

@@ -50,7 +50,7 @@ class CDMEDatasetProcessor:
         with open(file, 'r', encoding='utf-8') as f:
             lines = [json.loads(line.strip()) for line in f]
 
-        # 定义输出文件
+        # set output file
         output_file = Path(self.output_path) / f'{file.stem}_processed.jsonl'
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
@@ -91,7 +91,7 @@ class CDMEDatasetProcessor:
                             counter += 1
                             if counter >= self.num_records_per_file:
                                 break
-                            # 重置accumulated_tokens以开始下一条记录
+                            # reset accumulated_tokens for next record
                             accumulated_tokens = []
 
     def _generate_context(self, tokens_context, depth_percent, needle):
