@@ -97,23 +97,42 @@ class SubjectiveEvalTask(BaseTask):
                 for m in model_cfg
             ]
 
-        # Load predictions
-        filename = get_infer_output_path(
-            model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
-        # in case the prediction is partial
-        root, ext = osp.splitext(filename)
-        partial_filename = root + '_0' + ext
         pred_strs = None
 
+        # There will be 5 situations, so we need to deal with them
+        # 1.There are no partitions in infer and judge stage
+        # 2.No partition in infer stage, but use partition in judge stage
+        # 3.Use partition in infer stage, but not use partition in judge stage
+        # 4.Use both partition, with same partition size
+        # 5.Use both partition, but different partition size
+
+        # If take SubjectSizePartition, get new filename without _0
+        if 'test_range' in dataset_cfg['reader_cfg']:
+            filename = get_infer_output_path(
+                model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
+            root, ext = osp.splitext(filename)
+            filename = root[:-2] + ext
+        # If take SubjectNaivePartition, get filename
+        else:
+            filename = get_infer_output_path(
+                model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
+
+        # Get partition name
+        root, ext = osp.splitext(filename)
+        partial_filename = root + '_0' + ext
+
+        # If no predictions get in predictions dir
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
             return {'error': 'No predictions found.'}
         else:
+            # If use Naive partition in infer stage
             if osp.exists(osp.realpath(filename)):
                 preds = mmengine.load(filename)
                 pred_strs = [
                     preds[str(i)]['prediction'] for i in range(len(preds))
                 ]
+            # If use Size partition in infer stage
             else:
                 filename = partial_filename
                 pred_strs = []
@@ -125,31 +144,41 @@ class SubjectiveEvalTask(BaseTask):
                     pred_strs += [
                         preds[str(i)]['prediction'] for i in range(len(preds))
                     ]
+        # Get all predictions in pred_strs
 
-            if ('pred_role' in eval_cfg and 'meta_template' in model_cfg
-                    and not MODELS.get(model_cfg['type']).is_api):
-                # Create a prompt template for role config parsing
-                from opencompass.models.base import LMTemplateParser
-                parser = LMTemplateParser(model_cfg['meta_template'])
-                role = parser.roles[eval_cfg['pred_role']]
-                pred_strs = [
-                    self._extract_role_pred(pred, role.get('begin', None),
-                                            role.get('end', None))
-                    for pred in pred_strs
-                ]
+        # If take SubjectSizePartition, get new pred_strs based on test_range
+        if 'test_range' in dataset_cfg['reader_cfg']:
+            test_range = dataset_cfg['reader_cfg']['test_range']
+            pred_strs = eval('pred_strs' + test_range)
+        # If take SubjectNaivePartition, get all pred_strs
+        else:
+            pred_strs = pred_strs
 
-            # Postprocess predictions if necessary
-            ds_abbr = dataset_abbr_from_cfg(dataset_cfg)
-            model_postprocessors = model_cfg.get('pred_postprocessor', {})
-            pred_postprocessor = None
-            for pattern in model_postprocessors.keys():
-                if fnmatch.fnmatch(ds_abbr, pattern):
-                    pred_postprocessor = model_postprocessors[pattern]
-                    break
-            if 'pred_postprocessor' in eval_cfg or pred_postprocessor:
-                kwargs = pred_postprocessor or eval_cfg['pred_postprocessor']
-                proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
-                pred_strs = [proc(s, **kwargs) for s in pred_strs]
+        if ('pred_role' in eval_cfg and 'meta_template' in model_cfg
+                and not MODELS.get(model_cfg['type']).is_api):
+            # Create a prompt template for role config parsing
+            from opencompass.models.base import LMTemplateParser
+            parser = LMTemplateParser(model_cfg['meta_template'])
+            role = parser.roles[eval_cfg['pred_role']]
+            pred_strs = [
+                self._extract_role_pred(pred, role.get('begin', None),
+                                        role.get('end', None))
+                for pred in pred_strs
+            ]
+
+        # Postprocess predictions if necessary
+        ds_abbr = dataset_abbr_from_cfg(dataset_cfg)
+        model_postprocessors = model_cfg.get('pred_postprocessor', {})
+        pred_postprocessor = None
+        for pattern in model_postprocessors.keys():
+            if fnmatch.fnmatch(ds_abbr, pattern):
+                pred_postprocessor = model_postprocessors[pattern]
+                break
+        if 'pred_postprocessor' in eval_cfg or pred_postprocessor:
+            kwargs = pred_postprocessor or eval_cfg['pred_postprocessor']
+            proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+            pred_strs = [proc(s, **kwargs) for s in pred_strs]
+
         return {
             'model_name': model_abbr_from_cfg(model_cfg),
             'model_preds': pred_strs
