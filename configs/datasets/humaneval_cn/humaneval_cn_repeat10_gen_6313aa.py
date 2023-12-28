@@ -27,7 +27,7 @@ humaneval_eval_cfg = dict(
 
 humaneval_cn_datasets = [
     dict(
-        abbr='openai_humaneval_cn_pass10',
+        abbr='openai_humaneval_cn_repeat10',
         type=HumanevalDataset,
         path='./data/humaneval_cn/human-eval-cn-v2-20210705.jsonl',
         num_repeats=10,

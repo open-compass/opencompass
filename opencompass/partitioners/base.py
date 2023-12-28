@@ -84,7 +84,7 @@ class BasePartitioner:
 
         self.logger.info(f'Partitioned into {len(tasks)} tasks.')
         for i, task in enumerate(tasks):
-            self.logger.debug(f'Task {i}: {task_abbr_from_cfg(task)}')
+            self.logger.info(f'Task {i}: {task_abbr_from_cfg(task)}')
 
         return tasks
 
