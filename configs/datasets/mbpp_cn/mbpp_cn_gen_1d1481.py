@@ -1,12 +1,12 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import SanitizedMBPPDataset, MBPPEvaluator
+from opencompass.datasets import MBPPDataset, MBPPEvaluator
 
-sanitized_mbpp_reader_cfg = dict(
+mbpp_reader_cfg = dict(
     input_columns=['text', 'test_list'], output_column='test_list_2')
 
-sanitized_mbpp_infer_cfg = dict(
+mbpp_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
@@ -14,7 +14,7 @@ sanitized_mbpp_infer_cfg = dict(
                 dict(
                     role="HUMAN",
                     prompt=
-                    "You are an expert Python programmer, and here is your task: Write a function to find the similar elements from the given two tuple lists. Your code should pass these tests:\n\n assert similar_elements((3, 4, 5, 6),(5, 7, 4, 10)) == (4, 5)\n assert similar_elements((1, 2, 3, 4),(5, 4, 3, 7)) == (3, 4) \n assert similar_elements((11, 12, 14, 13),(17, 15, 14, 13)) == (13, 14) \n"
+                    "你是一名专业的 Python 程序员，你的任务是：编写一个函数，从给定的两个元组列表中查找相似的元素。 你的代码应该通过这些测试：\n\n assert similar_elements((3, 4, 5, 6),(5, 7, 4, 10)) == (4, 5)\n assert similar_elements((1, 2, 3, 4),(5, 4, 3, 7)) == (3, 4) \n assert similar_elements((11, 12, 14, 13),(17, 15, 14, 13)) == (13, 14) \n"
                 ),
                 dict(
                     role="BOT",
@@ -24,7 +24,7 @@ sanitized_mbpp_infer_cfg = dict(
                 dict(
                     role="HUMAN",
                     prompt=
-                    "You are an expert Python programmer, and here is your task: Write a python function to identify non-prime numbers. Your code should pass these tests:\n\n assert is_not_prime(2) == False \n assert is_not_prime(10) == True \n assert is_not_prime(35) == True \n"
+                    "你是一名专业的 Python 程序员，你的任务是：编写一个 Python 函数来识别一个整数是否不是素数。 你的代码应该通过这些测试：\n\n assert is_not_prime(2) == False \n assert is_not_prime(10) == True \n assert is_not_prime(35) == True \n"
                 ),
                 dict(
                     role="BOT",
@@ -34,7 +34,7 @@ sanitized_mbpp_infer_cfg = dict(
                 dict(
                     role="HUMAN",
                     prompt=
-                    "You are an expert Python programmer, and here is your task: Write a function to find the largest integers from a given list of numbers using heap queue algorithm. Your code should pass these tests:\n\n assert heap_queue_largest( [25, 35, 22, 85, 14, 65, 75, 22, 58],3)==[85, 75, 65] \n assert heap_queue_largest( [25, 35, 22, 85, 14, 65, 75, 22, 58],2)==[85, 75] \n assert heap_queue_largest( [25, 35, 22, 85, 14, 65, 75, 22, 58],5)==[85, 75, 65, 58, 35] \n"
+                    "你是一名专业的 Python 程序员，你的任务是：编写一个函数，使用堆队列算法从给定的数字列表中查找最大整数。 你的代码应该通过这些测试：\n\n assert heap_queue_largest( [25, 35, 22, 85, 14, 65, 75, 22, 58],3)==[85, 75, 65] \n assert heap_queue_largest( [25, 35, 22, 85, 14, 65, 75, 22, 58],2)==[85, 75] \n assert heap_queue_largest( [25, 35, 22, 85, 14, 65, 75, 22, 58],5)==[85, 75, 65, 58, 35] \n"
                 ),
                 dict(
                     role="BOT",
@@ -44,21 +44,21 @@ sanitized_mbpp_infer_cfg = dict(
                 dict(
                     role="HUMAN",
                     prompt=
-                    "You are an expert Python programmer, and here is your task: {text} Your code should pass these tests:\n\n {test_list}  \n"
+                    "你是一名专业的 Python 程序员，你的任务是: {text} 你的代码应该通过这些测试:\n\n {test_list}  \n"
                 ),
                 dict(role="BOT", prompt="[BEGIN]\n"),
             ], )),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer, max_out_len=512))
 
-sanitized_mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator), pred_role="BOT")
+mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator), pred_role="BOT")
 
-sanitized_mbpp_datasets = [
+mbpp_cn_datasets = [
     dict(
-        type=SanitizedMBPPDataset,
-        abbr='sanitized_mbpp',
-        path='./sanitized-mbpp.jsonl',
-        reader_cfg=sanitized_mbpp_reader_cfg,
-        infer_cfg=sanitized_mbpp_infer_cfg,
-        eval_cfg=sanitized_mbpp_eval_cfg)
+        type=MBPPDataset,
+        abbr='mbpp_cn',
+        path='./data/mbpp_cn/mbpp_cn.jsonl',
+        reader_cfg=mbpp_reader_cfg,
+        infer_cfg=mbpp_infer_cfg,
+        eval_cfg=mbpp_eval_cfg)
 ]
