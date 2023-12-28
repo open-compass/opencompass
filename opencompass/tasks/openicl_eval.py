@@ -198,7 +198,8 @@ class OpenICLEvalTask(BaseTask):
                             'incorrect_bpb'] = self.calculate_bpb(pred_dicts)
                     else:
                         result['incorrect_bpb'] = result['correct_bpb'] = -1
-                except Exception:
+                except Exception as e:
+                    self.logger.warning(f'Skip dumping details due to: {e}.')
                     result['incorrect_bpb'] = result['correct_bpb'] = -1
             else:
                 result.pop('details', None)
@@ -288,13 +289,19 @@ class OpenICLEvalTask(BaseTask):
                 result['predictions'] = str(predictions[i])
                 result['references'] = str(references[i])
                 result['correct'] = str(predictions[i]) == str(references[i])
-            else:
+            elif details is not None:
                 results['type'] = 'GEN'
                 result['prompt'] = origin_prediction['origin_prompt']
                 result['origin_prediction'] = pred_dicts[i]['prediction']
                 result['predictions'] = details[i]['pred']
                 result['references'] = details[i]['answer']
                 result['correct'] = details[i]['correct']
+            else:
+                results['type'] = 'GEN'
+                result['prompt'] = origin_prediction['origin_prompt']
+                result['origin_prediction'] = pred_dicts[i]['prediction']
+                result['predictions'] = str(predictions[i])
+                result['references'] = str(references[i])
             results[str(i)] = result
         return results
 

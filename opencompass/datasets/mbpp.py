@@ -71,6 +71,42 @@ class MBPPDataset_V2(BaseDataset):
         return DatasetDict({'train': train, 'test': test})
 
 
+class SanitizedMBPPDataset(BaseDataset):
+
+    @staticmethod
+    def load(path: str, num_repeats: int = 1):
+        """Load mbpp dataset for pass k mode.
+
+        Note that you can use num_repeats > 1 when your model does not support
+        `num_return_sequence` in generation, otherwise use the raw
+        mbpp dataset and set `num_return_sequence` in model config to
+        generate multiple responses for testing pass@k>1.
+
+        It better to change your dataset abbr correspondingly if you want to
+        change num_repeats>1, otherwise the number in
+        `.cache/dataset_size.json` might be inconsistent.
+
+        Args:
+            num_repeats(int): Number of repetition for this dataset to get
+        multiple responses in special cases.
+        """
+
+        def processing_test(example):
+            example['text'] = example.pop('prompt')
+            example['test_list'] = '\n'.join(example['test_list'])
+            example['test_column'] = dict(test_list_2=example['test_list'],
+                                          task_id=example['task_id'])
+            return example
+
+        # train : test = 7 : 257
+        train = load_dataset('json', data_files=path,
+                             split='train[:7]').map(processing_test)
+        test = load_dataset('json', data_files=path,
+                            split='train[7:264]').map(processing_test)
+        test = concatenate_datasets([test] * num_repeats)
+        return DatasetDict({'train': train, 'test': test})
+
+
 class TimeOutException(Exception):
     pass
 

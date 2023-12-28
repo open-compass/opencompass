@@ -7,7 +7,10 @@ with read_base():
     from .models.chatglm.hf_chatglm3_6b import models as hf_chatglm3_6b
     from .models.baichuan.hf_baichuan2_7b_chat import models as hf_baichuan2_7b
     from .models.hf_internlm.hf_internlm_chat_20b import models as hf_internlm_chat_20b
-    from .datasets.subjective_cmp.alignment_bench import subjective_datasets
+    from .models.judge_llm.auto_j.hf_autoj_eng_13b import models as hf_autoj
+    from .models.judge_llm.judgelm.hf_judgelm_33b_v1 import models as hf_judgelm
+    from .models.judge_llm.pandalm.hf_pandalm_7b_v1 import models as hf_pandalm
+    from .datasets.subjective_alignbench.alignbench_judgeby_critiquellm import subjective_datasets
 
 datasets = [*subjective_datasets]
 
