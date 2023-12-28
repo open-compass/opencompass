@@ -24,6 +24,8 @@ class CircularEvaluator(BaseEvaluator):
         Returns:
             dict: A dict of evaluation results.
         """
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length'}
 
         self._metrics = {}
         self._metrics.update({'acc_4': 0, 'acc_1': 0})

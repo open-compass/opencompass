@@ -1,8 +1,7 @@
 from opencompass.models import HuggingFaceCausalLM
 
 
-models = [
-    dict(
+models = [dict(
         type=HuggingFaceCausalLM,
         abbr='judgelm-7b-v1-hf',
         path="BAAI/JudgeLM-7B-v1.0",
@@ -16,5 +15,4 @@ models = [
         batch_size=8,
         model_kwargs=dict(device_map='auto', trust_remote_code=True),
         run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-]
+    )]

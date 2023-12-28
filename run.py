@@ -138,6 +138,9 @@ def parse_args():
     # set hf args
     hf_parser = parser.add_argument_group('hf_args')
     parse_hf_args(hf_parser)
+    # set custom dataset args
+    custom_dataset_parser = parser.add_argument_group('custom_dataset_args')
+    parse_custom_dataset_args(custom_dataset_parser)
     args = parser.parse_args()
     if args.slurm:
         assert args.partition is not None, (
@@ -197,6 +200,18 @@ def parse_hf_args(hf_parser):
     hf_parser.add_argument('--batch-size', type=int)
     hf_parser.add_argument('--num-gpus', type=int)
     hf_parser.add_argument('--pad-token-id', type=int)
+
+
+def parse_custom_dataset_args(custom_dataset_parser):
+    """These args are all for the quick construction of custom datasets."""
+    custom_dataset_parser.add_argument('--custom-dataset-path', type=str)
+    custom_dataset_parser.add_argument('--custom-dataset-meta-path', type=str)
+    custom_dataset_parser.add_argument('--custom-dataset-data-type',
+                                       type=str,
+                                       choices=['mcq', 'qa'])
+    custom_dataset_parser.add_argument('--custom-dataset-infer-method',
+                                       type=str,
+                                       choices=['gen', 'ppl'])
 
 
 def main():
