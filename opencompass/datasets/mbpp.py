@@ -93,7 +93,10 @@ class SanitizedMBPPDataset(BaseDataset):
 
         def processing_test(example):
             example['text'] = example.pop('prompt')
+            # used for prompt
             example['test_list'] = '\n'.join(example['test_list'])
+            # used for eval
+            example['test_list_2'] = example['test_list']
             example['test_column'] = dict(test_list_2=example['test_list'],
                                           task_id=example['task_id'])
             return example
