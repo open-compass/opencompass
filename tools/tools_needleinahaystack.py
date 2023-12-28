@@ -50,21 +50,20 @@ class CDMEDatasetProcessor:
         with open(file, 'r', encoding='utf-8') as f:
             lines = [json.loads(line.strip()) for line in f]
 
-        for original_context_length in context_lengths:
-            context_length = original_context_length - self.length_buffer
-            target_length_per_record = context_length - len(
-                self._get_tokens_from_context(needle))
-            for depth_percent in self._generate_depth_percents(
-                    document_depth_percent_intervals,
-                    document_depth_percent_interval_type):
-                output_file = (Path(self.output_path) /
-                               f'Length{original_context_length}'
-                               f'Depth{int(depth_percent)}' /
-                               f'{file.stem}_Length{original_context_length}'
-                               f'_Depth{int(depth_percent)}{file.suffix}')
+        # 定义输出文件
+        output_file = Path(self.output_path) / f'{file.stem}_processed.jsonl'
+        output_file.parent.mkdir(parents=True, exist_ok=True)
 
-                output_file.parent.mkdir(parents=True, exist_ok=True)
-                with open(output_file, 'w', encoding='utf-8') as out_f:
+        with open(output_file, 'w', encoding='utf-8') as out_f:
+            for original_context_length in context_lengths:
+                context_length = original_context_length - self.length_buffer
+                target_length_per_record = context_length - len(
+                    self._get_tokens_from_context(needle))
+
+                for depth_percent in self._generate_depth_percents(
+                        document_depth_percent_intervals,
+                        document_depth_percent_interval_type):
+
                     counter = 0
                     accumulated_tokens = []
                     for line in lines:
@@ -73,7 +72,6 @@ class CDMEDatasetProcessor:
                         accumulated_tokens.extend(tokens_current_line)
 
                         if len(accumulated_tokens) >= target_length_per_record:
-
                             processed_text = self._generate_context(
                                 accumulated_tokens[:target_length_per_record],
                                 depth_percent, needle)
@@ -83,7 +81,9 @@ class CDMEDatasetProcessor:
                             json.dump(
                                 {
                                     'prompt': processed_prompt,
-                                    'answer': needle
+                                    'answer': needle,
+                                    'length': original_context_length,
+                                    'depth': int(depth_percent),
                                 },
                                 out_f,
                                 ensure_ascii=False)
@@ -91,7 +91,7 @@ class CDMEDatasetProcessor:
                             counter += 1
                             if counter >= self.num_records_per_file:
                                 break
-                            # Reset the accumulated tokens for the next record
+                            # 重置accumulated_tokens以开始下一条记录
                             accumulated_tokens = []
 
     def _generate_context(self, tokens_context, depth_percent, needle):
@@ -190,7 +190,8 @@ class CDMEDataset():
             ]
 
             for model_name in model_columns[4:]:
-                model_df = df[['Document Depth', 'Context Length', model_name]]
+                model_df = df[['Document Depth', 'Context Length',
+                               model_name]].copy()
                 model_df.rename(columns={model_name: 'Score'}, inplace=True)
 
                 # Create pivot table
@@ -284,7 +285,7 @@ def main():
     parser.add_argument('--tokenizer_model', type=str, default='gpt-4')
     parser.add_argument('--num_records_per_file', type=int, default=10)
     parser.add_argument('--length_buffer', type=int, default=200)
-    parser.add_argument('--guided', type=bool, default=True)
+    parser.add_argument('--guided', type=bool, default=False)
     parser.add_argument('--file_list', nargs='*', default=['zh_finance.jsonl'])
     parser.add_argument('--context_lengths',
                         nargs='*',
