@@ -13,15 +13,15 @@ from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 class CDMEDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
-
+    def load(path: str, length: int, depth: int):
         data = {'prompt': [], 'answer': []}
         for file in Path(path).glob('*.jsonl'):
             with open(file, 'r', encoding='utf-8') as f:
                 for line in f:
                     line = json.loads(line.strip())
-                    data['prompt'].append(line['prompt'])
-                    data['answer'].append(line['answer'])
+                    if line['length'] == length and line['depth'] == depth:
+                        data['prompt'].append(line['prompt'])
+                        data['answer'].append(line['answer'])
 
         dataset = Dataset.from_dict({
             'prompt': data['prompt'],
