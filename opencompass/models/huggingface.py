@@ -621,6 +621,7 @@ class HuggingFaceChatGLM3(HuggingFace):
                  peft_path: Optional[str] = None,
                  tokenizer_only: bool = False,
                  model_kwargs: dict = dict(device_map='auto'),
+                 generation_kwargs: dict = dict(),
                  meta_template: Optional[Dict] = None,
                  extract_pred_after_decode: bool = False,
                  batch_padding: bool = False,
@@ -634,6 +635,7 @@ class HuggingFaceChatGLM3(HuggingFace):
                          tokenizer_kwargs=tokenizer_kwargs,
                          peft_path=peft_path,
                          tokenizer_only=tokenizer_only,
+                         generation_kwargs=generation_kwargs,
                          model_kwargs=model_kwargs,
                          meta_template=meta_template,
                          extract_pred_after_decode=extract_pred_after_decode,
@@ -647,15 +649,17 @@ class HuggingFaceChatGLM3(HuggingFace):
     def generate(self,
                  inputs: List[str or PromptList],
                  max_out_len: int = 512,
-                 temperature: float = 0.6,
-                 skip_overlength=False) -> str:
+                 skip_overlength=False,
+                 **kwargs) -> str:
         """Generate response from input prompt.
 
         Args:
             inputs (list): input prompt
             max_out_len (int): max output length
-            temperature (float): temperature for sampling
         """
+        generation_kwargs = kwargs.copy()
+        generation_kwargs.update(self.generation_kwargs)
+
         responses = []
         for _input in inputs:
             assert isinstance(_input, (str, PromptList))
@@ -692,7 +696,8 @@ class HuggingFaceChatGLM3(HuggingFace):
             try:
                 response, history = self.model.chat(self.tokenizer,
                                                     user_content,
-                                                    history=history)
+                                                    history=history,
+                                                    **generation_kwargs)
                 # response will be dict sometime
                 if isinstance(response, dict):
                     response = response.get('content', '')
