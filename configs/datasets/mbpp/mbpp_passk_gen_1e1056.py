@@ -56,7 +56,7 @@ mbpp_eval_cfg = dict(evaluator=dict(type=MBPPPassKEvaluator), pred_role="BOT")
 mbpp_datasets = [
     dict(
         type=MBPPDataset_V2,
-        abbr='mbpp',
+        abbr='mbpp_passk',
         path='./data/mbpp/mbpp.jsonl',
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
