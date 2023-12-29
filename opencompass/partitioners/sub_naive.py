@@ -8,6 +8,18 @@ from opencompass.registry import PARTITIONERS
 from .naive import NaivePartitioner
 
 
+def remove_duplicate_pairs(model_combinations):
+    combo_dict = {}
+    for i, combo in enumerate(model_combinations):
+        sorted_names = tuple(sorted((combo[0]['abbr'], combo[1]['abbr'])))
+        if sorted_names not in combo_dict:
+            combo_dict[sorted_names] = i
+    new_model_combinations = [
+        model_combinations[i] for i in combo_dict.values()
+    ]
+    return new_model_combinations
+
+
 @PARTITIONERS.register_module()
 class SubjectiveNaivePartitioner(NaivePartitioner):
     """Naive task partitioner for subjective evaluation. Compared to
@@ -35,17 +47,6 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
         self.compare_models = compare_models
         self.model_pairs = model_pairs
 
-    def remove_duplicate_pairs(self, model_combinations):
-        combo_dict = {}
-        for i, combo in enumerate(model_combinations):
-            sorted_names = tuple(sorted((combo[0]['abbr'], combo[1]['abbr'])))
-            if sorted_names not in combo_dict:
-                combo_dict[sorted_names] = i
-        new_model_combinations = [
-            model_combinations[i] for i in combo_dict.values()
-        ]
-        return new_model_combinations
-
     def get_model_combinations(
             self,
             models: List[ConfigDict],
@@ -57,7 +58,7 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
         elif self.mode == 'm2n':
             assert len(base_models) > 0 and len(compare_models) > 0
             model_combinations = list(product(base_models, compare_models))
-            unique_combinations = self.remove_duplicate_pairs([
+            unique_combinations = remove_duplicate_pairs([
                 combo for combo in model_combinations if combo[0] != combo[1]
             ])
             return unique_combinations
