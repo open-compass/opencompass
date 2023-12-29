@@ -95,7 +95,7 @@ class AlignmentBenchDataset(SubjectiveCmpDataset):
         else:
             alignmentbench_config = None
         dataset = list(super().load(path, name))
-        corev2_dataset = []
+        alignbench_dataset = []
         for data in dataset:
             if alignmentbench_config:
                 dimensions, prefix = prompt_construct(data,
@@ -103,8 +103,8 @@ class AlignmentBenchDataset(SubjectiveCmpDataset):
                 data['critiquellm_prefix'] = prefix
             data['judge']['others'] = data['others']
             data['ref'] = data['others']['reference']
-            corev2_dataset.append(data)
-        dataset = Dataset.from_list(corev2_dataset)
+            alignbench_dataset.append(data)
+        dataset = Dataset.from_list(alignbench_dataset)
         return dataset
 
 
