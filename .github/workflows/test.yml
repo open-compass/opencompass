@@ -1,4 +1,4 @@
-name: pr_stage_test
+name: test
 
 on:
   pull_request:
@@ -9,6 +9,10 @@ on:
       - 'configs/**'
       - 'tools/**'
 
+  workflow_dispatch:
+  schedule:
+    - cron:  '56 0 * * *'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -16,41 +20,40 @@ concurrency:
 jobs:
   test_functions:
     runs-on: self-hosted
-    timeout-minutes: 4320 # 72hours
+    timeout-minutes: 15
     strategy:
       matrix:
         python-version: ['3.10']
-        include:
-          - torch: 2.0.0
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-      - name: Install PyTorch
-        run: pip install torch==${{matrix.torch}}+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
-      - name: Install system dependencies
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Prepare - Clone Conde Env install and copy data
         run: |
-          sudo sed -i '$ a deb http://th.archive.ubuntu.com/ubuntu jammy main' /etc/apt/sources.list
-          sudo apt-get update && sudo apt-get install -y libc6 libffi-dev libncursesw6 wget unzip
-      - name: Upgrade pip
-        run: python -m pip install pip --upgrade
-      - name: Install opencompass dependencies
+          eval "$(conda shell.bash hook)"
+          conda create --name opencompass_regression --clone opencompass_base
+          conda activate opencompass_regression
+          python3 -m pip install -e .
+          cp -r /home/qa-llm-cicd/data .
+          conda info --envs
+      - name:  Run test
         run: |
-          python -m pip install -r requirements.txt
-      - name: Build and install
-        run: python -m pip install -e .
-      - name: Prepare dataset
+          eval "$(conda shell.bash hook)"
+          conda activate opencompass_regression
+          conda info --envs
+          rm -rf regression_result
+          python3 run.py --models hf_internlm_chat_7b --datasets siqa_gen --work-dir regression_result --debug
+      - name:  Remove Conda Env
         run: |
-          wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
-          unzip OpenCompassData-core-20231110.zip
-      - name: Dry run test
+          eval "$(conda shell.bash hook)"
+          conda env remove --name opencompass_regression
+          conda info --envs
+      - name:  Get result
         run: |
-          python run.py --models hf_opt_125m --datasets siqa_gen winograd_ppl --dry-run
-      - name: run testcase
-        run: |
-          python run.py --models hf_opt_125m --datasets siqa_gen winograd_ppl --dry-run
-  
+          score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
+          if (( ${score%.*} >= 70 && ${score%.*} <= 80 )); then
+             echo "score is $score between 70 and 80"
+          else
+             echo "score is $score not between 70 and 80"
+             exit 1
+          fi
+          rm -rf regression_result
