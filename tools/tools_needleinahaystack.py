@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import random
 import shutil
 from pathlib import Path
 
@@ -10,6 +11,7 @@ import pandas as pd
 import seaborn as sns
 import tiktoken
 from matplotlib.colors import LinearSegmentedColormap
+from tqdm import tqdm
 
 
 class CDMEDatasetProcessor:
@@ -18,17 +20,21 @@ class CDMEDatasetProcessor:
                  path,
                  output_path,
                  tokenizer_model='gpt-4',
-                 num_records_per_file=10,
+                 num_repeats_per_test=10,
                  length_buffer=200,
-                 guided=False,
-                 file_list=[]):
+                 guide=False,
+                 file_list=[],
+                 language='Chinese',
+                 add=False):
         self.path = path
         self.output_path = output_path
         self.tokenizer = tiktoken.encoding_for_model(tokenizer_model)
-        self.num_records_per_file = num_records_per_file
+        self.num_repeats_per_test = num_repeats_per_test
         self.length_buffer = length_buffer
-        self.guided = guided
+        self.guide = guide
         self.file_list = file_list
+        self.language = language
+        self.add = add
 
     def process_files(self,
                       context_lengths,
@@ -48,23 +54,31 @@ class CDMEDatasetProcessor:
                      document_depth_percent_intervals,
                      document_depth_percent_interval_type):
         with open(file, 'r', encoding='utf-8') as f:
-            lines = [json.loads(line.strip()) for line in f]
+            lines_bak = [json.loads(line.strip()) for line in f]
 
         # set output file
         output_file = Path(self.output_path) / f'{file.stem}_processed.jsonl'
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_file, 'w', encoding='utf-8') as out_f:
-            for original_context_length in context_lengths:
-                context_length = original_context_length - self.length_buffer
-                target_length_per_record = context_length - len(
-                    self._get_tokens_from_context(needle))
+        initial_file_mode = 'a' if self.add else 'w'
+        for counter in tqdm(range(self.num_repeats_per_test),
+                            desc='Processing datasets '
+                            f'of {self.num_repeats_per_test} repeats'):
+            file_mode = initial_file_mode if counter == 0 else 'a'
 
-                for depth_percent in self._generate_depth_percents(
-                        document_depth_percent_intervals,
-                        document_depth_percent_interval_type):
+            with open(output_file, file_mode, encoding='utf-8') as out_f:
+                lines = lines_bak.copy()
+                random.seed(counter)
+                random.shuffle(lines)
 
-                    counter = 0
+                for original_context_length in tqdm(context_lengths,
+                                                    desc='Processing datasets '
+                                                    'of different lengths'):
+                    context_length = original_context_length - \
+                        self.length_buffer
+                    target_length_per_record = context_length - len(
+                        self._get_tokens_from_context(needle))
+
                     accumulated_tokens = []
                     for line in lines:
                         tokens_current_line = self._get_tokens_from_context(
@@ -72,27 +86,29 @@ class CDMEDatasetProcessor:
                         accumulated_tokens.extend(tokens_current_line)
 
                         if len(accumulated_tokens) >= target_length_per_record:
-                            processed_text = self._generate_context(
-                                accumulated_tokens[:target_length_per_record],
-                                depth_percent, needle)
+                            break
 
-                            processed_prompt = self._generate_prompt(
-                                processed_text, retrieval_question)
-                            json.dump(
-                                {
-                                    'prompt': processed_prompt,
-                                    'answer': needle,
-                                    'length': original_context_length,
-                                    'depth': int(depth_percent),
-                                },
-                                out_f,
-                                ensure_ascii=False)
-                            out_f.write('\n')
-                            counter += 1
-                            if counter >= self.num_records_per_file:
-                                break
-                            # reset accumulated_tokens for next record
-                            accumulated_tokens = []
+                    for depth_percent in self._generate_depth_percents(
+                            document_depth_percent_intervals,
+                            document_depth_percent_interval_type):
+
+                        processed_text = self._generate_context(
+                            accumulated_tokens[:target_length_per_record],
+                            depth_percent, needle)
+
+                        processed_prompt = self._generate_prompt(
+                            processed_text, retrieval_question)
+                        json.dump(
+                            {
+                                'prompt': processed_prompt,
+                                'answer': needle,
+                                'length': original_context_length,
+                                'depth': int(depth_percent),
+                                'random_seed_repeat': counter
+                            },
+                            out_f,
+                            ensure_ascii=False)
+                        out_f.write('\n')
 
     def _generate_context(self, tokens_context, depth_percent, needle):
         tokens_needle = self._get_tokens_from_context(needle)
@@ -112,18 +128,42 @@ class CDMEDatasetProcessor:
     def _decode_tokens(self, tokens):
         return self.tokenizer.decode(tokens)
 
-    def _generate_prompt(self, context, retrieval_question):
-        if self.guided:
-            prompt = ('你是一个善于回答用户问题的智能AI助手\n'
-                      '请保持你的回答简洁清楚。不要说和下面文档中的无关的话，或重复你的回答\n'
-                      f'用户现在给你的文档是{context}\n\n'
-                      f'现在请问：{retrieval_question}'
-                      f'提示：文档中与该问题最相关的句子是_______')
+    def modify_retrieval_question(self, retrieval_question):
+        if self.language == 'Chinese':
+            parts = retrieval_question.split('请按照')
+            guide_retrieval_question = (parts[0] + '在回答之前，请思考文档中与此问题'
+                                        '最相关的内容是什么。请按照' + parts[1])
+            return guide_retrieval_question
+        elif self.language == 'English':
+            parts = retrieval_question.split('Please answer in the format')
+            guide_retrieval_question = (
+                parts[0] + 'Before answering, please consider'
+                ' what in the document is most relevant to this question.'
+                ' Please answer in the format' + parts[1])
+            return guide_retrieval_question
         else:
+            raise ValueError(f"Language '{self.language}' is not supported.")
+
+    def _generate_prompt(self, context, retrieval_question):
+        if self.guide:
+            retrieval_question = self.modify_retrieval_question(
+                retrieval_question)
+
+        if self.language == 'Chinese':
             prompt = ('你是一个善于回答用户问题的智能AI助手\n'
                       '请保持你的回答简洁清楚。不要说和下面文档中的无关的话，或重复你的回答\n'
                       f'用户现在给你的文档是{context}\n\n'
                       f'现在请问：{retrieval_question}')
+        elif self.language == 'English':
+            prompt = ('You are an intelligent AI assistant skilled in '
+                      'answering user questions.\n'
+                      'Please keep your answers concise and clear. Do not talk'
+                      ' about irrelevant topics or repeat your answers.\n'
+                      f'The document given to you by the user is {context}\n\n'
+                      f'Now, the question is: {retrieval_question}')
+        else:
+            raise ValueError(f"Language '{self.language}' is not supported.")
+
         return prompt
 
     def _generate_depth_percents(self, intervals, interval_type):
@@ -143,28 +183,41 @@ class CDMEDataset():
 
     @staticmethod
     def generate(processed_datasets_path, data_path, tokenizer_model,
-                 num_records_per_file, length_buffer, guided, file_list,
+                 num_repeats_per_test, length_buffer, guide, file_list,
                  context_lengths, needle, retrieval_question,
-                 document_depth_percent_intervals):
-        # Check if the processed datasets directory exists
-        if os.path.exists(processed_datasets_path):
-            shutil.rmtree(processed_datasets_path)
-            print('The existing processed datasets directory '
-                  f'{processed_datasets_path} has been '
-                  'removed for a fresh start.')
+                 document_depth_percent_intervals, language, add):
+
+        if add:
+            if os.path.exists(processed_datasets_path):
+                print('Adding new data to the existing processed datasets '
+                      'directory {processed_datasets_path}.')
+            else:
+                print(f'No existing processed datasets directory found '
+                      f'at {processed_datasets_path}. '
+                      'Creating a new directory.')
+                os.makedirs(processed_datasets_path)
         else:
-            print('No existing processed datasets directory found at'
-                  f' {processed_datasets_path}. '
-                  'Starting with a fresh directory.')
+            if os.path.exists(processed_datasets_path):
+                shutil.rmtree(processed_datasets_path)
+                print('The existing processed datasets directory '
+                      f'{processed_datasets_path} has been '
+                      'removed for a fresh start.')
+            else:
+                print('No existing processed datasets directory found at '
+                      f'{processed_datasets_path}. '
+                      'Starting with a fresh directory.')
+            os.makedirs(processed_datasets_path)
 
         processor = CDMEDatasetProcessor(
             path=data_path,
             output_path=processed_datasets_path,
             tokenizer_model=tokenizer_model,
-            num_records_per_file=num_records_per_file,
+            num_repeats_per_test=num_repeats_per_test,
             length_buffer=length_buffer,
-            guided=guided,
-            file_list=file_list)
+            guide=guide,
+            file_list=file_list,
+            language=language,
+            add=add)
 
         processor.process_files(context_lengths, needle, retrieval_question,
                                 document_depth_percent_intervals)
@@ -283,9 +336,9 @@ def main():
                         default='./data/CDME/processed')
     parser.add_argument('--data_path', type=str, default='./data/CDME')
     parser.add_argument('--tokenizer_model', type=str, default='gpt-4')
-    parser.add_argument('--num_records_per_file', type=int, default=10)
+    parser.add_argument('--num_repeats_per_test', type=int, default=10)
     parser.add_argument('--length_buffer', type=int, default=200)
-    parser.add_argument('--guided', type=bool, default=False)
+    parser.add_argument('--guide', type=bool, default=False)
     parser.add_argument('--file_list', nargs='*', default=['zh_finance.jsonl'])
     parser.add_argument('--context_lengths',
                         nargs='*',
@@ -297,10 +350,14 @@ def main():
     parser.add_argument('--retrieval_question',
                         type=str,
                         default='小明最喜欢的实习地点是哪里？'
-                        '你的回答格式应该为“小明最喜欢的实习地点就是________。”')
+                        '请按照“小明最喜欢的实习地点就是________。”的格式回答')
     parser.add_argument('--document_depth_percent_intervals',
                         type=int,
                         default=35)
+    parser.add_argument('--language', type=str, default='Chinese')
+    parser.add_argument('--add',
+                        action='store_true',
+                        help='Add datasets to existing datasets.')
     parser.add_argument('--plot',
                         action='store_true',
                         help='Visualize the dataset results')
@@ -323,14 +380,16 @@ def main():
             processed_datasets_path=args.processed_datasets_path,
             data_path=args.data_path,
             tokenizer_model=args.tokenizer_model,
-            num_records_per_file=args.num_records_per_file,
+            num_repeats_per_test=args.num_repeats_per_test,
             length_buffer=args.length_buffer,
-            guided=args.guided,
+            guide=args.guide,
             file_list=args.file_list,
             context_lengths=args.context_lengths,
             needle=args.needle,
             retrieval_question=args.retrieval_question,
-            document_depth_percent_intervals=doc_depth_intervals)
+            document_depth_percent_intervals=doc_depth_intervals,
+            language=args.language,
+            add=args.add)
 
 
 if __name__ == '__main__':
