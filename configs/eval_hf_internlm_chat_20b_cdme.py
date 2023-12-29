@@ -2,7 +2,7 @@ from opencompass.models import HuggingFaceCausalLM
 
 from mmengine.config import read_base
 with read_base():
-    from .datasets.cdme.cdme import cdme_datasets
+    from .datasets.cdme.cdme8k import cdme_datasets
 
 datasets = [*cdme_datasets]
 

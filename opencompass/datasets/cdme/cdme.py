@@ -1,7 +1,9 @@
 import json
+import random
 import re
 from pathlib import Path
 
+import tiktoken
 from datasets import Dataset
 
 from opencompass.datasets.base import BaseDataset
@@ -13,15 +15,106 @@ from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 class CDMEDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, length: int, depth: int):
+    def load(
+        path: str,
+        length: int,
+        depth: int,
+        tokenizer_model: str,
+        num_repeats_per_test: int,
+        length_buffer: int,
+        guide: bool,
+        language: str,
+        needle: str,
+        retrieval_question: str,
+    ):
         data = {'prompt': [], 'answer': []}
-        for file in Path(path).glob('*.jsonl'):
+        tokenizer = tiktoken.encoding_for_model(tokenizer_model)
+
+        def _generate_context(tokens_context, depth_percent, needle):
+            tokens_needle = _get_tokens_from_context(needle)
+            insertion_point = int(len(tokens_context) * (depth_percent / 100))
+            tokens_context = (tokens_context[:insertion_point] +
+                              tokens_needle + tokens_context[insertion_point:])
+            new_context = _decode_tokens(tokens_context)
+            return new_context
+
+        def _get_tokens_from_context(context):
+            return tokenizer.encode(context)
+
+        def _decode_tokens(tokens):
+            return tokenizer.decode(tokens)
+
+        def _modify_retrieval_question(retrieval_question):
+            if language == 'Chinese':
+                parts = retrieval_question.split('请按照')
+                guide_retrieval_question = (parts[0] + '在回答之前，请思考文档中与此问题'
+                                            '最相关的内容是什么。请按照' + parts[1])
+                return guide_retrieval_question
+            elif language == 'English':
+                parts = retrieval_question.split('Please answer in the format')
+                guide_retrieval_question = (
+                    parts[0] + 'Before answering, please consider'
+                    ' what in the document is most relevant to this question.'
+                    ' Please answer in the format' + parts[1])
+                return guide_retrieval_question
+            else:
+                raise ValueError(f"Language '{language}' is not supported.")
+
+        def _generate_prompt(context, retrieval_question):
+            if guide:
+                retrieval_question = _modify_retrieval_question(
+                    retrieval_question)
+
+            if language == 'Chinese':
+                prompt = ('你是一个善于回答用户问题的智能AI助手\n'
+                          '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
+                          '，或重复你的回答\n'
+                          f'用户现在给你的文档是{context}\n\n'
+                          f'现在请问：{retrieval_question}')
+            elif language == 'English':
+                prompt = ('You are an intelligent AI assistant skilled in '
+                          'answering user questions.\n'
+                          'Please keep your answers concise and clear. Do not'
+                          ' talk about irrelevant topics or repeat your '
+                          'answers.\n'
+                          f'The document given to you by the user is {context}'
+                          f'\n\nNow, the question is: {retrieval_question}')
+            else:
+                raise ValueError(f"Language '{language}' is not supported.")
+
+            return prompt
+
+        files = Path(path).glob('*.jsonl')
+        for file in files:
             with open(file, 'r', encoding='utf-8') as f:
-                for line in f:
-                    line = json.loads(line.strip())
-                    if line['length'] == length and line['depth'] == depth:
-                        data['prompt'].append(line['prompt'])
-                        data['answer'].append(line['answer'])
+                lines_bak = [json.loads(line.strip()) for line in f]
+            lines = lines_bak.copy()
+            for counter in range(num_repeats_per_test):
+                random.seed(counter)
+                random.shuffle(lines)
+
+                context_length = length - length_buffer
+                target_length_per_record = context_length - len(
+                    _get_tokens_from_context(needle))
+
+                accumulated_tokens = []
+                for line in lines:
+                    tokens_current_line = _get_tokens_from_context(
+                        line['text'])
+                    accumulated_tokens.extend(tokens_current_line)
+
+                    if len(accumulated_tokens) >= target_length_per_record:
+                        break
+
+                processed_text = _generate_context(
+                    accumulated_tokens[:target_length_per_record], depth,
+                    needle)
+
+                processed_prompt = _generate_prompt(processed_text,
+                                                    retrieval_question)
+
+                data['prompt'].append(processed_prompt)
+                data['answer'].append(needle)
 
         dataset = Dataset.from_dict({
             'prompt': data['prompt'],
