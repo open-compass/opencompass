@@ -20,7 +20,8 @@ class CDMEDataset(BaseDataset):
         length: int,
         depth: int,
         tokenizer_model: str,
-        num_repeats_per_test: int,
+        file_list: list[str],
+        num_repeats_per_file: int,
         length_buffer: int,
         guide: bool,
         language: str,
@@ -86,10 +87,13 @@ class CDMEDataset(BaseDataset):
 
         files = Path(path).glob('*.jsonl')
         for file in files:
+            if file.name not in file_list:
+                continue
+
             with open(file, 'r', encoding='utf-8') as f:
                 lines_bak = [json.loads(line.strip()) for line in f]
             lines = lines_bak.copy()
-            for counter in range(num_repeats_per_test):
+            for counter in range(num_repeats_per_file):
                 random.seed(counter)
                 random.shuffle(lines)
 
