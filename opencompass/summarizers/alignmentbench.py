@@ -70,7 +70,10 @@ def post_process_alignbench(judgement: str,
         pattern = rf"({'|'.join(possible_keys)}): (\d+(\.\d{{1,2}})?)"
         match = re.search(pattern, text)
         if match:
-            return float(match.group(1))
+            try:
+                return float(match.group(1))
+            except ValueError:
+                return -1
         return -1
 
     judgement = judgement.replace('\n', '')
