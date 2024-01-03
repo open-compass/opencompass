@@ -28,8 +28,6 @@ def extract_predictions_from_json(input_folder):
             # when only one complete file
             print(e)
             json_paths = [os.path.join(model_folder, 'alignment_bench.json')]
-        else:
-            raise FileNotFoundError
 
         all_predictions = []
         for json_ in json_paths:
