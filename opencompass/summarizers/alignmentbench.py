@@ -78,7 +78,7 @@ def post_process_alignbench(judgement: str,
 
     judgement = judgement.replace('\n', '')
     rating = extract_rating(judgement)
-    
+
     if rating is not None:
         score = -1
         for key in possible_keys:
