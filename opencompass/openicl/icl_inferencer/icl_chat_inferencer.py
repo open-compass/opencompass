@@ -359,10 +359,20 @@ class ChatInferencer(BaseInferencer):
                 )
                 index += 1
         if self.dialogue_mode:
-            chat = [{'role': i['role'], 'content': i['content']} for i in chat]
+            # dialogue mode for subjective evaluation
+            assert len(chat) % 2 == 0
+            round_num = int(len(chat) / 2)
+            preds_list = []
+            for i in range(round_num):
+                temp_dict = {
+                    'round': i + 1,
+                    'user': chat[i * 2]['content'],
+                    'assistant': chat[i * 2 + 1]['content']
+                }
+                preds_list.append(temp_dict)
             output_handler.save_results(
                 origin_prompt=None,
-                prediction=chat,
+                prediction=str(preds_list),
                 idx=index_copy,
                 gold=None,
             )

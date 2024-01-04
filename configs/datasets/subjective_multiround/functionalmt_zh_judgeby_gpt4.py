@@ -11,7 +11,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "FunctionalMT_ZH_",
+    "FunctionalMT",
 ]
 data_path ="data/subjective/"
 
