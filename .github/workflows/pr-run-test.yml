@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test_functions:
+  test_run:
     runs-on: self-hosted
     timeout-minutes: 15
     strategy:
