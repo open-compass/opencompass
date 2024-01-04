@@ -237,8 +237,10 @@ class MBPPEvaluator(BaseEvaluator):
             except ImportError:
                 raise ImportError(
                     'Please install evalplus use following steps:\n'
-                    'pip install \
-                        git+https://github.com/open-compass/evalplus.git')
+                    'git clone --recurse-submodules git@github.com:open-compass/human-eval.git\n'  # noqa
+                    'cd human-eval\n'
+                    'pip install -e .\n'
+                    'pip install -e evalplus\n')
             mbpp_preds = []
             for preds, refer in zip(predictions, references):
                 if not isinstance(preds, list):
