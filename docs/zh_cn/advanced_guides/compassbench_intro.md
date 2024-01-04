@@ -1,3 +1,18 @@
+<style>
+table th:first-of-type {
+    width: 10%;
+}
+table th:nth-of-type(2) {
+    width: 10%;
+}
+table th:nth-of-type(3) {
+    width: 30%;
+}
+table th:nth-of-type(4) {
+    width: 50%;
+}
+</style>
+
 # CompassBench 介绍
 
 为支持OpenCompass的年度榜单，本文将提供CompassBench的整体介绍。
