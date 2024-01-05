@@ -1,7 +1,10 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets.cdme.cdme import CDMEDataset,CDMEEvaluator,cdme_postprocess,cdme_dataset_postprocess
+from opencompass.datasets.cdme.cdme import CDMEDataset
+from opencompass.datasets.cdme.cdme import CDMEEvaluator
+from opencompass.datasets.cdme.cdme import cdme_postprocess
+from opencompass.datasets.cdme.cdme import cdme_dataset_postprocess
 import math
 
 
@@ -10,6 +13,10 @@ def logistic(x, L=100, x0=50, k=0.1):
 
 
 def generate_linear_space(start, end, num):
+    if num == 1:
+        return [start]
+    elif num < 1:
+        raise ValueError("num must be at least 1.")
     step = (end - start) / (num - 1)
     return [start + step * i for i in range(num)]
 
@@ -39,27 +46,36 @@ cdme_eval_cfg = dict(
     dataset_postprocessor=dict(type=cdme_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = list(range(1000, 9000, 1000))
-document_depth_percent_intervals = 35
+context_lengths = list(range(1000, 201000, 1000))
+document_depth_percent_intervals = 20
 document_depth_percent_interval_type = "linear"
 
-base_path = './data/CDME/processed'
+base_path = './data/CDME'
+file_list = ['zh_finance.jsonl']
 cdme_datasets = []
-
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
             document_depth_percent_intervals,
             document_depth_percent_interval_type):
-        dataset_dict = dict(
-            abbr=f'CDME_Length{original_context_length}'
-            'Depth{int(depth_percent)}',
-            type=CDMEDataset,
-            path=base_path,
-            length=original_context_length,
-            depth=int(depth_percent),
-            reader_cfg=cdme_reader_cfg,
-            infer_cfg=cdme_infer_cfg,
-            eval_cfg=cdme_eval_cfg
-        )
+        dataset_dict = {
+            'abbr': f'CDME_Length{original_context_length}'
+            f'Depth{int(depth_percent)}',
+            'type': CDMEDataset,
+            'path': base_path,
+            'length': original_context_length,
+            'depth': int(depth_percent),
+            'tokenizer_model': 'gpt-4',
+            'file_list': file_list,
+            'num_repeats_per_file': 10,
+            'length_buffer': 200,
+            'guide': True,
+            'language': 'Chinese',
+            'needle': '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n',
+            'retrieval_question': '小明最喜欢的实习地点是哪里？请按照'
+            '“小明最喜欢的实习地点就是________。”的格式回答。',
+            'reader_cfg': cdme_reader_cfg,
+            'infer_cfg': cdme_infer_cfg,
+            'eval_cfg': cdme_eval_cfg
+        }
         cdme_datasets.append(dataset_dict)
