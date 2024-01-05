@@ -128,7 +128,7 @@ def get_dimension_results(judged_answers, references, fout, fout_flag, model):
         writer = csv.writer(csvfile)
         if fout_flag == 0:
             writer.writerow(['模型'] + columns)
-            fout_flag += 1
+
         for row in rows:
             writer.writerow([row] +
                             [scores[row][column] for column in columns])
@@ -184,7 +184,6 @@ def get_capability_results(judged_answers,
                 sub_header.extend([category + '总分'])
                 sub_header.extend(sub_categories)
             writer.writerow(sub_header)
-            fout_flag += 1
 
         row = [model]
         row.append(scores[model]['总分'])
@@ -203,7 +202,7 @@ class AlignmentBenchSummarizer:
             It's expected to be filled out at runtime.
     """
 
-    def __init__(self, config: ConfigDict, judge_type: str) -> None:
+    def __init__(self, config: ConfigDict, judge_type='general') -> None:
         self.tasks = []
         self.cfg = config
         self.eval_model_cfgs = self.cfg['eval']['partitioner']['models']
@@ -252,8 +251,10 @@ class AlignmentBenchSummarizer:
                     if self.judge_type == 'general':
                         get_dimension_results(judged_answers, references, fout,
                                               fout_flag, model)
+                        fout_flag += 1
                     get_capability_results(judged_answers, references, fout2,
                                            fout_flag2, model, self.category)
+                    fout_flag2 += 1
             else:
                 print(subdir_path + ' is not exist! please check!')
         if self.judge_type == 'general':
