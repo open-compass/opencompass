@@ -11,7 +11,7 @@ from opencompass.registry import LOAD_DATASET
 from .subjective_cmp import SubjectiveCmpDataset
 
 eng_base_prefix = """
-You are a judge. Please impartially judge whether an AI model's response to a question is correct based on the reference answers. You need to provide a conclusion of "correct" or "wrong," followed by the corresponding reasoning.
+You are a judger. Please impartially judge whether an AI model's response to a question is correct based on the reference answers. You need to provide a conclusion of "correct" or "wrong," followed by the corresponding reasoning.
 
 Note that since the reference answer is a candidate list, the AI model's response only needs to align with one item in the list to be deemed "correct."
 
@@ -59,21 +59,24 @@ def prompt_construct(sample):
     lan = sample['others']['lan']
     question = sample['question']
     if lan == 'zh':
-        prefix = chn_base_prefix.format(question=sample['question'], ref=str(sample['others']['answers']))
+        prefix = chn_base_prefix.format(question=sample['question'],
+                                        ref=str(sample['others']['answers']))
         suffix = '\n[模型回答结束]\n'
     elif lan == 'en':
-        prefix = eng_base_prefix.format(question=sample['question'], ref=str(sample['others']['answers']))
-        suffix = "\n[Model Response End]\n"
-    return prompt, suffix
+        prefix = eng_base_prefix.format(question=sample['question'],
+                                        ref=str(sample['others']['answers']))
+        suffix = '\n[Model Response End]\n'
+    return prefix, suffix
 
 
 @LOAD_DATASET.register_module()
 class IRDataset(SubjectiveCmpDataset):
 
-    def load(self,
-             path: str,
-             name: str,
-            ):
+    def load(
+        self,
+        path: str,
+        name: str,
+    ):
         dataset = list(super().load(path, name))
         subject_dataset = []
         for data in dataset:

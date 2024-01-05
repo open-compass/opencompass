@@ -79,7 +79,7 @@ eval = dict(
 )
 
 summarizer = dict(
-    type=AlignmentBenchSummarizer,
+    type=AlignmentBenchSummarizer, judge_type = 'general'
 )
 
 work_dir = 'outputs/alignment_bench/'

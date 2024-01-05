@@ -28,5 +28,39 @@ models = [
         batch_size=8,
         meta_template=_meta_template,
         run_cfg=dict(num_gpus=4, num_procs=1),
+        end_str='<|im_end|>',
+    )
+]
+
+
+models_sample = [
+    dict(
+        type=HuggingFaceCausalLM,
+        abbr='qwen-72b-chat-hf',
+        path="Qwen/Qwen-72B-Chat",
+        tokenizer_path='Qwen/Qwen-72B-Chat',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+            use_fast=False,),
+        generation_kwargs=dict(
+            do_sample= True,
+            temperature = 1.0,
+            top_p = 0.8,
+            top_k = 0,
+            repetition_penalty = 1.1
+        ),
+        pad_token_id=151643,
+        max_out_len=100,
+        max_seq_len=2048,
+        batch_size=8,
+        meta_template=_meta_template,
+        run_cfg=dict(num_gpus=4, num_procs=1),
+        end_str='<|im_end|>',
     )
 ]
