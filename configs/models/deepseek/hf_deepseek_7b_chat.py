@@ -28,35 +28,5 @@ models = [
         max_seq_len=2048,
         batch_size=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
-        end_str='<｜end▁of▁sentence｜>',
-    )
-]
-models_sample = [
-    dict(
-        type=HuggingFaceCausalLM,
-        abbr='deepseek-7b-chat-hf',
-        path="deepseek-ai/deepseek-llm-7b-chat",
-        tokenizer_path='deepseek-ai/deepseek-llm-7b-chat',
-        model_kwargs=dict(
-            device_map='auto',
-            trust_remote_code=True,
-        ),
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True,
-            use_fast=False,
-        ),
-        generation_kwargs=dict(
-            do_sample= True,
-            temperature = 0.7,
-            top_p = 0.95,
-        ),
-        meta_template=_meta_template,
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=8,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-        end_str='<｜end▁of▁sentence｜>',
     )
 ]
