@@ -113,7 +113,7 @@ class SanitizedMBPPDataset(BaseDataset):
         return DatasetDict({'train': train, 'test': test})
 
 
-class MBPPPlus_Dataset(BaseDataset):
+class MBPPPlusDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, num_repeats: int = 1):
@@ -196,7 +196,7 @@ class MBPPEvaluator(BaseEvaluator):
 
     def __init__(self, metric: str = 'MBPP') -> None:
         self.metric = metric
-        assert self.metric in ['MBPP', 'MBPPPLUS']
+        assert self.metric in ['MBPP', 'MBPPPlus']
 
     def score(self, predictions, references):
         assert len(predictions) == len(references)
