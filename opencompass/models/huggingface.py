@@ -251,7 +251,9 @@ class HuggingFace(BaseModel):
                                        **generation_kwargs)
                  for input_ in inputs), [])
 
-    def _batch_generate(self, inputs: List[str], max_out_len: int, stopping_criteria: List[str] = [],
+    def _batch_generate(self, inputs: List[str], 
+                        max_out_len: int, 
+                        stopping_criteria: List[str] = [],
                         **kwargs) -> List[str]:
         """Support for batch prompts inference.
 
