@@ -70,7 +70,10 @@ def post_process_alignbench(judgement: str,
         pattern = rf"({'|'.join(possible_keys)}): (\d+(\.\d{{1,2}})?)"
         match = re.search(pattern, text)
         if match:
-            return float(match.group(1))
+            try:
+                return float(match.group(1))
+            except ValueError:
+                return -1
         return -1
 
     judgement = judgement.replace('\n', '')
@@ -150,7 +153,9 @@ def get_capability_results(judged_answers,
             capability] = total_score / capability_counts[capability]
 
     temp_list = []
+    total_column_num = 2
     for category, sub_categories in categories.items():
+        total_column_num += 1 + len(sub_categories)
         capability_avg_ratings[category + '总分'] = np.mean([
             np.mean(capability_avg_ratings[cat])
             for cat in categories[category]
@@ -165,7 +170,7 @@ def get_capability_results(judged_answers,
     with open(fout, 'a+', newline='') as csvfile:
         writer = csv.writer(csvfile)
         if fout_flag == 0:
-            num_header = [str(i) for i in range(12)]
+            num_header = [str(i) for i in range(total_column_num)]
             writer.writerow(num_header)
 
             header = ['模型', '总分']
