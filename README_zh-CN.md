@@ -31,6 +31,8 @@
 
 我们诚挚邀请各类大模型接入OpenCompass评测体系，以展示其在各个领域的性能优势。同时，也欢迎广大研究者、开发者向我们提供宝贵的意见和建议，共同推动大模型领域的发展。如有任何问题或需求，请随时[联系我们](mailto:opencompass@pjlab.org.cn)。此外，相关评测内容，性能数据，评测方法也将随榜单发布一并开源。
 
+我们提供了本次评测所使用的部分题目示例，详情请见[CompassBench 2023](docs/zh_cn/advanced_guides/compassbench_intro.md).
+
 <p>让我们共同期待OpenCompass 2023年度大模型榜单的发布，期待各大模型在榜单上的精彩表现！</p>
 
 ## 🧭	欢迎

@@ -31,6 +31,8 @@ At that time, we will release rankings for both open-source models and commercia
 
 We sincerely invite various large models to join the OpenCompass to showcase their performance advantages in different fields. At the same time, we also welcome researchers and developers to provide valuable suggestions and contributions to jointly promote the development of the LLMs. If you have any questions or needs, please feel free to [contact us](mailto:opencompass@pjlab.org.cn). In addition, relevant evaluation contents, performance statistics, and evaluation methods will be open-source along with the leaderboard release.
 
+We have provided the more details of the CompassBench 2023 in [Doc](docs/zh_cn/advanced_guides/compassbench_intro.md).
+
 Let's look forward to the release of the OpenCompass 2023 LLM Annual Leaderboard!
 
 ## 🧭	Welcome
