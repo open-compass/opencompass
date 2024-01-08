@@ -16,13 +16,13 @@ class ReasonBenchDataset(BaseDataset):
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 line = json.loads(line)
-                prompt = line['prompt']
-                prompt_ppl = line['prompt_ppl']
-                label = line['label']
-                label_ppl = line['label_ppl']
-                choices = line['choices']
-                tag = line['tag']
-                source = line['source']
+                prompt = line.get('prompt', '')
+                prompt_ppl = line.get('prompt_ppl', '')
+                label = line.get('label', '')
+                label_ppl = line.get('label_ppl', '')
+                choices = line.get('choices', '')
+                tag = line.get('tag', '')
+                source = line.get('source', '')
                 option_content = {choice: line[choice] for choice in choices}
                 data = {
                     'prompt': prompt,

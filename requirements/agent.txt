@@ -1,7 +1,12 @@
+antlr4-python3-runtime==4.11
+git+ssh://git@gitlab.pjlab.org.cn:1122/openmmlab/bigmodel/ilagent.git@czh/eval_gen
+ipykernel
+ipython
 json5
 jupyter
 jupyter_client
 jupytext
 lagent
+networkx
 scikit-image
-sympy
+sympy==1.12

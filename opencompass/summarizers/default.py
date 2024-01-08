@@ -127,6 +127,8 @@ class DefaultSummarizer:
                 dataset_eval_mode[dataset_abbr] = 'gen'
             elif 'PPLInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'ppl'
+            elif 'LLInferencer' in inferencer:
+                dataset_eval_mode[dataset_abbr] = 'll'
             else:
                 dataset_eval_mode[dataset_abbr] = 'unknown'
                 self.logger.warning(f'unknown inferencer: {inferencer} - {dataset_abbr}')

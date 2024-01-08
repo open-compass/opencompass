@@ -46,9 +46,11 @@ from .hellaswag import *  # noqa: F401, F403
 from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
+from .hungarian_math import *  # noqa: F401, F403
 from .infinitebench import *  # noqa: F401, F403
 from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
+from .jsonl import JsonlDataset  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
@@ -57,6 +59,7 @@ from .leval import *  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
+from .math401 import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
