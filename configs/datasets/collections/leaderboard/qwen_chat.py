@@ -42,7 +42,7 @@ with read_base():
     from ...siqa.siqa_ppl_e8d8c5 import siqa_datasets
     from ...math.math_gen_265cce import math_datasets
     from ...gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
-    from ...drop.drop_gen_599f07 import drop_datasets
+    from ...drop.drop_gen_8a9ed9 import drop_datasets
     from ...humaneval.humaneval_gen_a82cae import humaneval_datasets
     from ...mbpp.mbpp_gen_1e1056 import mbpp_datasets
     from ...bbh.bbh_gen_5b92b0 import bbh_datasets
