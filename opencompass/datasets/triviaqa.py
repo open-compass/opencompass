@@ -1,4 +1,5 @@
 import csv
+import json
 import os.path as osp
 
 from datasets import Dataset, DatasetDict
@@ -18,7 +19,7 @@ class TriviaQADataset(BaseDataset):
         dataset = DatasetDict()
         for split in ['dev', 'test']:
             filename = osp.join(path, f'trivia-{split}.qa.csv')
-            with open(filename) as f:
+            with open(filename, 'r', encoding='utf-8') as f:
                 reader = csv.reader(f, delimiter='\t')
                 raw_data = []
                 for row in reader:
@@ -32,20 +33,49 @@ class TriviaQADataset(BaseDataset):
         return dataset
 
 
+@LOAD_DATASET.register_module()
+class TriviaQADataset_V2(BaseDataset):
+
+    @staticmethod
+    def load(path: str):
+        dataset = DatasetDict()
+        for split in ['validation', 'train']:
+            filename = osp.join(path, f'triviaqa-{split}.jsonl')
+            raw_data = []
+            with open(filename, 'r', encoding='utf-8') as f:
+                for doc in f:
+                    doc = json.loads(doc)
+                    raw_data.append(doc)
+            dataset[split] = Dataset.from_list(raw_data)
+
+        return dataset
+
+
+@LOAD_DATASET.register_module()
+class TriviaQADataset_V3(BaseDataset):
+
+    @staticmethod
+    def load(path: str):
+        data_list = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for doc in f:
+                data_list.append(json.loads(doc))
+        return Dataset.from_list(data_list)
+
+
 @ICL_EVALUATORS.register_module()
 class TriviaQAEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         if len(predictions) != len(references):
-            return {
-                'error': 'predictions and references have different '
-                'length'
-            }
+            return {'error': 'preds and refrs have different length'}
         processed_predictions = []
         for prediction in predictions:
             prediction = prediction.strip().split('\n')[0].lower()
-            if 'answer is' in prediction:
-                prediction = prediction.split('answer is')[-1]
+            prediction = prediction.split('answer is')[-1]
+            prediction = prediction.split('a:')[-1]
+            prediction = prediction.split('answer:')[-1]
+            prediction = prediction.strip()
             prediction = general_postprocess(prediction)
             processed_predictions.append(prediction)
         processed_answers = [[general_postprocess(j).lower() for j in i]

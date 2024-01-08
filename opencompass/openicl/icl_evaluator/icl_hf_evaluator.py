@@ -210,6 +210,20 @@ class BleuEvaluator(HuggingfaceEvaluator):
         super().__init__(metric='sacrebleu')
 
 
+class BleuFloresEvaluator(HuggingfaceEvaluator):
+    """Bleu evaluator using flores200 tokenize."""
+
+    def __init__(self) -> None:
+        super().__init__(metric='sacrebleu')
+
+    def _preprocess(self, predictions: List, references: List) -> dict:
+        return {
+            'predictions': predictions,
+            'references': references,
+            'tokenize': 'flores200',
+        }
+
+
 @ICL_EVALUATORS.register_module()
 class MccEvaluator(AccEvaluator):
     """Matthews correlation evaluator."""

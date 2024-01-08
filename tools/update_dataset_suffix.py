@@ -30,6 +30,14 @@ def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
             hashes = ','.join([get_prompt_hash(cfg) for cfg in dataset_cfg])
             hash_object = hashlib.sha256(hashes.encode())
             return hash_object.hexdigest()
+    # for custom datasets
+    if 'infer_cfg' not in dataset_cfg:
+        dataset_cfg.pop('abbr', '')
+        dataset_cfg.pop('path', '')
+        d_json = json.dumps(dataset_cfg.to_dict(), sort_keys=True)
+        hash_object = hashlib.sha256(d_json.encode())
+        return hash_object.hexdigest()
+    # for regular datasets
     if 'reader_cfg' in dataset_cfg.infer_cfg:
         # new config
         reader_cfg = dict(type='DatasetReader',
@@ -67,7 +75,7 @@ def get_hash(path):
 
 def check_and_rename(filepath):
     base_name = os.path.basename(filepath)
-    match = re.match(r'(.*)_(gen|ppl)_(.*).py', base_name)
+    match = re.match(r'(.*)_(gen|ppl|ll)_(.*).py', base_name)
     if match:
         dataset, mode, old_hash = match.groups()
         new_hash = get_hash(filepath)
@@ -119,6 +127,7 @@ def main():
         return
     with Pool(16) as p:
         p.starmap(os.rename, name_pairs)
+    root_folder = 'configs'
     python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
     update_data = [(python_file, name_pairs) for python_file in python_files]
     with Pool(16) as p:

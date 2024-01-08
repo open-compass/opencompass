@@ -30,7 +30,7 @@ with read_base():
     from ..summedits.summedits_ppl_1fbeb6 import summedits_datasets
     from ..hellaswag.hellaswag_ppl_47bff9 import hellaswag_datasets
     from ..piqa.piqa_ppl_1cf9f0 import piqa_datasets
-    from ..winogrande.winogrande_ppl_55a66e import winogrande_datasets
+    from ..winogrande.winogrande_ll_c5cf57 import winogrande_datasets
     from ..obqa.obqa_ppl_c7c154 import obqa_datasets
     from ..nq.nq_gen_c788f6 import nq_datasets
     from ..triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
