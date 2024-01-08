@@ -365,7 +365,7 @@ class DS1000ServiceEvaluator(BaseEvaluator):
                  lib: str,
                  ip_address='localhost',
                  port=5000,
-                 timeout=180) -> None:
+                 timeout=600) -> None:
         assert lib in _LIBRARY_NAME_LIST, (
             f' lib must be in {_LIBRARY_NAME_LIST}')
         self.lib = lib

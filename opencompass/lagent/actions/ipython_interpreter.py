@@ -16,11 +16,14 @@ from jupyter_client import KernelManager
 from lagent.actions.base_action import BaseAction
 from lagent.schema import ActionReturn, ActionStatusCode
 
-WORK_DIR = os.getenv('CODE_INTERPRETER_WORK_DIR', '/tmp/workspace')
+WORK_DIR = os.getenv('CODE_INTERPRETER_WORK_DIR',
+                     f"{os.path.abspath('./output_images')}")
 
 DEFAULT_DESCRIPTION = """启动Jupter Kernel用于执行Python代码。"""
 
 START_CODE = """
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 def input(*args, **kwargs):
     raise NotImplementedError('Python input() function is disabled.')
 
@@ -74,6 +77,10 @@ class IPythonInterpreter(BaseAction):
 
         if user_data_dir:
             # user_data_dir = os.path.dirname(user_data_dir)
+            # in case change of dirs
+            assert os.path.exists(user_data_dir), \
+                f'{user_data_dir} does not exist.'
+            user_data_dir = os.path.abspath(user_data_dir)
             user_data_dir = f"import os\nos.chdir('{user_data_dir}')"
         self.user_data_dir = user_data_dir
         self._initialized = False

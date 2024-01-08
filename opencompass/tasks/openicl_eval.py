@@ -216,8 +216,8 @@ class OpenICLEvalTask(BaseTask):
             result = icl_evaluator.score(**preds)
 
             if self.dump_details:
+                details = result.get('details', None)
                 try:
-                    details = result.pop('details', None)
                     result['details'] = self.format_details(
                         pred_strs, test_set[self.output_column], details,
                         pred_dicts)
@@ -225,13 +225,10 @@ class OpenICLEvalTask(BaseTask):
 
                     if 'PPL' in str(
                             self.dataset_cfg.infer_cfg.inferencer.type):
-                        result['correct_bpb'], result[
-                            'incorrect_bpb'] = self.calculate_bpb(pred_dicts)
-                    else:
-                        result['incorrect_bpb'] = result['correct_bpb'] = -1
+                        result['correct_bpb'], result['incorrect_bpb'] = \
+                            self.calculate_bpb(pred_dicts)
                 except Exception as e:
                     self.logger.warning(f'Skip dumping details due to: {e}.')
-                    result['incorrect_bpb'] = result['correct_bpb'] = -1
             else:
                 result.pop('details', None)
 

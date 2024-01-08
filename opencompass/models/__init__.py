@@ -24,5 +24,6 @@ from .qwen_api import Qwen  # noqa: F401
 from .sensetime_api import SenseTime  # noqa: F401
 from .turbomind import TurboMindModel  # noqa: F401
 from .turbomind_tis import TurboMindTisModel  # noqa: F401
+from .vllm import VLLM  # noqa: F401
 from .xunfei_api import XunFei  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401

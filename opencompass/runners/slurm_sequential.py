@@ -140,17 +140,23 @@ class SlurmSequentialRunner(BaseRunner):
 
             tbar = tqdm(total=len(job_ids), desc='clear sruns')
             for batched_job_ids in batched(job_ids, 4):
-                ps = []
-                for job_id in batched_job_ids:
-                    tbar.update()
-                    if job_id is None:
-                        continue
-                    cmd = f'scancel {job_id}'
-                    p = subprocess.Popen(cmd,
-                                         shell=True,
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.STDOUT)
-                    ps.append(p)
+                while True:
+                    ps = []
+                    try:
+                        for job_id in batched_job_ids:
+                            tbar.update()
+                            if job_id is None:
+                                continue
+                            cmd = f'scancel {job_id}'
+                            p = subprocess.Popen(cmd,
+                                                 shell=True,
+                                                 stdout=subprocess.PIPE,
+                                                 stderr=subprocess.STDOUT)
+                            ps.append(p)
+                        break
+                    except KeyboardInterrupt:
+                        logger = get_logger()
+                        logger.error('Ignoring KeyboardInterrupt...')
                 for p in ps:
                     p.wait()
             tbar.close()
@@ -182,7 +188,7 @@ class SlurmSequentialRunner(BaseRunner):
                 tmpl += f' --gres=gpu:{num_gpus}'
             for extra_cmd in self.extra_command:
                 tmpl += f' {extra_cmd}'
-            tmpl += f" -N1 -J '{task_name[:512]}'" + ' {task_cmd}'
+            tmpl += f" -N1 -u -J '{task_name[:512]}'" + ' {task_cmd}'
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
