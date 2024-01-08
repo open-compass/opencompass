@@ -49,6 +49,14 @@ def first_capital_postprocess(text: str) -> str:
     return ''
 
 
+@TEXT_POSTPROCESSORS.register_module('last-capital')
+def last_capital_postprocess(text: str) -> str:
+    for t in text[::-1]:
+        if t.isupper():
+            return t
+    return ''
+
+
 def first_option_postprocess(text: str, options: str) -> str:
     """Find first valid option for text."""
 

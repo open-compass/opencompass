@@ -68,11 +68,11 @@ class LMTemplateParser:
         prompt = ''
         if self.roles:
             for dialog in chat:
-                role_cfg = self.roles.get(dialog['role'])
-                prompt += role_cfg['begin']
+                role_cfg = self.roles.get(dialog['role'], {})
+                prompt += (role_cfg.get('begin') or '')
                 prompt += (dialog.get('content') or '')
-                prompt += role_cfg['end']
-            prompt += self.roles['assistant']['begin']
+                prompt += (role_cfg.get('end') or '')
+            prompt += (self.roles['assistant'].get('begin') or '')
         else:
             # in case the model does not have any meta template
             last_sep = ''
@@ -188,6 +188,7 @@ class ChatInferencer(BaseInferencer):
         if self.model.is_api and save_every is None:
             save_every = 1
         self.save_every = save_every
+        self.dialogue_mode = False
 
     def _set_meta_template(self, model):
         origin = model.template_parser
@@ -227,9 +228,13 @@ class ChatInferencer(BaseInferencer):
                                          'tmp_' + output_json_filename)
         if osp.exists(tmp_json_filepath):
             # TODO: move resume to output handler
-            tmp_result_dict = mmengine.load(tmp_json_filepath)
-            output_handler.results_dict = tmp_result_dict
-            index = len(tmp_result_dict)
+            try:
+                tmp_result_dict = mmengine.load(tmp_json_filepath)
+            except Exception:
+                pass
+            else:
+                output_handler.results_dict = tmp_result_dict
+                index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         dataloader = self.get_dataloader(chat_list[index:], batch_size=1)
@@ -310,6 +315,9 @@ class ChatInferencer(BaseInferencer):
                     item[input_columns[0]], dict):
                 # Single input column and it's already a chat.
                 chat = item[input_columns[0]]
+            elif 'dialogue' in input_columns:
+                chat = item['dialogue']
+                self.dialogue_mode = True
             else:
                 raise ValueError('Cannot construct chat from the dataset.')
 
@@ -335,19 +343,39 @@ class ChatInferencer(BaseInferencer):
         assistant_indices = [
             i for i, item in enumerate(chat) if item['role'] == 'assistant'
         ]
+        index_copy = index
 
         for i in assistant_indices:
             history = chat[:i]
             output = self.model.generate_from_template([history],
                                                        max_out_len=512)[0]
-            output_handler.save_multiround_results(
-                origin_prompt=history[-1]['content'],
-                prediction=output,
-                idx=index,
-                gold=chat[i]['content'],
-            )
             chat[i]['content'] = output
-            index += 1
+            if not self.dialogue_mode:
+                output_handler.save_multiround_results(
+                    origin_prompt=history[-1]['content'],
+                    prediction=output,
+                    idx=index,
+                    gold=chat[i]['content'],
+                )
+                index += 1
+        if self.dialogue_mode:
+            # dialogue mode for subjective evaluation
+            assert len(chat) % 2 == 0
+            round_num = int(len(chat) / 2)
+            preds_list = []
+            for i in range(round_num):
+                temp_dict = {
+                    'round': i + 1,
+                    'user': chat[i * 2]['content'],
+                    'assistant': chat[i * 2 + 1]['content']
+                }
+                preds_list.append(temp_dict)
+            output_handler.save_results(
+                origin_prompt=None,
+                prediction=str(preds_list),
+                idx=index_copy,
+                gold=None,
+            )
 
     def infer_every_with_gt(self, chat: List[dict], index: int,
                             output_handler):

@@ -172,7 +172,8 @@ class LocalAPIRunner(BaseRunner):
         self.max_num_workers = max_num_workers
         self.concurrent_users = concurrent_users
         assert task['type'] in [
-            'OpenICLInferTask', 'opencompass.tasks.OpenICLInferTask'
+            'OpenICLInferTask',
+            'opencompass.tasks.OpenICLInferTask',
         ], 'Only supported for api infer task.'
 
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:

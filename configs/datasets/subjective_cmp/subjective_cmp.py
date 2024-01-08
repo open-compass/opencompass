@@ -6,11 +6,11 @@ from opencompass.datasets.subjective_cmp import SubjectiveCmpDataset
 
 subjective_reader_cfg = dict(
     input_columns=['question', 'index', 'reference_answer', 'evaluating_guidance', 'capability', 'prompt'],
-    output_column=None,
+    output_column='judge',
     train_split='test')
 
 subjective_all_sets = [
-    "subjective_demo",
+    "creation_v0.1",
 ]
 
 subjective_datasets = []
@@ -27,7 +27,7 @@ for _name in subjective_all_sets:
                 ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer),
+            inferencer=dict(type=GenInferencer, max_out_len=2048),
         )
 
     subjective_eval_cfg = dict(

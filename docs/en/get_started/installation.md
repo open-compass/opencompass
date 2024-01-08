@@ -87,13 +87,13 @@ wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/Ope
 unzip OpenCompassData-core-20231110.zip
 ```
 
-If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download it using the following command:
+If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download and `unzip` it using the following command:
 
 ```bash
 wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
 unzip OpenCompassData-complete-20231110.zip
 cd ./data
-unzip *.zip
+find . -name "*.zip" -exec unzip {} \;
 ```
 
 The list of datasets included in both `.zip` can be found [here](https://github.com/open-compass/opencompass/releases/tag/0.1.8.rc1)

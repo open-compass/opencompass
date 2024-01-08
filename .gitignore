@@ -4,6 +4,7 @@ outputs/
 icl_inference_output/
 .vscode/
 tmp/
+configs/eval_subjective_alignbench_test.py
 configs/openai_key.py
 configs/secrets.py
 configs/datasets/log.json
@@ -11,6 +12,7 @@ configs/eval_debug*.py
 configs/viz_*.py
 data
 work_dirs
+models/*
 configs/internal/
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -93,3 +95,6 @@ configs/cky/
 
 # path of turbomind's model after runing `lmdeploy.serve.turbomind.deploy`
 turbomind/
+
+# ignore the config file for criticbench evaluation
+configs/sft_cfg/criticbench_eval/*

@@ -4,11 +4,20 @@ from opencompass.partitioners import SizePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.models.lagent import LagentAgent
-from lagent import PythonInterpreter, ReAct
+from opencompass.lagent.actions.python_interpreter import PythonInterpreter
+from lagent import ReAct
 from lagent.agents.react import ReActProtocol
 
 with read_base():
-    from .datasets.gsm8k.gsm8k_agent_gen_3ac57d import gsm8k_datasets as datasets
+    from .datasets.gsm8k.gsm8k_agent_gen_be1606 import gsm8k_datasets
+    from .datasets.math.math_agent_gen_af2293 import math_datasets
+    from .datasets.MathBench.mathbench_agent_gen_568903 import mathbench_agent_datasets
+    from .summarizers.math_agent import summarizer
+
+datasets = []
+datasets += gsm8k_datasets
+datasets += math_datasets
+datasets += mathbench_agent_datasets
 
 system_prompt = """You are a helpful assistant which use tools to solve mathematical reasoning questions. The code must be a function, and the function name must be 'solution'. For mathematics, please use code tool to calculate. The example format is as follows:
 ```

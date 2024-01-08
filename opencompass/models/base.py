@@ -115,6 +115,20 @@ class BaseModel:
         inputs = self.parse_template(templates, mode='ppl')
         return self.get_ppl(inputs, mask_length)
 
+    def get_loglikelihood_from_template(self,
+                                        templates: List[PromptType],
+                                        conts: List[str],
+                                        mask_length=None):
+        """Get perplexity given a list of templates.
+
+        Args:
+            templates (List[PromptType]): A list of templates.
+            mask_length (List[int]): A list of mask lengths. If provided, the
+                perplexity will be calculated only on the unmasked tokens.
+        """
+        inputs = self.parse_template(templates, mode='ppl')
+        return self.get_loglikelihood(inputs, conts, mask_length)
+
     def generate_from_template(self, templates: List[PromptType],
                                max_out_len: int, **kwargs):
         """Generate completion from a list of templates.

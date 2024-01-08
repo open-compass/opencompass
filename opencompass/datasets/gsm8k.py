@@ -21,7 +21,6 @@ class GSM8KDataset(BaseDataset):
             with open(split_path, 'r', encoding='utf-8') as f:
                 for line in f:
                     line = json.loads(line.strip())
-                    line['answer']
                     dataset.append(line)
             datasets[split] = Dataset.from_list(dataset)
         return DatasetDict(datasets)
@@ -114,6 +113,8 @@ class Gsm8kAgentEvaluator(BaseEvaluator):
 
     def score(self, predictions, references, steps):
         """Calculate accuracy."""
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length'}
 
         row_reasoning_scope = 0
         action_scope = 0
@@ -142,6 +143,6 @@ class Gsm8kAgentEvaluator(BaseEvaluator):
             reasoning_acc=100 *
             (reasoning_scope + final_scope + row_reasoning_scope) / total,
             code_acc=100 * (code_scope + final_scope) / total,
-            action_acc=100 * (action_scope + final_scope) / total,
+            action_pct=100 * (action_scope + final_scope) / total,
         )
         return result

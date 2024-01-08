@@ -1,10 +1,12 @@
+import inspect
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Dict, List, Optional
 
 from mmengine.config import ConfigDict
 
-from opencompass.utils import get_logger, task_abbr_from_cfg
+from opencompass.utils import (dataset_abbr_from_cfg, get_logger,
+                               model_abbr_from_cfg, task_abbr_from_cfg)
 
 
 class BasePartitioner:
@@ -54,8 +56,7 @@ class BasePartitioner:
             List[Dict]: A list of tasks.
         """
         cfg = deepcopy(cfg)
-        models = cfg['models']
-        datasets = cfg['datasets']
+
         work_dir = cfg['work_dir']
 
         add_cfg = {}
@@ -74,10 +75,11 @@ class BasePartitioner:
                 self.logger.debug(f'Key {k} not found in config, ignored.')
         self.logger.debug(f'Additional config: {add_cfg}')
 
-        tasks = self.partition(models,
-                               datasets,
-                               work_dir,
-                               self.out_dir,
+        model_and_dataset_args = self.parse_model_dataset_args(cfg)
+
+        tasks = self.partition(**model_and_dataset_args,
+                               work_dir=work_dir,
+                               out_dir=self.out_dir,
                                add_cfg=add_cfg)
 
         self.logger.info(f'Partitioned into {len(tasks)} tasks.')
@@ -85,6 +87,41 @@ class BasePartitioner:
             self.logger.debug(f'Task {i}: {task_abbr_from_cfg(task)}')
 
         return tasks
+
+    def parse_model_dataset_args(self, cfg: ConfigDict):
+        models = cfg['models']
+        datasets = cfg['datasets']
+
+        sig = inspect.signature(self.partition)
+        if 'model_dataset_combinations' in sig.parameters:
+            combs = cfg.get('model_dataset_combinations', None)
+            if combs is None:
+                combs = [{'models': models, 'datasets': datasets}]
+            else:
+                # sanity check
+                model_abbrs = [model_abbr_from_cfg(model) for model in models]
+                dataset_abbrs = [
+                    dataset_abbr_from_cfg(dataset) for dataset in datasets
+                ]
+                for comb in combs:
+                    for model in comb['models']:
+                        if model_abbr_from_cfg(model) not in model_abbrs:
+                            raise ValueError(
+                                f'Model {model_abbr_from_cfg(model)} '
+                                'not found in config.')
+                    for dataset in comb['datasets']:
+                        if dataset_abbr_from_cfg(dataset) not in dataset_abbrs:
+                            raise ValueError(
+                                f'Dataset {dataset_abbr_from_cfg(dataset)} '
+                                'not found in config.')
+            used_kwargs = {'model_dataset_combinations': combs}
+        else:
+            if cfg.get('model_dataset_combinations', None) is not None:
+                self.logger.warning(
+                    'model_dataset_combinations is not supported by '
+                    f'{self.__class__.__name__}. Ignored.')
+            used_kwargs = {'models': models, 'datasets': datasets}
+        return used_kwargs
 
     @abstractmethod
     def partition(self,

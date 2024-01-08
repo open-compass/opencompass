@@ -1,0 +1,7 @@
+json5
+jupyter
+jupyter_client
+jupytext
+lagent
+scikit-image
+sympy
