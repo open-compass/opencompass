@@ -88,13 +88,13 @@ wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/Ope
 unzip OpenCompassData-core-20231110.zip
 ```
 
-如果需要使用 OpenCompass 提供的更加完整的数据集 (~500M)，可以使用下述命令进行下载：
+如果需要使用 OpenCompass 提供的更加完整的数据集 (~500M)，可以使用下述命令进行下载和解压：
 
 ```bash
 wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
 unzip OpenCompassData-complete-20231110.zip
 cd ./data
-unzip *.zip
+find . -name "*.zip" -exec unzip {} \;
 ```
 
 两个 `.zip` 中所含数据集列表如[此处](https://github.com/open-compass/opencompass/releases/tag/0.1.8.rc1)所示。
