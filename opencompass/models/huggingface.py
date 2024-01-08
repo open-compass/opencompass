@@ -241,6 +241,7 @@ class HuggingFace(BaseModel):
         if self.batch_padding and len(inputs) > 1:
             return self._batch_generate(inputs=inputs,
                                         max_out_len=max_out_len,
+                                        stopping_criteria=stopping_criteria,
                                         **generation_kwargs)
         else:
             return sum(
@@ -250,7 +251,9 @@ class HuggingFace(BaseModel):
                                        **generation_kwargs)
                  for input_ in inputs), [])
 
-    def _batch_generate(self, inputs: List[str], max_out_len: int,
+    def _batch_generate(self, inputs: List[str], 
+                        max_out_len: int, 
+                        stopping_criteria: List[str] = [],
                         **kwargs) -> List[str]:
         """Support for batch prompts inference.
 
@@ -288,6 +291,19 @@ class HuggingFace(BaseModel):
             k: torch.tensor(np.array(tokens[k]), device=self.model.device)
             for k in tokens if k in ['input_ids', 'attention_mask']
         }
+
+        if stopping_criteria:
+            # Construct huggingface stopping criteria
+            if self.tokenizer.eos_token is not None:
+                stopping_criteria = stopping_criteria + [self.tokenizer.eos_token]
+            stopping_criteria = transformers.StoppingCriteriaList([
+                *[
+                    MultiTokenEOSCriteria(sequence, self.tokenizer,
+                                          tokens['input_ids'].shape[0])
+                    for sequence in stopping_criteria
+                ],
+            ])
+            kwargs['stopping_criteria'] = stopping_criteria
 
         # step-2: conduct model forward to generate output
         outputs = self.model.generate(**tokens,
@@ -359,7 +375,8 @@ class HuggingFace(BaseModel):
 
         if stopping_criteria:
             # Construct huggingface stopping criteria
-            stopping_criteria = stopping_criteria + [self.tokenizer.eos_token]
+            if self.tokenizer.eos_token is not None:
+                stopping_criteria = stopping_criteria + [self.tokenizer.eos_token]
             stopping_criteria = transformers.StoppingCriteriaList([
                 *[
                     MultiTokenEOSCriteria(sequence, self.tokenizer,
