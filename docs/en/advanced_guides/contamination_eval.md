@@ -102,7 +102,7 @@ ceval-hard                                      -          ppl     44.35        
 ceval                                           -          ppl     67.32             71.01                          81.17                                    58.97             49.28                          67.82                                    ...
 ```
 
-Currently, this solution only supports the C-Eval dataset. [Contamination_Detector](https://github.com/liyucheng09/Contamination_Detector) also includes ARC, CSQA, HellaSwag, MMLU, and WinoGrande, but these have not yet been implemented in OpenCompass. We welcome the community to contribute more datasets.
+Currently, this solution only supports the C-Eval, MMLU, HellaSwag and ARC. [Contamination_Detector](https://github.com/liyucheng09/Contamination_Detector) also includes CSQA and WinoGrande, but these have not yet been implemented in OpenCompass. We welcome the community to contribute more datasets.
 
 Consider cite the following paper if you find it helpful:
 

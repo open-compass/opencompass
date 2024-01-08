@@ -11,5 +11,5 @@ with read_base():
     from .summarizers.contamination import summarizer
 
 
-datasets = [*ceval_datasets]
+datasets = [*ceval_datasets, *mmlu_datasets, *hellaswag_datasets, *ARC_c_datasets]
 models = [*hf_yi_6b_model, *hf_qwen_7b_model, *hf_llama2_7b_model]
