@@ -148,8 +148,8 @@ def parse_math_answer(setting_name, raw_string):
         last_match = None
         if '=' in s:
             last_match = s.split('=')[-1].lstrip(' ').rstrip('.')
-            if '\\n' in last_match:
-                last_match = last_match.split('\\n')[0]
+            if '\n' in last_match:
+                last_match = last_match.split('\n')[0]
         else:
             pattern = '(?:\\$)?\d+(?:\.\d+)?(?![\w\d])'
             matches = re.findall(pattern, s)
@@ -170,6 +170,8 @@ def parse_math_answer(setting_name, raw_string):
 def parse_qa_multiple_answer(string):
     # if setting_name == 'few-shot-CoT':
         # string = extract_last_line(string)
+    for x in ['CC', 'CA', 'AC', 'POMES', 'AI', 'MIBG', 'CF', 'CTE', 'AD', 'CB', 'BG', 'BD', 'BE', 'BH', 'CTB', 'BI', 'CE', 'Pugh', 'Child', 'CTI', 'CTA', 'TACE', 'PPD', 'Castleman', 'BA', 'CH', 'AB', 'CTC', 'CT', 'CTH', 'CD', 'AH', 'AE', 'AA', 'AF', 'BC', 'CG', 'BB', 'CI', 'BF', 'CTF', 'CTG', 'AG', 'CTD', '分级C', '分级A', 'I131', '分级B', '分级D', '131I‐MIBG', 'NYHA', 'IPF', 'DIP', 'Lambert-Eaton', 'Graves', 'IIA期', 'CKD', 'FDA', 'A级', 'B级', 'C级', 'D级', '维生素D']:
+        string = string.replace(x, '')
     pattern = '\(*([A-Z])\)*'
     match = re.findall(pattern, string)
     if match:

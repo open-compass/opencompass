@@ -23,7 +23,6 @@ medbench_ie_sets = ['DBMHG', 'CMeEE', 'CMeIE', 'CHIP-CDEE', 'CHIP-CDN', 'CHIP-CT
 
 def convert_zero_shot(line, dataset_name):
     # passage = line['passage'] if line['passage'] is not None else ''
-<<<<<<< HEAD
     # if dataset_name in medbench_qa_sets:
     #     return line['question']
     # elif dataset_name in medbench_cloze_sets:
@@ -34,17 +33,6 @@ def convert_zero_shot(line, dataset_name):
     # else:
     #     return line['question']
     return line['question']
-=======
-    if dataset_name in medbench_qa_sets:
-        return line['question']
-    elif dataset_name in medbench_cloze_sets:
-        return '问题：' + line['question'] + '\n答案：'
-    elif dataset_name in medbench_multiple_choices_sets:
-        return '问题：' + line['question'] + ' ' \
-            + '选项：' + ' '.join(line['options']) + '\n从A到G，我们应该选择'
-    else:
-        return line['question']
->>>>>>> ecd20bb94588f2864858c20571043c545e64bb7d
 
 prefix = '该问题为单选题，所有选项中必有一个正确答案，且只有一个正确答案。\n'
 
