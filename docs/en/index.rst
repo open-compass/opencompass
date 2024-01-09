@@ -58,6 +58,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :caption: Advanced Guides
 
    advanced_guides/new_dataset.md
+   advanced_guides/custom_dataset.md
    advanced_guides/new_model.md
    advanced_guides/evaluation_turbomind.md
    advanced_guides/evaluation_lightllm.md

@@ -4,6 +4,7 @@ from typing import List, Union
 import tabulate
 from mmengine.config import Config
 
+from opencompass.datasets.custom import make_custom_dataset_config
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
@@ -56,18 +57,37 @@ def get_config_from_arg(args) -> Config:
     3. Huggingface parameter groups and args.datasets
     """
     if args.config:
-        return Config.fromfile(args.config, format_python_code=False)
-    if args.datasets is None:
-        raise ValueError('You must specify "--datasets" if you do not specify '
-                         'a config file path.')
+        config = Config.fromfile(args.config, format_python_code=False)
+        for i, dataset in enumerate(config['datasets']):
+            if 'type' not in dataset:
+                config['datasets'][i] = make_custom_dataset_config(dataset)
+        return config
+    # parse dataset args
+    if not args.datasets and not args.custom_dataset_path:
+        raise ValueError('You must specify "--datasets" or '
+                         '"--custom-dataset-path" if you do not specify a '
+                         'config file path.')
     datasets = []
-    datasets_dir = os.path.join(args.config_dir, 'datasets')
-    for dataset in match_cfg_file(datasets_dir, args.datasets):
-        get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
-        cfg = Config.fromfile(dataset[1])
-        for k in cfg.keys():
-            if k.endswith('_datasets'):
-                datasets += cfg[k]
+    if args.datasets:
+        datasets_dir = os.path.join(args.config_dir, 'datasets')
+        for dataset in match_cfg_file(datasets_dir, args.datasets):
+            get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
+            cfg = Config.fromfile(dataset[1])
+            for k in cfg.keys():
+                if k.endswith('_datasets'):
+                    datasets += cfg[k]
+    else:
+        dataset = {'path': args.custom_dataset_path}
+        if args.custom_dataset_infer_method is not None:
+            dataset['infer_method'] = args.custom_dataset_infer_method
+        if args.custom_dataset_data_type is not None:
+            dataset['data_type'] = args.custom_dataset_data_type
+        if args.custom_dataset_meta_path is not None:
+            dataset['meta_path'] = args.custom_dataset_meta_path
+        dataset = make_custom_dataset_config(dataset)
+        datasets.append(dataset)
+
+    # parse model args
     if not args.models and not args.hf_path:
         raise ValueError('You must specify a config file path, '
                          'or specify --models and --datasets, or '
@@ -98,7 +118,7 @@ def get_config_from_arg(args) -> Config:
                      pad_token_id=args.pad_token_id,
                      run_cfg=dict(num_gpus=args.num_gpus))
         models.append(model)
-
+    # parse summarizer args
     summarizer = args.summarizer if args.summarizer is not None else 'example'
     summarizers_dir = os.path.join(args.config_dir, 'summarizers')
     s = match_cfg_file(summarizers_dir, [summarizer])[0]

@@ -18,6 +18,13 @@ models = [
         type=AI360GPT,
         path='360GPT_S2_V9',
         key="xxxxxxxxxxxx",
+        generation_kwargs={
+            'temperature': 0.9,
+            'max_tokens': 2048,
+            'top_p': 0.5,
+            'tok_k': 0,
+            'repetition_penalty': 1.05,
+        },
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,

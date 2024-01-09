@@ -1,9 +1,11 @@
 import re
 import sys
 import threading
+import time
 import warnings
 from abc import abstractmethod
 from copy import deepcopy
+from queue import Queue
 from time import sleep
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -37,6 +39,7 @@ class BaseAPIModel(BaseModel):
     def __init__(self,
                  path: str,
                  query_per_second: int = 1,
+                 rpm_verbose: bool = False,
                  retry: int = 2,
                  max_seq_len: int = 2048,
                  meta_template: Optional[Dict] = None,
@@ -46,7 +49,7 @@ class BaseAPIModel(BaseModel):
         self.meta_template = meta_template
         self.retry = retry
         self.query_per_second = query_per_second
-        self.token_bucket = TokenBucket(query_per_second)
+        self.token_bucket = TokenBucket(query_per_second, rpm_verbose)
         self.template_parser = APITemplateParser(meta_template)
         self.logger = get_logger()
         self.generation_kwargs = generation_kwargs
@@ -422,10 +425,13 @@ class TokenBucket:
         query_per_second (float): The rate of the token bucket.
     """
 
-    def __init__(self, rate):
+    def __init__(self, rate, verbose=False):
         self._rate = rate
         self._tokens = threading.Semaphore(0)
         self.started = False
+        self._request_queue = Queue()
+        self.logger = get_logger()
+        self.verbose = verbose
 
     def _add_tokens(self):
         """Add tokens to the bucket."""
@@ -440,3 +446,12 @@ class TokenBucket:
             self.started = True
             threading.Thread(target=self._add_tokens, daemon=True).start()
         self._tokens.acquire()
+        if self.verbose:
+            cur_time = time.time()
+            while not self._request_queue.empty():
+                if cur_time - self._request_queue.queue[0] > 60:
+                    self._request_queue.get()
+                else:
+                    break
+            self._request_queue.put(cur_time)
+            self.logger.info(f'Current RPM {self._request_queue.qsize()}.')

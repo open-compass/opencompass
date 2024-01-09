@@ -16,6 +16,8 @@ class cmnliDataset(BaseDataset):
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 line = json.loads(line)
+                if line['label'] == '-':
+                    continue
                 data.append(line)
         return Dataset.from_list(data)
 

@@ -4,7 +4,7 @@ import random
 import subprocess
 import time
 from functools import partial
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import mmengine
 from mmengine.config import ConfigDict
@@ -31,6 +31,8 @@ class SlurmRunner(BaseRunner):
         qos (str): Slurm quality of service. Defaults to None.
         debug (bool): Whether to run in debug mode. Defaults to False.
         lark_bot_url (str): Lark bot url. Defaults to None.
+        extra_command (List, optional): Extra slurm command.
+            For example ['-c 12', '-w node1']. Defaults to None.
     """
 
     def __init__(self,
@@ -41,13 +43,18 @@ class SlurmRunner(BaseRunner):
                  quotatype: str = None,
                  qos: str = None,
                  debug: bool = False,
-                 lark_bot_url: str = None):
+                 lark_bot_url: str = None,
+                 extra_command: Optional[List[str]] = None):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.max_num_workers = max_num_workers
         self.retry = retry
         self.partition = partition
         self.quotatype = quotatype
         self.qos = qos
+        if not extra_command:
+            extra_command = []
+        assert isinstance(extra_command, list)
+        self.extra_command = extra_command
 
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
         """Launch multiple tasks.
@@ -101,6 +108,8 @@ class SlurmRunner(BaseRunner):
                 tmpl += f' --qos={self.qos}'
             if num_gpus > 0:
                 tmpl += f' --gres=gpu:{num_gpus}'
+            for extra_cmd in self.extra_command:
+                tmpl += f' {extra_cmd}'
             tmpl += f" -N1 -J '{task_name[:512]}'" + ' {task_cmd}'
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,

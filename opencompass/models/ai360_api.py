@@ -38,12 +38,19 @@ class AI360GPT(BaseAPIModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
-    ):
+        generation_kwargs: Dict = {
+            'temperature': 0.9,
+            'max_tokens': 2048,
+            'top_p': 0.5,
+            'tok_k': 0,
+            'repetition_penalty': 1.05,
+        }):  # noqa E125
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          query_per_second=query_per_second,
                          meta_template=meta_template,
-                         retry=retry)
+                         retry=retry,
+                         generation_kwargs=generation_kwargs)
         self.headers = {
             'Authorization': f'Bearer {key}',
             'Content-Type': 'application/json',
@@ -110,14 +117,10 @@ class AI360GPT(BaseAPIModel):
             'model': self.model,
             'messages': messages,
             'stream': False,
-            'temperature': 0.9,
-            'max_tokens': 2048,
-            'top_p': 0.5,
-            'tok_k': 0,
-            'repetition_penalty': 1.05,
-            # "num_beams": 1,
             # "user": "OpenCompass"
         }
+
+        data.update(self.generation_kwargs)
 
         max_num_retries = 0
         while max_num_retries < self.retry:

@@ -94,11 +94,11 @@ for _split in list(mathbench_sets.keys()):
 
         mathbench_datasets.append(
             dict(
+                abbr="mathbench-" + _split + '-' + _name,
                 type=MathBenchDataset,
                 path=f"./data/mathbench/{_split}",
                 name=_name,
                 with_circular=with_circular_eval,
-                abbr="mathbench-" + _split + '-' + _name,
                 reader_cfg=dict(
                     input_columns=["question"],
                     output_column="answer"

@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 import torch
+import transformers
 
 from opencompass.models.base import BaseModel
 from opencompass.models.base_api import APITemplateParser
@@ -11,6 +12,33 @@ from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
 
 PromptType = Union[PromptList, str]
+
+
+class MultiTokenEOSCriteria(transformers.StoppingCriteria):
+    """Criteria to stop on the specified multi-token sequence."""
+
+    def __init__(
+        self,
+        sequence: str,
+        tokenizer: transformers.PreTrainedTokenizer,
+        batch_size: int,
+    ):
+        self.done_tracker = [False] * batch_size
+        self.sequence = sequence
+        self.sequence_ids = tokenizer.encode(sequence,
+                                             add_special_tokens=False)
+        self.sequence_id_len = len(self.sequence_ids)
+        self.tokenizer = tokenizer
+
+    def __call__(self, input_ids, scores, **kwargs) -> bool:
+        # compare the last len(stop) tokens
+        lookback_ids_batch = input_ids[:, -self.sequence_id_len:]
+        lookback_tokens_batch = self.tokenizer.batch_decode(lookback_ids_batch)
+        for i, done in enumerate(self.done_tracker):
+            if done:
+                continue
+            self.done_tracker[i] = self.sequence in lookback_tokens_batch[i]
+        return False not in self.done_tracker
 
 
 @MODELS.register_module()
@@ -194,7 +222,10 @@ class HuggingFace(BaseModel):
             self.model.config.eos_token_id = 2
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
-    def generate(self, inputs: List[str], max_out_len: int,
+    def generate(self,
+                 inputs: List[str],
+                 max_out_len: int,
+                 stopping_criteria: List[str] = [],
                  **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -212,9 +243,12 @@ class HuggingFace(BaseModel):
                                         max_out_len=max_out_len,
                                         **generation_kwargs)
         else:
-            return sum((self._single_generate(
-                inputs=[input_], max_out_len=max_out_len, **generation_kwargs)
-                        for input_ in inputs), [])
+            return sum(
+                (self._single_generate(inputs=[input_],
+                                       max_out_len=max_out_len,
+                                       stopping_criteria=stopping_criteria,
+                                       **generation_kwargs)
+                 for input_ in inputs), [])
 
     def _batch_generate(self, inputs: List[str], max_out_len: int,
                         **kwargs) -> List[str]:
@@ -275,7 +309,10 @@ class HuggingFace(BaseModel):
             decodeds = [token.split(self.end_str)[0] for token in decodeds]
         return decodeds
 
-    def _single_generate(self, inputs: List[str], max_out_len: int,
+    def _single_generate(self,
+                         inputs: List[str],
+                         max_out_len: int,
+                         stopping_criteria: List[str] = [],
                          **kwargs) -> List[str]:
         """Support for single prompt inference.
 
@@ -319,6 +356,19 @@ class HuggingFace(BaseModel):
                                    max_length=self.max_seq_len -
                                    max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
+
+        if stopping_criteria:
+            # Construct huggingface stopping criteria
+            stopping_criteria = stopping_criteria + [self.tokenizer.eos_token]
+            stopping_criteria = transformers.StoppingCriteriaList([
+                *[
+                    MultiTokenEOSCriteria(sequence, self.tokenizer,
+                                          input_ids.shape[0])
+                    for sequence in stopping_criteria
+                ],
+            ])
+            kwargs['stopping_criteria'] = stopping_criteria
+
         # To accommodate the PeftModel, parameters should be passed in
         # key-value format for generate.
         outputs = self.model.generate(input_ids=input_ids,
@@ -434,6 +484,71 @@ class HuggingFace(BaseModel):
         ce_loss = loss.sum(-1).cpu().detach().numpy() / lens
         return ce_loss
 
+    def get_loglikelihood(
+            self,
+            inputs: List[str],
+            conts: List[str],
+            mask_length: Optional[List[int]] = None) -> List[float]:
+        """Get loglikelihood scores given a list of inputs.
+
+        Args:
+            inputs (List[str]): A list of strings.
+            conts (List[str]): A list of strings: slices after the space.
+            NOT SUPPORT mask_length YET!
+            mask_length (Optional[List[int]]): A list of mask lengths. If
+                provided, the perplexity scores will be calculated with the
+                first mask_length[i] tokens masked out. It's okay to skip
+                its implementation if advanced features in PPLInfernecer is
+                not needed.
+
+        Returns:
+            List[float]: A list of loglikelihood scores.
+        """
+        assert mask_length is None, 'Not support mask_length yet.'
+        if self.batch_padding and len(inputs) > 1:
+            raise NotImplementedError('Batch padding is not supported yet.')
+            # assert self.tokenizer.pad_token
+            # return self._get_loglikelihood(inputs, mask_length=mask_length)
+        return np.array([
+            self._get_loglikelihood(inputs=inputs[idx], conts=conts[idx])
+            for idx in range(len(inputs))
+        ])
+
+    def _get_loglikelihood(self, inputs: str, conts: str) -> float:
+        """Get loglikelihood scores given input string and continuation string.
+
+        Args:
+            inputs (str): string.
+            conts (str): strings: slices after the space.
+        Returns:
+            float: loglikelihood scores.
+        """
+
+        input_ids = self.tokenizer(inputs,
+                                   padding=False,
+                                   truncation=True,
+                                   max_length=self.max_seq_len)['input_ids']
+        input_ids = torch.tensor(input_ids, device=self.model.device)
+        context_ids = self.tokenizer(inputs.replace(conts, ''),
+                                     padding=False,
+                                     truncation=True,
+                                     max_length=self.max_seq_len)['input_ids']
+        cont_ids = input_ids[len(context_ids):]
+
+        output = self.model(input_ids.unsqueeze(0))
+        logits = output['logits'][:, :-1]
+        logits = torch.nn.functional.log_softmax(logits, dim=-1)
+        contlen = cont_ids.shape[0]
+        logits = logits[:, -contlen:, :]
+        # Reducing the dimension will lead to a wrong outcome
+        logits_gather = torch.gather(
+            logits, 2,
+            cont_ids.unsqueeze(0).unsqueeze(-1))  # [1, seq]
+
+        # Answer: sum the likelihood of each token in continuation
+        answer = float(logits_gather.detach().cpu().sum())
+        return answer
+
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.
 
@@ -506,6 +621,7 @@ class HuggingFaceChatGLM3(HuggingFace):
                  peft_path: Optional[str] = None,
                  tokenizer_only: bool = False,
                  model_kwargs: dict = dict(device_map='auto'),
+                 generation_kwargs: dict = dict(),
                  meta_template: Optional[Dict] = None,
                  extract_pred_after_decode: bool = False,
                  batch_padding: bool = False,
@@ -519,6 +635,7 @@ class HuggingFaceChatGLM3(HuggingFace):
                          tokenizer_kwargs=tokenizer_kwargs,
                          peft_path=peft_path,
                          tokenizer_only=tokenizer_only,
+                         generation_kwargs=generation_kwargs,
                          model_kwargs=model_kwargs,
                          meta_template=meta_template,
                          extract_pred_after_decode=extract_pred_after_decode,
@@ -532,15 +649,17 @@ class HuggingFaceChatGLM3(HuggingFace):
     def generate(self,
                  inputs: List[str or PromptList],
                  max_out_len: int = 512,
-                 temperature: float = 0.6,
-                 skip_overlength=False) -> str:
+                 skip_overlength=False,
+                 **kwargs) -> str:
         """Generate response from input prompt.
 
         Args:
             inputs (list): input prompt
             max_out_len (int): max output length
-            temperature (float): temperature for sampling
         """
+        generation_kwargs = kwargs.copy()
+        generation_kwargs.update(self.generation_kwargs)
+
         responses = []
         for _input in inputs:
             assert isinstance(_input, (str, PromptList))
@@ -554,8 +673,8 @@ class HuggingFaceChatGLM3(HuggingFace):
                         'role': {
                             'HUMAN': 'user',
                             'BOT': 'assistant',
-                            'SYSTEM': 'system'
-                        }[item['role']]
+                            'SYSTEM': 'system',
+                        }[item['role'].upper()]
                     }
                     history.append(msg)
             user_content = history[-1]['content']
@@ -577,7 +696,11 @@ class HuggingFaceChatGLM3(HuggingFace):
             try:
                 response, history = self.model.chat(self.tokenizer,
                                                     user_content,
-                                                    history=history)
+                                                    history=history,
+                                                    **generation_kwargs)
+                # response will be dict sometime
+                if isinstance(response, dict):
+                    response = response.get('content', '')
                 responses.append(response)
             except Exception:
                 responses.append('')

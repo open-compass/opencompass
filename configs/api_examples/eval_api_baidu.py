@@ -20,10 +20,14 @@ models = [
         key='xxxxxx',  # please give you key
         secretkey='xxxxxxxxx',  # please give your group_id
         url='xxxxxxxxx',
+        generation_kwargs = {
+            'temperature': 0.8,
+        },
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
-        batch_size=8),
+        batch_size=8
+    ),
 ]
 
 infer = dict(
