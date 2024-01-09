@@ -2,6 +2,9 @@ from abc import abstractmethod
 from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
 
+import torch
+from mmengine import dist
+
 from opencompass.utils.prompt import PromptList
 
 PromptType = Union[PromptList, str]
@@ -21,6 +24,9 @@ class BaseModel:
             wrapping of any meta instructions.
         generation_kwargs (Dict, optional): The generation kwargs for the
             model. Defaults to dict().
+        sync_rank (bool): Whether to sync inputs between ranks. Do not use this
+            if you are not familiar with this behavior. Check `sync_inputs`
+            function for more details. Defaults to False.
     """
 
     is_api: bool = False
@@ -30,7 +36,8 @@ class BaseModel:
                  max_seq_len: int = 2048,
                  tokenizer_only: bool = False,
                  meta_template: Optional[Dict] = None,
-                 generation_kwargs: Optional[Dict] = dict()):
+                 generation_kwargs: Optional[Dict] = dict(),
+                 sync_rank: bool = False):
         self.path = path
         self.max_seq_len = max_seq_len
         self.tokenizer_only = tokenizer_only
@@ -40,6 +47,7 @@ class BaseModel:
         if meta_template and 'eos_token_id' in meta_template:
             self.eos_token_id = meta_template['eos_token_id']
         self.generation_kwargs = generation_kwargs
+        self.sync_rank = sync_rank
 
     @abstractmethod
     def generate(self, inputs: List[str], max_out_len: int) -> List[str]:
@@ -76,6 +84,34 @@ class BaseModel:
         raise NotImplementedError(f'{self.__class__.__name__} does not support'
                                   ' ppl-based evaluation yet, try gen-based '
                                   'instead.')
+
+    @abstractmethod
+    def encode(self, prompt: str) -> torch.Tensor:
+        """Encode prompt to tokens. Not necessary for most cases.
+
+        Args:
+            prompt (str): Input string.
+
+        Returns:
+            torch.Tensor: Encoded tokens.
+        """
+        raise NotImplementedError(
+            f'{self.__class__.__name__} does not implement'
+            '`encode` method.')
+
+    @abstractmethod
+    def decode(self, tokens: torch.Tensor) -> str:
+        """Decode tokens to text. Not necessary for most cases.
+
+        Args:
+            tokens (torch.Tensor): Input tokens.
+
+        Returns:
+            str: Decoded text.
+        """
+        raise NotImplementedError(
+            f'{self.__class__.__name__} does not implement'
+            '`decode` method.')
 
     @abstractmethod
     def get_token_len(self, prompt: str) -> int:
@@ -115,20 +151,6 @@ class BaseModel:
         inputs = self.parse_template(templates, mode='ppl')
         return self.get_ppl(inputs, mask_length)
 
-    def get_loglikelihood_from_template(self,
-                                        templates: List[PromptType],
-                                        conts: List[str],
-                                        mask_length=None):
-        """Get perplexity given a list of templates.
-
-        Args:
-            templates (List[PromptType]): A list of templates.
-            mask_length (List[int]): A list of mask lengths. If provided, the
-                perplexity will be calculated only on the unmasked tokens.
-        """
-        inputs = self.parse_template(templates, mode='ppl')
-        return self.get_loglikelihood(inputs, conts, mask_length)
-
     def generate_from_template(self, templates: List[PromptType],
                                max_out_len: int, **kwargs):
         """Generate completion from a list of templates.
@@ -138,6 +160,8 @@ class BaseModel:
             max_out_len (int): The maximum length of the output.
         """
         inputs = self.parse_template(templates, mode='gen')
+        if hasattr(self, 'sync_rank') and self.sync_rank:
+            inputs = self.sync_inputs(inputs)
         return self.generate(inputs, max_out_len=max_out_len, **kwargs)
 
     def get_token_len_from_template(
@@ -164,6 +188,39 @@ class BaseModel:
         prompts = [str(prompt) for prompt in prompts]
         token_lens = [self.get_token_len(prompt) for prompt in prompts]
         return token_lens[0] if not is_batched else token_lens
+
+    def sync_inputs(self, inputs: str) -> str:
+        """For some case, when it involves multiprocessing with multiple gpus,
+        there might be the chance that inputs are different among different
+        gpus. Therefore, we need to sync inputs for rank0.
+
+        Args:
+            inputs (str): Inputs for each rank.
+        """
+        rank = dist.get_rank()
+
+        if rank == 0:
+            tokens = self.encode(inputs)
+            length = self.get_token_len(inputs)
+            if length > 2048:
+                from opencompass.utils import get_logger
+                get_logger().info(f'Large tokens nums: {length}')
+            size = torch.tensor([tokens.shape], dtype=torch.long)
+        else:
+            tokens = None
+            size = torch.empty(2, dtype=torch.long)
+
+        # broadcast data size
+        dist.broadcast(size, src=0)
+
+        if rank != 0:
+            tokens = torch.empty(size.tolist(), dtype=torch.long)
+
+        # broadcast tokens
+        dist.broadcast(tokens, src=0)
+        # the final input might be different from original input
+        # due to the max sequence limitation
+        return self.decode(tokens)
 
     def to(self, device):
         self.model.to(device)

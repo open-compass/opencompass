@@ -100,7 +100,7 @@ ceval-hard                                      -          ppl     44.35        
 ceval                                           -          ppl     67.32             71.01                          81.17                                    58.97             49.28                          67.82                                    ...
 ```
 
-目前该方案仅支持 C-Eval 数据集，[Contamination_Detector](https://github.com/liyucheng09/Contamination_Detector) 中还包含了 ARC, CSQA, HellaSwag, MMLU 和 WinoGrande，但目前还没有在 OpenCompass 中实现。我们欢迎社区贡献更多的数据集。
+目前该方案仅支持 C-Eval, MMLU, HellaSwag 和 ARC 数据集，[Contamination_Detector](https://github.com/liyucheng09/Contamination_Detector) 中还包含了 CSQA 和 WinoGrande，但目前还没有在 OpenCompass 中实现。我们欢迎社区贡献更多的数据集。
 
 如果使用了该方法，请添加引用:
 

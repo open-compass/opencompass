@@ -47,7 +47,7 @@ with read_base():
     from ..piqa.piqa_ppl_0cfff2 import piqa_datasets
     from ..siqa.siqa_ppl_e8d8c5 import siqa_datasets
     from ..strategyqa.strategyqa_gen_1180a7 import strategyqa_datasets
-    from ..winogrande.winogrande_ppl_55a66e import winogrande_datasets
+    from ..winogrande.winogrande_ll_c5cf57 import winogrande_datasets
     from ..obqa.obqa_ppl_6aac9e import obqa_datasets
     from ..nq.nq_gen_0356ec import nq_datasets
     from ..triviaqa.triviaqa_gen_0356ec import triviaqa_datasets

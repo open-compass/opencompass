@@ -110,7 +110,7 @@ class SlurmRunner(BaseRunner):
                 tmpl += f' --gres=gpu:{num_gpus}'
             for extra_cmd in self.extra_command:
                 tmpl += f' {extra_cmd}'
-            tmpl += f" -N1 -J '{task_name[:512]}'" + ' {task_cmd}'
+            tmpl += f" -N1 -u -J '{task_name[:512]}'" + ' {task_cmd}'
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)

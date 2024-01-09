@@ -57,7 +57,7 @@ def last_capital_postprocess(text: str) -> str:
     return ''
 
 
-def first_option_postprocess(text: str, options: str) -> str:
+def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     """Find first valid option for text."""
 
     # yapf: disable
@@ -91,26 +91,31 @@ def first_option_postprocess(text: str, options: str) -> str:
         f'[是为。]\s?([{options}])[。\.]?$',
         f'因此\s?([{options}])[。\.]?$',
         f'显然\s?([{options}])[。\.]?$',
-        f'1.\s?(.*?)$',
         f'答案是\s?(\S+)(?:。|$)',
         f'答案应该是\s?(\S+)(?:。|$)',
         f'答案为\s?(\S+)(?:。|$)',
-        f'(\s|^)[{options}][\s。，,：:\.$]',
         f'[Tt]he answer is ([{options}])',
         f'[Tt]he answer is option ([{options}])',
         f'[Tt]he correct answer is ([{options}])',
         f'[Tt]he correct answer is option ([{options}])',
         f'[Tt]he answer to the question is ([{options}])',
+        f'^选项\s?([{options}])',
+        f'^([{options}])\s?选?项',
+        f'(\s|^)[{options}][\s。，,：:\.$]',
+        f'(\s|^)[{options}](\s|$)',
+        f'1.\s?(.*?)$',
+    ]
+    cushion_patterns = [
         f'([{options}]):',
-        f'(^|\s)[{options}](\s|$)',
         f'[{options}]',
     ]
     # flake8: noqa
     # yapf: enable
 
-    regexes = [re.compile(pattern) for pattern in patterns]
-    for regex in regexes:
-        match = regex.search(text)
+    if cushion:
+        patterns.extend(cushion_patterns)
+    for pattern in patterns:
+        match = re.search(pattern, text)
         if match:
             outputs = match.group(0)
             for i in options:

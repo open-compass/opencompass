@@ -164,8 +164,11 @@ class PretrainSummarizer:
         time = now.strftime('%m/%d %H:%M')
         times = [time] * len(model_abbrs)
         table.append(header)
-        table.append(['dataset', 'version', 'metric', 'mode'] + times)
-        table.append(['dataset', 'version', 'metric', 'mode']+ checkpoints)
+        table.append(['time', 'version', 'metric', 'mode'] + times)
+        table.append(['checkpoint', 'version', 'metric', 'mode']+ checkpoints)
+        # check long bench
+        max_seq_lens = [str(model_cfg.max_seq_len) for model_cfg in model_cfgs]
+        table.append(['max_seq_len', 'version', 'metric', 'mode']+ max_seq_lens)
         dataset_score = [0]* len(model_abbrs)
         dataset_num = [0]  * len(model_abbrs)
 
@@ -187,11 +190,9 @@ class PretrainSummarizer:
                 row = [dataset_abbr, prompt_version.get(dataset_abbr, '-'), metric, dataset_eval_mode.get(dataset_abbr, '-')]
             for i, model_abbr in enumerate(model_abbrs):
                 if dataset_abbr in parsed_results[model_abbr]:
-                    if index == 0:
-                        row.append('{:.02f}'.format(parsed_results[model_abbr][dataset_abbr][index]))
-                        dataset_score[i] += parsed_results[model_abbr][dataset_abbr][index]
-                        dataset_num[i] += 1
-                    # row.append('{:.02f}'.format(parsed_results[model_abbr][dataset_abbr][index]))
+                    row.append('{:.02f}'.format(parsed_results[model_abbr][dataset_abbr][index]))
+                    dataset_score[i] += parsed_results[model_abbr][dataset_abbr][index]
+                    dataset_num[i] += 1
                 else:
                     if dataset_abbr.startswith('---') and dataset_num[i] != 0:
                         row.append('{:.02f}'.format(dataset_score[i] / dataset_num[i]))
