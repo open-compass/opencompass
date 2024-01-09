@@ -12,7 +12,7 @@ from .post_process import parse_math_answer, parse_qa_multiple_answer
 
 import evaluate
 from nltk.translate.bleu_score import sentence_bleu
-from bert_score import score
+# from bert_score import score
 import re
 from transformers import BasicTokenizer
 from rouge_chinese import Rouge
