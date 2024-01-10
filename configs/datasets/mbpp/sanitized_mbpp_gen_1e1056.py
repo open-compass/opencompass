@@ -57,7 +57,7 @@ sanitized_mbpp_datasets = [
     dict(
         type=SanitizedMBPPDataset,
         abbr='sanitized_mbpp',
-        path='./sanitized-mbpp.jsonl',
+        path='./data/mbpp/sanitized-mbpp.jsonl',
         reader_cfg=sanitized_mbpp_reader_cfg,
         infer_cfg=sanitized_mbpp_infer_cfg,
         eval_cfg=sanitized_mbpp_eval_cfg)

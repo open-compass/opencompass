@@ -1,4 +1,5 @@
 import csv
+import json
 import os.path as osp
 
 from datasets import Dataset, DatasetDict
@@ -18,7 +19,7 @@ class NaturalQuestionDataset(BaseDataset):
         dataset = DatasetDict()
         for split in ['dev', 'test']:
             filename = osp.join(path, f'nq-{split}.qa.csv')
-            with open(filename) as f:
+            with open(filename, 'r', encoding='utf-8') as f:
                 reader = csv.reader(f, delimiter='\t')
                 raw_data = []
                 for row in reader:
@@ -29,6 +30,26 @@ class NaturalQuestionDataset(BaseDataset):
                         answers = answers[0]
                     raw_data.append({'question': question, 'answer': answers})
                 dataset[split] = Dataset.from_list(raw_data)
+
+        return dataset
+
+
+@LOAD_DATASET.register_module()
+class NQOpenDataset(BaseDataset):
+
+    @staticmethod
+    def load(path: str):
+        dataset = DatasetDict()
+        for split in ['validation', 'train']:
+            filename = osp.join(path, f'nq-open-{split}.jsonl')
+            raw_data = []
+            with open(filename, 'r', encoding='utf-8') as f:
+                for doc in f:
+                    doc = json.loads(doc)
+                    if split == 'train':
+                        doc['answer'] = doc['answer'][0]
+                    raw_data.append(doc)
+            dataset[split] = Dataset.from_list(raw_data)
 
         return dataset
 

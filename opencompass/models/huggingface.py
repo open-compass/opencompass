@@ -241,6 +241,7 @@ class HuggingFace(BaseModel):
         if self.batch_padding and len(inputs) > 1:
             return self._batch_generate(inputs=inputs,
                                         max_out_len=max_out_len,
+                                        stopping_criteria=stopping_criteria,
                                         **generation_kwargs)
         else:
             return sum(
@@ -250,7 +251,10 @@ class HuggingFace(BaseModel):
                                        **generation_kwargs)
                  for input_ in inputs), [])
 
-    def _batch_generate(self, inputs: List[str], max_out_len: int,
+    def _batch_generate(self,
+                        inputs: List[str],
+                        max_out_len: int,
+                        stopping_criteria: List[str] = [],
                         **kwargs) -> List[str]:
         """Support for batch prompts inference.
 
@@ -288,6 +292,21 @@ class HuggingFace(BaseModel):
             k: torch.tensor(np.array(tokens[k]), device=self.model.device)
             for k in tokens if k in ['input_ids', 'attention_mask']
         }
+
+        if stopping_criteria:
+            # Construct huggingface stopping criteria
+            if self.tokenizer.eos_token is not None:
+                stopping_criteria = stopping_criteria + [
+                    self.tokenizer.eos_token
+                ]
+            stopping_criteria = transformers.StoppingCriteriaList([
+                *[
+                    MultiTokenEOSCriteria(sequence, self.tokenizer,
+                                          tokens['input_ids'].shape[0])
+                    for sequence in stopping_criteria
+                ],
+            ])
+            kwargs['stopping_criteria'] = stopping_criteria
 
         # step-2: conduct model forward to generate output
         outputs = self.model.generate(**tokens,
@@ -356,10 +375,12 @@ class HuggingFace(BaseModel):
                                    max_length=self.max_seq_len -
                                    max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
-
         if stopping_criteria:
             # Construct huggingface stopping criteria
-            stopping_criteria = stopping_criteria + [self.tokenizer.eos_token]
+            if self.tokenizer.eos_token is not None:
+                stopping_criteria = stopping_criteria + [
+                    self.tokenizer.eos_token
+                ]
             stopping_criteria = transformers.StoppingCriteriaList([
                 *[
                     MultiTokenEOSCriteria(sequence, self.tokenizer,
@@ -506,13 +527,14 @@ class HuggingFace(BaseModel):
         """
         assert mask_length is None, 'Not support mask_length yet.'
         if self.batch_padding and len(inputs) > 1:
-            raise NotImplementedError('Batch padding is not supported yet.')
-            # assert self.tokenizer.pad_token
-            # return self._get_loglikelihood(inputs, mask_length=mask_length)
-        return np.array([
-            self._get_loglikelihood(inputs=inputs[idx], conts=conts[idx])
-            for idx in range(len(inputs))
-        ])
+            assert self.tokenizer.pad_token
+            return self._get_loglikelihood(inputs, conts)
+        else:
+            return np.concatenate([
+                self._get_loglikelihood(inputs=[inputs[idx]],
+                                        conts=[conts[idx]])
+                for idx in range(len(inputs))
+            ])
 
     def _get_loglikelihood(self, inputs: str, conts: str) -> float:
         """Get loglikelihood scores given input string and continuation string.
@@ -523,31 +545,75 @@ class HuggingFace(BaseModel):
         Returns:
             float: loglikelihood scores.
         """
+        input_tokenizer_out = self.tokenizer(inputs,
+                                             padding=True,
+                                             truncation=False,
+                                             return_length=True,
+                                             return_tensors='pt').to(
+                                                 self.model.device)
 
-        input_ids = self.tokenizer(inputs,
-                                   padding=False,
-                                   truncation=True,
-                                   max_length=self.max_seq_len)['input_ids']
-        input_ids = torch.tensor(input_ids, device=self.model.device)
-        context_ids = self.tokenizer(inputs.replace(conts, ''),
-                                     padding=False,
-                                     truncation=True,
-                                     max_length=self.max_seq_len)['input_ids']
-        cont_ids = input_ids[len(context_ids):]
-
-        output = self.model(input_ids.unsqueeze(0))
-        logits = output['logits'][:, :-1]
-        logits = torch.nn.functional.log_softmax(logits, dim=-1)
-        contlen = cont_ids.shape[0]
-        logits = logits[:, -contlen:, :]
-        # Reducing the dimension will lead to a wrong outcome
-        logits_gather = torch.gather(
-            logits, 2,
-            cont_ids.unsqueeze(0).unsqueeze(-1))  # [1, seq]
-
-        # Answer: sum the likelihood of each token in continuation
-        answer = float(logits_gather.detach().cpu().sum())
+        input_ids = input_tokenizer_out['input_ids'][:, :self.max_seq_len]
+        input_length = input_tokenizer_out['length']
+        attention_mask = input_tokenizer_out['attention_mask']
+        context_ids = [
+            self.tokenizer(inputs[i].replace(conts[i], ''),
+                           padding=False,
+                           truncation=True,
+                           max_length=self.max_seq_len)['input_ids']
+            for i in range(len(inputs))
+        ]
+        # forward
+        outputs = self.model(input_ids, attention_mask)['logits']
+        outputs = torch.nn.functional.log_softmax(outputs, dim=-1)
+        # calculate loglikelihood
+        answer = np.zeros(len(inputs))
+        for i in range(len(inputs)):
+            if self.tokenizer.padding_side == 'right':
+                cont_ids = input_ids[i, len(context_ids[i]):input_length[i]]
+                logits = outputs[i,
+                                 len(context_ids[i]) - 1:input_length[i] -
+                                 1, :]  # noqa
+            else:
+                cont_ids = input_ids[i, len(context_ids[i]) - input_length[i]:]
+                logits = outputs[i,
+                                 len(context_ids[i]) - input_length[i] - 1:-1]
+            # Reducing the dimension will lead to a wrong outcome
+            logits_gather = torch.gather(
+                logits.unsqueeze(0), 2,
+                cont_ids.unsqueeze(0).unsqueeze(-1))  # [1, seq]
+            # Answer: sum the likelihood of each token in continuation
+            answer[i] = float(logits_gather.detach().cpu().sum())
         return answer
+
+    def get_mink_percent(self, inputs: List[str], k: int = 20) -> List[float]:
+        """https://swj0419.github.io/detect-pretrain.github.io/"""
+
+        if self.batch_padding and len(inputs) > 1:
+            assert self.tokenizer.pad_token
+            return self._get_mink_percent(inputs, k=k)
+        else:
+            return np.concatenate([
+                self._get_mink_percent(inputs=[text], k=k) for text in inputs
+            ])
+
+    def _get_mink_percent(self, inputs: List[str], k: int = 20) -> List[float]:
+        outputs, inputs = self.get_logits(inputs)
+        shift_logits = outputs[:, :-1, :].contiguous().float()
+        shift_labels = inputs['tokens']['input_ids'][:, 1:].contiguous()
+
+        loss_fct = torch.nn.CrossEntropyLoss(
+            reduction='none', ignore_index=self.tokenizer.pad_token_id)
+        loss = loss_fct(shift_logits.view(-1, shift_logits.size(-1)),
+                        shift_labels.view(-1)).view(shift_labels.size())
+        lens = (inputs['tokens']['input_ids'] !=
+                self.tokenizer.pad_token_id).sum(-1).cpu().numpy()
+        mink_percent = []
+        for nloss, nlen in zip(loss, lens):
+            nlen = max(int(nlen) * k // 100, 1)
+            nloss = torch.topk(loss, nlen, dim=-1)[0]
+            nloss = -nloss.mean().cpu().detach().numpy()
+            mink_percent.append(nloss)
+        return np.array(mink_percent)
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.
@@ -693,17 +759,15 @@ class HuggingFaceChatGLM3(HuggingFace):
                     responses.append('')
                     continue
 
-            try:
-                response, history = self.model.chat(self.tokenizer,
-                                                    user_content,
-                                                    history=history,
-                                                    **generation_kwargs)
-                # response will be dict sometime
-                if isinstance(response, dict):
-                    response = response.get('content', '')
-                responses.append(response)
-            except Exception:
-                responses.append('')
+            response, history = self.model.chat(self.tokenizer,
+                                                user_content,
+                                                history=history,
+                                                max_new_tokens=max_out_len,
+                                                **generation_kwargs)
+            # response will be dict sometime
+            if isinstance(response, dict):
+                response = response.get('content', '')
+            responses.append(response)
         return responses
 
     def get_token_len(self, prompt: str) -> int:

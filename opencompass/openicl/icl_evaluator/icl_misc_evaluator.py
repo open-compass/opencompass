@@ -9,3 +9,11 @@ class AveragePPLEvaluator(BaseEvaluator):
     def score(self, ppl):
         average_ppl = sum(ppl) / len(ppl)
         return {'average_ppl': average_ppl}
+
+
+@ICL_EVALUATORS.register_module()
+class AverageMinKEvaluator(BaseEvaluator):
+
+    def score(self, mink):
+        average_mink = sum(mink) / len(mink)
+        return {'average_mink': average_mink}

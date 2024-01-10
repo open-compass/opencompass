@@ -69,13 +69,105 @@ def load_experiment(file: str) -> dict:
     )
 
 
+def load_experiment_template(file: str) -> dict:
+    """Load single experiment file with solutions for template experiment."""
+    with open(file, 'r') as f:
+        notebook = json.load(f)
+        example = notebook['cells']
+        metadata = notebook['metadata']
+        modules = metadata.get('modules', [])
+        if modules:
+            # these two annotations should be the same
+            assert len(modules) == len(metadata.get('step_types'))
+            # reformat annotations
+            modules = [[_m.strip() for _m in _modules.split('&')]
+                       for _modules in modules]
+        questions = []
+        source_codes = []
+        outputs = []
+        tags = []
+        for cell in example:
+            if cell['cell_type'] == 'markdown':
+                text = ''.join(cell['source']).strip()
+                if modules:
+                    _modules = modules.pop(0)
+                    if 'chinese' not in file:
+                        text += f"Please use {' and '.join(_modules)} modules."
+                    else:
+                        text += f"请用 {' 和 '.join(_modules)} 模块."
+                text = text.strip() + '\n'
+                # append the formatted text
+                questions.append(text)
+            elif cell['cell_type'] == 'code':
+                source_codes.append(''.join(cell['source']))
+                output_flag = False
+                if cell['outputs']:
+                    for _output in cell['outputs']:
+                        if _output['output_type'] == 'display_data':
+                            assert not output_flag
+                            output_flag = True
+                            tags.append('vis')
+                            outputs.append(_output['data']['image/png'])
+                    for _output in cell['outputs']:
+                        if output_flag:
+                            break
+                        if _output['output_type'] == 'stream' and _output[
+                                'name'] == 'stdout':
+                            assert not output_flag
+                            output_flag = True
+                            tags.append('general')
+                            outputs.append(''.join(_output['text']))
+                        elif _output['output_type'] == 'execute_result':
+                            assert not output_flag
+                            output_flag = True
+                            tags.append('general')
+                            outputs.append(''.join(
+                                _output['data']['text/plain']))
+                if not output_flag:
+                    # no output fallback to exec
+                    tags.append('exec')
+                    outputs.append(None)
+    return dict(
+        experiment=file,
+        questions=sum(([
+            dict(role='user', content=question),
+            dict(role='assistant', content=source_code)
+        ] for question, source_code in zip(questions, source_codes)), []),
+        references=dict(outputs=outputs,
+                        tags=tags,
+                        metadata=metadata,
+                        experiment=file),
+    )
+
+
+def check_internet():
+    """A tricky way to check internet."""
+    import socket
+
+    import nltk
+    socket.setdefaulttimeout(10)
+    ret = nltk.download('stopwords', quiet=True)
+    socket.setdefaulttimeout(None)
+    if not ret:
+        raise ConnectionError('CIBench needs internet to get response. Please'
+                              'check your internet and proxy.')
+
+
 @LOAD_DATASET.register_module()
 class CIBenchDataset(BaseDataset):
     """Code Interpreter dataset."""
 
     @staticmethod
-    def load(path: str):
-        """Load whole dataset."""
+    def load(path: str, internet_check: bool = False):
+        """Load whole dataset.
+
+        Args:
+            path(str): Path of cibench dataset.
+            internet_check(bool): Whether to check internet.
+                Defaults to False.
+        """
+        if internet_check:
+            check_internet()
         assert os.path.exists(path), f'Path {path} does not exist.'
         data_list = []
         for cwd, dirs, files in os.walk(path):
@@ -83,11 +175,36 @@ class CIBenchDataset(BaseDataset):
             files.sort()
             for f in files:
                 if '.ipynb' in f:
-                    try:
-                        data = load_experiment(os.path.join(cwd, f))
-                    except Exception:
-                        print(f'Error with file {os.path.join(cwd, f)}')
-                        continue
+                    data = load_experiment(os.path.join(cwd, f))
+                    data_list.append(data)
+
+        dataset = Dataset.from_list(data_list)
+        return dataset
+
+
+@LOAD_DATASET.register_module()
+class CIBenchTemplateDataset(BaseDataset):
+    """Code Interpreter dataset for template dataset."""
+
+    @staticmethod
+    def load(path: str, internet_check: bool = False):
+        """Load whole dataset.
+
+        Args:
+            path(str): Path of cibench dataset.
+            internet_check(bool): Whether to check internet.
+                Defaults to False.
+        """
+        if internet_check:
+            check_internet()
+        assert os.path.exists(path), f'Path {path} does not exist.'
+        data_list = []
+        for cwd, dirs, files in os.walk(path):
+            dirs.sort()
+            files.sort()
+            for f in files:
+                if '.ipynb' in f:
+                    data = load_experiment_template(os.path.join(cwd, f))
                     data_list.append(data)
 
         dataset = Dataset.from_list(data_list)
@@ -138,7 +255,8 @@ class CIBenchEvaluator(BaseEvaluator):
 
     def check_user_data_dir(self, user_data_dir):
         if user_data_dir == 'ENV':
-            user_data_dir = os.environ.get('USER_DATA_DIR', '')
+            default_path = osp.abspath('./data/cibench_dataset/datasources')
+            user_data_dir = os.environ.get('USER_DATA_DIR', default_path)
         user_data_dir = user_data_dir.rstrip('/')
         basename = osp.basename(user_data_dir)
         if basename and basename != 'data':
@@ -172,10 +290,11 @@ class CIBenchEvaluator(BaseEvaluator):
                 if action['result']:
                     try:
                         pred = action['result']['text']
-                        match = re.search('```\n(.*?)\n```', pred, re.DOTALL)
+                        match = re.search('execute_result:\n\n```\n(.*?)\n```',
+                                          pred, re.DOTALL)
                         if match:
                             out = match.group(1)
-                            return out == target or out in target
+                            return out.strip() == target.strip()
                     except Exception:
                         return False
         # Fall back to False
@@ -313,23 +432,23 @@ class CIBenchEvaluator(BaseEvaluator):
         # numeric_correct: numerical correct
         # text_score: text score
         # vis_sim: visual similarity
-        result = defaultdict(list)
-        for tag, step, output in zip(tags, steps, outputs):
-            # check whether this step is valid
-            result['executable'].append(self.valid_step(step))
-            if tag != 'exec':
-                key, func = self.TAG_MAPPING[tag]
-                result[key].append(func(step, output))
 
-        # add missing metric for better analyse if not exists
+        # create empty results
+        result = dict()
         if hard_tags:
             check_tags = ['exec', 'num', 'text', 'vis']
         else:
             check_tags = ['exec', 'general', 'vis']
         for tag in check_tags:
             key = self.TAG_MAPPING[tag][0]
-            if key not in result:
-                result[key] = []
+            result[key] = []
+
+        for tag, step, output in zip(tags, steps, outputs):
+            # check whether this step is valid
+            result['executable'].append(self.valid_step(step))
+            if tag != 'exec':
+                key, func = self.TAG_MAPPING[tag]
+                result[key].append(func(step, output))
 
         return result
 
