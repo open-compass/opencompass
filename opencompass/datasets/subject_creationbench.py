@@ -327,10 +327,8 @@ class CreationBenchDataset(SubjectiveCmpDataset):
             data['score_with_ref_prefix'], data[
                 'score_with_ref_suffix'] = prompt_construct_score_with_ref(
                     data)
-            data['compare_cn_prefix'], data[
-                'compare_cn_suffix'] = prompt_construct_compare(data)
-            data['compare_cn_prefix_4opt'], data[
-                'compare_cn_suffix_4opt'] = prompt_construct_compare_4opt(data)
+            # data['compare_cn_prefix'], data['compare_cn_suffix'] = prompt_construct_compare(data)
+            # data['compare_cn_prefix_4opt'], data['compare_cn_suffix_4opt'] = prompt_construct_compare_4opt(data)
             creation_dataset.append(data)
         dataset = Dataset.from_list(creation_dataset)
         return dataset
