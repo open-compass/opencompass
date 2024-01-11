@@ -18,6 +18,7 @@ from .minimax_api import MiniMax  # noqa: F401
 from .mixtral import Mixtral  # noqa: F401
 from .modelscope import ModelScope, ModelScopeCausalLM  # noqa: F401, F403
 from .moonshot_api import MoonShot  # noqa: F401
+from .nanbeige_api import Nanbeige  # noqa: F401
 from .openai_api import OpenAI  # noqa: F401
 from .pangu_api import PanGu  # noqa: F401
 from .qwen_api import Qwen  # noqa: F401
