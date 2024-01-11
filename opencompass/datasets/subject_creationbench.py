@@ -15,7 +15,7 @@ You are an assistant skilled at evaluating the quality of creative text.
 Please evaluate the quality of an AI model's response to a creative question in the capacity of an impartial judge. You'll need to assess the response on the following dimensions: Creativity, Richness, User Demand Fulfillment, and Logical Coherence. We will provide you with a creative question and the AI model's response for evaluation. As you begin your assessment, follow this process:
 1. Evaluate the AI model's answers on different dimensions, pointing out its strengths or weaknesses in each dimension and assigning a score of 1 to 10 for each.
 2. Finally, based on the assessments across dimensions, provide an overall score of 1 to 10 for the AI model's response.
-3. Your scoring should be as stringent as possible and follow the scoring rules below: 
+3. Your scoring should be as stringent as possible and follow the scoring rules below:
 
 Generally, the higher the quality of the model's response, the higher the score.
 
@@ -155,7 +155,7 @@ You are an assistant skilled at evaluating the quality of creative text.
 Please evaluate the quality of an AI model's response to a creative question in the capacity of an impartial judge. You'll need to assess the response on the following dimensions: Creativity, Richness, User Demand Fulfillment, and Logical Coherence. We will provide you with a creative question and the AI model's response and a reference answer for your evaluation. As you begin your assessment, follow this process:
 1. Evaluate the AI model's answers on different dimensions, pointing out its strengths or weaknesses in each dimension and assigning a score of 1 to 10 for each.
 2. Finally, based on the assessments across dimensions, provide an overall score of 1 to 10 for the AI model's response.
-3. Your scoring should be as stringent as possible and follow the scoring rules below: 
+3. Your scoring should be as stringent as possible and follow the scoring rules below:
 
 In general, the higher the quality of the model's response and its strict adherence to user needs, the higher the score. Responses that do not meet user needs will receive lower scores.
 
@@ -202,7 +202,7 @@ Please remember, you must evaluate and explain before scoring. After your explan
 compare_cn_prefix = """
 请根据提供的 评分要求，用户问题 以及 相应的两个回答（回答1，回答2），判断两个回答中哪一个更好。
 评分要求（重要性依次递减）:
-1. 好的回答必须首先符合用户问题里的各种需求，不能跑题 
+1. 好的回答必须首先符合用户问题里的各种需求，不能跑题
 2. 好的回答必须具有逻辑连贯性，围绕一个中心进行回答
 3. 好的回答必须具有创造性的词语和表达丰富度
 
@@ -224,11 +224,10 @@ B. 回答2更好
 原因：blahblah blahblah\n
 """
 
-
 compare_cn_prefix_4opt = """
 请根据提供的 评分要求，用户问题 以及 相应的两个回答（回答1，回答2），判断两个回答中哪一个更好。
 评分要求（重要性依次递减）:
-1. 好的回答必须首先符合用户问题里的各种需求，不能跑题 
+1. 好的回答必须首先符合用户问题里的各种需求，不能跑题
 2. 好的回答必须具有逻辑连贯性，围绕一个中心进行回答
 3. 好的回答必须具有创造性的词语和表达丰富度
 
@@ -261,7 +260,6 @@ D. 回答1、2都不好
 """
 
 
-
 def prompt_construct(sample):
     lan = sample['others']['language']
     question = sample['question']
@@ -274,17 +272,23 @@ def prompt_construct(sample):
         suffix = "\n[Model's response end]\n"
     return prompt, suffix
 
+
 def prompt_construct_score_with_ref(sample):
     lan = sample['others']['language']
     question = sample['question']
     ref = sample['ref']
     if lan == 'zh':
-        prompt = chn_base_prefix_score_with_ref + '创作类问题：' + str(question) + '\n[参考答案开始]\n' + str(ref) + '\n[参考答案结束]\n' + '\n[模型回答开始]\n'
+        prompt = chn_base_prefix_score_with_ref + '创作类问题：' + str(
+            question) + '\n[参考答案开始]\n' + str(
+                ref) + '\n[参考答案结束]\n' + '\n[模型回答开始]\n'
         suffix = '\n[模型回答结束]\n'
     elif lan == 'en':
-        prompt = eng_base_prefix_score_with_ref + 'Creative Question: ' + str(question) + '\n[Reference start]\n' + str(ref) + '\n[Reference end]\n' + "\n[Model's response start]\n"
+        prompt = eng_base_prefix_score_with_ref + 'Creative Question: ' + str(
+            question) + '\n[Reference start]\n' + str(
+                ref) + '\n[Reference end]\n' + "\n[Model's response start]\n"
         suffix = "\n[Model's response end]\n"
     return prompt, suffix
+
 
 def prompt_construct_compare(sample):
     lan = sample['others']['language']
@@ -294,6 +298,7 @@ def prompt_construct_compare(sample):
         suffix = compare_cn_suffix
     return prompt, suffix
 
+
 def prompt_construct_compare_4opt(sample):
     lan = sample['others']['language']
     question = sample['question']
@@ -301,6 +306,7 @@ def prompt_construct_compare_4opt(sample):
         prompt = compare_cn_prefix_4opt + str(question)
         suffix = compare_cn_suffix_4opt
     return prompt, suffix
+
 
 @LOAD_DATASET.register_module()
 class CreationBenchDataset(SubjectiveCmpDataset):
@@ -318,9 +324,13 @@ class CreationBenchDataset(SubjectiveCmpDataset):
                 data['gpt4_suffix'] = suffix
             data['judge']['others'] = data['others']
             data['ref'] = data['others']['reference']
-            data['score_with_ref_prefix'], data['score_with_ref_suffix'] = prompt_construct_score_with_ref(data)
-            data['compare_cn_prefix'], data['compare_cn_suffix'] = prompt_construct_compare(data)
-            data['compare_cn_prefix_4opt'], data['compare_cn_suffix_4opt'] = prompt_construct_compare_4opt(data)
+            data['score_with_ref_prefix'], data[
+                'score_with_ref_suffix'] = prompt_construct_score_with_ref(
+                    data)
+            data['compare_cn_prefix'], data[
+                'compare_cn_suffix'] = prompt_construct_compare(data)
+            data['compare_cn_prefix_4opt'], data[
+                'compare_cn_suffix_4opt'] = prompt_construct_compare_4opt(data)
             creation_dataset.append(data)
         dataset = Dataset.from_list(creation_dataset)
         return dataset
