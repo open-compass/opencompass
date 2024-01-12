@@ -33,7 +33,9 @@ jobs:
           conda create --name opencompass_regression --clone opencompass_base
           conda activate opencompass_regression
           python3 -m pip install -e .
-          cp -r /home/qa-llm-cicd/data .
+          cp -r /cpfs01/user/qa-llm-cicd/data .
+          rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
+          ln -s /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub ~/.cache/huggingface/hub
           conda info --envs
       - name:  Run test
         run: |
@@ -47,6 +49,7 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda env remove --name opencompass_regression
           conda info --envs
+          rm ~/.cache/huggingface/hub
       - name:  Get result
         run: |
           score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
