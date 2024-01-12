@@ -10,7 +10,7 @@ with read_base():
     from .models.judge_llm.auto_j.hf_autoj_eng_13b import models as hf_autoj
     from .models.judge_llm.judgelm.hf_judgelm_33b_v1 import models as hf_judgelm
     from .models.judge_llm.pandalm.hf_pandalm_7b_v1 import models as hf_pandalm
-    from .datasets.subjective_alignbench.alignbench_judgeby_critiquellm import subjective_datasets
+    from .datasets.subjective_creationbench.creationbench_judgeby_gpt4_withref import subjective_datasets
 
 datasets = [*subjective_datasets]
 
@@ -22,7 +22,7 @@ from opencompass.runners import LocalRunner
 from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import AlignmentBenchSummarizer
+from opencompass.summarizers import CreationBenchSummarizer
 
 
 # -------------Inferen Stage ----------------------------------------
@@ -81,7 +81,7 @@ eval = dict(
 )
 
 summarizer = dict(
-    type=AlignmentBenchSummarizer, judge_type = 'general'
+    type=CreationBenchSummarizer, judge_type = 'general'
 )
 
-work_dir = 'outputs/alignment_bench/'
+work_dir = 'outputs/creationbench/'
