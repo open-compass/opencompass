@@ -20,7 +20,7 @@ concurrency:
 jobs:
   test_run:
     runs-on: self-hosted
-    timeout-minutes: 15
+    timeout-minutes: 20
     strategy:
       matrix:
         python-version: ['3.10']
@@ -49,7 +49,6 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda env remove --name opencompass_regression
           conda info --envs
-          rm ~/.cache/huggingface/hub
       - name:  Get result
         run: |
           score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
