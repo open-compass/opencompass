@@ -9,12 +9,10 @@ from matplotlib.colors import LinearSegmentedColormap
 class CDMEDataset():
 
     @staticmethod
-    def visualize(csv_file_paths):
-        for file_path in csv_file_paths:
+    def visualize(path: str, dataset_length: str):
+        for file_path in path:
             df = pd.read_csv(file_path)
 
-            # Split 'dataset' column to
-            # get 'Context Length' and 'Document Depth'
             df['Context Length'] = df['dataset'].apply(
                 lambda x: int(x.split('Length')[1].split('Depth')[0]))
             df['Document Depth'] = df['dataset'].apply(
@@ -45,7 +43,7 @@ class CDMEDataset():
                 overall_score = mean_scores.mean()
 
                 # Create heatmap and line plot
-                plt.figure(figsize=(17.5, 8))
+                plt.figure(figsize=(15.5, 8))
                 ax = plt.gca()
                 cmap = LinearSegmentedColormap.from_list(
                     'custom_cmap', ['#F0496E', '#EBB839', '#0CD79F'])
@@ -84,9 +82,9 @@ class CDMEDataset():
                 ax2.legend(loc='upper left')
 
                 # Set chart title and labels
-                ax.set_title(f'{model_name} 8K Context Performance\n' +
-                             'Fact Retrieval Across Context Lengths ' +
-                             '("Needle In A Haystack")')
+                ax.set_title(f'{model_name} {dataset_length} Context '
+                             'Performance\nFact Retrieval Across '
+                             'Context Lengths ("Needle In A Haystack")')
                 ax.set_xlabel('Token Limit')
                 ax.set_ylabel('Depth Percent')
                 ax.set_xticklabels(pivot_table.columns.values, rotation=45)
@@ -102,7 +100,9 @@ class CDMEDataset():
 
                 # Save heatmap as PNG
                 png_file_path = file_path.replace('.csv', f'_{model_name}.png')
-                # plt.tight_layout()
+                plt.tight_layout()
+                plt.subplots_adjust(right=1)
+                plt.draw()
                 plt.savefig(png_file_path)
                 plt.show()
 
@@ -116,21 +116,20 @@ def main():
     parser = argparse.ArgumentParser(description='Generate NeedleInAHaystack'
                                      'Test Plots')
 
-    parser.add_argument('--plot',
-                        action='store_true',
-                        help='Visualize the dataset results')
-    parser.add_argument('--csv_file_paths',
+    parser.add_argument('--path',
                         nargs='*',
                         default=['path/to/your/result.csv'],
                         help='Paths to CSV files for visualization')
-
+    parser.add_argument('--dataset_length',
+                        default='8K',
+                        type=str,
+                        help='Dataset_length for visualization')
     args = parser.parse_args()
 
-    if args.plot:
-        if not args.csv_file_paths:
-            print("Error: '--csv_file_paths' is required for visualization.")
-            exit(1)
-        CDMEDataset.visualize(args.csv_file_paths)
+    if not args.path:
+        print("Error: '--path' is required for visualization.")
+        exit(1)
+    CDMEDataset.visualize(args.path, args.dataset_length)
 
 
 if __name__ == '__main__':
