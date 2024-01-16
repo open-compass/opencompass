@@ -40,8 +40,8 @@ class TurboMindModel(BaseModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
     ):
-        from lmdeploy import turbomind as tm
         from lmdeploy.tokenizer import Tokenizer
+        from lmdeploy.turbomind import TurboMind
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -49,7 +49,7 @@ class TurboMindModel(BaseModel):
         self.logger = get_logger()
         tokenizer_model_path = osp.join(path, 'triton_models', 'tokenizer')
         self.tokenizer = Tokenizer(tokenizer_model_path)
-        tm_model = tm.TurboMind(path)
+        tm_model = TurboMind.from_pretrained(path)
         self.generators = [
             tm_model.create_instance() for i in range(concurrency)
         ]
