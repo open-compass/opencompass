@@ -5,7 +5,7 @@ with read_base():
     from .models.chatglm.hf_chatglm3_6b import models as hf_chatglm3_6b
     from .models.baichuan.hf_baichuan2_7b_chat import models as hf_baichuan2_7b
     from .models.hf_internlm.hf_internlm_chat_20b import models as hf_internlm_chat_20b
-    from .datasets.subjective_cmp.alignment_bench import subjective_datasets
+    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import subjective_datasets
 
 datasets = [*subjective_datasets]
 
