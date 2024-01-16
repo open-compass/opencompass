@@ -133,7 +133,7 @@ class TurboMindModel(BaseModel):
                                               top_k=1,
                                               step=0,
                                               stream_output=False):
-            output_ids, _ = outputs[0]
-            response = self.tokenizer.decode(output_ids.tolist())
+            _, output_ids, _ = outputs
+            response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
         return response
