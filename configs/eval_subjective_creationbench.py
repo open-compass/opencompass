@@ -1,5 +1,3 @@
-from os import getenv as gv
-
 from mmengine.config import read_base
 with read_base():
     from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat
@@ -10,14 +8,15 @@ with read_base():
     from .models.judge_llm.auto_j.hf_autoj_eng_13b import models as hf_autoj
     from .models.judge_llm.judgelm.hf_judgelm_33b_v1 import models as hf_judgelm
     from .models.judge_llm.pandalm.hf_pandalm_7b_v1 import models as hf_pandalm
-    from .datasets.subjective_creationbench.creationbench_judgeby_gpt4_withref import subjective_datasets
+    from .datasets.subjective.creationbench.creationbench_judgeby_gpt4_withref import subjective_datasets
 
 datasets = [*subjective_datasets]
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
 from opencompass.models.openai_api import OpenAIAllesAPIN
-from opencompass.partitioners import NaivePartitioner
+from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
+from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
@@ -27,7 +26,7 @@ from opencompass.summarizers import CreationBenchSummarizer
 
 # -------------Inferen Stage ----------------------------------------
 
-models = [*hf_baichuan2_7b]#, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_qwen_14b_chat]
+models = [*hf_chatglm3_6b]#, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_qwen_14b_chat]
 
 infer = dict(
     partitioner=dict(type=NaivePartitioner),
@@ -38,7 +37,6 @@ infer = dict(
         max_num_workers=256,
         task=dict(type=OpenICLInferTask)),
 )
-
 
 # -------------Evalation Stage ----------------------------------------
 
@@ -69,7 +67,7 @@ eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
         mode='singlescore',
-        models = [*hf_baichuan2_7b]
+        models = models
     ),
     runner=dict(
         type=LocalRunner,

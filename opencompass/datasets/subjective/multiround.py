@@ -8,7 +8,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
 
-from .base import BaseDataset
+from ..base import BaseDataset
 
 base_prefix_en = """
 You are a helper who will help me to evaluate the quality of AI assistants.
