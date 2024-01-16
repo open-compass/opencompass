@@ -9,6 +9,7 @@ evaluate>=0.3.0
 fairscale
 func_timeout
 fuzzywuzzy
+git+https://github.com/Isaac-JL-Chen/rouge_chinese.git
 jieba
 ltp
 mmengine-lite
@@ -26,7 +27,6 @@ rapidfuzz
 requests==2.31.0
 rich
 rouge
-rouge_chinese
 rouge_score
 sacrebleu
 scikit_learn==1.2.1
