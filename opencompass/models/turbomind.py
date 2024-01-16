@@ -131,6 +131,7 @@ class TurboMindModel(BaseModel):
                                               sequence_start=True,
                                               sequence_end=True,
                                               top_k=1,
+                                              top_p=0.8,
                                               step=0,
                                               stream_output=False):
             _, output_ids, _ = outputs
