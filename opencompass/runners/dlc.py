@@ -116,7 +116,7 @@ class DLCRunner(BaseRunner):
                     ' --worker_count 1'
                     f' --worker_cpu {max(num_gpus * 6, 8)}'
                     f' --worker_gpu {num_gpus}'
-                    f' --worker_memory {max(num_gpus * 32, 48)}'
+                    f' --worker_memory {max(num_gpus * 64, 48)}'
                     f" --worker_image {self.aliyun_cfg['worker_image']}"
                     ' --interactive')
             get_cmd = partial(task.get_command,
