@@ -66,9 +66,9 @@ naive_mathbench_summary_groups = [
     {
         'name': 'mathbench-circular-and-cloze',
         'subsets': [
+            'mathbench-college-circular',
             'mathbench-high-circular',
             'mathbench-middle-circular',
-            'mathbench-circular',
             'mathbench-college-cloze_en',
             'mathbench-primary-cloze_cn',
         ],
