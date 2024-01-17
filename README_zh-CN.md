@@ -52,19 +52,12 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.01.17\]** 我们支持了 [InternLM2](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py) 和 [InternLM2-Chat](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py) 的相关评测，InternLM2 在这些测试中表现出非常强劲的性能，欢迎试用！🔥🔥🔥.
+- **\[2024.01.17\]** 我们支持了多根针版本的大海捞针测试，更多信息见[这里](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/needleinahaystack_eval.html#id8)🔥🔥🔥.
 - **\[2023.12.28\]** 我们支持了对使用[LLaMA2-Accessory](https://github.com/Alpha-VLLM/LLaMA2-Accessory)（一款强大的LLM开发工具箱）开发的所有模型的无缝评估! 🔥🔥🔥.
 - **\[2023.12.22\]** 我们开源了[T-Eval](https://github.com/open-compass/T-Eval)用于评测大语言模型工具调用能力。欢迎访问T-Eval的官方[Leaderboard](https://open-compass.github.io/T-Eval/leaderboard.html)获取更多信息! 🔥🔥🔥.
-- **\[2023.12.10\]** 我们开源了多模评测框架 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，目前已支持 20+ 个多模态大模型与包括 MMBench 系列在内的 7 个多模态评测集. 🔥🔥🔥.
-- **\[2023.12.10\]** 我们已经支持了Mistral AI的MoE模型 **Mixtral-8x7B-32K**。欢迎查阅[MixtralKit](https://github.com/open-compass/MixtralKit)以获取更多关于推理和评测的详细信息。🔥🔥🔥。
-- **\[2023.11.22\]** 我们已经支持了多个于API的模型，包括**百度、字节跳动、华为、360**。欢迎查阅[模型](https://opencompass.readthedocs.io/en/latest/user_guides/models.html)部分以获取更多详细信息。🔥🔥🔥。
-- **\[2023.11.20\]** 感谢[helloyongyang](https://github.com/helloyongyang)支持使用[LightLLM](https://github.com/ModelTC/lightllm)作为后端进行评估。欢迎查阅[使用LightLLM进行评估](https://opencompass.readthedocs.io/en/latest/advanced_guides/evaluation_lightllm.html)以获取更多详细信息。🔥🔥🔥。
-- **\[2023.11.13\]** 我们很高兴地宣布发布 OpenCompass v0.1.8 版本。此版本支持本地加载评估基准，从而无需连接互联网。请注意，随着此更新的发布，**您需要重新下载所有评估数据集**，以确保结果准确且最新。🔥🔥🔥。
-- **\[2023.11.06\]** 我们已经支持了多个基于 API 的模型，包括ChatGLM Pro@智谱清言、ABAB-Chat@MiniMax 和讯飞。欢迎查看 [模型](https://opencompass.readthedocs.io/en/latest/user_guides/models.html) 部分以获取更多详细信息。🔥🔥🔥。
-- **\[2023.10.24\]** 我们发布了一个全新的评测集，BotChat，用于评估大语言模型的多轮对话能力，欢迎查看 [BotChat](https://github.com/open-compass/BotChat) 获取更多信息.
-- **\[2023.09.26\]** 我们在评测榜单上更新了[Qwen](https://github.com/QwenLM/Qwen), 这是目前表现最好的开源模型之一, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
-- **\[2023.09.20\]** 我们在评测榜单上更新了[InternLM-20B](https://github.com/InternLM/InternLM), 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
-- **\[2023.09.19\]** 我们在评测榜单上更新了WeMix-LLaMA2-70B/Phi-1.5-1.3B, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
-- **\[2023.09.18\]** 我们发布了[长文本评测指引](docs/zh_cn/advanced_guides/longeval.md).
+- **\[2023.12.10\]** 我们开源了多模评测框架 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，目前已支持 20+ 个多模态大模型与包括 MMBench 系列在内的 7 个多模态评测集.
+- **\[2023.12.10\]** 我们已经支持了Mistral AI的MoE模型 **Mixtral-8x7B-32K**。欢迎查阅[MixtralKit](https://github.com/open-compass/MixtralKit)以获取更多关于推理和评测的详细信息.
 
 > [更多](docs/zh_cn/notes/news.md)
 
