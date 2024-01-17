@@ -28,28 +28,28 @@ internlm_7b = dict(
     )
 
 # # config for internlm-7b-w4 model
-internlm_7b_w4 = dict(
-        type=TurboMindModel,
-        abbr='internlm-7b-w4-turbomind',
-        path="internlm/internlm-7b-w4",
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=32,
-        concurrency=32,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
+# internlm_7b_w4 = dict(
+#         type=TurboMindModel,
+#         abbr='internlm-7b-w4-turbomind',
+#         path="internlm/internlm-7b-w4",
+#         max_out_len=100,
+#         max_seq_len=2048,
+#         batch_size=32,
+#         concurrency=32,
+#         run_cfg=dict(num_gpus=1, num_procs=1),
+#     )
 
 # # config for internlm-7b-w4kv8 model
-internlm_7b_w4kv8 = dict(
-        type=TurboMindModel,
-        abbr='internlm-7b-w4kv8-turbomind',
-        path="internlm/internlm-7b-w4kv8",
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=32,
-        concurrency=32,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
+# internlm_7b_w4kv8 = dict(
+#         type=TurboMindModel,
+#         abbr='internlm-7b-w4kv8-turbomind',
+#         path="internlm/internlm-7b-w4kv8",
+#         max_out_len=100,
+#         max_seq_len=2048,
+#         batch_size=32,
+#         concurrency=32,
+#         run_cfg=dict(num_gpus=1, num_procs=1),
+#     )
 
 # config for internlm-20b model
 internlm_20b = dict(
@@ -64,28 +64,28 @@ internlm_20b = dict(
     )
 
 # config for internlm-20b-w4 model
-internlm_20b_w4 = dict(
-        type=TurboMindModel,
-        abbr='internlm-20b-w4-turbomind',
-        path="internlm/internlm-20b-w4",
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=16,
-        concurrency=16,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
+# internlm_20b_w4 = dict(
+#         type=TurboMindModel,
+#         abbr='internlm-20b-w4-turbomind',
+#         path="internlm/internlm-20b-w4",
+#         max_out_len=100,
+#         max_seq_len=2048,
+#         batch_size=16,
+#         concurrency=16,
+#         run_cfg=dict(num_gpus=1, num_procs=1),
+#     )
 
 
 # config for internlm-20b-w4kv8 model
-internlm_20b_w4kv8 = dict(
-        type=TurboMindModel,
-        abbr='internlm-20b-w4kv8-turbomind',
-        path="internlm/internlm-20b-w4kv8",
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=16,
-        concurrency=16,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
+# internlm_20b_w4kv8 = dict(
+#         type=TurboMindModel,
+#         abbr='internlm-20b-w4kv8-turbomind',
+#         path="internlm/internlm-20b-w4kv8",
+#         max_out_len=100,
+#         max_seq_len=2048,
+#         batch_size=16,
+#         concurrency=16,
+#         run_cfg=dict(num_gpus=1, num_procs=1),
+#     )
 
 models = [internlm_20b]

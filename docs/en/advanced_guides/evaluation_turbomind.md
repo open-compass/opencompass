@@ -18,19 +18,9 @@ pip install lmdeploy
 
 ## Evaluation
 
-OpenCompass integrates both turbomind's python API and gRPC API for evaluation. And the former is highly recommended.
+OpenCompass integrates turbomind's python API for evaluation.
 
-We take the InternLM-20B as example. Please download it from huggingface:
-
-```shell
-# Download InternLM model(or use the cached model's checkpoint)
-
-# Make sure you have git-lfs installed (https://git-lfs.com)
-git lfs install
-git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
-```
-
-### Evaluation with Turbomind Python API (recommended)
+We take the InternLM-20B as example and prepare the evaluation config `configs/eval_internlm_turbomind.py`.
 
 In the home folder of OpenCompass, start evaluation by the following command:
 
@@ -44,40 +34,3 @@ You are expected to get the evaluation results after the inference and evaluatio
 
 - If you evaluate the InternLM Chat model, please use configuration file `eval_internlm_chat_turbomind.py`
 - If you evaluate the InternLM 7B model, please modify `eval_internlm_turbomind.py` or `eval_internlm_chat_turbomind.py` by changing to the setting `models = [internlm_7b]` in the last line.
-- If you want to evaluate other chat models like Llama2, QWen-7B, Baichuan2-7B, you could change to the setting of `models` in `eval_internlm_chat_turbomind.py`.
-
-### Evaluation with Turbomind gPRC API (optional)
-
-Convert model to TurboMind format using lmdeploy
-
-```shell
-lmdeploy convert internlm /path/to/internlm-20b \
-    --dst-path {/home/folder/of/opencompass}/turbomind
-```
-
-**Note**:
-
-If evaluating the InternLM Chat model, make sure to pass `internlm-chat` as the model name instead of `internlm` when converting the model format. The specific command is:
-
-```shell
-lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
-    --dst-path {/home/folder/of/opencompass}/turbomind
-```
-
-In the home folder of OpenCompass, launch the Triton Inference Server:
-
-```shell
-bash turbomind/service_docker_up.sh
-```
-
-And start evaluation by the following command:
-
-```shell
-python run.py configs/eval_internlm_turbomind_tis.py -w outputs/turbomind-tis/internlm-20b
-```
-
-\*\*Note: \*\*
-
-- If the InternLM Chat model is requested to be evaluated, please use config file `eval_internlm_chat_turbomind_tis.py`
-- In `eval_internlm_turbomind_tis.py`, the configured Triton Inference Server (TIS) address is `tis_addr='0.0.0.0:33337'`. Please modify `tis_addr` to the IP address of the machine where the server is launched.
-- If evaluating the InternLM 7B model, please modify the `models` configuration in `eval_internlm_xxx_turbomind_tis.py`.
