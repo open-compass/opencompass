@@ -13,7 +13,9 @@ from .commonsenseqa import commonsenseqaDataset
 from .hellaswag import hellaswagDataset_V2
 from .mmlu import MMLUDataset
 from .obqa import OBQADataset
+from .piqa import piqaDataset_V2
 from .race import RaceDataset
+from .siqa import siqaDataset_V3
 from .xiezhi import XiezhiDataset
 
 
@@ -271,6 +273,24 @@ class CircularXiezhiDataset(XiezhiDataset, metaclass=CircularDatasetMeta):
     default_circular_splits = None
     default_option_keys = ['A', 'B', 'C', 'D']
     default_answer_key = 'answer'
+
+
+class CircularsiqaDataset(siqaDataset_V3, metaclass=CircularDatasetMeta):
+    dataset_class = siqaDataset_V3
+    default_circular_splits = ['validation']
+    default_option_keys = ['A', 'B', 'C']
+    default_answer_key = 'answer'
+
+
+class CircularpiqaDataset(piqaDataset_V2, metaclass=CircularDatasetMeta):
+    dataset_class = piqaDataset_V2
+    default_circular_splits = ['validation']
+    default_option_keys = ['sol1', 'sol2']
+
+    def default_answer_key_switch_method(item, circular_pattern):
+        circular_pattern = tuple(int(i[-1]) - 1 for i in circular_pattern)
+        item['answer'] = 'AB'[circular_pattern['AB'.index(item['answer'])]]
+        return item
 
 
 class CircularEvaluator(BaseEvaluator):

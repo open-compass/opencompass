@@ -11,8 +11,8 @@ agent_summary_groups = [
     dict(name='math_perf_4_and_fill_in_blank-agent', subsets=[['compassbench_v1_math-high-single_choice_cn-agent', 'perf_4'], ['compassbench_v1_math-high-single_choice_en-agent', 'perf_4'], ['compassbench_v1_math-middle-single_choice_cn-agent', 'perf_4'], ['compassbench_v1_math-middle-single_choice_en-agent', 'perf_4'], ['compassbench_v1_math-primary-cloze_cn-agent', 'accuracy'], ['compassbench_v1_math-primary-cloze_en-agent', 'accuracy']]),
     dict(
         name='agent',
-        subsets=['math_perf_4_and_fill_in_blank-agent', 'cibench_template_wo_nltk:executable', 'cibench_template_wo_nltk:numeric_correct', 'cibench_template_wo_nltk:vis_sim', 'cibench_template_cn_wo_nltk:executable', 'cibench_template_cn_wo_nltk:numeric_correct', 'cibench_template_cn_wo_nltk:vis_sim', 'plugin_eval-p10'],
-        weights={'math_perf_4_and_fill_in_blank-agent': 1, 'cibench_template_wo_nltk:executable': 0.5, 'cibench_template_wo_nltk:numeric_correct': 0.25, 'cibench_template_wo_nltk:vis_sim': 0.25, 'cibench_template_cn_wo_nltk:executable': 0.5, 'cibench_template_cn_wo_nltk:numeric_correct': 0.25, 'cibench_template_cn_wo_nltk:vis_sim': 0.25, 'plugin_eval-p10': 1}
+        subsets=['math_perf_4_and_fill_in_blank-agent', 'cibench_template_wo_nltk:executable', 'cibench_template_wo_nltk:numeric_correct', 'cibench_template_wo_nltk:vis_sim', 'cibench_template_cn_wo_nltk:executable', 'cibench_template_cn_wo_nltk:numeric_correct', 'cibench_template_cn_wo_nltk:vis_sim', 'plugin_eval-p10', 'plugin_eval-p10_zh'],
+        weights={'math_perf_4_and_fill_in_blank-agent': 1, 'cibench_template_wo_nltk:executable': 0.5, 'cibench_template_wo_nltk:numeric_correct': 0.25, 'cibench_template_wo_nltk:vis_sim': 0.25, 'cibench_template_cn_wo_nltk:executable': 0.5, 'cibench_template_cn_wo_nltk:numeric_correct': 0.25, 'cibench_template_cn_wo_nltk:vis_sim': 0.25, 'plugin_eval-p10': 1, 'plugin_eval-p10_zh': 1}
     )
 ]
 
@@ -48,13 +48,26 @@ summarizer = dict(
         ['plugin_eval-p10-instruct_v1', 'args_em_metric'],
         ['plugin_eval-p10-plan_str_v1', 'f1_score'],
         ['plugin_eval-p10-plan_json_v1', 'f1_score'],
-        ['plugin_eval-p10-reason_str_v2', 'thought'],
-        ['plugin_eval-p10-reason_retrieve_understand_json_v2', 'thought'],
-        ['plugin_eval-p10-retrieve_str_v2', 'name'],
-        ['plugin_eval-p10-reason_retrieve_understand_json_v2', 'name'],
-        ['plugin_eval-p10-understand_str_v2', 'args'],
-        ['plugin_eval-p10-reason_retrieve_understand_json_v2', 'args'],
-        ['plugin_eval-p10-review_str_v6', 'review_quality'],
+        ['plugin_eval-p10-reason_str_v1', 'thought'],
+        ['plugin_eval-p10-reason_retrieve_understand_json_v1', 'thought'],
+        ['plugin_eval-p10-retrieve_str_v1', 'name'],
+        ['plugin_eval-p10-reason_retrieve_understand_json_v1', 'name'],
+        ['plugin_eval-p10-understand_str_v1', 'args'],
+        ['plugin_eval-p10-reason_retrieve_understand_json_v1', 'args'],
+        ['plugin_eval-p10-review_str_v1', 'review_quality'],
+
+        ['plugin_eval-p10_zh', 'naive_average'],
+        ['plugin_eval-p10-instruct_v1_zh', 'format_metric'],
+        ['plugin_eval-p10-instruct_v1_zh', 'args_em_metric'],
+        ['plugin_eval-p10-plan_str_v1_zh', 'f1_score'],
+        ['plugin_eval-p10-plan_json_v1_zh', 'f1_score'],
+        ['plugin_eval-p10-reason_str_v1_zh', 'thought'],
+        ['plugin_eval-p10-reason_retrieve_understand_json_v1_zh', 'thought'],
+        ['plugin_eval-p10-retrieve_str_v1_zh', 'name'],
+        ['plugin_eval-p10-reason_retrieve_understand_json_v1_zh', 'name'],
+        ['plugin_eval-p10-understand_str_v1_zh', 'args'],
+        ['plugin_eval-p10-reason_retrieve_understand_json_v1_zh', 'args'],
+        ['plugin_eval-p10-review_str_v1_zh', 'review_quality'],
     ],
     summary_groups=sum(
         [v for k, v in locals().items() if k.endswith("_summary_groups")], [])

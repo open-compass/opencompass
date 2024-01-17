@@ -200,30 +200,28 @@ class MBPPEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         assert len(predictions) == len(references)
-        predictions = [self._process_answer(pred) for pred in predictions]
 
         if self.metric == 'MBPP':
             result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
             details = {}
-            for index, (test_case,
-                        pred) in enumerate(zip(references, predictions)):
-                programs = self._process_test(test_case, pred)
-                try:
-                    # Add exec globals to prevent the exec to raise
-                    # unnecessary NameError for correct answer
-                    exec_globals = {}
-                    with swallow_io():
-                        with time_limit(2):
-                            exec(programs, exec_globals)
-                    r = 'pass'
-                except TimeOutException:
-                    r = 'timeout'
-                except AssertionError:
-                    r = 'wrong_answer'
-                except BaseException:
-                    r = 'failed'
-                result[r] += 1
-                details[str(index)] = {'programs': programs, 'result': r}
+            # change to thread pool for better killing blocked instance
+            with ThreadPoolExecutor() as executor:
+                futures = []
+                for i, (refer, pred) in enumerate(zip(references,
+                                                      predictions)):
+                    pred = self._process_answer(pred)
+                    programs = self._process_test(refer, pred)
+                    future = executor.submit(execution, programs, i, 3)
+                    futures.append(future)
+
+                from tqdm import tqdm
+                for future in tqdm(as_completed(futures), total=len(futures)):
+                    index, key = future.result()
+                    result[key] += 1
+                    details[str(index)] = {
+                        'programs': predictions[index],
+                        'result': key
+                    }
 
             result['score'] = result['pass'] / len(predictions) * 100
             result['details'] = details
@@ -263,6 +261,20 @@ class MBPPEvaluator(BaseEvaluator):
                 return {f'mbpp_plus_{k}': score[k] * 100 for k in score}
 
     def _process_answer(self, text):
+        try:
+            # for chatGLM related text
+            text = eval(text)
+        except Exception:
+            pass
+        # deal with code block
+        if '```' in text:
+            blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+            if len(blocks) == 0:
+                text = text.split('```')[1]  # fall back to default strategy
+            else:
+                text = blocks[0]  # fetch the first code block
+                if not text.startswith('\n'):  # in case starting with ```xxx
+                    text = text[max(text.find('\n') + 1, 0):]
         text = text.strip()
         match = re.search(r"('\s*|)(\[DONE\]|DONE)", text)
         if match:
@@ -275,6 +287,10 @@ class MBPPEvaluator(BaseEvaluator):
             text = text[1:]
         if text.endswith("'"):
             text = text[:-1]
+        text = text.replace('\\', '')
+        match = re.search(r'```python(.*)```', text, re.DOTALL)
+        if match:
+            text = match.group(1).strip().split('```')[0].strip()
         return text
 
     def _process_test(self, test_case, pred):
