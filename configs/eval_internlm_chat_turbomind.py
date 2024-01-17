@@ -1,7 +1,5 @@
 from mmengine.config import read_base
 from opencompass.models.turbomind import TurboMindModel
-from lmdeploy.messages import EngineGenerationConfig, TurbomindEngineConfig
-
 
 with read_base():
     # choose a list of datasets
@@ -30,8 +28,8 @@ internlm_chat_7b = dict(
     type=TurboMindModel,
     abbr='internlm-chat-7b-turbomind',
     path='internlm/internlm-chat-7b',
-    engine_config=TurbomindEngineConfig(session_len=2048, max_batch_size=8, rope_scaling_factor=1.0),
-    gen_config=EngineGenerationConfig(top_k=1, top_p=0.8, temperature=1.0, max_new_tokens=100),
+    engine_config=dict(session_len=2048, max_batch_size=8, rope_scaling_factor=1.0),
+    gen_config=dict(top_k=1, top_p=0.8, temperature=1.0, max_new_tokens=100),
     max_out_len=100,
     max_seq_len=2048,
     batch_size=32,
@@ -45,8 +43,8 @@ internlm_chat_20b = dict(
     type=TurboMindModel,
     abbr='internlm-chat-20b-turbomind',
     path='internlm/internlm-chat-20b',
-    engine_config=TurbomindEngineConfig(session_len=2048, max_batch_size=8, rope_scaling_factor=1.0),
-    gen_config=EngineGenerationConfig(top_k=1, top_p=0.8, temperature=1.0, max_new_tokens=100),
+    engine_config=dict(session_len=2048, max_batch_size=8, rope_scaling_factor=1.0),
+    gen_config=dict(top_k=1, top_p=0.8, temperature=1.0, max_new_tokens=100),
     max_out_len=100,
     max_seq_len=2048,
     batch_size=8,

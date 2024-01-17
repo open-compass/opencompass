@@ -41,13 +41,19 @@ class TurboMindModel(BaseModel):
                  concurrency: int = 8,
                  max_seq_len: int = 2048,
                  meta_template: Optional[Dict] = None,
-                 engine_config=None,
-                 gen_config=None):
-        from lmdeploy.turbomind import TurboMind
-
+                 engine_config: Optional[Dict] = None,
+                 gen_config: Optional[Dict] = None):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
+        from lmdeploy.turbomind import TurboMind
+
+        if engine_config is not None:
+            from lmdeploy.messages import TurbomindEngineConfig
+            engine_config = TurbomindEngineConfig(**engine_config)
+        if gen_config is not None:
+            from lmdeploy.messages import EngineGenerationConfig
+            gen_config = EngineGenerationConfig(**gen_config)
         self.logger = get_logger()
         tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
         self.tokenizer = tm_model.tokenizer
@@ -103,8 +109,12 @@ class TurboMindModel(BaseModel):
         """
         return self.token_bucket.get_token()
 
-    def _generate(self, generator, session_id, prompt: str or PromptList,
-                  max_out_len: int, gen_config: float) -> str:
+    def _generate(self,
+                  generator,
+                  session_id,
+                  prompt: str or PromptList,
+                  max_out_len: int,
+                  gen_config=None) -> str:
         """Generate results given a list of inputs.
 
         Args:
