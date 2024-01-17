@@ -20,9 +20,42 @@ pip install lmdeploy
 
 OpenCompass integrates turbomind's python API for evaluation.
 
-We take the InternLM-20B as example and prepare the evaluation config `configs/eval_internlm_turbomind.py`.
+We take the InternLM-20B as example. Firstly, we prepare the evaluation config `configs/eval_internlm_turbomind.py`:
 
-In the home folder of OpenCompass, start evaluation by the following command:
+```python
+from mmengine.config import read_base
+from opencompass.models.turbomind import TurboMindModel
+
+
+with read_base():
+    # choose a list of datasets
+    from .datasets.mmlu.mmlu_gen_a484b3 import mmlu_datasets
+    from .datasets.ceval.ceval_gen_5f30c7 import ceval_datasets
+    from .datasets.SuperGLUE_WiC.SuperGLUE_WiC_gen_d06864 import WiC_datasets
+    from .datasets.triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
+    from .datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
+    from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
+    # and output the results in a chosen format
+    from .summarizers.medium import summarizer
+
+datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
+
+# config for internlm-20b model
+internlm_20b = dict(
+        type=TurboMindModel,
+        abbr='internlm-20b-turbomind',
+        path="internlm/internlm-20b", # this path should be same as in huggingface
+        max_out_len=100,
+        max_seq_len=2048,
+        batch_size=8,
+        concurrency=8,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+
+models = [internlm_20b]
+```
+
+Then, in the home folder of OpenCompass, start evaluation by the following command:
 
 ```shell
 python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-20b

@@ -45,7 +45,7 @@ class TurboMindModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         self.logger = get_logger()
-        tm_model = TurboMind.from_pretrained(path)
+        tm_model = TurboMind.from_pretrained(path, session_len=max_seq_len)
         self.tokenizer = tm_model.tokenizer
         self.generators = [
             tm_model.create_instance() for i in range(concurrency)

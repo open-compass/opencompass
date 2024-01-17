@@ -20,9 +20,42 @@ pip install lmdeploy
 
 OpenCompass 支持分别通过 turbomind python API 评测数据集。
 
-下文以 InternLM-20B 模型为例，介绍如何评测。
+下文以 InternLM-20B 模型为例，介绍如何评测。首先我们准备好测试配置文件`configs/eval_internlm_turbomind.py`:
 
-在 OpenCompass 的项目目录下，执行如下命令可得到评测结果：
+```python
+from mmengine.config import read_base
+from opencompass.models.turbomind import TurboMindModel
+
+
+with read_base():
+    # choose a list of datasets
+    from .datasets.mmlu.mmlu_gen_a484b3 import mmlu_datasets
+    from .datasets.ceval.ceval_gen_5f30c7 import ceval_datasets
+    from .datasets.SuperGLUE_WiC.SuperGLUE_WiC_gen_d06864 import WiC_datasets
+    from .datasets.triviaqa.triviaqa_gen_2121ce import triviaqa_datasets
+    from .datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
+    from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
+    # and output the results in a chosen format
+    from .summarizers.medium import summarizer
+
+datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
+
+# config for internlm-20b model
+internlm_20b = dict(
+        type=TurboMindModel,
+        abbr='internlm-20b-turbomind',
+        path="internlm/internlm-20b", # 注意路径与huggingface保持一致
+        max_out_len=100,
+        max_seq_len=2048,
+        batch_size=8,
+        concurrency=8,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+
+models = [internlm_20b]
+```
+
+然后，在 OpenCompass 的项目目录下，执行如下命令可得到评测结果：
 
 ```shell
 python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-20b
