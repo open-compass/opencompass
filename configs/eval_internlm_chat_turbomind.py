@@ -1,5 +1,6 @@
 from mmengine.config import read_base
 from opencompass.models.turbomind import TurboMindModel
+from lmdeploy.messages import EngineGenerationConfig, TurbomindEngineConfig
 
 
 with read_base():
@@ -24,31 +25,13 @@ internlm_meta_template = dict(round=[
 ],
                               eos_token_id=103028)
 
-llama2_meta_template = dict(
-    round=[
-        dict(role='HUMAN', begin='[INST] ', end=' [/INST]'),
-        dict(role='BOT', generate=True),
-    ],
-    eos_token_id=2)
-
-qwen_meta_template = dict(round=[
-    dict(role='HUMAN', begin='\n<|im_start|>user\n', end='<|im_end|>'),
-    dict(role='BOT',
-         begin='\n<|im_start|>assistant\n',
-         end='<|im_end|>',
-         generate=True)
-    ])
-
-baichuan2_meta_template = dict(round=[
-    dict(role='HUMAN', begin='<reserved_106>'),
-    dict(role='BOT', begin='<reserved_107>', generate=True)
-    ])
-
 # config for internlm-chat-7b
 internlm_chat_7b = dict(
     type=TurboMindModel,
     abbr='internlm-chat-7b-turbomind',
     path='internlm/internlm-chat-7b',
+    engine_config=TurbomindEngineConfig(session_len=2048, max_batch_size=8, rope_scaling_factor=1.0),
+    gen_config=EngineGenerationConfig(top_k=1, top_p=0.8, temperature=1.0, max_new_tokens=100),
     max_out_len=100,
     max_seq_len=2048,
     batch_size=32,
@@ -57,36 +40,13 @@ internlm_chat_7b = dict(
     run_cfg=dict(num_gpus=1, num_procs=1),
 )
 
-# internlm_chat_7b_w4 = dict(
-#     type=TurboMindModel,
-#     abbr='internlm-chat-7b-w4-turbomind',
-#     path='internlm/internlm-chat-7b-w4',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=32,
-#     concurrency=32,
-#     meta_template=internlm_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
-# config for internlm-chat-7b-w4kv8 model
-# internlm_chat_7b_w4kv8 = dict(
-#     type=TurboMindModel,
-#     abbr='internlm-chat-7b-w4kv8-turbomind',
-#     path='internlm/internlm-chat-7b-w4kv8',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=32,
-#     concurrency=32,
-#     meta_template=internlm_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
 # config for internlm-chat-20b
 internlm_chat_20b = dict(
     type=TurboMindModel,
     abbr='internlm-chat-20b-turbomind',
     path='internlm/internlm-chat-20b',
+    engine_config=TurbomindEngineConfig(session_len=2048, max_batch_size=8, rope_scaling_factor=1.0),
+    gen_config=EngineGenerationConfig(top_k=1, top_p=0.8, temperature=1.0, max_new_tokens=100),
     max_out_len=100,
     max_seq_len=2048,
     batch_size=8,
@@ -94,109 +54,5 @@ internlm_chat_20b = dict(
     meta_template=internlm_meta_template,
     run_cfg=dict(num_gpus=1, num_procs=1),
 )
-
-# config for internlm-chat-20b-w4 model
-# internlm_chat_20b_w4 = dict(
-#     type=TurboMindModel,
-#     abbr='internlm-chat-20b-w4-turbomind',
-#     path='internlm/internlm-chat-20b-w4',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=16,
-#     concurrency=16,
-#     meta_template=internlm_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
-# config for internlm-chat-20b-w4kv8 model
-# internlm_chat_20b_w4kv8 = dict(
-#     type=TurboMindModel,
-#     abbr='internlm-chat-20b-w4kv8-turbomind',
-#     path='internlm/internlm-chat-20b-w4kv8',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=16,
-#     concurrency=16,
-#     meta_template=internlm_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
-# config for llama2-chat-7b
-# llama2_chat_7b = dict(
-#     type=TurboMindModel,
-#     abbr='llama2-chat-7b-turbomind',
-#     path='meta-llama/Llama-2-7b-chat-hf',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=16,
-#     concurrency=32,
-#     meta_template=llama2_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
-# config for llama2-chat-13b
-# llama2_chat_13b = dict(
-#     type=TurboMindModel,
-#     abbr='llama2-chat-13b-turbomind',
-#     path='meta-llama/Llama-2-13b-chat-hf',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=16,
-#     concurrency=16,
-#     meta_template=llama2_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
-# config for llama2-chat-70b
-# llama2_chat_70b = dict(
-#     type=TurboMindModel,
-#     abbr='llama2-chat-70b-turbomind',
-#     path='meta-llama/Llama-2-70b-chat-hf',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=8,
-#     concurrency=8,
-#     meta_template=llama2_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
-# config for qwen-chat-7b
-# qwen_chat_7b = dict(
-#     type=TurboMindModel,
-#     abbr='qwen-chat-7b-turbomind',
-#     path='Qwen/Qwen-7B-Chat',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=16,
-#     concurrency=32,
-#     meta_template=qwen_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
-# config for qwen-chat-7b
-# qwen_chat_14b = dict(
-#     type=TurboMindModel,
-#     abbr='qwen-chat-14b-turbomind',
-#     path='Qwen/Qwen-14B-Chat',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=16,
-#     concurrency=32,
-#     meta_template=qwen_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
-
-# config for baichuan2-chat-7b
-# baichuan2_chat_7b = dict(
-#     type=TurboMindModel,
-#     abbr='baichuan2-chat-7b-turbomind',
-#     path='baichuan-inc/Baichuan2-7B-Chat',
-#     max_out_len=100,
-#     max_seq_len=2048,
-#     batch_size=16,
-#     concurrency=32,
-#     meta_template=baichuan2_meta_template,
-#     run_cfg=dict(num_gpus=1, num_procs=1),
-# )
 
 models = [internlm_chat_20b]
