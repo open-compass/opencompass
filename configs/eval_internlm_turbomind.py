@@ -21,7 +21,7 @@ internlm_7b = dict(
         abbr='internlm-7b-turbomind',
         path="internlm/internlm-7b",
         engine_config=dict(session_len=2048,
-                           max_batch_size=8,
+                           max_batch_size=32,
                            rope_scaling_factor=1.0),
         gen_config=dict(top_k=1,
                         top_p=0.8,
