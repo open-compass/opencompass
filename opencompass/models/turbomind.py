@@ -30,9 +30,9 @@ class TurboMindModel(BaseModel):
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
-        engine_config (TurbomindEngineConfig): The engine config to set
+        engine_config (Dict, optional): The engine config to set
             arguments like session_len, max_batch_size for TurboMind.
-        gen_config (EngineGenerationConfig): Generation config to set
+        gen_config (Dict, optional): Generation config to set
                 arguments like top_k, top_p, temperature.
     """
 
@@ -122,8 +122,8 @@ class TurboMindModel(BaseModel):
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
-            gen_config (EngineGenerationConfig): Generation config to set
-                arguments like top_k, top_p, temperature.
+            gen_config (EngineGenerationConfig, optional): Generation
+                config to set arguments like top_k, top_p, temperature.
 
         Returns:
             str: The generated string.
