@@ -155,6 +155,11 @@ def humaneval_postprocess(text: str) -> str:
 def humaneval_postprocess_v2(text: str) -> str:
     """This is an advanced version of previous postprocess to handle more
     situations, better to use this one."""
+    try:
+        # for chatGLM raw text
+        text = eval(text)
+    except Exception:
+        pass
     text = text.lstrip('\n')
     if '```' in text:
         blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
@@ -173,11 +178,11 @@ def humaneval_postprocess_v2(text: str) -> str:
     text = text.lstrip('\n')
     if text.strip().startswith('def'):
         text = '\n'.join(text.split('\n')[1:])
-    if not text.startswith('    '):
-        if text.startswith(' '):
-            text = '    ' + text.lstrip()
-        else:
-            text = '\n'.join(['    ' + line for line in text.split('\n')])
+    # deal with the indentation error
+    if text.startswith(' '):
+        text = '    ' + text.lstrip()
+    else:
+        text = '\n'.join(['    ' + line for line in text.split('\n')])
     text = text.split('\n')
 
     # If number of leading space reduces, we assume that the code block ends.
