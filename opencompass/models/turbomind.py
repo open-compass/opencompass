@@ -1,4 +1,3 @@
-import os.path as osp
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -40,16 +39,14 @@ class TurboMindModel(BaseModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
     ):
-        from lmdeploy import turbomind as tm
-        from lmdeploy.tokenizer import Tokenizer
+        from lmdeploy.turbomind import TurboMind
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         self.logger = get_logger()
-        tokenizer_model_path = osp.join(path, 'triton_models', 'tokenizer')
-        self.tokenizer = Tokenizer(tokenizer_model_path)
-        tm_model = tm.TurboMind(path)
+        tm_model = TurboMind.from_pretrained(path)
+        self.tokenizer = tm_model.tokenizer
         self.generators = [
             tm_model.create_instance() for i in range(concurrency)
         ]
@@ -134,9 +131,10 @@ class TurboMindModel(BaseModel):
                                               sequence_start=True,
                                               sequence_end=True,
                                               top_k=1,
+                                              top_p=0.8,
                                               step=0,
                                               stream_output=False):
-            output_ids, _ = outputs[0]
-            response = self.tokenizer.decode(output_ids.tolist())
+            _, output_ids, _ = outputs
+            response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
         return response

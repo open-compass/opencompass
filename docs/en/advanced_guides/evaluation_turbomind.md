@@ -20,27 +20,14 @@ pip install lmdeploy
 
 OpenCompass integrates both turbomind's python API and gRPC API for evaluation. And the former is highly recommended.
 
-We take the InternLM-20B as example. Please download it from huggingface and convert it to turbomind's model format:
+We take the InternLM-20B as example. Please download it from huggingface:
 
 ```shell
-# 1. Download InternLM model(or use the cached model's checkpoint)
+# Download InternLM model(or use the cached model's checkpoint)
 
 # Make sure you have git-lfs installed (https://git-lfs.com)
 git lfs install
 git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
-
-# 2. Convert InternLM model to turbomind's format, and save it in the home folder of opencompass
-lmdeploy convert internlm /path/to/internlm-20b \
-    --dst-path {/home/folder/of/opencompass}/turbomind
-```
-
-**Note**:
-
-If evaluating the InternLM Chat model, make sure to pass `internlm-chat` as the model name instead of `internlm` when converting the model format. The specific command is:
-
-```shell
-lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
-    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
 ### Evaluation with Turbomind Python API (recommended)
@@ -60,6 +47,22 @@ You are expected to get the evaluation results after the inference and evaluatio
 - If you want to evaluate other chat models like Llama2, QWen-7B, Baichuan2-7B, you could change to the setting of `models` in `eval_internlm_chat_turbomind.py`.
 
 ### Evaluation with Turbomind gPRC API (optional)
+
+Convert model to TurboMind format using lmdeploy
+
+```shell
+lmdeploy convert internlm /path/to/internlm-20b \
+    --dst-path {/home/folder/of/opencompass}/turbomind
+```
+
+**Note**:
+
+If evaluating the InternLM Chat model, make sure to pass `internlm-chat` as the model name instead of `internlm` when converting the model format. The specific command is:
+
+```shell
+lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
+    --dst-path {/home/folder/of/opencompass}/turbomind
+```
 
 In the home folder of OpenCompass, launch the Triton Inference Server:
 

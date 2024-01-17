@@ -20,25 +20,14 @@ pip install lmdeploy
 
 OpenCompass 支持分别通过 turbomind python API 和 gRPC API 评测数据集。我们强烈推荐使用前者进行评测。
 
-下文以 InternLM-20B 模型为例，介绍如何评测。首先，从 huggingface 上下载 InternLM 模型，并转换为 turbomind 模型格式：
+下文以 InternLM-20B 模型为例，介绍如何评测。首先，从 huggingface 上下载 InternLM 模型：
 
 ```shell
-# 1. Download InternLM model(or use the cached model's checkpoint)
+Download InternLM model(or use the cached model's checkpoint)
 
 # Make sure you have git-lfs installed (https://git-lfs.com)
 git lfs install
 git clone https://huggingface.co/internlm/internlm-20b /path/to/internlm-20b
-
-# 2. Convert InternLM model to turbomind's format, and save it in the home folder of opencompass
-lmdeploy convert internlm /path/to/internlm-20b \
-    --dst-path {/home/folder/of/opencompass}/turbomind
-```
-
-注意：如果评测 InternLM Chat 模型，那么在转换模型格式的时候，模型名字要填写 `internlm-chat`。具体命令是：
-
-```shell
-lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
-    --dst-path {/home/folder/of/opencompass}/turbomind
 ```
 
 ### 通过 TurboMind Python API 评测（推荐）
@@ -56,6 +45,20 @@ python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-2
 - 如果评测其他模型如 Llama2, QWen-7B, Baichuan2-7B, 请修改`eval_internlm_chat_turbomind.py`中`models`字段 。
 
 ### 通过 TurboMind gPRC API 评测（可选）
+
+首先需要将模型转换为 turbomind 格式
+
+```shell script
+lmdeploy convert internlm /path/to/internlm-20b \
+    --dst-path {/home/folder/of/opencompass}/turbomind
+```
+
+注意：如果评测 InternLM Chat 模型，那么在转换模型格式的时候，模型名字要填写 `internlm-chat`。具体命令是：
+
+```shell
+lmdeploy convert internlm-chat /path/to/internlm-20b-chat \
+    --dst-path {/home/folder/of/opencompass}/turbomind
+```
 
 在 OpenCompass 的项目目录下，启动 triton inference server：
 
