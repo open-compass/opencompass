@@ -74,7 +74,7 @@ for original_context_length in context_lengths:
             'language': 'Chinese',
             'needle': '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n',
             'retrieval_question': '小明最喜欢的实习地点是哪里？请按照'
-            '“小明最喜欢的实习地点就是________。”的格式回答。',
+            '“小明最喜欢的实习地点就是________。”的格式回答。\n',
             'reader_cfg': cdme_reader_cfg,
             'infer_cfg': cdme_infer_cfg,
             'eval_cfg': cdme_eval_cfg
