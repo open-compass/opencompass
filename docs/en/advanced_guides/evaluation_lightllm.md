@@ -27,6 +27,7 @@ python -m lightllm.server.api_server --model_dir /path/llama2-7B     \
 ```
 
 \*\*Note: \*\* tp can be configured to enable TensorParallel inference on several gpus, suitable for the inference of very large models.
+\*\*Note: \*\* The max_total_token_num in the above command will affect the throughput performance during testing. It can be configured according to the documentation on the [Lightllm homepage](https://github.com/ModelTC/lightllm). As long as it does not run out of memory, it is often better to set it as high as possible.
 
 You can use the following Python script to quickly test whether the current service has been successfully started.
 
