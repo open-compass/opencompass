@@ -21,9 +21,6 @@ jobs:
   test_run:
     runs-on: self-hosted
     timeout-minutes: 20
-    strategy:
-      matrix:
-        python-version: ['3.10']
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -47,12 +44,6 @@ jobs:
           conda info --envs
           rm -rf regression_result
           python3 run.py --models hf_internlm_chat_7b --datasets siqa_gen --work-dir regression_result --debug
-      - name:  Remove Conda Env
-        if: always()
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda env remove --name opencompass_regression
-          conda info --envs
       - name:  Get result
         if: always()
         run: |
@@ -64,3 +55,9 @@ jobs:
              exit 1
           fi
           rm -rf regression_result
+      - name:  Remove Conda Env
+        if: always()
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda env remove --name opencompass_regression
+          conda info --envs
