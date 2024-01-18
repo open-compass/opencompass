@@ -11,7 +11,7 @@ on:
 
   workflow_dispatch:
   schedule:
-    - cron:  '56 0 * * *'
+    - cron:  '56 20 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,6 +39,7 @@ jobs:
           cp -r /cpfs01/user/qa-llm-cicd/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub ~/.cache/huggingface/hub
+          export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1;
       - name:  Run test
         run: |
           eval "$(conda shell.bash hook)"
