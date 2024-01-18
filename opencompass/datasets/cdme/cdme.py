@@ -159,6 +159,12 @@ class CDMEEvaluator(BaseEvaluator):
         for prediction, reference in zip(predictions, references):
             prediction = re.sub(r'\s+', '', prediction)
             reference = re.sub(r'\s+', '', reference)
+            l08 = int(0.8 * len(reference))
+            l12 = int(1.2 * len(reference))
+            prediction = prediction[:l12]
+            if len(prediction) > l08 and reference[-1] in prediction[l08:]:
+                end_pos = l08 + prediction[l08:].index(reference[-1]) + 1
+                prediction = prediction[:end_pos]
             edit_distance = self.levenshtein_distance(prediction, reference)
             max_len = max(len(prediction), len(reference))
             score = 100 * (1 -

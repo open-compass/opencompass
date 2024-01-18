@@ -46,7 +46,8 @@ cdme_eval_cfg = dict(
     dataset_postprocessor=dict(type=cdme_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = list(range(1000, 201000, 1000))
+#context_lengths = list(range(1000, 201000, 1000))
+context_lengths = [16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000, 144000, 160000, 176000, 192000, 200000]
 document_depth_percent_intervals = 20
 document_depth_percent_interval_type = "linear"
 
