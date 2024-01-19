@@ -10,7 +10,7 @@ api_meta_template = dict(
 
 models = [
     dict(abbr='GPT-3.5-turbo-0613',
-        type=OpenAI, path='gpt-3.5-turbo-0613',
+        type=OpenAI, path='gpt-3.5-turbo-16k',
         key='ENV',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
         meta_template=api_meta_template,
         query_per_second=1,
