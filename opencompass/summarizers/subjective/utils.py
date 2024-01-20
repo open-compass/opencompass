@@ -21,7 +21,11 @@ def get_outdir(cfg, time_str):
     return output_dir, results_folder
 
 
-def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
+def get_judgeanswer_and_reference(dataset,
+                                  subdir_path,
+                                  post_process,
+                                  check_position_bias=False,
+                                  banned_choice=['C']):
     """Extract judgements (scores) and references.
 
     Args:
@@ -59,11 +63,13 @@ def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
 
     judged_answers = []
     references = []
+    position_bias_list = []
     for k, v in result.items():
         processed_judge = post_process(v['prediction'])
         if processed_judge is not None:
             judged_answers.append(processed_judge)
             references.append(v['gold'])
+        position_bias_list.append(processed_judge)
     print(
         f'Among {len(result)} judgements, successfully extracted {len(judged_answers)} judgements.'
     )
@@ -74,4 +80,16 @@ def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
         )
         print('*' * 100)
     assert len(judged_answers) > 0
-    return judged_answers, references
+    if not check_position_bias:
+        return judged_answers, references
+    else:
+        assert len(
+            position_bias_list) % 2 == 0, 'List length must be an even number'
+        position_bias_flag = sum(
+            1 for i in range(len(position_bias_list) // 2)
+            if position_bias_list[i] is not None and position_bias_list[
+                i + len(position_bias_list) // 2] is not None
+            and position_bias_list[i] not in banned_choice
+            and position_bias_list[i] == position_bias_list[
+                i + len(position_bias_list) // 2])
+        return judged_answers, references, position_bias_flag
