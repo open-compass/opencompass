@@ -113,7 +113,7 @@ creation_prompt = """
 """ + base_prompt
 
 
-subjective_all_sets = ["knowledge", "language", "math", "reason", "zhihu_hot_0113", "creationv2_zh"]
+subjective_all_sets = ["knowledge", "language", "math", "reason", "qa", "creationv2_zh"]
 prompt_all_sets = [knowledge_prompt, language_prompt, math_prompt, reason_prompt, qa_prompt, creation_prompt]
 
 for _name,_prompt in zip(subjective_all_sets, prompt_all_sets):
