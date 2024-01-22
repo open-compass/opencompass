@@ -1,14 +1,18 @@
-from datasets import Dataset, DatasetDict
+from datasets import Dataset
+
 from opencompass.registry import LOAD_DATASET
+
 from .subjective_cmp import SubjectiveCmpDataset
+
 
 @LOAD_DATASET.register_module()
 class Compass_Arena(SubjectiveCmpDataset):
 
-    def load(self,
-             path: str,
-             name: str,
-            ):
+    def load(
+        self,
+        path: str,
+        name: str,
+    ):
         dataset = list(super().load(path, name))
         creation_dataset = []
         for data in dataset:

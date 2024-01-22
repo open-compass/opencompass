@@ -1,26 +1,29 @@
 # flake8: noqa: E501
+import ast
 import csv
 import os
 import os.path as osp
 import re
-import ast
 from collections import defaultdict
 from datetime import datetime
-from prettytable import from_csv
 from itertools import product
 
 import mmengine
 from mmengine import ConfigDict
-from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
+from prettytable import from_csv
+
 from opencompass.partitioners.sub_naive import remove_duplicate_pairs
+from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
 
 from .utils import get_judgeanswer_and_reference, get_outdir
+
 
 def post_process_compass_arena(s):
     if result := re.findall('(?:选择：|Choice: )([ABC])', s):
         return result[0]
     else:
         return None
+
 
 class Compassarena_Summarizer:
     """Do the subjectivity analyze based on evaluation results.
@@ -68,12 +71,19 @@ class Compassarena_Summarizer:
             if os.path.isdir(subdir_path):
                 for dataset in dataset_cfgs:
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
-                    fout = osp.join(output_dir, 'judged-by--' + judge_model + '-' + dataset_abbr +'-report.csv')
+                    fout = osp.join(
+                        output_dir, 'judged-by--' + judge_model + '-' +
+                        dataset_abbr + '-report.csv')
                     fout_list.append(fout)
                     judged_answers, references, bias_num = get_judgeanswer_and_reference(
-                        dataset, subdir_path, self.judge_function, check_position_bias=True)
-                    win_model1, win_model2, categories = defaultdict(float), defaultdict(float), defaultdict(float)
-                    model1, model2 = references[0]['answer1'], references[0]['answer2']
+                        dataset,
+                        subdir_path,
+                        self.judge_function,
+                        check_position_bias=True)
+                    win_model1, win_model2, categories = defaultdict(
+                        float), defaultdict(float), defaultdict(float)
+                    model1, model2 = references[0]['answer1'], references[0][
+                        'answer2']
                     for prediction, reference in zip(judged_answers,
                                                      references):
                         if dataset_abbr == 'zhihu_hot_0113':
@@ -116,7 +126,8 @@ class Compassarena_Summarizer:
                     rows = list(scores.keys())
                     columns = list(scores[rows[0]].keys())
                     columns.insert(0, columns.pop(columns.index('total')))
-                    columns.insert(1, columns.pop(columns.index('position_bias')))
+                    columns.insert(1,
+                                   columns.pop(columns.index('position_bias')))
                     with open(fout, 'a+', newline='') as csvfile:
                         writer = csv.writer(csvfile)
                         writer.writerow([model1 + '_vs_' + model2] + columns)
