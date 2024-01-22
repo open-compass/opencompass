@@ -91,5 +91,5 @@ eval = dict(
 
 
 summarizer = dict(
-    type=Compassarena_Summarizer
+    type=CompassArenaSummarizer
 )
