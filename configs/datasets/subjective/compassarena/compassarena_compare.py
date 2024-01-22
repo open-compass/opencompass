@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import Compass_Arena
+from opencompass.datasets import CompassArenaDataset
 
 subjective_reader_cfg = dict(
     input_columns=['question', 'ref'],
