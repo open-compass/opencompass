@@ -15,7 +15,7 @@ from opencompass.runners import LocalRunner
 from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import Compassarena_Summarizer
+from opencompass.summarizers import CompassArenaSummarizer
 
 infer = dict(
     #partitioner=dict(type=NaivePartitioner),
