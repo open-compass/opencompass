@@ -151,7 +151,7 @@ for _name,_prompt in zip(subjective_all_sets, prompt_all_sets):
     subjective_datasets.append(
         dict(
             abbr=f"{_name}",
-            type=Compass_Arena,
+            type=CompassArenaDataset,
             path=data_path,
             name=_name,
             reader_cfg=subjective_reader_cfg,
