@@ -25,7 +25,7 @@ def post_process_compass_arena(s):
         return None
 
 
-class Compassarena_Summarizer:
+class CompassArenaSummarizer:
     """Do the subjectivity analyze based on evaluation results.
 
     Args:
