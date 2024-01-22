@@ -20,12 +20,13 @@ from .subjective_post_process import post_process_autoj
 from .utils import get_judgeanswer_and_reference, get_outdir
 
 
-def get_capability_results(judged_answers,
-                           references,
-                           fout,
-                           fout_flag,
-                           model,
-                           ):
+def get_capability_results(
+    judged_answers,
+    references,
+    fout,
+    fout_flag,
+    model,
+):
     capability_ratings = defaultdict(int)
     capability_counts = defaultdict(int)
     for ans, ref in zip(judged_answers, references):
@@ -46,7 +47,9 @@ def get_capability_results(judged_answers,
         if fout_flag == 0:
             writer.writerow(['model'] + columns)
             fout_flag += 1
-        writer.writerow([model] + [capability_avg_ratings[column] for column in columns])
+        writer.writerow([model] +
+                        [capability_avg_ratings[column] for column in columns])
+
 
 class MTBenchSummarizer:
     """Do the subjectivity analyze based on evaluation results.
@@ -94,11 +97,11 @@ class MTBenchSummarizer:
                 for dataset in dataset_cfgs:
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
-                    get_capability_results(judged_answers, references, fout, fout_flag, model)
+                    get_capability_results(judged_answers, references, fout,
+                                           fout_flag, model)
                     fout_flag += 1
             else:
                 print(subdir_path + ' is not exist! please check!')
         with open(fout, 'r') as f:
             x = from_csv(f)
         print(x)
-
