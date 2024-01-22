@@ -12,6 +12,7 @@
     - [6. `拉取请求`合并之后删除该分支](#6-拉取请求合并之后删除该分支)
   - [代码风格](#代码风格)
     - [Python](#python)
+  - [关于提交数据集](#关于提交数据集)
 
 感谢你对于OpenCompass的贡献！我们欢迎各种形式的贡献，包括但不限于以下几点。
 
@@ -146,3 +147,21 @@ git checkout main -b branchname
 - [docformatter](https://github.com/myint/docformatter): 一个格式化docstring的工具。
 
 yapf和isort的样式配置可以在[setup.cfg](https://github.com/OpenCompass/blob/main/setup.cfg)中找到。
+
+## 关于贡献测试数据集
+
+- 提交测试数据集
+  - 请在代码中实现自动下载数据集的逻辑；或者在 PR 中提供获取数据集的方法，OpenCompass 的维护者会跟进处理。如果数据集尚未公开，亦请注明。
+- 提交数据配置文件
+- 在数据配置同级目录下提供 README，README 中的内容应该包含，但不局限于：
+  - 该数据集的简单说明
+  - 该数据集的官方链接
+  - 该数据集的一些测试样例
+  - 该数据集在相关模型上的评测结果
+  - 该数据集的引用
+- (可选) 数据集的 summarizer
+- (可选) 如果测试过程无法通过简单拼接数据集和模型配置文件的方式来实现的话，还需要提供进行测试过程的配置文件
+- (可选) 如果需要，请在文档相关位置处添加该数据集的说明。这在辅助用户理解该测试方案是非常必要的，可参考 OpenCompass 中该类型的文档：
+  - [循环评测](../advanced_guides/circular_eval.md)
+  - [代码评测](../advanced_guides/code_eval.md)
+  - [污染评估](../advanced_guides/contamination_eval.md)
