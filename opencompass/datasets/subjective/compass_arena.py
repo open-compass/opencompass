@@ -6,7 +6,7 @@ from .subjective_cmp import SubjectiveCmpDataset
 
 
 @LOAD_DATASET.register_module()
-class Compass_Arena(SubjectiveCmpDataset):
+class CompassArenaDataset(SubjectiveCmpDataset):
 
     def load(
         self,
