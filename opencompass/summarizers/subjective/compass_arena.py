@@ -25,6 +25,31 @@ def post_process_compass_arena(s):
         return None
 
 
+def check_position_bias(judged_answers, references, banned_choice=['C']):
+    """Check position bias for judgellm's judgement.
+
+    Args:
+        judged_answers: The successfully extracted judgement.
+        references: The references contains original question, which is used to located the same question for different position judgement.
+    """
+    position_bias_flag = 0
+    position_bias_dict = {}
+    for judge, ref in zip(judged_answers, references):
+        question = ref['others']['question']
+        question_hash = hash(question)
+        if question_hash not in position_bias_dict:
+            position_bias_dict[question_hash] = {
+                'question': question,
+                'judge': judge
+            }
+        else:
+            first_judge = position_bias_dict[question_hash]['judge']
+            if judge == first_judge and first_judge not in banned_choice and judge not in banned_choice:
+                # If second choice is same with first choice, there has position bias.
+                position_bias_flag += 1
+    return position_bias_flag
+
+
 class CompassArenaSummarizer:
     """Do the subjectivity analyze based on evaluation results.
 
@@ -47,7 +72,8 @@ class CompassArenaSummarizer:
         self.judge_function = self.judge_map[self.judge_type]
 
     def summarize(self,
-                  time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
+                  time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S'),
+                  check_pos_bias=True):
         """Summarize the subjectivity analysis based on evaluation results.
 
         Args:
@@ -75,11 +101,16 @@ class CompassArenaSummarizer:
                         output_dir, 'judged-by--' + judge_model + '-' +
                         dataset_abbr + '-report.csv')
                     fout_list.append(fout)
-                    judged_answers, references, bias_num = get_judgeanswer_and_reference(
+                    judged_answers, references = get_judgeanswer_and_reference(
                         dataset,
                         subdir_path,
                         self.judge_function,
-                        check_position_bias=True)
+                    )
+                    if check_pos_bias:
+                        bias_num = check_position_bias(judged_answers,
+                                                       references)
+                    else:
+                        bias_num = 0
                     win_model1, win_model2, categories = defaultdict(
                         float), defaultdict(float), defaultdict(float)
                     model1, model2 = references[0]['answer1'], references[0][
