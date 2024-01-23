@@ -122,10 +122,12 @@ class LMEvaluator:
             # calculate dupicated predictions numbers
             total_predictions_num = len(predictions[0])
 
-            for i in range(len(predictions[0])):
-                check = [sub[i] for sub in predictions]
-                if len(set(check)) == 1:
-                    dup_indices.append(i)
+            # since there is impossible that two models response same pattern in multi-round chat, so we just check dup for single chat
+            if isinstance(predictions[0][0], str):
+                for i in range(len(predictions[0])):
+                    check = [sub[i] for sub in predictions]
+                    if len(set(check)) == 1:
+                        dup_indices.append(i)
 
         elif type(predictions) == dict:
             """Apply to single-model scoring."""
@@ -153,7 +155,7 @@ class LMEvaluator:
             for i in range(len(predictions)):
                 multiround_predictions = extract_dicts(predictions[i])
                 for j in range(len(multiround_predictions)):
-                    key = 'prediction' if i == 0 else f'prediction{i + 1}'
+                    key = 'prediction' if i == 0 else f'prediction{i}'
                     key += '_r' + str(j + 1)
                     pred_dict[key] = multiround_predictions[j]
 

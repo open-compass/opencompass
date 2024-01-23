@@ -180,6 +180,12 @@ class MTBenchDataset(BaseDataset):
                     capability = problem['capability']
                     others = problem['others']
                     others['round'] = int(len(dialogue) / 2)
+                    user_contents = [
+                        item['content'] for item in dialogue
+                        if item['role'] == 'user'
+                    ]
+                    question = ' '.join(user_contents)
+                    others['question'] = question
                     raw_data.append({
                         'dialogue': dialogue,
                         'capability': capability,
@@ -188,7 +194,7 @@ class MTBenchDataset(BaseDataset):
                         'others': others,
                         'judge': {
                             'capability': capability,
-                            'others': others
+                            'others': others,
                         }
                     })
         dataset = Dataset.from_list(raw_data)

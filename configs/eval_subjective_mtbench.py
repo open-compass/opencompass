@@ -8,7 +8,8 @@ with read_base():
     from .models.judge_llm.auto_j.hf_autoj_eng_13b import models as hf_autoj
     from .models.judge_llm.judgelm.hf_judgelm_33b_v1 import models as hf_judgelm
     from .models.judge_llm.pandalm.hf_pandalm_7b_v1 import models as hf_pandalm
-    from .datasets.subjective.multiround.mtbench_judgeby_gpt4 import subjective_datasets
+    from .datasets.subjective.multiround.mtbench_single_judge import subjective_datasets
+    #from .datasets.subjective.multiround.mtbench_pair_judge import subjective_datasets
 
 datasets = [*subjective_datasets]
 
@@ -26,10 +27,9 @@ from opencompass.summarizers import MTBenchSummarizer
 
 # -------------Inferen Stage ----------------------------------------
 
-models = [*hf_chatglm3_6b]#, *hf_chatglm3_6b, *hf_internlm_chat_20b, *hf_qwen_7b_chat, *hf_qwen_14b_chat]
-
+models = [*hf_chatglm3_6b, *hf_qwen_7b_chat]
 infer = dict(
-    partitioner=dict(type=NaivePartitioner),
+    partitioner=dict(type=SizePartitioner, max_task_size=100),
     runner=dict(
         type=SlurmSequentialRunner,
         partition='llmeval',
@@ -61,11 +61,40 @@ judge_model = dict(
         batch_size=8,
         temperature = 0
 )
-judge_model=models[0]
+
 ## ------------- Evaluation Configuration
+'''
+## pair evaluation
 eval = dict(
     partitioner=dict(
-        type=SubjectiveNaivePartitioner,
+        type=SubjectiveSizePartitioner, 
+        max_task_size=100,
+        mode='m2n',
+        base_models = [*hf_chatglm3_6b, ],
+        compare_models = models
+    ),
+    runner=dict(
+        type=SlurmSequentialRunner,
+        partition='llmeval',
+        quotatype='auto',
+        max_num_workers=32,
+        task=dict(
+            type=SubjectiveEvalTask,
+            judge_cfg=judge_model
+        )),
+)
+
+summarizer = dict(
+    type=MTBenchSummarizer, judge_type='pair'
+)
+
+'''
+
+## single evaluation
+eval = dict(
+    partitioner=dict(
+        type=SubjectiveSizePartitioner, 
+        max_task_size=100,
         mode='singlescore',
         models = models
     ),
@@ -81,7 +110,7 @@ eval = dict(
 )
 
 summarizer = dict(
-    type=MTBenchSummarizer, judge_type = 'single'
+    type=MTBenchSummarizer, judge_type='single'
 )
 
 work_dir = 'outputs/mtbench/'
