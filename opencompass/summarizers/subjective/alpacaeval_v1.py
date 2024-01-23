@@ -42,7 +42,7 @@ def post_process_alpacav1(completion: str):
     except Exception as e:
         return None
 
-class AlpacaSummarizerv1:
+class AlpacaSummarizerV1:
     """Do the subjectivity analyze based on evaluation results.
 
     Args:
