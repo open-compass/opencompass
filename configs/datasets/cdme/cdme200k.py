@@ -46,13 +46,21 @@ cdme_eval_cfg = dict(
     dataset_postprocessor=dict(type=cdme_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = list(range(1000, 201000, 1000))
+cdme_trim_eval_cfg = dict(
+    evaluator=dict(type=CDMEEvaluator, use_trim=True),
+    pred_postprocessor=dict(type=cdme_postprocess),
+    dataset_postprocessor=dict(type=cdme_dataset_postprocess),
+    pred_role='BOT')
+
+#context_lengths = list(range(1000, 201000, 1000))
+context_lengths = [16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000, 144000, 160000, 176000, 192000, 200000]
 document_depth_percent_intervals = 20
 document_depth_percent_interval_type = "linear"
 
 base_path = './data/CDME'
 file_list = ['zh_finance.jsonl']
 cdme_datasets = []
+cdme_trim_datasets = []
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
@@ -73,9 +81,31 @@ for original_context_length in context_lengths:
             'language': 'Chinese',
             'needle': '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n',
             'retrieval_question': '小明最喜欢的实习地点是哪里？请按照'
-            '“小明最喜欢的实习地点就是________。”的格式回答。',
+            '“小明最喜欢的实习地点就是________。”的格式回答。\n',
             'reader_cfg': cdme_reader_cfg,
             'infer_cfg': cdme_infer_cfg,
             'eval_cfg': cdme_eval_cfg
         }
         cdme_datasets.append(dataset_dict)
+
+        trim_dataset_dict = {
+            'abbr': f'CDME_Length{original_context_length}'
+            f'Depth{int(depth_percent)}',
+            'type': CDMEDataset,
+            'path': base_path,
+            'length': original_context_length,
+            'depth': int(depth_percent),
+            'tokenizer_model': 'gpt-4',
+            'file_list': file_list,
+            'num_repeats_per_file': 10,
+            'length_buffer': 200,
+            'guide': True,
+            'language': 'Chinese',
+            'needle': '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n',
+            'retrieval_question': '小明最喜欢的实习地点是哪里？请按照'
+            '“小明最喜欢的实习地点就是________。”的格式回答。\n',
+            'reader_cfg': cdme_reader_cfg,
+            'infer_cfg': cdme_infer_cfg,
+            'eval_cfg': cdme_trim_eval_cfg
+        }
+        cdme_trim_datasets.append(trim_dataset_dict)
