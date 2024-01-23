@@ -117,7 +117,7 @@ class CompassArenaSummarizer:
                         'answer2']
                     for prediction, reference in zip(judged_answers,
                                                      references):
-                        if dataset_abbr == 'zhihu_hot_0113':
+                        if dataset_abbr == 'qa':
                             reference['capability'] = 'QA'
                         categories['total'] += 1
                         categories[reference['capability']] += 1
