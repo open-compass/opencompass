@@ -125,10 +125,15 @@ class MoonShot(BaseAPIModel):
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            raw_response = requests.request('POST',
-                                            url=self.url,
-                                            headers=self.headers,
-                                            json=data)
+            try:
+                raw_response = requests.request('POST',
+                                                url=self.url,
+                                                headers=self.headers,
+                                                json=data)
+            except Exception as err:
+                print('Request Error:{}'.format(err))
+                time.sleep(2)
+                continue
 
             response = raw_response.json()
             self.release()
@@ -153,12 +158,14 @@ class MoonShot(BaseAPIModel):
             elif raw_response.status_code == 400:
                 print(messages, response)
                 print('请求失败，状态码:', raw_response)
+                msg = 'The request was rejected because high risk'
+                return msg
                 time.sleep(1)
                 continue
             elif raw_response.status_code == 429:
                 print(messages, response)
                 print('请求失败，状态码:', raw_response)
-                time.sleep(3)
+                time.sleep(5)
                 continue
 
             max_num_retries += 1

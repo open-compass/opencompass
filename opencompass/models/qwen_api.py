@@ -109,6 +109,8 @@ class Qwen(BaseAPIModel):
                     msg['role'] = 'user'
                 elif item['role'] == 'BOT':
                     msg['role'] = 'assistant'
+                elif item['role'] == 'SYSTEM':
+                    msg['role'] = 'system'
 
                 messages.append(msg)
         data = {'messages': messages}
@@ -117,10 +119,16 @@ class Qwen(BaseAPIModel):
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            response = self.dashscope.Generation.call(
-                model=self.path,
-                **data,
-            )
+            try:
+                response = self.dashscope.Generation.call(
+                    model=self.path,
+                    **data,
+                )
+            except Exception as err:
+                print('Request Error:{}'.format(err))
+                time.sleep(1)
+                continue
+
             self.release()
 
             if response is None:
@@ -140,6 +148,13 @@ class Qwen(BaseAPIModel):
                     self.logger.error(str(response.status_code))
                     time.sleep(1)
                     continue
+            if response.status_code == 429:
+                print('Rate limited')
+                time.sleep(2)
+                continue
+            if response.status_code == 400:
+                msg = 'Output data may contain inappropriate content.'
+                return msg
 
             if ('Range of input length should be ' in response.message
                     or  # input too long
