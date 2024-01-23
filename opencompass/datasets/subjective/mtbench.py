@@ -164,7 +164,7 @@ def prompt_construct(problem, multi_turn=False, judge_type='single'):
 
 
 @LOAD_DATASET.register_module()
-class MTbenchDataset(BaseDataset):
+class MTBenchDataset(BaseDataset):
 
     def load(self, path: str, name: str, multi_turn=True, judge_type='single'):
         filename = osp.join(path, f'{name}.json')
