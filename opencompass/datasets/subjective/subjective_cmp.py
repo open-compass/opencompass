@@ -26,7 +26,8 @@ class SubjectiveCmpDataset(BaseDataset):
                     'capability': capability,
                     'others': others,
                     'judge': {
-                        'capability': capability
+                        'capability': capability,
+                        'question': question
                     }
                 })
         dataset = Dataset.from_list(raw_data)
