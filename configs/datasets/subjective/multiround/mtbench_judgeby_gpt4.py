@@ -53,7 +53,7 @@ for _name in subjective_all_sets:
     subjective_datasets.append(
         dict(
             abbr=f"{_name}",
-            type=MTbenchDataset,
+            type=MTBenchDataset,
             path=data_path,
             name=_name,
             reader_cfg=subjective_reader_cfg,
