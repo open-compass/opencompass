@@ -71,6 +71,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案为\s?([{options}])',
         f'答案选\s?([{options}])',
         f'选择?\s?([{options}])',
+        f'故选?\s?([{options}])'
         f'只有选?项?\s?([{options}])\s?是?对',
         f'只有选?项?\s?([{options}])\s?是?错',
         f'只有选?项?\s?([{options}])\s?不?正确',
