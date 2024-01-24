@@ -156,9 +156,9 @@ class SubjectiveEvalTask(BaseTask):
         # If take SubjectNaivePartition, get all pred_strs
         else:
             pred_strs = pred_strs
-
         if ('pred_role' in eval_cfg and 'meta_template' in model_cfg
-                and not MODELS.get(model_cfg['type']).is_api):
+                and not MODELS.get(model_cfg['type']).is_api
+                and isinstance(pred_strs[0], str)):
             # Create a prompt template for role config parsing
             from opencompass.models.base import LMTemplateParser
             parser = LMTemplateParser(model_cfg['meta_template'])
