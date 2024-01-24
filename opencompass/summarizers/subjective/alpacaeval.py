@@ -19,7 +19,7 @@ from .utils import get_judgeanswer_and_reference, get_outdir
 
 
 def post_process_alpacav1(completion: str):
-    r"""Parse a completion that contains a list of dictionary and returns the name of the preferred model.
+    r"""Parse a completion that contains a list of dictionary and returns the rank of the model1.
 
     Examples
     --------
@@ -45,8 +45,30 @@ def post_process_alpacav1(completion: str):
     except Exception as e:
         return None
 
+def post_process_alpacav2(completion: str):
+    r"""Parse a completion that contains 'm' or 'M' and returns the rank of the model1.
 
-class AlpacaSummarizerV1:
+    Examples
+    --------
+    >>> ranking_parser("m")
+    1
+    >>> ranking_parser("M")
+    2
+    >>> ranking_parser("s")
+    None
+    """
+    try:
+        if completion[0] == 'm':
+            return {'rank': 1}
+        elif completion[0] == 'M':
+            return {'rank': 2}
+        else:
+            return None
+    except Exception as e:
+        return None
+
+
+class AlpacaSummarizer:
     """Do the subjectivity analyze based on evaluation results.
 
     Args:
@@ -54,16 +76,17 @@ class AlpacaSummarizerV1:
             It's expected to be filled out at runtime.
     """
 
-    def __init__(self, config: ConfigDict, judge_type='general') -> None:
+    def __init__(self, config: ConfigDict, judge_type='v2') -> None:
         self.tasks = []
         self.cfg = config
         self.base_models = self.cfg['eval']['partitioner']['base_models']
         self.compare_models = self.cfg['eval']['partitioner']['compare_models']
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
         self.judge_type = judge_type
-        assert self.judge_type in ['general']
+        assert self.judge_type in ['v1', 'v2']
         self.judge_map = {
-            'general': post_process_alpacav1,
+            'v1': post_process_alpacav1,
+            'v2': post_process_alpacav2
         }
         self.judge_function = self.judge_map[self.judge_type]
 
