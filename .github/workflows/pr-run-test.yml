@@ -11,15 +11,19 @@ on:
 
   workflow_dispatch:
   schedule:
-    - cron:  '56 20 * * *'
+    - cron:  '56 22 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CONDA_ENV: opencompass_regression_daily
+
 jobs:
   pr_run_test:
     runs-on: self-hosted
+    environment: 'prod'
     timeout-minutes: 20
     steps:
       - name: Clone repository
@@ -27,8 +31,8 @@ jobs:
       - name: Prepare - create conda env and install code
         run: |
           eval "$(conda shell.bash hook)"
-          conda create --name opencompass_regression --clone opencompass_base
-          conda activate opencompass_regression
+          conda create --name ${{env.CONDA_ENV}} --clone opencompass_base --offline
+          conda activate ${{env.CONDA_ENV}}
           python3 -m pip install -e .
           conda info --envs
       - name: Prepare - prepare data and hf model
@@ -40,7 +44,7 @@ jobs:
       - name:  Run test
         run: |
           eval "$(conda shell.bash hook)"
-          conda activate opencompass_regression
+          conda activate ${{env.CONDA_ENV}}
           conda info --envs
           rm -rf regression_result
           python3 run.py --models hf_internlm_chat_7b --datasets siqa_gen --work-dir regression_result --debug
@@ -59,5 +63,16 @@ jobs:
         if: always()
         run: |
           eval "$(conda shell.bash hook)"
-          conda env remove --name opencompass_regression
+          conda env remove --name ${{env.CONDA_ENV}}
           conda info --envs
+
+  notify_to_feishu:
+    if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
+    needs: [pr_run_test]
+    environment: 'prod'
+    timeout-minutes: 5
+    runs-on: self-hosted
+    steps:
+      - name: notify
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{"msg_type":"post","content":{"post":{"zh_cn":{"title":"Opencompass- pr test failed","content":[[{"tag":"text","text":"branch: ${{github.ref_name}}, run action: ${{github.workflow}} failed. "},{"tag":"a","text":"Please click here for details ","href":"https://github.com/'${{ github.repository }}'/actions/runs/'${GITHUB_RUN_ID}'"},{"tag":"at","user_id":"'${{ secrets.USER_ID }}'"}]]}}}}'  ${{ secrets.WEBHOOK_URL }}
