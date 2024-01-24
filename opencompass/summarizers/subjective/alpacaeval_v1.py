@@ -1,20 +1,22 @@
 # flake8: noqa: E501
+import ast
 import csv
 import os
 import os.path as osp
 import re
-import ast
 from collections import defaultdict
 from datetime import datetime
-from prettytable import from_csv
 from itertools import product
 
 import mmengine
 from mmengine import ConfigDict
-from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
+from prettytable import from_csv
+
 from opencompass.partitioners.sub_naive import remove_duplicate_pairs
+from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
 
 from .utils import get_judgeanswer_and_reference, get_outdir
+
 
 def post_process_alpacav1(completion: str):
     r"""Parse a completion that contains a list of dictionary and returns the name of the preferred model.
@@ -34,13 +36,15 @@ def post_process_alpacav1(completion: str):
             ordered_completions = ast.literal_eval(completion)
         else:
             ordered_completions = completion
-        rank = [c for c in ordered_completions if c["model"] == 'model_1'][0]["rank"]
+        rank = [c for c in ordered_completions
+                if c['model'] == 'model_1'][0]['rank']
         if rank in [1, 2]:
             return {'rank': rank}
         else:
             return None
     except Exception as e:
         return None
+
 
 class AlpacaSummarizerV1:
     """Do the subjectivity analyze based on evaluation results.
@@ -91,8 +95,10 @@ class AlpacaSummarizerV1:
                 for dataset in dataset_cfgs:
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
-                    win_model1, win_model2, categories = defaultdict(float), defaultdict(float), defaultdict(float)
-                    model1, model2 = references[0]['answer1'], references[0]['answer2']
+                    win_model1, win_model2, categories = defaultdict(
+                        float), defaultdict(float), defaultdict(float)
+                    model1, model2 = references[0]['answer1'], references[0][
+                        'answer2']
                     for prediction, reference in zip(judged_answers,
                                                      references):
                         categories['total'] += 1
