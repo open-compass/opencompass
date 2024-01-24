@@ -105,10 +105,11 @@ def load_experiment_template(file: str) -> dict:
                     for _output in cell['outputs']:
                         if _output['output_type'] == 'display_data':
                             assert not output_flag
-                            output_flag = True
-                            tags.append('vis')
-                            outputs.append(_output['data']['image/png'])
-                    for _output in cell['outputs']:
+                            if 'image/png' in _output['data']:
+                                output_flag = True
+                                tags.append('vis')
+                                outputs.append(_output['data']['image/png'])
+                    for _output in cell['outputs'][::-1]:
                         if output_flag:
                             break
                         if _output['output_type'] == 'stream' and _output[
@@ -290,11 +291,26 @@ class CIBenchEvaluator(BaseEvaluator):
                 if action['result']:
                     try:
                         pred = action['result']['text']
-                        match = re.search('execute_result:\n\n```\n(.*?)\n```',
-                                          pred, re.DOTALL)
+                        match_exec = re.search(
+                            'execute_result:\n\n```\n(.*?)\n```', pred,
+                            re.DOTALL)
+                        match_stdout = re.search('stdout:\n\n```\n(.*?)\n```',
+                                                 pred, re.DOTALL)
+                        # get pred result from execute_result by default
+                        # else stdout
+                        if match_exec and match_stdout:
+                            match = match_exec
+                        elif match_exec:
+                            match = match_exec
+                        elif match_stdout:
+                            match = match_stdout
+                        else:
+                            match = None
                         if match:
                             out = match.group(1)
-                            return out.strip() == target.strip()
+                            score = (out.strip() == target.strip()
+                                     or target.strip() in out.strip())
+                            return score
                     except Exception:
                         return False
         # Fall back to False
