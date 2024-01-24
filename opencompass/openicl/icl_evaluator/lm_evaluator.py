@@ -141,14 +141,15 @@ class LMEvaluator:
                 for sublist in predictions:
                     del sublist[index]
                 del references[index]
-
         pred_dict = {}
         if isinstance(
                 predictions[0][0], str
         ):  #single chat for format like [['xxx', 'xxxx'], ['xxx', 'xxxx']]
             for i in range(len(predictions)):
                 key = 'prediction' if i == 0 else f'prediction{i + 1}'
+                gold_key = 'obj_gold'
                 pred_dict[key] = predictions[i]
+                pred_dict[gold_key] = references
         elif isinstance(
                 predictions[0][0], list
         ):  #multi round for format like [[[{'round':1, 'user':'', 'assistant':''}, {'round':2, 'user':'', 'assistant':''}], [{'round':1, 'user':'', 'assistant':''}, {'round':2, 'user':'', 'assistant':''}]]]
