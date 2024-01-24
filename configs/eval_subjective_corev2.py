@@ -71,7 +71,6 @@ judge_model =    dict(
         meta_template=_meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
-judge_model = [*internlm2_20b][0]
 
 eval = dict(
     partitioner=dict(
