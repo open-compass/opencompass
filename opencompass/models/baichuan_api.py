@@ -1,5 +1,3 @@
-import hashlib
-import json
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
@@ -22,7 +20,6 @@ class BaiChuan(BaseAPIModel):
         path (str): The name of Baichuan model.
             e.g. `Baichuan2-53B`
         api_key (str): Provided api key
-        secretkey (str): secretkey in order to obtain access_token
         url (str): Provide url
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
@@ -37,7 +34,6 @@ class BaiChuan(BaseAPIModel):
         self,
         path: str,
         api_key: str,
-        secret_key: str,
         url: str,
         query_per_second: int = 2,
         max_seq_len: int = 2048,
@@ -48,6 +44,7 @@ class BaiChuan(BaseAPIModel):
             'top_p': 0.85,
             'top_k': 5,
             'with_search_enhance': False,
+            'stream': False,
         }):  # noqa E125
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -57,7 +54,6 @@ class BaiChuan(BaseAPIModel):
                          generation_kwargs=generation_kwargs)
 
         self.api_key = api_key
-        self.secret_key = secret_key
         self.url = url
         self.model = path
 
@@ -119,36 +115,28 @@ class BaiChuan(BaseAPIModel):
         data = {'model': self.model, 'messages': messages}
         data.update(self.generation_kwargs)
 
-        def calculate_md5(input_string):
-            md5 = hashlib.md5()
-            md5.update(input_string.encode('utf-8'))
-            encrypted = md5.hexdigest()
-            return encrypted
-
-        json_data = json.dumps(data)
-        time_stamp = int(time.time())
-        signature = calculate_md5(self.secret_key + json_data +
-                                  str(time_stamp))
-
         headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + self.api_key,
-            'X-BC-Request-Id': 'your requestId',
-            'X-BC-Timestamp': str(time_stamp),
-            'X-BC-Signature': signature,
-            'X-BC-Sign-Algo': 'MD5',
         }
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            raw_response = requests.request('POST',
-                                            url=self.url,
-                                            headers=headers,
-                                            json=data)
-            response = raw_response.json()
-            self.release()
+            try:
+                raw_response = requests.request('POST',
+                                                url=self.url,
+                                                headers=headers,
+                                                json=data)
+                response = raw_response.json()
+            except Exception as err:
+                print('Request Error:{}'.format(err))
+                time.sleep(3)
+                continue
 
+            self.release()
+            # print(response.keys())
+            # print(response['choices'][0]['message']['content'])
             if response is None:
                 print('Connection error, reconnect.')
                 # if connect error, frequent requests will casuse
@@ -156,13 +144,13 @@ class BaiChuan(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
-            if raw_response.status_code == 200 and response['code'] == 0:
+            if raw_response.status_code == 200:
 
-                msg = response['data']['messages'][0]['content']
+                msg = response['choices'][0]['message']['content']
                 return msg
 
-            if response['code'] != 0:
-                print(response)
+            if raw_response.status_code != 200:
+                print(raw_response)
                 time.sleep(1)
                 continue
             print(response)

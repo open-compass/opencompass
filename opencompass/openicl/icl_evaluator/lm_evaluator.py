@@ -16,6 +16,17 @@ from opencompass.utils.text_postprocessors import first_number_postprocess
 from opencompass.utils.types import get_type_from_cfg
 
 
+def extract_dicts(data):
+    max_round_num = max(len(sublist) for sublist in data)
+    predictions = [[] for _ in range(max_round_num)]
+    for sublist in data:
+        for i, d in enumerate(sublist):
+            predictions[i].append(d.get('assistant'))
+        for j in range(i + 1, max_round_num):
+            predictions[j].append(None)
+    return predictions
+
+
 def order_preds_and_record_references(predictions,
                                       references,
                                       infer_order,
@@ -101,7 +112,6 @@ class LMEvaluator:
 
     def score(self, predictions, references: Optional[List] = None) -> Dict:
         dup_indices = []
-
         if type(predictions) == list:
             """Apply to multi-model comparison."""
             references = [{} for _ in range(len(predictions[0]['model_preds']))
@@ -112,10 +122,12 @@ class LMEvaluator:
             # calculate dupicated predictions numbers
             total_predictions_num = len(predictions[0])
 
-            for i in range(len(predictions[0])):
-                check = [sub[i] for sub in predictions]
-                if len(set(check)) == 1:
-                    dup_indices.append(i)
+            # since there is impossible that two models response same pattern in multi-round chat, so we just check dup for single chat
+            if isinstance(predictions[0][0], str):
+                for i in range(len(predictions[0])):
+                    check = [sub[i] for sub in predictions]
+                    if len(set(check)) == 1:
+                        dup_indices.append(i)
 
         elif type(predictions) == dict:
             """Apply to single-model scoring."""
@@ -131,9 +143,21 @@ class LMEvaluator:
                 del references[index]
 
         pred_dict = {}
-        for i in range(len(predictions)):
-            key = 'prediction' if i == 0 else f'prediction{i + 1}'
-            pred_dict[key] = predictions[i]
+        if isinstance(
+                predictions[0][0], str
+        ):  #single chat for format like [['xxx', 'xxxx'], ['xxx', 'xxxx']]
+            for i in range(len(predictions)):
+                key = 'prediction' if i == 0 else f'prediction{i + 1}'
+                pred_dict[key] = predictions[i]
+        elif isinstance(
+                predictions[0][0], list
+        ):  #multi round for format like [[[{'round':1, 'user':'', 'assistant':''}, {'round':2, 'user':'', 'assistant':''}], [{'round':1, 'user':'', 'assistant':''}, {'round':2, 'user':'', 'assistant':''}]]]
+            for i in range(len(predictions)):
+                multiround_predictions = extract_dicts(predictions[i])
+                for j in range(len(multiround_predictions)):
+                    key = 'prediction' if i == 0 else f'prediction{i}'
+                    key += '_r' + str(j + 1)
+                    pred_dict[key] = multiround_predictions[j]
 
         if self.dataset_cfg:
             dataset = build_dataset_from_cfg(self.dataset_cfg)

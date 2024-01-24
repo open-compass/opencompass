@@ -54,6 +54,9 @@ class ERNIEBot(BaseAPIModel):
         self.secretkey = secretkey
         self.key = key
         self.url = url
+        access_token, _ = self._generate_access_token()
+        self.access_token = access_token
+        print(access_token)
 
     def _generate_access_token(self):
         try:
@@ -154,12 +157,18 @@ class ERNIEBot(BaseAPIModel):
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            access_token, _ = self._generate_access_token()
-            raw_response = requests.request('POST',
-                                            url=self.url + access_token,
-                                            headers=self.headers,
-                                            json=data)
-            response = raw_response.json()
+            try:
+                raw_response = requests.request('POST',
+                                                url=self.url +
+                                                self.access_token,
+                                                headers=self.headers,
+                                                json=data)
+                response = raw_response.json()
+            except Exception as err:
+                print('Request Error:{}'.format(err))
+                time.sleep(3)
+                continue
+
             self.release()
 
             if response is None:
@@ -176,6 +185,10 @@ class ERNIEBot(BaseAPIModel):
                 except KeyError:
                     print(response)
                     self.logger.error(str(response['error_code']))
+                    if response['error_code'] == 336007:
+                        # exceed max length
+                        return ''
+
                     time.sleep(1)
                     continue
 
@@ -189,7 +202,8 @@ class ERNIEBot(BaseAPIModel):
                     or response['error_code'] == 216100
                     or response['error_code'] == 336001
                     or response['error_code'] == 336003
-                    or response['error_code'] == 336000):
+                    or response['error_code'] == 336000
+                    or response['error_code'] == 336007):
                 print(response['error_msg'])
                 return ''
             print(response)
