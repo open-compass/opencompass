@@ -70,6 +70,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    advanced_guides/subjective_evaluation.md
    advanced_guides/circular_eval.md
    advanced_guides/contamination_eval.md
+   advanced_guides/needleinahaystack_eval.md
 
 .. _Tools:
 .. toctree::

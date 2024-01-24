@@ -378,6 +378,8 @@ class DS1000ServiceEvaluator(BaseEvaluator):
         processed_predictions = {}
         assert len(predictions) == len(references)
         for i, (pred, gold) in enumerate(zip(predictions, references)):
+            if len(pred) > 10000:
+                pred = ''
             processed_predictions[str(i)] = {'prediction': pred, 'gold': gold}
 
         with tempfile.TemporaryDirectory() as tmp_dir:

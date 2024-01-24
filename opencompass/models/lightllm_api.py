@@ -78,6 +78,8 @@ class LightllmAPI(BaseAPIModel):
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
+            except KeyError:
+                self.logger.error(f'KeyError. Response: {str(response)}')
             max_num_retries += 1
 
         raise RuntimeError('Calling LightllmAPI failed after retrying for '
@@ -123,11 +125,11 @@ class LightllmAPI(BaseAPIModel):
                 response = raw_response.json()
 
                 assert ('prompt_token_ids' in response and 'prompt_logprobs'
-                        in response), 'prompt_token_ids and prompt_logprobs \
+                        in response), f'prompt_token_ids and prompt_logprobs \
                     must be in the output. \
                     Please consider adding \
                     --return_all_prompt_logprobs argument \
-                    when starting your lightllm service.'
+                    when starting lightllm service. Response: {str(response)}'
 
                 prompt_token_ids = response['prompt_token_ids'][1:]
                 prompt_logprobs = [

@@ -1,4 +1,3 @@
-import os.path as osp
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -31,45 +30,49 @@ class TurboMindModel(BaseModel):
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
+        engine_config (Dict, optional): The engine config to set
+            arguments like session_len, max_batch_size for TurboMind.
+        gen_config (Dict, optional): Generation config to set
+                arguments like top_k, top_p, temperature.
     """
 
-    def __init__(
-        self,
-        path: str,
-        concurrency: int = 8,
-        max_seq_len: int = 2048,
-        meta_template: Optional[Dict] = None,
-    ):
-        from lmdeploy import turbomind as tm
-        from lmdeploy.tokenizer import Tokenizer
-
+    def __init__(self,
+                 path: str,
+                 concurrency: int = 8,
+                 max_seq_len: int = 2048,
+                 meta_template: Optional[Dict] = None,
+                 engine_config: Optional[Dict] = None,
+                 gen_config: Optional[Dict] = None):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
+        from lmdeploy.turbomind import TurboMind
+
+        if engine_config is not None:
+            from lmdeploy.messages import TurbomindEngineConfig
+            engine_config = TurbomindEngineConfig(**engine_config)
+        if gen_config is not None:
+            from lmdeploy.messages import EngineGenerationConfig
+            gen_config = EngineGenerationConfig(**gen_config)
         self.logger = get_logger()
-        tokenizer_model_path = osp.join(path, 'triton_models', 'tokenizer')
-        self.tokenizer = Tokenizer(tokenizer_model_path)
-        tm_model = tm.TurboMind(path)
+        tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
+        self.tokenizer = tm_model.tokenizer
         self.generators = [
             tm_model.create_instance() for i in range(concurrency)
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
+        self.gen_config = gen_config
 
     def generate(
         self,
         inputs: List[str],
         max_out_len: int = 512,
-        temperature: float = 1.0,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
             inputs (List[str]): A list of prompts
             max_out_len (int): The maximum length of the output.
-            temperature (float): What sampling temperature to use,
-                between 0 and 2. Higher values like 0.8 will make the output
-                more random, while lower values like 0.2 will make it more
-                focused and deterministic. Defaults to 1.0.
 
         Returns:
             List[str]: A list of generated strings.
@@ -91,7 +94,7 @@ class TurboMindModel(BaseModel):
                                  self.generators[:len(batch_input)],
                                  self.generator_ids[:len(batch_input)],
                                  batch_input, [max_out_len] * len(batch_input),
-                                 [temperature] * len(batch_input)))
+                                 [self.gen_config] * len(batch_input)))
                 results += _results
         return results
 
@@ -106,8 +109,12 @@ class TurboMindModel(BaseModel):
         """
         return self.token_bucket.get_token()
 
-    def _generate(self, generator, session_id, prompt: str or PromptList,
-                  max_out_len: int, temperature: float) -> str:
+    def _generate(self,
+                  generator,
+                  session_id,
+                  prompt: str or PromptList,
+                  max_out_len: int,
+                  gen_config=None) -> str:
         """Generate results given a list of inputs.
 
         Args:
@@ -115,10 +122,8 @@ class TurboMindModel(BaseModel):
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
-            temperature (float): What sampling temperature to use,
-                between 0 and 2. Higher values like 0.8 will make the output
-                more random, while lower values like 0.2 will make it more
-                focused and deterministic.
+            gen_config (EngineGenerationConfig, optional): Generation
+                config to set arguments like top_k, top_p, temperature.
 
         Returns:
             str: The generated string.
@@ -130,13 +135,13 @@ class TurboMindModel(BaseModel):
 
         for outputs in generator.stream_infer(session_id=session_id,
                                               input_ids=[input_ids],
+                                              gen_config=gen_config,
                                               request_output_len=max_out_len,
                                               sequence_start=True,
                                               sequence_end=True,
-                                              top_k=1,
                                               step=0,
                                               stream_output=False):
-            output_ids, _ = outputs[0]
-            response = self.tokenizer.decode(output_ids.tolist())
+            _, output_ids, _ = outputs
+            response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
         return response
