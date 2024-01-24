@@ -9,7 +9,7 @@ evaluate>=0.3.0
 fairscale
 func_timeout
 fuzzywuzzy
-git+https://github.com/Isaac-JL-Chen/rouge_chinese.git
+git+https://github.com/Isaac-JL-Chen/rouge_chinese.git@master
 jieba
 ltp
 mmengine-lite
