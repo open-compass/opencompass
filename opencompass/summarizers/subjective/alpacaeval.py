@@ -45,6 +45,7 @@ def post_process_alpacav1(completion: str):
     except Exception as e:
         return None
 
+
 def post_process_alpacav2(completion: str):
     r"""Parse a completion that contains 'm' or 'M' and returns the rank of the model1.
 
