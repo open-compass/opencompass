@@ -58,41 +58,173 @@ cd opencompass
 pip install -e .
 ```
 
-### 生成数据集
+### 配置数据集
 
-运行以下命令以生成数据集：
+在最新版本中，数据集不再通过运行脚本手动生成，而是通过在配置文件中动态定义和加载。用户需要根据自己的需求，在配置文件中指定数据集的参数。这种方法提供了更大的灵活性和定制化选项。
 
-```bash
-python tools/tools_needleinahaystack.py \
-  --processed_datasets_path './data/CDME/processed' \
-  --data_path './data/CDME' \
-  --tokenizer_model 'gpt-4' \
-  --num_records_per_file 10 \
-  --length_buffer 200 \
-  --guided True \
-  --file_list 'zh_finance.jsonl' \
-  --context_lengths 1000 2000 3000 4000 5000 6000 7000 8000 \
-  --needle '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n' \
-  --retrieval_question '小明最喜欢的实习地点是哪里？你的回答格式应该为“小明最喜欢的实习地点就是________。”' \
-  --document_depth_percent_intervals 35 \
+#### 数据集配置示例
+
+以下是一个数据集配置的示例，展示了如何在配置文件 `configs/datasets/cdme/cdme8k.py` 中定义一个数据集。这个示例展示了一个 8000 tokens 长度的中文数据集配置：
+
+```python
+for original_context_length in context_lengths:
+    for depth_percent in generate_depth_percents(
+            document_depth_percent_intervals,
+            document_depth_percent_interval_type):
+        dataset_dict = {
+            'abbr': f'CDME_Length{original_context_length}Depth{int(depth_percent)}',
+            'type': CDMEDataset,
+            'path': base_path,
+            'length': original_context_length,
+            'depth': int(depth_percent),
+            'tokenizer_model': 'gpt-4',
+            'file_list': file_list,
+            'num_repeats_per_file': 10,
+            'length_buffer': 200,
+            'guide': True,
+            'language': 'Chinese',
+            'needle': '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n',
+            'retrieval_question': '小明最喜欢的实习地点是哪里？请按照“小明最喜欢的实习地点就是________。”的格式回答。',
+            'reader_cfg': cdme_reader_cfg,
+            'infer_cfg': cdme_infer_cfg,
+            'eval_cfg': cdme_eval_cfg
+        }
+        cdme_datasets.append(dataset_dict)
 ```
 
-您可以在启动 `tools/tools_needleinahaystack.py` 时设置特定参数，以选择任务所需的数据集。主要参数包括：
+在这个配置中，主要参数包括：
 
-- `needle`: 要在数据集中查找的指定文本（针）。
+- `abbr`: 数据集的简称。
+- `type`: 数据集类型。
+- `path`: 数据集文件的路径。
+- `length`: 上下文长度（以token为单位）。
+- `depth`: 文档深度百分比。
+- `tokenizer_model`: 使用的tokenizer 模型。
+- `file_list`: 数据源文件列表。
+- `num_repeats_per_file`: 每个文件重复的次数。
+- `length_buffer`: 长度缓冲区。
+- `guide`: 是否为引导式数据集。
+- `language`: 数据集的语言。
+- `needle`: 在数据集中要查找的特定文本（针）。
 - `retrieval_question`: 用于提示模型检索的问题。
-- `context_lengths`: 指定不同测试场景的上下文长度（以token为单位）。
-- `document_depth_percent_intervals`: 文档深度的划分间隔数量，用于确定在何处插入“针”。
+- `reader_cfg`, `infer_cfg`, `eval_cfg`: 分别对应读取、推理和评估的配置。
+
+通过在配置文件中定义这些参数，您可以灵活地创建适合您需求的数据集。配置文件提供了一种高度可定制和扩展的方式来管理数据集的生成和使用。
+
+### 多根针大海捞针测试
+
+最新版本中引入了多根针大海捞针测试，允许在同一个数据集中插入多个不同的针（文本片段）。这些针将根据给定的深度参数依次插入数据集中。相对于单针测试，多针测试提供了更复杂的数据处理场景。
+
+#### 多针数据集配置示例
+
+以下是一个配置多针数据集的示例，展示了如何在配置文件 `configs/datasets/cdme/multi_needle/cdme8k_cot3_italy.py` 中定义多针数据集。这个示例展示了一个包含三根针的数据集配置：
+
+```python
+# 数据集基础配置
+base_path = './data/CDME'
+file_list = ['zh_finance.jsonl']
+
+# 针（Needles）定义
+needles = [
+    '\n意大利的佛罗伦萨有一家名为"La Giostra"的餐馆，是整个佛罗伦萨中排行第一的餐馆。\n',
+    '"La Giostra"餐馆的特色菜肴是松露奶酪通心粉。',
+    '松露奶酪通心粉是该家餐馆的有着意大利皇室烹饪血统的大厨Jack制作'
+]
+
+# 配置参数
+retrieval_question = ("制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫什么？"
+                      "请按照'制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫______。'的格式回答。")
+answer = "制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫Jack"
+keyword = "Jack"
+diff = 25
+
+# 数据集生成循环
+for original_context_length in context_lengths:
+    for depth_percent in generate_depth_percents(
+            document_depth_percent_intervals,
+            document_depth_percent_interval_type):
+        dataset_dict = {
+            # 其他配置项...
+            'needles': needles,
+            'diff': diff,
+            'keyword': keyword,
+            # 其他配置项...
+        }
+        cdme_datasets.append(dataset_dict)
+```
+
+在这个配置中，除了标准的参数之外，主要新增了以下几个关键参数：
+
+- `needles`: 一个包含多个字符串的列表，每个字符串代表一个要插入的针。
+- `diff`: 定义后续针相对于第一根针的插入深度增量。
+- `keyword`: 用于在评分过程中对答案进行校正的关键词。
+
+#### 评分机制的改变
+
+在 `opencompass/datasets/cdme/cdme_multi.py` 的源代码中，对于多根针的数据集，评分机制有所不同。新增了以下代码段，用于基于 `keyword` 对预测的答案进行评分校正：
+
+```python
+if keyword in prediction:
+    print(f'{keyword} is in {prediction}')
+    score = 100
+else:
+    print(f'{keyword} is not in {prediction}')
+    score = 0.2 * score
+```
+
+这段代码意味着如果预测的答案中包含了 `keyword`，则会给予高分（如100分）。如果不包含，则分数会被大幅度降低（原分数的20%）。这种评分机制更加注重关键词的准确性，是对传统评分方法的一个重要补充。
 
 ### 评估
+
+#### 使用 `internlm` 模型进行评估
 
 例如，使用 `internlm` 模型进行评估，可以使用以下命令：
 
 ```bash
-python run.py configs/eval_hf_internlm_chat_20b_cdme.py --slurm -p partition_name-q auto --max-num-workers 32
+python run.py configs/eval_needleinahaystack.py --slurm -p partition_name -q auto --max-num-workers 32
 ```
 
-这个命令将启动评估流程，其中模型将试图在生成的数据集中找到指定的“针”。参数 `-p partition_name-q auto` 和 `--max-num-workers 32` 用于指定Slurm队列和最大工作进程数。
+这个命令将启动评估流程，其中模型将试图在生成的数据集中找到指定的“针”。参数 `-p partition_name -q auto` 和 `--max-num-workers 32` 用于指定 Slurm 队列和最大工作进程数。
+
+#### 使用 `LMDeploy` 进行大规模文本评估
+
+当评估特别长的文本（例如 200k tokens）时，常规方法可能会导致显存不足。在这种情况下，可以使用量化模型进行评估。这可以通过使用 `LMDeploy` 工具（[LMDeploy](https://github.com/InternLM/lmdeploy)）完成。
+
+安装和配置 `LMDeploy` 的详细信息可以在其 GitHub 页面上找到。安装完成后，可以使用 `configs/eval_needleinahaystack_turbomind.py` 配置文件中定义的 `TurboMindModel` 模型进行评估。
+
+以下是 `configs/eval_needleinahaystack_turbomind.py` 文件的示例配置：
+
+```python
+from opencompass.models.turbomind import TurboMindModel
+from mmengine.config import read_base
+
+with read_base():
+    from .datasets.cdme.cdme200k import cdme_datasets
+
+datasets = [*cdme_datasets]
+
+internlm_meta_template = dict(round=[
+    dict(role='HUMAN', begin=':', end='\n'),
+    dict(role='BOT', begin=':', end='<eoa>\n', generate=True),
+],
+                              eos_token_id=103028)
+
+models = [
+    dict(
+        type=TurboMindModel,
+        abbr='internlm-chat-20b-turbomind',
+        path='./turbomind',
+        max_out_len=100,
+        max_seq_len=2048,
+        batch_size=8,
+        concurrency=8,
+        meta_template=internlm_meta_template,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+]
+```
+
+在这个配置中，`TurboMindModel` 模型结合了 `LMDeploy` 的功能，适用于处理大规模文本数据集，有效减少显存的占用。
 
 ### Score计算方法
 
@@ -159,12 +291,26 @@ def score(self, predictions, references):
 
 ### 可视化
 
-可以使用 `tools_needleinahaystack.py` 脚本，将 `outputs` 文件夹中的 CSV 文件进行可视化绘图。例如
+可以使用 `tools_needleinahaystack.py` 脚本来对 CSV 文件进行可视化绘图。这个脚本支持通过 `--path` 参数指定一个或多个 CSV 文件的路径，并且可以使用 `--dataset_length` 参数来指定数据集的长度。
+
+#### 使用示例
+
+绘制单个 CSV 文件的可视化：
 
 ```bash
-python tools/tools_needleinahaystack.py \
-  --plot \
-  --csv_file_paths 'outputs/default/20231216_161457/summary/summary_20231216_161457.csv' 'outputs/default/20231217_022310/summary/summary_20231217_022310.csv'
+python tools/tools_needleinahaystack.py --path 'outputs/default/20231216_161457/summary/summary_20231216_161457.csv'
+```
+
+绘制多个 CSV 文件的可视化：
+
+```bash
+python tools/tools_needleinahaystack.py --path 'path_to_first_csv.csv' 'path_to_second_csv.csv'
+```
+
+指定数据集长度进行可视化,此参数用于生成可视化图中的图表标题：
+
+```bash
+python tools/tools_needleinahaystack.py --path 'path_to_csv.csv' --dataset_length 200K
 ```
 
 目前该方案仅支持 CDME 数据集，我们欢迎社区贡献更多的数据集。

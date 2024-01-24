@@ -225,6 +225,7 @@ class HuggingFace(BaseModel):
     def generate(self,
                  inputs: List[str],
                  max_out_len: int,
+                 min_out_len: Optional[int] = None,
                  stopping_criteria: List[str] = [],
                  **kwargs) -> List[str]:
         """Generate results given a list of inputs.
@@ -232,6 +233,7 @@ class HuggingFace(BaseModel):
         Args:
             inputs (List[str]): A list of strings.
             max_out_len (int): The maximum length of the output.
+            min_out_len (Optional[int]): The minimum length of the output.
 
         Returns:
             List[str]: A list of generated strings.
@@ -241,12 +243,14 @@ class HuggingFace(BaseModel):
         if self.batch_padding and len(inputs) > 1:
             return self._batch_generate(inputs=inputs,
                                         max_out_len=max_out_len,
+                                        min_out_len=min_out_len,
                                         stopping_criteria=stopping_criteria,
                                         **generation_kwargs)
         else:
             return sum(
                 (self._single_generate(inputs=[input_],
                                        max_out_len=max_out_len,
+                                       min_out_len=min_out_len,
                                        stopping_criteria=stopping_criteria,
                                        **generation_kwargs)
                  for input_ in inputs), [])
@@ -254,6 +258,7 @@ class HuggingFace(BaseModel):
     def _batch_generate(self,
                         inputs: List[str],
                         max_out_len: int,
+                        min_out_len: Optional[int] = None,
                         stopping_criteria: List[str] = [],
                         **kwargs) -> List[str]:
         """Support for batch prompts inference.
@@ -308,6 +313,9 @@ class HuggingFace(BaseModel):
             ])
             kwargs['stopping_criteria'] = stopping_criteria
 
+        if min_out_len is not None:
+            kwargs['min_new_tokens'] = min_out_len
+
         # step-2: conduct model forward to generate output
         outputs = self.model.generate(**tokens,
                                       max_new_tokens=max_out_len,
@@ -331,6 +339,7 @@ class HuggingFace(BaseModel):
     def _single_generate(self,
                          inputs: List[str],
                          max_out_len: int,
+                         min_out_len: Optional[int] = None,
                          stopping_criteria: List[str] = [],
                          **kwargs) -> List[str]:
         """Support for single prompt inference.
@@ -389,6 +398,9 @@ class HuggingFace(BaseModel):
                 ],
             ])
             kwargs['stopping_criteria'] = stopping_criteria
+
+        if min_out_len is not None:
+            kwargs['min_new_tokens'] = min_out_len
 
         # To accommodate the PeftModel, parameters should be passed in
         # key-value format for generate.
@@ -502,7 +514,7 @@ class HuggingFace(BaseModel):
                 self.tokenizer.pad_token_id).sum(-1).cpu().numpy()
         if mask_length is not None:
             lens -= np.array(mask_length)
-        ce_loss = loss.sum(-1).cpu().detach().numpy() / lens
+        ce_loss = loss.float().sum(-1).cpu().detach().numpy() / lens
         return ce_loss
 
     def get_loglikelihood(
@@ -554,7 +566,6 @@ class HuggingFace(BaseModel):
 
         input_ids = input_tokenizer_out['input_ids'][:, :self.max_seq_len]
         input_length = input_tokenizer_out['length']
-        attention_mask = input_tokenizer_out['attention_mask']
         context_ids = [
             self.tokenizer(inputs[i].replace(conts[i], ''),
                            padding=False,
@@ -563,7 +574,7 @@ class HuggingFace(BaseModel):
             for i in range(len(inputs))
         ]
         # forward
-        outputs = self.model(input_ids, attention_mask)['logits']
+        outputs = self.model(input_ids)['logits']
         outputs = torch.nn.functional.log_softmax(outputs, dim=-1)
         # calculate loglikelihood
         answer = np.zeros(len(inputs))
@@ -609,9 +620,10 @@ class HuggingFace(BaseModel):
                 self.tokenizer.pad_token_id).sum(-1).cpu().numpy()
         mink_percent = []
         for nloss, nlen in zip(loss, lens):
-            nlen = max(int(nlen) * k // 100, 1)
-            nloss = torch.topk(loss, nlen, dim=-1)[0]
-            nloss = -nloss.mean().cpu().detach().numpy()
+            nlen = int(nlen)
+            minklen = max(nlen * k // 100, 1)
+            nloss = torch.topk(loss[-nlen:], minklen, dim=-1)[0]
+            nloss = -nloss.float().mean().cpu().detach().numpy()
             mink_percent.append(nloss)
         return np.array(mink_percent)
 

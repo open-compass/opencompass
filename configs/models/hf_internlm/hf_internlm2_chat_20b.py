@@ -1,25 +1,21 @@
 from opencompass.models import HuggingFaceCausalLM
 
-from mmengine.config import read_base
-with read_base():
-    from .datasets.cdme.cdme8k import cdme_datasets
-
-datasets = [*cdme_datasets]
-
 
 _meta_template = dict(
     round=[
-        dict(role='HUMAN', begin='<|User|>:', end='\n'),
-        dict(role='BOT', begin='<|Bot|>:', end='<eoa>\n', generate=True),
+        dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
+        dict(role='SYSTEM', begin='<|im_start|>system\n', end='<|im_end|>\n'),
+        dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
     ],
+    eos_token_id=92542
 )
 
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='internlm-chat-20b-hf',
-        path="internlm/internlm-chat-20b",
-        tokenizer_path='internlm/internlm-chat-20b',
+        abbr='internlm2-chat-20b-hf',
+        path="internlm/internlm2-chat-20b",
+        tokenizer_path='internlm/internlm2-chat-20b',
         model_kwargs=dict(
             trust_remote_code=True,
             device_map='auto',
@@ -35,6 +31,6 @@ models = [
         batch_size=8,
         meta_template=_meta_template,
         run_cfg=dict(num_gpus=2, num_procs=1),
-        end_str='<eoa>',
+        end_str='<|im_end|>',
     )
 ]

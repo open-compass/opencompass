@@ -65,9 +65,9 @@ mathbench_agent_summary_groups = [
     {
         'name': 'mathbench-circular-and-cloze-agent',
         'subsets': [
+            'mathbench-college-circular-agent',
             'mathbench-high-circular-agent',
             'mathbench-middle-circular-agent',
-            'mathbench-circular-agent',
             'mathbench-college-cloze_en-agent',
             'mathbench-primary-cloze_cn-agent',
         ],

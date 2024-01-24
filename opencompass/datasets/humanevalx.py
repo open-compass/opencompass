@@ -14,6 +14,7 @@ from datasets import Dataset
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 
 from .base import BaseDataset
+from .humaneval import humaneval_postprocess_v2
 
 _LANGUAGE_NAME_DICT = {
     'cpp': 'CPP',
@@ -89,9 +90,11 @@ class HumanevalXEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         predictions = [{
-            'task_id': f'{_LANGUAGE_NAME_DICT[self.language]}/{i}',
-            'generation': _clean_up_code(pred, self.language),
-        } for i, pred in enumerate(predictions)]
+            'task_id':
+            f'{_LANGUAGE_NAME_DICT[self.language]}/{i}',
+            'generation':
+            _clean_up_code(pred, self.language, refer),
+        } for i, (pred, refer) in enumerate(zip(predictions, references))]
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_out_path = osp.join(tmp_dir,
                                     f'humanevalx_{self.language}.json')
@@ -161,15 +164,28 @@ class HumanevalXEvaluator(BaseEvaluator):
             return False, err
 
 
-def _clean_up_code(text: str, language_type: str) -> str:
+def _clean_up_code(text: str, language_type: str, reference) -> str:
     """Cleans up the generated code."""
+    try:
+        # for chatGLM related text
+        text = eval(text)
+    except Exception:
+        pass
+    # extract code from code block
+    text = text.lstrip('\n')
+    if '```' in text:
+        blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+        if len(blocks) == 0:
+            text = text.split('```')[1]  # fall back to default strategy
+        else:
+            text = blocks[0]  # fetch the first code block
+            if not text.startswith('\n'):  # in case starting with ```xxx
+                text = text[max(text.find('\n') + 1, 0):]
     if language_type.lower() == 'python':
+        text = humaneval_postprocess_v2(text)
         # we need to take care of the first line
         # append extra space for first line for correct indentation
-        for c_index, c in enumerate(text[:5]):
-            if c != ' ':
-                text = ' ' * (4 - c_index) + text
-                break
+        text = '    ' + text.lstrip()
 
         text_splits = text.split('\n')
         is_empty_line = False
@@ -189,7 +205,13 @@ def _clean_up_code(text: str, language_type: str) -> str:
             for w in end_words:
                 if w in text:
                     text = text[:text.rfind(w)]
-    elif language_type.lower() == 'java':
+    # strip function head for all other language
+    func_name = reference.strip().split('\n')[-1]
+    if func_name:
+        func_name = func_name.strip().strip('{')
+        if func_name in text:
+            text = '\n'.join(text[text.find(func_name):].split('\n')[1:])
+    if language_type.lower() == 'java':
         main_pos = text.find('public static void main')
         if main_pos != -1:
             text = text[:main_pos] + '}'

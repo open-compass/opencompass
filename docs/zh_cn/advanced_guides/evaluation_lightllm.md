@@ -27,6 +27,7 @@ python -m lightllm.server.api_server --model_dir /path/llama2-7B     \
 ```
 
 **注：** 上述命令可以通过 tp 的数量设置，在 tp 张卡上进行 TensorParallel 推理，适用于较大的模型的推理。
+**注：** 上述命令中的 max_total_token_num，会影响测试过程中的吞吐性能，可以根据 [Lightllm 主页](https://github.com/ModelTC/lightllm) 上的文档，进行设置。只要不爆显存，往往设置越大越好。
 
 可以使用下面的 Python 脚本简单测试一下当前服务是否已经起成功
 

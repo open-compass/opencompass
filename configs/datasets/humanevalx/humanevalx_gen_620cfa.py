@@ -4,7 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import HumanevalXDataset, HumanevalXEvaluator
 
 humanevalx_reader_cfg = dict(
-    input_columns=['prompt'], output_column='task_id', train_split='test')
+    input_columns=['prompt'], output_column='declaration', train_split='test')
 
 humanevalx_infer_cfg = dict(
     prompt_template=dict(

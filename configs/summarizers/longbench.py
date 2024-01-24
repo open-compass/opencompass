@@ -1,10 +1,10 @@
 summarizer = dict(
     dataset_abbrs = [
         '--------- LongBench Single-Document QA ---------', # category
-        "LongBench_narrativeqa",
+        'LongBench_narrativeqa',
         'LongBench_qasper',
         'LongBench_multifieldqa_en',
-        "LongBench_multifieldqa_zh",
+        'LongBench_multifieldqa_zh',
         '--------- LongBench Multi-Document QA ---------', # category
         'LongBench_hotpotqa',
         'LongBench_2wikimqa',
@@ -28,5 +28,5 @@ summarizer = dict(
         'LongBench_lcc',
         'LongBench_repobench-p',
     ],
-    summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+    summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

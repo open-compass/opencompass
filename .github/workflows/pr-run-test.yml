@@ -11,32 +11,32 @@ on:
 
   workflow_dispatch:
   schedule:
-    - cron:  '56 0 * * *'
+    - cron:  '56 20 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test_run:
+  pr_run_test:
     runs-on: self-hosted
     timeout-minutes: 20
-    strategy:
-      matrix:
-        python-version: ['3.10']
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
-      - name: Prepare - Clone Conde Env install and copy data
+      - name: Prepare - create conda env and install code
         run: |
           eval "$(conda shell.bash hook)"
           conda create --name opencompass_regression --clone opencompass_base
           conda activate opencompass_regression
           python3 -m pip install -e .
+          conda info --envs
+      - name: Prepare - prepare data and hf model
+        run: |
           cp -r /cpfs01/user/qa-llm-cicd/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub ~/.cache/huggingface/hub
-          conda info --envs
+          export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1;
       - name:  Run test
         run: |
           eval "$(conda shell.bash hook)"
@@ -44,12 +44,8 @@ jobs:
           conda info --envs
           rm -rf regression_result
           python3 run.py --models hf_internlm_chat_7b --datasets siqa_gen --work-dir regression_result --debug
-      - name:  Remove Conda Env
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda env remove --name opencompass_regression
-          conda info --envs
       - name:  Get result
+        if: always()
         run: |
           score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
           if (( ${score%.*} >= 70 && ${score%.*} <= 80 )); then
@@ -59,3 +55,9 @@ jobs:
              exit 1
           fi
           rm -rf regression_result
+      - name:  Remove Conda Env
+        if: always()
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda env remove --name opencompass_regression
+          conda info --envs
