@@ -9,7 +9,7 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    from .datasets.CIBench.CIBench_gen_8ab0dc import \
+    from .datasets.CIBench.CIBench_template_gen_e6b12a import \
         cibench_datasets as datasets
 
 FORCE_STOP_PROMPT_EN = """You should directly give results based on history information."""
@@ -70,7 +70,8 @@ models = [
         ),
         actions=[
             dict(type=IPythonInterpreter,
-                 description=IPYTHON_INTERPRETER_DESCRIPTION)
+                 description=IPYTHON_INTERPRETER_DESCRIPTION,
+                 user_data_dir='../cibench_dataset/datasources')
         ],
         protocol=dict(
             type=ReActProtocol,
