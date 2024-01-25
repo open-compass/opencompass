@@ -71,7 +71,7 @@ models = [
         actions=[
             dict(type=IPythonInterpreter,
                  description=IPYTHON_INTERPRETER_DESCRIPTION,
-                 user_data_dir='../cibench_dataset/datasources')
+                 user_data_dir='./data/cibench_dataset/datasources')
         ],
         protocol=dict(
             type=ReActProtocol,
