@@ -298,6 +298,13 @@ def main():
                                                     'predictions/')
         partitioner = PARTITIONERS.build(cfg.infer.partitioner)
         tasks = partitioner(cfg)
+        # overwrite retriever in dataset
+        # if a retriever configuration is provided by cfg.infer
+        if hasattr(cfg['infer'], 'retriever'):
+            for task in tasks:
+                for dataset in task['datasets']:
+                    dataset[0]['infer_cfg']['retriever'] = cfg['infer'][
+                        'retriever']
         if args.dry_run:
             return
         runner = RUNNERS.build(cfg.infer.runner)
