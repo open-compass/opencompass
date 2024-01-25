@@ -5,26 +5,29 @@ import os.path as osp
 import re
 from collections import defaultdict
 from datetime import datetime
-from prettytable import from_csv
+
 import numpy as np
-
 from mmengine import ConfigDict
-from opencompass.utils import model_abbr_from_cfg
-from .utils import get_judgeanswer_and_reference, get_outdir
+from prettytable import from_csv
 
+from opencompass.utils import model_abbr_from_cfg, dataset_abbr_from_cfg
+from .utils import get_judgeanswer_and_reference, get_outdir
 
 def post_process_allobj(judgement: str):
     """Input a string like below:
 
-    xxx[[1]]xxx, and extract the judge
+    xxx[[correct]]xxx, and extract the judge
     """
-    pattern = r'\[([0-1]+)\]'
+    pattern = r'(?i)\[(incorrect|correct|正确|错误)\]'
     matched_result = re.findall(pattern, judgement)
     if matched_result:
-        return matched_result[0]
+        content = matched_result[0].lower()
+        if content in ['correct', '正确']:
+            return {'score': 1}
+        elif content in ['incorrect', '错误']:
+            return {'score': 0}
     else:
         return None
-
 
 def get_capability_results(
     judged_answers,
@@ -38,8 +41,6 @@ def get_capability_results(
     for ans, ref in zip(judged_answers, references):
         capability_ratings['total'] += ans['score']
         capability_counts['total'] += 1
-        capability_ratings[ref['capability']] += ans['score']
-        capability_counts[ref['capability']] += 1
 
     capability_avg_ratings = defaultdict(float)
 
@@ -78,9 +79,7 @@ class AllObjSummarizer:
             self.compare_models = self.cfg['eval']['partitioner'][
                 'compare_models']
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
-        self.judge_map = {
-            'single': post_process_allobj
-        }
+        self.judge_map = {'single': post_process_allobj}
         self.judge_function = self.judge_map[self.judge_type]
 
     def summarize(self,
@@ -95,24 +94,24 @@ class AllObjSummarizer:
         """
         if self.judge_type == 'single':
             dataset_cfgs = self.cfg['datasets']
+            judge_model = self.judge_abbr
             output_dir, results_folder = get_outdir(self.cfg, time_str)
-            fout_flag = 0
-            for eval_model_abbr in self.eval_model_abbrs:
-                subdir = eval_model_abbr + '_judged-by--' + self.judge_abbr
-                subdir_path = os.path.join(results_folder, subdir)
-                if os.path.isdir(subdir_path):
-                    model, judge_model = eval_model_abbr, self.judge_abbr
-                    fout = osp.join(
-                        output_dir,
-                        'judged-by--' + judge_model + '-capability.csv')
-                    for dataset in dataset_cfgs:
+            for dataset in dataset_cfgs:
+                dataset_abbr = dataset_abbr_from_cfg(dataset)
+                fout = osp.join(output_dir, 'judged-by--' + judge_model + '-' + dataset_abbr + '.csv')
+                fout_flag = 0
+                for eval_model_abbr in self.eval_model_abbrs:
+                    subdir = eval_model_abbr + '_judged-by--' + self.judge_abbr
+                    subdir_path = os.path.join(results_folder, subdir)
+                    if os.path.isdir(subdir_path):
+                        model = eval_model_abbr
                         judged_answers, references = get_judgeanswer_and_reference(
                             dataset, subdir_path, self.judge_function)
                         get_capability_results(judged_answers, references,
                                                fout, fout_flag, model)
                         fout_flag += 1
-                else:
-                    print(subdir_path + ' is not exist! please check!')
+                    else:
+                        print(subdir_path + ' is not exist! please check!')
             with open(fout, 'r') as f:
                 x = from_csv(f)
             print(x)
