@@ -372,7 +372,7 @@ class ChatInferencer(BaseInferencer):
                 preds_list.append(temp_dict)
             output_handler.save_results(
                 origin_prompt=None,
-                prediction=str(preds_list),
+                prediction=preds_list,
                 idx=index_copy,
                 gold=None,
             )

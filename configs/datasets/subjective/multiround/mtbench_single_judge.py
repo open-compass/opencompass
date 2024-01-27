@@ -1,20 +1,19 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_inferencer import ChatInferencer, GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import Corev2Dataset
-from mmengine.config import read_base
+from opencompass.datasets import MTBenchDataset
+
 
 subjective_reader_cfg = dict(
-    input_columns=['question', 'prefix', 'suffix'],
+    input_columns=['dialogue', 'capability', 'system_prompt', 'prompt_template'],
     output_column='judge',
-    #train_split='test'
     )
 
 subjective_all_sets = [
-    "COREV2_6A_all",
+    "mtbench",
 ]
-
+data_path ="data/subjective/"
 
 subjective_datasets = []
 
@@ -22,27 +21,28 @@ for _name in subjective_all_sets:
     subjective_infer_cfg = dict(
             prompt_template=dict(
                 type=PromptTemplate,
-                template=dict(round=[
-                    dict(
-                        role='HUMAN',
-                        prompt="{question}"
-                    ),
-                ]),
+                template="""{dialogue}""",
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_out_len=2048),
+            inferencer=dict(type=ChatInferencer, max_seq_len=4096, max_out_len=512, infer_mode='every'),
         )
 
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
-            infer_order='random',
             prompt_template=dict(
                 type=PromptTemplate,
-                template=dict(round=[
+                template=dict(
+                begin=[
+                    dict(
+                        role='SYSTEM',
+                        fallback_role='HUMAN',
+                        prompt="{system_prompt}")
+                ],
+                    round=[
                     dict(
                         role='HUMAN',
-                        prompt = "{prefix}问题: <问题开始> {question} <问题结束>\n\n回答 1: <回答 1 开始> {prediction} <回答 1 结束>\n\n回答 2: <回答 2 开始> {prediction2} <回答 2 结束>\n\n{suffix}"
+                        prompt = "{prompt_template}"
                     ),
                 ]),
             ),
@@ -53,8 +53,8 @@ for _name in subjective_all_sets:
     subjective_datasets.append(
         dict(
             abbr=f"{_name}",
-            type=Corev2Dataset,
-            path="./data/subjective/",
+            type=MTBenchDataset,
+            path=data_path,
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,

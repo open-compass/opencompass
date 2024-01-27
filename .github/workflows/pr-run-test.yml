@@ -11,45 +11,45 @@ on:
 
   workflow_dispatch:
   schedule:
-    - cron:  '56 0 * * *'
+    - cron:  '56 22 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CONDA_ENV: opencompass_regression_daily
+
 jobs:
-  test_run:
+  pr_run_test:
     runs-on: self-hosted
+    environment: 'prod'
     timeout-minutes: 20
-    strategy:
-      matrix:
-        python-version: ['3.10']
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
-      - name: Prepare - Clone Conde Env install and copy data
+      - name: Prepare - create conda env and install code
         run: |
           eval "$(conda shell.bash hook)"
-          conda create --name opencompass_regression --clone opencompass_base
-          conda activate opencompass_regression
+          conda create --name ${{env.CONDA_ENV}} --clone opencompass_base --offline
+          conda activate ${{env.CONDA_ENV}}
           python3 -m pip install -e .
+          conda info --envs
+      - name: Prepare - prepare data and hf model
+        run: |
           cp -r /cpfs01/user/qa-llm-cicd/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub ~/.cache/huggingface/hub
-          conda info --envs
+          export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1;
       - name:  Run test
         run: |
           eval "$(conda shell.bash hook)"
-          conda activate opencompass_regression
+          conda activate ${{env.CONDA_ENV}}
           conda info --envs
           rm -rf regression_result
           python3 run.py --models hf_internlm_chat_7b --datasets siqa_gen --work-dir regression_result --debug
-      - name:  Remove Conda Env
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda env remove --name opencompass_regression
-          conda info --envs
       - name:  Get result
+        if: always()
         run: |
           score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
           if (( ${score%.*} >= 70 && ${score%.*} <= 80 )); then
@@ -59,3 +59,20 @@ jobs:
              exit 1
           fi
           rm -rf regression_result
+      - name:  Remove Conda Env
+        if: always()
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda env remove --name ${{env.CONDA_ENV}}
+          conda info --envs
+
+  notify_to_feishu:
+    if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
+    needs: [pr_run_test]
+    environment: 'prod'
+    timeout-minutes: 5
+    runs-on: self-hosted
+    steps:
+      - name: notify
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{"msg_type":"post","content":{"post":{"zh_cn":{"title":"Opencompass- pr test failed","content":[[{"tag":"text","text":"branch: ${{github.ref_name}}, run action: ${{github.workflow}} failed. "},{"tag":"a","text":"Please click here for details ","href":"https://github.com/'${{ github.repository }}'/actions/runs/'${GITHUB_RUN_ID}'"},{"tag":"at","user_id":"'${{ secrets.USER_ID }}'"}]]}}}}'  ${{ secrets.WEBHOOK_URL }}

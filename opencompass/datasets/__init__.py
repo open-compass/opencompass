@@ -61,6 +61,7 @@ from .longbench import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
 from .math401 import *  # noqa: F401, F403
+from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403

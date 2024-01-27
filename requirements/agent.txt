@@ -6,6 +6,8 @@ jupyter
 jupyter_client
 jupytext
 lagent
+lightgbm==4.1.0
 networkx
 scikit-image
 sympy==1.12
+tensorflow==2.14.0

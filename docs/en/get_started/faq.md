@@ -2,6 +2,27 @@
 
 ## General
 
+### What are the differences and connections between `ppl` and `gen`?
+
+`ppl` stands for perplexity, an index used to evaluate a model's language modeling capabilities. In the context of OpenCompass, it generally refers to a method of answering multiple-choice questions: given a context, the model needs to choose the most appropriate option from multiple choices. In this case, we concatenate the n options with the context to form n sequences, then calculate the model's perplexity for these n sequences. We consider the option corresponding to the sequence with the lowest perplexity as the model's reasoning result for this question. This evaluation method is simple and direct in post-processing, with high certainty.
+
+`gen` is an abbreviation for generate. In the context of OpenCompass, it refers to the model's continuation writing result given a context as the reasoning result for a question. Generally, the string obtained from continuation writing requires a heavier post-processing process to extract reliable answers and complete the evaluation.
+
+In terms of usage, multiple-choice questions and some multiple-choice-like questions of the base model use `ppl`, while the base model's multiple-selection and non-multiple-choice questions use `gen`. All questions of the chat model use `gen`, as many commercial API models do not expose the `ppl` interface. However, there are exceptions, such as when we want the base model to output the problem-solving process (e.g., Let's think step by step), we will also use `gen`, but the overall usage is as shown in the following table:
+
+|            | ppl            | gen                  |
+| ---------- | -------------- | -------------------- |
+| Base Model | Only MCQ Tasks | Tasks Other Than MCQ |
+| Chat Model | None           | All Tasks            |
+
+Similar to `ppl`, conditional log probability (`clp`) calculates the probability of the next token given a context. It is also only applicable to multiple-choice questions, and the range of probability calculation is limited to the tokens corresponding to the option numbers. The option corresponding to the token with the highest probability is considered the model's reasoning result. Compared to `ppl`, `clp` calculation is more efficient, requiring only one inference, whereas `ppl` requires n inferences. However, the drawback is that `clp` is subject to the tokenizer. For example, the presence or absence of space symbols before and after an option can change the tokenizer's encoding result, leading to unreliable test results. Therefore, `clp` is rarely used in OpenCompass.
+
+### How does OpenCompass control the number of shots in few-shot evaluations?
+
+In the dataset configuration file, there is a retriever field indicating how to recall samples from the dataset as context examples. The most commonly used is `FixKRetriever`, which means using a fixed k samples, hence k-shot. There is also `ZeroRetriever`, which means not using any samples, which in most cases implies 0-shot.
+
+On the other hand, in-context samples can also be directly specified in the dataset template. In this case, `ZeroRetriever` is also used, but the evaluation is not 0-shot and needs to be determined based on the specific template. Refer to [prompt](../prompt/prompt_template.md) for more details
+
 ### How does OpenCompass allocate GPUs?
 
 OpenCompass processes evaluation requests using the unit termed as "task". Each task is an independent combination of model(s) and dataset(s). The GPU resources needed for a task are determined entirely by the model being evaluated, specifically by the `num_gpus` parameter.
@@ -58,6 +79,10 @@ Because of HuggingFace's implementation, OpenCompass requires network (especiall
   HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_EVALUATE_OFFLINE=1 python run.py ...
   ```
   With which no more network connection is needed for the evaluation. However, error will still be raised if the files any dataset or model is missing from the cache.
+- Use mirror like [hf-mirror](https://hf-mirror.com/)
+  ```python
+  HF_ENDPOINT=https://hf-mirror.com python run.py ...
+  ```
 
 ### My server cannot connect to the Internet, how can I use OpenCompass?
 
