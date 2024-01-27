@@ -115,7 +115,6 @@ class ZhiPuV2AI(BaseAPIModel):
         data = {'model': self.model, 'messages': messages}
         data.update(self.generation_kwargs)
 
-        print(data)
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
