@@ -28,3 +28,4 @@ from .turbomind_tis import TurboMindTisModel  # noqa: F401
 from .vllm import VLLM  # noqa: F401
 from .xunfei_api import XunFei  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
+from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
