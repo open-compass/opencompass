@@ -64,9 +64,10 @@ def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
         if processed_judge is not None:
             judged_answers.append(processed_judge)
             references.append(v['gold'])
-    print(
-        f'Among {len(result)} judgements, successfully extracted {len(judged_answers)} judgements.'
-    )
+    if len(judged_answers) != len(result):
+        print(
+            f'Among {len(result)} judgements, successfully extracted {len(judged_answers)} judgements, please check!'
+        )
     if len(judged_answers) == 0:
         print('*' * 100)
         print(

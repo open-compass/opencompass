@@ -3,7 +3,6 @@ from opencompass.models import HuggingFaceCausalLM
 from mmengine.config import read_base
 with read_base():
     from .models.chatglm.hf_chatglm3_6b_32k import models as chatglm3_6b_32k_model
-    from .models.yi.hf_yi_6b_chat import models as yi_6b_chat_model
     from .datasets.subjective.compassarena.compassarena_compare import subjective_datasets
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
@@ -19,7 +18,7 @@ from opencompass.summarizers import CompassArenaSummarizer
 
 infer = dict(
     #partitioner=dict(type=NaivePartitioner),
-    partitioner=dict(type=SizePartitioner, max_task_size=10000),
+    partitioner=dict(type=SizePartitioner, strategy='split', max_task_size=10000),
     runner=dict(
         type=SlurmSequentialRunner,
         partition='llm_dev2',
@@ -47,12 +46,12 @@ gpt4 = dict(
         retry=20,
         temperature = 1
 )
-models = [*chatglm3_6b_32k_model, *yi_6b_chat_model]
+models = [*chatglm3_6b_32k_model]
 datasets = [*subjective_datasets]
 
 
 
-work_dir = 'outputs/compass_arena/'
+work_dir = 'outputs/compass_arena_debug/'
 
 # -------------Inferen Stage ----------------------------------------
 
@@ -68,6 +67,7 @@ judge_model = dict(
         retry=20,
         temperature = 0
 )
+
 ## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
@@ -76,7 +76,7 @@ eval = dict(
         max_task_size=10000,
         mode='m2n',
         base_models = [gpt4],
-        compare_models = [*chatglm3_6b_32k_model, *yi_6b_chat_model, ]
+        compare_models = [*chatglm3_6b_32k_model]
     ),
     runner=dict(
         type=SlurmSequentialRunner,
@@ -91,5 +91,6 @@ eval = dict(
 
 
 summarizer = dict(
-    type=CompassArenaSummarizer
+    type=CompassArenaSummarizer,
+    summary_type='half_add'
 )
