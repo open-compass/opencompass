@@ -42,7 +42,8 @@ class TurboMindModel(BaseModel):
                  max_seq_len: int = 2048,
                  meta_template: Optional[Dict] = None,
                  engine_config: Optional[Dict] = None,
-                 gen_config: Optional[Dict] = None):
+                 gen_config: Optional[Dict] = None,
+                 end_str: Optional[str] = None):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
@@ -62,6 +63,7 @@ class TurboMindModel(BaseModel):
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
         self.gen_config = gen_config
+        self.end_str = end_str
 
     def generate(
         self,
@@ -90,11 +92,15 @@ class TurboMindModel(BaseModel):
         for batch_input in batch_inputs:
             with ThreadPoolExecutor() as executor:
                 _results = list(
-                    executor.map(self._generate,
-                                 self.generators[:len(batch_input)],
-                                 self.generator_ids[:len(batch_input)],
-                                 batch_input, [max_out_len] * len(batch_input),
-                                 [self.gen_config] * len(batch_input)))
+                    executor.map(
+                        self._generate,
+                        self.generators[:len(batch_input)],
+                        self.generator_ids[:len(batch_input)],
+                        batch_input,
+                        [max_out_len] * len(batch_input),
+                        [self.gen_config] * len(batch_input),
+                        [self.end_str] * len(batch_input),
+                    ))
                 results += _results
         return results
 
@@ -114,7 +120,8 @@ class TurboMindModel(BaseModel):
                   session_id,
                   prompt: str or PromptList,
                   max_out_len: int,
-                  gen_config=None) -> str:
+                  gen_config=None,
+                  end_str: Optional[str] = None) -> str:
         """Generate results given a list of inputs.
 
         Args:
@@ -144,4 +151,7 @@ class TurboMindModel(BaseModel):
             _, output_ids, _ = outputs
             response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
+        # support internlm2
+        if end_str:
+            response = response.split(end_str)[0]
         return response
