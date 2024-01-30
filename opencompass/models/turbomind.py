@@ -34,6 +34,9 @@ class TurboMindModel(BaseModel):
             arguments like session_len, max_batch_size for TurboMind.
         gen_config (Dict, optional): Generation config to set
                 arguments like top_k, top_p, temperature.
+        end_str (str, optional): Whether to trim generated strings with end_str
+            if the model has special ending strings that are not handled well.
+            Defaults to None.
     """
 
     def __init__(self,
@@ -131,7 +134,10 @@ class TurboMindModel(BaseModel):
             max_out_len (int): The maximum length of the output.
             gen_config (EngineGenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
-
+            end_str (str, optional): Whether to trim generated strings
+                with end_str if the model has special ending strings
+                that are not handled well.
+                Defaults to None.
         Returns:
             str: The generated string.
         """
@@ -151,7 +157,7 @@ class TurboMindModel(BaseModel):
             _, output_ids, _ = outputs
             response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
-        # support internlm2
+        # used to trim
         if end_str:
             response = response.split(end_str)[0]
         return response
