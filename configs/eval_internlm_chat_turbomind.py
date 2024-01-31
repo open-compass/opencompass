@@ -50,6 +50,7 @@ internlm_chat_7b = dict(
     concurrency=32,
     meta_template=internlm_meta_template,
     run_cfg=dict(num_gpus=1, num_procs=1),
+    end_str='<eoa>',
 )
 
 # config for internlm-chat-7b
@@ -91,6 +92,7 @@ internlm_chat_20b = dict(
     concurrency=8,
     meta_template=internlm_meta_template,
     run_cfg=dict(num_gpus=1, num_procs=1),
+    end_str='<eoa>',
 )
 
 models = [internlm_chat_20b]
