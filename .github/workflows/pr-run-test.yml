@@ -19,6 +19,8 @@ concurrency:
 
 env:
   CONDA_ENV: opencompass_base
+  USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
+  HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
 
 jobs:
   pr_run_test:
@@ -33,13 +35,13 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate ${{env.CONDA_ENV}}
           python3 -m pip uninstall opencompass -y
-          python3 -m pip install -e . --cache-dir ${{secrets.USERSPACE_PREFIX}}/.cache/pip
+          python3 -m pip install -e . --cache-dir ${{env.USERSPACE_PREFIX}}/.cache/pip
           conda info --envs
       - name: Prepare - prepare data and hf model
         run: |
-          cp -r ${{secrets.USERSPACE_PREFIX}}/data .
+          cp -r ${{env.USERSPACE_PREFIX}}/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
-          ln -s ${{secrets.HF_CACHE_PATH}} ~/.cache/huggingface/hub
+          ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
           export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1;
       - name:  Run test
         run: |
