@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from datasets import Dataset, DatasetDict
 
@@ -52,6 +53,20 @@ def gsm8k_postprocess(text: str) -> str:
         if ret[i].isdigit() or ret[i] == '.':
             ret1 += ret[i]
     return ret1.strip('.')
+
+
+@TEXT_POSTPROCESSORS.register_module('gsm8k_v2')
+def gsm8k_postprocess_v2(text):
+    # 使用正则表达式查找所有的数字，包括浮点数
+    numbers = re.findall(r'\d+\.\d+|\d+', text)
+
+    # 如果没有找到任何数字，返回 None
+    if not numbers:
+        return 0
+
+    ret = numbers[-1]
+
+    return ret
 
 
 class Gsm8kEvaluator(BaseEvaluator):
