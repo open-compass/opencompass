@@ -1,0 +1,11 @@
+internlm-7b-hf:
+    ARC-c: 36.27
+    chid-dev: 81.68
+    chid-test: 83.67
+    openai_humaneval: 10.37
+
+internlm-chat-7b-hf:
+    ARC-c: 36.95
+    chid-dev: 71.78
+    chid-test: 76.87
+    openai_humaneval: 21.34
