@@ -55,7 +55,7 @@ jobs:
         run: |
           eval "$(conda shell.bash hook)"
           pip install pytest --cache-dir ${{env.PIP_CACHE_PATH}}
-          pytest -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
         if: always()
         run: |
