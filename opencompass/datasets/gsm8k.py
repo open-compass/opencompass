@@ -56,6 +56,14 @@ def gsm8k_postprocess(text: str) -> str:
 
 class Gsm8kEvaluator(BaseEvaluator):
 
+    def is_equal(self, pred, refer):
+        try:
+            if pred == refer or abs(float(pred) - int(refer)) < 1e-6:
+                return True
+        except Exception:
+            pass
+        return False
+
     def score(self, predictions, references):
         if len(predictions) != len(references):
             return {
@@ -68,7 +76,7 @@ class Gsm8kEvaluator(BaseEvaluator):
         for i, j in zip(predictions, references):
             detail = {'pred': i, 'answer': j, 'correct': False}
             count += 1
-            if i == j:
+            if self.is_equal(i, j):
                 correct += 1
                 detail['correct'] = True
             details.append(detail)
