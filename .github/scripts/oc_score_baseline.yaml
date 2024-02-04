@@ -3,19 +3,14 @@ internlm-7b-hf:
     chid-dev: 81.68
     chid-test: 83.67
     openai_humaneval: 10.37
-<<<<<<< HEAD
-=======
     openbookqa: 44.4
     openbookqa_fact: 73.2
->>>>>>> origin/add_daily_test
 
 internlm-chat-7b-hf:
     ARC-c: 36.95
     chid-dev: 71.78
     chid-test: 76.87
     openai_humaneval: 21.34
-<<<<<<< HEAD
-=======
     openbookqa: 66.6
     openbookqa_fact: 80.4
 
@@ -26,4 +21,3 @@ chatglm3-6b-base-hf:
     openai_humaneval: 20.73
     openbookqa: 79.8
     openbookqa_fact: 92.2
->>>>>>> origin/add_daily_test
