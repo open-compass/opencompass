@@ -6,8 +6,8 @@ import yaml
 
 output_path = 'regression_result_daily'
 
-model_list = ['internlm-7b-hf', 'internlm-chat-7b-hf', 'hf_chatglm3_6b_base', 'hf_chatglm3_6b', 'hf_qwen_7b_chat', 'hf_qwen_7b']
-dataset_list = ['ARC-c', 'chid-dev', 'chid-test', 'openai_humaneval']
+model_list = ['internlm-7b-hf', 'internlm-chat-7b-hf', 'chatglm3-6b-base-hf']
+dataset_list = ['ARC-c', 'chid-dev', 'chid-test', 'openai_humaneval', 'openbookqa', 'openbookqa_fact']
 
 
 @pytest.fixture()
