@@ -1,5 +1,3 @@
-# flake8: noqa
-# yapf: disable
 import ast
 import json
 
@@ -28,6 +26,7 @@ def q2text(q, p=sppPrompts):
     for edge in edges:
         this_line = f"Edge from {edge['from']} to {edge['to']} has a weight of {edge['weight']}."
         prompt_text += this_line + '\n'
+    return prompt_text
 
 
 @LOAD_DATASET.register_module(force=True)
@@ -79,8 +78,7 @@ class p_SPP_Evaluator(BaseEvaluator):
                 r = 'fail'
             result[r] += level
 
-        result['score'] = result['pass'] / (result['pass'] +
-                                            result['fail']) * 100
+        result['score'] = result['pass'] / (result['pass'] + result['fail']) * 100
         final_result = {'Weighted Accuracy': result['score']}
         return final_result
 
@@ -90,20 +88,16 @@ class p_SPP_Evaluator(BaseEvaluator):
             assert '</final_answer>' in xml_string
             # assert '<reasoning>' in xml_string
             # assert '</reasoning>' in xml_string
-            final_answer_start = xml_string.index('<final_answer>') + len(
-                '<final_answer>')
+            final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
             final_answer_end = xml_string.index('</final_answer>')
             # reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
             # reasoning_end = xml_string.index('</reasoning>')
-            final_answer_element = xml_string[
-                final_answer_start:final_answer_end].rstrip().strip().rstrip()
+            final_answer_element = xml_string[final_answer_start:final_answer_end].rstrip().strip().rstrip()
             assert '{' in final_answer_element
             assert '}' in final_answer_element
             dic_start = final_answer_element.index('{')
             dic_end = final_answer_element.index('}')
-            final_answer_element = final_answer_element[dic_start:dic_end +
-                                                        1].rstrip().strip(
-                                                        ).rstrip()
+            final_answer_element = final_answer_element[dic_start:dic_end + 1].rstrip().strip().rstrip()
             # reasoning_element = xml_string[reasoning_start:reasoning_end].rstrip().strip().rstrip()
             try:
                 final_answer_element = ast.literal_eval(final_answer_element)
@@ -132,14 +126,8 @@ class p_SPP_Evaluator(BaseEvaluator):
         shortest_path_length = None
         shortest_path = None
         if nx.has_path(G, source=source, target=target):
-            shortest_path_length = nx.shortest_path_length(G,
-                                                           source=source,
-                                                           target=target,
-                                                           weight='weight')
-            shortest_path = nx.shortest_path(G,
-                                             source=source,
-                                             target=target,
-                                             weight='weight')
+            shortest_path_length = nx.shortest_path_length(G, source=source, target=target, weight='weight')
+            shortest_path = nx.shortest_path(G, source=source, target=target, weight='weight')
         return shortest_path_length, shortest_path
 
     # SPP
@@ -187,13 +175,10 @@ class p_SPP_Evaluator(BaseEvaluator):
 
         # Check if the path is continuous and calculate the cost
         calculated_cost = 0
-        is_in_edge = lambda edge, from_node, to_node: (edge[
-            'from'] == from_node and edge['to'] == to_node) or (edge[
-                'from'] == to_node and edge['to'] == from_node)
+        is_in_edge = lambda edge, from_node, to_node: (edge['from'] == from_node and edge['to'] == to_node) or (edge['from'] == to_node and edge['to'] == from_node)
         for i in range(len(path) - 1):
             from_node, to_node = path[i], path[i + 1]
-            edge = next((edge for edge in instance['edges']
-                         if is_in_edge(edge, from_node, to_node)), None)
+            edge = next((edge for edge in instance['edges'] if is_in_edge(edge, from_node, to_node)), None)
 
             if not edge:
                 return False, f'No edge found from node {from_node} to node {to_node}.'

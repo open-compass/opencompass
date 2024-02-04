@@ -29,14 +29,11 @@ def parse_xml_to_dict(xml_string):
             assert '</final_answer>' in xml_string
             assert '<reasoning>' in xml_string
             assert '</reasoning>' in xml_string
-            final_answer_start = xml_string.index('<final_answer>') + len(
-                '<final_answer>')
+            final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
             final_answer_end = xml_string.index('</final_answer>')
-            reasoning_start = xml_string.index('<reasoning>') + len(
-                '<reasoning>')
+            reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
             reasoning_end = xml_string.index('</reasoning>')
-            final_answer_element = xml_string[
-                final_answer_start:final_answer_end]
+            final_answer_element = xml_string[final_answer_start:final_answer_end]
             reasoning_element = xml_string[reasoning_start:reasoning_end]
         except Exception:
             final_answer_element = ''

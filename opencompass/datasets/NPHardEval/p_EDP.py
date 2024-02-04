@@ -1,5 +1,3 @@
-# flake8: noqa
-# yapf: disable
 import ast
 import json
 
@@ -74,8 +72,7 @@ class p_EDP_Evaluator(BaseEvaluator):
                 r = 'fail'
             result[r] += level
 
-        result['score'] = result['pass'] / (result['pass'] +
-                                            result['fail']) * 100
+        result['score'] = result['pass'] / (result['pass'] + result['fail']) * 100
         final_result = {'Weighted Accuracy': result['score']}
         return final_result
 
@@ -94,8 +91,7 @@ class p_EDP_Evaluator(BaseEvaluator):
                 elif string_a[i - 1] == string_b[j - 1]:
                     dp[i][j] = dp[i - 1][j - 1]
                 else:
-                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1],
-                                       dp[i - 1][j - 1])
+                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
         return dp[m][n]
 
     def edp_check(self, instance, solution):
@@ -126,20 +122,16 @@ class p_EDP_Evaluator(BaseEvaluator):
             assert '</final_answer>' in xml_string
             # assert '<reasoning>' in xml_string
             # assert '</reasoning>' in xml_string
-            final_answer_start = xml_string.index('<final_answer>') + len(
-                '<final_answer>')
+            final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
             final_answer_end = xml_string.index('</final_answer>')
             # reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
             # reasoning_end = xml_string.index('</reasoning>')
-            final_answer_element = xml_string[
-                final_answer_start:final_answer_end].rstrip().strip().rstrip()
+            final_answer_element = xml_string[final_answer_start:final_answer_end].rstrip().strip().rstrip()
             assert '{' in final_answer_element
             assert '}' in final_answer_element
             dic_start = final_answer_element.index('{')
             dic_end = final_answer_element.index('}')
-            final_answer_element = final_answer_element[dic_start:dic_end +
-                                                        1].rstrip().strip(
-                                                        ).rstrip()
+            final_answer_element = final_answer_element[dic_start:dic_end + 1].rstrip().strip().rstrip()
             reasoning_element = xml_string
             # reasoning_element = xml_string[reasoning_start:reasoning_end].rstrip().strip().rstrip()
             try:

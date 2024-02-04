@@ -1,5 +1,3 @@
-# flake8: noqa
-# yapf: disable
 import ast
 import json
 
@@ -83,8 +81,7 @@ class cmp_KSP_Evaluator(BaseEvaluator):
             result[r] += level
             details[str(index)] = {'q': q, 'output': output, 'result': r}
 
-        result['score'] = result['pass'] / (result['pass'] +
-                                            result['fail']) * 100
+        result['score'] = result['pass'] / (result['pass'] + result['fail']) * 100
         result['details'] = details
         final_result = {'Weighted Accuracy': result['score']}
         return final_result
@@ -95,16 +92,12 @@ class cmp_KSP_Evaluator(BaseEvaluator):
             assert '</final_answer>' in xml_string
             assert '<reasoning>' in xml_string
             assert '</reasoning>' in xml_string
-            final_answer_start = xml_string.index('<final_answer>') + len(
-                '<final_answer>')
+            final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
             final_answer_end = xml_string.index('</final_answer>')
-            reasoning_start = xml_string.index('<reasoning>') + len(
-                '<reasoning>')
+            reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
             reasoning_end = xml_string.index('</reasoning>')
-            final_answer_element = xml_string[
-                final_answer_start:final_answer_end].rstrip().strip().rstrip()
-            reasoning_element = xml_string[
-                reasoning_start:reasoning_end].rstrip().strip().rstrip()
+            final_answer_element = xml_string[final_answer_start:final_answer_end].rstrip().strip().rstrip()
+            reasoning_element = xml_string[reasoning_start:reasoning_end].rstrip().strip().rstrip()
             try:
                 final_answer_element = ast.literal_eval(final_answer_element)
             except Exception:

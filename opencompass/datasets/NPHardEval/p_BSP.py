@@ -1,5 +1,3 @@
-# flake8: noqa
-# yapf: disable
 import ast
 import json
 
@@ -77,8 +75,7 @@ class p_BSP_Evaluator(BaseEvaluator):
                 r = 'fail'
             result[r] += level
 
-        result['score'] = result['pass'] / (result['pass'] +
-                                            result['fail']) * 100
+        result['score'] = result['pass'] / (result['pass'] + result['fail']) * 100
         final_result = {'Weighted Accuracy': result['score']}
         return final_result
 
@@ -88,16 +85,12 @@ class p_BSP_Evaluator(BaseEvaluator):
             assert '</final_answer>' in xml_string
             assert '<reasoning>' in xml_string
             assert '</reasoning>' in xml_string
-            final_answer_start = xml_string.index('<final_answer>') + len(
-                '<final_answer>')
+            final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
             final_answer_end = xml_string.index('</final_answer>')
-            reasoning_start = xml_string.index('<reasoning>') + len(
-                '<reasoning>')
+            reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
             reasoning_end = xml_string.index('</reasoning>')
-            final_answer_element = xml_string[
-                final_answer_start:final_answer_end].rstrip().strip().rstrip()
-            reasoning_element = xml_string[
-                reasoning_start:reasoning_end].rstrip().strip().rstrip()
+            final_answer_element = xml_string[final_answer_start:final_answer_end].rstrip().strip().rstrip()
+            reasoning_element = xml_string[reasoning_start:reasoning_end].rstrip().strip().rstrip()
             try:
                 final_answer_element = ast.literal_eval(final_answer_element)
             except Exception:

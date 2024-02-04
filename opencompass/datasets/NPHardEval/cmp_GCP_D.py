@@ -1,5 +1,3 @@
-# flake8: noqa
-# yapf: disable
 import ast
 
 import networkx as nx
@@ -13,10 +11,8 @@ from .prompts import gcp_dPrompts
 
 
 def q2text(q, p=gcp_dPrompts):
-    number_of_colors = q.split('\n')[0].split()[
-        -2]  # last character of the first line
-    number_of_vertices = q.split('\n')[1].split(' ')[
-        2]  # third word of the second line
+    number_of_colors = q.split('\n')[0].split()[-2]  # last character of the first line
+    number_of_vertices = q.split('\n')[1].split(' ')[2]  # third word of the second line
     prompt_text =   p['Intro'] + '\n' + \
                     p['Initial_question'].format(total_vertices=number_of_vertices, number_of_colors=number_of_colors) + '\n' + \
                     p['Output_content'] + '\n' + \
@@ -39,8 +35,7 @@ class cmp_GCP_D_Dataset(BaseDataset):
         data_path = path
         all_data = []
         for file_num in range(10):
-            with open(data_path +
-                      'decision_data_GCP_{}.txt'.format(file_num)) as f:
+            with open(data_path + 'decision_data_GCP_{}.txt'.format(file_num)) as f:
                 data = f.read()
                 sample = data.split('\n\n')[:-1]
             all_data += zip([file_num + 1] * len(sample), sample)
@@ -71,8 +66,7 @@ class cmp_GCP_D_Evaluator(BaseEvaluator):
                 number_of_colors = int(q.split('\n')[0].split()[-2])
                 output, reasoning = self.parse_xml_to_dict(output)
                 output_dict['output'] = output
-                output_dict['correctness'], _ = self.gcp_decision_check(
-                    q, output, number_of_colors)
+                output_dict['correctness'], _ = self.gcp_decision_check(q, output, number_of_colors)
             except Exception as e:
                 print(f'Attempt failed: {e}')
                 output_dict['correctness'] = False
@@ -85,8 +79,7 @@ class cmp_GCP_D_Evaluator(BaseEvaluator):
             result[r] += level
             details[str(index)] = {'q': q, 'output': output, 'result': r}
 
-        result['score'] = result['pass'] / (result['pass'] +
-                                            result['fail']) * 100
+        result['score'] = result['pass'] / (result['pass'] + result['fail']) * 100
         result['details'] = details
         final_result = {'Weighted Accuracy': result['score']}
         return final_result
@@ -97,16 +90,12 @@ class cmp_GCP_D_Evaluator(BaseEvaluator):
             assert '</final_answer>' in xml_string
             assert '<reasoning>' in xml_string
             assert '</reasoning>' in xml_string
-            final_answer_start = xml_string.index('<final_answer>') + len(
-                '<final_answer>')
+            final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
             final_answer_end = xml_string.index('</final_answer>')
-            reasoning_start = xml_string.index('<reasoning>') + len(
-                '<reasoning>')
+            reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
             reasoning_end = xml_string.index('</reasoning>')
-            final_answer_element = xml_string[
-                final_answer_start:final_answer_end].rstrip().strip().rstrip()
-            reasoning_element = xml_string[
-                reasoning_start:reasoning_end].rstrip().strip().rstrip()
+            final_answer_element = xml_string[final_answer_start:final_answer_end].rstrip().strip().rstrip()
+            reasoning_element = xml_string[reasoning_start:reasoning_end].rstrip().strip().rstrip()
             try:
                 final_answer_element = ast.literal_eval(final_answer_element)
             except Exception:

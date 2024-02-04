@@ -1,5 +1,3 @@
-# flake8: noqa
-# yapf: disable
 import ast
 import xml.etree.ElementTree as ET
 
@@ -12,13 +10,10 @@ from ..base import BaseDataset
 from .prompts import gcpPrompts
 
 
-def q2text(q,
-           p=gcpPrompts
-           ):  # q is the data for the HP-hard question, p is the prompt
+def q2text(q, p=gcpPrompts):  # q is the data for the HP-hard question, p is the prompt
     # print(q)
     chromatic_number = q.split('\n')[0][-1]  # last character of the first line
-    number_of_vertices = q.split('\n')[1].split(' ')[
-        2]  # third word of the second line
+    number_of_vertices = q.split('\n')[1].split(' ')[2]  # third word of the second line
     prompt_text = p['Intro'] + '\n' \
         + p['Initial_question'].format(max_vertices=number_of_vertices,max_colors=chromatic_number) + '\n' \
         + p['Output_content'] + '\n' \
@@ -26,8 +21,7 @@ def q2text(q,
         '\n The graph is below: \n'
     for line in q.split('\n')[2:]:
         vertex_list = line.split(' ')
-        this_line = 'Vertex {} is connected to vertex {}.'.format(
-            vertex_list[1], vertex_list[2])
+        this_line = 'Vertex {} is connected to vertex {}.'.format(vertex_list[1], vertex_list[2])
         prompt_text += this_line + '\n'
 
     return prompt_text
@@ -42,8 +36,7 @@ class hard_GCP_Dataset(BaseDataset):
         data_path = path
         all_data = []
         for file_num in range(10):
-            with open(data_path +
-                      'synthesized_data_GCP_{}.txt'.format(file_num)) as f:
+            with open(data_path + 'synthesized_data_GCP_{}.txt'.format(file_num)) as f:
                 data = f.read()
                 sample = data.split('\n\n')[:-1]
             all_data += zip([file_num + 1] * len(sample), sample)
@@ -86,8 +79,7 @@ class hard_GCP_Evaluator(BaseEvaluator):
             result[r] += level
             details[str(index)] = {'q': q, 'output': output, 'result': r}
 
-        result['score'] = result['pass'] / (result['pass'] +
-                                            result['fail']) * 100
+        result['score'] = result['pass'] / (result['pass'] + result['fail']) * 100
         result['details'] = details
         final_result = {'Weighted Accuracy': result['score']}
         return final_result
@@ -108,14 +100,11 @@ class hard_GCP_Evaluator(BaseEvaluator):
                 assert '</final_answer>' in xml_string
                 assert '<reasoning>' in xml_string
                 assert '</reasoning>' in xml_string
-                final_answer_start = xml_string.index('<final_answer>') + len(
-                    '<final_answer>')
+                final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
                 final_answer_end = xml_string.index('</final_answer>')
-                reasoning_start = xml_string.index('<reasoning>') + len(
-                    '<reasoning>')
+                reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
                 reasoning_end = xml_string.index('</reasoning>')
-                final_answer_element = xml_string[
-                    final_answer_start:final_answer_end]
+                final_answer_element = xml_string[final_answer_start:final_answer_end]
                 reasoning_element = xml_string[reasoning_start:reasoning_end]
             except Exception:
                 final_answer_element = ''
@@ -134,17 +123,13 @@ class hard_GCP_Evaluator(BaseEvaluator):
             for neighbor in neighbors:
                 try:
                     if answer_colors[vertex] == answer_colors[neighbor]:
-                        print(
-                            f'Invalid coloring: Vertex {vertex} and {neighbor} have the same color.'
-                        )
+                        print(f'Invalid coloring: Vertex {vertex} and {neighbor} have the same color.')
                         return False
                 except:
                     print(f'Invalid input.')  # dealing with hullucination
                     return False
 
-        print(
-            f'Valid coloring found with {len(set(answer_colors.values()))} colors: {answer_colors}'
-        )
+        print(f'Valid coloring found with {len(set(answer_colors.values()))} colors: {answer_colors}')
         return True
 
     def read_dimacs_format(self, dimacs_str):

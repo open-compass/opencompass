@@ -1,5 +1,3 @@
-# flake8: noqa
-# yapf: disable
 import ast
 import json
 import xml.etree.ElementTree as ET
@@ -15,9 +13,7 @@ from ..base import BaseDataset
 from .prompts import tspPrompts
 
 
-def q2text(q,
-           p=tspPrompts
-           ):  # q is the data for the HP-hard question, p is the prompt
+def q2text(q, p=tspPrompts):  # q is the data for the HP-hard question, p is the prompt
     total_cities = q.shape[0]
     prompt_text = p['Intro'] + '\n' \
         + p['Initial_question'].format(total_cities=total_cities) + '\n' \
@@ -27,8 +23,7 @@ def q2text(q,
     for i in range(q.shape[0]):
         for j in range(q.shape[1]):
             if i < j:  # only use the upper triangle
-                this_line = 'The path between City {} and City {} is with distance {}.'.format(
-                    i, j, q.iloc[i, j])
+                this_line = 'The path between City {} and City {} is with distance {}.'.format(i, j, q.iloc[i, j])
                 prompt_text += this_line + '\n'
     return prompt_text
 
@@ -44,10 +39,7 @@ class hard_TSP_Dataset(BaseDataset):
         for level in range(10):
             for file_num in range(10):
                 # read np array
-                df = pd.read_csv(
-                    data_path +
-                    'synthesized_data_TSP_level_{}_instance_{}.csv'.format(
-                        level, file_num + 1),
+                df = pd.read_csv(data_path + 'synthesized_data_TSP_level_{}_instance_{}.csv'.format(level, file_num + 1),
                     header=None,
                     index_col=False)
                 # transform df to
@@ -55,12 +47,9 @@ class hard_TSP_Dataset(BaseDataset):
         for (level, q) in all_data:
             prompt = q2text(q)
             raw_data.append({
-                'prompt':
-                prompt,
-                'q':
-                str(level) + '####\n' + json.dumps(q.to_json()),
-                'level':
-                level
+                'prompt': prompt,
+                'q': str(level) + '####\n' + json.dumps(q.to_json()),
+                'level': level
             })
         dataset = Dataset.from_list(raw_data)
         return dataset
@@ -93,8 +82,7 @@ class hard_TSP_Evaluator(BaseEvaluator):
                 r = 'fail'
             result[r] += level
 
-        result['score'] = result['pass'] / (result['pass'] +
-                                            result['fail']) * 100
+        result['score'] = result['pass'] / (result['pass'] + result['fail']) * 100
         final_result = {'Weighted Accuracy': result['score']}
         return final_result
 
@@ -114,14 +102,11 @@ class hard_TSP_Evaluator(BaseEvaluator):
                 assert '</final_answer>' in xml_string
                 assert '<reasoning>' in xml_string
                 assert '</reasoning>' in xml_string
-                final_answer_start = xml_string.index('<final_answer>') + len(
-                    '<final_answer>')
+                final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
                 final_answer_end = xml_string.index('</final_answer>')
-                reasoning_start = xml_string.index('<reasoning>') + len(
-                    '<reasoning>')
+                reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
                 reasoning_end = xml_string.index('</reasoning>')
-                final_answer_element = xml_string[
-                    final_answer_start:final_answer_end]
+                final_answer_element = xml_string[final_answer_start:final_answer_end]
                 reasoning_element = xml_string[reasoning_start:reasoning_end]
             except:
                 final_answer_element = ''
@@ -142,8 +127,7 @@ class hard_TSP_Evaluator(BaseEvaluator):
 
         # Convert the tour string to a list of integers
         # print(llm_string)
-        final_answer_element, reasoning_element = self.parse_xml_to_dict(
-            llm_string)
+        final_answer_element, reasoning_element = self.parse_xml_to_dict(llm_string)
         # convert solution to dictionary
         if final_answer_element == '':
             return False, ''
@@ -152,23 +136,19 @@ class hard_TSP_Evaluator(BaseEvaluator):
         else:
             if isinstance(final_answer_element, str):
                 try:
-                    tour_string = ast.literal_eval(
-                        final_answer_element)['Path']
+                    tour_string = ast.literal_eval(final_answer_element)['Path']
                     if tour_string is None:
                         return False, ''
                 except Exception:
                     try:
-                        tour_string = ast.literal_eval('{' +
-                                                       final_answer_element +
-                                                       '}')['Path']
+                        tour_string = ast.literal_eval('{' + final_answer_element + '}')['Path']
                         if tour_string is None:
                             return False, ''
                     except Exception:
                         return False, ''
             else:
                 try:
-                    tour_string = ast.literal_eval(
-                        final_answer_element.text)['Path']
+                    tour_string = ast.literal_eval(final_answer_element.text)['Path']
                     if tour_string is None:
                         return False, ''
                 except Exception:
@@ -217,10 +197,8 @@ class hard_TSP_Evaluator(BaseEvaluator):
             unvisited_cities.remove(current_city)
             if unvisited_cities:
                 # Find the nearest unvisited city
-                distances_to_unvisited = distance_matrix[current_city][list(
-                    unvisited_cities)]
-                nearest_city = list(unvisited_cities)[np.argmin(
-                    distances_to_unvisited)]
+                distances_to_unvisited = distance_matrix[current_city][list(unvisited_cities)]
+                nearest_city = list(unvisited_cities)[np.argmin(distances_to_unvisited)]
                 tour.append(nearest_city)
                 # Update the total distance
                 total_distance += distance_matrix[current_city, nearest_city]

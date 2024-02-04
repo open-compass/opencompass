@@ -1,5 +1,3 @@
-# flake8: noqa
-# yapf: disable
 import ast
 import json
 
@@ -25,8 +23,7 @@ def q2text(adj_matrix, distance_limit, p=tsp_dPrompts):
     for i in range(adj_matrix.shape[0]):
         for j in range(adj_matrix.shape[1]):
             if i < j:  # only use the upper triangle
-                this_line = 'The distance between City {} and City {} is {}.'.format(
-                    i, j, adj_matrix[i, j])
+                this_line = 'The distance between City {} and City {} is {}.'.format(i, j, adj_matrix[i, j])
                 prompt_text += this_line + '\n'
     return prompt_text
 
@@ -41,10 +38,7 @@ class cmp_TSP_D_Dataset(BaseDataset):
         all_data = []
         for level in range(10):
             for file_num in range(10):
-                df = pd.read_csv(
-                    data_path +
-                    'decision_data_TSP_level_{}_instance_{}.csv'.format(
-                        level, file_num + 1),
+                df = pd.read_csv(data_path + 'decision_data_TSP_level_{}_instance_{}.csv'.format(level, file_num + 1),
                     header=None,
                     index_col=False)
                 all_data.append((level + 1, df))
@@ -55,12 +49,9 @@ class cmp_TSP_D_Dataset(BaseDataset):
                                      -1].values  # distance matrix is the rest of the rows
             prompt = q2text(distance_matrix, threshold)
             raw_data.append({
-                'prompt':
-                prompt,
-                'q':
-                str(level) + '####\n' + json.dumps(q.to_json()),
-                'level':
-                level
+                'prompt': prompt,
+                'q': str(level) + '####\n' + json.dumps(q.to_json()),
+                'level': level
             })
         dataset = Dataset.from_list(raw_data)
         return dataset
@@ -82,12 +73,10 @@ class cmp_TSP_D_Evaluator(BaseEvaluator):
             q = json.loads(q.split('####\n')[-1])
             q = pd.DataFrame(eval(q))
             threshold = q.iloc[-1, 0]  # therashold is the last row
-            distance_matrix = q.iloc[:
-                                     -1].values  # distance matrix is the rest of the rows
+            distance_matrix = q.iloc[:-1].values  # distance matrix is the rest of the rows
             output_dict['output'] = output
             try:
-                output_dict['correctness'], _ = self.tsp_decision_check(
-                    distance_matrix, threshold, output)
+                output_dict['correctness'], _ = self.tsp_decision_check(distance_matrix, threshold, output)
             except Exception as e:
                 print(f'Check failed: {e}')
                 output_dict['correctness'] = False
@@ -103,8 +92,7 @@ class cmp_TSP_D_Evaluator(BaseEvaluator):
             result[r] += level
             details[str(index)] = {'q': q, 'output': output, 'result': r}
 
-        result['score'] = result['pass'] / (result['pass'] +
-                                            result['fail']) * 100
+        result['score'] = result['pass'] / (result['pass'] + result['fail']) * 100
         result['details'] = details
         final_result = {'Weighted Accuracy': result['score']}
         return final_result
@@ -115,16 +103,12 @@ class cmp_TSP_D_Evaluator(BaseEvaluator):
             assert '</final_answer>' in xml_string
             assert '<reasoning>' in xml_string
             assert '</reasoning>' in xml_string
-            final_answer_start = xml_string.index('<final_answer>') + len(
-                '<final_answer>')
+            final_answer_start = xml_string.index('<final_answer>') + len('<final_answer>')
             final_answer_end = xml_string.index('</final_answer>')
-            reasoning_start = xml_string.index('<reasoning>') + len(
-                '<reasoning>')
+            reasoning_start = xml_string.index('<reasoning>') + len('<reasoning>')
             reasoning_end = xml_string.index('</reasoning>')
-            final_answer_element = xml_string[
-                final_answer_start:final_answer_end].rstrip().strip().rstrip()
-            reasoning_element = xml_string[
-                reasoning_start:reasoning_end].rstrip().strip().rstrip()
+            final_answer_element = xml_string[final_answer_start:final_answer_end].rstrip().strip().rstrip()
+            reasoning_element = xml_string[reasoning_start:reasoning_end].rstrip().strip().rstrip()
             try:
                 final_answer_element = ast.literal_eval(final_answer_element)
             except Exception:
@@ -159,8 +143,7 @@ class cmp_TSP_D_Evaluator(BaseEvaluator):
 
         # Calculate the approxed distance of the tour
         tours = self.tsp_approx(distance_matrix)
-        tour_distance = sum(distance_matrix[tours[i], tours[i + 1]] for i in range(len(tours) - 1)) + \
-                        distance_matrix[tours[-1], tours[0]]
+        tour_distance = sum(distance_matrix[tours[i], tours[i + 1]] for i in range(len(tours) - 1)) + distance_matrix[tours[-1], tours[0]]
 
         if is_feasible != (tour_distance <= threshold):
             return False, f'Feasibility mismatch: {is_feasible} vs {tour_distance} > {threshold}'
