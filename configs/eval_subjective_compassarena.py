@@ -2,9 +2,7 @@ from os import getenv as gv
 from opencompass.models import HuggingFaceCausalLM
 from mmengine.config import read_base
 with read_base():
-    from .models.chatglm.hf_chatglm3_6b_32k import models as chatglm3_6b_32k_model
     from .datasets.subjective.compassarena.compassarena_compare import subjective_datasets
-
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.models.openai_api import OpenAIAllesAPIN
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
@@ -16,23 +14,46 @@ from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import CompassArenaSummarizer
 
-infer = dict(
-    #partitioner=dict(type=NaivePartitioner),
-    partitioner=dict(type=SizePartitioner, strategy='split', max_task_size=10000),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask)),
-)
-
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),
-        dict(role='BOT', api_role='BOT', generate=True),
-    ]
+        dict(role='BOT', api_role='BOT', generate=True)
+    ],
+    reserved_roles=[
+        dict(role='SYSTEM', api_role='SYSTEM'),
+    ],
 )
+
+# -------------Inferen Stage ----------------------------------------
+
+# For subjective evaluation, we often set do sample for models
+models = [
+    dict(
+        type=HuggingFaceChatGLM3,
+        abbr='chatglm3-6b-hf',
+        path='THUDM/chatglm3-6b',
+        tokenizer_path='THUDM/chatglm3-6b',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(
+            do_sample= True,
+        ),
+        meta_template=api_meta_template,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=1,
+        run_cfg=dict(num_gpus=1, num_procs=1)
+    )
+]
+
+datasets = [*subjective_datasets]
 
 gpt4 = dict(
         abbr='gpt4-turbo',
@@ -45,16 +66,21 @@ gpt4 = dict(
         batch_size=4,
         retry=20,
         temperature = 1
+) # Re-inference gpt4's predictions or you can choose to use the pre-commited gpt4's predictions 
+
+infer = dict(
+    partitioner=dict(type=SizePartitioner, strategy='split', max_task_size=10000),
+    runner=dict(
+        type=SlurmSequentialRunner,
+        partition='llm_dev2',
+        quotatype='auto',
+        max_num_workers=256,
+        task=dict(type=OpenICLInferTask)),
 )
-models = [*chatglm3_6b_32k_model]
-datasets = [*subjective_datasets]
 
+# -------------Evalation Stage ----------------------------------------
 
-
-work_dir = 'outputs/compass_arena_debug/'
-
-# -------------Inferen Stage ----------------------------------------
-
+## ------------- JudgeLLM Configuration
 judge_model = dict(
         abbr='GPT4-Turbo',
         type=OpenAI, path='gpt-4-1106-preview',
@@ -76,7 +102,7 @@ eval = dict(
         max_task_size=10000,
         mode='m2n',
         base_models = [gpt4],
-        compare_models = [*chatglm3_6b_32k_model]
+        compare_models = models
     ),
     runner=dict(
         type=SlurmSequentialRunner,
@@ -89,6 +115,7 @@ eval = dict(
         )),
 )
 
+work_dir = 'outputs/compass_arena_debug/'
 
 summarizer = dict(
     type=CompassArenaSummarizer,

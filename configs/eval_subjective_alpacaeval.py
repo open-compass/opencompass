@@ -1,16 +1,7 @@
 from mmengine.config import read_base
 with read_base():
-    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat
-    from .models.qwen.hf_qwen_14b_chat import models as hf_qwen_14b_chat
-    from .models.chatglm.hf_chatglm3_6b import models as hf_chatglm3_6b
-    from .models.baichuan.hf_baichuan2_7b_chat import models as hf_baichuan2_7b
-    from .models.hf_internlm.hf_internlm_chat_7b import models as hf_internlm_chat_7b
-    from .models.hf_internlm.hf_internlm_chat_20b import models as hf_internlm_chat_20b
     from .datasets.subjective.alpaca_eval.alpacav1_judgeby_gpt4 import subjective_datasets as alpacav1
     from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
-
-datasets = [*alpacav2]
-
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
 from opencompass.models.openai_api import OpenAI, OpenAIAllesAPIN
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
@@ -22,8 +13,6 @@ from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import AlpacaSummarizer
 
-models = [*hf_qwen_7b_chat, *hf_chatglm3_6b]
-
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),
@@ -33,6 +22,50 @@ api_meta_template = dict(
         dict(role='SYSTEM', api_role='SYSTEM'),
     ],
 )
+
+# -------------Inferen Stage ----------------------------------------
+
+# For subjective evaluation, we often set do sample for models
+models = [
+    dict(
+        type=HuggingFaceChatGLM3,
+        abbr='chatglm3-6b-hf',
+        path='THUDM/chatglm3-6b',
+        tokenizer_path='THUDM/chatglm3-6b',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(
+            do_sample= True,
+        ),
+        meta_template=api_meta_template,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=1,
+        run_cfg=dict(num_gpus=1, num_procs=1)
+    )
+]
+
+datasets = [*alpacav2]
+
+gpt4 = dict(
+        abbr='gpt4-turbo',
+        type=OpenAI, path='gpt-4-1106-preview',
+        key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+        meta_template=api_meta_template,
+        query_per_second=1,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=4,
+        retry=20,
+        temperature = 1
+) # Re-inference gpt4's predictions or you can choose to use the pre-commited gpt4's predictions 
 
 infer = dict(
     partitioner=dict(type=NaivePartitioner),
@@ -44,6 +77,9 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
+# -------------Evalation Stage ----------------------------------------
+
+## ------------- JudgeLLM Configuration
 judge_model = dict(
         abbr='GPT4-Turbo',
         type=OpenAI, path='gpt-4-1106-preview',
@@ -57,13 +93,14 @@ judge_model = dict(
         temperature = 0
 )
 
+## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
         type=SubjectiveSizePartitioner,
         max_task_size=1000,
         mode='m2n',
-        base_models = [*hf_chatglm3_6b],
-        compare_models = [*hf_qwen_7b_chat]
+        base_models = [gpt4],
+        compare_models = models
     ),
     runner=dict(
         type=SlurmSequentialRunner,
