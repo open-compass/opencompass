@@ -50,4 +50,4 @@ class IFEvaluator(BaseEvaluator):
         loose = sum(
             [result['loose'].follow_all_instructions
              for result in results]) / len(results)
-        return dict(strict_acc=strict, loose_acc=loose)
+        return dict(strict_acc=strict * 100, loose_acc=loose * 100)

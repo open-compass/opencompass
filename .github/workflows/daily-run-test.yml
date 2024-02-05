@@ -1,41 +1,41 @@
-name: pr_run_test
+name: daily_run_test
 
 on:
-  pull_request:
-    paths-ignore:
-      - 'README.md'
-      - 'README_zh-CN.md'
-      - 'docs/**'
-      - 'configs/**'
-      - 'tools/**'
-
   workflow_dispatch:
   schedule:
-    - cron:  '56 22 * * *'
+    - cron:  '56 16 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  CONDA_ENV: opencompass_base
+  CONDA_ENV: opencompass_regression
+  PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
   USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
 
 jobs:
-  pr_run_test:
+  daily_run_test:
     runs-on: self-hosted
     environment: 'prod'
-    timeout-minutes: 30
+    timeout-minutes: 240 #4hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
-      - name: Prepare - Install opencompass
+      - name: Prepare - create conda env and install torch
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda create -y --name ${{env.CONDA_ENV}} python=3.10
+          conda activate ${{env.CONDA_ENV}}
+          pip install torch torchvision torchaudio --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          conda info --envs
+      - name: Prepare - Pip install code
         run: |
           eval "$(conda shell.bash hook)"
           conda activate ${{env.CONDA_ENV}}
-          python3 -m pip uninstall opencompass -y
-          python3 -m pip install -e . --cache-dir ${{env.USERSPACE_PREFIX}}/.cache/pip
+          pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install human_eval transformers==4.33.0 --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
       - name: Prepare - prepare data and hf model
         run: |
@@ -48,29 +48,23 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          rm -rf regression_result
-          python3 run.py --models hf_internlm_chat_7b --datasets siqa_gen --work-dir regression_result --debug
+          rm -rf regression_result_daily
+          export from_tf=TRUE
+          python3 run.py --models hf_internlm_chat_7b hf_internlm_7b --datasets FewCLUE_chid_ppl humaneval_gen ARC_c_ppl --work-dir regression_result_daily --debug
       - name:  Get result
         run: |
-          score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 70 && ${score%.*} <= 75 )); then
-             echo "score is $score between 70 and 75"
-          else
-             echo "score is $score not between 70 and 75"
-             exit 1
-          fi
-          rm -rf regression_result
-      - name:  Uninstall opencompass
+          pip install pytest --cache-dir ${{env.PIP_CACHE_PATH}}
+          pytest -s -v --color=yes .github/scripts/oc_score_assert.py
+      - name:  Remove Conda Env
         if: always()
         run: |
           eval "$(conda shell.bash hook)"
-          conda activate ${{env.CONDA_ENV}}
-          python3 -m pip uninstall opencompass -y
+          conda env remove --name ${{env.CONDA_ENV}}
           conda info --envs
 
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
-    needs: [pr_run_test]
+    needs: [daily_run_test]
     environment: 'prod'
     timeout-minutes: 5
     runs-on: self-hosted

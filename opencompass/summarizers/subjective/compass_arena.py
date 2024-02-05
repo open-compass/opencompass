@@ -35,7 +35,7 @@ def check_position_bias(judged_answers, references, banned_choice=['C']):
     position_bias_flag = 0
     position_bias_dict = {}
     for judge, ref in zip(judged_answers, references):
-        question = ref['others']['question']
+        question = ref['question']
         question_hash = hash(question)
         if question_hash not in position_bias_dict:
             position_bias_dict[question_hash] = {
@@ -58,7 +58,11 @@ class CompassArenaSummarizer:
             It's expected to be filled out at runtime.
     """
 
-    def __init__(self, config: ConfigDict, judge_type='general') -> None:
+    def __init__(self,
+                 config: ConfigDict,
+                 judge_type='general',
+                 check_pos_bias=True,
+                 summary_type='single') -> None:
         self.tasks = []
         self.cfg = config
         self.base_models = self.cfg['eval']['partitioner']['base_models']
@@ -70,10 +74,13 @@ class CompassArenaSummarizer:
             'general': post_process_compass_arena,
         }
         self.judge_function = self.judge_map[self.judge_type]
+        self.check_pos_bias = check_pos_bias
+        self.summary_type = summary_type
 
-    def summarize(self,
-                  time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S'),
-                  check_pos_bias=True):
+    def summarize(
+            self,
+            time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S'),
+    ):
         """Summarize the subjectivity analysis based on evaluation results.
 
         Args:
@@ -88,25 +95,25 @@ class CompassArenaSummarizer:
             product(self.base_models, self.compare_models))
         unique_combinations = remove_duplicate_pairs(
             [combo for combo in model_combinations if combo[0] != combo[1]])
+        judge_model = self.judge_abbr
         fout_list = []
-        for model_pair in unique_combinations:
-            model1, model2, judge_model = model_pair[0]['abbr'], model_pair[1][
-                'abbr'], self.judge_abbr
-            subdir = model1 + '_' + model2 + '_judged-by--' + self.judge_abbr
-            subdir_path = os.path.join(results_folder, subdir)
-            if os.path.isdir(subdir_path):
-                for dataset in dataset_cfgs:
-                    dataset_abbr = dataset_abbr_from_cfg(dataset)
-                    fout = osp.join(
-                        output_dir, 'judged-by--' + judge_model + '-' +
-                        dataset_abbr + '-report.csv')
-                    fout_list.append(fout)
+        for dataset in dataset_cfgs:
+            dataset_abbr = dataset_abbr_from_cfg(dataset)
+            fout = osp.join(
+                output_dir, 'judged-by--' + judge_model + '-' + dataset_abbr +
+                '-report.csv')
+            fout_list.append(fout)
+            for model_pair in unique_combinations:
+                model1, model2, = model_pair[0]['abbr'], model_pair[1]['abbr'],
+                subdir = model1 + '_' + model2 + '_judged-by--' + judge_model
+                subdir_path = os.path.join(results_folder, subdir)
+                if os.path.isdir(subdir_path):
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset,
                         subdir_path,
                         self.judge_function,
                     )
-                    if check_pos_bias:
+                    if self.check_pos_bias:
                         bias_num = check_position_bias(judged_answers,
                                                        references)
                     else:
@@ -117,24 +124,47 @@ class CompassArenaSummarizer:
                         'answer2']
                     for prediction, reference in zip(judged_answers,
                                                      references):
-                        if dataset_abbr == 'qa':
-                            reference['capability'] = 'QA'
-                        categories['total'] += 1
-                        categories[reference['capability']] += 1
-                        if prediction == 'A':
-                            if reference['answer1'] == model1:
-                                win_model1[reference['capability']] += 1
-                                win_model1['total'] += 1
-                            else:
-                                win_model2[reference['capability']] += 1
-                                win_model2['total'] += 1
-                        elif prediction == 'B':
-                            if reference['answer1'] == model1:
-                                win_model2[reference['capability']] += 1
-                                win_model2['total'] += 1
-                            else:
-                                win_model1[reference['capability']] += 1
-                                win_model1['total'] += 1
+                        if self.summary_type == 'single':
+                            if prediction == 'A':
+                                categories['total'] += 1
+                                categories[reference['capability']] += 1
+                                if reference['answer1'] == model1:
+                                    win_model1[reference['capability']] += 1
+                                    win_model1['total'] += 1
+                                else:
+                                    win_model2[reference['capability']] += 1
+                                    win_model2['total'] += 1
+                            elif prediction == 'B':
+                                categories['total'] += 1
+                                categories[reference['capability']] += 1
+                                if reference['answer1'] == model1:
+                                    win_model2[reference['capability']] += 1
+                                    win_model2['total'] += 1
+                                else:
+                                    win_model1[reference['capability']] += 1
+                                    win_model1['total'] += 1
+                        elif self.summary_type == 'half_add':
+                            categories['total'] += 1
+                            categories[reference['capability']] += 1
+                            if prediction == 'A':
+                                if reference['answer1'] == model1:
+                                    win_model1[reference['capability']] += 1
+                                    win_model1['total'] += 1
+                                else:
+                                    win_model2[reference['capability']] += 1
+                                    win_model2['total'] += 1
+                            elif prediction == 'B':
+                                if reference['answer1'] == model1:
+                                    win_model2[reference['capability']] += 1
+                                    win_model2['total'] += 1
+                                else:
+                                    win_model1[reference['capability']] += 1
+                                    win_model1['total'] += 1
+                            elif prediction == 'C':
+                                win_model1[reference['capability']] += 0.5
+                                win_model1['total'] += 0.5
+                                win_model2[reference['capability']] += 0.5
+                                win_model2['total'] += 0.5
                     for capability in categories:
                         if capability not in win_model1:
                             win_model1[capability] = 0.0
@@ -166,8 +196,8 @@ class CompassArenaSummarizer:
                             writer.writerow(
                                 [row] +
                                 [scores[row][column] for column in columns])
-            else:
-                print(subdir_path + ' is not exist! please check!')
+                else:
+                    print(subdir_path + ' is not exist! please check!')
         for fout in fout_list:
             with open(fout, 'r') as f:
                 x = from_csv(f)

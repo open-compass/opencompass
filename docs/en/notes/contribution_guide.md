@@ -12,6 +12,7 @@
     - [6.  Merge your branch to `main` branch and delete the branch](#6--merge-your-branch-to-main-branch-and-delete-the-branch)
   - [Code style](#code-style)
     - [Python](#python)
+  - [About Contributing Test Datasets](#about-contributing-test-datasets)
 
 Thanks for your interest in contributing to OpenCompass! All kinds of contributions are welcome, including but not limited to the following.
 
@@ -137,3 +138,21 @@ We use the following tools for linting and formatting:
 - [docformatter](https://github.com/myint/docformatter): A formatter to format docstring.
 
 Style configurations of yapf and isort can be found in [setup.cfg](https://github.com/open-mmlab/OpenCompass/blob/main/setup.cfg).
+
+## About Contributing Test Datasets
+
+- Submitting Test Datasets
+  - Please implement logic for automatic dataset downloading in the code; or provide a method for obtaining the dataset in the PR. The OpenCompass maintainers will follow up accordingly. If the dataset is not yet public, please indicate so.
+- Submitting Data Configuration Files
+- Provide a README in the same directory as the data configuration. The README should include, but is not limited to:
+  - A brief description of the dataset
+  - The official link to the dataset
+  - Some test examples from the dataset
+  - Evaluation results of the dataset on relevant models
+  - Citation of the dataset
+- (Optional) Summarizer of the dataset
+- (Optional) If the testing process cannot be achieved simply by concatenating the dataset and model configuration files, a configuration file for conducting the test is also required.
+- (Optional) If necessary, please add a description of the dataset in the relevant documentation sections. This is very necessary to help users understand the testing scheme. You can refer to the following types of documents in OpenCompass:
+  - [Circular Evaluation](../advanced_guides/circular_eval.md)
+  - [Code Evaluation](../advanced_guides/code_eval.md)
+  - [Contamination Assessment](../advanced_guides/contamination_eval.md)

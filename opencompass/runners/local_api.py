@@ -28,6 +28,7 @@ def monkey_run(self, tokens: SyncManager.Semaphore):
     self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
     for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
         self.max_out_len = model_cfg.get('max_out_len', None)
+        self.min_out_len = model_cfg.get('min_out_len', None)
         self.batch_size = model_cfg.get('batch_size', None)
         self.model = build_model_from_cfg(model_cfg)
         # add global tokens for concurrents

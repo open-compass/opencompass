@@ -23,6 +23,14 @@ internlm_meta_template = dict(round=[
 ],
                               eos_token_id=103028)
 
+internlm2_meta_template = dict(
+    round=[
+        dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
+        dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
+    ],
+    eos_token_id=92542
+)
+
 # config for internlm-chat-7b
 internlm_chat_7b = dict(
     type=TurboMindModel,
@@ -41,6 +49,28 @@ internlm_chat_7b = dict(
     concurrency=32,
     meta_template=internlm_meta_template,
     run_cfg=dict(num_gpus=1, num_procs=1),
+    end_str='<eoa>',
+)
+
+# config for internlm-chat-7b
+internlm2_chat_7b = dict(
+    type=TurboMindModel,
+    abbr='internlm2-chat-7b-turbomind',
+    path='internlm/internlm2-chat-7b',
+    engine_config=dict(session_len=2048,
+                       max_batch_size=32,
+                       rope_scaling_factor=1.0),
+    gen_config=dict(top_k=1,
+                    top_p=0.8,
+                    temperature=1.0,
+                    max_new_tokens=100),
+    max_out_len=100,
+    max_seq_len=2048,
+    batch_size=32,
+    concurrency=32,
+    meta_template=internlm2_meta_template,
+    run_cfg=dict(num_gpus=1, num_procs=1),
+    end_str='<|im_end|>'
 )
 
 # config for internlm-chat-20b
@@ -61,6 +91,7 @@ internlm_chat_20b = dict(
     concurrency=8,
     meta_template=internlm_meta_template,
     run_cfg=dict(num_gpus=1, num_procs=1),
+    end_str='<eoa>',
 )
 
 models = [internlm_chat_20b]
