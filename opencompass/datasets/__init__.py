@@ -70,6 +70,7 @@ from .multirc import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403
 from .natural_question_cn import *  # noqa: F401, F403
+from .NPHardEval import *  # noqa: F401, F403
 from .obqa import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
