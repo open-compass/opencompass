@@ -6,8 +6,11 @@ import yaml
 
 output_path = 'regression_result_daily'
 
-model_list = ['internlm-7b-hf', 'internlm-chat-7b-hf']
-dataset_list = ['ARC-c', 'chid-dev', 'chid-test', 'openai_humaneval']
+model_list = ['internlm-7b-hf', 'internlm-chat-7b-hf', 'chatglm3-6b-base-hf']
+dataset_list = [
+    'ARC-c', 'chid-dev', 'chid-test', 'openai_humaneval', 'openbookqa',
+    'openbookqa_fact'
+]
 
 
 @pytest.fixture()
@@ -34,8 +37,8 @@ class TestChat:
 
     @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in model_list
                                                 for p2 in dataset_list])
-    def test_demo_default(self, baseline_scores, result_scores, model,
-                          dataset):
+    def test_model_dataset_score(self, baseline_scores, result_scores, model,
+                                 dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(result_score, base_score)
