@@ -91,6 +91,7 @@ from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
 from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
+from .teval import *  # noqa: F401, F403
 from .TheoremQA import *  # noqa: F401, F403
 from .tnews import *  # noqa: F401, F403
 from .triviaqa import *  # noqa: F401, F403

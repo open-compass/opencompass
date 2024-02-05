@@ -193,6 +193,7 @@ class SenseTime(BaseAPIModel):
                     time.sleep(1)
                     continue
 
+        return ''
         raise RuntimeError(
             f'request id: '
             f'{raw_response.headers.get("X-Request-Id")}, {raw_response.text}')

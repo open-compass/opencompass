@@ -30,12 +30,17 @@ class NumWorkerPartitioner(BasePartitioner):
                  out_dir: str,
                  num_worker: int = 8,
                  min_task_size: int = 16,
+                 strategy: str = 'heuristic',
                  dataset_size_path: str = '.cache/dataset_size.json',
                  keep_keys: Optional[List[str]] = None):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
         self.num_worker = num_worker
         self.min_task_size = min_task_size
         self.dataset_size_path = dataset_size_path
+        assert strategy in ('heuristic', 'split'), \
+            f'Unsupported partition strategy: {strategy}. '\
+            'Supported strategies are: `heuristic`, `split` .'
+        self.strategy = strategy
 
     def partition(self,
                   model_dataset_combinations: List[Dict[str, List]],
@@ -64,16 +69,26 @@ class NumWorkerPartitioner(BasePartitioner):
                     else:
                         chunks.append(dataset)
 
-                buckets = [[] for _ in range(self.num_worker)]
-                for i, chunk in enumerate(chunks):
-                    buckets[i % self.num_worker].append(chunk)
+                if self.strategy == 'heuristic':
+                    buckets = [[] for _ in range(self.num_worker)]
+                    for i, chunk in enumerate(chunks):
+                        buckets[i % self.num_worker].append(chunk)
 
-                for bucket in buckets:
-                    if len(bucket) > 0:
+                    for bucket in buckets:
+                        if len(bucket) > 0:
+                            tasks.append(
+                                Config({
+                                    'models': [model],
+                                    'datasets': [bucket],
+                                    'work_dir': work_dir,
+                                    **add_cfg
+                                }))
+                elif self.strategy == 'split':
+                    for dataset in chunks:
                         tasks.append(
                             Config({
                                 'models': [model],
-                                'datasets': [bucket],
+                                'datasets': [[dataset]],
                                 'work_dir': work_dir,
                                 **add_cfg
                             }))
