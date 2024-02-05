@@ -53,7 +53,7 @@ jobs:
   build_cu117:
     runs-on: ubuntu-22.04
     container:
-      image: pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
+      image: nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04
     strategy:
       matrix:
         python-version: ['3.10']
