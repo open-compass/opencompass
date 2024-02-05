@@ -1,4 +1,5 @@
 from mmengine.config import read_base
+
 with read_base():
     from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import subjective_datasets
 
@@ -18,7 +19,7 @@ api_meta_template = dict(
     ]
 )
 
-# -------------Inferen Stage ----------------------------------------
+# -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
 models = [
     dict(
@@ -36,13 +37,13 @@ models = [
             trust_remote_code=True,
         ),
         generation_kwargs=dict(
-            do_sample= True,
+            do_sample=True,
         ),
         meta_template=api_meta_template,
         max_out_len=2048,
         max_seq_len=4096,
         batch_size=1,
-        run_cfg=dict(num_gpus=1, num_procs=1)
+        run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
 
@@ -55,46 +56,37 @@ infer = dict(
         partition='llmeval',
         quotatype='auto',
         max_num_workers=256,
-        task=dict(type=OpenICLInferTask)),
+        task=dict(type=OpenICLInferTask),
+    ),
 )
 
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
 judge_model = dict(
-        type=HuggingFaceCausalLM,
-        abbr='pandalm-7b-v1-hf',
-        path="WeOpenML/PandaLM-7B-v1",
-        tokenizer_path='WeOpenML/PandaLM-7B-v1',
-        tokenizer_kwargs=dict(padding_side='left',
-                              truncation_side='left',
-                              trust_remote_code=True,
-                              use_fast=False,),
-        max_out_len=512,
-        max_seq_len=2048,
-        batch_size=8,
-        model_kwargs=dict(device_map='auto', trust_remote_code=True),
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
+    type=HuggingFaceCausalLM,
+    abbr='pandalm-7b-v1-hf',
+    path='WeOpenML/PandaLM-7B-v1',
+    tokenizer_path='WeOpenML/PandaLM-7B-v1',
+    tokenizer_kwargs=dict(
+        padding_side='left',
+        truncation_side='left',
+        trust_remote_code=True,
+        use_fast=False,
+    ),
+    max_out_len=512,
+    max_seq_len=2048,
+    batch_size=8,
+    model_kwargs=dict(device_map='auto', trust_remote_code=True),
+    run_cfg=dict(num_gpus=1, num_procs=1),
+)
 
 ## ------------- Evaluation Configuration
 eval = dict(
-    partitioner=dict(
-        type=SubjectiveNaivePartitioner,
-        mode='singlescore',
-        models = models
-    ),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=2,
-        task=dict(
-            type=SubjectiveEvalTask,
-            judge_cfg=judge_model
-        )),
+    partitioner=dict(type=SubjectiveNaivePartitioner, mode='singlescore', models=models),
+    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model)),
 )
 
-summarizer = dict(
-    type=AlignmentBenchSummarizer,
-)
+summarizer = dict(type=AlignmentBenchSummarizer)
 
 work_dir = 'outputs/pandalm'
