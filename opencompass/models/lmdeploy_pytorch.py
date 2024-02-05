@@ -160,4 +160,9 @@ class LmdeployPytorchModel(BaseModel):
             response_size += len(response_cur)
         if hasattr(generator, 'end'):
             generator.end(session_id)
+
+        # used to trim
+        if end_str:
+            response_all = response_all.split(end_str)[0]
+
         return response_all
