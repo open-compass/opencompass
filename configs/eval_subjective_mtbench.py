@@ -2,7 +2,6 @@ from mmengine.config import read_base
 
 with read_base():
     from .datasets.subjective.multiround.mtbench_single_judge import subjective_datasets
-
     # from .datasets.subjective.multiround.mtbench_pair_judge import subjective_datasets
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
@@ -54,10 +53,10 @@ models = [
 datasets = [*subjective_datasets]
 
 infer = dict(
-    partitioner=dict(type=SizePartitioner, max_task_size=100),
+    partitioner=dict(type=SizePartitioner, max_task_size=10000),
     runner=dict(
         type=SlurmSequentialRunner,
-        partition='llmeval',
+        partition='llm_dev2',
         quotatype='auto',
         max_num_workers=256,
         task=dict(type=OpenICLInferTask),
@@ -70,7 +69,7 @@ infer = dict(
 judge_model = dict(
     abbr='GPT4-Turbo',
     type=OpenAIAllesAPIN,
-    path='gpt-4-0613',
+    path='gpt-4-0613', # To compare with the official leaderboard, please use gpt4-0613
     key='xxxx',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
     url='xxxx',
     meta_template=api_meta_template,
@@ -95,7 +94,7 @@ judge_model = dict(
 
 ## single evaluation
 eval = dict(
-    partitioner=dict(type=SubjectiveSizePartitioner, max_task_size=100, mode='singlescore', models=models),
+    partitioner=dict(type=SubjectiveSizePartitioner, max_task_size=10000, mode='singlescore', models=models),
     runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model)),
 )
 

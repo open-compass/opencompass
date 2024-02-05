@@ -17,11 +17,10 @@ except ImportError:
 from opencompass.utils import model_abbr_from_cfg
 
 from .compass_arena import CompassArenaSummarizer
-from .subjective_post_process import post_process_autoj
 from .utils import get_judgeanswer_and_reference, get_outdir
 
 
-def post_process_mtbench(judgement: str):
+def post_process_mtbench_pair(judgement: str):
     """Input a string like below:
 
     xxx[[A]]xxx, and extract the judge
@@ -32,6 +31,20 @@ def post_process_mtbench(judgement: str):
         return matched_result[0]
     else:
         return None
+
+
+def post_process_mtbench_single(judgement: str):
+    """Input a string like below:
+
+    xxx[[5]]xxx, and extract the score
+    """
+    pattern = r'Rating:\s*\[\[([\d.]+)\]\]'
+    matched_result = re.findall(pattern, judgement)
+    if matched_result:
+        score = float(matched_result[0])
+    else:
+        return None
+    return {'score': score}
 
 
 def get_capability_results(
@@ -87,8 +100,8 @@ class MTBenchSummarizer(CompassArenaSummarizer):
                 'compare_models']
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
         self.judge_map = {
-            'single': post_process_autoj,
-            'pair': post_process_mtbench
+            'single': post_process_mtbench_single,
+            'pair': post_process_mtbench_pair
         }
         self.judge_function = self.judge_map[self.judge_type]
 
