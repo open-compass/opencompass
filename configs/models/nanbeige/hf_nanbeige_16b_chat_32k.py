@@ -19,16 +19,16 @@ models = [
             torch_dtype='auto',
         ),
         tokenizer_kwargs=dict(
-            padding_side='right',
+            padding_side='left',
             truncation_side='left',
             trust_remote_code=True,
             use_fast=False,
         ),
         meta_template=_meta_template,
-        batch_padding=False,
-        max_out_len=1024,
-        max_seq_len=8192,
+        max_out_len=100,
+        max_seq_len=2048,
         batch_size=8,
-        run_cfg=dict(num_gpus=1, num_procs=1),
+        run_cfg=dict(num_gpus=2, num_procs=1),
+        end_str='</s>',
     )
 ]

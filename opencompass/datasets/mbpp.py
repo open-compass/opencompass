@@ -263,9 +263,12 @@ class MBPPEvaluator(BaseEvaluator):
     def _process_answer(self, text):
         try:
             # for chatGLM related text
-            text = eval(text)
+            eval_text = eval(text)
         except Exception:
             pass
+        else:
+            if isinstance(eval_text, str):
+                text = eval_text
         # deal with code block
         if '```' in text:
             blocks = re.findall(r'```(.*?)```', text, re.DOTALL)

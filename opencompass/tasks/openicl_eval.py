@@ -67,8 +67,10 @@ class OpenICLEvalTask(BaseTask):
 
     def __init__(self, cfg: ConfigDict):
         super().__init__(cfg)
-        self.num_gpus = 0
         self.logger = get_logger()
+        self.num_gpus = max(
+            c.get('eval_cfg', {}).get('num_gpus', 0)
+            for c in sum(self.dataset_cfgs, []))
         self.dump_details = cfg.get('eval', {}).get('runner', {}).get(
             'task', {}).get('dump_details', False)
 

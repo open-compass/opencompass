@@ -83,7 +83,6 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'([{options}])\s?是正确答案',
         f'选项\s?([{options}])\s?正确',
         f'所以答\s?([{options}])',
-        f'1.\s?([{options}])[.。$]?$',
         f'所以\s?([{options}][.。$]?$)',
         f'所有\s?([{options}][.。$]?$)',
         f'[\s，：:,]([{options}])[。，,\.]?$',
@@ -105,6 +104,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'(\s|^)[{options}][\s。，,：:\.$]',
         f'(\s|^)[{options}](\s|$)',
         f'1.\s?(.*?)$',
+        f'1.\s?([{options}])[.。$]?$',
     ]
     cushion_patterns = [
         f'([{options}]):',

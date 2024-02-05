@@ -119,6 +119,8 @@ class ZhiPuV2AI(BaseAPIModel):
         while max_num_retries < self.retry:
             self.acquire()
 
+            response = None
+
             try:
                 response = self.client.chat.completions.create(**data)
             except APIStatusError as err:

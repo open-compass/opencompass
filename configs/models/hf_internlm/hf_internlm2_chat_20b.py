@@ -4,7 +4,6 @@ from opencompass.models import HuggingFaceCausalLM
 _meta_template = dict(
     round=[
         dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
-        dict(role='SYSTEM', begin='<|im_start|>system\n', end='<|im_end|>\n'),
         dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
     ],
     eos_token_id=92542

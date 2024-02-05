@@ -33,7 +33,7 @@ def gsm8k_dataset_postprocess(text: str) -> str:
 
 @TEXT_POSTPROCESSORS.register_module('gsm8k')
 def gsm8k_postprocess(text: str) -> str:
-    text = text.split('\n\n')[0]
+    text = text.split('Question:')[0]
     text = text.split(' ')[::-1]
     flag = False
     ret = ''
