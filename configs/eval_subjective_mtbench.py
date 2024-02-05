@@ -66,12 +66,12 @@ infer = dict(
 ## ------------- JudgeLLM Configuration
 judge_model = dict(
         abbr='GPT4-Turbo',
-        type=OpenAIAllesAPIN, path='gpt-4-1106-preview',
+        type=OpenAIAllesAPIN, path='gpt-4-0613',
         key='xxxx',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
         url='xxxx',
         meta_template=api_meta_template,
         query_per_second=16,
-        max_out_len=2048,
+        max_out_len=1024,
         max_seq_len=2048,
         batch_size=8,
         temperature = 0
@@ -85,13 +85,11 @@ eval = dict(
         type=SubjectiveSizePartitioner, 
         max_task_size=100,
         mode='m2n',
-        base_models = [*hf_chatglm3_6b, ],
+        base_models = [gpt4],
         compare_models = models
     ),
     runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
+        type=LocalRunner,
         max_num_workers=32,
         task=dict(
             type=SubjectiveEvalTask,
@@ -114,9 +112,7 @@ eval = dict(
         models = models
     ),
     runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
+        type=LocalRunner,
         max_num_workers=32,
         task=dict(
             type=SubjectiveEvalTask,
