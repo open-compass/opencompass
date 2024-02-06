@@ -146,23 +146,22 @@ class LmdeployPytorchModel(BaseModel):
         assert type(
             prompt) is str, 'We only support string for TurboMind Python API'
         input_ids = self.tokenizer.encode(prompt)
-        response_size = 0
+        _, output_ids, _ = generator.infer(session_id,
+                                           input_ids,
+                                           gen_config=gen_config)
+        if end_str:
+            end_id = self.tokenizer.encode(end_str)[0]
+            try:
+                idx = output_ids.index(end_id)
+                output_ids = output_ids[:idx]
+            except ValueError:
+                # not exists
+                pass
 
-        for outputs in generator.stream_infer(session_id=session_id,
-                                              input_ids=input_ids,
-                                              gen_config=gen_config,
-                                              request_output_len=max_out_len,
-                                              step=0):
-            status, res, tokens = outputs
-            response_all = self.tokenizer.decode(res)
-            response_cur = response_all[response_size:]
-            response_all = valid_str(response_all)
-            response_size += len(response_cur)
+        # stop engine
         if hasattr(generator, 'end'):
             generator.end(session_id)
-
-        # used to trim
-        if end_str:
-            response_all = response_all.split(end_str)[0]
-
+        # decode output
+        response_all = self.tokenizer.decode(output_ids)
+        response_all = valid_str(response_all)
         return response_all
