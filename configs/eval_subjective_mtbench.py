@@ -17,6 +17,7 @@ from opencompass.summarizers import MTBenchSummarizer
 
 api_meta_template = dict(
     round=[
+        dict(role='SYSTEM', api_role='SYSTEM'),
         dict(role='HUMAN', api_role='HUMAN'),
         dict(role='BOT', api_role='BOT', generate=True),
     ]
@@ -74,7 +75,7 @@ judge_model = dict(
     url='xxxx',
     meta_template=api_meta_template,
     query_per_second=16,
-    max_out_len=1024,
+    max_out_len=2048,
     max_seq_len=2048,
     batch_size=8,
     temperature=0,
