@@ -102,7 +102,6 @@ class LmdeployPytorchModel(BaseModel):
                         self.generators[:len(batch_input)],
                         self.generator_ids[:len(batch_input)],
                         batch_input,
-                        [max_out_len] * len(batch_input),
                         [self.gen_config] * len(batch_input),
                         [self.end_str] * len(batch_input),
                     ))
@@ -124,7 +123,6 @@ class LmdeployPytorchModel(BaseModel):
                   generator,
                   session_id,
                   prompt: str or PromptList,
-                  max_out_len: int,
                   gen_config=None,
                   end_str: Optional[str] = None) -> str:
         """Generate results given a list of inputs.
@@ -133,7 +131,6 @@ class LmdeployPytorchModel(BaseModel):
             prompt (str or PromptList): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
-            max_out_len (int): The maximum length of the output.
             gen_config (EngineGenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
             end_str (str, optional): Whether to trim generated strings
@@ -149,19 +146,14 @@ class LmdeployPytorchModel(BaseModel):
         _, output_ids, _ = generator.infer(session_id,
                                            input_ids,
                                            gen_config=gen_config)
-        if end_str:
-            end_id = self.tokenizer.encode(end_str)[0]
-            try:
-                idx = output_ids.index(end_id)
-                output_ids = output_ids[:idx]
-            except ValueError:
-                # not exists
-                pass
-
         # stop engine
         if hasattr(generator, 'end'):
             generator.end(session_id)
         # decode output
         response_all = self.tokenizer.decode(output_ids)
+        # trim output
+        if end_str:
+            response_all = response_all.split(end_str)[0]
+        # remove invalid characters
         response_all = valid_str(response_all)
         return response_all
