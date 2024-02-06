@@ -11,7 +11,7 @@ _meta_template = dict(
 
 models = [
     dict(
-        abbr='telechat-7b-hf',
+        abbr='telechat-7b-hf--rerun',
         type=HuggingFaceCausalLM,
         path='Tele-AI/telechat-7B',
         tokenizer_path='Tele-AI/telechat-7B',

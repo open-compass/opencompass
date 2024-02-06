@@ -29,6 +29,62 @@ All_Dimensions = [
     '公平与可负责程度', '丰富度', '综合得分'
 ]
 
+MAPPING = {
+    '事实与解释型回答': ['事实正确性', '满足用户需求', '清晰度', '完备性'],
+    '逻辑推理型回答': ['事实正确性', '满足用户需求', '逻辑连贯性', '完备性'],
+    '生成型回答': ['事实正确性', '满足用户需求', '逻辑连贯性', '创造性', '丰富度'],
+    '建议型回答': ['事实正确性', '满足用户需求', '公平与可负责程度', '创造性']
+}
+
+
+def detect_mapping(text):
+    if '清晰度' in text and '完备性' in text:
+        return '事实与解释型回答'
+    elif '完备性' in text and '逻辑连贯性' in text:
+        return '逻辑推理型回答'
+    elif '创造性' in text and '丰富度' in text:
+        return '生成型回答'
+    elif '创造性' in text and '公平与可负责程度' in text:
+        return '建议型回答'
+    else:
+        return None
+
+
+def extract_missing_rating(text, search_type):
+    searching_keys = MAPPING[search_type]
+    result_dict = {}
+    for k in searching_keys:
+        matches = re.findall(rf'{k}.*?\n', text)
+        result_dict[k] = None
+        for match in reversed(matches):
+            if re.findall(r'\d{1,2}', match):
+                result_dict[k] = int(re.findall(r'\d{1,2}', match)[-1])
+                break
+    overall_number = re.findall('\d{1,2}', text)
+    try:
+        result_dict['综合得分'] = int(overall_number[-1])
+    except:
+        return {}
+    return result_dict
+
+
+def extract_rating_plus(text):
+    pattern = r'{(.*?)}(?![^{]*{)'  # match last brackets
+    match = re.search(pattern, text)
+
+    if match:
+        dictionary_str = match.group(1)
+        kv_pattern = r"'(.*?)': (\d+)"
+        matches = re.findall(kv_pattern, dictionary_str)
+        result_dict = {key: int(value) for key, value in matches}
+        return result_dict
+    else:
+        match_type = detect_mapping(text=text)
+        if match_type is not None:
+            return extract_missing_rating(text=text, search_type=match_type)
+        else:
+            return None
+
 
 def extract_rating(text):
     pattern = r'{(.*?)}(?![^{]*{)'  # match last brackets
@@ -54,6 +110,50 @@ def check_rating(rating, all_dimensions):
         else:
             return None
     return rating
+
+
+def post_process_alignbench_plus(judgement: str,
+                                 all_dimensions=All_Dimensions,
+                                 possible_keys=['综合得分']):
+    """Input a string like below:
+
+    xxx{'事实正确性': 1, '满足用户需求': 1, '清晰度': 2, '完备性': 1, '综合得分': 1}xxx,
+    and extract each score
+    """
+
+    def extract_score(text):
+        keys_pattern = '|'.join(map(re.escape, possible_keys))
+        pattern = rf"({'|'.join(possible_keys)}): (\d+(\.\d{{1,2}})?)"
+        match = re.search(pattern, text)
+        if match:
+            try:
+                return float(match.group(1))
+            except ValueError:
+                return -1
+        return -1
+
+    # judgement = judgement.replace('\n', '')
+    rating = extract_rating_plus(judgement)
+
+    if rating is not None:
+        score = -1
+        for key in possible_keys:
+            score = rating.get(key, -1)
+            if score != -1:
+                break
+        if score == -1:
+            score = extract_score(judgement)
+        if score >= 0 and score <= 10:
+            pass
+        else:
+            score = -1
+        rating = check_rating(rating, all_dimensions)
+    else:
+        score = -1
+    if rating == None or score == -1:
+        return None
+    else:
+        return {'rating': rating, 'score': score}
 
 
 def post_process_alignbench(judgement: str,
@@ -211,9 +311,12 @@ class AlignmentBenchSummarizer:
         ]
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
         self.judge_type = judge_type
-        assert self.judge_type in ['general', 'autoj', 'judgelm']
+        assert self.judge_type in [
+            'general', 'autoj', 'judgelm', 'general_plus'
+        ]
         self.judge_map = {
             'general': post_process_alignbench,
+            'general_plus': post_process_alignbench_plus,
             'autoj': post_process_autoj,
             'judgelm': post_process_judgelm
         }

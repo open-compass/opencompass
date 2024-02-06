@@ -18,28 +18,30 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CONDA_ENV: opencompass_regression_daily
+  CONDA_ENV: opencompass_base
+  USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
+  HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
 
 jobs:
   pr_run_test:
     runs-on: self-hosted
     environment: 'prod'
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
-      - name: Prepare - create conda env and install code
+      - name: Prepare - Install opencompass
         run: |
           eval "$(conda shell.bash hook)"
-          conda create --name ${{env.CONDA_ENV}} --clone opencompass_base --offline
           conda activate ${{env.CONDA_ENV}}
-          python3 -m pip install -e .
+          python3 -m pip uninstall opencompass -y
+          python3 -m pip install -e . --cache-dir ${{env.USERSPACE_PREFIX}}/.cache/pip
           conda info --envs
       - name: Prepare - prepare data and hf model
         run: |
-          cp -r /cpfs01/user/qa-llm-cicd/data .
+          cp -r ${{env.USERSPACE_PREFIX}}/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
-          ln -s /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub ~/.cache/huggingface/hub
+          ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
           export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1;
       - name:  Run test
         run: |
@@ -49,21 +51,21 @@ jobs:
           rm -rf regression_result
           python3 run.py --models hf_internlm_chat_7b --datasets siqa_gen --work-dir regression_result --debug
       - name:  Get result
-        if: always()
         run: |
           score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 70 && ${score%.*} <= 80 )); then
-             echo "score is $score between 70 and 80"
+          if (( ${score%.*} >= 70 && ${score%.*} <= 75 )); then
+             echo "score is $score between 70 and 75"
           else
-             echo "score is $score not between 70 and 80"
+             echo "score is $score not between 70 and 75"
              exit 1
           fi
           rm -rf regression_result
-      - name:  Remove Conda Env
+      - name:  Uninstall opencompass
         if: always()
         run: |
           eval "$(conda shell.bash hook)"
-          conda env remove --name ${{env.CONDA_ENV}}
+          conda activate ${{env.CONDA_ENV}}
+          python3 -m pip uninstall opencompass -y
           conda info --envs
 
   notify_to_feishu:

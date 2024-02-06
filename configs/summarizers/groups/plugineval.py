@@ -18,6 +18,28 @@ _base_summary_groups = [
         ]
     },
     {
+        'name': 'plugin_eval-instruct_v1',
+        'metric': 'string_metric',
+        'subsets': [
+            ['plugin_eval-instruct_v1', 'string_format_metric'],
+            ['plugin_eval-instruct_v1', 'string_args_em_metric'],
+        ]
+    },
+    {
+        'name': 'plugin_eval-instruct_v1',
+        'metric': 'json_metric',
+        'subsets': [
+            ['plugin_eval-instruct_v1', 'json_format_metric'],
+            ['plugin_eval-instruct_v1', 'json_args_em_metric'],
+        ]
+    },
+    {
+        'name': 'copy_plugin_eval-review_str_v1',
+        'subsets': [
+            ['plugin_eval-review_str_v1', 'review_quality'],
+        ],
+    },
+    {
         'name': 'plugin_eval',
         'subsets': [
             ['plugin_eval-instruct_v1', 'format_metric'],
@@ -31,6 +53,7 @@ _base_summary_groups = [
             ['plugin_eval-understand_str_v1', 'args'],
             ['plugin_eval-reason_retrieve_understand_json_v1', 'args'],
             ['plugin_eval-review_str_v1', 'review_quality'],
+            ['copy_plugin_eval-review_str_v1', 'naive_average'],  # a hack for review * 2
         ]
     },
 ]
@@ -61,4 +84,18 @@ for group in _base_summary_groups:
     group = deepcopy(group)
     group['name'] = group['name'].replace('plugin_eval', 'plugin_eval-p10') + '_zh'
     group['subsets'] = [[subset[0].replace('plugin_eval', 'plugin_eval-p10') + '_zh', subset[1]] for subset in group['subsets']]
+    plugineval_summary_groups.append(group)
+
+# base -mus-p10-
+for group in _base_summary_groups:
+    group = deepcopy(group)
+    group['name'] = group['name'].replace('plugin_eval', 'plugin_eval-mus-p10')
+    group['subsets'] = [[subset[0].replace('plugin_eval', 'plugin_eval-mus-p10'), subset[1]] for subset in group['subsets']]
+    plugineval_summary_groups.append(group)
+
+# base -mus-p10- _zh
+for group in _base_summary_groups:
+    group = deepcopy(group)
+    group['name'] = group['name'].replace('plugin_eval', 'plugin_eval-mus-p10') + '_zh'
+    group['subsets'] = [[subset[0].replace('plugin_eval', 'plugin_eval-mus-p10') + '_zh', subset[1]] for subset in group['subsets']]
     plugineval_summary_groups.append(group)

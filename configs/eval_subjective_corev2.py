@@ -1,16 +1,9 @@
 from mmengine.config import read_base
+
 with read_base():
-    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat
-    from .models.qwen.hf_qwen_14b_chat import models as hf_qwen_14b_chat
-    from .models.chatglm.hf_chatglm3_6b import models as hf_chatglm3_6b
-    from .models.baichuan.hf_baichuan2_7b_chat import models as hf_baichuan2_7b
-    from .models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_7b
-    from .models.hf_internlm.hf_internlm2_chat_20b import models as internlm2_20b
     from .datasets.subjective.subjective_cmp.subjective_corev2 import subjective_datasets
 
-datasets = [*subjective_datasets]
-
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
@@ -19,17 +12,61 @@ from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import Corev2Summarizer
-models = [*internlm2_7b, *internlm2_20b]
 
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),
-        dict(role='BOT', api_role='BOT', generate=True)
+        dict(role='BOT', api_role='BOT', generate=True),
     ],
     reserved_roles=[
         dict(role='SYSTEM', api_role='SYSTEM'),
     ],
 )
+
+# -------------Inference Stage ----------------------------------------
+
+# For subjective evaluation, we often set do sample for models
+models = [
+    dict(
+        type=HuggingFaceChatGLM3,
+        abbr='chatglm3-6b-hf',
+        path='THUDM/chatglm3-6b',
+        tokenizer_path='THUDM/chatglm3-6b',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(
+            do_sample=True,
+        ),
+        meta_template=api_meta_template,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=1,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+]
+
+datasets = [*subjective_datasets]
+
+gpt4 = dict(
+    abbr='gpt4-turbo',
+    type=OpenAI,
+    path='gpt-4-1106-preview',
+    key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+    meta_template=api_meta_template,
+    query_per_second=1,
+    max_out_len=2048,
+    max_seq_len=4096,
+    batch_size=4,
+    retry=20,
+    temperature=1,
+)  # Re-inference gpt4's predictions or you can choose to use the pre-commited gpt4's predictions
 
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=500),
@@ -38,61 +75,41 @@ infer = dict(
         partition='llm_dev2',
         quotatype='auto',
         max_num_workers=256,
-        task=dict(type=OpenICLInferTask)),
+        task=dict(type=OpenICLInferTask),
+    ),
 )
 
+# -------------Evalation Stage ----------------------------------------
 
-_meta_template = dict(
-    round=[
-        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
-        dict(role="BOT", begin="\n<|im_start|>assistant\n", end='<|im_end|>', generate=True),
-    ],
+## ------------- JudgeLLM Configuration
+judge_model = dict(
+    abbr='GPT4-Turbo',
+    type=OpenAI,
+    path='gpt-4-1106-preview',
+    key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+    meta_template=api_meta_template,
+    query_per_second=1,
+    max_out_len=1024,
+    max_seq_len=4096,
+    batch_size=2,
+    retry=20,
+    temperature=0,
 )
 
-
-judge_model =    dict(
-        type=HuggingFaceCausalLM,
-        abbr='qwen-7b-chat-hf',
-        path="Qwen/Qwen-7B-Chat",
-        tokenizer_path='Qwen/Qwen-7B-Chat',
-        model_kwargs=dict(
-            device_map='auto',
-            trust_remote_code=True
-        ),
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True,
-            use_fast=False,),
-        pad_token_id=151643,
-        max_out_len=2048,
-        max_seq_len=2048,
-        batch_size=8,
-        meta_template=_meta_template,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-
+## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
-        type=SubjectiveSizePartitioner,
-        mode='m2n',
-        max_task_size=500,
-        base_models = [*internlm2_7b],
-        compare_models = [*internlm2_20b]
+        type=SubjectiveSizePartitioner, mode='m2n', max_task_size=500, base_models=[gpt4], compare_models=models
     ),
     runner=dict(
         type=SlurmSequentialRunner,
         partition='llm_dev2',
         quotatype='auto',
         max_num_workers=256,
-        task=dict(
-            type=SubjectiveEvalTask,
-        judge_cfg=judge_model
-        )),
+        task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model),
+    ),
 )
-work_dir = 'outputs/corev2/'
 
-summarizer = dict(
-    type=Corev2Summarizer,
-    match_method='smart',
-)
+summarizer = dict(type=Corev2Summarizer, match_method='smart')
+
+work_dir = 'outputs/corev2/'

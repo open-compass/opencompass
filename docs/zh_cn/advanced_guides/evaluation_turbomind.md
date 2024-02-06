@@ -56,6 +56,7 @@ internlm_20b = dict(
         batch_size=8,
         concurrency=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
+        end_str='<eoa>'
     )
 
 models = [internlm_20b]
