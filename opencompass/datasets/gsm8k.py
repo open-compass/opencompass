@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from datasets import Dataset, DatasetDict
 
@@ -34,24 +35,10 @@ def gsm8k_dataset_postprocess(text: str) -> str:
 @TEXT_POSTPROCESSORS.register_module('gsm8k')
 def gsm8k_postprocess(text: str) -> str:
     text = text.split('Question:')[0]
-    text = text.split(' ')[::-1]
-    flag = False
-    ret = ''
-    for i in range(len(text)):
-        s = text[i]
-        for i in range(len(s)):
-            if s[i].isdigit():
-                flag = True
-                ret = s
-                break
-        if flag:
-            break
-    ret1 = ''
-    for i in range(len(ret)):
-        # deal with potential float number
-        if ret[i].isdigit() or ret[i] == '.':
-            ret1 += ret[i]
-    return ret1.strip('.')
+    numbers = re.findall(r'\-?\d+\.\d+|\-?\d+', text)
+    if not numbers:
+        return 'NULL'
+    return numbers[-1]
 
 
 class Gsm8kEvaluator(BaseEvaluator):
