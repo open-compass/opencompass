@@ -10,8 +10,7 @@ Correction = namedtuple(
         "inds",
     ],
 ) 
-file_path = os.path.dirname(os.path.abspath(__file__))
-char_smi = CharFuncs(os.path.join(file_path.replace("modules", ""), 'data/char_meta.txt'))
+char_smi = CharFuncs(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", "data", "lawbench", "eval_assets", "char_meta.txt"))
 
 def check_spell_error(src_span: str,
                       tgt_span: str,
