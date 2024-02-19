@@ -19,8 +19,7 @@ govrepcrs_infer_cfg = dict(
                 dict(
                     role='SYSTEM',
                     fallback_role='HUMAN',
-                    prompt=
-                    'Please summarize the following English report in English:'
+                    prompt='Please summarize the following English report in English:'
                 ),
             ],
             round=[

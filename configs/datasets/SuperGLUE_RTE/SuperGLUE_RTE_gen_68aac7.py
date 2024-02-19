@@ -16,8 +16,7 @@ RTE_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '{premise}\n{hypothesis}\nIs the sentence below entailed by the sentence above?\nA. Yes\nB. No\nAnswer:'
+                prompt='{premise}\n{hypothesis}\nIs the sentence below entailed by the sentence above?\nA. Yes\nB. No\nAnswer:'
             ),
         ]),
     ),

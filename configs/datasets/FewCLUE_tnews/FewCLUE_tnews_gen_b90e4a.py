@@ -38,8 +38,7 @@ tnews_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                f'{{sentence}}\n请判断上述内容属于什么新闻？\n{_tnews_options_list_str}\n请从{_tnews_options_range_str}中进行选择。\n答：',
+                prompt=f'{{sentence}}\n请判断上述内容属于什么新闻？\n{_tnews_options_list_str}\n请从{_tnews_options_range_str}中进行选择。\n答：',
             ),
         ]),
     ),

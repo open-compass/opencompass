@@ -14,8 +14,7 @@ eprstmt_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '内容： "{sentence}"。请对上述内容进行情绪分类。\nA. 积极\nB. 消极\n请从”A“，”B“中进行选择。\n答：'
+                prompt='内容： "{sentence}"。请对上述内容进行情绪分类。\nA. 积极\nB. 消极\n请从”A“，”B“中进行选择。\n答：'
             ),
         ]),
     ),

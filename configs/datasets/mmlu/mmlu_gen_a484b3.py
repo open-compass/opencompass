@@ -82,8 +82,7 @@ for _name in mmlu_all_sets:
             template=dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    f'{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: '
+                    prompt=f'{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: '
                 ),
                 dict(role='BOT', prompt='{target}\n')
             ]),
@@ -95,8 +94,7 @@ for _name in mmlu_all_sets:
                 round=[
                     dict(
                         role='HUMAN',
-                        prompt=
-                        f'{_hint}\nQ: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nA: '
+                        prompt=f'{_hint}\nQ: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nA: '
                     ),
                 ],
             ),

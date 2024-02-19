@@ -21,16 +21,14 @@ WiC_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    "Sentence 1: {sentence1}\nSentence 2: {sentence2}\n'{word}' in the above two sentenses are different."
+                    prompt="Sentence 1: {sentence1}\nSentence 2: {sentence2}\n'{word}' in the above two sentenses are different."
                 ),
             ]),
             1:
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    "Sentence 1: {sentence1}\nSentence 2: {sentence2}\n'{word}' in the above two sentenses are the same."
+                    prompt="Sentence 1: {sentence1}\nSentence 2: {sentence2}\n'{word}' in the above two sentenses are the same."
                 ),
             ]),
         },

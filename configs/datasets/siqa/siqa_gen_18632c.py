@@ -17,8 +17,7 @@ siqa_infer_cfg = dict(
             round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{context}\nQuestion: {question}\nA. {A}\nB. {B}\nC. {C}\nAnswer:'
+                    prompt='{context}\nQuestion: {question}\nA. {A}\nB. {B}\nC. {C}\nAnswer:'
                 )
             ], ),
     ),

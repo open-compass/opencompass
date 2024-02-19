@@ -17,8 +17,7 @@ chid_infer_cfg = dict(
             round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{content}\n请选择______处所填的词\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nF. {F}\nG. {G}\n请从”A“，”B“，”C“，”D“，”E“，”F“，”G“中进行选择。答：',
+                    prompt='{content}\n请选择______处所填的词\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nF. {F}\nG. {G}\n请从”A“，”B“，”C“，”D“，”E“，”F“，”G“中进行选择。答：',
                 ),
             ])),
     retriever=dict(type=ZeroRetriever),

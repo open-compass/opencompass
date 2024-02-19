@@ -14,8 +14,7 @@ summedits_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                'Document:\n{doc}Summary:\n{summary}\nQuestion:\nIs the summary factually consistent with the document?\nA. Yes\nB. No\nAnswer:'
+                prompt='Document:\n{doc}Summary:\n{summary}\nQuestion:\nIs the summary factually consistent with the document?\nA. Yes\nB. No\nAnswer:'
             ),
         ])),
     retriever=dict(type=ZeroRetriever),

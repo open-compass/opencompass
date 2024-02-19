@@ -49,8 +49,7 @@ for _name in bbh_multiple_choice_sets:
             template=dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    f'Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: '
+                    prompt=f'Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: '
                 )
             ])),
         retriever=dict(type=ZeroRetriever),
@@ -80,8 +79,7 @@ for _name in bbh_free_form_sets:
             template=dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    f'Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: '
+                    prompt=f'Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: '
                 )
             ])),
         retriever=dict(type=ZeroRetriever),

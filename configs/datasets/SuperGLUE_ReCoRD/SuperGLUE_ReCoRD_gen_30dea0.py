@@ -15,8 +15,7 @@ ReCoRD_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                'Passage: {text}\nResult: {question}\nQuestion: What entity does ____ refer to in the result? Give me the entity name:'
+                prompt='Passage: {text}\nResult: {question}\nQuestion: What entity does ____ refer to in the result? Give me the entity name:'
             ),
         ]),
     ),

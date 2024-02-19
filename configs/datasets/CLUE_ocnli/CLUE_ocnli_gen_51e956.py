@@ -17,8 +17,7 @@ ocnli_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '阅读文章：{sentence1}\n根据上文，回答如下问题：{sentence2}\nA. 对\nB. 错\nC. 可能\n请从“A”，“B”，“C”中进行选择。\n答：'
+                prompt='阅读文章：{sentence1}\n根据上文，回答如下问题：{sentence2}\nA. 对\nB. 错\nC. 可能\n请从“A”，“B”，“C”中进行选择。\n答：'
             ),
         ]),
     ),

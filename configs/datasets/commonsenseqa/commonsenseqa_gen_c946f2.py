@@ -17,8 +17,7 @@ _ice_template = dict(
         round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nAnswer:',
+                prompt='{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nAnswer:',
             ),
             dict(
                 role='BOT',

@@ -14,8 +14,7 @@ summscreen_reader_cfg = dict(
 summscreen_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=
-        'Please summarize the following English report in English:{content}\n{summary}.'),
+        template='Please summarize the following English report in English:{content}\n{summary}.'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(
         type=GenInferencer, batch_size=4, max_out_len=500, max_seq_len=8192))

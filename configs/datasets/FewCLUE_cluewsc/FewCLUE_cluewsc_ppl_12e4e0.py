@@ -16,8 +16,7 @@ cluewsc_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    "{text}\nHere, is the pronoun \"{span2}\" used to mean \"{span1}\"?"
+                    prompt="{text}\nHere, is the pronoun \"{span2}\" used to mean \"{span1}\"?"
                 ),
                 dict(role='BOT', prompt='No.')
             ]),
@@ -25,8 +24,7 @@ cluewsc_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    "{text}\nHere, is the pronoun \"{span2}\" used to mean \"{span1}\"?"
+                    prompt="{text}\nHere, is the pronoun \"{span2}\" used to mean \"{span1}\"?"
                 ),
                 dict(role='BOT', prompt='Yes.')
             ]),

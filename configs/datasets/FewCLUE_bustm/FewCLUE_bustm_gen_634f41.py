@@ -16,8 +16,7 @@ bustm_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '语句一：“{sentence1}”\n语句二：“{sentence2}”\n请判断语句一和语句二说的是否是一个意思？\nA. 无关\nB. 相关\n请从“A”，“B”中进行选择。\n答：',
+                prompt='语句一：“{sentence1}”\n语句二：“{sentence2}”\n请判断语句一和语句二说的是否是一个意思？\nA. 无关\nB. 相关\n请从“A”，“B”中进行选择。\n答：',
             ),
         ]),
     ),

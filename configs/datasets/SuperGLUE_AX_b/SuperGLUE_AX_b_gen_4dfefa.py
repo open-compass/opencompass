@@ -16,8 +16,7 @@ AX_b_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                '{sentence1}\n{sentence2}\nIs the sentence below entailed by the sentence above?\nA. Yes\nB. No\nAnswer:'
+                prompt='{sentence1}\n{sentence2}\nIs the sentence below entailed by the sentence above?\nA. Yes\nB. No\nAnswer:'
             ),
         ]),
     ),

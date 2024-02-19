@@ -28,8 +28,7 @@ ds1000_eval_cfg_dict = {
         evaluator=dict(
             type=DS1000ServiceEvaluator,
             lib=lib,
-            ip_address=
-            'localhost',  # replace to your code_eval_server ip_address, port
+            ip_address='localhost',  # replace to your code_eval_server ip_address, port
             port=5000
             ),
         pred_role='BOT')

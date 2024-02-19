@@ -73,8 +73,7 @@ for _split in ['val']:
                     round=[
                         dict(
                             role='HUMAN',
-                            prompt=
-                            f'以下是中国关于{_ch_name}考试的单项选择题，请选出其中的正确答案。\n{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n让我们一步一步思考。答案: '
+                            prompt=f'以下是中国关于{_ch_name}考试的单项选择题，请选出其中的正确答案。\n{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n让我们一步一步思考。答案: '
                         ),
                         dict(role='BOT', prompt='{answer}'),
                     ]),

@@ -17,8 +17,7 @@ CB_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
+                    prompt='{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
                 ),
                 dict(role='BOT', prompt='Contradiction'),
             ]),
@@ -26,8 +25,7 @@ CB_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
+                    prompt='{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
                 ),
                 dict(role='BOT', prompt='Entailment'),
             ]),
@@ -35,8 +33,7 @@ CB_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
+                    prompt='{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
                 ),
                 dict(role='BOT', prompt='Neutral'),
             ]),

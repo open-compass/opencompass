@@ -17,8 +17,7 @@ winograd_infer_cfg = dict(
             i: dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    f"{{prompt}} Q: In the previous text, what does '{{pronoun}}' refer to? A: {{opt{i+1}}}"
+                    prompt=f"{{prompt}} Q: In the previous text, what does '{{pronoun}}' refer to? A: {{opt{i+1}}}"
                 ),  # noqa
             ])
             for i in range(2)

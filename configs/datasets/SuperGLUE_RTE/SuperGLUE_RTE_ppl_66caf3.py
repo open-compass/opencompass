@@ -17,8 +17,7 @@ RTE_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{premise}\n{hypothesis}\nIs the sentence below entailed by the sentence above?'
+                    prompt='{premise}\n{hypothesis}\nIs the sentence below entailed by the sentence above?'
                 ),
                 dict(role='BOT', prompt='Yes'),
             ]),
@@ -26,8 +25,7 @@ RTE_infer_cfg = dict(
             dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    '{premise}\n{hypothesis}\nIs the sentence below entailed by the sentence above?'
+                    prompt='{premise}\n{hypothesis}\nIs the sentence below entailed by the sentence above?'
                 ),
                 dict(role='BOT', prompt='No'),
             ])

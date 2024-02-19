@@ -54,9 +54,7 @@ models = [
         actions=[
             dict(
                 type=IPythonInterpreter,
-                description=
-                '''It can run Python code in a manner as jupyter notebook. The code must be a valid code that contains only python method.
-'''),
+                description='It can run Python code in a manner as jupyter notebook. The code must be a valid code that contains only python method.\n'),
         ],
         protocol=dict(
             type=ReActProtocol,
