@@ -14,7 +14,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='internlm2-chat-20b-hf',
-        path="internlm/internlm2-chat-20b",
+        path='internlm/internlm2-chat-20b',
         tokenizer_path='internlm/internlm2-chat-20b',
         model_kwargs=dict(
             trust_remote_code=True,

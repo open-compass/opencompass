@@ -6,27 +6,27 @@ from opencompass.datasets import commonsenseqaDataset
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 commonsenseqa_reader_cfg = dict(
-    input_columns=["question", "A", "B", "C", "D", "E"],
-    output_column="answerKey",
-    test_split="validation")
+    input_columns=['question', 'A', 'B', 'C', 'D', 'E'],
+    output_column='answerKey',
+    test_split='validation')
 
 _ice_template = dict(
     type=PromptTemplate,
     template=dict(
-        begin="</E>",
+        begin='</E>',
         round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nAnswer:",
+                '{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nAnswer:',
             ),
             dict(
-                role="BOT",
-                prompt="{answerKey}",
+                role='BOT',
+                prompt='{answerKey}',
             ),
         ],
     ),
-    ice_token="</E>",
+    ice_token='</E>',
 )
 
 commonsenseqa_infer_cfg = dict(

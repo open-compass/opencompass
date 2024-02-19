@@ -5,9 +5,9 @@ from opencompass.openicl.icl_evaluator import EDAccEvaluator
 from opencompass.datasets import siqaDataset_V2
 
 siqa_reader_cfg = dict(
-    input_columns=["context", "question", "answerA", "answerB", "answerC"],
-    output_column="all_labels",
-    test_split="validation")
+    input_columns=['context', 'question', 'answerA', 'answerB', 'answerC'],
+    output_column='all_labels',
+    test_split='validation')
 
 siqa_infer_cfg = dict(
     prompt_template=dict(
@@ -15,9 +15,9 @@ siqa_infer_cfg = dict(
         template=dict(
             round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "{context}\nQuestion: {question}\nA. {answerA}\nB. {answerB}\nC. {answerC}\nAnswer:"
+                    '{context}\nQuestion: {question}\nA. {answerA}\nB. {answerB}\nC. {answerC}\nAnswer:'
                 )
             ], ),
     ),
@@ -27,12 +27,12 @@ siqa_infer_cfg = dict(
 
 siqa_eval_cfg = dict(
     evaluator=dict(type=EDAccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
 )
 
 siqa_datasets = [
     dict(
-        abbr="siqa",
+        abbr='siqa',
         type=siqaDataset_V2,
         path='./data/siqa',
         reader_cfg=siqa_reader_cfg,

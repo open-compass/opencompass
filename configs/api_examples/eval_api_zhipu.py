@@ -29,7 +29,7 @@ models = [
         abbr='chatglm_pro',
         type=ZhiPuAI,
         path='chatglm_pro',
-        key='xxxxxxxxxxxx', 
+        key='xxxxxxxxxxxx',
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
@@ -45,4 +45,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_zhipu/"
+work_dir = 'outputs/api_zhipu/'

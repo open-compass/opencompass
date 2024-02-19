@@ -4,7 +4,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='qwen-1.8b-hf',
-        path="Qwen/Qwen-1_8B",
+        path='Qwen/Qwen-1_8B',
         tokenizer_path='Qwen/Qwen-1_8B',
         model_kwargs=dict(
             device_map='auto',

@@ -62,23 +62,23 @@ ceval_subject_mapping = {
 ceval_all_sets = list(ceval_subject_mapping.keys())
 
 ceval_datasets = []
-for _split in ["val"]:
+for _split in ['val']:
     for _name in ceval_all_sets:
         _ch_name = ceval_subject_mapping[_name][1]
         ceval_infer_cfg = dict(
             ice_template=dict(
                 type=PromptTemplate,
                 template=dict(
-                    begin="</E>",
+                    begin='</E>',
                     round=[
                         dict(
-                            role="HUMAN",
+                            role='HUMAN',
                             prompt=
-                            f"以下是中国关于{_ch_name}考试的单项选择题，请选出其中的正确答案。\n{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n让我们一步一步思考。答案: "
+                            f'以下是中国关于{_ch_name}考试的单项选择题，请选出其中的正确答案。\n{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n让我们一步一步思考。答案: '
                         ),
-                        dict(role="BOT", prompt="{answer}"),
+                        dict(role='BOT', prompt='{answer}'),
                     ]),
-                ice_token="</E>",
+                ice_token='</E>',
             ),
             retriever=dict(type=ZeroRetriever),
             inferencer=dict(type=GenInferencer, max_out_len=256),
@@ -91,14 +91,14 @@ for _split in ["val"]:
         ceval_datasets.append(
             dict(
                 type=CEvalDataset,
-                path="./data/ceval/formal_ceval",
+                path='./data/ceval/formal_ceval',
                 name=_name,
-                abbr="ceval-" + _name if _split == "val" else "ceval-test-" +
+                abbr='ceval-' + _name if _split == 'val' else 'ceval-test-' +
                 _name,
                 reader_cfg=dict(
-                    input_columns=["question", "A", "B", "C", "D"],
-                    output_column="answer",
-                    train_split="dev",
+                    input_columns=['question', 'A', 'B', 'C', 'D'],
+                    output_column='answer',
+                    train_split='dev',
                     test_split=_split),
                 infer_cfg=ceval_infer_cfg,
                 eval_cfg=ceval_eval_cfg,

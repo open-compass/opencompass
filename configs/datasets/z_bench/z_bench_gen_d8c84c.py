@@ -12,7 +12,7 @@ z_bench_reader_cfg = dict(
 z_bench_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=dict(round=[dict(role="HUMAN", prompt="{text}")]),
+        template=dict(round=[dict(role='HUMAN', prompt='{text}')]),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))

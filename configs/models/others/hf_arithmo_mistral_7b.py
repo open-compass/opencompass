@@ -4,8 +4,8 @@ from opencompass.models import HuggingFaceCausalLM
 _meta_template = dict(
     begin='',
     round=[
-        dict(role="HUMAN", begin='Question: ', end='\n\n'),
-        dict(role="BOT", begin="Answer: ", end='\n\n', generate=True),
+        dict(role='HUMAN', begin='Question: ', end='\n\n'),
+        dict(role='BOT', begin='Answer: ', end='\n\n', generate=True),
     ],
 )
 

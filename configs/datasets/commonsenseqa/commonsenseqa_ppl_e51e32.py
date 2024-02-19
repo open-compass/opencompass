@@ -15,12 +15,12 @@ _ice_template = dict(
         ans: dict(
             begin='</E>',
             round=[
-                dict(role="HUMAN", prompt="Question: {question}\nAnswer: "),
-                dict(role="BOT", prompt=ans_token),
+                dict(role='HUMAN', prompt='Question: {question}\nAnswer: '),
+                dict(role='BOT', prompt=ans_token),
             ])
-        for ans, ans_token in [["A", "{A}"], ["B", "{B}"],
-                               ["C", "{C}"], ["D", "{D}"],
-                               ["E", "{E}"]]
+        for ans, ans_token in [['A', '{A}'], ['B', '{B}'],
+                               ['C', '{C}'], ['D', '{D}'],
+                               ['E', '{E}']]
     },
     ice_token='</E>')
 

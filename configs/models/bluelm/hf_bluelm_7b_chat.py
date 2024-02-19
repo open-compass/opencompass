@@ -11,7 +11,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='bluelm-7b-chat-hf',
-        path="vivo-ai/BlueLM-7B-Chat",
+        path='vivo-ai/BlueLM-7B-Chat',
         tokenizer_path='vivo-ai/BlueLM-7B-Chat',
         model_kwargs=dict(
             device_map='auto',

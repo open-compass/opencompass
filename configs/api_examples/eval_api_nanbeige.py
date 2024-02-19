@@ -18,7 +18,7 @@ models = [
         abbr='nanbeige-plus',
         type=Nanbeige,
         path='nanbeige-plus',
-        key="xxxxxx",
+        key='xxxxxx',
         query_per_second=1,
         max_out_len=2048,
         batch_size=8),
@@ -33,4 +33,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir ="./output/nanbeige-plus"
+work_dir ='./output/nanbeige-plus'

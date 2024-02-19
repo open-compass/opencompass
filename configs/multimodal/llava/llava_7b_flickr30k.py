@@ -48,5 +48,3 @@ llava_flickr30k_evaluator = [
         ann_file='data/flickr30k/annotations/flickr30k_val_gt.json',
     )  # noqa
 ]
-
-

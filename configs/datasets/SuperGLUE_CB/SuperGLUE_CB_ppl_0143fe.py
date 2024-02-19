@@ -5,40 +5,40 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import HFDataset
 
 CB_reader_cfg = dict(
-    input_columns=["premise", "hypothesis"],
-    output_column="label",
+    input_columns=['premise', 'hypothesis'],
+    output_column='label',
 )
 
 CB_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            "contradiction":
+            'contradiction':
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "{premise}\n{hypothesis}\nWhat is the relation between the two sentences?"
+                    '{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
                 ),
-                dict(role="BOT", prompt="Contradiction"),
+                dict(role='BOT', prompt='Contradiction'),
             ]),
-            "entailment":
+            'entailment':
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "{premise}\n{hypothesis}\nWhat is the relation between the two sentences?"
+                    '{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
                 ),
-                dict(role="BOT", prompt="Entailment"),
+                dict(role='BOT', prompt='Entailment'),
             ]),
-            "neutral":
+            'neutral':
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "{premise}\n{hypothesis}\nWhat is the relation between the two sentences?"
+                    '{premise}\n{hypothesis}\nWhat is the relation between the two sentences?'
                 ),
-                dict(role="BOT", prompt="Neutral"),
+                dict(role='BOT', prompt='Neutral'),
             ]),
         },
     ),
@@ -51,10 +51,10 @@ CB_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 CB_datasets = [
     dict(
         type=HFDataset,
-        abbr="CB",
-        path="json",
-        split="train",
-        data_files="./data/SuperGLUE/CB/val.jsonl",
+        abbr='CB',
+        path='json',
+        split='train',
+        data_files='./data/SuperGLUE/CB/val.jsonl',
         reader_cfg=CB_reader_cfg,
         infer_cfg=CB_infer_cfg,
         eval_cfg=CB_eval_cfg,

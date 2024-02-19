@@ -5,20 +5,20 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import HFDataset
 
 
-_hint = "The following are text classification questions. \n" \
-    "Please determine whether the following sentence is linguistically acceptable: " \
-    "0 means unacceptable, 1 means acceptable.\n"
+_hint = 'The following are text classification questions. \n' \
+    'Please determine whether the following sentence is linguistically acceptable: ' \
+    '0 means unacceptable, 1 means acceptable.\n'
 
 CoLA_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
-        template="Sentence: {sentence}\nResult: {label}",
+        template='Sentence: {sentence}\nResult: {label}',
     ),
     prompt_template=dict(
         type=PromptTemplate,
         template={
             answer:
-            f"{_hint}</E>Sentence: {{sentence}}\nResult: {answer}"
+            f'{_hint}</E>Sentence: {{sentence}}\nResult: {answer}'
             for answer in [0, 1]
         },
         ice_token='</E>',
@@ -29,7 +29,7 @@ CoLA_infer_cfg = dict(
 CoLA_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
 CoLA_datasets = []
-for _split in ["validation"]:
+for _split in ['validation']:
 
     CoLA_reader_cfg = dict(
         input_columns=['sentence'],

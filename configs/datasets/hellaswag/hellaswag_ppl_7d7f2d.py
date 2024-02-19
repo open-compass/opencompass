@@ -13,8 +13,8 @@ hellaswag_infer_cfg = dict(
         type=PromptTemplate,
         template={
             ans: dict(round=[
-                dict(role="HUMAN", prompt="{ctx}\nQuestion: Which ending makes the most sense?\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: "),
-                dict(role="BOT", prompt=f"{ans}"),
+                dict(role='HUMAN', prompt='{ctx}\nQuestion: Which ending makes the most sense?\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: '),
+                dict(role='BOT', prompt=f'{ans}'),
             ]) for ans in ['A', 'B', 'C', 'D']
         }),
     retriever=dict(type=ZeroRetriever),

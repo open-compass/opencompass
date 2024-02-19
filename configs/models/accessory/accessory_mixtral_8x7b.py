@@ -6,7 +6,7 @@ from opencompass.models import LLaMA2AccessoryModel
 
 models = [
     dict(
-        abbr="Accessory_mixtral_8x7b",
+        abbr='Accessory_mixtral_8x7b',
         type=LLaMA2AccessoryModel,
 
         # additional_stop_symbols=["###"],  # for models tuned with chat template  # noqa
@@ -15,7 +15,7 @@ models = [
         # <begin> kwargs for accessory.MetaModel.from_pretrained
         # download from https://huggingface.co/Alpha-VLLM/MoE-Mixtral-7B-8Expert/tree/main/converted_sparse  # noqa
         # see https://llama2-accessory.readthedocs.io/en/latest/projects/mixtral-8x7b.html for more details  # noqa
-        pretrained_path="path/to/MoE-Mixtral-7B-8Expert/converted_sparse",
+        pretrained_path='path/to/MoE-Mixtral-7B-8Expert/converted_sparse',
         llama_type=None,  # None for automatic probe from pretrained_path
         llama_config=None,  # None for automatic probe from pretrained_path
         tokenizer_path=None,  # None for automatic probe from pretrained_path

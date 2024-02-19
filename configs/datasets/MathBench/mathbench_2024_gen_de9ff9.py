@@ -6,14 +6,14 @@ from opencompass.datasets import MathBenchDataset, mathbench_postprocess
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 single_choice_prompts = {
-    "single_choice_cn_with_reasoning": "以下是一道关于数学的单项选择题，请你一步一步推理，并在最后用“所以答案为选项X”给出答案，其中“X”为选项A，B，C，D中你认为正确的选项。下面是你要回答的问题\n{question}\n让我们一步一步思考：\n",
-    "single_choice_cn": "以下是一道关于数学的单项选择题，请你直接回答正确答案的选项序号。\n下面是你要回答的题目：\n{question}\n答案选项：",
-    "single_choice_en_with_reasoning": "Here is a multiple-choice question about mathematics. Please reason through it step by step, and at the end, provide your answer option with 'Therefore, the correct answer is option X', Where 'X' is the correct option you think from A，B，C，D. Here is the question you need to answer:\n{question}\nLet's think step by step:",
-    "single_choice_en": "Here is a multiple-choice question about mathematics. Please provide the correct answer option directly.\nHere is the question you need to answer:\n{question}\nAnswer option:",
+    'single_choice_cn_with_reasoning': '以下是一道关于数学的单项选择题，请你一步一步推理，并在最后用“所以答案为选项X”给出答案，其中“X”为选项A，B，C，D中你认为正确的选项。下面是你要回答的问题\n{question}\n让我们一步一步思考：\n',
+    'single_choice_cn': '以下是一道关于数学的单项选择题，请你直接回答正确答案的选项序号。\n下面是你要回答的题目：\n{question}\n答案选项：',
+    'single_choice_en_with_reasoning': "Here is a multiple-choice question about mathematics. Please reason through it step by step, and at the end, provide your answer option with 'Therefore, the correct answer is option X', Where 'X' is the correct option you think from A，B，C，D. Here is the question you need to answer:\n{question}\nLet's think step by step:",
+    'single_choice_en': 'Here is a multiple-choice question about mathematics. Please provide the correct answer option directly.\nHere is the question you need to answer:\n{question}\nAnswer option:',
 }
 
 cloze_prompts = {
-    "cloze_cn": [
+    'cloze_cn': [
                 dict(role='HUMAN', prompt='Q: 林中有15棵树。林务工人员今天将在林中种植树木。完成后，将有21棵树。林务工人员今天种植了多少棵树？'),
                 dict(role='BOT', prompt='A: 我们从15棵树开始。后来有21棵树。差值必定是他们种植的树木数量。所以，他们必须种植了21 - 15 = 6棵树。答案是 6\n'),
                 dict(role='HUMAN', prompt='Q: 如果停车场有3辆车，又有2辆车进来，停车场里有多少辆车？'),
@@ -33,7 +33,7 @@ cloze_prompts = {
                 dict(role='HUMAN', prompt='Q: {question}'),
                 dict(role='BOT', prompt='A: {answer}'),
                 ],
-    "cloze_en": [
+    'cloze_en': [
                 dict(role='HUMAN', prompt='Q: There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 21 trees. How many trees did the grove workers plant today?'),
                 dict(role='BOT', prompt='A: We start with 15 trees. Later we have 21 trees. The difference must be the number of trees they planted. So, they must have planted 21 - 15 = 6 trees. The answer is 6.\n'),
                 dict(role='HUMAN', prompt='Q: If there are 3 cars in the parking lot and 2 more cars arrive, how many cars are in the parking lot?'),
@@ -78,10 +78,10 @@ for _split in list(mathbench_sets.keys()):
                 template=dict(
                     round=[
                         dict(
-                            role="HUMAN",
-                            prompt=single_choice_prompts[_name + "_with_reasoning"] if with_reasoning else single_choice_prompts[_name],
+                            role='HUMAN',
+                            prompt=single_choice_prompts[_name + '_with_reasoning'] if with_reasoning else single_choice_prompts[_name],
                         ),
-                        dict(role="BOT", prompt="{answer}")] if 'choice' in _name else cloze_prompts[_name],
+                        dict(role='BOT', prompt='{answer}')] if 'choice' in _name else cloze_prompts[_name],
                     ),
             ),
             retriever=dict(type=ZeroRetriever),
@@ -94,14 +94,14 @@ for _split in list(mathbench_sets.keys()):
 
         mathbench_datasets.append(
             dict(
-                abbr="mathbench-" + _split + '-' + _name,
+                abbr='mathbench-' + _split + '-' + _name,
                 type=MathBenchDataset,
-                path=f"./data/mathbench/{_split}",
+                path=f'./data/mathbench/{_split}',
                 name=_name,
                 with_circular=with_circular_eval,
                 reader_cfg=dict(
-                    input_columns=["question"],
-                    output_column="answer"
+                    input_columns=['question'],
+                    output_column='answer'
                     ),
                 infer_cfg=mathbench_infer_cfg,
                 eval_cfg=mathbench_eval_cfg,

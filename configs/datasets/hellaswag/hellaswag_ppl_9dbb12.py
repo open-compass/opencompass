@@ -13,10 +13,10 @@ hellaswag_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "{ctx} {A}",
-            1: "{ctx} {B}",
-            2: "{ctx} {C}",
-            3: "{ctx} {D}",
+            0: '{ctx} {A}',
+            1: '{ctx} {B}',
+            2: '{ctx} {C}',
+            3: '{ctx} {D}',
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

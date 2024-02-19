@@ -19,7 +19,7 @@ datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 internlm_7b = dict(
         type=TurboMindModel,
         abbr='internlm-7b-turbomind',
-        path="internlm/internlm-7b",
+        path='internlm/internlm-7b',
         engine_config=dict(session_len=2048,
                            max_batch_size=32,
                            rope_scaling_factor=1.0),
@@ -38,7 +38,7 @@ internlm_7b = dict(
 internlm_20b = dict(
         type=TurboMindModel,
         abbr='internlm-20b-turbomind',
-        path="internlm/internlm-20b",
+        path='internlm/internlm-20b',
         engine_config=dict(session_len=2048,
                            max_batch_size=8,
                            rope_scaling_factor=1.0),

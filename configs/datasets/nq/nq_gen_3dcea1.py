@@ -16,7 +16,7 @@ nq_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
-nq_eval_cfg = dict(evaluator=dict(type=NQEvaluator), pred_role="BOT")
+nq_eval_cfg = dict(evaluator=dict(type=NQEvaluator), pred_role='BOT')
 
 nq_datasets = [
     dict(

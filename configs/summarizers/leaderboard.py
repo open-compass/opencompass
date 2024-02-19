@@ -13,11 +13,11 @@ with read_base():
 
 
 other_summary_groups = []
-other_summary_groups.append({'name': 'Exam', 'subsets': ["ceval",'agieval','mmlu','cmmlu',"GaokaoBench",'ARC-c','ARC-e']})
+other_summary_groups.append({'name': 'Exam', 'subsets': ['ceval','agieval','mmlu','cmmlu','GaokaoBench','ARC-c','ARC-e']})
 other_summary_groups.append({'name': 'Language', 'subsets': ['WiC','chid-dev','afqmc-dev','WSC','tydiqa-goldp','flores_100']})
 other_summary_groups.append({'name': 'Knowledge', 'subsets': ['BoolQ','commonsense_qa','triviaqa','nq']})
 other_summary_groups.append({'name': 'Understanding', 'subsets': ['C3','race-middle','race-high','openbookqa_fact','csl_dev','lcsts','Xsum','eprstmt-dev','lambada']})
-other_summary_groups.append({'name': 'Reasoning', 'subsets': ['cmnli','ocnli','AX_b','AX_g','RTE','COPA','ReCoRD','hellaswag','piqa','siqa','math','gsm8k','drop','openai_humaneval','mbpp',"bbh"]})
+other_summary_groups.append({'name': 'Reasoning', 'subsets': ['cmnli','ocnli','AX_b','AX_g','RTE','COPA','ReCoRD','hellaswag','piqa','siqa','math','gsm8k','drop','openai_humaneval','mbpp','bbh']})
 other_summary_groups.append({'name': 'Overall', 'subsets': ['Exam', 'Language', 'Knowledge', 'Understanding', 'Reasoning']})
 
 summarizer = dict(
@@ -30,11 +30,11 @@ summarizer = dict(
         'Reasoning',
         '--------- 考试 Exam ---------',  # category
         # 'Mixed', # subcategory
-        "ceval",
+        'ceval',
         'agieval',
         'mmlu',
         'cmmlu',
-        "GaokaoBench",
+        'GaokaoBench',
         'ARC-c',
         'ARC-e',
         '--------- 语言 Language ---------',  # category
@@ -92,8 +92,8 @@ summarizer = dict(
         'openai_humaneval',
         'mbpp',
         # '综合推理', # subcategory
-        "bbh",
+        'bbh',
     ],
     summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

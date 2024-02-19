@@ -4,7 +4,7 @@ from opencompass.models import HuggingFaceCausalLM
 models = [dict(
         type=HuggingFaceCausalLM,
         abbr='autoj-scenario-classifier',
-        path="GAIR/autoj-scenario-classifier",
+        path='GAIR/autoj-scenario-classifier',
         tokenizer_path='GAIR/autoj-scenario-classifier',
         tokenizer_kwargs=dict(padding_side='left',
                               truncation_side='left',

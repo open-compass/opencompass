@@ -16,5 +16,5 @@ with read_base():
 
 work_dir = './outputs/internlm2-keyset/'
 
-datasets = sum([v for k, v in locals().items() if k.endswith("_datasets")], [])
-models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
+datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
+models = sum([v for k, v in locals().items() if k.endswith('_model')], [])

@@ -17,8 +17,8 @@ winogrande_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            1: "Good sentence: {opt1}",
-            2: "Good sentence: {opt2}",
+            1: 'Good sentence: {opt1}',
+            2: 'Good sentence: {opt2}',
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

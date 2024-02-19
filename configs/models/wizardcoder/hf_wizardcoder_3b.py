@@ -5,7 +5,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='WizardCoder-1B-V1.0',
-        path="WizardLM/WizardCoder-1B-V1.0",
+        path='WizardLM/WizardCoder-1B-V1.0',
         tokenizer_path='WizardLM/WizardCoder-1B-V1.0',
         tokenizer_kwargs=dict(
             padding_side='left',

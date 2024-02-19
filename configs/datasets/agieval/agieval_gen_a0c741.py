@@ -63,13 +63,13 @@ for name in agieval_multiple_choices_sets + agieval_cloze_sets:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role="HUMAN", prompt='{problem_input}')])),
+                round=[dict(role='HUMAN', prompt='{problem_input}')])),
         retriever=dict(type=ZeroRetriever
                        ),  # retriver 不起作用，以输入参数为准 (zero-shot / few-shot)
         inferencer=dict(type=GenInferencer))
 
     agieval_eval_cfg = dict(
-        evaluator=dict(type=AGIEvalEvaluator), pred_role="BOT")
+        evaluator=dict(type=AGIEvalEvaluator), pred_role='BOT')
 
     agieval_datasets.append(
         dict(

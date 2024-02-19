@@ -2,8 +2,8 @@ from opencompass.models import HuggingFaceCausalLM
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='USER: '),
-        dict(role="BOT", begin=" ASSISTANT:", end='</s>', generate=True),
+        dict(role='HUMAN', begin='USER: '),
+        dict(role='BOT', begin=' ASSISTANT:', end='</s>', generate=True),
     ],
 )
 
@@ -11,7 +11,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='vicuna-13b-v1.5-16k-hf',
-        path="lmsys/vicuna-13b-v1.5-16k",
+        path='lmsys/vicuna-13b-v1.5-16k',
         tokenizer_path='lmsys/vicuna-13b-v1.5-16k',
         tokenizer_kwargs=dict(
             padding_side='left',

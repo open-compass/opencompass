@@ -13,5 +13,5 @@ with read_base():
     from .infinitebenchretrievenumber.infinitebench_retrievenumber_gen import InfiniteBench_retrievenumber_datasets
     from .infinitebenchretrievepasskey.infinitebench_retrievepasskey_gen import InfiniteBench_retrievepasskey_datasets
     from .infinitebenchzhqa.infinitebench_zhqa_gen import InfiniteBench_zhqa_datasets
-    
+
 infinitebench_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

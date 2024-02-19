@@ -18,7 +18,7 @@ models = [
     dict(
         type=TurboMindTisModel,
         abbr='internlm-chat-20b-turbomind',
-        path="internlm",
+        path='internlm',
         tis_addr='0.0.0.0:33337',
         max_out_len=100,
         max_seq_len=2048,

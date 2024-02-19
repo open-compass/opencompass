@@ -5,7 +5,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='internlm2-1.8b-hf',
-        path="internlm/internlm2-1_8b",
+        path='internlm/internlm2-1_8b',
         tokenizer_path='internlm/internlm2-1_8b',
         model_kwargs=dict(
             trust_remote_code=True,

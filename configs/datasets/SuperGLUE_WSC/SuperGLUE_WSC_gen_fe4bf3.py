@@ -6,8 +6,8 @@ from opencompass.datasets import WSCDataset_V3
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 WSC_reader_cfg = dict(
-    input_columns=["span1", "span2", "text"],
-    output_column="label",
+    input_columns=['span1', 'span2', 'text'],
+    output_column='label',
 )
 
 WSC_infer_cfg = dict(
@@ -15,9 +15,9 @@ WSC_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnswer:"
+                'Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnswer:'
             ),
         ]),
     ),
@@ -27,15 +27,15 @@ WSC_infer_cfg = dict(
 
 WSC_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 WSC_datasets = [
     dict(
-        abbr="WSC",
+        abbr='WSC',
         type=WSCDataset_V3,
-        path="./data/SuperGLUE/WSC/val.jsonl",
+        path='./data/SuperGLUE/WSC/val.jsonl',
         reader_cfg=WSC_reader_cfg,
         infer_cfg=WSC_infer_cfg,
         eval_cfg=WSC_eval_cfg,

@@ -21,8 +21,8 @@ summedits_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: f"{summedits_prompt}Answer: No.",
-            1: f"{summedits_prompt}Answer: Yes."
+            0: f'{summedits_prompt}Answer: No.',
+            1: f'{summedits_prompt}Answer: Yes.'
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

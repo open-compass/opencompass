@@ -6,7 +6,7 @@ from opencompass.datasets import InfiniteBenchmathcalcDataset, InfiniteBenchmath
 InfiniteBench_mathcalc_reader_cfg = dict(
     input_columns=['context'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_mathcalc_infer_cfg = dict(

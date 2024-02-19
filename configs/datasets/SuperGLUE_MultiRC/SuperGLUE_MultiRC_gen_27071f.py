@@ -6,8 +6,8 @@ from opencompass.datasets import MultiRCDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 MultiRC_reader_cfg = dict(
-    input_columns=["question", "text", "answer"],
-    output_column="label",
+    input_columns=['question', 'text', 'answer'],
+    output_column='label',
 )
 
 MultiRC_infer_cfg = dict(
@@ -15,9 +15,9 @@ MultiRC_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "{text}\nQuestion: {question}\nAnswer: {answer}\nIs it true?\nA. Yes\nB. No\nAnswer:"
+                '{text}\nQuestion: {question}\nAnswer: {answer}\nIs it true?\nA. Yes\nB. No\nAnswer:'
             ),
         ]),
     ),
@@ -27,15 +27,15 @@ MultiRC_infer_cfg = dict(
 
 MultiRC_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 MultiRC_datasets = [
     dict(
-        abbr="MultiRC",
+        abbr='MultiRC',
         type=MultiRCDataset_V2,
-        path="./data/SuperGLUE/MultiRC/val.jsonl",
+        path='./data/SuperGLUE/MultiRC/val.jsonl',
         reader_cfg=MultiRC_reader_cfg,
         infer_cfg=MultiRC_infer_cfg,
         eval_cfg=MultiRC_eval_cfg,

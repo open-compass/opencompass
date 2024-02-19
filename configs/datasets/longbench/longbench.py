@@ -22,5 +22,5 @@ with read_base():
     from .longbenchlsht.longbench_lsht_gen import LongBench_lsht_datasets
     from .longbenchmulti_news.longbench_multi_news_gen import LongBench_multi_news_datasets
     from .longbenchsamsum.longbench_samsum_gen import LongBench_samsum_datasets
-    
+
 longbench_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

@@ -44,5 +44,3 @@ llava_vizwiz_model = dict(
 
 # evaluation settings
 llava_vizwiz_evaluator = [dict(type='mmpretrain.VQAAcc')]
-
-

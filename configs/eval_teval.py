@@ -16,7 +16,7 @@ meta_template_system_patches = {
     'internlm2-chat-20b-hf': dict(role='SYSTEM', begin='<|im_start|>system\n', end='<|im_end|>\n'),
 }
 
-_origin_models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
+_origin_models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 models = []
 for m in _origin_models:
     m = deepcopy(m)

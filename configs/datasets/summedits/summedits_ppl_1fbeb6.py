@@ -16,20 +16,20 @@ summedits_infer_cfg = dict(
             0:
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
                     """\nDocument:\n{doc}\nSummary:\n{summary}\nIs the summary factually consistent with the document? """
                 ),
-                dict(role="BOT", prompt="No")
+                dict(role='BOT', prompt='No')
             ]),
             1:
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
                     """Document:\n{doc}\nSummary:\n{summary}\nIs the summary factually consistent with the document? """
                 ),
-                dict(role="BOT", prompt="Yes")
+                dict(role='BOT', prompt='Yes')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),

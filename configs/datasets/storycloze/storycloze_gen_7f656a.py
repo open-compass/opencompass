@@ -6,8 +6,8 @@ from opencompass.datasets import storyclozeDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 storycloze_reader_cfg = dict(
-    input_columns=["context", "sentence_quiz1", "sentence_quiz2"],
-    output_column="answer_right_ending",
+    input_columns=['context', 'sentence_quiz1', 'sentence_quiz2'],
+    output_column='answer_right_ending',
 )
 
 storycloze_infer_cfg = dict(
@@ -15,7 +15,7 @@ storycloze_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
                 "{context}\nQuestion: Which ending makes the most sense?\nA. {sentence_quiz1}\nB. {sentence_quiz2}\nYou may choose between 'A' and 'B'.\nAnswer:",
             ),
@@ -27,7 +27,7 @@ storycloze_infer_cfg = dict(
 
 storycloze_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
@@ -35,7 +35,7 @@ storycloze_eval_cfg = dict(
 # Using multilingual version of this dataset.
 storycloze_datasets = [
     dict(
-        abbr="story_cloze",
+        abbr='story_cloze',
         type=storyclozeDataset_V2,
         path='./data/xstory_cloze',
         lang='en',

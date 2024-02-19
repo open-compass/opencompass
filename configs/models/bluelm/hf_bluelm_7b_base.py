@@ -4,7 +4,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='bluelm-7b-base-hf',
-        path="vivo-ai/BlueLM-7B-Base",
+        path='vivo-ai/BlueLM-7B-Base',
         tokenizer_path='vivo-ai/BlueLM-7B-Base',
         model_kwargs=dict(
             device_map='auto',

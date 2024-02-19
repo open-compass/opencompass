@@ -8,8 +8,8 @@ from opencompass.utils.text_postprocessors import first_capital_postprocess
 race_reader_cfg = dict(
     input_columns=['article', 'question', 'A', 'B', 'C', 'D'],
     output_column='answer',
-    train_split="validation",
-    test_split="test"
+    train_split='validation',
+    test_split='test'
 )
 
 race_infer_cfg = dict(

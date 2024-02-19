@@ -25,13 +25,13 @@ for name in medbench_single_choice_sets + medbench_multiple_choices_sets:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role="HUMAN", prompt='{problem_input}')])),
+                round=[dict(role='HUMAN', prompt='{problem_input}')])),
         retriever=dict(type=ZeroRetriever
                        ),  # retriver 不起作用，以输入参数为准 (zero-shot / few-shot)
         inferencer=dict(type=GenInferencer))
 
     medbench_eval_cfg = dict(
-        evaluator=dict(type=MedBenchEvaluator), pred_role="BOT")
+        evaluator=dict(type=MedBenchEvaluator), pred_role='BOT')
 
     medbench_datasets.append(
         dict(
@@ -49,13 +49,13 @@ for name in medbench_qa_sets:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role="HUMAN", prompt='{problem_input}')])),
+                round=[dict(role='HUMAN', prompt='{problem_input}')])),
         retriever=dict(type=ZeroRetriever
                        ),  # retriver 不起作用，以输入参数为准 (zero-shot / few-shot)
         inferencer=dict(type=GenInferencer))
 
     medbench_eval_cfg = dict(
-        evaluator=dict(type=MedBenchEvaluator_NLG), pred_role="BOT")
+        evaluator=dict(type=MedBenchEvaluator_NLG), pred_role='BOT')
 
     medbench_datasets.append(
         dict(
@@ -73,13 +73,13 @@ for name in medbench_cloze_sets:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role="HUMAN", prompt='{problem_input}')])),
+                round=[dict(role='HUMAN', prompt='{problem_input}')])),
         retriever=dict(type=ZeroRetriever
                        ),  # retriver 不起作用，以输入参数为准 (zero-shot / few-shot)
         inferencer=dict(type=GenInferencer))
 
     medbench_eval_cfg = dict(
-        evaluator=dict(type=MedBenchEvaluator_Cloze), pred_role="BOT")
+        evaluator=dict(type=MedBenchEvaluator_Cloze), pred_role='BOT')
 
     medbench_datasets.append(
         dict(
@@ -97,13 +97,13 @@ for name in medbench_ie_sets:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role="HUMAN", prompt='{problem_input}')])),
+                round=[dict(role='HUMAN', prompt='{problem_input}')])),
         retriever=dict(type=ZeroRetriever
                        ),  # retriver 不起作用，以输入参数为准 (zero-shot / few-shot)
         inferencer=dict(type=GenInferencer))
 
     medbench_eval_cfg = dict(
-        evaluator=dict(type=eval('MedBenchEvaluator_'+name.replace('-', '_'))), pred_role="BOT")
+        evaluator=dict(type=eval('MedBenchEvaluator_'+name.replace('-', '_'))), pred_role='BOT')
 
     medbench_datasets.append(
         dict(

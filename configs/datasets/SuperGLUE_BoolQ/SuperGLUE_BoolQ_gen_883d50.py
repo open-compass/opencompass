@@ -6,8 +6,8 @@ from opencompass.datasets import BoolQDataset_V2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 BoolQ_reader_cfg = dict(
-    input_columns=["question", "passage"],
-    output_column="label",
+    input_columns=['question', 'passage'],
+    output_column='label',
 )
 
 BoolQ_infer_cfg = dict(
@@ -15,8 +15,8 @@ BoolQ_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
-                prompt="{passage}\nQuestion: {question}\nA. Yes\nB. No\nAnswer:"),
+                role='HUMAN',
+                prompt='{passage}\nQuestion: {question}\nA. Yes\nB. No\nAnswer:'),
         ]),
     ),
     retriever=dict(type=ZeroRetriever),
@@ -25,15 +25,15 @@ BoolQ_infer_cfg = dict(
 
 BoolQ_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 BoolQ_datasets = [
     dict(
-        abbr="BoolQ",
+        abbr='BoolQ',
         type=BoolQDataset_V2,
-        path="./data/SuperGLUE/BoolQ/val.jsonl",
+        path='./data/SuperGLUE/BoolQ/val.jsonl',
         reader_cfg=BoolQ_reader_cfg,
         infer_cfg=BoolQ_infer_cfg,
         eval_cfg=BoolQ_eval_cfg,

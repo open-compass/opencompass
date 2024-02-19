@@ -13,8 +13,8 @@ bustm_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "{sentence1}。\n{sentence2}。\n两句话说的毫不相关。",
-            1: "{sentence1}。\n{sentence2}。\n两句话说的一个意思。"
+            0: '{sentence1}。\n{sentence2}。\n两句话说的毫不相关。',
+            1: '{sentence1}。\n{sentence2}。\n两句话说的一个意思。'
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

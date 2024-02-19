@@ -11,7 +11,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='nanbeige-16b-chat-hf',
-        path="Nanbeige/Nanbeige-16B-Chat",
+        path='Nanbeige/Nanbeige-16B-Chat',
         tokenizer_path='Nanbeige/Nanbeige-16B-Chat',
         model_kwargs=dict(
             device_map='auto',

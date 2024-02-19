@@ -18,7 +18,7 @@ models = [
     dict(
         type=TurboMindAPIModel,
         abbr='internlm-chat-20b-turbomind',
-        path="internlm-chat-20b",
+        path='internlm-chat-20b',
         api_addr='http://0.0.0.0:23333',
         max_out_len=100,
         max_seq_len=2048,

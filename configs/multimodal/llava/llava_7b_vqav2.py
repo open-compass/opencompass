@@ -46,5 +46,3 @@ llava_vqav2_model = dict(
 
 # evaluation settings
 llava_vqav2_evaluator = [dict(type='mmpretrain.VQAAcc')]
-
-

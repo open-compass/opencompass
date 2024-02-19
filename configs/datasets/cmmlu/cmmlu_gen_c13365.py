@@ -85,16 +85,16 @@ for _name in cmmlu_all_sets:
         ice_template=dict(
             type=PromptTemplate,
             template=dict(
-                begin="</E>",
+                begin='</E>',
                 round=[
                     dict(
-                        role="HUMAN",
+                        role='HUMAN',
                         prompt=
-                        f"以下是关于{_ch_name}的单项选择题，请直接给出正确答案的选项。\n题目：{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}"
+                        f'以下是关于{_ch_name}的单项选择题，请直接给出正确答案的选项。\n题目：{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}'
                     ),
-                    dict(role="BOT", prompt='答案是: {answer}'),
+                    dict(role='BOT', prompt='答案是: {answer}'),
                 ]),
-            ice_token="</E>",
+            ice_token='</E>',
         ),
         retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
         inferencer=dict(type=GenInferencer),
@@ -107,13 +107,13 @@ for _name in cmmlu_all_sets:
     cmmlu_datasets.append(
         dict(
             type=CMMLUDataset,
-            path="./data/cmmlu/",
+            path='./data/cmmlu/',
             name=_name,
-            abbr=f"cmmlu-{_name}",
+            abbr=f'cmmlu-{_name}',
             reader_cfg=dict(
-                input_columns=["question", "A", "B", "C", "D"],
-                output_column="answer",
-                train_split="dev",
+                input_columns=['question', 'A', 'B', 'C', 'D'],
+                output_column='answer',
+                train_split='dev',
                 test_split='test'),
             infer_cfg=cmmlu_infer_cfg,
             eval_cfg=cmmlu_eval_cfg,

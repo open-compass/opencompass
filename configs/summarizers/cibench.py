@@ -19,7 +19,7 @@ summarizer = dict(
         'cibench_template_cn:numeric_correct',
         'cibench_template_cn:text_score',
         'cibench_template_cn:vis_sim',
-        '######## CIBench Template w/o NLTK ########', # category no text score becase it is only for nltk 
+        '######## CIBench Template w/o NLTK ########', # category no text score becase it is only for nltk
         'cibench_template_wo_nltk:executable',
         'cibench_template_wo_nltk:numeric_correct',
         'cibench_template_wo_nltk:vis_sim',
@@ -29,5 +29,5 @@ summarizer = dict(
         'cibench_template_cn_wo_nltk:vis_sim',
     ],
     summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith("_summary_groups")], [])
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], [])
 )

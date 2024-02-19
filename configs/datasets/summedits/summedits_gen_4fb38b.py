@@ -13,7 +13,7 @@ summedits_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
                 'Document:\n{doc}Summary:\n{summary}\nQuestion:\nIs the summary factually consistent with the document?\nA. Yes\nB. No\nAnswer:'
             ),
@@ -23,7 +23,7 @@ summedits_infer_cfg = dict(
 
 summedits_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 

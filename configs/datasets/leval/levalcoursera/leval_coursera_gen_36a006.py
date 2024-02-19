@@ -28,7 +28,7 @@ LEval_coursera_infer_cfg = dict(
 )
 
 LEval_coursera_eval_cfg = dict(
-    evaluator=dict(type=AccEvaluator), 
+    evaluator=dict(type=AccEvaluator),
     pred_postprocessor=dict(type=first_capital_postprocess_multi),
     pred_role='BOT'
 )

@@ -46,5 +46,3 @@ llava_textvqa_model = dict(
 
 # evaluation settings
 llava_textvqa_evaluator = [dict(type='mmpretrain.VQAAcc')]
-
-

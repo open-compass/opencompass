@@ -13,8 +13,8 @@ XCOPA_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "Premise:{premise}。\nQuestion:{question}。\nAnswer: {choice1}.",
-            1: "Passage:{premise}。\nQuestion:{question}。\nAnswer: {choice2}.",
+            0: 'Premise:{premise}。\nQuestion:{question}。\nAnswer: {choice1}.',
+            1: 'Passage:{premise}。\nQuestion:{question}。\nAnswer: {choice2}.',
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

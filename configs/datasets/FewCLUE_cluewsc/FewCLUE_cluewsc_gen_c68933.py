@@ -6,8 +6,8 @@ from opencompass.datasets import CluewscDataset_V2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 cluewsc_reader_cfg = dict(
-    input_columns=["span1", "span2", "text", "new_text"],
-    output_column="label",
+    input_columns=['span1', 'span2', 'text', 'new_text'],
+    output_column='label',
 )
 
 cluewsc_infer_cfg = dict(
@@ -15,9 +15,9 @@ cluewsc_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "{text}\n此处，“{span2}”是否指代“{span1}“？\nA. 是\nB. 否\n请从”A“，”B“中进行选择。\n答：",
+                '{text}\n此处，“{span2}”是否指代“{span1}“？\nA. 是\nB. 否\n请从”A“，”B“中进行选择。\n答：',
             ),
         ]),
     ),
@@ -27,23 +27,23 @@ cluewsc_infer_cfg = dict(
 
 cluewsc_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 cluewsc_datasets = [
     dict(
-        abbr="cluewsc-dev",
+        abbr='cluewsc-dev',
         type=CluewscDataset_V2,
-        path="./data/FewCLUE/cluewsc/dev_few_all.json",
+        path='./data/FewCLUE/cluewsc/dev_few_all.json',
         reader_cfg=cluewsc_reader_cfg,
         infer_cfg=cluewsc_infer_cfg,
         eval_cfg=cluewsc_eval_cfg,
     ),
     dict(
-        abbr="cluewsc-test",
+        abbr='cluewsc-test',
         type=CluewscDataset_V2,
-        path="./data/FewCLUE/cluewsc/test_public.json",
+        path='./data/FewCLUE/cluewsc/test_public.json',
         reader_cfg=cluewsc_reader_cfg,
         infer_cfg=cluewsc_infer_cfg,
         eval_cfg=cluewsc_eval_cfg,

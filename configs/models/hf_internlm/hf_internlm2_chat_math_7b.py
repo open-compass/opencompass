@@ -13,7 +13,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='internlm2-chat-math-7b-hf',
-        path="internlm/internlm2-math-7b",
+        path='internlm/internlm2-math-7b',
         tokenizer_path='internlm/internlm2-math-7b',
         model_kwargs=dict(
             trust_remote_code=True,

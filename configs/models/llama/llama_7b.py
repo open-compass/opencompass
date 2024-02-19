@@ -12,10 +12,10 @@ from opencompass.models import Llama2
 
 models = [
     dict(
-        abbr="llama-7b",
+        abbr='llama-7b',
         type=Llama2,
-        path="./models/llama/7B/",
-        tokenizer_path="./models/llama/tokenizer.model",
+        path='./models/llama/7B/',
+        tokenizer_path='./models/llama/tokenizer.model',
         max_out_len=100,
         max_seq_len=2048,
         batch_size=16,

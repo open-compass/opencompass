@@ -6,10 +6,10 @@ from opencompass.models import Mixtral
 
 models = [
     dict(
-        abbr="mixtral-8x7b-32k",
+        abbr='mixtral-8x7b-32k',
         type=Mixtral,
-        path="./models/mixtral/mixtral-8x7b-32kseqlen",
-        tokenizer_path="./models/mixtral/mixtral-8x7b-32kseqlen/tokenizer.model",
+        path='./models/mixtral/mixtral-8x7b-32kseqlen',
+        tokenizer_path='./models/mixtral/mixtral-8x7b-32kseqlen/tokenizer.model',
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,

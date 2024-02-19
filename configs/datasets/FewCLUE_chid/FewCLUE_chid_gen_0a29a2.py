@@ -6,8 +6,8 @@ from opencompass.datasets import CHIDDataset_V2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 chid_reader_cfg = dict(
-    input_columns=["content","A","B","C","D","E","F","G"],
-    output_column="answer",
+    input_columns=['content','A','B','C','D','E','F','G'],
+    output_column='answer',
 )
 
 chid_infer_cfg = dict(
@@ -16,9 +16,9 @@ chid_infer_cfg = dict(
         template=dict(
             round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "{content}\n请选择______处所填的词\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nF. {F}\nG. {G}\n请从”A“，”B“，”C“，”D“，”E“，”F“，”G“中进行选择。答：",
+                    '{content}\n请选择______处所填的词\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nF. {F}\nG. {G}\n请从”A“，”B“，”C“，”D“，”E“，”F“，”G“中进行选择。答：',
                 ),
             ])),
     retriever=dict(type=ZeroRetriever),
@@ -27,23 +27,23 @@ chid_infer_cfg = dict(
 
 chid_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 chid_datasets = [
     dict(
-        abbr="chid-dev",
+        abbr='chid-dev',
         type=CHIDDataset_V2,
-        path="./data/FewCLUE/chid/dev_few_all.json",
+        path='./data/FewCLUE/chid/dev_few_all.json',
         reader_cfg=chid_reader_cfg,
         infer_cfg=chid_infer_cfg,
         eval_cfg=chid_eval_cfg,
     ),
     dict(
-        abbr="chid-test",
+        abbr='chid-test',
         type=CHIDDataset_V2,
-        path="./data/FewCLUE/chid/test_public.json",
+        path='./data/FewCLUE/chid/test_public.json',
         reader_cfg=chid_reader_cfg,
         infer_cfg=chid_infer_cfg,
         eval_cfg=chid_eval_cfg,

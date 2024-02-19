@@ -3,8 +3,8 @@ from opencompass.models import HuggingFaceCausalLM
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='GPT4 Correct User: ', end='<|end_of_turn|>'),
-        dict(role="BOT", begin="GPT4 Correct Assistant: ", end='<|end_of_turn|>', generate=True),
+        dict(role='HUMAN', begin='GPT4 Correct User: ', end='<|end_of_turn|>'),
+        dict(role='BOT', begin='GPT4 Correct Assistant: ', end='<|end_of_turn|>', generate=True),
     ],
 )
 

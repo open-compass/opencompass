@@ -6,7 +6,7 @@ from opencompass.datasets import InfiniteBenchenqaDataset, LongBenchF1Evaluator
 InfiniteBench_enqa_reader_cfg = dict(
     input_columns=['context', 'question'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_enqa_infer_cfg = dict(

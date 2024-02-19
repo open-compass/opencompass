@@ -13,7 +13,7 @@ summedits_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
                 """Given the document below, you have to determine if "Yes" or "No", the summary is factually consistent with the document.
 
@@ -36,7 +36,7 @@ Answer:"""
 
 summedits_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 

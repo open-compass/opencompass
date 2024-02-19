@@ -44,5 +44,3 @@ llava_vsr_model = dict(
 
 # evaluation settings
 llava_vsr_evaluator = [dict(type='mmpretrain.GQAAcc')]
-
-

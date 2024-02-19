@@ -8,17 +8,17 @@ from opencompass.datasets import TabMWPDataset, TabMWPEvaluator
 
 input_format='TQ'
 output_format='A'
-elements = {"Q": "Question: {question}", 
-            "T": "Table: {table}", 
-            "S": "Solution: {solution}",
-            "A": "Answer: The answer is {answer}.",
-            "AS": "Answer: The answer is {answer}. BECAUSE: {solution}",
-            "SA": "Answer: {solution} The answer is {answer}."}
+elements = {'Q': 'Question: {question}',
+            'T': 'Table: {table}',
+            'S': 'Solution: {solution}',
+            'A': 'Answer: The answer is {answer}.',
+            'AS': 'Answer: The answer is {answer}. BECAUSE: {solution}',
+            'SA': 'Answer: {solution} The answer is {answer}.'}
 
 
 TabMWP_reader_cfg = dict(
-    input_columns=["question", "table"],
-    output_column="test_elements",
+    input_columns=['question', 'table'],
+    output_column='test_elements',
     train_split='dev',
     )
 
@@ -28,8 +28,8 @@ TabMWP_infer_cfg = dict(
         template=dict(
             round=[
                 dict(
-                    role="HUMAN",
-                    prompt= "\n".join(elements[label] for label in input_format)
+                    role='HUMAN',
+                    prompt= '\n'.join(elements[label] for label in input_format)
                 ),
             ],
         ),
@@ -45,9 +45,8 @@ TabMWP_eval_cfg = dict(
 TabMWP_datasets = [
     dict(
         type=TabMWPDataset,
-        path="./data/tabmwp/",
+        path='./data/tabmwp/',
         reader_cfg=TabMWP_reader_cfg,
         infer_cfg=TabMWP_infer_cfg,
         eval_cfg=TabMWP_eval_cfg,)
 ]
-
