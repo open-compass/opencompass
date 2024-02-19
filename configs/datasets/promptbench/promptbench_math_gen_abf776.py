@@ -6,16 +6,16 @@ from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
 
 original_prompt_list = [
-        "Solve the following math question about",
-        "Determine the solution to this mathematical problem related to",
-        "Calculate the answer to the following math query about",
-        "Find the solution for this mathematical challenge with",
-        "Compute the result of this math task concerning",
-        "Resolve the following mathematical question associated with",
-        "Work out the answer to this math problem featuring",
-        "Figure out the solution for the following mathematical task with",
-        "Obtain the result for this math question regarding",
-        "Evaluate the following mathematical problem that includes",
+        'Solve the following math question about',
+        'Determine the solution to this mathematical problem related to',
+        'Calculate the answer to the following math query about',
+        'Find the solution for this mathematical challenge with',
+        'Compute the result of this math task concerning',
+        'Resolve the following mathematical question associated with',
+        'Work out the answer to this math problem featuring',
+        'Figure out the solution for the following mathematical task with',
+        'Obtain the result for this math question regarding',
+        'Evaluate the following mathematical problem that includes',
 ]
 
 math_infer_cfg = dict(
@@ -23,8 +23,8 @@ math_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
-                prompt="{adv_prompt} {problem}:"),
+                role='HUMAN',
+                prompt='{adv_prompt} {problem}:'),
         ]),
     ),
     retriever=dict(type=ZeroRetriever),

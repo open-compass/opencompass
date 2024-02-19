@@ -15,8 +15,7 @@ humanevalx_infer_cfg = {
             template=dict(round=[
                 dict(
                     role='HUMAN',
-                    prompt=
-                    f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
+                    prompt=f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
 
 ### Instruction:
@@ -33,10 +32,9 @@ Create a {lang} script for this problem:
 humanevalx_eval_cfg_dict = {
     lang: dict(
         evaluator=dict(
-            type=HumanevalXEvaluator, 
+            type=HumanevalXEvaluator,
             language=lang,
-            ip_address=
-            "localhost",  # replace to your code_eval_server ip_address, port
+            ip_address='localhost',  # replace to your code_eval_server ip_address, port
             port=5001
         ),  # refer to https://opencompass.readthedocs.io/en/latest/advanced_guides/code_eval_service.html to launch a server
         pred_role='BOT')

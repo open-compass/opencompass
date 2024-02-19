@@ -12,7 +12,7 @@ qaspercut_reader_cfg = dict(
 qaspercut_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template="{evidence}\nAnswer these questions:\nQ: {question}?\nA:"),
+        template='{evidence}\nAnswer these questions:\nQ: {question}?\nA:'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(
         type=GenInferencer, max_out_len=50, max_seq_len=8192, batch_size=4))

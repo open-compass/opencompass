@@ -1,15 +1,15 @@
 from opencompass.models import HuggingFaceCausalLM
 
 '''
-#This is a 4bits quantized version of Auto-J by using AutoGPTQ, 
-which is available on huggingface-hub: 
+#This is a 4bits quantized version of Auto-J by using AutoGPTQ,
+which is available on huggingface-hub:
 https://huggingface.co/GAIR/autoj-13b-GPTQ-4bits
 '''
 
 models = [dict(
         type=HuggingFaceCausalLM,
         abbr='autoj-13b-GPTQ-4bits',
-        path="GAIR/autoj-13b-GPTQ-4bits",
+        path='GAIR/autoj-13b-GPTQ-4bits',
         tokenizer_path='GAIR/autoj-13b-GPTQ-4bits',
         tokenizer_kwargs=dict(padding_side='left',
                               truncation_side='left',

@@ -8,4 +8,4 @@ with read_base():
 
 datasets = lawbench_zero_shot_datasets + lawbench_one_shot_datasets
 for d in datasets:
-    d["infer_cfg"]["inferencer"]["save_every"] = 1
+    d['infer_cfg']['inferencer']['save_every'] = 1

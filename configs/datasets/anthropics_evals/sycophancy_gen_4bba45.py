@@ -24,7 +24,7 @@ sycophancy_infer_cfg = dict(
 
 sycophancy_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='ABCDEFG'),
 )
 

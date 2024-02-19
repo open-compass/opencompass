@@ -8,7 +8,7 @@ from opencompass.datasets import (
     Gsm8kAgentEvaluator,
 )
 
-gsm8k_reader_cfg = dict(input_columns=["question"], output_column="answer")
+gsm8k_reader_cfg = dict(input_columns=['question'], output_column='answer')
 
 gsm8k_infer_cfg = dict(
     prompt_template=dict(

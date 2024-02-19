@@ -15,8 +15,7 @@ TheoremQA_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """You are a mathematician, you are supposed to answer the given question. You need to output the answer in your final sentence like "Therefore, the answer is ...". The answer can only be one of the following forms:\n1. a numerical value like 0.1, no symbol and no unit at all.\n2. a list of number like [2, 3, 4].\n3. True/False.\n4. an option like (a), (b), (c), (d)\nQuestion: {Question}\nLet\'s think step by step."""
+                prompt="""You are a mathematician, you are supposed to answer the given question. You need to output the answer in your final sentence like "Therefore, the answer is ...". The answer can only be one of the following forms:\n1. a numerical value like 0.1, no symbol and no unit at all.\n2. a list of number like [2, 3, 4].\n3. True/False.\n4. an option like (a), (b), (c), (d)\nQuestion: {Question}\nLet\'s think step by step."""
             ),
         ])),
     retriever=dict(type=ZeroRetriever),
@@ -30,7 +29,7 @@ TheoremQA_datasets = [
     dict(
         abbr='TheoremQA',
         type=TheoremQADataset,
-        path="./data/TheoremQA/test.csv",
+        path='./data/TheoremQA/test.csv',
         reader_cfg=TheoremQA_reader_cfg,
         infer_cfg=TheoremQA_infer_cfg,
         eval_cfg=TheoremQA_eval_cfg)

@@ -5,7 +5,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='llama-65b-hf',
-        path="huggyllama/llama-65b",
+        path='huggyllama/llama-65b',
         tokenizer_path='huggyllama/llama-65b',
         tokenizer_kwargs=dict(padding_side='left',
                               truncation_side='left',

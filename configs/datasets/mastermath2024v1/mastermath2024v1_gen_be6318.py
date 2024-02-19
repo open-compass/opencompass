@@ -34,4 +34,3 @@ mastermath2024v1_datasets = [dict(
         reader_cfg=mastermath2024v1_reader_cfg,
         infer_cfg=mastermath2024v1_infer_cfg,
         eval_cfg=mastermath2024v1_eval_cfg)]
-

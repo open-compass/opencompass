@@ -10,7 +10,7 @@ from lagent.agents.react import ReActProtocol
 
 with read_base():
     from .datasets.CIBench.CIBench_gen_eb42f9 import cibench_datasets as datasets
-    
+
 FORCE_STOP_PROMPT_EN = """You should directly give results based on history information."""
 
 FEWSHOT_INSTRUCTION = """\
@@ -54,9 +54,7 @@ models = [
         actions=[
             dict(
                 type=IPythonInterpreter,
-                description=
-                '''It can run Python code in a manner as jupyter notebook. The code must be a valid code that contains only python method.
-'''),
+                description='It can run Python code in a manner as jupyter notebook. The code must be a valid code that contains only python method.\n'),
         ],
         protocol=dict(
             type=ReActProtocol,
@@ -75,6 +73,6 @@ models = [
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=50, gen_task_coef=1),
     runner=dict(
-        type=SlurmRunner, max_num_workers=8, retry=2, 
+        type=SlurmRunner, max_num_workers=8, retry=2,
         task=dict(type=OpenICLInferTask)),
 )

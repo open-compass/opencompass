@@ -5,8 +5,8 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import WSCDataset_V2
 
 WSC_reader_cfg = dict(
-    input_columns=["span1", "span2", "text"],
-    output_column="label",
+    input_columns=['span1', 'span2', 'text'],
+    output_column='label',
 )
 
 WSC_infer_cfg = dict(
@@ -16,18 +16,16 @@ WSC_infer_cfg = dict(
             'A':
             dict(round=[
                 dict(
-                    role="HUMAN",
-                    prompt=
-                    "{text}\nIs '{span1}' and '{span2}' refers to the same entity in the above sentence?"
+                    role='HUMAN',
+                    prompt="{text}\nIs '{span1}' and '{span2}' refers to the same entity in the above sentence?"
                 ),
                 dict(role='BOT', prompt='Yes'),
             ]),
             'B':
             dict(round=[
                 dict(
-                    role="HUMAN",
-                    prompt=
-                    "{text}\nIs '{span1}' and '{span2}' refers to the same entity in the above sentence?"
+                    role='HUMAN',
+                    prompt="{text}\nIs '{span1}' and '{span2}' refers to the same entity in the above sentence?"
                 ),
                 dict(role='BOT', prompt='No'),
             ]),
@@ -41,9 +39,9 @@ WSC_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
 WSC_datasets = [
     dict(
-        abbr="WSC",
+        abbr='WSC',
         type=WSCDataset_V2,
-        path="./data/SuperGLUE/WSC/val.jsonl",
+        path='./data/SuperGLUE/WSC/val.jsonl',
         reader_cfg=WSC_reader_cfg,
         infer_cfg=WSC_infer_cfg,
         eval_cfg=WSC_eval_cfg,

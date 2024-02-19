@@ -7,28 +7,28 @@ from opencompass.datasets import AnliDataset
 anli_datasets = []
 for _split in ['R1', 'R2', 'R3']:
     anli_reader_cfg = dict(
-        input_columns=["context", "hypothesis"],
-        output_column="label",
+        input_columns=['context', 'hypothesis'],
+        output_column='label',
     )
 
     anli_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
             template={
-                "A":
+                'A':
                 dict(round=[
-                    dict(role="HUMAN", prompt="{context}\n{hypothesis}\What is the relation between the two sentences?"),
-                    dict(role="BOT", prompt="Contradiction"),
+                    dict(role='HUMAN', prompt='{context}\n{hypothesis}\What is the relation between the two sentences?'),
+                    dict(role='BOT', prompt='Contradiction'),
                 ]),
-                "B":
+                'B':
                 dict(round=[
-                    dict(role="HUMAN", prompt="{context}\n{hypothesis}\What is the relation between the two sentences?"),
-                    dict(role="BOT", prompt="Entailment"),
+                    dict(role='HUMAN', prompt='{context}\n{hypothesis}\What is the relation between the two sentences?'),
+                    dict(role='BOT', prompt='Entailment'),
                 ]),
-                "C":
+                'C':
                 dict(round=[
-                    dict(role="HUMAN", prompt="{context}\n{hypothesis}\What is the relation between the two sentences?"),
-                    dict(role="BOT", prompt="Neutral"),
+                    dict(role='HUMAN', prompt='{context}\n{hypothesis}\What is the relation between the two sentences?'),
+                    dict(role='BOT', prompt='Neutral'),
                 ]),
             },
         ),
@@ -41,8 +41,8 @@ for _split in ['R1', 'R2', 'R3']:
     anli_datasets.append(
         dict(
             type=AnliDataset,
-            abbr=f"anli-{_split}",
-            path=f"data/anli/anli_v1.0/{_split}/dev.jsonl",
+            abbr=f'anli-{_split}',
+            path=f'data/anli/anli_v1.0/{_split}/dev.jsonl',
             reader_cfg=anli_reader_cfg,
             infer_cfg=anli_infer_cfg,
             eval_cfg=anli_eval_cfg,

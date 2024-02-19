@@ -19,5 +19,5 @@ with read_base():
     from .levaltvshowsumm.leval_tvshow_summ_gen import LEval_tvshow_summ_datasets
     from .levalscientificqa.leval_scientificqa_gen import LEval_scientificqa_datasets
     from .levalreviewsumm.leval_review_summ_gen import LEval_review_summ_datasets
-    
+
 leval_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

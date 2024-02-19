@@ -4,7 +4,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='deepseek-moe-16b-base-hf',
-        path="deepseek-ai/deepseek-moe-16b-base",
+        path='deepseek-ai/deepseek-moe-16b-base',
         tokenizer_path='deepseek-ai/deepseek-moe-16b-base',
         model_kwargs=dict(
             device_map='auto',

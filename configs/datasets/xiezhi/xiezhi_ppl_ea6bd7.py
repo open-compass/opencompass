@@ -5,16 +5,16 @@ from opencompass.datasets import XiezhiDataset, XiezhiRetriever
 
 xiezhi_datasets = []
 
-for split in ["spec_eng", "spec_chn", "inter_eng", "inter_chn"]:
+for split in ['spec_eng', 'spec_chn', 'inter_eng', 'inter_chn']:
     if 'chn' in split:
-        q_hint, a_hint = "题目", "答案"
+        q_hint, a_hint = '题目', '答案'
     else:
-        q_hint, a_hint = "Question", "Answer"
+        q_hint, a_hint = 'Question', 'Answer'
 
     xiezhi_reader_cfg = dict(
-        input_columns=["question", "A", "B", "C", "D", "labels"],
-        output_column="answer",
-        train_split="train",
+        input_columns=['question', 'A', 'B', 'C', 'D', 'labels'],
+        output_column='answer',
+        train_split='train',
         test_split='test',
     )
     xiezhi_infer_cfg = dict(
@@ -22,14 +22,14 @@ for split in ["spec_eng", "spec_chn", "inter_eng", "inter_chn"]:
             type=PromptTemplate,
             template={
                 answer: dict(
-                    begin="</E>",
+                    begin='</E>',
                     round=[
-                        dict(role="HUMAN", prompt=f"{q_hint}: {{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}"),
-                        dict(role="BOT", prompt=f"{a_hint}: {answer}"),
+                        dict(role='HUMAN', prompt=f'{q_hint}: {{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}'),
+                        dict(role='BOT', prompt=f'{a_hint}: {answer}'),
                     ])
-                for answer in ["A", "B", "C", "D"]
+                for answer in ['A', 'B', 'C', 'D']
             },
-            ice_token="</E>",
+            ice_token='</E>',
         ),
         retriever=dict(type=XiezhiRetriever, ice_num=3),
         inferencer=dict(type=PPLInferencer),
@@ -40,9 +40,9 @@ for split in ["spec_eng", "spec_chn", "inter_eng", "inter_chn"]:
     xiezhi_datasets.append(
         dict(
             type=XiezhiDataset,
-            abbr=f"xiezhi-{split}",
-            path="./data/xiezhi/",
-            name="xiezhi_" + split,
+            abbr=f'xiezhi-{split}',
+            path='./data/xiezhi/',
+            name='xiezhi_' + split,
             reader_cfg=xiezhi_reader_cfg,
             infer_cfg=xiezhi_infer_cfg,
             eval_cfg=xiezhi_eval_cfg,

@@ -5,7 +5,7 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import MathBenchDataset, mathbench_postprocess
 
 cloze_prompts ={
-    "cloze_arith_en": [
+    'cloze_arith_en': [
         dict(role='HUMAN', prompt='Q: Calculate (341/11)/(9/(-6)*(-2)/3).'),
         dict(role='BOT', prompt='A: First, (9/(-6)*(-2)/3) can be simplified by : 9/(-6) = -1.5, -1.5 * (-2) = 3, 3 / 3 = 1. So, (9/(-6)*(-2)/3) is equal to 1. Now, we have `(341/11)/1` equals `341/11`. Finally, calculate `341/11 = 31`. The answer is 31.\n'),
         dict(role='HUMAN', prompt='Q: In base 14, what is 5 - 638d8d?'),
@@ -45,13 +45,13 @@ for _split in list(mathbench_sets.keys()):
         mathbench_datasets.append(
             dict(
                 type=MathBenchDataset,
-                path=f"./data/mathbench/{_split}",
+                path=f'./data/mathbench/{_split}',
                 name=_name,
                 with_circular=False,
-                abbr="mathbench-arithmetic" + _split + '-' + _name,
+                abbr='mathbench-arithmetic' + _split + '-' + _name,
                 reader_cfg=dict(
-                    input_columns=["question"],
-                    output_column="answer"
+                    input_columns=['question'],
+                    output_column='answer'
                     ),
                 infer_cfg=mathbench_infer_cfg,
                 eval_cfg=mathbench_eval_cfg,

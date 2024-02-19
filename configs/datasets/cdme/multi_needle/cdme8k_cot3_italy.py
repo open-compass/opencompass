@@ -16,7 +16,7 @@ def generate_linear_space(start, end, num):
     if num == 1:
         return [start]
     elif num < 1:
-        raise ValueError("num must be at least 1.")
+        raise ValueError('num must be at least 1.')
     step = (end - start) / (num - 1)
     return [start + step * i for i in range(num)]
 
@@ -48,7 +48,7 @@ cdme_eval_cfg = dict(
 
 context_lengths = list(range(1000, 9000, 1000))
 document_depth_percent_intervals = 20
-document_depth_percent_interval_type = "linear"
+document_depth_percent_interval_type = 'linear'
 
 base_path = './data/CDME'
 file_list = ['zh_finance.jsonl']
@@ -57,11 +57,11 @@ cdme_datasets = []
 needles = ['\n意大利的佛罗伦萨有一家名为"La Giostra"的餐馆，是整个佛罗伦萨中排行第一的餐馆。\n',
            '"La Giostra"餐馆的特色菜肴是松露奶酪通心粉。',
            '松露奶酪通心粉是该家餐馆的有着意大利皇室烹饪血统的大厨Jack制作',]
-retrieval_question = ("制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫什么？"
+retrieval_question = ('制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫什么？'
                       "请按照'制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫______。'的格式回答。")
-answer = "制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫Jack"
+answer = '制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫Jack'
 
-keyword = "Jack"
+keyword = 'Jack'
 diff = 25
 
 for original_context_length in context_lengths:

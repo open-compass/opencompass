@@ -5,7 +5,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='CodeLlama-13b-Instruct',
-        path="codellama/CodeLlama-13b-Instruct-hf",
+        path='codellama/CodeLlama-13b-Instruct-hf',
         tokenizer_path='codellama/CodeLlama-13b-Instruct-hf',
         tokenizer_kwargs=dict(
             padding_side='left',

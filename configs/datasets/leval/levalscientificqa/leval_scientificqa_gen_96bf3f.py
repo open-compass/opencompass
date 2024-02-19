@@ -27,7 +27,7 @@ LEval_scientificqa_infer_cfg = dict(
 )
 
 LEval_scientificqa_eval_cfg = dict(
-    evaluator=dict(type=RougeEvaluator), 
+    evaluator=dict(type=RougeEvaluator),
     pred_role='BOT'
 )
 

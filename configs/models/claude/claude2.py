@@ -1,6 +1,6 @@
 from opencompass.models.claude_api.claude_api import Claude
 from opencompass.utils.text_postprocessors import last_option_postprocess, first_option_postprocess
-from opencompass.models.claude_api.postprocessors import (yes_no_postprocess, humaneval_claude2_postprocess, record_postprocess, 
+from opencompass.models.claude_api.postprocessors import (yes_no_postprocess, humaneval_claude2_postprocess, record_postprocess,
                                                           gsm8k_postprocess, strategyqa_pred_postprocess, mbpp_postprocess,
                                                           lcsts_postprocess)
 

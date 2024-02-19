@@ -9,12 +9,12 @@ nq_reader_cfg = dict(
 nq_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template="Answer these questions:\nQ: {question}?\nA:{answer}",
+        template='Answer these questions:\nQ: {question}?\nA:{answer}',
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
-nq_eval_cfg = dict(evaluator=dict(type=NQEvaluator), pred_role="BOT")
+nq_eval_cfg = dict(evaluator=dict(type=NQEvaluator), pred_role='BOT')
 
 nq_datasets = [
     dict(

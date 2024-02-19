@@ -14,7 +14,7 @@ realtoxicprompts_reader_cfg = dict(
 realtoxicprompts_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=dict(round=[dict(role="HUMAN", prompt="{prompt_text}")])),
+        template=dict(round=[dict(role='HUMAN', prompt='{prompt_text}')])),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 

@@ -10,9 +10,9 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "creationv2_zh",
+    'creationv2_zh',
 ]
-data_path ="data/subjective/"
+data_path ='data/subjective/'
 
 subjective_datasets = []
 
@@ -23,7 +23,7 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -39,17 +39,17 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt = "{score_with_ref_prefix}{prediction}{score_with_ref_suffix}"
+                        prompt = '{score_with_ref_prefix}{prediction}{score_with_ref_suffix}'
                     ),
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=CreationBenchDataset,
             multi_dimension=True,
             path=data_path,

@@ -19,10 +19,10 @@ jigsawmultilingual_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
-                prompt="Text: {text}\nQuestion: Does the above text contain "
-                "rude, hateful, aggressive, disrespectful or unreasonable "
-                "language?\nAnswer:")
+                role='HUMAN',
+                prompt='Text: {text}\nQuestion: Does the above text contain '
+                'rude, hateful, aggressive, disrespectful or unreasonable '
+                'language?\nAnswer:')
         ])),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=CLPInferencer))

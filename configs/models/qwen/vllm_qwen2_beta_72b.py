@@ -5,7 +5,7 @@ models = [
     dict(
         type=VLLM,
         abbr='qwen2-beta-72b-vllm',
-        path="Qwen/Qwen2-beta-72B",
+        path='Qwen/Qwen2-beta-72B',
         model_kwargs=dict(tensor_parallel_size=4),
         max_out_len=100,
         max_seq_len=2048,

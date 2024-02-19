@@ -11,8 +11,8 @@ MultiRC_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "Passage:{text}。\nQuestion:{question}。\nAnswer: {answer}. It is false.",
-            1: "Passage:</P>。\nQuestion:{question}。\nAnswer: {answer}. It is true.",
+            0: 'Passage:{text}。\nQuestion:{question}。\nAnswer: {answer}. It is false.',
+            1: 'Passage:</P>。\nQuestion:{question}。\nAnswer: {answer}. It is true.',
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

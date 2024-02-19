@@ -8,7 +8,7 @@ from opencompass.datasets import InfiniteBenchenmcDataset
 InfiniteBench_enmc_reader_cfg = dict(
     input_columns=['context', 'question', 'option_A', 'option_B', 'option_C', 'option_D'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_enmc_infer_cfg = dict(

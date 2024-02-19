@@ -12,29 +12,29 @@ ARC_c_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            "A":
+            'A':
             dict(
                 round=[
-                    dict(role="HUMAN", prompt="Question: {question}\nAnswer: "),
-                    dict(role="BOT", prompt="{textA}")
+                    dict(role='HUMAN', prompt='Question: {question}\nAnswer: '),
+                    dict(role='BOT', prompt='{textA}')
                 ], ),
-            "B":
+            'B':
             dict(
                 round=[
-                    dict(role="HUMAN", prompt="Question: {question}\nAnswer: "),
-                    dict(role="BOT", prompt="{textB}")
+                    dict(role='HUMAN', prompt='Question: {question}\nAnswer: '),
+                    dict(role='BOT', prompt='{textB}')
                 ], ),
-            "C":
+            'C':
             dict(
                 round=[
-                    dict(role="HUMAN", prompt="Question: {question}\nAnswer: "),
-                    dict(role="BOT", prompt="{textC}")
+                    dict(role='HUMAN', prompt='Question: {question}\nAnswer: '),
+                    dict(role='BOT', prompt='{textC}')
                 ], ),
-            "D":
+            'D':
             dict(
                 round=[
-                    dict(role="HUMAN", prompt="Question: {question}\nAnswer: "),
-                    dict(role="BOT", prompt="{textD}")
+                    dict(role='HUMAN', prompt='Question: {question}\nAnswer: '),
+                    dict(role='BOT', prompt='{textD}')
                 ], ),
         }),
     retriever=dict(type=ZeroRetriever),

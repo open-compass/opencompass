@@ -10,7 +10,7 @@ summedits_reader_cfg = dict(
     test_split='train')
 
 summedits_prompt1 = "Given the document below, you have to determine if 'Yes' or 'No', the summary is factually consistent with the document."
-summedits_prompt2 = "Document:\n{doc}\nSummary:\n{summary}\nIs the summary factually consistent with the document? "
+summedits_prompt2 = 'Document:\n{doc}\nSummary:\n{summary}\nIs the summary factually consistent with the document? '
 summedits_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
@@ -24,8 +24,8 @@ summedits_infer_cfg = dict(
                         prompt=summedits_prompt1)
                 ],
                 round=[
-                    dict(role="HUMAN", prompt=summedits_prompt2),
-                    dict(role="BOT", prompt="No")
+                    dict(role='HUMAN', prompt=summedits_prompt2),
+                    dict(role='BOT', prompt='No')
                 ]),
             1:
             dict(
@@ -36,8 +36,8 @@ summedits_infer_cfg = dict(
                         prompt=summedits_prompt1)
                 ],
                 round=[
-                    dict(role="HUMAN", prompt=summedits_prompt2),
-                    dict(role="BOT", prompt="Yes")
+                    dict(role='HUMAN', prompt=summedits_prompt2),
+                    dict(role='BOT', prompt='Yes')
                 ]),
         }),
     retriever=dict(type=ZeroRetriever),

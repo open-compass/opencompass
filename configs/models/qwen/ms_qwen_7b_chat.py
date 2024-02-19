@@ -3,8 +3,8 @@ from opencompass.models import ModelScopeCausalLM
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
-        dict(role="BOT", begin="\n<|im_start|>assistant\n", end='<|im_end|>', generate=True),
+        dict(role='HUMAN', begin='\n<|im_start|>user\n', end='<|im_end|>'),
+        dict(role='BOT', begin='\n<|im_start|>assistant\n', end='<|im_end|>', generate=True),
     ],
 )
 
@@ -12,7 +12,7 @@ models = [
     dict(
         type=ModelScopeCausalLM,
         abbr='qwen-7b-chat-ms',
-        path="qwen/Qwen-7B-Chat",
+        path='qwen/Qwen-7B-Chat',
         tokenizer_path='qwen/Qwen-7B-Chat',
         tokenizer_kwargs=dict(
             padding_side='left',

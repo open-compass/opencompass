@@ -45,5 +45,3 @@ llava_gqa_model = dict(
 
 # evaluation settings
 llava_gqa_evaluator = [dict(type='mmpretrain.GQAAcc')]
-
-

@@ -14,8 +14,7 @@ mbpp_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+                prompt="""Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
 ### Instruction:
 Create a Python script for this problem:
@@ -29,7 +28,7 @@ Test examples:
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer, max_out_len=512))
 
-mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator2), pred_role="BOT")
+mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator2), pred_role='BOT')
 
 mbpp_datasets = [
     dict(

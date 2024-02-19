@@ -24,7 +24,7 @@ airisk_infer_cfg = dict(
 
 airisk_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='ABCDEFGH'),
 )
 
@@ -58,8 +58,7 @@ for _dataset in _dataset_list:
         dict(
             abbr=f'airisk_{_dataset}',
             type=AiRiskDataset,
-            path=
-            f'data/advanced-ai-risk/human_generated_evals/{_dataset}.jsonl',
+            path=f'data/advanced-ai-risk/human_generated_evals/{_dataset}.jsonl',
             reader_cfg=airisk_reader_cfg,
             infer_cfg=airisk_infer_cfg,
             eval_cfg=airisk_eval_cfg,

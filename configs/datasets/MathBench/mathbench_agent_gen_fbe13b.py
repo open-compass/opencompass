@@ -9,7 +9,7 @@ from opencompass.utils.text_postprocessors import first_option_postprocess
 
 
 PROMPT_EN = {
-        "FEWSHOT_INSTRUCTION_CLOZE" : [
+        'FEWSHOT_INSTRUCTION_CLOZE' : [
         dict(role='HUMAN', prompt='Mark\'s basketball team scores 25 2 pointers, 8 3 pointers and 10 free throws.  Their opponents score double the 2 pointers but half the 3 pointers and free throws.  What\'s the total number of points scored by both teams added together?'),
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:def solution():\n    mark_pointers_2 = 25 * 2\n    mark_pointers_3 = 8 * 3\n    mark_free_throws = 10 * 1\n    mark_points_scored = mark_pointers_2 + mark_pointers_3 + mark_free_throws\n    opponents_pointers_2 = mark_pointers_2 * 2\n    opponents_pointers_3 = mark_pointers_3 / 2\n    opponents_free_throws = mark_free_throws / 2\n    opponents_points_scored = opponents_pointers_2 + opponents_pointers_3 + opponents_free_throws\n    total_points_scored = mark_points_scored + opponents_points_scored\n    result = total_points_scored\n    return result'),
         dict(role='SYSTEM', prompt='Response:210'),
@@ -27,7 +27,7 @@ PROMPT_EN = {
 
         dict(role='HUMAN', prompt='{question}'),
     ],
-    "FEWSHOT_INSTRUCTION_CHOICE" : [
+    'FEWSHOT_INSTRUCTION_CHOICE' : [
         dict(role='HUMAN', prompt='Given point P(-1,4) lies on the graph of the inverse proportionality function $y=\\frac{{k}}{{x}}$ (k≠0), what is the value of k? A. $-\\frac{{1}}{{4}}$ B. $\\frac{{1}}{{4}}$ C. $4$ D. $-4$'),
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:from sympy import solve, symbols, Ne, Eq\ndef solution():\n    k = symbols(\'k\')\n    result = solve([Eq(4, k / (-1)), Ne(k, 0)], k, dict=True)\n    return result'),
         dict(role='SYSTEM', prompt='Response:{{Eq(k, -4)}}'),
@@ -48,7 +48,7 @@ PROMPT_EN = {
 }
 
 PROMPT_CN = {
-    "FEWSHOT_INSTRUCTION_CLOZE" : [
+    'FEWSHOT_INSTRUCTION_CLOZE' : [
         dict(role='HUMAN', prompt='Mark的篮球队得到25个2分球，8个3分球和10个罚球。他们的对手得到2分球的两倍，但3分球和罚球的一半。两队得分的总和是多少？'),
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:def solution():\n    mark_pointers_2 = 25 * 2\n    mark_pointers_3 = 8 * 3\n    mark_free_throws = 10 * 1\n    mark_points_scored = mark_pointers_2 + mark_pointers_3 + mark_free_throws\n    opponents_pointers_2 = mark_pointers_2 * 2\n    opponents_pointers_3 = mark_pointers_3 / 2\n    opponents_free_throws = mark_free_throws / 2\n    opponents_points_scored = opponents_pointers_2 + opponents_pointers_3 + opponents_free_throws\n    total_points_scored = mark_points_scored + opponents_points_scored\n    result = total_points_scored\n    return result'),
         dict(role='SYSTEM', prompt='Response:210'),
@@ -66,7 +66,7 @@ PROMPT_CN = {
 
         dict(role='HUMAN', prompt='{question}'),
     ],
-    "FEWSHOT_INSTRUCTION_CHOICE" : [
+    'FEWSHOT_INSTRUCTION_CHOICE' : [
         dict(role='HUMAN', prompt='已知点P（-1，4）在反比例函数$y=\\frac{{k}}{{x}}$ (k≠0)的图象上，则k的值是____'),
         dict(role='BOT', prompt='Tool:PythonInterpreter\nTool Input:from sympy import solve, symbols, Ne, Eq\ndef solution():\n    k = symbols(\'k\')\n    result = solve([Eq(4, k / (-1)), Ne(k, 0)], k, dict=True)\n    return result'),
         dict(role='SYSTEM', prompt='Response:{{Eq(k, -4)}}'),
@@ -105,7 +105,7 @@ for _split in list(mathbench_sets.keys()):
         mathbench_infer_cfg = dict(
             prompt_template=dict(type=PromptTemplate,
                                  template=dict(
-                                     round = prompt_example["FEWSHOT_INSTRUCTION_CLOZE"] if 'cloze' in _name else prompt_example["FEWSHOT_INSTRUCTION_CHOICE"])),
+                                     round = prompt_example['FEWSHOT_INSTRUCTION_CLOZE'] if 'cloze' in _name else prompt_example['FEWSHOT_INSTRUCTION_CHOICE'])),
             retriever=dict(type=ZeroRetriever),
             inferencer=dict(type=AgentInferencer)
         )
@@ -116,14 +116,14 @@ for _split in list(mathbench_sets.keys()):
 
         mathbench_agent_datasets.append(
             dict(
-                abbr="mathbench-" + _split + '-' + _name + '-agent',
+                abbr='mathbench-' + _split + '-' + _name + '-agent',
                 type=MathBenchDataset,
-                path=f"./data/mathbench/{_split}",
+                path=f'./data/mathbench/{_split}',
                 name=_name,
                 with_circular=with_circular_eval,
                 reader_cfg=dict(
-                    input_columns=["question"],
-                    output_column="answer"
+                    input_columns=['question'],
+                    output_column='answer'
                     ),
                 infer_cfg=mathbench_infer_cfg,
                 eval_cfg=mathbench_eval_cfg,

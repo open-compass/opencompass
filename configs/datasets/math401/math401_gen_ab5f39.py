@@ -33,14 +33,14 @@ math401_eval_cfg = dict(
 
 math401_datasets = [
     dict(
-        abbr="math401",
+        abbr='math401',
         type=MathBenchDataset,
-        path=f"./data/math401/",
+        path=f'./data/math401/',
         with_circular=False,
-        name="cloze_en",
+        name='cloze_en',
         reader_cfg=dict(
-            input_columns=["question"],
-            output_column="answer"
+            input_columns=['question'],
+            output_column='answer'
             ),
         infer_cfg=math401_infer_cfg,
         eval_cfg=math401_eval_cfg,

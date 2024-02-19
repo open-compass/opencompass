@@ -4,7 +4,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='skywork-13b-hf',
-        path="Skywork/Skywork-13B-base",
+        path='Skywork/Skywork-13B-base',
         tokenizer_path='Skywork/Skywork-13B-base',
         model_kwargs=dict(
             device_map='auto',

@@ -4,7 +4,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='aquila2-34b-hf',
-        path="BAAI/Aquila2-34B",
+        path='BAAI/Aquila2-34B',
         tokenizer_path='BAAI/Aquila2-34B',
         model_kwargs=dict(
             device_map='auto',

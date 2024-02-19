@@ -12,7 +12,7 @@ iwslt2017_infer_cfg = dict(
     ice_template=dict(type='PromptTemplate',
                     template=dict(
                         begin=[
-                            dict(role='SYSTEM', fallback_role="HUMAN", prompt='Please translate the following English statements to German:'),
+                            dict(role='SYSTEM', fallback_role='HUMAN', prompt='Please translate the following English statements to German:'),
                             '</E>',
                         ],
                         round=[

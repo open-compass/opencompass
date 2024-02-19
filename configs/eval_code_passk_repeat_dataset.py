@@ -19,26 +19,26 @@ datasets += sanitized_mbpp_datasets
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin="<|User|>:", end="\n"),
-        dict(role="BOT", begin="<|Bot|>:", end="<eoa>\n", generate=True),
+        dict(role='HUMAN', begin='<|User|>:', end='\n'),
+        dict(role='BOT', begin='<|Bot|>:', end='<eoa>\n', generate=True),
     ],
 )
 
 models = [
     dict(
-        abbr="internlm-chat-7b-hf-v11",
+        abbr='internlm-chat-7b-hf-v11',
         type=HuggingFaceCausalLM,
-        path="internlm/internlm-chat-7b-v1_1",
-        tokenizer_path="internlm/internlm-chat-7b-v1_1",
+        path='internlm/internlm-chat-7b-v1_1',
+        tokenizer_path='internlm/internlm-chat-7b-v1_1',
         tokenizer_kwargs=dict(
-            padding_side="left",
-            truncation_side="left",
+            padding_side='left',
+            truncation_side='left',
             use_fast=False,
             trust_remote_code=True,
         ),
         max_seq_len=2048,
         meta_template=_meta_template,
-        model_kwargs=dict(trust_remote_code=True, device_map="auto"),
+        model_kwargs=dict(trust_remote_code=True, device_map='auto'),
         generation_kwargs=dict(
             do_sample=True,
             top_p=0.95,

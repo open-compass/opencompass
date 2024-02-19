@@ -13,8 +13,7 @@ adv_qnli_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """Please identify whether the sentence answers the question. The answer should be exactly 'A. yes' or 'B. no'.
+                prompt="""Please identify whether the sentence answers the question. The answer should be exactly 'A. yes' or 'B. no'.
 question: {question}
 sentence: {sentence}
 Answer:"""),
@@ -26,7 +25,7 @@ Answer:"""),
 
 adv_qnli_eval_cfg = dict(
     evaluator=dict(type=AccDropEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 

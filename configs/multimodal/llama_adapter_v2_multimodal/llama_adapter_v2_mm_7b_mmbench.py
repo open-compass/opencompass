@@ -45,4 +45,3 @@ llama_adapter_mmbench_evaluator = [
 ]
 
 llama_adapter_mmbench_load_from = None  # noqa
-

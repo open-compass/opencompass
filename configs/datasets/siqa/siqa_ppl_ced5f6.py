@@ -15,18 +15,18 @@ siqa_infer_cfg = dict(
         template={
             1:
             dict(round=[
-                dict(role='HUMAN', prompt="{context}\nQuestion: {question}\nAnswer:"),
-                dict(role='BOT', prompt="{answerA}")
+                dict(role='HUMAN', prompt='{context}\nQuestion: {question}\nAnswer:'),
+                dict(role='BOT', prompt='{answerA}')
             ]),
             2:
             dict(round=[
-                dict(role='HUMAN', prompt="{context}\nQuestion: {question}\nAnswer:"),
-                dict(role='BOT', prompt="{answerB}")
+                dict(role='HUMAN', prompt='{context}\nQuestion: {question}\nAnswer:'),
+                dict(role='BOT', prompt='{answerB}')
             ]),
             3:
             dict(round=[
-                dict(role='HUMAN', prompt="{context}\nQuestion: {question}\nAnswer:"),
-                dict(role='BOT', prompt="{answerC}")
+                dict(role='HUMAN', prompt='{context}\nQuestion: {question}\nAnswer:'),
+                dict(role='BOT', prompt='{answerC}')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),
@@ -36,7 +36,7 @@ siqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 siqa_datasets = [
     dict(
-        abbr="siqa",
+        abbr='siqa',
         type=siqaDataset,
         path='./data/siqa',
         reader_cfg=siqa_reader_cfg,

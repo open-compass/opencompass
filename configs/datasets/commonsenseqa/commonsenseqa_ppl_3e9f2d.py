@@ -15,17 +15,17 @@ _ice_template = dict(
         ans: dict(
             begin=[
                 dict(
-                    role="SYSTEM",
-                    fallback_role="HUMAN",
-                    prompt=f"Answer the following question:"), '</E>'
+                    role='SYSTEM',
+                    fallback_role='HUMAN',
+                    prompt=f'Answer the following question:'), '</E>'
             ],
             round=[
-                dict(role="HUMAN", prompt="{question}"),
-                dict(role="BOT", prompt=ans_token),
+                dict(role='HUMAN', prompt='{question}'),
+                dict(role='BOT', prompt=ans_token),
             ])
-        for ans, ans_token in [["A", "{A}"], ["B", "{B}"],
-                               ["C", "{C}"], ["D", "{D}"],
-                               ["E", "{E}"]]
+        for ans, ans_token in [['A', '{A}'], ['B', '{B}'],
+                               ['C', '{C}'], ['D', '{D}'],
+                               ['E', '{E}']]
     },
     ice_token='</E>')
 

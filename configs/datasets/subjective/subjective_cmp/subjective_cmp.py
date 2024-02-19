@@ -10,7 +10,7 @@ subjective_reader_cfg = dict(
     train_split='test')
 
 subjective_all_sets = [
-    "creation_v0.1",
+    'creation_v0.1',
 ]
 
 subjective_datasets = []
@@ -22,7 +22,7 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -39,21 +39,21 @@ for _name in subjective_all_sets:
                 template=dict(
                     begin=[
                         dict(
-                            role="SYSTEM",
-                            fallback_role="HUMAN",
-                            prompt="{prompt}"
+                            role='SYSTEM',
+                            fallback_role='HUMAN',
+                            prompt='{prompt}'
                         ),
                     ],
-                    round=[dict(role="HUMAN",
-                                prompt="回答 1: <回答 1 开始> {prediction} <回答 1 结束>\n回答 2: <回答 2 开始> {prediction2} <回答 2 结束>\n")]))),
-        pred_role="BOT",
+                    round=[dict(role='HUMAN',
+                                prompt='回答 1: <回答 1 开始> {prediction} <回答 1 结束>\n回答 2: <回答 2 开始> {prediction2} <回答 2 结束>\n')]))),
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=SubjectiveCmpDataset,
-            path="./data/subjective/",
+            path='./data/subjective/',
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,

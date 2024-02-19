@@ -18,8 +18,8 @@ models = [
         abbr='skylark-pro-public',
         type=ByteDance,
         path='skylark-pro-public',
-        accesskey="xxxxxxx",
-        secretkey="xxxxxxx",
+        accesskey='xxxxxxx',
+        secretkey='xxxxxxx',
         url='xxxxxx',
         generation_kwargs={
             'temperature': 0.7,
@@ -41,4 +41,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_bytedance/"
+work_dir = 'outputs/api_bytedance/'

@@ -10,9 +10,9 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "alignment_bench",
+    'alignment_bench',
 ]
-data_path ="data/subjective/alignment_bench"
+data_path ='data/subjective/alignment_bench'
 
 subjective_datasets = []
 
@@ -23,7 +23,7 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -56,12 +56,12 @@ for _name in subjective_all_sets:
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=AlignmentBenchDataset,
             path=data_path,
             name=_name,

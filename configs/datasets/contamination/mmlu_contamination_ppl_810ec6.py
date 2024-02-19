@@ -7,7 +7,7 @@ from opencompass.datasets import JsonlDataset
 mmlu_datasets = []
 
 mmlu_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template="{text}"),
+    prompt_template=dict(type=PromptTemplate, template='{text}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLOnlyInferencer),
 )
@@ -31,7 +31,7 @@ mmlu_datasets.append(
 )
 
 mmlu_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template="{rephrase}"),
+    prompt_template=dict(type=PromptTemplate, template='{rephrase}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLOnlyInferencer),
 )

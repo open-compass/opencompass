@@ -5,19 +5,19 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import HFDataset
 
 
-_hint = "The following are semantic matching questions. \n" \
-    "Please determine whether the following two sentences are semantically duplicate: " \
-    "0 means not duplicate, 1 means duplicate.\n"
+_hint = 'The following are semantic matching questions. \n' \
+    'Please determine whether the following two sentences are semantically duplicate: ' \
+    '0 means not duplicate, 1 means duplicate.\n'
 QQP_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
-        template="Sentence one: {question1}\nSentence two: {question2}\nResult: {label}",
+        template='Sentence one: {question1}\nSentence two: {question2}\nResult: {label}',
     ),
     prompt_template=dict(
         type=PromptTemplate,
         template={
             answer:
-            f"{_hint}</E>Sentence one: {{question1}}\nSentence two: {{question2}}\nResult: {answer}"
+            f'{_hint}</E>Sentence one: {{question1}}\nSentence two: {{question2}}\nResult: {answer}'
             for answer in [0, 1]
         },
         ice_token='</E>',
@@ -29,12 +29,12 @@ QQP_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
 
 QQP_datasets = []
-for _split in ["validation", "test"]:
+for _split in ['validation', 'test']:
 
     QQP_reader_cfg = dict(
         input_columns=['question1', 'question2'],
         output_column='label',
-        train_split="train",
+        train_split='train',
         test_split=_split
     )
 

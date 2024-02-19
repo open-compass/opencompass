@@ -27,7 +27,7 @@ role_generalization_eng_infer_cfg = dict(
 )
 
 role_generalization_eng_eval_cfg = dict(
-    evaluator=dict(type=RougeEvaluator), 
+    evaluator=dict(type=RougeEvaluator),
     pred_role='BOT'
 )
 

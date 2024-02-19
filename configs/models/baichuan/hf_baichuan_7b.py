@@ -5,7 +5,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='baichuan-7b-hf',
-        path="baichuan-inc/baichuan-7B",
+        path='baichuan-inc/baichuan-7B',
         tokenizer_path='baichuan-inc/baichuan-7B',
         tokenizer_kwargs=dict(padding_side='left',
                               truncation_side='left',

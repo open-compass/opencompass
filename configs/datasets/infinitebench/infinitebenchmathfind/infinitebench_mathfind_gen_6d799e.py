@@ -8,7 +8,7 @@ from opencompass.datasets.infinitebench.utils import InfiniteBench_first_number_
 InfiniteBench_mathfind_reader_cfg = dict(
     input_columns=['prefix', 'context', 'question'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_mathfind_infer_cfg = dict(

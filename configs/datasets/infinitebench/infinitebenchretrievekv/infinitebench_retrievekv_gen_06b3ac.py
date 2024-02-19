@@ -6,7 +6,7 @@ from opencompass.datasets import InfiniteBenchretrievekvDataset, InfiniteBenchre
 InfiniteBench_retrievekv_reader_cfg = dict(
     input_columns=['context', 'input'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_retrievekv_infer_cfg = dict(

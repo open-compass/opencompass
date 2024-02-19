@@ -16,8 +16,8 @@ _ice_template = dict(
         ans: dict(
             begin='</E>',
             round=[
-                dict(role="HUMAN", prompt="Question: {question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nAnswer: "),
-                dict(role="BOT", prompt=f"{ans}"),
+                dict(role='HUMAN', prompt='Question: {question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nAnswer: '),
+                dict(role='BOT', prompt=f'{ans}'),
             ])
         for ans in ['A', 'B', 'C', 'D', 'E']
     },

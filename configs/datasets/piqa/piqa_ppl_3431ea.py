@@ -16,14 +16,14 @@ piqa_infer_cfg = dict(
             0:
             dict(
                 round=[
-                    dict(role="HUMAN", prompt="{goal}"),
-                    dict(role="BOT", prompt="{sol1}")
+                    dict(role='HUMAN', prompt='{goal}'),
+                    dict(role='BOT', prompt='{sol1}')
                 ], ),
             1:
             dict(
                 round=[
-                    dict(role="HUMAN", prompt="{goal}"),
-                    dict(role="BOT", prompt="{sol2}")
+                    dict(role='HUMAN', prompt='{goal}'),
+                    dict(role='BOT', prompt='{sol2}')
                 ], )
         }),
     retriever=dict(type=ZeroRetriever),

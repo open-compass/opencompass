@@ -13,8 +13,7 @@ adv_mnli_mm_infer_cfg = dict(
         template=dict(round=[
             dict(
                 role='HUMAN',
-                prompt=
-                """Please identify whether the premise entails the hypothesis. The answer should be exactly 'A. yes', 'B. maybe' or 'C. no'.
+                prompt="""Please identify whether the premise entails the hypothesis. The answer should be exactly 'A. yes', 'B. maybe' or 'C. no'.
 premise: {premise}
 hypothesis: {hypothesis}
 Answer:"""),
@@ -26,7 +25,7 @@ Answer:"""),
 
 adv_mnli_mm_eval_cfg = dict(
     evaluator=dict(type=AccDropEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='ABC'),
 )
 

@@ -39,4 +39,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_erniebot/"
+work_dir = 'outputs/api_erniebot/'

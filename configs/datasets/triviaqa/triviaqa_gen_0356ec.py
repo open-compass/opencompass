@@ -37,19 +37,19 @@ for k in [0, 1, 5]:
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
-                    begin="</E>",
+                    begin='</E>',
                     round=[
                         dict(role='HUMAN', prompt='Answer the question, your answer should be as simple as possible, start your answer with the prompt \'The answer is \'.\nQ: {question}?'),
                         dict(role='BOT', prompt='A:'),
                     ]
                 ),
-                ice_token="</E>",
+                ice_token='</E>',
             ),
             retriever=dict(type=FixKRetriever, fix_id_list=list(range(k))),
             inferencer=dict(type=GenInferencer, max_out_len=50),
         )
 
-    triviaqa_eval_cfg = dict(evaluator=dict(type=TriviaQAEvaluator), pred_role="BOT")
+    triviaqa_eval_cfg = dict(evaluator=dict(type=TriviaQAEvaluator), pred_role='BOT')
 
     triviaqa_datasets.append(
         dict(

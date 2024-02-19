@@ -16,7 +16,7 @@ def generate_linear_space(start, end, num):
     if num == 1:
         return [start]
     elif num < 1:
-        raise ValueError("num must be at least 1.")
+        raise ValueError('num must be at least 1.')
     step = (end - start) / (num - 1)
     return [start + step * i for i in range(num)]
 
@@ -55,7 +55,7 @@ cdme_trim_eval_cfg = dict(
 #context_lengths = list(range(1000, 201000, 1000))
 context_lengths = [16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000, 144000, 160000, 176000, 192000, 200000]
 document_depth_percent_intervals = 20
-document_depth_percent_interval_type = "linear"
+document_depth_percent_interval_type = 'linear'
 
 base_path = './data/CDME'
 file_list = ['zh_finance.jsonl']

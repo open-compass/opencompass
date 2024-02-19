@@ -13,8 +13,8 @@ afqmc_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "{sentence1},{sentence2}不同。",
-            1: "{sentence1},{sentence2}相似。"
+            0: '{sentence1},{sentence2}不同。',
+            1: '{sentence1},{sentence2}相似。'
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

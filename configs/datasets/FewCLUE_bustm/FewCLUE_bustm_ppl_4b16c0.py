@@ -19,11 +19,11 @@ bustm_infer_cfg = dict(
                     dict(
                         role='SYSTEM',
                         fallback_role='HUMAN',
-                        prompt="请判断以下两句话说的是否是一个意思：")
+                        prompt='请判断以下两句话说的是否是一个意思：')
                 ],
                 round=[
-                    dict(role="HUMAN", prompt="{sentence1}，{sentence2}"),
-                    dict(role="BOT", prompt="两句话说的毫不相关。")
+                    dict(role='HUMAN', prompt='{sentence1}，{sentence2}'),
+                    dict(role='BOT', prompt='两句话说的毫不相关。')
                 ]),
             1:
             dict(
@@ -31,11 +31,11 @@ bustm_infer_cfg = dict(
                     dict(
                         role='SYSTEM',
                         fallback_role='HUMAN',
-                        prompt="请判断以下两句话说的是否是一个意思：")
+                        prompt='请判断以下两句话说的是否是一个意思：')
                 ],
                 round=[
-                    dict(role="HUMAN", prompt="{sentence1}，{sentence2}"),
-                    dict(role="BOT", prompt="两句话说是的一个意思。")
+                    dict(role='HUMAN', prompt='{sentence1}，{sentence2}'),
+                    dict(role='BOT', prompt='两句话说是的一个意思。')
                 ]),
         }),
     retriever=dict(type=ZeroRetriever),

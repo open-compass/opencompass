@@ -13,11 +13,11 @@ piqa_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            "0": dict(
-                round=[dict(role="HUMAN", prompt="{goal} {sol1}")]
+            '0': dict(
+                round=[dict(role='HUMAN', prompt='{goal} {sol1}')]
             ),
-            "1": dict(
-                round=[dict(role="HUMAN", prompt="{goal} {sol2}")]
+            '1': dict(
+                round=[dict(role='HUMAN', prompt='{goal} {sol2}')]
             ),
         }
     ),
