@@ -12,8 +12,8 @@ _meta_template = dict(
 models = [
     dict(
         type=VLLM,
-        abbr='qwen2-beta-72b-chat-vllm',
-        path="Qwen/Qwen2-beta-72B-Chat",
+        abbr='qwen1.5-72b-chat-vllm',
+        path="Qwen/Qwen1.5-72B-Chat",
         model_kwargs=dict(tensor_parallel_size=4),
         meta_template=_meta_template,
         max_out_len=100,

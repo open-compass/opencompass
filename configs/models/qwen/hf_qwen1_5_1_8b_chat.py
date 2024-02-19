@@ -11,8 +11,8 @@ _meta_template = dict(
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='qwen2-beta-7b-chat-hf',
-        path="Qwen/Qwen2-beta-7B-Chat",
+        abbr='qwen1.5-1.8b-chat-hf',
+        path="Qwen/Qwen1.5-1.8B-Chat",
         model_kwargs=dict(
             device_map='auto',
             trust_remote_code=True

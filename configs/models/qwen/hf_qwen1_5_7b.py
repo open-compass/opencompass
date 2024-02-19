@@ -3,9 +3,9 @@ from opencompass.models import HuggingFaceCausalLM
 models = [
     dict(
         type=HuggingFaceCausalLM,
-        abbr='qwen2-beta-1.8b-hf',
-        path="Qwen/Qwen2-beta-1_8B",
-        tokenizer_path='Qwen/Qwen2-beta-1_8B',
+        abbr='qwen1.5-7b-hf',
+        path="Qwen/Qwen1.5-7B",
+        tokenizer_path='Qwen/Qwen1.5-7B',
         model_kwargs=dict(
             device_map='auto',
             trust_remote_code=True
