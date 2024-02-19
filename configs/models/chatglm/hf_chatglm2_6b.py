@@ -1,5 +1,11 @@
 from opencompass.models import HuggingFace
 
+_meta_template = dict(
+    round=[
+        dict(role='HUMAN', begin='[Round 1]\n\n问：', end='\n\n'),
+        dict(role='BOT', begin='答：', end='\n\n', generate=True),
+    ],
+)
 
 models = [
     dict(
@@ -16,6 +22,7 @@ models = [
            truncation_side='left',
            trust_remote_code=True,
         ),
+        meta_template=_meta_template,
         max_out_len=100,
         max_seq_len=4096,
         batch_size=8,
