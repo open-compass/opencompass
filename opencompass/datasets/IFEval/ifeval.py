@@ -12,6 +12,7 @@ from .evaluation_main import (InputExample, test_instruction_following_loose,
 
 @LOAD_DATASET.register_module()
 class IFEvalDataset(BaseDataset):
+
     @staticmethod
     def load(path):
         datasets = []
