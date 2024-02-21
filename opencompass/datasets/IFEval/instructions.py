@@ -25,7 +25,7 @@ from typing import Dict, Optional, Sequence, Union
 import langdetect
 from absl import logging
 
-import opencompass.datasets.ifeval.instructions_util as instructions_util
+import opencompass.datasets.IFEval.instructions_util as instructions_util
 
 _InstructionArgsDtype = Optional[Dict[str, Union[int, str, Sequence[str]]]]
 
