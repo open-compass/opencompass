@@ -20,7 +20,7 @@ from typing import Dict, Optional, Union
 
 from absl import flags
 
-import opencompass.datasets.ifeval.instructions_registry as instructions_registry
+import opencompass.datasets.IFEval.instructions_registry as instructions_registry
 
 _INPUT_DATA = flags.DEFINE_string('input_data',
                                   None,
@@ -69,8 +69,6 @@ def test_instruction_following_strict(
         instruction_cls = instructions_registry.INSTRUCTION_DICT[
             instruction_id]
         instruction = instruction_cls(instruction_id)
-        print(index)
-        print(inp)
         instruction.build_description(**inp.kwargs[index])
         args = instruction.get_instruction_args()
         if args and 'prompt' in args:

@@ -29,7 +29,6 @@ class IFEvaluator(BaseEvaluator):
     def score(self, predictions, references):
         results = []
         for pred, refer in zip(predictions, references):
-            print(refer)
             input = InputExample(
                 key=refer['key'],
                 instruction_id_list=refer['instruction_id_list'],
