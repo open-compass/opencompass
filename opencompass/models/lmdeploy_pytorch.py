@@ -50,7 +50,6 @@ class LmdeployPytorchModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.pytorch import engine as tm
-        from transformers import AutoTokenizer
 
         if engine_config is not None:
             from lmdeploy.messages import PytorchEngineConfig
@@ -60,9 +59,8 @@ class LmdeployPytorchModel(BaseModel):
             gen_config = EngineGenerationConfig(**gen_config)
 
         self.logger = get_logger()
-        self.tokenizer = AutoTokenizer.from_pretrained(path,
-                                                       trust_remote_code=True)
         tm_model = tm.Engine(path, engine_config)
+        self.tokenizer = tm_model.tokenizer
         self.generators = [
             tm_model.create_instance() for i in range(concurrency)
         ]
