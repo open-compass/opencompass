@@ -9,7 +9,9 @@ evaluate>=0.3.0
 fairscale
 func_timeout
 fuzzywuzzy
+immutabledict
 jieba
+langdetect
 ltp
 mmengine-lite
 nltk==3.8
