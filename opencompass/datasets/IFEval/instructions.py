@@ -22,7 +22,11 @@ import re
 import string
 from typing import Dict, Optional, Sequence, Union
 
-import langdetect
+try:
+    import langdetect
+except ImportError:
+    langdetect = None
+
 from absl import logging
 
 import opencompass.datasets.IFEval.instructions_util as instructions_util
