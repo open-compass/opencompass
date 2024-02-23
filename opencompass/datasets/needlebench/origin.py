@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import re
 from pathlib import Path
@@ -11,8 +12,26 @@ from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 
+def get_random_line_by_language(file_path, language):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        lines = [
+            json.loads(line.strip()) for line in file
+            if json.loads(line.strip())['language'] == language
+        ]
+
+    if lines:
+        random_line = random.choice(lines)
+        return {
+            'needle': random_line['needle'],
+            'retrieval_question': random_line['retrieval_question'],
+            'keyword': random_line['arg2']
+        }
+    else:
+        return None
+
+
 @LOAD_DATASET.register_module()
-class CDMEDataset(BaseDataset):
+class NeedleBenchOriginDataset(BaseDataset):
 
     @staticmethod
     def load(
@@ -25,8 +44,7 @@ class CDMEDataset(BaseDataset):
         length_buffer: int,
         guide: bool,
         language: str,
-        needle: str,
-        retrieval_question: str,
+        needle_file_name: str,
     ):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
@@ -96,11 +114,17 @@ class CDMEDataset(BaseDataset):
             for counter in range(num_repeats_per_file):
                 random.seed(counter)
                 random.shuffle(lines)
+                needle_file_path = os.path.join(path, needle_file_name)
+                random_needle = get_random_line_by_language(
+                    needle_file_path, language)
+                needle = '\n' + random_needle['needle'] + '\n'
+                retrieval_question = random_needle['retrieval_question']
+                keyword = random_needle['keyword']
 
                 context_length = length - length_buffer
                 target_length_per_record = context_length - len(
                     _get_tokens_from_context(needle))
-
+                target_length_per_record = max(target_length_per_record, 0)
                 accumulated_tokens = []
                 for line in lines:
                     tokens_current_line = _get_tokens_from_context(
@@ -118,7 +142,7 @@ class CDMEDataset(BaseDataset):
                                                     retrieval_question)
 
                 data['prompt'].append(processed_prompt)
-                data['answer'].append(needle)
+                data['answer'].append(needle + '*' + keyword)
 
         dataset = Dataset.from_dict({
             'prompt': data['prompt'],
@@ -127,7 +151,7 @@ class CDMEDataset(BaseDataset):
         return dataset
 
 
-class CDMEEvaluator(BaseEvaluator):
+class NeedleBenchOriginEvaluator(BaseEvaluator):
 
     def __init__(self, use_trim=False):
         self.use_trim = use_trim
@@ -174,26 +198,35 @@ class CDMEEvaluator(BaseEvaluator):
 
         return previous_row[-1]
 
-    def score(self, predictions, references):
-        if len(predictions) != len(references):
-            return {
-                'error': 'predictions and references have different lengths'
-            }
+    def score(self, predictions, gold):
+
+        if len(predictions) != len(gold):
+            return {'error': 'predictions and gold have different lengths'}
 
         total_score = 0
         details = []
-        for prediction, reference in zip(predictions, references):
+        for prediction, reference in zip(predictions, gold):
+            keyword = reference.split('*')[1]
+            reference = reference.split('*')[0]
+            raw_prediction = prediction
             prediction = re.sub(r'\s+', '', prediction)
             reference = re.sub(r'\s+', '', reference)
 
             if self.use_trim:
-                prediction = CDMEEvaluator._trim_prediction(
+                prediction = NeedleBenchOriginEvaluator._trim_prediction(
                     prediction, reference)
 
             edit_distance = self.levenshtein_distance(prediction, reference)
             max_len = max(len(prediction), len(reference))
             score = 100 * (1 -
                            edit_distance / max_len) if max_len != 0 else 100
+
+            if keyword in raw_prediction:
+                print(f'{keyword} is in {prediction}')
+                score = 100
+            else:
+                print(f'{keyword} is not in {prediction}')
+                score = 0.2 * score
 
             detail = {
                 'pred': prediction,
@@ -209,11 +242,11 @@ class CDMEEvaluator(BaseEvaluator):
         return result
 
 
-@TEXT_POSTPROCESSORS.register_module('cdme')
-def cdme_postprocess(text: str) -> str:
+@TEXT_POSTPROCESSORS.register_module('needlebench')
+def needlebench_postprocess(text: str) -> str:
     return text
 
 
-@TEXT_POSTPROCESSORS.register_module('cdme_dataset')
-def cdme_dataset_postprocess(text: str) -> str:
+@TEXT_POSTPROCESSORS.register_module('needlebench_dataset')
+def needlebench_dataset_postprocess(text: str) -> str:
     return text

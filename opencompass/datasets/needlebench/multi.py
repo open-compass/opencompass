@@ -1,6 +1,6 @@
 import json
+import os
 import random
-import re
 from pathlib import Path
 
 import tiktoken
@@ -8,11 +8,31 @@ from datasets import Dataset
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
-from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.registry import LOAD_DATASET
+
+
+def get_random_needles(file_path, needle_count):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+
+    matching_records = [
+        record for record in data
+        if record.get('derivation_count') == needle_count
+    ]
+
+    if matching_records:
+        random_record = random.choice(matching_records)
+        return {
+            'needles': random_record['derivations'],
+            'answer': random_record['answer'],
+            'retrieval_question': random_record['question']
+        }
+    else:
+        return None
 
 
 @LOAD_DATASET.register_module()
-class CDMEDataset(BaseDataset):
+class NeedleBenchMultiDataset(BaseDataset):
 
     @staticmethod
     def load(
@@ -25,11 +45,9 @@ class CDMEDataset(BaseDataset):
         length_buffer: int,
         guide: bool,
         language: str,
-        needles: 'list[str]',
+        needle_file_name: str,
+        num_needles: int,
         diff: int,
-        retrieval_question: str,
-        answer: str,
-        keyword: str,
     ):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
@@ -73,16 +91,14 @@ class CDMEDataset(BaseDataset):
 
         def _modify_retrieval_question(retrieval_question):
             if language == 'Chinese':
-                parts = retrieval_question.split('请按照')
-                guide_retrieval_question = (parts[0] + '在回答之前，请思考文档中与此问题'
-                                            '最相关的内容是什么。请按照' + parts[1])
+                guide_retrieval_question = (retrieval_question +
+                                            '在回答之前，请思考文档中与此问题'
+                                            '最相关的内容是什么。')
                 return guide_retrieval_question
             elif language == 'English':
-                parts = retrieval_question.split('Please answer in the format')
                 guide_retrieval_question = (
-                    parts[0] + 'Before answering, please consider'
-                    ' what in the document is most relevant to this question.'
-                    ' Please answer in the format' + parts[1])
+                    retrieval_question + 'Before answering, please consider'
+                    ' what in the document is most relevant to this question.')
                 return guide_retrieval_question
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
@@ -112,6 +128,7 @@ class CDMEDataset(BaseDataset):
             return prompt
 
         files = Path(path).glob('*.jsonl')
+        needle_file_path = os.path.join(path, needle_file_name)
         for file in files:
             if file.name not in file_list:
                 continue
@@ -122,12 +139,20 @@ class CDMEDataset(BaseDataset):
             for counter in range(num_repeats_per_file):
                 random.seed(counter)
                 random.shuffle(lines)
-
+                random_needle_data = get_random_needles(
+                    needle_file_path, num_needles)
+                needles = [
+                    '\n' + needle + '\n'
+                    for needle in random_needle_data['needles']
+                ]
+                answer = random_needle_data['answer']
+                keyword = answer
+                retrieval_question = random_needle_data['retrieval_question']
                 context_length = length - length_buffer
                 target_length_per_record = context_length - \
                     sum(len(tokens) for tokens
                         in _get_tokens_from_context(needles))
-
+                target_length_per_record = max(target_length_per_record, 0)
                 accumulated_tokens = []
                 for line in lines:
                     tokens_current_line = _get_tokens_from_context(
@@ -154,7 +179,7 @@ class CDMEDataset(BaseDataset):
         return dataset
 
 
-class CDMEEvaluator(BaseEvaluator):
+class NeedleBenchMultiEvaluator(BaseEvaluator):
 
     def levenshtein_distance(self, s1, s2):
         if len(s1) < len(s2):
@@ -175,50 +200,33 @@ class CDMEEvaluator(BaseEvaluator):
 
         return previous_row[-1]
 
-    def score(self, predictions, references):
-        if len(predictions) != len(references):
-            return {
-                'error': 'predictions and references have different lengths'
-            }
+    def score(self, predictions, gold):
+        if len(predictions) != len(gold):
+            return {'error': 'predictions and gold have different lengths'}
 
         total_score = 0
         details = []
-        for prediction, reference in zip(predictions, references):
-            keyword = reference.split('*')[1]
-            reference = reference.split('*')[0]
-            prediction = re.sub(r'\s+', '', prediction)
-            reference = re.sub(r'\s+', '', reference)
-            edit_distance = self.levenshtein_distance(prediction, reference)
-            max_len = max(len(prediction), len(reference))
-            score = 100 * (1 -
-                           edit_distance / max_len) if max_len != 0 else 100
 
-            if keyword in prediction:
-                print(f'{keyword} is in {prediction}')
-                score = 100
-            else:
-                print(f'{keyword} is not in {prediction}')
-                score = 0.2 * score
+        for prediction, reference in zip(predictions, gold):
+            answer, keyword = reference.split('*')
+            keywords = keyword.lower().split()
+            prediction = prediction.lower()
+
+            keyword_score = 100 / len(keywords) if keywords else 0
+
+            matched_keywords = sum(1 for kword in keywords
+                                   if kword in prediction)
+            score = matched_keywords * keyword_score
 
             detail = {
                 'pred': prediction,
                 'answer': reference,
-                'edit_distance': edit_distance,
+                'matched_keywords': matched_keywords,
                 'score': score
             }
+
             total_score += score
             details.append(detail)
 
         average_score = total_score / len(predictions) if predictions else 0
-        result = {'score': average_score, 'details': details}
-        return result
-
-
-@TEXT_POSTPROCESSORS.register_module('cdme')
-def cdme_postprocess(text: str) -> str:
-    return text
-
-
-@TEXT_POSTPROCESSORS.register_module('cdme_dataset')
-def cdme_dataset_postprocess(text: str) -> str:
-    return text
+        return {'score': average_score, 'details': details}
