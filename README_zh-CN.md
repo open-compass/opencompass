@@ -81,7 +81,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 ## 📊 性能榜单
 
-我们将陆续提供开源模型和API模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://opencompass.org.cn/rank) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
+我们将陆续提供开源模型和 API 模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
