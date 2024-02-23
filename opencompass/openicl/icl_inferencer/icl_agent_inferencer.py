@@ -124,8 +124,15 @@ class AgentInferencer(ChatInferencer):
             i for i, item in enumerate(chat) if item['role'] == 'assistant'
         ]
 
+        history = chat[:assistant_indices[0] - 1]
+        prev_idx = 0
         for i in assistant_indices:
-            self.model.set_history(chat[:i - 1])
+            for j in range(prev_idx, i - 1):
+                if chat[j]['role'] == 'assistant':
+                    history += self.model.gt_response(chat[j]['content'])
+                elif chat[j]['role'] == 'user':
+                    history += [chat[j]]
+            self.model.set_history(history)
             answer, steps, _ = self.model.chat(chat[i - 1]['content'])
             output_handler.save_multiround_results(
                 origin_prompt=chat[i - 1]['content'],
@@ -134,4 +141,6 @@ class AgentInferencer(ChatInferencer):
                 idx=index,
                 gold=chat[i]['content'],
             )
+            history += [chat[i - 1]]
+            prev_idx = i
         self.model.reset()

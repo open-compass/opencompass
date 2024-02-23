@@ -12,7 +12,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "COREV2_6A_",
+    "COREV2_6A_all",
 ]
 
 

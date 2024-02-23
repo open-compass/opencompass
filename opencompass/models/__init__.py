@@ -14,6 +14,7 @@ from .huggingface import HuggingFaceChatGLM3  # noqa: F401, F403
 from .intern_model import InternLM  # noqa: F401, F403
 from .lightllm_api import LightllmAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401, F403
+from .lmdeploy_pytorch import LmdeployPytorchModel  # noqa: F401
 from .minimax_api import MiniMax  # noqa: F401
 from .mixtral import Mixtral  # noqa: F401
 from .modelscope import ModelScope, ModelScopeCausalLM  # noqa: F401, F403
@@ -28,3 +29,4 @@ from .turbomind_tis import TurboMindTisModel  # noqa: F401
 from .vllm import VLLM  # noqa: F401
 from .xunfei_api import XunFei  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
+from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401

@@ -17,6 +17,7 @@ models = [
             use_fast=False,
         ),
         pad_token_id=151643,
+        min_out_len=1,
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,

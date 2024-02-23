@@ -20,6 +20,7 @@ class LightllmAPI(BaseAPIModel):
             self,
             path: str = 'LightllmAPI',
             url: str = 'http://localhost:8080/generate',
+            input_format: str = '<input_text_to_replace>',
             max_seq_len: int = 2048,
             meta_template: Optional[Dict] = None,
             retry: int = 2,
@@ -33,6 +34,7 @@ class LightllmAPI(BaseAPIModel):
                          generation_kwargs=generation_kwargs)
         self.logger = get_logger()
         self.url = url
+        self.input_format = input_format
         self.generation_kwargs = generation_kwargs
         self.max_out_len = self.generation_kwargs.get('max_new_tokens', 1024)
 
@@ -62,6 +64,8 @@ class LightllmAPI(BaseAPIModel):
             self.wait()
             header = {'content-type': 'application/json'}
             try:
+                input = self.input_format.replace('<input_text_to_replace>',
+                                                  input)
                 data = dict(inputs=input, parameters=self.generation_kwargs)
                 raw_response = requests.post(self.url,
                                              headers=header,
@@ -114,6 +118,8 @@ class LightllmAPI(BaseAPIModel):
             self.wait()
             header = {'content-type': 'application/json'}
             try:
+                input = self.input_format.replace('<input_text_to_replace>',
+                                                  input)
                 data = dict(inputs=input, parameters=self.generation_kwargs)
                 raw_response = requests.post(self.url,
                                              headers=header,

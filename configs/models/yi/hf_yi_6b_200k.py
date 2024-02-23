@@ -1,6 +1,5 @@
 from opencompass.models import HuggingFace
 
-
 models = [
     dict(
         type=HuggingFace,

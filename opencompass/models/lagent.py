@@ -42,6 +42,26 @@ class LagentAgent:
     def set_history(self, history):
         self.agent._session_history = deepcopy(history)
 
+    def gt_response(self, prompt):
+        if 'CIReAct' in str(self.agent.__class__):
+            gold = prompt
+            prompt = f"""{self.agent._protocol.action['begin']} IPythonInterpreter
+{self.agent._protocol.action_input['begin']} ```python\n{gold}\n```\n"""  # noqa
+            action_input = dict(
+                command=f"""```python\n{gold}\n```\n""",
+                timeout=120,
+            )
+            response = self.agent._action_executor('IPythonInterpreter',
+                                                   action_input)
+            gt_response = dict(role='assistant', content=prompt)
+            system_response = dict(
+                role='system',
+                content=self.agent._protocol.format_response(response))
+            return [gt_response, system_response]
+        else:
+            gt_response = dict(role='assistant', content=prompt)
+            return [gt_response]
+
     @property
     def template_parser(self):
         return self.agent._llm.template_parser

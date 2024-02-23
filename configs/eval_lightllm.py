@@ -14,6 +14,7 @@ models = [
         abbr='LightllmAPI',
         type=LightllmAPI,
         url='http://localhost:8080/generate',
+        input_format='<input_text_to_replace>',
         max_seq_len=2048,
         batch_size=32,
         generation_kwargs=dict(

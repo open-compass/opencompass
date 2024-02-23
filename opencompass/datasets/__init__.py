@@ -47,7 +47,7 @@ from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .hungarian_math import *  # noqa: F401, F403
-from .IFEval import *  # noqa: F401, F403
+from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
 from .infinitebench import *  # noqa: F401, F403
 from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
@@ -61,6 +61,7 @@ from .longbench import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
 from .math401 import *  # noqa: F401, F403
+from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
@@ -69,6 +70,7 @@ from .multirc import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403
 from .natural_question_cn import *  # noqa: F401, F403
+from .NPHardEval import *  # noqa: F401, F403
 from .obqa import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
@@ -89,6 +91,7 @@ from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
 from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
+from .teval import *  # noqa: F401, F403
 from .TheoremQA import *  # noqa: F401, F403
 from .tnews import *  # noqa: F401, F403
 from .triviaqa import *  # noqa: F401, F403
