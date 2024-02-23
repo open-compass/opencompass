@@ -4,6 +4,7 @@ from opencompass.summarizers.needlebench import NeedleBenchATCSummarizer
 # ----------NeedleBench-4k-summarizer----------
 context_lengths_4k = list(range(1000, 5000, 1000))
 depths = [0, 5, 10, 15, 21, 26, 31, 36, 42, 47, 52, 57, 63, 68, 73, 78, 84, 89, 94, 100]
+depths_list_sparse = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
 # Initialize the lists
 _needlebench_4k_2needle_en = []
@@ -235,7 +236,7 @@ _needlebench_32k_origin_zh = []
 
 # Fill the lists using nested loops
 for original_context_length in context_lengths_32k:
-    for depth_percent in depths:
+    for depth_percent in depths_list_sparse:
         _needlebench_32k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_32k')
         _needlebench_32k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_32k')
         _needlebench_32k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_32k')
@@ -343,7 +344,7 @@ _needlebench_128k_origin_zh = []
 
 # Fill the lists using nested loops
 for original_context_length in context_lengths_128k:
-    for depth_percent in depths:
+    for depth_percent in depths_list_sparse:
         _needlebench_128k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_128k')
         _needlebench_128k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_128k')
         _needlebench_128k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_128k')
@@ -435,8 +436,7 @@ needlebench_128k_summarizer = dict(
 
 # ----------NeedleBench-200k-summarizer----------
 
-context_lengths_200k = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000, 144000, 160000, 176000, 192000, 200000])
-
+context_lengths_200k = list([16000, 48000, 80000, 112000, 128000, 144000, 176000, 200000])
 # Initialize the lists
 _needlebench_200k_2needle_en = []
 _needlebench_200k_3needle_en = []
@@ -451,7 +451,7 @@ _needlebench_200k_origin_zh = []
 
 # Fill the lists using nested loops
 for original_context_length in context_lengths_200k:
-    for depth_percent in depths:
+    for depth_percent in depths_list_sparse:
         _needlebench_200k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_200k')
         _needlebench_200k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_200k')
         _needlebench_200k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_200k')

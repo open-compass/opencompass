@@ -60,10 +60,7 @@ base_path = './data/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
 needlebench_datasets_en = []
 needle_file_name = 'needles.jsonl'
-depths_float = generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type)
-depths = [int(depth) for depth in depths_float]
+depths = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
 for original_context_length in context_lengths:
     dataset_dict = {

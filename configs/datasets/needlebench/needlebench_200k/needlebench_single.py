@@ -52,9 +52,9 @@ needlebench_eval_cfg = dict(
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000, 144000, 160000, 176000, 192000, 200000])
-document_depth_percent_intervals = 20
-document_depth_percent_interval_type = "linear"
+# context_lengths = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000, 144000, 160000, 176000, 192000, 200000])
+context_lengths = [16000, 48000, 80000, 112000, 128000, 144000, 176000, 200000]
+depths_list = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
 base_path = './data/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
@@ -62,9 +62,7 @@ needlebench_datasets_en = []
 needle_file_name = 'needles.jsonl'
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_origin_en_200k',
@@ -90,9 +88,7 @@ needlebench_datasets_zh = []
 needle_file_name = 'needles.jsonl'
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_origin_zh_200k',

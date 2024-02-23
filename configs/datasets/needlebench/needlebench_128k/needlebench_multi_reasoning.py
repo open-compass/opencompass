@@ -53,6 +53,7 @@ needlebench_eval_cfg = dict(
     pred_role='BOT')
 
 context_lengths = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000])
+depths_list = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 document_depth_percent_intervals = 20
 document_depth_percent_interval_type = "linear"
 
@@ -67,9 +68,7 @@ needlebench_datasets_2needle_en = []
 language = 'English'
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_{num_needles}needle_en_128k',
@@ -96,9 +95,7 @@ num_needles = 3
 needlebench_datasets_3needle_en = []
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_{num_needles}needle_en_128k',
@@ -125,9 +122,7 @@ num_needles = 4
 needlebench_datasets_4needle_en = []
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_{num_needles}needle_en_128k',
@@ -154,9 +149,7 @@ num_needles = 5
 needlebench_datasets_5needle_en = []
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_{num_needles}needle_en_128k',
@@ -190,9 +183,7 @@ needlebench_datasets_2needle_zh = []
 language = 'Chinese'
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_{num_needles}needle_zh_128k',
@@ -219,9 +210,7 @@ num_needles = 3
 needlebench_datasets_3needle_zh = []
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_{num_needles}needle_zh_128k',
@@ -248,9 +237,7 @@ num_needles = 4
 needlebench_datasets_4needle_zh = []
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_{num_needles}needle_zh_128k',
@@ -277,9 +264,7 @@ num_needles = 5
 needlebench_datasets_5needle_zh = []
 
 for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+    for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
                     f'Depth{int(depth_percent)}_{num_needles}needle_zh_128k',
