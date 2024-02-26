@@ -278,6 +278,12 @@ def merge_dataframes(model_name, dataset_abbrs, parsed_data):
 
     # 沿着列方向合并DataFrame
     merged_df = pd.concat(dfs, axis=1)
+
+    # Check for NaN values and filter out rows with NaN
+    if merged_df.isnull().any().any():
+        print('Warning: Some rows were filtered out due to NaN values. This is often due to mismatched row counts among DataFrames.')
+        merged_df = merged_df.dropna()
+
     return merged_df
 
 def calculate_elementwise_average(merged_df):
