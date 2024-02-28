@@ -99,7 +99,7 @@ class LocalRunner(BaseRunner):
                     tmpl = get_command_template(all_gpu_ids[:num_gpus])
                     cmd = task.get_command(cfg_path=param_file, template=tmpl)
                     # run in subprocess if starts with torchrun etc.
-                    if 'python ' in cmd:
+                    if 'python ' in cmd or 'python3 ' in cmd:
                         task.run()
                     else:
                         subprocess.run(cmd, shell=True, text=True)
