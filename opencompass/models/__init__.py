@@ -7,6 +7,7 @@ from .base import BaseModel, LMTemplateParser  # noqa
 from .base_api import APITemplateParser, BaseAPIModel  # noqa
 from .bytedance_api import ByteDance  # noqa: F401
 from .claude_api import Claude  # noqa: F401
+from .gemini_api import Gemini, GeminiAllesAPIN  # noqa: F401, F403
 from .glm import GLM130B  # noqa: F401, F403
 from .huggingface import HuggingFace  # noqa: F401, F403
 from .huggingface import HuggingFaceCausalLM  # noqa: F401, F403
