@@ -241,6 +241,8 @@ def save_results_to_plots(txt_results_save_path):
         # Process and visualize the overall score
         overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.png')
         merged_df = merge_dataframes(model_name, dataset_abbrs, parsed_data)
+
+        print(merge_dataframes)
         averaged_df = calculate_elementwise_average(merged_df)
 
         # Assume visualize returns the average score for the overall visualization
@@ -277,13 +279,16 @@ def merge_dataframes(model_name, dataset_abbrs, parsed_data):
         dfs.append(df)
 
     # 沿着列方向合并DataFrame
-    merged_df = pd.concat(dfs, axis=1)
-
+    # 使用reduce函数和merge来按'dataset_name'合并所有DataFrame
+    from functools import reduce
+    merged_df = reduce(lambda left, right: pd.merge(left, right, on='dataset', how='outer'), dfs)
+    
+    # merged_df.to_csv("dropbefore.csv")
     # Check for NaN values and filter out rows with NaN
     if merged_df.isnull().any().any():
         print('Warning: Some rows were filtered out due to NaN values. This is often due to mismatched row counts among DataFrames.')
         merged_df = merged_df.dropna()
-
+    # merged_df.to_csv("dropafter.csv")
     return merged_df
 
 def calculate_elementwise_average(merged_df):
