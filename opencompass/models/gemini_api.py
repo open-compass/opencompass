@@ -1,9 +1,10 @@
+# flake8: noqa: E501
+import json
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
 import requests
-import json
 
 from opencompass.utils.prompt import PromptList
 
@@ -106,7 +107,11 @@ class Gemini(BaseAPIModel):
                     system_prompt = item['prompt']
             for item in input:
                 if system_prompt is not None:
-                    msg = {'parts': [{'text': system_prompt + '\n' + item['prompt']}]}
+                    msg = {
+                        'parts': [{
+                            'text': system_prompt + '\n' + item['prompt']
+                        }]
+                    }
                 else:
                     msg = {'parts': [{'text': item['prompt']}]}
                 if item['role'] == 'HUMAN':
@@ -123,8 +128,10 @@ class Gemini(BaseAPIModel):
             assert msg['role'] in ['user', 'system']
 
         data = {
-            'model': self.path,
-            'contents': messages,
+            'model':
+            self.path,
+            'contents':
+            messages,
             'safetySettings': [
                 {
                     'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
@@ -164,8 +171,7 @@ class Gemini(BaseAPIModel):
                                   str(raw_response.content))
                 time.sleep(1)
                 continue
-            if raw_response.status_code == 200 and response[
-                    'msg'] == 'ok':
+            if raw_response.status_code == 200 and response['msg'] == 'ok':
                 body = response['body']
                 if 'candidates' not in body:
                     self.logger.error(response)
@@ -173,12 +179,14 @@ class Gemini(BaseAPIModel):
                     if 'content' not in body['candidates'][0]:
                         return "Due to Google's restrictive policies, I am unable to respond to this question."
                     else:
-                        return body['candidates'][0]['content']['parts'][0]['text'].strip()
+                        return body['candidates'][0]['content']['parts'][0][
+                            'text'].strip()
             self.logger.error(response['msg'])
             self.logger.error(response)
             time.sleep(1)
 
         raise RuntimeError('API call failed.')
+
 
 class GeminiAllesAPIN(Gemini):
     """Model wrapper around Gemini models.
