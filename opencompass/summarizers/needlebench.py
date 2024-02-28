@@ -49,7 +49,7 @@ def read_after_specific_line_except_last(file_name, keyword, offset):
 def create_model_dataframe(nested_dict, model_name, dataset_abbr, parallel=False):
     if model_name not in nested_dict:
         print(f'Model {model_name} not found in the provided data.')
-        return pd.DataFrame() 
+        return pd.DataFrame()
 
     model_data = nested_dict[model_name]
     data = []
@@ -267,7 +267,7 @@ def merge_dataframes(model_name, dataset_abbrs, parsed_data):
 
     from functools import reduce
     merged_df = reduce(lambda left, right: pd.merge(left, right, on='dataset', how='outer'), dfs)
-    
+
     if merged_df.isnull().any().any():
         print('Warning: Some rows were filtered out due to NaN values. This is often due to mismatched row counts among DataFrames.')
         merged_df = merged_df.dropna()
