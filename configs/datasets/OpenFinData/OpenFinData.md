@@ -1,8 +1,9 @@
-# IFEval
+# OpenFinData
 ## Introduction
-The following introduction comes from the introduction in [OpenFinData](https://github.com/open-compass/OpenFinData?tab=readme-ov-file)
+The following introduction comes from the introduction in [OpenFinData](https://github.com/open-compass/OpenFinData)
 
 ```
+OpenFinData是由东方财富与上海人工智能实验室联合发布的开源金融评测数据集。该数据集代表了最真实的产业场景需求，是目前场景最全、专业性最深的金融评测数据集。它基于东方财富实际金融业务的多样化丰富场景，旨在为金融科技领域的研究者和开发者提供一个高质量的数据资源。
 OpenFinData is an open source financial evaluation dataset jointly released by Oriental Fortune and Shanghai Artificial Intelligence Laboratory. This data set represents the most realistic industrial scenario needs and is currently the most comprehensive and professional financial evaluation data set. It is based on the diverse and rich scenarios of Oriental Fortune's actual financial business and aims to provide a high-quality data resource for researchers and developers in the field of financial technology.
 ```
 
@@ -10,8 +11,14 @@ OpenFinData is an open source financial evaluation dataset jointly released by O
 
 ### Repository
 
-[OpenFinData](https://github.com/open-compass/OpenFinData?tab=readme-ov-file)
+[OpenFinData](https://github.com/open-compass/OpenFinData)
 
+## Use cases
+
+In evaluation scripts, add OpenFinData dataset as other datasets by using
+```
+from .datasets.OepnFinData.OpenFinData_gen import OpenFinData_datasets
+```
 
 ## Examples
 Input example I:
