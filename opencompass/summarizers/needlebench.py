@@ -37,23 +37,19 @@ def read_after_specific_line_except_last(file_name, keyword, offset):
     with open(file_name, 'r', encoding='utf-8') as file:
         lines = file.readlines()
 
-    # 找到含有关键词的行的索引
     for index, line in enumerate(lines):
         if keyword in line:
             start_index = index + offset + 1
             break
     else:
-        # 如果文件中没有找到关键字，则返回空字符串
         return ''
 
-    # 返回从指定行开始到倒数第二行的内容
     return ''.join(lines[start_index:-1])
 
 def create_model_dataframe(nested_dict, model_name, dataset_abbr, parallel=False):
-    # 确保模型名存在于字典中
     if model_name not in nested_dict:
         print(f'Model {model_name} not found in the provided data.')
-        return pd.DataFrame()  # 返回一个空的DataFrame
+        return pd.DataFrame() 
 
     model_data = nested_dict[model_name]
     data = []
@@ -76,20 +72,16 @@ def create_model_dataframe(nested_dict, model_name, dataset_abbr, parallel=False
     return df
 
 def parse_model_scores(text):
-    # 分割字符串为多行
     lines = text.split('\n')
 
     result_dict = {}
     current_model = None
 
     for line in lines:
-        # 检查行是否定义了新模型
         if line.startswith('Model:'):
-            # 获取模型名称
             current_model = line.split('Model:')[1].strip()
             result_dict[current_model] = {}
         elif current_model and ':' in line:
-            # 解析数据集和分数
             dataset, score_str = line.split(':', 1)
             score_dict = eval(score_str.strip())
             result_dict[current_model][dataset] = score_dict
@@ -196,7 +188,6 @@ def save_results_to_plots(txt_results_save_path):
 
     parsed_data = parse_model_scores(content)
     model_names = get_dict_model_names(parsed_data)
-    # 定义数字、语言代码和尺寸
     numbers = [2, 3, 4, 5]
     languages = ['en', 'zh']
     size_exists = []
@@ -206,10 +197,8 @@ def save_results_to_plots(txt_results_save_path):
         if size in content:
             size_exists.append(size)
 
-    # 创建dataset_abbrs列表
     multi_dataset_abbrs = [f'{num}needle_{lang}{size}' for num in numbers for lang in languages for size in size_exists]
     origin_dataset_abbrs = [f'origin_{lang}{size}' for lang in languages for size in size_exists]
-    # 创建parallel_dataset_abbrs列表
     parallel_dataset_abbrs = [f'parallel_{lang}{size}' for lang in languages for size in size_exists]
 
     dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + \
@@ -270,36 +259,27 @@ def merge_dataframes(model_name, dataset_abbrs, parsed_data):
         parallel_flag = 'parallel' in dataset_abbr
         df = create_model_dataframe(parsed_data, model_name, dataset_abbr, parallel=parallel_flag)
 
-        # 检查DataFrame是否为空或是否有多于一列（除了'dataset'列）
         if not df.empty and len(df.columns) > 1:
-            # 将模型名称列重命名为dataset_abbr
-            score_column = df.columns[-1]  # 假设分数列是最后一列
+            score_column = df.columns[-1]
             df.rename(columns={score_column: dataset_abbr}, inplace=True)
 
         dfs.append(df)
 
-    # 沿着列方向合并DataFrame
-    # 使用reduce函数和merge来按'dataset_name'合并所有DataFrame
     from functools import reduce
     merged_df = reduce(lambda left, right: pd.merge(left, right, on='dataset', how='outer'), dfs)
     
-    # merged_df.to_csv("dropbefore.csv")
-    # Check for NaN values and filter out rows with NaN
     if merged_df.isnull().any().any():
         print('Warning: Some rows were filtered out due to NaN values. This is often due to mismatched row counts among DataFrames.')
         merged_df = merged_df.dropna()
-    # merged_df.to_csv("dropafter.csv")
     return merged_df
 
 def calculate_elementwise_average(merged_df):
-    # 选择需要计算平均值的列
     score_columns = [col for col in merged_df.columns if col != 'dataset']
 
     origin_columns = [col for col in score_columns if 'origin' in col]
     parallel_columns = [col for col in score_columns if 'parallel' in col]
     multi_columns = [col for col in score_columns if 'needle'  in col]
 
-    # 计算加权平均分数
     if origin_columns and parallel_columns and multi_columns:
         origin_avg = merged_df[origin_columns].mean(axis=1) * 0.4
         parallel_avg = merged_df[parallel_columns].mean(axis=1) * 0.3
@@ -307,7 +287,6 @@ def calculate_elementwise_average(merged_df):
 
         merged_df['weighted_average_score'] = origin_avg + parallel_avg + multi_avg
     else:
-        # 如果没有任何得分列nn
         merged_df['weighted_average_score'] = pd.Series([0] * len(merged_df))
 
     return merged_df.iloc[:, [0, -1]]
@@ -652,11 +631,9 @@ class NeedleBenchSummarizer:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
 
-        # 读取、排序并获取DataFrame
         df_sorted = self._read_and_sort_dataframe(output_csv_path)
 
-        # 导出排序后的DataFrame为CSV文件
-        sorted_file_path = osp.abspath(output_csv_path).split('.')[0] + '_sorted.csv'  # 指定输出文件的路径
+        sorted_file_path = osp.abspath(output_csv_path).split('.')[0] + '_sorted.csv'
         df_sorted.to_csv(sorted_file_path, index=False, header=False)
 
         self.logger.info(f'write sorted csv to {sorted_file_path}')
@@ -1062,10 +1039,8 @@ class NeedleBenchATCSummarizer:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         # self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
 
-        # 读取、排序并获取DataFrame
         df_sorted = self._read_and_sort_dataframe(output_csv_path)
 
-        # 导出排序后的DataFrame为CSV文件
         df_sorted.to_csv(output_csv_path)
 
         self.logger.info(f'write sorted csv to {output_csv_path}')
