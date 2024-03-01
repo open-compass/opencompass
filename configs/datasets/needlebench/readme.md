@@ -4,7 +4,7 @@ English | [简体中文](readme_zh-CN.md)
 
 ## Overview
 
-Needlebench is an exhaustive benchmark designed to rigorously assess the information retrieval and reasoning capabilities of large language models (LLMs). Drawing inspiration from the NeedleInAHaystack experiment, Needlebench broadens the scope to include a variety of tasks, each aimed at testing different facets of LLMs' abilities to process, recall, and reason with information embedded in lengthy texts.
+Needlebench is an exhaustive benchmark designed to rigorously assess the information retrieval and reasoning capabilities of large language models (LLMs). Drawing inspiration from the NeedleInAHaystack experiment, Needlebench broadens the scope to include a variety of tasks, each aimed at testing different facets of LLMs' abilities in long-context scenarios.
 
 ### Directory Structure
 
@@ -37,15 +37,15 @@ Needlebench offers tasks in various length configurations, such as 4k, 8k, etc.,
 
 ### Single-Needle Retrieval (`needlebench_single.py`)
 
-The Single-Needle Retrieval task evaluates the LLM's ability to recall a single piece of crucial information from a haystack text of a specific length. This task mirrors the original NeedleInAHaystack test's objective, assessing the model's precision in identifying and recalling specific information within large bodies of text.
+The Single-Needle Retrieval task evaluates the LLMs' ability to recall a single piece of crucial information from a haystack text of a specific length. This task mirrors the original NeedleInAHaystack test's objective, assessing the model's precision in identifying and recalling specific information from extended texts.
 
 ### Multi-Needle Retrieval (`needlebench_multi_retrieval.py`)
 
-The Multi-Needle Retrieval task challenges the LLM's ability to identify and extract multiple key information points from extensive texts. It simulates real-world scenarios where multiple data points, facts, or figures need to be retrieved from documents or reports, evaluating the model's efficiency in navigating and extracting relevant information from dense texts.
+The Multi-Needle Retrieval task challenges the LLMs' ability to identify and extract multiple key information points from extensive texts. It simulates real-world scenarios where multiple data points, facts, or figures need to be retrieved from documents or reports, evaluating the model's efficiency in navigating and extracting relevant information from dense texts.
 
 ### Multi-Needle Reasoning (`needlebench_multi_reasoning.py`)
 
-Building on the retrieval tasks, the Multi-Needle Reasoning task emphasizes the LLM's capacity for complex reasoning with the retrieved information. The model must not only recall multiple pieces of information but also engage in logical reasoning, synthesizing answers that reflect an understanding of the intricate relationships between various information points.
+Building on the retrieval tasks, the Multi-Needle Reasoning task emphasizes the LLMs' capacity for complex reasoning with the retrieved information. The model must not only recall multiple pieces of information but also engage in logical reasoning, synthesizing answers that reflect an understanding of the intricate relationships between various information points.
 
 ### Ancestral Trace Challenge (ATC)
 
