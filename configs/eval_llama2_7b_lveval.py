@@ -7,10 +7,10 @@ with read_base():
 
 models[0][
     "path"
-] = "/home/yuantao/workspace/link/public_models/Llama-2-7b-chat-hf"
+] = "/path/to/your/huggingface_models/Llama-2-7b-chat-hf"
 models[0][
     "tokenizer_path"
-] = "/home/yuantao/workspace/link/public_models/Llama-2-7b-chat-hf"
+] = "/path/to/your/huggingface_models/Llama-2-7b-chat-hf"
 models[0]["max_seq_len"] = 4096
 models[0]["generation_kwargs"] = dict(do_sample=False)
 models[0]["mode"] = "mid"  # truncate in the middle
