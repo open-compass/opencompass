@@ -7,10 +7,10 @@ with read_base():
 
 models[0][
     "path"
-] = "/home/yuantao/workspace/link/public_models/BlueLM-7B-Chat-32K"
+] = "/path/to/your/huggingface_models/BlueLM-7B-Chat-32K"
 models[0][
     "tokenizer_path"
-] = "/home/yuantao/workspace/link/public_models/BlueLM-7B-Chat-32K"
+] = "/path/to/your/huggingface_models/BlueLM-7B-Chat-32K"
 models[0]["max_seq_len"] = 32768
 models[0]["generation_kwargs"] = dict(do_sample=False)
 models[0]["mode"] = "mid"  # truncate in the middle
