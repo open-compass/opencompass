@@ -27,9 +27,10 @@ class IFEvalDataset(BaseDataset):
 class IFEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
-        results = []
+        results = dict()
+        for metric in ('strict', 'loose'):
+            results[metric] = []
         for pred, refer in zip(predictions, references):
-            print(refer)
             input = InputExample(
                 key=refer['key'],
                 instruction_id_list=refer['instruction_id_list'],
@@ -39,15 +40,29 @@ class IFEvaluator(BaseEvaluator):
                 for k in list(kwarg.keys()):
                     if kwarg[k] is None:
                         kwarg.pop(k, None)
-            result = dict(
-                strict=test_instruction_following_strict(input, pred),
-                loose=test_instruction_following_loose(input, pred),
-            )
-            results.append(result)
-        strict = sum(
-            [result['strict'].follow_all_instructions
-             for result in results]) / len(results)
-        loose = sum(
-            [result['loose'].follow_all_instructions
-             for result in results]) / len(results)
-        return dict(strict_acc=strict * 100, loose_acc=loose * 100)
+            results['strict'].append(
+                test_instruction_following_strict(input, pred))
+            results['loose'].append(
+                test_instruction_following_loose(input, pred))
+        final_scores = dict()
+        for metric in ('strict', 'loose'):
+            prompt_total = 0
+            prompt_correct = 0
+            inst_total = 0
+            inst_correct = 0
+
+            for example in results[metric]:
+                follow_instruction_list = example.follow_instruction_list
+                instruction_id_list = example.instruction_id_list
+
+                prompt_total += 1
+                if all(follow_instruction_list):
+                    prompt_correct += 1
+
+                inst_total += len(instruction_id_list)
+                inst_correct += sum(follow_instruction_list)
+            prompt_score = f'Prompt-level-{metric}-accuracy'
+            inst_score = f'Inst-level-{metric}-accuracy'
+            final_scores[prompt_score] = prompt_correct / prompt_total * 100
+            final_scores[inst_score] = inst_correct / inst_total * 100
+        return final_scores

@@ -50,11 +50,12 @@ jobs:
           conda info --envs
           rm -rf regression_result_daily
           export from_tf=TRUE
-          python3 run.py --models hf_internlm_chat_7b hf_internlm_7b --datasets FewCLUE_chid_ppl humaneval_gen ARC_c_ppl --work-dir regression_result_daily --debug
+          python3 run.py --models hf_internlm_chat_7b hf_internlm_7b hf_chatglm3_6b_base hf_chatglm3_6b hf_qwen_7b_chat hf_qwen_7b --datasets FewCLUE_chid_ppl humaneval_gen ARC_c_ppl obqa_ppl --work-dir regression_result_daily
       - name:  Get result
         run: |
+          eval "$(conda shell.bash hook)"
           pip install pytest --cache-dir ${{env.PIP_CACHE_PATH}}
-          pytest -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
         if: always()
         run: |
@@ -71,4 +72,4 @@ jobs:
     steps:
       - name: notify
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{"msg_type":"post","content":{"post":{"zh_cn":{"title":"Opencompass- pr test failed","content":[[{"tag":"text","text":"branch: ${{github.ref_name}}, run action: ${{github.workflow}} failed. "},{"tag":"a","text":"Please click here for details ","href":"https://github.com/'${{ github.repository }}'/actions/runs/'${GITHUB_RUN_ID}'"},{"tag":"at","user_id":"'${{ secrets.USER_ID }}'"}]]}}}}'  ${{ secrets.WEBHOOK_URL }}
+          curl -X POST -H "Content-Type: application/json" -d '{"msg_type":"post","content":{"post":{"zh_cn":{"title":"Opencompass- Daily test failed","content":[[{"tag":"text","text":"branch: ${{github.ref_name}}, run action: ${{github.workflow}} failed. "},{"tag":"a","text":"Please click here for details ","href":"https://github.com/'${{ github.repository }}'/actions/runs/'${GITHUB_RUN_ID}'"},{"tag":"at","user_id":"'${{ secrets.USER_ID }}'"}]]}}}}'  ${{ secrets.WEBHOOK_URL }}

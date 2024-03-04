@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Registry of all instructions."""
-import opencompass.datasets.ifeval.instructions as instructions
+import opencompass.datasets.IFEval.instructions as instructions
 
 _KEYWORD = 'keywords:'
 

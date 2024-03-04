@@ -405,6 +405,7 @@ class OpenAIAllesAPIN(OpenAI):
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
+                time.sleep(1)
                 continue
             if raw_response.status_code == 200 and response[
                     'msgCode'] == '10000':
@@ -415,6 +416,8 @@ class OpenAIAllesAPIN(OpenAI):
                 else:
                     return choices[0]['message']['content'].strip()
             self.logger.error(response['msg'])
+            self.logger.error(response)
+            time.sleep(1)
 
         raise RuntimeError('API call failed.')
 

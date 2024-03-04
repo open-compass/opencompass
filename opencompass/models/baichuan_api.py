@@ -150,7 +150,7 @@ class BaiChuan(BaseAPIModel):
                 return msg
 
             if raw_response.status_code != 200:
-                print(raw_response)
+                print(raw_response.json())
                 time.sleep(1)
                 continue
             print(response)

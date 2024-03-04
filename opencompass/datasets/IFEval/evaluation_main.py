@@ -16,11 +16,11 @@
 # limitations under the License.
 
 import dataclasses
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from absl import flags
 
-import opencompass.datasets.ifeval.instructions_registry as instructions_registry
+import opencompass.datasets.IFEval.instructions_registry as instructions_registry
 
 _INPUT_DATA = flags.DEFINE_string('input_data',
                                   None,
@@ -43,18 +43,18 @@ _OUTPUT_DIR = flags.DEFINE_string(
 @dataclasses.dataclass
 class InputExample:
     key: int
-    instruction_id_list: list[str]
+    instruction_id_list: List[str]
     prompt: str
-    kwargs: list[Dict[str, Optional[Union[str, int]]]]
+    kwargs: List[Dict[str, Optional[Union[str, int]]]]
 
 
 @dataclasses.dataclass
 class OutputExample:
-    instruction_id_list: list[str]
+    instruction_id_list: List[str]
     prompt: str
     response: str
     follow_all_instructions: bool
-    follow_instruction_list: list[bool]
+    follow_instruction_list: List[bool]
 
 
 def test_instruction_following_strict(
@@ -69,8 +69,6 @@ def test_instruction_following_strict(
         instruction_cls = instructions_registry.INSTRUCTION_DICT[
             instruction_id]
         instruction = instruction_cls(instruction_id)
-        print(index)
-        print(inp)
         instruction.build_description(**inp.kwargs[index])
         args = instruction.get_instruction_args()
         if args and 'prompt' in args:
