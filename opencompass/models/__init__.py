@@ -13,6 +13,7 @@ from .huggingface import HuggingFace  # noqa: F401, F403
 from .huggingface import HuggingFaceCausalLM  # noqa: F401, F403
 from .huggingface import HuggingFaceChatGLM3  # noqa: F401, F403
 from .intern_model import InternLM  # noqa: F401, F403
+from .krgpt_api import KrGPT  # noqa: F401
 from .lightllm_api import LightllmAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401, F403
 from .lmdeploy_pytorch import LmdeployPytorchModel  # noqa: F401

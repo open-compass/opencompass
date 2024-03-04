@@ -1,7 +1,7 @@
 import json
 import os
 
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
 
@@ -20,12 +20,12 @@ class winograndeDataset(BaseDataset):
             for line in f:
                 line = json.loads(line)
                 prompt = line['sentence']
-                continue_prompt = prompt.split('_')
+                continue_prompt = prompt.split('_')[1]
                 data_item = {
                     'opt1': prompt.replace('_', line['option1']),
                     'opt2': prompt.replace('_', line['option2']),
                     'answer': line['answer'],
-                    'cont': continue_prompt[1]
+                    'cont': continue_prompt,
                 }
                 dataset_list.append(data_item)
         dataset_list = Dataset.from_list(dataset_list)
@@ -44,13 +44,43 @@ class winograndeDataset_V2(BaseDataset):
             for line in f:
                 line = json.loads(line)
                 prompt = line['sentence']
+                continue_prompt = prompt.split('_')[1]
                 answer = line['answer']
                 answer = ' AB'[int(answer)] if answer != '' else 'NULL'
                 data_item = {
                     'opt1': prompt.replace('_', line['option1']),
                     'opt2': prompt.replace('_', line['option2']),
                     'answer': answer,
+                    'cont': continue_prompt,
                 }
                 dataset_list.append(data_item)
         dataset_list = Dataset.from_list(dataset_list)
         return dataset_list
+
+
+@LOAD_DATASET.register_module()
+class winograndeDataset_V3(BaseDataset):
+    """Disconnect from Huggingface, winograndeDataset_V2."""
+
+    @staticmethod
+    def load(path):
+        dataset_dict = DatasetDict()
+        for split in ['train_xs', 'dev']:
+            filename = os.path.join(path, f'{split}.jsonl')
+            dataset_list = []
+            with open(filename, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = json.loads(line)
+                    prompt = line['sentence']
+                    continue_prompt = prompt.split('_')[1]
+                    answer = line['answer']
+                    answer = ' AB'[int(answer)] if answer != '' else 'NULL'
+                    data_item = {
+                        'opt1': prompt.replace('_', line['option1']),
+                        'opt2': prompt.replace('_', line['option2']),
+                        'answer': answer,
+                        'cont': continue_prompt,
+                    }
+                    dataset_list.append(data_item)
+            dataset_dict[split] = Dataset.from_list(dataset_list)
+        return dataset_dict

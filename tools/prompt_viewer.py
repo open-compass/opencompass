@@ -6,7 +6,8 @@ from mmengine.config import Config, ConfigDict
 
 from opencompass.openicl.icl_inferencer import (AgentInferencer,
                                                 ChatInferencer, CLPInferencer,
-                                                GenInferencer, PPLInferencer,
+                                                GenInferencer, LLInferencer,
+                                                PPLInferencer,
                                                 PPLOnlyInferencer)
 from opencompass.registry import ICL_PROMPT_TEMPLATES, ICL_RETRIEVERS
 from opencompass.utils import (Menu, build_dataset_from_cfg,
@@ -81,14 +82,15 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
 
     supported_inferencer = [
         AgentInferencer, PPLInferencer, GenInferencer, CLPInferencer,
-        PPLOnlyInferencer, ChatInferencer
+        PPLOnlyInferencer, ChatInferencer, LLInferencer
     ]
     if infer_cfg.inferencer.type not in supported_inferencer:
         print(f'Only {supported_inferencer} are supported')
         return
 
     for idx in range(min(count, len(ice_idx_list))):
-        if issubclass(infer_cfg.inferencer.type, PPLInferencer):
+        if issubclass(infer_cfg.inferencer.type,
+                      (PPLInferencer, LLInferencer)):
             labels = retriever.get_labels(ice_template=ice_template,
                                           prompt_template=prompt_template)
             ice = retriever.generate_ice(ice_idx_list[idx],

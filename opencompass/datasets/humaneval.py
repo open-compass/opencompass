@@ -156,10 +156,13 @@ def humaneval_postprocess_v2(text: str) -> str:
     """This is an advanced version of previous postprocess to handle more
     situations, better to use this one."""
     try:
-        # for chatGLM raw text
-        text = eval(text)
+        # for chatGLM related text
+        eval_text = eval(text)
     except Exception:
         pass
+    else:
+        if isinstance(eval_text, str):
+            text = eval_text
     text = text.lstrip('\n')
     if '```' in text:
         blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
