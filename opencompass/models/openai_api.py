@@ -415,6 +415,13 @@ class OpenAIAllesAPIN(OpenAI):
                     self.logger.error(data)
                 else:
                     return choices[0]['message']['content'].strip()
+            try:
+                match = re.match(r'Error code: \d+ - (.*)', response['data'])
+                err = eval(match.group(1))['error']
+                if err['code'] == 'content_filter' and err['status'] == 400:
+                    return err['message']
+            except Exception:
+                pass
             self.logger.error(response['msg'])
             self.logger.error(response)
             time.sleep(1)

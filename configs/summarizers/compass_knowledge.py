@@ -15,21 +15,13 @@ compassbench_v1_knowledge_groups = [
 'compassbench_v1_knowledge-mixed-cloze_en'
 summarizer = dict(
     dataset_abbrs=[
-        'knowledge_acc_1_and_cloze',
-        ['knowledge_cn', 'acc_1'],
-        ['compassbench_v1_knowledge-common_knowledge-single_choice_cn_circular', 'acc_1'],
-        ['compassbench_v1_knowledge-humanity-single_choice_cn_circular', 'acc_1'],
-        ['compassbench_v1_knowledge-natural_science-single_choice_cn_circular', 'acc_1'],
-        ['compassbench_v1_knowledge-social_science-single_choice_cn_circular', 'acc_1'],
-        'compassbench_v1_knowledge-mixed-cloze_en',
-
         'knowledge_perf_4_and_cloze',
         ['knowledge_cn', 'perf_4'],
+        'compassbench_v1_knowledge-mixed-cloze_en',
         ['compassbench_v1_knowledge-common_knowledge-single_choice_cn_circular', 'perf_4'],
         ['compassbench_v1_knowledge-humanity-single_choice_cn_circular', 'perf_4'],
         ['compassbench_v1_knowledge-natural_science-single_choice_cn_circular', 'perf_4'],
         ['compassbench_v1_knowledge-social_science-single_choice_cn_circular', 'perf_4'],
-        'compassbench_v1_knowledge-mixed-cloze_en',
     ],
     summary_groups=compassbench_v1_knowledge_groups
 )
