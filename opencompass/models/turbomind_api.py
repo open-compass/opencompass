@@ -20,7 +20,7 @@ def valid_str(string, coding='utf-8'):
 
 
 class TurboMindAPIModel(BaseModel):
-    """Model wrapper for TurboMind Triton Inference Server gRPC API.
+    """Model wrapper for lmdeploy api server.
 
     Args:
         api_addr (str): The address (ip:port format) of lmdeploy's
