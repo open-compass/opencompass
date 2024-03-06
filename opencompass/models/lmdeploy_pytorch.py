@@ -54,6 +54,10 @@ class LmdeployPytorchModel(BaseModel):
         if engine_config is not None:
             from lmdeploy.messages import PytorchEngineConfig
             engine_config = PytorchEngineConfig(**engine_config)
+            # set thread_safe
+            if hasattr(engine_config, 'thread_safe'):
+                engine_config.thread_safe = True
+
         if gen_config is not None:
             from lmdeploy.messages import EngineGenerationConfig
             gen_config = EngineGenerationConfig(**gen_config)

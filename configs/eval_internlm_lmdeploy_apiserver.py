@@ -14,15 +14,25 @@ with read_base():
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
-models = [
-    dict(
-        type=TurboMindAPIModel,
-        abbr='internlm-chat-20b-turbomind',
-        path="internlm-chat-20b",
-        api_addr='http://0.0.0.0:23333',
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=8,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-]
+internlm_chat_20b = dict(
+    type=TurboMindAPIModel,
+    abbr='internlm-chat-20b-turbomind',
+    api_addr='http://0.0.0.0:23333',
+    max_out_len=100,
+    max_seq_len=2048,
+    batch_size=8,
+    run_cfg=dict(num_gpus=1, num_procs=1),
+)
+
+internlm_chat_7b = dict(
+    type=TurboMindAPIModel,
+    abbr='internlm-chat-7b-turbomind',
+    api_addr='http://0.0.0.0:23333',
+    max_out_len=100,
+    max_seq_len=2048,
+    batch_size=16,
+    run_cfg=dict(num_gpus=1, num_procs=1),
+)
+
+models = [internlm_chat_20b]
+
