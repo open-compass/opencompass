@@ -19,15 +19,22 @@
 ### 第一步: 将模型通过 Lightllm 在本地以服务的形式起起来
 
 ```shell
-python -m lightllm.server.api_server --model_dir /path/llama2-7B     \
+python -m lightllm.server.api_server --model_dir /path/llama2-7B    \
                                      --host 0.0.0.0                 \
-                                     --port 8080                    \
+                                     --port 1030                    \
+                                     --nccl_port 2066               \
+                                     --max_req_input_len 4096       \
+                                     --max_req_total_len 6144       \
                                      --tp 1                         \
+                                     --trust_remote_code            \
                                      --max_total_token_num 120000
 ```
 
 **注：** 上述命令可以通过 tp 的数量设置，在 tp 张卡上进行 TensorParallel 推理，适用于较大的模型的推理。
+
 **注：** 上述命令中的 max_total_token_num，会影响测试过程中的吞吐性能，可以根据 [Lightllm 主页](https://github.com/ModelTC/lightllm) 上的文档，进行设置。只要不爆显存，往往设置越大越好。
+
+**注：** 如果要在同一个机器上起多个 Lightllm 服务，需要重新设定上面的 port 和 nccl_port。
 
 可以使用下面的 Python 脚本简单测试一下当前服务是否已经起成功
 

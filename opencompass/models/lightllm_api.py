@@ -8,11 +8,12 @@ import requests
 from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
 
-from .base_api import BaseAPIModel
+from .base import BaseModel
+from .base_api import TokenBucket
 
 
 @MODELS.register_module()
-class LightllmAPI(BaseAPIModel):
+class LightllmAPI(BaseModel):
 
     is_api: bool = True
 
@@ -20,23 +21,21 @@ class LightllmAPI(BaseAPIModel):
             self,
             path: str = 'LightllmAPI',
             url: str = 'http://localhost:8080/generate',
-            input_format: str = '<input_text_to_replace>',
-            max_seq_len: int = 2048,
             meta_template: Optional[Dict] = None,
+            rate_per_worker: int = 2,
             retry: int = 2,
             generation_kwargs: Optional[Dict] = dict(),
     ):
 
         super().__init__(path=path,
-                         max_seq_len=max_seq_len,
                          meta_template=meta_template,
-                         retry=retry,
                          generation_kwargs=generation_kwargs)
         self.logger = get_logger()
         self.url = url
-        self.input_format = input_format
+        self.retry = retry
         self.generation_kwargs = generation_kwargs
         self.max_out_len = self.generation_kwargs.get('max_new_tokens', 1024)
+        self.token_bucket = TokenBucket(rate_per_worker, False)
 
     def generate(self, inputs: List[str], max_out_len: int,
                  **kwargs) -> List[str]:
@@ -64,8 +63,6 @@ class LightllmAPI(BaseAPIModel):
             self.wait()
             header = {'content-type': 'application/json'}
             try:
-                input = self.input_format.replace('<input_text_to_replace>',
-                                                  input)
                 data = dict(inputs=input, parameters=self.generation_kwargs)
                 raw_response = requests.post(self.url,
                                              headers=header,
@@ -118,8 +115,6 @@ class LightllmAPI(BaseAPIModel):
             self.wait()
             header = {'content-type': 'application/json'}
             try:
-                input = self.input_format.replace('<input_text_to_replace>',
-                                                  input)
                 data = dict(inputs=input, parameters=self.generation_kwargs)
                 raw_response = requests.post(self.url,
                                              headers=header,
@@ -156,3 +151,10 @@ class LightllmAPI(BaseAPIModel):
         raise RuntimeError('Calling LightllmAPI failed after retrying for '
                            f'{max_num_retries} times. Check the logs for '
                            'details.')
+
+    def wait(self):
+        """Wait till the next query can be sent.
+
+        Applicable in both single-thread and multi-thread environments.
+        """
+        return self.token_bucket.get_token()
