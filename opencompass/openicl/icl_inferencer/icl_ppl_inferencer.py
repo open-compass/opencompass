@@ -108,9 +108,9 @@ class PPLInferencer(BaseInferencer):
                     ice_template=ice_template,
                     prompt_template=prompt_template,
                     remain_sep=normalizing_str is not None)
+                prompt_token_num = self.model.get_token_len_from_template(
+                    prompt, mode='ppl')
                 if self.max_seq_len is not None:
-                    prompt_token_num = self.model.get_token_len_from_template(
-                        prompt, mode='ppl')
                     while len(ice_idx_list[idx]
                               ) > 0 and prompt_token_num > self.max_seq_len:
                         ice_idx_list[idx] = ice_idx_list[idx][:-1]
