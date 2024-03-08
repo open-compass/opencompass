@@ -239,6 +239,7 @@ class OpenAI(BaseAPIModel):
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
                         time.sleep(1)
+                        self.logger.warn('Rate limit exceeded, retrying...')
                         continue
                     elif response['error']['code'] == 'insufficient_quota':
                         self.invalid_keys.add(key)

@@ -1,6 +1,6 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.datasets import GPQADataset, GPQAEvaluator
 from opencompass.utils import first_option_postprocess
 
@@ -11,25 +11,19 @@ gpqa_reader_cfg = dict(
 gpqa_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(role='HUMAN', prompt='{question}\nChoices:\n'
-                                          '(A){A}\n'
-                                          '(B){B}\n'
-                                          '(C){C}\n'
-                                          '(D){D}\n'
-                                          'Format your response as follows: "The correct answer is (insert answer here)"'),
-            ], )),
+        template={
+            opt: f'Question: {{question}}\n(A){{A}}\n(B){{B}}\n(C){{C}}\n(D){{D}}\nAnswer: {opt}' for opt in ['A', 'B', 'C', 'D']
+        }),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer))
+    inferencer=dict(type=PPLInferencer))
 
 gpqa_eval_cfg = dict(evaluator=dict(type=GPQAEvaluator),
                      pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'))
 
 gpqa_datasets = []
 gpqa_subsets = {
-    'extended': 'gpqa_extended.csv',
-    'main': 'gpqa_main.csv',
+    # 'extended': 'gpqa_extended.csv',
+    # 'main': 'gpqa_main.csv',
     'diamond': 'gpqa_diamond.csv'
 }
 
