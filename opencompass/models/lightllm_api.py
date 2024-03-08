@@ -1,4 +1,5 @@
 import json
+import re
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional
 
@@ -35,6 +36,7 @@ class LightllmAPI(BaseModel):
         self.retry = retry
         self.generation_kwargs = generation_kwargs
         self.max_out_len = self.generation_kwargs.get('max_new_tokens', 1024)
+        self.meta_template = meta_template
         self.token_bucket = TokenBucket(rate_per_worker, False)
 
     def generate(self, inputs: List[str], max_out_len: int,
@@ -158,3 +160,26 @@ class LightllmAPI(BaseModel):
         Applicable in both single-thread and multi-thread environments.
         """
         return self.token_bucket.get_token()
+
+    def get_token_len(self, prompt: str) -> int:
+        """Get lengths of the tokenized string. Only English and Chinese
+        characters are counted for now. Users are encouraged to override this
+        method if more accurate length is needed.
+
+        Args:
+            prompt (str): Input string.
+
+        Returns:
+            int: Length of the input tokens
+        """
+
+        english_parts = re.findall(r'[A-Za-z0-9]+', prompt)
+        chinese_parts = re.findall(r'[\u4e00-\u9FFF]+', prompt)
+
+        # Count English words
+        english_count = sum(len(part.split()) for part in english_parts)
+
+        # Count Chinese words
+        chinese_count = sum(len(part) for part in chinese_parts)
+
+        return english_count + chinese_count
