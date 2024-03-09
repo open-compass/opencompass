@@ -127,12 +127,16 @@ class MTBenchSummarizer(CompassArenaSummarizer):
                     fout = osp.join(
                         output_dir,
                         'judged-by--' + judge_model + '-capability.csv')
+                    overall_judged_answers, overall_references = [], []
                     for dataset in dataset_cfgs:
                         judged_answers, references = get_judgeanswer_and_reference(
                             dataset, subdir_path, self.judge_function)
-                        get_capability_results(judged_answers, references,
-                                               fout, fout_flag, model)
-                        fout_flag += 1
+                        overall_judged_answers += judged_answers
+                        overall_references += references
+                    get_capability_results(overall_judged_answers,
+                                           overall_references, fout, fout_flag,
+                                           model)
+                    fout_flag += 1
                 else:
                     print(subdir_path + ' is not exist! please check!')
             with open(fout, 'r') as f:
