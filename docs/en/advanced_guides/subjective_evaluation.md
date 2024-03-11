@@ -202,6 +202,35 @@ Consider cite the following paper if you find it helpful:
 }
 ```
 
+## Multi-round Subjective Evaluation in OpenCompass
+
+In OpenCompass, we also support subjective multi-turn dialogue evaluation. For instance, the evaluation of MT-Bench can be referred to in `configs/eval_subjective_mtbench.py`.
+
+In the multi-turn dialogue evaluation, you need to organize the data format into the following dialogue structure:
+
+```
+"dialogue": [
+    {
+        "role": "user",
+        "content": "Imagine you are participating in a race with a group of people. If you have just overtaken the second person, what's your current position? Where is the person you just overtook?"
+    },
+    {
+        "role": "assistant",
+        "content": ""
+    },
+    {
+        "role": "user",
+        "content": "If the \"second person\" is changed to \"last person\" in the above question, what would the answer be?"
+    },
+    {
+        "role": "assistant",
+        "content": ""
+    }
+],
+```
+
+It's important to note that due to the different question types in MTBench having different temperature settings, we need to divide the original data files into three different subsets according to the temperature for separate inference. For different subsets, we can set different temperatures. For specific settings, please refer to `configs\datasets\subjective\multiround\mtbench_single_judge_diff_temp.py`.
+
 ## Practice: AlignBench Evaluation
 
 ### Dataset
