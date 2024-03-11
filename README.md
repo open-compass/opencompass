@@ -55,9 +55,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 - **\[2024.01.17\]** We supported the evaluation of [InternLM2](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_keyset.py) and [InternLM2-Chat](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py), InternLM2 showed extremely strong performance in these tests, welcome to try! 🔥🔥🔥.
 - **\[2024.01.17\]** We supported the needle in a haystack test with multiple needles, more information can be found [here](https://opencompass.readthedocs.io/en/latest/advanced_guides/needleinahaystack_eval.html#id8) 🔥🔥🔥.
 - **\[2023.12.28\]** We have enabled seamless evaluation of all models developed using [LLaMA2-Accessory](https://github.com/Alpha-VLLM/LLaMA2-Accessory), a powerful toolkit for comprehensive LLM development.
-- **\[2023.12.22\]** We have released [T-Eval](https://github.com/open-compass/T-Eval), a step-by-step evaluation benchmark to gauge your LLMs on tool utilization. Welcome to our [Leaderboard](https://open-compass.github.io/T-Eval/leaderboard.html) for more details! 🔥🔥🔥.
-- **\[2023.12.10\]** We have released [VLMEvalKit](https://github.com/open-compass/VLMEvalKit), a toolkit for evaluating vision-language models (VLMs), currently support 20+ VLMs and 7 multi-modal benchmarks (including MMBench series).
-- **\[2023.12.10\]** We have supported Mistral AI's MoE LLM: **Mixtral-8x7B-32K**. Welcome to [MixtralKit](https://github.com/open-compass/MixtralKit) for more details about inference and evaluation.
+- **\[2023.12.22\]** We have released [T-Eval](https://github.com/open-compass/T-Eval), a step-by-step evaluation benchmark to gauge your LLMs on tool utilization. Welcome to our [Leaderboard](https://open-compass.github.io/T-Eval/leaderboard.html) for more details!
 
 > [More](docs/en/notes/news.md)
 
@@ -479,18 +477,18 @@ Through the command line or configuration files, OpenCompass also supports evalu
 
 ## 🔜 Roadmap
 
-- [ ] Subjective Evaluation
+- [x] Subjective Evaluation
   - [ ] Release CompassAreana
-  - [ ] Subjective evaluation dataset.
+  - [x] Subjective evaluation.
 - [x] Long-context
-  - [ ] Long-context evaluation with extensive datasets.
+  - [x] Long-context evaluation with extensive datasets.
   - [ ] Long-context leaderboard.
-- [ ] Coding
+- [x] Coding
   - [ ] Coding evaluation leaderboard.
   - [x] Non-python language evaluation service.
-- [ ] Agent
+- [x] Agent
   - [ ] Support various agenet framework.
-  - [ ] Evaluation of tool use of the LLMs.
+  - [x] Evaluation of tool use of the LLMs.
 - [x] Robustness
   - [x] Support various attack method
 
