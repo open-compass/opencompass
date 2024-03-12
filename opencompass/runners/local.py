@@ -189,7 +189,7 @@ class LocalRunner(BaseRunner):
                                     stderr=stdout)
 
             if result.returncode != 0:
-                logger.warning(f'task {task_name} fail, see\n{out_path}')
+                logger.error(f'task {task_name} fail, see\n{out_path}')
         finally:
             # Clean up
             os.remove(param_file)
