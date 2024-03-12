@@ -75,22 +75,15 @@ mmlu_all_sets = [
 mmlu_datasets = []
 for _name in mmlu_all_sets:
     _hint = f'The following are multiple choice questions (with answers) about  {_name.replace("_", " ")}.\n\n'
+    question_overall = '{input}\nA. {A}\nB. {B}\nC. {C}\nD. {D}'
     mmlu_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
-            template={
-                opt:
-                f"{{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: {opt}\n"
-                for opt in ["A", "B", "C", "D"]
-            },
+            template={opt: f"{question_overall}\nAnswer: {opt}\n" for opt in ["A", "B", "C", "D"]},
         ),
         prompt_template=dict(
             type=PromptTemplate,
-            template={
-                opt:
-                f"{_hint}</E>{{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: {opt}"
-                for opt in ["A", "B", "C", "D"]
-            },
+            template={opt: f"{_hint}</E>{question_overall}\nAnswer: {opt}" for opt in ["A", "B", "C", "D"]},
             ice_token="</E>",
         ),
         retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),

@@ -91,8 +91,12 @@ docs/zh_cn/_build/
 
 # sft config ignore list
 configs/sft_cfg/*B_*
+configs/sft_cfg/1B/*
 configs/sft_cfg/7B/*
 configs/sft_cfg/20B/*
+configs/sft_cfg/60B/*
+configs/sft_cfg/100B/*
+
 configs/cky/
 # in case llama clone in the opencompass
 llama/
@@ -120,3 +124,6 @@ turbomind/
 *.csv
 *.npy
 *.c
+
+# aliyun
+core.*

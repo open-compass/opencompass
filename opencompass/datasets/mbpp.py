@@ -213,15 +213,15 @@ class MBPPEvaluator(BaseEvaluator):
                     programs = self._process_test(refer, pred)
                     future = executor.submit(execution, programs, i, 3)
                     futures.append(future)
+                    details[str(i)] = {}
+                    details[str(i)]['origin'] = predictions[i]
+                    details[str(i)]['programs'] = programs
 
                 from tqdm import tqdm
                 for future in tqdm(as_completed(futures), total=len(futures)):
                     index, key = future.result()
                     result[key] += 1
-                    details[str(index)] = {
-                        'programs': predictions[index],
-                        'result': key
-                    }
+                    details[str(index)]['result'] = key
 
             result['score'] = result['pass'] / len(predictions) * 100
             result['details'] = details

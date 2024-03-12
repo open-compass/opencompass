@@ -242,7 +242,7 @@ class SlurmSequentialRunner(BaseRunner):
                             retry -= 1
                             cmd = get_cmd()
                         else:
-                            logger.warning(
+                            logger.error(
                                 f'task {task_name} fail, see\n{out_path}')
                             break
                     else:

@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import MMLUDataset
-from opencompass.utils.text_postprocessors import first_capital_postprocess
+from opencompass.utils.text_postprocessors import first_option_postprocess
 
 # None of the mmlu dataset in huggingface is correctly parsed, so we use our own dataset reader
 # Please download the dataset from https://people.eecs.berkeley.edu/~hendrycks/data.tar
@@ -95,8 +95,7 @@ for _name in mmlu_all_sets:
                 round=[
                     dict(
                         role="HUMAN",
-                        prompt=
-                        f"{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: "
+                        prompt=f"{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: "
                     ),
                 ],
             ),
@@ -108,7 +107,7 @@ for _name in mmlu_all_sets:
 
     mmlu_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
-        pred_postprocessor=dict(type=first_capital_postprocess))
+        pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'))
 
     mmlu_datasets.append(
         dict(
