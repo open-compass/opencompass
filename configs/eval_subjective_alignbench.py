@@ -52,10 +52,10 @@ models = [
 datasets = [*subjective_datasets]
 
 infer = dict(
-    partitioner=dict(type=NaivePartitioner),
+    partitioner=dict(type=SizePartitioner,  max_task_size=2000),
     runner=dict(
         type=SlurmSequentialRunner,
-        partition='llmeval',
+        partition='llm_dev2',
         quotatype='auto',
         max_num_workers=256,
         task=dict(type=OpenICLInferTask),
@@ -65,7 +65,7 @@ infer = dict(
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_model = dict(
+judge_models = [dict(
     abbr='GPT4-Turbo',
     type=OpenAIAllesAPIN,
     path='gpt-4-1106-preview',
@@ -77,17 +77,19 @@ judge_model = dict(
     max_seq_len=2048,
     batch_size=8,
     temperature=0,
-)
+)]
 
 ## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
-        type=SubjectiveNaivePartitioner, mode='singlescore', models=models
+        type=SubjectiveSizePartitioner, max_task_size=3000, mode='singlescore', models=models, judge_models=judge_models,
     ),
     runner=dict(
-        type=LocalRunner,
-        max_num_workers=2,
-        task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model),
+        type=SlurmSequentialRunner,
+        partition='llm_dev2',
+        quotatype='auto',
+        max_num_workers=32,
+        task=dict(type=SubjectiveEvalTask),
     ),
 )
 

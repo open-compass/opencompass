@@ -309,7 +309,7 @@ class AlignmentBenchSummarizer:
         self.eval_model_abbrs = [
             model_abbr_from_cfg(model) for model in self.eval_model_cfgs
         ]
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
+        self.judge_models = self.cfg.get('judge_models', None)
         self.judge_type = judge_type
         assert self.judge_type in [
             'general', 'autoj', 'judgelm', 'general_plus'
@@ -333,33 +333,36 @@ class AlignmentBenchSummarizer:
         Returns:
             pd.DataFrame: The summary results.
         """
-        dataset_cfgs = self.cfg['datasets']
-        output_dir, results_folder = get_outdir(self.cfg, time_str)
-        fout_flag, fout_flag2 = 0, 0
-        for eval_model_abbr in self.eval_model_abbrs:
-            subdir = eval_model_abbr + '_judged-by--' + self.judge_abbr
-            subdir_path = os.path.join(results_folder, subdir)
-            if os.path.isdir(subdir_path):
-                model, judge_model = eval_model_abbr, self.judge_abbr
-                if self.judge_type == 'general':
-                    fout = osp.join(
-                        output_dir,
-                        'judged-by--' + judge_model + '-dimension.csv')
-                fout2 = osp.join(
-                    output_dir,
-                    'judged-by--' + judge_model + '-capability.csv')
-                for dataset in dataset_cfgs:
-                    judged_answers, references = get_judgeanswer_and_reference(
-                        dataset, subdir_path, self.judge_function)
+        for judge_model in self.judge_models:
+            judge_abbr = model_abbr_from_cfg(judge_model)
+            dataset_cfgs = self.cfg['datasets']
+            output_dir, results_folder = get_outdir(self.cfg, time_str)
+            fout_flag, fout_flag2 = 0, 0
+            for eval_model_abbr in self.eval_model_abbrs:
+                subdir = eval_model_abbr + '_judged-by--' + judge_abbr
+                subdir_path = os.path.join(results_folder, subdir)
+                if os.path.isdir(subdir_path):
+                    model = eval_model_abbr
                     if self.judge_type == 'general':
-                        get_dimension_results(judged_answers, references, fout,
-                                              fout_flag, model)
-                        fout_flag += 1
-                    get_capability_results(judged_answers, references, fout2,
-                                           fout_flag2, model, self.category)
-                    fout_flag2 += 1
-            else:
-                print(subdir_path + ' is not exist! please check!')
+                        fout = osp.join(
+                            output_dir,
+                            'judged-by--' + judge_abbr + '-dimension.csv')
+                    fout2 = osp.join(
+                        output_dir,
+                        'judged-by--' + judge_abbr + '-capability.csv')
+                    for dataset in dataset_cfgs:
+                        judged_answers, references = get_judgeanswer_and_reference(
+                            dataset, subdir_path, self.judge_function)
+                        if self.judge_type == 'general':
+                            get_dimension_results(judged_answers, references,
+                                                  fout, fout_flag, model)
+                            fout_flag += 1
+                        get_capability_results(judged_answers, references,
+                                               fout2, fout_flag2, model,
+                                               self.category)
+                        fout_flag2 += 1
+                else:
+                    print(subdir_path + ' is not exist! please check!')
         if self.judge_type == 'general':
             with open(fout, 'r') as f:
                 x = from_csv(f)

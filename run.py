@@ -341,7 +341,14 @@ def main():
         if args.dry_run:
             return
         runner = RUNNERS.build(cfg.eval.runner)
-        runner(tasks)
+
+        # For meta-review-judge in subjective evaluation
+        if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
+                tasks[0], list):
+            for task_part in tasks:
+                runner(task_part)
+        else:
+            runner(tasks)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
