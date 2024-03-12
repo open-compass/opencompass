@@ -9,6 +9,8 @@
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
 [🌐Website](https://opencompass.org.cn/) |
+[📖CompassHub](https://hub.opencompass.org.cn/home) |
+[📊CompassRank](https://rank.opencompass.org.cn/home) |
 [📘Documentation](https://opencompass.readthedocs.io/en/latest/) |
 [🛠️Installation](https://opencompass.readthedocs.io/en/latest/get_started/installation.html) |
 [🤔Reporting Issues](https://github.com/open-compass/opencompass/issues/new/choose)
@@ -21,19 +23,16 @@ English | [简体中文](README_zh-CN.md)
     👋 join us on <a href="https://discord.gg/KKwfEbFj7U" target="_blank">Discord</a> and <a href="https://r.vansin.top/?r=opencompass" target="_blank">WeChat</a>
 </p>
 
-## 📣 OpenCompass 2023 LLM Annual Leaderboard
+## 📣 OpenCompass 2.0
 
-We are honored to have witnessed the tremendous progress of artificial general intelligence together with the community in the past year, and we are also very pleased that **OpenCompass** can help numerous developers and users.
+We are thrilled to introduce OpenCompass 2.0, an advanced suite featuring three key components: [CompassKit](https://github.com/open-compass), [CompassHub](https://hub.opencompass.org.cn/home), and [CompassRank](https://rank.opencompass.org.cn/home).
+![oc20](https://github.com/tonysy/opencompass/assets/7881589/90dbe1c0-c323-470a-991e-2b37ab5350b2)
 
-We announce the launch of the **OpenCompass 2023 LLM Annual Leaderboard** plan. We expect to release the annual leaderboard of the LLMs in January 2024, systematically evaluating the performance of LLMs in various capabilities such as language, knowledge, reasoning, creation, long-text, and agents.
+**CompassRank** has been significantly enhanced into the leaderboards that now incorporates both open-source benchmarks and proprietary benchmarks. This upgrade allows for a more comprehensive evaluation of models across the industry.
 
-At that time, we will release rankings for both open-source models and commercial API models, aiming to provide a comprehensive, objective, and neutral reference for the industry and research community.
+**CompassHub** presents a pioneering benchmark browser interface, designed to simplify and expedite the exploration and utilization of an extensive array of benchmarks for researchers and practitioners alike. To enhance the visibility of your own benchmark within the community, we warmly invite you to contribute it to CompassHub. You may initiate the submission process by clicking [here](https://hub.opencompass.org.cn/dataset-submit).
 
-We sincerely invite various large models to join the OpenCompass to showcase their performance advantages in different fields. At the same time, we also welcome researchers and developers to provide valuable suggestions and contributions to jointly promote the development of the LLMs. If you have any questions or needs, please feel free to [contact us](mailto:opencompass@pjlab.org.cn). In addition, relevant evaluation contents, performance statistics, and evaluation methods will be open-source along with the leaderboard release.
-
-We have provided the more details of the CompassBench 2023 in [Doc](docs/zh_cn/advanced_guides/compassbench_intro.md).
-
-Let's look forward to the release of the OpenCompass 2023 LLM Annual Leaderboard!
+**CompassKit** is a powerful collection of evaluation toolkits specifically tailored for Large Language Models and Large Vision-language Models. It provides an extensive set of tools to assess and measure the performance of these complex models effectively. Welcome to try our toolkits for in your research and products.
 
 ## 🧭	Welcome
 
@@ -52,12 +51,12 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.02.29\]** We supported the MT-Bench, AlpacalEval and AlignBench, more information can be found [here](https://opencompass.readthedocs.io/en/latest/advanced_guides/subjective_evaluation.html) 🔥🔥🔥.
+- **\[2024.01.30\]** We release OpenCompass 2.0. Click  [CompassKit](https://github.com/open-compass), [CompassHub](https://hub.opencompass.org.cn/home), and [CompassRank](https://rank.opencompass.org.cn/home) for more information ! 🔥🔥🔥.
 - **\[2024.01.17\]** We supported the evaluation of [InternLM2](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_keyset.py) and [InternLM2-Chat](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py), InternLM2 showed extremely strong performance in these tests, welcome to try! 🔥🔥🔥.
 - **\[2024.01.17\]** We supported the needle in a haystack test with multiple needles, more information can be found [here](https://opencompass.readthedocs.io/en/latest/advanced_guides/needleinahaystack_eval.html#id8) 🔥🔥🔥.
-- **\[2023.12.28\]** We have enabled seamless evaluation of all models developed using [LLaMA2-Accessory](https://github.com/Alpha-VLLM/LLaMA2-Accessory), a powerful toolkit for comprehensive LLM development. 🔥🔥🔥.
-- **\[2023.12.22\]** We have released [T-Eval](https://github.com/open-compass/T-Eval), a step-by-step evaluation benchmark to gauge your LLMs on tool utilization. Welcome to our [Leaderboard](https://open-compass.github.io/T-Eval/leaderboard.html) for more details! 🔥🔥🔥.
-- **\[2023.12.10\]** We have released [VLMEvalKit](https://github.com/open-compass/VLMEvalKit), a toolkit for evaluating vision-language models (VLMs), currently support 20+ VLMs and 7 multi-modal benchmarks (including MMBench series).
-- **\[2023.12.10\]** We have supported Mistral AI's MoE LLM: **Mixtral-8x7B-32K**. Welcome to [MixtralKit](https://github.com/open-compass/MixtralKit) for more details about inference and evaluation.
+- **\[2023.12.28\]** We have enabled seamless evaluation of all models developed using [LLaMA2-Accessory](https://github.com/Alpha-VLLM/LLaMA2-Accessory), a powerful toolkit for comprehensive LLM development.
+- **\[2023.12.22\]** We have released [T-Eval](https://github.com/open-compass/T-Eval), a step-by-step evaluation benchmark to gauge your LLMs on tool utilization. Welcome to our [Leaderboard](https://open-compass.github.io/T-Eval/leaderboard.html) for more details!
 
 > [More](docs/en/notes/news.md)
 
@@ -79,7 +78,7 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 
 ## 📊 Leaderboard
 
-We provide [OpenCompass Leaderboard](https://opencompass.org.cn/rank) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
+We provide [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -114,8 +113,8 @@ pip install -e .
 
 ```bash
 # Download dataset to data/ folder
-wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
-unzip OpenCompassData-core-20231110.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
+unzip OpenCompassData-core-20240207.zip
 ```
 
 Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started/installation.html).
@@ -420,10 +419,6 @@ Through the command line or configuration files, OpenCompass also supports evalu
   </tbody>
 </table>
 
-## OpenCompass Ecosystem
-
-<p align="right"><a href="#top">🔝Back to top</a></p>
-
 ## 📖 Model Support
 
 <table align="center">
@@ -453,12 +448,14 @@ Through the command line or configuration files, OpenCompass also supports evalu
 - [TigerBot](https://github.com/TigerResearch/TigerBot)
 - [Qwen](https://github.com/QwenLM/Qwen)
 - [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
+- [Gemma](https://huggingface.co/google/gemma-7b)
 - ...
 
 </td>
 <td>
 
 - OpenAI
+- Gemini
 - Claude
 - ZhipuAI(ChatGLM)
 - Baichuan
@@ -481,18 +478,18 @@ Through the command line or configuration files, OpenCompass also supports evalu
 
 ## 🔜 Roadmap
 
-- [ ] Subjective Evaluation
+- [x] Subjective Evaluation
   - [ ] Release CompassAreana
-  - [ ] Subjective evaluation dataset.
+  - [x] Subjective evaluation.
 - [x] Long-context
-  - [ ] Long-context evaluation with extensive datasets.
+  - [x] Long-context evaluation with extensive datasets.
   - [ ] Long-context leaderboard.
-- [ ] Coding
+- [x] Coding
   - [ ] Coding evaluation leaderboard.
   - [x] Non-python language evaluation service.
-- [ ] Agent
+- [x] Agent
   - [ ] Support various agenet framework.
-  - [ ] Evaluation of tool use of the LLMs.
+  - [x] Evaluation of tool use of the LLMs.
 - [x] Robustness
   - [x] Support various attack method
 

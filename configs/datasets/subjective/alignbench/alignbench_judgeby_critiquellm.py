@@ -14,8 +14,8 @@ subjective_all_sets = [
 ]
 data_path ="data/subjective/alignment_bench"
 
-alignment_bench_config_path = "data/subjective/alignment_bench/"
-alignment_bench_config_name = 'config/multi-dimension'
+alignment_bench_config_path = "data/subjective/alignment_bench/config"
+alignment_bench_config_name = 'multi-dimension'
 
 subjective_datasets = []
 

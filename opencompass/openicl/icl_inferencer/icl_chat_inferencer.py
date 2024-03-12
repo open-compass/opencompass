@@ -172,7 +172,10 @@ class ChatInferencer(BaseInferencer):
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
             save_every: Optional[int] = 1,
+            temperature: Optional[float] = 0.0,
+            do_sample: Optional[bool] = False,
             infer_mode: str = 'last',
+            max_out_len: int = 512,
             **kwargs) -> None:
         super().__init__(
             model=model,
@@ -182,6 +185,8 @@ class ChatInferencer(BaseInferencer):
         )
         assert infer_mode in ['last', 'every', 'every_with_gt']
         self.infer_mode = infer_mode
+        self.temperature = temperature
+        self.do_sample = do_sample
         self.model: BaseModel
         self._set_meta_template(self.model)
 
@@ -189,6 +194,7 @@ class ChatInferencer(BaseInferencer):
             save_every = 1
         self.save_every = save_every
         self.dialogue_mode = False
+        self.max_out_len = max_out_len
 
     def _set_meta_template(self, model):
         origin = model.template_parser
@@ -330,8 +336,8 @@ class ChatInferencer(BaseInferencer):
         ]
 
         history = chat[:assistant_indices[-1]]
-        output = self.model.generate_from_template([history],
-                                                   max_out_len=512)[0]
+        output = self.model.generate_from_template(
+            [history], max_out_len=self.max_out_len)[0]
         output_handler.save_results(
             origin_prompt=history,
             prediction=output,
@@ -347,8 +353,16 @@ class ChatInferencer(BaseInferencer):
 
         for i in assistant_indices:
             history = chat[:i]
-            output = self.model.generate_from_template([history],
-                                                       max_out_len=512)[0]
+            if self.do_sample:
+                output = self.model.generate_from_template(
+                    [history],
+                    do_sample=self.do_sample,
+                    temperature=self.temperature,
+                    max_out_len=self.max_out_len)[0]
+            else:
+                output = self.model.generate_from_template(
+                    [history], do_sample=False,
+                    max_out_len=self.max_out_len)[0]
             chat[i]['content'] = output
             if not self.dialogue_mode:
                 output_handler.save_multiround_results(
@@ -385,8 +399,8 @@ class ChatInferencer(BaseInferencer):
 
         for i in assistant_indices:
             history = chat[:i]
-            output = self.model.generate_from_template([history],
-                                                       max_out_len=512)[0]
+            output = self.model.generate_from_template(
+                [history], max_out_len=self.max_out_len)[0]
             output_handler.save_multiround_results(
                 origin_prompt=history[-1]['content'],
                 prediction=output,

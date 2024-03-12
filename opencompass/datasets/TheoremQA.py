@@ -24,3 +24,15 @@ def TheoremQA_postprocess(text: str) -> str:
     else:
         text = matches[0].strip().strip('.,?!\"\';:')
         return text
+
+
+def TheoremQA_postprocess_v2(text: str) -> str:
+    prediction = text.strip().strip('\n').split('\n')[-1]
+    tmp = ''
+    for entry in prediction.split(' ')[::-1]:
+        if entry == 'is' or entry == 'be' or entry == 'are' or entry.endswith(
+                ':'):
+            break
+        tmp = entry + ' ' + tmp
+    prediction = tmp.strip().strip('.')
+    return prediction

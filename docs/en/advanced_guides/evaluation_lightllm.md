@@ -19,15 +19,22 @@ We use the evaluation of Humaneval with the llama2-7B model as an example.
 ### Step-1: Deploy the model locally as a service using Lightllm.
 
 ```shell
-python -m lightllm.server.api_server --model_dir /path/llama2-7B     \
+python -m lightllm.server.api_server --model_dir /path/llama2-7B    \
                                      --host 0.0.0.0                 \
-                                     --port 8080                    \
+                                     --port 1030                    \
+                                     --nccl_port 2066               \
+                                     --max_req_input_len 4096       \
+                                     --max_req_total_len 6144       \
                                      --tp 1                         \
+                                     --trust_remote_code            \
                                      --max_total_token_num 120000
 ```
 
 \*\*Note: \*\* tp can be configured to enable TensorParallel inference on several gpus, suitable for the inference of very large models.
+
 \*\*Note: \*\* The max_total_token_num in the above command will affect the throughput performance during testing. It can be configured according to the documentation on the [Lightllm homepage](https://github.com/ModelTC/lightllm). As long as it does not run out of memory, it is often better to set it as high as possible.
+
+\*\*Note: \*\* If you want to start multiple LightLLM services on the same machine, you need to reconfigure the above port and nccl_port.
 
 You can use the following Python script to quickly test whether the current service has been successfully started.
 

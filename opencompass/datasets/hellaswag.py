@@ -1,7 +1,7 @@
 import json
 import os.path as osp
 
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
 
@@ -69,6 +69,32 @@ class hellaswagDataset_V3(BaseDataset):
                 })
         dataset = Dataset.from_list(dataset)
         return dataset
+
+
+@LOAD_DATASET.register_module()
+class hellaswagDatasetwithICE(BaseDataset):
+
+    @staticmethod
+    def load(path):
+        dataset_dict = DatasetDict()
+        for split, filename in [
+            ['train', 'hellaswag_train_sampled25.jsonl'],
+            ['val', 'hellaswag.jsonl'],
+        ]:
+            dataset = []
+            with open(osp.join(path, filename), 'r', encoding='utf-8') as f:
+                for line in f:
+                    data = json.loads(line)
+                    dataset.append({
+                        'ctx': data['query'].split(': ', 1)[-1],
+                        'A': data['choices'][0],
+                        'B': data['choices'][1],
+                        'C': data['choices'][2],
+                        'D': data['choices'][3],
+                        'label': 'ABCD'[data['gold']],
+                    })
+            dataset_dict[split] = Dataset.from_list(dataset)
+        return dataset_dict
 
 
 class hellaswagDatasetClean(BaseDataset):
