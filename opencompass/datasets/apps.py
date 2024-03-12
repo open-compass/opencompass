@@ -77,13 +77,10 @@ class APPSDataset(BaseDataset):
         dataset_train_repeated = new_dataset['train'].from_list(train_repeated)
         dataset_test_repeated = new_dataset['test'].from_list(test_repeated)
 
-        # 合并重复后的 train 和 test 数据集到一个新的 DatasetDict
-        dataset = {
+        return DatasetDict({
             'train': dataset_train_repeated,
             'test': dataset_test_repeated
-        }
-
-        return dataset
+        })
 
 
 EOF_STRINGS = ['\nQUESTION', '\n---', '\nANSWER', '<|endoftext|>']
