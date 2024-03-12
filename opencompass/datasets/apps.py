@@ -135,7 +135,7 @@ class APPSEvaluator(BaseEvaluator):
         results = {}
         idx = 0
         for task_id, problem_generations in generations.items():
-            sample = samples[idx]
+            sample = samples.iloc[idx]
             res = []
             # loop over the generations
             for o_idx, o in enumerate(problem_generations):
