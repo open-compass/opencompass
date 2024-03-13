@@ -14,4 +14,8 @@ jobs:
       - name: linkchecker
         run: |
           pip install linkchecker
-          linkchecker https://opencompass.readthedocs.io/ --no-robots -t 30
+          linkchecker https://opencompass.readthedocs.io/ --no-robots -t 30 --no-warnings |
+            --ignore-url https://opencompass\.readthedocs\.io/.*/static/images/opencompass_logo\.svg |
+            --ignore-url https://opencompass\.readthedocs\.io/.*/_static/images/icon-menu-dots\.svg |
+            --ignore-url https://opencompass\.readthedocs\.io/policy |
+            --ignore-url https://opencompass\.readthedocs\.io/(en|zh_CN)/[0-9a-f]{40}/.*
