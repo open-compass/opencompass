@@ -43,8 +43,6 @@ agieval_chinese_sets = [
     'gaokao-mathqa',
     'logiqa-zh',
     'gaokao-mathcloze',
-    'jec-qa-kd',
-    'jec-qa-ca',
 ]
 agieval_english_sets = [
     'lsat-ar',
