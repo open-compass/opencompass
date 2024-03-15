@@ -94,7 +94,7 @@ unzip OpenCompassData-core-20240207.zip
 wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip
 unzip OpenCompassData-complete-20240207.zip
 cd ./data
-find . -name "*.zip" -exec unzip {} \;
+find . -name "*.zip" -exec unzip "{}" \;
 ```
 
 两个 `.zip` 中所含数据集列表如[此处](https://github.com/open-compass/opencompass/releases/tag/0.2.2.rc1)所示。
