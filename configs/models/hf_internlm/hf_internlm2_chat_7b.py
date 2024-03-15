@@ -31,5 +31,6 @@ models = [
         meta_template=_meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
         end_str='<|im_end|>',
+        generation_kwargs = {"eos_token_id": [2, 92542]},
     )
 ]
