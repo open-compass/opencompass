@@ -8,7 +8,7 @@ APPS_reader_cfg = dict(input_columns=["question", "starter"], output_column="pro
 APPS_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template="\nQUESTION:\n{question} {starter}\nANSWER:\n"),
+        template="Please write a python program to address the following QUESTION. Your ANSWER should be in a code block format like this: ```python # Write your code here ```. \nQUESTION:\n{question} {starter}\nANSWER:\n"),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer, max_out_len=512),
 )

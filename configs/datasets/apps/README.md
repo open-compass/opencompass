@@ -15,6 +15,8 @@ DatasetDict({
     })
 })
 ```
+We also offer an apps_mini subset, which includes 1500 questions divided proportionally of introductory, interview, and competition categories, with a ratio of 1:1:1(500 questions each).
+
 ## How to Use
 You can also filter the dataset based on difficulty level: introductory, interview and competition. Just pass a list of difficulty levels to the filter. For example, if you want the most challenging questions, you need to select the competition level:
 ```python
