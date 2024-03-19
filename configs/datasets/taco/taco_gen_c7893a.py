@@ -8,7 +8,7 @@ TACO_reader_cfg = dict(input_columns=["question", "starter"], output_column="pro
 TACO_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template="\nQUESTION:\n{question} {starter}\nANSWER:\n"),
+        template="Please write a python program to address the following QUESTION. Your ANSWER should be in a code block format like this: ```python # Write your code here ```. \nQUESTION:\n{question} {starter}\nANSWER:\n"),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer, max_out_len=512),
 )
@@ -19,7 +19,7 @@ TACO_datasets = [
     dict(
         type=TACODataset,
         abbr="TACO",
-        path='BAAI/TACO',
+        path='./data/BAAI-TACO',
         num_repeats = 1,
         reader_cfg=TACO_reader_cfg,
         infer_cfg=TACO_infer_cfg,
