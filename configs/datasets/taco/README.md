@@ -31,7 +31,13 @@ from datasets import load_dataset
 taco_skills = load_dataset('BAAI/TACO', skills=['Sorting', 'Range queries'], token=YOUR_HF_TOKEN)
 ```
 ## Evaluation results
-check the official [repo](https://github.com/FlagOpen/TACO/tree/main?tab=readme-ov-file)
+
+| dataset              | metric   | Qwen1.5-1.8B | Qwen1.5-7B  | Qwen1.5-14B | Qwen1.5-72B | Baichuan2-7B | Baichuan2-13B | InternLM2-7B | InternLM2-20B |
+|-----------------------|----------|-------------|-------------|-------------|-------------|--------------|--------------|-------------|-------------|
+| TACO                   | pass@1   | 0.2         | 1           | 2           | 2           | 0.2          | 0.1          | 0.1         | 0.1         |
+
+
+Please refer to [repo](https://github.com/FlagOpen/TACO/tree/main?tab=readme-ov-file) for original results if needed.
 
 ## Citation
 ```
