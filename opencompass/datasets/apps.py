@@ -89,14 +89,16 @@ EOF_STRINGS = ['\nQUESTION', '\n---', '\nANSWER', '<|endoftext|>']
 @ICL_EVALUATORS.register_module()
 class APPSEvaluator(BaseEvaluator):
 
-    def truncate_after_eof_strings(self, text):
-        pattern = '|'.join(re.escape(s) for s in EOF_STRINGS)
-        match = re.search(pattern, text)
-
-        if match:
-            return text[:match.start()]
-        else:
-            return text
+    def post_process(self, text):
+        if '```' in text:
+            blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+            if len(blocks) == 0:
+                text = text.split('```')[1]  # fall back to default strategy
+            else:
+                text = blocks[0]  # fetch the first code block
+                if not text.startswith('\n'):  # starting with ```python
+                    text = text[max(text.find('\n') + 1, 0):]
+        return text
 
     TIMEOUT = 10
 
@@ -226,7 +228,7 @@ class APPSEvaluator(BaseEvaluator):
         assert len(predictions) == len(references)
         generations = defaultdict(list)
         for refer, pred in zip(references, predictions):
-            pred = self.truncate_after_eof_strings(pred)
+            pred = self.post_process(pred)
             generations[refer].append(pred)
         # convert to non-duplicated version
         test_set = test_set.to_pandas()
