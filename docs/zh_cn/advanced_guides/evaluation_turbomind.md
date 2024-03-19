@@ -6,7 +6,7 @@
 
 ### 安装 OpenCompass
 
-请根据 OpenCompass [安装指南](https://opencompass.readthedocs.io/en/latest/get_started.html) 来安装算法库和准备数据集。
+请根据 OpenCompass [安装指南](https://opencompass.readthedocs.io/en/latest/get_started/installation.html) 来安装算法库和准备数据集。
 
 ### 安装 LMDeploy
 

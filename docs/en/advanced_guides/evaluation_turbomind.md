@@ -6,7 +6,7 @@ We now support evaluation of models accelerated by the [LMDeploy](https://github
 
 ### Install OpenCompass
 
-Please follow the [instructions](https://opencompass.readthedocs.io/en/latest/get_started.html) to install the OpenCompass and prepare the evaluation datasets.
+Please follow the [instructions](https://opencompass.readthedocs.io/en/latest/get_started/installation.html) to install the OpenCompass and prepare the evaluation datasets.
 
 ### Install LMDeploy
 
