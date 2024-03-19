@@ -67,6 +67,7 @@ class NeedleBenchParallelDataset(BaseDataset):
         length_buffer: int,
         guide: bool,
         language: str,
+        position: str = 'End',
     ):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
@@ -134,20 +135,41 @@ class NeedleBenchParallelDataset(BaseDataset):
                     retrieval_question)
 
             if language == 'Chinese':
-                prompt = ('你是一个善于回答用户问题的智能AI助手\n'
-                          '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
-                          '，或重复你的回答\n请先仔细阅读下面的文档再依次回答'
-                          f'最后提出的问题\n用户现在给你的文档是{context}\n\n'
-                          f'现在请问：{retrieval_question}\n')
+                if position == 'End':
+                    prompt = ('你是一个善于回答用户问题的智能AI助手\n'
+                              '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
+                              '，或重复你的回答\n请先仔细阅读下面的文档再依次回答'
+                              f'最后提出的问题\n用户现在给你的文档是{context}\n\n'
+                              f'现在请问：{retrieval_question}\n')
+                if position == 'Start':
+                    prompt = ('你是一个善于回答用户问题的智能AI助手\n'
+                              '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
+                              '，或重复你的回答\n请先仔细阅读下面的文档再依次回答'
+                              f'最后提出的问题\n现在请问：{retrieval_question}\n\n'
+                              f'用户现在给你的文档是{context}\n')
+                else:
+                    raise ValueError('Unsupported position. '
+                                     'Position must be "End" or "Start".')
+
             elif language == 'English':
-                prompt = (
-                    'You are an intelligent AI assistant skilled in '
-                    'answering user questions.\n'
-                    'Please keep your answers concise and clear. Do not'
-                    ' talk about irrelevant topics or repeat your '
-                    'answers.\n'
-                    f'The document given to you by the user is {context}'
-                    f'\n\nNow, the questions are: {retrieval_question}\n')
+                if position == 'End':
+                    prompt = (
+                        'You are an intelligent AI assistant skilled in '
+                        'answering user questions.\n'
+                        'Please keep your answers concise and clear. Do not'
+                        ' talk about irrelevant topics or repeat your '
+                        'answers.\n'
+                        f'The document given to you by the user is {context}'
+                        f'\n\nNow, the questions are: {retrieval_question}\n')
+                if position == 'Start':
+                    prompt = (
+                        'You are an intelligent AI assistant skilled in '
+                        'answering user questions.\n'
+                        'Please keep your answers concise and clear. Do not'
+                        ' talk about irrelevant topics or repeat your '
+                        'answers.\n'
+                        f'\nNow, the questions are: {retrieval_question}\n\n'
+                        f'The document given to you by the user is {context}')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
 
