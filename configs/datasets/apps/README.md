@@ -24,9 +24,9 @@ print(next(iter(ds))["question"])
 ## Evaluation results
 
 
-| Dataset | Metric | Baichuan2-7B | Baichuan2-13B | InternLM2-7B | InternLM2-20B |
-|---------|--------|---------------|----------------|---------------|----------------|
-| APPS(testset) | pass@1 | 0.0 | 0.06 | 0.0 | 0.0 |
+| dataset             | metric | Qwen1.5-1.8B | Qwen1.5-7B  | Qwen1.5-14B | Qwen1.5-72B | Baichuan2-7B | Baichuan2-13B | InternLM2-7B | InternLM2-20B |
+|----------------------|--------|---------------|---------------|---------------|---------------|----------------|----------------|---------------|---------------|
+| APPS (testset5000)      | pass@1  | 0.2           | 1.7           | 5.92          | 7.5           | 0              | 0.06          | 0             | 0             |
 
 Please refer to Table 3 of [code llama](https://scontent-nrt1-2.xx.fbcdn.net/v/t39.2365-6/369856151_1754812304950972_1159666448927483931_n.pdf?_nc_cat=107&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=TxT1PKkNBZoAX8zMHbm&_nc_ht=scontent-nrt1-2.xx&oh=00_AfDmmQAPzqX1-QOKIDUV5lGKzaZqt0CZUVtxFjHtnh6ycQ&oe=65F5AF8F) for original results if needed. 
 
