@@ -18,7 +18,7 @@ from io import StringIO
 from unittest.mock import mock_open, patch
 
 import numpy as np
-from datasets import Dataset, DatasetDict, load_dataset
+from datasets import Dataset, DatasetDict, load_dataset, load_from_disk
 from pyext import RuntimeModule
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
@@ -35,6 +35,60 @@ class APPSDataset(BaseDataset):
     @staticmethod
     def load(path: str, num_repeats: int = 1):
         dataset = load_dataset(path)
+        new_dataset = DatasetDict()
+        # add new column "starter" in the prompt
+        for split in dataset.keys():
+            new_samples = []
+            for _, sample in enumerate(dataset[split]):
+                starter_code = None if len(
+                    sample['starter_code']) == 0 else sample['starter_code']
+                try:
+                    input_output = json.loads(sample['input_output'])
+                    fn_name = (None if not input_output.get('fn_name') else
+                               input_output['fn_name'])
+                except ValueError:
+                    fn_name = None
+                starter = ''
+                if starter_code:
+                    starter += starter_code
+                if (not fn_name) and (not starter_code):
+                    call_format = '\\nUse Standard Input format'
+                    starter += call_format
+                else:
+                    call_format = '\\nUse Call-Based format'
+                    starter += call_format
+                # Add the new column "starter" to the sample
+                sample['starter'] = starter
+                new_samples.append(sample)
+            new_data = {
+                key: [sample[key] for sample in new_samples]
+                for key in new_samples[0].keys()
+            }
+            new_dataset[split] = Dataset.from_dict(new_data)
+
+        # num_repeats duplicate
+        train_repeated = []
+        test_repeated = []
+        for sample in new_dataset['train']:
+            train_repeated.extend([sample] * num_repeats)
+        for sample in new_dataset['test']:
+            test_repeated.extend([sample] * num_repeats)
+
+        dataset_train_repeated = new_dataset['train'].from_list(train_repeated)
+        dataset_test_repeated = new_dataset['test'].from_list(test_repeated)
+
+        return DatasetDict({
+            'train': dataset_train_repeated,
+            'test': dataset_test_repeated
+        })
+
+
+@LOAD_DATASET.register_module()
+class APPS_miniDataset(BaseDataset):
+
+    @staticmethod
+    def load(path: str, num_repeats: int = 1):
+        dataset = load_from_disk(path)
         new_dataset = DatasetDict()
         # add new column "starter" in the prompt
         for split in dataset.keys():
