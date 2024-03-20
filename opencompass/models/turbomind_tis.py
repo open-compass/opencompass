@@ -47,6 +47,8 @@ class TurboMindTisModel(BaseModel):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
+        from lmdeploy.serve.turbomind.utils import Preprocessor
+        self.preprocess = Preprocessor(tis_addr)
         self.logger = get_logger()
         self.template_parser = LMTemplateParser(meta_template)
         self.eos_token_id = None
@@ -82,6 +84,10 @@ class TurboMindTisModel(BaseModel):
                              [max_out_len] * len(inputs),
                              [temperature] * len(inputs)))
         return results
+
+    def get_token_len(self, prompt: str) -> int:
+        input_ids, _ = self.preprocess(prompt)
+        return input_ids.shape[-1]
 
     def wait(self):
         """Wait till the next query can be sent.
