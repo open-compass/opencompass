@@ -53,11 +53,7 @@ judge_model = dict(
         max_seq_len=4096,
         batch_size=1,
         retry=30,
-        generation_kwargs=dict(
-            do_sample= False,
-            temperature = 0,
-            top_p = 0,
-        )
+        temperature = 0
 )
 
 infer = dict(

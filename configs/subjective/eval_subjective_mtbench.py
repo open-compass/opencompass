@@ -8,7 +8,10 @@ from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
 from opencompass.summarizers import MTBenchSummarizer
 datasets = [*subjective_datasets]
-
+for model in models:
+    if 'generation_kwargs' in model:
+        if 'do_sample' in model['generation_kwargs']:
+            del model['generation_kwargs']['do_sample']
 eval = dict(
     partitioner=dict(type=SubjectiveSizePartitioner, strategy='split', max_task_size=10000, mode='singlescore', models=models),
     runner=runner
