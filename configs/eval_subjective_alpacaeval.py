@@ -68,16 +68,7 @@ gpt4 = dict(
     temperature=1,
 )  # Re-inference gpt4's predictions or you can choose to use the pre-commited gpt4's predictions
 
-infer = dict(
-    partitioner=dict(type=NaivePartitioner),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask),
-    ),
-)
+
 
 # -------------Evalation Stage ----------------------------------------
 

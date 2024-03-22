@@ -69,17 +69,6 @@ gpt4 = dict(
     temperature=1,
 )  # Re-inference gpt4's predictions or you can choose to use the pre-commited gpt4's predictions
 
-infer = dict(
-    partitioner=dict(type=SizePartitioner, strategy='split', max_task_size=10000),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask),
-    ),
-)
-
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
