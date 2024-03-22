@@ -3,7 +3,7 @@ from mmengine.config import read_base
 with read_base():
     from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import subjective_datasets
 
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.models.openai_api import OpenAIAllesAPIN
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
@@ -51,26 +51,14 @@ models = [
 
 datasets = [*subjective_datasets]
 
-infer = dict(
-    partitioner=dict(type=NaivePartitioner),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask),
-    ),
-)
-
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
 judge_model = dict(
     abbr='GPT4-Turbo',
-    type=OpenAIAllesAPIN,
+    type=OpenAI,
     path='gpt-4-1106-preview',
     key='xxxx',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
-    url='xxxx',
     meta_template=api_meta_template,
     query_per_second=16,
     max_out_len=2048,
