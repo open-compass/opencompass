@@ -171,8 +171,8 @@ class NeedleBenchParallelDataset(BaseDataset):
                         f'\nNow, the questions are: {retrieval_question}\n\n'
                         f'The document given to you by the user is {context}')
                 else:
-                  raise ValueError('Unsupported position. '
-                                   'Position must be "End" or "Start".')
+                    raise ValueError('Unsupported position. '
+                                     'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
 
