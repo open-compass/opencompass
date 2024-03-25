@@ -16,6 +16,7 @@ configs/datasets/needlebench/
 ├── needlebench_32k
 ├── needlebench_128k
 ├── needlebench_200k
+├── needlebench_1000k
 ├── needlebench.py
 ├── readme.md
 └── readme_zh-CN.md
