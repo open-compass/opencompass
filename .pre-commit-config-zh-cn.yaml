@@ -62,8 +62,6 @@ repos:
         args: ["--remove"]
       - id: mixed-line-ending
         args: ["--fix=lf"]
-      - id: mixed-line-ending
-        args: ["--fix=lf"]
   - repo: https://gitee.com/openmmlab/mirrors-mdformat
     rev: 0.7.9
     hooks:
