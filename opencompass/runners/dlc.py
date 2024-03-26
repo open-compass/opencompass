@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import os.path as osp
 import random
@@ -38,6 +39,7 @@ class DLCRunner(BaseRunner):
                  task: ConfigDict,
                  aliyun_cfg: ConfigDict,
                  max_num_workers: int = 32,
+                 eval_with_gpu: list = ['plugin_eval'],
                  retry: int = 2,
                  debug: bool = False,
                  lark_bot_url: str = None):
@@ -45,6 +47,8 @@ class DLCRunner(BaseRunner):
         self.aliyun_cfg = aliyun_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
+
+        self.eval_with_gpu = eval_with_gpu
 
         logger = get_logger()
         logger.warning(
@@ -93,19 +97,62 @@ class DLCRunner(BaseRunner):
         num_gpus = task.num_gpus
         task_name = task.name
 
+        is_eval_task = 'OpenICLEval' in task_name
+        if is_eval_task and num_gpus == 0:
+            for check_name in self.eval_with_gpu:
+                if check_name in task_name:
+                    num_gpus = 1
+                    break
+
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
         param_file = f'tmp/{os.getpid()}_params.py'
+        pwd = os.getcwd()
         try:
             cfg.dump(param_file)
+            if self.aliyun_cfg.get('bashrc_path') is not None:
+                # using user's conda env
+                bashrc_path = self.aliyun_cfg['bashrc_path']
+                assert osp.exists(bashrc_path)
+                assert self.aliyun_cfg.get('conda_env_name') is not None
+                conda_env_name = self.aliyun_cfg['conda_env_name']
+                shell_cmd = (f'source {bashrc_path}; '
+                             f'conda activate {conda_env_name}; ')
+            else:
+                # using public conda env
+                # users can also set `python_env_path` to their
+                # own env python path
+                assert self.aliyun_cfg.get('python_env_path') is not None
+                shell_cmd = (
+                    f'export PATH={self.aliyun_cfg["python_env_path"]}/bin:$PATH; '  # noqa: E501
+                    f'export PYTHONPATH={pwd}:$PYTHONPATH; ')
 
-            # Build up DLC command
-            pwd = os.getcwd()
-            shell_cmd = (
-                f'source {self.aliyun_cfg["bashrc_path"]}; '
-                f'conda activate {self.aliyun_cfg["conda_env_name"]}; '
-                f'cd {pwd}; '
-                '{task_cmd}')
+            huggingface_cache = self.aliyun_cfg.get('huggingface_cache')
+            if huggingface_cache is not None:
+                # HUGGINGFACE_HUB_CACHE is a Legacy env variable, here we set
+                # `HF_HUB_CACHE` and `HUGGINGFACE_HUB_CACHE` for bc
+                shell_cmd += f'export HF_HUB_CACHE={huggingface_cache}; '
+                shell_cmd += f'export HUGGINGFACE_HUB_CACHE={huggingface_cache}; '  # noqa: E501
+
+            torch_cache = self.aliyun_cfg.get('torch_cache')
+            if torch_cache is not None:
+                shell_cmd += f'export TORCH_HOME={torch_cache}; '
+
+            hf_offline = self.aliyun_cfg.get('hf_offline', True)
+            if hf_offline:
+                shell_cmd += 'export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1; export HF_EVALUATE_OFFLINE=1; '  # noqa: E501
+
+            http_proxy = self.aliyun_cfg.get('http_proxy')
+            if http_proxy is not None:
+                shell_cmd += f'export http_proxy={http_proxy}; export https_proxy={http_proxy}; '  # noqa: E501
+                shell_cmd += f'export HTTP_PROXY={http_proxy}; export HTTPS_PROXY={http_proxy}; '  # noqa: E501
+
+            hf_endpoint = self.aliyun_cfg.get('hf_endpoint')
+            if hf_endpoint is not None:
+                shell_cmd += f'export HF_ENDPOINT={hf_endpoint}; '
+
+            shell_cmd += f'cd {pwd}; '
+            shell_cmd += '{task_cmd}'
 
             tmpl = ('dlc create job'
                     f" --command '{shell_cmd}'"
@@ -114,11 +161,10 @@ class DLCRunner(BaseRunner):
                     f" -c {self.aliyun_cfg['dlc_config_path']}"
                     f" --workspace_id {self.aliyun_cfg['workspace_id']}"
                     ' --worker_count 1'
-                    f' --worker_cpu {max(num_gpus * 6, 8)}'
+                    f' --worker_cpu {max(num_gpus * 8, 32)}'
                     f' --worker_gpu {num_gpus}'
-                    f' --worker_memory {max(num_gpus * 64, 48)}'
-                    f" --worker_image {self.aliyun_cfg['worker_image']}"
-                    ' --interactive')
+                    f' --worker_memory {max(num_gpus * 128, 256)}'
+                    f" --worker_image {self.aliyun_cfg['worker_image']}")
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
@@ -139,77 +185,64 @@ class DLCRunner(BaseRunner):
                 time.sleep(random.randint(0, 10))
 
             def _run_within_retry():
-                try:
-                    process = subprocess.Popen(cmd,
-                                               shell=True,
-                                               text=True,
-                                               stdout=subprocess.PIPE,
-                                               stderr=subprocess.PIPE)
-                    job_id = None
-                    job_allocated = False
-                    job_finished = False
-                    last_end_time = datetime.datetime.now().strftime(
-                        '%Y-%m-%dT%H:%M:%SZ')
-                    while True:
-                        if not job_allocated:
-                            line = process.stdout.readline()
-                            if not line:
-                                break
-                            match = re.search(r'(dlc[0-9a-z]+)', line)
-                            if match and job_id is None:
-                                job_id = match.group(1)
-                            stdout.write(line)
-                            match = re.search(r'Job .* is \[Running\]', line)
-                            if match:
-                                job_allocated = True
-                        else:
-                            try:
-                                process.wait(10)
-                            except subprocess.TimeoutExpired:
-                                pass
-                            else:
-                                job_finished = True
-                            if job_finished:
-                                this_end_time = datetime.datetime.now(
-                                ).strftime('%Y-%m-%dT%H:%M:%SZ')
-                            else:
-                                this_end_time = (
-                                    datetime.datetime.now() -
-                                    datetime.timedelta(seconds=10)
-                                ).strftime('%Y-%m-%dT%H:%M:%SZ')
-                            logs_cmd = (
-                                'dlc logs'
-                                f' {job_id} {job_id}-worker-0'
-                                f' --start_time {last_end_time}'
-                                f' --end_time {this_end_time}'
-                                f" -c {self.aliyun_cfg['dlc_config_path']}")
-                            log_process = subprocess.Popen(
-                                logs_cmd,
-                                shell=True,
-                                text=True,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-                            log_output, log_err = log_process.communicate()
-                            log_output = '\n'.join(log_output.split('\n')[2:])
-                            stdout.write(log_output)
-                            last_end_time = this_end_time
-                        stdout.flush()
-                        if job_finished:
+                output = subprocess.getoutput(cmd)
+                match = re.search(r'\|\s+(dlc[0-9a-z]+)\s+\|', output)
+                if match is None:
+                    raise RuntimeError(
+                        f'Failed to launch dlc job for {output}')
+                else:
+                    job_id = match.group(1)
+                stdout.write(output)
+
+                pod_create_time = None
+                pri_time = None
+                initial_time = datetime.datetime.now()
+                while True:
+                    # 1. Avoid to request dlc too frequently.
+                    # 2. DLC job may not be ready immediately after creation.
+                    for _ in range(5):
+                        time.sleep(2)
+                        try:
+                            job_info = json.loads(
+                                subprocess.getoutput(f'dlc get job {job_id}'))
                             break
-                    process.wait()
-                    return process.returncode
-                finally:
-                    if job_id is not None:
-                        cancel_cmd = (
-                            'dlc stop job'
-                            f' {job_id}'
-                            f" -c {self.aliyun_cfg['dlc_config_path']}"
-                            ' -f')
-                        subprocess.run(cancel_cmd,
-                                       shell=True,
-                                       text=True,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
+                        except:  # noqa: E722
+                            pass
+                    else:
+                        raise RuntimeError(
+                            f'Failed to get job info for {job_id}')
+
+                    status = job_info['Status']
+                    if status == 'Failed':
+                        return -1
+                    elif status == 'Succeeded':
+                        return 0
+                    elif status != 'Running':
+                        continue
+
+                    # The pod time could be different from the real time.
+                    # Therefore we need to extract the pod start time from
+                    # the `job_info` and calculate the `start_time` and
+                    # `end_time` in pod.
+                    if pod_create_time is None:
+                        pod_create_time = job_info['GmtCreateTime']
+                        pri_time = pod_create_time
+                        pod_create_time = datetime.datetime.strptime(
+                            pod_create_time, '%Y-%m-%dT%H:%M:%SZ')
+                    elasped_time = datetime.datetime.now() - initial_time
+                    cur_time = (pod_create_time +
+                                elasped_time).strftime('%Y-%m-%dT%H:%M:%SZ')
+                    logs_cmd = ('dlc logs'
+                                f' {job_id} {job_id}-worker-0'
+                                f" -c {self.aliyun_cfg['dlc_config_path']}"
+                                f' --start_time {pri_time}'
+                                f' --end_time {cur_time}')
+                    log_output = subprocess.getoutput(logs_cmd)
+
+                    if '[WARN] No logs found for the pod' not in log_output:
+                        pri_time = cur_time
+                        stdout.write(log_output)
+                        stdout.flush()
 
             return_code = _run_within_retry()
             retry = self.retry

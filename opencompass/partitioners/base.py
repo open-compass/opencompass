@@ -28,8 +28,8 @@ class BasePartitioner:
         self.out_dir = out_dir
         if keep_keys is None:
             self.keep_keys = [
-                'eval.runner.task.judge_cfg',
-                'eval.runner.task.dump_details',
+                'eval.runner.task.judge_cfg', 'eval.runner.task.dump_details',
+                'eval.given_pred'
             ]
         else:
             self.keep_keys = keep_keys

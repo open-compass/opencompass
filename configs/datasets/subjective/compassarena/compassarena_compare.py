@@ -9,7 +9,7 @@ subjective_reader_cfg = dict(
     output_column='judge',
     )
 
-data_path ="data/subjective/"
+data_path ="data/subjective/compass_arena"
 
 subjective_datasets = []
 

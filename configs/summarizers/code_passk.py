@@ -21,30 +21,22 @@ code_passk_summary_groups = [
     {'name': 'sanitized_mbpp_pass@10', 'subsets': [['sanitized_mbpp_repeat10', 'pass@10']]},
     # real add
     {'name': 'humanevalx', 'subsets': ['humanevalx-python', 'humanevalx-cpp', 'humanevalx-go', 'humanevalx-java', 'humanevalx-js']},
-    {'name': 'code', 'subsets': ['humaneval_plus_pass@1(greedy)', 'sanitized_mbpp_pass@1(greedy)', 'humaneval_cn_pass@1(greedy)', 'mbpp_cn_pass@1(greedy)', 'humanevalx']}
+    # {'name': 'code', 'subsets': ['humaneval_plus_pass@1(greedy)', 'sanitized_mbpp_pass@1(greedy)', 'humaneval_cn_pass@1(greedy)', 'mbpp_cn_pass@1(greedy)', 'humanevalx']}
+    {'name': 'code_cn', 'subsets': ['humaneval_cn_pass@1(greedy)', 'mbpp_cn_pass@1(greedy)']},
+    {'name': 'code_en', 'subsets': ['humaneval_plus_pass@1(greedy)', 'sanitized_mbpp_pass@1(greedy)', 'humanevalx']},
+    {'name': 'code', 'subsets': ['humaneval_cn_pass@1(greedy)', 'mbpp_cn_pass@1(greedy)', 'humaneval_plus_pass@1(greedy)', 'sanitized_mbpp_pass@1(greedy)', 'humanevalx']},
 ]
 
 summarizer = dict(
     dataset_abbrs=[
         'code',
-        'humaneval_pass@1(greedy)',
-        'humaneval_pass@10',
+        'code_cn',
+        'code_en',
         'humaneval_cn_pass@1(greedy)',
-        'humaneval_cn_pass@10',
         'humaneval_plus_pass@1(greedy)',
-        'humaneval_plus_pass@10',
-        'mbpp_pass@1(greedy)',
-        'mbpp_pass@10',
         'mbpp_cn_pass@1(greedy)',
-        'mbpp_cn_pass@10',
         'sanitized_mbpp_pass@1(greedy)',
-        'sanitized_mbpp_pass@10',
         'humanevalx',
-        'humanevalx-python',
-        'humanevalx-cpp',
-        'humanevalx-go',
-        'humanevalx-java',
-        'humanevalx-js',
     ],
     summary_groups=sum(
         [v for k, v in locals().items() if k.endswith("_summary_groups")], [])

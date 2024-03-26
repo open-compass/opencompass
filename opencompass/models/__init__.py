@@ -7,13 +7,16 @@ from .base import BaseModel, LMTemplateParser  # noqa
 from .base_api import APITemplateParser, BaseAPIModel  # noqa
 from .bytedance_api import ByteDance  # noqa: F401
 from .claude_api import Claude  # noqa: F401
+from .gemini_api import Gemini, GeminiAllesAPIN  # noqa: F401, F403
 from .glm import GLM130B  # noqa: F401, F403
 from .huggingface import HuggingFace  # noqa: F401, F403
 from .huggingface import HuggingFaceCausalLM  # noqa: F401, F403
 from .huggingface import HuggingFaceChatGLM3  # noqa: F401, F403
 from .intern_model import InternLM  # noqa: F401, F403
+from .krgpt_api import KrGPT  # noqa: F401
 from .lightllm_api import LightllmAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401, F403
+from .lmdeploy_pytorch import LmdeployPytorchModel  # noqa: F401
 from .minimax_api import MiniMax  # noqa: F401
 from .mixtral import Mixtral  # noqa: F401
 from .modelscope import ModelScope, ModelScopeCausalLM  # noqa: F401, F403

@@ -40,6 +40,22 @@ _base_summary_groups = [
         ],
     },
     {
+        'name': 'plugin_eval_one_review',
+        'subsets': [
+            ['plugin_eval-instruct_v1', 'format_metric'],
+            ['plugin_eval-instruct_v1', 'args_em_metric'],
+            ['plugin_eval-plan_str_v1', 'f1_score'],
+            ['plugin_eval-plan_json_v1', 'f1_score'],
+            ['plugin_eval-reason_str_v1', 'thought'],
+            ['plugin_eval-reason_retrieve_understand_json_v1', 'thought'],
+            ['plugin_eval-retrieve_str_v1', 'name'],
+            ['plugin_eval-reason_retrieve_understand_json_v1', 'name'],
+            ['plugin_eval-understand_str_v1', 'args'],
+            ['plugin_eval-reason_retrieve_understand_json_v1', 'args'],
+            ['plugin_eval-review_str_v1', 'review_quality'],
+        ]
+    },
+    {
         'name': 'plugin_eval',
         'subsets': [
             ['plugin_eval-instruct_v1', 'format_metric'],
@@ -53,7 +69,6 @@ _base_summary_groups = [
             ['plugin_eval-understand_str_v1', 'args'],
             ['plugin_eval-reason_retrieve_understand_json_v1', 'args'],
             ['plugin_eval-review_str_v1', 'review_quality'],
-            ['copy_plugin_eval-review_str_v1', 'naive_average'],  # a hack for review * 2
         ]
     },
 ]

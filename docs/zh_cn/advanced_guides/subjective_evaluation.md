@@ -202,6 +202,54 @@ Opencompass 已经支持了很多的JudgeLLM，实际上，你可以将Opencompa
 }
 ```
 
+## 主观多轮对话评测
+
+在OpenCompass中我们同样支持了主观的多轮对话评测，以MT-Bench为例，对MTBench的评测可以参见`configs/eval_subjective_mtbench.py`
+
+在多轮对话评测中，你需要将数据格式整理为如下的dialogue格式
+
+```
+"dialogue": [
+            {
+                "role": "user",
+                "content": "Imagine you are participating in a race with a group of people. If you have just overtaken the second person, what's your current position? Where is the person you just overtook?"
+            },
+            {
+                "role": "assistant",
+                "content": ""
+            },
+            {
+                "role": "user",
+                "content": "If the \"second person\" is changed to \"last person\" in the above question, what would the answer be?"
+            },
+            {
+                "role": "assistant",
+                "content": ""
+            }
+        ],
+```
+
+值得注意的是，由于MTBench各不同的题目类型设置了不同的温度，因此我们需要将原始数据文件按照温度分成三个不同的子集以分别推理，针对不同的子集我们可以设置不同的温度，具体设置参加`configs\datasets\subjective\multiround\mtbench_single_judge_diff_temp.py`
+
+如果使用了该方法，请添加引用:
+
+```bibtex
+@misc{zheng2023judging,
+      title={Judging LLM-as-a-judge with MT-Bench and Chatbot Arena},
+      author={Lianmin Zheng and Wei-Lin Chiang and Ying Sheng and Siyuan Zhuang and Zhanghao Wu and Yonghao Zhuang and Zi Lin and Zhuohan Li and Dacheng Li and Eric. P Xing and Hao Zhang and Joseph E. Gonzalez and Ion Stoica},
+      year={2023},
+      eprint={2306.05685},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
+```
+
 ## 实战：AlignBench 主观评测
 
 ### 数据集准备

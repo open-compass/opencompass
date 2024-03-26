@@ -1,6 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
+import numpy as np
+
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
@@ -161,3 +163,29 @@ class TurboMindModel(BaseModel):
         if end_str:
             response = response.split(end_str)[0]
         return response
+
+    def get_ppl(self,
+                inputs: List[str],
+                mask_length: Optional[List[int]] = None) -> List[float]:
+        """Get perplexity scores given a list of inputs.
+
+        Args:
+            inputs (List[str]): A list of strings.
+            mask_length (Optional[List[int]]): A list of mask lengths. If
+                provided, the perplexity scores will be calculated with the
+                first mask_length[i] tokens masked out. It's okay to skip
+                its implementation if advanced features in PPLInfernecer is
+                not needed.
+
+        Returns:
+            np.ndarray:  The perplexity scores in shape of (N,)
+        """
+        assert isinstance(
+            inputs, List), f'List(str) is expected, but got {type(inputs)}'
+        results = []
+        for text in inputs:
+            input_ids = self.tokenizer.encode(text)
+            res = self.generators[0].get_ppl(input_ids)
+            results.append(res)
+        results = np.concatenate(results)
+        return results

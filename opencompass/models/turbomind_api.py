@@ -20,30 +20,31 @@ def valid_str(string, coding='utf-8'):
 
 
 class TurboMindAPIModel(BaseModel):
-    """Model wrapper for TurboMind Triton Inference Server gRPC API.
+    """Model wrapper for lmdeploy api server.
 
     Args:
-        path (str): The name of OpenAI's model.
-        tis_addr (str): The address (ip:port format) of turbomind's
-            triton inference server
+        api_addr (str): The address (ip:port format) of lmdeploy's
+            api server.
         max_seq_len (int): The maximum allowed sequence length of a model.
             Note that the length of prompt + generated tokens shall not exceed
             this value. Defaults to 2048.
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
+        end_str (str, optional): Whether to trim generated strings with end_str
+            if the model has special ending strings that are not handled well.
+            Defaults to None.
     """
 
     is_api: bool = True
 
-    def __init__(
-        self,
-        path: str,
-        api_addr: str = 'http://0.0.0.0:23333',
-        max_seq_len: int = 2048,
-        meta_template: Optional[Dict] = None,
-    ):
-        super().__init__(path=path,
+    def __init__(self,
+                 api_addr: str = 'http://0.0.0.0:23333',
+                 max_seq_len: int = 2048,
+                 meta_template: Optional[Dict] = None,
+                 end_str: Optional[str] = None,
+                 **kwargs):
+        super().__init__(path='',
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.serve.openai.api_client import APIClient
@@ -55,6 +56,7 @@ class TurboMindAPIModel(BaseModel):
         if meta_template and 'eos_token_id' in meta_template:
             self.eos_token_id = meta_template['eos_token_id']
         self.api_addr = api_addr
+        self.end_str = end_str
 
     def generate(
         self,
@@ -73,7 +75,10 @@ class TurboMindAPIModel(BaseModel):
                 between 0 and 2. Higher values like 0.8 will make the output
                 more random, while lower values like 0.2 will make it more
                 focused and deterministic. Defaults to 0.7.
-
+            end_str (str, optional): Whether to trim generated strings
+                with end_str if the model has special ending strings
+                that are not handled well.
+                Defaults to None.
         Returns:
             List[str]: A list of generated strings.
         """
@@ -82,7 +87,8 @@ class TurboMindAPIModel(BaseModel):
             results = list(
                 executor.map(self._generate, inputs,
                              [max_out_len] * len(inputs),
-                             [temperature] * len(inputs)))
+                             [temperature] * len(inputs),
+                             [self.end_str] * len(inputs)))
         return results
 
     def get_token_len(self, prompt: str) -> int:
@@ -97,7 +103,7 @@ class TurboMindAPIModel(BaseModel):
         return self.token_bucket.get_token()
 
     def _generate(self, prompt: str or PromptList, max_out_len: int,
-                  temperature: float) -> str:
+                  temperature: float, end_str: str) -> str:
         """Generate results given a list of inputs.
 
         Args:
@@ -127,4 +133,6 @@ class TurboMindAPIModel(BaseModel):
                 top_k=1):
             response += output['choices'][0]['text']
         response = valid_str(response)
+        if end_str:
+            response = response.split(end_str)[0]
         return response
