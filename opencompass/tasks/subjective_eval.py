@@ -132,30 +132,29 @@ class SubjectiveEvalTask(BaseTask):
         # Get partition name
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
-
         # If no predictions get in predictions dir
-        if not osp.exists(osp.realpath(filename)) and not osp.exists(
-                osp.realpath(partial_filename)):
-            return {'error': 'No predictions found.'}
+        assert osp.exists(filename) or osp.exists(
+            osp.realpath(partial_filename)
+        ), 'No predictions found for {filename}.'.format(filename=filename)
+
+        # If use Naive partition in infer stage
+        if osp.exists(osp.realpath(filename)):
+            preds = mmengine.load(filename)
+            pred_strs = [
+                preds[str(i)]['prediction'] for i in range(len(preds))
+            ]
+        # If use Size partition in infer stage
         else:
-            # If use Naive partition in infer stage
-            if osp.exists(osp.realpath(filename)):
+            filename = partial_filename
+            pred_strs = []
+            i = 1
+            while osp.exists(osp.realpath(filename)):
                 preds = mmengine.load(filename)
-                pred_strs = [
+                filename = root + f'_{i}' + ext
+                i += 1
+                pred_strs += [
                     preds[str(i)]['prediction'] for i in range(len(preds))
                 ]
-            # If use Size partition in infer stage
-            else:
-                filename = partial_filename
-                pred_strs = []
-                i = 1
-                while osp.exists(osp.realpath(filename)):
-                    preds = mmengine.load(filename)
-                    filename = root + f'_{i}' + ext
-                    i += 1
-                    pred_strs += [
-                        preds[str(i)]['prediction'] for i in range(len(preds))
-                    ]
         # Get all predictions in pred_strs
 
         # If take SubjectSizePartition, get new pred_strs based on test_range
