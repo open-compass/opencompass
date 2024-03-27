@@ -44,7 +44,6 @@ async def generate(request: Request) -> Response:
     prompt = request_dict.pop("prompt")
     stream = request_dict.pop("stream", False)
     sampling_params = SamplingParams(**request_dict)
-    
 
     if isinstance(prompt, list):
         results_generator_all = []
@@ -80,7 +79,7 @@ async def generate(request: Request) -> Response:
             ret = {"output": final_output}
             final_output_all.append(ret)
         return final_output_all
-        
+    
     else:
         final_output = None
         async for request_output in results_generator:
@@ -89,7 +88,6 @@ async def generate(request: Request) -> Response:
         assert final_output is not None
         ret = {"output": final_output}
         return ret
-
 
 
 if __name__ == "__main__":
@@ -129,4 +127,3 @@ if __name__ == "__main__":
                 ssl_certfile=args.ssl_certfile,
                 ssl_ca_certs=args.ssl_ca_certs,
                 ssl_cert_reqs=args.ssl_cert_reqs)
-
