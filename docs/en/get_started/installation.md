@@ -72,6 +72,19 @@
 
    </details>
 
+5. Install alpaca-eval (Optional)：
+
+   If you want to**evaluate alpaca-eval in official ways**, follow this step.
+
+   <details>
+   <summary><b>click to show the details</b></summary>
+
+   ```bash
+   pip install alpaca-eval
+   ```
+
+   </details>
+
 # Dataset Preparation
 
 The datasets supported by OpenCompass mainly include two parts:

@@ -1,1 +1,2 @@
+alpaca-eval
 faiss_gpu==1.7.2
