@@ -97,14 +97,15 @@ class VLLM(BaseModel):
             output_strs.append(generated_text)
 
         return output_strs
-        
+
     def get_ppl(self,
                 inputs: List[str],
                 mask_length: Optional[List[int]] = None) -> List[float]:
-        
+
         bsz = len(inputs)
 
-        sampling_kwargs = SamplingParams(prompt_logprobs=0,**self.generation_kwargs)
+        sampling_kwargs = SamplingParams(prompt_logprobs=0, 
+                                         **self.generation_kwargs)
         # forward
         outputs = self.model.generate(inputs, sampling_kwargs)
         # compute ppl
@@ -112,9 +113,11 @@ class VLLM(BaseModel):
         for i in range(bsz):
             outputs_prob = outputs[i].prompt_logprobs[1:]
             prompt_token_ids = outputs[i].prompt_token_ids[1:]
-            outputs_prob_list = [outputs_prob[i][prompt_token_ids[i]] for i in range(len(outputs_prob))]
+            outputs_prob_list = [outputs_prob[i][prompt_token_ids[i]] 
+                                 for i in range(len(outputs_prob))]
             outputs_prob_list = torch.tensor(outputs_prob_list)
-            ce_loss.append(-1 * outputs_prob_list.sum(-1).cpu().detach().numpy() / len(prompt_token_ids))
+            ce_loss.append(-1 * outputs_prob_list.sum(-1).cpu().detach().numpy() 
+                           / len(prompt_token_ids))
         return np.array(ce_loss)
 
     def prompts_preproccess(self, inputs: List[str]):
