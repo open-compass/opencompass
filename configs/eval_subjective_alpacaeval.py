@@ -28,7 +28,7 @@ api_meta_template = dict(
 models = [
     dict(
         type=HuggingFaceChatGLM3,
-        abbr='chatglm3',
+        abbr='chatglm3-6b',
         path='THUDM/chatglm3-6b',
         tokenizer_path='THUDM/chatglm3-6b',
         model_kwargs=dict(

@@ -1,24 +1,15 @@
-import argparse
+# flake8: noqa: E501
 import copy
-import fnmatch
-import os.path as osp
-import random
-import time
-import argparse
 import json
+import os.path as osp
 
-from typing import List, Union
-from shutil import which
 import mmengine
 from mmengine.config import Config, ConfigDict
-from mmengine.utils import mkdir_or_exist
 
-from opencompass.registry import ICL_EVALUATORS, MODELS, TEXT_POSTPROCESSORS
 from opencompass.tasks.base import BaseTask
-from opencompass.tasks.openicl_eval import extract_role_pred
-from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
-                               get_infer_output_path, get_logger,
-                               model_abbr_from_cfg, task_abbr_from_cfg)
+from opencompass.utils import (build_dataset_from_cfg, get_infer_output_path,
+                               get_logger)
+
 
 class PredictionMerger:
     """"""
@@ -66,11 +57,13 @@ class PredictionMerger:
             print('length mismatch')
             return
 
-        with open(osp.realpath(osp.join(self.dataset_cfg['path'], 'example.json')), 'r') as f:
+        with open(
+                osp.realpath(osp.join(self.dataset_cfg['path'],
+                                      'example.json')), 'r') as f:
             data_format = json.load(f)
 
         for idx in range(len(preds)):
-            data_format[idx]['output'] = preds[str(idx)]["prediction"]
+            data_format[idx]['output'] = preds[str(idx)]['prediction']
             data_format[idx]['generator'] = self.model_cfg['abbr']
 
         print(f'Merge {partial_filenames} to {filename}')
@@ -110,7 +103,7 @@ class AlpacaEvalTask(BaseTask):
             template (str): The template which have '{task_cmd}' to format
                 the command.
         """
-        script_path = __file__
+        # script_path = __file__
         alpaca_cfg = self.judge_cfg.get('config', None)
         api_key = self.judge_cfg.get('key', None)
         assert alpaca_cfg is not None
@@ -124,7 +117,8 @@ class AlpacaEvalTask(BaseTask):
                 'dataset': dataset_cfg,
                 'work_dir': work_dir
             }).run()
-            filename = get_infer_output_path(m_cfg, dataset_cfg, osp.join(work_dir, 'predictions'))
+            filename = get_infer_output_path(m_cfg, dataset_cfg,
+                                             osp.join(work_dir, 'predictions'))
             output_path = osp.join(work_dir, 'results', m_cfg['abbr'])
             command = f'export OPENAI_API_KEY={api_key}; alpaca_eval --model_outputs {filename} --annotators_config {alpaca_cfg} --output_path {output_path}'
             return template.format(task_cmd=command)
