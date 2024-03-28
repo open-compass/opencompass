@@ -32,3 +32,4 @@ from .vllm import VLLM  # noqa: F401
 from .xunfei_api import XunFei  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
 from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
+from .vllm_api import VLLM_API
