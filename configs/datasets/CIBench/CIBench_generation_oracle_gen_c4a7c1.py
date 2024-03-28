@@ -16,18 +16,17 @@ cibench_infer_cfg = dict(
         template="""{questions}""",
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=AgentInferencer, infer_mode='every'),
+    inferencer=dict(type=AgentInferencer, infer_mode='every_with_gt'),
 )
 
-
-libs = ['Pandas', 'Matplotlib', 'Opencv', 'SciPy', 'Seaborn', 'PyTorch']
+libs = ['matplotlib', 'opencv', 'pandas', 'pytorch', 'scipy', 'seaborn']
 cibench_eval_cfg = dict(evaluator=dict(type=CIBenchEvaluator), pred_role="BOT")
 
 cibench_datasets = [
     dict(
-        abbr=f"cibench_generation_{lib}",
+        abbr=f"cibench_generation_oracle/{lib}",
         type=CIBenchDataset,
-        path=f"./data/cibench/{lib}",
+        path=f"./data/cibench_dataset/cibench_generation/{lib}",
         internet_check=False,
         reader_cfg=cibench_reader_cfg,
         infer_cfg=cibench_infer_cfg,

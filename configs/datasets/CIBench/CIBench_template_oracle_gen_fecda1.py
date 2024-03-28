@@ -16,7 +16,7 @@ cibench_infer_cfg = dict(
         template="""{questions}""",
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=AgentInferencer, infer_mode='every'),
+    inferencer=dict(type=AgentInferencer, infer_mode='every_with_gt'),
 )
 
 # no tensorboard
@@ -28,7 +28,7 @@ libs = ['/lightgbm', '/matplotlib', '/nltk', '/opencv', '/pandas', '/pytorch',
 cibench_eval_cfg = dict(evaluator=dict(type=CIBenchEvaluator), pred_role="BOT")
 cibench_datasets = [
     dict(
-        abbr=f"cibench_template{lib}",
+        abbr=f"cibench_template_oracle{lib}",
         type=CIBenchDataset,
         path=f"./data/cibench_dataset/cibench_template{lib}",
         internet_check=False,
