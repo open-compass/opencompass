@@ -65,6 +65,8 @@ class OpenAI(BaseAPIModel):
                  meta_template: Optional[Dict] = None,
                  openai_api_base: str = OPENAI_API_BASE,
                  mode: str = 'none',
+                 logprobs: Optional[bool] = False,
+                 top_logprobs: Optional[int] = None,
                  temperature: Optional[float] = None):
 
         super().__init__(path=path,
@@ -78,6 +80,8 @@ class OpenAI(BaseAPIModel):
         self.temperature = temperature
         assert mode in ['none', 'front', 'mid', 'rear']
         self.mode = mode
+        self.logprobs = logprobs
+        self.top_logprobs = top_logprobs
 
         if isinstance(key, str):
             self.keys = [os.getenv('OPENAI_API_KEY') if key == 'ENV' else key]
@@ -218,6 +222,8 @@ class OpenAI(BaseAPIModel):
                     messages=messages,
                     max_tokens=max_out_len,
                     n=1,
+                    logprobs=self.logprobs,
+                    top_logprobs=self.top_logprobs,
                     stop=None,
                     temperature=temperature,
                 )
@@ -234,7 +240,10 @@ class OpenAI(BaseAPIModel):
                                   str(raw_response.content))
                 continue
             try:
-                return response['choices'][0]['message']['content'].strip()
+                if self.logprobs:
+                    return response['choices']
+                else:
+                    return response['choices'][0]['message']['content'].strip()
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
