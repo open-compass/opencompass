@@ -5,8 +5,6 @@ from queue import Queue
 from typing import Dict, List, Optional, Union
 
 import numpy as np
-import tritonclient.grpc as grpcclient
-from tritonclient.utils import np_to_triton_dtype
 
 from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.utils.logging import get_logger
@@ -27,6 +25,8 @@ def valid_str(string, coding='utf-8'):
 
 def prepare_tensor(name, input_tensor):
     """Create grpcclient's InferInput instance according to a given tensor."""
+    import tritonclient.grpc as grpcclient
+    from tritonclient.utils import np_to_triton_dtype
     t = grpcclient.InferInput(name, list(input_tensor.shape),
                               np_to_triton_dtype(input_tensor.dtype))
     t.set_data_from_numpy(input_tensor)
@@ -118,6 +118,7 @@ class LmdeployTisModel(BaseModel):
 
     def _call_triton_server(self, prompt, tis_addr, session_id,
                             request_output_len, temperature, res_que):
+        import tritonclient.grpc as grpcclient
 
         with grpcclient.InferenceServerClient(tis_addr) as client:
             inputs = [
