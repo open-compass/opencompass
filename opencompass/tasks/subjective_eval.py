@@ -400,7 +400,7 @@ class SubjectiveEvalTask(BaseTask):
         output_paths = []
         for model, datasets in zip(self.model_cfgs, self.dataset_cfgs):
             for dataset in datasets:
-                if type(model) == ConfigDict:
+                if isinstance(model, ConfigDict):
                     model = (model, )
                 if self.meta:
                     model += ({
@@ -417,6 +417,7 @@ class SubjectiveEvalTask(BaseTask):
                         model, dataset,
                         osp.join(self.work_dir, self.output_subdir),
                         file_extension))
+                model = model[:-1]
         return output_paths
 
 

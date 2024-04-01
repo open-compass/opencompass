@@ -98,7 +98,7 @@ class MTBenchSummarizer(CompassArenaSummarizer):
             self.base_models = self.cfg['eval']['partitioner']['base_models']
             self.compare_models = self.cfg['eval']['partitioner'][
                 'compare_models']
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
+        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
         self.judge_map = {
             'single': post_process_mtbench_single,
             'pair': post_process_mtbench_pair

@@ -63,7 +63,7 @@ infer = dict(
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_model = dict(
+judge_models = [dict(
     type=HuggingFaceCausalLM,
     abbr='pandalm-7b-v1-hf',
     path='WeOpenML/PandaLM-7B-v1',
@@ -79,12 +79,12 @@ judge_model = dict(
     batch_size=8,
     model_kwargs=dict(device_map='auto', trust_remote_code=True),
     run_cfg=dict(num_gpus=1, num_procs=1),
-)
+)]
 
 ## ------------- Evaluation Configuration
 eval = dict(
-    partitioner=dict(type=SubjectiveNaivePartitioner, mode='singlescore', models=models),
-    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model)),
+    partitioner=dict(type=SubjectiveNaivePartitioner, mode='singlescore', models=models, judge_models=judge_models),
+    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
 )
 
 summarizer = dict(type=AlignmentBenchSummarizer)

@@ -1,4 +1,5 @@
 # flake8: noqa: E501
+import copy
 import os.path as osp
 from itertools import combinations, product
 from typing import Dict, List, Optional, Tuple
@@ -10,7 +11,7 @@ from opencompass.utils import (deal_with_judge_model_abbr,
                                get_infer_output_path, model_abbr_from_cfg)
 
 from .naive import NaivePartitioner
-import copy
+
 
 def remove_duplicate_pairs(model_combinations):
     # For compare mode, we need to remove redundant pairs first
@@ -54,38 +55,48 @@ def remove_already_tasks(tasks, work_dir, meta_judge_model):
         for i in range(2):
             for task in tasks[i]:
                 temp_task = copy.deepcopy(task)
-                to_delete_index = [] # To deal with the situation that the partition strategy is not split, which means that there will be a task contains multi dataset, and when we need to re-start, we need to remove the already done tasks.
+                to_delete_index = [
+                ]  # To deal with the situation that the partition strategy is not split, which means that there will be a task contains multi dataset, and when we need to re-start, we need to remove the already done tasks.
                 for idx, dataset in enumerate(task['datasets'][0]):
                     if i == 0:
                         filename = get_infer_output_path(
                             deal_with_judge_model_abbr(task['models'][0],
-                                                    task['judge_model'], False),
-                            dataset, osp.join(work_dir, 'results'))
+                                                       task['judge_model'],
+                                                       False), dataset,
+                            osp.join(work_dir, 'results'))
                     else:
                         filename = get_infer_output_path(
-                            deal_with_judge_model_abbr(task['models'][0],
-                                                    task['meta_judge_model'],
-                                                    True),
-                            dataset, osp.join(work_dir, 'results'))
+                            deal_with_judge_model_abbr(
+                                task['models'][0], task['meta_judge_model'],
+                                True), dataset, osp.join(work_dir, 'results'))
                     if osp.exists(filename):
                         to_delete_index.append(idx)
-                temp_task['datasets'][0] = [temp_task['datasets'][0][j] for j in range(len(temp_task['datasets'][0])) if j not in to_delete_index]
+                temp_task['datasets'][0] = [
+                    temp_task['datasets'][0][j]
+                    for j in range(len(temp_task['datasets'][0]))
+                    if j not in to_delete_index
+                ]
                 if len(temp_task['datasets'][0]) != 0:
                     tasks_to_keep[i].append(temp_task)
     else:
         tasks_to_keep = []
         for task in tasks:
             temp_task = copy.deepcopy(task)
-            to_delete_index = [] # To deal with the situation that the partition strategy is not split, which means that there will be a task contains multi dataset, and when we need to re-start, we need to remove the already done tasks.
+            to_delete_index = [
+            ]  # To deal with the situation that the partition strategy is not split, which means that there will be a task contains multi dataset, and when we need to re-start, we need to remove the already done tasks.
             for idx, dataset in enumerate(task['datasets'][0]):
                 filename = get_infer_output_path(
                     deal_with_judge_model_abbr(task['models'][0],
-                                            task['judge_model']),
-                    dataset, osp.join(work_dir, 'results'))
+                                               task['judge_model']), dataset,
+                    osp.join(work_dir, 'results'))
                 if osp.exists(filename):
                     to_delete_index.append(idx)
             # Remove the already done tasks
-            temp_task['datasets'][0] = [temp_task['datasets'][0][j] for j in range(len(temp_task['datasets'][0])) if j not in to_delete_index]
+            temp_task['datasets'][0] = [
+                temp_task['datasets'][0][j]
+                for j in range(len(temp_task['datasets'][0]))
+                if j not in to_delete_index
+            ]
             if len(temp_task['datasets'][0]) != 0:
                 tasks_to_keep.append(temp_task)
     return tasks_to_keep

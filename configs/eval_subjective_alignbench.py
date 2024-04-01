@@ -44,7 +44,7 @@ models = [
         meta_template=api_meta_template,
         max_out_len=2048,
         max_seq_len=4096,
-        batch_size=1,
+        batch_size=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
@@ -70,7 +70,7 @@ judge_models = [dict(
 ## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
-        type=SubjectiveSizePartitioner, max_task_size=3000, mode='singlescore', models=models, judge_models=judge_models,
+        type=SubjectiveSizePartitioner, max_task_size=1000, mode='singlescore', models=models, judge_models=judge_models,
     ),
     runner=dict(
         type=SlurmSequentialRunner,

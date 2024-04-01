@@ -47,7 +47,7 @@ models = [
         meta_template=api_meta_template,
         max_out_len=2048,
         max_seq_len=4096,
-        batch_size=1,
+        batch_size=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
@@ -73,7 +73,7 @@ gpt4 = dict(
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_model = dict(
+judge_models = [dict(
     abbr='GPT4-Turbo',
     type=OpenAI,
     path='gpt-4-1106-preview',
@@ -85,21 +85,26 @@ judge_model = dict(
     batch_size=2,
     retry=20,
     temperature=0,
-)
+)]
 
 ## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
-        type=SubjectiveSizePartitioner, max_task_size=1000, mode='m2n', base_models=[gpt4], compare_models=models
+        type=SubjectiveSizePartitioner, max_task_size=1000, mode='m2n', base_models=[gpt4], compare_models=models, 
+        infer_order='random',
+        judge_models=judge_models
     ),
     runner=dict(
         type=SlurmSequentialRunner,
-        partition='llmeval',
+        partition='llm_dev2',
         quotatype='auto',
         max_num_workers=256,
-        task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model),
+        task=dict(type=SubjectiveEvalTask),
     ),
+    given_pred = [{'abbr':'gpt4-turbo', 'path':''}]
 )
 work_dir = 'outputs/alpaca/'
+
+
 
 summarizer = dict(type=AlpacaSummarizer, judge_type='v2')
