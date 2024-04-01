@@ -111,7 +111,6 @@ class SubjectiveSizePartitioner(SubjectiveNaivePartitioner):
             models = super().get_model_combinations(models, base_models,
                                                     compare_models)
         model_dataset_combinations = [{'models': models, 'datasets': datasets}]
-
         tasks = []
         for comb in model_dataset_combinations:
             comb['datasets'] = sorted(comb['datasets'],
@@ -122,8 +121,8 @@ class SubjectiveSizePartitioner(SubjectiveNaivePartitioner):
                 for dataset in comb['datasets']:
                     filename = get_infer_output_path(model, dataset, out_dir)
                     # skip the task if the task output exists
-                    if osp.exists(filename):
-                        continue
+                    # if osp.exists(filename):
+                    #   continue
                     dataset_size = self.get_cost(dataset)
                     if dataset_size > self.max_task_size:
                         root, ext = osp.splitext(filename)
@@ -160,9 +159,11 @@ class SubjectiveSizePartitioner(SubjectiveNaivePartitioner):
                                 'work_dir': work_dir,
                                 **add_cfg
                             }))
+
         tasks = replicate_tasks_with_judge_models(tasks, judge_models,
                                                   meta_judge_model)
         tasks = remove_already_tasks(tasks, work_dir, meta_judge_model)
+
         if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
                 tasks[0], list):
             # Refer to meta review judge

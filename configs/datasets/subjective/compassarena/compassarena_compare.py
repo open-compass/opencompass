@@ -119,7 +119,6 @@ for _name, _prompt in sub_map.items():
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
-            infer_order='double',
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(round=[

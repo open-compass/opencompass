@@ -350,13 +350,13 @@ class SubjectiveEvalTask(BaseTask):
             dataset_cfg, osp.join(self.work_dir, 'results'))
         if meta:
             model_preds = self._load_model_pred(model_cfg, dataset_cfg,
-                                                eval_cfg)
+                                                eval_cfg, self.given_pred)
             model_judges = self._load_model_judgements(model_cfg, dataset_cfg,
                                                        eval_cfg,
                                                        self.judge_models)
         else:
             model_preds = self._load_model_pred(model_cfg, dataset_cfg,
-                                                eval_cfg)
+                                                eval_cfg, self.given_pred)
             model_judges = None
         if not self.judge_cfg:
             raise ValueError('missing "eval.judge_cfg"')
