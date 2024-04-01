@@ -93,7 +93,7 @@ If you need to use the more comprehensive dataset (~500M) provided by OpenCompas
 wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip
 unzip OpenCompassData-complete-20240207.zip
 cd ./data
-find . -name "*.zip" -exec unzip {} \;
+find . -name "*.zip" -exec unzip "{}" \;
 ```
 
 The list of datasets included in both `.zip` can be found [here](https://github.com/open-compass/opencompass/releases/tag/0.2.2.rc1)

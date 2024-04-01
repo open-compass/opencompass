@@ -15,11 +15,11 @@ question_and_options = "Which of the following is a good sentence:\nA. {opt1}\nB
 winogrande_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
-        template={answer: f"{question_and_options}\nAnswer: {answer}\n" for answer in ["A", "B"]},
+        template={'A': '{opt1}', 'B': '{opt2}'},
     ),
     prompt_template=dict(
         type=PromptTemplate,
-        template={answer: f"</E>{question_and_options}\nAnswer: {answer}" for answer in ["A", "B"]},
+        template={'A': '</E>{opt1}', 'B': '</E>{opt2}'},
         ice_token="</E>",
     ),
     retriever=dict(type=FixKRetriever, fix_id_list=[0, 2, 4, 6, 8]),

@@ -56,6 +56,7 @@ class SubjectiveEvalTask(BaseTask):
         self.judge_cfg = copy.deepcopy(judge_cfg)
         self.judge_models = judge_models
         self.infer_order = cfg.get('infer_order')
+        self.given_pred = cfg.eval.get('given_pred', [])
 
     def get_command(self, cfg_path, template):
         """Get the command template for the task.
@@ -93,12 +94,16 @@ class SubjectiveEvalTask(BaseTask):
                 self._score(model_cfg, dataset_cfg, eval_cfg, output_column,
                             self.meta)
 
-    def _load_model_pred(self, model_cfg: Union[ConfigDict, List[ConfigDict]],
-                         dataset_cfg: ConfigDict,
-                         eval_cfg: ConfigDict) -> Union[None, List[str]]:
+    def _load_model_pred(
+        self,
+        model_cfg: Union[ConfigDict, List[ConfigDict]],
+        dataset_cfg: ConfigDict,
+        eval_cfg: ConfigDict,
+        given_preds: List[dict],
+    ) -> Union[None, List[str]]:
         if isinstance(model_cfg, (tuple, list)):
             return [
-                self._load_model_pred(m, dataset_cfg, eval_cfg)
+                self._load_model_pred(m, dataset_cfg, eval_cfg, given_preds)
                 for m in model_cfg
             ]
 
@@ -123,7 +128,11 @@ class SubjectiveEvalTask(BaseTask):
         else:
             filename = get_infer_output_path(
                 model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
-
+        for given_pred in given_preds:
+            abbr = given_pred['abbr']
+            path = given_pred['path']
+            if abbr == model_cfg['abbr']:
+                filename = osp.join(path, osp.basename(filename))
         # Get partition name
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext

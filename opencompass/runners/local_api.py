@@ -128,7 +128,7 @@ def launch(task: BaseTask, tokens: SyncManager.Semaphore):
         traceback.print_exc()
         # reset stdout and stderr
         reset_std()
-        logger.warning(f'task {task_name} fail, see\n{out_path}')
+        logger.error(f'task {task_name} fail, see\n{out_path}')
         returncode = 1
     else:
         # reset stdout and stderr

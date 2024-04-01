@@ -8,7 +8,7 @@ with read_base():
     from ..triviaqa.triviaqa_wiki_1shot_gen_20a989 import triviaqa_datasets
     from ..nq.nq_open_1shot_gen_20a989 import nq_datasets
     from ..race.race_ppl_abed12 import race_datasets
-    from ..winogrande.winogrande_5shot_ll_9d81d7 import winogrande_datasets
+    from ..winogrande.winogrande_5shot_ll_252f01 import winogrande_datasets
     from ..hellaswag.hellaswag_10shot_ppl_59c85e import hellaswag_datasets
     from ..bbh.bbh_gen_0a5495 import bbh_datasets
     from ..gsm8k.gsm8k_gen_ee684f import gsm8k_datasets

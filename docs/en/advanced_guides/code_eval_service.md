@@ -117,7 +117,7 @@ Model inference and code evaluation services located in different machines which
 ### Collect Inference Results(Only for Humanevalx)
 
 In OpenCompass's tools folder, there is a script called `collect_code_preds.py` provided to process and collect the inference results after providing the task launch configuration file during startup along with specifying the working directory used corresponding to the task.
-It is the same with `-r` option in `run.py`. More details can be referred through the [documentation](https://opencompass.readthedocs.io/en/latest/get_started.html#launch-evaluation).
+It is the same with `-r` option in `run.py`. More details can be referred through the [documentation](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html#launching-evaluation).
 
 ```shell
 python tools/collect_code_preds.py [config] [-r latest]

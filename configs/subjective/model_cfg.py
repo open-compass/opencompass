@@ -1,9 +1,5 @@
-from mmengine.config import read_base
-
-with read_base():
-    from .datasets.subjective.subjective_cmp.subjective_corev2 import subjective_datasets
-
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
+from opencompass.models.openai_api import OpenAIAllesAPIN
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
@@ -11,20 +7,13 @@ from opencompass.runners import LocalRunner
 from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import Corev2Summarizer
-
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),
         dict(role='BOT', api_role='BOT', generate=True),
-    ],
-    reserved_roles=[
-        dict(role='SYSTEM', api_role='SYSTEM'),
-    ],
+    ]
 )
-
 # -------------Inference Stage ----------------------------------------
-
 # For subjective evaluation, we often set do sample for models
 models = [
     dict(
@@ -52,11 +41,36 @@ models = [
     )
 ]
 
-datasets = [*subjective_datasets]
+
+judge_model = dict(
+        abbr='GPT4-Turbo',
+        type=OpenAIAllesAPIN, path='gpt-4-1106-preview',
+        key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+        url='',
+        meta_template=api_meta_template,
+        query_per_second=1,
+        max_out_len=1024,
+        max_seq_len=4096,
+        batch_size=1,
+        retry=30,
+        temperature = 0
+)
+
+infer = dict(
+    partitioner=dict(type=SizePartitioner, strategy='split', max_task_size=10000),
+    runner=dict(
+        type=SlurmSequentialRunner,
+        partition='llmeval',
+        quotatype='auto',
+        max_num_workers=256,
+        task=dict(type=OpenICLInferTask),
+    ),
+)
+runner=dict(type=LocalRunner, max_num_workers=12, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model))
 
 gpt4 = dict(
     abbr='gpt4-turbo',
-    type=OpenAI,
+    type=OpenAIAllesAPIN,
     path='gpt-4-1106-preview',
     key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
     meta_template=api_meta_template,
@@ -66,50 +80,6 @@ gpt4 = dict(
     batch_size=4,
     retry=20,
     temperature=1,
-)  # Re-inference gpt4's predictions or you can choose to use the pre-commited gpt4's predictions
+) 
+given_pred = [{'abbr':'gpt4-turbo', 'path':'your path'}]
 
-infer = dict(
-    partitioner=dict(type=SizePartitioner, max_task_size=500),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask),
-    ),
-)
-
-# -------------Evalation Stage ----------------------------------------
-
-## ------------- JudgeLLM Configuration
-judge_model = dict(
-    abbr='GPT4-Turbo',
-    type=OpenAI,
-    path='gpt-4-1106-preview',
-    key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
-    meta_template=api_meta_template,
-    query_per_second=1,
-    max_out_len=1024,
-    max_seq_len=4096,
-    batch_size=2,
-    retry=20,
-    temperature=0,
-)
-
-## ------------- Evaluation Configuration
-eval = dict(
-    partitioner=dict(
-        type=SubjectiveSizePartitioner, mode='m2n', max_task_size=500, base_models=[gpt4], compare_models=models
-    ),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model),
-    ),
-)
-
-summarizer = dict(type=Corev2Summarizer, match_method='smart')
-
-work_dir = 'outputs/corev2/'
