@@ -1,0 +1,234 @@
+03/12 21:27:42 - OpenCompass - [4m[97mINFO[0m - Task [chatglm3-6b-hf/alignment_bench_1]
+03/12 21:27:53 - OpenCompass - [4m[97mINFO[0m - Start inferencing [chatglm3-6b-hf/alignment_bench_1]
+03/12 21:37:08 - OpenCompass - [4m[97mINFO[0m - time elapsed: 566.03s
+srun: job 3471903 queued and waiting for resources
+srun: job 3471903 has been allocated resources
+srun: Job 3471903 scheduled successfully!
+Current QUOTA_TYPE is [spot], which means the job has occupied quota in SPOT_TOTAL under your partition.
+[NOTE]: This job MAY BE PREEMPTED by other jobs of reserved QUOTA_TYPE.
+[NOTE]: phx_priority has NO effect on job of spot quota type.
+
+/mnt/petrelfs/caomaosong/miniconda3/envs/opencompass/lib/python3.10/site-packages/transformers/utils/hub.py:124: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+A new version of the following files was downloaded from https://huggingface.co/THUDM/chatglm3-6b:
+- tokenization_chatglm.py
+. Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
+A new version of the following files was downloaded from https://huggingface.co/THUDM/chatglm3-6b:
+- configuration_chatglm.py
+. Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
+A new version of the following files was downloaded from https://huggingface.co/THUDM/chatglm3-6b:
+- modeling_chatglm.py
+. Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
+
+Downloading shards:   0%|          | 0/7 [00:00<?, ?it/s]
+Downloading shards: 100%|██████████| 7/7 [00:00<00:00, 736.38it/s]
+
+Loading checkpoint shards:   0%|          | 0/7 [00:00<?, ?it/s]
+Loading checkpoint shards:  14%|█▍        | 1/7 [00:00<00:05,  1.04it/s]
+Loading checkpoint shards:  29%|██▊       | 2/7 [00:01<00:04,  1.01it/s]
+Loading checkpoint shards:  43%|████▎     | 3/7 [00:02<00:03,  1.04it/s]
+Loading checkpoint shards:  57%|█████▋    | 4/7 [00:03<00:02,  1.08it/s]
+Loading checkpoint shards:  71%|███████▏  | 5/7 [00:04<00:01,  1.09it/s]
+Loading checkpoint shards:  86%|████████▌ | 6/7 [00:05<00:00,  1.10it/s]
+Loading checkpoint shards: 100%|██████████| 7/7 [00:06<00:00,  1.27it/s]
+Loading checkpoint shards: 100%|██████████| 7/7 [00:06<00:00,  1.15it/s]
+[2024-03-12 21:27:53,992] [opencompass.openicl.icl_inferencer.icl_gen_inferencer] [INFO] Starting inference process...
+
+  0%|          | 0/98 [00:00<?, ?it/s]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  1%|          | 1/98 [00:02<04:12,  2.60s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  2%|▏         | 2/98 [00:11<09:53,  6.18s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  3%|▎         | 3/98 [00:11<05:41,  3.60s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  4%|▍         | 4/98 [00:12<03:47,  2.42s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  5%|▌         | 5/98 [00:15<04:02,  2.60s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  6%|▌         | 6/98 [00:15<02:51,  1.86s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  7%|▋         | 7/98 [00:16<02:07,  1.40s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  8%|▊         | 8/98 [00:25<05:54,  3.94s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+  9%|▉         | 9/98 [00:31<06:56,  4.68s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 10%|█         | 10/98 [00:32<05:07,  3.49s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 11%|█         | 11/98 [00:36<04:58,  3.43s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 12%|█▏        | 12/98 [00:41<06:00,  4.19s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 13%|█▎        | 13/98 [00:50<07:51,  5.54s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 14%|█▍        | 14/98 [00:54<07:05,  5.06s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 15%|█▌        | 15/98 [01:00<07:27,  5.40s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 16%|█▋        | 16/98 [01:04<06:50,  5.01s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 17%|█▋        | 17/98 [01:06<05:29,  4.07s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 18%|█▊        | 18/98 [01:06<03:53,  2.92s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 19%|█▉        | 19/98 [01:16<06:17,  4.77s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 20%|██        | 20/98 [01:16<04:40,  3.59s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 21%|██▏       | 21/98 [01:19<04:14,  3.31s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 22%|██▏       | 22/98 [01:22<04:13,  3.34s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 23%|██▎       | 23/98 [01:31<06:13,  4.98s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 24%|██▍       | 24/98 [01:32<04:26,  3.60s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 26%|██▌       | 25/98 [01:36<04:45,  3.91s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 27%|██▋       | 26/98 [01:41<05:03,  4.21s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 28%|██▊       | 27/98 [01:44<04:38,  3.92s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 29%|██▊       | 28/98 [01:58<07:56,  6.80s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 30%|██▉       | 29/98 [02:05<08:02,  6.99s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 31%|███       | 30/98 [02:16<09:06,  8.03s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 32%|███▏      | 31/98 [02:21<08:01,  7.19s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 33%|███▎      | 32/98 [02:27<07:30,  6.83s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 34%|███▎      | 33/98 [02:28<05:32,  5.11s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 35%|███▍      | 34/98 [02:36<06:09,  5.78s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 36%|███▌      | 35/98 [02:45<07:06,  6.77s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 37%|███▋      | 36/98 [02:50<06:29,  6.28s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 38%|███▊      | 37/98 [03:02<08:10,  8.04s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 39%|███▉      | 38/98 [03:46<18:47, 18.79s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 40%|███▉      | 39/98 [03:56<15:50, 16.11s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 41%|████      | 40/98 [04:04<13:18, 13.76s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 42%|████▏     | 41/98 [04:07<10:03, 10.59s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 43%|████▎     | 42/98 [04:11<07:53,  8.45s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 44%|████▍     | 43/98 [04:19<07:53,  8.60s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 45%|████▍     | 44/98 [04:25<06:48,  7.57s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 46%|████▌     | 45/98 [04:35<07:31,  8.53s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 47%|████▋     | 46/98 [04:43<07:03,  8.14s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 48%|████▊     | 47/98 [04:54<07:44,  9.11s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 49%|████▉     | 48/98 [04:56<05:53,  7.07s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 50%|█████     | 49/98 [04:59<04:41,  5.74s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 51%|█████     | 50/98 [05:07<05:06,  6.39s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 52%|█████▏    | 51/98 [05:16<05:42,  7.29s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 53%|█████▎    | 52/98 [05:22<05:10,  6.74s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 54%|█████▍    | 53/98 [05:36<06:43,  8.97s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 55%|█████▌    | 54/98 [05:39<05:22,  7.33s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 56%|█████▌    | 55/98 [05:46<05:00,  6.99s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 57%|█████▋    | 56/98 [05:52<04:47,  6.85s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 58%|█████▊    | 57/98 [05:57<04:22,  6.40s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 59%|█████▉    | 58/98 [06:01<03:47,  5.68s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 60%|██████    | 59/98 [06:05<03:12,  4.93s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 61%|██████    | 60/98 [06:08<02:48,  4.43s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 62%|██████▏   | 61/98 [06:10<02:14,  3.63s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 63%|██████▎   | 62/98 [06:13<02:11,  3.66s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 64%|██████▍   | 63/98 [06:17<02:10,  3.72s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 65%|██████▌   | 64/98 [06:20<01:58,  3.48s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 66%|██████▋   | 65/98 [06:24<02:02,  3.71s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 67%|██████▋   | 66/98 [06:25<01:26,  2.70s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 68%|██████▊   | 67/98 [06:27<01:17,  2.49s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 69%|██████▉   | 68/98 [06:31<01:26,  2.87s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 70%|███████   | 69/98 [06:34<01:25,  2.95s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 71%|███████▏  | 70/98 [06:44<02:23,  5.13s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 72%|███████▏  | 71/98 [06:45<01:45,  3.92s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 73%|███████▎  | 72/98 [06:52<02:05,  4.83s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 74%|███████▍  | 73/98 [06:57<02:04,  4.98s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 76%|███████▌  | 74/98 [07:02<01:57,  4.90s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 77%|███████▋  | 75/98 [07:06<01:45,  4.58s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 78%|███████▊  | 76/98 [07:09<01:29,  4.08s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 79%|███████▊  | 77/98 [07:15<01:40,  4.81s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 80%|███████▉  | 78/98 [07:21<01:41,  5.08s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 81%|████████  | 79/98 [07:24<01:25,  4.50s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 82%|████████▏ | 80/98 [07:28<01:15,  4.20s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 83%|████████▎ | 81/98 [07:39<01:45,  6.23s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 84%|████████▎ | 82/98 [07:47<01:49,  6.85s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 85%|████████▍ | 83/98 [07:52<01:35,  6.37s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 86%|████████▌ | 84/98 [07:57<01:23,  5.98s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 87%|████████▋ | 85/98 [08:03<01:17,  5.93s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 88%|████████▊ | 86/98 [08:08<01:07,  5.63s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 89%|████████▉ | 87/98 [08:13<01:00,  5.46s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 90%|████████▉ | 88/98 [08:15<00:44,  4.47s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 91%|█████████ | 89/98 [08:23<00:48,  5.34s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 92%|█████████▏| 90/98 [08:25<00:35,  4.46s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 93%|█████████▎| 91/98 [08:30<00:31,  4.52s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 94%|█████████▍| 92/98 [08:35<00:29,  4.90s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 95%|█████████▍| 93/98 [08:44<00:30,  6.15s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 96%|█████████▌| 94/98 [08:57<00:31,  7.93s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 97%|█████████▋| 95/98 [09:03<00:22,  7.58s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 98%|█████████▊| 96/98 [09:07<00:12,  6.33s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+ 99%|█████████▉| 97/98 [09:12<00:05,  5.93s/it]Both `max_new_tokens` (=2048) and `max_length`(=8192) seem to have been set. `max_new_tokens` will take precedence. Please refer to the documentation for more information. (https://huggingface.co/docs/transformers/main/en/main_classes/text_generation)
+
+100%|██████████| 98/98 [09:14<00:00,  4.89s/it]
+100%|██████████| 98/98 [09:14<00:00,  5.66s/it]

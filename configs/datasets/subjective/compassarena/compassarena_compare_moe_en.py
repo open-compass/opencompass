@@ -99,10 +99,38 @@ creation_prompt = """
 {question}
 """ + base_prompt
 
-sub_map = {"creationv2_zh": creation_prompt}
+sub_map = {"creationv2_en": creation_prompt}
+
 meta_prompt = """
-\n你是一个评判专家，请根据提供的 评分要求，用户问题 以及 相应的两个回答（回答1，回答2），判断两个回答中哪一个更好。\n评分要求（重要性依次递减）:\n1. 好的回答必须首先符合用户问题里的各种需求，不能跑题 \n2. 好的回答必须具有逻辑连贯性，围绕一个中心进行回答\n3. 好的回答必须具有创造性的词语和表达丰富度\n\n[用户问题]\n{question}\n[回答1开始]\n{prediction}\n[回答1结束]\n[回答2开始]\n{prediction2}\n[回答2结束]\n此外，还有两个其他评判专家的评判意见供你参考。\n[评判意见1]\n{judgement}\n[评判意见2]\n{judgement2}\n\n最终请你综合其他评判专家的评判意见与你自己的意见，在以下 3 个选项中做出选择:\nA. 回答1更好\nB. 回答2更好\nC. 回答1、2平局\n并提供你的解释原因。\n\n如果你认为回答1更好，你的输出应形如：\n选择：A\n原因：blahblah blahblah\n\n\n如果你认为回答2更好，你的输出应形如：\n选择：B\n原因：blahblah blahblah\n\n\n如果你认为回答1、2打成平手，你的输出应形如：\n选择：C\n原因：blahblah blahblah\n\n
+Please use the provided scoring criteria and user question to determine which of the two answers (Answer 1, Answer 2) is better. Scoring criteria (in decreasing order of importance):
+1. A good answer must first and foremost meet the various requirements within the user's question without straying off-topic.
+2. A good answer must be logically coherent and centered around a single focus in its response.
+3. A good answer must exhibit creative word use and richness in expression.
+[Start of User Question]
+{question}
+[End of User Question]
+[Start of Answer 1]
+{prediction}
+[End of Answer 1]
+[Start of Answer 2]
+{prediction2}
+[End of Answer 2]
+Besides, there are two other judgments from expert judges for your reference.\n[Judgment 1]\n{judgement}\n[Judgment 2]\n{judgement2}\n
+Ultimately, please synthesize the judgments from other expert judges with your own opinions and make a choice from the following 3 options:
+A. Answer 1 is better.
+B. Answer 2 is better.
+C. Answer 1 and 2 are tied.
+If you believe Answer 1 is better, your output should be in the form of:
+Choice: A
+Reason: blahblah blahblah\n
+If you believe Answer 2 is better, your output should be in the form of:
+Choice: B
+Reason: blahblah blahblah\n
+If you believe Answer 1 and 2 are tied, your output should be in the form of:
+Choice: C
+Reason: blahblah blahblah\n
 """
+
 for _name, _prompt in sub_map.items():
     subjective_infer_cfg = dict(
             prompt_template=dict(

@@ -110,7 +110,7 @@ class SubjectiveEvalTask(BaseTask):
         # 3.Use partition in infer stage, but not use partition in judge stage
         # 4.Use both partition, with same partition size
         # 5.Use both partition, but different partition size
-        print(model_cfg)
+
         # If take SubjectSizePartition, get new filename without _0
         if 'test_range' in dataset_cfg['reader_cfg']:
             filename = get_infer_output_path(
