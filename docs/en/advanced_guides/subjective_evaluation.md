@@ -13,6 +13,13 @@ A popular evaluation method involves
 
 We support the use of GPT-4 (or other JudgeLLM) for the subjective evaluation of models based on above methods.
 
+## Current Supported Subjective Evaluation Datasets
+
+1. AlginBench (https://github.com/THUDM/AlignBench)
+2. MTBench (https://github.com/lm-sys/FastChat)
+3. AlpacaEvalv2 (https://github.com/tatsu-lab/alpaca_eval)
+4. CompassArena (Internal dataset)
+
 ## Subjective Evaluation with Custom Dataset
 
 The specific process includes:

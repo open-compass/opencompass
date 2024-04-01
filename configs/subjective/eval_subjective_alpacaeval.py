@@ -7,14 +7,24 @@ with read_base():
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
 from opencompass.summarizers import AlpacaSummarizer
+from opencompass.tasks.outer_eval.alpacaeval import AlpacaEvalTask
 datasets = [*alpacav2]
+gpt4_judge = dict(
+    abbr='GPT4-Turbo',
+    path='gpt-4-1106-preview',
+    key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+    config='weighted_alpaca_eval_gpt4_turbo' 
+)
+## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
-        type=SubjectiveSizePartitioner, max_task_size=1000, mode='m2n', base_models=[gpt4], compare_models=models
+        type=NaivePartitioner
     ),
-runner=runner,
-given_pred=given_pred
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=256,
+        task=dict(type=AlpacaEvalTask, judge_cfg=gpt4_judge),
+    )
 )
 work_dir = 'outputs/alpaca/'
 
-summarizer = dict(type=AlpacaSummarizer, judge_type='v2')

@@ -73,6 +73,19 @@
 
    </details>
 
+5. 安装 alpaca-eval（可选）：
+
+   如果你需要**使用官方alpaca-eval实现评测 alpaca-eval 数据集**，请执行此步骤，否则忽略这一步。
+
+   <details>
+   <summary><b>点击查看详细</b></summary>
+
+   ```bash
+   pip install alpaca-eval
+   ```
+
+   </details>
+
 # 数据集准备
 
 OpenCompass 支持的数据集主要包括两个部分：
