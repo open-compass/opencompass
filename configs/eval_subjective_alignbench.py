@@ -44,7 +44,7 @@ models = [
         meta_template=api_meta_template,
         max_out_len=2048,
         max_seq_len=4096,
-        batch_size=1,
+        batch_size=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]
@@ -54,7 +54,7 @@ datasets = [*subjective_datasets]
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_model = dict(
+judge_models = [dict(
     abbr='GPT4-Turbo',
     type=OpenAI,
     path='gpt-4-1106-preview',
@@ -65,18 +65,14 @@ judge_model = dict(
     max_seq_len=2048,
     batch_size=8,
     temperature=0,
-)
+)]
 
 ## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
-        type=SubjectiveNaivePartitioner, mode='singlescore', models=models
+        type=SubjectiveSizePartitioner, max_task_size=1000, mode='singlescore', models=models, judge_models=judge_models,
     ),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=2,
-        task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model),
-    ),
+    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
 )
 
 summarizer = dict(type=AlignmentBenchSummarizer, judge_type='general')

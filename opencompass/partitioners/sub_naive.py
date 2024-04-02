@@ -1,14 +1,20 @@
+# flake8: noqa: E501
+import copy
+import os.path as osp
 from itertools import combinations, product
 from typing import Dict, List, Optional, Tuple
 
 from mmengine.config import ConfigDict
 
 from opencompass.registry import PARTITIONERS
+from opencompass.utils import (deal_with_judge_model_abbr,
+                               get_infer_output_path, model_abbr_from_cfg)
 
 from .naive import NaivePartitioner
 
 
 def remove_duplicate_pairs(model_combinations):
+    # For compare mode, we need to remove redundant pairs first
     combo_dict = {}
     for i, combo in enumerate(model_combinations):
         sorted_names = tuple(sorted((combo[0]['abbr'], combo[1]['abbr'])))
@@ -18,6 +24,82 @@ def remove_duplicate_pairs(model_combinations):
         model_combinations[i] for i in combo_dict.values()
     ]
     return new_model_combinations
+
+
+def replicate_tasks_with_judge_models(tasks, judge_models, meta_judge_model):
+    # When all tasks are already partitioned, we add judge_models and meta_judge_model as additional args.
+    if meta_judge_model:
+        replicated_tasks = [[], []]
+    else:
+        replicated_tasks = []
+    for task in tasks:
+        replicated_task_dicts = [task.copy() for _ in range(len(judge_models))]
+        for idx, replicated_task in enumerate(replicated_task_dicts):
+            replicated_task['judge_model'] = judge_models[idx]
+        if meta_judge_model:
+            meta_task = task.copy()
+            meta_task['meta_judge_model'] = meta_judge_model
+            meta_task['judge_models'] = judge_models
+            replicated_tasks[1].append(meta_task)
+            replicated_tasks[0].extend(replicated_task_dicts)
+        else:
+            replicated_tasks.extend(replicated_task_dicts)
+    return replicated_tasks
+
+
+def remove_already_tasks(tasks, work_dir, meta_judge_model):
+    # Check and remove the already finished subjective evaluation tasks
+    if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
+            tasks[0], list):
+        tasks_to_keep = [[], []]
+        for i in range(2):
+            for task in tasks[i]:
+                temp_task = copy.deepcopy(task)
+                to_delete_index = [
+                ]  # To deal with the situation that the partition strategy is not split, which means that there will be a task contains multi dataset, and when we need to re-start, we need to remove the already done tasks.
+                for idx, dataset in enumerate(task['datasets'][0]):
+                    if i == 0:
+                        filename = get_infer_output_path(
+                            deal_with_judge_model_abbr(task['models'][0],
+                                                       task['judge_model'],
+                                                       False), dataset,
+                            osp.join(work_dir, 'results'))
+                    else:
+                        filename = get_infer_output_path(
+                            deal_with_judge_model_abbr(
+                                task['models'][0], task['meta_judge_model'],
+                                True), dataset, osp.join(work_dir, 'results'))
+                    if osp.exists(filename):
+                        to_delete_index.append(idx)
+                temp_task['datasets'][0] = [
+                    temp_task['datasets'][0][j]
+                    for j in range(len(temp_task['datasets'][0]))
+                    if j not in to_delete_index
+                ]
+                if len(temp_task['datasets'][0]) != 0:
+                    tasks_to_keep[i].append(temp_task)
+    else:
+        tasks_to_keep = []
+        for task in tasks:
+            temp_task = copy.deepcopy(task)
+            to_delete_index = [
+            ]  # To deal with the situation that the partition strategy is not split, which means that there will be a task contains multi dataset, and when we need to re-start, we need to remove the already done tasks.
+            for idx, dataset in enumerate(task['datasets'][0]):
+                filename = get_infer_output_path(
+                    deal_with_judge_model_abbr(task['models'][0],
+                                               task['judge_model']), dataset,
+                    osp.join(work_dir, 'results'))
+                if osp.exists(filename):
+                    to_delete_index.append(idx)
+            # Remove the already done tasks
+            temp_task['datasets'][0] = [
+                temp_task['datasets'][0][j]
+                for j in range(len(temp_task['datasets'][0]))
+                if j not in to_delete_index
+            ]
+            if len(temp_task['datasets'][0]) != 0:
+                tasks_to_keep.append(temp_task)
+    return tasks_to_keep
 
 
 @PARTITIONERS.register_module()
@@ -37,15 +119,22 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
                  models: Optional[List[ConfigDict]] = [],
                  base_models: Optional[List[ConfigDict]] = [],
                  compare_models: Optional[List[ConfigDict]] = [],
+                 judge_models: Optional[List[ConfigDict]] = [],
+                 meta_judge_model: Optional[ConfigDict] = None,
                  model_pairs: Optional[List[Tuple]] = None,
-                 keep_keys: Optional[List[str]] = None):
+                 keep_keys: Optional[List[str]] = None,
+                 infer_order: Optional[str] = 'random'):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
         assert mode in ['singlescore', 'allpair', 'm2n', 'fixed']
+        assert infer_order in ['random', 'double']
         self.mode = mode
         self.models = models
         self.base_models = base_models
         self.compare_models = compare_models
         self.model_pairs = model_pairs
+        self.judge_models = judge_models
+        self.meta_judge_model = meta_judge_model
+        self.infer_order = infer_order
 
     def get_model_combinations(
             self,
@@ -97,14 +186,35 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
         """
         models = self.models if self.models != [] else models
         base_models, compare_models = self.base_models, self.compare_models
+        judge_models, meta_judge_model = self.judge_models, self.meta_judge_model
         if self.mode == 'singlescore':
             models = models
         else:
             models = self.get_model_combinations(models, base_models,
                                                  compare_models)
         model_dataset_combinations = [{'models': models, 'datasets': datasets}]
-        return super().partition(
+        tasks = super().partition(
             model_dataset_combinations=model_dataset_combinations,
             work_dir=work_dir,
             out_dir=out_dir,
             add_cfg=add_cfg)
+
+        # We need to add judge models and meta-judge-model as new tasks
+        # When there is no meta-judge-model, we assign all judge models to each tasks
+        # When there is a meta-judge-model, we add an additional task stage
+        tasks = replicate_tasks_with_judge_models(tasks, judge_models,
+                                                  meta_judge_model)
+
+        # We also need to check and remove the already done tasks
+        tasks = remove_already_tasks(tasks, work_dir, meta_judge_model)
+        if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
+                tasks[0], list):
+            # Refer to meta review judge
+            for task_stage in tasks:
+                for task in task_stage:
+                    task['infer_order'] = self.infer_order
+        else:
+            # Refer to just have review judge
+            for task in tasks:
+                task['infer_order'] = self.infer_order
+        return tasks

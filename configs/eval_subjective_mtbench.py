@@ -2,7 +2,6 @@ from mmengine.config import read_base
 
 with read_base():
     from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import subjective_datasets
-    # from .datasets.subjective.multiround.mtbench_pair_judge import subjective_datasets
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.models.openai_api import OpenAIAllesAPIN
@@ -62,7 +61,7 @@ datasets = [*subjective_datasets]
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_model = dict(
+judge_models = [dict(
     abbr='GPT4-Turbo',
     type=OpenAI,
     path='gpt-4-0613', # To compare with the official leaderboard, please use gpt4-0613
@@ -73,23 +72,12 @@ judge_model = dict(
     max_seq_len=2048,
     batch_size=8,
     temperature=0,
-)
-## ------------- Evaluation Configuration
-# ## pair evaluation
-# eval = dict(
-#     partitioner=dict(
-#         type=SubjectiveSizePartitioner, max_task_size=100, mode='m2n', base_models=[gpt4], compare_models=models
-#     ),
-#     runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model)),
-# )
-
-# summarizer = dict(type=MTBenchSummarizer, judge_type='pair')
-
+)]
 
 ## single evaluation
 eval = dict(
-    partitioner=dict(type=SubjectiveSizePartitioner, strategy='split', max_task_size=10000, mode='singlescore', models=models),
-    runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model)),
+    partitioner=dict(type=SubjectiveSizePartitioner, strategy='split', max_task_size=10000, mode='singlescore', models=models, judge_models=judge_models),
+    runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask)),
 )
 
 summarizer = dict(type=MTBenchSummarizer, judge_type='single')
