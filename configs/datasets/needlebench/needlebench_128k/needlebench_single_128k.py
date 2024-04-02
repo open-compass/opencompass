@@ -59,7 +59,7 @@ document_depth_percent_interval_type = "linear"
 
 base_path = './data/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
-needlebench_datasets_en = []
+needlebench_en_datasets = []
 needle_file_name = 'needles.jsonl'
 
 for original_context_length in context_lengths:
@@ -82,10 +82,10 @@ for original_context_length in context_lengths:
             'infer_cfg': needlebench_infer_cfg,
             'eval_cfg': needlebench_eval_cfg
         }
-        needlebench_datasets_en.append(dataset_dict)
+        needlebench_en_datasets.append(dataset_dict)
 
 file_list = ['zh_finance.jsonl']
-needlebench_datasets_zh = []
+needlebench_zh_datasets = []
 needle_file_name = 'needles.jsonl'
 
 for original_context_length in context_lengths:
@@ -108,4 +108,4 @@ for original_context_length in context_lengths:
             'infer_cfg': needlebench_infer_cfg,
             'eval_cfg': needlebench_eval_cfg
         }
-        needlebench_datasets_zh.append(dataset_dict)
+        needlebench_zh_datasets.append(dataset_dict)

@@ -52,20 +52,20 @@ needlebench_eval_cfg = dict(
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
     pred_role='BOT')
 
-context_lengths = list([9000, 13000, 17000, 21000, 25000, 29000, 31000, 32000])
+context_lengths = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000])
 document_depth_percent_intervals = 20
 document_depth_percent_interval_type = "linear"
 
 base_path = './data/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
-needlebench_datasets_en = []
+needlebench_en_datasets = []
 needle_file_name = 'needles.jsonl'
 depths = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
 for original_context_length in context_lengths:
     dataset_dict = {
         'abbr': f'Length{original_context_length}'
-                f'_parallel_en_32k',
+                f'_parallel_en_128k',
         'type': NeedleBenchParallelDataset,
         'path': base_path,
         'needle_file_name': needle_file_name,
@@ -81,15 +81,15 @@ for original_context_length in context_lengths:
         'infer_cfg': needlebench_infer_cfg,
         'eval_cfg': needlebench_eval_cfg
     }
-    needlebench_datasets_en.append(dataset_dict)
+    needlebench_en_datasets.append(dataset_dict)
 
 file_list = ['zh_finance.jsonl']
-needlebench_datasets_zh = []
+needlebench_zh_datasets = []
 
 for original_context_length in context_lengths:
     dataset_dict = {
         'abbr': f'Length{original_context_length}'
-                f'_parallel_zh_32k',
+                f'_parallel_zh_128k',
         'type': NeedleBenchParallelDataset,
         'path': base_path,
         'needle_file_name': needle_file_name,
@@ -105,4 +105,4 @@ for original_context_length in context_lengths:
         'infer_cfg': needlebench_infer_cfg,
         'eval_cfg': needlebench_eval_cfg
     }
-    needlebench_datasets_zh.append(dataset_dict)
+    needlebench_zh_datasets.append(dataset_dict)

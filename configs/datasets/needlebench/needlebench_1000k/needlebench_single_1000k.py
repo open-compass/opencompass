@@ -52,20 +52,19 @@ needlebench_eval_cfg = dict(
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
     pred_role='BOT')
 
-# context_lengths = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000, 144000, 160000, 176000, 192000, 200000])
-context_lengths = [16000, 48000, 80000, 112000, 128000, 144000, 176000, 200000]
+context_lengths = [20000, 160000, 300000, 440000, 580000, 720000, 860000, 1000000]
 depths_list = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
 base_path = './data/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
-needlebench_datasets_en = []
+needlebench_en_datasets = []
 needle_file_name = 'needles.jsonl'
 
 for original_context_length in context_lengths:
     for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_origin_en_200k',
+                    f'Depth{int(depth_percent)}_origin_en_1000k',
             'type': NeedleBenchOriginDataset,
             'path': base_path,
             'length': original_context_length,
@@ -81,17 +80,17 @@ for original_context_length in context_lengths:
             'infer_cfg': needlebench_infer_cfg,
             'eval_cfg': needlebench_eval_cfg
         }
-        needlebench_datasets_en.append(dataset_dict)
+        needlebench_en_datasets.append(dataset_dict)
 
 file_list = ['zh_finance.jsonl']
-needlebench_datasets_zh = []
+needlebench_zh_datasets = []
 needle_file_name = 'needles.jsonl'
 
 for original_context_length in context_lengths:
     for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_origin_zh_200k',
+                    f'Depth{int(depth_percent)}_origin_zh_1000k',
             'type': NeedleBenchOriginDataset,
             'path': base_path,
             'length': original_context_length,
@@ -107,4 +106,4 @@ for original_context_length in context_lengths:
             'infer_cfg': needlebench_infer_cfg,
             'eval_cfg': needlebench_eval_cfg
         }
-        needlebench_datasets_zh.append(dataset_dict)
+        needlebench_zh_datasets.append(dataset_dict)
