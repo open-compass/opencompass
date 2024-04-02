@@ -94,13 +94,7 @@ eval = dict(
         infer_order='random',
         judge_models=judge_models
     ),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=SubjectiveEvalTask),
-    ),
+    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
     given_pred = [{'abbr':'gpt4-turbo', 'path':''}]
 )
 work_dir = 'outputs/alpaca/'

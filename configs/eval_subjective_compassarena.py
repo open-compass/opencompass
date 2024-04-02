@@ -98,13 +98,7 @@ eval = dict(
         compare_models=models,
         judge_models=judge_models,
     ),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=32,
-        task=dict(type=SubjectiveEvalTask),
-    ),
+    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
     given_pred = [{'abbr':'gpt4-turbo', 'path':''}]
 )
 

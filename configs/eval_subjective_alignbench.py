@@ -72,13 +72,7 @@ eval = dict(
     partitioner=dict(
         type=SubjectiveSizePartitioner, max_task_size=1000, mode='singlescore', models=models, judge_models=judge_models,
     ),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=32,
-        task=dict(type=SubjectiveEvalTask),
-    ),
+    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
 )
 
 summarizer = dict(type=AlignmentBenchSummarizer, judge_type='general')
