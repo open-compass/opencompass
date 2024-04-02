@@ -539,45 +539,6 @@ needlebench_200k_summarizer = dict(
     ],
     summary_groups=needlebench_summary_groups,
 )
-<<<<<<< HEAD
-
-# ----------NeedleBench-1000k-summarizer----------
-
-context_lengths_1000k = list([20000, 160000, 300000, 440000, 580000, 720000, 860000, 1000000])
-# Initialize the lists
-_needlebench_1000k_2needle_en = []
-_needlebench_1000k_3needle_en = []
-_needlebench_1000k_4needle_en = []
-_needlebench_1000k_5needle_en = []
-_needlebench_1000k_2needle_zh = []
-_needlebench_1000k_3needle_zh = []
-_needlebench_1000k_4needle_zh = []
-_needlebench_1000k_5needle_zh = []
-_needlebench_1000k_origin_en = []
-_needlebench_1000k_origin_zh = []
-
-# Fill the lists using nested loops
-for original_context_length in context_lengths_1000k:
-    for depth_percent in depths_list_sparse:
-        _needlebench_1000k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_1000k')
-        _needlebench_1000k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_1000k')
-        _needlebench_1000k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_1000k')
-        _needlebench_1000k_5needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_en_1000k')
-        _needlebench_1000k_2needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_zh_1000k')
-        _needlebench_1000k_3needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_zh_1000k')
-        _needlebench_1000k_4needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_zh_1000k')
-        _needlebench_1000k_5needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_zh_1000k')
-
-        _needlebench_1000k_origin_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_en_1000k')
-        _needlebench_1000k_origin_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_zh_1000k')
-
-# Concatenate the multi-needle and origin lists
-_needlebench_1000k_multi_needle_en = _needlebench_1000k_2needle_en + _needlebench_1000k_3needle_en + _needlebench_1000k_4needle_en + _needlebench_1000k_5needle_en
-_needlebench_1000k_multi_needle_zh = _needlebench_1000k_2needle_zh + _needlebench_1000k_3needle_zh + _needlebench_1000k_4needle_zh + _needlebench_1000k_5needle_zh
-_needlebench_1000k_origin = _needlebench_1000k_origin_en + _needlebench_1000k_origin_zh
-_needlebench_1000k_multi_needle = _needlebench_1000k_multi_needle_en + _needlebench_1000k_multi_needle_zh
-=======
->>>>>>> main
 
 # ----------NeedleBench-1000k-summarizer----------
 
