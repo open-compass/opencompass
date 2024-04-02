@@ -11,7 +11,7 @@ from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 
 
-def get_random_needles(file_path, needle_count):
+def get_random_needles(counter, file_path, needle_count):
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
@@ -21,6 +21,7 @@ def get_random_needles(file_path, needle_count):
     ]
 
     if matching_records:
+        random.seed(counter)
         random_record = random.choice(matching_records)
         return {
             'needles': random_record['derivations'],
@@ -144,7 +145,7 @@ class NeedleBenchMultiDataset(BaseDataset):
                               'The document given to you by the user'
                               f' is {context}\n\n')
                 else:
-                    raise ValueError('Unsupported position. '
+                    raise ValueError(f'Unsupported position {position}. '
                                      'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
@@ -164,7 +165,7 @@ class NeedleBenchMultiDataset(BaseDataset):
                 random.seed(counter)
                 random.shuffle(lines)
                 random_needle_data = get_random_needles(
-                    needle_file_path, num_needles)
+                    counter, needle_file_path, num_needles)
                 needles = [
                     '\n' + needle + '\n'
                     for needle in random_needle_data['needles']

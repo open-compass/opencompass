@@ -12,7 +12,7 @@ from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 
-def get_random_line_by_language(file_path, language):
+def get_random_line_by_language(counter, file_path, language):
     with open(file_path, 'r', encoding='utf-8') as file:
         lines = [
             json.loads(line.strip()) for line in file
@@ -20,6 +20,7 @@ def get_random_line_by_language(file_path, language):
         ]
 
     if lines:
+        random.seed(counter)
         random_line = random.choice(lines)
         return {
             'needle': random_line['needle'],
@@ -120,7 +121,7 @@ class NeedleBenchOriginDataset(BaseDataset):
                               'The document given to you by the user'
                               f' is {context}\n\n')
                 else:
-                    raise ValueError('Unsupported position. '
+                    raise ValueError(f'Unsupported position {position}. '
                                      'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
@@ -140,7 +141,7 @@ class NeedleBenchOriginDataset(BaseDataset):
                 random.shuffle(lines)
                 needle_file_path = os.path.join(path, needle_file_name)
                 random_needle = get_random_line_by_language(
-                    needle_file_path, language)
+                    counter, needle_file_path, language)
                 needle = '\n' + random_needle['needle'] + '\n'
                 retrieval_question = random_needle['retrieval_question']
                 keyword = random_needle['keyword']
