@@ -761,15 +761,11 @@ needlebench_8k_batch_depth0_summarizer = dict(
 
 needle_num_list = list(range(2, 20, 1))
 
-# 定义各个分类，包括CircularEval相关的评分指标
 categories = ['ZH', 'EN', 'ZH-Reasoning', 'EN-Reasoning', 'ZH-CircularEval', 'EN-CircularEval', 'ZH-Reasoning-Circular', 'EN-Reasoning-Circular']
 needlebench_atc_summary_groups = []
 
-# 根据分类生成summary groups
 for category in categories:
-    # 对于CircularEval相关的评分，使用perf_4指标，否则使用acc_1指标
     metric = 'perf_4' if 'CircularEval' in category else 'acc_1'
-    # 生成subsets时，不需要在数据集名称中包含CircularEval信息
     cleaned_category = category.replace('-CircularEval', '').replace('-Circular', '')
     subsets = [f'NeedleBenchATCDataset-{num_needles}Needle-{cleaned_category}'
                for num_needles in needle_num_list]
@@ -785,17 +781,13 @@ for category in categories:
 
 atc_dataset_abbrs = []
 
-# 根据categories数组遍历生成描述和评分指标
 for category in categories:
-    # 生成分类标题
     title = f'######## Needlebench-ATC-{category}-Score ########'
     atc_dataset_abbrs.append(title)
 
-    # 添加加权平均分描述
     weighted_average_score_entry = [f'{category}', 'weighted_average']
     atc_dataset_abbrs.append(weighted_average_score_entry)
 
-# 移除最后一个分隔符
 if atc_dataset_abbrs[-1] == '------------------------------------------':
     atc_dataset_abbrs.pop()
 

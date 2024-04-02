@@ -68,7 +68,7 @@ class NeedleBenchATCDataset(BaseDataset):
         all_names = names_data[language].split(',')
 
         for id in range(repeats):
-            # random.seed(id)
+            random.seed(id)
             names = random.sample(all_names, num_needles)
             if language == 'Chinese':
 
@@ -154,10 +154,7 @@ Given the scrambled family relationships described above, who is the eldest rela
             shuffled_story_with_prompt = shuffled_story + ' ' + prompt
 
             entry['question'] = shuffled_story_with_prompt
-            # 检查names列表长度是否至少为4
             if len(names) < 4:
-                # 从all_names中补足names列表直到长度达到4
-                # 确保至少需要0个额外名字
                 additional_names_needed = max(4 - len(names), 0)
                 additional_names = random.sample(
                     [name for name in all_names if name not in names],
