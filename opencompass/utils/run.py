@@ -127,11 +127,6 @@ def get_config_from_arg(args) -> Config:
                      run_cfg=dict(num_gpus=args.num_gpus))
         models.append(model)
     # parse summarizer args
-    summarizer_arg = args.summarizer if args.summarizer \
-        is not None else 'example'
-    summarizers_dir = os.path.join(args.config_dir, 'summarizers')
-
-    # Parse summarizer arguments
     summarizer_arg = args.summarizer if args.summarizer is not None \
         else 'example'
     summarizers_dir = os.path.join(args.config_dir, 'summarizers')
