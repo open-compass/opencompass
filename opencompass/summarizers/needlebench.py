@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import tabulate
+import shutil
 from matplotlib.colors import LinearSegmentedColormap
 from mmengine import ConfigDict
 from tqdm import tqdm
@@ -26,6 +27,92 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
                                model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
 
+model_name_mapping = {
+    'llama-2-7b-chat-hf': 'LLaMA-2-7B',
+    'llama-2-13b-chat-hf': 'LLaMA-2-13B',
+    'llama-2-70b-chat-hf': 'LLaMA-2-70B',
+    'baichuan2-7b-chat-hf': 'Baichuan2-7B',
+    'baichuan2-13b-chat-hf': 'Baichuan2-13B',
+    'yi-6b-chat-hf': 'Yi-6B',
+    'yi-34b-chat-hf': 'Yi-34B',
+    'deepseek-67b-chat-hf': 'DeepSeek-67B',
+    'wizardlm-70b-v1.0-vllm': 'WizardLM-70B',
+    'qwen-14b-chat-hf': 'Qwen-14B',
+    'qwen-72b-chat-hf': 'Qwen-72B',
+    'qwen-72b-chat-vllm': 'Qwen-72B-vLLM',
+    'internlm2-chat-7b-turbomind': 'InternLM2-7B-200K',
+    'internlm2-chat-20b-turbomind': 'InternLM2-20B-200K',
+    'internlm2-chat-7b-hf': 'InternLM2-7B',
+    'internlm2-chat-20b-hf': 'InternLM2-20B',
+    'qwen-7b-chat-hf': 'Qwen-7B',
+    'chatglm3-6b-hf': 'ChatGLM3-6B',
+    'chatglm3-6b-32k-hf': 'ChatGLM3-6B-32K',
+    'zephyr-7b-beta-vllm': 'Zephyr-7B Beta',
+    'mistral-7b-instruct-v0.2-vllm': 'Mistral-7B Inst. v0.2',
+    'mistral-7b-instruct-v0.1-vllm': 'Mistral-7B Inst. v0.1',
+    'mixtral-8x7b-instruct-v0.1-vllm': 'Mixtral-8x7B Inst. v0.1',
+    'orionstar-yi-34b-chat-hf': 'OrionStar-Yi-34B',
+    'orionstar-14b-long-chat-vllm': 'Orion-14B-LongChat',
+    'internlm-chat-7b-hf': 'InternLM-7B',
+    'gemma-2b-it-hf': 'Gemma-2B',
+    'gemma-7b-it-hf': 'Gemma-7B',
+    'qwen1.5-0.5b-chat-hf': 'Qwen-1.5-0.5B',
+    'qwen1.5-1.8b-chat-hf': 'Qwen-1.5-1.8B',
+    'qwen1.5-4b-chat-hf': 'Qwen-1.5-4B',
+    'qwen1.5-14b-chat-hf': 'Qwen-1.5-14B',
+    'qwen1.5-72b-chat-hf': 'Qwen-1.5-72B',
+    'qwen1.5-14b-chat-vllm': 'Qwen-1.5-14B-vLLM',
+    'qwen1.5-72b-chat-vllm': 'Qwen-1.5-72B-vLLM',
+    'glm4_notools': 'GLM-4',
+    'claude-3-opus': 'Claude-3-Opus',
+    # Add more mappings as necessary
+}
+
+dataset_mapping_dict = {}
+
+needle_counts = ['2', '3', '4', '5']
+languages = ['en', 'zh']
+sizes = ['4k', '8k', '32k', '200k', '1000k']
+types = ['origin', 'parallel']
+
+for needle_count in needle_counts:
+    for language in languages:
+        for size in sizes:
+            key = f"{needle_count}needle_{language}_{size}"
+            value = f"{needle_count}-Needle-Reasoning-{language.upper()}-{size.upper()}"
+            dataset_mapping_dict[key] = value
+for t in types:
+    for language in languages:
+        for size in sizes:
+            if t == 'origin':
+                key = f"{t}_{language}_{size}"
+                value = f"Single-Needle-Retrieval-{language.upper()}-{size.upper()}"
+            elif t == 'parallel':
+                key = f"{t}_{language}_{size}"
+                value = f"Multi-Needle-Retrieval-{language.upper()}-{size.upper()}"
+            dataset_mapping_dict[key] = value
+
+
+def calculate_elementwise_average(model_name, merged_df):
+    score_columns = [col for col in merged_df.columns if col != 'dataset']
+
+    origin_columns = [col for col in score_columns if 'origin' in col]
+    parallel_columns = [col for col in score_columns if 'parallel' in col]
+    multi_columns = [col for col in score_columns if 'needle' in col]
+
+    if origin_columns and parallel_columns and multi_columns:
+        origin_avg = merged_df[origin_columns].mean(axis=1) * 0.4
+        parallel_avg = merged_df[parallel_columns].mean(axis=1) * 0.3
+        multi_avg = merged_df[multi_columns].mean(axis=1) * 0.3
+        merged_df[model_name] = origin_avg + parallel_avg + multi_avg
+    else:
+        relevant_columns = origin_columns or parallel_columns or multi_columns
+        if relevant_columns:
+            merged_df[model_name] = merged_df[relevant_columns].mean(axis=1)
+        else:
+            merged_df[model_name] = pd.Series([0] * len(merged_df))
+
+    return merged_df.iloc[:, [0, -1]]
 
 def read_after_specific_line_except_last(file_name, keyword, offset):
     with open(file_name, 'r', encoding='utf-8') as file:
@@ -65,6 +152,12 @@ def create_model_dataframe(nested_dict, model_name, dataset_abbr, parallel=False
     df = pd.DataFrame(data, columns=['dataset', model_name])
     return df
 
+def convert_to_k(value):
+    try:
+        return f'{int(value) // 1000}k'
+    except ValueError:
+        return value
+    
 def parse_model_scores(text):
     lines = text.split('\n')
 
@@ -82,8 +175,86 @@ def parse_model_scores(text):
 
     return result_dict
 
+def remove_empty_subfolders(plot_path):
+    for folder_name in tqdm(os.listdir(plot_path),
+                            desc="Deleting Empty folders"):
+        folder_path = os.path.join(plot_path, folder_name)
+        if os.path.isdir(folder_path):
+            if not os.listdir(folder_path):
+                shutil.rmtree(folder_path)
+                
+def save_results_to_plots(txt_results_save_path):
+    content = read_after_specific_line_except_last(txt_results_save_path, 'raw format', 2)
+    parsed_data = parse_model_scores(content)
+    model_names = get_dict_model_names(parsed_data)
+    numbers = [2, 3, 4, 5]
+    languages = ['en', 'zh']
+    size_exists = []
+    sizes_origin = ['_4k', '_8k', '_32k', '_128k', '_200k', '_1000k']
+
+    for size in sizes_origin:
+        if size in content:
+            size_exists.append(size)
+
+    multi_dataset_abbrs = [f'{num}needle_{lang}{size}' for num in numbers for lang in languages for size in size_exists]
+    origin_dataset_abbrs = [f'origin_{lang}{size}' for lang in languages for size in size_exists]
+    parallel_dataset_abbrs = [f'parallel_{lang}{size}' for lang in languages for size in size_exists]
+
+    dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + \
+                        parallel_dataset_abbrs
+    base_path = os.path.dirname(txt_results_save_path)
+    plot_path = os.path.join(base_path, 'plots')
+    
+    model_scores = {}
+
+    for model_name in tqdm(model_names):
+        model_datasets_scores = {}  # Dictionary to store scores for each dataset for the current model
+        for dataset_abbr in dataset_abbrs:
+            parallel_flag = 'parallel' in dataset_abbr
+
+            folder_path = os.path.join(plot_path, dataset_mapping_dict[dataset_abbr])
+            ensure_directory(folder_path)
+
+            save_path = os.path.join(folder_path, f'{model_name}.png')
+
+            df = create_model_dataframe(parsed_data, model_name, dataset_abbr, parallel=parallel_flag)
+
+            score = visualize(df, save_path, model_name, dataset_abbr)
+
+            model_datasets_scores[dataset_abbr] = '{:.02f}'.format(score)
+
+        overall_dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + parallel_dataset_abbrs
+        overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.png')
+        merged_df = merge_dataframes(model_name, overall_dataset_abbrs, parsed_data)
+        averaged_df = calculate_elementwise_average(model_name, merged_df)
+        overall_score = visualize(averaged_df, overall_score_pic_path, model_name, 'Overall Score')
+
+        # Single-Retrieval
+        single_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_single_retrieval_overall.png')
+        single_retrieval_merged_df = merge_dataframes(model_name, origin_dataset_abbrs, parsed_data)
+        single_retrieval_averaged_df = calculate_elementwise_average(model_name, single_retrieval_merged_df)
+        single_retrieval_overall_score = visualize(single_retrieval_averaged_df, single_retrieval_score_pic_path, model_name, 'Single-Retrieval Overall Score')
+
+        # Multi-Retrieval
+        multi_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_retrieval_overall.png')
+        multi_retrieval_merged_df = merge_dataframes(model_name, parallel_dataset_abbrs, parsed_data)
+        multi_retrieval_averaged_df = calculate_elementwise_average(model_name, multi_retrieval_merged_df)
+        multi_retrieval_overall_score = visualize(multi_retrieval_averaged_df, multi_retrieval_score_pic_path, model_name, 'Multi-Retrieval Overall Score')
+
+        # Multi-Reasoning
+        multi_reasoning_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_reasoning_overall.png')
+        multi_reasoning_merged_df = merge_dataframes(model_name, multi_dataset_abbrs, parsed_data)
+        multi_reasoning_averaged_df = calculate_elementwise_average(model_name, multi_reasoning_merged_df)
+        multi_reasoning_overall_score = visualize(multi_reasoning_averaged_df, multi_reasoning_score_pic_path, model_name, 'Multi-Reasoning Overall Score')
+
+        model_scores[model_name] = averaged_df
+    remove_empty_subfolders(plot_path)
+    return model_scores
+
 def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
     df = df_raw.copy()
+    if df.empty:
+        return -1
     df['Context Length'] = df['dataset'].apply(
         lambda x: int(x.split('Length')[1].split('Depth')[0]))
     df['Document Depth'] = df['dataset'].apply(
@@ -98,144 +269,96 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
         model_df = df[['Document Depth', 'Context Length',
                         model_name]].copy()
         model_df.rename(columns={model_name: 'Score'}, inplace=True)
-
-        # Create pivot table
         pivot_table = pd.pivot_table(model_df,
-                                        values='Score',
-                                        index=['Document Depth'],
-                                        columns=['Context Length'],
-                                        aggfunc='mean')
+                                    values='Score',
+                                    index=['Document Depth'],
+                                    columns=['Context Length'],
+                                    aggfunc='mean')
 
-        # Calculate mean scores
         mean_scores = pivot_table.mean().values
-
-        # Calculate overall score
         overall_score = mean_scores.mean()
-
-        # Create heatmap and line plot
-        plt.figure(figsize=(15.5, 8))
+        plt.figure(figsize=(10, 6))
         ax = plt.gca()
         cmap = LinearSegmentedColormap.from_list(
             'custom_cmap', ['#F0496E', '#EBB839', '#0CD79F'])
 
-        # Draw heatmap
         sns.heatmap(pivot_table,
                     cmap=cmap,
                     ax=ax,
-                    cbar_kws={'label': 'Score'},
                     vmin=0,
                     vmax=100)
-
-        # Set line plot data
+        cbar = ax.collections[0].colorbar
         x_data = [i + 0.5 for i in range(len(mean_scores))]
         y_data = mean_scores
 
-        # Create twin axis for line plot
         ax2 = ax.twinx()
-        # Draw line plot
         ax2.plot(x_data,
-                    y_data,
-                    color='white',
-                    marker='o',
-                    linestyle='-',
-                    linewidth=2,
-                    markersize=8,
-                    label='Average Depth Score')
-        # Set y-axis range
+                y_data,
+                color='white',
+                marker='o',
+                linestyle='-',
+                linewidth=2,
+                markersize=8,
+                label='Average Depth Score'
+                )
         ax2.set_ylim(0, 100)
 
-        # Hide original y-axis ticks and labels
         ax2.set_yticklabels([])
         ax2.set_yticks([])
 
-        # Add legend
-        ax2.legend(loc='upper left')
+        ax2.legend(loc='lower left')
 
-        # Set chart title and labels
-        ax.set_title(f'{model_name} {dataset_type} Context '
-                        'Performance\nFact Retrieval Across '
-                        'Context Lengths ("Needle In A Haystack")')
-        ax.set_xlabel('Token Limit')
-        ax.set_ylabel('Depth Percent')
-        ax.set_xticklabels(pivot_table.columns.values, rotation=45)
-        ax.set_yticklabels(pivot_table.index.values, rotation=0)
-        # Add overall score as a subtitle
-        plt.text(0.5,
-                 -0.13, f'Overall Score for {model_name}: '
-                 f'{overall_score:.2f}',
-                 ha='center',
-                 va='center',
-                 transform=ax.transAxes,
-                 fontsize=13)
+        if model_name in model_name_mapping:
+            title_name = model_name_mapping[model_name]
+        else:
+            title_name = model_name
+
+        ax.set_title(title_name, fontsize=12, fontweight='bold', pad=15)
+
+        if dataset_type in dataset_mapping_dict:
+            dataset_name = dataset_mapping_dict[dataset_type]
+        else:
+            dataset_name = dataset_type
+
+        ax.text(0.5, 1.005, f'{dataset_name}:{overall_score:.2f}',
+                transform=ax.transAxes,
+                ha='center',
+                fontsize=12,
+                fontweight='normal')
+        ax.set_xlabel('Token Length', fontsize=13, fontweight='normal', labelpad=1)
+        ax.set_ylabel('Depth Percent(%)', fontsize=13, fontweight='normal', labelpad=1)
+        converted_labels = [convert_to_k(value) for value in pivot_table.columns.values]
+
+        ax.tick_params(axis='both', which='major', length=1, pad=1)
+        ax.tick_params(axis='both', which='minor', length=1, pad=1)
+        ax.set_xticklabels(converted_labels, rotation=45)
+        index_length = len(pivot_table.index)
+
+        selected_indices = pivot_table.index.values[::2]
+        labels = [str(int(index)) for index in selected_indices]
+        ax.set_yticks(np.arange(0, len(pivot_table.index), 2))
+        ax.set_yticklabels(labels, rotation=0)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+        for spine in ax2.spines.values():
+            spine.set_visible(False)
 
         plt.tight_layout()
-        plt.subplots_adjust(right=1)
         plt.draw()
-        plt.savefig(save_path)
-        print(f'Saved :{save_path}')
-        plt.close()  # Close figure to prevent memory leaks
+        directory_path, original_filename = os.path.split(save_path)
+
+        filename_suffix = (title_name+'_'+dataset_name).replace(' ', '_')
+        new_filename = f"{filename_suffix}.png"
+
+        new_save_path = os.path.join(directory_path, new_filename)
+
+        plt.savefig(new_save_path, format='png', bbox_inches='tight', pad_inches=0)
+        print(f'Saved :{new_save_path}')
+
+        plt.close()
+
     return overall_score
 
-def save_results_to_plots(txt_results_save_path):
-
-    content = read_after_specific_line_except_last(txt_results_save_path, 'raw format', 2)
-
-    parsed_data = parse_model_scores(content)
-    model_names = get_dict_model_names(parsed_data)
-    numbers = [2, 3, 4, 5]
-    languages = ['en', 'zh']
-    size_exists = []
-    sizes_origin = ['_4k', '_8k', '_32k', '_128k', '_200k']
-
-    for size in sizes_origin:
-        if size in content:
-            size_exists.append(size)
-
-    multi_dataset_abbrs = [f'{num}needle_{lang}{size}' for num in numbers for lang in languages for size in size_exists]
-    origin_dataset_abbrs = [f'origin_{lang}{size}' for lang in languages for size in size_exists]
-    parallel_dataset_abbrs = [f'parallel_{lang}{size}' for lang in languages for size in size_exists]
-
-    dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + \
-                        parallel_dataset_abbrs
-    base_path = os.path.dirname(txt_results_save_path)
-    plot_path = os.path.join(base_path, 'plots')
-    model_scores = {}
-    for model_name in tqdm(model_names):
-        model_datasets_scores = {}  # Dictionary to store scores for each dataset for the current model
-        for dataset_abbr in dataset_abbrs:
-            parallel_flag = 'parallel' in dataset_abbr
-
-            # Create a directory for each dataset_abbr
-            folder_path = os.path.join(plot_path, dataset_abbr)
-            ensure_directory(folder_path)
-
-            # Construct the full path to save the image
-            save_path = os.path.join(folder_path, f'{model_name}.png')
-
-            # Create DataFrame for the model and dataset
-            df = create_model_dataframe(parsed_data, model_name, dataset_abbr, parallel=parallel_flag)
-
-            # Generate visualization and get the score
-            score = visualize(df, save_path, model_name, dataset_abbr)
-
-            # Store the score in the dictionary
-            model_datasets_scores[dataset_abbr] = '{:.02f}'.format(score)
-
-        # Process and visualize the overall score
-        overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.png')
-        merged_df = merge_dataframes(model_name, dataset_abbrs, parsed_data)
-
-        print(merge_dataframes)
-        averaged_df = calculate_elementwise_average(merged_df)
-
-        # Assume visualize returns the average score for the overall visualization
-        overall_score = visualize(averaged_df, overall_score_pic_path, 'weighted_average_score', 'Overall Score')
-
-        # Add the overall score to the dictionary
-        model_datasets_scores['Overall'] = '{:.02f}'.format(overall_score)
-
-        # Add the model's scores to the main dictionary
-        model_scores[model_name] = model_datasets_scores
 
 def ensure_directory(path):
     if not os.path.exists(path):
@@ -263,28 +386,10 @@ def merge_dataframes(model_name, dataset_abbrs, parsed_data):
     merged_df = reduce(lambda left, right: pd.merge(left, right, on='dataset', how='outer'), dfs)
 
     if merged_df.isnull().any().any():
-        print('Warning: Some rows were filtered out due to NaN values. This is often due to mismatched row counts among DataFrames.')
+        print('Warning: Some rows were filtered out due to NaN values. '
+              'This is often due to mismatched row counts among DataFrames.')
         merged_df = merged_df.dropna()
     return merged_df
-
-def calculate_elementwise_average(merged_df):
-    score_columns = [col for col in merged_df.columns if col != 'dataset']
-
-    origin_columns = [col for col in score_columns if 'origin' in col]
-    parallel_columns = [col for col in score_columns if 'parallel' in col]
-    multi_columns = [col for col in score_columns if 'needle'  in col]
-
-    if origin_columns and parallel_columns and multi_columns:
-        origin_avg = merged_df[origin_columns].mean(axis=1) * 0.4
-        parallel_avg = merged_df[parallel_columns].mean(axis=1) * 0.3
-        multi_avg = merged_df[multi_columns].mean(axis=1) * 0.3
-
-        merged_df['weighted_average_score'] = origin_avg + parallel_avg + multi_avg
-    else:
-        merged_df['weighted_average_score'] = pd.Series([0] * len(merged_df))
-
-    return merged_df.iloc[:, [0, -1]]
-
 
 class NeedleBenchSummarizer(DefaultSummarizer):
     """NeedleBench summarizer in OpenCompass.
@@ -303,20 +408,17 @@ class NeedleBenchSummarizer(DefaultSummarizer):
 
         summarizer_dataset_abbrs = []
         if self.dataset_abbrs is None:
-            # display all dataset metrics included in the config
             for dataset_abbr in dataset_abbrs:
                 if dataset_abbr in dataset_metrics:
                     for metric in dataset_metrics[dataset_abbr]:
                         summarizer_dataset_abbrs.append((dataset_abbr, metric))
                 else:
                     summarizer_dataset_abbrs.append((dataset_abbr, None))
-            # along with all possible group metrics
             for dataset_abbr in dataset_metrics:
                 for metric in dataset_metrics[dataset_abbr]:
                     if (dataset_abbr, metric) not in summarizer_dataset_abbrs:
                         summarizer_dataset_abbrs.append((dataset_abbr, metric))
         else:
-            # follow the required order
             for item in self.dataset_abbrs:
                 if isinstance(item, str):
                     summarizer_dataset_abbrs.append((item, None))
@@ -332,6 +434,7 @@ class NeedleBenchSummarizer(DefaultSummarizer):
 
         for dataset_abbr, metric in summarizer_dataset_abbrs:
             if dataset_abbr not in dataset_metrics:
+                
                 table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
                 table.append(header)
                 continue
@@ -378,33 +481,7 @@ class NeedleBenchSummarizer(DefaultSummarizer):
         raw_txts = '\n'.join(raw_txts)
         return raw_txts
 
-    def _read_and_sort_dataframe(self, file_path):
-        # Read the file without treating the first row as a header
-        df = pd.read_csv(file_path, header=None)
-
-        # Function to sort columns based on the value of a specific row, excluding the first column
-        def sort_columns_based_on_row_corrected(df, base_row_idx, start_row_idx, end_row_idx):
-            # Extract the rows for sorting
-            sort_values_row = df.iloc[base_row_idx, 1:].replace('-', np.nan).apply(pd.to_numeric, errors='coerce')
-            # Handle NaNs by setting them to a value less than the minimum or using a method to keep them at the end
-            min_possible_value = sort_values_row.min(skipna=True) - 1  # Use min value in the row minus 1 or another method
-            sort_values_row_filled = sort_values_row.fillna(min_possible_value)
-            # Get the sorted order of indices, excluding the first column
-            sorted_col_indices = sort_values_row_filled.sort_values(ascending=False).index
-            # Apply the sorted column indices to the whole DataFrame, adjusting for Python's 0-based index
-            df.iloc[start_row_idx:end_row_idx+1] = df.iloc[start_row_idx:end_row_idx+1, [0] + sorted_col_indices.tolist()]
-
-        # Apply the corrected sorting function based on the description
-        sort_columns_based_on_row_corrected(df, 1, 0, 2)  # For rows 1-2 based on row 2's values
-        sort_columns_based_on_row_corrected(df, 4, 3, 7)  # For rows 4-7 based on row 5's values
-        sort_columns_based_on_row_corrected(df, 9, 8, 12)  # For rows 9-12 based on row 10's values
-        sort_columns_based_on_row_corrected(df, 14, 13, 25)  # For rows 14-25 based on row 15's values
-
-        # Return the sorted DataFrame
-        return df
-
     def _output_to_file(self, output_path, time_str, table, raw_txts):
-        # output to file
         if output_path is None:
             output_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.txt')
             output_csv_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.csv')
@@ -436,38 +513,19 @@ class NeedleBenchSummarizer(DefaultSummarizer):
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
 
-        df_sorted = self._read_and_sort_dataframe(output_csv_path)
-
-        sorted_file_path = osp.abspath(output_csv_path).split('.')[0] + '_sorted.csv'
-        df_sorted.to_csv(sorted_file_path, index=False, header=False)
-
-        self.logger.info(f'write sorted csv to {sorted_file_path}')
-
 
     def summarize(
         self,
         output_path: str = None,
         time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):  # noqa
 
-        # pick up results
         raw_results, parsed_results, dataset_metrics, dataset_eval_mode = self._pick_up_results()
-
-        # calculate group metrics
         raw_results, parsed_results, dataset_metrics, dataset_eval_mode = \
             self._calculate_group_metrics(raw_results, parsed_results, dataset_metrics, dataset_eval_mode)
-
-        # format table
         table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode)
-
-        # format raw txt
         raw_txts = self._format_raw_txt(raw_results)
-
-        # output to screen
         print(tabulate.tabulate(table, headers='firstrow'))
-
-        # output to .text / .csv files
         self._output_to_file(output_path, time_str, table, raw_txts)
-
         if self.lark_reporter:
             content = f'{getpass.getuser()} 的'
             content += f'详细评测汇总已输出至 {osp.abspath(output_path)}'
