@@ -758,6 +758,60 @@ needlebench_8k_batch_depth0_summarizer = dict(
     ],
     summary_groups=needlebench_summary_groups,
 )
+
+needle_num_list = list(range(2, 20, 1))
+
+categories = ['ZH', 'EN', 'ZH-Reasoning', 'EN-Reasoning', 'ZH-CircularEval', 'EN-CircularEval', 'ZH-Reasoning-Circular', 'EN-Reasoning-Circular']
+needlebench_atc_summary_groups = []
+
+for category in categories:
+    metric = 'perf_4' if 'CircularEval' in category else 'acc_1'
+    cleaned_category = category.replace('-CircularEval', '').replace('-Circular', '')
+    subsets = [f'NeedleBenchATCDataset-{num_needles}Needle-{cleaned_category}'
+               for num_needles in needle_num_list]
+
+    needlebench_atc_summary_groups.append({
+        'name': category,
+        'subsets': [
+            [f'NeedleBenchATCDataset-{num_needles}Needle-{cleaned_category}',
+             metric]
+            for num_needles in needle_num_list
+        ]
+        })
+
+atc_dataset_abbrs = []
+
+for category in categories:
+    title = f'######## Needlebench-ATC-{category}-Score ########'
+    atc_dataset_abbrs.append(title)
+
+    weighted_average_score_entry = [f'{category}', 'weighted_average']
+    atc_dataset_abbrs.append(weighted_average_score_entry)
+
+if atc_dataset_abbrs[-1] == '------------------------------------------':
+    atc_dataset_abbrs.pop()
+
 needlebench_atc_summarizer = dict(
-    type=NeedleBenchATCSummarizer,
+    dataset_abbrs=[
+        *atc_dataset_abbrs,
+        '######## Needlebench-ATC Accuracy ########',  # category
+        *[[f'NeedleBenchATCDataset-{num_needles}Needle-ZH', 'acc_1'] for num_needles in needle_num_list],
+        '------------------------------------------',
+        *[[f'NeedleBenchATCDataset-{num_needles}Needle-EN', 'acc_1'] for num_needles in needle_num_list],
+        '------------------------------------------',
+        *[[f'NeedleBenchATCDataset-{num_needles}Needle-ZH-Reasoning', 'acc_1'] for num_needles in needle_num_list],
+        '------------------------------------------',
+        *[[f'NeedleBenchATCDataset-{num_needles}Needle-EN-Reasoning', 'acc_1'] for num_needles in needle_num_list],
+        '------------------------------------------',
+        '######## Needlebench-ATC CircularEval ########',  # category
+        *[[f'NeedleBenchATCDataset-{num_needles}Needle-ZH', 'perf_4'] for num_needles in needle_num_list],
+        '------------------------------------------',
+        *[[f'NeedleBenchATCDataset-{num_needles}Needle-EN', 'perf_4'] for num_needles in needle_num_list],
+        '------------------------------------------',
+        *[[f'NeedleBenchATCDataset-{num_needles}Needle-ZH-Reasoning', 'perf_4'] for num_needles in needle_num_list],
+        '------------------------------------------',
+        *[[f'NeedleBenchATCDataset-{num_needles}Needle-EN-Reasoning', 'perf_4'] for num_needles in needle_num_list],
+        '------------------------------------------',
+    ],
+    summary_groups=needlebench_atc_summary_groups
 )
