@@ -5,6 +5,7 @@ import getpass
 import math
 import os
 import os.path as osp
+import shutil
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -14,7 +15,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import tabulate
-import shutil
 from matplotlib.colors import LinearSegmentedColormap
 from mmengine import ConfigDict
 from tqdm import tqdm
@@ -78,18 +78,18 @@ types = ['origin', 'parallel']
 for needle_count in needle_counts:
     for language in languages:
         for size in sizes:
-            key = f"{needle_count}needle_{language}_{size}"
-            value = f"{needle_count}-Needle-Reasoning-{language.upper()}-{size.upper()}"
+            key = f'{needle_count}needle_{language}_{size}'
+            value = f'{needle_count}-Needle-Reasoning-{language.upper()}-{size.upper()}'
             dataset_mapping_dict[key] = value
 for t in types:
     for language in languages:
         for size in sizes:
             if t == 'origin':
-                key = f"{t}_{language}_{size}"
-                value = f"Single-Needle-Retrieval-{language.upper()}-{size.upper()}"
+                key = f'{t}_{language}_{size}'
+                value = f'Single-Needle-Retrieval-{language.upper()}-{size.upper()}'
             elif t == 'parallel':
-                key = f"{t}_{language}_{size}"
-                value = f"Multi-Needle-Retrieval-{language.upper()}-{size.upper()}"
+                key = f'{t}_{language}_{size}'
+                value = f'Multi-Needle-Retrieval-{language.upper()}-{size.upper()}'
             dataset_mapping_dict[key] = value
 
 
@@ -157,7 +157,7 @@ def convert_to_k(value):
         return f'{int(value) // 1000}k'
     except ValueError:
         return value
-    
+
 def parse_model_scores(text):
     lines = text.split('\n')
 
@@ -177,12 +177,12 @@ def parse_model_scores(text):
 
 def remove_empty_subfolders(plot_path):
     for folder_name in tqdm(os.listdir(plot_path),
-                            desc="Deleting Empty folders"):
+                            desc='Deleting Empty folders'):
         folder_path = os.path.join(plot_path, folder_name)
         if os.path.isdir(folder_path):
             if not os.listdir(folder_path):
                 shutil.rmtree(folder_path)
-                
+
 def save_results_to_plots(txt_results_save_path):
     content = read_after_specific_line_except_last(txt_results_save_path, 'raw format', 2)
     parsed_data = parse_model_scores(content)
@@ -204,7 +204,7 @@ def save_results_to_plots(txt_results_save_path):
                         parallel_dataset_abbrs
     base_path = os.path.dirname(txt_results_save_path)
     plot_path = os.path.join(base_path, 'plots')
-    
+
     model_scores = {}
 
     for model_name in tqdm(model_names):
@@ -348,7 +348,7 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
         directory_path, original_filename = os.path.split(save_path)
 
         filename_suffix = (title_name+'_'+dataset_name).replace(' ', '_')
-        new_filename = f"{filename_suffix}.png"
+        new_filename = f'{filename_suffix}.png'
 
         new_save_path = os.path.join(directory_path, new_filename)
 
@@ -434,7 +434,7 @@ class NeedleBenchSummarizer(DefaultSummarizer):
 
         for dataset_abbr, metric in summarizer_dataset_abbrs:
             if dataset_abbr not in dataset_metrics:
-                
+
                 table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
                 table.append(header)
                 continue
