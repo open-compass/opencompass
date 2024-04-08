@@ -43,9 +43,12 @@ class OpenICLInferTask(BaseTask):
                 the command.
         """
         script_path = __file__
-        has_vllm = ('VLLM' in str(self.model_cfgs[0].get('type', ''))) or \
-            'VLLM' in str(self.model_cfgs[0].get('llm', {}).get('type', ''))
-        if self.num_gpus > 0 and not has_vllm:
+        backend_keys = ['VLLM', 'Lmdeploy']
+        use_backend = any(
+            key in str(self.model_cfgs[0].get('type', ''))
+            or key in str(self.model_cfgs[0].get('llm', {}).get('type', ''))
+            for key in backend_keys)
+        if self.num_gpus > 0 and not use_backend:
             port = random.randint(12000, 32000)
             command = (f'torchrun --master_port={port} '
                        f'--nproc_per_node {self.num_procs} '

@@ -1,7 +1,11 @@
 import ast
 import json
 
-import networkx as nx
+try:
+    import networkx as nx
+except ImportError:
+    nx = None
+
 import pandas as pd
 from datasets import Dataset
 

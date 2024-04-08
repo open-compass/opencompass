@@ -57,7 +57,7 @@ class MathBenchDataset(BaseDataset):
         """
         data = []
         filename = osp.join(path, f'{name}.jsonl')
-        with open(filename, 'r') as infile:
+        with open(filename, 'r', encoding='utf-8') as infile:
             for id, line in enumerate(infile):
                 entry = json.loads(line)
                 if 'cloze' in name:

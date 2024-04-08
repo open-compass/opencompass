@@ -1,6 +1,10 @@
 import ast
 
-import networkx as nx
+try:
+    import networkx as nx
+except ImportError:
+    nx = None
+
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator

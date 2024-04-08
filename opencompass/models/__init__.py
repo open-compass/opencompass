@@ -1,7 +1,7 @@
 from .accessory import LLaMA2AccessoryModel  # noqa: F401
 from .ai360_api import AI360GPT  # noqa: F401
 from .alaya import AlayaLM  # noqa: F401
-from .baichuan_api import BaiChuan  # noqa: F401
+from .baichuan_api import BaiChuan, BaiChuan3  # noqa: F401
 from .baidu_api import ERNIEBot  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa
 from .base_api import APITemplateParser, BaseAPIModel  # noqa
@@ -12,12 +12,14 @@ from .glm import GLM130B  # noqa: F401, F403
 from .huggingface import HuggingFace  # noqa: F401, F403
 from .huggingface import HuggingFaceCausalLM  # noqa: F401, F403
 from .huggingface import HuggingFaceChatGLM3  # noqa: F401, F403
+from .hunyuan_api import Hunyuan  # noqa: F401
 from .intern_model import InternLM  # noqa: F401, F403
 from .krgpt_api import KrGPT  # noqa: F401
 from .lightllm_api import LightllmAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401, F403
 from .lmdeploy_pytorch import LmdeployPytorchModel  # noqa: F401
 from .minimax_api import MiniMax  # noqa: F401
+from .mistral_api import Mistral  # noqa: F401
 from .mixtral import Mixtral  # noqa: F401
 from .modelscope import ModelScope, ModelScopeCausalLM  # noqa: F401, F403
 from .moonshot_api import MoonShot  # noqa: F401
@@ -28,7 +30,9 @@ from .qwen_api import Qwen  # noqa: F401
 from .sensetime_api import SenseTime  # noqa: F401
 from .turbomind import TurboMindModel  # noqa: F401
 from .turbomind_tis import TurboMindTisModel  # noqa: F401
+from .unigpt_api import UniGPT  # noqa: F401
 from .vllm import VLLM  # noqa: F401
 from .xunfei_api import XunFei  # noqa: F401
+from .yayi_api import Yayi  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
 from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401

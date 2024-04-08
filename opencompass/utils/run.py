@@ -48,6 +48,19 @@ def match_cfg_file(workdir: str, pattern: Union[str, List[str]]) -> List[str]:
     return files
 
 
+def try_fill_in_custom_cfgs(config):
+    for i, dataset in enumerate(config['datasets']):
+        if 'type' not in dataset:
+            config['datasets'][i] = make_custom_dataset_config(dataset)
+    if 'model_dataset_combinations' not in config:
+        return config
+    for mdc in config['model_dataset_combinations']:
+        for i, dataset in enumerate(mdc['datasets']):
+            if 'type' not in dataset:
+                mdc['datasets'][i] = make_custom_dataset_config(dataset)
+    return config
+
+
 def get_config_from_arg(args) -> Config:
     """Get the config object given args.
 
@@ -58,9 +71,7 @@ def get_config_from_arg(args) -> Config:
     """
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
-        for i, dataset in enumerate(config['datasets']):
-            if 'type' not in dataset:
-                config['datasets'][i] = make_custom_dataset_config(dataset)
+        config = try_fill_in_custom_cfgs(config)
         return config
     # parse dataset args
     if not args.datasets and not args.custom_dataset_path:
