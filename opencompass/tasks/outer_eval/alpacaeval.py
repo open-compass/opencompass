@@ -120,7 +120,10 @@ class AlpacaEvalTask(BaseTask):
             filename = get_infer_output_path(m_cfg, dataset_cfg,
                                              osp.join(work_dir, 'predictions'))
             output_path = osp.join(work_dir, 'results', m_cfg['abbr'])
-            command = f'export OPENAI_API_KEY={api_key}; alpaca_eval --model_outputs {filename} --annotators_config {alpaca_cfg} --output_path {output_path}'
+            command = ''
+            if api_key is not None:
+                command += f'export OPENAI_API_KEY={api_key}; '
+            command += f'alpaca_eval --model_outputs {filename} --annotators_config {alpaca_cfg} --output_path {output_path}'
             return template.format(task_cmd=command)
 
     def run(self):

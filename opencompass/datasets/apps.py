@@ -19,13 +19,19 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 from datasets import Dataset, DatasetDict, load_dataset, load_from_disk
-from pyext import RuntimeModule
+
+try:
+    from pyext import RuntimeModule
+except ImportError:
+    RuntimeModule = None
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils.logging import get_logger
 
 from .base import BaseDataset
 
+logger = get_logger()
 TIMEOUT = 10
 
 
@@ -67,18 +73,20 @@ class APPSDataset(BaseDataset):
             new_dataset[split] = Dataset.from_dict(new_data)
 
         # num_repeats duplicate
-        train_repeated = []
+        # train_repeated = []
         test_repeated = []
-        for sample in new_dataset['train']:
-            train_repeated.extend([sample] * num_repeats)
+        # for sample in new_dataset['train']:
+        #     train_repeated.extend([sample] * num_repeats)
         for sample in new_dataset['test']:
             test_repeated.extend([sample] * num_repeats)
 
-        dataset_train_repeated = new_dataset['train'].from_list(train_repeated)
+        # dataset_train_repeated = new_dataset['train'].from_list(
+        #    train_repeated
+        # )
         dataset_test_repeated = new_dataset['test'].from_list(test_repeated)
 
         return DatasetDict({
-            'train': dataset_train_repeated,
+            # 'train': dataset_train_repeated,
             'test': dataset_test_repeated
         })
 
@@ -121,18 +129,20 @@ class APPS_miniDataset(BaseDataset):
             new_dataset[split] = Dataset.from_dict(new_data)
 
         # num_repeats duplicate
-        train_repeated = []
+        # train_repeated = []
         test_repeated = []
-        for sample in new_dataset['train']:
-            train_repeated.extend([sample] * num_repeats)
+        # for sample in new_dataset['train']:
+        #     train_repeated.extend([sample] * num_repeats)
         for sample in new_dataset['test']:
             test_repeated.extend([sample] * num_repeats)
 
-        dataset_train_repeated = new_dataset['train'].from_list(train_repeated)
+        # dataset_train_repeated = new_dataset['train'].from_list(
+        #     train_repeated
+        # )
         dataset_test_repeated = new_dataset['test'].from_list(test_repeated)
 
         return DatasetDict({
-            'train': dataset_train_repeated,
+            # 'train': dataset_train_repeated,
             'test': dataset_test_repeated
         })
 
@@ -308,7 +318,10 @@ def timeout_handler(signum, frame):
     raise TimeoutException
 
 
-signal.signal(signal.SIGALRM, timeout_handler)
+try:
+    signal.signal(signal.SIGALRM, timeout_handler)
+except AttributeError:
+    logger.warning('signal.SIGALRM is not available on this platform')
 timeout = 4  # seconds
 
 
