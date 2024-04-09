@@ -201,3 +201,77 @@ class CIReAct(ReAct):
         self._session_history.append(
             dict(role='assistant', content=agent_return.response))
         return agent_return
+
+
+class CIReActMergeRole(CIReAct):
+    """如有第一轮 SYSTEM, 则使用 SYSTEM。后续 SYSTEM 使用 USER 合并复数轮 USER USER 与 BOT
+    交替出现."""
+
+    def chat(self, message: str) -> AgentReturn:
+        for hist in self._session_history:
+            if hist['role'] == 'system':
+                hist['role'] = self.system_role
+        self._inner_history = []
+        # append the user message for session history
+        self._session_history.append(dict(role='user', content=message))
+        agent_return = AgentReturn()
+        force_stop = False
+        default_response = '对不起，我无法回答你的问题'
+        for turn in range(self.max_turn):
+            prompt = self._protocol.format(
+                chat_history=self.session_history,
+                inner_step=self._inner_history,
+                action_executor=self._action_executor,
+                force_stop=force_stop)
+            prompt = self.merge_role(prompt)
+            response = self._llm.generate_from_template(prompt, 512)
+            self._inner_history.append(dict(role='assistant',
+                                            content=response))
+            thought, action, action_input = self._protocol.parse(
+                response, self._action_executor)
+            action_return: ActionReturn = self._action_executor(
+                action, action_input)
+            action_return.thought = thought
+            agent_return.actions.append(action_return)
+            if action_return.state == ActionStatusCode.SUCCESS:
+                # if success, stash model response and system response
+                self._session_history.append(
+                    dict(role='assistant', content=response))
+                self._session_history.append(
+                    dict(
+                        role=self.system_role,
+                        content=self._protocol.format_response(action_return)))
+                agent_return.response = action_return.result['text']
+                return agent_return
+            elif action_return.type == self._action_executor.invalid_action.name:  # noqa
+                action_return.errmsg = 'The action is invalid, please check the action name.'  # noqa
+            self._inner_history.append(
+                dict(role=self.system_role,
+                     content=self._protocol.format_response(action_return)))
+            if turn == self.max_turn - 1:
+                force_stop = True
+        agent_return.response = default_response
+        self._session_history.append(
+            dict(role='assistant', content=agent_return.response))
+        return agent_return
+
+    def merge_role(self, inputs):
+        messages = []
+        msg_buffer, last_role = [], None
+        for index, item in enumerate(inputs):
+            if index == 0 and item['role'] == 'system':
+                role = 'system'
+            elif item['role'] == 'assistant':
+                role = 'assistant'
+            else:
+                role = 'user'
+            if role != last_role and last_role is not None:
+                messages.append({
+                    'content': '\n'.join(msg_buffer),
+                    'role': last_role
+                })
+                msg_buffer = []
+            msg_buffer.append(item['content'])
+            last_role = role
+        messages.append({'content': '\n'.join(msg_buffer), 'role': last_role})
+        return messages

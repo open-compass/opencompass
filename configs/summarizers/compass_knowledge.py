@@ -12,7 +12,6 @@ compassbench_v1_knowledge_groups = [
     {'name': 'knowledge_perf_4_and_cloze', 'subsets': [['knowledge_cn', 'perf_4'], ['compassbench_v1_knowledge-mixed-cloze_en', 'score']]},
 ]
 
-'compassbench_v1_knowledge-mixed-cloze_en'
 summarizer = dict(
     dataset_abbrs=[
         'knowledge_perf_4_and_cloze',

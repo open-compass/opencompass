@@ -2,8 +2,6 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
-from httpx import ProxyError
-
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
@@ -59,13 +57,13 @@ class ZhiPuV2AI(BaseAPIModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -82,13 +80,13 @@ class ZhiPuV2AI(BaseAPIModel):
 
     def _generate(
         self,
-        input: str or PromptList,
+        input: PromptType,
         max_out_len: int = 512,
     ) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -103,6 +101,8 @@ class ZhiPuV2AI(BaseAPIModel):
         else:
             messages = []
             for item in input:
+                if not item['prompt']:
+                    continue
                 msg = {'content': item['prompt']}
                 if item['role'] == 'HUMAN':
                     msg['role'] = 'user'
@@ -115,11 +115,15 @@ class ZhiPuV2AI(BaseAPIModel):
         data = {'model': self.model, 'messages': messages}
         data.update(self.generation_kwargs)
 
+        from pprint import pprint
+        print('-' * 128)
+        pprint(data)
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
 
             response = None
+            from httpx import ProxyError
 
             try:
                 response = self.client.chat.completions.create(**data)
@@ -161,6 +165,8 @@ class ZhiPuV2AI(BaseAPIModel):
             #     msg = response['data']['choices'][0]['content']
             else:
                 msg = response.choices[0].message.content
+                print('=' * 128)
+                print(msg)
                 return msg
             # sensitive content, prompt overlength, network error
             # or illegal prompt

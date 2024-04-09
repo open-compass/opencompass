@@ -19,7 +19,7 @@ APPS_mini_datasets = [
     dict(
         type=APPS_miniDataset,
         abbr="apps_mini",
-        path="codeparrot_mini/apps",
+        path="./data/apps_mini",
         num_repeats=1,
         reader_cfg=APPS_reader_cfg,
         infer_cfg=APPS_infer_cfg,
