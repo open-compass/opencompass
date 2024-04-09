@@ -60,14 +60,14 @@ class TurboMindAPIModel(BaseModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
         temperature: float = 1.0,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -102,12 +102,12 @@ class TurboMindAPIModel(BaseModel):
         """
         return self.token_bucket.get_token()
 
-    def _generate(self, prompt: str or PromptList, max_out_len: int,
+    def _generate(self, prompt: PromptType, max_out_len: int,
                   temperature: float, end_str: str) -> str:
         """Generate results given a list of inputs.
 
         Args:
-            prompt (str or PromptList): A string or PromptDict.
+            prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.

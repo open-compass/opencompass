@@ -103,14 +103,14 @@ class OpenAI(BaseAPIModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
         temperature: float = 0.7,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -132,12 +132,12 @@ class OpenAI(BaseAPIModel):
                              [temperature] * len(inputs)))
         return results
 
-    def _generate(self, input: str or PromptList, max_out_len: int,
+    def _generate(self, input: PromptType, max_out_len: int,
                   temperature: float) -> str:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -207,6 +207,7 @@ class OpenAI(BaseAPIModel):
             header = {
                 'Authorization': f'Bearer {key}',
                 'content-type': 'application/json',
+                'api-key': key,
             }
 
             if self.orgs:
@@ -239,6 +240,7 @@ class OpenAI(BaseAPIModel):
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
                 continue
+            self.logger.error(str(response))
             try:
                 if self.logprobs:
                     return response['choices']
@@ -247,13 +249,16 @@ class OpenAI(BaseAPIModel):
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
-                        time.sleep(1)
+                        time.sleep(10)
                         self.logger.warn('Rate limit exceeded, retrying...')
                         continue
                     elif response['error']['code'] == 'insufficient_quota':
                         self.invalid_keys.add(key)
                         self.logger.warn(f'insufficient_quota key: {key}')
                         continue
+                    elif response['error']['code'] == 'invalid_prompt':
+                        self.logger.warn('Invalid prompt:', str(input))
+                        return ''
 
                     self.logger.error('Find error message in response: ',
                                       str(response['error']))
@@ -363,12 +368,12 @@ class OpenAIAllesAPIN(OpenAI):
             'content-type': 'application/json',
         }
 
-    def _generate(self, input: str or PromptList, max_out_len: int,
+    def _generate(self, input: PromptType, max_out_len: int,
                   temperature: float) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.

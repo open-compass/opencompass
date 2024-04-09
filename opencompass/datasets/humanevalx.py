@@ -168,9 +168,12 @@ def _clean_up_code(text: str, language_type: str, reference) -> str:
     """Cleans up the generated code."""
     try:
         # for chatGLM related text
-        text = eval(text)
+        eval_text = eval(text)
     except Exception:
         pass
+    else:
+        if isinstance(eval_text, str):
+            text = eval_text
     # extract code from code block
     text = text.lstrip('\n')
     if '```' in text:

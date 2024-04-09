@@ -48,13 +48,13 @@ class Qwen(BaseAPIModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -71,13 +71,13 @@ class Qwen(BaseAPIModel):
 
     def _generate(
         self,
-        input: str or PromptList,
+        input: PromptType,
         max_out_len: int = 512,
     ) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -103,16 +103,26 @@ class Qwen(BaseAPIModel):
             messages = [{'role': 'user', 'content': input}]
         else:
             messages = []
-            for item in input:
-                msg = {'content': item['prompt']}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
+            msg_buffer, last_role = [], None
+            for index, item in enumerate(input):
+                if index == 0 and item['role'] == 'SYSTEM':
+                    role = 'system'
                 elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
-                elif item['role'] == 'SYSTEM':
-                    msg['role'] = 'system'
-
-                messages.append(msg)
+                    role = 'assistant'
+                else:
+                    role = 'user'
+                if role != last_role and last_role is not None:
+                    messages.append({
+                        'content': '\n'.join(msg_buffer),
+                        'role': last_role
+                    })
+                    msg_buffer = []
+                msg_buffer.append(item['prompt'])
+                last_role = role
+            messages.append({
+                'content': '\n'.join(msg_buffer),
+                'role': last_role
+            })
         data = {'messages': messages}
         data.update(self.generation_kwargs)
 
@@ -142,6 +152,8 @@ class Qwen(BaseAPIModel):
             if response.status_code == 200:
                 try:
                     msg = response.output.text
+                    print('=' * 128)
+                    print(msg)
                     return msg
                 except KeyError:
                     print(response)
@@ -153,6 +165,8 @@ class Qwen(BaseAPIModel):
                 time.sleep(2)
                 continue
             if response.status_code == 400:
+                print('=' * 128)
+                print(response)
                 msg = 'Output data may contain inappropriate content.'
                 return msg
 

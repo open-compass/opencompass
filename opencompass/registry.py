@@ -1,7 +1,21 @@
+from typing import Callable, List, Optional, Type, Union
+
 from mmengine.registry import DATASETS as MMENGINE_DATASETS
 from mmengine.registry import METRICS as MMENGINE_METRICS
 from mmengine.registry import MODELS as MMENGINE_MODELS
-from mmengine.registry import Registry
+from mmengine.registry import Registry as OriginalRegistry
+
+
+class Registry(OriginalRegistry):
+
+    # override the default force behavior
+    def register_module(
+            self,
+            name: Optional[Union[str, List[str]]] = None,
+            force: bool = True,
+            module: Optional[Type] = None) -> Union[type, Callable]:
+        return super().register_module(name, force, module)
+
 
 PARTITIONERS = Registry('partitioner', locations=['opencompass.partitioners'])
 RUNNERS = Registry('runner', locations=['opencompass.runners'])

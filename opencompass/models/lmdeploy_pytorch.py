@@ -124,13 +124,13 @@ class LmdeployPytorchModel(BaseModel):
     def _generate(self,
                   generator,
                   session_id,
-                  prompt: str or PromptList,
+                  prompt: PromptType,
                   gen_config=None,
                   end_str: Optional[str] = None) -> str:
         """Generate results given a list of inputs.
 
         Args:
-            prompt (str or PromptList): A string or PromptDict.
+            prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             gen_config (EngineGenerationConfig, optional): Generation

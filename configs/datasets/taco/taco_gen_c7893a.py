@@ -19,7 +19,7 @@ TACO_datasets = [
     dict(
         type=TACODataset,
         abbr="TACO",
-        path='BAAI/TACO',
+        path='./data/BAAI-TACO',
         num_repeats = 1,
         reader_cfg=TACO_reader_cfg,
         infer_cfg=TACO_infer_cfg,

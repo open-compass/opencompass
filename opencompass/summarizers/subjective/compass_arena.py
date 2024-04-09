@@ -229,4 +229,5 @@ class CompassArenaSummarizer:
         for fout in fout_list:
             with open(fout, 'r') as f:
                 x = from_csv(f)
+            print(fout)
             print(x)
