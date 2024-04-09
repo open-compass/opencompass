@@ -210,6 +210,8 @@ def make_mcq_gen_config(meta):
         input_columns=meta['input_columns'],
         output_column=meta['output_column'],
     )
+    if 'test_range' in meta:
+        reader_cfg['test_range'] = meta['test_range']
     infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -255,6 +257,8 @@ def make_circular_mcq_gen_config(meta):
         input_columns=meta['input_columns'],
         output_column=meta['output_column'],
     )
+    if 'test_range' in meta:
+        reader_cfg['test_range'] = meta['test_range']
     infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -304,6 +308,8 @@ def make_qa_gen_config(meta):
         input_columns=meta['input_columns'],
         output_column=meta['output_column'],
     )
+    if 'test_range' in meta:
+        reader_cfg['test_range'] = meta['test_range']
     infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -353,6 +359,8 @@ def make_mcq_ppl_config(meta):
         input_columns=meta['input_columns'],
         output_column=meta['output_column'],
     )
+    if 'test_range' in meta:
+        reader_cfg['test_range'] = meta['test_range']
     infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -399,6 +407,8 @@ def make_circular_mcq_ppl_config(meta):
         input_columns=meta['input_columns'],
         output_column=meta['output_column'],
     )
+    if 'test_range' in meta:
+        reader_cfg['test_range'] = meta['test_range']
     infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,

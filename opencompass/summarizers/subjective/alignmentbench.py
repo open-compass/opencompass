@@ -218,8 +218,9 @@ def get_dimension_results(judged_answers, references, fout, fout_flag, model):
 
     dimension_avg_ratings = defaultdict(float)
     for dimension, total_score in dimension_ratings.items():
-        dimension_avg_ratings[
-            dimension] = total_score / dimension_counts[dimension]
+        s = total_score / dimension_counts[dimension]
+        s = round(s, 2)
+        dimension_avg_ratings[dimension] = s
 
     scores = {model: dimension_avg_ratings}
     rows = list(scores.keys())
@@ -249,8 +250,9 @@ def get_capability_results(judged_answers,
     capability_avg_ratings = defaultdict(float)
 
     for capability, total_score in capability_ratings.items():
-        capability_avg_ratings[
-            capability] = total_score / capability_counts[capability]
+        s = total_score / capability_counts[capability]
+        s = round(s, 2)
+        capability_avg_ratings[capability] = s
 
     temp_list = []
     total_column_num = 2
@@ -260,11 +262,14 @@ def get_capability_results(judged_answers,
             np.mean(capability_avg_ratings[cat])
             for cat in categories[category]
         ])
+        capability_avg_ratings[category + '总分'] = round(
+            capability_avg_ratings[category + '总分'], 2)
         temp_list.append(category + '总分')
     capability_avg_ratings['总分'] = 0
     for temp in temp_list:
         capability_avg_ratings['总分'] += capability_avg_ratings[temp]
     capability_avg_ratings['总分'] /= len(temp_list)
+    capability_avg_ratings['总分'] = round(capability_avg_ratings['总分'], 2)
     scores = {model: capability_avg_ratings}
 
     with open(fout, 'a+', newline='') as csvfile:
@@ -365,8 +370,10 @@ class AlignmentBenchSummarizer:
                     print(subdir_path + ' is not exist! please check!')
         if self.judge_type == 'general':
             with open(fout, 'r') as f:
-                x = from_csv(f)
+                x = from_csv(f, delimiter=',')
             print(x)
+            print(fout)
         with open(fout2, 'r') as f:
-            x = from_csv(f)
+            x = from_csv(f, delimiter=',')
         print(x)
+        print(fout2)

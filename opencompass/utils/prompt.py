@@ -73,7 +73,7 @@ class PromptList(list):
 
         Args:
             src (str): The string to be replaced.
-            dst (str or PromptList): The string or PromptList to replace with.
+            dst (PromptType): The string or PromptList to replace with.
 
         Returns:
             PromptList: A new PromptList with 'src' replaced by 'dst'.
@@ -98,7 +98,7 @@ class PromptList(list):
 
         Args:
             src (str): The string to be replaced.
-            dst (str or PromptList): The string or PromptList to replace with.
+            dst (PromptType): The string or PromptList to replace with.
 
         Returns:
             PromptList: A new PromptList with 'src' replaced by 'dst'.
@@ -139,7 +139,7 @@ class PromptList(list):
         """Adds a string or another PromptList to this PromptList.
 
         Args:
-            other (str or PromptList): The string or PromptList to be added.
+            other (PromptType): The string or PromptList to be added.
 
         Returns:
             PromptList: A new PromptList that is the result of the addition.
@@ -156,7 +156,7 @@ class PromptList(list):
         '+' operator.
 
         Args:
-            other (str or PromptList): The string or PromptList to be added.
+            other (PromptType): The string or PromptList to be added.
 
         Returns:
             PromptList: A new PromptList that is the result of the addition.
@@ -172,7 +172,7 @@ class PromptList(list):
         """Implements in-place addition for the PromptList.
 
         Args:
-            other (str or PromptList): The string or PromptList to be added.
+            other (PromptType): The string or PromptList to be added.
 
         Returns:
             PromptList: The updated PromptList.

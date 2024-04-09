@@ -120,7 +120,7 @@ class LMEvaluator:
               meta: Optional[bool] = False,
               infer_order: Optional[str] = 'random') -> Dict:
         dup_indices = []
-        if type(predictions) == list:
+        if isinstance(predictions, list):
             """Apply to multi-model comparison."""
             references = [{} for _ in range(len(predictions[0]['model_preds']))
                           ] if references is None else references
@@ -137,7 +137,7 @@ class LMEvaluator:
                     if len(set(check)) == 1:
                         dup_indices.append(i)
 
-        elif type(predictions) == dict:
+        elif isinstance(predictions, dict):
             """Apply to single-model scoring."""
             references = [{} for _ in range(len(predictions[0]['model_preds']))
                           ] if references is None else references

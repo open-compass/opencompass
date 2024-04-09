@@ -60,7 +60,7 @@ mathbench_sets = {
     'high': ['single_choice_cn', 'single_choice_en'],
     'middle': ['single_choice_cn', 'single_choice_en'],
     'primary': ['cloze_cn', 'cloze_en'],
-    'calculate': ['cloze_en'],
+    'arithmetic': ['cloze_en'],
     # Theory part
     'college_knowledge': ['single_choice_cn','single_choice_en'],
     'high_knowledge': ['single_choice_cn','single_choice_en'],
@@ -102,7 +102,7 @@ for _split in list(mathbench_sets.keys()):
             dict(
                 abbr="mathbench-" + _split + '-' + _name,
                 type=MathBenchDataset,
-                path=f"./data/mathbench_v1_ori/{_split}",
+                path=f"./data/mathbench_v1/{_split}",
                 name=_name,
                 with_circular=with_circular_eval,
                 reader_cfg=dict(

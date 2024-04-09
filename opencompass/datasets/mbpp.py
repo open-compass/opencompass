@@ -244,6 +244,7 @@ class MBPPEvaluator(BaseEvaluator):
                 if not isinstance(preds, list):
                     preds = [preds]
                 for pred in preds:
+                    pred = self._process_answer(pred)
                     mbpp_preds.append({'task_id': refer, 'solution': pred})
             with tempfile.TemporaryDirectory() as tmp_dir:
                 out_dir = osp.join(tmp_dir, 'mbpp_eval.jsonl')
