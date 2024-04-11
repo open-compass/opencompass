@@ -28,7 +28,7 @@ chembench_datasets = []
 for _name in chembench_all_sets:
     # _hint = f'There is a single choice question about {_name.replace("_", " ")}. Answer the question by replying A, B, C or D.'
     _hint = f'There is a single choice question about chemistry. Answer the question by replying A, B, C or D.'
-    
+
     chembench_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
@@ -65,7 +65,7 @@ for _name in chembench_all_sets:
 
     chembench_datasets.append(
         dict(
-            abbr=f"molbench_{_name}",
+            abbr=f"ChemBench_{_name}",
             type=ChemBenchDataset,
             path="./data/ChemBench/",
             name=_name,
