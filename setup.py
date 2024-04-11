@@ -115,7 +115,7 @@ def do_setup():
         cmdclass={'download_nltk': DownloadNLTK},
         setup_requires=['nltk==3.8'],
         python_requires='>=3.8.0',
-        #   install_requires=parse_requirements('requirements/runtime.txt'),
+        install_requires=parse_requirements('requirements/runtime.txt'),
         license='Apache License 2.0',
         packages=find_packages(exclude=[
             'test*',
