@@ -88,6 +88,7 @@ class LMEvaluator:
         judge_cfg: ConfigDict,
         output_path: str,
         meta_review_prompt_template: Optional[ConfigDict] = None,
+        wrap_all_predictions: Optional[bool] = False,
         dataset_cfg: Optional[ConfigDict] = None,
         postprocessor: ConfigDict = dict(type=first_number_postprocess)
     ) -> None:
@@ -112,6 +113,7 @@ class LMEvaluator:
         self.postprocessor = get_type_from_cfg(postprocessor)
         self.logger = get_logger()
         self.dataset_cfg = dataset_cfg
+        self.wrap_all_predictions = wrap_all_predictions
 
     def score(self,
               predictions,
@@ -171,12 +173,17 @@ class LMEvaluator:
         elif isinstance(
                 predictions[0][0], list
         ):  #multi round for format like [[[{'round':1, 'user':'', 'assistant':''}, {'round':2, 'user':'', 'assistant':''}], [{'round':1, 'user':'', 'assistant':''}, {'round':2, 'user':'', 'assistant':''}]]]
-            for i in range(len(predictions)):
-                multiround_predictions = extract_dicts(predictions[i])
-                for j in range(len(multiround_predictions)):
-                    key = 'prediction' if i == 0 else f'prediction{i}'
-                    key += '_r' + str(j + 1)
-                    pred_dict[key] = multiround_predictions[j]
+            if self.wrap_all_predictions:
+                for i in range(len(predictions)):
+                    key = 'prediction' if i == 0 else f'prediction{i + 1}'
+                    pred_dict[key] = predictions[i]
+            else:
+                for i in range(len(predictions)):
+                    multiround_predictions = extract_dicts(predictions[i])
+                    for j in range(len(multiround_predictions)):
+                        key = 'prediction' if i == 0 else f'prediction{i}'
+                        key += '_r' + str(j + 1)
+                        pred_dict[key] = multiround_predictions[j]
             if judgements:
                 raise NotImplementedError(
                     'Not applied meta-reivew judge on multi-round dataset')
