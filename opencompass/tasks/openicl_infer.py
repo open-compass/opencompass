@@ -50,22 +50,26 @@ class OpenICLInferTask(BaseTask):
             for key in backend_keys)
         if self.num_gpus > 0 and not use_backend:
             port = random.randint(12000, 32000)
-            command = (f'torchrun --master_port={port} '
-                       f'--nproc_per_node {self.num_procs} '
-                       f'{script_path} {cfg_path}')
+            command = (f"torchrun --master_port={port} "
+                       f"--nproc_per_node {self.num_procs} "
+                       f"{script_path} {cfg_path}")
         else:
             python = 'python3' if which('python3') else 'python'
-            command = f'{python} {script_path} {cfg_path}'
+            command = f"{python} {script_path} {cfg_path}"
 
         return template.format(task_cmd=command)
 
-    def run(self):
-        self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
+    def run(self, cur_model=None):
+        self.logger.info(f"Task {task_abbr_from_cfg(self.cfg)}")
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
             self.min_out_len = model_cfg.get('min_out_len', None)
-            self.model = build_model_from_cfg(model_cfg)
+            if cur_model:
+                self.model = cur_model
+            else:
+                self.model = build_model_from_cfg(model_cfg)
+                cur_model = self.model
 
             for dataset_cfg in dataset_cfgs:
                 self.model_cfg = model_cfg
@@ -77,18 +81,21 @@ class OpenICLInferTask(BaseTask):
                     'datasets': [[self.dataset_cfg]],
                 }
                 out_path = get_infer_output_path(
-                    self.model_cfg, self.dataset_cfg,
-                    osp.join(self.work_dir, 'predictions'))
+                    self.model_cfg,
+                    self.dataset_cfg,
+                    osp.join(self.work_dir, 'predictions'),
+                )
                 if osp.exists(out_path):
                     continue
                 self._inference()
 
     def _inference(self):
         self.logger.info(
-            f'Start inferencing {task_abbr_from_cfg(self.sub_cfg)}')
+            f"Start inferencing {task_abbr_from_cfg(self.sub_cfg)}")
 
-        assert hasattr(self.infer_cfg, 'ice_template') or hasattr(self.infer_cfg, 'prompt_template'), \
-            'Both ice_template and prompt_template cannot be None simultaneously.'  # noqa: E501
+        assert hasattr(self.infer_cfg, 'ice_template') or hasattr(
+            self.infer_cfg, 'prompt_template'
+        ), 'Both ice_template and prompt_template cannot be None simultaneously.'  # noqa: E501
         if hasattr(self.infer_cfg, 'ice_template'):
             ice_template = ICL_PROMPT_TEMPLATES.build(
                 self.infer_cfg['ice_template'])
@@ -118,23 +125,29 @@ class OpenICLInferTask(BaseTask):
         out_dir, out_file = osp.split(out_path)
         mkdir_or_exist(out_dir)
 
-        if hasattr(self.infer_cfg, 'prompt_template') and \
-                hasattr(self.infer_cfg, 'ice_template'):
-            inferencer.inference(retriever,
-                                 ice_template=ice_template,
-                                 prompt_template=prompt_template,
-                                 output_json_filepath=out_dir,
-                                 output_json_filename=out_file)
+        if hasattr(self.infer_cfg, 'prompt_template') and hasattr(
+                self.infer_cfg, 'ice_template'):
+            inferencer.inference(
+                retriever,
+                ice_template=ice_template,
+                prompt_template=prompt_template,
+                output_json_filepath=out_dir,
+                output_json_filename=out_file,
+            )
         elif hasattr(self.infer_cfg, 'prompt_template'):
-            inferencer.inference(retriever,
-                                 prompt_template=prompt_template,
-                                 output_json_filepath=out_dir,
-                                 output_json_filename=out_file)
+            inferencer.inference(
+                retriever,
+                prompt_template=prompt_template,
+                output_json_filepath=out_dir,
+                output_json_filename=out_file,
+            )
         else:
-            inferencer.inference(retriever,
-                                 ice_template=ice_template,
-                                 output_json_filepath=out_dir,
-                                 output_json_filename=out_file)
+            inferencer.inference(
+                retriever,
+                ice_template=ice_template,
+                output_json_filepath=out_dir,
+                output_json_filename=out_file,
+            )
 
     def _set_default_value(self, cfg: ConfigDict, key: str, value: Any):
         if key not in cfg:
@@ -155,4 +168,4 @@ if __name__ == '__main__':
     inferencer = OpenICLInferTask(cfg)
     inferencer.run()
     end_time = time.time()
-    get_logger().info(f'time elapsed: {end_time - start_time:.2f}s')
+    get_logger().info(f"time elapsed: {end_time - start_time:.2f}s")

@@ -46,12 +46,14 @@ class LocalRunner(BaseRunner):
         lark_bot_url (str): Lark bot url.
     """
 
-    def __init__(self,
-                 task: ConfigDict,
-                 max_num_workers: int = 16,
-                 debug: bool = False,
-                 max_workers_per_gpu: int = 1,
-                 lark_bot_url: str = None):
+    def __init__(
+        self,
+        task: ConfigDict,
+        max_num_workers: int = 16,
+        debug: bool = False,
+        max_workers_per_gpu: int = 1,
+        lark_bot_url: str = None,
+    ):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.max_num_workers = max_num_workers
         self.max_workers_per_gpu = max_workers_per_gpu
@@ -69,6 +71,7 @@ class LocalRunner(BaseRunner):
 
         status = []
         import torch
+
         if 'CUDA_VISIBLE_DEVICES' in os.environ:
             all_gpu_ids = [
                 int(i) for i in re.findall(r'(?<!-)\d+',
@@ -85,7 +88,7 @@ class LocalRunner(BaseRunner):
                 assert len(all_gpu_ids) >= num_gpus
                 # get cmd
                 mmengine.mkdir_or_exist('tmp/')
-                param_file = f'tmp/{os.getpid()}_params.py'
+                param_file = f"tmp/{os.getpid()}_params.py"
                 try:
                     task.cfg.dump(param_file)
                     # if use torchrun, restrict it behaves the same as non
@@ -93,14 +96,25 @@ class LocalRunner(BaseRunner):
                     # available resources which might cause inconsistent
                     # behavior.
                     if len(all_gpu_ids) > num_gpus and num_gpus > 0:
-                        get_logger().warning(f'Only use {num_gpus} GPUs for '
-                                             f'total {len(all_gpu_ids)} '
+                        get_logger().warning(f"Only use {num_gpus} GPUs for "
+                                             f"total {len(all_gpu_ids)} "
                                              'available GPUs in debug mode.')
                     tmpl = get_command_template(all_gpu_ids[:num_gpus])
                     cmd = task.get_command(cfg_path=param_file, template=tmpl)
                     # run in subprocess if starts with torchrun etc.
                     if 'python3 ' in cmd or 'python ' in cmd:
-                        task.run()
+                        # If it is an infer type task do not reload if
+                        # the current model has already been loaded.
+                        if 'infer' in self.task_cfg.type.lower():
+                            # If a model instance already exists,
+                            # do not reload it.
+                            if hasattr(self, 'cur_model'):
+                                task.run(self.cur_model)
+                            else:
+                                task.run()
+                            self.cur_model = task.model
+                        else:
+                            task.run()
                     else:
                         subprocess.run(cmd, shell=True, text=True)
                 finally:
@@ -132,10 +146,10 @@ class LocalRunner(BaseRunner):
                     time.sleep(1)
 
                 if num_gpus > 0:
-                    tqdm.write(f'launch {task.name} on GPU ' +
+                    tqdm.write(f"launch {task.name} on GPU " +
                                ','.join(map(str, gpu_ids)))
                 else:
-                    tqdm.write(f'launch {task.name} on CPU ')
+                    tqdm.write(f"launch {task.name} on CPU ")
 
                 res = self._launch(task, gpu_ids, index)
                 pbar.update()
@@ -165,7 +179,7 @@ class LocalRunner(BaseRunner):
 
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_{index}_params.py'
+        param_file = f"tmp/{os.getpid()}_{index}_params.py"
         try:
             task.cfg.dump(param_file)
             tmpl = get_command_template(gpu_ids)
@@ -175,7 +189,7 @@ class LocalRunner(BaseRunner):
             cmd = get_cmd()
 
             logger = get_logger()
-            logger.debug(f'Running command: {cmd}')
+            logger.debug(f"Running command: {cmd}")
 
             # Run command
             out_path = task.get_log_path(file_extension='out')
@@ -189,7 +203,7 @@ class LocalRunner(BaseRunner):
                                     stderr=stdout)
 
             if result.returncode != 0:
-                logger.error(f'task {task_name} fail, see\n{out_path}')
+                logger.error(f"task {task_name} fail, see\n{out_path}")
         finally:
             # Clean up
             os.remove(param_file)
