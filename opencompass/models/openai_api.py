@@ -240,7 +240,7 @@ class OpenAI(BaseAPIModel):
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
                 continue
-            self.logger.error(str(response))
+            self.logger.debug(str(response))
             try:
                 if self.logprobs:
                     return response['choices']
