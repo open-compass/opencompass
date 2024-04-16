@@ -3,7 +3,6 @@
   <br />
   <br />
 
-
 [![][github-release-shield]][github-release-link]
 [![][github-releasedate-shield]][github-releasedate-link]
 [![][github-contributors-shield]][github-contributors-link]<br>
@@ -31,7 +30,6 @@
     👋 加入我们的 <a href="https://discord.gg/KKwfEbFj7U" target="_blank">Discord</a> 和 <a href="https://r.vansin.top/?r=opencompass" target="_blank">微信社区</a>
 </p>
 
-
 > \[!IMPORTANT\]
 >
 > **收藏项目**，你将能第一时间获取 OpenCompass 的最新动态～⭐️
@@ -53,7 +51,6 @@
     <img width="100%" src="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&type=Date">
   </picture>
 </details>
-
 
 ## 🧭	欢迎
 
@@ -534,7 +531,6 @@ python run.py --datasets ceval_ppl mmlu_ppl \
   </table>
 </a>
 
-
 ## 🤝 致谢
 
 该项目部分的代码引用并修改自 [OpenICL](https://github.com/Shark-NLP/OpenICL)。
@@ -553,7 +549,6 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 ```
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
-
 
 [github-contributors-link]: https://github.com/open-compass/opencompass/graphs/contributors
 [github-contributors-shield]: https://img.shields.io/github/contributors/open-compass/opencompass?color=c4f042&labelColor=black&style=flat-square
