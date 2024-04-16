@@ -3,8 +3,14 @@
   <br />
   <br />
 
-[![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/zh_CN)
-[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/open-compass/opencompass/blob/main/LICENSE)
+
+[![][github-release-shield]][github-release-link]
+[![][github-releasedate-shield]][github-releasedate-link]
+[![][github-contributors-shield]][github-contributors-link]<br>
+[![][github-forks-shield]][github-forks-link]
+[![][github-stars-shield]][github-stars-link]
+[![][github-issues-shield]][github-issues-link]
+[![][github-license-shield]][github-license-link]
 
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
@@ -17,11 +23,18 @@
 
 [English](/README.md) | 简体中文
 
+[![][github-trending-shield]][github-trending-url]
+
 </div>
 
 <p align="center">
     👋 加入我们的 <a href="https://discord.gg/KKwfEbFj7U" target="_blank">Discord</a> 和 <a href="https://r.vansin.top/?r=opencompass" target="_blank">微信社区</a>
 </p>
+
+
+> \[!IMPORTANT\]
+>
+> **收藏项目**，你将能第一时间获取 OpenCompass 的最新动态～⭐️
 
 ## 📣 OpenCompass 2.0
 
@@ -32,6 +45,15 @@
 **CompassHub** 创新性地推出了一个基准测试资源导航平台，其设计初衷旨在简化和加快研究人员及行业从业者在多样化的基准测试库中进行搜索与利用的过程。为了让更多独具特色的基准测试成果得以在业内广泛传播和应用，我们热忱欢迎各位将自定义的基准数据贡献至CompassHub平台。只需轻点鼠标，通过访问[这里](https://hub.opencompass.org.cn/dataset-submit)，即可启动提交流程。
 
 **CompassKit** 是一系列专为大型语言模型和大型视觉-语言模型打造的强大评估工具合集，它所提供的全面评测工具集能够有效地对这些复杂模型的功能性能进行精准测量和科学评估。在此，我们诚挚邀请您在学术研究或产品研发过程中积极尝试运用我们的工具包，以助您取得更加丰硕的研究成果和产品优化效果。
+
+<details>
+  <summary><kbd>Star History</kbd></summary>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&theme=dark&type=Date">
+    <img width="100%" src="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&type=Date">
+  </picture>
+</details>
+
 
 ## 🧭	欢迎
 
@@ -502,6 +524,17 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 
 我们感谢所有的贡献者为改进和提升 OpenCompass 所作出的努力。请参考[贡献指南](https://opencompass.readthedocs.io/zh_CN/latest/notes/contribution_guide.html)来了解参与项目贡献的相关指引。
 
+<a href="https://github.com/open-compass/opencompass/graphs/contributors" target="_blank">
+  <table>
+    <tr>
+      <th colspan="2">
+        <br><img src="https://contrib.rocks/image?repo=open-compass/opencompass"><br><br>
+      </th>
+    </tr>
+  </table>
+</a>
+
+
 ## 🤝 致谢
 
 该项目部分的代码引用并修改自 [OpenICL](https://github.com/Shark-NLP/OpenICL)。
@@ -520,3 +553,21 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 ```
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
+
+
+[github-contributors-link]: https://github.com/open-compass/opencompass/graphs/contributors
+[github-contributors-shield]: https://img.shields.io/github/contributors/open-compass/opencompass?color=c4f042&labelColor=black&style=flat-square
+[github-forks-link]: https://github.com/open-compass/opencompass/network/members
+[github-forks-shield]: https://img.shields.io/github/forks/open-compass/opencompass?color=8ae8ff&labelColor=black&style=flat-square
+[github-issues-link]: https://github.com/open-compass/opencompass/issues
+[github-issues-shield]: https://img.shields.io/github/issues/open-compass/opencompass?color=ff80eb&labelColor=black&style=flat-square
+[github-license-link]: https://github.com/open-compass/opencompass/blob/main/LICENSE
+[github-license-shield]: https://img.shields.io/github/license/open-compass/opencompass?color=white&labelColor=black&style=flat-square
+[github-release-link]: https://github.com/open-compass/opencompass/releases
+[github-release-shield]: https://img.shields.io/github/v/release/open-compass/opencompass?color=369eff&labelColor=black&logo=github&style=flat-square
+[github-releasedate-link]: https://github.com/open-compass/opencompass/releases
+[github-releasedate-shield]: https://img.shields.io/github/release-date/open-compass/opencompass?labelColor=black&style=flat-square
+[github-stars-link]: https://github.com/open-compass/opencompass/stargazers
+[github-stars-shield]: https://img.shields.io/github/stars/open-compass/opencompass?color=ffcb47&labelColor=black&style=flat-square
+[github-trending-shield]: https://trendshift.io/api/badge/repositories/6630
+[github-trending-url]: https://trendshift.io/repositories/6630
