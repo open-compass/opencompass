@@ -56,13 +56,12 @@ class LmdeployTisModel(BaseModel):
 
     is_api: bool = True
 
-    def __init__(
-        self,
-        path: str,
-        tis_addr: str = '0.0.0.0:33337',
-        max_seq_len: int = 2048,
-        meta_template: Optional[Dict] = None,
-    ):
+    def __init__(self,
+                 path: str,
+                 tis_addr: str = '0.0.0.0:33337',
+                 max_seq_len: int = 2048,
+                 meta_template: Optional[Dict] = None,
+                 end_str: Optional[str] = None):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
@@ -75,6 +74,7 @@ class LmdeployTisModel(BaseModel):
             self.eos_token_id = meta_template['eos_token_id']
         self.tis_addr = tis_addr
         self.tokenizer = Tokenizer(path)
+        self.end_str = end_str
 
     def generate(
         self,
@@ -102,7 +102,8 @@ class LmdeployTisModel(BaseModel):
             results = list(
                 executor.map(self._generate, inputs,
                              [max_out_len] * len(inputs),
-                             [temperature] * len(inputs)))
+                             [temperature] * len(inputs),
+                             [self.end_str] * len(inputs)))
         return results
 
     def wait(self):
@@ -160,8 +161,11 @@ class LmdeployTisModel(BaseModel):
             else:
                 return text
 
-    def _generate(self, prompt: str or PromptList, max_out_len: int,
-                  temperature: float) -> str:
+    def _generate(self,
+                  prompt: str or PromptList,
+                  max_out_len: int,
+                  temperature: float,
+                  end_str: Optional[str] = None) -> str:
         """Generate results given a list of inputs.
 
         Args:
@@ -191,5 +195,6 @@ class LmdeployTisModel(BaseModel):
                                  res_que=res_que)
         text = self._process_result(res_que)
         response = valid_str(text)
-        response = response.replace('<eoa>', '')
+        if end_str:
+            response = response.split(end_str)[0]
         return response

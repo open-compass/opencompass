@@ -19,10 +19,11 @@ datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 meta_template = dict(
     round=[
-        dict(role='HUMAN', begin='<|User|>:', end='\n'),
-        dict(role='BOT', begin='<|Bot|>:', end='<eoa>\n', generate=True),
+        dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
+        dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
     ],
-    eos_token_id=103028)
+    eos_token_id=92542
+)
 
 models = [
     dict(
@@ -35,5 +36,6 @@ models = [
         batch_size=8,
         meta_template=meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
+        end_str='<|im_end|>',
     )
 ]
