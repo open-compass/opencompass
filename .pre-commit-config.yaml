@@ -13,12 +13,12 @@ exclude: |
     )
 repos:
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
+    rev: 5.0.4
     hooks:
       - id: flake8
         exclude: configs/
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 5.11.5
     hooks:
       - id: isort
         exclude: configs/
@@ -28,7 +28,7 @@ repos:
       - id: yapf
         exclude: configs/
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.2.1
     hooks:
       - id: codespell
         exclude: |
@@ -37,7 +37,7 @@ repos:
                 configs/
             )
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v4.3.0
     hooks:
       - id: trailing-whitespace
         exclude: |
@@ -65,7 +65,7 @@ repos:
       - id: mixed-line-ending
         args: ["--fix=lf"]
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17
+    rev: 0.7.9
     hooks:
       - id: mdformat
         args: ["--number", "--table-width", "200"]
@@ -75,7 +75,7 @@ repos:
           - linkify-it-py
         exclude: configs/
   - repo: https://github.com/myint/docformatter
-    rev: v1.7.5
+    rev: v1.3.1
     hooks:
       - id: docformatter
         args: ["--in-place", "--wrap-descriptions", "79"]

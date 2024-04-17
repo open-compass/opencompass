@@ -50,17 +50,17 @@ class OpenICLInferTask(BaseTask):
             for key in backend_keys)
         if self.num_gpus > 0 and not use_backend:
             port = random.randint(12000, 32000)
-            command = (f"torchrun --master_port={port} "
-                       f"--nproc_per_node {self.num_procs} "
-                       f"{script_path} {cfg_path}")
+            command = (f'torchrun --master_port={port} '
+                       f'--nproc_per_node {self.num_procs} '
+                       f'{script_path} {cfg_path}')
         else:
             python = 'python3' if which('python3') else 'python'
-            command = f"{python} {script_path} {cfg_path}"
+            command = f'{python} {script_path} {cfg_path}'
 
         return template.format(task_cmd=command)
 
     def run(self, cur_model=None):
-        self.logger.info(f"Task {task_abbr_from_cfg(self.cfg)}")
+        self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
@@ -91,7 +91,7 @@ class OpenICLInferTask(BaseTask):
 
     def _inference(self):
         self.logger.info(
-            f"Start inferencing {task_abbr_from_cfg(self.sub_cfg)}")
+            f'Start inferencing {task_abbr_from_cfg(self.sub_cfg)}')
 
         assert hasattr(self.infer_cfg, 'ice_template') or hasattr(
             self.infer_cfg, 'prompt_template'
@@ -168,4 +168,4 @@ if __name__ == '__main__':
     inferencer = OpenICLInferTask(cfg)
     inferencer.run()
     end_time = time.time()
-    get_logger().info(f"time elapsed: {end_time - start_time:.2f}s")
+    get_logger().info(f'time elapsed: {end_time - start_time:.2f}s')
