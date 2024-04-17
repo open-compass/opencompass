@@ -49,6 +49,12 @@ class VLLM(BaseModel):
         model_kwargs = DEFAULT_MODEL_KWARGS.copy()
         if add_model_kwargs is not None:
             model_kwargs.update(add_model_kwargs)
+        import ray
+
+        if ray.is_initialized():
+            self.logger.info('shutdown ray instance to avoid '
+                             '"Calling ray.init() again" error.')
+            ray.shutdown()
         self.model = LLM(path, **model_kwargs)
 
     def generate(self, inputs: List[str], max_out_len: int,

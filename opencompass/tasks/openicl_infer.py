@@ -59,13 +59,17 @@ class OpenICLInferTask(BaseTask):
 
         return template.format(task_cmd=command)
 
-    def run(self):
+    def run(self, cur_model=None):
         self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
             self.min_out_len = model_cfg.get('min_out_len', None)
-            self.model = build_model_from_cfg(model_cfg)
+            if cur_model:
+                self.model = cur_model
+            else:
+                self.model = build_model_from_cfg(model_cfg)
+                cur_model = self.model
 
             for dataset_cfg in dataset_cfgs:
                 self.model_cfg = model_cfg
