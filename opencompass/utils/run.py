@@ -5,6 +5,7 @@ import tabulate
 from mmengine.config import Config
 
 from opencompass.datasets.custom import make_custom_dataset_config
+from opencompass.models import VLLM, HuggingFaceCausalLM, TurboMindModel
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
@@ -72,6 +73,10 @@ def get_config_from_arg(args) -> Config:
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
+        # set infer accelerator if needed
+        if args.accelerator in ['vllm', 'lmdeploy']:
+            config['models'] = change_accelerator(config['models'],
+                                                  args.accelerator)
         return config
     # parse dataset args
     if not args.datasets and not args.custom_dataset_path:
@@ -137,6 +142,9 @@ def get_config_from_arg(args) -> Config:
                      pad_token_id=args.pad_token_id,
                      run_cfg=dict(num_gpus=args.num_gpus))
         models.append(model)
+    # set infer accelerator if needed
+    if args.accelerator in ['vllm', 'lmdeploy']:
+        models = change_accelerator(models, args.accelerator)
     # parse summarizer args
     summarizer_arg = args.summarizer if args.summarizer is not None \
         else 'example'
@@ -162,6 +170,93 @@ def get_config_from_arg(args) -> Config:
     return Config(dict(models=models, datasets=datasets,
                        summarizer=summarizer),
                   format_python_code=False)
+
+
+def change_accelerator(models, accelerator):
+    models = models.copy()
+    model_accels = []
+    for model in models:
+        get_logger().info(f'Transforming {model["abbr"]} to {accelerator}')
+        # change HuggingFace model to VLLM or TurboMindModel
+        if model['type'] is HuggingFaceCausalLM:
+            gen_args = dict()
+            if model.get('generation_kwargs') is not None:
+                generation_kwargs = model['generation_kwargs'].copy()
+                gen_args['temperature'] = 0.001 if generation_kwargs.get(
+                    'temperature'
+                ) is None else generation_kwargs['temperature']
+                gen_args['top_k'] = 1 if generation_kwargs.get(
+                    'top_k') is None else generation_kwargs['top_k']
+                gen_args['top_p'] = 0.9 if generation_kwargs.get(
+                    'top_p') is None else generation_kwargs['top_p']
+                gen_args['stop_token_ids'] = None if generation_kwargs.get(
+                    'eos_token_id'
+                ) is None else generation_kwargs['eos_token_id']
+                generation_kwargs[
+                    'stop_token_ids'] = None if generation_kwargs.get(
+                        'eos_token_id'
+                    ) is None else generation_kwargs['eos_token_id']
+                generation_kwargs.pop('eos_token_id')
+            else:
+                # if generation_kwargs is not provided, set default values
+                generation_kwargs = dict()
+                gen_args['temperature'] = 0.0
+                gen_args['top_k'] = 1
+                gen_args['top_p'] = 0.9
+                gen_args['stop_token_ids'] = None
+
+            if accelerator == 'lmdeploy':
+                get_logger().info(
+                    f'Transforming {model["abbr"]} to {accelerator}')
+                model = dict(
+                    type=  # noqa E251
+                    f'{TurboMindModel.__module__}.{TurboMindModel.__name__}',
+                    abbr=model['abbr'].replace('hf', 'lmdeploy')
+                    if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
+                    path=model['path'],
+                    engine_config=dict(session_len=model['max_seq_len'],
+                                       max_batch_size=model['batch_size'],
+                                       tp=model['run_cfg']['num_gpus']),
+                    gen_config=dict(top_k=gen_args['top_k'],
+                                    temperature=gen_args['temperature'],
+                                    top_p=gen_args['top_p'],
+                                    max_new_tokens=model['max_out_len'],
+                                    stop_words=gen_args['stop_token_ids']),
+                    max_out_len=model['max_out_len'],
+                    max_seq_len=model['max_seq_len'],
+                    batch_size=model['batch_size'],
+                    concurrency=model['batch_size'],
+                    run_cfg=model['run_cfg'],
+                )
+                for item in ['meta_template']:
+                    if model.get(item) is not None:
+                        model.update(item, model[item])
+            elif accelerator == 'vllm':
+                get_logger().info(
+                    f'Transforming {model["abbr"]} to {accelerator}')
+
+                model = dict(
+                    type=f'{VLLM.__module__}.{VLLM.__name__}',
+                    abbr=model['abbr'].replace('hf', 'vllm')
+                    if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
+                    path=model['path'],
+                    model_kwargs=dict(
+                        tensor_parallel_size=model['run_cfg']['num_gpus']),
+                    max_out_len=model['max_out_len'],
+                    max_seq_len=model['max_seq_len'],
+                    batch_size=model['batch_size'],
+                    generation_kwargs=generation_kwargs,
+                    run_cfg=model['run_cfg'],
+                )
+                for item in ['meta_template', 'end_str']:
+                    if model.get(item) is not None:
+                        model.update(item, model[item])
+                generation_kwargs.update(
+                    dict(temperature=gen_args['temperature']))
+            else:
+                raise ValueError(f'Unsupported accelerator {accelerator}')
+        model_accels.append(model)
+    return model_accels
 
 
 def exec_mm_infer_runner(tasks, args, cfg):

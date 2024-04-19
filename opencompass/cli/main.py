@@ -56,6 +56,12 @@ def parse_args():
                         'to run',
                         action='store_true',
                         default=False)
+    parser.add_argument(
+        '--accelerator',
+        help='Infer accelerator, support vllm and lmdeploy now.',
+        choices=['vllm', 'lmdeploy', 'hg'],
+        default='hg',
+        type=str)
     parser.add_argument('-m',
                         '--mode',
                         help='Running mode. You can choose "infer" if you '

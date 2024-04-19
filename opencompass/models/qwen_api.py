@@ -161,7 +161,7 @@ class Qwen(BaseAPIModel):
                     time.sleep(1)
                     continue
             if response.status_code == 429:
-                print('Rate limited')
+                print(response)
                 time.sleep(2)
                 continue
             if response.status_code == 400:

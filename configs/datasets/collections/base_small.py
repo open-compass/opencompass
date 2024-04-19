@@ -11,7 +11,7 @@ with read_base():
     from ..FewCLUE_cluewsc.FewCLUE_cluewsc_ppl_868415 import cluewsc_datasets
     from ..FewCLUE_eprstmt.FewCLUE_eprstmt_ppl_f1e631 import eprstmt_datasets
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from ..mbpp.mbpp_gen_1e1056 import mbpp_datasets
+    from ..mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
     from ..lambada.lambada_gen_217e11 import lambada_datasets
     from ..storycloze.storycloze_ppl_496661 import storycloze_datasets
     from ..SuperGLUE_AX_b.SuperGLUE_AX_b_ppl_6db806 import AX_b_datasets

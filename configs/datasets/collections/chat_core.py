@@ -15,6 +15,6 @@ with read_base():
     from ..math.math_evaluatorv2_gen_cecb31 import math_datasets
     from ..TheoremQA.TheoremQA_post_v2_gen_ef26ca import TheoremQA_datasets
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from ..mbpp.sanitized_mbpp_gen_1e1056 import sanitized_mbpp_datasets
+    from ..mbpp.deprecated_sanitized_mbpp_gen_1e1056 import sanitized_mbpp_datasets
 
 datasets = sum((v for k, v in locals().items() if k.endswith("_datasets")), [])
