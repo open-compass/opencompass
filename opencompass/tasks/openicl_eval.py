@@ -1,3 +1,6 @@
+import os, sys
+sys.path.append(os.getcwd())
+
 import argparse
 import copy
 import fnmatch
@@ -76,7 +79,8 @@ class OpenICLEvalTask(BaseTask):
 
     def get_command(self, cfg_path, template):
         script_path = __file__
-        python = 'python3' if which('python3') else 'python'
+        import sys
+        python = sys.executable
         command = f'{python} {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
