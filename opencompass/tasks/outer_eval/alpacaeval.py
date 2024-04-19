@@ -1,6 +1,7 @@
 # flake8: noqa: E501
 import copy
 import json
+import os
 import os.path as osp
 
 import mmengine
@@ -123,6 +124,10 @@ class AlpacaEvalTask(BaseTask):
             command = ''
             if api_key is not None:
                 command += f'export OPENAI_API_KEY={api_key}; '
+            else:
+                api_key = os.environ.get('OPENAI_API_KEY', '').split(',')[0]
+                if api_key:
+                    command += f'export OPENAI_API_KEY={api_key}; '
             command += f'alpaca_eval --model_outputs {filename} --annotators_config {alpaca_cfg} --output_path {output_path}'
             return template.format(task_cmd=command)
 
