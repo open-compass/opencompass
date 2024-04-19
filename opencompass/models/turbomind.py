@@ -1,3 +1,4 @@
+import copy
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -70,11 +71,10 @@ class TurboMindModel(BaseModel):
         self.gen_config = gen_config
         self.end_str = end_str
 
-    def generate(
-        self,
-        inputs: List[str],
-        max_out_len: int = 512,
-    ) -> List[str]:
+    def generate(self,
+                 inputs: List[str],
+                 max_out_len: int = 512,
+                 **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
@@ -93,6 +93,15 @@ class TurboMindModel(BaseModel):
             inputs[i:i + batch_size] for i in range(0, len(inputs), batch_size)
         ]
 
+        gen_config = copy.deepcopy(self.gen_config)
+        if 'do_sample' in kwargs:
+            if kwargs['do_sample']:
+                gen_config.top_k = 1000
+                gen_config.temperature = kwargs.get('temperature', 1)
+            else:
+                gen_config.top_k = 1
+                gen_config.temperature = 0.01
+
         results = []
         for batch_input in batch_inputs:
             with ThreadPoolExecutor() as executor:
@@ -103,7 +112,7 @@ class TurboMindModel(BaseModel):
                         self.generator_ids[:len(batch_input)],
                         batch_input,
                         [max_out_len] * len(batch_input),
-                        [self.gen_config] * len(batch_input),
+                        [gen_config] * len(batch_input),
                         [self.end_str] * len(batch_input),
                     ))
                 results += _results
@@ -123,14 +132,14 @@ class TurboMindModel(BaseModel):
     def _generate(self,
                   generator,
                   session_id,
-                  prompt: str or PromptList,
+                  prompt: PromptType,
                   max_out_len: int,
                   gen_config=None,
                   end_str: Optional[str] = None) -> str:
         """Generate results given a list of inputs.
 
         Args:
-            prompt (str or PromptList): A string or PromptDict.
+            prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -187,5 +196,24 @@ class TurboMindModel(BaseModel):
             input_ids = self.tokenizer.encode(text)
             res = self.generators[0].get_ppl(input_ids)
             results.append(res)
+        results = np.concatenate(results)
+        return results
+
+    def get_loglikelihood(
+            self,
+            inputs: List[str],
+            conts: List[str],
+            mask_length: Optional[List[int]] = None) -> List[float]:
+        assert isinstance(
+            inputs, List), f'List(str) is expected, but got {type(inputs)}'
+        results = []
+        for text, cont in zip(inputs, conts):
+            input_ids = self.tokenizer.encode(text)
+            res = self.generators[0].get_ppl(input_ids)
+            logit_sum = res * len(input_ids)
+            input_ids = self.tokenizer.encode(text.replace(cont, ''))
+            res = self.generators[0].get_ppl(input_ids)
+            logit_part = res * len(input_ids)
+            results.append(-(logit_sum - logit_part))
         results = np.concatenate(results)
         return results

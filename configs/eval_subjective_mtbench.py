@@ -2,9 +2,8 @@ from mmengine.config import read_base
 
 with read_base():
     from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import subjective_datasets
-    # from .datasets.subjective.multiround.mtbench_pair_judge import subjective_datasets
 
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.models.openai_api import OpenAIAllesAPIN
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
@@ -59,49 +58,26 @@ models = [
 
 datasets = [*subjective_datasets]
 
-infer = dict(
-    partitioner=dict(type=SizePartitioner, strategy='split', max_task_size=10000),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask),
-    ),
-)
-
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_model = dict(
+judge_models = [dict(
     abbr='GPT4-Turbo',
-    type=OpenAIAllesAPIN,
+    type=OpenAI,
     path='gpt-4-0613', # To compare with the official leaderboard, please use gpt4-0613
     key='xxxx',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
-    url='xxxx',
     meta_template=api_meta_template,
     query_per_second=16,
     max_out_len=2048,
     max_seq_len=2048,
     batch_size=8,
     temperature=0,
-)
-## ------------- Evaluation Configuration
-# ## pair evaluation
-# eval = dict(
-#     partitioner=dict(
-#         type=SubjectiveSizePartitioner, max_task_size=100, mode='m2n', base_models=[gpt4], compare_models=models
-#     ),
-#     runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model)),
-# )
-
-# summarizer = dict(type=MTBenchSummarizer, judge_type='pair')
-
+)]
 
 ## single evaluation
 eval = dict(
-    partitioner=dict(type=SubjectiveSizePartitioner, strategy='split', max_task_size=10000, mode='singlescore', models=models),
-    runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model)),
+    partitioner=dict(type=SubjectiveSizePartitioner, strategy='split', max_task_size=10000, mode='singlescore', models=models, judge_models=judge_models),
+    runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask)),
 )
 
 summarizer = dict(type=MTBenchSummarizer, judge_type='single')

@@ -65,8 +65,9 @@ def get_capability_results(
     capability_avg_ratings = defaultdict(float)
 
     for capability, total_score in capability_ratings.items():
-        capability_avg_ratings[
-            capability] = total_score / capability_counts[capability]
+        s = total_score / capability_counts[capability]
+        s = round(s, 2)
+        capability_avg_ratings[capability] = s
     columns = list(capability_avg_ratings.keys())
     columns.insert(0, columns.pop(columns.index('total')))
     with open(fout, 'a+', newline='') as csvfile:
@@ -98,7 +99,7 @@ class MTBenchSummarizer(CompassArenaSummarizer):
             self.base_models = self.cfg['eval']['partitioner']['base_models']
             self.compare_models = self.cfg['eval']['partitioner'][
                 'compare_models']
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
+        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
         self.judge_map = {
             'single': post_process_mtbench_single,
             'pair': post_process_mtbench_pair
@@ -142,5 +143,6 @@ class MTBenchSummarizer(CompassArenaSummarizer):
             with open(fout, 'r') as f:
                 x = from_csv(f)
             print(x)
+            print(fout)
         elif self.judge_type == 'pair':
             super().summarize()

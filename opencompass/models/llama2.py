@@ -199,7 +199,7 @@ class Llama2Chat(BaseModel):
         self.tokenizer = Tokenizer(tokenizer_path)
 
     def generate(self,
-                 inputs: List[str or PromptList],
+                 inputs: List[PromptType],
                  max_out_len: int = 512,
                  temperature: float = 0.6) -> str:
         """Generate response from input prompt.

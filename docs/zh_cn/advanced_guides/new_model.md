@@ -42,7 +42,7 @@ class MyModelAPI(BaseAPIModel):
 
 ## 新增第三方模型
 
-新增基于API的模型，需要在 `opencompass/models` 下新建 `mymodel.py` 文件，继承 `BaseModel`，并实现  `generate` 方法来进行生成式推理， `get_ppl` 方法来进行判别式推理，以及 `get_token_len` 方法来计算 token 的长度。在定义好之后修改对应配置文件名称即可。
+新增基于第三方的模型，需要在 `opencompass/models` 下新建 `mymodel.py` 文件，继承 `BaseModel`，并实现  `generate` 方法来进行生成式推理， `get_ppl` 方法来进行判别式推理，以及 `get_token_len` 方法来计算 token 的长度。在定义好之后修改对应配置文件名称即可。
 
 ```python
 from ..base import BaseModel

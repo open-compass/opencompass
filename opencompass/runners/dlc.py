@@ -118,6 +118,7 @@ class DLCRunner(BaseRunner):
                 conda_env_name = self.aliyun_cfg['conda_env_name']
                 shell_cmd = (f'source {bashrc_path}; '
                              f'conda activate {conda_env_name}; ')
+                shell_cmd += f'export PYTHONPATH={pwd}:$PYTHONPATH; '
             else:
                 # using public conda env
                 # users can also set `python_env_path` to their
@@ -151,6 +152,11 @@ class DLCRunner(BaseRunner):
             if hf_endpoint is not None:
                 shell_cmd += f'export HF_ENDPOINT={hf_endpoint}; '
 
+            extra_envs = self.aliyun_cfg.get('extra_envs')
+            if extra_envs is not None:
+                for extra_env in extra_envs:
+                    shell_cmd += f'export {extra_env}; '
+
             shell_cmd += f'cd {pwd}; '
             shell_cmd += '{task_cmd}'
 
@@ -161,9 +167,9 @@ class DLCRunner(BaseRunner):
                     f" -c {self.aliyun_cfg['dlc_config_path']}"
                     f" --workspace_id {self.aliyun_cfg['workspace_id']}"
                     ' --worker_count 1'
-                    f' --worker_cpu {max(num_gpus * 8, 32)}'
+                    f' --worker_cpu {max(num_gpus * 8, 12)}'
                     f' --worker_gpu {num_gpus}'
-                    f' --worker_memory {max(num_gpus * 128, 256)}'
+                    f' --worker_memory {max(num_gpus * 128, 192)}'
                     f" --worker_image {self.aliyun_cfg['worker_image']}")
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
@@ -185,14 +191,25 @@ class DLCRunner(BaseRunner):
                 time.sleep(random.randint(0, 10))
 
             def _run_within_retry():
-                output = subprocess.getoutput(cmd)
-                match = re.search(r'\|\s+(dlc[0-9a-z]+)\s+\|', output)
-                if match is None:
-                    raise RuntimeError(
-                        f'Failed to launch dlc job for {output}')
+                num_retry_to_start = 5
+                index_to_start = 0
+                while index_to_start < num_retry_to_start:
+                    index_to_start += 1
+                    output = subprocess.getoutput(cmd)
+                    match = re.search(r'\|\s+(dlc[0-9a-z]+)\s+\|', output)
+                    if match is None:
+                        stdout.write('Failed to get job id from output:')
+                        stdout.write(output)
+                        if index_to_start < num_retry_to_start:
+                            stdout.write(f'Retry #{index_to_start} starting')
+                        time.sleep(2)
+                        continue
+                    else:
+                        job_id = match.group(1)
+                        stdout.write(output)
+                        break
                 else:
-                    job_id = match.group(1)
-                stdout.write(output)
+                    raise RuntimeError(f'Cannot get job id from {output}')
 
                 pod_create_time = None
                 pri_time = None
@@ -200,7 +217,7 @@ class DLCRunner(BaseRunner):
                 while True:
                     # 1. Avoid to request dlc too frequently.
                     # 2. DLC job may not be ready immediately after creation.
-                    for _ in range(5):
+                    for _ in range(20):
                         time.sleep(2)
                         try:
                             job_info = json.loads(

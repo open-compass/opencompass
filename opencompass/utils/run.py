@@ -48,6 +48,19 @@ def match_cfg_file(workdir: str, pattern: Union[str, List[str]]) -> List[str]:
     return files
 
 
+def try_fill_in_custom_cfgs(config):
+    for i, dataset in enumerate(config['datasets']):
+        if 'type' not in dataset:
+            config['datasets'][i] = make_custom_dataset_config(dataset)
+    if 'model_dataset_combinations' not in config:
+        return config
+    for mdc in config['model_dataset_combinations']:
+        for i, dataset in enumerate(mdc['datasets']):
+            if 'type' not in dataset:
+                mdc['datasets'][i] = make_custom_dataset_config(dataset)
+    return config
+
+
 def get_config_from_arg(args) -> Config:
     """Get the config object given args.
 
@@ -58,9 +71,7 @@ def get_config_from_arg(args) -> Config:
     """
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
-        for i, dataset in enumerate(config['datasets']):
-            if 'type' not in dataset:
-                config['datasets'][i] = make_custom_dataset_config(dataset)
+        config = try_fill_in_custom_cfgs(config)
         return config
     # parse dataset args
     if not args.datasets and not args.custom_dataset_path:
@@ -70,12 +81,20 @@ def get_config_from_arg(args) -> Config:
     datasets = []
     if args.datasets:
         datasets_dir = os.path.join(args.config_dir, 'datasets')
-        for dataset in match_cfg_file(datasets_dir, args.datasets):
-            get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
-            cfg = Config.fromfile(dataset[1])
-            for k in cfg.keys():
-                if k.endswith('_datasets'):
-                    datasets += cfg[k]
+        for dataset_arg in args.datasets:
+            if '/' in dataset_arg:
+                dataset_name, dataset_suffix = dataset_arg.split('/', 1)
+                dataset_key_suffix = dataset_suffix
+            else:
+                dataset_name = dataset_arg
+                dataset_key_suffix = '_datasets'
+
+            for dataset in match_cfg_file(datasets_dir, [dataset_name]):
+                get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
+                cfg = Config.fromfile(dataset[1])
+                for k in cfg.keys():
+                    if k.endswith(dataset_key_suffix):
+                        datasets += cfg[k]
     else:
         dataset = {'path': args.custom_dataset_path}
         if args.custom_dataset_infer_method is not None:
@@ -119,12 +138,26 @@ def get_config_from_arg(args) -> Config:
                      run_cfg=dict(num_gpus=args.num_gpus))
         models.append(model)
     # parse summarizer args
-    summarizer = args.summarizer if args.summarizer is not None else 'example'
+    summarizer_arg = args.summarizer if args.summarizer is not None \
+        else 'example'
     summarizers_dir = os.path.join(args.config_dir, 'summarizers')
-    s = match_cfg_file(summarizers_dir, [summarizer])[0]
+
+    # Check if summarizer_arg contains '/'
+    if '/' in summarizer_arg:
+        # If it contains '/', split the string by '/'
+        # and use the second part as the configuration key
+        summarizer_file, summarizer_key = summarizer_arg.split('/', 1)
+    else:
+        # If it does not contain '/', keep the original logic unchanged
+        summarizer_key = 'summarizer'
+        summarizer_file = summarizer_arg
+
+    s = match_cfg_file(summarizers_dir, [summarizer_file])[0]
     get_logger().info(f'Loading {s[0]}: {s[1]}')
     cfg = Config.fromfile(s[1])
-    summarizer = cfg['summarizer']
+    # Use summarizer_key to retrieve the summarizer definition
+    # from the configuration file
+    summarizer = cfg[summarizer_key]
 
     return Config(dict(models=models, datasets=datasets,
                        summarizer=summarizer),

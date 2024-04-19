@@ -85,6 +85,7 @@ def normalize_final_answer(final_answer: str) -> str:
 
     # Extract answer that is in LaTeX math, is bold,
     # is surrounded by a box, etc.
+    final_answer = re.sub(r'(\\text\{)\((.*?)\)(\})', '\\2', final_answer)
     final_answer = re.sub(r'(\\text\{)(.*?)(\})', '\\2', final_answer)
     final_answer = re.sub(r'(\\textbf\{)(.*?)(\})', '\\2', final_answer)
     final_answer = re.sub(r'(\\overline\{)(.*?)(\})', '\\2', final_answer)
@@ -178,10 +179,7 @@ class MATHEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         if len(predictions) != len(references):
-            return {
-                'error': 'predictions and references have different '
-                'length'
-            }
+            return {'error': 'preds and refrs have different length'}
         correct = 0
         count = 0
         details = []
@@ -457,9 +455,24 @@ class MATHEvaluator(BaseEvaluator):
             ss2 = strip_string_func(str2)
             if verbose:
                 print(ss1, ss2)
-            return ss1 == ss2
+            if ss1 == ss2:
+                return True
+            ss1 = normalize_final_answer(ss1)
+            ss2 = normalize_final_answer(ss2)
+            if ss1 == ss2:
+                return True
         except Exception:
-            return str1 == str2
+            pass
+
+        try:
+            ss1 = normalize_final_answer(str1)
+            ss2 = normalize_final_answer(str2)
+            if ss1 == ss2:
+                return True
+        except Exception:
+            pass
+
+        return str1 == str2
 
 
 @ICL_EVALUATORS.register_module()

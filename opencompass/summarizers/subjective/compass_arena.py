@@ -67,7 +67,9 @@ class CompassArenaSummarizer:
         self.cfg = config
         self.base_models = self.cfg['eval']['partitioner']['base_models']
         self.compare_models = self.cfg['eval']['partitioner']['compare_models']
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
+        self.judge_models = self.cfg.get('judge_models', None)
+        self.meta_judge_model = self.cfg.eval.partitioner.get(
+            'meta_judge_model', None)
         self.judge_type = judge_type
         assert self.judge_type in ['general']
         self.judge_map = {
@@ -95,110 +97,137 @@ class CompassArenaSummarizer:
             product(self.base_models, self.compare_models))
         unique_combinations = remove_duplicate_pairs(
             [combo for combo in model_combinations if combo[0] != combo[1]])
-        judge_model = self.judge_abbr
+
         fout_list = []
-        for dataset in dataset_cfgs:
-            dataset_abbr = dataset_abbr_from_cfg(dataset)
-            fout = osp.join(
-                output_dir, 'judged-by--' + judge_model + '-' + dataset_abbr +
-                '-report.csv')
-            fout_list.append(fout)
-            for model_pair in unique_combinations:
-                model1, model2, = model_pair[0]['abbr'], model_pair[1]['abbr'],
-                subdir = model1 + '_' + model2 + '_judged-by--' + judge_model
-                subdir_path = os.path.join(results_folder, subdir)
-                if os.path.isdir(subdir_path):
-                    judged_answers, references = get_judgeanswer_and_reference(
-                        dataset,
-                        subdir_path,
-                        self.judge_function,
-                    )
-                    if self.check_pos_bias:
-                        bias_num = check_position_bias(judged_answers,
-                                                       references)
-                    else:
-                        bias_num = 0
-                    win_model1, win_model2, categories = defaultdict(
-                        float), defaultdict(float), defaultdict(float)
-                    model1, model2 = references[0]['answer1'], references[0][
-                        'answer2']
-                    for prediction, reference in zip(judged_answers,
-                                                     references):
-                        if self.summary_type == 'single':
-                            if prediction == 'A':
-                                categories['total'] += 1
-                                categories[reference['capability']] += 1
-                                if reference['answer1'] == model1:
-                                    win_model1[reference['capability']] += 1
-                                    win_model1['total'] += 1
-                                else:
-                                    win_model2[reference['capability']] += 1
-                                    win_model2['total'] += 1
-                            elif prediction == 'B':
-                                categories['total'] += 1
-                                categories[reference['capability']] += 1
-                                if reference['answer1'] == model1:
-                                    win_model2[reference['capability']] += 1
-                                    win_model2['total'] += 1
-                                else:
-                                    win_model1[reference['capability']] += 1
-                                    win_model1['total'] += 1
-                        elif self.summary_type == 'half_add':
-                            categories['total'] += 1
-                            categories[reference['capability']] += 1
-                            if prediction == 'A':
-                                if reference['answer1'] == model1:
-                                    win_model1[reference['capability']] += 1
-                                    win_model1['total'] += 1
-                                else:
-                                    win_model2[reference['capability']] += 1
-                                    win_model2['total'] += 1
-                            elif prediction == 'B':
-                                if reference['answer1'] == model1:
-                                    win_model2[reference['capability']] += 1
-                                    win_model2['total'] += 1
-                                else:
-                                    win_model1[reference['capability']] += 1
-                                    win_model1['total'] += 1
-                            elif prediction == 'C':
-                                win_model1[reference['capability']] += 0.5
-                                win_model1['total'] += 0.5
-                                win_model2[reference['capability']] += 0.5
-                                win_model2['total'] += 0.5
-                    for capability in categories:
-                        if capability not in win_model1:
-                            win_model1[capability] = 0.0
-                        else:
-                            win_model1[capability] = round(
-                                (win_model1[capability] /
-                                 categories[capability]) * 100, 2)
-                        if capability not in win_model2:
-                            win_model2[capability] = 0.0
-                        else:
-                            win_model2[capability] = round(
-                                (win_model2[capability] /
-                                 categories[capability]) * 100, 2)
-                    win_model1['position_bias'] = bias_num
-                    win_model2['position_bias'] = bias_num
-                    scores = {
-                        'win_' + model1: win_model1,
-                        'win_' + model2: win_model2
-                    }
-                    rows = list(scores.keys())
-                    columns = list(scores[rows[0]].keys())
-                    columns.insert(0, columns.pop(columns.index('total')))
-                    columns.insert(1,
-                                   columns.pop(columns.index('position_bias')))
-                    with open(fout, 'a+', newline='') as csvfile:
-                        writer = csv.writer(csvfile)
-                        writer.writerow([model1 + '_vs_' + model2] + columns)
-                        for row in rows:
-                            writer.writerow(
-                                [row] +
-                                [scores[row][column] for column in columns])
+        pre_len = len(self.judge_models)
+        if self.meta_judge_model is not None:
+            self.judge_models.append(self.meta_judge_model)
+            meta_judge_model_abbr = model_abbr_from_cfg(self.meta_judge_model)
+        else:
+            meta_judge_model_abbr = None
+        for idx, judge_model in enumerate(self.judge_models):
+            judge_model = model_abbr_from_cfg(judge_model)
+            for dataset in dataset_cfgs:
+                dataset_abbr = dataset_abbr_from_cfg(dataset)
+                if idx == pre_len:
+                    fout = osp.join(
+                        output_dir, 'summarized-by--' + judge_model + '-' +
+                        dataset_abbr + '-report.csv')
                 else:
-                    print(subdir_path + ' is not exist! please check!')
+                    fout = osp.join(
+                        output_dir, 'judged-by--' + judge_model + '-' +
+                        dataset_abbr + '-report.csv')
+                fout_list.append(fout)
+                for model_pair in unique_combinations:
+                    model1, model2, = model_pair[0]['abbr'], model_pair[1][
+                        'abbr'],
+                    if idx == pre_len:
+                        subdir = model1 + '_' + model2 + '_summarized-by--' + judge_model
+                    else:
+                        subdir = model1 + '_' + model2 + '_judged-by--' + judge_model
+                    subdir_path = os.path.join(results_folder, subdir)
+                    if os.path.isdir(subdir_path):
+                        judged_answers, references = get_judgeanswer_and_reference(
+                            dataset,
+                            subdir_path,
+                            self.judge_function,
+                        )
+                        if self.check_pos_bias:
+                            bias_num = check_position_bias(
+                                judged_answers, references)
+                        else:
+                            bias_num = 0
+                        win_model1, win_model2, categories = defaultdict(
+                            float), defaultdict(float), defaultdict(float)
+                        model1, model2 = references[0]['answer1'], references[
+                            0]['answer2']
+                        for prediction, reference in zip(
+                                judged_answers, references):
+                            if self.summary_type == 'single':
+                                if prediction == 'A':
+                                    categories['total'] += 1
+                                    categories[reference['capability']] += 1
+                                    if reference['answer1'] == model1:
+                                        win_model1[
+                                            reference['capability']] += 1
+                                        win_model1['total'] += 1
+                                    else:
+                                        win_model2[
+                                            reference['capability']] += 1
+                                        win_model2['total'] += 1
+                                elif prediction == 'B':
+                                    categories['total'] += 1
+                                    categories[reference['capability']] += 1
+                                    if reference['answer1'] == model1:
+                                        win_model2[
+                                            reference['capability']] += 1
+                                        win_model2['total'] += 1
+                                    else:
+                                        win_model1[
+                                            reference['capability']] += 1
+                                        win_model1['total'] += 1
+                            elif self.summary_type == 'half_add':
+                                categories['total'] += 1
+                                categories[reference['capability']] += 1
+                                if prediction == 'A':
+                                    if reference['answer1'] == model1:
+                                        win_model1[
+                                            reference['capability']] += 1
+                                        win_model1['total'] += 1
+                                    else:
+                                        win_model2[
+                                            reference['capability']] += 1
+                                        win_model2['total'] += 1
+                                elif prediction == 'B':
+                                    if reference['answer1'] == model1:
+                                        win_model2[
+                                            reference['capability']] += 1
+                                        win_model2['total'] += 1
+                                    else:
+                                        win_model1[
+                                            reference['capability']] += 1
+                                        win_model1['total'] += 1
+                                elif prediction == 'C':
+                                    win_model1[reference['capability']] += 0.5
+                                    win_model1['total'] += 0.5
+                                    win_model2[reference['capability']] += 0.5
+                                    win_model2['total'] += 0.5
+                        for capability in categories:
+                            if capability not in win_model1:
+                                win_model1[capability] = 0.0
+                            else:
+                                win_model1[capability] = round(
+                                    (win_model1[capability] /
+                                     categories[capability]) * 100, 2)
+                            if capability not in win_model2:
+                                win_model2[capability] = 0.0
+                            else:
+                                win_model2[capability] = round(
+                                    (win_model2[capability] /
+                                     categories[capability]) * 100, 2)
+                        win_model1['position_bias'] = bias_num
+                        win_model2['position_bias'] = bias_num
+                        scores = {
+                            'win_' + model1: win_model1,
+                            'win_' + model2: win_model2
+                        }
+                        rows = list(scores.keys())
+                        columns = list(scores[rows[0]].keys())
+                        columns.insert(0, columns.pop(columns.index('total')))
+                        columns.insert(
+                            1, columns.pop(columns.index('position_bias')))
+                        with open(fout, 'a+', newline='') as csvfile:
+                            writer = csv.writer(csvfile)
+                            writer.writerow([model1 + '_vs_' + model2] +
+                                            columns)
+                            for row in rows:
+                                writer.writerow([row] + [
+                                    scores[row][column] for column in columns
+                                ])
+                    else:
+                        print(subdir_path + ' is not exist! please check!')
         for fout in fout_list:
             with open(fout, 'r') as f:
                 x = from_csv(f)
+            print(fout)
             print(x)

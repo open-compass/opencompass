@@ -69,21 +69,10 @@ gpt4 = dict(
     temperature=1,
 )  # Re-inference gpt4's predictions or you can choose to use the pre-commited gpt4's predictions
 
-infer = dict(
-    partitioner=dict(type=SizePartitioner, strategy='split', max_task_size=10000),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask),
-    ),
-)
-
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_model = dict(
+judge_models = [dict(
     abbr='GPT4-Turbo',
     type=OpenAI,
     path='gpt-4-1106-preview',
@@ -95,7 +84,7 @@ judge_model = dict(
     batch_size=2,
     retry=20,
     temperature=0,
-)
+)]
 
 ## ------------- Evaluation Configuration
 eval = dict(
@@ -104,16 +93,13 @@ eval = dict(
         strategy='split',
         max_task_size=10000,
         mode='m2n',
+        infer_order='double',
         base_models=[gpt4],
         compare_models=models,
+        judge_models=judge_models,
     ),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llm_dev2',
-        quotatype='auto',
-        max_num_workers=32,
-        task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model),
-    ),
+    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
+    given_pred = [{'abbr':'gpt4-turbo', 'path':''}]
 )
 
 work_dir = 'outputs/compass_arena_debug/'

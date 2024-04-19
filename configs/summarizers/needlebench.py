@@ -1,547 +1,142 @@
 from opencompass.summarizers.needlebench import NeedleBenchSummarizer
-from opencompass.summarizers.needlebench import NeedleBenchATCSummarizer
 
-# ----------NeedleBench-4k-summarizer----------
-context_lengths_4k = list(range(1000, 5000, 1000))
+
+def create_m_rs_names_list(context_lengths, depths, needle_counts,
+                           languages, dataset_size):
+    names_dict = {}
+    multi_needle_list = []
+    multi_needle_en_list = []
+    multi_needle_zh_list = []
+
+    for needle_count in needle_counts:
+        for language in languages:
+            key = f"{needle_count}-Needle-{language.upper()}-{dataset_size.upper()}"
+            names_list = [
+                f"Length{length}Depth{int(depth)}_{needle_count}needle_{language}_{dataset_size}"
+                for length in context_lengths
+                for depth in depths
+            ]
+            names_dict[key] = names_list
+            
+            multi_needle_list.extend(names_list)
+            if language == 'en':
+                multi_needle_en_list.extend(names_list)
+            elif language == 'zh':
+                multi_needle_zh_list.extend(names_list)
+    names_dict['Multi-Needle-Reasoning(M-RS)'] =  multi_needle_list
+    names_dict['Multi-Needle-Reasoning-EN'] = multi_needle_en_list
+    names_dict['Multi-Needle-Reasoning-ZH'] = multi_needle_zh_list
+
+    return names_dict
+
+def create_summarizer(context_lengths, depths, dataset_size, 
+                      sparse_depths=None):
+    needle_counts = ["2", "3", "4", "5"]
+    languages = ["en", "zh"]
+    if sparse_depths:
+        depths = sparse_depths
+    names_dict = {}
+    multi_reasoning_names = create_m_rs_names_list(
+        context_lengths, depths, needle_counts, languages, dataset_size)
+
+    names_dict.update(multi_reasoning_names)
+    
+    single_needle_list = []
+    single_needle_en_list = []
+    single_needle_zh_list = []
+
+    for language in languages:
+        names_list = [
+            f"Length{length}Depth{int(depth)}_origin_{language}_{dataset_size}"
+            for length in context_lengths
+            for depth in depths
+        ]
+        single_needle_list.extend(names_list)
+        if language == 'en':
+            single_needle_en_list.extend(names_list)
+        elif language == 'zh':
+            single_needle_zh_list.extend(names_list)
+    names_dict['Single-Needle-Retrieval(S-RT)'] = single_needle_list
+    names_dict['Single-Needle-Retrieval-EN'] = single_needle_en_list
+    names_dict['Single-Needle-Retrieval-ZH'] = single_needle_zh_list
+
+    parallel_list = []
+    parallel_en_list = []
+    parallel_zh_list = []
+
+    for language in languages:
+        names_list = [
+            f"Length{length}_parallel_{language}_{dataset_size}"
+            for length in context_lengths
+        ]
+        parallel_list.extend(names_list)
+        if language == 'en':
+            parallel_en_list.extend(names_list)
+        elif language == 'zh':
+            parallel_zh_list.extend(names_list)
+    names_dict['Multi-Needle-Retrieval(M-RT)'] = parallel_list
+    names_dict['Multi-Needle-Retrieval-EN'] = parallel_en_list
+    names_dict['Multi-Needle-Retrieval-ZH'] = parallel_zh_list
+
+    summary_groups = [
+        {'name': key, 'subsets': value} for key, value in names_dict.items()
+    ]
+
+    summary_groups.append({
+        'name': 'NeedleBench-Overall-Score',
+        'subsets': [['Single-Needle-Retrieval(S-RT)', 'naive_average'],
+                    ['Multi-Needle-Reasoning(M-RS)', 'naive_average'],
+                    ['Multi-Needle-Retrieval(M-RT)', 'average_score']],
+        'weights': {'Single-Needle-Retrieval(S-RT)': 0.4,
+                    'Multi-Needle-Reasoning(M-RS)': 0.3,
+                    'Multi-Needle-Retrieval(M-RT)': 0.3}})
+    summarizer_config = {
+        'type': NeedleBenchSummarizer,
+        'summary_groups': summary_groups,
+        'dataset_abbrs': [
+            'NeedleBench-Overall-Score',
+            f'--------- NeedleBench-{dataset_size.upper()}-Single-Needle-Retrieval ---------',
+            'Single-Needle-Retrieval(S-RT)',
+            'Single-Needle-Retrieval-EN',
+            'Single-Needle-Retrieval-ZH',
+            f'--------- NeedleBench-{dataset_size.upper()}-Multi-Needle-Retrieval ---------',
+            'Multi-Needle-Retrieval(M-RT)',
+            'Multi-Needle-Retrieval-EN',
+            'Multi-Needle-Retrieval-ZH',
+            f'--------- NeedleBench-{dataset_size.upper()}-Multi-Needle-Reasoning ---------',
+            'Multi-Needle-Reasoning(M-RS)',
+            'Multi-Needle-Reasoning-EN',
+            'Multi-Needle-Reasoning-ZH',
+            '2-Needle-EN-4K',
+            '2-Needle-ZH-4K',
+            '3-Needle-EN-4K',
+            '3-Needle-ZH-4K',
+            '4-Needle-EN-4K',
+            '4-Needle-ZH-4K',
+            '5-Needle-EN-4K',
+            '5-Needle-ZH-4K',
+            ]
+        }
+    return summarizer_config
+
+
 depths = [0, 5, 10, 15, 21, 26, 31, 36, 42, 47, 52, 57, 63, 68, 73, 78, 84, 89, 94, 100]
 depths_list_sparse = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
-# Initialize the lists
-_needlebench_4k_2needle_en = []
-_needlebench_4k_3needle_en = []
-_needlebench_4k_4needle_en = []
-_needlebench_4k_5needle_en = []
-_needlebench_4k_2needle_zh = []
-_needlebench_4k_3needle_zh = []
-_needlebench_4k_4needle_zh = []
-_needlebench_4k_5needle_zh = []
-_needlebench_4k_origin_en = []
-_needlebench_4k_origin_zh = []
-
-# Fill the lists using nested loops
-for original_context_length in context_lengths_4k:
-    for depth_percent in depths:
-        _needlebench_4k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_4k')
-        _needlebench_4k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_4k')
-        _needlebench_4k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_4k')
-        _needlebench_4k_5needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_en_4k')
-        _needlebench_4k_2needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_zh_4k')
-        _needlebench_4k_3needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_zh_4k')
-        _needlebench_4k_4needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_zh_4k')
-        _needlebench_4k_5needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_zh_4k')
-
-        _needlebench_4k_origin_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_en_4k')
-        _needlebench_4k_origin_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_zh_4k')
-
-# Concatenate the multi-needle and origin lists
-_needlebench_4k_multi_needle_en = _needlebench_4k_2needle_en + _needlebench_4k_3needle_en + _needlebench_4k_4needle_en + _needlebench_4k_5needle_en
-_needlebench_4k_multi_needle_zh = _needlebench_4k_2needle_zh + _needlebench_4k_3needle_zh + _needlebench_4k_4needle_zh + _needlebench_4k_5needle_zh
-_needlebench_4k_origin = _needlebench_4k_origin_en + _needlebench_4k_origin_zh
-_needlebench_4k_multi_needle = _needlebench_4k_multi_needle_en + _needlebench_4k_multi_needle_zh
-
-# Repeating the same process for parallel (assuming it's similar to origin_en)
-_needlebench_4k_parallel_en = []
-_needlebench_4k_parallel_zh = []
-for original_context_length in context_lengths_4k:
-    _needlebench_4k_parallel_en.append(f'Length{original_context_length}_parallel_en_4k')
-for original_context_length in context_lengths_4k:
-    _needlebench_4k_parallel_zh.append(f'Length{original_context_length}_parallel_zh_4k')
-_needlebench_4k_parallel = _needlebench_4k_parallel_en + _needlebench_4k_parallel_zh
-
-needlebench_summary_groups = [
-    {'name': 'original_version', 'subsets': _needlebench_4k_origin},
-    {'name': 'original_version_zh', 'subsets': _needlebench_4k_origin_zh},
-    {'name': 'original_version_en', 'subsets': _needlebench_4k_origin_en},
-
-    {'name': 'multi_needle_en', 'subsets': _needlebench_4k_multi_needle_en},
-    {'name': 'multi_needle2_en', 'subsets': _needlebench_4k_2needle_en},
-    {'name': 'multi_needle3_en', 'subsets': _needlebench_4k_3needle_en},
-    {'name': 'multi_needle4_en', 'subsets': _needlebench_4k_4needle_en},
-    {'name': 'multi_needle5_en', 'subsets': _needlebench_4k_5needle_en},
-
-    {'name': 'multi_needle_zh', 'subsets': _needlebench_4k_multi_needle_zh},
-    {'name': 'multi_needle2_zh', 'subsets': _needlebench_4k_2needle_zh},
-    {'name': 'multi_needle3_zh', 'subsets': _needlebench_4k_3needle_zh},
-    {'name': 'multi_needle4_zh', 'subsets': _needlebench_4k_4needle_zh},
-    {'name': 'multi_needle5_zh', 'subsets': _needlebench_4k_5needle_zh},
-
-    {'name': 'multi_needle', 'subsets': _needlebench_4k_multi_needle},
-
-    {'name': 'parallel_version', 'subsets': _needlebench_4k_parallel},
-    {'name': 'parallel_version_zh', 'subsets': _needlebench_4k_parallel_zh},
-    {'name': 'parallel_version_en', 'subsets': _needlebench_4k_parallel_en},
-
-
-    {'name': 'overall',
-     'subsets': [['original_version', 'naive_average'],
-                 ['multi_needle', 'naive_average'],
-                 ['parallel_version', 'average_score']],
-     'weights': {'original_version': 0.4,
-                 'multi_needle': 0.3,
-                 'parallel_version': 0.3}},
-]
-needlebench_4k_summarizer = dict(
-    type=NeedleBenchSummarizer,
-    dataset_abbrs=[
-        'overall',
-        '--------- NeedleBench-4k Single-Needle ---------',  # category
-        'original_version',
-        'original_version_zh',
-        'original_version_en',
-        '--------- NeedleBench-4k Parallel-Needles ---------',  # category
-        'parallel_version',
-        'parallel_version_zh',
-        'parallel_version_en',
-        '--------- NeedleBench-4k Multi-Needles ---------',  # category
-        'multi_needle',
-        'multi_needle_en',
-        'multi_needle_zh',
-        'multi_needle2_en',
-        'multi_needle3_en',
-        'multi_needle4_en',
-        'multi_needle5_en',
-        'multi_needle2_zh',
-        'multi_needle3_zh',
-        'multi_needle4_zh',
-        'multi_needle5_zh',
-
-        # *_needlebench_4k_origin, *_needlebench_4k_multi_needle, *_needlebench_4k_parallel,
-    ],
-    summary_groups=needlebench_summary_groups,
-)
-
-# ----------NeedleBench-8k-summarizer----------
-
+context_lengths_4k = list(range(1000, 5000, 1000))
+needlebench_4k_summarizer = create_summarizer(context_lengths_4k, depths, "4k")
 context_lengths_8k = list(range(5000, 9000, 1000))
-
-# Initialize the lists
-_needlebench_8k_2needle_en = []
-_needlebench_8k_3needle_en = []
-_needlebench_8k_4needle_en = []
-_needlebench_8k_5needle_en = []
-_needlebench_8k_2needle_zh = []
-_needlebench_8k_3needle_zh = []
-_needlebench_8k_4needle_zh = []
-_needlebench_8k_5needle_zh = []
-_needlebench_8k_origin_en = []
-_needlebench_8k_origin_zh = []
-
-# Fill the lists using nested loops
-for original_context_length in context_lengths_8k:
-    for depth_percent in depths:
-        _needlebench_8k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_8k')
-        _needlebench_8k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_8k')
-        _needlebench_8k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_8k')
-        _needlebench_8k_5needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_en_8k')
-        _needlebench_8k_2needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_zh_8k')
-        _needlebench_8k_3needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_zh_8k')
-        _needlebench_8k_4needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_zh_8k')
-        _needlebench_8k_5needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_zh_8k')
-
-        _needlebench_8k_origin_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_en_8k')
-        _needlebench_8k_origin_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_zh_8k')
-
-# Concatenate the multi-needle and origin lists
-_needlebench_8k_multi_needle_en = _needlebench_8k_2needle_en + _needlebench_8k_3needle_en + _needlebench_8k_4needle_en + _needlebench_8k_5needle_en
-_needlebench_8k_multi_needle_zh = _needlebench_8k_2needle_zh + _needlebench_8k_3needle_zh + _needlebench_8k_4needle_zh + _needlebench_8k_5needle_zh
-_needlebench_8k_origin = _needlebench_8k_origin_en + _needlebench_8k_origin_zh
-_needlebench_8k_multi_needle = _needlebench_8k_multi_needle_en + _needlebench_8k_multi_needle_zh
-
-# Repeating the same process for parallel (assuming it's similar to origin_en)
-_needlebench_8k_parallel_en = []
-_needlebench_8k_parallel_zh = []
-for original_context_length in context_lengths_8k:
-    _needlebench_8k_parallel_en.append(f'Length{original_context_length}_parallel_en_8k')
-for original_context_length in context_lengths_8k:
-    _needlebench_8k_parallel_zh.append(f'Length{original_context_length}_parallel_zh_8k')
-_needlebench_8k_parallel = _needlebench_8k_parallel_en + _needlebench_8k_parallel_zh
-
-needlebench_summary_groups = [
-    {'name': 'original_version', 'subsets': _needlebench_8k_origin},
-    {'name': 'original_version_zh', 'subsets': _needlebench_8k_origin_zh},
-    {'name': 'original_version_en', 'subsets': _needlebench_8k_origin_en},
-
-    {'name': 'multi_needle_en', 'subsets': _needlebench_8k_multi_needle_en},
-    {'name': 'multi_needle2_en', 'subsets': _needlebench_8k_2needle_en},
-    {'name': 'multi_needle3_en', 'subsets': _needlebench_8k_3needle_en},
-    {'name': 'multi_needle4_en', 'subsets': _needlebench_8k_4needle_en},
-    {'name': 'multi_needle5_en', 'subsets': _needlebench_8k_5needle_en},
-
-    {'name': 'multi_needle_zh', 'subsets': _needlebench_8k_multi_needle_zh},
-    {'name': 'multi_needle2_zh', 'subsets': _needlebench_8k_2needle_zh},
-    {'name': 'multi_needle3_zh', 'subsets': _needlebench_8k_3needle_zh},
-    {'name': 'multi_needle4_zh', 'subsets': _needlebench_8k_4needle_zh},
-    {'name': 'multi_needle5_zh', 'subsets': _needlebench_8k_5needle_zh},
-
-    {'name': 'multi_needle', 'subsets': _needlebench_8k_multi_needle},
-
-    {'name': 'parallel_version', 'subsets': _needlebench_8k_parallel},
-    {'name': 'parallel_version_zh', 'subsets': _needlebench_8k_parallel_zh},
-    {'name': 'parallel_version_en', 'subsets': _needlebench_8k_parallel_en},
-
-
-    {'name': 'overall',
-     'subsets': [['original_version', 'naive_average'],
-                 ['multi_needle', 'naive_average'],
-                 ['parallel_version', 'average_score']],
-     'weights': {'original_version': 0.4,
-                 'multi_needle': 0.3,
-                 'parallel_version': 0.3}},
-]
-needlebench_8k_summarizer = dict(
-    type=NeedleBenchSummarizer,
-    dataset_abbrs=[
-        'overall',
-        '--------- NeedleBench-8k Single-Needle ---------',  # category
-        'original_version',
-        'original_version_zh',
-        'original_version_en',
-        '--------- NeedleBench-8k Parallel-Needles ---------',  # category
-        'parallel_version',
-        'parallel_version_zh',
-        'parallel_version_en',
-        '--------- NeedleBench-8k Multi-Needles ---------',  # category
-        'multi_needle',
-        'multi_needle_en',
-        'multi_needle_zh',
-        'multi_needle2_en',
-        'multi_needle3_en',
-        'multi_needle4_en',
-        'multi_needle5_en',
-        'multi_needle2_zh',
-        'multi_needle3_zh',
-        'multi_needle4_zh',
-        'multi_needle5_zh',
-
-        # *_needlebench_8k_origin, *_needlebench_8k_multi_needle, *_needlebench_8k_parallel,
-    ],
-    summary_groups=needlebench_summary_groups,
-)
-
-# ----------NeedleBench-32k-summarizer----------
-
+needlebench_8k_summarizer = create_summarizer(context_lengths_8k, depths, "8k")
 context_lengths_32k = [9000, 13000, 17000, 21000, 25000, 29000, 31000, 32000]
-
-# Initialize the lists
-_needlebench_32k_2needle_en = []
-_needlebench_32k_3needle_en = []
-_needlebench_32k_4needle_en = []
-_needlebench_32k_5needle_en = []
-_needlebench_32k_2needle_zh = []
-_needlebench_32k_3needle_zh = []
-_needlebench_32k_4needle_zh = []
-_needlebench_32k_5needle_zh = []
-_needlebench_32k_origin_en = []
-_needlebench_32k_origin_zh = []
-
-# Fill the lists using nested loops
-for original_context_length in context_lengths_32k:
-    for depth_percent in depths_list_sparse:
-        _needlebench_32k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_32k')
-        _needlebench_32k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_32k')
-        _needlebench_32k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_32k')
-        _needlebench_32k_5needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_en_32k')
-        _needlebench_32k_2needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_zh_32k')
-        _needlebench_32k_3needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_zh_32k')
-        _needlebench_32k_4needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_zh_32k')
-        _needlebench_32k_5needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_zh_32k')
-
-        _needlebench_32k_origin_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_en_32k')
-        _needlebench_32k_origin_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_zh_32k')
-
-# Concatenate the multi-needle and origin lists
-_needlebench_32k_multi_needle_en = _needlebench_32k_2needle_en + _needlebench_32k_3needle_en + _needlebench_32k_4needle_en + _needlebench_32k_5needle_en
-_needlebench_32k_multi_needle_zh = _needlebench_32k_2needle_zh + _needlebench_32k_3needle_zh + _needlebench_32k_4needle_zh + _needlebench_32k_5needle_zh
-_needlebench_32k_origin = _needlebench_32k_origin_en + _needlebench_32k_origin_zh
-_needlebench_32k_multi_needle = _needlebench_32k_multi_needle_en + _needlebench_32k_multi_needle_zh
-
-# Repeating the same process for parallel (assuming it's similar to origin_en)
-_needlebench_32k_parallel_en = []
-_needlebench_32k_parallel_zh = []
-for original_context_length in context_lengths_32k:
-    _needlebench_32k_parallel_en.append(f'Length{original_context_length}_parallel_en_32k')
-for original_context_length in context_lengths_32k:
-    _needlebench_32k_parallel_zh.append(f'Length{original_context_length}_parallel_zh_32k')
-_needlebench_32k_parallel = _needlebench_32k_parallel_en + _needlebench_32k_parallel_zh
-
-needlebench_summary_groups = [
-    {'name': 'original_version', 'subsets': _needlebench_32k_origin},
-    {'name': 'original_version_zh', 'subsets': _needlebench_32k_origin_zh},
-    {'name': 'original_version_en', 'subsets': _needlebench_32k_origin_en},
-
-    {'name': 'multi_needle_en', 'subsets': _needlebench_32k_multi_needle_en},
-    {'name': 'multi_needle2_en', 'subsets': _needlebench_32k_2needle_en},
-    {'name': 'multi_needle3_en', 'subsets': _needlebench_32k_3needle_en},
-    {'name': 'multi_needle4_en', 'subsets': _needlebench_32k_4needle_en},
-    {'name': 'multi_needle5_en', 'subsets': _needlebench_32k_5needle_en},
-
-    {'name': 'multi_needle_zh', 'subsets': _needlebench_32k_multi_needle_zh},
-    {'name': 'multi_needle2_zh', 'subsets': _needlebench_32k_2needle_zh},
-    {'name': 'multi_needle3_zh', 'subsets': _needlebench_32k_3needle_zh},
-    {'name': 'multi_needle4_zh', 'subsets': _needlebench_32k_4needle_zh},
-    {'name': 'multi_needle5_zh', 'subsets': _needlebench_32k_5needle_zh},
-
-    {'name': 'multi_needle', 'subsets': _needlebench_32k_multi_needle},
-
-    {'name': 'parallel_version', 'subsets': _needlebench_32k_parallel},
-    {'name': 'parallel_version_zh', 'subsets': _needlebench_32k_parallel_zh},
-    {'name': 'parallel_version_en', 'subsets': _needlebench_32k_parallel_en},
-
-
-    {'name': 'overall',
-     'subsets': [['original_version', 'naive_average'],
-                 ['multi_needle', 'naive_average'],
-                 ['parallel_version', 'average_score']],
-     'weights': {'original_version': 0.4,
-                 'multi_needle': 0.3,
-                 'parallel_version': 0.3}},
-]
-needlebench_32k_summarizer = dict(
-    type=NeedleBenchSummarizer,
-    dataset_abbrs=[
-        'overall',
-        '--------- NeedleBench-32k Single-Needle ---------',  # category
-        'original_version',
-        'original_version_zh',
-        'original_version_en',
-        '--------- NeedleBench-32k Parallel-Needles ---------',  # category
-        'parallel_version',
-        'parallel_version_zh',
-        'parallel_version_en',
-        '--------- NeedleBench-32k Multi-Needles ---------',  # category
-        'multi_needle',
-        'multi_needle_en',
-        'multi_needle_zh',
-        'multi_needle2_en',
-        'multi_needle3_en',
-        'multi_needle4_en',
-        'multi_needle5_en',
-        'multi_needle2_zh',
-        'multi_needle3_zh',
-        'multi_needle4_zh',
-        'multi_needle5_zh',
-
-        # *_needlebench_32k_origin, *_needlebench_32k_multi_needle, *_needlebench_32k_parallel,
-    ],
-    summary_groups=needlebench_summary_groups,
-)
-
-# ----------NeedleBench-128k-summarizer----------
-
+needlebench_32k_summarizer = create_summarizer(context_lengths_32k, depths_list_sparse, "32k")
 context_lengths_128k = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000])
-
-# Initialize the lists
-_needlebench_128k_2needle_en = []
-_needlebench_128k_3needle_en = []
-_needlebench_128k_4needle_en = []
-_needlebench_128k_5needle_en = []
-_needlebench_128k_2needle_zh = []
-_needlebench_128k_3needle_zh = []
-_needlebench_128k_4needle_zh = []
-_needlebench_128k_5needle_zh = []
-_needlebench_128k_origin_en = []
-_needlebench_128k_origin_zh = []
-
-# Fill the lists using nested loops
-for original_context_length in context_lengths_128k:
-    for depth_percent in depths_list_sparse:
-        _needlebench_128k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_128k')
-        _needlebench_128k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_128k')
-        _needlebench_128k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_128k')
-        _needlebench_128k_5needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_en_128k')
-        _needlebench_128k_2needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_zh_128k')
-        _needlebench_128k_3needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_zh_128k')
-        _needlebench_128k_4needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_zh_128k')
-        _needlebench_128k_5needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_zh_128k')
-
-        _needlebench_128k_origin_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_en_128k')
-        _needlebench_128k_origin_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_zh_128k')
-
-# Concatenate the multi-needle and origin lists
-_needlebench_128k_multi_needle_en = _needlebench_128k_2needle_en + _needlebench_128k_3needle_en + _needlebench_128k_4needle_en + _needlebench_128k_5needle_en
-_needlebench_128k_multi_needle_zh = _needlebench_128k_2needle_zh + _needlebench_128k_3needle_zh + _needlebench_128k_4needle_zh + _needlebench_128k_5needle_zh
-_needlebench_128k_origin = _needlebench_128k_origin_en + _needlebench_128k_origin_zh
-_needlebench_128k_multi_needle = _needlebench_128k_multi_needle_en + _needlebench_128k_multi_needle_zh
-
-# Repeating the same process for parallel (assuming it's similar to origin_en)
-_needlebench_128k_parallel_en = []
-_needlebench_128k_parallel_zh = []
-for original_context_length in context_lengths_128k:
-    _needlebench_128k_parallel_en.append(f'Length{original_context_length}_parallel_en_128k')
-for original_context_length in context_lengths_128k:
-    _needlebench_128k_parallel_zh.append(f'Length{original_context_length}_parallel_zh_128k')
-_needlebench_128k_parallel = _needlebench_128k_parallel_en + _needlebench_128k_parallel_zh
-
-needlebench_summary_groups = [
-    {'name': 'original_version', 'subsets': _needlebench_128k_origin},
-    {'name': 'original_version_zh', 'subsets': _needlebench_128k_origin_zh},
-    {'name': 'original_version_en', 'subsets': _needlebench_128k_origin_en},
-
-    {'name': 'multi_needle_en', 'subsets': _needlebench_128k_multi_needle_en},
-    {'name': 'multi_needle2_en', 'subsets': _needlebench_128k_2needle_en},
-    {'name': 'multi_needle3_en', 'subsets': _needlebench_128k_3needle_en},
-    {'name': 'multi_needle4_en', 'subsets': _needlebench_128k_4needle_en},
-    {'name': 'multi_needle5_en', 'subsets': _needlebench_128k_5needle_en},
-
-    {'name': 'multi_needle_zh', 'subsets': _needlebench_128k_multi_needle_zh},
-    {'name': 'multi_needle2_zh', 'subsets': _needlebench_128k_2needle_zh},
-    {'name': 'multi_needle3_zh', 'subsets': _needlebench_128k_3needle_zh},
-    {'name': 'multi_needle4_zh', 'subsets': _needlebench_128k_4needle_zh},
-    {'name': 'multi_needle5_zh', 'subsets': _needlebench_128k_5needle_zh},
-
-    {'name': 'multi_needle', 'subsets': _needlebench_128k_multi_needle},
-
-    {'name': 'parallel_version', 'subsets': _needlebench_128k_parallel},
-    {'name': 'parallel_version_zh', 'subsets': _needlebench_128k_parallel_zh},
-    {'name': 'parallel_version_en', 'subsets': _needlebench_128k_parallel_en},
-
-
-    {'name': 'overall',
-     'subsets': [['original_version', 'naive_average'],
-                 ['multi_needle', 'naive_average'],
-                 ['parallel_version', 'average_score']],
-     'weights': {'original_version': 0.4,
-                 'multi_needle': 0.3,
-                 'parallel_version': 0.3}},
-]
-needlebench_128k_summarizer = dict(
-    type=NeedleBenchSummarizer,
-    dataset_abbrs=[
-        'overall',
-        '--------- NeedleBench-128k Single-Needle ---------',  # category
-        'original_version',
-        'original_version_zh',
-        'original_version_en',
-        '--------- NeedleBench-128k Parallel-Needles ---------',  # category
-        'parallel_version',
-        'parallel_version_zh',
-        'parallel_version_en',
-        '--------- NeedleBench-128k Multi-Needles ---------',  # category
-        'multi_needle',
-        'multi_needle_en',
-        'multi_needle_zh',
-        'multi_needle2_en',
-        'multi_needle3_en',
-        'multi_needle4_en',
-        'multi_needle5_en',
-        'multi_needle2_zh',
-        'multi_needle3_zh',
-        'multi_needle4_zh',
-        'multi_needle5_zh',
-
-        # *_needlebench_128k_origin, *_needlebench_128k_multi_needle, *_needlebench_128k_parallel,
-    ],
-    summary_groups=needlebench_summary_groups,
-)
-
-# ----------NeedleBench-200k-summarizer----------
-
+needlebench_128k_summarizer = create_summarizer(context_lengths_128k, depths_list_sparse, "128k")
 context_lengths_200k = list([16000, 48000, 80000, 112000, 128000, 144000, 176000, 200000])
-# Initialize the lists
-_needlebench_200k_2needle_en = []
-_needlebench_200k_3needle_en = []
-_needlebench_200k_4needle_en = []
-_needlebench_200k_5needle_en = []
-_needlebench_200k_2needle_zh = []
-_needlebench_200k_3needle_zh = []
-_needlebench_200k_4needle_zh = []
-_needlebench_200k_5needle_zh = []
-_needlebench_200k_origin_en = []
-_needlebench_200k_origin_zh = []
+needlebench_200k_summarizer = create_summarizer(context_lengths_200k, depths_list_sparse, "200k")
+context_lengths_1000k = list([20000, 160000, 300000, 440000, 580000, 720000, 860000, 1000000])
+needlebench_1000k_summarizer = create_summarizer(context_lengths_1000k, depths_list_sparse, "1000k")
 
-# Fill the lists using nested loops
-for original_context_length in context_lengths_200k:
-    for depth_percent in depths_list_sparse:
-        _needlebench_200k_2needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_en_200k')
-        _needlebench_200k_3needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_en_200k')
-        _needlebench_200k_4needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_en_200k')
-        _needlebench_200k_5needle_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_en_200k')
-        _needlebench_200k_2needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_2needle_zh_200k')
-        _needlebench_200k_3needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_3needle_zh_200k')
-        _needlebench_200k_4needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_4needle_zh_200k')
-        _needlebench_200k_5needle_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_5needle_zh_200k')
 
-        _needlebench_200k_origin_en.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_en_200k')
-        _needlebench_200k_origin_zh.append(f'Length{original_context_length}Depth{int(depth_percent)}_origin_zh_200k')
-
-# Concatenate the multi-needle and origin lists
-_needlebench_200k_multi_needle_en = _needlebench_200k_2needle_en + _needlebench_200k_3needle_en + _needlebench_200k_4needle_en + _needlebench_200k_5needle_en
-_needlebench_200k_multi_needle_zh = _needlebench_200k_2needle_zh + _needlebench_200k_3needle_zh + _needlebench_200k_4needle_zh + _needlebench_200k_5needle_zh
-_needlebench_200k_origin = _needlebench_200k_origin_en + _needlebench_200k_origin_zh
-_needlebench_200k_multi_needle = _needlebench_200k_multi_needle_en + _needlebench_200k_multi_needle_zh
-
-# Repeating the same process for parallel (assuming it's similar to origin_en)
-_needlebench_200k_parallel_en = []
-_needlebench_200k_parallel_zh = []
-for original_context_length in context_lengths_200k:
-    _needlebench_200k_parallel_en.append(f'Length{original_context_length}_parallel_en_200k')
-for original_context_length in context_lengths_200k:
-    _needlebench_200k_parallel_zh.append(f'Length{original_context_length}_parallel_zh_200k')
-_needlebench_200k_parallel = _needlebench_200k_parallel_en + _needlebench_200k_parallel_zh
-
-needlebench_summary_groups = [
-    {'name': 'original_version', 'subsets': _needlebench_200k_origin},
-    {'name': 'original_version_zh', 'subsets': _needlebench_200k_origin_zh},
-    {'name': 'original_version_en', 'subsets': _needlebench_200k_origin_en},
-
-    {'name': 'multi_needle_en', 'subsets': _needlebench_200k_multi_needle_en},
-    {'name': 'multi_needle2_en', 'subsets': _needlebench_200k_2needle_en},
-    {'name': 'multi_needle3_en', 'subsets': _needlebench_200k_3needle_en},
-    {'name': 'multi_needle4_en', 'subsets': _needlebench_200k_4needle_en},
-    {'name': 'multi_needle5_en', 'subsets': _needlebench_200k_5needle_en},
-
-    {'name': 'multi_needle_zh', 'subsets': _needlebench_200k_multi_needle_zh},
-    {'name': 'multi_needle2_zh', 'subsets': _needlebench_200k_2needle_zh},
-    {'name': 'multi_needle3_zh', 'subsets': _needlebench_200k_3needle_zh},
-    {'name': 'multi_needle4_zh', 'subsets': _needlebench_200k_4needle_zh},
-    {'name': 'multi_needle5_zh', 'subsets': _needlebench_200k_5needle_zh},
-
-    {'name': 'multi_needle', 'subsets': _needlebench_200k_multi_needle},
-
-    {'name': 'parallel_version', 'subsets': _needlebench_200k_parallel},
-    {'name': 'parallel_version_zh', 'subsets': _needlebench_200k_parallel_zh},
-    {'name': 'parallel_version_en', 'subsets': _needlebench_200k_parallel_en},
-
-    {'name': 'overall',
-     'subsets': [['original_version', 'naive_average'],
-                 ['multi_needle', 'naive_average'],
-                 ['parallel_version', 'average_score']],
-     'weights': {'original_version': 0.4,
-                 'multi_needle': 0.3,
-                 'parallel_version': 0.3}},
-]
-needlebench_200k_summarizer = dict(
-    type=NeedleBenchSummarizer,
-    dataset_abbrs=[
-        'overall',
-        '--------- NeedleBench-200k Single-Needle ---------',  # category
-        'original_version',
-        'original_version_zh',
-        'original_version_en',
-        '--------- NeedleBench-200k Parallel-Needles ---------',  # category
-        'parallel_version',
-        'parallel_version_zh',
-        'parallel_version_en',
-        '--------- NeedleBench-200k Multi-Needles ---------',  # category
-        'multi_needle',
-        'multi_needle_en',
-        'multi_needle_zh',
-        'multi_needle2_en',
-        'multi_needle3_en',
-        'multi_needle4_en',
-        'multi_needle5_en',
-        'multi_needle2_zh',
-        'multi_needle3_zh',
-        'multi_needle4_zh',
-        'multi_needle5_zh',
-
-        # *_needlebench_200k_origin, *_needlebench_200k_multi_needle, *_needlebench_200k_parallel,
-    ],
-    summary_groups=needlebench_summary_groups,
-)
-context_lengths_8k = list(range(5000, 9000, 1000))
-
-# Repeating the same process for parallel (assuming it's similar to origin_en)
 _needlebench_8k_parallel_en_batch1 = []
 _needlebench_8k_parallel_en_batch5 = []
 _needlebench_8k_parallel_en_batch10 = []
@@ -607,7 +202,6 @@ needlebench_8k_batch_overall_summarizer = dict(
         'parallel_version_en_batch15',
         'parallel_version_zh_batch20',
         'parallel_version_en_batch20',
-        # *_needlebench_8k_origin, *_needlebench_8k_multi_needle, *_needlebench_8k_parallel,
     ],
     summary_groups=needlebench_summary_groups,
 )
@@ -648,10 +242,72 @@ needlebench_8k_batch_depth0_summarizer = dict(
         'parallel_version_en_batch15',
         'parallel_version_zh_batch20',
         'parallel_version_en_batch20',
-        # *_needlebench_8k_origin, *_needlebench_8k_multi_needle, *_needlebench_8k_parallel,
     ],
     summary_groups=needlebench_summary_groups,
 )
-needlebench_atc_summarizer = dict(
-    type=NeedleBenchATCSummarizer,
-)
+
+def gen_atc_summarizer(needle_num_list):
+    categories = [
+        'ZH-Direct-CE', 'EN-Direct-CE',
+        'ZH-Reasoning-CE', 'EN-Reasoning-CE'
+    ]
+    needlebench_atc_summary_groups = []
+
+    # 根据分类生成summary groups
+    for category in categories:
+        # 对于CircularEval相关的评分，使用perf_4指标，否则使用acc_1指标
+        metric = 'perf_4' if 'CE' in category else 'acc_1'
+        # 生成subsets时，不需要在数据集名称中包含CircularEval信息
+        cleaned_category = category.replace('-CE', '').replace('-Direct', '')
+        needlebench_atc_summary_groups.append({
+            'name': category,
+            'subsets': [
+                [f'NeedleBenchATCDataset-{num_needles}Needle-{cleaned_category}', metric]
+                for num_needles in needle_num_list
+            ],
+            'weights': {f'NeedleBenchATCDataset-{num_needles}Needle-{cleaned_category}': num_needles for num_needles in needle_num_list},
+        })
+
+    needlebench_atc_summary_groups.append({
+        'name': 'ATC-CE-Overall',
+        'subsets': [
+            [f'{category}', 'weighted_average'] for category in categories
+        ],
+    })
+    atc_dataset_abbrs = []
+    atc_dataset_abbrs.append(['ATC-CE-Overall', 'naive_average'])
+
+    for category in categories:
+        weighted_average_score_entry = [f'{category}', 'weighted_average']
+        atc_dataset_abbrs.append(weighted_average_score_entry)
+
+    needlebench_atc_summarizer = dict(
+        dataset_abbrs=[
+            *atc_dataset_abbrs,
+            '######## Needlebench-ATC Accuracy ########',  # category
+            *[[f'NeedleBenchATCDataset-{num_needles}Needle-ZH', 'acc_1'] for num_needles in needle_num_list],
+            '------------------------------------------',
+            *[[f'NeedleBenchATCDataset-{num_needles}Needle-EN', 'acc_1'] for num_needles in needle_num_list],
+            '------------------------------------------',
+            *[[f'NeedleBenchATCDataset-{num_needles}Needle-ZH-Reasoning', 'acc_1'] for num_needles in needle_num_list],
+            '------------------------------------------',
+            *[[f'NeedleBenchATCDataset-{num_needles}Needle-EN-Reasoning', 'acc_1'] for num_needles in needle_num_list],
+            '------------------------------------------',
+            '######## Needlebench-ATC CircularEval ########',  # category
+            *[[f'NeedleBenchATCDataset-{num_needles}Needle-ZH', 'perf_4'] for num_needles in needle_num_list],
+            '------------------------------------------',
+            *[[f'NeedleBenchATCDataset-{num_needles}Needle-EN', 'perf_4'] for num_needles in needle_num_list],
+            '------------------------------------------',
+            *[[f'NeedleBenchATCDataset-{num_needles}Needle-ZH-Reasoning', 'perf_4'] for num_needles in needle_num_list],
+            '------------------------------------------',
+            *[[f'NeedleBenchATCDataset-{num_needles}Needle-EN-Reasoning', 'perf_4'] for num_needles in needle_num_list],
+            '------------------------------------------',
+        ],
+        summary_groups=needlebench_atc_summary_groups
+    )
+    return needlebench_atc_summarizer
+
+
+atc_summarizer_20 = gen_atc_summarizer(list(range(2, 20, 1)))
+atc_summarizer_50 = gen_atc_summarizer(list(range(2, 50, 1)))
+atc_summarizer_80 = gen_atc_summarizer(list(range(2, 80, 1)))

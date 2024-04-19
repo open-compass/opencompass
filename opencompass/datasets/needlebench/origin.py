@@ -12,7 +12,7 @@ from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 
-def get_random_line_by_language(file_path, language):
+def get_random_line_by_language(counter, file_path, language):
     with open(file_path, 'r', encoding='utf-8') as file:
         lines = [
             json.loads(line.strip()) for line in file
@@ -20,6 +20,7 @@ def get_random_line_by_language(file_path, language):
         ]
 
     if lines:
+        random.seed(counter)
         random_line = random.choice(lines)
         return {
             'needle': random_line['needle'],
@@ -45,6 +46,7 @@ class NeedleBenchOriginDataset(BaseDataset):
         guide: bool,
         language: str,
         needle_file_name: str,
+        position: str = 'End',
     ):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
@@ -85,19 +87,42 @@ class NeedleBenchOriginDataset(BaseDataset):
                     retrieval_question)
 
             if language == 'Chinese':
-                prompt = ('你是一个善于回答用户问题的智能AI助手\n'
-                          '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
-                          '，或重复你的回答\n'
-                          f'用户现在给你的文档是{context}\n\n'
-                          f'现在请问：{retrieval_question}')
+                if position == 'End':
+                    prompt = ('你是一个善于回答用户问题的智能AI助手\n'
+                              '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
+                              '，或重复你的回答\n'
+                              f'用户现在给你的文档是{context}\n\n'
+                              f'现在请问：{retrieval_question}')
+                elif position == 'Start':
+                    prompt = ('你是一个善于回答用户问题的智能AI助手\n'
+                              '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
+                              '，或重复你的回答\n'
+                              f'现在请问：{retrieval_question}',
+                              f'用户现在给你的文档是{context}\n\n')
+                else:
+                    raise ValueError('Unsupported position. '
+                                     'Position must be "End" or "Start".')
             elif language == 'English':
-                prompt = ('You are an intelligent AI assistant skilled in '
-                          'answering user questions.\n'
-                          'Please keep your answers concise and clear. Do not'
-                          ' talk about irrelevant topics or repeat your '
-                          'answers.\n'
-                          f'The document given to you by the user is {context}'
-                          f'\n\nNow, the question is: {retrieval_question}')
+                if position == 'End':
+                    prompt = ('You are an intelligent AI assistant skilled in '
+                              'answering user questions.\n'
+                              'Please keep your answers concise and clear. Do '
+                              'not talk about irrelevant topics or repeat '
+                              'your answers.\nThe document '
+                              f'given to you by the user is {context}\n\n'
+                              f'Now, the question is: {retrieval_question}')
+                elif position == 'Start':
+                    prompt = ('You are an intelligent AI assistant skilled in '
+                              'answering user questions.\n'
+                              'Please keep your answers concise and clear. Do '
+                              'not talk about irrelevant topics or repeat '
+                              'your answers.\n'
+                              f'Now, the question is: {retrieval_question}'
+                              'The document given to you by the user'
+                              f' is {context}\n\n')
+                else:
+                    raise ValueError(f'Unsupported position {position}. '
+                                     'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
 
@@ -116,7 +141,7 @@ class NeedleBenchOriginDataset(BaseDataset):
                 random.shuffle(lines)
                 needle_file_path = os.path.join(path, needle_file_name)
                 random_needle = get_random_line_by_language(
-                    needle_file_path, language)
+                    counter, needle_file_path, language)
                 needle = '\n' + random_needle['needle'] + '\n'
                 retrieval_question = random_needle['retrieval_question']
                 keyword = random_needle['keyword']
