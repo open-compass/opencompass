@@ -1,3 +1,5 @@
+# flake8: noqa
+# yapf: disable
 import argparse
 import getpass
 import os
@@ -57,7 +59,7 @@ def parse_args():
                         action='store_true',
                         default=False)
     parser.add_argument(
-        '--accelerator',
+        '-a', '--accelerator',
         help='Infer accelerator, support vllm and lmdeploy now.',
         choices=['vllm', 'lmdeploy', 'hg'],
         default='hg',
@@ -187,25 +189,21 @@ def parse_dlc_args(dlc_parser):
 
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
+    hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat')
     hf_parser.add_argument('--hf-path', type=str)
-    hf_parser.add_argument('--peft-path', type=str)
+    hf_parser.add_argument('--model-kwargs', nargs='+', action=DictAction, default={})
     hf_parser.add_argument('--tokenizer-path', type=str)
-    hf_parser.add_argument('--model-kwargs',
-                           nargs='+',
-                           action=DictAction,
-                           default={})
-    hf_parser.add_argument('--tokenizer-kwargs',
-                           nargs='+',
-                           action=DictAction,
-                           default={})
-    hf_parser.add_argument('--max-out-len', type=int)
+    hf_parser.add_argument('--tokenizer-kwargs', nargs='+', action=DictAction, default={})
+    hf_parser.add_argument('--peft-path', type=str)
+    hf_parser.add_argument('--peft-kwargs', nargs='+', action=DictAction, default={})
+    hf_parser.add_argument('--generation-kwargs', nargs='+', action=DictAction, default={})
     hf_parser.add_argument('--max-seq-len', type=int)
-    hf_parser.add_argument('--no-batch-padding',
-                           action='store_true',
-                           default=False)
-    hf_parser.add_argument('--batch-size', type=int)
-    hf_parser.add_argument('--num-gpus', type=int)
+    hf_parser.add_argument('--max-out-len', type=int, default=256)
+    hf_parser.add_argument('--min-out-len', type=int, default=1)
+    hf_parser.add_argument('--batch-size', type=int, default=8)
+    hf_parser.add_argument('--num-gpus', type=int, default=1)
     hf_parser.add_argument('--pad-token-id', type=int)
+    hf_parser.add_argument('--stop-words', nargs='+', default=[])
 
 
 def parse_custom_dataset_args(custom_dataset_parser):
