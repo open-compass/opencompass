@@ -8,7 +8,7 @@ from opencompass.datasets.custom import make_custom_dataset_config
 from opencompass.models import (VLLM, HuggingFaceAboveV433Base,
                                 HuggingFaceAboveV433Chat, HuggingFaceCausalLM,
                                 TurboMindModel)
-from opencompass.partitioners import NaivePartitioner, SizePartitioner
+from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
@@ -289,9 +289,8 @@ def get_config_type(obj) -> str:
 
 def fill_infer_cfg(cfg, args):
     new_cfg = dict(infer=dict(
-        partitioner=dict(type=get_config_type(SizePartitioner),
-                         max_task_size=args.max_partition_size,
-                         gen_task_coef=args.gen_task_coef),
+        partitioner=dict(type=get_config_type(NumWorkerPartitioner),
+                         num_worker=args.max_num_workers),
         runner=dict(
             max_num_workers=args.max_num_workers,
             debug=args.debug,

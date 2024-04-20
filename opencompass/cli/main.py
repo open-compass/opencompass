@@ -103,17 +103,6 @@ def parse_args():
                         help='Report the running status to lark bot',
                         action='store_true',
                         default=False)
-    parser.add_argument('--max-partition-size',
-                        help='The maximum size of an infer task. Only '
-                        'effective when "infer" is missing from the config.',
-                        type=int,
-                        default=40000),
-    parser.add_argument(
-        '--gen-task-coef',
-        help='The dataset cost measurement coefficient for generation tasks, '
-        'Only effective when "infer" is missing from the config.',
-        type=int,
-        default=20)
     parser.add_argument('--max-num-workers',
                         help='Max number of workers to run in parallel. '
                         'Will be overrideen by the "max_num_workers" argument '
