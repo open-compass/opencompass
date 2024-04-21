@@ -5,7 +5,7 @@ models = [
     dict(
         abbr='mistral-7b-v0.2-hf',
         type=HuggingFaceCausalLM,
-        path='alpindale/Mistral-7B-v0.2-hf',
+        path='mistral-community/Mistral-7B-v0.2',
         model_kwargs=dict(
             device_map='auto',
             trust_remote_code=True,

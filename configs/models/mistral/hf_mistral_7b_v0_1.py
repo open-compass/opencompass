@@ -6,7 +6,6 @@ models = [
         abbr='mistral-7b-v0.1-hf',
         type=HuggingFaceCausalLM,
         path='mistralai/Mistral-7B-v0.1',
-        tokenizer_path='mistralai/Mistral-7B-v0.1',
         model_kwargs=dict(
             device_map='auto',
             trust_remote_code=True,

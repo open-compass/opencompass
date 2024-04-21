@@ -84,8 +84,6 @@ def answer_clean(direct_answer_trigger_for_fewshot: tuple, pred: str):
 
     # Remove the period at the end, again!
     pred = pred.rstrip('.').rstrip('/')
-    print(pred)
-
     return pred
 
 

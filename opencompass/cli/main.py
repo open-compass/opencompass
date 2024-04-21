@@ -89,7 +89,7 @@ def parse_args():
                         'saved in this path, including the slurm logs, '
                         'the evaluation results, the summary results, etc.'
                         'If not specified, the work_dir will be set to '
-                        './outputs/default.',
+                        'outputs/default.',
                         default=None,
                         type=str)
     parser.add_argument(
@@ -218,7 +218,7 @@ def main():
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
-        cfg.setdefault('work_dir', './outputs/default/')
+        cfg.setdefault('work_dir', osp.join('outputs', 'default'))
 
     # cfg_time_str defaults to the current time
     cfg_time_str = dir_time_str = datetime.now().strftime('%Y%m%d_%H%M%S')
