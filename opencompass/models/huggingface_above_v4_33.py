@@ -2,7 +2,7 @@
 # yapf: disable
 from typing import Dict, List, Optional, Union
 
-from opencompass.models.base import BaseModel
+from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.models.base_api import APITemplateParser
 from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
@@ -14,9 +14,7 @@ def _format_with_fast_chat_template(inputs: List[str], name: str='vicuna'):
     try:
         from fastchat.model import get_conversation_template
     except ImportError:
-        raise ModuleNotFoundError(
-            'fastchat not found. Please install with\n'
-            'pip install "fschat[model_worker,webui]"')
+        raise ModuleNotFoundError('fastchat not found. Please install with\npip install "fschat[model_worker,webui]"')
     for i in range(len(inputs)):
         template = get_conversation_template(name)
         template.append_message(template.roles[0], inputs[i])
@@ -238,6 +236,11 @@ class HuggingFaceAboveV433Chat(BaseModel):
 
         return decodeds
 
+    def get_token_len(self, prompt: str) -> int:
+        m = _convert_chat_messages([prompt])[0]
+        t = self.tokenizer.apply_chat_template(m, add_generation_prompt=True)
+        return len(t['input_ids'])
+
 def  _convert_base_messages(inputs):
     outputs = []
     for _input in inputs:
@@ -274,7 +277,7 @@ class HuggingFaceAboveV433Base(HuggingFaceAboveV433Chat):
 
         self.path = path
         self.tokenizer_only = tokenizer_only
-        self.template_parser = _get_meta_template(None)
+        self.template_parser = LMTemplateParser()
         self.config = AutoConfig.from_pretrained(path, trust_remote_code=True)
         self.generation_config = GenerationConfig.from_pretrained(path)
         self.max_seq_len = max_seq_len or self.config.max_position_embeddings
@@ -379,3 +382,65 @@ class HuggingFaceAboveV433Base(HuggingFaceAboveV433Chat):
             decodeds = [token.split(stop)[0] for token in decodeds]
 
         return decodeds
+
+    def get_ppl(self, inputs: List[str], mask_length: Optional[List[int]] = None) -> List[float]:
+        """Get perplexity scores given a list of inputs.
+
+        Args:
+            inputs (List[str]): A list of strings.
+            mask_length (Optional[List[int]]): A list of mask lengths. If
+                provided, the perplexity scores will be calculated with the
+                first mask_length[i] tokens masked out. It's okay to skip
+                its implementation if advanced features in PPLInfernecer is
+                not needed.
+
+        Returns:
+            List[float]: A list of perplexity scores.
+        """
+        assert self.tokenizer.pad_token
+        import torch
+        import torch.nn.functional as F
+        pad_token_id = self.tokenizer.pad_token_id
+        messages = _convert_base_messages(inputs)
+
+        tokenize_kwargs = dict(
+            return_tensors='pt',
+            padding=True,
+            truncation=True,
+            add_special_tokens=True,
+            max_length=self.max_seq_len
+        )
+        tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+        tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
+        outputs = self.model(**tokens)[0]
+
+        batch_size, seq_len, vocab_size = outputs.shape
+        shift_logits = outputs[:, :-1, :].contiguous().float()
+        shift_labels = tokens['input_ids'][:, 1:].contiguous()
+        loss = F.cross_entropy(
+            shift_logits.view(-1, vocab_size),
+            shift_labels.view(-1),
+            ignore_index=pad_token_id,
+            reduction='none').view(batch_size, seq_len - 1)
+        lens = (tokens['input_ids'] != pad_token_id).sum(-1).cpu().numpy()
+
+        if mask_length is not None:
+            import numpy as np
+            mask = torch.zeros_like(shift_labels)  # [batch,seqlen]
+            for i in range(len(mask)):
+                for j in range(mask_length[i] - 1, len(mask[i])):
+                    mask[i][j] = 1
+            loss = loss * mask
+            lens -= np.array(mask_length)
+
+        ce_loss = loss.float().sum(-1).cpu().detach().numpy() / lens
+        return ce_loss
+
+    def get_loglikelihood(self, inputs: List[str], conts:  List[str]) -> List[float]:
+        mask_length = [self.get_token_len(c, add_special_tokens=False) for c in conts]
+        return - self.get_ppl(inputs, mask_length)
+
+    def get_token_len(self, prompt: str, add_special_tokens: bool=True) -> int:
+        m = _convert_base_messages([prompt])[0]
+        t = self.tokenizer(m, add_special_tokens=add_special_tokens)
+        return len(t['input_ids'])

@@ -108,7 +108,7 @@ def parse_args():
                         'Will be overrideen by the "max_num_workers" argument '
                         'in the config.',
                         type=int,
-                        default=32)
+                        default=1)
     parser.add_argument('--max-workers-per-gpu',
                         help='Max task to run in parallel on one GPU. '
                         'It will only be used in the local runner.',

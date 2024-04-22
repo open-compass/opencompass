@@ -306,7 +306,7 @@ class DefaultSummarizer:
             text = f'{time_str}\n' + \
                     'tabulate format\n' + \
                     '^' * 128 + '\n' + \
-                    tabulate.tabulate(table, headers='firstrow') + '\n' + \
+                    tabulate.tabulate(table, headers='firstrow', floatfmt='.2f') + '\n' + \
                     '$' * 128 + '\n\n' + \
                     '-' * 128 + ' THIS IS A DIVIDER ' + '-' * 128 + '\n\n' + \
                     'csv format\n' + \
@@ -344,7 +344,7 @@ class DefaultSummarizer:
         raw_txts = self._format_raw_txt(raw_results)
 
         # output to screen
-        print(tabulate.tabulate(table, headers='firstrow'))
+        print(tabulate.tabulate(table, headers='firstrow', floatfmt='.2f'))
 
         # output to .text / .csv files
         self._output_to_file(output_path, time_str, table, raw_txts)

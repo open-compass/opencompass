@@ -25,7 +25,7 @@ TheoremQA_reader_cfg = dict(input_columns=["Question", "Answer_type"], output_co
 TheoremQA_infer_cfg = dict(
     prompt_template=dict(type=PromptTemplate, template=dict(round=rounds)),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=2048, stopping_criteria=["Problem:", "Problem"]),
+    inferencer=dict(type=GenInferencer, max_out_len=1024, stopping_criteria=["Problem:", "Problem"]),
 )
 
 TheoremQA_eval_cfg = dict(
