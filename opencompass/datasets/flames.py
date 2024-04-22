@@ -48,9 +48,6 @@ class FlamesDataset(SubjectiveCmpDataset):
             dataset = json.load(f)
         flames_dataset = []
         for ins in dataset:
-            # prefix = prompt_construct(ins, config)
-            # ins['prefix'] = prefix \
-            # ins['reference'] = ins['answer']
             ins['instruction'] = prompt_construct(ins, config)
             ins['judge'] = {}
             flames_dataset.append(ins)
