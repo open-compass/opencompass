@@ -3,10 +3,10 @@ from opencompass.models import HuggingFaceAboveV433Base
 models = [
     dict(
         type=HuggingFaceAboveV433Base,
-        abbr='bluelm-7b-base-32k-hf',
-        path='vivo-ai/BlueLM-7B-Base-32K',
+        abbr='mixtral-8x22b-v0.1',
+        path='mistralai/Mixtral-8x22B-v0.1',
         max_out_len=1024,
         batch_size=8,
-        run_cfg=dict(num_gpus=1),
+        run_cfg=dict(num_gpus=4),
     )
 ]

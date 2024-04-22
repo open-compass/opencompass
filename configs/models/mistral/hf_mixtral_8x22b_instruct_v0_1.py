@@ -3,10 +3,10 @@ from opencompass.models import HuggingFaceAboveV433Chat
 models = [
     dict(
         type=HuggingFaceAboveV433Chat,
-        abbr='llama-2-13b-chat-hf',
-        path='meta-llama/Llama-2-13b-chat-hf',
+        abbr='mixtral-8x22b-instruct-v0.1',
+        path='mistralai/Mixtral-8x22B-Instruct-v0.1',
         max_out_len=1024,
         batch_size=8,
-        run_cfg=dict(num_gpus=1),
+        run_cfg=dict(num_gpus=4),
     )
 ]

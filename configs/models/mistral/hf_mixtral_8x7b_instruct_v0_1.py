@@ -3,11 +3,10 @@ from opencompass.models import HuggingFaceAboveV433Chat
 models = [
     dict(
         type=HuggingFaceAboveV433Chat,
-        abbr='internlm2-chat-20b-sft-hf',
-        path='internlm/internlm2-chat-20b-sft',
+        abbr='mixtral-8x7b-instruct-v0.1',
+        path='mistralai/Mixtral-8x7B-Instruct-v0.1',
         max_out_len=1024,
         batch_size=8,
         run_cfg=dict(num_gpus=2),
-        generation_kwargs = {"eos_token_id": [2, 92542]},
     )
 ]
