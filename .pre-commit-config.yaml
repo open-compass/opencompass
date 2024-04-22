@@ -9,6 +9,7 @@ exclude: |
       opencompass/datasets/medbench/|
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
+      opencompass/datasets/TheoremQA|
       docs/zh_cn/advanced_guides/compassbench_intro.md
     )
 repos:
