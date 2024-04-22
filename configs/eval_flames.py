@@ -137,15 +137,15 @@ eval = dict(
         mode='singlescore',
         models = models
     ),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(
-            type=SubjectiveEvalTask,
-        judge_cfg=judge_model # 评价模型
-        )),
+    # runner=dict(
+    #     type=SlurmSequentialRunner,
+    #     partition='llmeval',
+    #     quotatype='auto',
+    #     max_num_workers=256,
+    #     task=dict(
+    #         type=SubjectiveEvalTask,
+    #     judge_cfg=judge_model # JudgeModel
+    #     )),
 )
 
 summarizer = dict(
