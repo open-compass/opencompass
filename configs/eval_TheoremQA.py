@@ -10,7 +10,7 @@ with read_base():
 
 models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
 
-work_dir = 'outputs/debug/theorem-5shot'
+work_dir = 'outputs/TheoremQA-5shot'
 
 
 # dataset    version    metric    mode      mistral-7b-v0.1-hf    mistral-7b-v0.2-hf    internlm2-20b-hf    internlm2-math-20b-hf
