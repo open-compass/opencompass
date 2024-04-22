@@ -55,24 +55,6 @@ def _get_stopping_criteria(stop_words, tokenizer, batch_size):
     return criteria
 
 
-def _set_model_kwargs_torch_dtype(model_kwargs):
-    import torch
-
-    if 'torch_dtype' not in model_kwargs:
-        torch_dtype = torch.float16
-    else:
-        torch_dtype = {
-            'torch.float16': torch.float16,
-            'torch.bfloat16': torch.bfloat16,
-            'torch.float': torch.float,
-            'auto': 'auto',
-            'None': None
-        }.get(model_kwargs['torch_dtype'])
-    if torch_dtype is not None:
-        model_kwargs['torch_dtype'] = torch_dtype
-    return model_kwargs
-
-
 def _convert_chat_messages(inputs):
     outputs = []
     for _input in inputs:
@@ -130,7 +112,7 @@ class HuggingFaceAboveV433Chat(BaseModel):
         if not tokenizer_only:
             self._load_model(path=path, kwargs=model_kwargs, peft_path=peft_path, peft_kwargs=peft_kwargs)
         self.generation_kwargs = generation_kwargs
-        self.fastchat_template = fastchat_template  # 'vicuna'
+        self.fastchat_template = fastchat_template
         self.stop_words = stop_words
 
         for k, v in other_kwargs.items():
@@ -173,7 +155,6 @@ class HuggingFaceAboveV433Chat(BaseModel):
         DEFAULT_MODEL_KWARGS = dict(device_map='auto', trust_remote_code=True)
         model_kwargs = DEFAULT_MODEL_KWARGS
         model_kwargs.update(kwargs)
-        model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
 
         try:
             self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
@@ -267,7 +248,6 @@ class HuggingFaceAboveV433Base(HuggingFaceAboveV433Chat):
                  generation_kwargs: dict = dict(),
                  max_seq_len: Optional[int] = None,
                  pad_token_id: Optional[int] = None,
-                 fastchat_template: Optional[str] = None,
                  stop_words: Optional[str] = [],
                  **other_kwargs):
 
@@ -285,7 +265,6 @@ class HuggingFaceAboveV433Base(HuggingFaceAboveV433Chat):
         if not tokenizer_only:
             self._load_model(path=path, kwargs=model_kwargs, peft_path=peft_path, peft_kwargs=peft_kwargs)
         self.generation_kwargs = generation_kwargs
-        self.fastchat_template = fastchat_template  # 'vicuna'
         self.stop_words = stop_words
 
         for k, v in other_kwargs.items():
@@ -328,7 +307,6 @@ class HuggingFaceAboveV433Base(HuggingFaceAboveV433Chat):
         DEFAULT_MODEL_KWARGS = dict(device_map='auto', trust_remote_code=True)
         model_kwargs = DEFAULT_MODEL_KWARGS
         model_kwargs.update(kwargs)
-        model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
 
         try:
             self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
