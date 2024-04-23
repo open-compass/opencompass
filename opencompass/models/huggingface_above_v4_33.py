@@ -63,15 +63,16 @@ def _convert_chat_messages(inputs):
     outputs = []
     for _input in inputs:
         messages = []
-        for item in _input:
-            msg = {'content': item['prompt']}
-            if item['role'] == 'HUMAN':
-                msg['role'] = 'user'
-            elif item['role'] == 'BOT':
-                msg['role'] = 'assistant'
-            elif item['role'] == 'SYSTEM':
-                msg['role'] = 'system'
-            messages.append(msg)
+        if isinstance(_input, str):
+            messages.append({'role': 'HUMAN', 'prompt': _input})
+        else:
+            for item in _input:
+                role = {
+                    'HUMAN': 'user',
+                    'BOT': 'assistant',
+                    'SYSTEM': 'system',
+                }[item['role']]
+                messages.append({'role': role, 'content': item['prompt']})
         outputs.append(messages)
     return outputs
 
@@ -262,7 +263,7 @@ class HuggingFaceAboveV433Chat(BaseModel):
 
     def get_token_len(self, prompt: str) -> int:
         m = _convert_chat_messages([prompt])[0]
-        t = self.tokenizer.apply_chat_template(m, add_generation_prompt=True)
+        t = self.tokenizer.apply_chat_template(m, add_generation_prompt=True, return_dict=True)
         return len(t['input_ids'])
 
 def  _convert_base_messages(inputs):

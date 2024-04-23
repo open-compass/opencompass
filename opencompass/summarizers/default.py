@@ -226,12 +226,12 @@ class DefaultSummarizer:
 
         return raw_results, parsed_results, dataset_metrics, dataset_eval_mode
 
-    def _format_table(self, parsed_results, dataset_metrics, dataset_eval_mode):
+    def _format_table(self, parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=None):
         dataset_abbrs = [dataset_abbr_from_cfg(dataset) for dataset in self.dataset_cfgs]
         prompt_version = {dataset_abbr_from_cfg(d): get_prompt_hash(d)[:6] for d in self.dataset_cfgs}
 
         summarizer_dataset_abbrs = []
-        if self.dataset_abbrs is None:
+        if required_dataset_abbrs is None:
             # display all dataset metrics included in the config
             for dataset_abbr in dataset_abbrs:
                 if dataset_abbr in dataset_metrics:
@@ -246,7 +246,7 @@ class DefaultSummarizer:
                         summarizer_dataset_abbrs.append((dataset_abbr, metric))
         else:
             # follow the required order
-            for item in self.dataset_abbrs:
+            for item in required_dataset_abbrs:
                 if isinstance(item, str):
                     summarizer_dataset_abbrs.append((item, None))
                 elif isinstance(item, (list, tuple)):
@@ -338,7 +338,7 @@ class DefaultSummarizer:
             self._calculate_group_metrics(raw_results, parsed_results, dataset_metrics, dataset_eval_mode)
 
         # format table
-        table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode)
+        table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=self.dataset_abbrs)
 
         # format raw txt
         raw_txts = self._format_raw_txt(raw_results)

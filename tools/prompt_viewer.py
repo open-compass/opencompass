@@ -54,7 +54,7 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
     # extracted and generalized as a static method in these Inferencers
     # and reused here.
     if model_cfg:
-        max_seq_len = model_cfg.max_seq_len
+        max_seq_len = model_cfg.get('max_seq_len', 32768)
         if not model_cfg['type'].is_api:
             model_cfg['tokenizer_only'] = True
         model = build_model_from_cfg(model_cfg)
