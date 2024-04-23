@@ -6,13 +6,12 @@ from datetime import datetime
 
 from mmengine.config import Config, DictAction
 
-from opencompass.partitioners import MultimodalNaivePartitioner
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
 from opencompass.utils import LarkReporter, get_logger
-from opencompass.utils.run import (exec_mm_infer_runner, fill_eval_cfg,
-                                   fill_infer_cfg, get_config_from_arg)
+from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
+                                   get_config_from_arg)
 
 
 def parse_args():
@@ -34,11 +33,6 @@ def parse_args():
                                help='Whether to force tasks to run on dlc. If '
                                'True, `--aliyun-cfg` must be set. Defaults'
                                ' to False')
-    # multi-modal support
-    parser.add_argument('--mm-eval',
-                        help='Whether or not enable multimodal evaluation',
-                        action='store_true',
-                        default=False)
     # Add shortcut parameters (models, datasets and summarizer)
     parser.add_argument('--models', nargs='+', help='', default=None)
     parser.add_argument('--datasets', nargs='+', help='', default=None)
@@ -278,13 +272,6 @@ def main():
                            'also specified --slurm or --dlc. '
                            'The "infer" configuration will be overridden by '
                            'your runtime arguments.')
-        # Check whether run multimodal evaluation
-        if args.mm_eval:
-            partitioner = MultimodalNaivePartitioner(
-                osp.join(cfg['work_dir'], 'predictions/'))
-            tasks = partitioner(cfg)
-            exec_mm_infer_runner(tasks, args, cfg)
-            return
 
         if args.dlc or args.slurm or cfg.get('infer', None) is None:
             fill_infer_cfg(cfg, args)
