@@ -18,6 +18,7 @@ from .krgpt_api import KrGPT  # noqa: F401
 from .lightllm_api import LightllmAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401, F403
 from .lmdeploy_pytorch import LmdeployPytorchModel  # noqa: F401
+from .lmdeploy_tis import LmdeployTisModel  # noqa: F401
 from .minimax_api import MiniMax  # noqa: F401
 from .mistral_api import Mistral  # noqa: F401
 from .mixtral import Mixtral  # noqa: F401
