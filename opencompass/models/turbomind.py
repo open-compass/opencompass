@@ -165,7 +165,7 @@ class TurboMindModel(BaseModel):
                                               sequence_end=True,
                                               step=0,
                                               stream_output=False):
-            _, output_ids, _ = outputs
+            output_ids = outputs.token_ids
             response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
         # used to trim

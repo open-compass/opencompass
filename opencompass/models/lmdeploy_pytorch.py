@@ -145,9 +145,10 @@ class LmdeployPytorchModel(BaseModel):
         assert type(
             prompt) is str, 'We only support string for TurboMind Python API'
         input_ids = self.tokenizer.encode(prompt)
-        _, output_ids, _ = generator.infer(session_id,
+        outputs = generator.infer(session_id,
                                            input_ids,
                                            gen_config=gen_config)
+        output_ids = outputs.token_ids
         # stop engine
         if hasattr(generator, 'end'):
             generator.end(session_id)
