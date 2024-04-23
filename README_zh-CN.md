@@ -60,12 +60,14 @@
 
 🚩🚩🚩 欢迎加入 OpenCompass！我们目前**招聘全职研究人员/工程师和实习生**。如果您对 LLM 和 OpenCompass 充满热情，请随时通过[电子邮件](mailto:zhangsongyang@pjlab.org.cn)与我们联系。我们非常期待与您交流！
 
-🔥🔥🔥 祝贺 **OpenCompass 作为大模型标准测试工具被Meta AI官方推荐**, 点击 Llama 的 [入门文档](https://ai.meta.com/llama/get-started/#validation) 获取更多信息.
+🔥🔥🔥 祝贺 **OpenCompass 作为大模型标准测试工具被Meta AI官方推荐**, 点击 Llama 的 [入门文档](https://ai.meta.com/llama/get-started/#validation) 获取更多信息。
 
 > **注意**<br />
 > 我们正式启动 OpenCompass 共建计划，诚邀社区用户为 OpenCompass 提供更具代表性和可信度的客观评测数据集!
 > 点击 [Issue](https://github.com/open-compass/opencompass/issues/248) 获取更多数据集.
 > 让我们携手共进，打造功能强大易用的大模型评测平台！
+
+另：OpenCompass 代码库目前主要支持大语言模型评测，如您希望评测多模态大模型，推荐使用 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit) 进行评测。
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
