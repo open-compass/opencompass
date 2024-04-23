@@ -8,6 +8,6 @@ models = [
         max_out_len=1024,
         batch_size=8,
         run_cfg=dict(num_gpus=1),
-        generation_kwargs={'eos_token_id': [128001, 128009]},
+        stop_words=['<|end_of_text|>', '<|eot_id|>'],
     )
 ]

@@ -256,7 +256,7 @@ class HuggingFaceAboveV433Chat(BaseModel):
         # step-3: decode the output
         decodeds = self.tokenizer.batch_decode(outputs)
         for stop in stopping_criteria:
-            decodeds = [token.split(stop)[0] for token in decodeds]
+            decodeds = [t.split(stop)[0] for t in decodeds]
 
         return decodeds
 
