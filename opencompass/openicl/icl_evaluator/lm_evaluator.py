@@ -12,8 +12,6 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.registry import ICL_PROMPT_TEMPLATES
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
-from opencompass.utils.text_postprocessors import first_number_postprocess
-from opencompass.utils.types import get_type_from_cfg
 
 
 def extract_dicts(data):
@@ -92,8 +90,6 @@ class LMEvaluator:
         meta_review_prompt_template: Optional[ConfigDict] = None,
         pack_all_predictions: Optional[bool] = False,
         dataset_cfg: Optional[ConfigDict] = None,
-        # postprocessor: ConfigDict = dict(type=first_number_postprocess),
-        pred_postprocessor: Optional[ConfigDict] = None,
     ) -> None:
         self.output_path = output_path
         out_dir, out_name = osp.split(output_path)
@@ -113,7 +109,6 @@ class LMEvaluator:
                                         batch_size=batch_size,
                                         output_json_filepath=out_dir,
                                         output_json_filename=out_name)
-        # self.postprocessor = get_type_from_cfg(postprocessor)
         self.logger = get_logger()
         self.dataset_cfg = dataset_cfg
         self.pack_all_predictions = pack_all_predictions
