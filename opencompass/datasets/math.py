@@ -125,6 +125,14 @@ def normalize_final_answer(final_answer: str) -> str:
     return final_answer
 
 
+ANSWER_PATTERN = r'(?i)ANSWER\s*:\s*([^\n]+)'
+
+
+def extract_answer(response_text: str):
+    match = re.search(ANSWER_PATTERN, response_text)
+    return match.group(1) if match else None
+
+
 @LOAD_DATASET.register_module()
 class MATHDataset(BaseDataset):
 
@@ -154,6 +162,12 @@ def math_postprocess(text: str) -> str:
     return normalize_final_answer(text.split('.')[0])
     # return normalize_final_answer(
     #     text.split('Final Answer: ', 1)[-1].split('\n\n')[0])
+
+
+@TEXT_POSTPROCESSORS.register_module('math_judement_preprocess')
+def math_judement_preprocess(text: str) -> str:
+    """Preprocess prediction before judgement."""
+    return extract_answer(text)
 
 
 @TEXT_POSTPROCESSORS.register_module('math_postprocess_v2')
