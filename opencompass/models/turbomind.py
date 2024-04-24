@@ -54,6 +54,7 @@ class TurboMindModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.turbomind import TurboMind
+        from lmdeploy.version import version_info
 
         if engine_config is not None:
             from lmdeploy.messages import TurbomindEngineConfig
@@ -70,6 +71,7 @@ class TurboMindModel(BaseModel):
         self.generator_ids = [i + 1 for i in range(concurrency)]
         self.gen_config = gen_config
         self.end_str = end_str
+        self.major_version, self.minor_version, _ = version_info
 
     def generate(self,
                  inputs: List[str],
@@ -165,7 +167,10 @@ class TurboMindModel(BaseModel):
                                               sequence_end=True,
                                               step=0,
                                               stream_output=False):
-            output_ids = outputs.token_ids
+            if self.major_version >= 0 and self.minor_version >= 4:
+                output_ids = outputs.token_ids
+            else:
+                _, output_ids, _ = outputs
             response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
         # used to trim
