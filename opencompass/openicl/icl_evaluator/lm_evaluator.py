@@ -78,7 +78,7 @@ class LMEvaluator:
         dataset_cfg (ConfigDict, optional): The config of the dataset to be
             evaluated.
         pack_all_predictions (bool, optional): For multiround evaluation, judge all round or judge every single round.
-        postprocessor (ConfigDict): The model prediction's postprocessor
+        pred_postprocessor (ConfigDict): The model prediction's postprocessor
             config.
     """
 
@@ -90,6 +90,7 @@ class LMEvaluator:
         meta_review_prompt_template: Optional[ConfigDict] = None,
         pack_all_predictions: Optional[bool] = False,
         dataset_cfg: Optional[ConfigDict] = None,
+        pred_postprocessor: Optional[ConfigDict] = None,
     ) -> None:
         self.output_path = output_path
         out_dir, out_name = osp.split(output_path)

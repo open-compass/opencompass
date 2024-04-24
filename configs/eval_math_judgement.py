@@ -95,6 +95,8 @@ for d in eng_datasets:
     d['eval_cfg']= dict(
         evaluator=dict(
             type=LMEvaluator,
+            # If you need to preprocess the prediction before judging, 
+            # you can specify the pred_postprocessor function here
             pred_postprocessor=dict(type=math_judement_preprocess),
             prompt_template=dict(
                 type=PromptTemplate,
@@ -122,7 +124,7 @@ infer = dict(
 # ------------- Evaluation Configuration --------------------------------
 eval = dict(
     partitioner=dict(
-        type=SubjectiveSizePartitioner, max_task_size=80000, mode='singlescore', models=models, judge_models= judge_models,
+        type=SubjectiveSizePartitioner, max_task_size=100000, mode='singlescore', models=models, judge_models=judge_models,
     ),
     runner=dict(type=SlurmSequentialRunner,
         partition='llmeval',
