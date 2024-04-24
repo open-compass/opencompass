@@ -27,11 +27,9 @@ except ImportError:
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
-from opencompass.utils.logging import get_logger
 
 from .base import BaseDataset
 
-logger = get_logger()
 TIMEOUT = 10
 
 
@@ -267,7 +265,7 @@ def timeout_handler(signum, frame):
 try:
     signal.signal(signal.SIGALRM, timeout_handler)
 except AttributeError:
-    logger.warning('signal.SIGALRM is not available on this platform')
+    print('signal.SIGALRM is not available on this platform')
 timeout = 4  # seconds
 
 

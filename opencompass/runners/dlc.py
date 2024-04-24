@@ -214,6 +214,16 @@ class DLCRunner(BaseRunner):
                 pod_create_time = None
                 pri_time = None
                 initial_time = datetime.datetime.now()
+
+                url = 'http://pai-console.cb210e3f99cd7403f8de2a630dcc99fc3.cn-wulanchabu.alicontainer.com'  # noqa: E501
+                logger = get_logger()
+                logger.debug('')
+                logger.debug('*' * 168)
+                logger.debug(
+                    f'{url}/index?workspaceId={self.aliyun_cfg["workspace_id"]}#/dlc2/job/{job_id}/detail'  # noqa: E501
+                )
+                logger.debug('*' * 168)
+
                 while True:
                     # 1. Avoid to request dlc too frequently.
                     # 2. DLC job may not be ready immediately after creation.

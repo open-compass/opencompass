@@ -4,7 +4,7 @@ from datasets import load_dataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
-from .base import BaseDataset
+from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()

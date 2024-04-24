@@ -17,7 +17,7 @@ def create_m_rs_names_list(context_lengths, depths, needle_counts,
                 for depth in depths
             ]
             names_dict[key] = names_list
-            
+
             multi_needle_list.extend(names_list)
             if language == 'en':
                 multi_needle_en_list.extend(names_list)
@@ -29,7 +29,7 @@ def create_m_rs_names_list(context_lengths, depths, needle_counts,
 
     return names_dict
 
-def create_summarizer(context_lengths, depths, dataset_size, 
+def create_summarizer(context_lengths, depths, dataset_size,
                       sparse_depths=None):
     needle_counts = ["2", "3", "4", "5"]
     languages = ["en", "zh"]
@@ -40,7 +40,7 @@ def create_summarizer(context_lengths, depths, dataset_size,
         context_lengths, depths, needle_counts, languages, dataset_size)
 
     names_dict.update(multi_reasoning_names)
-    
+
     single_needle_list = []
     single_needle_en_list = []
     single_needle_zh_list = []
@@ -133,6 +133,8 @@ context_lengths_128k = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 1
 needlebench_128k_summarizer = create_summarizer(context_lengths_128k, depths_list_sparse, "128k")
 context_lengths_200k = list([16000, 48000, 80000, 112000, 128000, 144000, 176000, 200000])
 needlebench_200k_summarizer = create_summarizer(context_lengths_200k, depths_list_sparse, "200k")
+context_lengths_256k = list([32000, 128000, 256000])
+needlebench_256k_summarizer = create_summarizer(context_lengths_256k, depths_list_sparse, "256k")
 context_lengths_1000k = list([20000, 160000, 300000, 440000, 580000, 720000, 860000, 1000000])
 needlebench_1000k_summarizer = create_summarizer(context_lengths_1000k, depths_list_sparse, "1000k")
 

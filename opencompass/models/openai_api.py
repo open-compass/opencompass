@@ -84,7 +84,12 @@ class OpenAI(BaseAPIModel):
         self.top_logprobs = top_logprobs
 
         if isinstance(key, str):
-            self.keys = [os.getenv('OPENAI_API_KEY') if key == 'ENV' else key]
+            if key == 'ENV':
+                if 'OPENAI_API_KEY' not in os.environ:
+                    raise ValueError('OpenAI API key is not set.')
+                self.keys = os.getenv('OPENAI_API_KEY').split(',')
+            else:
+                self.keys = [key]
         else:
             self.keys = key
 
@@ -101,12 +106,11 @@ class OpenAI(BaseAPIModel):
         self.url = openai_api_base
         self.path = path
 
-    def generate(
-        self,
-        inputs: List[PromptType],
-        max_out_len: int = 512,
-        temperature: float = 0.7,
-    ) -> List[str]:
+    def generate(self,
+                 inputs: List[PromptType],
+                 max_out_len: int = 512,
+                 temperature: float = 0.7,
+                 **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
@@ -412,9 +416,15 @@ class OpenAIAllesAPIN(OpenAI):
         }
         for _ in range(self.retry):
             self.wait()
-            raw_response = requests.post(self.url,
-                                         headers=self.headers,
-                                         data=json.dumps(data))
+            try:
+                raw_response = requests.post(self.url,
+                                             headers=self.headers,
+                                             data=json.dumps(data))
+            except requests.ConnectionError:
+                self.logger.error('Request error, got',
+                                  str(raw_response.content))
+                time.sleep(1)
+                continue
             try:
                 response = raw_response.json()
             except requests.JSONDecodeError:

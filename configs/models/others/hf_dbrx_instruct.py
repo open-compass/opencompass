@@ -29,7 +29,6 @@ models = [
         batch_size=8,
         meta_template=_meta_template,
         run_cfg=dict(num_gpus=8, num_procs=1),
-        end_str='<|im_end|>',
         batch_padding=True,
     )
 ]
