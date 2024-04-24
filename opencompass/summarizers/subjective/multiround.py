@@ -128,7 +128,8 @@ class MultiroundSummarizer:
         self.eval_model_abbrs = [
             model_abbr_from_cfg(model) for model in self.eval_model_cfgs
         ]
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
+        self.judge_abbr = model_abbr_from_cfg(
+            self.cfg['eval']['partitioner']['judge_models'][0])
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):

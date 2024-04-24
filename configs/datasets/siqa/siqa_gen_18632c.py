@@ -1,7 +1,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets.custom import OptionSimAccEvaluator
+from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.utils.text_postprocessors import first_option_postprocess
 from opencompass.datasets import siqaDataset_V3
 
 siqa_reader_cfg = dict(
@@ -26,8 +27,8 @@ siqa_infer_cfg = dict(
 )
 
 siqa_eval_cfg = dict(
-    evaluator=dict(type=OptionSimAccEvaluator, options='ABC'),
-    pred_role="BOT",
+            evaluator=dict(type=AccEvaluator),
+            pred_postprocessor=dict(type=first_option_postprocess, options='ABC')
 )
 
 siqa_datasets = [

@@ -77,9 +77,10 @@ class NQEvaluator(BaseEvaluator):
         cnt = 0
         for pred, cand_ans in zip(processed_predictions, processed_answers):
             detail = {'pred': pred, 'answer': cand_ans, 'correct': False}
-            cnt += int(any([cand == pred for cand in cand_ans]))
-            if int(any([cand == pred for cand in cand_ans])):
-                detail['correct'] = True
+            # is_correct = any([cand == pred for cand in cand_ans])
+            is_correct = any([cand in pred for cand in cand_ans])
+            cnt += int(is_correct)
+            detail['correct'] = is_correct
             details.append(detail)
         score = cnt / len(predictions) * 100
 

@@ -109,10 +109,8 @@ class HuggingFace(BaseModel):
                          max_seq_len=max_seq_len,
                          tokenizer_only=tokenizer_only,
                          meta_template=meta_template)
-        from opencompass.utils.fileio import patch_hf_auto_model
         if hf_cache_dir is None:
             hf_cache_dir = os.getenv('HF_MODEL_HUB', None)
-        patch_hf_auto_model(hf_cache_dir)
         self.logger = get_logger()
         self.pad_token_id = pad_token_id
         assert mode in ['none', 'mid']
@@ -725,7 +723,7 @@ class HuggingFaceChatGLM3(HuggingFace):
         self.num_extra_tokens = num_extra_tokens
 
     def generate(self,
-                 inputs: List[str or PromptList],
+                 inputs: List[PromptType],
                  max_out_len: int = 512,
                  skip_overlength=False,
                  **kwargs) -> str:

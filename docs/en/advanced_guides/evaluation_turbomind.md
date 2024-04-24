@@ -6,7 +6,7 @@ We now support evaluation of models accelerated by the [LMDeploy](https://github
 
 ### Install OpenCompass
 
-Please follow the [instructions](https://opencompass.readthedocs.io/en/latest/get_started.html) to install the OpenCompass and prepare the evaluation datasets.
+Please follow the [instructions](https://opencompass.readthedocs.io/en/latest/get_started/installation.html) to install the OpenCompass and prepare the evaluation datasets.
 
 ### Install LMDeploy
 
@@ -56,6 +56,7 @@ internlm_20b = dict(
         batch_size=8,
         concurrency=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
+        end_str='<eoa>'
     )
 
 models = [internlm_20b]

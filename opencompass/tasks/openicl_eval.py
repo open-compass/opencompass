@@ -3,6 +3,7 @@ import copy
 import fnmatch
 import math
 import os.path as osp
+import re
 import statistics
 import time
 from collections import Counter
@@ -38,12 +39,12 @@ def extract_role_pred(s: str, begin_str: Optional[str],
     start = 0
     end = len(s)
 
-    if begin_str:
+    if begin_str and re.match(r'\s*', begin_str) is None:
         begin_idx = s.find(begin_str)
         if begin_idx != -1:
             start = begin_idx + len(begin_str)
 
-    if end_str:
+    if end_str and re.match(r'\s*', end_str) is None:
         # TODO: Support calling tokenizer for the accurate eos token
         # and avoid such hardcode
         end_idx = s.find(end_str, start)
@@ -67,8 +68,10 @@ class OpenICLEvalTask(BaseTask):
 
     def __init__(self, cfg: ConfigDict):
         super().__init__(cfg)
-        self.num_gpus = 0
         self.logger = get_logger()
+        self.num_gpus = max(
+            c.get('eval_cfg', {}).get('num_gpus', 0)
+            for c in sum(self.dataset_cfgs, []))
         self.dump_details = cfg.get('eval', {}).get('runner', {}).get(
             'task', {}).get('dump_details', False)
 

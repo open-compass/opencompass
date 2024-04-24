@@ -47,6 +47,8 @@ class TurboMindTisModel(BaseModel):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
+        from lmdeploy.serve.turbomind.utils import Preprocessor
+        self.preprocess = Preprocessor(tis_addr)
         self.logger = get_logger()
         self.template_parser = LMTemplateParser(meta_template)
         self.eos_token_id = None
@@ -56,14 +58,14 @@ class TurboMindTisModel(BaseModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
         temperature: float = 1.0,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -83,6 +85,10 @@ class TurboMindTisModel(BaseModel):
                              [temperature] * len(inputs)))
         return results
 
+    def get_token_len(self, prompt: str) -> int:
+        input_ids, _ = self.preprocess(prompt)
+        return input_ids.shape[-1]
+
     def wait(self):
         """Wait till the next query can be sent.
 
@@ -90,12 +96,12 @@ class TurboMindTisModel(BaseModel):
         """
         return self.token_bucket.get_token()
 
-    def _generate(self, prompt: str or PromptList, max_out_len: int,
+    def _generate(self, prompt: PromptType, max_out_len: int,
                   temperature: float) -> str:
         """Generate results given a list of inputs.
 
         Args:
-            prompt (str or PromptList): A string or PromptDict.
+            prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.

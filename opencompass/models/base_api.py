@@ -60,7 +60,7 @@ class BaseAPIModel(BaseModel):
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -111,7 +111,7 @@ class BaseAPIModel(BaseModel):
         """Get perplexity scores given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings.
+            inputs (List[PromptType]): A list of strings.
             mask_length (Optional[List[int]]): A list of mask lengths. If
                 provided, the perplexity scores will be calculated with the
                 first mask_length[i] tokens masked out. It's okay to skip
@@ -200,12 +200,12 @@ class APITemplateParser:
             {'role': 'user', 'prompt': '...'}).
 
         Args:
-            prompt_template (List[str or PromptList]): An intermidate prompt
+            prompt_template (List[PromptType]): An intermidate prompt
                 template (potentially before being wrapped by meta template).
             mode (str): Parsing mode. Choices are 'ppl' and 'gen'.
 
         Returns:
-            List[str or PromptList]: The finalized prompt or a conversation.
+            List[PromptType]: The finalized prompt or a conversation.
         """
         assert isinstance(prompt_template, (str, list, PromptList, tuple))
 

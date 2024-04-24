@@ -1,6 +1,7 @@
 from opencompass.models import HuggingFaceCausalLM
 
 _meta_template = dict(
+    begin='<｜begin▁of▁sentence｜>',
     round=[
         dict(role="HUMAN", begin='User: ', end='\n\n'),
         dict(role="BOT", begin="Assistant: ", end='<｜end▁of▁sentence｜>', generate=True),
@@ -12,7 +13,6 @@ models = [
         type=HuggingFaceCausalLM,
         abbr='deepseek-67b-chat-hf',
         path="deepseek-ai/deepseek-llm-67b-chat",
-        tokenizer_path='deepseek-ai/deepseek-llm-67b-chat',
         model_kwargs=dict(
             device_map='auto',
             trust_remote_code=True,
@@ -28,6 +28,6 @@ models = [
         max_seq_len=2048,
         batch_size=8,
         run_cfg=dict(num_gpus=4, num_procs=1),
-        end_str='<｜end▁of▁sentence｜>',
+        batch_padding=True,
     )
 ]

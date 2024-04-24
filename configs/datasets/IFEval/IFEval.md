@@ -36,10 +36,12 @@ Hark! Hearken to the tale of thy journey to the land of the rising sun, Japan. \
 ## Evaluation results
 
 ```
-dataset    version    metric      mode      internlm2-chat-20b-hf
----------  ---------  ----------  ------  -----------------------
-IFEval     3321a3     strict_acc  gen                        0.33
-IFEval     3321a3     loose_acc   gen                        0.4
+dataset    version    metric                        mode      baichuan2-7b-chat-hf    baichuan2-13b-chat-hf    internlm2-chat-7b-hf    internlm2-chat-20b-hf    llama-2-7b-chat-hf    llama-2-13b-chat-hf
+---------  ---------  ----------------------------  ------  ----------------------  -----------------------  ----------------------  -----------------------  --------------------  ---------------------
+IFEval     3321a3     Prompt-level-strict-accuracy  gen                      36.04                    35.49                   38.26                    33.09                 33.46                  33.64
+IFEval     3321a3     Inst-level-strict-accuracy    gen                      46.76                    46.76                   49.16                    45.32                 45.68                  45.44
+IFEval     3321a3     Prompt-level-loose-accuracy   gen                      37.52                    37.71                   42.51                    39.37                 43.81                  47.32
+IFEval     3321a3     Inst-level-loose-accuracy     gen                      48.44                    49.16                   53.72                    51.08                 55.64                  58.03
 ```
 
 ## Reference

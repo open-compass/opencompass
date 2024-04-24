@@ -11,19 +11,12 @@ race_reader_cfg = dict(
     test_split="test"
 )
 
+hint = "Read the article, and answer the question by replying A, B, C or D."
+question_and_options = "{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}"
 race_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template={
-            'A':
-            'Read the article, and answer the question by replying A, B, C or D.\n\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n\nAnswer: A',
-            'B':
-            'Read the article, and answer the question by replying A, B, C or D.\n\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n\nAnswer: B',
-            'C':
-            'Read the article, and answer the question by replying A, B, C or D.\n\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n\nAnswer: C',
-            'D':
-            'Read the article, and answer the question by replying A, B, C or D.\n\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n\nAnswer: D',
-        }),
+        template={answer: hint + '\n\n' + question_and_options + '\n\nAnswer: ' + answer for answer in ['A', 'B', 'C', 'D']}),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))
 

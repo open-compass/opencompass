@@ -6,7 +6,7 @@
 
 ### 安装 OpenCompass
 
-请根据 OpenCompass [安装指南](https://opencompass.readthedocs.io/en/latest/get_started.html) 来安装算法库和准备数据集。
+请根据 OpenCompass [安装指南](https://opencompass.readthedocs.io/en/latest/get_started/installation.html) 来安装算法库和准备数据集。
 
 ### 安装 LMDeploy
 
@@ -56,6 +56,7 @@ internlm_20b = dict(
         batch_size=8,
         concurrency=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
+        end_str='<eoa>'
     )
 
 models = [internlm_20b]

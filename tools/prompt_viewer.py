@@ -4,7 +4,9 @@ from typing import Dict
 
 from mmengine.config import Config, ConfigDict
 
-from opencompass.openicl.icl_inferencer import (CLPInferencer, GenInferencer,
+from opencompass.openicl.icl_inferencer import (AgentInferencer,
+                                                ChatInferencer, CLPInferencer,
+                                                GenInferencer, LLInferencer,
                                                 PPLInferencer,
                                                 PPLOnlyInferencer)
 from opencompass.registry import ICL_PROMPT_TEMPLATES, ICL_RETRIEVERS
@@ -78,12 +80,17 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
 
     ice_idx_list = retriever.retrieve()
 
-    assert infer_cfg.inferencer.type in [
-        PPLInferencer, GenInferencer, CLPInferencer, PPLOnlyInferencer], \
-        'Only PPLInferencer and GenInferencer are supported'
+    supported_inferencer = [
+        AgentInferencer, PPLInferencer, GenInferencer, CLPInferencer,
+        PPLOnlyInferencer, ChatInferencer, LLInferencer
+    ]
+    if infer_cfg.inferencer.type not in supported_inferencer:
+        print(f'Only {supported_inferencer} are supported')
+        return
 
     for idx in range(min(count, len(ice_idx_list))):
-        if infer_cfg.inferencer.type == PPLInferencer:
+        if issubclass(infer_cfg.inferencer.type,
+                      (PPLInferencer, LLInferencer)):
             labels = retriever.get_labels(ice_template=ice_template,
                                           prompt_template=prompt_template)
             ice = retriever.generate_ice(ice_idx_list[idx],
@@ -129,9 +136,7 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
                 print('-' * 100)
                 print(prompt)
                 print('-' * 100)
-        elif infer_cfg.inferencer.type in [
-                GenInferencer, CLPInferencer, PPLOnlyInferencer
-        ]:
+        else:
             ice_idx = ice_idx_list[idx]
             ice = retriever.generate_ice(ice_idx, ice_template=ice_template)
             prompt = retriever.generate_prompt_for_generate_task(

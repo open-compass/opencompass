@@ -9,7 +9,7 @@ subjective_reader_cfg = dict(
     output_column='judge',
     )
 
-data_path ="data/subjective/"
+data_path ="data/subjective/compass_arena"
 
 subjective_datasets = []
 
@@ -88,23 +88,10 @@ math_prompt = """
 
 reason_prompt = math_prompt
 
-qa_prompt = """
-请根据提供的 评分要求，用户问题 以及 相应的两个回答（回答1，回答2），判断两个回答中哪一个更好。
-评分要求（重要性依次递减）:
-1. 好的回答必须首先具有事实正确性，即除了想象的内容外，所引用或阐述的各种信息都是真实正确的
-2. 好的回答必须具有逻辑连贯性，围绕一个中心进行回答，且前后连贯，逻辑没有问题
-3. 在都准确答对问题的前提下，更好的回答能进行额外补充，且补充的内容准确无误
-
-[用户问题]
-{question}
-""" + base_prompt
-
-
-
 creation_prompt = """
 请根据提供的 评分要求，用户问题 以及 相应的两个回答（回答1，回答2），判断两个回答中哪一个更好。
 评分要求（重要性依次递减）:
-1. 好的回答必须首先符合用户问题里的各种需求，不能跑题 
+1. 好的回答必须首先符合用户问题里的各种需求，不能跑题
 2. 好的回答必须具有逻辑连贯性，围绕一个中心进行回答
 3. 好的回答必须具有创造性的词语和表达丰富度
 
@@ -112,11 +99,9 @@ creation_prompt = """
 {question}
 """ + base_prompt
 
+sub_map = {"language": language_prompt, "knowledge": knowledge_prompt, "reason_v2": reason_prompt, "math_v2": math_prompt, "creationv2_zh": creation_prompt}
 
-subjective_all_sets = ["knowledge", "language", "math", "reason", "qa", "creationv2_zh"]
-prompt_all_sets = [knowledge_prompt, language_prompt, math_prompt, reason_prompt, qa_prompt, creation_prompt]
-
-for _name,_prompt in zip(subjective_all_sets, prompt_all_sets):
+for _name, _prompt in sub_map.items():
     subjective_infer_cfg = dict(
             prompt_template=dict(
                 type=PromptTemplate,
@@ -134,7 +119,6 @@ for _name,_prompt in zip(subjective_all_sets, prompt_all_sets):
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
-            infer_order='double',
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(round=[

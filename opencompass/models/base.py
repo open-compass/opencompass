@@ -129,7 +129,7 @@ class BaseModel:
         applicable.
 
         Args:
-            prompt_template (List[str or PromptList]): A prompt
+            prompt_template (List[PromptType]): A prompt
                 template (potentially before being wrapped by meta template).
             mode (str): Parsing mode. Choices are 'ppl' and 'gen'.
 
@@ -266,7 +266,7 @@ class LMTemplateParser:
         applicable.
 
         Args:
-            prompt_template (List[str or PromptList]): A prompt
+            prompt_template (List[PromptType]): A prompt
                 template (potentially before being wrapped by meta template).
             mode (str): Parsing mode. Choices are 'ppl' and 'gen'.
 
