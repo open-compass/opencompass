@@ -7,15 +7,21 @@ datasets>=2.12.0
 einops==0.5.0
 evaluate>=0.3.0
 fairscale
+func_timeout
 fuzzywuzzy
+immutabledict
 jieba
+langdetect
 ltp
 mmengine-lite
 nltk==3.8
-numpy==1.23.4
+numpy>=1.23.4
 openai
 OpenCC
+opencv-python-headless
 pandas<2.0.0
+prettytable
+pyext
 pypinyin
 python-Levenshtein
 rank_bm25==0.2.2
@@ -23,7 +29,7 @@ rapidfuzz
 requests==2.31.0
 rich
 rouge
-rouge_chinese
+-e git+https://github.com/Isaac-JL-Chen/rouge_chinese.git@master#egg=rouge_chinese
 rouge_score
 sacrebleu
 scikit_learn==1.2.1

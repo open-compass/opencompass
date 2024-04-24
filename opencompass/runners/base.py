@@ -36,7 +36,8 @@ class BaseRunner:
                 Partitioner.
         """
         status = self.launch(tasks)
-        self.summarize(status)
+        status_list = list(status)  # change into list format
+        self.summarize(status_list)
 
     @abstractmethod
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:

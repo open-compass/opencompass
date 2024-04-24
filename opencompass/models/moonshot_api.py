@@ -38,6 +38,7 @@ class MoonShot(BaseAPIModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
+        system_prompt: str = '',
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -50,16 +51,17 @@ class MoonShot(BaseAPIModel):
         }
         self.url = url
         self.model = path
+        self.system_prompt = system_prompt
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -76,13 +78,13 @@ class MoonShot(BaseAPIModel):
 
     def _generate(
         self,
-        input: str or PromptList,
+        input: PromptType,
         max_out_len: int = 512,
     ) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -96,38 +98,40 @@ class MoonShot(BaseAPIModel):
             messages = [{'role': 'user', 'content': input}]
         else:
             messages = []
+            msg_buffer, last_role = [], None
             for item in input:
-                msg = {'content': item['prompt']}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
+                item['role'] = 'assistant' if item['role'] == 'BOT' else 'user'
+                if item['role'] != last_role and last_role is not None:
+                    messages.append({
+                        'content': '\n'.join(msg_buffer),
+                        'role': last_role
+                    })
+                    msg_buffer = []
+                msg_buffer.append(item['prompt'])
+                last_role = item['role']
+            messages.append({
+                'content': '\n'.join(msg_buffer),
+                'role': last_role
+            })
 
-                messages.append(msg)
+        if self.system_prompt:
+            system = {'role': 'system', 'content': self.system_prompt}
+            messages.insert(0, system)
 
-        system = {
-            'role':
-            'system',
-            'content':
-            '你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。'
-            '你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一些涉及恐怖主义，种族歧视，'
-            '黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。'
-        }
-
-        messages.insert(0, system)
-
-        data = {
-            'model': self.model,
-            'messages': messages,
-        }
+        data = {'model': self.model, 'messages': messages}
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            raw_response = requests.request('POST',
-                                            url=self.url,
-                                            headers=self.headers,
-                                            json=data)
+            try:
+                raw_response = requests.request('POST',
+                                                url=self.url,
+                                                headers=self.headers,
+                                                json=data)
+            except Exception as err:
+                print('Request Error:{}'.format(err))
+                time.sleep(2)
+                continue
 
             response = raw_response.json()
             self.release()
@@ -150,12 +154,16 @@ class MoonShot(BaseAPIModel):
                 print('请求被拒绝 api_key错误')
                 continue
             elif raw_response.status_code == 400:
+                print(messages, response)
                 print('请求失败，状态码:', raw_response)
+                msg = 'The request was rejected because high risk'
+                return msg
                 time.sleep(1)
                 continue
             elif raw_response.status_code == 429:
+                print(messages, response)
                 print('请求失败，状态码:', raw_response)
-                time.sleep(3)
+                time.sleep(5)
                 continue
 
             max_num_retries += 1

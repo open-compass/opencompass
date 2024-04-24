@@ -6,23 +6,16 @@ from opencompass.models import HuggingFaceCausalLM
 from opencompass.runners import LocalRunner
 from opencompass.partitioners import SizePartitioner
 from opencompass.tasks import OpenICLInferTask
-from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
 
 with read_base():
-    from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from .datasets.mbpp.mbpp_gen_1e1056 import mbpp_datasets
-
-humaneval_datasets[0]['abbr'] = 'openai_humaneval_pass10'
-humaneval_datasets[0]['num_repeats'] = 10
-mbpp_datasets[0]['abbr'] = 'mbpp_pass10'
-mbpp_datasets[0]['num_repeats'] = 10
-mbpp_datasets[0]['type'] = MBPPDataset_V2
-mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
-mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
+    from .datasets.humaneval.humaneval_repeat10_gen_8e312c import humaneval_datasets
+    from .datasets.mbpp.deprecated_mbpp_repeat10_gen_1e1056 import mbpp_datasets
+    from .datasets.mbpp.deprecated_sanitized_mbpp_repeat10_gen_1e1056 import sanitized_mbpp_datasets
 
 datasets = []
 datasets += humaneval_datasets
 datasets += mbpp_datasets
+datasets += sanitized_mbpp_datasets
 
 _meta_template = dict(
     round=[

@@ -16,8 +16,15 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
                                model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
 
-METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
-METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
+METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth', 'f1', 'exact_match']
+METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len', 'tool_rate']
+
+def model_abbr_from_cfg_used_in_summarizer(model):
+    if model.get('summarizer_abbr', None):
+        return model['summarizer_abbr']
+    else:
+        return model_abbr_from_cfg(model)
+
 
 class DefaultSummarizer:
     """Default summarizer in OpenCompass.
@@ -49,7 +56,13 @@ class DefaultSummarizer:
         self.model_cfgs = self.cfg['models']
         self.dataset_cfgs = self.cfg['datasets']
         self.work_dir = self.cfg['work_dir']
-        self.model_abbrs = [model_abbr_from_cfg(model) for model in self.model_cfgs]
+        model_abbrs = []
+        for model in self.model_cfgs:
+            model_abbr = model_abbr_from_cfg_used_in_summarizer(model)
+            if model_abbr in model_abbrs:
+                continue
+            model_abbrs.append(model_abbr)
+        self.model_abbrs = model_abbrs
 
     def _pick_up_results(self):
         """The function reads the numerical results of evaluations from the
@@ -71,9 +84,9 @@ class DefaultSummarizer:
         dataset_metrics : Dict[str, List[str]] = {}
 
         for model in self.model_cfgs:
-            model_abbr = model_abbr_from_cfg(model)
-            parsed_results[model_abbr] = {}
-            raw_results[model_abbr] = {}
+            model_abbr = model_abbr_from_cfg_used_in_summarizer(model)
+            parsed_results.setdefault(model_abbr, {})
+            raw_results.setdefault(model_abbr, {})
             for dataset in self.dataset_cfgs:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
                 filepath = get_infer_output_path(model, dataset, osp.join(self.work_dir, 'results'))
@@ -114,6 +127,8 @@ class DefaultSummarizer:
                 dataset_eval_mode[dataset_abbr] = 'gen'
             elif 'PPLInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'ppl'
+            elif 'LLInferencer' in inferencer:
+                dataset_eval_mode[dataset_abbr] = 'll'
             else:
                 dataset_eval_mode[dataset_abbr] = 'unknown'
                 self.logger.warning(f'unknown inferencer: {inferencer} - {dataset_abbr}')
@@ -126,19 +141,37 @@ class DefaultSummarizer:
         summary_groups = self.summary_groups
         for sg in summary_groups:
             for model_abbr in self.model_abbrs:
-                available_count = sum(dataset_abbr in parsed_results[model_abbr] for dataset_abbr in sg['subsets'])
-                if available_count == 0:
+                available_metrics, missing_metrics = [], []
+                for i in sg['subsets']:
+                    if isinstance(i, (list, tuple)):
+                        if i[0] in parsed_results[model_abbr] and i[1] in parsed_results[model_abbr][i[0]]:
+                            available_metrics.append(i)
+                        else:
+                            missing_metrics.append(i)
+                    else:
+                        if i in parsed_results[model_abbr]:
+                            available_metrics.append(i)
+                        else:
+                            missing_metrics.append(i)
+
+                if len(available_metrics) == 0:
                     continue
-                if available_count != len(sg['subsets']):
-                    raw_results[model_abbr][sg['name']] = {'error': 'missing datasets: {}'.format(set(sg['subsets']) - set(parsed_results[model_abbr].keys()))}
+                if len(missing_metrics) != 0:
+                    raw_results[model_abbr][sg['name']] = {'error': 'missing metrics: {}'.format(missing_metrics)}
                     continue
 
-                if sg.get('std', False):
-                    default_metric = 'standard_deviation'
-                elif sg.get('weights', []):
-                    default_metric = 'weighted_average'
+                if 'metric' in sg:
+                    default_metric = sg['metric']
+                    need_smart_metric = False
                 else:
-                    default_metric = 'naive_average'
+                    need_smart_metric = True
+                    if sg.get('std', False):
+                        default_metric = 'standard_deviation'
+                    elif sg.get('weights', []):
+                        default_metric = 'weighted_average'
+                    else:
+                        default_metric = 'naive_average'
+
                 scores, eval_modes, group_metrics = {}, [], None
                 if any(isinstance(dataset_abbr, (list, tuple)) for dataset_abbr in sg['subsets']) and \
                     any(isinstance(dataset_abbr, str) for dataset_abbr in sg['subsets']):
@@ -147,31 +180,36 @@ class DefaultSummarizer:
                 if all(isinstance(dataset_abbr, (list, tuple)) for dataset_abbr in sg['subsets']):
                     group_metrics = [default_metric]
                     for dataset_abbr, metric in sg['subsets']:
-                        scores.setdefault(default_metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
+                        scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 else:
                     group_metrics = list(functools.reduce(lambda a, b: a & b, [set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']]))
-                    if len(group_metrics) > 1:
+                    if need_smart_metric and len(group_metrics) > 1:
                         for metric in group_metrics:
                             for dataset_abbr in sg['subsets']:
-                                scores.setdefault(metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
+                                scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
                                 eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
                     else:
                         group_metrics = [default_metric]
                         for dataset_abbr in sg['subsets']:
                             metric = dataset_metrics[dataset_abbr][0]
-                            scores.setdefault(default_metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
+                            scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
                             eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
 
                 result = {}
                 for metric in scores:
                     if default_metric == 'standard_deviation':
                         avg = sum(scores[metric].values()) / len(scores[metric])
-                        variance = sum((k - avg) ** 2 for k in scores[metric]) / len(scores[metric])
+                        variance = sum((scores[metric][k] - avg) ** 2 for k in scores[metric]) / len(scores[metric])
                         scores[metric] = result[metric] = math.sqrt(variance)
                     else:
-                        if default_metric == 'weighted_average':
-                            numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'])
+                        if sg.get('weights', []):
+                            # check sg['weights'][k] != 0 in case of scores[metric][k] is NaN
+                            try:
+                                numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
+                            except KeyError:
+                                tmp_scores = {metric: {k.split('@')[0]: v for k, v in scores[metric].items()} for metric in scores}
+                                numerator = sum(tmp_scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
                             denominator = sum(sg['weights'].values())
                         else:
                             numerator = sum(scores[metric].values())
@@ -181,9 +219,9 @@ class DefaultSummarizer:
                     eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
 
                 # add to global results
-                raw_results[model_abbr][sg['name']] = scores
-                parsed_results[model_abbr][sg['name']]= result
-                dataset_metrics[sg['name']] = group_metrics
+                raw_results[model_abbr].setdefault(sg['name'], {}).update(scores)
+                parsed_results[model_abbr].setdefault(sg['name'], {}).update(result)
+                dataset_metrics.setdefault(sg['name'], []).extend(group_metrics)
                 dataset_eval_mode[sg['name']] = eval_mode
 
         return raw_results, parsed_results, dataset_metrics, dataset_eval_mode

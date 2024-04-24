@@ -1,7 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from ..mmlu.mmlu_gen_a484b3 import mmlu_datasets
+    from ..mmlu.mmlu_gen_4d595a import mmlu_datasets
     from ..ceval.ceval_gen_5f30c7 import ceval_datasets
     from ..bbh.bbh_gen_5b92b0 import bbh_datasets
     from ..CLUE_CMRC.CLUE_CMRC_gen_1bd3c8 import CMRC_datasets
@@ -12,7 +12,7 @@ with read_base():
     from ..FewCLUE_cluewsc.FewCLUE_cluewsc_gen_c68933 import cluewsc_datasets
     from ..FewCLUE_eprstmt.FewCLUE_eprstmt_gen_740ea0 import eprstmt_datasets
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from ..mbpp.mbpp_gen_1e1056 import mbpp_datasets
+    from ..mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
     from ..lambada.lambada_gen_217e11 import lambada_datasets
     from ..storycloze.storycloze_gen_7f656a import storycloze_datasets
     from ..SuperGLUE_AX_b.SuperGLUE_AX_b_gen_4dfefa import AX_b_datasets

@@ -4,7 +4,7 @@ This tutorial primarily focuses on evaluating a model's coding proficiency, usin
 
 ## pass@1
 
-If you only need to generate a single response to evaluate the pass@1 performance, you can directly use [configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/humaneval/humaneval_gen_8e312c.py) and [configs/datasets/mbpp/mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/mbpp/mbpp_gen_1e1056.py), referring to the general [quick start tutorial](../get_started/quick_start.md).
+If you only need to generate a single response to evaluate the pass@1 performance, you can directly use [configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/humaneval/humaneval_gen_8e312c.py) and [configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py), referring to the general [quick start tutorial](../get_started/quick_start.md).
 
 For multilingual evaluation, please refer to the [Multilingual Code Evaluation Tutorial](./code_eval_service.md).
 
@@ -21,7 +21,7 @@ from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
 
 with read_base():
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from .datasets.mbpp.mbpp_gen_1e1056 import mbpp_datasets
+    from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
 
 mbpp_datasets[0]['type'] = MBPPDataset_V2
 mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
@@ -63,7 +63,7 @@ from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
 
 with read_base():
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from .datasets.mbpp.mbpp_gen_1e1056 import mbpp_datasets
+    from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
 
 humaneval_datasets[0]['abbr'] = 'openai_humaneval_pass10'
 humaneval_datasets[0]['num_repeats'] = 10

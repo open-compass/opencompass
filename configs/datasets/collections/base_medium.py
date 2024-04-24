@@ -7,7 +7,7 @@ with read_base():
     from ..GaokaoBench.GaokaoBench_mixed_f2038e import GaokaoBench_datasets
     from ..bbh.bbh_gen_5b92b0 import bbh_datasets
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from ..mbpp.mbpp_gen_1e1056 import mbpp_datasets
+    from ..mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
     from ..CLUE_C3.CLUE_C3_ppl_e24a31 import C3_datasets
     from ..CLUE_CMRC.CLUE_CMRC_gen_1bd3c8 import CMRC_datasets
     from ..CLUE_DRCD.CLUE_DRCD_gen_1bd3c8 import DRCD_datasets
@@ -47,7 +47,7 @@ with read_base():
     from ..piqa.piqa_ppl_1cf9f0 import piqa_datasets
     from ..siqa.siqa_ppl_ced5f6 import siqa_datasets
     from ..strategyqa.strategyqa_gen_1180a7 import strategyqa_datasets
-    from ..winogrande.winogrande_ppl_55a66e import winogrande_datasets
+    from ..winogrande.winogrande_ll_c5cf57 import winogrande_datasets
     from ..obqa.obqa_ppl_c7c154 import obqa_datasets
     from ..nq.nq_gen_c788f6 import nq_datasets
     from ..triviaqa.triviaqa_gen_2121ce import triviaqa_datasets

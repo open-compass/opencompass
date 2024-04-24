@@ -89,7 +89,7 @@ class AgentInferencer(ChatInferencer):
 
         user_idx = assistant_indices[-1] - 1
         self.model.set_history(chat[:user_idx])
-        answer, steps = self.model.chat(chat[user_idx]['content'])
+        answer, steps, _ = self.model.chat(chat[user_idx]['content'])
         output_handler.save_results(
             origin_prompt=chat[user_idx]['content'],
             prediction=answer,
@@ -104,10 +104,11 @@ class AgentInferencer(ChatInferencer):
             i for i, item in enumerate(chat) if item['role'] == 'assistant'
         ]
 
-        self.model.set_history(chat[:assistant_indices[0] - 1])
-
+        history = chat[:assistant_indices[0] - 1]
         for i in assistant_indices:
-            answer, steps = self.model.chat(chat[i - 1]['content'])
+            answer, steps, inner_steps = self.model.chat(
+                chat[i - 1]['content'], history)
+            history += inner_steps
             output_handler.save_multiround_results(
                 origin_prompt=chat[i - 1]['content'],
                 prediction=answer,
@@ -123,9 +124,16 @@ class AgentInferencer(ChatInferencer):
             i for i, item in enumerate(chat) if item['role'] == 'assistant'
         ]
 
+        history = chat[:assistant_indices[0] - 1]
+        prev_idx = 0
         for i in assistant_indices:
-            self.model.set_history(chat[:i - 1])
-            answer, steps = self.model.chat(chat[i - 1]['content'])
+            for j in range(prev_idx, i - 1):
+                if chat[j]['role'] == 'assistant':
+                    history += self.model.gt_response(chat[j]['content'])
+                elif chat[j]['role'] == 'user':
+                    history += [chat[j]]
+            self.model.set_history(history)
+            answer, steps, _ = self.model.chat(chat[i - 1]['content'])
             output_handler.save_multiround_results(
                 origin_prompt=chat[i - 1]['content'],
                 prediction=answer,
@@ -133,4 +141,6 @@ class AgentInferencer(ChatInferencer):
                 idx=index,
                 gold=chat[i]['content'],
             )
+            history += [chat[i - 1]]
+            prev_idx = i
         self.model.reset()

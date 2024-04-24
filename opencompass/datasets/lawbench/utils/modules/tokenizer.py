@@ -57,8 +57,7 @@ class Tokenizer:
         """
         if bpe:
             from . import tokenization
-            project_dir = os.path.dirname(os.path.dirname(__file__))
-            tokenizer = tokenization.FullTokenizer(vocab_file=os.path.join(project_dir,"data","chinese_vocab.txt"), do_lower_case=False)
+            tokenizer = tokenization.FullTokenizer(vocab_file=os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", "data", "lawbench", "eval_assets", "chinese_vocab.txt"), do_lower_case=False)
         results = []
         for input_string in input_strings:
             if not self.segmented:  # 如果没有被分字，就按照每个字符隔开（不考虑英文标点的特殊处理，也不考虑BPE），否则遵循原分字结果

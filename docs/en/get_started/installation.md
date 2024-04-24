@@ -72,6 +72,19 @@
 
    </details>
 
+5. Install alpaca-eval (Optional)：
+
+   If you want to**evaluate alpaca-eval in official ways**, follow this step.
+
+   <details>
+   <summary><b>click to show the details</b></summary>
+
+   ```bash
+   pip install alpaca-eval
+   ```
+
+   </details>
+
 # Dataset Preparation
 
 The datasets supported by OpenCompass mainly include two parts:
@@ -83,20 +96,20 @@ Run the following commands to download and place the datasets in the `${OpenComp
 
 ```bash
 # Run in the OpenCompass directory
-wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
-unzip OpenCompassData-core-20231110.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
+unzip OpenCompassData-core-20240207.zip
 ```
 
-If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download it using the following command:
+If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download and `unzip` it using the following command:
 
 ```bash
-wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
-unzip OpenCompassData-complete-20231110.zip
+wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip
+unzip OpenCompassData-complete-20240207.zip
 cd ./data
-unzip *.zip
+find . -name "*.zip" -exec unzip "{}" \;
 ```
 
-The list of datasets included in both `.zip` can be found [here](https://github.com/open-compass/opencompass/releases/tag/0.1.8.rc1)
+The list of datasets included in both `.zip` can be found [here](https://github.com/open-compass/opencompass/releases/tag/0.2.2.rc1)
 
 OpenCompass has supported most of the datasets commonly used for performance comparison, please refer to `configs/dataset` for the specific list of supported datasets.
 

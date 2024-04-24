@@ -38,12 +38,19 @@ class AI360GPT(BaseAPIModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
-    ):
+        generation_kwargs: Dict = {
+            'temperature': 0.9,
+            'max_tokens': 2048,
+            'top_p': 0.5,
+            'tok_k': 0,
+            'repetition_penalty': 1.05,
+        }):  # noqa E125
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          query_per_second=query_per_second,
                          meta_template=meta_template,
-                         retry=retry)
+                         retry=retry,
+                         generation_kwargs=generation_kwargs)
         self.headers = {
             'Authorization': f'Bearer {key}',
             'Content-Type': 'application/json',
@@ -53,13 +60,13 @@ class AI360GPT(BaseAPIModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -76,13 +83,13 @@ class AI360GPT(BaseAPIModel):
 
     def _generate(
         self,
-        input: str or PromptList,
+        input: PromptType,
         max_out_len: int = 512,
     ) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -110,14 +117,10 @@ class AI360GPT(BaseAPIModel):
             'model': self.model,
             'messages': messages,
             'stream': False,
-            'temperature': 0.9,
-            'max_tokens': 2048,
-            'top_p': 0.5,
-            'tok_k': 0,
-            'repetition_penalty': 1.05,
-            # "num_beams": 1,
             # "user": "OpenCompass"
         }
+
+        data.update(self.generation_kwargs)
 
         max_num_retries = 0
         while max_num_retries < self.retry:

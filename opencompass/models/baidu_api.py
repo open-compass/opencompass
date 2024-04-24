@@ -32,27 +32,31 @@ class ERNIEBot(BaseAPIModel):
         retry (int): Number of retires if the API call fails. Defaults to 2.
     """
 
-    def __init__(
-        self,
-        path: str,
-        key: str,
-        secretkey: str,
-        url: str,
-        query_per_second: int = 2,
-        max_seq_len: int = 2048,
-        meta_template: Optional[Dict] = None,
-        retry: int = 2,
-    ):
+    def __init__(self,
+                 path: str,
+                 key: str,
+                 secretkey: str,
+                 url: str,
+                 query_per_second: int = 2,
+                 max_seq_len: int = 2048,
+                 meta_template: Optional[Dict] = None,
+                 retry: int = 2,
+                 generation_kwargs: Dict = {
+                     'temperature': 0.8,
+                 }):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          query_per_second=query_per_second,
                          meta_template=meta_template,
-                         retry=retry)
+                         retry=retry,
+                         generation_kwargs=generation_kwargs)
         self.headers = {'Content_Type': 'application/json'}
         self.secretkey = secretkey
         self.key = key
         self.url = url
-        self.model = path
+        access_token, _ = self._generate_access_token()
+        self.access_token = access_token
+        print(access_token)
 
     def _generate_access_token(self):
         try:
@@ -84,13 +88,13 @@ class ERNIEBot(BaseAPIModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -107,13 +111,13 @@ class ERNIEBot(BaseAPIModel):
 
     def _generate(
         self,
-        input: str or PromptList,
+        input: PromptType,
         max_out_len: int = 512,
     ) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -148,16 +152,23 @@ class ERNIEBot(BaseAPIModel):
 
                 messages.append(msg)
         data = {'messages': messages}
+        data.update(self.generation_kwargs)
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            access_token, _ = self._generate_access_token()
-            raw_response = requests.request('POST',
-                                            url=self.url + access_token,
-                                            headers=self.headers,
-                                            json=data)
-            response = raw_response.json()
+            try:
+                raw_response = requests.request('POST',
+                                                url=self.url +
+                                                self.access_token,
+                                                headers=self.headers,
+                                                json=data)
+                response = raw_response.json()
+            except Exception as err:
+                print('Request Error:{}'.format(err))
+                time.sleep(3)
+                continue
+
             self.release()
 
             if response is None:
@@ -174,6 +185,10 @@ class ERNIEBot(BaseAPIModel):
                 except KeyError:
                     print(response)
                     self.logger.error(str(response['error_code']))
+                    if response['error_code'] == 336007:
+                        # exceed max length
+                        return ''
+
                     time.sleep(1)
                     continue
 
@@ -187,7 +202,8 @@ class ERNIEBot(BaseAPIModel):
                     or response['error_code'] == 216100
                     or response['error_code'] == 336001
                     or response['error_code'] == 336003
-                    or response['error_code'] == 336000):
+                    or response['error_code'] == 336000
+                    or response['error_code'] == 336007):
                 print(response['error_msg'])
                 return ''
             print(response)

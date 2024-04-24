@@ -1,0 +1,121 @@
+name: pr_stage_test
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'README_zh-CN.md'
+      - 'docs/**'
+      - 'configs/**'
+      - 'tools/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ['3.10']
+        include:
+          - torch: 2.0.0
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+      - name: Install PyTorch
+        run: pip install torch==${{matrix.torch}}+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+      - name: Install system dependencies
+        run: |
+          sudo sed -i '$ a deb http://th.archive.ubuntu.com/ubuntu jammy main' /etc/apt/sources.list
+          sudo apt-get update && sudo apt-get install -y libc6 libffi-dev libncursesw6 wget unzip
+      - name: Upgrade pip
+        run: python -m pip install pip --upgrade
+      - name: Install opencompass dependencies
+        run: |
+          python -m pip install -r requirements.txt
+      - name: Build and install
+        run: python -m pip install -e .
+      - name: Prepare dataset
+        run: |
+          wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
+          unzip OpenCompassData-core-20240207.zip
+      - name: Dry run test
+        run: |
+          python run.py --models hf_opt_125m --datasets siqa_gen winograd_ppl --dry-run
+
+  build_cu117:
+    runs-on: ubuntu-22.04
+    container:
+      image: nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04
+    strategy:
+      matrix:
+        python-version: ['3.10']
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Fetch GPG keys
+        run: |
+          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
+          apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/7fa2af80.pub
+      - name: Install Python-dev
+        run: apt-get update && apt-get install -y python${{matrix.python-version}}-dev
+        if: ${{matrix.python-version != 3.10}}
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libxrender-dev libc6 libc6-dev
+          sed -i '$ a deb http://th.archive.ubuntu.com/ubuntu jammy main' /etc/apt/sources.list
+          apt-get update && apt-get install -y libc6 libffi-dev libncursesw6 wget unzip
+      - name: Upgrade pip
+        run: python -m pip install pip --upgrade
+      - name: Install opencompass dependencies
+        run: |
+          python -m pip install -r requirements.txt
+      - name: Build and install
+        run: python -m pip install -e .
+      - name: Prepare dataset
+        run: |
+          wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
+          unzip OpenCompassData-core-20240207.zip
+      - name: Dry run test
+        run: |
+          python run.py --models hf_opt_125m --datasets siqa_gen winograd_ppl --dry-run
+
+  build_windows:
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        python-version: ['3.10']
+        platform: [cpu]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Upgrade pip
+        run: python -m pip install pip --upgrade
+      - name: Install PyTorch
+        run: pip install torch==2.0.0+${{matrix.platform}} -f https://download.pytorch.org/whl/${{matrix.platform}}/torch_stable.html
+      - name: Install opencompass dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Build and install
+        run: pip install -e .
+      - name: Prepare dataset
+        run: |
+          Invoke-WebRequest -Uri https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip -OutFile OpenCompassData-core-20240207.zip
+          unzip OpenCompassData-core-20240207.zip
+      - name: Dry run test
+        run: |
+          python run.py --models hf_opt_125m --datasets siqa_gen winograd_ppl --dry-run

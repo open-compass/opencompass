@@ -2,6 +2,27 @@
 
 ## 通用
 
+### ppl 和 gen 有什么区别和联系？
+
+`ppl` 是困惑度 (perplexity) 的缩写，是一种评价模型进行语言建模能力的指标。在 OpenCompass 的语境下，它一般指一种选择题的做法：给定一个上下文，模型需要从多个备选项中选择一个最合适的。此时，我们会将 n 个选项拼接上上下文后，形成 n 个序列，然后计算模型对这 n 个序列的 perplexity，我们认为其中 perplexity 最低的序列所对应的选项即为模型在这道题上面的推理结果，该种评测方法的后处理简单直接、确定性高。
+
+`gen` 是生成 (generate) 的缩写。在 OpenCompass 的语境下，它指的是在给定上下文的情况下，模型往后续写的结果就是这道题目上的推理结果。一般来说，续写得到的字符串需要结合上比较重的后处理过程，才能进行可靠的答案提取，从而完成评测。
+
+从使用上来说，基座模型的单项选择题和部分具有选择题性质的题目会使用 `ppl`，基座模型的不定项选择和非选择题都会使用 `gen`。而对话模型的所有题目都会使用 `gen`，因为许多商用 API 模型不会暴露 `ppl` 的接口。但也存在例外情况，例如我们希望基座模型输出解题思路过程时 (例如 Let's think step by step)，我们同样会使用 `gen`，但总体的使用如下图所示：
+
+|          | ppl         | gen                |
+| -------- | ----------- | ------------------ |
+| 基座模型 | 仅 MCQ 任务 | MCQ 以外的其他任务 |
+| 对话模型 | 无          | 所有任务           |
+
+与 `ppl` 高度类似地，条件对数概率 `clp` (conditional log probability) 是在给定上下文的情况下，计算下一个 token 的概率。它也仅适用于选择题，考察概率的范围仅限于备选项标号所对应的 token，取其中概率最高的 token 所对应的选项为模型的推理结果。与 ppl 相比，`clp` 的计算更加高效，仅需要推理一次，而 ppl 需要推理 n 次，但坏处是，`clp` 受制于 tokenizer，在例如选项前后有无空格符号时，tokenizer 编码的结果会有变化，导致测试结果不可靠。因此 OpenCompass 中很少使用 `clp`。
+
+### OpenCompass 如何控制 few shot 评测的 shot 数目？
+
+在数据集配置文件中，有一个 `retriever` 的字段，该字段表示如何召回数据集中的样本作为上下文样例，其中最常用的是 `FixKRetriever` 表示固定使用某 k 个样本，因此即为 k-shot。另外还有 `ZeroRetriever` 表示不使用任何样本，这在大多数情况下意味着 0-shot。
+
+另一方面，in context 的样本也可以直接在数据集的模板中指定，在该情况下亦会搭配使用 `ZeroRetriever`，但此时的评测并不是 0-shot，而需要根据具体的模板来进行确定。具体请看 [prompt](../prompt/prompt_template.md)
+
 ### OpenCompass 如何分配 GPU？
 
 OpenCompass 使用称为 task (任务) 的单位处理评估请求。每个任务都是模型和数据集的独立组合。任务所需的 GPU 资源完全由正在评估的模型决定，具体取决于 `num_gpus` 参数。
@@ -16,7 +37,7 @@ OpenCompass 使用称为 task (任务) 的单位处理评估请求。每个任�
 
 供给侧就是运行多少任务。任务是模型和数据集的组合，它首先取决于要测多少模型和多少数据集。另外由于 OpenCompass 会将一个较大的任务拆分成多个小任务，因此每个子任务有多少条数据 `--max-partition-size` 也会影响任务的数量。(`--max-partition-size` 与真实数据条目成正比，但并不是 1:1 的关系)。
 
-需求侧就是有多少 worker 在运行。由于 OpenCompass 会同时实例化多个模型去进行推理，因此我们用 `--num-gpus` 来指定每个实例使用多少 GPU。注意 `--num-gpus` 是一个 HuggingFace 模型专用的参数，非 HuggingFace 模型设置该参数是不会起作用的。同时我们使用 `--max-num-workers` 去表示最多有多少个实例在运行。最后由于 GPU 显存、负载不充分等问题，OpenCompass 也支持在同一个 GPU 上运行多个实例，这个参数是 `--max-num-workers-per-gpu`。因此可以笼统地认为，我们总共会使用 `--num-gpus` * `--max-num-workers` /  `--max-num-workers-per-gpu` 个 GPU。
+需求侧就是有多少 worker 在运行。由于 OpenCompass 会同时实例化多个模型去进行推理，因此我们用 `--num-gpus` 来指定每个实例使用多少 GPU。注意 `--num-gpus` 是一个 HuggingFace 模型专用的参数，非 HuggingFace 模型设置该参数是不会起作用的。同时我们使用 `--max-num-workers` 去表示最多有多少个实例在运行。最后由于 GPU 显存、负载不充分等问题，OpenCompass 也支持在同一个 GPU 上运行多个实例，这个参数是 `--max-num-workers-per-gpu`。因此可以笼统地认为，我们总共会使用 `--num-gpus` * `--max-num-workers` / `--max-num-workers-per-gpu` 个 GPU。
 
 综上，当任务运行较慢，GPU 负载不高的时候，我们首先需要检查供给是否充足，如果不充足，可以考虑调小 `--max-partition-size` 来将任务拆分地更细；其次需要检查需求是否充足，如果不充足，可以考虑增大 `--max-num-workers` 和 `--max-num-workers-per-gpu`。一般来说，**我们会将 `--num-gpus` 设定为最小的满足需求的值，并不会再进行调整**。
 
@@ -58,6 +79,10 @@ sudo apt-get install -y libgl1 libglib2.0-0
   HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_EVALUATE_OFFLINE=1 python run.py ...
   ```
   这样，评估不再需要网络连接。但是，如果缓存中缺少任何数据集或模型的文件，仍然会引发错误。
+- 使用中国大陆内的镜像源，例如 [hf-mirror](https://hf-mirror.com/)
+  ```python
+  HF_ENDPOINT=https://hf-mirror.com python run.py ...
+  ```
 
 ### 我的服务器无法连接到互联网，我如何使用 OpenCompass？
 
@@ -87,9 +112,9 @@ OpenCompass 中的每个任务代表等待评估的特定模型和数据集部�
 
 ## 模型
 
-### 如何使用本地已下好的Huggingface模型?
+### 如何使用本地已下好的 Huggingface 模型?
 
-如果您已经提前下载好Huggingface的模型文件，请手动指定模型路径，并在`--model-kwargs` 和 `--tokenizer-kwargs`中添加 `trust_remote_code=True`. 示例如下
+如果您已经提前下载好 Huggingface 的模型文件，请手动指定模型路径，并在`--model-kwargs` 和 `--tokenizer-kwargs`中添加 `trust_remote_code=True`. 示例如下
 
 ```bash
 python run.py --datasets siqa_gen winograd_ppl \

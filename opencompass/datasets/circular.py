@@ -13,7 +13,9 @@ from .commonsenseqa import commonsenseqaDataset
 from .hellaswag import hellaswagDataset_V2
 from .mmlu import MMLUDataset
 from .obqa import OBQADataset
+from .piqa import piqaDataset_V2
 from .race import RaceDataset
+from .siqa import siqaDataset_V3
 from .xiezhi import XiezhiDataset
 
 
@@ -183,8 +185,13 @@ class CircularDatasetMeta(type):
 
         def load(cls, circular_patterns='circular', *args, **kwargs):
             circular_splits = getattr(cls, 'default_circular_splits', None)
-            option_keys = cls.default_option_keys
+            option_keys = getattr(cls, 'default_option_keys', None)
+            if 'option_keys' in kwargs:
+                option_keys = kwargs.pop('option_keys')
+            assert option_keys is not None, 'option_keys cannot be None'
             answer_key = getattr(cls, 'default_answer_key', None)
+            if 'answer_key' in kwargs:
+                answer_key = kwargs.pop('answer_key')
             answer_key_switch_method = getattr(
                 cls, 'default_answer_key_switch_method', None)
             dataset = cls.dataset_class.load(*args, **kwargs)
@@ -268,6 +275,24 @@ class CircularXiezhiDataset(XiezhiDataset, metaclass=CircularDatasetMeta):
     default_answer_key = 'answer'
 
 
+class CircularsiqaDataset(siqaDataset_V3, metaclass=CircularDatasetMeta):
+    dataset_class = siqaDataset_V3
+    default_circular_splits = ['validation']
+    default_option_keys = ['A', 'B', 'C']
+    default_answer_key = 'answer'
+
+
+class CircularpiqaDataset(piqaDataset_V2, metaclass=CircularDatasetMeta):
+    dataset_class = piqaDataset_V2
+    default_circular_splits = ['validation']
+    default_option_keys = ['sol1', 'sol2']
+
+    def default_answer_key_switch_method(item, circular_pattern):
+        circular_pattern = tuple(int(i[-1]) - 1 for i in circular_pattern)
+        item['answer'] = 'AB'[circular_pattern['AB'.index(item['answer'])]]
+        return item
+
+
 class CircularEvaluator(BaseEvaluator):
     """This Evaluator assesses datasets post-Circular processing, generating
     the following evaluation metrics:
@@ -311,11 +336,11 @@ class CircularEvaluator(BaseEvaluator):
         tmp_metrics.update({f'correct_{k}': 0 for k in circular_patterns})
         tmp_metrics.update({f'count_{k}': 0 for k in circular_patterns})
         # calculate the original accuracy
-        for pred, ref, origin_item in zip(predictions, references, test_set):
+        for pred, refr, origin_item in zip(predictions, references, test_set):
             circular_pattern = origin_item['circular_pattern']
             for k in circular_patterns:
                 if tuple(circular_pattern) in circular_patterns[k]:
-                    tmp_metrics[f'correct_{k}'] += 1 if pred == ref else 0
+                    tmp_metrics[f'correct_{k}'] += 1 if pred == refr else 0
                     tmp_metrics[f'count_{k}'] += 1
 
         for k in circular_patterns:
@@ -324,13 +349,13 @@ class CircularEvaluator(BaseEvaluator):
 
         # calculate the circular accuracy
         _details = {k: {} for k in circular_patterns}
-        for pred, ref, origin_item in zip(predictions, references, test_set):
+        for pred, refr, origin_item in zip(predictions, references, test_set):
             index = origin_item['qid']
             circular_pattern = origin_item['circular_pattern']
             for k in circular_patterns:
                 if tuple(circular_pattern) in circular_patterns[k]:
                     _details[k].setdefault(
-                        index, []).append(True if pred == ref else False)
+                        index, []).append(True if pred == refr else False)
         for k in _details:
             _details[k] = {
                 index: sum(_details[k][index])

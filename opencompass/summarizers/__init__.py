@@ -1,5 +1,4 @@
-from .circular import CircularSummarizer
-from .default import DefaultSummarizer
-from .subjective import SubjectiveSummarizer
-
-__all__ = ['DefaultSummarizer', 'SubjectiveSummarizer', 'CircularSummarizer']
+# flake8: noqa: F401, E501
+from .circular import CircularSummarizer  # noqa: F401
+from .default import DefaultSummarizer  # noqa: F401
+from .subjective import *  # noqa: F401

@@ -3,6 +3,7 @@ from .afqmcd import *  # noqa: F401, F403
 from .agieval import *  # noqa: F401, F403
 from .anli import AnliDataset  # noqa: F401, F403
 from .anthropics_evals import *  # noqa: F401, F403
+from .apps import *  # noqa: F401, F403
 from .arc import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
@@ -11,6 +12,7 @@ from .bustum import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
 from .cb import *  # noqa: F401, F403
 from .ceval import *  # noqa: F401, F403
+from .chembench import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
 from .cibench import *  # noqa: F401, F403
 from .circular import *  # noqa: F401, F403
@@ -27,6 +29,7 @@ from .copa import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
 from .crowspairs_cn import *  # noqa: F401, F403
 from .csl import *  # noqa: F401, F403
+from .custom import *  # noqa: F401, F403
 from .cvalues import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
@@ -38,35 +41,49 @@ from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
+from .gpqa import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
 from .hellaswag import *  # noqa: F401, F403
 from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
+from .hungarian_math import *  # noqa: F401, F403
+from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
+from .infinitebench import *  # noqa: F401, F403
 from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
+from .jsonl import JsonlDataset  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
+from .lveval import *  # noqa: F401, F403
+from .mastermath2024v1 import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
+from .math401 import *  # noqa: F401, F403
+from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
+from .medbench import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403
 from .natural_question_cn import *  # noqa: F401, F403
+from .NPHardEval import *  # noqa: F401, F403
 from .obqa import *  # noqa: F401, F403
+from .OpenFinData import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
 from .qaspercut import *  # noqa: F401, F403
+from .QuALITY import *  # noqa: F401, F403
 from .race import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
+from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
 from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
@@ -74,11 +91,13 @@ from .siqa import *  # noqa: F401, F403
 from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403
 from .strategyqa import *  # noqa: F401, F403
-from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403
+from .subjective import *  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
 from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
+from .taco import *  # noqa: F401, F403
+from .teval import *  # noqa: F401, F403
 from .TheoremQA import *  # noqa: F401, F403
 from .tnews import *  # noqa: F401, F403
 from .triviaqa import *  # noqa: F401, F403

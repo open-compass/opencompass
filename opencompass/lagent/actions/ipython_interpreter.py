@@ -16,11 +16,14 @@ from jupyter_client import KernelManager
 from lagent.actions.base_action import BaseAction
 from lagent.schema import ActionReturn, ActionStatusCode
 
-WORK_DIR = os.getenv('CODE_INTERPRETER_WORK_DIR', '/tmp/workspace')
+WORK_DIR = os.getenv('CODE_INTERPRETER_WORK_DIR',
+                     f"{os.path.abspath('./output_images')}")
 
 DEFAULT_DESCRIPTION = """启动Jupter Kernel用于执行Python代码。"""
 
 START_CODE = """
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 def input(*args, **kwargs):
     raise NotImplementedError('Python input() function is disabled.')
 
@@ -47,9 +50,15 @@ class IPythonInterpreter(BaseAction):
             it is disabled. Defaults to None.
         timeout (int): Upper bound of waiting time for Python script execution.
             Defaults to 20.
+        trim_output (int, optional): Max characters restriction of ipython
+            outputs. If None, do not perform any trim.
+            Notice that, this is not token length but string length.
+            Trim strategies might be added later if needed. Defaults to 1024.
         user_data_dir (str): Specified the user data directory for files
             loading. If set to `ENV`, use `USER_DATA_DIR` environment variable.
             Defaults to `ENV`.
+        force_user_data (bool): Whether to force use user data.
+            Defaults to True.
     """
 
     _KERNEL_CLIENTS = {}
@@ -60,7 +69,9 @@ class IPythonInterpreter(BaseAction):
                  enable: bool = True,
                  disable_description: Optional[str] = None,
                  timeout: int = 20,
-                 user_data_dir: str = 'ENV') -> None:
+                 trim_output: Optional[int] = 1024,
+                 user_data_dir: str = 'ENV',
+                 force_user_data: bool = True) -> None:
         super().__init__(description, name, enable, disable_description)
 
         self.timeout = timeout
@@ -68,10 +79,20 @@ class IPythonInterpreter(BaseAction):
             user_data_dir = os.environ.get('USER_DATA_DIR', '')
 
         if user_data_dir:
-            user_data_dir = os.path.dirname(user_data_dir)
+            # user_data_dir = os.path.dirname(user_data_dir)
+            # in case change of dirs
+            assert os.path.exists(user_data_dir), \
+                f'{user_data_dir} does not exist.'
+            user_data_dir = os.path.abspath(user_data_dir)
             user_data_dir = f"import os\nos.chdir('{user_data_dir}')"
+        else:
+            if force_user_data:
+                raise ValueError('user_data_dir is not set. Please '
+                                 'set force_user_data to False if '
+                                 'no extra data needed.')
         self.user_data_dir = user_data_dir
         self._initialized = False
+        self.trim_output = trim_output
         if not os.path.exists(WORK_DIR):
             os.mkdir(WORK_DIR)
 
@@ -178,6 +199,12 @@ class IPythonInterpreter(BaseAction):
                 if image:
                     result += f'\n\n{image}'
                 if finished:
+                    # in case output text too long
+                    # might need better design later
+                    if self.trim_output and len(result) > self.trim_output:
+                        ellip = '......'
+                        half_len = int((self.trim_output - len(ellip)) / 2)
+                        result = result[:half_len] + ellip + result[-half_len:]
                     return succeed, result
 
         try:
@@ -204,13 +231,20 @@ class IPythonInterpreter(BaseAction):
                  command: str,
                  timeout: Optional[int] = None) -> ActionReturn:
         tool_return = ActionReturn(url=None, args=None, type=self.name)
-        tool_return.args = dict(text=command)
-        succeed, result = self._call(command, timeout)
-        if succeed:
-            tool_return.result = dict(text=result)
-            tool_return.state = ActionStatusCode.SUCCESS
+        extracted_command = extract_code(command)
+        tool_return.args = dict(text=command, extract_code=extracted_command)
+        if extracted_command:
+            succeed, result = self._call(extracted_command, timeout)
+            if succeed:
+                if not result:
+                    result = 'The code is succeed without any outputs.'
+                tool_return.result = dict(text=result)
+                tool_return.state = ActionStatusCode.SUCCESS
+            else:
+                tool_return.errmsg = repr(result)
+                tool_return.state = ActionStatusCode.API_ERROR
         else:
-            tool_return.errmsg = repr(result)
+            tool_return.errmsg = 'The input code is empty. Please follow the format.'  # noqa
             tool_return.state = ActionStatusCode.API_ERROR
         return tool_return
 

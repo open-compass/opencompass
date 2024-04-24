@@ -1,3 +1,7 @@
+# GONNA BE DEPRECATED, DON'T USE IT
+# The postprocessor has the assumption that the prompt is in the format of "Question:blabla"
+# This config does not follow the above assumption, thus deprecated
+
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer

@@ -46,12 +46,14 @@ class LocalRunner(BaseRunner):
         lark_bot_url (str): Lark bot url.
     """
 
-    def __init__(self,
-                 task: ConfigDict,
-                 max_num_workers: int = 16,
-                 debug: bool = False,
-                 max_workers_per_gpu: int = 1,
-                 lark_bot_url: str = None):
+    def __init__(
+        self,
+        task: ConfigDict,
+        max_num_workers: int = 16,
+        debug: bool = False,
+        max_workers_per_gpu: int = 1,
+        lark_bot_url: str = None,
+    ):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.max_num_workers = max_num_workers
         self.max_workers_per_gpu = max_workers_per_gpu
@@ -69,6 +71,7 @@ class LocalRunner(BaseRunner):
 
         status = []
         import torch
+
         if 'CUDA_VISIBLE_DEVICES' in os.environ:
             all_gpu_ids = [
                 int(i) for i in re.findall(r'(?<!-)\d+',
@@ -99,8 +102,19 @@ class LocalRunner(BaseRunner):
                     tmpl = get_command_template(all_gpu_ids[:num_gpus])
                     cmd = task.get_command(cfg_path=param_file, template=tmpl)
                     # run in subprocess if starts with torchrun etc.
-                    if cmd.startswith('python'):
-                        task.run()
+                    if 'python3 ' in cmd or 'python ' in cmd:
+                        # If it is an infer type task do not reload if
+                        # the current model has already been loaded.
+                        if 'infer' in self.task_cfg.type.lower():
+                            # If a model instance already exists,
+                            # do not reload it.
+                            if hasattr(self, 'cur_model'):
+                                task.run(self.cur_model)
+                            else:
+                                task.run()
+                            self.cur_model = task.model
+                        else:
+                            task.run()
                     else:
                         subprocess.run(cmd, shell=True, text=True)
                 finally:
@@ -189,7 +203,7 @@ class LocalRunner(BaseRunner):
                                     stderr=stdout)
 
             if result.returncode != 0:
-                logger.warning(f'task {task_name} fail, see\n{out_path}')
+                logger.error(f'task {task_name} fail, see\n{out_path}')
         finally:
             # Clean up
             os.remove(param_file)

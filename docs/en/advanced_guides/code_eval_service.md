@@ -25,20 +25,28 @@ Choose the dockerfile corresponding to the dataset you need, and replace `humane
 
 ```shell
 git clone https://github.com/open-compass/code-evaluator.git
-sudo docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
+docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
 ```
 
 3. Create a container with the following commands:
 
 ```shell
 # Log output format
-sudo docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
+docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # Run the program in the background
-# sudo docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
+# docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
 
 # Using different ports
-# sudo docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
+# docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
+```
+
+**Note:**
+
+- If you encounter a timeout during the evaluation of Go, please use the following command when creating the container.
+
+```shell
+docker run -it -p 5000:5000 -e GO111MODULE=on -e GOPROXY=https://goproxy.io code-eval-{your-dataset}:latest python server.py
 ```
 
 4. To ensure you have access to the service, use the following command to check the inference environment and evaluation service connection status. (If both inferences and code evaluations run on the same host, skip this step.)
@@ -109,7 +117,7 @@ Model inference and code evaluation services located in different machines which
 ### Collect Inference Results(Only for Humanevalx)
 
 In OpenCompass's tools folder, there is a script called `collect_code_preds.py` provided to process and collect the inference results after providing the task launch configuration file during startup along with specifying the working directory used corresponding to the task.
-It is the same with `-r` option in `run.py`. More details can be referred through the [documentation](https://opencompass.readthedocs.io/en/latest/get_started.html#launch-evaluation).
+It is the same with `-r` option in `run.py`. More details can be referred through the [documentation](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html#launching-evaluation).
 
 ```shell
 python tools/collect_code_preds.py [config] [-r latest]
@@ -205,7 +213,7 @@ When supporting new datasets or modifying post-processors, it is possible that m
 1. Remove the installation of the `code-evaluator` in `Dockerfile`, mount the `code-evaluator` when starting the container instead:
 
 ```shell
-sudo docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
+docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
 ```
 
 2. Install and start the code evaluation service locally. At this point, any necessary modifications can be made to the local copy of the `code-evaluator`.

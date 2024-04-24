@@ -43,7 +43,12 @@ class OpenICLInferTask(BaseTask):
                 the command.
         """
         script_path = __file__
-        if self.num_gpus > 0:
+        backend_keys = ['VLLM', 'Lmdeploy']
+        use_backend = any(
+            key in str(self.model_cfgs[0].get('type', ''))
+            or key in str(self.model_cfgs[0].get('llm', {}).get('type', ''))
+            for key in backend_keys)
+        if self.num_gpus > 0 and not use_backend:
             port = random.randint(12000, 32000)
             command = (f'torchrun --master_port={port} '
                        f'--nproc_per_node {self.num_procs} '
@@ -54,12 +59,17 @@ class OpenICLInferTask(BaseTask):
 
         return template.format(task_cmd=command)
 
-    def run(self):
+    def run(self, cur_model=None):
         self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
-            self.model = build_model_from_cfg(model_cfg)
+            self.min_out_len = model_cfg.get('min_out_len', None)
+            if cur_model:
+                self.model = cur_model
+            else:
+                self.model = build_model_from_cfg(model_cfg)
+                cur_model = self.model
 
             for dataset_cfg in dataset_cfgs:
                 self.model_cfg = model_cfg
@@ -100,6 +110,8 @@ class OpenICLInferTask(BaseTask):
         inferencer_cfg['model'] = self.model
         self._set_default_value(inferencer_cfg, 'max_out_len',
                                 self.max_out_len)
+        self._set_default_value(inferencer_cfg, 'min_out_len',
+                                self.min_out_len)
         self._set_default_value(inferencer_cfg, 'batch_size', self.batch_size)
         inferencer_cfg['max_seq_len'] = self.model_cfg.get('max_seq_len')
         inferencer = ICL_INFERENCERS.build(inferencer_cfg)

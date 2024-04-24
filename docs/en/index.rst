@@ -58,6 +58,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :caption: Advanced Guides
 
    advanced_guides/new_dataset.md
+   advanced_guides/custom_dataset.md
    advanced_guides/new_model.md
    advanced_guides/evaluation_turbomind.md
    advanced_guides/evaluation_lightllm.md
@@ -68,6 +69,8 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    advanced_guides/longeval.md
    advanced_guides/subjective_evaluation.md
    advanced_guides/circular_eval.md
+   advanced_guides/contamination_eval.md
+   advanced_guides/needleinahaystack_eval.md
 
 .. _Tools:
 .. toctree::

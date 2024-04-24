@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from datasets import Dataset, DatasetDict
 
@@ -21,7 +22,6 @@ class GSM8KDataset(BaseDataset):
             with open(split_path, 'r', encoding='utf-8') as f:
                 for line in f:
                     line = json.loads(line.strip())
-                    line['answer']
                     dataset.append(line)
             datasets[split] = Dataset.from_list(dataset)
         return DatasetDict(datasets)
@@ -34,28 +34,22 @@ def gsm8k_dataset_postprocess(text: str) -> str:
 
 @TEXT_POSTPROCESSORS.register_module('gsm8k')
 def gsm8k_postprocess(text: str) -> str:
-    text = text.split('\n\n')[0]
-    text = text.split(' ')[::-1]
-    flag = False
-    ret = ''
-    for i in range(len(text)):
-        s = text[i]
-        for i in range(len(s)):
-            if s[i].isdigit():
-                flag = True
-                ret = s
-                break
-        if flag:
-            break
-    ret1 = ''
-    for i in range(len(ret)):
-        # deal with potential float number
-        if ret[i].isdigit() or ret[i] == '.':
-            ret1 += ret[i]
-    return ret1.strip('.')
+    text = text.split('Question:')[0]
+    numbers = re.findall(r'\-?\d+\.\d+|\-?\d+', text)
+    if not numbers:
+        return 'NULL'
+    return numbers[-1]
 
 
 class Gsm8kEvaluator(BaseEvaluator):
+
+    def is_equal(self, pred, refer):
+        try:
+            if pred == refer or abs(float(pred) - int(refer)) < 1e-6:
+                return True
+        except Exception:
+            pass
+        return False
 
     def score(self, predictions, references):
         if len(predictions) != len(references):
@@ -69,7 +63,7 @@ class Gsm8kEvaluator(BaseEvaluator):
         for i, j in zip(predictions, references):
             detail = {'pred': i, 'answer': j, 'correct': False}
             count += 1
-            if i == j:
+            if self.is_equal(i, j):
                 correct += 1
                 detail['correct'] = True
             details.append(detail)
@@ -114,6 +108,8 @@ class Gsm8kAgentEvaluator(BaseEvaluator):
 
     def score(self, predictions, references, steps):
         """Calculate accuracy."""
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length'}
 
         row_reasoning_scope = 0
         action_scope = 0
@@ -142,6 +138,6 @@ class Gsm8kAgentEvaluator(BaseEvaluator):
             reasoning_acc=100 *
             (reasoning_scope + final_scope + row_reasoning_scope) / total,
             code_acc=100 * (code_scope + final_scope) / total,
-            action_acc=100 * (action_scope + final_scope) / total,
+            action_pct=100 * (action_scope + final_scope) / total,
         )
         return result

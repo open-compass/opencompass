@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 import torch
+import transformers
 
 from opencompass.models.base import BaseModel
 from opencompass.models.base_api import APITemplateParser
@@ -11,6 +12,33 @@ from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
 
 PromptType = Union[PromptList, str]
+
+
+class MultiTokenEOSCriteria(transformers.StoppingCriteria):
+    """Criteria to stop on the specified multi-token sequence."""
+
+    def __init__(
+        self,
+        sequence: str,
+        tokenizer: transformers.PreTrainedTokenizer,
+        batch_size: int,
+    ):
+        self.done_tracker = [False] * batch_size
+        self.sequence = sequence
+        self.sequence_ids = tokenizer.encode(sequence,
+                                             add_special_tokens=False)
+        self.sequence_id_len = len(self.sequence_ids)
+        self.tokenizer = tokenizer
+
+    def __call__(self, input_ids, scores, **kwargs) -> bool:
+        # compare the last len(stop) tokens
+        lookback_ids_batch = input_ids[:, -self.sequence_id_len:]
+        lookback_tokens_batch = self.tokenizer.batch_decode(lookback_ids_batch)
+        for i, done in enumerate(self.done_tracker):
+            if done:
+                continue
+            self.done_tracker[i] = self.sequence in lookback_tokens_batch[i]
+        return False not in self.done_tracker
 
 
 @MODELS.register_module()
@@ -81,10 +109,8 @@ class HuggingFace(BaseModel):
                          max_seq_len=max_seq_len,
                          tokenizer_only=tokenizer_only,
                          meta_template=meta_template)
-        from opencompass.utils.fileio import patch_hf_auto_model
         if hf_cache_dir is None:
             hf_cache_dir = os.getenv('HF_MODEL_HUB', None)
-        patch_hf_auto_model(hf_cache_dir)
         self.logger = get_logger()
         self.pad_token_id = pad_token_id
         assert mode in ['none', 'mid']
@@ -194,13 +220,18 @@ class HuggingFace(BaseModel):
             self.model.config.eos_token_id = 2
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
 
-    def generate(self, inputs: List[str], max_out_len: int,
+    def generate(self,
+                 inputs: List[str],
+                 max_out_len: int,
+                 min_out_len: Optional[int] = None,
+                 stopping_criteria: List[str] = [],
                  **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
             inputs (List[str]): A list of strings.
             max_out_len (int): The maximum length of the output.
+            min_out_len (Optional[int]): The minimum length of the output.
 
         Returns:
             List[str]: A list of generated strings.
@@ -210,13 +241,23 @@ class HuggingFace(BaseModel):
         if self.batch_padding and len(inputs) > 1:
             return self._batch_generate(inputs=inputs,
                                         max_out_len=max_out_len,
+                                        min_out_len=min_out_len,
+                                        stopping_criteria=stopping_criteria,
                                         **generation_kwargs)
         else:
-            return sum((self._single_generate(
-                inputs=[input_], max_out_len=max_out_len, **generation_kwargs)
-                        for input_ in inputs), [])
+            return sum(
+                (self._single_generate(inputs=[input_],
+                                       max_out_len=max_out_len,
+                                       min_out_len=min_out_len,
+                                       stopping_criteria=stopping_criteria,
+                                       **generation_kwargs)
+                 for input_ in inputs), [])
 
-    def _batch_generate(self, inputs: List[str], max_out_len: int,
+    def _batch_generate(self,
+                        inputs: List[str],
+                        max_out_len: int,
+                        min_out_len: Optional[int] = None,
+                        stopping_criteria: List[str] = [],
                         **kwargs) -> List[str]:
         """Support for batch prompts inference.
 
@@ -255,6 +296,24 @@ class HuggingFace(BaseModel):
             for k in tokens if k in ['input_ids', 'attention_mask']
         }
 
+        if stopping_criteria:
+            # Construct huggingface stopping criteria
+            if self.tokenizer.eos_token is not None:
+                stopping_criteria = stopping_criteria + [
+                    self.tokenizer.eos_token
+                ]
+            stopping_criteria = transformers.StoppingCriteriaList([
+                *[
+                    MultiTokenEOSCriteria(sequence, self.tokenizer,
+                                          tokens['input_ids'].shape[0])
+                    for sequence in stopping_criteria
+                ],
+            ])
+            kwargs['stopping_criteria'] = stopping_criteria
+
+        if min_out_len is not None:
+            kwargs['min_new_tokens'] = min_out_len
+
         # step-2: conduct model forward to generate output
         outputs = self.model.generate(**tokens,
                                       max_new_tokens=max_out_len,
@@ -275,7 +334,11 @@ class HuggingFace(BaseModel):
             decodeds = [token.split(self.end_str)[0] for token in decodeds]
         return decodeds
 
-    def _single_generate(self, inputs: List[str], max_out_len: int,
+    def _single_generate(self,
+                         inputs: List[str],
+                         max_out_len: int,
+                         min_out_len: Optional[int] = None,
+                         stopping_criteria: List[str] = [],
                          **kwargs) -> List[str]:
         """Support for single prompt inference.
 
@@ -319,6 +382,24 @@ class HuggingFace(BaseModel):
                                    max_length=self.max_seq_len -
                                    max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
+        if stopping_criteria:
+            # Construct huggingface stopping criteria
+            if self.tokenizer.eos_token is not None:
+                stopping_criteria = stopping_criteria + [
+                    self.tokenizer.eos_token
+                ]
+            stopping_criteria = transformers.StoppingCriteriaList([
+                *[
+                    MultiTokenEOSCriteria(sequence, self.tokenizer,
+                                          input_ids.shape[0])
+                    for sequence in stopping_criteria
+                ],
+            ])
+            kwargs['stopping_criteria'] = stopping_criteria
+
+        if min_out_len is not None:
+            kwargs['min_new_tokens'] = min_out_len
+
         # To accommodate the PeftModel, parameters should be passed in
         # key-value format for generate.
         outputs = self.model.generate(input_ids=input_ids,
@@ -431,8 +512,118 @@ class HuggingFace(BaseModel):
                 self.tokenizer.pad_token_id).sum(-1).cpu().numpy()
         if mask_length is not None:
             lens -= np.array(mask_length)
-        ce_loss = loss.sum(-1).cpu().detach().numpy() / lens
+        ce_loss = loss.float().sum(-1).cpu().detach().numpy() / lens
         return ce_loss
+
+    def get_loglikelihood(
+            self,
+            inputs: List[str],
+            conts: List[str],
+            mask_length: Optional[List[int]] = None) -> List[float]:
+        """Get loglikelihood scores given a list of inputs.
+
+        Args:
+            inputs (List[str]): A list of strings.
+            conts (List[str]): A list of strings: slices after the space.
+            NOT SUPPORT mask_length YET!
+            mask_length (Optional[List[int]]): A list of mask lengths. If
+                provided, the perplexity scores will be calculated with the
+                first mask_length[i] tokens masked out. It's okay to skip
+                its implementation if advanced features in PPLInfernecer is
+                not needed.
+
+        Returns:
+            List[float]: A list of loglikelihood scores.
+        """
+        assert mask_length is None, 'Not support mask_length yet.'
+        if self.batch_padding and len(inputs) > 1:
+            assert self.tokenizer.pad_token
+            return self._get_loglikelihood(inputs, conts)
+        else:
+            return np.concatenate([
+                self._get_loglikelihood(inputs=[inputs[idx]],
+                                        conts=[conts[idx]])
+                for idx in range(len(inputs))
+            ])
+
+    def _get_loglikelihood(self, inputs: str, conts: str) -> float:
+        """Get loglikelihood scores given input string and continuation string.
+
+        Args:
+            inputs (str): string.
+            conts (str): strings: slices after the space.
+        Returns:
+            float: loglikelihood scores.
+        """
+        input_tokenizer_out = self.tokenizer(inputs,
+                                             padding=True,
+                                             truncation=False,
+                                             return_length=True,
+                                             return_tensors='pt').to(
+                                                 self.model.device)
+
+        input_ids = input_tokenizer_out['input_ids'][:, :self.max_seq_len]
+        input_length = input_tokenizer_out['length']
+        context_ids = [
+            self.tokenizer(inputs[i].replace(conts[i], ''),
+                           padding=False,
+                           truncation=True,
+                           max_length=self.max_seq_len)['input_ids']
+            for i in range(len(inputs))
+        ]
+        # forward
+        outputs = self.model(input_ids)['logits']
+        outputs = torch.nn.functional.log_softmax(outputs, dim=-1)
+        # calculate loglikelihood
+        answer = np.zeros(len(inputs))
+        for i in range(len(inputs)):
+            if self.tokenizer.padding_side == 'right':
+                cont_ids = input_ids[i, len(context_ids[i]):input_length[i]]
+                logits = outputs[i,
+                                 len(context_ids[i]) - 1:input_length[i] -
+                                 1, :]  # noqa
+            else:
+                cont_ids = input_ids[i, len(context_ids[i]) - input_length[i]:]
+                logits = outputs[i,
+                                 len(context_ids[i]) - input_length[i] - 1:-1]
+            # Reducing the dimension will lead to a wrong outcome
+            logits_gather = torch.gather(
+                logits.unsqueeze(0), 2,
+                cont_ids.unsqueeze(0).unsqueeze(-1))  # [1, seq]
+            # Answer: sum the likelihood of each token in continuation
+            answer[i] = float(logits_gather.detach().cpu().sum())
+        return answer
+
+    def get_mink_percent(self, inputs: List[str], k: int = 20) -> List[float]:
+        """https://swj0419.github.io/detect-pretrain.github.io/"""
+
+        if self.batch_padding and len(inputs) > 1:
+            assert self.tokenizer.pad_token
+            return self._get_mink_percent(inputs, k=k)
+        else:
+            return np.concatenate([
+                self._get_mink_percent(inputs=[text], k=k) for text in inputs
+            ])
+
+    def _get_mink_percent(self, inputs: List[str], k: int = 20) -> List[float]:
+        outputs, inputs = self.get_logits(inputs)
+        shift_logits = outputs[:, :-1, :].contiguous().float()
+        shift_labels = inputs['tokens']['input_ids'][:, 1:].contiguous()
+
+        loss_fct = torch.nn.CrossEntropyLoss(
+            reduction='none', ignore_index=self.tokenizer.pad_token_id)
+        loss = loss_fct(shift_logits.view(-1, shift_logits.size(-1)),
+                        shift_labels.view(-1)).view(shift_labels.size())
+        lens = (inputs['tokens']['input_ids'] !=
+                self.tokenizer.pad_token_id).sum(-1).cpu().numpy()
+        mink_percent = []
+        for nloss, nlen in zip(loss, lens):
+            nlen = int(nlen)
+            minklen = max(nlen * k // 100, 1)
+            nloss = torch.topk(loss[-nlen:], minklen, dim=-1)[0]
+            nloss = -nloss.float().mean().cpu().detach().numpy()
+            mink_percent.append(nloss)
+        return np.array(mink_percent)
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.
@@ -506,6 +697,7 @@ class HuggingFaceChatGLM3(HuggingFace):
                  peft_path: Optional[str] = None,
                  tokenizer_only: bool = False,
                  model_kwargs: dict = dict(device_map='auto'),
+                 generation_kwargs: dict = dict(),
                  meta_template: Optional[Dict] = None,
                  extract_pred_after_decode: bool = False,
                  batch_padding: bool = False,
@@ -519,6 +711,7 @@ class HuggingFaceChatGLM3(HuggingFace):
                          tokenizer_kwargs=tokenizer_kwargs,
                          peft_path=peft_path,
                          tokenizer_only=tokenizer_only,
+                         generation_kwargs=generation_kwargs,
                          model_kwargs=model_kwargs,
                          meta_template=meta_template,
                          extract_pred_after_decode=extract_pred_after_decode,
@@ -530,17 +723,19 @@ class HuggingFaceChatGLM3(HuggingFace):
         self.num_extra_tokens = num_extra_tokens
 
     def generate(self,
-                 inputs: List[str or PromptList],
+                 inputs: List[PromptType],
                  max_out_len: int = 512,
-                 temperature: float = 0.6,
-                 skip_overlength=False) -> str:
+                 skip_overlength=False,
+                 **kwargs) -> str:
         """Generate response from input prompt.
 
         Args:
             inputs (list): input prompt
             max_out_len (int): max output length
-            temperature (float): temperature for sampling
         """
+        generation_kwargs = kwargs.copy()
+        generation_kwargs.update(self.generation_kwargs)
+
         responses = []
         for _input in inputs:
             assert isinstance(_input, (str, PromptList))
@@ -554,8 +749,8 @@ class HuggingFaceChatGLM3(HuggingFace):
                         'role': {
                             'HUMAN': 'user',
                             'BOT': 'assistant',
-                            'SYSTEM': 'system'
-                        }[item['role']]
+                            'SYSTEM': 'system',
+                        }[item['role'].upper()]
                     }
                     history.append(msg)
             user_content = history[-1]['content']
@@ -574,13 +769,15 @@ class HuggingFaceChatGLM3(HuggingFace):
                     responses.append('')
                     continue
 
-            try:
-                response, history = self.model.chat(self.tokenizer,
-                                                    user_content,
-                                                    history=history)
-                responses.append(response)
-            except Exception:
-                responses.append('')
+            response, history = self.model.chat(self.tokenizer,
+                                                user_content,
+                                                history=history,
+                                                max_new_tokens=max_out_len,
+                                                **generation_kwargs)
+            # response will be dict sometime
+            if isinstance(response, dict):
+                response = response.get('content', '')
+            responses.append(response)
         return responses
 
     def get_token_len(self, prompt: str) -> int:

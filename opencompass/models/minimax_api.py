@@ -60,13 +60,13 @@ class MiniMax(BaseAPIModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -83,14 +83,14 @@ class MiniMax(BaseAPIModel):
 
     def _generate(
         self,
-        input: str or PromptList,
+        input: PromptType,
         max_out_len: int = 512,
     ) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
-                The PromptDict should be organized in OpenCompass'
+            inputs (PromptType): A string or PromptDict.
+                The PromptDict should be organized in Test'
                 API format.
             max_out_len (int): The maximum length of the output.
 
@@ -102,7 +102,7 @@ class MiniMax(BaseAPIModel):
         if isinstance(input, str):
             messages = [{
                 'sender_type': 'USER',
-                'sender_name': 'OpenCompass',
+                'sender_name': 'Test',
                 'text': input
             }]
         else:
@@ -111,7 +111,7 @@ class MiniMax(BaseAPIModel):
                 msg = {'text': item['prompt']}
                 if item['role'] == 'HUMAN':
                     msg['sender_type'] = 'USER'
-                    msg['sender_name'] = 'OpenCompass'
+                    msg['sender_name'] = 'Test'
                 elif item['role'] == 'BOT':
                     msg['sender_type'] = 'BOT'
                     msg['sender_name'] = 'MM智能助理'
@@ -135,15 +135,19 @@ class MiniMax(BaseAPIModel):
             'messages':
             messages
         }
-
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            raw_response = requests.request('POST',
-                                            url=self.url,
-                                            headers=self.headers,
-                                            json=data)
-            response = raw_response.json()
+            try:
+                raw_response = requests.request('POST',
+                                                url=self.url,
+                                                headers=self.headers,
+                                                json=data)
+                response = raw_response.json()
+            except Exception as err:
+                print('Request Error:{}'.format(err))
+                time.sleep(3)
+                continue
             self.release()
 
             if response is None:
@@ -157,6 +161,7 @@ class MiniMax(BaseAPIModel):
                 # msg = json.load(response.text)
                 # response
                 msg = response['reply']
+                # msg = response['choices']['messages']['text']
                 return msg
             # sensitive content, prompt overlength, network error
             # or illegal prompt
