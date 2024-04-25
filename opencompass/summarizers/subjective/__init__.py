@@ -7,3 +7,4 @@ from .creationbench import CreationBenchSummarizer
 from .information_retrival import IRSummarizer
 from .mtbench import MTBenchSummarizer
 from .multiround import MultiroundSummarizer
+from .all_obj import AllObjSummarizer
