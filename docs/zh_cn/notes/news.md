@@ -1,5 +1,9 @@
 # 新闻
 
+- **\[2024.01.17\]** 我们支持了 [InternLM2](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py) 和 [InternLM2-Chat](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py) 的相关评测，InternLM2 在这些测试中表现出非常强劲的性能，欢迎试用！.
+- **\[2024.01.17\]** 我们支持了多根针版本的大海捞针测试，更多信息见[这里](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/needleinahaystack_eval.html#id8).
+- **\[2023.12.28\]** 我们支持了对使用[LLaMA2-Accessory](https://github.com/Alpha-VLLM/LLaMA2-Accessory)（一款强大的LLM开发工具箱）开发的所有模型的无缝评估!
+- **\[2023.12.22\]** 我们开源了[T-Eval](https://github.com/open-compass/T-Eval)用于评测大语言模型工具调用能力。欢迎访问T-Eval的官方[Leaderboard](https://open-compass.github.io/T-Eval/leaderboard.html)获取更多信息!
 - **\[2023.12.10\]** 我们开源了多模评测框架 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，目前已支持 20+ 个多模态大模型与包括 MMBench 系列在内的 7 个多模态评测集.
 - **\[2023.12.10\]** 我们已经支持了Mistral AI的MoE模型 **Mixtral-8x7B-32K**。欢迎查阅[MixtralKit](https://github.com/open-compass/MixtralKit)以获取更多关于推理和评测的详细信息.
 - **\[2023.11.22\]** 我们已经支持了多个于API的模型，包括**百度、字节跳动、华为、360**。欢迎查阅[模型](https://opencompass.readthedocs.io/en/latest/user_guides/models.html)部分以获取更多详细信息。

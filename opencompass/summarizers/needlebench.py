@@ -72,7 +72,7 @@ dataset_mapping_dict = {}
 
 needle_counts = ['2', '3', '4', '5']
 languages = ['en', 'zh']
-sizes = ['4k', '8k', '32k', '200k', '1000k']
+sizes = ['4k', '8k', '32k', '200k', '256k', '1000k']
 types = ['origin', 'parallel']
 
 for needle_count in needle_counts:
@@ -190,7 +190,7 @@ def save_results_to_plots(txt_results_save_path):
     numbers = [2, 3, 4, 5]
     languages = ['en', 'zh']
     size_exists = []
-    sizes_origin = ['_4k', '_8k', '_32k', '_128k', '_200k', '_1000k']
+    sizes_origin = ['_4k', '_8k', '_32k', '_128k', '_200k', '_256k', '_1000k']
 
     for size in sizes_origin:
         if size in content:
@@ -301,6 +301,9 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
                 markersize=8,
                 label='Average Depth Score'
                 )
+        for x_value, y_value in zip(x_data, y_data):
+            ax2.text(x_value, y_value, f'{y_value:.2f}', ha='center', va='top')
+
         ax2.set_ylim(0, 100)
 
         ax2.set_yticklabels([])
@@ -353,7 +356,7 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
         new_save_path = os.path.join(directory_path, new_filename)
 
         plt.savefig(new_save_path, format='png', bbox_inches='tight', pad_inches=0)
-        print(f'Saved :{new_save_path}')
+        print(f'Saved: {new_save_path}')
 
         plt.close()
 

@@ -12,7 +12,6 @@ models = [
         type=HuggingFace,
         abbr='yi-34b-chat-hf',
         path='01-ai/Yi-34B-Chat',
-        tokenizer_path='01-ai/Yi-34B-Chat',
         model_kwargs=dict(
             trust_remote_code=True,
             device_map='auto',
@@ -26,7 +25,8 @@ models = [
         max_out_len=100,
         max_seq_len=2048,
         batch_size=8,
-        run_cfg=dict(num_gpus=4, num_procs=1),
+        run_cfg=dict(num_gpus=2, num_procs=1),
         end_str='<|im_end|>',
+        batch_padding=True,
     )
 ]
