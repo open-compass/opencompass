@@ -12,6 +12,8 @@ subjective_reader_cfg = dict(
 subjective_all_sets = [
     'data_protection', 'legality', 'morality_non_environmental_friendly', 'morality_disobey_social_norm', 'morality_chinese_values', 'safety_non_anthropomorphism', 'safety_physical_harm', 'safety_mental_harm', 'safety_property_safety', 'fairness'
 ]
+
+
 #this is the path to flames dataset
 data_path ="./data/flames"
 
