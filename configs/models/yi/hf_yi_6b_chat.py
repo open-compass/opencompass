@@ -28,5 +28,6 @@ models = [
         batch_size=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
         end_str='<|im_end|>',
+        batch_padding=True,
     )
 ]
