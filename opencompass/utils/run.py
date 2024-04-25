@@ -79,7 +79,10 @@ def get_config_from_arg(args) -> Config:
                                                   args.accelerator)
             if 'eval' in config and 'partitioner' in config['eval']:
                 if 'models' in config['eval']['partitioner']:
-                    config['eval']['partitioner']['models'] = change_accelerator(config['eval']['partitioner']['models'],args.accelerator)
+                    config['eval']['partitioner'][
+                        'models'] = change_accelerator(
+                            config['eval']['partitioner']['models'],
+                            args.accelerator)
                 #if 'judge_models' in config['eval']['partitioner']:
                 #    config['eval']['partitioner']['judge_models'] = change_accelerator(config['eval']['partitioner']['judge_models'],args.accelerator)
         return config
