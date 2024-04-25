@@ -66,8 +66,6 @@ infer = dict(
     partitioner=dict(type=NaivePartitioner),
     runner=dict(
         type=LocalRunner,
-        partition='llmeval',
-        quotatype='auto',
         max_num_workers=256,
         task=dict(type=OpenICLInferTask)),
 )
@@ -133,8 +131,6 @@ eval = dict(
     ),
     runner=dict(
         type=LocalRunner,
-        partition='llmeval',
-        quotatype='auto',
         max_num_workers=256,
         task=dict(
             type=SubjectiveEvalTask
