@@ -19,15 +19,16 @@ class ArenaHardDataset(BaseDataset):
             for line in file:
                 problem = json.loads(line)
                 question_id = problem['question_id']
-                category = problem['category']
                 cluster = problem['cluster']
-                question = problem['turns'][0]['content'] # only one turn in arena_hard
+                question = problem['turns'][0][
+                    'content']  # only one turn in arena_hard
                 raw_data.append({
                     'question': question,
                     'capability': cluster,
                     'judge': {
                         'capability': cluster,
-                        'question': question
+                        'question': question,
+                        'question_id': question_id
                     }
                 })
         dataset = Dataset.from_list(raw_data)
