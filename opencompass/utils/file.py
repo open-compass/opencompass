@@ -1,6 +1,6 @@
 import fnmatch
 import os
-from typing import List, Union, Tuple
+from typing import List, Tuple, Union
 
 
 def match_files(path: str,
