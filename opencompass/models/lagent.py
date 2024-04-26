@@ -44,9 +44,10 @@ class LagentAgent:
 
     def gt_response(self, prompt):
         if 'CIReAct' in str(self.agent.__class__):
-            gold = prompt
-            prompt = f"""{self.agent._protocol.action['begin']} IPythonInterpreter
-{self.agent._protocol.action_input['begin']} ```python\n{gold}\n```\n"""  # noqa
+            thought, gold = prompt.split('**split**')
+            prompt = f"""{self.agent._protocol.thought['begin']} {thought}\
+\n{self.agent._protocol.action['begin']} IPythonInterpreter\n\
+{self.agent._protocol.action_input['begin']}```python\n{gold}\n```\n"""  # noqa
             action_input = dict(
                 command=f"""```python\n{gold}\n```\n""",
                 timeout=120,

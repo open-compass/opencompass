@@ -144,6 +144,7 @@ class IPythonInterpreter(BaseAction):
 
         def _inner_call():
             result = ''
+            image_path = ''
             succeed = True
             image_idx = 0
 
@@ -197,7 +198,7 @@ class IPythonInterpreter(BaseAction):
                 if text:
                     result += f'\n\n{msg_type}:\n\n```\n{text}\n```'
                 if image:
-                    result += f'\n\n{image}'
+                    image_path += f'\n\n{image}'
                 if finished:
                     # in case output text too long
                     # might need better design later
@@ -205,7 +206,7 @@ class IPythonInterpreter(BaseAction):
                         ellip = '......'
                         half_len = int((self.trim_output - len(ellip)) / 2)
                         result = result[:half_len] + ellip + result[-half_len:]
-                    return succeed, result
+                    return succeed, result, image_path
 
         try:
             if timeout:
@@ -215,7 +216,7 @@ class IPythonInterpreter(BaseAction):
 
                 signal.signal(signal.SIGALRM, handler)
                 signal.alarm(timeout)
-            succeed, result = _inner_call()
+            succeed, result, image_path = _inner_call()
         except TimeoutError:
             succeed = False
             text = 'The code interpreter encountered an unexpected error.'
@@ -225,7 +226,8 @@ class IPythonInterpreter(BaseAction):
                 signal.alarm(0)
 
         result = result.lstrip('\n')
-        return succeed, result
+        image_path = image_path.lstrip('\n')
+        return succeed, result, image_path
 
     def __call__(self,
                  command: str,
@@ -234,11 +236,12 @@ class IPythonInterpreter(BaseAction):
         extracted_command = extract_code(command)
         tool_return.args = dict(text=command, extract_code=extracted_command)
         if extracted_command:
-            succeed, result = self._call(extracted_command, timeout)
+            succeed, result, image_path = self._call(extracted_command,
+                                                     timeout)
             if succeed:
                 if not result:
                     result = 'The code is succeed without any outputs.'
-                tool_return.result = dict(text=result)
+                tool_return.result = dict(text=result, image_path=image_path)
                 tool_return.state = ActionStatusCode.SUCCESS
             else:
                 tool_return.errmsg = repr(result)
