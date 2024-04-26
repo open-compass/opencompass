@@ -4,7 +4,7 @@ with read_base():
     from .models.hf_llama.hf_llama3_8b_instruct import models as hf_llama3_8b_instruct_model # noqa: F401, F403
     from .models.hf_internlm.hf_internlm2_chat_20b import models as hf_internlm2_chat_20b_model  # noqa: F401, F403
     from .models.hf_llama.hf_llama3_70b_instruct import models as hf_llama3_70b_instruct_model  # noqa: F401, F403
-    from .datasets.math.math_subjective_judge import math_datasets  # noqa: F401, F403
+    from .datasets.math.math_llm_judge import math_datasets  # noqa: F401, F403
 from opencompass.models.openai_api import OpenAIAllesAPIN
 from opencompass.datasets import math_judement_preprocess
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
