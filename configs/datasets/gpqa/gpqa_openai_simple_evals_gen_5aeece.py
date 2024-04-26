@@ -2,17 +2,18 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import GPQADataset_Simple_Eval, GPQA_Simple_Eval_postprocess, GPQAEvaluator
-# from opencompass.utils import first_option_postprocess
 
 # openai_simple_eval prompt
-align_prompt = """Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering.
+align_prompt = """
+Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering.
 
 {question}
 
 A) {A}
 B) {B}
 C) {C}
-D) {D}""".strip()
+D) {D}
+""".strip()
 
 gpqa_reader_cfg = dict(
     input_columns=['question', 'A', 'B', 'C', 'D'],
