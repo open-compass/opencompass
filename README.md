@@ -159,19 +159,8 @@ python tools/list_configs.py llama mmlu
 You can also evaluate other HuggingFace models via command line. Taking LLaMA-7b as an example:
 
 ```bash
-python run.py --datasets ceval_ppl mmlu_ppl \
---hf-path huggyllama/llama-7b \  # HuggingFace model path
---model-kwargs device_map='auto' \  # Arguments for model construction
---tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # Arguments for tokenizer construction
---max-out-len 100 \  # Maximum number of tokens generated
---max-seq-len 2048 \  # Maximum sequence length the model can accept
---batch-size 8 \  # Batch size
---no-batch-padding \  # Don't enable batch padding, infer through for loop to avoid performance loss
---num-gpus 1  # Number of minimum required GPUs
+python run.py --datasets ceval_ppl mmlu_ppl --hf-type base --hf-path huggyllama/llama-7b
 ```
-
-> **Note**<br />
-> To run the command above, you will need to remove the comments starting from `# ` first.
 
 Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html) to learn how to run an evaluation task.
 

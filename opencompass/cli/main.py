@@ -172,21 +172,21 @@ def parse_dlc_args(dlc_parser):
 
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
-    hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat')
-    hf_parser.add_argument('--hf-path', type=str)
-    hf_parser.add_argument('--model-kwargs', nargs='+', action=DictAction, default={})
-    hf_parser.add_argument('--tokenizer-path', type=str)
-    hf_parser.add_argument('--tokenizer-kwargs', nargs='+', action=DictAction, default={})
-    hf_parser.add_argument('--peft-path', type=str)
-    hf_parser.add_argument('--peft-kwargs', nargs='+', action=DictAction, default={})
-    hf_parser.add_argument('--generation-kwargs', nargs='+', action=DictAction, default={})
-    hf_parser.add_argument('--max-seq-len', type=int)
-    hf_parser.add_argument('--max-out-len', type=int, default=256)
-    hf_parser.add_argument('--min-out-len', type=int, default=1)
-    hf_parser.add_argument('--batch-size', type=int, default=8)
-    hf_parser.add_argument('--num-gpus', type=int, default=1)
-    hf_parser.add_argument('--pad-token-id', type=int)
-    hf_parser.add_argument('--stop-words', nargs='+', default=[])
+    hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat', help='The type of the HuggingFace model, base or chat')
+    hf_parser.add_argument('--hf-path', type=str, help='The path to the HuggingFace model, e.g. "facebook/opt-125m", required')
+    hf_parser.add_argument('--model-kwargs', nargs='+', action=DictAction, default={}, help='The kwargs for the HuggingFace model')
+    hf_parser.add_argument('--tokenizer-path', type=str, help='The path to the HuggingFace tokenizer, same as --hf-path if not specified')
+    hf_parser.add_argument('--tokenizer-kwargs', nargs='+', action=DictAction, default={}, help='The kwargs for the tokenizer')
+    hf_parser.add_argument('--peft-path', type=str, help='The path to the PEFT model')
+    hf_parser.add_argument('--peft-kwargs', nargs='+', action=DictAction, default={}, help='The kwargs for the PEFT model')
+    hf_parser.add_argument('--generation-kwargs', nargs='+', action=DictAction, default={}, help='The kwargs for the generation')
+    hf_parser.add_argument('--max-seq-len', type=int, help='The max sequence length for the HuggingFace model')
+    hf_parser.add_argument('--max-out-len', type=int, default=256, help='The max output length for the HuggingFace model')
+    hf_parser.add_argument('--min-out-len', type=int, default=1, help='The min output length for the HuggingFace model')
+    hf_parser.add_argument('--batch-size', type=int, default=8, help='The batch size for the HuggingFace model')
+    hf_parser.add_argument('--num-gpus', type=int, default=1, help='The number of GPUs for **the HuggingFace model passed via cli**')
+    hf_parser.add_argument('--pad-token-id', type=int, help='The pad token id for the HuggingFace model')
+    hf_parser.add_argument('--stop-words', nargs='+', default=[], help='The stop words for the HuggingFace model')
 
 
 def parse_custom_dataset_args(custom_dataset_parser):
