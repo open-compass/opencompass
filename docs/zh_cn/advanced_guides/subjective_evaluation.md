@@ -15,10 +15,11 @@
 
 ## 目前已支持的主观评测数据集
 
-1. AlginBench（https://github.com/THUDM/AlignBench）
+1. AlignBench（https://github.com/THUDM/AlignBench）
 2. MTBench （https://github.com/lm-sys/FastChat）
 3. AlpacaEvalv2 （https://github.com/tatsu-lab/alpaca_eval）
-4. CompassArena（内部数据集）
+4. ArenaHard (https://github.com/lm-sys/arena-hard/tree/main)
+5. CompassArena（内部数据集）
 
 ## 自定义主观数据集评测
 
