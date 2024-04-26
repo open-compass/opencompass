@@ -10,7 +10,7 @@ with read_base():
     from ..datasets.race.race_gen_69ee4f import race_datasets
     from ..datasets.winogrande.winogrande_5shot_gen_b36770 import winogrande_datasets
     from ..datasets.hellaswag.hellaswag_10shot_gen_e42710 import hellaswag_datasets
-    from ..datasets.bbh.bbh_gen_5b92b0 import bbh_datasets
+    from ..datasets.bbh.bbh_gen_2879b0 import bbh_datasets
     from ..datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
     from ..datasets.math.math_0shot_gen_393424 import math_datasets
     from ..datasets.TheoremQA.TheoremQA_5shot_gen_6f0af8 import TheoremQA_datasets

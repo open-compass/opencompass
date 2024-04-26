@@ -24,7 +24,7 @@ models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
 # race-high             9a54b6     accuracy                      gen     81.22
 # winogrande            b36770     accuracy                      gen     66.46
 # hellaswag             e42710     accuracy                      gen     74.33
-# bbh                   -          naive_average                 gen     52.79
+# bbh                   -          naive_average                 gen     67.25
 # gsm8k                 1d7fe4     accuracy                      gen     79.08
 # math                  393424     accuracy                      gen     27.78
 # TheoremQA             6f0af8     score                         gen     19.50
