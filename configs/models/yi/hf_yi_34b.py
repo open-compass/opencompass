@@ -1,8 +1,8 @@
-from opencompass.models import HuggingFaceAboveV433Base
+from opencompass.models import HuggingFaceBaseModel
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Base,
+        type=HuggingFaceBaseModel,
         abbr='yi-34b-hf',
         path='01-ai/Yi-34B',
         max_out_len=1024,

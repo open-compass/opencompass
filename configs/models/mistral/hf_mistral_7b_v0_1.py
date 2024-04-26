@@ -1,9 +1,9 @@
-from opencompass.models import HuggingFaceAboveV433Base
+from opencompass.models import HuggingFaceBaseModel
 
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Base,
+        type=HuggingFaceBaseModel,
         abbr='mistral-7b-v0.1-hf',
         path='mistralai/Mistral-7B-v0.1',
         max_out_len=1024,

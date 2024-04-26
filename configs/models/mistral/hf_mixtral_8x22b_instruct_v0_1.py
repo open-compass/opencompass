@@ -1,9 +1,9 @@
-from opencompass.models import HuggingFaceAboveV433Chat
+from opencompass.models import HuggingFacewithChatTemplate
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Chat,
-        abbr='mixtral-8x22b-instruct-v0.1',
+        type=HuggingFacewithChatTemplate,
+        abbr='mixtral-8x22b-instruct-v0.1-hf',
         path='mistralai/Mixtral-8x22B-Instruct-v0.1',
         max_out_len=1024,
         batch_size=8,

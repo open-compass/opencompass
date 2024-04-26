@@ -1,8 +1,8 @@
-from opencompass.models import HuggingFaceAboveV433Base
+from opencompass.models import HuggingFaceBaseModel
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Base,
+        type=HuggingFaceBaseModel,
         abbr='CodeLlama-7b-Python',
         path='codellama/CodeLlama-7b-Python-hf',
         max_out_len=1024,

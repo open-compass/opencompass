@@ -1,8 +1,8 @@
-from opencompass.models import HuggingFaceAboveV433Chat
+from opencompass.models import HuggingFacewithChatTemplate
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Chat,
+        type=HuggingFacewithChatTemplate,
         abbr='qwen-1.8b-chat-hf',
         path='Qwen/Qwen-1_8B-Chat',
         max_out_len=1024,

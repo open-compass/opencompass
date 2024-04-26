@@ -1,8 +1,8 @@
-from opencompass.models import HuggingFaceAboveV433Base
+from opencompass.models import HuggingFaceBaseModel
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Base,
+        type=HuggingFaceBaseModel,
         abbr='qwen-72b-hf',
         path='Qwen/Qwen-72B',
         max_out_len=1024,

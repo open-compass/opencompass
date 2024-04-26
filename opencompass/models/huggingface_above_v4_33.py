@@ -128,7 +128,7 @@ def _set_model_kwargs_torch_dtype(model_kwargs):
 
 
 @MODELS.register_module()
-class HuggingFaceAboveV433Chat(BaseModel):
+class HuggingFacewithChatTemplate(BaseModel):
 
     def __init__(self,
                  path: str,
@@ -279,7 +279,7 @@ def  _convert_base_messages(inputs):
     return outputs
 
 
-class HuggingFaceAboveV433Base(HuggingFaceAboveV433Chat):
+class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
 
     def __init__(self,
                  path: str,
@@ -309,57 +309,6 @@ class HuggingFaceAboveV433Base(HuggingFaceAboveV433Chat):
         for k, v in other_kwargs.items():
             if v is not None:
                 self.logger.warning(f'Unused argument {k}={v}')
-
-    def _load_tokenizer(self, path: Optional[str], kwargs: dict, pad_token_id: Optional[int] = None):
-        from transformers import AutoTokenizer, GenerationConfig
-
-        DEFAULT_TOKENIZER_KWARGS = dict(padding_side='left', truncation_side='left', use_fast=False, trust_remote_code=True)
-        tokenizer_kwargs = DEFAULT_TOKENIZER_KWARGS
-        tokenizer_kwargs.update(kwargs)
-        self.tokenizer = AutoTokenizer.from_pretrained(path, **tokenizer_kwargs)
-
-        # A patch for some models without pad_token_id
-        if pad_token_id is not None:
-            if self.tokenizer.pad_token_id is None:
-                self.logger.debug(f'Using {pad_token_id} as pad_token_id')
-            elif self.tokenizer.pad_token_id != pad_token_id:
-                self.logger.warning(f'pad_token_id is not consistent. Using {pad_token_id} as pad_token_id')
-            self.tokenizer.pad_token_id = pad_token_id
-            return
-        if self.tokenizer.pad_token_id is not None:
-            return
-        self.logger.warning('pad_token_id is not set for the tokenizer.')
-        generation_config = GenerationConfig.from_pretrained(path)
-        if generation_config.pad_token_id is not None:
-            self.logger.warning(f'Using {generation_config.pad_token_id} as pad_token_id.')
-            self.tokenizer.pad_token_id = generation_config.pad_token_id
-            return
-        if self.tokenizer.eos_token_id is not None:
-            self.logger.warning(f'Using eos_token_id {self.tokenizer.eos_token_id} as pad_token_id.')
-            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
-            return
-        raise ValueError('pad_token_id is not set for this tokenizer. Please set `pad_token_id={PAD_TOKEN_ID}` in model_cfg.')
-
-    def _load_model(self, path: str, kwargs: dict, peft_path: Optional[str] = None, peft_kwargs: dict = dict()):
-        from transformers import AutoModel, AutoModelForCausalLM
-
-        DEFAULT_MODEL_KWARGS = dict(device_map='auto', trust_remote_code=True)
-        model_kwargs = DEFAULT_MODEL_KWARGS
-        model_kwargs.update(kwargs)
-        model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
-
-        try:
-            self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
-        except ValueError:
-            self.model = AutoModel.from_pretrained(path, **model_kwargs)
-
-        if peft_path is not None:
-            from peft import PeftModel
-            peft_kwargs['is_trainable'] = False
-            self.model = PeftModel.from_pretrained(self.model, peft_path, **peft_kwargs)
-
-        self.model.eval()
-        self.model.generation_config.do_sample = False
 
     def generate(self,
                  inputs: List[str],

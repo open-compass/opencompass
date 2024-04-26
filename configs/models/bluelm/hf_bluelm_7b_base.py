@@ -1,8 +1,8 @@
-from opencompass.models import HuggingFaceAboveV433Base
+from opencompass.models import HuggingFaceBaseModel
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Base,
+        type=HuggingFaceBaseModel,
         abbr='bluelm-7b-base-hf',
         path='vivo-ai/BlueLM-7B-Base',
         max_out_len=1024,

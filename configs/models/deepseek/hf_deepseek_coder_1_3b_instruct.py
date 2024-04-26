@@ -1,8 +1,8 @@
-from opencompass.models import HuggingFaceAboveV433Chat
+from opencompass.models import HuggingFacewithChatTemplate
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Chat,
+        type=HuggingFacewithChatTemplate,
         abbr='deepseek-coder-1.3b-hf',
         path='deepseek-ai/deepseek-coder-1.3b-instruct',
         max_out_len=1024,

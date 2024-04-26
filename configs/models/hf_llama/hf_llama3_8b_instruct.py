@@ -1,8 +1,8 @@
-from opencompass.models import HuggingFaceAboveV433Chat
+from opencompass.models import HuggingFacewithChatTemplate
 
 models = [
     dict(
-        type=HuggingFaceAboveV433Chat,
+        type=HuggingFacewithChatTemplate,
         abbr='llama-3-8b-instruct-hf',
         path='meta-llama/Meta-Llama-3-8B-Instruct',
         max_out_len=1024,

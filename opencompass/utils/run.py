@@ -5,9 +5,9 @@ import tabulate
 from mmengine.config import Config
 
 from opencompass.datasets.custom import make_custom_dataset_config
-from opencompass.models import (VLLM, HuggingFaceAboveV433Base,
-                                HuggingFaceAboveV433Chat, HuggingFaceCausalLM,
-                                TurboMindModel)
+from opencompass.models import (VLLM, HuggingFaceBaseModel,
+                                HuggingFaceCausalLM,
+                                HuggingFacewithChatTemplate, TurboMindModel)
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
@@ -143,9 +143,9 @@ def get_config_from_arg(args) -> Config:
             models += cfg['models']
     else:
         if args.hf_type == 'chat':
-            mod = HuggingFaceAboveV433Chat
+            mod = HuggingFacewithChatTemplate
         else:
-            mod = HuggingFaceAboveV433Base
+            mod = HuggingFaceBaseModel
         model = dict(type=f'{mod.__module__}.{mod.__name__}',
                      abbr=args.hf_path.split('/')[-1] + '_hf',
                      path=args.hf_path,
