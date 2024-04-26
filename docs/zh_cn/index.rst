@@ -64,7 +64,6 @@ OpenCompass 上手路线
    advanced_guides/evaluation_lightllm.md
    advanced_guides/code_eval.md
    advanced_guides/code_eval_service.md
-   advanced_guides/multimodal_eval.md
    advanced_guides/prompt_attack.md
    advanced_guides/longeval.md
    advanced_guides/subjective_evaluation.md

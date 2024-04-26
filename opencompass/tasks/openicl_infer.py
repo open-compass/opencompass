@@ -1,8 +1,9 @@
 import argparse
+import os
 import os.path as osp
 import random
+import sys
 import time
-from shutil import which
 from typing import Any
 
 from mmengine.config import Config, ConfigDict
@@ -42,6 +43,7 @@ class OpenICLInferTask(BaseTask):
             template (str): The template which have '{task_cmd}' to format
                 the command.
         """
+        sys.path.append(os.getcwd())
         script_path = __file__
         backend_keys = ['VLLM', 'Lmdeploy']
         use_backend = any(
@@ -54,7 +56,7 @@ class OpenICLInferTask(BaseTask):
                        f'--nproc_per_node {self.num_procs} '
                        f'{script_path} {cfg_path}')
         else:
-            python = 'python3' if which('python3') else 'python'
+            python = sys.executable
             command = f'{python} {script_path} {cfg_path}'
 
         return template.format(task_cmd=command)

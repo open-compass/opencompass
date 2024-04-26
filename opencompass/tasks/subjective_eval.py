@@ -139,7 +139,8 @@ class SubjectiveEvalTask(BaseTask):
         # If no predictions get in predictions dir
         assert osp.exists(filename) or osp.exists(
             osp.realpath(partial_filename)
-        ), 'No predictions found for {filename}.'.format(filename=filename)
+        ), 'No predictions found for {filename} and {partial_filename}'.format(
+            filename=filename, partial_filename=partial_filename)
 
         # If use Naive partition in infer stage
         if osp.exists(osp.realpath(filename)):
@@ -188,10 +189,14 @@ class SubjectiveEvalTask(BaseTask):
             if fnmatch.fnmatch(ds_abbr, pattern):
                 pred_postprocessor = model_postprocessors[pattern]
                 break
-        if 'pred_postprocessor' in eval_cfg or pred_postprocessor:
-            kwargs = pred_postprocessor or eval_cfg['pred_postprocessor']
+        if 'pred_postprocessor' in eval_cfg['evaluator'] or pred_postprocessor:
+            kwargs = pred_postprocessor or eval_cfg['evaluator'][
+                'pred_postprocessor']
             proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+            self.logger.info('Get postprocessor {postprocessor}.')
             pred_strs = [proc(s, **kwargs) for s in pred_strs]
+        else:
+            self.logger.info('No postprocessor found.')
 
         return {
             'model_name': model_abbr_from_cfg(model_cfg),
