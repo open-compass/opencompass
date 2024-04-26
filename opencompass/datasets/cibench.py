@@ -12,7 +12,6 @@ from datasets import Dataset
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.datasets.gsm8k import gsm8k_postprocess
-from opencompass.lagent.actions.ipython_interpreter import extract_code
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
@@ -383,6 +382,8 @@ class CIBenchEvaluator(BaseEvaluator):
 
     def save_results(self, origin_prompt, steps, references):
         """Save the prediction result in a markdown and notebook format."""
+
+        from opencompass.lagent.actions.ipython_interpreter import extract_code
 
         def check_jupytext():
             """Check requirements existence."""
