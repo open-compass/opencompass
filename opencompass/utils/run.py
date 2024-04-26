@@ -1,5 +1,5 @@
 import os
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import tabulate
 from mmengine.config import Config
@@ -12,7 +12,8 @@ from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
 
 
-def match_cfg_file(workdir: str, pattern: Union[str, List[str]]) -> List[str]:
+def match_cfg_file(workdir: str,
+                   pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
     """Match the config file in workdir recursively given the pattern.
 
     Additionally, if the pattern itself points to an existing file, it will be
