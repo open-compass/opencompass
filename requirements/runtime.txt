@@ -11,6 +11,7 @@ func_timeout
 fuzzywuzzy
 immutabledict
 jieba
+json5
 langdetect
 ltp
 mmengine-lite
@@ -21,6 +22,7 @@ OpenCC
 opencv-python-headless
 pandas<2.0.0
 prettytable
+pyext
 pypinyin
 python-Levenshtein
 rank_bm25==0.2.2

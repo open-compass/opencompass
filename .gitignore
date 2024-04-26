@@ -12,6 +12,7 @@ configs/eval_debug*.py
 configs/viz_*.py
 data
 work_dirs
+outputs
 models/*
 configs/internal/
 # Byte-compiled / optimized / DLL files
@@ -121,6 +122,7 @@ turbomind/
 *.txt
 *.jpg
 *.json
+*.jsonl
 *.csv
 *.npy
 *.c

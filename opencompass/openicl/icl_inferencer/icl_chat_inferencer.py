@@ -172,8 +172,6 @@ class ChatInferencer(BaseInferencer):
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
             save_every: Optional[int] = 1,
-            temperature: Optional[float] = 0.0,
-            do_sample: Optional[bool] = False,
             infer_mode: str = 'last',
             max_out_len: int = 512,
             **kwargs) -> None:
@@ -185,8 +183,6 @@ class ChatInferencer(BaseInferencer):
         )
         assert infer_mode in ['last', 'every', 'every_with_gt']
         self.infer_mode = infer_mode
-        self.temperature = temperature
-        self.do_sample = do_sample
         self.model: BaseModel
         self._set_meta_template(self.model)
 
@@ -353,16 +349,8 @@ class ChatInferencer(BaseInferencer):
 
         for i in assistant_indices:
             history = chat[:i]
-            if self.do_sample:
-                output = self.model.generate_from_template(
-                    [history],
-                    do_sample=self.do_sample,
-                    temperature=self.temperature,
-                    max_out_len=self.max_out_len)[0]
-            else:
-                output = self.model.generate_from_template(
-                    [history], do_sample=False,
-                    max_out_len=self.max_out_len)[0]
+            output = self.model.generate_from_template(
+                [history], max_out_len=self.max_out_len)[0]
             chat[i]['content'] = output
             if not self.dialogue_mode:
                 output_handler.save_multiround_results(

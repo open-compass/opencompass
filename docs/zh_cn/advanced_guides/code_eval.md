@@ -4,7 +4,7 @@
 
 ## pass@1
 
-如果只需要生成单条回复来评测pass@1的性能，可以直接使用[configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/humaneval/humaneval_gen_8e312c.py) 和 [configs/datasets/mbpp/mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/mbpp/mbpp_gen_1e1056.py) 并参考通用的[快速上手教程](../get_started/quick_start.md)即可。
+如果只需要生成单条回复来评测pass@1的性能，可以直接使用[configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/humaneval/humaneval_gen_8e312c.py) 和 [configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py) 并参考通用的[快速上手教程](../get_started/quick_start.md)即可。
 
 如果要进行多语言评测，可以参考[多语言代码评测教程](./code_eval_service.md)。
 
@@ -21,7 +21,7 @@ from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
 
 with read_base():
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from .datasets.mbpp.mbpp_gen_1e1056 import mbpp_datasets
+    from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
 
 mbpp_datasets[0]['type'] = MBPPDataset_V2
 mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
@@ -64,7 +64,7 @@ from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
 
 with read_base():
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from .datasets.mbpp.mbpp_gen_1e1056 import mbpp_datasets
+    from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
 
 humaneval_datasets[0]['abbr'] = 'openai_humaneval_pass10'
 humaneval_datasets[0]['num_repeats'] = 10

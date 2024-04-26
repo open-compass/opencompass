@@ -3,8 +3,13 @@
   <br />
   <br />
 
-[![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/en)
-[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/open-compass/opencompass/blob/main/LICENSE)
+[![][github-release-shield]][github-release-link]
+[![][github-releasedate-shield]][github-releasedate-link]
+[![][github-contributors-shield]][github-contributors-link]<br>
+[![][github-forks-shield]][github-forks-link]
+[![][github-stars-shield]][github-stars-link]
+[![][github-issues-shield]][github-issues-link]
+[![][github-license-shield]][github-license-link]
 
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
@@ -17,11 +22,17 @@
 
 English | [简体中文](README_zh-CN.md)
 
+[![][github-trending-shield]][github-trending-url]
+
 </div>
 
 <p align="center">
     👋 join us on <a href="https://discord.gg/KKwfEbFj7U" target="_blank">Discord</a> and <a href="https://r.vansin.top/?r=opencompass" target="_blank">WeChat</a>
 </p>
+
+> \[!IMPORTANT\]
+>
+> **Star Us**, You will receive all release notifications from GitHub without any delay ~ ⭐️
 
 ## 📣 OpenCompass 2.0
 
@@ -33,6 +44,14 @@ We are thrilled to introduce OpenCompass 2.0, an advanced suite featuring three 
 **CompassHub** presents a pioneering benchmark browser interface, designed to simplify and expedite the exploration and utilization of an extensive array of benchmarks for researchers and practitioners alike. To enhance the visibility of your own benchmark within the community, we warmly invite you to contribute it to CompassHub. You may initiate the submission process by clicking [here](https://hub.opencompass.org.cn/dataset-submit).
 
 **CompassKit** is a powerful collection of evaluation toolkits specifically tailored for Large Language Models and Large Vision-language Models. It provides an extensive set of tools to assess and measure the performance of these complex models effectively. Welcome to try our toolkits for in your research and products.
+
+<details>
+  <summary><kbd>Star History</kbd></summary>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&theme=dark&type=Date">
+    <img width="100%" src="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&type=Date">
+  </picture>
+</details>
 
 ## 🧭	Welcome
 
@@ -51,12 +70,10 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **\[2024.02.29\]** We supported the MT-Bench, AlpacalEval and AlignBench, more information can be found [here](https://opencompass.readthedocs.io/en/latest/advanced_guides/subjective_evaluation.html) 🔥🔥🔥.
-- **\[2024.01.30\]** We release OpenCompass 2.0. Click  [CompassKit](https://github.com/open-compass), [CompassHub](https://hub.opencompass.org.cn/home), and [CompassRank](https://rank.opencompass.org.cn/home) for more information ! 🔥🔥🔥.
-- **\[2024.01.17\]** We supported the evaluation of [InternLM2](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_keyset.py) and [InternLM2-Chat](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py), InternLM2 showed extremely strong performance in these tests, welcome to try! 🔥🔥🔥.
-- **\[2024.01.17\]** We supported the needle in a haystack test with multiple needles, more information can be found [here](https://opencompass.readthedocs.io/en/latest/advanced_guides/needleinahaystack_eval.html#id8) 🔥🔥🔥.
-- **\[2023.12.28\]** We have enabled seamless evaluation of all models developed using [LLaMA2-Accessory](https://github.com/Alpha-VLLM/LLaMA2-Accessory), a powerful toolkit for comprehensive LLM development.
-- **\[2023.12.22\]** We have released [T-Eval](https://github.com/open-compass/T-Eval), a step-by-step evaluation benchmark to gauge your LLMs on tool utilization. Welcome to our [Leaderboard](https://open-compass.github.io/T-Eval/leaderboard.html) for more details!
+- **\[2024.04.26\]** We supported the evaluation of [ArenaHard](configs/eval_subjective_arena_hard.py)  welcome to try!🔥🔥🔥.
+- **\[2024.04.22\]** We supported the evaluation of [LLaMA3](configs/models/hf_llama/hf_llama3_8b.py) 和 [LLaMA3-Instruct](configs/models/hf_llama/hf_llama3_8b_instruct.py), welcome to try! 🔥🔥🔥
+- **\[2024.02.29\]** We supported the MT-Bench, AlpacalEval and AlignBench, more information can be found [here](https://opencompass.readthedocs.io/en/latest/advanced_guides/subjective_evaluation.html)
+- **\[2024.01.30\]** We release OpenCompass 2.0. Click  [CompassKit](https://github.com/open-compass), [CompassHub](https://hub.opencompass.org.cn/home), and [CompassRank](https://rank.opencompass.org.cn/home) for more information !
 
 > [More](docs/en/notes/news.md)
 
@@ -439,6 +456,7 @@ Through the command line or configuration files, OpenCompass also supports evalu
 
 - [InternLM](https://github.com/InternLM/InternLM)
 - [LLaMA](https://github.com/facebookresearch/llama)
+- [LLaMA3](https://github.com/meta-llama/llama3)
 - [Vicuna](https://github.com/lm-sys/FastChat)
 - [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
 - [Baichuan](https://github.com/baichuan-inc)
@@ -497,6 +515,20 @@ Through the command line or configuration files, OpenCompass also supports evalu
 
 We appreciate all contributions to improving OpenCompass. Please refer to the [contributing guideline](https://opencompass.readthedocs.io/en/latest/notes/contribution_guide.html) for the best practice.
 
+<!-- Copy-paste in your Readme.md file -->
+
+<!-- Made with [OSS Insight](https://ossinsight.io/) -->
+
+<a href="https://github.com/open-compass/opencompass/graphs/contributors" target="_blank">
+  <table>
+    <tr>
+      <th colspan="2">
+        <br><img src="https://contrib.rocks/image?repo=open-compass/opencompass"><br><br>
+      </th>
+    </tr>
+  </table>
+</a>
+
 ## 🤝 Acknowledgements
 
 Some code in this project is cited and modified from [OpenICL](https://github.com/Shark-NLP/OpenICL).
@@ -515,3 +547,20 @@ Some datasets and prompt implementations are modified from [chain-of-thought-hub
 ```
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
+
+[github-contributors-link]: https://github.com/open-compass/opencompass/graphs/contributors
+[github-contributors-shield]: https://img.shields.io/github/contributors/open-compass/opencompass?color=c4f042&labelColor=black&style=flat-square
+[github-forks-link]: https://github.com/open-compass/opencompass/network/members
+[github-forks-shield]: https://img.shields.io/github/forks/open-compass/opencompass?color=8ae8ff&labelColor=black&style=flat-square
+[github-issues-link]: https://github.com/open-compass/opencompass/issues
+[github-issues-shield]: https://img.shields.io/github/issues/open-compass/opencompass?color=ff80eb&labelColor=black&style=flat-square
+[github-license-link]: https://github.com/open-compass/opencompass/blob/main/LICENSE
+[github-license-shield]: https://img.shields.io/github/license/open-compass/opencompass?color=white&labelColor=black&style=flat-square
+[github-release-link]: https://github.com/open-compass/opencompass/releases
+[github-release-shield]: https://img.shields.io/github/v/release/open-compass/opencompass?color=369eff&labelColor=black&logo=github&style=flat-square
+[github-releasedate-link]: https://github.com/open-compass/opencompass/releases
+[github-releasedate-shield]: https://img.shields.io/github/release-date/open-compass/opencompass?labelColor=black&style=flat-square
+[github-stars-link]: https://github.com/open-compass/opencompass/stargazers
+[github-stars-shield]: https://img.shields.io/github/stars/open-compass/opencompass?color=ffcb47&labelColor=black&style=flat-square
+[github-trending-shield]: https://trendshift.io/api/badge/repositories/6630
+[github-trending-url]: https://trendshift.io/repositories/6630

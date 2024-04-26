@@ -67,7 +67,6 @@ for _name in subjective_all_sets:
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
-            infer_order='random',
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
@@ -92,7 +91,7 @@ for _name in subjective_all_sets:
         dict(
             abbr=f"{_name}",
             type=SubjectiveCmpDataset,
-            path="./data/subjective/",
+            path="./data/subjective/alpaca_eval",
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,

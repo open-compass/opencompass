@@ -148,7 +148,7 @@ class NeedleBenchParallelDataset(BaseDataset):
                               f'最后提出的问题\n现在请问：{retrieval_question}\n\n'
                               f'用户现在给你的文档是{context}\n')
                 else:
-                    raise ValueError('Unsupported position. '
+                    raise ValueError(f'Unsupported position {position}. '
                                      'Position must be "End" or "Start".')
 
             elif language == 'English':
@@ -171,7 +171,7 @@ class NeedleBenchParallelDataset(BaseDataset):
                         f'\nNow, the questions are: {retrieval_question}\n\n'
                         f'The document given to you by the user is {context}')
                 else:
-                    raise ValueError('Unsupported position. '
+                    raise ValueError(f'Unsupported position {position}. '
                                      'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
@@ -190,6 +190,7 @@ class NeedleBenchParallelDataset(BaseDataset):
                 random.seed(counter)
                 random.shuffle(lines)
                 predefined_needles = predefined_needles_bak.copy()
+                random.seed(counter)
                 random.shuffle(predefined_needles)
 
                 needles = [

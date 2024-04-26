@@ -13,6 +13,14 @@
 
 我们基于以上方法支持了JudgeLLM用于模型的主观能力评估（目前opencompass仓库里支持的所有模型都可以直接作为JudgeLLM进行调用，此外一些专用的JudgeLLM我们也在计划支持中）。
 
+## 目前已支持的主观评测数据集
+
+1. AlignBench（https://github.com/THUDM/AlignBench）
+2. MTBench （https://github.com/lm-sys/FastChat）
+3. AlpacaEvalv2 （https://github.com/tatsu-lab/alpaca_eval）
+4. ArenaHard (https://github.com/lm-sys/arena-hard/tree/main)
+5. CompassArena（内部数据集）
+
 ## 自定义主观数据集评测
 
 主观评测的具体流程包括:
