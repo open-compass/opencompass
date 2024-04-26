@@ -2,7 +2,7 @@
 
 ## Evaluation Targets
 
-The primary evaluation targets of this algorithm library are large language models and multimodal large models. We introduce specific model types for evaluation using the large language model as an example.
+The primary evaluation targets of this algorithm library are large language models. We introduce specific model types for evaluation using the large language model as an example.
 
 - base Model: Typically obtained through training on massive textual data in a self-supervised manner (e.g., OpenAI's GPT-3, Meta's LLaMA). These models usually have powerful text continuation capabilities.
 

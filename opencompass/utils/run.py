@@ -270,27 +270,6 @@ def change_accelerator(models, accelerator):
     return model_accels
 
 
-def exec_mm_infer_runner(tasks, args, cfg):
-    """execute multimodal infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        raise NotImplementedError('Currently, we do not support evaluating \
-                             multimodal models on dlc.')
-    else:
-        runner = LocalRunner(task=dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
-
-
 def get_config_type(obj) -> str:
     return f'{obj.__module__}.{obj.__name__}'
 
