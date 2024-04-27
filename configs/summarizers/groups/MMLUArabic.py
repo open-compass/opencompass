@@ -21,30 +21,30 @@ sub_categories = {
 categories = {
     "STEM": ["physics", "chemistry", "biology", "computer science", "math", "engineering"],
     "humanities": ["history", "philosophy", "law"],
-    "social sciences": ["politics", "culture", "economics", "geography", "psychology"],
+    "social_sciences": ["politics", "culture", "economics", "geography", "psychology"],
     "other": ["other", "business", "health"],
 }
 
 category2subject = {}
 for k, v in categories.items():
     for subject, subcat in sub_categories.items():
-        for c in subcat:
-            if c in v:
-                category2subject.setdefault(k, []).append(subject)
+        if subject in v:
+            for c in subcat:
+                category2subject.setdefault(k, []).append(c)
 
 MMLUArabic_summary_groups = []
 
-_MMLUArabic_stem = ['MMLUArabic-' + s for s in category2subject['STEM']]
-MMLUArabic_summary_groups.append({'name': 'MMLUArabic-stem', 'subsets': _MMLUArabic_stem})
+_MMLUArabic_stem = ['acegpt_MMLUArabic_' + s for s in category2subject['STEM']]
+MMLUArabic_summary_groups.append({'name': 'acegpt_MMLUArabic_STEM', 'subsets': _MMLUArabic_stem})
 
-_MMLUArabic_humanities = ['MMLUArabic-' + s for s in category2subject['humanities']]
-MMLUArabic_summary_groups.append({'name': 'MMLUArabic-humanities', 'subsets': _MMLUArabic_humanities})
+_MMLUArabic_humanities = ['acegpt_MMLUArabic_' + s for s in category2subject['humanities']]
+MMLUArabic_summary_groups.append({'name': 'acegpt_MMLUArabic_humanities', 'subsets': _MMLUArabic_humanities})
 
-_MMLUArabic_social_science = ['MMLUArabic-' + s for s in category2subject['social sciences']]
-MMLUArabic_summary_groups.append({'name': 'MMLUArabic-social-science', 'subsets': _MMLUArabic_social_science})
+_MMLUArabic_social_science = ['acegpt_MMLUArabic_' + s for s in category2subject['social_sciences']]
+MMLUArabic_summary_groups.append({'name': 'acegpt_MMLUArabic_social_science', 'subsets': _MMLUArabic_social_science})
 
-_MMLUArabic_other = ['MMLUArabic-' + s for s in category2subject['other']]
-MMLUArabic_summary_groups.append({'name': 'MMLUArabic-other', 'subsets': _MMLUArabic_other})
+_MMLUArabic_other = ['acegpt_MMLUArabic_' + s for s in category2subject['other']]
+MMLUArabic_summary_groups.append({'name': 'acegpt_MMLUArabic_other', 'subsets': _MMLUArabic_other})
 
-_MMLUArabic_all = ['MMLUArabic-' + s for s in sub_categories.keys()]
-MMLUArabic_summary_groups.append({'name': 'MMLUArabic', 'subsets': _MMLUArabic_all})
+_MMLUArabic_all = _MMLUArabic_stem + _MMLUArabic_humanities + _MMLUArabic_social_science + _MMLUArabic_other
+MMLUArabic_summary_groups.append({'name': 'acegpt_MMLUArabic', 'subsets': _MMLUArabic_all})

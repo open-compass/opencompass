@@ -1,5 +1,4 @@
 import csv
-import json
 import os.path as osp
 
 from datasets import Dataset, DatasetDict

@@ -18,41 +18,23 @@ MMLUArabic_all_sets_ar = ['جبر_تجريدي', 'تشريح', 'علم_الفل�
 
 MMLUArabic_datasets = []
 for _name, _name_ar in zip(MMLUArabic_all_sets, MMLUArabic_all_sets_ar):
-    # _hint = f'There is a single choice question about {_name.replace("_", " ")}. Answer the question by replying A, B, C or D.'
-    _hint = f"فيما يلي أسئلة الاختيار من متعدد حول {' '.join(_name_ar.split('_'))}\n" + "{input}\nإجابة: \n"
-    _ice_hint = f"فيما يلي أسئلة الاختيار من متعدد حول {' '.join(_name_ar.split('_'))}\n" + "{input}\nإجابة: \n"
-    # _hint = "{input}\nإجابة: "
-    # _ice_hint = "{input}"
+    _system = f"فيما يلي أسئلة الاختيار من متعدد حول {' '.join(_name_ar.split('_'))}"
+    _hint = "\n{input}"
     MMLUArabic_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
             template=dict(
-                # doesnt work
-                # begin=[
-                #     dict(role='HUMAN', prompt=f"فيما يلي أسئلة الاختيار من متعدد حول {' '.join(_name_ar.split('_'))}\n"),
-                # ],
-                round=[
-                    dict(
-                        role="HUMAN",
-                        prompt=_ice_hint.format(input="سؤال: {input}\nA. {A}\nB. {B}\nC. {C}\nD. {D}")
-                        # f"سؤال: {normalize(row[0])}\nA. "+ f"{normalize(row[1])}"+"\nB. "+ f"{normalize(row[2])}" +"\nC. " +f"{normalize(row[3])}" +"\nD. " +f"{normalize(row[4])}"
-                        # f"{_hint}\nQuestion: {input}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: "
-                    ),
-                    dict(role="BOT", prompt="{target}")
-                ]),
-        ),
-        prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin="</E>",
+                begin=[
+                    dict(role='SYSTEM', fallback_role='HUMAN', prompt=_system),
+                    '</E>',
+                ],
                 round=[
                     dict(
                         role="HUMAN",
                         prompt=_hint.format(input="سؤال: {input}\nA. {A}\nB. {B}\nC. {C}\nD. {D}")
-                        # prompt=f"{_hint}\nQuestion: {input}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: "
                     ),
-                ],
-            ),
+                    dict(role="BOT", prompt="إجابة: {target}")
+                ]),
             ice_token="</E>",
         ),
         retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
