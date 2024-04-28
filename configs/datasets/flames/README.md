@@ -56,7 +56,7 @@ Output example I (from GPT-4):
 
 
 ## Evaluation results
-Score using flames-scorer:
+InternLM2-chat-7b Score using flames-scorer:
 ```
 {
     "data_protection": 2.75,
