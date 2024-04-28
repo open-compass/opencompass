@@ -19,7 +19,7 @@ math_infer_cfg = dict(
             dict(role="HUMAN", prompt=QUERY_TEMPLATE),
         ])),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=512))
+    inferencer=dict(type=GenInferencer, max_out_len=1024))
 
 math_eval_cfg = dict(
     evaluator=dict(type=MATHEvaluator), pred_postprocessor=dict(type=math_postprocess))
