@@ -129,8 +129,9 @@ ANSWER_PATTERN = r'(?i)ANSWER\s*:\s*([^\n]+)'
 
 
 def extract_answer(response_text: str):
+    # We suggest to return an empty string but not None when extract failed
     match = re.search(ANSWER_PATTERN, response_text)
-    return match.group(1) if match else None
+    return match.group(1) if match else ''
 
 
 @LOAD_DATASET.register_module()

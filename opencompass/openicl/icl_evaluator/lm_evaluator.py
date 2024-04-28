@@ -188,6 +188,10 @@ class LMEvaluator:
             if judgements:
                 raise NotImplementedError(
                     'Not applied meta-reivew judge on multi-round dataset')
+        else:
+            raise NotImplementedError(
+                f'{predictions[0][0]} with type {type(predictions[0][0])}, please check the postprocess you add to the prediction string is right or not, we suggest to return an empty string but not None'
+            )
         if self.dataset_cfg:
             dataset = build_dataset_from_cfg(self.dataset_cfg)
 
