@@ -20,13 +20,13 @@ def post_process_allobj(judgement: str):
 
     xxx[[correct]]xxx, and extract the judge
     """
-    pattern = r'(?i)\[(incorrect|correct|正确|错误)\]'
+    pattern = r'(?i)\[(incorrect|correct|正确|错误|Yes|No)\]'
     matched_result = re.findall(pattern, judgement)
     if matched_result:
         content = matched_result[0].lower()
-        if content in ['correct', '正确']:
+        if content in ['correct', '正确', 'yes']:
             return {'score': 1}
-        elif content in ['incorrect', '错误']:
+        elif content in ['incorrect', '错误', 'no']:
             return {'score': 0}
     else:
         return None
@@ -81,7 +81,8 @@ class AllObjSummarizer:
             self.base_models = self.cfg['eval']['partitioner']['base_models']
             self.compare_models = self.cfg['eval']['partitioner'][
                 'compare_models']
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
+        self.judge_abbr = model_abbr_from_cfg(
+            self.cfg['eval']['partitioner']['judge_models'][0])
         self.judge_map = {'single': post_process_allobj}
         self.judge_function = self.judge_map[self.judge_type]
 
