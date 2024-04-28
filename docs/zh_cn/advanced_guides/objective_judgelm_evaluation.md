@@ -175,7 +175,7 @@ python run.py eval_math_llm_judge.py
 
 - 模型预测的结果会保存在 `output/.../timestamp/predictions/xxmodel/xxx.json`
 - JudgeLLM的评测回复会保存在 `output/.../timestamp/results/xxmodel/xxx.json`
-- 评测报告则会输出到 `output/.../summary/timestamp/report.csv`。
+- 评测报告则会输出到 `output/.../timestamp/summary/timestamp/xxx.csv`
 
 ## 评测结果
 

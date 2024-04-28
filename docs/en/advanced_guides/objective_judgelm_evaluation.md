@@ -175,7 +175,7 @@ This will initiate two rounds of evaluation. The first round involves model infe
 
 - The results of model predictions will be saved in `output/.../timestamp/predictions/xxmodel/xxx.json`
 - The JudgeLLM's evaluation responses will be saved in `output/.../timestamp/results/xxmodel/xxx.json`
-- The evaluation report will be output to `output/.../summary/timestamp/report.csv`.
+- The evaluation report will be output to `output/.../timestamp/summary/timestamp/xxx.csv`
 
 ## Results
 
