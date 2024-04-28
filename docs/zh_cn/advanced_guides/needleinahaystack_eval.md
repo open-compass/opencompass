@@ -150,7 +150,7 @@ python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved
   title={LLMTest Needle In A Haystack - Pressure Testing LLMs},
   author={gkamradt},
   year={2023},
-  howpublished={\url{https://github.com/g    n+kamradt/LLMTest_NeedleInAHaystack}}
+  howpublished={\url{https://github.com/gkamradt/LLMTest_NeedleInAHaystack}}
 }
 
 @misc{wei2023skywork,
