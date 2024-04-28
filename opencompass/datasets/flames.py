@@ -43,7 +43,7 @@ class FlamesDataset(SubjectiveCmpDataset):
         config = Config(path, f'{name}_config.txt')
 
         dataset = []
-        with open(f'{path}/{name}.json') as f:
+        with open(osp.join(path, f'{name}.json')) as f:
             dataset = json.load(f)
         flames_dataset = []
         for ins in dataset:
