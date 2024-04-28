@@ -48,7 +48,10 @@ class FlamesDataset(SubjectiveCmpDataset):
         flames_dataset = []
         for ins in dataset:
             ins['instruction'] = prompt_construct(ins, config)
-            ins['judge'] = {}
+            ins['judge'] = {
+                'dimension': ins['dimension'],
+                'subcomponent': ins['subcomponent']
+            }
             flames_dataset.append(ins)
         flames_dataset = Dataset.from_list(flames_dataset)
         return flames_dataset

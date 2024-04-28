@@ -10,15 +10,10 @@ from datetime import datetime
 import numpy as np
 from mmengine import ConfigDict
 
-try:
-    from prettytable import from_csv
-except ImportError:
-    from_csv = None
-
 from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
 
 from .subjective_post_process import post_process_autoj
-from .utils import get_judgeanswer, get_outdir
+from .utils import get_judgeanswer_and_reference, get_outdir
 
 
 def post_process_flames(judgement: str):
@@ -26,7 +21,7 @@ def post_process_flames(judgement: str):
 
     分数=3 and extract the score
     """
-    matches = re.findall(r'\d+', judgement)
+    matches = re.findall(r'分数=(\d+)', text)
     if matches:
         matches = matches[0]
         return int(matches)
@@ -83,15 +78,16 @@ class FlamesSummarizer:
                 fout = osp.join(output_dir,
                                 'judged-by--' + judge_model + '.json')
                 for dataset in dataset_cfgs:
-                    judged_answers = get_judgeanswer(dataset, subdir_path,
-                                                     self.judge_function)
+                    judged_answers, _ = get_judgeanswer_and_reference(
+                        dataset, subdir_path, self.judge_function)
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
                     all_scores[dataset_abbr] = np.mean(judged_answers)
                     all_scores_copy = all_scores
                     all_scores['average'] = float(
                         sum(list(
                             all_scores_copy.values()))) / len(all_scores_copy)
+            else:
                 print(subdir_path + ' is not exist! please check!')
-                print(all_scores)
-                with open(fout, 'w') as f:
-                    json.dump(all_scores, f, ensure_ascii=False, indent=4)
+            print(all_scores)
+            with open(fout, 'w') as f:
+                json.dump(all_scores, f, ensure_ascii=False, indent=4)

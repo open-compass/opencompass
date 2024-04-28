@@ -1,3 +1,5 @@
+from os import getenv as gv
+
 from mmengine.config import read_base
 
 from opencompass.models import HuggingFaceCausalLM
@@ -12,27 +14,28 @@ from opencompass.summarizers import FlamesSummarizer
 # -------------Inferen Stage ----------------------------------------
 
 with read_base():
-    from .datasets.flames.flames_gen import flames_datasets
-    from .models.hf_internlm.hf_internlm2_chat_7b import models
-datasets = [*flames_datasets]
+    from .datasets.flames.flames_gen import subjective_datasets
 
+datasets = [*subjective_datasets]
 
-from opencompass.models import HuggingFaceCausalLM
-
-
-_meta_template = dict(
+internlm2_chat_meta_template =dict(
     round=[
         dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
         dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
     ],
+    eos_token_id=92542
 )
 
+
 models = [
-    dict(
+        dict(
         type=HuggingFaceCausalLM,
-        abbr='internlm2-chat-7b-hf',
-        path="internlm/internlm2-chat-7b",
-        tokenizer_path='internlm/internlm2-chat-7b',
+        abbr='internlm2-chat',
+
+        path='internlm/internlm-chat-7b',
+        tokenizer_path='internlm/internlm-chat-7b',
+
+
         model_kwargs=dict(
             trust_remote_code=True,
             device_map='auto',
@@ -43,16 +46,20 @@ models = [
             use_fast=False,
             trust_remote_code=True,
         ),
+        generation_kwargs=dict(
+            eos_token_id=92542,
+            do_sample=True,
+        ),
         max_out_len=2048,
-        max_seq_len=2048,
+        max_seq_len=3048,
         batch_size=8,
-        meta_template=_meta_template,
+        meta_template=internlm2_chat_meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
-        end_str='<|im_end|>',
-        generation_kwargs = {"eos_token_id": [2, 92542], "do_sample": True},
-        batch_padding=True,
+
+        end_str='<|im_end|>'
     )
 ]
+
 
 
 infer = dict(
@@ -68,12 +75,29 @@ infer = dict(
 
 
 ## ------------- JudgeLLM Configuration---------------------------------
-judge_models = [
-    dict(
+api_meta_template = dict(
+    round=[
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
+    ]
+)
+
+_meta_template = dict(
+    round=[
+        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
+        dict(role="BOT", begin="\n<|im_start|>assistant\n", end='<|im_end|>', generate=True),
+    ],
+)
+
+
+judge_models = [dict(
         type=HuggingFaceCausalLM,
         abbr='flames-scorer',
+
         path='CaasiHUANG/flames-scorer',
         tokenizer_path='CaasiHUANG/flames-scorer',
+
+
         model_kwargs=dict(
             trust_remote_code=True,
             device_map='auto',
@@ -84,16 +108,18 @@ judge_models = [
             use_fast=False,
             trust_remote_code=True,
         ),
+        generation_kwargs=dict(
+            eos_token_id=92542,
+            do_sample=True,
+        ),
         max_out_len=2048,
-        max_seq_len=2048,
+        max_seq_len=3048,
         batch_size=8,
-        meta_template=_meta_template,
+        meta_template=internlm2_chat_meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
-        end_str='<|im_end|>',
-        generation_kwargs = {"eos_token_id": [2, 92542], "do_sample": True},
-        batch_padding=True,
-    )
-]
+
+        end_str='<|im_end|>'
+    )]
 
 ## ------------- Evaluation Configuration----------------
 eval = dict(
@@ -114,5 +140,7 @@ eval = dict(
 summarizer = dict(
     type=FlamesSummarizer, judge_type = 'general'
 )
+
+# summarizer = dict(type=CreationBenchSummarizer, judge_type='general')
 
 work_dir = 'outputs/flames/'
