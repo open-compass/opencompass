@@ -68,6 +68,13 @@ infer = dict(
 
 
 ## ------------- JudgeLLM Configuration---------------------------------
+internlm1_chat_template = dict(
+    round=[
+        dict(role='HUMAN', begin='<|User|>:', end='\n'),
+        dict(role='BOT', begin='<|Bot|>:', end='<eoa>\n', generate=True),
+    ],
+)
+
 judge_models = [
     dict(
         type=HuggingFaceCausalLM,
@@ -84,16 +91,16 @@ judge_models = [
             use_fast=False,
             trust_remote_code=True,
         ),
-        max_out_len=2048,
-        max_seq_len=2048,
+        generation_kwargs = {"do_sample": True},
+        max_out_len=512,
+        max_seq_len=4096,
         batch_size=8,
-        meta_template=_meta_template,
+        meta_template=internlm1_chat_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
-        end_str='<|im_end|>',
-        generation_kwargs = {"eos_token_id": [2, 92542], "do_sample": True},
-        batch_padding=True,
+        end_str='<eoa>',
     )
 ]
+
 
 ## ------------- Evaluation Configuration----------------
 eval = dict(
