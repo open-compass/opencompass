@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import FixKRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import MMLUArabicDataset
@@ -18,26 +18,20 @@ MMLUArabic_all_sets_ar = ['جبر_تجريدي', 'تشريح', 'علم_الفل�
 
 MMLUArabic_datasets = []
 for _name, _name_ar in zip(MMLUArabic_all_sets, MMLUArabic_all_sets_ar):
-    _system = f"فيما يلي أسئلة الاختيار من متعدد (مع الإجابات) حول {' '.join(_name_ar.split('_'))}"
-    _hint = "\n{input}"
+    _hint = f"فيما يلي أسئلة الاختيار من متعدد حول {' '.join(_name_ar.split('_'))}\n\n" + "{input}\n" + "من فضلك اختر إجابة واحدة من بين 'A، B، C، D' دون شرح."
     MMLUArabic_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
             template=dict(
-                begin=[
-                    dict(role='SYSTEM', fallback_role='HUMAN', prompt=_system),
-                    '</E>',
-                ],
                 round=[
                     dict(
                         role="HUMAN",
                         prompt=_hint.format(input="سؤال: {input}\nA. {A}\nB. {B}\nC. {C}\nD. {D}")
                     ),
-                    dict(role="BOT", prompt="إجابة: {target}")
                 ]),
             ice_token="</E>",
         ),
-        retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
+        retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer),
     )
 
