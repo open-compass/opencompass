@@ -69,6 +69,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.04.26\]** 我们报告了若干知名大型语言模型在常用基准测试上的表现，欢迎访问[]()以获取更多信息！🔥🔥🔥.
 - **\[2024.04.26\]** 我们废弃了 OpenCompass 进行多模态大模型评测的功能，相关功能转移至 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，推荐使用！🔥🔥🔥.
 - **\[2024.04.26\]** 我们支持了 [ArenaHard评测](configs/eval_subjective_arena_hard.py) 欢迎试用！🔥🔥🔥.
 - **\[2024.04.22\]** 我们支持了 [LLaMA3](configs/models/hf_llama/hf_llama3_8b.py) 和 [LLaMA3-Instruct](configs/models/hf_llama/hf_llama3_8b_instruct.py) 的评测，欢迎试用！🔥🔥🔥.
