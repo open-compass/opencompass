@@ -60,6 +60,7 @@ from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
+from .logiqa import *  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
