@@ -125,7 +125,7 @@ conda activate opencompass
 git clone https://github.com/open-compass/opencompass opencompass
 cd opencompass
 pip install -e .
-# also please install requiresments packages via `pip install -r requirements/api.txt` for API models if needed.
+# also please install requirements packages via `pip install -r requirements/api.txt` for API models if needed.
 ```
 
 ### 📂 Data Preparation
