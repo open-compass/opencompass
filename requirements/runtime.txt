@@ -11,6 +11,7 @@ func_timeout
 fuzzywuzzy
 immutabledict
 jieba
+json5
 langdetect
 ltp
 mmengine-lite

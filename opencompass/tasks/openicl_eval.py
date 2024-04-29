@@ -2,13 +2,14 @@ import argparse
 import copy
 import fnmatch
 import math
+import os
 import os.path as osp
 import re
 import statistics
+import sys
 import time
 from collections import Counter
 from inspect import signature
-from shutil import which
 from typing import List, Optional
 
 import mmengine
@@ -76,8 +77,9 @@ class OpenICLEvalTask(BaseTask):
             'task', {}).get('dump_details', False)
 
     def get_command(self, cfg_path, template):
+        sys.path.append(os.getcwd())
         script_path = __file__
-        python = 'python3' if which('python3') else 'python'
+        python = sys.executable
         command = f'{python} {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
