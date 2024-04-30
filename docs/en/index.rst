@@ -40,6 +40,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    user_guides/experimentation.md
    user_guides/metrics.md
    user_guides/summarizer.md
+   user_guides/corebench.md
 
 .. _Prompt:
 .. toctree::
