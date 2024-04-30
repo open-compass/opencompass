@@ -1,4 +1,4 @@
-# APPS
+# MMLUArabic
 ## Dataset Description
 MMLUArabic is a benchmark for the assessment of knowledge in Arabic and covers a wide range of topics and aspects, consisting of multiple-choice questions in various branches of knowledge.
 
