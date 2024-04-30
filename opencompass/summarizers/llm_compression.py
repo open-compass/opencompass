@@ -112,7 +112,6 @@ class LLMCompressionSummarizer(DefaultSummarizer):
         # Pivot model columns to rows
         table_df_long = table_df.melt(id_vars=['dataset', 'version', 'metric'],
                                       var_name='model')
-        table_df_long
 
         # Pivot dataset rows to columns
         table_df_wide = table_df_long\
@@ -196,6 +195,6 @@ class LLMCompressionSummarizer(DefaultSummarizer):
         self._output_df_to_file(output_path, time_str, table_df)
 
         if self.lark_reporter:
-            content = f'{getpass.getuser()} 的'
-            content += f'详细评测汇总已输出至 {osp.abspath(output_path)}'
+            content = f'Detailed evaluation summary for {getpass.getuser()}'
+            content += f' saved to {osp.abspath(output_path)}'
             self.lark_reporter.post(content)
