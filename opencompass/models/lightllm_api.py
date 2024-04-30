@@ -23,6 +23,7 @@ class LightllmAPI(BaseModel):
             path: str = 'LightllmAPI',
             url: str = 'http://localhost:8080/generate',
             meta_template: Optional[Dict] = None,
+            max_workers_per_task: int = 2,
             rate_per_worker: int = 2,
             retry: int = 2,
             generation_kwargs: Optional[Dict] = dict(),
@@ -37,6 +38,7 @@ class LightllmAPI(BaseModel):
         self.generation_kwargs = generation_kwargs
         self.max_out_len = self.generation_kwargs.get('max_new_tokens', 1024)
         self.meta_template = meta_template
+        self.max_workers_per_task = max_workers_per_task
         self.token_bucket = TokenBucket(rate_per_worker, False)
 
     def generate(self, inputs: List[str], max_out_len: int,
@@ -53,7 +55,8 @@ class LightllmAPI(BaseModel):
             List[str]: A list of generated strings.
         """
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(
+                max_workers=self.max_workers_per_task) as executor:
             results = list(
                 executor.map(self._generate, inputs,
                              [self.max_out_len] * len(inputs)))
@@ -103,7 +106,8 @@ class LightllmAPI(BaseModel):
             List[str]: A list of generated strings.
         """
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(
+                max_workers=self.max_workers_per_task) as executor:
             results = list(
                 executor.map(self._get_ppl, inputs,
                              [self.max_out_len] * len(inputs)))
