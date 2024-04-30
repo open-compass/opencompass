@@ -25,7 +25,7 @@ class LLMCompressionDataset(BaseDataset):
         else:
             raise FileNotFoundError(f'{filename} not found.')
 
-        samples = 'test' if None else f'test[:{samples}]'
+        samples = 'test' if samples is None else f'test[:{samples}]'
 
         data_files = {'test': filename}
         dataset = load_dataset('json', data_files=data_files, split=samples)
