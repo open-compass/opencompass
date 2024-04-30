@@ -93,7 +93,8 @@ class LLMCompressionSummarizer(DefaultSummarizer):
         datasets and rows are models.
 
         Args:
-            table (List[List]): _description_
+            table (List[List]): List of lists containing summary table rows
+                (including headers)
 
         Returns:
             pd.DataFrame: Summary dataframe sorted by ascending average BPC

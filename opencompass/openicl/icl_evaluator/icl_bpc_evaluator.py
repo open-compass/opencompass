@@ -20,7 +20,7 @@ class BPCEvaluator(BaseEvaluator):
             in the original dataset.
 
         Returns:
-            Dict[str, float]: bites per character
+            Dict[str, float]: Bits per Character
         """
         total_loss = sum(loss)
 

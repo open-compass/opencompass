@@ -173,7 +173,6 @@ class SWCELossInferencer(BaseInferencer):
                                         index)
             index = index + 1
 
-            # 5-3. Save intermediate results
             if (self.save_every is not None and index % self.save_every == 0
                     and self.is_main_process):
                 output_handler.write_to_json(output_json_filepath,
