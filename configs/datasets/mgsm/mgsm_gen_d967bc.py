@@ -6,8 +6,6 @@ from opencompass.datasets import MGSMSDataset, MGSM_Evaluator, mgsm_postprocess
 
 
 ALL_LANGUAGES = ["bn", "de", "en", "es", "fr", "ja", "ru", "sw", "te", "th", "zh"]
-LATIN_LANGUAGES = ["de", "en", "es", "fr", "sw"]
-NON_LATIN_LANGUAGES = ["bn", "ja", "ru", "te", "th", "zh"]
 
 LANG_TO_INSTRUCTIONS = {
     "en": """Solve this math problem. Give the reasoning steps before giving the final answer on the last line by itself in the format of "Answer:". Do not add anything other than the integer answer after "Answer:".\n\n{question}""",
@@ -33,12 +31,12 @@ for lang in ALL_LANGUAGES:
             type=PromptTemplate,
             template=dict(
                 round=[
-                    dict(role="HUMAN", prompt="{question}"),
+                    dict(role="HUMAN", prompt=LANG_TO_INSTRUCTIONS[lang]),
                 ]
             ),
         ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer),
+        inferencer=dict(type=GenInferencer, max_out_len=512),
     )
 
     mgsm_eval_cfg = dict(
@@ -48,7 +46,7 @@ for lang in ALL_LANGUAGES:
     )
 
     # all datasets
-    mgsm_datasets = [
+    mgsm_datasets.append(
         dict(
             type=MGSMSDataset,
             abbr=f"mgsm_{lang}",
@@ -56,5 +54,5 @@ for lang in ALL_LANGUAGES:
             reader_cfg=mgsm_reader_cfg,
             infer_cfg=mgsm_infer_cfg,
             eval_cfg=mgsm_eval_cfg,
-        ),
-    ]
+        )
+    )
