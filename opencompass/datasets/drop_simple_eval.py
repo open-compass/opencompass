@@ -35,7 +35,7 @@ def fuzzy_match(s1: str, s2: str) -> bool:
 
 
 @LOAD_DATASET.register_module()
-class dropOpenAIDataset(BaseDataset):
+class DropOpenAIDataset(BaseDataset):
 
     @staticmethod
     def load(path):
@@ -53,31 +53,28 @@ class dropOpenAIDataset(BaseDataset):
         return DatasetDict({'validation': dataset_list})
 
 
-class dropOpenAIEvaluator(BaseEvaluator):
+class DropOpenAIEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         if len(predictions) != len(references):
-            return {
-                'error': 'predictions and references have different '
-                'length'
-            }
-        correct = 0
+            return {'error': 'preds and refers have different length'}
+        num_correct = 0
         count = 0
         details = []
-        for i, j in zip(predictions, references):
-            match = re.search(ANSWER_PATTERN, i)
-            extracted_answer = match.group(1) if match else i
-            js = j.split('|')
+        for pred, refr in zip(predictions, references):
+            match = re.search(ANSWER_PATTERN, pred)
+            extracted_answer = match.group(1) if match else pred
+            refrs = refr.split('|')
             matches = [
                 fuzzy_match(extracted_answer, correct_answer)
-                for correct_answer in js
+                for correct_answer in refrs
             ]
-            score = True in matches
-            correct += 1 if score else 0
+            correct = True in matches
+            num_correct += correct
 
-            detail = {'pred': i, 'answer': j, 'correct': score}
+            detail = {'pred': pred, 'answer': refr, 'correct': correct}
             count += 1
 
             details.append(detail)
-        result = {'accuracy': 100 * correct / count, 'details': details}
+        result = {'accuracy': 100 * num_correct / count, 'details': details}
         return result

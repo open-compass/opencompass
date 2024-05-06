@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import dropOpenAIDataset, dropOpenAIEvaluator
+from opencompass.datasets import DropOpenAIDataset, DropOpenAIEvaluator
 
 drop_reader_cfg = dict(
     input_columns=['prompt'],
@@ -42,12 +42,12 @@ drop_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
-drop_eval_cfg = dict(evaluator=dict(type=dropOpenAIEvaluator))
+drop_eval_cfg = dict(evaluator=dict(type=DropOpenAIEvaluator))
 
 drop_datasets = [
     dict(
         abbr='drop',
-        type=dropOpenAIDataset,
+        type=DropOpenAIDataset,
         path='./data/drop_simple_eval/dev.jsonl',
         reader_cfg=drop_reader_cfg,
         infer_cfg=drop_infer_cfg,
