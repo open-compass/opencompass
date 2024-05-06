@@ -25,7 +25,6 @@ mgsm_datasets = []
 for lang in ALL_LANGUAGES:
     mgsm_reader_cfg = dict(input_columns=["question"], output_column="answer")
 
-    # each instance in datafile
     mgsm_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -45,7 +44,6 @@ for lang in ALL_LANGUAGES:
         pred_postprocessor=dict(type=mgsm_postprocess, lang=lang),
     )
 
-    # all datasets
     mgsm_datasets.append(
         dict(
             type=MGSMSDataset,
