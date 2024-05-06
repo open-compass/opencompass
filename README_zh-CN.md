@@ -60,7 +60,7 @@
 
 🚩🚩🚩 欢迎加入 OpenCompass！我们目前**招聘全职研究人员/工程师和实习生**。如果您对 LLM 和 OpenCompass 充满热情，请随时通过[电子邮件](mailto:zhangsongyang@pjlab.org.cn)与我们联系。我们非常期待与您交流！
 
-🔥🔥🔥 祝贺 **OpenCompass 作为大模型标准测试工具被Meta AI官方推荐**, 点击 Llama 的 [入门文档](https://ai.meta.com/llama/get-started/#validation) 获取更多信息.
+🔥🔥🔥 祝贺 **OpenCompass 作为大模型标准测试工具被Meta AI官方推荐**, 点击 Llama 的 [入门文档](https://ai.meta.com/llama/get-started/#validation) 获取更多信息。
 
 > **注意**<br />
 > 我们正式启动 OpenCompass 共建计划，诚邀社区用户为 OpenCompass 提供更具代表性和可信度的客观评测数据集!
@@ -69,6 +69,9 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.04.26\]** 我们报告了典型LLM在常用基准测试上的表现，欢迎访问[文档](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/corebench.html)以获取更多信息！🔥🔥🔥.
+- **\[2024.04.26\]** 我们废弃了 OpenCompass 进行多模态大模型评测的功能，相关功能转移至 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，推荐使用！🔥🔥🔥.
+- **\[2024.04.26\]** 我们支持了 [ArenaHard评测](configs/eval_subjective_arena_hard.py) 欢迎试用！🔥🔥🔥.
 - **\[2024.04.22\]** 我们支持了 [LLaMA3](configs/models/hf_llama/hf_llama3_8b.py) 和 [LLaMA3-Instruct](configs/models/hf_llama/hf_llama3_8b_instruct.py) 的评测，欢迎试用！🔥🔥🔥.
 - **\[2024.02.29\]** 我们支持了MT-Bench、AlpacalEval和AlignBench，更多信息可以在[这里](https://opencompass.readthedocs.io/en/latest/advanced_guides/subjective_evaluation.html)找到。
 - **\[2024.01.30\]** 我们发布了OpenCompass 2.0。更多信息，请访问[CompassKit](https://github.com/open-compass)、[CompassHub](https://hub.opencompass.org.cn/home)和[CompassRank](https://rank.opencompass.org.cn/home)。
