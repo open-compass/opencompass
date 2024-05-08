@@ -60,28 +60,42 @@ pip install -e .
 
 We have pre-configured datasets for common text lengths (4k, 8k, 32k, 128k, 200k, 1000k) in `configs/datasets/needlebench`, allowing you to flexibly create datasets that meet your needs by defining related parameters in the configuration files.
 
-### Example of Evaluation
+### Evaluation Example
 
-#### Evaluating using the `InternLM2-7B` model deployed with `LMDeploy`
+#### Evaluating `InternLM2-7B` Model Deployed Using `LMDeploy`
 
-For instance, to evaluate all tasks in NeedleBench-4K using the `InternLM2-7B` model deployed with `LMDeploy`, use the following command line command that calls the predefined model and dataset configuration files, without needing to write additional configuration files:
+For example, to evaluate the `InternLM2-7B` model deployed using `LMDeploy` for all tasks in NeedleBench-4K, you can directly use the following command in the command line. This command calls the pre-defined model and dataset configuration files without needing to write additional configuration files:
+
+##### Local Evaluation
+
+If you are evaluating the model locally, the command below will utilize all available GPUs on your machine. You can limit the GPU access for `OpenCompass` by setting the `CUDA_VISIBLE_DEVICES` environment variable. For instance, using `CUDA_VISIBLE_DEVICES=0,1,2,3 python run.py ...` will only expose the first four GPUs to OpenCompass, ensuring that it does not use more than these four GPUs.
 
 ```bash
-python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+# Local Evaluation
+python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer
 ```
 
-If you only want to test the original Needle In A Haystack task setup, you can change the dataset parameter to `needlebench_single_4k`, such as:
+##### Evaluation on a Slurm Cluster
+
+If using `Slurm`, you can add parameters such as `--slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000`, as shown below:
 
 ```bash
-python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b --summarizer needlebench/needlebench_4k_summarizer --sl
-
-urm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+# Slurm Evaluation
+python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
 ```
 
-You can also choose sub-datasets, such as changing the `--datasets` parameter to `needlebench_single_4k/needlebench_zh_datasets` for only testing the Chinese version of the single needle task, where the parameter after `/` represents the sub-dataset. You can find the optional sub-dataset variables in the `configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py`, such as:
+##### Evaluating a Subdataset Only
+
+If you only want to test the original NeedleInAHaystack task setup, you could change the dataset parameter to `needlebench_single_4k`, which corresponds to the single needle version of the NeedleInAHaystack test at 4k length:
 
 ```bash
-python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+```
+
+You can also choose to evaluate a specific subdataset, such as changing the `--datasets` parameter to `needlebench_single_4k/needlebench_zh_datasets` for testing just the Chinese version of the single needle 4K length NeedleInAHaystack task. The parameter after `/` represents the subdataset, which can be found in the dataset variable of `configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py` :
+
+```bash
+python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
 ```
 
 Be sure to install the [LMDeploy](https://github.com/InternLM/lmdeploy) tool before starting the evaluation:
