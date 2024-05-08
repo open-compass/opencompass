@@ -33,10 +33,12 @@ from .custom import *  # noqa: F401, F403
 from .cvalues import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
+from .drop_simple_eval import *  # noqa: F401, F403
 from .ds1000 import *  # noqa: F401, F403
 from .ds1000_interpreter import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
 from .FinanceIQ import *  # noqa: F401, F403
+from .flames import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
@@ -59,6 +61,7 @@ from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
+from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
@@ -68,7 +71,9 @@ from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
+from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
+from .MMLUArabic import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403
