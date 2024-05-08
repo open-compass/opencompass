@@ -66,17 +66,33 @@ pip install -e .
 
 例如，使用`LMDeploy`部署的 `InternLM2-7B` 模型进行评估NeedleBench-4K的所有任务，可以在命令行中直接使用以下命令，该命令会调用预定义好的模型、数据集配置文件，而无需额外书写配置文件：
 
+##### 本地评估
+
+如果您在本地评估模型，下面命令会调用机器的所有可用GPU。您可以通过设置 `CUDA_VISIBLE_DEVICES` 环境变量来限制 `OpenCompass` 的 GPU 访问。例如，使用 `CUDA_VISIBLE_DEVICES=0,1,2,3 python run.py ...` 只会向 OpenCompass 暴露前四个 GPU，确保它同时使用的 GPU 数量不超过这四个。
+
 ```bash
+# 本地评估
+python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer
+```
+
+##### 在Slurm集群上评估
+
+如果使用 `Slurm`，可以添加 `--slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000`等参数，例如下面：
+
+```bash
+# Slurm评估
 python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
 ```
 
-如果只想测试原始的大海捞针任务设定，可以更换数据集的参数为`needlebench_single_4k`，如：
+##### 只评估子数据集
+
+如果只想测试原始的大海捞针任务设定，比如可以更换数据集的参数为`needlebench_single_4k`，这对应于4k长度下的单针版本的大海捞针测试：
 
 ```bash
 python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
 ```
 
-您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_4k/needlebench_zh_datasets`，仅仅进行中文版本的单针大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py`中找到可选的子数据集变量，如：
+您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_4k/needlebench_zh_datasets`，仅仅进行中文版本的单针4K长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py`中找到可选的子数据集变量，如：
 
 ```bash
 python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
