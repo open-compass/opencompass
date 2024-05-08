@@ -92,7 +92,7 @@ If you only want to test the original NeedleInAHaystack task setup, you could ch
 python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
 ```
 
-You can also choose to evaluate a specific subdataset, such as changing the `--datasets` parameter to `needlebench_single_4k/needlebench_zh_datasets` for testing just the Chinese version of the single needle 4K length NeedleInAHaystack task. The parameter after `/` represents the subdataset, which can be found in the variable `configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py` as:
+You can also choose to evaluate a specific subdataset, such as changing the `--datasets` parameter to `needlebench_single_4k/needlebench_zh_datasets` for testing just the Chinese version of the single needle 4K length NeedleInAHaystack task. The parameter after `/` represents the subdataset, which can be found in the dataset variable of `configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py` :
 
 ```bash
 python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
