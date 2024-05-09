@@ -220,7 +220,7 @@ def change_accelerator(models, accelerator):
             if accelerator == 'lmdeploy':
                 get_logger().info(
                     f'Transforming {model["abbr"]} to {accelerator}')
-                model = dict(
+                acc_model = dict(
                     type=  # noqa E251
                     f'{TurboMindModel.__module__}.{TurboMindModel.__name__}',
                     abbr=model['abbr'].replace('hf', 'lmdeploy')
@@ -242,12 +242,12 @@ def change_accelerator(models, accelerator):
                 )
                 for item in ['meta_template']:
                     if model.get(item) is not None:
-                        model.update(item, model[item])
+                        acc_model[item] = model[item]
             elif accelerator == 'vllm':
                 get_logger().info(
                     f'Transforming {model["abbr"]} to {accelerator}')
 
-                model = dict(
+                acc_model = dict(
                     type=f'{VLLM.__module__}.{VLLM.__name__}',
                     abbr=model['abbr'].replace('hf', 'vllm')
                     if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
@@ -262,12 +262,10 @@ def change_accelerator(models, accelerator):
                 )
                 for item in ['meta_template', 'end_str']:
                     if model.get(item) is not None:
-                        model.update(item, model[item])
-                generation_kwargs.update(
-                    dict(temperature=gen_args['temperature']))
+                        acc_model[item] = model[item]
             else:
                 raise ValueError(f'Unsupported accelerator {accelerator}')
-        model_accels.append(model)
+        model_accels.append(acc_model)
     return model_accels
 
 
