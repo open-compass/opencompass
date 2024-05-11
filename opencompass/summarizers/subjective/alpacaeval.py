@@ -156,7 +156,7 @@ class AlpacaSummarizer:
                                 (win_model2[capability] /
                                  categories[capability]) * 100, 2)
                     scores = {
-                        #'win_' + model1: win_model1,
+                        'win_' + model1: win_model1,
                         'win_' + model2: win_model2
                     }
                     rows = list(scores.keys())
@@ -164,7 +164,7 @@ class AlpacaSummarizer:
                     columns.insert(0, columns.pop(columns.index('total')))
                     with open(fout, 'a+', newline='') as csvfile:
                         writer = csv.writer(csvfile)
-                        # writer.writerow([model1 + '_vs_' + model2] + columns)
+                        writer.writerow([model1 + '_vs_' + model2] + columns)
                         for row in rows:
                             writer.writerow(
                                 [row] +
