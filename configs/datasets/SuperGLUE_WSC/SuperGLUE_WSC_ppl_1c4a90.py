@@ -5,8 +5,8 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import WSCDataset_V3
 
 WSC_reader_cfg = dict(
-    input_columns=["span1", "span2", "text"],
-    output_column="label",
+    input_columns=['span1', 'span2', 'text'],
+    output_column='label',
 )
 
 WSC_infer_cfg = dict(
@@ -16,16 +16,16 @@ WSC_infer_cfg = dict(
             'A':
             dict(round=[
                 dict(
-                    role="HUMAN",
-                    prompt="Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnswer: "
+                    role='HUMAN',
+                    prompt='Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnswer: '
                 ),
                 dict(role='BOT', prompt='A'),
             ]),
             'B':
             dict(round=[
                 dict(
-                    role="HUMAN",
-                    prompt="Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnswer: "
+                    role='HUMAN',
+                    prompt='Passage: {text}\nDoes the pronoun # {span2} # refer to * {span1} *?\nA. Yes\nB. No\nAnswer: '
                 ),
                 dict(role='BOT', prompt='B'),
             ]),
@@ -39,9 +39,9 @@ WSC_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
 WSC_datasets = [
     dict(
-        abbr="WSC",
+        abbr='WSC',
         type=WSCDataset_V3,
-        path="./data/SuperGLUE/WSC/val.jsonl",
+        path='./data/SuperGLUE/WSC/val.jsonl',
         reader_cfg=WSC_reader_cfg,
         infer_cfg=WSC_infer_cfg,
         eval_cfg=WSC_eval_cfg,

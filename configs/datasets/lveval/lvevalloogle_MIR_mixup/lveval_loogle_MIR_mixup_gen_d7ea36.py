@@ -4,10 +4,10 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import LVEvalOPTF1Evaluator, LVEvallooglemirDataset
 
 LVEval_loogle_MIR_mixup_reader_cfg = dict(
-    input_columns=["context", "input"],
-    output_column="answers",
-    train_split="test",
-    test_split="test",
+    input_columns=['context', 'input'],
+    output_column='answers',
+    train_split='test',
+    test_split='test',
 )
 
 LVEval_loogle_MIR_mixup_infer_cfg = dict(
@@ -16,8 +16,8 @@ LVEval_loogle_MIR_mixup_infer_cfg = dict(
         template=dict(
             round=[
                 dict(
-                    role="HUMAN",
-                    prompt="Please answer the following question based on the given passages. Questions and answers are only relevant to one passage. Only give me the answer and do not output any other explanation and evidence.\n\nArticle: {context}\n\nPlease answer the following question based on the above passages. Questions and answers are only relevant to one passage. Only give me the answer and do not output any other explanation and evidence.\n\nQuestion: {input}\nAnswer:",
+                    role='HUMAN',
+                    prompt='Please answer the following question based on the given passages. Questions and answers are only relevant to one passage. Only give me the answer and do not output any other explanation and evidence.\n\nArticle: {context}\n\nPlease answer the following question based on the above passages. Questions and answers are only relevant to one passage. Only give me the answer and do not output any other explanation and evidence.\n\nQuestion: {input}\nAnswer:',
                 ),
             ],
         ),
@@ -27,28 +27,28 @@ LVEval_loogle_MIR_mixup_infer_cfg = dict(
 )
 
 LVEval_loogle_MIR_mixup_eval_cfg = dict(
-    evaluator=dict(type=LVEvalOPTF1Evaluator, language="en"), pred_role="BOT"
+    evaluator=dict(type=LVEvalOPTF1Evaluator, language='en'), pred_role='BOT'
 )
 
-DATASET_LENGTH_LEVEL = ["16k", "32k", "64k", "128k", "256k"]
+DATASET_LENGTH_LEVEL = ['16k', '32k', '64k', '128k', '256k']
 
 
 def get_dataset_names(dataset_name, length_levels):
     datasets = []
     for length in length_levels:
-        datasets.append(f"{dataset_name}_{length}")
+        datasets.append(f'{dataset_name}_{length}')
     return datasets
 
 
 LVEval_loogle_MIR_mixup_datasets = [
     dict(
         type=LVEvallooglemirDataset,
-        abbr="LVEval_" + name_len,
-        path="Infinigence/LVEval",
+        abbr='LVEval_' + name_len,
+        path='Infinigence/LVEval',
         name=name_len,
         reader_cfg=LVEval_loogle_MIR_mixup_reader_cfg,
         infer_cfg=LVEval_loogle_MIR_mixup_infer_cfg,
         eval_cfg=LVEval_loogle_MIR_mixup_eval_cfg,
     )
-    for name_len in get_dataset_names("loogle_MIR_mixup", DATASET_LENGTH_LEVEL)
+    for name_len in get_dataset_names('loogle_MIR_mixup', DATASET_LENGTH_LEVEL)
 ]

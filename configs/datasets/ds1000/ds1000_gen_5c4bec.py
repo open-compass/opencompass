@@ -39,10 +39,10 @@ def solution(x):
 """
 
 ds1000_reader_cfg = dict(
-    input_columns=["prompt"],
-    output_column="test_column",
-    train_split="test",
-    test_split="test",
+    input_columns=['prompt'],
+    output_column='test_column',
+    train_split='test',
+    test_split='test',
 )
 
 ds1000_infer_cfg = dict(
@@ -56,7 +56,7 @@ ds1000_infer_cfg = dict(
 
 ds1000_eval_cfg = dict(
     evaluator=dict(type=DS1000InterpreterEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
 )
 
 # The DS-1000 dataset can be downloaded from
@@ -65,20 +65,20 @@ ds1000_eval_cfg = dict(
 # Matplotlib cannot fit this setting
 ds1000_datasets = [
     dict(
-        abbr=f"ds1000_{lib}",
+        abbr=f'ds1000_{lib}',
         type=DS1000Dataset_Interperter,  # bustm share the same format with AFQMC
-        path="./data/ds1000_data/",
-        libs=f"{lib}",
+        path='./data/ds1000_data/',
+        libs=f'{lib}',
         reader_cfg=ds1000_reader_cfg,
         infer_cfg=ds1000_infer_cfg,
         eval_cfg=ds1000_eval_cfg,
     )
     for lib in [
-        "Pandas",
-        "Numpy",
+        'Pandas',
+        'Numpy',
         # 'Tensorflow',  # error using tensorflow, skipped temporarily
-        "Scipy",
-        "Sklearn",
-        "Pytorch",
+        'Scipy',
+        'Sklearn',
+        'Pytorch',
     ]
 ]

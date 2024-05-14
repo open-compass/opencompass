@@ -61,7 +61,7 @@ ceval_subject_mapping = {
 ceval_all_sets = list(ceval_subject_mapping.keys())
 
 ceval_datasets = []
-for _split in ["val"]:
+for _split in ['val']:
     for _name in ceval_all_sets:
         _ch_name = ceval_subject_mapping[_name][1]
         ceval_infer_cfg = dict(
@@ -69,18 +69,18 @@ for _split in ["val"]:
                 type=PromptTemplate,
                 template={
                     answer: dict(
-                        begin="</E>",
+                        begin='</E>',
                         round=[
                             dict(
-                                role="HUMAN",
+                                role='HUMAN',
                                 prompt=
-                                f"以下是中国关于{_ch_name}考试的单项选择题，请选出其中的正确答案。\n{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n答案: "
+                                f'以下是中国关于{_ch_name}考试的单项选择题，请选出其中的正确答案。\n{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n答案: '
                             ),
-                            dict(role="BOT", prompt=answer),
+                            dict(role='BOT', prompt=answer),
                         ])
-                    for answer in ["A", "B", "C", "D"]
+                    for answer in ['A', 'B', 'C', 'D']
                 },
-                ice_token="</E>",
+                ice_token='</E>',
             ),
             retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
             inferencer=dict(type=PPLInferencer),
@@ -91,14 +91,14 @@ for _split in ["val"]:
         ceval_datasets.append(
             dict(
                 type=CEvalDataset,
-                path="./data/ceval/formal_ceval",
+                path='./data/ceval/formal_ceval',
                 name=_name,
-                abbr="ceval-" + _name if _split == "val" else "ceval-test-" +
+                abbr='ceval-' + _name if _split == 'val' else 'ceval-test-' +
                 _name,
                 reader_cfg=dict(
-                    input_columns=["question", "A", "B", "C", "D"],
-                    output_column="answer",
-                    train_split="dev",
+                    input_columns=['question', 'A', 'B', 'C', 'D'],
+                    output_column='answer',
+                    train_split='dev',
                     test_split=_split),
                 infer_cfg=ceval_infer_cfg,
                 eval_cfg=ceval_eval_cfg,

@@ -10,9 +10,9 @@ def create_m_rs_names_list(context_lengths, depths, needle_counts,
 
     for needle_count in needle_counts:
         for language in languages:
-            key = f"{needle_count}-Needle-{language.upper()}-{dataset_size.upper()}"
+            key = f'{needle_count}-Needle-{language.upper()}-{dataset_size.upper()}'
             names_list = [
-                f"Length{length}Depth{int(depth)}_{needle_count}needle_{language}_{dataset_size}"
+                f'Length{length}Depth{int(depth)}_{needle_count}needle_{language}_{dataset_size}'
                 for length in context_lengths
                 for depth in depths
             ]
@@ -31,8 +31,8 @@ def create_m_rs_names_list(context_lengths, depths, needle_counts,
 
 def create_summarizer(context_lengths, depths, dataset_size,
                       sparse_depths=None):
-    needle_counts = ["2", "3", "4", "5"]
-    languages = ["en", "zh"]
+    needle_counts = ['2', '3', '4', '5']
+    languages = ['en', 'zh']
     if sparse_depths:
         depths = sparse_depths
     names_dict = {}
@@ -47,7 +47,7 @@ def create_summarizer(context_lengths, depths, dataset_size,
 
     for language in languages:
         names_list = [
-            f"Length{length}Depth{int(depth)}_origin_{language}_{dataset_size}"
+            f'Length{length}Depth{int(depth)}_origin_{language}_{dataset_size}'
             for length in context_lengths
             for depth in depths
         ]
@@ -66,7 +66,7 @@ def create_summarizer(context_lengths, depths, dataset_size,
 
     for language in languages:
         names_list = [
-            f"Length{length}_parallel_{language}_{dataset_size}"
+            f'Length{length}_parallel_{language}_{dataset_size}'
             for length in context_lengths
         ]
         parallel_list.extend(names_list)
@@ -124,19 +124,19 @@ depths = [0, 5, 10, 15, 21, 26, 31, 36, 42, 47, 52, 57, 63, 68, 73, 78, 84, 89, 
 depths_list_sparse = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
 context_lengths_4k = list(range(1000, 5000, 1000))
-needlebench_4k_summarizer = create_summarizer(context_lengths_4k, depths, "4k")
+needlebench_4k_summarizer = create_summarizer(context_lengths_4k, depths, '4k')
 context_lengths_8k = list(range(5000, 9000, 1000))
-needlebench_8k_summarizer = create_summarizer(context_lengths_8k, depths, "8k")
+needlebench_8k_summarizer = create_summarizer(context_lengths_8k, depths, '8k')
 context_lengths_32k = [9000, 13000, 17000, 21000, 25000, 29000, 31000, 32000]
-needlebench_32k_summarizer = create_summarizer(context_lengths_32k, depths_list_sparse, "32k")
+needlebench_32k_summarizer = create_summarizer(context_lengths_32k, depths_list_sparse, '32k')
 context_lengths_128k = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000])
-needlebench_128k_summarizer = create_summarizer(context_lengths_128k, depths_list_sparse, "128k")
+needlebench_128k_summarizer = create_summarizer(context_lengths_128k, depths_list_sparse, '128k')
 context_lengths_200k = list([16000, 48000, 80000, 112000, 128000, 144000, 176000, 200000])
-needlebench_200k_summarizer = create_summarizer(context_lengths_200k, depths_list_sparse, "200k")
+needlebench_200k_summarizer = create_summarizer(context_lengths_200k, depths_list_sparse, '200k')
 context_lengths_256k = list([32000, 128000, 256000])
-needlebench_256k_summarizer = create_summarizer(context_lengths_256k, depths_list_sparse, "256k")
+needlebench_256k_summarizer = create_summarizer(context_lengths_256k, depths_list_sparse, '256k')
 context_lengths_1000k = list([20000, 160000, 300000, 440000, 580000, 720000, 860000, 1000000])
-needlebench_1000k_summarizer = create_summarizer(context_lengths_1000k, depths_list_sparse, "1000k")
+needlebench_1000k_summarizer = create_summarizer(context_lengths_1000k, depths_list_sparse, '1000k')
 
 
 _needlebench_8k_parallel_en_batch1 = []
@@ -169,21 +169,21 @@ _needlebench_8k_parallel_batch15 = _needlebench_8k_parallel_en_batch15 + _needle
 _needlebench_8k_parallel_batch20 = _needlebench_8k_parallel_en_batch20 + _needlebench_8k_parallel_zh_batch20
 
 needlebench_summary_groups = [
-    {'name': 'parallel_version_batch1', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_batch1]},
-    {'name': 'parallel_version_zh_batch1', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_zh_batch1]},
-    {'name': 'parallel_version_en_batch1', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_en_batch1]},
-    {'name': 'parallel_version_batch5', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_batch5]},
-    {'name': 'parallel_version_zh_batch5', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_zh_batch5]},
-    {'name': 'parallel_version_en_batch5', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_en_batch5]},
-    {'name': 'parallel_version_batch10', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_batch10]},
-    {'name': 'parallel_version_zh_batch10', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_zh_batch10]},
-    {'name': 'parallel_version_en_batch10', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_en_batch10]},
-    {'name': 'parallel_version_batch15', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_batch15]},
-    {'name': 'parallel_version_zh_batch15', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_zh_batch15]},
-    {'name': 'parallel_version_en_batch15', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_en_batch15]},
-    {'name': 'parallel_version_batch20', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_batch20]},
-    {'name': 'parallel_version_zh_batch20', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_zh_batch20]},
-    {'name': 'parallel_version_en_batch20', 'subsets': [[_dataset, "average_score"] for _dataset in _needlebench_8k_parallel_en_batch20]},
+    {'name': 'parallel_version_batch1', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_batch1]},
+    {'name': 'parallel_version_zh_batch1', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_zh_batch1]},
+    {'name': 'parallel_version_en_batch1', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_en_batch1]},
+    {'name': 'parallel_version_batch5', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_batch5]},
+    {'name': 'parallel_version_zh_batch5', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_zh_batch5]},
+    {'name': 'parallel_version_en_batch5', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_en_batch5]},
+    {'name': 'parallel_version_batch10', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_batch10]},
+    {'name': 'parallel_version_zh_batch10', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_zh_batch10]},
+    {'name': 'parallel_version_en_batch10', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_en_batch10]},
+    {'name': 'parallel_version_batch15', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_batch15]},
+    {'name': 'parallel_version_zh_batch15', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_zh_batch15]},
+    {'name': 'parallel_version_en_batch15', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_en_batch15]},
+    {'name': 'parallel_version_batch20', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_batch20]},
+    {'name': 'parallel_version_zh_batch20', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_zh_batch20]},
+    {'name': 'parallel_version_en_batch20', 'subsets': [[_dataset, 'average_score'] for _dataset in _needlebench_8k_parallel_en_batch20]},
 ]
 
 needlebench_8k_batch_overall_summarizer = dict(
@@ -209,21 +209,21 @@ needlebench_8k_batch_overall_summarizer = dict(
 )
 
 needlebench_summary_groups = [
-    {'name': 'parallel_version_batch1', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_batch1]},
-    {'name': 'parallel_version_zh_batch1', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_zh_batch1]},
-    {'name': 'parallel_version_en_batch1', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_en_batch1]},
-    {'name': 'parallel_version_batch5', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_batch5]},
-    {'name': 'parallel_version_zh_batch5', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_zh_batch5]},
-    {'name': 'parallel_version_en_batch5', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_en_batch5]},
-    {'name': 'parallel_version_batch10', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_batch10]},
-    {'name': 'parallel_version_zh_batch10', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_zh_batch10]},
-    {'name': 'parallel_version_en_batch10', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_en_batch10]},
-    {'name': 'parallel_version_batch15', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_batch15]},
-    {'name': 'parallel_version_zh_batch15', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_zh_batch15]},
-    {'name': 'parallel_version_en_batch15', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_en_batch15]},
-    {'name': 'parallel_version_batch20', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_batch20]},
-    {'name': 'parallel_version_zh_batch20', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_zh_batch20]},
-    {'name': 'parallel_version_en_batch20', 'subsets': [[_dataset, "Depth0"] for _dataset in _needlebench_8k_parallel_en_batch20]},
+    {'name': 'parallel_version_batch1', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_batch1]},
+    {'name': 'parallel_version_zh_batch1', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_zh_batch1]},
+    {'name': 'parallel_version_en_batch1', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_en_batch1]},
+    {'name': 'parallel_version_batch5', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_batch5]},
+    {'name': 'parallel_version_zh_batch5', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_zh_batch5]},
+    {'name': 'parallel_version_en_batch5', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_en_batch5]},
+    {'name': 'parallel_version_batch10', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_batch10]},
+    {'name': 'parallel_version_zh_batch10', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_zh_batch10]},
+    {'name': 'parallel_version_en_batch10', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_en_batch10]},
+    {'name': 'parallel_version_batch15', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_batch15]},
+    {'name': 'parallel_version_zh_batch15', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_zh_batch15]},
+    {'name': 'parallel_version_en_batch15', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_en_batch15]},
+    {'name': 'parallel_version_batch20', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_batch20]},
+    {'name': 'parallel_version_zh_batch20', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_zh_batch20]},
+    {'name': 'parallel_version_en_batch20', 'subsets': [[_dataset, 'Depth0'] for _dataset in _needlebench_8k_parallel_en_batch20]},
 ]
 
 needlebench_8k_batch_depth0_summarizer = dict(

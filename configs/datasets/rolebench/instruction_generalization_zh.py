@@ -27,7 +27,7 @@ instruction_generalization_zh_infer_cfg = dict(
 )
 
 instruction_generalization_zh_eval_cfg = dict(
-    evaluator=dict(type=RougeEvaluator), 
+    evaluator=dict(type=RougeEvaluator),
     pred_role='BOT'
 )
 

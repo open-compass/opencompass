@@ -10,13 +10,13 @@ Download file from [link](https://github.com/FreedomIntelligence/AceGPT/tree/mai
 val_ds = load_dataset("MMLUArabic", header=None)['validation']
 test_ds = load_dataset("MMLUArabic", header=None)['test']
 # input, option_a, option_b, option_c, option_d, target
-print(next(iter(val_ds))) 
+print(next(iter(val_ds)))
 ```
 
 ## Citation
 ```
 @misc{huang2023acegpt,
-      title={AceGPT, Localizing Large Language Models in Arabic}, 
+      title={AceGPT, Localizing Large Language Models in Arabic},
       author={Huang Huang and Fei Yu and Jianqing Zhu and Xuening Sun and Hao Cheng and Dingjie Song and Zhihong Chen and Abdulmohsen Alharthi and Bang An and Ziche Liu and Zhiyi Zhang and Junying Chen and Jianquan Li and Benyou Wang and Lian Zhang and Ruoyu Sun and Xiang Wan and Haizhou Li and Jinchao Xu},
       year={2023},
       eprint={2309.12053},

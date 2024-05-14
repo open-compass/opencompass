@@ -5,14 +5,14 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import CslDataset
 
 csl_reader_cfg = dict(
-    input_columns=["abst", "keywords"], output_column='label')
+    input_columns=['abst', 'keywords'], output_column='label')
 
 csl_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "摘要：{abst}",
-            1: "摘要：{abst}\n关键词：{keywords}"
+            0: '摘要：{abst}',
+            1: '摘要：{abst}\n关键词：{keywords}'
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

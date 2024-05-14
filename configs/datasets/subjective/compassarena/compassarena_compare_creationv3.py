@@ -9,7 +9,7 @@ subjective_reader_cfg = dict(
     output_column='judge',
     )
 
-data_path ="data/subjective/compass_arena"
+data_path ='data/subjective/compass_arena'
 
 subjective_datasets = []
 
@@ -99,7 +99,7 @@ creation_prompt = """
 {question}
 """ + base_prompt
 
-sub_map = {"creationv3": creation_prompt}
+sub_map = {'creationv3': creation_prompt}
 
 for _name, _prompt in sub_map.items():
     subjective_infer_cfg = dict(
@@ -108,7 +108,7 @@ for _name, _prompt in sub_map.items():
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -130,12 +130,12 @@ for _name, _prompt in sub_map.items():
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=CompassArenaDataset,
             path=data_path,
             name=_name,

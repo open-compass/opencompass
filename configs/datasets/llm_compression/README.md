@@ -4,7 +4,7 @@
 
 The following introduction comes from the abstract of [Compression Represents Intelligence Linearly](https://arxiv.org/abs/2404.09937):
 
->There is a belief that learning to compress well will lead to intelligence. Recently, language modeling has been shown to be equivalent to compression, which offers a compelling rationale for the success of large language models (LLMs): the development of more advanced language models is essentially enhancing compression which facilitates intelligence. ...our findings suggest that compression efficiency, as an unsupervised metric derived from raw text corpora, serves as a reliable evaluation measure that is linearly associated with the model capabilities. We open-source our compression datasets as well as our data collection pipelines to facilitate future researchers to assess compression properly. 
+>There is a belief that learning to compress well will lead to intelligence. Recently, language modeling has been shown to be equivalent to compression, which offers a compelling rationale for the success of large language models (LLMs): the development of more advanced language models is essentially enhancing compression which facilitates intelligence. ...our findings suggest that compression efficiency, as an unsupervised metric derived from raw text corpora, serves as a reliable evaluation measure that is linearly associated with the model capabilities. We open-source our compression datasets as well as our data collection pipelines to facilitate future researchers to assess compression properly.
 
 
 ## Official Links
@@ -13,7 +13,7 @@ The following introduction comes from the abstract of [Compression Represents In
 - GitHub Repository: [llm-compression-intelligence](https://github.com/hkust-nlp/llm-compression-intelligence)
 
 
-## Overview and Usage 
+## Overview and Usage
 
 ### Dataset
 The dataset, which consists of three external corpora, can be downloaded using the following python script:
@@ -95,7 +95,7 @@ Token indices sequence length is longer than the specified maximum sequence leng
 ## Reference
 ```
 @misc{huang2024compression,
-      title={Compression Represents Intelligence Linearly}, 
+      title={Compression Represents Intelligence Linearly},
       author={Yuzhen Huang and Jinghan Zhang and Zifei Shan and Junxian He},
       year={2024},
       eprint={2404.09937},

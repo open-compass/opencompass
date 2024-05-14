@@ -7,7 +7,7 @@ from opencompass.utils.text_postprocessors import general_cn_postprocess
 InfiniteBench_zhqa_reader_cfg = dict(
     input_columns=['context', 'question'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_zhqa_infer_cfg = dict(

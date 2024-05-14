@@ -24,8 +24,8 @@ api_meta_template = dict(
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
-        dict(role="BOT", begin="\n<|im_start|>assistant\n", end='<|im_end|>', generate=True),
+        dict(role='HUMAN', begin='\n<|im_start|>user\n', end='<|im_end|>'),
+        dict(role='BOT', begin='\n<|im_start|>assistant\n', end='<|im_end|>', generate=True),
     ],
 )
 # -------------Inference Stage ----------------------------------------
@@ -34,7 +34,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='qwen-7b-chat-hf',
-        path="Qwen/Qwen-7B-Chat",
+        path='Qwen/Qwen-7B-Chat',
         tokenizer_path='Qwen/Qwen-7B-Chat',
         model_kwargs=dict(
             device_map='auto',

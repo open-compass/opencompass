@@ -10,13 +10,13 @@ gsmhard_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
             template=dict(
-                begin="</E>",
+                begin='</E>',
             round=[
-                dict(role='HUMAN', prompt="Question: {question}\nAnswer:"),
-                dict(role="BOT", prompt="The answer is {answer}"),
+                dict(role='HUMAN', prompt='Question: {question}\nAnswer:'),
+                dict(role='BOT', prompt='The answer is {answer}'),
             ],
-        ),                
-        ice_token="</E>",
+        ),
+        ice_token='</E>',
 ),
 
     retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),

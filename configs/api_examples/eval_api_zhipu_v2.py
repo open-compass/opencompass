@@ -64,4 +64,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_zhipu_v2/"
+work_dir = 'outputs/api_zhipu_v2/'

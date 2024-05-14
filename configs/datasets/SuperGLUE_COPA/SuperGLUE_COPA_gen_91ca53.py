@@ -6,8 +6,8 @@ from opencompass.datasets import COPADataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 COPA_reader_cfg = dict(
-    input_columns=["question", "premise", "choice1", "choice2"],
-    output_column="label",
+    input_columns=['question', 'premise', 'choice1', 'choice2'],
+    output_column='label',
 )
 
 COPA_infer_cfg = dict(
@@ -16,9 +16,9 @@ COPA_infer_cfg = dict(
         template=dict(
             round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "{premise}\nQuestion: Which may be the {question}?\nA. {choice1}\nB. {choice2}\nAnswer:"
+                    '{premise}\nQuestion: Which may be the {question}?\nA. {choice1}\nB. {choice2}\nAnswer:'
                 ),
             ], ),
     ),
@@ -28,15 +28,15 @@ COPA_infer_cfg = dict(
 
 COPA_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 COPA_datasets = [
     dict(
-        abbr="COPA",
+        abbr='COPA',
         type=COPADataset_V2,
-        path="./data/SuperGLUE/COPA/val.jsonl",
+        path='./data/SuperGLUE/COPA/val.jsonl',
         reader_cfg=COPA_reader_cfg,
         infer_cfg=COPA_infer_cfg,
         eval_cfg=COPA_eval_cfg,

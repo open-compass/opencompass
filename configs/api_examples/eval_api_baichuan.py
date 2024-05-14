@@ -18,8 +18,8 @@ models = [
         type=BaiChuan,
         path='Baichuan2-53B',
         api_key='xxxxxx',
-        secret_key="xxxxx",
-        url="xxxxx",
+        secret_key='xxxxx',
+        url='xxxxx',
         generation_kwargs={
             'temperature': 0.3,
             'top_p': 0.85,
@@ -41,4 +41,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_baichuan53b/"
+work_dir = 'outputs/api_baichuan53b/'

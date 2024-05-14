@@ -4,12 +4,12 @@ from opencompass.models.turbomind import TurboMindModel
 models = [
     dict(
         type=TurboMindModel,
-        abbr="internlm2-20b-turbomind",
-        path="internlm/internlm2-20b",
+        abbr='internlm2-20b-turbomind',
+        path='internlm/internlm2-20b',
         engine_config=dict(
             session_len=32768,
             max_batch_size=32,
-            model_name="internlm2-20b",
+            model_name='internlm2-20b',
             tp=2,
         ),
         gen_config=dict(

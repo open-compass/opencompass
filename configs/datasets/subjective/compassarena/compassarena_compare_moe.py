@@ -9,7 +9,7 @@ subjective_reader_cfg = dict(
     output_column='judge',
     )
 
-data_path ="data/subjective/compass_arena"
+data_path ='data/subjective/compass_arena'
 
 subjective_datasets = []
 
@@ -91,7 +91,7 @@ reason_prompt = math_prompt
 creation_prompt = """
 请根据提供的 评分要求，用户问题 以及 相应的两个回答（回答1，回答2），判断两个回答中哪一个更好。
 评分要求（重要性依次递减）:
-1. 好的回答必须首先符合用户问题里的各种需求，不能跑题 
+1. 好的回答必须首先符合用户问题里的各种需求，不能跑题
 2. 好的回答必须具有逻辑连贯性，围绕一个中心进行回答
 3. 好的回答必须具有创造性的词语和表达丰富度
 
@@ -99,7 +99,7 @@ creation_prompt = """
 {question}
 """ + base_prompt
 
-sub_map = {"knowledge": knowledge_prompt, "language": language_prompt, "math_v2": math_prompt, "reason_v2": reason_prompt, "creationv2_zh": creation_prompt}
+sub_map = {'knowledge': knowledge_prompt, 'language': language_prompt, 'math_v2': math_prompt, 'reason_v2': reason_prompt, 'creationv2_zh': creation_prompt}
 
 meta_prompt = """
 \n你是一个评判专家，请根据提供的 评分要求，用户问题 以及 相应的两个回答（回答1，回答2），判断两个回答中哪一个更好。\n评分要求（重要性依次递减）:\n1. 好的回答必须首先符合用户问题里的各种需求，不能跑题 \n2. 好的回答必须具有逻辑连贯性，围绕一个中心进行回答\n3. 好的回答必须具有创造性的词语和表达丰富度\n\n[用户问题]\n{question}\n[回答1开始]\n{prediction}\n[回答1结束]\n[回答2开始]\n{prediction2}\n[回答2结束]\n此外，还有两个其他评判专家的评判意见供你参考。\n[评判意见1]\n{judgement}\n[评判意见2]\n{judgement2}\n\n最终请你综合其他评判专家的评判意见与你自己的意见，在以下 3 个选项中做出选择:\nA. 回答1更好\nB. 回答2更好\nC. 回答1、2平局\n并提供你的解释原因。\n\n如果你认为回答1更好，你的输出应形如：\n选择：A\n原因：blahblah blahblah\n\n\n如果你认为回答2更好，你的输出应形如：\n选择：B\n原因：blahblah blahblah\n\n\n如果你认为回答1、2打成平手，你的输出应形如：\n选择：C\n原因：blahblah blahblah\n\n
@@ -111,7 +111,7 @@ for _name, _prompt in sub_map.items():
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -141,12 +141,12 @@ for _name, _prompt in sub_map.items():
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=CompassArenaDataset,
             path=data_path,
             name=_name,

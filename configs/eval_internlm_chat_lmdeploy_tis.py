@@ -29,7 +29,7 @@ models = [
     dict(
         type=LmdeployTisModel,
         abbr='internlm-chat-20b-lmdeploy-tis',
-        path="internlm/internlm-chat-20b",
+        path='internlm/internlm-chat-20b',
         tis_addr='0.0.0.0:33337',
         max_out_len=100,
         max_seq_len=2048,

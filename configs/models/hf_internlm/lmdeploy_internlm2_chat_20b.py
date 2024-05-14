@@ -3,21 +3,21 @@ from opencompass.models.turbomind import TurboMindModel
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin="<|im_start|>user\n", end="<|im_end|>\n"),
-        dict(role="BOT", begin="<|im_start|>assistant\n", end="<|im_end|>\n", generate=True),
+        dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
+        dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
     ],
 )
 
 models = [
     dict(
         type=TurboMindModel,
-        abbr="internlm2-chat-20b-turbomind",
-        path="internlm/internlm2-chat-20b",
+        abbr='internlm2-chat-20b-turbomind',
+        path='internlm/internlm2-chat-20b',
         meta_template=_meta_template,
         engine_config=dict(
             session_len=32768,
             max_batch_size=32,
-            model_name="internlm2-chat-20b",
+            model_name='internlm2-chat-20b',
             tp=2,
             stop_words=[2, 92542],
         ),

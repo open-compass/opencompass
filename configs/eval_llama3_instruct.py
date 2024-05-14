@@ -10,7 +10,7 @@ with read_base():
 
 work_dir = 'outputs/debug/llama3-instruct'
 
-models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
+models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 # dataset               version    metric                        mode    llama-3-8b-instruct-hf
 # --------------------  ---------  ----------------------------  ------  ------------------------

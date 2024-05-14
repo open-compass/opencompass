@@ -34,5 +34,5 @@ with read_base():
     )
 
 LVEval_datasets = sum(
-    (v for k, v in locals().items() if k.endswith("_datasets")), []
+    (v for k, v in locals().items() if k.endswith('_datasets')), []
 )

@@ -5,7 +5,7 @@ models = [
     dict(
         type=HuggingFaceBaseModel,
         abbr='internlm2-7b-hf',
-        path="internlm/internlm2-7b",
+        path='internlm/internlm2-7b',
         max_out_len=1024,
         batch_size=8,
         run_cfg=dict(num_gpus=1),

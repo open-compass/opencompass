@@ -30,7 +30,7 @@ wnli_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt="""{adv_prompt}
 Sentence 1: {sentence1}
 Sentence 2: {sentence2}
@@ -45,7 +45,7 @@ Answer:"""),
 
 wnli_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
