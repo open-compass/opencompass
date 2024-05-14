@@ -49,7 +49,7 @@ for _name in bbh_multiple_choice_sets:
             template=f"Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: Let's think step by step."
         ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_out_len=512))
+        inferencer=dict(type=GenInferencer, max_out_len=512, stopping_criteria=['Q:']))
     bbh_eval_cfg = dict(
         evaluator=dict(type=BBHEvaluator_mcq),
         pred_role='BOT',
@@ -66,6 +66,7 @@ for _name in bbh_multiple_choice_sets:
             infer_cfg=bbh_infer_cfg.copy(),
             eval_cfg=bbh_eval_cfg.copy()))
 
+
 for _name in bbh_free_form_sets:
     with open(os.path.join(os.path.dirname(__file__), 'lib_prompt', f'{_name}.txt'), 'r') as f:
         _hint = f.read()
@@ -75,7 +76,7 @@ for _name in bbh_free_form_sets:
             template=f"Follow the given examples and answer the question.\n{_hint}\n\nQ: {{input}}\nA: Let's think step by step."
         ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_out_len=512))
+        inferencer=dict(type=GenInferencer, max_out_len=512, stopping_criteria=['Q:']))
     bbh_eval_cfg = dict(evaluator=dict(type=BBHEvaluator), pred_role='BOT')
 
     bbh_datasets.append(

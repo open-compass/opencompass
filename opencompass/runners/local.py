@@ -46,17 +46,19 @@ class LocalRunner(BaseRunner):
         lark_bot_url (str): Lark bot url.
     """
 
-    def __init__(
-        self,
-        task: ConfigDict,
-        max_num_workers: int = 16,
-        debug: bool = False,
-        max_workers_per_gpu: int = 1,
-        lark_bot_url: str = None,
-    ):
+    def __init__(self,
+                 task: ConfigDict,
+                 max_num_workers: int = 16,
+                 debug: bool = False,
+                 max_workers_per_gpu: int = 1,
+                 lark_bot_url: str = None,
+                 **kwargs):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.max_num_workers = max_num_workers
         self.max_workers_per_gpu = max_workers_per_gpu
+        logger = get_logger()
+        for k, v in kwargs.items():
+            logger.warning(f'Ignored argument in {self.__module__}: {k}={v}')
 
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
         """Launch multiple tasks.

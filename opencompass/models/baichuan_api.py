@@ -145,8 +145,8 @@ class BaiChuan(BaseAPIModel):
                 self.wait()
                 continue
             if raw_response.status_code == 200:
-
                 msg = response['choices'][0]['message']['content']
+                self.logger.debug(f'Generated: {msg}')
                 return msg
 
             if raw_response.status_code != 200:
