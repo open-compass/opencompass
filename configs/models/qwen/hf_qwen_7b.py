@@ -1,26 +1,12 @@
-from opencompass.models import HuggingFaceCausalLM
+from opencompass.models import HuggingFaceBaseModel
 
 models = [
     dict(
-        type=HuggingFaceCausalLM,
+        type=HuggingFaceBaseModel,
         abbr='qwen-7b-hf',
-        path="Qwen/Qwen-7B",
-        tokenizer_path='Qwen/Qwen-7B',
-        model_kwargs=dict(
-            device_map='auto',
-            trust_remote_code=True,
-        ),
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True,
-            use_fast=False,
-        ),
-        pad_token_id=151643,
-        min_out_len=1,
-        max_out_len=100,
-        max_seq_len=2048,
+        path='Qwen/Qwen-7B',
+        max_out_len=1024,
         batch_size=8,
-        run_cfg=dict(num_gpus=1, num_procs=1),
+        run_cfg=dict(num_gpus=1),
     )
 ]

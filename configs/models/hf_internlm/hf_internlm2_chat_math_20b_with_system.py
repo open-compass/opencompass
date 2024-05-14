@@ -7,7 +7,6 @@ _meta_template = dict(
         dict(role='SYSTEM', begin='[UNUSED_TOKEN_146]system\n', end='[UNUSED_TOKEN_145]\n'),
         dict(role='BOT', begin='[UNUSED_TOKEN_146]assistant\n', end='[UNUSED_TOKEN_145]\n', generate=True),
     ],
-    eos_token_id=92542
 )
 
 models = [

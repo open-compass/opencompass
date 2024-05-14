@@ -1,24 +1,12 @@
-from opencompass.models import HuggingFaceCausalLM
+from opencompass.models import HuggingFaceBaseModel
 
 models = [
     dict(
-        type=HuggingFaceCausalLM,
+        type=HuggingFaceBaseModel,
         abbr='aquila2-34b-hf',
-        path="BAAI/Aquila2-34B",
-        tokenizer_path='BAAI/Aquila2-34B',
-        model_kwargs=dict(
-            device_map='auto',
-            trust_remote_code=True,
-        ),
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True,
-            use_fast=False,
-        ),
-        max_out_len=100,
-        max_seq_len=2048,
+        path='BAAI/Aquila2-34B',
+        max_out_len=1024,
         batch_size=8,
-        run_cfg=dict(num_gpus=2, num_procs=1),
+        run_cfg=dict(num_gpus=2),
     )
 ]

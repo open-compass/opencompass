@@ -1,4 +1,6 @@
-"""PPL Inferencer."""
+# flake8: noqa
+# yapf: disable
+"""LogLikelihood(LL) Inferencer."""
 
 import os
 from typing import List, Optional
@@ -76,16 +78,13 @@ class LLInferencer(BaseInferencer):
 
         # 3. Get labels of all the classes
         if self.labels is None:
-            labels = retriever.get_labels(ice_template=ice_template,
-                                          prompt_template=prompt_template)
+            labels = retriever.get_labels(ice_template=ice_template, prompt_template=prompt_template)
         else:
             labels = self.labels
 
         # 4. Generate in-context examples for testing inputs
         for idx in range(len(ice_idx_list)):
-            ice.append(
-                retriever.generate_ice(ice_idx_list[idx],
-                                       ice_template=ice_template))
+            ice.append(retriever.generate_ice(ice_idx_list[idx], ice_template=ice_template))
         output_handler.save_ice(self.model.parse_template(ice, mode='ppl'))
 
         # 5. Calculating loglikelihood for prompts in each label's class
@@ -99,58 +98,41 @@ class LLInferencer(BaseInferencer):
             # 5.1 Generate prompts of current label and truncate
             # TODO: Refactor
             for idx in range(len(ice_idx_list)):
-                prompt = retriever.generate_label_prompt(
-                    idx,
-                    ice[idx],
-                    label,
-                    ice_template=ice_template,
-                    prompt_template=prompt_template)
+                prompt_kwargs = {
+                    'idx': idx,
+                    'ice': ice[idx],
+                    'label': label,
+                    'ice_template': ice_template,
+                    'prompt_template': prompt_template,
+                }
+                prompt = retriever.generate_label_prompt(**prompt_kwargs)
+                prompt_token_num = self.model.get_token_len_from_template(prompt, mode='ppl')
                 if self.max_seq_len is not None:
-                    prompt_token_num = self.model.get_token_len_from_template(
-                        prompt, mode='ppl')
-                    while len(ice_idx_list[idx]
-                              ) > 0 and prompt_token_num > self.max_seq_len:
+                    while len(ice_idx_list[idx]) > 0 and prompt_token_num > self.max_seq_len:
                         ice_idx_list[idx] = ice_idx_list[idx][:-1]
-                        ice[idx] = retriever.generate_ice(
-                            ice_idx_list[idx], ice_template=ice_template)
-                        prompt = retriever.generate_label_prompt(
-                            idx,
-                            ice[idx],
-                            label,
-                            ice_template=ice_template,
-                            prompt_template=prompt_template)
-                        prompt_token_num = self.model.get_token_len_from_template(  # noqa
-                            prompt, mode='ppl')  # noqa
+                        ice[idx] = retriever.generate_ice(ice_idx_list[idx], ice_template=ice_template)
+                        prompt_kwargs['ice'] = ice[idx]
+                        prompt = retriever.generate_label_prompt(**prompt_kwargs)
+                        prompt_token_num = self.model.get_token_len_from_template(prompt, mode='ppl')
 
                 prompt_list.append(prompt)
                 token_num_list.append(prompt_token_num)
                 cont_list.append(retriever.test_ds[idx]['cont'])
 
             # 5.2 Get loglikelihood
-            logger.info(
-                f"Calculating Loglikelihood for prompts labeled '{label}'"
-            )  # noqa
-            for idx in trange(0,
-                              len(prompt_list),
-                              self.batch_size,
-                              disable=not self.is_main_process):
+            logger.info(f"Calculating Loglikelihood for prompts labeled '{label}'")
+            for idx in trange(0, len(prompt_list), self.batch_size, disable=not self.is_main_process):
                 sub_prompt_list = prompt_list[idx:idx + self.batch_size]
                 sub_cont_list = cont_list[idx:idx + self.batch_size]
 
                 with torch.no_grad():
                     # mainly modify compared to PPLInferencer
-                    sub_inputs = self.model.parse_template(sub_prompt_list,
-                                                           mode='ppl')
-                    sub_res = self.model.get_loglikelihood(
-                        sub_inputs, sub_cont_list).tolist()
-                for res, prompt in zip(
-                        sub_res,
-                        self.model.parse_template(sub_prompt_list,
-                                                  mode='ppl')):
+                    sub_inputs = self.model.parse_template(sub_prompt_list, mode='ppl')
+                    sub_res = self.model.get_loglikelihood(sub_inputs, sub_cont_list).tolist()
+                for res, prompt in zip(sub_res, self.model.parse_template(sub_prompt_list, mode='ppl')):
                     sub_ppl_list.append(res)
                     ice_str = self.model.parse_template(ice[idx], mode='ppl')
-                    output_handler.save_prompt_and_loglikelihood(
-                        label, prompt.replace(ice_str, ''), prompt, res, index)
+                    output_handler.save_prompt_and_loglikelihood(label, prompt.replace(ice_str, ''), prompt, res, index)
                     index = index + 1
             ppl.append(sub_ppl_list)
 
@@ -169,13 +151,9 @@ class LLInferencer(BaseInferencer):
         # 8. Output
         if self.is_main_process:
             os.makedirs(output_json_filepath, exist_ok=True)
-            output_handler.write_to_json(output_json_filepath,
-                                         output_json_filename)
+            output_handler.write_to_json(output_json_filepath, output_json_filename)
 
-        return [
-            sample['prediction']
-            for sample in output_handler.results_dict.values()
-        ]
+        return [sample['prediction'] for sample in output_handler.results_dict.values()]
 
 
 class LLInferencerOutputHandler:

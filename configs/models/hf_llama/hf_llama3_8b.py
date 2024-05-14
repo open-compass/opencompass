@@ -1,21 +1,12 @@
-from opencompass.models import HuggingFaceCausalLM
-
+from opencompass.models import HuggingFaceBaseModel
 
 models = [
     dict(
-        type=HuggingFaceCausalLM,
-        abbr="llama-3-8b-hf",
-        path="meta-llama/Meta-Llama-3-8B",
-        model_kwargs=dict(device_map="auto"),
-        tokenizer_kwargs=dict(
-            padding_side="left",
-            truncation_side="left",
-            use_fast=False,
-        ),
-        max_out_len=100,
-        max_seq_len=2048,
+        type=HuggingFaceBaseModel,
+        abbr='llama-3-8b-hf',
+        path='meta-llama/Meta-Llama-3-8B',
+        max_out_len=1024,
         batch_size=8,
-        batch_padding=True,
-        run_cfg=dict(num_gpus=1, num_procs=1),
+        run_cfg=dict(num_gpus=1),
     )
 ]

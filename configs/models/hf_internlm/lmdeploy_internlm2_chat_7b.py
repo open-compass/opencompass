@@ -15,9 +15,8 @@ models = [
         path="internlm/internlm2-chat-7b",
         meta_template=_meta_template,
         engine_config=dict(
-            session_len=210000,
-            max_batch_size=8,
-            rope_scaling_factor=2.0,
+            session_len=32768,
+            max_batch_size=32,
             model_name="internlm2-chat-7b",
             tp=1,
             stop_words=[2, 92542],
@@ -29,8 +28,8 @@ models = [
             max_new_tokens=2000,
         ),
         max_out_len=2000,
-        max_seq_len=210000,
-        batch_size=1,
+        max_seq_len=32768,
+        batch_size=32,
         concurrency=8,
         run_cfg=dict(num_gpus=1, num_procs=1),
     )

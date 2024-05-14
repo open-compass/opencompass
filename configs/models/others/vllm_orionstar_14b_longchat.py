@@ -7,7 +7,6 @@ _meta_template = dict(
         dict(role="HUMAN", begin='Human: ', end='\n'),
         dict(role="BOT", begin="Assistant: ", end='</s>', generate=True),
     ],
-    eos_token_id=2
 )
 
 models = [
