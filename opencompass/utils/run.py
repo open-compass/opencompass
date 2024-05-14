@@ -5,7 +5,8 @@ import tabulate
 from mmengine.config import Config
 
 from opencompass.datasets.custom import make_custom_dataset_config
-from opencompass.models import VLLM, HuggingFaceCausalLM, TurboMindModel
+from opencompass.models import (VLLM, HuggingFace, HuggingFaceCausalLM,
+                                HuggingFaceChatGLM3, TurboMindModel)
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
@@ -190,7 +191,9 @@ def change_accelerator(models, accelerator):
     for model in models:
         get_logger().info(f'Transforming {model["abbr"]} to {accelerator}')
         # change HuggingFace model to VLLM or TurboMindModel
-        if model['type'] is HuggingFaceCausalLM:
+        if model['type'] in [
+                HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3
+        ]:
             gen_args = dict()
             if model.get('generation_kwargs') is not None:
                 generation_kwargs = model['generation_kwargs'].copy()
@@ -265,6 +268,8 @@ def change_accelerator(models, accelerator):
                         acc_model[item] = model[item]
             else:
                 raise ValueError(f'Unsupported accelerator {accelerator}')
+        else:
+            raise ValueError(f'Unsupported model type {model["type"]}')
         model_accels.append(acc_model)
     return model_accels
 
