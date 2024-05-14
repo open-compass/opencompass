@@ -75,6 +75,13 @@ for _name in agieval_single_choice_sets:
         _hint = '答案是：'
     else:
         _hint = 'The answer is '
+    agieval_infer_cfg = dict(
+        prompt_template=dict(
+            type=PromptTemplate,
+            template={
+                label: dict(round=[
+                    dict(role='HUMAN', prompt='{question}\n{options}'),
+                    dict(role='BOT', prompt=f'{_hint}{label}')
                 ])
                 for label in _options
             }),
