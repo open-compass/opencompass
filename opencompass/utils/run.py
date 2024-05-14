@@ -5,8 +5,8 @@ import tabulate
 from mmengine.config import Config
 
 from opencompass.datasets.custom import make_custom_dataset_config
-from opencompass.models import (VLLM, HuggingFaceBaseModel,
-                                HuggingFaceCausalLM,
+from opencompass.models import (VLLM, HuggingFace, HuggingFaceBaseModel,
+                                HuggingFaceCausalLM, HuggingFaceChatGLM3,
                                 HuggingFacewithChatTemplate, TurboMindModel)
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
