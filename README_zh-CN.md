@@ -163,19 +163,8 @@ python tools/list_configs.py llama mmlu
 你也可以通过命令行去评测其它 HuggingFace 模型。同样以 LLaMA-7b 为例：
 
 ```bash
-python run.py --datasets ceval_ppl mmlu_ppl \
---hf-path huggyllama/llama-7b \  # HuggingFace 模型地址
---model-kwargs device_map='auto' \  # 构造 model 的参数
---tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # 构造 tokenizer 的参数
---max-out-len 100 \  # 最长生成 token 数
---max-seq-len 2048 \  # 模型能接受的最大序列长度
---batch-size 8 \  # 批次大小
---no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
---num-gpus 1  # 运行该模型所需的最少 gpu 数
+python run.py --datasets ceval_ppl mmlu_ppl --hf-type base --hf-path huggyllama/llama-7b
 ```
-
-> **注意**<br />
-> 若需要运行上述命令，你需要删除所有从 `# ` 开始的注释。
 
 通过命令行或配置文件，OpenCompass 还支持评测 API 或自定义模型，以及更多样化的评测策略。请阅读[快速开始](https://opencompass.readthedocs.io/zh_CN/latest/get_started/quick_start.html)了解如何运行一个评测任务。
 

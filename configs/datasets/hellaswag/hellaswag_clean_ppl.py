@@ -13,8 +13,8 @@ hellaswag_infer_cfg = dict(
         type=PromptTemplate,
         template={
             i: dict(round=[
-                dict(role="HUMAN", prompt="{ctx}"),
-                dict(role="BOT", prompt=f"{{{chr(ord('A') + i)}}}"),
+                dict(role='HUMAN', prompt='{ctx}'),
+                dict(role='BOT', prompt=f"{{{chr(ord('A') + i)}}}"),
             ])
             for i in range(4)
         }),

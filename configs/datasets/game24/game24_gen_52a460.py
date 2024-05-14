@@ -15,7 +15,7 @@ game24_infer_cfg = dict(
         type=PromptTemplate,
         template='{input}'),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=ToTInferencer, generation_kwargs=generation_kwargs, method_generate='propose', 
+    inferencer=dict(type=ToTInferencer, generation_kwargs=generation_kwargs, method_generate='propose',
                     method_evaluate='value', method_select='greedy', n_evaluate_sample=3, n_select_sample=5, prompt_wrapper=dict(type=Game24PromptWrapper)))
 
 game24_eval_cfg = dict(

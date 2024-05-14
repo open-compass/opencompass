@@ -12,15 +12,15 @@ DRCD_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
-                prompt="根据文章回答问题。你的答案应该尽可能简练，请以 ‘答案是’ 开头的句式作答。\n文章：{context}\n问：{question}\n答："),
+                role='HUMAN',
+                prompt='根据文章回答问题。你的答案应该尽可能简练，请以 ‘答案是’ 开头的句式作答。\n文章：{context}\n问：{question}\n答：'),
         ])),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
 DRCD_eval_cfg = dict(
     evaluator=dict(type=EMEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=drcd_postprocess),
 
 )

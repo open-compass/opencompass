@@ -5,7 +5,7 @@ models = [
     dict(
         type=AlayaLM,
         abbr='alaya-7b-hf',
-        path="DataCanvas/Alaya-7B-Base",
+        path='DataCanvas/Alaya-7B-Base',
         tokenizer_path='DataCanvas/Alaya-7B-Base',
         tokenizer_kwargs=dict(padding_side='left',
                         truncation_side='left',

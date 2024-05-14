@@ -21,7 +21,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='CodeLlama-7b-Python',
-        path="codellama/CodeLlama-7b-Python-hf",
+        path='codellama/CodeLlama-7b-Python-hf',
         tokenizer_path='codellama/CodeLlama-7b-Python-hf',
         tokenizer_kwargs=dict(
             padding_side='left',

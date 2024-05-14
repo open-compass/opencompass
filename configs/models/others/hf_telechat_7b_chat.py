@@ -3,10 +3,9 @@ from opencompass.models import HuggingFaceCausalLM
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='<_user>'),
-        dict(role="BOT", begin="<_bot>", end='<_end>', generate=True),
+        dict(role='HUMAN', begin='<_user>'),
+        dict(role='BOT', begin='<_bot>', end='<_end>', generate=True),
     ],
-    eos_token_id=160133
 )
 
 models = [

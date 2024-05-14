@@ -13,8 +13,8 @@ chid_infer_cfg = dict(
         template={
             i: dict(
                 round=[
-                    dict(role="HUMAN", prompt=f"以下句子是否通顺？\n{{content{i}}}"),
-                    dict(role="BOT", prompt="这个句子是通顺的。"),
+                    dict(role='HUMAN', prompt=f'以下句子是否通顺？\n{{content{i}}}'),
+                    dict(role='BOT', prompt='这个句子是通顺的。'),
                 ], )
             for i in range(7)
         }),

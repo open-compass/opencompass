@@ -6,14 +6,14 @@ from opencompass.models import LLaMA2AccessoryModel
 
 models = [
     dict(
-        abbr="Accessory_sphinx_v2_1k",
+        abbr='Accessory_sphinx_v2_1k',
         type=LLaMA2AccessoryModel,
 
-        additional_stop_symbols=["###"],  # for models tuned with chat template
+        additional_stop_symbols=['###'],  # for models tuned with chat template
 
         # <begin> kwargs for accessory.MetaModel.from_pretrained
         # download from https://huggingface.co/Alpha-VLLM/LLaMA2-Accessory/tree/main/finetune/mm/SPHINX/SPHINX-v2-1k  # noqa
-        pretrained_path="path/to/sphinx_v2_1k",
+        pretrained_path='path/to/sphinx_v2_1k',
         llama_type=None,  # None for automatic probe from pretrained_path
         llama_config=None,  # None for automatic probe from pretrained_path
         tokenizer_path=None,  # None for automatic probe from pretrained_path

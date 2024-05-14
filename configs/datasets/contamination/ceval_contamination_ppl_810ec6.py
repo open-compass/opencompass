@@ -7,7 +7,7 @@ from opencompass.datasets import JsonlDataset
 ceval_datasets = []
 
 ceval_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template="{text}"),
+    prompt_template=dict(type=PromptTemplate, template='{text}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLOnlyInferencer),
 )
@@ -31,7 +31,7 @@ ceval_datasets.append(
 )
 
 ceval_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template="{rephrase}"),
+    prompt_template=dict(type=PromptTemplate, template='{rephrase}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLOnlyInferencer),
 )

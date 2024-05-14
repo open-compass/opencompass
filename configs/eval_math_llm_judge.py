@@ -68,7 +68,7 @@ Examples:
 (give benefit of the doubt to units)
 
     Expression 1: 64
-    Expression 2: 
+    Expression 2:
 
 [No]
 (only mark as equivalent if both expressions are nonempty)
@@ -80,7 +80,7 @@ YOUR TASK
 
 Respond with only "[Yes]" or "[No]" (without quotes). Do not include a rationale.
     Expression 1: {obj_gold}
-    Expression 2: {prediction} 
+    Expression 2: {prediction}
 
 """
 
@@ -99,7 +99,7 @@ for d in eng_datasets:
     d['eval_cfg']= dict(
         evaluator=dict(
             type=LMEvaluator,
-            # If you need to preprocess the prediction before judging, 
+            # If you need to preprocess the prediction before judging,
             # you can specify the pred_postprocessor function here
             pred_postprocessor=dict(type=math_judement_preprocess),
             prompt_template=dict(
@@ -112,7 +112,7 @@ for d in eng_datasets:
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
 infer = dict(

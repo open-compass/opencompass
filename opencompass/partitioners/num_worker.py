@@ -60,14 +60,16 @@ class NumWorkerPartitioner(BasePartitioner):
                     if osp.exists(filename):
                         continue
                     dataset_size = self.get_size(dataset)
-                    if dataset_size > self.min_task_size:
+                    if self.num_worker <= 1:
+                        chunks.append(dataset)
+                    elif dataset_size <= self.min_task_size:
+                        chunks.append(dataset)
+                    else:
                         root, ext = osp.splitext(filename)
                         dataset_splits = self.split_dataset(dataset)
                         for i, dataset_split in enumerate(dataset_splits):
                             if not osp.exists(f'{root}_{i}{ext}'):
                                 chunks.append(dataset_split)
-                    else:
-                        chunks.append(dataset)
 
                 if self.strategy == 'heuristic':
                     buckets = [[] for _ in range(self.num_worker)]

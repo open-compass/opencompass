@@ -16,22 +16,22 @@ cmnli_infer_cfg = dict(
             'contradiction':
             dict(round=[
                 dict(
-                    role="HUMAN",
-                    prompt="阅读文章：{sentence1}\n根据上文，回答如下问题：{sentence2}？"),
-                dict(role="BOT", prompt="错")
+                    role='HUMAN',
+                    prompt='阅读文章：{sentence1}\n根据上文，回答如下问题：{sentence2}？'),
+                dict(role='BOT', prompt='错')
             ]),
             'entailment':
             dict(round=[
                 dict(
-                    role="HUMAN",
-                    prompt="阅读文章：{sentence1}\n根据上文，回答如下问题：{sentence2}？"),
-                dict(role="BOT", prompt="对")
+                    role='HUMAN',
+                    prompt='阅读文章：{sentence1}\n根据上文，回答如下问题：{sentence2}？'),
+                dict(role='BOT', prompt='对')
             ]),
             'neutral':
             dict(round=[
                 dict(
-                    role="HUMAN", prompt="如果{sentence1}为真，那么{sentence2}也为真吗？"),
-                dict(role="BOT", prompt="可能")
+                    role='HUMAN', prompt='如果{sentence1}为真，那么{sentence2}也为真吗？'),
+                dict(role='BOT', prompt='可能')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),
@@ -41,7 +41,7 @@ cmnli_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 cmnli_datasets = [
     dict(
-        abbr="cmnli",
+        abbr='cmnli',
         type=cmnliDataset,
         path='./data/CLUE/cmnli/cmnli_public/dev.json',
         reader_cfg=cmnli_reader_cfg,

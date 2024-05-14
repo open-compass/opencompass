@@ -4,7 +4,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='rwkv-5-3b',
-        path="RWKV/rwkv-5-world-3b",
+        path='RWKV/rwkv-5-world-3b',
         tokenizer_path='RWKV/rwkv-5-world-3b',
         model_kwargs=dict(
             device_map='auto',

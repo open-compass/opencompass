@@ -5,9 +5,9 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import BoolQDataset_V3
 
 BoolQ_reader_cfg = dict(
-    input_columns=["question", "passage"],
-    output_column="label",
-    test_split="train")
+    input_columns=['question', 'passage'],
+    output_column='label',
+    test_split='train')
 
 BoolQ_infer_cfg = dict(
     prompt_template=dict(
@@ -15,13 +15,13 @@ BoolQ_infer_cfg = dict(
         template={
             'false':
             dict(round=[
-                dict(role="HUMAN", prompt="Passage: {passage}\nQuestion: {question}?"),
-                dict(role="BOT", prompt="Answer: No"),
+                dict(role='HUMAN', prompt='Passage: {passage}\nQuestion: {question}?'),
+                dict(role='BOT', prompt='Answer: No'),
             ]),
             'true':
             dict(round=[
-                dict(role="HUMAN", prompt="Passage: {passage}\nQuestion: {question}?"),
-                dict(role="BOT", prompt="Answer: Yes"),
+                dict(role='HUMAN', prompt='Passage: {passage}\nQuestion: {question}?'),
+                dict(role='BOT', prompt='Answer: Yes'),
             ]),
         },
     ),
@@ -33,9 +33,9 @@ BoolQ_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 BoolQ_datasets = [
     dict(
-        abbr="BoolQ",
+        abbr='BoolQ',
         type=BoolQDataset_V3,
-        path="./data/SuperGLUE/BoolQ/val.jsonl",
+        path='./data/SuperGLUE/BoolQ/val.jsonl',
         reader_cfg=BoolQ_reader_cfg,
         infer_cfg=BoolQ_infer_cfg,
         eval_cfg=BoolQ_eval_cfg,

@@ -26,11 +26,11 @@ print(next(iter(ds))["question"])
 ## Evaluation results
 
 
-| dataset              | metric   | CodeLlama-7b-Python | internlm2-chat-1.8b-sft-hf  | internlm2-chat-7b-sft-hf | internlm2-chat-20b-sft-hf | 
+| dataset              | metric   | CodeLlama-7b-Python | internlm2-chat-1.8b-sft-hf  | internlm2-chat-7b-sft-hf | internlm2-chat-20b-sft-hf |
 |-----------------------|----------|-------------|-------------|-------------|-------------|
-| apps_mini                   | pass@1   | 1.3         | 0.7           | 7.1           | 9.3           | 
+| apps_mini                   | pass@1   | 1.3         | 0.7           | 7.1           | 9.3           |
 
-Please refer to Table 3 of [code llama](https://scontent-nrt1-2.xx.fbcdn.net/v/t39.2365-6/369856151_1754812304950972_1159666448927483931_n.pdf?_nc_cat=107&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=TxT1PKkNBZoAX8zMHbm&_nc_ht=scontent-nrt1-2.xx&oh=00_AfDmmQAPzqX1-QOKIDUV5lGKzaZqt0CZUVtxFjHtnh6ycQ&oe=65F5AF8F) for original results if needed. 
+Please refer to Table 3 of [code llama](https://scontent-nrt1-2.xx.fbcdn.net/v/t39.2365-6/369856151_1754812304950972_1159666448927483931_n.pdf?_nc_cat=107&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=TxT1PKkNBZoAX8zMHbm&_nc_ht=scontent-nrt1-2.xx&oh=00_AfDmmQAPzqX1-QOKIDUV5lGKzaZqt0CZUVtxFjHtnh6ycQ&oe=65F5AF8F) for original results if needed.
 
 ## Citation
 ```

@@ -28,9 +28,9 @@ def solution():
 
 protocol = dict(
     type=ReActProtocol,
-    action=dict(role="ACTION", begin="Tool:", end="\n"),
-    action_input=dict(role="ARGS", begin="Tool Input:", end="\n"),
-    finish=dict(role="FINISH", begin="FinalAnswer:", end="\n"),
+    action=dict(role='ACTION', begin='Tool:', end='\n'),
+    action_input=dict(role='ARGS', begin='Tool Input:', end='\n'),
+    finish=dict(role='FINISH', begin='FinalAnswer:', end='\n'),
     call_protocol=system_prompt,
 )
 

@@ -75,7 +75,7 @@ def get_hash(path):
 
 def check_and_rename(filepath):
     base_name = os.path.basename(filepath)
-    match = re.match(r'(.*)_(gen|ppl|ll)_(.*).py', base_name)
+    match = re.match(r'(.*)_(gen|ppl|ll|mixed)_(.*).py', base_name)
     if match:
         dataset, mode, old_hash = match.groups()
         new_hash = get_hash(filepath)

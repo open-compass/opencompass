@@ -8,7 +8,7 @@ with read_base():
 
     from .datasets.TheoremQA.TheoremQA_5shot_gen_6f0af8 import TheoremQA_datasets as datasets
 
-models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
+models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 work_dir = 'outputs/TheoremQA-5shot'
 

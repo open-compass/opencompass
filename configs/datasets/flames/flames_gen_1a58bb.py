@@ -15,7 +15,7 @@ subjective_all_sets = [
 
 
 #this is the path to flames dataset
-data_path ="./data/flames"
+data_path ='./data/flames'
 
 flames_datasets = []
 
@@ -47,12 +47,12 @@ for _name in subjective_all_sets:
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     flames_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=FlamesDataset,
             path=data_path,
             name=_name,

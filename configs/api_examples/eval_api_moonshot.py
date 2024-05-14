@@ -37,4 +37,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_moonshot/"
+work_dir = 'outputs/api_moonshot/'

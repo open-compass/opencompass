@@ -12,10 +12,10 @@ ARC_c_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            "A": "Question: {question}\nAnswer: {textA}",
-            "B": "Question: {question}\nAnswer: {textB}",
-            "C": "Question: {question}\nAnswer: {textC}",
-            "D": "Question: {question}\nAnswer: {textD}"
+            'A': 'Question: {question}\nAnswer: {textA}',
+            'B': 'Question: {question}\nAnswer: {textB}',
+            'C': 'Question: {question}\nAnswer: {textC}',
+            'D': 'Question: {question}\nAnswer: {textD}'
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

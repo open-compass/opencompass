@@ -41,7 +41,7 @@ for mdl in models:
 
 infer = dict(
     # The OpenCompass implementation of BPC currently only supports NaivePartitioner, as the sliding window approach requires the dataset to be loaded sequentially. Using other partitioner types may produce incorrect results.
-    partitioner=dict(type=NaivePartitioner),  
+    partitioner=dict(type=NaivePartitioner),
     runner=dict(
         type=LocalRunner,
         task=dict(type=OpenICLInferTask),

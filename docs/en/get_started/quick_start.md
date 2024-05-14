@@ -80,13 +80,8 @@ For HuggingFace models, users can set model parameters directly through the comm
 
 ```bash
 python run.py --datasets siqa_gen winograd_ppl \
---hf-path facebook/opt-125m \
---model-kwargs device_map='auto' \
---tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \
---max-seq-len 2048 \
---max-out-len 100 \
---batch-size 128  \
---num-gpus 1  # Number of minimum required GPUs
+--hf-type base \
+--hf-path facebook/opt-125m
 ```
 
 Note that in this way, OpenCompass only evaluates one model at a time, while other ways can evaluate multiple models at once.
@@ -99,12 +94,14 @@ Note that in this way, OpenCompass only evaluates one model at a time, while oth
 :animate: fade-in-slide-down
 ```bash
 python run.py --datasets siqa_gen winograd_ppl \
+--hf-type base \  # HuggingFace model type, base or chat
 --hf-path facebook/opt-125m \  # HuggingFace model path
 --tokenizer-path facebook/opt-125m \  # HuggingFace tokenizer path (if the same as the model path, can be omitted)
 --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # Arguments to construct the tokenizer
 --model-kwargs device_map='auto' \  # Arguments to construct the model
 --max-seq-len 2048 \  # Maximum sequence length the model can accept
 --max-out-len 100 \  # Maximum number of tokens to generate
+--min-out-len 100 \  # Minimum number of tokens to generate
 --batch-size 64  \  # Batch size
 --num-gpus 1  # Number of GPUs required to run the model
 ```
@@ -146,28 +143,22 @@ python run.py configs/eval_demo.py
 OpenCompass provides a series of pre-defined model configurations under `configs/models`. Below is the configuration snippet related to [opt-350m](https://github.com/open-compass/opencompass/blob/main/configs/models/opt/hf_opt_350m.py) (`configs/models/opt/hf_opt_350m.py`):
 
 ```python
-# Evaluate models supported by HuggingFace's `AutoModelForCausalLM` using `HuggingFaceCausalLM`
-from opencompass.models import HuggingFaceCausalLM
+# Evaluate models supported by HuggingFace's `AutoModelForCausalLM` using `HuggingFaceBaseModel`
+from opencompass.models import HuggingFaceBaseModel
 
-# OPT-350M
-opt350m = dict(
-       type=HuggingFaceCausalLM,
-       # Initialization parameters for `HuggingFaceCausalLM`
-       path='facebook/opt-350m',
-       tokenizer_path='facebook/opt-350m',
-       tokenizer_kwargs=dict(
-           padding_side='left',
-           truncation_side='left',
-           proxies=None,
-           trust_remote_code=True),
-       model_kwargs=dict(device_map='auto'),
-       # Below are common parameters for all models, not specific to HuggingFaceCausalLM
-       abbr='opt350m',               # Model abbreviation for result display
-       max_seq_len=2048,             # The maximum length of the entire sequence
-       max_out_len=100,              # Maximum number of generated tokens
-       batch_size=64,                # batchsize
-       run_cfg=dict(num_gpus=1),     # The required GPU numbers for this model
+models = [
+    # OPT-350M
+    dict(
+        type=HuggingFaceBaseModel,
+        # Initialization parameters for `HuggingFaceBaseModel`
+        path='facebook/opt-350m',
+        # Below are common parameters for all models, not specific to HuggingFaceBaseModel
+        abbr='opt-350m-hf',         # Model abbreviation
+        max_out_len=1024,           # Maximum number of generated tokens
+        batch_size=32,              # Batch size
+        run_cfg=dict(num_gpus=1),   # The required GPU numbers for this model
     )
+]
 ```
 
 When using configurations, we can specify the relevant files through the command-line argument ` --models` or import the model configurations into the  `models` list in the configuration file using the inheritance mechanism.

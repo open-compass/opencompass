@@ -9,7 +9,7 @@ from opencompass.utils.text_postprocessors import first_option_postprocess
 
 few_shot_prompts = {
     'single_choice_prompts': {
-        "single_choice_cn": [
+        'single_choice_cn': [
             dict(role='HUMAN', prompt='问题: 毕东作为刘红的爸爸，对刘红的成长有重要影响。 \n在上面提供的打乱的家族关系文本中，"刘红"的能够向上追溯到的最年长的亲人是谁？\nA. 毕东\nB. 刘红\nC. 李清亮\nD. 王展\n'),
             dict(role='BOT', prompt='回答: A'),
             dict(role='HUMAN', prompt='问题: 梅建平作为黄玉兰的姥姥，对黄玉兰的成长有重要影响。梅建平的妈妈是朱丽丽。蓝鑫把黄玉兰视为其母亲。焦慧不仅是朱丽丽的妈妈，还是朱丽丽的榜样。 \n在上面提供的打乱的家族关系文本中，"蓝鑫"的能够向上追溯到的最年长的亲人是谁？\nA. 梅建平\nB. 朱丽丽\nC. 蓝鑫\nD. 焦慧\n'),
@@ -20,7 +20,7 @@ few_shot_prompts = {
             dict(role='BOT', prompt='回答: D'),
             dict(role='HUMAN', prompt='问题: {question}'),
         ],
-        "single_choice_en": [
+        'single_choice_en': [
             dict(role='HUMAN', prompt="Question: Jasmine Lane plays the role of James Hill's father in James Hill's life. \nGiven the scrambled family relationships described above, who is the eldest relative that 'James Hill' can trace back to in the context?\nA. Jasmine Lane\nB. James Hill\nC. Christopher Flores\nD. Paula Reeves\n"),
             dict(role='BOT', prompt='Answer: A'),
             dict(role='HUMAN', prompt="Question: For Michael Goodwin, Annette Valdez is not just a dad, but also a friend.For Annette Valdez, Mary Sanders is not just a father, but also a friend. \nGiven the scrambled family relationships described above, who is the eldest relative that 'Michael Goodwin' can trace back to in the context?\nA. Michael Goodwin\nB. Annette Valdez\nC. Mary Sanders\nD. James Mitchell\n"),
@@ -31,12 +31,12 @@ few_shot_prompts = {
             dict(role='BOT', prompt='Answer: B'),
             dict(role='HUMAN', prompt='Question: {question}'),
         ],
-        "single_choice_cn_reasoning": [
+        'single_choice_cn_reasoning': [
             dict(role='HUMAN', prompt='问题: 毕东作为刘红的爸爸，对刘红的成长有重要影响。 \n在上面提供的打乱的家族关系文本中，"刘红"的能够向上追溯到的最年长的亲人是谁？\nA. 毕东\nB. 刘红\nC. 李清亮\nD. 王展\n'),
             dict(role='BOT', prompt='回答: 根据提供的信息，我们可以构建以下家族关系链：\n\n- 刘红的爸爸是毕东。\n\n因此，"刘红"能够向上追溯到的最年长的亲人是毕东。所以答案是：A'),
 
             dict(role='HUMAN', prompt='问题: 梅建平作为黄玉兰的姥姥，对黄玉兰的成长有重要影响。梅建平的妈妈是朱丽丽。蓝鑫把黄玉兰视为其母亲。焦慧不仅是朱丽丽的妈妈，还是朱丽丽的榜样。 \n在上面提供的打乱的家族关系文本中，"蓝鑫"的能够向上追溯到的最年长的亲人是谁？\nA. 梅建平\nB. 朱丽丽\nC. 蓝鑫\nD. 焦慧\n'),
-            dict(role='BOT', prompt='回答: 根据提供的信息，我们可以构建以下家族关系链：\n\n- 黄玉兰的姥姥是梅建平。\n- 梅建平的妈妈是朱丽丽。\n- 朱丽丽的妈妈是焦慧。\n- 蓝鑫把黄玉兰视为其母亲。\n\n因此，"蓝鑫"能够向上追溯到的最年长的亲人是焦慧。所以答案是：D'),
+            dict(role='BOT', prompt='回答: 根据提供的信息，我们可以构建以下家族关系链：\n\n- 蓝鑫把黄玉兰视为其母亲。\n- 黄玉兰的姥姥是梅建平。\n- 梅建平的妈妈是朱丽丽。\n- 朱丽丽的妈妈是焦慧。\n\n因此，"蓝鑫"能够向上追溯到的最年长的亲人是焦慧。所以答案是：D'),
 
             dict(role='HUMAN', prompt='问题: 毕东把柳金凤视为其姥姥。奉兵作为柳金凤的妈妈，对柳金凤的成长有重要影响。余萍把杨颖视为其爸爸。毕东在郭建华的生命中扮演着父亲的角色。常宁的外公是余萍。刘慧是郭建华所生的孩子。刘慧在杨颖的生命中扮演着外公的角色。 \n在上面提供的打乱的家族关系文本中，"常宁"的能够向上追溯到的最年长的亲人是谁？\nA. 柳金凤\nB. 毕东\nC. 奉兵\nD. 余萍\n'),
             dict(role='BOT', prompt='回答: 根据提供的信息，我们可以构建以下家族关系链：\n\n- 常宁的外公是余萍。\n- 余萍把杨颖视为其爸爸。\n- 杨颖的外公是刘慧。\n- 刘慧是郭建华所生的孩子。\n- 郭建华的父亲是毕东。\n- 毕东的姥姥是柳金凤。\n- 柳金凤的妈妈是奉兵。\n\n因此，"常宁"能够向上追溯到的最年长的亲人是奉兵。所以答案是：C'),
@@ -45,7 +45,7 @@ few_shot_prompts = {
             dict(role='BOT', prompt='回答: 根据提供的信息，我们可以构建以下家族关系链：\n\n- 郑玉珍的外婆是谢平。\n- 谢平的奶奶是魏丽丽。\n- 魏丽丽的外公是魏阳。 \n- 魏阳的姥姥是郭兵。\n- 郭兵的爷爷是李建国。 \n- 李建国的外婆是丁颖。 \n- 丁颖的外公是武波。 \n- 武波的父亲是刘瑜。\n- 刘瑜的爷爷是许玲。\n- 许玲的父亲是余桂芳。 \n\n因此，"郑玉珍"能够向上追溯到的最年长的亲人是余桂芳。所以答案是：D'),
             dict(role='HUMAN', prompt='问题: {question}'),
         ],
-        "single_choice_en_reasoning": [
+        'single_choice_en_reasoning': [
             dict(role='HUMAN', prompt="Question: Sharon House, as Jessica Stewart's father, has a significant impact on Jessica Stewart's upbringing. \nGiven the scrambled family relationships described above, who is the eldest relative that 'Jessica Stewart' can trace back to in the context?\nA. Jack Burch\nB. Jessica Stewart\nC. Sharon House\nD. Carolyn Jackson\n"),
             dict(role='BOT', prompt="Answer: Based on the provided information, we can construct the following family relationship chain：\n\n- Sharon House, as Jessica Stewart's father, has a significant impact on Jessica Stewart's upbringing.\n\nTherefore, the eldest relative that 'Jessica Stewart' can trace back to in the context is Sharon House. The answer is: C"),
             dict(role='HUMAN', prompt="Question: For Robert Hill, Mikayla Scott is not just a paternal grandfather, but also a friend.Jacob Oconnor's paternal grandmother is Robert Hill. \nGiven the scrambled family relationships described above, who is the eldest relative that 'Jacob Oconnor' can trace back to in the context?\nA. Laura Holland\nB. Robert Hill\nC. Jacob Oconnor\nD. Mikayla Scott\n"),
@@ -92,8 +92,8 @@ for _name in list(single_choice_prompts.keys()):
 needlebench_datasets = []
 
 
-needlebench_atc_reader_cfg = dict(input_columns=["question"],
-                                  output_column="answer")
+needlebench_atc_reader_cfg = dict(input_columns=['question'],
+                                  output_column='answer')
 
 for _name in list(single_choice_prompts.keys()):
 
@@ -116,7 +116,7 @@ for _name in list(single_choice_prompts.keys()):
     for num_needles in current_needle_num_list:
         abbr = (f'NeedleBenchATCDataset-'
                 f'{num_needles}Needle-{"EN" if "en" in _name else "ZH"}')
-        language = "English" if "en" in _name else "Chinese"
+        language = 'English' if 'en' in _name else 'Chinese'
         if 'reasoning' in _name:
             abbr += '-Reasoning'
         dataset_dict = {

@@ -11,7 +11,7 @@ s3eval_cfg = dict(evaluator=dict(type=S3EvalEvaluator))
 s3eval_datasets = [
     dict(
         type=S3EvalDataset,
-        abbr="s3eval",
+        abbr='s3eval',
         path='FangyuLei/s3eval',
         eval_cfg=s3eval_cfg)
 ]

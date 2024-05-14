@@ -6,8 +6,8 @@ from opencompass.datasets import ARCDataset
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 ARC_c_reader_cfg = dict(
-    input_columns=["question", "textA", "textB", "textC", "textD"],
-    output_column="answerKey")
+    input_columns=['question', 'textA', 'textB', 'textC', 'textD'],
+    output_column='answerKey')
 
 ARC_c_infer_cfg = dict(
     prompt_template=dict(
@@ -15,9 +15,9 @@ ARC_c_infer_cfg = dict(
         template=dict(
             round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "Question: {question}\nA. {textA}\nB. {textB}\nC. {textC}\nD. {textD}\nAnswer:"
+                    'Question: {question}\nA. {textA}\nB. {textB}\nC. {textC}\nD. {textD}\nAnswer:'
                 )
             ], ),
     ),
@@ -27,15 +27,15 @@ ARC_c_infer_cfg = dict(
 
 ARC_c_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'),
 )
 
 ARC_c_datasets = [
     dict(
-        abbr="ARC-c",
+        abbr='ARC-c',
         type=ARCDataset,
-        path="./data/ARC/ARC-c/ARC-Challenge-Dev.jsonl",
+        path='./data/ARC/ARC-c/ARC-Challenge-Dev.jsonl',
         reader_cfg=ARC_c_reader_cfg,
         infer_cfg=ARC_c_infer_cfg,
         eval_cfg=ARC_c_eval_cfg,

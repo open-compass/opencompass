@@ -81,17 +81,17 @@ cmmlu_all_sets = list(cmmlu_subject_mapping.keys())
 cmmlu_datasets = []
 for _name in cmmlu_all_sets:
     _ch_name = cmmlu_subject_mapping[_name]
-    hint = f"以下是关于{_ch_name}的单项选择题，请直接给出正确答案的选项。"
-    question_and_options = "题目：{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}"
+    hint = f'以下是关于{_ch_name}的单项选择题，请直接给出正确答案的选项。'
+    question_and_options = '题目：{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}'
     cmmlu_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
-            template={answer: f"{question_and_options}\n答案是: {answer}\n" for answer in ["A", "B", "C", "D"]},
+            template={answer: f'{question_and_options}\n答案是: {answer}\n' for answer in ['A', 'B', 'C', 'D']},
         ),
         prompt_template=dict(
             type=PromptTemplate,
-            template={answer: f"{hint}\n</E>{question_and_options}\n答案是: {answer}" for answer in ["A", "B", "C", "D"]},
-            ice_token="</E>",
+            template={answer: f'{hint}\n</E>{question_and_options}\n答案是: {answer}' for answer in ['A', 'B', 'C', 'D']},
+            ice_token='</E>',
         ),
         retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
         inferencer=dict(type=PPLInferencer),
@@ -102,13 +102,13 @@ for _name in cmmlu_all_sets:
     cmmlu_datasets.append(
         dict(
             type=CMMLUDataset,
-            path="./data/cmmlu/",
+            path='./data/cmmlu/',
             name=_name,
-            abbr=f"cmmlu-{_name}",
+            abbr=f'cmmlu-{_name}',
             reader_cfg=dict(
-                input_columns=["question", "A", "B", "C", "D"],
-                output_column="answer",
-                train_split="dev",
+                input_columns=['question', 'A', 'B', 'C', 'D'],
+                output_column='answer',
+                train_split='dev',
                 test_split='test'),
             infer_cfg=cmmlu_infer_cfg,
             eval_cfg=cmmlu_eval_cfg,

@@ -25,8 +25,8 @@ api_meta_template = dict(
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='<|im_start|>user\n', end='<|im_end|>\n'),
-        dict(role="BOT", begin="<|im_start|>assistant\n", end='<|im_end|>\n', generate=True),
+        dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
+        dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
     ],
     eos_token_id=151645,
 )
@@ -35,7 +35,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='qwen1.5-7b-chat-hf',
-        path="Qwen/Qwen1.5-7B-Chat",
+        path='Qwen/Qwen1.5-7B-Chat',
         model_kwargs=dict(
             device_map='auto',
             trust_remote_code=True
@@ -79,7 +79,7 @@ judge_models = [dict(
     abbr='GPT4-Turbo',
     type=OpenAI,
     path='gpt-4-1106-preview',
-    key='',  
+    key='',
         meta_template=api_meta_template,
         query_per_second=1,
         max_out_len=1024,

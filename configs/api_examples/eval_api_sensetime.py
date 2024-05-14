@@ -24,17 +24,17 @@ models = [
         max_seq_len=2048,
         batch_size=8,
         parameters={
-            "temperature": 0.8,
-            "top_p": 0.7,
-            "max_new_tokens": 1024,
-            "repetition_penalty": 1.05,
-            "know_ids": [],
-            "stream": True,
-            "user": "#*#***TestUser***#*#",
-            "knowledge_config": {
-                "control_level": "normal",
-                "knowledge_base_result": False,
-                "online_search_result": False
+            'temperature': 0.8,
+            'top_p': 0.7,
+            'max_new_tokens': 1024,
+            'repetition_penalty': 1.05,
+            'know_ids': [],
+            'stream': True,
+            'user': '#*#***TestUser***#*#',
+            'knowledge_config': {
+                'control_level': 'normal',
+                'knowledge_base_result': False,
+                'online_search_result': False
             }
         }
     )
@@ -49,4 +49,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_sensetime/"
+work_dir = 'outputs/api_sensetime/'

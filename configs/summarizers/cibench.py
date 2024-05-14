@@ -41,14 +41,14 @@ summarizer = dict(
         'cibench_template_cn_oracle:numeric_correct',
         'cibench_template_cn_oracle:text_score',
         'cibench_template_cn_oracle:vis_sim',
-        '######## CIBench Category Metric ########', 
+        '######## CIBench Category Metric ########',
         'cibench_data_manipulation:scores',
         'cibench_data_visualization:scores',
         'cibench_modeling:scores',
         'cibench_nlp:scores',
         'cibench_ip:scores',
         'cibench_math:scores',
-        '######## CIBench Category Metric Oracle ########', 
+        '######## CIBench Category Metric Oracle ########',
         'cibench_data_manipulation_oracle:scores',
         'cibench_data_visualization_oracle:scores',
         'cibench_modeling_oracle:scores',
@@ -58,5 +58,5 @@ summarizer = dict(
 
     ],
     summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith("_summary_groups")], [])
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], [])
 )

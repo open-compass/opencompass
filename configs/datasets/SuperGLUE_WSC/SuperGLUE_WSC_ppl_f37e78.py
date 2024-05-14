@@ -12,8 +12,8 @@ WSC_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "{text}",
-            1: "{new_text}"
+            0: '{text}',
+            1: '{new_text}'
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

@@ -9,16 +9,16 @@ iwslt2017_reader_cfg = dict(
     input_columns='en', output_column='de', train_split='validation')
 
 original_prompt_list = [
-        "Translate the provided sentence from English to German while maintaining the original meaning and context:",
-        "Convert the following sentence from its original English language to the target language German:",
-        "Given the sentence below, perform a machine translation from English to German:",
-        "Translate the subsequent sentence from its source language English into the desired language German:",
-        "Accurately translate the sentence from English to German, ensuring the meaning remains intact:",
-        "Please perform a translation of the given sentence, converting it from English to German:",
-        "Translate the following text from the source language English to the target language German:",
-        "Using machine translation, convert the given sentence from English into the German language:",
-        "Translate the subsequent text passage from its original English language to the German language:",
-        "Perform a machine translation for the provided sentence, changing it from English to German:",
+        'Translate the provided sentence from English to German while maintaining the original meaning and context:',
+        'Convert the following sentence from its original English language to the target language German:',
+        'Given the sentence below, perform a machine translation from English to German:',
+        'Translate the subsequent sentence from its source language English into the desired language German:',
+        'Accurately translate the sentence from English to German, ensuring the meaning remains intact:',
+        'Please perform a translation of the given sentence, converting it from English to German:',
+        'Translate the following text from the source language English to the target language German:',
+        'Using machine translation, convert the given sentence from English into the German language:',
+        'Translate the subsequent text passage from its original English language to the German language:',
+        'Perform a machine translation for the provided sentence, changing it from English to German:',
 ]
 
 iwslt2017_infer_cfg = dict(

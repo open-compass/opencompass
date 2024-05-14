@@ -13,8 +13,8 @@ winogrande_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            1: "{opt1}",
-            2: "{opt2}",
+            1: '{opt1}',
+            2: '{opt2}',
         }
     ),
     retriever=dict(type=ZeroRetriever),

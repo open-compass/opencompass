@@ -6,7 +6,7 @@ from opencompass.datasets import OBQADataset_V2
 
 obqa_reader_cfg = dict(
     input_columns=['question_stem', 'A', 'B', 'C', 'D', 'fact1'],
-    output_column="answerKey"
+    output_column='answerKey'
 )
 obqa_infer_cfg = dict(
     prompt_template=dict(
@@ -15,10 +15,10 @@ obqa_infer_cfg = dict(
             ans: dict(
                 round=[
                     dict(
-                        role="HUMAN",
-                        prompt="We know the fact that {fact1}.\nQuestion: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n"
+                        role='HUMAN',
+                        prompt='We know the fact that {fact1}.\nQuestion: {question_stem}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n'
                     ),
-                    dict(role="BOT", prompt=f"Answer: {ans}"),
+                    dict(role='BOT', prompt=f'Answer: {ans}'),
                 ], )
             for ans in ['A', 'B', 'C', 'D']
         }
