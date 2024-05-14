@@ -6,7 +6,7 @@ with read_base():
     from .datasets.nq.nq_open_gen_e93f8a import nq_datasets
     from .datasets.gsm8k.gsm8k_gen_3309bd import gsm8k_datasets
     from .datasets.humaneval.humaneval_gen_a82cae import humaneval_datasets
-    from .datasets.agieval.agieval_mixed_2f14ad import agieval_datasets
+    from .datasets.agieval.agieval_mixed_713d14 import agieval_datasets
     from .datasets.SuperGLUE_BoolQ.SuperGLUE_BoolQ_ppl_314797 import BoolQ_datasets
     from .datasets.hellaswag.hellaswag_ppl_a6e128 import hellaswag_datasets
     from .datasets.obqa.obqa_ppl_6aac9e import obqa_datasets
