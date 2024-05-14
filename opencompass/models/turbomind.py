@@ -52,13 +52,10 @@ class TurboMindModel(BaseModel):
         from lmdeploy.turbomind import TurboMind
         from lmdeploy.version import version_info
 
+        self.logger = get_logger()
         if engine_config is not None:
             from lmdeploy.messages import TurbomindEngineConfig
             engine_config = TurbomindEngineConfig(**engine_config)
-        if gen_config is not None:
-            from lmdeploy.messages import EngineGenerationConfig
-            gen_config = EngineGenerationConfig(**gen_config)
-        self.logger = get_logger()
         tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
         self.tokenizer = tm_model.tokenizer
         self.generators = [
