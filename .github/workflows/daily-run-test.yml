@@ -14,6 +14,9 @@ env:
   PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
   USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
+  HF_DATASETS_OFFLINE: 1
+  TRANSFORMERS_OFFLINE: 1
+  HF_HUB_OFFLINE: 1
 
 jobs:
   daily_run_test:
@@ -42,7 +45,7 @@ jobs:
           cp -r ${{env.USERSPACE_PREFIX}}/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
-          export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1;
+          export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1; export HF_HUB_OFFLINE=1;
       - name:  Run test
         run: |
           eval "$(conda shell.bash hook)"

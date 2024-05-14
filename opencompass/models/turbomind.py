@@ -55,9 +55,6 @@ class TurboMindModel(BaseModel):
         if engine_config is not None:
             from lmdeploy.messages import TurbomindEngineConfig
             engine_config = TurbomindEngineConfig(**engine_config)
-        if gen_config is not None:
-            from lmdeploy.messages import EngineGenerationConfig
-            gen_config = EngineGenerationConfig(**gen_config)
         self.logger = get_logger()
         tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
         self.tokenizer = tm_model.tokenizer
@@ -106,6 +103,7 @@ class TurboMindModel(BaseModel):
                 t = self.tokenizer.encode(t, add_bos=False)
                 stop_words.append(t[0])
             gen_config['stop_words'] = list(set(stop_words))
+        gen_config.setdefault('min_new_tokens', 1)
 
         from lmdeploy.messages import EngineGenerationConfig
         gen_config = EngineGenerationConfig(**gen_config)
@@ -123,6 +121,9 @@ class TurboMindModel(BaseModel):
                         [gen_config] * len(batch_input),
                     ))
                 results += _results
+        if stopping_criteria:
+            for s in stopping_criteria:
+                results = [r.split(s)[0] for r in results]
         return results
 
     def get_token_len(self, prompt: str) -> int:
