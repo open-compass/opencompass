@@ -2,7 +2,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .groups.cibench import cibench_summary_groups
+    from .groups.legacy.cibench import cibench_summary_groups
     from .groups.plugineval import plugineval_summary_groups
 
 

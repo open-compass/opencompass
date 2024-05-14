@@ -158,6 +158,7 @@ class DLCRunner(BaseRunner):
                     shell_cmd += f'export {extra_env}; '
 
             shell_cmd += f'cd {pwd}; '
+            shell_cmd += 'umask 0000; '
             shell_cmd += '{task_cmd}'
 
             tmpl = ('dlc create job'
@@ -195,7 +196,10 @@ class DLCRunner(BaseRunner):
                 index_to_start = 0
                 while index_to_start < num_retry_to_start:
                     index_to_start += 1
-                    output = subprocess.getoutput(cmd)
+                    try:
+                        output = subprocess.getoutput(cmd)
+                    except BlockingIOError:
+                        output = ''
                     match = re.search(r'\|\s+(dlc[0-9a-z]+)\s+\|', output)
                     if match is None:
                         stdout.write('Failed to get job id from output:')
@@ -264,7 +268,10 @@ class DLCRunner(BaseRunner):
                                 f" -c {self.aliyun_cfg['dlc_config_path']}"
                                 f' --start_time {pri_time}'
                                 f' --end_time {cur_time}')
-                    log_output = subprocess.getoutput(logs_cmd)
+                    try:
+                        log_output = subprocess.getoutput(logs_cmd)
+                    except BlockingIOError:
+                        log_output = '[WARN] No logs found for the pod'
 
                     if '[WARN] No logs found for the pod' not in log_output:
                         pri_time = cur_time

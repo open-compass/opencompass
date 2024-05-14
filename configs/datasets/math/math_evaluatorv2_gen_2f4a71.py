@@ -38,7 +38,7 @@ Problem:
 Solution:"""
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=512))
+    inferencer=dict(type=GenInferencer, max_out_len=512, stopping_criteria=['Problem']))
 
 # postprocess v2
 math_eval_cfg = dict(
