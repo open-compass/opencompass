@@ -1,6 +1,6 @@
 # flake8: noqa
 # yapf: disable
-"""LL Inferencer."""
+"""LogLikelihood(LL) Inferencer."""
 
 import os
 from typing import List, Optional
