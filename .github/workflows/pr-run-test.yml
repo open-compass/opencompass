@@ -54,10 +54,10 @@ jobs:
       - name:  Get result
         run: |
           score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 70 && ${score%.*} <= 75 )); then
-             echo "score is $score between 70 and 75"
+          if (( ${score%.*} >= 79 && ${score%.*} <= 81 )); then
+             echo "score is $score between 79 and 81"
           else
-             echo "score is $score not between 70 and 75"
+             echo "score is $score not between 79 and 81"
              exit 1
           fi
           rm -rf regression_result
