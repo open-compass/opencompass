@@ -17,4 +17,4 @@ with read_base():
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets
     from ..mbpp.deprecated_sanitized_mbpp_gen_1e1056 import sanitized_mbpp_datasets
 
-datasets = sum((v for k, v in locals().items() if k.endswith("_datasets")), [])
+datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

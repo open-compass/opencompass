@@ -11,7 +11,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='baichuan2-7b-chat-hf',
-        path="baichuan-inc/Baichuan2-7B-Chat",
+        path='baichuan-inc/Baichuan2-7B-Chat',
         tokenizer_path='baichuan-inc/Baichuan2-7B-Chat',
         tokenizer_kwargs=dict(
             padding_side='left',

@@ -17,10 +17,10 @@ models = [
     dict(
         abbr='Spark-v1-1',
         type=XunFei,
-        appid="xxxx",
+        appid='xxxx',
         path='ws://spark-api.xf-yun.com/v1.1/chat',
-        api_secret = "xxxxxxx",
-        api_key = "xxxxxxx",
+        api_secret = 'xxxxxxx',
+        api_key = 'xxxxxxx',
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
@@ -28,11 +28,11 @@ models = [
     dict(
         abbr='Spark-v3-1',
         type=XunFei,
-        appid="xxxx",
+        appid='xxxx',
         domain='generalv3',
         path='ws://spark-api.xf-yun.com/v3.1/chat',
-        api_secret = "xxxxxxxx",
-        api_key = "xxxxxxxxx",
+        api_secret = 'xxxxxxxx',
+        api_key = 'xxxxxxxxx',
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
@@ -48,4 +48,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_xunfei/"
+work_dir = 'outputs/api_xunfei/'

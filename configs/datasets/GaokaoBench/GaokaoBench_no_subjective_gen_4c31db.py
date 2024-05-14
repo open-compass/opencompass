@@ -10,33 +10,33 @@ with read_base():
 
 GaokaoBench_datasets = []
 for folder, prompts in [
-    ("Multiple-choice_Questions", MCQ_prompts),
-    ("Fill-in-the-blank_Questions", FBQ_prompts),
+    ('Multiple-choice_Questions', MCQ_prompts),
+    ('Fill-in-the-blank_Questions', FBQ_prompts),
 ]:
     for p in prompts:
         reader_cfg = {
-            "input_columns": ["question"],
-            "output_column": "answer",
+            'input_columns': ['question'],
+            'output_column': 'answer',
         }
         infer_cfg = {
-            "ice_template": {
-                "type": PromptTemplate,
-                "template": {"round": [{"role": "HUMAN", "prompt": p["prefix_prompt"] + "{question}"}]},
-                "ice_token": "</E>",
+            'ice_template': {
+                'type': PromptTemplate,
+                'template': {'round': [{'role': 'HUMAN', 'prompt': p['prefix_prompt'] + '{question}'}]},
+                'ice_token': '</E>',
             },
-            "retriever": {"type": ZeroRetriever},
-            "inferencer": {"type": GenInferencer, "max_out_len": 1024},
+            'retriever': {'type': ZeroRetriever},
+            'inferencer': {'type': GenInferencer, 'max_out_len': 1024},
         }
         eval_cfg = {
-            "evaluator": {"type": "GaokaoBenchEvaluator" + "_" + p["type"]},
-            "pred_role": "BOT",
+            'evaluator': {'type': 'GaokaoBenchEvaluator' + '_' + p['type']},
+            'pred_role': 'BOT',
         }
         dataset = {
-            "type": GaokaoBenchDataset,
-            "abbr": "GaokaoBench_" + p["keyword"],
-            "path": os.path.join("data", "GAOKAO-BENCH", "data", folder, p["keyword"] + ".json"),
-            "reader_cfg": reader_cfg,
-            "infer_cfg": infer_cfg,
-            "eval_cfg": eval_cfg,
+            'type': GaokaoBenchDataset,
+            'abbr': 'GaokaoBench_' + p['keyword'],
+            'path': os.path.join('data', 'GAOKAO-BENCH', 'data', folder, p['keyword'] + '.json'),
+            'reader_cfg': reader_cfg,
+            'infer_cfg': infer_cfg,
+            'eval_cfg': eval_cfg,
         }
         GaokaoBench_datasets.append(dataset)

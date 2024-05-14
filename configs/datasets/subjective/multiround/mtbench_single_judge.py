@@ -11,9 +11,9 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "mtbench",
+    'mtbench',
 ]
-data_path ="data/subjective/"
+data_path ='data/subjective/'
 
 subjective_datasets = []
 
@@ -37,22 +37,22 @@ for _name in subjective_all_sets:
                     dict(
                         role='SYSTEM',
                         fallback_role='HUMAN',
-                        prompt="{system_prompt}")
+                        prompt='{system_prompt}')
                 ],
                     round=[
                     dict(
                         role='HUMAN',
-                        prompt = "{prompt_template}"
+                        prompt = '{prompt_template}'
                     ),
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=MTBenchDataset,
             path=data_path,
             name=_name,

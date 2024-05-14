@@ -6,8 +6,8 @@ from opencompass.datasets import winograndeDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 winogrande_reader_cfg = dict(
-    input_columns=["prompt", "only_option1", "only_option2"],
-    output_column="answer",
+    input_columns=['prompt', 'only_option1', 'only_option2'],
+    output_column='answer',
 )
 
 winogrande_infer_cfg = dict(
@@ -15,7 +15,7 @@ winogrande_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role="HUMAN", prompt="Question: {prompt}\nA. {only_option1}\nB. {only_option2}\nAnswer:"),
+                dict(role='HUMAN', prompt='Question: {prompt}\nA. {only_option1}\nB. {only_option2}\nAnswer:'),
             ]
         ),
     ),
@@ -25,13 +25,13 @@ winogrande_infer_cfg = dict(
 
 winogrande_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 winogrande_datasets = [
     dict(
-        abbr="winogrande",
+        abbr='winogrande',
         type=winograndeDataset_V2,
         path='./data/winogrande',
         reader_cfg=winogrande_reader_cfg,

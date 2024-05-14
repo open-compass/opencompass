@@ -16,7 +16,7 @@ def generate_linear_space(start, end, num):
     if num == 1:
         return [start]
     elif num < 1:
-        raise ValueError("num must be at least 1.")
+        raise ValueError('num must be at least 1.')
     step = (end - start) / (num - 1)
     return [start + step * i for i in range(num)]
 
@@ -54,7 +54,7 @@ needlebench_eval_cfg = dict(
 
 context_lengths = list([9000, 13000, 17000, 21000, 25000, 29000, 31000, 32000])
 document_depth_percent_intervals = 20
-document_depth_percent_interval_type = "linear"
+document_depth_percent_interval_type = 'linear'
 
 base_path = './data/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']

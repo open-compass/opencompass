@@ -5,9 +5,9 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import HFDataset
 
 COPA_reader_cfg = dict(
-    input_columns=["question", "premise", "choice1", "choice2"],
-    output_column="label",
-    test_split="train")
+    input_columns=['question', 'premise', 'choice1', 'choice2'],
+    output_column='label',
+    test_split='train')
 
 COPA_infer_cfg = dict(
     prompt_template=dict(
@@ -15,13 +15,13 @@ COPA_infer_cfg = dict(
         template={
             0:
             dict(round=[
-                dict(role="HUMAN", prompt="{premise}\nQuestion: {question}\nAnswer:"),
-                dict(role="BOT", prompt="{choice1}"),
+                dict(role='HUMAN', prompt='{premise}\nQuestion: {question}\nAnswer:'),
+                dict(role='BOT', prompt='{choice1}'),
             ]),
             1:
             dict(round=[
-                dict(role="HUMAN", prompt="{premise}\nQuestion: {question}\nAnswer:"),
-                dict(role="BOT", prompt="{choice2}"),
+                dict(role='HUMAN', prompt='{premise}\nQuestion: {question}\nAnswer:'),
+                dict(role='BOT', prompt='{choice2}'),
             ]),
         },
     ),
@@ -34,10 +34,10 @@ COPA_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 COPA_datasets = [
     dict(
         type=HFDataset,
-        abbr="COPA",
-        path="json",
-        data_files="./data/SuperGLUE/COPA/val.jsonl",
-        split="train",
+        abbr='COPA',
+        path='json',
+        data_files='./data/SuperGLUE/COPA/val.jsonl',
+        split='train',
         reader_cfg=COPA_reader_cfg,
         infer_cfg=COPA_infer_cfg,
         eval_cfg=COPA_eval_cfg,

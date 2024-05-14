@@ -3,8 +3,8 @@ from opencompass.models import HuggingFaceCausalLM
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='\n<|im_start|>user\n', end='<|im_end|>'),
-        dict(role="BOT", begin="\n<|im_start|>assistant\n", end='<|im_end|>', generate=True),
+        dict(role='HUMAN', begin='\n<|im_start|>user\n', end='<|im_end|>'),
+        dict(role='BOT', begin='\n<|im_start|>assistant\n', end='<|im_end|>', generate=True),
     ],
 )
 
@@ -12,7 +12,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='lemur-70b-chat-v1',
-        path="OpenLemur/lemur-70b-chat-v1",
+        path='OpenLemur/lemur-70b-chat-v1',
         tokenizer_path='OpenLemur/lemur-70b-chat-v1',
         # tokenizer_kwargs=dict(
         #     padding_side='left',

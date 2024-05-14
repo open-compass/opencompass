@@ -6,7 +6,7 @@ from opencompass.datasets import InfiniteBenchendiaDataset, InfiniteBenchendiaEv
 InfiniteBench_endia_reader_cfg = dict(
     input_columns=['context', 'question'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_endia_infer_cfg = dict(

@@ -19,4 +19,4 @@ with read_base():
     from ..datasets.gpqa.gpqa_gen_4baadb import gpqa_datasets
     from ..datasets.IFEval.IFEval_gen_3321a3 import ifeval_datasets
 
-datasets = sum((v for k, v in locals().items() if k.endswith("_datasets")), [])
+datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])

@@ -12,7 +12,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='tigerbot-sft-7b-hf',
-        path="TigerResearch/tigerbot-7b-sft",
+        path='TigerResearch/tigerbot-7b-sft',
         tokenizer_path='TigerResearch/tigerbot-7b-sft',
         tokenizer_kwargs=dict(
             padding_side='left',

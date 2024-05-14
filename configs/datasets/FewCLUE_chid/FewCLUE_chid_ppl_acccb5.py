@@ -10,7 +10,7 @@ chid_reader_cfg = dict(
 chid_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template={i: f"以下句子是否通顺？\n{{content{i}}}\n这个句子是通顺的。"
+        template={i: f'以下句子是否通顺？\n{{content{i}}}\n这个句子是通顺的。'
                   for i in range(7)}),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

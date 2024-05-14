@@ -24,8 +24,8 @@ D) {D}
 """.strip()
 
 mmlu_reader_cfg = dict(
-    input_columns=["input", "A", "B", "C", "D"],
-    output_column="target",
+    input_columns=['input', 'A', 'B', 'C', 'D'],
+    output_column='target',
     train_split='dev')
 
 mmlu_datasets = []
@@ -35,7 +35,7 @@ for name in mmlu_all_sets:
             type=PromptTemplate,
             template=dict(
                 round=[
-                    dict(role="HUMAN", prompt=QUERY_TEMPLATE),
+                    dict(role='HUMAN', prompt=QUERY_TEMPLATE),
                 ],
             ),
         ),
@@ -45,13 +45,13 @@ for name in mmlu_all_sets:
 
     mmlu_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
-        pred_postprocessor=dict(type=match_answer_pattern, answer_pattern=r"(?i)ANSWER\s*:\s*([A-D])"))
+        pred_postprocessor=dict(type=match_answer_pattern, answer_pattern=r'(?i)ANSWER\s*:\s*([A-D])'))
 
     mmlu_datasets.append(
         dict(
-            abbr=f"lukaemon_mmlu_{name}",
+            abbr=f'lukaemon_mmlu_{name}',
             type=MMLUDataset,
-            path="./data/mmlu/",
+            path='./data/mmlu/',
             name=name,
             reader_cfg=mmlu_reader_cfg,
             infer_cfg=mmlu_infer_cfg,

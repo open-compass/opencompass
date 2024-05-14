@@ -31,7 +31,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='internlm2-chat-7b-hf',
-        path="internlm/internlm2-chat-7b",
+        path='internlm/internlm2-chat-7b',
         tokenizer_path='internlm/internlm2-chat-7b',
         model_kwargs=dict(
             trust_remote_code=True,
@@ -49,7 +49,7 @@ models = [
         meta_template=_meta_template,
         run_cfg=dict(num_gpus=1, num_procs=1),
         end_str='<|im_end|>',
-        generation_kwargs = {"eos_token_id": [2, 92542], "do_sample": True},
+        generation_kwargs = {'eos_token_id': [2, 92542], 'do_sample': True},
         batch_padding=True,
     )
 ]
@@ -91,7 +91,7 @@ judge_models = [
             use_fast=False,
             trust_remote_code=True,
         ),
-        generation_kwargs = {"do_sample": True},
+        generation_kwargs = {'do_sample': True},
         max_out_len=512,
         max_seq_len=4096,
         batch_size=8,

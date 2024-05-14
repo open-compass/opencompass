@@ -12,7 +12,7 @@ qabench_reader_cfg = dict(
 qabench_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=dict(round=[dict(role="HUMAN", prompt="{prompt}")])),
+        template=dict(round=[dict(role='HUMAN', prompt='{prompt}')])),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
@@ -21,9 +21,9 @@ qabench_datasets = [
         type=HFDataset,
         path='csv',
         data_files='./data/qabench/qabench-test.qa.csv',
-        abbr="qabench",
+        abbr='qabench',
         split='train',
         reader_cfg=qabench_reader_cfg,
         infer_cfg=qabench_infer_cfg,
-        eval_cfg=dict(ds_column="reference"))
+        eval_cfg=dict(ds_column='reference'))
 ]

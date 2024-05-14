@@ -16,7 +16,7 @@ math_infer_cfg = dict(
         type=PromptTemplate,
 
         template=dict(round=[
-            dict(role="HUMAN", prompt=QUERY_TEMPLATE),
+            dict(role='HUMAN', prompt=QUERY_TEMPLATE),
         ])),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer, max_out_len=1024))

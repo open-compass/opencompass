@@ -10,7 +10,7 @@ DRCD_reader_cfg = dict(
 DRCD_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template="文章：{context}\n根据上文，回答如下问题： {question}\n答："),
+        template='文章：{context}\n根据上文，回答如下问题： {question}\n答：'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 

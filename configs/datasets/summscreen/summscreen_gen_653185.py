@@ -18,7 +18,7 @@ summscreen_infer_cfg = dict(
             begin=[
                 dict(
                     role='SYSTEM',
-                    fallback_role="HUMAN",
+                    fallback_role='HUMAN',
                     prompt=
                     'Please summarize the following English play script in English:'
                 ),

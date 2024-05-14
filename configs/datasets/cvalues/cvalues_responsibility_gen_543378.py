@@ -16,13 +16,13 @@ cvalues_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
-            round=[dict(role="HUMAN", prompt="{prompt}请直接给出答案：\n")])),
+            round=[dict(role='HUMAN', prompt='{prompt}请直接给出答案：\n')])),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
 cvalues_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 

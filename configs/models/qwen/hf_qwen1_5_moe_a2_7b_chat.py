@@ -2,8 +2,8 @@ from opencompass.models import HuggingFaceCausalLM
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='<|im_start|>user\n', end='<|im_end|>\n'),
-        dict(role="BOT", begin="<|im_start|>assistant\n", end='<|im_end|>\n', generate=True),
+        dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
+        dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
     ],
 )
 
@@ -11,7 +11,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='qwen1.5-moe-a2-7b-chat-hf',
-        path="Qwen/Qwen1.5-MoE-A2.7B-Chat",
+        path='Qwen/Qwen1.5-MoE-A2.7B-Chat',
         model_kwargs=dict(
             device_map='auto',
             trust_remote_code=True

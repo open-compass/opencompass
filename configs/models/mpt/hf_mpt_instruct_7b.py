@@ -5,8 +5,8 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='mpt-instruct-7b-hf',
-        path="mosaicml/mpt-7b-instruct",
-        tokenizer_path="mosaicml/mpt-7b-instruct",
+        path='mosaicml/mpt-7b-instruct',
+        tokenizer_path='mosaicml/mpt-7b-instruct',
         tokenizer_kwargs=dict(
             padding_side='left',
             truncation_side='left',

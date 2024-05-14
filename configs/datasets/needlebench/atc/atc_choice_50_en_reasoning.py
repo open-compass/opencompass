@@ -9,7 +9,7 @@ from opencompass.utils.text_postprocessors import first_option_postprocess
 
 few_shot_prompts = {
     'single_choice_prompts': {
-        "single_choice_en_reasoning": [
+        'single_choice_en_reasoning': [
             dict(role='HUMAN', prompt="Question: Sharon House, as Jessica Stewart's father, has a significant impact on Jessica Stewart's upbringing. \nGiven the scrambled family relationships described above, who is the eldest relative that 'Jessica Stewart' can trace back to in the context?\nA. Jack Burch\nB. Jessica Stewart\nC. Sharon House\nD. Carolyn Jackson\n"),
             dict(role='BOT', prompt="Answer: Based on the provided information, we can construct the following family relationship chain：\n\n- Sharon House, as Jessica Stewart's father, has a significant impact on Jessica Stewart's upbringing.\n\nTherefore, the eldest relative that 'Jessica Stewart' can trace back to in the context is Sharon House. The answer is: C"),
             dict(role='HUMAN', prompt="Question: For Robert Hill, Mikayla Scott is not just a paternal grandfather, but also a friend.Jacob Oconnor's paternal grandmother is Robert Hill. \nGiven the scrambled family relationships described above, who is the eldest relative that 'Jacob Oconnor' can trace back to in the context?\nA. Laura Holland\nB. Robert Hill\nC. Jacob Oconnor\nD. Mikayla Scott\n"),
@@ -56,8 +56,8 @@ for _name in list(single_choice_prompts.keys()):
 needlebench_datasets = []
 
 
-needlebench_atc_reader_cfg = dict(input_columns=["question"],
-                                  output_column="answer")
+needlebench_atc_reader_cfg = dict(input_columns=['question'],
+                                  output_column='answer')
 
 for _name in list(single_choice_prompts.keys()):
 
@@ -78,7 +78,7 @@ for _name in list(single_choice_prompts.keys()):
     for num_needles in needle_num_list:
         abbr = (f'NeedleBenchATCDataset-'
                 f'{num_needles}Needle-{"EN" if "en" in _name else "ZH"}')
-        language = "English" if "en" in _name else "Chinese"
+        language = 'English' if 'en' in _name else 'Chinese'
         if 'reasoning' in _name:
             abbr += '-Reasoning'
         dataset_dict = {

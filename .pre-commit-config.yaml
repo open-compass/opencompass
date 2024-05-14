@@ -45,7 +45,7 @@ repos:
             (?x)^(
               dicts/|
               projects/.*?/dicts/|
-              configs/
+              configs/.*?/.*\.txt
             )
       - id: check-yaml
       - id: end-of-file-fixer
@@ -53,11 +53,10 @@ repos:
             (?x)^(
               dicts/|
               projects/.*?/dicts/|
-              configs/
+              configs/.*?/.*\.txt
             )
       - id: requirements-txt-fixer
       - id: double-quote-string-fixer
-        exclude: configs/
       - id: check-merge-conflict
       - id: fix-encoding-pragma
         args: ["--remove"]

@@ -2,10 +2,10 @@ from opencompass.models import VLLM
 
 
 _meta_template = dict(
-    begin="<s>",
+    begin='<s>',
     round=[
-        dict(role="HUMAN", begin='[INST]', end='[/INST]'),
-        dict(role="BOT", begin="", end='</s>', generate=True),
+        dict(role='HUMAN', begin='[INST]', end='[/INST]'),
+        dict(role='BOT', begin='', end='</s>', generate=True),
     ],
 )
 

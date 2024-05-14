@@ -26,13 +26,13 @@ for k in [1]:
             prompt_template=dict(
                 type=PromptTemplate,
                 template='</E>Q: {question}\nA: ',
-                ice_token="</E>",
+                ice_token='</E>',
             ),
             retriever=dict(type=FixKRetriever, fix_id_list=list(range(k))),
-            inferencer=dict(type=GenInferencer, max_out_len=50, stopping_criteria=["Q:", "\n"]),
+            inferencer=dict(type=GenInferencer, max_out_len=50, stopping_criteria=['Q:', '\n']),
         )
 
-    nq_eval_cfg = dict(evaluator=dict(type=NQEvaluator), pred_role="BOT")
+    nq_eval_cfg = dict(evaluator=dict(type=NQEvaluator), pred_role='BOT')
 
     nq_datasets.append(
         dict(

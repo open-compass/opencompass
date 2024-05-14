@@ -26,7 +26,7 @@ Answer:"""),
 
 adv_rte_eval_cfg = dict(
     evaluator=dict(type=AccDropEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 

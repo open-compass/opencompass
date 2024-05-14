@@ -10,11 +10,11 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "alignment_bench",
+    'alignment_bench',
 ]
-data_path ="data/subjective/alignment_bench"
+data_path ='data/subjective/alignment_bench'
 
-alignment_bench_config_path = "data/subjective/alignment_bench/config"
+alignment_bench_config_path = 'data/subjective/alignment_bench/config'
 alignment_bench_config_name = 'multi-dimension'
 
 subjective_datasets = []
@@ -26,7 +26,7 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -42,17 +42,17 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt = "{critiquellm_prefix}[助手的答案开始]\n{prediction}\n[助手的答案结束]\n"
+                        prompt = '{critiquellm_prefix}[助手的答案开始]\n{prediction}\n[助手的答案结束]\n'
                     ),
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=AlignmentBenchDataset,
             path=data_path,
             name=_name,

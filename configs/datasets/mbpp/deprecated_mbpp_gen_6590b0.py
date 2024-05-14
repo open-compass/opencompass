@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MBPPDataset, MBPPEvaluator
 
-mbpp_reader_cfg = dict(input_columns=["text", "test_list"], output_column="test_list_2")
+mbpp_reader_cfg = dict(input_columns=['text', 'test_list'], output_column='test_list_2')
 
 mbpp_infer_cfg = dict(
     prompt_template=dict(
@@ -19,8 +19,8 @@ mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator))
 mbpp_datasets = [
     dict(
         type=MBPPDataset,
-        abbr="mbpp",
-        path="./data/mbpp/mbpp.jsonl",
+        abbr='mbpp',
+        path='./data/mbpp/mbpp.jsonl',
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
         eval_cfg=mbpp_eval_cfg,

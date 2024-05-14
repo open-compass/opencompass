@@ -16,10 +16,10 @@ summarizer = dict(
     dataset_abbrs=[
         '--------- 考试 Exam ---------',  # category
         # 'Mixed', # subcategory
-        "ceval",
+        'ceval',
         'agieval',
         'mmlu',
-        "GaokaoBench",
+        'GaokaoBench',
         'ARC-c',
         '--------- 语言 Language ---------',  # category
         # '字词释义', # subcategory
@@ -69,7 +69,7 @@ summarizer = dict(
         'openai_humaneval',
         'mbpp',
         # '综合推理', # subcategory
-        "bbh",
+        'bbh',
         '--------- 理解 Understanding ---------',  # category
         # '阅读理解', # subcategory
         'C3',
@@ -89,5 +89,5 @@ summarizer = dict(
         'tnews-dev',
     ],
     summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

@@ -14,5 +14,5 @@ with read_base():
     from .models.hf_llama.hf_llama2_7b import models
     from .summarizers.example import summarizer
 
-datasets = sum([v for k, v in locals().items() if k.endswith("_datasets") or k == 'datasets'], [])
+datasets = sum([v for k, v in locals().items() if k.endswith('_datasets') or k == 'datasets'], [])
 work_dir = './outputs/llama2/'

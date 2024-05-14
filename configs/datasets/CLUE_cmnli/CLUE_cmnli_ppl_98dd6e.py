@@ -25,7 +25,7 @@ cmnli_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 cmnli_datasets = [
     dict(
-        abbr="cmnli",
+        abbr='cmnli',
         type=cmnliDataset,
         path='./data/CLUE/cmnli/cmnli_public/dev.json',
         reader_cfg=cmnli_reader_cfg,
