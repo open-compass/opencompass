@@ -4,7 +4,7 @@ import os
 import pytest
 
 output_path = 'regression_result'
-model = 'internlm-chat-7b-hf'
+model = 'internlm2-chat-7b-hf'
 dataset = 'siqa'
 
 
@@ -22,7 +22,7 @@ class TestChatScore:
 
     def test_model_dataset_score(self, result_scores):
         result_score = result_scores.get(model).get(dataset)
-        assert_score(result_score, 73.59)
+        assert_score(result_score, 79.53)
 
 
 def assert_score(score, baseline):
