@@ -11,7 +11,7 @@ from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 
 
-def get_random_needles(file_path, needle_count):
+def get_random_needles(counter, file_path, needle_count):
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
@@ -21,6 +21,7 @@ def get_random_needles(file_path, needle_count):
     ]
 
     if matching_records:
+        random.seed(counter)
         random_record = random.choice(matching_records)
         return {
             'needles': random_record['derivations'],
@@ -48,6 +49,7 @@ class NeedleBenchMultiDataset(BaseDataset):
         needle_file_name: str,
         num_needles: int,
         diff: int,
+        position: str = 'End',
     ):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
@@ -109,19 +111,42 @@ class NeedleBenchMultiDataset(BaseDataset):
                     retrieval_question)
 
             if language == 'Chinese':
-                prompt = ('你是一个善于回答用户问题的智能AI助手\n'
-                          '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
-                          '，或重复你的回答\n'
-                          f'用户现在给你的文档是{context}\n\n'
-                          f'现在请问：{retrieval_question}')
+                if position == 'End':
+                    prompt = ('你是一个善于回答用户问题的智能AI助手\n'
+                              '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
+                              '，或重复你的回答\n'
+                              f'用户现在给你的文档是{context}\n\n'
+                              f'现在请问：{retrieval_question}')
+                elif position == 'Start':
+                    prompt = ('你是一个善于回答用户问题的智能AI助手\n'
+                              '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
+                              '，或重复你的回答\n'
+                              f'现在请问：{retrieval_question}',
+                              f'用户现在给你的文档是{context}\n\n')
+                else:
+                    raise ValueError('Unsupported position. '
+                                     'Position must be "End" or "Start".')
             elif language == 'English':
-                prompt = ('You are an intelligent AI assistant skilled in '
-                          'answering user questions.\n'
-                          'Please keep your answers concise and clear. Do not'
-                          ' talk about irrelevant topics or repeat your '
-                          'answers.\n'
-                          f'The document given to you by the user is {context}'
-                          f'\n\nNow, the question is: {retrieval_question}')
+                if position == 'End':
+                    prompt = ('You are an intelligent AI assistant skilled in '
+                              'answering user questions.\n'
+                              'Please keep your answers concise and clear. Do '
+                              'not talk about irrelevant topics or repeat '
+                              'your answers.\nThe document '
+                              f'given to you by the user is {context}\n\n'
+                              f'Now, the question is: {retrieval_question}')
+                elif position == 'Start':
+                    prompt = ('You are an intelligent AI assistant skilled in '
+                              'answering user questions.\n'
+                              'Please keep your answers concise and clear. Do '
+                              'not talk about irrelevant topics or repeat '
+                              'your answers.\n'
+                              f'Now, the question is: {retrieval_question}'
+                              'The document given to you by the user'
+                              f' is {context}\n\n')
+                else:
+                    raise ValueError(f'Unsupported position {position}. '
+                                     'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
 
@@ -140,7 +165,7 @@ class NeedleBenchMultiDataset(BaseDataset):
                 random.seed(counter)
                 random.shuffle(lines)
                 random_needle_data = get_random_needles(
-                    needle_file_path, num_needles)
+                    counter, needle_file_path, num_needles)
                 needles = [
                     '\n' + needle + '\n'
                     for needle in random_needle_data['needles']

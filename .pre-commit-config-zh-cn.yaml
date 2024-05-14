@@ -9,6 +9,7 @@ exclude: |
       opencompass/datasets/medbench/|
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
+      opencompass/datasets/TheoremQA|
       docs/zh_cn/advanced_guides/compassbench_intro.md
     )
 repos:
@@ -60,8 +61,6 @@ repos:
       - id: check-merge-conflict
       - id: fix-encoding-pragma
         args: ["--remove"]
-      - id: mixed-line-ending
-        args: ["--fix=lf"]
       - id: mixed-line-ending
         args: ["--fix=lf"]
   - repo: https://gitee.com/openmmlab/mirrors-mdformat

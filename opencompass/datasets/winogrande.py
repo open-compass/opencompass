@@ -22,6 +22,9 @@ class winograndeDataset(BaseDataset):
                 prompt = line['sentence']
                 continue_prompt = prompt.split('_')[1]
                 data_item = {
+                    'prompt': prompt,
+                    'only_option1': line['option1'],
+                    'only_option2': line['option2'],
                     'opt1': prompt.replace('_', line['option1']),
                     'opt2': prompt.replace('_', line['option2']),
                     'answer': line['answer'],
@@ -48,6 +51,9 @@ class winograndeDataset_V2(BaseDataset):
                 answer = line['answer']
                 answer = ' AB'[int(answer)] if answer != '' else 'NULL'
                 data_item = {
+                    'prompt': prompt,
+                    'only_option1': line['option1'],
+                    'only_option2': line['option2'],
                     'opt1': prompt.replace('_', line['option1']),
                     'opt2': prompt.replace('_', line['option2']),
                     'answer': answer,
@@ -76,6 +82,9 @@ class winograndeDataset_V3(BaseDataset):
                     answer = line['answer']
                     answer = ' AB'[int(answer)] if answer != '' else 'NULL'
                     data_item = {
+                        'prompt': prompt,
+                        'only_option1': line['option1'],
+                        'only_option2': line['option2'],
                         'opt1': prompt.replace('_', line['option1']),
                         'opt2': prompt.replace('_', line['option2']),
                         'answer': answer,

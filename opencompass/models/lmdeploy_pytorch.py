@@ -50,6 +50,7 @@ class LmdeployPytorchModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.pytorch import engine as tm
+        from lmdeploy.version import version_info
 
         if engine_config is not None:
             from lmdeploy.messages import PytorchEngineConfig
@@ -71,6 +72,7 @@ class LmdeployPytorchModel(BaseModel):
         self.generator_ids = [i + 1 for i in range(concurrency)]
         self.gen_config = gen_config
         self.end_str = end_str
+        self.major_version, self.minor_version, _ = version_info
 
     def generate(
         self,
@@ -124,13 +126,13 @@ class LmdeployPytorchModel(BaseModel):
     def _generate(self,
                   generator,
                   session_id,
-                  prompt: str or PromptList,
+                  prompt: PromptType,
                   gen_config=None,
                   end_str: Optional[str] = None) -> str:
         """Generate results given a list of inputs.
 
         Args:
-            prompt (str or PromptList): A string or PromptDict.
+            prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             gen_config (EngineGenerationConfig, optional): Generation
@@ -145,9 +147,16 @@ class LmdeployPytorchModel(BaseModel):
         assert type(
             prompt) is str, 'We only support string for TurboMind Python API'
         input_ids = self.tokenizer.encode(prompt)
-        _, output_ids, _ = generator.infer(session_id,
-                                           input_ids,
-                                           gen_config=gen_config)
+        if self.major_version >= 0 and self.minor_version >= 4:
+            outputs = generator.infer(session_id,
+                                      input_ids,
+                                      gen_config=gen_config)
+            output_ids = outputs.token_ids
+        else:
+            _, output_ids, _ = generator.infer(session_id,
+                                               input_ids,
+                                               gen_config=gen_config)
+
         # stop engine
         if hasattr(generator, 'end'):
             generator.end(session_id)

@@ -1,5 +1,4 @@
 import re
-import cn2an
 
 """
 task: law article prediction
@@ -15,6 +14,7 @@ def compute_ljp_article(data_dict):
     A reference contains a list of articles of the Criminal Law of the People's Republic of China.
     We compute the F1-score between the prediction and the reference.
     """
+    import cn2an
 
     score_list, abstentions = [], 0
 

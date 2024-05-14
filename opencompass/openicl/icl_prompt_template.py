@@ -77,7 +77,7 @@ class PromptTemplate:
             label (:obj:`Hashable`): The value of the output field.
 
         Returns:
-            str or PromptList: The generated in-context example.
+            PromptType: The generated in-context example.
         """
         # Select the corresponding template
         if isinstance(self.template, str) or self.prompt_type == 'meta':
@@ -114,7 +114,7 @@ class PromptTemplate:
 
             entry (:obj:`Dict`): A piece of data containing the input field
                 content.
-            ice (str or PromptList): The generated in-context example.
+            ice (PromptType): The generated in-context example.
             label (:obj:`Hashable`): The value of the output field.
             remain_sep (:obj:`bool`): If remain sep_token
 
@@ -165,7 +165,7 @@ class PromptTemplate:
                 the :obj:`ice_token`. Defaults to ``''``.
 
         Returns:
-            str or PromptList: The generated item.
+            PromptType: The generated item.
         """
         template = None
         if isinstance(self.template, str):
@@ -220,7 +220,7 @@ class PromptTemplate:
                 examples.
 
         Returns:
-            str or PromptList: The encoded template.
+            PromptType: The encoded template.
         """
         if isinstance(prompt_template, str):
             return prompt_template

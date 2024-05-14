@@ -82,7 +82,8 @@ class AlpacaSummarizer:
         self.cfg = config
         self.base_models = self.cfg['eval']['partitioner']['base_models']
         self.compare_models = self.cfg['eval']['partitioner']['compare_models']
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
+        self.judge_abbr = model_abbr_from_cfg(
+            self.cfg['judge_models'][0])  # We will reorganize the summarizers
         self.judge_type = judge_type
         assert self.judge_type in ['v1', 'v2']
         self.judge_map = {

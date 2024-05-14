@@ -1,3 +1,4 @@
+import copy
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -36,9 +37,6 @@ class TurboMindModel(BaseModel):
             arguments like session_len, max_batch_size for TurboMind.
         gen_config (Dict, optional): Generation config to set
                 arguments like top_k, top_p, temperature.
-        end_str (str, optional): Whether to trim generated strings with end_str
-            if the model has special ending strings that are not handled well.
-            Defaults to None.
     """
 
     def __init__(self,
@@ -46,13 +44,13 @@ class TurboMindModel(BaseModel):
                  concurrency: int = 8,
                  max_seq_len: int = 2048,
                  meta_template: Optional[Dict] = None,
-                 engine_config: Optional[Dict] = None,
-                 gen_config: Optional[Dict] = None,
-                 end_str: Optional[str] = None):
+                 engine_config: Dict = {},
+                 gen_config: Dict = {}):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.turbomind import TurboMind
+        from lmdeploy.version import version_info
 
         if engine_config is not None:
             from lmdeploy.messages import TurbomindEngineConfig
@@ -68,13 +66,15 @@ class TurboMindModel(BaseModel):
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
         self.gen_config = gen_config
-        self.end_str = end_str
+        self.major_version, self.minor_version, _ = version_info
 
-    def generate(
-        self,
-        inputs: List[str],
-        max_out_len: int = 512,
-    ) -> List[str]:
+    def generate(self,
+                 inputs: List[str],
+                 max_out_len: int = 512,
+                 stopping_criteria: List[str] = [],
+                 do_sample: Optional[bool] = None,
+                 temperature: int = 1,
+                 **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
@@ -93,6 +93,23 @@ class TurboMindModel(BaseModel):
             inputs[i:i + batch_size] for i in range(0, len(inputs), batch_size)
         ]
 
+        gen_config = copy.deepcopy(self.gen_config)
+        if do_sample is not None:
+            if do_sample:
+                gen_config['top_k'] = 1000
+                gen_config['temperature'] = temperature
+            else:
+                gen_config['top_k'] = 1
+        if stopping_criteria:
+            stop_words = gen_config.get('stop_words', [])
+            for t in stopping_criteria:
+                t = self.tokenizer.encode(t, add_bos=False)
+                stop_words.append(t[0])
+            gen_config['stop_words'] = list(set(stop_words))
+
+        from lmdeploy.messages import EngineGenerationConfig
+        gen_config = EngineGenerationConfig(**gen_config)
+
         results = []
         for batch_input in batch_inputs:
             with ThreadPoolExecutor() as executor:
@@ -103,8 +120,7 @@ class TurboMindModel(BaseModel):
                         self.generator_ids[:len(batch_input)],
                         batch_input,
                         [max_out_len] * len(batch_input),
-                        [self.gen_config] * len(batch_input),
-                        [self.end_str] * len(batch_input),
+                        [gen_config] * len(batch_input),
                     ))
                 results += _results
         return results
@@ -123,23 +139,18 @@ class TurboMindModel(BaseModel):
     def _generate(self,
                   generator,
                   session_id,
-                  prompt: str or PromptList,
+                  prompt: PromptType,
                   max_out_len: int,
-                  gen_config=None,
-                  end_str: Optional[str] = None) -> str:
+                  gen_config=None) -> str:
         """Generate results given a list of inputs.
 
         Args:
-            prompt (str or PromptList): A string or PromptDict.
+            prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
             gen_config (EngineGenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
-            end_str (str, optional): Whether to trim generated strings
-                with end_str if the model has special ending strings
-                that are not handled well.
-                Defaults to None.
         Returns:
             str: The generated string.
         """
@@ -156,12 +167,12 @@ class TurboMindModel(BaseModel):
                                               sequence_end=True,
                                               step=0,
                                               stream_output=False):
-            _, output_ids, _ = outputs
+            if self.major_version >= 0 and self.minor_version >= 4:
+                output_ids = outputs.token_ids
+            else:
+                _, output_ids, _ = outputs
             response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
-        # used to trim
-        if end_str:
-            response = response.split(end_str)[0]
         return response
 
     def get_ppl(self,
@@ -187,5 +198,24 @@ class TurboMindModel(BaseModel):
             input_ids = self.tokenizer.encode(text)
             res = self.generators[0].get_ppl(input_ids)
             results.append(res)
+        results = np.concatenate(results)
+        return results
+
+    def get_loglikelihood(
+            self,
+            inputs: List[str],
+            conts: List[str],
+            mask_length: Optional[List[int]] = None) -> List[float]:
+        assert isinstance(
+            inputs, List), f'List(str) is expected, but got {type(inputs)}'
+        results = []
+        for text, cont in zip(inputs, conts):
+            input_ids = self.tokenizer.encode(text)
+            res = self.generators[0].get_ppl(input_ids)
+            logit_sum = res * len(input_ids)
+            input_ids = self.tokenizer.encode(text.replace(cont, ''))
+            res = self.generators[0].get_ppl(input_ids)
+            logit_part = res * len(input_ids)
+            results.append(-(logit_sum - logit_part))
         results = np.concatenate(results)
         return results

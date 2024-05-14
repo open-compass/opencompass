@@ -72,6 +72,19 @@
 
    </details>
 
+5. Install alpaca-eval (Optional)：
+
+   If you want to**evaluate alpaca-eval in official ways**, follow this step.
+
+   <details>
+   <summary><b>click to show the details</b></summary>
+
+   ```bash
+   pip install alpaca-eval
+   ```
+
+   </details>
+
 # Dataset Preparation
 
 The datasets supported by OpenCompass mainly include two parts:
@@ -93,7 +106,7 @@ If you need to use the more comprehensive dataset (~500M) provided by OpenCompas
 wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip
 unzip OpenCompassData-complete-20240207.zip
 cd ./data
-find . -name "*.zip" -exec unzip {} \;
+find . -name "*.zip" -exec unzip "{}" \;
 ```
 
 The list of datasets included in both `.zip` can be found [here](https://github.com/open-compass/opencompass/releases/tag/0.2.2.rc1)

@@ -6,7 +6,7 @@ from opencompass.tasks import OpenICLInferTask
 
 with read_base():
     from .summarizers.leaderboard import summarizer
-    from .datasets.humaneval.humaneval_gen import humaneval_datasets
+    from .datasets.humaneval.humaneval_gen_a82cae import humaneval_datasets
 
 datasets = [*humaneval_datasets]
 
@@ -32,7 +32,8 @@ models = [
         url='http://localhost:1030/generate',
         meta_template=_meta_template,
         batch_size=32,
-        rate_per_worker=32,
+        max_workers_per_task=128,
+        rate_per_worker=1024,
         retry=4,
         generation_kwargs=dict(
             do_sample=False,

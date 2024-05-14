@@ -723,7 +723,7 @@ class HuggingFaceChatGLM3(HuggingFace):
         self.num_extra_tokens = num_extra_tokens
 
     def generate(self,
-                 inputs: List[str or PromptList],
+                 inputs: List[PromptType],
                  max_out_len: int = 512,
                  skip_overlength=False,
                  **kwargs) -> str:
