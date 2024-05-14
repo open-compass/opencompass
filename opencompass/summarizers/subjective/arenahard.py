@@ -50,8 +50,7 @@ def compute_mle_elo(df, SCALE=400, BASE=10, INIT_RATING=1000):
     tie_idx = (df['winner'] == 'tie') | (df['winner'] == 'tie (bothbad)')
     tie_idx[len(tie_idx)//2:] = False
     Y[tie_idx] = 1.0
-
-    lr = LogisticRegression(fit_intercept=False, penalty=None, tol=1e-8)
+    lr = LogisticRegression(fit_intercept=False, penalty=None, tol=1e-8) # May need to set a small value when not use GPT4 as judge model
     lr.fit(X,Y)
 
     elo_scores = SCALE * lr.coef_[0] + INIT_RATING
@@ -134,10 +133,8 @@ def get_win_rate_column(df, column, baseline='gpt4-0314'):
     return win_rate_table[baseline].fillna(0.5).apply(lambda x: round(x * 100, 2))
 
 
-def get_battles_from_judgment(dataset, subdir_path, post_process, first_game_only=False, WEIGHT=3):
+def get_battles_from_judgment(dataset, subdir_path, post_process, WEIGHT=3):
     arena_hard_battles = pd.DataFrame()
-    print('Turning judgment results into battles...')
-
     dataset_abbr = dataset_abbr_from_cfg(dataset)
     filename = osp.join(subdir_path, dataset_abbr + '.json')
     partial_filename = osp.join(subdir_path, dataset_abbr + '_0.json')
@@ -197,7 +194,6 @@ def get_battles_from_judgment(dataset, subdir_path, post_process, first_game_onl
         if weight:
             arena_hard_battles = pd.concat([arena_hard_battles, pd.DataFrame([output] * weight)])
 
-    arena_hard_battles.to_json(os.path.join(subdir_path,'arena_hard_battles.jsonl'), lines=True, orient='records')
     return arena_hard_battles
 
 class ArenaHardSummarizer:
@@ -240,6 +236,8 @@ class ArenaHardSummarizer:
             judge_model = model_abbr_from_cfg(judge_model_cfg)
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
+                battles = pd.DataFrame()
+                print('Turning judgment results into battles...')
                 for model_pair in unique_combinations:
                     model1 = model_pair[0]['abbr']
                     model2 = model_pair[1]['abbr']
@@ -252,49 +250,49 @@ class ArenaHardSummarizer:
                         print(subdir_path + ' is not exist! please check!')
                         continue
 
-                    battles = get_battles_from_judgment(dataset, subdir_path, self.judge_function)
+                    new_battle = get_battles_from_judgment(dataset, subdir_path, self.judge_function)
+                    battles = pd.concat([battles, new_battle], ignore_index=True)
+                battles.to_json(os.path.join(output_dir,'arena_hard_battles_judged-by--'+ judge_model+'.jsonl'), lines=True, orient='records')
 
-                    bootstrap_online_elo = compute_mle_elo(battles)
+                bootstrap_online_elo = compute_mle_elo(battles)
 
-                    np.random.seed(42)
-                    bootstrap_elo_lu = get_bootstrap_result(battles, compute_mle_elo, 100)
-                    bootstrap_elo_lu.to_json(os.path.join(subdir_path,'bootstrapping_results.jsonl'), lines=True, orient='records')
+                np.random.seed(42)
+                bootstrap_elo_lu = get_bootstrap_result(battles, compute_mle_elo, 100)
+                bootstrap_elo_lu.to_json(os.path.join(output_dir,'bootstrapping_results'+ judge_model+'.jsonl'), lines=True, orient='records')
 
-                    stats = pd.DataFrame()
-                    stats['results'] = None
-                    stats['results'] = stats['results'].astype('object')
+                stats = pd.DataFrame()
+                stats['results'] = None
+                stats['results'] = stats['results'].astype('object')
 
-                    for i, model in enumerate(bootstrap_online_elo.index):
-                        assert model in bootstrap_elo_lu.columns
+                for i, model in enumerate(bootstrap_online_elo.index):
+                    assert model in bootstrap_elo_lu.columns
 
-                        stats.at[i, 'model'] = model
-                        stats.at[i, 'score'] = bootstrap_online_elo[model]
-                        stats.at[i, 'lower'] = np.percentile(bootstrap_elo_lu[model], 2.5)
-                        stats.at[i, 'upper'] = np.percentile(bootstrap_elo_lu[model], 97.5)
-                        if model == 'gpt4-0314':
-                            stats.at[i, 'avg_tokens'] = 423
-                        else:
-                            with open(os.path.join(output_dir.split('summary')[0], 'predictions', model, dataset_abbr+'.json'), 'r') as f:
-                                model_preds = json.load(f)
-                                pred_length = 0
-                                for k, v in model_preds.items():
-                                    pred_length += len(tiktoken.encoding_for_model('gpt-3.5-turbo').encode(v['prediction']))
-                                pred_length /= len(model_preds)
-                            stats.at[i, 'avg_tokens'] = pred_length
-                        stats.at[i, 'results'] = bootstrap_elo_lu[model].tolist()
-                    stats.sort_values(by='model', inplace=True)
-                    stats['score'] = get_win_rate_column(stats, 'score', 'gpt4-0314').tolist()
-                    stats['lower'] = get_win_rate_column(stats, 'lower', 'gpt4-0314').tolist()
-                    stats['upper'] = get_win_rate_column(stats, 'upper', 'gpt4-0314').tolist()
-                    decimal = 1
-
-
-                    stats.sort_values(by='score', ascending=False, inplace=True)
-                    for _, row in stats.iterrows():
-                        interval = str((round(row['lower'] - row['score'], decimal), round(row['upper'] - row['score'], decimal)))
-                        print(f"{row['model'] : <30} | score: {round(row['score'], decimal) : ^5} | 95% CI: {interval : ^12} | average #tokens: {int(row['avg_tokens'])}")
-
-                    stats.to_json(os.path.join(output_dir,'arena_hard_leaderboard.json'), orient='records', indent=4)
+                    stats.at[i, 'model'] = model
+                    stats.at[i, 'score'] = bootstrap_online_elo[model]
+                    stats.at[i, 'lower'] = np.percentile(bootstrap_elo_lu[model], 2.5)
+                    stats.at[i, 'upper'] = np.percentile(bootstrap_elo_lu[model], 97.5)
+                    if model == 'gpt4-0314':
+                        stats.at[i, 'avg_tokens'] = 423
+                    else:
+                        with open(os.path.join(output_dir.split('summary')[0], 'predictions', model, dataset_abbr+'.json'), 'r') as f:
+                            model_preds = json.load(f)
+                            pred_length = 0
+                            for k, v in model_preds.items():
+                                pred_length += len(tiktoken.encoding_for_model('gpt-3.5-turbo').encode(v['prediction']))
+                            pred_length /= len(model_preds)
+                        stats.at[i, 'avg_tokens'] = pred_length
+                    stats.at[i, 'results'] = bootstrap_elo_lu[model].tolist()
+                stats.sort_values(by='model', inplace=True)
+                stats['score'] = get_win_rate_column(stats, 'score', 'gpt4-0314').tolist()
+                stats['lower'] = get_win_rate_column(stats, 'lower', 'gpt4-0314').tolist()
+                stats['upper'] = get_win_rate_column(stats, 'upper', 'gpt4-0314').tolist()
+                decimal = 1
+                stats.sort_values(by='score', ascending=False, inplace=True)
+                for _, row in stats.iterrows():
+                    interval = str((round(row['lower'] - row['score'], decimal), round(row['upper'] - row['score'], decimal)))
+                    print(f"{row['model'] : <30} | score: {round(row['score'], decimal) : ^5} | 95% CI: {interval : ^12} | average #tokens: {int(row['avg_tokens'])}")
+                stats.to_json(os.path.join(output_dir,'arena_hard_leaderboard_judged-by--'+judge_model+'.json'), orient='records', indent=4)
+                stats.to_csv(os.path.join(output_dir,'arena_hard_leaderboard_judged-by--'+judge_model+'.csv'))
 
     def summarize(
             self,
