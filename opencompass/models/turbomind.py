@@ -49,9 +49,15 @@ class TurboMindModel(BaseModel):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
-        from lmdeploy.messages import TurbomindEngineConfig
         from lmdeploy.turbomind import TurboMind
-        engine_config = TurbomindEngineConfig(**engine_config)
+        from lmdeploy.version import version_info
+
+        if engine_config is not None:
+            from lmdeploy.messages import TurbomindEngineConfig
+            engine_config = TurbomindEngineConfig(**engine_config)
+        if gen_config is not None:
+            from lmdeploy.messages import EngineGenerationConfig
+            gen_config = EngineGenerationConfig(**gen_config)
         self.logger = get_logger()
         tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
         self.tokenizer = tm_model.tokenizer
@@ -60,6 +66,7 @@ class TurboMindModel(BaseModel):
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
         self.gen_config = gen_config
+        self.major_version, self.minor_version, _ = version_info
 
     def generate(self,
                  inputs: List[str],
@@ -160,7 +167,10 @@ class TurboMindModel(BaseModel):
                                               sequence_end=True,
                                               step=0,
                                               stream_output=False):
-            _, output_ids, _ = outputs
+            if self.major_version >= 0 and self.minor_version >= 4:
+                output_ids = outputs.token_ids
+            else:
+                _, output_ids, _ = outputs
             response = self.tokenizer.decode(output_ids)
             response = valid_str(response)
         return response

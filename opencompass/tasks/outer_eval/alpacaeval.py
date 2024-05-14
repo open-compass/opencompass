@@ -28,12 +28,14 @@ class PredictionMerger:
             self.model_cfg, self.dataset_cfg,
             osp.join(self.work_dir, 'predictions'))
         root, ext = osp.splitext(filename)
+        alpaca_format_filename = root + '_alpaca' + ext
         partial_filename = root + '_0' + ext
 
-        if osp.exists(osp.realpath(filename)):
+        if osp.exists(osp.realpath(alpaca_format_filename)):
             return
 
-        if not osp.exists(osp.realpath(partial_filename)):
+        if not osp.exists(osp.realpath(partial_filename)) and not osp.exists(
+                osp.realpath(filename)):
             print(f'{filename} not found')
             return
 
@@ -67,8 +69,8 @@ class PredictionMerger:
             data_format[idx]['output'] = preds[str(idx)]['prediction']
             data_format[idx]['generator'] = self.model_cfg['abbr']
 
-        print(f'Merge {partial_filenames} to {filename}')
-        with open(filename, 'w', encoding='utf-8') as f:
+        print(f'Convert to {alpaca_format_filename}')
+        with open(alpaca_format_filename, 'w', encoding='utf-8') as f:
             json.dump(data_format, f, indent=4, ensure_ascii=False)
 
 
@@ -107,6 +109,7 @@ class AlpacaEvalTask(BaseTask):
         # script_path = __file__
         alpaca_cfg = self.judge_cfg.get('config', None)
         api_key = self.judge_cfg.get('key', None)
+        base_url = self.judge_cfg.get('base_url', None)
         assert alpaca_cfg is not None
         all_cfg = Config.fromfile(cfg_path)
         model_cfg = all_cfg['models']
@@ -120,7 +123,12 @@ class AlpacaEvalTask(BaseTask):
             }).run()
             filename = get_infer_output_path(m_cfg, dataset_cfg,
                                              osp.join(work_dir, 'predictions'))
+            root, ext = osp.splitext(filename)
+            alpaca_format_filename = root + '_alpaca' + ext
             output_path = osp.join(work_dir, 'results', m_cfg['abbr'])
+            if not osp.exists(output_path):
+                os.makedirs(output_path)
+            caching_path = osp.join(output_path, 'tmp_annotations.json')
             command = ''
             if api_key is not None:
                 command += f'export OPENAI_API_KEY={api_key}; '
@@ -128,7 +136,9 @@ class AlpacaEvalTask(BaseTask):
                 api_key = os.environ.get('OPENAI_API_KEY', '').split(',')[0]
                 if api_key:
                     command += f'export OPENAI_API_KEY={api_key}; '
-            command += f'alpaca_eval --model_outputs {filename} --annotators_config {alpaca_cfg} --output_path {output_path}'
+            if base_url is not None:
+                command += f'export OPENAI_BASE_URL={base_url}; '
+            command += f'alpaca_eval --model_outputs {alpaca_format_filename} --annotators_config {alpaca_cfg} --output_path {output_path} --caching_path {caching_path};'
             return template.format(task_cmd=command)
 
     def run(self):

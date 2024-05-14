@@ -1,5 +1,5 @@
 import os
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import tabulate
 from mmengine.config import Config
@@ -14,7 +14,8 @@ from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
 
 
-def match_cfg_file(workdir: str, pattern: Union[str, List[str]]) -> List[str]:
+def match_cfg_file(workdir: str,
+                   pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
     """Match the config file in workdir recursively given the pattern.
 
     Additionally, if the pattern itself points to an existing file, it will be
@@ -223,7 +224,7 @@ def change_accelerator(models, accelerator):
             if accelerator == 'lmdeploy':
                 logger.info(f'Transforming {model["abbr"]} to {accelerator}')
                 mod = TurboMindModel
-                model = dict(
+                acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
                     abbr=model['abbr'].replace('hf', 'lmdeploy')
                     if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
@@ -244,11 +245,11 @@ def change_accelerator(models, accelerator):
                 )
                 for item in ['meta_template']:
                     if model.get(item) is not None:
-                        model.update(item, model[item])
+                        acc_model[item] = model[item]
             elif accelerator == 'vllm':
                 logger.info(f'Transforming {model["abbr"]} to {accelerator}')
 
-                model = dict(
+                acc_model = dict(
                     type=f'{VLLM.__module__}.{VLLM.__name__}',
                     abbr=model['abbr'].replace('hf', 'vllm')
                     if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
@@ -263,13 +264,10 @@ def change_accelerator(models, accelerator):
                 )
                 for item in ['meta_template', 'end_str']:
                     if model.get(item) is not None:
-                        model.update(item, model[item])
-                generation_kwargs.update(
-                    dict(temperature=gen_args['temperature']))
+                        acc_model[item] = model[item]
             else:
                 raise ValueError(f'Unsupported accelerator {accelerator}')
-        logger.info(f'After convert to {accelerator}: {model}')
-        model_accels.append(model)
+        model_accels.append(acc_model)
     return model_accels
 
 

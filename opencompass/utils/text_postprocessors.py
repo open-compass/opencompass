@@ -182,3 +182,9 @@ def general_eval_wrapper_postprocess(text: str,
         return postprocess(text, **kwargs)
     else:
         return text
+
+
+def match_answer_pattern(response_text: str, answer_pattern: str):
+    match = re.search(answer_pattern, response_text)
+    extracted_answer = match.group(1) if match else ''
+    return extracted_answer

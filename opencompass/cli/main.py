@@ -55,8 +55,8 @@ def parse_args():
     parser.add_argument(
         '-a', '--accelerator',
         help='Infer accelerator, support vllm and lmdeploy now.',
-        choices=['vllm', 'lmdeploy', 'hg'],
-        default='hg',
+        choices=['vllm', 'lmdeploy', 'hf'],
+        default='hf',
         type=str)
     parser.add_argument('-m',
                         '--mode',

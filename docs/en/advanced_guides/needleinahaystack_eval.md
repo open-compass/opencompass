@@ -1,54 +1,52 @@
-# Needle In A Haystack Experiment Evaluation
+# Needle In A Haystack Experimental Evaluation
 
 ## Introduction to the Needle In A Haystack Test
 
-The Needle In A Haystack test, inspired by [NeedleInAHaystack](https://github.com/gkamradt/LLMTest_NeedleInAHaystack/blob/main/LLMNeedleHaystackTester.py), is a method to evaluate the long-text information extraction ability of Large Language Models (LLMs). It involves randomly inserting key information at various points in a long text to form a prompt for LLMs. This test assesses the fundamental ability of LLMs to understand long texts by extracting critical information from them.
+The Needle In A Haystack test (inspired by [NeedleInAHaystack](https://github.com/gkamradt/LLMTest_NeedleInAHaystack/blob/main/LLMNeedleHaystackTester.py)) is an evaluation method that randomly inserts key information into long texts to form prompts for large language models (LLMs). The test aims to detect whether large models can extract such key information from extensive texts, thereby assessing the models' capabilities in processing and understanding long documents.
 
-## Dataset Introduction
+## Task Overview
 
-The `Skywork/ChineseDomainModelingEval` dataset includes high-quality Chinese articles published between September and October 2023, covering multiple domains. These articles ensure a fair and challenging benchmark for testing.
+Within the `NeedleBench` framework of `OpenCompass`, we have designed a series of increasingly challenging test scenarios to comprehensively evaluate the models' abilities in long text information extraction and reasoning:
 
-## File Description
+- **Single-Needle Retrieval Task (S-RT)**: Assesses an LLM's ability to extract a single key piece of information from a long text, testing its precision in recalling specific details within broad narratives. This corresponds to the **original Needle In A Haystack test** setup.
 
-The dataset includes files specific to various domains:
+- **Multi-Needle Retrieval Task (M-RT)**: Explores an LLM's capability to retrieve multiple related pieces of information from long texts, simulating real-world scenarios of complex queries on comprehensive documents.
 
-- `zh_finance.jsonl` - Finance
-- `zh_game.jsonl` - Gaming
-- `zh_government.jsonl` - Government
-- `zh_movie.jsonl` - Movies
-- `zh_tech.jsonl` - Technology
-- `zh_general.jsonl` - General
+- **Multi-Needle Reasoning Task (M-RS)**: Evaluates an LLM's long-text abilities by extracting and utilizing multiple key pieces of information, requiring the model to have a comprehensive understanding of each key information fragment.
 
-These files are used to assess the LLM's understanding of different specific domains.
+- **Ancestral Trace Challenge (ATC)**: Uses the "relational needle" to test an LLM's ability to handle multi-layer logical challenges in real long texts. In the ATC task, a series of logical reasoning questions are used to test the model's memory and analytical skills for every detail in the text. For this task, we remove the irrelevant text (Haystack) setting, designing all texts as critical information, requiring the LLM to use all the content and reasoning in the text accurately to answer the questions.
 
 ### Evaluation Steps
 
-1. Download the dataset from [Skywork/ChineseDomainModelingEval](https://huggingface.co/datasets/Skywork/ChineseDomainModelingEval/tree/main).
+1. Download the dataset from [here](https://github.com/open-compass/opencompass/files/14741330/needlebench.zip).
 
-2. Place the downloaded files in `opencompass/data/CDME/`. The expected file structure in the `CDME` directory is as follows:
+2. Place the downloaded files in the `opencompass/data/needlebench/` directory. The expected file structure in the `needlebench` directory is shown below:
 
-   ```
-   opencompass/
-   ├── configs
-   ├── docs
-   ├── data
-   │   └── CDME
-   │       ├── processed
-   │       ├── README.md
-   │       ├── zh_finance.jsonl
-   │       ├── zh_game.jsonl
-   │       ├── zh_general.jsonl
-   │       ├── zh_government.jsonl
-   │       ├── zh_movie.jsonl
-   │       └── zh_tech.jsonl
-   ├── LICENSE
-   ├── opencompass
-   ├── outputs
-   ├── run.py
-   ├── more...
-   ```
+```
+opencompass/
+├── configs
+├── docs
+├── data
+│   └── needlebench
+│       ├── multi_needle_reasoning_en.json
+│       ├── multi_needle_reasoning_zh.json
+│       ├── names.json
+│       ├── needles.jsonl
+│       ├── PaulGrahamEssays.jsonl
+│       ├── zh_finance.jsonl
+│       ├── zh_game.jsonl
+│       ├── zh_government.jsonl
+│       ├── zh_movie.jsonl
+│       ├── zh_tech.jsonl
+│       ├── zh_general.jsonl
+├── LICENSE
+├── opencompass
+├── outputs
+├── run.py
+├── more...
+```
 
-### Environment Setup
+### `OpenCompass` Environment Setup
 
 ```bash
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
@@ -60,272 +58,110 @@ pip install -e .
 
 ### Configuring the Dataset
 
-In the latest version, datasets are no longer generated by running scripts but dynamically defined and loaded through configuration files. Users need to specify dataset parameters in the configuration file according to their needs, offering greater flexibility and customization options.
+We have pre-configured datasets for common text lengths (4k, 8k, 32k, 128k, 200k, 1000k) in `configs/datasets/needlebench`, allowing you to flexibly create datasets that meet your needs by defining related parameters in the configuration files.
 
-#### Dataset Configuration Example
+### Evaluation Example
 
-Here is an example of dataset configuration, showing how to define a dataset in the `configs/datasets/cdme/cdme8k.py` configuration file. This example demonstrates a Chinese dataset configuration with a length of 8000 tokens:
+#### Evaluating `InternLM2-7B` Model Deployed Using `LMDeploy`
 
-```python
-for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
-        dataset_dict = {
-            'abbr': f'CDME_Length{original_context_length}Depth{int(depth_percent)}',
-            'type': CDMEDataset,
-            'path': base_path,
-            'length': original_context_length,
-            'depth': int(depth_percent),
-            'tokenizer_model': 'gpt-4',
-            'file_list': file_list,
-            'num_repeats_per_file': 10,
-            'length_buffer': 200,
-            'guide': True,
-            'language': 'Chinese',
-            'needle': '\n小明最喜欢的实习的地点就是上海人工智能实验室。\n',
-            'retrieval_question': '小明最喜欢的实习地点是哪里？请按照“小明最喜欢的实习地点就是________。”的格式回答。',
-            'reader_cfg': cdme_reader_cfg,
-            'infer_cfg': cdme_infer_cfg,
-            'eval_cfg': cdme_eval_cfg
-        }
-        cdme_datasets.append(dataset_dict)
-```
+For example, to evaluate the `InternLM2-7B` model deployed using `LMDeploy` for all tasks in NeedleBench-4K, you can directly use the following command in the command line. This command calls the pre-defined model and dataset configuration files without needing to write additional configuration files:
 
-In this configuration, the main parameters include:
+##### Local Evaluation
 
-- `abbr`: Abbreviation of the dataset.
-- `type`: Dataset type.
-- `path`: Path to the dataset files.
-- `length`: Context length in tokens.
-- `depth`: Depth percentage of the document.
-- `tokenizer_model`: Tokenizer model used.
-- `file_list`: List of data source files.
-- `num_repeats_per_file`: Number of repeats per file.
-- `length_buffer`: Length buffer.
-- `guide`: Whether it's a guided dataset.
-- `language`: Language of the dataset.
-- `needle`: Specific text to find in the dataset (the 'needle').
-- `retrieval_question`: Question used to prompt the model for retrieval.
-- `reader_cfg`, `infer_cfg`, `eval_cfg`: Configurations for reading, inference, and evaluation, respectively.
-
-By defining these parameters in the configuration file, you can flexibly create datasets that suit your needs. Configuration files offer a highly customizable and scalable way to manage the generation and use of datasets.
-
-### Multi-Needle Needle In A Haystack Test
-
-The latest version introduces the multi-needle Needle In A Haystack test, allowing multiple different needles (text snippets) to be inserted into the same dataset. These needles are inserted in sequence according to a given depth parameter. Compared to the single-needle test, the multi-needle test provides a more complex data processing scenario.
-
-#### Multi-Needle Dataset Configuration Example
-
-Here is an example of configuring a multi-needle dataset, showing how to define a multi-needle dataset in the `configs/datasets/cdme/multi_needle/cdme8k_cot3_italy.py` configuration file. This example demonstrates a dataset configuration with three needles:
-
-```python
-# Basic dataset configuration
-base_path = './data/CDME'
-file_list = ['zh_finance.jsonl']
-
-# Definition of Needles
-needles = [
-    '\n意大利的佛罗伦萨有一家名为"La Giostra"的餐馆，是整个佛罗伦萨中排行第一的餐馆。\n',
-    '"La Giostra"餐馆的特色菜肴是松露奶酪通心粉。',
-    '松露奶酪通心粉是该家餐馆的有着意大利皇室烹饪血统的大厨Jack制作'
-]
-
-
-# Configuration parameters
-retrieval_question = ("制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫什么？"
-                      "请按照'制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫______。'的格式回答。")
-answer = "制作佛罗伦萨中排行第一的餐馆的特色菜肴的人叫Jack"
-keyword = "Jack"
-diff = 25
-
-# Dataset generation loop
-for original_context_length in context_lengths:
-    for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
-        dataset_dict = {
-            # Other configuration items...
-            'needles': needles,
-            'diff': diff,
-            'keyword': keyword,
-            # Other configuration items...
-        }
-        cdme_datasets.append(dataset_dict)
-```
-
-In this configuration, in addition to the standard parameters, the main new parameters include:
-
-- `needles`: A list containing multiple strings, each representing a needle to be inserted.
-- `diff`: Defines the depth increment for subsequent needles relative to the first needle.
-- `keyword`: A keyword used for score correction during the evaluation process.
-
-#### Change in Scoring Mechanism
-
-In the source code of `opencompass/datasets/cdme/cdme_multi.py`, the scoring mechanism for multi-needle datasets differs. The following code segment has been added to adjust the scores based on the `keyword` in the predictions:
-
-```python
-if keyword in prediction:
-    print(f'{keyword} is in {prediction}')
-    score = 100
-else:
-    print(f'{keyword} is not in {prediction}')
-    score = 0.2 * score
-```
-
-This code means that if the keyword is present in the prediction, it will be awarded a high score (e.g., 100). If not, the score will be significantly reduced (20% of the original score). This scoring mechanism places more emphasis on the accuracy of keywords, supplementing the traditional scoring methods.
-
-### Evaluation
-
-#### Evaluating with the `internlm` Model
-
-For example, to evaluate using the `internlm` model, the following command can be used:
+If you are evaluating the model locally, the command below will utilize all available GPUs on your machine. You can limit the GPU access for `OpenCompass` by setting the `CUDA_VISIBLE_DEVICES` environment variable. For instance, using `CUDA_VISIBLE_DEVICES=0,1,2,3 python run.py ...` will only expose the first four GPUs to OpenCompass, ensuring that it does not use more than these four GPUs.
 
 ```bash
-python run.py configs/eval_needleinahaystack.py --slurm -p partition_name -q auto --max-num-workers 32
+# Local Evaluation
+python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer
 ```
 
-This command initiates the evaluation process, where the model attempts to find the specified "needle" in the generated dataset. The parameters `-p partition_name -q auto` and `--max-num-workers 32` specify the Slurm queue and the maximum number of worker processes, respectively.
+##### Evaluation on a Slurm Cluster
 
-#### Large-Scale Text Evaluation with `LMDeploy`
+If using `Slurm`, you can add parameters such as `--slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000`, as shown below:
 
-When evaluating especially long texts (e.g., 200k tokens), conventional methods might lead to memory overload. In such cases, quantized models can be used for evaluation. This can be achieved using the `LMDeploy` tool ([LMDeploy](https://github.com/InternLM/lmdeploy)).
+```bash
+# Slurm Evaluation
+python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+```
 
-Detailed information about installing and configuring `LMDeploy` can be found on its GitHub page. Once installed, the `TurboMindModel` defined in the `configs/eval_needleinahaystack_turbomind.py` configuration file can be used for evaluation.
+##### Evaluating a Subdataset Only
 
-Below is an example configuration in the `configs/eval_needleinahaystack_turbomind.py` file:
+If you only want to test the original NeedleInAHaystack task setup, you could change the dataset parameter to `needlebench_single_4k`, which corresponds to the single needle version of the NeedleInAHaystack test at 4k length:
+
+```bash
+python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+```
+
+You can also choose to evaluate a specific subdataset, such as changing the `--datasets` parameter to `needlebench_single_4k/needlebench_zh_datasets` for testing just the Chinese version of the single needle 4K length NeedleInAHaystack task. The parameter after `/` represents the subdataset, which can be found in the dataset variable of `configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py` :
+
+```bash
+python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+```
+
+Be sure to install the [LMDeploy](https://github.com/InternLM/lmdeploy) tool before starting the evaluation:
+
+```bash
+pip install lmdeploy
+```
+
+This command initiates the evaluation process, with parameters `-p partition_name -q auto` and `--max-num-workers 32` used to specify the Slurm partition name and the maximum number of worker processes.
+
+#### Evaluating Other `Huggingface` Models
+
+For other models, we recommend writing an additional configuration file to modify the model's `max_seq_len` and `max_out_len` parameters so the model can receive the complete long text content, as we have prepared in the `configs/eval_needlebench.py` file. The complete content is as follows:
 
 ```python
-from opencompass.models.turbomind import TurboMindModel
 from mmengine.config import read_base
-
 with read_base():
-    from .datasets.cdme.cdme200k import cdme_datasets
+    from .models.hf_internlm.lmdeploy_internlm2_chat_7b import models as internlm2_chat_7b_200k
+    from .models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
 
-datasets = [*cdme_datasets]
+    # Evaluate needlebench_4k, adjust the configuration to use 8k, 32k, 128k, 200k, or 1000k if necessary.
+    # from .datasets.needlebench.needlebench_4k.needlebench_4k import needlebench_datasets
+    # from .summarizers.needlebench import needlebench_4k_summarizer as summarizer
 
-internlm_meta_template = dict(round=[
-    dict(role='HUMAN', begin=':', end='\n'),
-    dict(role='BOT', begin=':', end='<eoa>\n', generate=True),
-],
-                              eos_token_id=103028)
+    # only eval original "needle in a haystack test" in needlebench_4k
+    from .datasets.needlebench.needlebench_4k.needlebench_single_4k import needlebench_zh_datasets, needlebench_en_datasets
+    from .summarizers.needlebench import needlebench_4k_summarizer as summarizer
 
-models = [
-    dict(
-        type=TurboMindModel,
-        abbr='internlm-chat-20b-turbomind',
-        path='./turbomind',
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=8,
-        concurrency=8,
-        meta_template=internlm_meta_template,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-]
+    # eval Ancestral Tracing Challenge(ATC)
+    # from .datasets.needlebench.atc.atc_choice_50 import needlebench_datasets
+    # from .summarizers.needlebench import atc_summarizer_50 as summarizer
+
+datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
+
+for m in internlm2_chat_7b:
+    m['max_seq_len'] = 32768 # Ensure InternLM2-7B model can receive the complete long text, other models need to adjust according to their maximum sequence length support.
+    m['max_out_len'] = 2000 # Ensure that in the multi-needle recall task, the model can receive a complete response
+
+models = internlm2_chat_7b
+
+work_dir = './outputs/needlebench'
 ```
 
-In this configuration, the `TurboMindModel` combines the functionality of `LMDeploy`, suitable for handling large-scale text datasets and effectively reducing memory usage.
+Once the test `config` file is written, we can pass the corresponding config file path through the `run.py` file in the command line, such as:
 
-### Score Calculation Method
-
-In the `CDMEEvaluator` class, we use two main methods to calculate scores: `levenshtein_distance` and `score`. Here are detailed explanations and implementations of these methods.
-
-#### Levenshtein Distance
-
-Levenshtein distance is a measure of the difference between two strings. It represents the minimum number of single-character edits (insertions, deletions, or substitutions) required to change one string into the other.
-
-```python
-def levenshtein_distance(self, s1, s2):
-    if len(s1) < len(s2):
-        return self.levenshtein_distance(s2, s1)
-
-    if len(s2) == 0:
-        return len(s1)
-
-    previous_row = range(len(s2) + 1)
-    for i, c1 in enumerate(s1):
-        current_row = [i + 1]
-        for j, c2 in enumerate(s2):
-            insertions = previous_row[j + 1] + 1
-            deletions = current_row[j] + 1
-            substitutions = previous_row[j] + (c1 != c2)
-            current_row.append(min(insertions, deletions, substitutions))
-        previous_row = current_row
-
-    return previous_row[-1]
+```bash
+python run.py configs/eval_needlebench.py --slurm -p partition_name -q reserved --max-num-workers 128 --max-partition-size 8000
 ```
 
-#### Score Calculation
-
-The `score` calculation method accepts two lists of predictions and references and calculates the edit distance and score for each pair of prediction and reference.
-
-```python
-def score(self, predictions, references):
-    if len(predictions) != len(references):
-        return {"error": "predictions and references have different lengths"}
-
-    total_score = 0
-    details = []
-    for prediction, reference in zip(predictions, references):
-        prediction = re.sub(r'\s+', '', prediction)
-        reference = re.sub(r'\s+', '', reference)
-        edit_distance = self.levenshtein_distance(prediction, reference)
-
-
-        max_len = max(len(prediction), len(reference))
-        score = 100 * (1 - edit_distance /max_len) if max_len != 0 else 100
-
-        detail = {
-            "pred": prediction,
-            "ref": reference,
-            "edit_distance": edit_distance,
-            "score": score
-        }
-        total_score += score
-        details.append(detail)
-
-    average_score = total_score / len(predictions) if predictions else 0
-    result = {"average_score": average_score, "details": details}
-    return result
-```
-
-This scoring method first removes all whitespace characters from both predictions and references and then calculates the Levenshtein distance between them. The score is calculated as 100 minus the percentage loss based on edit distance. Finally, it returns detailed scores for each prediction and the average score overall.
+Note, at this point, we do not need to pass in the `--dataset, --models, --summarizer` parameters, as we have already defined these configurations in the config file. You can manually adjust the `--max-partition-size` setting to achieve the best task slicing strategy to improve evaluation efficiency.
 
 ### Visualization
 
-The `tools_needleinahaystack.py` script can be used to visualize CSV files. This script supports specifying one or more CSV file paths through the `--path` parameter and can use the `--dataset_length` parameter to specify the length of the dataset.
+We have built-in result visualization into the `summarizer` implementation in the latest code version. You can find the corresponding visualizations in the plots directory of the respective output folder, eliminating the need for manual visualization of scores across various depths and lengths.
 
-#### Usage Examples
-
-To visualize a single CSV file:
-
-```bash
-python tools/tools_needleinahaystack.py --path 'outputs/default/20231216_161457/summary/summary_20231216_161457.csv'
-```
-
-To visualize multiple CSV files:
-
-```bash
-python tools/tools_needleinahaystack.py --path 'path_to_first_csv.csv' 'path_to_second_csv.csv'
-```
-
-To specify the dataset length for visualization, which is used for generating titles in the visualization charts:
-
-```bash
-python tools/tools_needleinahaystack.py --path 'path_to_csv.csv' --dataset_length 200K
-```
-
-Currently, this approach only supports the CDME dataset, and we welcome community contributions for more datasets.
-
-If you use this method, please cite as follows:
+If you use this method, please add a reference:
 
 ```bibtex
+
 @misc{2023opencompass,
     title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
     author={OpenCompass Contributors},
     howpublished={\url{https://github.com/open-compass/opencompass}},
     year={2023}
+
+
 }
 
 @misc{LLMTest_NeedleInAHaystack,
@@ -343,4 +179,5 @@ If you use this method, please cite as follows:
       archivePrefix={arXiv},
       primaryClass={cs.CL}
 }
+
 ```

@@ -30,7 +30,7 @@ for _name in subjective_all_sets:
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
-            wrap_all_predictions=True,
+            pack_all_predictions=True,
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(round=[
