@@ -156,7 +156,7 @@ class HuggingFacewithChatTemplate(BaseModel):
             self._load_model(path=path, kwargs=model_kwargs, peft_path=peft_path, peft_kwargs=peft_kwargs)
         self.generation_kwargs = generation_kwargs
         self.fastchat_template = fastchat_template
-        self.stop_words = stop_words
+        self.stop_words = list(set(stop_words + self._get_potential_stop_words(path)))
 
         for k, v in other_kwargs.items():
             if v is not None:
@@ -212,6 +212,19 @@ class HuggingFacewithChatTemplate(BaseModel):
 
         self.model.eval()
         self.model.generation_config.do_sample = False
+
+    def _get_potential_stop_words(self, path: Optional[str]):
+        from transformers import GenerationConfig
+        potential_stop_words = []
+        try:
+            generation_config = GenerationConfig.from_pretrained(path)
+            for token_id in generation_config.eos_token_id:
+                potential_stop_words.append(self.tokenizer.decode(token_id))
+        except:
+            pass
+        potential_stop_words.append(self.tokenizer.eos_token)
+        potential_stop_words = list(set(potential_stop_words))
+        return potential_stop_words
 
     def generate(self,
                  inputs: List[str],
