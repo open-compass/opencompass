@@ -130,21 +130,6 @@ class VLLM(BaseModel):
             ce_loss.append(loss)
         return np.array(ce_loss)
 
-    def prompts_preproccess(self, inputs: List[str]):
-        if self.use_fastchat_template:
-            try:
-                from fastchat.model import get_conversation_template
-            except ModuleNotFoundError:
-                raise ModuleNotFoundError(
-                    'Fastchat is not implemented. You can use '
-                    "'pip install \"fschat[model_worker,webui]\"' "
-                    'to implement fastchat.')
-            conv = get_conversation_template('vicuna')
-            conv.append_message(conv.roles[0], inputs[0])
-            conv.append_message(conv.roles[1], None)
-            inputs = [conv.get_prompt()]
-        return inputs
-
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.
 

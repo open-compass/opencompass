@@ -64,7 +64,7 @@ def _convert_chat_messages(inputs):
     for _input in inputs:
         messages = []
         if isinstance(_input, str):
-            messages.append({'role': 'HUMAN', 'prompt': _input})
+            messages.append({'role': 'HUMAN', 'content': _input})
         else:
             for item in _input:
                 role = {
