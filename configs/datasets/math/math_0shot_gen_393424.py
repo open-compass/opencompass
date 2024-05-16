@@ -3,14 +3,14 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess_v2, normalize_final_answer
 
-math_reader_cfg = dict(input_columns=["problem"], output_column="solution")
+math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
 
 math_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role="HUMAN", prompt="{problem}\nPlease reason step by step, and put your final answer within \\boxed{}."),
+                dict(role='HUMAN', prompt='{problem}\nPlease reason step by step, and put your final answer within \\boxed{}.'),
             ]
         ),
     ),
@@ -20,14 +20,14 @@ math_infer_cfg = dict(
 
 # postprocess v2
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator, version="v2"), pred_postprocessor=dict(type=math_postprocess_v2),
+    evaluator=dict(type=MATHEvaluator, version='v2'), pred_postprocessor=dict(type=math_postprocess_v2),
 )
 
 math_datasets = [
     dict(
         type=MATHDataset,
-        abbr="math",
-        path="./data/math/math.json",
+        abbr='math',
+        path='./data/math/math.json',
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg,

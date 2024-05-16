@@ -7,7 +7,7 @@ from opencompass.datasets import InfiniteBenchensumDataset
 InfiniteBench_ensum_reader_cfg = dict(
     input_columns=['context'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_ensum_infer_cfg = dict(

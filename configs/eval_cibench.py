@@ -10,7 +10,7 @@ from lagent.agents.react import ReActProtocol
 
 with read_base():
     from .datasets.CIBench.CIBench_gen_eb42f9 import cibench_datasets as datasets
-    
+
 FORCE_STOP_PROMPT_EN = """You should directly give results based on history information."""
 
 FEWSHOT_INSTRUCTION = """\
@@ -75,6 +75,6 @@ models = [
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=50, gen_task_coef=1),
     runner=dict(
-        type=SlurmRunner, max_num_workers=8, retry=2, 
+        type=SlurmRunner, max_num_workers=8, retry=2,
         task=dict(type=OpenICLInferTask)),
 )

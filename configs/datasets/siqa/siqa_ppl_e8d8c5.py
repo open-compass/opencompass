@@ -13,20 +13,20 @@ siqa_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            "1":
+            '1':
             dict(round=[
-                dict(role='HUMAN', prompt="{context}\nQuestion: {question}\nA. {answerA}\nB. {answerB}\nC. {answerC}"),
-                dict(role='BOT', prompt="Answer: A")
+                dict(role='HUMAN', prompt='{context}\nQuestion: {question}\nA. {answerA}\nB. {answerB}\nC. {answerC}'),
+                dict(role='BOT', prompt='Answer: A')
             ]),
-            "2":
+            '2':
             dict(round=[
-                dict(role='HUMAN', prompt="{context}\nQuestion: {question}\nA. {answerA}\nB. {answerB}\nC. {answerC}"),
-                dict(role='BOT', prompt="Answer: B")
+                dict(role='HUMAN', prompt='{context}\nQuestion: {question}\nA. {answerA}\nB. {answerB}\nC. {answerC}'),
+                dict(role='BOT', prompt='Answer: B')
             ]),
-            "3":
+            '3':
             dict(round=[
-                dict(role='HUMAN', prompt="{context}\nQuestion: {question}\nA. {answerA}\nB. {answerB}\nC. {answerC}"),
-                dict(role='BOT', prompt="Answer: C")
+                dict(role='HUMAN', prompt='{context}\nQuestion: {question}\nA. {answerA}\nB. {answerB}\nC. {answerC}'),
+                dict(role='BOT', prompt='Answer: C')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),
@@ -36,7 +36,7 @@ siqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 siqa_datasets = [
     dict(
-        abbr="siqa",
+        abbr='siqa',
         type=siqaDataset,
         path='./data/siqa',
         reader_cfg=siqa_reader_cfg,

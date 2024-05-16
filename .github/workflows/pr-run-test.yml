@@ -23,6 +23,7 @@ env:
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HF_DATASETS_OFFLINE: 1
   TRANSFORMERS_OFFLINE: 1
+  HF_HUB_OFFLINE: 1
 
 jobs:
   pr_run_test:

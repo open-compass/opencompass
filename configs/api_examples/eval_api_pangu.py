@@ -17,13 +17,13 @@ dict(
         abbr='pangu',
         type=PanGu,
         path='pangu',
-        access_key="xxxxxx",
-        secret_key="xxxxxx",
-        url = "xxxxxx",
+        access_key='xxxxxx',
+        secret_key='xxxxxx',
+        url = 'xxxxxx',
         # url of token sever, used for generate token, like "https://xxxxxx.myhuaweicloud.com/v3/auth/tokens",
-        token_url = "xxxxxx",
+        token_url = 'xxxxxx',
         # scope-project-name, used for generate token
-        project_name = "xxxxxx",
+        project_name = 'xxxxxx',
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
@@ -39,4 +39,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_pangu/"
+work_dir = 'outputs/api_pangu/'

@@ -71,7 +71,7 @@ hungarianmath_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt=template+"\n\nProblem:\n{question}\n\nSolution:\n"),
+                dict(role='HUMAN', prompt=template+'\n\nProblem:\n{question}\n\nSolution:\n'),
             ],
         )),
     retriever=dict(type=ZeroRetriever),

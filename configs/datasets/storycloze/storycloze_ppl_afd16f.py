@@ -14,8 +14,8 @@ storycloze_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            1: "{context}{sentence_quiz1}",
-            2: "{context}{sentence_quiz2}",
+            1: '{context}{sentence_quiz1}',
+            2: '{context}{sentence_quiz2}',
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

@@ -55,8 +55,8 @@ def parse_args():
     parser.add_argument(
         '-a', '--accelerator',
         help='Infer accelerator, support vllm and lmdeploy now.',
-        choices=['vllm', 'lmdeploy', 'hf'],
-        default='hf',
+        choices=['vllm', 'lmdeploy', None],
+        default=None,
         type=str)
     parser.add_argument('-m',
                         '--mode',
@@ -170,6 +170,8 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
+
+
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
     hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat', help='The type of the HuggingFace model, base or chat')
@@ -212,7 +214,7 @@ def main():
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
-        cfg.setdefault('work_dir', osp.join('outputs', 'default'))
+        cfg.setdefault('work_dir', os.path.join('outputs', 'default'))
 
     # cfg_time_str defaults to the current time
     cfg_time_str = dir_time_str = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -338,6 +340,7 @@ def main():
         summarizer_cfg['config'] = cfg
         summarizer = build_from_cfg(summarizer_cfg)
         summarizer.summarize(time_str=cfg_time_str)
+
 
 
 if __name__ == '__main__':

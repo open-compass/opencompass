@@ -6,8 +6,8 @@ from opencompass.datasets import AXDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 AX_b_reader_cfg = dict(
-    input_columns=["sentence1", "sentence2"],
-    output_column="label",
+    input_columns=['sentence1', 'sentence2'],
+    output_column='label',
 )
 
 AX_b_infer_cfg = dict(
@@ -15,9 +15,9 @@ AX_b_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "{sentence1}\n{sentence2}\nIs the sentence below entailed by the sentence above?\nA. Yes\nB. No\nAnswer:"
+                '{sentence1}\n{sentence2}\nIs the sentence below entailed by the sentence above?\nA. Yes\nB. No\nAnswer:'
             ),
         ]),
     ),
@@ -27,15 +27,15 @@ AX_b_infer_cfg = dict(
 
 AX_b_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 AX_b_datasets = [
     dict(
-        abbr="AX_b",
+        abbr='AX_b',
         type=AXDataset_V2,
-        path="./data/SuperGLUE/AX-b/AX-b.jsonl",
+        path='./data/SuperGLUE/AX-b/AX-b.jsonl',
         reader_cfg=AX_b_reader_cfg,
         infer_cfg=AX_b_infer_cfg,
         eval_cfg=AX_b_eval_cfg,

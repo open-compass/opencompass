@@ -8,8 +8,8 @@ from opencompass.utils.text_postprocessors import first_option_postprocess
 race_reader_cfg = dict(
     input_columns=['article', 'question', 'A', 'B', 'C', 'D'],
     output_column='answer',
-    train_split="validation",
-    test_split="test"
+    train_split='validation',
+    test_split='test'
 )
 
 race_infer_cfg = dict(
@@ -17,9 +17,9 @@ race_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "Read the article, and answer the question by replying A, B, C or D.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}"
+                'Read the article, and answer the question by replying A, B, C or D.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}'
             ),
         ])),
     retriever=dict(type=ZeroRetriever),

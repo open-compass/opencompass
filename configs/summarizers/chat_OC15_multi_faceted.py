@@ -126,5 +126,5 @@ summarizer = dict(
         {'name': 'sanitized_mbpp', 'dataset_abbrs': sanitized_mbpp_dataset_abbrs},
         {'name': 'overall', 'dataset_abbrs': overall_dataset_abbrs},
     ],
-    summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+    summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

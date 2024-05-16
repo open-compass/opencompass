@@ -23,11 +23,11 @@ for name, test_type in settings:
             desc = task_prompt.strip() + '\n'
         else:
             desc = ''
-        prompt_rounds.append(dict(role="HUMAN", prompt=f"{desc}{question.strip()}"))
-        prompt_rounds.append(dict(role="BOT", prompt=answer.strip()))
-    prompt_rounds.append(dict(role="HUMAN", prompt="Q: {input}"))
+        prompt_rounds.append(dict(role='HUMAN', prompt=f'{desc}{question.strip()}'))
+        prompt_rounds.append(dict(role='BOT', prompt=answer.strip()))
+    prompt_rounds.append(dict(role='HUMAN', prompt='Q: {input}'))
 
-    bbh_reader_cfg = dict(input_columns=["input"], output_column="target")
+    bbh_reader_cfg = dict(input_columns=['input'], output_column='target')
 
     bbh_infer_cfg = dict(
         prompt_template=dict(type=PromptTemplate, template=dict(round=prompt_rounds)),
@@ -37,18 +37,18 @@ for name, test_type in settings:
     if test_type == 'mcq':
         bbh_eval_cfg = dict(
             evaluator=dict(type=BBHEvaluator_mcq),
-            pred_role="BOT",
+            pred_role='BOT',
             pred_postprocessor=dict(type=bbh_mcq_postprocess),
             dataset_postprocessor=dict(type=bbh_mcq_postprocess))
     else:
         bbh_eval_cfg = dict(
             evaluator=dict(type=BBHEvaluator),
-            pred_role="BOT")
+            pred_role='BOT')
 
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path="./data/BBH/data",
+            path='./data/BBH/data',
             name=name,
             abbr='bbh-' + name,
             reader_cfg=bbh_reader_cfg.copy(),

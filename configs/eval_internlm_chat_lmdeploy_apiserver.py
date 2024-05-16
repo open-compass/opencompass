@@ -49,4 +49,3 @@ internlm_chat_7b = dict(
 )
 
 models = [internlm_chat_20b]
-

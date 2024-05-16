@@ -77,5 +77,5 @@ summarizer = dict(
         'ceval-hard',
     ],
     summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

@@ -2,8 +2,8 @@ from opencompass.models import VLLM
 
 _meta_template = dict(
     round=[
-        dict(role="HUMAN", begin='<|user|>\n', end='</s>'),
-        dict(role="BOT", begin="<|assistant|>\n", end='</s>', generate=True),
+        dict(role='HUMAN', begin='<|user|>\n', end='</s>'),
+        dict(role='BOT', begin='<|assistant|>\n', end='</s>', generate=True),
     ],
 )
 

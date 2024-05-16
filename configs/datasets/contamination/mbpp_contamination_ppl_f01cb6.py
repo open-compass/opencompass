@@ -7,7 +7,7 @@ from opencompass.datasets import SanitizedMBPPDataset, JsonlDataset
 mbpp_datasets = []
 
 mbpp_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template="{text}\n{code}"),
+    prompt_template=dict(type=PromptTemplate, template='{text}\n{code}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLOnlyInferencer),
 )
@@ -33,7 +33,7 @@ for split in ['train', 'test']:
 
 
 mbpp_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template="{text}"),
+    prompt_template=dict(type=PromptTemplate, template='{text}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLOnlyInferencer),
 )

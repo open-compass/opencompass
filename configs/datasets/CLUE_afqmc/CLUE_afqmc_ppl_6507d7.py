@@ -16,20 +16,20 @@ afqmc_infer_cfg = dict(
             0:
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "语句一：“{sentence1}”\n语句二：“{sentence2}”\n语句一与语句二是关于蚂蚁金融产品的疑问，两者所询问的内容是否完全一致？"
+                    '语句一：“{sentence1}”\n语句二：“{sentence2}”\n语句一与语句二是关于蚂蚁金融产品的疑问，两者所询问的内容是否完全一致？'
                 ),
-                dict(role="BOT", prompt="不完全一致")
+                dict(role='BOT', prompt='不完全一致')
             ]),
             1:
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "语句一：“{sentence1}”\n语句二：“{sentence2}”\n语句一与语句二是关于蚂蚁金融产品的疑问，两者所询问的内容是否完全一致？"
+                    '语句一：“{sentence1}”\n语句二：“{sentence2}”\n语句一与语句二是关于蚂蚁金融产品的疑问，两者所询问的内容是否完全一致？'
                 ),
-                dict(role="BOT", prompt="完全一致")
+                dict(role='BOT', prompt='完全一致')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),

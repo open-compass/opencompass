@@ -20,10 +20,10 @@ for _name in subset_mapping.keys():
     llm_cmp_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
-            template="{content}",
+            template='{content}',
         ),
         # No in-context example, using ZeroRetriever
-        retriever=dict(type=ZeroRetriever),  
+        retriever=dict(type=ZeroRetriever),
         # Calculates cross entropy loss for each batch based on a sliding context window
         # Setting block_size=1900 and stride=512 according to the original paper
         inferencer=dict(type=SWCELossInferencer, block_size=1900, stride=512),
@@ -34,13 +34,13 @@ for _name in subset_mapping.keys():
 
     llm_compression_datasets.append(
         dict(
-            abbr=f"llm_compression-{_name}",
+            abbr=f'llm_compression-{_name}',
             type=LLMCompressionDataset,
-            path="./data/llm-compression",
+            path='./data/llm-compression',
             name=_name,
             samples=None,  # Set small samples for testing
             reader_cfg=dict(
-                input_columns=["content"],
+                input_columns=['content'],
                 output_column=None,
             ),
             infer_cfg=llm_cmp_infer_cfg,

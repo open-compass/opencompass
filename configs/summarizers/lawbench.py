@@ -50,7 +50,7 @@ summarizer = dict(
         'lawbench-3-7-criminal_damages_calculation-1-shot',
         'lawbench-3-8-consultation-1-shot',
     ],
-    summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+    summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
     prompt_db=dict(
         database_path='configs/datasets/log.json',
         config_dir='configs/datasets',

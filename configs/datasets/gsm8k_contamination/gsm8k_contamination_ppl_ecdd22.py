@@ -7,7 +7,7 @@ from opencompass.datasets import GSM8KDataset, GSM8KReferenceSkywork
 gsm8k_datasets = []
 
 gsm8k_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template="{question} {answer}"),
+    prompt_template=dict(type=PromptTemplate, template='{question} {answer}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLOnlyInferencer),
 )
@@ -33,7 +33,7 @@ for split in ['train', 'test']:
 
 
 gsm8k_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template="{text}"),
+    prompt_template=dict(type=PromptTemplate, template='{text}'),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLOnlyInferencer),
 )

@@ -13,7 +13,7 @@ gpt4_judge = dict(
     abbr='GPT4-Turbo',
     path='gpt-4-1106-preview',
     key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
-    config='weighted_alpaca_eval_gpt4_turbo' 
+    config='weighted_alpaca_eval_gpt4_turbo'
 )
 ## ------------- Evaluation Configuration
 eval = dict(
@@ -27,4 +27,3 @@ eval = dict(
     )
 )
 work_dir = 'outputs/alpaca/'
-

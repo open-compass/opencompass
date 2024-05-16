@@ -15,20 +15,20 @@ cluewsc_infer_cfg = dict(
             0:
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
                     "{text}\nHere, is the pronoun \"{span2}\" used to mean \"{span1}\"?"
                 ),
-                dict(role="BOT", prompt="No.")
+                dict(role='BOT', prompt='No.')
             ]),
             1:
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
                     "{text}\nHere, is the pronoun \"{span2}\" used to mean \"{span1}\"?"
                 ),
-                dict(role="BOT", prompt="Yes.")
+                dict(role='BOT', prompt='Yes.')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),

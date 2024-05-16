@@ -66,7 +66,7 @@ def solution():
     return result"""),
                 dict(role='SYSTEM', prompt='Response:1.17'),
                 dict(role='BOT', prompt='FinalAnswer: The final answer is $1.17$. I hope it is correct.'),
-                dict(role='HUMAN', prompt="Given $\mathbf{a} = \\begin{pmatrix} -7 \\ 0 \\ 1 \end{pmatrix}$ and $\mathbf{b} = \\begin{pmatrix} 4 \\ 2 \\ -1 \end{pmatrix},$ find $\mathbf{a} - 3 \mathbf{b}.$"),
+                dict(role='HUMAN', prompt='Given $\mathbf{a} = \\begin{pmatrix} -7 \\ 0 \\ 1 \end{pmatrix}$ and $\mathbf{b} = \\begin{pmatrix} 4 \\ 2 \\ -1 \end{pmatrix},$ find $\mathbf{a} - 3 \mathbf{b}.$'),
                 dict(role='BOT', prompt="""Tool:PythonInterpreter\nTool Input:import numpy as np
 
 def solution()

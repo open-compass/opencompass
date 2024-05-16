@@ -7,11 +7,11 @@ from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 WiC_reader_cfg = dict(
     input_columns=[
-        "word",
-        "sentence1",
-        "sentence2",
+        'word',
+        'sentence1',
+        'sentence2',
     ],
-    output_column="label",
+    output_column='label',
 )
 
 WiC_infer_cfg = dict(
@@ -19,7 +19,7 @@ WiC_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
                 "Sentence 1: {sentence1}\nSentence 2: {sentence2}\nAre '{word}' in the above two sentenses the same?\nA. Yes\nB. No\nAnswer:"
             ),
@@ -31,15 +31,15 @@ WiC_infer_cfg = dict(
 
 WiC_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 WiC_datasets = [
     dict(
-        abbr="WiC",
+        abbr='WiC',
         type=WiCDataset_V2,
-        path="./data/SuperGLUE/WiC/val.jsonl",
+        path='./data/SuperGLUE/WiC/val.jsonl',
         reader_cfg=WiC_reader_cfg,
         infer_cfg=WiC_infer_cfg,
         eval_cfg=WiC_eval_cfg,

@@ -12,15 +12,15 @@ CMRC_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
-                prompt="文章：{context}\n根据上文，回答如下问题：\n{question}\n答："),
+                role='HUMAN',
+                prompt='文章：{context}\n根据上文，回答如下问题：\n{question}\n答：'),
         ])),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
 CMRC_eval_cfg = dict(
     evaluator=dict(type=EMEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
 )
 
 CMRC_datasets = [

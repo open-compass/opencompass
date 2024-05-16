@@ -2,7 +2,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .groups.cibench import cibench_summary_groups
+    from .groups.legacy.cibench import cibench_summary_groups
     from .groups.plugineval import plugineval_summary_groups
 
 
@@ -115,36 +115,36 @@ agent_summary_groups = [
 
 other_summary_groups = [
     {
-        "name": "average_cn",
-        "subsets": [
-            ["language_zh_perf_4_and_non_mcq", "naive_average"],
-            ["knowledge_cn", "perf_4"],
-            ["reasonbench_cn_circular", "perf_circular"],
-            ["math_perf_4_and_fill_in_blank_cn", "naive_average"],
-            ["code_cn", "naive_average"],
-            ["agent_cn", "naive_average"],
+        'name': 'average_cn',
+        'subsets': [
+            ['language_zh_perf_4_and_non_mcq', 'naive_average'],
+            ['knowledge_cn', 'perf_4'],
+            ['reasonbench_cn_circular', 'perf_circular'],
+            ['math_perf_4_and_fill_in_blank_cn', 'naive_average'],
+            ['code_cn', 'naive_average'],
+            ['agent_cn', 'naive_average'],
         ],
     },
     {
-        "name": "average_en",
-        "subsets": [
-            ["language_en_perf_4_and_non_mcq", "naive_average"],
-            ["compassbench_v1_knowledge-mixed-cloze_en", "score"],
-            ["reasonbench_en_circular", "perf_circular"],
-            ["math_perf_4_and_fill_in_blank_en", "naive_average"],
-            ["code_en", "naive_average"],
-            ["agent_en", "naive_average"],
+        'name': 'average_en',
+        'subsets': [
+            ['language_en_perf_4_and_non_mcq', 'naive_average'],
+            ['compassbench_v1_knowledge-mixed-cloze_en', 'score'],
+            ['reasonbench_en_circular', 'perf_circular'],
+            ['math_perf_4_and_fill_in_blank_en', 'naive_average'],
+            ['code_en', 'naive_average'],
+            ['agent_en', 'naive_average'],
         ],
     },
     {
-        "name": "average",
-        "subsets": [
-            ["language_perf_4_and_non_mcq", "naive_average"],
-            ["knowledge_perf_4_and_cloze", "naive_average"],
-            ["reasonbench", "perf_circular"],
-            ["math_perf_4_and_fill_in_blank", "naive_average"],
-            ["code", "naive_average"],
-            ["agent", "naive_average"],
+        'name': 'average',
+        'subsets': [
+            ['language_perf_4_and_non_mcq', 'naive_average'],
+            ['knowledge_perf_4_and_cloze', 'naive_average'],
+            ['reasonbench', 'perf_circular'],
+            ['math_perf_4_and_fill_in_blank', 'naive_average'],
+            ['code', 'naive_average'],
+            ['agent', 'naive_average'],
         ],
     },
 ]
@@ -223,5 +223,5 @@ summarizer = dict(
         ['plugin_eval-mus-p10_one_review_zh', 'naive_average'],
         ['plugin_eval-mus-p10_one_review', 'naive_average'],
     ],
-    summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+    summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )
