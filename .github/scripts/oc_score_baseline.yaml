@@ -1,10 +1,10 @@
 internlm-7b-hf:
-    ARC-c: 36.27
-    chid-dev: 81.68
-    chid-test: 83.67
-    openai_humaneval: 10.37
-    openbookqa: 44.4
-    openbookqa_fact: 73.2
+    ARC-c: 34.24
+    chid-dev: 79.70
+    chid-test: 81.12
+    openai_humaneval: 10.98
+    openbookqa: 47.20
+    openbookqa_fact: 74.00
 
 internlm-chat-7b-hf:
     ARC-c: 36.95
@@ -15,9 +15,17 @@ internlm-chat-7b-hf:
     openbookqa_fact: 80.4
 
 chatglm3-6b-base-hf:
-    ARC-c: 43.05
-    chid-dev: 80.2
-    chid-test: 80.77
+    ARC-c: 44.41
+    chid-dev: 78.22
+    chid-test: 78.57
     openai_humaneval: 20.73
-    openbookqa: 79.8
-    openbookqa_fact: 92.2
+    openbookqa: 78.40
+    openbookqa_fact: 92.00
+
+internlm2-7b-hf:
+    ARC-c: 34.92
+    chid-dev: 55.94
+    chid-test: 53.70
+    openai_humaneval: 44.51
+    openbookqa: 83.00
+    openbookqa_fact: 83.00
