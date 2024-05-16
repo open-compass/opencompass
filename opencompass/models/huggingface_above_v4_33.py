@@ -64,7 +64,7 @@ def _convert_chat_messages(inputs):
     for _input in inputs:
         messages = []
         if isinstance(_input, str):
-            messages.append({'role': 'HUMAN', 'content': _input})
+            messages.append({'role': 'user', 'content': _input})
         else:
             for item in _input:
                 role = {
@@ -165,7 +165,7 @@ class HuggingFacewithChatTemplate(BaseModel):
     def _load_tokenizer(self, path: Optional[str], kwargs: dict, pad_token_id: Optional[int] = None):
         from transformers import AutoTokenizer, GenerationConfig
 
-        DEFAULT_TOKENIZER_KWARGS = dict(padding_side='left', truncation_side='left', use_fast=False, trust_remote_code=True)
+        DEFAULT_TOKENIZER_KWARGS = dict(padding_side='left', truncation_side='left', trust_remote_code=True)
         tokenizer_kwargs = DEFAULT_TOKENIZER_KWARGS
         tokenizer_kwargs.update(kwargs)
         self.tokenizer = AutoTokenizer.from_pretrained(path, **tokenizer_kwargs)
@@ -199,6 +199,7 @@ class HuggingFacewithChatTemplate(BaseModel):
         model_kwargs = DEFAULT_MODEL_KWARGS
         model_kwargs.update(kwargs)
         model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
+        self.logger.debug(f'using model_kwargs: {model_kwargs}')
 
         try:
             self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
