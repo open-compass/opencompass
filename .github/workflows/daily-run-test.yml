@@ -51,7 +51,7 @@ jobs:
           conda info --envs
           rm -rf regression_result_daily
           export from_tf=TRUE
-          python3 run.py --models hf_internlm2_chat_7b hf_internlm2_7b hf_chatglm3_6b_base hf_chatglm3_6b hf_qwen_7b_chat hf_qwen_7b --datasets FewCLUE_chid_ppl humaneval_gen ARC_c_ppl obqa_ppl --work-dir regression_result_daily
+          python3 run.py --models hf_internlm_chat_7b hf_internlm2_7b hf_chatglm3_6b_base hf_chatglm3_6b hf_qwen_7b_chat hf_qwen_7b --datasets FewCLUE_chid_ppl humaneval_gen ARC_c_ppl obqa_ppl --work-dir regression_result_daily
       - name:  Get result
         run: |
           eval "$(conda shell.bash hook)"
