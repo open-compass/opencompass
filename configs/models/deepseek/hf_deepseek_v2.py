@@ -13,6 +13,6 @@ models = [
             max_memory={i: '75GB' for i in range(8)},
             attn_implementation='eager'
         ),
-        run_cfg=dict(num_gpus=4),
+        run_cfg=dict(num_gpus=8),
     )
 ]

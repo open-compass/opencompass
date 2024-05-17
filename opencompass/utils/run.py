@@ -84,7 +84,7 @@ def get_config_from_arg(args) -> Config:
         # set infer accelerator if needed
         if args.accelerator in ['vllm', 'lmdeploy']:
             config['models'] = change_accelerator(config['models'], args.accelerator)
-            if 'eval' in config and 'partitioner' in config['eval']:
+            if config.get('eval', {}).get('partitioner', {}).get('models') is not None:
                 config['eval']['partitioner']['models'] = change_accelerator(config['eval']['partitioner']['models'], args.accelerator)
             if config.get('eval', {}).get('partitioner', {}).get('judge_models') is not None:
                 config['eval']['partitioner']['judge_models'] = change_accelerator(config['eval']['partitioner']['judge_models'], args.accelerator)

@@ -42,5 +42,6 @@ from .vllm import VLLM  # noqa: F401
 from .vllm_with_tf_above_v4_33 import VLLMwithChatTemplate  # noqa: F401
 from .xunfei_api import XunFei, XunFeiSpark  # noqa: F401
 from .yayi_api import Yayi  # noqa: F401
+from .yi_api import YiAPI  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
 from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401

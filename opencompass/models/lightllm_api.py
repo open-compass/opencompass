@@ -68,6 +68,7 @@ class LightllmAPI(BaseModel):
             self.wait()
             header = {'content-type': 'application/json'}
             try:
+                self.logger.debug(f'input: {input}')
                 data = dict(inputs=input, parameters=self.generation_kwargs)
                 raw_response = requests.post(self.url,
                                              headers=header,
@@ -80,6 +81,7 @@ class LightllmAPI(BaseModel):
                 generated_text = response['generated_text']
                 if isinstance(generated_text, list):
                     generated_text = generated_text[0]
+                self.logger.debug(f'generated_text: {generated_text}')
                 return generated_text
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',

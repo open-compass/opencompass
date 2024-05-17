@@ -288,6 +288,7 @@ class MBPPEvaluator(BaseEvaluator):
             r'(.*)\s*```.*',
             r"\[BEGIN\]\s*'(.*)",
             r'\[BEGIN\](.*)',
+            r"'(.*)'\s*\[DONE\]",
         ]
         for p in patterns:
             match = re.search(p, text, re.DOTALL)
