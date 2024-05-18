@@ -1,1 +1,79 @@
--r requirements/runtime.txt
+# -r requirements/runtime.txt
+absl-py
+accelerate>=0.19.0
+boto3
+cn2an
+cpm_kernels
+datasets>=2.12.0
+einops==0.5.0
+evaluate>=0.3.0
+fairscale
+func_timeout
+fuzzywuzzy
+immutabledict
+jieba
+langdetect
+ltp
+mmengine-lite
+nltk==3.8
+numpy==1.23.4
+openai
+OpenCC
+opencv-python-headless
+pandas<2.0.0
+prettytable
+pypinyin
+python-Levenshtein
+rank_bm25==0.2.2
+rapidfuzz
+requests==2.31.0
+rich
+rouge
+-e git+https://github.com/Isaac-JL-Chen/rouge_chinese.git@master#egg=rouge_chinese
+rouge_score
+sacrebleu
+scikit_learn==1.2.1
+seaborn
+sentence_transformers==2.2.2
+tabulate
+tiktoken
+timeout_decorator
+tokenizers>=0.13.3
+# torch>=1.13.1
+tqdm==4.64.1
+# transformers>=4.29.1
+typer
+
+# accelerate
+# datasets
+deepspeed==0.9.3
+pybind11
+six
+jieba
+regex
+numpy
+tensorboardX
+sentencepiece
+nltk
+pydantic
+transformers_stream_generator
+torch==2.0.1
+# https://nebula-cv.oss-cn-zhangjiakou.aliyuncs.com/yansong/deepspeed-0.7.7%2B731fea5-py3-none-any.whl
+# https://347712.oss-cn-hangzhou-zmf.aliyuncs.com/M6/deepspeed-0.7.7%2Bd6f10c7-py3-none-any.whl
+# deepspeed==0.8.3
+human-eval
+modelscope
+tiktoken
+transformers_stream_generator
+
+transformers==4.31.0
+# transformers==4.35.0 #Yi
+# transformers==4.36.2 #mixtral
+einops
+scipy
+rouge_score
+shortuuid
+openai
+anthropic
+triton
+jinja2
