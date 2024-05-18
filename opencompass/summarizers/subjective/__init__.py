@@ -6,4 +6,5 @@ from .corev2 import Corev2Summarizer
 from .creationbench import CreationBenchSummarizer
 from .information_retrival import IRSummarizer
 from .mtbench import MTBenchSummarizer
+from .mtbench101 import MTBench101Summarizer
 from .multiround import MultiroundSummarizer
