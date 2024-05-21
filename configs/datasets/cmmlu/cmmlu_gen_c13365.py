@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
 from opencompass.datasets import CMMLUDataset
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
@@ -101,7 +101,7 @@ for _name in cmmlu_all_sets:
     )
 
     cmmlu_eval_cfg = dict(
-        evaluator=dict(type=AccEvaluator),
+        evaluator=dict(type=AccwithDetailsEvaluator),
         pred_postprocessor=dict(type=first_capital_postprocess))
 
     cmmlu_datasets.append(
