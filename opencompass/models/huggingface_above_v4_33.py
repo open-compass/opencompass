@@ -59,7 +59,7 @@ def _get_possible_max_seq_len(max_seq_len, path):
     raise ValueError('max_seq_len is not provided and cannot be inferred from the model config.')
 
 
-def _convert_chat_messages(inputs):
+def _convert_chat_messages(inputs, merge_role=True):
     outputs = []
     for _input in inputs:
         messages = []
@@ -73,7 +73,18 @@ def _convert_chat_messages(inputs):
                     'SYSTEM': 'system',
                 }[item['role']]
                 messages.append({'role': role, 'content': item['prompt']})
+
+        if merge_role:
+            merged_messages = []
+            for item in messages:
+                if merged_messages and merged_messages[-1]['role'] == item['role']:
+                    merged_messages[-1]['content'] += '\n' + item['content']
+                else:
+                    merged_messages.append(item)
+            messages = merged_messages
+
         outputs.append(messages)
+        print(messages)
     return outputs
 
 
@@ -104,6 +115,8 @@ def _get_meta_template(meta_template):
     default_meta_template = dict(
         round=[
             dict(role='HUMAN', api_role='HUMAN'),
+            # XXX: all system roles are mapped to human in purpose
+            dict(role='SYSTEM', api_role='HUMAN'),
             dict(role='BOT', api_role='BOT', generate=True),
         ]
     )
