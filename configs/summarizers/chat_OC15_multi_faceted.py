@@ -115,6 +115,14 @@ sanitized_mbpp_dataset_abbrs = [
     ['sanitized_mbpp', 'timeout'],
 ]
 
+IFEval_dataset_abbrs = [
+    ['IFEval', 'Prompt-level-strict-accuracy'],
+    ['IFEval', 'Inst-level-strict-accuracy'],
+    ['IFEval', 'Prompt-level-loose-accuracy'],
+    ['IFEval', 'Inst-level-loose-accuracy'],
+]
+
+
 summarizer = dict(
     type=MultiFacetedSummarizer,
     dataset_abbrs_list=[
@@ -124,6 +132,17 @@ summarizer = dict(
         {'name': 'bbh', 'dataset_abbrs': bbh_dataset_abbrs},
         {'name': 'GaokaoBench', 'dataset_abbrs': GaokaoBench_dataset_abbrs},
         {'name': 'sanitized_mbpp', 'dataset_abbrs': sanitized_mbpp_dataset_abbrs},
+        {'name': 'triviaqa', 'dataset_abbrs': [['triviaqa_wiki_1shot', 'score']]},
+        {'name': 'nq', 'dataset_abbrs': [['nq_open_1shot', 'score']]},
+        {'name': 'race', 'dataset_abbrs': [['race-high', 'accuracy']]},
+        {'name': 'winogrande', 'dataset_abbrs': [['winogrande', 'accuracy']]},
+        {'name': 'hellaswag', 'dataset_abbrs': [['hellaswag', 'accuracy']]},
+        {'name': 'gsm8k', 'dataset_abbrs': [['gsm8k', 'accuracy']]},
+        {'name': 'math', 'dataset_abbrs': [['math', 'accuracy']]},
+        {'name': 'TheoremQA', 'dataset_abbrs': [['TheoremQA', 'score']]},
+        {'name': 'humaneval', 'dataset_abbrs': [['openai_humaneval', 'humaneval_pass@1']]},
+        {'name': 'GPQA', 'dataset_abbrs': [['GPQA_diamond', 'accuracy']]},
+        {'name': 'IFEval', 'dataset_abbrs': IFEval_dataset_abbrs},
         {'name': 'overall', 'dataset_abbrs': overall_dataset_abbrs},
     ],
     summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
