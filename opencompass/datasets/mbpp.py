@@ -8,7 +8,7 @@ import re
 import signal
 import tempfile
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import List, Sequence, Union
 
 import numpy as np
@@ -213,8 +213,7 @@ class MBPPEvaluator(BaseEvaluator):
         if self.metric == 'MBPP':
             result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
             details = {}
-            # change to thread pool for better killing blocked instance
-            with ThreadPoolExecutor() as executor:
+            with ProcessPoolExecutor() as executor:
                 futures = []
                 for i, (refer, pred) in enumerate(zip(references,
                                                       predictions)):
@@ -289,6 +288,7 @@ class MBPPEvaluator(BaseEvaluator):
             r'(.*)\s*```.*',
             r"\[BEGIN\]\s*'(.*)",
             r'\[BEGIN\](.*)',
+            r"'(.*)'\s*\[DONE\]",
         ]
         for p in patterns:
             match = re.search(p, text, re.DOTALL)
@@ -439,7 +439,7 @@ class MBPPPassKEvaluator(MBPPEvaluator):
         task_total = defaultdict(int)
 
         result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
-        with ThreadPoolExecutor() as executor:
+        with ProcessPoolExecutor() as executor:
             futures = []
             for refer, preds in zip(references, predictions):
                 # suits for two case

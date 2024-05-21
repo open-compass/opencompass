@@ -80,6 +80,5 @@ gpt4 = dict(
     batch_size=4,
     retry=20,
     temperature=1,
-) 
+)
 given_pred = [{'abbr':'gpt4-turbo', 'path':'your path'}]
-

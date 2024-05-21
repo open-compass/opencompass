@@ -39,7 +39,7 @@ gsm8k_infer_cfg = dict(
     inferencer=dict(type=GenInferencer))
 
 gsm8k_eval_cfg = dict(evaluator=dict(type=Gsm8kEvaluator),
-                      pred_role="BOT",
+                      pred_role='BOT',
                       pred_postprocessor=dict(type=gsm8k_postprocess),
                       dataset_postprocessor=dict(type=gsm8k_dataset_postprocess))
 

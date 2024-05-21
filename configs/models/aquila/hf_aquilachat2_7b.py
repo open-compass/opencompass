@@ -5,14 +5,13 @@ _meta_template = dict(
         dict(role='HUMAN', begin='<|startofpiece|>', end=''),
         dict(role='BOT', begin='<|endofpiece|>', end='</s>', generate=True),
     ],
-    eos_token_id=2,
 )
 
 models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='aquilachat2-7b-hf',
-        path="BAAI/AquilaChat2-7B",
+        path='BAAI/AquilaChat2-7B',
         tokenizer_path='BAAI/AquilaChat2-7B',
         model_kwargs=dict(
             device_map='auto',

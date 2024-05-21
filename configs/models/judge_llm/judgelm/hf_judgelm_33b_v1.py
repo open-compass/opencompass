@@ -4,7 +4,7 @@ from opencompass.models import HuggingFaceCausalLM
 models = [dict(
         type=HuggingFaceCausalLM,
         abbr='judgelm-33b-v1-hf',
-        path="BAAI/JudgeLM-33B-v1.0",
+        path='BAAI/JudgeLM-33B-v1.0',
         tokenizer_path='BAAI/JudgeLM-33B-v1.0',
         tokenizer_kwargs=dict(padding_side='left',
                               truncation_side='left',

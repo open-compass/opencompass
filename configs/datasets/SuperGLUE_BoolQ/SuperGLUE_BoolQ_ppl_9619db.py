@@ -13,8 +13,8 @@ BoolQ_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            0: "Passage:{passage}。\nQuestion:{question}。\nAnswer: No.",
-            1: "Passage:{passage}。\nQuestion:{question}。\nAnswer: Yes.",
+            0: 'Passage:{passage}。\nQuestion:{question}。\nAnswer: No.',
+            1: 'Passage:{passage}。\nQuestion:{question}。\nAnswer: Yes.',
         }),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=PPLInferencer))

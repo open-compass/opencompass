@@ -72,7 +72,7 @@ Answer:
 | pcokyw   | zhwohj     | kjsdl     |
 | gjjznp   | zhwohj     | zbwamhiui |
 
-SQL:select count ( chisel ) from my_table where highboy < brewpub group by newburgh having min ( highboy ) < 47 
+SQL:select count ( chisel ) from my_table where highboy < brewpub group by newburgh having min ( highboy ) < 47
 Answer:
 |   count ( chisel ) |
 |-------------------:|

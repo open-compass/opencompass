@@ -25,7 +25,7 @@ class VLLM(BaseModel):
         meta_template: Optional[Dict] = None,
         mode: str = 'none',
         use_fastchat_template: bool = False,
-        end_str: Optional[str] = None,
+        stop_words: List[str] = [],
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -42,7 +42,7 @@ class VLLM(BaseModel):
         assert mode in ['none', 'mid']
         self.mode = mode
         self.use_fastchat_template = use_fastchat_template
-        self.end_str = end_str
+        self.stop_words = stop_words
 
     def _load_model(self,
                     path: str,
@@ -59,7 +59,10 @@ class VLLM(BaseModel):
             ray.shutdown()
         self.model = LLM(path, **model_kwargs)
 
-    def generate(self, inputs: List[str], max_out_len: int,
+    def generate(self,
+                 inputs: List[str],
+                 max_out_len: int,
+                 stopping_criteria: List[str] = [],
                  **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -90,6 +93,8 @@ class VLLM(BaseModel):
         generation_kwargs = kwargs.copy()
         generation_kwargs.update(self.generation_kwargs)
         generation_kwargs.update({'max_tokens': max_out_len})
+        _stop = list(set(self.stop_words + stopping_criteria))
+        generation_kwargs.update({'stop': _stop})
         sampling_kwargs = SamplingParams(**generation_kwargs)
         outputs = self.model.generate(inputs, sampling_kwargs)
 
@@ -97,9 +102,6 @@ class VLLM(BaseModel):
         for output in outputs:
             prompt = output.prompt
             generated_text = output.outputs[0].text
-
-            if self.end_str:
-                generated_text = generated_text.split(self.end_str)[0]
             prompt_list.append(prompt)
             output_strs.append(generated_text)
 
@@ -127,21 +129,6 @@ class VLLM(BaseModel):
             loss = -prompt_logprobs_list.sum(axis=-1) / len(prompt_token_ids)
             ce_loss.append(loss)
         return np.array(ce_loss)
-
-    def prompts_preproccess(self, inputs: List[str]):
-        if self.use_fastchat_template:
-            try:
-                from fastchat.model import get_conversation_template
-            except ModuleNotFoundError:
-                raise ModuleNotFoundError(
-                    'Fastchat is not implemented. You can use '
-                    "'pip install \"fschat[model_worker,webui]\"' "
-                    'to implement fastchat.')
-            conv = get_conversation_template('vicuna')
-            conv.append_message(conv.roles[0], inputs[0])
-            conv.append_message(conv.roles[1], None)
-            inputs = [conv.get_prompt()]
-        return inputs
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.

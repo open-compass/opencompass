@@ -41,15 +41,15 @@ for ds, t in [
         d['circular_patterns'] = 'circular'
 
 
-datasets = sum([v for k, v in locals().items() if k.endswith("_datasets") or k == 'datasets'], [])
-models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
+datasets = sum([v for k, v in locals().items() if k.endswith('_datasets') or k == 'datasets'], [])
+models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 # config summarizer
 other_summary_groups = [
     {'name': 'average',
      'subsets': ['ceval', 'mmlu', 'cmmlu', 'hellaswag', 'ARC-e', 'ARC-c', 'commonsense_qa', 'openbookqa_fact', 'race-middle', 'race-high']},
 ]
-origin_summary_groups = sum([v for k, v in locals().items() if k.endswith("_summary_groups")], [])
+origin_summary_groups = sum([v for k, v in locals().items() if k.endswith('_summary_groups')], [])
 new_summary_groups = []
 for item in origin_summary_groups:
     new_summary_groups.append(

@@ -17,8 +17,8 @@ with read_base():
 
 work_dir = './outputs/internlm2-chat-keyset/'
 
-_origin_datasets = sum([v for k, v in locals().items() if k.endswith("_datasets")], [])
-_origin_models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
+_origin_datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
+_origin_models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 _vanilla_datasets = [deepcopy(d) for d in _origin_datasets]
 _vanilla_models = []

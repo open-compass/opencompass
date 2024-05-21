@@ -14,9 +14,9 @@ QuALITY_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "Read the article, and answer the question.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}"
+                'Read the article, and answer the question.\n\nArticle:\n{article}\n\nQ: {question}\n\nA. {A}\nB. {B}\nC. {C}\nD. {D}'
             ),
         ])),
     retriever=dict(type=ZeroRetriever),

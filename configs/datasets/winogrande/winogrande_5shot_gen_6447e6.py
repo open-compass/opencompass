@@ -6,23 +6,23 @@ from opencompass.datasets import winograndeDataset_V3
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 winogrande_reader_cfg = dict(
-    input_columns=["opt1", "opt2"],
-    output_column="answer",
-    train_split="train_xs",
-    test_split="dev",
+    input_columns=['opt1', 'opt2'],
+    output_column='answer',
+    train_split='train_xs',
+    test_split='dev',
 )
 
 winogrande_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
         template=dict(
-            begin="</E>",
+            begin='</E>',
             round=[
-                dict(role="HUMAN", prompt="Which of the following is a good sentence:\nA. {opt1}\nB. {opt2}\nAnswer:"),
-                dict(role="BOT", prompt="{answer}"),
+                dict(role='HUMAN', prompt='Which of the following is a good sentence:\nA. {opt1}\nB. {opt2}\nAnswer:'),
+                dict(role='BOT', prompt='{answer}'),
             ]
         ),
-        ice_token="</E>",
+        ice_token='</E>',
     ),
     retriever=dict(type=FixKRetriever, fix_id_list=[0, 2, 4, 6, 8]),
     inferencer=dict(type=GenInferencer),
@@ -30,15 +30,15 @@ winogrande_infer_cfg = dict(
 
 winogrande_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
-    pred_postprocessor=dict(type=first_option_postprocess, options="AB"),
+    pred_role='BOT',
+    pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 winogrande_datasets = [
     dict(
-        abbr="winogrande",
+        abbr='winogrande',
         type=winograndeDataset_V3,
-        path="./data/winogrande",
+        path='./data/winogrande',
         reader_cfg=winogrande_reader_cfg,
         infer_cfg=winogrande_infer_cfg,
         eval_cfg=winogrande_eval_cfg,

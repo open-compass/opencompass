@@ -71,4 +71,3 @@ for group in _base_summary_groups:
     group['name'] = group['name'] + '_zh'
     group['subsets'] = [[subset[0] + '_zh', subset[1]] for subset in group['subsets']]
     teval_summary_groups.append(group)
-

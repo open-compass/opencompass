@@ -61,28 +61,28 @@ ceval_subject_mapping = {
 ceval_all_sets = list(ceval_subject_mapping.keys())
 
 ceval_datasets = []
-for _split in ["val", "test"]:
+for _split in ['val', 'test']:
     for _name in ceval_all_sets:
         ceval_reader_cfg = dict(
-            input_columns=["question", "A", "B", "C", "D"],
-            output_column="answer",
-            train_split="dev",
+            input_columns=['question', 'A', 'B', 'C', 'D'],
+            output_column='answer',
+            train_split='dev',
             test_split=_split,
         )
 
         _ch_name = ceval_subject_mapping[_name][1]
 
-        hint = f"以下是关于{_ch_name}的单项选择题，请直接给出正确答案的选项。"
-        question_and_options = "{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}"
+        hint = f'以下是关于{_ch_name}的单项选择题，请直接给出正确答案的选项。'
+        question_and_options = '{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}'
         ceval_infer_cfg = dict(
             ice_template=dict(
                 type=PromptTemplate,
-                template={answer: f"{question_and_options}\n答案: {answer}\n" for answer in ["A", "B", "C", "D"]},
+                template={answer: f'{question_and_options}\n答案: {answer}\n' for answer in ['A', 'B', 'C', 'D']},
             ),
             prompt_template=dict(
                 type=PromptTemplate,
-                template={answer: f"{hint}\n</E>{question_and_options}\n答案: {answer}" for answer in ["A", "B", "C", "D"]},
-                ice_token="</E>",
+                template={answer: f'{hint}\n</E>{question_and_options}\n答案: {answer}' for answer in ['A', 'B', 'C', 'D']},
+                ice_token='</E>',
             ),
             retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
             inferencer=dict(type=PPLInferencer),
@@ -93,9 +93,9 @@ for _split in ["val", "test"]:
         ceval_datasets.append(
             dict(
                 type=CEvalDataset,
-                path="./data/ceval/formal_ceval",
+                path='./data/ceval/formal_ceval',
                 name=_name,
-                abbr="ceval-" + _name if _split == "val" else "ceval-test-" + _name,
+                abbr='ceval-' + _name if _split == 'val' else 'ceval-test-' + _name,
                 reader_cfg=ceval_reader_cfg,
                 infer_cfg=ceval_infer_cfg,
                 eval_cfg=ceval_eval_cfg,

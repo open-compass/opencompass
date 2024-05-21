@@ -72,7 +72,7 @@ dataset_mapping_dict = {}
 
 needle_counts = ['2', '3', '4', '5']
 languages = ['en', 'zh']
-sizes = ['4k', '8k', '32k', '200k', '256k', '1000k']
+sizes = ['4k', '8k', '32k', '128k', '200k', '256k', '1000k']
 types = ['origin', 'parallel']
 
 for needle_count in needle_counts:

@@ -1,16 +1,16 @@
 from opencompass.models import HuggingFaceCausalLM
 
 '''
-This is a bilingual 6B version of Auto-J. 
-It is trained on both the original training data 
-and its Chinese translation, which can be find in 
+This is a bilingual 6B version of Auto-J.
+It is trained on both the original training data
+and its Chinese translation, which can be find in
 https://huggingface.co/GAIR/autoj-bilingual-6b
 '''
 
 models = [dict(
         type=HuggingFaceCausalLM,
         abbr='autoj-bilingual-6b',
-        path="GAIR/autoj-bilingual-6b",
+        path='GAIR/autoj-bilingual-6b',
         tokenizer_path='GAIR/autoj-bilingual-6b',
         tokenizer_kwargs=dict(padding_side='left',
                               truncation_side='left',

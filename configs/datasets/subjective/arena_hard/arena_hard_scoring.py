@@ -11,7 +11,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "question",
+    'question',
 ]
 
 
@@ -29,7 +29,7 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -57,14 +57,14 @@ for _name in subjective_all_sets:
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=ArenaHardDataset,
-            path="./data/subjective/arena_hard",
+            path='./data/subjective/arena_hard',
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,

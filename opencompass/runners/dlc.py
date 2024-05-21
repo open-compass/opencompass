@@ -141,7 +141,7 @@ class DLCRunner(BaseRunner):
 
             hf_offline = self.aliyun_cfg.get('hf_offline', True)
             if hf_offline:
-                shell_cmd += 'export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1; export HF_EVALUATE_OFFLINE=1; '  # noqa: E501
+                shell_cmd += 'export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1; export HF_EVALUATE_OFFLINE=1; export HF_HUB_OFFLINE=1; '  # noqa: E501
 
             http_proxy = self.aliyun_cfg.get('http_proxy')
             if http_proxy is not None:
@@ -158,19 +158,22 @@ class DLCRunner(BaseRunner):
                     shell_cmd += f'export {extra_env}; '
 
             shell_cmd += f'cd {pwd}; '
+            shell_cmd += 'umask 0000; '
             shell_cmd += '{task_cmd}'
 
-            tmpl = ('dlc create job'
-                    f" --command '{shell_cmd}'"
-                    f' --name {task_name[:512]}'
-                    ' --kind BatchJob'
-                    f" -c {self.aliyun_cfg['dlc_config_path']}"
-                    f" --workspace_id {self.aliyun_cfg['workspace_id']}"
-                    ' --worker_count 1'
-                    f' --worker_cpu {max(num_gpus * 8, 12)}'
-                    f' --worker_gpu {num_gpus}'
-                    f' --worker_memory {max(num_gpus * 128, 192)}'
-                    f" --worker_image {self.aliyun_cfg['worker_image']}")
+            tmpl = (
+                'dlc submit pytorchjob'
+                f" --command '{shell_cmd}'"
+                f' --name {task_name[:512]}'
+                f" --config {self.aliyun_cfg['dlc_config_path']}"
+                f" --workspace_id {self.aliyun_cfg['workspace_id']}"
+                f" --resource_id {self.aliyun_cfg['resource_id']}"
+                ' --workers 1'
+                f' --worker_cpu {max(num_gpus * 8, 12)}'
+                f' --worker_gpu {num_gpus}'
+                f' --worker_memory {max(num_gpus * 128, 192)}Gi'
+                f" --worker_image {self.aliyun_cfg['worker_image']}"
+                f" --data_sources {','.join(self.aliyun_cfg['data_sources'])}")
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
@@ -195,7 +198,10 @@ class DLCRunner(BaseRunner):
                 index_to_start = 0
                 while index_to_start < num_retry_to_start:
                     index_to_start += 1
-                    output = subprocess.getoutput(cmd)
+                    try:
+                        output = subprocess.getoutput(cmd)
+                    except BlockingIOError:
+                        output = ''
                     match = re.search(r'\|\s+(dlc[0-9a-z]+)\s+\|', output)
                     if match is None:
                         stdout.write('Failed to get job id from output:')
@@ -215,14 +221,9 @@ class DLCRunner(BaseRunner):
                 pri_time = None
                 initial_time = datetime.datetime.now()
 
-                url = 'http://pai-console.cb210e3f99cd7403f8de2a630dcc99fc3.cn-wulanchabu.alicontainer.com'  # noqa: E501
+                url = f"https://pai.console.aliyun.com/?regionId=cn-wulanchabu&workspaceId={self.aliyun_cfg['workspace_id']}#/dlc/jobs/{job_id}"  # noqa: E501
                 logger = get_logger()
-                logger.debug('')
-                logger.debug('*' * 168)
-                logger.debug(
-                    f'{url}/index?workspaceId={self.aliyun_cfg["workspace_id"]}#/dlc2/job/{job_id}/detail'  # noqa: E501
-                )
-                logger.debug('*' * 168)
+                logger.debug('\n' + '*' * 168 + '\n' + url + '\n' + '*' * 168)
 
                 while True:
                     # 1. Avoid to request dlc too frequently.
@@ -260,11 +261,14 @@ class DLCRunner(BaseRunner):
                     cur_time = (pod_create_time +
                                 elasped_time).strftime('%Y-%m-%dT%H:%M:%SZ')
                     logs_cmd = ('dlc logs'
-                                f' {job_id} {job_id}-worker-0'
+                                f' {job_id} {job_id}-master-0'
                                 f" -c {self.aliyun_cfg['dlc_config_path']}"
                                 f' --start_time {pri_time}'
                                 f' --end_time {cur_time}')
-                    log_output = subprocess.getoutput(logs_cmd)
+                    try:
+                        log_output = subprocess.getoutput(logs_cmd)
+                    except BlockingIOError:
+                        log_output = '[WARN] No logs found for the pod'
 
                     if '[WARN] No logs found for the pod' not in log_output:
                         pri_time = cur_time

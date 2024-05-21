@@ -37,13 +37,16 @@ TIMEOUT = 10
 class TACODataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, num_repeats: int = 1):
+    def load(path: str, num_repeats: int = 1, difficulty='ALL'):
         dataset = load_from_disk(path)
         new_dataset = DatasetDict()
         # add new column "starter" in the prompt
         for split in dataset.keys():
             new_samples = []
             for idx, sample in enumerate(dataset[split]):
+                if 'ALL' not in difficulty:
+                    if not sample['difficulty'] == difficulty:
+                        continue
                 starter_code = None if len(
                     sample['starter_code']) == 0 else sample['starter_code']
                 try:
@@ -71,7 +74,6 @@ class TACODataset(BaseDataset):
                 for key in new_samples[0].keys()
             }
             new_dataset[split] = Dataset.from_dict(new_data)
-
         # num_repeats duplicate
         # train_repeated = []
         test_repeated = []
@@ -84,7 +86,6 @@ class TACODataset(BaseDataset):
         #     train_repeated
         # )
         dataset_test_repeated = new_dataset['test'].from_list(test_repeated)
-
         return DatasetDict({
             # 'train': dataset_train_repeated,
             'test': dataset_test_repeated

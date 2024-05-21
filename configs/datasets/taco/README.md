@@ -32,9 +32,9 @@ taco_skills = load_dataset('BAAI/TACO', skills=['Sorting', 'Range queries'], tok
 ```
 ## Evaluation results
 
-| dataset              | metric   | CodeLlama-7b-Python | internlm2-chat-1.8b-sft-hf  | internlm2-chat-7b-sft-hf | internlm2-chat-20b-sft-hf | 
+| dataset              | metric   | CodeLlama-7b-Python | internlm2-chat-1.8b-sft-hf  | internlm2-chat-7b-sft-hf | internlm2-chat-20b-sft-hf |
 |-----------------------|----------|-------------|-------------|-------------|-------------|
-| TACO                   | pass@1   | 0.7         | 0.7           | 1.7           | 2.7           | 
+| TACO                   | pass@1   | 0.7         | 0.7           | 1.7           | 2.7           |
 
 
 Please refer to [repo](https://github.com/FlagOpen/TACO/tree/main?tab=readme-ov-file) for original results if needed.

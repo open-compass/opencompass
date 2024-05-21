@@ -1,7 +1,7 @@
 from mmengine.config import read_base
 with read_base():
     from .atc_choice_20 import *
- 
+
 needle_num_list = list(range(2, 50, 1))
 needlebench_datasets = []
 
@@ -24,7 +24,7 @@ for _name in list(single_choice_prompts.keys()):
     for num_needles in needle_num_list:
         abbr = (f'NeedleBenchATCDataset-'
                 f'{num_needles}Needle-{"EN" if "en" in _name else "ZH"}')
-        language = "English" if "en" in _name else "Chinese"
+        language = 'English' if 'en' in _name else 'Chinese'
         if 'reasoning' in _name:
             abbr += '-Reasoning'
         dataset_dict = {
@@ -40,4 +40,3 @@ for _name in list(single_choice_prompts.keys()):
             'eval_cfg': needlebench_atc_eval_cfg
         }
         needlebench_datasets.append(dataset_dict)
-

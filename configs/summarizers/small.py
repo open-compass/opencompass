@@ -15,8 +15,8 @@ summarizer = dict(
     dataset_abbrs = [
         '--- Exam ---',
         'mmlu',
-        "ceval",
-        "bbh",
+        'ceval',
+        'bbh',
         '--- ChineseUniversal ---',
         'CMRC_dev',
         'DRCD_dev',
@@ -57,5 +57,5 @@ summarizer = dict(
         'nq',
         'triviaqa',
     ],
-    summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+    summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

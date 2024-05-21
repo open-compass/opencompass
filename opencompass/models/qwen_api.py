@@ -152,8 +152,7 @@ class Qwen(BaseAPIModel):
             if response.status_code == 200:
                 try:
                     msg = response.output.text
-                    print('=' * 128)
-                    print(msg)
+                    self.logger.debug(msg)
                     return msg
                 except KeyError:
                     print(response)

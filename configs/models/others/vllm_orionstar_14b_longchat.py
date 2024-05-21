@@ -4,10 +4,9 @@ from opencompass.models import VLLM
 _meta_template = dict(
     begin='<s>',
     round=[
-        dict(role="HUMAN", begin='Human: ', end='\n'),
-        dict(role="BOT", begin="Assistant: ", end='</s>', generate=True),
+        dict(role='HUMAN', begin='Human: ', end='\n'),
+        dict(role='BOT', begin='Assistant: ', end='</s>', generate=True),
     ],
-    eos_token_id=2
 )
 
 models = [

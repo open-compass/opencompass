@@ -21,6 +21,9 @@ env:
   CONDA_ENV: opencompass_base
   USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
+  HF_DATASETS_OFFLINE: 1
+  TRANSFORMERS_OFFLINE: 1
+  HF_HUB_OFFLINE: 1
 
 jobs:
   pr_run_test:
@@ -42,21 +45,20 @@ jobs:
           cp -r ${{env.USERSPACE_PREFIX}}/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
-          export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1;
       - name:  Run test
         run: |
           eval "$(conda shell.bash hook)"
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           rm -rf regression_result
-          python3 run.py --models hf_internlm_chat_7b --datasets siqa_gen --work-dir regression_result --debug
+          python3 run.py --models hf_internlm2_chat_7b --datasets siqa_gen --work-dir regression_result --debug
       - name:  Get result
         run: |
           score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 70 && ${score%.*} <= 75 )); then
-             echo "score is $score between 70 and 75"
+          if (( ${score%.*} >= 79 && ${score%.*} <= 81 )); then
+             echo "score is $score between 79 and 81"
           else
-             echo "score is $score not between 70 and 75"
+             echo "score is $score not between 79 and 81"
              exit 1
           fi
           rm -rf regression_result

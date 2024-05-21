@@ -14,10 +14,10 @@ ARC_e_infer_cfg = dict(
         template={
             opt: dict(
                 round=[
-                    dict(role="HUMAN", prompt=f"{{question}}\nA. {{textA}}\nB. {{textB}}\nC. {{textC}}\nD. {{textD}}"),
-                    dict(role="BOT", prompt=f"Answer: {opt}"),
+                    dict(role='HUMAN', prompt=f'{{question}}\nA. {{textA}}\nB. {{textB}}\nC. {{textC}}\nD. {{textD}}'),
+                    dict(role='BOT', prompt=f'Answer: {opt}'),
                 ]
-            ) for opt in ["A", "B", "C", "D"]
+            ) for opt in ['A', 'B', 'C', 'D']
         },
     ),
     retriever=dict(type=ZeroRetriever),

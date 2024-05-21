@@ -3,7 +3,7 @@
 The following introduction comes from the abstract in [FLAMES: Benchmarking Value Alignment of LLMs in Chinese](https://arxiv.org/abs/2311.06899)
 
 ```
-This paper proposes a value alignment benchmark named FLAMES, which encompasses both common harmlessness principles and a unique morality dimension that integrates specific Chinese values such as harmony. 
+This paper proposes a value alignment benchmark named FLAMES, which encompasses both common harmlessness principles and a unique morality dimension that integrates specific Chinese values such as harmony.
 ```
 
 ## Official link
@@ -76,7 +76,7 @@ InternLM2-chat-7b Score using flames-scorer:
 ## Reference
 ```
 @misc{huang2023flames,
-      title={Flames: Benchmarking Value Alignment of Chinese Large Language Models}, 
+      title={Flames: Benchmarking Value Alignment of Chinese Large Language Models},
       author={Kexin Huang and Xiangyang Liu and Qianyu Guo and Tianxiang Sun and Jiawei Sun and Yaru Wang and Zeyang Zhou and Yixu Wang and Yan Teng and Xipeng Qiu and Yingchun Wang and Dahua Lin},
       year={2023},
       eprint={2311.06899},

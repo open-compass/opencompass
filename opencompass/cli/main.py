@@ -1,3 +1,5 @@
+# flake8: noqa
+# yapf: disable
 import argparse
 import getpass
 import os
@@ -51,10 +53,10 @@ def parse_args():
                         action='store_true',
                         default=False)
     parser.add_argument(
-        '--accelerator',
+        '-a', '--accelerator',
         help='Infer accelerator, support vllm and lmdeploy now.',
-        choices=['vllm', 'lmdeploy', 'hf'],
-        default='hf',
+        choices=['vllm', 'lmdeploy', None],
+        default=None,
         type=str)
     parser.add_argument('-m',
                         '--mode',
@@ -81,7 +83,7 @@ def parse_args():
                         'saved in this path, including the slurm logs, '
                         'the evaluation results, the summary results, etc.'
                         'If not specified, the work_dir will be set to '
-                        './outputs/default.',
+                        'outputs/default.',
                         default=None,
                         type=str)
     parser.add_argument(
@@ -95,23 +97,12 @@ def parse_args():
                         help='Report the running status to lark bot',
                         action='store_true',
                         default=False)
-    parser.add_argument('--max-partition-size',
-                        help='The maximum size of an infer task. Only '
-                        'effective when "infer" is missing from the config.',
-                        type=int,
-                        default=40000),
-    parser.add_argument(
-        '--gen-task-coef',
-        help='The dataset cost measurement coefficient for generation tasks, '
-        'Only effective when "infer" is missing from the config.',
-        type=int,
-        default=20)
     parser.add_argument('--max-num-workers',
                         help='Max number of workers to run in parallel. '
                         'Will be overrideen by the "max_num_workers" argument '
                         'in the config.',
                         type=int,
-                        default=32)
+                        default=1)
     parser.add_argument('--max-workers-per-gpu',
                         help='Max task to run in parallel on one GPU. '
                         'It will only be used in the local runner.',
@@ -179,27 +170,25 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
+
+
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
-    hf_parser.add_argument('--hf-path', type=str)
-    hf_parser.add_argument('--peft-path', type=str)
-    hf_parser.add_argument('--tokenizer-path', type=str)
-    hf_parser.add_argument('--model-kwargs',
-                           nargs='+',
-                           action=DictAction,
-                           default={})
-    hf_parser.add_argument('--tokenizer-kwargs',
-                           nargs='+',
-                           action=DictAction,
-                           default={})
-    hf_parser.add_argument('--max-out-len', type=int)
-    hf_parser.add_argument('--max-seq-len', type=int)
-    hf_parser.add_argument('--no-batch-padding',
-                           action='store_true',
-                           default=False)
-    hf_parser.add_argument('--batch-size', type=int)
-    hf_parser.add_argument('--num-gpus', type=int)
-    hf_parser.add_argument('--pad-token-id', type=int)
+    hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat', help='The type of the HuggingFace model, base or chat')
+    hf_parser.add_argument('--hf-path', type=str, help='The path to the HuggingFace model, e.g. "facebook/opt-125m", required')
+    hf_parser.add_argument('--model-kwargs', nargs='+', action=DictAction, default={}, help='The kwargs for the HuggingFace model')
+    hf_parser.add_argument('--tokenizer-path', type=str, help='The path to the HuggingFace tokenizer, same as --hf-path if not specified')
+    hf_parser.add_argument('--tokenizer-kwargs', nargs='+', action=DictAction, default={}, help='The kwargs for the tokenizer')
+    hf_parser.add_argument('--peft-path', type=str, help='The path to the PEFT model')
+    hf_parser.add_argument('--peft-kwargs', nargs='+', action=DictAction, default={}, help='The kwargs for the PEFT model')
+    hf_parser.add_argument('--generation-kwargs', nargs='+', action=DictAction, default={}, help='The kwargs for the generation')
+    hf_parser.add_argument('--max-seq-len', type=int, help='The max sequence length for the HuggingFace model')
+    hf_parser.add_argument('--max-out-len', type=int, default=256, help='The max output length for the HuggingFace model')
+    hf_parser.add_argument('--min-out-len', type=int, default=1, help='The min output length for the HuggingFace model')
+    hf_parser.add_argument('--batch-size', type=int, default=8, help='The batch size for the HuggingFace model')
+    hf_parser.add_argument('--num-gpus', type=int, default=1, help='The number of GPUs for **the HuggingFace model passed via cli**')
+    hf_parser.add_argument('--pad-token-id', type=int, help='The pad token id for the HuggingFace model')
+    hf_parser.add_argument('--stop-words', nargs='+', default=[], help='The stop words for the HuggingFace model')
 
 
 def parse_custom_dataset_args(custom_dataset_parser):
@@ -225,7 +214,7 @@ def main():
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
     else:
-        cfg.setdefault('work_dir', './outputs/default/')
+        cfg.setdefault('work_dir', os.path.join('outputs', 'default'))
 
     # cfg_time_str defaults to the current time
     cfg_time_str = dir_time_str = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -351,6 +340,7 @@ def main():
         summarizer_cfg['config'] = cfg
         summarizer = build_from_cfg(summarizer_cfg)
         summarizer.summarize(time_str=cfg_time_str)
+
 
 
 if __name__ == '__main__':

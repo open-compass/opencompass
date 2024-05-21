@@ -7,8 +7,8 @@ from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 
 chembench_reader_cfg = dict(
-    input_columns=["input", "A", "B", "C", "D"],
-    output_column="target",
+    input_columns=['input', 'A', 'B', 'C', 'D'],
+    output_column='target',
     train_split='dev')
 
 chembench_all_sets = [
@@ -34,26 +34,26 @@ for _name in chembench_all_sets:
             type=PromptTemplate,
             template=dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    f"{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: "
+                    f'{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: '
                 ),
-                dict(role="BOT", prompt="{target}\n")
+                dict(role='BOT', prompt='{target}\n')
             ]),
         ),
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                begin="</E>",
+                begin='</E>',
                 round=[
                     dict(
-                        role="HUMAN",
+                        role='HUMAN',
                         prompt=
-                        f"{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: "
+                        f'{_hint}\nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: '
                     ),
                 ],
             ),
-            ice_token="</E>",
+            ice_token='</E>',
         ),
         retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
         inferencer=dict(type=GenInferencer),
@@ -65,9 +65,9 @@ for _name in chembench_all_sets:
 
     chembench_datasets.append(
         dict(
-            abbr=f"ChemBench_{_name}",
+            abbr=f'ChemBench_{_name}',
             type=ChemBenchDataset,
-            path="./data/ChemBench/",
+            path='./data/ChemBench/',
             name=_name,
             reader_cfg=chembench_reader_cfg,
             infer_cfg=chembench_infer_cfg,

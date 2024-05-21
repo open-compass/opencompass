@@ -7,15 +7,15 @@ from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 C3_reader_cfg = dict(
     input_columns=[
-        "question",
-        "content",
-        "choice0",
-        "choice1",
-        "choice2",
-        "choice3",
-        "choices",
+        'question',
+        'content',
+        'choice0',
+        'choice1',
+        'choice2',
+        'choice3',
+        'choices',
     ],
-    output_column="label",
+    output_column='label',
 )
 
 C3_infer_cfg = dict(
@@ -23,9 +23,9 @@ C3_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(round=[
             dict(
-                role="HUMAN",
+                role='HUMAN',
                 prompt=
-                "{content}\n问：{question}\nA. {choice0}\nB. {choice1}\nC. {choice2}\nD. {choice3}\n请从“A”，“B”，“C”，“D”中进行选择。\n答：",
+                '{content}\n问：{question}\nA. {choice0}\nB. {choice1}\nC. {choice2}\nD. {choice3}\n请从“A”，“B”，“C”，“D”中进行选择。\n答：',
             ),
         ]),
     ),
@@ -35,15 +35,15 @@ C3_infer_cfg = dict(
 
 C3_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
     pred_postprocessor=dict(type=first_capital_postprocess),
 )
 
 C3_datasets = [
     dict(
-        abbr="C3",
+        abbr='C3',
         type=C3Dataset_V2,
-        path="./data/CLUE/C3/dev_0.json",
+        path='./data/CLUE/C3/dev_0.json',
         reader_cfg=C3_reader_cfg,
         infer_cfg=C3_infer_cfg,
         eval_cfg=C3_eval_cfg,

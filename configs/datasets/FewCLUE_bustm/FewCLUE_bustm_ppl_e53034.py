@@ -16,20 +16,20 @@ bustm_infer_cfg = dict(
             0:
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "语句一：“{sentence1}”\n语句二：“{sentence2}”\n请判断语句一和语句二说的是否是一个意思？"
+                    '语句一：“{sentence1}”\n语句二：“{sentence2}”\n请判断语句一和语句二说的是否是一个意思？'
                 ),
-                dict(role="BOT", prompt="两句话说的毫不相关。")
+                dict(role='BOT', prompt='两句话说的毫不相关。')
             ]),
             1:
             dict(round=[
                 dict(
-                    role="HUMAN",
+                    role='HUMAN',
                     prompt=
-                    "语句一：“{sentence1}”\n语句二：“{sentence2}”\n请判断语句一和语句二说的是否是一个意思？"
+                    '语句一：“{sentence1}”\n语句二：“{sentence2}”\n请判断语句一和语句二说的是否是一个意思？'
                 ),
-                dict(role="BOT", prompt="两句话说是的一个意思。")
+                dict(role='BOT', prompt='两句话说是的一个意思。')
             ]),
         }),
     retriever=dict(type=ZeroRetriever),
