@@ -1,6 +1,7 @@
 import copy
 import math
 import os.path as osp
+import torch
 from fnmatch import fnmatch
 from typing import Dict, List, Optional, Tuple, Union
 
