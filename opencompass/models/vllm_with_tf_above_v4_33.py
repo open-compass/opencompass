@@ -31,6 +31,8 @@ class VLLMwithChatTemplate(BaseModel):
         fastchat_template: Optional[str] = None,
         stop_words: List[str] = [],
     ):
+        from transformers import AutoTokenizer
+
         assert LLM, ('Please install VLLM with `pip install vllm`. note: torch==2.1.2 is required.')
 
         self.logger = get_logger()
@@ -38,13 +40,9 @@ class VLLMwithChatTemplate(BaseModel):
         self.tokenizer_only = tokenizer_only
         self.template_parser = _get_meta_template(meta_template)
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
-        if tokenizer_only:
-            from transformers import AutoTokenizer
-
-            self.tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
-        else:
+        self.tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
+        if not tokenizer_only:
             self._load_model(path, model_kwargs)
-            self.tokenizer = self.model.get_tokenizer()
 
         self.generation_kwargs = generation_kwargs
         self.generation_kwargs.pop('do_sample', None)
