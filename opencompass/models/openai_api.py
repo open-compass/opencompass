@@ -184,8 +184,12 @@ class OpenAI(BaseAPIModel):
                 messages.append(msg)
 
         # Hold out 100 tokens due to potential errors in tiktoken calculation
-        max_out_len = min(
-            max_out_len, context_window - self.get_token_len(str(input)) - 100)
+        try:
+            max_out_len = min(
+                max_out_len,
+                context_window - self.get_token_len(str(input)) - 100)
+        except KeyError:
+            max_out_len = max_out_len
         if max_out_len <= 0:
             return ''
 
