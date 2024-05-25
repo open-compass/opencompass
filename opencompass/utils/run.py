@@ -17,9 +17,6 @@ from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
 
-cur_dir = os.path.dirname(os.path.abspath(__file__))
-work_dir = os.path.join(cur_dir, os.path.pardir, os.path.pardir)
-
 
 def match_cfg_file(workdir: str,
                    pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
@@ -81,8 +78,6 @@ def get_config_from_arg(args) -> Config:
     3. Huggingface parameter groups and args.datasets
     """
     logger = get_logger()
-
-    args.config_dir = os.path.join(work_dir, args.config_dir)
 
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
