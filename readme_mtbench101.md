@@ -1,4 +1,52 @@
-### 📂 Data Preparation
+<div align= "center">
+    <h1> MT-Bench-101 </h1>
+</div>
+
+<p align="center">  
+A Fine-Grained Benchmark for Evaluating Large Language Models in Multi-Turn Dialogues Models
+</p>
+
+<p align="center">  
+📃 <a href="https://arxiv.org/pdf/2402.14762" target="_blank">Paper</a> • 
+🤗 <a href="https://huggingface.co" target="_blank">Data (WIP)</a> • 
+🏆 <a href="" target="_blank">Leaderboard (WIP)</a>
+</p>
+
+
+## Todo
+
+- [x] Release the research paper.
+- [x] Release the evaluation code.
+- [x] Release the dataset.
+- [ ] Develop and launch an online leaderboard.
+
+
+## 💥What's New
+
+- **[2024.02.22]** Our paper is now accessible at https://arxiv.org/abs/2402.14762.
+- **[2024.05.28]** Code and dataset are now available. 
+
+## About MT-Bench-101
+
+MT-Bench101 is specifically designed to evaluate the finegrained abilities of LLMs in **multi-turn** dialogues. By conducting a detailed analysis of real multi-turn dialogue data, we construct a three-tier hierarchical ability taxonomy comprising **4208** turns across 1388 multi-turn dialogues in **13** distinct tasks. 
+
+## Installation
+
+We integrated our MTBench101 benchmark into [OpenCompass](https://github.com/open-compass/opencompass), a comprehensive platform for large model evaluation. 
+
+#### Create virtual env
+
+```bash
+conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
+conda activate opencompass
+git clone https://github.com/mtbench101/mt-bench-101.git
+cd mt-bench-101
+pip install -e .
+```
+
+#### Data Preparation
+
+Our data has been stored in the following folder.
 
 ```bash
 # Dataset folder
@@ -6,7 +54,7 @@ data/subjective/mtbench101.jsonl
 ```
 
 
-## 🏗️ ️Evaluation
+#### Evaluation
 
 ```bash
 # run
@@ -15,7 +63,12 @@ python run.py configs/eval_subjective_mtbench101.py
 python run.py configs/eval_subjective_mtbench101.py --debug
 ```
 
-## 📝 Citation
+## Leaderboard
+
+![image](assets/leaderboard.png)
+
+## Citation
+
 If you find our work helpful, feel free to give us a cite.
 ```
 @article{bai2024mt,
