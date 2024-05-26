@@ -11,7 +11,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "alpaca_eval",
+    'alpaca_eval',
 ]
 
 
@@ -56,7 +56,7 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -67,7 +67,6 @@ for _name in subjective_all_sets:
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
-            infer_order='random',
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
@@ -75,7 +74,7 @@ for _name in subjective_all_sets:
                     dict(
                         role='SYSTEM',
                         fallback_role='HUMAN',
-                        prompt="You are a highly efficient assistant, who evaluates and selects the best large language model (LLMs) based on the quality of their responses to a given instruction. This process will be used to create a leaderboard reflecting the most accurate and human-preferred answers.")
+                        prompt='You are a highly efficient assistant, who evaluates and selects the best large language model (LLMs) based on the quality of their responses to a given instruction. This process will be used to create a leaderboard reflecting the most accurate and human-preferred answers.')
                 ],
                     round=[
                     dict(
@@ -85,14 +84,14 @@ for _name in subjective_all_sets:
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=SubjectiveCmpDataset,
-            path="./data/subjective/",
+            path='./data/subjective/alpaca_eval',
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,

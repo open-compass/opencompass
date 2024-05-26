@@ -11,9 +11,9 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    "FunctionalMT",
+    'FunctionalMT',
 ]
-data_path ="data/subjective/"
+data_path ='data/subjective/'
 
 subjective_datasets = []
 
@@ -30,22 +30,23 @@ for _name in subjective_all_sets:
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
+            pack_all_predictions=True,
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt = "{gpt4_prefix}{prediction}{gpt4_suffix}"
+                        prompt = '{gpt4_prefix}{prediction}{gpt4_suffix}'
                     ),
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=MultiroundDataset,
             path=data_path,
             name=_name,

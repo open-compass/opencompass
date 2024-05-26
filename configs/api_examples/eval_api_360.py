@@ -17,7 +17,7 @@ models = [
         abbr='360GPT_S2_V9',
         type=AI360GPT,
         path='360GPT_S2_V9',
-        key="xxxxxxxxxxxx",
+        key='xxxxxxxxxxxx',
         generation_kwargs={
             'temperature': 0.9,
             'max_tokens': 2048,
@@ -40,4 +40,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir ="./output/api_360GPT_S2_V9"
+work_dir ='./output/api_360GPT_S2_V9'

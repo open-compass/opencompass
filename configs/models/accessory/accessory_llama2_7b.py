@@ -6,7 +6,7 @@ from opencompass.models import LLaMA2AccessoryModel
 
 models = [
     dict(
-        abbr="Accessory_llama2_7b",
+        abbr='Accessory_llama2_7b',
         type=LLaMA2AccessoryModel,
 
         # additional_stop_symbols=["###"],  # for models tuned with chat template  # noqa
@@ -18,10 +18,10 @@ models = [
         #   - consolidated.00.pth
         #   - params.json
         #   - tokenizer.model
-        pretrained_path="path/to/Llama-2-7b/",
-        llama_type="llama",
-        llama_config="path/to/Llama-2-7b/params.json",
-        tokenizer_path="path/to/Llama-2-7b/tokenizer.model",
+        pretrained_path='path/to/Llama-2-7b/',
+        llama_type='llama',
+        llama_config='path/to/Llama-2-7b/params.json',
+        tokenizer_path='path/to/Llama-2-7b/tokenizer.model',
         with_visual=False,
         max_seq_len=4096,
         quant=False,

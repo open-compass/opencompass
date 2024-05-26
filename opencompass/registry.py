@@ -1,7 +1,19 @@
-from mmengine.registry import DATASETS as MMENGINE_DATASETS
+from typing import Callable, List, Optional, Type, Union
+
 from mmengine.registry import METRICS as MMENGINE_METRICS
-from mmengine.registry import MODELS as MMENGINE_MODELS
-from mmengine.registry import Registry
+from mmengine.registry import Registry as OriginalRegistry
+
+
+class Registry(OriginalRegistry):
+
+    # override the default force behavior
+    def register_module(
+            self,
+            name: Optional[Union[str, List[str]]] = None,
+            force: bool = True,
+            module: Optional[Type] = None) -> Union[type, Callable]:
+        return super().register_module(name, force, module)
+
 
 PARTITIONERS = Registry('partitioner', locations=['opencompass.partitioners'])
 RUNNERS = Registry('runner', locations=['opencompass.runners'])
@@ -25,15 +37,9 @@ ICL_PROMPT_TEMPLATES = Registry(
     locations=['opencompass.openicl.icl_prompt_template'])
 ICL_EVALUATORS = Registry('icl_evaluators',
                           locations=['opencompass.openicl.icl_evaluator'])
-DATASETS = Registry('mm_datasets',
-                    parent=MMENGINE_DATASETS,
-                    locations=['opencompass.multimodal.datasets'])
 METRICS = Registry('metric',
                    parent=MMENGINE_METRICS,
                    locations=['opencompass.metrics'])
-MM_MODELS = Registry('mm_model',
-                     parent=MMENGINE_MODELS,
-                     locations=['opencompass.multimodal.models'])
 TOT_WRAPPER = Registry('tot_wrapper', locations=['opencompass.datasets'])
 
 

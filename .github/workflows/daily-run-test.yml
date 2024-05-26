@@ -14,6 +14,9 @@ env:
   PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
   USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
+  HF_DATASETS_OFFLINE: 1
+  TRANSFORMERS_OFFLINE: 1
+  HF_HUB_OFFLINE: 1
 
 jobs:
   daily_run_test:
@@ -35,14 +38,13 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate ${{env.CONDA_ENV}}
           pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers==4.33.0 --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install human_eval transformers==4.33.0 protobuf --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
       - name: Prepare - prepare data and hf model
         run: |
           cp -r ${{env.USERSPACE_PREFIX}}/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
-          export HF_DATASETS_OFFLINE=1; export TRANSFORMERS_OFFLINE=1;
       - name:  Run test
         run: |
           eval "$(conda shell.bash hook)"
@@ -50,7 +52,7 @@ jobs:
           conda info --envs
           rm -rf regression_result_daily
           export from_tf=TRUE
-          python3 run.py --models hf_internlm_chat_7b hf_internlm_7b hf_chatglm3_6b_base hf_chatglm3_6b hf_qwen_7b_chat hf_qwen_7b --datasets FewCLUE_chid_ppl humaneval_gen ARC_c_ppl obqa_ppl --work-dir regression_result_daily
+          python3 run.py --models hf_internlm_chat_7b hf_internlm2_7b hf_chatglm3_6b_base hf_chatglm3_6b hf_qwen_7b_chat hf_qwen_7b --datasets FewCLUE_chid_ppl humaneval_gen ARC_c_ppl obqa_ppl --work-dir regression_result_daily
       - name:  Get result
         run: |
           eval "$(conda shell.bash hook)"
@@ -59,8 +61,9 @@ jobs:
       - name:  Remove Conda Env
         if: always()
         run: |
+          cp -r regression_result_daily/* /cpfs01/user/qa-llm-cicd/report
           eval "$(conda shell.bash hook)"
-          conda env remove --name ${{env.CONDA_ENV}}
+          conda env remove -y --name ${{env.CONDA_ENV}}
           conda info --envs
 
   notify_to_feishu:

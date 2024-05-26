@@ -9,8 +9,8 @@ from opencompass.tasks import OpenICLInferTask
 
 with read_base():
     from .datasets.humaneval.humaneval_passk_gen_8e312c import humaneval_datasets
-    from .datasets.mbpp.mbpp_passk_gen_1e1056 import mbpp_datasets
-    from .datasets.mbpp.sanitized_mbpp_passk_gen_1e1056 import sanitized_mbpp_datasets
+    from .datasets.mbpp.deprecated_mbpp_passk_gen_1e1056 import mbpp_datasets
+    from .datasets.mbpp.deprecated_sanitized_mbpp_passk_gen_1e1056 import sanitized_mbpp_datasets
 
 datasets = []
 datasets += humaneval_datasets
@@ -21,7 +21,7 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='CodeLlama-7b-Python',
-        path="codellama/CodeLlama-7b-Python-hf",
+        path='codellama/CodeLlama-7b-Python-hf',
         tokenizer_path='codellama/CodeLlama-7b-Python-hf',
         tokenizer_kwargs=dict(
             padding_side='left',

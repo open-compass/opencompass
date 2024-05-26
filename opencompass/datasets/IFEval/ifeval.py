@@ -26,11 +26,13 @@ class IFEvalDataset(BaseDataset):
 
 class IFEvaluator(BaseEvaluator):
 
-    def score(self, predictions, references):
-        results = dict()
-        for metric in ('strict', 'loose'):
-            results[metric] = []
-        for pred, refer in zip(predictions, references):
+    def score(self, predictions, references, origin_prompt):
+        prompt_strict_correct, prompt_strict_total = 0, 0
+        inst_strict_correct, inst_strict_total = 0, 0
+        prompt_loose_correct, prompt_loose_total = 0, 0
+        inst_loose_correct, inst_loose_total = 0, 0
+        details = {}
+        for index, (pred, refer) in enumerate(zip(predictions, references)):
             input = InputExample(
                 key=refer['key'],
                 instruction_id_list=refer['instruction_id_list'],
@@ -40,29 +42,54 @@ class IFEvaluator(BaseEvaluator):
                 for k in list(kwarg.keys()):
                     if kwarg[k] is None:
                         kwarg.pop(k, None)
-            results['strict'].append(
-                test_instruction_following_strict(input, pred))
-            results['loose'].append(
-                test_instruction_following_loose(input, pred))
-        final_scores = dict()
-        for metric in ('strict', 'loose'):
-            prompt_total = 0
-            prompt_correct = 0
-            inst_total = 0
-            inst_correct = 0
 
-            for example in results[metric]:
-                follow_instruction_list = example.follow_instruction_list
-                instruction_id_list = example.instruction_id_list
+            # strict
+            example = test_instruction_following_strict(input, pred)
+            follow_instruction_list = example.follow_instruction_list
+            instruction_id_list = example.instruction_id_list
+            prompt_strict_total += 1
+            is_strict_correct = all(follow_instruction_list)
+            prompt_strict_correct += is_strict_correct
+            inst_strict_total += len(instruction_id_list)
+            inst_strict_correct += sum(follow_instruction_list)
 
-                prompt_total += 1
-                if all(follow_instruction_list):
-                    prompt_correct += 1
+            # loose
+            example = test_instruction_following_loose(input, pred)
+            follow_instruction_list = example.follow_instruction_list
+            instruction_id_list = example.instruction_id_list
+            prompt_loose_total += 1
+            is_loose_correct = all(follow_instruction_list)
+            prompt_loose_correct += is_loose_correct
+            inst_loose_total += len(instruction_id_list)
+            inst_loose_correct += sum(follow_instruction_list)
 
-                inst_total += len(instruction_id_list)
-                inst_correct += sum(follow_instruction_list)
-            prompt_score = f'Prompt-level-{metric}-accuracy'
-            inst_score = f'Inst-level-{metric}-accuracy'
-            final_scores[prompt_score] = prompt_correct / prompt_total * 100
-            final_scores[inst_score] = inst_correct / inst_total * 100
-        return final_scores
+            if is_strict_correct:
+                grade = 'strict'
+            elif is_loose_correct:
+                grade = 'loose'
+            else:
+                grade = 'none'
+
+            details[str(index)] = {
+                'prompt': origin_prompt[index],
+                'pred': pred,
+                'refer': refer,
+                'is_strict_correct': is_strict_correct,
+                'is_loose_correct': is_loose_correct,
+                'is_correct': is_strict_correct,
+                'grade': grade
+            }
+
+        results = {
+            'Prompt-level-strict-accuracy':
+            prompt_strict_correct / prompt_strict_total * 100,
+            'Inst-level-strict-accuracy':
+            inst_strict_correct / inst_strict_total * 100,
+            'Prompt-level-loose-accuracy':
+            prompt_loose_correct / prompt_loose_total * 100,
+            'Inst-level-loose-accuracy':
+            inst_loose_correct / inst_loose_total * 100,
+            'details':
+            details
+        }
+        return results

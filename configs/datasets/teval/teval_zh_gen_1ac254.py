@@ -5,23 +5,23 @@ from opencompass.openicl.icl_evaluator import TEvalEvaluator
 from opencompass.datasets import teval_postprocess, TEvalDataset
 
 teval_subject_mapping = {
-    "instruct_zh": ["instruct_v1_zh"],
-    "plan_zh": ["plan_json_v1_zh", "plan_str_v1_zh"],
-    "review_zh": ["review_str_v1_zh"],
-    "reason_retrieve_understand_zh": ["reason_retrieve_understand_json_v1_zh"],
-    "reason_zh": ["reason_str_v1_zh"],
-    "retrieve_zh": ["retrieve_str_v1_zh"],
-    "understand_zh": ["understand_str_v1_zh"],
+    'instruct_zh': ['instruct_v1_zh'],
+    'plan_zh': ['plan_json_v1_zh', 'plan_str_v1_zh'],
+    'review_zh': ['review_str_v1_zh'],
+    'reason_retrieve_understand_zh': ['reason_retrieve_understand_json_v1_zh'],
+    'reason_zh': ['reason_str_v1_zh'],
+    'retrieve_zh': ['retrieve_str_v1_zh'],
+    'understand_zh': ['understand_str_v1_zh'],
 }
 
-teval_reader_cfg = dict(input_columns=["prompt"], output_column="ground_truth")
+teval_reader_cfg = dict(input_columns=['prompt'], output_column='ground_truth')
 
 teval_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role="HUMAN", prompt="{prompt}"),
+                dict(role='HUMAN', prompt='{prompt}'),
             ],
         ),
     ),
@@ -41,9 +41,9 @@ for _name in teval_all_sets:
     for subset in teval_subject_mapping[_name]:
         teval_datasets.append(
             dict(
-                abbr="teval-" + subset,
+                abbr='teval-' + subset,
                 type=TEvalDataset,
-                path="./data/teval/ZH",
+                path='./data/teval/ZH',
                 name=subset,
                 reader_cfg=teval_reader_cfg,
                 infer_cfg=teval_infer_cfg,

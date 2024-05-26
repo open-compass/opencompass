@@ -7,10 +7,10 @@ from opencompass.utils.text_postprocessors import multiple_select_postprocess
 
 
 cmb_datasets = []
-for split in ["val", "test"]:
+for split in ['val', 'test']:
     cmb_reader_cfg = dict(
-        input_columns=["exam_type", "exam_class", "question_type", "question", "option_str"],
-        output_column="answer",
+        input_columns=['exam_type', 'exam_class', 'question_type', 'question', 'option_str'],
+        output_column='answer',
         train_split=split,
         test_split=split,
     )
@@ -21,10 +21,10 @@ for split in ["val", "test"]:
             template=dict(
                 round=[
                     dict(
-                        role="HUMAN",
-                        prompt=f"以下是中国{{exam_type}}中{{exam_class}}考试的一道{{question_type}}，不需要做任何分析和解释，直接输出答案选项。\n{{question}}\n{{option_str}} \n 答案: ",
+                        role='HUMAN',
+                        prompt=f'以下是中国{{exam_type}}中{{exam_class}}考试的一道{{question_type}}，不需要做任何分析和解释，直接输出答案选项。\n{{question}}\n{{option_str}} \n 答案: ',
                     ),
-                    dict(role="BOT", prompt="{answer}"),
+                    dict(role='BOT', prompt='{answer}'),
                 ],
             ),
         ),
@@ -39,9 +39,9 @@ for split in ["val", "test"]:
 
     cmb_datasets.append(
         dict(
-            abbr="cmb" if split == "val" else "cmb_test",
+            abbr='cmb' if split == 'val' else 'cmb_test',
             type=CMBDataset,
-            path="./data/CMB/",
+            path='./data/CMB/',
             reader_cfg=cmb_reader_cfg,
             infer_cfg=cmb_infer_cfg,
             eval_cfg=cmb_eval_cfg,

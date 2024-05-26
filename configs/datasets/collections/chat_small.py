@@ -12,7 +12,7 @@ with read_base():
     from ..FewCLUE_cluewsc.FewCLUE_cluewsc_gen_c68933 import cluewsc_datasets
     from ..FewCLUE_eprstmt.FewCLUE_eprstmt_gen_740ea0 import eprstmt_datasets
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from ..mbpp.mbpp_gen_1e1056 import mbpp_datasets
+    from ..mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
     from ..lambada.lambada_gen_217e11 import lambada_datasets
     from ..storycloze.storycloze_gen_7f656a import storycloze_datasets
     from ..SuperGLUE_AX_b.SuperGLUE_AX_b_gen_4dfefa import AX_b_datasets
@@ -31,7 +31,7 @@ with read_base():
     from ..summedits.summedits_gen_315438 import summedits_datasets
     from ..hellaswag.hellaswag_gen_6faab5 import hellaswag_datasets
     from ..piqa.piqa_gen_1194eb import piqa_datasets
-    from ..winogrande.winogrande_gen_a9ede5 import winogrande_datasets
+    from ..winogrande.deprecated_winogrande_gen_a9ede5 import winogrande_datasets
     from ..obqa.obqa_gen_9069e4 import obqa_datasets
     from ..nq.nq_gen_c788f6 import nq_datasets
     from ..triviaqa.triviaqa_gen_2121ce import triviaqa_datasets

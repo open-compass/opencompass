@@ -1,11 +1,12 @@
-import copy
 import csv
 import os
+import random
+import re
 
 from datasets import Dataset
 
 from opencompass.openicl import BaseEvaluator
-from opencompass.registry import LOAD_DATASET
+from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from .base import BaseDataset
 
@@ -17,7 +18,6 @@ class GPQADataset(BaseDataset):
     def load(path: str, name: str):
         cnt = 0
         data = []
-        data_new = []
         with open(os.path.join(path, name), 'r', encoding='utf-8') as f:
             reader = csv.reader(f, delimiter=',')
             for row in reader:
@@ -25,38 +25,20 @@ class GPQADataset(BaseDataset):
                     continue
                 cnt = cnt + 1
                 question = row[7]
-                A = row[8]
-                B = row[9]
-                C = row[10]
-                D = row[11]
+                # 第一个是正确选项
                 options = [row[8], row[9], row[10], row[11]]
-                answer = 'A'
-
-                data.append({
-                    'question': question,
-                    'A': A,
-                    'B': B,
-                    'C': C,
-                    'D': D,
-                    'options': options,
-                    'answer': answer
-                })
-
-                circular_patterns = ['ABCD', 'BCDA', 'CDAB', 'DABC']  # 更新选项顺序
-                c = circular_patterns[cnt % 4]
-                line = copy.deepcopy(data[cnt - 1])
-                tmp = line['A']
+                shuffle_patterns = ['ABCD', 'BCDA', 'CDAB', 'DABC']  # 更新选项顺序
+                c = shuffle_patterns[cnt % 4]
+                line = {'question': question}
+                ground_truth = options[0]
                 for i in range(4):
-                    line['ABCD'[i]] = line['options'][ord(c[i]) - ord('A')]
-
+                    line['ABCD'[i]] = options[ord(c[i]) - ord('A')]
                 for i in range(4):
-                    if line['ABCD'[i]] == tmp:
+                    if line['ABCD'[i]] == ground_truth:
                         line['answer'] = 'ABCD'[i]
                         break
-                data_new.append(line)
-
-        dataset = Dataset.from_list(data_new)
-
+                data.append(line)
+        dataset = Dataset.from_list(data)
         return dataset
 
 
@@ -64,9 +46,7 @@ class GPQAEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         if len(predictions) != len(references):
-            return {
-                'error': 'predictions and references have different length'
-            }
+            return {'error': 'preds and refrs have different length'}
         correct = 0
         count = 0
         details = []
@@ -79,3 +59,53 @@ class GPQAEvaluator(BaseEvaluator):
             details.append(detail)
         result = {'accuracy': 100 * correct / count, 'details': details}
         return result
+
+
+@LOAD_DATASET.register_module()
+class GPQADataset_Simple_Eval(BaseDataset):
+
+    @staticmethod
+    def load(path: str, name: str):
+        n_repeats = 4
+        data = []
+        with open(os.path.join(path, name), 'r', encoding='utf-8') as f:
+            reader = csv.reader(f, delimiter=',')
+            for row in reader:
+                if row[7] == 'Question':
+                    continue
+                question = row[7]
+                # 第一个是正确选项
+                options = [row[8], row[9], row[10], row[11]]
+                line = {'question': question}
+                line['answer'] = 'A'
+                line['options'] = options
+                data.append(line)
+
+        data_list = data * n_repeats
+        rng = random.Random(0)
+        data_list = [
+            data | {
+                'permutation': rng.sample(range(4), 4)
+            } for data in data_list
+        ]
+        for entry in data_list:
+            options = entry['options']
+            correct_options = [options[i] for i in entry['permutation']]
+            for i in range(4):
+                entry['ABCD'[i]] = correct_options[i]
+            correct_index = entry['permutation'].index(0)
+            correct_answer = 'ABCD'[correct_index]
+            entry['options'] = correct_options
+            entry['answer'] = correct_answer
+
+        dataset = Dataset.from_list(data_list)
+        return dataset
+
+
+@TEXT_POSTPROCESSORS.register_module()
+def GPQA_Simple_Eval_postprocess(text: str) -> str:
+    ANSWER_PATTERN = r'(?i)ANSWER\s*:\s*([A-D])'
+    match = re.search(ANSWER_PATTERN, text)
+    if match:
+        return match.group(1)
+    return None

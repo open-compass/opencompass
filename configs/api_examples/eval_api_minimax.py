@@ -34,4 +34,4 @@ infer = dict(
         task=dict(type=OpenICLInferTask)),
 )
 
-work_dir = "outputs/api_minimax/"
+work_dir = 'outputs/api_minimax/'

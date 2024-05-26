@@ -12,8 +12,6 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.registry import ICL_PROMPT_TEMPLATES
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
-from opencompass.utils.text_postprocessors import first_number_postprocess
-from opencompass.utils.types import get_type_from_cfg
 
 
 def extract_dicts(data):
@@ -27,10 +25,12 @@ def extract_dicts(data):
     return predictions
 
 
-def order_preds_and_record_references(predictions,
-                                      references,
-                                      infer_order,
-                                      seed=2680):
+def order_preds_and_record_references(
+    predictions,
+    references,
+    infer_order,
+    seed=666,
+):
     """Order predictions based on args and recording regrading references.
 
     Args:
@@ -73,10 +73,12 @@ class LMEvaluator:
             keywords, ``{prediction}`` and ``{reference}``, referring to
             the prediction and optionally the reference answer.
         judge_cfg (ConfigDict): The config of language model as a judge.
+        meta_review_prompt_template (ConfigDict, optional): Prompt template for meta judge model.
         output_path (str): The path to prediction output.
         dataset_cfg (ConfigDict, optional): The config of the dataset to be
             evaluated.
-        postprocessor (ConfigDict): The model prediction's postprocessor
+        pack_all_predictions (bool, optional): For multiround evaluation, judge all round or judge every single round.
+        pred_postprocessor (ConfigDict): The model prediction's postprocessor
             config.
     """
 
@@ -85,17 +87,20 @@ class LMEvaluator:
         prompt_template: ConfigDict,
         judge_cfg: ConfigDict,
         output_path: str,
-        infer_order: Optional[str] = 'random',
+        meta_review_prompt_template: Optional[ConfigDict] = None,
+        pack_all_predictions: Optional[bool] = False,
         dataset_cfg: Optional[ConfigDict] = None,
-        postprocessor: ConfigDict = dict(type=first_number_postprocess)
+        pred_postprocessor: Optional[ConfigDict] = None,
     ) -> None:
-        assert infer_order in ['random', 'double']
         self.output_path = output_path
         out_dir, out_name = osp.split(output_path)
         if not out_dir:
             out_dir = './'
 
         self.prompt_tmpl = ICL_PROMPT_TEMPLATES.build(prompt_template)
+        if meta_review_prompt_template is not None:
+            self.meta_review_prompt_tmpl = ICL_PROMPT_TEMPLATES.build(
+                meta_review_prompt_template)
 
         max_out_len = judge_cfg.get('max_out_len', None)
         batch_size = judge_cfg.get('batch_size', None)
@@ -105,19 +110,23 @@ class LMEvaluator:
                                         batch_size=batch_size,
                                         output_json_filepath=out_dir,
                                         output_json_filename=out_name)
-        self.postprocessor = get_type_from_cfg(postprocessor)
         self.logger = get_logger()
         self.dataset_cfg = dataset_cfg
-        self.infer_order = infer_order
+        self.pack_all_predictions = pack_all_predictions
 
-    def score(self, predictions, references: Optional[List] = None) -> Dict:
+    def score(self,
+              predictions,
+              judgements: Optional[List] = None,
+              references: Optional[List] = None,
+              meta: Optional[bool] = False,
+              infer_order: Optional[str] = 'random') -> Dict:
         dup_indices = []
-        if type(predictions) == list:
+        if isinstance(predictions, list):
             """Apply to multi-model comparison."""
             references = [{} for _ in range(len(predictions[0]['model_preds']))
                           ] if references is None else references
             predictions, references = order_preds_and_record_references(
-                predictions, references, self.infer_order)
+                predictions, references, infer_order)
 
             # calculate dupicated predictions numbers
             total_predictions_num = len(predictions[0])
@@ -129,11 +138,14 @@ class LMEvaluator:
                     if len(set(check)) == 1:
                         dup_indices.append(i)
 
-        elif type(predictions) == dict:
+        elif isinstance(predictions, dict):
             """Apply to single-model scoring."""
             references = [{} for _ in range(len(predictions[0]['model_preds']))
                           ] if references is None else references
             predictions = [predictions['model_preds']]
+
+        # Due to the rarity of identical predictions, we have temporarily disabled the plagiarism detection feature.
+        dup_indices = []
 
         if len(dup_indices) != 0:
             # remove dupicated predictions
@@ -148,21 +160,42 @@ class LMEvaluator:
         ):  #single chat for format like [['xxx', 'xxxx'], ['xxx', 'xxxx']]
             for i in range(len(predictions)):
                 key = 'prediction' if i == 0 else f'prediction{i + 1}'
+                gold_key = 'obj_gold'
                 pred_dict[key] = predictions[i]
+                pred_dict[gold_key] = references
+            if judgements:
+                for i in range(len(judgements)):
+                    key = 'judgement' if i == 0 else f'judgement{i + 1}'
+                    pred_dict[key] = judgements[i]['model_preds']
+                    for j in range(len(references)):
+                        references[j]['judge_model' +
+                                      str(i + 1)] = judgements[i]['model_name']
+
         elif isinstance(
                 predictions[0][0], list
         ):  #multi round for format like [[[{'round':1, 'user':'', 'assistant':''}, {'round':2, 'user':'', 'assistant':''}], [{'round':1, 'user':'', 'assistant':''}, {'round':2, 'user':'', 'assistant':''}]]]
-            for i in range(len(predictions)):
-                multiround_predictions = extract_dicts(predictions[i])
-                for j in range(len(multiround_predictions)):
-                    key = 'prediction' if i == 0 else f'prediction{i}'
-                    key += '_r' + str(j + 1)
-                    pred_dict[key] = multiround_predictions[j]
-
+            if self.pack_all_predictions:
+                for i in range(len(predictions)):
+                    key = 'prediction' if i == 0 else f'prediction{i + 1}'
+                    pred_dict[key] = predictions[i]
+            else:
+                for i in range(len(predictions)):
+                    multiround_predictions = extract_dicts(predictions[i])
+                    for j in range(len(multiround_predictions)):
+                        key = 'prediction' if i == 0 else f'prediction{i}'
+                        key += '_r' + str(j + 1)
+                        pred_dict[key] = multiround_predictions[j]
+            if judgements:
+                raise NotImplementedError(
+                    'Not applied meta-reivew judge on multi-round dataset')
+        else:
+            raise NotImplementedError(
+                f'{predictions[0][0]} with type {type(predictions[0][0])}, please check the postprocess you add to the prediction string is right or not, we suggest to return an empty string but not None'
+            )
         if self.dataset_cfg:
             dataset = build_dataset_from_cfg(self.dataset_cfg)
 
-            if self.infer_order == 'double':
+            if infer_order == 'double':
                 new_ds = {
                     k: dataset.test[k] * 2
                     for k in dataset.test.column_names
@@ -179,7 +212,6 @@ class LMEvaluator:
                 print(
                     f'Among total {total_predictions_num} predictions, there are {len(dup_indices)} predictions totally same, which are removed!'
                 )
-
             for k, v in pred_dict.items():
                 dataset.reader.dataset['test'] = dataset.test.add_column(k, v)
                 dataset.reader.input_columns.append(k)
@@ -201,8 +233,13 @@ class LMEvaluator:
                                     **pred_dict)
         dataset.reader.output_column = 'reference'
         retriever = ZeroRetriever(dataset)
-        self.inferencer.inference(retriever=retriever,
-                                  prompt_template=self.prompt_tmpl)
+        if meta:
+            self.inferencer.inference(
+                retriever=retriever,
+                prompt_template=self.meta_review_prompt_tmpl)
+        else:
+            self.inferencer.inference(retriever=retriever,
+                                      prompt_template=self.prompt_tmpl)
 
         output = mmengine.load(self.output_path)
         return self.postprocess(output)

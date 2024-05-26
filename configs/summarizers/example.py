@@ -11,7 +11,8 @@ with read_base():
     from .groups.tydiqa import tydiqa_summary_groups
     from .groups.xiezhi import xiezhi_summary_groups
     from .groups.scibench import scibench_summary_groups
+    from .groups.mgsm import mgsm_summary_groups
 
 summarizer = dict(
-    summary_groups=sum([v for k, v in locals().items() if k.endswith("_summary_groups")], []),
+    summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

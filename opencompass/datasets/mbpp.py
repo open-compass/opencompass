@@ -8,7 +8,7 @@ import re
 import signal
 import tempfile
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import List, Sequence, Union
 
 import numpy as np
@@ -134,11 +134,20 @@ class MBPPPlusDataset(BaseDataset):
         multiple responses in special cases.
         """
 
+        def processing_test(example):
+            example['test_case'] = example['test_list']
+            example['test_list'] = '\n'.join(example['test_list'])
+            example['test_list_2'] = example['test_list']
+            example['test_column'] = dict(test_list_2=example['test_list'],
+                                          task_id=example['task_id'])
+            return example
+
         dataset = []
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
-                dataset.extend(
-                    [json.loads(line.strip()) for _ in range(num_repeats)])
+                example = json.loads(line.strip())
+                example = processing_test(example)
+                dataset.extend([example for _ in range(num_repeats)])
         return Dataset.from_list(dataset)
 
 
@@ -204,24 +213,24 @@ class MBPPEvaluator(BaseEvaluator):
         if self.metric == 'MBPP':
             result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
             details = {}
-            # change to thread pool for better killing blocked instance
-            with ThreadPoolExecutor() as executor:
+            with ProcessPoolExecutor() as executor:
                 futures = []
                 for i, (refer, pred) in enumerate(zip(references,
                                                       predictions)):
                     pred = self._process_answer(pred)
                     programs = self._process_test(refer, pred)
-                    future = executor.submit(execution, programs, i, 3)
+                    future = executor.submit(execution, programs, i, 10)
                     futures.append(future)
+                    details[str(i)] = {}
+                    details[str(i)]['origin'] = predictions[i]
+                    details[str(i)]['programs'] = programs
 
                 from tqdm import tqdm
                 for future in tqdm(as_completed(futures), total=len(futures)):
-                    index, key = future.result()
-                    result[key] += 1
-                    details[str(index)] = {
-                        'programs': predictions[index],
-                        'result': key
-                    }
+                    index, ret = future.result()
+                    result[ret] += 1
+                    details[str(index)]['result'] = ret
+                    details[str(index)]['is_correct'] = (ret == 'pass')
 
             result['score'] = result['pass'] / len(predictions) * 100
             result['details'] = details
@@ -244,6 +253,7 @@ class MBPPEvaluator(BaseEvaluator):
                 if not isinstance(preds, list):
                     preds = [preds]
                 for pred in preds:
+                    pred = self._process_answer(pred)
                     mbpp_preds.append({'task_id': refer, 'solution': pred})
             with tempfile.TemporaryDirectory() as tmp_dir:
                 out_dir = osp.join(tmp_dir, 'mbpp_eval.jsonl')
@@ -261,39 +271,35 @@ class MBPPEvaluator(BaseEvaluator):
                 return {f'mbpp_plus_{k}': score[k] * 100 for k in score}
 
     def _process_answer(self, text):
-        try:
-            # for chatGLM related text
-            eval_text = eval(text)
-        except Exception:
-            pass
-        else:
-            if isinstance(eval_text, str):
-                text = eval_text
-        # deal with code block
-        if '```' in text:
-            blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
-            if len(blocks) == 0:
-                text = text.split('```')[1]  # fall back to default strategy
-            else:
-                text = blocks[0]  # fetch the first code block
-                if not text.startswith('\n'):  # in case starting with ```xxx
-                    text = text[max(text.find('\n') + 1, 0):]
+        patterns = [
+            r"\[BEGIN\]\s*'(.*)'\s*\[DONE\]",
+            r"BEGIN\s*'(.*)'\s*\[DONE\]",
+            r"\[BEGIN\]\s*'(.*)'\s*DONE",
+            r"BEGIN\s*'(.*)'\s*DONE",
+            r"\[BEGIN\]\s*'(.*)\s*\[DONE\]",
+            r"BEGIN\s*'(.*)\s*\[DONE\]",
+            r"\[BEGIN\]\s*'(.*)\s*DONE",
+            r"BEGIN\s*'(.*)\s*DONE",
+            r'\[BEGIN\]\s*(.*)\s*\[DONE\]',
+            r'BEGIN\s*(.*)\s*\[DONE\]',
+            r'\[BEGIN\]\s*(.*)\s*DONE',
+            r'BEGIN\s*(.*)\s*DONE',
+            r'```python\s*(.*)\s*```',
+            r'```\s*(.*)\s*```',
+            r'(.*)\s*```.*',
+            r"\[BEGIN\]\s*'(.*)",
+            r'\[BEGIN\](.*)',
+            r"'(.*)'\s*\[DONE\]",
+        ]
+        for p in patterns:
+            match = re.search(p, text, re.DOTALL)
+            if match:
+                text = match.group(1)
+                break
+        text = text.split('```')[0]
+        text = re.split(r"'?\s*\[?DONE\]?", text)[0]
+        text = text.replace('\\_', '_')
         text = text.strip()
-        match = re.search(r"('\s*|)(\[DONE\]|DONE)", text)
-        if match:
-            text = text[:match.start()]
-        match = re.search(r"(\[BEGIN\]|BEGIN)('\s*|)", text)
-        if match:
-            text = text[match.end():]
-        text = text.strip()
-        if text.startswith("'"):
-            text = text[1:]
-        if text.endswith("'"):
-            text = text[:-1]
-        text = text.replace('\\', '')
-        match = re.search(r'```python(.*)```', text, re.DOTALL)
-        if match:
-            text = match.group(1).strip().split('```')[0].strip()
         return text
 
     def _process_test(self, test_case, pred):
@@ -434,7 +440,7 @@ class MBPPPassKEvaluator(MBPPEvaluator):
         task_total = defaultdict(int)
 
         result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
-        with ThreadPoolExecutor() as executor:
+        with ProcessPoolExecutor() as executor:
             futures = []
             for refer, preds in zip(references, predictions):
                 # suits for two case
@@ -450,7 +456,7 @@ class MBPPPassKEvaluator(MBPPEvaluator):
                 for pred in preds:
                     pred = self._process_answer(pred)
                     programs = self._process_test(test_case, pred)
-                    future = executor.submit(execution, programs, task_id, 3)
+                    future = executor.submit(execution, programs, task_id, 10)
                     futures.append(future)
 
             from tqdm import tqdm

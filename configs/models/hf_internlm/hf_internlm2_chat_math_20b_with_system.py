@@ -7,14 +7,13 @@ _meta_template = dict(
         dict(role='SYSTEM', begin='[UNUSED_TOKEN_146]system\n', end='[UNUSED_TOKEN_145]\n'),
         dict(role='BOT', begin='[UNUSED_TOKEN_146]assistant\n', end='[UNUSED_TOKEN_145]\n', generate=True),
     ],
-    eos_token_id=92542
 )
 
 models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='internlm2-chat-math-20b-hf',
-        path="internlm/internlm2-math-20b",
+        path='internlm/internlm2-math-20b',
         tokenizer_path='internlm/internlm2-math-20b',
         model_kwargs=dict(
             trust_remote_code=True,

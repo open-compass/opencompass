@@ -24,7 +24,7 @@ siqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
 
 siqa_datasets = [
     dict(
-        abbr="siqa",
+        abbr='siqa',
         type=siqaDataset,
         path='./data/siqa',
         reader_cfg=siqa_reader_cfg,

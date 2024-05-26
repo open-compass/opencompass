@@ -12,17 +12,17 @@ hellaswag_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            "0": dict(
-                round=[dict(role="HUMAN", prompt="{query} {A}")]
+            '0': dict(
+                round=[dict(role='HUMAN', prompt='{query} {A}')]
             ),
-            "1": dict(
-                round=[dict(role="HUMAN", prompt="{query} {B}")]
+            '1': dict(
+                round=[dict(role='HUMAN', prompt='{query} {B}')]
             ),
-            "2": dict(
-                round=[dict(role="HUMAN", prompt="{query} {C}")]
+            '2': dict(
+                round=[dict(role='HUMAN', prompt='{query} {C}')]
             ),
-            "3": dict(
-                round=[dict(role="HUMAN", prompt="{query} {D}")]
+            '3': dict(
+                round=[dict(role='HUMAN', prompt='{query} {D}')]
             ),
         }),
     retriever=dict(type=ZeroRetriever),

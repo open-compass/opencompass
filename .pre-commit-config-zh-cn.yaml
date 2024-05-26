@@ -9,6 +9,7 @@ exclude: |
       opencompass/datasets/medbench/|
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
+      opencompass/datasets/TheoremQA|
       docs/zh_cn/advanced_guides/compassbench_intro.md
     )
 repos:
@@ -44,7 +45,7 @@ repos:
             (?x)^(
               dicts/|
               projects/.*?/dicts/|
-              configs/
+              configs/.*?/.*\.txt
             )
       - id: check-yaml
       - id: end-of-file-fixer
@@ -52,16 +53,13 @@ repos:
             (?x)^(
               dicts/|
               projects/.*?/dicts/|
-              configs/
+              configs/.*?/.*\.txt
             )
       - id: requirements-txt-fixer
       - id: double-quote-string-fixer
-        exclude: configs/
       - id: check-merge-conflict
       - id: fix-encoding-pragma
         args: ["--remove"]
-      - id: mixed-line-ending
-        args: ["--fix=lf"]
       - id: mixed-line-ending
         args: ["--fix=lf"]
   - repo: https://gitee.com/openmmlab/mirrors-mdformat

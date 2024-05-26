@@ -6,9 +6,9 @@ with read_base():
     from .datasets.agieval.agieval_gen_64afd3 import agieval_datasets
     from .datasets.bbh.bbh_gen_5b92b0 import bbh_datasets
     from .datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
-    from .datasets.math.math_evaluatorv2_gen_265cce import math_datasets
+    from .datasets.math.math_evaluatorv2_gen_cecb31 import math_datasets
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
-    from .datasets.mbpp.sanitized_mbpp_gen_1e1056 import sanitized_mbpp_datasets
+    from .datasets.mbpp.deprecated_sanitized_mbpp_gen_1e1056 import sanitized_mbpp_datasets
 
     from .models.hf_internlm.hf_internlm2_chat_7b import models as hf_internlm2_chat_7b_model
     from .models.hf_internlm.hf_internlm2_chat_20b import models as hf_internlm2_chat_20b_model
@@ -17,8 +17,8 @@ with read_base():
 
 work_dir = './outputs/internlm2-chat-keyset/'
 
-_origin_datasets = sum([v for k, v in locals().items() if k.endswith("_datasets")], [])
-_origin_models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
+_origin_datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
+_origin_models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 _vanilla_datasets = [deepcopy(d) for d in _origin_datasets]
 _vanilla_models = []

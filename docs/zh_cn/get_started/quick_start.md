@@ -79,13 +79,8 @@ python tools/list_configs.py llama mmlu
 
 ```bash
 python run.py --datasets siqa_gen winograd_ppl \
---hf-path facebook/opt-125m \
---model-kwargs device_map='auto' \
---tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \
---max-seq-len 2048 \
---max-out-len 100 \
---batch-size 128  \
---num-gpus 1  # 最少需要的 GPU 数量
+--hf-type base \
+--hf-path facebook/opt-125m
 ```
 
 请注意，通过这种方式，OpenCompass 一次只评估一个模型，而其他方式可以一次评估多个模型。
@@ -100,12 +95,14 @@ python run.py --datasets siqa_gen winograd_ppl \
 :animate: fade-in-slide-down
 ```bash
 python run.py --datasets siqa_gen winograd_ppl \
+--hf-type base \  # HuggingFace 模型类型, base 或 chat
 --hf-path facebook/opt-125m \  # HuggingFace 模型路径
 --tokenizer-path facebook/opt-125m \  # HuggingFace tokenizer 路径（如果与模型路径相同，可以省略）
 --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # 构建 tokenizer 的参数
 --model-kwargs device_map='auto' \  # 构建模型的参数
 --max-seq-len 2048 \  # 模型可以接受的最大序列长度
 --max-out-len 100 \  # 生成的最大 token 数
+--min-out-len 100 \  # 生成的最小 token 数
 --batch-size 64  \  # 批量大小
 --num-gpus 1  # 运行模型所需的 GPU 数量
 ```
@@ -147,28 +144,22 @@ python run.py configs/eval_demo.py
 OpenCompass 提供了一系列预定义的模型配置，位于 `configs/models` 下。以下是与 [opt-350m](https://github.com/open-compass/opencompass/blob/main/configs/models/opt/hf_opt_350m.py)（`configs/models/opt/hf_opt_350m.py`）相关的配置片段：
 
 ```python
-# 使用 `HuggingFaceCausalLM` 评估由 HuggingFace 的 `AutoModelForCausalLM` 支持的模型
-from opencompass.models import HuggingFaceCausalLM
+# 使用 `HuggingFaceBaseModel` 评估由 HuggingFace 的 `AutoModelForCausalLM` 支持的模型
+from opencompass.models import HuggingFaceBaseModel
 
-# OPT-350M
-opt350m = dict(
-       type=HuggingFaceCausalLM,
-       # `HuggingFaceCausalLM` 的初始化参数
-       path='facebook/opt-350m',
-       tokenizer_path='facebook/opt-350m',
-       tokenizer_kwargs=dict(
-           padding_side='left',
-           truncation_side='left',
-           proxies=None,
-           trust_remote_code=True),
-       model_kwargs=dict(device_map='auto'),
-       # 下面是所有模型的共同参数，不特定于 HuggingFaceCausalLM
-       abbr='opt350m',               # 结果显示的模型缩写
-       max_seq_len=2048,             # 整个序列的最大长度
-       max_out_len=100,              # 生成的最大 token 数
-       batch_size=64,                # 批量大小
-       run_cfg=dict(num_gpus=1),     # 该模型所需的 GPU 数量
+models = [
+    # OPT-350M
+    dict(
+        type=HuggingFaceBaseModel,
+        # `HuggingFaceBaseModel` 的初始化参数
+        path='facebook/opt-350m',
+        # 下面是所有模型的共同参数，不特定于 HuggingFaceBaseModel
+        abbr='opt-350m-hf',         # 模型的缩写
+        max_out_len=1024,           # 生成的最大 token 数
+        batch_size=32,              # 批量大小
+        run_cfg=dict(num_gpus=1),   # 该模型所需的 GPU 数量
     )
+]
 ```
 
 使用配置时，我们可以通过命令行参数 `--models` 指定相关文件，或使用继承机制将模型配置导入到配置文件中的 `models` 列表中。

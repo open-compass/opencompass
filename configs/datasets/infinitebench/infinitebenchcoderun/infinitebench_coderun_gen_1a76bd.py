@@ -8,7 +8,7 @@ from opencompass.datasets import InfiniteBenchcoderunDataset
 InfiniteBench_coderun_reader_cfg = dict(
     input_columns=['context', 'func', 'func_call'],
     output_column='answer',
-    
+
 )
 
 InfiniteBench_coderun_infer_cfg = dict(

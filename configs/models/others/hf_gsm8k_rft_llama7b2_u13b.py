@@ -4,8 +4,8 @@ from opencompass.models import HuggingFaceCausalLM
 _meta_template = dict(
     begin='Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n',
     round=[
-        dict(role="HUMAN", begin='### Instruction:\n', end='\n\n'),
-        dict(role="BOT", begin="### Response:", end='\n\n', generate=True),
+        dict(role='HUMAN', begin='### Instruction:\n', end='\n\n'),
+        dict(role='BOT', begin='### Response:', end='\n\n', generate=True),
     ],
 )
 

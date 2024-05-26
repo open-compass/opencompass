@@ -1,26 +1,13 @@
-from opencompass.models import HuggingFaceCausalLM
+from opencompass.models import HuggingFaceBaseModel
 
 
 models = [
     dict(
-        type=HuggingFaceCausalLM,
+        type=HuggingFaceBaseModel,
         abbr='internlm2-7b-hf',
-        path="internlm/internlm2-7b",
-        tokenizer_path='internlm/internlm2-7b',
-        model_kwargs=dict(
-            trust_remote_code=True,
-            device_map='auto',
-        ),
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            use_fast=False,
-            trust_remote_code=True,
-        ),
-        max_out_len=100,
-        min_out_len=1,
-        max_seq_len=2048,
+        path='internlm/internlm2-7b',
+        max_out_len=1024,
         batch_size=8,
-        run_cfg=dict(num_gpus=1, num_procs=1),
+        run_cfg=dict(num_gpus=1),
     )
 ]

@@ -1,17 +1,25 @@
+# flake8: noqa
+# yapf: disable
 import os
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import tabulate
 from mmengine.config import Config
 
 from opencompass.datasets.custom import make_custom_dataset_config
-from opencompass.partitioners import NaivePartitioner, SizePartitioner
+from opencompass.models import (VLLM, HuggingFace, HuggingFaceBaseModel,
+                                HuggingFaceCausalLM, HuggingFaceChatGLM3,
+                                HuggingFacewithChatTemplate, TurboMindModel,
+                                TurboMindModelwithChatTemplate,
+                                VLLMwithChatTemplate)
+from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
 
 
-def match_cfg_file(workdir: str, pattern: Union[str, List[str]]) -> List[str]:
+def match_cfg_file(workdir: str,
+                   pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
     """Match the config file in workdir recursively given the pattern.
 
     Additionally, if the pattern itself points to an existing file, it will be
@@ -48,6 +56,19 @@ def match_cfg_file(workdir: str, pattern: Union[str, List[str]]) -> List[str]:
     return files
 
 
+def try_fill_in_custom_cfgs(config):
+    for i, dataset in enumerate(config['datasets']):
+        if 'type' not in dataset:
+            config['datasets'][i] = make_custom_dataset_config(dataset)
+    if 'model_dataset_combinations' not in config:
+        return config
+    for mdc in config['model_dataset_combinations']:
+        for i, dataset in enumerate(mdc['datasets']):
+            if 'type' not in dataset:
+                mdc['datasets'][i] = make_custom_dataset_config(dataset)
+    return config
+
+
 def get_config_from_arg(args) -> Config:
     """Get the config object given args.
 
@@ -56,26 +77,39 @@ def get_config_from_arg(args) -> Config:
     2. args.models and args.datasets
     3. Huggingface parameter groups and args.datasets
     """
+    logger = get_logger()
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
-        for i, dataset in enumerate(config['datasets']):
-            if 'type' not in dataset:
-                config['datasets'][i] = make_custom_dataset_config(dataset)
+        config = try_fill_in_custom_cfgs(config)
+        # set infer accelerator if needed
+        if args.accelerator in ['vllm', 'lmdeploy']:
+            config['models'] = change_accelerator(config['models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('models') is not None:
+                config['eval']['partitioner']['models'] = change_accelerator(config['eval']['partitioner']['models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('judge_models') is not None:
+                config['eval']['partitioner']['judge_models'] = change_accelerator(config['eval']['partitioner']['judge_models'], args.accelerator)
         return config
+
     # parse dataset args
     if not args.datasets and not args.custom_dataset_path:
-        raise ValueError('You must specify "--datasets" or '
-                         '"--custom-dataset-path" if you do not specify a '
-                         'config file path.')
+        raise ValueError('You must specify "--datasets" or "--custom-dataset-path" if you do not specify a config file path.')
     datasets = []
     if args.datasets:
         datasets_dir = os.path.join(args.config_dir, 'datasets')
-        for dataset in match_cfg_file(datasets_dir, args.datasets):
-            get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
-            cfg = Config.fromfile(dataset[1])
-            for k in cfg.keys():
-                if k.endswith('_datasets'):
-                    datasets += cfg[k]
+        for dataset_arg in args.datasets:
+            if '/' in dataset_arg:
+                dataset_name, dataset_suffix = dataset_arg.split('/', 1)
+                dataset_key_suffix = dataset_suffix
+            else:
+                dataset_name = dataset_arg
+                dataset_key_suffix = '_datasets'
+
+            for dataset in match_cfg_file(datasets_dir, [dataset_name]):
+                logger.info(f'Loading {dataset[0]}: {dataset[1]}')
+                cfg = Config.fromfile(dataset[1])
+                for k in cfg.keys():
+                    if k.endswith(dataset_key_suffix):
+                        datasets += cfg[k]
     else:
         dataset = {'path': args.custom_dataset_path}
         if args.custom_dataset_infer_method is not None:
@@ -89,67 +123,165 @@ def get_config_from_arg(args) -> Config:
 
     # parse model args
     if not args.models and not args.hf_path:
-        raise ValueError('You must specify a config file path, '
-                         'or specify --models and --datasets, or '
-                         'specify HuggingFace model parameters and '
-                         '--datasets.')
+        raise ValueError('You must specify a config file path, or specify --models and --datasets, or specify HuggingFace model parameters and --datasets.')
     models = []
     if args.models:
         model_dir = os.path.join(args.config_dir, 'models')
         for model in match_cfg_file(model_dir, args.models):
-            get_logger().info(f'Loading {model[0]}: {model[1]}')
+            logger.info(f'Loading {model[0]}: {model[1]}')
             cfg = Config.fromfile(model[1])
             if 'models' not in cfg:
-                raise ValueError(
-                    f'Config file {model[1]} does not contain "models" field')
+                raise ValueError(f'Config file {model[1]} does not contain "models" field')
             models += cfg['models']
     else:
-        from opencompass.models import HuggingFace
-        model = dict(type=f'{HuggingFace.__module__}.{HuggingFace.__name__}',
+        if args.hf_type == 'chat':
+            mod = HuggingFacewithChatTemplate
+        else:
+            mod = HuggingFaceBaseModel
+        model = dict(type=f'{mod.__module__}.{mod.__name__}',
+                     abbr=args.hf_path.split('/')[-1] + '_hf',
                      path=args.hf_path,
-                     peft_path=args.peft_path,
-                     tokenizer_path=args.tokenizer_path,
                      model_kwargs=args.model_kwargs,
+                     tokenizer_path=args.tokenizer_path,
                      tokenizer_kwargs=args.tokenizer_kwargs,
+                     peft_path=args.peft_path,
+                     peft_kwargs=args.peft_kwargs,
                      max_seq_len=args.max_seq_len,
                      max_out_len=args.max_out_len,
-                     batch_padding=not args.no_batch_padding,
                      batch_size=args.batch_size,
                      pad_token_id=args.pad_token_id,
+                     stop_words=args.stop_words,
                      run_cfg=dict(num_gpus=args.num_gpus))
+        logger.debug(f'Using model: {model}')
         models.append(model)
+    # set infer accelerator if needed
+    if args.accelerator in ['vllm', 'lmdeploy']:
+        models = change_accelerator(models, args.accelerator)
     # parse summarizer args
-    summarizer = args.summarizer if args.summarizer is not None else 'example'
+    summarizer_arg = args.summarizer if args.summarizer is not None else 'example'
     summarizers_dir = os.path.join(args.config_dir, 'summarizers')
-    s = match_cfg_file(summarizers_dir, [summarizer])[0]
-    get_logger().info(f'Loading {s[0]}: {s[1]}')
-    cfg = Config.fromfile(s[1])
-    summarizer = cfg['summarizer']
 
-    return Config(dict(models=models, datasets=datasets,
-                       summarizer=summarizer),
-                  format_python_code=False)
-
-
-def exec_mm_infer_runner(tasks, args, cfg):
-    """execute multimodal infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        raise NotImplementedError('Currently, we do not support evaluating \
-                             multimodal models on dlc.')
+    # Check if summarizer_arg contains '/'
+    if '/' in summarizer_arg:
+        # If it contains '/', split the string by '/'
+        # and use the second part as the configuration key
+        summarizer_file, summarizer_key = summarizer_arg.split('/', 1)
     else:
-        runner = LocalRunner(task=dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
+        # If it does not contain '/', keep the original logic unchanged
+        summarizer_key = 'summarizer'
+        summarizer_file = summarizer_arg
+
+    s = match_cfg_file(summarizers_dir, [summarizer_file])[0]
+    logger.info(f'Loading {s[0]}: {s[1]}')
+    cfg = Config.fromfile(s[1])
+    # Use summarizer_key to retrieve the summarizer definition
+    # from the configuration file
+    summarizer = cfg[summarizer_key]
+
+    return Config(dict(models=models, datasets=datasets, summarizer=summarizer), format_python_code=False)
+
+
+def change_accelerator(models, accelerator):
+    models = models.copy()
+    logger = get_logger()
+    model_accels = []
+    for model in models:
+        logger.info(f'Transforming {model["abbr"]} to {accelerator}')
+        # change HuggingFace model to VLLM or TurboMindModel
+        if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3]:
+            gen_args = dict()
+            if model.get('generation_kwargs') is not None:
+                generation_kwargs = model['generation_kwargs'].copy()
+                gen_args['temperature'] = generation_kwargs.get('temperature', 0.001)
+                gen_args['top_k'] = generation_kwargs.get('top_k', 1)
+                gen_args['top_p'] = generation_kwargs.get('top_p', 0.9)
+                gen_args['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
+                generation_kwargs['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
+                generation_kwargs.pop('eos_token_id')
+            else:
+                # if generation_kwargs is not provided, set default values
+                generation_kwargs = dict()
+                gen_args['temperature'] = 0.0
+                gen_args['top_k'] = 1
+                gen_args['top_p'] = 0.9
+                gen_args['stop_token_ids'] = None
+
+            if accelerator == 'lmdeploy':
+                logger.info(f'Transforming {model["abbr"]} to {accelerator}')
+                mod = TurboMindModel
+                acc_model = dict(
+                    type=f'{mod.__module__}.{mod.__name__}',
+                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
+                    path=model['path'],
+                    engine_config=dict(session_len=model['max_seq_len'],
+                                       max_batch_size=model['batch_size'],
+                                       tp=model['run_cfg']['num_gpus']),
+                    gen_config=dict(top_k=gen_args['top_k'],
+                                    temperature=gen_args['temperature'],
+                                    top_p=gen_args['top_p'],
+                                    max_new_tokens=model['max_out_len'],
+                                    stop_words=gen_args['stop_token_ids']),
+                    max_out_len=model['max_out_len'],
+                    max_seq_len=model['max_seq_len'],
+                    batch_size=model['batch_size'],
+                    concurrency=model['batch_size'],
+                    run_cfg=model['run_cfg'],
+                )
+                for item in ['meta_template']:
+                    if model.get(item) is not None:
+                        acc_model[item] = model[item]
+            elif accelerator == 'vllm':
+                logger.info(f'Transforming {model["abbr"]} to {accelerator}')
+
+                acc_model = dict(
+                    type=f'{VLLM.__module__}.{VLLM.__name__}',
+                    abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
+                    path=model['path'],
+                    model_kwargs=dict(tensor_parallel_size=model['run_cfg']['num_gpus']),
+                    max_out_len=model['max_out_len'],
+                    max_seq_len=model['max_seq_len'],
+                    batch_size=model['batch_size'],
+                    generation_kwargs=generation_kwargs,
+                    run_cfg=model['run_cfg'],
+                )
+                for item in ['meta_template', 'end_str']:
+                    if model.get(item) is not None:
+                        acc_model[item] = model[item]
+            else:
+                raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
+        elif model['type'] in [HuggingFacewithChatTemplate]:
+            if accelerator == 'vllm':
+                mod = VLLMwithChatTemplate
+                acc_model = dict(
+                    type=f'{mod.__module__}.{mod.__name__}',
+                    abbr='-hf'.join(model['abbr'].split('-hf')[:-1]) + '-vllm',
+                    path=model['path'],
+                    model_kwargs=dict(tensor_parallel_size=model['run_cfg']['num_gpus']),
+                    max_out_len=model['max_out_len'],
+                    batch_size=32768,
+                    run_cfg=model['run_cfg'],
+                    stop_words=model.get('stop_words', []),
+                )
+            elif accelerator == 'lmdeploy':
+                mod = TurboMindModelwithChatTemplate
+                acc_model = dict(
+                    type=f'{mod.__module__}.{mod.__name__}',
+                    abbr='-hf'.join(model['abbr'].split('-hf')[:-1]) + '-turbomind',
+                    path=model['path'],
+                    engine_config=dict(max_batch_size=model.get('batch_size', 16), tp=model['run_cfg']['num_gpus']),
+                    gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
+                    max_seq_len=model.get('max_seq_len', 2048),
+                    max_out_len=model['max_out_len'],
+                    batch_size=32768,
+                    run_cfg=model['run_cfg'],
+                    stop_words=model.get('stop_words', []),
+                )
+            else:
+                raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
+        else:
+            raise ValueError(f'Unsupported model type {model["type"]}')
+        model_accels.append(acc_model)
+    return model_accels
 
 
 def get_config_type(obj) -> str:
@@ -158,9 +290,8 @@ def get_config_type(obj) -> str:
 
 def fill_infer_cfg(cfg, args):
     new_cfg = dict(infer=dict(
-        partitioner=dict(type=get_config_type(SizePartitioner),
-                         max_task_size=args.max_partition_size,
-                         gen_task_coef=args.gen_task_coef),
+        partitioner=dict(type=get_config_type(NumWorkerPartitioner),
+                         num_worker=args.max_num_workers),
         runner=dict(
             max_num_workers=args.max_num_workers,
             debug=args.debug,

@@ -53,6 +53,8 @@ class ERNIEBot(BaseAPIModel):
         self.headers = {'Content_Type': 'application/json'}
         self.secretkey = secretkey
         self.key = key
+        if not url.endswith('?access_token='):
+            url += '?access_token='
         self.url = url
         access_token, _ = self._generate_access_token()
         self.access_token = access_token
@@ -88,13 +90,13 @@ class ERNIEBot(BaseAPIModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -111,13 +113,13 @@ class ERNIEBot(BaseAPIModel):
 
     def _generate(
         self,
-        input: str or PromptList,
+        input: PromptType,
         max_out_len: int = 512,
     ) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -143,14 +145,25 @@ class ERNIEBot(BaseAPIModel):
             messages = [{'role': 'user', 'content': input}]
         else:
             messages = []
+            msg_buffer, last_role = [], None
             for item in input:
-                msg = {'content': item['prompt']}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
+                if item['role'] == 'BOT':
+                    role = 'assistant'
+                else:  # USER or SYSTEM
+                    role = 'user'
+                if role != last_role and last_role is not None:
+                    messages.append({
+                        'content': '\n'.join(msg_buffer),
+                        'role': last_role
+                    })
+                    msg_buffer = []
+                msg_buffer.append(item['prompt'])
+                last_role = role
+            messages.append({
+                'content': '\n'.join(msg_buffer),
+                'role': last_role
+            })
 
-                messages.append(msg)
         data = {'messages': messages}
         data.update(self.generation_kwargs)
 
@@ -181,6 +194,7 @@ class ERNIEBot(BaseAPIModel):
             if raw_response.status_code == 200:
                 try:
                     msg = response['result']
+                    self.logger.debug(msg)
                     return msg
                 except KeyError:
                     print(response)
@@ -188,9 +202,12 @@ class ERNIEBot(BaseAPIModel):
                     if response['error_code'] == 336007:
                         # exceed max length
                         return ''
-
-                    time.sleep(1)
-                    continue
+                    elif response['error_code'] == 336103:
+                        # prompt tokens too long
+                        return ''
+                    else:
+                        time.sleep(1)
+                        continue
 
             if (response['error_code'] == 110 or response['error_code'] == 100
                     or response['error_code'] == 111

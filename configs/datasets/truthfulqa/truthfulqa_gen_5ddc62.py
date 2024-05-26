@@ -13,7 +13,7 @@ truthfulqa_reader_cfg = dict(
 truthfulqa_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=dict(round=[dict(role="HUMAN", prompt="{question}")])),
+        template=dict(round=[dict(role='HUMAN', prompt='{question}')])),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 

@@ -1,8 +1,9 @@
 import argparse
+import os
 import os.path as osp
 import random
+import sys
 import time
-from shutil import which
 from typing import Any
 
 from mmengine.config import Config, ConfigDict
@@ -42,27 +43,35 @@ class OpenICLInferTask(BaseTask):
             template (str): The template which have '{task_cmd}' to format
                 the command.
         """
+        sys.path.append(os.getcwd())
         script_path = __file__
-        has_vllm = ('VLLM' in str(self.model_cfgs[0].get('type', ''))) or \
-            'VLLM' in str(self.model_cfgs[0].get('llm', {}).get('type', ''))
-        if self.num_gpus > 0 and not has_vllm:
+        backend_keys = ['VLLM', 'Lmdeploy']
+        use_backend = any(
+            key in str(self.model_cfgs[0].get('type', ''))
+            or key in str(self.model_cfgs[0].get('llm', {}).get('type', ''))
+            for key in backend_keys)
+        if self.num_gpus > 0 and not use_backend:
             port = random.randint(12000, 32000)
             command = (f'torchrun --master_port={port} '
                        f'--nproc_per_node {self.num_procs} '
                        f'{script_path} {cfg_path}')
         else:
-            python = 'python3' if which('python3') else 'python'
+            python = sys.executable
             command = f'{python} {script_path} {cfg_path}'
 
         return template.format(task_cmd=command)
 
-    def run(self):
+    def run(self, cur_model=None):
         self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
             self.min_out_len = model_cfg.get('min_out_len', None)
-            self.model = build_model_from_cfg(model_cfg)
+            if cur_model:
+                self.model = cur_model
+            else:
+                self.model = build_model_from_cfg(model_cfg)
+                cur_model = self.model
 
             for dataset_cfg in dataset_cfgs:
                 self.model_cfg = model_cfg

@@ -289,13 +289,13 @@ class HuggingFace(BaseModel):
         tokens = self.tokenizer.batch_encode_plus(inputs,
                                                   padding=True,
                                                   truncation=True,
-                                                  max_length=self.max_seq_len -
-                                                  max_out_len)
+                                                  max_length=self.max_seq_len)
         tokens = {
             k: torch.tensor(np.array(tokens[k]), device=self.model.device)
             for k in tokens if k in ['input_ids', 'attention_mask']
         }
 
+        origin_stopping_criteria = stopping_criteria
         if stopping_criteria:
             # Construct huggingface stopping criteria
             if self.tokenizer.eos_token is not None:
@@ -332,6 +332,9 @@ class HuggingFace(BaseModel):
 
         if self.end_str:
             decodeds = [token.split(self.end_str)[0] for token in decodeds]
+        if origin_stopping_criteria:
+            for t in origin_stopping_criteria:
+                decodeds = [token.split(t)[0] for token in decodeds]
         return decodeds
 
     def _single_generate(self,
@@ -382,6 +385,7 @@ class HuggingFace(BaseModel):
                                    max_length=self.max_seq_len -
                                    max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
+        origin_stopping_criteria = stopping_criteria
         if stopping_criteria:
             # Construct huggingface stopping criteria
             if self.tokenizer.eos_token is not None:
@@ -419,6 +423,9 @@ class HuggingFace(BaseModel):
 
         if self.end_str:
             decodeds = [token.split(self.end_str)[0] for token in decodeds]
+        if origin_stopping_criteria:
+            for t in origin_stopping_criteria:
+                decodeds = [token.split(t)[0] for token in decodeds]
         return decodeds
 
     def get_logits(self, inputs: List[str]):
@@ -723,7 +730,7 @@ class HuggingFaceChatGLM3(HuggingFace):
         self.num_extra_tokens = num_extra_tokens
 
     def generate(self,
-                 inputs: List[str or PromptList],
+                 inputs: List[PromptType],
                  max_out_len: int = 512,
                  skip_overlength=False,
                  **kwargs) -> str:

@@ -9,7 +9,7 @@ subjective_reader_cfg = dict(
     output_column='judge',
     )
 
-data_path ="data/subjective/"
+data_path ='data/subjective/compass_arena'
 
 subjective_datasets = []
 
@@ -91,7 +91,7 @@ reason_prompt = math_prompt
 creation_prompt = """
 请根据提供的 评分要求，用户问题 以及 相应的两个回答（回答1，回答2），判断两个回答中哪一个更好。
 评分要求（重要性依次递减）:
-1. 好的回答必须首先符合用户问题里的各种需求，不能跑题 
+1. 好的回答必须首先符合用户问题里的各种需求，不能跑题
 2. 好的回答必须具有逻辑连贯性，围绕一个中心进行回答
 3. 好的回答必须具有创造性的词语和表达丰富度
 
@@ -99,7 +99,7 @@ creation_prompt = """
 {question}
 """ + base_prompt
 
-sub_map = {"knowledge": knowledge_prompt, "language": language_prompt, "math_v2": math_prompt, "reason_v2": reason_prompt, "creationv2_zh": creation_prompt}
+sub_map = {'language': language_prompt, 'knowledge': knowledge_prompt, 'reason_v2': reason_prompt, 'math_v2': math_prompt, 'creationv2_zh': creation_prompt}
 
 for _name, _prompt in sub_map.items():
     subjective_infer_cfg = dict(
@@ -108,7 +108,7 @@ for _name, _prompt in sub_map.items():
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt="{question}"
+                        prompt='{question}'
                     ),
                 ]),
             ),
@@ -119,7 +119,6 @@ for _name, _prompt in sub_map.items():
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
-            infer_order='double',
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(round=[
@@ -130,12 +129,12 @@ for _name, _prompt in sub_map.items():
                 ]),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     subjective_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=CompassArenaDataset,
             path=data_path,
             name=_name,

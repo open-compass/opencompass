@@ -94,11 +94,11 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案是\s?(\S+)(?:。|$)',
         f'答案应该是\s?(\S+)(?:。|$)',
         f'答案为\s?(\S+)(?:。|$)',
-        f'[Tt]he answer is ([{options}])',
-        f'[Tt]he answer is option ([{options}])',
-        f'[Tt]he correct answer is ([{options}])',
-        f'[Tt]he correct answer is option ([{options}])',
-        f'[Tt]he answer to the question is ([{options}])',
+        f'[Tt]he answer is:?\s+\(?([{options}])\)?',
+        f'[Tt]he answer is option:?\s+\(?([{options}])\)?',
+        f'[Tt]he correct answer is:?\s+\(?([{options}])\)?',
+        f'[Tt]he correct answer is option:?\s+\(?([{options}])\)?',
+        f'[Tt]he answer to the question is:?\s+\(?([{options}])\)?',
         f'^选项\s?([{options}])',
         f'^([{options}])\s?选?项',
         f'(\s|^)[{options}][\s。，,：:\.$]',
@@ -116,7 +116,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     if cushion:
         patterns.extend(cushion_patterns)
     for pattern in patterns:
-        match = re.search(pattern, text)
+        match = re.search(pattern, text, re.DOTALL)
         if match:
             outputs = match.group(0)
             for i in options:
@@ -182,3 +182,9 @@ def general_eval_wrapper_postprocess(text: str,
         return postprocess(text, **kwargs)
     else:
         return text
+
+
+def match_answer_pattern(response_text: str, answer_pattern: str):
+    match = re.search(answer_pattern, response_text)
+    extracted_answer = match.group(1) if match else ''
+    return extracted_answer

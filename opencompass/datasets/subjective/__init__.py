@@ -1,4 +1,5 @@
 from .alignbench import AlignmentBenchDataset  # noqa: F401, F403
+from .arena_hard import ArenaHardDataset  # noqa: F401, F403
 from .compass_arena import CompassArenaDataset  # noqa: F401, F403
 from .corev2 import Corev2Dataset  # noqa: F401, F403
 from .creationbench import CreationBenchDataset  # noqa: F401, F403

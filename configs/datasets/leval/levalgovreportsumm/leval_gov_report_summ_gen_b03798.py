@@ -27,7 +27,7 @@ LEval_govreport_summ_infer_cfg = dict(
 )
 
 LEval_govreport_summ_eval_cfg = dict(
-    evaluator=dict(type=RougeEvaluator), 
+    evaluator=dict(type=RougeEvaluator),
     pred_role='BOT'
 )
 

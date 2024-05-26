@@ -115,7 +115,7 @@ humanevalx_datasets = [
 
 ### 收集推理结果（仅针对Humanevalx）
 
-OpenCompass 在 `tools` 中提供了 `collect_code_preds.py` 脚本对推理结果进行后处理并收集，我们只需要提供启动任务时的配置文件，以及指定复用对应任务的工作目录，其配置与 `run.py` 中的 `-r` 一致，细节可参考[文档](https://opencompass.readthedocs.io/zh_CN/latest/get_started.html#id7)。
+OpenCompass 在 `tools` 中提供了 `collect_code_preds.py` 脚本对推理结果进行后处理并收集，我们只需要提供启动任务时的配置文件，以及指定复用对应任务的工作目录，其配置与 `run.py` 中的 `-r` 一致，细节可参考[文档](https://opencompass.readthedocs.io/zh-cn/latest/get_started/quick_start.html#id4)。
 
 ```shell
 python tools/collect_code_preds.py [config] [-r latest]
