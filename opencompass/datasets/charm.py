@@ -1,12 +1,9 @@
 import json
 import os.path as osp
 import re
-import ast
-from typing import List
 
 from datasets import Dataset
 
-from opencompass.utils.prompt import PromptList
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
