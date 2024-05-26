@@ -27,7 +27,7 @@ api_meta_template = dict(
 models = [
     dict(abbr='LlaMA-3-8B-INSTRUCT',
          type=OpenAI,
-         path='gpt-4-0613',
+         path='llama3-8b-instruct',
          # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
          key='your_openai_api_key',     # No need for swift deployment API
          meta_template=api_meta_template,
