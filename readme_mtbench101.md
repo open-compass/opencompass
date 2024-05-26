@@ -28,11 +28,11 @@ A Fine-Grained Benchmark for Evaluating Large Language Models in Multi-Turn Dial
 
 ## About MT-Bench-101
 
-MT-Bench101 is specifically designed to evaluate the finegrained abilities of LLMs in **multi-turn** dialogues. By conducting a detailed analysis of real multi-turn dialogue data, we construct a three-tier hierarchical ability taxonomy comprising **4208** turns across 1388 multi-turn dialogues in **13** distinct tasks. 
+MT-Bench-101 is specifically designed to evaluate the finegrained abilities of LLMs in **multi-turn** dialogues. By conducting a detailed analysis of real multi-turn dialogue data, we construct a three-tier hierarchical ability taxonomy comprising **4208** turns across 1388 multi-turn dialogues in **13** distinct tasks. 
 
 ## Installation
 
-We integrated our MTBench101 benchmark into [OpenCompass](https://github.com/open-compass/opencompass), a comprehensive platform for large model evaluation. 
+We integrated our MT-Bench-101 benchmark into [OpenCompass](https://github.com/open-compass/opencompass), a comprehensive platform for large model evaluation. 
 
 #### Create virtual env
 
