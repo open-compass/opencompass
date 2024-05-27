@@ -27,6 +27,26 @@ with read_base():
 
     # from .models.hf_llama.hf_llama3_8b_instruct import models as llama3_8b_instruct_model
     # from .models.hf_llama.hf_llama3_70b_instruct import models as llama3_70b_instruct_model
+    from .summarizers.charm_rea import summarizer
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 work_dir = './outputs/CHARM/chat/'
+
+# dataset                                                        version    metric         mode    internlm2-chat-7b-turbomind
+# -------------------------------------------------------------  ---------  -------------  ------  -----------------------------
+# charm-rea-Direct                                               -          naive_average  gen     49.51
+# charm-rea-ZH-CoT                                               -          naive_average  gen     61.33
+# charm-rea-EN-CoT                                               -          naive_average  gen     54.55
+# charm-rea-XLT                                                  -          naive_average  gen     58.46
+# charm-rea-Translate-EN                                         -          naive_average  gen     56.15
+#                                                                -          -              -       -
+# charm-rea-Chinese_Direct                                       -          naive_average  gen     47.14
+# charm-rea-Chinese_ZH-CoT                                       -          naive_average  gen     58.40
+# charm-rea-Chinese_EN-CoT                                       -          naive_average  gen     48.31
+# charm-rea-Chinese_XLT                                          -          naive_average  gen     53.57
+# charm-rea-Chinese_Translate-EN                                 -          naive_average  gen     48.21
+# charm-rea-Global_Direct                                        -          naive_average  gen     51.88
+# charm-rea-Global_ZH-CoT                                        -          naive_average  gen     64.26
+# charm-rea-Global_EN-CoT                                        -          naive_average  gen     60.79
+# charm-rea-Global_XLT                                           -          naive_average  gen     63.36
+# charm-rea-Global_Translate-EN                                  -          naive_average  gen     64.10

@@ -32,41 +32,11 @@ Translate_EN_template = 'Follow the given examples and answer the question.\n{_h
 Other_template = '请按照给定的例子回答问题。\n{_hint}\n\nQ：{{input}}\nA：'
 
 settings = [
-    (
-        'Direct',
-        '',
-        dataset_path_ZH,
-        fewshot_example_path_ZH,
-        Other_template,
-    ),
-    (
-        'ZH-CoT',
-        '让我们一步一步来思考。',
-        dataset_path_ZH,
-        fewshot_example_path_ZH,
-        Other_template,
-    ),
-    (
-        'EN-CoT',
-        "Let's think step by step.",
-        dataset_path_ZH,
-        fewshot_example_path_ZH,
-        Other_template,
-    ),
-    (
-        'XLT',
-        """You should retell the request in English.\nYou should do the answer step by step to choose the right answer.\nYou should step-by-step answer the request.\nYou should tell me the answer in this format 'So the answer is'.""",
-        dataset_path_ZH,
-        fewshot_example_path_ZH,
-        XLT_template,
-    ),
-    (
-        'Translate-EN',
-        "Let's think step by step.",
-        dataset_path_TransEn,
-        fewshot_example_path_TransEn,
-        Translate_EN_template,
-    ),
+    ('Direct', '', dataset_path_ZH, fewshot_example_path_ZH, Other_template),
+    ('ZH-CoT', '让我们一步一步来思考。', dataset_path_ZH, fewshot_example_path_ZH, Other_template),
+    ('EN-CoT', "Let's think step by step.", dataset_path_ZH, fewshot_example_path_ZH, Other_template),
+    ('XLT', """You should retell the request in English.\nYou should do the answer step by step to choose the right answer.\nYou should step-by-step answer the request.\nYou should tell me the answer in this format 'So the answer is'.""", dataset_path_ZH, fewshot_example_path_ZH, XLT_template),
+    ('Translate-EN', "Let's think step by step.", dataset_path_TransEn, fewshot_example_path_TransEn, Translate_EN_template),
 ]
 
 charm_rea_datasets = []
