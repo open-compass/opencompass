@@ -1,0 +1,61 @@
+识别给定陈述是否包含时代错误。
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下陈述是否包含时代错误，一个接受了义务教育、具备基本常识的人会如何回答？
+在硫磺岛登陆作战期间，拉尔夫大声对着收音机说话。
+选项：
+(A) 是
+(B) 否
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：How would a person with compulsory education and basic common sense answer whether the following statement contains an anachronism?
+During the landing operations on Iwo Jima, Ralph spoke loudly into the radio.
+Options:
+(A) Yes
+(B) No
+Step-by-step answer:
+1.The statement mentions “the Allied bombardment of the beaches of Iwo Jima,” which refers to a historical event during World War II.
+2.The use of radios for communication among military personnel during that time is accurate and appropriate.
+So the answer is (B).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下陈述是否包含时代错误，一个接受了义务教育、具备基本常识的人会如何回答？
+在硫磺岛登陆作战期间，拉尔夫大声对着他的 iPhone 说话。
+选项：
+(A) 是
+(B) 否
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：How would a person with compulsory education and basic common sense answer whether the following statement contains an anachronism?
+During the landing operations on Iwo Jima, Ralph spoke loudly into the radio.
+Options:
+(A) Yes
+(B) No
+Step-by-step answer:
+1.The statement mentions “the Allied bombardment of the beaches of Iwo Jima,” which refers to a historical event during World War II.
+2.However, the mention of Ralph speaking loudly into his iPhone introduces an anachronism.The iPhone is a modern-day smartphone that was not available during the time of the Allied bombardment of Iwo Jima in 1945.
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下陈述是否包含时代错误，一个接受了义务教育、具备基本常识的人会如何回答？
+没有什么比萨莉·海明斯边看 HBO 的《真探》边织毛衣更令人满足。
+选项：
+(A) 是
+(B) 否
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：How would a person with compulsory education and basic common sense answer whether the following statement contains an anachronism?
+During the landing operations on Iwo Jima, Ralph spoke loudly into the radio.
+Options:
+(A) Yes
+(B) No
+Step-by-step answer:
+1.The statement mentions Sally Hemings, who was an enslaved woman in the United States during the late 18th and early 19th centuries.
+2.However, the mention of watching HBO’s True Detective, which is a modern television show, introduces an anachronism. During Sally Hemings’ time, television did not exist, and the specific mention of watching a specific show like True Detective is clearly out of place for that historical period.
+So the answer is (A).
