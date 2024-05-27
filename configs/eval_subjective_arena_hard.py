@@ -14,7 +14,7 @@ from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import ArenaHardSummarizer
 
 with read_base():
-    from .datasets.subjective.arena_hard.arena_hard_scoring import subjective_datasets
+    from .datasets.subjective.arena_hard.arena_hard_compare import subjective_datasets
 
 api_meta_template = dict(
     round=[
@@ -72,8 +72,8 @@ judge_models = [dict(
     key='',
         meta_template=api_meta_template,
         query_per_second=1,
-        max_out_len=1024,
-        max_seq_len=4096,
+        max_out_len=5120,
+        max_seq_len=9216,
         batch_size=10,
         retry=10,
         temperature = 0,
