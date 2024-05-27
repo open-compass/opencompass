@@ -1,6 +1,7 @@
 import re
 import os
 import subprocess
+import tempfile
 
 """
 Task: legal document grammar correction
@@ -30,21 +31,22 @@ def compute_wsjd(data_dict):
 
     now_path = os.path.abspath(os.getcwd())
     utils_path = os.path.abspath(os.path.join(__file__, '..', '..', 'utils'))
-    uid = os.getuid()
     os.chdir(utils_path)
-    with open(f'/tmp/tmp_pred_{uid}.para', 'w') as f:
-        f.writelines(preds)
-    with open(f'/tmp/tmp_gold_{uid}.para', 'w') as f:
-        f.writelines(golds)
-    os.environ['KMP_DUPLICATE_LIB_OK']='True'
-    os.system(f'python3 parallel_to_m2.py -f /tmp/tmp_pred_{uid}.para -o /tmp/tmp_pred_{uid}.para.m2 -g char')
-    os.system(f'python3 parallel_to_m2.py -f /tmp/tmp_gold_{uid}.para -o /tmp/tmp_gold_{uid}.para.m2 -g char')
-    output = subprocess.check_output(f"python3 compare_m2_for_evaluation.py -hyp /tmp/tmp_pred_{uid}.para.m2 -ref /tmp/tmp_gold_{uid}.para.m2", shell = True)
+    with tempfile.NamedTemporaryFile(delete=False, mode='w') as tmp_pred_file, \
+            tempfile.NamedTemporaryFile(delete=False, mode='w') as tmp_gold_file:
+        tmp_pred_file.writelines(preds)
+        tmp_gold_file.writelines(golds)
+
+    os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+    os.system(f'python3 parallel_to_m2.py -f {tmp_pred_file.name} -o {tmp_pred_file.name}.m2 -g char')
+    os.system(f'python3 parallel_to_m2.py -f {tmp_gold_file.name} -o {tmp_gold_file.name}.m2 -g char')
+    output = subprocess.check_output(
+        f"python3 compare_m2_for_evaluation.py -hyp {tmp_pred_file.name}.m2 -ref {tmp_gold_file.name}.m2", shell=True)
     score = float(output.decode().split('\t')[-1].split('\n')[0])
     #remove prediction files
-    os.remove(f'/tmp/tmp_pred_{uid}.para')
-    os.remove(f'/tmp/tmp_gold_{uid}.para')
-    os.remove(f'/tmp/tmp_pred_{uid}.para.m2')
-    os.remove(f'/tmp/tmp_gold_{uid}.para.m2')
+    os.remove(tmp_pred_file.name)
+    os.remove(tmp_gold_file.name)
+    os.remove(f"{tmp_pred_file.name}.m2")
+    os.remove(f"{tmp_gold_file.name}.m2")
     os.chdir(now_path)
     return {"score": score}
