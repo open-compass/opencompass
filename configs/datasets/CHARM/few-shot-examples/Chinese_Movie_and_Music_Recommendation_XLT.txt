@@ -1,0 +1,76 @@
+给根据给定艺术作品清单，找出最类似的。
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：和这些电影《疯狂的外星人》、《斗牛》、《杀生》、《疯狂的石头》有共同点的电影是：
+选项:
+(A)《泰囧》
+(B)《少年派》
+(C)《江湖儿女》
+(D)《湄公河行动》
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：The movie that has something in common with these movies Crazy Aliens, Bullitt, Killjoys and Crazy Stone is:
+Options.
+(A)Lost in Thailand
+(B)The Young and the Restless
+(C)The Children of the River and the Lake
+(D)The Mekong Operation
+Step-by-step answer:
+1."Crazy Alien" is a comedy science fiction film directed by Ning Hao, written by Liu Cixin and Sun Xiaohang, and starring Huang Bo, Shen Teng, and Xu Zheng. It was released in 2019.
+2."Cow" is a dark comedy film directed by Guan Hu, starring Huang Bo and Yan Ni. It was released in 2009.
+3."Design of Death" is an absurd and suspenseful comedy film directed by Guan Hu, featuring Huang Bo, Simon Yam, Su Youpeng, and Yu Nan. It was released in 2012.
+4."Crazy Stone" is a dark comedy film directed by Ning Hao, featuring Guo Tao, Liu Hua, Lian Jin, Liu Gang, Xu Zheng, and Huang Bo. It was released in 2006.
+5.These are all famous classic Chinese comedy films featuring Huang Bo. The only film among the options that seems to have something in common with these films is "Lost in Thailand" (directed by Xu Zheng, starring Huang Bo, Xu Zheng, and Wang Baoqiang), a comedy film released in 2012. 
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：和这些电影《红高梁》、《活着》、《大红灯笼高高挂》、《英雄》有共同点的电影是：
+选项:
+(A)《一个都不能少》
+(B)《让子弹飞》
+(C)《阿飞正传》
+(D)《东邪西毒》
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：The movie that has something in common with these movies 'Red High Beam', 'Alive', 'Big Red Lantern' and 'Hero' is:
+Option.
+(A) 'Not One Less'
+(B)Let the Bullets Fly
+(C)The Legend of Ah Fei
+(D)East is East, West is West
+Step-by-step answer:
+1."Red Sorghum," directed by Zhang Yimou and starring Jiang Wen, Gong Li, and Teng Rujun, is a war drama film that was released in China in 1987.
+2."To Live," directed by Zhang Yimou and starring Ge You and Gong Li, is a drama film that was released in China in 1994.
+3."Raise the Red Lantern," directed by Zhang Yimou and starring Gong Li, He Saifei, Ma Jingwu, Cao Cuifen, Kong Lin, and Jin Shuyuan, is a drama film that was released in China in 1991.
+4."Hero," directed by Zhang Yimou and starring Jet Li, Tony Leung, Maggie Cheung, Chen Daoming, Zhang Ziyi, and Donnie Yen, is a wuxia film that was released in China in 2002.
+5.These are all famous classic Chinese films directed by Zhang Yimou. The only film among the options that seems to have something in common with these films is "Not One Less" (directed by Zhang Yimou, starring Wei Minzhi and Zhang Huike), a drama film released in 1999.
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：和这些歌曲《夜曲》、《本草纲目》、《听妈妈的话》、《七里香》有共同点的歌曲是：
+选项:
+(A)《双节棍》
+(B)《年少有为》
+(C)《浮夸》
+(D)《三人游》
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：The songs that have something in common with these songs "Nocturne", "Materia Medica", "Listen to Your Mother" and "Seven Miles" are:
+Option.
+(A) 'Nunchaku'
+(B) 'The Young and the Restless'
+(C) 'Pomp and Circumstance'
+(D) "Three's a Crowd
+Step-by-step answer:
+1."Nocturne" is a song performed by Jay Chou, with lyrics by Vincent Fang, music by Jay Chou, and arrangement by Michael Lin. It is included in Jay Chou's 2005 album "November's Chopin."
+2."Herbalist's Manual" is a song performed by Jay Chou, with lyrics by Vincent Fang, music by Jay Chou, and arrangement by Michael Lin. It is included in Jay Chou's 2006 album "Still Fantasy."
+3."Listen to Your Mother" is a song performed by Jay Chou, with lyrics and music by Jay Chou, arrangement by Michael Lin and Hong Jingyao. It is included in Jay Chou's 2006 album "Still Fantasy."
+4."Common Jasmine Orange" is a song performed by Jay Chou, with lyrics by Vincent Fang, music by Jay Chou, and arrangement by Chung Hsin-min. It is included in Jay Chou's self-titled album "Common Jasmine Orange" released in 2004.
+5.These are all famous pop songs performed by Jay Chou. The only song among the options that seems to have something in common with these songs is "Nunchucks" (performed by Jay Chou, composed by Jay Chou, lyrics by Vincent Fang, arrangement by Chung Hsin-min, included in Jay Chou's 2001 album "Fantasy").
+So the answer is (A).
