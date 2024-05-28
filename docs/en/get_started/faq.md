@@ -117,5 +117,5 @@ Hence, if users find that the number of tasks greatly exceeds the available GPUs
 If you have already download the checkpoints of the model, you can specify the local path of the model. For example
 
 ```bash
-python run.py --datasets siqa_gen winograd_ppl --hf-path /path/to/model
+python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to/model
 ```

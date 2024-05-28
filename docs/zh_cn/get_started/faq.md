@@ -117,5 +117,5 @@ OpenCompass 中的每个任务代表等待评估的特定模型和数据集部�
 如果您已经提前下载好 Huggingface 的模型文件，请手动指定模型路径. 示例如下
 
 ```bash
-python run.py --datasets siqa_gen winograd_ppl --hf-path /path/to/model
+python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to/model
 ```
