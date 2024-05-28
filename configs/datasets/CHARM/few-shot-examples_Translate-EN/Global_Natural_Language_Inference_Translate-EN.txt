@@ -1,0 +1,28 @@
+Choose the correct answer based on the relationship between the two sentences in the question.
+
+Q:Statement 1: But the old man carefully picked the snake away from the grass, letting it crawl towards the grass, mumbling: sin, sin, this was your home!
+Statement 2: The old man was very sad in his heart.
+What is the relationship between these two statements?
+(A) Contained
+(B) contradictory
+(C) Irrelevant
+A: Let's think step by step.
+The first sentence describes an old man carefully handling a snake's row. The old man says, "Sin, sin, sin," indicating that he feels guilty and sad because he has violated the snake's territory. The second sentence can be inferred from the fact that the old man was very sad. Therefore, the two sentences are implicitly related. So the answer is (A).
+
+Q:Statement 1: She was a black explosive-headed woman with a plump face, full lips and big teeth.
+Statement 2: She likes to wear red lipstick and red clothes.
+What is the relationship between these two statements?
+(A) implied
+(B) contradictory
+(C) Unrelated
+A: Let's think step by step.
+Both sentences describe the same woman, but they focus on different features. The first sentence describes her physical features, including her face, lips, teeth, and hair. The second sentence describes her aesthetic preferences, including lipstick color and dress color. There is no obvious implication or contradiction between these two sentences, so we can say that they are unrelated. So the answer is (C).
+
+Q:Statement 1: You're not sure you've made it clear whose side you're on.
+Statement 2: It is obvious whose side you are on.
+What is the relationship between these two statements?
+(A) Contained
+(B) Contradictory
+(C) Unrelated
+A: Let's think step by step.
+The first sentence indicates that you are not sure who you support, while the second sentence makes it clear that your position is obvious, i.e. you know exactly who you support. Therefore, the two sentences contradict each other. So the answer is (B).

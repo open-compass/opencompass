@@ -8,6 +8,7 @@ settings = [
     ('qwen1.5-14b-pytorch', 'Qwen/Qwen1.5-14B', 1),
     ('qwen1.5-32b-pytorch', 'Qwen/Qwen1.5-32B', 2),
     ('qwen1.5-72b-pytorch', 'Qwen/Qwen1.5-72B', 4),
+    ('qwen1.5-110b-pytorch', 'Qwen/Qwen1.5-110B', 4),
     ('qwen1.5-moe-a2.7b-pytorch', 'Qwen/Qwen1.5-MoE-A2.7B', 1),
 ]
 

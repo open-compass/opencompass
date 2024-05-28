@@ -1,0 +1,40 @@
+给根据给定艺术作品清单，找出最类似的。
+
+Q: 和这些电影《疯狂的外星人》、《斗牛》、《杀生》、《疯狂的石头》有共同点的电影是：
+选项:
+(A)《泰囧》
+(B)《少年派》
+(C)《江湖儿女》
+(D)《湄公河行动》
+A：Let's think step by step.
+"Crazy Alien" is a comedy science fiction film directed by Ning Hao, written by Liu Cixin and Sun Xiaohang, and starring Huang Bo, Shen Teng, and Xu Zheng. It was released in 2019.
+"Cow" is a dark comedy film directed by Guan Hu, starring Huang Bo and Yan Ni. It was released in 2009.
+"Design of Death" is an absurd and suspenseful comedy film directed by Guan Hu, featuring Huang Bo, Simon Yam, Su Youpeng, and Yu Nan. It was released in 2012.
+"Crazy Stone" is a dark comedy film directed by Ning Hao, featuring Guo Tao, Liu Hua, Lian Jin, Liu Gang, Xu Zheng, and Huang Bo. It was released in 2006.
+These are all famous classic Chinese comedy films featuring Huang Bo. The only film among the options that seems to have something in common with these films is "Lost in Thailand" (directed by Xu Zheng, starring Huang Bo, Xu Zheng, and Wang Baoqiang), a comedy film released in 2012. So the answer is (A).
+
+Q: 和这些电影《红高梁》、《活着》、《大红灯笼高高挂》、《英雄》有共同点的电影是：
+选项:
+(A)《一个都不能少》
+(B)《让子弹飞》
+(C)《阿飞正传》
+(D)《东邪西毒》
+A:Let's think step by step.
+"Red Sorghum," directed by Zhang Yimou and starring Jiang Wen, Gong Li, and Teng Rujun, is a war drama film that was released in China in 1987.
+"To Live," directed by Zhang Yimou and starring Ge You and Gong Li, is a drama film that was released in China in 1994.
+"Raise the Red Lantern," directed by Zhang Yimou and starring Gong Li, He Saifei, Ma Jingwu, Cao Cuifen, Kong Lin, and Jin Shuyuan, is a drama film that was released in China in 1991.
+"Hero," directed by Zhang Yimou and starring Jet Li, Tony Leung, Maggie Cheung, Chen Daoming, Zhang Ziyi, and Donnie Yen, is a wuxia film that was released in China in 2002.
+These are all famous classic Chinese films directed by Zhang Yimou. The only film among the options that seems to have something in common with these films is "Not One Less" (directed by Zhang Yimou, starring Wei Minzhi and Zhang Huike), a drama film released in 1999. So the answer is (A).
+
+Q: 和这些歌曲《夜曲》、《本草纲目》、《听妈妈的话》、《七里香》有共同点的歌曲是：
+选项:
+(A)《双节棍》
+(B)《年少有为》
+(C)《浮夸》
+(D)《三人游》
+A：Let's think step by step.
+"Nocturne" is a song performed by Jay Chou, with lyrics by Vincent Fang, music by Jay Chou, and arrangement by Michael Lin. It is included in Jay Chou's 2005 album "November's Chopin."
+"Herbalist's Manual" is a song performed by Jay Chou, with lyrics by Vincent Fang, music by Jay Chou, and arrangement by Michael Lin. It is included in Jay Chou's 2006 album "Still Fantasy."
+"Listen to Your Mother" is a song performed by Jay Chou, with lyrics and music by Jay Chou, arrangement by Michael Lin and Hong Jingyao. It is included in Jay Chou's 2006 album "Still Fantasy."
+"Common Jasmine Orange" is a song performed by Jay Chou, with lyrics by Vincent Fang, music by Jay Chou, and arrangement by Chung Hsin-min. It is included in Jay Chou's self-titled album "Common Jasmine Orange" released in 2004.
+These are all famous pop songs performed by Jay Chou. The only song among the options that seems to have something in common with these songs is "Nunchucks" (performed by Jay Chou, composed by Jay Chou, lyrics by Vincent Fang, arrangement by Chung Hsin-min, included in Jay Chou's 2001 album "Fantasy"). So the answer is (A).
