@@ -1,11 +1,9 @@
 # flake8: noqa
 # yapf: disable
-import functools
-import getpass
-import math
+import json
 import os
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import tabulate
 from mmengine import ConfigDict
@@ -33,7 +31,9 @@ class MultiFacetedSummarizer(DefaultSummarizer):
             profile_dataset_abbrs = dataset_abbrs_item['dataset_abbrs']
 
             # format table
-            table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=profile_dataset_abbrs)
+            table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=profile_dataset_abbrs, skip_all_slash=True)
+            if len(table) == 1:
+                continue
 
             # output to screen
             print(tabulate.tabulate(table, headers='firstrow', floatfmt='.2f'))

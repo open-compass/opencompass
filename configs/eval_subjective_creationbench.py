@@ -4,7 +4,6 @@ with read_base():
     from .datasets.subjective.creationbench.creationbench_judgeby_gpt4_withref import subjective_datasets
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
-from opencompass.models.openai_api import OpenAIAllesAPIN
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner

@@ -3,7 +3,9 @@ from opencompass.models import TurboMindModel
 settings = [
     ('internlm2-1.8b-turbomind', 'internlm/internlm2-1_8b', 1),
     ('internlm2-7b-turbomind', 'internlm/internlm2-7b', 1),
+    ('internlm2-base-7b-turbomind', 'internlm/internlm2-base-7b', 1),
     ('internlm2-20b-turbomind', 'internlm/internlm2-20b', 2),
+    ('internlm2-base-20b-turbomind', 'internlm/internlm2-base-20b', 2),
 ]
 
 models = []
