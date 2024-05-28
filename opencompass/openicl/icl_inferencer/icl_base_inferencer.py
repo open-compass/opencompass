@@ -145,6 +145,8 @@ class PPLInferencerOutputHandler:
     def save_prompt_and_ppl(self, label, input, prompt, ppl, idx):
         if str(idx) not in self.results_dict.keys():
             self.results_dict[str(idx)] = {}
+        if 'origin_prompt' not in self.results_dict[str(idx)]:
+            self.results_dict[str(idx)]['origin_prompt'] = input
         if 'label: ' + str(label) not in self.results_dict[str(idx)].keys():
             self.results_dict[str(idx)]['label: ' + str(label)] = {}
         self.results_dict[str(idx)]['label: ' +

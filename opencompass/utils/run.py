@@ -258,7 +258,7 @@ def change_accelerator(models, accelerator):
                     path=model['path'],
                     model_kwargs=dict(tensor_parallel_size=model['run_cfg']['num_gpus']),
                     max_out_len=model['max_out_len'],
-                    batch_size=32768,
+                    batch_size=16,
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
@@ -272,7 +272,7 @@ def change_accelerator(models, accelerator):
                     gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
                     max_seq_len=model.get('max_seq_len', 2048),
                     max_out_len=model['max_out_len'],
-                    batch_size=32768,
+                    batch_size=16,
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )

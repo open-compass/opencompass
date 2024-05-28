@@ -1,5 +1,5 @@
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
-from opencompass.models.openai_api import OpenAIAllesAPIN
+from opencompass.models.openai_api import OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
@@ -44,7 +44,7 @@ models = [
 
 judge_model = dict(
         abbr='GPT4-Turbo',
-        type=OpenAIAllesAPIN, path='gpt-4-1106-preview',
+        type=OpenAI, path='gpt-4-1106-preview',
         key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
         url='',
         meta_template=api_meta_template,
@@ -70,7 +70,7 @@ runner=dict(type=LocalRunner, max_num_workers=12, task=dict(type=SubjectiveEvalT
 
 gpt4 = dict(
     abbr='gpt4-turbo',
-    type=OpenAIAllesAPIN,
+    type=OpenAI,
     path='gpt-4-1106-preview',
     key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
     meta_template=api_meta_template,
