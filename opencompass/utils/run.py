@@ -10,7 +10,7 @@ from opencompass.datasets.custom import make_custom_dataset_config
 from opencompass.models import (VLLM, HuggingFace, HuggingFaceBaseModel,
                                 HuggingFaceCausalLM, HuggingFaceChatGLM3,
                                 HuggingFacewithChatTemplate, TurboMindModel,
-                                TurboMindModelwithChatTemplate,
+                                LMDeploywithChatTemplate,
                                 VLLMwithChatTemplate)
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
@@ -263,7 +263,7 @@ def change_accelerator(models, accelerator):
                     stop_words=model.get('stop_words', []),
                 )
             elif accelerator == 'lmdeploy':
-                mod = TurboMindModelwithChatTemplate
+                mod = LMDeploywithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
                     abbr='-hf'.join(model['abbr'].split('-hf')[:-1]) + '-turbomind',

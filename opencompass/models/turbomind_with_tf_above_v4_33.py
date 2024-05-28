@@ -26,21 +26,18 @@ def valid_str(string, coding='utf-8'):
     return ret
 
 
-class TurboMindModelwithChatTemplate(BaseModel):
+class LMDeploywithChatTemplate(BaseModel):
     def __init__(
         self,
         path: str,
         tokenizer_only: bool = False,
         engine_config: Dict = {},
         gen_config: Dict = {},
-        concurrency: int = 8,
         max_seq_len: int = None,
         meta_template: Optional[Dict] = None,
         fastchat_template: Optional[str] = None,
         stop_words: List[str] = [],
     ):
-        from lmdeploy.messages import TurbomindEngineConfig
-        from lmdeploy.turbomind import TurboMind
         from lmdeploy.version import version_info
         from transformers import AutoTokenizer
 
@@ -50,17 +47,14 @@ class TurboMindModelwithChatTemplate(BaseModel):
         self.template_parser = _get_meta_template(meta_template)
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
 
-        self.origin_tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
         if not tokenizer_only:
             DEFAULT_ENGING_CONFIG = {'session_len': self.max_seq_len}
             _engine_config = DEFAULT_ENGING_CONFIG.copy()
             _engine_config.update(engine_config)
-            engine_config = TurbomindEngineConfig(**_engine_config)
-            tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
-            self.tokenizer = tm_model.tokenizer
-        self.generators = [tm_model.create_instance() for i in range(concurrency)]
-        self.generator_ids = [i + 1 for i in range(concurrency)]
-        self.concurrency = concurrency
+            self.pipe = self._build_pipe(path, _engine_config)
+        else:
+            self.pipe = None
         self.gen_config = gen_config
         self.version_info = version_info
         self.fastchat_template = fastchat_template
@@ -73,19 +67,19 @@ class TurboMindModelwithChatTemplate(BaseModel):
         try:
             generation_config = GenerationConfig.from_pretrained(path)
             for token_id in generation_config.eos_token_id:
-                potential_stop_words.append(self.origin_tokenizer.decode(token_id))
+                potential_stop_words.append(self.tokenizer.decode(token_id))
         except:
             pass
-        potential_stop_words.append(self.origin_tokenizer.eos_token)
+        potential_stop_words.append(self.tokenizer.eos_token)
         potential_stop_words = list(set(potential_stop_words))
         return potential_stop_words
 
     def generate(self,
                  inputs: List[str],
-                 max_out_len: int = 512,
+                 max_out_len: int,
                  stopping_criteria: List[str] = [],
                  do_sample: Optional[bool] = None,
-                 temperature: int = 1,
+                 temperature: float = 1.0,
                  **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -102,10 +96,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         if self.fastchat_template:
             messages = _format_with_fast_chat_template(messages, self.fastchat_template)
         else:
-            messages = [self.origin_tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
-
-        # split messages into batches
-        batch_messages = [messages[i:i + self.concurrency] for i in range(0, len(messages), self.concurrency)]
+            messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
 
         stop_words = list(set(self.stop_words + stopping_criteria))
         DEFAULT_GEN_CONFIG = {
@@ -117,7 +108,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         gen_config = copy.deepcopy(DEFAULT_GEN_CONFIG)
         gen_config.update(self.gen_config)
         if do_sample:
-            gen_config['top_k'] = 1000
+            gen_config['top_k'] = 40
             gen_config['temperature'] = temperature
         # if stopping_criteria:
         #     stop_words = gen_config.get('stop_words', [])
@@ -125,61 +116,17 @@ class TurboMindModelwithChatTemplate(BaseModel):
         #         t = self.tokenizer.encode(t, add_bos=False)
         #         stop_words.append(t[0])
         #     gen_config['stop_words'] = list(set(stop_words))
-        from lmdeploy.messages import EngineGenerationConfig, GenerationConfig
+        from lmdeploy.messages import GenerationConfig
         gen_config = GenerationConfig(**gen_config)
-        gen_config = EngineGenerationConfig.From(gen_config, self.tokenizer)
 
         results = []
-        for batch_message in batch_messages:
-            n = len(batch_message)
-            with ThreadPoolExecutor() as executor:
-                _results = list(
-                    executor.map(
-                        self._generate,
-                        self.generators[:n],
-                        self.generator_ids[:n],
-                        batch_message,
-                        [gen_config] * n,
-                    ))
-                results += _results
+        outputs = self.pipe(messages, do_preprocess=False)
+        for output in outputs:
+            results.append(output.text)
 
         for s in stop_words:
             results = [r.split(s)[0] for r in results]
         return results
-
-    def _generate(self,
-                  generator,
-                  session_id,
-                  prompt: PromptType,
-                  gen_config=None) -> str:
-        """Generate results given a list of inputs.
-
-        Args:
-            prompt (PromptType): A string or PromptDict.
-                The PromptDict should be organized in OpenCompass'
-                API format.
-            gen_config (EngineGenerationConfig, optional): Generation
-                config to set arguments like top_k, top_p, temperature.
-        Returns:
-            str: The generated string.
-        """
-        assert type(prompt) is str, 'We only support string for TurboMind Python API'
-
-        input_ids = self.tokenizer.encode(prompt)
-        for outputs in generator.stream_infer(session_id=session_id,
-                                              input_ids=[input_ids],
-                                              gen_config=gen_config,
-                                              sequence_start=True,
-                                              sequence_end=True,
-                                              step=0,
-                                              stream_output=False):
-            if self.version_info >= (0, 4, 0):
-                output_ids = outputs.token_ids
-            else:
-                _, output_ids, _ = outputs
-            response = self.tokenizer.decode(output_ids)
-            response = valid_str(response)
-        return response
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.
@@ -191,5 +138,25 @@ class TurboMindModelwithChatTemplate(BaseModel):
             int: Length of the input tokens
         """
         m = _convert_chat_messages([prompt])[0]
-        t = self.origin_tokenizer.apply_chat_template(m, add_generation_prompt=True, return_dict=True)
+        t = self.tokenizer.apply_chat_template(m, add_generation_prompt=True, return_dict=True)
         return len(t['input_ids'])
+
+    def _build_pipe(self, model_path, engine_config):
+        assert 'backend' in engine_config, \
+                f'miss "backend" key in config {engine_config}'
+        
+        backend = engine_config['backend']
+        assert backend in ['pytorch', 'turbomind'], \
+                f'unsupported backend type: {backend}'
+    
+        if backend == 'turbomind':
+            from lmdeploy import TurbomindEngineConfig
+            filtered = {k: v for k, v in engine_config.items() if hasattr(TurbomindEngineConfig, k)}
+            backend_config = TurbomindEngineConfig(**filtered)
+        else:
+            from lmdeploy import PytorchEngineConfig
+            filtered = {k: v for k, v in engine_config.items() if hasattr(PytorchEngineConfig, k)}
+            backend_config = PytorchEngineConfig(**filtered)
+   
+        from lmdeploy import pipeline
+        return pipeline(model_path, backend_config=backend_config)
