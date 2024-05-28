@@ -1,5 +1,10 @@
 # BBH
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets bbh_gen_98fba6 --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets bbh_gen_5b92b0 --debug
+```
+
 ## Base Models
 
 |          model           |   bbh |

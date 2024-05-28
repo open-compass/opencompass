@@ -1,5 +1,10 @@
 # GaokaoBench
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets GaokaoBench_no_subjective_gen_d21e37 --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets GaokaoBench_no_subjective_gen_4c31db --debug
+```
+
 ## Base Models
 
 |          model           |   GaokaoBench |

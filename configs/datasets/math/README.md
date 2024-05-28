@@ -1,5 +1,10 @@
 # MATH
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets math_4shot_base_gen_db136b --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets math_0shot_gen_393424 --debug
+```
+
 ## Base Models
 
 |          model           |   math |
