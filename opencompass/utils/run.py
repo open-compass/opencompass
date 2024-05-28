@@ -279,7 +279,8 @@ def change_accelerator(models, accelerator):
             else:
                 raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
         else:
-            raise ValueError(f'Unsupported model type {model["type"]}')
+            acc_model = model
+            logger.warning(f'Unsupported model type {model["type"]}, will keep the original model.')
         model_accels.append(acc_model)
     return model_accels
 
