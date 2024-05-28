@@ -25,15 +25,7 @@ Task Configuration (`$EXP`):
 - For HuggingFace related models, users can also define a model quickly in the command line through HuggingFace parameters and then specify datasets using `--datasets DATASET1 DATASET2 ...`.
 
   ```bash
-  python run.py --datasets siqa_gen winograd_ppl \
-  --hf-path huggyllama/llama-7b \  # HuggingFace model path
-  --model-kwargs device_map='auto' \  # Parameters for constructing the model
-  --tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # Parameters for constructing the tokenizer
-  --max-out-len 100 \  # Maximum sequence length the model can accept
-  --max-seq-len 2048 \  # Maximum generated token count
-  --batch-size 8 \  # Batch size
-  --no-batch-padding \  # Disable batch padding and infer through a for loop to avoid accuracy loss
-  --num-gpus 1  # Number of minimum required GPUs for this model
+  python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path huggyllama/llama-7b
   ```
 
   Complete HuggingFace parameter descriptions:
@@ -45,9 +37,8 @@ Task Configuration (`$EXP`):
   - `--tokenizer-kwargs`: Parameters for constructing the tokenizer
   - `--max-out-len`: Maximum generated token count
   - `--max-seq-len`: Maximum sequence length the model can accept
-  - `--no-batch-padding`: Disable batch padding and infer through a for loop to avoid accuracy loss
   - `--batch-size`: Batch size
-  - `--num-gpus`: Number of GPUs required to run the model. Please note that this parameter is only used to determine the number of GPUs required to run the model, and does not affect the actual number of GPUs used for the task. Refer to [Efficient Evaluation](./evaluation.md) for more details.
+  - `--hf-num-gpus`: Number of GPUs required to run the model. Please note that this parameter is only used to determine the number of GPUs required to run the model, and does not affect the actual number of GPUs used for the task. Refer to [Efficient Evaluation](./evaluation.md) for more details.
 
 Starting Methods:
 
