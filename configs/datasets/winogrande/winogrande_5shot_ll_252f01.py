@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import LLInferencer
-from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
 from opencompass.datasets import winograndeDataset_V3
 
 winogrande_reader_cfg = dict(
@@ -25,7 +25,7 @@ winogrande_infer_cfg = dict(
     retriever=dict(type=FixKRetriever, fix_id_list=[0, 2, 4, 6, 8]),
     inferencer=dict(type=LLInferencer),
 )
-winogrande_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
+winogrande_eval_cfg = dict(evaluator=dict(type=AccwithDetailsEvaluator))
 
 winogrande_datasets = [
     dict(

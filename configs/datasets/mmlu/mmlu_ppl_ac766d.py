@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
-from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
 from opencompass.datasets import MMLUDataset
 
 # None of the mmlu dataset in huggingface is correctly parsed, so we use our own dataset reader
@@ -90,7 +90,7 @@ for _name in mmlu_all_sets:
         inferencer=dict(type=PPLInferencer),
     )
 
-    mmlu_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
+    mmlu_eval_cfg = dict(evaluator=dict(type=AccwithDetailsEvaluator), )
 
     mmlu_datasets.append(
         dict(

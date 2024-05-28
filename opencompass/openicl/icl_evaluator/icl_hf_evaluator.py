@@ -342,3 +342,29 @@ class EDAccEvaluator(AccEvaluator):
             'predictions': preds,
             'references': golds,
         }
+
+
+@ICL_EVALUATORS.register_module()
+class AccwithDetailsEvaluator(BaseEvaluator):
+
+    def score(self, predictions, references, origin_prompt) -> dict:
+
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length.'}
+
+        details = {}
+        correct, total = 0, 0
+        for index, (pred, ref) in enumerate(zip(predictions, references)):
+            is_correct = pred == ref
+            correct += is_correct
+            details[str(index)] = {
+                'prompt': origin_prompt[index],
+                'pred': pred,
+                'refr': ref,
+                'is_correct': is_correct,
+            }
+            total += 1
+
+        results = {'accuracy': correct / total * 100, 'details': details}
+
+        return results

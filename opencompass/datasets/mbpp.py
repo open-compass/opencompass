@@ -227,9 +227,10 @@ class MBPPEvaluator(BaseEvaluator):
 
                 from tqdm import tqdm
                 for future in tqdm(as_completed(futures), total=len(futures)):
-                    index, key = future.result()
-                    result[key] += 1
-                    details[str(index)]['result'] = key
+                    index, ret = future.result()
+                    result[ret] += 1
+                    details[str(index)]['result'] = ret
+                    details[str(index)]['is_correct'] = (ret == 'pass')
 
             result['score'] = result['pass'] / len(predictions) * 100
             result['details'] = details
