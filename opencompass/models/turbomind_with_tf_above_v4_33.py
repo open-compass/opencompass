@@ -144,11 +144,11 @@ class LMDeploywithChatTemplate(BaseModel):
     def _build_pipe(self, model_path, engine_config):
         assert 'backend' in engine_config, \
                 f'miss "backend" key in config {engine_config}'
-        
+
         backend = engine_config['backend']
         assert backend in ['pytorch', 'turbomind'], \
                 f'unsupported backend type: {backend}'
-    
+
         if backend == 'turbomind':
             from lmdeploy import TurbomindEngineConfig
             filtered = {k: v for k, v in engine_config.items() if hasattr(TurbomindEngineConfig, k)}
@@ -157,6 +157,6 @@ class LMDeploywithChatTemplate(BaseModel):
             from lmdeploy import PytorchEngineConfig
             filtered = {k: v for k, v in engine_config.items() if hasattr(PytorchEngineConfig, k)}
             backend_config = PytorchEngineConfig(**filtered)
-   
+
         from lmdeploy import pipeline
         return pipeline(model_path, backend_config=backend_config)

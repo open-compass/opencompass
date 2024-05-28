@@ -3,7 +3,7 @@ from opencompass.models import LMDeploywithChatTemplate
 # inference backend of LMDeploy. It can be one of ['turbomind', 'pytorch']
 backend = 'turbomind'
 # the config of the inference backend
-# For the detailed config, please refer to 
+# For the detailed config, please refer to
 # https://github.com/InternLM/lmdeploy/blob/main/lmdeploy/messages.py
 engine_config = dict(
     backend=backend,
@@ -33,7 +33,7 @@ models = [
         max_seq_len=8000,
         max_out_len=1024,
         # the max number of prompts that LMDeploy receives
-        # in `generate` function 
+        # in `generate` function
         batch_size=5000,
         run_cfg=dict(num_gpus=1),
         stop_words=['</s>', '<|im_end|>'],
