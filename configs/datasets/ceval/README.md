@@ -1,5 +1,10 @@
 # C-Eval
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets ceval_internal_ppl_93e5ce --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets ceval_internal_gen_2daf24 --debug
+```
+
 ## Base Models
 
 |          model           |   ceval-test |   ceval-test-hard |   ceval-test-stem |   ceval-test-social-science |   ceval-test-humanities |   ceval-test-other |   ceval-dev |   ceval-dev-hard |   ceval-dev-stem |   ceval-dev-social-science |   ceval-dev-humanities |   ceval-dev-other |

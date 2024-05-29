@@ -1,5 +1,10 @@
 # TriviaQA
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets triviaqa_wiki_1shot_gen_20a989 --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets triviaqa_wiki_1shot_gen_eaf81e --debug
+```
+
 ## Base Models
 
 |          model           |   triviaqa |

@@ -1,5 +1,10 @@
 # HellaSwag
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets hellaswag_10shot_ppl_59c85e --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets hellaswag_10shot_gen_e42710 --debug
+```
+
 ## Base Models
 
 |          model           |   hellaswag |

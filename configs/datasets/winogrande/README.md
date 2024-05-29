@@ -1,5 +1,10 @@
 # WinoGrande
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets winogrande_5shot_ll_252f01 --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets winogrande_5shot_gen_b36770 --debug
+```
+
 ## Base Models
 
 |          model           |   winogrande |

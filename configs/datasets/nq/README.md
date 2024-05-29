@@ -1,5 +1,10 @@
 # NQ
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets nq_open_1shot_gen_20a989 --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets nq_open_1shot_gen_01cf41 --debug
+```
+
 ## Base Models
 
 |          model           |    nq |
