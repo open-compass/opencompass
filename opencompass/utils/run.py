@@ -151,7 +151,7 @@ def get_config_from_arg(args) -> Config:
                      batch_size=args.batch_size,
                      pad_token_id=args.pad_token_id,
                      stop_words=args.stop_words,
-                     run_cfg=dict(num_gpus=args.num_gpus))
+                     run_cfg=dict(num_gpus=args.hf_num_gpus))
         logger.debug(f'Using model: {model}')
         models.append(model)
     # set infer accelerator if needed
