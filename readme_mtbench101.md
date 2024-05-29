@@ -3,7 +3,8 @@
 </div>
 
 <p align="center">  
-A Fine-Grained Benchmark for Evaluating Large Language Models in Multi-Turn Dialogues Models
+<!-- A Fine-Grained Benchmark for Evaluating Large Language Models in Multi-Turn Dialogues Models -->
+[ACL 2024] MT-Bench-101: A Fine-Grained Benchmark for Evaluating Large Language Models in Multi-Turn Dialogues
 </p>
 
 <p align="center">  
@@ -24,6 +25,7 @@ A Fine-Grained Benchmark for Evaluating Large Language Models in Multi-Turn Dial
 ## 💥What's New
 
 - **[2024.02.22]** Our paper is now accessible at https://arxiv.org/abs/2402.14762.
+- **[2024.05.15]** MT-Bench-101 is accepted to the ACL 2024 main conference.
 - **[2024.05.28]** Code and dataset are now available. 
 
 ## About MT-Bench-101
