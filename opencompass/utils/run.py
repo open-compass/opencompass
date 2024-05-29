@@ -86,8 +86,14 @@ def get_config_from_arg(args) -> Config:
             config['models'] = change_accelerator(config['models'], args.accelerator)
             if config.get('eval', {}).get('partitioner', {}).get('models') is not None:
                 config['eval']['partitioner']['models'] = change_accelerator(config['eval']['partitioner']['models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('base_models') is not None:
+                config['eval']['partitioner']['base_models'] = change_accelerator(config['eval']['partitioner']['base_models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('compare_models') is not None:
+                config['eval']['partitioner']['compare_models'] = change_accelerator(config['eval']['partitioner']['compare_models'], args.accelerator)
             if config.get('eval', {}).get('partitioner', {}).get('judge_models') is not None:
                 config['eval']['partitioner']['judge_models'] = change_accelerator(config['eval']['partitioner']['judge_models'], args.accelerator)
+            if config.get('judge_models', {}) is not None:
+                config['judge_models'] = change_accelerator(config['judge_models'], args.accelerator)
         return config
 
     # parse dataset args
@@ -211,7 +217,7 @@ def change_accelerator(models, accelerator):
                 mod = TurboMindModel
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
-                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
+                    abbr=model['abbr'].replace('hf', 'turbomind') if '-hf' in model['abbr'] else model['abbr'] + '-turbomind',
                     path=model['path'],
                     engine_config=dict(session_len=model['max_seq_len'],
                                        max_batch_size=model['batch_size'],
@@ -254,7 +260,7 @@ def change_accelerator(models, accelerator):
                 mod = VLLMwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
-                    abbr='-hf'.join(model['abbr'].split('-hf')[:-1]) + '-vllm',
+                    abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
                     path=model['path'],
                     model_kwargs=dict(tensor_parallel_size=model['run_cfg']['num_gpus']),
                     max_out_len=model['max_out_len'],
@@ -266,7 +272,7 @@ def change_accelerator(models, accelerator):
                 mod = TurboMindModelwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
-                    abbr='-hf'.join(model['abbr'].split('-hf')[:-1]) + '-turbomind',
+                    abbr=model['abbr'].replace('hf', 'turbomind') if '-hf' in model['abbr'] else model['abbr'] + '-turbomind',
                     path=model['path'],
                     engine_config=dict(max_batch_size=model.get('batch_size', 16), tp=model['run_cfg']['num_gpus']),
                     gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
