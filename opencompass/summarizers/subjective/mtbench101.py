@@ -45,9 +45,7 @@ def post_process_mtbench101(judgement: str):
 
     else:
         return None
-    print('=========judgement=========')
-    print(judgement)
-    
+
     return {'score': score,'judgement':judgement}
 
 
@@ -79,7 +77,7 @@ def get_final_results(judged_answers, references,output_dir,fout_flag,model):
     fout = osp.join(
                         output_dir,
                         'task_score.csv')
-    
+
     columns = list(final_task_scores.keys())
     
     print('================task_score=====================')
@@ -113,7 +111,7 @@ class MTBench101Summarizer(CompassArenaSummarizer):
             model_abbr_from_cfg(model) for model in self.eval_model_cfgs
         ]
 
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_model'])
+        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
 
         self.judge_function =post_process_mtbench101
 

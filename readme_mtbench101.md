@@ -25,7 +25,7 @@
 ## 💥What's New
 
 - **[2024.02.22]** Our paper is now accessible at https://arxiv.org/abs/2402.14762.
-- **[2024.05.15]** MT-Bench-101 is accepted to the ACL 2024 main conference.
+- **[2024.05.15]** MT-Bench-101 has been accepted by ACL 2024 main conference.
 - **[2024.05.28]** Code and dataset are now available. 
 
 ## About MT-Bench-101

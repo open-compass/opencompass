@@ -4,9 +4,7 @@ with read_base():
     from .datasets.subjective.multiround.mtbench101_judge import subjective_datasets
 
 
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
-from opencompass.models.openai_api import OpenAIAllesAPIN
-# from opencompass.models.idealab_api import IdeaLabAllesAPIN
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
@@ -74,7 +72,6 @@ infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=10000),
     runner=dict(
         type=SlurmSequentialRunner,
-        # type=LocalRunner,
         partition='llm_dev2',
         quotatype='auto',
         max_num_workers=32,
@@ -85,28 +82,26 @@ infer = dict(
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_model = dict(
+judge_models = [dict(
     abbr='GPT4-Turbo',
-    type=OpenAIAllesAPIN,
-    # type=IdeaLabAllesAPIN,
+    type=OpenAI,
     path='', 
     key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
-    url='https://api.openai.com/v1',
     meta_template=api_meta_template,
     query_per_second=16,
     max_out_len=4096,
     max_seq_len=4096,
     batch_size=8,
-    temperature=0,
-)
+    temperature=0.8,
+)]
 
 ## ------------- Evaluation Configuration
 
 
 
 eval = dict(
-    partitioner=dict(type=SubjectiveSizePartitioner, max_task_size=10000, mode='singlescore', models=models),
-    runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask, judge_cfg=judge_model)),
+    partitioner=dict(type=SubjectiveSizePartitioner, max_task_size=100000, mode='singlescore', models=models, judge_models=judge_models),
+    runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask)),
 )
 
 summarizer = dict(type=MTBench101Summarizer, judge_type='single')

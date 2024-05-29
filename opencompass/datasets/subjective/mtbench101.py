@@ -272,8 +272,6 @@ class MTBench101Dataset(BaseDataset):
         # filename = osp.join(path, 'mtbench101.jsonl')
         dataset = DatasetDict()
         raw_data = []
-        print('load...........')
-
         
         lines = open(filename, 'r', encoding='utf-8').readlines()
         conversations = []
@@ -281,13 +279,7 @@ class MTBench101Dataset(BaseDataset):
             line = json.loads(line)
             conversations.append(line)
 
-
-        step = 0
-        print('=========dataset========================')
-        
         for  dialogue in conversations:
-            
-            
             multi_id = dialogue['id']
             task = dialogue['task']
             if task in skip_first_tasks:
