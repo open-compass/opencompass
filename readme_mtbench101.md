@@ -9,7 +9,7 @@
 
 <p align="center">  
 📃 <a href="https://arxiv.org/pdf/2402.14762" target="_blank">Paper</a> • 
-🤗 <a href="https://huggingface.co" target="_blank">Data (WIP)</a> • 
+<!-- 🤗 <a href="https://huggingface.co" target="_blank">Data (WIP)</a> •  -->
 🏆 <a href="" target="_blank">Leaderboard (WIP)</a>
 </p>
 
