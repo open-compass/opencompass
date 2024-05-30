@@ -235,10 +235,12 @@ class OpenAI(BaseAPIModel):
                 print(f'>>url: {self.url}')
                 print(f'>>header: {header}')
                 print(f'>>data: {data}')
+
                 # TODO: BY JASON ONLY FOR TEST!  To adapt swift deploy API
-                for k, v in data.items():
-                    if v is None:
-                        data.pop(k)
+
+                def remove_none_val(input_d: dict):
+                    return {k: v for k, v in input_d.items() if v is not None}
+                data = remove_none_val(data)
 
                 raw_response = requests.post(self.url,
                                              headers=header,
