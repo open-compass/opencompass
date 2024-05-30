@@ -52,5 +52,24 @@ infer = dict(
 
 
 summarizer = dict(
-    type=DefaultSummarizer
+    dataset_abbrs=[
+        ['ceval-test', 'naive_average'],
+
+        # ['mmlu', 'naive_average'],
+        # ['cmmlu', 'naive_average'],
+        # ['GaokaoBench', 'weighted_average'],
+        # ['triviaqa_wiki_1shot', 'score'],
+        # ['nq_open_1shot', 'score'],
+        # ['race-high', 'accuracy'],
+        # ['winogrande', 'accuracy'],
+        # ['hellaswag', 'accuracy'],
+        # ['bbh', 'naive_average'],
+        # ['gsm8k', 'accuracy'],
+        # ['math', 'accuracy'],
+        # ['TheoremQA', 'accuracy'],
+        # ['openai_humaneval', 'humaneval_pass@1'],
+        # ['sanitized_mbpp', 'score'],
+    ],
+    summary_groups=sum(
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )
