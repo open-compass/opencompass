@@ -232,6 +232,9 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
                 )
+                print(f'>>url: {self.url}')
+                print(f'>>header: {header}')
+                print(f'>>data: {data}')
                 raw_response = requests.post(self.url,
                                              headers=header,
                                              data=json.dumps(data))
