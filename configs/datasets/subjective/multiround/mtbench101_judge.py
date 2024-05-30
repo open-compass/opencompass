@@ -6,7 +6,6 @@ from opencompass.datasets import MTBench101Dataset
 
 
 subjective_reader_cfg = dict(
-    # input_columns=['dialogue', 'capability', 'system_prompt', 'prompt_template'],
     input_columns=["dialogue","task","multi_id","turn_id","system_prompt",'prompt_template'],
     output_column='judge',
     )

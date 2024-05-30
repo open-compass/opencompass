@@ -3,7 +3,6 @@ from mmengine.config import read_base
 with read_base():
     from .datasets.subjective.multiround.mtbench101_judge import subjective_datasets
 
-
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
@@ -14,10 +13,6 @@ from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import MTBench101Summarizer
 
-
-
-
-
 # ---------------------------------------------------------------------------------------------------------
 
 api_meta_template = dict(
@@ -27,16 +22,6 @@ api_meta_template = dict(
         dict(role='BOT', api_role='BOT', generate=True),
     ]
 )
-
-# api_meta_template = dict(
-#     round=[
-#         dict(role='system', api_role='SYSTEM'),
-#         dict(role='user', api_role='HUMAN'),
-#         dict(role='assistant', api_role='BOT', generate=True),
-#     ]
-# )
-
-
 
 # -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
@@ -85,7 +70,7 @@ infer = dict(
 judge_models = [dict(
     abbr='GPT4-Turbo',
     type=OpenAI,
-    path='', 
+    path='gpt-4-1106-preview', # To compare with the official leaderboard, please use gpt4-0613
     key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
     meta_template=api_meta_template,
     query_per_second=16,
