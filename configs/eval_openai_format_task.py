@@ -3,6 +3,7 @@ from mmengine.config import read_base
 from opencompass.models import OpenAI
 from opencompass.partitioners import NaivePartitioner
 from opencompass.runners import LocalRunner
+from opencompass.summarizers import DefaultSummarizer
 from opencompass.tasks import OpenICLInferTask
 
 
@@ -47,4 +48,9 @@ infer = dict(
         type=LocalRunner,
         max_num_workers=4,
         task=dict(type=OpenICLInferTask)),
+)
+
+
+summarizer = dict(
+    type=DefaultSummarizer
 )
