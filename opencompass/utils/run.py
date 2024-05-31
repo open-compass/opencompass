@@ -92,7 +92,7 @@ def get_config_from_arg(args) -> Config:
                 config['eval']['partitioner']['compare_models'] = change_accelerator(config['eval']['partitioner']['compare_models'], args.accelerator)
             if config.get('eval', {}).get('partitioner', {}).get('judge_models') is not None:
                 config['eval']['partitioner']['judge_models'] = change_accelerator(config['eval']['partitioner']['judge_models'], args.accelerator)
-            if config.get('judge_models', {}) is not None:
+            if config.get('judge_models') is not None:
                 config['judge_models'] = change_accelerator(config['judge_models'], args.accelerator)
         return config
 
