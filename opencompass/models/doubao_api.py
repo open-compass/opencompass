@@ -161,8 +161,7 @@ class Doubao(BaseAPIModel):
 
             if isinstance(response, str):
                 print(response)
-                time.sleep(1)
-                continue
+                return response
 
             max_num_retries += 1
 
