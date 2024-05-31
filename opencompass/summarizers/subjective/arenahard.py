@@ -17,7 +17,6 @@ import numpy as np
 #import plotly.express as px
 import pandas as pd
 import tiktoken
-import mmengine
 from mmengine import ConfigDict
 from sklearn.linear_model import LogisticRegression
 from tabulate import tabulate
