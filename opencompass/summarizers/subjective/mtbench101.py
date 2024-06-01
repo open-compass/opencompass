@@ -18,6 +18,7 @@ from opencompass.utils import model_abbr_from_cfg
 
 from .compass_arena import CompassArenaSummarizer
 from .utils import get_judgeanswer_and_reference, get_outdir
+
 # from .utils.writer import Writer
 
 
@@ -46,11 +47,11 @@ def post_process_mtbench101(judgement: str):
     else:
         return None
 
-    return {'score': score,'judgement':judgement}
+    return {'score': score, 'judgement': judgement}
 
 
-def get_final_results(judged_answers, references,output_dir,fout_flag,model):
-
+def get_final_results(judged_answers, references, output_dir, fout_flag,
+                      model):
 
     task_multi_id_scores = defaultdict(list)
     task_scores = defaultdict(list)
@@ -63,26 +64,22 @@ def get_final_results(judged_answers, references,output_dir,fout_flag,model):
 
         task_multi_id_scores[(task, multi_id)].append(score)
 
-
     for (task, multi_id), scores in task_multi_id_scores.items():
         min_score = min(scores)
         task_scores[task].append(min_score)
 
+    final_task_scores = {
+        task: sum(scores) / len(scores) if scores else 0
+        for task, scores in task_scores.items()
+    }
 
-    final_task_scores = {task: sum(scores) / len(scores) if scores else 0 for task, scores in task_scores.items()}
-
-
-
-
-    fout = osp.join(
-                        output_dir,
-                        'task_score.csv')
+    fout = osp.join(output_dir, 'task_score.csv')
 
     columns = list(final_task_scores.keys())
-    
+
     print('================task_score=====================')
     print(final_task_scores)
-    
+
     with open(fout, 'a+', newline='') as csvfile:
 
         writer = csv.writer(csvfile)
@@ -113,7 +110,7 @@ class MTBench101Summarizer(CompassArenaSummarizer):
 
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
 
-        self.judge_function =post_process_mtbench101
+        self.judge_function = post_process_mtbench101
 
     def summarize(self,
                   time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
@@ -138,8 +135,8 @@ class MTBench101Summarizer(CompassArenaSummarizer):
                     print()
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
-                    get_final_results(judged_answers, references,output_dir,fout_flag,model)
+                    get_final_results(judged_answers, references, output_dir,
+                                      fout_flag, model)
                     fout_flag += 1
             else:
                 print(subdir_path + ' is not exist! please check!')
-

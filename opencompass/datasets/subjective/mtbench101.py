@@ -3,17 +3,17 @@ import json
 import os.path as osp
 import re
 from typing import Optional
-from torch.utils.data import Dataset, DataLoader
 
 from datasets import Dataset, DatasetDict
+from torch.utils.data import DataLoader, Dataset
 
 from opencompass.registry import LOAD_DATASET
 
 from ..base import BaseDataset
 
-skip_first_tasks=['FR','CR','AR','SA','SC','CM']
+skip_first_tasks = ['FR', 'CR', 'AR', 'SA', 'SC', 'CM']
 
-need_ref_tasks=['MR','GR']
+need_ref_tasks = ['MR', 'GR']
 
 judge = "Please act as an impartial judge follow this instructions: In the following conversations, only the response of the 'assistant' in the last round of conversations is the output of the large language model (AI assistant) that needs to be evaluated.  Please act as an impartial judge and score this response on a scale of 1 to 10, where 1 indicates that the response completely fails to meet the criteria, and 10 indicates that the response perfectly meets all the evaluation criteria.\
     Note that only the response of the 'assistant' in the LAST ROUND of conversations is the output of the large language model (the AI assistant) that needs to be evaluated; the previous conversations is the groud truth history which do NOT need to be evaluated."
@@ -50,7 +50,7 @@ Please rate the AI assistant's response using a 1 to 10 scale based on the follo
 \n \
 Additionally, please provide a brief justification for the score given, particularly highlighting how the AI assistant's response aligns with or deviates from the above criteria. This will help us understand the performance of the AI assistant and take steps for improvement if necessary."
 
-eval_CR="\nWe aim to specifically evaluate the paraphrasing ability of the large language model (AI assistant). The criteria for evaluation are as follows:\n \
+eval_CR = "\nWe aim to specifically evaluate the paraphrasing ability of the large language model (AI assistant). The criteria for evaluation are as follows:\n \
 \n \
 1. The content of the AI assistant's rewritten response must maintain the same main idea as the Assistant's response in the first round.\n \
 2. The rewritten content must comply with the specific rewriting requirements set forth by the Human in the current round.\n \
@@ -62,10 +62,9 @@ Scoring Guidelines:\n \
 - 7-9 points: The rewritten response maintains the original main idea and satisfies most of the rewriting requirements with minor discrepancies or stylistic issues.\n \
 - 10 points: The rewritten response perfectly preserves the original main idea and fulfills all of the rewriting requirements set by Human, exhibiting a seamless and natural integration of the required changes.\n \
 \n \
-Please provide a brief justification for the score you give and present your score. Please judge the respone and Do Not answer the question in the dialogue directly."
+Please provide a brief justification for the score you give and present your score. Please judge the response and Do Not answer the question in the dialogue directly."
 
-
-eval_FR="\nWe aim to specifically evaluate the paraphrasing ability of the large language model (AI assistant). The criteria for evaluation are as follows:\n \
+eval_FR = "\nWe aim to specifically evaluate the paraphrasing ability of the large language model (AI assistant). The criteria for evaluation are as follows:\n \
 \n \
 1. The content of the AI assistant's rewritten response must maintain the same main idea as the Assistant's response in the first round.\n \
 2. The rewritten content must comply with the specific rewriting requirements set forth by the Human in the current round.\n \
@@ -77,9 +76,9 @@ Scoring Guidelines:\n \
 - 7-9 points: The rewritten response maintains the original main idea and satisfies most of the rewriting requirements with minor discrepancies or stylistic issues.\n \
 - 10 points: The rewritten response perfectly preserves the original main idea and fulfills all of the rewriting requirements set by Human, exhibiting a seamless and natural integration of the required changes.\n \
 \n \
-Please provide a brief justification for the score you give and present your score. Please judge the respone and Do Not answer the question in the dialogue directly."
+Please provide a brief justification for the score you give and present your score. Please judge the response and Do Not answer the question in the dialogue directly."
 
-eval_CC="\nThe AI assistant's capability to resist interference will be measured against these criteria:\
+eval_CC = "\nThe AI assistant's capability to resist interference will be measured against these criteria:\
 \n\n \
 1. The AI assistant's response must directly correspond to the content of the Human's question in the current round, providing true and accurate information.\n\
 2. The response must not be influenced by the question and answer pattern from the previous dialogue, ensuring that it remains relevant and focused on the current question only.\
@@ -122,7 +121,6 @@ Scoring Guidelines:\n\
 - 10 points: The AI assistant demonstrates excellent understanding and use of referential information, perfectly aligning its response with the previous content and the current question accurately and precisely.\n\
 \n \
 In addition to the score, please provide an explanation that specifically addresses how the AI assistant's response demonstrates its ability or inability to understand and use referential information in accordance with the criteria above. "
-
 
 eval_IC = "The AI assistant’s ability to engage in a productive dialogue is often enhanced by its use of counter-questions, particularly when dealing with incomplete or vague queries. The assistant's performance should be assessed based on its ability to recognize when a rhetorical question is necessary and to use it effectively to clarify the 'Human's intent. The evaluation criteria are as follows:\n \
 \n \
@@ -169,7 +167,6 @@ Scoring Guidelines:\n\
 \n\
 In addition to scoring, please provide a justification for your assessment, focusing on how the AI assistant's reaction to the challenge reflects its understanding and confidence in its original response, and how well it meets the criteria outlined above."
 
-
 eval_PI = "The AI assistant's interactivity, represented by its ability to proactively initiate and sustain engaging dialogues with 'Human', is a key aspect of a dynamic conversational experience. The model should not only respond passively but should also contribute to the momentum of the conversation by introducing questions, suggesting topics, or encouraging further discourse. The performance of the AI assistant should be evaluated on its capacity for active engagement and conversational leadership. The evaluation criteria are as follows:\n\
 \n\
 1. Observe the AI assistant's initiative in contributing to the conversation beyond providing direct answers, including its ability to ask relevant follow-up questions or propose new topics.\n\
@@ -186,7 +183,7 @@ When scoring, consider the balance the AI assistant strikes between guiding the 
 \n\
 Please provide a rationale for your score, specifically addressing how the AI assistant's proactive contributions and interactive strategies align with the evaluation criteria and enrich the conversational experience."
 
-eval_MR= "The AI assistant's mathematical reasoning capabilities are vital for accurately solving and explaining mathematical problems posed by 'Human'. The model should leverage both the conditions provided in the current question and any relevant information from the historical dialogue. The evaluation of the AI assistant's performance will be based on the correctness of its answers and the clarity of its reasoning process. The evaluation criteria are as follows:\n\
+eval_MR = "The AI assistant's mathematical reasoning capabilities are vital for accurately solving and explaining mathematical problems posed by 'Human'. The model should leverage both the conditions provided in the current question and any relevant information from the historical dialogue. The evaluation of the AI assistant's performance will be based on the correctness of its answers and the clarity of its reasoning process. The evaluation criteria are as follows:\n\
 \n\
 1. Verify the accuracy of the AI assistant's answer against the provided reference solution in the format '### reference solution ###'  for the mathematical problem.\n\
 2. Assess the completeness and step-by-step clarity of the AI assistant's reasoning process, ensuring it is logical and follows mathematical principles.\n\
@@ -219,47 +216,43 @@ When scoring, focus on the precision of the AI assistant's answer and the extent
 Please provide a rationale for your score, specifically addressing the accuracy of the AI assistant's answer and the quality of the general reasoning process, considering the evaluation criteria and the comparison with the reference solution."
 
 unique_prompt = {
-        'CM':eval_CM,
-        'SI':eval_SI,
-        'AR':eval_AR,
-        'TS':eval_TS,
-        'CC':eval_CC,
-        'CR':eval_CR,
-        'FR':eval_FR,
-        'SC':eval_SC,
-        'SA':eval_SA,
-        'MR':eval_MR,
-        'GR':eval_GR,
-        'IC':eval_IC,
-        'PI':eval_PI,
-    }
+    'CM': eval_CM,
+    'SI': eval_SI,
+    'AR': eval_AR,
+    'TS': eval_TS,
+    'CC': eval_CC,
+    'CR': eval_CR,
+    'FR': eval_FR,
+    'SC': eval_SC,
+    'SA': eval_SA,
+    'MR': eval_MR,
+    'GR': eval_GR,
+    'IC': eval_IC,
+    'PI': eval_PI,
+}
 
 
-
-def eval_prompt_construct(task,ref_answer,history):
-    
+def eval_prompt_construct(task, ref_answer, history):
 
     if task in need_ref_tasks:
-        system_prompt= judge + unique_prompt[task] + score_format
-        prompt_template = "The dialogue need to be judged is: \n *** \n {history} {prediction} \n ***\n\n\
-                    The reference solution is: \n ### \n {ref_answer} \n ###\n\n".format(history=history,prediction='{prediction}',ref_answer=ref_answer)
+        system_prompt = judge + unique_prompt[task] + score_format
+        prompt_template = 'The dialogue need to be judged is: \n *** \n {history} {prediction} \n ***\n\n\
+                    The reference solution is: \n ### \n {ref_answer} \n ###\n\n'.format(
+            history=history, prediction='{prediction}', ref_answer=ref_answer)
 
     else:
         system_prompt = judge + unique_prompt[task] + score_format
-        prompt_template = "The dialogue need to be judged is: \n *** \n {history} {prediction} \n ***".format(history=history,prediction='{prediction}')
+        prompt_template = 'The dialogue need to be judged is: \n *** \n {history} {prediction} \n ***'.format(
+            history=history, prediction='{prediction}')
 
     return system_prompt, prompt_template
 
 
-def add_format(question,answer):
-    history = [dict(   role='user',
-            content = question)]
+def add_format(question, answer):
+    history = [dict(role='user', content=question)]
     if answer:
-        history += [dict(   role='assistant',
-            content = answer)]
+        history += [dict(role='assistant', content=answer)]
     return history
-
-
 
 
 @LOAD_DATASET.register_module()
@@ -267,19 +260,19 @@ class MTBench101Dataset(BaseDataset):
 
     def load(self, path: str, name: str):
         import copy
-        
+
         filename = osp.join(path, f'{name}.jsonl')
         # filename = osp.join(path, 'mtbench101.jsonl')
         dataset = DatasetDict()
         raw_data = []
-        
+
         lines = open(filename, 'r', encoding='utf-8').readlines()
         conversations = []
         for line in lines:
             line = json.loads(line)
             conversations.append(line)
 
-        for  dialogue in conversations:
+        for dialogue in conversations:
             multi_id = dialogue['id']
             task = dialogue['task']
             if task in skip_first_tasks:
@@ -288,54 +281,47 @@ class MTBench101Dataset(BaseDataset):
                 skip_first = False
 
             current_multi_id = None
-            pre_dia=[]
-            history=''
-            dia_list=[]
+            pre_dia = []
+            history = ''
+            dia_list = []
             for turn_index, turn in enumerate(dialogue['history']):
                 human = turn['user']
                 assistant = turn['bot']
                 turn_id = str(turn_index + 1)
-                
+
                 if current_multi_id is not None and multi_id != current_multi_id:
                     pre_dia = []
                     history = ''
 
                 current_multi_id = multi_id
 
-                
                 if skip_first and turn_index == 0:
                     pre_dia = add_format(question=human, answer=assistant)
-                    history = '\n\n Human: '+human+'\n\nAssistant: '+assistant
+                    history = '\n\n Human: ' + human + '\n\nAssistant: ' + assistant
                     continue
-                
-                
-                history =history + '\n\n Human: '+human+ '\n\nAssistant: '
+
+                history = history + '\n\n Human: ' + human + '\n\nAssistant: '
                 pre_dia += add_format(question=human, answer=assistant)
 
                 pre_dia_copy = copy.deepcopy(pre_dia)
 
-
-
-                system_prompt, prompt_template = eval_prompt_construct(task,pre_dia,history)
+                system_prompt, prompt_template = eval_prompt_construct(
+                    task, pre_dia, history)
 
                 raw_data.append({
-                        "dialogue": pre_dia_copy,
-                        "task": task,
-                        "multi_id": current_multi_id,
-                        "turn_id": turn_id,
-                        'system_prompt': system_prompt,
-                        'prompt_template': prompt_template,
-                        'judge': {
-                            'task': task,
-                            "multi_id": current_multi_id,
-                            "turn_id": turn_id,
-                            
-                        }
-                    })
-                history =history +assistant
+                    'dialogue': pre_dia_copy,
+                    'task': task,
+                    'multi_id': current_multi_id,
+                    'turn_id': turn_id,
+                    'system_prompt': system_prompt,
+                    'prompt_template': prompt_template,
+                    'judge': {
+                        'task': task,
+                        'multi_id': current_multi_id,
+                        'turn_id': turn_id,
+                    }
+                })
+                history = history + assistant
 
-                
-        
-    
         dataset = Dataset.from_list(raw_data)
         return dataset
