@@ -232,9 +232,9 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
                 )
-                print(f'>>url: {self.url}')
-                print(f'>>header: {header}')
-                print(f'>>data: {data}')
+                self.logger.info(f'\n>>url: {self.url}')
+                self.logger.info(f'>>header: {header}')
+                self.logger.info(f'>>data: {data} \n')
 
                 # TODO: BY JASON ONLY FOR TEST!  To adapt swift deploy API
 
