@@ -5,13 +5,13 @@ from opencompass.openicl.icl_evaluator import TEvalEvaluator
 from opencompass.datasets import teval_postprocess, TEvalDataset
 
 teval_subject_mapping = {
-    'instruct': ['instruct_v2'],
-    'plan': ['plan_json_v2', 'plan_str_v2'],
-    'review': ['review_str_v2'],
-    'reason_retrieve_understand': ['reason_retrieve_understand_json_v2'],
-    'reason': ['reason_str_v2'],
-    'retrieve': ['retrieve_str_v2'],
-    'understand': ['understand_str_v2'],
+    'instruct': ['instruct_v2_subset'],
+    'plan': ['plan_json_v2_subset', 'plan_str_v2_subset'],
+    'review': ['review_str_v2_subset'],
+    'reason_retrieve_understand': ['reason_retrieve_understand_json_v2_subset'],
+    'reason': ['reason_str_v2_subset'],
+    'retrieve': ['retrieve_str_v2_subset'],
+    'understand': ['understand_str_v2_subset'],
 }
 
 teval_reader_cfg = dict(input_columns=['prompt'], output_column='ground_truth')
@@ -43,7 +43,7 @@ for _name in teval_all_sets:
             dict(
                 abbr='teval-' + subset,
                 type=TEvalDataset,
-                path='./data/teval_v2/EN',
+                path='./data/teval_v2_subset/EN',
                 name=subset,
                 reader_cfg=teval_reader_cfg,
                 infer_cfg=teval_infer_cfg,
