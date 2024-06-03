@@ -234,7 +234,7 @@ class OpenAI(BaseAPIModel):
                 )
                 self.logger.info(f'\n>>url: {self.url}')
                 self.logger.info(f'>>header: {header}')
-                self.logger.info(f'>>data: {data} \n')
+                self.logger.info(f'>>data: {json.dumps(data)} \n')
 
                 # TODO: BY JASON ONLY FOR TEST!  To adapt swift deploy API
 
