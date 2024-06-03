@@ -5,13 +5,13 @@ from opencompass.openicl.icl_evaluator import TEvalEvaluator
 from opencompass.datasets import teval_postprocess, TEvalDataset
 
 teval_subject_mapping = {
-    'instruct_zh': ['instruct_v1_zh'],
-    'plan_zh': ['plan_json_v1_zh', 'plan_str_v1_zh'],
-    'review_zh': ['review_str_v1_zh'],
-    'reason_retrieve_understand_zh': ['reason_retrieve_understand_json_v1_zh'],
-    'reason_zh': ['reason_str_v1_zh'],
-    'retrieve_zh': ['retrieve_str_v1_zh'],
-    'understand_zh': ['understand_str_v1_zh'],
+    'instruct_zh': ['instruct_v2_zh'],
+    'plan_zh': ['plan_json_v2_zh', 'plan_str_v2_zh'],
+    'review_zh': ['review_str_v2_zh'],
+    'reason_retrieve_understand_zh': ['reason_retrieve_understand_json_v2_zh'],
+    'reason_zh': ['reason_str_v2_zh'],
+    'retrieve_zh': ['retrieve_str_v2_zh'],
+    'understand_zh': ['understand_str_v2_zh'],
 }
 
 teval_reader_cfg = dict(input_columns=['prompt'], output_column='ground_truth')
@@ -43,7 +43,7 @@ for _name in teval_all_sets:
             dict(
                 abbr='teval-' + subset,
                 type=TEvalDataset,
-                path='./data/teval/ZH',
+                path='./data/teval_v2/ZH',
                 name=subset,
                 reader_cfg=teval_reader_cfg,
                 infer_cfg=teval_infer_cfg,

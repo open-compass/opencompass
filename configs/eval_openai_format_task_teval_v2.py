@@ -10,10 +10,10 @@ SWIFT_DEPLOY_API = 'http://127.0.0.1:8000/v1/chat/completions'
 
 # TODO: BY JASON ONLY FOR TEST!
 with read_base():
-    from .datasets.teval.teval_en_gen_1ac254 import teval_datasets as teval_en_datasets
-    from .datasets.teval.teval_zh_gen_1ac254 import teval_datasets as teval_zh_datasets
+    from .datasets.teval_v2.teval_v2_en_gen_1ac254 import teval_datasets as teval_en_datasets
+    from .datasets.teval_v2.teval_v2_zh_gen_1ac254 import teval_datasets as teval_zh_datasets
 
-    from .summarizers.teval import summarizer
+    from .summarizers.teval_v2 import summarizer
 
 datasets = [*teval_en_datasets, *teval_zh_datasets]
 
