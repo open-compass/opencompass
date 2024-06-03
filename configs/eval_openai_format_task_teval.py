@@ -20,8 +20,11 @@ datasets = [*teval_en_datasets, *teval_zh_datasets]
 
 api_meta_template = dict(
     round=[
-            dict(role='HUMAN', api_role='HUMAN'),
-            dict(role='BOT', api_role='BOT', generate=True),
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True)
+    ],
+    reserved_roles=[
+        dict(role='SYSTEM', api_role='SYSTEM'),
     ],
 )
 
