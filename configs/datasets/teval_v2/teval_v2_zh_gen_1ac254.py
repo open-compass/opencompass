@@ -6,7 +6,7 @@ from opencompass.datasets import teval_postprocess, TEvalDataset
 
 teval_subject_mapping = {
     'instruct_zh': ['instruct_v2_subset_zh'],
-    'plan_zh': ['plan_json_v2_zh', 'plan_str_v2_subset_zh'],
+    'plan_zh': ['plan_json_v2_subset_zh', 'plan_str_v2_subset_zh'],
     'review_zh': ['review_str_v2_subset_zh'],
     'reason_retrieve_understand_zh': ['reason_retrieve_understand_json_v2_subset_zh'],
     'reason_zh': ['reason_str_v2_subset_zh'],
