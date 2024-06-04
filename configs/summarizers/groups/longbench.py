@@ -18,5 +18,5 @@ longbench_summary_groups = [
         'LongBench_passage_count', 'LongBench_passage_retrieval_en',
         'LongBench_lcc', 'LongBench_repobench-p'
     ]},
-    {'name': 'longbench', 'subsets': ['longbench_single-document-qa', 'longbench_multi-document-qa', 'longbench_summarization', 'longbench_few-shot-learning', 'longbench_synthetic-tasks', 'longbench_code-completion', 'longbench_code-completion']},
+    {'name': 'longbench', 'subsets': ['longbench_single-document-qa', 'longbench_multi-document-qa', 'longbench_summarization', 'longbench_few-shot-learning', 'longbench_synthetic-tasks', 'longbench_code-completion']},
 ]
