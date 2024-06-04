@@ -12,7 +12,7 @@ from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.models import HuggingFacewithChatTemplate
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import AlignmentBenchSummarizer
+from opencompass.summarizers import FofoSummarizer
 
 api_meta_template = dict(
     round=[
@@ -55,26 +55,15 @@ judge_models = [dict(
     batch_size=8,
     temperature=0,
 )]
-judge_models = [
-    dict(
-        type=HuggingFacewithChatTemplate,
-        abbr='internlm2-chat-20b-hf',
-        path='internlm/internlm2-chat-20b',
-        max_out_len=1024,
-        batch_size=8,
-        run_cfg=dict(num_gpus=2),
-        stop_words=['</s>', '<|im_end|>'],
-    )
-]
 
 ## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(
-        type=SubjectiveSizePartitioner, max_task_size=1000, mode='singlescore', models=models, judge_models=judge_models,
+        type=SubjectiveSizePartitioner, max_task_size=10000, mode='singlescore', models=models, judge_models=judge_models,
     ),
     runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
 )
 
-summarizer = dict(type=AlignmentBenchSummarizer, judge_type='general')
+summarizer = dict(type=FofoSummarizer, judge_type='general')
 
 work_dir = 'outputs/fofo/'

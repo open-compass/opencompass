@@ -87,7 +87,7 @@ class CompassBenchDataset(BaseDataset):
                 lan = problem['language']
                 others = problem['others']
                 judge_prompt = base_prompt_zh if lan == 'zh' else base_prompt_en
-                judge_prompt = judge_prompt.replace("{question}", question)
+                judge_prompt = judge_prompt.replace('{question}', question)
                 raw_data.append({
                     'question': question,
                     'judge_prompt': judge_prompt,

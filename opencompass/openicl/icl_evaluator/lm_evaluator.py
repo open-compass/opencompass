@@ -215,6 +215,7 @@ class LMEvaluator:
             for k, v in pred_dict.items():
                 dataset.reader.dataset['test'] = dataset.test.add_column(k, v)
                 dataset.reader.input_columns.append(k)
+
             if references:
                 dataset.reader.input_columns.append('reference')
                 dataset.reader.dataset['test'] = dataset.test.add_column(
