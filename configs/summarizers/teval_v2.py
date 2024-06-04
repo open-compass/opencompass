@@ -6,7 +6,7 @@ with read_base():
 summarizer = dict(
     dataset_abbrs=[
         ['teval', 'naive_average'],
-        ['teval-instruct_v2', 'string_metric'],  # 指令跟随能力-string格式
+        ['teval-instruct_v2_subset', 'string_metric'],  # 指令跟随能力-string格式
         ['teval-instruct_v2', 'json_metric'],  # 指令跟随能力-json格式
         ['teval-plan_str_v2', 'f1_score'],  # 规划能力-string格式
         ['teval-plan_json_v2', 'f1_score'],  # 规划能力-json格式
