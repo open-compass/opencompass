@@ -2,35 +2,35 @@ from copy import deepcopy
 
 _base_summary_groups = [
     {
-        'name': 'teval-instruct_v2',
+        'name': 'teval-instruct_v2_subset',
         'metric': 'format_metric',
         'subsets': [
-            ['teval-instruct_v2', 'string_format_metric'],
-            ['teval-instruct_v2', 'json_format_metric'],
+            ['teval-instruct_v2_subset', 'string_format_metric'],
+            ['teval-instruct_v2_subset', 'json_format_metric'],
         ]
     },
     {
-        'name': 'teval-instruct_v2',
+        'name': 'teval-instruct_v2_subset',
         'metric': 'args_em_metric',
         'subsets': [
-            ['teval-instruct_v2', 'string_args_em_metric'],
+            ['teval-instruct_v2_subset', 'string_args_em_metric'],
             ['teval-instruct_v2', 'json_args_em_metric'],
         ]
     },
     {
-        'name': 'teval-instruct_v2',
+        'name': 'teval-instruct_v2_subset',
         'metric': 'string_metric',
         'subsets': [
-            ['teval-instruct_v2', 'string_format_metric'],
-            ['teval-instruct_v2', 'string_args_em_metric'],
+            ['teval-instruct_v2_subset', 'string_format_metric'],
+            ['teval-instruct_v2_subset', 'string_args_em_metric'],
         ]
     },
     {
-        'name': 'teval-instruct_v2',
+        'name': 'teval-instruct_v2_subset',
         'metric': 'json_metric',
         'subsets': [
-            ['teval-instruct_v2', 'json_format_metric'],
-            ['teval-instruct_v2', 'json_args_em_metric'],
+            ['teval-instruct_v2_subset', 'json_format_metric'],
+            ['teval-instruct_v2_subset', 'json_args_em_metric'],
         ]
     },
     {
@@ -42,8 +42,8 @@ _base_summary_groups = [
     {
         'name': 'teval',
         'subsets': [
-            ['teval-instruct_v2', 'format_metric'],
-            ['teval-instruct_v2', 'args_em_metric'],
+            ['teval-instruct_v2_subset', 'format_metric'],
+            ['teval-instruct_v2_subset', 'args_em_metric'],
             ['teval-plan_str_v2', 'f1_score'],
             ['teval-plan_json_v2', 'f1_score'],
             ['teval-reason_str_v2', 'thought'],
