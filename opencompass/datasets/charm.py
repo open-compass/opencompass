@@ -8,6 +8,7 @@ from datasets import Dataset
 from opencompass.openicl.icl_evaluator import BaseEvaluator, LMEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
+from opencompass.utils import build_dataset_from_cfg
 
 from .base import BaseDataset
 
@@ -115,13 +116,27 @@ class CharmMemoryEvaluator(LMEvaluator):
             for pred, ref in zip(predictions, references)
         ]
 
+        dataset = None
+        if self.dataset_cfg:
+            dataset = build_dataset_from_cfg(self.dataset_cfg)
+
         output = dict()
         for i in range(len(predictions)):
+            if dataset is not None:
+                question = ''
+                for col in dataset.reader.input_columns:
+                    question += dataset.reader['test'][col][i] + '\n'
             output[str(i)] = {
-                'origin_prompt': [],
-                'origin_prediction': predictions[i],
-                'prediction': eval_results[i],
-                'gold': references[i],
+                'origin_prompt': [{
+                    'role':
+                    'HUMAN',
+                    'prompt':
+                    f"[Question]: {question}[Assistant's Answer]: {predictions[i]}"  # noqa
+                }],
+                'prediction':
+                eval_results[i],
+                'gold':
+                references[i],
             }
 
         return output

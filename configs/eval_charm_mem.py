@@ -4,7 +4,7 @@ from opencompass.models import OpenAI
 from opencompass.runners import LocalRunner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import AllObjSummarizer
+from opencompass.summarizers import CharmMemSummarizer
 
 with read_base():
     from .datasets.CHARM.charm_memory_gen_bbbd53 import charm_memory_datasets as datasets
@@ -89,6 +89,6 @@ eval = dict(
                 task=dict(type=SubjectiveEvalTask)),
 )
 
-summarizer = dict(type=AllObjSummarizer)
+summarizer = dict(type=CharmMemSummarizer)
 
 work_dir = './outputs/CHARM/chat/'
