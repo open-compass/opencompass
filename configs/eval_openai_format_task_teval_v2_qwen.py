@@ -6,11 +6,9 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 
 
-# chat model
-# SWIFT_DEPLOY_URL = 'http://127.0.0.1:8000/v1/chat/completions'
+# For swift model serving
+SWIFT_DEPLOY_URL = 'http://127.0.0.1:8000/v1/chat/completions'
 
-# base model
-SWIFT_DEPLOY_URL = 'http://127.0.0.1:8000/v1/completions'
 
 # TODO: BY JASON ONLY FOR TEST!
 with read_base():
@@ -34,9 +32,9 @@ api_meta_template = dict(
 
 
 models = [
-    dict(abbr='Qwen-7B-Base',
+    dict(abbr='Qwen-7B-Chat',
          type=OpenAI,
-         path='qwen-7b',
+         path='qwen-7b-chat',
          # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
          key='your_openai_api_key',  # No need for swift deployment API
          meta_template=api_meta_template,

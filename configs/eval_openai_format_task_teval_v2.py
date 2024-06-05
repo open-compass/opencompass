@@ -6,11 +6,9 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 
 
-# chat model
+# For swift model serving
 SWIFT_DEPLOY_URL = 'http://127.0.0.1:8000/v1/chat/completions'
 
-# base model
-# SWIFT_DEPLOY_URL = 'http://127.0.0.1:8000/v1/completions'
 
 # TODO: BY JASON ONLY FOR TEST!
 with read_base():
