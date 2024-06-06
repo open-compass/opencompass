@@ -5,7 +5,8 @@ with read_base():
     from .datasets.teval_v2.teval_v2_en_gen_1ac254 import teval_datasets as teval_en_datasets
     from .datasets.teval_v2.teval_v2_zh_gen_1ac254 import teval_datasets as teval_zh_datasets
 
-    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat_model
+    from .models.qwen.ms_qwen_7b_chat import models as ms_qwen_7b_chat_model        # based on ModelScope Qwen-7B-Chat
+
     # from .models.hf_internlm.hf_internlm2_chat_7b import models as hf_internlm2_chat_7b_model
     # from .models.hf_llama.hf_llama2_7b_chat import models as hf_llama2_7b_chat_model
 
