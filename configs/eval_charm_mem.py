@@ -91,4 +91,4 @@ eval = dict(
 
 summarizer = dict(type=CharmMemSummarizer)
 
-work_dir = './outputs/CHARM/chat/'
+work_dir = './outputs/CHARM_mem/chat/'

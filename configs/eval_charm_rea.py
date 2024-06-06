@@ -50,7 +50,7 @@ with read_base():
     from .summarizers.charm_reason import summarizer
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
-work_dir = './outputs/CHARM/chat/'
+work_dir = './outputs/CHARM_rea/chat/'
 
 # dataset                                                        version    metric         mode    internlm2-chat-7b-turbomind
 # -------------------------------------------------------------  ---------  -------------  ------  -----------------------------
