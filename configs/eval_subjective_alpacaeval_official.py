@@ -74,3 +74,5 @@ eval = dict(
     )
 )
 work_dir = 'outputs/alpaca/'
+
+# To run this config, please ensure to successfully installed `alpaca-eval==0.6` and `scikit-learn==1.5`
