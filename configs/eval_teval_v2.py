@@ -10,7 +10,7 @@ with read_base():
     # from .models.hf_internlm.hf_internlm2_chat_7b import models as hf_internlm2_chat_7b_model
     # from .models.hf_llama.hf_llama2_7b_chat import models as hf_llama2_7b_chat_model
 
-    from .summarizers.teval import summarizer
+    from .summarizers.teval_v2 import summarizer
 
 meta_template_system_patches = {
     'internlm2-chat-7b-hf': dict(role='SYSTEM', begin='<|im_start|>system\n', end='<|im_end|>\n'),
