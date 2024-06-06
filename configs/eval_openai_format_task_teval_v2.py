@@ -32,7 +32,7 @@ api_meta_template = dict(
 
 
 models = [
-    dict(abbr='LlaMA-3-8B-INSTRUCT',
+    dict(abbr='LlaMA-3-8b-Instruct-Agent-V7',
          type=OpenAI,
          path='llama3-8b-instruct',
          # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
