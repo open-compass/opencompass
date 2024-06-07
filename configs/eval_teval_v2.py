@@ -35,6 +35,12 @@ for m in _origin_models:
         raise ValueError(f'no meta_template.round in {m.get("abbr", None)}')
 
     print(f'model {m["abbr"]} is using the following meta_template: {m["meta_template"]}')
+
+    if 'generation_kwargs' in m:
+        print(f'model {m["abbr"]} is using the following generation_kwargs: {m["generation_kwargs"]}')
+    else:
+        print(f'generation_kwargs not found for model: {m["abbr"]} !')
+
     models.append(m)
 
 datasets = teval_en_datasets + teval_zh_datasets

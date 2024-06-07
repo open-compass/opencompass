@@ -17,7 +17,8 @@ with read_base():
 
     from .summarizers.teval_v2 import summarizer
 
-datasets = [*teval_en_datasets, *teval_zh_datasets]
+# datasets = [*teval_en_datasets, *teval_zh_datasets]
+datasets = [*teval_en_datasets]     # TODO： BY JASON ONLY FOR TEST!
 
 
 api_meta_template = dict(
@@ -40,7 +41,7 @@ models = [
          meta_template=api_meta_template,
          query_per_second=1,
          max_out_len=2048,
-         max_seq_len=2048,
+         max_seq_len=4096,
          batch_size=1,
          run_cfg=dict(num_gpus=0),
          openai_api_base=SWIFT_DEPLOY_URL,
