@@ -161,6 +161,9 @@ class DLCRunner(BaseRunner):
             shell_cmd += 'umask 0000; '
             shell_cmd += '{task_cmd}'
 
+            # set priority to 1 as default
+            task_priority = self.aliyun_cfg.get('priority', 1)
+
             tmpl = (
                 'dlc submit pytorchjob'
                 f" --command '{shell_cmd}'"
@@ -168,6 +171,7 @@ class DLCRunner(BaseRunner):
                 f" --config {self.aliyun_cfg['dlc_config_path']}"
                 f" --workspace_id {self.aliyun_cfg['workspace_id']}"
                 f" --resource_id {self.aliyun_cfg['resource_id']}"
+                f' --priority {task_priority}'
                 ' --workers 1'
                 f' --worker_cpu {max(num_gpus * 8, 12)}'
                 f' --worker_gpu {num_gpus}'

@@ -22,6 +22,7 @@ OpenCC
 opencv-python-headless
 pandas<2.0.0
 prettytable
+protobuf
 pyext
 pypinyin
 python-Levenshtein

@@ -37,9 +37,9 @@ OpenCompass 使用称为 task (任务) 的单位处理评估请求。每个任�
 
 供给侧就是运行多少任务。任务是模型和数据集的组合，它首先取决于要测多少模型和多少数据集。另外由于 OpenCompass 会将一个较大的任务拆分成多个小任务，因此每个子任务有多少条数据 `--max-partition-size` 也会影响任务的数量。(`--max-partition-size` 与真实数据条目成正比，但并不是 1:1 的关系)。
 
-需求侧就是有多少 worker 在运行。由于 OpenCompass 会同时实例化多个模型去进行推理，因此我们用 `--num-gpus` 来指定每个实例使用多少 GPU。注意 `--num-gpus` 是一个 HuggingFace 模型专用的参数，非 HuggingFace 模型设置该参数是不会起作用的。同时我们使用 `--max-num-workers` 去表示最多有多少个实例在运行。最后由于 GPU 显存、负载不充分等问题，OpenCompass 也支持在同一个 GPU 上运行多个实例，这个参数是 `--max-num-workers-per-gpu`。因此可以笼统地认为，我们总共会使用 `--num-gpus` * `--max-num-workers` / `--max-num-workers-per-gpu` 个 GPU。
+需求侧就是有多少 worker 在运行。由于 OpenCompass 会同时实例化多个模型去进行推理，因此我们用 `--hf-num-gpus` 来指定每个实例使用多少 GPU。注意 `--hf-num-gpus` 是一个 HuggingFace 模型专用的参数，非 HuggingFace 模型设置该参数是不会起作用的。同时我们使用 `--max-num-workers` 去表示最多有多少个实例在运行。最后由于 GPU 显存、负载不充分等问题，OpenCompass 也支持在同一个 GPU 上运行多个实例，这个参数是 `--max-num-workers-per-gpu`。因此可以笼统地认为，我们总共会使用 `--hf-num-gpus` * `--max-num-workers` / `--max-num-workers-per-gpu` 个 GPU。
 
-综上，当任务运行较慢，GPU 负载不高的时候，我们首先需要检查供给是否充足，如果不充足，可以考虑调小 `--max-partition-size` 来将任务拆分地更细；其次需要检查需求是否充足，如果不充足，可以考虑增大 `--max-num-workers` 和 `--max-num-workers-per-gpu`。一般来说，**我们会将 `--num-gpus` 设定为最小的满足需求的值，并不会再进行调整**。
+综上，当任务运行较慢，GPU 负载不高的时候，我们首先需要检查供给是否充足，如果不充足，可以考虑调小 `--max-partition-size` 来将任务拆分地更细；其次需要检查需求是否充足，如果不充足，可以考虑增大 `--max-num-workers` 和 `--max-num-workers-per-gpu`。一般来说，**我们会将 `--hf-num-gpus` 设定为最小的满足需求的值，并不会再进行调整**。
 
 ### 我如何控制 OpenCompass 占用的 GPU 数量？
 
@@ -114,17 +114,8 @@ OpenCompass 中的每个任务代表等待评估的特定模型和数据集部�
 
 ### 如何使用本地已下好的 Huggingface 模型?
 
-如果您已经提前下载好 Huggingface 的模型文件，请手动指定模型路径，并在`--model-kwargs` 和 `--tokenizer-kwargs`中添加 `trust_remote_code=True`. 示例如下
+如果您已经提前下载好 Huggingface 的模型文件，请手动指定模型路径. 示例如下
 
 ```bash
-python run.py --datasets siqa_gen winograd_ppl \
---hf-path /path/to/model \  # HuggingFace 模型地址
---tokenizer-path /path/to/model \  # HuggingFace 模型地址
---model-kwargs device_map='auto' trust_remote_code=True \  # 构造 model 的参数
---tokenizer-kwargs padding_side='left' truncation='left' use_fast=False trust_remote_code=True \  # 构造 tokenizer 的参数
---max-out-len 100 \  # 模型能接受的最大序列长度
---max-seq-len 2048 \  # 最长生成 token 数
---batch-size 8 \  # 批次大小
---no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
---num-gpus 1  # 所需 gpu 数
+python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to/model
 ```

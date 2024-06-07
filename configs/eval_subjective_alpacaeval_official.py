@@ -4,7 +4,7 @@ with read_base():
     from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
-from opencompass.models.openai_api import OpenAI, OpenAIAllesAPIN
+from opencompass.models.openai_api import OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
@@ -21,6 +21,9 @@ api_meta_template = dict(
     ],
     reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
+
+
+# To run this config, please ensure to successfully installed `alpaca-eval==0.6` and `scikit-learn==1.5`
 
 # -------------Inference Stage ----------------------------------------
 
