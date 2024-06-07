@@ -63,15 +63,15 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     # yapf: disable
     # flake8: noqa: W605
     patterns = [
-        f'答案是?\s?([{options}])',
-        f'答案是?\s?：([{options}])',
-        f'答案是?\s?:([{options}])',
-        f'答案应该?是\s?([{options}])',
-        f'答案应该?选\s?([{options}])',
-        f'答案为\s?([{options}])',
-        f'答案选\s?([{options}])',
-        f'选择?\s?([{options}])',
-        f'故选?\s?([{options}])'
+        f'答案是?\s*([{options}])',
+        f'答案是?\s*：\s*([{options}])',
+        f'答案是?\s*:\s*([{options}])',
+        f'答案应该?是\s*([{options}])',
+        f'答案应该?选\s*([{options}])',
+        f'答案为\s*([{options}])',
+        f'答案选\s*([{options}])',
+        f'选择?\s*([{options}])',
+        f'故选?\s*([{options}])'
         f'只有选?项?\s?([{options}])\s?是?对',
         f'只有选?项?\s?([{options}])\s?是?错',
         f'只有选?项?\s?([{options}])\s?不?正确',

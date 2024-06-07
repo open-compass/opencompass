@@ -1,0 +1,30 @@
+从上下文中推断日期。
+
+Q: 请根据题目选择正确答案。今天是1937年圣诞节前夜。请问10天前的日期是多少？选项：
+(A)1988年12月14日
+(B)2026年12月14日
+(C)1950年12月14日
+(D)1938年07月14日
+(E)1937年12月14日
+(F)2007年12月14日
+A: Let's think step by step.
+If today is Christmas Eve of 1937, then today's date is December 24, 1937. 10 days before today is December 14, 1937. So the answer is (E).
+
+Q: 请根据题目选择正确答案。明天是2019年11月12日。请问一年前的日期是多少？选项：
+(A)2018年08月25日
+(B)2018年11月04日
+(C)2018年11月02日
+(D)2018年11月11日
+(E)2018年09月04日
+A: Let's think step by step.
+If tomorrow is November 12, 2019, then today is November 11, 2019. The date one year ago from today is November 11, 2019. So the answer is (D).
+
+Q: 请根据题目选择正确答案。李静和王伟在1958年1月2日结婚。今天是他们的5周年纪念日。请问明天的日期是多少？选项：
+(A)1961年01月18日
+(B)1982年01月03日
+(C)1961年01月11日
+(D)1960年10月14日
+(E)1963年01月03日
+(F)1960年12月03日
+A: Let's think step by step.
+If Jane and John married on Jan 2, 1958, then and if it is their 5-year anniversary today, then today's date is Jan 2, 1963. The date tomorrow is Jan 3, 1963. So the answer is (E).

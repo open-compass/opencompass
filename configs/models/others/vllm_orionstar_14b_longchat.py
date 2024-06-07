@@ -21,6 +21,6 @@ models = [
         max_seq_len=4096,
         batch_size=32,
         run_cfg=dict(num_gpus=4, num_procs=1),
-        end_str='<|endoftext|>',
+        stop_words=['<|endoftext|>'],
     )
 ]

@@ -50,6 +50,9 @@ class OpenAI(BaseAPIModel):
         temperature (float, optional): What sampling temperature to use.
             If not None, will override the temperature in the `generate()`
             call. Defaults to None.
+        tokenizer_path (str, optional): The path to the tokenizer. Use path if
+            'tokenizer_path' is None, otherwise use the 'tokenizer_path'.
+            Defaults to None.
     """
 
     is_api: bool = True
@@ -67,7 +70,8 @@ class OpenAI(BaseAPIModel):
                  mode: str = 'none',
                  logprobs: Optional[bool] = False,
                  top_logprobs: Optional[int] = None,
-                 temperature: Optional[float] = None):
+                 temperature: Optional[float] = None,
+                 tokenizer_path: Optional[str] = None):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -82,6 +86,7 @@ class OpenAI(BaseAPIModel):
         self.mode = mode
         self.logprobs = logprobs
         self.top_logprobs = top_logprobs
+        self.tokenizer_path = tokenizer_path
 
         if isinstance(key, str):
             if key == 'ENV':
@@ -184,8 +189,12 @@ class OpenAI(BaseAPIModel):
                 messages.append(msg)
 
         # Hold out 100 tokens due to potential errors in tiktoken calculation
-        max_out_len = min(
-            max_out_len, context_window - self.get_token_len(str(input)) - 100)
+        try:
+            max_out_len = min(
+                max_out_len,
+                context_window - self.get_token_len(str(input)) - 100)
+        except KeyError:
+            max_out_len = max_out_len
         if max_out_len <= 0:
             return ''
 
@@ -283,7 +292,8 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        enc = self.tiktoken.encoding_for_model(self.path)
+        enc = self.tiktoken.encoding_for_model(self.path
+                                               or self.tokenizer_path)
         return len(enc.encode(prompt))
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
@@ -329,140 +339,3 @@ class OpenAI(BaseAPIModel):
         elif self.mode == 'rear':
             prompt = sep.join(words[:l])
         return prompt
-
-
-class OpenAIAllesAPIN(OpenAI):
-    """Model wrapper around OpenAI-AllesAPIN.
-
-    Args:
-        path (str): The name of OpenAI's model.
-        url (str): URL to AllesAPIN.
-        key (str): AllesAPIN key.
-        query_per_second (int): The maximum queries allowed per second
-            between two consecutive calls of the API. Defaults to 1.
-        max_seq_len (int): Unused here.
-        meta_template (Dict, optional): The model's meta prompt
-            template if needed, in case the requirement of injecting or
-            wrapping of any meta instructions.
-        retry (int): Number of retires if the API call fails. Defaults to 2.
-    """
-
-    is_api: bool = True
-
-    def __init__(self,
-                 path: str,
-                 url: str,
-                 key: str,
-                 temperature: float = 1.0,
-                 query_per_second: int = 1,
-                 rpm_verbose: bool = False,
-                 max_seq_len: int = 2048,
-                 meta_template: Optional[Dict] = None,
-                 retry: int = 2):
-        super().__init__(path=path,
-                         max_seq_len=max_seq_len,
-                         query_per_second=query_per_second,
-                         rpm_verbose=rpm_verbose,
-                         meta_template=meta_template,
-                         retry=retry)
-        self.url = url
-        self.temperature = temperature
-        self.headers = {
-            'alles-apin-token': key,
-            'content-type': 'application/json',
-        }
-
-    def _generate(self, input: PromptType, max_out_len: int,
-                  temperature: float) -> str:
-        """Generate results given an input.
-
-        Args:
-            inputs (PromptType): A string or PromptDict.
-                The PromptDict should be organized in OpenCompass'
-                API format.
-            max_out_len (int): The maximum length of the output.
-            temperature (float): What sampling temperature to use,
-                between 0 and 2. Higher values like 0.8 will make the output
-                more random, while lower values like 0.2 will make it more
-                focused and deterministic.
-
-        Returns:
-            str: The generated string.
-        """
-        assert isinstance(input, (str, PromptList))
-
-        if isinstance(input, str):
-            messages = [{'role': 'user', 'content': input}]
-        else:
-            messages = []
-            for item in input:
-                msg = {'content': item['prompt']}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
-                elif item['role'] == 'SYSTEM':
-                    msg['role'] = 'system'
-                messages.append(msg)
-
-            # model can be response with user and system
-            # when it comes with agent involved.
-            assert msg['role'] in ['user', 'system']
-
-        data = {
-            'model': self.path,
-            'messages': messages,
-            'temperature': temperature
-        }
-        for _ in range(self.retry):
-            self.wait()
-            try:
-                raw_response = requests.post(self.url,
-                                             headers=self.headers,
-                                             data=json.dumps(data))
-            except requests.ConnectionError:
-                self.logger.error('Request error, got',
-                                  str(raw_response.content))
-                time.sleep(1)
-                continue
-            try:
-                response = raw_response.json()
-            except requests.JSONDecodeError:
-                self.logger.error('JsonDecode error, got',
-                                  str(raw_response.content))
-                time.sleep(1)
-                continue
-            if raw_response.status_code == 200 and response[
-                    'msgCode'] == '10000':
-                data = response['data']
-                choices = data['choices']
-                if choices is None:
-                    self.logger.error(data)
-                else:
-                    return choices[0]['message']['content'].strip()
-            try:
-                match = re.match(r'Error code: \d+ - (.*)', response['data'])
-                err = eval(match.group(1))['error']
-                if err['code'] == 'content_filter' and err['status'] == 400:
-                    return err['message']
-            except Exception:
-                pass
-            self.logger.error(response['msg'])
-            self.logger.error(response)
-            time.sleep(1)
-
-        raise RuntimeError('API call failed.')
-
-    def get_token_len(self, prompt: str) -> int:
-        """Get lengths of the tokenized string. Only English and Chinese
-        characters are counted for now. Users are encouraged to override this
-        method if more accurate length is needed.
-
-        Args:
-            prompt (str): Input string.
-
-        Returns:
-            int: Length of the input tokens
-        """
-        enc = self.tiktoken.encoding_for_model(self.path)
-        return len(enc.encode(prompt))

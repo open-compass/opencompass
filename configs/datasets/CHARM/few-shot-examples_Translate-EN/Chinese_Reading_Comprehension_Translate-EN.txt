@@ -1,0 +1,26 @@
+Please understand the meaning of the question and choose the correct answer.
+
+Q:Some Cantonese people don't like chili peppers. Therefore, some southerners don't like chili peppers. Which of the following ensures the validity of the above argument?
+(A) Some Cantonese people love chili peppers
+(B) Some Southerners love chili peppers.
+(C) All Cantonese are Southerners.
+(D) Some Cantonese people do not love chili or sweets.
+A: Let's think step by step.
+In this argument, we infer from "some Cantonese don't like chili peppers" that "some Southerners don't like chili peppers". This inference depends on the relationship between Cantonese and Southerners. In order for this inference to be valid, we need to make sure that at least some Cantonese are Southerners. Therefore, option (C) "All Cantonese are southerners" is the one that ensures that this argument is valid. So the answer is (C).
+
+
+Q:Thangka is a form of painting rich in Tibetan cultural characteristics, which has a history of more than 1300 years since the rise of the Tubo Dynasty and is a cultural treasure of the Snowy Plateau. It is a cultural treasure of the Snowy Plateau. Its subject matter is not only religious, but also historical and folklore content, so it is also known as the "encyclopedia" to understand Tibet. Therefore, if you want to understand the history of Tibet, in addition to sitting down and reading the strict but slightly dull history books, you can also choose a pleasant and enjoyable way - enjoying the thangka, conversing with many ancient people, imagining the historical events, savoring the rich spiritual world of the Tibetans, and understanding the unique folklore of the Tibetans, which is a process to make the history become a three-dimensional and palpable. This is a process of making history three-dimensional and palpable.
+(A) Thangkas can provide a cozy and relaxing way to learn about Tibet.
+(B) The thangkas are a unique record of Tibetan folklore and historical events.
+(C) The thangka is an "encyclopedic" form of painting for understanding Tibetan culture and history.
+(D) The thangka is a form of painting that is rich in Tibetan cultural characteristics and has a long history.
+A: Let's think step by step.
+It is clearly mentioned in the text that apart from reading rigorous but dull history books, appreciating thangkas is a pleasant and enjoyable way to talk with many ancient people, imagine historical events, experience the rich spiritual world of the Tibetans, and learn about the unique Tibetan folklore. So the main intention of the passage is (A) "Thangkas can provide a cozy and relaxing way to learn about Tibet." So the answer is (A).
+
+Q:As a principle and method of literary criticism, the concept of "knowing people and discussing the world" was first proposed by Mencius, a thinker of the Warring States period. According to Mencius, in order to make friends with the ancients, it is not enough just to read their poems and books, but also to understand their behavior and the times in which they lived, so as to read and understand their poems and books, and to make friends with them and become their soulmates. What is the incorrect understanding of this passage?
+(A) People's hearts can communicate and resonate with each other.
+(B) "Knowing people and discussing the world" has been used as a kind of literary criticism and has shown a strong vitality.
+(C) "Knowing people and discussing the world" can help the descendants to make friends with the ancients and the ancients to become their soulmates.
+(D) Knowing about the ancients and their times helps to understand their works.
+A: Let us think step by step
+From the passage, we fail to see that (B) "Knowing the people of the world" has been used as a kind of literary criticism and has shown a strong vitality. Although it is true that "knowing people and discussing the world" is a principle and method of literary criticism put forward by the philosopher Mencius during the Warring States period, the passage does not mention that "knowing people and discussing the world" is still in use today, nor does it mention that it has shown great vitality. Therefore, option (B) is a misconception. So the answer is (B).

@@ -1,0 +1,22 @@
+Determine whether a human-constructed sentence about sports is plausible.
+
+Q: Is the following sentence plausible? "Athlete Zhang Peimeng's consistent passes made the offensive end take the initiative"
+Options:
+(A) Credible
+(B) Not credible
+A: Let's think step by step.
+Zhang Peimeng is a Chinese track and field athlete, and first pass is a volleyball term. Since he is not a volleyball player, he would not be involved in the passing part of a volleyball game. So the answer is (B).
+
+Q: Is the following sentence plausible? "Athlete Guo Allen scored a free kick."
+Options:
+(A) Credible
+(B) Unbelievable
+A: Let's think step by step.
+Guo Allen is a Chinese basketball player, and free kick is a soccer term. Since he is not a soccer player, he won't be in involved in the free kick part of a soccer game, so the answer is (B).
+
+Q: Is the following sentence plausible? "The athlete Fan Zhiyi scored a goal."
+Options:
+(A) Credible
+(B) Not credible
+A: Let's think step by step.
+Fan Zhiyi is a Chinese soccer player, and scoring a goal is a soccer sport term. Since he is a professional soccer player, he is likely to score a goal, so the answer is (A).

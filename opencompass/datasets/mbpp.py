@@ -208,7 +208,8 @@ class MBPPEvaluator(BaseEvaluator):
         assert self.metric in ['MBPP', 'MBPPPlus']
 
     def score(self, predictions, references):
-        assert len(predictions) == len(references)
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length'}
 
         if self.metric == 'MBPP':
             result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
@@ -286,6 +287,8 @@ class MBPPEvaluator(BaseEvaluator):
             r'BEGIN\s*(.*)\s*DONE',
             r'```python\s*(.*)\s*```',
             r'```\s*(.*)\s*```',
+            r'```python\s*(.*)\s*$',
+            r'```\s*(.*)\s*$',
             r'(.*)\s*```.*',
             r"\[BEGIN\]\s*'(.*)",
             r'\[BEGIN\](.*)',
