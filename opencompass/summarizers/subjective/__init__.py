@@ -8,6 +8,7 @@ from .compassbench import CompassBenchSummarizer
 from .corev2 import Corev2Summarizer
 from .creationbench import CreationBenchSummarizer
 from .flames import FlamesSummarizer
+from .fofo import FofoSummarizer
 from .information_retrival import IRSummarizer
 from .mtbench import MTBenchSummarizer
 from .mtbench101 import MTBench101Summarizer
