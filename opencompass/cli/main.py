@@ -10,7 +10,7 @@ from argparse import Namespace
 
 from mmengine.config import Config, DictAction
 
-from opencompass.cli.cli_arguments import Arguments
+from opencompass.cli.arguments import Arguments
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
