@@ -5,9 +5,12 @@ import getpass
 import os
 import os.path as osp
 from datetime import datetime
+from typing import Union
+from argparse import Namespace
 
 from mmengine.config import Config, DictAction
 
+from opencompass.cli.cli_arguments import Arguments
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
@@ -170,8 +173,6 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
-
-
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
     hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat', help='The type of the HuggingFace model, base or chat')
@@ -203,8 +204,7 @@ def parse_custom_dataset_args(custom_dataset_parser):
                                        choices=['gen', 'ppl'])
 
 
-def main():
-    args = parse_args()
+def run_task(args: Union[Arguments, Namespace]):
     if args.dry_run:
         args.debug = True
     # initialize logger
@@ -341,6 +341,10 @@ def main():
         summarizer = build_from_cfg(summarizer_cfg)
         summarizer.summarize(time_str=cfg_time_str)
 
+
+def main():
+    args = parse_args()
+    run_task(args)
 
 
 if __name__ == '__main__':
