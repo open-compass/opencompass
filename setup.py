@@ -119,7 +119,7 @@ def do_setup():
         license='Apache License 2.0',
         packages=find_packages(exclude=[
             'test*',
-            'configs',
+            # 'configs',
             'data',
             'docs',
             'tools',
