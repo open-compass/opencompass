@@ -186,8 +186,7 @@ def parse_hf_args(hf_parser):
     hf_parser.add_argument('--max-out-len', type=int, default=256, help='The max output length for the HuggingFace model')
     hf_parser.add_argument('--min-out-len', type=int, default=1, help='The min output length for the HuggingFace model')
     hf_parser.add_argument('--batch-size', type=int, default=8, help='The batch size for the HuggingFace model')
-    hf_parser.add_argument('--num-gpus', type=int, default=None, help='Deprecated, please use --hf-num-gpus instead')
-    hf_parser.add_argument('--hf-num-gpus', type=int, default=1, help='The number of GPUs for the HuggingFace model passed via cli')
+    hf_parser.add_argument('--num-gpus', type=int, default=1, help='The number of GPUs for **the HuggingFace model passed via cli**')
     hf_parser.add_argument('--pad-token-id', type=int, help='The pad token id for the HuggingFace model')
     hf_parser.add_argument('--stop-words', nargs='+', default=[], help='The stop words for the HuggingFace model')
 
@@ -206,12 +205,6 @@ def parse_custom_dataset_args(custom_dataset_parser):
 
 def main():
     args = parse_args()
-
-    if args.num_gpus is not None:
-        raise ValueError('The `--num-gpus` argument is deprecated, please use '
-                         '`--hf-num-gpus` to describe number of gpus used for '
-                         'the HuggingFace model instead.')
-
     if args.dry_run:
         args.debug = True
     # initialize logger

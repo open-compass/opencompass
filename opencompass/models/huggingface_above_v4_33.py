@@ -84,6 +84,7 @@ def _convert_chat_messages(inputs, merge_role=True):
             messages = merged_messages
 
         outputs.append(messages)
+        print(messages)
     return outputs
 
 

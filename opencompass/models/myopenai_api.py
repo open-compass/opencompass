@@ -15,11 +15,11 @@ from opencompass.utils.prompt import PromptList
 from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
-OPENAI_API_BASE = 'https://api.openai.com/v1/chat/completions'
+OPENAI_API_BASE = 'http://192.168.31.10:9997/v1/chat/completions'
 
 
 @MODELS.register_module()
-class OpenAI(BaseAPIModel):
+class MyOpenAI(BaseAPIModel):
     """Model wrapper around OpenAI's models.
 
     Args:
@@ -75,8 +75,8 @@ class OpenAI(BaseAPIModel):
                          query_per_second=query_per_second,
                          rpm_verbose=rpm_verbose,
                          retry=retry)
-        import tiktoken
-        self.tiktoken = tiktoken
+        # import tiktoken
+        # self.tiktoken = tiktoken
         self.temperature = temperature
         assert mode in ['none', 'front', 'mid', 'rear']
         self.mode = mode
@@ -184,12 +184,8 @@ class OpenAI(BaseAPIModel):
                 messages.append(msg)
 
         # Hold out 100 tokens due to potential errors in tiktoken calculation
-        try:
-            max_out_len = min(
-                max_out_len,
-                context_window - self.get_token_len(str(input)) - 100)
-        except KeyError:
-            max_out_len = max_out_len
+        max_out_len = min(
+            max_out_len, context_window - self.get_token_len(str(input)) - 100)
         if max_out_len <= 0:
             return ''
 
@@ -236,8 +232,14 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
                 )
+                headers = {
+                    'content-type': 'application/json',
+
+                }
+                print("url--------------", self.url)
+                print(data)
                 raw_response = requests.post(self.url,
-                                             headers=header,
+                                             headers=headers,
                                              data=json.dumps(data))
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')
@@ -248,6 +250,7 @@ class OpenAI(BaseAPIModel):
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
                 continue
+            print("response--------------", response)
             self.logger.debug(str(response))
             try:
                 if self.logprobs:
@@ -287,8 +290,9 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        enc = self.tiktoken.encoding_for_model(self.path)
-        return len(enc.encode(prompt))
+        # enc = self.tiktoken.encoding_for_model(self.path)
+        # return len(enc.encode(prompt))
+        return 1
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.
@@ -335,7 +339,7 @@ class OpenAI(BaseAPIModel):
         return prompt
 
 
-class OpenAIAllesAPIN(OpenAI):
+class OpenAIAllesAPIN(MyOpenAI):
     """Model wrapper around OpenAI-AllesAPIN.
 
     Args:
@@ -437,7 +441,7 @@ class OpenAIAllesAPIN(OpenAI):
                 time.sleep(1)
                 continue
             if raw_response.status_code == 200 and response[
-                    'msgCode'] == '10000':
+                'msgCode'] == '10000':
                 data = response['data']
                 choices = data['choices']
                 if choices is None:
@@ -468,5 +472,6 @@ class OpenAIAllesAPIN(OpenAI):
         Returns:
             int: Length of the input tokens
         """
-        enc = self.tiktoken.encoding_for_model(self.path)
-        return len(enc.encode(prompt))
+        # enc = self.tiktoken.encoding_for_model(self.path)
+        # return len(enc.encode(prompt))
+        return 1
