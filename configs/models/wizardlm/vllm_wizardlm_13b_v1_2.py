@@ -18,7 +18,7 @@ models = [
         max_seq_len=2048,
         batch_size=1,
         generation_kwargs=dict(temperature=0),
-        stop_words=['</s>'],
+        end_str='</s>',
         run_cfg=dict(num_gpus=1, num_procs=1),
     )
 ]

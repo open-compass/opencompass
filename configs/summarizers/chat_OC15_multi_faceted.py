@@ -122,10 +122,10 @@ IFEval_dataset_abbrs = [
     ['IFEval', 'Inst-level-loose-accuracy'],
 ]
 
+
 summarizer = dict(
     type=MultiFacetedSummarizer,
     dataset_abbrs_list=[
-        {'name': 'overall', 'dataset_abbrs': overall_dataset_abbrs},
         {'name': 'mmlu', 'dataset_abbrs': mmlu_dataset_abbrs},
         {'name': 'cmmlu', 'dataset_abbrs': cmmlu_dataset_abbrs},
         {'name': 'ceval', 'dataset_abbrs': ceval_dataset_abbrs},
@@ -143,6 +143,7 @@ summarizer = dict(
         {'name': 'humaneval', 'dataset_abbrs': [['openai_humaneval', 'humaneval_pass@1']]},
         {'name': 'GPQA', 'dataset_abbrs': [['GPQA_diamond', 'accuracy']]},
         {'name': 'IFEval', 'dataset_abbrs': IFEval_dataset_abbrs},
+        {'name': 'overall', 'dataset_abbrs': overall_dataset_abbrs},
     ],
     summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

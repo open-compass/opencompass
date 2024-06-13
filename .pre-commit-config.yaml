@@ -10,7 +10,6 @@ exclude: |
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
       opencompass/datasets/TheoremQA|
-      opencompass/datasets/subjective/mtbench101.py|
       docs/zh_cn/advanced_guides/compassbench_intro.md
     )
 repos:
@@ -36,7 +35,6 @@ repos:
         exclude: |
             (?x)^(
                 .*\.jsonl|
-                .*\.md.template|
                 configs/
             )
   - repo: https://github.com/pre-commit/pre-commit-hooks

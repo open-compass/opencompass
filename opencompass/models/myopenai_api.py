@@ -19,7 +19,7 @@ OPENAI_API_BASE = 'http://192.168.31.10:9997/v1/chat/completions'
 
 
 @MODELS.register_module()
-class OpenAI(BaseAPIModel):
+class MyOpenAI(BaseAPIModel):
     """Model wrapper around OpenAI's models.
 
     Args:
@@ -339,7 +339,7 @@ class OpenAI(BaseAPIModel):
         return prompt
 
 
-class OpenAIAllesAPIN(OpenAI):
+class OpenAIAllesAPIN(MyOpenAI):
     """Model wrapper around OpenAI-AllesAPIN.
 
     Args:
