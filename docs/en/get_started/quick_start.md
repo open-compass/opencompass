@@ -87,7 +87,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 Note that in this way, OpenCompass only evaluates one model at a time, while other ways can evaluate multiple models at once.
 
 ```{caution}
-`--num-gpus` does not stand for the actual number of GPUs to use in evaluation, but the minimum required number of GPUs for this model. [More](faq.md#how-does-opencompass-allocate-gpus)
+`--hf-num-gpus` does not stand for the actual number of GPUs to use in evaluation, but the minimum required number of GPUs for this model. [More](faq.md#how-does-opencompass-allocate-gpus)
 ```
 
 :::{dropdown} More detailed example
@@ -103,7 +103,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 --max-out-len 100 \  # Maximum number of tokens to generate
 --min-out-len 100 \  # Minimum number of tokens to generate
 --batch-size 64  \  # Batch size
---num-gpus 1  # Number of GPUs required to run the model
+--hf-num-gpus 1  # Number of GPUs required to run the model
 ```
 ```{seealso}
 For all HuggingFace related parameters supported by `run.py`, please read [Launching Evaluation Task](../user_guides/experimentation.md#launching-an-evaluation-task).

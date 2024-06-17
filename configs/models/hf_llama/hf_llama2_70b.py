@@ -7,6 +7,6 @@ models = [
         path='meta-llama/Llama-2-70b-hf',
         max_out_len=1024,
         batch_size=8,
-        run_cfg=dict(num_gpus=4),
+        run_cfg=dict(num_gpus=8),
     )
 ]

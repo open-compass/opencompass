@@ -3,7 +3,7 @@ from mmengine.config import read_base
 with read_base():
     from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import subjective_datasets
 
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAIAllesAPIN, HuggingFaceChatGLM3
+from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
 from opencompass.partitioners import NaivePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner

@@ -86,7 +86,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 请注意，通过这种方式，OpenCompass 一次只评估一个模型，而其他方式可以一次评估多个模型。
 
 ```{caution}
-`--num-gpus` 不代表实际用于评估的 GPU 数量，而是该模型所需的最少 GPU 数量。[更多](faq.md#opencompass-如何分配-gpu)
+`--hf-num-gpus` 不代表实际用于评估的 GPU 数量，而是该模型所需的最少 GPU 数量。[更多](faq.md#opencompass-如何分配-gpu)
 ```
 
 
@@ -104,7 +104,7 @@ python run.py --datasets siqa_gen winograd_ppl \
 --max-out-len 100 \  # 生成的最大 token 数
 --min-out-len 100 \  # 生成的最小 token 数
 --batch-size 64  \  # 批量大小
---num-gpus 1  # 运行模型所需的 GPU 数量
+--hf-num-gpus 1  # 运行模型所需的 GPU 数量
 ```
 ```{seealso}
 有关 `run.py` 支持的所有与 HuggingFace 相关的参数，请阅读 [评测任务发起](../user_guides/experimentation.md#评测任务发起)
