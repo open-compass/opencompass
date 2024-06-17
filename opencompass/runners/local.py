@@ -27,7 +27,7 @@ def get_command_template(gpu_ids: List[int]) -> str:
         tmpl = 'set CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
         tmpl += ' & {task_cmd}'
     else:
-        tmpl = 'CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
+        tmpl = 'ASCEND_RT_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
         tmpl += ' {task_cmd}'
     return tmpl
 
@@ -73,6 +73,7 @@ class LocalRunner(BaseRunner):
 
         status = []
         import torch
+        import torch_npu
 
         if 'CUDA_VISIBLE_DEVICES' in os.environ:
             all_gpu_ids = [
