@@ -1,7 +1,7 @@
 # Copyright (c) Alibaba, Inc. and its affiliates.
 from dataclasses import dataclass, asdict, field
 from typing import Optional, Union
-from opencompass.models import OpenAI
+from opencompass.models import OpenAI, BaseAPIModel
 
 
 @dataclass
@@ -59,7 +59,7 @@ class ModelConfig:
     meta_template: Union[str, dict]
     openai_api_base: str   # The base URL of the OpenAI API, e.g. `http://127.0.0.1:8000/v1/chat/completions`
 
-    type = OpenAI
+    type: BaseAPIModel = OpenAI
     key: str = 'default_openai_api_key'    # No need for APIs in the format of OpenAI.
     query_per_second: int = 1
     max_out_len: int = 2048
