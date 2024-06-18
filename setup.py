@@ -1,5 +1,9 @@
+import os
 from setuptools import find_packages, setup
 from setuptools.command.install import install
+
+
+VERSION_FILE = os.path.abspath('opencompass/__init__.py')
 
 
 class DownloadNLTK(install):
@@ -96,19 +100,44 @@ def parse_requirements(fname='requirements.txt', with_version=True):
 
 
 def get_version():
-    version_file = 'opencompass/__init__.py'
-    with open(version_file, 'r', encoding='utf-8') as f:
-        exec(compile(f.read(), version_file, 'exec'))
+    # version_file = 'opencompass/__init__.py'
+    with open(VERSION_FILE, 'r', encoding='utf-8') as f:
+        exec(compile(f.read(), VERSION_FILE, 'exec'))
     return locals()['__version__']
 
 
+def pack_resource():
+    import shutil
+    # pack resource such as configs and tools
+    root_dir = 'package/'
+    if os.path.isdir(root_dir):
+        shutil.rmtree(root_dir)
+    os.makedirs(root_dir)
+
+    proj_dir = root_dir + 'opencompass/'
+    shutil.copytree('opencompass', proj_dir)
+    shutil.copy('requirements/agent.txt', 'package/agent.txt')
+    shutil.copy('requirements/api.txt', 'package/api.txt')
+    shutil.copy('requirements/docs.txt', 'package/docs.txt')
+    shutil.copy('requirements/extra.txt', 'package/extra.txt')
+    shutil.copy('requirements/runtime.txt', 'package/runtime.txt')
+    shutil.copy('./README.md', 'package/README.md')
+    shutil.copy('./README_zh-CN.md', 'package/README_zh-CN.md')
+
+
 def do_setup():
+    print('Usage: python3 setup.py bdist_wheel')
+
+    pack_resource()
+    os.chdir('package')
+
     setup(
-        name='opencompass',
+        name='ms-opencompass',      # ModelScope-OpenCompass Version
         author='OpenCompass Contributors',
         version=get_version(),
         description='A comprehensive toolkit for large model evaluation',
-        url='https://github.com/open-compass/opencompass',
+        # url='https://github.com/open-compass/opencompass',
+        url='https://github.com/wangxingjun778/opencompass',          # TODO: Update the URL
         long_description=readme(),
         long_description_content_type='text/markdown',
         maintainer='OpenCompass Authors',

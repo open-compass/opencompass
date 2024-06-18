@@ -1,7 +1,6 @@
 # Copyright (c) Alibaba, Inc. and its affiliates.
 from dataclasses import dataclass, asdict, field
 from typing import Optional, Union
-from opencompass.models import OpenAI, BaseAPIModel
 
 
 @dataclass
