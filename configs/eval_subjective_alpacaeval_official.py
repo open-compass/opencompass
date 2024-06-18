@@ -22,6 +22,9 @@ api_meta_template = dict(
     reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
 
+
+# To run this config, please ensure to successfully installed `alpaca-eval==0.6` and `scikit-learn==1.5`
+
 # -------------Inference Stage ----------------------------------------
 
 # For subjective evaluation, we often set do sample for models

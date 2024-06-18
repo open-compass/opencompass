@@ -20,7 +20,7 @@ base_prompt_zh = """请根据 用户问题 以及 相应的两个回答，判断
 {prediction2}
 [回答2结束]
 
-根据评分要求，请先对两个回答进行评价，最后在以下 3 个选项中做出选择:
+请先对两个回答进行评价，最后在以下 3 个选项中做出选择:
 A. 回答1更好
 B. 回答2更好
 C. 回答1、2平局
@@ -87,6 +87,7 @@ class CompassBenchDataset(BaseDataset):
                 lan = problem['language']
                 others = problem['others']
                 judge_prompt = base_prompt_zh if lan == 'zh' else base_prompt_en
+                judge_prompt = judge_prompt.replace('{question}', question)
                 raw_data.append({
                     'question': question,
                     'judge_prompt': judge_prompt,
