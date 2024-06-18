@@ -1,4 +1,4 @@
-# 使用 VLLM 或 LMDeploy 来一键式加速评测推理
+# 使用 vLLM 或 LMDeploy 来一键式加速评测推理
 
 ## 背景
 
@@ -9,7 +9,7 @@
 
 ## 加速前准备
 
-首先，请检查您要评测的模型是否支持使用 VLLM 或 LMDeploy 进行推理加速。其次，请确保您已经安装了 VLLM 或 LMDeploy，具体安装方法请参考它们的官方文档，下面是参考的安装方法：
+首先，请检查您要评测的模型是否支持使用 vLLM 或 LMDeploy 进行推理加速。其次，请确保您已经安装了 vLLM 或 LMDeploy，具体安装方法请参考它们的官方文档，下面是参考的安装方法：
 
 ### LMDeploy 安装方法
 
@@ -29,9 +29,9 @@ pip install vllm
 
 ## 评测时使用 VLLM 或 LMDeploy
 
-OpenCompass 提供了一键式的评测加速，可以在评测过程中自动将 Huggingface 的 transformers 模型转化为 VLLM 或 LMDeploy 的模型，以便在评测过程中使用。以下是使用默认 Huggingface 版本的 Internlm2-chat-7b 模型评测 GSM8k 数据集的脚本：
+### 方法1：使用命令行参数来变更推理后端
 
-### OpenCompass 主库
+OpenCompass 提供了一键式的评测加速，可以在评测过程中自动将 Huggingface 的 transformers 模型转化为 VLLM 或 LMDeploy 的模型，以便在评测过程中使用。以下是使用默认 Huggingface 版本的 llama3-8b-instruct 模型评测 GSM8k 数据集的样例代码：
 
 ```python
 # eval_gsm8k.py
@@ -68,7 +68,7 @@ models = [
 python run.py config/eval_gsm8k.py
 ```
 
-如果需要使用 VLLM 或 LMDeploy 进行加速评测，可以使用下面的脚本：
+如果需要使用 vLLM 或 LMDeploy 进行加速评测，可以使用下面的脚本：
 
 ```bash
 python run.py config/eval_gsm8k.py -a vllm
@@ -80,9 +80,58 @@ python run.py config/eval_gsm8k.py -a vllm
 python run.py config/eval_gsm8k.py -a lmdeploy
 ```
 
+### 方法2：通过部署推理加速服务API来加速评测
+
+OpenCompass 还支持通过部署vLLM或LMDeploy的推理加速服务 API 来加速评测，参考步骤如下：
+
+1. 安装openai包：
+
+```bash
+pip install openai
+```
+
+2. 部署 vLLM 或 LMDeploy 的推理加速服务 API，具体部署方法请参考它们的官方文档，下面以LMDeploy为例：
+
+```bash
+lmdeploy serve api_server meta-llama/Meta-Llama-3-8B-Instruct --model-name Meta-Llama-3-8B-Instruct --server-port 23333
+```
+
+api_server 启动时的参数可以通过命令行`lmdeploy serve api_server -h`查看。 比如，--tp 设置张量并行，--session-len 设置推理的最大上下文窗口长度，--cache-max-entry-count 调整 k/v cache 的内存使用比例等等。
+
+3. 服务部署成功后，修改评测脚本，将模型配置中的路径改为部署的服务地址，如下：
+
+```python
+from opencompass.models import OpenAI
+
+api_meta_template = dict(
+    round=[
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
+    ],
+    reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
+)
+
+models = [
+    dict(
+        abbr='Meta-Llama-3-8B-Instruct-LMDeploy-API',
+        type=OpenAI,
+        openai_api_base='http://0.0.0.0:23333/v1', # 服务地址
+        path='Meta-Llama-3-8B-Instruct ', # 请求服务时的 model name
+        rpm_verbose=True, # 是否打印请求速率
+        meta_template=api_meta_template, # 服务请求模板
+        query_per_second=1, # 服务请求速率
+        max_out_len=1024, # 最大输出长度
+        max_seq_len=4096, # 最大输入长度
+        temperature=0.01, # 生成温度
+        batch_size=8, # 批处理大小
+        retry=3, # 重试次数
+    )
+]
+```
+
 ## 加速效果及性能对比
 
-下面是使用 VLLM 或 LMDeploy 在单卡 A800 上对 GSM8k 数据集进行加速评测的效果及性能对比表：
+下面是使用 VLLM 或 LMDeploy 在单卡 A800 上 Llama-3-8B-Instruct 模型对 GSM8k 数据集进行加速评测的效果及性能对比表：
 
 | 推理后端    | 精度（Accuracy） | 推理时间（分钟：秒） | 加速比（相对于 Huggingface） |
 | ----------- | ---------------- | -------------------- | ---------------------------- |
