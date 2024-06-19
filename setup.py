@@ -114,22 +114,29 @@ def pack_resource():
         shutil.rmtree(root_dir)
     os.makedirs(root_dir)
 
+    requirements_dir = os.path.join(root_dir, 'requirements')
+    os.makedirs(requirements_dir, exist_ok=True)
+
     proj_dir = root_dir + 'opencompass/'
     shutil.copytree('opencompass', proj_dir)
-    shutil.copy('requirements/agent.txt', 'package/agent.txt')
-    shutil.copy('requirements/api.txt', 'package/api.txt')
-    shutil.copy('requirements/docs.txt', 'package/docs.txt')
-    shutil.copy('requirements/extra.txt', 'package/extra.txt')
-    shutil.copy('requirements/runtime.txt', 'package/runtime.txt')
-    shutil.copy('./README.md', 'package/README.md')
-    shutil.copy('./README_zh-CN.md', 'package/README_zh-CN.md')
+
+    configs_dir = os.path.join(root_dir, 'opencompass/configs')
+    shutil.copytree('configs', configs_dir)
+
+    shutil.copy('requirements/agent.txt', os.path.join(requirements_dir, 'agent.txt'))
+    shutil.copy('requirements/api.txt', os.path.join(requirements_dir, 'api.txt'))
+    shutil.copy('requirements/docs.txt', os.path.join(requirements_dir, 'docs.txt'))
+    shutil.copy('requirements/extra.txt', os.path.join(requirements_dir, 'extra.txt'))
+    shutil.copy('requirements/runtime.txt', os.path.join(requirements_dir, 'runtime.txt'))
+    shutil.copy('./README.md', os.path.join(root_dir, 'README.md'))
+    shutil.copy('./README_zh-CN.md', os.path.join(root_dir, 'README_zh-CN.md'))
 
 
 def do_setup():
     print('Usage: python3 setup.py bdist_wheel')
 
-    # pack_resource()
-    # os.chdir('package')
+    pack_resource()
+    os.chdir('package')
 
     setup(
         name='ms-opencompass',      # ModelScope-OpenCompass Version
@@ -138,6 +145,8 @@ def do_setup():
         description='A comprehensive toolkit for large model evaluation',
         # url='https://github.com/open-compass/opencompass',
         url='https://github.com/wangxingjun778/opencompass',          # TODO: Update the URL
+        include_package_data=True,
+        package_data={'opencompass': ['configs/*']},
         long_description=readme(),
         long_description_content_type='text/markdown',
         maintainer='OpenCompass Authors',
