@@ -5,8 +5,8 @@ models = [
     dict(
         type=HuggingFaceCausalLM,
         abbr='PULSE-7bv5',
-        path='/home/dongru/PULSE-7bv5',
-        tokenizer_path='/home/dongru/PULSE-7bv5',
+        path='OpenMEDLab/PULSE-7bv5',
+        tokenizer_path='OpenMEDLab/PULSE-7bv5',
         model_kwargs=dict(
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
