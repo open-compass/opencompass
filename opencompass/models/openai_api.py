@@ -235,7 +235,7 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
 
-                    do_sample=False,            # TODO: ONLY FOR TEST !
+                    # do_sample=False,            # TODO: ONLY FOR TEST !
                 )
                 self.logger.info(f'\n>>url: {self.url}')
                 self.logger.info(f'>>header: {header}')
