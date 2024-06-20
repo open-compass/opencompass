@@ -135,8 +135,8 @@ def pack_resource():
 def do_setup():
     print('Usage: python3 setup.py bdist_wheel')
 
-    pack_resource()
-    os.chdir('package')
+    # pack_resource()
+    # os.chdir('package')
 
     setup(
         name='ms-opencompass',      # ModelScope-OpenCompass Version
