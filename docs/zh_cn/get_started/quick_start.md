@@ -22,6 +22,45 @@
 在 OpenCompass 中，每个评估任务由待评估的模型和数据集组成。评估的入口点是 `run.py`。用户可以通过命令行或配置文件选择要测试的模型和数据集。
 
 `````{tabs}
+````{tab} 命令行（自定义 HF 模型）
+
+对于 HuggingFace 模型，用户可以通过命令行直接设置模型参数，无需额外的配置文件。例如，对于 `facebook/opt-125m` 模型，您可以使用以下命令进行评估：
+
+```bash
+python run.py --datasets siqa_gen winograd_ppl \
+--hf-type base \
+--hf-path facebook/opt-125m
+```
+
+请注意，通过这种方式，OpenCompass 一次只评估一个模型，而其他方式可以一次评估多个模型。
+
+```{caution}
+`--hf-num-gpus` 不代表实际用于评估的 GPU 数量，而是该模型所需的最少 GPU 数量。[更多](faq.md#opencompass-如何分配-gpu)
+```
+
+
+
+:::{dropdown} 更详细的示例
+:animate: fade-in-slide-down
+```bash
+python run.py --datasets siqa_gen winograd_ppl \
+--hf-type base \  # HuggingFace 模型类型, base 或 chat
+--hf-path facebook/opt-125m \  # HuggingFace 模型路径
+--tokenizer-path facebook/opt-125m \  # HuggingFace tokenizer 路径（如果与模型路径相同，可以省略）
+--tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # 构建 tokenizer 的参数
+--model-kwargs device_map='auto' \  # 构建模型的参数
+--max-seq-len 2048 \  # 模型可以接受的最大序列长度
+--max-out-len 100 \  # 生成的最大 token 数
+--min-out-len 100 \  # 生成的最小 token 数
+--batch-size 64  \  # 批量大小
+--hf-num-gpus 1  # 运行模型所需的 GPU 数量
+```
+```{seealso}
+有关 `run.py` 支持的所有与 HuggingFace 相关的参数，请阅读 [评测任务发起](../user_guides/experimentation.md#评测任务发起)
+```
+:::
+
+````
 ````{tab} 命令行
 
 用户可以使用 `--models` 和 `--datasets` 结合想测试的模型和数据集。
@@ -70,47 +109,6 @@ python tools/list_configs.py llama mmlu
 如果您想评估其他模型，请查看 “命令行（自定义 HF 模型）”选项卡，了解无需配置文件自定义 HF 模型的方法，或 “配置文件”选项卡，了解准备模型配置的通用方法。
 
 :::
-
-````
-
-````{tab} 命令行（自定义 HF 模型）
-
-对于 HuggingFace 模型，用户可以通过命令行直接设置模型参数，无需额外的配置文件。例如，对于 `facebook/opt-125m` 模型，您可以使用以下命令进行评估：
-
-```bash
-python run.py --datasets siqa_gen winograd_ppl \
---hf-type base \
---hf-path facebook/opt-125m
-```
-
-请注意，通过这种方式，OpenCompass 一次只评估一个模型，而其他方式可以一次评估多个模型。
-
-```{caution}
-`--hf-num-gpus` 不代表实际用于评估的 GPU 数量，而是该模型所需的最少 GPU 数量。[更多](faq.md#opencompass-如何分配-gpu)
-```
-
-
-
-:::{dropdown} 更详细的示例
-:animate: fade-in-slide-down
-```bash
-python run.py --datasets siqa_gen winograd_ppl \
---hf-type base \  # HuggingFace 模型类型, base 或 chat
---hf-path facebook/opt-125m \  # HuggingFace 模型路径
---tokenizer-path facebook/opt-125m \  # HuggingFace tokenizer 路径（如果与模型路径相同，可以省略）
---tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # 构建 tokenizer 的参数
---model-kwargs device_map='auto' \  # 构建模型的参数
---max-seq-len 2048 \  # 模型可以接受的最大序列长度
---max-out-len 100 \  # 生成的最大 token 数
---min-out-len 100 \  # 生成的最小 token 数
---batch-size 64  \  # 批量大小
---hf-num-gpus 1  # 运行模型所需的 GPU 数量
-```
-```{seealso}
-有关 `run.py` 支持的所有与 HuggingFace 相关的参数，请阅读 [评测任务发起](../user_guides/experimentation.md#评测任务发起)
-```
-:::
-
 
 ````
 ````{tab} 配置文件
