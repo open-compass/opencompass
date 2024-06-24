@@ -492,6 +492,7 @@ class OpenAIAllesAPIN(OpenAI):
         return len(enc.encode(prompt))
 
 
+@MODELS.register_module()
 class OpenAIExtra(OpenAI):
     """
     Model wrapper around OpenAI's models with extra features.
