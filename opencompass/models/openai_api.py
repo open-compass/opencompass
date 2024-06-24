@@ -155,8 +155,8 @@ class OpenAI(BaseAPIModel):
         """
         assert isinstance(input, (str, PromptList))
 
-        print(f'>> _generate input type: {type(input)}')
-        print(f'>> _generate input len: {len(input)}')
+        print(f'>> new _generate input type: {type(input)}')
+        print(f'>>new  _generate input len: {len(input)}')
 
         # max num token for gpt-3.5-turbo is 4097
         context_window = 4096
@@ -194,6 +194,7 @@ class OpenAI(BaseAPIModel):
 
         max_num_retries = 0
         while max_num_retries < self.retry:
+            print(f'>>> start process with max_num_retries: {max_num_retries} and total retry: {self.retry}')
             self.wait()
 
             with Lock():
@@ -216,6 +217,8 @@ class OpenAI(BaseAPIModel):
                 'content-type': 'application/json',
                 'api-key': key,
             }
+
+            print(f'>>init header: {header}')
 
             if self.orgs:
                 with Lock():
