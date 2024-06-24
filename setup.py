@@ -135,6 +135,7 @@ def pack_resource():
 def do_setup():
     print('Usage: python3 setup.py bdist_wheel')
 
+    # TODO: pip install -e .  issue with configs
     # pack_resource()
     # os.chdir('package')
 

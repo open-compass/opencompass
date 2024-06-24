@@ -233,13 +233,13 @@ class OpenAI(BaseAPIModel):
                     logprobs=self.logprobs,
                     top_logprobs=self.top_logprobs,
                     stop=None,
-                    temperature=temperature,
+                    temperature=temperature,        # Note: do_sample=False if temperature is 0 else True
 
                     # do_sample=False,            # TODO: ONLY FOR TEST !
                 )
-                self.logger.info(f'\n>>url: {self.url}')
-                self.logger.info(f'>>header: {header}')
-                self.logger.info(f'>>data: {json.dumps(data, ensure_ascii=False)} \n')
+                print(f'\n>>url: {self.url}')
+                print(f'>>header: {header}')
+                print(f'>>data: {json.dumps(data, ensure_ascii=False)} \n')
 
                 # TODO: BY JASON ONLY FOR TEST!  To adapt swift deploy API
 
@@ -250,6 +250,9 @@ class OpenAI(BaseAPIModel):
                 raw_response = requests.post(self.url,
                                              headers=header,
                                              data=json.dumps(data))
+
+                print(f'>> raw_resp: {raw_response}')
+
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')
                 continue
