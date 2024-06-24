@@ -307,11 +307,11 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        # enc = self.tiktoken.encoding_for_model(self.path)
-        # return len(enc.encode(prompt))
+        enc = self.tiktoken.encoding_for_model(self.path)
+        return len(enc.encode(prompt))
 
         # TODO: BY JASON ONLY FOR TEST!
-        return len(prompt)
+        # return len(prompt)
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.
@@ -493,3 +493,64 @@ class OpenAIAllesAPIN(OpenAI):
         """
         enc = self.tiktoken.encoding_for_model(self.path)
         return len(enc.encode(prompt))
+
+
+class OpenAIExtra(OpenAI):
+    """
+    Model wrapper around OpenAI's models with extra features.
+
+    Args:
+        path (str): The name of OpenAI's model.
+        max_seq_len (int): The maximum allowed sequence length of a model.
+            Note that the length of prompt + generated tokens shall not exceed
+            this value. Defaults to 2048.
+        query_per_second (int): The maximum queries allowed per second
+            between two consecutive calls of the API. Defaults to 1.
+        retry (int): Number of retires if the API call fails. Defaults to 2.
+        key (str or List[str]): OpenAI key(s). In particular, when it
+            is set to "ENV", the key will be fetched from the environment
+            variable $OPENAI_API_KEY, as how openai defaults to be. If it's a
+            list, the keys will be used in round-robin manner. Defaults to
+            'ENV'.
+        org (str or List[str], optional): OpenAI organization(s). If not
+            specified, OpenAI uses the default organization bound to each API
+            key. If specified, the orgs will be posted with each request in
+            round-robin manner. Defaults to None.
+        meta_template (Dict, optional): The model's meta prompt
+            template if needed, in case the requirement of injecting or
+            wrapping of any meta instructions.
+        openai_api_base (str): The base url of OpenAI's API. Defaults to
+            'https://api.openai.com/v1/chat/completions'.
+        mode (str, optional): The method of input truncation when input length
+            exceeds max_seq_len. 'front','mid' and 'rear' represents the part
+            of input to truncate. Defaults to 'none'.
+        temperature (float, optional): What sampling temperature to use.
+            If not None, will override the temperature in the `generate()`
+            call. Defaults to None.
+    """
+
+    def __init__(self, *args, **kwargs):
+
+        super(OpenAIExtra, self).__init__(*args, **kwargs)
+
+    def get_token_len(self, prompt: str) -> int:
+        """Get lengths of the tokenized string. Only English and Chinese
+        characters are counted for now. Users are encouraged to override this
+        method if more accurate length is needed.
+
+        Args:
+            prompt (str): Input string.
+
+        Returns:
+            int: Length of the input tokens
+        """
+        english_parts = re.findall(r'[A-Za-z0-9]+', prompt)
+        chinese_parts = re.findall(r'[\u4e00-\u9FFF]+', prompt)
+
+        # Count English words
+        english_count = sum(len(part.split()) for part in english_parts)
+
+        # Count Chinese words
+        chinese_count = sum(len(part) for part in chinese_parts)
+
+        return english_count + chinese_count
