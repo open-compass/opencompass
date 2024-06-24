@@ -147,7 +147,7 @@ def do_setup():
         # url='https://github.com/open-compass/opencompass',
         url='https://github.com/wangxingjun778/opencompass',          # TODO: Update the URL
         include_package_data=True,
-        package_data={'opencompass': ['configs/*',
+        package_data={'opencompass': ['configs/**/*',
                                       'configs/datasets/bbh/lib_prompt/*.txt',
                                       'configs/datasets/scibench/lib_prompt/*.txt',
                                       ]
