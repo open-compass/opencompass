@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import re
 from copy import deepcopy
 from typing import Dict, List, Union
 
@@ -20,15 +19,20 @@ def safe_format(input_str: str, **kwargs) -> str:
     Returns:
         str: The formatted string.
     """
-    segs = [input_str]
+    # import re
+    # segs = [input_str]
+    # for k, v in kwargs.items():
+    #     regex = re.compile(f'(?<={{{k}}})(?={{{k}}})|({{{k}}})')
+    #     segs = [regex.split(seg) for seg in segs]
+    #     segs = sum(segs, [])
+    # replace_dict = {f'{{{k}}}': str(v) for k, v in kwargs.items()}
+    # segs = [replace_dict.get(seg, seg) for seg in segs]
+    # output_str = ''.join(segs)
+    # return output_str
+
     for k, v in kwargs.items():
-        regex = re.compile(f'(?<={{{k}}})(?={{{k}}})|({{{k}}})')
-        segs = [regex.split(seg) for seg in segs]
-        segs = sum(segs, [])
-    replace_dict = {f'{{{k}}}': str(v) for k, v in kwargs.items()}
-    segs = [replace_dict.get(seg, seg) for seg in segs]
-    output_str = ''.join(segs)
-    return output_str
+        input_str = input_str.replace(f'{{{k}}}', str(v))
+    return input_str
 
 
 def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
