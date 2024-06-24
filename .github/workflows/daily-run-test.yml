@@ -32,13 +32,14 @@ jobs:
           conda create -y --name ${{env.CONDA_ENV}} python=3.10
           conda activate ${{env.CONDA_ENV}}
           pip install torch torchvision torchaudio --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-*.whl
           conda info --envs
       - name: Prepare - Pip install code
         run: |
           eval "$(conda shell.bash hook)"
           conda activate ${{env.CONDA_ENV}}
           pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers==4.33.0 protobuf --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install human_eval transformers protobuf --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
       - name: Prepare - prepare data and hf model
         run: |
