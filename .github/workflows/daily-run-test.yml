@@ -32,6 +32,7 @@ jobs:
           conda create -y --name ${{env.CONDA_ENV}} python=3.10
           conda activate ${{env.CONDA_ENV}}
           pip install torch torchvision torchaudio --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-*.whl
           conda info --envs
       - name: Prepare - Pip install code
         run: |
