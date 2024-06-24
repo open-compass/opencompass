@@ -257,7 +257,7 @@ class OpenAI(BaseAPIModel):
                                              headers=header,
                                              data=json.dumps(data))
 
-                print(f'>> raw_resp: {raw_response}')
+                print(f'>> raw_resp: {raw_response.json()}')
 
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')

@@ -65,6 +65,7 @@ class ModelConfig:
     max_seq_len: int = 4096
     batch_size: int = 1
     run_cfg: dict = field(default_factory=lambda: {"num_gpus": 0})
+    generation_kwargs = dict(temperature=0.0)     # It means the do_sample is False in OpenAI API.
 
 
 if __name__ == '__main__':
