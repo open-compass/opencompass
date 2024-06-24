@@ -172,6 +172,8 @@ class OpenAI(BaseAPIModel):
             context_window = self.max_seq_len
             input = self.bin_trim(input, context_window - 100 - max_out_len)
 
+        print(f'>>input: {input}')
+
         if isinstance(input, str):
             messages = [{'role': 'user', 'content': input}]
         else:
@@ -189,6 +191,7 @@ class OpenAI(BaseAPIModel):
         # Hold out 100 tokens due to potential errors in tiktoken calculation
         max_out_len = min(
             max_out_len, context_window - self.get_token_len(str(input)) - 100)
+        print(f'>> max_out_len: {max_out_len}, context_window: {context_window}, input_len: {self.get_token_len(str(input))}')
         if max_out_len <= 0:
             return ''
 
