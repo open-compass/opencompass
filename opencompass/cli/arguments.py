@@ -45,7 +45,7 @@ class Arguments:
     summarizer: str = None
     tokenizer_kwargs: Optional[dict] = field(default_factory=dict)
     tokenizer_path: str = None
-    work_dir: str = None
+    work_dir: str = 'outputs/default'
 
     def __post_init__(self):
         ...
@@ -65,8 +65,7 @@ class ModelConfig:
     max_seq_len: int = 4096
     batch_size: int = 1
     run_cfg: dict = field(default_factory=lambda: {"num_gpus": 0})
-    # generation_kwargs = dict(temperature=0.0)     # TODO：未生效？ It means the do_sample is False in OpenAI API.
-    temperature: float = 0.0
+    temperature: float = 0.0        # It means the do_sample is False in OpenAI API.
 
 
 if __name__ == '__main__':
