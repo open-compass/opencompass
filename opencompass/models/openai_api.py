@@ -77,7 +77,7 @@ class OpenAI(BaseAPIModel):
                          retry=retry)
         import tiktoken
         self.tiktoken = tiktoken
-        self.temperature = temperature
+        self.temperature = temperature if temperature is not None else 0.0
         assert mode in ['none', 'front', 'mid', 'rear']
         self.mode = mode
         self.logprobs = logprobs
