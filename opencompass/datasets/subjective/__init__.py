@@ -10,3 +10,4 @@ from .mtbench import MTBenchDataset  # noqa: F401, F403
 from .mtbench101 import MTBench101Dataset  # noqa: F401, F403
 from .multiround import MultiroundDataset  # noqa: F401, F403
 from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403
+from .wildbench import WildBenchDataset  # noqa: F401, F403

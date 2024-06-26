@@ -69,6 +69,8 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.06.20\]** OpenCompass 现已支持一键切换推理加速后端，助力评测过程更加高效。除了默认的HuggingFace推理后端外，还支持了常用的 [LMDeploy](https://github.com/InternLM/lmdeploy) 和 [vLLM](https://github.com/vllm-project/vllm) ，支持命令行一键切换和部署 API 加速服务两种方式，详细使用方法见[文档](docs/zh_cn/advanced_guides/accelerator_intro.md)。
+  欢迎试用！🔥🔥🔥.
 - **\[2024.05.08\]** 我们支持了以下四个MoE模型的评测配置文件: [Mixtral-8x22B-v0.1](configs/models/mixtral/hf_mixtral_8x22b_v0_1.py), [Mixtral-8x22B-Instruct-v0.1](configs/models/mixtral/hf_mixtral_8x22b_instruct_v0_1.py), [Qwen1.5-MoE-A2.7B](configs/models/qwen/hf_qwen1_5_moe_a2_7b.py), [Qwen1.5-MoE-A2.7B-Chat](configs/models/qwen/hf_qwen1_5_moe_a2_7b_chat.py) 。欢迎试用!
 - **\[2024.04.30\]** 我们支持了计算模型在给定[数据集](configs/datasets/llm_compression/README.md)上的压缩率（Bits per Character）的评测方法（[官方文献](https://github.com/hkust-nlp/llm-compression-intelligence)）。欢迎试用[llm-compression](configs/eval_llm_compression.py)评测集! 🔥🔥🔥
 - **\[2024.04.26\]** 我们报告了典型LLM在常用基准测试上的表现，欢迎访问[文档](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/corebench.html)以获取更多信息！🔥🔥🔥.
@@ -149,6 +151,12 @@ unzip OpenCompassData-core-20240207.zip
 
 ```bash
 python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
+```
+
+另外，如果想使用除了 HuggingFace 外的推理后端进行加速评测，如 LMDeploy 或 vLLM，可以通过以下命令。使用前请确保您已经安装了相应后端的软件包，以及模型支持使用该后端进行加速推理，更多内容见推理加速后端[文档](docs/zh_cn/advanced_guides/accelerator_intro.md)，下面以LMDeploy为例：
+
+```bash
+python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl -a lmdeploy
 ```
 
 OpenCompass 预定义了许多模型和数据集的配置，你可以通过 [工具](./docs/zh_cn/tools.md#ListConfigs) 列出所有可用的模型和数据集配置。

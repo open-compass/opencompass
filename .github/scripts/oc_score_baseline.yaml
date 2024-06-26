@@ -23,9 +23,9 @@ chatglm3-6b-base-hf:
     openbookqa_fact: 92.00
 
 internlm2-7b-hf:
-    ARC-c: 34.92
+    ARC-c: 36.27
     chid-dev: 55.94
     chid-test: 53.70
-    openai_humaneval: 44.51
-    openbookqa: 83.00
-    openbookqa_fact: 83.00
+    openai_humaneval: 45.12
+    openbookqa: 80.00
+    openbookqa_fact: 86.40
