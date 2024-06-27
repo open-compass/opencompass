@@ -68,7 +68,7 @@ class OpenAI(BaseAPIModel):
                  logprobs: Optional[bool] = False,
                  top_logprobs: Optional[int] = None,
                  temperature: Optional[float] = 0.0,
-                 is_chat: bool = True,
+                 is_chat: bool = False,
                  **kwargs):
 
         super().__init__(path=path,
