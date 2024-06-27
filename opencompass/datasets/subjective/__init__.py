@@ -3,6 +3,7 @@ from .arena_hard import ArenaHardDataset  # noqa: F401, F403
 from .compass_arena import CompassArenaDataset  # noqa: F401, F403
 from .compassbench import CompassBenchDataset  # noqa: F401, F403
 from .corev2 import Corev2Dataset  # noqa: F401, F403
+from .crb import CRBDataset  # noqa: F401, F403
 from .creationbench import CreationBenchDataset  # noqa: F401, F403
 from .fofo import FofoDataset  # noqa: F401, F403
 from .information_retrival import IRDataset  # noqa: F401, F403
