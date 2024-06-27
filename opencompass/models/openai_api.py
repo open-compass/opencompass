@@ -67,7 +67,9 @@ class OpenAI(BaseAPIModel):
                  mode: str = 'none',
                  logprobs: Optional[bool] = False,
                  top_logprobs: Optional[int] = None,
-                 temperature: Optional[float] = 0.0):
+                 temperature: Optional[float] = 0.0,
+                 is_chat: bool = True,
+                 **kwargs):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -105,6 +107,7 @@ class OpenAI(BaseAPIModel):
         self.org_ctr = 0
         self.url = openai_api_base
         self.path = path
+        self.is_chat = is_chat
 
     def generate(self,
                  inputs: List[PromptType],
@@ -172,8 +175,6 @@ class OpenAI(BaseAPIModel):
             context_window = self.max_seq_len
             input = self.bin_trim(input, context_window - 100 - max_out_len)
 
-        print(f'>>input: {input}')
-
         if isinstance(input, str):
             messages = [{'role': 'user', 'content': input}]
         else:
@@ -188,16 +189,18 @@ class OpenAI(BaseAPIModel):
                     msg['role'] = 'system'
                 messages.append(msg)
 
+        # Examples of messages:
+        #   [{'role': 'user', 'content': 'Say this is a test'}]
+        #   [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'Hi, who are you?'}, {'role': 'assistant', 'content': 'I am AI assistant.'}]
+
         # Hold out 100 tokens due to potential errors in tiktoken calculation
         max_out_len = min(
             max_out_len, context_window - self.get_token_len(str(input)) - 100)
-        print(f'>> max_out_len: {max_out_len}, context_window: {context_window}, input_len: {self.get_token_len(str(input))}')
         if max_out_len <= 0:
             return ''
 
         max_num_retries = 0
         while max_num_retries < self.retry:
-            print(f'>>> start process with max_num_retries: {max_num_retries} and total retry: {self.retry}')
             self.wait()
 
             with Lock():
@@ -221,8 +224,6 @@ class OpenAI(BaseAPIModel):
                 'api-key': key,
             }
 
-            print(f'>>init header: {header}')
-
             if self.orgs:
                 with Lock():
                     self.org_ctr += 1
@@ -231,23 +232,33 @@ class OpenAI(BaseAPIModel):
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
             try:
-                data = dict(
-                    model=self.path,
-                    messages=messages,
-                    max_tokens=max_out_len,
-                    n=1,
-                    logprobs=self.logprobs,
-                    top_logprobs=self.top_logprobs,
-                    stop=None,
-                    temperature=temperature,        # Note: do_sample=False if temperature is 0 else True
+                if self.is_chat:
+                    data = dict(
+                        model=self.path,
+                        messages=messages,
+                        max_tokens=max_out_len,
+                        n=1,
+                        logprobs=self.logprobs,
+                        top_logprobs=self.top_logprobs,
+                        stop=None,
+                        temperature=temperature,
+                    )
+                else:
+                    # TODO: This is a temporary solution for non-chat models.
+                    input_prompts = []
+                    for msg in messages:
+                        input_prompts.append(msg['content'])
 
-                    # do_sample=False,            # TODO: ONLY FOR TEST !
-                )
+                    data = dict(
+                        model=self.path,
+                        prompt='\n'.join(input_prompts),
+                        max_tokens=max_out_len,
+                        temperature=temperature,
+                    )
+
                 print(f'\n>>url: {self.url}')
                 print(f'>>header: {header}')
                 print(f'>>data: {json.dumps(data, ensure_ascii=False)} \n')
-
-                # TODO: BY JASON ONLY FOR TEST!  To adapt swift deploy API
 
                 def remove_none_val(input_d: dict):
                     return {k: v for k, v in input_d.items() if v is not None}
@@ -257,13 +268,12 @@ class OpenAI(BaseAPIModel):
                                              headers=header,
                                              data=json.dumps(data))
 
-                print(f'>> raw_resp: {raw_response.json()}')
-
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')
                 continue
             try:
                 response = raw_response.json()
+                print(f'>> raw_resp: {raw_response.json()}')
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
@@ -273,7 +283,10 @@ class OpenAI(BaseAPIModel):
                 if self.logprobs:
                     return response['choices']
                 else:
-                    return response['choices'][0]['message']['content'].strip()
+                    if self.is_chat:
+                        return response['choices'][0]['message']['content'].strip()
+                    else:
+                        return response['choices'][0]['text'].strip()
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
