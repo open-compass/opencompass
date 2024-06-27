@@ -52,13 +52,13 @@ class Arguments:
 
 
 @dataclass
-class ModelConfig:
+class ApiModelConfig:
     abbr: str       # The abbreviation of the model, e.g. 'Qwen-7B-Chat'
     path: str       # The path of the model, e.g. 'qwen/Qwen-7B-Chat', you can set it to the value of abbr in the format of OpenAI.
     openai_api_base: str   # The base URL of the OpenAI API, e.g. `http://127.0.0.1:8000/v1/chat/completions`
 
     meta_template: Union[str, dict] = None
-    type: str = 'opencompass.models.OpenAIExtra'     # dump type err: OpenAI ?
+    type: str = 'opencompass.models.OpenAIExtra'
     key: str = 'default_openai_api_key'    # No need for APIs in the format of OpenAI.
     query_per_second: int = 1
     max_out_len: int = 2048
@@ -66,6 +66,7 @@ class ModelConfig:
     batch_size: int = 1
     run_cfg: dict = field(default_factory=lambda: {"num_gpus": 0})
     temperature: float = 0.0        # It means the do_sample is False in OpenAI API.
+    is_chat: bool = True
 
 
 if __name__ == '__main__':
