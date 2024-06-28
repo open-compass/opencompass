@@ -14,12 +14,13 @@ for abbr, path, num_gpus in settings:
             type=TurboMindModel,
             abbr=abbr,
             path=path,
-            engine_config=dict(session_len=2048, max_batch_size=16, tp=num_gpus),
+            engine_config=dict(session_len=7168, max_batch_size=16, tp=num_gpus),
             gen_config=dict(top_k=1, temperature=1, top_p=0.9, max_new_tokens=1024),
             max_out_len=1024,
-            max_seq_len=2048,
+            max_seq_len=7168,
             batch_size=16,
             concurrency=16,
             run_cfg=dict(num_gpus=num_gpus),
+            stop_words=['<|im_end|>', '<|im_start|>'],
         )
     )

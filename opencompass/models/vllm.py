@@ -126,11 +126,22 @@ class VLLM(BaseModel):
             ]
             prompt_logprobs_list = [i.logprob for i in prompt_logprobs_list]
             prompt_logprobs_list = np.array(prompt_logprobs_list)
+            if mask_length is not None:
+                prompt_logprobs_list = prompt_logprobs_list[-mask_length[i]:]
             loss = -prompt_logprobs_list.sum(axis=-1) / len(prompt_token_ids)
             ce_loss.append(loss)
         return np.array(ce_loss)
 
-    def get_token_len(self, prompt: str) -> int:
+    def get_loglikelihood(self, inputs: List[str],
+                          conts: List[str]) -> List[float]:
+        mask_length = [
+            self.get_token_len(c, add_special_tokens=False) for c in conts
+        ]
+        return -self.get_ppl(inputs, mask_length)
+
+    def get_token_len(self,
+                      prompt: str,
+                      add_special_tokens: bool = True) -> int:
         """Get lengths of the tokenized strings.
 
         Args:
@@ -139,4 +150,7 @@ class VLLM(BaseModel):
         Returns:
             int: Length of the input tokens
         """
-        return len(self.model.get_tokenizer().encode(prompt))
+        tokenizer = self.model.get_tokenizer()
+        token_ids = tokenizer.encode(prompt,
+                                     add_special_tokens=add_special_tokens)
+        return len(token_ids)

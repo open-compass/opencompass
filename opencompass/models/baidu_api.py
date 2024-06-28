@@ -147,6 +147,8 @@ class ERNIEBot(BaseAPIModel):
             messages = []
             msg_buffer, last_role = [], None
             for item in input:
+                if not item['prompt']:
+                    continue
                 if item['role'] == 'BOT':
                     role = 'assistant'
                 else:  # USER or SYSTEM

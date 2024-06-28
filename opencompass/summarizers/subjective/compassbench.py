@@ -1,5 +1,6 @@
 # flake8: noqa
 # yapf: disable
+import copy
 import os
 import os.path as osp
 import re
@@ -7,7 +8,7 @@ from collections import defaultdict
 from datetime import datetime
 from itertools import product
 
-import mmengine
+import pandas as pd
 from mmengine import ConfigDict
 from tabulate import tabulate
 
@@ -115,12 +116,14 @@ class CompassBenchSummarizer:
                     win_model2 = defaultdict(float)
                     categories = defaultdict(float)
                     difficulties = defaultdict(float)
+                    languages = defaultdict(float)
                     model1 = references[0]['answer1']
                     model2 = references[0]['answer2']
                     for prediction, reference in zip(judged_answers, references):
                         categories[dataset_abbr] += 1
                         categories[reference['category']] += 1
-                        difficulties[reference['level']] += 1
+                        difficulties['Level-' + str(reference['level'])] += 1
+                        languages['Lan-' + reference['lan']] += 1
 
                         if prediction == 'A':
                             if reference['answer1'] == model1:
@@ -140,8 +143,12 @@ class CompassBenchSummarizer:
 
                         win_model1[reference['category']] += score_1
                         win_model1[dataset_abbr] += score_1
+                        win_model1['Level-' + str(reference['level'])] += score_1
+                        win_model1['Lan-' + reference['lan']] += score_1
                         win_model2[reference['category']] += score_2
                         win_model2[dataset_abbr] += score_2
+                        win_model2['Level-' + str(reference['level'])] += score_2
+                        win_model2['Lan-' + reference['lan']] += score_2
                     for category in categories:
                         win_model1[category] = win_model1[category] / categories[category] * 100
                         win_model1[category] = round(win_model1[category], 2)
@@ -149,6 +156,12 @@ class CompassBenchSummarizer:
                         win_model2[category] = round(win_model2[category], 2)
                     win_model1['position_bias'] = bias_num
                     win_model2['position_bias'] = bias_num
+                    for difficulty in difficulties:
+                        win_model1[difficulty] = win_model1[difficulty] / difficulties[difficulty] * 100
+                        win_model2[difficulty] = win_model2[difficulty] / difficulties[difficulty] * 100
+                    for language in languages:
+                        win_model1[language] = win_model1[language] / languages[language] * 100
+                        win_model2[language] = win_model2[language] / languages[language] * 100
 
                     if judge_model not in scores:
                         scores[judge_model] = {}
@@ -156,7 +169,7 @@ class CompassBenchSummarizer:
                         scores[judge_model][dataset_abbr] = {}
                     scores[judge_model][dataset_abbr][model2] = win_model2
 
-        return scores
+        return scores, difficulties, languages
 
     def summarize(
             self,
@@ -172,10 +185,10 @@ class CompassBenchSummarizer:
         """
 
 
-        scores = self.get_score(time_str)
+        scores, difficulties, languages = self.get_score(time_str)
         # scores['win_' + model1] = win_model1
         output_dir, results_folder = get_outdir(self.cfg, time_str)
-
+        all_judge_file_list = []
 
         for idx, judge_model in enumerate(self.judge_models):
             judge_abbr = model_abbr_from_cfg(judge_model)
@@ -183,8 +196,13 @@ class CompassBenchSummarizer:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
                 summarizer_model_abbrs = [model_abbr_from_cfg_used_in_summarizer(i) for i in self.compare_models]
                 one_column = list(scores[judge_abbr][dataset_abbr].values())[0]
-                row_headers = [i for i in one_column.keys() if i not in [dataset_abbr, 'position_bias']]
-                row_headers = [dataset_abbr, 'position_bias'] + row_headers
+                detail_headers = [i for i in one_column.keys() if i not in [dataset_abbr, 'position_bias'] and i not in difficulties and i not in languages]
+                row_headers = [dataset_abbr, 'position_bias']
+                for difficulty in difficulties:
+                    row_headers += [difficulty]
+                for language in languages:
+                    row_headers += [language]
+                row_headers += detail_headers
                 headers = [''] + summarizer_model_abbrs
                 table = []
                 for row_header in row_headers:
@@ -199,7 +217,7 @@ class CompassBenchSummarizer:
                         row.append(s)
                     table.append(row)
                 txt = tabulate(table, headers=headers)
-                print(txt)
+                # print(txt)
 
                 if idx == len(self.judge_models):
                     output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
@@ -211,31 +229,15 @@ class CompassBenchSummarizer:
                     for line in table:
                         f.write(','.join(line) + '\n')
                 print(output_filename)
+                all_judge_file_list.append(output_filename)
 
-            table = []
-            summarizer_model_abbrs = [model_abbr_from_cfg_used_in_summarizer(i) for i in self.compare_models]
-            headers = [''] + summarizer_model_abbrs
-            for dataset in self.cfg['datasets']:
-                dataset_abbr = dataset_abbr_from_cfg(dataset)
-                row = [dataset_abbr]
-                for model_cfg in self.compare_models:
-                    model_abbr = model_abbr_from_cfg(model_cfg)
-                    s = scores[judge_abbr][dataset_abbr][model_abbr].get(dataset_abbr, '')
-                    if isinstance(s, float):
-                        s = f'{s:.2f}'
-                    if isinstance(s, int):
-                        s = str(s)
-                    row.append(s)
-                table.append(row)
-            txt = tabulate(table, headers=headers)
-            print(txt)
+        dfs = [pd.read_csv(file) for file in all_judge_file_list]
 
-            if idx == len(self.judge_models):
-                output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-overall-report.csv')
-            else:
-                output_filename = osp.join(output_dir, 'judged-by--' + judge_abbr + '-overall-report.csv')
-            with open(output_filename, 'w') as f:
-                f.write(','.join(headers) + '\n')
-                for line in table:
-                    f.write(','.join(line) + '\n')
-            print(output_filename)
+        if len(dfs) > 1:
+            average_df = copy.deepcopy(dfs[0])
+            for col in dfs[0].columns[1:]:
+                for i in range(1, len(dfs[0])):
+                    average_df[col][i] = round(sum(df[col][i] for df in dfs) / len(dfs), 2)
+            average_csv_path = osp.join(output_dir,  'Averaged-' + dataset_abbr + '-report.csv')
+            average_df.to_csv(average_csv_path, index=False)
+            print(average_csv_path)
