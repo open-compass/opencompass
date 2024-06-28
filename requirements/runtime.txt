@@ -34,7 +34,7 @@ rouge
 -e git+https://github.com/Isaac-JL-Chen/rouge_chinese.git@master#egg=rouge_chinese
 rouge_score
 sacrebleu
-scikit_learn==1.2.1
+scikit_learn==1.5.0
 seaborn
 sentence_transformers==2.2.2
 tabulate

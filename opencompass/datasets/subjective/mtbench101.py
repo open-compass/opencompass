@@ -5,6 +5,7 @@ import re
 from typing import Optional
 
 from datasets import Dataset, DatasetDict
+from torch.utils.data import DataLoader
 
 from opencompass.registry import LOAD_DATASET
 
