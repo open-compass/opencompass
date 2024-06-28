@@ -59,7 +59,7 @@ class ApiModelConfig:
 
     meta_template: Union[str, dict] = None
     type: str = 'opencompass.models.OpenAIExtra'
-    key: str = 'default_openai_api_key'    # No need for APIs in the format of OpenAI.
+    key: str = 'EMPTY'    # No need for APIs in the format of OpenAI.
     query_per_second: int = 1
     max_out_len: int = 2048
     max_seq_len: int = 4096
