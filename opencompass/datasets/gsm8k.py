@@ -9,22 +9,28 @@ from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from .base import BaseDataset
 
+from os import environ
+from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class GSM8KDataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        datasets = {}
-        for split in ['train', 'test']:
-            split_path = os.path.join(path, split + '.jsonl')
-            dataset = []
-            with open(split_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    line = json.loads(line.strip())
-                    dataset.append(line)
-            datasets[split] = Dataset.from_list(dataset)
-        return DatasetDict(datasets)
+        if environ.get("DATASET_SOURCE") == "ModelScope":
+            dataset = MsDataset.load(dataset_name=path)
+        else:
+            datasets = {}
+            for split in ['train', 'test']:
+                split_path = os.path.join(path, split + '.jsonl')
+                dataset = []
+                with open(split_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = json.loads(line.strip())
+                        dataset.append(line)
+                datasets[split] = Dataset.from_list(dataset)
+            dataset = DatasetDict(datasets)
+        return dataset
 
 
 @TEXT_POSTPROCESSORS.register_module('gsm8k_dataset')

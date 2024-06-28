@@ -1,3 +1,4 @@
+from os import environ
 from mmengine.config import read_base
 from opencompass.models import ZhiPuV2AI
 from opencompass.partitioners import NaivePartitioner
@@ -7,10 +8,13 @@ from opencompass.tasks import OpenICLInferTask
 with read_base():
     # from .datasets.collections.chat_medium import datasets
     from ..summarizers.medium import summarizer
-    from ..datasets.ceval.ceval_gen import ceval_datasets
+    # from ..datasets.ceval.ceval_gen import ceval_datasets as cur_datasets
+    # from ..datasets.ceval.ceval_clean_ppl import ceval_datasets as cur_datasets
+    # from ..datasets.GaokaoBench.GaokaoBench_gen import GaokaoBench_datasets as cur_datasets
+    from ..datasets.gsm8k.gsm8k_gen import gsm8k_datasets as cur_datasets
 
 datasets = [
-    *ceval_datasets,
+    *cur_datasets,
 ]
 
 # needs a special postprocessor for all
@@ -34,10 +38,10 @@ api_meta_template = dict(
 
 models = [
      dict(
-        abbr='glm4_notools',
+        abbr='glm-4-flash',
         type=ZhiPuV2AI,
-        path='glm-4',
-        key='xxxxxx',
+        path='glm-4-flash',
+        key=environ["ZHIPU_API_KEY"],
         generation_kwargs={
             'tools': [
                 {
@@ -52,16 +56,18 @@ models = [
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
-        batch_size=8)
+        batch_size=1)
 ]
 
 infer = dict(
     partitioner=dict(type=NaivePartitioner),
     runner=dict(
         type=LocalAPIRunner,
-        max_num_workers=2,
-        concurrent_users=2,
-        task=dict(type=OpenICLInferTask)),
+        max_num_workers=1,
+        concurrent_users=1,
+        task=dict(type=OpenICLInferTask),
+        debug=True,
+        )
 )
 
 work_dir = 'outputs/api_zhipu_v2/'
