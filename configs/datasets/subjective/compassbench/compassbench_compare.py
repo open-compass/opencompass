@@ -13,7 +13,7 @@ data_path ='data/subjective/compassbench'
 
 subjective_datasets = []
 
-versions = ['CompassbenchV1']
+versions = ['CompassBenchV1.1']
 
 for version_abbr in versions:
     subjective_infer_cfg = dict(

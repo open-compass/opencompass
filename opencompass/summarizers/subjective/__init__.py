@@ -5,6 +5,7 @@ from .alpacaeval import AlpacaSummarizer
 from .arenahard import ArenaHardSummarizer
 from .compass_arena import CompassArenaSummarizer
 from .compassbench import CompassBenchSummarizer
+from .compassbench_th import CompassBenchTHSummarizer
 from .corev2 import Corev2Summarizer
 from .creationbench import CreationBenchSummarizer
 from .flames import FlamesSummarizer

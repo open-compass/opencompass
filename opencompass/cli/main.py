@@ -242,11 +242,14 @@ def main():
 
     # update "actual" work_dir
     cfg['work_dir'] = osp.join(cfg.work_dir, dir_time_str)
+    current_workdir = cfg['work_dir']
+    logger.info(f'Current exp folder: {current_workdir}')
+
     os.makedirs(osp.join(cfg.work_dir, 'configs'), exist_ok=True)
 
     # dump config
     output_config_path = osp.join(cfg.work_dir, 'configs',
-                                  f'{cfg_time_str}.py')
+                                  f'{cfg_time_str}_{os.getpid()}.py')
     cfg.dump(output_config_path)
     # Config is intentally reloaded here to avoid initialized
     # types cannot be serialized

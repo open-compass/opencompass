@@ -15,7 +15,7 @@ from mmengine.config import ConfigDict
 from tqdm import tqdm
 
 from opencompass.registry import RUNNERS, TASKS
-from opencompass.utils import get_logger
+from opencompass.utils import get_logger, model_abbr_from_cfg
 
 from .base import BaseRunner
 
@@ -110,11 +110,13 @@ class LocalRunner(BaseRunner):
                         if 'infer' in self.task_cfg.type.lower():
                             # If a model instance already exists,
                             # do not reload it.
-                            if hasattr(self, 'cur_model'):
-                                task.run(self.cur_model)
-                            else:
-                                task.run()
+                            task.run(cur_model=getattr(self, 'cur_model',
+                                                       None),
+                                     cur_model_abbr=getattr(
+                                         self, 'cur_model_abbr', None))
                             self.cur_model = task.model
+                            self.cur_model_abbr = model_abbr_from_cfg(
+                                task.model_cfg)
                         else:
                             task.run()
                     else:

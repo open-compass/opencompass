@@ -12,35 +12,32 @@ PromptType = Union[PromptList, str]
 
 
 def _get_stopping_criteria(stop_words, tokenizer, batch_size):
-    from transformers import (PreTrainedTokenizer, StoppingCriteria,
-                              StoppingCriteriaList)
+    from transformers import StoppingCriteria, StoppingCriteriaList
 
     class MultiTokenEOSCriteria(StoppingCriteria):
         """Criteria to stop on the specified multi-token sequence."""
 
-        def __init__(self, sequence: str, tokenizer: PreTrainedTokenizer, batch_size: int):
+        def __init__(self, stop_words: List[str], tokenizer, batch_size: int):
             self.done_tracker = [False] * batch_size
-            self.sequence = sequence
-            self.sequence_ids = tokenizer.encode(sequence, add_special_tokens=False)
-            self.sequence_id_len = len(self.sequence_ids)
+            self.stop_words, self.max_sequence_id_len = [], 0
+            for s in stop_words:
+                self.stop_words.append(s)
+                sequence_ids = tokenizer.encode(s, add_special_tokens=False)
+                self.max_sequence_id_len = max(self.max_sequence_id_len, len(sequence_ids))
             self.tokenizer = tokenizer
 
         def __call__(self, input_ids, scores, **kwargs) -> bool:
             # compare the last len(stop) tokens
-            lookback_ids_batch = input_ids[:, -self.sequence_id_len:]
+            lookback_ids_batch = input_ids[:, -self.max_sequence_id_len:]
             lookback_tokens_batch = self.tokenizer.batch_decode(lookback_ids_batch)
             for i, done in enumerate(self.done_tracker):
                 if done:
                     continue
-                self.done_tracker[i] = self.sequence in lookback_tokens_batch[i]
+                self.done_tracker[i] = any(s in lookback_tokens_batch[i] for s in self.stop_words)
             return False not in self.done_tracker
 
-    criteria = []
-    for stop_word in stop_words:
-        c = MultiTokenEOSCriteria(stop_word, tokenizer, batch_size)
-        criteria.append(c)
-    criteria = StoppingCriteriaList(criteria)
-    return criteria
+    c = MultiTokenEOSCriteria(stop_words, tokenizer, batch_size)
+    return StoppingCriteriaList([c])
 
 def _get_possible_max_seq_len(max_seq_len, path):
     if max_seq_len is not None:
@@ -59,7 +56,7 @@ def _get_possible_max_seq_len(max_seq_len, path):
     raise ValueError('max_seq_len is not provided and cannot be inferred from the model config.')
 
 
-def _convert_chat_messages(inputs, merge_role=True):
+def _convert_chat_messages(inputs, merge_role=True, skip_empty_prompt=True):
     outputs = []
     for _input in inputs:
         messages = []
@@ -67,6 +64,8 @@ def _convert_chat_messages(inputs, merge_role=True):
             messages.append({'role': 'user', 'content': _input})
         else:
             for item in _input:
+                if skip_empty_prompt and not item['prompt']:
+                    continue
                 role = {
                     'HUMAN': 'user',
                     'BOT': 'assistant',
@@ -169,6 +168,7 @@ class HuggingFacewithChatTemplate(BaseModel):
         self.generation_kwargs = generation_kwargs
         self.fastchat_template = fastchat_template
         self.stop_words = list(set(stop_words + self._get_potential_stop_words(path)))
+        self.logger.info(f'using stop words: {self.stop_words}')
 
         for k, v in other_kwargs.items():
             if v is not None:
@@ -231,12 +231,19 @@ class HuggingFacewithChatTemplate(BaseModel):
         potential_stop_words = []
         try:
             generation_config = GenerationConfig.from_pretrained(path)
-            for token_id in generation_config.eos_token_id:
-                potential_stop_words.append(self.tokenizer.decode(token_id))
         except:
-            pass
-        potential_stop_words.append(self.tokenizer.eos_token)
+            generation_config = None
+        if generation_config and hasattr(generation_config, 'eos_token_id'):
+            if isinstance(generation_config.eos_token_id, int):
+                potential_stop_words.append(self.tokenizer.decode(generation_config.eos_token_id))
+            else:
+                assert isinstance(generation_config.eos_token_id, list)
+                for token_id in generation_config.eos_token_id:
+                    potential_stop_words.append(self.tokenizer.decode(token_id))
+        if self.tokenizer.eos_token is not None:
+            potential_stop_words.append(self.tokenizer.eos_token)
         potential_stop_words = list(set(potential_stop_words))
+        potential_stop_words = [s for s in potential_stop_words if s]
         return potential_stop_words
 
     def generate(self,

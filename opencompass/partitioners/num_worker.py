@@ -29,12 +29,17 @@ class NumWorkerPartitioner(BasePartitioner):
     def __init__(self,
                  out_dir: str,
                  num_worker: int = 8,
+                 num_worker_split: Optional[int] = None,
                  min_task_size: int = 16,
                  strategy: str = 'heuristic',
                  dataset_size_path: str = '.cache/dataset_size.json',
                  keep_keys: Optional[List[str]] = None):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
+        if strategy == 'split' and num_worker_split is not None:
+            self.logger.warning('num_worker_split is ignored with split.')
+
         self.num_worker = num_worker
+        self.num_worker_split = num_worker_split or num_worker
         self.min_task_size = min_task_size
         self.dataset_size_path = dataset_size_path
         assert strategy in ('heuristic', 'split'), \
@@ -72,9 +77,9 @@ class NumWorkerPartitioner(BasePartitioner):
                                 chunks.append(dataset_split)
 
                 if self.strategy == 'heuristic':
-                    buckets = [[] for _ in range(self.num_worker)]
+                    buckets = [[] for _ in range(self.num_worker_split)]
                     for i, chunk in enumerate(chunks):
-                        buckets[i % self.num_worker].append(chunk)
+                        buckets[i % self.num_worker_split].append(chunk)
 
                     for bucket in buckets:
                         if len(bucket) > 0:
