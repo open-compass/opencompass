@@ -2,12 +2,14 @@ import csv
 import json
 import os.path as osp
 
+from os import environ
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
+from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class CEvalDataset(BaseDataset):
@@ -15,18 +17,21 @@ class CEvalDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         dataset = {}
-        for split in ['dev', 'val', 'test']:
-            filename = osp.join(path, split, f'{name}_{split}.csv')
-            with open(filename, encoding='utf-8') as f:
-                reader = csv.reader(f)
-                header = next(reader)
-                for row in reader:
-                    item = dict(zip(header, row))
-                    item.setdefault('explanation', '')
-                    item.setdefault('answer', '')
-                    dataset.setdefault(split, []).append(item)
-        dataset = {i: Dataset.from_list(dataset[i]) for i in dataset}
-        return DatasetDict(dataset)
+        if environ.get("DATASET_SOURCE") == "ModelScope":
+            dataset = MsDataset.load(dataset_name=path, subset_name=name)
+        else:
+            for split in ['dev', 'val', 'test']:
+                filename = osp.join(path, split, f'{name}_{split}.csv')
+                with open(filename, encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    header = next(reader)
+                    for row in reader:
+                        item = dict(zip(header, row))
+                        item.setdefault('explanation', '')
+                        item.setdefault('answer', '')
+                        dataset.setdefault(split, []).append(item)
+            dataset = DatasetDict({i: Dataset.from_list(dataset[i]) for i in dataset})
+        return dataset
 
 
 class CEvalDatasetClean(BaseDataset):
@@ -53,24 +58,37 @@ class CEvalDatasetClean(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         dataset = {}
-        for split in ['dev', 'val', 'test']:
-            if split == 'val':
-                annotations = CEvalDatasetClean.load_contamination_annotations(
-                    path, split)
-            filename = osp.join(path, split, f'{name}_{split}.csv')
-            with open(filename, encoding='utf-8') as f:
-                reader = csv.reader(f)
-                header = next(reader)
-                for row_index, row in enumerate(reader):
-                    item = dict(zip(header, row))
-                    item.setdefault('explanation', '')
-                    item.setdefault('answer', '')
-                    if split == 'val':
-                        row_id = f'{name}-{row_index}'
-                        if row_id in annotations:
-                            item['is_clean'] = annotations[row_id][0]
-                        else:
-                            item['is_clean'] = 'not labeled'
-                    dataset.setdefault(split, []).append(item)
-        dataset = {i: Dataset.from_list(dataset[i]) for i in dataset}
-        return DatasetDict(dataset)
+        if environ.get("DATASET_SOURCE") == "ModelScope":
+            dataset = MsDataset.load(dataset_name=path, subset_name=name)
+            # 向该数据添加 'is_clean' 字段
+            annotations = CEvalDatasetClean.load_contamination_annotations(path, 'val')
+            val = dataset['val']
+            val_data = []
+            for index in range(val.num_rows):
+                row = val[index]
+                row_id = f'{name}-{index}'
+                row.update({'is_clean': annotations[row_id][0] if row_id in annotations else 'not labeled'})
+                val_data.append(row)
+            dataset['val'] = Dataset.from_list(val_data)
+        else:
+            for split in ['dev', 'val', 'test']:
+                if split == 'val':
+                    annotations = CEvalDatasetClean.load_contamination_annotations(
+                        path, split)
+                filename = osp.join(path, split, f'{name}_{split}.csv')
+                with open(filename, encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    header = next(reader)
+                    for row_index, row in enumerate(reader):
+                        item = dict(zip(header, row))
+                        item.setdefault('explanation', '')
+                        item.setdefault('answer', '')
+                        if split == 'val':
+                            row_id = f'{name}-{row_index}'
+                            if row_id in annotations:
+                                item['is_clean'] = annotations[row_id][0]
+                            else:
+                                item['is_clean'] = 'not labeled'
+                        dataset.setdefault(split, []).append(item)
+            dataset = DatasetDict({i: Dataset.from_list(dataset[i]) for i in dataset})
+        return dataset
