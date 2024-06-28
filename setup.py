@@ -147,14 +147,15 @@ def do_setup():
         # url='https://github.com/open-compass/opencompass',
         url='https://github.com/wangxingjun778/opencompass',          # TODO: Update the URL
         include_package_data=True,
-        package_data={'opencompass': ['configs/**/*',
+        package_data={'opencompass': ['configs/*.py',
+                                      'configs/datasets/**/*',
                                       'configs/datasets/bbh/lib_prompt/*.txt',
                                       'configs/datasets/scibench/lib_prompt/*.txt',
                                       ]
                       },
         long_description=readme(),
         long_description_content_type='text/markdown',
-        maintainer='OpenCompass Authors',
+        maintainer='OpenCompass Authors, ModelScope Contributors',
         cmdclass={'download_nltk': DownloadNLTK},
         setup_requires=['nltk==3.8'],
         python_requires='>=3.8.0',
