@@ -136,8 +136,8 @@ def do_setup():
     print('Usage: python3 setup.py bdist_wheel')
 
     # TODO: pip install -e .  issue with `opencompass.configs.xxx` import
-    # pack_resource()
-    # os.chdir('package')
+    pack_resource()
+    os.chdir('package')
 
     setup(
         name='ms-opencompass',      # ModelScope-OpenCompass Version
@@ -147,12 +147,15 @@ def do_setup():
         # url='https://github.com/open-compass/opencompass',
         url='https://github.com/wangxingjun778/opencompass',          # TODO: Update the URL
         include_package_data=True,
-        package_data={'opencompass': ['configs/*.py',
-                                      'configs/datasets/**/*',
-                                      'configs/datasets/bbh/lib_prompt/*.txt',
-                                      'configs/datasets/scibench/lib_prompt/*.txt',
-                                      ]
-                      },
+        # package_data={'opencompass': ['configs/*.py',
+        #                               'configs/datasets/**/*',
+        #                               'configs/datasets/bbh/lib_prompt/*.txt',
+        #                               'configs/datasets/scibench/lib_prompt/*.txt',
+        #                               ]
+        #               },
+        package_data={
+            '': ['*.txt'],
+        },
         long_description=readme(),
         long_description_content_type='text/markdown',
         maintainer='OpenCompass Authors, ModelScope Contributors',
