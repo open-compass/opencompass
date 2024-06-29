@@ -47,6 +47,9 @@ class Arguments:
     tokenizer_path: str = None
     work_dir: str = 'outputs/default'
 
+    # refer to: test_range in `opencompass.openicl.icl_dataset_reader.DatasetReader`
+    limit: Optional[Union[int, float, str]] = None
+
     def __post_init__(self):
         ...
 

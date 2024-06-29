@@ -145,7 +145,7 @@ def do_setup():
         version=get_version(),
         description='A comprehensive toolkit for large model evaluation',
         # url='https://github.com/open-compass/opencompass',
-        url='https://github.com/wangxingjun778/opencompass',          # TODO: Update the URL
+        url='https://github.com/wangxingjun778/opencompass',
         include_package_data=True,
         # package_data={'opencompass': ['configs/*.py',
         #                               'configs/datasets/**/*',
