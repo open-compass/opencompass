@@ -13,18 +13,8 @@ from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
-
-HUMANEVAL_IMPORT_ERROR = '''\
-Please install human_eval use following steps:
-git clone git@github.com:open-compass/human-eval.git
-cd human-eval && pip install -e .'''
-
-HUMANEVAL_PLUS_IMPORT_ERROR = '''\
-Please install evalplus use following steps:
-git clone --recurse-submodules git@github.com:open-compass/human-eval.git
-cd human-eval
-pip install -e .
-pip install -e evalplus'''
+from modelscope import MsDataset
+from os import environ
 
 @LOAD_DATASET.register_module()
 class HumanevalDataset(BaseDataset):
@@ -46,12 +36,20 @@ class HumanevalDataset(BaseDataset):
             num_repeats(int): Number of repetition for this dataset to get
         multiple responses in special cases.
         """
-        dataset = []
-        with open(path, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = json.loads(line)
-                dataset.extend([copy.deepcopy(line) for _ in range(num_repeats)])
-        return Dataset.from_list(dataset)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            dataset = MsDataset.load(path, subset_name='openai_humaneval', split='test')
+            dataset_list = []
+            for example in dataset:
+                dataset_list.extend([example] * num_repeats)
+            dataset = Dataset.from_list(dataset_list)
+        else:
+            dataset = []
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    dataset.extend(
+                        [json.loads(line.strip()) for _ in range(num_repeats)])
+            dataset = Dataset.from_list(dataset)
+        return dataset
 
 
 class HumanEvalEvaluator(BaseEvaluator):

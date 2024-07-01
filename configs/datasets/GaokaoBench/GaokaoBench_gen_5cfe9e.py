@@ -285,7 +285,7 @@ for _folder, _prompts in [
             },
             'pred_role': 'BOT',
         }
-        _base_path = 'opencompass/gaokao-benchmark' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/GAOKAO-BENCH/data',
+        _base_path = 'opencompass/gaokao-benchmark' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/GAOKAO-BENCH/data'
         _dataset = {
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + _p['keyword'],

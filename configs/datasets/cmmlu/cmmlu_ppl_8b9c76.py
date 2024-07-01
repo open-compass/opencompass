@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import CMMLUDataset
 from opencompass.utils.text_postprocessors import first_capital_postprocess
+from os import environ
 
 cmmlu_subject_mapping = {
     'agronomy': '农学',
@@ -107,7 +108,7 @@ for _name in cmmlu_all_sets:
     cmmlu_datasets.append(
         dict(
             type=CMMLUDataset,
-            path='./data/cmmlu/',
+            path='opencompass/cmmlu' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/cmmlu/',
             name=_name,
             abbr=f'cmmlu-{_name}',
             reader_cfg=dict(

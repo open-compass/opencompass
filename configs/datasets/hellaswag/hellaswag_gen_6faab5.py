@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import hellaswagDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
+from os import environ
 
 hellaswag_reader_cfg = dict(
     input_columns=['ctx', 'A', 'B', 'C', 'D'],
@@ -37,7 +38,7 @@ hellaswag_datasets = [
     dict(
         abbr='hellaswag',
         type=hellaswagDataset_V2,
-        path='./data/hellaswag/hellaswag.jsonl',
+        path="opencompass/hellaswag" if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/hellaswag/hellaswag.jsonl',
         reader_cfg=hellaswag_reader_cfg,
         infer_cfg=hellaswag_infer_cfg,
         eval_cfg=hellaswag_eval_cfg)

@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccContaminationEvaluator
 from opencompass.datasets import ARCDatasetClean as ARCDataset
+from os import environ
 
 ARC_c_reader_cfg = dict(
     input_columns=['question', 'textA', 'textB', 'textC', 'textD'],
@@ -47,7 +48,8 @@ ARC_c_datasets = [
     dict(
         type=ARCDataset,
         abbr='ARC-c-test',
-        path='./data/ARC/ARC-c/ARC-Challenge-Test.jsonl',
+        path='opencompass/ai2_arc' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/ARC/ARC-c/ARC-Challenge-Test.jsonl',
+        name='ARC-Challenge',
         reader_cfg=ARC_c_reader_cfg,
         infer_cfg=ARC_c_infer_cfg,
         eval_cfg=ARC_c_eval_cfg)

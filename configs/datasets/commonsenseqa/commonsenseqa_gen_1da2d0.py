@@ -5,6 +5,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import commonsenseqaDataset
 from opencompass.utils.text_postprocessors import first_capital_postprocess
+from os import environ
 
 commonsenseqa_reader_cfg = dict(
     input_columns=['question', 'A', 'B', 'C', 'D', 'E'],
@@ -45,7 +46,7 @@ commonsenseqa_datasets = [
     dict(
         abbr='commonsense_qa',
         type=commonsenseqaDataset,
-        path='./data/commonsenseqa',
+        path='opencompass/commonsense_qa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/commonsenseqa',
         reader_cfg=commonsenseqa_reader_cfg,
         infer_cfg=commonsenseqa_infer_cfg,
         eval_cfg=commonsenseqa_eval_cfg,

@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
 from opencompass.datasets import MMLUDataset
 from opencompass.utils.text_postprocessors import first_option_postprocess
+from os import environ
 
 # None of the mmlu dataset in huggingface is correctly parsed, so we use our own dataset reader
 # Please download the dataset from https://people.eecs.berkeley.edu/~hendrycks/data.tar
@@ -113,7 +114,7 @@ for _name in mmlu_all_sets:
         dict(
             abbr=f'lukaemon_mmlu_{_name}',
             type=MMLUDataset,
-            path='./data/mmlu/',
+            path='opencompass/mmlu' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/mmlu/',
             name=_name,
             reader_cfg=mmlu_reader_cfg,
             infer_cfg=mmlu_infer_cfg,
