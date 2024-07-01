@@ -13,7 +13,7 @@ with read_base():
 # Max for this dataset is 4
 num_shot = 4
 # Generate reasoning path or not, only for single choice
-with_reasoning = False
+with_reasoning = True
 # Use circular evaluation or not
 with_circular_eval = True
 # Use PPL mode in single choice test or not
@@ -69,7 +69,7 @@ for _split in mathbench_sets:
 
         mathbench_datasets.append(
             dict(
-                abbr='mathbench-no_cot-' + _split + '-' + _name,
+                abbr='mathbench-' + _split + '-' + _name,
                 type=MathBenchDataset,
                 path=f'data/mathbench_v1/{_split}',
                 name=_name,
