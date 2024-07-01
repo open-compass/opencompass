@@ -1,6 +1,6 @@
-from mmengine.config import reasond_base
+from mmengine.config import read_base
 
-with reasond_base():
+with read_base():
     from .groups.charm_reason import charm_reason_summary_groups
 
 summarizer = dict(

@@ -17,7 +17,7 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
 from opencompass.utils.prompt import get_prompt_hash
 
 METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth', 'f1', 'exact_match']
-METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
+METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len', 'type']
 
 def model_abbr_from_cfg_used_in_summarizer(model):
     if model.get('summarizer_abbr', None):
@@ -167,6 +167,8 @@ class DefaultSummarizer:
                     need_smart_metric = True
                     if sg.get('std', False):
                         default_metric = 'standard_deviation'
+                    elif sg.get('sum', False):
+                        default_metric = 'sum'
                     elif sg.get('weights', []):
                         default_metric = 'weighted_average'
                     else:
@@ -208,13 +210,16 @@ class DefaultSummarizer:
                             try:
                                 numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
                             except KeyError:
-                                tmp_scores = {metric: {k.split('@')[0]: v for k, v in scores[metric].items()} for metric in scores}
+                                tmp_scores = {metric: {k.split('@')[0]: v for k, v in scores[metric].items()}}
                                 numerator = sum(tmp_scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
                             denominator = sum(sg['weights'].values())
                         else:
                             numerator = sum(scores[metric].values())
                             denominator = len(scores[metric])
-                        scores[metric] = result[metric] = numerator / denominator
+                        if default_metric == 'sum':
+                            scores[metric] = result[metric] = numerator
+                        else:
+                            scores[metric] = result[metric] = numerator / denominator
                     eval_modes = list(set(eval_modes))
                     eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
 

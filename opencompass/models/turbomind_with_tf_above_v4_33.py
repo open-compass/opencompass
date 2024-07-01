@@ -72,12 +72,19 @@ class TurboMindModelwithChatTemplate(BaseModel):
         potential_stop_words = []
         try:
             generation_config = GenerationConfig.from_pretrained(path)
-            for token_id in generation_config.eos_token_id:
-                potential_stop_words.append(self.origin_tokenizer.decode(token_id))
         except:
-            pass
-        potential_stop_words.append(self.origin_tokenizer.eos_token)
+            generation_config = None
+        if generation_config and hasattr(generation_config, 'eos_token_id'):
+            if isinstance(generation_config.eos_token_id, int):
+                potential_stop_words.append(self.origin_tokenizer.decode(generation_config.eos_token_id))
+            else:
+                assert isinstance(generation_config.eos_token_id, list)
+                for token_id in generation_config.eos_token_id:
+                    potential_stop_words.append(self.origin_tokenizer.decode(token_id))
+        if self.origin_tokenizer.eos_token is not None:
+            potential_stop_words.append(self.origin_tokenizer.eos_token)
         potential_stop_words = list(set(potential_stop_words))
+        potential_stop_words = [s for s in potential_stop_words if s]
         return potential_stop_words
 
     def generate(self,
@@ -119,12 +126,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         if do_sample:
             gen_config['top_k'] = 1000
             gen_config['temperature'] = temperature
-        # if stopping_criteria:
-        #     stop_words = gen_config.get('stop_words', [])
-        #     for t in stopping_criteria:
-        #         t = self.tokenizer.encode(t, add_bos=False)
-        #         stop_words.append(t[0])
-        #     gen_config['stop_words'] = list(set(stop_words))
+
         from lmdeploy.messages import EngineGenerationConfig, GenerationConfig
         gen_config = GenerationConfig(**gen_config)
         gen_config = EngineGenerationConfig.From(gen_config, self.tokenizer)
@@ -165,7 +167,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         """
         assert type(prompt) is str, 'We only support string for TurboMind Python API'
 
-        input_ids = self.tokenizer.encode(prompt)
+        input_ids = self.tokenizer.encode(prompt, add_bos=False)
         for outputs in generator.stream_infer(session_id=session_id,
                                               input_ids=[input_ids],
                                               gen_config=gen_config,

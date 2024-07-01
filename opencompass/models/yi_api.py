@@ -118,7 +118,11 @@ class YiAPI(BaseAPIModel):
             system = {'role': 'system', 'content': self.system_prompt}
             messages.insert(0, system)
 
-        data = {'model': self.model, 'messages': messages}
+        data = {
+            'model': self.model,
+            'messages': messages,
+            'max_tokens': max_out_len
+        }
 
         max_num_retries = 0
         while max_num_retries < self.retry:

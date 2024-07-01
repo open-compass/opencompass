@@ -94,6 +94,15 @@ class SubjectiveEvalTask(BaseTask):
                 self._score(model_cfg, dataset_cfg, eval_cfg, output_column,
                             self.meta)
 
+    @property
+    def name(self) -> str:
+        task_name = task_abbr_from_cfg({
+            'models': self.model_cfgs,
+            'datasets': self.dataset_cfgs
+        })
+        return self.name_prefix + task_name + \
+            '--judge-by--' + model_abbr_from_cfg(self.judge_cfg)
+
     def _load_model_pred(
         self,
         model_cfg: Union[ConfigDict, List[ConfigDict]],

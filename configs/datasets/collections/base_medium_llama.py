@@ -6,7 +6,7 @@ with read_base():
     from ..agieval.agieval_mixed_713d14 import agieval_datasets
     from ..GaokaoBench.GaokaoBench_mixed_9af5ee import GaokaoBench_datasets
     from ..bbh.bbh_gen_5b92b0 import bbh_datasets
-    from ..humaneval.humaneval_gen_a82cae import humaneval_datasets
+    from ..humaneval.deprecated_humaneval_gen_a82cae import humaneval_datasets
     from ..mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
     from ..CLUE_C3.CLUE_C3_ppl_e24a31 import C3_datasets
     from ..CLUE_CMRC.CLUE_CMRC_gen_1bd3c8 import CMRC_datasets
