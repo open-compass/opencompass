@@ -215,7 +215,12 @@ class OpenICLEvalTask(BaseTask):
                                    if self.output_column else None)
             preds['test_set'] = test_set
             if 'origin_prompt' not in preds:
-                preds['origin_prompt'] = [None for _ in range(len(pred_strs))]
+                try:
+                    preds['origin_prompt'] = [
+                        None for _ in range(len(pred_strs))
+                    ]
+                except TypeError:
+                    preds['origin_prompt'] = None
             preds = {
                 k: preds[k]
                 for k in signature(icl_evaluator.score).parameters
