@@ -5,6 +5,8 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import AXDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
+from os import environ
+
 AX_b_reader_cfg = dict(
     input_columns=['sentence1', 'sentence2'],
     output_column='label',
@@ -35,7 +37,7 @@ AX_b_datasets = [
     dict(
         abbr='AX_b',
         type=AXDataset_V2,
-        path='./data/SuperGLUE/AX-b/AX-b.jsonl',
+        path='opencompass/gaokao-benchmark' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/SuperGLUE/AX-b/AX-b.jsonl',
         reader_cfg=AX_b_reader_cfg,
         infer_cfg=AX_b_infer_cfg,
         eval_cfg=AX_b_eval_cfg,

@@ -3,6 +3,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import HumanevalDataset, HumanEvalEvaluator, humaneval_postprocess_v2
+from os import environ
 
 humaneval_reader_cfg = dict(
     input_columns=['prompt'], output_column='task_id', train_split='test')
@@ -30,7 +31,7 @@ humaneval_datasets = [
     dict(
         abbr='openai_humaneval',
         type=HumanevalDataset,
-        path='./data/humaneval/human-eval-v2-20210705.jsonl',
+        path='opencompass/humaneval' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/humaneval/human-eval-v2-20210705.jsonl',
         reader_cfg=humaneval_reader_cfg,
         infer_cfg=humaneval_infer_cfg,
         eval_cfg=humaneval_eval_cfg)

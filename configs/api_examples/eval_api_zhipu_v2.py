@@ -11,7 +11,8 @@ with read_base():
     # from ..datasets.ceval.ceval_gen import ceval_datasets as cur_datasets
     # from ..datasets.ceval.ceval_clean_ppl import ceval_datasets as cur_datasets
     # from ..datasets.GaokaoBench.GaokaoBench_gen import GaokaoBench_datasets as cur_datasets
-    from ..datasets.gsm8k.gsm8k_gen import gsm8k_datasets as cur_datasets
+    # from ..datasets.gsm8k.gsm8k_gen import gsm8k_datasets as cur_datasets
+    from ..datasets.SuperGLUE_AX_b.SuperGLUE_AX_b_gen import AX_b_datasets as cur_datasets
 
 datasets = [
     *cur_datasets,
@@ -66,7 +67,6 @@ infer = dict(
         max_num_workers=1,
         concurrent_users=1,
         task=dict(type=OpenICLInferTask),
-        debug=True,
         )
 )
 

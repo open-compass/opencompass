@@ -5,6 +5,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import MMLUDataset
 from opencompass.utils.text_postprocessors import match_answer_pattern
+from os import environ
 
 with read_base():
    from .mmlu_all_sets import mmlu_all_sets
@@ -51,7 +52,7 @@ for name in mmlu_all_sets:
         dict(
             abbr=f'lukaemon_mmlu_{name}',
             type=MMLUDataset,
-            path='./data/mmlu/',
+            path='opencompass/mmlu' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/mmlu/',
             name=name,
             reader_cfg=mmlu_reader_cfg,
             infer_cfg=mmlu_infer_cfg,

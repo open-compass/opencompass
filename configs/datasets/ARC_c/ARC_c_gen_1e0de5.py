@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import ARCDataset
 from opencompass.utils.text_postprocessors import first_option_postprocess
+from os import environ
 
 ARC_c_reader_cfg = dict(
     input_columns=['question', 'textA', 'textB', 'textC', 'textD'],
@@ -35,7 +36,8 @@ ARC_c_datasets = [
     dict(
         abbr='ARC-c',
         type=ARCDataset,
-        path='./data/ARC/ARC-c/ARC-Challenge-Dev.jsonl',
+        path='opencompass/ai2_arc' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/ARC/ARC-c/ARC-Challenge-Dev.jsonl',
+        name='ARC-Challenge',
         reader_cfg=ARC_c_reader_cfg,
         infer_cfg=ARC_c_infer_cfg,
         eval_cfg=ARC_c_eval_cfg,

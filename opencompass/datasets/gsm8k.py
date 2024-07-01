@@ -18,7 +18,7 @@ class GSM8KDataset(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get("DATASET_SOURCE") == "ModelScope":
-            dataset = MsDataset.load(dataset_name=path)
+            dataset = MsDataset.load(dataset_name=path, trust_remote_code=True)
         else:
             datasets = {}
             for split in ['train', 'test']:

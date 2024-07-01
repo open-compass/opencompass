@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import RaceDataset
+from os import environ
 
 race_reader_cfg = dict(
     input_columns=['article', 'question', 'A', 'B', 'C', 'D'],
@@ -32,7 +33,7 @@ race_datasets = [
     dict(
         abbr='race-middle',
         type=RaceDataset,
-        path='./data/race',
+        path='opencompass/race' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/race',
         name='middle',
         reader_cfg=race_reader_cfg,
         infer_cfg=race_infer_cfg,
@@ -40,7 +41,7 @@ race_datasets = [
     dict(
         abbr='race-high',
         type=RaceDataset,
-        path='./data/race',
+        path='opencompass/race' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/race',
         name='high',
         reader_cfg=race_reader_cfg,
         infer_cfg=race_infer_cfg,
