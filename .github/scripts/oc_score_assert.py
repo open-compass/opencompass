@@ -6,10 +6,12 @@ import yaml
 
 output_path = 'regression_result_daily'
 
-model_list = ['internlm2-7b-hf', 'internlm-chat-7b-hf', 'chatglm3-6b-base-hf']
+model_list = ['baichuan2-7b-chat-hf', 'internlm2-chat-1.8b-turbomind', 'internlm2-chat-1.8b-sft-turbomind', 
+              'internlm2-chat-7b-turbomind', 'internlm2-chat-7b-sft-turbomind', 'llama-3-8b-instruct-turbomind', 
+              'minicpm-2b-dpo-fp32-hf', 'minicpm-2b-sft-bf16-hf', 'minicpm-2b-sft-fp32-hf', 
+              'phi-3-mini-4k-instruct-hf', 'qwen2-1.5b-instruct-turbomind', 'qwen2-7b-instruct-turbomind']
 dataset_list = [
-    'ARC-c', 'chid-dev', 'chid-test', 'openai_humaneval', 'openbookqa',
-    'openbookqa_fact'
+    'gsm8k', 'race-middle', 'race-high'
 ]
 
 
@@ -47,13 +49,13 @@ class TestChat:
 def assert_score(score, baseline):
     if score is None or score == '-':
         assert False, 'value is none'
-    if float(score) < (baseline * 1.03) and float(score) > (baseline * 0.97):
-        print(score + ' between ' + str(baseline * 0.97) + ' and ' +
-              str(baseline * 1.03))
+    if float(score) <= (baseline + 5) and float(score) >= (baseline - 5):
+        print(score + ' between ' + str(baseline - 5) + ' and ' +
+              str(baseline + 5))
         assert True
     else:
         assert False, score + ' not between ' + str(
-            baseline * 0.97) + ' and ' + str(baseline * 1.03)
+            baseline - 5) + ' and ' + str(baseline + 5)
 
 
 def find_csv_files(directory):

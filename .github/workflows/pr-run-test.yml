@@ -31,8 +31,8 @@ jobs:
     environment: 'prod'
     timeout-minutes: 30
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Prepare - Install opencompass
         run: |
           eval "$(conda shell.bash hook)"
