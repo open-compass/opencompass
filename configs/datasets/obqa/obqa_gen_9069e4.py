@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import OBQADataset
 from opencompass.utils.text_postprocessors import first_option_postprocess
+from os import environ
 
 _input_columns = [
     ['question_stem', 'A', 'B', 'C', 'D'],
@@ -32,12 +33,14 @@ obqa_datasets = [
     dict(
         abbr='openbookqa',
         type=OBQADataset,
-        path='./data/openbookqa/Main/test.jsonl',
+        path='opencompass/openbookqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/openbookqa/Main/test.jsonl',
+        name='main',
     ),
     dict(
         abbr='openbookqa_fact',
         type=OBQADataset,
-        path='./data/openbookqa/Additional/test_complete.jsonl',
+        path='opencompass/openbookqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/openbookqa/Additional/test_complete.jsonl',
+        name='additional',
     ),
 ]
 

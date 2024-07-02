@@ -7,6 +7,8 @@ from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
+from os import environ
+from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class siqaDataset(BaseDataset):
@@ -31,11 +33,23 @@ class siqaDataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        train_dataset = siqaDataset.load_single(path, 'train.jsonl',
-                                                'train-labels.lst')
-        val_dataset = siqaDataset.load_single(path, 'dev.jsonl',
-                                              'dev-labels.lst')
-        return DatasetDict({'train': train_dataset, 'validation': val_dataset})
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            dataset = DatasetDict()
+            for split in ['train', 'validation']:
+                data_list = []
+                ms_dataset = MsDataset.load(path, split=split)
+                for item in ms_dataset:
+                    row = item
+                    row['label'] = int(item['label'])
+                    data_list.append(row)
+                dataset[split] = Dataset.from_list(data_list)
+            return dataset
+        else:
+            train_dataset = siqaDataset.load_single(path, 'train.jsonl',
+                                                    'train-labels.lst')
+            val_dataset = siqaDataset.load_single(path, 'dev.jsonl',
+                                                'dev-labels.lst')
+            return DatasetDict({'train': train_dataset, 'validation': val_dataset})
 
 
 @LOAD_DATASET.register_module()
@@ -73,11 +87,34 @@ class siqaDataset_V2(BaseDataset):
 
     @staticmethod
     def load(path):
-        train_dataset = siqaDataset_V2.load_single(path, 'train.jsonl',
-                                                   'train-labels.lst')
-        val_dataset = siqaDataset_V2.load_single(path, 'dev.jsonl',
-                                                 'dev-labels.lst')
-        return DatasetDict({'train': train_dataset, 'validation': val_dataset})
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            dataset = DatasetDict()
+            for split in ['train', 'validation']:
+                data_list = []
+                ms_dataset = MsDataset.load(path, split=split)
+                for item in ms_dataset:
+                    row = item
+                    label = item['label']
+                    # some preprocessing
+                    row['all_labels'] = {
+                        'candidates': [
+                            [f'A. {item["answerA"]}', 'A', item['answerA']],
+                            [f'B. {item["answerB"]}', 'B', item['answerB']],
+                            [f'C. {item["answerC"]}', 'C', item['answerC']],
+                        ],
+                        'label': int(label) - 1
+                    }
+                    row['label'] = ' ABC'[int(label)]
+
+                    data_list.append(row)
+                dataset[split] = Dataset.from_list(data_list)
+        else:
+            train_dataset = siqaDataset_V2.load_single(path, 'train.jsonl',
+                                                    'train-labels.lst')
+            val_dataset = siqaDataset_V2.load_single(path, 'dev.jsonl',
+                                                    'dev-labels.lst')
+            dataset = DatasetDict({'train': train_dataset, 'validation': val_dataset})
+        return dataset
 
 
 @LOAD_DATASET.register_module()
@@ -106,9 +143,26 @@ class siqaDataset_V3(BaseDataset):
 
     @staticmethod
     def load(path):
-        train_dataset = siqaDataset_V3.load_single(path, 'train.jsonl',
-                                                   'train-labels.lst')
-        val_dataset = siqaDataset_V3.load_single(path, 'dev.jsonl',
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            dataset = DatasetDict()
+            for split in ['train', 'validation']:
+                data_list = []
+                ms_dataset = MsDataset.load(path, split=split)
+                for item in ms_dataset:
+                    row = item
+                    label = item['label']
+                    # some preprocessing
+                    row['A'] = item['answerA']
+                    row['B'] = item['answerB']
+                    row['C'] = item['answerC']
+                    row['answer'] = 'ABC'[int(label)-1]
+                    del row['answerA'], row['answerB'], row['answerC'], row['label']
+                    data_list.append(row)
+                dataset[split] = Dataset.from_list(data_list)
+        else:
+            train_dataset = siqaDataset_V3.load_single(path, 'train.jsonl',
+                                                    'train-labels.lst')
+            val_dataset = siqaDataset_V3.load_single(path, 'dev.jsonl',
                                                  'dev-labels.lst')
-
-        return DatasetDict({'train': train_dataset, 'validation': val_dataset})
+            dataset = DatasetDict({'train': train_dataset, 'validation': val_dataset})
+        return dataset

@@ -9,7 +9,8 @@ from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from ..base import BaseDataset
 from .math_equivalence import is_equiv
 from .post_process import parse_math_answer
-
+from os import environ
+from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class AGIEvalDataset(BaseDataset):
@@ -38,24 +39,43 @@ class AGIEvalDataset_v2(BaseDataset):
     @staticmethod
     def load(path: str, name: str, setting_name: str):
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
-        filename = osp.join(path, name + '.jsonl')
-        with open(filename, encoding='utf-8') as f:
-            data = [json.loads(line.strip()) for line in f]
-        dataset = []
-        for item in data:
-            passage = item['passage'] if item['passage'] else ''
-            question = passage + item['question']
-            options = '\n'.join(item['options']) if item['options'] else ''
-            if item['label']:
-                if isinstance(item['label'], list):
-                    label = ''.join(item['label'])
+        
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            ms_dataset = MsDataset.load(path, subset_name=name, split='test')
+            dataset = []
+            for item in ms_dataset:
+                passage = item['passage'] if item['passage'] else ''
+                question = passage + item['question']
+                options = '\n'.join(item['options']) if item['options'] else ''
+                if item['label']:
+                    if isinstance(item['label'], list):
+                        label = ''.join(item['label'])
+                    else:
+                        label = item['label']
                 else:
-                    label = item['label']
-            else:
-                label = item['answer']
-            d = {'question': question, 'options': options, 'label': label}
-            dataset.append(d)
-        dataset = Dataset.from_list(dataset)
+                    label = item['answer']
+                d = {'question': question, 'options': options, 'label': label}
+                dataset.append(d)
+            dataset = Dataset.from_list(dataset)
+        else:
+            filename = osp.join(path, name + '.jsonl')
+            with open(filename, encoding='utf-8') as f:
+                data = [json.loads(line.strip()) for line in f]
+            dataset = []
+            for item in data:
+                passage = item['passage'] if item['passage'] else ''
+                question = passage + item['question']
+                options = '\n'.join(item['options']) if item['options'] else ''
+                if item['label']:
+                    if isinstance(item['label'], list):
+                        label = ''.join(item['label'])
+                    else:
+                        label = item['label']
+                else:
+                    label = item['answer']
+                d = {'question': question, 'options': options, 'label': label}
+                dataset.append(d)
+            dataset = Dataset.from_list(dataset)
         return dataset
 
 

@@ -9,16 +9,20 @@ from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
 
 from .base import BaseDataset
-
+from os import environ
+from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class BBHDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
-        with open(osp.join(path, f'{name}.json'), 'r') as f:
-            data = json.load(f)['examples']
-        dataset = Dataset.from_list(data)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            dataset = MsDataset.load(path, subset_name=name, split='test')
+        else:
+            with open(osp.join(path, f'{name}.json'), 'r') as f:
+                data = json.load(f)['examples']
+            dataset = Dataset.from_list(data)
         return dataset
 
 

@@ -7,6 +7,9 @@ from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from .base import BaseDataset
 
+from os import environ
+from modelscope import MsDataset
+
 
 @TEXT_POSTPROCESSORS.register_module('strategyqa')
 def strategyqa_pred_postprocess(text: str) -> str:
@@ -28,6 +31,10 @@ class StrategyQADataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        with open(path, 'r', encoding='utf-8') as f:
-            dataset = json.load(f)
-        return Dataset.from_list(dataset)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            dataset = MsDataset.load('opencompass/strategy_qa', split='train', trust_remote_code=True)
+        else:
+            with open(path, 'r', encoding='utf-8') as f:
+                dataset = json.load(f)
+            dataset = Dataset.from_list(dataset)
+        return dataset

@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import LLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import winograndeDataset
+from os import environ
 
 winogrande_reader_cfg = dict(
     input_columns=['opt1', 'opt2'],
@@ -26,7 +27,7 @@ winogrande_datasets = [
     dict(
         abbr='winogrande',
         type=winograndeDataset,
-        path='./data/winogrande',
+        path='opencompass/winogrande' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/winogrande',
         reader_cfg=winogrande_reader_cfg,
         infer_cfg=winogrande_infer_cfg,
         eval_cfg=winogrande_eval_cfg)

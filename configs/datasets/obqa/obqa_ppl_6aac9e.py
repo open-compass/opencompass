@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import OBQADataset_V2
+from os import environ
 
 obqa_reader_cfg = dict(
     input_columns=['question_stem', 'A', 'B', 'C', 'D', 'fact1'],
@@ -33,7 +34,8 @@ obqa_datasets = [
     dict(
         abbr='openbookqa_fact',
         type=OBQADataset_V2,
-        path='./data/openbookqa/Additional/test_complete.jsonl',
+        path='opencompass/openbookqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/openbookqa/Additional/test_complete.jsonl',
+        name='additional',
         reader_cfg=obqa_reader_cfg,
         infer_cfg=obqa_infer_cfg,
         eval_cfg=obqa_eval_cfg,
