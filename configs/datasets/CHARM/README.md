@@ -86,15 +86,69 @@ Below are the steps for quickly downloading CHARM and using OpenCompass for eval
 ### 1. Download CHARM
 ```bash
 git clone https://github.com/opendatalab/CHARM ${path_to_CHARM_repo}
+
+cd ${path_to_opencompass}
+mkdir data
+ln -snf ${path_to_CHARM_repo}/data/CHARM ./data/CHARM
 ```
 ### 2. Run Inference and Evaluation
 ```bash
 cd ${path_to_opencompass}
-mkdir -p data
-ln -snf ${path_to_CHARM_repo}/data/CHARM ./data/CHARM
 
-# Infering and evaluating CHARM with hf_llama3_8b_instruct model
-python run.py --models hf_llama3_8b_instruct --datasets charm_gen
+# modify config file `configs/eval_charm_rea.py`: uncomment or add models you want to evaluate
+python run.py configs/eval_charm_rea.py -r --dump-eval-details
+
+# modify config file `configs/eval_charm_mem.py`: uncomment or add models you want to evaluate
+python run.py configs/eval_charm_mem.py -r --dump-eval-details
+```
+The inference and evaluation results would be in `${path_to_opencompass}/outputs`, like this:
+```bash
+outputs
+├── CHARM_mem
+│   └── chat
+│       └── 20240605_151442
+│           ├── predictions
+│           │   ├── internlm2-chat-1.8b-turbomind
+│           │   ├── llama-3-8b-instruct-lmdeploy
+│           │   └── qwen1.5-1.8b-chat-hf
+│           ├── results
+│           │   ├── internlm2-chat-1.8b-turbomind_judged-by--GPT-3.5-turbo-0125
+│           │   ├── llama-3-8b-instruct-lmdeploy_judged-by--GPT-3.5-turbo-0125
+│           │   └── qwen1.5-1.8b-chat-hf_judged-by--GPT-3.5-turbo-0125
+│           └── summary
+│               └── 20240605_205020 # MEMORY_SUMMARY_DIR
+│                   ├── judged-by--GPT-3.5-turbo-0125-charm-memory-Chinese_Anachronisms_Judgment
+│                   ├── judged-by--GPT-3.5-turbo-0125-charm-memory-Chinese_Movie_and_Music_Recommendation
+│                   ├── judged-by--GPT-3.5-turbo-0125-charm-memory-Chinese_Sport_Understanding
+│                   ├── judged-by--GPT-3.5-turbo-0125-charm-memory-Chinese_Time_Understanding
+│                   └── judged-by--GPT-3.5-turbo-0125.csv # MEMORY_SUMMARY_CSV
+└── CHARM_rea
+    └── chat
+        └── 20240605_152359
+            ├── predictions
+            │   ├── internlm2-chat-1.8b-turbomind
+            │   ├── llama-3-8b-instruct-lmdeploy
+            │   └── qwen1.5-1.8b-chat-hf
+            ├── results # REASON_RESULTS_DIR
+            │   ├── internlm2-chat-1.8b-turbomind
+            │   ├── llama-3-8b-instruct-lmdeploy
+            │   └── qwen1.5-1.8b-chat-hf
+            └── summary
+                ├── summary_20240605_205328.csv # REASON_SUMMARY_CSV
+                └── summary_20240605_205328.txt
+```
+### 3. Generate Analysis Results
+```bash
+cd ${path_to_CHARM_repo}
+
+# generate Table5, Table6, Table9 and Table10 in https://arxiv.org/abs/2403.14112
+PYTHONPATH=. python tools/summarize_reasoning.py ${REASON_SUMMARY_CSV}
+
+# generate Figure3 and Figure9 in https://arxiv.org/abs/2403.14112
+PYTHONPATH=. python tools/summarize_mem_rea.py ${REASON_SUMMARY_CSV} ${MEMORY_SUMMARY_CSV}
+
+# generate Table7, Table12, Table13 and Figure11 in https://arxiv.org/abs/2403.14112
+PYTHONPATH=. python tools/analyze_mem_indep_rea.py data/CHARM ${REASON_RESULTS_DIR} ${MEMORY_SUMMARY_DIR} ${MEMORY_SUMMARY_CSV}
 ```
 
 ## 🖊️ Citation

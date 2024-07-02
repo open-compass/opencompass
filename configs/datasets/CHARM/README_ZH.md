@@ -84,15 +84,69 @@
 ### 1. 下载 CHARM
 ```bash
 git clone https://github.com/opendatalab/CHARM ${path_to_CHARM_repo}
+
+cd ${path_to_opencompass}
+mkdir data
+ln -snf ${path_to_CHARM_repo}/data/CHARM ./data/CHARM
 ```
 ### 2. 推理和评测
 ```bash
 cd ${path_to_opencompass}
-mkdir -p data
-ln -snf ${path_to_CHARM_repo}/data/CHARM ./data/CHARM
 
-# 在CHARM上对模型hf_llama3_8b_instruct做推理和评测
-python run.py --models hf_llama3_8b_instruct --datasets charm_gen
+# 修改配置文件`configs/eval_charm_rea.py`: 将现有的模型取消注释，或者添加你想评测的模型
+python run.py configs/eval_charm_rea.py -r --dump-eval-details
+
+# 修改配置文件`configs/eval_charm_mem.py`: 将现有的模型取消注释，或者添加你想评测的模型
+python run.py configs/eval_charm_mem.py -r --dump-eval-details
+```
+推理和评测的结果位于路径`${path_to_opencompass}/outputs`, 如下所示:
+```bash
+outputs
+├── CHARM_mem
+│   └── chat
+│       └── 20240605_151442
+│           ├── predictions
+│           │   ├── internlm2-chat-1.8b-turbomind
+│           │   ├── llama-3-8b-instruct-lmdeploy
+│           │   └── qwen1.5-1.8b-chat-hf
+│           ├── results
+│           │   ├── internlm2-chat-1.8b-turbomind_judged-by--GPT-3.5-turbo-0125
+│           │   ├── llama-3-8b-instruct-lmdeploy_judged-by--GPT-3.5-turbo-0125
+│           │   └── qwen1.5-1.8b-chat-hf_judged-by--GPT-3.5-turbo-0125
+│           └── summary
+│               └── 20240605_205020 # MEMORY_SUMMARY_DIR
+│                   ├── judged-by--GPT-3.5-turbo-0125-charm-memory-Chinese_Anachronisms_Judgment
+│                   ├── judged-by--GPT-3.5-turbo-0125-charm-memory-Chinese_Movie_and_Music_Recommendation
+│                   ├── judged-by--GPT-3.5-turbo-0125-charm-memory-Chinese_Sport_Understanding
+│                   ├── judged-by--GPT-3.5-turbo-0125-charm-memory-Chinese_Time_Understanding
+│                   └── judged-by--GPT-3.5-turbo-0125.csv # MEMORY_SUMMARY_CSV
+└── CHARM_rea
+    └── chat
+        └── 20240605_152359
+            ├── predictions
+            │   ├── internlm2-chat-1.8b-turbomind
+            │   ├── llama-3-8b-instruct-lmdeploy
+            │   └── qwen1.5-1.8b-chat-hf
+            ├── results # REASON_RESULTS_DIR
+            │   ├── internlm2-chat-1.8b-turbomind
+            │   ├── llama-3-8b-instruct-lmdeploy
+            │   └── qwen1.5-1.8b-chat-hf
+            └── summary
+                ├── summary_20240605_205328.csv # REASON_SUMMARY_CSV
+                └── summary_20240605_205328.txt
+```
+### 3. 生成分析结果
+```bash
+cd ${path_to_CHARM_repo}
+
+# 生成论文中的Table5, Table6, Table9 and Table10，详见https://arxiv.org/abs/2403.14112
+PYTHONPATH=. python tools/summarize_reasoning.py ${REASON_SUMMARY_CSV}
+
+# 生成论文中的Figure3 and Figure9，详见https://arxiv.org/abs/2403.14112
+PYTHONPATH=. python tools/summarize_mem_rea.py ${REASON_SUMMARY_CSV} ${MEMORY_SUMMARY_CSV}
+
+# 生成论文中的Table7, Table12, Table13 and Figure11，详见https://arxiv.org/abs/2403.14112
+PYTHONPATH=. python tools/analyze_mem_indep_rea.py data/CHARM ${REASON_RESULTS_DIR} ${MEMORY_SUMMARY_DIR} ${MEMORY_SUMMARY_CSV}
 ```
 
 ## 🖊️ 引用
