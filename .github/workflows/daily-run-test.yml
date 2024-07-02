@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 240 #4hours
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Prepare - create conda env and install torch
         run: |
           eval "$(conda shell.bash hook)"
