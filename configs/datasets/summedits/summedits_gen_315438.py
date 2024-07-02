@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import SummeditsDataset_V2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
+from os import environ
 
 summedits_reader_cfg = dict(
     input_columns=['doc', 'summary'], output_column='label')
@@ -44,7 +45,7 @@ summedits_datasets = [
     dict(
         abbr='summedits',
         type=SummeditsDataset_V2,
-        path='./data/summedits/summedits.jsonl',
+        path='opencompass/summedits' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/summedits/summedits.jsonl',
         reader_cfg=summedits_reader_cfg,
         infer_cfg=summedits_infer_cfg,
         eval_cfg=summedits_eval_cfg)

@@ -4,6 +4,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import BBHDataset, bbh_mcq_postprocess, BBHEvaluator, BBHEvaluator_mcq
+from os import environ
 
 with read_base():
     from .bbh_subset_settings import settings
@@ -48,7 +49,7 @@ for name, test_type in settings:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path='./data/BBH/data',
+            path='opencompass/bbh' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/BBH/data',
             name=name,
             abbr='bbh-' + name,
             reader_cfg=bbh_reader_cfg.copy(),

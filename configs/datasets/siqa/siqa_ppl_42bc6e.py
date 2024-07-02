@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import siqaDataset
+from os import environ
 
 siqa_reader_cfg = dict(
     input_columns=['context', 'question', 'answerA', 'answerB', 'answerC'],
@@ -26,7 +27,7 @@ siqa_datasets = [
     dict(
         abbr='siqa',
         type=siqaDataset,
-        path='./data/siqa',
+        path='opencompass/siqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/siqa',
         reader_cfg=siqa_reader_cfg,
         infer_cfg=siqa_infer_cfg,
         eval_cfg=siqa_eval_cfg)

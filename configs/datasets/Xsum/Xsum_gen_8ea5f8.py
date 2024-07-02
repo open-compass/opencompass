@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import RougeEvaluator
 from opencompass.datasets import XsumDataset, Xsum_postprocess
+from os import environ
 
 Xsum_reader_cfg = dict(input_columns=['dialogue'], output_column='summary')
 
@@ -23,7 +24,7 @@ Xsum_datasets = [
     dict(
         type=XsumDataset,
         abbr='Xsum',
-        path='./data/Xsum/dev.jsonl',
+        path='opencompass/xsum' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/Xsum/dev.jsonl',
         reader_cfg=Xsum_reader_cfg,
         infer_cfg=Xsum_infer_cfg,
         eval_cfg=Xsum_eval_cfg)

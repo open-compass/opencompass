@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import winograndeDataset_V2
 from opencompass.utils.text_postprocessors import first_option_postprocess
+from os import environ
 
 winogrande_reader_cfg = dict(
     input_columns=['opt1', 'opt2'],
@@ -28,7 +29,7 @@ for _choice in _winogrande_prompt:
         dict(
             abbr='winogrande_'+_choice,
             type=winograndeDataset_V2,
-            path='./data/winogrande',
+            path='opencompass/winogrande' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/winogrande',
             reader_cfg=winogrande_reader_cfg,
             infer_cfg=dict(
                 prompt_template=dict(

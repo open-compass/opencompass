@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import StrategyQADataset, strategyqa_pred_postprocess, strategyqa_dataset_postprocess
+from os import environ
 
 strategyqa_reader_cfg = dict(
     input_columns=['question'],
@@ -51,7 +52,7 @@ strategyqa_datasets = [
     dict(
         abbr='strategyqa',
         type=StrategyQADataset,
-        path='./data/strategyqa/strategyQA_train.json',
+        path='opencompass/strategy_qa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/strategyqa/strategyQA_train.json',
         reader_cfg=strategyqa_reader_cfg,
         infer_cfg=strategyqa_infer_cfg,
         eval_cfg=strategyqa_eval_cfg)

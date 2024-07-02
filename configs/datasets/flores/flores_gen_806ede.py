@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import TopkRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import BleuEvaluator
 from opencompass.datasets import FloresFirst100Dataset
+from os import environ
 
 _flores_lang_map = [
     ['eng', 'eng_Latn', 'English', 'Indo-European-Germanic'],
@@ -154,7 +155,7 @@ for _flores_subtask in _flores_subtasks:
         dict(
             abbr=f'flores_100_{_src}-{_tgt}',
             type=FloresFirst100Dataset,
-            path='./data/flores_first100',
+            path='opencompass/flores' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/flores_first100',
             name=f'{_flores_source}-{_flores_target}',
             reader_cfg=flores_reader_cfg.copy(),
             infer_cfg=flores_infer_cfg.copy(),
