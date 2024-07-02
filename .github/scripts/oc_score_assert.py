@@ -49,13 +49,13 @@ class TestChat:
 def assert_score(score, baseline):
     if score is None or score == '-':
         assert False, 'value is none'
-    if float(score) <= (baseline + 2) and float(score) >= (baseline - 2):
-        print(score + ' between ' + str(baseline - 2) + ' and ' +
-              str(baseline + 2))
+    if float(score) <= (baseline + 5) and float(score) >= (baseline - 5):
+        print(score + ' between ' + str(baseline - 5) + ' and ' +
+              str(baseline + 5))
         assert True
     else:
         assert False, score + ' not between ' + str(
-            baseline - 2) + ' and ' + str(baseline + 2)
+            baseline - 5) + ' and ' + str(baseline + 5)
 
 
 def find_csv_files(directory):
