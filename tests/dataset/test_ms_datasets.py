@@ -1,4 +1,3 @@
-import importlib
 import random
 import sys
 import unittest
@@ -22,33 +21,33 @@ def reload_datasets():
         del sys.modules[module_name]
 
     with read_base():
-        # from configs.datasets.ceval.ceval_gen import ceval_datasets
-        # from configs.datasets.gsm8k.gsm8k_gen import gsm8k_datasets
-        # from configs.datasets.cmmlu.cmmlu_gen import cmmlu_datasets
-        # from configs.datasets.ARC_c.ARC_c_gen import ARC_c_datasets
-        # from configs.datasets.ARC_c.ARC_c_clean_ppl import ARC_c_datasets as ARC_c_clean_datasets
-        # from configs.datasets.ARC_e.ARC_e_gen import ARC_e_datasets
-        # from configs.datasets.humaneval.humaneval_gen import humaneval_datasets
-        # from configs.datasets.humaneval.humaneval_repeat10_gen_8e312c import humaneval_datasets as humaneval_repeat10_datasets
-        # from configs.datasets.race.race_ppl import race_datasets
-        # from configs.datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
-        # from configs.datasets.mmlu.mmlu_gen import mmlu_datasets
-        # from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
-        # from configs.datasets.strategyqa.strategyqa_gen import strategyqa_datasets
-        # from configs.datasets.bbh.bbh_gen import bbh_datasets
-        # from configs.datasets.Xsum.Xsum_gen import Xsum_datasets
-        # from configs.datasets.flores.flores_gen import flores_datasets
-        # from configs.datasets.winogrande.winogrande_gen import winogrande_datasets
-        # from configs.datasets.winogrande.winogrande_ll import winogrande_datasets as winogrande_ll_datasets
-        # from configs.datasets.winogrande.winogrande_5shot_ll_252f01 import winogrande_datasets as winogrande_5shot_ll_datasets
-        # from configs.datasets.obqa.obqa_gen import obqa_datasets
-        # from configs.datasets.obqa.obqa_ppl_6aac9e import obqa_datasets as obqa_ppl_datasets
-        # from configs.datasets.agieval.agieval_gen import agieval_datasets
-        # from configs.datasets.siqa.siqa_gen import siqa_datasets as siqa_v2_datasets
-        # from configs.datasets.siqa.siqa_gen_18632c import siqa_datasets as siqa_v3_datasets
-        # from configs.datasets.siqa.siqa_ppl_42bc6e import siqa_datasets as siqa_ppl_datasets
-        # from configs.datasets.storycloze.storycloze_gen import storycloze_datasets
-        # from configs.datasets.storycloze.storycloze_ppl import storycloze_datasets as storycloze_ppl_datasets
+        from configs.datasets.ceval.ceval_gen import ceval_datasets
+        from configs.datasets.gsm8k.gsm8k_gen import gsm8k_datasets
+        from configs.datasets.cmmlu.cmmlu_gen import cmmlu_datasets
+        from configs.datasets.ARC_c.ARC_c_gen import ARC_c_datasets
+        from configs.datasets.ARC_c.ARC_c_clean_ppl import ARC_c_datasets as ARC_c_clean_datasets
+        from configs.datasets.ARC_e.ARC_e_gen import ARC_e_datasets
+        from configs.datasets.humaneval.humaneval_gen import humaneval_datasets
+        from configs.datasets.humaneval.humaneval_repeat10_gen_8e312c import humaneval_datasets as humaneval_repeat10_datasets
+        from configs.datasets.race.race_ppl import race_datasets
+        from configs.datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
+        from configs.datasets.mmlu.mmlu_gen import mmlu_datasets
+        from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
+        from configs.datasets.strategyqa.strategyqa_gen import strategyqa_datasets
+        from configs.datasets.bbh.bbh_gen import bbh_datasets
+        from configs.datasets.Xsum.Xsum_gen import Xsum_datasets
+        from configs.datasets.flores.flores_gen import flores_datasets
+        from configs.datasets.winogrande.winogrande_gen import winogrande_datasets
+        from configs.datasets.winogrande.winogrande_ll import winogrande_datasets as winogrande_ll_datasets
+        from configs.datasets.winogrande.winogrande_5shot_ll_252f01 import winogrande_datasets as winogrande_5shot_ll_datasets
+        from configs.datasets.obqa.obqa_gen import obqa_datasets
+        from configs.datasets.obqa.obqa_ppl_6aac9e import obqa_datasets as obqa_ppl_datasets
+        from configs.datasets.agieval.agieval_gen import agieval_datasets
+        from configs.datasets.siqa.siqa_gen import siqa_datasets as siqa_v2_datasets
+        from configs.datasets.siqa.siqa_gen_18632c import siqa_datasets as siqa_v3_datasets
+        from configs.datasets.siqa.siqa_ppl_42bc6e import siqa_datasets as siqa_ppl_datasets
+        from configs.datasets.storycloze.storycloze_gen import storycloze_datasets
+        from configs.datasets.storycloze.storycloze_ppl import storycloze_datasets as storycloze_ppl_datasets
         from configs.datasets.summedits.summedits_gen import \
             summedits_datasets as summedits_v2_datasets
 
