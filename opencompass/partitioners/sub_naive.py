@@ -102,6 +102,25 @@ def remove_already_tasks(tasks, work_dir, meta_judge_model):
     return tasks_to_keep
 
 
+def get_model_combinations(
+        mode,
+        models: List[ConfigDict],
+        base_models: Optional[List[ConfigDict]] = [],
+        compare_models: Optional[List[ConfigDict]] = []) -> List:
+    if mode == 'allpair':
+        assert len(models) > 1
+        return combinations(models, 2)
+    elif mode == 'm2n':
+        assert len(base_models) > 0 and len(compare_models) > 0
+        model_combinations = list(product(base_models, compare_models))
+        unique_combinations = remove_duplicate_pairs(
+            [combo for combo in model_combinations if combo[0] != combo[1]])
+        return unique_combinations
+    elif mode == 'fixed':
+        pass
+        return None
+
+
 @PARTITIONERS.register_module()
 class SubjectiveNaivePartitioner(NaivePartitioner):
     """Naive task partitioner for subjective evaluation. Compared to
@@ -113,46 +132,25 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
             to the task config.
     """
 
-    def __init__(self,
-                 mode: str,
-                 out_dir: str,
-                 models: Optional[List[ConfigDict]] = [],
-                 base_models: Optional[List[ConfigDict]] = [],
-                 compare_models: Optional[List[ConfigDict]] = [],
-                 judge_models: Optional[List[ConfigDict]] = [],
-                 meta_judge_model: Optional[ConfigDict] = None,
-                 model_pairs: Optional[List[Tuple]] = None,
-                 keep_keys: Optional[List[str]] = None,
-                 infer_order: Optional[str] = 'random'):
+    def __init__(
+        self,
+        out_dir: str,
+        models: Optional[List[ConfigDict]] = [],
+        base_models: Optional[List[ConfigDict]] = [],
+        compare_models: Optional[List[ConfigDict]] = [],
+        judge_models: Optional[List[ConfigDict]] = [],
+        meta_judge_model: Optional[ConfigDict] = None,
+        model_pairs: Optional[List[Tuple]] = None,
+        keep_keys: Optional[List[str]] = None,
+    ):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
-        assert mode in ['singlescore', 'allpair', 'm2n', 'fixed']
-        assert infer_order in ['random', 'double']
-        self.mode = mode
+
         self.models = models
         self.base_models = base_models
         self.compare_models = compare_models
         self.model_pairs = model_pairs
         self.judge_models = judge_models
         self.meta_judge_model = meta_judge_model
-        self.infer_order = infer_order
-
-    def get_model_combinations(
-            self,
-            models: List[ConfigDict],
-            base_models: Optional[List[ConfigDict]] = [],
-            compare_models: Optional[List[ConfigDict]] = []) -> List:
-        if self.mode == 'allpair':
-            assert len(models) > 1
-            return combinations(models, 2)
-        elif self.mode == 'm2n':
-            assert len(base_models) > 0 and len(compare_models) > 0
-            model_combinations = list(product(base_models, compare_models))
-            unique_combinations = remove_duplicate_pairs([
-                combo for combo in model_combinations if combo[0] != combo[1]
-            ])
-            return unique_combinations
-        elif self.mode == 'fixed':
-            pass
 
     def partition(self,
                   models: List[ConfigDict],
@@ -187,34 +185,46 @@ class SubjectiveNaivePartitioner(NaivePartitioner):
         models = self.models if self.models != [] else models
         base_models, compare_models = self.base_models, self.compare_models
         judge_models, meta_judge_model = self.judge_models, self.meta_judge_model
-        if self.mode == 'singlescore':
-            models = models
-        else:
-            models = self.get_model_combinations(models, base_models,
-                                                 compare_models)
-        model_dataset_combinations = [{'models': models, 'datasets': datasets}]
-        tasks = super().partition(
-            model_dataset_combinations=model_dataset_combinations,
-            work_dir=work_dir,
-            out_dir=out_dir,
-            add_cfg=add_cfg)
+        all_tasks = []
+        for dataset in datasets:
+            mode = dataset['mode']
+            infer_order = dataset.get('infer_order', None)
+            assert mode in ['singlescore', 'allpair', 'm2n', 'fixed']
+            assert infer_order in ['random', 'double', None]
+            if mode == 'singlescore':
+                temp_models = models
+            else:
+                temp_models = get_model_combinations(mode, models,
+                                                     dataset['base_models'],
+                                                     models)
+            model_dataset_combinations = [{
+                'models': temp_models,
+                'datasets': [dataset]
+            }]
 
-        # We need to add judge models and meta-judge-model as new tasks
-        # When there is no meta-judge-model, we assign all judge models to each tasks
-        # When there is a meta-judge-model, we add an additional task stage
-        tasks = replicate_tasks_with_judge_models(tasks, judge_models,
-                                                  meta_judge_model)
+            tasks = super().partition(
+                model_dataset_combinations=model_dataset_combinations,
+                work_dir=work_dir,
+                out_dir=out_dir,
+                add_cfg=add_cfg)
 
-        # We also need to check and remove the already done tasks
-        tasks = remove_already_tasks(tasks, work_dir, meta_judge_model)
-        if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
-                tasks[0], list):
-            # Refer to meta review judge
-            for task_stage in tasks:
-                for task in task_stage:
-                    task['infer_order'] = self.infer_order
-        else:
-            # Refer to just have review judge
-            for task in tasks:
-                task['infer_order'] = self.infer_order
-        return tasks
+            # We need to add judge models and meta-judge-model as new tasks
+            # When there is no meta-judge-model, we assign all judge models to each tasks
+            # When there is a meta-judge-model, we add an additional task stage
+            tasks = replicate_tasks_with_judge_models(tasks, judge_models,
+                                                      meta_judge_model)
+
+            # We also need to check and remove the already done tasks
+            tasks = remove_already_tasks(tasks, work_dir, meta_judge_model)
+            if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
+                    tasks[0], list):
+                # Refer to meta review judge
+                for task_stage in tasks:
+                    for task in task_stage:
+                        task['infer_order'] = infer_order
+            else:
+                # Refer to just have review judge
+                for task in tasks:
+                    task['infer_order'] = infer_order
+            all_tasks += tasks
+        return all_tasks

@@ -87,8 +87,10 @@ class AlignmentBenchDataset(SubjectiveCmpDataset):
     def load(self,
              path: str,
              name: str,
+             mode: Optional[str] = 'singlescore',
              alignment_bench_config_path: Optional[str] = '',
-             alignment_bench_config_name: Optional[str] = ''):
+             alignment_bench_config_name: Optional[str] = '',
+             summarizer: Optional = None):
         if alignment_bench_config_path != '':
             alignmentbench_config = Config(alignment_bench_config_path,
                                            alignment_bench_config_name)

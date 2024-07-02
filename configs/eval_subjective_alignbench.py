@@ -1,7 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import subjective_datasets
+    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
@@ -48,7 +48,7 @@ models = [
     )
 ]
 
-datasets = [*subjective_datasets]
+datasets = [*alignbench_datasets]
 
 # -------------Evalation Stage ----------------------------------------
 
