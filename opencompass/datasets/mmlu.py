@@ -85,8 +85,9 @@ class MMLUDatasetClean(BaseDataset):
                                             subset_name=name,
                                             split=split)
                 if split == 'test':
-                    annotations = MMLUDatasetClean.load_contamination_annotations(
-                        path, split)
+                    annotations = \
+                        MMLUDatasetClean.load_contamination_annotations(
+                            path, split)
                 dataset_list = []
                 for row_index, line in enumerate(ms_dataset):
                     item = {
@@ -111,8 +112,9 @@ class MMLUDatasetClean(BaseDataset):
                 raw_data = []
                 filename = osp.join(path, split, f'{name}_{split}.csv')
                 if split == 'test':
-                    annotations = MMLUDatasetClean.load_contamination_annotations(
-                        path, split)
+                    annotations = \
+                        MMLUDatasetClean.load_contamination_annotations(
+                            path, split)
                 with open(filename, encoding='utf-8') as f:
                     reader = csv.reader(f)
                     for row_index, row in enumerate(reader):

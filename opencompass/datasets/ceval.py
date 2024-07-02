@@ -82,8 +82,9 @@ class CEvalDatasetClean(BaseDataset):
         else:
             for split in ['dev', 'val', 'test']:
                 if split == 'val':
-                    annotations = CEvalDatasetClean.load_contamination_annotations(
-                        path, split)
+                    annotations = \
+                        CEvalDatasetClean.load_contamination_annotations(
+                            path, split)
                 filename = osp.join(path, split, f'{name}_{split}.csv')
                 with open(filename, encoding='utf-8') as f:
                     reader = csv.reader(f)
