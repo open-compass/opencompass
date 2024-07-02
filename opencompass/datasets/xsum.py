@@ -1,12 +1,13 @@
 import json
+from os import environ
 
 from datasets import Dataset
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from .base import BaseDataset
-from os import environ
-from modelscope import MsDataset
+
 
 @LOAD_DATASET.register_module()
 class XsumDataset(BaseDataset):
@@ -34,7 +35,8 @@ class XsumDataset(BaseDataset):
                     sample = json.loads(line.strip())
                     dialogue = sample['dialogue']
                     summary = sample['summary']
-                    if isinstance(dialogue, float) or isinstance(summary, float):
+                    if isinstance(dialogue, float) or isinstance(
+                            summary, float):
                         continue
                     rows.append({'dialogue': dialogue, 'summary': summary})
                 dataset = Dataset.from_dict({

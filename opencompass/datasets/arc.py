@@ -1,22 +1,24 @@
 import json
 import os.path as osp
+from os import environ
 
 from datasets import Dataset
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
-from os import environ
-from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class ARCDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name:str):
+    def load(path: str, name: str):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
-            dataset = MsDataset.load(path, split='validation', subset_name=name)
+            dataset = MsDataset.load(path,
+                                     split='validation',
+                                     subset_name=name)
             rows = []
             for row in dataset:
                 answerKey = row['answerKey']

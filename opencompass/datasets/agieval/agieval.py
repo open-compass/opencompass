@@ -1,7 +1,9 @@
 import json
 import os.path as osp
+from os import environ
 
 from datasets import Dataset
+from modelscope import MsDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
@@ -9,8 +11,7 @@ from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from ..base import BaseDataset
 from .math_equivalence import is_equiv
 from .post_process import parse_math_answer
-from os import environ
-from modelscope import MsDataset
+
 
 @LOAD_DATASET.register_module()
 class AGIEvalDataset(BaseDataset):
@@ -39,7 +40,7 @@ class AGIEvalDataset_v2(BaseDataset):
     @staticmethod
     def load(path: str, name: str, setting_name: str):
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
-        
+
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             ms_dataset = MsDataset.load(path, subset_name=name, split='test')
             dataset = []

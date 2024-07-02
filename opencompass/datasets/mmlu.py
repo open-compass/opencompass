@@ -1,14 +1,15 @@
 import csv
 import json
 import os.path as osp
+from os import environ
 
 from datasets import Dataset, DatasetDict
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
-from os import environ
-from modelscope import MsDataset
+
 
 @LOAD_DATASET.register_module()
 class MMLUDataset(BaseDataset):
@@ -19,7 +20,9 @@ class MMLUDataset(BaseDataset):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             for split in ['dev', 'test']:
                 # 从 ModelScope 加载数据
-                ms_dataset = MsDataset.load(path, subset_name=name, split=split)
+                ms_dataset = MsDataset.load(path,
+                                            subset_name=name,
+                                            split=split)
                 dataset_list = []
                 for line in ms_dataset:
                     dataset_list.append({
@@ -78,13 +81,15 @@ class MMLUDatasetClean(BaseDataset):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             for split in ['dev', 'test']:
                 # 从 ModelScope 加载数据
-                ms_dataset = MsDataset.load(path, subset_name=name, split=split)
+                ms_dataset = MsDataset.load(path,
+                                            subset_name=name,
+                                            split=split)
                 if split == 'test':
                     annotations = MMLUDatasetClean.load_contamination_annotations(
                         path, split)
                 dataset_list = []
                 for row_index, line in enumerate(ms_dataset):
-                    item ={
+                    item = {
                         'input': line['question'],
                         'A': line['choices'][0],
                         'B': line['choices'][1],

@@ -1,14 +1,14 @@
 import json
 import os
+from os import environ
 
 from datasets import Dataset, DatasetDict
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
-from os import environ
-from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class RaceDataset(BaseDataset):
@@ -19,8 +19,10 @@ class RaceDataset(BaseDataset):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             for split in ['validation', 'test']:
                 # 从 ModelScope 加载数据
-                ms_dataset = MsDataset.load(path, subset_name=name, split=split)
-                
+                ms_dataset = MsDataset.load(path,
+                                            subset_name=name,
+                                            split=split)
+
                 dataset_list = []
                 for line in ms_dataset:
                     dataset_list.append({

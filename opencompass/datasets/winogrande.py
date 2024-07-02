@@ -1,13 +1,14 @@
 import json
 import os
+from os import environ
 
 from datasets import Dataset, DatasetDict
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
-from os import environ
-from modelscope import MsDataset
+
 
 @LOAD_DATASET.register_module()
 class winograndeDataset(BaseDataset):
@@ -16,7 +17,10 @@ class winograndeDataset(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
-            ms_dataset = MsDataset.load(path, subset_name='winogrande_xs', split='validation', trust_remote_code=True)
+            ms_dataset = MsDataset.load(path,
+                                        subset_name='winogrande_xs',
+                                        split='validation',
+                                        trust_remote_code=True)
             dataset_list = []
             for line in ms_dataset:
                 prompt = line['sentence']
@@ -61,7 +65,10 @@ class winograndeDataset_V2(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
-            ms_dataset = MsDataset.load(path, subset_name='winogrande_xs', split='validation', trust_remote_code=True)
+            ms_dataset = MsDataset.load(path,
+                                        subset_name='winogrande_xs',
+                                        split='validation',
+                                        trust_remote_code=True)
             dataset_list = []
             for line in ms_dataset:
                 prompt = line['sentence']
@@ -112,7 +119,10 @@ class winograndeDataset_V3(BaseDataset):
         dataset_dict = DatasetDict()
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             for split in ['train', 'validation']:
-                ms_dataset = MsDataset.load(path, subset_name='winogrande_xs', split=split, trust_remote_code=True)
+                ms_dataset = MsDataset.load(path,
+                                            subset_name='winogrande_xs',
+                                            split=split,
+                                            trust_remote_code=True)
                 dataset_list = []
                 for line in ms_dataset:
                     prompt = line['sentence']
@@ -133,7 +143,7 @@ class winograndeDataset_V3(BaseDataset):
                     dataset_dict['train_xs'] = Dataset.from_list(dataset_list)
                 elif split == 'validation':
                     dataset_dict['dev'] = Dataset.from_list(dataset_list)
-        else:        
+        else:
             for split in ['train_xs', 'dev']:
                 filename = os.path.join(path, f'{split}.jsonl')
                 dataset_list = []

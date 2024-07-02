@@ -1,13 +1,14 @@
 import json
 import os
+from os import environ
 
 from datasets import Dataset, DatasetDict
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
-from os import environ
-from modelscope import MsDataset
+
 
 @LOAD_DATASET.register_module()
 class commonsenseqaDataset(BaseDataset):

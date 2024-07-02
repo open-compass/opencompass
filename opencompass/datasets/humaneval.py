@@ -5,16 +5,17 @@ import json
 import os.path as osp
 import re
 import tempfile
+from os import environ
 from typing import List
 
 from datasets import Dataset
+from modelscope import MsDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
-from modelscope import MsDataset
-from os import environ
+
 
 @LOAD_DATASET.register_module()
 class HumanevalDataset(BaseDataset):

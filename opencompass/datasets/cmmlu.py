@@ -1,14 +1,14 @@
 import csv
 import os.path as osp
+from os import environ
 
 from datasets import Dataset, DatasetDict
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
-from os import environ
-from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class CMMLUDataset(BaseDataset):
@@ -16,7 +16,9 @@ class CMMLUDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
-            dataset = MsDataset.load(path, subset_name=name, trust_remote_code=True)
+            dataset = MsDataset.load(path,
+                                     subset_name=name,
+                                     trust_remote_code=True)
             modified_dataset = DatasetDict()
             for split in dataset.keys():
                 raw_data = []

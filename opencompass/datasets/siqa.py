@@ -1,14 +1,14 @@
 import json
 import os
+from os import environ
 
 from datasets import Dataset, DatasetDict
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
-from os import environ
-from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class siqaDataset(BaseDataset):
@@ -48,8 +48,11 @@ class siqaDataset(BaseDataset):
             train_dataset = siqaDataset.load_single(path, 'train.jsonl',
                                                     'train-labels.lst')
             val_dataset = siqaDataset.load_single(path, 'dev.jsonl',
-                                                'dev-labels.lst')
-            return DatasetDict({'train': train_dataset, 'validation': val_dataset})
+                                                  'dev-labels.lst')
+            return DatasetDict({
+                'train': train_dataset,
+                'validation': val_dataset
+            })
 
 
 @LOAD_DATASET.register_module()
@@ -102,7 +105,8 @@ class siqaDataset_V2(BaseDataset):
                             [f'B. {item["answerB"]}', 'B', item['answerB']],
                             [f'C. {item["answerC"]}', 'C', item['answerC']],
                         ],
-                        'label': int(label) - 1
+                        'label':
+                        int(label) - 1
                     }
                     row['label'] = ' ABC'[int(label)]
 
@@ -110,10 +114,13 @@ class siqaDataset_V2(BaseDataset):
                 dataset[split] = Dataset.from_list(data_list)
         else:
             train_dataset = siqaDataset_V2.load_single(path, 'train.jsonl',
-                                                    'train-labels.lst')
+                                                       'train-labels.lst')
             val_dataset = siqaDataset_V2.load_single(path, 'dev.jsonl',
-                                                    'dev-labels.lst')
-            dataset = DatasetDict({'train': train_dataset, 'validation': val_dataset})
+                                                     'dev-labels.lst')
+            dataset = DatasetDict({
+                'train': train_dataset,
+                'validation': val_dataset
+            })
         return dataset
 
 
@@ -155,14 +162,18 @@ class siqaDataset_V3(BaseDataset):
                     row['A'] = item['answerA']
                     row['B'] = item['answerB']
                     row['C'] = item['answerC']
-                    row['answer'] = 'ABC'[int(label)-1]
-                    del row['answerA'], row['answerB'], row['answerC'], row['label']
+                    row['answer'] = 'ABC'[int(label) - 1]
+                    del row['answerA'], row['answerB'], row['answerC'], row[
+                        'label']
                     data_list.append(row)
                 dataset[split] = Dataset.from_list(data_list)
         else:
             train_dataset = siqaDataset_V3.load_single(path, 'train.jsonl',
-                                                    'train-labels.lst')
+                                                       'train-labels.lst')
             val_dataset = siqaDataset_V3.load_single(path, 'dev.jsonl',
-                                                 'dev-labels.lst')
-            dataset = DatasetDict({'train': train_dataset, 'validation': val_dataset})
+                                                     'dev-labels.lst')
+            dataset = DatasetDict({
+                'train': train_dataset,
+                'validation': val_dataset
+            })
         return dataset

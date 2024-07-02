@@ -1,23 +1,23 @@
 import json
 import os
 import re
+from os import environ
 
 from datasets import Dataset, DatasetDict
+from modelscope import MsDataset
 
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from .base import BaseDataset
 
-from os import environ
-from modelscope import MsDataset
 
 @LOAD_DATASET.register_module()
 class GSM8KDataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        if environ.get("DATASET_SOURCE") == "ModelScope":
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
             dataset = MsDataset.load(dataset_name=path, trust_remote_code=True)
         else:
             datasets = {}
