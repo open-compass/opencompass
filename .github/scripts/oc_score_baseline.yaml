@@ -29,3 +29,58 @@ internlm2-7b-hf:
     openai_humaneval: 45.12
     openbookqa: 80.00
     openbookqa_fact: 86.40
+
+baichuan2-7b-chat-hf:
+    gsm8k: 30
+    race-middle: 74
+    race-high: 79
+
+internlm2-chat-1.8b-turbomind:
+    gsm8k: 40
+    race-middle: 82
+    race-high: 83
+
+internlm2-chat-1.8b-sft-turbomind:
+    gsm8k: 69
+    race-middle: 90
+    race-high: 88
+
+internlm2-chat-7b-sft-turbomind:
+    gsm8k: 71
+    race-middle: 91
+    race-high: 92
+    
+llama-3-8b-instruct-turbomind:
+    gsm8k: 77
+    race-middle: 85
+    race-high: 89
+
+minicpm-2b-dpo-fp32-hf:
+    gsm8k: 58
+    race-middle: 66
+    race-high: 74
+
+minicpm-2b-sft-bf16-hf:
+    gsm8k: 58
+    race-middle: 75
+    race-high: 81
+
+minicpm-2b-sft-fp32-hf:
+    gsm8k: 58
+    race-middle: 75
+    race-high: 81
+    
+phi-3-mini-4k-instruct-hf:
+    gsm8k: 67
+    race-middle: 81
+    race-high: 84
+
+qwen2-1.5b-instruct-turbomind:
+    gsm8k: 60
+    race-middle: 77
+    race-high: 86
+
+qwen2-7b-instruct-turbomind:
+    gsm8k: 88
+    race-middle: 87
+    race-high: 89
