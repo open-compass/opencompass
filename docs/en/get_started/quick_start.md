@@ -22,7 +22,43 @@ For larger parameterized models like Llama-7B, refer to other examples provided 
 In OpenCompass, each evaluation task consists of the model to be evaluated and the dataset. The entry point for evaluation is `run.py`. Users can select the model and dataset to be tested either via command line or configuration files.
 
 `````{tabs}
+````{tab} Command Line (Custom HF Model)
 
+For HuggingFace models, users can set model parameters directly through the command line without additional configuration files. For instance, for the `facebook/opt-125m` model, you can evaluate it with the following command:
+
+```bash
+python run.py --datasets siqa_gen winograd_ppl \
+--hf-type base \
+--hf-path facebook/opt-125m
+```
+
+Note that in this way, OpenCompass only evaluates one model at a time, while other ways can evaluate multiple models at once.
+
+```{caution}
+`--hf-num-gpus` does not stand for the actual number of GPUs to use in evaluation, but the minimum required number of GPUs for this model. [More](faq.md#how-does-opencompass-allocate-gpus)
+```
+
+:::{dropdown} More detailed example
+:animate: fade-in-slide-down
+```bash
+python run.py --datasets siqa_gen winograd_ppl \
+--hf-type base \  # HuggingFace model type, base or chat
+--hf-path facebook/opt-125m \  # HuggingFace model path
+--tokenizer-path facebook/opt-125m \  # HuggingFace tokenizer path (if the same as the model path, can be omitted)
+--tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # Arguments to construct the tokenizer
+--model-kwargs device_map='auto' \  # Arguments to construct the model
+--max-seq-len 2048 \  # Maximum sequence length the model can accept
+--max-out-len 100 \  # Maximum number of tokens to generate
+--min-out-len 100 \  # Minimum number of tokens to generate
+--batch-size 64  \  # Batch size
+--hf-num-gpus 1  # Number of GPUs required to run the model
+```
+```{seealso}
+For all HuggingFace related parameters supported by `run.py`, please read [Launching Evaluation Task](../user_guides/experimentation.md#launching-an-evaluation-task).
+```
+:::
+
+````
 ````{tab} Command Line
 
 Users can combine the models and datasets they want to test using `--models` and `--datasets`.
@@ -74,44 +110,6 @@ If you want to evaluate other models, please check out the "Command Line (Custom
 
 ````
 
-````{tab} Command Line (Custom HF Model)
-
-For HuggingFace models, users can set model parameters directly through the command line without additional configuration files. For instance, for the `facebook/opt-125m` model, you can evaluate it with the following command:
-
-```bash
-python run.py --datasets siqa_gen winograd_ppl \
---hf-type base \
---hf-path facebook/opt-125m
-```
-
-Note that in this way, OpenCompass only evaluates one model at a time, while other ways can evaluate multiple models at once.
-
-```{caution}
-`--hf-num-gpus` does not stand for the actual number of GPUs to use in evaluation, but the minimum required number of GPUs for this model. [More](faq.md#how-does-opencompass-allocate-gpus)
-```
-
-:::{dropdown} More detailed example
-:animate: fade-in-slide-down
-```bash
-python run.py --datasets siqa_gen winograd_ppl \
---hf-type base \  # HuggingFace model type, base or chat
---hf-path facebook/opt-125m \  # HuggingFace model path
---tokenizer-path facebook/opt-125m \  # HuggingFace tokenizer path (if the same as the model path, can be omitted)
---tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # Arguments to construct the tokenizer
---model-kwargs device_map='auto' \  # Arguments to construct the model
---max-seq-len 2048 \  # Maximum sequence length the model can accept
---max-out-len 100 \  # Maximum number of tokens to generate
---min-out-len 100 \  # Minimum number of tokens to generate
---batch-size 64  \  # Batch size
---hf-num-gpus 1  # Number of GPUs required to run the model
-```
-```{seealso}
-For all HuggingFace related parameters supported by `run.py`, please read [Launching Evaluation Task](../user_guides/experimentation.md#launching-an-evaluation-task).
-```
-:::
-
-
-````
 ````{tab} Configuration File
 
 In addition to configuring the experiment through the command line, OpenCompass also allows users to write the full configuration of the experiment in a configuration file and run it directly through `run.py`. The configuration file is organized in Python format and must include the `datasets` and `models` fields.
