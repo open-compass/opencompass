@@ -2,7 +2,9 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
+from opencompass.models.openai_api import OpenAI
 from opencompass.datasets import CompassArenaDataset
+from opencompass.summarizers import CompassArenaSummarizer
 
 subjective_reader_cfg = dict(
     input_columns=['question', 'ref'],
@@ -11,7 +13,7 @@ subjective_reader_cfg = dict(
 
 data_path ='data/subjective/compass_arena'
 
-subjective_datasets = []
+compassarena_datasets = []
 
 base_prompt = """
 
@@ -101,6 +103,11 @@ creation_prompt = """
 
 sub_map = {'language': language_prompt, 'knowledge': knowledge_prompt, 'reason_v2': reason_prompt, 'math_v2': math_prompt, 'creationv2_zh': creation_prompt}
 
+gpt4 = [dict(
+    abbr='gpt4-turbo',
+    type=OpenAI,
+)]
+
 for _name, _prompt in sub_map.items():
     subjective_infer_cfg = dict(
             prompt_template=dict(
@@ -132,13 +139,17 @@ for _name, _prompt in sub_map.items():
         pred_role='BOT',
     )
 
-    subjective_datasets.append(
+    compassarena_datasets.append(
         dict(
-            abbr=f'{_name}',
+            abbr=f'compassarena_{_name}',
             type=CompassArenaDataset,
             path=data_path,
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
-            eval_cfg=subjective_eval_cfg
+            eval_cfg=subjective_eval_cfg,
+            mode='m2n',
+            infer_order='double',
+            base_models=gpt4,
+            summarizer = dict(type=CompassArenaSummarizer, summary_type='half_add')
         ))

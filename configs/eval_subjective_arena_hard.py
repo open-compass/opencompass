@@ -14,7 +14,7 @@ from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import ArenaHardSummarizer
 
 with read_base():
-    from .datasets.subjective.arena_hard.arena_hard_compare import subjective_datasets
+    from .datasets.subjective.arena_hard.arena_hard_compare import arenahard_datasets
 
 api_meta_template = dict(
     round=[
@@ -51,7 +51,7 @@ models = [
     )
 ]
 
-datasets = [*subjective_datasets]
+datasets = [*arenahard_datasets]
 
 work_dir = 'outputs/arena_hard/'
 # -------------Inferen Stage ----------------------------------------

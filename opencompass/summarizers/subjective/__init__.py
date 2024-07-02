@@ -14,4 +14,5 @@ from .information_retrival import IRSummarizer
 from .mtbench import MTBenchSummarizer
 from .mtbench101 import MTBench101Summarizer
 from .multiround import MultiroundSummarizer
+from .subjective import SubjectiveSummarizer
 from .wildbench import WildBenchPairSummarizer, WildBenchSingleSummarizer

@@ -4,6 +4,7 @@ import argparse
 import getpass
 import os
 import os.path as osp
+from copy import deepcopy
 from datetime import datetime
 
 from mmengine.config import Config, DictAction
@@ -345,13 +346,31 @@ def main():
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
         summarizer_cfg = cfg.get('summarizer', {})
-        if not summarizer_cfg or summarizer_cfg.get('type', None) is None:
-            summarizer_cfg['type'] = DefaultSummarizer
-        summarizer_cfg['config'] = cfg
-        summarizer = build_from_cfg(summarizer_cfg)
-        summarizer.summarize(time_str=cfg_time_str)
 
+        # For subjective summarizer
+        if summarizer_cfg.get('function', None):
+            grouped_datasets = {}
+            for dataset in cfg.datasets:
+                prefix = dataset['abbr'].split('_')[0]
+                if prefix not in grouped_datasets:
+                    grouped_datasets[prefix] = []
+                grouped_datasets[prefix].append(dataset)
+            all_grouped_lists = []
+            for prefix in grouped_datasets:
+                all_grouped_lists.append(grouped_datasets[prefix])
+            for dataset in all_grouped_lists:
+                temp_cfg = deepcopy(cfg)
+                temp_cfg.datasets = dataset
+                summarizer_cfg = dict(type=dataset[0]['summarizer']['type'], config=temp_cfg)
+                summarizer = build_from_cfg(summarizer_cfg)
+                summarizer.summarize(time_str=cfg_time_str)
 
+        else:
+            if not summarizer_cfg or summarizer_cfg.get('type', None) is None:
+                summarizer_cfg['type'] = DefaultSummarizer
+            summarizer_cfg['config'] = cfg
+            summarizer = build_from_cfg(summarizer_cfg)
+            summarizer.summarize(time_str=cfg_time_str)
 
 if __name__ == '__main__':
     main()

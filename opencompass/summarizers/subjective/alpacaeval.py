@@ -80,8 +80,8 @@ class AlpacaSummarizer:
     def __init__(self, config: ConfigDict, judge_type='v2') -> None:
         self.tasks = []
         self.cfg = config
-        self.base_models = self.cfg['eval']['partitioner']['base_models']
-        self.compare_models = self.cfg['eval']['partitioner']['compare_models']
+        self.base_models = self.cfg['datasets'][0]['base_models']
+        self.compare_models = self.cfg['eval']['partitioner']['models']
         self.judge_abbr = model_abbr_from_cfg(
             self.cfg['judge_models'][0])  # We will reorganize the summarizers
         self.judge_type = judge_type

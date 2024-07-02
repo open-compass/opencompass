@@ -3,6 +3,8 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import SubjectiveCmpDataset
+from opencompass.models.openai_api import OpenAI
+from opencompass.summarizers import AlpacaSummarizer
 from mmengine.config import read_base
 
 subjective_reader_cfg = dict(
@@ -48,6 +50,18 @@ Evaluate the models based on the quality and relevance of their outputs, and sel
 ## Best Model Identifier
 """
 
+api_meta_template = dict(
+    round=[
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
+    ],
+    reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
+)
+
+gpt4 = [dict(
+    abbr='gpt4-turbo',
+    type=OpenAI,
+)]
 
 for _name in subjective_all_sets:
     subjective_infer_cfg = dict(
@@ -95,5 +109,9 @@ for _name in subjective_all_sets:
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
-            eval_cfg=subjective_eval_cfg
+            eval_cfg=subjective_eval_cfg,
+            mode='m2n',
+            infer_order='random',
+            base_models=gpt4,
+            summarizer = dict(type=AlpacaSummarizer, judge_type='v2')
         ))
