@@ -42,7 +42,7 @@ models = [
         abbr='glm-4-flash',
         type=ZhiPuV2AI,
         path='glm-4-flash',
-        key=environ["ZHIPU_API_KEY"],
+        key=environ['ZHIPU_API_KEY'],
         generation_kwargs={
             'tools': [
                 {

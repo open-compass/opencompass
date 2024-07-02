@@ -1,16 +1,17 @@
 import json
 import os.path as osp
 import re
+from os import environ
 
 from datasets import Dataset
+from modelscope import MsDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
 
 from .base import BaseDataset
-from os import environ
-from modelscope import MsDataset
+
 
 @LOAD_DATASET.register_module()
 class BBHDataset(BaseDataset):
