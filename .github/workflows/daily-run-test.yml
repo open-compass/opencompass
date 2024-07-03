@@ -57,7 +57,7 @@ jobs:
           rm -rf regression_result_daily
           export from_tf=TRUE
           python3 run.py .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
-          cp -r /cpfs01/user/qa-llm-cicd/report/9774${{ github.run_id }}971066/*/summary regression_result_daily
+          cp -r /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test
         run: |
