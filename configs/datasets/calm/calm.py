@@ -139,7 +139,7 @@ for _name in calm_all_sets:
                 type=PromptTemplate,
                 template="{question}"),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_out_len=100))
+            inferencer=dict(type=GenInferencer, max_out_len=500))
 
         calm_eval_cfg = dict(evaluator=dict(
                 type=CaLMEvaluator, 
