@@ -1,7 +1,9 @@
 import json
 import os.path as osp
+from os import environ
 
 from datasets import Dataset, DatasetDict
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -14,9 +16,9 @@ class hellaswagDataset(BaseDataset):
     @staticmethod
     def load(path):
         dataset = []
-        with open(path, 'r', encoding='utf-8') as f:
-            for line in f:
-                data = json.loads(line)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            ms_dataset = MsDataset.load(path, split='validation')
+            for data in ms_dataset:
                 dataset.append({
                     'ctx': data['query'].split(': ', 2)[-1],
                     'A': data['choices'][0],
@@ -25,6 +27,18 @@ class hellaswagDataset(BaseDataset):
                     'D': data['choices'][3],
                     'label': data['gold'],
                 })
+        else:
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    data = json.loads(line)
+                    dataset.append({
+                        'ctx': data['query'].split(': ', 2)[-1],
+                        'A': data['choices'][0],
+                        'B': data['choices'][1],
+                        'C': data['choices'][2],
+                        'D': data['choices'][3],
+                        'label': data['gold'],
+                    })
         dataset = Dataset.from_list(dataset)
         return dataset
 
@@ -35,9 +49,9 @@ class hellaswagDataset_V2(BaseDataset):
     @staticmethod
     def load(path):
         dataset = []
-        with open(path, 'r', encoding='utf-8') as f:
-            for line in f:
-                data = json.loads(line)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            ms_dataset = MsDataset.load(path, split='validation')
+            for data in ms_dataset:
                 dataset.append({
                     'ctx': data['query'].split(': ', 1)[-1],
                     'A': data['choices'][0],
@@ -46,6 +60,18 @@ class hellaswagDataset_V2(BaseDataset):
                     'D': data['choices'][3],
                     'label': 'ABCD'[data['gold']],
                 })
+        else:
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    data = json.loads(line)
+                    dataset.append({
+                        'ctx': data['query'].split(': ', 1)[-1],
+                        'A': data['choices'][0],
+                        'B': data['choices'][1],
+                        'C': data['choices'][2],
+                        'D': data['choices'][3],
+                        'label': 'ABCD'[data['gold']],
+                    })
         dataset = Dataset.from_list(dataset)
         return dataset
 
@@ -56,9 +82,9 @@ class hellaswagDataset_V3(BaseDataset):
     @staticmethod
     def load(path):
         dataset = []
-        with open(path, 'r', encoding='utf-8') as f:
-            for line in f:
-                data = json.loads(line)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            ms_dataset = MsDataset.load(path, split='validation')
+            for data in ms_dataset:
                 dataset.append({
                     'query': data['query'],
                     'A': data['choices'][0],
@@ -67,6 +93,18 @@ class hellaswagDataset_V3(BaseDataset):
                     'D': data['choices'][3],
                     'gold': data['gold'],
                 })
+        else:
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    data = json.loads(line)
+                    dataset.append({
+                        'query': data['query'],
+                        'A': data['choices'][0],
+                        'B': data['choices'][1],
+                        'C': data['choices'][2],
+                        'D': data['choices'][3],
+                        'gold': data['gold'],
+                    })
         dataset = Dataset.from_list(dataset)
         return dataset
 
@@ -82,9 +120,10 @@ class hellaswagDatasetwithICE(BaseDataset):
             ['val', 'hellaswag.jsonl'],
         ]:
             dataset = []
-            with open(osp.join(path, filename), 'r', encoding='utf-8') as f:
-                for line in f:
-                    data = json.loads(line)
+            if environ.get('DATASET_SOURCE') == 'ModelScope':
+                ms_dataset = MsDataset.load(
+                    path, split=split if split == 'train' else 'validation')
+                for data in ms_dataset:
                     dataset.append({
                         'ctx': data['query'].split(': ', 1)[-1],
                         'A': data['choices'][0],
@@ -93,6 +132,19 @@ class hellaswagDatasetwithICE(BaseDataset):
                         'D': data['choices'][3],
                         'label': 'ABCD'[data['gold']],
                     })
+            else:
+                with open(osp.join(path, filename), 'r',
+                          encoding='utf-8') as f:
+                    for line in f:
+                        data = json.loads(line)
+                        dataset.append({
+                            'ctx': data['query'].split(': ', 1)[-1],
+                            'A': data['choices'][0],
+                            'B': data['choices'][1],
+                            'C': data['choices'][2],
+                            'D': data['choices'][3],
+                            'label': 'ABCD'[data['gold']],
+                        })
             dataset_dict[split] = Dataset.from_list(dataset)
         return dataset_dict
 
@@ -123,9 +175,10 @@ class hellaswagDatasetClean(BaseDataset):
         dataset = []
         annotations = hellaswagDatasetClean.load_contamination_annotations(
             osp.dirname(path))
-        with open(path, 'r', encoding='utf-8') as f:
-            for rwo_index, line in enumerate(f):
-                data = json.loads(line)
+
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            ms_dataset = MsDataset.load(path, split='validation')
+            for rwo_index, data in enumerate(ms_dataset):
                 rwo_index = f'{rwo_index}'
                 if rwo_index in annotations:
                     is_clean = annotations[rwo_index][0]
@@ -140,5 +193,23 @@ class hellaswagDatasetClean(BaseDataset):
                     'label': data['gold'],
                     'is_clean': is_clean,
                 })
+        else:
+            with open(path, 'r', encoding='utf-8') as f:
+                for rwo_index, line in enumerate(f):
+                    data = json.loads(line)
+                    rwo_index = f'{rwo_index}'
+                    if rwo_index in annotations:
+                        is_clean = annotations[rwo_index][0]
+                    else:
+                        is_clean = 'not labeled'
+                    dataset.append({
+                        'ctx': data['query'].split(': ', 2)[-1],
+                        'A': data['choices'][0],
+                        'B': data['choices'][1],
+                        'C': data['choices'][2],
+                        'D': data['choices'][3],
+                        'label': data['gold'],
+                        'is_clean': is_clean,
+                    })
         dataset = Dataset.from_list(dataset)
         return dataset

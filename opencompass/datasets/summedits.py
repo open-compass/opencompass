@@ -20,8 +20,6 @@ class SummeditsDataset_V2(BaseDataset):
             for line in ms_dataset:
                 row = line
                 row['label'] = 'BA'[line['label']]
-                row['original_summary'] = line['seed_summary']
-                del row['seed_summary'], row['domain']
                 dataset.append(row)
         else:
             with open(path, 'r') as f:

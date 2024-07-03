@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import AGIEvalDataset_v2, AGIEvalEvaluator
 from opencompass.utils.text_postprocessors import first_capital_postprocess, first_capital_postprocess_multi
+from os import environ
 
 agieval_reader_cfg = dict(
     input_columns=['question', 'options'], output_column='label')
@@ -88,7 +89,7 @@ for _name in agieval_single_choice_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset_v2,
-            path='./data/AGIEval/data/v1/',
+            path='opencompass/agieval' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/AGIEval/data/v1/',
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',
@@ -117,7 +118,7 @@ for _name in agieval_multiple_choices_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset_v2,
-            path='./data/AGIEval/data/v1/',
+            path='opencompass/agieval' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/AGIEval/data/v1/',
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',
@@ -143,7 +144,7 @@ for _name in agieval_cloze_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset_v2,
-            path='./data/AGIEval/data/v1/',
+            path='opencompass/agieval' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/AGIEval/data/v1/',
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',

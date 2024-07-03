@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import piqaDataset_V3
+from os import environ
 
 piqa_reader_cfg = dict(
     input_columns=['goal', 'sol1', 'sol2'],
@@ -30,7 +31,7 @@ piqa_datasets = [
     dict(
         abbr='piqa',
         type=piqaDataset_V3,
-        path='./data/piqa',
+        path='opencompass/piqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/piqa',
         reader_cfg=piqa_reader_cfg,
         infer_cfg=piqa_infer_cfg,
         eval_cfg=piqa_eval_cfg)
