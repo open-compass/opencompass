@@ -31,34 +31,46 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda create -y --name ${{env.CONDA_ENV}} python=3.10
           conda activate ${{env.CONDA_ENV}}
-          pip install torch torchvision torchaudio --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-          pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-*.whl
+          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.5.0.post1+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.5.8+cu118torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl --index-url https://download.pytorch.org/whl/cu118
+          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          pip install xformers==0.0.25.post1 --cache-dir ${{env.PIP_CACHE_PATH}} --extra-index-url https://download.pytorch.org/whl/cu118
           conda info --envs
       - name: Prepare - Pip install code
         run: |
           eval "$(conda shell.bash hook)"
           conda activate ${{env.CONDA_ENV}}
           pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers protobuf --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install human_eval transformers protobuf pytest --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
       - name: Prepare - prepare data and hf model
         run: |
           cp -r ${{env.USERSPACE_PREFIX}}/data .
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
-      - name:  Run test
+      - name:  Run chat model test
         run: |
           eval "$(conda shell.bash hook)"
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           rm -rf regression_result_daily
           export from_tf=TRUE
-          python3 run.py --models hf_internlm_chat_7b hf_internlm2_7b hf_chatglm3_6b_base hf_chatglm3_6b hf_qwen_7b_chat hf_qwen_7b --datasets FewCLUE_chid_ppl humaneval_gen ARC_c_ppl obqa_ppl --work-dir regression_result_daily
-      - name:  Get result
+          rm -rf /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary
+          python3 run.py .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
+          cp -r /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary regression_result_daily
+          python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
+      - name:  Run base model test
         run: |
           eval "$(conda shell.bash hook)"
-          pip install pytest --cache-dir ${{env.PIP_CACHE_PATH}}
-          python -m pytest -s -v --color=yes .github/scripts/oc_score_assert.py
+          conda activate ${{env.CONDA_ENV}}
+          conda info --envs
+          rm -rf regression_result_daily
+          export from_tf=TRUE
+          rm -rf /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary
+          python3 run.py .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
+          cp -r /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary regression_result_daily
+          python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
         if: always()
         run: |
