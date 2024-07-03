@@ -6,13 +6,15 @@ import yaml
 
 output_path = 'regression_result_daily'
 
-model_list = ['baichuan2-7b-chat-hf', 'internlm2-chat-1.8b-turbomind', 'internlm2-chat-1.8b-sft-turbomind', 
-              'internlm2-chat-7b-turbomind', 'internlm2-chat-7b-sft-turbomind', 'llama-3-8b-instruct-turbomind', 
-              'minicpm-2b-dpo-fp32-hf', 'minicpm-2b-sft-bf16-hf', 'minicpm-2b-sft-fp32-hf', 
-              'phi-3-mini-4k-instruct-hf', 'qwen2-1.5b-instruct-turbomind', 'qwen2-7b-instruct-turbomind']
-dataset_list = [
-    'gsm8k', 'race-middle', 'race-high'
+model_list = [
+    'baichuan2-7b-chat-hf', 'internlm2-chat-1.8b-turbomind',
+    'internlm2-chat-1.8b-sft-turbomind', 'internlm2-chat-7b-turbomind',
+    'internlm2-chat-7b-sft-turbomind', 'llama-3-8b-instruct-turbomind',
+    'minicpm-2b-dpo-fp32-hf', 'minicpm-2b-sft-bf16-hf',
+    'minicpm-2b-sft-fp32-hf', 'phi-3-mini-4k-instruct-hf',
+    'qwen2-1.5b-instruct-turbomind', 'qwen2-7b-instruct-turbomind'
 ]
+dataset_list = ['gsm8k', 'race-middle', 'race-high']
 
 
 @pytest.fixture()

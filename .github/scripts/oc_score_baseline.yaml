@@ -54,7 +54,7 @@ internlm2-chat-7b-sft-turbomind:
     gsm8k: 71
     race-middle: 91
     race-high: 92
-    
+
 llama-3-8b-instruct-turbomind:
     gsm8k: 77
     race-middle: 85
@@ -74,7 +74,7 @@ minicpm-2b-sft-fp32-hf:
     gsm8k: 58
     race-middle: 75
     race-high: 81
-    
+
 phi-3-mini-4k-instruct-hf:
     gsm8k: 67
     race-middle: 81
