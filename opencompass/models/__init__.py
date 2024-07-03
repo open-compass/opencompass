@@ -1,13 +1,14 @@
 from .accessory import LLaMA2AccessoryModel  # noqa: F401
 from .ai360_api import AI360GPT  # noqa: F401
 from .alaya import AlayaLM  # noqa: F401
-from .baichuan_api import BaiChuan, BaiChuan3  # noqa: F401
+from .baichuan_api import BaiChuan  # noqa: F401
 from .baidu_api import ERNIEBot  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa: F401
 from .base_api import APITemplateParser, BaseAPIModel  # noqa: F401
 from .bytedance_api import ByteDance  # noqa: F401
 from .claude_api import Claude  # noqa: F401
 from .deepseek_api import DeepseekAPI  # noqa: F401
+from .doubao import Doubao  # noqa: F401
 from .gemini_api import Gemini  # noqa: F401
 from .glm import GLM130B  # noqa: F401
 from .huggingface import HuggingFace  # noqa: F401

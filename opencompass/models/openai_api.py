@@ -241,7 +241,12 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
                 )
-                raw_response = requests.post(self.url,
+                if isinstance(self.url, list):
+                    import random
+                    url = self.url[random.randint(0, len(self.url) - 1)]
+                else:
+                    url = self.url
+                raw_response = requests.post(url,
                                              headers=header,
                                              data=json.dumps(data))
             except requests.ConnectionError:
@@ -270,6 +275,9 @@ class OpenAI(BaseAPIModel):
                         self.logger.warn(f'insufficient_quota key: {key}')
                         continue
                     elif response['error']['code'] == 'invalid_prompt':
+                        self.logger.warn('Invalid prompt:', str(input))
+                        return ''
+                    elif response['error']['type'] == 'invalid_prompt':
                         self.logger.warn('Invalid prompt:', str(input))
                         return ''
 

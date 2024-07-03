@@ -5,8 +5,8 @@ with read_base():
     from ..cmmlu.cmmlu_gen_c13365 import cmmlu_datasets
     from ..ceval.ceval_internal_gen_2daf24 import ceval_datasets
     from ..GaokaoBench.GaokaoBench_no_subjective_gen_4c31db import GaokaoBench_datasets
-    from ..triviaqa.triviaqa_wiki_1shot_gen_eaf81e import triviaqa_datasets
-    from ..nq.nq_open_1shot_gen_01cf41 import nq_datasets
+    from ..triviaqa.triviaqa_wiki_1shot_gen_bc5f21 import triviaqa_datasets
+    from ..nq.nq_open_1shot_gen_2e45e5 import nq_datasets
     from ..race.race_gen_69ee4f import race_datasets
     from ..winogrande.winogrande_5shot_gen_6447e6 import winogrande_datasets
     from ..hellaswag.hellaswag_10shot_gen_e42710 import hellaswag_datasets

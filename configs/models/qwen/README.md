@@ -32,7 +32,7 @@ python3 run.py --models hf_qwen1_5_7b --datasets bbh_gen_98fba6 --debug
 python3 run.py --models hf_qwen1_5_7b --datasets gsm8k_gen_17d0dc --debug
 python3 run.py --models hf_qwen1_5_7b --datasets math_4shot_base_gen_db136b --debug
 python3 run.py --models hf_qwen1_5_7b --datasets TheoremQA_5shot_gen_6f0af8 --debug
-python3 run.py --models hf_qwen1_5_7b --datasets humaneval_gen_d2537e --debug
+python3 run.py --models hf_qwen1_5_7b --datasets deprecated_humaneval_gen_d2537e --debug
 python3 run.py --models hf_qwen1_5_7b --datasets sanitized_mbpp_gen_742f0c --debug
 python3 run.py --models hf_qwen1_5_7b --datasets lcbench_gen_5ff288 --debug
 python3 run.py --models hf_qwen1_5_7b --datasets gpqa_ppl_6bf57a --debug

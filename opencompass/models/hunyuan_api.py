@@ -1,4 +1,5 @@
 import json
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -33,22 +34,21 @@ class Hunyuan(BaseAPIModel):
         self.secret_id = secret_id
         self.secret_key = secret_key
         self.endpoint = endpoint
+        self.model = path
 
+        # pip install tencentcloud-sdk-python
         from tencentcloud.common import credential
-        from tencentcloud.common.common_client import CommonClient
         from tencentcloud.common.profile.client_profile import ClientProfile
         from tencentcloud.common.profile.http_profile import HttpProfile
+        from tencentcloud.hunyuan.v20230901 import hunyuan_client
 
         cred = credential.Credential(self.secret_id, self.secret_key)
         httpProfile = HttpProfile()
         httpProfile.endpoint = self.endpoint
         clientProfile = ClientProfile()
         clientProfile.httpProfile = httpProfile
-        self.client = CommonClient('hunyuan',
-                                   '2023-09-01',
-                                   cred,
-                                   'ap-beijing',
-                                   profile=clientProfile)
+        self.client = hunyuan_client.HunyuanClient(cred, 'ap-beijing',
+                                                   clientProfile)
 
     def generate(self,
                  inputs: List[PromptType],
@@ -87,35 +87,65 @@ class Hunyuan(BaseAPIModel):
         assert isinstance(input, (str, PromptList))
 
         if isinstance(input, str):
-            messages = [{'role': 'user', 'content': input}]
+            messages = [{'Role': 'user', 'Content': input}]
         else:
             messages = []
+            msg_buffer, last_role = [], None
             for item in input:
-                msg = {'Content': item['prompt']}
-                if item['role'] == 'HUMAN':
-                    msg['Role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['Role'] = 'assistant'
-                messages.append(msg)
+                if not item['prompt']:
+                    continue
+                if item['role'] == 'BOT':
+                    role = 'assistant'
+                else:  # USER or SYSTEM
+                    role = 'user'
+                if role != last_role and last_role is not None:
+                    messages.append({
+                        'Content': '\n'.join(msg_buffer),
+                        'Role': last_role
+                    })
+                    msg_buffer = []
+                msg_buffer.append(item['prompt'])
+                last_role = role
+            messages.append({
+                'Content': '\n'.join(msg_buffer),
+                'Role': last_role
+            })
+            messages = messages[-40:]
+            if messages[0]['Role'] == 'assistant':
+                messages = messages[1:]
 
         from tencentcloud.common.exception.tencent_cloud_sdk_exception import \
             TencentCloudSDKException
+        from tencentcloud.hunyuan.v20230901 import models
 
-        data = {'Messages': messages}
+        data = {'Model': self.model, 'Messages': messages}
 
-        for _ in range(self.retry):
+        retry_counter = 0
+        while retry_counter < self.retry:
             try:
-                resp = self.client.call_sse('ChatPro', data)
-                contents = []
-                for event in resp:
-                    part = json.loads(event['data'])
-                    contents.append(part['Choices'][0]['Delta']['Content'])
-                answer = ''.join(contents)
+                req = models.ChatCompletionsRequest()
+                req.from_json_string(json.dumps(data))
+                resp = self.client.ChatCompletions(req)
+                resp = json.loads(resp.to_json_string())
+                answer = resp['Choices'][0]['Message']['Content']
 
-            except TencentCloudSDKException as err:
-                print(err)
+            except TencentCloudSDKException as e:
+                self.logger.error(f'Got error code: {e.get_code()}')
+                if e.get_code() == 'ClientNetworkError':
+                    return 'client network error'
+                elif e.get_code() in ['InternalError', 'ServerNetworkError']:
+                    retry_counter += 1
+                    continue
+                elif e.get_code() in ['LimitExceeded']:
+                    time.sleep(5)
+                    continue
+                else:
+                    print(e)
+                    from IPython import embed
+                    embed()
+                    exit()
 
-            print(answer)
+            self.logger.debug(f'Generated: {answer}')
             return answer
 
         raise RuntimeError(f'Failed to respond in {self.retry} retrys')

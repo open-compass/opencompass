@@ -6,7 +6,7 @@ In the evaluation phase, we typically select the corresponding evaluation metric
 - **Phrase**: Common in Q&A and reading comprehension tasks. This type of dataset mainly includes CLUE_CMRC, CLUE_DRCD, DROP datasets, etc. Matching rate is usually used as the evaluation standard--`EMEvaluator`.
 - **Sentence**: Common in translation and generating pseudocode/command-line tasks, mainly including Flores, Summscreen, Govrepcrs, Iwdlt2017 datasets, etc. BLEU (Bilingual Evaluation Understudy) is usually used as the evaluation standard--`BleuEvaluator`.
 - **Paragraph**: Common in text summary generation tasks, commonly used datasets mainly include Lcsts, TruthfulQA, Xsum datasets, etc. ROUGE (Recall-Oriented Understudy for Gisting Evaluation) is usually used as the evaluation standard--`RougeEvaluator`.
-- **Code**: Common in code generation tasks, commonly used datasets mainly include Humaneval, MBPP datasets, etc. Execution pass rate and `pass@k` are usually used as the evaluation standard. At present, Opencompass supports `MBPPEvaluator` and `HumanEvaluator`.
+- **Code**: Common in code generation tasks, commonly used datasets mainly include Humaneval, MBPP datasets, etc. Execution pass rate and `pass@k` are usually used as the evaluation standard. At present, Opencompass supports `MBPPEvaluator` and `HumanEvalEvaluator`.
 
 There is also a type of **scoring-type** evaluation task without standard answers, such as judging whether the output of a model is toxic, which can directly use the related API service for scoring. At present, it supports `ToxicEvaluator`, and currently, the realtoxicityprompts dataset uses this evaluation method.
 
@@ -21,7 +21,7 @@ Currently, in OpenCompass, commonly used Evaluators are mainly located in the [`
 | `BleuEvaluator`       | BLEU                 | None, `flores`               | flores, iwslt2017, summscreen, govrepcrs                             |
 | `RougeEvaluator`      | ROUGE                | None, dataset-specific       | truthfulqa, Xsum, XLSum                                              |
 | `JiebaRougeEvaluator` | ROUGE                | None, dataset-specific       | lcsts                                                                |
-| `HumanEvaluator`      | pass@k               | `humaneval_postprocess`      | humaneval_postprocess                                                |
+| `HumanEvalEvaluator`  | pass@k               | `humaneval_postprocess`      | humaneval_postprocess                                                |
 | `MBPPEvaluator`       | Execution Pass Rate  | None                         | mbpp                                                                 |
 | `ToxicEvaluator`      | PerspectiveAPI       | None                         | realtoxicityprompts                                                  |
 | `AGIEvalEvaluator`    | Accuracy             | None                         | agieval                                                              |

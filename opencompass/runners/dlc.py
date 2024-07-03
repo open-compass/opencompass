@@ -232,14 +232,18 @@ class DLCRunner(BaseRunner):
                 while True:
                     # 1. Avoid to request dlc too frequently.
                     # 2. DLC job may not be ready immediately after creation.
-                    for _ in range(20):
+                    num_retry = 60
+                    for retry_index in range(num_retry):
                         time.sleep(2)
                         try:
                             job_info = json.loads(
                                 subprocess.getoutput(f'dlc get job {job_id}'))
                             break
                         except:  # noqa: E722
-                            pass
+                            if retry_index > num_retry // 3:
+                                logger.warning(
+                                    f'Failed to get job info for {job_id}, '
+                                    'retrying...')
                     else:
                         raise RuntimeError(
                             f'Failed to get job info for {job_id}')

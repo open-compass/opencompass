@@ -1,8 +1,10 @@
 """Direct Generation Inferencer."""
 
 import inspect
+import json
 import os
 import os.path as osp
+import time
 from typing import List, Optional
 
 import mmengine
@@ -71,6 +73,7 @@ class GenInferencer(BaseInferencer):
         self.max_out_len = max_out_len
         self.min_out_len = min_out_len
         self.stopping_criteria = stopping_criteria
+        self.dump_timer = kwargs.get('dump_timer', False)
 
         if self.model.is_api and save_every is None:
             save_every = 1
@@ -128,6 +131,9 @@ class GenInferencer(BaseInferencer):
 
         # 5. Inference for prompts in each batch
         logger.info('Starting inference process...')
+
+        start_time_stamp = time.time()
+        num_sample = 0
         for datum in tqdm(dataloader, disable=not self.is_main_process):
             if ds_reader.output_column:
                 entry, golds = list(zip(*datum))
@@ -166,6 +172,9 @@ class GenInferencer(BaseInferencer):
                     and self.is_main_process):
                 output_handler.write_to_json(output_json_filepath,
                                              'tmp_' + output_json_filename)
+            num_sample += len(datum)
+
+        end_time_stamp = time.time()
 
         # 6. Output
         if self.is_main_process:
@@ -174,6 +183,18 @@ class GenInferencer(BaseInferencer):
                                          output_json_filename)
             if osp.exists(tmp_json_filepath):
                 os.remove(tmp_json_filepath)
+
+        if self.dump_timer and self.is_main_process:
+            timer_filepath = os.path.join(output_json_filepath, 'timer',
+                                          'time.jsonl')
+            os.makedirs(os.path.dirname(timer_filepath), exist_ok=True)
+            time_dict = {
+                'dataset_name': output_json_filename.removesuffix('.json'),
+                'time': end_time_stamp - start_time_stamp,
+                'num_sample': num_sample
+            }
+            with open(timer_filepath, 'a') as f:
+                f.write(json.dumps(time_dict) + '\n')
 
         return [
             sample['prediction']

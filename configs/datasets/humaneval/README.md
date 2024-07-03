@@ -1,7 +1,7 @@
 # HumanEval
 
 ```bash
-python3 run.py --models hf_internlm2_7b --datasets humaneval_gen_d2537e --debug
+python3 run.py --models hf_internlm2_7b --datasets deprecated_humaneval_gen_d2537e --debug
 python3 run.py --models hf_internlm2_chat_7b --datasets humaneval_gen_8e312c --debug
 ```
 

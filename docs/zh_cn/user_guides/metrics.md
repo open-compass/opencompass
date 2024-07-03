@@ -6,7 +6,7 @@
 - **短语**：常见于问答以及阅读理解任务，这类数据集主要包括 CLUE_CMRC, CLUE_DRCD, DROP 数据集等等，评估标准一般使用匹配率--`EMEvaluator`。
 - **句子**：常见于翻译以及生成伪代码、命令行任务中，主要包括 Flores, Summscreen, Govrepcrs, Iwdlt2017 数据集等等，评估标准一般使用 BLEU(Bilingual Evaluation Understudy)--`BleuEvaluator`。
 - **段落**：常见于文本摘要生成的任务，常用的数据集主要包括 Lcsts, TruthfulQA, Xsum 数据集等等，评估标准一般使用 ROUGE（Recall-Oriented Understudy for Gisting Evaluation）--`RougeEvaluator`。
-- **代码**：常见于代码生成的任务，常用的数据集主要包括 Humaneval，MBPP 数据集等等，评估标准一般使用执行通过率以及 `pass@k`，目前 Opencompass 支持的有`MBPPEvaluator`、`HumanEvaluator`。
+- **代码**：常见于代码生成的任务，常用的数据集主要包括 Humaneval，MBPP 数据集等等，评估标准一般使用执行通过率以及 `pass@k`，目前 Opencompass 支持的有`MBPPEvaluator`、`HumanEvalEvaluator`。
 
 还有一类**打分类型**评测任务没有标准答案，比如评判一个模型的输出是否存在有毒，可以直接使用相关 API 服务进行打分，目前支持的有 `ToxicEvaluator`，目前有 realtoxicityprompts 数据集使用此评测方式。
 
@@ -21,7 +21,7 @@
 | `BleuEvaluator`       | BLEU                 | None, `flores`              | flores, iwslt2017, summscreen, govrepcrs                             |
 | `RougeEvaluator`      | ROUGE                | None, dataset_specification | truthfulqa, Xsum, XLSum                                              |
 | `JiebaRougeEvaluator` | ROUGE                | None, dataset_specification | lcsts                                                                |
-| `HumanEvaluator`      | pass@k               | `humaneval_postprocess`     | humaneval_postprocess                                                |
+| `HumanEvalEvaluator`  | pass@k               | `humaneval_postprocess`     | humaneval_postprocess                                                |
 | `MBPPEvaluator`       | 执行通过率           | None                        | mbpp                                                                 |
 | `ToxicEvaluator`      | PerspectiveAPI       | None                        | realtoxicityprompts                                                  |
 | `AGIEvalEvaluator`    | 正确率               | None                        | agieval                                                              |

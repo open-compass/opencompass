@@ -287,6 +287,7 @@ class XunFeiSpark(BaseAPIModel):
         assert isinstance(input, (str, PromptList))
 
         from sparkai.core.messages import ChatMessage
+        from sparkai.errors import SparkAIConnectionError
         from sparkai.llm.llm import ChatSparkLLM
 
         if isinstance(input, str):
@@ -334,28 +335,34 @@ class XunFeiSpark(BaseAPIModel):
                 msg = outputs[0].text
                 self.logger.debug(f'Generated: {msg}')
                 return msg
-            except ConnectionError as e:
-                match = re.match(r'Error Code: (\d+), Error: (.*)',
-                                 e.args[0],
-                                 flags=re.DOTALL)
-                if match:
-                    error_code = int(match.group(1))
-                    msg = match.group(2)
-                    if error_code == 10003:  # query data exceed limit
-                        self.logger.error(f'Error {error_code}: {msg}')
-                        return msg
-                    elif error_code in [10013, 10014]:  # skip safety problem
-                        self.logger.debug(f'Generated: {msg}')
-                        return msg
-                    elif error_code == 10020:  # plugin result is empty
-                        self.logger.error(f'Error {error_code}: {msg}')
-                        return msg
-                    elif error_code == 11202:  # qps limit
-                        time.sleep(1)
-                    else:
-                        self.logger.error(f'Error {error_code}: {msg}')
+            except (ConnectionError, SparkAIConnectionError) as e:
+                if isinstance(e, SparkAIConnectionError):
+                    error_code = e.error_code
+                    message = e.message
+                else:
+                    match = re.match(r'Error Code: (\d+), Error: (.*)',
+                                     e.args[0],
+                                     flags=re.DOTALL)
+                    if not match:
                         raise e
-                raise e
+                    error_code = int(match.group(1))
+                    message = match.group(2)
+
+                if error_code == 10003:  # query data exceed limit
+                    self.logger.error(f'Error {error_code}: {message}')
+                    return message
+                elif error_code in [10013, 10014]:  # skip safety problem
+                    self.logger.debug(f'Generated: {message}')
+                    return message
+                elif error_code == 10020:  # plugin result is empty
+                    self.logger.error(f'Error {error_code}: {message}')
+                    return message
+                elif error_code == 11202:  # qps limit
+                    time.sleep(1)
+                    continue
+                else:
+                    self.logger.error(f'Error {error_code}: {message}')
+                    raise e
             except TimeoutError:
                 self.logger.error('TimeoutError, sleep 60, retrying...')
                 time.sleep(60)
