@@ -160,8 +160,8 @@ class CompassBenchTHSummarizer:
                  word_count_threshold=None) -> None:
         self.tasks = []
         self.cfg = config
-        self.base_models = self.cfg['eval']['partitioner']['base_models']
-        self.compare_models = self.cfg['eval']['partitioner']['compare_models']
+        self.base_models = self.cfg['datasets'][0]['base_models']
+        self.compare_models = self.cfg['eval']['partitioner']['models']
         self.judge_models = self.cfg.get('judge_models', None)
         self.meta_judge_model = self.cfg.eval.partitioner.get('meta_judge_model', None)
         self.judge_type = judge_type
@@ -329,9 +329,9 @@ class CompassBenchTHSummarizer:
                 # print(txt)
 
                 if idx == len(self.judge_models):
-                    output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
+                    output_filename = osp.join(output_dir, dataset_abbr + '-summarized-by--' + judge_abbr + '-report.csv')
                 else:
-                    output_filename = osp.join(output_dir, 'judged-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
+                    output_filename = osp.join(output_dir, dataset_abbr + '-judged-by--' + judge_abbr + '-report.csv')
 
                 with open(output_filename, 'w') as f:
                     f.write(','.join(headers) + '\n')
@@ -348,6 +348,6 @@ class CompassBenchTHSummarizer:
         for col in dfs[0].columns[1:]:
             for i in range(1, len(dfs[0])):
                 average_df[col][i] = round(sum(df[col][i] for df in dfs) / len(dfs), 2)
-        average_csv_path = osp.join(output_dir,  'Averaged-' + dataset_abbr + '-report.csv')
+        average_csv_path = osp.join(output_dir,  'CompassBench-Averaged-' + dataset_abbr + '-report.csv')
         average_df.to_csv(average_csv_path, index=False)
         print(average_csv_path)

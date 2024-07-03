@@ -5,6 +5,10 @@ with read_base():
     from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
     from .datasets.subjective.compassarena.compassarena_compare import compassarena_datasets
     from .datasets.subjective.arena_hard.arena_hard_compare import arenahard_datasets
+    from .datasets.subjective.compassbench.compassbench_compare import compassbench_datasets
+    from .datasets.subjective.fofo.fofo_judge import fofo_datasets
+    from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import mtbench_datasets
+    from .datasets.subjective.multiround.mtbench101_judge import mtbench101_datasets
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
@@ -51,9 +55,10 @@ models = [
     )
 ]
 
-datasets = [*alignbench_datasets, *alpacav2, *arenahard_datasets, *compassarena_datasets]
+datasets = [*alignbench_datasets, *alpacav2, *arenahard_datasets, *compassarena_datasets, *compassbench_datasets, *fofo_datasets, *mtbench_datasets, *mtbench101_datasets]
+
 infer = dict(
-    partitioner=dict(type=SizePartitioner),
+    partitioner=dict(type=NaivePartitioner),
     runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=OpenICLInferTask)),
 )
 # -------------Evalation Stage ----------------------------------------
@@ -74,9 +79,9 @@ judge_models = [dict(
 
 ## ------------- Evaluation Configuration
 eval = dict(
-    partitioner=dict(type=SubjectiveNumWorkerPartitioner, models=models, judge_models=judge_models,),
+    partitioner=dict(type=SubjectiveNaivePartitioner, models=models, judge_models=judge_models,),
     runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
-    given_pred = [{'abbr':'gpt4-turbo', 'path':'your path'},{'abbr':'gpt4-0314', 'path':'your path'}]
+    given_pred = [{'abbr':'gpt4-turbo', 'path':'your reference path'},{'abbr':'gpt4-0314', 'path':'your reference path'}]
 )
 
 summarizer = dict(type=SubjectiveSummarizer, function='subjective')

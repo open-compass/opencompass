@@ -166,7 +166,13 @@ def prompt_construct(problem, multi_turn=False, judge_type='single'):
 @LOAD_DATASET.register_module()
 class MTBenchDataset(BaseDataset):
 
-    def load(self, path: str, name: str, multi_turn=True, judge_type='single'):
+    def load(self,
+             path: str,
+             name: str,
+             multi_turn=True,
+             judge_type='single',
+             mode: Optional[str] = 'singlescore',
+             summarizer: Optional = None):
         filename = osp.join(path, f'{name}.json')
         dataset = DatasetDict()
         raw_data = []

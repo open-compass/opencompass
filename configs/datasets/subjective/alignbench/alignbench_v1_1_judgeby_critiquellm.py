@@ -11,7 +11,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    'alignment_bench_v1_1',
+    'alignment_bench_v1_1', # Changed to Alignbench_v1_1 since 06/15/2024, refer to https://github.com/THUDM/AlignBench
 ]
 data_path ='data/subjective/alignment_bench'
 

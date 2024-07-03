@@ -258,7 +258,7 @@ def add_format(question, answer):
 @LOAD_DATASET.register_module()
 class MTBench101Dataset(BaseDataset):
 
-    def load(self, path: str, name: str):
+    def load(self, path: str, name: str, mode: Optional[str] = 'singlescore', summarizer: Optional = None):
         import copy
 
         filename = osp.join(path, f'{name}.jsonl')

@@ -115,8 +115,9 @@ class AlpacaSummarizer:
             subdir = model1 + '_' + model2 + '_judged-by--' + self.judge_abbr
             subdir_path = os.path.join(results_folder, subdir)
             if os.path.isdir(subdir_path):
-                fout = osp.join(output_dir,
-                                'judged-by--' + judge_model + '-report.csv')
+                fout = osp.join(
+                    output_dir,
+                    'AlpacaEval2-judged-by--' + judge_model + '.csv')
                 for dataset in dataset_cfgs:
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)

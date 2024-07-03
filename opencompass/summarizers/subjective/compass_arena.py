@@ -201,9 +201,9 @@ class CompassArenaSummarizer:
                 print(txt)
 
                 if idx == len(self.judge_models):
-                    output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
+                    output_filename = osp.join(output_dir, dataset_abbr + '-summarized-by--' + judge_abbr + '-report.csv')
                 else:
-                    output_filename = osp.join(output_dir, 'judged-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
+                    output_filename = osp.join(output_dir, dataset_abbr + '-judged-by--' + judge_abbr + '-report.csv')
 
                 with open(output_filename, 'w') as f:
                     f.write(','.join(headers) + '\n')
@@ -230,9 +230,9 @@ class CompassArenaSummarizer:
             print(txt)
 
             if idx == len(self.judge_models):
-                output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-overall-report.csv')
+                output_filename = osp.join(output_dir, 'compassarena-overall-summarized-by--' + judge_abbr + '.csv')
             else:
-                output_filename = osp.join(output_dir, 'judged-by--' + judge_abbr + '-overall-report.csv')
+                output_filename = osp.join(output_dir, 'compassarena-overall-judged-by--' + judge_abbr + '.csv')
             with open(output_filename, 'w') as f:
                 f.write(','.join(headers) + '\n')
                 for line in table:

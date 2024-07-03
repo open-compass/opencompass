@@ -350,11 +350,11 @@ class AlignmentBenchSummarizer:
                     model = eval_model_abbr
                     if self.judge_type == 'general':
                         fout = osp.join(
-                            output_dir,
-                            'judged-by--' + judge_abbr + '-dimension.csv')
+                            output_dir, 'Alignbench-judged-by--' + judge_abbr +
+                            '-dimension.csv')
                     fout2 = osp.join(
-                        output_dir,
-                        'judged-by--' + judge_abbr + '-capability.csv')
+                        output_dir, 'Alignbench-judged-by--' + judge_abbr +
+                        '-capability.csv')
                     for dataset in dataset_cfgs:
                         judged_answers, references = get_judgeanswer_and_reference(
                             dataset, subdir_path, self.judge_function)

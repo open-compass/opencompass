@@ -279,7 +279,7 @@ class ArenaHardSummarizer:
 
                 np.random.seed(42)
                 bootstrap_elo_lu = get_bootstrap_result(battles, compute_mle_elo, 100)
-                bootstrap_elo_lu.to_json(os.path.join(output_dir,'bootstrapping_results'+ judge_model+'.jsonl'), lines=True, orient='records')
+                bootstrap_elo_lu.to_json(os.path.join(output_dir,'arena_hard_bootstrapping_results_judged-by--'+ judge_model+'.jsonl'), lines=True, orient='records')
 
                 stats = pd.DataFrame()
                 stats['results'] = None

@@ -73,7 +73,7 @@ def get_final_results(judged_answers, references, output_dir, fout_flag,
         for task, scores in task_scores.items()
     }
 
-    fout = osp.join(output_dir, 'task_score.csv')
+    fout = osp.join(output_dir, 'MTBench101-task_score.csv')
 
     columns = list(final_task_scores.keys())
 

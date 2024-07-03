@@ -3,7 +3,8 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import CompassBenchControlLengthBiasDataset
-
+from opencompass.models.openai_api import OpenAI
+from opencompass.summarizers import CompassBenchSummarizer
 subjective_reader_cfg = dict(
     input_columns=['question', 'judge_prompt'],
     output_column='judge',
@@ -11,10 +12,13 @@ subjective_reader_cfg = dict(
 
 data_path ='data/subjective/compassbench'
 
-subjective_datasets = []
+compassbench_datasets = []
 
 versions = ['CompassBenchV1.2']
-
+gpt4 = [dict(
+    abbr='gpt4-turbo',
+    type=OpenAI,
+)]
 for version_abbr in versions:
     subjective_infer_cfg = dict(
             prompt_template=dict(
@@ -46,7 +50,7 @@ for version_abbr in versions:
         pred_role='BOT',
     )
 
-    subjective_datasets.append(
+    compassbench_datasets.append(
         dict(
             abbr=version_abbr,
             type=CompassBenchControlLengthBiasDataset,
@@ -54,5 +58,9 @@ for version_abbr in versions:
             name=version_abbr,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
-            eval_cfg=subjective_eval_cfg
+            eval_cfg=subjective_eval_cfg,
+            mode='m2n',
+            infer_order='double',
+            base_models=gpt4,
+            summarizer=dict(type=CompassBenchSummarizer, summary_type='half_add')
         ))

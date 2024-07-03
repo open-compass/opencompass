@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import ChatInferencer, GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import MTBench101Dataset
-
+from opencompass.summarizers import MTBench101Summarizer
 
 subjective_reader_cfg = dict(
     input_columns=['dialogue','task','multi_id','turn_id','system_prompt','prompt_template'],
@@ -15,7 +15,7 @@ subjective_all_sets = [
 ]
 data_path ='data/subjective/'
 
-subjective_datasets = []
+mtbench101_datasets = []
 
 for _name in subjective_all_sets:
     subjective_infer_cfg = dict(
@@ -50,7 +50,7 @@ for _name in subjective_all_sets:
         pred_role='BOT',
     )
 
-    subjective_datasets.append(
+    mtbench101_datasets.append(
         dict(
             abbr=f'{_name}',
             type=MTBench101Dataset,
@@ -58,5 +58,7 @@ for _name in subjective_all_sets:
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
-            eval_cfg=subjective_eval_cfg
+            eval_cfg=subjective_eval_cfg,
+            mode='singlescore',
+            summarizer = dict(type=MTBench101Summarizer, judge_type='single')
         ))

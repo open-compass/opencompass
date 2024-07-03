@@ -140,12 +140,12 @@ class FofoSummarizer:
 
                 if idx == len(self.judge_models):
                     output_filename = osp.join(
-                        output_dir, 'summarized-by--' + judge_abbr + '-' +
-                        dataset_abbr + '-report.csv')
+                        output_dir, dataset_abbr + '-summarized-by--' +
+                        judge_abbr + '-' + '-report.csv')
                 else:
                     output_filename = osp.join(
-                        output_dir, 'judged-by--' + judge_abbr + '-' +
-                        dataset_abbr + '-report.csv')
+                        output_dir, dataset_abbr + '-judged-by--' +
+                        judge_abbr + '-' + '-report.csv')
 
                 with open(output_filename, 'w') as f:
                     f.write(','.join(headers) + '\n')

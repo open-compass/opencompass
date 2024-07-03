@@ -1,6 +1,7 @@
 # flake8: noqa
 import json
 import os.path as osp
+from typing import Optional
 
 from datasets import Dataset
 
@@ -12,7 +13,11 @@ from ..base import BaseDataset
 @LOAD_DATASET.register_module()
 class FofoDataset(BaseDataset):
 
-    def load(self, path: str, name: str):
+    def load(self,
+             path: str,
+             name: str,
+             mode: Optional[str] = 'singlescore',
+             summarizer: Optional = None):
         filename = osp.join(path, f'{name}.json')
         raw_data = []
         with open(filename, 'r', encoding='utf-8') as f:

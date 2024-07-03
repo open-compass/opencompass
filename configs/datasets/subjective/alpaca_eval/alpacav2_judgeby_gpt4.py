@@ -113,5 +113,5 @@ for _name in subjective_all_sets:
             mode='m2n',
             infer_order='random',
             base_models=gpt4,
-            summarizer = dict(type=AlpacaSummarizer, judge_type='v2')
+            summarizer=dict(type=AlpacaSummarizer, judge_type='v2')
         ))

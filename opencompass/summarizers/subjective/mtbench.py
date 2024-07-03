@@ -126,7 +126,7 @@ class MTBenchSummarizer(CompassArenaSummarizer):
             show_model_abbr = model_abbr_from_cfg_used_in_summarizer(eval_model_cfg)
             subdir_path = os.path.join(results_folder, eval_model_abbr + '_judged-by--' + self.judge_abbr)
             if os.path.isdir(subdir_path):
-                fout = osp.join(output_dir, 'judged-by--' + self.judge_abbr + '-capability.csv')
+                fout = osp.join(output_dir, 'MTBench-judged-by--' + self.judge_abbr + '-capability.csv')
                 overall_judged_answers, overall_references = [], []
                 for dataset in dataset_cfgs:
                     judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
