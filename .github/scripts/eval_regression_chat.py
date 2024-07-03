@@ -15,6 +15,8 @@ with read_base():
         models as hf_deepseek_7b_chat_model  # noqa: F401, E501
     from ...configs.models.deepseek.hf_deepseek_moe_16b_chat import \
         models as hf_deepseek_moe_16b_chat_model  # noqa: F401, E501
+    from ...configs.models.deepseek.vllm_deepseek_7b_chat import \
+        models as vllm_deepseek_7b_chat_model  # noqa: F401, E501
     from ...configs.models.gemma.hf_gemma_2b_it import \
         models as hf_gemma_2b_it_model  # noqa: F401, E501
     from ...configs.models.gemma.hf_gemma_7b_it import \
@@ -27,12 +29,16 @@ with read_base():
         models as lmdeploy_internlm2_chat_7b_model  # noqa: F401, E501
     from ...configs.models.hf_internlm.lmdeploy_internlm2_chat_7b_sft import \
         models as lmdeploy_internlm2_chat_7b_sft_model  # noqa: F401, E501
+    from ...configs.models.hf_internlm.vllm_internlm2_chat_7b import \
+        models as vllm_internlm2_chat_7b_model  # noqa: F401, E501
     from ...configs.models.hf_llama.hf_llama3_8b_instruct import \
         models as hf_llama3_8b_instruct_model  # noqa: F401, E501
     from ...configs.models.hf_llama.lmdeploy_llama3_8b_instruct import \
         models as lmdeploy_llama3_8b_instruct_model  # noqa: F401, E501
     from ...configs.models.mistral.hf_mistral_7b_instruct_v0_2 import \
         models as hf_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
+    from ...configs.models.mistral.vllm_mistral_7b_instruct_v0_2 import \
+        models as vllm_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from ...configs.models.openbmb.hf_minicpm_2b_dpo_fp32 import \
         models as hf_minicpm_2b_dpo_fp32_model  # noqa: F401, E501
     from ...configs.models.openbmb.hf_minicpm_2b_sft_bf16 import \
@@ -49,6 +55,8 @@ with read_base():
         models as lmdeploy_qwen2_1_5b_instruct_model  # noqa: F401, E501
     from ...configs.models.qwen.lmdeploy_qwen2_7b_instruct import \
         models as lmdeploy_qwen2_7b_instruct_model  # noqa: F401, E501
+    from ...configs.models.qwen.vllm_qwen1_5_0_5b_chat import \
+        models as vllm_qwen1_5_0_5b_chat_model  # noqa: F401, E501
     from ...configs.models.yi.hf_yi_1_5_6b_chat import \
         models as hf_yi_1_5_6b_chat_model  # noqa: F401, E501
     from ...configs.models.yi.hf_yi_1_5_9b_chat import \
