@@ -14,11 +14,7 @@
 python run.py --models YOUR_MODEL --datasets calm
 ```
 ## Available Causal Tasks
-<div align="center">
-<img src="./assets/causal_task.png" width="800px"/>
-</div>
-
-We provide 92 tasks for causal evaluation, stored in the `data/calm folder`. For more information about our causal tasks, refer to tasks.
+We provide 92 tasks for causal evaluation, stored in the `data/calm folder`. For more information about our causal tasks, refer to [tasks](https://github.com/OpenCausaLab/CaLM/blob/main/documents/tasks.md).
 The directory structure is:
 
 ```
