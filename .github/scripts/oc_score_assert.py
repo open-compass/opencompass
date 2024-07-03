@@ -95,11 +95,11 @@ def find_csv_files(directory):
         for file in files:
             if file.endswith('.csv'):
                 csv_files.append(os.path.join(root, file))
-    if len(csv_files) > 1:
-        raise 'have more than 1 result file, please check the result manually'
-    if len(csv_files) == 0:
-        return None
-    return csv_files[0]
+
+    csv_files_with_time = {f: os.path.getctime(f) for f in csv_files}
+    sorted_csv_files = sorted(csv_files_with_time.items(), key=lambda x: x[1])
+    latest_csv_file = sorted_csv_files[-1][0]
+    return latest_csv_file
 
 
 def read_csv_file(file_path):
