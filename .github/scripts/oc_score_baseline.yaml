@@ -1,39 +1,27 @@
-internlm-7b-hf:
-    ARC-c: 34.24
-    chid-dev: 79.70
-    chid-test: 81.12
-    openai_humaneval: 10.98
-    openbookqa: 47.20
-    openbookqa_fact: 74.00
-
-internlm-chat-7b-hf:
-    ARC-c: 36.95
-    chid-dev: 71.78
-    chid-test: 76.87
-    openai_humaneval: 21.34
-    openbookqa: 66.6
-    openbookqa_fact: 80.4
-
-chatglm3-6b-base-hf:
-    ARC-c: 44.41
-    chid-dev: 78.22
-    chid-test: 78.57
-    openai_humaneval: 20.73
-    openbookqa: 78.40
-    openbookqa_fact: 92.00
-
-internlm2-7b-hf:
-    ARC-c: 36.27
-    chid-dev: 55.94
-    chid-test: 53.70
-    openai_humaneval: 45.12
-    openbookqa: 80.00
-    openbookqa_fact: 86.40
-
 baichuan2-7b-chat-hf:
     gsm8k: 30
     race-middle: 74
     race-high: 79
+
+deepseek-7b-chat-hf:
+    gsm8k: 60
+    race-middle: 74
+    race-high: 80
+
+deepseek-moe-16b-chat-hf:
+    gsm8k: 62
+    race-middle: 62
+    race-high: 70
+
+gemma-2b-it-hf:
+    gsm8k: 14
+    race-middle: 62
+    race-high: 52
+
+gemma-7b-it-hf:
+    gsm8k: 39
+    race-middle: 74
+    race-high: 71
 
 internlm2-chat-1.8b-turbomind:
     gsm8k: 40
@@ -55,10 +43,20 @@ internlm2-chat-7b-sft-turbomind:
     race-middle: 91
     race-high: 92
 
+llama-3-8b-instruct-hf:
+    gsm8k: 77
+    race-middle: 85
+    race-high: 87
+
 llama-3-8b-instruct-turbomind:
     gsm8k: 77
     race-middle: 85
     race-high: 89
+
+mistral-7b-instruct-v0.2-hf:
+    gsm8k: 48
+    race-middle: 82
+    race-high: 78
 
 minicpm-2b-dpo-fp32-hf:
     gsm8k: 58
@@ -80,6 +78,11 @@ phi-3-mini-4k-instruct-hf:
     race-middle: 81
     race-high: 84
 
+qwen1.5-0.5b-chat-hf:
+    gsm8k: 5
+    race-middle: 55
+    race-high: 50
+
 qwen2-1.5b-instruct-turbomind:
     gsm8k: 60
     race-middle: 77
@@ -89,3 +92,13 @@ qwen2-7b-instruct-turbomind:
     gsm8k: 88
     race-middle: 87
     race-high: 89
+
+yi-1.5-6b-chat-hf:
+    gsm8k: 72
+    race-middle: 88
+    race-high: 86
+
+yi-1.5-9b-chat-hf:
+    gsm8k: 81
+    race-middle: 89
+    race-high: 91

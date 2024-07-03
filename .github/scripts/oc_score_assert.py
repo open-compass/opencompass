@@ -7,12 +7,15 @@ import yaml
 output_path = 'regression_result_daily'
 
 model_list = [
-    'baichuan2-7b-chat-hf', 'internlm2-chat-1.8b-turbomind',
+    'baichuan2-7b-chat-hf', 'deepseek-7b-chat-hf', 'deepseek-moe-16b-chat-hf',
+    'gemma-2b-it-hf', 'gemma-7b-it-hf', 'internlm2-chat-1.8b-turbomind',
     'internlm2-chat-1.8b-sft-turbomind', 'internlm2-chat-7b-turbomind',
-    'internlm2-chat-7b-sft-turbomind', 'llama-3-8b-instruct-turbomind',
+    'internlm2-chat-7b-sft-turbomind', 'llama-3-8b-instruct-hf',
+    'llama-3-8b-instruct-turbomind', 'mistral-7b-instruct-v0.2-hf',
     'minicpm-2b-dpo-fp32-hf', 'minicpm-2b-sft-bf16-hf',
     'minicpm-2b-sft-fp32-hf', 'phi-3-mini-4k-instruct-hf',
-    'qwen2-1.5b-instruct-turbomind', 'qwen2-7b-instruct-turbomind'
+    'qwen1.5-0.5b-chat-hf', 'qwen2-1.5b-instruct-turbomind',
+    'qwen2-7b-instruct-turbomind', 'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf'
 ]
 dataset_list = ['gsm8k', 'race-middle', 'race-high']
 
