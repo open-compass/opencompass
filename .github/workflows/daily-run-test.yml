@@ -55,6 +55,7 @@ jobs:
           rm -rf regression_result_daily
           export from_tf=TRUE
           python3 run.py .github/scripts/eval_regression_chat.py --work-dir regression_result_daily --reuse
+          python3 run.py .github/scripts/eval_regression_base.py --work-dir regression_result_daily --reuse
       - name:  Get result
         run: |
           eval "$(conda shell.bash hook)"
