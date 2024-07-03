@@ -1,6 +1,8 @@
 import os.path as osp
+from os import environ
 
 from datasets import Dataset
+from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
@@ -12,22 +14,33 @@ class LCSTSDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        src_path = osp.join(path, 'test.src.txt')
-        tgt_path = osp.join(path, 'test.tgt.txt')
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            ms_dataset = MsDataset.load('opencompass/LCSTS', split='test')
+            dataset = []
+            for row in ms_dataset:
+                new_row = {}
+                new_row['content'] = row['text']
+                new_row['abst'] = row['summary']
+                dataset.append(new_row)
+            dataset = Dataset.from_list(dataset)
+        else:
+            src_path = osp.join(path, 'test.src.txt')
+            tgt_path = osp.join(path, 'test.tgt.txt')
 
-        src_lines = open(src_path, 'r', encoding='utf-8').readlines()
-        tgt_lines = open(tgt_path, 'r', encoding='utf-8').readlines()
+            src_lines = open(src_path, 'r', encoding='utf-8').readlines()
+            tgt_lines = open(tgt_path, 'r', encoding='utf-8').readlines()
 
-        data = {'content': [], 'abst': []}
+            data = {'content': [], 'abst': []}
 
-        for _, (src_text, tgt_text) in enumerate(zip(src_lines, tgt_lines)):
-            data['content'].append(src_text.strip())
-            data['abst'].append(tgt_text.strip())
+            for _, (src_text, tgt_text) in enumerate(zip(src_lines,
+                                                         tgt_lines)):
+                data['content'].append(src_text.strip())
+                data['abst'].append(tgt_text.strip())
 
-        dataset = Dataset.from_dict({
-            'content': data['content'],
-            'abst': data['abst']
-        })
+            dataset = Dataset.from_dict({
+                'content': data['content'],
+                'abst': data['abst']
+            })
         return dataset
 
 

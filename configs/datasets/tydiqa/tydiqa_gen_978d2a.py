@@ -2,6 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import TydiQADataset, TydiQAEvaluator
+from os import environ
 
 # All configs are for TydiQA Goldp task
 tydiqa_reader_cfg = dict(
@@ -47,7 +48,7 @@ for _lang in langs:
     tydiqa_datasets.append(
         dict(abbr=f'tydiqa-goldp_{_lang}',
             type=TydiQADataset,
-            path='./data/tydiqa',
+            path='opencompass/tydiqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/tydiqa',
             lang=_lang,
             reader_cfg=tydiqa_reader_cfg,
             infer_cfg=tydiqa_infer_cfg,

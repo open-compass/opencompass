@@ -4,6 +4,8 @@ from opencompass.openicl.icl_inferencer import AgentInferencer
 from opencompass.datasets import (
     MATHDataset, MATHAgentEvaluator, math_postprocess_v2
 )
+from os import environ
+
 # use pal format but not perform well
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
 
@@ -91,7 +93,7 @@ math_datasets = [
     dict(
         abbr='math-agent',
         type=MATHDataset,
-        path='./data/math/math.json',
+        path='opencompass/math' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/math/math.json',
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg,

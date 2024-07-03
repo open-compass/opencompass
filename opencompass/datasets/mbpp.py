@@ -9,10 +9,12 @@ import signal
 import tempfile
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from os import environ
 from typing import List, Sequence, Union
 
 import numpy as np
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
+from modelscope import MsDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
@@ -32,10 +34,18 @@ class MBPPDataset(BaseDataset):
             example['test_list_2'] = example['test_list']
             return example
 
-        train = load_dataset('json', data_files=path,
-                             split='train[:10]').map(processing_test)
-        test = load_dataset('json', data_files=path,
-                            split='train[10:510]').map(processing_test)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            train = MsDataset.load(path,
+                                   subset_name='full',
+                                   split='train[:10]').map(processing_test)
+            test = MsDataset.load(path,
+                                  subset_name='full',
+                                  split='train[10:510]').map(processing_test)
+        else:
+            train = load_dataset('json', data_files=path,
+                                 split='train[:10]').map(processing_test)
+            test = load_dataset('json', data_files=path,
+                                split='train[10:510]').map(processing_test)
         return DatasetDict({'train': train, 'test': test})
 
 
@@ -66,10 +76,18 @@ class MBPPDataset_V2(BaseDataset):
                                           task_id=example['task_id'])
             return example
 
-        train = load_dataset('json', data_files=path,
-                             split='train[:10]').map(processing_test)
-        test = load_dataset('json', data_files=path,
-                            split='train[10:510]').map(processing_test)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            train = MsDataset.load(path,
+                                   subset_name='full',
+                                   split='train[:10]').map(processing_test)
+            test = MsDataset.load(path,
+                                  subset_name='full',
+                                  split='train[10:510]').map(processing_test)
+        else:
+            train = load_dataset('json', data_files=path,
+                                 split='train[:10]').map(processing_test)
+            test = load_dataset('json', data_files=path,
+                                split='train[10:510]').map(processing_test)
         test = concatenate_datasets([test] * num_repeats)
         return DatasetDict({'train': train, 'test': test})
 
@@ -105,10 +123,18 @@ class SanitizedMBPPDataset(BaseDataset):
             return example
 
         # train : test = 7 : 257
-        train = load_dataset('json', data_files=path,
-                             split='train[:7]').map(processing_test)
-        test = load_dataset('json', data_files=path,
-                            split='train[7:264]').map(processing_test)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            train = MsDataset.load(path,
+                                   subset_name='sanitized',
+                                   split='train[:7]').map(processing_test)
+            test = MsDataset.load(path,
+                                  subset_name='sanitized',
+                                  split='train[7:264]').map(processing_test)
+        else:
+            train = load_dataset('json', data_files=path,
+                                 split='train[:7]').map(processing_test)
+            test = load_dataset('json', data_files=path,
+                                split='train[7:264]').map(processing_test)
         test = concatenate_datasets([test] * num_repeats)
         return DatasetDict({'train': train, 'test': test})
 

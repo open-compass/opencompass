@@ -1,5 +1,6 @@
 import json
 import re
+from os import environ
 
 from datasets import Dataset, DatasetDict
 
@@ -140,15 +141,26 @@ class MATHDataset(BaseDataset):
     @staticmethod
     def load(path: str):
         dataset = DatasetDict()
-        data = json.load(open(path))
         raw_data = []
-        for i in data.keys():
-            raw_data.append({
-                'problem':
-                data[i]['problem'],
-                'solution':
-                extract_boxed_answer(data[i]['solution'])
-            })
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            ms_dataset = MsDataset.load(path, split='train')
+            for item in ms_dataset:
+                raw_data.append({
+                    'problem':
+                    item['problem'],
+                    'solution':
+                    extract_boxed_answer(item['solution'])
+                })
+        else:
+            data = json.load(open(path))
+            for i in data.keys():
+                raw_data.append({
+                    'problem':
+                    data[i]['problem'],
+                    'solution':
+                    extract_boxed_answer(data[i]['solution'])
+                })
         dataset['test'] = Dataset.from_list(raw_data)
         dataset['train'] = Dataset.from_list(raw_data)
         return dataset

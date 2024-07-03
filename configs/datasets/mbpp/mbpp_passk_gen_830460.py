@@ -2,6 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
+from os import environ
 
 mbpp_reader_cfg = dict(input_columns=['text', 'test_list'], output_column='test_column')
 
@@ -34,7 +35,7 @@ mbpp_datasets = [
     dict(
         type=MBPPDataset_V2,
         abbr='mbpp_passk',
-        path='./data/mbpp/mbpp.jsonl',
+        path='opencompass/mbpp' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/mbpp/mbpp.jsonl',
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
         eval_cfg=mbpp_eval_cfg,
