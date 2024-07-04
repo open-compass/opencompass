@@ -189,8 +189,9 @@ class CompassBenchSummarizer:
         # scores['win_' + model1] = win_model1
         output_dir, results_folder = get_outdir(self.cfg, time_str)
         all_judge_file_list = []
-
+        all_scores = {}
         for idx, judge_model in enumerate(self.judge_models):
+            score_by_judgemodel = {}
             judge_abbr = model_abbr_from_cfg(judge_model)
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
@@ -228,16 +229,17 @@ class CompassBenchSummarizer:
                     f.write(','.join(headers) + '\n')
                     for line in table:
                         f.write(','.join(line) + '\n')
-                print(output_filename)
                 all_judge_file_list.append(output_filename)
-
+            for idx, model in enumerate(summarizer_model_abbrs):
+                score_by_judgemodel[model] = float(table[0][idx+1])
+            all_scores[judge_abbr]=score_by_judgemodel
         dfs = [pd.read_csv(file) for file in all_judge_file_list]
 
         if len(dfs) > 1:
             average_df = copy.deepcopy(dfs[0])
             for col in dfs[0].columns[1:]:
-                for i in range(1, len(dfs[0])):
+                for i in range(0, len(dfs[0])):
                     average_df[col][i] = round(sum(df[col][i] for df in dfs) / len(dfs), 2)
             average_csv_path = osp.join(output_dir,  'CompassBench-Averaged-' + dataset_abbr + '-report.csv')
             average_df.to_csv(average_csv_path, index=False)
-            print(average_csv_path)
+        return {'CompassBench': all_scores}

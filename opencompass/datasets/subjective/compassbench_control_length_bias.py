@@ -1,7 +1,6 @@
 # flake8: noqa
 import json
 import os.path as osp
-from typing import Optional
 
 from datasets import Dataset
 
@@ -106,13 +105,7 @@ Choice: [[C]]
 @LOAD_DATASET.register_module()
 class CompassBenchControlLengthBiasDataset(BaseDataset):
 
-    def load(self,
-             path: str,
-             name: str,
-             mode: Optional[str] = 'm2n',
-             infer_order: Optional[str] = 'double',
-             base_models: Optional = None,
-             summarizer: Optional = None):
+    def load(self, path: str, name: str, *args, **kwargs):
         filename = osp.join(path, f'{name}.json')
         raw_data = []
         with open(filename, 'r', encoding='utf-8') as f:

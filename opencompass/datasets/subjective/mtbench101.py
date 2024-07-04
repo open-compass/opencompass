@@ -2,7 +2,6 @@
 import json
 import os.path as osp
 import re
-from typing import Optional
 
 from datasets import Dataset, DatasetDict
 from torch.utils.data import DataLoader
@@ -258,7 +257,7 @@ def add_format(question, answer):
 @LOAD_DATASET.register_module()
 class MTBench101Dataset(BaseDataset):
 
-    def load(self, path: str, name: str, mode: Optional[str] = 'singlescore', summarizer: Optional = None):
+    def load(self, path: str, name: str, *args, **kwargs):
         import copy
 
         filename = osp.join(path, f'{name}.jsonl')

@@ -98,7 +98,7 @@ class MTBenchSummarizer(CompassArenaSummarizer):
         elif self.judge_type == 'pair':
             self.base_models = self.cfg['eval']['partitioner']['base_models']
             self.compare_models = self.cfg['eval']['partitioner']['compare_models']
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
+        self.judge_models = self.cfg.get('judge_models', None)
         self.judge_map = {
             'single': post_process_mtbench_single,
             'pair': post_process_mtbench_pair
@@ -120,34 +120,40 @@ class MTBenchSummarizer(CompassArenaSummarizer):
         # self.judge_type == 'single'
         dataset_cfgs = self.cfg['datasets']
         output_dir, results_folder = get_outdir(self.cfg, time_str)
-        fout_flag = 0
-        for eval_model_cfg in self.eval_model_cfgs:
-            eval_model_abbr = model_abbr_from_cfg(eval_model_cfg)
-            show_model_abbr = model_abbr_from_cfg_used_in_summarizer(eval_model_cfg)
-            subdir_path = os.path.join(results_folder, eval_model_abbr + '_judged-by--' + self.judge_abbr)
-            if os.path.isdir(subdir_path):
-                fout = osp.join(output_dir, 'MTBench-judged-by--' + self.judge_abbr + '-capability.csv')
-                overall_judged_answers, overall_references = [], []
-                for dataset in dataset_cfgs:
-                    judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
-                    overall_judged_answers += judged_answers
-                    overall_references += references
-                get_capability_results(overall_judged_answers, overall_references, fout, fout_flag, show_model_abbr)
-                fout_flag += 1
-            else:
-                print(subdir_path + ' is not exist! please check!')
-        with open(fout, 'r') as f:
-            csv_reader = csv.reader(f)
-            header = next(csv_reader)
-            table = [line for line in csv_reader]
+        all_scores = {}
+        for judge_model in self.judge_models:
+            fout_flag = 0
+            score_by_judgemodel = {}
+            judge_abbr = model_abbr_from_cfg(judge_model)
+            for eval_model_cfg in self.eval_model_cfgs:
+                eval_model_abbr = model_abbr_from_cfg(eval_model_cfg)
+                show_model_abbr = model_abbr_from_cfg_used_in_summarizer(eval_model_cfg)
+                subdir_path = os.path.join(results_folder, eval_model_abbr + '_judged-by--' + judge_abbr)
+                if os.path.isdir(subdir_path):
+                    fout = osp.join(output_dir, 'MTBench-judged-by--' + judge_abbr + '-capability.csv')
+                    overall_judged_answers, overall_references = [], []
+                    for dataset in dataset_cfgs:
+                        judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
+                        overall_judged_answers += judged_answers
+                        overall_references += references
+                    get_capability_results(overall_judged_answers, overall_references, fout, fout_flag, show_model_abbr)
+                    fout_flag += 1
+                else:
+                    print(subdir_path + ' is not exist! please check!')
+            with open(fout, 'r') as f:
+                csv_reader = csv.reader(f)
+                header = next(csv_reader)
+                table = [line for line in csv_reader]
+            for model_score in table:
+                score_by_judgemodel[model_score[0]] = float(model_score[1])
+            all_scores[judge_abbr] = score_by_judgemodel
+            new_header = [''] + [line[0] for line in table]
+            new_table = [[h] + line[1:] for h, line in zip(header[1:], table)]
+            new_table = [[h] + [line[i] for line in table] for i, h in enumerate(header[1:], start=1)]
+            t = tabulate(new_table, headers=new_header)
+            with open(fout, 'w') as f:
+                f.write(','.join(new_header) + '\n')
+                for line in new_table:
+                    f.write(','.join(map(str, line)) + '\n')
 
-        new_header = [''] + [line[0] for line in table]
-        new_table = [[h] + line[1:] for h, line in zip(header[1:], table)]
-        new_table = [[h] + [line[i] for line in table] for i, h in enumerate(header[1:], start=1)]
-        t = tabulate(new_table, headers=new_header)
-        with open(fout, 'w') as f:
-            f.write(','.join(new_header) + '\n')
-            for line in new_table:
-                f.write(','.join(map(str, line)) + '\n')
-        print(t)
-        print(fout)
+        return {'MTbench': all_scores}

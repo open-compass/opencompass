@@ -67,14 +67,10 @@ def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
         # else:
         #     print(v['prediction'])
         #     print('-' * 128)
-    if len(judged_answers) != len(result):
-        print(
-            f'Among {len(result)} judgements, successfully extracted {len(judged_answers)} judgements, please check!'
-        )
-    if len(judged_answers) == 0:
+    if len(judged_answers) <= 0.95 * len(result):
         print('*' * 100)
         print(
-            'There are no extracted judgements, please change your judge model or check your prompt!!!'
+            f'For your {filename} judge. Among {len(result)} judgements, successfully extracted {len(judged_answers)} judgements, please check!'
         )
         print('*' * 100)
     assert len(judged_answers) > 0

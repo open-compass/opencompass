@@ -32,7 +32,7 @@ api_meta_template = dict(
 models = [
     dict(
         type=HuggingFaceChatGLM3,
-        abbr='chatglm3-6b-hf',
+        abbr='chatglm3-6b-hf2',
         path='THUDM/chatglm3-6b',
         tokenizer_path='THUDM/chatglm3-6b',
         model_kwargs=dict(
@@ -59,7 +59,7 @@ datasets = [*alignbench_datasets, *alpacav2, *arenahard_datasets, *compassarena_
 
 infer = dict(
     partitioner=dict(type=NaivePartitioner),
-    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=OpenICLInferTask)),
+    runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=OpenICLInferTask)),
 )
 # -------------Evalation Stage ----------------------------------------
 
@@ -80,7 +80,7 @@ judge_models = [dict(
 ## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(type=SubjectiveNaivePartitioner, models=models, judge_models=judge_models,),
-    runner=dict(type=LocalRunner, max_num_workers=2, task=dict(type=SubjectiveEvalTask)),
+    runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=SubjectiveEvalTask)),
     given_pred = [{'abbr':'gpt4-turbo', 'path':'your reference path'},{'abbr':'gpt4-0314', 'path':'your reference path'}]
 )
 

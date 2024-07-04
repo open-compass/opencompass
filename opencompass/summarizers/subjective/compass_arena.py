@@ -175,8 +175,9 @@ class CompassArenaSummarizer:
         # scores['win_' + model1] = win_model1
         output_dir, results_folder = get_outdir(self.cfg, time_str)
 
-
+        all_scores = {}
         for idx, judge_model in enumerate(self.judge_models):
+            score_by_judgemodel = {}
             judge_abbr = model_abbr_from_cfg(judge_model)
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
@@ -198,7 +199,6 @@ class CompassArenaSummarizer:
                         row.append(s)
                     table.append(row)
                 txt = tabulate(table, headers=headers)
-                print(txt)
 
                 if idx == len(self.judge_models):
                     output_filename = osp.join(output_dir, dataset_abbr + '-summarized-by--' + judge_abbr + '-report.csv')
@@ -209,7 +209,6 @@ class CompassArenaSummarizer:
                     f.write(','.join(headers) + '\n')
                     for line in table:
                         f.write(','.join(line) + '\n')
-                print(output_filename)
 
             table = []
             summarizer_model_abbrs = [model_abbr_from_cfg_used_in_summarizer(i) for i in self.compare_models]
@@ -227,14 +226,27 @@ class CompassArenaSummarizer:
                     row.append(s)
                 table.append(row)
             txt = tabulate(table, headers=headers)
-            print(txt)
 
             if idx == len(self.judge_models):
                 output_filename = osp.join(output_dir, 'compassarena-overall-summarized-by--' + judge_abbr + '.csv')
             else:
                 output_filename = osp.join(output_dir, 'compassarena-overall-judged-by--' + judge_abbr + '.csv')
+
+            column_sums = [0.0] * (len(table[0]) - 1)
+            for row in table:
+                for i in range(1, len(row)):
+                    row[i] = float(row[i])
+                    column_sums[i - 1] += row[i]
+            num_rows = len(table)
+            averages = [s / num_rows for s in column_sums]
+            average_row = ['compassarena_average'] + averages
+            table.append(average_row)
+            table = [[row[0]] + [f'{x:.2f}' for x in row[1:]] for row in table]
             with open(output_filename, 'w') as f:
                 f.write(','.join(headers) + '\n')
                 for line in table:
                     f.write(','.join(line) + '\n')
-            print(output_filename)
+            for idx, model in enumerate(summarizer_model_abbrs):
+                score_by_judgemodel[model] = averages[idx]
+            all_scores[judge_abbr]=score_by_judgemodel
+        return {'CompassArena': all_scores}

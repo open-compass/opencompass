@@ -251,17 +251,18 @@ class ArenaHardSummarizer:
         if self.meta_judge_model is not None:
             self.judge_models.append(self.meta_judge_model)
 
-        scores = {}
+        all_scores = {}
 
         for idx, judge_model_cfg in enumerate(self.judge_models):
+            score_by_judgemodel = {}
             judge_model = model_abbr_from_cfg(judge_model_cfg)
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
                 battles = pd.DataFrame()
                 print('Turning judgment results into battles...')
                 for model_pair in unique_combinations:
-                    model1 = model_pair[0]['abbr']
-                    model2 = model_pair[1]['abbr']
+                    model1 = model_pair[0]['abbr'] # base model, in ArenaHard it is gpt4-0314
+                    model2 = model_pair[1]['abbr'] # compare model, your models
                     if idx == len(self.judge_models):
                         subdir = model1 + '_' + model2 + '_summarized-by--' + judge_model
                     else:
@@ -292,8 +293,11 @@ class ArenaHardSummarizer:
                     stats.at[i, 'score'] = bootstrap_online_elo[model]
                     stats.at[i, 'lower'] = np.percentile(bootstrap_elo_lu[model], 2.5)
                     stats.at[i, 'upper'] = np.percentile(bootstrap_elo_lu[model], 97.5)
-                    if model == 'gpt4-0314':
-                        stats.at[i, 'avg_tokens'] = 423
+                    if model == model1:
+                        if model1 == 'gpt4-0314':
+                            stats.at[i, 'avg_tokens'] = 423
+                        else:
+                            stats.at[i, 'avg_tokens'] = 0 # Not expected model
                     else:
                         file_name = os.path.join(output_dir.split('summary')[0], 'predictions', model, dataset_abbr+'.json')
                         model_preds = load_model_preds(file_name)
@@ -304,16 +308,20 @@ class ArenaHardSummarizer:
                         stats.at[i, 'avg_tokens'] = pred_length
                     stats.at[i, 'results'] = bootstrap_elo_lu[model].tolist()
                 stats.sort_values(by='model', inplace=True)
-                stats['score'] = get_win_rate_column(stats, 'score', 'gpt4-0314').tolist()
-                stats['lower'] = get_win_rate_column(stats, 'lower', 'gpt4-0314').tolist()
-                stats['upper'] = get_win_rate_column(stats, 'upper', 'gpt4-0314').tolist()
+                stats['score'] = get_win_rate_column(stats, 'score', model1).tolist()
+                stats['lower'] = get_win_rate_column(stats, 'lower', model1).tolist()
+                stats['upper'] = get_win_rate_column(stats, 'upper', model1).tolist()
                 decimal = 1
                 stats.sort_values(by='score', ascending=False, inplace=True)
                 for _, row in stats.iterrows():
                     interval = str((round(row['lower'] - row['score'], decimal), round(row['upper'] - row['score'], decimal)))
                     print(f"{row['model'] : <30} | score: {round(row['score'], decimal) : ^5} | 95% CI: {interval : ^12} | average #tokens: {int(row['avg_tokens'])}")
+                    if row['model'] != model1:
+                        score_by_judgemodel[row['model']] = row['score']
                 stats.to_json(os.path.join(output_dir,'arena_hard_leaderboard_judged-by--'+judge_model+'.json'), orient='records', indent=4)
                 stats.to_csv(os.path.join(output_dir,'arena_hard_leaderboard_judged-by--'+judge_model+'.csv'))
+            all_scores[judge_model] = score_by_judgemodel
+        return {'ArenaHard': all_scores}
 
     def summarize(
             self,
@@ -327,4 +335,4 @@ class ArenaHardSummarizer:
         Returns:
             pd.DataFrame: The summary results.
         """
-        self.get_score(time_str)
+        return self.get_score(time_str)

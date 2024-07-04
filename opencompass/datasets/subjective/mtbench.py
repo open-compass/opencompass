@@ -2,7 +2,6 @@
 import json
 import os.path as osp
 import re
-from typing import Optional
 
 from datasets import Dataset, DatasetDict
 
@@ -169,10 +168,10 @@ class MTBenchDataset(BaseDataset):
     def load(self,
              path: str,
              name: str,
-             multi_turn=True,
              judge_type='single',
-             mode: Optional[str] = 'singlescore',
-             summarizer: Optional = None):
+             multi_turn=True,
+             *args,
+             **kwargs):
         filename = osp.join(path, f'{name}.json')
         dataset = DatasetDict()
         raw_data = []

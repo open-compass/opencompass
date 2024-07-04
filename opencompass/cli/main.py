@@ -349,6 +349,7 @@ def main():
 
         # For subjective summarizer
         if summarizer_cfg.get('function', None):
+            main_summarizer_cfg = deepcopy(summarizer_cfg)
             grouped_datasets = {}
             for dataset in cfg.datasets:
                 prefix = dataset['abbr'].split('_')[0]
@@ -358,13 +359,18 @@ def main():
             all_grouped_lists = []
             for prefix in grouped_datasets:
                 all_grouped_lists.append(grouped_datasets[prefix])
+            dataset_score_container = []
             for dataset in all_grouped_lists:
                 temp_cfg = deepcopy(cfg)
                 temp_cfg.datasets = dataset
                 summarizer_cfg = dict(type=dataset[0]['summarizer']['type'], config=temp_cfg)
                 summarizer = build_from_cfg(summarizer_cfg)
-                summarizer.summarize(time_str=cfg_time_str)
-
+                dataset_score = summarizer.summarize(time_str=cfg_time_str)
+                if dataset_score:
+                    dataset_score_container.append(dataset_score)
+            main_summarizer_cfg['config'] = cfg
+            main_summarizer = build_from_cfg(main_summarizer_cfg)
+            main_summarizer.summarize(time_str=cfg_time_str, subjective_scores=dataset_score_container)
         else:
             if not summarizer_cfg or summarizer_cfg.get('type', None) is None:
                 summarizer_cfg['type'] = DefaultSummarizer
