@@ -61,10 +61,10 @@ The directory structure is:
 | Intervention | BAS | mix-BAS | Choice selection | Symbolic | 100 | 1600 |
 | Intervention | FAS | FAS | Choice selection | Symbolic | 100 | 1600 |
 | Intervention | IV | CaLM-IV | Choice selection | Symbolic | 100 | 1600 |
-| Intervention | CE | 0.2-UC | Binary classification | Symbolic | 100 | 1600 |
-| Intervention | CE | 0.4-UC | Binary classification | Symbolic | 100 | 1600 |
-| Intervention | CE | 0.6-UC | Binary classification | Symbolic | 100 | 1600 |
-| Intervention | CE | 0.8-UC | Binary classification | Symbolic | 100 | 1600 |
+| Intervention | CEI | 0.2-UC | Binary classification | Symbolic | 100 | 1600 |
+| Intervention | CEI | 0.4-UC | Binary classification | Symbolic | 100 | 1600 |
+| Intervention | CEI | 0.6-UC | Binary classification | Symbolic | 100 | 1600 |
+| Intervention | CEI | 0.8-UC | Binary classification | Symbolic | 100 | 1600 |
 | Counterfactuals | ETT | ETT-natural | Binary classification | Natural | 100 | 1600 |
 | Counterfactuals | ETT | ETT-basic | Probability calculation | Mathematical | 100 | 1600 |
 | Counterfactuals | ETT | ETT-hard | Probability calculation | Mathematical | 100 | 1600 |
