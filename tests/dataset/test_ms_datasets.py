@@ -130,13 +130,12 @@ class TestingMsDatasets(unittest.TestCase):
         ok_list = []
         fail_list = [] 
         for ms_conf, local_conf in tqdm(zip(ms_datasets_conf, local_datasets_conf)):
-            try:
-                ms_name = f"{ms_conf.get('path')}/{ms_conf.get('name', '')}\t{ms_conf.get('lang','')}"
-                local_name = f"{local_conf.get('path')}/{local_conf.get('name', '')}\t{ms_conf.get('lang','')}"
-                print(ms_name, local_name)
-                
-                assert ms_conf['type'] == local_conf['type']
+            ms_name = f"{ms_conf.get('path')}/{ms_conf.get('name', '')}\t{ms_conf.get('lang', '')}"
+            local_name = f"{local_conf.get('path')}/{local_conf.get('name', '')}\t{ms_conf.get('lang', '')}"
+            assert ms_conf['type'] == local_conf['type']
 
+            print(ms_name, local_name)
+            try:
                 ms_dataset = load_datasets('ModelScope', ms_conf)
                 oc_dataset = load_datasets('Local', local_conf)
 
@@ -155,6 +154,7 @@ class TestingMsDatasets(unittest.TestCase):
         print(f"Fail {len(fail_list)} datasets")
         for fail in fail_list:
             print(f"  {fail}")
+
 
 def _check_data(ms_dataset: Dataset | DatasetDict,
                 oc_dataset: Dataset | DatasetDict,
