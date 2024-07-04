@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import cmnliDataset_V2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
+from os import environ
 
 ocnli_reader_cfg = dict(
     input_columns=['sentence1', 'sentence2'],
@@ -36,7 +37,7 @@ ocnli_datasets = [
     dict(
         abbr='ocnli',
         type=cmnliDataset_V2,  # ocnli share the same format with cmnli
-        path='./data/CLUE/OCNLI/dev.json',
+        path='opencompass/OCNLI' if environ.get('DATASET_SOURCE') == 'ModelScope' else'./data/CLUE/OCNLI/dev.json',
         reader_cfg=ocnli_reader_cfg,
         infer_cfg=ocnli_infer_cfg,
         eval_cfg=ocnli_eval_cfg,
