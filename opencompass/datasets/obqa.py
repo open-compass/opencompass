@@ -2,7 +2,6 @@ import json
 from os import environ
 
 from datasets import Dataset
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -16,6 +15,7 @@ class OBQADataset(BaseDataset):
     def load(path, name='main'):
         dataset_list = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, subset_name=name, split='test')
             for line in ms_dataset:
                 item = {
@@ -54,6 +54,7 @@ class OBQADataset_V2(BaseDataset):
     def load(path, name='main'):
         dataset_list = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, subset_name=name, split='test')
             for line in ms_dataset:
                 question = line['question_stem']

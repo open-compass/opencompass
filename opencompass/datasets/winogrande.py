@@ -3,7 +3,6 @@ import os
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -17,6 +16,7 @@ class winograndeDataset(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path,
                                         subset_name='winogrande_xs',
                                         split='validation',
@@ -65,6 +65,7 @@ class winograndeDataset_V2(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path,
                                         subset_name='winogrande_xs',
                                         split='validation',
@@ -118,6 +119,7 @@ class winograndeDataset_V3(BaseDataset):
     def load(path):
         dataset_dict = DatasetDict()
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             for split in ['train', 'validation']:
                 ms_dataset = MsDataset.load(path,
                                             subset_name='winogrande_xs',

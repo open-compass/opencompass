@@ -3,7 +3,6 @@ import os
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -16,6 +15,7 @@ class commonsenseqaDataset(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = {}
             for split in ['train', 'validation']:
                 ms_dataset = MsDataset.load(path, split=split)

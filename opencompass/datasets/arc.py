@@ -3,7 +3,6 @@ import os.path as osp
 from os import environ
 
 from datasets import Dataset
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -16,6 +15,7 @@ class ARCDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = MsDataset.load(path,
                                      split='validation',
                                      subset_name=name)
@@ -68,13 +68,22 @@ class ARCDatasetClean(BaseDataset):
         import requests
 
         assert split == 'test', 'We only have test set annotation for ARC'
-        annotation_cache_path = osp.join(
-            path, f'ARC_c_{split}_contamination_annotations.json')
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope.utils.config_ds import MS_DATASETS_CACHE
+            annotation_cache_path = osp.join(
+                MS_DATASETS_CACHE,
+                f'ARC_c_{split}_contamination_annotations.json')
+            link_of_annotations = 'https://modelscope.cn/datasets/opencompass/Contamination_Detector/resolve/master/ARC_annotations.json'  # noqa
+        else:
+            annotation_cache_path = osp.join(
+                path, f'ARC_c_{split}_contamination_annotations.json')
+            link_of_annotations = 'https://github.com/liyucheng09/Contamination_Detector/releases/download/v0.1.1rc/ARC_annotations.json'  # noqa
+
         if osp.exists(annotation_cache_path):
             with open(annotation_cache_path, 'r') as f:
                 annotations = json.load(f)
             return annotations
-        link_of_annotations = 'https://github.com/liyucheng09/Contamination_Detector/releases/download/v0.1.1rc/ARC_annotations.json'  # noqa
+
         annotations = json.loads(requests.get(link_of_annotations).text)
         with open(annotation_cache_path, 'w') as f:
             json.dump(annotations, f)
@@ -85,6 +94,7 @@ class ARCDatasetClean(BaseDataset):
         annotations = ARCDatasetClean.load_contamination_annotations(
             osp.dirname(path), 'test')
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = MsDataset.load(path, split='test', subset_name=name)
             rows = []
             for row in dataset:

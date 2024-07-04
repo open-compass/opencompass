@@ -2,7 +2,6 @@ import json
 from os import environ
 
 from datasets import Dataset
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -16,6 +15,7 @@ class SummeditsDataset_V2(BaseDataset):
     def load(path: str):
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, split='train')
             for line in ms_dataset:
                 row = line

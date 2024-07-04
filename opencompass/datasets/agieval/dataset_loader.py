@@ -6,7 +6,6 @@ from os import environ
 
 import pandas as pd
 import tiktoken
-from modelscope import MsDataset
 from tqdm import tqdm
 
 from .constructions import ChatGPTSchema, ResultsForHumanSchema
@@ -283,6 +282,7 @@ def load_dataset(dataset_name,
                  verbose=False):
 
     if environ.get('DATASET_SOURCE') == 'ModelScope':
+        from modelscope import MsDataset
         loaded_jsonl = MsDataset.load(parent_path,
                                       subset_name=dataset_name,
                                       split='test')
@@ -364,6 +364,7 @@ def generate_second_stage_input(dataset_name,
 
 
 def load_dataset_as_result_schema(dataset_name, parent_path):
+    from modelscope import MsDataset
     if environ.get('DATASET_SOURCE') == 'ModelScope':
         loaded_jsonl = MsDataset.load(parent_path,
                                       subset_name=dataset_name,

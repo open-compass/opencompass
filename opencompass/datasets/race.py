@@ -3,7 +3,6 @@ import os
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -17,6 +16,7 @@ class RaceDataset(BaseDataset):
     def load(path: str, name: str):
         dataset = {}
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             for split in ['validation', 'test']:
                 # 从 ModelScope 加载数据
                 ms_dataset = MsDataset.load(path,

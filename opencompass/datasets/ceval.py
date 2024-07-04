@@ -4,7 +4,6 @@ import os.path as osp
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -18,6 +17,7 @@ class CEvalDataset(BaseDataset):
     def load(path: str, name: str):
         dataset = {}
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = MsDataset.load(dataset_name=path,
                                      subset_name=name,
                                      trust_remote_code=True)
@@ -47,13 +47,20 @@ class CEvalDatasetClean(BaseDataset):
         import requests
 
         assert split == 'val', 'Now we only have annotations for val set'
-        annotation_cache_path = osp.join(
-            path, split, 'ceval_contamination_annotations.json')
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope.utils.config_ds import MS_DATASETS_CACHE
+            annotation_cache_path = osp.join(
+                MS_DATASETS_CACHE, 'ceval_contamination_annotations.json')
+            link_of_annotations = 'https://modelscope.cn/datasets/opencompass/Contamination_Detector/resolve/master/ceval_annotations.json'  # noqa
+        else:
+            annotation_cache_path = osp.join(
+                path, split, 'ceval_contamination_annotations.json')
+            link_of_annotations = 'https://github.com/liyucheng09/Contamination_Detector/releases/download/v0.1.1rc/ceval_annotations.json'  # noqa
+
         if osp.exists(annotation_cache_path):
             with open(annotation_cache_path, 'r') as f:
                 annotations = json.load(f)
             return annotations
-        link_of_annotations = 'https://github.com/liyucheng09/Contamination_Detector/releases/download/v0.1.1rc/ceval_annotations.json'  # noqa
         annotations = json.loads(requests.get(link_of_annotations).text)
         with open(annotation_cache_path, 'w') as f:
             json.dump(annotations, f)
@@ -63,6 +70,7 @@ class CEvalDatasetClean(BaseDataset):
     def load(path: str, name: str):
         dataset = {}
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = MsDataset.load(dataset_name=path, subset_name=name)
             # 向该数据添加 'is_clean' 字段
             annotations = CEvalDatasetClean.load_contamination_annotations(

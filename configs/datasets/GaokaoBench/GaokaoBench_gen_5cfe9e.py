@@ -285,11 +285,12 @@ for _folder, _prompts in [
             },
             'pred_role': 'BOT',
         }
-        _base_path = 'opencompass/gaokao-benchmark' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/GAOKAO-BENCH/data'
+        _base_path = './data/GAOKAO-BENCH/data'
         _dataset = {
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + _p['keyword'],
-            'path': _base_path + '/' + _folder + '/' + _p['keyword'] + '.json',
+            'path':'opencompass/gaokao-benchmark' if environ.get('DATASET_SOURCE') == 'ModelScope' else _base_path + '/' + _folder + '/' + _p['keyword'] + '.json',
+            'name': _p['keyword'],
             'reader_cfg': _reader_cfg,
             'infer_cfg': _infer_cfg,
             'eval_cfg': _eval_cfg,

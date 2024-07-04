@@ -3,7 +3,6 @@ import os
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -34,6 +33,7 @@ class piqaDataset(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path)
             dataset = DatasetDict({
                 'train': ms_dataset['train'],
@@ -79,6 +79,7 @@ class piqaDataset_V2(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = DatasetDict()
             for split in ['train', 'validation']:
                 ms_dataset = MsDataset.load(path, split=split)
@@ -140,6 +141,7 @@ class piqaDataset_V3(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = DatasetDict()
             for split in ['train', 'validation']:
                 ms_dataset = MsDataset.load(path, split=split)

@@ -3,7 +3,6 @@ import os
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -18,6 +17,7 @@ class storyclozeDataset(BaseDataset):
         dataset_list = []
         for split in ['train', 'eval']:
             if environ.get('DATASET_SOURCE') == 'ModelScope':
+                from modelscope import MsDataset
                 ms_dataset = MsDataset.load(path,
                                             subset_name=lang,
                                             split=split)
@@ -49,6 +49,7 @@ class storyclozeDataset_V2(BaseDataset):
         dataset_list = []
         for split in ['train', 'eval']:
             if environ.get('DATASET_SOURCE') == 'ModelScope':
+                from modelscope import MsDataset
                 ms_dataset = MsDataset.load(path,
                                             subset_name=lang,
                                             split=split)

@@ -4,7 +4,6 @@ import os.path as osp
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -18,6 +17,7 @@ class MMLUDataset(BaseDataset):
     def load(path: str, name: str):
         dataset = DatasetDict()
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             for split in ['dev', 'test']:
                 # 从 ModelScope 加载数据
                 ms_dataset = MsDataset.load(path,
@@ -63,16 +63,25 @@ class MMLUDatasetClean(BaseDataset):
         import requests
 
         assert split == 'test', 'We only use test set for MMLU'
-        annotation_cache_path = osp.join(
-            path, split, f'MMLU_{split}_contamination_annotations.json')
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope.utils.config_ds import MS_DATASETS_CACHE
+            annotation_cache_path = osp.join(
+                MS_DATASETS_CACHE,
+                f'MMLU_{split}_contamination_annotations.json')
+            link_of_annotations = 'https://modelscope.cn/datasets/opencompass/Contamination_Detector/resolve/master/mmlu_annotations.json'  # noqa
+        else:
+            annotation_cache_path = osp.join(
+                path, split, f'MMLU_{split}_contamination_annotations.json')
+            link_of_annotations = 'https://github.com/liyucheng09/Contamination_Detector/releases/download/v0.1.1rc2/mmlu_annotations.json'  # noqa
+
         if osp.exists(annotation_cache_path):
             with open(annotation_cache_path, 'r') as f:
                 annotations = json.load(f)
             return annotations
-        link_of_annotations = 'https://github.com/liyucheng09/Contamination_Detector/releases/download/v0.1.1rc2/mmlu_annotations.json'  # noqa
+
         annotations = json.loads(requests.get(link_of_annotations).text)
-        # with open(annotation_cache_path, 'w') as f:
-        #     json.dump(annotations, f)
+        with open(annotation_cache_path, 'w') as f:
+            json.dump(annotations, f)
         return annotations
 
     @staticmethod
@@ -80,6 +89,8 @@ class MMLUDatasetClean(BaseDataset):
         dataset = DatasetDict()
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             for split in ['dev', 'test']:
+                from modelscope import MsDataset
+
                 # 从 ModelScope 加载数据
                 ms_dataset = MsDataset.load(path,
                                             subset_name=name,

@@ -9,7 +9,6 @@ from os import environ
 from typing import List
 
 from datasets import Dataset
-from modelscope import MsDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
@@ -38,6 +37,7 @@ class HumanevalDataset(BaseDataset):
         multiple responses in special cases.
         """
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = MsDataset.load(path, subset_name='openai_humaneval', split='test')
             dataset_list = []
             for example in dataset:

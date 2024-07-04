@@ -3,7 +3,6 @@ import os.path as osp
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -17,6 +16,7 @@ class hellaswagDataset(BaseDataset):
     def load(path):
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, split='validation')
             for data in ms_dataset:
                 dataset.append({
@@ -50,6 +50,7 @@ class hellaswagDataset_V2(BaseDataset):
     def load(path):
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, split='validation')
             for data in ms_dataset:
                 dataset.append({
@@ -83,6 +84,7 @@ class hellaswagDataset_V3(BaseDataset):
     def load(path):
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, split='validation')
             for data in ms_dataset:
                 dataset.append({
@@ -121,6 +123,7 @@ class hellaswagDatasetwithICE(BaseDataset):
         ]:
             dataset = []
             if environ.get('DATASET_SOURCE') == 'ModelScope':
+                from modelscope import MsDataset
                 ms_dataset = MsDataset.load(
                     path, split=split if split == 'train' else 'validation')
                 for data in ms_dataset:
@@ -158,13 +161,22 @@ class hellaswagDatasetClean(BaseDataset):
         import requests
 
         assert split == 'val', 'We only use val set of hellaswag'
-        annotation_cache_path = osp.join(
-            path, f'hellaswag_{split}_contamination_annotations.json')
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope.utils.config_ds import MS_DATASETS_CACHE
+            annotation_cache_path = osp.join(
+                MS_DATASETS_CACHE,
+                f'hellaswag_{split}_contamination_annotations.json')
+            link_of_annotations = 'https://modelscope.cn/datasets/opencompass/Contamination_Detector/resolve/master/hellaswag_annotations_with_line_index.json'  # noqa
+        else:
+            annotation_cache_path = osp.join(
+                path, f'hellaswag_{split}_contamination_annotations.json')
+            link_of_annotations = 'https://github.com/liyucheng09/Contamination_Detector/releases/download/v0.1.1rc2/hellaswag_annotations_with_line_index.json'  # noqa
+
         if osp.exists(annotation_cache_path):
             with open(annotation_cache_path, 'r') as f:
                 annotations = json.load(f)
             return annotations
-        link_of_annotations = 'https://github.com/liyucheng09/Contamination_Detector/releases/download/v0.1.1rc2/hellaswag_annotations_with_line_index.json'  # noqa
+
         annotations = json.loads(requests.get(link_of_annotations).text)
         with open(annotation_cache_path, 'w') as f:
             json.dump(annotations, f)
@@ -177,6 +189,7 @@ class hellaswagDatasetClean(BaseDataset):
             osp.dirname(path))
 
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, split='validation')
             for rwo_index, data in enumerate(ms_dataset):
                 rwo_index = f'{rwo_index}'

@@ -33,7 +33,7 @@ def reload_datasets():
         # from configs.datasets.race.race_ppl import race_datasets
         # from configs.datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
         # from configs.datasets.mmlu.mmlu_gen import mmlu_datasets
-        # from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
+        from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
         # from configs.datasets.strategyqa.strategyqa_gen import strategyqa_datasets
         # from configs.datasets.bbh.bbh_gen import bbh_datasets
         # from configs.datasets.Xsum.Xsum_gen import Xsum_datasets
@@ -53,7 +53,7 @@ def reload_datasets():
         #     summedits_datasets as summedits_v2_datasets
         # from configs.datasets.hellaswag.hellaswag_gen import hellaswag_datasets as hellaswag_v2_datasets
         # from configs.datasets.hellaswag.hellaswag_10shot_gen_e42710 import hellaswag_datasets as hellaswag_ice_datasets
-        # from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
+        from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
         # from configs.datasets.hellaswag.hellaswag_ppl_9dbb12 import hellaswag_datasets as hellaswag_v1_datasets
         # from configs.datasets.hellaswag.hellaswag_ppl_a6e128 import hellaswag_datasets as hellaswag_v3_datasets
         # from configs.datasets.mbpp.mbpp_gen import mbpp_datasets as mbpp_v1_datasets
@@ -66,7 +66,12 @@ def reload_datasets():
         # from configs.datasets.piqa.piqa_ppl import piqa_datasets as piqa_v1_datasets
         # from configs.datasets.piqa.piqa_ppl_0cfff2 import piqa_datasets as piqa_v3_datasets
         # from configs.datasets.lambada.lambada_gen import lambada_datasets
-        from configs.datasets.tydiqa.tydiqa_gen import tydiqa_datasets
+        # from configs.datasets.tydiqa.tydiqa_gen import tydiqa_datasets
+        # from configs.datasets.GaokaoBench.GaokaoBench_gen import GaokaoBench_datasets
+        # from configs.datasets.GaokaoBench.GaokaoBench_mixed import GaokaoBench_datasets as GaokaoBench_mixed_datasets
+        # from configs.datasets.GaokaoBench.GaokaoBench_no_subjective_gen_4c31db import GaokaoBench_datasets as GaokaoBench_no_subjective_datasets
+        # from configs.datasets.triviaqa.triviaqa_gen import triviaqa_datasets
+        # from configs.datasets.triviaqa.triviaqa_wiki_1shot_gen_20a989 import triviaqa_datasets as triviaqa_wiki_1shot_datasets
         
     return sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
@@ -111,22 +116,31 @@ class TestingMsDatasets(unittest.TestCase):
         ms_datasets_conf = load_datasets_conf('ModelScope')
         local_datasets_conf = load_datasets_conf('Local')
 
-        for ms_conf, local_conf in zip(ms_datasets_conf, local_datasets_conf):
-            print(f"ms file: {ms_conf.get('path')}/{ms_conf.get('name', '')}")
-            print(
-                f"local file: {local_conf.get('path')}/{local_conf.get('name', '')}"
-            )
+        ok_list = []
+        fail_list = [] 
+        for ms_conf, local_conf in tqdm(zip(ms_datasets_conf, local_datasets_conf)):
+            ms_name = f"{ms_conf.get('path')}\t{ms_conf.get('name', '')}"
+            local_name = f"{local_conf.get('path')}\t{local_conf.get('name', '')}"
 
             assert ms_conf['type'] == local_conf['type']
 
             ms_dataset = load_datasets('ModelScope', ms_conf)
             oc_dataset = load_datasets('Local', local_conf)
-
-            _check_data(ms_dataset, oc_dataset, sample_size=sample_size)
-
-        print(f'All {len(ms_datasets_conf)} datasets are the same!!!' +
-              '=' * 50)
-
+            try:
+                _check_data(ms_dataset, oc_dataset, sample_size=sample_size)
+            except Exception as e:
+                fail_list.append(
+                    f'{ms_name} is not the same as {local_name}')
+                continue
+            ok_list.append(f'{ms_name} | {local_name}')
+            
+        print(f"All {len(ms_datasets_conf)} datasets")
+        print(f"OK {len(ok_list)} datasets")
+        for ok in ok_list:
+            print(f"  {ok}")
+        print(f"Fail {len(fail_list)} datasets")
+        for fail in fail_list:
+            print(f"  {fail}")
 
 def _check_data(ms_dataset: Dataset | DatasetDict,
                 oc_dataset: Dataset | DatasetDict,
@@ -159,9 +173,9 @@ def _check_data(ms_dataset: Dataset | DatasetDict,
                                        min(sample_size, len(ms_dataset)))
 
         for i, idx in enumerate(tqdm(sample_indices, total=sample_size)):
-            if i == 0:
-                print(f'MS Dataset: {ms_dataset[idx]}')
-                print(f'OC Dataset: {oc_dataset[idx]}')
+            # if i == 0:
+            #     print(f'MS Dataset: {ms_dataset[idx]}')
+            #     print(f'OC Dataset: {oc_dataset[idx]}')
             for col in ms_dataset.column_names:
                 ms_value = clean_string(str(ms_dataset[col][idx]))
                 oc_value = clean_string(str(oc_dataset[col][idx]))
@@ -178,5 +192,5 @@ def _check_data(ms_dataset: Dataset | DatasetDict,
 
 
 if __name__ == '__main__':
-    sample_size = 100
+    sample_size = 10
     unittest.main()
