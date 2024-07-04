@@ -143,7 +143,7 @@ def do_setup():
         name='ms-opencompass',      # ModelScope-OpenCompass Version
         author='OpenCompass Contributors',
         version=get_version(),
-        description='A comprehensive toolkit for large model evaluation',
+        description='A lightweight toolkit for evaluating LLMs based on OpenCompass.',
         # url='https://github.com/open-compass/opencompass',
         url='https://github.com/wangxingjun778/opencompass',
         include_package_data=True,
