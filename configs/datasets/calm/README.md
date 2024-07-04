@@ -34,60 +34,6 @@ The directory structure is:
 - **Dataset configuration**: We prioritize balance in our dataset for **binary classification** and **choice selection** questions. By ensuring an equal number of each GT label, we minimize the risk of introducing bias into the model's testing. For **probability calculation**, CaLM-Lite takes extra attention to balance the number of problems across different causal reasoning processes. (For more details on how causal reasoning process is defined, please refer to Section 9.1.6 of the [paper](https://arxiv.org/abs/2405.00622).)
 - **Efficient evaluation**: For enhanced evaluation efficiency, OpenCompass offers customizable methods. Refer to the [documentation](https://opencompass.org.cn/doc) for guidance on tailoring these methods to your needs.
 
-
-| Causal ladder | Causal scenario | Subset | Question type | Mode | CaLM Lite | CaLM |
-|---------------|-----------------|--------|---------------|------|-----------|------|
-| Causal discovery | PCD | E-CARE | Binary classification | Natural | 100 | 2000 |
-|  |     | E-CARE | Choice selection | Natural | 100 | 1000 |
-|                  |     | COPA | Binary classification | Natural | 100 | 2000 |
-|                  |     | COPA | Choice selection | Natural | 100 | 1000 |
-|                  | ECI | CTB | Binary classification | Natural | 100 | 596 |
-|                  |     | ESC | Binary classification | Natural | 100 | 1000 |
-|                  |     | MAVEN-ERE | Binary classification | Natural | 100 | 1000 |
-| | AR | CaLM-AR | Binary classification | Symbolic | 100 | 1600 |
-| | CA | FP | Binary classification | Symbolic | 100 | 1600 |
-| |    | FA | Binary classification | Symbolic | 100 | 1600 |
-| Association | CORR | correlation | Binary classification | Natural | 100 | 1476 |
-| | EAE | exp-away | Binary classification | Natural | 100 | 168 |
-| Intervention | CB | collider-bias | Binary classification | Natural | 100 | 163 |
-| | ATE | ATE-natural | Binary classification | Natural | 100 | 1600 |
-| | | ATE-basic | Probability calculation | Mathematical | 100 | 1600 |
-| | | ATE-hard | Probability calculation | Mathematical | 100 | 1600 |
-| | CDE | CDE-natural | Binary classification | Natural | 100 | 1600 |
-| | | CDE-basic | Probability calculation | Mathematical | 100 | 1600 |
-| | | CDE-hard | Probability calculation | Mathematical | 100 | 1600 |
-| | BAS | backadj | Binary classification | Natural | 100 | 227 |
-| | | max-BAS | Choice selection | Symbolic | 100 | 1600 |
-| | | min-BAS | Choice selection | Symbolic | 100 | 1600 |
-| | | mix-BAS | Choice selection | Symbolic | 100 | 1600 |
-| | FAS | FAS | Choice selection | Symbolic | 100 | 1600 |
-| | IV | CaLM-IV | Choice selection | Symbolic | 100 | 1600 |
-| | CE | 0.2-UC | Binary classification | Symbolic | 100 | 1600 |
-| | | 0.4-UC | Binary classification | Symbolic | 100 | 1600 |
-| | | 0.6-UC | Binary classification | Symbolic | 100 | 1600 |
-| | | 0.8-UC | Binary classification | Symbolic | 100 | 1600 |
-| Counterfactuals | ETT | ETT-natural | Binary classification | Natural | 100 | 1600 |
-| | | ETT-basic | Probability calculation | Mathematical | 100 | 1600 |
-| | | ETT-hard | Probability calculation | Mathematical | 100 | 1600 |
-| | NDE | NDE-natural | Binary classification | Natural | 100 | 1600 |
-| | | NDE-basic | Probability calculation | Mathematical | 100 | 1600 |
-| | | NDE-hard | Probability calculation | Mathematical | 100 | 1600 |
-| | NIE | NIE-natural | Binary classification | Natural | 100 | 1600 |
-| | | NIE-basic | Probability calculation | Mathematical | 100 | 1600 |
-| | | NIE-hard | Probability calculation | Mathematical | 100 | 1600 |
-| | PN | PN-basic | Probability calculation | Mathematical | 100 | 1600 |
-| | | PN-hard | Probability calculation | Mathematical | 100 | 1600 |
-| | PS | PS-basic | Probability calculation | Mathematical | 100 | 1600 |
-| | | PS-hard | Probability calculation | Mathematical | 100 | 1600 |
-| | AC | causal judgement | Binary classification | Natural | 100 | 187 |
-| | CR | CRASS | Choice selection | Natural | 100 | 274 |
-| | | det-counterfactual | Binary classification | Natural | 100 | 1476 |
-| | CEG | E-CARE | Open-ended generation | Natural | 100 | 1000 |
-| **Total** | | | | | 4600 | 63167 |
-
-
-我理解您的要求。我会帮您填充空白行,使表格更加完整和清晰。以下是填充后的表格:
-
 | Causal ladder | Causal scenario | Subset | Question type | Mode | CaLM Lite | CaLM |
 |---------------|-----------------|--------|---------------|------|-----------|------|
 | Causal discovery | PCD | E-CARE | Binary classification | Natural | 100 | 2000 |
@@ -138,7 +84,6 @@ The directory structure is:
 | Counterfactuals | CEG | E-CARE | Open-ended generation | Natural | 100 | 1000 |
 | **Total** | | | | | 4600 | 63167 |
 
-这个表格现在更加完整和清晰。每一行都有完整的信息,没有空白的单元格。这样可以更容易理解每个类别和子类别之间的关系,以及它们对应的问题类型、模式和数量。如果您需要进一步的解释或有任何问题,请随时告诉我。
 ## Available Prompt Styles (Adaptation)
 Basic Prompt is our default setting for efficient evaluation of CaLM Lite, but we provide flexibility for exploring additional prompts through CaLM. If you'd like to explore and compare a wider range of prompts, we encourage you to use CaLM. We provide a comprehensive and easy-to-follow guide to assist you in our [repository](https://github.com/OpenCausaLab/CaLM).
 
