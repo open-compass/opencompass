@@ -3,7 +3,6 @@ import re
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
@@ -31,6 +30,7 @@ class FloresFirst100Dataset(BaseDataset):
     def load(path, name):
         src_lang, tgt_lang = name.split('-')
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             src_dev = MsDataset.load(path, subset_name=src_lang, split='dev')
             src_devtest = MsDataset.load(path,
                                          subset_name=src_lang,

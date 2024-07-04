@@ -3,7 +3,6 @@ import os.path as osp
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -16,6 +15,7 @@ class CMMLUDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = MsDataset.load(path,
                                      subset_name=name,
                                      trust_remote_code=True)

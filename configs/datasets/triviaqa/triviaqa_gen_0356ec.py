@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import TriviaQADataset, TriviaQAEvaluator
-
+from os import environ
 
 triviaqa_datasets = []
 for k in [0, 1, 5]:
@@ -55,7 +55,7 @@ for k in [0, 1, 5]:
         dict(
             type=TriviaQADataset,
             abbr='triviaqa' if k == 0 else f'triviaqa_{k}shot',
-            path='./data/triviaqa/',
+            path='opencompass/trivia_qa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/triviaqa/',
             reader_cfg=triviaqa_reader_cfg,
             infer_cfg=triviaqa_infer_cfg,
             eval_cfg=triviaqa_eval_cfg)

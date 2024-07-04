@@ -3,7 +3,6 @@ import os
 from os import environ
 
 from datasets import Dataset, DatasetDict
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -34,6 +33,7 @@ class siqaDataset(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = DatasetDict()
             for split in ['train', 'validation']:
                 data_list = []
@@ -91,6 +91,7 @@ class siqaDataset_V2(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = DatasetDict()
             for split in ['train', 'validation']:
                 data_list = []
@@ -151,6 +152,7 @@ class siqaDataset_V3(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = DatasetDict()
             for split in ['train', 'validation']:
                 data_list = []

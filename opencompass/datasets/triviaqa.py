@@ -1,6 +1,7 @@
 import csv
 import json
 import os.path as osp
+from os import environ
 
 from datasets import Dataset, DatasetDict
 
@@ -16,20 +17,39 @@ class TriviaQADataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        dataset = DatasetDict()
-        for split in ['dev', 'test']:
-            filename = osp.join(path, f'trivia-{split}.qa.csv')
-            with open(filename, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f, delimiter='\t')
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            dataset = DatasetDict()
+            for split in ['dev', 'test']:
+                ms_dataset = MsDataset.load(path,
+                                            subset_name='v1',
+                                            split=split)
                 raw_data = []
-                for row in reader:
-                    assert len(row) == 2
-                    question = row[0]
-                    answers = eval(row[1])
+                for row in ms_dataset:
+                    question = row['question']
+                    answers = eval(row['answer'])
                     if split == 'test':
                         answers = answers[0]
                     raw_data.append({'question': question, 'answer': answers})
                 dataset[split] = Dataset.from_list(raw_data)
+        else:
+            dataset = DatasetDict()
+            for split in ['dev', 'test']:
+                filename = osp.join(path, f'trivia-{split}.qa.csv')
+                with open(filename, 'r', encoding='utf-8') as f:
+                    reader = csv.reader(f, delimiter='\t')
+                    raw_data = []
+                    for row in reader:
+                        assert len(row) == 2
+                        question = row[0]
+                        answers = eval(row[1])
+                        if split == 'test':
+                            answers = answers[0]
+                        raw_data.append({
+                            'question': question,
+                            'answer': answers
+                        })
+                    dataset[split] = Dataset.from_list(raw_data)
         return dataset
 
 
@@ -38,15 +58,32 @@ class TriviaQADataset_V2(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        dataset = DatasetDict()
-        for split in ['validation', 'train']:
-            filename = osp.join(path, f'triviaqa-{split}.jsonl')
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            dataset = DatasetDict()
+            dataset['train'] = MsDataset.load(path,
+                                              subset_name='v2',
+                                              split='train')
+            # validation
+            ms_dataset = MsDataset.load(path,
+                                        subset_name='v2',
+                                        split='validation')
             raw_data = []
-            with open(filename, 'r', encoding='utf-8') as f:
-                for doc in f:
-                    doc = json.loads(doc)
-                    raw_data.append(doc)
-            dataset[split] = Dataset.from_list(raw_data)
+            for row in ms_dataset:
+                question = row['question']
+                answers = eval(row['answer'])
+                raw_data.append({'question': question, 'answer': answers})
+            dataset['validation'] = Dataset.from_list(raw_data)
+        else:
+            dataset = DatasetDict()
+            for split in ['validation', 'train']:
+                filename = osp.join(path, f'triviaqa-{split}.jsonl')
+                raw_data = []
+                with open(filename, 'r', encoding='utf-8') as f:
+                    for doc in f:
+                        doc = json.loads(doc)
+                        raw_data.append(doc)
+                dataset[split] = Dataset.from_list(raw_data)
 
         return dataset
 

@@ -3,7 +3,6 @@ import os.path as osp
 from os import environ
 
 from datasets import Dataset
-from modelscope import MsDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
@@ -42,6 +41,7 @@ class AGIEvalDataset_v2(BaseDataset):
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
 
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, subset_name=name, split='test')
             dataset = []
             for item in ms_dataset:

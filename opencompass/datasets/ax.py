@@ -2,7 +2,6 @@ import json
 from os import environ
 
 from datasets import Dataset
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -16,6 +15,7 @@ class AXDataset_V2(BaseDataset):
     def load(path: str):
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             ms_dataset = MsDataset.load('opencompass/super_glue',
                                         subset_name='axb')['test']
             for data in ms_dataset:

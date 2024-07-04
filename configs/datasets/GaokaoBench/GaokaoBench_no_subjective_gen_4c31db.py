@@ -4,7 +4,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import GaokaoBenchDataset
 from mmengine.config import read_base
-
+from os import environ
 with read_base():
     from .GaokaoBench_prompts import MCQ_prompts, FBQ_prompts
 
@@ -34,7 +34,8 @@ for folder, prompts in [
         dataset = {
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + p['keyword'],
-            'path': os.path.join('data', 'GAOKAO-BENCH', 'data', folder, p['keyword'] + '.json'),
+            'path': 'opencompass/gaokao-benchmark' if environ.get('DATASET_SOURCE') == 'ModelScope' else os.path.join('data', 'GAOKAO-BENCH', 'data', folder, p['keyword'] + '.json'),
+            'name': p['keyword'],
             'reader_cfg': reader_cfg,
             'infer_cfg': infer_cfg,
             'eval_cfg': eval_cfg,

@@ -14,7 +14,6 @@ from typing import List, Sequence, Union
 
 import numpy as np
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
-from modelscope import MsDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
@@ -35,6 +34,7 @@ class MBPPDataset(BaseDataset):
             return example
 
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             train = MsDataset.load(path,
                                    subset_name='full',
                                    split='train[:10]').map(processing_test)
@@ -77,6 +77,7 @@ class MBPPDataset_V2(BaseDataset):
             return example
 
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             train = MsDataset.load(path,
                                    subset_name='full',
                                    split='train[:10]').map(processing_test)
@@ -124,6 +125,7 @@ class SanitizedMBPPDataset(BaseDataset):
 
         # train : test = 7 : 257
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             train = MsDataset.load(path,
                                    subset_name='sanitized',
                                    split='train[:7]').map(processing_test)

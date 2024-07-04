@@ -4,7 +4,6 @@ import re
 from os import environ
 
 from datasets import Dataset
-from modelscope import MsDataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
@@ -19,6 +18,7 @@ class BBHDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = MsDataset.load(path, subset_name=name, split='test')
         else:
             with open(osp.join(path, f'{name}.json'), 'r') as f:

@@ -3,7 +3,6 @@ import re
 from os import environ
 
 from datasets import Dataset
-from modelscope import MsDataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
@@ -31,6 +30,7 @@ class StrategyQADataset(BaseDataset):
     @staticmethod
     def load(path):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
             dataset = MsDataset.load('opencompass/strategy_qa',
                                      split='train',
                                      trust_remote_code=True)

@@ -1,5 +1,6 @@
 import json
 import re
+from os import environ
 
 from datasets import Dataset
 
@@ -13,10 +14,14 @@ from .base import BaseDataset
 class GaokaoBenchDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
-        with open(path, encoding='utf-8') as f:
-            data = json.load(f)
-        return Dataset.from_list(data['example'])
+    def load(path: str, name: str):
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            return MsDataset.load(path, subset_name=name, split='test')
+        else:
+            with open(path, encoding='utf-8') as f:
+                data = json.load(f)
+            return Dataset.from_list(data['example'])
 
 
 valid_gaokao_bench_question_types = [
