@@ -8,15 +8,23 @@ from opencompass.tasks import OpenICLInferTask
 with read_base():
     # from .datasets.collections.chat_medium import datasets
     from ..summarizers.medium import summarizer
-    # from ..datasets.ceval.ceval_gen import ceval_datasets as cur_datasets
-    # from ..datasets.ceval.ceval_clean_ppl import ceval_datasets as cur_datasets
-    # from ..datasets.GaokaoBench.GaokaoBench_gen import GaokaoBench_datasets as cur_datasets
+    # from ..datasets.ceval.ceval_gen import ceval_datasets
+    from ..datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
+    # from ..datasets.GaokaoBench.GaokaoBench_gen import GaokaoBench_datasets
+    # from ..datasets.strategyqa.strategyqa_gen import strategyqa_datasets
+    # from ..datasets.bbh.bbh_gen import bbh_datasets
+    # from ..datasets.Xsum.Xsum_gen import Xsum_datasets
+    # from ..datasets.agieval.agieval_gen import agieval_datasets as agieval_v2_datasets
     # from ..datasets.gsm8k.gsm8k_gen import gsm8k_datasets as cur_datasets
-    from ..datasets.SuperGLUE_AX_b.SuperGLUE_AX_b_gen import AX_b_datasets as cur_datasets
+    # from ..datasets.summedits.summedits_gen import summedits_datasets as cur_datasets
 
-datasets = [
-    *cur_datasets,
-]
+datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
+
+for d in datasets:
+    d['reader_cfg'].update({
+        'train_range':'[0:2]',
+        'test_range':'[0:2]'
+    })
 
 # needs a special postprocessor for all
 # except 'gsm8k' and 'strategyqa'
@@ -64,8 +72,8 @@ infer = dict(
     partitioner=dict(type=NaivePartitioner),
     runner=dict(
         type=LocalAPIRunner,
-        max_num_workers=1,
-        concurrent_users=1,
+        max_num_workers=2,
+        concurrent_users=2,
         task=dict(type=OpenICLInferTask),
         )
 )

@@ -21,7 +21,7 @@ def reload_datasets():
         del sys.modules[module_name]
 
     with read_base():
-        # from configs.datasets.ceval.ceval_gen import ceval_datasets
+        from configs.datasets.ceval.ceval_gen import ceval_datasets
         # from configs.datasets.ceval.ceval_clean_ppl import ceval_datasets as ceval_clean_datasets
         # from configs.datasets.gsm8k.gsm8k_gen import gsm8k_datasets
         # from configs.datasets.cmmlu.cmmlu_gen import cmmlu_datasets
@@ -79,7 +79,7 @@ def reload_datasets():
         # from configs.datasets.CLUE_afqmc.CLUE_afqmc_ppl import afqmc_datasets as afqmc_ppl_datasets
         # from configs.datasets.CLUE_cmnli.CLUE_cmnli_gen import cmnli_datasets
         # from configs.datasets.CLUE_cmnli.CLUE_cmnli_ppl import cmnli_datasets as cmnli_ppl_datasets
-        from configs.datasets.CLUE_ocnli.CLUE_ocnli_gen import ocnli_datasets
+        # from configs.datasets.CLUE_ocnli.CLUE_ocnli_gen import ocnli_datasets
         
     return sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
