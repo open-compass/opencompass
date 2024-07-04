@@ -8,8 +8,8 @@ from opencompass.tasks import OpenICLInferTask
 with read_base():
     # from .datasets.collections.chat_medium import datasets
     from ..summarizers.medium import summarizer
-    # from ..datasets.ceval.ceval_gen import ceval_datasets
-    from ..datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
+    from ..datasets.ceval.ceval_gen import ceval_datasets
+    # from ..datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
     # from ..datasets.GaokaoBench.GaokaoBench_gen import GaokaoBench_datasets
     # from ..datasets.strategyqa.strategyqa_gen import strategyqa_datasets
     # from ..datasets.bbh.bbh_gen import bbh_datasets
@@ -18,13 +18,11 @@ with read_base():
     # from ..datasets.gsm8k.gsm8k_gen import gsm8k_datasets as cur_datasets
     # from ..datasets.summedits.summedits_gen import summedits_datasets as cur_datasets
 
-datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
+# datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
-for d in datasets:
-    d['reader_cfg'].update({
-        'train_range':'[0:2]',
-        'test_range':'[0:2]'
-    })
+datasets = [
+    *ceval_datasets,
+]
 
 # needs a special postprocessor for all
 # except 'gsm8k' and 'strategyqa'
@@ -65,7 +63,7 @@ models = [
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
-        batch_size=1)
+        batch_size=8)
 ]
 
 infer = dict(
