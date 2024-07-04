@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import AFQMCDataset_V2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
+from os import environ
 
 afqmc_reader_cfg = dict(
     input_columns=['sentence1', 'sentence2'],
@@ -35,7 +36,7 @@ afqmc_datasets = [
     dict(
         abbr='afqmc-dev',
         type=AFQMCDataset_V2,
-        path='./data/CLUE/AFQMC/dev.json',
+        path='opencompass/afqmc' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/CLUE/AFQMC/dev.json',
         reader_cfg=afqmc_reader_cfg,
         infer_cfg=afqmc_infer_cfg,
         eval_cfg=afqmc_eval_cfg,

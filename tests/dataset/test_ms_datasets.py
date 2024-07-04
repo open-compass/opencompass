@@ -32,18 +32,19 @@ def reload_datasets():
         # from configs.datasets.humaneval.humaneval_repeat10_gen_8e312c import humaneval_datasets as humaneval_repeat10_datasets
         # from configs.datasets.race.race_ppl import race_datasets
         # from configs.datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
+        
         # from configs.datasets.mmlu.mmlu_gen import mmlu_datasets
-        from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
+        # from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
         # from configs.datasets.strategyqa.strategyqa_gen import strategyqa_datasets
         # from configs.datasets.bbh.bbh_gen import bbh_datasets
         # from configs.datasets.Xsum.Xsum_gen import Xsum_datasets
-        # from configs.datasets.flores.flores_gen import flores_datasets
         # from configs.datasets.winogrande.winogrande_gen import winogrande_datasets
         # from configs.datasets.winogrande.winogrande_ll import winogrande_datasets as winogrande_ll_datasets
         # from configs.datasets.winogrande.winogrande_5shot_ll_252f01 import winogrande_datasets as winogrande_5shot_ll_datasets
         # from configs.datasets.obqa.obqa_gen import obqa_datasets
         # from configs.datasets.obqa.obqa_ppl_6aac9e import obqa_datasets as obqa_ppl_datasets
         # from configs.datasets.agieval.agieval_gen import agieval_datasets as agieval_v2_datasets
+        # from configs.datasets.agieval.agieval_gen_a0c741 import agieval_datasets as agieval_v1_datasets
         # from configs.datasets.siqa.siqa_gen import siqa_datasets as siqa_v2_datasets
         # from configs.datasets.siqa.siqa_gen_18632c import siqa_datasets as siqa_v3_datasets
         # from configs.datasets.siqa.siqa_ppl_42bc6e import siqa_datasets as siqa_ppl_datasets
@@ -51,9 +52,10 @@ def reload_datasets():
         # from configs.datasets.storycloze.storycloze_ppl import storycloze_datasets as storycloze_ppl_datasets
         # from configs.datasets.summedits.summedits_gen import \
         #     summedits_datasets as summedits_v2_datasets
+        
         # from configs.datasets.hellaswag.hellaswag_gen import hellaswag_datasets as hellaswag_v2_datasets
         # from configs.datasets.hellaswag.hellaswag_10shot_gen_e42710 import hellaswag_datasets as hellaswag_ice_datasets
-        from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
+        # from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
         # from configs.datasets.hellaswag.hellaswag_ppl_9dbb12 import hellaswag_datasets as hellaswag_v1_datasets
         # from configs.datasets.hellaswag.hellaswag_ppl_a6e128 import hellaswag_datasets as hellaswag_v3_datasets
         # from configs.datasets.mbpp.mbpp_gen import mbpp_datasets as mbpp_v1_datasets
@@ -72,6 +74,12 @@ def reload_datasets():
         # from configs.datasets.GaokaoBench.GaokaoBench_no_subjective_gen_4c31db import GaokaoBench_datasets as GaokaoBench_no_subjective_datasets
         # from configs.datasets.triviaqa.triviaqa_gen import triviaqa_datasets
         # from configs.datasets.triviaqa.triviaqa_wiki_1shot_gen_20a989 import triviaqa_datasets as triviaqa_wiki_1shot_datasets
+        
+        # from configs.datasets.CLUE_afqmc.CLUE_afqmc_gen import afqmc_datasets
+        # from configs.datasets.CLUE_afqmc.CLUE_afqmc_ppl import afqmc_datasets as afqmc_ppl_datasets
+        # from configs.datasets.CLUE_cmnli.CLUE_cmnli_gen import cmnli_datasets
+        # from configs.datasets.CLUE_cmnli.CLUE_cmnli_ppl import cmnli_datasets as cmnli_ppl_datasets
+        from configs.datasets.CLUE_ocnli.CLUE_ocnli_gen import ocnli_datasets
         
     return sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
@@ -95,7 +103,10 @@ def load_datasets(source, conf):
     if 'name' in conf:
         dataset = conf['type'].load(path=conf['path'], name=conf['name'])
         return dataset
-    dataset = conf['type'].load(path=conf['path'])
+    try:
+        dataset = conf['type'].load(path=conf['path'])
+    except Exception:
+        dataset = conf['type'].load(**conf)
     return dataset
 
 
@@ -119,18 +130,21 @@ class TestingMsDatasets(unittest.TestCase):
         ok_list = []
         fail_list = [] 
         for ms_conf, local_conf in tqdm(zip(ms_datasets_conf, local_datasets_conf)):
-            ms_name = f"{ms_conf.get('path')}\t{ms_conf.get('name', '')}"
-            local_name = f"{local_conf.get('path')}\t{local_conf.get('name', '')}"
-
-            assert ms_conf['type'] == local_conf['type']
-
-            ms_dataset = load_datasets('ModelScope', ms_conf)
-            oc_dataset = load_datasets('Local', local_conf)
             try:
+                ms_name = f"{ms_conf.get('path')}/{ms_conf.get('name', '')}\t{ms_conf.get('lang','')}"
+                local_name = f"{local_conf.get('path')}/{local_conf.get('name', '')}\t{ms_conf.get('lang','')}"
+                print(ms_name, local_name)
+                
+                assert ms_conf['type'] == local_conf['type']
+
+                ms_dataset = load_datasets('ModelScope', ms_conf)
+                oc_dataset = load_datasets('Local', local_conf)
+
                 _check_data(ms_dataset, oc_dataset, sample_size=sample_size)
             except Exception as e:
                 fail_list.append(
                     f'{ms_name} is not the same as {local_name}')
+                print(e)
                 continue
             ok_list.append(f'{ms_name} | {local_name}')
             
