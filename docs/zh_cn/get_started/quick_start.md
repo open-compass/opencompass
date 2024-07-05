@@ -203,7 +203,7 @@ with read_base():
 datasets = gsm8k_datasets + math_datasets       # 最终的配置需要包含所需的评估数据集列表 'datasets'
 ```
 
-数据集配置通常有两种类型：'ppl' 和 'gen'，分别指示使用的评估方法。其中 `ppl` 表示辨别性评估，`gen` 表示生成性评估。对话模型仅使用 `gen` 生成式评估。
+数据集配置通常有两种类型：`ppl` 和 `gen`，分别指示使用的评估方法。其中 `ppl` 表示辨别性评估，`gen` 表示生成性评估。对话模型仅使用 `gen` 生成式评估。
 
 此外，[configs/datasets/collections](https://github.com/open-compass/opencompass/blob/main/configs/datasets/collections) 收录了各种数据集集合，方便进行综合评估。OpenCompass 通常使用 [`chat_OC15.py`](https://github.com/open-compass/opencompass/blob/main/configs/dataset_collections/chat_OC15.py) 进行全面的模型测试。要复制结果，只需导入该文件，例如：
 
@@ -337,7 +337,7 @@ with read_base():
 datasets = gsm8k_datasets + math_datasets       # 最终的配置需要包含所需的评估数据集列表 'datasets'
 ```
 
-数据集配置通常有两种类型：'ppl' 和 'gen'，分别指示使用的评估方法。其中 `ppl` 表示判别性评估，`gen` 表示生成性评估。基座模型对于 "选择题" 类型的数据集会使用 `ppl` 判别性评估，其他则会使用 `gen` 生成式评估。
+数据集配置通常有两种类型：`ppl` 和 `gen`，分别指示使用的评估方法。其中 `ppl` 表示判别性评估，`gen` 表示生成性评估。基座模型对于 "选择题" 类型的数据集会使用 `ppl` 判别性评估，其他则会使用 `gen` 生成式评估。
 
 ```{seealso}
 您可以从 [配置数据集](../user_guides/datasets.md) 中找到更多信息。
@@ -368,7 +368,7 @@ python run.py configs/eval_chat_demo.py -w outputs/demo --debug
 [2023-07-12 18:23:55,076] [opencompass.openicl.icl_inferencer.icl_gen_inferencer] [INFO] Starting inference process...
 ```
 
-然后，您可以按 `ctrl+c` 中断程序，并以正常模式运行以下命令：
+然后，您可以按 `Ctrl+C` 中断程序，并以正常模式运行以下命令：
 
 ```bash
 python run.py configs/eval_chat_demo.py -w outputs/demo
