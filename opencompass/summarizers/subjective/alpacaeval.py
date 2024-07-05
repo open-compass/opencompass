@@ -80,10 +80,9 @@ class AlpacaSummarizer:
     def __init__(self, config: ConfigDict, judge_type='v2') -> None:
         self.tasks = []
         self.cfg = config
-        self.base_models = self.cfg['eval']['partitioner']['base_models']
-        self.compare_models = self.cfg['eval']['partitioner']['compare_models']
-        self.judge_abbr = model_abbr_from_cfg(
-            self.cfg['judge_models'][0])  # We will reorganize the summarizers
+        self.base_models = self.cfg['datasets'][0]['base_models']
+        self.compare_models = self.cfg['eval']['partitioner']['models']
+        self.judge_models = self.cfg.get('judge_models', None)
         self.judge_type = judge_type
         assert self.judge_type in ['v1', 'v2']
         self.judge_map = {
@@ -102,22 +101,34 @@ class AlpacaSummarizer:
         Returns:
             pd.DataFrame: The summary results.
         """
-        dataset_cfgs = self.cfg['datasets']
-        output_dir, results_folder = get_outdir(self.cfg, time_str)
-        model_combinations = list(
-            product(self.base_models, self.compare_models))
-        unique_combinations = remove_duplicate_pairs(
-            [combo for combo in model_combinations if combo[0] != combo[1]])
+        all_scores = {}
+        for judge_model in self.judge_models:
+            score_by_judgemodel = {}
+            judge_abbr = model_abbr_from_cfg(judge_model)
+            dataset_cfgs = self.cfg['datasets']
+            dataset = dataset_cfgs[0]  # AlpacaEval just have only one subfile
+            dataset_abbr = dataset_abbr_from_cfg(dataset)
+            output_dir, results_folder = get_outdir(self.cfg, time_str)
+            model_combinations = list(
+                product(self.base_models, self.compare_models))
+            unique_combinations = remove_duplicate_pairs([
+                combo for combo in model_combinations if combo[0] != combo[1]
+            ])
 
-        for model_pair in unique_combinations:
-            model1, model2, judge_model = model_pair[0]['abbr'], model_pair[1][
-                'abbr'], self.judge_abbr
-            subdir = model1 + '_' + model2 + '_judged-by--' + self.judge_abbr
-            subdir_path = os.path.join(results_folder, subdir)
-            if os.path.isdir(subdir_path):
-                fout = osp.join(output_dir,
-                                'judged-by--' + judge_model + '-report.csv')
-                for dataset in dataset_cfgs:
+            for model_pair in unique_combinations:
+                model1, model2 = model_pair[0]['abbr'], model_pair[1]['abbr']
+                subdir = model1 + '_' + model2 + '_judged-by--' + judge_abbr
+                subdir_path = os.path.join(results_folder, subdir)
+                filename = osp.realpath(
+                    osp.join(subdir_path, dataset_abbr + '.json'))
+                partial_filename = osp.realpath(
+                    osp.join(subdir_path, dataset_abbr + '_0.json'))
+                if osp.exists(osp.realpath(filename)) or osp.exists(
+                        osp.realpath(partial_filename)):
+                    fout = osp.join(
+                        output_dir,
+                        'AlpacaEval2-judged-by--' + judge_abbr + '.csv')
+
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
                     win_model1, win_model2, categories = defaultdict(
@@ -155,9 +166,11 @@ class AlpacaSummarizer:
                             win_model2[capability] = round(
                                 (win_model2[capability] /
                                  categories[capability]) * 100, 2)
+
                     scores = {
-                        'win_' + model1: win_model1,
-                        'win_' + model2: win_model2
+                        #'win_' + model1: win_model1, # We just show winrate of model2, because model1 is base model and only one model as base model in AlpacaEval
+                        'win_' + model2:
+                        win_model2
                     }
                     rows = list(scores.keys())
                     columns = list(scores[rows[0]].keys())
@@ -169,8 +182,11 @@ class AlpacaSummarizer:
                             writer.writerow(
                                 [row] +
                                 [scores[row][column] for column in columns])
-            else:
-                print(subdir_path + ' is not exist! please check!')
-        with open(fout, 'r') as f:
-            x = from_csv(f)
-        print(x)
+                    win_model2_update = {'total': win_model2.pop('total')}
+                    win_model2_update.update(win_model2)
+                    score_by_judgemodel[model2] = win_model2_update
+                else:
+                    score_by_judgemodel[model2] = None
+                    # print(subdir_path + ' is not exist! please check!')
+            all_scores[judge_abbr] = score_by_judgemodel
+        return {'AlpacaEval': all_scores}
