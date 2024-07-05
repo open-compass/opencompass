@@ -39,7 +39,7 @@ python run.py \
 
 请注意，通过这种方式，OpenCompass 一次只评估一个模型，而其他方式可以一次评估多个模型。
 
-:::{dropdown} 完整参数列表如下：
+:::{dropdown} HF 模型完整参数列表
 :animate: fade-in-slide-down
 | 命令行参数 | 描述 | 样例数值 |
 | --- | --- | --- |
@@ -54,14 +54,17 @@ python run.py \
 | `--min-out-len` | 生成的最小 token 数 | 1 |
 | `--batch-size` | 批量大小 | 64 |
 | `--hf-num-gpus` | 运行一个模型实例所需的 GPU 数量 | 1 |
-| `--stop-words` | 停用词列表 | '<|im_end|>' '<|im_start|>' |
+| `--stop-words` | 停用词列表 | '<\|im_end\|>' '<\|im_start\|>' |
 | `--pad-token-id` | 填充 token 的 ID | 0 |
 | `--peft-path` | (例如) LoRA 模型的路径 | internlm/internlm2-chat-1_8b |
 | `--peft-kwargs` | (例如) 构建 LoRA 模型的参数 | trust_remote_code=True |
 :::
 
-:::{dropdown} 例如一个占用 2 卡进行测试的 Qwen1.5-14B-Chat, 开启数据采样，模型的命令如下：
+:::{dropdown} 更复杂的命令样例
 :animate: fade-in-slide-down
+
+例如一个占用 2 卡进行测试的 Qwen1.5-14B-Chat, 开启数据采样，模型的命令如下：
+
 ```bash
 python run.py --datasets demo_gsm8k_chat_gen demo_math_chat_gen \
     --hf-type chat \
