@@ -8,6 +8,5 @@ models = [
         max_out_len=1024,
         batch_size=8,
         run_cfg=dict(num_gpus=2),
-        stop_words=['</s>', '<|im_end|>'],
     )
 ]
