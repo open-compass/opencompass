@@ -17,6 +17,17 @@
 在运行此实验之前，请确保您已在本地安装了 OpenCompass。这个例子可以在一台 _GTX-1660-6G_ GPU 下成功运行。
 对于参数更大的模型，如 Llama-7B，请参考 [configs 目录](https://github.com/open-compass/opencompass/tree/main/configs) 中提供的其他示例。
 
+`````{tabs}
+````{tab} 内层 tab1
+````
+````{tab} 内层 tab2
+````
+````{tab} 内层 tab3
+````
+````{tab} 内层 tab4
+````
+`````
+
 ## 配置评估任务
 
 在 OpenCompass 中，每个评估任务由待评估的模型和数据集组成。评估的入口点是 `run.py`。用户可以通过命令行或配置文件选择要测试的模型和数据集。
@@ -278,9 +289,9 @@ outputs/default/
 │   ├── logs            # 推理和评估阶段的日志文件
 │   │   ├── eval
 │   │   └── infer
-│   ├── predictions   # 每个任务的推理结果
-│   ├── results       # 每个任务的评估结果
-│   └── summary       # 单个实验的汇总评估结果
+│   ├── predictions   # 每个任务的推理结果
+│   ├── results       # 每个任务的评估结果
+│   └── summary       # 单个实验的汇总评估结果
 ├── ...
 ```
 
