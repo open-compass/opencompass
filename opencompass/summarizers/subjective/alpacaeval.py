@@ -106,6 +106,8 @@ class AlpacaSummarizer:
             score_by_judgemodel = {}
             judge_abbr = model_abbr_from_cfg(judge_model)
             dataset_cfgs = self.cfg['datasets']
+            dataset = dataset_cfgs[0]  # AlpacaEval just have only one subfile
+            dataset_abbr = dataset_abbr_from_cfg(dataset)
             output_dir, results_folder = get_outdir(self.cfg, time_str)
             model_combinations = list(
                 product(self.base_models, self.compare_models))
@@ -117,12 +119,16 @@ class AlpacaSummarizer:
                 model1, model2 = model_pair[0]['abbr'], model_pair[1]['abbr']
                 subdir = model1 + '_' + model2 + '_judged-by--' + judge_abbr
                 subdir_path = os.path.join(results_folder, subdir)
-                if os.path.isdir(subdir_path):
+                filename = osp.realpath(
+                    osp.join(subdir_path, dataset_abbr + '.json'))
+                partial_filename = osp.realpath(
+                    osp.join(subdir_path, dataset_abbr + '_0.json'))
+                if osp.exists(osp.realpath(filename)) or osp.exists(
+                        osp.realpath(partial_filename)):
                     fout = osp.join(
                         output_dir,
                         'AlpacaEval2-judged-by--' + judge_abbr + '.csv')
-                    dataset = dataset_cfgs[
-                        0]  # AlpacaEval just have only one subfile
+
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
                     win_model1, win_model2, categories = defaultdict(
@@ -160,6 +166,7 @@ class AlpacaSummarizer:
                             win_model2[capability] = round(
                                 (win_model2[capability] /
                                  categories[capability]) * 100, 2)
+
                     scores = {
                         #'win_' + model1: win_model1, # We just show winrate of model2, because model1 is base model and only one model as base model in AlpacaEval
                         'win_' + model2:
@@ -175,8 +182,11 @@ class AlpacaSummarizer:
                             writer.writerow(
                                 [row] +
                                 [scores[row][column] for column in columns])
-                    score_by_judgemodel[model2] = win_model2['total']
+                    win_model2_update = {'total': win_model2.pop('total')}
+                    win_model2_update.update(win_model2)
+                    score_by_judgemodel[model2] = win_model2_update
                 else:
-                    print(subdir_path + ' is not exist! please check!')
+                    score_by_judgemodel[model2] = None
+                    # print(subdir_path + ' is not exist! please check!')
             all_scores[judge_abbr] = score_by_judgemodel
         return {'AlpacaEval': all_scores}

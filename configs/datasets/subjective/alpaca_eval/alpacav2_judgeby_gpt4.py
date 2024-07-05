@@ -3,7 +3,6 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import SubjectiveCmpDataset
-from opencompass.models.openai_api import OpenAI
 from opencompass.summarizers import AlpacaSummarizer
 from mmengine.config import read_base
 
@@ -17,7 +16,7 @@ subjective_all_sets = [
 ]
 
 
-subjective_datasets = []
+alpacav2_datasets = []
 
 gpt4_prompt = """
 I require a leaderboard for various large language models. I'll provide you with prompts given to these models and their corresponding outputs. Your task is to assess these responses, and select the model that produces the best output from a human perspective.
@@ -60,7 +59,6 @@ api_meta_template = dict(
 
 gpt4 = [dict(
     abbr='gpt4-turbo',
-    type=OpenAI,
 )]
 
 for _name in subjective_all_sets:
@@ -101,7 +99,7 @@ for _name in subjective_all_sets:
         pred_role='BOT',
     )
 
-    subjective_datasets.append(
+    alpacav2_datasets.append(
         dict(
             abbr=f'{_name}',
             type=SubjectiveCmpDataset,
@@ -113,5 +111,6 @@ for _name in subjective_all_sets:
             mode='m2n',
             infer_order='random',
             base_models=gpt4,
-            summarizer=dict(type=AlpacaSummarizer, judge_type='v2')
+            summarizer=dict(type=AlpacaSummarizer, judge_type='v2'),
+            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/alpaca_eval/gpt4-turbo'}]
         ))

@@ -2,7 +2,6 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.models.openai_api import OpenAI
 from opencompass.datasets import CompassArenaDataset
 from opencompass.summarizers import CompassArenaSummarizer
 
@@ -105,7 +104,6 @@ sub_map = {'language': language_prompt, 'knowledge': knowledge_prompt, 'reason_v
 
 gpt4 = [dict(
     abbr='gpt4-turbo',
-    type=OpenAI,
 )]
 
 for _name, _prompt in sub_map.items():
@@ -151,5 +149,6 @@ for _name, _prompt in sub_map.items():
             mode='m2n',
             infer_order='double',
             base_models=gpt4,
-            summarizer = dict(type=CompassArenaSummarizer, summary_type='half_add')
+            summarizer = dict(type=CompassArenaSummarizer, summary_type='half_add'),
+            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/alpaca_eval/gpt4-turbo'}]
         ))

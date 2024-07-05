@@ -55,7 +55,6 @@ def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
         print('There are no results for ' + filename + ' or ' +
               partial_filename)
         print('*' * 100)
-        assert len(result) > 0
 
     judged_answers = []
     references = []
@@ -73,5 +72,4 @@ def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
             f'For your {filename} judge. Among {len(result)} judgements, successfully extracted {len(judged_answers)} judgements, please check!'
         )
         print('*' * 100)
-    assert len(judged_answers) > 0
     return judged_answers, references

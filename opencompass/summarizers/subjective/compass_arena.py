@@ -107,6 +107,9 @@ class CompassArenaSummarizer:
                         print(subdir_path + ' is not exist! please check!')
                         continue
                     judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
+                    if len(judged_answers) == 0:
+                        scores[judge_model][dataset_abbr][model2] = {}
+                        continue
                     if self.check_pos_bias:
                         bias_num = check_position_bias(judged_answers, references)
                     else:
@@ -232,21 +235,15 @@ class CompassArenaSummarizer:
             else:
                 output_filename = osp.join(output_dir, 'compassarena-overall-judged-by--' + judge_abbr + '.csv')
 
-            column_sums = [0.0] * (len(table[0]) - 1)
-            for row in table:
-                for i in range(1, len(row)):
-                    row[i] = float(row[i])
-                    column_sums[i - 1] += row[i]
-            num_rows = len(table)
-            averages = [s / num_rows for s in column_sums]
-            average_row = ['compassarena_average'] + averages
-            table.append(average_row)
-            table = [[row[0]] + [f'{x:.2f}' for x in row[1:]] for row in table]
+            table = [[row[0]] + [f'{x:.2f}' if not isinstance(x, str) else x for x in row[1:]] for row in table]
             with open(output_filename, 'w') as f:
                 f.write(','.join(headers) + '\n')
                 for line in table:
                     f.write(','.join(line) + '\n')
+
             for idx, model in enumerate(summarizer_model_abbrs):
-                score_by_judgemodel[model] = averages[idx]
+                score_by_judgemodel[model] = {}
+                for subset in table:
+                    score_by_judgemodel[model][subset[0]] = subset[idx+1]
             all_scores[judge_abbr]=score_by_judgemodel
         return {'CompassArena': all_scores}

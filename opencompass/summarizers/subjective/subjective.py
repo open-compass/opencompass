@@ -8,6 +8,40 @@ from mmengine import ConfigDict
 from .utils import get_outdir
 
 
+# Flatten the nested structure and ensure consistent order of models across datasets
+def flatten_data(data):
+    flat_data = {}
+    models_order = set()
+
+    for dataset in data:
+        for dataset_name, judgemodel_scores in dataset.items():
+            for judgemodel_name, model_scores in judgemodel_scores.items():
+                if judgemodel_name not in flat_data:
+                    flat_data[judgemodel_name] = {}
+                for model_name, scores in model_scores.items():
+                    models_order.add(model_name)
+                    if scores is not None:
+                        for score_name, score_value in scores.items():
+                            flat_data[judgemodel_name].setdefault(
+                                score_name,
+                                {}).setdefault(model_name, score_value)
+                    else:
+                        for score_name in flat_data[judgemodel_name]:
+                            flat_data[judgemodel_name][score_name].setdefault(
+                                model_name, None)
+
+    # Ensure consistent order of models
+    consistent_models_order = sorted(list(models_order))
+
+    for judgemodel_name in flat_data:
+        for score_name in flat_data[judgemodel_name]:
+            for model_name in consistent_models_order:
+                flat_data[judgemodel_name][score_name].setdefault(
+                    model_name, None)
+
+    return flat_data, consistent_models_order
+
+
 class SubjectiveSummarizer:
     """Do the subjectivity analyze based on evaluation results.
 
@@ -34,20 +68,24 @@ class SubjectiveSummarizer:
         Returns:
             None
         """
+
         output_dir, results_folder = get_outdir(self.cfg, time_str)
-        # Create a DataFrame for each judgemodel
-        judgemodel_dfs = {}
-        for dataset in subjective_scores:
-            for dataset_name, judgemodel_scores in dataset.items():
-                for judgemodel_name, scores in judgemodel_scores.items():
-                    if judgemodel_name not in judgemodel_dfs:
-                        judgemodel_dfs[judgemodel_name] = pd.DataFrame(
-                            columns=scores.keys())
-                    judgemodel_dfs[judgemodel_name].loc[dataset_name] = list(
-                        scores.values())
+
+        flat_data, models_order = flatten_data(subjective_scores)
+
+        # Create a DataFrame for each judgemodel with models as rows and datasets as columns
+        judgemodel_dfs_final_corrected = {}
+        for judgemodel_name, scores in flat_data.items():
+            # Create a DataFrame with models as index and datasets as columns
+            df = pd.DataFrame.from_dict(scores,
+                                        orient='index',
+                                        columns=models_order)
+            # Insert a new row at the top for the dataset names
+            df.insert(0, 'Dataset', list(scores.keys()))
+            judgemodel_dfs_final_corrected[judgemodel_name] = df
 
         # Save each DataFrame to a separate CSV file
-        for judgemodel_name, df in judgemodel_dfs.items():
+        for judgemodel_name, df in judgemodel_dfs_final_corrected.items():
             fout = osp.join(
                 output_dir, 'Subjective_all_results-judged-by--' +
                 judgemodel_name + '.csv')

@@ -138,7 +138,9 @@ class MTBench101Summarizer(CompassArenaSummarizer):
                         judged_answers, references, output_dir, fout_flag,
                         eval_model_abbr, judge_abbr)
                     fout_flag += 1
-                    score_by_judgemodel[eval_model_abbr] = model_average_score
+                    score_by_judgemodel[eval_model_abbr] = {
+                        'average': model_average_score
+                    }
                 else:
                     print(subdir_path + ' is not exist! please check!')
             all_scores[judge_abbr] = score_by_judgemodel

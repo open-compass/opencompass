@@ -3,7 +3,6 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import CompassBenchControlLengthBiasDataset
-from opencompass.models.openai_api import OpenAI
 from opencompass.summarizers import CompassBenchSummarizer
 
 subjective_reader_cfg = dict(
@@ -19,7 +18,6 @@ versions = ['CompassBenchV1.1.patch', 'CompassBenchV1.1.patch.en']
 
 gpt4 = [dict(
     abbr='gpt4-turbo',
-    type=OpenAI,
 )]
 
 
@@ -66,5 +64,6 @@ for version_abbr in versions:
             mode='m2n',
             infer_order='double',
             base_models=gpt4,
-            summarizer=dict(type=CompassBenchSummarizer, summary_type='half_add')
+            summarizer=dict(type=CompassBenchSummarizer, summary_type='half_add'),
+            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/alpaca_eval/gpt4-turbo'}]
         ))

@@ -2,13 +2,14 @@ from mmengine.config import read_base
 
 with read_base():
     from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
-    from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
+    from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import alpacav2_datasets
     from .datasets.subjective.compassarena.compassarena_compare import compassarena_datasets
     from .datasets.subjective.arena_hard.arena_hard_compare import arenahard_datasets
     from .datasets.subjective.compassbench.compassbench_compare import compassbench_datasets
     from .datasets.subjective.fofo.fofo_judge import fofo_datasets
     from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import mtbench_datasets
     from .datasets.subjective.multiround.mtbench101_judge import mtbench101_datasets
+    from .models.chatglm.hf_chatglm3_6b import models
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
@@ -29,10 +30,57 @@ api_meta_template = dict(
 
 # -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
+for model in models:
+    model['generation_kwargs'] = dict(do_sample=True)
+
 models = [
     dict(
         type=HuggingFaceChatGLM3,
+        abbr='chatglm3-6b-hf',
+        path='THUDM/chatglm3-6b',
+        tokenizer_path='THUDM/chatglm3-6b',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(
+            do_sample=True,
+        ),
+        meta_template=api_meta_template,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=8,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    ),dict(
+        type=HuggingFaceChatGLM3,
         abbr='chatglm3-6b-hf2',
+        path='THUDM/chatglm3-6b',
+        tokenizer_path='THUDM/chatglm3-6b',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(
+            do_sample=True,
+        ),
+        meta_template=api_meta_template,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=8,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    ),dict(
+        type=HuggingFaceChatGLM3,
+        abbr='chatglm3-6b-hf3',
         path='THUDM/chatglm3-6b',
         tokenizer_path='THUDM/chatglm3-6b',
         model_kwargs=dict(
@@ -55,7 +103,7 @@ models = [
     )
 ]
 
-datasets = [*alignbench_datasets, *alpacav2, *arenahard_datasets, *compassarena_datasets, *compassbench_datasets, *fofo_datasets, *mtbench_datasets, *mtbench101_datasets]
+datasets = [*alignbench_datasets, *alpacav2_datasets, *arenahard_datasets, *compassarena_datasets, *compassbench_datasets, *fofo_datasets, *mtbench_datasets, *mtbench101_datasets]
 
 infer = dict(
     partitioner=dict(type=NaivePartitioner),
@@ -76,12 +124,12 @@ judge_models = [dict(
     batch_size=8,
     temperature=0,
 )]
+judge_models = [models[0]]
 
 ## ------------- Evaluation Configuration
 eval = dict(
     partitioner=dict(type=SubjectiveNaivePartitioner, models=models, judge_models=judge_models,),
     runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=SubjectiveEvalTask)),
-    given_pred = [{'abbr':'gpt4-turbo', 'path':'your reference path'},{'abbr':'gpt4-0314', 'path':'your reference path'}]
 )
 
 summarizer = dict(type=SubjectiveSummarizer, function='subjective')

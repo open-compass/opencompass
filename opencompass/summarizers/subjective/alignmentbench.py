@@ -296,7 +296,15 @@ def get_capability_results(judged_answers,
             for sub_category in sub_categories:
                 row.append(scores[model][sub_category])
         writer.writerow(row)
-    return scores
+
+    scores = scores[model]
+    scores.pop('中文推理总分', None)
+    scores.pop('中文语言总分', None)
+
+    # Creating a new dictionary with '总分' as the first item
+    updated_scores = {'总分': scores.pop('总分')}
+    updated_scores.update(scores)
+    return updated_scores
 
 
 class AlignmentBenchSummarizer:
@@ -357,9 +365,8 @@ class AlignmentBenchSummarizer:
             for eval_model_abbr in self.eval_model_abbrs:
                 subdir = eval_model_abbr + '_judged-by--' + judge_abbr
                 subdir_path = os.path.join(results_folder, subdir)
+                model = eval_model_abbr
                 if os.path.isdir(subdir_path):
-                    model = eval_model_abbr
-
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
                     if self.judge_type == 'general':
@@ -369,9 +376,11 @@ class AlignmentBenchSummarizer:
                     scores = get_capability_results(judged_answers, references,
                                                     fout2, fout_flag2, model,
                                                     self.category)
-                    score_by_judgemodel[model] = scores[model]['总分']
+
+                    score_by_judgemodel[model] = scores
                     fout_flag2 += 1
                 else:
+                    score_by_judgemodel[model] = None
                     print(subdir_path + ' is not exist! please check!')
 
             all_scores[judge_abbr] = score_by_judgemodel

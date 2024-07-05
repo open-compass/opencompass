@@ -3,7 +3,6 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import ArenaHardDataset
-from opencompass.models.openai_api import OpenAI
 from opencompass.summarizers import ArenaHardSummarizer
 from mmengine.config import read_base
 
@@ -25,7 +24,6 @@ judge_prompt = "<|User Prompt|>\n{question}\n\n<|The Start of Assistant A's Answ
 
 gpt4 = [dict(
     abbr='gpt4-0314',
-    type=OpenAI,
 )]
 
 for _name in subjective_all_sets:
@@ -78,5 +76,6 @@ for _name in subjective_all_sets:
             mode='m2n',
             infer_order='double',
             base_models=gpt4,
-            summarizer = dict(type=ArenaHardSummarizer)
+            summarizer = dict(type=ArenaHardSummarizer),
+            given_pred = [{'abbr':'gpt4-0314', 'path':'./data/subjective/arena_hard'}]
         ))

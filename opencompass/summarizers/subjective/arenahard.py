@@ -268,7 +268,11 @@ class ArenaHardSummarizer:
                     else:
                         subdir = model1 + '_' + model2 + '_judged-by--' + judge_model
                     subdir_path = os.path.join(results_folder, subdir)
-                    if not os.path.isdir(subdir_path):
+                    dataset_abbr = dataset_abbr_from_cfg(dataset)
+                    filename = osp.realpath(osp.join(subdir_path, dataset_abbr + '.json'))
+                    partial_filename = osp.realpath(osp.join(subdir_path, dataset_abbr + '_0.json'))
+                    if not osp.exists(osp.realpath(filename)) and not osp.exists(osp.realpath(partial_filename)):
+                        score_by_judgemodel[model2] = None
                         print(subdir_path + ' is not exist! please check!')
                         continue
 
@@ -317,7 +321,7 @@ class ArenaHardSummarizer:
                     interval = str((round(row['lower'] - row['score'], decimal), round(row['upper'] - row['score'], decimal)))
                     print(f"{row['model'] : <30} | score: {round(row['score'], decimal) : ^5} | 95% CI: {interval : ^12} | average #tokens: {int(row['avg_tokens'])}")
                     if row['model'] != model1:
-                        score_by_judgemodel[row['model']] = row['score']
+                        score_by_judgemodel[row['model']] = {'score': row['score']}
                 stats.to_json(os.path.join(output_dir,'arena_hard_leaderboard_judged-by--'+judge_model+'.json'), orient='records', indent=4)
                 stats.to_csv(os.path.join(output_dir,'arena_hard_leaderboard_judged-by--'+judge_model+'.csv'))
             all_scores[judge_model] = score_by_judgemodel

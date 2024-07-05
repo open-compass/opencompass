@@ -83,10 +83,13 @@ class FofoSummarizer:
                                 scores[domain].append(score)
                                 if format_type == 'general':
                                     scores[format_name].append(score)
-                        single_model_scores = {
-                            task: sum(score) / len(score)
-                            for task, score in scores.items()
-                        }
+                        if len(judged_answers) == 0:
+                            single_model_scores = {}
+                        else:
+                            single_model_scores = {
+                                task: sum(score) / len(score)
+                                for task, score in scores.items()
+                            }
                         if judge_model not in total_scores:
                             total_scores[judge_model] = {}
                         if dataset_abbr not in total_scores[judge_model]:
@@ -113,7 +116,7 @@ class FofoSummarizer:
         for idx, judge_model in enumerate(self.judge_models):
             judge_abbr = model_abbr_from_cfg(judge_model)
             score_by_judgemodel = {}
-            score_saver = []
+            score_saver = {}
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
                 summarizer_model_abbrs = self.eval_model_abbrs
@@ -138,8 +141,7 @@ class FofoSummarizer:
                         row.append(s)
                     table.append(row)
                 txt = tabulate(table, headers=headers)
-                score_saver.append([float(s) for s in table[0][1:]])
-
+                score_saver[dataset_abbr] = [s for s in table[0][1:]]
                 if idx == len(self.judge_models):
                     output_filename = osp.join(
                         output_dir, dataset_abbr + '-summarized-by--' +
@@ -153,13 +155,10 @@ class FofoSummarizer:
                     f.write(','.join(headers) + '\n')
                     for line in table:
                         f.write(','.join(line) + '\n')
-            if len(score_saver) > 1:
-                model_scores = [
-                    sum(column) / len(column) for column in zip(*score_saver)
-                ]
-            else:
-                model_scores = score_saver[0]
             for idx, model in enumerate(summarizer_model_abbrs):
-                score_by_judgemodel[model] = model_scores[idx]
+                score_by_judgemodel[model] = {}
+                for subset_name, subset_scores in score_saver.items():
+                    score_by_judgemodel[model][subset_name] = subset_scores[
+                        idx]
             all_scores[judge_abbr] = score_by_judgemodel
         return {'Fofo': all_scores}

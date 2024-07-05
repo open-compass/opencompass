@@ -108,6 +108,9 @@ class CompassBenchSummarizer:
                         print(subdir_path + ' is not exist! please check!')
                         continue
                     judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
+                    if len(judged_answers) == 0:
+                        scores[judge_model][dataset_abbr][model2] = {}
+                        continue
                     if self.check_pos_bias:
                         bias_num = check_position_bias(judged_answers, references)
                     else:
@@ -231,7 +234,7 @@ class CompassBenchSummarizer:
                         f.write(','.join(line) + '\n')
                 all_judge_file_list.append(output_filename)
             for idx, model in enumerate(summarizer_model_abbrs):
-                score_by_judgemodel[model] = float(table[0][idx+1])
+                score_by_judgemodel[model] = {'overall': table[0][idx+1]}
             all_scores[judge_abbr]=score_by_judgemodel
         dfs = [pd.read_csv(file) for file in all_judge_file_list]
 

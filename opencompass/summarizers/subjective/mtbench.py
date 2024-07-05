@@ -16,6 +16,7 @@ from opencompass.utils import model_abbr_from_cfg
 from .compass_arena import CompassArenaSummarizer
 from .utils import get_judgeanswer_and_reference, get_outdir
 
+COLUMNS = ['total', 'writing', 'roleplay', 'reasoning', 'math', 'coding', 'extraction', 'stem', 'humanities']
 
 def model_abbr_from_cfg_used_in_summarizer(model):
     if model.get('summarizer_abbr', None):
@@ -57,22 +58,24 @@ def get_capability_results(
     fout_flag,
     model_abbr,
 ):
+    columns = COLUMNS
     capability_ratings = defaultdict(int)
     capability_counts = defaultdict(int)
-    for ans, ref in zip(judged_answers, references):
-        capability_ratings['total'] += ans['score']
-        capability_counts['total'] += 1
-        capability_ratings[ref['capability']] += ans['score']
-        capability_counts[ref['capability']] += 1
-
     capability_avg_ratings = defaultdict(float)
+    if len(judged_answers) == 0:
+        for column in columns:
+            capability_avg_ratings[column] = ''
+    else:
+        for ans, ref in zip(judged_answers, references):
+            capability_ratings['total'] += ans['score']
+            capability_counts['total'] += 1
+            capability_ratings[ref['capability']] += ans['score']
+            capability_counts[ref['capability']] += 1
 
-    for capability, total_score in capability_ratings.items():
-        s = total_score / capability_counts[capability]
-        s = round(s, 2)
-        capability_avg_ratings[capability] = s
-    columns = list(capability_avg_ratings.keys())
-    columns.insert(0, columns.pop(columns.index('total')))
+        for capability, total_score in capability_ratings.items():
+            s = total_score / capability_counts[capability]
+            s = round(s, 2)
+            capability_avg_ratings[capability] = s
 
     with open(fout, 'a+', newline='') as csvfile:
         writer = csv.writer(csvfile)
@@ -144,16 +147,10 @@ class MTBenchSummarizer(CompassArenaSummarizer):
                 csv_reader = csv.reader(f)
                 header = next(csv_reader)
                 table = [line for line in csv_reader]
-            for model_score in table:
-                score_by_judgemodel[model_score[0]] = float(model_score[1])
-            all_scores[judge_abbr] = score_by_judgemodel
-            new_header = [''] + [line[0] for line in table]
-            new_table = [[h] + line[1:] for h, line in zip(header[1:], table)]
-            new_table = [[h] + [line[i] for line in table] for i, h in enumerate(header[1:], start=1)]
-            t = tabulate(new_table, headers=new_header)
-            with open(fout, 'w') as f:
-                f.write(','.join(new_header) + '\n')
-                for line in new_table:
-                    f.write(','.join(map(str, line)) + '\n')
 
+            for model_score in table:
+                score_by_judgemodel[model_score[0]] = {}
+                for idx, column in enumerate(COLUMNS):
+                    score_by_judgemodel[model_score[0]][column] = model_score[idx+1]
+            all_scores[judge_abbr] = score_by_judgemodel
         return {'MTbench': all_scores}
