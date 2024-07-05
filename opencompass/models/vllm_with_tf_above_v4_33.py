@@ -68,12 +68,19 @@ class VLLMwithChatTemplate(BaseModel):
         potential_stop_words = []
         try:
             generation_config = GenerationConfig.from_pretrained(path)
-            for token_id in generation_config.eos_token_id:
-                potential_stop_words.append(self.tokenizer.decode(token_id))
         except:
-            pass
-        potential_stop_words.append(self.tokenizer.eos_token)
+            generation_config = None
+        if generation_config and hasattr(generation_config, 'eos_token_id'):
+            if isinstance(generation_config.eos_token_id, int):
+                potential_stop_words.append(self.tokenizer.decode(generation_config.eos_token_id))
+            else:
+                assert isinstance(generation_config.eos_token_id, list)
+                for token_id in generation_config.eos_token_id:
+                    potential_stop_words.append(self.tokenizer.decode(token_id))
+        if self.tokenizer.eos_token is not None:
+            potential_stop_words.append(self.tokenizer.eos_token)
         potential_stop_words = list(set(potential_stop_words))
+        potential_stop_words = [s for s in potential_stop_words if s]
         return potential_stop_words
 
     def generate(self, inputs: List[str], max_out_len: int, stopping_criteria: List[str] = [], **kwargs) -> List[str]:

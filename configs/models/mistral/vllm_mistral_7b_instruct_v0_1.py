@@ -1,25 +1,15 @@
-from opencompass.models import VLLM
+from opencompass.models import VLLMwithChatTemplate
 
-
-_meta_template = dict(
-    begin='<s>',
-    round=[
-        dict(role='HUMAN', begin='[INST]', end='[/INST]'),
-        dict(role='BOT', begin='', end='</s>', generate=True),
-    ],
-)
 
 models = [
     dict(
-        type=VLLM,
+        type=VLLMwithChatTemplate,
         abbr='mistral-7b-instruct-v0.1-vllm',
         path='mistralai/Mistral-7B-Instruct-v0.1',
-        meta_template=_meta_template,
-        max_out_len=100,
-        max_seq_len=2048,
-        batch_size=32,
+        model_kwargs=dict(tensor_parallel_size=1),
+        max_out_len=256,
+        batch_size=16,
         generation_kwargs=dict(temperature=0),
-        stop_words=['</s>'],
-        run_cfg=dict(num_gpus=1, num_procs=1),
+        run_cfg=dict(num_gpus=1),
     )
 ]
