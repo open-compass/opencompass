@@ -22,7 +22,7 @@
 
 在 OpenCompass 中，每个评估任务由待评估的模型和数据集组成。评估的入口点是 `run.py`。用户可以通过命令行或配置文件选择要测试的模型和数据集。
 
-对于对话模型：
+对于对话模型
 
 `````{tabs}
 ````{tab} 命令行（自定义 HF 模型）
@@ -85,7 +85,7 @@ python run.py --datasets demo_gsm8k_chat_gen demo_math_chat_gen \
 
 ```bash
 python run.py \
-    --models hf_internlm2_chat_1_8b \
+    --models hf_internlm2_chat_1_8b hf_qwen2_1_5b_instruct \
     --datasets demo_gsm8k_chat_gen demo_math_chat_gen \
     --debug
 ```
@@ -160,10 +160,10 @@ python run.py configs/eval_chat_demo.py --debug
 :::{dropdown} 关于 `models`
 :animate: fade-in-slide-down
 
-OpenCompass 提供了一系列预定义的模型配置，位于 `configs/models` 下。以下是与 [opt-350m](https://github.com/open-compass/opencompass/blob/main/configs/models/hf_internlm/hf_internlm2_chat_1_8b.py)（`configs/models/hf_internlm/hf_internlm2_chat_1_8b.py`）相关的配置片段：
+OpenCompass 提供了一系列预定义的模型配置，位于 `configs/models` 下。以下是与 [InternLM2-Chat-1.8B](https://github.com/open-compass/opencompass/blob/main/configs/models/hf_internlm/hf_internlm2_chat_1_8b.py)（`configs/models/hf_internlm/hf_internlm2_chat_1_8b.py`）相关的配置片段：
 
 ```python
-# 使用 `HuggingFacewithChatTemplate` 评估由 HuggingFace 的 `AutoModelForCausalLM` 支持的模型
+# 使用 `HuggingFacewithChatTemplate` 评估由 HuggingFace 的 `AutoModelForCausalLM` 支持的对话模型
 from opencompass.models import HuggingFacewithChatTemplate
 
 models = [
@@ -216,15 +216,145 @@ python run.py --models hf_internlm2_chat_1_8b --datasets chat_OC15 --debug
 ```
 :::
 
+````
+`````
+
+:::{dropdown} 对于基座模型
+:animate: fade-in-slide-down
+
+`````{tabs}
+````{tab} 命令行（自定义 HF 模型）
+
+对于 HuggingFace 模型，用户可以通过命令行直接设置模型参数，无需额外的配置文件。例如，对于 `internlm/internlm2-1_8b` 模型，您可以使用以下命令进行评估：
+
+```bash
+python run.py \
+    --datasets demo_gsm8k_base_gen demo_math_base_gen \
+    --hf-type base \
+    --hf-path internlm/internlm2-1_8b \
+    --debug
+```
+
+请注意，通过这种方式，OpenCompass 一次只评估一个模型，而其他方式可以一次评估多个模型。
+
+:::{dropdown} 更复杂的命令样例
+:animate: fade-in-slide-down
+
+例如一个占用 2 卡进行测试的 Qwen1.5-14B, 开启数据采样，模型的命令如下：
+
+```bash
+python run.py --datasets demo_gsm8k_base_gen demo_math_base_gen \
+    --hf-type chat \
+    --hf-path Qwen/Qwen1.5-14B \
+    --max-out-len 1024 \
+    --min-out-len 1 \
+    --hf-num-gpus 2 \
+    --generation-kwargs do_sample=True temperature=0.6 \
+    --debug
+```
+:::
+
+````
+````{tab} 命令行
+
+用户可以使用 `--models` 和 `--datasets` 结合想测试的模型和数据集。
+
+```bash
+python run.py \
+    --models hf_internlm2_1_8b hf_qwen2_1_5b \
+    --datasets demo_gsm8k_base_gen demo_math_base_gen \
+    --debug
+```
+
+````
+````{tab} 配置文件
+
+除了通过命令行配置实验外，OpenCompass 还允许用户在配置文件中编写实验的完整配置，并通过 `run.py` 直接运行它。配置文件是以 Python 格式组织的，并且必须包括 `datasets` 和 `models` 字段。
+
+本次测试配置在 [configs/eval_base_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_base_demo.py) 中。此配置通过 [继承机制](../user_guides/config.md#继承机制) 引入所需的数据集和模型配置，并以所需格式组合 `datasets` 和 `models` 字段。
+
+```python
+from mmengine.config import read_base
+
+with read_base():
+    from .datasets.demo.demo_gsm8k_base_gen import gsm8k_datasets
+    from .datasets.demo.demo_math_base_gen import math_datasets
+    from .models.qwen.hf_qwen2_1_5b_instruct import models as hf_qwen2_1_5b_instruct_models
+    from .models.hf_internlm.hf_internlm2_1_8b import models as hf_internlm2_1_8b_models
+
+datasets = gsm8k_datasets + math_datasets
+models = hf_qwen2_1_5b_instruct_models + hf_internlm2_1_8b_models
+```
+
+运行任务时，我们只需将配置文件的路径传递给 `run.py`：
+
+```bash
+python run.py configs/eval_base_demo.py --debug
+```
+
+:::{dropdown} 关于 `models`
+:animate: fade-in-slide-down
+
+OpenCompass 提供了一系列预定义的模型配置，位于 `configs/models` 下。以下是与 [InternLM2-1.8B](https://github.com/open-compass/opencompass/blob/main/configs/models/hf_internlm/hf_internlm2_1_8b.py)（`configs/models/hf_internlm/hf_internlm2_1_8b.py`）相关的配置片段：
+
+```python
+# 使用 `HuggingFaceBaseModel` 评估由 HuggingFace 的 `AutoModelForCausalLM` 支持的基座模型
+from opencompass.models import HuggingFaceBaseModel
+
+models = [
+    dict(
+        type=HuggingFaceBaseModel,
+        abbr='internlm2-1.8b-hf',              # 模型的缩写
+        path='internlm/internlm2-1_8b',        # 模型的 HuggingFace 路径
+        max_out_len=1024,                      # 生成的最大 token 数
+        batch_size=8,                          # 批量大小
+        run_cfg=dict(num_gpus=1),              # 该模型所需的 GPU 数量
+    )
+]
+```
+
+使用配置时，我们可以通过命令行参数 `--models` 指定相关文件，或使用继承机制将模型配置导入到配置文件中的 `models` 列表中。
+
+```{seealso}
+有关模型配置的更多信息，请参见 [准备模型](../user_guides/models.md)。
+```
+:::
+
+:::{dropdown} 关于 `datasets`
+:animate: fade-in-slide-down
+
+与模型类似，数据集的配置文件也提供在 `configs/datasets` 下。用户可以在命令行中使用 `--datasets`，或通过继承在配置文件中导入相关配置
+
+下面是来自 `configs/eval_base_demo.py` 的与数据集相关的配置片段：
+
+```python
+from mmengine.config import read_base  # 使用 mmengine.read_base() 读取基本配置
+
+with read_base():
+    # 直接从预设的数据集配置中读取所需的数据集配置
+    from .datasets.demo.demo_gsm8k_base_gen import gsm8k_datasets  # 读取 GSM8K 配置，使用 4-shot，基于生成式进行评估
+    from .datasets.demo.demo_math_base_gen import math_datasets    # 读取 MATH 配置，使用 0-shot，基于生成式进行评估
+
+datasets = gsm8k_datasets + math_datasets       # 最终的配置需要包含所需的评估数据集列表 'datasets'
+```
+
+数据集配置通常有两种类型：'ppl' 和 'gen'，分别指示使用的评估方法。其中 `ppl` 表示判别性评估，`gen` 表示生成性评估。基座模型对于 "选择题" 类型的数据集会使用 `ppl` 判别性评估，其他则会使用 `gen` 生成式评估。
+
+```{seealso}
+您可以从 [配置数据集](../user_guides/datasets.md) 中找到更多信息。
+```
+:::
 
 ````
 `````
+
+:::
 
 ```{warning}
 OpenCompass 通常假定运行环境网络是可用的。如果您遇到网络问题或希望在离线环境中运行 OpenCompass，请参阅 [FAQ - 网络 - Q1](./faq.md#网络) 寻求解决方案。
 ```
 
-接下来的部分将使用基于配置的方法作为示例来解释其他特征。
+接下来的部分将使用基于配置的方法，评测对话模型，作为示例来解释其他特征。
 
 ## 启动评估
 
@@ -234,7 +364,7 @@ OpenCompass 通常假定运行环境网络是可用的。如果您遇到网络�
 python run.py configs/eval_chat_demo.py -w outputs/demo --debug
 ```
 
-预训练模型 'facebook/opt-350m' 和 'internlm/internlm2-chat-1_8b' 将在首次运行期间从 HuggingFace 自动下载。
+对话默写 'internlm/internlm2-chat-1_8b' 和 'Qwen/Qwen2-1.5B-Instruct' 将在首次运行期间从 HuggingFace 自动下载。
 如果一切正常，您应该看到屏幕上显示 “Starting inference process”，且进度条开始前进：
 
 ```bash
