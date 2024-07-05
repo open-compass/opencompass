@@ -4,7 +4,6 @@ import argparse
 import getpass
 import os
 import os.path as osp
-from copy import deepcopy
 from datetime import datetime
 
 from mmengine.config import Config, DictAction
@@ -349,7 +348,7 @@ def main():
 
         # For subjective summarizer
         if summarizer_cfg.get('function', None):
-            main_summarizer_cfg = deepcopy(summarizer_cfg)
+            main_summarizer_cfg = copy.deepcopy(summarizer_cfg)
             grouped_datasets = {}
             for dataset in cfg.datasets:
                 prefix = dataset['abbr'].split('_')[0]
@@ -361,7 +360,7 @@ def main():
                 all_grouped_lists.append(grouped_datasets[prefix])
             dataset_score_container = []
             for dataset in all_grouped_lists:
-                temp_cfg = deepcopy(cfg)
+                temp_cfg = copy.deepcopy(cfg)
                 temp_cfg.datasets = dataset
                 summarizer_cfg = dict(type=dataset[0]['summarizer']['type'], config=temp_cfg)
                 summarizer = build_from_cfg(summarizer_cfg)
@@ -377,6 +376,8 @@ def main():
             summarizer_cfg['config'] = cfg
             summarizer = build_from_cfg(summarizer_cfg)
             summarizer.summarize(time_str=cfg_time_str)
+
+
 
 if __name__ == '__main__':
     main()
