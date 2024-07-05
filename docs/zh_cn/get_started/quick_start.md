@@ -219,8 +219,7 @@ python run.py --models hf_internlm2_chat_1_8b --datasets chat_OC15 --debug
 ````
 `````
 
-:::{dropdown} 对于基座模型
-:animate: fade-in-slide-down
+对于基座模型
 
 `````{tabs}
 ````{tab} 命令行（自定义 HF 模型）
@@ -347,8 +346,6 @@ datasets = gsm8k_datasets + math_datasets       # 最终的配置需要包含所
 
 ````
 `````
-
-:::
 
 ```{warning}
 OpenCompass 通常假定运行环境网络是可用的。如果您遇到网络问题或希望在离线环境中运行 OpenCompass，请参阅 [FAQ - 网络 - Q1](./faq.md#网络) 寻求解决方案。
