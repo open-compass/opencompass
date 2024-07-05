@@ -30,13 +30,17 @@
 对于 HuggingFace 模型，用户可以通过命令行直接设置模型参数，无需额外的配置文件。例如，对于 `internlm/internlm2-chat-1_8b` 模型，您可以使用以下命令进行评估：
 
 ```bash
-python run.py --datasets demo_gsm8k_chat_gen demo_math_chat_gen --hf-type chat --hf-path internlm/internlm2-chat-1_8b --debug
+python run.py \
+    --datasets demo_gsm8k_chat_gen demo_math_chat_gen \
+    --hf-type chat \
+    --hf-path internlm/internlm2-chat-1_8b \
+    --debug
 ```
 
 请注意，通过这种方式，OpenCompass 一次只评估一个模型，而其他方式可以一次评估多个模型。
 
-有参数列表如下：
-
+:::{dropdown} 完整参数列表如下：
+:animate: fade-in-slide-down
 | 命令行参数 | 描述 | 样例数值 |
 | --- | --- | --- |
 | `--hf-type` | HuggingFace 模型类型，可选值为 `chat` 或 `base` | chat |
@@ -50,10 +54,11 @@ python run.py --datasets demo_gsm8k_chat_gen demo_math_chat_gen --hf-type chat -
 | `--min-out-len` | 生成的最小 token 数 | 1 |
 | `--batch-size` | 批量大小 | 64 |
 | `--hf-num-gpus` | 运行一个模型实例所需的 GPU 数量 | 1 |
-| `--stop-words` | 停用词列表 |  |
+| `--stop-words` | 停用词列表 | '<|im_end|>' '<|im_start|>' |
 | `--pad-token-id` | 填充 token 的 ID | 0 |
 | `--peft-path` | (例如) LoRA 模型的路径 | internlm/internlm2-chat-1_8b |
 | `--peft-kwargs` | (例如) 构建 LoRA 模型的参数 | trust_remote_code=True |
+:::
 
 :::{dropdown} 例如一个占用 2 卡进行测试的 Qwen1.5-14B-Chat, 开启数据采样，模型的命令如下：
 :animate: fade-in-slide-down
@@ -76,7 +81,10 @@ python run.py --datasets demo_gsm8k_chat_gen demo_math_chat_gen \
 用户可以使用 `--models` 和 `--datasets` 结合想测试的模型和数据集。
 
 ```bash
-python run.py --models hf_internlm2_chat_1_8b --datasets demo_gsm8k_chat_gen demo_math_chat_gen
+python run.py \
+    --models hf_internlm2_chat_1_8b \
+    --datasets demo_gsm8k_chat_gen demo_math_chat_gen \
+    --debug
 ```
 
 模型和数据集的配置文件预存于 `configs/models` 和 `configs/datasets` 中。用户可以使用 `tools/list_configs.py` 查看或过滤当前可用的模型和数据集配置。
@@ -197,7 +205,7 @@ datasets = gsm8k_datasets + math_datasets       # 最终的配置需要包含所
 此外，[configs/datasets/collections](https://github.com/open-compass/opencompass/blob/main/configs/datasets/collections) 收录了各种数据集集合，方便进行综合评估。OpenCompass 通常使用 [`chat_OC15.py`](https://github.com/open-compass/opencompass/blob/main/configs/dataset_collections/chat_OC15.py) 进行全面的模型测试。要复制结果，只需导入该文件，例如：
 
 ```bash
-python run.py --models internlm/internlm2-chat-1_8b --datasets chat_OC15 --debug
+python run.py --models hf_internlm2_chat_1_8b --datasets chat_OC15 --debug
 ```
 
 ```{seealso}
