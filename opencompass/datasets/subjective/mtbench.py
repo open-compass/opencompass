@@ -2,7 +2,6 @@
 import json
 import os.path as osp
 import re
-from typing import Optional
 
 from datasets import Dataset, DatasetDict
 
@@ -166,7 +165,13 @@ def prompt_construct(problem, multi_turn=False, judge_type='single'):
 @LOAD_DATASET.register_module()
 class MTBenchDataset(BaseDataset):
 
-    def load(self, path: str, name: str, multi_turn=True, judge_type='single'):
+    def load(self,
+             path: str,
+             name: str,
+             judge_type='single',
+             multi_turn=True,
+             *args,
+             **kwargs):
         filename = osp.join(path, f'{name}.json')
         dataset = DatasetDict()
         raw_data = []

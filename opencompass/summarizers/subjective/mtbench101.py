@@ -50,8 +50,8 @@ def post_process_mtbench101(judgement: str):
     return {'score': score, 'judgement': judgement}
 
 
-def get_final_results(judged_answers, references, output_dir, fout_flag,
-                      model):
+def get_final_results(judged_answers, references, output_dir, fout_flag, model,
+                      judgemodel):
 
     task_multi_id_scores = defaultdict(list)
     task_scores = defaultdict(list)
@@ -72,22 +72,21 @@ def get_final_results(judged_answers, references, output_dir, fout_flag,
         task: sum(scores) / len(scores) if scores else 0
         for task, scores in task_scores.items()
     }
-
-    fout = osp.join(output_dir, 'task_score.csv')
+    average_score = round(
+        sum(final_task_scores.values()) / len(final_task_scores), 2)
+    fout = osp.join(output_dir,
+                    'MTBench101-task_score-judged-by--' + judgemodel + '.csv')
 
     columns = list(final_task_scores.keys())
-
-    print('================task_score=====================')
-    print(final_task_scores)
 
     with open(fout, 'a+', newline='') as csvfile:
 
         writer = csv.writer(csvfile)
         if fout_flag == 0:
-            writer.writerow(['model'] + columns)
-        writer.writerow([model] +
+            writer.writerow(['model', 'average'] + columns)
+        writer.writerow([model, average_score] +
                         [final_task_scores[column] for column in columns])
-    return 0
+    return average_score
 
 
 class MTBench101Summarizer(CompassArenaSummarizer):
@@ -107,7 +106,7 @@ class MTBench101Summarizer(CompassArenaSummarizer):
         self.eval_model_abbrs = [
             model_abbr_from_cfg(model) for model in self.eval_model_cfgs
         ]
-
+        self.judge_models = self.cfg.get('judge_models', None)
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
 
         self.judge_function = post_process_mtbench101
@@ -122,21 +121,27 @@ class MTBench101Summarizer(CompassArenaSummarizer):
         Returns:
             pd.DataFrame: The summary results.
         """
-        dataset_cfgs = self.cfg['datasets']
+        dataset = self.cfg['datasets'][0]  # MTBench101 has just one subfile
         output_dir, results_folder = get_outdir(self.cfg, time_str)
-        fout_flag = 0
-        for eval_model_abbr in self.eval_model_abbrs:
-            subdir = eval_model_abbr + '_judged-by--' + self.judge_abbr
-            subdir_path = os.path.join(results_folder, subdir)
-            if os.path.isdir(subdir_path):
-                model, judge_model = eval_model_abbr, self.judge_abbr
-
-                for dataset in dataset_cfgs:
-                    print()
+        all_scores = {}
+        for judge_model in self.judge_models:
+            fout_flag = 0
+            score_by_judgemodel = {}
+            judge_abbr = model_abbr_from_cfg(judge_model)
+            for eval_model_abbr in self.eval_model_abbrs:
+                subdir = eval_model_abbr + '_judged-by--' + judge_abbr
+                subdir_path = os.path.join(results_folder, subdir)
+                if os.path.isdir(subdir_path):
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
-                    get_final_results(judged_answers, references, output_dir,
-                                      fout_flag, model)
+                    model_average_score = get_final_results(
+                        judged_answers, references, output_dir, fout_flag,
+                        eval_model_abbr, judge_abbr)
                     fout_flag += 1
-            else:
-                print(subdir_path + ' is not exist! please check!')
+                    score_by_judgemodel[eval_model_abbr] = {
+                        'average': model_average_score
+                    }
+                else:
+                    print(subdir_path + ' is not exist! please check!')
+            all_scores[judge_abbr] = score_by_judgemodel
+        return {'MTBench101': all_scores}

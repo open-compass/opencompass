@@ -12,7 +12,7 @@ from ..base import BaseDataset
 @LOAD_DATASET.register_module()
 class FofoDataset(BaseDataset):
 
-    def load(self, path: str, name: str):
+    def load(self, path: str, name: str, *args, **kwargs):
         filename = osp.join(path, f'{name}.json')
         raw_data = []
         with open(filename, 'r', encoding='utf-8') as f:

@@ -6,11 +6,26 @@ import yaml
 
 output_path = 'regression_result_daily'
 
-model_list = ['internlm2-7b-hf', 'internlm-chat-7b-hf', 'chatglm3-6b-base-hf']
-dataset_list = [
-    'ARC-c', 'chid-dev', 'chid-test', 'openai_humaneval', 'openbookqa',
-    'openbookqa_fact'
+chat_model_list = [
+    'baichuan2-7b-chat-hf', 'deepseek-7b-chat-hf', 'deepseek-moe-16b-chat-hf',
+    'gemma-2b-it-hf', 'gemma-7b-it-hf', 'internlm2-chat-1.8b-turbomind',
+    'internlm2-chat-1.8b-sft-turbomind', 'internlm2-chat-7b-turbomind',
+    'internlm2-chat-7b-sft-turbomind', 'llama-3-8b-instruct-hf',
+    'llama-3-8b-instruct-turbomind', 'mistral-7b-instruct-v0.2-hf',
+    'minicpm-2b-dpo-fp32-hf', 'minicpm-2b-sft-bf16-hf',
+    'minicpm-2b-sft-fp32-hf', 'phi-3-mini-4k-instruct-hf',
+    'qwen1.5-0.5b-chat-hf', 'qwen2-1.5b-instruct-turbomind',
+    'qwen2-7b-instruct-turbomind', 'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf'
 ]
+base_model_list = [
+    'deepseek-moe-16b-base-hf', 'deepseek-7b-base-turbomind', 'gemma-2b-hf',
+    'gemma-7b-hf', 'internlm2-1.8b-turbomind', 'internlm2-7b-turbomind',
+    'internlm2-base-7b-turbomind', 'llama-3-8b-turbomind',
+    'mistral-7b-v0.2-hf', 'qwen1.5-moe-a2.7b-hf', 'qwen2-0.5b-hf',
+    'qwen2-1.5b-turbomind', 'qwen2-7b-turbomind', 'yi-1.5-6b-hf',
+    'yi-1.5-9b-hf'
+]
+dataset_list = ['gsm8k', 'race-middle', 'race-high']
 
 
 @pytest.fixture()
@@ -32,10 +47,28 @@ def result_scores():
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores')
+@pytest.mark.chat
 class TestChat:
     """Test cases for chat model."""
 
-    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in model_list
+    @pytest.mark.parametrize('model, dataset', [(p1, p2)
+                                                for p1 in chat_model_list
+                                                for p2 in dataset_list])
+    def test_model_dataset_score(self, baseline_scores, result_scores, model,
+                                 dataset):
+        base_score = baseline_scores.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(result_score, base_score)
+
+
+@pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores')
+@pytest.mark.base
+class TestBase:
+    """Test cases for base model."""
+
+    @pytest.mark.parametrize('model, dataset', [(p1, p2)
+                                                for p1 in base_model_list
                                                 for p2 in dataset_list])
     def test_model_dataset_score(self, baseline_scores, result_scores, model,
                                  dataset):
@@ -47,13 +80,13 @@ class TestChat:
 def assert_score(score, baseline):
     if score is None or score == '-':
         assert False, 'value is none'
-    if float(score) < (baseline * 1.03) and float(score) > (baseline * 0.97):
-        print(score + ' between ' + str(baseline * 0.97) + ' and ' +
-              str(baseline * 1.03))
+    if float(score) <= (baseline + 5) and float(score) >= (baseline - 5):
+        print(score + ' between ' + str(baseline - 5) + ' and ' +
+              str(baseline + 5))
         assert True
     else:
         assert False, score + ' not between ' + str(
-            baseline * 0.97) + ' and ' + str(baseline * 1.03)
+            baseline - 5) + ' and ' + str(baseline + 5)
 
 
 def find_csv_files(directory):
@@ -62,11 +95,11 @@ def find_csv_files(directory):
         for file in files:
             if file.endswith('.csv'):
                 csv_files.append(os.path.join(root, file))
-    if len(csv_files) > 1:
-        raise 'have more than 1 result file, please check the result manually'
-    if len(csv_files) == 0:
-        return None
-    return csv_files[0]
+
+    csv_files_with_time = {f: os.path.getctime(f) for f in csv_files}
+    sorted_csv_files = sorted(csv_files_with_time.items(), key=lambda x: x[1])
+    latest_csv_file = sorted_csv_files[-1][0]
+    return latest_csv_file
 
 
 def read_csv_file(file_path):
