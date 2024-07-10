@@ -1,10 +1,12 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import AgentInferencer
 from opencompass.datasets import (
     MATHDataset, MATHAgentEvaluator, math_postprocess
 )
-from os import environ
 
 # use pal format but not perform well
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
@@ -96,7 +98,7 @@ math_datasets = [
     dict(
         abbr='math-agent',
         type=MATHDataset,
-        path='opencompass/math' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/math/math.json',
+        path=get_data_path('opencompass/math', './data/math/math.json'),
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg,

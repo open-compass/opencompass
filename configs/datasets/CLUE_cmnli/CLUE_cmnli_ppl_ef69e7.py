@@ -1,9 +1,11 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import cmnliDataset
-from os import environ
 
 cmnli_reader_cfg = dict(
     input_columns=['sentence1', 'sentence2'],
@@ -44,7 +46,7 @@ cmnli_datasets = [
     dict(
         abbr='cmnli',
         type=cmnliDataset,
-        path='opencompass/cmnli' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/CLUE/cmnli/cmnli_public/dev.json',
+        path=get_data_path('opencompass/cmnli', './data/CLUE/cmnli/cmnli_public/dev.json'),
         reader_cfg=cmnli_reader_cfg,
         infer_cfg=cmnli_infer_cfg,
         eval_cfg=cmnli_eval_cfg)

@@ -1,10 +1,12 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 # This config is used for pass@k evaluation with dataset repetition
 # That model cannot generate multiple response for single input
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
-from os import environ
 
 mbpp_reader_cfg = dict(input_columns=['text', 'test_list'], output_column='test_column')
 
@@ -37,7 +39,7 @@ mbpp_datasets = [
     dict(
         type=MBPPDataset_V2,
         abbr='mbpp_repeat10',
-        path='opencompass/mbpp' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/mbpp/mbpp.jsonl',
+        path=get_data_path('opencompass/mbpp', './data/mbpp/mbpp.jsonl'),
         num_repeats=10,
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
