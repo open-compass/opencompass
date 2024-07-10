@@ -6,19 +6,8 @@ from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    # from .datasets.collections.chat_medium import datasets
     from ..summarizers.medium import summarizer
     from ..datasets.ceval.ceval_gen import ceval_datasets
-    # from ..datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
-    # from ..datasets.GaokaoBench.GaokaoBench_gen import GaokaoBench_datasets
-    # from ..datasets.strategyqa.strategyqa_gen import strategyqa_datasets
-    # from ..datasets.bbh.bbh_gen import bbh_datasets
-    # from ..datasets.Xsum.Xsum_gen import Xsum_datasets
-    # from ..datasets.agieval.agieval_gen import agieval_datasets as agieval_v2_datasets
-    # from ..datasets.gsm8k.gsm8k_gen import gsm8k_datasets as cur_datasets
-    # from ..datasets.summedits.summedits_gen import summedits_datasets as cur_datasets
-
-# datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 datasets = [
     *ceval_datasets,
