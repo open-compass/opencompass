@@ -3,9 +3,9 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess_v2
-from os import environ
 
 with read_base():
+    from ..utils.utils import get_data_path
     from .math_4shot_example_from_google_research import prompt
 
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
@@ -24,7 +24,7 @@ math_datasets = [
     dict(
         type=MATHDataset,
         abbr='math',
-        path='opencompass/math' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/math/math.json',
+        path=get_data_path('opencompass/math', './data/math/math.json'),
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg)

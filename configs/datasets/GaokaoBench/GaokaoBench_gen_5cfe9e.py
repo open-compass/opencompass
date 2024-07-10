@@ -1,9 +1,11 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import GaokaoBenchDataset
 
-from os import environ
 
 _MCQ_prompts = [
     {
@@ -289,7 +291,7 @@ for _folder, _prompts in [
         _dataset = {
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + _p['keyword'],
-            'path':'opencompass/gaokao-benchmark' if environ.get('DATASET_SOURCE') == 'ModelScope' else _base_path + '/' + _folder + '/' + _p['keyword'] + '.json',
+            'path':get_data_path('opencompass/gaokao-benchmark' , _base_path + '/' + _folder + '/' + _p['keyword'] + '.json'),
             'name': _p['keyword'],
             'reader_cfg': _reader_cfg,
             'infer_cfg': _infer_cfg,

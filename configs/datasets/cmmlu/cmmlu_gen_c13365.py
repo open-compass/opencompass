@@ -1,3 +1,6 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -5,7 +8,6 @@ from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
 from opencompass.datasets import CMMLUDataset
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
-from os import environ
 
 cmmlu_subject_mapping = {
     'agronomy': '农学',
@@ -109,7 +111,7 @@ for _name in cmmlu_all_sets:
     cmmlu_datasets.append(
         dict(
             type=CMMLUDataset,
-            path='opencompass/cmmlu' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/cmmlu/',
+            path=get_data_path('opencompass/cmmlu', './data/cmmlu/'),
             name=_name,
             abbr=f'cmmlu-{_name}',
             reader_cfg=dict(

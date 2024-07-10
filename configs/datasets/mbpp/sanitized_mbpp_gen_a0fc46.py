@@ -1,8 +1,10 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import SanitizedMBPPDataset, MBPPEvaluator
-from os import environ
 
 sanitized_mbpp_reader_cfg = dict(input_columns=['text', 'test_list'], output_column='test_list_2')
 
@@ -34,7 +36,7 @@ sanitized_mbpp_datasets = [
     dict(
         type=SanitizedMBPPDataset,
         abbr='sanitized_mbpp',
-        path='opencompass/mbpp' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/mbpp/sanitized-mbpp.jsonl',
+        path=get_data_path('opencompass/mbpp', './data/mbpp/sanitized-mbpp.jsonl'),
         reader_cfg=sanitized_mbpp_reader_cfg,
         infer_cfg=sanitized_mbpp_infer_cfg,
         eval_cfg=sanitized_mbpp_eval_cfg,

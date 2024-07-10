@@ -1,10 +1,12 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import OBQADataset
 from opencompass.utils.text_postprocessors import first_option_postprocess
-from os import environ
 
 _input_columns = [
     ['question_stem', 'A', 'B', 'C', 'D'],
@@ -33,13 +35,13 @@ obqa_datasets = [
     dict(
         abbr='openbookqa',
         type=OBQADataset,
-        path='opencompass/openbookqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/openbookqa/Main/test.jsonl',
+        path=get_data_path('opencompass/openbookqa', './data/openbookqa/Main/test.jsonl'),
         name='main',
     ),
     dict(
         abbr='openbookqa_fact',
         type=OBQADataset,
-        path='opencompass/openbookqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/openbookqa/Additional/test_complete.jsonl',
+        path=get_data_path('opencompass/openbookqa', './data/openbookqa/Additional/test_complete.jsonl'),
         name='additional',
     ),
 ]

@@ -1,9 +1,11 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccContaminationEvaluator
 from opencompass.datasets import ARCDatasetClean as ARCDataset
-from os import environ
 
 ARC_c_reader_cfg = dict(
     input_columns=['question', 'textA', 'textB', 'textC', 'textD'],
@@ -48,7 +50,7 @@ ARC_c_datasets = [
     dict(
         type=ARCDataset,
         abbr='ARC-c-test',
-        path='opencompass/ai2_arc' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/ARC/ARC-c/ARC-Challenge-Test.jsonl',
+        path=get_data_path('opencompass/ai2_arc', './data/ARC/ARC-c/ARC-Challenge-Test.jsonl'),
         name='ARC-Challenge',
         reader_cfg=ARC_c_reader_cfg,
         infer_cfg=ARC_c_infer_cfg,

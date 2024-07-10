@@ -8,6 +8,8 @@ from datasets import Dataset, DatasetDict
 from mmengine.config import read_base
 from tqdm import tqdm
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
@@ -22,50 +24,44 @@ def reload_datasets():
 
     with read_base():
         from configs.datasets.ceval.ceval_gen import ceval_datasets
-        from configs.datasets.ceval.ceval_clean_ppl import ceval_datasets as ceval_clean_datasets
         from configs.datasets.gsm8k.gsm8k_gen import gsm8k_datasets
         from configs.datasets.cmmlu.cmmlu_gen import cmmlu_datasets
         from configs.datasets.ARC_c.ARC_c_gen import ARC_c_datasets
-        from configs.datasets.ARC_c.ARC_c_clean_ppl import ARC_c_datasets as ARC_c_clean_datasets
-        from configs.datasets.ARC_e.ARC_e_gen import ARC_e_datasets
-        from configs.datasets.humaneval.humaneval_gen import humaneval_datasets
-        from configs.datasets.humaneval.humaneval_repeat10_gen_8e312c import humaneval_datasets as humaneval_repeat10_datasets
-        from configs.datasets.race.race_ppl import race_datasets
-        from configs.datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
-        from configs.datasets.ceval.ceval_clean_ppl import ceval_datasets as ceval_clean_datasets
-        from configs.datasets.gsm8k.gsm8k_gen import gsm8k_datasets
-        from configs.datasets.cmmlu.cmmlu_gen import cmmlu_datasets
-        from configs.datasets.ARC_c.ARC_c_gen import ARC_c_datasets
-        from configs.datasets.ARC_c.ARC_c_clean_ppl import ARC_c_datasets as ARC_c_clean_datasets
         from configs.datasets.ARC_e.ARC_e_gen import ARC_e_datasets
         from configs.datasets.humaneval.humaneval_gen import humaneval_datasets
         from configs.datasets.humaneval.humaneval_repeat10_gen_8e312c import humaneval_datasets as humaneval_repeat10_datasets
         from configs.datasets.race.race_ppl import race_datasets
         from configs.datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
         
-        # from configs.datasets.mmlu.mmlu_gen import mmlu_datasets
-        # from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
-        # from configs.datasets.strategyqa.strategyqa_gen import strategyqa_datasets
-        # from configs.datasets.bbh.bbh_gen import bbh_datasets
-        # from configs.datasets.Xsum.Xsum_gen import Xsum_datasets
-        # from configs.datasets.winogrande.winogrande_gen import winogrande_datasets
-        # from configs.datasets.winogrande.winogrande_ll import winogrande_datasets as winogrande_ll_datasets
-        # from configs.datasets.winogrande.winogrande_5shot_ll_252f01 import winogrande_datasets as winogrande_5shot_ll_datasets
-        # from configs.datasets.obqa.obqa_gen import obqa_datasets
-        # from configs.datasets.obqa.obqa_ppl_6aac9e import obqa_datasets as obqa_ppl_datasets
-        # from configs.datasets.agieval.agieval_gen import agieval_datasets as agieval_v2_datasets
-        # from configs.datasets.agieval.agieval_gen_a0c741 import agieval_datasets as agieval_v1_datasets
-        # from configs.datasets.siqa.siqa_gen import siqa_datasets as siqa_v2_datasets
-        # from configs.datasets.siqa.siqa_gen_18632c import siqa_datasets as siqa_v3_datasets
-        # from configs.datasets.siqa.siqa_ppl_42bc6e import siqa_datasets as siqa_ppl_datasets
-        # from configs.datasets.storycloze.storycloze_gen import storycloze_datasets
-        # from configs.datasets.storycloze.storycloze_ppl import storycloze_datasets as storycloze_ppl_datasets
-        # from configs.datasets.summedits.summedits_gen import \
-        #     summedits_datasets as summedits_v2_datasets
+        from configs.datasets.gsm8k.gsm8k_gen import gsm8k_datasets
+        from configs.datasets.cmmlu.cmmlu_gen import cmmlu_datasets
+        from configs.datasets.ARC_c.ARC_c_gen import ARC_c_datasets
+        from configs.datasets.ARC_e.ARC_e_gen import ARC_e_datasets
+        from configs.datasets.humaneval.humaneval_gen import humaneval_datasets
+        from configs.datasets.humaneval.humaneval_repeat10_gen_8e312c import humaneval_datasets as humaneval_repeat10_datasets
+        from configs.datasets.race.race_ppl import race_datasets
+        from configs.datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
+        
+        from configs.datasets.mmlu.mmlu_gen import mmlu_datasets
+        from configs.datasets.strategyqa.strategyqa_gen import strategyqa_datasets
+        from configs.datasets.bbh.bbh_gen import bbh_datasets
+        from configs.datasets.Xsum.Xsum_gen import Xsum_datasets
+        from configs.datasets.winogrande.winogrande_gen import winogrande_datasets
+        from configs.datasets.winogrande.winogrande_ll import winogrande_datasets as winogrande_ll_datasets
+        from configs.datasets.winogrande.winogrande_5shot_ll_252f01 import winogrande_datasets as winogrande_5shot_ll_datasets
+        from configs.datasets.obqa.obqa_gen import obqa_datasets
+        from configs.datasets.obqa.obqa_ppl_6aac9e import obqa_datasets as obqa_ppl_datasets
+        from configs.datasets.agieval.agieval_gen import agieval_datasets as agieval_v2_datasets
+        from configs.datasets.agieval.agieval_gen_a0c741 import agieval_datasets as agieval_v1_datasets
+        from configs.datasets.siqa.siqa_gen import siqa_datasets as siqa_v2_datasets
+        from configs.datasets.siqa.siqa_gen_18632c import siqa_datasets as siqa_v3_datasets
+        from configs.datasets.siqa.siqa_ppl_42bc6e import siqa_datasets as siqa_ppl_datasets
+        from configs.datasets.storycloze.storycloze_gen import storycloze_datasets
+        from configs.datasets.storycloze.storycloze_ppl import storycloze_datasets as storycloze_ppl_datasets
+        from configs.datasets.summedits.summedits_gen import summedits_datasets as summedits_v2_datasets
         
         from configs.datasets.hellaswag.hellaswag_gen import hellaswag_datasets as hellaswag_v2_datasets
         from configs.datasets.hellaswag.hellaswag_10shot_gen_e42710 import hellaswag_datasets as hellaswag_ice_datasets
-        from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
         from configs.datasets.hellaswag.hellaswag_ppl_9dbb12 import hellaswag_datasets as hellaswag_v1_datasets
         from configs.datasets.hellaswag.hellaswag_ppl_a6e128 import hellaswag_datasets as hellaswag_v3_datasets
         from configs.datasets.mbpp.mbpp_gen import mbpp_datasets as mbpp_v1_datasets
@@ -86,7 +82,7 @@ def reload_datasets():
         from configs.datasets.triviaqa.triviaqa_wiki_1shot_gen_20a989 import triviaqa_datasets as triviaqa_wiki_1shot_datasets
         from configs.datasets.hellaswag.hellaswag_gen import hellaswag_datasets as hellaswag_v2_datasets
         from configs.datasets.hellaswag.hellaswag_10shot_gen_e42710 import hellaswag_datasets as hellaswag_ice_datasets
-        from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
+        
         from configs.datasets.hellaswag.hellaswag_ppl_9dbb12 import hellaswag_datasets as hellaswag_v1_datasets
         from configs.datasets.hellaswag.hellaswag_ppl_a6e128 import hellaswag_datasets as hellaswag_v3_datasets
         from configs.datasets.mbpp.mbpp_gen import mbpp_datasets as mbpp_v1_datasets
@@ -109,6 +105,14 @@ def reload_datasets():
         from configs.datasets.CLUE_cmnli.CLUE_cmnli_gen import cmnli_datasets
         from configs.datasets.CLUE_cmnli.CLUE_cmnli_ppl import cmnli_datasets as cmnli_ppl_datasets
         from configs.datasets.CLUE_ocnli.CLUE_ocnli_gen import ocnli_datasets
+        
+        from configs.datasets.ceval.ceval_clean_ppl import ceval_datasets as ceval_clean_datasets
+        from configs.datasets.ARC_c.ARC_c_clean_ppl import ARC_c_datasets as ARC_c_clean_datasets
+        from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
+        from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
+        from configs.datasets.ceval.ceval_clean_ppl import ceval_datasets as ceval_clean_datasets
+        from configs.datasets.ARC_c.ARC_c_clean_ppl import ARC_c_datasets as ARC_c_clean_datasets
+        from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
         
     return sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
@@ -153,36 +157,51 @@ def clean_string(value):
 class TestingMsDatasets(unittest.TestCase):
 
     def test_datasets(self):
+        # 加载 ModelScope 和 Local 数据集配置
         ms_datasets_conf = load_datasets_conf('ModelScope')
         local_datasets_conf = load_datasets_conf('Local')
-
-        ok_list = []
-        fail_list = [] 
-        for ms_conf, local_conf in tqdm(zip(ms_datasets_conf, local_datasets_conf)):
-            ms_name = f"{ms_conf.get('path')}/{ms_conf.get('name', '')}\t{ms_conf.get('lang', '')}"
-            local_name = f"{local_conf.get('path')}/{local_conf.get('name', '')}\t{ms_conf.get('lang', '')}"
-            assert ms_conf['type'] == local_conf['type']
-
-            print(ms_name, local_name)
+        
+        # 初始化成功和失败的数据集列表
+        successful_comparisons = []
+        failed_comparisons = []
+        
+        def compare_datasets(ms_conf, local_conf):
+            modelscope_path_name = f"{ms_conf.get('path')}/{ms_conf.get('name', '')}\t{ms_conf.get('lang', '')}"
+            local_path_name = f"{local_conf.get('path')}/{local_conf.get('name', '')}\t{local_conf.get('lang', '')}"
+            # 断言类型一致
+            assert ms_conf['type'] == local_conf['type'], "Data types do not match"
+            print(modelscope_path_name, local_path_name)
             try:
                 ms_dataset = load_datasets('ModelScope', ms_conf)
-                oc_dataset = load_datasets('Local', local_conf)
-
-                _check_data(ms_dataset, oc_dataset, sample_size=sample_size)
-            except Exception as e:
-                fail_list.append(
-                    f'{ms_name} is not the same as {local_name}')
-                print(e)
-                continue
-            ok_list.append(f'{ms_name} | {local_name}')
+                local_dataset = load_datasets('Local', local_conf)
+                _check_data(ms_dataset, local_dataset, sample_size=sample_size)
+                return 'success', f'{modelscope_path_name} | {local_path_name}'
+            except Exception as exception:
+                print(exception)
+                return 'failure', f'{modelscope_path_name} is not the same as {local_path_name}'
+        
+        with ThreadPoolExecutor(16) as executor:
+            futures = {
+                executor.submit(compare_datasets, ms_conf, local_conf): (ms_conf, local_conf)
+                for ms_conf, local_conf in zip(ms_datasets_conf, local_datasets_conf)
+            }
             
-        print(f"All {len(ms_datasets_conf)} datasets")
-        print(f"OK {len(ok_list)} datasets")
-        for ok in ok_list:
-            print(f"  {ok}")
-        print(f"Fail {len(fail_list)} datasets")
-        for fail in fail_list:
-            print(f"  {fail}")
+            for future in tqdm(as_completed(futures), total=len(futures)):
+                result, message = future.result()
+                if result == 'success':
+                    successful_comparisons.append(message)
+                else:
+                    failed_comparisons.append(message)
+        
+        # 输出测试总结
+        total_datasets = len(ms_datasets_conf)
+        print(f"All {total_datasets} datasets")
+        print(f"OK {len(successful_comparisons)} datasets")
+        for success in successful_comparisons:
+            print(f"  {success}")
+        print(f"Fail {len(failed_comparisons)} datasets")
+        for failure in failed_comparisons:
+            print(f"  {failure}")
 
 
 def _check_data(ms_dataset: Dataset | DatasetDict,
@@ -215,7 +234,7 @@ def _check_data(ms_dataset: Dataset | DatasetDict,
         sample_indices = random.sample(range(len(ms_dataset)),
                                        min(sample_size, len(ms_dataset)))
 
-        for i, idx in enumerate(tqdm(sample_indices, total=sample_size)):
+        for i, idx in enumerate(sample_indices):
             for col in ms_dataset.column_names:
                 ms_value = clean_string(str(ms_dataset[col][idx]))
                 oc_value = clean_string(str(oc_dataset[col][idx]))
@@ -226,7 +245,6 @@ def _check_data(ms_dataset: Dataset | DatasetDict,
                     print(f'ms_value: {ms_value} ({type(ms_value)})')
                     print(f'oc_value: {oc_value} ({type(oc_value)})')
                     raise e
-        print('All values match!'.upper() + '-' * 50)
     else:
         raise ValueError(f'Datasets type not supported {type(ms_dataset)}')
 

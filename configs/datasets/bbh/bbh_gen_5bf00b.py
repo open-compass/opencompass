@@ -1,10 +1,12 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 import os
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import BBHDataset, BBHEvaluator, bbh_mcq_postprocess, BBHEvaluator_mcq
-from os import environ
 
 bbh_reader_cfg = dict(input_columns=['input'], output_column='target')
 
@@ -65,7 +67,7 @@ for _name in bbh_multiple_choice_sets:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path='opencompass/bbh' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/BBH/data',
+            path=get_data_path('opencompass/bbh', './data/BBH/data'),
             name=_name,
             abbr='bbh-' + _name,
             reader_cfg=bbh_reader_cfg,
@@ -92,7 +94,7 @@ for _name in bbh_free_form_sets:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path='opencompass/bbh' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/BBH/data',
+            path=get_data_path('opencompass/bbh', './data/BBH/data'),
             name=_name,
             abbr='bbh-' + _name,
             reader_cfg=bbh_reader_cfg,

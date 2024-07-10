@@ -1,10 +1,12 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import ARCDataset
 from opencompass.utils.text_postprocessors import first_option_postprocess
-from os import environ
 
 ARC_e_reader_cfg = dict(
     input_columns=['question', 'textA', 'textB', 'textC', 'textD'],
@@ -36,7 +38,7 @@ ARC_e_datasets = [
     dict(
         abbr='ARC-e',
         type=ARCDataset,
-        path='opencompass/ai2_arc' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/ARC/ARC-e/ARC-Easy-Dev.jsonl',
+        path=get_data_path('opencompass/ai2_arc', './data/ARC/ARC-e/ARC-Easy-Dev.jsonl'),
         name='ARC-Easy',
         reader_cfg=ARC_e_reader_cfg,
         infer_cfg=ARC_e_infer_cfg,

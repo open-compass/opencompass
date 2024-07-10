@@ -1,9 +1,11 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import MDLRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import commonsenseqaDataset
-from os import environ
 
 commonsenseqa_reader_cfg = dict(
     input_columns=['question', 'A', 'B', 'C', 'D', 'E'],
@@ -43,7 +45,7 @@ commonsenseqa_datasets = [
     dict(
         abbr='commonsense_qa',
         type=commonsenseqaDataset,
-        path='opencompass/commonsense_qa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/commonsenseqa',
+        path=get_data_path('opencompass/commonsense_qa', './data/commonsenseqa'),
         reader_cfg=commonsenseqa_reader_cfg,
         infer_cfg=commonsenseqa_infer_cfg,
         eval_cfg=commonsenseqa_eval_cfg)
