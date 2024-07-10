@@ -56,7 +56,7 @@ class SubjectiveEvalTask(BaseTask):
         self.judge_cfg = copy.deepcopy(judge_cfg)
         self.judge_models = judge_models
         self.infer_order = cfg.get('infer_order')
-        self.given_pred = cfg.eval.get('given_pred', [])
+        self.given_pred = cfg['datasets'][0][0].get('given_pred', [])
 
     def get_command(self, cfg_path, template):
         """Get the command template for the task.

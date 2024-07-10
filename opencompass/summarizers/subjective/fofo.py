@@ -83,10 +83,13 @@ class FofoSummarizer:
                                 scores[domain].append(score)
                                 if format_type == 'general':
                                     scores[format_name].append(score)
-                        single_model_scores = {
-                            task: sum(score) / len(score)
-                            for task, score in scores.items()
-                        }
+                        if len(judged_answers) == 0:
+                            single_model_scores = {}
+                        else:
+                            single_model_scores = {
+                                task: sum(score) / len(score)
+                                for task, score in scores.items()
+                            }
                         if judge_model not in total_scores:
                             total_scores[judge_model] = {}
                         if dataset_abbr not in total_scores[judge_model]:
@@ -107,11 +110,13 @@ class FofoSummarizer:
         Returns:
             pd.DataFrame: The summary results.
         """
+        all_scores = {}
         scores = self.get_score(time_str)
-        print(scores)
         output_dir, results_folder = get_outdir(self.cfg, time_str)
         for idx, judge_model in enumerate(self.judge_models):
             judge_abbr = model_abbr_from_cfg(judge_model)
+            score_by_judgemodel = {}
+            score_saver = {}
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
                 summarizer_model_abbrs = self.eval_model_abbrs
@@ -119,7 +124,7 @@ class FofoSummarizer:
                 format_types = ['Json', 'CSV', 'XML', 'YAML', 'Markdown']
                 row_headers = [
                     i for i in one_column.keys()
-                    if i not in [dataset_abbr] + format_types
+                    if i not in [dataset_abbr] + format_types + ['overall']
                 ]
                 row_headers = ['overall'] + format_types + row_headers
                 headers = [dataset_abbr] + summarizer_model_abbrs
@@ -136,19 +141,24 @@ class FofoSummarizer:
                         row.append(s)
                     table.append(row)
                 txt = tabulate(table, headers=headers)
-                print(txt)
-
+                score_saver[dataset_abbr] = [s for s in table[0][1:]]
                 if idx == len(self.judge_models):
                     output_filename = osp.join(
-                        output_dir, 'summarized-by--' + judge_abbr + '-' +
-                        dataset_abbr + '-report.csv')
+                        output_dir, dataset_abbr + '-summarized-by--' +
+                        judge_abbr + '-' + '-report.csv')
                 else:
                     output_filename = osp.join(
-                        output_dir, 'judged-by--' + judge_abbr + '-' +
-                        dataset_abbr + '-report.csv')
+                        output_dir, dataset_abbr + '-judged-by--' +
+                        judge_abbr + '-' + '-report.csv')
 
                 with open(output_filename, 'w') as f:
                     f.write(','.join(headers) + '\n')
                     for line in table:
                         f.write(','.join(line) + '\n')
-                print(output_filename)
+            for idx, model in enumerate(summarizer_model_abbrs):
+                score_by_judgemodel[model] = {}
+                for subset_name, subset_scores in score_saver.items():
+                    score_by_judgemodel[model][subset_name] = subset_scores[
+                        idx]
+            all_scores[judge_abbr] = score_by_judgemodel
+        return {'Fofo': all_scores}
