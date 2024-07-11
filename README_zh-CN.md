@@ -147,7 +147,7 @@ unzip OpenCompassData-core-20240207.zip
 另外，您还可以使用[ModelScope](www.modelscope.cn)来加载数据集：
 环境准备：
 ```bash
-pip install modelscope
+pip install modelscope[framework]
 export DATASET_SOURCE=ModelScope
 ```
 配置好环境后，无需下载全部数据，直接提交评测任务即可。目前支持的数据集有：

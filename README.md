@@ -147,7 +147,7 @@ Also, use the [ModelScope](www.modelscope.cn) to load the datasets on demand.
 
 Installation:
 ```bash
-pip install modelscope
+pip install modelscope[framework]
 export DATASET_SOURCE=ModelScope
 ```
 
