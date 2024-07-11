@@ -35,58 +35,9 @@
    pip install -e .
    ```
 
-3. 安装 humaneval（可选）：
+3. 如果需要使用推理后端，或者进行 API 模型测试，或者进行 代码、智能体、主观 等数据集的评测，请参考 [其他安装说明](./extra-installation.md)
 
-   如果你需要**在 humaneval 数据集上评估模型代码能力**，请执行此步骤，否则忽略这一步。
-
-   <details>
-   <summary><b>点击查看详细</b></summary>
-
-   ```bash
-   git clone https://github.com/openai/human-eval.git
-   cd human-eval
-   pip install -r requirements.txt
-   pip install -e .
-   cd ..
-   ```
-
-   请仔细阅读 `human_eval/execution.py` **第48-57行**的注释，了解执行模型生成的代码可能存在的风险，如果接受这些风险，请取消**第58行**的注释，启用代码执行评测。
-
-   </details>
-
-4. 安装 Llama（可选）：
-
-   如果你需要**使用官方实现评测 Llama / Llama-2 / Llama-2-chat 模型**，请执行此步骤，否则忽略这一步。
-
-   <details>
-   <summary><b>点击查看详细</b></summary>
-
-   ```bash
-   git clone https://github.com/facebookresearch/llama.git
-   cd llama
-   pip install -r requirements.txt
-   pip install -e .
-   cd ..
-   ```
-
-   你可以在 `configs/models` 下找到所有 Llama / Llama-2 / Llama-2-chat 模型的配置文件示例。([示例](https://github.com/open-compass/opencompass/blob/eb4822a94d624a4e16db03adeb7a59bbd10c2012/configs/models/llama2_7b_chat.py))
-
-   </details>
-
-5. 安装 alpaca-eval（可选）：
-
-   如果你需要**使用官方alpaca-eval实现评测 alpaca-eval 数据集**，请执行此步骤，否则忽略这一步。
-
-   <details>
-   <summary><b>点击查看详细</b></summary>
-
-   ```bash
-   pip install alpaca-eval
-   ```
-
-   </details>
-
-# 数据集准备
+## 数据集准备
 
 OpenCompass 支持的数据集主要包括两个部分：
 

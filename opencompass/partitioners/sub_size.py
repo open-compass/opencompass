@@ -12,7 +12,8 @@ from opencompass.registry import PARTITIONERS
 from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
                                get_infer_output_path)
 
-from .sub_naive import (SubjectiveNaivePartitioner, remove_already_tasks,
+from .sub_naive import (SubjectiveNaivePartitioner, get_model_combinations,
+                        remove_already_tasks,
                         replicate_tasks_with_judge_models)
 
 
@@ -36,31 +37,31 @@ class SubjectiveSizePartitioner(SubjectiveNaivePartitioner):
             to the task config.
     """
 
-    def __init__(self,
-                 mode: str,
-                 out_dir: str,
-                 models: Optional[List[ConfigDict]] = [],
-                 base_models: Optional[List[ConfigDict]] = [],
-                 compare_models: Optional[List[ConfigDict]] = [],
-                 judge_models: Optional[List[ConfigDict]] = [],
-                 meta_judge_model: Optional[ConfigDict] = None,
-                 model_pairs: Optional[List[Tuple]] = None,
-                 max_task_size: int = 40000,
-                 gen_task_coef: int = 20,
-                 strategy: str = 'heuristic',
-                 dataset_size_path: str = '.cache/dataset_size.json',
-                 keep_keys: Optional[List[str]] = None,
-                 infer_order: Optional[str] = 'random'):
-        super().__init__(out_dir=out_dir,
-                         keep_keys=keep_keys,
-                         mode=mode,
-                         models=models,
-                         base_models=base_models,
-                         compare_models=compare_models,
-                         judge_models=judge_models,
-                         meta_judge_model=meta_judge_model,
-                         model_pairs=model_pairs,
-                         infer_order=infer_order)
+    def __init__(
+        self,
+        out_dir: str,
+        models: Optional[List[ConfigDict]] = [],
+        base_models: Optional[List[ConfigDict]] = [],
+        compare_models: Optional[List[ConfigDict]] = [],
+        judge_models: Optional[List[ConfigDict]] = [],
+        meta_judge_model: Optional[ConfigDict] = None,
+        model_pairs: Optional[List[Tuple]] = None,
+        max_task_size: int = 40000,
+        gen_task_coef: int = 20,
+        strategy: str = 'heuristic',
+        dataset_size_path: str = '.cache/dataset_size.json',
+        keep_keys: Optional[List[str]] = None,
+    ):
+        super().__init__(
+            out_dir=out_dir,
+            keep_keys=keep_keys,
+            models=models,
+            base_models=base_models,
+            compare_models=compare_models,
+            judge_models=judge_models,
+            meta_judge_model=meta_judge_model,
+            model_pairs=model_pairs,
+        )
         self.max_task_size = max_task_size
         self.gen_task_coef = gen_task_coef
         self.dataset_size_path = dataset_size_path
@@ -105,76 +106,94 @@ class SubjectiveSizePartitioner(SubjectiveNaivePartitioner):
         models = self.models if self.models != [] else models
         base_models, compare_models = self.base_models, self.compare_models
         judge_models, meta_judge_model = self.judge_models, self.meta_judge_model
-        if self.mode == 'singlescore':
-            models = models
-        else:
-            models = super().get_model_combinations(models, base_models,
-                                                    compare_models)
-        model_dataset_combinations = [{'models': models, 'datasets': datasets}]
-        tasks = []
-        for comb in model_dataset_combinations:
-            comb['datasets'] = sorted(comb['datasets'],
-                                      key=lambda x: self.get_cost(x),
-                                      reverse=True)
-            for model in comb['models']:
-                chunks = []  # elements: tuple(size, dataset_chunk)
-                for dataset in comb['datasets']:
-                    filename = get_infer_output_path(model, dataset, out_dir)
-                    # skip the task if the task output exists
-                    # if osp.exists(filename):
-                    #   continue
-                    dataset_size = self.get_cost(dataset)
-                    if dataset_size > self.max_task_size:
-                        root, ext = osp.splitext(filename)
-                        dataset_splits = self.split_dataset(dataset)
-                        for i, dataset_split in enumerate(dataset_splits):
-                            if not osp.exists(f'{root}_{i}{ext}'):
-                                chunks.append(
-                                    (self.max_task_size, dataset_split))
-                    else:
-                        chunks.append((dataset_size, dataset))
+        self.max_task_size *= len(datasets)
+        all_tasks = []
+        for dataset in datasets:
+            mode = dataset['mode']
+            infer_order = dataset.get('infer_order', None)
+            assert mode in ['singlescore', 'allpair', 'm2n', 'fixed']
+            assert infer_order in ['random', 'double', None]
+            if mode == 'singlescore':
+                temp_models = models
+            else:
+                temp_models = get_model_combinations(mode, models,
+                                                     dataset['base_models'],
+                                                     models)
+            model_dataset_combinations = [{
+                'models': temp_models,
+                'datasets': [dataset]
+            }]
 
-                if self.strategy == 'heuristic':
-                    chunks = sorted(chunks, key=lambda x: x[0], reverse=True)
-                    current_size, current_chunks = 0, []
-                    for index in range(len(chunks)):
-                        current_size += chunks[index][0]
-                        current_chunks.append(chunks[index][1])
-                        if index == len(chunks) - 1 or current_size + chunks[
-                                index + 1][0] > self.max_task_size:
+            tasks = []
+            for comb in model_dataset_combinations:
+                comb['datasets'] = sorted(comb['datasets'],
+                                          key=lambda x: self.get_cost(x),
+                                          reverse=True)
+                for model in comb['models']:
+                    chunks = []  # elements: tuple(size, dataset_chunk)
+                    for dataset in comb['datasets']:
+                        filename = get_infer_output_path(
+                            model, dataset, out_dir)
+                        # skip the task if the task output exists
+                        # if osp.exists(filename):
+                        #   continue
+                        dataset_size = self.get_cost(dataset)
+                        if dataset_size > self.max_task_size:
+                            root, ext = osp.splitext(filename)
+                            dataset_splits = self.split_dataset(dataset)
+                            for i, dataset_split in enumerate(dataset_splits):
+                                if not osp.exists(f'{root}_{i}{ext}'):
+                                    chunks.append(
+                                        (self.max_task_size, dataset_split))
+                        else:
+                            chunks.append((dataset_size, dataset))
+
+                    if self.strategy == 'heuristic':
+                        chunks = sorted(chunks,
+                                        key=lambda x: x[0],
+                                        reverse=True)
+                        current_size, current_chunks = 0, []
+                        for index in range(len(chunks)):
+                            current_size += chunks[index][0]
+                            current_chunks.append(chunks[index][1])
+                            if index == len(
+                                    chunks) - 1 or current_size + chunks[
+                                        index + 1][0] > self.max_task_size:
+                                tasks.append(
+                                    Config({
+                                        'models': [model],
+                                        'datasets': [current_chunks],
+                                        'work_dir': work_dir,
+                                        **add_cfg
+                                    }))
+                                current_size, current_chunks = 0, []
+                    elif self.strategy == 'split':
+                        for _, dataset in chunks:
                             tasks.append(
                                 Config({
                                     'models': [model],
-                                    'datasets': [current_chunks],
+                                    'datasets': [[dataset]],
                                     'work_dir': work_dir,
                                     **add_cfg
                                 }))
-                            current_size, current_chunks = 0, []
-                elif self.strategy == 'split':
-                    for _, dataset in chunks:
-                        tasks.append(
-                            Config({
-                                'models': [model],
-                                'datasets': [[dataset]],
-                                'work_dir': work_dir,
-                                **add_cfg
-                            }))
 
-        tasks = replicate_tasks_with_judge_models(tasks, judge_models,
-                                                  meta_judge_model)
-        tasks = remove_already_tasks(tasks, work_dir, meta_judge_model)
+            tasks = replicate_tasks_with_judge_models(tasks, judge_models,
+                                                      meta_judge_model)
+            tasks = remove_already_tasks(tasks, work_dir, meta_judge_model)
 
-        if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
-                tasks[0], list):
-            # Refer to meta review judge
-            for task_stage in tasks:
-                for task in task_stage:
-                    task['infer_order'] = self.infer_order
-        else:
-            # Refer to just have review judge
-            for task in tasks:
-                task['infer_order'] = self.infer_order
-        return tasks
+            if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
+                    tasks[0], list):
+                # Refer to meta review judge
+                for task_stage in tasks:
+                    for task in task_stage:
+                        task['infer_order'] = infer_order
+            else:
+                # Refer to just have review judge
+                for task in tasks:
+                    task['infer_order'] = infer_order
+
+            all_tasks += tasks
+        return all_tasks
 
     @property
     def dataset_size(self):

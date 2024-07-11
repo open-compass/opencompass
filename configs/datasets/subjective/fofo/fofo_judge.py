@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import FofoDataset
+from opencompass.summarizers import FofoSummarizer
 from mmengine.config import read_base
 
 subjective_reader_cfg = dict(
@@ -44,7 +45,7 @@ Please evaluate the formatting of the model's responses by checking if they comp
 Please note that your response should be a properly formatted JSON string and should not contain any additional content. We will load it directly as a JSON string in Python.
 """
 
-subjective_datasets = []
+fofo_datasets = []
 
 for _name in subjective_all_sets:
     subjective_infer_cfg = dict(
@@ -84,7 +85,7 @@ for _name in subjective_all_sets:
         pred_role='BOT',
     )
 
-    subjective_datasets.append(
+    fofo_datasets.append(
         dict(
             abbr=f'{_name}',
             type=FofoDataset,
@@ -92,5 +93,7 @@ for _name in subjective_all_sets:
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
-            eval_cfg=subjective_eval_cfg
+            eval_cfg=subjective_eval_cfg,
+            mode='singlescore',
+            summarizer = dict(type=FofoSummarizer, judge_type='general')
         ))

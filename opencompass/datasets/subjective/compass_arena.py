@@ -8,11 +8,7 @@ from .subjective_cmp import SubjectiveCmpDataset
 @LOAD_DATASET.register_module()
 class CompassArenaDataset(SubjectiveCmpDataset):
 
-    def load(
-        self,
-        path: str,
-        name: str,
-    ):
+    def load(self, path: str, name: str, *args, **kwargs):
         dataset = list(super().load(path, name))
         creation_dataset = []
         for data in dataset:
