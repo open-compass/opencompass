@@ -11,7 +11,7 @@ from ..base import BaseDataset
 @LOAD_DATASET.register_module()
 class ArenaHardDataset(BaseDataset):
 
-    def load(self, path: str, name: str):
+    def load(self, path: str, name: str, *args, **kwargs):
         filename = osp.join(path, f'{name}.jsonl')
         dataset = DatasetDict()
         raw_data = []

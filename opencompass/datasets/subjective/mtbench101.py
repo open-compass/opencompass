@@ -2,10 +2,8 @@
 import json
 import os.path as osp
 import re
-from typing import Optional
 
 from datasets import Dataset, DatasetDict
-from torch.utils.data import DataLoader
 
 from opencompass.registry import LOAD_DATASET
 
@@ -258,7 +256,7 @@ def add_format(question, answer):
 @LOAD_DATASET.register_module()
 class MTBench101Dataset(BaseDataset):
 
-    def load(self, path: str, name: str):
+    def load(self, path: str, name: str, *args, **kwargs):
         import copy
 
         filename = osp.join(path, f'{name}.jsonl')

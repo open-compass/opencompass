@@ -70,8 +70,8 @@ class CompassArenaSummarizer:
                  summary_type='single') -> None:
         self.tasks = []
         self.cfg = config
-        self.base_models = self.cfg['eval']['partitioner']['base_models']
-        self.compare_models = self.cfg['eval']['partitioner']['compare_models']
+        self.base_models = self.cfg['datasets'][0]['base_models']
+        self.compare_models = self.cfg['eval']['partitioner']['models']
         self.judge_models = self.cfg.get('judge_models', None)
         self.meta_judge_model = self.cfg.eval.partitioner.get('meta_judge_model', None)
         self.judge_type = judge_type
@@ -107,6 +107,9 @@ class CompassArenaSummarizer:
                         print(subdir_path + ' is not exist! please check!')
                         continue
                     judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
+                    if len(judged_answers) == 0:
+                        scores[judge_model][dataset_abbr][model2] = {}
+                        continue
                     if self.check_pos_bias:
                         bias_num = check_position_bias(judged_answers, references)
                     else:
@@ -175,8 +178,9 @@ class CompassArenaSummarizer:
         # scores['win_' + model1] = win_model1
         output_dir, results_folder = get_outdir(self.cfg, time_str)
 
-
+        all_scores = {}
         for idx, judge_model in enumerate(self.judge_models):
+            score_by_judgemodel = {}
             judge_abbr = model_abbr_from_cfg(judge_model)
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
@@ -198,18 +202,16 @@ class CompassArenaSummarizer:
                         row.append(s)
                     table.append(row)
                 txt = tabulate(table, headers=headers)
-                print(txt)
 
                 if idx == len(self.judge_models):
-                    output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
+                    output_filename = osp.join(output_dir, dataset_abbr + '-summarized-by--' + judge_abbr + '-report.csv')
                 else:
-                    output_filename = osp.join(output_dir, 'judged-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
+                    output_filename = osp.join(output_dir, dataset_abbr + '-judged-by--' + judge_abbr + '-report.csv')
 
                 with open(output_filename, 'w') as f:
                     f.write(','.join(headers) + '\n')
                     for line in table:
                         f.write(','.join(line) + '\n')
-                print(output_filename)
 
             table = []
             summarizer_model_abbrs = [model_abbr_from_cfg_used_in_summarizer(i) for i in self.compare_models]
@@ -227,14 +229,21 @@ class CompassArenaSummarizer:
                     row.append(s)
                 table.append(row)
             txt = tabulate(table, headers=headers)
-            print(txt)
 
             if idx == len(self.judge_models):
-                output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-overall-report.csv')
+                output_filename = osp.join(output_dir, 'compassarena-overall-summarized-by--' + judge_abbr + '.csv')
             else:
-                output_filename = osp.join(output_dir, 'judged-by--' + judge_abbr + '-overall-report.csv')
+                output_filename = osp.join(output_dir, 'compassarena-overall-judged-by--' + judge_abbr + '.csv')
+
+            table = [[row[0]] + [f'{x:.2f}' if not isinstance(x, str) else x for x in row[1:]] for row in table]
             with open(output_filename, 'w') as f:
                 f.write(','.join(headers) + '\n')
                 for line in table:
                     f.write(','.join(line) + '\n')
-            print(output_filename)
+
+            for idx, model in enumerate(summarizer_model_abbrs):
+                score_by_judgemodel[model] = {}
+                for subset in table:
+                    score_by_judgemodel[model][subset[0]] = subset[idx+1]
+            all_scores[judge_abbr]=score_by_judgemodel
+        return {'CompassArena': all_scores}

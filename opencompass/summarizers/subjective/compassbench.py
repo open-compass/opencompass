@@ -71,8 +71,8 @@ class CompassBenchSummarizer:
                  summary_type='single') -> None:
         self.tasks = []
         self.cfg = config
-        self.base_models = self.cfg['eval']['partitioner']['base_models']
-        self.compare_models = self.cfg['eval']['partitioner']['compare_models']
+        self.base_models = self.cfg['datasets'][0]['base_models']
+        self.compare_models = self.cfg['eval']['partitioner']['models']
         self.judge_models = self.cfg.get('judge_models', None)
         self.meta_judge_model = self.cfg.eval.partitioner.get('meta_judge_model', None)
         self.judge_type = judge_type
@@ -108,6 +108,9 @@ class CompassBenchSummarizer:
                         print(subdir_path + ' is not exist! please check!')
                         continue
                     judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
+                    if len(judged_answers) == 0:
+                        scores[judge_model][dataset_abbr][model2] = {}
+                        continue
                     if self.check_pos_bias:
                         bias_num = check_position_bias(judged_answers, references)
                     else:
@@ -189,8 +192,9 @@ class CompassBenchSummarizer:
         # scores['win_' + model1] = win_model1
         output_dir, results_folder = get_outdir(self.cfg, time_str)
         all_judge_file_list = []
-
+        all_scores = {}
         for idx, judge_model in enumerate(self.judge_models):
+            score_by_judgemodel = {}
             judge_abbr = model_abbr_from_cfg(judge_model)
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
@@ -220,24 +224,25 @@ class CompassBenchSummarizer:
                 # print(txt)
 
                 if idx == len(self.judge_models):
-                    output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
+                    output_filename = osp.join(output_dir, dataset_abbr + '-summarized-by--' + judge_abbr + '-report.csv')
                 else:
-                    output_filename = osp.join(output_dir, 'judged-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
+                    output_filename = osp.join(output_dir, dataset_abbr + '-judged-by--' + judge_abbr + '-report.csv')
 
                 with open(output_filename, 'w') as f:
                     f.write(','.join(headers) + '\n')
                     for line in table:
                         f.write(','.join(line) + '\n')
-                print(output_filename)
                 all_judge_file_list.append(output_filename)
-
+            for idx, model in enumerate(summarizer_model_abbrs):
+                score_by_judgemodel[model] = {'overall': table[0][idx+1]}
+            all_scores[judge_abbr]=score_by_judgemodel
         dfs = [pd.read_csv(file) for file in all_judge_file_list]
 
         if len(dfs) > 1:
             average_df = copy.deepcopy(dfs[0])
             for col in dfs[0].columns[1:]:
-                for i in range(1, len(dfs[0])):
+                for i in range(0, len(dfs[0])):
                     average_df[col][i] = round(sum(df[col][i] for df in dfs) / len(dfs), 2)
-            average_csv_path = osp.join(output_dir,  'Averaged-' + dataset_abbr + '-report.csv')
+            average_csv_path = osp.join(output_dir,  'CompassBench-Averaged-' + dataset_abbr + '-report.csv')
             average_df.to_csv(average_csv_path, index=False)
-            print(average_csv_path)
+        return {'CompassBench': all_scores}
