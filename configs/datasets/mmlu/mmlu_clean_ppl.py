@@ -1,9 +1,11 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccContaminationEvaluator
 from opencompass.datasets import MMLUDatasetClean as MMLUDataset
-from os import environ
 
 # None of the mmlu dataset in huggingface is correctly parsed, so we use our own dataset reader
 # Please download the dataset from https://people.eecs.berkeley.edu/~hendrycks/data.tar
@@ -105,7 +107,7 @@ for _name in mmlu_all_sets:
         dict(
             abbr=f'lukaemon_mmlu_{_name}',
             type=MMLUDataset,
-            path='opencompass/mmlu' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/mmlu/',
+            path=get_data_path('opencompass/mmlu', './data/mmlu/'),
             name=_name,
             reader_cfg=mmlu_reader_cfg,
             infer_cfg=mmlu_infer_cfg,

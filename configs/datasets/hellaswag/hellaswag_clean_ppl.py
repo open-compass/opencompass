@@ -1,9 +1,11 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccContaminationEvaluator
 from opencompass.datasets import hellaswagDatasetClean as hellaswagDataset
-from os import environ
 
 hellaswag_reader_cfg = dict(
     input_columns=['ctx', 'A', 'B', 'C', 'D'],
@@ -29,7 +31,7 @@ hellaswag_datasets = [
     dict(
         abbr='hellaswag',
         type=hellaswagDataset,
-        path='opencompass/hellaswag' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/hellaswag/hellaswag.jsonl',
+        path=get_data_path('opencompass/hellaswag', './data/hellaswag/hellaswag.jsonl'),
         reader_cfg=hellaswag_reader_cfg,
         infer_cfg=hellaswag_infer_cfg,
         eval_cfg=hellaswag_eval_cfg)

@@ -146,16 +146,17 @@ unzip OpenCompassData-core-20240207.zip
 Also, use the [ModelScope](www.modelscope.cn) to load the datasets on demand.
 
 Installation:
+
 ```bash
 pip install modelscope[framework]
 export DATASET_SOURCE=ModelScope
 ```
 
 Then submit the evaluation task without downloading all the data to your local disk. Available datasets include:
+
 ```bash
 humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ceval, math, LCSTS, Xsum, winogrande, openbookqa, AGIEval, gsm8k, nq, race, siqa, mbpp, mmlu, hellaswag, ARC, BBH, xstory_cloze, summedits, GAOKAO-BENCH, OCNLI, cmnli
 ```
-
 
 Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started/installation.html).
 

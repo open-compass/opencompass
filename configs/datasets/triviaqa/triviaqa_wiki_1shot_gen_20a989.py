@@ -1,8 +1,10 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import TriviaQADataset_V2, TriviaQAEvaluator
-from os import environ
 
 
 triviaqa_datasets = []
@@ -40,7 +42,7 @@ for k in [1]:
     dict(
         type=TriviaQADataset_V2,
         abbr=f'triviaqa_wiki_{k}shot',
-        path='opencompass/trivia_qa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/triviaqa/',
+        path=get_data_path('opencompass/trivia_qa', './data/triviaqa/'),
         reader_cfg=triviaqa_reader_cfg,
         infer_cfg=triviaqa_infer_cfg,
         eval_cfg=triviaqa_eval_cfg)

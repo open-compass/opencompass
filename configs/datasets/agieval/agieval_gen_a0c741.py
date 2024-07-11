@@ -1,10 +1,12 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import AGIEvalDataset, AGIEvalEvaluator
 from opencompass.utils.text_postprocessors import first_capital_postprocess
-from os import environ
 
 agieval_reader_cfg = dict(
     input_columns=['problem_input'], output_column='label')
@@ -51,7 +53,7 @@ for name in agieval_single_choice_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset,
-            path='opencompass/agieval' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/AGIEval/data/v1/',
+            path=get_data_path('opencompass/agieval', './data/AGIEval/data/v1/'),
             name=name,
             abbr='agieval-' + name,
             setting_name='zero-shot',
@@ -75,7 +77,7 @@ for name in agieval_multiple_choices_sets + agieval_cloze_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset,
-            path='opencompass/agieval' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/AGIEval/data/v1/',
+            path=get_data_path('opencompass/agieval', './data/AGIEval/data/v1/'),
             name=name,
             abbr='agieval-' + name,
             setting_name='zero-shot',

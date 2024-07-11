@@ -1,3 +1,6 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -45,10 +48,14 @@ for _lang in langs:
         ds_column='answer',
     )
 
+    # Skip japanese due to filter rules of Modelscope
+    if environ.get('DATASET_SOURCE') == 'Modelscope' and _lang == 'japanese':
+        continue
+
     tydiqa_datasets.append(
         dict(abbr=f'tydiqa-goldp_{_lang}',
             type=TydiQADataset,
-            path='opencompass/tydiqa' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/tydiqa',
+            path=get_data_path('opencompass/tydiqa', './data/tydiqa'),
             lang=_lang,
             reader_cfg=tydiqa_reader_cfg,
             infer_cfg=tydiqa_infer_cfg,

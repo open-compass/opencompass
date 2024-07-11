@@ -1,8 +1,10 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess
-from os import environ
 
 QUERY_TEMPLATE = """
 Solve the following math problem step by step. The last line of your response should be of the form ANSWER: $ANSWER (without quotes) where $ANSWER is the answer to the problem.
@@ -31,7 +33,7 @@ math_datasets = [
     dict(
         type=MATHDataset,
         abbr='math',
-        path='opencompass/math' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/math/math.json',
+        path=get_data_path('opencompass/math', './data/math/math.json'),
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg)

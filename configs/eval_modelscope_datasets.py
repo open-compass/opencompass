@@ -1,8 +1,5 @@
 from os import environ
 environ['DATASET_SOURCE'] = 'ModelScope'
-environ['MKL_SERVICE_FORCE_INTEL'] = '1'
-environ['MKL_THREADING_LAYER'] = '1'
-environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
 from datasets import Dataset, DatasetDict
 from mmengine.config import read_base
 from tqdm import tqdm

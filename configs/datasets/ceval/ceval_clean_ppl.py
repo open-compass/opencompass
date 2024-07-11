@@ -1,3 +1,6 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from typing import List
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
@@ -5,7 +8,6 @@ from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccContaminationEvaluator
 from opencompass.datasets import CEvalDatasetClean as CEvalDataset
 
-from os import environ
 
 ceval_subject_mapping = {
     'computer_network': ['Computer Network', '计算机网络', 'STEM'],
@@ -94,7 +96,7 @@ for _split in ['val']:
         ceval_datasets.append(
             dict(
                 type=CEvalDataset,
-                path='opencompass/ceval-exam' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/ceval/formal_ceval',
+                path=get_data_path('opencompass/ceval-exam', './data/ceval/formal_ceval'),
                 name=_name,
                 abbr='ceval-' + _name if _split == 'val' else 'ceval-test-' + _name,
                 reader_cfg=dict(

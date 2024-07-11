@@ -1,10 +1,12 @@
+from mmengine.config import read_base
+with read_base():
+    from ..utils.utils import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import CEvalDataset
 from opencompass.utils.text_postprocessors import first_capital_postprocess
-from os import environ
 
 ceval_subject_mapping = {
     'computer_network': ['Computer Network', '计算机网络', 'STEM'],
@@ -92,7 +94,7 @@ for _split in ['val', 'test']:
         ceval_datasets.append(
             dict(
                 type=CEvalDataset,
-                path='opencompass/ceval-exam' if environ.get('DATASET_SOURCE') == 'ModelScope' else './data/ceval/formal_ceval',
+                path=get_data_path('opencompass/ceval-exam', './data/ceval/formal_ceval'),
                 name=_name,
                 abbr='ceval-' + _name if _split == 'val' else 'ceval-test-' +
                 _name,
