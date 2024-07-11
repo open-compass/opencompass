@@ -88,7 +88,6 @@ def reload_datasets():
         from configs.datasets.mbpp.mbpp_gen import mbpp_datasets as mbpp_v1_datasets
         from configs.datasets.mbpp.mbpp_passk_gen_830460 import mbpp_datasets as mbpp_v2_datasets
         from configs.datasets.mbpp.sanitized_mbpp_gen_830460 import sanitized_mbpp_datasets
-        from configs.datasets.nq.nq_gen import nq_datasets
         from configs.datasets.lcsts.lcsts_gen import lcsts_datasets
         from configs.datasets.math.math_gen import math_datasets
         from configs.datasets.piqa.piqa_gen import piqa_datasets as piqa_v2_datasets
@@ -242,6 +241,8 @@ def _check_data(ms_dataset: Dataset | DatasetDict,
                     assert ms_value == oc_value, f"Value mismatch in column '{col}', index {idx}: {ms_value} != {oc_value}"
                 except AssertionError as e:
                     print(f"Assertion failed for column '{col}', index {idx}")
+                    print(f"ms_data: {ms_dataset[idx]}")
+                    print(f'oc_data: {oc_dataset[idx]}')
                     print(f'ms_value: {ms_value} ({type(ms_value)})')
                     print(f'oc_value: {oc_value} ({type(oc_value)})')
                     raise e
@@ -250,5 +251,5 @@ def _check_data(ms_dataset: Dataset | DatasetDict,
 
 
 if __name__ == '__main__':
-    sample_size = 10
+    sample_size = 100
     unittest.main()
