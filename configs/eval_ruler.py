@@ -58,10 +58,10 @@ models = [
 datasets = [
     *ruler_4k_datasets,
     *ruler_8k_datasets,
-    *ruler_16k_datasets, 
+    *ruler_16k_datasets,
     # *ruler_32k_datasets,
     # *ruler_128k_datasets,
-    ]        
+    ]
 models = [*models]
 
 infer = dict(
