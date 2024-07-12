@@ -68,7 +68,7 @@ infer = dict(
 该划分器会将每个数据集划分成 `num_split` 个，然后将这些数据集均匀地分入 `num_worker` 个任务中，其中的任务数预期应该是与实际运行的 worker 数目是相同的。
 
 ![](https://github.com/user-attachments/assets/432a6738-3298-4729-8b00-a370ea5053ac)
-![](https://github.com/user-attachments/assets/606fa3ac-2a1c-4aed-9e32-f9be7e08e678)
+![](https://github.com/user-attachments/assets/07fb30fa-eb2d-4f1b-bf7d-c05ebdba518d)
 
 ```python
 from opencompass.partitioners import NumWorkerPartitioner
