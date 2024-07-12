@@ -17,7 +17,7 @@ from opencompass.utils import (build_dataset_from_cfg, build_model_from_cfg,
                                model_abbr_from_cfg, task_abbr_from_cfg)
 
 
-@TASKS.register_module(force=(__name__ == '__main__'))  # A hack for script run
+@TASKS.register_module()
 class OpenICLInferTask(BaseTask):
     """OpenICL Inference Task.
 
