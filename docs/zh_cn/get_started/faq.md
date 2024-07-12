@@ -124,5 +124,5 @@ python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to
 
 ### 如何构建自己的评测数据集
 
-客观数据集构建参见：https://github.com/open-compass/opencompass/blob/main/docs/zh_cn/advanced_guides/new_dataset.md
-主观数据集构建参见：https://github.com/open-compass/opencompass/blob/main/docs/zh_cn/advanced_guides/subjective_evaluation.md
+客观数据集构建参见：[支持新数据集](../advanced_guides/new_dataset.md)
+主观数据集构建参见：[主观评测指引](../advanced_guides/subjective_evaluation.md)

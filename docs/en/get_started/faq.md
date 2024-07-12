@@ -124,5 +124,5 @@ python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to
 
 ### How to build a new dataset?
 
-For building new objective dataset: https://github.com/open-compass/opencompass/blob/main/docs/en/advanced_guides/new_dataset.md
-For building new subjective dataset: https://github.com/open-compass/opencompass/blob/main/docs/en/advanced_guides/subjective_evaluation.md
+For building new objective dataset: [new_dataset](../advanced_guides/new_dataset.md)
+For building new subjective dataset: [subjective_evaluation](../advanced_guides/subjective_evaluation.md)
