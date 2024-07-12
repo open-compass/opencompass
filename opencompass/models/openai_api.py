@@ -506,7 +506,7 @@ class OpenAIAllesAPIN(OpenAI):
 
 
 @MODELS.register_module()
-class OpenAIExtra(OpenAI):
+class AsyncOpenAI(OpenAI):
     """
     Model wrapper around OpenAI's models with extra features.
 
@@ -542,7 +542,29 @@ class OpenAIExtra(OpenAI):
 
     def __init__(self, *args, **kwargs):
 
-        super(OpenAIExtra, self).__init__(*args, **kwargs)
+        super(AsyncOpenAI, self).__init__(*args, **kwargs)
+
+    def generate(self,
+                 inputs: List[PromptType],
+                 max_out_len: int = 512,
+                 temperature: float = 0.7,
+                 **kwargs) -> List[str]:
+
+        if self.temperature is not None:
+            temperature = self.temperature
+
+        # with ThreadPoolExecutor() as executor:
+        #     results = list(
+        #         executor.map(self._generate, inputs,
+        #                      [max_out_len] * len(inputs),
+        #                      [temperature] * len(inputs)))
+
+
+
+        # TODO
+        results = []
+
+        return results
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese
