@@ -35,6 +35,7 @@ repos:
         exclude: |
             (?x)^(
                 .*\.jsonl|
+                opencompass/datasets/subjective/mtbench101.py|
                 configs/
             )
   - repo: https://gitee.com/openmmlab/mirrors-pre-commit-hooks

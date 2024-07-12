@@ -20,16 +20,16 @@ prompts = [
 ]
 
 
-charm_reaso_summary_groups = []
+charm_reason_summary_groups = []
 for prompt in prompts:
     for region in regions:
         subsets = ['charm-reason-' + region + '_' + task + '_' + prompt for task in charm_tasks]
-        charm_reaso_summary_groups.append({'name': 'charm-reason-' + region + '_' + prompt, 'subsets': subsets})
+        charm_reason_summary_groups.append({'name': 'charm-reason-' + region + '_' + prompt, 'subsets': subsets})
 
 for prompt in prompts:
     subsets = ['charm-reason-' + region + '_' + prompt for region in regions]
-    charm_reaso_summary_groups.append({'name': 'charm-reason-' + prompt, 'subsets': subsets})
+    charm_reason_summary_groups.append({'name': 'charm-reason-' + prompt, 'subsets': subsets})
 
-charm_reaso_summary_groups.append(
+charm_reason_summary_groups.append(
     {'name': 'charm-reason-CoT', 'subsets': ['charm-reason-ZH-CoT', 'charm-reason-EN-CoT']}
 )

@@ -125,10 +125,16 @@ class AI360GPT(BaseAPIModel):
         while max_num_retries < self.retry:
             self.acquire()
             # payload = json.dumps(data)
-            raw_response = requests.request('POST',
-                                            url=self.url,
-                                            headers=self.headers,
-                                            json=data)
+            try:
+                raw_response = requests.request('POST',
+                                                url=self.url,
+                                                headers=self.headers,
+                                                json=data)
+            except Exception as e:
+                self.release()
+                print(e)
+                max_num_retries += 1
+                continue
             response = raw_response.json()
             self.release()
 

@@ -1,5 +1,10 @@
 # RACE
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets race_ppl_abed12 --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets race_gen_69ee4f --debug
+```
+
 ## Base Models
 
 |          model           |   race-high |   race-middle |

@@ -1,5 +1,10 @@
 # MMLU
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets mmlu_ppl_ac766d --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets mmlu_gen_4d595a --debug
+```
+
 ## Base Models
 
 |          model           |   mmlu |   mmlu-stem |   mmlu-social-science |   mmlu-humanities |   mmlu-other |

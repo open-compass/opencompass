@@ -1,5 +1,10 @@
 # GPQA
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets gpqa_ppl_6bf57a --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets gpqa_gen_4baadb --debug
+```
+
 ## Base Models
 
 |          model           |   GPQA_diamond |

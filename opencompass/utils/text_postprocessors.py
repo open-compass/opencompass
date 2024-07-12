@@ -102,13 +102,12 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'^选项\s?([{options}])',
         f'^([{options}])\s?选?项',
         f'(\s|^)[{options}][\s。，,：:\.$]',
-        f'(\s|^)[{options}](\s|$)',
         f'1.\s?(.*?)$',
         f'1.\s?([{options}])[.。$]?$',
     ]
     cushion_patterns = [
         f'([{options}]):',
-        f'[{options}]',
+        f'([{options}])',
     ]
     # flake8: noqa
     # yapf: enable

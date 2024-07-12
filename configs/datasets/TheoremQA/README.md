@@ -1,5 +1,10 @@
 # TheoremQA
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets TheoremQA_5shot_gen_6f0af8 --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets TheoremQA_5shot_gen_6f0af8 --debug
+```
+
 ## Base Models
 
 |          model           |   TheoremQA |

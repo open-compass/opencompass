@@ -104,14 +104,23 @@ class SenseTime(BaseAPIModel):
             messages = [{'role': 'user', 'content': input}]
         else:
             messages = []
+            msg_buffer, last_role = [], None
             for item in input:
-                msg = {'content': item['prompt']}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
-
-                messages.append(msg)
+                if not item['prompt']:
+                    continue
+                item['role'] = 'assistant' if item['role'] == 'BOT' else 'user'
+                if item['role'] != last_role and last_role is not None:
+                    messages.append({
+                        'content': '\n'.join(msg_buffer),
+                        'role': last_role
+                    })
+                    msg_buffer = []
+                msg_buffer.append(item['prompt'])
+                last_role = item['role']
+            messages.append({
+                'content': '\n'.join(msg_buffer),
+                'role': last_role
+            })
 
         data = {'messages': messages, 'model': self.model}
         if self.params is not None:
@@ -157,6 +166,9 @@ class SenseTime(BaseAPIModel):
                         return 'error:too long'
                     else:
                         print(raw_response.text)
+                        from IPython import embed
+                        embed()
+                        exit()
                         time.sleep(1)
                         continue
             else:
@@ -198,7 +210,4 @@ class SenseTime(BaseAPIModel):
                     time.sleep(1)
                     continue
 
-        return ''
-        raise RuntimeError(
-            f'request id: '
-            f'{raw_response.headers.get("X-Request-Id")}, {raw_response.text}')
+        raise RuntimeError

@@ -1,5 +1,10 @@
 # GSM8K
 
+```bash
+python3 run.py --models hf_internlm2_7b --datasets gsm8k_gen_17d0dc --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets gsm8k_gen_1d7fe4 --debug
+```
+
 ## Base Models
 
 |          model           |   gsm8k |
