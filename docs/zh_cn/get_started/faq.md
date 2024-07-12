@@ -119,3 +119,10 @@ OpenCompass 中的每个任务代表等待评估的特定模型和数据集部�
 ```bash
 python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to/model
 ```
+
+## 数据集
+
+### 如何构建自己的评测数据集
+
+- 客观数据集构建参见：[支持新数据集](../advanced_guides/new_dataset.md)
+- 主观数据集构建参见：[主观评测指引](../advanced_guides/subjective_evaluation.md)
