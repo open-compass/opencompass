@@ -1,6 +1,6 @@
 """Sliding Window Retriever."""
 
-from typing import List, Optional
+from typing import Optional
 
 from tqdm import trange
 
@@ -17,16 +17,21 @@ class SlidingWindowRetriever(BaseRetriever):
     retrieved based on a sliding window from the index set.
 
     Args:
-        dataset (`BaseDataset`): Any BaseDataset instances.
+        dataset (`BaseDataset`):
+            Any BaseDataset instances.
             Attributes of ``reader``, ``train`` and ``test`` will be used.
-        k (int): The number of in-context examples to retrieve for each test prompt.
-        ice_separator (`Optional[str]`): The separator between each in-context
+        k (int):
+            The number of in-context examples to retrieve for each test prompt.
+        ice_separator (`Optional[str]`):
+            The separator between each in-context
             example template when origin `PromptTemplate` is provided. Defaults
             to '\n'.
-        ice_eos_token (`Optional[str]`): The end of sentence token for
+        ice_eos_token (`Optional[str]`):
+            The end of sentence token for
             in-context example template when origin `PromptTemplate` is
             provided. Defaults to '\n'.
-        ice_num (`Optional[int]`): The number of in-context example template
+        ice_num (`Optional[int]`):
+            The number of in-context example template
             when origin `PromptTemplate` is provided. Defaults to 1.
     """
 
@@ -43,16 +48,20 @@ class SlidingWindowRetriever(BaseRetriever):
         """Retrieve the in-context example index for each test example."""
         num_idx = len(self.index_ds)
         rtr_idx_list = []
-        for current_index in trange(len(self.test_ds), disable=not self.is_main_process):
+        for current_index in trange(len(self.test_ds),
+                                    disable=not self.is_main_process):
             if current_index < self.k:
-                # For the first few examples, get the previous ones and pad with the last ones
+                """For the first few examples,
+                get the previous ones and pad with the last ones"""
                 start_index = max(0, current_index - self.k)
                 previous_shots = list(range(start_index, current_index))
                 if len(previous_shots) < self.k:
                     pad_needed = self.k - len(previous_shots)
-                    previous_shots = list(range(num_idx - pad_needed, num_idx)) + previous_shots
+                    previous_shots = list(range(num_idx - pad_needed,
+                                                num_idx)) + previous_shots
             else:
                 # For other examples, retrieve the previous k examples
-                previous_shots = list(range(current_index - self.k, current_index))
+                previous_shots = list(
+                    range(current_index - self.k, current_index))
             rtr_idx_list.append(previous_shots)
         return rtr_idx_list
