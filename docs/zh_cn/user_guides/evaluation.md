@@ -55,6 +55,9 @@ infer = dict(
 
 ```{warning}
 该划分器目前不适用于评测阶段的任务（`OpenICLEvalTask`）。
+```
+
+```{note}
 该划分器是目前推理阶段默认使用的划分器。
 ```
 
