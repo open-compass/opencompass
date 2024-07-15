@@ -10,43 +10,48 @@ subjective_reader_cfg = dict(
     output_column='judge',
     )
 
-data_path ='/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/crbbenchv2.jsonl'
 
+# data_path = '/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/crbbenchv3.jsonl'
+data_paths = ['/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/crbbenchv3.jsonl',
+'/mnt/petrelfs/zhangchuyu/reasoning/compasssak/testset/cn_arena_sampled_out.jsonl',
+'/mnt/petrelfs/zhangchuyu/reasoning/compasssak/testset/cn_arena_sampled_inter.jsonl']
+
+abbrs = ['crbbench', 'cn_crbbench_out', 'cn_crbbench_inter']
 subjective_datasets = []
 
-# the question is a list, how to process it
-subjective_infer_cfg = dict(
-        prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(round=[
-                    dict(
-                        role='HUMAN',
-                        prompt='{question}'
-                    ),
-                ])
+for data_path, abbr in zip(data_paths, abbrs):
+    subjective_infer_cfg = dict(
+            prompt_template=dict(
+                type=PromptTemplate,
+                template=dict(round=[
+                        dict(
+                            role='HUMAN',
+                            prompt='{question}'
+                        ),
+                    ]),
+                ),
+            retriever=dict(type=ZeroRetriever),
+            inferencer=dict(type=GenInferencer, max_seq_len=4096, max_out_len=4096),
+        )
+
+    subjective_eval_cfg = dict(
+        evaluator=dict(
+            type=LMEvaluator,
+            prompt_template=dict(
+                type=PromptTemplate,
+                template="""{prompt}"""
+            ),
         ),
-        retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_seq_len=4096, max_out_len=4096),
+        pred_role='BOT',
     )
 
-subjective_eval_cfg = dict(
-    evaluator=dict(
-        type=LMEvaluator,
-        prompt_template=dict(
-            type=PromptTemplate,
-            template="""{prompt}"""
-        ),
-    ),
-    pred_role='BOT',
-)
-
-subjective_datasets.append(
-    dict(
-        abbr='crbbench',
-        type=CRBDataset,
-        path=data_path,
-        mode='single',
-        reader_cfg=subjective_reader_cfg,
-        infer_cfg=subjective_infer_cfg,
-        eval_cfg=subjective_eval_cfg
-    ))
+    subjective_datasets.append(
+        dict(
+            abbr=abbr,
+            type=CRBDataset,
+            path=data_path,
+            mode='single',
+            reader_cfg=subjective_reader_cfg,
+            infer_cfg=subjective_infer_cfg,
+            eval_cfg=subjective_eval_cfg
+        ))
