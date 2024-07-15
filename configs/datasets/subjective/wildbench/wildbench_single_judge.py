@@ -10,7 +10,7 @@ subjective_reader_cfg = dict(
     output_column='judge',
     )
 
-data_path ='/mnt/petrelfs/zhangchuyu/project/WildBench/wildbench/wildbench.jsonl'
+data_path ='./data/WildBench/wildbench.jsonl'
 
 subjective_datasets = []
 
