@@ -228,10 +228,11 @@ class HuggingFacewithChatTemplate(BaseModel):
 
 
     def get_ppl_tokenwise(self, inputs: List[str], label: List[List[int]], mask_length: Optional[List[int]] = None) -> List[float]:
-        """Get perplexity scores given a list of inputs.
+        """Get inference-ppl per token given a list of inputs and label.
 
         Args:
             inputs (List[str]): A list of strings.
+            label (List[List[int]]): A list of list of label, each label is a tuple of (start, end, 1)
             mask_length (Optional[List[int]]): A list of mask lengths. If
                 provided, the perplexity scores will be calculated with the
                 first mask_length[i] tokens masked out. It's okay to skip
@@ -255,11 +256,8 @@ class HuggingFacewithChatTemplate(BaseModel):
             max_length=self.max_seq_len,
         )
 
-        self.tokenizer.padding_side = "right"
-        self.tokenizer.truncation_side = "right"
-        
-        # get the bos token
-        bos_token = self.tokenizer.bos_token
+        self.tokenizer.padding_side = 'right'
+        self.tokenizer.truncation_side = 'right'
 
         tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
 
@@ -289,10 +287,11 @@ class HuggingFacewithChatTemplate(BaseModel):
 
         decode_messages = [[self.tokenizer.decode([input_id]) for input_id in token] for token in tokens['input_ids']]
         char_messages = [[ch for ch in message] for message in messages]
-        # if bos_token is not None:
+
+        # shifted to align label and loss
         for i in range(len(decode_messages)):
             decode_messages[i] = decode_messages[i][1:]
-    
+
         aggregated_label_list = [[] for _ in range(len(decode_messages))]
 
         tag_list = [[] for _ in range(len(decode_messages))]
@@ -303,8 +302,8 @@ class HuggingFacewithChatTemplate(BaseModel):
                 right = single_label[1]
                 for i in range(left, right):
                     aggregated_label_list[tmp_index].append(i)
-            
-        
+
+
         def align_sequences(seq1, seq2, sep_len):
             """
             seq1: decoded sequence from token, one token may contain multiple characters
@@ -344,30 +343,19 @@ class HuggingFacewithChatTemplate(BaseModel):
                         j += 1
                 i += 1
 
-            # try:
-            #     assert len(matched_pairs) == len(seq1)
-            # except AssertionError:
-            #     print("seq1:")
-            #     for item in seq1:
-            #         print(item)
-            #     print("\nmatched_pairs:")
-            #     for item in matched_pairs:
-            #         print(item)
-            #     raise AssertionError
-
             return matched_pairs
 
 
 
-        if "qwen" in self.path or "Qwen" in self.path:
+        if 'qwen' in self.path or 'Qwen' in self.path:
             sep_len = 2
-        elif "Llama-3" in self.path:
+        elif 'Llama-3' in self.path:
             sep_len = 2
-        elif "Yi" in self.path:
+        elif 'Yi' in self.path:
             sep_len = 3
-        elif "Llama-2" in self.path:
+        elif 'Llama-2' in self.path:
             sep_len = 3
-        elif "deepseek" in self.path:
+        elif 'deepseek' in self.path:
             sep_len = 2
         else:
             sep_len = 3
@@ -376,12 +364,10 @@ class HuggingFacewithChatTemplate(BaseModel):
         matched_pairs_list = [align_sequences(decode_messages[i], char_messages[i], sep_len) for i in range(len(decode_messages))]
         for match_index, matched_pairs in enumerate(matched_pairs_list):
             for i, (word, indices) in enumerate(matched_pairs):
-                    for j in indices:
-                        if j in aggregated_label_list[match_index]:
-                            tag_list[match_index].append(i)
-                            break
-                            
-        # print(tag_list)
+                for j in indices:
+                    if j in aggregated_label_list[match_index]:
+                        tag_list[match_index].append(i)
+                        break
 
         inference_loss_list = []
         token_len_list = []
@@ -390,15 +376,13 @@ class HuggingFacewithChatTemplate(BaseModel):
             token_len = 0
             for j in range(len(loss[i])):
                 if j in tag_list[i]:
-                    
+
                     inference_loss += loss[i][j]
                     print(loss[i][j])
                     token_len += 1
             inference_loss_list.append(inference_loss)
             token_len_list.append(token_len)
 
-        # print(inference_loss_list)
-    
         return inference_loss_list, token_len_list
 
     def _get_potential_stop_words(self, path: Optional[str]):
@@ -611,7 +595,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
 
         ce_loss = loss.float().sum(-1).cpu().detach().numpy() / lens
         return ce_loss
-    
+
     def get_loglikelihood(self, inputs: List[str], conts:  List[str]) -> List[float]:
         mask_length = [self.get_token_len(c, add_special_tokens=False) for c in conts]
         return - self.get_ppl(inputs, mask_length)

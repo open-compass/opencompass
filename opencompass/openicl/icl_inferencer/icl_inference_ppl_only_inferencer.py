@@ -20,8 +20,9 @@ logger = get_logger(__name__)
 
 @ICL_INFERENCERS.register_module()
 class InferencePPLOnlyInferencer(BaseInferencer):
-    """PPLOnlyInferencer class to calculate PPL and PPL only, no choice is
-    made. This Inferencer is usually used along with AveragePPLEvaluator.
+    """InferencePPLOnlyInferencer class to calculate Inference-PPL only, no
+    choice is made. This Inferencer is usually used along with
+    AverageInferencePPLEvaluator.
 
     Attributes:
         model (:obj:`BaseModel`, optional): The module to inference.
@@ -73,20 +74,23 @@ class InferencePPLOnlyInferencer(BaseInferencer):
         ice_idx_list = retriever.retrieve()
 
         # 3. Generate prompts for testing input
-        prompt_list, label_list = self.get_generation_prompt_list_and_label_from_retriever_indices(
+        prompt_list, label_list = self.get_generation_prompt_list_and_label(
             ice_idx_list,
             retriever,
             max_seq_len=self.max_seq_len,
             ice_template=ice_template,
             prompt_template=prompt_template)
-        
-        prompt_list = [{"prompt": prompt, "label": label} for prompt, label in zip(prompt_list, label_list)]
-        
+
+        prompt_list = [{
+            'prompt': prompt,
+            'label': label
+        } for prompt, label in zip(prompt_list, label_list)]
+
         # 3.1 Fetch and zip prompt & gold answer if output column exists
         ds_reader = retriever.dataset_reader
 
         assert ds_reader.output_column is None, (
-            'PPLOnlyInferencer supports `output_column=None` only.')
+            'InferencePPLOnlyInferencer supports `output_column=None` only.')
 
         # Create tmp json file for saving intermediate results and future
         # resuming
@@ -114,12 +118,16 @@ class InferencePPLOnlyInferencer(BaseInferencer):
 
             # 5-1. Inference with local model
             with torch.no_grad():
-                inference_loss_list, token_len_list = self.model.get_ppl_tokenwise_from_template(entry, label)
+                (inference_loss_list,
+                 token_len_list) = self.model.get_ppl_tokenwise_from_template(
+                     entry, label)
 
             parsed_entries = self.model.parse_template(entry, mode='gen')
             # 5-3. Save current output
-            for prompt, inference_loss, token_len, in zip(parsed_entries, inference_loss_list, token_len_list):
-                output_handler.save_results(prompt, inference_loss, token_len, index)
+            for prompt, inference_loss, token_len, in zip(
+                    parsed_entries, inference_loss_list, token_len_list):
+                output_handler.save_results(prompt, inference_loss, token_len,
+                                            index)
                 index = index + 1
 
             # 5-4. Save intermediate results
@@ -156,7 +164,7 @@ class InferencePPLOnlyInferencer(BaseInferencer):
                 ice,
                 ice_template=ice_template,
                 prompt_template=prompt_template)
-            
+
             if max_seq_len is not None:
                 prompt_token_num = self.model.get_token_len_from_template(
                     prompt, mode='gen')
@@ -174,7 +182,7 @@ class InferencePPLOnlyInferencer(BaseInferencer):
             prompt_list.append(prompt)
         return prompt_list
 
-    def get_generation_prompt_list_and_label_from_retriever_indices(
+    def get_generation_prompt_list_and_label(
             self,
             ice_idx_list: List[List[int]],
             retriever: BaseRetriever,
@@ -186,12 +194,12 @@ class InferencePPLOnlyInferencer(BaseInferencer):
         for idx, ice_idx in enumerate(ice_idx_list):
             ice = retriever.generate_ice(ice_idx, ice_template=ice_template)
 
-            prompt, label = retriever.generate_prompt_and_label_for_generate_task(
+            prompt, label = retriever.generate_prompt_and_label_for_generate_task(  # noqa
                 idx,
                 ice,
                 ice_template=ice_template,
                 prompt_template=prompt_template)
-            
+
             if max_seq_len is not None:
                 prompt_token_num = self.model.get_token_len_from_template(
                     prompt, mode='gen')
@@ -199,7 +207,7 @@ class InferencePPLOnlyInferencer(BaseInferencer):
                     ice_idx = ice_idx[:-1]
                     ice = retriever.generate_ice(ice_idx,
                                                  ice_template=ice_template)
-                    prompt, label = retriever.generate_prompt_for_generate_task(
+                    prompt, label = retriever.generate_prompt_for_generate_task(  # noqa
                         idx,
                         ice,
                         ice_template=ice_template,
