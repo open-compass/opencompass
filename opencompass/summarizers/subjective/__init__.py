@@ -6,6 +6,7 @@ from .arenahard import ArenaHardSummarizer
 from .compass_arena import CompassArenaSummarizer
 from .compassbench import CompassBenchSummarizer
 from .corev2 import Corev2Summarizer
+from .crb import CRBBenchPairSummarizer, CRBBenchSingleSummarizer
 from .creationbench import CreationBenchSummarizer
 from .flames import FlamesSummarizer
 from .fofo import FofoSummarizer

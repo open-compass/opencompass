@@ -168,7 +168,7 @@ eval = dict(
         task=dict(
             type=SubjectiveEvalTask
         )),
-    given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/WildBench/gpt4'},
+    given_pred = [{'abbr': 'gpt4-turbo', 'path':'./data/WildBench/gpt4'},
                   {'abbr': 'llama-2-70b-chat-hf', 'path':'./data/WildBench/llama2-70b'},
                   {'abbr': 'HaiKu', 'path':'./data/WildBench/claude'},
                   {'abbr': 'llama-2-70b-chat-turbomind', 'path':'./data/WildBench/llama2-70b'},
