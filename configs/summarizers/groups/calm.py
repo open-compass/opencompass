@@ -1,30 +1,3 @@
-
-## ori results
-# calm_PCD-C_E-CARE_EN_basic                685f2e     Accuracy                             gen                                0.71
-# calm_PCD-C_E-CARE_EN_basic                685f2e     Same response to all questions       gen                                0.00
-# calm_PCD-C_E-CARE_EN_basic                685f2e     Language inconsistency               gen                                0.00
-# calm_PCD-C_E-CARE_EN_basic                685f2e     Limitation of instruction-following  gen                                1.00
-# calm_PCD-C_E-CARE_EN_basic                685f2e     Repetition                           gen                                0.00
-# calm_PCD-C_E-CARE_EN_basic                685f2e     Empty response                       gen                                0.00
-# calm_PCD-C_E-CARE_CN_basic-CN             685f2e     Accuracy                             gen                                0.62
-# calm_PCD-C_E-CARE_CN_basic-CN             685f2e     Same response to all questions       gen                                0.00
-# calm_PCD-C_E-CARE_CN_basic-CN             685f2e     Language inconsistency               gen                                0.38
-# calm_PCD-C_E-CARE_CN_basic-CN             685f2e     Limitation of instruction-following  gen                                1.00
-# calm_PCD-C_E-CARE_CN_basic-CN             685f2e     Repetition                           gen                                0.03
-# calm_PCD-C_E-CARE_CN_basic-CN             685f2e     Empty response                       gen                                0.00
-# calm_NDE-P_NDE-basic_EN_basic             685f2e     Accuracy                             gen                                0.25
-# calm_NDE-P_NDE-basic_EN_basic             685f2e     Same response to all questions       gen                                0.00
-# calm_NDE-P_NDE-basic_EN_basic             685f2e     Language inconsistency               gen                                0.00
-# calm_NDE-P_NDE-basic_EN_basic             685f2e     Limitation of instruction-following  gen                                1.00
-# calm_NDE-P_NDE-basic_EN_basic             685f2e     Repetition                           gen                                0.00
-# calm_NDE-P_NDE-basic_EN_basic             685f2e     Empty response                       gen                                0.00
-# calm_NDE-P_NDE-basic_CN_basic-CN          685f2e     Accuracy                             gen                                0.33
-# calm_NDE-P_NDE-basic_CN_basic-CN          685f2e     Same response to all questions       gen                                0.00
-# calm_NDE-P_NDE-basic_CN_basic-CN          685f2e     Language inconsistency               gen                                1.00
-# calm_NDE-P_NDE-basic_CN_basic-CN          685f2e     Limitation of instruction-following  gen                                1.00
-# calm_NDE-P_NDE-basic_CN_basic-CN          685f2e     Repetition                           gen                                0.00
-# calm_NDE-P_NDE-basic_CN_basic-CN          685f2e     Empty response                       gen                                0.00
-
 task_hiearchy_dict = {
     # association/
         # correlation/
