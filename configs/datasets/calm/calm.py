@@ -149,7 +149,7 @@ for _name in calm_all_sets:
                 task=_task_name))
         calm_datasets.append(
             dict(
-                abbr=f'calm_{_task_name}_{_prompt_style}',
+                abbr=f'calm_{_task_name}',
                 type=CaLMDataset,
                 path=_path,
                 prompt_style=_prompt_style,
