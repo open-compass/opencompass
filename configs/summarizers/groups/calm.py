@@ -125,6 +125,8 @@ error_dict = {"Same response to all questions":[],
 
 for error in error_dict:
     for key in dict_keys:
+        if "CEG-O_E-CARE" in key:
+            continue
         error_dict[error].append([f"calm_{key}", error])
 
 English_avg = []
