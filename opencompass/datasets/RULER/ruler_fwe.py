@@ -4,9 +4,9 @@ import string
 
 import numpy as np
 import tiktoken
-from transformers import AutoTokenizer
 from datasets import Dataset
 from scipy.special import zeta
+from transformers import AutoTokenizer
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
@@ -31,7 +31,7 @@ class RulerFweDataset(BaseDataset):
         vocab_size: int = -1,
     ) -> Dataset:
 
-        if tokenizer_model == "gpt-4":
+        if tokenizer_model == 'gpt-4':
             tokenizer = tiktoken.encoding_for_model(tokenizer_model)
         else:
             tokenizer = AutoTokenizer.from_pretrained(tokenizer_model)
@@ -141,16 +141,10 @@ class RulerFweDataset(BaseDataset):
 class RulerFweEvaluator(BaseEvaluator):
 
     def score(self, predictions, gold):
-        score = (
-            sum(
-                [
-                    sum([1.0 if r.lower() in pred.lower() else 0.0 for r in ref])
-                    / len(ref)
-                    for pred, ref in zip(predictions, gold)
-                ]
-            )
-            / len(predictions)
-            * 100
-        )
+        score = (sum([
+            sum([1.0 if r.lower() in pred.lower() else 0.0
+                 for r in ref]) / len(ref)
+            for pred, ref in zip(predictions, gold)
+        ]) / len(predictions) * 100)
         result = {'score': round(score, 2)}
         return result

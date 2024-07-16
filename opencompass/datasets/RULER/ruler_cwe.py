@@ -3,9 +3,9 @@ import random
 
 import numpy as np
 import tiktoken
-from transformers import AutoTokenizer
 import wonderwords
 from datasets import Dataset
+from transformers import AutoTokenizer
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
@@ -30,7 +30,7 @@ class RulerCweDataset(BaseDataset):
         remove_newline_tab: str = '',
     ) -> Dataset:
 
-        if tokenizer_model == "gpt-4":
+        if tokenizer_model == 'gpt-4':
             tokenizer = tiktoken.encoding_for_model(tokenizer_model)
         else:
             tokenizer = AutoTokenizer.from_pretrained(tokenizer_model)
@@ -158,16 +158,10 @@ class RulerCweDataset(BaseDataset):
 class RulerCweEvaluator(BaseEvaluator):
 
     def score(self, predictions, gold):
-        score = (
-            sum(
-                [
-                    sum([1.0 if r.lower() in pred.lower() else 0.0 for r in ref])
-                    / len(ref)
-                    for pred, ref in zip(predictions, gold)
-                ]
-            )
-            / len(predictions)
-            * 100
-        )
+        score = (sum([
+            sum([1.0 if r.lower() in pred.lower() else 0.0
+                 for r in ref]) / len(ref)
+            for pred, ref in zip(predictions, gold)
+        ]) / len(predictions) * 100)
         result = {'score': round(score, 2)}
         return result
