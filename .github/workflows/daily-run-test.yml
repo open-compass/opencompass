@@ -71,10 +71,24 @@ jobs:
           python3 run.py .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
           cp -r /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary regression_result_daily
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
+      - name:  Run command testcase
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate ${{env.CONDA_ENV}}
+          conda info --envs
+          rm -rf regression_result_daily
+          export from_tf=TRUE
+          rm -rf /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary
+          python tools/list_configs.py internlm2_5 mmlu
+          python run.py --models hf_internlm2_5_7b --datasets mmlu_ppl ceval_ppl --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
+          python run.py --models hf_internlm2_5_7b --datasets mmlu_ppl ceval_ppl -a lmdeploy --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
+          python run.py --models hf_internlm2_5_7b --datasets mmlu_ppl ceval_ppl -a vllm --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
+          python run.py --datasets ceval_ppl mmlu_ppl --hf-type base --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
+          cp -r /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary regression_result_daily
       - name:  Remove Conda Env
         if: always()
         run: |
-          cp -r regression_result_daily/* /cpfs01/user/qa-llm-cicd/report
+          rm -rf regression_result_daily
           eval "$(conda shell.bash hook)"
           conda env remove -y --name ${{env.CONDA_ENV}}
           conda info --envs
