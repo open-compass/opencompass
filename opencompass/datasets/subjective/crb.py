@@ -168,7 +168,7 @@ format by filling in the placeholders in []:
 @LOAD_DATASET.register_module()
 class CRBDataset(BaseDataset):
 
-    def load(self, path: str, mode='pair'):
+    def load(self, path: str, eval_mode='pair', *args, **kwargs):
         dataset = DatasetDict()
         raw_data = []
         with open(path, 'r', encoding='utf-8') as file:
@@ -179,13 +179,13 @@ class CRBDataset(BaseDataset):
                 for checklist_item in item['checklist']:
                     checklist_mardkdown += f'- {checklist_item}\n'
 
-                if mode == 'single':
+                if eval_mode == 'single':
                     prompt = score_prompt
-                elif mode == 'pair':
+                elif eval_mode == 'pair':
                     prompt = pair_prompt
                 else:
                     assert NotImplementedError(
-                        f'Mode {mode} not in single or pair.')
+                        f'eval_mode {eval_mode} not in single or pair.')
 
                 prompt = prompt.replace('{user_query}', item['question'])
                 prompt = prompt.replace('{checklist}', checklist_mardkdown)

@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import ChatInferencer, GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import CRBDataset
+from opencompass.summarizers import CRBBenchPairSummarizer
 
 
 subjective_reader_cfg = dict(
@@ -18,6 +19,21 @@ data_paths = ['/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/crbbenchv3.json
 
 abbrs = ['crbbench', 'cn_crbbench_out', 'cn_crbbench_inter']
 subjective_datasets = []
+gpt4 = [dict(
+    abbr='gpt-4o',
+)]
+
+# gpt4 = [dict(
+#     abbr='gpt-4o',
+#     type=OpenAI,
+#     path='gpt-4-1106-preview', # To compare with the official leaderboard, please use gpt4-0613
+#     meta_template=api_meta_template,
+#     query_per_second=16,
+#     max_out_len=4096,
+#     max_seq_len=4096,
+#     batch_size=8,
+#     temperature=0,
+# )]
 
 for data_path, abbr in zip(data_paths, abbrs):
     subjective_infer_cfg = dict(
@@ -50,8 +66,12 @@ for data_path, abbr in zip(data_paths, abbrs):
             abbr=abbr,
             type=CRBDataset,
             path=data_path,
-            mode='pair',
+            eval_mode='pair',
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
-            eval_cfg=subjective_eval_cfg
+            eval_cfg=subjective_eval_cfg,
+            mode='m2n',
+            infer_order='random',
+            base_models=gpt4,
+            given_pred = [{'abbr': 'gpt-4o', 'path':'/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/gpt_4o'}]
         ))

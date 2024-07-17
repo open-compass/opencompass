@@ -133,9 +133,8 @@ class CRBBenchPairSummarizer(CompassArenaSummarizer):
     def __init__(self, config: ConfigDict, check_pos_bias=False) -> None:
         self.tasks = []
         self.cfg = config
-
-        self.base_models = self.cfg['eval']['partitioner']['base_models']
-        self.compare_models = self.cfg['eval']['partitioner']['compare_models']
+        self.base_models = self.cfg['datasets'][0]['base_models']
+        self.compare_models = self.cfg['eval']['partitioner']['models']
         self.judge_models = self.cfg.get('judge_models', None)
         self.meta_judge_model = self.cfg.eval.partitioner.get('meta_judge_model', None)
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
