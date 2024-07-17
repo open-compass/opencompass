@@ -35,7 +35,7 @@ class RulerQaDataset(BaseDataset):
         if tokenizer_model == 'gpt-4':
             tokenizer = tiktoken.encoding_for_model(tokenizer_model)
         else:
-            tokenizer = AutoTokenizer.from_pretrained(tokenizer_model)
+            tokenizer = AutoTokenizer.from_pretrained(tokenizer_model, trust_remote_code=True)
 
         random.seed(random_seed)
         np.random.seed(random_seed)
