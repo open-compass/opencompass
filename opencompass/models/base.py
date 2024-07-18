@@ -84,11 +84,12 @@ class BaseModel:
         raise NotImplementedError(f'{self.__class__.__name__} does not support'
                                   ' ppl-based evaluation yet, try gen-based '
                                   'instead.')
-    
+
     @abstractmethod
-    def get_ppl_tokenwise(self,
-                inputs: List[str],
-                mask_length: Optional[List[int]] = None) -> List[float]:
+    def get_ppl_tokenwise(
+            self,
+            inputs: List[str],
+            mask_length: Optional[List[int]] = None) -> List[float]:
         """Get tokenwise perplexity scores given a list of inputs.
 
         Args:
@@ -171,11 +172,11 @@ class BaseModel:
         """
         inputs = self.parse_template(templates, mode='ppl')
         return self.get_ppl(inputs, mask_length)
-    
+
     def get_ppl_tokenwise_from_template(self,
-                              templates: List[PromptType],
-                              label: List[List[int]],
-                              mask_length=None):
+                                        templates: List[PromptType],
+                                        label: List[List[int]],
+                                        mask_length=None):
         """Get token-wise perplexity given a list of templates.
 
         Args:
