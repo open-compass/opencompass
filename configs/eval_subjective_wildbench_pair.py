@@ -34,12 +34,6 @@ api_meta_template = dict(
     ]
 )
 
-# _meta_template = dict(
-#     round=[
-#         dict(role='HUMAN', begin='\n<|im_start|>user\n', end='<|im_end|>'),
-#         dict(role='BOT', begin='\n<|im_start|>assistant\n', end='<|im_end|>', generate=True),
-#     ],
-# )
 # -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
 
@@ -61,38 +55,13 @@ models = [
         batch_size=8,
         run_cfg=dict(num_gpus=1),
     ),
-    dict(
-        type=HuggingFacewithChatTemplate,
-        abbr='qwen1.5-7b-chat-hf',
-        path='Qwen/Qwen1.5-7B-Chat',
-        max_out_len=4096,
-        batch_size=8,
-        run_cfg=dict(num_gpus=1),
-    ),
     # dict(
     #     type=HuggingFacewithChatTemplate,
-    #     abbr='llama-3-70b-instruct-hf',
-    #     path='meta-llama/Meta-Llama-3-70B-Instruct',
+    #     abbr='qwen1.5-7b-chat-hf',
+    #     path='Qwen/Qwen1.5-7B-Chat',
     #     max_out_len=4096,
     #     batch_size=8,
-    #     run_cfg=dict(num_gpus=4),
-    #     stop_words=['<|end_of_text|>', '<|eot_id|>'],
-    # ),
-    #     dict(
-    #     type=HuggingFacewithChatTemplate,
-    #     abbr='yi-1.5-34b-chat-hf',
-    #     path='01-ai/Yi-1.5-34B-Chat',
-    #     max_out_len=4096,
-    #     batch_size=8,
-    #     run_cfg=dict(num_gpus=2),
-    # ),
-    # dict(
-    #     type=HuggingFacewithChatTemplate,
-    #     abbr='qwen1.5-72b-chat-hf',
-    #     path='Qwen/Qwen1.5-72B-Chat',
-    #     max_out_len=4096,
-    #     batch_size=8,
-    #     run_cfg=dict(num_gpus=8),
+    #     run_cfg=dict(num_gpus=1),
     # )
 ]
 
@@ -105,7 +74,6 @@ judge_models = [dict(
     abbr='GPT4-Turbo',
     type=OpenAI,
     path='gpt-4-0613', # To compare with the official leaderboard, please use gpt4-0613
-    key='xxxx',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
     meta_template=api_meta_template,
     query_per_second=16,
     max_out_len=2048,
@@ -114,27 +82,6 @@ judge_models = [dict(
     temperature=0,
 )]
 
-gpt4 = dict(
-    abbr='gpt4-turbo',
-    type=OpenAI,
-    path='gpt-4-0409-preview',
-    key='',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
-    meta_template=api_meta_template,
-    query_per_second=1,
-    max_out_len=2048,
-    max_seq_len=4096,
-    batch_size=4,
-    retry=20,
-    temperature=1,
-)  # Re-inference gpt4's predictions or you can choose to use the pre-commited gpt4's predictions
-
-claude = dict(abbr='HaiKu',
-        type=Claude,
-        path='claude-2',
-        key='YOUR_CLAUDE_KEY',
-        query_per_second=1,
-        max_out_len=2048, max_seq_len=2048, batch_size=2,
-    )
 ## single evaluation
 # eval = dict(
 #     partitioner=dict(type=SubjectiveSizePartitioner, strategy='split', max_task_size=10000, mode='singlescore', models=models, judge_models=judge_models),
@@ -153,26 +100,14 @@ infer = dict(
 eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
-        mode='m2n', # m个模型 与 n个模型进行对战
-        infer_order='random',
-        #  在m2n模式下，需要指定base_models和compare_models，将会对base_models和compare_models生成对应的两两pair（去重且不会与自身进行比较）
-        base_models = [*llama2_models, gpt4, claude], # 用于对比的基线模型
-        compare_models = models, # 待评测模型
         judge_models=judge_models
     ),
     runner=dict(
         type=LocalRunner,
-        # partition='llmeval',
-        # quotatype='auto',
         max_num_workers=3,
         task=dict(
             type=SubjectiveEvalTask
         )),
-    given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/WildBench/gpt4'},
-                  {'abbr': 'llama-2-70b-chat-hf', 'path':'./data/WildBench/llama2-70b'},
-                  {'abbr': 'HaiKu', 'path':'./data/WildBench/claude'},
-                  {'abbr': 'llama-2-70b-chat-turbomind', 'path':'./data/WildBench/llama2-70b'},
-                  {'abbr': 'llama-2-70b-chat-vllm', 'path':'./data/WildBench/llama2-70b'}]
 )
 
 summarizer = dict(type=WildBenchPairSummarizer)

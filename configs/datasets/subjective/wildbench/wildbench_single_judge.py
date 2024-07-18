@@ -40,7 +40,7 @@ subjective_datasets.append(
         abbr='wildbench',
         type=WildBenchDataset,
         path=data_path,
-        mode='single',
+        eval_mode='single',
         reader_cfg=subjective_reader_cfg,
         infer_cfg=subjective_infer_cfg,
         eval_cfg=subjective_eval_cfg
