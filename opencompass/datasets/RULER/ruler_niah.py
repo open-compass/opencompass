@@ -129,7 +129,7 @@ class RulerNiahDataset(BaseDataset):
                 document_sents = text.split('. ')
                 document_sents = [
                     sentence.strip() for sentence in document_sents if sentence
-                ]  # 去除可能的空白
+                ]  # remove possible whitespace
                 insertion_positions = ([0] + sorted([
                     int(len(document_sents) * (depth / 100))
                     for depth in random.sample(DEPTHS, len(needles))
