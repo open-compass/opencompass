@@ -214,11 +214,11 @@ class BaseRetriever:
             gen_field_replace_token='',
             ice_template: Optional[PromptTemplate] = None,
             prompt_template: Optional[PromptTemplate] = None):
-        """Generate the prompt and the label info for one test example in generative evaluation
-        with `prompt_template`. If `prompt_template` is not provided, the
-        `ice_template` will be used to generate the prompt. The token
-        represented by `gen_field_replace_token` will not be replaced by the
-        generated text, or it will leaks the answer.
+        """Generate the prompt and the label info for one test example in
+        generative evaluation with `prompt_template`. If `prompt_template` is
+        not provided, the `ice_template` will be used to generate the prompt.
+        The token represented by `gen_field_replace_token` will not be replaced
+        by the generated text, or it will leaks the answer.
 
         Args:
             idx (`int`): The index of the test example.
@@ -236,7 +236,7 @@ class BaseRetriever:
                     self.test_ds[idx],
                     output_field=self.dataset_reader.output_column,
                     output_field_replace_token=gen_field_replace_token,
-                    ice_field_replace_token=ice), self.test_ds[idx]["label"]
+                    ice_field_replace_token=ice), self.test_ds[idx]['label']
             else:
                 raise NotImplementedError(
                     'ice_token of prompt_template is not provided')
@@ -246,7 +246,7 @@ class BaseRetriever:
                     self.test_ds[idx],
                     output_field=self.dataset_reader.output_column,
                     output_field_replace_token=gen_field_replace_token,
-                    ice_field_replace_token=ice), self.test_ds[idx]["label"]
+                    ice_field_replace_token=ice), self.test_ds[idx]['label']
             else:
                 raise NotImplementedError(
                     'ice_token of ice_template is not provided')
@@ -255,7 +255,7 @@ class BaseRetriever:
                 self.test_ds[idx],
                 output_field=self.dataset_reader.output_column,
                 output_field_replace_token=gen_field_replace_token,
-                ice_field_replace_token=ice), self.test_ds[idx]["label"]
+                ice_field_replace_token=ice), self.test_ds[idx]['label']
         else:
             raise NotImplementedError(
                 'Leaving prompt as empty is not supported')
