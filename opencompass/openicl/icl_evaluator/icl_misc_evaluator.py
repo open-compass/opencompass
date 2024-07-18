@@ -18,6 +18,7 @@ class AverageMinKEvaluator(BaseEvaluator):
         average_mink = sum(mink) / len(mink)
         return {'average_mink': average_mink}
 
+
 @ICL_EVALUATORS.register_module()
 class AverageInferencePPLEvaluator(BaseEvaluator):
 
