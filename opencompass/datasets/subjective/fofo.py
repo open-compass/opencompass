@@ -19,8 +19,8 @@ class FofoDataset(BaseDataset):
             json_data = json.load(f)
             for problem in json_data:
                 question = problem['instruction']
+                checklist_mardkdown = ''
                 if problem.get('checklist', None):
-                    checklist_mardkdown = ''
                     for checklist_item in problem['checklist']:
                         checklist_mardkdown += f'- {checklist_item}\n'
                 lan = 'cn' if 'cn' in name else 'en'
