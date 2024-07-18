@@ -376,7 +376,7 @@ class APITemplateParser:
         res = []
         for prompt in prompts:
             if isinstance(prompt, str):
-                raise TypeError('Mixing str without explict role is not '
+                raise TypeError('Mixing str without explicit role is not '
                                 'allowed in API models!')
             else:
                 api_role, cont = self._role2api_role(prompt, role_dict,
