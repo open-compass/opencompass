@@ -79,7 +79,8 @@ jobs:
           python run.py --models hf_internlm2_5_7b --datasets race_ppl sanitized_mbpp_gen_742f0c --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
           python run.py --models hf_internlm2_5_7b_chat --datasets race_gen sanitized_mbpp_gen_742f0c -a lmdeploy --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
           python run.py --models hf_internlm2_5_7b_chat --datasets race_gen sanitized_mbpp_gen_742f0c -a vllm --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
-          python run.py --datasets race_gen sanitized_mbpp_gen_742f0c --hf-type base --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
+          python run.py --datasets race_ppl sanitized_mbpp_gen_742f0c --hf-type base --hf-path internlm/internlm2_5-7b --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
+          python run.py --datasets race_gen sanitized_mbpp_gen_742f0c --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
           cp -r /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary regression_result_daily
       - name:  Remove Conda Env
         if: always()

@@ -134,6 +134,11 @@ internlm2-7b-turbomind:
     race-middle: 78
     race-high: 76
 
+internlm2_5-7b-chat-turbomind:
+    gsm8k: 87
+    race-middle: 92
+    race-high: 93
+
 internlm2-base-7b-turbomind:
     gsm8k: 39
     race-middle: 75
