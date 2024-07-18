@@ -28,7 +28,7 @@ class InferencePPLDataset(BaseDataset):
         samples = 'test' if samples is None else f'test[:{samples}]'
 
         data_files = {'test': filename}
-        
+
         dataset = load_dataset('json', data_files=data_files, split=samples)
 
         # Filter out empty samples
