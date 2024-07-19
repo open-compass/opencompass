@@ -5,24 +5,24 @@ from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import CompassBenchCheklistDataset
 
 subjective_reader_cfg = dict(
-    input_columns=["question", "checklist"],
-    output_column="judge",
+    input_columns=['question', 'checklist'],
+    output_column='judge',
 )
 
 subjective_all_sets = {
-    "en": [
-        "language/compass_bench_language_en_val",
-        "instruct/compass_bench_instruct_en_val",
-        "reasoning/compass_bench_reasoning_en_val",
+    'en': [
+        'language/compass_bench_language_en_val',
+        'instruct/compass_bench_instruct_en_val',
+        'reasoning/compass_bench_reasoning_en_val',
     ],
-    "cn": [
-        "language/compass_bench_language_cn_val",
-        "instruct/compass_bench_instruct_cn_val",
-        "reasoning/compass_bench_reasoning_cn_val",
+    'cn': [
+        'language/compass_bench_language_cn_val',
+        'instruct/compass_bench_instruct_cn_val',
+        'reasoning/compass_bench_reasoning_cn_val',
     ],
 }
 
-data_path = "./data/compassbench_v1_3/data"
+data_path = './data/compassbench_v1_3/data'
 
 pair_prompt_en = """# Instruction
 
@@ -182,13 +182,13 @@ pair_prompt_cn = """# 指令
 checklist_datasets = []
 gpt4 = [
     dict(
-        abbr="gpt4o",
+        abbr='gpt4o',
     )
 ]
 for lan, data_name_list in subjective_all_sets.items():
-    if lan == "en":
+    if lan == 'en':
         pair_prompt = pair_prompt_en
-    elif lan == "cn":
+    elif lan == 'cn':
         pair_prompt = pair_prompt_cn
     for _name in data_name_list:
         subjective_infer_cfg = dict(
@@ -196,7 +196,7 @@ for lan, data_name_list in subjective_all_sets.items():
                 type=PromptTemplate,
                 template=dict(
                     round=[
-                        dict(role="HUMAN", prompt="{question}"),
+                        dict(role='HUMAN', prompt='{question}'),
                     ]
                 ),
             ),
@@ -211,25 +211,25 @@ for lan, data_name_list in subjective_all_sets.items():
                     type=PromptTemplate,
                     template=dict(
                         round=[
-                            dict(role="HUMAN", prompt=pair_prompt),
+                            dict(role='HUMAN', prompt=pair_prompt),
                         ]
                     ),
                 ),
             ),
-            pred_role="BOT",
+            pred_role='BOT',
         )
 
         checklist_datasets.append(
             dict(
-                abbr=f"{_name}",
+                abbr=f'{_name}',
                 type=CompassBenchCheklistDataset,
                 path=data_path,
                 name=_name,
                 reader_cfg=subjective_reader_cfg,
                 infer_cfg=subjective_infer_cfg,
                 eval_cfg=subjective_eval_cfg,
-                mode="m2n",
-                infer_order="random",
+                mode='m2n',
+                infer_order='random',
                 base_models=gpt4,
             )
         )

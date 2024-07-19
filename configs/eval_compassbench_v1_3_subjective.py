@@ -14,8 +14,8 @@ from opencompass.models import HuggingFacewithChatTemplate
 from opencompass.models import TurboMindModelwithChatTemplate
 api_meta_template = dict(
     round=[
-        dict(role="HUMAN", api_role="HUMAN"),
-        dict(role="BOT", api_role="BOT", generate=True),
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
     ]
 )
 models = [
@@ -81,4 +81,4 @@ eval = dict(
 )
 # TODO summarizer to be implemented
 # summarizer = dict(type=SubjectiveSummarizer, function='subjective')
-work_dir = "outputs/debug_checklist/"
+work_dir = 'outputs/debug_checklist/'
