@@ -13,7 +13,6 @@ from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers.subjective.compassbench_v13 import CompassBenchSummarizer
 from opencompass.models import HuggingFacewithChatTemplate
 from opencompass.models import TurboMindModelwithChatTemplate
-
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),
@@ -60,7 +59,7 @@ models = [
         max_out_len=2048,
         batch_size=16,
         run_cfg=dict(num_gpus=1),
-    ),
+    )
 ]
 # -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
