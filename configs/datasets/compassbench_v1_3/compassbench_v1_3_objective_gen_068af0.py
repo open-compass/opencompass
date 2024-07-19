@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import CircularEvaluator, AccEvaluator
-from opencompass.datasets import DoUKnowDataset, douknow_postprocess
+from opencompass.datasets.compassbench_obj import CompassBenchObjectiveV1_3, compassbench_objective_v1_3_postprocess
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 
@@ -55,12 +55,12 @@ for _split in list(douknow_sets.keys()):
         )
         douknow_eval_cfg = dict(
             evaluator=dict(type=CircularEvaluator if CircularEval else AccEvaluator) if 'single_choice' in _name else dict(type=AccEvaluator),
-            pred_postprocessor=dict(type=first_option_postprocess, options='ABCD' ) if 'single_choice' in _name else dict(type=douknow_postprocess, name=_name))
+            pred_postprocessor=dict(type=first_option_postprocess, options='ABCD' ) if 'single_choice' in _name else dict(type=compassbench_objective_v1_3_postprocess, name=_name))
 
         compassbench_aug_datasets.append(
             dict(
-                type=DoUKnowDataset,
-                path=f'./data/compassbench_august/{_split}/{_name}.jsonl',
+                type=CompassBenchObjectiveV1_3,
+                path=f'./data/compassbench_objective_v1_3/{_split}/{_name}.jsonl',
                 name='circular_' + _name if CircularEval else _name,
                 abbr='compassbench-' + _split + '-' + _name + 'circular'if CircularEval else '',
                 reader_cfg=dict(

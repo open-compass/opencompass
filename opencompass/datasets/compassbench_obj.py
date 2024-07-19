@@ -18,7 +18,7 @@ def get_number(options):
 
 
 @LOAD_DATASET.register_module()
-class DoUKnowDataset(BaseDataset):
+class CompassBenchObjectiveV1_3(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
@@ -64,7 +64,7 @@ class DoUKnowDataset(BaseDataset):
 
 
 @TEXT_POSTPROCESSORS.register_module()
-def douknow_postprocess(text: str) -> str:
+def compassbench_objective_v1_3_postprocess(text: str) -> str:
     pattern = r'\\boxed{(.*?)}'
     match = re.search(pattern, text)
 
