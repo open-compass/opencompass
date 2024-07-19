@@ -48,7 +48,7 @@ models = [
     ),
     dict(
         type=TurboMindModelwithChatTemplate,
-        abbr='gpt4o',
+        abbr='judgellm',
         path='internlm/internlm2-chat-1_8b',
         engine_config=dict(session_len=7168, max_batch_size=16, tp=1),
         gen_config=dict(top_k=1000, temperature=1, top_p=0.9, max_new_tokens=2048),

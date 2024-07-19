@@ -14,11 +14,13 @@ subjective_all_sets = {
         'language/compass_bench_language_en_val',
         'instruct/compass_bench_instruct_en_val',
         'reasoning/compass_bench_reasoning_en_val',
+        'coding/compass_bench_coding_en_val',
     ],
     'cn': [
         'language/compass_bench_language_cn_val',
         'instruct/compass_bench_instruct_cn_val',
         'reasoning/compass_bench_reasoning_cn_val',
+        'coding/compass_bench_coding_cn_val',
     ],
 }
 
