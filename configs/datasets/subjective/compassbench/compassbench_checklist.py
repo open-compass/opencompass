@@ -5,8 +5,8 @@ from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import CompassBenchCheklistDataset
 
 subjective_reader_cfg = dict(
-    input_columns=["question", "checklist"],
-    output_column="judge",
+    input_columns=['question', 'checklist'],
+    output_column='judge',
 )
 
 subjective_all_sets = {
@@ -184,7 +184,7 @@ pair_prompt_cn = """# 指令
 checklist_datasets = []
 gpt4 = [
     dict(
-        abbr="gpt4o",
+        abbr='gpt4o',
     )
 ]
 for lan, data_name_list in subjective_all_sets.items():
