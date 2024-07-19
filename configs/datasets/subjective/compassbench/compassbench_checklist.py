@@ -3,19 +3,19 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import CompassBenchCheklistDataset
-from mmengine.config import read_base
 
 subjective_reader_cfg = dict(
-    input_columns=["question", "checklist"],
-    output_column="judge",
+    input_columns=['question', 'checklist'],
+    output_column='judge',
 )
 
 subjective_all_sets = [
-    # 'fofo_test_prompts_checklist', 'fofo_test_prompts_cn_checklist',
-    "instruct/compass_bench_instruct_val",
-    # "reasoning/compass_bench_reasoning_val",
-    "language/compass_bench_language_val",
+    'instruct/compass_bench_instruct_val',
+    'reasoning/compass_bench_reasoning_val',
+    'language/compass_bench_language_val',
 ]
+# TODO change to your data path
+data_path = '/cpfs01/shared/public/public_hdd/xiaolinchen/compassbench_v1_3/data'
 
 pair_prompt = """# Instruction
 
@@ -103,7 +103,7 @@ format by filling in the placeholders in []:
 checklist_datasets = []
 gpt4 = [
     dict(
-        abbr="gpt4o",
+        abbr='gpt4o',
     )
 ]
 for _name in subjective_all_sets:
@@ -112,7 +112,7 @@ for _name in subjective_all_sets:
             type=PromptTemplate,
             template=dict(
                 round=[
-                    dict(role="HUMAN", prompt="{question}"),
+                    dict(role='HUMAN', prompt='{question}'),
                 ]
             ),
         ),
@@ -127,26 +127,25 @@ for _name in subjective_all_sets:
                 type=PromptTemplate,
                 template=dict(
                     round=[
-                        dict(role="HUMAN", prompt=pair_prompt),
+                        dict(role='HUMAN', prompt=pair_prompt),
                     ]
                 ),
             ),
         ),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     checklist_datasets.append(
         dict(
-            abbr=f"{_name}",
+            abbr=f'{_name}',
             type=CompassBenchCheklistDataset,
-            # path='./data/subjective/compassbench_checklist',
-            path="/cpfs01/shared/public/public_hdd/xiaolinchen/compassbench_v1_3/data",
+            path=data_path,
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
-            mode="m2n",
-            infer_order="random",
+            mode='m2n',
+            infer_order='random',
             base_models=gpt4,
         )
     )
