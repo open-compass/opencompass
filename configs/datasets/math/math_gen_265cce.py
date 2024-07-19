@@ -23,7 +23,7 @@ math_infer_cfg = dict(
     inferencer=dict(type=GenInferencer, max_out_len=512))
 
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator), pred_postprocessor=dict(type=math_postprocess_v2))
+    evaluator=dict(type=MATHEvaluator, version='v2'), pred_postprocessor=dict(type=math_postprocess_v2))
 
 math_datasets = [
     dict(
