@@ -11,7 +11,7 @@ from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import SubjectiveSummarizer
 from opencompass.models import HuggingFacewithChatTemplate
-
+from opencompass.models import TurboMindModelwithChatTemplate
 api_meta_template = dict(
     round=[
         dict(role="HUMAN", api_role="HUMAN"),
@@ -19,22 +19,44 @@ api_meta_template = dict(
     ]
 )
 models = [
+    # dict(
+    #     type=HuggingFacewithChatTemplate,
+    #     abbr="internlm2-chat-1.8b",
+    #     path="internlm/internlm2-chat-1_8b-sft",
+    #     max_out_len=1024,
+    #     batch_size=8,
+    #     run_cfg=dict(num_gpus=1),
+    # ),
+    # dict(
+    #     type=HuggingFacewithChatTemplate,
+    #     abbr="gpt4o",
+    #     path="internlm/internlm2-chat-1_8b-sft",
+    #     max_out_len=1024,
+    #     batch_size=8,
+    #     run_cfg=dict(num_gpus=1),
+    # ),
     dict(
-        type=HuggingFacewithChatTemplate,
-        abbr="internlm2-chat-1.8b",
-        path="internlm/internlm2-chat-1_8b-sft",
-        max_out_len=1024,
-        batch_size=8,
+        type=TurboMindModelwithChatTemplate,
+        abbr='internlm2-chat-1.8b-turbomind',
+        path='internlm/internlm2-chat-1_8b',
+        engine_config=dict(session_len=7168, max_batch_size=16, tp=1),
+        gen_config=dict(top_k=1000, temperature=1, top_p=0.9, max_new_tokens=2048),
+        max_seq_len=7168,
+        max_out_len=2048,
+        batch_size=16,
         run_cfg=dict(num_gpus=1),
     ),
     dict(
-        type=HuggingFacewithChatTemplate,
-        abbr="gpt4o",
-        path="internlm/internlm2-chat-1_8b-sft",
-        max_out_len=1024,
-        batch_size=8,
+        type=TurboMindModelwithChatTemplate,
+        abbr='gpt4o',
+        path='internlm/internlm2-chat-1_8b',
+        engine_config=dict(session_len=7168, max_batch_size=16, tp=1),
+        gen_config=dict(top_k=1000, temperature=1, top_p=0.9, max_new_tokens=2048),
+        max_seq_len=7168,
+        max_out_len=2048,
+        batch_size=16,
         run_cfg=dict(num_gpus=1),
-    ),
+    )
 ]
 # -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
