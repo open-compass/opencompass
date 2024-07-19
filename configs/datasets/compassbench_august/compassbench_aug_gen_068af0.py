@@ -22,7 +22,7 @@ douknow_sets = {
     'math': ['single_choice_cn'],
 }
 
-# Settting up the prompts
+# Set up the prompts
 CircularEval = True
 
 
