@@ -7,8 +7,8 @@ assign:
   scedule:
     '*/1 * * * *'
   assignees:
-    - Leymore
     - bittersweet1999
     - liushz
-    - kennymckormick
+    - MaiziXiao
+    - acylam
     - tonysy

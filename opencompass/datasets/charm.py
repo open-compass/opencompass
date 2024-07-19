@@ -49,7 +49,7 @@ class CharmDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
-        with open(osp.join(path, f'{name}.json'), 'r') as f:
+        with open(osp.join(path, f'{name}.json'), 'r', encoding='utf-8') as f:
             data = json.load(f)['examples']
         dataset = Dataset.from_list(data)
         return dataset

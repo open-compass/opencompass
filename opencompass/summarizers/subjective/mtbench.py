@@ -16,6 +16,7 @@ from opencompass.utils import model_abbr_from_cfg
 from .compass_arena import CompassArenaSummarizer
 from .utils import get_judgeanswer_and_reference, get_outdir
 
+COLUMNS = ['total', 'writing', 'roleplay', 'reasoning', 'math', 'coding', 'extraction', 'stem', 'humanities']
 
 def model_abbr_from_cfg_used_in_summarizer(model):
     if model.get('summarizer_abbr', None):
@@ -57,22 +58,24 @@ def get_capability_results(
     fout_flag,
     model_abbr,
 ):
+    columns = COLUMNS
     capability_ratings = defaultdict(int)
     capability_counts = defaultdict(int)
-    for ans, ref in zip(judged_answers, references):
-        capability_ratings['total'] += ans['score']
-        capability_counts['total'] += 1
-        capability_ratings[ref['capability']] += ans['score']
-        capability_counts[ref['capability']] += 1
-
     capability_avg_ratings = defaultdict(float)
+    if len(judged_answers) == 0:
+        for column in columns:
+            capability_avg_ratings[column] = ''
+    else:
+        for ans, ref in zip(judged_answers, references):
+            capability_ratings['total'] += ans['score']
+            capability_counts['total'] += 1
+            capability_ratings[ref['capability']] += ans['score']
+            capability_counts[ref['capability']] += 1
 
-    for capability, total_score in capability_ratings.items():
-        s = total_score / capability_counts[capability]
-        s = round(s, 2)
-        capability_avg_ratings[capability] = s
-    columns = list(capability_avg_ratings.keys())
-    columns.insert(0, columns.pop(columns.index('total')))
+        for capability, total_score in capability_ratings.items():
+            s = total_score / capability_counts[capability]
+            s = round(s, 2)
+            capability_avg_ratings[capability] = s
 
     with open(fout, 'a+', newline='') as csvfile:
         writer = csv.writer(csvfile)
@@ -98,7 +101,7 @@ class MTBenchSummarizer(CompassArenaSummarizer):
         elif self.judge_type == 'pair':
             self.base_models = self.cfg['eval']['partitioner']['base_models']
             self.compare_models = self.cfg['eval']['partitioner']['compare_models']
-        self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
+        self.judge_models = self.cfg.get('judge_models', None)
         self.judge_map = {
             'single': post_process_mtbench_single,
             'pair': post_process_mtbench_pair
@@ -120,34 +123,34 @@ class MTBenchSummarizer(CompassArenaSummarizer):
         # self.judge_type == 'single'
         dataset_cfgs = self.cfg['datasets']
         output_dir, results_folder = get_outdir(self.cfg, time_str)
-        fout_flag = 0
-        for eval_model_cfg in self.eval_model_cfgs:
-            eval_model_abbr = model_abbr_from_cfg(eval_model_cfg)
-            show_model_abbr = model_abbr_from_cfg_used_in_summarizer(eval_model_cfg)
-            subdir_path = os.path.join(results_folder, eval_model_abbr + '_judged-by--' + self.judge_abbr)
-            if os.path.isdir(subdir_path):
-                fout = osp.join(output_dir, 'judged-by--' + self.judge_abbr + '-capability.csv')
-                overall_judged_answers, overall_references = [], []
-                for dataset in dataset_cfgs:
-                    judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
-                    overall_judged_answers += judged_answers
-                    overall_references += references
-                get_capability_results(overall_judged_answers, overall_references, fout, fout_flag, show_model_abbr)
-                fout_flag += 1
-            else:
-                print(subdir_path + ' is not exist! please check!')
-        with open(fout, 'r') as f:
-            csv_reader = csv.reader(f)
-            header = next(csv_reader)
-            table = [line for line in csv_reader]
+        all_scores = {}
+        for judge_model in self.judge_models:
+            fout_flag = 0
+            score_by_judgemodel = {}
+            judge_abbr = model_abbr_from_cfg(judge_model)
+            for eval_model_cfg in self.eval_model_cfgs:
+                eval_model_abbr = model_abbr_from_cfg(eval_model_cfg)
+                show_model_abbr = model_abbr_from_cfg_used_in_summarizer(eval_model_cfg)
+                subdir_path = os.path.join(results_folder, eval_model_abbr + '_judged-by--' + judge_abbr)
+                if os.path.isdir(subdir_path):
+                    fout = osp.join(output_dir, 'MTBench-judged-by--' + judge_abbr + '-capability.csv')
+                    overall_judged_answers, overall_references = [], []
+                    for dataset in dataset_cfgs:
+                        judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
+                        overall_judged_answers += judged_answers
+                        overall_references += references
+                    get_capability_results(overall_judged_answers, overall_references, fout, fout_flag, show_model_abbr)
+                    fout_flag += 1
+                else:
+                    print(subdir_path + ' is not exist! please check!')
+            with open(fout, 'r') as f:
+                csv_reader = csv.reader(f)
+                header = next(csv_reader)
+                table = [line for line in csv_reader]
 
-        new_header = [''] + [line[0] for line in table]
-        new_table = [[h] + line[1:] for h, line in zip(header[1:], table)]
-        new_table = [[h] + [line[i] for line in table] for i, h in enumerate(header[1:], start=1)]
-        t = tabulate(new_table, headers=new_header)
-        with open(fout, 'w') as f:
-            f.write(','.join(new_header) + '\n')
-            for line in new_table:
-                f.write(','.join(map(str, line)) + '\n')
-        print(t)
-        print(fout)
+            for model_score in table:
+                score_by_judgemodel[model_score[0]] = {}
+                for idx, column in enumerate(COLUMNS):
+                    score_by_judgemodel[model_score[0]][column] = model_score[idx+1]
+            all_scores[judge_abbr] = score_by_judgemodel
+        return {'MTbench': all_scores}

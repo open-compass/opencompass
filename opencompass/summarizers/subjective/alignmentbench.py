@@ -271,7 +271,6 @@ def get_capability_results(judged_answers,
     capability_avg_ratings['总分'] /= len(temp_list)
     capability_avg_ratings['总分'] = round(capability_avg_ratings['总分'], 2)
     scores = {model: capability_avg_ratings}
-
     with open(fout, 'a+', newline='') as csvfile:
         writer = csv.writer(csvfile)
         if fout_flag == 0:
@@ -297,6 +296,15 @@ def get_capability_results(judged_answers,
             for sub_category in sub_categories:
                 row.append(scores[model][sub_category])
         writer.writerow(row)
+
+    scores = scores[model]
+    scores.pop('中文推理总分', None)
+    scores.pop('中文语言总分', None)
+
+    # Creating a new dictionary with '总分' as the first item
+    updated_scores = {'总分': scores.pop('总分')}
+    updated_scores.update(scores)
+    return updated_scores
 
 
 class AlignmentBenchSummarizer:
@@ -338,42 +346,45 @@ class AlignmentBenchSummarizer:
         Returns:
             pd.DataFrame: The summary results.
         """
+        all_scores = {}
         for judge_model in self.judge_models:
+            score_by_judgemodel = {}
             judge_abbr = model_abbr_from_cfg(judge_model)
             dataset_cfgs = self.cfg['datasets']
+            dataset = dataset_cfgs[0]  # Alignbench just have only one subfile
             output_dir, results_folder = get_outdir(self.cfg, time_str)
             fout_flag, fout_flag2 = 0, 0
+            if self.judge_type == 'general':
+                fout = osp.join(
+                    output_dir,
+                    'Alignbench-judged-by--' + judge_abbr + '-dimension.csv')
+            fout2 = osp.join(
+                output_dir,
+                'Alignbench-judged-by--' + judge_abbr + '-capability.csv')
+
             for eval_model_abbr in self.eval_model_abbrs:
                 subdir = eval_model_abbr + '_judged-by--' + judge_abbr
                 subdir_path = os.path.join(results_folder, subdir)
+                model = eval_model_abbr
                 if os.path.isdir(subdir_path):
-                    model = eval_model_abbr
+                    judged_answers, references = get_judgeanswer_and_reference(
+                        dataset, subdir_path, self.judge_function)
+                    if len(judged_answers) == 0:
+                        score_by_judgemodel[model] = None
+                        continue
                     if self.judge_type == 'general':
-                        fout = osp.join(
-                            output_dir,
-                            'judged-by--' + judge_abbr + '-dimension.csv')
-                    fout2 = osp.join(
-                        output_dir,
-                        'judged-by--' + judge_abbr + '-capability.csv')
-                    for dataset in dataset_cfgs:
-                        judged_answers, references = get_judgeanswer_and_reference(
-                            dataset, subdir_path, self.judge_function)
-                        if self.judge_type == 'general':
-                            get_dimension_results(judged_answers, references,
-                                                  fout, fout_flag, model)
-                            fout_flag += 1
-                        get_capability_results(judged_answers, references,
-                                               fout2, fout_flag2, model,
-                                               self.category)
-                        fout_flag2 += 1
+                        get_dimension_results(judged_answers, references, fout,
+                                              fout_flag, model)
+                        fout_flag += 1
+                    scores = get_capability_results(judged_answers, references,
+                                                    fout2, fout_flag2, model,
+                                                    self.category)
+
+                    score_by_judgemodel[model] = scores
+                    fout_flag2 += 1
                 else:
+                    score_by_judgemodel[model] = None
                     print(subdir_path + ' is not exist! please check!')
-        if self.judge_type == 'general':
-            with open(fout, 'r') as f:
-                x = from_csv(f, delimiter=',')
-            print(x)
-            print(fout)
-        with open(fout2, 'r') as f:
-            x = from_csv(f, delimiter=',')
-        print(x)
-        print(fout2)
+
+            all_scores[judge_abbr] = score_by_judgemodel
+        return {'Alignbench': all_scores}
