@@ -13,7 +13,7 @@ CompassBench（官方自建榜单）经历了多次更新迭代，从2024年7月
 | 语言     | 评测模型在信息抽取、信息抽取、内容总结、对话、创作等多种任务上的能力                   | 主观评测            | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/language      |
 | 推理     | 评测模型在逻辑推理、常识推理、表格推理等多种日常推理任务上的能力                       | 主观评测            | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/reasoning     |
 | 知识     | 评测模型在理科、工科、人文社科等多个领域的知识水平                                     | 客观评测            | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/knowledge     |
-| 数学     | 评测模型在数值计算、高中及大学难度的数学问题上的能力                                   | 客观评测            | https://github.com/open-compass/MathBench                                      |
+| 数学     | 评测模型在数值计算、高中及大学难度的数学问题上的能力                                   | 客观评测            |  https://github.com/open-compass/CompassBench/tree/main/v1_3_data/math          |
 | 代码     | 评测模型在代码生成、代码补全、代码注释、代码重构、代码改写、计算机知识综合问答上的能力 | 客观评测 + 主观评测 | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/code          |
 | 指令跟随 | 评测模型在基于各类语言、推理、知识等任务中，能否准确遵循复杂指令的能力                 | 主观评测            | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/instruct      |
 | 智能体   | 评估模型在复杂工具调用的能力，以及数据科学、数学等情况下使用代码解释器的能力           | 客观评测            | https://github.com/open-compass/T-Eval https://github.com/open-compass/CIBench |
@@ -33,6 +33,8 @@ CompassBench（官方自建榜单）经历了多次更新迭代，从2024年7月
     - `A=B`：回答A和回答B质量相同。
     - `B+`：回答B略优于回答A。
     - `B++`：回答B远胜于回答A。
+- 主观评测配置文件
+  - [示例评测配置](https://github.com/open-compass/opencompass/blob/main/configs/eval_compassbench_v1_3_subjective.py)
 - 主观评价提示词
 
 ```
