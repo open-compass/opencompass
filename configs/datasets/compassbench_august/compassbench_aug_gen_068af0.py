@@ -62,7 +62,7 @@ for _split in list(douknow_sets.keys()):
                 type=DoUKnowDataset,
                 path=f'./data/compassbench_august/{_split}/{_name}.jsonl',
                 name='circular_' + _name if CircularEval else _name,
-                abbr='douknow-' + _split + '-' + _name + 'circular'if CircularEval else '',
+                abbr='compassbench-' + _split + '-' + _name + 'circular'if CircularEval else '',
                 reader_cfg=dict(
                     input_columns=['question'],
                     output_column='answer'
