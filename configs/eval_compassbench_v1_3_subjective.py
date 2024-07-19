@@ -9,7 +9,7 @@ from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import SubjectiveSummarizer
+# from opencompass.summarizers import SubjectiveSummarizer
 from opencompass.models import HuggingFacewithChatTemplate
 from opencompass.models import TurboMindModelwithChatTemplate
 api_meta_template = dict(
@@ -79,5 +79,6 @@ eval = dict(
         type=LocalRunner, max_num_workers=16, task=dict(type=SubjectiveEvalTask)
     ),
 )
+# TODO summarizer to be implemented
 # summarizer = dict(type=SubjectiveSummarizer, function='subjective')
 work_dir = "outputs/debug_checklist/"

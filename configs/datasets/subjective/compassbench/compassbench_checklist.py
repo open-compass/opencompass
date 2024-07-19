@@ -9,13 +9,6 @@ subjective_reader_cfg = dict(
     output_column="judge",
 )
 
-# subjective_all_sets = [
-#     "instruct/compass_bench_instruct_val",
-#     "reasoning/compass_bench_reasoning_val",
-#     "language/compass_bench_language_val",
-# ]
-
-
 subjective_all_sets = {
     "en": [
         "language/compass_bench_language_en_val",
@@ -28,8 +21,9 @@ subjective_all_sets = {
         "reasoning/compass_bench_reasoning_cn_val",
     ],
 }
-# TODO change to your data path
-data_path = "/cpfs01/shared/public/public_hdd/xiaolinchen/compassbench_v1_3/data"
+
+data_path = "./data/compassbench_v1_3/data"
+
 pair_prompt_en = """# Instruction
 
 You are an expert evaluator. Your task is to evaluate the quality of the \
