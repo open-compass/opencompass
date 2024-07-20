@@ -18,7 +18,7 @@ prompt_en = {
 
 
 douknow_sets = {
-    'wiki': ['single_choice_cn'],
+    'knowledge': ['single_choice_cn'],
     'math': ['single_choice_cn'],
 }
 
@@ -60,7 +60,7 @@ for _split in list(douknow_sets.keys()):
         compassbench_aug_datasets.append(
             dict(
                 type=CompassBenchObjectiveV1_3,
-                path=f'./data/compassbench_objective_v1_3/{_split}/{_name}.jsonl',
+                path=f'./data/compassbench_v1_3/{_split}/{_name}.jsonl',
                 name='circular_' + _name if CircularEval else _name,
                 abbr='compassbench-' + _split + '-' + _name + 'circular'if CircularEval else '',
                 reader_cfg=dict(
