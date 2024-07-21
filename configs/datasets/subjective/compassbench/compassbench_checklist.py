@@ -24,7 +24,7 @@ subjective_all_sets = {
     ],
 }
 
-data_path = './data/compassbench_v1_3/data'
+data_path = './data/compassbench_v1_3/'
 
 pair_prompt_en = """# Instruction
 
