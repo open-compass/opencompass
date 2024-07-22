@@ -300,7 +300,6 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        return 0
         enc = self.tiktoken.encoding_for_model(self.path
                                                or self.tokenizer_path)
         return len(enc.encode(prompt))
