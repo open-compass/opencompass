@@ -11,13 +11,9 @@ subjective_reader_cfg = dict(
     )
 
 
-# data_path = '/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/crbbenchv3.jsonl'
-data_paths = ['/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/crbbenchv3.jsonl',
-'/mnt/petrelfs/zhangchuyu/reasoning/compasssak/testset/cn_arena_sampled_out.jsonl',
-'/mnt/petrelfs/zhangchuyu/reasoning/compasssak/testset/cn_arena_sampled_inter.jsonl']
-
-abbrs = ['crbbench', 'cn_crbbench_out', 'cn_crbbench_inter']
-subjective_datasets = []
+data_paths = ['data/crbbench/crbbench.jsonl', 'data/crbbench/cn_crbbench.jsonl']
+abbrs = ['crbbench', 'cn_crbbench']
+crb_datasets = []
 
 for data_path, abbr in zip(data_paths, abbrs):
     subjective_infer_cfg = dict(
@@ -45,12 +41,12 @@ for data_path, abbr in zip(data_paths, abbrs):
         pred_role='BOT',
     )
 
-    subjective_datasets.append(
+    crb_datasets.append(
         dict(
             abbr=abbr,
             type=CRBDataset,
             path=data_path,
-            mode='single',
+            eval_mode='single',
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg

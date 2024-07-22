@@ -12,28 +12,12 @@ subjective_reader_cfg = dict(
     )
 
 
-# data_path = '/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/crbbenchv3.jsonl'
-data_paths = ['/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/crbbenchv3.jsonl',
-'/mnt/petrelfs/zhangchuyu/reasoning/compasssak/testset/cn_arena_sampled_out.jsonl',
-'/mnt/petrelfs/zhangchuyu/reasoning/compasssak/testset/cn_arena_sampled_inter.jsonl']
-
-abbrs = ['crbbench', 'cn_crbbench_out', 'cn_crbbench_inter']
-subjective_datasets = []
+data_paths = ['data/crbbench/crbbench.jsonl', 'data/crbbench/cn_crbbench.jsonl']
+abbrs = ['crbbench', 'cn_crbbench']
+crb_datasets = []
 gpt4 = [dict(
     abbr='gpt-4o',
 )]
-
-# gpt4 = [dict(
-#     abbr='gpt-4o',
-#     type=OpenAI,
-#     path='gpt-4-1106-preview', # To compare with the official leaderboard, please use gpt4-0613
-#     meta_template=api_meta_template,
-#     query_per_second=16,
-#     max_out_len=4096,
-#     max_seq_len=4096,
-#     batch_size=8,
-#     temperature=0,
-# )]
 
 for data_path, abbr in zip(data_paths, abbrs):
     subjective_infer_cfg = dict(
@@ -61,7 +45,7 @@ for data_path, abbr in zip(data_paths, abbrs):
         pred_role='BOT',
     )
 
-    subjective_datasets.append(
+    crb_datasets.append(
         dict(
             abbr=abbr,
             type=CRBDataset,
@@ -73,5 +57,5 @@ for data_path, abbr in zip(data_paths, abbrs):
             mode='m2n',
             infer_order='random',
             base_models=gpt4,
-            given_pred = [{'abbr': 'gpt-4o', 'path':'/mnt/petrelfs/zhangchuyu/reasoning/compasssak/crb/gpt_4o'}]
+            given_pred = [{'abbr': 'gpt-4o', 'path':'data/crbbench/gpt_4o'}]
         ))
