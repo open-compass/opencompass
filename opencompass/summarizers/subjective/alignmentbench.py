@@ -369,6 +369,9 @@ class AlignmentBenchSummarizer:
                 if os.path.isdir(subdir_path):
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
+                    if len(judged_answers) == 0:
+                        score_by_judgemodel[model] = None
+                        continue
                     if self.judge_type == 'general':
                         get_dimension_results(judged_answers, references, fout,
                                               fout_flag, model)

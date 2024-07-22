@@ -55,7 +55,7 @@ def extract_role_pred(s: str, begin_str: Optional[str],
     return s[start:end]
 
 
-@TASKS.register_module(force=(__name__ == '__main__'))  # A hack for script run
+@TASKS.register_module()
 class OpenICLEvalTask(BaseTask):
     """OpenICL Evaluation Task.
 

@@ -12,7 +12,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    'question',
+    'arenahard',
 ]
 
 

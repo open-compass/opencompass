@@ -26,7 +26,7 @@ for _name in subjective_all_sets:
                 template="""{dialogue}""",
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=ChatInferencer, max_seq_len=4096, max_out_len=512, temperature=temperature, do_sample=do_sample,infer_mode='every'),
+            inferencer=dict(type=ChatInferencer, max_seq_len=4096, max_out_len=1024, temperature=temperature, do_sample=do_sample,infer_mode='every'),
         )
 
     subjective_eval_cfg = dict(

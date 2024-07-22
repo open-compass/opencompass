@@ -2,6 +2,8 @@ from .alignbench import AlignmentBenchDataset  # noqa: F401, F403
 from .arena_hard import ArenaHardDataset  # noqa: F401, F403
 from .compass_arena import CompassArenaDataset  # noqa: F401, F403
 from .compassbench import CompassBenchDataset  # noqa: F401, F403
+from .compassbench_checklist import \
+    CompassBenchCheklistDataset  # noqa: F401, F403
 from .compassbench_control_length_bias import \
     CompassBenchControlLengthBiasDataset  # noqa: F401, F403
 from .corev2 import Corev2Dataset  # noqa: F401, F403

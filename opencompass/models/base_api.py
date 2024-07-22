@@ -351,7 +351,7 @@ class APITemplateParser:
     def _prompt2api(self,
                     prompts: Union[List, str],
                     role_dict: Dict[str, Dict],
-                    for_gen: bool = False) -> Tuple[str, bool]:
+                    for_gen: bool = False) -> Tuple[List, bool]:
         """Convert the prompts to a API-style prompts, given an updated
         role_dict.
 
@@ -363,7 +363,7 @@ class APITemplateParser:
                 role whose "generate" is set to True.
 
         Returns:
-            Tuple[str, bool]: The converted string, and whether the follow-up
+            Tuple[List, bool]: The converted string, and whether the follow-up
             conversion should be proceeded.
         """
         cont = True
@@ -376,7 +376,7 @@ class APITemplateParser:
         res = []
         for prompt in prompts:
             if isinstance(prompt, str):
-                raise TypeError('Mixing str without explictt role is not '
+                raise TypeError('Mixing str without explicit role is not '
                                 'allowed in API models!')
             else:
                 api_role, cont = self._role2api_role(prompt, role_dict,
@@ -390,7 +390,7 @@ class APITemplateParser:
     def _role2api_role(self,
                        role_prompt: Dict,
                        role_dict: Dict[str, Dict],
-                       for_gen: bool = False) -> Tuple[str, bool]:
+                       for_gen: bool = False) -> Tuple[Dict, bool]:
         """Convert a role prompt to a string, given an updated role_dict.
 
         Args:
@@ -401,7 +401,7 @@ class APITemplateParser:
                 role whose "generate" is set to True.
 
         Returns:
-            Tuple[str, bool]: The converted string, and whether the follow-up
+            Tuple[Dict, bool]: The converted string, and whether the follow-up
             conversion should be proceeded.
         """
         merged_prompt = role_dict.get(
