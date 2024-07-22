@@ -2,7 +2,7 @@ from mmengine.config import read_base
 
 with read_base():
     # from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import subjective_datasets
-    from .datasets.subjective.wildbench.wildbench_pair_judge import subjective_datasets
+    from .datasets.subjective.wildbench.wildbench_pair_judge import wildbench_datasets
     from .models.openai.gpt_4 import models as gpt4_models
     from .models.hf_llama.hf_llama2_70b_chat import models as llama2_models
     # from .models.gemma.hf_gemma_2b_it import models
@@ -65,7 +65,7 @@ models = [
     # )
 ]
 
-datasets = [*subjective_datasets]
+datasets = [*wildbench_datasets]
 
 # -------------Evalation Stage ----------------------------------------
 

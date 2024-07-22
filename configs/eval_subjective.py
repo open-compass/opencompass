@@ -7,6 +7,7 @@ with read_base():
     from .datasets.subjective.arena_hard.arena_hard_compare import arenahard_datasets
     from .datasets.subjective.compassbench.compassbench_compare import compassbench_datasets
     from .datasets.subjective.fofo.fofo_judge import fofo_datasets
+    from .datasets.subjective.wildbench.wildbench_pair_judge import wildbench_datasets
     from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import mtbench_datasets
     from .datasets.subjective.multiround.mtbench101_judge import mtbench101_datasets
     from .models.chatglm.hf_chatglm3_6b import models
@@ -103,7 +104,7 @@ models = [
     )
 ]
 
-datasets = [*alignbench_datasets, *alpacav2_datasets, *arenahard_datasets, *compassarena_datasets, *compassbench_datasets, *fofo_datasets, *mtbench_datasets, *mtbench101_datasets]
+datasets = [*alignbench_datasets, *alpacav2_datasets, *arenahard_datasets, *compassarena_datasets, *compassbench_datasets, *fofo_datasets, *mtbench_datasets, *mtbench101_datasets, *wildbench_datasets]
 
 infer = dict(
     partitioner=dict(type=NaivePartitioner),

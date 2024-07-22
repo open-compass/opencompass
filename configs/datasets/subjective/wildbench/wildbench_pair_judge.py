@@ -13,7 +13,7 @@ subjective_reader_cfg = dict(
 
 data_path ='./data/WildBench/wildbench.jsonl'
 
-subjective_datasets = []
+wildbench_datasets = []
 subjective_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -45,7 +45,7 @@ llama_2_70b = dict(
     abbr='llama-2-70b-chat-hf',
 )
 
-subjective_datasets.append(
+wildbench_datasets.append(
     dict(
         abbr='wildbench',
         type=WildBenchDataset,
