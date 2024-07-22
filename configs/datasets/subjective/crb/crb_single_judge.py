@@ -11,7 +11,7 @@ subjective_reader_cfg = dict(
     )
 
 
-data_paths = ['data/crbbench/crbbench.jsonl', 'data/crbbench/cn_crbbench.jsonl']
+data_paths = ['./data/crbbench/crbbench.jsonl', './data/crbbench/cn_crbbench.jsonl']
 abbrs = ['crbbench', 'cn_crbbench']
 crb_datasets = []
 
