@@ -12,7 +12,7 @@ subjective_reader_cfg = dict(
     )
 
 
-data_paths = ['data/crbbench/crbbench.jsonl', 'data/crbbench/cn_crbbench.jsonl']
+data_paths = ['./data/crbbench/crbbench.jsonl', './data/crbbench/cn_crbbench.jsonl']
 abbrs = ['crbbench', 'cn_crbbench']
 crb_datasets = []
 gpt4 = [dict(
@@ -57,5 +57,5 @@ for data_path, abbr in zip(data_paths, abbrs):
             mode='m2n',
             infer_order='random',
             base_models=gpt4,
-            given_pred = [{'abbr': 'gpt-4o', 'path':'data/crbbench/gpt_4o'}]
+            given_pred = [{'abbr': 'gpt-4o', 'path':'./data/crbbench/gpt_4o'}]
         ))
