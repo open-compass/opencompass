@@ -24,25 +24,25 @@ with read_base():
     from .datasets.ruler.ruler_qa import qa_datasets  # QA
 
     # from .datasets.collections.leaderboard.qwen_chat import datasets
-import_datasets = sum((v for k, v in locals().items() if k.endswith("_datasets")), [])
+import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 # Evaluation config
 NUM_SAMPLES = 500
 max_seq_lens = [1024 * 4, 1024 * 8, 1024 * 16, 1024 * 32]
-abbr_suffixs = ["4k", "8k", "16k", "32k"]
+abbr_suffixs = ['4k', '8k', '16k', '32k']
 
 
 # Model Settings
-qwen2_7b_instruct_model[0]["max_seq_len"] = 33792
-qwen2_7b_instruct_model[0]["engine_config"]["tp"] = 2
-qwen2_7b_instruct_model[0]["run_cfg"]["num_gpus"] = 2
-llama3_8b_instruct_model[0]["max_seq_len"] = 33792
-llama3_8b_instruct_model[0]["engine_config"]["tp"] = 2
-llama3_8b_instruct_model[0]["run_cfg"]["num_gpus"] = 2
+qwen2_7b_instruct_model[0]['max_seq_len'] = 33792
+qwen2_7b_instruct_model[0]['engine_config']['tp'] = 2
+qwen2_7b_instruct_model[0]['run_cfg']['num_gpus'] = 2
+llama3_8b_instruct_model[0]['max_seq_len'] = 33792
+llama3_8b_instruct_model[0]['engine_config']['tp'] = 2
+llama3_8b_instruct_model[0]['run_cfg']['num_gpus'] = 2
 model_settings = [
-    [qwen2_7b_instruct_model[0], "Qwen/Qwen2-7B-Instruct"],
-    [llama3_8b_instruct_model[0], "meta-llama/Meta-Llama-3-8B-Instruct"],
-    [internlm2_5_7b_chat_1m[0], "internlm/internlm2_5-7b-chat-1m"],
+    [qwen2_7b_instruct_model[0], 'Qwen/Qwen2-7B-Instruct'],
+    [llama3_8b_instruct_model[0], 'meta-llama/Meta-Llama-3-8B-Instruct'],
+    [internlm2_5_7b_chat_1m[0], 'internlm/internlm2_5-7b-chat-1m'],
 ]
 
 
@@ -57,10 +57,10 @@ for max_seq_len, abbr_suffix in zip(max_seq_lens, abbr_suffixs):
         _tmp_datasets = []
         for dataset in import_datasets:
             tmp_dataset = dataset.deepcopy()
-            tmp_dataset["tokenizer_model"] = model_path
-            tmp_dataset["abbr"] = tmp_dataset["abbr"] + "_" + abbr_suffix
-            tmp_dataset["num_samples"] = NUM_SAMPLES
-            tmp_dataset["max_seq_length"] = max_seq_len
+            tmp_dataset['tokenizer_model'] = model_path
+            tmp_dataset['abbr'] = tmp_dataset['abbr'] + '_' + abbr_suffix
+            tmp_dataset['num_samples'] = NUM_SAMPLES
+            tmp_dataset['max_seq_length'] = max_seq_len
             _tmp_datasets.append(tmp_dataset)
         model_dataset_combinations.append(dict(models=[model], datasets=_tmp_datasets))
         models.append(model)
