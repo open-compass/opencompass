@@ -37,7 +37,7 @@ class NeedleBenchMultiDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str,
+        path: str,  # depreciated
         length: int,
         depth: int,
         tokenizer_model: str,
@@ -159,18 +159,20 @@ class NeedleBenchMultiDataset(BaseDataset):
             'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
             'zh_movie.jsonl', 'zh_tech.jsonl'
         ]
-        needle_file_path = os.path.join(path, needle_file_name)
         downloaded_files = []
+        base_file_path = ''
         for file_name in file_names:
             file_path = hf_hub_download(repo_id=repo_id,
                                         filename=file_name,
                                         repo_type='dataset')
             downloaded_files.append(file_path)
-            print(f'Downloaded {file_name} to {file_path}')
+            base_file_path = '/'.join(file_path.split('/')[:-1])
 
+        needle_file_path = os.path.join(base_file_path, needle_file_name)
         for file_path in downloaded_files:
             if file_path.split('/')[-1] not in file_list:
                 continue
+
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines_bak = [json.loads(line.strip()) for line in f]
             lines = lines_bak.copy()

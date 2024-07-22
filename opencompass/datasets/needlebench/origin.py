@@ -36,7 +36,7 @@ class NeedleBenchOriginDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str,
+        path: str,  # depreciated
         length: int,
         depth: int,
         tokenizer_model: str,
@@ -136,12 +136,13 @@ class NeedleBenchOriginDataset(BaseDataset):
         ]
 
         downloaded_files = []
+        base_file_path = ''
         for file_name in file_names:
             file_path = hf_hub_download(repo_id=repo_id,
                                         filename=file_name,
                                         repo_type='dataset')
             downloaded_files.append(file_path)
-            print(f'Downloaded {file_name} to {file_path}')
+            base_file_path = '/'.join(file_path.split('/')[:-1])
 
         for file_path in downloaded_files:
             if file_path.split('/')[-1] not in file_list:
@@ -152,7 +153,8 @@ class NeedleBenchOriginDataset(BaseDataset):
             for counter in range(num_repeats_per_file):
                 random.seed(counter)
                 random.shuffle(lines)
-                needle_file_path = os.path.join(path, needle_file_name)
+                needle_file_path = os.path.join(base_file_path,
+                                                needle_file_name)
                 random_needle = get_random_line_by_language(
                     counter, needle_file_path, language)
                 needle = '\n' + random_needle['needle'] + '\n'

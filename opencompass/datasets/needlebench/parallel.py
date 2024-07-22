@@ -57,7 +57,7 @@ class NeedleBenchParallelDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str,
+        path: str,  # depreciated
         needle_file_name: str,
         length: int,
         depths: list[int],
@@ -85,7 +85,6 @@ class NeedleBenchParallelDataset(BaseDataset):
                                         filename=file_name,
                                         repo_type='dataset')
             downloaded_files.append(file_path)
-            print(f'Downloaded {file_name} to {file_path}')
 
         for file in downloaded_files:
             if file.split('/')[-1] == needle_file_name:
