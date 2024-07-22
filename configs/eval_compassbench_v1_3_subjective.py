@@ -16,8 +16,8 @@ from opencompass.models import TurboMindModelwithChatTemplate
 
 api_meta_template = dict(
     round=[
-        dict(role="HUMAN", api_role="HUMAN"),
-        dict(role="BOT", api_role="BOT", generate=True),
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
     ]
 )
 models = [
@@ -40,8 +40,8 @@ models = [
     # ),
     dict(
         type=TurboMindModelwithChatTemplate,
-        abbr="internlm2-chat-1.8b-turbomind",
-        path="internlm/internlm2-chat-1_8b",
+        abbr='internlm2-chat-1.8b-turbomind',
+        path='internlm/internlm2-chat-1_8b',
         engine_config=dict(session_len=7168, max_batch_size=16, tp=1),
         gen_config=dict(top_k=1000, temperature=1, top_p=0.9, max_new_tokens=2048),
         max_seq_len=7168,
@@ -52,8 +52,8 @@ models = [
     # Mock as gpt4o
     dict(
         type=TurboMindModelwithChatTemplate,
-        abbr="gpt4o",
-        path="internlm/internlm2-chat-1_8b",
+        abbr='gpt4o',
+        path='internlm/internlm2-chat-1_8b',
         engine_config=dict(session_len=7168, max_batch_size=16, tp=1),
         gen_config=dict(top_k=1000, temperature=1, top_p=0.9, max_new_tokens=2048),
         max_seq_len=7168,
@@ -84,4 +84,4 @@ eval = dict(
     ),
 )
 summarizer = dict(type=CompassBenchSummarizer)
-work_dir = "outputs/debug_checklist/"
+work_dir = 'outputs/debug_checklist/'

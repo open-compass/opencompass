@@ -14,9 +14,10 @@ from tabulate import tabulate
 
 from opencompass.partitioners.sub_naive import remove_duplicate_pairs
 from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
-from .compass_arena import (check_position_bias, model_abbr_from_cfg_used_in_summarizer)
-from .utils import get_judgeanswer_and_reference, get_outdir
 
+from .compass_arena import (check_position_bias,
+                            model_abbr_from_cfg_used_in_summarizer)
+from .utils import get_judgeanswer_and_reference, get_outdir
 
 
 def post_process_wildbench_pair(judgement: str):
