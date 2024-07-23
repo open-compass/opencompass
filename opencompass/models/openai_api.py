@@ -303,12 +303,13 @@ class OpenAI(BaseAPIModel):
         """
         try:
             enc = self.tiktoken.encoding_for_model(self.path
-                                               or self.tokenizer_path)
+                or self.tokenizer_path)
             return len(enc.encode(prompt))
-        except Exception as ex:
+        except Exception:
             from transformers import AutoTokenizer
             if self.hf_tokenizer is None:
-                self.hf_tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_path)
+                self.hf_tokenizer = AutoTokenizer.from_pretrained(
+                    self.tokenizer_path)
             return len(self.hf_tokenizer(prompt).input_ids)
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
