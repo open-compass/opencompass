@@ -194,7 +194,7 @@ def identify_model_errors(items, task, prompt_style, gt_items):
     abnormalities = error_module.check_abnormality(pred_list)
 
     return {
-        "Same response to all questions": abnormalities,
+        "Same response to all questions": 1 if abnormalities!=0 else 0,
         "Language inconsistency": language_error / len(pred_list),
         "Limitation of instruction-following": nonstandrad / len(pred_list),
         "Repetition": repetition / len(pred_list),
