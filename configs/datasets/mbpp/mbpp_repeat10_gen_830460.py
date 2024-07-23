@@ -1,6 +1,6 @@
 from mmengine.config import read_base
 with read_base():
-    from ..utils.utils import get_data_path
+    from opencompass.utils.datasets import get_data_path
 # This config is used for pass@k evaluation with dataset repetition
 # That model cannot generate multiple response for single input
 from opencompass.openicl.icl_prompt_template import PromptTemplate

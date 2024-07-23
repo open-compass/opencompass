@@ -1,6 +1,6 @@
 from mmengine.config import read_base
 with read_base():
-    from ..utils.utils import get_data_path
+    from opencompass.utils.datasets import get_data_path
 # GONNA BE DEPRECATED, DON'T USE IT
 # The postprocessor has the assumption that the prompt is in the format of "Question:blabla"
 # This config does not follow the above assumption, thus deprecated

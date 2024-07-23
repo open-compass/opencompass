@@ -6,7 +6,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import BBHDataset, bbh_mcq_postprocess, BBHEvaluator, BBHEvaluator_mcq
 
 with read_base():
-    from ..utils.utils import get_data_path
+    from opencompass.utils.datasets import get_data_path
     from .bbh_subset_settings import settings
 
 bbh_datasets = []
