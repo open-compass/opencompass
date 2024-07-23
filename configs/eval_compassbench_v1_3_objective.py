@@ -14,7 +14,6 @@ from opencompass.partitioners import (
 )
 from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 
-
 with read_base():
     from .models.qwen.lmdeploy_qwen2_7b_instruct import (
         models as qwen2_7b_instruct_model,
@@ -28,6 +27,7 @@ with read_base():
     # from .datasets.compassbench_20_v1_1.agent.mus_teval_gen_105c48 import (
     #     plugin_eval_datasets,
     # )
+    from .summarizers.compassbench_v1_3_objective import summarizer
 
 _origin_models = sum(
     [v for k, v in locals().items() if k.endswith("_model") or k == "_origin_models"],
@@ -96,3 +96,4 @@ if _naive_datasets:
 #     model_dataset_combinations.append(dict(models=_cibench_agent_models, datasets=_cibench_agent_datasets))
 #     models.extend(_cibench_agent_models)
 #     datasets.extend(_cibench_agent_datasets)
+
