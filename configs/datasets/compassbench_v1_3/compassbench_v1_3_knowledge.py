@@ -19,17 +19,25 @@ prompt_en = {
     "cloze_en": "Here is a fill-in-the-blank question. Please think step by step based on your knowledge and put your final answer in \\boxed{}. Here is the question you need to answer:\n{question}\nLet's solve this problem step by step:",
 }
 
-
 douknow_sets = {
-    "knowledge": ["single_choice_cn"],
-    "math": ["single_choice_cn"],
+    "wiki_en_sub_500_人文科学":["single_choice_en"],
+    "wiki_en_sub_500_社会科学":["single_choice_en"],
+    "wiki_en_sub_500_生活常识":["single_choice_en"],
+    "wiki_en_sub_500_自然科学-工科":["single_choice_en"],
+    "wiki_en_sub_500_自然科学-理科":["single_choice_en"],
+    "wiki_zh_sub_500_人文科学": ["single_choice_cn"],
+    "wiki_zh_sub_500_社会科学": ["single_choice_cn"],
+    "wiki_zh_sub_500_生活常识": ["single_choice_cn"],
+    "wiki_zh_sub_500_自然科学-工科":["single_choice_cn"],
+    "wiki_zh_sub_500_自然科学-理科":["single_choice_cn"],
 }
+
+data_path = "./data/compassbench_v1_3/knowledge"
 
 # Set up the prompts
 CircularEval = True
 
-
-compassbench_aug_datasets = []
+compassbench_knowledge_datasets = []
 
 for _split in list(douknow_sets.keys()):
     for _name in douknow_sets[_split]:
@@ -39,51 +47,45 @@ for _split in list(douknow_sets.keys()):
         else:
             single_choice_prompts = prompt_en
             cloze_prompts = prompt_en
+
+        if "single_choice" in _name:
+            template_round = [dict(role="HUMAN", prompt=single_choice_prompts[_name])]
+            pred_postprocessor = dict(type=first_option_postprocess, options="ABCD")
+            evaluator = dict(type=CircularEvaluator if CircularEval else AccEvaluator)
+            dataset_name = _name + "_circular" if CircularEval else _name
+            dataset_abbr = (
+                "compassbench-" + _split + "_circular"
+                if CircularEval
+                else "compassbench-" + _split
+            )
+        else:
+            template_round = [dict(role="HUMAN", prompt=cloze_prompts[_name])]
+            pred_postprocessor = dict(
+                type=compassbench_objective_v1_3_postprocess, name=_name
+            )
+            evaluator = dict(type=AccEvaluator)
+            dataset_name = _name
+            dataset_abbr = "compassbench-" + _split
+
         douknow_infer_cfg = dict(
-            ice_template=dict(
-                type=PromptTemplate,
-                template=dict(
-                    begin="</E>",
-                    round=(
-                        [
-                            dict(
-                                role="HUMAN",
-                                prompt=single_choice_prompts[_name],
-                            ),
-                            dict(role="BOT", prompt="{answer}"),
-                        ]
-                        if "choice" in _name
-                        else cloze_prompts[_name]
-                    ),
-                ),
-                ice_token="</E>",
+            prompt_template=dict(
+                type=PromptTemplate, template=dict(round=template_round)
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer),
-        )
-        douknow_eval_cfg = dict(
-            evaluator=(
-                dict(type=CircularEvaluator if CircularEval else AccEvaluator)
-                if "single_choice" in _name
-                else dict(type=AccEvaluator)
-            ),
-            pred_postprocessor=(
-                dict(type=first_option_postprocess, options="ABCD")
-                if "single_choice" in _name
-                else dict(type=compassbench_objective_v1_3_postprocess, name=_name)
-            ),
+            inferencer=dict(type=GenInferencer, max_out_len=2048),
         )
 
-        compassbench_aug_datasets.append(
+        douknow_eval_cfg = dict(
+            evaluator=evaluator,
+            pred_postprocessor=pred_postprocessor,
+        )
+
+        compassbench_knowledge_datasets.append(
             dict(
                 type=CompassBenchObjectiveV1_3,
-                path=f"./data/compassbench_v1_3/{_split}/{_name}.jsonl",
-                name="circular_" + _name if CircularEval else _name,
-                abbr=(
-                    "compassbench-" + _split + "-" + _name + "circular"
-                    if CircularEval
-                    else ""
-                ),
+                path=f"{data_path}/{_split}.jsonl",
+                name=dataset_name,
+                abbr=dataset_abbr,
                 reader_cfg=dict(input_columns=["question"], output_column="answer"),
                 infer_cfg=douknow_infer_cfg,
                 eval_cfg=douknow_eval_cfg,

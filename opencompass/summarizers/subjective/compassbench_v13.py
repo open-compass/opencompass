@@ -84,7 +84,6 @@ class CompassBenchSummarizer:
                     for prediction, reference in zip(judged_answers, references):
                         if prediction not in score_mapping:
                             continue
-
                         categories[dataset_abbr] += 1
                         flag = 1 if reference['answer1'] == base_model else -1
                         score_1 = score_mapping[prediction]*flag
