@@ -3,15 +3,28 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import CompassBenchCheklistDataset
-from mmengine.config import read_base
 
 subjective_reader_cfg = dict(
-    input_columns=['question','checklist'],
+    input_columns=['question', 'checklist'],
     output_column='judge',
-    )
+)
 
-subjective_all_sets = {'en':['fofo_test_prompts_checklist'],
-                       'cn':['fofo_test_prompts_cn_checklist']}
+subjective_all_sets = {
+    'en': [
+        'language/compass_bench_language_en_val',
+        'instruct/compass_bench_instruct_en_val',
+        'reasoning/compass_bench_reasoning_en_val',
+        'coding/compass_bench_coding_en_val',
+    ],
+    'cn': [
+        'language/compass_bench_language_cn_val',
+        'instruct/compass_bench_instruct_cn_val',
+        'reasoning/compass_bench_reasoning_cn_val',
+        'coding/compass_bench_coding_cn_val',
+    ],
+}
+
+data_path = './data/compassbench_v1_3/'
 
 pair_prompt_en = """# Instruction
 
@@ -169,9 +182,11 @@ pair_prompt_cn = """# 指令
 """
 
 checklist_datasets = []
-gpt4 = [dict(
-    abbr='gpt4o',
-)]
+gpt4 = [
+    dict(
+        abbr='gpt4o',
+    )
+]
 for lan, data_name_list in subjective_all_sets.items():
     if lan == 'en':
         pair_prompt = pair_prompt_en
@@ -179,18 +194,17 @@ for lan, data_name_list in subjective_all_sets.items():
         pair_prompt = pair_prompt_cn
     for _name in data_name_list:
         subjective_infer_cfg = dict(
-                prompt_template=dict(
-                    type=PromptTemplate,
-                    template=dict(round=[
-                        dict(
-                            role='HUMAN',
-                            prompt='{question}'
-                        ),
-                    ]),
+            prompt_template=dict(
+                type=PromptTemplate,
+                template=dict(
+                    round=[
+                        dict(role='HUMAN', prompt='{question}'),
+                    ]
                 ),
-                retriever=dict(type=ZeroRetriever),
-                inferencer=dict(type=GenInferencer, max_out_len=4096),
-            )
+            ),
+            retriever=dict(type=ZeroRetriever),
+            inferencer=dict(type=GenInferencer, max_out_len=4096),
+        )
 
         subjective_eval_cfg = dict(
             evaluator=dict(
@@ -198,12 +212,10 @@ for lan, data_name_list in subjective_all_sets.items():
                 prompt_template=dict(
                     type=PromptTemplate,
                     template=dict(
-                    round=[
-                    dict(
-                        role='HUMAN',
-                        prompt = pair_prompt
+                        round=[
+                            dict(role='HUMAN', prompt=pair_prompt),
+                        ]
                     ),
-                ]),
                 ),
             ),
             pred_role='BOT',
@@ -213,7 +225,7 @@ for lan, data_name_list in subjective_all_sets.items():
             dict(
                 abbr=f'{_name}',
                 type=CompassBenchCheklistDataset,
-                path='./data/subjective/compassbench_checklist',
+                path=data_path,
                 name=_name,
                 reader_cfg=subjective_reader_cfg,
                 infer_cfg=subjective_infer_cfg,
@@ -221,4 +233,5 @@ for lan, data_name_list in subjective_all_sets.items():
                 mode='m2n',
                 infer_order='random',
                 base_models=gpt4,
-            ))
+            )
+        )
