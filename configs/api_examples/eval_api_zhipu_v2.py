@@ -59,8 +59,8 @@ infer = dict(
     partitioner=dict(type=NaivePartitioner),
     runner=dict(
         type=LocalAPIRunner,
-        max_num_workers=2,
-        concurrent_users=2,
+        max_num_workers=1,
+        concurrent_users=1,
         task=dict(type=OpenICLInferTask),
         )
 )
