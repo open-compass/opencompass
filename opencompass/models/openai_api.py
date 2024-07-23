@@ -53,6 +53,8 @@ class OpenAI(BaseAPIModel):
         tokenizer_path (str, optional): The path to the tokenizer. Use path if
             'tokenizer_path' is None, otherwise use the 'tokenizer_path'.
             Defaults to None.
+        extra_body (Dict, optional): Add additional JSON properties to 
+            the request
     """
 
     is_api: bool = True
@@ -71,7 +73,8 @@ class OpenAI(BaseAPIModel):
                  logprobs: Optional[bool] = False,
                  top_logprobs: Optional[int] = None,
                  temperature: Optional[float] = None,
-                 tokenizer_path: Optional[str] = None):
+                 tokenizer_path: Optional[str] = None,
+                 extra_body: Optional[Dict] = None):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -88,6 +91,7 @@ class OpenAI(BaseAPIModel):
         self.top_logprobs = top_logprobs
         self.tokenizer_path = tokenizer_path
         self.hf_tokenizer = None
+        self.extra_body = extra_body
 
         if isinstance(key, str):
             if key == 'ENV':
@@ -242,6 +246,8 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
                 )
+                if self.extra_body:
+                    data.update(self.extra_body)
                 if isinstance(self.url, list):
                     import random
                     url = self.url[random.randint(0, len(self.url) - 1)]
