@@ -21,6 +21,7 @@ We support the use of GPT-4 (or other JudgeLLM) for the subjective evaluation of
 4. AlpacaEvalv2 English Compare Dataset (https://github.com/tatsu-lab/alpaca_eval)
 5. ArenaHard English Compare Dataset, mainly focused on coding (https://github.com/lm-sys/arena-hard/tree/main)
 6. Fofo English Scoring Dataset (https://github.com/SalesforceAIResearch/FoFo/)
+7. Wildbench English Score and Compare Dataset（https://github.com/allenai/WildBench）
 
 ## Initiating Subjective Evaluation
 

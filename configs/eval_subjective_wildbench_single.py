@@ -1,13 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    # from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import subjective_datasets
-    from .datasets.subjective.wildbench.wildbench_single_judge import subjective_datasets
-    # from .models.gemma.hf_gemma_2b_it import models as gemma_2b_models
-    # from .models.hf_llama.hf_llama3_70b_instruct import models as llama3_model
-    # # from .models.hf_internlm.hf_internlm2_chat_7b import models
-    # from .models.yi.hf_yi_1_5_34b_chat import models as yi_model
-    # from .models.qwen.hf_qwen1_5_72b_chat import models as qwen_model
+    from .datasets.subjective.wildbench.wildbench_single_judge import wildbench_single_datasets
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
@@ -21,8 +15,6 @@ from opencompass.summarizers import WildBenchSingleSummarizer
 from opencompass.models import HuggingFacewithChatTemplate
 
 
-# models = sum([v for k, v in locals().items() if k.endswith("_model")], [])
-
 api_meta_template = dict(
     round=[
         dict(role='SYSTEM', api_role='SYSTEM'),
@@ -31,12 +23,6 @@ api_meta_template = dict(
     ]
 )
 
-# _meta_template = dict(
-#     round=[
-#         dict(role='HUMAN', begin='\n<|im_start|>user\n', end='<|im_end|>'),
-#         dict(role='BOT', begin='\n<|im_start|>assistant\n', end='<|im_end|>', generate=True),
-#     ],
-# )
 # -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
 # set max_out_len to 4096.
@@ -49,51 +35,13 @@ models = [
         batch_size=8,
         run_cfg=dict(num_gpus=1),
         stop_words=['<|end_of_text|>', '<|eot_id|>'],
-    ),
-    # dict(
-    #     type=HuggingFacewithChatTemplate,
-    #     abbr='yi-1.5-6b-chat-hf',
-    #     path='01-ai/Yi-1.5-6B-Chat',
-    #     max_out_len=4096,
-    #     batch_size=8,
-    #     run_cfg=dict(num_gpus=1),
-    # ),
-    dict(
-        type=HuggingFacewithChatTemplate,
-        abbr='qwen1.5-7b-chat-hf',
-        path='Qwen/Qwen1.5-7B-Chat',
-        max_out_len=8192,
-        batch_size=8,
-        run_cfg=dict(num_gpus=1),
-    ),
-    # dict(
-    #     type=HuggingFacewithChatTemplate,
-    #     abbr='llama-3-70b-instruct-hf',
-    #     path='meta-llama/Meta-Llama-3-70B-Instruct',
-    #     max_out_len=4096,
-    #     batch_size=8,
-    #     run_cfg=dict(num_gpus=4),
-    #     stop_words=['<|end_of_text|>', '<|eot_id|>'],
-    # ),
-    # dict(
-    #     type=HuggingFacewithChatTemplate,
-    #     abbr='yi-1.5-34b-chat-hf',
-    #     path='01-ai/Yi-1.5-34B-Chat',
-    #     max_out_len=4096,
-    #     batch_size=8,
-    #     run_cfg=dict(num_gpus=2),
-    # ),
-    # dict(
-    #     type=HuggingFacewithChatTemplate,
-    #     abbr='qwen1.5-72b-chat-hf',
-    #     path='Qwen/Qwen1.5-72B-Chat',
-    #     max_out_len=4096,
-    #     batch_size=8,
-    #     run_cfg=dict(num_gpus=4),
-    # )
+    )
 ]
 
-datasets = [*subjective_datasets]
+for model in models:
+    model['generation_kwargs'] = dict(do_sample=True)
+
+datasets = [*wildbench_single_datasets]
 
 # -------------Evalation Stage ----------------------------------------
 

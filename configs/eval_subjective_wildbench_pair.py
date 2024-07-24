@@ -1,30 +1,18 @@
 from mmengine.config import read_base
 
 with read_base():
-    # from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import subjective_datasets
     from .datasets.subjective.wildbench.wildbench_pair_judge import wildbench_datasets
-    from .models.openai.gpt_4 import models as gpt4_models
-    from .models.hf_llama.hf_llama2_70b_chat import models as llama2_models
-    # from .models.gemma.hf_gemma_2b_it import models
-    # from .models.hf_llama.hf_llama3_70b_instruct import models as llama3_model
-    # # from .models.hf_internlm.hf_internlm2_chat_7b import models
-    # from .models.yi.hf_yi_1_5_34b_chat import models as yi_model
-    # from .models.qwen.hf_qwen1_5_72b_chat import models as qwen_model
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.partitioners.sub_size import SubjectiveSizePartitioner
-from opencompass.runners import LocalRunner
-from opencompass.runners import SlurmSequentialRunner
+from opencompass.runners import LocalRunner, SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.summarizers import WildBenchPairSummarizer
-from opencompass.models.claude_api.claude_api import Claude
 from opencompass.models import HuggingFacewithChatTemplate
 
-
-models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 api_meta_template = dict(
     round=[
@@ -36,7 +24,6 @@ api_meta_template = dict(
 
 # -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
-
 models = [
     dict(
         type=HuggingFacewithChatTemplate,
@@ -46,24 +33,11 @@ models = [
         batch_size=8,
         run_cfg=dict(num_gpus=1),
         stop_words=['<|end_of_text|>', '<|eot_id|>'],
-    ),
-    dict(
-        type=HuggingFacewithChatTemplate,
-        abbr='yi-1.5-6b-chat-hf',
-        path='01-ai/Yi-1.5-6B-Chat',
-        max_out_len=4096,
-        batch_size=8,
-        run_cfg=dict(num_gpus=1),
-    ),
-    # dict(
-    #     type=HuggingFacewithChatTemplate,
-    #     abbr='qwen1.5-7b-chat-hf',
-    #     path='Qwen/Qwen1.5-7B-Chat',
-    #     max_out_len=4096,
-    #     batch_size=8,
-    #     run_cfg=dict(num_gpus=1),
-    # )
+    )
 ]
+
+for model in models:
+    model['generation_kwargs'] = dict(do_sample=True)
 
 datasets = [*wildbench_datasets]
 
@@ -82,11 +56,7 @@ judge_models = [dict(
     temperature=0,
 )]
 
-## single evaluation
-# eval = dict(
-#     partitioner=dict(type=SubjectiveSizePartitioner, strategy='split', max_task_size=10000, mode='singlescore', models=models, judge_models=judge_models),
-#     runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=SubjectiveEvalTask)),
-# )
+
 infer = dict(
     partitioner=dict(type=SizePartitioner, max_task_size=1000, strategy='split'),
     runner=dict(

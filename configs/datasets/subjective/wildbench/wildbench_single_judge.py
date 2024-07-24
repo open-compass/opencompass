@@ -12,7 +12,7 @@ subjective_reader_cfg = dict(
 
 data_path ='./data/WildBench/wildbench.jsonl'
 
-subjective_datasets = []
+wildbench_single_datasets = []
 
 # the question is a list, how to process it
 subjective_infer_cfg = dict(
@@ -35,7 +35,7 @@ subjective_eval_cfg = dict(
     pred_role='BOT',
 )
 
-subjective_datasets.append(
+wildbench_single_datasets.append(
     dict(
         abbr='wildbench',
         type=WildBenchDataset,
