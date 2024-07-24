@@ -585,7 +585,8 @@ class AsyncOpenAI(OpenAI):
             temperature=temperature,
             max_tokens=max_out_len,
         )
-        self.logger.info(f'>> infer_config: {infer_config}')
+        self.logger.info(f'>>infer_config: {infer_config}')
+        self.logger.info(f'>>len of inputs_batch: {len(inputs_batch)}')
 
         request_config = XRequestConfig(**infer_config)
 
