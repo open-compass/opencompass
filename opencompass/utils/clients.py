@@ -327,26 +327,25 @@ class OpenAIClientUtil:
                               messages: Optional[Messages] = None,
                               images: Optional[List[str]] = None,
                               *,
-                              is_chat_request: Optional[bool] = None,
+                              is_chat_request: Optional[bool] = True,
                               request_config: Optional[XRequestConfig] = None,
                               host: str = '127.0.0.1',
                               port: str = '8000',
                               **kwargs) -> Tuple[str, Dict[str, Any], bool]:
         if images is None:
             images = []
-        model_list = get_model_list_client(host, port, **kwargs)
-        for model in model_list.data:
-            if model_type == model.id:
-                _is_chat = model.is_chat
-                is_multimodal = model.is_multimodal
-                break
-        else:
-            raise ValueError(f'model_type: {model_type}, model_list: {[model.id for model in model_list.data]}')
 
-        if is_chat_request is None:
-            is_chat_request = _is_chat
-        assert is_chat_request is not None, (
-            'Please set the `is_chat_request` parameter to indicate whether the model is a chat model.')
+        is_multimodal = False  # TODO: to be supported
+
+        # model_list = get_model_list_client(host, port, **kwargs)
+        # for model in model_list.data:
+        #     if model_type == model.id:
+        #         _is_chat = model.is_chat
+        #         is_multimodal = model.is_multimodal
+        #         break
+        # else:
+        #     raise ValueError(f'model_type: {model_type}, model_list: {[model.id for model in model_list.data]}')
+
         data = {k: v for k, v in request_config.__dict__.items() if not k.startswith('__')}
         url = kwargs.pop('url', None)
         if url is None:
