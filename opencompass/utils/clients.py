@@ -373,6 +373,9 @@ class OpenAIClientUtil:
                 images = convert_to_base64(images=images)['images']
             data['prompt'] = query
             url = f'{url}/completions'
+
+        print(f'>>url: {url}')
+
         data['model'] = model_type
         if len(images) > 0:
             data['images'] = images
@@ -439,6 +442,9 @@ class OpenAIClientUtil:
             async with aiohttp.ClientSession() as session:
                 async with session.post(url, json=data) as resp:
                     resp_obj = await resp.json()
+
+                    print(f'>>resp_obj: {resp_obj}')
+
                     if resp_obj['object'] == 'error':
                         raise HTTPError(resp_obj['message'])
                     return from_dict(ret_cls, resp_obj)
