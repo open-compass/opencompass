@@ -53,7 +53,7 @@ class OpenAI(BaseAPIModel):
         tokenizer_path (str, optional): The path to the tokenizer. Use path if
             'tokenizer_path' is None, otherwise use the 'tokenizer_path'.
             Defaults to None.
-        extra_body (Dict, optional): Add additional JSON properties to 
+        extra_body (Dict, optional): Add additional JSON properties to
             the request
     """
 
@@ -308,8 +308,8 @@ class OpenAI(BaseAPIModel):
             int: Length of the input tokens
         """
         try:
-            enc = self.tiktoken.encoding_for_model(self.path
-                or self.tokenizer_path)
+            enc = self.tiktoken.encoding_for_model(
+                self.path or self.tokenizer_path)
             return len(enc.encode(prompt))
         except Exception:
             from transformers import AutoTokenizer
