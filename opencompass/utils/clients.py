@@ -324,13 +324,14 @@ class OpenAIClientUtil:
                               # query: str,
                               # history: Optional[History] = None,
                               # system: Optional[str] = None,
+                              url: str,
                               messages: Optional[Messages] = None,
                               images: Optional[List[str]] = None,
                               *,
                               is_chat_request: Optional[bool] = True,
                               request_config: Optional[XRequestConfig] = None,
-                              host: str = '127.0.0.1',
-                              port: str = '8000',
+                              # host: str = '127.0.0.1',
+                              # port: str = '8000',
                               **kwargs) -> Tuple[str, Dict[str, Any], bool]:
         if images is None:
             images = []
@@ -347,21 +348,14 @@ class OpenAIClientUtil:
         #     raise ValueError(f'model_type: {model_type}, model_list: {[model.id for model in model_list.data]}')
 
         data = {k: v for k, v in request_config.__dict__.items() if not k.startswith('__')}
-        url = kwargs.pop('url', None)
-        if url is None:
-            url = f'http://{host}:{port}/v1'
-        url = url.rstrip('/')
+
         if is_chat_request:
             # messages = history_to_messages(history, query, system, kwargs.get('roles'))
             if is_multimodal:
                 messages = convert_to_base64(messages=messages)['messages']
                 images = convert_to_base64(images=images)['images']
             data['messages'] = messages
-            url = f'{url}/chat/completions'
         else:
-            # assert system is None and history is None, (
-            #     'The chat template for text generation does not support system and history.')
-
             # TODO: This is a temporary solution for non-chat models.
             input_prompts = []
             for msg in messages:
@@ -372,11 +366,6 @@ class OpenAIClientUtil:
                 query = convert_to_base64(prompt=query)['prompt']
                 images = convert_to_base64(images=images)['images']
             data['prompt'] = query
-            url = f'{url}/completions'
-
-        # TODO: ONLY FOR TEST !
-        url = 'http://127.0.0.1:8000/v1/chat/completions'
-        print(f'>>url: {url}')
 
         data['model'] = model_type
         if len(images) > 0:
@@ -391,28 +380,28 @@ class OpenAIClientUtil:
             # history: Optional[History] = None,
             # system: Optional[str] = None,
             messages: Messages,
+            url: str,
             images: Optional[List[str]] = None,
             *,
             is_chat_request: Optional[bool] = None,
             request_config: Optional[XRequestConfig] = None,
-            host: str = '127.0.0.1',
-            port: str = '8000',
+            # host: str = '127.0.0.1',
+            # port: str = '8000',
             **kwargs
     ) -> Union[ChatCompletionResponse, CompletionResponse, AsyncIterator[ChatCompletionStreamResponse],
                AsyncIterator[CompletionStreamResponse]]:
         if request_config is None:
             request_config = XRequestConfig()
+
         url, data, is_chat_request = OpenAIClientUtil._pre_inference_client(
-            model_type,
-            # query,
-            # history,
-            # system,
-            messages,
-            images,
+            model_type=model_type,
+            url=url,
+            messages=messages,
+            images=images,
             is_chat_request=is_chat_request,
             request_config=request_config,
-            host=host,
-            port=port,
+            # host=host,
+            # port=port,
             **kwargs)
 
         if request_config.stream:
@@ -444,8 +433,6 @@ class OpenAIClientUtil:
             async with aiohttp.ClientSession() as session:
                 async with session.post(url, json=data) as resp:
                     resp_obj = await resp.json()
-
-                    print(f'>>resp_obj: {resp_obj}')
 
                     if resp_obj['object'] == 'error':
                         raise HTTPError(resp_obj['message'])
