@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -587,12 +588,19 @@ class AsyncOpenAI(OpenAI):
         self.logger.info(f'>> infer_config: {infer_config}')
 
         request_config = XRequestConfig(**infer_config)
-        resp_list = OpenAIClientUtil.call_openai_batched(model_type=self.path,
-                                                         messages_batch=inputs_batch,
-                                                         request_config=request_config,
-                                                         base_url=self.url,
-                                                         is_chat=self.is_chat,
-                                                         )
+
+        resp_list = asyncio.run(
+            OpenAIClientUtil.call_openai_batched(
+                model_type=self.path,
+                messages_batch=inputs_batch,
+                request_config=request_config,
+                base_url=self.url,
+                is_chat=self.is_chat,
+            )
+        )
+
+        self.logger.info(f'>> resp_list[0]: {resp_list[0]}')
+
         return resp_list
 
     def get_token_len(self, prompt: str) -> int:
