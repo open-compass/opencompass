@@ -10,6 +10,13 @@
 </div>
 
 ## Quick Start
+### Data Preparation
+Download dataset to data/ folder.
+```
+wget https://github.com/OpenCausaLab/CaLM/releases/download/v1.0.0.lite/calm.zip
+unzip calm.zip
+```
+### Run Model and Infer
 To obtain a concise output with only the average information for all tasks, use:
 
 ```
