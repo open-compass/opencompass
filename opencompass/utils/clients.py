@@ -374,6 +374,8 @@ class OpenAIClientUtil:
             data['prompt'] = query
             url = f'{url}/completions'
 
+        # TODO: ONLY FOR TEST !
+        url = 'http://127.0.0.1:8000/v1/chat/completions'
         print(f'>>url: {url}')
 
         data['model'] = model_type
