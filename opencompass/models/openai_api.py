@@ -13,6 +13,7 @@ from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
+from opencompass.utils.clients import OpenAIClientUtil, XRequestConfig
 
 PromptType = Union[PromptList, str]
 OPENAI_API_BASE = 'https://api.openai.com/v1/chat/completions'
@@ -508,7 +509,7 @@ class OpenAIAllesAPIN(OpenAI):
 @MODELS.register_module()
 class AsyncOpenAI(OpenAI):
     """
-    Model wrapper around OpenAI's models with extra features.
+    Async version of OpenAI model.
 
     Args:
         path (str): The name of OpenAI's model.
@@ -550,21 +551,49 @@ class AsyncOpenAI(OpenAI):
                  temperature: float = 0.7,
                  **kwargs) -> List[str]:
 
+        results = []
+
+        if len(inputs) == 0:
+            self.logger.error('Got empty input list in generate()')
+            return results
+
         if self.temperature is not None:
             temperature = self.temperature
 
-        # with ThreadPoolExecutor() as executor:
-        #     results = list(
-        #         executor.map(self._generate, inputs,
-        #                      [max_out_len] * len(inputs),
-        #                      [temperature] * len(inputs)))
+        inputs_batch = []
 
+        for input_sample in inputs:
 
+            if isinstance(input_sample, str):
+                messages = [{'role': 'user', 'content': input_sample}]
+            else:
+                messages = []
+                for item in input_sample:
+                    msg = {'content': item['prompt']}
+                    if item['role'] == 'HUMAN':
+                        msg['role'] = 'user'
+                    elif item['role'] == 'BOT':
+                        msg['role'] = 'assistant'
+                    elif item['role'] == 'SYSTEM':
+                        msg['role'] = 'system'
+                    messages.append(msg)
 
-        # TODO
-        results = []
+            inputs_batch.append(messages)
 
-        return results
+        infer_config = dict(
+            temperature=temperature,
+            max_tokens=max_out_len,
+        )
+        self.logger.info(f'>> infer_config: {infer_config}')
+
+        request_config = XRequestConfig(**infer_config)
+        resp_list = OpenAIClientUtil.call_openai_batched(model_type=self.path,
+                                                         messages_batch=inputs_batch,
+                                                         request_config=request_config,
+                                                         base_url=self.url,
+                                                         is_chat=self.is_chat,
+                                                         )
+        return resp_list
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese

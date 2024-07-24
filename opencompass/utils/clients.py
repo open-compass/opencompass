@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -21,6 +22,36 @@ Messages = List[Dict[str, Union[str, List[Dict]]]]
 
 def random_uuid() -> str:
     return str(uuid.uuid4().hex)
+
+
+class XRequestConfig:
+    """NOTE: The following behavior is inconsistent with the OpenAI API.
+    Default values for OpenAI:
+        temperature = 1.
+        top_k = -1
+        top_p = 1.
+        repetition_penalty = 1.
+    """
+    max_tokens: Optional[int] = None  # None: max_model_len - num_tokens
+    # None: use deploy_args
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
+
+    n: int = 1
+    seed: Optional[int] = None
+    stop: Optional[List[str]] = None
+    stream: bool = False
+
+    best_of: Optional[int] = None
+    presence_penalty: float = 0.
+    frequency_penalty: float = 0.
+    length_penalty: float = 1.
+
+    # additional
+    num_beams: int = 1
+    # None: use deploy_args
+    top_k: Optional[int] = None
+    repetition_penalty: Optional[float] = None
 
 
 @dataclass
@@ -290,9 +321,10 @@ class OpenAIClientUtil:
 
     @staticmethod
     def _pre_inference_client(model_type: str,
-                              query: str,
-                              history: Optional[History] = None,
-                              system: Optional[str] = None,
+                              # query: str,
+                              # history: Optional[History] = None,
+                              # system: Optional[str] = None,
+                              messages: Optional[Messages] = None,
                               images: Optional[List[str]] = None,
                               *,
                               is_chat_request: Optional[bool] = None,
@@ -321,15 +353,22 @@ class OpenAIClientUtil:
             url = f'http://{host}:{port}/v1'
         url = url.rstrip('/')
         if is_chat_request:
-            messages = history_to_messages(history, query, system, kwargs.get('roles'))
+            # messages = history_to_messages(history, query, system, kwargs.get('roles'))
             if is_multimodal:
                 messages = convert_to_base64(messages=messages)['messages']
                 images = convert_to_base64(images=images)['images']
             data['messages'] = messages
             url = f'{url}/chat/completions'
         else:
-            assert system is None and history is None, (
-                'The chat template for text generation does not support system and history.')
+            # assert system is None and history is None, (
+            #     'The chat template for text generation does not support system and history.')
+
+            # TODO: This is a temporary solution for non-chat models.
+            input_prompts = []
+            for msg in messages:
+                input_prompts.append(msg['content'])
+            query = '\n'.join(input_prompts)
+
             if is_multimodal:
                 query = convert_to_base64(prompt=query)['prompt']
                 images = convert_to_base64(images=images)['images']
@@ -344,9 +383,10 @@ class OpenAIClientUtil:
     @staticmethod
     async def _inference_client_async(
             model_type: str,
-            query: str,
-            history: Optional[History] = None,
-            system: Optional[str] = None,
+            # query: str,
+            # history: Optional[History] = None,
+            # system: Optional[str] = None,
+            messages: Messages,
             images: Optional[List[str]] = None,
             *,
             is_chat_request: Optional[bool] = None,
@@ -360,9 +400,10 @@ class OpenAIClientUtil:
             request_config = XRequestConfig()
         url, data, is_chat_request = OpenAIClientUtil._pre_inference_client(
             model_type,
-            query,
-            history,
-            system,
+            # query,
+            # history,
+            # system,
+            messages,
             images,
             is_chat_request=is_chat_request,
             request_config=request_config,
@@ -404,11 +445,18 @@ class OpenAIClientUtil:
                     return from_dict(ret_cls, resp_obj)
 
     @staticmethod
-    async def _call_openai(model_type: str, query: str, eval_url: str, *, is_chat_model: bool,
-                           request_config: XRequestConfig, prog_bar: tqdm) -> Tuple[str, Optional[int]]:
+    async def _call_openai(model_type: str,
+                           # query: str,
+                           messages: Messages,
+                           eval_url: str,
+                           *,
+                           is_chat_model: bool,
+                           request_config: XRequestConfig,
+                           prog_bar: tqdm,
+                           ) -> Tuple[str, Optional[int]]:
         # idx: maintain the order
         resp = await OpenAIClientUtil._inference_client_async(
-            model_type, query, is_chat_request=is_chat_model, request_config=request_config, url=eval_url)
+            model_type, messages, is_chat_request=is_chat_model, request_config=request_config, url=eval_url)
         if is_chat_model:
             response = resp.choices[0].message.content
         else:
@@ -416,5 +464,27 @@ class OpenAIClientUtil:
         prog_bar.update()
         return response
 
-
-    # TODO: to be continued
+    @staticmethod
+    async def call_openai_batched(model_type: str,
+                                  # prompts: List[str],
+                                  messages_batch: List[Messages],
+                                  request_config: XRequestConfig,
+                                  base_url: str,
+                                  is_chat: bool = True,
+                                  ) -> List[str]:
+        use_tqdm = True if len(messages_batch) >= 20 else False
+        prog_bar = tqdm(total=len(messages_batch), dynamic_ncols=True, disable=not use_tqdm)
+        tasks = []
+        for messages in messages_batch:
+            tasks.append(
+                OpenAIClientUtil._call_openai(
+                    model_type,
+                    # prompt,
+                    messages,
+                    base_url,
+                    is_chat_model=is_chat,
+                    request_config=request_config,
+                    prog_bar=prog_bar))
+        response_list: List[str] = await asyncio.gather(*tasks)
+        prog_bar.close()
+        return response_list
