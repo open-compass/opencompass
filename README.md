@@ -70,7 +70,9 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **\[2024.07.05\]** We supported the [ModelScope](www.modelscope.cn) datasets, you can load them on demand without downloading all the data to your local disk. Welcome to try! 🔥🔥🔥
+- **\[2024.07.23\]** We supported the [ModelScope](www.modelscope.cn) datasets, you can load them on demand without downloading all the data to your local disk. Welcome to try! 🔥🔥🔥
+- **\[2024.07.17\]** We have released the example data and configuration for the CompassBench-202408, welcome to [CompassBench](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/compassbench_intro.html) for more details. 🔥🔥🔥
+- **\[2024.07.17\]** We are excited to announce the release of NeedleBench's [technical report](http://arxiv.org/abs/2407.11963). We invite you to visit our [support documentation](https://opencompass.readthedocs.io/en/latest/advanced_guides/needleinahaystack_eval.html) for detailed evaluation guidelines. 🔥🔥🔥
 - **\[2024.07.04\]** OpenCompass now supports InternLM2.5, which has **outstanding reasoning capability**, **1M Context window and** and **stronger tool use**, you can try the models in [OpenCompass Config](https://github.com/open-compass/opencompass/tree/main/configs/models/hf_internlm) and [InternLM](https://github.com/InternLM/InternLM) .🔥🔥🔥.
 - **\[2024.06.20\]** OpenCompass now supports one-click switching between inference acceleration backends, enhancing the efficiency of the evaluation process. In addition to the default HuggingFace inference backend, it now also supports popular backends [LMDeploy](https://github.com/InternLM/lmdeploy) and [vLLM](https://github.com/vllm-project/vllm). This feature is available via a simple command-line switch and through deployment APIs. For detailed usage, see the [documentation](docs/en/advanced_guides/accelerator_intro.md).🔥🔥🔥.
 - **\[2024.05.08\]** We supported the evaluation of 4 MoE models: [Mixtral-8x22B-v0.1](configs/models/mixtral/hf_mixtral_8x22b_v0_1.py), [Mixtral-8x22B-Instruct-v0.1](configs/models/mixtral/hf_mixtral_8x22b_instruct_v0_1.py), [Qwen1.5-MoE-A2.7B](configs/models/qwen/hf_qwen1_5_moe_a2_7b.py), [Qwen1.5-MoE-A2.7B-Chat](configs/models/qwen/hf_qwen1_5_moe_a2_7b_chat.py). Try them out now!
@@ -148,7 +150,7 @@ Also, use the [ModelScope](www.modelscope.cn) to load the datasets on demand.
 Installation:
 
 ```bash
-pip install modelscope[framework]
+pip install modelscope
 export DATASET_SOURCE=ModelScope
 ```
 
@@ -478,20 +480,21 @@ Through the command line or configuration files, OpenCompass also supports evalu
     <tr valign="top">
       <td>
 
+- [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
+- [Baichuan](https://github.com/baichuan-inc)
+- [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
+- [ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)
+- [ChatGLM3](https://github.com/THUDM/ChatGLM3-6B)
+- [Gemma](https://huggingface.co/google/gemma-7b)
 - [InternLM](https://github.com/InternLM/InternLM)
 - [LLaMA](https://github.com/facebookresearch/llama)
 - [LLaMA3](https://github.com/meta-llama/llama3)
-- [Vicuna](https://github.com/lm-sys/FastChat)
-- [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
-- [Baichuan](https://github.com/baichuan-inc)
-- [WizardLM](https://github.com/nlpxucan/WizardLM)
-- [ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)
-- [ChatGLM3](https://github.com/THUDM/ChatGLM3-6B)
-- [TigerBot](https://github.com/TigerResearch/TigerBot)
 - [Qwen](https://github.com/QwenLM/Qwen)
-- [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
-- [Gemma](https://huggingface.co/google/gemma-7b)
-- ...
+- [TigerBot](https://github.com/TigerResearch/TigerBot)
+- [Vicuna](https://github.com/lm-sys/FastChat)
+- [WizardLM](https://github.com/nlpxucan/WizardLM)
+- [Yi](https://github.com/01-ai/Yi)
+- ……
 
 </td>
 <td>

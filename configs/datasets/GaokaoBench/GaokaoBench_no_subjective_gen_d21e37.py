@@ -6,7 +6,7 @@ from opencompass.datasets import GaokaoBenchDataset
 from mmengine.config import read_base
 
 with read_base():
-    from ..utils.utils import get_data_path
+    from opencompass.utils.datasets import get_data_path
     from .GaokaoBench_prompts import MCQ_prompts, FBQ_prompts
 
 GaokaoBench_datasets = []

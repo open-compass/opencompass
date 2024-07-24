@@ -226,6 +226,165 @@ class HuggingFacewithChatTemplate(BaseModel):
         self.model.eval()
         self.model.generation_config.do_sample = False
 
+
+    def get_ppl_tokenwise(self, inputs: List[str], label: List[List[int]], mask_length: Optional[List[int]] = None) -> List[float]:
+        """Get inference-ppl per token given a list of inputs and label.
+
+        Args:
+            inputs (List[str]): A list of strings.
+            label (List[List[int]]): A list of list of label, each label is a tuple of (start, end, 1)
+            mask_length (Optional[List[int]]): A list of mask lengths. If
+                provided, the perplexity scores will be calculated with the
+                first mask_length[i] tokens masked out. It's okay to skip
+                its implementation if advanced features in PPLInfernecer is
+                not needed.
+
+        Returns:
+            List[float]: A list of perplexity scores.
+        """
+        assert self.tokenizer.pad_token
+        import torch
+        import torch.nn.functional as F
+        pad_token_id = self.tokenizer.pad_token_id
+        messages = _convert_base_messages(inputs)
+
+        tokenize_kwargs = dict(
+            return_tensors='pt',
+            padding=True,
+            truncation=True,
+            add_special_tokens=True,
+            max_length=self.max_seq_len,
+        )
+
+        self.tokenizer.padding_side = 'right'
+        self.tokenizer.truncation_side = 'right'
+
+        tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
+        tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
+        outputs = self.model(**tokens)[0]
+
+        batch_size, seq_len, vocab_size = outputs.shape
+        shift_logits = outputs[:, :-1, :].contiguous().float()
+        shift_labels = tokens['input_ids'][:, 1:].contiguous()
+        loss = F.cross_entropy(
+            shift_logits.view(-1, vocab_size),
+            shift_labels.view(-1),
+            ignore_index=pad_token_id,
+            reduction='none').view(batch_size, seq_len - 1)
+        lens = (tokens['input_ids'] != pad_token_id).sum(-1).cpu().numpy()
+
+        if mask_length is not None:
+            import numpy as np
+            mask = torch.zeros_like(shift_labels)  # [batch,seqlen]
+            for i in range(len(mask)):
+                for j in range(mask_length[i] - 1, len(mask[i])):
+                    mask[i][j] = 1
+            loss = loss * mask
+            lens -= np.array(mask_length)
+
+        loss = loss.cpu().numpy()
+
+        decode_messages = [[self.tokenizer.decode([input_id]) for input_id in token] for token in tokens['input_ids']]
+        char_messages = [[ch for ch in message] for message in messages]
+
+        # shifted to align label and loss
+        for i in range(len(decode_messages)):
+            decode_messages[i] = decode_messages[i][1:]
+
+        aggregated_label_list = [[] for _ in range(len(decode_messages))]
+
+        tag_list = [[] for _ in range(len(decode_messages))]
+
+        for tmp_index, label_list in enumerate(label):
+            for single_label in label_list:
+                left = single_label[0]
+                right = single_label[1]
+                for i in range(left, right):
+                    aggregated_label_list[tmp_index].append(i)
+
+
+        def align_sequences(seq1, seq2, sep_len):
+            """
+            seq1: decoded sequence from token, one token may contain multiple characters
+            seq2: original separate character sequence
+            """
+            i, j = 0, 0
+            matched_pairs = []
+            while i < len(seq1) and j < len(seq2):
+                word = seq1[i]
+                if len(word) == 0:
+                    matched_pairs.append((word, []))
+                    i += 1
+                    continue
+
+                if '\ufffd' in word:
+                    for _ in range(sep_len):
+                        matched_pairs.append((word, [j]))
+                        i += 1
+                    j += 1
+                    continue
+
+                char_sequence = ''
+                while j < len(seq2) and (char_sequence != word):
+                    char_sequence += seq2[j]
+                    if char_sequence == word:
+                        matched_pairs.append((word, [k for k in range(j - len(word) + 1, j+1)]))
+                        j += 1
+                        break
+                    elif len(char_sequence) > len(word):
+                        if word == char_sequence[-len(word):]:
+                            matched_pairs.append((word, [k for k in range(j - len(word) + 1, j+1)]))
+                            j += 1
+                            break
+                        else:
+                            j += 1
+                    else:
+                        j += 1
+                i += 1
+
+            return matched_pairs
+
+
+
+        if 'qwen' in self.path or 'Qwen' in self.path:
+            sep_len = 2
+        elif 'Llama-3' in self.path:
+            sep_len = 2
+        elif 'Yi' in self.path:
+            sep_len = 3
+        elif 'Llama-2' in self.path:
+            sep_len = 3
+        elif 'deepseek' in self.path:
+            sep_len = 2
+        else:
+            sep_len = 3
+
+
+        matched_pairs_list = [align_sequences(decode_messages[i], char_messages[i], sep_len) for i in range(len(decode_messages))]
+        for match_index, matched_pairs in enumerate(matched_pairs_list):
+            for i, (word, indices) in enumerate(matched_pairs):
+                for j in indices:
+                    if j in aggregated_label_list[match_index]:
+                        tag_list[match_index].append(i)
+                        break
+
+        inference_loss_list = []
+        token_len_list = []
+        for i in range(len(loss)):
+            inference_loss = 0
+            token_len = 0
+            for j in range(len(loss[i])):
+                if j in tag_list[i]:
+
+                    inference_loss += loss[i][j]
+                    print(loss[i][j])
+                    token_len += 1
+            inference_loss_list.append(inference_loss)
+            token_len_list.append(token_len)
+
+        return inference_loss_list, token_len_list
+
     def _get_potential_stop_words(self, path: Optional[str]):
         from transformers import GenerationConfig
         potential_stop_words = []

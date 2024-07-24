@@ -1,10 +1,10 @@
 from mmengine.config import read_base
 with read_base():
-    from ..utils.utils import get_data_path
+    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess
+from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess_v2
 
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
 
@@ -26,7 +26,7 @@ math_infer_cfg = dict(
     inferencer=dict(type=GenInferencer, max_out_len=512))
 
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator), pred_postprocessor=dict(type=math_postprocess))
+    evaluator=dict(type=MATHEvaluator, version='v2'), pred_postprocessor=dict(type=math_postprocess_v2))
 
 math_datasets = [
     dict(

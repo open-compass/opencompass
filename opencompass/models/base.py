@@ -86,6 +86,28 @@ class BaseModel:
                                   'instead.')
 
     @abstractmethod
+    def get_ppl_tokenwise(
+            self,
+            inputs: List[str],
+            mask_length: Optional[List[int]] = None) -> List[float]:
+        """Get tokenwise perplexity scores given a list of inputs.
+
+        Args:
+            inputs (List[str]): A list of strings.
+            mask_length (Optional[List[int]]): A list of mask lengths. If
+                provided, the perplexity scores will be calculated with the
+                first mask_length[i] tokens masked out. It's okay to skip
+                its implementation if advanced features in PPLInfernecer is
+                not needed.
+
+        Returns:
+            List[float]: A list of perplexity scores.
+        """
+        raise NotImplementedError(f'{self.__class__.__name__} does not support'
+                                  ' ppl-based evaluation yet, try gen-based '
+                                  'instead.')
+
+    @abstractmethod
     def encode(self, prompt: str) -> torch.Tensor:
         """Encode prompt to tokens. Not necessary for most cases.
 
@@ -150,6 +172,20 @@ class BaseModel:
         """
         inputs = self.parse_template(templates, mode='ppl')
         return self.get_ppl(inputs, mask_length)
+
+    def get_ppl_tokenwise_from_template(self,
+                                        templates: List[PromptType],
+                                        label: List[List[int]],
+                                        mask_length=None):
+        """Get token-wise perplexity given a list of templates.
+
+        Args:
+            templates (List[PromptType]): A list of templates.
+            mask_length (List[int]): A list of mask lengths. If provided, the
+                perplexity will be calculated only on the unmasked tokens.
+        """
+        inputs = self.parse_template(templates, mode='ppl')
+        return self.get_ppl_tokenwise(inputs, label, mask_length)
 
     def generate_from_template(self, templates: List[PromptType],
                                max_out_len: int, **kwargs):
