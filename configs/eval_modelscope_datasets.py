@@ -1,5 +1,5 @@
-from os import environ
-environ['DATASET_SOURCE'] = 'ModelScope'
+
+# export DATASET_SOURCE='ModelScope' # before run this script
 from datasets import Dataset, DatasetDict
 from mmengine.config import read_base
 from tqdm import tqdm

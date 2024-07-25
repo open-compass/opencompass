@@ -1,4 +1,3 @@
-from os import environ
 from mmengine.config import read_base
 from opencompass.models import ZhiPuV2AI
 from opencompass.partitioners import NaivePartitioner
@@ -6,6 +5,7 @@ from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
+    # from .datasets.collections.chat_medium import datasets
     from ..summarizers.medium import summarizer
     from ..datasets.ceval.ceval_gen import ceval_datasets
 
@@ -34,10 +34,10 @@ api_meta_template = dict(
 
 models = [
      dict(
-        abbr='glm-4-flash',
+        abbr='glm4_notools',
         type=ZhiPuV2AI,
-        path='glm-4-flash',
-        key=environ['ZHIPU_API_KEY'],
+        path='glm-4',
+        key='xxxxxx',
         generation_kwargs={
             'tools': [
                 {
@@ -59,10 +59,9 @@ infer = dict(
     partitioner=dict(type=NaivePartitioner),
     runner=dict(
         type=LocalAPIRunner,
-        max_num_workers=1,
-        concurrent_users=1,
-        task=dict(type=OpenICLInferTask),
-        )
+        max_num_workers=2,
+        concurrent_users=2,
+        task=dict(type=OpenICLInferTask)),
 )
 
 work_dir = 'outputs/api_zhipu_v2/'
