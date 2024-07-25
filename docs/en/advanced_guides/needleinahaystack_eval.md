@@ -18,6 +18,8 @@ Within the `NeedleBench` framework of `OpenCompass`, we have designed a series o
 
 ### Evaluation Steps
 
+> Note: In the latest code, OpenCompass has been set to automatically load the dataset from [Huggingface API](https://huggingface.co/datasets/opencompass/NeedleBench), so you can **skip directly** the following steps of manually downloading and placing the dataset.
+
 1. Download the dataset from [here](https://github.com/open-compass/opencompass/files/14741330/needlebench.zip).
 
 2. Place the downloaded files in the `opencompass/data/needlebench/` directory. The expected file structure in the `needlebench` directory is shown below:
