@@ -600,6 +600,7 @@ class AsyncOpenAI(OpenAI):
             )
         )
 
+        self.logger.info(f'>> resp_list len: {len(resp_list)}')
         self.logger.info(f'>> resp_list[0]: {resp_list[0]}')
 
         return resp_list
