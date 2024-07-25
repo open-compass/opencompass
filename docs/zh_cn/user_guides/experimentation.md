@@ -45,7 +45,7 @@ python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--deb
 - 本地机器运行: `run.py $EXP`。
 - srun运行: `run.py $EXP --slurm -p $PARTITION_name`。
 - dlc运行： `run.py $EXP --dlc --aliyun-cfg $AliYun_Cfg`
-- 定制化启动: `run.py $EXP`。这里 $EXP 为配置文件，且里面包含 `eval` 和 `infer` 字段，详细配置请参考 [高效评测](./evaluation.md)。
+- 定制化启动: `run.py $EXP`。这里 $EXP 为配置文件，且里面包含 `eval` 和 `infer` 字段，详细配置请参考 [数据分片](./evaluation.md)。
 
 参数解释如下：
 
