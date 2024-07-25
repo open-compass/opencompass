@@ -195,7 +195,7 @@ class NeedleBenchParallelDataset(BaseDataset):
             if file_path.split('/')[-1] not in file_list:
                 continue
 
-            with open(file, 'r', encoding='utf-8') as f:
+            with open(file_path, 'r', encoding='utf-8') as f:
                 lines_bak = [json.loads(line.strip()) for line in f]
             lines = lines_bak.copy()
             for counter in range(num_repeats_per_file):
