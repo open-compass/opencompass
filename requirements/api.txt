@@ -1,5 +1,6 @@
 dashscope # Qwen
 sseclient-py==1.7.2
 volcengine # bytedance
+volcengine-python-sdk[ark] # doubao/bytedance Ark v3
 websocket-client
 zhipuai # zhipu
