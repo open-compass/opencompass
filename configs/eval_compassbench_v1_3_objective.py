@@ -19,9 +19,9 @@ with read_base():
     #     models as qwen2_7b_instruct_model,
     # )  # Qwen2-7B-Instruct
 
-    # from .datasets.compassbench_v1_3.compassbench_v1_3_math import (
-    #     compassbench_math_datasets,
-    # )
+    from .datasets.compassbench_v1_3.compassbench_v1_3_math import (
+        compassbench_math_datasets,
+    )
     from .datasets.compassbench_v1_3.compassbench_v1_3_knowledge import (
         compassbench_knowledge_datasets,
     )
