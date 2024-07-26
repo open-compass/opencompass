@@ -1,9 +1,9 @@
 import json
 import random
-from pathlib import Path
 
 import tiktoken
 from datasets import Dataset
+from huggingface_hub import hf_hub_download
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
@@ -57,7 +57,7 @@ class NeedleBenchParallelDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str,
+        path: str,  # depreciated
         needle_file_name: str,
         length: int,
         depths: list[int],
@@ -72,9 +72,22 @@ class NeedleBenchParallelDataset(BaseDataset):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
 
-        files = Path(path).glob('*.jsonl')
-        for file in files:
-            if file.name == needle_file_name:
+        repo_id = 'opencompass/NeedleBench'
+        file_names = [
+            'PaulGrahamEssays.jsonl', 'needles.jsonl', 'zh_finance.jsonl',
+            'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
+            'zh_movie.jsonl', 'zh_tech.jsonl'
+        ]
+
+        downloaded_files = []
+        for file_name in file_names:
+            file_path = hf_hub_download(repo_id=repo_id,
+                                        filename=file_name,
+                                        repo_type='dataset')
+            downloaded_files.append(file_path)
+
+        for file in downloaded_files:
+            if file.split('/')[-1] == needle_file_name:
                 needle_file_path = file
 
         predefined_needles_bak = get_unique_entries(needle_file_path,
@@ -178,12 +191,11 @@ class NeedleBenchParallelDataset(BaseDataset):
 
             return prompt
 
-        files = Path(path).glob('*.jsonl')
-        for file in files:
-            if file.name not in file_list:
+        for file_path in downloaded_files:
+            if file_path.split('/')[-1] not in file_list:
                 continue
 
-            with open(file, 'r', encoding='utf-8') as f:
+            with open(file_path, 'r', encoding='utf-8') as f:
                 lines_bak = [json.loads(line.strip()) for line in f]
             lines = lines_bak.copy()
             for counter in range(num_repeats_per_file):

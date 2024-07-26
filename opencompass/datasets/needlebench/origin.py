@@ -2,10 +2,10 @@ import json
 import os
 import random
 import re
-from pathlib import Path
 
 import tiktoken
 from datasets import Dataset
+from huggingface_hub import hf_hub_download
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
@@ -36,7 +36,7 @@ class NeedleBenchOriginDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str,
+        path: str,  # depreciated
         length: int,
         depth: int,
         tokenizer_model: str,
@@ -128,18 +128,33 @@ class NeedleBenchOriginDataset(BaseDataset):
 
             return prompt
 
-        files = Path(path).glob('*.jsonl')
-        for file in files:
-            if file.name not in file_list:
-                continue
+        repo_id = 'opencompass/NeedleBench'
+        file_names = [
+            'PaulGrahamEssays.jsonl', 'needles.jsonl', 'zh_finance.jsonl',
+            'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
+            'zh_movie.jsonl', 'zh_tech.jsonl'
+        ]
 
-            with open(file, 'r', encoding='utf-8') as f:
+        downloaded_files = []
+        base_file_path = ''
+        for file_name in file_names:
+            file_path = hf_hub_download(repo_id=repo_id,
+                                        filename=file_name,
+                                        repo_type='dataset')
+            downloaded_files.append(file_path)
+            base_file_path = '/'.join(file_path.split('/')[:-1])
+
+        for file_path in downloaded_files:
+            if file_path.split('/')[-1] not in file_list:
+                continue
+            with open(file_path, 'r', encoding='utf-8') as f:
                 lines_bak = [json.loads(line.strip()) for line in f]
             lines = lines_bak.copy()
             for counter in range(num_repeats_per_file):
                 random.seed(counter)
                 random.shuffle(lines)
-                needle_file_path = os.path.join(path, needle_file_name)
+                needle_file_path = os.path.join(base_file_path,
+                                                needle_file_name)
                 random_needle = get_random_line_by_language(
                     counter, needle_file_path, language)
                 needle = '\n' + random_needle['needle'] + '\n'
