@@ -25,7 +25,7 @@ def get_command_template(gpu_ids: List[int]) -> str:
     """Format command template given available gpu ids."""
     if is_npu_available():
         tmpl = 'ASCEND_RT_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
-        tmpl += ' & {task_cmd}'
+        tmpl += ' {task_cmd}'
     elif sys.platform == 'win32':  # Always return win32 for Windows
         # use command in Windows format
         tmpl = 'set CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
