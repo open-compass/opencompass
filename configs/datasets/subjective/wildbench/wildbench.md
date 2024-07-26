@@ -4,7 +4,7 @@
 
 We support the [wildbench dataset](https://github.com/allenai/WildBench), developed by Lin et al. Please refer to their repo for more detail.
 
-You have to download our preprocessed dataset from . The format of dir should be like:
+You have to download our preprocessed dataset. The format of dir should be like:
 
 ```
 wildbench
