@@ -21,6 +21,7 @@
 4. AlpacaEvalv2 英文Compare数据集（https://github.com/tatsu-lab/alpaca_eval）
 5. ArenaHard 英文Compare数据集，主要面向coding(https://github.com/lm-sys/arena-hard/tree/main)
 6. Fofo  英文Socring数据集（https://github.com/SalesforceAIResearch/FoFo/）
+7. Wildbench 英文Score和Compare数据集（https://github.com/allenai/WildBench）
 
 ## 启动主观评测
 
