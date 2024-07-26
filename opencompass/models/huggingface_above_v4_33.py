@@ -12,35 +12,32 @@ PromptType = Union[PromptList, str]
 
 
 def _get_stopping_criteria(stop_words, tokenizer, batch_size):
-    from transformers import (PreTrainedTokenizer, StoppingCriteria,
-                              StoppingCriteriaList)
+    from transformers import StoppingCriteria, StoppingCriteriaList
 
     class MultiTokenEOSCriteria(StoppingCriteria):
         """Criteria to stop on the specified multi-token sequence."""
 
-        def __init__(self, sequence: str, tokenizer: PreTrainedTokenizer, batch_size: int):
+        def __init__(self, stop_words: List[str], tokenizer, batch_size: int):
             self.done_tracker = [False] * batch_size
-            self.sequence = sequence
-            self.sequence_ids = tokenizer.encode(sequence, add_special_tokens=False)
-            self.sequence_id_len = len(self.sequence_ids)
+            self.stop_words, self.max_sequence_id_len = [], 0
+            for s in stop_words:
+                self.stop_words.append(s)
+                sequence_ids = tokenizer.encode(s, add_special_tokens=False)
+                self.max_sequence_id_len = max(self.max_sequence_id_len, len(sequence_ids))
             self.tokenizer = tokenizer
 
         def __call__(self, input_ids, scores, **kwargs) -> bool:
             # compare the last len(stop) tokens
-            lookback_ids_batch = input_ids[:, -self.sequence_id_len:]
+            lookback_ids_batch = input_ids[:, -self.max_sequence_id_len:]
             lookback_tokens_batch = self.tokenizer.batch_decode(lookback_ids_batch)
             for i, done in enumerate(self.done_tracker):
                 if done:
                     continue
-                self.done_tracker[i] = self.sequence in lookback_tokens_batch[i]
+                self.done_tracker[i] = any(s in lookback_tokens_batch[i] for s in self.stop_words)
             return False not in self.done_tracker
 
-    criteria = []
-    for stop_word in stop_words:
-        c = MultiTokenEOSCriteria(stop_word, tokenizer, batch_size)
-        criteria.append(c)
-    criteria = StoppingCriteriaList(criteria)
-    return criteria
+    c = MultiTokenEOSCriteria(stop_words, tokenizer, batch_size)
+    return StoppingCriteriaList([c])
 
 def _get_possible_max_seq_len(max_seq_len, path):
     if max_seq_len is not None:
@@ -59,7 +56,7 @@ def _get_possible_max_seq_len(max_seq_len, path):
     raise ValueError('max_seq_len is not provided and cannot be inferred from the model config.')
 
 
-def _convert_chat_messages(inputs, merge_role=True):
+def _convert_chat_messages(inputs, merge_role=True, skip_empty_prompt=True):
     outputs = []
     for _input in inputs:
         messages = []
@@ -67,6 +64,8 @@ def _convert_chat_messages(inputs, merge_role=True):
             messages.append({'role': 'user', 'content': _input})
         else:
             for item in _input:
+                if skip_empty_prompt and not item['prompt']:
+                    continue
                 role = {
                     'HUMAN': 'user',
                     'BOT': 'assistant',
@@ -169,6 +168,7 @@ class HuggingFacewithChatTemplate(BaseModel):
         self.generation_kwargs = generation_kwargs
         self.fastchat_template = fastchat_template
         self.stop_words = list(set(stop_words + self._get_potential_stop_words(path)))
+        self.logger.info(f'using stop words: {self.stop_words}')
 
         for k, v in other_kwargs.items():
             if v is not None:
@@ -226,17 +226,183 @@ class HuggingFacewithChatTemplate(BaseModel):
         self.model.eval()
         self.model.generation_config.do_sample = False
 
+
+    def get_ppl_tokenwise(self, inputs: List[str], label: List[List[int]], mask_length: Optional[List[int]] = None) -> List[float]:
+        """Get inference-ppl per token given a list of inputs and label.
+
+        Args:
+            inputs (List[str]): A list of strings.
+            label (List[List[int]]): A list of list of label, each label is a tuple of (start, end, 1)
+            mask_length (Optional[List[int]]): A list of mask lengths. If
+                provided, the perplexity scores will be calculated with the
+                first mask_length[i] tokens masked out. It's okay to skip
+                its implementation if advanced features in PPLInfernecer is
+                not needed.
+
+        Returns:
+            List[float]: A list of perplexity scores.
+        """
+        assert self.tokenizer.pad_token
+        import torch
+        import torch.nn.functional as F
+        pad_token_id = self.tokenizer.pad_token_id
+        messages = _convert_base_messages(inputs)
+
+        tokenize_kwargs = dict(
+            return_tensors='pt',
+            padding=True,
+            truncation=True,
+            add_special_tokens=True,
+            max_length=self.max_seq_len,
+        )
+
+        self.tokenizer.padding_side = 'right'
+        self.tokenizer.truncation_side = 'right'
+
+        tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
+        tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
+        outputs = self.model(**tokens)[0]
+
+        batch_size, seq_len, vocab_size = outputs.shape
+        shift_logits = outputs[:, :-1, :].contiguous().float()
+        shift_labels = tokens['input_ids'][:, 1:].contiguous()
+        loss = F.cross_entropy(
+            shift_logits.view(-1, vocab_size),
+            shift_labels.view(-1),
+            ignore_index=pad_token_id,
+            reduction='none').view(batch_size, seq_len - 1)
+        lens = (tokens['input_ids'] != pad_token_id).sum(-1).cpu().numpy()
+
+        if mask_length is not None:
+            import numpy as np
+            mask = torch.zeros_like(shift_labels)  # [batch,seqlen]
+            for i in range(len(mask)):
+                for j in range(mask_length[i] - 1, len(mask[i])):
+                    mask[i][j] = 1
+            loss = loss * mask
+            lens -= np.array(mask_length)
+
+        loss = loss.cpu().numpy()
+
+        decode_messages = [[self.tokenizer.decode([input_id]) for input_id in token] for token in tokens['input_ids']]
+        char_messages = [[ch for ch in message] for message in messages]
+
+        # shifted to align label and loss
+        for i in range(len(decode_messages)):
+            decode_messages[i] = decode_messages[i][1:]
+
+        aggregated_label_list = [[] for _ in range(len(decode_messages))]
+
+        tag_list = [[] for _ in range(len(decode_messages))]
+
+        for tmp_index, label_list in enumerate(label):
+            for single_label in label_list:
+                left = single_label[0]
+                right = single_label[1]
+                for i in range(left, right):
+                    aggregated_label_list[tmp_index].append(i)
+
+
+        def align_sequences(seq1, seq2, sep_len):
+            """
+            seq1: decoded sequence from token, one token may contain multiple characters
+            seq2: original separate character sequence
+            """
+            i, j = 0, 0
+            matched_pairs = []
+            while i < len(seq1) and j < len(seq2):
+                word = seq1[i]
+                if len(word) == 0:
+                    matched_pairs.append((word, []))
+                    i += 1
+                    continue
+
+                if '\ufffd' in word:
+                    for _ in range(sep_len):
+                        matched_pairs.append((word, [j]))
+                        i += 1
+                    j += 1
+                    continue
+
+                char_sequence = ''
+                while j < len(seq2) and (char_sequence != word):
+                    char_sequence += seq2[j]
+                    if char_sequence == word:
+                        matched_pairs.append((word, [k for k in range(j - len(word) + 1, j+1)]))
+                        j += 1
+                        break
+                    elif len(char_sequence) > len(word):
+                        if word == char_sequence[-len(word):]:
+                            matched_pairs.append((word, [k for k in range(j - len(word) + 1, j+1)]))
+                            j += 1
+                            break
+                        else:
+                            j += 1
+                    else:
+                        j += 1
+                i += 1
+
+            return matched_pairs
+
+
+
+        if 'qwen' in self.path or 'Qwen' in self.path:
+            sep_len = 2
+        elif 'Llama-3' in self.path:
+            sep_len = 2
+        elif 'Yi' in self.path:
+            sep_len = 3
+        elif 'Llama-2' in self.path:
+            sep_len = 3
+        elif 'deepseek' in self.path:
+            sep_len = 2
+        else:
+            sep_len = 3
+
+
+        matched_pairs_list = [align_sequences(decode_messages[i], char_messages[i], sep_len) for i in range(len(decode_messages))]
+        for match_index, matched_pairs in enumerate(matched_pairs_list):
+            for i, (word, indices) in enumerate(matched_pairs):
+                for j in indices:
+                    if j in aggregated_label_list[match_index]:
+                        tag_list[match_index].append(i)
+                        break
+
+        inference_loss_list = []
+        token_len_list = []
+        for i in range(len(loss)):
+            inference_loss = 0
+            token_len = 0
+            for j in range(len(loss[i])):
+                if j in tag_list[i]:
+
+                    inference_loss += loss[i][j]
+                    print(loss[i][j])
+                    token_len += 1
+            inference_loss_list.append(inference_loss)
+            token_len_list.append(token_len)
+
+        return inference_loss_list, token_len_list
+
     def _get_potential_stop_words(self, path: Optional[str]):
         from transformers import GenerationConfig
         potential_stop_words = []
         try:
             generation_config = GenerationConfig.from_pretrained(path)
-            for token_id in generation_config.eos_token_id:
-                potential_stop_words.append(self.tokenizer.decode(token_id))
         except:
-            pass
-        potential_stop_words.append(self.tokenizer.eos_token)
+            generation_config = None
+        if generation_config and hasattr(generation_config, 'eos_token_id'):
+            if isinstance(generation_config.eos_token_id, int):
+                potential_stop_words.append(self.tokenizer.decode(generation_config.eos_token_id))
+            else:
+                assert isinstance(generation_config.eos_token_id, list)
+                for token_id in generation_config.eos_token_id:
+                    potential_stop_words.append(self.tokenizer.decode(token_id))
+        if self.tokenizer.eos_token is not None:
+            potential_stop_words.append(self.tokenizer.eos_token)
         potential_stop_words = list(set(potential_stop_words))
+        potential_stop_words = [s for s in potential_stop_words if s]
         return potential_stop_words
 
     def generate(self,

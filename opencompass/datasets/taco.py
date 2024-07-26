@@ -234,7 +234,8 @@ class TACOEvaluator(BaseEvaluator):
         return pass_at_k
 
     def score(self, predictions, references, test_set):
-        assert len(predictions) == len(references)
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length'}
         generations = defaultdict(list)
         for refer, pred in zip(references, predictions):
             pred = self.post_process(pred)

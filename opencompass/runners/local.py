@@ -12,17 +12,21 @@ from typing import Any, Dict, List, Tuple
 import mmengine
 import numpy as np
 from mmengine.config import ConfigDict
+from mmengine.device import is_npu_available
 from tqdm import tqdm
 
 from opencompass.registry import RUNNERS, TASKS
-from opencompass.utils import get_logger
+from opencompass.utils import get_logger, model_abbr_from_cfg
 
 from .base import BaseRunner
 
 
 def get_command_template(gpu_ids: List[int]) -> str:
     """Format command template given available gpu ids."""
-    if sys.platform == 'win32':  # Always return win32 for Windows
+    if is_npu_available():
+        tmpl = 'ASCEND_RT_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
+        tmpl += ' {task_cmd}'
+    elif sys.platform == 'win32':  # Always return win32 for Windows
         # use command in Windows format
         tmpl = 'set CUDA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
         tmpl += ' & {task_cmd}'
@@ -74,13 +78,19 @@ class LocalRunner(BaseRunner):
         status = []
         import torch
 
-        if 'CUDA_VISIBLE_DEVICES' in os.environ:
+        if is_npu_available():
+            visible_devices = 'ASCEND_RT_VISIBLE_DEVICES'
+            device_nums = torch.npu.device_count()
+        else:
+            visible_devices = 'CUDA_VISIBLE_DEVICES'
+            device_nums = torch.cuda.device_count()
+        if visible_devices in os.environ:
             all_gpu_ids = [
-                int(i) for i in re.findall(r'(?<!-)\d+',
-                                           os.getenv('CUDA_VISIBLE_DEVICES'))
+                int(i)
+                for i in re.findall(r'(?<!-)\d+', os.getenv(visible_devices))
             ]
         else:
-            all_gpu_ids = list(range(torch.cuda.device_count()))
+            all_gpu_ids = list(range(device_nums))
 
         if self.debug:
             for task in tasks:
@@ -110,11 +120,13 @@ class LocalRunner(BaseRunner):
                         if 'infer' in self.task_cfg.type.lower():
                             # If a model instance already exists,
                             # do not reload it.
-                            if hasattr(self, 'cur_model'):
-                                task.run(self.cur_model)
-                            else:
-                                task.run()
+                            task.run(cur_model=getattr(self, 'cur_model',
+                                                       None),
+                                     cur_model_abbr=getattr(
+                                         self, 'cur_model_abbr', None))
                             self.cur_model = task.model
+                            self.cur_model_abbr = model_abbr_from_cfg(
+                                task.model_cfg)
                         else:
                             task.run()
                     else:

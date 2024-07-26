@@ -10,7 +10,8 @@ exclude: |
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
       opencompass/datasets/TheoremQA|
-      docs/zh_cn/advanced_guides/compassbench_intro.md
+      docs/zh_cn/advanced_guides/compassbench_intro.md|
+      docs/zh_cn/advanced_guides/compassbench_v2_0.md
     )
 repos:
   - repo: https://gitee.com/openmmlab/mirrors-flake8
@@ -35,6 +36,7 @@ repos:
         exclude: |
             (?x)^(
                 .*\.jsonl|
+                opencompass/datasets/subjective/mtbench101.py|
                 configs/
             )
   - repo: https://gitee.com/openmmlab/mirrors-pre-commit-hooks

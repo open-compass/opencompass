@@ -53,6 +53,7 @@ from .humaneval import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .hungarian_math import *  # noqa: F401, F403
 from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
+from .inference_ppl import InferencePPLDataset  # noqa: F401, F403
 from .infinitebench import *  # noqa: F401, F403
 from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
@@ -74,6 +75,7 @@ from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
 from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
+from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403

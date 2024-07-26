@@ -16,6 +16,7 @@ def parse_args():
     parser.add_argument('-w', '--work-dir', default=None, type=str)
     parser.add_argument('-r', '--reuse', default='latest', type=str)
     parser.add_argument('-c', '--clean', action='store_true')
+    parser.add_argument('-f', '--force', action='store_true')
     args = parser.parse_args()
     return args
 
@@ -35,7 +36,8 @@ class PredictionMerger:
         root, ext = os.path.splitext(filename)
         partial_filename = root + '_0' + ext
 
-        if os.path.exists(os.path.realpath(filename)):
+        if os.path.exists(
+                os.path.realpath(filename)) and not self.cfg['force']:
             return
 
         if not os.path.exists(os.path.realpath(partial_filename)):
@@ -77,7 +79,8 @@ def dispatch_tasks(cfg):
                 'model': model,
                 'dataset': dataset,
                 'work_dir': cfg['work_dir'],
-                'clean': cfg['clean']
+                'clean': cfg['clean'],
+                'force': cfg['force'],
             }).run()
 
 
@@ -104,6 +107,7 @@ def main():
     cfg['work_dir'] = os.path.join(cfg.work_dir, dir_time_str)
 
     cfg['clean'] = args.clean
+    cfg['force'] = args.force
 
     dispatch_tasks(cfg)
 

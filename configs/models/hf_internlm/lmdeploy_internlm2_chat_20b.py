@@ -1,36 +1,15 @@
-from opencompass.models.turbomind import TurboMindModel
-
-
-_meta_template = dict(
-    round=[
-        dict(role='HUMAN', begin='<|im_start|>user\n', end='<|im_end|>\n'),
-        dict(role='BOT', begin='<|im_start|>assistant\n', end='<|im_end|>\n', generate=True),
-    ],
-)
+from opencompass.models import TurboMindModelwithChatTemplate
 
 models = [
     dict(
-        type=TurboMindModel,
+        type=TurboMindModelwithChatTemplate,
         abbr='internlm2-chat-20b-turbomind',
         path='internlm/internlm2-chat-20b',
-        meta_template=_meta_template,
-        engine_config=dict(
-            session_len=32768,
-            max_batch_size=32,
-            model_name='internlm2-chat-20b',
-            tp=2,
-            stop_words=[2, 92542],
-        ),
-        gen_config=dict(
-            top_k=1,
-            top_p=0.8,
-            temperature=1.0,
-            max_new_tokens=2000,
-        ),
-        max_out_len=2000,
-        max_seq_len=32768,
-        batch_size=32,
-        concurrency=8,
-        run_cfg=dict(num_gpus=2, num_procs=1),
+        engine_config=dict(session_len=7168, max_batch_size=16, tp=2),
+        gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9, max_new_tokens=1024),
+        max_seq_len=7168,
+        max_out_len=1024,
+        batch_size=16,
+        run_cfg=dict(num_gpus=2),
     )
 ]

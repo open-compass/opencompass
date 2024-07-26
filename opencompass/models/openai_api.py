@@ -53,6 +53,8 @@ class OpenAI(BaseAPIModel):
         tokenizer_path (str, optional): The path to the tokenizer. Use path if
             'tokenizer_path' is None, otherwise use the 'tokenizer_path'.
             Defaults to None.
+        extra_body (Dict, optional): Add additional JSON properties to
+            the request
     """
 
     is_api: bool = True
@@ -71,7 +73,8 @@ class OpenAI(BaseAPIModel):
                  logprobs: Optional[bool] = False,
                  top_logprobs: Optional[int] = None,
                  temperature: Optional[float] = None,
-                 tokenizer_path: Optional[str] = None):
+                 tokenizer_path: Optional[str] = None,
+                 extra_body: Optional[Dict] = None):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -87,6 +90,8 @@ class OpenAI(BaseAPIModel):
         self.logprobs = logprobs
         self.top_logprobs = top_logprobs
         self.tokenizer_path = tokenizer_path
+        self.hf_tokenizer = None
+        self.extra_body = extra_body
 
         if isinstance(key, str):
             if key == 'ENV':
@@ -241,7 +246,14 @@ class OpenAI(BaseAPIModel):
                     stop=None,
                     temperature=temperature,
                 )
-                raw_response = requests.post(self.url,
+                if self.extra_body:
+                    data.update(self.extra_body)
+                if isinstance(self.url, list):
+                    import random
+                    url = self.url[random.randint(0, len(self.url) - 1)]
+                else:
+                    url = self.url
+                raw_response = requests.post(url,
                                              headers=header,
                                              data=json.dumps(data))
             except requests.ConnectionError:
@@ -272,6 +284,9 @@ class OpenAI(BaseAPIModel):
                     elif response['error']['code'] == 'invalid_prompt':
                         self.logger.warn('Invalid prompt:', str(input))
                         return ''
+                    elif response['error']['type'] == 'invalid_prompt':
+                        self.logger.warn('Invalid prompt:', str(input))
+                        return ''
 
                     self.logger.error('Find error message in response: ',
                                       str(response['error']))
@@ -292,9 +307,16 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        enc = self.tiktoken.encoding_for_model(self.path
-                                               or self.tokenizer_path)
-        return len(enc.encode(prompt))
+        try:
+            enc = self.tiktoken.encoding_for_model(self.path
+                                                   or self.tokenizer_path)
+            return len(enc.encode(prompt))
+        except Exception:
+            from transformers import AutoTokenizer
+            if self.hf_tokenizer is None:
+                self.hf_tokenizer = AutoTokenizer.from_pretrained(
+                    self.tokenizer_path)
+            return len(self.hf_tokenizer(prompt).input_ids)
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.

@@ -10,7 +10,9 @@ exclude: |
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
       opencompass/datasets/TheoremQA|
-      docs/zh_cn/advanced_guides/compassbench_intro.md
+      opencompass/datasets/subjective/mtbench101.py|
+      docs/zh_cn/advanced_guides/compassbench_intro.md |
+      docs/zh_cn/advanced_guides/compassbench_v2_0.md
     )
 repos:
   - repo: https://github.com/PyCQA/flake8

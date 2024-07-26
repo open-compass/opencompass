@@ -20,6 +20,8 @@ class NumWorkerPartitioner(BasePartitioner):
     Args:
         out_dir (str): The output directory of tasks.
         num_worker (int): The number of workers. default: 8.
+        num_split (int): The number of splits for each dataset, set to
+            num_worker if not specified. default: None.
         min_task_size (int): The minimum size of a task. default: 16.
         dataset_size_path (str): The path to the dataset size cache file.
         keep_keys (list[str]): The keys to be kept from the experiment config
@@ -29,12 +31,17 @@ class NumWorkerPartitioner(BasePartitioner):
     def __init__(self,
                  out_dir: str,
                  num_worker: int = 8,
+                 num_split: Optional[int] = None,
                  min_task_size: int = 16,
                  strategy: str = 'heuristic',
                  dataset_size_path: str = '.cache/dataset_size.json',
                  keep_keys: Optional[List[str]] = None):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
+        if strategy == 'split' and num_worker is not None:
+            self.logger.warning('num_worker is ignored with split.')
+
         self.num_worker = num_worker
+        self.num_split = num_split or num_worker
         self.min_task_size = min_task_size
         self.dataset_size_path = dataset_size_path
         assert strategy in ('heuristic', 'split'), \
@@ -60,7 +67,7 @@ class NumWorkerPartitioner(BasePartitioner):
                     if osp.exists(filename):
                         continue
                     dataset_size = self.get_size(dataset)
-                    if self.num_worker <= 1:
+                    if self.num_split <= 1:
                         chunks.append(dataset)
                     elif dataset_size <= self.min_task_size:
                         chunks.append(dataset)
@@ -111,7 +118,7 @@ class NumWorkerPartitioner(BasePartitioner):
         split_configs = []
         abbr = dataset_abbr_from_cfg(dataset_cfg)
         # evenly distribute the task
-        num_split = self.num_worker
+        num_split = self.num_split
         step = max(math.ceil(dataset_size / num_split), self.min_task_size)
         for part, i in enumerate(range(0, dataset_size, step)):
             cfg = copy.deepcopy(dataset_cfg)

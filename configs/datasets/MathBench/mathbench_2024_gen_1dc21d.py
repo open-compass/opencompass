@@ -69,7 +69,7 @@ for _split in mathbench_sets:
 
         mathbench_datasets.append(
             dict(
-                abbr='mathbench-' + _split + '-' + _name,
+                abbr='mathbench-no_cot-' + _split + '-' + _name,
                 type=MathBenchDataset,
                 path=f'data/mathbench_v1/{_split}',
                 name=_name,
