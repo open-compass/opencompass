@@ -463,19 +463,20 @@ python run.py --datasets ceval_ppl mmlu_ppl --hf-type base --hf-path huggyllama/
     <tr valign="top">
       <td>
 
+- [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
+- [Baichuan](https://github.com/baichuan-inc)
+- [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
+- [ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)
+- [ChatGLM3](https://github.com/THUDM/ChatGLM3-6B)
+- [Gemma](https://huggingface.co/google/gemma-7b)
 - [InternLM](https://github.com/InternLM/InternLM)
 - [LLaMA](https://github.com/facebookresearch/llama)
 - [LLaMA3](https://github.com/meta-llama/llama3)
-- [Vicuna](https://github.com/lm-sys/FastChat)
-- [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
-- [Baichuan](https://github.com/baichuan-inc)
-- [WizardLM](https://github.com/nlpxucan/WizardLM)
-- [ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)
-- [ChatGLM3](https://github.com/THUDM/ChatGLM3-6B)
-- [TigerBot](https://github.com/TigerResearch/TigerBot)
 - [Qwen](https://github.com/QwenLM/Qwen)
-- [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
-- [Gemma](https://huggingface.co/google/gemma-7b)
+- [TigerBot](https://github.com/TigerResearch/TigerBot)
+- [Vicuna](https://github.com/lm-sys/FastChat)
+- [WizardLM](https://github.com/nlpxucan/WizardLM)
+- [Yi](https://github.com/01-ai/Yi)
 - ……
 
 </td>

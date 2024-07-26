@@ -86,7 +86,7 @@ class SubjectiveSummarizer:
                                             orient='index',
                                             columns=models_order)
                 # Insert a new row at the top for the dataset names
-                df.insert(0, 'Detailed Scores', list(scores.keys()))
+                df.insert(0, 'Detailed Scores', df.index.values)
                 df.insert(0, 'Dataset',
                           [dataset_name for _ in range(len(df.index))])
                 dfs[dataset_name] = df
