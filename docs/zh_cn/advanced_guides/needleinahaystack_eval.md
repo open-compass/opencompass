@@ -18,6 +18,8 @@
 
 ### 评估步骤
 
+> 注意：在最新代码中，OpenCompass已经设置数据集从[Huggingface的接口](https://huggingface.co/datasets/opencompass/NeedleBench)中自动加载，可以直接跳过下面的手动下载安放数据集。
+
 1. 从[这里](https://github.com/open-compass/opencompass/files/14741330/needlebench.zip)下载数据集。
 
 2. 将下载的文件放置于`opencompass/data/needlebench/`目录下。`needlebench`目录中预期的文件结构如下所示：
