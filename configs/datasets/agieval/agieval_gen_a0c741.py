@@ -1,6 +1,4 @@
 from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -53,7 +51,7 @@ for name in agieval_single_choice_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset,
-            path=get_data_path('opencompass/agieval', './data/AGIEval/data/v1/'),
+            path='opencompass/agieval',
             name=name,
             abbr='agieval-' + name,
             setting_name='zero-shot',
@@ -77,7 +75,7 @@ for name in agieval_multiple_choices_sets + agieval_cloze_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset,
-            path=get_data_path('opencompass/agieval', './data/AGIEval/data/v1/'),
+            path='opencompass/agieval',
             name=name,
             abbr='agieval-' + name,
             setting_name='zero-shot',

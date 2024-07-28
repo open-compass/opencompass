@@ -4,6 +4,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -13,6 +14,7 @@ class MGSMSDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         src_lines = open(path, 'r', encoding='utf-8').readlines()
         data = {'question': [], 'answer': []}
         for lines in src_lines:

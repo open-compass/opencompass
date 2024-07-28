@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import TNewsDataset_V2
+from opencompass.datasets import TNewsDatasetV2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 tnews_reader_cfg = dict(
@@ -56,7 +56,7 @@ tnews_eval_cfg = dict(
 tnews_datasets = [
     dict(
         abbr='tnews-dev',
-        type=TNewsDataset_V2,
+        type=TNewsDatasetV2,
         path='./data/FewCLUE/tnews/dev_few_all.json',
         reader_cfg=tnews_reader_cfg,
         infer_cfg=tnews_infer_cfg,
@@ -64,7 +64,7 @@ tnews_datasets = [
     ),
     dict(
         abbr='tnews-test',
-        type=TNewsDataset_V2,
+        type=TNewsDatasetV2,
         path='./data/FewCLUE/tnews/test_public.json',
         reader_cfg=tnews_reader_cfg,
         infer_cfg=tnews_infer_cfg,

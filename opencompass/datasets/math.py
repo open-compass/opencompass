@@ -7,6 +7,7 @@ from datasets import Dataset, DatasetDict
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -140,6 +141,7 @@ class MATHDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path)
         dataset = DatasetDict()
         raw_data = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':

@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -31,7 +28,7 @@ race_datasets = [
     dict(
         abbr='race-middle',
         type=RaceDataset,
-        path=get_data_path('opencompass/race', './data/race'),
+        path='opencompass/race',
         name='middle',
         reader_cfg=race_reader_cfg,
         infer_cfg=race_infer_cfg,
@@ -39,7 +36,7 @@ race_datasets = [
     dict(
         abbr='race-high',
         type=RaceDataset,
-        path=get_data_path('opencompass/race', './data/race'),
+        path='opencompass/race',
         name='high',
         reader_cfg=race_reader_cfg,
         infer_cfg=race_infer_cfg,

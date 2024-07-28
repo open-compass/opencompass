@@ -4,15 +4,17 @@ from os import environ
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class AXDataset_V2(BaseDataset):
+class AXDatasetV2(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path)
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset

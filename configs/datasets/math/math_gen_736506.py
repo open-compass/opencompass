@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -24,7 +21,7 @@ math_datasets = [
     dict(
         type=MATHInternDataset,
         abbr='math',
-        path=get_data_path('opencompass/math', './data/math/math.json'),
+        path='opencompass/math',
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg)

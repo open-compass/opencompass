@@ -4,6 +4,7 @@ import os
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -25,6 +26,7 @@ class RoleBenchBaseDataset(BaseDataset):
 
     @staticmethod
     def load_desc(path):
+        path = get_data_path(path, local_mode=True)
         with open(path, 'r', encoding='utf-8') as f:
             desc_list = json.load(f)
         return desc_list
@@ -50,6 +52,7 @@ class InstructionGeneralizationEnglishDataset(RoleBenchBaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         desc_list = RoleBenchBaseDataset.load_desc(
             os.path.join(path, 'profiles-eng/desc.json'))
         path = os.path.join(path, 'rolebench-eng/instruction-generalization')
@@ -63,6 +66,7 @@ class RoleGeneralizationEnglishDataset(RoleBenchBaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         desc_list = RoleBenchBaseDataset.load_desc(
             os.path.join(path, 'profiles-eng/desc.json'))
         path = os.path.join(path, 'rolebench-eng/role-generalization')

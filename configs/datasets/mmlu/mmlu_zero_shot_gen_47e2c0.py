@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever, ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -118,7 +115,7 @@ for _name in mmlu_all_sets:
         dict(
             abbr=f'lukaemon_mmlu_{_name}',
             type=MMLUDataset,
-            path=get_data_path('opencompass/mmlu', './data/mmlu/'),
+            path='opencompass/mmlu',
             name=_name,
             reader_cfg=mmlu_reader_cfg,
             infer_cfg=mmlu_infer_cfg,

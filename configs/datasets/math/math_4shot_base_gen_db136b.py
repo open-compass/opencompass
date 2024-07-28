@@ -5,7 +5,6 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess_v2
 
 with read_base():
-    from opencompass.utils.datasets import get_data_path
     from .math_4shot_example_from_google_research import prompt
 
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
@@ -24,7 +23,7 @@ math_datasets = [
     dict(
         type=MATHDataset,
         abbr='math',
-        path=get_data_path('opencompass/math', './data/math/math.json'),
+        path='opencompass/math',
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg)

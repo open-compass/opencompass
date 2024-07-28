@@ -1,11 +1,8 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
-from opencompass.datasets import hellaswagDatasetwithICE
+from opencompass.datasets import HellaswagDatasetwithICE
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 hellaswag_reader_cfg = dict(
@@ -39,8 +36,8 @@ hellaswag_eval_cfg = dict(
 hellaswag_datasets = [
     dict(
         abbr='hellaswag',
-        type=hellaswagDatasetwithICE,
-        path=get_data_path('opencompass/hellaswag', './data/hellaswag'),
+        type=HellaswagDatasetwithICE,
+        path='opencompass/hellaswag_ice',
         reader_cfg=hellaswag_reader_cfg,
         infer_cfg=hellaswag_infer_cfg,
         eval_cfg=hellaswag_eval_cfg,

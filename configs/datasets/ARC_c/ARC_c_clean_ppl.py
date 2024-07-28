@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
@@ -50,7 +47,7 @@ ARC_c_datasets = [
     dict(
         type=ARCDataset,
         abbr='ARC-c-test',
-        path=get_data_path('opencompass/ai2_arc', './data/ARC/ARC-c/ARC-Challenge-Test.jsonl'),
+        path='opencompass/ai2_arc-test',
         name='ARC-Challenge',
         reader_cfg=ARC_c_reader_cfg,
         infer_cfg=ARC_c_infer_cfg,

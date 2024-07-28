@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -26,7 +23,7 @@ triviaqa_datasets = [
     dict(
         type=TriviaQADataset,
         abbr='triviaqa',
-        path=get_data_path('opencompass/trivia_qa', './data/triviaqa/'),
+        path='opencompass/trivia_qa',
         reader_cfg=triviaqa_reader_cfg,
         infer_cfg=triviaqa_infer_cfg,
         eval_cfg=triviaqa_eval_cfg)

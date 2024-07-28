@@ -5,15 +5,17 @@ from os import environ
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class storyclozeDataset(BaseDataset):
+class StoryClozeDataset(BaseDataset):
 
     @staticmethod
     def load(path, lang):
+        path = get_data_path(path)
         dataset_list = []
         for split in ['train', 'eval']:
             if environ.get('DATASET_SOURCE') == 'ModelScope':
@@ -42,10 +44,11 @@ class storyclozeDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class storyclozeDataset_V2(BaseDataset):
+class StoryClozeDatasetV2(BaseDataset):
 
     @staticmethod
     def load(path, lang):
+        path = get_data_path(path)
         dataset_list = []
         for split in ['train', 'eval']:
             if environ.get('DATASET_SOURCE') == 'ModelScope':

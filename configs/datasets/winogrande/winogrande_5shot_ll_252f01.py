@@ -1,11 +1,8 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import LLInferencer
 from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
-from opencompass.datasets import winograndeDataset_V3
+from opencompass.datasets import WinograndeDatasetV3
 
 winogrande_reader_cfg = dict(
     input_columns=['opt1', 'opt2'],
@@ -33,8 +30,8 @@ winogrande_eval_cfg = dict(evaluator=dict(type=AccwithDetailsEvaluator))
 winogrande_datasets = [
     dict(
         abbr='winogrande',
-        type=winograndeDataset_V3,
-        path=get_data_path('opencompass/winogrande', './data/winogrande'),
+        type=WinograndeDatasetV3,
+        path='opencompass/winogrande',
         reader_cfg=winogrande_reader_cfg,
         infer_cfg=winogrande_infer_cfg,
         eval_cfg=winogrande_eval_cfg)

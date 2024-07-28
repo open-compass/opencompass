@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 # GONNA BE DEPRECATED, DON'T USE IT
 # The postprocessor has the assumption that the prompt is in the format of "Question:blabla"
 # This config does not follow the above assumption, thus deprecated
@@ -49,7 +46,7 @@ gsm8k_datasets = [
     dict(
         abbr='gsm8k',
         type=GSM8KDataset,
-        path=get_data_path('opencompass/gsm8k', './data/gsm8k'),
+        path='opencompass/gsm8k',
         reader_cfg=gsm8k_reader_cfg,
         infer_cfg=gsm8k_infer_cfg,
         eval_cfg=gsm8k_eval_cfg)

@@ -7,6 +7,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
@@ -17,6 +18,7 @@ class TriviaQADataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = DatasetDict()
@@ -54,10 +56,11 @@ class TriviaQADataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class TriviaQADataset_V2(BaseDataset):
+class TriviaQADatasetV2(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = DatasetDict()
@@ -89,10 +92,11 @@ class TriviaQADataset_V2(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class TriviaQADataset_V3(BaseDataset):
+class TriviaQADatasetV3(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path)
         data_list = []
         with open(path, 'r', encoding='utf-8') as f:
             for doc in f:

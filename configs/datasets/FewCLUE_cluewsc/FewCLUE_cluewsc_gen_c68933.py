@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import CluewscDataset_V2
+from opencompass.datasets import CluewscDatasetV2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 cluewsc_reader_cfg = dict(
@@ -34,7 +34,7 @@ cluewsc_eval_cfg = dict(
 cluewsc_datasets = [
     dict(
         abbr='cluewsc-dev',
-        type=CluewscDataset_V2,
+        type=CluewscDatasetV2,
         path='./data/FewCLUE/cluewsc/dev_few_all.json',
         reader_cfg=cluewsc_reader_cfg,
         infer_cfg=cluewsc_infer_cfg,
@@ -42,7 +42,7 @@ cluewsc_datasets = [
     ),
     dict(
         abbr='cluewsc-test',
-        type=CluewscDataset_V2,
+        type=CluewscDatasetV2,
         path='./data/FewCLUE/cluewsc/test_public.json',
         reader_cfg=cluewsc_reader_cfg,
         infer_cfg=cluewsc_infer_cfg,

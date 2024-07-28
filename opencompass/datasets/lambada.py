@@ -7,6 +7,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
@@ -17,6 +18,7 @@ class lambadaDataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = MsDataset.load(path)

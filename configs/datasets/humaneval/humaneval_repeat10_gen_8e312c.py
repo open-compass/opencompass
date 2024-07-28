@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -32,7 +29,7 @@ humaneval_datasets = [
     dict(
         abbr='openai_humaneval_repeat10',
         type=HumanevalDataset,
-        path=get_data_path('opencompass/humaneval', './data/humaneval/human-eval-v2-20210705.jsonl'),
+        path='opencompass/humaneval',
         num_repeats=10,
         reader_cfg=humaneval_reader_cfg,
         infer_cfg=humaneval_infer_cfg,

@@ -10,10 +10,10 @@ from .arc import ARCDataset
 from .ceval import CEvalDataset
 from .cmmlu import CMMLUDataset
 from .commonsenseqa import commonsenseqaDataset
-from .hellaswag import hellaswagDataset_V2
+from .hellaswag import HellaswagDataset_V2
 from .mmlu import MMLUDataset
 from .obqa import OBQADataset
-from .piqa import piqaDataset_V2
+from .piqa import PIQADatasetV2
 from .race import RaceDataset
 from .siqa import siqaDataset_V3
 from .xiezhi import XiezhiDataset
@@ -247,8 +247,8 @@ class CircularARCDataset(ARCDataset, metaclass=CircularDatasetMeta):
         return item
 
 
-class CircularHSWAGDataset(hellaswagDataset_V2, metaclass=CircularDatasetMeta):
-    dataset_class = hellaswagDataset_V2
+class CircularHSWAGDataset(HellaswagDataset_V2, metaclass=CircularDatasetMeta):
+    dataset_class = HellaswagDataset_V2
     default_circular_splits = None
     default_option_keys = ['A', 'B', 'C', 'D']
     default_answer_key = 'label'
@@ -282,8 +282,8 @@ class CircularsiqaDataset(siqaDataset_V3, metaclass=CircularDatasetMeta):
     default_answer_key = 'answer'
 
 
-class CircularpiqaDataset(piqaDataset_V2, metaclass=CircularDatasetMeta):
-    dataset_class = piqaDataset_V2
+class CircularPIQADataset(PIQADatasetV2, metaclass=CircularDatasetMeta):
+    dataset_class = PIQADatasetV2
     default_circular_splits = ['validation']
     default_option_keys = ['sol1', 'sol2']
 

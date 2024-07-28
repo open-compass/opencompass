@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -55,7 +52,7 @@ for _lang in langs:
     tydiqa_datasets.append(
         dict(abbr=f'tydiqa-goldp_{_lang}',
             type=TydiQADataset,
-            path=get_data_path('opencompass/tydiqa', './data/tydiqa'),
+            path='opencompass/tydiqa',
             lang=_lang,
             reader_cfg=tydiqa_reader_cfg,
             infer_cfg=tydiqa_infer_cfg,

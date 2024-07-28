@@ -2,6 +2,7 @@ import pandas as pd
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -11,6 +12,7 @@ class HungarianExamMathDataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         df = pd.read_csv(path)
         df.columns = ['question']
         outputs = [{

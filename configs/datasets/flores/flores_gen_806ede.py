@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import TopkRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -157,7 +154,7 @@ for _flores_subtask in _flores_subtasks:
         dict(
             abbr=f'flores_100_{_src}-{_tgt}',
             type=FloresFirst100Dataset,
-            path=get_data_path('opencompass/flores', './data/flores_first100'),
+            path='opencompass/flores',
             name=f'{_flores_source}-{_flores_target}',
             reader_cfg=flores_reader_cfg.copy(),
             infer_cfg=flores_infer_cfg.copy(),

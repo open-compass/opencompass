@@ -27,7 +27,7 @@ humaneval_plus_datasets = [
     dict(
         abbr='humaneval_plus',
         type=HumanevalDataset,
-        path='./data/humaneval/human-eval-v2-20210705.jsonl',
+        path='opencompass/humaneval',
         reader_cfg=humaneval_plus_reader_cfg,
         infer_cfg=humaneval_plus_infer_cfg,
         eval_cfg=humaneval_plus_eval_cfg,

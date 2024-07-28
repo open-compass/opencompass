@@ -5,15 +5,17 @@ from os import environ
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class hellaswagDataset(BaseDataset):
+class HellaswagDataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
@@ -44,7 +46,7 @@ class hellaswagDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class hellaswagDataset_V2(BaseDataset):
+class HellaswagDataset_V2(BaseDataset):
 
     @staticmethod
     def load(path):
@@ -78,7 +80,7 @@ class hellaswagDataset_V2(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class hellaswagDataset_V3(BaseDataset):
+class HellaswagDataset_V3(BaseDataset):
 
     @staticmethod
     def load(path):
@@ -112,10 +114,11 @@ class hellaswagDataset_V3(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class hellaswagDatasetwithICE(BaseDataset):
+class HellaswagDatasetwithICE(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         dataset_dict = DatasetDict()
         for split, filename in [
             ['train', 'hellaswag_train_sampled25.jsonl'],
@@ -152,7 +155,7 @@ class hellaswagDatasetwithICE(BaseDataset):
         return dataset_dict
 
 
-class hellaswagDatasetClean(BaseDataset):
+class HellaswagDatasetClean(BaseDataset):
 
     # load the contamination annotations of CEval from
     # https://github.com/liyucheng09/Contamination_Detector
@@ -184,8 +187,9 @@ class hellaswagDatasetClean(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         dataset = []
-        annotations = hellaswagDatasetClean.load_contamination_annotations(
+        annotations = HellaswagDatasetClean.load_contamination_annotations(
             osp.dirname(path))
 
         if environ.get('DATASET_SOURCE') == 'ModelScope':

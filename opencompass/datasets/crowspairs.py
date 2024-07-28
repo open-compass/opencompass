@@ -10,7 +10,7 @@ from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class crowspairsDataset(BaseDataset):
+class CrowspairsDataset(BaseDataset):
 
     @staticmethod
     def load(**kwargs):
@@ -25,7 +25,7 @@ class crowspairsDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class crowspairsDataset_V2(BaseDataset):
+class CrowspairsDatasetV2(BaseDataset):
 
     @staticmethod
     def load(**kwargs):

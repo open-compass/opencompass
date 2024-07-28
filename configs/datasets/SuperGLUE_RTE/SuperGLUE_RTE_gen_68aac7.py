@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import AXDataset_V2
+from opencompass.datasets import AXDatasetV2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 RTE_reader_cfg = dict(
@@ -34,7 +34,7 @@ RTE_eval_cfg = dict(
 RTE_datasets = [
     dict(
         abbr='RTE',
-        type=AXDataset_V2,  # rte share the same format with ax
+        type=AXDatasetV2,  # rte share the same format with ax
         path='./data/SuperGLUE/RTE/val.jsonl',
         reader_cfg=RTE_reader_cfg,
         infer_cfg=RTE_infer_cfg,

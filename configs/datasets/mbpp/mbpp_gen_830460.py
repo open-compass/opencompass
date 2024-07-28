@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -37,7 +34,7 @@ mbpp_datasets = [
     dict(
         type=MBPPDataset,
         abbr='mbpp',
-        path=get_data_path('opencompass/mbpp', './data/mbpp/mbpp.jsonl'),
+        path='opencompass/mbpp',
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
         eval_cfg=mbpp_eval_cfg,

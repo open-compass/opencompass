@@ -6,7 +6,6 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import BBHDataset, bbh_mcq_postprocess, BBHEvaluator, BBHEvaluator_mcq
 
 with read_base():
-    from opencompass.utils.datasets import get_data_path
     from .bbh_subset_settings import settings
 
 bbh_datasets = []
@@ -49,7 +48,7 @@ for name, test_type in settings:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path=get_data_path('opencompass/bbh', './data/BBH/data'),
+            path='opencompass/bbh',
             name=name,
             abbr='bbh-' + name,
             reader_cfg=bbh_reader_cfg.copy(),

@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import CslDataset_V2
+from opencompass.datasets import CslDatasetV2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 csl_reader_cfg = dict(
@@ -34,7 +34,7 @@ csl_eval_cfg = dict(
 csl_datasets = [
     dict(
         abbr='csl_dev',
-        type=CslDataset_V2,
+        type=CslDatasetV2,
         path='./data/FewCLUE/csl/dev_few_all.json',
         reader_cfg=csl_reader_cfg,
         infer_cfg=csl_infer_cfg,
@@ -42,7 +42,7 @@ csl_datasets = [
     ),
     dict(
         abbr='csl_test',
-        type=CslDataset_V2,
+        type=CslDatasetV2,
         path='./data/FewCLUE/csl/test_public.json',
         reader_cfg=csl_reader_cfg,
         infer_cfg=csl_infer_cfg,

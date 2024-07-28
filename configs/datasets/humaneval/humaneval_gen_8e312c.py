@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 # THIS SHALL ALSO BE DEPRECATED
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
@@ -33,7 +30,7 @@ humaneval_datasets = [
     dict(
         abbr='openai_humaneval',
         type=HumanevalDataset,
-        path=get_data_path('opencompass/humaneval', './data/humaneval/human-eval-v2-20210705.jsonl'),
+        path='opencompass/humaneval',
         reader_cfg=humaneval_reader_cfg,
         infer_cfg=humaneval_infer_cfg,
         eval_cfg=humaneval_eval_cfg)

@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -26,7 +23,7 @@ Xsum_datasets = [
     dict(
         type=XsumDataset,
         abbr='Xsum',
-        path=get_data_path('opencompass/xsum', './data/Xsum/dev.jsonl'),
+        path='opencompass/xsum',
         reader_cfg=Xsum_reader_cfg,
         infer_cfg=Xsum_infer_cfg,
         eval_cfg=Xsum_eval_cfg)

@@ -4,6 +4,7 @@ from os import environ
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -13,9 +14,10 @@ class LCSTSDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
-            ms_dataset = MsDataset.load('opencompass/LCSTS', split='test')
+            ms_dataset = MsDataset.load(path, split='test')
             dataset = []
             for row in ms_dataset:
                 new_row = {}

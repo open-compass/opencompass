@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -25,7 +22,7 @@ lambada_datasets = [
     dict(
         abbr='lambada',
         type=lambadaDataset,
-        path=get_data_path('opencompass/lambada', './data/lambada/test.jsonl'),
+        path='opencompass/lambada',
         reader_cfg=lambada_reader_cfg,
         infer_cfg=lambada_infer_cfg,
         eval_cfg=lambada_eval_cfg)

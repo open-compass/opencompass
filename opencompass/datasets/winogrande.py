@@ -5,16 +5,18 @@ from os import environ
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class winograndeDataset(BaseDataset):
-    """Disconnect from Huggingface, winograndeDataset."""
+class WinograndeDataset(BaseDataset):
+    """Disconnect from Huggingface, WinograndeDataset."""
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             ms_dataset = MsDataset.load(path,
@@ -59,11 +61,12 @@ class winograndeDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class winograndeDataset_V2(BaseDataset):
-    """Disconnect from Huggingface, winograndeDataset_V2."""
+class WinograndeDatasetV2(BaseDataset):
+    """Disconnect from Huggingface, WinograndeDatasetV2."""
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             ms_dataset = MsDataset.load(path,
@@ -112,11 +115,12 @@ class winograndeDataset_V2(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class winograndeDataset_V3(BaseDataset):
-    """Disconnect from Huggingface, winograndeDataset_V2."""
+class WinograndeDatasetV3(BaseDataset):
+    """Disconnect from Huggingface, WinograndeDatasetV2."""
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         dataset_dict = DatasetDict()
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset

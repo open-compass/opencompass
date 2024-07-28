@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import eprstmtDataset_V2
+from opencompass.datasets import EprstmtDatasetV2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 eprstmt_reader_cfg = dict(
@@ -32,7 +32,7 @@ eprstmt_eval_cfg = dict(
 eprstmt_datasets = [
     dict(
         abbr='eprstmt-dev',
-        type=eprstmtDataset_V2,
+        type=EprstmtDatasetV2,
         path='./data/FewCLUE/eprstmt/dev_few_all.json',
         reader_cfg=eprstmt_reader_cfg,
         infer_cfg=eprstmt_infer_cfg,
@@ -40,7 +40,7 @@ eprstmt_datasets = [
     ),
     dict(
         abbr='eprstmt-test',
-        type=eprstmtDataset_V2,
+        type=EprstmtDatasetV2,
         path='./data/FewCLUE/eprstmt/test_public.json',
         reader_cfg=eprstmt_reader_cfg,
         infer_cfg=eprstmt_infer_cfg,

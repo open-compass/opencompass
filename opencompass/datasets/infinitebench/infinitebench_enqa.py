@@ -1,6 +1,7 @@
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .utils import iter_jsonl
@@ -11,6 +12,7 @@ class InfiniteBenchenqaDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
 
         dataset = list(iter_jsonl(path))
 

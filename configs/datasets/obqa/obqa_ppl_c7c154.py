@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
@@ -42,13 +39,13 @@ obqa_datasets = [
     dict(
         abbr='openbookqa',
         type=OBQADataset,
-        path=get_data_path('opencompass/openbookqa', './data/openbookqa/Main/test.jsonl'),
+        path='opencompass/openbookqa_test',
         name='main',
     ),
     dict(
         abbr='openbookqa_fact',
         type=OBQADataset,
-        path=get_data_path('opencompass/openbookqa', './data/openbookqa/Additional/test_complete.jsonl'),
+        path='opencompass/openbookqa_fact',
         name='additional',
     ),
 ]

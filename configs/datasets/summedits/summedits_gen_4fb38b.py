@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -34,7 +31,7 @@ summedits_datasets = [
     dict(
         abbr='summedits',
         type=SummeditsDataset_V2,
-        path=get_data_path('opencompass/summedits', './data/summedits/summedits.jsonl'),
+        path='opencompass/summedits',
         reader_cfg=summedits_reader_cfg,
         infer_cfg=summedits_infer_cfg,
         eval_cfg=summedits_eval_cfg)

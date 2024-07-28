@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -26,7 +23,7 @@ nq_datasets = [
     dict(
         type=NaturalQuestionDataset,
         abbr='nq',
-        path=get_data_path('opencompass/natural_question', './data/nq/'),
+        path='opencompass/natural_question',
         reader_cfg=nq_reader_cfg,
         infer_cfg=nq_infer_cfg,
         eval_cfg=nq_eval_cfg)

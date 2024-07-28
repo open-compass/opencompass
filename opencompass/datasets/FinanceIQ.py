@@ -4,6 +4,7 @@ import os.path as osp
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -18,6 +19,7 @@ class FinanceIQDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path, local_mode=True)
         dataset = DatasetDict()
         for split in ['dev', 'test']:
             raw_data = []

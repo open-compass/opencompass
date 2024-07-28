@@ -6,6 +6,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -39,6 +40,7 @@ class DropOpenAIDataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         dataset_list = []
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:

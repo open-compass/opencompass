@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -54,7 +51,7 @@ strategyqa_datasets = [
     dict(
         abbr='strategyqa',
         type=StrategyQADataset,
-        path=get_data_path('opencompass/strategy_qa', './data/strategyqa/strategyQA_train.json'),
+        path='opencompass/strategy_qa',
         reader_cfg=strategyqa_reader_cfg,
         infer_cfg=strategyqa_infer_cfg,
         eval_cfg=strategyqa_eval_cfg)

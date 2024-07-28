@@ -4,6 +4,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .evaluation_main import (InputExample, test_instruction_following_loose,
@@ -15,6 +16,7 @@ class IFEvalDataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         datasets = []
         with open(path, 'r', encoding='utf-8') as file:
             for line in file:

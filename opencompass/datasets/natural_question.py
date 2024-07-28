@@ -7,6 +7,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
@@ -17,6 +18,7 @@ class NaturalQuestionDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path)
         dataset = DatasetDict()
         for split in ['dev', 'test']:
             if environ.get('DATASET_SOURCE') == 'ModelScope':
@@ -53,6 +55,7 @@ class NQOpenDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         dataset = DatasetDict()
         for split in ['validation', 'train']:
             filename = osp.join(path, f'nq-open-{split}.jsonl')

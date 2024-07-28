@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import MDLRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
@@ -41,7 +38,7 @@ commonsenseqa_datasets = [
     dict(
         abbr='commonsense_qa',
         type=commonsenseqaDataset,
-        path=get_data_path('opencompass/commonsense_qa', './data/commonsenseqa'),
+        path='opencompass/commonsense_qa',
         reader_cfg=commonsenseqa_reader_cfg,
         infer_cfg=commonsenseqa_infer_cfg,
         eval_cfg=commonsenseqa_eval_cfg)

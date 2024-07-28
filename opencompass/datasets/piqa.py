@@ -5,12 +5,13 @@ from os import environ
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class piqaDataset(BaseDataset):
+class PIQADataset(BaseDataset):
 
     @staticmethod
     def load_single(path, data_filename, label_filename):
@@ -32,6 +33,7 @@ class piqaDataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             ms_dataset = MsDataset.load(path)
@@ -40,9 +42,9 @@ class piqaDataset(BaseDataset):
                 'validation': ms_dataset['validation']
             })
         else:
-            train_dataset = piqaDataset.load_single(path, 'train.jsonl',
+            train_dataset = PIQADataset.load_single(path, 'train.jsonl',
                                                     'train-labels.lst')
-            val_dataset = piqaDataset.load_single(path, 'dev.jsonl',
+            val_dataset = PIQADataset.load_single(path, 'dev.jsonl',
                                                   'dev-labels.lst')
             dataset = DatasetDict({
                 'train': train_dataset,
@@ -52,7 +54,7 @@ class piqaDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class piqaDataset_V2(BaseDataset):
+class PIQADatasetV2(BaseDataset):
 
     @staticmethod
     def load_single(path, data_filename, label_filename):
@@ -78,6 +80,7 @@ class piqaDataset_V2(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = DatasetDict()
@@ -98,10 +101,10 @@ class piqaDataset_V2(BaseDataset):
                     })
                 dataset[split] = Dataset.from_list(dataset_list)
         else:
-            train_dataset = piqaDataset_V2.load_single(path, 'train.jsonl',
-                                                       'train-labels.lst')
-            val_dataset = piqaDataset_V2.load_single(path, 'dev.jsonl',
-                                                     'dev-labels.lst')
+            train_dataset = PIQADatasetV2.load_single(path, 'train.jsonl',
+                                                      'train-labels.lst')
+            val_dataset = PIQADatasetV2.load_single(path, 'dev.jsonl',
+                                                    'dev-labels.lst')
             dataset = DatasetDict({
                 'train': train_dataset,
                 'validation': val_dataset
@@ -110,7 +113,7 @@ class piqaDataset_V2(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class piqaDataset_V3(BaseDataset):
+class PIQADatasetV3(BaseDataset):
 
     @staticmethod
     def load_single(path, data_filename, label_filename):
@@ -140,6 +143,7 @@ class piqaDataset_V3(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = DatasetDict()
@@ -163,10 +167,10 @@ class piqaDataset_V3(BaseDataset):
                     })
                 dataset[split] = Dataset.from_list(dataset_list)
         else:
-            train_dataset = piqaDataset_V3.load_single(path, 'train.jsonl',
-                                                       'train-labels.lst')
-            val_dataset = piqaDataset_V3.load_single(path, 'dev.jsonl',
-                                                     'dev-labels.lst')
+            train_dataset = PIQADatasetV3.load_single(path, 'train.jsonl',
+                                                      'train-labels.lst')
+            val_dataset = PIQADatasetV3.load_single(path, 'dev.jsonl',
+                                                    'dev-labels.lst')
             dataset = DatasetDict({
                 'train': train_dataset,
                 'validation': val_dataset

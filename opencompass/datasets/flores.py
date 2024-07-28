@@ -5,6 +5,7 @@ from os import environ
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -28,6 +29,7 @@ class FloresFirst100Dataset(BaseDataset):
 
     @staticmethod
     def load(path, name):
+        path = get_data_path(path)
         src_lang, tgt_lang = name.split('-')
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset

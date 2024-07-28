@@ -4,6 +4,7 @@ import re
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -30,6 +31,7 @@ class Py150Dataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         lines = open(path, 'r').readlines()
         rows = []
         for line in lines:

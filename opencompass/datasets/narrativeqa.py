@@ -1,6 +1,7 @@
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -10,6 +11,7 @@ class NarrativeQADataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         import csv
         import os
         dataset_dict = DatasetDict()

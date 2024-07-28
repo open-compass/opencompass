@@ -1,6 +1,3 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -24,7 +21,7 @@ lcsts_datasets = [
     dict(
         type=LCSTSDataset,
         abbr='lcsts',
-        path=get_data_path('opencompass/natural_question', './data/LCSTS'),
+        path='opencompass/LCSTS',
         reader_cfg=lcsts_reader_cfg,
         infer_cfg=lcsts_infer_cfg,
         eval_cfg=lcsts_eval_cfg)

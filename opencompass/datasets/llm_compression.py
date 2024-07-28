@@ -4,6 +4,7 @@ from typing import List
 from datasets import load_dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -13,6 +14,7 @@ class LLMCompressionDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: List[str] = None, samples: int = None):
+        path = get_data_path(path, local_mode=True)
 
         # Check if file exists in the given path
         supported_extensions = ['json', 'jsonl']

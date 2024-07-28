@@ -1,6 +1,4 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
+
 import os
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
@@ -67,7 +65,7 @@ for _name in bbh_multiple_choice_sets:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path=get_data_path('opencompass/bbh', './data/BBH/data'),
+            path='opencompass/bbh',
             name=_name,
             abbr='bbh-' + _name,
             reader_cfg=bbh_reader_cfg,
@@ -94,7 +92,7 @@ for _name in bbh_free_form_sets:
     bbh_datasets.append(
         dict(
             type=BBHDataset,
-            path=get_data_path('opencompass/bbh', './data/BBH/data'),
+            path='opencompass/bbh',
             name=_name,
             abbr='bbh-' + _name,
             reader_cfg=bbh_reader_cfg,

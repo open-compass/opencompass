@@ -1,11 +1,8 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import OBQADataset_V2
+from opencompass.datasets import OBQADatasetV2
 
 obqa_reader_cfg = dict(
     input_columns=['question_stem', 'A', 'B', 'C', 'D', 'fact1'],
@@ -35,8 +32,8 @@ obqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 obqa_datasets = [
     dict(
         abbr='openbookqa_fact',
-        type=OBQADataset_V2,
-        path=get_data_path('opencompass/openbookqa', './data/openbookqa/Additional/test_complete.jsonl'),
+        type=OBQADatasetV2,
+        path='opencompass/openbookqa_fact',
         name='additional',
         reader_cfg=obqa_reader_cfg,
         infer_cfg=obqa_infer_cfg,

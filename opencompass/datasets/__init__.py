@@ -50,6 +50,7 @@ from .gsm_hard import *  # noqa: F401, F403
 from .hellaswag import *  # noqa: F401, F403
 from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
+from .humaneval_multi import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .hungarian_math import *  # noqa: F401, F403
 from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403

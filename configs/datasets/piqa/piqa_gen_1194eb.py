@@ -1,11 +1,8 @@
-from mmengine.config import read_base
-with read_base():
-    from opencompass.utils.datasets import get_data_path
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import piqaDataset_V2
+from opencompass.datasets import PIQADatasetV2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 piqa_reader_cfg = dict(
@@ -36,8 +33,8 @@ piqa_eval_cfg = dict(
 piqa_datasets = [
     dict(
         abbr='piqa',
-        type=piqaDataset_V2,
-        path=get_data_path('opencompass/piqa', './data/piqa'),
+        type=PIQADatasetV2,
+        path='opencompass/piqa',
         reader_cfg=piqa_reader_cfg,
         infer_cfg=piqa_infer_cfg,
         eval_cfg=piqa_eval_cfg)
