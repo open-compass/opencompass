@@ -7,6 +7,7 @@ from os import environ
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.utils import get_data_path
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
@@ -16,6 +17,7 @@ class TydiQADataset(BaseDataset):
 
     @staticmethod
     def load(path, lang):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             ms_dataset = MsDataset.load(path, subset_name=lang, split='dev')

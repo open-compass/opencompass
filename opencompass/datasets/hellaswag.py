@@ -50,6 +50,7 @@ class HellaswagDataset_V2(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
@@ -84,6 +85,7 @@ class HellaswagDataset_V3(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         dataset = []
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset

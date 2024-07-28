@@ -93,6 +93,7 @@ class ARCDatasetClean(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path)
         annotations = ARCDatasetClean.load_contamination_annotations(
             osp.dirname(path), 'test')
         if environ.get('DATASET_SOURCE') == 'ModelScope':

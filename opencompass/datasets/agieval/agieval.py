@@ -6,6 +6,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .math_equivalence import is_equiv
@@ -17,6 +18,7 @@ class AGIEvalDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str, setting_name: str):
+        path = get_data_path(path)
         from .dataset_loader import load_dataset, load_dataset_as_result_schema
 
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
@@ -38,6 +40,7 @@ class AGIEvalDataset_v2(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str, setting_name: str):
+        path = get_data_path(path)
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
 
         if environ.get('DATASET_SOURCE') == 'ModelScope':

@@ -15,7 +15,7 @@ from .mmlu import MMLUDataset
 from .obqa import OBQADataset
 from .piqa import PIQADatasetV2
 from .race import RaceDataset
-from .siqa import siqaDataset_V3
+from .siqa import SiqaDatasetV3
 from .xiezhi import XiezhiDataset
 
 
@@ -275,8 +275,8 @@ class CircularXiezhiDataset(XiezhiDataset, metaclass=CircularDatasetMeta):
     default_answer_key = 'answer'
 
 
-class CircularsiqaDataset(siqaDataset_V3, metaclass=CircularDatasetMeta):
-    dataset_class = siqaDataset_V3
+class CircularsiqaDataset(SiqaDatasetV3, metaclass=CircularDatasetMeta):
+    dataset_class = SiqaDatasetV3
     default_circular_splits = ['validation']
     default_option_keys = ['A', 'B', 'C']
     default_answer_key = 'answer'

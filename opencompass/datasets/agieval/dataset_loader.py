@@ -364,8 +364,9 @@ def generate_second_stage_input(dataset_name,
 
 
 def load_dataset_as_result_schema(dataset_name, parent_path):
-    from modelscope import MsDataset
+
     if environ.get('DATASET_SOURCE') == 'ModelScope':
+        from modelscope import MsDataset
         loaded_jsonl = MsDataset.load(parent_path,
                                       subset_name=dataset_name,
                                       split='test')

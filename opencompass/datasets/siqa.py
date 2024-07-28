@@ -5,6 +5,7 @@ from os import environ
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -32,6 +33,7 @@ class siqaDataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = DatasetDict()
@@ -90,6 +92,7 @@ class siqaDataset_V2(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = DatasetDict()
@@ -126,7 +129,7 @@ class siqaDataset_V2(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class siqaDataset_V3(BaseDataset):
+class SiqaDatasetV3(BaseDataset):
     """Disconnect from HuggingFace version of HFDataset."""
 
     @staticmethod
@@ -151,6 +154,7 @@ class siqaDataset_V3(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = DatasetDict()
@@ -170,10 +174,10 @@ class siqaDataset_V3(BaseDataset):
                     data_list.append(row)
                 dataset[split] = Dataset.from_list(data_list)
         else:
-            train_dataset = siqaDataset_V3.load_single(path, 'train.jsonl',
-                                                       'train-labels.lst')
-            val_dataset = siqaDataset_V3.load_single(path, 'dev.jsonl',
-                                                     'dev-labels.lst')
+            train_dataset = SiqaDatasetV3.load_single(path, 'train.jsonl',
+                                                      'train-labels.lst')
+            val_dataset = SiqaDatasetV3.load_single(path, 'dev.jsonl',
+                                                    'dev-labels.lst')
             dataset = DatasetDict({
                 'train': train_dataset,
                 'validation': val_dataset

@@ -6,6 +6,7 @@ from os import environ
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -15,6 +16,7 @@ class MMLUDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path)
         dataset = DatasetDict()
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
@@ -86,6 +88,7 @@ class MMLUDatasetClean(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path)
         dataset = DatasetDict()
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             for split in ['dev', 'test']:
