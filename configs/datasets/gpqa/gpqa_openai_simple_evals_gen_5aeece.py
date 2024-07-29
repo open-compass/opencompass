@@ -43,11 +43,7 @@ for split in list(gpqa_subsets.keys()):
     gpqa_datasets.append(
         dict(
             abbr='GPQA_' + split,
-<<<<<<< HEAD
-            type=GPQASimpleEvalDataset,
-=======
             type=GPQADataset,
->>>>>>> a1235ef (Update Configuration)
             path='./data/gpqa/',
             name=gpqa_subsets[split],
             reader_cfg=gpqa_reader_cfg,
