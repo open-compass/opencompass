@@ -61,12 +61,12 @@ class ApiModelConfig:
     openai_api_base: str   # The base URL of the OpenAI API, e.g. `http://127.0.0.1:8000/v1/chat/completions`
 
     meta_template: Union[str, dict] = None
-    type: str = 'opencompass.models.AsyncOpenAI'
+    type: str = 'opencompass.models.OpenAIExtra'
     key: str = 'EMPTY'    # No need for APIs in the format of OpenAI.
     query_per_second: int = 1
     max_out_len: int = 2048
     max_seq_len: int = 4096
-    batch_size: int = 100
+    batch_size: int = 8
     run_cfg: dict = field(default_factory=lambda: {"num_gpus": 0})
     temperature: float = 0.0        # It means the do_sample is False in OpenAI API.
     is_chat: bool = True
