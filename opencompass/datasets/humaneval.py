@@ -16,6 +16,18 @@ from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
+HUMANEVAL_IMPORT_ERROR = '''\
+Please install human_eval use following steps:
+git clone git@github.com:open-compass/human-eval.git
+cd human-eval && pip install -e .'''
+
+HUMANEVAL_PLUS_IMPORT_ERROR = '''\
+Please install evalplus use following steps:
+git clone --recurse-submodules git@github.com:open-compass/human-eval.git
+cd human-eval
+pip install -e .
+pip install -e evalplus'''
+
 
 @LOAD_DATASET.register_module()
 class HumanevalDataset(BaseDataset):

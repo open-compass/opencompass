@@ -6,6 +6,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -15,6 +16,7 @@ class GaokaoBenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        data = get_data_path(path, local_mode=True)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             return MsDataset.load(path, subset_name=name, split='test')
