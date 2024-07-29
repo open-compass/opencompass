@@ -56,7 +56,7 @@ class Hard_MSP_Dataset(BaseDataset):
 
 
 @ICL_EVALUATORS.register_module(force=True)
-class hard_MSP_Evaluator(BaseEvaluator):
+class Hard_MSP_Evaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         assert len(predictions) == len(references)
