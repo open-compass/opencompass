@@ -6,6 +6,7 @@ import re
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -55,6 +56,7 @@ class MathBenchDataset(BaseDataset):
             with_circular (bool): Whether to create circular dataset for
                 single choice question. Defaults to True.
         """
+        path = get_data_path(path, local_mode=True)
         data = []
         filename = osp.join(path, f'{name}.jsonl')
         with open(filename, 'r', encoding='utf-8') as infile:

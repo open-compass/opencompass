@@ -33,8 +33,8 @@ maxmin_datasets = [
     dict(
         type=MaxminDataset,
         abbr=f'maxmin',
-        test_path=f'data/clozeTest-maxmin/python/clozeTest.json',
-        answer_path=f'data/clozeTest-maxmin/python/answers.txt',
+        test_path='opencompass/clozeTest_maxmin',
+        answer_path='opencompass/clozeTest_maxmin_answers',
         reader_cfg=maxmin_reader_cfg,
         infer_cfg=maxmin_infer_cfg,
         eval_cfg=maxmin_eval_cfg,

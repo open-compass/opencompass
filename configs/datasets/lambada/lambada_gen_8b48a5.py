@@ -22,7 +22,7 @@ lambada_datasets = [
     dict(
         abbr='lambada',
         type=lambadaDataset,
-        path='./data/lambada/test.jsonl',
+        path='opencompass/lambada',
         reader_cfg=lambada_reader_cfg,
         infer_cfg=lambada_infer_cfg,
         eval_cfg=lambada_eval_cfg)

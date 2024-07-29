@@ -9,6 +9,7 @@ import signal
 import tempfile
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from os import environ
 from typing import List, Sequence, Union
 
 import numpy as np
@@ -16,6 +17,7 @@ from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -24,7 +26,8 @@ from .base import BaseDataset
 class MBPPDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
+    def load(path: str, local_mode: bool = False):
+        path = get_data_path(path, local_mode=local_mode)
 
         def processing_test(example):
             example['test_case'] = example['test_list']
@@ -32,14 +35,23 @@ class MBPPDataset(BaseDataset):
             example['test_list_2'] = example['test_list']
             return example
 
-        train = load_dataset('json', data_files=path,
-                             split='train[:10]').map(processing_test)
-        test = load_dataset('json', data_files=path,
-                            split='train[10:510]').map(processing_test)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            train = MsDataset.load(path,
+                                   subset_name='full',
+                                   split='train[:10]').map(processing_test)
+            test = MsDataset.load(path,
+                                  subset_name='full',
+                                  split='train[10:510]').map(processing_test)
+        else:
+            train = load_dataset('json', data_files=path,
+                                 split='train[:10]').map(processing_test)
+            test = load_dataset('json', data_files=path,
+                                split='train[10:510]').map(processing_test)
         return DatasetDict({'train': train, 'test': test})
 
 
-class MBPPDataset_V2(BaseDataset):
+class MBPPDatasetV2(BaseDataset):
 
     @staticmethod
     def load(path: str, num_repeats: int = 1):
@@ -59,6 +71,8 @@ class MBPPDataset_V2(BaseDataset):
         multiple responses in special cases.
         """
 
+        path = get_data_path(path)
+
         def processing_test(example):
             example['test_case'] = example['test_list']
             example['test_list'] = '\n'.join(example['test_list'])
@@ -66,10 +80,19 @@ class MBPPDataset_V2(BaseDataset):
                                           task_id=example['task_id'])
             return example
 
-        train = load_dataset('json', data_files=path,
-                             split='train[:10]').map(processing_test)
-        test = load_dataset('json', data_files=path,
-                            split='train[10:510]').map(processing_test)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            train = MsDataset.load(path,
+                                   subset_name='full',
+                                   split='train[:10]').map(processing_test)
+            test = MsDataset.load(path,
+                                  subset_name='full',
+                                  split='train[10:510]').map(processing_test)
+        else:
+            train = load_dataset('json', data_files=path,
+                                 split='train[:10]').map(processing_test)
+            test = load_dataset('json', data_files=path,
+                                split='train[10:510]').map(processing_test)
         test = concatenate_datasets([test] * num_repeats)
         return DatasetDict({'train': train, 'test': test})
 
@@ -93,6 +116,7 @@ class SanitizedMBPPDataset(BaseDataset):
             num_repeats(int): Number of repetition for this dataset to get
         multiple responses in special cases.
         """
+        path = get_data_path(path)
 
         def processing_test(example):
             example['text'] = example.pop('prompt')
@@ -105,10 +129,19 @@ class SanitizedMBPPDataset(BaseDataset):
             return example
 
         # train : test = 7 : 257
-        train = load_dataset('json', data_files=path,
-                             split='train[:7]').map(processing_test)
-        test = load_dataset('json', data_files=path,
-                            split='train[7:264]').map(processing_test)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            train = MsDataset.load(path,
+                                   subset_name='sanitized',
+                                   split='train[:7]').map(processing_test)
+            test = MsDataset.load(path,
+                                  subset_name='sanitized',
+                                  split='train[7:264]').map(processing_test)
+        else:
+            train = load_dataset('json', data_files=path,
+                                 split='train[:7]').map(processing_test)
+            test = load_dataset('json', data_files=path,
+                                split='train[7:264]').map(processing_test)
         test = concatenate_datasets([test] * num_repeats)
         return DatasetDict({'train': train, 'test': test})
 
@@ -133,6 +166,8 @@ class MBPPPlusDataset(BaseDataset):
             num_repeats(int): Number of repetition for this dataset to get
         multiple responses in special cases.
         """
+
+        path = get_data_path(path)
 
         def processing_test(example):
             example['test_case'] = example['test_list']

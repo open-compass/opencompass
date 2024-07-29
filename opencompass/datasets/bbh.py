@@ -1,12 +1,14 @@
 import json
 import os.path as osp
 import re
+from os import environ
 
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -16,9 +18,14 @@ class BBHDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
-        with open(osp.join(path, f'{name}.json'), 'r') as f:
-            data = json.load(f)['examples']
-        dataset = Dataset.from_list(data)
+        path = get_data_path(path)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            dataset = MsDataset.load(path, subset_name=name, split='test')
+        else:
+            with open(osp.join(path, f'{name}.json'), 'r') as f:
+                data = json.load(f)['examples']
+            dataset = Dataset.from_list(data)
         return dataset
 
 

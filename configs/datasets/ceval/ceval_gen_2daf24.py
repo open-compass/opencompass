@@ -91,7 +91,7 @@ for _split in ['val', 'test']:
         ceval_datasets.append(
             dict(
                 type=CEvalDataset,
-                path='./data/ceval/formal_ceval',
+                path='opencompass/ceval-exam',
                 name=_name,
                 abbr='ceval-' + _name if _split == 'val' else 'ceval-test-' +
                 _name,

@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import winogradDataset
+from opencompass.datasets import WinogradDataset
 
 winograd_reader_cfg = dict(
     input_columns=['opt1', 'opt2'],
@@ -27,7 +27,7 @@ winograd_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 winograd_datasets = [
     dict(
         abbr='winograd',
-        type=winogradDataset,
+        type=WinogradDataset,
         path='winograd_wsc',
         name='wsc285',
         reader_cfg=winograd_reader_cfg,

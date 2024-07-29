@@ -26,7 +26,7 @@ triviaqa_datasets = [
     dict(
         type=TriviaQADataset,
         abbr='triviaqa',
-        path='./data/triviaqa/',
+        path='opencompass/trivia_qa',
         reader_cfg=triviaqa_reader_cfg,
         infer_cfg=triviaqa_infer_cfg,
         eval_cfg=triviaqa_eval_cfg)

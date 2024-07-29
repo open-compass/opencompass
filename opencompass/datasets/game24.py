@@ -7,6 +7,7 @@ import pandas as pd
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -162,6 +163,7 @@ class Game24Dataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         data = list(pd.read_csv(path)['Puzzles'])
         data = [{'input': i, 'output': i} for i in data]
         return Dataset.from_list(data[900:905])

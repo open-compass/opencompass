@@ -5,6 +5,7 @@ from datasets import Dataset
 from sklearn.metrics import classification_report
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .math_equivalence import is_equiv
@@ -23,6 +24,7 @@ class MedBenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str, setting_name: str):
+        path = get_data_path(path, local_mode=True)
         from .dataset_loader import load_dataset, load_dataset_as_result_schema
 
         assert setting_name in 'zero-shot', 'only support zero-shot setting'

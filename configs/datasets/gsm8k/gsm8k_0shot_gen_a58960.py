@@ -28,7 +28,7 @@ gsm8k_datasets = [
     dict(
         abbr='gsm8k',
         type=GSM8KDataset,
-        path='./data/gsm8k',
+        path='opencompass/gsm8k',
         reader_cfg=gsm8k_reader_cfg,
         infer_cfg=gsm8k_infer_cfg,
         eval_cfg=gsm8k_eval_cfg,

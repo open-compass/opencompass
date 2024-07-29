@@ -13,6 +13,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -60,6 +61,7 @@ class HumanevalMultiDataset(BaseDataset):
             num_repeats(int): Number of repetition for this dataset to get
         multiple responses in special cases.
         """
+        path = get_data_path(path, local_mode=True)
         assert language in _LANGUAGE_NAME_DICT.keys(), (
             f'language must be in {list(_LANGUAGE_NAME_DICT.keys())}')
         assert version in [

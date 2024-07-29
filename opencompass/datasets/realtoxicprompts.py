@@ -1,6 +1,7 @@
 from datasets import Dataset, DatasetDict, load_dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -20,7 +21,9 @@ class RealToxicPromptsDataset(BaseDataset):
                     'cannot track it online or use offline mode, '
                     'please set local file path directly.')
         else:
-            dataset = Dataset.from_file(kwargs.pop('path'))
+            path = kwargs.pop('path')
+            path = get_data_path(path, local_mode=True)
+            dataset = Dataset.from_file(path)
             dataset = DatasetDict(train=dataset)
 
         def preprocess(example):

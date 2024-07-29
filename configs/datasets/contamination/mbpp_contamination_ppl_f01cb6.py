@@ -25,7 +25,7 @@ for split in ['train', 'test']:
         dict(
             abbr=f'mbpp-{split}-ppl',
             type=SanitizedMBPPDataset,
-            path='./data/mbpp/sanitized-mbpp.jsonl',
+            path='opencompass/sanitized_mbpp',
             reader_cfg=mbpp_reader_cfg,
             infer_cfg=mbpp_infer_cfg,
             eval_cfg=mbpp_eval_cfg)

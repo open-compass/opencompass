@@ -2,7 +2,6 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer, PPLInferencer
 from opencompass.datasets import GaokaoBenchDataset
-
 _MCQ_prompts = [
     {
         'type': 'single_choice',
@@ -290,6 +289,7 @@ for _folder, _prompts in [
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + _p['keyword'],
             'path': _base_path + '/' + _folder + '/' + _p['keyword'] + '.json',
+            'name': _p['keyword'],
             'reader_cfg': _reader_cfg,
             'infer_cfg': _infer_cfg,
             'eval_cfg': _eval_cfg,
@@ -340,6 +340,7 @@ for _p in _MCQ_prompts:
         'type': GaokaoBenchDataset,
         'abbr': 'GaokaoBench_' + _p['keyword'],
         'path': _base_path + '/' + _folder + '/' + _p['keyword'] + '.json',
+        'name': _p['keyword'],
         'reader_cfg': _reader_cfg,
         'infer_cfg': _infer_cfg,
         'eval_cfg': _eval_cfg,

@@ -147,7 +147,7 @@ for _flores_subtask in _flores_subtasks:
         dict(
             abbr=f'flores_100_{_src}-{_tgt}',
             type=FloresFirst100Dataset,
-            path='./data/flores_first100',
+            path='opencompass/flores',
             name=f'{_flores_source}-{_flores_target}',
             reader_cfg=flores_reader_cfg.copy(),
             infer_cfg=flores_infer_cfg.copy(),

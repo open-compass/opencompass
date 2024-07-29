@@ -34,7 +34,7 @@ adv_mnli_mm_datasets = [
     dict(
         abbr='adv_mnli_mm',
         type=AdvMnliMMDataset,
-        path='./data/adv_glue/dev_ann.json',
+        path='opencompass/advglue-dev',
         reader_cfg=adv_mnli_mm_reader_cfg,
         infer_cfg=adv_mnli_mm_infer_cfg,
         eval_cfg=adv_mnli_mm_eval_cfg,

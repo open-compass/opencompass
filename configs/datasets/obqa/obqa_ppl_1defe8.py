@@ -24,12 +24,14 @@ obqa_datasets = [
     dict(
         abbr='openbookqa',
         type=OBQADataset,
-        path='./data/openbookqa/Main/test.jsonl',
+        path='opencompass/openbookqa_test',
+        name='main',
     ),
     dict(
         abbr='openbookqa_fact',
         type=OBQADataset,
-        path='./data/openbookqa/Additional/test_complete.jsonl',
+        path='opencompass/openbookqa_fact',
+        name='additional',
     ),
 ]
 for _i in range(2):

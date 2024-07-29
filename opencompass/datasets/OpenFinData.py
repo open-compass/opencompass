@@ -5,6 +5,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -14,6 +15,7 @@ class OpenFinDataDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path, local_mode=True)
         with open(osp.join(path, f'{name}.json'), 'r') as f:
             data = json.load(f)
             return Dataset.from_list(data)

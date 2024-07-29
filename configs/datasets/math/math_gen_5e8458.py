@@ -43,7 +43,7 @@ math_datasets = [
     dict(
         type=MATHDataset,
         abbr='math',
-        path='./data/math/math.json',
+        path='opencompass/math',
         reader_cfg=dict(
             input_columns=['problem'],
             output_column='solution',

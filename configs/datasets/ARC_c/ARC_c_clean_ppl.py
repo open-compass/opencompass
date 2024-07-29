@@ -47,7 +47,8 @@ ARC_c_datasets = [
     dict(
         type=ARCDataset,
         abbr='ARC-c-test',
-        path='./data/ARC/ARC-c/ARC-Challenge-Test.jsonl',
+        path='opencompass/ai2_arc-test',
+        name='ARC-Challenge',
         reader_cfg=ARC_c_reader_cfg,
         infer_cfg=ARC_c_infer_cfg,
         eval_cfg=ARC_c_eval_cfg)
