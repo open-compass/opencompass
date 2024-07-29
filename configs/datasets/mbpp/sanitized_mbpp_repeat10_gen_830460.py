@@ -34,7 +34,7 @@ sanitized_mbpp_datasets = [
     dict(
         type=SanitizedMBPPDataset,
         abbr='sanitized_mbpp_repeat10',
-        path='./data/mbpp/sanitized-mbpp.jsonl',
+        path='opencompass/sanitized_mbpp',
         num_repeats=10,
         reader_cfg=sanitized_mbpp_reader_cfg,
         infer_cfg=sanitized_mbpp_infer_cfg,

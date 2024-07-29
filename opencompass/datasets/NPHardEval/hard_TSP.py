@@ -8,6 +8,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .prompts import tspPrompts
@@ -29,10 +30,11 @@ def q2text(q, p=tspPrompts):  # q is the data for the HP-hard question, p is the
 
 
 @LOAD_DATASET.register_module(force=True)
-class hard_TSP_Dataset(BaseDataset):
+class Hard_TSP_Dataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         raw_data = []
         data_path = path
         all_data = []
@@ -56,7 +58,7 @@ class hard_TSP_Dataset(BaseDataset):
 
 
 @ICL_EVALUATORS.register_module(force=True)
-class hard_TSP_Evaluator(BaseEvaluator):
+class Hard_TSP_Evaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         assert len(predictions) == len(references)

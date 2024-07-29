@@ -69,6 +69,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.07.23\]** 我们支持了[ModelScope](www.modelscope.cn)数据集，您可以按需加载，无需事先下载全部数据到本地，欢迎试用！🔥🔥🔥
 - **\[2024.07.17\]** 我们发布了CompassBench-202408榜单的示例数据和评测规则，敬请访问 [CompassBench](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/compassbench_intro.html) 获取更多信息。 🔥🔥🔥
 - **\[2024.07.17\]** 我们正式发布 NeedleBench 的[技术报告](http://arxiv.org/abs/2407.11963)。诚邀您访问我们的[帮助文档](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/needleinahaystack_eval.html)进行评估。🔥🔥🔥
 - **\[2024.07.04\]** OpenCompass 现已支持 InternLM2.5， 它拥有卓越的推理性能、有效支持百万字超长上下文以及工具调用能力整体升级，欢迎访问[OpenCompass Config](https://github.com/open-compass/opencompass/tree/main/configs/models/hf_internlm) 和 [InternLM](https://github.com/InternLM/InternLM) .🔥🔥🔥.
@@ -138,10 +139,26 @@ pip install -e .
 
 ### 📂 数据准备
 
+OpenCompass支持使用本地数据集进行评测，数据集的下载和解压可以通过以下命令完成：
+
 ```bash
 # 下载数据集到 data/ 处
 wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
 unzip OpenCompassData-core-20240207.zip
+```
+
+另外，您还可以使用[ModelScope](www.modelscope.cn)来加载数据集：
+环境准备：
+
+```bash
+pip install modelscope
+export DATASET_SOURCE=ModelScope
+```
+
+配置好环境后，无需下载全部数据，直接提交评测任务即可。目前支持的数据集有：
+
+```bash
+humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ceval, math, LCSTS, Xsum, winogrande, openbookqa, AGIEval, gsm8k, nq, race, siqa, mbpp, mmlu, hellaswag, ARC, BBH, xstory_cloze, summedits, GAOKAO-BENCH, OCNLI, cmnli
 ```
 
 有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html)。

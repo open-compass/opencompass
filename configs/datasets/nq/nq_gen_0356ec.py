@@ -54,7 +54,7 @@ for k in [0, 1, 5]:
         dict(
             type=NaturalQuestionDataset,
             abbr='nq' if k == 0 else f'nq_{k}shot',
-            path='./data/nq/',
+            path='opencompass/natural_question',
             reader_cfg=nq_reader_cfg,
             infer_cfg=nq_infer_cfg,
             eval_cfg=nq_eval_cfg)

@@ -35,7 +35,7 @@ commonsenseqa_datasets = [
     dict(
         abbr='commonsense_qa',
         type=commonsenseqaDataset,
-        path='./data/commonsenseqa',
+        path='opencompass/commonsense_qa',
         reader_cfg=commonsenseqa_reader_cfg,
         infer_cfg=commonsenseqa_infer_cfg,
         eval_cfg=commonsenseqa_eval_cfg)

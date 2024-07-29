@@ -23,7 +23,7 @@ nq_datasets = [
     dict(
         type=NaturalQuestionDataset,
         abbr='nq',
-        path='./data/nq/',
+        path='opencompass/natural_question',
         reader_cfg=nq_reader_cfg,
         infer_cfg=nq_infer_cfg,
         eval_cfg=nq_eval_cfg)

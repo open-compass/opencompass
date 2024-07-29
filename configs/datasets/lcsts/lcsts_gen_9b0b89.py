@@ -21,7 +21,7 @@ lcsts_datasets = [
     dict(
         type=LCSTSDataset,
         abbr='lcsts',
-        path='./data/LCSTS',
+        path='opencompass/LCSTS',
         reader_cfg=lcsts_reader_cfg,
         infer_cfg=lcsts_infer_cfg,
         eval_cfg=lcsts_eval_cfg)

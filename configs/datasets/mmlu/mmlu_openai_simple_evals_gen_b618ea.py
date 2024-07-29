@@ -7,7 +7,7 @@ from opencompass.datasets import MMLUDataset
 from opencompass.utils.text_postprocessors import match_answer_pattern
 
 with read_base():
-   from .mmlu_all_sets import mmlu_all_sets
+    from .mmlu_all_sets import mmlu_all_sets
 
 # None of the mmlu dataset in huggingface is correctly parsed, so we use our own dataset reader
 # Please download the dataset from https://people.eecs.berkeley.edu/~hendrycks/data.tar
@@ -51,7 +51,7 @@ for name in mmlu_all_sets:
         dict(
             abbr=f'lukaemon_mmlu_{name}',
             type=MMLUDataset,
-            path='./data/mmlu/',
+            path='opencompass/mmlu',
             name=name,
             reader_cfg=mmlu_reader_cfg,
             infer_cfg=mmlu_infer_cfg,

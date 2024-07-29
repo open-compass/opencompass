@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import CBDataset_V2
+from opencompass.datasets import CBDatasetV2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 CB_reader_cfg = dict(
@@ -35,7 +35,7 @@ CB_eval_cfg = dict(
 CB_datasets = [
     dict(
         abbr='CB',
-        type=CBDataset_V2,
+        type=CBDatasetV2,
         path='./data/SuperGLUE/CB/val.jsonl',
         reader_cfg=CB_reader_cfg,
         infer_cfg=CB_infer_cfg,

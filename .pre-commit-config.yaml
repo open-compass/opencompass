@@ -1,6 +1,7 @@
 exclude: |
     (?x)^(
       tests/data/|
+      tests/dataset/|
       opencompass/models/internal/|
       opencompass/utils/internal/|
       opencompass/openicl/icl_evaluator/hf_metrics/|

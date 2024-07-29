@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import cmnliDataset_V2
+from opencompass.datasets import CMNLIDatasetV2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 cmnli_reader_cfg = dict(
@@ -34,8 +34,8 @@ cmnli_eval_cfg = dict(
 cmnli_datasets = [
     dict(
         abbr='cmnli',
-        type=cmnliDataset_V2,
-        path='./data/CLUE/cmnli/cmnli_public/dev.json',
+        type=CMNLIDatasetV2,
+        path='opencompass/cmnli-dev',
         reader_cfg=cmnli_reader_cfg,
         infer_cfg=cmnli_infer_cfg,
         eval_cfg=cmnli_eval_cfg,

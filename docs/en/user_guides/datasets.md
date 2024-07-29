@@ -39,7 +39,7 @@ In each dataset configuration file, the dataset will be defined in the `{}_datas
 afqmc_datasets = [
     dict(
         abbr="afqmc-dev",
-        type=AFQMCDataset_V2,
+        type=AFQMCDatasetV2,
         path="./data/CLUE/AFQMC/dev.json",
         reader_cfg=afqmc_reader_cfg,
         infer_cfg=afqmc_infer_cfg,

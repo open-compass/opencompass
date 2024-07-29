@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import MultiRCDataset_V2
+from opencompass.datasets import MultiRCDatasetV2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 MultiRC_reader_cfg = dict(
@@ -34,7 +34,7 @@ MultiRC_eval_cfg = dict(
 MultiRC_datasets = [
     dict(
         abbr='MultiRC',
-        type=MultiRCDataset_V2,
+        type=MultiRCDatasetV2,
         path='./data/SuperGLUE/MultiRC/val.jsonl',
         reader_cfg=MultiRC_reader_cfg,
         infer_cfg=MultiRC_infer_cfg,

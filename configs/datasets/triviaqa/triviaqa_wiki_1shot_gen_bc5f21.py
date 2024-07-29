@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import TriviaQADataset_V2, TriviaQAEvaluator
+from opencompass.datasets import TriviaQADatasetV2, TriviaQAEvaluator
 
 
 triviaqa_datasets = []
@@ -53,9 +53,9 @@ for k in [1]:
 
     triviaqa_datasets.append(
     dict(
-        type=TriviaQADataset_V2,
+        type=TriviaQADatasetV2,
         abbr=f'triviaqa_wiki_{k}shot',
-        path='./data/triviaqa',
+        path='opencompass/trivia_qa',
         reader_cfg=triviaqa_reader_cfg,
         infer_cfg=triviaqa_infer_cfg,
         eval_cfg=triviaqa_eval_cfg)

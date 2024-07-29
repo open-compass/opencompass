@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import CrowspairsDataset_CN
+from opencompass.datasets import CrowspairsDatasetCN
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 crowspairscn_reader_cfg = dict(
@@ -55,7 +55,7 @@ crowspairscn_eval_cfg = dict(
 crowspairscn_datasets = [
     dict(
         abbr='crowspairs_cn',
-        type=CrowspairsDataset_CN,
+        type=CrowspairsDatasetCN,
         path='./data/crowspairs_cn/test.jsonl',
         reader_cfg=crowspairscn_reader_cfg,
         infer_cfg=crowspairscn_infer_cfg,
