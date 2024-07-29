@@ -75,6 +75,8 @@ class OpenICLEvalTask(BaseTask):
             for c in sum(self.dataset_cfgs, []))
         self.dump_details = cfg.get('eval', {}).get('runner', {}).get(
             'task', {}).get('dump_details', False)
+        self.cal_extrat_rate = cfg.get('eval', {}).get('runner', {}).get(
+            'task', {}).get('cal_extrat_rate', False)
 
     def get_command(self, cfg_path, template):
         sys.path.append(os.getcwd())
@@ -234,7 +236,9 @@ class OpenICLEvalTask(BaseTask):
                         pred_strs, test_set[self.output_column], details,
                         pred_dicts)
                     result['type'] = result['details'].pop('type', None)
-                    # result['extract_rate'] = self.extract_rate(result)
+                    if self.cal_extrat_rate:
+                        # Calculate the extraction success rate for prediction
+                        result['extract_rate'] = self.extract_rate(result)
 
                     if 'PPL' in str(
                             self.dataset_cfg.infer_cfg.inferencer.type):
@@ -264,11 +268,21 @@ class OpenICLEvalTask(BaseTask):
         mmengine.dump(result, out_path, ensure_ascii=False, indent=4)
 
     def extract_rate(self, results):
+        """This function is designed for calculating the extraction rate.
+
+        Args:
+            results (dict): The result dict, include the information
+        """
         details = results['details']
         details_list = list(details.values())
-        invalid_extractions = [
-            item for item in details_list if len(item['predictions']) < 1
-        ]
+        invalid_extractions = []
+        for item in details_list:
+            try:
+                invalid_extractions.extend(
+                    [item] if not item['predictions'] else [])
+            except KeyError as e:
+                self.logger.warning(f'Skip {e} due to: {item}')
+                raise KeyError
         success_rate = 100 - len(invalid_extractions) / len(details) * 100
         return success_rate
 
