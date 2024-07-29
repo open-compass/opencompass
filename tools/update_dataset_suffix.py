@@ -111,7 +111,7 @@ def main():
     parser.add_argument('python_files', nargs='*')
     # Could be opencompass/configs/datasets and configs/datasets
     parser.add_argument('--root_folder',
-                        default='opencompass/configs/datasets')
+                        default='configs/datasets')
     args = parser.parse_args()
 
     root_folder = args.root_folder
