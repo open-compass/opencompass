@@ -80,7 +80,8 @@ def reload_datasets():
         from configs.datasets.ARC_c.ARC_c_clean_ppl import ARC_c_datasets as ARC_c_clean_datasets
         from configs.datasets.mmlu.mmlu_clean_ppl import mmlu_datasets as mmlu_clean_datasets
         from configs.datasets.hellaswag.hellaswag_clean_ppl import hellaswag_datasets as hellaswag_clean_datasets
-        
+        from configs.datasets.FewCLUE_ocnli_fc.FewCLUE_ocnli_fc_gen import ocnli_fc_datasets
+
     return sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 
@@ -102,6 +103,10 @@ def load_datasets(source, conf):
         return dataset
     if 'name' in conf:
         dataset = conf['type'].load(path=conf['path'], name=conf['name'])
+        return dataset
+
+    if 'local_mode' in conf:
+        dataset = conf['type'].load(path=conf['path'], local_mode=conf['local_mode'])
         return dataset
     try:
         dataset = conf['type'].load(path=conf['path'])
