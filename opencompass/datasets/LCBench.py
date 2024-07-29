@@ -13,6 +13,7 @@ from datasets import DatasetDict, concatenate_datasets, load_dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -37,6 +38,7 @@ class LCDataset(BaseDataset):
             num_repeats(int): Number of repetition for this dataset to get
         multiple responses in special cases.
         """
+        path = get_data_path(path, local_mode=True)
 
         def processing_test(example):
             example['test_case'] = example['test_list']
