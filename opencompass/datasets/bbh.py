@@ -50,9 +50,15 @@ def bbh_freeform_postprocess(text: str) -> str:
     ans_line = ans.split('answer is ')
     if len(ans_line) != 1:
         ans = ans_line[1].strip()
-    ans = ans.split('\n')[0]
+    ans = ans.split('\n')[0].strip()
+
     if ans.endswith('.'):
-        ans = ans[:-1]
+        ans = ans[:-1].strip()
+
+    match = re.search(r'\*\*(.*?)\*\*', ans)
+    if match:
+        return match.group(1)
+
     return ans
 
 

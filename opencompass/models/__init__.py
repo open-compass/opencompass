@@ -6,7 +6,9 @@ from .baidu_api import ERNIEBot  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa: F401
 from .base_api import APITemplateParser, BaseAPIModel  # noqa: F401
 from .bytedance_api import ByteDance  # noqa: F401
+from .claude_allesapin import ClaudeAllesAPIN  # noqa: F401
 from .claude_api import Claude  # noqa: F401
+from .claude_sdk_api import ClaudeSDK  # noqa: F401
 from .deepseek_api import DeepseekAPI  # noqa: F401
 from .doubao_api import Doubao  # noqa: F401
 from .gemini_api import Gemini  # noqa: F401

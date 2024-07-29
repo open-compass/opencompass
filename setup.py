@@ -117,14 +117,8 @@ def do_setup():
         python_requires='>=3.8.0',
         install_requires=parse_requirements('requirements/runtime.txt'),
         license='Apache License 2.0',
-        packages=find_packages(exclude=[
-            'test*',
-            'configs',
-            'data',
-            'docs',
-            'tools',
-            'tmp',
-        ]),
+        include_package_data=True,
+        packages=find_packages(),
         keywords=[
             'AI', 'NLP', 'in-context learning', 'large language model',
             'evaluation', 'benchmark', 'llm'

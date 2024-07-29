@@ -109,9 +109,11 @@ def update_imports(data):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('python_files', nargs='*')
+    # Could be opencompass/configs/datasets and configs/datasets
+    parser.add_argument('--root_folder', default='configs/datasets')
     args = parser.parse_args()
 
-    root_folder = 'configs/datasets'
+    root_folder = args.root_folder
     if args.python_files:
         python_files = [
             i for i in args.python_files if i.startswith(root_folder)
