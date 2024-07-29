@@ -93,13 +93,16 @@ repos:
         files: ^configs/datasets
   - repo: local
     hooks:
-    -   id: update-dataset-suffix
-        name: dataset suffix updater
+    -   id: update-dataset-suffix-pacakge
+        name: dataset suffix updater(package)
         entry: ./tools/update_dataset_suffix.py
         language: script
         pass_filenames: true
         require_serial: true
         files: ^opencompass/configs/datasets
+        args:
+          - --root_folder
+          - opencompass/configs/datasets
   - repo: local
     hooks:
     -   id: compare-configs-datasets
@@ -123,7 +126,7 @@ repos:
           - configs/models
           - opencompass/configs/models
           - --ignore
-          - configs/models/llama
+          - llama
   - repo: local
     hooks:
     -   id: compare-configs-summarizers

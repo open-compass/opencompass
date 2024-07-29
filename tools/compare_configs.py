@@ -17,11 +17,18 @@ def get_files(folder, extensions, ignore_folder=[]):
     for folder in ignore_folder:
         ignore_folders.append(os.path.relpath(folder))
     # ignore the files starting with the folder in ignore_folder
+    ignore_files = []
     for file in files:
         for folder in ignore_folders:
             if file.startswith(folder):
-                files.remove(file)
-    return files
+                ignore_files.append(file)
+                # files.remove(file)
+    keep_files = []
+    for file in files:
+        if file not in ignore_files:
+            keep_files.append(file)
+
+    return keep_files
 
 
 def compare_folders(folder1, folder2, extensions, ignore_folder):
@@ -36,7 +43,9 @@ def compare_folders(folder1, folder2, extensions, ignore_folder):
     common_files = files1 & files2
 
     if only_in_folder1:
-        print(f'Only in {folder1}: {only_in_folder1}')
+        message = f'Only in {folder1}: {only_in_folder1}, '\
+            'please copy files into {folder2}'
+        raise ValueError(message)
     if only_in_folder2:
         print(f'Only in {folder2}: {only_in_folder2}')
 
