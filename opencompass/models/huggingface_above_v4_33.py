@@ -1,5 +1,6 @@
 # flake8: noqa
 # yapf: disable
+import torch
 from typing import Dict, List, Optional, Union
 
 from opencompass.models.base import BaseModel, LMTemplateParser
@@ -430,6 +431,21 @@ class HuggingFacewithChatTemplate(BaseModel):
             tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
 
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
+
+        # Reserve space for the tokens to be generated in the future.
+        max_prompt_len = self.max_seq_len - max_out_len
+
+        # Retain the first 0.5 * max_prompt_len tokens and the last 0.5 * max_prompt_len tokens, discarding the middle ones,
+        # because the prompts' questions are usually at the beginning or the end.
+        # To avoid the warning: 
+        # This is a friendly reminder - the current text generation call will exceed the model's predefined maximum length (32768). 
+        # Depending on the model, you may observe exceptions, performance degradation, or nothing at all.     
+        half_max_seq_len = max_prompt_len // 2
+        if half_max_seq_len > 0 and tokens['input_ids'].shape[1] > max_prompt_len:
+            for key in tokens.keys():
+                if tokens[key].shape[1] > max_prompt_len:
+                    field_values = tokens[key]
+                    tokens[key] = torch.cat((field_values[:, :half_max_seq_len], field_values[:, -half_max_seq_len:]), dim=1)
 
         generation_kwargs = self.generation_kwargs.copy()
         generation_kwargs.update(kwargs)
