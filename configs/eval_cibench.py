@@ -21,14 +21,15 @@ with read_base():
     from .summarizers.cibench import summarizer
     from .datasets.CIBench.CIBench_template_gen_e6b12a import cibench_datasets as cibench_datasets_template
     from .datasets.CIBench.CIBench_generation_gen_8ab0dc import cibench_datasets as cibench_datasets_generation
-    from .datasets.CIBench.CIBench_template_oracle_gen_fecda1 import cibench_datasets as cibench_datasets_template_oracle
-    from .datasets.CIBench.CIBench_generation_oracle_gen_c4a7c1 import cibench_datasets as cibench_datasets_generation_oracle
+    # Oracle mode for analysis
+    # from .datasets.CIBench.CIBench_template_oracle_gen_fecda1 import cibench_datasets as cibench_datasets_template_oracle
+    # from .datasets.CIBench.CIBench_generation_oracle_gen_c4a7c1 import cibench_datasets as cibench_datasets_generation_oracle
 
 datasets = []
 datasets += cibench_datasets_template
 datasets += cibench_datasets_generation
-datasets += cibench_datasets_template_oracle
-datasets += cibench_datasets_generation_oracle
+# datasets += cibench_datasets_template_oracle
+# datasets += cibench_datasets_generation_oracle
 
 _origin_models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
