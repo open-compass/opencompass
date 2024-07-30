@@ -2,6 +2,8 @@ from mmengine.config import read_base
 
 with read_base():
     # choose a list of datasets
+    from ...configs.datasets.bbh.bbh_gen import \
+        bbh_datasets  # noqa: F401, E501
     from ...configs.datasets.gsm8k.gsm8k_gen_17d0dc import \
         gsm8k_datasets  # noqa: F401, E501
     from ...configs.datasets.race.race_ppl import \
