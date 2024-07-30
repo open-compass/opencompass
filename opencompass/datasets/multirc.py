@@ -3,6 +3,7 @@ import json
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -12,6 +13,7 @@ class MultiRCDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         with open(path, 'r', errors='ignore') as in_f:
             rows = []
             for line in in_f:
@@ -41,10 +43,11 @@ class MultiRCDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class MultiRCDataset_V2(BaseDataset):
+class MultiRCDatasetV2(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         with open(path, 'r', errors='ignore') as in_f:
             rows = []
             for line in in_f:

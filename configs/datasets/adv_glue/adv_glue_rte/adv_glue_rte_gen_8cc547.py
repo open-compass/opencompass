@@ -34,7 +34,7 @@ adv_rte_datasets = [
     dict(
         abbr='adv_rte',
         type=AdvRteDataset,
-        path='./data/adv_glue/dev_ann.json',
+        path='opencompass/advglue-dev',
         reader_cfg=adv_rte_reader_cfg,
         infer_cfg=adv_rte_infer_cfg,
         eval_cfg=adv_rte_eval_cfg,

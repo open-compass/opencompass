@@ -1,9 +1,11 @@
 import json
 import re
+from os import environ
 
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -28,6 +30,15 @@ class StrategyQADataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        with open(path, 'r', encoding='utf-8') as f:
-            dataset = json.load(f)
-        return Dataset.from_list(dataset)
+        path = get_data_path(path)
+
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            dataset = MsDataset.load('opencompass/strategy_qa',
+                                     split='train',
+                                     trust_remote_code=True)
+        else:
+            with open(path, 'r', encoding='utf-8') as f:
+                dataset = json.load(f)
+            dataset = Dataset.from_list(dataset)
+        return dataset

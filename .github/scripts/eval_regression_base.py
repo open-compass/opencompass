@@ -17,6 +17,12 @@ with read_base():
         models as hf_gemma_2b_model  # noqa: F401, E501
     from ...configs.models.gemma.hf_gemma_7b import \
         models as hf_gemma_7b_model  # noqa: F401, E501
+    from ...configs.models.hf_internlm.hf_internlm2_5_7b import \
+        models as hf_internlm2_5_7b_model  # noqa: F401, E501
+    from ...configs.models.hf_internlm.hf_internlm2_7b import \
+        models as hf_internlm2_7b_model  # noqa: F401, E501
+    from ...configs.models.hf_internlm.hf_internlm2_base_7b import \
+        models as hf_internlm2_base_7b_model  # noqa: F401, E501
     from ...configs.models.hf_internlm.lmdeploy_internlm2_1_8b import \
         models as lmdeploy_internlm2_1_8b_model  # noqa: F401, E501
     from ...configs.models.hf_internlm.lmdeploy_internlm2_5_7b import \

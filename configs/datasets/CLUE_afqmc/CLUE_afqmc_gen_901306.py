@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import AFQMCDataset_V2
+from opencompass.datasets import AFQMCDatasetV2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 afqmc_reader_cfg = dict(
@@ -34,8 +34,8 @@ afqmc_eval_cfg = dict(
 afqmc_datasets = [
     dict(
         abbr='afqmc-dev',
-        type=AFQMCDataset_V2,
-        path='./data/CLUE/AFQMC/dev.json',
+        type=AFQMCDatasetV2,
+        path='opencompass/afqmc-dev',
         reader_cfg=afqmc_reader_cfg,
         infer_cfg=afqmc_infer_cfg,
         eval_cfg=afqmc_eval_cfg,

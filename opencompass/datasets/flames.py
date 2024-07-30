@@ -7,6 +7,7 @@ from typing import Optional
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .subjective.subjective_cmp import SubjectiveCmpDataset
 
@@ -40,6 +41,7 @@ class FlamesDataset(SubjectiveCmpDataset):
         path: str,
         name: str,
     ):
+        path = get_data_path(path, local_mode=True)
         config = Config(path, f'{name}_config.txt')
 
         dataset = []

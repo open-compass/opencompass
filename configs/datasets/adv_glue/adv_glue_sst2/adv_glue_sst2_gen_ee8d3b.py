@@ -33,7 +33,7 @@ adv_sst2_datasets = [
     dict(
         abbr='adv_sst2',
         type=AdvSst2Dataset,
-        path='./data/adv_glue/dev_ann.json',
+        path='opencompass/advglue-dev',
         reader_cfg=adv_sst2_reader_cfg,
         infer_cfg=adv_sst2_infer_cfg,
         eval_cfg=adv_sst2_eval_cfg,

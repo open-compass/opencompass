@@ -21,6 +21,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -99,6 +100,7 @@ class DS1000Dataset(BaseDataset):
                 are supported. Defaults to `Insertion`.
         """
 
+        path = get_data_path(path, local_mode=True)
         if isinstance(libs, str):
             libs = [libs]
 

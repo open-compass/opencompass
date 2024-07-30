@@ -5,6 +5,7 @@ from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccContaminationEvaluator
 from opencompass.datasets import CEvalDatasetClean as CEvalDataset
 
+
 ceval_subject_mapping = {
     'computer_network': ['Computer Network', '计算机网络', 'STEM'],
     'operating_system': ['Operating System', '操作系统', 'STEM'],
@@ -92,7 +93,7 @@ for _split in ['val']:
         ceval_datasets.append(
             dict(
                 type=CEvalDataset,
-                path='./data/ceval/formal_ceval',
+                path='opencompass/ceval-exam',
                 name=_name,
                 abbr='ceval-' + _name if _split == 'val' else 'ceval-test-' + _name,
                 reader_cfg=dict(

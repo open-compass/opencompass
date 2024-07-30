@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import AFQMCDataset_V2
+from opencompass.datasets import AFQMCDatasetV2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 bustm_reader_cfg = dict(
@@ -34,16 +34,18 @@ bustm_eval_cfg = dict(
 bustm_datasets = [
     dict(
         abbr='bustm-dev',
-        type=AFQMCDataset_V2,  # bustm share the same format with AFQMC
+        type=AFQMCDatasetV2,  # bustm share the same format with AFQMC
         path='./data/FewCLUE/bustm/dev_few_all.json',
+        local_mode=True,
         reader_cfg=bustm_reader_cfg,
         infer_cfg=bustm_infer_cfg,
         eval_cfg=bustm_eval_cfg,
     ),
     dict(
         abbr='bustm-test',
-        type=AFQMCDataset_V2,  # bustm share the same format with AFQMC
+        type=AFQMCDatasetV2,  # bustm share the same format with AFQMC
         path='./data/FewCLUE/bustm/test_public.json',
+        local_mode=True,
         reader_cfg=bustm_reader_cfg,
         infer_cfg=bustm_infer_cfg,
         eval_cfg=bustm_eval_cfg,

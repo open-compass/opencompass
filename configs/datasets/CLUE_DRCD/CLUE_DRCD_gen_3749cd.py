@@ -26,7 +26,7 @@ DRCD_datasets = [
     dict(
         type=DRCDDataset,
         abbr='DRCD_dev',
-        path='./data/CLUE/DRCD/dev.json',
+        path='opencompass/drcd_dev',
         reader_cfg=DRCD_reader_cfg,
         infer_cfg=DRCD_infer_cfg,
         eval_cfg=DRCD_eval_cfg),

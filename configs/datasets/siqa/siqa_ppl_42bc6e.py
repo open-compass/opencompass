@@ -26,7 +26,7 @@ siqa_datasets = [
     dict(
         abbr='siqa',
         type=siqaDataset,
-        path='./data/siqa',
+        path='opencompass/siqa',
         reader_cfg=siqa_reader_cfg,
         infer_cfg=siqa_infer_cfg,
         eval_cfg=siqa_eval_cfg)

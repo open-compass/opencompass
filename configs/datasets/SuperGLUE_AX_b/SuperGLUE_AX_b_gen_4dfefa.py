@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import AXDataset_V2
+from opencompass.datasets import AXDatasetV2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 AX_b_reader_cfg = dict(
@@ -34,7 +34,7 @@ AX_b_eval_cfg = dict(
 AX_b_datasets = [
     dict(
         abbr='AX_b',
-        type=AXDataset_V2,
+        type=AXDatasetV2,
         path='./data/SuperGLUE/AX-b/AX-b.jsonl',
         reader_cfg=AX_b_reader_cfg,
         infer_cfg=AX_b_infer_cfg,

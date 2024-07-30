@@ -207,6 +207,59 @@ class BaseRetriever:
             raise NotImplementedError(
                 'Leaving prompt as empty is not supported')
 
+    def generate_prompt_and_label_for_generate_task(
+            self,
+            idx,
+            ice,
+            gen_field_replace_token='',
+            ice_template: Optional[PromptTemplate] = None,
+            prompt_template: Optional[PromptTemplate] = None):
+        """Generate the prompt and the label info for one test example in
+        generative evaluation with `prompt_template`. If `prompt_template` is
+        not provided, the `ice_template` will be used to generate the prompt.
+        The token represented by `gen_field_replace_token` will not be replaced
+        by the generated text, or it will leaks the answer.
+
+        Args:
+            idx (`int`): The index of the test example.
+            ice (`str`): The in-context example for the test example.
+            gen_field_replace_token (`str`): The token of the answer in the
+                prompt. Defaults to ''.
+            ice_template (`Optional[PromptTemplate]`): The template for
+                in-context example. Defaults to None.
+            prompt_template (`Optional[PromptTemplate]`): The template for
+                prompt. Defaults to None.
+        """
+        if prompt_template is not None and ice_template is not None:
+            if prompt_template.ice_token is not None:
+                return prompt_template.generate_item(
+                    self.test_ds[idx],
+                    output_field=self.dataset_reader.output_column,
+                    output_field_replace_token=gen_field_replace_token,
+                    ice_field_replace_token=ice), self.test_ds[idx]['label']
+            else:
+                raise NotImplementedError(
+                    'ice_token of prompt_template is not provided')
+        elif ice_template is not None and prompt_template is None:
+            if ice_template.ice_token is not None:
+                return ice_template.generate_item(
+                    self.test_ds[idx],
+                    output_field=self.dataset_reader.output_column,
+                    output_field_replace_token=gen_field_replace_token,
+                    ice_field_replace_token=ice), self.test_ds[idx]['label']
+            else:
+                raise NotImplementedError(
+                    'ice_token of ice_template is not provided')
+        elif ice_template is None and prompt_template is not None:
+            return prompt_template.generate_item(
+                self.test_ds[idx],
+                output_field=self.dataset_reader.output_column,
+                output_field_replace_token=gen_field_replace_token,
+                ice_field_replace_token=ice), self.test_ds[idx]['label']
+        else:
+            raise NotImplementedError(
+                'Leaving prompt as empty is not supported')
+
     def generate_prompt_for_adv_generate_task(
             self,
             idx,

@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import CHIDDataset_V2
+from opencompass.datasets import CHIDDatasetV2
 from opencompass.utils.text_postprocessors import first_capital_postprocess
 
 chid_reader_cfg = dict(
@@ -34,7 +34,7 @@ chid_eval_cfg = dict(
 chid_datasets = [
     dict(
         abbr='chid-dev',
-        type=CHIDDataset_V2,
+        type=CHIDDatasetV2,
         path='./data/FewCLUE/chid/dev_few_all.json',
         reader_cfg=chid_reader_cfg,
         infer_cfg=chid_infer_cfg,
@@ -42,7 +42,7 @@ chid_datasets = [
     ),
     dict(
         abbr='chid-test',
-        type=CHIDDataset_V2,
+        type=CHIDDatasetV2,
         path='./data/FewCLUE/chid/test_public.json',
         reader_cfg=chid_reader_cfg,
         infer_cfg=chid_infer_cfg,

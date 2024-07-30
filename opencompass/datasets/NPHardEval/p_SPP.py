@@ -10,6 +10,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .prompts import sppPrompts
@@ -34,10 +35,11 @@ def q2text(q, p=sppPrompts):
 
 
 @LOAD_DATASET.register_module(force=True)
-class p_SPP_Dataset(BaseDataset):
+class P_SPP_Dataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         raw_data = []
         data_path = path
         all_data = []
@@ -56,7 +58,7 @@ class p_SPP_Dataset(BaseDataset):
 
 
 @ICL_EVALUATORS.register_module(force=True)
-class p_SPP_Evaluator(BaseEvaluator):
+class P_SPP_Evaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         assert len(predictions) == len(references)

@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
-from opencompass.datasets import hellaswagDatasetwithICE
+from opencompass.datasets import HellaswagDatasetwithICE
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 hellaswag_reader_cfg = dict(
@@ -49,8 +49,8 @@ hellaswag_eval_cfg = dict(
 hellaswag_datasets = [
     dict(
         abbr='hellaswag',
-        type=hellaswagDatasetwithICE,
-        path='./data/hellaswag/',
+        type=HellaswagDatasetwithICE,
+        path='opencompass/hellaswag_ice',
         reader_cfg=hellaswag_reader_cfg,
         infer_cfg=hellaswag_infer_cfg,
         eval_cfg=hellaswag_eval_cfg,

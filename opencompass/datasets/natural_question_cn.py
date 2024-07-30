@@ -4,15 +4,17 @@ import os.path as osp
 from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.utils import get_data_path
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
 
 
-class NaturalQuestionDataset_CN(BaseDataset):
+class NaturalQuestionDatasetCN(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         dataset = DatasetDict()
         for split in ['dev', 'test']:
             filename = osp.join(path, f'{split}.jsonl')
@@ -28,7 +30,7 @@ class NaturalQuestionDataset_CN(BaseDataset):
         return dataset
 
 
-class NQEvaluator_CN(BaseEvaluator):
+class NQEvaluatorCN(BaseEvaluator):
 
     def score(self, predictions, references):
         if len(predictions) != len(references):

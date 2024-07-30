@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import CrowspairsDataset_CN
+from opencompass.datasets import CrowspairsDatasetCN
 
 crowspairscn_reader_cfg = dict(
     input_columns=['sent_more', 'sent_less'],
@@ -30,7 +30,7 @@ crowspairscn_eval_cfg = dict(
 crowspairscn_datasets = [
     dict(
         abbr='crowspairs_cn',
-        type=CrowspairsDataset_CN,
+        type=CrowspairsDatasetCN,
         path='./data/crowspairs_cn/test.jsonl',
         reader_cfg=crowspairscn_reader_cfg,
         infer_cfg=crowspairscn_infer_cfg,

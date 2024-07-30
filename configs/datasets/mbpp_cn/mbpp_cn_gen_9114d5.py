@@ -58,6 +58,7 @@ mbpp_cn_datasets = [
         type=MBPPDataset,
         abbr='mbpp_cn',
         path='./data/mbpp_cn/mbpp_cn.jsonl',
+        local_mode=True,
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
         eval_cfg=mbpp_eval_cfg)

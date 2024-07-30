@@ -1,12 +1,14 @@
 import json
 import os.path as osp
 import re
+from os import environ
 
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -16,9 +18,14 @@ class BBHDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
-        with open(osp.join(path, f'{name}.json'), 'r') as f:
-            data = json.load(f)['examples']
-        dataset = Dataset.from_list(data)
+        path = get_data_path(path)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            dataset = MsDataset.load(path, subset_name=name, split='test')
+        else:
+            with open(osp.join(path, f'{name}.json'), 'r') as f:
+                data = json.load(f)['examples']
+            dataset = Dataset.from_list(data)
         return dataset
 
 
@@ -43,9 +50,15 @@ def bbh_freeform_postprocess(text: str) -> str:
     ans_line = ans.split('answer is ')
     if len(ans_line) != 1:
         ans = ans_line[1].strip()
-    ans = ans.split('\n')[0]
+    ans = ans.split('\n')[0].strip()
+
     if ans.endswith('.'):
-        ans = ans[:-1]
+        ans = ans[:-1].strip()
+
+    match = re.search(r'\*\*(.*?)\*\*', ans)
+    if match:
+        return match.group(1)
+
     return ans
 
 
