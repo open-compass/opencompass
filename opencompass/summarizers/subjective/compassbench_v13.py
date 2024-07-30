@@ -84,6 +84,14 @@ class CompassBenchSummarizer:
                     for prediction, reference in zip(judged_answers, references):
                         if prediction not in score_mapping:
                             continue
+                        # 使用json中的category作为category:
+                        # 针对category有多级分类的情况
+                        parts = reference['category'].split('---')
+                        if len(parts) >= 2:  # 确保有足够的子分类
+                            category = parts[1]
+                        else:
+                            category = parts[0]
+                        categories[category] += 1
                         categories[dataset_abbr] += 1
                         flag = 1 if reference['answer1'] == base_model else -1
                         score_1 = score_mapping[prediction]*flag
@@ -153,6 +161,9 @@ class CompassBenchSummarizer:
                         # row.append(f'{avg:.2f}')
                         # headers.append('Avg')
                     table.append(row)
+                # 数据集分隔
+                row = ['' for _ in range(len(row_headers))]
+                table.append(row)
             txt = tabulate(table, headers=headers)
             print(txt)
 

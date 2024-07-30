@@ -1,4 +1,4 @@
-      
+
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -179,5 +179,3 @@ for difficulty in TACO_difficulties_list:
             eval_cfg=TACO_eval_cfg,
         )
     )
-
-    

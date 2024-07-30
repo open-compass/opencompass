@@ -17,21 +17,21 @@ from opencompass.models import OpenAI
 
 api_meta_template = dict(
     round=[
-        dict(role="HUMAN", api_role="HUMAN"),
-        dict(role="BOT", api_role="BOT", generate=True),
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
     ],
-    reserved_roles=[dict(role="SYSTEM", api_role="SYSTEM")],
+    reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
 
 models = [
     # True GPT4-O
     dict(
-        abbr="gpt4o",
+        abbr='gpt4o',
         type=OpenAI,
-        path="gpt-4o",
+        path='gpt-4o',
         rpm_verbose=True,
         meta_template=api_meta_template,
-        key="",
+        key='',
         query_per_second=1,
         max_out_len=2048,
         max_seq_len=2048,
@@ -40,8 +40,8 @@ models = [
     ),
     dict(
         type=TurboMindModelwithChatTemplate,
-        abbr="internlm2-chat-1.8b-turbomind",
-        path="internlm/internlm2-chat-1_8b",
+        abbr='internlm2-chat-1.8b-turbomind',
+        path='internlm/internlm2-chat-1_8b',
         engine_config=dict(session_len=7168, max_batch_size=16, tp=1),
         gen_config=dict(top_k=1000, temperature=1, top_p=0.9, max_new_tokens=2048),
         max_seq_len=7168,
@@ -72,4 +72,4 @@ eval = dict(
     ),
 )
 summarizer = dict(type=CompassBenchSummarizer)
-work_dir = "outputs/compassbench_v1_3_subjective_debug/"
+work_dir = 'outputs/compassbench_v1_3_subjective_debug/'

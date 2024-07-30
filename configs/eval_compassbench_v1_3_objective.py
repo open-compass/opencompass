@@ -21,7 +21,7 @@ with read_base():
     from .datasets.compassbench_v1_3.compassbench_v1_3_knowledge import (
         compassbench_knowledge_datasets,
     )
-    from .datasets.compassbench_v1_3.compassbench_v1_3_code_gen_986f01 import compassbench_v1_3_code_datasets    
+    from .datasets.compassbench_v1_3.compassbench_v1_3_code_gen_c8c3aa import compassbench_v1_3_code_datasets
     # from .datasets.compassbench_20_v1_1.agent.cibench_template_gen_e6b12a import (
     #     cibench_datasets,
     # )
@@ -40,11 +40,11 @@ with read_base():
     from .internal.opensource_model_compass_bench_v1_3 import models as _origin_models
 
 _origin_models = sum(
-    [v for k, v in locals().items() if k.endswith("_model") or k == "_origin_models"],
+    [v for k, v in locals().items() if k.endswith('_model') or k == '_origin_models'],
     [],
 )
 
-work_dir = "outputs/compassbench_v1_3/objective"
+work_dir = 'outputs/compassbench_v1_3/objective'
 
 
 # ######### LOCAL RUNNER #########
@@ -62,8 +62,8 @@ infer['runner']['max_num_workers'] = 32
 infer['runner']['retry'] = 0
 eval['runner']['retry'] = 0
 
-CIBENCH_DATASET_NAMES = ["cibench_datasets"]
-MUS_PLUGINEVAL_DATASET_NAMES = ["plugin_eval_datasets"]
+CIBENCH_DATASET_NAMES = ['cibench_datasets']
+MUS_PLUGINEVAL_DATASET_NAMES = ['plugin_eval_datasets']
 
 # ---------------------------------------- VANILLA BEGIN ----------------------------------------
 # remove system round
@@ -71,7 +71,7 @@ _naive_datasets = sum(
     [
         v
         for k, v in locals().items()
-        if (k.endswith("_datasets") or k == "datasets")
+        if (k.endswith('_datasets') or k == 'datasets')
         and (k not in CIBENCH_DATASET_NAMES)
     ],
     [],
@@ -79,14 +79,14 @@ _naive_datasets = sum(
 _naive_models = []
 for m in _origin_models:
     m = deepcopy(m)
-    if "meta_template" in m and "round" in m["meta_template"]:
-        round = m["meta_template"]["round"]
-        if any(r["role"] == "SYSTEM" for r in round):
-            new_round = [r for r in round if r["role"] != "SYSTEM"]
+    if 'meta_template' in m and 'round' in m['meta_template']:
+        round = m['meta_template']['round']
+        if any(r['role'] == 'SYSTEM' for r in round):
+            new_round = [r for r in round if r['role'] != 'SYSTEM']
             print(
                 f'WARNING: remove SYSTEM round in meta_template for {m.get("abbr", None)}'
             )
-            m["meta_template"]["round"] = new_round
+            m['meta_template']['round'] = new_round
     _naive_models.append(m)
 # # ---------------------------------------- VANILLA END ----------------------------------------
 # # add system round

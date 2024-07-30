@@ -17,6 +17,8 @@ from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
+# from opencompass.utils import get_data_path
+
 
 @LOAD_DATASET.register_module()
 class LCDataset(BaseDataset):
