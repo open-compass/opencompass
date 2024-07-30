@@ -15,17 +15,13 @@ from opencompass.partitioners import (
 from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 
 with read_base():
-    # from .models.qwen.lmdeploy_qwen2_7b_instruct import (
-    #     models as qwen2_7b_instruct_model,
-    # )  # Qwen2-7B-Instruct
-
     from .datasets.compassbench_v1_3.compassbench_v1_3_math import (
         compassbench_math_datasets,
     )
     from .datasets.compassbench_v1_3.compassbench_v1_3_knowledge import (
         compassbench_knowledge_datasets,
     )
-
+    from .datasets.compassbench_v1_3.compassbench_v1_3_code_gen_986f01 import compassbench_v1_3_code_datasets    
     # from .datasets.compassbench_20_v1_1.agent.cibench_template_gen_e6b12a import (
     #     cibench_datasets,
     # )
@@ -48,22 +44,23 @@ _origin_models = sum(
     [],
 )
 
-work_dir = "outputs/compassbench_v1_3/objective_local_debug"
-# work_dir = "outputs/compassbench_v1_3/objective"
-# infer['partitioner']['num_worker'] = 16
-# # infer['runner']['max_num_workers'] = 32
-# infer['runner']['retry'] = 0
-# eval['runner']['retry'] = 0
+work_dir = "outputs/compassbench_v1_3/objective"
 
-infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=8),
-    runner=dict(type=LocalRunner, task=dict(type=OpenICLInferTask)),
-)
+
+# ######### LOCAL RUNNER #########
+# infer = dict(
+#     partitioner=dict(type=NumWorkerPartitioner, num_worker=8),
+#     runner=dict(type=LocalRunner, task=dict(type=OpenICLInferTask)),
+# )
 
 eval = dict(
     partitioner=dict(type=NaivePartitioner, n=8),
     runner=dict(type=LocalRunner, task=dict(type=OpenICLEvalTask)),
 )
+infer['partitioner']['num_worker'] = 4
+infer['runner']['max_num_workers'] = 32
+infer['runner']['retry'] = 0
+eval['runner']['retry'] = 0
 
 CIBENCH_DATASET_NAMES = ["cibench_datasets"]
 MUS_PLUGINEVAL_DATASET_NAMES = ["plugin_eval_datasets"]
@@ -91,26 +88,26 @@ for m in _origin_models:
             )
             m["meta_template"]["round"] = new_round
     _naive_models.append(m)
-# ---------------------------------------- VANILLA END ----------------------------------------
-# add system round
-_agent_models = []
-for m in _origin_models:
-    m = deepcopy(m)
-    if "meta_template" in m and "round" in m["meta_template"]:
-        round = m["meta_template"]["round"]
-        if all(r["role"].upper() != "SYSTEM" for r in round):  # no system round
-            if not any("api_role" in r for r in round):
-                m["meta_template"]["round"].append(
-                    dict(role="system", begin="System response:", end="\n")
-                )
-            else:
-                m["meta_template"]["round"].append(
-                    dict(role="system", api_role="SYSTEM")
-                )
-            print(
-                f'WARNING: adding SYSTEM round in meta_template for {m.get("abbr", None)}'
-            )
-    _agent_models.append(m)
+# # ---------------------------------------- VANILLA END ----------------------------------------
+# # add system round
+# _agent_models = []
+# for m in _origin_models:
+#     m = deepcopy(m)
+#     if "meta_template" in m and "round" in m["meta_template"]:
+#         round = m["meta_template"]["round"]
+#         if all(r["role"].upper() != "SYSTEM" for r in round):  # no system round
+#             if not any("api_role" in r for r in round):
+#                 m["meta_template"]["round"].append(
+#                     dict(role="system", begin="System response:", end="\n")
+#                 )
+#             else:
+#                 m["meta_template"]["round"].append(
+#                     dict(role="system", api_role="SYSTEM")
+#                 )
+#             print(
+#                 f'WARNING: adding SYSTEM round in meta_template for {m.get("abbr", None)}'
+#             )
+#     _agent_models.append(m)
 
 # ---------------------------------------- CIBENCH AGENT BEGIN ----------------------------------------
 # _cibench_agent_datasets = sum(
