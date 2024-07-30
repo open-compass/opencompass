@@ -12,6 +12,7 @@ from opencompass.partitioners import SizePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
+from opencompass.partitioners import NaivePartitioner
 
 with read_base():
     # Note that it might occur cuda OOM error for hf model
@@ -132,11 +133,9 @@ for m in _agent_models:
     models.append(agent_model)
 
 infer = dict(
-    partitioner=dict(type=SizePartitioner, max_task_size=1000, strategy='split'),
+    partitioner=dict(type=NaivePartitioner),
     runner=dict(
-        type=SlurmSequentialRunner,
-        max_num_workers=64,
-        quotatype='reserved',
-        partition='llmeval',
+        type=LocalRunner,
+        max_num_workers=4,
         task=dict(type=OpenICLInferTask)),
 )
