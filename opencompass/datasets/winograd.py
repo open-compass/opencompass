@@ -6,7 +6,7 @@ from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
-class winogradDataset(BaseDataset):
+class WinogradDataset(BaseDataset):
 
     @staticmethod
     def load(**kwargs):

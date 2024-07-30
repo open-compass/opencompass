@@ -3,6 +3,7 @@ import json
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.utils import get_data_path
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
@@ -12,6 +13,7 @@ class SQuAD20Dataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         with open(path, 'r') as f:
             data = json.load(f)
         data = data['data']

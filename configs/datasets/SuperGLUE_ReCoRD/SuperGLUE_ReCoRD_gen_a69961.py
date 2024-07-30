@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import EMEvaluator
-from opencompass.datasets import ReCoRDDataset_V2, ReCoRD_postprocess
+from opencompass.datasets import ReCoRDDatasetV2, ReCoRD_postprocess
 
 ReCoRD_reader_cfg = dict(
     input_columns=['question', 'text'], output_column='answers')
@@ -26,7 +26,7 @@ ReCoRD_eval_cfg = dict(
 
 ReCoRD_datasets = [
     dict(
-        type=ReCoRDDataset_V2,
+        type=ReCoRDDatasetV2,
         abbr='ReCoRD',
         path='./data/SuperGLUE/ReCoRD/val.jsonl',
         reader_cfg=ReCoRD_reader_cfg,

@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import COPADataset_V2
+from opencompass.datasets import COPADatasetV2
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 COPA_reader_cfg = dict(
@@ -35,7 +35,7 @@ COPA_eval_cfg = dict(
 COPA_datasets = [
     dict(
         abbr='COPA',
-        type=COPADataset_V2,
+        type=COPADatasetV2,
         path='./data/SuperGLUE/COPA/val.jsonl',
         reader_cfg=COPA_reader_cfg,
         infer_cfg=COPA_infer_cfg,

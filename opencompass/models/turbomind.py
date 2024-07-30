@@ -1,4 +1,5 @@
 import copy
+import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -60,6 +61,8 @@ class TurboMindModel(BaseModel):
             from lmdeploy.messages import TurbomindEngineConfig
             engine_config = TurbomindEngineConfig(**engine_config)
         self.logger = get_logger()
+        if path.startswith('/') or path.startswith('.'):
+            assert os.path.exists(path), '{} is not existist'.format(path)
         tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
         self.tokenizer = tm_model.tokenizer
         self.generators = [

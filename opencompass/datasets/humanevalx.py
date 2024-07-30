@@ -12,6 +12,7 @@ from typing import Dict, Iterable
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 from .humaneval import humaneval_postprocess_v2
@@ -30,6 +31,7 @@ class HumanevalXDataset(BaseDataset):
 
     @staticmethod
     def load(path, language, **kwargs):
+        path = get_data_path(path, local_mode=True)
         assert language in _LANGUAGE_NAME_DICT.keys(), (
             f'language must be in {list(_LANGUAGE_NAME_DICT.keys())}')
         file_path = osp.join(path, f'humanevalx_{language}.jsonl.gz')

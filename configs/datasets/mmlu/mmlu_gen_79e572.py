@@ -100,7 +100,7 @@ for _name in mmlu_all_sets:
         dict(
             abbr=f'lukaemon_mmlu_{_name}',
             type=MMLUDataset,
-            path='./data/mmlu/',
+            path='opencompass/mmlu',
             name=_name,
             reader_cfg=mmlu_reader_cfg,
             infer_cfg=mmlu_infer_cfg,

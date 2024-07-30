@@ -92,7 +92,7 @@ for _split in list(compassbench_v1_knowledge_sets.keys()):
         )
 
 
-from opencompass.datasets import TriviaQADataset_V3, TriviaQAEvaluator
+from opencompass.datasets import TriviaQADatasetV3, TriviaQAEvaluator
 
 triviaqa_and_nq_reader_cfg = dict(input_columns=['question'], output_column='answer')
 
@@ -123,7 +123,7 @@ triviaqa_and_nq_eval_cfg = dict(evaluator=dict(type=TriviaQAEvaluator), pred_rol
 
 compassbench_v1_knowledge_datasets.append(
     dict(
-        type=TriviaQADataset_V3,
+        type=TriviaQADatasetV3,
         abbr='compassbench_v1_knowledge-mixed-cloze_en',
         path='data/compassbench_v1.1/knowledge/mixed/cloze_en.jsonl',
         reader_cfg=triviaqa_and_nq_reader_cfg,

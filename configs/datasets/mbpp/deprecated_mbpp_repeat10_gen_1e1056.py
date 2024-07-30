@@ -3,7 +3,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
 
 mbpp_reader_cfg = dict(input_columns=['text', 'test_list'], output_column='test_column')
 
@@ -34,7 +34,7 @@ mbpp_eval_cfg = dict(evaluator=dict(type=MBPPPassKEvaluator), pred_role='BOT')
 
 mbpp_datasets = [
     dict(
-        type=MBPPDataset_V2,
+        type=MBPPDatasetV2,
         abbr='mbpp_repeat10',
         path='./data/mbpp/mbpp.jsonl',
         num_repeats=10,

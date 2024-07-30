@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import WSCDataset_V3
+from opencompass.datasets import WSCDatasetV3
 
 WSC_reader_cfg = dict(
     input_columns=['span1', 'span2', 'text'],
@@ -40,7 +40,7 @@ WSC_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 WSC_datasets = [
     dict(
         abbr='WSC',
-        type=WSCDataset_V3,
+        type=WSCDatasetV3,
         path='./data/SuperGLUE/WSC/val.jsonl',
         reader_cfg=WSC_reader_cfg,
         infer_cfg=WSC_infer_cfg,

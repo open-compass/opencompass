@@ -7,6 +7,7 @@ from datasets import Dataset
 
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -16,6 +17,7 @@ class GPQADataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path, local_mode=True)
         cnt = 0
         data = []
         with open(os.path.join(path, name), 'r', encoding='utf-8') as f:
@@ -62,10 +64,12 @@ class GPQAEvaluator(BaseEvaluator):
 
 
 @LOAD_DATASET.register_module()
-class GPQADataset_Simple_Eval(BaseDataset):
+class GPQASimpleEvalDataset(BaseDataset):
+    """GPQA dataset compatible with simple-eval."""
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path, local_mode=True)
         n_repeats = 4
         data = []
         with open(os.path.join(path, name), 'r', encoding='utf-8') as f:

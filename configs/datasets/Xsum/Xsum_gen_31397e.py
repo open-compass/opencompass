@@ -31,7 +31,7 @@ Xsum_datasets = [
     dict(
         type=XsumDataset,
         abbr='Xsum',
-        path='./data/Xsum/dev.jsonl',
+        path='opencompass/xsum',
         reader_cfg=Xsum_reader_cfg,
         infer_cfg=Xsum_infer_cfg,
         eval_cfg=Xsum_eval_cfg,

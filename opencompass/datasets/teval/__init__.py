@@ -6,6 +6,7 @@ import mmengine
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -16,6 +17,7 @@ class TEvalDataset(BaseDataset):
         super().__init__(reader_cfg=reader_cfg, **kwargs)
 
     def load(self, path: str, name: str):
+        path = get_data_path(path, local_mode=True)
 
         dataset = DatasetDict()
         data = mmengine.load(osp.join(path, f'{name}.json'))

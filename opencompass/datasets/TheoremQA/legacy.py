@@ -3,6 +3,7 @@ import re
 from datasets import load_dataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -12,6 +13,7 @@ class TheoremQADataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)        
         return load_dataset('csv', data_files={'test': path})
 
 

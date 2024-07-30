@@ -67,7 +67,7 @@ for _name in chembench_all_sets:
         dict(
             abbr=f'ChemBench_{_name}',
             type=ChemBenchDataset,
-            path='./data/ChemBench/',
+            path='opencompass/ChemBench',
             name=_name,
             reader_cfg=chembench_reader_cfg,
             infer_cfg=chembench_infer_cfg,

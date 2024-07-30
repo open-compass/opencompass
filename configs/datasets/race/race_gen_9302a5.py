@@ -28,7 +28,7 @@ race_datasets = [
     dict(
         abbr='race-middle',
         type=RaceDataset,
-        path='./data/race',
+        path='opencompass/race',
         name='middle',
         reader_cfg=race_reader_cfg,
         infer_cfg=race_infer_cfg,
@@ -36,7 +36,7 @@ race_datasets = [
     dict(
         abbr='race-high',
         type=RaceDataset,
-        path='./data/race',
+        path='opencompass/race',
         name='high',
         reader_cfg=race_reader_cfg,
         infer_cfg=race_infer_cfg,

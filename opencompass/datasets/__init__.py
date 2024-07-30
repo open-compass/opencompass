@@ -50,6 +50,7 @@ from .gsm_hard import *  # noqa: F401, F403
 from .hellaswag import *  # noqa: F401, F403
 from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
+from .humaneval_multi import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .hungarian_math import *  # noqa: F401, F403
 from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
@@ -61,6 +62,7 @@ from .jsonl import JsonlDataset  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
+from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403

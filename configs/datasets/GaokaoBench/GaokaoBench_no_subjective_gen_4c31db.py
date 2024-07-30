@@ -35,6 +35,7 @@ for folder, prompts in [
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + p['keyword'],
             'path': os.path.join('data', 'GAOKAO-BENCH', 'data', folder, p['keyword'] + '.json'),
+            'name': p['keyword'],
             'reader_cfg': reader_cfg,
             'infer_cfg': infer_cfg,
             'eval_cfg': eval_cfg,

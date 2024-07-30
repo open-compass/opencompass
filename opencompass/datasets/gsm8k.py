@@ -1,11 +1,13 @@
 import json
 import os
 import re
+from os import environ
 
 from datasets import Dataset, DatasetDict
 
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -15,16 +17,22 @@ class GSM8KDataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        datasets = {}
-        for split in ['train', 'test']:
-            split_path = os.path.join(path, split + '.jsonl')
-            dataset = []
-            with open(split_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    line = json.loads(line.strip())
-                    dataset.append(line)
-            datasets[split] = Dataset.from_list(dataset)
-        return DatasetDict(datasets)
+        path = get_data_path(path)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            dataset = MsDataset.load(dataset_name=path, trust_remote_code=True)
+        else:
+            datasets = {}
+            for split in ['train', 'test']:
+                split_path = os.path.join(path, split + '.jsonl')
+                dataset = []
+                with open(split_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = json.loads(line.strip())
+                        dataset.append(line)
+                datasets[split] = Dataset.from_list(dataset)
+            dataset = DatasetDict(datasets)
+        return dataset
 
 
 @TEXT_POSTPROCESSORS.register_module('gsm8k_dataset')

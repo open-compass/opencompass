@@ -92,7 +92,7 @@ for _name in agieval_single_choice_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset_v2,
-            path='./data/AGIEval/data/v1/',
+            path='opencompass/agieval',
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',
@@ -122,7 +122,7 @@ for _name in agieval_multiple_choices_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset_v2,
-            path='./data/AGIEval/data/v1/',
+            path='opencompass/agieval',
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',
@@ -148,7 +148,7 @@ for _name in agieval_cloze_sets:
     agieval_datasets.append(
         dict(
             type=AGIEvalDataset_v2,
-            path='./data/AGIEval/data/v1/',
+            path='opencompass/agieval',
             name=_name,
             abbr='agieval-' + _name,
             setting_name='zero-shot',

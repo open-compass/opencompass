@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import GPQADataset_Simple_Eval, GPQA_Simple_Eval_postprocess, GPQAEvaluator
+from opencompass.datasets import GPQADataset, GPQA_Simple_Eval_postprocess, GPQAEvaluator
 
 # openai_simple_eval prompt
 align_prompt = """
@@ -43,7 +43,7 @@ for split in list(gpqa_subsets.keys()):
     gpqa_datasets.append(
         dict(
             abbr='GPQA_' + split,
-            type=GPQADataset_Simple_Eval,
+            type=GPQADataset,
             path='./data/gpqa/',
             name=gpqa_subsets[split],
             reader_cfg=gpqa_reader_cfg,

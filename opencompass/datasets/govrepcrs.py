@@ -1,6 +1,10 @@
+import json
+import os
+
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -10,8 +14,8 @@ class GovRepcrsDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        import json
-        import os
+        path = get_data_path(path, local_mode=True)
+
         dataset_dict = DatasetDict()
         splits = ['train', 'valid', 'test']
         dataset_lists = {x: [] for x in splits}
