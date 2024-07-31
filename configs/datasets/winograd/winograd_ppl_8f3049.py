@@ -29,6 +29,7 @@ winograd_datasets = [
         abbr='winograd',
         type=WinogradDataset,
         path='winograd_wsc',
+        trust_remote_code=True,
         name='wsc285',
         reader_cfg=winograd_reader_cfg,
         infer_cfg=winograd_infer_cfg,
