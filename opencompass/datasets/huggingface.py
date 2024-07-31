@@ -14,4 +14,5 @@ class HFDataset(BaseDataset):
         if 'data_files' in kwargs:
             kwargs['data_files'] = get_data_path(kwargs['data_files'],
                                                  local_mode=True)
+
         return load_dataset(**kwargs)

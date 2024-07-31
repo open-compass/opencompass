@@ -13,7 +13,10 @@ exclude: |
       opencompass/datasets/TheoremQA|
       opencompass/datasets/subjective/mtbench101.py|
       docs/zh_cn/advanced_guides/compassbench_intro.md |
-      docs/zh_cn/advanced_guides/compassbench_v2_0.md
+      docs/zh_cn/advanced_guides/compassbench_v2_0.md |
+      opencompass/configs/datasets/ |
+      opencompass/configs/models/|
+      opencompass/configs/summarizers/
     )
 repos:
   - repo: https://github.com/PyCQA/flake8
@@ -39,7 +42,8 @@ repos:
             (?x)^(
                 .*\.jsonl|
                 .*\.md.template|
-                configs/
+                configs/ |
+                opencompass/configs/
             )
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
@@ -90,6 +94,53 @@ repos:
         pass_filenames: true
         require_serial: true
         files: ^configs/datasets
+  - repo: local
+    hooks:
+    -   id: update-dataset-suffix-package
+        name: dataset suffix updater(package)
+        entry: ./tools/update_dataset_suffix.py
+        language: script
+        pass_filenames: false
+        args:
+          - --root_folder
+          - opencompass/configs/datasets
+        files: \.py$
+  - repo: local
+    hooks:
+    -   id: compare-configs-datasets
+        name: compare configs datasets
+        entry: ./tools/compare_configs.py
+        language: script
+        pass_filenames: false
+        # require_serial: true
+        args:
+          - configs/datasets
+          - opencompass/configs/datasets
+  - repo: local
+    hooks:
+    -   id: compare-configs-models
+        name: compare configs models
+        entry: ./tools/compare_configs.py
+        language: script
+        pass_filenames: false
+        # require_serial: true
+        args:
+          - configs/models
+          - opencompass/configs/models
+          - --ignore
+          - configs/models/llama
+  - repo: local
+    hooks:
+    -   id: compare-configs-summarizers
+        name: compare configs summarizers
+        entry: ./tools/compare_configs.py
+        language: script
+        pass_filenames: false
+        # require_serial: true
+        args:
+          - configs/summarizers
+          - opencompass/configs/summarizers
+
   # - repo: https://github.com/open-mmlab/pre-commit-hooks
   #   rev: v0.2.0  # Use the ref you want to point at
   #   hooks:

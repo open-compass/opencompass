@@ -1,0 +1,40 @@
+给根据给定艺术作品清单，找出最类似的。
+
+Q: 寻找一部与《勇敢的心》、《风月俏佳人》、《辛德勒的名单》、《阿波罗13号》类似的电影：
+选项：
+(A)《星际迷航》
+(B)《我盛大的希腊婚礼2》
+(C)《圣诞老人2》
+(D)《与狼共舞》
+A: Let's think step by step.
+Star Trek is a science fiction film that, despite its depth and complexity, has significant differences in theme and style from the four aforementioned films.
+My Grand Greek Wedding 2 is a light hearted comedy film that differs significantly from the themes and styles of the four aforementioned films.
+Santa Claus 2 is a family movie with a Christmas theme, which differs significantly from the themes and styles of the four aforementioned movies.
+"Dancing with Wolves" is a film that depicts the relationship between Native Americans and the American West during its pioneering period
+The theme and style of "Dancing with Wolves" are consistent with the four films mentioned above. This movie, like Brave Heart, Pretty Woman, Schindler's List, and Apollo 13, is a historical film with depth and seriousness. So the answer is (D).
+
+Q: 寻找一部与《勇敢的心》、《风月俏佳人》、《阿波罗13号》、《与狼共舞》类似的电影：
+选项：
+(A)《蝙蝠侠：突袭阿卡姆》
+(B)《肖申克的救赎》
+(C)《玩具总动员》
+(D)《狮子王》
+A: Let's think step by step.
+Batman: Assault on Arkham is a superhero film with significant differences in theme and style from the four aforementioned films.
+Shawshank Redemption is a 1994 American drama film directed by Frank Delabond and starring Tim Robbins and Morgan Freeman. It is a film about hope and perseverance.
+Toy Story is an animated film, although it may have some themes of adventure and friendship, its themes and style differ significantly from the four aforementioned films.
+Although Lion King is a classic animated film that covers themes of courage and growth, its themes and style differ significantly from the four aforementioned films.
+The Shawshank Redemption, like Brave Heart, Pretty Woman, Apollo 13, and Dancing with Wolves, is a film with depth and seriousness, and its theme and style are similar to the other three films. So the answer is (B).
+
+Q: 寻找一部与《惊世骇案》、《勇敢的心》、《低俗小说》、《辛德勒的名单》类似的电影：
+选项：
+(A)《卡里加里博士的小屋》
+(B)《肖申克的救赎》
+(C)《蜘蛛侠2》
+(D)《出租车》
+A: Let's think step by step.
+"Dr. Caligary's Cabin" is a 1920 German expressionist silent film directed by Robert Wiener. This film is often considered a milestone in German expressionist cinema and one of the earliest horror films.
+Shawshank Redemption is a 1994 American drama film directed by Frank Delabond and starring Tim Robbins and Morgan Freeman. It is a film about hope and perseverance.
+Spider Man 2 is a 2004 American superhero film directed by Sam Remy and starring Toby Maguire. It is the second installment of the Spider Man trilogy.
+"Taxi" is a 2004 American comedy action film directed by Tim Storey, starring Jimmy Flanders and Quentin Latafa. This movie is an American remake of a 1998 French film.
+And the titles of "The Amazing Case", "Brave Heart", "Pulp Fiction", and "Schindler's List" are all very profound, plot rich, and have strong human themes in movies. They have all won high praise from audiences and critics for their excellent scripts, brilliant performances, and profound themes. The Shawshank Redemption tells the story of a wrongly accused banker who maintains hope in prison and ultimately escapes. The plot of this movie is deeply ingrained in people's hearts, with a profound portrayal of human nature, and there are many similarities with the movie in the title. So the answer is (B).

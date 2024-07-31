@@ -1,0 +1,120 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: The single electron in a certain excited state of a hydrogenic $\mathrm{He}^{+}$ion $(Z=2)$ is described by the wavefunction $R_{3,2}(r) \times$ $Y_{2,-1}(\theta, \phi)$. What is the energy of its electron?
+Explanation for Problem 1: Replacing $\mu$ by $m_{\mathrm{e}}$ and using $\hbar=h / 2 \pi$, we can write the expression for the energy (eqn 17.7) as
+$$
+E_n=-\frac{Z^2 m_e e^4}{8 \varepsilon_0^2 h^2 n^2}=-\frac{Z^2 h c \tilde{R}_{\infty}}{n^2}
+$$
+with
+$$
+\begin{aligned}
+& \times \underbrace{2.997926 \times 10^{10} \mathrm{~cm} \mathrm{~s}^{-1}}_c \\
+& =109737 \mathrm{~cm}^{-1} \\
+&
+\end{aligned}
+$$
+and
+$$
+\begin{aligned}
+h c \tilde{R}_{\infty}= & \left(6.62608 \times 10^{-34} \mathrm{Js}\right) \times\left(2.997926 \times 10^{10} \mathrm{~cm} \mathrm{~s}^{-1}\right) \\
+& \times\left(109737 \mathrm{~cm}^{-1}\right) \\
+= & 2.17987 \times 10^{-18} \mathrm{~J}
+\end{aligned}
+$$
+Therefore, for $n=3$, the energy is
+$$
+\begin{aligned}
+& E_3=-\frac{\overbrace{4}^{Z^2} \times \overbrace{2.17987 \times 10^{-18} \mathrm{~J}}^{h c \tilde{R}_{\infty}}}{\underset{\tilde{n}^2}{9}} \\
+& =-9.68831 \times 10^{-19} \mathrm{~J} \\
+&
+\end{aligned}
+$$
+or $-0.968831 \mathrm{aJ}$ (a, for atto, is the prefix that denotes $10^{-18}$ ). In some applications it is useful to express the energy in electronvolts $\left(1 \mathrm{eV}=1.602176 \times 10^{-19} \mathrm{~J}\right)$; in this case, $E_3=-6.04697 \mathrm{eV}$
+Therefore, the answer is \boxed{ -6.04697}.
+
+Promblem 2: Using the Planck distribution
+Compare the energy output of a black-body radiator (such as an incandescent lamp) at two different wavelengths by calculating the ratio of the energy output at $450 \mathrm{~nm}$ (blue light) to that at $700 \mathrm{~nm}$ (red light) at $298 \mathrm{~K}$.
+
+Explanation for Problem 2: At a temperature $T$, the ratio of the spectral density of states at a wavelength $\lambda_1$ to that at $\lambda_2$ is given by
+$$
+\frac{\rho\left(\lambda_1, T\right)}{\rho\left(\lambda_2, T\right)}=\left(\frac{\lambda_2}{\lambda_1}\right)^5 \times \frac{\left(\mathrm{e}^{h c / \lambda_2 k T}-1\right)}{\left(\mathrm{e}^{h c / \lambda_1 k T}-1\right)}
+$$
+Insert the data and evaluate this ratio.
+Answer With $\lambda_1=450 \mathrm{~nm}$ and $\lambda_2=700 \mathrm{~nm}$,
+$$
+\begin{aligned}
+\frac{h c}{\lambda_1 k T} & =\frac{\left(6.626 \times 10^{-34} \mathrm{Js}\right) \times\left(2.998 \times 10^8 \mathrm{~m} \mathrm{~s}^{-1}\right)}{\left(450 \times 10^{-9} \mathrm{~m}\right) \times\left(1.381 \times 10^{-23} \mathrm{~J} \mathrm{~K}^{-1}\right) \times(298 \mathrm{~K})}=107.2 \ldots \\
+\frac{h c}{\lambda_2 k T} & =\frac{\left(6.626 \times 10^{-34} \mathrm{Js}\right) \times\left(2.998 \times 10^8 \mathrm{~m} \mathrm{~s}^{-1}\right)}{\left(700 \times 10^{-9} \mathrm{~m}\right) \times\left(1.381 \times 10^{-23} \mathrm{JK}^{-1}\right) \times(298 \mathrm{~K})}=68.9 \ldots
+\end{aligned}
+$$
+and therefore
+$$
+\begin{aligned}
+& \frac{\rho(450 \mathrm{~nm}, 298 \mathrm{~K})}{\rho(700 \mathrm{~nm}, 298 \mathrm{~K})}=\left(\frac{700 \times 10^{-9} \mathrm{~m}}{450 \times 10^{-9} \mathrm{~m}}\right)^5 \times \frac{\left(\mathrm{e}^{68.9 \cdots}-1\right)}{\left(\mathrm{e}^{107.2 \cdots}-1\right)} \\
+& =9.11 \times\left(2.30 \times 10^{-17}\right)=2.10 \times 10^{-16}
+\end{aligned}
+$$
+Therefore, the answer is \boxed{2.10}.
+
+Promblem 3: Determine the energies and degeneracies of the lowest four energy levels of an ${ }^1 \mathrm{H}^{35} \mathrm{Cl}$ molecule freely rotating in three dimensions. What is the frequency of the transition between the lowest two rotational levels? The moment of inertia of an ${ }^1 \mathrm{H}^{35} \mathrm{Cl}$ molecule is $2.6422 \times 10^{-47} \mathrm{~kg} \mathrm{~m}^2$.
+
+Explanation for Problem 3: First, note that
+$$
+\frac{\hbar^2}{2 I}=\frac{\left(1.055 \times 10^{-34} \mathrm{Js}^2\right.}{2 \times\left(2.6422 \times 10^{-47} \mathrm{~kg} \mathrm{~m}^2\right)}=2.106 \ldots \times 10^{-22} \mathrm{~J}
+$$
+or $0.2106 \ldots$ zJ. We now draw up the following table, where the molar energies are obtained by multiplying the individual energies by Avogadro's constant:
+\begin{tabular}{llll}
+\hline$J$ & $E / z J$ & $E /\left(\mathrm{J} \mathrm{mol}^{-1}\right)$ & Degeneracy \\
+\hline 0 & 0 & 0 & 1 \\
+1 & 0.4212 & 253.6 & 3 \\
+2 & 1.264 & 760.9 & 5 \\
+3 & 2.527 & 1522 & 7 \\
+\hline
+\end{tabular}
+
+The energy separation between the two lowest rotational energy levels $\left(J=0\right.$ and 1 ) is $4.212 \times 10^{-22} \mathrm{~J}$, which corresponds to a photon frequency of
+$$
+\nu=\frac{\Delta E}{h}=\frac{4.212 \times 10^{-22} \mathrm{~J}}{6.626 \times 10^{-34} \mathrm{Js}}=6.357 \times 10^{11} \mathrm{~s}^{-1}=635.7 \mathrm{GHz}
+$$
+Therefore, the answer is \boxed{635.7}.
+
+Promblem 4: Calculate the shielding constant for the proton in a free $\mathrm{H}$ atom.
+Explanation for Problem 4: The wavefunction for a hydrogen 1 s orbital is
+$$
+\psi=\left(\frac{1}{\pi a_0^3}\right)^{1 / 2} \mathrm{e}^{-r / a_0}
+$$
+so, because $\mathrm{d} \tau=r^2 \mathrm{~d} r \sin \theta \mathrm{d} \theta \mathrm{d} \phi$, the expectation value of $1 / r$ is written as
+$$
+\begin{aligned}
+\left\langle\frac{1}{r}\right\rangle & =\int \frac{\psi^* \psi}{r} \mathrm{~d} \tau=\frac{1}{\pi a_0^3} \int_0^{2 \pi} \mathrm{d} \phi \int_0^\pi \sin \theta \mathrm{d} \theta \int_0^{\infty} r \mathrm{e}^{-2 r / a_0} \mathrm{~d} r \\
+& =\frac{4}{a_0^3} \overbrace{\int_0^{\infty} r \mathrm{e}^{-2 r / a_0} \mathrm{~d} r}^{a_0^2 / 4 \text { (Integral E.1) }}=\frac{1}{a_0}
+\end{aligned}
+$$
+where we used the integral listed in the Resource section. Therefore,
+$$
+\begin{aligned}
+& =\frac{\left(1.602 \times 10^{-19} \mathrm{C}\right)^2 \times(4 \pi \times 10^{-7} \overbrace{\mathrm{J}}^{\mathrm{Jg} \mathrm{m}^2 \mathrm{~s}^{-2}} \mathrm{~s}^2 \mathrm{C}^{-2} \mathrm{~m}^{-1})}{12 \pi \times\left(9.109 \times 10^{-31} \mathrm{~kg}\right) \times\left(5.292 \times 10^{-11} \mathrm{~m}\right)} \\
+& =1.775 \times 10^{-5} \\
+&
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{1.775}.
+
+Promblem 5: Estimate the molar volume of $\mathrm{CO}_2$ at $500 \mathrm{~K}$ and 100 atm by treating it as a van der Waals gas.
+Explanation for Problem 5: According to Table 36.3, $a=3.610 \mathrm{dm}^6$ atm $\mathrm{mol}^{-2}$ and $b=4.29 \times 10^{-2} \mathrm{dm}^3 \mathrm{~mol}^{-1}$. Under the stated conditions, $R T / p=0.410 \mathrm{dm}^3 \mathrm{~mol}^{-1}$. The coefficients in the equation for $V_{\mathrm{m}}$ are therefore
+$$
+\begin{aligned}
+b+R T / p & =0.453 \mathrm{dm}^3 \mathrm{~mol}^{-1} \\
+a / p & =3.61 \times 10^{-2}\left(\mathrm{dm}^3 \mathrm{~mol}^{-1}\right)^2 \\
+a b / p & =1.55 \times 10^{-3}\left(\mathrm{dm}^3 \mathrm{~mol}^{-1}\right)^3
+\end{aligned}
+$$
+Therefore, on writing $x=V_{\mathrm{m}} /\left(\mathrm{dm}^3 \mathrm{~mol}^{-1}\right)$, the equation to solve is
+$$
+x^3-0.453 x^2+\left(3.61 \times 10^{-2}\right) x-\left(1.55 \times 10^{-3}\right)=0
+$$
+The acceptable root is $x=0.366$, which implies that $V_{\mathrm{m}}=0.366$ $\mathrm{dm}^3 \mathrm{~mol}^{-1}$. The molar volume of a perfect gas under these conditions is $0.410 \mathrm{dm}^3 \mathrm{~mol}^{-1}$.
+
+Therefore, the answer is \boxed{0.366}.
+
