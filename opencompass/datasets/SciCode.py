@@ -197,6 +197,10 @@ class SciCodeEvaluator(BaseEvaluator):
 
             is_all_correct = True
             for sub_idx in range(num_of_subproblems):
+                # extract code
+                response = prediction_list[sub_idx]
+                python_code += self.extract_python_script(response)
+
                 # process special examples
                 if problem_id == '13' and sub_idx >= 5 or \
                    problem_id == '62' and sub_idx >= 0 or \
@@ -205,9 +209,6 @@ class SciCodeEvaluator(BaseEvaluator):
 
                 # test cases
                 test_lst = self.dataset[idx]['test'][sub_idx]
-                # extract code
-                response = prediction_list[sub_idx]
-                python_code += self.extract_python_script(response)
 
                 testfile_path = os.path.join(testdir_path,
                                              f'{problem_id}-{sub_idx + 1}.py')
