@@ -1,30 +1,32 @@
-base_prompt_dict = {"basic":"""Input Info: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "basic-CN":"""输入信息：%s
+    'basic-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "adversarial-ignore":"""Input Info: %s
+    'adversarial-ignore': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "adversarial-ignore-CN":"""输入信息：%s
+    'adversarial-ignore-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-                "adversarial-doubt":"""Input Info: %s
+    'adversarial-doubt': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "adversarial-doubt-CN":"""输入信息：%s
+    'adversarial-doubt-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-IcL":"""Answer questions about deterministic counterfactual.
+    'zero-shot-IcL': """Answer questions about deterministic counterfactual.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "zero-shot-IcL-CN":"""请回答有关确定性反事实的问题。
+    'zero-shot-IcL-CN': """请回答有关确定性反事实的问题。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "one-shot-IcL":"""Answer questions about deterministic counterfactual.
+    'one-shot-IcL': """Answer questions about deterministic counterfactual.
 Input Info: We know that alarm set by husband causes alarm not set by wife. alarm set by husband or alarm set by wife causes ringing alarm.
 Question: Would the alarm rings the next morning if alarm not set by husband instead of alarm set by husband?
 Answer (Yes or No ?): Yes
@@ -32,7 +34,7 @@ Answer (Yes or No ?): Yes
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "one-shot-IcL-CN":"""请回答有关确定性反事实的问题。
+    'one-shot-IcL-CN': """请回答有关确定性反事实的问题。
 输入信息：我们知道丈夫设置闹钟会导致妻子没有设置闹钟，丈夫设置闹钟或妻子设置闹钟会导致闹钟响铃。
 问题：如果丈夫没有设置闹钟，而不是丈夫设置闹钟，第二天早上闹钟会响吗？
 答案（是或否？）：是
@@ -40,7 +42,7 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "three-shot-IcL":"""Answer questions about deterministic counterfactual.
+    'three-shot-IcL': """Answer questions about deterministic counterfactual.
 Input Info: We know that alarm set by husband causes alarm not set by wife. alarm set by husband or alarm set by wife causes ringing alarm.
 Question: Would the alarm rings the next morning if alarm not set by husband instead of alarm set by husband?
 Answer (Yes or No ?): Yes
@@ -56,7 +58,7 @@ Answer (Yes or No ?): no
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "three-shot-IcL-CN":"""请回答有关确定性反事实的问题。
+    'three-shot-IcL-CN': """请回答有关确定性反事实的问题。
 输入信息：我们知道丈夫设置闹钟会导致妻子没有设置闹钟，丈夫设置闹钟或妻子设置闹钟会导致闹钟响铃。
 问题：如果丈夫没有设置闹钟，而不是丈夫设置闹钟，第二天早上闹钟会响吗？
 答案（是或否？）：是
@@ -72,16 +74,15 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-CoT":"""Input Info: %s
+    'zero-shot-CoT': """Input Info: %s
 Question: %s Let's think step by step.
-Answer (Yes or No ?):"""
-,
-               "zero-shot-CoT-CN":"""输入信息：%s
+Answer (Yes or No ?):""",
+    'zero-shot-CoT-CN': """输入信息：%s
 问题：%s请逐步思考。
-答案（是或否？）："""
-,
-               "manual-CoT":"""Here are three examples of problems about deterministic counterfactual with chain of thought.
-                
+答案（是或否？）：""",
+    'manual-CoT':
+    """Here are three examples of problems about deterministic counterfactual with chain of thought.
+
 Input Info: We know that having a sister causes the corporal shooting and the private not shooting. the corporal shooting and the private shooting causes the prisoner's death.
 Question: Would the prisoner is dead if not having a sister instead of having a sister?
 Answer (Yes or No ?): Let X = having a sister; V3 = the private; V2 = the corporal; Y = prisoner. The causal relations are: X->V3,X->V2,V2->Y,V3->Y. Set Y_{X=0} = 1 | , then solve for Y, given the evidence and the action. V2 = X\nV3 = not V2\nY = V2 and V3. Then we get Y = [0] = 0 and 1. Thus, the prisoner would not be dead if not having a sister instead of having a sister. Therefore, the answer is No.
@@ -98,7 +99,7 @@ Input Info: %s
 Question: %s
 Answer (Yes or No ?):
 """,
-               "manual-CoT-CN":"""如下为三个使用思维链进行推理的有关反事实的问题：
+    'manual-CoT-CN': """如下为三个使用思维链进行推理的有关反事实的问题：
 
 输入信息：我们知道丈夫设置闹钟会导致妻子设置闹钟，丈夫设置闹钟或妻子设置闹钟会导致闹钟响铃。
 问题：如果丈夫没有设置闹钟，而不是丈夫设置闹钟，第二天早上闹钟会响吗？
@@ -115,17 +116,20 @@ Answer (Yes or No ?):
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-                "explicit-function":"""You are a helpful assistant for deterministic counterfactual.
+    'explicit-function':
+    """You are a helpful assistant for deterministic counterfactual.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "explicit-function-CN":"""你是用于决定论反事实的得力助手。
+    'explicit-function-CN': """你是用于决定论反事实的得力助手。
 输入信息：%s
 问题：%s
 答案（是或否？）""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
+}
 
-        prompt = prompt_style_str + base % (item["given_info"], item["question"])
-        return prompt
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['given_info'], item['question'])
+    return prompt

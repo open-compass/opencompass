@@ -1,46 +1,57 @@
-base_prompt_dict = {"basic":"""Input Info: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "basic-CN":"""输入信息：%s
+    'basic-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "adversarial-ignore":"""Input Info: %s
+    'adversarial-ignore':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "adversarial-ignore-CN":"""输入信息：%s
+    'adversarial-ignore-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-                "adversarial-doubt":"""Input Info: %s
+    'adversarial-doubt':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-                "adversarial-doubt-CN":"""输入信息：%s
+    'adversarial-doubt-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "zero-shot-IcL":"""Answer questions about the Natural Indirect Effect (NIE). Computing the Natural Indirect Effect involves looking at the outcomes for individuals when the treatment is fixed but the mediator is allowed to change as it naturally would due to the treatment.
+    'zero-shot-IcL':
+    """Answer questions about the Natural Indirect Effect (NIE). Computing the Natural Indirect Effect involves looking at the outcomes for individuals when the treatment is fixed but the mediator is allowed to change as it naturally would due to the treatment.
 Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "zero-shot-IcL-CN":"""回答有关自然间接效应（NIE）的问题。自然间接效应的计算方法是，当治疗方法固定不变，但允许中介因子因治疗方法而自然发生变化时，研究个体的结果。
+    'zero-shot-IcL-CN':
+    """回答有关自然间接效应（NIE）的问题。自然间接效应的计算方法是，当治疗方法固定不变，但允许中介因子因治疗方法而自然发生变化时，研究个体的结果。
 输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "one-shot-IcL":"""Answer questions about the Natural Indirect Effect (NIE). Computing the Natural Indirect Effect involves looking at the outcomes for individuals when the treatment is fixed but the mediator is allowed to change as it naturally would due to the treatment.
+    'one-shot-IcL':
+    """Answer questions about the Natural Indirect Effect (NIE). Computing the Natural Indirect Effect involves looking at the outcomes for individuals when the treatment is fixed but the mediator is allowed to change as it naturally would due to the treatment.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Income level has a direct effect on job satisfaction. Income level has a direct effect on life satisfaction. Education level has a direct effect on job satisfaction. Education level has a direct effect on happiness level. Job satisfaction has a direct effect on happiness level. Job satisfaction has a direct effect on life satisfaction. Happiness level has a direct effect on life satisfaction.
 For those with job satisfaction being not satisfied and education level being high, the probability of happiness level being low is 0.2180. For those with education level being low, the probability of job satisfaction being not satisfied is 0.5969. For those with education level being high, the probability of job satisfaction being not satisfied is 0.4075. For those with job satisfaction being satisfied and education level being high, the probability of happiness level being low is 0.1982.
@@ -53,7 +64,8 @@ Input Info: %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "one-shot-IcL-CN":"""回答有关自然间接效应（NIE）的问题。自然间接效应的计算方法是，当治疗方法固定不变，但允许中介因子因治疗方法而自然发生变化时，研究个体的结果。
+    'one-shot-IcL-CN':
+    """回答有关自然间接效应（NIE）的问题。自然间接效应的计算方法是，当治疗方法固定不变，但允许中介因子因治疗方法而自然发生变化时，研究个体的结果。
 
 输入信息：设想一个只有以下条件，而没有其他因素或因果关系的假设世界：收入水平对工作是否满意有直接影响。收入水平对生活是否满意有直接影响。教育水平对工作是否满意有直接影响。教育水平对幸福水平有直接影响。工作是否满意对幸福水平有直接影响。工作是否满意对生活是否满意有直接影响。幸福水平对生活是否满意有直接影响。
 在工作是否满意为不满意且教育水平为高的条件下, 幸福水平为低的概率为0.2180。在教育水平为低的条件下, 工作是否满意为不满意的概率为0.5969。在教育水平为高的条件下, 工作是否满意为不满意的概率为0.4075。在工作是否满意为满意且教育水平为高的条件下, 幸福水平为低的概率为0.1982。
@@ -66,7 +78,8 @@ Provide the calculation result to four decimal places and a final "yes" or "no" 
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "two-shot-IcL":"""Answer questions about the Natural Indirect Effect (NIE). Computing the Natural Indirect Effect involves looking at the outcomes for individuals when the treatment is fixed but the mediator is allowed to change as it naturally would due to the treatment.
+    'two-shot-IcL':
+    """Answer questions about the Natural Indirect Effect (NIE). Computing the Natural Indirect Effect involves looking at the outcomes for individuals when the treatment is fixed but the mediator is allowed to change as it naturally would due to the treatment.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Income level has a direct effect on job satisfaction. Income level has a direct effect on life satisfaction. Education level has a direct effect on job satisfaction. Education level has a direct effect on happiness level. Job satisfaction has a direct effect on happiness level. Job satisfaction has a direct effect on life satisfaction. Happiness level has a direct effect on life satisfaction.
 For those with job satisfaction being not satisfied and education level being high, the probability of happiness level being low is 0.2180. For those with education level being low, the probability of job satisfaction being not satisfied is 0.5969. For those with education level being high, the probability of job satisfaction being not satisfied is 0.4075. For those with job satisfaction being satisfied and education level being high, the probability of happiness level being low is 0.1982.
@@ -85,19 +98,20 @@ Input Info: %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "zero-shot-CoT":"""Input Info: %s
+    'zero-shot-CoT':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s Let's think step by step.
-Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:"""
-,
-               "zero-shot-CoT-CN":"""输入信息：%s
+Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
+    'zero-shot-CoT-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s请逐步思考。
-请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}："""
-,
-               "manual-CoT":"""Here are three examples for math problems about natural indirect effect (NIE) task with chain of thought.
+请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
+    'manual-CoT':
+    """Here are three examples for math problems about natural indirect effect (NIE) task with chain of thought.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Alor has a direct effect on geer. Tnkc has a direct effect on dzww. Dzww has a direct effect on geer.
 For those with dzww being low and tnkc being low, the probability of geer being high is 0.2261. For those with tnkc being high, the probability of dzww being low is 0.9090. For those with tnkc being low, the probability of dzww being low is 0.4752. For those with dzww being high and tnkc being low, the probability of geer being high is 0.0652.
@@ -121,9 +135,9 @@ Input Info: %s
 %s
 Instruction: %s
 Question: %s
-Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:"""
-,
-               "manual-CoT-CN":"""如下为一个使用思维链进行推理的关于“自然间接效果”(natural indirect effect, NIE)任务的数学问题：
+Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
+    'manual-CoT-CN':
+    """如下为一个使用思维链进行推理的关于“自然间接效果”(natural indirect effect, NIE)任务的数学问题：
 
 输入信息：设想一个只有以下条件，而没有其他因素或因果关系的假设世界：Zild对vean有直接影响。Zild对dhib有直接影响。Vean对dhib有直接影响。Dhib对maiw有直接影响。
 在vean为低且zild为高的条件下, dhib为高的概率为0.5548。在zild为低的条件下, vean为低的概率为0.6871。在zild为高的条件下, vean为低的概率为0.7006。在vean为高且zild为高的条件下, dhib为高的概率为0.9182。
@@ -135,23 +149,28 @@ Provide the calculation result to four decimal places and a final "yes" or "no" 
 %s
 指令：%s
 问题：%s
-请根据上述信息，给出计算结果（答案保留四位小数）。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}："""   
-,
-                "explicit-function":"""You are a helpful assistant for math probability.
+请根据上述信息，给出计算结果（答案保留四位小数）。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
+    'explicit-function':
+    """You are a helpful assistant for math probability.
 Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-                "explicit-function-CN":"""你是一个用于计算数学概率的得力助手。
+    'explicit-function-CN':
+    """你是一个用于计算数学概率的得力助手。
 输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
-    
-        prompt = prompt_style_str + base % (item["given_info"], item["Background"]["data_info"],item["Instruction"],item["Question"])
-        return prompt
+}
+
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['given_info'],
+                                        item['Background']['data_info'],
+                                        item['Instruction'], item['Question'])
+    return prompt

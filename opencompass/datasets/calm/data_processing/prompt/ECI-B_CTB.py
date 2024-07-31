@@ -1,30 +1,41 @@
-base_prompt_dict = {"basic":"""Input: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic':
+    """Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ?
 Answer (Yes or No ?):""",
-               "basic-CN":"""输入：%s
+    'basic-CN':
+    """输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？
 答案（是或否？）：""",
-               "adversarial-ignore":"""Input: %s
+    'adversarial-ignore':
+    """Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ?
 Answer (Yes or No ?):""",
-               "adversarial-ignore-CN":"""输入：%s
+    'adversarial-ignore-CN':
+    """输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？
 答案（是或否？）：""",
-                "adversarial-doubt":"""Input: %s
+    'adversarial-doubt':
+    """Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ?
 Answer (Yes or No ?):""",
-                "adversarial-doubt-CN":"""输入：%s
+    'adversarial-doubt-CN':
+    """输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？
 答案（是或否？）：""",
-               "zero-shot-IcL":"""determine whether there is a causal relationship between two events in a sentence.
+    'zero-shot-IcL':
+    """determine whether there is a causal relationship between two events in a sentence.
 Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ?
 Answer (Yes or No ?):""",
-               "zero-shot-IcL-CN":"""判断句子中的两个事件之间是否存在因果关系。
+    'zero-shot-IcL-CN':
+    """判断句子中的两个事件之间是否存在因果关系。
 输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？
 答案（是或否？）：""",
-               "one-shot-IcL":"""determine whether there is a causal relationship between two events in a sentence.
+    'one-shot-IcL':
+    """determine whether there is a causal relationship between two events in a sentence.
 Input: The break in an undersea cable on that affected Seacom has been repaired
 Question: is there a causal relationship between "affected" and "Seacom" ?
 Answer (Yes or No ?):No.
@@ -32,7 +43,8 @@ Answer (Yes or No ?):No.
 Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ?
 Answer (Yes or No ?):""",
-               "one-shot-IcL-CN":"""判断句子中的两个事件之间是否存在因果关系。
+    'one-shot-IcL-CN':
+    """判断句子中的两个事件之间是否存在因果关系。
 输入：影响东南非洲海底光缆系统的海底电缆断裂处已经修复。
 问题："影响"和"东南非洲海底光缆系统"之间是否存在因果关系？
 答案（是或否？）：否
@@ -40,7 +52,8 @@ Answer (Yes or No ?):""",
 输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？
 答案（是或否？）：""",
-               "three-shot-IcL":"""determine whether there is a causal relationship between two events in a sentence.
+    'three-shot-IcL':
+    """determine whether there is a causal relationship between two events in a sentence.
 Input: The break in an undersea cable on that affected Seacom has been repaired
 Question: is there a causal relationship between "affected" and "Seacom" ?
 Answer (Yes or No ?):No.
@@ -56,7 +69,8 @@ Answer (Yes or No ?): No.
 Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ?
 Answer (Yes or No ?):""",
-               "three-shot-IcL-CN":"""判断句子中的两个事件之间是否存在因果关系。
+    'three-shot-IcL-CN':
+    """判断句子中的两个事件之间是否存在因果关系。
 输入：影响东南非洲海底光缆系统的海底电缆断裂处已经修复。
 问题："影响"和"东南非洲海底光缆系统"之间是否存在因果关系？
 答案（是或否？）：否
@@ -72,18 +86,19 @@ Answer (Yes or No ?):""",
 输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？
 答案（是或否？）：""",
-               "zero-shot-CoT":"""Input: %s
+    'zero-shot-CoT':
+    """Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ? Let's think step by step.
-Answer:"""
-,
-               "zero-shot-CoT-CN":"""输入：%s
+Answer:""",
+    'zero-shot-CoT-CN':
+    """输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？请逐步思考。
-答案（是或否？）："""
-,
-               "manual-CoT":"""Here we will provide eight chain-of-thought exemplars, followed by a causality identification question that needs to be answered with chain-of-thought. 
+答案（是或否？）：""",
+    'manual-CoT':
+    """Here we will provide eight chain-of-thought exemplars, followed by a causality identification question that needs to be answered with chain-of-thought.
 
 Input: The truck maker said the significant drop in net income will result in lower earnings for the fiscal year .
-Question: is there a causal relationship between "earnings" and "drop" ? 
+Question: is there a causal relationship between "earnings" and "drop" ?
 Answer(Yes or No? With chain-of-thought): The term "drop" indicates a decrease or reduction in something, which in this case is the net income. Net income is directly related to earnings, as it represents the amount of profit left after deducting expenses from revenue. Thus, the answer is Yes.
 
 Input: said it plans to aggressively discount its major beer brands , setting the stage for a potentially bruising price war as the maturing industry 's growth continues to slow .
@@ -91,7 +106,7 @@ Question: is there a causal relationship between "continues" and "setting" ?
 Answer(Yes or No? With chain-of-thought): The term "setting the stage" suggests preparing or creating a context for something. The word "continues" refers to the ongoing slowing down of the industry's growth. The slowing growth of the industry isn't directly a result of the company's action of setting the stage for a price war. Thus, the answer is No.
 
 Input: The charges were offset in part by a gain from the sale of the company 's construction division .
-Question: is there a causal relationship between "sale" and "gain" ? 
+Question: is there a causal relationship between "sale" and "gain" ?
 Answer(Yes or No? With chain-of-thought): The term "gain" suggests a positive financial outcome or benefit. The sale of the construction division directly leads to the gain mentioned. The act of selling the construction division causes or results in the gain mentioned. Thus, the answer is Yes.
 
 Input: The Atlanta-based airline , the third largest in the U.S., attributed the increase to higher passenger traffic , new international routes and reduced service by rival Eastern Airlines , which is in bankruptcy proceedings in the wake of a strike that began last spring .
@@ -116,9 +131,9 @@ Answer(Yes or No? With chain-of-thought):  The president met with Sununu on Sund
 
 Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ?
-Answer (Yes or No ?):"""
-,
-               "manual-CoT-CN":"""如下为三个使用思维链进行推理的问题:
+Answer (Yes or No ?):""",
+    'manual-CoT-CN':
+    """如下为三个使用思维链进行推理的问题:
 
 输入：Sloan股份有限公司表示，该公司聘请了一家投资银行公司协助评估重组或合并方案，并报告截至9月30日的第三季度净亏损810万美元，即每股214美元。
 问题：\”协助\”和\”报道\”之间是否存在因果关系？
@@ -135,25 +150,34 @@ Answer (Yes or No ?):"""
 输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？
 答案（是或否？）：""",
-                "explicit-function":"""You are a helpful assistant for event causality identification.
+    'explicit-function':
+    """You are a helpful assistant for event causality identification.
 Input: %s
 Question: is there a causal relationship between \"%s\" and \"%s\" ?
 Answer (Yes or No ?):""",
-                "explicit-function-CN":"""你是一个识别事件因果关系的得力助手。
+    'explicit-function-CN':
+    """你是一个识别事件因果关系的得力助手。
 输入：%s
 问题：\"%s\"和\"%s\"之间是否存在因果关系？
 答案（是或否？）：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
-        if prompt_style in ["basic","adversarial-ignore","adversarial-doubt","zero-shot-CoT","manual-CoT","zero-shot-IcL","one-shot-IcL","three-shot-IcL","explicit-function"]:
-            words=item["words"]
-            sent = " ".join(words)
-            events=item["events"]
-            event1 = " ".join([words[t] for t in events[0]])
-            event2 = " ".join([words[t] for t in events[1]])
-            prompt = prompt_style_str + base % (sent,event1,event2)
-        else:
-            prompt = prompt_style_str + base % (item["sent"], item["event1"], item["event2"])
+}
 
-        return prompt
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+    if prompt_style in [
+            'basic', 'adversarial-ignore', 'adversarial-doubt',
+            'zero-shot-CoT', 'manual-CoT', 'zero-shot-IcL', 'one-shot-IcL',
+            'three-shot-IcL', 'explicit-function'
+    ]:
+        words = item['words']
+        sent = ' '.join(words)
+        events = item['events']
+        event1 = ' '.join([words[t] for t in events[0]])
+        event2 = ' '.join([words[t] for t in events[1]])
+        prompt = prompt_style_str + base % (sent, event1, event2)
+    else:
+        prompt = prompt_style_str + base % (item['sent'], item['event1'],
+                                            item['event2'])
+
+    return prompt

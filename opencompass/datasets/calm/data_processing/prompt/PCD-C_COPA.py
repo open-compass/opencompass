@@ -1,46 +1,57 @@
-base_prompt_dict = {"basic":"""Input Event: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic':
+    """Input Event: %s
 Question: Please select the %s of the input event from the following options.
 Option 1: %s
 Option 2: %s
 Answer (Option 1 or Option 2 ?):""",
-               "basic-CN":"""输入事件：%s
+    'basic-CN':
+    """输入事件：%s
 问题：请从以下选项中选择输入事件的%s。
 选项一：%s
 选项二：%s
 答案（选项一或选项二？）：""",
-               "adversarial-ignore":"""Input Event: %s
+    'adversarial-ignore':
+    """Input Event: %s
 Question: Please select the %s of the input event from the following options.
 Option 1: %s
 Option 2: %s
 Answer (Option 1 or Option 2 ?):""",
-               "adversarial-ignore-CN":"""输入事件：%s
+    'adversarial-ignore-CN':
+    """输入事件：%s
 问题：请从以下选项中选择输入事件的%s。
 选项一：%s
 选项二：%s
 答案（选项一或选项二？）：""",
-                "adversarial-doubt":"""Input Event: %s
+    'adversarial-doubt':
+    """Input Event: %s
 Question: Please select the %s of the input event from the following options.
 Option 1: %s
 Option 2: %s
 Answer (Option 1 or Option 2 ?):""",
-                "adversarial-doubt-CN":"""输入事件：%s
+    'adversarial-doubt-CN':
+    """输入事件：%s
 问题：请从以下选项中选择输入事件的%s。
 选项一：%s
 选项二：%s
 答案（选项一或选项二？）：""",
-               "zero-shot-IcL":"""Select the cause or effect of the input event from two options.
+    'zero-shot-IcL':
+    """Select the cause or effect of the input event from two options.
 Input Event: %s
 Question: Please select the %s of the input event from the following options.
 Option 1: %s
 Option 2: %s
 Answer (Option 1 or Option 2 ?):""",
-               "zero-shot-IcL-CN":"""从两个选项中选择输入事件的原因或结果。
+    'zero-shot-IcL-CN':
+    """从两个选项中选择输入事件的原因或结果。
 输入事件：%s
 问题：请从以下选项中选择输入事件的%s。
 选项一：%s
 选项二：%s
 答案（选项一或选项二？）：""",
-               "one-shot-IcL":"""Select the cause or effect of the input event from two options.
+    'one-shot-IcL':
+    """Select the cause or effect of the input event from two options.
 Input Event: My body cast a shadow over the grass.
 Question: Please select the cause of the input event from the following options.
 Option 1: The sun was rising.
@@ -51,7 +62,8 @@ Question: Please select the %s of the input event from the following options.
 Option 1: %s
 Option 2: %s
 Answer (Option 1 or Option 2 ?):""",
-               "one-shot-IcL-CN":"""从两个选项中选择输入事件的原因或结果。
+    'one-shot-IcL-CN':
+    """从两个选项中选择输入事件的原因或结果。
 输入事件：我的身体投下了阴影，落在草地上。
 问题：请从以下选项中选择输入事件的原因。
 选项一：太阳正在升起。
@@ -62,7 +74,8 @@ Answer (Option 1 or Option 2 ?):""",
 选项一：%s
 选项二：%s
 答案（选项一或选项二？）：""",
-               "three-shot-IcL":"""Select the cause or effect of the input event from two options.
+    'three-shot-IcL':
+    """Select the cause or effect of the input event from two options.
 Input Event: My body cast a shadow over the grass.
 Question: Please select the cause of the input event from the following options.
 Option 1: The sun was rising.
@@ -86,7 +99,8 @@ Question: Please select the %s of the input event from the following options.
 Option 1: %s
 Option 2: %s
 Answer (Option 1 or Option 2 ?):""",
-               "three-shot-IcL-CN":"""从两个选项中选择输入事件的原因或结果。
+    'three-shot-IcL-CN':
+    """从两个选项中选择输入事件的原因或结果。
 输入事件：我的身体投下了阴影，落在草地上。
 问题：请从以下选项中选择输入事件的原因。
 选项一：太阳正在升起。
@@ -110,20 +124,21 @@ Answer (Option 1 or Option 2 ?):""",
 选项一：%s
 选项二：%s
 答案（选项一或选项二？）：""",
-               "zero-shot-CoT":"""Input Event: %s
+    'zero-shot-CoT':
+    """Input Event: %s
 Question: Please select the %s of the input event from the following options. Let's think step by step.
 Option 1: %s
 Option 2: %s
-Answer (Option 1 or Option 2 ?):"""
-,
-               "zero-shot-CoT-CN":"""输入事件：%s 
+Answer (Option 1 or Option 2 ?):""",
+    'zero-shot-CoT-CN':
+    """输入事件：%s
 问题：请从以下选项中选择输入事件的%s。请逐步思考。
 选项一：%s
 选项二：%s
-答案（选项一或选项二？）："""
-,
-               "manual-CoT":"""
-Here we will provide eight chain-of-thought exemplars, where a few chain of thought demonstrations are provided as exemplars in prompting, followed by a question that needs to be answered. 
+答案（选项一或选项二？）：""",
+    'manual-CoT':
+    """
+Here we will provide eight chain-of-thought exemplars, where a few chain of thought demonstrations are provided as exemplars in prompting, followed by a question that needs to be answered.
 
 Input Event: My body cast a shadow over the grass
 Question: Please select the cause of the input event from the following options.
@@ -187,7 +202,8 @@ Option 1: %s
 Option 2: %s
 Answer (Option 1 or Option 2 ?):
 """,
-               "manual-CoT-CN":"""如下为三个使用思维链进行推理的问题
+    'manual-CoT-CN':
+    """如下为三个使用思维链进行推理的问题
 
 输入事件：那个女孩许了一个愿望。
 问题：请从以下选项中选择输入事件的原因。
@@ -211,23 +227,28 @@ Answer (Option 1 or Option 2 ?):
 问题：请从以下选项中选择输入事件的%s。
 选项一：%s
 选项二：%s
-答案（选项一或选项二？）："""
-,
-                "explicit-function":"""You are a helpful assistant for causal discovery.
+答案（选项一或选项二？）：""",
+    'explicit-function':
+    """You are a helpful assistant for causal discovery.
 Input Event: %s
 Question: Please select the %s of the input event from the following options.
 Option 1: %s
 Option 2: %s
 Answer (Option 1 or Option 2 ?):""",
-                "explicit-function-CN":"""你是一个用于因果发现的得力助手。
+    'explicit-function-CN':
+    """你是一个用于因果发现的得力助手。
 输入事件：%s
 问题：请从以下选项中选择输入事件的%s。
 选项一：%s
 选项二：%s
 答案（选项一或选项二？）：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
+}
+
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
     base = base_prompt_dict[prompt_style]
-    
-    prompt = prompt_style_str + base % (item["premise"], item["ask-for"], item["hypothesis1"], item["hypothesis2"])
+
+    prompt = prompt_style_str + base % (item['premise'], item['ask-for'],
+                                        item['hypothesis1'],
+                                        item['hypothesis2'])
     return prompt

@@ -1,48 +1,60 @@
-base_prompt_dict = {"basic":"""You will be presented with a causal graph in the following form: %s.
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic':
+    """You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
-Question: Whether the causal effect of %s on %s is identified or not? 
+Question: Whether the causal effect of %s on %s is identified or not?
 Answer (Yes or No ?):""",
-               "basic-CN":"""给定如下因果图：%s。
+    'basic-CN':
+    """给定如下因果图：%s。
 在这些变量间存在着不可观察的混淆变量：%s。
 问题：%s对%s的因果效应是否可以被识别？
 答案（是或否？）：""",
-               "adversarial-ignore":"""You will be presented with a causal graph in the following form: %s.
+    'adversarial-ignore':
+    """You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
-Question: Whether the causal effect of %s on %s is identified or not? 
+Question: Whether the causal effect of %s on %s is identified or not?
 Answer (Yes or No ?):""",
-               "adversarial-ignore-CN":"""给定如下因果图：%s。
+    'adversarial-ignore-CN':
+    """给定如下因果图：%s。
 在这些变量间存在着不可观察的混淆变量：%s。
 问题：%s对%s的因果效应是否可以被识别？
 答案（是或否？）：""",
-                "adversarial-doubt":"""You will be presented with a causal graph in the following form: %s.
+    'adversarial-doubt':
+    """You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
-Question: Whether the causal effect of %s on %s is identified or not? 
+Question: Whether the causal effect of %s on %s is identified or not?
 Answer (Yes or No ?):""",
-                "adversarial-doubt-CN":"""给定如下因果图：%s。
+    'adversarial-doubt-CN':
+    """给定如下因果图：%s。
 在这些变量间存在着不可观察的混淆变量：%s。
 问题：%s对%s的因果效应是否可以被识别？
 答案（是或否？）：""",
-               "zero-shot-IcL":"""Determine whether the causal effect can be identified given two variables on a causal graph.
+    'zero-shot-IcL':
+    """Determine whether the causal effect can be identified given two variables on a causal graph.
 You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
-Question: Whether the causal effect of %s on %s is identified or not? 
+Question: Whether the causal effect of %s on %s is identified or not?
 Answer (Yes or No ?):""",
-               "zero-shot-IcL-CN":"""确定在因果图中给定两个变量的情况下，因果效应是否可以被识别。
+    'zero-shot-IcL-CN':
+    """确定在因果图中给定两个变量的情况下，因果效应是否可以被识别。
 给定如下因果图：%s。
 在这些变量间存在着不可观察的混淆变量：%s。
 问题：%s对%s的因果效应是否可以被识别？
 答案（是或否？）：""",
-               "one-shot-IcL":"""Determine whether the causal effect can be identified given two variables on a causal graph.
+    'one-shot-IcL':
+    """Determine whether the causal effect can be identified given two variables on a causal graph.
 You will be presented with a causal graph in the following form: A causes E, A causes C, A causes B, B causes D, B causes E, and D causes E.
 There exist unobserved confounders between: B and E.
-Question: Whether the causal effect of B on E is identified or not? 
+Question: Whether the causal effect of B on E is identified or not?
 Answer (Yes or No ?): No
 
 You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
-Question: Whether the causal effect of %s on %s is identified or not? 
+Question: Whether the causal effect of %s on %s is identified or not?
 Answer (Yes or No ?):""",
-               "one-shot-IcL-CN":"""确定在因果图中给定两个变量的情况下，因果效应是否可以被识别。
+    'one-shot-IcL-CN':
+    """确定在因果图中给定两个变量的情况下，因果效应是否可以被识别。
 给定如下因果图：A导致E, A导致C, A导致B, B导致D, B导致E, 以及D导致E。
 在这些变量间存在着不可观察的混淆变量：B和E。
 问题：B对E的因果效应是否可以被识别？
@@ -52,27 +64,29 @@ Answer (Yes or No ?):""",
 在这些变量间存在着不可观察的混淆变量：%s。
 问题：%s对%s的因果效应是否可以被识别？
 答案（是或否？）：""",
-               "three-shot-IcL":"""Determine whether the causal effect can be identified given two variables on a causal graph.
+    'three-shot-IcL':
+    """Determine whether the causal effect can be identified given two variables on a causal graph.
 You will be presented with a causal graph in the following form: A causes E, A causes C, A causes B, B causes D, B causes E, and D causes E.
 There exist unobserved confounders between: B and E.
-Question: Whether the causal effect of B on E is identified or not? 
+Question: Whether the causal effect of B on E is identified or not?
 Answer (Yes or No ?): No
 
 You will be presented with a causal graph in the following form: A causes D, A causes E, B causes E, C causes D, and D causes E.
 There exist unobserved confounders between: C and D, and A and E.
-Question: Whether the causal effect of C on D is identified or not? 
+Question: Whether the causal effect of C on D is identified or not?
 Answer (Yes or No ?): No
 
 You will be presented with a causal graph in the following form: A causes D, A causes C, A causes B, B causes E, B causes D, and C causes D.
 There exist unobserved confounders between: B and D, C and D, and A and B.
-Question: Whether the causal effect of D on C is identified or not? 
+Question: Whether the causal effect of D on C is identified or not?
 Answer (Yes or No ?): Yes
 
 You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
-Question: Whether the causal effect of %s on %s is identified or not? 
+Question: Whether the causal effect of %s on %s is identified or not?
 Answer (Yes or No ?):""",
-               "three-shot-IcL-CN":"""确定在因果图中给定两个变量的情况下，因果效应是否可以被识别。
+    'three-shot-IcL-CN':
+    """确定在因果图中给定两个变量的情况下，因果效应是否可以被识别。
 给定如下因果图：A导致E, A导致C, A导致B, B导致D, B导致E, 以及D导致E。
 在这些变量间存在着不可观察的混淆变量：B和E。
 问题：B对E的因果效应是否可以被识别？
@@ -92,17 +106,18 @@ Answer (Yes or No ?):""",
 在这些变量间存在着不可观察的混淆变量：%s。
 问题：%s对%s的因果效应是否可以被识别？
 答案（是或否？）：""",
-               "zero-shot-CoT":"""You will be presented with a causal graph in the following form: %s.
+    'zero-shot-CoT':
+    """You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
 Question: Whether the causal effect of %s on %s is identified or not? Let's think step by step.
-Answer (Yes or No ?):"""
-,
-               "zero-shot-CoT-CN":"""给定如下因果图：%s。
+Answer (Yes or No ?):""",
+    'zero-shot-CoT-CN':
+    """给定如下因果图：%s。
 在这些变量间存在着不可观察的混淆变量：%s。
 问题：%s对%s的因果效应是否可以被识别？请逐步思考。
-答案（是或否？）："""
-,
-               "manual-CoT":"""Here are three examples of causal effect identification using chain of thought, and a question to answer. 
+答案（是或否？）：""",
+    'manual-CoT':
+    """Here are three examples of causal effect identification using chain of thought, and a question to answer.
 
 You will be presented with a causal graph in the following form: A causes E, A causes D, B causes D, B causes E, C causes E, and D causes E.
 There exist unobserved confounders between: B and D.
@@ -111,7 +126,7 @@ Answer (Yes or No ?): The unobserved confounders between B and D suggests there 
 
 You will be presented with a causal graph in the following form: A causes B, B causes C, B causes D, and D causes E.
 There exist unobserved confounders between: .
-Question: Whether the causal effect of A on B is identified or not? 
+Question: Whether the causal effect of A on B is identified or not?
 Answer (Yes or No ?): There are no unobserved confounders, and there is no unblocked back-door path from A to B, so the causal effect of A on B can be identified. Therefore, the answer is Yes.
 
 You will be presented with a causal graph in the following form: A causes D, A causes C, B causes D, B causes E, and C causes D.
@@ -121,10 +136,11 @@ Answer (Yes or No ?): There are no unobserved confounders between A and B, and t
 
 You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
-Question: Whether the causal effect of %s on %s is identified or not? 
+Question: Whether the causal effect of %s on %s is identified or not?
 Answer (Yes or No ?):
 """,
-               "manual-CoT-CN":"""如下为两个使用思维链进行推理的判断因果效应可否识别的示例，和一个需要回答的问题。
+    'manual-CoT-CN':
+    """如下为两个使用思维链进行推理的判断因果效应可否识别的示例，和一个需要回答的问题。
 
 给定如下因果图：A导致E, A导致D, B导致D, B导致E, C导致E, 以及D导致E。
 在这些变量间存在着不可观察的混淆变量：B和D。
@@ -141,19 +157,24 @@ Answer (Yes or No ?):
 问题：%s对%s的因果效应是否可以被识别？
 答案（是或否？）：
 """,
-                "explicit-function":"""You are a helpful assistant for causality identification.
+    'explicit-function':
+    """You are a helpful assistant for causality identification.
 You will be presented with a causal graph in the following form: %s.
 There exist unobserved confounders between: %s.
-Question: Whether the causal effect of %s on %s is identified or not? 
+Question: Whether the causal effect of %s on %s is identified or not?
 Answer (Yes or No ?):""",
-                "explicit-function-CN":"""你是一个用于因果识别的得力助手。
+    'explicit-function-CN':
+    """你是一个用于因果识别的得力助手。
 给定如下因果图：%s。
 在这些变量间存在着不可观察的混淆变量：%s。
 问题：%s对%s的因果效应是否可以被识别？
 答案（是或否？）：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
+}
 
-        prompt = prompt_style_str + base % (item["di_edges"], item["bi_edges"], item["treatment"], item["outcome"])
-        return prompt
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['di_edges'], item['bi_edges'],
+                                        item['treatment'], item['outcome'])
+    return prompt

@@ -1,49 +1,60 @@
-base_prompt_dict = {"basic":"""Input Info: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "basic-CN":"""输入信息：%s
+    'basic-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "adversarial-ignore":"""Input Info: %s
+    'adversarial-ignore':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "adversarial-ignore-CN":"""输入信息：%s
+    'adversarial-ignore-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-                "adversarial-doubt":"""Input Info: %s
+    'adversarial-doubt':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-                "adversarial-doubt-CN":"""输入信息：%s
+    'adversarial-doubt-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "zero-shot-IcL":"""Answer questions about the Natural Direct Effect (NDE). Computing the Natural Direct Effect involves comparing the outcomes for individuals under two scenarios: receiving the treatment and not receiving the treatment, while allowing a mediator variable to take its natural course under each scenario. 
+    'zero-shot-IcL':
+    """Answer questions about the Natural Direct Effect (NDE). Computing the Natural Direct Effect involves comparing the outcomes for individuals under two scenarios: receiving the treatment and not receiving the treatment, while allowing a mediator variable to take its natural course under each scenario.
 Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "zero-shot-IcL-CN":"""回答有关自然直接效应（NDE）的问题。计算自然直接效应需要比较两种情况下的个人结果：接受治疗和不接受治疗，同时允许中介变量在每种情况下自然发展。
+    'zero-shot-IcL-CN':
+    """回答有关自然直接效应（NDE）的问题。计算自然直接效应需要比较两种情况下的个人结果：接受治疗和不接受治疗，同时允许中介变量在每种情况下自然发展。
 输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "one-shot-IcL":"""Answer questions about the Natural Direct Effect (NDE). Computing the Natural Direct Effect involves comparing the outcomes for individuals under two scenarios: receiving the treatment and not receiving the treatment, while allowing a mediator variable to take its natural course under each scenario. 
+    'one-shot-IcL':
+    """Answer questions about the Natural Direct Effect (NDE). Computing the Natural Direct Effect involves comparing the outcomes for individuals under two scenarios: receiving the treatment and not receiving the treatment, while allowing a mediator variable to take its natural course under each scenario.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Fbge has a direct effect on vijq. Fbge has a direct effect on twac. Fbge has a direct effect on vdla.
-For those with fbge being high, the probability of vdla being low is 0.1851. For those with fbge being low, the probability of vdla being low is 0.5311. 
+For those with fbge being high, the probability of vdla being low is 0.1851. For those with fbge being low, the probability of vdla being low is 0.5311.
 Instruction: Consider the natural direct effect (NDE) of fbge on vdla.
 Question: Suppose the mediator keeps constant when fbge is changed to be high, would the vdla have been more likely to be low?
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}: {"ANSWER": "No", "PROB": "-0.3460"}
@@ -53,7 +64,8 @@ Input Info: %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "one-shot-IcL-CN":"""回答有关自然直接效应（NDE）的问题。计算自然直接效应需要比较两种情况下的个人结果：接受治疗和不接受治疗，同时允许中介变量在每种情况下自然发展。
+    'one-shot-IcL-CN':
+    """回答有关自然直接效应（NDE）的问题。计算自然直接效应需要比较两种情况下的个人结果：接受治疗和不接受治疗，同时允许中介变量在每种情况下自然发展。
 
 输入信息：设想一个只有以下条件，而没有其他因素或因果关系的假设世界：Fbge对vijq有直接影响。Fbge对twac有直接影响。Fbge对vdla有直接影响。
 在fbge为高的条件下, vdla为低的概率为0.1851。在fbge为低的条件下, vdla为低的概率为0.5311。
@@ -66,16 +78,17 @@ Provide the calculation result to four decimal places and a final "yes" or "no" 
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "two-shot-IcL":"""Answer questions about the Natural Direct Effect (NDE). Computing the Natural Direct Effect involves comparing the outcomes for individuals under two scenarios: receiving the treatment and not receiving the treatment, while allowing a mediator variable to take its natural course under each scenario. 
+    'two-shot-IcL':
+    """Answer questions about the Natural Direct Effect (NDE). Computing the Natural Direct Effect involves comparing the outcomes for individuals under two scenarios: receiving the treatment and not receiving the treatment, while allowing a mediator variable to take its natural course under each scenario.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Fbge has a direct effect on vijq. Fbge has a direct effect on twac. Fbge has a direct effect on vdla.
-For those with fbge being high, the probability of vdla being low is 0.1851. For those with fbge being low, the probability of vdla being low is 0.5311. 
+For those with fbge being high, the probability of vdla being low is 0.1851. For those with fbge being low, the probability of vdla being low is 0.5311.
 Instruction: Consider the natural direct effect (NDE) of fbge on vdla.
 Question: Suppose the mediator keeps constant when fbge is changed to be high, would the vdla have been more likely to be low?
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}: {"ANSWER": "No", "PROB": "-0.3460"}
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Parent has a direct effect on first-born child. Parent has a direct effect on second-born child. Parent has a direct effect on third-born child. First-born child has a direct effect on second-born child. First-born child has a direct effect on third-born child.
-For those with parent being supportive, the probability of first-born child being favored is 0.2759. For those with parent being neglectful, the probability of first-born child being favored is 0.3249. 
+For those with parent being supportive, the probability of first-born child being favored is 0.2759. For those with parent being neglectful, the probability of first-born child being favored is 0.3249.
 Instruction: Consider the natural direct effect (NDE) of parent on first-born child.
 Question: Suppose the mediator keeps constant when parent is changed to be supportive, would the first-born child have been more likely to be favored?
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}: {"ANSWER": "No", "PROB": "-0.0490"}
@@ -85,19 +98,20 @@ Input Info: %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "zero-shot-CoT":"""Input Info: %s
+    'zero-shot-CoT':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s Let's think step by step.
-Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:"""
-,
-               "zero-shot-CoT-CN":"""输入信息：%s
+Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
+    'zero-shot-CoT-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s请逐步思考。
-请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}："""
-,
-               "manual-CoT":"""Here are three examples for math problems about natural direct effect (NDE) task with chain of thought.
+请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
+    'manual-CoT':
+    """Here are three examples for math problems about natural direct effect (NDE) task with chain of thought.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Vqpf has a direct effect on uhxm. Vqpf has a direct effect on ezwx.
 For those with vqpf being high, the probability of uhxm being low is 0.8005. For those with vqpf being low, the probability of uhxm being low is 0.8489.
@@ -122,9 +136,9 @@ Input Info: %s
 %s
 Instruction: %s
 Question: %s
-Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:"""
-,
-               "manual-CoT-CN":"""如下为一个使用思维链进行推理的关于“自然直接效果”(natural direct effect, NDE)任务的数学问题：
+Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
+    'manual-CoT-CN':
+    """如下为一个使用思维链进行推理的关于“自然直接效果”(natural direct effect, NDE)任务的数学问题：
 
 输入信息：设想一个只有以下条件，而没有其他因素或因果关系的假设世界：顾客对产品的满意度对产品的正面评价数量有直接影响。顾客对产品的满意度对产品收入有直接影响。产品的正面评价数量对产品销售表现有直接影响。产品销售表现对产品收入有直接影响。
 在顾客对产品的满意度为低的条件下, 产品的正面评价数量为高的概率为0.4636。在顾客对产品的满意度为高的条件下, 产品的正面评价数量为高的概率为0.9016。
@@ -136,23 +150,28 @@ Provide the calculation result to four decimal places and a final "yes" or "no" 
 %s
 指令：%s
 问题：%s
-请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}："""
-,
-                "explicit-function":"""You are a helpful assistant for math probability.
+请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
+    'explicit-function':
+    """You are a helpful assistant for math probability.
 Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-                "explicit-function-CN":"""你是一个用于计算数学概率的得力助手。
+    'explicit-function-CN':
+    """你是一个用于计算数学概率的得力助手。
 输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
-    
-        prompt = prompt_style_str + base % (item["given_info"], item["Background"]["data_info"],item["Instruction"],item["Question"])
-        return prompt
+}
+
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['given_info'],
+                                        item['Background']['data_info'],
+                                        item['Instruction'], item['Question'])
+    return prompt

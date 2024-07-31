@@ -1,30 +1,32 @@
-base_prompt_dict = {"basic":"""Input Info: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "basic-CN":"""输入信息：%s
+    'basic-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "adversarial-ignore":"""Input Info: %s
+    'adversarial-ignore': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "adversarial-ignore-CN":"""输入信息：%s
+    'adversarial-ignore-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-                "adversarial-doubt":"""Input Info: %s
+    'adversarial-doubt': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "adversarial-doubt-CN":"""输入信息：%s
+    'adversarial-doubt-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-IcL":"""Answer questions about explaining away effect.
+    'zero-shot-IcL': """Answer questions about explaining away effect.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "zero-shot-IcL-CN":"""请回答关于相消解释作用的问题。
+    'zero-shot-IcL-CN': """请回答关于相消解释作用的问题。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "one-shot-IcL":"""Answer questions about explaining away effect.
+    'one-shot-IcL': """Answer questions about explaining away effect.
 Input Info: The overall probability of attractive appearance is 48%%. For people considered unattractive and are not famous, the probability of talent is 3%%. For people considered unattractive and are famous, the probability of talent is 9%%. For people considered attractive and are not famous, the probability of talent is 2%%. For people considered attractive and are famous, the probability of talent is 6%%.
 Question: If we look at people who are famous, does the chance of talent increase when attractive appearance?
 Answer (Yes or No ?):No.
@@ -32,7 +34,7 @@ Answer (Yes or No ?):No.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "one-shot-IcL-CN":"""请回答关于相消解释作用的问题。
+    'one-shot-IcL-CN': """请回答关于相消解释作用的问题。
 输入信息：拥有迷人外表的总体概率是48%%。对于被认为外表不迷人且不出名的人来说，有天赋的概率是3%%。对于被认为没有外表不迷人但很出名的人来说，有天赋的概率是9%%。对于被认为外表迷人但不出名的人来说，有天赋的概率是2%%。对于被认为外表迷人且出名的人来说，有天赋的概率是6%%。
 问题：如果我们观察那些出名的人，当他们拥有迷人的外表时，其拥有天赋的概率会增加吗？
 答案（是或否？）：否
@@ -40,7 +42,7 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "three-shot-IcL":"""Answer questions about explaining away effect.
+    'three-shot-IcL': """Answer questions about explaining away effect.
 Input Info: The overall probability of attractive appearance is 48%%. For people considered unattractive and are not famous, the probability of talent is 3%%. For people considered unattractive and are famous, the probability of talent is 9%%. For people considered attractive and are not famous, the probability of talent is 2%%. For people considered attractive and are famous, the probability of talent is 6%%.
 Question: If we look at people who are famous, does the chance of talent increase when attractive appearance?
 Answer (Yes or No ?):No.
@@ -56,7 +58,7 @@ Answer (Yes or No ?): yes
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "three-shot-IcL-CN":"""请回答关于相消解释作用的问题。
+    'three-shot-IcL-CN': """请回答关于相消解释作用的问题。
 输入信息：拥有迷人外表的总体概率是48%%。对于被认为外表不迷人且不出名的人来说，有天赋的概率是3%%。对于被认为没有外表不迷人但很出名的人来说，有天赋的概率是9%%。对于被认为外表迷人但不出名的人来说，有天赋的概率是2%%。对于被认为外表迷人且出名的人来说，有天赋的概率是6%%。
 问题：如果我们观察那些出名的人，当他们拥有迷人的外表时，其拥有天赋的概率会增加吗？
 答案（是或否？）：否
@@ -72,15 +74,14 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-CoT":"""Input Info: %s
+    'zero-shot-CoT': """Input Info: %s
 Question: %s Let's think step by step.
-Answer (Yes or No ?):"""
-,
-               "zero-shot-CoT-CN":"""输入信息：%s
+Answer (Yes or No ?):""",
+    'zero-shot-CoT-CN': """输入信息：%s
 问题：%s请逐步思考。
-答案（是或否？）："""
-,
-               "manual-CoT":"""Here are three examples of problems about explaining away effect with chain of thought.
+答案（是或否？）：""",
+    'manual-CoT':
+    """Here are three examples of problems about explaining away effect with chain of thought.
 
 Input Info: The overall probability of attractive appearance is 81%%. For people considered unattractive and are not famous, the probability of talent is 98%%. For people considered unattractive and are famous, the probability of talent is 92%%. For people considered attractive and are not famous, the probability of talent is 97%%. For people considered attractive and are famous, the probability of talent is 86%%.
 Question: If we look at people who are famous, does the chance of talent increase when attractive appearance?
@@ -96,9 +97,8 @@ Answer (Yes or No ?): Let Y = brown eyes; X = talent; V3 = elite institution adm
 
 Input Info: %s
 Question: %s
-Answer (Yes or No ?):"""
-,
-               "manual-CoT-CN":"""如下为一个使用思维链进行推理的有关解释移除效应的问题：
+Answer (Yes or No ?):""",
+    'manual-CoT-CN': """如下为一个使用思维链进行推理的有关解释移除效应的问题：
 
 输入信息：呼吸系统有问题的总体概率是49%%。对于呼吸系统没有问题且未住院的人来说，骨折的概率是15%%。对于呼吸系统没有问题但住院的人来说，骨折的概率是31%%。对于呼吸系统有问题但未住院的人来说，骨折的概率是7%%。对于呼吸系统有问题且已住院的人来说，骨折的概率为27%%。
 问题：如果我们观察那些住院患者，当他们呼吸系统出现问题时，其骨折的概率会降低吗？
@@ -106,19 +106,21 @@ Answer (Yes or No ?):"""
 
 输入信息：%s
 问题：%s
-答案（是或否？）："""
-,
-                "explicit-function":"""You are a helpful assistant for explaining away effect.
+答案（是或否？）：""",
+    'explicit-function':
+    """You are a helpful assistant for explaining away effect.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "explicit-function-CN":"""你是一个用于评估相消解释效应的得力助手。
+    'explicit-function-CN': """你是一个用于评估相消解释效应的得力助手。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
+}
 
-        prompt = prompt_style_str + base % (item["given_info"], item["question"])
-        return prompt
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['given_info'], item['question'])
+    return prompt

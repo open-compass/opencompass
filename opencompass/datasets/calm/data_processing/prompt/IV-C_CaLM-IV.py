@@ -1,40 +1,49 @@
-base_prompt_dict = {"basic":"""You will be presented with a causal graph in the following form: %s.
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic':
+    """You will be presented with a causal graph in the following form: %s.
 Question: Which set of variables is the instrumental variables relative to an ordered pair of variables (%s, %s) in the above causal graph?
 Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "basic-CN":"""给定如下因果图：%s。
+    'basic-CN':
+    """给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，工具变量是哪个？
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）："""      ,
-               "adversarial-ignore":"""You will be presented with a causal graph in the following form: %s.
+答案（选项一或选项二或选项三？）：""",
+    'adversarial-ignore':
+    """You will be presented with a causal graph in the following form: %s.
 Question: Which set of variables is the instrumental variables relative to an ordered pair of variables (%s, %s) in the above causal graph?
 Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "adversarial-ignore-CN":"""给定如下因果图：%s。
+    'adversarial-ignore-CN':
+    """给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，工具变量是哪个？
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）："""      ,
-                "adversarial-doubt":"""You will be presented with a causal graph in the following form: %s.
+答案（选项一或选项二或选项三？）：""",
+    'adversarial-doubt':
+    """You will be presented with a causal graph in the following form: %s.
 Question: Which set of variables is the instrumental variables relative to an ordered pair of variables (%s, %s) in the above causal graph?
 Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-                "adversarial-doubt-CN":"""给定如下因果图：%s。
+    'adversarial-doubt-CN':
+    """给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，工具变量是哪个？
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）："""      ,
-               "zero-shot-IcL":"""Objective:
+答案（选项一或选项二或选项三？）：""",
+    'zero-shot-IcL':
+    """Objective:
 Your task is to identify the set of variables that serve as instrumental variables for a given ordered pair of treatment and outcome variables (X, Y) in a specified causal graph.
 Background Information:
 An instrumental variable Z must meet the following criteria:
@@ -54,7 +63,8 @@ Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "zero-shot-IcL-CN":"""目标
+    'zero-shot-IcL-CN':
+    """目标
 您的任务是在指定的因果关系图中，找出一组变量，作为给定的一对有序处理变量和结果变量（X，Y）的工具变量。
 背景信息：
 工具变量 Z 必须符合以下标准：
@@ -74,7 +84,8 @@ Answer (Option 1 or Option 2 or Option 3 ?):""",
 选项二：%s
 选项三：%s
 答案（选项一或选项二或选项三？）：""",
-               "one-shot-IcL":"""Objective:
+    'one-shot-IcL':
+    """Objective:
 Your task is to identify the set of variables that serve as instrumental variables for a given ordered pair of treatment and outcome variables (X, Y) in a specified causal graph.
 Background Information:
 An instrumental variable Z must meet the following criteria:
@@ -103,7 +114,8 @@ Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "one-shot-IcL-CN":"""目标
+    'one-shot-IcL-CN':
+    """目标
 您的任务是在指定的因果关系图中，找出一组变量，作为给定的一对有序处理变量和结果变量（X，Y）的工具变量。
 背景信息：
 工具变量 Z 必须符合以下标准：
@@ -132,7 +144,8 @@ Answer (Option 1 or Option 2 or Option 3 ?):""",
 选项二：%s
 选项三：%s
 答案（选项一或选项二或选项三？）：""",
-               "three-shot-IcL":"""Objective:
+    'three-shot-IcL':
+    """Objective:
 Your task is to identify the set of variables that serve as instrumental variables for a given ordered pair of treatment and outcome variables (X, Y) in a specified causal graph.
 Background Information:
 An instrumental variable Z must meet the following criteria:
@@ -175,7 +188,8 @@ Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "three-shot-IcL-CN":"""目标
+    'three-shot-IcL-CN':
+    """目标
 您的任务是在指定的因果关系图中，找出一组变量，作为给定的一对有序处理变量和结果变量（X，Y）的工具变量。
 背景信息：
 工具变量 Z 必须符合以下标准：
@@ -218,21 +232,22 @@ Answer (Option 1 or Option 2 or Option 3 ?):""",
 选项二：%s
 选项三：%s
 答案（选项一或选项二或选项三？）：""",
-               "zero-shot-CoT":"""You will be presented with a causal graph in the following form: %s.
+    'zero-shot-CoT':
+    """You will be presented with a causal graph in the following form: %s.
 Question: Which set of variables is the instrument variables relative to an ordered pair of variables (%s, %s) in the above causal graph? Let's think step by step.
 Option 1: %s
 Option 2: %s
 Option 3: %s
-Answer (Option 1 or Option 2 or Option 3 ?):"""
-,
-               "zero-shot-CoT-CN":"""给定如下因果图：%s。
+Answer (Option 1 or Option 2 or Option 3 ?):""",
+    'zero-shot-CoT-CN':
+    """给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，工具变量是哪个？请逐步思考。
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）："""   
-,
-               "manual-CoT":"""Here are three examples of identifying instrumental variables using chain of thought, and a question to answer.
+答案（选项一或选项二或选项三？）：""",
+    'manual-CoT':
+    """Here are three examples of identifying instrumental variables using chain of thought, and a question to answer.
 
 You will be presented with a causal graph in the following form: A causes D, A causes C, B causes E, C causes D, and D causes E.
 Question: Which set of variables is the instrument variables relative to an ordered pair of variables (D, E) in the above causal graph?
@@ -260,9 +275,9 @@ Question: Which set of variables is the instrument variables relative to an orde
 Option 1: %s
 Option 2: %s
 Option 3: %s
-Answer (Option 1 or Option 2 or Option 3 ?):"""
-,
-               "manual-CoT-CN":"""如下为两个使用思维链进行推理的识别工具变量的示例，和一个需要回答的问题。
+Answer (Option 1 or Option 2 or Option 3 ?):""",
+    'manual-CoT-CN':
+    """如下为两个使用思维链进行推理的识别工具变量的示例，和一个需要回答的问题。
 
 给定如下因果图：A导致D, A导致C, B导致E, C导致D, 以及D导致E。
 问题：对于上述因果图中的有序变量对 (D, E)，工具变量是哪个？
@@ -283,25 +298,30 @@ Answer (Option 1 or Option 2 or Option 3 ?):"""
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）："""
-,
-                "explicit-function":"""You are a helpful assistant for adjustment set analysis (instrument variables).
+答案（选项一或选项二或选项三？）：""",
+    'explicit-function':
+    """You are a helpful assistant for adjustment set analysis (instrument variables).
 You will be presented with a causal graph in the following form: %s.
 Question: Which set of variables is the instrument variables relative to an ordered pair of variables (%s, %s) in the above causal graph?
 Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-                "explicit-function-CN":"""你是一个用于调整集分析(工具变量)的得力助手。
+    'explicit-function-CN':
+    """你是一个用于调整集分析(工具变量)的得力助手。
 给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，工具变量是哪个？
 选项一：%s
 选项二：%s
 选项三：%s
 答案（选项一或选项二或选项三？）""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
+}
 
-        prompt = prompt_style_str + base % (item["edges"], item["treatment"], item["outcome"], item["option1"], item["option2"], item["option3"])
-        return prompt
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['edges'], item['treatment'],
+                                        item['outcome'], item['option1'],
+                                        item['option2'], item['option3'])
+    return prompt

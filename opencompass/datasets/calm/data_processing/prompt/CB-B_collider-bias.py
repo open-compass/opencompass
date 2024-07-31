@@ -1,30 +1,32 @@
-base_prompt_dict = {"basic":"""Input Info: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "basic-CN":"""输入信息：%s
+    'basic-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "adversarial-ignore":"""Input Info: %s
+    'adversarial-ignore': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "adversarial-ignore-CN":"""输入信息：%s
+    'adversarial-ignore-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-                "adversarial-doubt":"""Input Info: %s
+    'adversarial-doubt': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "adversarial-doubt-CN":"""输入信息：%s
+    'adversarial-doubt-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-IcL":"""Answer questions about collider bias.
+    'zero-shot-IcL': """Answer questions about collider bias.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "zero-shot-IcL-CN":"""请回答有关碰撞偏见的问题。
+    'zero-shot-IcL-CN': """请回答有关碰撞偏见的问题。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "one-shot-IcL":"""Answer questions about collider bias.
+    'one-shot-IcL': """Answer questions about collider bias.
 Input Info: For people who are famous, the correlation between attractive appearance and talent is -0.08.
 Question: If we look at people who are famous, does it mean that attractive appearance does not affect talent?
 Answer (Yes or No ?):Yes.
@@ -32,7 +34,7 @@ Answer (Yes or No ?):Yes.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "one-shot-IcL-CN":"""请回答有关碰撞偏见的问题。
+    'one-shot-IcL-CN': """请回答有关碰撞偏见的问题。
 输入信息：对于那些出名的人来说，有吸引力的外表和才华之间的相关系数为-0.08。
 问题：如果我们观察那些出名的人，这是否意味着有吸引力的外表不会影响才华?
 答案（是或否？）：是
@@ -40,7 +42,7 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "three-shot-IcL":"""Answer questions about collider bias.
+    'three-shot-IcL': """Answer questions about collider bias.
 Input Info: For people who are famous, the correlation between attractive appearance and talent is -0.08.
 Question: If we look at people who are famous, does it mean that attractive appearance does not affect talent?
 Answer (Yes or No ?):Yes.
@@ -56,7 +58,7 @@ Answer (Yes or No ?): no
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "three-shot-IcL-CN":"""请回答有关碰撞偏见的问题。
+    'three-shot-IcL-CN': """请回答有关碰撞偏见的问题。
 输入信息：对于那些出名的人来说，有吸引力的外表和才华之间的相关系数为-0.08。
 问题：如果我们观察那些出名的人，这是否意味着有吸引力的外表不会影响才华?
 答案（是或否？）：是
@@ -72,15 +74,14 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-CoT":"""Input Info: %s
+    'zero-shot-CoT': """Input Info: %s
 Question: %s Let's think step by step.
-Answer (Yes or No ?):"""
-,
-               "zero-shot-CoT-CN":"""输入信息：%s
+Answer (Yes or No ?):""",
+    'zero-shot-CoT-CN': """输入信息：%s
 问题：%s 请逐步思考。
-答案（是或否？）："""
-,
-               "manual-CoT":"""Here are eight examples of problems with collider bias answered with chain of thought.
+答案（是或否？）：""",
+    'manual-CoT':
+    """Here are eight examples of problems with collider bias answered with chain of thought.
 
 Input Info: For people who are famous, the correlation between attractive appearance and talent is -0.08.
 Question: If we look at people who are famous, does it mean that attractive appearance does not affect talent?
@@ -116,9 +117,8 @@ Answer (Yes or No ?): Both zuph and glimx affect jyka. This collision creates a 
 
 Input Info: %s
 Question: %s
-Answer (Yes or No ?):"""
-,
-               "manual-CoT-CN":"""如下为三个使用思维链进行推理的对撞偏差问题：
+Answer (Yes or No ?):""",
+    'manual-CoT-CN': """如下为三个使用思维链进行推理的对撞偏差问题：
 
 输入信息：对于那些出名的人来说，有吸引力的外表和才华之间的相关系数为-0.08。
 问题：如果我们观察那些出名的人，这是否意味着有吸引力的外表不会影响才华?
@@ -135,17 +135,20 @@ Answer (Yes or No ?):"""
 输入信息：%s
 问题：%s
 答案（是或否？）""",
-                "explicit-function":"""You are a helpful assistant for collider bias analysis.
+    'explicit-function':
+    """You are a helpful assistant for collider bias analysis.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "explicit-function-CN":"""你是一个用于分析汇聚偏差的得力助手。
+    'explicit-function-CN': """你是一个用于分析汇聚偏差的得力助手。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
+}
 
-        prompt = prompt_style_str + base % (item["given_info"], item["question"])
-        return prompt
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['given_info'], item['question'])
+    return prompt

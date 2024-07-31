@@ -1,30 +1,34 @@
-base_prompt_dict = {"basic":"""Input Info: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "basic-CN":"""输入信息：%s
+    'basic-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "adversarial-ignore":"""Input Info: %s
+    'adversarial-ignore': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "adversarial-ignore-CN":"""输入信息：%s
+    'adversarial-ignore-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-                "adversarial-doubt":"""Input Info: %s
+    'adversarial-doubt': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "adversarial-doubt-CN":"""输入信息：%s
+    'adversarial-doubt-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-IcL":"""Answer questions by considering what constitutes a valid adjustment set that can block all backdoor spurious correlations between two events.
+    'zero-shot-IcL':
+    """Answer questions by considering what constitutes a valid adjustment set that can block all backdoor spurious correlations between two events.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "zero-shot-IcL-CN":"""通过考虑什么构成一个有效的调整集，以阻断两个事件之间所有后门伪相关，来回答问题。
+    'zero-shot-IcL-CN': """通过考虑什么构成一个有效的调整集，以阻断两个事件之间所有后门伪相关，来回答问题。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "one-shot-IcL":"""Answer questions by considering what constitutes a valid adjustment set that can block all backdoor spurious correlations between two events.
+    'one-shot-IcL':
+    """Answer questions by considering what constitutes a valid adjustment set that can block all backdoor spurious correlations between two events.
 Input Info: Method 1: We look at how husband correlates with alarm clock case by case according to wife. Method 2: We look directly at how husband correlates with alarm clock in general.
 Question: To understand how husband affects alarm clock, is it more correct to use the Method 1 than Method 2?
 Answer (Yes or No ?): no
@@ -32,7 +36,7 @@ Answer (Yes or No ?): no
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "one-shot-IcL-CN":"""通过考虑什么构成一个有效的调整集，以阻断两个事件之间所有后门伪相关，来回答问题。
+    'one-shot-IcL-CN': """通过考虑什么构成一个有效的调整集，以阻断两个事件之间所有后门伪相关，来回答问题。
 输入信息：方法1：根据妻子的情况，我们逐个研究丈夫与闹钟之间的关联；方法2：我们直接研究一般情况下丈夫与闹钟之间的关联。
 问题：要了解丈夫如何影响闹钟，使用方法1比方法2更准确吗？
 答案（是或否？）：否
@@ -40,7 +44,8 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "three-shot-IcL":"""Answer questions by considering what constitutes a valid adjustment set that can block all backdoor spurious correlations between two events.
+    'three-shot-IcL':
+    """Answer questions by considering what constitutes a valid adjustment set that can block all backdoor spurious correlations between two events.
 Input Info: Method 1: We look at how husband correlates with alarm clock case by case according to wife. Method 2: We look directly at how husband correlates with alarm clock in general.
 Question: To understand how husband affects alarm clock, is it more correct to use the Method 1 than Method 2?
 Answer (Yes or No ?): no
@@ -56,7 +61,7 @@ Answer (Yes or No ?): yes
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "three-shot-IcL-CN":"""通过考虑什么构成一个有效的调整集，以阻断两个事件之间所有后门伪相关，来回答问题。
+    'three-shot-IcL-CN': """通过考虑什么构成一个有效的调整集，以阻断两个事件之间所有后门伪相关，来回答问题。
 输入信息：方法1：根据妻子的情况，我们逐个研究丈夫与闹钟之间的关联；方法2：我们直接研究一般情况下丈夫与闹钟之间的关联。
 问题：要了解丈夫如何影响闹钟，使用方法1比方法2更准确吗？
 答案（是或否？）：否
@@ -72,15 +77,14 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-CoT":"""Input Info: %s
+    'zero-shot-CoT': """Input Info: %s
 Question: %s Let's think step by step.
-Answer (Yes or No ?):"""
-,
-               "zero-shot-CoT-CN":"""输入信息：%s
+Answer (Yes or No ?):""",
+    'zero-shot-CoT-CN': """输入信息：%s
 问题：%s请逐步思考。
-答案（是或否？）："""
-,
-               "manual-CoT":"""Here are three examples for problems about considering backdoor adjustment set with chain of thought. 
+答案（是或否？）：""",
+    'manual-CoT':
+    """Here are three examples for problems about considering backdoor adjustment set with chain of thought.
 Input Info: Method 1: We look directly at how jyka correlates with lirg in general. Method 2: We look at this correlation case by case according to gyzp.
 Question: To understand how jyka affects lirg, is it more correct to use the Method 1 than Method 2?
 Answer (Yes or No ?): Since gyzp is a confounder, both affects jyka and lirg, looking directly at the relation between jyka and lirg like Method 1 is not correct. Therefore, the answer is No.
@@ -96,7 +100,7 @@ Answer (Yes or No ?): Since zory is a confounder, both affects zuph and glimx, l
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "manual-CoT-CN":"""如下为三个使用思维链进行推理的有关后门变量集合的问题：
+    'manual-CoT-CN': """如下为三个使用思维链进行推理的有关后门变量集合的问题：
 
 输入信息：方法1: 我们直接研究一般情况下房间里的男人与房间之间的关联;方法2:根据蜡烛，我们逐个研究这种关联。
 问题：要了解房间里的男子如何影响房间，使用方法1比方法2更准确吗？
@@ -113,17 +117,20 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）""",
-                "explicit-function":"""You are a helpful assistant for backdoor adjustment set.
+    'explicit-function':
+    """You are a helpful assistant for backdoor adjustment set.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "explicit-function-CN":"""你是一个用于后门调节的得力助手。
+    'explicit-function-CN': """你是一个用于后门调节的得力助手。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
+}
 
-        prompt = prompt_style_str + base % (item["given_info"], item["question"])
-        return prompt
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['given_info'], item['question'])
+    return prompt

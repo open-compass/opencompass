@@ -1,5 +1,5 @@
 # CaLM Lite
-**CaLM Lite** is a lightweight version of CaLM. 
+**CaLM Lite** is a lightweight version of CaLM.
 
 **Ca**usal evaluation of **L**anguage **M**odels (CaLM), to the best of our knowledge, is the first comprehensive benchmark for evaluating the causal reasoning capabilities of language models. The CaLM framework establishes a foundational taxonomy consisting of four modules: causal target (i.e., what to evaluate), adaptation (i.e., how to obtain the results), metric (i.e., how to measure the results), and error (i.e., how to analyze the bad results).
 
@@ -115,4 +115,3 @@ Basic Prompt is our default setting for efficient evaluation of CaLM Lite, but w
       primaryClass={cs.CL}
 }
 ```
-

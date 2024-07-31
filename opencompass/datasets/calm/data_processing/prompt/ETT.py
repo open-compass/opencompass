@@ -1,49 +1,60 @@
-base_prompt_dict = {"basic":"""Input Info: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "basic-CN":"""输入信息：%s
+    'basic-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "adversarial-ignore":"""Input Info: %s
+    'adversarial-ignore':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "adversarial-ignore-CN":"""输入信息：%s
+    'adversarial-ignore-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-                "adversarial-doubt":"""Input Info: %s
+    'adversarial-doubt':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-                "adversarial-doubt-CN":"""输入信息：%s
+    'adversarial-doubt-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "zero-shot-IcL":"""Answer questions about the Effect of the Treatment on the Treated (ETT). Computing the Effect of the Treatment on the Treated  involves focusing solely on the individuals who actually received the treatment. You compare their observed outcomes with what their outcomes would have been had they not received the treatment. 
+    'zero-shot-IcL':
+    """Answer questions about the Effect of the Treatment on the Treated (ETT). Computing the Effect of the Treatment on the Treated  involves focusing solely on the individuals who actually received the treatment. You compare their observed outcomes with what their outcomes would have been had they not received the treatment.
 Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "zero-shot-IcL-CN":"""回答有关 "治疗对受试者的影响"（ETT）的问题。计算治疗对受试者的影响时，只需关注实际接受治疗的个体。将观察到的结果与未接受治疗时的结果进行比较。
+    'zero-shot-IcL-CN':
+    """回答有关 "治疗对受试者的影响"（ETT）的问题。计算治疗对受试者的影响时，只需关注实际接受治疗的个体。将观察到的结果与未接受治疗时的结果进行比较。
 输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "one-shot-IcL":"""Answer questions about the Effect of the Treatment on the Treated (ETT). Computing the Effect of the Treatment on the Treated  involves focusing solely on the individuals who actually received the treatment. You compare their observed outcomes with what their outcomes would have been had they not received the treatment. 
+    'one-shot-IcL':
+    """Answer questions about the Effect of the Treatment on the Treated (ETT). Computing the Effect of the Treatment on the Treated  involves focusing solely on the individuals who actually received the treatment. You compare their observed outcomes with what their outcomes would have been had they not received the treatment.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Smku has a direct effect on eons. Smku has a direct effect on pgqh. Arbu has a direct effect on eons. Eons has a direct effect on pgqh.
-For those with arbu being low, the probability of eons being high is 0.2617. For those with arbu being high, the probability of eons being high is 0.0291. 
+For those with arbu being low, the probability of eons being high is 0.2617. For those with arbu being high, the probability of eons being high is 0.0291.
 Instruction: Consider the effect of treatment on the treated (ETT) of arbu on eons.
 Question: For those with arbu being low, if their arbu had been high, would the eons have been more likely to be high?
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}: {"ANSWER": "No", "PROB": "0.2326"}
@@ -53,7 +64,8 @@ Input Info: %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "one-shot-IcL-CN":"""回答有关 "治疗对受试者的影响"（ETT）的问题。计算治疗对受试者的影响时，只需关注实际接受治疗的个体。将观察到的结果与未接受治疗时的结果进行比较。
+    'one-shot-IcL-CN':
+    """回答有关 "治疗对受试者的影响"（ETT）的问题。计算治疗对受试者的影响时，只需关注实际接受治疗的个体。将观察到的结果与未接受治疗时的结果进行比较。
 
 输入信息：设想一个只有以下条件，而没有其他因素或因果关系的假设世界：Smku对eons有直接影响。Smku对pgqh有直接影响。Arbu对eons有直接影响。Eons对pgqh有直接影响。
 在arbu为低的条件下, eons为高的概率为0.2617。在arbu为高的条件下, eons为高的概率为0.0291。
@@ -66,10 +78,11 @@ Provide the calculation result to four decimal places and a final "yes" or "no" 
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               "three-shot-IcL":"""Answer questions about the Effect of the Treatment on the Treated (ETT). Computing the Effect of the Treatment on the Treated  involves focusing solely on the individuals who actually received the treatment. You compare their observed outcomes with what their outcomes would have been had they not received the treatment. 
+    'three-shot-IcL':
+    """Answer questions about the Effect of the Treatment on the Treated (ETT). Computing the Effect of the Treatment on the Treated  involves focusing solely on the individuals who actually received the treatment. You compare their observed outcomes with what their outcomes would have been had they not received the treatment.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Smku has a direct effect on eons. Smku has a direct effect on pgqh. Arbu has a direct effect on eons. Eons has a direct effect on pgqh.
-For those with arbu being low, the probability of eons being high is 0.2617. For those with arbu being high, the probability of eons being high is 0.0291. 
+For those with arbu being low, the probability of eons being high is 0.2617. For those with arbu being high, the probability of eons being high is 0.0291.
 Instruction: Consider the effect of treatment on the treated (ETT) of arbu on eons.
 Question: For those with arbu being low, if their arbu had been high, would the eons have been more likely to be high?
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}: {"ANSWER": "No", "PROB": "0.2326"}
@@ -81,7 +94,7 @@ Question: For those with air pressure being high, if their air pressure had been
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}: {"ANSWER": "No", "PROB": "0.0000"}
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Weather conditions has a direct effect on temperature. Weather conditions has a direct effect on humidity. Temperature has a direct effect on humidity. Temperature has a direct effect on precipitation.
-For those with weather conditions being good, the probability of humidity being low is 0.8897. For those with weather conditions being bad, the probability of humidity being low is 0.7378. 
+For those with weather conditions being good, the probability of humidity being low is 0.8897. For those with weather conditions being bad, the probability of humidity being low is 0.7378.
 Instruction: Consider the effect of treatment on the treated (ETT) of weather conditions on humidity.
 Question: For those with weather conditions being good, if their weather conditions had been bad, would the humidity have been more likely to be low?
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}: {"ANSWER": "No", "PROB": "0.1519"}
@@ -91,19 +104,20 @@ Input Info: %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-               "zero-shot-CoT":"""Input Info: %s
+    'zero-shot-CoT':
+    """Input Info: %s
 %s
 Instruction: %s
 Question: %s Let's think step by step.
-Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:"""
-,
-               "zero-shot-CoT-CN":"""输入信息：%s
+Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
+    'zero-shot-CoT-CN':
+    """输入信息：%s
 %s
 指令：%s
 问题：%s请逐步思考。
-请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}："""
-,
-               "manual-CoT":"""Here are three examples for math problems about effect of treatment on the treated (ETT) task with chain of thought.
+请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
+    'manual-CoT':
+    """Here are three examples for math problems about effect of treatment on the treated (ETT) task with chain of thought.
 
 Input Info: Imagine a self-contained, hypothetical world with only the following conditions, and without any unmentioned factors or causal relationships: Exxp has a direct effect on hnzi. Hnzi has a direct effect on mlhx. Ovlq has a direct effect on hnzi. Wtel has a direct effect on mlhx.
 For those with ovlq being low, the probability of hnzi being low is 0.5625. For those with ovlq being high, the probability of hnzi being low is 0.5062.
@@ -127,9 +141,9 @@ Input Info: %s
 %s
 Instruction: %s
 Question: %s
-Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:"""
-,
-               "manual-CoT-CN":"""如下为一个使用思维链进行推理的关于“对被干预者的干预效果”(effect of treatment on the treated, ETT)任务的数学问题：
+Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
+    'manual-CoT-CN':
+    """如下为一个使用思维链进行推理的关于“对被干预者的干预效果”(effect of treatment on the treated, ETT)任务的数学问题：
 
 输入信息：设想一个只有以下条件，而没有其他因素或因果关系的假设世界：工作生活平衡水平对收入水平有直接影响。工作生活平衡水平对天赋水平有直接影响。工作生活平衡水平对政府政策有直接影响。收入水平对天赋水平有直接影响。天赋水平对政府政策有直接影响。
 在工作生活平衡水平为高的条件下, 政府政策为高的概率为0.1633。在工作生活平衡水平为低的条件下, 政府政策为高的概率为0.5540。
@@ -141,23 +155,28 @@ Provide the calculation result to four decimal places and a final "yes" or "no" 
 %s
 指令：%s
 问题：%s
-请根据上述信息，给出计算结果（答案保留四位小数）。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}："""
-,
-                "explicit-function":"""You are a helpful assistant for math probability.
+请根据上述信息，给出计算结果（答案保留四位小数）。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
+    'explicit-function':
+    """You are a helpful assistant for math probability.
 Input Info: %s
 %s
 Instruction: %s
 Question: %s
 Provide the calculation result to four decimal places and a final "yes" or "no" answer in JSON format, like {"ANSWER": "Yes", "PROB": "0.1234"}:""",
-                "explicit-function-CN":"""你是一个用于计算数学概率的得力助手。
+    'explicit-function-CN':
+    """你是一个用于计算数学概率的得力助手。
 输入信息：%s
 %s
 指令：%s
 问题：%s
 请根据上述信息，给出计算结果（答案保留四位小数），并给出最终答案“是“或”否“。请以JSON格式返回最终结果，例如，{"ANSWER":"是","PROB":"0.1234"}：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
-    
-        prompt = prompt_style_str + base % (item["given_info"], item["Background"]["data_info"],item["Instruction"],item["Question"])
-        return prompt
+}
+
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['given_info'],
+                                        item['Background']['data_info'],
+                                        item['Instruction'], item['Question'])
+    return prompt

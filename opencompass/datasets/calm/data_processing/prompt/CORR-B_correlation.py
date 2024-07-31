@@ -1,30 +1,32 @@
-base_prompt_dict = {"basic":"""Input Info: %s
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "basic-CN":"""输入信息：%s
+    'basic-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "adversarial-ignore":"""Input Info: %s
+    'adversarial-ignore': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "adversarial-ignore-CN":"""输入信息：%s
+    'adversarial-ignore-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-                "adversarial-doubt":"""Input Info: %s
+    'adversarial-doubt': """Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "adversarial-doubt-CN":"""输入信息：%s
+    'adversarial-doubt-CN': """输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-IcL":"""Answer questions about correlation.
+    'zero-shot-IcL': """Answer questions about correlation.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "zero-shot-IcL-CN":"""回答有关相关性的问题。
+    'zero-shot-IcL-CN': """回答有关相关性的问题。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "one-shot-IcL":"""Answer questions about correlation.
+    'one-shot-IcL': """Answer questions about correlation.
 Input Info: The overall probability of alarm set by husband is 0.74. The probability of alarm not set by husband and ringing alarm is 0.09. The probability of alarm set by husband and ringing alarm is 0.51.
 Question: Is the chance of ringing alarm smaller when observing alarm set by husband?
 Answer (Yes or No ?): No.
@@ -32,7 +34,7 @@ Answer (Yes or No ?): No.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "one-shot-IcL-CN":"""回答有关相关性的问题。
+    'one-shot-IcL-CN': """回答有关相关性的问题。
 输入信息：丈夫设置闹钟的总体概率为74%%，丈夫未设置闹钟而闹钟响起的概率为9%%，丈夫设置闹钟且闹钟响起的概率为51%%。
 问题：观察到丈夫设置闹钟是否会降低闹钟响铃的概率？
 答案（是或否？）：否
@@ -40,7 +42,7 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "three-shot-IcL":"""Answer questions about correlation.
+    'three-shot-IcL': """Answer questions about correlation.
 Input Info: The overall probability of alarm set by husband is 0.74. The probability of alarm not set by husband and ringing alarm is 0.09. The probability of alarm set by husband and ringing alarm is 0.51.
 Question: Is the chance of ringing alarm smaller when observing alarm set by husband?
 Answer (Yes or No ?): No.
@@ -56,7 +58,7 @@ Answer (Yes or No ?): yes
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "three-shot-IcL-CN":"""回答有关相关性的问题。
+    'three-shot-IcL-CN': """回答有关相关性的问题。
 输入信息：丈夫设置闹钟的总体概率为74%%，丈夫未设置闹钟而闹钟响起的概率为9%%，丈夫设置闹钟且闹钟响起的概率为51%%。
 问题：观察到丈夫设置闹钟是否会降低闹钟响铃的概率？
 答案（是或否？）：否
@@ -72,15 +74,14 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               "zero-shot-CoT":"""Input Info: %s
+    'zero-shot-CoT': """Input Info: %s
 Question: %s Let's think step by step.
-Answer (Yes or No ?):"""
-,
-               "zero-shot-CoT-CN":"""输入信息：%s
+Answer (Yes or No ?):""",
+    'zero-shot-CoT-CN': """输入信息：%s
 问题：%s 请逐步思考。
-答案（是或否？）："""
-,
-               "manual-CoT":"""Here are three examples of problems about considering correlation with chain of thought.
+答案（是或否？）：""",
+    'manual-CoT':
+    """Here are three examples of problems about considering correlation with chain of thought.
 
 Input Info: The overall probability of encouragement is 13%%. The probability of discouragement and high exam score is 24%%. The probability of encouragement and high exam score is 9%%.
 Question: Is the chance of high exam score larger when observing encouragement?
@@ -97,7 +98,7 @@ Answer (Yes or No ?): Let V2 = residency status; X = gender; V3 = department com
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-               "manual-CoT-CN":"""如下为三个使用思维链进行推理的有关统计关联程度的问题：
+    'manual-CoT-CN': """如下为三个使用思维链进行推理的有关统计关联程度的问题：
 
 输入信息：丈夫设置闹钟的总体概率为86%%，丈夫未设置闹钟而闹钟响起的概率为7%%，丈夫设置闹钟且闹钟响起的概率为71%%。
 问题：观察到丈夫设置闹钟是否会增加闹钟响铃的概率？
@@ -114,17 +115,20 @@ Answer (Yes or No ?):""",
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-                "explicit-function":"""You are a helpful assistant for identifying correlation.
+    'explicit-function':
+    """You are a helpful assistant for identifying correlation.
 Input Info: %s
 Question: %s
 Answer (Yes or No ?):""",
-                "explicit-function-CN":"""你是一个识别相关关系的得力助手。
+    'explicit-function-CN': """你是一个识别相关关系的得力助手。
 输入信息：%s
 问题：%s
 答案（是或否？）：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
+}
 
-        prompt = prompt_style_str + base % (item["given_info"], item["question"])
-        return prompt
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+
+    prompt = prompt_style_str + base % (item['given_info'], item['question'])
+    return prompt

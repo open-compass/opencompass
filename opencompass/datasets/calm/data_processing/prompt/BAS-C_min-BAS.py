@@ -1,40 +1,49 @@
-base_prompt_dict = {"basic":"""You will be presented with a causal graph in the following form: %s.
+# flake8: noqa: E501
+base_prompt_dict = {
+    'basic':
+    """You will be presented with a causal graph in the following form: %s.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (%s, %s) in the above causal graph?
 Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "basic-CN":"""给定如下因果图：%s。
+    'basic-CN':
+    """给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，满足后门准则的最小变量集是哪个？
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）：""" ,
-               "adversarial-ignore":"""You will be presented with a causal graph in the following form: %s.
+答案（选项一或选项二或选项三？）：""",
+    'adversarial-ignore':
+    """You will be presented with a causal graph in the following form: %s.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (%s, %s) in the above causal graph?
 Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "adversarial-ignore-CN":"""给定如下因果图：%s。
+    'adversarial-ignore-CN':
+    """给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，满足后门准则的最小变量集是哪个？
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）：""" ,
-                "adversarial-doubt":"""You will be presented with a causal graph in the following form: %s.
+答案（选项一或选项二或选项三？）：""",
+    'adversarial-doubt':
+    """You will be presented with a causal graph in the following form: %s.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (%s, %s) in the above causal graph?
 Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-                "adversarial-doubt-CN":"""给定如下因果图：%s。
+    'adversarial-doubt-CN':
+    """给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，满足后门准则的最小变量集是哪个？
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）：""" ,
-               "zero-shot-IcL":"""Objective:
+答案（选项一或选项二或选项三？）：""",
+    'zero-shot-IcL':
+    """Objective:
 Given a causal graph with specified relationships between variables, your task is to identify the set of variables that satisfy the back-door criterion relative to an ordered pair of variables (X, Y) in that graph.
 Background Information:
 The back-door criterion is defined as follows:
@@ -53,7 +62,8 @@ Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "zero-shot-IcL-CN":"""给定一个具有指定变量间关系的因果图，你的任务是找出相对于该图中有序的一对变量（X，Y），满足后门标准的一组变量。
+    'zero-shot-IcL-CN':
+    """给定一个具有指定变量间关系的因果图，你的任务是找出相对于该图中有序的一对变量（X，Y），满足后门标准的一组变量。
 背景信息：
 后门准则的定义如下：
 1. 变量集 Z 不能包含任何 X 的后代。
@@ -71,7 +81,8 @@ Answer (Option 1 or Option 2 or Option 3 ?):""",
 选项二：%s
 选项三：%s
 答案（选项一或选项二或选项三？）：""",
-               "one-shot-IcL":"""Objective:
+    'one-shot-IcL':
+    """Objective:
 Given a causal graph with specified relationships between variables, your task is to identify the set of variables that satisfy the back-door criterion relative to an ordered pair of variables (X, Y) in that graph.
 Background Information:
 The back-door criterion is defined as follows:
@@ -87,7 +98,7 @@ Output:
 Example:
 You will be presented with a causal graph in the following form: A causes D, A causes E, B causes E, C causes D, and D causes E.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (A, C) in the above causal graph?
-Option 1: 
+Option 1:
 Option 2: A
 Option 3: E
 Answer (Option 1 or Option 2 or Option 3 ?): Option 1
@@ -99,7 +110,8 @@ Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "one-shot-IcL-CN":"""给定一个具有指定变量间关系的因果图，你的任务是找出相对于该图中有序的一对变量（X，Y），满足后门标准的一组变量。
+    'one-shot-IcL-CN':
+    """给定一个具有指定变量间关系的因果图，你的任务是找出相对于该图中有序的一对变量（X，Y），满足后门标准的一组变量。
 背景信息：
 后门准则的定义如下：
 1. 变量集 Z 不能包含任何 X 的后代。
@@ -126,7 +138,8 @@ Answer (Option 1 or Option 2 or Option 3 ?):""",
 选项二：%s
 选项三：%s
 答案（选项一或选项二或选项三？）：""",
-               "three-shot-IcL":"""Objective:
+    'three-shot-IcL':
+    """Objective:
 Given a causal graph with specified relationships between variables, your task is to identify the set of variables that satisfy the back-door criterion relative to an ordered pair of variables (X, Y) in that graph.
 Background Information:
 The back-door criterion is defined as follows:
@@ -142,7 +155,7 @@ Output:
 Example:
 You will be presented with a causal graph in the following form: A causes D, A causes E, B causes E, C causes D, and D causes E.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (A, C) in the above causal graph?
-Option 1: 
+Option 1:
 Option 2: A
 Option 3: E
 Answer (Option 1 or Option 2 or Option 3 ?): Option 1
@@ -157,7 +170,7 @@ Answer (Option 1 or Option 2 or Option 3 ?): Option 3
 You will be presented with a causal graph in the following form: A causes C, A causes D, A causes E, B causes D, B causes E, C causes D, and D causes E.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (D, D) in the above causal graph?
 Option 1: B
-Option 2: 
+Option 2:
 Option 3: C
 Answer (Option 1 or Option 2 or Option 3 ?): Option 2
 
@@ -168,7 +181,8 @@ Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-               "three-shot-IcL-CN":"""给定一个具有指定变量间关系的因果图，你的任务是找出相对于该图中有序的一对变量（X，Y），满足后门标准的一组变量。
+    'three-shot-IcL-CN':
+    """给定一个具有指定变量间关系的因果图，你的任务是找出相对于该图中有序的一对变量（X，Y），满足后门标准的一组变量。
 背景信息：
 后门准则的定义如下：
 1. 变量集 Z 不能包含任何 X 的后代。
@@ -209,21 +223,22 @@ Answer (Option 1 or Option 2 or Option 3 ?):""",
 选项二：%s
 选项三：%s
 答案（选项一或选项二或选项三？）：""",
-               "zero-shot-CoT":"""You will be presented with a causal graph in the following form: %s.
+    'zero-shot-CoT':
+    """You will be presented with a causal graph in the following form: %s.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (%s, %s) in the above causal graph? Let's think step by step.
 Option 1: %s
 Option 2: %s
 Option 3: %s
-Answer (Option 1 or Option 2 or Option 3 ?):"""
-,
-               "zero-shot-CoT-CN":"""给定如下因果图：%s。
+Answer (Option 1 or Option 2 or Option 3 ?):""",
+    'zero-shot-CoT-CN':
+    """给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，满足后门准则的最小变量集是哪个？请逐步思考。
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）："""  
-,
-               "manual-CoT":"""Here are eight examples for problems about finding minimal backdoor adjustment set with chain of thought.
+答案（选项一或选项二或选项三？）：""",
+    'manual-CoT':
+    """Here are eight examples for problems about finding minimal backdoor adjustment set with chain of thought.
 
 You will be presented with a causal graph in the following form: A causes C, A causes D, B causes C, B causes D, and C causes E.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (B, E) in the above causal graph?
@@ -288,7 +303,8 @@ Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):
 """,
-               "manual-CoT-CN":"""如下为两个使用思维链进行推理的判断最小后门变量集合的示例，和一个需要回答的问题。
+    'manual-CoT-CN':
+    """如下为两个使用思维链进行推理的判断最小后门变量集合的示例，和一个需要回答的问题。
 
 给定如下因果图：A导致C, A导致D, B导致C, B导致D, 以及C导致E。
 问题：对于上述因果图中的有序变量对 (B, E)，满足后门准则的最小变量集是哪个？
@@ -309,23 +325,29 @@ Answer (Option 1 or Option 2 or Option 3 ?):
 选项一：%s
 选项二：%s
 选项三：%s
-答案（选项一或选项二或选项三？）："""     ,
-                "explicit-function":"""You are a helpful assistant for adjustment set analysis (back-door criterion).
+答案（选项一或选项二或选项三？）：""",
+    'explicit-function':
+    """You are a helpful assistant for adjustment set analysis (back-door criterion).
 You will be presented with a causal graph in the following form: %s.
 Question: Which is the minimal set of variables that satisfies the back-door criterion relative to an ordered pair of variables (%s, %s) in the above causal graph?
 Option 1: %s
 Option 2: %s
 Option 3: %s
 Answer (Option 1 or Option 2 or Option 3 ?):""",
-                "explicit-function-CN":"""你是一个用于调整集分析(后门准则)的得力助手。
+    'explicit-function-CN':
+    """你是一个用于调整集分析(后门准则)的得力助手。
 给定如下因果图：%s。
 问题：对于上述因果图中的有序变量对 (%s, %s)，满足后门准则的最小变量集是哪个？
 选项一：%s
 选项二：%s
 选项三：%s
 答案（选项一或选项二或选项三？）：""",
-               }
-def get_prompt(task_name, prompt_style, item, prompt_style_str=""):
-        base = base_prompt_dict[prompt_style]
-        prompt = prompt_style_str + base % (item["edges"], item["treatment"], item["outcome"], item["option1"], item["option2"], item["option3"])
-        return prompt
+}
+
+
+def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
+    base = base_prompt_dict[prompt_style]
+    prompt = prompt_style_str + base % (item['edges'], item['treatment'],
+                                        item['outcome'], item['option1'],
+                                        item['option2'], item['option3'])
+    return prompt
