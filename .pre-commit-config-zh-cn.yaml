@@ -90,6 +90,15 @@ repos:
         files: ^configs/datasets
   - repo: local
     hooks:
+    -   id: update-dataset-suffix
+        name: dataset suffix updater
+        entry: ./tools/update_dataset_suffix.py
+        language: script
+        pass_filenames: true
+        require_serial: true
+        files: ^opencompass/configs/datasets
+  - repo: local
+    hooks:
     -   id: compare-configs-datasets
         name: compare configs datasets
         entry: ./tools/compare_configs.py

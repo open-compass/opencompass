@@ -93,6 +93,17 @@ repos:
         files: ^configs/datasets
   - repo: local
     hooks:
+    -   id: update-dataset-suffix-package
+        name: dataset suffix updater(package)
+        entry: ./tools/update_dataset_suffix.py
+        language: script
+        pass_filenames: false
+        args:
+          - --root_folder
+          - opencompass/configs/datasets
+        files: \.py$
+  - repo: local
+    hooks:
     -   id: compare-configs-datasets
         name: compare configs datasets
         entry: ./tools/compare_configs.py

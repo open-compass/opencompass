@@ -307,16 +307,19 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        try:
-            enc = self.tiktoken.encoding_for_model(self.path
-                                                   or self.tokenizer_path)
+        if self.tokenizer_path:
+            try:
+                enc = self.tiktoken.encoding_for_model(self.tokenizer_path)
+                return len(enc.encode(prompt))
+            except Exception:
+                from transformers import AutoTokenizer
+                if self.hf_tokenizer is None:
+                    self.hf_tokenizer = AutoTokenizer.from_pretrained(
+                        self.tokenizer_path)
+                return len(self.hf_tokenizer(prompt).input_ids)
+        else:
+            enc = self.tiktoken.encoding_for_model(self.path)
             return len(enc.encode(prompt))
-        except Exception:
-            from transformers import AutoTokenizer
-            if self.hf_tokenizer is None:
-                self.hf_tokenizer = AutoTokenizer.from_pretrained(
-                    self.tokenizer_path)
-            return len(self.hf_tokenizer(prompt).input_ids)
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.
