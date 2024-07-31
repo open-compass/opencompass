@@ -127,6 +127,8 @@ repos:
         args:
           - configs/models
           - opencompass/configs/models
+          - --ignore
+          - configs/models/llama
   - repo: local
     hooks:
     -   id: compare-configs-summarizers

@@ -6,20 +6,28 @@ import os
 from mmengine.logging import MMLogger
 
 
-def get_files(folder, extensions):
+def get_files(folder, extensions, ignore_folder=[]):
     """Get all file paths in the folder with specified extensions."""
     files = []
     for root, dirs, files_in_dir in os.walk(folder):
         for file in files_in_dir:
             if any(file.endswith(ext) for ext in extensions):
                 files.append(os.path.relpath(os.path.join(root, file), folder))
+    ignore_folders = []
+    for folder in ignore_folder:
+        ignore_folders.append(os.path.relpath(folder))
+    # ignore the files starting with the folder in ignore_folder
+    for file in files:
+        for folder in ignore_folders:
+            if file.startswith(folder):
+                files.remove(file)
     return files
 
 
-def compare_folders(folder1, folder2, extensions):
+def compare_folders(folder1, folder2, extensions, ignore_folder):
     """Compare files with specified extensions in two folders."""
     logger = MMLogger.get_current_instance()
-    files1 = set(get_files(folder1, extensions))
+    files1 = set(get_files(folder1, extensions, ignore_folder))
     files2 = set(get_files(folder2, extensions))
 
     # Check for files that are only in one folder
@@ -54,10 +62,13 @@ def main():
         nargs='+',
         default=['.py', '.json', '.md', '.yml', '.txt'],
         help='File extensions to compare (default: .py .json .md .yml .txt)')
-
+    parser.add_argument('--ignore',
+                        nargs='+',
+                        default=[],
+                        help='Folder of ignored case')
     args = parser.parse_args()
 
-    compare_folders(args.folder1, args.folder2, args.extensions)
+    compare_folders(args.folder1, args.folder2, args.extensions, args.ignore)
 
 
 if __name__ == '__main__':
