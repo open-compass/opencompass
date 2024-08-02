@@ -18,10 +18,14 @@ from .base import BaseDataset
 class SciCodeDataset(BaseDataset):
 
     @staticmethod
-    def load(path, **kwargs):
+    def load(path, with_bg, **kwargs):
         test_data = []
 
-        file_path = osp.join(path, 'SciCode_datasets.json')
+        if with_bg:  # test with background
+            file_path = osp.join(path, 'SciCode_datasets_with_background.json')
+        else:  # test w/o background
+            file_path = osp.join(path, 'SciCode_datasets.json')
+
         with open(file_path, 'r', encoding='utf-8') as file:
             test_data = json.load(file)
 
@@ -128,10 +132,14 @@ def process_hdf5_to_tuple(step_id, test_num):
 @ICL_EVALUATORS.register_module()
 class SciCodeEvaluator(BaseEvaluator):
 
-    def __init__(self, dataset_path, testcode_path='./tmp/SciCode'):
+    def __init__(self, dataset_path, with_bg, testcode_path='./tmp/SciCode'):
         super().__init__()
         test_data = []
-        file_path = osp.join(dataset_path, 'SciCode_datasets.json')
+        if with_bg:  # test with background
+            file_path = osp.join(dataset_path,
+                                 'SciCode_datasets_with_background.json')
+        else:  # test w/o background
+            file_path = osp.join(dataset_path, 'SciCode_datasets.json')
         with open(file_path, 'r', encoding='utf-8') as file:
             test_data = json.load(file)
         self.dataset = Dataset.from_list(test_data)
