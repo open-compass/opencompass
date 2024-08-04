@@ -258,6 +258,14 @@ DATASETS_MAPPING = {
     }
 }
 
+DATASET_URL = {
+    './data/mmlu/': {
+        'url':
+        'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip',
+        'md5': '761310671509a239e41c4b717f7fab9c',
+    }
+}
+
 
 def get_data_path(dataset_id: str, local_mode: bool = False):
     """return dataset id when getting data from ModelScope repo, otherwise just
