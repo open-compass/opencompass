@@ -257,7 +257,7 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
-    './data/mmlu/': {
+    'mmlu': {
         'url':
         'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip',
         'md5': '761310671509a239e41c4b717f7fab9c',
