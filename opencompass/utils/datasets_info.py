@@ -257,9 +257,89 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
-    'mmlu': {
+    '/mmlu/': {
         'url':
         'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip',
         'md5': '761310671509a239e41c4b717f7fab9c',
-    }
+    },
+    '/gpqa/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gpqa.zip',
+        'md5': '2e9657959030a765916f1f2aca29140d'
+    },
+    '/CHARM/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/CHARM.zip',
+        'md5': 'fdf51e955d1b8e0bb35bc1997eaf37cb'
+    },
+    '/ifeval/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ifeval.zip',
+        'md5': '64d98b6f36b42e7390c9cef76cace75f'
+    },
+    '/mbpp/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp.zip',
+        'md5': '777739c90f04bce44096a5bc96c8f9e5'
+    },
+    '/cmmlu/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmmlu.zip',
+        'md5': 'a59f4003d6918509a719ce3bc2a5d5bc'
+    },
+    '/math/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/math.zip',
+        'md5': '8b1b897259684672055e6fd4fc07c808'
+    },
+    '/hellaswag/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hellaswag.zip',
+        'md5': '2b700a02ffb58571c7df8d8d0619256f'
+    },
+    '/BBH/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/BBH.zip',
+        'md5': '60c49f9bef5148aa7e1941328e96a554'
+    },
+    '/mmlu/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip', 
+        'md5': '761310671509a239e41c4b717f7fab9c'
+    },
+    '/compass_arena/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/compass_arena.zip', 
+        'md5': 'cd59b54a179d16f2a858b359b60588f6'
+    },
+    '/TheoremQA/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/TheoremQA.zip',
+        'md5': 'f2793b07bc26510d507aa710d9bd8622'
+    },
+    '/mathbench_v1/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mathbench_v1.zip',
+        'md5': '50257a910ca43d1f61a610a79fdb16b5'
+    },
+    '/gsm8k/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gsm8k.zip',
+        'md5': '901e5dc93a2889789a469da9850cdca8'
+    },
+    '/LCBench2023/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/LCBench2023.zip',
+        'md5': 'e1a38c94a42ad1809e9e0650476a9306'
+    },
+    '/humaneval/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/humaneval.zip',
+        'md5':'88b1b89dc47b7121c81da6bcd85a69c3'
+    },
+    '/drop_simple_eval/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/drop_simple_eval.zip',
+        'md5': 'c912afe5b4a63509851cf16e6b91830e'
+    },
+    'subjective/alignment_bench/': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/alignment_bench.zip',
+        'md5': 'd8ae9a0398526479dbbcdb80fafabceb'
+    },
+    'subjective/alpaca_eval': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/alpaca_eval.zip',
+        'md5': 'd7399d63cb46c82f089447160ef49b6a'
+    },
+    'subjective/arena_hard': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/arena_hard.zip',
+        'md5': '02cd09a482cb0f0cd9d2c2afe7a1697f'
+    },
+    'subjective/mtbench': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mtbench.zip',
+        'md5': 'd1afc0787aeac7f1f24872742e161069'
+    },
 }

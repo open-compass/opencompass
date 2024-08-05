@@ -3,6 +3,9 @@ from .fileio import download_and_extract_archive
 from .datasets_info import DATASETS_MAPPING, DATASETS_URL
 from .logging import get_logger
 
+USER_HOME = os.path.expanduser("~")
+DEFAULT_DATA_FOLDER = os.path.join(USER_HOME, '.cache/opencompass/')
+
 
 def get_data_path(dataset_id: str, local_mode: bool = False):
     """return dataset id when getting data from ModelScope repo, otherwise just
@@ -23,8 +26,10 @@ def get_data_path(dataset_id: str, local_mode: bool = False):
     # For relative path, with CACHE_DIR
     if local_mode:
         local_path = os.path.join(cache_dir, dataset_id)
-        assert os.path.exists(local_path), f'{local_path} does not exist!'
-        return local_path
+        if not os.path.exists(local_path):
+            return download_dataset(local_path, cache_dir)
+        else:
+            return local_path
 
     dataset_source = os.environ.get('DATASET_SOURCE', None)
     if dataset_source == 'ModelScope':
@@ -44,17 +49,36 @@ def get_data_path(dataset_id: str, local_mode: bool = False):
         local_path = os.path.join(cache_dir, local_path)
         
         if not os.path.exists(local_path):
-            get_logger().info(f'{local_path} does not exist!'
-                            'Start Download data automatically!'
-                            'If you have downloaded the data before,'
-                            'You can specific `COMPASS_DATA_CACHE` '
-                            'to avoid downloading~')
-            download_dataset()
+            return download_dataset(local_path, cache_dir)
         else:
             return local_path
 
-def download_dataset(data_path, cache_dir, remove_finished=True):
 
+def download_dataset(data_path, cache_dir, remove_finished=True):
+    get_logger().info(f'{data_path} does not exist!'
+                    'Start Download data automatically!'
+                    'If you have downloaded the data before,'
+                    'You can specific `COMPASS_DATA_CACHE` '
+                    'to avoid downloading~')
+    # Try to load from default cache folder
+    try_default_path = os.path.join(DEFAULT_DATA_FOLDER, data_path)
+    if os.path.exists(try_default_path):
+        get_logger().info(f"Try to load the data from {try_default_path}")
+        return try_default_path
+
+    # Cannot find data from default cache folder, download data.
+    # Update DATASET_URL for internal dataset
+    try:
+        import json
+        internal_datasets = '.OPENCOMPASS_INTERNAL_DATA_URL.json'
+        file_path = os.path.join(USER_HOME, internal_datasets)
+        assert os.path.exists(file_path), f"{file_path} not exits"
+        with open(file_path, 'r') as f:
+            internal_datasets_info = json.load(f)
+        DATASETS_URL.update(internal_datasets_info)
+        get_logger().info("Load internal dataset from: {file_path}")
+    except Exception as e:  # noqa
+        pass
 
     valid_data_names = list(DATASETS_URL.keys())
     dataset_name = ''
@@ -66,13 +90,14 @@ def download_dataset(data_path, cache_dir, remove_finished=True):
     dataset_info = DATASETS_URL[dataset_name]
     dataset_url = dataset_info['url']
     dataset_md5 = dataset_info['md5']
-    cache_dir = cache_dir if cache_dir else "~/.cache/opencompass/data"
+    cache_dir = cache_dir if cache_dir else DEFAULT_DATA_FOLDER
 
     # download and extract files
     download_and_extract_archive(
         url=dataset_url, 
-        download_root=cache_dir,
+        download_root=os.path.join(cache_dir, 'data'),
         md5=dataset_md5,
         remove_finished=remove_finished
     )
-
+    
+    return os.path.join(cache_dir, data_path)

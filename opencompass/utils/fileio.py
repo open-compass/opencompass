@@ -285,8 +285,6 @@ def download_url(url, root, filename=None, md5=None):
     if not filename:
         filename = os.path.basename(url)
     fpath = os.path.join(root, filename)
-    import pdb
-    pdb.set_trace()
     os.makedirs(root, exist_ok=True)
 
     if check_integrity(fpath, md5):
