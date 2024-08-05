@@ -160,9 +160,6 @@ class OpenAI(BaseAPIModel):
         """
         assert isinstance(input, (str, PromptList))
 
-        print(f'>> new _generate input type: {type(input)}')
-        print(f'>>new  _generate input len: {len(input)}')
-
         # max num token for gpt-3.5-turbo is 4097
         context_window = 4096
         if '32k' in self.path:
