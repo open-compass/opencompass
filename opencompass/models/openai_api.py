@@ -265,10 +265,6 @@ class OpenAI(BaseAPIModel):
                         temperature=temperature,
                     )
 
-                print(f'\n>>url: {self.url}')
-                print(f'>>header: {header}')
-                print(f'>>data: {json.dumps(data, ensure_ascii=False)} \n')
-
                 def remove_none_val(input_d: dict):
                     return {k: v for k, v in input_d.items() if v is not None}
                 data = remove_none_val(data)
@@ -282,7 +278,7 @@ class OpenAI(BaseAPIModel):
                 continue
             try:
                 response = raw_response.json()
-                print(f'>> raw_resp: {raw_response.json()}')
+                # print(f'>> raw_resp: {raw_response.json()}')
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
