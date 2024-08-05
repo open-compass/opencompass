@@ -311,11 +311,15 @@ class OpenAI(BaseAPIModel):
             try:
                 enc = self.tiktoken.encoding_for_model(self.tokenizer_path)
                 return len(enc.encode(prompt))
-            except Exception:
+            except Exception as e:
+                self.logger.warn(f'{e}, tiktoken encoding cannot load '
+                                 '{self.tokenizer_path}')
                 from transformers import AutoTokenizer
                 if self.hf_tokenizer is None:
                     self.hf_tokenizer = AutoTokenizer.from_pretrained(
-                        self.tokenizer_path)
+                        self.tokenizer_path, trust_remote_code=True)
+                    self.logger.infer(
+                        f'Tokenizer is loaded from {self.tokenizer_path}')
                 return len(self.hf_tokenizer(prompt).input_ids)
         else:
             enc = self.tiktoken.encoding_for_model(self.path)
@@ -424,14 +428,14 @@ class OpenAISDK(OpenAI):
                 messages.append(msg)
 
         # Hold out 100 tokens due to potential errors in tiktoken calculation
-        try:
-            max_out_len = min(
-                max_out_len,
-                context_window - self.get_token_len(str(input)) - 100)
-        except KeyError:
-            max_out_len = max_out_len
-        if max_out_len <= 0:
-            return ''
+        # try:
+        #     max_out_len = min(
+        #         max_out_len,
+        #         context_window - self.get_token_len(str(input)) - 100)
+        # except KeyError:
+        #     max_out_len = max_out_len
+        # if max_out_len <= 0:
+        #     return ''
 
         num_retries = 0
         while num_retries < self.retry:
