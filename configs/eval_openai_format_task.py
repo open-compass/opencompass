@@ -1,4 +1,4 @@
-# Copyright (c) Alibaba, Inc. and its affiliates.
+
 from mmengine.config import read_base
 from opencompass.models import OpenAI
 from opencompass.partitioners import NaivePartitioner
