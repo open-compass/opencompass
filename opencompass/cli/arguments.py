@@ -46,6 +46,7 @@ class Arguments:
     tokenizer_kwargs: Optional[dict] = field(default_factory=dict)
     tokenizer_path: str = None
     work_dir: str = 'outputs/default'
+    dump_extract_rate: bool = False
 
     # refer to: test_range in `opencompass.openicl.icl_dataset_reader.DatasetReader`
     limit: Optional[Union[int, float, str]] = None
