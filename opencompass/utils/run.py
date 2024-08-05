@@ -86,6 +86,7 @@ def get_config_from_arg(args) -> Config:
     3. Huggingface parameter groups and args.datasets
     """
     logger = get_logger()
+
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)

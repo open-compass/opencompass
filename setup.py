@@ -1,5 +1,9 @@
+import os
 from setuptools import find_packages, setup
 from setuptools.command.install import install
+
+
+VERSION_FILE = os.path.abspath('opencompass/__init__.py')
 
 
 class DownloadNLTK(install):
@@ -96,29 +100,78 @@ def parse_requirements(fname='requirements.txt', with_version=True):
 
 
 def get_version():
-    version_file = 'opencompass/__init__.py'
-    with open(version_file, 'r', encoding='utf-8') as f:
-        exec(compile(f.read(), version_file, 'exec'))
+    # version_file = 'opencompass/__init__.py'
+    with open(VERSION_FILE, 'r', encoding='utf-8') as f:
+        exec(compile(f.read(), VERSION_FILE, 'exec'))
     return locals()['__version__']
 
 
+def pack_resource():
+    import shutil
+    # pack resource such as configs and tools
+    root_dir = 'package/'
+    if os.path.isdir(root_dir):
+        shutil.rmtree(root_dir)
+    os.makedirs(root_dir)
+
+    requirements_dir = os.path.join(root_dir, 'requirements')
+    os.makedirs(requirements_dir, exist_ok=True)
+
+    proj_dir = root_dir + 'opencompass/'
+    shutil.copytree('opencompass', proj_dir)
+
+    configs_dir = os.path.join(root_dir, 'opencompass/configs')
+    shutil.copytree('configs', configs_dir)
+
+    shutil.copy('requirements/agent.txt', os.path.join(requirements_dir, 'agent.txt'))
+    shutil.copy('requirements/api.txt', os.path.join(requirements_dir, 'api.txt'))
+    shutil.copy('requirements/docs.txt', os.path.join(requirements_dir, 'docs.txt'))
+    shutil.copy('requirements/extra.txt', os.path.join(requirements_dir, 'extra.txt'))
+    shutil.copy('requirements/runtime.txt', os.path.join(requirements_dir, 'runtime.txt'))
+    shutil.copy('./README.md', os.path.join(root_dir, 'README.md'))
+    shutil.copy('./README_zh-CN.md', os.path.join(root_dir, 'README_zh-CN.md'))
+
+
 def do_setup():
+    print('Usage: python3 setup.py bdist_wheel')
+
+    # TODO: pip install -e .  issue with `opencompass.configs.xxx` import
+    pack_resource()
+    os.chdir('package')
+
     setup(
-        name='opencompass',
+        name='ms-opencompass',      # ModelScope-OpenCompass Version
         author='OpenCompass Contributors',
         version=get_version(),
-        description='A comprehensive toolkit for large model evaluation',
-        url='https://github.com/open-compass/opencompass',
+        description='A lightweight toolkit for evaluating LLMs based on OpenCompass.',
+        # url='https://github.com/open-compass/opencompass',
+        url='https://github.com/wangxingjun778/opencompass',
+        include_package_data=True,
+        # package_data={'opencompass': ['configs/*.py',
+        #                               'configs/datasets/**/*',
+        #                               'configs/datasets/bbh/lib_prompt/*.txt',
+        #                               'configs/datasets/scibench/lib_prompt/*.txt',
+        #                               ]
+        #               },
+        package_data={
+            '': ['*.txt'],
+        },
         long_description=readme(),
         long_description_content_type='text/markdown',
-        maintainer='OpenCompass Authors',
+        maintainer='OpenCompass Authors, ModelScope Contributors',
         cmdclass={'download_nltk': DownloadNLTK},
         setup_requires=['nltk==3.8'],
         python_requires='>=3.8.0',
         install_requires=parse_requirements('requirements/runtime.txt'),
         license='Apache License 2.0',
-        include_package_data=True,
-        packages=find_packages(),
+        packages=find_packages(exclude=[
+            'test*',
+            # 'configs',
+            'data',
+            'docs',
+            'tools',
+            'tmp',
+        ]),
         keywords=[
             'AI', 'NLP', 'in-context learning', 'large language model',
             'evaluation', 'benchmark', 'llm'

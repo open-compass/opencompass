@@ -238,6 +238,14 @@ class HuggingFace(BaseModel):
         """
         generation_kwargs = kwargs.copy()
         generation_kwargs.update(self.generation_kwargs)
+
+        # TODO: BY JASON ONLY FOR TEST!
+        self.logger.info(f'>>> inputs: {inputs}')
+        self.logger.info(f'>>> max_out_len: {max_out_len}')
+        self.logger.info(f'>>> min_out_len: {min_out_len}')
+        self.logger.info(f'>>> stopping_criteria: {stopping_criteria}')
+        self.logger.info(f'>>> generation_kwargs: {generation_kwargs}')
+
         if self.batch_padding and len(inputs) > 1:
             return self._batch_generate(inputs=inputs,
                                         max_out_len=max_out_len,

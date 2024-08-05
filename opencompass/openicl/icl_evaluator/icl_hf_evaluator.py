@@ -1,6 +1,7 @@
 import os
 import random
 from typing import List
+import inspect
 
 import evaluate
 import numpy as np
@@ -75,8 +76,9 @@ class HuggingfaceEvaluator(BaseEvaluator):
                 f'len(references): {len(references)}'
             }
         # use codes pre-downloaded to opencompass repo, avoid downloading
-        local_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        local_path = os.path.join(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))),
                                   'hf_metrics', self.metric + '.py')
+
         if os.path.exists(local_path):
             metric = evaluate.load(local_path)
         else:

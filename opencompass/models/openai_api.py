@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -13,6 +14,7 @@ from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
+from opencompass.utils.clients import OpenAIClientUtil, XRequestConfig
 
 PromptType = Union[PromptList, str]
 OPENAI_API_BASE = 'https://api.openai.com/v1/chat/completions'
@@ -72,9 +74,11 @@ class OpenAI(BaseAPIModel):
                  mode: str = 'none',
                  logprobs: Optional[bool] = False,
                  top_logprobs: Optional[int] = None,
-                 temperature: Optional[float] = None,
+                 temperature: Optional[float] = 0.0,
                  tokenizer_path: Optional[str] = None,
-                 extra_body: Optional[Dict] = None):
+                 extra_body: Optional[Dict] = None,
+                 is_chat: bool = True,
+                 **kwargs):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -115,6 +119,7 @@ class OpenAI(BaseAPIModel):
         self.org_ctr = 0
         self.url = openai_api_base
         self.path = path
+        self.is_chat = is_chat
 
     def generate(self,
                  inputs: List[PromptType],
@@ -193,13 +198,13 @@ class OpenAI(BaseAPIModel):
                     msg['role'] = 'system'
                 messages.append(msg)
 
+        # Examples of messages:
+        #   [{'role': 'user', 'content': 'Say this is a test'}]
+        #   [{'role': 'system', 'content': 'You are a helpful assistant.'}, {'role': 'user', 'content': 'Hi, who are you?'}, {'role': 'assistant', 'content': 'I am AI assistant.'}]
+
         # Hold out 100 tokens due to potential errors in tiktoken calculation
-        try:
-            max_out_len = min(
-                max_out_len,
-                context_window - self.get_token_len(str(input)) - 100)
-        except KeyError:
-            max_out_len = max_out_len
+        max_out_len = min(
+            max_out_len, context_window - self.get_token_len(str(input)) - 100)
         if max_out_len <= 0:
             return ''
 
@@ -236,31 +241,48 @@ class OpenAI(BaseAPIModel):
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
             try:
-                data = dict(
-                    model=self.path,
-                    messages=messages,
-                    max_tokens=max_out_len,
-                    n=1,
-                    logprobs=self.logprobs,
-                    top_logprobs=self.top_logprobs,
-                    stop=None,
-                    temperature=temperature,
-                )
-                if self.extra_body:
-                    data.update(self.extra_body)
-                if isinstance(self.url, list):
-                    import random
-                    url = self.url[random.randint(0, len(self.url) - 1)]
+                if self.is_chat:
+                    data = dict(
+                        model=self.path,
+                        messages=messages,
+                        max_tokens=max_out_len,
+                        n=1,
+                        logprobs=self.logprobs,
+                        top_logprobs=self.top_logprobs,
+                        stop=None,
+                        temperature=temperature,
+                    )
                 else:
-                    url = self.url
-                raw_response = requests.post(url,
+                    # TODO: This is a temporary solution for non-chat models.
+                    input_prompts = []
+                    for msg in messages:
+                        input_prompts.append(msg['content'])
+
+                    data = dict(
+                        model=self.path,
+                        prompt='\n'.join(input_prompts),
+                        max_tokens=max_out_len,
+                        temperature=temperature,
+                    )
+
+                print(f'\n>>url: {self.url}')
+                print(f'>>header: {header}')
+                print(f'>>data: {json.dumps(data, ensure_ascii=False)} \n')
+
+                def remove_none_val(input_d: dict):
+                    return {k: v for k, v in input_d.items() if v is not None}
+                data = remove_none_val(data)
+
+                raw_response = requests.post(self.url,
                                              headers=header,
                                              data=json.dumps(data))
+
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')
                 continue
             try:
                 response = raw_response.json()
+                print(f'>> raw_resp: {raw_response.json()}')
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
@@ -270,7 +292,10 @@ class OpenAI(BaseAPIModel):
                 if self.logprobs:
                     return response['choices']
                 else:
-                    return response['choices'][0]['message']['content'].strip()
+                    if self.is_chat:
+                        return response['choices'][0]['message']['content'].strip()
+                    else:
+                        return response['choices'][0]['text'].strip()
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
@@ -449,3 +474,183 @@ class OpenAISDK(OpenAI):
             num_retries += 1
         raise RuntimeError('Calling OpenAI API failed after retrying for '
                            f'{self.retry} times. Check the logs for details.')
+
+
+@MODELS.register_module()
+class AsyncOpenAI(OpenAI):
+    """
+    Async version of OpenAI model.
+
+    Args:
+        path (str): The name of OpenAI's model.
+        max_seq_len (int): The maximum allowed sequence length of a model.
+            Note that the length of prompt + generated tokens shall not exceed
+            this value. Defaults to 2048.
+        query_per_second (int): The maximum queries allowed per second
+            between two consecutive calls of the API. Defaults to 1.
+        retry (int): Number of retires if the API call fails. Defaults to 2.
+        key (str or List[str]): OpenAI key(s). In particular, when it
+            is set to "ENV", the key will be fetched from the environment
+            variable $OPENAI_API_KEY, as how openai defaults to be. If it's a
+            list, the keys will be used in round-robin manner. Defaults to
+            'ENV'.
+        org (str or List[str], optional): OpenAI organization(s). If not
+            specified, OpenAI uses the default organization bound to each API
+            key. If specified, the orgs will be posted with each request in
+            round-robin manner. Defaults to None.
+        meta_template (Dict, optional): The model's meta prompt
+            template if needed, in case the requirement of injecting or
+            wrapping of any meta instructions.
+        openai_api_base (str): The base url of OpenAI's API. Defaults to
+            'https://api.openai.com/v1/chat/completions'.
+        mode (str, optional): The method of input truncation when input length
+            exceeds max_seq_len. 'front','mid' and 'rear' represents the part
+            of input to truncate. Defaults to 'none'.
+        temperature (float, optional): What sampling temperature to use.
+            If not None, will override the temperature in the `generate()`
+            call. Defaults to None.
+    """
+
+    def __init__(self, *args, **kwargs):
+
+        super(AsyncOpenAI, self).__init__(*args, **kwargs)
+
+    def generate(self,
+                 inputs: List[PromptType],
+                 max_out_len: int = 512,
+                 temperature: float = 0.7,
+                 **kwargs) -> List[str]:
+
+        results = []
+
+        if len(inputs) == 0:
+            self.logger.error('Got empty input list in generate()')
+            return results
+
+        if self.temperature is not None:
+            temperature = self.temperature
+
+        inputs_batch = []
+
+        for input_sample in inputs:
+
+            if isinstance(input_sample, str):
+                messages = [{'role': 'user', 'content': input_sample}]
+            else:
+                messages = []
+                for item in input_sample:
+                    msg = {'content': item['prompt']}
+                    if item['role'] == 'HUMAN':
+                        msg['role'] = 'user'
+                    elif item['role'] == 'BOT':
+                        msg['role'] = 'assistant'
+                    elif item['role'] == 'SYSTEM':
+                        msg['role'] = 'system'
+                    messages.append(msg)
+
+            inputs_batch.append(messages)
+
+        infer_config = dict(
+            temperature=temperature,
+            max_tokens=max_out_len,
+        )
+        self.logger.info(f'>>infer_config: {infer_config}')
+        self.logger.info(f'>>len of inputs_batch: {len(inputs_batch)}')
+
+        request_config = XRequestConfig(**infer_config)
+
+        resp_list = asyncio.run(
+            OpenAIClientUtil.call_openai_batched(
+                model_type=self.path,
+                messages_batch=inputs_batch,
+                request_config=request_config,
+                base_url=self.url,
+                is_chat=self.is_chat,
+            )
+        )
+
+        self.logger.info(f'>> resp_list len: {len(resp_list)}')
+        self.logger.info(f'>> resp_list[0]: {resp_list[0]}')
+
+        return resp_list
+
+    def get_token_len(self, prompt: str) -> int:
+        """Get lengths of the tokenized string. Only English and Chinese
+        characters are counted for now. Users are encouraged to override this
+        method if more accurate length is needed.
+
+        Args:
+            prompt (str): Input string.
+
+        Returns:
+            int: Length of the input tokens
+        """
+        english_parts = re.findall(r'[A-Za-z0-9]+', prompt)
+        chinese_parts = re.findall(r'[\u4e00-\u9FFF]+', prompt)
+
+        # Count English words
+        english_count = sum(len(part.split()) for part in english_parts)
+
+        # Count Chinese words
+        chinese_count = sum(len(part) for part in chinese_parts)
+
+        return english_count + chinese_count
+
+
+@MODELS.register_module()
+class OpenAIExtra(OpenAI):
+    """
+    Model wrapper around OpenAI's models with extra features.
+    Args:
+        path (str): The name of OpenAI's model.
+        max_seq_len (int): The maximum allowed sequence length of a model.
+            Note that the length of prompt + generated tokens shall not exceed
+            this value. Defaults to 2048.
+        query_per_second (int): The maximum queries allowed per second
+            between two consecutive calls of the API. Defaults to 1.
+        retry (int): Number of retires if the API call fails. Defaults to 2.
+        key (str or List[str]): OpenAI key(s). In particular, when it
+            is set to "ENV", the key will be fetched from the environment
+            variable $OPENAI_API_KEY, as how openai defaults to be. If it's a
+            list, the keys will be used in round-robin manner. Defaults to
+            'ENV'.
+        org (str or List[str], optional): OpenAI organization(s). If not
+            specified, OpenAI uses the default organization bound to each API
+            key. If specified, the orgs will be posted with each request in
+            round-robin manner. Defaults to None.
+        meta_template (Dict, optional): The model's meta prompt
+            template if needed, in case the requirement of injecting or
+            wrapping of any meta instructions.
+        openai_api_base (str): The base url of OpenAI's API. Defaults to
+            'https://api.openai.com/v1/chat/completions'.
+        mode (str, optional): The method of input truncation when input length
+            exceeds max_seq_len. 'front','mid' and 'rear' represents the part
+            of input to truncate. Defaults to 'none'.
+        temperature (float, optional): What sampling temperature to use.
+            If not None, will override the temperature in the `generate()`
+            call. Defaults to None.
+    """
+
+    def __init__(self, *args, **kwargs):
+
+        super(OpenAIExtra, self).__init__(*args, **kwargs)
+
+    def get_token_len(self, prompt: str) -> int:
+        """Get lengths of the tokenized string. Only English and Chinese
+        characters are counted for now. Users are encouraged to override this
+        method if more accurate length is needed.
+        Args:
+            prompt (str): Input string.
+        Returns:
+            int: Length of the input tokens
+        """
+        english_parts = re.findall(r'[A-Za-z0-9]+', prompt)
+        chinese_parts = re.findall(r'[\u4e00-\u9FFF]+', prompt)
+
+        # Count English words
+        english_count = sum(len(part.split()) for part in english_parts)
+
+        # Count Chinese words
+        chinese_count = sum(len(part) for part in chinese_parts)
+
+        return english_count + chinese_count
