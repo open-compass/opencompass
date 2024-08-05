@@ -15,7 +15,8 @@ exclude: |
       opencompass/configs/datasets/ |
       opencompass/configs/models/|
       opencompass/configs/summarizers/|
-      opencompass/utils/datasets.py
+      opencompass/utils/datasets.py |
+      opencompass/utils/datasets_info.py
     )
 repos:
   - repo: https://gitee.com/openmmlab/mirrors-flake8
