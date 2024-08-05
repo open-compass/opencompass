@@ -7,6 +7,7 @@ from typing import Optional
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .subjective_cmp import SubjectiveCmpDataset
 
@@ -15,6 +16,8 @@ class Config:
 
     def __init__(self, alignment_bench_config_path,
                  alignment_bench_config_name) -> None:
+        alignment_bench_config_path = get_data_path(
+            alignment_bench_config_path, local_mode=True)
         config_file_path = osp.join(alignment_bench_config_path,
                                     alignment_bench_config_name + '.json')
         with open(config_file_path, 'r') as config_file:

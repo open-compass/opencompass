@@ -16,7 +16,9 @@ exclude: |
       docs/zh_cn/advanced_guides/compassbench_v2_0.md |
       opencompass/configs/datasets/ |
       opencompass/configs/models/|
-      opencompass/configs/summarizers/
+      opencompass/configs/summarizers/ |
+      opencompass/utils/datasets.py |
+      opencompass/utils/datasets_info.py
     )
 repos:
   - repo: https://github.com/PyCQA/flake8

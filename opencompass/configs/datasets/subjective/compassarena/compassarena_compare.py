@@ -150,5 +150,5 @@ for _name, _prompt in sub_map.items():
             infer_order='double',
             base_models=gpt4,
             summarizer = dict(type=CompassArenaSummarizer, summary_type='half_add'),
-            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/alpaca_eval/gpt4-turbo'}]
+            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/compass_arena/gpt4-turbo'}]
         ))
