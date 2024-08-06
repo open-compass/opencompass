@@ -1,0 +1,101 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: A container is divided into two equal compartments (Fig. 5.8). One contains $3.0 \mathrm{~mol} \mathrm{H}_2(\mathrm{~g})$ at $25^{\circ} \mathrm{C}$; the other contains $1.0 \mathrm{~mol} \mathrm{~N}_2(\mathrm{~g})$ at $25^{\circ} \mathrm{C}$. Calculate the Gibbs energy of mixing when the partition is removed. Assume perfect behaviour.
+
+Explanation for Problem 1: Given that the pressure of nitrogen is $p$, the pressure of hydrogen is $3 p$; therefore, the initial Gibbs energy is
+$$
+G_{\mathrm{i}}=(3.0 \mathrm{~mol})\left\{\mu^{\ominus}\left(\mathrm{H}_2\right)+R T \ln 3 p\right\}+(1.0 \mathrm{~mol})\left\{\mu^{\ominus}\left(\mathrm{N}_2\right)+R T \ln p\right\}
+$$
+When the partition is removed and each gas occupies twice the original volume, the partial pressure of nitrogen falls to $\frac{1}{2} p$ and that of hydrogen falls to $\frac{3}{2} p$. Therefore, the Gibbs energy changes to
+$$
+G_{\mathrm{f}}=(3.0 \mathrm{~mol})\left\{\mu^{\ominus}\left(\mathrm{H}_2\right)+R T \ln \frac{3}{2} p\right\}+(1.0 \mathrm{~mol})\left\{\mu^{\ominus}\left(\mathrm{N}_2\right)+R T \ln \frac{1}{2} p\right\}
+$$
+The Gibbs energy of mixing is the difference of these two quantities:
+$$
+\begin{aligned}
+\Delta_{\text {mix }} G & =(3.0 \mathrm{~mol}) R T \ln \left(\frac{\frac{3}{2} p}{3 p}\right)+(1.0 \mathrm{~mol}) R T \ln \left(\frac{\frac{1}{2} p}{p}\right) \\
+& =-(3.0 \mathrm{~mol}) R T \ln 2-(1.0 \mathrm{~mol}) R T \ln 2 \\
+& =-(4.0 \mathrm{~mol}) R T \ln 2=-6.9 \mathrm{~kJ}
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{-6.9}.
+
+Promblem 2: The change in molar internal energy when $\mathrm{CaCO}_3(\mathrm{~s})$ as calcite converts to another form, aragonite, is $+0.21 \mathrm{~kJ} \mathrm{~mol}^{-1}$. Calculate the difference between the molar enthalpy and internal energy changes when the pressure is 1.0 bar given that the densities of the polymorphs are $2.71 \mathrm{~g} \mathrm{~cm}^{-3}$ and $2.93 \mathrm{~g} \mathrm{~cm}^{-3}$, respectively.
+Explanation for Problem 2: The change in enthalpy when the transition occurs is
+$$
+\begin{aligned}
+\Delta H_{\mathrm{m}} & =H_{\mathrm{m}}(\text { aragonite })-H_{\mathrm{m}}(\text { calcite }) \\
+& =\left\{U_{\mathrm{m}}(\mathrm{a})+p V_{\mathrm{m}}(\mathrm{a})\right\}-\left\{U_{\mathrm{m}}(\mathrm{c})+p V_{\mathrm{m}}(\mathrm{c})\right\} \\
+& =\Delta U_{\mathrm{m}}+p\left\{V_{\mathrm{m}}(\mathrm{a})-V_{\mathrm{m}}(\mathrm{c})\right\}
+\end{aligned}
+$$
+where a denotes aragonite and c calcite. It follows by substituting $V_{\mathrm{m}}=M / \rho$ that
+$$
+\Delta H_{\mathrm{m}}-\Delta U_{\mathrm{m}}=p M\left(\frac{1}{\rho(\mathrm{a})}-\frac{1}{\rho(\mathrm{c})}\right)
+$$
+Substitution of the data, using $M=100 \mathrm{~g} \mathrm{~mol}^{-1}$, gives
+$$
+\begin{aligned}
+\Delta H_{\mathrm{m}}-\Delta U_{\mathrm{m}} & =\left(1.0 \times 10^5 \mathrm{~Pa}\right) \times\left(100 \mathrm{~g} \mathrm{~mol}^{-1}\right) \times\left(\frac{1}{2.93 \mathrm{~g} \mathrm{~cm}^{-3}}-\frac{1}{2.71 \mathrm{~g} \mathrm{~cm}^{-3}}\right) \\
+& =-2.8 \times 10^5 \mathrm{~Pa} \mathrm{~cm}{ }^3 \mathrm{~mol}^{-1}=-0.28 \mathrm{~Pa} \mathrm{~m}^3 \mathrm{~mol}^{-1}
+\end{aligned}
+$$
+Therefore, the answer is \boxed{-0.28}.
+
+Promblem 3: The osmotic pressures of solutions of poly(vinyl chloride), PVC, in cyclohexanone at $298 \mathrm{~K}$ are given below. The pressures are expressed in terms of the heights of solution (of mass density $\rho=0.980 \mathrm{~g} \mathrm{~cm}^{-3}$ ) in balance with the osmotic pressure. Determine the molar mass of the polymer.
+$\begin{array}{llllll}c /\left(\mathrm{g} \mathrm{dm}^{-3}\right) & 1.00 & 2.00 & 4.00 & 7.00 & 9.00 \\ h / \mathrm{cm} & 0.28 & 0.71 & 2.01 & 5.10 & 8.00\end{array}$
+
+Explanation for Problem 3: The data give the following values for the quantities to plot:
+$$
+\begin{array}{llllll}
+c /\left(\mathrm{g} \mathrm{dm}^{-3}\right) & 1.00 & 2.00 & 4.00 & 7.00 & 9.00 \\
+(h / c) /\left(\mathrm{cm} \mathrm{g}^{-1} \mathrm{dm}^3\right) & 0.28 & 0.36 & 0.503 & 0.729 & 0.889
+\end{array}
+$$
+The points are plotted in Fig. 5.28. The intercept is at 0.21 . Therefore,
+$$
+\begin{aligned}
+M & =\frac{R T}{\rho g} \times \frac{1}{0.21 \mathrm{~cm} \mathrm{~g}^{-1} \mathrm{dm}^3} \\
+& =\frac{\left(8.3145 \mathrm{~J} \mathrm{~K}^{-1} \mathrm{~mol}^{-1}\right) \times(298 \mathrm{~K})}{\left(980 \mathrm{~kg} \mathrm{~m}^{-1}\right) \times\left(9.81 \mathrm{~m} \mathrm{~s}^{-2}\right)} \times \frac{1}{2.1 \times 10^{-3} \mathrm{~m}^4 \mathrm{~kg}^{-1}} \\
+& =1.2 \times 10^2 \mathrm{~kg} \mathrm{~mol}^{-1}
+\end{aligned}
+$$
+Therefore, the answer is \boxed{1.2}.
+
+Promblem 4: What is the mean speed, $\bar{c}$, of $\mathrm{N}_2$ molecules in air at $25^{\circ} \mathrm{C}$ ?
+Explanation for Problem 4: The integral required is
+$$
+\begin{aligned}
+\bar{c} & =4 \pi\left(\frac{M}{2 \pi R T}\right)^{3 / 2} \int_0^{\infty} v^3 \mathrm{e}^{-M v^2 / 2 R T} \mathrm{~d} v \\
+& =4 \pi\left(\frac{M}{2 \pi R T}\right)^{3 / 2} \times \frac{1}{2}\left(\frac{2 R T}{M}\right)^2=\left(\frac{8 R T}{\pi M}\right)^{1 / 2}
+\end{aligned}
+$$
+where we have used the standard result from tables of integrals (or software) that
+$$
+\int_0^{\infty} x^3 \mathrm{e}^{-a x^2} \mathrm{~d} x=\frac{1}{2 a^2}
+$$
+Substitution of the data then gives
+$$
+\bar{c}=\left(\frac{8 \times\left(8.3141 \mathrm{~J} \mathrm{~K}^{-1} \mathrm{~mol}^{-1}\right) \times(298 \mathrm{~K})}{\pi \times\left(28.02 \times 10^{-3} \mathrm{~kg} \mathrm{~mol}^{-1}\right)}\right)^{1 / 2}=475 \mathrm{~m} \mathrm{~s}^{-1}
+$$
+where we have used $1 \mathrm{~J}=1 \mathrm{~kg} \mathrm{~m}^2 \mathrm{~s}^{-2}$.
+
+Therefore, the answer is \boxed{475}.
+
+Promblem 5: In an industrial process, nitrogen is heated to $500 \mathrm{~K}$ in a vessel of constant volume. If it enters the vessel at $100 \mathrm{~atm}$ and $300 \mathrm{~K}$, what pressure would it exert at the working temperature if it behaved as a perfect gas?
+Explanation for Problem 5: Cancellation of the volumes (because $V_1=V_2$ ) and amounts (because $\left.n_1=n_2\right)$ on each side of the combined gas law results in
+$$
+\frac{p_1}{T_1}=\frac{p_2}{T_2}
+$$
+which can be rearranged into
+$$
+p_2=\frac{T_2}{T_1} \times p_1
+$$
+Substitution of the data then gives
+$$
+p_2=\frac{500 \mathrm{~K}}{300 \mathrm{~K}} \times(100 \mathrm{~atm})=167 \mathrm{~atm}
+$$
+
+Therefore, the answer is \boxed{167}.
+
