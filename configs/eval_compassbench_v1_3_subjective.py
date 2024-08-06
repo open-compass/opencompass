@@ -4,7 +4,37 @@ with read_base():
     from .datasets.subjective.compassbench.compassbench_checklist import (
         checklist_datasets,
     )
-from opencompass.partitioners import NaivePartitioner
+
+    # INTERNAL SETTINGS
+    from .internal.aliyun_llmeval_xiaolinchen import infer_num_worker as infer
+    from .internal.opensource_model_compass_bench_v1_3 import models as _origin_models
+    from .internal.closesource_model_compass_bench_v1_3 import (
+        ai_360gpt_pro,
+        minimax_abab6_5_chat,
+        baichuan4_api,
+        step_1_8k,
+        moonshot_v1_8k,
+        qwen_max_0428,
+        gpt4o_20240513,
+        gpt_4o_mini_20240718,
+        ernie_4_0_8k_preview_0518,
+        glm4_0520,
+        mistral_large,
+        yi_large_api,
+        xunfei_spark_v4_ultra,
+        claude3_5_sonnet_alles,
+        doubao_pro_4k_240515,
+        hunyuan,
+        mistral_large_instruct_2407,
+        deepseek_api,
+        gpt4_1106,
+        xunfei_spark_v3_5_max,
+    )
+from opencompass.partitioners import (
+    SizePartitioner,
+    NaivePartitioner,
+    NumWorkerPartitioner,
+)
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask

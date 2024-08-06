@@ -10,8 +10,13 @@ exclude: |
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
       opencompass/datasets/TheoremQA|
-      docs/zh_cn/advanced_guides/compassbench_intro.md|
-      docs/zh_cn/advanced_guides/compassbench_v2_0.md
+      docs/zh_cn/advanced_guides/compassbench_intro.md |
+      docs/zh_cn/advanced_guides/compassbench_v2_0.md |
+      opencompass/configs/datasets/ |
+      opencompass/configs/models/|
+      opencompass/configs/summarizers/|
+      opencompass/utils/datasets.py |
+      opencompass/utils/datasets_info.py
     )
 repos:
   - repo: https://gitee.com/openmmlab/mirrors-flake8
