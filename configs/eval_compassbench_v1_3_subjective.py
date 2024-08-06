@@ -9,7 +9,6 @@ with read_base():
     from .internal.aliyun_llmeval_xiaolinchen import infer_num_worker as infer
     from .internal.opensource_model_compass_bench_v1_3 import models as _origin_models
     from .internal.closesource_model_compass_bench_v1_3 import (
-        ai_360gpt_pro,
         minimax_abab6_5_chat,
         baichuan4_api,
         step_1_8k,
