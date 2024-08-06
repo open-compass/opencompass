@@ -142,12 +142,19 @@ agent_summary_groups = [
             'cibench_template_cn_wo_nltk:vis_sim',
         ],
     ),
-    dict(
+    # dict(
+    #     name='agent_cn',
+    #     subsets=['cibench_template_cn', 'plugin_eval-mus-p10_one_review_zh'],
+    # ),
+    # dict(
+    #     name='agent_en', subsets=['cibench_template', 'plugin_eval-mus-p10_one_review']
+    # ),
+        dict(
         name='agent_cn',
-        subsets=['cibench_template_cn', 'plugin_eval-mus-p10_one_review_zh'],
+        subsets=['plugin_eval-mus-p10_one_review_zh'],
     ),
     dict(
-        name='agent_en', subsets=['cibench_template', 'plugin_eval-mus-p10_one_review']
+        name='agent_en', subsets=['plugin_eval-mus-p10_one_review']
     ),
     dict(name='agent', subsets=['agent_cn', 'agent_en']),
 ]
@@ -188,8 +195,6 @@ summarizer = dict(
         ['agent', 'naive_average'],
         ['agent_en', 'naive_average'],
         ['agent_cn', 'naive_average'],
-        ['cibench_template', 'naive_average'],
-        ['cibench_template_cn', 'naive_average'],
         ['plugin_eval-mus-p10_one_review_zh', 'naive_average'],
         ['plugin_eval-mus-p10_one_review', 'naive_average'],
     ],

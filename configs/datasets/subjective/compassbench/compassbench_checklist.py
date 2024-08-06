@@ -183,7 +183,7 @@ pair_prompt_cn = """# 指令
 checklist_datasets = []
 gpt4 = [
     dict(
-        abbr='gpt4o',
+        abbr='gpt4-1106',
     )
 ]
 for lan, data_name_list in subjective_all_sets.items():

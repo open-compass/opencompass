@@ -15,7 +15,7 @@ prompt_cn = {
 }
 
 prompt_en = {
-    'single_choice_en': "Here is a single-choice question. Please give the correct answer based on your knowledge. Please reason step by step and answer with 'The answer is X' at the end, where X is the option number you think is correct.\nHere is the question you need to answer:\n{question}\nLet's solve this problem step by step:",
+    'single_choice_en': "Here is a single-choice question. Please give the correct answer based on your knowledge. Please reason step by step and answer with 'The answer is X' at the end, where X is the option letter you think is correct.\nHere is the question you need to answer:\n{question}\nLet's solve this problem step by step:",
     'cloze_en': "Here is a fill-in-the-blank question. Please think step by step based on your knowledge and put your final answer in \\boxed{}. Here is the question you need to answer:\n{question}\nLet's solve this problem step by step:",
 }
 

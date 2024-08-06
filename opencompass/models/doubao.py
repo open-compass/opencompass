@@ -106,5 +106,5 @@ class Doubao(BaseAPIModel):
             generated = completion.choices[0].message.content
             self.logger.debug(f'Generated: {generated}')
             return completion.choices[0].message.content
-
+        self.logger.debug(f'Failed to generate answer for query: {input}')
         raise RuntimeError(f'Failed to respond in {self.retry} retrys')
