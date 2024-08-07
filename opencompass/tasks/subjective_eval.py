@@ -15,7 +15,7 @@ from opencompass.registry import ICL_EVALUATORS, MODELS, TEXT_POSTPROCESSORS
 from opencompass.tasks.base import BaseTask
 from opencompass.tasks.openicl_eval import extract_role_pred
 from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
-                               deal_with_judge_model_abbr,
+                               deal_with_judge_model_abbr, get_data_path,
                                get_infer_output_path, get_logger,
                                model_abbr_from_cfg, task_abbr_from_cfg)
 
@@ -140,6 +140,7 @@ class SubjectiveEvalTask(BaseTask):
         for given_pred in given_preds:
             abbr = given_pred['abbr']
             path = given_pred['path']
+            path = get_data_path(path, local_mode=True)
             if abbr == model_cfg['abbr']:
                 filename = osp.join(path, osp.basename(filename))
         # Get partition name
