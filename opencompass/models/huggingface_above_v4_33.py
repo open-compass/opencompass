@@ -452,13 +452,13 @@ class HuggingFacewithChatTemplate(BaseModel):
             # To avoid the warning: 
             # This is a friendly reminder - the current text generation call will exceed the model's predefined maximum length (32768). 
             # Depending on the model, you may observe exceptions, performance degradation, or nothing at all.     
-            half_max_seq_len = max_prompt_len // 2
-            if half_max_seq_len > 0 and tokens['input_ids'].shape[1] > max_prompt_len:
+            half_max_prompt_len = max_prompt_len // 2
+            if half_max_prompt_len > 0 and tokens['input_ids'].shape[1] > max_prompt_len:
                 for key in tokens.keys():
                     if tokens[key].shape[1] > max_prompt_len:
                         field_values = tokens[key]
                         tokens[key] = torch.cat(
-                            (field_values[:, :half_max_seq_len], field_values[:, -half_max_seq_len:]), dim=1
+                            (field_values[:, :half_max_prompt_len], field_values[:, -half_max_prompt_len:]), dim=1
                         )
 
         generation_kwargs = self.generation_kwargs.copy()
