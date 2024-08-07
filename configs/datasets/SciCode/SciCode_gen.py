@@ -24,7 +24,7 @@ SciCode_datasets = [
     dict(
         abbr='SciCode',
         type=SciCodeDataset,
-        path=SciCode_dataset_path,
+        path='./data/SciCode',
         with_bg=with_bg,
         reader_cfg=SciCode_reader_cfg,
         infer_cfg=SciCode_infer_cfg,
