@@ -142,7 +142,7 @@ def _set_model_kwargs_torch_dtype(model_kwargs):
 
 @MODELS.register_module()
 class HuggingFacewithChatTemplate(BaseModel):
-    """Model wrapper around HuggingFace models.
+    """Model wrapper for HuggingFace models designed for chat.
 
     Args:
         mode (str, optional): The method of input truncation when input length
