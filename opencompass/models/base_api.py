@@ -281,6 +281,9 @@ class APITemplateParser:
                     new_prompt.append(item)
             prompt = new_prompt
 
+            if self.meta_template.get('begin', None):
+                prompt.insert(0, self.meta_template['begin'])
+
         else:
             # in case the model does not have any meta template
             prompt = ''
