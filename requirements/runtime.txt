@@ -4,7 +4,7 @@ boto3
 cn2an
 cpm_kernels
 datasets>=2.18.0
-einops==0.5.0
+einops
 evaluate>=0.3.0
 fairscale
 func_timeout
@@ -25,7 +25,7 @@ OpenCC
 pandas    # <2.0.0
 prettytable
 protobuf
-pyext
+# pyext
 pypinyin
 python-Levenshtein
 rank_bm25       # ==0.2.2

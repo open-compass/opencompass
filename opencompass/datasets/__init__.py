@@ -3,7 +3,7 @@ from .afqmcd import *  # noqa: F401, F403
 from .agieval import *  # noqa: F401, F403
 from .anli import AnliDataset  # noqa: F401, F403
 from .anthropics_evals import *  # noqa: F401, F403
-from .apps import *  # noqa: F401, F403
+# from .apps import *  # noqa: F401, F403  # Note: to be supported for python 3.11 (pyext issue)
 from .arc import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
@@ -107,7 +107,7 @@ from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
 from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
-from .taco import *  # noqa: F401, F403
+# from .taco import *  # noqa: F401, F403  # Note: to be supported for python 3.11 (pyext issue)
 from .teval import *  # noqa: F401, F403
 from .TheoremQA import *  # noqa: F401, F403
 from .tnews import *  # noqa: F401, F403
