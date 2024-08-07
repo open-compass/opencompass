@@ -4,7 +4,6 @@ from opencompass.openicl.icl_inferencer import ChatInferencer
 from opencompass.datasets import SciCodeDataset, SciCodeEvaluator
 
 
-SciCode_dataset_path = './data/SciCode'
 with_bg = True
 
 SciCode_reader_cfg = dict(input_columns=['prompt'], output_column=None)
