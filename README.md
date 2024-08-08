@@ -138,6 +138,10 @@ pip install -e .
 
 ### 📂 Data Preparation
 
+You can choose one for the following method to prepare datasets.
+
+#### Offline Preparation
+
 You can download and extract the datasets with the following commands:
 
 ```bash
@@ -146,12 +150,19 @@ wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/Ope
 unzip OpenCompassData-core-20240207.zip
 ```
 
-Also, use the [ModelScope](www.modelscope.cn) to load the datasets on demand.
+#### Automatic Download from OpenCompass
+
+We have supported download datasets automatic from the OpenCompass storage server. You can run the evaluation with extra `--dry-run` to download these datasets.
+Currently, the supported datasets are listed in [here](https://github.com/open-compass/opencompass/blob/main/opencompass/utils/datasets_info.py#L259). More datasets will be uploaded recently.
+
+#### (Optional) Automatic Download with ModelScope
+
+Also you can use the [ModelScope](www.modelscope.cn) to load the datasets on demand.
 
 Installation:
 
 ```bash
-pip install modelscope
+pip install modelscope[framework]
 export DATASET_SOURCE=ModelScope
 ```
 

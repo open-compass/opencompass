@@ -222,7 +222,7 @@ class VOLCRunner(BaseRunner):
                     f.write(logs)
                 if task_status in [
                         'Success', 'Failed', 'Cancelled', 'Exception',
-                        'Killing'
+                        'Killing', 'SuccessHolding', 'FailedHolding'
                 ]:
                     break
                 time.sleep(poll_interval)
