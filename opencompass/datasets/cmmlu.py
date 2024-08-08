@@ -19,8 +19,7 @@ class CMMLUDataset(BaseDataset):
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = MsDataset.load(path,
-                                     subset_name=name,
-                                     trust_remote_code=True)
+                                     subset_name=name,)
             modified_dataset = DatasetDict()
             for split in dataset.keys():
                 raw_data = []

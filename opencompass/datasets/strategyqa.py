@@ -34,9 +34,10 @@ class StrategyQADataset(BaseDataset):
 
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
-            dataset = MsDataset.load('opencompass/strategy_qa',
+            from modelscope.utils.constant import DownloadMode
+            dataset = MsDataset.load(path,
                                      split='train',
-                                     trust_remote_code=True)
+                                     download_mode=DownloadMode.FORCE_REDOWNLOAD)
         else:
             with open(path, 'r', encoding='utf-8') as f:
                 dataset = json.load(f)
