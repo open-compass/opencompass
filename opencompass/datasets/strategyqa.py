@@ -34,10 +34,7 @@ class StrategyQADataset(BaseDataset):
 
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
-            from modelscope.utils.constant import DownloadMode
-            dataset = MsDataset.load(path,
-                                     split='train',
-                                     download_mode=DownloadMode.FORCE_REDOWNLOAD)
+            dataset = MsDataset.load(path, split='train')
         else:
             with open(path, 'r', encoding='utf-8') as f:
                 dataset = json.load(f)
