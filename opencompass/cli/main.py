@@ -121,6 +121,12 @@ def parse_args():
         'correctness of each sample, bpb, etc.',
         action='store_true',
     )
+    parser.add_argument(
+        '--dump-extract-rate',
+        help='Whether to dump the evaluation details, including the '
+        'correctness of each sample, bpb, etc.',
+        action='store_true',
+    )
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -316,7 +322,8 @@ def main():
             fill_eval_cfg(cfg, args)
         if args.dump_eval_details:
             cfg.eval.runner.task.dump_details = True
-
+        if args.dump_extract_rate:
+            cfg.eval.runner.task.cal_extract_rate = True
         if args.partition is not None:
             if RUNNERS.get(cfg.eval.runner.type) == SlurmRunner:
                 cfg.eval.runner.partition = args.partition

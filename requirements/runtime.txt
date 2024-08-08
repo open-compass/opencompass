@@ -28,7 +28,7 @@ pypinyin
 python-Levenshtein
 rank_bm25==0.2.2
 rapidfuzz
-requests==2.31.0
+requests>=2.31.0
 rich
 rouge
 -e git+https://github.com/Isaac-JL-Chen/rouge_chinese.git@master#egg=rouge_chinese
@@ -42,6 +42,6 @@ tiktoken
 timeout_decorator
 tokenizers>=0.13.3
 torch>=1.13.1
-tqdm==4.64.1
+tqdm>=4.64.1
 transformers>=4.29.1
 typer

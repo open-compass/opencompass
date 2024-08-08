@@ -1,0 +1,25 @@
+请理解题目含义并选择正确答案。
+
+Q:有些广东人不爱吃辣椒.因此,有些南方人不爱吃辣椒. 以下哪项能保证上述论证的成立？
+(A) 有些广东人爱吃辣椒
+(B) 爱吃辣椒的有些是南方人
+(C) 所有的广东人都是南方人
+(D) 有些广东人不爱吃辣椒也不爱吃甜食
+A: Let's think step by step.
+In this argument, we infer from "some Cantonese people do not like to eat chili peppers" that "some southerners do not like to eat chili peppers". The establishment of this reasoning depends on the relationship between Cantonese and Southerners. In order for this reasoning to be valid, we need to ensure that at least a portion of Cantonese people are from the south. Therefore, option (C) "All Cantonese are southerners" can ensure the validity of this argument. So the answer is (C).
+
+Q:唐卡是极富藏族文化特色的一种绘画形式,自吐蕃王朝兴起至今已有1300多年的历史,是雪域高原的文化瑰宝.它的题材除宗教外,还有历史和民俗内容,故又被称为了解西藏的“百科全书”.所以,想要了解西藏的历史,除了正襟危坐地阅读严谨但略显呆板的史书外,你还可以选择一种惬意和愉悦的方式--欣赏唐卡,与众多的古人对话,想象曾经的历史事件,体味藏族人丰富的精神世界,了解独特的藏族民俗,这是一个让历史变得立体可感的过程. 这段文字意在说明:
+(A) 唐卡可以给大家提供一种惬意轻松的了解西藏的方式
+(B) 唐卡中记录了独特的藏族民俗和曾经的历史事件
+(C) 唐卡是了解西藏文化和历史的“百科全书”式的绘画形式
+(D) 唐卡是极富藏族文化特色且历史悠久的一种绘画形式
+A: Let's think step by step.
+It is explicitly mentioned in the article that besides reading rigorous but somewhat rigid historical books, appreciating thangkas is a comfortable and enjoyable way for people to converse with numerous ancient people, imagine past historical events, appreciate the rich spiritual world of Tibetans, and understand unique Tibetan customs. So the main purpose of this passage is (A) "Thangka can provide a comfortable and easy way for everyone to understand Xizang". So the answer is (A).
+
+Q:“知人论世”作为一种文学批评的原则和方法,最早由战国时期的思想家孟子提出.孟子认为,后人要交结古人,只是读其诗书是不行的,还必须了解他们的为人行事以及他们的生活的时代,这样,才能读懂古人的诗书,才能和古人心契神交,成为知音. 对这段话的理解,不正确的是?
+(A) 人的心灵是可以互通和共鸣的
+(B) “知人论世”作为一种文学评论发沿用至今并显现了强大的生命力
+(C) “知人论世”可以帮助后人交结古人和古人成为知音
+(D) 了解古人和他所处的时代,有助于理解他的作品
+A: Let's think step by step.
+From this passage, we cannot see (B) that "understanding people and discussing the world" as a literary criticism has been used to this day and has shown strong vitality. Although "knowing people and discussing the world" was indeed proposed by the philosopher Mencius during the Warring States period as a principle and method of literary criticism, this passage does not mention that "knowing people and discussing the world" is still in use today, or that it has shown strong vitality. Therefore, option (B) is an incorrect understanding. So the answer is (B).
