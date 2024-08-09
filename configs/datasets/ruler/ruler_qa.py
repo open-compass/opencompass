@@ -1,8 +1,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets.RULER.ruler_qa import RulerQaDataset
-from opencompass.datasets.RULER.ruler_qa import RulerQaEvaluator
+from opencompass.datasets.ruler.ruler_qa import RulerQaDataset
+from opencompass.datasets.ruler.ruler_qa import RulerQaEvaluator
 
 qa_configurations = [
     {'dataset': 'squad', 'path': './data/SQuAD2.0/dev-v2.0.json'},

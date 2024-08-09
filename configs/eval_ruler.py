@@ -30,7 +30,7 @@ import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')
 NUM_SAMPLES = 500
 max_seq_lens = [1024 * 4, 1024 * 8, 1024 * 16, 1024 * 32]
 abbr_suffixs = ['4k', '8k', '16k', '32k']
-
+work_dir = './outputs/ruler'
 
 # Model Settings
 qwen2_7b_instruct_model[0]['max_seq_len'] = 33792

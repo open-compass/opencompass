@@ -1,5 +1,5 @@
-from opencompass.datasets.RULER.ruler_cwe import RulerCweDataset
-from opencompass.datasets.RULER.ruler_cwe import RulerCweEvaluator
+from opencompass.datasets.ruler.ruler_cwe import RulerCweDataset
+from opencompass.datasets.ruler.ruler_cwe import RulerCweEvaluator
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer

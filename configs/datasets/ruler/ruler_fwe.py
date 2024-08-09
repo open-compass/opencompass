@@ -1,8 +1,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets.RULER.ruler_fwe import RulerFweDataset
-from opencompass.datasets.RULER.ruler_fwe import RulerFweEvaluator
+from opencompass.datasets.ruler.ruler_fwe import RulerFweDataset
+from opencompass.datasets.ruler.ruler_fwe import RulerFweEvaluator
 
 # FWE Dataset
 fwe_datasets = [

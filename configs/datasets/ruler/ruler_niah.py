@@ -1,8 +1,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets.RULER.ruler_niah import RulerNiahDataset
-from opencompass.datasets.RULER.ruler_niah import RulerNiahEvaluator
+from opencompass.datasets.ruler.ruler_niah import RulerNiahDataset
+from opencompass.datasets.ruler.ruler_niah import RulerNiahEvaluator
 
 
 # Ruler Dataset settings

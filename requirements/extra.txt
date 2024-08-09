@@ -2,3 +2,4 @@ alpaca-eval==0.6
 faiss_gpu==1.7.2
 latex2sympy2
 scikit-learn==1.5
+wonderwords
