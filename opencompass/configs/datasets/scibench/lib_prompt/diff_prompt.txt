@@ -1,0 +1,17 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: At time $t=0$ a tank contains $Q_0 \mathrm{lb}$ of salt dissolved in 100 gal of water; see Figure 2.3.1. Assume that water containing $\frac{1}{4} \mathrm{lb}$ of salt/gal is entering the tank at a rate of $r \mathrm{gal} / \mathrm{min}$ and that the well-stirred mixture is draining from the tank at the same rate. Set up the initial value problem that describes this flow process. By finding the amount of salt $Q(t)$ in the tank at any time, and the limiting amount $Q_L$ that is present after a very long time, if $r=3$ and $Q_0=2 Q_L$, find the time $T$ after which the salt level is within $2 \%$ of $Q_L$. 
+Answer: The answer is \boxed{130.400766848}.
+
+Promblem 2: The logistic model has been applied to the natural growth of the halibut population in certain areas of the Pacific Ocean. ${ }^{12}$ Let $y$, measured in kilograms, be the total mass, or biomass, of the halibut population at time $t$. The parameters in the logistic equation are estimated to have the values $r=0.71 /$ year and $K=80.5 \times 10^6 \mathrm{~kg}$. If the initial biomass is $y_0=0.25 K$, find the biomass 2 years later. 
+Answer: The answer is \boxed{46.7}.
+
+Promblem 3: For instance, suppose that one opens an individual retirement account (IRA) at age 25 and makes annual investments of $\$ 2000$ thereafter in a continuous manner. Assuming a rate of return of $8 \%$, what will be the balance in the IRA at age 65 ?
+Answer: The answer is \boxed{588313}.
+
+Promblem 4: Suppose that a mass weighing $10 \mathrm{lb}$ stretches a spring $2 \mathrm{in}$. If the mass is displaced an additional 2 in. and is then set in motion with an initial upward velocity of $1 \mathrm{ft} / \mathrm{s}$, by determining the position of the mass at any later time, calculate the amplitude of the motion.
+Answer: The answer is \boxed{0.18162}.
+
+Promblem 5: Suppose that a mass weighing $10 \mathrm{lb}$ stretches a spring $2 \mathrm{in}$. If the mass is displaced an additional 2 in. and is then set in motion with an initial upward velocity of $1 \mathrm{ft} / \mathrm{s}$, by determining the position of the mass at any later time, calculate the phase of the motion.
+Answer: The answer is \boxed{-0.40864}.
+

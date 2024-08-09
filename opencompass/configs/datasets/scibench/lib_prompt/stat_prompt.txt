@@ -1,0 +1,17 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: In an orchid show, seven orchids are to be placed along one side of the greenhouse. There are four lavender orchids and three white orchids. How many ways are there to lineup these orchids?
+Answer: The answer is \boxed{35}.
+
+Promblem 2: What is the number of ways of selecting a president, a vice president, a secretary, and a treasurer in a club consisting of 10 persons?
+Answer: The answer is \boxed{5040}.
+
+Promblem 3: From an ordinary deck of playing cards, cards are to be drawn successively at random and without replacement. What is the probability that the third spade appears on the sixth draw?
+Answer: The answer is \boxed{0.064}.
+
+Promblem 4: What is the number of possible 5-card hands (in 5-card poker) drawn from a deck of 52 playing cards?
+Answer: The answer is \boxed{2598960}.
+
+Promblem 5: A grade school boy has five blue and four white marbles in his left pocket and four blue and five white marbles in his right pocket. If he transfers one marble at random from his left to his right pocket, what is the probability of his then drawing a blue marble from his right pocket?
+Answer: The answer is \boxed{0.444444444444444 }.
+

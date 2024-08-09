@@ -75,8 +75,8 @@ class OpenICLEvalTask(BaseTask):
             for c in sum(self.dataset_cfgs, []))
         self.dump_details = cfg.get('eval', {}).get('runner', {}).get(
             'task', {}).get('dump_details', False)
-        self.cal_extrat_rate = cfg.get('eval', {}).get('runner', {}).get(
-            'task', {}).get('cal_extrat_rate', False)
+        self.cal_extract_rate = cfg.get('eval', {}).get('runner', {}).get(
+            'task', {}).get('cal_extract_rate', False)
 
     def get_command(self, cfg_path, template):
         sys.path.append(os.getcwd())
@@ -236,7 +236,7 @@ class OpenICLEvalTask(BaseTask):
                         pred_strs, test_set[self.output_column], details,
                         pred_dicts)
                     result['type'] = result['details'].pop('type', None)
-                    if self.cal_extrat_rate:
+                    if self.cal_extract_rate:
                         # Calculate the extraction success rate for prediction
                         result['extract_rate'] = self.extract_rate(result)
 

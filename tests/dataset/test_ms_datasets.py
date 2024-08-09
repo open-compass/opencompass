@@ -34,7 +34,6 @@ def reload_datasets():
         from configs.datasets.commonsenseqa.commonsenseqa_gen import commonsenseqa_datasets
         
         from configs.datasets.mmlu.mmlu_gen import mmlu_datasets
-        from configs.datasets.strategyqa.strategyqa_gen import strategyqa_datasets
         from configs.datasets.bbh.bbh_gen import bbh_datasets
         from configs.datasets.Xsum.Xsum_gen import Xsum_datasets
         from configs.datasets.winogrande.winogrande_gen import winogrande_datasets
@@ -51,15 +50,17 @@ def reload_datasets():
         from configs.datasets.storycloze.storycloze_ppl import storycloze_datasets as storycloze_ppl_datasets
         from configs.datasets.summedits.summedits_gen import summedits_datasets as summedits_v2_datasets
         
+        from configs.datasets.strategyqa.strategyqa_gen import strategyqa_datasets
+        from configs.datasets.mbpp.mbpp_gen import mbpp_datasets as mbpp_v1_datasets
+        from configs.datasets.lcsts.lcsts_gen import lcsts_datasets
+        
         from configs.datasets.hellaswag.hellaswag_gen import hellaswag_datasets as hellaswag_v2_datasets
         from configs.datasets.hellaswag.hellaswag_10shot_gen_e42710 import hellaswag_datasets as hellaswag_ice_datasets
         from configs.datasets.hellaswag.hellaswag_ppl_9dbb12 import hellaswag_datasets as hellaswag_v1_datasets
         from configs.datasets.hellaswag.hellaswag_ppl_a6e128 import hellaswag_datasets as hellaswag_v3_datasets
-        from configs.datasets.mbpp.mbpp_gen import mbpp_datasets as mbpp_v1_datasets
         from configs.datasets.mbpp.mbpp_passk_gen_830460 import mbpp_datasets as mbpp_v2_datasets
         from configs.datasets.mbpp.sanitized_mbpp_gen_830460 import sanitized_mbpp_datasets
         from configs.datasets.nq.nq_gen import nq_datasets
-        from configs.datasets.lcsts.lcsts_gen import lcsts_datasets
         from configs.datasets.math.math_gen import math_datasets
         from configs.datasets.piqa.piqa_gen import piqa_datasets as piqa_v2_datasets
         from configs.datasets.piqa.piqa_ppl import piqa_datasets as piqa_v1_datasets
@@ -105,7 +106,8 @@ def load_datasets(source, conf):
         return dataset
     try:
         dataset = conf['type'].load(path=conf['path'])
-    except Exception:
+    except Exception as e:
+        print(e)
         dataset = conf['type'].load(**conf)
     return dataset
 
@@ -147,7 +149,7 @@ class TestingMsDatasets(unittest.TestCase):
                 print(exception)
                 return 'failure', f'{modelscope_path_name} is not the same as {local_path_name}'
         
-        with ThreadPoolExecutor(16) as executor:
+        with ThreadPoolExecutor(thread) as executor:
             futures = {
                 executor.submit(compare_datasets, ms_conf, local_conf): (ms_conf, local_conf)
                 for ms_conf, local_conf in zip(ms_datasets_conf, local_datasets_conf)
@@ -220,4 +222,5 @@ def _check_data(ms_dataset: Dataset | DatasetDict,
 
 if __name__ == '__main__':
     sample_size = 100
+    thread = 1
     unittest.main()

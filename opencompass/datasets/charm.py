@@ -8,7 +8,7 @@ from datasets import Dataset
 from opencompass.openicl.icl_evaluator import BaseEvaluator, LMEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
-from opencompass.utils import build_dataset_from_cfg
+from opencompass.utils import build_dataset_from_cfg, get_data_path
 
 from .base import BaseDataset
 
@@ -147,6 +147,7 @@ class CharmDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path, local_mode=True)
         with open(osp.join(path, f'{name}.json'), 'r', encoding='utf-8') as f:
             data = json.load(f)['examples']
         dataset = Dataset.from_list(data)

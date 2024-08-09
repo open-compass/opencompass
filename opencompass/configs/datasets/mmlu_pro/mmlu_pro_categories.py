@@ -1,0 +1,16 @@
+categories = [
+    'math',
+    'physics',
+    'chemistry',
+    'law',
+    'engineering',
+    'other',
+    'economics',
+    'health',
+    'psychology',
+    'business',
+    'biology',
+    'philosophy',
+    'computer science',
+    'history',
+]

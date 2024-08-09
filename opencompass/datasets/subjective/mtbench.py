@@ -6,6 +6,7 @@ import re
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -172,6 +173,7 @@ class MTBenchDataset(BaseDataset):
              multi_turn=True,
              *args,
              **kwargs):
+        path = get_data_path(path, local_mode=True)
         filename = osp.join(path, f'{name}.json')
         dataset = DatasetDict()
         raw_data = []
