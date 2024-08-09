@@ -132,7 +132,8 @@ class Hunyuan(BaseAPIModel):
             except TencentCloudSDKException as e:
                 self.logger.error(f'Got error code: {e.get_code()}')
                 if e.get_code() == 'ClientNetworkError':
-                    return 'client network error'
+                    retry_counter += 1
+                    continue
                 elif e.get_code() in ['InternalError', 'ServerNetworkError']:
                     retry_counter += 1
                     continue
@@ -147,5 +148,5 @@ class Hunyuan(BaseAPIModel):
 
             self.logger.debug(f'Generated: {answer}')
             return answer
-
+        self.logger.debug(f'Failed to generate answer for query: {input}')
         raise RuntimeError(f'Failed to respond in {self.retry} retrys')
