@@ -8,35 +8,12 @@ Place the dataset file `SciCode_dataset.json`( or/and `SciCode_dataset_with_back
 By modifying the with_bg parameter in the configuration file, you can support setup for w/ background evaluation.
 
 ## Reference Performance
-<table>
-  <tr>
-    <th>Model</th>
-    <th colspan="2">Background</th>
-    <th colspan="2">Accuracy (%)</th>
-  </tr>
-  <tr>
-    <th rowspan="2">Llama-3-70B-Instruct</th>
-    <th>W/O</th>
-    <td>21.53</td>
-    <td>0.0</td>
-  </tr>
-  <tr>
-    <th>W/</th>
-    <td>24.31</td>
-    <td>0.0</td>
-  </tr>
-  <tr>
-    <th rowspan="2">Qwen2-72B-Instruct</th>
-    <th>W/O</th>
-    <td>16.67</td>
-    <td>0.0</td>
-  </tr>
-  <tr>
-    <th>W/</th>
-    <td>19.79</td>
-    <td>0.0</td>
-  </tr>
-</table>
+| Model                     | Condition    | Subproblem Accuracy | Main Problem Accuracy |
+|---------------------------|--------------|---------------------|-----------------------|
+| Llama-3-70B-Instruct      | w/o Background  | 21.53%              | 0.0%                  |
+| Llama-3-70B-Instruct      | w/ Background   | 24.31%              | 0.0%                  |
+| Qwen2-72B-Instruct        | w/o Background  | 16.67%              | 0.0%                  |
+| Qwen2-72B-Instruct        | w/ Background   | 19.79%              | 0.0%                  |
 
 ## Citation
 ```
