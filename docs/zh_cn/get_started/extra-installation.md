@@ -4,111 +4,58 @@
 
 ## 推理后端
 
+OpenCompass 开发者所使用的 CUDA 版本为 12.1。
+
+由于不同的推理后端会有依赖冲突，我们强烈建议使用conda管理包依赖环境
+
 - LMDeploy
 
 ```bash
-pip install lmdeploy
+pip install -U opencompass[lmdeploy]
 ```
 
-- VLLM
+安装完成后，可运行以下命令确保安装成功
 
 ```bash
-pip install vllm
+lmdeploy serve api_server internlm/internlm2_5-7b-chat
 ```
 
-OpenCompass 开发者所使用的 CUDA 版本为 11.8，一个能够应对 2024.07 之前绝大部分模型的依赖版本如下：
+具体文档可见 [LMDeploy 官方文档](https://lmdeploy.readthedocs.io/zh-cn/latest/get_started.html#id3)
+
+- vLLM
 
 ```bash
-export VLLM_VERSION=0.4.3
-export LMDEPLOY_VERSION=0.4.1
-export FLASH_ATTN_VERSION=2.5.7
-export XFORMERS_VERSION=0.0.25.post1
-export TORCH_VERSION=2.2.2
-export TORCHVISION_VERSION=0.17.2
-export TORCHAUDIO_VERSION=2.2.2
-export TRITON_VERSION=2.1.0
-export PYTHON_VERSION=310
-
-
-pip3 install "https://github.com/InternLM/lmdeploy/releases/download/v${LMDEPLOY_VERSION}/lmdeploy-${LMDEPLOY_VERSION}+cu118-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-manylinux2014_x86_64.whl" --extra-index-url https://download.pytorch.org/whl/cu118
-pip3 install "https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/vllm-${VLLM_VERSION}+cu118-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-manylinux1_x86_64.whl" --extra-index-url https://download.pytorch.org/whl/cu118
-pip3 install "https://github.com/Dao-AILab/flash-attention/releases/download/v${FLASH_ATTN_VERSION}/flash_attn-${FLASH_ATTN_VERSION}+cu118torch2.2cxx11abiFALSE-cp${PYTHON_VERSION}-cp${PYTHON_VERSION}-linux_x86_64.whl" --extra-index-url https://download.pytorch.org/whl/cu118
-pip3 install xformers==${XFORMERS_VERSION} --extra-index-url https://download.pytorch.org/whl/cu118
-pip3 install torch==${TORCH_VERSION} torchvision==${TORCHVISION_VERSION} torchaudio==${TORCHAUDIO_VERSION} --index-url https://download.pytorch.org/whl/cu118
-pip3 install triton==${TRITON_VERSION} --extra-index-url https://download.pytorch.org/whl/cu118
+pip install -U opencompass[vllm]
 ```
 
-请注意，在安装过程中，后一条 `pip install` 命令可能会覆盖前一条命令中部分依赖的版本。并且在最终安装完成后，可能有的软件依赖会不满足，但是对 lmdeploy / vllm / xformers 等有需求的模型都是可以跑起来的。很神秘。
+安装完成后，可运行以下命令确保安装成功
+
+```bash
+vllm serve facebook/opt-125m
+```
+
+具体文档可见 [vLLM官方文档](https://docs.vllm.ai/en/latest/getting_started/quickstart.html)
 
 ## 模型
 
-- LLAMA (参数，原生, 非 HF 格式)
+- 开源模型
+
+OpenCompass的基础依赖可以提供一个兼容大部分开源模型的环境，但是OpenCompass无法保证提供一个可以应对所有模型，针对某些有特殊依赖 (i.e. FlashAttention, XFormers) 的模型，用户可依据相关文档安装。
+
+- 闭源API模型
 
 ```bash
-   git clone https://github.com/facebookresearch/llama.git
-   cd llama
-   pip install -r requirements.txt
-   pip install -e .
+pip install -r requirements/api.txt
 ```
 
-- Vicuna (参数)
+## 用户也可根据需要，安装指定模型API
 
 ```bash
-pip install "fschat[model_worker,webui]
-```
-
-- Baichuan / Baichuan2 (参数)
-
-```bash
-pip install "transformers<=4.33.3"
-```
-
-- ChatGLM-3 / GLM-4 (参数)
-
-```bash
-pip install "transformers<=4.41.2"
-```
-
-- GPT-3.5-Turbo / GPT-4-Turbo / GPT-4 / GPT-4o (API)
-
-```bash
-pip install openai
-```
-
-- Claude (API)
-
-```bash
-pip install anthropic
-```
-
-- 字节豆包 (API)
-
-```bash
-pip install volcengine-python-sdk
-```
-
-- 腾讯混元 (API)
-
-```bash
-pip install tencentcloud-sdk-python
-```
-
-- 讯飞星火 (API)
-
-```bash
-pip install spark_ai_python "sseclient-py==1.7.2"  websocket-client
-```
-
-- 智谱 (API)
-
-```bash
-pip install zhipuai
-```
-
-- 通义千问 (API)
-
-```bash
-pip install dashscope
+pip install openai # GPT-3.5-Turbo / GPT-4-Turbo / GPT-4 / GPT-4o (API)
+pip install anthropic # Claude (API)
+pip install dashscope #  通义千问 (API)
+pip install volcengine-python-sdk # 字节豆包 (API)
+...
 ```
 
 ## 数据集

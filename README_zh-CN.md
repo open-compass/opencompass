@@ -69,9 +69,10 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.08.08\]** 我们发布了CompassBench-202407正式榜单排名，敬请访问 [CompassBench](https://rank.opencompass.org.cn/home) 查看详细排名。 🔥🔥🔥
 - **\[2024.07.23\]** 我们支持了[Gemma2](https://huggingface.co/collections/google/gemma-2-release-667d6600fd5220e7b967f315)模型，欢迎试用！🔥🔥🔥
 - **\[2024.07.23\]** 我们支持了[ModelScope](www.modelscope.cn)数据集，您可以按需加载，无需事先下载全部数据到本地，欢迎试用！🔥🔥🔥
-- **\[2024.07.17\]** 我们发布了CompassBench-202408榜单的示例数据和评测规则，敬请访问 [CompassBench](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/compassbench_intro.html) 获取更多信息。 🔥🔥🔥
+- **\[2024.07.17\]** 我们发布了CompassBench-202407榜单的示例数据和评测规则，敬请访问 [CompassBench](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/compassbench_intro.html) 获取更多信息。 🔥🔥🔥
 - **\[2024.07.17\]** 我们正式发布 NeedleBench 的[技术报告](http://arxiv.org/abs/2407.11963)。诚邀您访问我们的[帮助文档](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/needleinahaystack_eval.html)进行评估。🔥🔥🔥
 - **\[2024.07.04\]** OpenCompass 现已支持 InternLM2.5， 它拥有卓越的推理性能、有效支持百万字超长上下文以及工具调用能力整体升级，欢迎访问[OpenCompass Config](https://github.com/open-compass/opencompass/tree/main/configs/models/hf_internlm) 和 [InternLM](https://github.com/InternLM/InternLM) .🔥🔥🔥.
 - **\[2024.06.20\]** OpenCompass 现已支持一键切换推理加速后端，助力评测过程更加高效。除了默认的HuggingFace推理后端外，还支持了常用的 [LMDeploy](https://github.com/InternLM/lmdeploy) 和 [vLLM](https://github.com/vllm-project/vllm) ，支持命令行一键切换和部署 API 加速服务两种方式，详细使用方法见[文档](docs/zh_cn/advanced_guides/accelerator_intro.md)。
@@ -117,25 +118,30 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 ### 💻 环境配置
 
-#### 面向开源模型的GPU环境
+#### 推荐使用conda构建基于Python 3.10的虚拟环境
 
 ```bash
+# GPU环境
 conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
 conda activate opencompass
-git clone https://github.com/open-compass/opencompass opencompass
-cd opencompass
-pip install -e .
-```
 
-#### 面向API模型测试的CPU环境
-
-```bash
+# CPU环境
 conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
 conda activate opencompass
+```
+
+#### 通过pip安装OpenCompass
+
+```bash
+pip install -U opencompass
+```
+
+#### 基于源码安装OpenCompass
+
+```bash
 git clone https://github.com/open-compass/opencompass opencompass
 cd opencompass
 pip install -e .
-# 如果需要使用各个API模型，请 `pip install -r requirements/api.txt` 安装API模型的相关依赖
 ```
 
 ### 📂 数据准备
