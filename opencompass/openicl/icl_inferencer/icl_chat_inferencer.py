@@ -359,7 +359,7 @@ class ChatInferencer(BaseInferencer):
                     idx=index,
                     gold=chat[i]['content'],
                 )
-                index += 1
+                # index += 1
         if self.dialogue_mode:
             # dialogue mode for subjective evaluation
             assert len(chat) % 2 == 0

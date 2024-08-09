@@ -9,6 +9,7 @@ evaluate>=0.3.0
 fairscale
 func_timeout
 fuzzywuzzy
+h5py
 immutabledict
 jieba
 json5
