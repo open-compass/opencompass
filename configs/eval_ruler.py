@@ -7,7 +7,6 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 
 with read_base():
-    # from ..models.qwen.lmdeploy_qwen2_1_5b_instruct import models as qwen2_1_5b_instruct_model  # Qwen2-1.5B-Instruct
     from ..configs.models.qwen.lmdeploy_qwen2_7b_instruct import (
         models as qwen2_7b_instruct_model,
     )
@@ -23,7 +22,6 @@ with read_base():
     from .datasets.ruler.ruler_cwe import cwe_datasets  # CWE
     from .datasets.ruler.ruler_qa import qa_datasets  # QA
 
-    # from .datasets.collections.leaderboard.qwen_chat import datasets
 import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 # Evaluation config
@@ -68,7 +66,6 @@ for max_seq_len, abbr_suffix in zip(max_seq_lens, abbr_suffixs):
 
 
 infer = dict(
-    # partitioner=dict(type=NaivePartitioner),
     partitioner=dict(type=NumWorkerPartitioner),
     runner=dict(
         type=LocalRunner, max_num_workers=16, task=dict(type=OpenICLInferTask), retry=5
@@ -79,3 +76,37 @@ eval = dict(
     partitioner=dict(type=NaivePartitioner),
     runner=dict(type=LocalRunner, max_num_workers=32, task=dict(type=OpenICLEvalTask)),
 )
+
+
+summary_groups = []
+for abbr_suffix in abbr_suffixs:
+    summary_groups.append(
+        {
+            'name': abbr_suffix,
+            'subsets': [dataset['abbr'] + abbr_suffix for dataset in import_datasets],
+        }
+    )
+summarizer = dict(dataset_abbrs=abbr_suffixs, summary_groups=summary_groups)
+
+# summarizer = dict(
+#     dataset_abbrs = [
+#         '###### MathBench-A: Application Part ######',
+#         'college',
+#         'high',
+#         'middle',
+#         'primary',
+#         'arithmetic',
+#         'mathbench-a (average)',
+
+#         '###### MathBench-T: Theory Part ######',
+#         'college_knowledge',
+#         'high_knowledge',
+#         'middle_knowledge',
+#         'primary_knowledge',
+#         'mathbench-t (average)',
+
+#         '###### Overall: Average between MathBench-A and MathBench-T ######',
+#         'Overall',
+#     ],
+#     summary_groups=mathbench_2024_summary_groups,
+# )
