@@ -26,15 +26,18 @@ import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')
 
 # Evaluation config
 NUM_SAMPLES = 500
+# Change the context lengths to be tested
 max_seq_lens = [1024 * 4, 1024 * 8, 1024 * 16, 1024 * 32]
 abbr_suffixs = ['4k', '8k', '16k', '32k']
 work_dir = './outputs/ruler'
 
 # Model Settings
 qwen2_7b_instruct_model[0]['max_seq_len'] = 33792
+qwen2_7b_instruct_model[0]['engine_config']['session_len'] = 33792
 qwen2_7b_instruct_model[0]['engine_config']['tp'] = 2
 qwen2_7b_instruct_model[0]['run_cfg']['num_gpus'] = 2
 llama3_8b_instruct_model[0]['max_seq_len'] = 33792
+llama3_8b_instruct_model[0]['engine_config']['session_len'] = 33792
 llama3_8b_instruct_model[0]['engine_config']['tp'] = 2
 llama3_8b_instruct_model[0]['run_cfg']['num_gpus'] = 2
 model_settings = [
@@ -83,30 +86,17 @@ for abbr_suffix in abbr_suffixs:
     summary_groups.append(
         {
             'name': abbr_suffix,
-            'subsets': [dataset['abbr'] + abbr_suffix for dataset in import_datasets],
+            'subsets': [dataset['abbr'] + '_' + abbr_suffix for dataset in import_datasets],
         }
     )
 summarizer = dict(dataset_abbrs=abbr_suffixs, summary_groups=summary_groups)
 
-# summarizer = dict(
-#     dataset_abbrs = [
-#         '###### MathBench-A: Application Part ######',
-#         'college',
-#         'high',
-#         'middle',
-#         'primary',
-#         'arithmetic',
-#         'mathbench-a (average)',
 
-#         '###### MathBench-T: Theory Part ######',
-#         'college_knowledge',
-#         'high_knowledge',
-#         'middle_knowledge',
-#         'primary_knowledge',
-#         'mathbench-t (average)',
-
-#         '###### Overall: Average between MathBench-A and MathBench-T ######',
-#         'Overall',
-#     ],
-#     summary_groups=mathbench_2024_summary_groups,
-# )
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# dataset    version    metric         mode      qwen2-7b-instruct-turbomind    llama-3-8b-instruct-turbomind    internlm2_5-7b-chat-1m-turbomind
+# ---------  ---------  -------------  ------  -----------------------------  -------------------------------  ----------------------------------
+# 4k         -          naive_average  gen                             93.66                            93.48                               91.20
+# 8k         -          naive_average  gen                             88.38                            89.95                               89.07
+# 16k        -          naive_average  gen                             84.27                             0.14                               87.61
+# 32k        -          naive_average  gen                             81.36                             0.00                               84.59
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
