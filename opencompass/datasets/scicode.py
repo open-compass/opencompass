@@ -36,7 +36,7 @@ class SciCodeDataset(BaseDataset):
         return self.dataset
 
 
-H5PY_FILE = './data/SciCode/test_data.h5'
+H5PY_FILE = './data/scicode/test_data.h5'
 
 
 def process_hdf5_list(group):
