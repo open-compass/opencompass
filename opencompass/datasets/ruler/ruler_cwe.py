@@ -3,7 +3,6 @@ import random
 
 import numpy as np
 import tiktoken
-import wonderwords
 from datasets import Dataset
 from transformers import AutoTokenizer
 
@@ -38,7 +37,11 @@ class RulerCweDataset(BaseDataset):
 
         random.seed(random_seed)
         np.random.seed(random_seed)
-
+        try:
+            import wonderwords
+        except ImportError:
+            raise ImportError('''Please install wonderwords by:
+                              pip install wonderwords''')
         nouns = wonderwords.random_word._get_words_from_text_file(
             'nounlist.txt')
         adjs = wonderwords.random_word._get_words_from_text_file(

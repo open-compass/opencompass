@@ -8,7 +8,6 @@ from pathlib import Path
 
 import numpy as np
 import tiktoken
-import wonderwords
 from datasets import Dataset
 from transformers import AutoTokenizer
 
@@ -69,7 +68,11 @@ class RulerNiahDataset(BaseDataset):
             haystack = needle
         else:
             raise NotImplementedError(f'{type_haystack} is not implemented.')
-
+        try:
+            import wonderwords
+        except ImportError:
+            raise ImportError('''Please install wonderwords by:
+                              pip install wonderwords''')
         # Words
         nouns = wonderwords.random_word._get_words_from_text_file(
             'nounlist.txt')
