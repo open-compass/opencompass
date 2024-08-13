@@ -24,7 +24,7 @@ class RulerQaDataset(BaseDataset):
         tokenizer_model: str,
         max_seq_length: int,
         template:
-        str = 'Answer the question based on the given documents. Only give me the answer and do not output any other words.\n\nThe following are given documents.\n\n{context}\n\nAnswer the question based on the given documents. Only give me the answer and do not output any other words.\n\nQuestion: {query}',
+        str = 'Answer the question based on the given documents. Only give me the answer and do not output any other words.\n\nThe following are given documents.\n\n{context}\n\nAnswer the question based on the given documents. Only give me the answer and do not output any other words.\n\nQuestion: {query} Answer:',
         tokens_to_generate: int = 32,
         num_samples: int = 500,
         pre_samples: int = 0,
