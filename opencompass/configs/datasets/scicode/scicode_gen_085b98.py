@@ -15,13 +15,13 @@ SciCode_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=ChatInferencer, infer_mode='every', max_out_len=4096))
 
-SciCode_eval_cfg = dict(evaluator=dict(type=SciCodeEvaluator, dataset_path='./data/SciCode', with_bg=False))
+SciCode_eval_cfg = dict(evaluator=dict(type=SciCodeEvaluator, dataset_path='./data/scicode', with_bg=False))
 
 SciCode_datasets = [
     dict(
         abbr='SciCode',
         type=SciCodeDataset,
-        path='./data/SciCode',
+        path='./data/scicode',
         with_bg=False,
         reader_cfg=SciCode_reader_cfg,
         infer_cfg=SciCode_infer_cfg,
