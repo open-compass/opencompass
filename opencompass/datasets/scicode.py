@@ -251,8 +251,8 @@ from opencompass.datasets.SciCode import process_hdf5_to_tuple
                 sub_count += 1
                 details.append(msg)
 
-        correct += is_all_correct
-        count += 1
+            correct += is_all_correct
+            count += 1
 
         result = {
             'accuracy': 100 * correct / count,
