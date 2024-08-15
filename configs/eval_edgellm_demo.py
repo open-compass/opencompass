@@ -12,6 +12,6 @@ with read_base():
     # models
     from .models.hf_llama.hf_llama3_8b import models as hf_llama3_8b_model
     from .models.qwen.hf_qwen2_7b import models as hf_qwen2_7b_model
-    
+
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets') or k == 'datasets'], [])
 work_dir = './outputs/edgellm/'
