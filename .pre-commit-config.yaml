@@ -102,9 +102,9 @@ repos:
         name: dataset suffix updater(package)
         entry: ./tools/update_dataset_suffix.py
         language: script
-        pass_filenames: true
-        require_serial: true
-        files: ^opencompass/configs/datasets
+        pass_filenames: false
+        # require_serial: true
+        # files: ^opencompass/configs/datasets
         args:
           - --root_folder
           - opencompass/configs/datasets
