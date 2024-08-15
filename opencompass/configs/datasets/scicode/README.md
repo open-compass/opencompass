@@ -10,10 +10,10 @@ By modifying the with_bg parameter in the configuration file, you can support se
 ## Reference Performance
 | Model                     | Condition    | Subproblem Accuracy | Main Problem Accuracy |
 |---------------------------|--------------|---------------------|-----------------------|
-| Llama-3-70B-Instruct      | w/o Background  | 21.53%              | 0.0%                  |
-| Llama-3-70B-Instruct      | w/ Background   | 24.31%              | 0.0%                  |
-| Qwen2-72B-Instruct        | w/o Background  | 16.67%              | 0.0%                  |
-| Qwen2-72B-Instruct        | w/ Background   | 19.79%              | 0.0%                  |
+| Llama-3-70B-Instruct      | w/o Background  | 21.53%              | 4.62%                  |
+| Llama-3-70B-Instruct      | w/ Background   | 24.31%              | 7.69%                  |
+| Qwen2-72B-Instruct        | w/o Background  | 16.67%              | 1.54%                  |
+| Qwen2-72B-Instruct        | w/ Background   | 19.79%              | 1.54%                  |
 
 ## Citation
 ```
