@@ -11,7 +11,7 @@ subjective_reader_cfg = dict(
     )
 
 
-data_path ='./data/WildBench/wildbench.jsonl'
+data_path ='./data/subjective/WildBench/wildbench.jsonl'
 
 wildbench_datasets = []
 subjective_infer_cfg = dict(
@@ -54,11 +54,11 @@ wildbench_datasets.append(
         reader_cfg=subjective_reader_cfg,
         infer_cfg=subjective_infer_cfg,
         eval_cfg=subjective_eval_cfg,
-        given_pred = [{'abbr': 'gpt4-turbo', 'path':'./data/WildBench/gpt4'},
-                {'abbr': 'llama-2-70b-chat-hf', 'path':'./data/WildBench/llama2-70b'},
-                {'abbr': 'HaiKu', 'path':'./data/WildBench/claude'},
-                {'abbr': 'llama-2-70b-chat-turbomind', 'path':'./data/WildBench/llama2-70b'},
-                {'abbr': 'llama-2-70b-chat-vllm', 'path':'./data/WildBench/llama2-70b'}],
+        given_pred = [{'abbr': 'gpt4-turbo', 'path':'./data/subjective/WildBench/gpt4'},
+                {'abbr': 'llama-2-70b-chat-hf', 'path':'./data/subjective/WildBench/llama2-70b'},
+                {'abbr': 'HaiKu', 'path':'./data/subjective/WildBench/claude'},
+                {'abbr': 'llama-2-70b-chat-turbomind', 'path':'./data/subjective/WildBench/llama2-70b'},
+                {'abbr': 'llama-2-70b-chat-vllm', 'path':'./data/subjective/WildBench/llama2-70b'}],
         mode='m2n', # m个模型 与 n个模型进行对战
         infer_order='random',
         base_models = [llama_2_70b, gpt4, claude]

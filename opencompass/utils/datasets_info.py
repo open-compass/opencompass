@@ -349,5 +349,9 @@ DATASETS_URL = {
     'subjective/mtbench101': {
         'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mtbench101.zip',
         'md5': '5d80257bc9929ebe5cfbf6d11184b04c',
+    },
+    'subjective/WildBench': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/wildbench.zip',
+        'md5': 'b06252857f1f8f44a17b1bfca4888ff4',
     }
 }
