@@ -18,19 +18,16 @@ truthfulqa_infer_cfg = dict(
     inferencer=dict(type=GenInferencer))
 
 # Metrics such as 'truth' and 'info' needs
-# OPENAI_API_KEY with finetuned models in it.
-# Please use your own finetuned openai model with keys and refers to
+# extra judge models.
+# Please use your own finetuned model  and refers to
 # the source code of `TruthfulQAEvaluator` for more details.
-#
+
 # If you cannot provide available models for 'truth' and 'info',
 # and want to perform basic metric eval, please set
 # `metrics=('bleurt', 'rouge', 'bleu')`
-
-# When key is set to "ENV", the key will be fetched from the environment
-# variable $OPENAI_API_KEY. Otherwise, set key in here directly.
 truthfulqa_eval_cfg = dict(
     evaluator=dict(
-        type=TruthfulQAEvaluator, metrics=('truth', 'info'), key='ENV'), )
+        type=TruthfulQAEvaluator, metrics=('rouge'), key='ENV'), )
 
 truthfulqa_datasets = [
     dict(
