@@ -4,7 +4,6 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import commonsenseqaDataset
 from opencompass.utils.text_postprocessors import (
-    first_capital_postprocess,
     match_answer_pattern,
 )
 
