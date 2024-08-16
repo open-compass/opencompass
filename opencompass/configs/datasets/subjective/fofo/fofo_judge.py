@@ -12,7 +12,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    'fofo_test_prompts', 'fofo_test_prompts_cn',
+    'fofo_test_prompts'
 ]
 
 base_prompt = """

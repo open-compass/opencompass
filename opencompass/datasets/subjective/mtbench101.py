@@ -6,6 +6,7 @@ import re
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -260,6 +261,7 @@ class MTBench101Dataset(BaseDataset):
         import copy
 
         filename = osp.join(path, f'{name}.jsonl')
+        filename = get_data_path(filename, local_mode=True)
         # filename = osp.join(path, 'mtbench101.jsonl')
         dataset = DatasetDict()
         raw_data = []
