@@ -5,8 +5,8 @@ from opencompass.datasets.ruler.ruler_qa import RulerQaDataset
 from opencompass.datasets.ruler.ruler_qa import RulerQaEvaluator
 
 qa_configurations = [
-    {'dataset': 'squad', 'path': './data/SQuAD2.0/dev-v2.0.json'},
-    {'dataset': 'hotpotqa', 'path': './data/hotpotqa/hotpotqa.json'},
+    {'dataset': 'squad', 'path': './data/ruler/dev-v2.0.json'},
+    {'dataset': 'hotpotqa', 'path': './data/ruler/hotpotqa.json'},
 ]
 
 qa_datasets = []

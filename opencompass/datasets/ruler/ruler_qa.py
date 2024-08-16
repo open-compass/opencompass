@@ -12,6 +12,7 @@ from transformers import AutoTokenizer
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 
 @LOAD_DATASET.register_module()
@@ -20,9 +21,9 @@ class RulerQaDataset(BaseDataset):
     @staticmethod
     def load(
         path: str,
-        dataset: str,
-        tokenizer_model: str,
-        max_seq_length: int,
+        dataset: str = 'squad',
+        max_seq_length: int = 4096,
+        tokenizer_model: str = 'gpt-4',
         template:
         str = 'Answer the question based on the given documents. Only give me the answer and do not output any other words.\n\nThe following are given documents.\n\n{context}\n\nAnswer the question based on the given documents. Only give me the answer and do not output any other words.\n\nQuestion: {query} Answer:',
         tokens_to_generate: int = 32,
@@ -43,6 +44,7 @@ class RulerQaDataset(BaseDataset):
 
         # Read SQuAD QA dataset
         def _read_squad(file):
+            file = get_data_path(file, local_mode=True)
             with open(file) as f:
                 data = json.load(f)
 
@@ -75,23 +77,24 @@ class RulerQaDataset(BaseDataset):
 
         # Read Hotpot QA dataset
         def _read_hotpotqa(file_path):
-            url = (
-                'http://curtis.ml.cmu.edu/datasets/hotpot/hotpot_dev_distractor_v1.json'
-            )
-            if not os.path.exists(os.path.dirname(file_path)):
-                os.makedirs(os.path.dirname(file_path))
+            # url = (
+            #     'http://curtis.ml.cmu.edu/datasets/hotpot/hotpot_dev_distractor_v1.json'
+            # )
+            # if not os.path.exists(os.path.dirname(file_path)):
+            #     os.makedirs(os.path.dirname(file_path))
 
-            if not os.path.exists(file_path):
-                response = requests.get(url)
-                if response.status_code == 200:
-                    with open(file_path, 'wb') as file:
-                        file.write(response.content)
-                else:
-                    print(
-                        f'Failed to download file. Status code: {response.status_code}'
-                    )
-            else:
-                print('File already exists.')
+            # if not os.path.exists(file_path):
+            #     response = requests.get(url)
+            #     if response.status_code == 200:
+            #         with open(file_path, 'wb') as file:
+            #             file.write(response.content)
+            #     else:
+            #         print(
+            #             f'Failed to download file. Status code: {response.status_code}'
+            #         )
+            # else:
+            #     print('File already exists.')
+            file_path = get_data_path(file_path, local_mode=True)
 
             with open(file_path) as f:
                 data = json.load(f)

@@ -61,6 +61,8 @@ def download_dataset(data_path, cache_dir, remove_finished=True):
                     'You can specific `COMPASS_DATA_CACHE` '
                     'to avoid downloading~')
     # Try to load from default cache folder
+    if data_path.startswith('./'):
+        data_path = data_path[2:]
     try_default_path = os.path.join(DEFAULT_DATA_FOLDER, data_path)
     if os.path.exists(try_default_path):
         get_logger().info(f"Try to load the data from {try_default_path}")

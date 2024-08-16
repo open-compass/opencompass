@@ -16,8 +16,8 @@ class RulerCweDataset(BaseDataset):
 
     @staticmethod
     def load(
-        tokenizer_model: str,
-        max_seq_length: int,
+        max_seq_length: int = 4096,
+        tokenizer_model: str = 'gpt-4',
         template:
         str = 'Below is a numbered list of words. In these words, some appear more often than others. Memorize the ones that appear most often.\n{context}\nQuestion: What are the 10 most common words in the above list? Answer: The top 10 words that appear most often in the list are:',
         tokens_to_generate: int = 120,

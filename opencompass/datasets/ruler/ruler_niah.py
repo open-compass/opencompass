@@ -14,6 +14,7 @@ from transformers import AutoTokenizer
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 
 @LOAD_DATASET.register_module()
@@ -23,9 +24,9 @@ class RulerNiahDataset(BaseDataset):
     def load(
         base_path: str,
         file_path: str,
-        tokenizer_model: str,
-        tokens_to_generate: int,
-        max_seq_length: int,
+        tokens_to_generate: int = 128,
+        max_seq_length: int = 4096,
+        tokenizer_model: str = 'gpt-4',
         num_samples: int = 500,
         random_seed: int = 42,
         template:
@@ -54,6 +55,7 @@ class RulerNiahDataset(BaseDataset):
         needle = 'One of the special magic {type_needle_v} for {key} is: {value}.'
         if type_haystack == 'essay':
             essay = os.path.join(base_path, file_path)
+            essay = get_data_path(essay, local_mode=True)
             # essay = json.load(open(essay))['text']
             combined_essay = ''
             with open(essay, 'r', encoding='utf-8') as f:

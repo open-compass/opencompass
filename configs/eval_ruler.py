@@ -16,11 +16,11 @@ with read_base():
     from ..configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat_1m import (
         models as internlm2_5_7b_chat_1m,
     )
-    from .datasets.ruler.ruler_niah import niah_datasets  # Niah
-    from .datasets.ruler.ruler_vt import vt_datasets  # VT
-    from .datasets.ruler.ruler_fwe import fwe_datasets  # FWE
-    from .datasets.ruler.ruler_cwe import cwe_datasets  # CWE
-    from .datasets.ruler.ruler_qa import qa_datasets  # QA
+    from .datasets.ruler.ruler_niah_gen import niah_datasets  # Niah
+    from .datasets.ruler.ruler_vt_gen import vt_datasets  # VT
+    from .datasets.ruler.ruler_fwe_gen import fwe_datasets  # FWE
+    from .datasets.ruler.ruler_cwe_gen import cwe_datasets  # CWE
+    from .datasets.ruler.ruler_qa_gen import qa_datasets  # QA
 
 import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 

@@ -18,8 +18,8 @@ class RulerFweDataset(BaseDataset):
 
     @staticmethod
     def load(
-        tokenizer_model: str,
-        max_seq_length: int,
+        max_seq_length: int = 4096,
+        tokenizer_model: str = 'gpt-4',
         template:
         str = "Read the following coded text and track the frequency of each coded word. Find the three most frequently appeared coded words. {context}\nQuestion: Do not provide any explanation. Please ignore the dots '....'. What are the three most frequently appeared words in the above coded text? Answer: According to the coded text above, the three most frequently appeared words are:",
         tokens_to_generate: int = 50,

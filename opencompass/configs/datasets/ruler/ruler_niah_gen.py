@@ -84,7 +84,7 @@ niah_configurations = [
 niah_datasets = []
 
 # NIAH Dataset
-base_path = './data/needlebench'
+base_path = './data/ruler'
 file_path = 'PaulGrahamEssays.jsonl'
 for index, config in enumerate(niah_configurations):
     dataset_dict = {
