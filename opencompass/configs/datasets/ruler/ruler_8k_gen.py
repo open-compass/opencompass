@@ -14,8 +14,8 @@ import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')
 # Evaluation config
 NUM_SAMPLES = 100 # Change to the number of samples you need
 # Change the context lengths to be tested
-max_seq_lens = [1024 * 32]
-abbr_suffixs = ['32k']
+max_seq_lens = [1024 * 8]
+abbr_suffixs = ['8k']
 
 ruler_datasets = []
 

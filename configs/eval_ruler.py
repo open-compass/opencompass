@@ -21,6 +21,7 @@ with read_base():
     from .datasets.ruler.ruler_fwe_gen import fwe_datasets  # FWE
     from .datasets.ruler.ruler_cwe_gen import cwe_datasets  # CWE
     from .datasets.ruler.ruler_qa_gen import qa_datasets  # QA
+    from ..configs.summarizers.groups.ruler import ruler_summary_groups
 
 import_datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
@@ -81,15 +82,12 @@ eval = dict(
 )
 
 
-summary_groups = []
-for abbr_suffix in abbr_suffixs:
-    summary_groups.append(
-        {
-            'name': abbr_suffix,
-            'subsets': [dataset['abbr'] + '_' + abbr_suffix for dataset in import_datasets],
-        }
-    )
-summarizer = dict(dataset_abbrs=abbr_suffixs, summary_groups=summary_groups)
+summarizer = dict(
+    dataset_abbrs=abbr_suffixs,
+    summary_groups=sum(
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []
+    ),
+)
 
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
