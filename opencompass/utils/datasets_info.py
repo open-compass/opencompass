@@ -342,4 +342,16 @@ DATASETS_URL = {
         'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mtbench.zip',
         'md5': 'd1afc0787aeac7f1f24872742e161069'
     },
+    'subjective/fofo': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/fofo.zip',
+        'md5': '8a302712e425e27e4292a9369df5b9d3'
+    },
+    'subjective/mtbench101': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mtbench101.zip',
+        'md5': '5d80257bc9929ebe5cfbf6d11184b04c',
+    },
+    'subjective/WildBench': {
+        'url': 'http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/wildbench.zip',
+        'md5': 'b06252857f1f8f44a17b1bfca4888ff4',
+    }
 }
