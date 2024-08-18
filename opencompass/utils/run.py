@@ -206,7 +206,7 @@ def change_accelerator(models, accelerator):
     for model in models:
         logger.info(f'Transforming {model["abbr"]} to {accelerator}')
         # change HuggingFace model to VLLM or TurboMindModel
-        if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3]:
+        if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3, f'{HuggingFaceBaseModel.__module__}.{HuggingFaceBaseModel.__name__}']:
             gen_args = dict()
             if model.get('generation_kwargs') is not None:
                 generation_kwargs = model['generation_kwargs'].copy()
@@ -215,7 +215,7 @@ def change_accelerator(models, accelerator):
                 gen_args['top_p'] = generation_kwargs.get('top_p', 0.9)
                 gen_args['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
                 generation_kwargs['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
-                generation_kwargs.pop('eos_token_id')
+                generation_kwargs.pop('eos_token_id') if 'eos_token_id' in generation_kwargs else None
             else:
                 # if generation_kwargs is not provided, set default values
                 generation_kwargs = dict()
@@ -267,7 +267,7 @@ def change_accelerator(models, accelerator):
                         acc_model[item] = model[item]
             else:
                 raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
-        elif model['type'] in [HuggingFacewithChatTemplate]:
+        elif model['type'] in [HuggingFacewithChatTemplate, f'{HuggingFacewithChatTemplate.__module__}.{HuggingFacewithChatTemplate.__name__}']:
             if accelerator == 'vllm':
                 mod = VLLMwithChatTemplate
                 acc_model = dict(
