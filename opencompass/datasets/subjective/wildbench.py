@@ -3,6 +3,7 @@ import json
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -210,6 +211,7 @@ def parse_conversation(conversation):
 class WildBenchDataset(BaseDataset):
 
     def load(self, path: str, K=-1, eval_mode='pair', *args, **kwargs):
+        path = get_data_path(path, local_mode=True)
         dataset = DatasetDict()
         raw_data = []
         with open(path, 'r', encoding='utf-8') as file:
