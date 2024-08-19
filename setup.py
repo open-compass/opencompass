@@ -128,6 +128,9 @@ def do_setup():
             'api':
             parse_requirements('requirements/api.txt') +
             parse_requirements('requirements/runtime.txt'),
+            'full':
+            parse_requirements('requirements/extra.txt') +
+            parse_requirements('requirements/runtime.txt'),
         },
         license='Apache License 2.0',
         include_package_data=True,

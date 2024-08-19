@@ -1,5 +1,6 @@
 anthropic # claude
 dashscope # Qwen
+openai # openai
 spark_ai_python # xunfei
 sseclient-py==1.7.2
 tencentcloud-sdk-python # tecent
