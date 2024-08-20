@@ -132,6 +132,22 @@ We highly recommend using conda to manage your python environment.
     pip install opencompass
   ```
 
+- #### Install Opencompass for different purposes
+
+  ```bash
+    # Full installation (with support for more datasets)
+    pip install "opencompass[full]"
+
+    # Environment with model acceleration frameworks
+    # Manage different acceleration frameworks using virtual environments
+    # since they usually have dependency conflicts with each other.
+    pip install "opencompass[lmdeploy]"
+    pip install "opencompass[vllm]"
+
+    # API evaluation (i.e. Openai, Qwen)
+    pip install "opencompass[api]"
+  ```
+
 - #### Install Opencompass from source
 
   if you want to use opencompass's latest feature, you can also build it from source
@@ -140,22 +156,8 @@ We highly recommend using conda to manage your python environment.
     git clone https://github.com/open-compass/opencompass opencompass
     cd opencompass
     pip install -e .
-
-  ```
-
-- #### Install Opencompass for different purposes
-
-  ```bash
-    # Full installation (with support for more datasets)
-    pip install "opencompass[full]"
-
-    # Environment with model acceleration frameworks
-    # Manage different acceleration frameworks using virtual environments since they usually have dependency conflicts with each other.
-    pip install "opencompass[lmdeploy]"
-    pip install "opencompass[vllm]"
-
-    # API evaluation (i.e. Openai, Qwen)
-    pip install "opencompass[api]"
+    # pip install -e ".[full]"
+    # pip install -e ".[vllm]"
   ```
 
 ### 📂 Data Preparation
@@ -252,7 +254,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
   python tools/list_configs.py llama mmlu
   ```
 
-  If it is not on the list but supported by Huggingface AutoModel class, you can also evaluate it with Opencompass. You are welcome to contribute to the maintenance of the Opencompass supported model and dataset lists.
+  If the model is not on the list but supported by Huggingface AutoModel class, you can also evaluate it with Opencompass. You are welcome to contribute to the maintenance of the Opencompass supported model and dataset lists.
 
   ```bash
   opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat
