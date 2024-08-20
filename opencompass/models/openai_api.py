@@ -309,13 +309,14 @@ class OpenAI(BaseAPIModel):
         """
         assert self.tokenizer_path or self.path
         try:
-            tokenizer_path = self.tokenizer_path if self.tokenizer_path else self.path
+            tokenizer_path = self.tokenizer_path if self.tokenizer_path \
+                else self.path
             try:
                 enc = self.tiktoken.encoding_for_model(tokenizer_path)
                 return len(enc.encode(prompt))
             except Exception as e:
                 self.logger.warn(f'{e}, tiktoken encoding cannot load '
-                                f'{tokenizer_path}')
+                                 f'{tokenizer_path}')
                 from transformers import AutoTokenizer
                 if self.hf_tokenizer is None:
                     self.hf_tokenizer = AutoTokenizer.from_pretrained(
@@ -323,8 +324,10 @@ class OpenAI(BaseAPIModel):
                     self.logger.info(
                         f'Tokenizer is loaded from {tokenizer_path}')
                 return len(self.hf_tokenizer(prompt).input_ids)
-        except Exception as e:
-            self.logger.warn(f'Can not get tokenizer automatically, will use default tokenizer gpt-4 for length calculation.')
+        except Exception:
+            self.logger.warn(
+                'Can not get tokenizer automatically, '
+                'will use default tokenizer gpt-4 for length calculation.')
             default_tokenizer = 'gpt-4'
             enc = self.tiktoken.encoding_for_model(default_tokenizer)
             return len(enc.encode(prompt))
