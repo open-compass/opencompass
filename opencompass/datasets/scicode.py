@@ -221,6 +221,7 @@ class SciCodeEvaluator(BaseEvaluator):
     def __init__(self, dataset_path, with_bg, testcode_path='./tmp/scicode'):
         super().__init__()
         test_data = []
+        dataset_path = get_data_path(dataset_path, local_mode=True)
         if with_bg:  # test with background
             file_path = osp.join(dataset_path,
                                  'SciCode_datasets_with_background.json')
