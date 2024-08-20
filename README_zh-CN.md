@@ -69,6 +69,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.08.16\]** OpenCompass 现已支持全新的长上下文语言模型评估基准——[RULER](https://arxiv.org/pdf/2404.06654)。RULER 通过灵活的配置，提供了对长上下文包括检索、多跳追踪、聚合和问答等多种任务类型的评测，欢迎访问[RULER](configs/datasets/ruler/README.md)。🔥🔥🔥
 - **\[2024.07.23\]** 我们支持了[Gemma2](https://huggingface.co/collections/google/gemma-2-release-667d6600fd5220e7b967f315)模型，欢迎试用！🔥🔥🔥
 - **\[2024.07.23\]** 我们支持了[ModelScope](www.modelscope.cn)数据集，您可以按需加载，无需事先下载全部数据到本地，欢迎试用！🔥🔥🔥
 - **\[2024.07.17\]** 我们发布了CompassBench-202408榜单的示例数据和评测规则，敬请访问 [CompassBench](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/compassbench_intro.html) 获取更多信息。 🔥🔥🔥

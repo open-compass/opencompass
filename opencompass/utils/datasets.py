@@ -55,16 +55,18 @@ def get_data_path(dataset_id: str, local_mode: bool = False):
 
 
 def download_dataset(data_path, cache_dir, remove_finished=True):
-    get_logger().info(f'{data_path} does not exist!'
-                    'Start Download data automatically!'
-                    'If you have downloaded the data before,'
-                    'You can specific `COMPASS_DATA_CACHE` '
-                    'to avoid downloading~')
+
     # Try to load from default cache folder
     try_default_path = os.path.join(DEFAULT_DATA_FOLDER, data_path)
     if os.path.exists(try_default_path):
         get_logger().info(f"Try to load the data from {try_default_path}")
         return try_default_path
+
+    get_logger().info(f'{data_path} does not exist!'
+                    'Start Download data automatically!'
+                    'If you have downloaded the data before,'
+                    'You can specific `COMPASS_DATA_CACHE` '
+                    'to avoid downloading~')
 
     # Cannot find data from default cache folder, download data.
     # Update DATASET_URL for internal dataset
@@ -76,7 +78,7 @@ def download_dataset(data_path, cache_dir, remove_finished=True):
         with open(file_path, 'r') as f:
             internal_datasets_info = json.load(f)
         DATASETS_URL.update(internal_datasets_info)
-        get_logger().info("Load internal dataset from: {file_path}")
+        get_logger().info(f"Load internal dataset from: {file_path}")
     except Exception as e:  # noqa
         pass
 
