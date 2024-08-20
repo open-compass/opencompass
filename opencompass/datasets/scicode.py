@@ -13,6 +13,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -23,7 +24,7 @@ class SciCodeDataset(BaseDataset):
     @staticmethod
     def load(path, with_bg, **kwargs):
         test_data = []
-
+        path = get_data_path(path, local_mode=True)
         if with_bg:  # test with background
             file_path = osp.join(path, 'SciCode_datasets_with_background.json')
         else:  # test w/o background
@@ -39,7 +40,8 @@ class SciCodeDataset(BaseDataset):
         return self.dataset
 
 
-H5PY_FILE = './data/scicode/test_data.h5'
+H5PY_FILE_FOLDER = './data/scicode/'
+H5PY_FILE_FOLDER = get_data_path(H5PY_FILE_FOLDER, local_mode=True)
 
 
 def process_hdf5_list(group):
@@ -97,6 +99,11 @@ def process_hdf5_datagroup(group):
 
 def process_hdf5_to_tuple(step_id, test_num):
     data_lst = []
+    H5PY_FILE = os.path.join(H5PY_FILE_FOLDER, 'test_data.h5')
+    assert os.path.exists(
+        H5PY_FILE
+    ), f"Please manually download 'test_data.h5' from https://github.com/open-compass/storage/releases/download/v0.1.0/scicode_test_data.zip and put the file in {H5PY_FILE}"  # noqa: E501
+
     with h5py.File(H5PY_FILE, 'r') as f:
         for test_id in range(test_num):
             group_path = f'{step_id}/test{test_id + 1}'
