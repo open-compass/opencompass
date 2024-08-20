@@ -101,7 +101,7 @@ api_server 启动时的参数可以通过命令行`lmdeploy serve api_server -h`
 3. 服务部署成功后，修改评测脚本，将模型配置中的路径改为部署的服务地址，如下：
 
 ```python
-from opencompass.models import OpenAI
+from opencompass.models import OpenAISDK
 
 api_meta_template = dict(
     round=[
@@ -114,9 +114,11 @@ api_meta_template = dict(
 models = [
     dict(
         abbr='Meta-Llama-3-8B-Instruct-LMDeploy-API',
-        type=OpenAI,
+        type=OpenAISDK,
+        key='EMPTY', # API key
         openai_api_base='http://0.0.0.0:23333/v1', # 服务地址
         path='Meta-Llama-3-8B-Instruct ', # 请求服务时的 model name
+        tokenizer_path='meta-llama/Meta-Llama-3.1-8B-Instruct', # 请求服务时的 tokenizer name 或 path, 为None时使用默认tokenizer gpt-4
         rpm_verbose=True, # 是否打印请求速率
         meta_template=api_meta_template, # 服务请求模板
         query_per_second=1, # 服务请求速率

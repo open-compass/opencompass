@@ -307,22 +307,29 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        if self.tokenizer_path:
+        assert self.tokenizer_path or self.path
+        try:
+            tokenizer_path = self.tokenizer_path if self.tokenizer_path \
+                else self.path
             try:
-                enc = self.tiktoken.encoding_for_model(self.tokenizer_path)
+                enc = self.tiktoken.encoding_for_model(tokenizer_path)
                 return len(enc.encode(prompt))
             except Exception as e:
                 self.logger.warn(f'{e}, tiktoken encoding cannot load '
-                                 '{self.tokenizer_path}')
+                                 f'{tokenizer_path}')
                 from transformers import AutoTokenizer
                 if self.hf_tokenizer is None:
                     self.hf_tokenizer = AutoTokenizer.from_pretrained(
-                        self.tokenizer_path, trust_remote_code=True)
-                    self.logger.infer(
-                        f'Tokenizer is loaded from {self.tokenizer_path}')
+                        tokenizer_path, trust_remote_code=True)
+                    self.logger.info(
+                        f'Tokenizer is loaded from {tokenizer_path}')
                 return len(self.hf_tokenizer(prompt).input_ids)
-        else:
-            enc = self.tiktoken.encoding_for_model(self.path)
+        except Exception:
+            self.logger.warn(
+                'Can not get tokenizer automatically, '
+                'will use default tokenizer gpt-4 for length calculation.')
+            default_tokenizer = 'gpt-4'
+            enc = self.tiktoken.encoding_for_model(default_tokenizer)
             return len(enc.encode(prompt))
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
