@@ -33,6 +33,7 @@ instruction_generalization_eng_eval_cfg = dict(
 
 instruction_generalization_eng_datasets = [
     dict(
+        abbr='RoleBench_instruct_eng',
         type=InstructionGeneralizationEnglishDataset,
         path='ZenMoore/RoleBench',
         reader_cfg=instruction_generalization_eng_reader_cfg,

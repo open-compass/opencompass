@@ -96,6 +96,7 @@ from .race import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
 from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
+from .ruler import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
 from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
