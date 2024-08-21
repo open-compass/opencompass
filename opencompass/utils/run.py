@@ -17,6 +17,7 @@ from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
 
+logger = get_logger()
 
 def match_cfg_file(workdir: Union[str, List[str]],
                    pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
@@ -57,9 +58,13 @@ def match_cfg_file(workdir: Union[str, List[str]],
                                          tablefmt='psql')
         if ambiguous:
             table = [['Ambiguous patterns', 'Matched files'], *ambiguous]
-            err_msg += tabulate.tabulate(table,
+            warning_msg = 'Found ambiguous patterns, using the first matched config.'
+            warning_msg += tabulate.tabulate(table,
                                          headers='firstrow',
                                          tablefmt='psql')
+            logger.warning(warning_msg)
+            return [files[0]]
+
         raise ValueError(err_msg)
     return files
 
@@ -85,7 +90,7 @@ def get_config_from_arg(args) -> Config:
     2. args.models and args.datasets
     3. Huggingface parameter groups and args.datasets
     """
-    logger = get_logger()
+
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
@@ -109,9 +114,15 @@ def get_config_from_arg(args) -> Config:
         raise ValueError('You must specify "--datasets" or "--custom-dataset-path" if you do not specify a config file path.')
     datasets = []
     if args.datasets:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(os.path.dirname(script_dir))
+        default_configs_dir = os.path.join(parent_dir, 'configs')
         datasets_dir = [
             os.path.join(args.config_dir, 'datasets'),
-            os.path.join(args.config_dir, 'dataset_collections')
+            os.path.join(args.config_dir, 'dataset_collections'),
+            os.path.join(default_configs_dir, './datasets'),
+            os.path.join(default_configs_dir, './dataset_collections')
+
         ]
         for dataset_arg in args.datasets:
             if '/' in dataset_arg:
@@ -142,9 +153,17 @@ def get_config_from_arg(args) -> Config:
     if not args.models and not args.hf_path:
         raise ValueError('You must specify a config file path, or specify --models and --datasets, or specify HuggingFace model parameters and --datasets.')
     models = []
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(os.path.dirname(script_dir))
+    default_configs_dir = os.path.join(parent_dir, 'configs')
+    models_dir = [
+        os.path.join(args.config_dir, 'models'),
+        os.path.join(default_configs_dir, './models'),
+
+    ]
     if args.models:
-        model_dir = os.path.join(args.config_dir, 'models')
-        for model in match_cfg_file(model_dir, args.models):
+        # model_dir = os.path.join(args.config_dir, 'models')
+        for model in match_cfg_file(models_dir, args.models):
             logger.info(f'Loading {model[0]}: {model[1]}')
             cfg = Config.fromfile(model[1])
             if 'models' not in cfg:
@@ -177,7 +196,14 @@ def get_config_from_arg(args) -> Config:
         models = change_accelerator(models, args.accelerator)
     # parse summarizer args
     summarizer_arg = args.summarizer if args.summarizer is not None else 'example'
-    summarizers_dir = os.path.join(args.config_dir, 'summarizers')
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(os.path.dirname(script_dir))
+    default_configs_dir = os.path.join(parent_dir, 'configs')
+    summarizers_dir = [
+        os.path.join(args.config_dir, 'summarizers'),
+        os.path.join(default_configs_dir, './summarizers'),
+
+    ]
 
     # Check if summarizer_arg contains '/'
     if '/' in summarizer_arg:
