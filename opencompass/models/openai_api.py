@@ -166,13 +166,16 @@ class OpenAI(BaseAPIModel):
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097
-        context_window = 4096
+        # Most models' token limits are above 32k
+        context_window = 32768
         if '32k' in self.path:
             context_window = 32768
         elif '16k' in self.path:
             context_window = 16384
         elif 'gpt-4' in self.path:
             context_window = 8192
+        elif 'gpt-3.5' in self.path:
+            context_window = 4097
 
         # will leave 100 tokens as prompt buffer, triggered if input is str
         if isinstance(input, str) and self.mode != 'none':
@@ -407,13 +410,16 @@ class OpenAISDK(OpenAI):
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097
-        context_window = 4096
+        # Most models' token limits are above 32k
+        context_window = 32768
         if '32k' in self.path:
             context_window = 32768
         elif '16k' in self.path:
             context_window = 16384
         elif 'gpt-4' in self.path:
             context_window = 8192
+        elif 'gpt-3.5' in self.path:
+            context_window = 4097
 
         # will leave 100 tokens as prompt buffer, triggered if input is str
         if isinstance(input, str) and self.mode != 'none':
