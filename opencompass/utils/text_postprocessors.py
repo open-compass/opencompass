@@ -66,8 +66,12 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案是?\s*([{options}])',
         f'答案是?\s*：\s*([{options}])',
         f'答案是?\s*:\s*([{options}])',
+        f'答案选项应?该?是\s*([{options}])',
+        f'答案选项应?该?为\s*([{options}])',
         f'答案应该?是\s*([{options}])',
         f'答案应该?选\s*([{options}])',
+        f'答案选项为?\s*：\s*([{options}])',
+        f'答案选项是?\s*:\s*([{options}])',
         f'答案为\s*([{options}])',
         f'答案选\s*([{options}])',
         f'选择?\s*([{options}])',
@@ -115,6 +119,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     if cushion:
         patterns.extend(cushion_patterns)
     for pattern in patterns:
+        text = text.strip()
         match = re.search(pattern, text, re.DOTALL)
         if match:
             outputs = match.group(0)

@@ -15,14 +15,12 @@ from .base import BaseDataset
 class CEvalDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name: str):
-        path = get_data_path(path)
+    def load(path: str, name: str, local_mode: bool = False):
+        path = get_data_path(path, local_mode=local_mode)
         dataset = {}
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
-            dataset = MsDataset.load(dataset_name=path,
-                                     subset_name=name,
-                                     trust_remote_code=True)
+            dataset = MsDataset.load(dataset_name=path, subset_name=name)
         else:
             for split in ['dev', 'val', 'test']:
                 filename = osp.join(path, split, f'{name}_{split}.csv')

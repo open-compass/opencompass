@@ -1,4 +1,6 @@
 from mmengine.config import read_base
+from opencompass.models import OpenAISDK
+from lmdeploy.serve.openai.api_client import APIClient
 
 with read_base():
     # choose a list of datasets
@@ -69,6 +71,36 @@ with read_base():
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
+
+api_meta_template = dict(
+    round=[
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
+    ],
+    reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
+)
+
+api_client = APIClient("http://10.1.9.14:10001")
+model_name = api_client.available_models[0]
+
+models.append(
+    dict(
+        abbr='lmdeploy-api-test',
+        type=OpenAISDK,
+        key='EMPTY', 
+        openai_api_base='http://10.1.9.14:10001/v1', 
+        path=model_name, 
+        tokenizer_path='internlm/internlm2_5-20b-chat',
+        rpm_verbose=True, 
+        meta_template=api_meta_template, 
+        query_per_second=50, 
+        max_out_len=1024,
+        max_seq_len=4096, 
+        temperature=0.01,
+        batch_size=128, 
+        retry=3, 
+    )
+)
 
 for d in datasets:
     d['reader_cfg']['test_range'] = '[0:100]'
