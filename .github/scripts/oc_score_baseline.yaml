@@ -140,9 +140,9 @@ gemma-7b-hf:
     race-high: 66
 
 internlm2_5-7b-hf:
-    gsm8k: 65
-    race-middle: 59
-    race-high: 66
+    gsm8k: 46
+    race-middle: 92
+    race-high: 91
 
 internlm2_5-7b-turbomind:
     gsm8k: 73
@@ -150,9 +150,9 @@ internlm2_5-7b-turbomind:
     race-high: 91
 
 internlm2-1.8b-turbomind:
-    gsm8k: 46
-    race-middle: 92
-    race-high: 91
+    gsm8k: 25
+    race-middle: 75
+    race-high: 72
 
 internlm2-7b-turbomind:
     gsm8k: 67
