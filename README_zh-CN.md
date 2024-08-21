@@ -130,22 +130,18 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 - #### 通过pip安装OpenCompass
 
   ```bash
+  # 支持绝大多数数据集及模型
   pip install -U opencompass
-  ```
 
-- #### 根据不同需求安装 OpenCompass
-
-  ```bash
   # 完整安装（支持更多数据集）
-  pip install "opencompass[full]"
+  # pip install "opencompass[full]"
 
-  # 环境中包含模型加速框架
-  # 由于这些加速框架通常存在依赖冲突，建议使用不同的虚拟环境来管理它们。
-  pip install "opencompass[lmdeploy]"
-  pip install "opencompass[vllm]"
+  # 模型推理后端，由于这些推理后端通常存在依赖冲突，建议使用不同的虚拟环境来管理它们。
+  # pip install "opencompass[lmdeploy]"
+  # pip install "opencompass[vllm]"
 
   # API 测试（例如 OpenAI、Qwen）
-  pip install "opencompass[api]"
+  # pip install "opencompass[api]"
   ```
 
 - #### 基于源码安装OpenCompass

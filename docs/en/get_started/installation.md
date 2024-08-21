@@ -1,89 +1,104 @@
 # Installation
 
-1. Set up the OpenCompass environment:
+## Basic Installation
 
-`````{tabs}
-````{tab} Open-source Models with GPU
+1. Prepare the OpenCompass runtime environment using Conda:
 
-   ```bash
-   conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
+```conda create --name opencompass python=3.10 -y
+   # conda create --name opencompass_lmdeploy python=3.10 -y
+
    conda activate opencompass
-   ```
+```
 
-   If you want to customize the PyTorch version or related CUDA version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
-
-````
-````{tab} API Models with CPU-only
-
-   ```bash
-   conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
-   conda activate opencompass
-   # also please install requiresments packages via `pip install -r requirements/api.txt` for API models if needed.
-   ```
-
-   If you want to customize the PyTorch version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
-
-````
-`````
+If you want to customize the PyTorch version or related CUDA version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
 
 2. Install OpenCompass:
-
+   - pip Installation
    ```bash
-   git clone https://github.com/open-compass/opencompass.git
+   # For support of most datasets and models
+   pip install -U opencompass
+
+   # Complete installation (supports more datasets)
+   # pip install "opencompass[full]"
+
+   # API Testing (e.g., OpenAI, Qwen)
+   # pip install "opencompass[api]"
+   ```
+   - Building from Source Code If you want to use the latest features of OpenCompass
+   ```bash
+   git clone https://github.com/open-compass/opencompass opencompass
    cd opencompass
    pip install -e .
    ```
 
-3. Install humaneval (Optional)
+## Other Installations
 
-   If you want to **evaluate your models coding ability on the humaneval dataset**, follow this step.
+### Inference Backends
 
-   <details>
-   <summary><b>click to show the details</b></summary>
+```bash
+ # Model inference backends. Since these backends often have dependency conflicts,
+ # we recommend using separate virtual environments to manage them.
+ pip install "opencompass[lmdeploy]"
+ # pip install "opencompass[vllm]"
+```
 
-   ```bash
-   git clone https://github.com/openai/human-eval.git
-   cd human-eval
-   pip install -r requirements.txt
-   pip install -e .
-   cd ..
-   ```
+- LMDeploy
 
-   Please read the comments in `human_eval/execution.py` **lines 48-57** to understand the potential risks of executing the model generation code. If you accept these risks, uncomment **line 58** to enable code execution evaluation.
+You can check if the inference backend has been installed successfully with the following command. For more information, refer to the [official documentation](https://lmdeploy.readthedocs.io/en/latest/get_started.html)
 
-   </details>
+```bash
+lmdeploy chat internlm/internlm2_5-1_8b-chat --backend turbomind
+```
 
-4. Install Llama (Optional)
+- vLLM
 
-   If you want to **evaluate Llama / Llama-2 / Llama-2-chat with its official implementation**, follow this step.
+You can check if the inference backend has been installed successfully with the following command. For more information, refer to the [official documentation](https://docs.vllm.ai/en/latest/getting_started/quickstart.html)
 
-   <details>
-   <summary><b>click to show the details</b></summary>
+```bash
+vllm serve facebook/opt-125m
+```
 
-   ```bash
-   git clone https://github.com/facebookresearch/llama.git
-   cd llama
-   pip install -r requirements.txt
-   pip install -e .
-   cd ..
-   ```
+### API
 
-   You can find example configs in `configs/models`. ([example](https://github.com/open-compass/opencompass/blob/eb4822a94d624a4e16db03adeb7a59bbd10c2012/configs/models/llama2_7b_chat.py))
+OpenCompass supports different commercial model API calls, which you can install via pip or by referring to the [API dependencies](https://github.com/open-compass/opencompass/blob/main/requirements/api.txt) for specific API model dependencies.
 
-   </details>
+```bash
+pip install opencompass[api]
 
-5. Install alpaca-eval (Optional)：
+# pip install openai # GPT-3.5-Turbo / GPT-4-Turbo / GPT-4 / GPT-4o (API)
+# pip install anthropic # Claude (API)
+# pip install dashscope # Qwen (API)
+# pip install volcengine-python-sdk # ByteDance Volcano Engine (API)
+# ...
+```
 
-   If you want to**evaluate alpaca-eval in official ways**, follow this step.
+### Datasets
 
-   <details>
-   <summary><b>click to show the details</b></summary>
+The basic installation supports most fundamental datasets. For certain datasets (e.g., Alpaca-eval, Longbench, etc.), additional dependencies need to be installed.
 
-   ```bash
-   pip install alpaca-eval
-   ```
+You can install these through pip or refer to the [additional dependencies](<(https://github.com/open-compass/opencompass/blob/main/requirements/extra.txt)>) for specific dependencies.
 
-   </details>
+```bash
+pip install opencompass[full]
+```
+
+For HumanEvalX / HumanEval+ / MBPP+, you need to manually clone the Git repository and install it.
+
+```bash
+git clone --recurse-submodules git@github.com:open-compass/human-eval.git
+cd human-eval
+pip install -e .
+pip install -e evalplus
+```
+
+Some agent evaluations require installing numerous dependencies, which may conflict with existing runtime environments. We recommend creating separate conda environments to manage these.
+
+```bash
+# T-Eval
+pip install lagent==0.1.2
+# CIBench
+pip install -r requirements/agent.txt
+```
 
 # Dataset Preparation
 

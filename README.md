@@ -129,23 +129,19 @@ We highly recommend using conda to manage your python environment.
 - #### Install Opencompass via pip
 
   ```bash
-    pip install opencompass
-  ```
+    pip install -U opencompass
 
-- #### Install Opencompass for different purposes
+    ## Full installation (with support for more datasets)
+    # pip install "opencompass[full]"
 
-  ```bash
-    # Full installation (with support for more datasets)
-    pip install "opencompass[full]"
+    ## Environment with model acceleration frameworks
+    ## Manage different acceleration frameworks using virtual environments
+    ## since they usually have dependency conflicts with each other.
+    # pip install "opencompass[lmdeploy]"
+    # pip install "opencompass[vllm]"
 
-    # Environment with model acceleration frameworks
-    # Manage different acceleration frameworks using virtual environments
-    # since they usually have dependency conflicts with each other.
-    pip install "opencompass[lmdeploy]"
-    pip install "opencompass[vllm]"
-
-    # API evaluation (i.e. Openai, Qwen)
-    pip install "opencompass[api]"
+    ## API evaluation (i.e. Openai, Qwen)
+    # pip install "opencompass[api]"
   ```
 
 - #### Install Opencompass from source
