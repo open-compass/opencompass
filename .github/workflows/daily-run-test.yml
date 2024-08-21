@@ -75,10 +75,10 @@ jobs:
           python tools/list_configs.py internlm2_5 mmlu
           python run.py --models hf_internlm2_5_7b --datasets race_ppl --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1 --reuse
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/cmd1/summary regression_result_daily
-          python -m pytest -m other -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -m case1 -s -v --color=yes .github/scripts/oc_score_assert.py
           python run.py --models hf_internlm2_5_7b_chat --datasets race_gen -a lmdeploy --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2 --reuse
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/cmd2/summary regression_result_daily
-          python -m pytest -m other -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -m case2 -s -v --color=yes .github/scripts/oc_score_assert.py
           python run.py --datasets race_ppl --hf-type base --hf-path internlm/internlm2_5-7b --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3 --reuse
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/cmd3/summary regression_result_daily
           python -m pytest -m other -s -v --color=yes .github/scripts/oc_score_assert.py

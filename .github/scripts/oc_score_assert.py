@@ -17,7 +17,7 @@ chat_model_list = [
     'minicpm-2b-sft-bf16-hf', 'minicpm-2b-sft-fp32-hf',
     'phi-3-mini-4k-instruct-hf', 'qwen1.5-0.5b-chat-hf',
     'qwen2-1.5b-instruct-turbomind', 'qwen2-7b-instruct-turbomind',
-    'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf'
+    'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf', 'lmdeploy-api-test'
 ]
 base_model_list = [
     'deepseek-moe-16b-base-hf', 'deepseek-7b-base-turbomind', 'gemma-2b-hf',
@@ -80,18 +80,18 @@ class TestBase:
         assert_score(result_score, base_score)
 
 
+@pytest.mark.case1
 @pytest.mark.usefixtures('result_scores')
-@pytest.mark.other
-class TestBaseLine:
-    """Test cases for base model."""
+class TestCmdCase1:
 
-    def test_model_dataset_score(self, result_scores):
+    @pytest.mark.parametrize('model, dataset',
+                             [('internlm2_5-7b-hf', 'race-middle'),
+                              ('internlm2_5-7b-hf', 'race-high')])
+    def test_model_dataset_score(self, result_scores, model, dataset):
         if len(result_scores.keys()) != 1:
             assert False, 'result is none'
-        model = result_scores.keys()[0]
-        for dataset in ['race-middle', 'race-high']:
-            result_score = result_scores.get(model).get(dataset)
-            assert_score(result_score, 91)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(result_score, 91)
 
 
 def assert_score(score, baseline):
