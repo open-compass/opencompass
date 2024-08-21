@@ -3,8 +3,6 @@ alpaca-eval==0.6
 cn2an
 # Icl topk retriever
 faiss_gpu==1.7.2
-# Longbench
-fuzzywuzzy
 # Humaneval, Humaneval X
 -e git+https://github.com/open-compass/human-eval.git#egg=human-eval
 # IFEval
