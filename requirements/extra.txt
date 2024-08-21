@@ -17,3 +17,5 @@ ltp
 pyext
 # Law Bench
 pypinyin
+# RULER
+wonderwords
