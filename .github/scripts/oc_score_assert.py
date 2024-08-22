@@ -103,6 +103,16 @@ class TestCmdCase:
         result_score = result_scores.get(model).get(dataset)
         assert_score(result_score, 91)
 
+    @pytest.mark.case3
+    @pytest.mark.parametrize('model, dataset',
+                             [('internlm2_5-7b_hf', 'race-middle'),
+                              ('internlm2_5-7b_hf', 'race-high')])
+    def test_cmd_case3(self, result_scores, model, dataset):
+        if len(result_scores.keys()) != 1:
+            assert False, 'result is none'
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(result_score, 91)
+
 
 def assert_score(score, baseline):
     if score is None or score == '-':
