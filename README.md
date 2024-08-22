@@ -125,7 +125,7 @@ We highly recommend using conda to manage your python environment.
   conda activate opencompass
   ```
 
-- #### Install Opencompass via pip
+- #### Install OpenCompass via pip
 
   ```bash
     pip install -U opencompass
@@ -143,7 +143,7 @@ We highly recommend using conda to manage your python environment.
     # pip install "opencompass[api]"
   ```
 
-- #### Install Opencompass from source
+- #### Install OpenCompass from source
 
   if you want to use opencompass's latest feature, you can also build it from source
 
