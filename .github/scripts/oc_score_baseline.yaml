@@ -123,6 +123,10 @@ deepseek-moe-16b-base-hf:
     race-middle: 35
     race-high: 23
 
+lmdeploy-api-test:
+    gsm8k: 90
+    race-middle: 95
+    race-high: 96
 
 deepseek-7b-base-turbomind:
     gsm8k: 21
