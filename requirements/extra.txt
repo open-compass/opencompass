@@ -1,5 +1,19 @@
+# Alpaca-eval
 alpaca-eval==0.6
+cn2an
+# Icl topk retriever
 faiss_gpu==1.7.2
+# Humaneval, Humaneval X
+-e git+https://github.com/open-compass/human-eval.git#egg=human-eval
+# IFEval
+langdetect
+# TheoremQA
 latex2sympy2
-scikit-learn==1.5
+# Lawbench, leval
+ltp
+# Taco, apps Dataset
+pyext
+# Law Bench
+pypinyin
+# RULER
 wonderwords

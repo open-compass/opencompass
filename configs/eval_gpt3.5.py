@@ -6,9 +6,9 @@ from opencompass.tasks import OpenICLInferTask
 
 with read_base():
     # choose a list of datasets
-    from .datasets.collections.chat_medium import datasets
+    from opencompass.configs.datasets.collections.chat_medium import datasets
     # and output the results in a choosen format
-    from .summarizers.medium import summarizer
+    from opencompass.configs.summarizers.medium import summarizer
 
 
 api_meta_template = dict(

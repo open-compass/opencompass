@@ -117,26 +117,44 @@ Below are the steps for quick installation and datasets preparation.
 
 ### 💻 Environment Setup
 
-#### Open-source Models with GPU
+We highly recommend using conda to manage your python environment.
 
-```bash
-conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
-conda activate opencompass
-git clone https://github.com/open-compass/opencompass opencompass
-cd opencompass
-pip install -e .
-```
+- #### Create your virtual environment
 
-#### API Models with CPU-only
+  ```bash
+  conda create --name opencompass python=3.10 -y
+  conda activate opencompass
+  ```
 
-```bash
-conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
-conda activate opencompass
-git clone https://github.com/open-compass/opencompass opencompass
-cd opencompass
-pip install -e .
-# also please install requirements packages via `pip install -r requirements/api.txt` for API models if needed.
-```
+- #### Install OpenCompass via pip
+
+  ```bash
+    pip install -U opencompass
+
+    ## Full installation (with support for more datasets)
+    # pip install "opencompass[full]"
+
+    ## Environment with model acceleration frameworks
+    ## Manage different acceleration frameworks using virtual environments
+    ## since they usually have dependency conflicts with each other.
+    # pip install "opencompass[lmdeploy]"
+    # pip install "opencompass[vllm]"
+
+    ## API evaluation (i.e. Openai, Qwen)
+    # pip install "opencompass[api]"
+  ```
+
+- #### Install OpenCompass from source
+
+  If you want to use opencompass's latest features, or develop new features, you can also build it from source
+
+  ```bash
+    git clone https://github.com/open-compass/opencompass opencompass
+    cd opencompass
+    pip install -e .
+    # pip install -e ".[full]"
+    # pip install -e ".[vllm]"
+  ```
 
 ### 📂 Data Preparation
 
@@ -180,32 +198,63 @@ Some third-party features, like Humaneval and Llama, may require additional step
 
 ## 🏗️ ️Evaluation
 
-After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared, you can evaluate the performance of the LLaMA-7b model on the MMLU and C-Eval datasets using the following command:
+After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared. Now you can start your first evaluation using OpenCompass!
 
-```bash
-python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
-```
+- Your first evaluation with OpenCompass!
 
-Additionally, if you want to use an inference backend other than HuggingFace for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Please ensure that you have installed the necessary packages for the chosen backend and that your model supports accelerated inference with it. For more information, see the documentation on inference acceleration backends [here](docs/en/advanced_guides/accelerator_intro.md). Below is an example using LMDeploy:
+  OpenCompass support setting your configs via CLI or a python script. For simple evaluation settings we recommend using CLI, for more complex evaluation, it is suggested using the script way. You can find more example scripts under the example_scripts folder.
 
-```bash
-python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl -a lmdeploy
-```
+  ```bash
+  # CLI
+  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
-OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
+  # Python scripts
+  opencompass example_scripts/eval_chat_demo.py
+  ```
 
-```bash
-# List all configurations
-python tools/list_configs.py
-# List all configurations related to llama and mmlu
-python tools/list_configs.py llama mmlu
-```
+  You can find more script examples under [configs](./configs) folder.
 
-You can also evaluate other HuggingFace models via command line. Taking LLaMA-7b as an example:
+- API evaluation
 
-```bash
-python run.py --datasets ceval_ppl mmlu_ppl --hf-type base --hf-path huggyllama/llama-7b
-```
+  OpenCompass, by its design, does not really discriminate between open-source models and API models. You can evaluate both model types in the same way or even in one settings.
+
+  ```bash
+  export OPENAI_API_KEY="YOUR_OPEN_API_KEY"
+  # CLI
+  opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
+
+  # Python scripts
+  opencompass example_scripts/eval_api_demo.py
+  ```
+
+- Accelerated Evaluation
+
+  Additionally, if you want to use an inference backend other than HuggingFace for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Please ensure that you have installed the necessary packages for the chosen backend and that your model supports accelerated inference with it. For more information, see the documentation on inference acceleration backends [here](docs/en/advanced_guides/accelerator_intro.md). Below is an example using LMDeploy:
+
+  ```bash
+  # CLI
+  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
+
+  # Python scripts
+  opencompass ./configs/eval_lmdeploy_demo.py
+  ```
+
+- Supported Models
+
+  OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
+
+  ```bash
+  # List all configurations
+  python tools/list_configs.py
+  # List all configurations related to llama and mmlu
+  python tools/list_configs.py llama mmlu
+  ```
+
+  If the model is not on the list but supported by Huggingface AutoModel class, you can also evaluate it with OpenCompass. You are welcome to contribute to the maintenance of the OpenCompass supported model and dataset lists.
+
+  ```bash
+  opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat
+  ```
 
 > \[!TIP\]
 >

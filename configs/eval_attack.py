@@ -5,8 +5,8 @@ from opencompass.tasks import OpenICLAttackTask
 
 with read_base():
     # choose a list of datasets
-    from .datasets.promptbench.promptbench_wnli_gen_50662f import wnli_datasets
-    from .models.hf_vicuna_7b import models
+    from opencompass.configs.datasets.promptbench.promptbench_wnli_gen_50662f import wnli_datasets
+    from opencompass.configs.models.qwen.hf_qwen2_1_5b import models
 
 datasets = wnli_datasets
 

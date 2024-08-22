@@ -1,7 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
+    from opencompass.configs.datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
 
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3
 from opencompass.models.openai_api import OpenAI

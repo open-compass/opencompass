@@ -1,15 +1,15 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
-    from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import alpacav2_datasets
-    from .datasets.subjective.compassarena.compassarena_compare import compassarena_datasets
-    from .datasets.subjective.arena_hard.arena_hard_compare import arenahard_datasets
-    from .datasets.subjective.compassbench.compassbench_compare import compassbench_datasets
-    from .datasets.subjective.fofo.fofo_judge import fofo_datasets
-    from .datasets.subjective.wildbench.wildbench_pair_judge import wildbench_datasets
-    from .datasets.subjective.multiround.mtbench_single_judge_diff_temp import mtbench_datasets
-    from .datasets.subjective.multiround.mtbench101_judge import mtbench101_datasets
+    from opencompass.configs.datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
+    from opencompass.configs.datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import alpacav2_datasets
+    from opencompass.configs.datasets.subjective.compassarena.compassarena_compare import compassarena_datasets
+    from opencompass.configs.datasets.subjective.arena_hard.arena_hard_compare import arenahard_datasets
+    from opencompass.configs.datasets.subjective.compassbench.compassbench_compare import compassbench_datasets
+    from opencompass.configs.datasets.subjective.fofo.fofo_judge import fofo_datasets
+    from opencompass.configs.datasets.subjective.wildbench.wildbench_pair_judge import wildbench_datasets
+    from opencompass.configs.datasets.subjective.multiround.mtbench_single_judge_diff_temp import mtbench_datasets
+    from opencompass.configs.datasets.subjective.multiround.mtbench101_judge import mtbench101_datasets
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner

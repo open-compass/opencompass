@@ -16,14 +16,14 @@ from opencompass.partitioners import NaivePartitioner
 
 with read_base():
     # Note that it might occur cuda OOM error for hf model
-    from .models.hf_llama.lmdeploy_llama3_8b_instruct import models as lmdeploy_llama3_8b_instruct_model
+    from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import models as lmdeploy_llama3_8b_instruct_model
 
-    from .summarizers.cibench import summarizer
-    from .datasets.CIBench.CIBench_template_gen_e6b12a import cibench_datasets as cibench_datasets_template
-    from .datasets.CIBench.CIBench_generation_gen_8ab0dc import cibench_datasets as cibench_datasets_generation
+    from opencompass.configs.summarizers.cibench import summarizer
+    from opencompass.configs.datasets.CIBench.CIBench_template_gen_e6b12a import cibench_datasets as cibench_datasets_template
+    from opencompass.configs.datasets.CIBench.CIBench_generation_gen_8ab0dc import cibench_datasets as cibench_datasets_generation
     # Oracle mode for analysis
-    # from .datasets.CIBench.CIBench_template_oracle_gen_fecda1 import cibench_datasets as cibench_datasets_template_oracle
-    # from .datasets.CIBench.CIBench_generation_oracle_gen_c4a7c1 import cibench_datasets as cibench_datasets_generation_oracle
+    # from opencompass.configs.datasets.CIBench.CIBench_template_oracle_gen_fecda1 import cibench_datasets as cibench_datasets_template_oracle
+    # from opencompass.configs.datasets.CIBench.CIBench_generation_oracle_gen_c4a7c1 import cibench_datasets as cibench_datasets_generation_oracle
 
 datasets = []
 datasets += cibench_datasets_template

@@ -1,9 +1,9 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .datasets.lveval.lveval import LVEval_datasets as datasets
-    from .models.bluelm.hf_bluelm_7b_chat_32k import models
-    from .summarizers.lveval import summarizer
+    from opencompass.configs.datasets.lveval.lveval import LVEval_datasets as datasets
+    from opencompass.configs.models.bluelm.hf_bluelm_7b_chat_32k import models
+    from opencompass.configs.summarizers.lveval import summarizer
 
 models[0][
     'path'

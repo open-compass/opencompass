@@ -1,41 +1,106 @@
 # 安装
 
-1. 准备 OpenCompass 运行环境：
+## 基础安装
 
-`````{tabs}
-````{tab} 面向开源模型的GPU环境
-
-   ```bash
-   conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
-   conda activate opencompass
-   ```
-
-   如果你希望自定义 PyTorch 版本或相关的 CUDA 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
-
-````
-
-````{tab} 面向API模型测试的CPU环境
+1. 使用Conda准备 OpenCompass 运行环境：
 
    ```bash
-   conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
+   conda create --name opencompass python=3.10 -y
+   # conda create --name opencompass_lmdeploy python=3.10 -y
+
    conda activate opencompass
-   # 如果需要使用各个API模型，请 `pip install -r requirements/api.txt` 安装API模型的相关依赖
    ```
 
    如果你希望自定义 PyTorch 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
 
-````
-`````
-
 2. 安装 OpenCompass：
 
+   - pip安装
+
    ```bash
-   git clone https://github.com/open-compass/opencompass.git
+   # 支持绝大多数数据集及模型
+   pip install -U opencompass
+
+   # 完整安装（支持更多数据集）
+   # pip install "opencompass[full]"
+
+   # API 测试（例如 OpenAI、Qwen）
+   # pip install "opencompass[api]"
+   ```
+
+   - 如果希望使用 OpenCompass 的最新功能，也可以从源代码构建它：
+
+   ```bash
+   git clone https://github.com/open-compass/opencompass opencompass
    cd opencompass
    pip install -e .
    ```
 
-3. 如果需要使用推理后端，或者进行 API 模型测试，或者进行 代码、智能体、主观 等数据集的评测，请参考 [其他安装说明](./extra-installation.md)
+## 其他安装
+
+### 推理后端
+
+```bash
+# 模型推理后端，由于这些推理后端通常存在依赖冲突，建议使用不同的虚拟环境来管理它们。
+pip install "opencompass[lmdeploy]"
+# pip install "opencompass[vllm]"
+```
+
+- LMDeploy
+
+可以通过下列命令判断推理后端是否安装成功，更多信息请参考 [官方文档](https://lmdeploy.readthedocs.io/zh-cn/latest/get_started.html)
+
+```bash
+lmdeploy chat internlm/internlm2_5-1_8b-chat --backend turbomind
+```
+
+- vLLM
+  可以通过下列命令判断推理后端是否安装成功，更多信息请参考 [官方文档](https://docs.vllm.ai/en/latest/getting_started/quickstart.html)
+
+```bash
+vllm serve facebook/opt-125m
+```
+
+### API
+
+Opencompass支持不同的商业模型API调用，你可以通过pip方式安装，或者参考 [API](https://github.com/open-compass/opencompass/blob/main/requirements/api.txt) 安装对应的API模型依赖
+
+```bash
+pip install opencompass[api]
+
+# pip install openai # GPT-3.5-Turbo / GPT-4-Turbo / GPT-4 / GPT-4o (API)
+# pip install anthropic # Claude (API)
+# pip install dashscope #  通义千问 (API)
+# pip install volcengine-python-sdk # 字节豆包 (API)
+# ...
+```
+
+### 数据集
+
+基础安装可以支持绝大部分基础数据集，针对某些数据集（i.e. Alpaca-eval, Longbench etc.），需要安装额外的依赖。
+你可以通过pip方式安装，或者参考 [额外依赖](https://github.com/open-compass/opencompass/blob/main/requirements/extra.txt) 安装对应的依赖
+
+```bash
+pip install opencompass[full]
+```
+
+针对 HumanEvalX / HumanEval+ / MBPP+ 需要手动clone git仓库进行安装
+
+```bash
+git clone --recurse-submodules git@github.com:open-compass/human-eval.git
+cd human-eval
+pip install -e .
+pip install -e evalplus
+```
+
+部分智能体评测需要安装大量依赖且可能会与已有运行环境冲突，我们建议创建不同的conda环境来管理
+
+```bash
+# T-Eval
+pip install lagent==0.1.2
+# CIBench
+pip install -r requirements/agent.txt
+```
 
 ## 数据集准备
 
