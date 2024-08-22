@@ -81,10 +81,10 @@ jobs:
           python -m pytest -m case2 -s -v --color=yes .github/scripts/oc_score_assert.py
           python run.py --datasets race_ppl --hf-type base --hf-path internlm/internlm2_5-7b --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3 --reuse
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3/*/summary regression_result_daily
-          python -m pytest -m other -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -m case3 -s -v --color=yes .github/scripts/oc_score_assert.py
           python run.py --datasets race_gen --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4 --reuse
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4/*/summary regression_result_daily
-          python -m pytest -m other -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
         if: always()
         run: |
