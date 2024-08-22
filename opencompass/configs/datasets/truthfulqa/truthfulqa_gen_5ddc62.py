@@ -27,7 +27,7 @@ truthfulqa_infer_cfg = dict(
 # `metrics=('bleurt', 'rouge', 'bleu')`
 truthfulqa_eval_cfg = dict(
     evaluator=dict(
-        type=TruthfulQAEvaluator, metrics=('rouge'), key='ENV'), )
+        type=TruthfulQAEvaluator, metrics=('bleu'), key='ENV'), )
 
 truthfulqa_datasets = [
     dict(
