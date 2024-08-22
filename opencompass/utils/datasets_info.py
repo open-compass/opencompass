@@ -356,4 +356,8 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ruler.zip",
         "md5": "c60bdfff3d02358067104cc1dea7c0f7",
     },
+    "scicode/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/scicode.zip",
+        "md5": "06f64edad6680072e5bca3f0ce892d0c",
+    }
 }
