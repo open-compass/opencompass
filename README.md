@@ -145,7 +145,7 @@ We highly recommend using conda to manage your python environment.
 
 - #### Install OpenCompass from source
 
-  if you want to use opencompass's latest feature, you can also build it from source
+  If you want to use opencompass's latest features, or develop new features, you can also build it from source
 
   ```bash
     git clone https://github.com/open-compass/opencompass opencompass
@@ -197,15 +197,15 @@ Some third-party features, like Humaneval and Llama, may require additional step
 
 ## 🏗️ ️Evaluation
 
-After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared. Now you can start your first evaluation using Opencompass!
+After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared. Now you can start your first evaluation using OpenCompass!
 
-- Your first evaluation with Opencompass!
+- Your first evaluation with OpenCompass!
 
-  Opencompass support setting your configs via CLI or a python script. For simple evaluation settings we recommend using CLI, for more complex evaluation, it is suggested using the script way. You can find more example scripts under the example_scripts folder.
+  OpenCompass support setting your configs via CLI or a python script. For simple evaluation settings we recommend using CLI, for more complex evaluation, it is suggested using the script way. You can find more example scripts under the example_scripts folder.
 
   ```bash
   # CLI
-  opencompass --models hf_internlm2_chat_1_8b_sft --datasets demo_gsm8k_chat_gen
+  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
   # Python scripts
   opencompass example_scripts/eval_chat_demo.py
@@ -226,13 +226,13 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass example_scripts/eval_api_demo.py
   ```
 
-- Accelerated evaluation
+- Accelerated Evaluation
 
   Additionally, if you want to use an inference backend other than HuggingFace for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Please ensure that you have installed the necessary packages for the chosen backend and that your model supports accelerated inference with it. For more information, see the documentation on inference acceleration backends [here](docs/en/advanced_guides/accelerator_intro.md). Below is an example using LMDeploy:
 
   ```bash
   # CLI
-  opencompass --models hf_internlm2_chat_1_8b_sft --datasets demo_gsm8k_chat_gen -a lmdeploy
+  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
 
   # Python scripts
   opencompass ./configs/eval_lmdeploy_demo.py

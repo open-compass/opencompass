@@ -203,7 +203,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
   ```bash
   # 命令行界面 (CLI)
-  opencompass --models hf_internlm2_chat_1_8b_sft --datasets demo_gsm8k_chat_gen
+  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
   # Python 脚本
   opencompass example_scripts/eval_chat_demo.py
@@ -229,7 +229,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
   另外，如果您想使用除 HuggingFace 之外的推理后端来进行加速评估，比如 LMDeploy 或 vLLM，可以通过以下命令进行。请确保您已经为所选的后端安装了必要的软件包，并且您的模型支持该后端的加速推理。更多信息，请参阅关于推理加速后端的文档 [这里](docs/zh_cn/advanced_guides/accelerator_intro.md)。以下是使用 LMDeploy 的示例：
 
   ```bash
-  python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl -a lmdeploy
+  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
   ```
 
   OpenCompass 预定义了许多模型和数据集的配置，你可以通过 [工具](./docs/zh_cn/tools.md#ListConfigs) 列出所有可用的模型和数据集配置。
