@@ -80,14 +80,24 @@ class TestBase:
         assert_score(result_score, base_score)
 
 
-@pytest.mark.case1
 @pytest.mark.usefixtures('result_scores')
-class TestCmdCase1:
+class TestCmdCase:
 
+    @pytest.mark.case1
     @pytest.mark.parametrize('model, dataset',
                              [('internlm2_5-7b-hf', 'race-middle'),
                               ('internlm2_5-7b-hf', 'race-high')])
-    def test_model_dataset_score(self, result_scores, model, dataset):
+    def test_cmd_case1(self, result_scores, model, dataset):
+        if len(result_scores.keys()) != 1:
+            assert False, 'result is none'
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(result_score, 91)
+
+    @pytest.mark.case2
+    @pytest.mark.parametrize('model, dataset',
+                             [('internlm2_5-7b-chat-turbomind', 'race-middle'),
+                              ('internlm2_5-7b-chat-turbomind', 'race-high')])
+    def test_cmd_case2(self, result_scores, model, dataset):
         if len(result_scores.keys()) != 1:
             assert False, 'result is none'
         result_score = result_scores.get(model).get(dataset)
