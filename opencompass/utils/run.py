@@ -115,7 +115,7 @@ def get_config_from_arg(args) -> Config:
     datasets = []
     if args.datasets:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(os.path.dirname(script_dir))
+        parent_dir = os.path.dirname(script_dir)
         default_configs_dir = os.path.join(parent_dir, 'configs')
         datasets_dir = [
             os.path.join(args.config_dir, 'datasets'),
@@ -154,7 +154,7 @@ def get_config_from_arg(args) -> Config:
         raise ValueError('You must specify a config file path, or specify --models and --datasets, or specify HuggingFace model parameters and --datasets.')
     models = []
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(os.path.dirname(script_dir))
+    parent_dir = os.path.dirname(script_dir)
     default_configs_dir = os.path.join(parent_dir, 'configs')
     models_dir = [
         os.path.join(args.config_dir, 'models'),
@@ -197,7 +197,7 @@ def get_config_from_arg(args) -> Config:
     # parse summarizer args
     summarizer_arg = args.summarizer if args.summarizer is not None else 'example'
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(os.path.dirname(script_dir))
+    parent_dir = os.path.dirname(script_dir)
     default_configs_dir = os.path.join(parent_dir, 'configs')
     summarizers_dir = [
         os.path.join(args.config_dir, 'summarizers'),
