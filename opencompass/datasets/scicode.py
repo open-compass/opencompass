@@ -40,10 +40,6 @@ class SciCodeDataset(BaseDataset):
         return self.dataset
 
 
-H5PY_FILE_FOLDER = './data/scicode/'
-H5PY_FILE_FOLDER = get_data_path(H5PY_FILE_FOLDER, local_mode=True)
-
-
 def process_hdf5_list(group):
     lst = []
     for key in group.keys():
@@ -98,6 +94,9 @@ def process_hdf5_datagroup(group):
 
 
 def process_hdf5_to_tuple(step_id, test_num):
+
+    H5PY_FILE_FOLDER = './data/scicode/'
+    H5PY_FILE_FOLDER = get_data_path(H5PY_FILE_FOLDER, local_mode=True)
     data_lst = []
     H5PY_FILE = os.path.join(H5PY_FILE_FOLDER, 'test_data.h5')
     assert os.path.exists(

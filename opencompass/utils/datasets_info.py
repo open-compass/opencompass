@@ -359,5 +359,13 @@ DATASETS_URL = {
     "scicode/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/scicode.zip",
         "md5": "06f64edad6680072e5bca3f0ce892d0c",
+    },
+    "/commonsenseqa": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/commonsenseqa.zip",
+        "md5": "c4a82fc07c81ae1462605f5d7fd2bb2e",
+    },
+    "FewCLUE": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/FewCLUE.zip",
+        "md5": "7976e2bb0e9d885ffd3c55f7c5d4021e",
     }
 }
