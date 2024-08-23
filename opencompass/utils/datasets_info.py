@@ -367,5 +367,9 @@ DATASETS_URL = {
     "FewCLUE": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/FewCLUE.zip",
         "md5": "7976e2bb0e9d885ffd3c55f7c5d4021e",
-    }
+    },
+    "/race/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/race.zip",
+        "md5": "b758251764a264746cf45749c02363f9",
+    },
 }
