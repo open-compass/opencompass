@@ -58,7 +58,7 @@ def match_cfg_file(workdir: Union[str, List[str]],
                                          tablefmt='psql')
         if ambiguous:
             table = [['Ambiguous patterns', 'Matched files'], *ambiguous]
-            warning_msg = 'Found ambiguous patterns, using the first matched config.'
+            warning_msg = 'Found ambiguous patterns, using the first matched config.\n'
             warning_msg += tabulate.tabulate(table,
                                          headers='firstrow',
                                          tablefmt='psql')
@@ -162,13 +162,13 @@ def get_config_from_arg(args) -> Config:
 
     ]
     if args.models:
-        # model_dir = os.path.join(args.config_dir, 'models')
-        for model in match_cfg_file(models_dir, args.models):
-            logger.info(f'Loading {model[0]}: {model[1]}')
-            cfg = Config.fromfile(model[1])
-            if 'models' not in cfg:
-                raise ValueError(f'Config file {model[1]} does not contain "models" field')
-            models += cfg['models']
+        for model_arg in args.models:
+            for model in match_cfg_file(models_dir, [model_arg]):
+                logger.info(f'Loading {model[0]}: {model[1]}')
+                cfg = Config.fromfile(model[1])
+                if 'models' not in cfg:
+                    raise ValueError(f'Config file {model[1]} does not contain "models" field')
+                models += cfg['models']
     else:
         if args.hf_type == 'chat':
             mod = HuggingFacewithChatTemplate
