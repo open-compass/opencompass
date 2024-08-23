@@ -202,14 +202,14 @@ After ensuring that OpenCompass is installed correctly according to the above st
 
 - Your first evaluation with OpenCompass!
 
-  OpenCompass support setting your configs via CLI or a python script. For simple evaluation settings we recommend using CLI, for more complex evaluation, it is suggested using the script way. You can find more example scripts under the example_scripts folder.
+  OpenCompass support setting your configs via CLI or a python script. For simple evaluation settings we recommend using CLI, for more complex evaluation, it is suggested using the script way. You can find more example scripts under the configs folder.
 
   ```bash
   # CLI
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
   # Python scripts
-  opencompass example_scripts/eval_chat_demo.py
+  opencompass ./configs/eval_chat_demo.py
   ```
 
   You can find more script examples under [configs](./configs) folder.
@@ -224,7 +224,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
 
   # Python scripts
-  opencompass example_scripts/eval_api_demo.py
+  opencompass ./configs/eval_api_demo.py
   ```
 
 - Accelerated Evaluation

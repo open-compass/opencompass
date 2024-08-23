@@ -200,14 +200,14 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
 - ### 首次评测
 
-  OpenCompass 支持通过命令行界面 (CLI) 或 Python 脚本来设置配置。对于简单的评估设置，我们推荐使用 CLI；而对于更复杂的评估，则建议使用脚本方式。你可以在example_scripts文件夹下找到更多脚本示例。
+  OpenCompass 支持通过命令行界面 (CLI) 或 Python 脚本来设置配置。对于简单的评估设置，我们推荐使用 CLI；而对于更复杂的评估，则建议使用脚本方式。你可以在configs文件夹下找到更多脚本示例。
 
   ```bash
   # 命令行界面 (CLI)
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
   # Python 脚本
-  opencompass example_scripts/eval_chat_demo.py
+  opencompass ./configs/eval_chat_demo.py
   ```
 
   你可以在[configs](./configs) 文件夹下找到更多的脚本示例。
@@ -222,7 +222,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
   opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
 
   # Python 脚本
-  opencompass example_scripts/eval_api_demo.py
+  opencompass  ./configs/eval_api_demo.py
   ```
 
 - ### 推理后端
