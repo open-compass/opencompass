@@ -12,6 +12,7 @@ with read_base():
     from .groups.tydiqa import tydiqa_summary_groups
     from .groups.xiezhi import xiezhi_summary_groups
 
+# TODO: obqa, storycloze
 summarizer = dict(
     dataset_abbrs=[
         '--------- 考试 Exam ---------',  # category
@@ -21,6 +22,7 @@ summarizer = dict(
         'mmlu',
         'GaokaoBench',
         'ARC-c',
+        'ARC-e',
         '--------- 语言 Language ---------',  # category
         # '字词释义', # subcategory
         'WiC',
