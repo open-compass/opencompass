@@ -31,7 +31,7 @@ class BoolQDatasetV2(BaseDataset):
 
     @staticmethod
     def load(path):
-        path = get_data_path(path, local_mode=True)
+        path = get_data_path(path)
         dataset = []
         with open(path, 'r') as f:
             for line in f:
