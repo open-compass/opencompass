@@ -1,11 +1,8 @@
 from mmengine.config import read_base
 import os.path as osp
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
-from opencompass.runners import DLCRunner, LocalRunner
+from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
-from opencompass.models import TurboMindModelwithChatTemplate
-from opencompass.models.openai_api import OpenAISDK
-from copy import deepcopy
 
 
 #######################################################################
