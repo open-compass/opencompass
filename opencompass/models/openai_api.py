@@ -45,6 +45,10 @@ class OpenAI(BaseAPIModel):
             wrapping of any meta instructions.
         openai_api_base (str): The base url of OpenAI's API. Defaults to
             'https://api.openai.com/v1/chat/completions'.
+        openai_proxy_url (str, optional): An optional proxy url to use when
+            connecting to OpenAI's API. When set to 'ENV', the url will be
+            fetched from the environment variable $OPENAI_PROXY_URL.
+            Defaults to None.
         mode (str, optional): The method of input truncation when input length
             exceeds max_seq_len. 'front','mid' and 'rear' represents the part
             of input to truncate. Defaults to 'none'.
