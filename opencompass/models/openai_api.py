@@ -15,7 +15,9 @@ from opencompass.utils.prompt import PromptList
 from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
-OPENAI_API_BASE = 'https://api.openai.com/v1/chat/completions'
+OPENAI_API_BASE = os.path.join(
+    os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
+    'chat/completions')
 
 
 @MODELS.register_module()
