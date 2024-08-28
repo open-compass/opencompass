@@ -3,7 +3,21 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import BoolQDatasetV2
-from opencompass.utils.text_postprocessors import first_capital_postprocess
+from opencompass.utils.text_postprocessors import (
+    first_option_postprocess,
+)
+
+QUERY_TEMPLATE = """
+Answer the following question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of AB. Think step by step before answering.
+
+Passage: {passage}
+
+Question: {question}
+
+A. Yes
+B. NO
+
+""".strip()
 
 BoolQ_reader_cfg = dict(
     input_columns=['question', 'passage'],
@@ -13,11 +27,11 @@ BoolQ_reader_cfg = dict(
 BoolQ_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=dict(round=[
-            dict(
-                role='HUMAN',
-                prompt='{passage}\nQuestion: {question}\nA. Yes\nB. No\nAnswer:'),
-        ]),
+        template=dict(
+            round=[
+                dict(role='HUMAN', prompt=QUERY_TEMPLATE),
+            ]
+        ),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
@@ -26,7 +40,7 @@ BoolQ_infer_cfg = dict(
 BoolQ_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
     pred_role='BOT',
-    pred_postprocessor=dict(type=first_capital_postprocess),
+    pred_postprocessor=dict(type=first_option_postprocess, options='AB'),
 )
 
 BoolQ_datasets = [

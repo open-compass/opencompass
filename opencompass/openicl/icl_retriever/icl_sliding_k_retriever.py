@@ -51,8 +51,8 @@ class SlidingWindowRetriever(BaseRetriever):
         for current_index in trange(len(self.test_ds),
                                     disable=not self.is_main_process):
             if current_index < self.k:
-                """For the first few examples,
-                get the previous ones and pad with the last ones"""
+                """For the first few examples, get the previous ones and pad
+                with the last ones."""
                 start_index = max(0, current_index - self.k)
                 previous_shots = list(range(start_index, current_index))
                 if len(previous_shots) < self.k:

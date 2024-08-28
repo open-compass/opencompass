@@ -203,7 +203,7 @@ DATASETS_MAPPING = {
     "opencompass/race": {
         "ms_id": "opencompass/race",
         "hf_id": "opencompass/race",
-        "local": "./data/race",
+        "local": "./data/race/",
     },
     # SIQA
     "opencompass/siqa": {
@@ -228,6 +228,12 @@ DATASETS_MAPPING = {
         "ms_id": "opencompass/summedits",
         "hf_id": "opencompass/summedits",
         "local": "./data/summedits/summedits.jsonl",
+    },
+    # SuperGLUE
+    "opencompass/boolq": {
+        "ms_id": "opencompass/boolq",
+        "hf_id": "opencompass/boolq",
+        "local": "./data/SuperGLUE/BoolQ/val.jsonl",
     },
     # TriviaQA
     "opencompass/trivia_qa": {
@@ -291,10 +297,6 @@ DATASETS_URL = {
     "/BBH/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/BBH.zip",
         "md5": "60c49f9bef5148aa7e1941328e96a554",
-    },
-    "/mmlu/": {
-        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip",
-        "md5": "761310671509a239e41c4b717f7fab9c",
     },
     "/compass_arena/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/compass_arena.zip",
@@ -367,5 +369,17 @@ DATASETS_URL = {
     "FewCLUE": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/FewCLUE.zip",
         "md5": "7976e2bb0e9d885ffd3c55f7c5d4021e",
-    }
+    },
+    "/race": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/race.zip",
+        "md5": "b758251764a264746cf45749c02363f9",
+    },
+    "/ARC": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ARC.zip",
+        "md5": "d720629b69f1a51cfe78bf65b00b44f6",
+    },
+    "/SuperGLUE": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SuperGLUE.zip",
+        "md5": "b60904915b0b61d1a04ea52280169936",
+    },
 }
