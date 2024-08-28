@@ -4,6 +4,7 @@
 from datasets import load_dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -24,8 +25,9 @@ def _parse(item):
 class MMLUProDataset(BaseDataset):
 
     @staticmethod
-    def load(category: str):
-        mmlu_pro = load_dataset('TIGER-Lab/MMLU-Pro')
+    def load(path: str, category: str):
+        path = get_data_path(path)
+        mmlu_pro = load_dataset(path)
         mmlu_pro = mmlu_pro.filter(lambda x: x['category'] == category)
         mmlu_pro = mmlu_pro.map(_parse)
         return mmlu_pro
