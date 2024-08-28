@@ -382,4 +382,8 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SuperGLUE.zip",
         "md5": "b60904915b0b61d1a04ea52280169936",
     },
+    "SQuAD2.0": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SQuAD2.0.zip",
+        "md5": "1321cbf9349e1102a57d31d1b2bfdd7e",
+    },
 }
