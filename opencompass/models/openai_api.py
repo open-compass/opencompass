@@ -395,16 +395,16 @@ class OpenAISDK(OpenAI):
                  query_per_second: int = 1,
                  rpm_verbose: bool = False,
                  retry: int = 2,
-                 key: str | List[str] = 'ENV',
-                 org: str | List[str] | None = None,
-                 meta_template: Dict | None = None,
+                 key: Union[str, List[str]] = 'ENV',
+                 org: Optional[Union[str, List[str]]] = None,
+                 meta_template: Optional[Dict] = None,
                  openai_api_base: str = OPENAI_API_BASE,
                  mode: str = 'none',
-                 logprobs: bool | None = False,
-                 top_logprobs: int | None = None,
-                 temperature: float | None = None,
-                 tokenizer_path: str | None = None,
-                 extra_body: Dict | None = None):
+                 logprobs: Optional[bool] = False,
+                 top_logprobs: Optional[int] = None,
+                 temperature: Optional[float] = 0.0,
+                 tokenizer_path: Optional[str] = None,
+                 extra_body: Optional[Dict] = None):
         super().__init__(path, max_seq_len, query_per_second, rpm_verbose,
                          retry, key, org, meta_template, openai_api_base, mode,
                          logprobs, top_logprobs, temperature, tokenizer_path,
@@ -412,7 +412,9 @@ class OpenAISDK(OpenAI):
         from openai import OpenAI
         self.opeanai_cleint = OpenAI(base_url=openai_api_base, api_key=key)
 
-    def _generate(self, input: PromptList | str, max_out_len: int,
+    def _generate(self,
+                  input: Union[str, PromptList],
+                  max_out_len: int,
                   temperature: float) -> str:
         assert isinstance(input, (str, PromptList))
 
