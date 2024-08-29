@@ -18,6 +18,7 @@ summarizer = dict(
         '--------- 考试 Exam ---------',  # category
         # 'Mixed', # subcategory
         'ceval',
+        'cmb',
         'agieval',
         'mmlu',
         'GaokaoBench',

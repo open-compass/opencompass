@@ -1,6 +1,17 @@
-dashscope # Qwen
+# claude
+anthropic
+# Qwen
+dashscope
+# openai
+openai
+ # xunfei
+spark_ai_python
 sseclient-py==1.7.2
-volcengine # bytedance
-volcengine-python-sdk[ark] # doubao/bytedance Ark v3
+# tecent
+tencentcloud-sdk-python
+# bytedance
+volcengine
+volcengine-python-sdk
 websocket-client
-zhipuai # zhipu
+# zhipu
+zhipuai

@@ -4,24 +4,24 @@ from opencompass.datasets.circular import (CircularCEvalDataset, CircularMMLUDat
 from opencompass.summarizers import CircularSummarizer
 
 with read_base():
-    from .datasets.ceval.ceval_gen_5f30c7 import ceval_datasets
-    from .datasets.mmlu.mmlu_gen_a484b3 import mmlu_datasets
-    from .datasets.cmmlu.cmmlu_gen_c13365 import cmmlu_datasets
-    from .datasets.hellaswag.hellaswag_gen_6faab5 import hellaswag_datasets
-    from .datasets.ARC_e.ARC_e_gen_1e0de5 import ARC_e_datasets
-    from .datasets.ARC_c.ARC_c_gen_1e0de5 import ARC_c_datasets
-    from .datasets.commonsenseqa.commonsenseqa_gen_1da2d0 import commonsenseqa_datasets
-    from .datasets.obqa.obqa_gen_9069e4 import obqa_datasets
-    from .datasets.race.race_gen_69ee4f import race_datasets
+    from opencompass.configs.datasets.ceval.ceval_gen_5f30c7 import ceval_datasets
+    from opencompass.configs.datasets.mmlu.mmlu_gen_a484b3 import mmlu_datasets
+    from opencompass.configs.datasets.cmmlu.cmmlu_gen_c13365 import cmmlu_datasets
+    from opencompass.configs.datasets.hellaswag.hellaswag_gen_6faab5 import hellaswag_datasets
+    from opencompass.configs.datasets.ARC_e.ARC_e_gen_1e0de5 import ARC_e_datasets
+    from opencompass.configs.datasets.ARC_c.ARC_c_gen_1e0de5 import ARC_c_datasets
+    from opencompass.configs.datasets.commonsenseqa.commonsenseqa_gen_1da2d0 import commonsenseqa_datasets
+    from opencompass.configs.datasets.obqa.obqa_gen_9069e4 import obqa_datasets
+    from opencompass.configs.datasets.race.race_gen_69ee4f import race_datasets
 
-    from .models.hf_internlm.hf_internlm_chat_7b import models as hf_internlm_chat_7b_model
-    from .models.hf_internlm.hf_internlm_chat_20b import models as hf_internlm_chat_20b_model
-    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat_model
-    from .models.qwen.hf_qwen_14b_chat import models as hf_qwen_14b_chat_model
+    from opencompass.configs.models.hf_internlm.hf_internlm_chat_7b import models as hf_internlm_chat_7b_model
+    from opencompass.configs.models.hf_internlm.hf_internlm_chat_20b import models as hf_internlm_chat_20b_model
+    from opencompass.configs.models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat_model
+    from opencompass.configs.models.qwen.hf_qwen_14b_chat import models as hf_qwen_14b_chat_model
 
-    from .summarizers.groups.mmlu import mmlu_summary_groups
-    from .summarizers.groups.cmmlu import cmmlu_summary_groups
-    from .summarizers.groups.ceval import ceval_summary_groups
+    from opencompass.configs.summarizers.groups.mmlu import mmlu_summary_groups
+    from opencompass.configs.summarizers.groups.cmmlu import cmmlu_summary_groups
+    from opencompass.configs.summarizers.groups.ceval import ceval_summary_groups
 
 for ds, t in [
     (ceval_datasets, CircularCEvalDataset),

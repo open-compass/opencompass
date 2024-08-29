@@ -12,8 +12,8 @@ from opencompass.summarizers import FlamesSummarizer
 # -------------Inferen Stage ----------------------------------------
 
 with read_base():
-    from .datasets.flames.flames_gen import flames_datasets
-    from .models.hf_internlm.hf_internlm2_chat_7b import models
+    from opencompass.configs.datasets.flames.flames_gen import flames_datasets
+    from opencompass.configs.models.hf_internlm.hf_internlm2_chat_7b import models
 datasets = [*flames_datasets]
 
 

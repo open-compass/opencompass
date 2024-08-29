@@ -2,14 +2,14 @@ from copy import deepcopy
 from mmengine.config import read_base
 
 with read_base():
-    from .datasets.teval.teval_en_gen_1ac254 import teval_datasets as teval_en_datasets
-    from .datasets.teval.teval_zh_gen_1ac254 import teval_datasets as teval_zh_datasets
+    from opencompass.configs.datasets.teval.teval_en_gen_1ac254 import teval_datasets as teval_en_datasets
+    from opencompass.configs.datasets.teval.teval_zh_gen_1ac254 import teval_datasets as teval_zh_datasets
 
-    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat_model
-    from .models.hf_internlm.hf_internlm2_chat_7b import models as hf_internlm2_chat_7b_model
-    from .models.hf_llama.hf_llama2_7b_chat import models as hf_llama2_7b_chat_model
+    from opencompass.configs.models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat_model
+    from opencompass.configs.models.hf_internlm.hf_internlm2_chat_7b import models as hf_internlm2_chat_7b_model
+    from opencompass.configs.models.hf_llama.hf_llama2_7b_chat import models as hf_llama2_7b_chat_model
 
-    from .summarizers.teval import summarizer
+    from opencompass.configs.summarizers.teval import summarizer
 
 meta_template_system_patches = {
     'internlm2-chat-7b-hf': dict(role='SYSTEM', begin='<|im_start|>system\n', end='<|im_end|>\n'),
