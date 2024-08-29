@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Prepare - create conda env and install torch
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate 
           conda create -y --name ${{env.CONDA_ENV}} python=3.10
           conda activate ${{env.CONDA_ENV}}
           pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
@@ -40,7 +40,7 @@ jobs:
           conda info --envs
       - name: Prepare - Pip install code
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate 
           conda activate ${{env.CONDA_ENV}}
           pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install human_eval transformers protobuf pytest --cache-dir ${{env.PIP_CACHE_PATH}}
@@ -52,7 +52,7 @@ jobs:
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run chat model test
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate 
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           python3 run.py .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat --reuse
@@ -60,7 +60,7 @@ jobs:
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate 
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           python3 run.py .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base --reuse
@@ -68,7 +68,7 @@ jobs:
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run command testcase
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate 
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           export from_tf=TRUE
