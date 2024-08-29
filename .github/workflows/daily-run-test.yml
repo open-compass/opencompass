@@ -89,7 +89,7 @@ jobs:
         if: always()
         run: |
           rm -rf regression_result_daily
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate 
           conda env remove -y --name ${{env.CONDA_ENV}}
           conda info --envs
 
