@@ -88,7 +88,7 @@ models.append(
         abbr='lmdeploy-api-test',
         type=OpenAISDK,
         key='EMPTY',
-        openai_api_base='http://10.1.9.14:10001/v1',
+        openai_api_base='http://judgemodel:10001/v1',
         path='compass_judger_internlm2_102b_0508',
         tokenizer_path='internlm/internlm2_5-20b-chat',
         rpm_verbose=True,

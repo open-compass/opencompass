@@ -29,18 +29,19 @@ jobs:
         uses: actions/checkout@v2
       - name: Prepare - create conda env and install torch
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}} python=3.10
           conda activate ${{env.CONDA_ENV}}
-          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.5.2+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.5.8+cu118torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl --index-url https://download.pytorch.org/whl/cu118
+          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.5.8+cu118torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+          pip install bitsandbytes
           pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-          pip install xformers==0.0.25.post1 --cache-dir ${{env.PIP_CACHE_PATH}} --extra-index-url https://download.pytorch.org/whl/cu118
+          pip install xformers==0.0.25.post1 --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
       - name: Prepare - Pip install code
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install human_eval transformers protobuf pytest --cache-dir ${{env.PIP_CACHE_PATH}}
@@ -52,15 +53,16 @@ jobs:
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run chat model test
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
+          sed -i 's/judgemodel/'$(tail -n 1 /cpfs01/shared/public/llmeval/share_info/compassjuder_ip.txt)'/g' .github/scripts/eval_regression_chat.py
           python3 run.py .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat --reuse
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           python3 run.py .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base --reuse
@@ -68,7 +70,7 @@ jobs:
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run command testcase
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           export from_tf=TRUE
@@ -89,7 +91,7 @@ jobs:
         if: always()
         run: |
           rm -rf regression_result_daily
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda env remove -y --name ${{env.CONDA_ENV}}
           conda info --envs
 
