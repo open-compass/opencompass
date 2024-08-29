@@ -32,11 +32,11 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate 
           conda create -y --name ${{env.CONDA_ENV}} python=3.10
           conda activate ${{env.CONDA_ENV}}
-          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.5.2+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.5.8+cu118torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl --index-url https://download.pytorch.org/whl/cu118
+          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.5.8+cu118torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
           pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-          pip install xformers==0.0.25.post1 --cache-dir ${{env.PIP_CACHE_PATH}} --extra-index-url https://download.pytorch.org/whl/cu118
+          pip install xformers==0.0.25.post1 --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
       - name: Prepare - Pip install code
         run: |
