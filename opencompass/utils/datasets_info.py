@@ -175,6 +175,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/mmlu",
         "local": "./data/mmlu/",
     },
+    # MMLU_PRO
+    "opencompass/mmlu_pro": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mmlu_pro",
+    },
     # NQ
     "opencompass/natural_question": {
         "ms_id": "opencompass/natural_question",
@@ -385,5 +391,9 @@ DATASETS_URL = {
     "SQuAD2.0": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SQuAD2.0.zip",
         "md5": "1321cbf9349e1102a57d31d1b2bfdd7e",
+    },
+    "mmlu_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
+        "md5": "e3200c7380f4cea5f13c768f2815fabb",
     },
 }

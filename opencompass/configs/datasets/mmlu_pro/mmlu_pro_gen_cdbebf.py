@@ -51,6 +51,7 @@ for category in categories:
         dict(
             abbr=f'mmlu_pro_{category.replace(" ", "_")}',
             type=MMLUProDataset,
+            path='opencompass/mmlu_pro',
             category=category,
             reader_cfg=mmlu_pro_reader_cfg,
             infer_cfg=mmlu_pro_infer_cfg,
