@@ -45,7 +45,7 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes--cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
       - name: Prepare - prepare data and hf model
         run: |
