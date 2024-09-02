@@ -10,6 +10,7 @@ from .bbh import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
+from .calm import *  # noqa: F401, F403
 from .cb import *  # noqa: F401, F403
 from .ceval import *  # noqa: F401, F403
 from .charm import *  # noqa: F401, F403
@@ -62,6 +63,7 @@ from .jsonl import JsonlDataset  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
+from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
@@ -94,8 +96,10 @@ from .race import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
 from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
+from .ruler import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
 from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
+from .scicode import *  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
 from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403

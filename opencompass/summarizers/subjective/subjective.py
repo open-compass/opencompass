@@ -1,5 +1,6 @@
 # flake8: noqa: E501
 import os.path as osp
+from collections import OrderedDict
 from datetime import datetime
 
 import pandas as pd
@@ -73,18 +74,19 @@ class SubjectiveSummarizer:
             None
         """
         output_dir, results_folder = get_outdir(self.cfg, time_str)
-
         flat_data, models_order = flatten_data(subjective_scores)
-
         # Create a DataFrame for each judgemodel with models as rows and datasets as columns
         judgemodel_dfs_final_corrected = {}
         for judgemodel_name, datasets_scores in flat_data.items():
             dfs = {}  # Dictionary to hold DataFrames for each dataset
             for dataset_name, scores in datasets_scores.items():
                 # Create a DataFrame with models as index and datasets as columns
-                df = pd.DataFrame.from_dict(scores,
-                                            orient='index',
-                                            columns=models_order)
+
+                order_of_rows = list(scores.keys())
+                df = pd.DataFrame.from_dict(
+                    {k: scores[k]
+                     for k in order_of_rows}, orient='index')
+                df = df.reindex(order_of_rows)
                 # Insert a new row at the top for the dataset names
                 df.insert(0, 'Detailed Scores', df.index.values)
                 df.insert(0, 'Dataset',

@@ -5,10 +5,10 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    from .datasets.gsm8k.gsm8k_gen_d6de81 import gsm8k_datasets
-    from .datasets.math.math_gen_1ed9c2 import math_datasets
-    from .datasets.MathBench.mathbench_gen import mathbench_datasets
-    from .summarizers.math_baseline import summarizer
+    from opencompass.configs.datasets.gsm8k.gsm8k_gen_d6de81 import gsm8k_datasets
+    from opencompass.configs.datasets.math.math_gen_1ed9c2 import math_datasets
+    from opencompass.configs.datasets.MathBench.mathbench_gen import mathbench_datasets
+    from opencompass.configs.summarizers.math_baseline import summarizer
 
 datasets = []
 datasets += gsm8k_datasets

@@ -1,0 +1,69 @@
+请根据题目中两句话的关系选择正确答案。
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：语句一：可是老人小心翼翼将蛇挑开,让它爬向草丛,嘴里念念有词:罪过,罪过,这本来是你的家呀
+语句二：老人心里十分难过。
+请问这两句话什么关系？
+(A) 蕴含
+(B) 矛盾
+(C) 无关
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request:Sentence 1：But the old man carefully picked the snake away from the grass, letting it crawl towards the grass, mumbling: sin, sin, this was your home!
+Sentence 2: The old man was very sad in his heart.
+What is the relationship between these two statements?
+(A) Contained
+(B) contradictory
+(C) Unrelated
+Step-by-step answer:
+1.The first sentence describes the process of an old man carefully handling a snake's movements.
+2.The old man says "sin, sin, sin," indicating that he feels guilty and sad for violating the snake's territory.
+3.The second sentence can be inferred, the old man is very sad in his heart. Therefore, the two sentences contain a relationship.
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：语句一：她是一个有着丰满的脸、丰满的嘴唇和大牙齿的黑色爆炸头女人。
+语句二：她喜欢抹红色的口红，穿红色的衣服。
+请问这两句话什么关系？
+(A) 蕴含
+(B) 矛盾
+(C) 无关
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request:Sentence 1：Sentence 1: She was a black explosive-headed woman with a plump face, full lips and big teeth.
+Sentence 2: She likes to wear red lipstick and red clothes.
+What is the relationship between these two statements?
+(A) implied
+(B) contradictory
+(C) Unrelated
+Step-by-step answer:
+1.These two sentences both describe the same woman, but they focus on different characteristics.
+2.The first sentence describes her physical characteristics, including face, lips, teeth, and hairstyle.
+3.The second sentence describes her aesthetic preferences, including lipstick color and clothing color. These two sentences do not have any obvious implication or contradictory relationship, so we can say that they are unrelated.
+So the answer is (C).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：语句一：你不确定你已经清楚你站着谁的一面。
+语句二：你支持谁，这一点显而易见。
+请问这两句话什么关系？
+(A) 蕴含
+(B) 矛盾
+(C) 无关
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request:Sentence 1: You're not sure you've made it clear whose side you're on.
+Sentence 2: It is obvious whose side you are on.
+What is the relationship between these two statements?
+(A) Contained
+(B) Contradictory
+(C) Unrelated
+Step-by-step answer:
+1.The first sentence indicates that you are not sure who you support, while the second sentence clearly indicates that your position is obvious, which means you are clear about who you support.
+2.Therefore, the content of these two sentences is contradictory to each other.
+So the answer is (B).

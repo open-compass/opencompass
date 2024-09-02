@@ -1,16 +1,16 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .models.qwen.hf_qwen_7b import models as hf_qwen_7b_base_models
-    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat_models
+    from opencompass.configs.models.qwen.hf_qwen_7b import models as hf_qwen_7b_base_models
+    from opencompass.configs.models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat_models
 
-    from .datasets.ceval.ceval_ppl_578f8d import ceval_datasets as base_ceval_datasets
-    from .datasets.ceval.ceval_gen_5f30c7 import ceval_datasets as chat_ceval_datasets
+    from opencompass.configs.datasets.ceval.ceval_ppl_578f8d import ceval_datasets as base_ceval_datasets
+    from opencompass.configs.datasets.ceval.ceval_gen_5f30c7 import ceval_datasets as chat_ceval_datasets
 
-    from .internal.clusters.slurm import infer, eval
-    # from .clusters.slurm import infer_split as infer, eval
-    # from .clusters.slurm import infer_size as infer, eval
-    # from .clusters.slurm import infer_size_split as infer, eval
+    from opencompass.configs.internal.clusters.slurm import infer, eval
+    # from opencompass.configs.internal.clusters.slurm import infer_split as infer, eval
+    # from opencompass.configs.internal.clusters.slurm import infer_size as infer, eval
+    # from opencompass.configs.internal.clusters.slurm import infer_size_split as infer, eval
 
 base_ceval_datasets = base_ceval_datasets[:1]
 chat_ceval_datasets = chat_ceval_datasets[-1:]

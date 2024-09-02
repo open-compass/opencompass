@@ -1,0 +1,62 @@
+Please provide a clear and step-by-step solution for a scientific problem in the categories of Chemistry, Physics, or Mathematics. The problem will specify the unit of measurement, which should not be included in the answer. Express the final answer as a decimal number with three digits after the decimal point. Conclude the answer by stating 'Therefore, the answer is \boxed[ANSWER].
+
+Promblem 1: Find the average value of the function $f(x)=1+x^2$ on the interval $[-1,2]$.
+Explanation for Problem 1: With $a=-1$ and $b=2$ we have
+$$
+\begin{aligned}
+f_{\text {ave }} & =\frac{1}{b-a} \int_a^b f(x) d x=\frac{1}{2-(-1)} \int_{-1}^2\left(1+x^2\right) d x \\
+& =\frac{1}{3}\left[x+\frac{x^3}{3}\right]_{-1}^2=2
+\end{aligned}
+$$
+Therefore, the answer is \boxed{2}.
+
+Promblem 2: Estimate the volume of the solid that lies above the square $R=[0,2] \times[0,2]$ and below the elliptic paraboloid $z=16-x^2-2 y^2$. Divide $R$ into four equal squares and choose the sample point to be the upper right corner of each square $R_{i j}$. 
+Explanation for Problem 2: The squares are shown in Figure 6. The paraboloid is the graph of $f(x, y)=16-x^2-2 y^2$ and the area of each square is $\Delta A=1$. Approximating the volume by the Riemann sum with $m=n=2$, we have
+$$
+\begin{aligned}
+V & \approx \sum_{i=1}^2 \sum_{j=1}^2 f\left(x_i, y_j\right) \Delta A \\
+& =f(1,1) \Delta A+f(1,2) \Delta A+f(2,1) \Delta A+f(2,2) \Delta A \\
+& =13(1)+7(1)+10(1)+4(1)=34
+\end{aligned}
+$$
+Therefore, the answer is \boxed{34}.
+
+Promblem 3: Find the length of the cardioid $r=1+\sin \theta$.
+Explanation for Problem 3: The cardioid is shown in Figure 8. (We sketched it in Example 7 in Section 10.3.) Its full length is given by the parameter interval $0 \leqslant \theta \leqslant 2 \pi$, so Formula 5 gives
+$$
+\begin{aligned}
+L & =\int_0^{2 \pi} \sqrt{r^2+\left(\frac{d r}{d \theta}\right)^2} d \theta=\int_0^{2 \pi} \sqrt{(1+\sin \theta)^2+\cos ^2 \theta} d \theta \\
+& =\int_0^{2 \pi} \sqrt{2+2 \sin \theta} d \theta
+\end{aligned}
+$$
+We could evaluate this integral by multiplying and dividing the integrand by $\sqrt{2-2 \sin \theta}$, or we could use a computer algebra system. In any event, we find that the length of the cardioid is $L=8$.
+
+Therefore, the answer is \boxed{8}.
+
+Promblem 4: The region $\mathscr{R}$ enclosed by the curves $y=x$ and $y=x^2$ is rotated about the $x$-axis. Find the volume of the resulting solid.
+Explanation for Problem 4: The curves $y=x$ and $y=x^2$ intersect at the points $(0,0)$ and $(1,1)$. The region between them, the solid of rotation, and a cross-section perpendicular to the $x$-axis are shown in Figure. A cross-section in the plane $P_x$ has the shape of a washer (an annular ring) with inner radius $x^2$ and outer radius $x$, so we find the cross-sectional area by subtracting the area of the inner circle from the area of the outer circle:
+$$
+A(x)=\pi x^2-\pi\left(x^2\right)^2=\pi\left(x^2-x^4\right)
+$$
+Therefore we have
+$$
+\begin{aligned}
+V & =\int_0^1 A(x) d x=\int_0^1 \pi\left(x^2-x^4\right) d x \\
+& =\pi\left[\frac{x^3}{3}-\frac{x^5}{5}\right]_0^1=\frac{2 \pi}{15}
+\end{aligned}
+$$
+Therefore, the answer is \boxed{0.41887902047}.
+
+Promblem 5: Use Simpson's Rule with $n=10$ to approximate $\int_1^2(1 / x) d x$.
+Explanation for Problem 5: Putting $f(x)=1 / x, n=10$, and $\Delta x=0.1$ in Simpson's Rule, we obtain
+$$
+\begin{aligned}
+\int_1^2 \frac{1}{x} d x & \approx S_{10} \\
+& =\frac{\Delta x}{3}[f(1)+4 f(1.1)+2 f(1.2)+4 f(1.3)+\cdots+2 f(1.8)+4 f(1.9)+f(2)] \\
+& =\frac{0.1}{3}\left(\frac{1}{1}+\frac{4}{1.1}+\frac{2}{1.2}+\frac{4}{1.3}+\frac{2}{1.4}+\frac{4}{1.5}+\frac{2}{1.6}+\frac{4}{1.7}+\frac{2}{1.8}+\frac{4}{1.9}+\frac{1}{2}\right) \\
+& \approx 0.693150
+\end{aligned}
+$$
+
+Therefore, the answer is \boxed{0.693150}.
+

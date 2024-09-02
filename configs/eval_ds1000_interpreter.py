@@ -19,7 +19,7 @@ actions = [
 ]
 
 with read_base():
-    from .datasets.ds1000.ds1000_gen_5c4bec import ds1000_datasets as datasets
+    from opencompass.configs.datasets.ds1000.ds1000_gen_5c4bec import ds1000_datasets as datasets
 
 models = [
     dict(

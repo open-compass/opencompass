@@ -33,7 +33,7 @@ pip install -e evalplus'''
 class HumanevalDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, num_repeats: int = 1):
+    def load(path: str, num_repeats: int = 1, local_mode: bool = False):
         """Load humaneval dataset for pass k mode.
 
         Note that you can use num_repeats > 1 when your model does not support
@@ -49,7 +49,7 @@ class HumanevalDataset(BaseDataset):
             num_repeats(int): Number of repetition for this dataset to get
         multiple responses in special cases.
         """
-        path = get_data_path(path)
+        path = get_data_path(path, local_mode=local_mode)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = MsDataset.load(path, subset_name='openai_humaneval', split='test')

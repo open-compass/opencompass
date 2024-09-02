@@ -101,7 +101,7 @@ Parameters for starting the api_server can be checked using `lmdeploy serve api_
 3. Once the service is successfully deployed, modify the evaluation script by changing the model configuration path to the service address, as shown below:
 
 ```python
-from opencompass.models import OpenAI
+from opencompass.models import OpenAISDK
 
 api_meta_template = dict(
     round=[
@@ -114,9 +114,11 @@ api_meta_template = dict(
 models = [
     dict(
         abbr='Meta-Llama-3-8B-Instruct-LMDeploy-API',
-        type=OpenAI,
+        type=OpenAISDK,
+        key='EMPTY', # API key
         openai_api_base='http://0.0.0.0:23333/v1',  # Service address
         path='Meta-Llama-3-8B-Instruct',  # Model name for service request
+        tokenizer_path='meta-llama/Meta-Llama-3.1-8B-Instruct', # The tokenizer name or path, if set to `None`, uses the default `gpt-4` tokenizer
         rpm_verbose=True,  # Whether to print request rate
         meta_template=api_meta_template,  # Service request template
         query_per_second=1,  # Service request rate
