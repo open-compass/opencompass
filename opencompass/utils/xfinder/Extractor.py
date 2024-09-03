@@ -2,9 +2,10 @@ import json
 import time
 
 import requests
-from loguru import logger
 from openai import OpenAI
 from vllm import LLM, SamplingParams
+
+from opencompass.utils import get_logger
 
 from .xfinder_utils import PROMPT_TEMPLATE
 
@@ -39,6 +40,7 @@ class Extractor:
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.mode = 'API' if self.url is not None else 'Local'
+        self.logger = get_logger()
 
         if self.mode == 'Local':
             self.sampling_params = SamplingParams(temperature=self.temperature,
@@ -147,14 +149,14 @@ class Extractor:
                 response = js_response['choices'][0]['message']['content']
                 break
             except Exception as e:
-                logger.info(f'Error: {e}')
-                logger.info(f'{self.url} is down. Retrying...')
-                logger.info(f'Time elapsed: {time.time() - t} seconds')
+                self.logger.info(f'Error: {e}')
+                self.logger.info(f'{self.url} is down. Retrying...')
+                self.logger.info(f'Time elapsed: {time.time() - t} seconds')
                 time.sleep(6)
                 retry -= 1
         if retry == 0:
             response = 'Error: Failed to get response.'
-            logger.info(f'Failed to get response after {self.retry} tries.')
+            self.logger.info(f'{response} after {self.retry} tries.')
             raise ValueError('The api is down')
         return response.strip()
 
