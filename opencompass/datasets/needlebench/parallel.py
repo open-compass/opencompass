@@ -1,13 +1,14 @@
 import json
+import os
 import random
 
 import tiktoken
 from datasets import Dataset
-from huggingface_hub import hf_hub_download
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 
 def get_unique_entries(file_path,
@@ -72,23 +73,31 @@ class NeedleBenchParallelDataset(BaseDataset):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
 
-        repo_id = 'opencompass/NeedleBench'
+        # repo_id = 'opencompass/NeedleBench'
+        # file_names = [
+        #     'PaulGrahamEssays.jsonl', 'needles.jsonl', 'zh_finance.jsonl',
+        #     'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
+        #     'zh_movie.jsonl', 'zh_tech.jsonl'
+        # ]
+
+        # downloaded_files = []
+        # for file_name in file_names:
+        #     file_path = hf_hub_download(repo_id=repo_id,
+        #                                 filename=file_name,
+        #                                 repo_type='dataset')
+        #     downloaded_files.append(file_path)
+
+        # for file in downloaded_files:
+        #     if file.split('/')[-1] == needle_file_name:
+        #         needle_file_path = file
         file_names = [
-            'PaulGrahamEssays.jsonl', 'needles.jsonl', 'zh_finance.jsonl',
+            'PaulGrahamEssays.jsonl', 'multi_needle_reasoning_en.json',
+            'multi_needle_reasoning_zh.json', 'zh_finance.jsonl',
             'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
             'zh_movie.jsonl', 'zh_tech.jsonl'
         ]
-
-        downloaded_files = []
-        for file_name in file_names:
-            file_path = hf_hub_download(repo_id=repo_id,
-                                        filename=file_name,
-                                        repo_type='dataset')
-            downloaded_files.append(file_path)
-
-        for file in downloaded_files:
-            if file.split('/')[-1] == needle_file_name:
-                needle_file_path = file
+        needle_file_path = os.path.join(path, needle_file_name)
+        needle_file_path = get_data_path(needle_file_path, local_mode=True)
 
         predefined_needles_bak = get_unique_entries(needle_file_path,
                                                     len(depths),
@@ -191,8 +200,13 @@ class NeedleBenchParallelDataset(BaseDataset):
 
             return prompt
 
-        for file_path in downloaded_files:
-            if file_path.split('/')[-1] not in file_list:
+        # for file_path in downloaded_files:
+        #     if file_path.split('/')[-1] not in file_list:
+        #         continue
+        for file_name in file_names:
+            file_path = os.path.join(path, file_name)
+            file_path = get_data_path(file_path, local_mode=True)
+            if file_name not in file_list:
                 continue
 
             with open(file_path, 'r', encoding='utf-8') as f:

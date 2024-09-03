@@ -6,6 +6,7 @@ import random
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 

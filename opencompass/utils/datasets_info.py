@@ -396,4 +396,8 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
         "md5": "e3200c7380f4cea5f13c768f2815fabb",
     },
+    "/needlebench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/needlebench.zip",
+        "md5": "b546da0397746eaff4d3ff0f20d6ede2",
+    }
 }

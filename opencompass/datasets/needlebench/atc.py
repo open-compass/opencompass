@@ -6,6 +6,7 @@ from datasets import Dataset
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 
 @LOAD_DATASET.register_module()
