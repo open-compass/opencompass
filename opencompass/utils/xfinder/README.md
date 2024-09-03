@@ -84,7 +84,13 @@ The `question_type` is the type of the question, which can be one of the four ty
 1. **IAAR-Shanghai/xFinder-qwen1505**
 2. **IAAR-Shanghai/xFinder-llama38it**
 
-📢：Please attention following points:
+You can use LMDeploy or vLLM to deploy the xFinder model server, for example, you can use the following command to deploy the xFinder model server with LMDeploy:
+
+```bash
+lmdeploy serve api_server IAAR-Shanghai/xFinder-qwen1505  --model-name xFinder-qwen1505  --server-port 23333 --backend turbomind --tp 1
+```
+
+📢：**Please attention following points**:
 
 1. Now only support extract questions with Zero-shot setting.
 2. For alphabet_option problems, the option should be like '\\nA. xxx\\nB. xxx\\nC. xxx\\nD. xxx\\nE. xxx\\n ...' or '\\n(A) xxx\\n(B) xxx\\n(C) xxx\\n(D) xxx\\n(E) xxx\\n ...' format, and the correct answer should be the alphabet of the correct answer, like 'A', 'B', 'C', 'D', 'E'.
