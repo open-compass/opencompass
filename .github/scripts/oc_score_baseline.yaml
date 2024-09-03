@@ -20,7 +20,7 @@ deepseek-moe-16b-chat-hf:
 
 deepseek-7b-chat-vllm:
     gsm8k: 63
-    race-middle: 64
+    race-middle: 74
     race-high: 79
 
 gemma-2b-it-hf:
