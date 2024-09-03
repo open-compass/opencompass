@@ -265,6 +265,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/xsum",
         "local": "./data/Xsum/dev.jsonl",
     },
+    # Longbench
+    "opencompass/Longbench": {
+        "ms_id": "",
+        "hf_id": "THUDM/LongBench",
+        "local": "./data/Longbench",
+    },
 }
 
 DATASETS_URL = {
@@ -395,5 +401,9 @@ DATASETS_URL = {
     "mmlu_pro": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
         "md5": "e3200c7380f4cea5f13c768f2815fabb",
+    },
+    "/Longbench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/Longbench.zip",
+        "md5": "ab0cb9e520ae5cfb899bf38b564249bb",
     },
 }
