@@ -127,9 +127,8 @@ class TurboMindModelwithChatTemplate(BaseModel):
             gen_config['top_k'] = 1000
             gen_config['temperature'] = temperature
 
-        from lmdeploy.messages import EngineGenerationConfig, GenerationConfig
+        from lmdeploy.messages import GenerationConfig
         gen_config = GenerationConfig(**gen_config)
-        gen_config = EngineGenerationConfig.From(gen_config, self.tokenizer)
 
         results = []
         for batch_message in batch_messages:
@@ -160,7 +159,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
             prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
-            gen_config (EngineGenerationConfig, optional): Generation
+            gen_config (GenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
         Returns:
             str: The generated string.
