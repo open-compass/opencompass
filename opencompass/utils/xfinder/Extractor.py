@@ -1,10 +1,9 @@
 import json
 import time
+from logging import getLogger
 
 import requests
 from openai import OpenAI
-
-from opencompass.utils import get_logger
 
 from .xfinder_utils import PROMPT_TEMPLATE
 
@@ -39,7 +38,7 @@ class Extractor:
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.mode = 'API' if self.url is not None else 'Local'
-        self.logger = get_logger()
+        self.logger = getLogger(__name__)
 
         if self.mode == 'Local':
             from vllm import LLM, SamplingParams
