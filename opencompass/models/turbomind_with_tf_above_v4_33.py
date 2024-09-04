@@ -118,7 +118,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         if decode_stop_words is not None and len(decode_stop_words) > 0:
             stop_words = []
             for words in decode_stop_words:
-                stop_words += self.origin_tokenizer.encode(words, add_bos=False)
+                stop_words += self.tokenizer.encode(words, add_bos=False)
 
         DEFAULT_GEN_CONFIG = {
             'max_new_tokens': max_out_len,
