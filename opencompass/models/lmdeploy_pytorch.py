@@ -63,6 +63,13 @@ class LmdeployPytorchModel(BaseModel):
             from lmdeploy.messages import GenerationConfig
             gen_config = GenerationConfig(**gen_config)
 
+        self.logger = get_logger()
+        tm_model = tm.Engine(path, engine_config)
+        self.tokenizer = tm_model.tokenizer
+        self.generators = [
+            tm_model.create_instance() for i in range(concurrency)
+        ]
+        self.generator_ids = [i + 1 for i in range(concurrency)]
         if end_str is not None:
             stop_words = gen_config.stop_words
             if stop_words is None:
@@ -71,14 +78,6 @@ class LmdeployPytorchModel(BaseModel):
                 t = self.tokenizer.encode(t, add_bos=False)
                 stop_words.append(t[0])
             gen_config.stop_words = list(set(stop_words))
-
-        self.logger = get_logger()
-        tm_model = tm.Engine(path, engine_config)
-        self.tokenizer = tm_model.tokenizer
-        self.generators = [
-            tm_model.create_instance() for i in range(concurrency)
-        ]
-        self.generator_ids = [i + 1 for i in range(concurrency)]
         self.gen_config = gen_config
         self.end_str = end_str
         self.major_version, self.minor_version, _ = version_info
