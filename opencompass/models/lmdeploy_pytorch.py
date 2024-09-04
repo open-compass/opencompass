@@ -76,8 +76,6 @@ class LmdeployPytorchModel(BaseModel):
             generation_config = GenerationConfig.from_pretrained(path)
         except Exception:
             generation_config = None
-        except:
-            generation_config = None
         if generation_config and hasattr(generation_config, 'eos_token_id'):
             if gen_config.stop_words is None:
                 stop_words = []
