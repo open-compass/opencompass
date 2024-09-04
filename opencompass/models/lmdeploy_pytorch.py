@@ -63,6 +63,13 @@ class LmdeployPytorchModel(BaseModel):
             from lmdeploy.messages import GenerationConfig
             gen_config = GenerationConfig(**gen_config)
 
+        if end_str is not None:
+            stop_words = gen_config.get('stop_words', [])
+            for t in end_str:
+                t = self.tokenizer.encode(t, add_bos=False)
+                stop_words.append(t[0])
+            gen_config['stop_words'] = list(set(stop_words))
+
         self.logger = get_logger()
         tm_model = tm.Engine(path, engine_config)
         self.tokenizer = tm_model.tokenizer
@@ -135,7 +142,7 @@ class LmdeployPytorchModel(BaseModel):
             prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
-            gen_config (EngineGenerationConfig, optional): Generation
+            gen_config (GenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
             end_str (str, optional): Whether to trim generated strings
                 with end_str if the model has special ending strings
