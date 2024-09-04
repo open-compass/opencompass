@@ -41,23 +41,25 @@ needlebench_infer_cfg = dict(
                 dict(role='HUMAN', prompt='{prompt}'),
                 dict(role='BOT', prompt='{answer}\n'),
             ]
-        )
         ),
+    ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer))
+    inferencer=dict(type=GenInferencer),
+)
 
 needlebench_eval_cfg = dict(
     evaluator=dict(type=NeedleBenchMultiEvaluator),
     pred_postprocessor=dict(type=needlebench_postprocess),
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
-    pred_role='BOT')
+    pred_role='BOT',
+)
 
 context_lengths = list(range(1000, 5000, 1000))
 document_depth_percent_intervals = 20
 document_depth_percent_interval_type = 'linear'
 
 # ----------English Version----------
-base_path = './data/needlebench'
+base_path = 'opencompass/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
 
 needle_file_name = 'multi_needle_reasoning_en.json'
@@ -68,11 +70,11 @@ language = 'English'
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    ):
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_{num_needles}needle_en_4k',
+            f'Depth{int(depth_percent)}_{num_needles}needle_en_4k',
             'type': NeedleBenchMultiDataset,
             'path': base_path,
             'length': original_context_length,
@@ -88,7 +90,7 @@ for original_context_length in context_lengths:
             'diff': diff,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_2needle_en_datasets.append(dataset_dict)
 
@@ -97,11 +99,11 @@ needlebench_3needle_en_datasets = []
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    ):
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_{num_needles}needle_en_4k',
+            f'Depth{int(depth_percent)}_{num_needles}needle_en_4k',
             'type': NeedleBenchMultiDataset,
             'path': base_path,
             'length': original_context_length,
@@ -117,7 +119,7 @@ for original_context_length in context_lengths:
             'diff': diff,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_3needle_en_datasets.append(dataset_dict)
 
@@ -126,11 +128,11 @@ needlebench_4needle_en_datasets = []
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    ):
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_{num_needles}needle_en_4k',
+            f'Depth{int(depth_percent)}_{num_needles}needle_en_4k',
             'type': NeedleBenchMultiDataset,
             'path': base_path,
             'length': original_context_length,
@@ -146,7 +148,7 @@ for original_context_length in context_lengths:
             'diff': diff,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_4needle_en_datasets.append(dataset_dict)
 
@@ -155,11 +157,11 @@ needlebench_5needle_en_datasets = []
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    ):
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_{num_needles}needle_en_4k',
+            f'Depth{int(depth_percent)}_{num_needles}needle_en_4k',
             'type': NeedleBenchMultiDataset,
             'path': base_path,
             'length': original_context_length,
@@ -175,12 +177,12 @@ for original_context_length in context_lengths:
             'diff': diff,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_5needle_en_datasets.append(dataset_dict)
 
 # ----------Chinese Version----------
-base_path = './data/needlebench'
+base_path = 'opencompass/needlebench'
 file_list = ['zh_finance.jsonl']
 
 needle_file_name = 'multi_needle_reasoning_zh.json'
@@ -191,11 +193,11 @@ language = 'Chinese'
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    ):
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_{num_needles}needle_zh_4k',
+            f'Depth{int(depth_percent)}_{num_needles}needle_zh_4k',
             'type': NeedleBenchMultiDataset,
             'path': base_path,
             'length': original_context_length,
@@ -211,7 +213,7 @@ for original_context_length in context_lengths:
             'diff': diff,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_2needle_zh_datasets.append(dataset_dict)
 
@@ -220,11 +222,11 @@ needlebench_3needle_zh_datasets = []
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    ):
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_{num_needles}needle_zh_4k',
+            f'Depth{int(depth_percent)}_{num_needles}needle_zh_4k',
             'type': NeedleBenchMultiDataset,
             'path': base_path,
             'length': original_context_length,
@@ -240,7 +242,7 @@ for original_context_length in context_lengths:
             'diff': diff,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_3needle_zh_datasets.append(dataset_dict)
 
@@ -249,11 +251,11 @@ needlebench_4needle_zh_datasets = []
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    ):
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_{num_needles}needle_zh_4k',
+            f'Depth{int(depth_percent)}_{num_needles}needle_zh_4k',
             'type': NeedleBenchMultiDataset,
             'path': base_path,
             'length': original_context_length,
@@ -269,7 +271,7 @@ for original_context_length in context_lengths:
             'diff': diff,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_4needle_zh_datasets.append(dataset_dict)
 
@@ -278,11 +280,11 @@ needlebench_5needle_zh_datasets = []
 
 for original_context_length in context_lengths:
     for depth_percent in generate_depth_percents(
-            document_depth_percent_intervals,
-            document_depth_percent_interval_type):
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    ):
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_{num_needles}needle_zh_4k',
+            f'Depth{int(depth_percent)}_{num_needles}needle_zh_4k',
             'type': NeedleBenchMultiDataset,
             'path': base_path,
             'length': original_context_length,
@@ -298,6 +300,6 @@ for original_context_length in context_lengths:
             'diff': diff,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_5needle_zh_datasets.append(dataset_dict)

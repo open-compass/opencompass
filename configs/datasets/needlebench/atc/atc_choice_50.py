@@ -30,7 +30,8 @@ for _name in list(single_choice_prompts.keys()):
         dataset_dict = {
             'abbr': abbr,
             'type': NeedleBenchATCDataset,
-            'path': names_path,
+            'path': path,
+            'file_name': file_name,
             'num_needles': num_needles,
             'language': language,
             'repeats': repeats,

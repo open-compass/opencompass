@@ -134,12 +134,14 @@ class NeedleBenchOriginDataset(BaseDataset):
             'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
             'zh_movie.jsonl', 'zh_tech.jsonl'
         ]
+        path = get_data_path(path)
+        if os.environ.get('DATASET_SOURCE') == 'HF':
+            from huggingface_hub import snapshot_download
+            path = snapshot_download(repo_id=path, repo_type='dataset')
         needle_file_path = os.path.join(path, needle_file_name)
-        needle_file_path = get_data_path(needle_file_path, local_mode=True)
 
         for file_name in file_names:
             file_path = os.path.join(path, file_name)
-            file_path = get_data_path(file_path, local_mode=True)
             if file_name not in file_list:
                 continue
 

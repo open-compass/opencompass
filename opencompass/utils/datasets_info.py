@@ -265,6 +265,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/xsum",
         "local": "./data/Xsum/dev.jsonl",
     },
+    # Needlebench
+    "opencompass/needlebench": {
+        "ms_id": "",
+        "hf_id": "opencompass/needlebench",
+        "local": "./data/needlebench",
+    }
 }
 
 DATASETS_URL = {
