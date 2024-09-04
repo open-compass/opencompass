@@ -64,11 +64,13 @@ class LmdeployPytorchModel(BaseModel):
             gen_config = GenerationConfig(**gen_config)
 
         if end_str is not None:
-            stop_words = gen_config.get('stop_words', [])
+            stop_words = gen_config.stop_words
+            if stop_words is None:
+                stop_words = []
             for t in end_str:
                 t = self.tokenizer.encode(t, add_bos=False)
                 stop_words.append(t[0])
-            gen_config['stop_words'] = list(set(stop_words))
+            gen_config.stop_words = list(set(stop_words))
 
         self.logger = get_logger()
         tm_model = tm.Engine(path, engine_config)
