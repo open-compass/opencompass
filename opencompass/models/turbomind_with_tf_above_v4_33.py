@@ -114,7 +114,10 @@ class TurboMindModelwithChatTemplate(BaseModel):
         # split messages into batches
         batch_messages = [messages[i:i + self.concurrency] for i in range(0, len(messages), self.concurrency)]
 
-        stop_words = list(set(self.stop_words + stopping_criteria))
+        decode_stop_words = list(set(self.stop_words + stopping_criteria))
+        if decode_stop_words is not None and len(decode_stop_words) > 0:
+            stop_words = [self.origin_tokenizer.encode(i) for i in decode_stop_words]
+
         DEFAULT_GEN_CONFIG = {
             'max_new_tokens': max_out_len,
             'min_new_tokens': 1,
