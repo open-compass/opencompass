@@ -70,14 +70,22 @@ class LmdeployPytorchModel(BaseModel):
             tm_model.create_instance() for i in range(concurrency)
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
-        if end_str is not None:
-            stop_words = gen_config.stop_words
-            if stop_words is None:
+
+        from transformers import GenerationConfig
+        try:
+            generation_config = GenerationConfig.from_pretrained(path)
+        except:
+            generation_config = None
+        if generation_config and hasattr(generation_config, 'eos_token_id'):
+            if gen_config.stop_words is None:
                 stop_words = []
-            for t in end_str:
-                t = self.tokenizer.encode(t, add_bos=False)
-                stop_words.append(t[0])
-            gen_config.stop_words = list(set(stop_words))
+            if isinstance(generation_config.eos_token_id, int):
+                stop_words.append(generation_config.eos_token_id)
+            else:
+                assert isinstance(generation_config.eos_token_id, list)
+                for token_id in generation_config.eos_token_id:
+                    stop_words.append(token_id)
+            gen_config.stop_words = stop_words
         self.gen_config = gen_config
         self.end_str = end_str
         self.major_version, self.minor_version, _ = version_info
