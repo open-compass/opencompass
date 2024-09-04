@@ -18,33 +18,55 @@ env:
   HF_DATASETS_OFFLINE: 1
   TRANSFORMERS_OFFLINE: 1
   HF_HUB_OFFLINE: 1
+  TRITON_PTXAS_PATH: /usr/local/cuda/bin/ptxas
 
 jobs:
+  build-pypi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Build lagent
+        run: |
+          pip install wheel
+          python setup.py sdist bdist_wheel
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          path: dist/*
+          retention-days: 1
+          name: my-artifact-${{ github.run_id }}
+
   daily_run_test:
+    needs: build-pypi
     runs-on: self-hosted
     environment: 'prod'
-    timeout-minutes: 240 #4hours
+    timeout-minutes: 420 #7hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact-${{ github.run_id }}
       - name: Prepare - create conda env and install torch
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}} python=3.10
           conda activate ${{env.CONDA_ENV}}
+          pip install opencompass*.whl
           pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.5.2+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.5.8+cu118torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
-          pip install bitsandbytes
-          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-          pip install xformers==0.0.25.post1 --cache-dir ${{env.PIP_CACHE_PATH}}
-          conda info --envs
-      - name: Prepare - Pip install code
-        run: |
-          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}
-          pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers protobuf pytest --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.5.5+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+
+          pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip uninstall torch torchvision torchaudio -y
+          pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu118torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+          pip install /cpfs01/user/qa-llm-cicd/packages/xformers-0.0.27.post2+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
       - name: Prepare - prepare data and hf model
         run: |
