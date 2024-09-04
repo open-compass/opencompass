@@ -74,6 +74,8 @@ class LmdeployPytorchModel(BaseModel):
         from transformers import GenerationConfig
         try:
             generation_config = GenerationConfig.from_pretrained(path)
+        except Exception:
+            generation_config = None
         except:
             generation_config = None
         if generation_config and hasattr(generation_config, 'eos_token_id'):
