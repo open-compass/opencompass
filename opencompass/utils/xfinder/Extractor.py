@@ -3,7 +3,6 @@ import time
 
 import requests
 from openai import OpenAI
-from vllm import LLM, SamplingParams
 
 from opencompass.utils import get_logger
 
@@ -43,6 +42,7 @@ class Extractor:
         self.logger = get_logger()
 
         if self.mode == 'Local':
+            from vllm import LLM, SamplingParams
             self.sampling_params = SamplingParams(temperature=self.temperature,
                                                   max_tokens=self.max_tokens,
                                                   stop=[
