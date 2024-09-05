@@ -171,7 +171,7 @@ We have tested the model postprocess method with XFinder model on the GSM8K, MML
 | nq      | short_text      | nq_xfinder_gen_3dcea1    | 22.33                   | 37.53                   |
 | mmlu    | alphabet_option | mmlu_xfinder_gen_4d595a  | 67.89                   | 67.93                   |
 
-## 🖊️ Citation
+## Citation
 
 ```bibtex
 @misc{2023opencompass,
