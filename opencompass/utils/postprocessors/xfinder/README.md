@@ -170,3 +170,25 @@ We have tested the model postprocess method with XFinder model on the GSM8K, MML
 | gsm8k   | math            | gsm8k_xfinder_gen_a58960 | 73.46                   | 78.09                   |
 | nq      | short_text      | nq_xfinder_gen_3dcea1    | 22.33                   | 37.53                   |
 | mmlu    | alphabet_option | mmlu_xfinder_gen_4d595a  | 67.89                   | 67.93                   |
+
+## 🖊️ Citation
+
+```bibtex
+@misc{2023opencompass,
+    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
+    author={OpenCompass Contributors},
+    howpublished = {\url{https://github.com/open-compass/opencompass}},
+    year={2023}
+}
+
+@misc{yu2024xfinderrobustpinpointanswer,
+      title={xFinder: Robust and Pinpoint Answer Extraction for Large Language Models},
+      author={Qingchen Yu and Zifan Zheng and Shichao Song and Zhiyu Li and Feiyu Xiong and Bo Tang and Ding Chen},
+      year={2024},
+      eprint={2405.11874},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2405.11874},
+}
+
+```
