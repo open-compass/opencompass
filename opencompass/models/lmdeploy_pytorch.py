@@ -88,7 +88,7 @@ class LmdeployPytorchModel(BaseModel):
             gen_config.stop_words = stop_words
         self.gen_config = gen_config
         self.end_str = end_str
-        self.major_version, self.minor_version, _ = version_info
+        self.major_version, self.minor_version = version_info[:2]
 
     def generate(
         self,
