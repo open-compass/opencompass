@@ -126,7 +126,10 @@ class Rendu(BaseAPIModel):
         while max_num_retries < self.retry:
             self.acquire()
             try:
-                raw_response = requests.request('POST', url=self.url, headers=self.headers, json=data)
+                raw_response = requests.request('POST',
+                url=self.url,
+                headers=self.headers,
+                json=data)
             except Exception as err:
                 print('Request Error:{}'.format(err))
                 time.sleep(2)
