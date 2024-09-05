@@ -1,7 +1,9 @@
+import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
-import time
+
 import requests
+
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel

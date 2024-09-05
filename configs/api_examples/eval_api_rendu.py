@@ -17,8 +17,8 @@ models = [
         abbr='Rendu',
         type=Rendu,
         path='rendu',
-        key="xxxxxx",
-        url="xxxxxx",
+        key='xxxxxx',
+        url='xxxxxx',
         generation_kwargs={
             'temperature': 0.1,
             'top_p': 0.9,
