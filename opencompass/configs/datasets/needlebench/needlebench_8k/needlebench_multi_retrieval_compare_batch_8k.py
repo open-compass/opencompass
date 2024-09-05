@@ -41,36 +41,38 @@ needlebench_infer_cfg = dict(
                 dict(role='HUMAN', prompt='{prompt}'),
                 dict(role='BOT', prompt='{answer}\n'),
             ]
-        )
         ),
+    ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer))
+    inferencer=dict(type=GenInferencer),
+)
 
 needlebench_eval_cfg = dict(
     evaluator=dict(type=NeedleBenchParallelEvaluator),
     pred_postprocessor=dict(type=needlebench_postprocess),
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
-    pred_role='BOT')
+    pred_role='BOT',
+)
 
 context_lengths = list(range(5000, 9000, 1000))
 document_depth_percent_intervals_list = [1, 5, 10, 15, 20]
 document_depth_percent_interval_type = 'linear'
 
-base_path = './data/needlebench'
+base_path = 'opencompass/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
 needlebench_en_datasets = []
 needle_file_name = 'needles.jsonl'
 
 for document_depth_percent_intervals in document_depth_percent_intervals_list:
     depths_float = generate_depth_percents(
-                       document_depth_percent_intervals,
-                       document_depth_percent_interval_type)
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    )
     depths = [int(depth) for depth in depths_float]
 
     for original_context_length in context_lengths:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'_parallel_en_8k_batch{document_depth_percent_intervals}',
+            f'_parallel_en_8k_batch{document_depth_percent_intervals}',
             'type': NeedleBenchParallelDataset,
             'path': base_path,
             'needle_file_name': needle_file_name,
@@ -84,7 +86,7 @@ for document_depth_percent_intervals in document_depth_percent_intervals_list:
             'language': 'English',
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_en_datasets.append(dataset_dict)
 
@@ -94,14 +96,14 @@ needle_file_name = 'needles.jsonl'
 
 for document_depth_percent_intervals in document_depth_percent_intervals_list:
     depths_float = generate_depth_percents(
-                       document_depth_percent_intervals,
-                       document_depth_percent_interval_type)
+        document_depth_percent_intervals, document_depth_percent_interval_type
+    )
     depths = [int(depth) for depth in depths_float]
 
     for original_context_length in context_lengths:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'_parallel_zh_8k_batch{document_depth_percent_intervals}',
+            f'_parallel_zh_8k_batch{document_depth_percent_intervals}',
             'type': NeedleBenchParallelDataset,
             'path': base_path,
             'needle_file_name': needle_file_name,
@@ -115,6 +117,6 @@ for document_depth_percent_intervals in document_depth_percent_intervals_list:
             'language': 'Chinese',
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_zh_datasets.append(dataset_dict)
