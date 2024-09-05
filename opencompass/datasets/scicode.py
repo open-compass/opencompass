@@ -230,7 +230,6 @@ class SciCodeEvaluator(BaseEvaluator):
         with open(file_path, 'r', encoding='utf-8') as file:
             test_data = json.load(file)
         self.dataset = Dataset.from_list(test_data)
-        self.testcode_path = './tmp'
 
     def extract_python_script(self, response: str):
         start_marker = '```python'
@@ -271,9 +270,6 @@ class SciCodeEvaluator(BaseEvaluator):
             return 2
 
     def score(self, predictions, references):
-
-        self.testcode_path = self._out_dir  # defined in OpenICLEvalTask._score
-
         # generate all python test codes
         for idx, prediction_list in enumerate(predictions):
             # traverse each test sample
@@ -281,7 +277,7 @@ class SciCodeEvaluator(BaseEvaluator):
             num_of_subproblems = len(prediction_list)
 
             # create dir for each test sample
-            testdir_path = os.path.join(self.testcode_path, str(problem_id))
+            testdir_path = os.path.join(self._out_dir, str(problem_id))
             os.makedirs(testdir_path, exist_ok=True)
 
             python_code = ''
@@ -322,7 +318,7 @@ from opencompass.datasets.scicode import process_hdf5_to_tuple
 
         # find all scripts
         python_scripts = []
-        for root, dirs, files in os.walk(self.testcode_path):
+        for root, dirs, files in os.walk(self._out_dir):
             for file in files:
                 if file.endswith('.py'):
                     python_scripts.append(os.path.join(root, file))
