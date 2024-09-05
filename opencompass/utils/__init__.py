@@ -9,5 +9,6 @@ from .fileio import *  # noqa
 from .lark import *  # noqa
 from .logging import *  # noqa
 from .menu import *  # noqa
+from .model_postprocessors import *  # noqa
 from .prompt import *  # noqa
 from .text_postprocessors import *  # noqa
