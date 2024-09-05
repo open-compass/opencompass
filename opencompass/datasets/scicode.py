@@ -327,13 +327,13 @@ from opencompass.datasets.scicode import process_hdf5_to_tuple
                 if file.endswith('.py'):
                     python_scripts.append(os.path.join(root, file))
 
-        # 使用ThreadPoolExecutor来并发执行脚本
+        # Use ThreadPoolExecutor to concurrently execute scripts
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            # 提交任务并获取Future对象
+            # Submit task and obtain Future object
             futures = [
                 executor.submit(self.run_script, script)
                 for script in python_scripts
-            ]  # noqa: E501
+            ]
 
         results = []
         for future in concurrent.futures.as_completed(futures):
