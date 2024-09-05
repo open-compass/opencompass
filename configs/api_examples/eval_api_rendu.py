@@ -7,8 +7,6 @@ from opencompass.tasks import OpenICLInferTask
 with read_base():
     from ..summarizers.medium import summarizer
     from ..datasets.ceval.ceval_gen import ceval_datasets
-    from ..datasets.mmlu.mmlu_gen import mmlu_datasets
-    from ..datasets.humaneval.humaneval_gen import humaneval_datasets
 
 datasets = [
     *ceval_datasets

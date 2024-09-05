@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
-import time, requests
+import time
+import requests
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
@@ -45,7 +46,7 @@ class Rendu(BaseAPIModel):
                          meta_template=meta_template,
                          retry=retry,
                          generation_kwargs=generation_kwargs)
-        
+
         self.url = url
         self.key = key
         self.model = path
@@ -125,10 +126,7 @@ class Rendu(BaseAPIModel):
         while max_num_retries < self.retry:
             self.acquire()
             try:
-                raw_response = requests.request('POST',
-                                            url=self.url,
-                                            headers=self.headers,
-                                            json=data)
+                raw_response = requests.request('POST', url=self.url, headers=self.headers, json=data)
             except Exception as err:
                 print('Request Error:{}'.format(err))
                 time.sleep(2)
@@ -144,7 +142,7 @@ class Rendu(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
-            
+
             if raw_response.status_code == 200:
                 # msg = json.load(response.text)
                 # response
