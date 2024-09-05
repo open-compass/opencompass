@@ -6,8 +6,9 @@ from tqdm import tqdm
 
 from opencompass.registry import TEXT_POSTPROCESSORS
 
-from .xfinder.Extractor import Extractor
-from .xfinder.xfinder_utils import DataProcessor, convert_to_xfinder_format
+from .postprocessors.xfinder.extractor import Extractor
+from .postprocessors.xfinder.xfinder_utils import (DataProcessor,
+                                                   convert_to_xfinder_format)
 
 
 def gen_output(ori_data, extractor):

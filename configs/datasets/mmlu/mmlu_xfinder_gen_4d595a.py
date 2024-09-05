@@ -108,8 +108,13 @@ for _name in mmlu_all_sets:
 
     mmlu_eval_cfg = dict(
         evaluator=dict(type=AccwithDetailsEvaluator),
-        model_postprocessor=dict(type=xfinder_postprocess, question_type='alphabet_option', xfinder_model_name='xFinder-qwen1505', xfiner_api_url='http://0.0.0.0:23333/v1,http://0.0.0.0:23334/v1'),
-        pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'))
+        pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'),
+        model_postprocessor=dict(
+            type=xfinder_postprocess,
+            question_type='alphabet_option',
+            xfinder_model_name='xFinder-qwen1505',
+            xfiner_api_url='http://0.0.0.0:23333/v1,http://0.0.0.0:23334/v1')
+        )
 
     mmlu_datasets.append(
         dict(

@@ -69,17 +69,9 @@ Here are some examples of the question type supported from the official xFinder 
 
 ## How to Use Model Postprocess in OpenCompass
 
-We make the postprocess as a common postprocess function in OpenCompass, so you can use it by setting the `postprocess` parameter in the `predict` function of OpenCompass. It can be used with the default postprocess regularization extract function at the same time. The only thing you need to do is to deploy the postprocess model server and set the `model_postprocessor` to the original `eval_cfg` in the dataset configuration, like the following example:
+### Step 1: Deploy the Postprocess Model Server
 
-```python
-from opencompass.utils.model_postprocessors import xfinder_postprocess
-
-...
-
-    model_postprocessor=dict(type=xfinder_postprocess, question_type='math', xfinder_model_name='xFinder-qwen1505', xfiner_api_url='http://0.0.0.0:23333/v1,http://0.0.0.0:23334/v1'),
-```
-
-The `question_type` is the type of the question, which can be one of the four types mentioned above. The `xfinder_model_name` is the name of the model you deploying the model server, and the `xfiner_api_url` is the URL of the model server. For now, there are two xFinder model can use, you can download them from Huggingface model hub:
+For now, there are two xFinder models can use, you can download them from Huggingface model hub:
 
 1. **IAAR-Shanghai/xFinder-qwen1505**
 2. **IAAR-Shanghai/xFinder-llama38it**
@@ -89,6 +81,28 @@ You can use LMDeploy or vLLM to deploy the xFinder model server, for example, yo
 ```bash
 lmdeploy serve api_server IAAR-Shanghai/xFinder-qwen1505  --model-name xFinder-qwen1505  --server-port 23333 --backend turbomind --tp 1
 ```
+
+### Step 2: Set the Postprocess Model Config in the Dataset Configuration
+
+We make the postprocess as a common postprocess function in OpenCompass, so you can use it by setting the `postprocess` parameter in the `predict` function of OpenCompass. It can be used with the default postprocess regularization extract function at the same time. The only thing you need to do is to deploy the postprocess model server and set the `model_postprocessor` to the original `eval_cfg` in the dataset configuration, like the following example:
+
+```python
+from opencompass.utils.model_postprocessors import xfinder_postprocess
+
+...
+
+    model_postprocessor=dict(
+        type=xfinder_postprocess,
+        question_type='math',
+        xfinder_model_name='xFinder-qwen1505',
+        xfiner_api_url='http://0.0.0.0:23333/v1,http://0.0.0.0:23334/v1')
+```
+
+Explanation of the parameters:
+
+- `question_type`: the type of the question, which can be one of the three types mentioned above.
+- `xfinder_model_name`: the name of the model you deploying the model server.
+- `xfiner_api_url`: the URL of the model server, you can set multiple URLs with `,` to use multiple model servers, which can accelerate the postprocess speed.
 
 📢：**Please attention following points**:
 
@@ -123,9 +137,13 @@ gsm8k_infer_cfg = dict(
 gsm8k_eval_cfg = dict(
     evaluator=dict(type=MATHEvaluator, version='v2'),
     pred_postprocessor=dict(type=math_postprocess_v2),
-    model_postprocessor=dict(type=xfinder_postprocess, question_type='math', xfinder_model_name='xFinder-qwen1505', xfiner_api_url='http://0.0.0.0:23333/v1,http://0.0.0.0:23334/v1'), # Add model postprocess
     dataset_postprocessor=dict(type=gsm8k_dataset_postprocess),
-)
+    model_postprocessor=dict(
+        type=xfinder_postprocess,
+        question_type='math',
+        xfinder_model_name='xFinder-qwen1505',
+        xfiner_api_url='http://0.0.0.0:23333/v1,http://0.0.0.0:23334/v1')
+    )
 
 gsm8k_datasets = [
     dict(
@@ -145,10 +163,10 @@ You can also use the `--dump-eval-details` command to dump the detailed evaluati
 
 ## Results Comparison with Different Question Types
 
-We have tested the model postprocess method with XFinder model on the GSM8K, MMLU, Natural Questions (NQ) datasets with above settings, and the results are as follows:
+We have tested the model postprocess method with XFinder model on the GSM8K, MMLU, Natural Questions (NQ) datasets for `Meta-Llama-3-8B-Instruct` with above settings, and the results are as follows:
 
-| Dataset | Type            | Regex Postprocess Score | Model Postprocess Score |
-| ------- | --------------- | ----------------------- | ----------------------- |
-| gsm8k   | math            | 73.46                   | 78.09                   |
-| nq      | short_text      | 22.33                   | 37.53                   |
-| mmlu    | alphabet_option | 67.89                   | 67.93                   |
+| Dataset | Type            | Config Name              | Regex Postprocess Score | Model Postprocess Score |
+| ------- | --------------- | ------------------------ | ----------------------- | ----------------------- |
+| gsm8k   | math            | gsm8k_xfinder_gen_a58960 | 73.46                   | 78.09                   |
+| nq      | short_text      | nq_xfinder_gen_3dcea1    | 22.33                   | 37.53                   |
+| mmlu    | alphabet_option | mmlu_xfinder_gen_4d595a  | 67.89                   | 67.93                   |

@@ -23,9 +23,13 @@ gsm8k_infer_cfg = dict(
 gsm8k_eval_cfg = dict(
     evaluator=dict(type=MATHEvaluator, version='v2'),
     pred_postprocessor=dict(type=math_postprocess_v2),
-    model_postprocessor=dict(type=xfinder_postprocess, question_type='math', xfinder_model_name='xFinder-qwen1505', xfiner_api_url='http://0.0.0.0:23333/v1,http://0.0.0.0:23334/v1'),
     dataset_postprocessor=dict(type=gsm8k_dataset_postprocess),
-)
+    model_postprocessor=dict(
+        type=xfinder_postprocess,
+        question_type='math',
+        xfinder_model_name='xFinder-qwen1505',
+        xfiner_api_url='http://0.0.0.0:23333/v1,http://0.0.0.0:23334/v1')
+    )
 
 gsm8k_datasets = [
     dict(
