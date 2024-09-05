@@ -36,7 +36,7 @@ class NeedleBenchOriginDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str,  # depreciated
+        path: str,
         length: int,
         depth: int,
         tokenizer_model: str,

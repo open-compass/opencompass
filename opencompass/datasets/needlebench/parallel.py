@@ -11,12 +11,14 @@ from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
 
 
-def get_unique_entries(file_path,
-                       n,
-                       language,
-                       unique_arg1=False,
-                       unique_arg2=False,
-                       unique_combination=False):
+def get_unique_entries(
+    file_path,
+    n,
+    language,
+    unique_arg1=False,
+    unique_arg2=False,
+    unique_combination=False,
+):
     seen_arg1 = set()
     seen_arg2 = set()
     seen_combinations = set()
@@ -39,9 +41,11 @@ def get_unique_entries(file_path,
         key2 = entry.get('arg2', '') if unique_arg2 else ''
         combination = (key1, key2) if unique_combination else ''
 
-        if (key1 not in seen_arg1 or not unique_arg1) and \
-           (key2 not in seen_arg2 or not unique_arg2) and \
-           (combination not in seen_combinations or not unique_combination):
+        if ((key1 not in seen_arg1 or not unique_arg1)  # noqa: E501
+                and (key2 not in seen_arg2 or not unique_arg2)
+                and  # noqa: E501
+            (combination not in seen_combinations
+             or not unique_combination)):  # noqa: E501
             seen_arg1.add(key1)
             seen_arg2.add(key2)
             seen_combinations.add(combination)
@@ -58,7 +62,7 @@ class NeedleBenchParallelDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str,  # depreciated
+        path: str,
         needle_file_name: str,
         length: int,
         depths: list[int],
@@ -73,41 +77,32 @@ class NeedleBenchParallelDataset(BaseDataset):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
 
-        # repo_id = 'opencompass/NeedleBench'
-        # file_names = [
-        #     'PaulGrahamEssays.jsonl', 'needles.jsonl', 'zh_finance.jsonl',
-        #     'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
-        #     'zh_movie.jsonl', 'zh_tech.jsonl'
-        # ]
-
-        # downloaded_files = []
-        # for file_name in file_names:
-        #     file_path = hf_hub_download(repo_id=repo_id,
-        #                                 filename=file_name,
-        #                                 repo_type='dataset')
-        #     downloaded_files.append(file_path)
-
-        # for file in downloaded_files:
-        #     if file.split('/')[-1] == needle_file_name:
-        #         needle_file_path = file
         file_names = [
-            'PaulGrahamEssays.jsonl', 'multi_needle_reasoning_en.json',
-            'multi_needle_reasoning_zh.json', 'zh_finance.jsonl',
-            'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
-            'zh_movie.jsonl', 'zh_tech.jsonl'
+            'PaulGrahamEssays.jsonl',
+            'multi_needle_reasoning_en.json',
+            'multi_needle_reasoning_zh.json',
+            'zh_finance.jsonl',
+            'zh_game.jsonl',
+            'zh_general.jsonl',
+            'zh_government.jsonl',
+            'zh_movie.jsonl',
+            'zh_tech.jsonl',
         ]
         path = get_data_path(path)
         if os.environ.get('DATASET_SOURCE') == 'HF':
             from huggingface_hub import snapshot_download
+
             path = snapshot_download(repo_id=path, repo_type='dataset')
         needle_file_path = os.path.join(path, needle_file_name)
 
-        predefined_needles_bak = get_unique_entries(needle_file_path,
-                                                    len(depths),
-                                                    language,
-                                                    unique_arg1=True,
-                                                    unique_arg2=True,
-                                                    unique_combination=True)
+        predefined_needles_bak = get_unique_entries(
+            needle_file_path,
+            len(depths),
+            language,
+            unique_arg1=True,
+            unique_arg2=True,
+            unique_combination=True,
+        )
 
         def _generate_context(tokens_context, depths, needles):
             insertion_points = [
@@ -120,10 +115,12 @@ class NeedleBenchParallelDataset(BaseDataset):
                 needle_tokens = _get_tokens_from_context(needle)
                 current_insertion_point = min(
                     insertion_points[i] + cumulative_inserted_length,
-                    len(tokens_context))
+                    len(tokens_context),
+                )
 
-                tokens_context = tokens_context[:current_insertion_point] + \
-                    needle_tokens + tokens_context[current_insertion_point:]
+                tokens_context = (tokens_context[:current_insertion_point] +
+                                  needle_tokens +
+                                  tokens_context[current_insertion_point:])
                 cumulative_inserted_length += len(needle_tokens)
 
             new_context = _decode_tokens(tokens_context)
@@ -232,8 +229,8 @@ class NeedleBenchParallelDataset(BaseDataset):
                         item['retrieval_question'].split("'")[1].split('。')[0]
                         for item in predefined_needles
                     ])
-                    retrieval_question = questions + "请按照'" + \
-                        answers_format + "'的格式回答。"
+                    retrieval_question = (questions + "请按照'" + answers_format +
+                                          "'的格式回答。")
                 elif language == 'English':
                     questions = '、'.join([
                         item['retrieval_question'].split('?')[0] + '?'
@@ -244,14 +241,14 @@ class NeedleBenchParallelDataset(BaseDataset):
                         item['retrieval_question'].split("'")[1].split('.')[0]
                         for item in predefined_needles
                     ])
-                    retrieval_question = questions + \
-                        "Please answer in the format of '" + \
-                        answers_format + "'"
+                    retrieval_question = (questions +
+                                          "Please answer in the format of '" +
+                                          answers_format + "'")
 
                 context_length = length - length_buffer
-                target_length_per_record = context_length - \
-                    sum(len(tokens) for tokens
-                        in _get_tokens_from_context(needles))
+                target_length_per_record = context_length - sum(
+                    len(tokens)
+                    for tokens in _get_tokens_from_context(needles))
                 target_length_per_record = max(target_length_per_record, 0)
                 accumulated_tokens = []
                 for line in lines:
@@ -330,7 +327,8 @@ class NeedleBenchParallelEvaluator(BaseEvaluator):
         }
 
         result = {
-            **flattened_scores, 'details': details,
-            'average_score': average_score
+            **flattened_scores,
+            'details': details,
+            'average_score': average_score,
         }
         return result
