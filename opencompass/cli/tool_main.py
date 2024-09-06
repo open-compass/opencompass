@@ -29,7 +29,6 @@ def main():
     # Create subparsers for each module
     for name, module in TOOLS.items():
         subparser = subparsers.add_parser(name, help=module.__doc__)
-        print(name, module)
         # Get the ArgumentParser object for the subcommand, add its arguments
         module.parse_args(subparser)
         subparser.set_defaults(func=module.main)

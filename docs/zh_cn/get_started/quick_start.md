@@ -90,19 +90,19 @@ python run.py \
     --debug
 ```
 
-模型和数据集的配置文件预存于 `configs/models` 和 `configs/datasets` 中。用户可以使用 `tools/list_configs.py` 查看或过滤当前可用的模型和数据集配置。
+模型和数据集的配置文件预存于 `configs/models` 和 `configs/datasets` 中。用户可以使用 `opencompass/tools/list_configs.py` 查看或过滤当前可用的模型和数据集配置。
 
 ```bash
 # 列出所有配置
-python tools/list_configs.py
+python opencompass/tools/list_configs.py
 # 列出与llama和mmlu相关的所有配置
-python tools/list_configs.py llama mmlu
+python opencompass/tools/list_configs.py llama mmlu
 ```
 
 :::{dropdown} 关于 `list_configs`
 :animate: fade-in-slide-down
 
-运行 `python tools/list_configs.py llama mmlu` 将产生如下输出：
+运行 `python opencompass/tools/list_configs.py llama mmlu` 将产生如下输出：
 
 ```text
 +-----------------+-----------------------------------+

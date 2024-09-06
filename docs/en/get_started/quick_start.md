@@ -67,19 +67,19 @@ Users can combine the models and datasets they want to test using `--models` and
 python run.py --models hf_opt_125m hf_opt_350m --datasets siqa_gen winograd_ppl
 ```
 
-The models and datasets are pre-stored in the form of configuration files in `configs/models` and `configs/datasets`. Users can view or filter the currently available model and dataset configurations using `tools/list_configs.py`.
+The models and datasets are pre-stored in the form of configuration files in `configs/models` and `configs/datasets`. Users can view or filter the currently available model and dataset configurations using `opencompass/tools/list_configs.py`.
 
 ```bash
 # List all configurations
-python tools/list_configs.py
+python opencompass/tools/list_configs.py
 # List all configurations related to llama and mmlu
-python tools/list_configs.py llama mmlu
+python opencompass/tools/list_configs.py llama mmlu
 ```
 
 :::{dropdown} More about `list_configs`
 :animate: fade-in-slide-down
 
-Running `python tools/list_configs.py llama mmlu` gives the output like:
+Running `python opencompass/tools/list_configs.py llama mmlu` gives the output like:
 
 ```text
 +-----------------+-----------------------------------+

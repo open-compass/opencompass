@@ -7,7 +7,7 @@ on:
       - 'README_zh-CN.md'
       - 'docs/**'
       - 'configs/**'
-      - 'tools/**'
+      - 'opencompass/tools/**'
 
   workflow_dispatch:
   schedule:

@@ -260,4 +260,4 @@ In this regard, OpenCompass has preset three `api_role` values for API models: `
 
 ## Debugging
 
-If you need to debug the prompt, it is recommended to use the `tools/prompt_viewer.py` script to preview the actual prompt received by the model after preparing the configuration file. Read [here](../tools.md#prompt-viewer) for more.
+If you need to debug the prompt, it is recommended to use the `opencompass/tools/prompt_viewer.py` script to preview the actual prompt received by the model after preparing the configuration file. Read [here](../tools.md#prompt-viewer) for more.

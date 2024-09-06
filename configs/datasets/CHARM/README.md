@@ -142,13 +142,13 @@ outputs
 cd ${path_to_CHARM_repo}
 
 # generate Table5, Table6, Table9 and Table10 in https://arxiv.org/abs/2403.14112
-PYTHONPATH=. python tools/summarize_reasoning.py ${REASON_SUMMARY_CSV}
+PYTHONPATH=. python opencompass/tools/summarize_reasoning.py ${REASON_SUMMARY_CSV}
 
 # generate Figure3 and Figure9 in https://arxiv.org/abs/2403.14112
-PYTHONPATH=. python tools/summarize_mem_rea.py ${REASON_SUMMARY_CSV} ${MEMORY_SUMMARY_CSV}
+PYTHONPATH=. python opencompass/tools/summarize_mem_rea.py ${REASON_SUMMARY_CSV} ${MEMORY_SUMMARY_CSV}
 
 # generate Table7, Table12, Table13 and Figure11 in https://arxiv.org/abs/2403.14112
-PYTHONPATH=. python tools/analyze_mem_indep_rea.py data/CHARM ${REASON_RESULTS_DIR} ${MEMORY_SUMMARY_DIR} ${MEMORY_SUMMARY_CSV}
+PYTHONPATH=. python opencompass/tools/analyze_mem_indep_rea.py data/CHARM ${REASON_RESULTS_DIR} ${MEMORY_SUMMARY_DIR} ${MEMORY_SUMMARY_CSV}
 ```
 
 ## 🖊️ Citation
