@@ -1,11 +1,13 @@
 # flake8: noqa
 import copy
 import json
+import os
 import random
 
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -46,11 +48,14 @@ def get_circular_example(entry, id):
 class NeedleBenchATCDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str,
-             num_needles: int,
-             language: str,
-             repeats: int,
-             with_circular: bool = True):
+    def load(
+        path: str,
+        file_name: str,
+        num_needles: int,
+        language: str,
+        repeats: int,
+        with_circular: bool = True,
+    ):
         """NeedleBenthATC Dataset.
 
         Args:
@@ -61,8 +66,14 @@ class NeedleBenchATCDataset(BaseDataset):
         """
         data = []
         entry = {}
+        path = get_data_path(path)
+        if os.environ.get('DATASET_SOURCE') == 'HF':
+            from huggingface_hub import snapshot_download
 
-        with open(path, 'r', encoding='utf-8') as file:
+            path = snapshot_download(repo_id=path, repo_type='dataset')
+        file_path = os.path.join(path, file_name)
+
+        with open(file_path, 'r', encoding='utf-8') as file:
             names_data = json.load(file)
 
         all_names = names_data[language].split(',')
@@ -73,7 +84,16 @@ class NeedleBenchATCDataset(BaseDataset):
             if language == 'Chinese':
 
                 relationship_terms = [
-                    '父亲', '母亲', '爸爸', '妈妈', '爷爷', '奶奶', '姥姥', '姥爷', '外公', '外婆'
+                    '父亲',
+                    '母亲',
+                    '爸爸',
+                    '妈妈',
+                    '爷爷',
+                    '奶奶',
+                    '姥姥',
+                    '姥爷',
+                    '外公',
+                    '外婆',
                 ]
 
                 relationship_templates = [
@@ -89,10 +109,16 @@ class NeedleBenchATCDataset(BaseDataset):
             elif language == 'English':
 
                 relationship_terms = [
-                    'father', 'mother', 'dad', 'mom', 'grandfather',
-                    'grandmother', 'maternal grandmother',
-                    'maternal grandfather', 'paternal grandfather',
-                    'paternal grandmother'
+                    'father',
+                    'mother',
+                    'dad',
+                    'mom',
+                    'grandfather',
+                    'grandmother',
+                    'maternal grandmother',
+                    'maternal grandfather',
+                    'paternal grandfather',
+                    'paternal grandmother',
                 ]
 
                 relationship_templates = [
@@ -139,12 +165,11 @@ class NeedleBenchATCDataset(BaseDataset):
 
             # Generating the prompt based on the language
             if language == 'Chinese':
-                prompt = (f"""
-在上面提供的打乱的家族关系文本中，'{last_person}'的能够向上追溯到的最年长的亲人是谁？""")
+                prompt = f"""
+在上面提供的打乱的家族关系文本中，'{last_person}'的能够向上追溯到的最年长的亲人是谁？"""
             elif language == 'English':
-                prompt = (f"""
+                prompt = f"""
 Given the scrambled family relationships described above, who is the eldest relative that '{last_person}' can trace back to in the context?"""
-                          )
             else:
                 prompt = 'Language not supported.'
                 raise Exception('Unsupported language specified. '
@@ -158,7 +183,8 @@ Given the scrambled family relationships described above, who is the eldest rela
                 additional_names_needed = max(4 - len(names), 0)
                 additional_names = random.sample(
                     [name for name in all_names if name not in names],
-                    additional_names_needed)
+                    additional_names_needed,
+                )
                 names.extend(additional_names)
 
             entry['options'] = names[0:4]

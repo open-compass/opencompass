@@ -41,21 +41,23 @@ needlebench_infer_cfg = dict(
                 dict(role='HUMAN', prompt='{prompt}'),
                 dict(role='BOT', prompt='{answer}\n'),
             ]
-        )
         ),
+    ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer))
+    inferencer=dict(type=GenInferencer),
+)
 
 needlebench_eval_cfg = dict(
     evaluator=dict(type=NeedleBenchOriginEvaluator),
     pred_postprocessor=dict(type=needlebench_postprocess),
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
-    pred_role='BOT')
+    pred_role='BOT',
+)
 
 context_lengths = [20000, 160000, 300000, 440000, 580000, 720000, 860000, 1000000]
 depths_list = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
-base_path = './data/needlebench'
+base_path = 'opencompass/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
 needlebench_en_datasets = []
 needle_file_name = 'needles.jsonl'
@@ -64,7 +66,7 @@ for original_context_length in context_lengths:
     for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_origin_en_1000k',
+            f'Depth{int(depth_percent)}_origin_en_1000k',
             'type': NeedleBenchOriginDataset,
             'path': base_path,
             'length': original_context_length,
@@ -78,7 +80,7 @@ for original_context_length in context_lengths:
             'needle_file_name': needle_file_name,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_en_datasets.append(dataset_dict)
 
@@ -90,7 +92,7 @@ for original_context_length in context_lengths:
     for depth_percent in depths_list:
         dataset_dict = {
             'abbr': f'Length{original_context_length}'
-                    f'Depth{int(depth_percent)}_origin_zh_1000k',
+            f'Depth{int(depth_percent)}_origin_zh_1000k',
             'type': NeedleBenchOriginDataset,
             'path': base_path,
             'length': original_context_length,
@@ -104,6 +106,6 @@ for original_context_length in context_lengths:
             'needle_file_name': needle_file_name,
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,
-            'eval_cfg': needlebench_eval_cfg
+            'eval_cfg': needlebench_eval_cfg,
         }
         needlebench_zh_datasets.append(dataset_dict)
