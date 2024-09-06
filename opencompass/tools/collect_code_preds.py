@@ -13,22 +13,21 @@ from opencompass.utils import (dataset_abbr_from_cfg, get_infer_output_path,
                                get_logger, model_abbr_from_cfg)
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Collect Humanevalx dataset predictions.')
+def parse_args(parser):
     parser.add_argument('config', help='Config file path')
-    parser.add_argument('-r',
-                        '--reuse',
-                        nargs='?',
-                        type=str,
-                        const='latest',
-                        help='Reuse previous outputs & results, and run any '
-                        'missing jobs presented in the config. If its '
-                        'argument is not specified, the latest results in '
-                        'the work_dir will be reused. The argument should '
-                        'also be a specific timestamp, e.g. 20230516_144254'),
-    args = parser.parse_args()
-    return args
+    parser.add_argument(
+        '-r',
+        '--reuse',
+        nargs='?',
+        type=str,
+        const='latest',
+        help='Reuse previous outputs & results, and run any '
+        'missing jobs presented in the config. If its '
+        'argument is not specified, the latest results in '
+        'the work_dir will be reused. The argument should '
+        'also be a specific timestamp, e.g. 20230516_144254',
+    ),
+    return parser
 
 
 _LANGUAGE_NAME_DICT = {
@@ -124,8 +123,7 @@ def collect_preds(filename: str):
         return SUCCEED, ori_prompt_strs, pred_strs
 
 
-def main():
-    args = parse_args()
+def main(args):
     # initialize logger
     logger = get_logger(log_level='INFO')
     cfg = Config.fromfile(args.config)
@@ -206,4 +204,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Collect Humanevalx dataset predictions.')
+    parser = parse_args(parser)
+    args = parser.parse_args()
+    main(args)

@@ -1,33 +1,43 @@
+import argparse
 from pathlib import Path
 from typing import List
 
-import typer
 from mmengine.config import Config
-from typer import Option
 
 from opencompass.registry import build_from_cfg
 from opencompass.summarizers.multi_model import MultiModelSummarizer
 
-app = typer.Typer(add_completion=False, pretty_exceptions_show_locals=False)
+
+def parse_args(parser):
+    parser.add_argument(
+        'cfg_paths',
+        type=List[Path],
+        nargs='+',
+        help='The path(s) to the config file(s) of the task',
+        default=[],
+    )
+    parser.add_argument(
+        'work_dirs',
+        type=List[Path],
+        nargs='+',
+        help='The work dir(s) for the task (named by timestamp)\
+            , need to ensure the order is the same as cfg_paths.',
+        default=[],
+    )
+    parser.add_argument(
+        '--group',
+        type=str,
+        default=None,
+        help='If not None, show the accuracy in the group.',
+    )
+    return parser
 
 
-@app.command(help='Visualize the results of multiple models')
-def main(
-    cfg_paths: List[Path] = Option(
-        ...,
-        help='The path to the config file of the task',
-        exists=True,
-    ),
-    work_dirs: List[Path] = Option(
-        ...,
-        help='The work dirs for the task(named by timestamp), '
-        'need to ensure the order is the same as cfg_paths.',
-        exists=True,
-    ),
-    group: str = Option(None,
-                        help='If not None, show the accuracy in the group.'),
-):
-    # assert len(cfg_paths) == len(work_dirs)
+def main(args):
+    cfg_paths = args.cfg_paths
+    work_dirs = args.work_dirs
+    group = args.group
+
     cfgs = [Config.fromfile(it, format_python_code=False) for it in cfg_paths]
 
     multi_models_summarizer = None
@@ -47,4 +57,8 @@ def main(
 
 
 if __name__ == '__main__':
-    app()
+    parser = argparse.ArgumentParser(
+        description='Visualize the results of multiple models')
+    parser = parse_args(parser)
+    args = parser.parse_args()
+    main(args)

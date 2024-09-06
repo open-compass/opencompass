@@ -103,7 +103,7 @@ repos:
     hooks:
     -   id: update-dataset-suffix
         name: dataset suffix updater
-        entry: ./tools/update_dataset_suffix.py
+        entry: ./opencompass/tools/update_dataset_suffix.py
         language: script
         pass_filenames: true
         require_serial: true
@@ -112,7 +112,7 @@ repos:
     hooks:
     -   id: update-dataset-suffix-pacakge
         name: dataset suffix updater(package)
-        entry: ./tools/update_dataset_suffix.py
+        entry: ./opencompass/tools/update_dataset_suffix.py
         language: script
         pass_filenames: false
         # require_serial: true
@@ -124,7 +124,7 @@ repos:
     hooks:
     -   id: compare-configs-datasets
         name: compare configs datasets
-        entry: ./tools/compare_configs.py
+        entry: ./opencompass/tools/compare_configs.py
         language: script
         pass_filenames: false
         # require_serial: true
@@ -135,7 +135,7 @@ repos:
     hooks:
     -   id: compare-configs-models
         name: compare configs models
-        entry: ./tools/compare_configs.py
+        entry: ./opencompass/tools/compare_configs.py
         language: script
         pass_filenames: false
         # require_serial: true
@@ -148,7 +148,7 @@ repos:
     hooks:
     -   id: compare-configs-summarizers
         name: compare configs summarizers
-        entry: ./tools/compare_configs.py
+        entry: ./opencompass/tools/compare_configs.py
         language: script
         pass_filenames: false
         # require_serial: true
