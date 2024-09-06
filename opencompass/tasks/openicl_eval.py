@@ -198,6 +198,26 @@ class OpenICLEvalTask(BaseTask):
                 else:
                     pred_strs = [proc(s, **kwargs) for s in pred_strs]
 
+            model_pred_strs = []
+            if 'model_postprocessor' in self.eval_cfg:
+                references = (test_set[self.output_column]
+                              if self.output_column else None)
+                model_pred_dicts = copy.deepcopy(pred_dicts)
+                for i, pred_dict in enumerate(model_pred_dicts):
+                    pred_dict['reference'] = [references[i]]
+                self.logger.info('Postprocessing model predictions...')
+                kwargs = self.eval_cfg['model_postprocessor']
+                proc = kwargs.pop('type')
+                if isinstance(proc, str):
+                    proc = TEXT_POSTPROCESSORS.get(proc)
+                if pred_list_flag:
+                    model_pred_strs = [[
+                        proc(model_pred_dict, **kwargs)
+                        for model_pred_dict in model_pred_dicts
+                    ]]
+                else:
+                    model_pred_strs = proc(model_pred_dicts, **kwargs)
+
             # Get majority voting predictions if use self-consistency
             if sc_size is not None:
                 pred_strs = [
@@ -229,12 +249,29 @@ class OpenICLEvalTask(BaseTask):
             }
             result = icl_evaluator.score(**preds)
 
+            # Get model postprocess result
+            model_details = None
+            model_result = None
+            if 'model_postprocessor' in self.eval_cfg:
+                model_preds = copy.deepcopy(preds)
+                model_preds['predictions'] = model_pred_strs
+                model_result = icl_evaluator.score(**model_preds)
+                for key in model_result:
+                    if key == 'details':
+                        model_details = model_result[key]
+                        continue
+                    new_key = 'model_postprocess_' + key
+                    result[new_key] = model_result[key]
+
             if self.dump_details:
                 details = result.get('details', None)
                 try:
                     result['details'] = self.format_details(
-                        pred_strs, test_set[self.output_column], details,
+                        pred_strs, model_pred_strs,
+                        test_set[self.output_column], details, model_details,
                         pred_dicts)
+                    self.logger.warning(
+                        f"result['details'] : {result['details']}"),
                     result['type'] = result['details'].pop('type', None)
                     if self.cal_extract_rate:
                         # Calculate the extraction success rate for prediction
@@ -253,13 +290,27 @@ class OpenICLEvalTask(BaseTask):
             self.logger.error(
                 f'Task {task_abbr_from_cfg(self.cfg)}: {result["error"]}')
             return
-        else:
+        elif model_result is None:
             result_wo_details = {
                 i: result[i]
                 for i in result if i != 'details'
             }
             self.logger.info(
                 f'Task {task_abbr_from_cfg(self.cfg)}: {result_wo_details}')
+        else:
+            result_wo_details = {
+                i: result[i]
+                for i in result if i != 'details'
+            }
+            model_result_wo_details = {
+                i: model_result[i]
+                for i in model_result if i != 'details'
+            }
+            self.logger.info(
+                f'Task {task_abbr_from_cfg(self.cfg)}: {result_wo_details}')
+            self.logger.info(
+                'Model Postprocess Task: ' +
+                f'{task_abbr_from_cfg(self.cfg)}:{model_result_wo_details}')
 
         # Save result
         out_path = get_infer_output_path(self.model_cfg, self.dataset_cfg,
@@ -286,7 +337,8 @@ class OpenICLEvalTask(BaseTask):
         success_rate = 100 - len(invalid_extractions) / len(details) * 100
         return success_rate
 
-    def format_details(self, predictions, references, details, pred_dicts):
+    def format_details(self, predictions, model_pred_strs, references, details,
+                       model_details, pred_dicts):
         """This function is responsible for formatting prediction details.
 
         Args:
@@ -323,6 +375,19 @@ class OpenICLEvalTask(BaseTask):
                 result['predictions'] = str(predictions[i])
                 result['references'] = str(references[i])
                 result['correct'] = str(predictions[i]) == str(references[i])
+            elif details is not None and model_details is not None:
+                assert model_pred_strs != [], \
+                    'Model details is not None, but model_pred_strs is empty'
+                self.logger.info(
+                    f"model_details[i]['pred']: {model_details[i]['pred']}")
+                results['type'] = 'GEN'
+                result['prompt'] = origin_prediction['origin_prompt']
+                result['origin_prediction'] = pred_dicts[i]['prediction']
+                result['predictions'] = details[i]['pred']
+                result['model_extract_predictions'] = model_details[i]['pred']
+                result['references'] = details[i]['answer']
+                result['correct'] = details[i]['correct']
+                result['model_extract_correct'] = model_details[i]['correct']
             elif details is not None:
                 results['type'] = 'GEN'
                 result['prompt'] = origin_prediction['origin_prompt']

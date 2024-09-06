@@ -265,6 +265,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/xsum",
         "local": "./data/Xsum/dev.jsonl",
     },
+    # Needlebench
+    "opencompass/needlebench": {
+        "ms_id": "",
+        "hf_id": "opencompass/needlebench",
+        "local": "./data/needlebench",
+    }
 }
 
 DATASETS_URL = {
@@ -364,9 +370,9 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ruler.zip",
         "md5": "c60bdfff3d02358067104cc1dea7c0f7",
     },
-    "scicode/": {
+    "/scicode": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/scicode.zip",
-        "md5": "06f64edad6680072e5bca3f0ce892d0c",
+        "md5": "9c6c64b8c70edc418f713419ea39989c",
     },
     "/commonsenseqa": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/commonsenseqa.zip",
@@ -396,4 +402,8 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
         "md5": "e3200c7380f4cea5f13c768f2815fabb",
     },
+    "/needlebench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/needlebench.zip",
+        "md5": "b546da0397746eaff4d3ff0f20d6ede2",
+    }
 }

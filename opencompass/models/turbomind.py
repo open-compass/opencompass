@@ -113,8 +113,8 @@ class TurboMindModel(BaseModel):
             gen_config['stop_words'] = list(set(stop_words))
         gen_config.setdefault('min_new_tokens', 1)
 
-        from lmdeploy.messages import EngineGenerationConfig
-        gen_config = EngineGenerationConfig(**gen_config)
+        from lmdeploy.messages import GenerationConfig
+        gen_config = GenerationConfig(**gen_config)
 
         results = []
         for batch_input in batch_inputs:
@@ -160,7 +160,7 @@ class TurboMindModel(BaseModel):
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
-            gen_config (EngineGenerationConfig, optional): Generation
+            gen_config (GenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
             end_str (str, optional): Whether to trim generated strings
                 with end_str if the model has special ending strings

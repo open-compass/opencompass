@@ -41,23 +41,25 @@ needlebench_infer_cfg = dict(
                 dict(role='HUMAN', prompt='{prompt}'),
                 dict(role='BOT', prompt='{answer}\n'),
             ]
-        )
         ),
+    ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer))
+    inferencer=dict(type=GenInferencer),
+)
 
 needlebench_eval_cfg = dict(
     evaluator=dict(type=NeedleBenchParallelEvaluator),
     pred_postprocessor=dict(type=needlebench_postprocess),
     dataset_postprocessor=dict(type=needlebench_dataset_postprocess),
-    pred_role='BOT')
+    pred_role='BOT',
+)
 
 # context_lengths = list([16000, 32000, 48000, 64000, 80000, 96000, 112000, 128000, 144000, 160000, 176000, 192000, 200000])
 context_lengths = [32000, 128000, 256000]
 document_depth_percent_intervals = 20
 document_depth_percent_interval_type = 'linear'
 
-base_path = './data/needlebench'
+base_path = 'opencompass/needlebench'
 file_list = ['PaulGrahamEssays.jsonl']
 needlebench_en_datasets = []
 needle_file_name = 'needles.jsonl'
@@ -65,8 +67,7 @@ depths = [0, 10, 21, 31, 42, 52, 63, 73, 84, 94, 100]
 
 for original_context_length in context_lengths:
     dataset_dict = {
-        'abbr': f'Length{original_context_length}'
-                f'_parallel_en_256k',
+        'abbr': f'Length{original_context_length}' f'_parallel_en_256k',
         'type': NeedleBenchParallelDataset,
         'path': base_path,
         'needle_file_name': needle_file_name,
@@ -80,7 +81,7 @@ for original_context_length in context_lengths:
         'language': 'English',
         'reader_cfg': needlebench_reader_cfg,
         'infer_cfg': needlebench_infer_cfg,
-        'eval_cfg': needlebench_eval_cfg
+        'eval_cfg': needlebench_eval_cfg,
     }
     needlebench_en_datasets.append(dataset_dict)
 
@@ -89,8 +90,7 @@ needlebench_zh_datasets = []
 
 for original_context_length in context_lengths:
     dataset_dict = {
-        'abbr': f'Length{original_context_length}'
-                f'_parallel_zh_256k',
+        'abbr': f'Length{original_context_length}' f'_parallel_zh_256k',
         'type': NeedleBenchParallelDataset,
         'path': base_path,
         'needle_file_name': needle_file_name,
@@ -104,6 +104,6 @@ for original_context_length in context_lengths:
         'language': 'Chinese',
         'reader_cfg': needlebench_reader_cfg,
         'infer_cfg': needlebench_infer_cfg,
-        'eval_cfg': needlebench_eval_cfg
+        'eval_cfg': needlebench_eval_cfg,
     }
     needlebench_zh_datasets.append(dataset_dict)

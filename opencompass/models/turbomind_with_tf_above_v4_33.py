@@ -115,11 +115,16 @@ class TurboMindModelwithChatTemplate(BaseModel):
         batch_messages = [messages[i:i + self.concurrency] for i in range(0, len(messages), self.concurrency)]
 
         stop_words = list(set(self.stop_words + stopping_criteria))
+        encode_stop_words = []
+        if stop_words is not None and len(stop_words) > 0:
+            for words in stop_words:
+                encode_stop_words += self.tokenizer.encode(words, add_bos=False)
+
         DEFAULT_GEN_CONFIG = {
             'max_new_tokens': max_out_len,
             'min_new_tokens': 1,
             'top_k': 1,
-            'stop_words': stop_words,
+            'stop_words': encode_stop_words,
         }
         gen_config = copy.deepcopy(DEFAULT_GEN_CONFIG)
         gen_config.update(self.gen_config)
@@ -127,9 +132,8 @@ class TurboMindModelwithChatTemplate(BaseModel):
             gen_config['top_k'] = 1000
             gen_config['temperature'] = temperature
 
-        from lmdeploy.messages import EngineGenerationConfig, GenerationConfig
+        from lmdeploy.messages import GenerationConfig
         gen_config = GenerationConfig(**gen_config)
-        gen_config = EngineGenerationConfig.From(gen_config, self.tokenizer)
 
         results = []
         for batch_message in batch_messages:
@@ -160,7 +164,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
             prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
-            gen_config (EngineGenerationConfig, optional): Generation
+            gen_config (GenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
         Returns:
             str: The generated string.

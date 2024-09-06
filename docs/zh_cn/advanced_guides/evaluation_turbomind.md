@@ -70,6 +70,6 @@ python run.py configs/eval_internlm_turbomind.py -w outputs/turbomind/internlm-2
 
 **注：**
 
-- 如果想在测评配置文件中`engine_config`和`gen_config`字段传递更多参数，请参考[TurbomindEngineConfig](https://lmdeploy.readthedocs.io/zh-cn/latest/inference/pipeline.html#turbomindengineconfig) 和 [EngineGenerationConfig](https://lmdeploy.readthedocs.io/zh-cn/latest/inference/pipeline.html#generationconfig)
+- 如果想在测评配置文件中`engine_config`和`gen_config`字段传递更多参数，请参考[TurbomindEngineConfig](https://lmdeploy.readthedocs.io/zh-cn/latest/inference/pipeline.html#turbomindengineconfig) 和 [GenerationConfig](https://lmdeploy.readthedocs.io/zh-cn/latest/inference/pipeline.html#generationconfig)
 - 如果评测 InternLM Chat 模型，请使用配置文件 `eval_internlm_chat_turbomind.py`
 - 如果评测 InternLM 7B 模型，请修改 `eval_internlm_turbomind.py` 或者 `eval_internlm_chat_turbomind.py`。将`models`字段配置为`models = [internlm_7b]` 。

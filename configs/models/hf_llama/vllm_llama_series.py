@@ -10,9 +10,9 @@ settings = [
     ('llama-2-70b-vllm', 'meta-llama/Llama-2-70b-hf', 4),
     ('llama-3-8b-vllm', 'meta-llama/Meta-Llama-3-8B', 1),
     ('llama-3-70b-vllm', 'meta-llama/Meta-Llama-3-70B', 4),
-    ('llama-3.1-8b-instruct-vllm', 'meta-llama/Meta-Llama-3.1-8B-Instruct', 1)
-    ('llama-3.1-70b-instruct-vllm', 'meta-llama/Meta-Llama-3.1-70B-Instruct', 4)
-    ('llama-3.1-405b-fp8-instruct-vllm', 'meta-llama/Meta-Llama-3.1-405B-Instruct-FP8', 8)
+    ('llama-3.1-8b-instruct-vllm', 'meta-llama/Meta-Llama-3.1-8B-Instruct', 1),
+    ('llama-3.1-70b-instruct-vllm', 'meta-llama/Meta-Llama-3.1-70B-Instruct', 4),
+    ('llama-3.1-405b-fp8-instruct-vllm', 'meta-llama/Meta-Llama-3.1-405B-Instruct-FP8', 8),
 ]
 
 models = []
