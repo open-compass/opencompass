@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # - uses: actions/checkout@v3
-  
+
       - name: Install linkchecker
         run: |
           pip install linkchecker
-      
+
 
       - name: Run linkchecker
         run: |
