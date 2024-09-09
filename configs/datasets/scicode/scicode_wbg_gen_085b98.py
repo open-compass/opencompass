@@ -17,8 +17,8 @@ SciCode_infer_cfg = dict(
 
 SciCode_eval_cfg = dict(
     evaluator=dict(
-        type=SciCodeEvaluator, 
-        dataset_path='./data/scicode', 
+        type=SciCodeEvaluator,
+        dataset_path='./data/scicode',
         with_bg=True
     )
 )
