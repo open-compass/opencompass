@@ -2,18 +2,24 @@
 import json
 import os.path as osp
 import re
+
 from datasets import Dataset
+
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
+
 def check_match(target, generation):
-    pattern_str = target.replace('{{', '{').replace('}}', '}').replace('{answer}', '.*')
+    pattern_str = target.replace('{{',
+                                 '{').replace('}}',
+                                              '}').replace('{answer}', '.*')
     pattern_str = re.escape(pattern_str).replace('\\.\\*', '.*')
     match = re.fullmatch(pattern_str, generation)
     return bool(match)
+
 
 @LOAD_DATASET.register_module()
 class FollowBenchDataset(BaseDataset):
@@ -28,11 +34,19 @@ class FollowBenchDataset(BaseDataset):
             data = json.load(f)
             for item in data:
                 if cate == 'llm':
-                    raw_data.append({'instruction': item['instruction'], 'judge_prompt': item['judge_prompt'], 'judge': item})
+                    raw_data.append({
+                        'instruction': item['instruction'],
+                        'judge_prompt': item['judge_prompt'],
+                        'judge': item
+                    })
                 elif cate == 'rule':
-                    raw_data.append({'instruction': item['instruction'], 'judge': item})
+                    raw_data.append({
+                        'instruction': item['instruction'],
+                        'judge': item
+                    })
                 else:
-                    raise NotImplementedError(f"Category '{cate}' is not implemented.")
+                    raise NotImplementedError(
+                        f"Category '{cate}' is not implemented.")
 
         dataset = Dataset.from_list(raw_data)
         return dataset
@@ -126,15 +140,19 @@ class FollowBenchEvaluator(BaseEvaluator):
         return chdir_return(cwd, pass_flag)
 
     def score(self, predictions, references):
-        results = {'example':{'accuracy':[0,0,0,0,0], 'num':0}}
+        results = {'example': {'accuracy': [0, 0, 0, 0, 0], 'num': 0}}
         for prediction, reference in zip(predictions, references):
             if reference['category'] == 'example':
                 results['example']['num'] += 1
                 template = reference['target'].replace('{instruction}\n', '')
                 match_result = check_match(template, prediction)
                 print(match_result)
-                results['example']['accuracy'][reference['level'] - 1] += match_result
-        results['example']['accuracy'] = [round(acc / (results['example']['num'] // 5), 2) for acc in results['example']['accuracy']]
+                results['example']['accuracy'][reference['level'] -
+                                               1] += match_result
+        results['example']['accuracy'] = [
+            round(acc / (results['example']['num'] // 5), 2)
+            for acc in results['example']['accuracy']
+        ]
         ######## Still not finished for rule-based evaluation
 
         # Each process changes cwd, need to use multi-processing
