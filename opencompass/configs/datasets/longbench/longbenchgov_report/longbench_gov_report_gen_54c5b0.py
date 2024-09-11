@@ -7,7 +7,7 @@ LongBench_gov_report_reader_cfg = dict(
     input_columns=['context'],
     output_column='answers',
     train_split='test',
-    test_split='test'
+    test_split='test',
 )
 
 LongBench_gov_report_infer_cfg = dict(
@@ -15,24 +15,29 @@ LongBench_gov_report_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt='You are given a report by a government agency. Write a one-page summary of the report.\n\nReport:\n{context}\n\nNow, write a one-page summary of the report.\n\nSummary:'),
-            ], )),
+                dict(
+                    role='HUMAN',
+                    prompt='You are given a report by a government agency. Write a one-page summary of the report.\n\nReport:\n{context}\n\nNow, write a one-page summary of the report.\n\nSummary:',
+                ),
+            ],
+        ),
+    ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=512)
+    inferencer=dict(type=GenInferencer, max_out_len=512),
 )
 
 LongBench_gov_report_eval_cfg = dict(
-    evaluator=dict(type=LongBenchRougeEvaluator),
-    pred_role='BOT'
+    evaluator=dict(type=LongBenchRougeEvaluator), pred_role='BOT'
 )
 
 LongBench_gov_report_datasets = [
     dict(
         type=LongBenchgov_reportDataset,
         abbr='LongBench_gov_report',
-        path='THUDM/LongBench',
+        path='opencompass/Longbench',
         name='gov_report',
         reader_cfg=LongBench_gov_report_reader_cfg,
         infer_cfg=LongBench_gov_report_infer_cfg,
-        eval_cfg=LongBench_gov_report_eval_cfg)
+        eval_cfg=LongBench_gov_report_eval_cfg,
+    )
 ]

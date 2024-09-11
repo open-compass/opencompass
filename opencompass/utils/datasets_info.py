@@ -265,6 +265,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/xsum",
         "local": "./data/Xsum/dev.jsonl",
     },
+    # Longbench
+    "opencompass/Longbench": {
+        "ms_id": "",
+        "hf_id": "THUDM/LongBench",
+        "local": "./data/Longbench",
+    },
     # Needlebench
     "opencompass/needlebench": {
         "ms_id": "",
@@ -402,8 +408,16 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
         "md5": "e3200c7380f4cea5f13c768f2815fabb",
     },
+    "/Longbench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/Longbench.zip",
+        "md5": "ab0cb9e520ae5cfb899bf38b564249bb",
+    },
     "/needlebench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/needlebench.zip",
         "md5": "b546da0397746eaff4d3ff0f20d6ede2",
-    }
+    },
+    "/teval": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/teval.zip",
+        "md5": "7628ab5891a26bf96ca17becfd044867",
+    },
 }
