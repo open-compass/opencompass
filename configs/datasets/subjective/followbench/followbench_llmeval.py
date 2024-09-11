@@ -11,7 +11,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    'followbench_llmeval_cn', 'followbench_llmeval_en', 
+    'followbench_llmeval_cn', 'followbench_llmeval_en',
 ]
 data_path ='data/subjective/followbench/converted_data'
 
