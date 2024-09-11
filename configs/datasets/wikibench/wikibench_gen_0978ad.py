@@ -7,7 +7,7 @@ from opencompass.utils.text_postprocessors import first_option_postprocess
 
 
 single_choice_prompts = {
-    'single_choice_cn': '以下是一道单项选择题，请你根据你了解的知识给出正确的答案选项。\n下面是你要回答的题目：\n{question}\n答案选项：',
+    'single_choice_cn': '以下是一道单项选择题，请你根据你了解的知识一步步推理，并在最后用“所以答案为选项X”给出答案，其中“X”为选项A，B，C，D中你认为正确的选项。。\n下面是你要回答的题目：\n{question}\n让我们一步步推理：',
 }
 
 wikibench_sets = {
