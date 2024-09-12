@@ -408,10 +408,6 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
         "md5": "e3200c7380f4cea5f13c768f2815fabb",
     },
-    "WikiBench": {
-        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/WikiBench.zip",
-        "md5": "f19f9857517148c876d9cf1b6f4c63b1",
-    },
     "/Longbench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/Longbench.zip",
         "md5": "ab0cb9e520ae5cfb899bf38b564249bb",
