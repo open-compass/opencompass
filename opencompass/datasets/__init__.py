@@ -89,6 +89,7 @@ from .obqa import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
+from .qa import * # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
 from .qaspercut import *  # noqa: F401, F403
 from .QuALITY import *  # noqa: F401, F403
