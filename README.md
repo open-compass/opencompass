@@ -590,7 +590,7 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 ## 🔜 Roadmap
 
 - [x] Subjective Evaluation
-  - [ ] Release CompassAreana
+  - [x] Release CompassAreana
   - [x] Subjective evaluation.
 - [x] Long-context
   - [x] Long-context evaluation with extensive datasets.
