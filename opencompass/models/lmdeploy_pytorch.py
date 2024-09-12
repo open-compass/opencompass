@@ -86,6 +86,8 @@ class LmdeployPytorchModel(BaseModel):
                 for token_id in generation_config.eos_token_id:
                     stop_words.append(token_id)
             gen_config.stop_words = stop_words
+            if version_info >= (0, 6, 0):
+                gen_config.stop_token_ids = stop_words
         self.gen_config = gen_config
         self.end_str = end_str
         self.major_version, self.minor_version = version_info[:2]
