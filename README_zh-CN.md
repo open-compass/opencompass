@@ -240,11 +240,11 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
   ```bash
   # 列出所有配置
-  octools list-configs
-  # python opencompass/tools/list_configs.py
+  opencompass-tool list-configs
+  # It is equal to: python opencompass/tools/list_configs.py
 
   # 列出所有跟 llama 及 mmlu 相关的配置
-  octools list-configs llama mmlu
+  opencompass-tool list-configs llama mmlu
   # python opencompass/tools/list_configs.py llama mmlu
   ```
 

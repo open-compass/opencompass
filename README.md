@@ -247,11 +247,11 @@ After ensuring that OpenCompass is installed correctly according to the above st
 
   ```bash
   # List all configurations
-  octools list-configs
-  # python opencompass/tools/list_configs.py
+  opencompass-tool list-configs
+  # It is equal to: python opencompass/tools/list_configs.py
 
   # List all configurations related to llama and mmlu
-  octools list-configs llama mmlu
+  opencompass-tool list-configs llama mmlu
   # python opencompass/tools/list_configs.py llama mmlu
   ```
 
