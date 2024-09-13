@@ -59,7 +59,7 @@ class dingoEvaluator(BaseEvaluator):
                 f.write('\n')
 
         input_data = {
-            "eval_models": ["pretrain"],
+            "eval_models": ["llm_base"],
             "input_path": file_name,
             "output_path": "./outputs/dingo/",
             "dataset": "local",
