@@ -1,5 +1,6 @@
 # flake8: noqa
 # yapf: disable
+import os
 import csv
 import json
 from typing import List
@@ -11,9 +12,9 @@ from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from .base import BaseDataset
 
 try:
-    from dingo.model import Model
-    from dingo.model.modelres import ModelRes
-    from dingo.io import MetaData, SummaryModel, ErrorInfo
+    from dingo.model.model import Model
+    from dingo.io import InputArgs
+    from dingo.exec import Executor
 except Exception:
     raise ModuleNotFoundError('=========== dingo register fail. please try: pip install dingo-python. ===========')
 
@@ -48,61 +49,28 @@ class qaLongDataset(BaseDataset):
 class qaEvaluator(BaseEvaluator):
 
     def score(self, origin_prompt: List, predictions: List) -> dict:
-        num = len(predictions)
-        summary = SummaryModel(
-            score=0,
-            num_good=0,
-            num_bad=0,
-            total=num
-        )
-        error_info_list = []
-        if num == 0:
-            return summary.to_dict()
+        file_data = [{'prompt':pmt, 'prediction':prd} for pmt, prd in zip(origin_prompt, predictions)]
+        file_name = 'tmp_file.txt'
+        with open(file_name, 'a', encoding='utf-8') as f:
+            for d in file_data:
+                json.dump(d, f, ensure_ascii=False)
+                f.write('\n')
 
-        eval_model = 'pretrain'
-        rule_map = Model.rule_groups[eval_model]
+        input_data = {
+            "eval_models": ["pretrain"],
+            "input_path": file_name,
+            "output_path": "./output/dingo/",
+            "dataset": "local",
+            "datasource": "local",  # If not fill in this item, it will be the same as "dataset"
+            "data_format": "jsonl",
+            "column_prompt": ["prompt"],
+            "column_content": ["prediction"],
+        }
+        Model.apply_config(input_data['custom_config_path'])
+        input_args = InputArgs(**input_data)
+        executor = Executor.exec_map["local"](input_args)
+        result = executor.execute()
+        summary = result[0].to_dict()
 
-        for i in range(num):
-            data = MetaData(
-                data_id=i,
-                prompt=origin_prompt[i],
-                content=predictions[i]
-            )
-            error_info = ErrorInfo(data_id=data.data_id, prompt=data.prompt, content=data.content)
-
-            if_good = True
-            for rule in rule_map:
-                tmp: ModelRes = rule.eval(data)
-                # 结果判断
-                if tmp.error_status is False:
-                    continue
-                if_good = False
-                e_t = tmp.error_type
-                e_n = tmp.error_type + '-' + tmp.error_name
-                e_r = tmp.error_reason
-                if e_t not in error_info.error_type:
-                    error_info.error_type.append(e_t)
-                error_info.error_name.append(e_n)
-                error_info.error_reason.append(e_r)
-            if if_good == False:
-                summary.num_bad += 1
-                error_info_list.append(error_info)
-                for e_t in error_info.error_type:
-                    if e_t not in summary.error_type_ratio:
-                        summary.error_type_ratio[e_t] = 1
-                    else:
-                        summary.error_type_ratio[e_t] += 1
-                for e_n in error_info.error_name:
-                    if e_n not in summary.error_name_ratio:
-                        summary.error_name_ratio[e_n] = 1
-                    else:
-                        summary.error_name_ratio[e_n] += 1
-
-
-        summary.num_good = summary.total - summary.num_bad
-        summary.score = round(summary.num_good / summary.total, 6)
-        for e_t in summary.error_type_ratio:
-            summary.error_type_ratio[e_t] = round(summary.error_type_ratio[e_t] / summary.total, 6)
-        for e_n in summary.error_name_ratio:
-            summary.error_name_ratio[e_n] = round(summary.error_name_ratio[e_n] / summary.total, 6)
-        return summary.to_dict()
+        os.remove(file_name)
+        return summary
