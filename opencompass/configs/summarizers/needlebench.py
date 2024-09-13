@@ -23,9 +23,9 @@ def create_m_rs_names_list(context_lengths, depths, needle_counts,
                 multi_needle_en_list.extend(names_list)
             elif language == 'zh':
                 multi_needle_zh_list.extend(names_list)
-    names_dict['Multi-Needle-Reasoning(M-RS)'] =  multi_needle_list
-    names_dict['Multi-Needle-Reasoning-EN'] = multi_needle_en_list
-    names_dict['Multi-Needle-Reasoning-ZH'] = multi_needle_zh_list
+    names_dict[f'Multi-Needle-Reasoning(M-RS)-{dataset_size.upper()}'] = multi_needle_list
+    names_dict[f'Multi-Needle-Reasoning-EN-{dataset_size.upper()}'] = multi_needle_en_list
+    names_dict[f'Multi-Needle-Reasoning-ZH-{dataset_size.upper()}'] = multi_needle_zh_list
 
     return names_dict
 
@@ -56,9 +56,9 @@ def create_summarizer(context_lengths, depths, dataset_size,
             single_needle_en_list.extend(names_list)
         elif language == 'zh':
             single_needle_zh_list.extend(names_list)
-    names_dict['Single-Needle-Retrieval(S-RT)'] = single_needle_list
-    names_dict['Single-Needle-Retrieval-EN'] = single_needle_en_list
-    names_dict['Single-Needle-Retrieval-ZH'] = single_needle_zh_list
+    names_dict[f'Single-Needle-Retrieval(S-RT)-{dataset_size.upper()}'] = single_needle_list
+    names_dict[f'Single-Needle-Retrieval-EN-{dataset_size.upper()}'] = single_needle_en_list
+    names_dict[f'Single-Needle-Retrieval-ZH-{dataset_size.upper()}'] = single_needle_zh_list
 
     parallel_list = []
     parallel_en_list = []
@@ -74,39 +74,39 @@ def create_summarizer(context_lengths, depths, dataset_size,
             parallel_en_list.extend(names_list)
         elif language == 'zh':
             parallel_zh_list.extend(names_list)
-    names_dict['Multi-Needle-Retrieval(M-RT)'] = parallel_list
-    names_dict['Multi-Needle-Retrieval-EN'] = parallel_en_list
-    names_dict['Multi-Needle-Retrieval-ZH'] = parallel_zh_list
+    names_dict[f'Multi-Needle-Retrieval(M-RT)-{dataset_size.upper()}'] = parallel_list
+    names_dict[f'Multi-Needle-Retrieval-EN-{dataset_size.upper()}'] = parallel_en_list
+    names_dict[f'Multi-Needle-Retrieval-ZH-{dataset_size.upper()}'] = parallel_zh_list
 
     summary_groups = [
         {'name': key, 'subsets': value} for key, value in names_dict.items()
     ]
 
     summary_groups.append({
-        'name': 'NeedleBench-Overall-Score',
-        'subsets': [['Single-Needle-Retrieval(S-RT)', 'naive_average'],
-                    ['Multi-Needle-Reasoning(M-RS)', 'naive_average'],
-                    ['Multi-Needle-Retrieval(M-RT)', 'average_score']],
-        'weights': {'Single-Needle-Retrieval(S-RT)': 0.4,
-                    'Multi-Needle-Reasoning(M-RS)': 0.3,
-                    'Multi-Needle-Retrieval(M-RT)': 0.3}})
+        'name': f'NeedleBench-Overall-Score-{dataset_size.upper()}',
+        'subsets': [[f'Single-Needle-Retrieval(S-RT)-{dataset_size.upper()}', 'naive_average'],
+                    [f'Multi-Needle-Reasoning(M-RS)-{dataset_size.upper()}', 'naive_average'],
+                    [f'Multi-Needle-Retrieval(M-RT)-{dataset_size.upper()}', 'average_score']],
+        'weights': {f'Single-Needle-Retrieval(S-RT)-{dataset_size.upper()}': 0.4,
+                    f'Multi-Needle-Reasoning(M-RS)-{dataset_size.upper()}': 0.3,
+                    f'Multi-Needle-Retrieval(M-RT)-{dataset_size.upper()}': 0.3}})
     summarizer_config = {
         'type': NeedleBenchSummarizer,
         'summary_groups': summary_groups,
         'dataset_abbrs': [
-            'NeedleBench-Overall-Score',
+            f'NeedleBench-Overall-Score-{dataset_size.upper()}',
             f'--------- NeedleBench-{dataset_size.upper()}-Single-Needle-Retrieval ---------',
-            'Single-Needle-Retrieval(S-RT)',
-            'Single-Needle-Retrieval-EN',
-            'Single-Needle-Retrieval-ZH',
+            f'Single-Needle-Retrieval(S-RT)-{dataset_size.upper()}',
+            f'Single-Needle-Retrieval-EN-{dataset_size.upper()}',
+            f'Single-Needle-Retrieval-ZH-{dataset_size.upper()}',
             f'--------- NeedleBench-{dataset_size.upper()}-Multi-Needle-Retrieval ---------',
-            'Multi-Needle-Retrieval(M-RT)',
-            'Multi-Needle-Retrieval-EN',
-            'Multi-Needle-Retrieval-ZH',
+            f'Multi-Needle-Retrieval(M-RT)-{dataset_size.upper()}',
+            f'Multi-Needle-Retrieval-EN-{dataset_size.upper()}',
+            f'Multi-Needle-Retrieval-ZH-{dataset_size.upper()}',
             f'--------- NeedleBench-{dataset_size.upper()}-Multi-Needle-Reasoning ---------',
-            'Multi-Needle-Reasoning(M-RS)',
-            'Multi-Needle-Reasoning-EN',
-            'Multi-Needle-Reasoning-ZH',
+            f'Multi-Needle-Reasoning(M-RS)-{dataset_size.upper()}',
+            f'Multi-Needle-Reasoning-EN-{dataset_size.upper()}',
+            f'Multi-Needle-Reasoning-ZH-{dataset_size.upper()}',
             f'2-Needle-EN-{dataset_size.upper()}',
             f'2-Needle-ZH-{dataset_size.upper()}',
             f'3-Needle-EN-{dataset_size.upper()}',

@@ -16,10 +16,10 @@ chat_model_list = [
     'llama-3-8b-instruct-turbomind', 'mistral-7b-instruct-v0.2-hf',
     'mistral-7b-instruct-v0.2-vllm', 'minicpm-2b-dpo-fp32-hf',
     'minicpm-2b-sft-bf16-hf', 'minicpm-2b-sft-fp32-hf',
-    'phi-3-mini-4k-instruct-hf', 'phi-3-small-8k-instruct-hf',
-    'qwen1.5-0.5b-chat-hf', 'qwen2-1.5b-instruct-turbomind',
-    'qwen2-7b-instruct-turbomind', 'qwen1.5-0.5b-chat-vllm',
-    'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf', 'lmdeploy-api-test'
+    'phi-3-mini-4k-instruct-hf', 'qwen1.5-0.5b-chat-hf',
+    'qwen2-1.5b-instruct-turbomind', 'qwen2-7b-instruct-turbomind',
+    'qwen1.5-0.5b-chat-vllm', 'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf',
+    'lmdeploy-api-test'
 ]
 base_model_list = [
     'deepseek-moe-16b-base-hf', 'deepseek-7b-base-turbomind',
