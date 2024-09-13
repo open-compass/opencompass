@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import AlignmentBenchDataset
+from opencompass.datasets import AlignmentBenchDataset, alignbench_postprocess
 from opencompass.summarizers import AlignmentBenchSummarizer
 
 subjective_reader_cfg = dict(
@@ -47,6 +47,7 @@ for _name in subjective_all_sets:
                     ),
                 ]),
             ),
+            dict_postprocessor=dict(type=alignbench_postprocess, judge_type='general'),
         ),
         pred_role='BOT',
     )
@@ -63,5 +64,4 @@ for _name in subjective_all_sets:
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
             mode='singlescore',
-            summarizer = dict(type=AlignmentBenchSummarizer, judge_type='general')
         ))
