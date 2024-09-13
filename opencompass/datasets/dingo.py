@@ -1,8 +1,9 @@
-# flake8: noqa
+# flake8: nodingo
 # yapf: disable
 import os
 import csv
 import json
+import time
 from typing import List
 from datasets import Dataset
 
@@ -19,7 +20,7 @@ except Exception:
     raise ModuleNotFoundError('=========== dingo register fail. please try: pip install dingo-python. ===========')
 
 @LOAD_DATASET.register_module()
-class qaDataset(BaseDataset):
+class dingoDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
@@ -34,7 +35,7 @@ class qaDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class qaLongDataset(BaseDataset):
+class dingoLongDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
@@ -46,11 +47,12 @@ class qaLongDataset(BaseDataset):
 
 
 @ICL_EVALUATORS.register_module()
-class qaEvaluator(BaseEvaluator):
+class dingoEvaluator(BaseEvaluator):
 
     def score(self, origin_prompt: List, predictions: List) -> dict:
+        current_time = time.strftime('%Y%m%d_%H%M%S', time.localtime())
         file_data = [{'prompt':pmt, 'prediction':prd} for pmt, prd in zip(origin_prompt, predictions)]
-        file_name = 'tmp_file.txt'
+        file_name = 'dingo_file_' + current_time + '.jsonl'
         with open(file_name, 'a', encoding='utf-8') as f:
             for d in file_data:
                 json.dump(d, f, ensure_ascii=False)
@@ -59,14 +61,14 @@ class qaEvaluator(BaseEvaluator):
         input_data = {
             "eval_models": ["pretrain"],
             "input_path": file_name,
-            "output_path": "./output/dingo/",
+            "output_path": "./outputs/dingo/",
             "dataset": "local",
             "datasource": "local",  # If not fill in this item, it will be the same as "dataset"
             "data_format": "jsonl",
             "column_prompt": ["prompt"],
             "column_content": ["prediction"],
         }
-        Model.apply_config(input_data['custom_config_path'])
+        # Model.apply_config(input_data['custom_config_path'])
         input_args = InputArgs(**input_data)
         executor = Executor.exec_map["local"](input_args)
         result = executor.execute()
