@@ -76,7 +76,7 @@ class HumanevalXEvaluator(BaseEvaluator):
     def __init__(self,
                  language,
                  ip_address='localhost',
-                 port=5000,
+                 port='',
                  retry=2,
                  timeout=600) -> None:
         assert language in _LANGUAGE_NAME_DICT.keys(), (
@@ -141,10 +141,13 @@ class HumanevalXEvaluator(BaseEvaluator):
                 f'\nError Information: {output}')
 
     def _code_eval_service(self, file_path):
+        if self.port:
+            eval_server_url = f'{self.ip_address}:{self.port}/evaluate'
+        else:
+            eval_server_url = f'{self.ip_address}/evaluate'
         exec_result = subprocess.run([
             'curl', '-X', 'POST', '-F', f'file=@{file_path}', '-F',
-            f'dataset=humanevalx/{self.language}',
-            f'{self.ip_address}:{self.port}/evaluate'
+            f'dataset=humanevalx/{self.language}', f'{eval_server_url}'
         ],
                                      timeout=self.timeout,
                                      capture_output=True)
