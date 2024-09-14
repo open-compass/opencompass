@@ -126,6 +126,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
             'top_k': 1,
             'stop_words': encode_stop_words,
         }
+
         gen_config = copy.deepcopy(DEFAULT_GEN_CONFIG)
         gen_config.update(self.gen_config)
         if do_sample:
@@ -134,6 +135,9 @@ class TurboMindModelwithChatTemplate(BaseModel):
 
         from lmdeploy.messages import GenerationConfig
         gen_config = GenerationConfig(**gen_config)
+        if self.version_info >= (0, 6, 0):
+            gen_config.stop_words = stop_words
+            gen_config.convert_stop_bad_words_to_ids(self.tokenizer)
 
         results = []
         for batch_message in batch_messages:

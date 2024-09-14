@@ -340,6 +340,14 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/humaneval.zip",
         "md5": "88b1b89dc47b7121c81da6bcd85a69c3",
     },
+    "/humanevalx": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/humanevalx.zip",
+        "md5": "22930355c03fb73fb5bae14b50f1deb9",
+    },
+    "/ds1000_data": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ds1000_data.zip",
+        "md5": "1a4990aec04a2fd73ccfad12e2d43b43",
+    },
     "/drop_simple_eval/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/drop_simple_eval.zip",
         "md5": "c912afe5b4a63509851cf16e6b91830e",
