@@ -10,8 +10,8 @@ with read_base():
     from .models.hf_internlm.hf_internlm_7b import models
 
 dingo_paths = [
-    './data/dingo/en_162.csv',
-    './data/dingo/zh_90.csv',
+    './data/dingo/en_192.csv',
+    './data/dingo/zh_170.csv',
 ]
 
 dingo_datasets = []
