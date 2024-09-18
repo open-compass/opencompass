@@ -78,14 +78,12 @@ jobs:
           conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           pip install opencompass*.whl
-          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.5.5+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-
+          pip install opencompass[lmdeploy]
+          pip install opencompass[vllm]
           pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes --cache-dir ${{env.PIP_CACHE_PATH}}
           pip uninstall torch torchvision torchaudio -y
-          pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu118torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
-          pip install /cpfs01/user/qa-llm-cicd/packages/xformers-0.0.27.post2+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}}
+          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install flash_attn xformers --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
           pip list
       - name: Prepare - prepare data and hf model
