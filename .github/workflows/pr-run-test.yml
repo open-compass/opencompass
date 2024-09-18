@@ -51,8 +51,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           rm -rf regression_result
-          opencompass --models hf_internlm2_chat_7b --datasets siqa_gen --work-dir regression_result --debug
-          opencompass --models hf_internlm2_chat_7b --datasets demo_gsm8k_chat_gen --work-dir regression_result --debug
+          opencompass --models hf_internlm2_chat_7b --datasets siqa_gen demo_gsm8k_chat_gen --work-dir regression_result --debug
       - name:  Get result
         run: |
           score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
