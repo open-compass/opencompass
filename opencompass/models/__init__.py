@@ -30,6 +30,7 @@ from .mistral_api import Mistral  # noqa: F401
 from .mixtral import Mixtral  # noqa: F401
 from .modelscope import ModelScope, ModelScopeCausalLM  # noqa: F401
 from .moonshot_api import MoonShot  # noqa: F401
+from .telechat_api import TeleChat  # noqa: F401
 from .nanbeige_api import Nanbeige  # noqa: F401
 from .openai_api import OpenAI  # noqa: F401
 from .openai_api import OpenAISDK  # noqa: F401
