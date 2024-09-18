@@ -57,6 +57,7 @@ jobs:
         with:
           name: my-artifact-${{ github.run_id }}
       - name: Prepare - create conda env and install torch - cu11
+        if: ${{matrix.cuda_env == 'dsw_cu11'}}
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
@@ -73,6 +74,7 @@ jobs:
           conda info --envs
           pip list
       - name: Prepare - create conda env and install torch - cu12
+        if: ${{matrix.cuda_env == 'dsw_cu12'}}
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
