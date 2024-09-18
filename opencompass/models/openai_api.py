@@ -20,6 +20,13 @@ OPENAI_API_BASE = os.path.join(
     os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
     'chat/completions')
 
+O1_MODEL_LIST = [
+    'o1-preview-2024-09-12',
+    'o1-mini-2024-09-12',
+    'o1-preview',
+    'o1-mini',
+]
+
 
 @MODELS.register_module()
 class OpenAI(BaseAPIModel):
@@ -82,7 +89,8 @@ class OpenAI(BaseAPIModel):
                  top_logprobs: Optional[int] = None,
                  temperature: Optional[float] = None,
                  tokenizer_path: Optional[str] = None,
-                 extra_body: Optional[Dict] = None):
+                 extra_body: Optional[Dict] = None,
+                 max_completion_tokens: int = 16384):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -131,6 +139,9 @@ class OpenAI(BaseAPIModel):
             self.proxy_url = openai_proxy_url
 
         self.path = path
+        self.max_completion_tokens = max_completion_tokens
+        self.logger.warning(
+            f'Max Completion tokens for {path} is :{max_completion_tokens}')
 
     def generate(self,
                  inputs: List[PromptType],
@@ -255,16 +266,33 @@ class OpenAI(BaseAPIModel):
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
             try:
-                data = dict(
-                    model=self.path,
-                    messages=messages,
-                    max_tokens=max_out_len,
-                    n=1,
-                    logprobs=self.logprobs,
-                    top_logprobs=self.top_logprobs,
-                    stop=None,
-                    temperature=temperature,
-                )
+                if self.path in O1_MODEL_LIST:
+                    self.logger.warning(
+                        f"'max_token' is unsupported for model {self.path}")
+                    self.logger.warning(
+                        f'We use max_completion_tokens:'
+                        f'{self.max_completion_tokens}for this query')
+                    data = dict(
+                        model=self.path,
+                        messages=messages,
+                        max_completion_tokens=self.max_completion_tokens,
+                        n=1,
+                        logprobs=self.logprobs,
+                        top_logprobs=self.top_logprobs,
+                        stop=None,
+                        temperature=temperature,
+                    )
+                else:
+                    data = dict(
+                        model=self.path,
+                        messages=messages,
+                        max_tokens=max_out_len,
+                        n=1,
+                        logprobs=self.logprobs,
+                        top_logprobs=self.top_logprobs,
+                        stop=None,
+                        temperature=temperature,
+                    )
                 if self.extra_body:
                     data.update(self.extra_body)
                 if isinstance(self.url, list):
@@ -429,11 +457,13 @@ class OpenAISDK(OpenAI):
                  top_logprobs: int | None = None,
                  temperature: float | None = None,
                  tokenizer_path: str | None = None,
-                 extra_body: Dict | None = None):
+                 extra_body: Dict | None = None,
+                 max_completion_tokens: int = 16384):
         super().__init__(path, max_seq_len, query_per_second, rpm_verbose,
                          retry, key, org, meta_template, openai_api_base,
                          openai_proxy_url, mode, logprobs, top_logprobs,
-                         temperature, tokenizer_path, extra_body)
+                         temperature, tokenizer_path, extra_body,
+                         max_completion_tokens)
         from openai import OpenAI
 
         if self.proxy_url is None:
@@ -497,8 +527,23 @@ class OpenAISDK(OpenAI):
         num_retries = 0
         while num_retries < self.retry:
             self.wait()
-            try:
-                responses = self.openai_client.chat.completions.create(
+
+            if self.path in O1_MODEL_LIST:
+                self.logger.warning(
+                    f"'max_token' is unsupported for model {self.path}")
+                self.logger.warning(
+                    f'We use max_completion_tokens:'
+                    f'{self.max_completion_tokens}for this query')
+                query_data = dict(
+                    model=self.path,
+                    max_completion_tokens=self.max_completion_tokens,
+                    n=1,
+                    temperature=self.temperature,
+                    messages=messages,
+                    extra_body=self.extra_body,
+                )
+            else:
+                query_data = dict(
                     model=self.path,
                     max_tokens=max_out_len,
                     n=1,
@@ -506,6 +551,10 @@ class OpenAISDK(OpenAI):
                     messages=messages,
                     extra_body=self.extra_body,
                 )
+
+            try:
+                responses = self.openai_client.chat.completions.create(
+                    **query_data)
                 return responses.choices[0].message.content
             except Exception as e:
                 self.logger.error(e)

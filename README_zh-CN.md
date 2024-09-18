@@ -59,6 +59,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.09.05\]** 现已支持OpenAI o1 模型(`o1-mini-2024-09-12` and `o1-preview-2024-09-12`), 欢迎尝试! 🔥🔥🔥
 - **\[2024.09.05\]** OpenCompass 现在支持通过模型后处理来进行答案提取，以更准确地展示模型的能力。作为此次更新的一部分，我们集成了 [XFinder](https://github.com/IAAR-Shanghai/xFinder) 作为首个后处理模型。具体信息请参阅 [文档](opencompass/utils/postprocessors/xfinder/README.md)，欢迎尝试！ 🔥🔥🔥
 - **\[2024.08.20\]** OpenCompass 现已支持 [SciCode](https://github.com/scicode-bench/SciCode): A Research Coding Benchmark Curated by Scientists。 🔥🔥🔥
 - **\[2024.08.16\]** OpenCompass 现已支持全新的长上下文语言模型评估基准——[RULER](https://arxiv.org/pdf/2404.06654)。RULER 通过灵活的配置，提供了对长上下文包括检索、多跳追踪、聚合和问答等多种任务类型的评测，欢迎访问[RULER](configs/datasets/ruler/README.md)。🔥🔥🔥
@@ -187,6 +188,9 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
   # Python 脚本
   opencompass  ./configs/eval_api_demo.py
+
+
+  # 现已支持 o1_mini_2024_09_12/o1_preview_2024_09_12  模型, 默认情况下 max_completion_tokens=8192.
   ```
 
 - ### 推理后端
