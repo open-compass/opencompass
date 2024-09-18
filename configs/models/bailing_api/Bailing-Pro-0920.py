@@ -1,4 +1,4 @@
-from opencompass.models import BaiLingAPI
+from opencompass.models import BailingAPI
 
 api_meta_template = dict(
     round=[
@@ -13,10 +13,10 @@ models = [
         path="Bailing-Pro-0920",
         token="",  # set your token
         url="https://bailingchat.alipay.com/chat/completions",
-        type=BaiLingAPI,
+        type=BailingAPI,
         meta_template=api_meta_template,
         query_per_second=1,
-        max_out_len=1024,
-        batch_size=1,
+        max_seq_len=4096,
+        generation_kwargs = {"temperature": 0.4, "top_p": 1.0, "top_k": -1, "n": 1, "logprobs": 1, "use_beam_search": False}
     ),
 ]

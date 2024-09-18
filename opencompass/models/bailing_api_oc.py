@@ -33,8 +33,8 @@ class HTTPAdapterWithSocketOptions(HTTPAdapter):
         super(HTTPAdapterWithSocketOptions, self).init_poolmanager(*args, **kwargs)
 
 
-class BaiLingAPI(BaseAPIModel):
-    """Model wrapper around BaiLing Service.
+class BailingAPI(BaseAPIModel):
+    """Model wrapper around Bailing Service.
 
     Args:
         ouput_key (str): key for prediction
@@ -49,11 +49,11 @@ class BaiLingAPI(BaseAPIModel):
         path: str,
         token: str,
         url: str,
-        query_per_second: int = 1,
-        max_seq_len: int = None,
         meta_template: Optional[Dict] = None,
+        query_per_second: int = 1,
         retry: int = 3,
         generation_kwargs: Dict = {},
+        max_seq_len=4096,
     ):
         super().__init__(
             path=path,
@@ -94,7 +94,7 @@ class BaiLingAPI(BaseAPIModel):
     def generate(
         self,
         inputs: Union[List[str], PromptList],
-        max_out_len: int = 512,
+        max_out_len: int = 4096,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -169,7 +169,7 @@ class BaiLingAPI(BaseAPIModel):
                 else:
                     message["role"] = item["role"]
                 messages.append(message)
-        request = {"model": self._model, "messages": messages}
+        request = {"model": self._model, "messages": messages, "max_seq_len": max(max_out_len, self.max_seq_len)}
         request.update(self.generation_kwargs)
         try:
             response = self._infer_result(request, sess)

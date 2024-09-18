@@ -1,6 +1,6 @@
 from mmengine.config import read_base
 
-from opencompass.models import BaiLingAPI
+from opencompass.models import BailingAPI
 from opencompass.partitioners import NaivePartitioner
 from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
@@ -18,10 +18,10 @@ models = [
         path="Bailing-Lite-0830",
         token="xxxxxx",  # please give your key
         url="https://bailingchat.alipay.com/chat/completions",
-        type=BaiLingAPI,
+        type=BailingAPI,
         generation_kwargs={},
         query_per_second=1,
-        max_seq_len=2048,
+        max_seq_len=4096,
     ),
 ]
 
