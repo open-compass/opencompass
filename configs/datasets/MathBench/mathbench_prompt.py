@@ -11,6 +11,12 @@ zero_shot_prompts = {
     'single_choice_en': [
         dict(role='HUMAN', prompt='Question: Here is a multiple-choice question about mathematics. Please provide the correct answer option directly.\nHere is the question you need to answer:\n{question}\nThe answer is:'),
     ],
+    'cloze_en': [
+        dict(role='HUMAN', prompt='{question}\nPlease reason step by step, and put your final answer within \\boxed{}.'),
+    ],
+    'cloze_cn': [
+        dict(role='HUMAN', prompt='{question}\n请一步一步推理，并在最后用\\boxed{}给出你的答案。'),
+    ]
 }
 
 few_shot_prompts = {
