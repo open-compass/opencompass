@@ -17,6 +17,14 @@ models = [
         meta_template=api_meta_template,
         query_per_second=1,
         max_seq_len=4096,
-        generation_kwargs = {"temperature": 0.4, "top_p": 1.0, "top_k": -1, "n": 1, "logprobs": 1, "use_beam_search": False}
+        batch_size=1,
+        generation_kwargs={
+            "temperature": 0.4,
+            "top_p": 1.0,
+            "top_k": -1,
+            "n": 1,
+            "logprobs": 1,
+            "use_beam_search": False,
+        },
     ),
 ]

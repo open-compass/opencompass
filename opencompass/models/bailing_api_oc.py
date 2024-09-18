@@ -123,13 +123,17 @@ class BailingAPI(BaseAPIModel):
                 m = future_to_m[future]
                 resp = future.result()
                 if resp and resp.status_code == 200:
-                    result = resp.json()
-                    if (
-                        result.get("choices")
-                        and result["choices"][0].get("message")
-                        and result["choices"][0]["message"].get("content")
-                    ):
-                        results.append(result["choices"][0]["message"]["content"])
+                    try:
+                        result = resp.json()
+                    except:
+                        results.append("")
+                    else:
+                        if (
+                            result.get("choices")
+                            and result["choices"][0].get("message")
+                            and result["choices"][0]["message"].get("content")
+                        ):
+                            results.append(result["choices"][0]["message"]["content"])
                 else:
                     results.append("")
         self.flush()
@@ -169,7 +173,14 @@ class BailingAPI(BaseAPIModel):
                 else:
                     message["role"] = item["role"]
                 messages.append(message)
-        request = {"model": self._model, "messages": messages, "max_seq_len": max(max_out_len, self.max_seq_len)}
+        request = {
+            "model": self._model,
+            "messages": messages,
+            "max_seq_len": max(
+                max_out_len if max_out_len else 4096,
+                self.max_seq_len if self.max_seq_len else 4096,
+            ),
+        }
         request.update(self.generation_kwargs)
         try:
             response = self._infer_result(request, sess)
