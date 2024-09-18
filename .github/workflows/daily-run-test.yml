@@ -80,7 +80,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           sed -i 's/judgemodel/'$(tail -n 1 /cpfs01/shared/public/llmeval/share_info/compassjuder_ip.txt)'/g' .github/scripts/eval_regression_chat.py
-          python3 run.py .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat --reuse
+          python3 run.py .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test
@@ -88,7 +88,7 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          python3 run.py .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base --reuse
+          python3 run.py .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base/*/summary regression_result_daily
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run command testcase
@@ -98,16 +98,16 @@ jobs:
           conda info --envs
           export from_tf=TRUE
           python tools/list_configs.py internlm2_5 mmlu
-          python run.py --models hf_internlm2_5_7b --datasets race_ppl --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1 --reuse
+          python run.py --models hf_internlm2_5_7b --datasets race_ppl --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1 --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1/*/summary regression_result_daily
           python -m pytest -m case1 -s -v --color=yes .github/scripts/oc_score_assert.py
-          python run.py --models hf_internlm2_5_7b_chat --datasets race_gen -a lmdeploy --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2 --reuse
+          python run.py --models hf_internlm2_5_7b_chat --datasets race_gen -a lmdeploy --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2 --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2/*/summary regression_result_daily
           python -m pytest -m case2 -s -v --color=yes .github/scripts/oc_score_assert.py
-          python run.py --datasets race_ppl --hf-type base --hf-path internlm/internlm2_5-7b --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3 --reuse
+          python run.py --datasets race_ppl --hf-type base --hf-path internlm/internlm2_5-7b --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3 --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3/*/summary regression_result_daily
           python -m pytest -m case3 -s -v --color=yes .github/scripts/oc_score_assert.py
-          python run.py --datasets race_gen --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4 --reuse
+          python run.py --datasets race_gen --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4 --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4/*/summary regression_result_daily
           python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
