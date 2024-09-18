@@ -193,6 +193,52 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass ./configs/eval_api_demo.py
   ```
 
+- Subjective evaluation
+
+  When conducting subjective evaluations, in addition to specifying the models and datasets, it is also necessary to specify a robust model as the judgemodel, such as using API models like GPT4 or open-source large models like Qwen-72B-Instruct.
+  Prepare the following Python script for parameter specification, where you should replace models, datasets, and judgemodels according to your own needs:
+
+  ```
+  from mmengine.config import read_base
+  with read_base():
+      from opencompass.configs.datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
+      from opencompass.configs.datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import alpacav2_datasets
+      from opencompass.configs.models.qwen.lmdeploy_qwen2_7b_instruct import models as lmdeploy_qwen2_7b_instruct
+      from opencompass.configs.models.qwen.lmdeploy_qwen2_72b_instruct import models as lmdeploy_qwen2_72b_instruct
+
+  from opencompass.partitioners import NaivePartitioner
+  from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
+  from opencompass.runners import LocalRunner
+  from opencompass.tasks import OpenICLInferTask
+  from opencompass.tasks.subjective_eval import SubjectiveEvalTask
+  from opencompass.summarizers import SubjectiveSummarizer
+
+  ### Base Configuration
+  models = lmdeploy_qwen2_7b_instruct
+  datasets = [*alignbench_datasets, *alpacav2_datasets]
+  judge_models = lmdeploy_qwen2_72b_instruct
+  work_dir = 'outputs/subjective/'
+
+
+  ### Advanced Configuration
+  infer = dict(
+      partitioner=dict(type=NaivePartitioner),
+      runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=OpenICLInferTask)),
+  )
+  eval = dict(
+      partitioner=dict(type=SubjectiveNaivePartitioner, models=models, judge_models=judge_models,),
+      runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=SubjectiveEvalTask)),
+  )
+  summarizer = dict(type=SubjectiveSummarizer, function='subjective')
+  ```
+
+  After setting your config python file, run it!
+
+  ```bash
+  # Python scripts
+  opencompass ./configs/eval_api_demo.py
+  ```
+
 - Accelerated Evaluation
 
   Additionally, if you want to use an inference backend other than HuggingFace for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Please ensure that you have installed the necessary packages for the chosen backend and that your model supports accelerated inference with it. For more information, see the documentation on inference acceleration backends [here](docs/en/advanced_guides/accelerator_intro.md). Below is an example using LMDeploy:

@@ -10,6 +10,8 @@ with read_base():
     from opencompass.configs.datasets.subjective.wildbench.wildbench_pair_judge import wildbench_datasets
     from opencompass.configs.datasets.subjective.multiround.mtbench_single_judge_diff_temp import mtbench_datasets
     from opencompass.configs.datasets.subjective.multiround.mtbench101_judge import mtbench101_datasets
+    from opencompass.configs.models.qwen.lmdeploy_qwen2_72b_instruct import models as lmdeploy_qwen2_72b_instruct
+
 from opencompass.models import HuggingFaceCausalLM, HuggingFace, HuggingFaceChatGLM3, OpenAI
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
@@ -67,18 +69,20 @@ infer = dict(
 # -------------Evalation Stage ----------------------------------------
 
 ## ------------- JudgeLLM Configuration
-judge_models = [dict(
-    abbr='GPT4-Turbo',
-    type=OpenAI,
-    path='gpt-4-1106-preview',
-    key='xxxx',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
-    meta_template=api_meta_template,
-    query_per_second=16,
-    max_out_len=2048,
-    max_seq_len=2048,
-    batch_size=8,
-    temperature=0,
-)]
+# judge_models = [dict(
+#     abbr='GPT4-Turbo',
+#     type=OpenAI,
+#     path='gpt-4-1106-preview',
+#     key='xxxx',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+#     meta_template=api_meta_template,
+#     query_per_second=16,
+#     max_out_len=2048,
+#     max_seq_len=2048,
+#     batch_size=8,
+#     temperature=0,
+# )]
+
+judge_models = lmdeploy_qwen2_72b_instruct
 
 ## ------------- Evaluation Configuration
 eval = dict(

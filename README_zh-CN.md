@@ -189,6 +189,52 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
   opencompass  ./configs/eval_api_demo.py
   ```
 
+- ### 主观评测
+
+  进行主观评测时，除了需要指定models和datasets，还需要指定一个强有力的模型作为judgemodel，比如使用API模型如GPT4或开源大模型Qwen-72B-Instruct
+  准备如下python脚本进行参数指定，其中的models，datasets和judgemodels根据自己的需求进行替换：
+
+  ```
+  from mmengine.config import read_base
+  with read_base():
+      from opencompass.configs.datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
+      from opencompass.configs.datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import alpacav2_datasets
+      from opencompass.configs.models.qwen.lmdeploy_qwen2_7b_instruct import models as lmdeploy_qwen2_7b_instruct
+      from opencompass.configs.models.qwen.lmdeploy_qwen2_72b_instruct import models as lmdeploy_qwen2_72b_instruct
+
+  from opencompass.partitioners import NaivePartitioner
+  from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
+  from opencompass.runners import LocalRunner
+  from opencompass.tasks import OpenICLInferTask
+  from opencompass.tasks.subjective_eval import SubjectiveEvalTask
+  from opencompass.summarizers import SubjectiveSummarizer
+
+  ### 基础设定
+  models = lmdeploy_qwen2_7b_instruct
+  datasets = [*alignbench_datasets, *alpacav2_datasets]
+  judge_models = lmdeploy_qwen2_72b_instruct
+  work_dir = 'outputs/subjective/'
+
+
+  ### 进阶设定(一般情况下默认即可)
+  infer = dict(
+      partitioner=dict(type=NaivePartitioner),
+      runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=OpenICLInferTask)),
+  )
+  eval = dict(
+      partitioner=dict(type=SubjectiveNaivePartitioner, models=models, judge_models=judge_models,),
+      runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=SubjectiveEvalTask)),
+  )
+  summarizer = dict(type=SubjectiveSummarizer, function='subjective')
+  ```
+
+  随后运行
+
+  ```bash
+  # Python scripts
+  opencompass your_config_name.py
+  ```
+
 - ### 推理后端
 
   另外，如果您想使用除 HuggingFace 之外的推理后端来进行加速评估，比如 LMDeploy 或 vLLM，可以通过以下命令进行。请确保您已经为所选的后端安装了必要的软件包，并且您的模型支持该后端的加速推理。更多信息，请参阅关于推理加速后端的文档 [这里](docs/zh_cn/advanced_guides/accelerator_intro.md)。以下是使用 LMDeploy 的示例：
