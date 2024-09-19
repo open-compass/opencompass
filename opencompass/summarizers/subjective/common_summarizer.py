@@ -111,7 +111,7 @@ class CommonSummarizer(CompassArenaSummarizer):
         dataset_cfgs = self.cfg['datasets']
         output_dir, results_folder = get_outdir(self.cfg, time_str)
         fout_flag = 0
-        output_file = osp.join(output_dir, 'result.csv')
+        output_file = osp.join(output_dir, show_dataset_abbr + 'result.csv')
         for eval_model_cfg in self.eval_model_cfgs:
             for judge_model_cfg in self.judge_model_cfgs:
                 eval_model_abbr = model_abbr_from_cfg(eval_model_cfg)
