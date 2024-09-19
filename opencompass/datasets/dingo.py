@@ -41,7 +41,8 @@ class DingoLongDataset(BaseDataset):
 
 @ICL_EVALUATORS.register_module()
 class DingoEvaluator(BaseEvaluator):
-    def __init__(self):
+
+    def score(self, origin_prompt: List, predictions: List) -> dict:
         try:
             from dingo.model.model import Model
             from dingo.io import InputArgs
@@ -50,7 +51,6 @@ class DingoEvaluator(BaseEvaluator):
             raise ModuleNotFoundError(
                 '=========== dingo register fail. please try: pip install dingo-python. ===========')
 
-    def score(self, origin_prompt: List, predictions: List) -> dict:
         current_time = time.strftime('%Y%m%d_%H%M%S', time.localtime())
         file_data = [{'prompt':pmt, 'prediction':prd} for pmt, prd in zip(origin_prompt, predictions)]
         file_name = 'dingo_file_' + current_time + '.jsonl'
