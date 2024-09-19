@@ -33,7 +33,7 @@ BoolQ_datasets = [
     dict(
         abbr='BoolQ',
         type=BoolQDatasetV2,
-        path='./data/SuperGLUE/BoolQ/val.jsonl',
+        path='opencompass/boolq',
         reader_cfg=BoolQ_reader_cfg,
         infer_cfg=BoolQ_infer_cfg,
         eval_cfg=BoolQ_eval_cfg,

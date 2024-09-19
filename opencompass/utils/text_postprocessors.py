@@ -66,8 +66,12 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案是?\s*([{options}])',
         f'答案是?\s*：\s*([{options}])',
         f'答案是?\s*:\s*([{options}])',
+        f'答案选项应?该?是\s*([{options}])',
+        f'答案选项应?该?为\s*([{options}])',
         f'答案应该?是\s*([{options}])',
         f'答案应该?选\s*([{options}])',
+        f'答案选项为?\s*：\s*([{options}])',
+        f'答案选项是?\s*:\s*([{options}])',
         f'答案为\s*([{options}])',
         f'答案选\s*([{options}])',
         f'选择?\s*([{options}])',
@@ -94,10 +98,14 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案是\s?(\S+)(?:。|$)',
         f'答案应该是\s?(\S+)(?:。|$)',
         f'答案为\s?(\S+)(?:。|$)',
+        f'(?i)ANSWER\s*:\s*([{options}])',
         f'[Tt]he answer is:?\s+\(?([{options}])\)?',
         f'[Tt]he answer is option:?\s+\(?([{options}])\)?',
         f'[Tt]he correct answer is:?\s+\(?([{options}])\)?',
         f'[Tt]he correct answer is option:?\s+\(?([{options}])\)?',
+        f'[Tt]he correct answer is:?.*?boxed{{([{options}])}}',
+        f'[Tt]he correct option is:?.*?boxed{{([{options}])}}',
+        f'[Tt]he correct answer option is:?.*?boxed{{([{options}])}}',
         f'[Tt]he answer to the question is:?\s+\(?([{options}])\)?',
         f'^选项\s?([{options}])',
         f'^([{options}])\s?选?项',
@@ -115,6 +123,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     if cushion:
         patterns.extend(cushion_patterns)
     for pattern in patterns:
+        text = text.strip()
         match = re.search(pattern, text, re.DOTALL)
         if match:
             outputs = match.group(0)

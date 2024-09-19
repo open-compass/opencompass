@@ -3,7 +3,7 @@ from opencompass.models import HuggingFaceCausalLM
 
 
 with read_base():
-    from .datasets.winogrande.winogrande_gen_a027b6 import winogrande_datasets
+    from opencompass.configs.datasets.winogrande.winogrande_gen_a027b6 import winogrande_datasets
 
 datasets = [*winogrande_datasets]
 

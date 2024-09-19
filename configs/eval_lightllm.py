@@ -5,8 +5,8 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    from .summarizers.leaderboard import summarizer
-    from .datasets.humaneval.deprecated_humaneval_gen_a82cae import humaneval_datasets
+    from opencompass.configs.summarizers.leaderboard import summarizer
+    from opencompass.configs.datasets.humaneval.deprecated_humaneval_gen_a82cae import humaneval_datasets
 
 datasets = [*humaneval_datasets]
 

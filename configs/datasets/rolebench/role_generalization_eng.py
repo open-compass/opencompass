@@ -33,6 +33,7 @@ role_generalization_eng_eval_cfg = dict(
 
 role_generalization_eng_datasets = [
     dict(
+        abbr='RoleBench_role_eng',
         type=RoleGeneralizationEnglishDataset,
         path='ZenMoore/RoleBench',
         reader_cfg=role_generalization_eng_reader_cfg,

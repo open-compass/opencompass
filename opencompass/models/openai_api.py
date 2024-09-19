@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from typing import Dict, List, Optional, Union
 
+import httpx
 import jieba
 import requests
 
@@ -15,7 +16,16 @@ from opencompass.utils.prompt import PromptList
 from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
-OPENAI_API_BASE = 'https://api.openai.com/v1/chat/completions'
+OPENAI_API_BASE = os.path.join(
+    os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
+    'chat/completions')
+
+O1_MODEL_LIST = [
+    'o1-preview-2024-09-12',
+    'o1-mini-2024-09-12',
+    'o1-preview',
+    'o1-mini',
+]
 
 
 @MODELS.register_module()
@@ -44,6 +54,10 @@ class OpenAI(BaseAPIModel):
             wrapping of any meta instructions.
         openai_api_base (str): The base url of OpenAI's API. Defaults to
             'https://api.openai.com/v1/chat/completions'.
+        openai_proxy_url (str, optional): An optional proxy url to use when
+            connecting to OpenAI's API. When set to 'ENV', the url will be
+            fetched from the environment variable $OPENAI_PROXY_URL.
+            Defaults to None.
         mode (str, optional): The method of input truncation when input length
             exceeds max_seq_len. 'front','mid' and 'rear' represents the part
             of input to truncate. Defaults to 'none'.
@@ -69,12 +83,14 @@ class OpenAI(BaseAPIModel):
                  org: Optional[Union[str, List[str]]] = None,
                  meta_template: Optional[Dict] = None,
                  openai_api_base: str = OPENAI_API_BASE,
+                 openai_proxy_url: Optional[str] = None,
                  mode: str = 'none',
                  logprobs: Optional[bool] = False,
                  top_logprobs: Optional[int] = None,
                  temperature: Optional[float] = None,
                  tokenizer_path: Optional[str] = None,
-                 extra_body: Optional[Dict] = None):
+                 extra_body: Optional[Dict] = None,
+                 max_completion_tokens: int = 16384):
 
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -114,7 +130,18 @@ class OpenAI(BaseAPIModel):
             self.orgs = org
         self.org_ctr = 0
         self.url = openai_api_base
+
+        if openai_proxy_url == 'ENV':
+            if 'OPENAI_PROXY_URL' not in os.environ:
+                raise ValueError('OPENAI_PROXY_URL is not set.')
+            self.proxy_url = os.getenv('OPENAI_PROXY_URL')
+        else:
+            self.proxy_url = openai_proxy_url
+
         self.path = path
+        self.max_completion_tokens = max_completion_tokens
+        self.logger.warning(
+            f'Max Completion tokens for {path} is :{max_completion_tokens}')
 
     def generate(self,
                  inputs: List[PromptType],
@@ -166,13 +193,16 @@ class OpenAI(BaseAPIModel):
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097
-        context_window = 4096
+        # Most models' token limits are above 32k
+        context_window = 32768
         if '32k' in self.path:
             context_window = 32768
         elif '16k' in self.path:
             context_window = 16384
         elif 'gpt-4' in self.path:
             context_window = 8192
+        elif 'gpt-3.5' in self.path:
+            context_window = 4097
 
         # will leave 100 tokens as prompt buffer, triggered if input is str
         if isinstance(input, str) and self.mode != 'none':
@@ -236,16 +266,33 @@ class OpenAI(BaseAPIModel):
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
             try:
-                data = dict(
-                    model=self.path,
-                    messages=messages,
-                    max_tokens=max_out_len,
-                    n=1,
-                    logprobs=self.logprobs,
-                    top_logprobs=self.top_logprobs,
-                    stop=None,
-                    temperature=temperature,
-                )
+                if self.path in O1_MODEL_LIST:
+                    self.logger.warning(
+                        f"'max_token' is unsupported for model {self.path}")
+                    self.logger.warning(
+                        f'We use max_completion_tokens:'
+                        f'{self.max_completion_tokens}for this query')
+                    data = dict(
+                        model=self.path,
+                        messages=messages,
+                        max_completion_tokens=self.max_completion_tokens,
+                        n=1,
+                        logprobs=self.logprobs,
+                        top_logprobs=self.top_logprobs,
+                        stop=None,
+                        temperature=temperature,
+                    )
+                else:
+                    data = dict(
+                        model=self.path,
+                        messages=messages,
+                        max_tokens=max_out_len,
+                        n=1,
+                        logprobs=self.logprobs,
+                        top_logprobs=self.top_logprobs,
+                        stop=None,
+                        temperature=temperature,
+                    )
                 if self.extra_body:
                     data.update(self.extra_body)
                 if isinstance(self.url, list):
@@ -253,9 +300,24 @@ class OpenAI(BaseAPIModel):
                     url = self.url[random.randint(0, len(self.url) - 1)]
                 else:
                     url = self.url
-                raw_response = requests.post(url,
-                                             headers=header,
-                                             data=json.dumps(data))
+
+                if self.proxy_url is None:
+                    raw_response = requests.post(url,
+                                                 headers=header,
+                                                 data=json.dumps(data))
+                else:
+                    proxies = {
+                        'http': self.proxy_url,
+                        'https': self.proxy_url,
+                    }
+
+                    raw_response = requests.post(
+                        url,
+                        headers=header,
+                        data=json.dumps(data),
+                        proxies=proxies,
+                    )
+
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')
                 continue
@@ -307,22 +369,29 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        if self.tokenizer_path:
+        assert self.tokenizer_path or self.path
+        try:
+            tokenizer_path = self.tokenizer_path if self.tokenizer_path \
+                else self.path
             try:
-                enc = self.tiktoken.encoding_for_model(self.tokenizer_path)
+                enc = self.tiktoken.encoding_for_model(tokenizer_path)
                 return len(enc.encode(prompt))
             except Exception as e:
                 self.logger.warn(f'{e}, tiktoken encoding cannot load '
-                                 '{self.tokenizer_path}')
+                                 f'{tokenizer_path}')
                 from transformers import AutoTokenizer
                 if self.hf_tokenizer is None:
                     self.hf_tokenizer = AutoTokenizer.from_pretrained(
-                        self.tokenizer_path, trust_remote_code=True)
-                    self.logger.infer(
-                        f'Tokenizer is loaded from {self.tokenizer_path}')
+                        tokenizer_path, trust_remote_code=True)
+                    self.logger.info(
+                        f'Tokenizer is loaded from {tokenizer_path}')
                 return len(self.hf_tokenizer(prompt).input_ids)
-        else:
-            enc = self.tiktoken.encoding_for_model(self.path)
+        except Exception:
+            self.logger.warn(
+                'Can not get tokenizer automatically, '
+                'will use default tokenizer gpt-4 for length calculation.')
+            default_tokenizer = 'gpt-4'
+            enc = self.tiktoken.encoding_for_model(default_tokenizer)
             return len(enc.encode(prompt))
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
@@ -382,31 +451,49 @@ class OpenAISDK(OpenAI):
                  org: str | List[str] | None = None,
                  meta_template: Dict | None = None,
                  openai_api_base: str = OPENAI_API_BASE,
+                 openai_proxy_url: Optional[str] = None,
                  mode: str = 'none',
                  logprobs: bool | None = False,
                  top_logprobs: int | None = None,
                  temperature: float | None = None,
                  tokenizer_path: str | None = None,
-                 extra_body: Dict | None = None):
+                 extra_body: Dict | None = None,
+                 max_completion_tokens: int = 16384):
         super().__init__(path, max_seq_len, query_per_second, rpm_verbose,
-                         retry, key, org, meta_template, openai_api_base, mode,
-                         logprobs, top_logprobs, temperature, tokenizer_path,
-                         extra_body)
+                         retry, key, org, meta_template, openai_api_base,
+                         openai_proxy_url, mode, logprobs, top_logprobs,
+                         temperature, tokenizer_path, extra_body,
+                         max_completion_tokens)
         from openai import OpenAI
-        self.opeanai_cleint = OpenAI(base_url=openai_api_base, api_key=key)
+
+        if self.proxy_url is None:
+            self.openai_client = OpenAI(base_url=openai_api_base, api_key=key)
+        else:
+            proxies = {
+                'http://': self.proxy_url,
+                'https://': self.proxy_url,
+            }
+
+            self.openai_client = OpenAI(
+                base_url=openai_api_base,
+                api_key=key,
+                http_client=httpx.Client(proxies=proxies))
 
     def _generate(self, input: PromptList | str, max_out_len: int,
                   temperature: float) -> str:
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097
-        context_window = 4096
+        # Most models' token limits are above 32k
+        context_window = 32768
         if '32k' in self.path:
             context_window = 32768
         elif '16k' in self.path:
             context_window = 16384
         elif 'gpt-4' in self.path:
             context_window = 8192
+        elif 'gpt-3.5' in self.path:
+            context_window = 4097
 
         # will leave 100 tokens as prompt buffer, triggered if input is str
         if isinstance(input, str) and self.mode != 'none':
@@ -440,13 +527,34 @@ class OpenAISDK(OpenAI):
         num_retries = 0
         while num_retries < self.retry:
             self.wait()
-            try:
-                responses = self.opeanai_cleint.chat.completions.create(
+
+            if self.path in O1_MODEL_LIST:
+                self.logger.warning(
+                    f"'max_token' is unsupported for model {self.path}")
+                self.logger.warning(
+                    f'We use max_completion_tokens:'
+                    f'{self.max_completion_tokens}for this query')
+                query_data = dict(
+                    model=self.path,
+                    max_completion_tokens=self.max_completion_tokens,
+                    n=1,
+                    temperature=self.temperature,
+                    messages=messages,
+                    extra_body=self.extra_body,
+                )
+            else:
+                query_data = dict(
                     model=self.path,
                     max_tokens=max_out_len,
                     n=1,
                     temperature=self.temperature,
-                    messages=messages)
+                    messages=messages,
+                    extra_body=self.extra_body,
+                )
+
+            try:
+                responses = self.openai_client.chat.completions.create(
+                    **query_data)
                 return responses.choices[0].message.content
             except Exception as e:
                 self.logger.error(e)

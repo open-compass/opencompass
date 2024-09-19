@@ -1,9 +1,9 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .models.qwen.hf_qwen_7b_chat import models
-    from .datasets.collections.leaderboard.qwen_chat import datasets
-    from .summarizers.leaderboard import summarizer
+    from opencompass.configs.models.qwen.hf_qwen_7b_chat import models
+    from opencompass.configs.datasets.collections.leaderboard.qwen_chat import datasets
+    from opencompass.configs.summarizers.leaderboard import summarizer
 
 '''
 dataset                                 version    metric            mode    qwen-7b-chat-hf

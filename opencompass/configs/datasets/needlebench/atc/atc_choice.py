@@ -61,7 +61,8 @@ few_shot_prompts = {
 
 # ----------------------- Prompt Settings ----------------------- #
 needle_num_list = list(range(2, 20, 1))
-names_path = './data/needlebench/names.json'
+path = 'opencompass/needlebench'
+file_name = 'names.json'
 
 repeats = 10
 
@@ -122,7 +123,8 @@ for _name in list(single_choice_prompts.keys()):
         dataset_dict = {
             'abbr': abbr,
             'type': NeedleBenchATCDataset,
-            'path': names_path,
+            'path': path,
+            'file_name': file_name,
             'num_needles': num_needles,
             'language': language,
             'repeats': repeats,

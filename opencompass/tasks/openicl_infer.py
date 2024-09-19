@@ -50,7 +50,7 @@ class OpenICLInferTask(BaseTask):
             key in str(self.model_cfgs[0].get('type', ''))
             or key in str(self.model_cfgs[0].get('llm', {}).get('type', ''))
             for key in backend_keys)
-        if self.num_gpus > 0 and not use_backend:
+        if self.num_gpus > 1 and not use_backend:
             port = random.randint(12000, 32000)
             command = (f'torchrun --master_port={port} '
                        f'--nproc_per_node {self.num_procs} '

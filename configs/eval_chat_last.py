@@ -7,7 +7,7 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    from .datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets as datasets
+    from opencompass.configs.datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets as datasets
 
 models = [
     dict(

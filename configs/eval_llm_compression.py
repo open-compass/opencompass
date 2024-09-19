@@ -2,13 +2,13 @@ from mmengine.config import read_base
 
 with read_base():
     # LLM compression datasets
-    from .datasets.llm_compression.llm_compression import llm_compression_datasets
+    from opencompass.configs.datasets.llm_compression.llm_compression import llm_compression_datasets
 
     # Model configs
-    from .models.qwen.hf_qwen1_5_7b import models as qwen1_5_7b
-    from .models.qwen.hf_qwen1_5_14b import models as qwen1_5_14b
-    from .models.hf_llama.hf_llama2_7b import models as llama2_7b
-    from .models.hf_llama.hf_llama2_13b import models as llama2_13b
+    from opencompass.configs.models.qwen.hf_qwen1_5_7b import models as qwen1_5_7b
+    from opencompass.configs.models.qwen.hf_qwen1_5_14b import models as qwen1_5_14b
+    from opencompass.configs.models.hf_llama.hf_llama2_7b import models as llama2_7b
+    from opencompass.configs.models.hf_llama.hf_llama2_13b import models as llama2_13b
 
 
 from opencompass.partitioners import NaivePartitioner

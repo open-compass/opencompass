@@ -1,11 +1,13 @@
 # flake8: noqa
 import json
+import os
 import random
 
 from datasets import Dataset
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 
 @LOAD_DATASET.register_module()
@@ -14,13 +16,20 @@ class NeedleBenchATCDataset(BaseDataset):
     @staticmethod
     def load(
         path,
+        file_name: str,
         num_needles: int,
         language: str,
         repeats: int,
     ):
         data = {'prompt': [], 'answer': []}
+        path = get_data_path(path)
+        if os.environ.get('DATASET_SOURCE') == 'HF':
+            from huggingface_hub import snapshot_download
 
-        with open(path, 'r', encoding='utf-8') as file:
+            path = snapshot_download(repo_id=path, repo_type='dataset')
+        file_path = os.path.join(path, file_name)
+
+        with open(file_path, 'r', encoding='utf-8') as file:
             names_data = json.load(file)
 
         all_names = names_data[language].split(',')
@@ -30,7 +39,16 @@ class NeedleBenchATCDataset(BaseDataset):
             if language == 'Chinese':
 
                 relationship_terms = [
-                    '父亲', '母亲', '爸爸', '妈妈', '爷爷', '奶奶', '姥姥', '姥爷', '外公', '外婆'
+                    '父亲',
+                    '母亲',
+                    '爸爸',
+                    '妈妈',
+                    '爷爷',
+                    '奶奶',
+                    '姥姥',
+                    '姥爷',
+                    '外公',
+                    '外婆',
                 ]
 
                 relationship_templates = [
@@ -46,10 +64,16 @@ class NeedleBenchATCDataset(BaseDataset):
             elif language == 'English':
 
                 relationship_terms = [
-                    'father', 'mother', 'dad', 'mom', 'grandfather',
-                    'grandmother', 'maternal grandmother',
-                    'maternal grandfather', 'paternal grandfather',
-                    'paternal grandmother'
+                    'father',
+                    'mother',
+                    'dad',
+                    'mom',
+                    'grandfather',
+                    'grandmother',
+                    'maternal grandmother',
+                    'maternal grandfather',
+                    'paternal grandfather',
+                    'paternal grandmother',
                 ]
 
                 relationship_templates = [
@@ -96,21 +120,20 @@ class NeedleBenchATCDataset(BaseDataset):
 
             # Generating the prompt based on the language
             if language == 'Chinese':
-                prompt = (f"""
+                prompt = f"""
 在上面提供的打乱的家族关系文本中，'{last_person}'的能够向上追溯到的最年长的亲人是谁？
 例如：
 例子1.如果张强的父亲是马克，除此以外提供的文本中没有更多关于亲属关系的信息，那么在提供的文本中张强能够向上追溯到的最年长的亲人就是马克。
 例子2.如果李明的姥姥是张红，而张红的父亲是张强，除此以外提供的文本中没有更多关于亲属关系的信息，那么在提供的文本中李明能够向上追溯到的最年长的亲人就是张强。
 例子3.如果小明是张红的曾孙女，张红的祖母是王华，王华的父亲是王刚，除此以外提供的文本中没有更多关于亲属关系的信息，那么小明能够向上追溯到的最年长的亲人就是王刚。
-""")
+"""
             elif language == 'English':
-                prompt = (f"""
+                prompt = f"""
 Given the scrambled family relationships described above, who is the eldest relative that '{last_person}' can trace back to in the context?
 For example:
 Example 1: If Zhang Qiang's father is Mark, and no further information about familial relationships is provided in the text, then the oldest relative Zhang Qiang can trace back to in the provided text is Mark.
 Example 2: If Li Ming's grandmother is Zhang Hong, and Zhang Hong's father is Zhang Qiang, and no further information about familial relationships is provided in the text, then the oldest relative Li Ming can trace back to in the provided text is Zhang Qiang.
 Example 3: If Xiao Ming is Zhang Hong's great-granddaughter, Zhang Hong's grandmother is Wang Hua, and Wang Hua's father is Wang Gang, and no further information about familial relationships is provided in the text, then the oldest relative Xiao Ming can trace back to in the provided text is Wang Gang."""
-                          )
             else:
                 prompt = 'Language not supported.'
                 raise Exception('Unsupported language specified. '
@@ -135,13 +158,20 @@ class NeedleBenchATCOrderedDataset(BaseDataset):
     @staticmethod
     def load(
         path,
+        file_name,
         num_needles: int,
         language: str,
         repeats: int,
     ):
         data = {'prompt': [], 'answer': []}
+        path = get_data_path(path)
+        if os.environ.get('DATASET_SOURCE') == 'HF':
+            from huggingface_hub import snapshot_download
 
-        with open(path, 'r', encoding='utf-8') as file:
+            path = snapshot_download(repo_id=path, repo_type='dataset')
+        file_path = os.path.join(path, file_name)
+
+        with open(file_path, 'r', encoding='utf-8') as file:
             names_data = json.load(file)
 
         all_names = names_data[language].split(',')
@@ -151,7 +181,16 @@ class NeedleBenchATCOrderedDataset(BaseDataset):
             if language == 'Chinese':
 
                 relationship_terms = [
-                    '父亲', '母亲', '爸爸', '妈妈', '爷爷', '奶奶', '姥姥', '姥爷', '外公', '外婆'
+                    '父亲',
+                    '母亲',
+                    '爸爸',
+                    '妈妈',
+                    '爷爷',
+                    '奶奶',
+                    '姥姥',
+                    '姥爷',
+                    '外公',
+                    '外婆',
                 ]
 
                 relationship_templates = [
@@ -167,10 +206,16 @@ class NeedleBenchATCOrderedDataset(BaseDataset):
             elif language == 'English':
 
                 relationship_terms = [
-                    'father', 'mother', 'dad', 'mom', 'grandfather',
-                    'grandmother', 'maternal grandmother',
-                    'maternal grandfather', 'paternal grandfather',
-                    'paternal grandmother'
+                    'father',
+                    'mother',
+                    'dad',
+                    'mom',
+                    'grandfather',
+                    'grandmother',
+                    'maternal grandmother',
+                    'maternal grandfather',
+                    'paternal grandfather',
+                    'paternal grandmother',
                 ]
 
                 relationship_templates = [
@@ -214,21 +259,20 @@ class NeedleBenchATCOrderedDataset(BaseDataset):
 
             # Generating the prompt based on the language
             if language == 'Chinese':
-                prompt = (f"""
+                prompt = f"""
 在上面提供的打乱的家族关系文本中，'{last_person}'的能够向上追溯到的最年长的亲人是谁？
 例如：
 例子1.如果张强的父亲是马克，除此以外提供的文本中没有更多关于亲属关系的信息，那么在提供的文本中张强能够向上追溯到的最年长的亲人就是马克。
 例子2.如果李明的姥姥是张红，而张红的父亲是张强，除此以外提供的文本中没有更多关于亲属关系的信息，那么在提供的文本中李明能够向上追溯到的最年长的亲人就是张强。
 例子3.如果小明是张红的曾孙女，张红的祖母是王华，王华的父亲是王刚，除此以外提供的文本中没有更多关于亲属关系的信息，那么小明能够向上追溯到的最年长的亲人就是王刚。
-""")
+"""
             elif language == 'English':
-                prompt = (f"""
+                prompt = f"""
 Given the scrambled family relationships described above, who is the eldest relative that '{last_person}' can trace back to in the context?
 For example:
 Example 1: If Zhang Qiang's father is Mark, and no further information about familial relationships is provided in the text, then the oldest relative Zhang Qiang can trace back to in the provided text is Mark.
 Example 2: If Li Ming's grandmother is Zhang Hong, and Zhang Hong's father is Zhang Qiang, and no further information about familial relationships is provided in the text, then the oldest relative Li Ming can trace back to in the provided text is Zhang Qiang.
 Example 3: If Xiao Ming is Zhang Hong's great-granddaughter, Zhang Hong's grandmother is Wang Hua, and Wang Hua's father is Wang Gang, and no further information about familial relationships is provided in the text, then the oldest relative Xiao Ming can trace back to in the provided text is Wang Gang."""
-                          )
             else:
                 prompt = 'Language not supported.'
                 raise Exception('Unsupported language specified. '

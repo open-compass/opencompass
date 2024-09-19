@@ -14,68 +14,107 @@ env:
   PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
   USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
+  DATEASET_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/llm-evaluation-datasets
   HF_DATASETS_OFFLINE: 1
   TRANSFORMERS_OFFLINE: 1
   HF_HUB_OFFLINE: 1
+  TRITON_PTXAS_PATH: /usr/local/cuda/bin/ptxas
 
 jobs:
+  build-pypi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Build lagent
+        run: |
+          pip install wheel
+          python setup.py sdist bdist_wheel
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          path: dist/*
+          retention-days: 1
+          name: my-artifact-${{ github.run_id }}
+
   daily_run_test:
+    needs: build-pypi
     runs-on: self-hosted
     environment: 'prod'
-    timeout-minutes: 240 #4hours
+    timeout-minutes: 420 #7hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact-${{ github.run_id }}
       - name: Prepare - create conda env and install torch
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}} python=3.10
           conda activate ${{env.CONDA_ENV}}
-          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-          pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.5.0.post1+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.5.8+cu118torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl --index-url https://download.pytorch.org/whl/cu118
-          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-          pip install xformers==0.0.25.post1 --cache-dir ${{env.PIP_CACHE_PATH}} --extra-index-url https://download.pytorch.org/whl/cu118
+          pip install opencompass*.whl
+          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.5.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.5.5+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+
+          pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip uninstall torch torchvision torchaudio -y
+          pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+          FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu118torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+          pip install /cpfs01/user/qa-llm-cicd/packages/xformers-0.0.27.post2+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
-      - name: Prepare - Pip install code
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate ${{env.CONDA_ENV}}
-          pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers protobuf pytest --cache-dir ${{env.PIP_CACHE_PATH}}
-          conda info --envs
+          pip list
       - name: Prepare - prepare data and hf model
         run: |
-          cp -r ${{env.USERSPACE_PREFIX}}/data .
+          ln -s ${{env.DATEASET_CACHE_PATH}} data
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run chat model test
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          rm -rf regression_result_daily
-          export from_tf=TRUE
-          rm -rf /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary
-          python3 run.py .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
-          cp -r /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary regression_result_daily
+          sed -i 's/judgemodel/'$(tail -n 1 /cpfs01/shared/public/llmeval/share_info/compassjuder_ip.txt)'/g' .github/scripts/eval_regression_chat.py
+          python3 run.py .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat --reuse
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          rm -rf regression_result_daily
-          export from_tf=TRUE
-          rm -rf /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary
-          python3 run.py .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }} --reuse
-          cp -r /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/*/summary regression_result_daily
+          python3 run.py .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base --reuse
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base/*/summary regression_result_daily
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
+      - name:  Run command testcase
+        run: |
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          conda info --envs
+          export from_tf=TRUE
+          python tools/list_configs.py internlm2_5 mmlu
+          python run.py --models hf_internlm2_5_7b --datasets race_ppl --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1 --reuse
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1/*/summary regression_result_daily
+          python -m pytest -m case1 -s -v --color=yes .github/scripts/oc_score_assert.py
+          python run.py --models hf_internlm2_5_7b_chat --datasets race_gen -a lmdeploy --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2 --reuse
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2/*/summary regression_result_daily
+          python -m pytest -m case2 -s -v --color=yes .github/scripts/oc_score_assert.py
+          python run.py --datasets race_ppl --hf-type base --hf-path internlm/internlm2_5-7b --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3 --reuse
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3/*/summary regression_result_daily
+          python -m pytest -m case3 -s -v --color=yes .github/scripts/oc_score_assert.py
+          python run.py --datasets race_gen --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4 --reuse
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4/*/summary regression_result_daily
+          python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
         if: always()
         run: |
-          cp -r regression_result_daily/* /cpfs01/user/qa-llm-cicd/report
-          eval "$(conda shell.bash hook)"
+          rm -rf regression_result_daily
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda env remove -y --name ${{env.CONDA_ENV}}
           conda info --envs
 

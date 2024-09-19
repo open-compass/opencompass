@@ -7,6 +7,7 @@ class DownloadNLTK(install):
     def run(self):
         self.do_egg_install()
         import nltk
+
         nltk.download('punkt')
 
 
@@ -33,6 +34,7 @@ def parse_requirements(fname='requirements.txt', with_version=True):
     import re
     import sys
     from os.path import exists
+
     require_fpath = fname
 
     def parse_line(line):
@@ -116,12 +118,31 @@ def do_setup():
         setup_requires=['nltk==3.8'],
         python_requires='>=3.8.0',
         install_requires=parse_requirements('requirements/runtime.txt'),
+        extras_require={
+            'lmdeploy':
+            parse_requirements('requirements/lmdeploy.txt') +
+            parse_requirements('requirements/runtime.txt'),
+            'vllm':
+            parse_requirements('requirements/vllm.txt') +
+            parse_requirements('requirements/runtime.txt'),
+            'api':
+            parse_requirements('requirements/api.txt') +
+            parse_requirements('requirements/runtime.txt'),
+            'full':
+            parse_requirements('requirements/extra.txt') +
+            parse_requirements('requirements/runtime.txt'),
+        },
         license='Apache License 2.0',
         include_package_data=True,
         packages=find_packages(),
         keywords=[
-            'AI', 'NLP', 'in-context learning', 'large language model',
-            'evaluation', 'benchmark', 'llm'
+            'AI',
+            'NLP',
+            'in-context learning',
+            'large language model',
+            'evaluation',
+            'benchmark',
+            'llm',
         ],
         classifiers=[
             'Programming Language :: Python :: 3.8',

@@ -20,9 +20,7 @@ class CEvalDataset(BaseDataset):
         dataset = {}
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
-            dataset = MsDataset.load(dataset_name=path,
-                                     subset_name=name,
-                                     trust_remote_code=True)
+            dataset = MsDataset.load(dataset_name=path, subset_name=name)
         else:
             for split in ['dev', 'val', 'test']:
                 filename = osp.join(path, split, f'{name}_{split}.csv')

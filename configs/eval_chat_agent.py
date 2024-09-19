@@ -9,10 +9,10 @@ from lagent import ReAct
 from lagent.agents.react import ReActProtocol
 
 with read_base():
-    from .datasets.gsm8k.gsm8k_agent_gen_be1606 import gsm8k_datasets
-    from .datasets.math.math_agent_gen_af2293 import math_datasets
-    from .datasets.MathBench.mathbench_agent_gen_568903 import mathbench_agent_datasets
-    from .summarizers.math_agent import summarizer
+    from opencompass.configs.datasets.gsm8k.gsm8k_agent_gen_be1606 import gsm8k_datasets
+    from opencompass.configs.datasets.math.math_agent_gen_af2293 import math_datasets
+    from opencompass.configs.datasets.MathBench.mathbench_agent_gen_568903 import mathbench_agent_datasets
+    from opencompass.configs.summarizers.math_agent import summarizer
 
 datasets = []
 datasets += gsm8k_datasets
