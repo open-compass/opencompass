@@ -59,7 +59,8 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **\[2024.09.05\]** We now support OpenAI o1(`o1-mini-2024-09-12` and `o1-preview-2024-09-12`). Feel free to give them a try! 🔥🔥🔥
+- **\[2024.09.19\]** We now support [Qwen2.5](https://huggingface.co/Qwen)(0.5B to 72B) with multiple backend(huggingface/vllm/lmdeploy). Feel free to give them a try! 🔥🔥🔥
+- **\[2024.09.17\]** We now support OpenAI o1(`o1-mini-2024-09-12` and `o1-preview-2024-09-12`). Feel free to give them a try! 🔥🔥🔥
 - **\[2024.09.05\]** We now support answer extraction through model post-processing to provide a more accurate representation of the model's capabilities. As part of this update, we have integrated [XFinder](https://github.com/IAAR-Shanghai/xFinder) as our first post-processing model. For more detailed information, please refer to the [documentation](opencompass/utils/postprocessors/xfinder/README.md), and give it a try! 🔥🔥🔥
 - **\[2024.08.20\]** OpenCompass now supports the [SciCode](https://github.com/scicode-bench/SciCode): A Research Coding Benchmark Curated by Scientists. 🔥🔥🔥
 - **\[2024.08.16\]** OpenCompass now supports the brand new long-context language model evaluation benchmark — [RULER](https://arxiv.org/pdf/2404.06654). RULER provides an evaluation of long-context including retrieval, multi-hop tracing, aggregation, and question answering through flexible configurations. Check out the [RULER](configs/datasets/ruler/README.md) evaluation config now! 🔥🔥🔥
