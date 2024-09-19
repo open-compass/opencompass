@@ -1,13 +1,8 @@
-from mmengine.config import read_base
-
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import DingoDataset, DingoEvaluator
 
-
-with read_base():
-    from configs.models.hf_internlm.hf_internlm_7b import models
 
 dingo_paths = [
     './data/dingo/en_192.csv',
@@ -38,4 +33,3 @@ for path in dingo_paths:
 
 datasets = dingo_datasets
 
-work_dir = './outputs/eval_dingo'
