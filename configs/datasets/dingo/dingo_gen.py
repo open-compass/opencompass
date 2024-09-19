@@ -3,11 +3,11 @@ from mmengine.config import read_base
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import dingoDataset, dingoEvaluator
+from opencompass.datasets import DingoDataset, DingoEvaluator
 
 
 with read_base():
-    from .models.hf_internlm.hf_internlm_7b import models
+    from configs.models.hf_internlm.hf_internlm_7b import models
 
 dingo_paths = [
     './data/dingo/en_192.csv',
@@ -24,12 +24,12 @@ for path in dingo_paths:
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer),
     )
-    dingo_eval_cfg = dict(evaluator=dict(type=dingoEvaluator), pred_role='BOT')
+    dingo_eval_cfg = dict(evaluator=dict(type=DingoEvaluator), pred_role='BOT')
 
     dingo_datasets.append(
         dict(
             abbr='dingo_' + path.split('/')[-1].split('.csv')[0],
-            type=dingoDataset,
+            type=DingoDataset,
             path=path,
             reader_cfg=dingo_reader_cfg,
             infer_cfg=dingo_infer_cfg,

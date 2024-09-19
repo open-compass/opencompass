@@ -20,7 +20,7 @@ except Exception:
     raise ModuleNotFoundError('=========== dingo register fail. please try: pip install dingo-python. ===========')
 
 @LOAD_DATASET.register_module()
-class dingoDataset(BaseDataset):
+class DingoDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
@@ -35,7 +35,7 @@ class dingoDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class dingoLongDataset(BaseDataset):
+class DingoLongDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
@@ -47,7 +47,7 @@ class dingoLongDataset(BaseDataset):
 
 
 @ICL_EVALUATORS.register_module()
-class dingoEvaluator(BaseEvaluator):
+class DingoEvaluator(BaseEvaluator):
 
     def score(self, origin_prompt: List, predictions: List) -> dict:
         current_time = time.strftime('%Y%m%d_%H%M%S', time.localtime())
