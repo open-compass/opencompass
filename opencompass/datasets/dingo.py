@@ -12,13 +12,6 @@ from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
 from .base import BaseDataset
 
-try:
-    from dingo.model.model import Model
-    from dingo.io import InputArgs
-    from dingo.exec import Executor
-except Exception:
-    raise ModuleNotFoundError('=========== dingo register fail. please try: pip install dingo-python. ===========')
-
 @LOAD_DATASET.register_module()
 class DingoDataset(BaseDataset):
 
@@ -48,6 +41,14 @@ class DingoLongDataset(BaseDataset):
 
 @ICL_EVALUATORS.register_module()
 class DingoEvaluator(BaseEvaluator):
+    def __init__(self):
+        try:
+            from dingo.model.model import Model
+            from dingo.io import InputArgs
+            from dingo.exec import Executor
+        except Exception:
+            raise ModuleNotFoundError(
+                '=========== dingo register fail. please try: pip install dingo-python. ===========')
 
     def score(self, origin_prompt: List, predictions: List) -> dict:
         current_time = time.strftime('%Y%m%d_%H%M%S', time.localtime())

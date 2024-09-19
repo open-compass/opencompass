@@ -17,4 +17,4 @@ pyext
 pypinyin
 # RULER
 wonderwords
-dingo
+dingo-python
