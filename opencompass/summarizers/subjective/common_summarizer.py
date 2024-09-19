@@ -111,7 +111,8 @@ class CommonSummarizer(CompassArenaSummarizer):
         dataset_cfgs = self.cfg['datasets']
         output_dir, results_folder = get_outdir(self.cfg, time_str)
         fout_flag = 0
-        output_file = osp.join(output_dir, show_dataset_abbr + 'result.csv')
+        output_tmp_file = osp.join(output_dir, 'result.csv')
+        output_file = osp.join(output_dir, 'total_result.csv')
         for eval_model_cfg in self.eval_model_cfgs:
             for judge_model_cfg in self.judge_model_cfgs:
                 eval_model_abbr = model_abbr_from_cfg(eval_model_cfg)
@@ -124,11 +125,11 @@ class CommonSummarizer(CompassArenaSummarizer):
                         judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
                         show_dataset_abbr = dataset_abbr_from_cfg(dataset)
 
-                        get_capability_results(judged_answers, references, output_file, fout_flag, show_model_abbr, show_judge_model_abbr, show_dataset_abbr)
+                        get_capability_results(judged_answers, references, output_tmp_file, fout_flag, show_model_abbr, show_judge_model_abbr, show_dataset_abbr)
                         fout_flag += 1
                 else:
                     print(subdir_path + ' is not exist! please check!')
-        with open(output_file, 'r') as f:
+        with open(output_tmp_file, 'r') as f:
             csv_reader = csv.reader(f)
             header = next(csv_reader)
             table = [line for line in csv_reader]
@@ -137,8 +138,9 @@ class CommonSummarizer(CompassArenaSummarizer):
             new_table = [[h] + line[1:] for h, line in zip(header[1:], table)]
             new_table = [[h] + [line[i] for line in table] for i, h in enumerate(header[1:], start=1)]
             t = tabulate(new_table, headers=new_header)
-        with open(output_file, 'w') as f:
+        with open(output_file, 'a') as f:
             f.write(','.join(new_header) + '\n')
             for line in new_table:
                 f.write(','.join(map(str, line)) + '\n')
+            print(t)
             print(output_file)
