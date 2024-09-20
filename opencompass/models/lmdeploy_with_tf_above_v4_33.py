@@ -1,7 +1,6 @@
 # flake8: noqa
 # yapf: disable
 import copy
-from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
 from opencompass.models.base import BaseModel
@@ -12,6 +11,12 @@ from .huggingface_above_v4_33 import (_convert_chat_messages,
                                       _format_with_fast_chat_template,
                                       _get_meta_template,
                                       _get_possible_max_seq_len)
+
+from lmdeploy.version import version_info
+from lmdeploy import pipeline, TurbomindEngineConfig, PytorchEngineConfig
+from transformers import AutoTokenizer
+import numpy as np
+
 
 PromptType = Union[PromptList, str]
 
@@ -38,9 +43,6 @@ class LMDeploywithChatTemplate(BaseModel):
         fastchat_template: Optional[str] = None,
         stop_words: List[str] = [],
     ):
-        from lmdeploy.version import version_info
-        from transformers import AutoTokenizer
-
         self.logger = get_logger()
         self.path = path
         self.tokenizer_only = tokenizer_only
@@ -70,13 +72,13 @@ class LMDeploywithChatTemplate(BaseModel):
             generation_config = None
         if generation_config and hasattr(generation_config, 'eos_token_id'):
             if isinstance(generation_config.eos_token_id, int):
-                potential_stop_words.append(self.origin_tokenizer.decode(generation_config.eos_token_id))
+                potential_stop_words.append(self.tokenizer.decode(generation_config.eos_token_id))
             else:
                 assert isinstance(generation_config.eos_token_id, list)
                 for token_id in generation_config.eos_token_id:
-                    potential_stop_words.append(self.origin_tokenizer.decode(token_id))
-        if self.origin_tokenizer.eos_token is not None:
-            potential_stop_words.append(self.origin_tokenizer.eos_token)
+                    potential_stop_words.append(self.tokenizer.decode(token_id))
+        if self.tokenizer.eos_token is not None:
+            potential_stop_words.append(self.tokenizer.eos_token)
         potential_stop_words = list(set(potential_stop_words))
         potential_stop_words = [s for s in potential_stop_words if s]
         return potential_stop_words
@@ -98,7 +100,6 @@ class LMDeploywithChatTemplate(BaseModel):
             List[str]: A list of generated strings.
         """
         assert isinstance(inputs, List), f'List(str) is expected, but got {type(inputs)}'
-
         messages = _convert_chat_messages(inputs)
         if self.fastchat_template:
             messages = _format_with_fast_chat_template(messages, self.fastchat_template)
@@ -106,34 +107,30 @@ class LMDeploywithChatTemplate(BaseModel):
             messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
 
         stop_words = list(set(self.stop_words + stopping_criteria))
-        encode_stop_words = []
-        if stop_words is not None and len(stop_words) > 0:
-            for words in stop_words:
-                encode_stop_words += self.tokenizer.encode(words, add_bos=False)
-
-        DEFAULT_GEN_CONFIG = {
-            'max_new_tokens': max_out_len,
-            'min_new_tokens': 1,
-            'top_k': 1,
-            'stop_words': encode_stop_words,
-        }
-
-        gen_config = copy.deepcopy(DEFAULT_GEN_CONFIG)
-        gen_config.update(self.gen_config)
-        if do_sample:
-            gen_config['top_k'] = 40
-            gen_config['temperature'] = temperature
 
         from lmdeploy.messages import GenerationConfig
-        gen_config = GenerationConfig(**gen_config)
+        gen_config = GenerationConfig(
+            max_new_tokens=max_out_len,
+            min_new_tokens=1,
+            stop_words=stop_words
+        )
+        # gen_config.update(self.gen_config)
+        if do_sample:
+            gen_config.do_sample = True
+            gen_config.top_k = 40
+            gen_config.temperature = temperature
+        else:
+            gen_config.do_sample = False
+
         if self.version_info >= (0, 6, 0):
             gen_config.stop_words = stop_words
-            gen_config.convert_stop_bad_words_to_ids(self.tokenizer)
+            gen_config.convert_stop_bad_words_to_ids(self.pipe.tokenizer)
 
         results = []
-        outputs = self.pipe(messages, do_preprocess=False)
+        outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
         for output in outputs:
-            results.append(output.text)
+            text = self.tokenizer.decode(output.token_ids)
+            results.append(text)
 
         for s in stop_words:
             results = [r.split(s)[0] for r in results]
@@ -153,7 +150,6 @@ class LMDeploywithChatTemplate(BaseModel):
         return len(t['input_ids'])
 
     def _build_pipe(self, model_path, engine_config):
-        from lmdeploy import pipeline, TurbomindEngineConfig, PytorchEngineConfig
         assert 'backend' in engine_config, \
                 f'miss "backend" key in config {engine_config}'
 
@@ -169,3 +165,60 @@ class LMDeploywithChatTemplate(BaseModel):
             backend_config = PytorchEngineConfig(**filtered)
 
         return pipeline(model_path, backend_config=backend_config)
+
+
+    def get_token_len(self, prompt: str) -> int:
+        input_ids = self.tokenizer.encode(prompt)
+        return len(input_ids)
+
+    def wait(self):
+        """Wait till the next query can be sent.
+
+        Applicable in both single-thread and multi-thread environments.
+        """
+        return self.token_bucket.get_token()
+    
+    def get_ppl(self,
+                inputs: List[str],
+                mask_length: Optional[List[int]] = None) -> List[float]:
+        """Get perplexity scores given a list of inputs.
+
+        Args:
+            inputs (List[str]): A list of strings.
+            mask_length (Optional[List[int]]): A list of mask lengths. If
+                provided, the perplexity scores will be calculated with the
+                first mask_length[i] tokens masked out. It's okay to skip
+                its implementation if advanced features in PPLInfernecer is
+                not needed.
+
+        Returns:
+            np.ndarray:  The perplexity scores in shape of (N,)
+        """
+        assert isinstance(
+            inputs, List), f'List(str) is expected, but got {type(inputs)}'
+        results = []
+        for text in inputs:
+            input_ids = self.tokenizer.encode(text)
+            res = self.pipe.get_ppl(input_ids)
+            results.append(res)
+        results = np.concatenate(results)
+        return results
+
+    def get_loglikelihood(
+            self,
+            inputs: List[str],
+            conts: List[str],
+            mask_length: Optional[List[int]] = None) -> List[float]:
+        assert isinstance(
+            inputs, List), f'List(str) is expected, but got {type(inputs)}'
+        results = []
+        for text, cont in zip(inputs, conts):
+            input_ids = self.tokenizer.encode(text)
+            res = self.generators[0].get_ppl(input_ids)
+            logit_sum = res * len(input_ids)
+            input_ids = self.tokenizer.encode(text.replace(cont, ''))
+            res = self.generators[0].get_ppl(input_ids)
+            logit_part = res * len(input_ids)
+            results.append(-(logit_sum - logit_part))
+        results = np.concatenate(results)
+        return results
