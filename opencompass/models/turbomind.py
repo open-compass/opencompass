@@ -1,4 +1,5 @@
 import copy
+import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -60,6 +61,8 @@ class TurboMindModel(BaseModel):
             from lmdeploy.messages import TurbomindEngineConfig
             engine_config = TurbomindEngineConfig(**engine_config)
         self.logger = get_logger()
+        if path.startswith('/') or path.startswith('.'):
+            assert os.path.exists(path), '{} is not existist'.format(path)
         tm_model = TurboMind.from_pretrained(path, engine_config=engine_config)
         self.tokenizer = tm_model.tokenizer
         self.generators = [
@@ -110,8 +113,8 @@ class TurboMindModel(BaseModel):
             gen_config['stop_words'] = list(set(stop_words))
         gen_config.setdefault('min_new_tokens', 1)
 
-        from lmdeploy.messages import EngineGenerationConfig
-        gen_config = EngineGenerationConfig(**gen_config)
+        from lmdeploy.messages import GenerationConfig
+        gen_config = GenerationConfig(**gen_config)
 
         results = []
         for batch_input in batch_inputs:
@@ -157,7 +160,7 @@ class TurboMindModel(BaseModel):
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
-            gen_config (EngineGenerationConfig, optional): Generation
+            gen_config (GenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
             end_str (str, optional): Whether to trim generated strings
                 with end_str if the model has special ending strings

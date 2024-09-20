@@ -34,17 +34,6 @@ English | [简体中文](README_zh-CN.md)
 >
 > **Star Us**, You will receive all release notifications from GitHub without any delay ~ ⭐️
 
-## 📣 OpenCompass 2.0
-
-We are thrilled to introduce OpenCompass 2.0, an advanced suite featuring three key components: [CompassKit](https://github.com/open-compass), [CompassHub](https://hub.opencompass.org.cn/home), and [CompassRank](https://rank.opencompass.org.cn/home).
-![oc20](https://github.com/tonysy/opencompass/assets/7881589/90dbe1c0-c323-470a-991e-2b37ab5350b2)
-
-**CompassRank** has been significantly enhanced into the leaderboards that now incorporates both open-source benchmarks and proprietary benchmarks. This upgrade allows for a more comprehensive evaluation of models across the industry.
-
-**CompassHub** presents a pioneering benchmark browser interface, designed to simplify and expedite the exploration and utilization of an extensive array of benchmarks for researchers and practitioners alike. To enhance the visibility of your own benchmark within the community, we warmly invite you to contribute it to CompassHub. You may initiate the submission process by clicking [here](https://hub.opencompass.org.cn/dataset-submit).
-
-**CompassKit** is a powerful collection of evaluation toolkits specifically tailored for Large Language Models and Large Vision-language Models. It provides an extensive set of tools to assess and measure the performance of these complex models effectively. Welcome to try our toolkits for in your research and products.
-
 <details>
   <summary><kbd>Star History</kbd></summary>
   <picture>
@@ -70,16 +59,202 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **\[2024.05.08\]** We supported the evaluation of 4 MoE models: [Mixtral-8x22B-v0.1](configs/models/mixtral/hf_mixtral_8x22b_v0_1.py), [Mixtral-8x22B-Instruct-v0.1](configs/models/mixtral/hf_mixtral_8x22b_instruct_v0_1.py), [Qwen1.5-MoE-A2.7B](configs/models/qwen/hf_qwen1_5_moe_a2_7b.py), [Qwen1.5-MoE-A2.7B-Chat](configs/models/qwen/hf_qwen1_5_moe_a2_7b_chat.py). Try them out now!
-- **\[2024.04.30\]** We supported evaluating a model's compression efficiency by calculating its Bits per Character (BPC) metric on an [external corpora](configs/datasets/llm_compression/README.md) ([official paper](https://github.com/hkust-nlp/llm-compression-intelligence)). Check out the [llm-compression](configs/eval_llm_compression.py) evaluation config now! 🔥🔥🔥
-- **\[2024.04.29\]** We report the performance of several famous LLMs on the common benchmarks, welcome to [documentation](https://opencompass.readthedocs.io/en/latest/user_guides/corebench.html) for more information! 🔥🔥🔥.
-- **\[2024.04.26\]** We deprecated the multi-madality evaluating function from OpenCompass, related implement has moved to [VLMEvalKit](https://github.com/open-compass/VLMEvalKit), welcome to use! 🔥🔥🔥.
-- **\[2024.04.26\]** We supported the evaluation of [ArenaHard](configs/eval_subjective_arena_hard.py)  welcome to try!🔥🔥🔥.
-- **\[2024.04.22\]** We supported the evaluation of [LLaMA3](configs/models/hf_llama/hf_llama3_8b.py) 和 [LLaMA3-Instruct](configs/models/hf_llama/hf_llama3_8b_instruct.py), welcome to try! 🔥🔥🔥
-- **\[2024.02.29\]** We supported the MT-Bench, AlpacalEval and AlignBench, more information can be found [here](https://opencompass.readthedocs.io/en/latest/advanced_guides/subjective_evaluation.html)
-- **\[2024.01.30\]** We release OpenCompass 2.0. Click  [CompassKit](https://github.com/open-compass), [CompassHub](https://hub.opencompass.org.cn/home), and [CompassRank](https://rank.opencompass.org.cn/home) for more information !
+- **\[2024.09.19\]** We now support [Qwen2.5](https://huggingface.co/Qwen)(0.5B to 72B) with multiple backend(huggingface/vllm/lmdeploy). Feel free to give them a try! 🔥🔥🔥
+- **\[2024.09.17\]** We now support OpenAI o1(`o1-mini-2024-09-12` and `o1-preview-2024-09-12`). Feel free to give them a try! 🔥🔥🔥
+- **\[2024.09.05\]** We now support answer extraction through model post-processing to provide a more accurate representation of the model's capabilities. As part of this update, we have integrated [XFinder](https://github.com/IAAR-Shanghai/xFinder) as our first post-processing model. For more detailed information, please refer to the [documentation](opencompass/utils/postprocessors/xfinder/README.md), and give it a try! 🔥🔥🔥
+- **\[2024.08.20\]** OpenCompass now supports the [SciCode](https://github.com/scicode-bench/SciCode): A Research Coding Benchmark Curated by Scientists. 🔥🔥🔥
+- **\[2024.08.16\]** OpenCompass now supports the brand new long-context language model evaluation benchmark — [RULER](https://arxiv.org/pdf/2404.06654). RULER provides an evaluation of long-context including retrieval, multi-hop tracing, aggregation, and question answering through flexible configurations. Check out the [RULER](configs/datasets/ruler/README.md) evaluation config now! 🔥🔥🔥
+- **\[2024.08.09\]** We have released the example data and configuration for the CompassBench-202408, welcome to [CompassBench](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/compassbench_intro.html) for more details. 🔥🔥🔥
+- **\[2024.08.01\]** We supported the [Gemma2](https://huggingface.co/collections/google/gemma-2-release-667d6600fd5220e7b967f315) models. Welcome to try! 🔥🔥🔥
+- **\[2024.07.23\]** We supported the [ModelScope](www.modelscope.cn) datasets, you can load them on demand without downloading all the data to your local disk. Welcome to try! 🔥🔥🔥
+- **\[2024.07.17\]** We are excited to announce the release of NeedleBench's [technical report](http://arxiv.org/abs/2407.11963). We invite you to visit our [support documentation](https://opencompass.readthedocs.io/en/latest/advanced_guides/needleinahaystack_eval.html) for detailed evaluation guidelines. 🔥🔥🔥
+- **\[2024.07.04\]** OpenCompass now supports InternLM2.5, which has **outstanding reasoning capability**, **1M Context window and** and **stronger tool use**, you can try the models in [OpenCompass Config](https://github.com/open-compass/opencompass/tree/main/configs/models/hf_internlm) and [InternLM](https://github.com/InternLM/InternLM) .🔥🔥🔥.
+- **\[2024.06.20\]** OpenCompass now supports one-click switching between inference acceleration backends, enhancing the efficiency of the evaluation process. In addition to the default HuggingFace inference backend, it now also supports popular backends [LMDeploy](https://github.com/InternLM/lmdeploy) and [vLLM](https://github.com/vllm-project/vllm). This feature is available via a simple command-line switch and through deployment APIs. For detailed usage, see the [documentation](docs/en/advanced_guides/accelerator_intro.md).🔥🔥🔥.
 
 > [More](docs/en/notes/news.md)
+
+## 📊 Leaderboard
+
+We provide [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
+## 🛠️ Installation
+
+Below are the steps for quick installation and datasets preparation.
+
+### 💻 Environment Setup
+
+We highly recommend using conda to manage your python environment.
+
+- #### Create your virtual environment
+
+  ```bash
+  conda create --name opencompass python=3.10 -y
+  conda activate opencompass
+  ```
+
+- #### Install OpenCompass via pip
+
+  ```bash
+    pip install -U opencompass
+
+    ## Full installation (with support for more datasets)
+    # pip install "opencompass[full]"
+
+    ## Environment with model acceleration frameworks
+    ## Manage different acceleration frameworks using virtual environments
+    ## since they usually have dependency conflicts with each other.
+    # pip install "opencompass[lmdeploy]"
+    # pip install "opencompass[vllm]"
+
+    ## API evaluation (i.e. Openai, Qwen)
+    # pip install "opencompass[api]"
+  ```
+
+- #### Install OpenCompass from source
+
+  If you want to use opencompass's latest features, or develop new features, you can also build it from source
+
+  ```bash
+    git clone https://github.com/open-compass/opencompass opencompass
+    cd opencompass
+    pip install -e .
+    # pip install -e ".[full]"
+    # pip install -e ".[vllm]"
+  ```
+
+### 📂 Data Preparation
+
+You can choose one for the following method to prepare datasets.
+
+#### Offline Preparation
+
+You can download and extract the datasets with the following commands:
+
+```bash
+# Download dataset to data/ folder
+wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
+unzip OpenCompassData-core-20240207.zip
+```
+
+#### Automatic Download from OpenCompass
+
+We have supported download datasets automatic from the OpenCompass storage server. You can run the evaluation with extra `--dry-run` to download these datasets.
+Currently, the supported datasets are listed in [here](https://github.com/open-compass/opencompass/blob/main/opencompass/utils/datasets_info.py#L259). More datasets will be uploaded recently.
+
+#### (Optional) Automatic Download with ModelScope
+
+Also you can use the [ModelScope](www.modelscope.cn) to load the datasets on demand.
+
+Installation:
+
+```bash
+pip install modelscope[framework]
+export DATASET_SOURCE=ModelScope
+```
+
+Then submit the evaluation task without downloading all the data to your local disk. Available datasets include:
+
+```bash
+humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ceval, math, LCSTS, Xsum, winogrande, openbookqa, AGIEval, gsm8k, nq, race, siqa, mbpp, mmlu, hellaswag, ARC, BBH, xstory_cloze, summedits, GAOKAO-BENCH, OCNLI, cmnli
+```
+
+Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started/installation.html).
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
+## 🏗️ ️Evaluation
+
+After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared. Now you can start your first evaluation using OpenCompass!
+
+- Your first evaluation with OpenCompass!
+
+  OpenCompass support setting your configs via CLI or a python script. For simple evaluation settings we recommend using CLI, for more complex evaluation, it is suggested using the script way. You can find more example scripts under the configs folder.
+
+  ```bash
+  # CLI
+  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
+
+  # Python scripts
+  opencompass ./configs/eval_chat_demo.py
+  ```
+
+  You can find more script examples under [configs](./configs) folder.
+
+- API evaluation
+
+  OpenCompass, by its design, does not really discriminate between open-source models and API models. You can evaluate both model types in the same way or even in one settings.
+
+  ```bash
+  export OPENAI_API_KEY="YOUR_OPEN_API_KEY"
+  # CLI
+  opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
+
+  # Python scripts
+  opencompass ./configs/eval_api_demo.py
+
+  # You can use o1_mini_2024_09_12/o1_preview_2024_09_12  for o1 models, we set max_completion_tokens=8192 as default.
+  ```
+
+- Accelerated Evaluation
+
+  Additionally, if you want to use an inference backend other than HuggingFace for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Please ensure that you have installed the necessary packages for the chosen backend and that your model supports accelerated inference with it. For more information, see the documentation on inference acceleration backends [here](docs/en/advanced_guides/accelerator_intro.md). Below is an example using LMDeploy:
+
+  ```bash
+  # CLI
+  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
+
+  # Python scripts
+  opencompass ./configs/eval_lmdeploy_demo.py
+  ```
+
+- Supported Models
+
+  OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
+
+  ```bash
+  # List all configurations
+  python tools/list_configs.py
+  # List all configurations related to llama and mmlu
+  python tools/list_configs.py llama mmlu
+  ```
+
+  If the model is not on the list but supported by Huggingface AutoModel class, you can also evaluate it with OpenCompass. You are welcome to contribute to the maintenance of the OpenCompass supported model and dataset lists.
+
+  ```bash
+  opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat
+  ```
+
+  If you want to use multiple GPUs to evaluate the model in data parallel, you can use `--max-num-worker`.
+
+  ```bash
+  CUDA_VISIBLE_DEVICES=0,1 opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat --max-num-worker 2
+  ```
+
+> \[!TIP\]
+>
+> `--hf-num-gpus` is used for model parallel(huggingface format), `--max-num-worker` is used for data parallel.
+
+> \[!TIP\]
+>
+> configuration with `_ppl` is designed for base model typically.
+> configuration with `_gen` can be used for both base model and chat model.
+
+Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html) to learn how to run an evaluation task.
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
+
+## 📣 OpenCompass 2.0
+
+We are thrilled to introduce OpenCompass 2.0, an advanced suite featuring three key components: [CompassKit](https://github.com/open-compass), [CompassHub](https://hub.opencompass.org.cn/home), and [CompassRank](https://rank.opencompass.org.cn/home).
+![oc20](https://github.com/tonysy/opencompass/assets/7881589/90dbe1c0-c323-470a-991e-2b37ab5350b2)
+
+**CompassRank** has been significantly enhanced into the leaderboards that now incorporates both open-source benchmarks and proprietary benchmarks. This upgrade allows for a more comprehensive evaluation of models across the industry.
+
+**CompassHub** presents a pioneering benchmark browser interface, designed to simplify and expedite the exploration and utilization of an extensive array of benchmarks for researchers and practitioners alike. To enhance the visibility of your own benchmark within the community, we warmly invite you to contribute it to CompassHub. You may initiate the submission process by clicking [here](https://hub.opencompass.org.cn/dataset-submit).
+
+**CompassKit** is a powerful collection of evaluation toolkits specifically tailored for Large Language Models and Large Vision-language Models. It provides an extensive set of tools to assess and measure the performance of these complex models effectively. Welcome to try our toolkits for in your research and products.
 
 ## ✨ Introduction
 
@@ -96,83 +271,6 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 - **Modular design with high extensibility**: Want to add new models or datasets, customize an advanced task division strategy, or even support a new cluster management system? Everything about OpenCompass can be easily expanded!
 
 - **Experiment management and reporting mechanism**: Use config files to fully record each experiment, and support real-time reporting of results.
-
-## 📊 Leaderboard
-
-We provide [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
-
-<p align="right"><a href="#top">🔝Back to top</a></p>
-
-## 🛠️ Installation
-
-Below are the steps for quick installation and datasets preparation.
-
-### 💻 Environment Setup
-
-#### Open-source Models with GPU
-
-```bash
-conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
-conda activate opencompass
-git clone https://github.com/open-compass/opencompass opencompass
-cd opencompass
-pip install -e .
-```
-
-#### API Models with CPU-only
-
-```bash
-conda create -n opencompass python=3.10 pytorch torchvision torchaudio cpuonly -c pytorch -y
-conda activate opencompass
-git clone https://github.com/open-compass/opencompass opencompass
-cd opencompass
-pip install -e .
-# also please install requirements packages via `pip install -r requirements/api.txt` for API models if needed.
-```
-
-### 📂 Data Preparation
-
-```bash
-# Download dataset to data/ folder
-wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
-unzip OpenCompassData-core-20240207.zip
-```
-
-Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started/installation.html).
-
-<p align="right"><a href="#top">🔝Back to top</a></p>
-
-## 🏗️ ️Evaluation
-
-After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared, you can evaluate the performance of the LLaMA-7b model on the MMLU and C-Eval datasets using the following command:
-
-```bash
-python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
-```
-
-OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
-
-```bash
-# List all configurations
-python tools/list_configs.py
-# List all configurations related to llama and mmlu
-python tools/list_configs.py llama mmlu
-```
-
-You can also evaluate other HuggingFace models via command line. Taking LLaMA-7b as an example:
-
-```bash
-python run.py --datasets ceval_ppl mmlu_ppl --hf-type base --hf-path huggyllama/llama-7b
-```
-
-> \[!TIP\]
->
-> configuration with `_ppl` is designed for base model typically.
-> configuration with `_gen` can be used for both base model and chat model.
-
-Through the command line or configuration files, OpenCompass also supports evaluating APIs or custom models, as well as more diversified evaluation strategies. Please read the [Quick Start](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html) to learn how to run an evaluation task.
-
-<p align="right"><a href="#top">🔝Back to top</a></p>
 
 ## 📖 Dataset Support
 
@@ -452,20 +550,21 @@ Through the command line or configuration files, OpenCompass also supports evalu
     <tr valign="top">
       <td>
 
+- [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
+- [Baichuan](https://github.com/baichuan-inc)
+- [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
+- [ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)
+- [ChatGLM3](https://github.com/THUDM/ChatGLM3-6B)
+- [Gemma](https://huggingface.co/google/gemma-7b)
 - [InternLM](https://github.com/InternLM/InternLM)
 - [LLaMA](https://github.com/facebookresearch/llama)
 - [LLaMA3](https://github.com/meta-llama/llama3)
-- [Vicuna](https://github.com/lm-sys/FastChat)
-- [Alpaca](https://github.com/tatsu-lab/stanford_alpaca)
-- [Baichuan](https://github.com/baichuan-inc)
-- [WizardLM](https://github.com/nlpxucan/WizardLM)
-- [ChatGLM2](https://github.com/THUDM/ChatGLM2-6B)
-- [ChatGLM3](https://github.com/THUDM/ChatGLM3-6B)
-- [TigerBot](https://github.com/TigerResearch/TigerBot)
 - [Qwen](https://github.com/QwenLM/Qwen)
-- [BlueLM](https://github.com/vivo-ai-lab/BlueLM)
-- [Gemma](https://huggingface.co/google/gemma-7b)
-- ...
+- [TigerBot](https://github.com/TigerResearch/TigerBot)
+- [Vicuna](https://github.com/lm-sys/FastChat)
+- [WizardLM](https://github.com/nlpxucan/WizardLM)
+- [Yi](https://github.com/01-ai/Yi)
+- ……
 
 </td>
 <td>
@@ -495,7 +594,7 @@ Through the command line or configuration files, OpenCompass also supports evalu
 ## 🔜 Roadmap
 
 - [x] Subjective Evaluation
-  - [ ] Release CompassAreana
+  - [x] Release CompassAreana
   - [x] Subjective evaluation.
 - [x] Long-context
   - [x] Long-context evaluation with extensive datasets.

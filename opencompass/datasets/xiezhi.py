@@ -6,6 +6,7 @@ from datasets import Dataset, DatasetDict
 from tqdm import trange
 
 from opencompass.openicl.icl_retriever import BaseRetriever
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -14,6 +15,7 @@ class XiezhiDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path, local_mode=True)
         dataset = DatasetDict()
         filename = osp.join(path, name, 'xiezhi.v1.json')
         if 'chn' in name:

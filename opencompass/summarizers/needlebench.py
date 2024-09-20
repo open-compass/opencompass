@@ -65,6 +65,8 @@ model_name_mapping = {
     'qwen1.5-72b-chat-vllm': 'Qwen-1.5-72B-vLLM',
     'glm4_notools': 'GLM-4',
     'claude-3-opus': 'Claude-3-Opus',
+    'glm-4-9b-chat-1m-vllm': 'GLM4-9B-Chat-1M',
+    'internlm2_5-7b-chat-1m-turbomind': 'InternLM2.5-7B-Chat-1M',
     # Add more mappings as necessary
 }
 

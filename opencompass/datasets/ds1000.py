@@ -21,6 +21,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -99,6 +100,7 @@ class DS1000Dataset(BaseDataset):
                 are supported. Defaults to `Insertion`.
         """
 
+        path = get_data_path(path, local_mode=True)
         if isinstance(libs, str):
             libs = [libs]
 
@@ -364,7 +366,7 @@ class DS1000ServiceEvaluator(BaseEvaluator):
     def __init__(self,
                  lib: str,
                  ip_address='localhost',
-                 port=5000,
+                 port='',
                  timeout=600) -> None:
         assert lib in _LIBRARY_NAME_LIST, (
             f' lib must be in {_LIBRARY_NAME_LIST}')
@@ -419,9 +421,14 @@ class DS1000ServiceEvaluator(BaseEvaluator):
         Returns:
             tuple[bool, str]: Whether the access is successful and the output.
         """
+        if self.port:
+            eval_server_url = f'{self.ip_address}:{self.port}/evaluate'
+        else:
+            eval_server_url = f'{self.ip_address}/evaluate'
+
         exec_result = subprocess.run([
             'curl', '-X', 'POST', '-F', f'file=@{file_path}',
-            f'{self.ip_address}:{self.port}/evaluate'
+            f'{eval_server_url}'
         ],
                                      timeout=self.timeout,
                                      capture_output=True)

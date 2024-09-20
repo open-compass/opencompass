@@ -5,6 +5,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .prompts import edpPrompts
@@ -21,10 +22,11 @@ def q2text(q, p=edpPrompts):
 
 
 @LOAD_DATASET.register_module(force=True)
-class p_EDP_Dataset(BaseDataset):
+class P_EDP_Dataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         raw_data = []
         data_path = path
         all_data = []
@@ -46,7 +48,7 @@ class p_EDP_Dataset(BaseDataset):
 
 
 @ICL_EVALUATORS.register_module(force=True)
-class p_EDP_Evaluator(BaseEvaluator):
+class P_EDP_Evaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         assert len(predictions) == len(references)

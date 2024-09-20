@@ -13,13 +13,66 @@ A popular evaluation method involves
 
 We support the use of GPT-4 (or other JudgeLLM) for the subjective evaluation of models based on above methods.
 
-## Current Supported Subjective Evaluation Datasets
+## Currently Supported Subjective Evaluation Datasets
 
-1. AlignBench (https://github.com/THUDM/AlignBench)
-2. MTBench (https://github.com/lm-sys/FastChat)
-3. AlpacaEvalv2 (https://github.com/tatsu-lab/alpaca_eval)
-4. ArenaHard (https://github.com/lm-sys/arena-hard/tree/main)
-5. CompassArena (Internal dataset)
+1. AlignBench Chinese Scoring Dataset (https://github.com/THUDM/AlignBench)
+2. MTBench English Scoring Dataset, two-turn dialogue (https://github.com/lm-sys/FastChat)
+3. MTBench101 English Scoring Dataset, multi-turn dialogue (https://github.com/mtbench101/mt-bench-101)
+4. AlpacaEvalv2 English Compare Dataset (https://github.com/tatsu-lab/alpaca_eval)
+5. ArenaHard English Compare Dataset, mainly focused on coding (https://github.com/lm-sys/arena-hard/tree/main)
+6. Fofo English Scoring Dataset (https://github.com/SalesforceAIResearch/FoFo/)
+7. Wildbench English Score and Compare Dataset（https://github.com/allenai/WildBench）
+
+## Initiating Subjective Evaluation
+
+Similar to existing objective evaluation methods, you can configure related settings in `configs/eval_subjective.py`.
+
+### Basic Parameters: Specifying models, datasets, and judgemodels
+
+Similar to objective evaluation, import the models and datasets that need to be evaluated, for example:
+
+```
+with read_base():
+    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
+    from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
+    from .models.qwen.hf_qwen_7b import models
+```
+
+It is worth noting that since the model setup parameters for subjective evaluation are often different from those for objective evaluation, it often requires setting up `do_sample` for inference instead of `greedy`. You can modify the relevant parameters in the configuration file as needed, for example:
+
+```
+models = [
+    dict(
+        type=HuggingFaceChatGLM3,
+        abbr='chatglm3-6b-hf2',
+        path='THUDM/chatglm3-6b',
+        tokenizer_path='THUDM/chatglm3-6b',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(
+            do_sample=True,
+        ),
+        meta_template=api_meta_template,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=8,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+]
+```
+
+The judgemodel is usually set to a powerful model like GPT4, and you can directly enter your API key according to the configuration in the config file, or use a custom model as the judgemodel.
+
+### Specifying Other Parameters
+
+In addition to the basic parameters, you can also modify the `infer` and `eval` fields in the config to set a more appropriate partitioning method. The currently supported partitioning methods mainly include three types: NaivePartitioner, SizePartitioner, and NumberWorkPartitioner. You can also specify your own workdir to save related files.
 
 ## Subjective Evaluation with Custom Dataset
 
@@ -32,6 +85,9 @@ The specific process includes:
 
 ### Step-1: Data Preparation
 
+This step requires preparing the dataset file and implementing your own dataset class under `Opencompass/datasets/subjective/`, returning the read data in the format of `list of dict`.
+
+Actually, you can prepare the data in any format you like (csv, json, jsonl, etc.). However, to make it easier to get started, it is recommended to construct the data according to the format of the existing subjective datasets or according to the following json format.
 We provide mini test-set for **Compare Mode** and **Score Mode** as below:
 
 ```python
@@ -66,80 +122,12 @@ If you want to modify prompt on each single question, you can full some other in
 
 ### Step-2: Evaluation Configuration(Compare Mode)
 
-For `config/eval_subjective_compare.py`, we provide some annotations to help users understand the configuration file.
+Taking Alignbench as an example, `configs/datasets/subjective/alignbench/alignbench_judgeby_critiquellm.py`:
 
-```python
-
-from mmengine.config import read_base
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
-
-from opencompass.partitioners import NaivePartitioner
-from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
-from opencompass.runners import LocalRunner
-from opencompass.runners import SlurmSequentialRunner
-from opencompass.tasks import OpenICLInferTask
-from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import Corev2Summarizer
-
-with read_base():
-    # Pre-defined models
-    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat
-    from .models.chatglm.hf_chatglm3_6b import models as hf_chatglm3_6b
-    from .models.qwen.hf_qwen_14b_chat import models as hf_qwen_14b_chat
-    from .models.openai.gpt_4 import models as gpt4_model
-    from .datasets.subjective_cmp.subjective_corev2 import subjective_datasets
-
-# Evaluation datasets
-datasets = [*subjective_datasets]
-
-# Model to be evaluated
-models = [*hf_qwen_7b_chat, *hf_chatglm3_6b]
-
-# Inference configuration
-infer = dict(
-    partitioner=dict(type=NaivePartitioner),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask)),
-)
-# Evaluation configuration
-eval = dict(
-    partitioner=dict(
-        type=SubjectiveNaivePartitioner,
-        mode='m2n', # m-model v.s n-model
-        # Under m2n setting
-        # must specify base_models and compare_models, program will generate pairs between base_models compare_models.
-        base_models = [*hf_qwen_14b_chat], # Baseline model
-        compare_models = [*hf_baichuan2_7b, *hf_chatglm3_6b] # model to be evaluated
-    ),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(
-            type=SubjectiveEvalTask,
-        judge_cfg=gpt4_model # Judge model
-        )),
-)
-work_dir = './outputs/subjective/'
-
-summarizer = dict(
-    type=Corev2Summarizer,  # Custom summarizer
-    match_method='smart', # Answer extraction
-)
-```
-
-In addition, you can also change the response order of the two models, please refer to `config/eval_subjective_compare.py`,
-when `infer_order` is setting to `random`, the response will be random ordered,
-when `infer_order` is setting to `double`, the response of two models will be doubled in two ways.
-
-### Step-2: Evaluation Configuration(Score Mode)
-
-For `config/eval_subjective_score.py`, it is mainly same with `config/eval_subjective_compare.py`, and you just need to modify the eval mode to `singlescore`.
+1. First, you need to set `subjective_reader_cfg` to receive the relevant fields returned from the custom Dataset class and specify the output fields when saving files.
+2. Then, you need to specify the root path `data_path` of the dataset and the dataset filename `subjective_all_sets`. If there are multiple sub-files, you can add them to this list.
+3. Specify `subjective_infer_cfg` and `subjective_eval_cfg` to configure the corresponding inference and evaluation prompts.
+4. Finally, specify additional information such as `mode`, `summarizer`, etc., at the appropriate location. Note that for different subjective datasets, the fields that need to be specified may vary. Additionally, the summarizer class for the respective dataset also needs to be implemented to perform data statistics. You can refer to the summarizer implementations of other datasets, located in `opencompass/opencompass/summarizers/subjective`.
 
 ### Step-3: Launch the Evaluation
 
@@ -152,67 +140,9 @@ The `-r` parameter allows the reuse of model inference and GPT-4 evaluation resu
 The response of JudgeLLM will be output to `output/.../results/timestamp/xxmodel/xxdataset/.json`.
 The evaluation report will be output to `output/.../summary/timestamp/report.csv`.
 
-Opencompass has supported lots of JudgeLLM, actually, you can take any model as JudgeLLM in opencompass configs.
-And we list the popular open-source JudgeLLM here:
-
-1. Auto-J, refer to `configs/models/judge_llm/auto_j`
-
-Consider cite the following paper if you find it helpful:
-
-```bibtex
-@article{li2023generative,
-  title={Generative judge for evaluating alignment},
-  author={Li, Junlong and Sun, Shichao and Yuan, Weizhe and Fan, Run-Ze and Zhao, Hai and Liu, Pengfei},
-  journal={arXiv preprint arXiv:2310.05470},
-  year={2023}
-}
-@misc{2023opencompass,
-    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
-    author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/open-compass/opencompass}},
-    year={2023}
-}
-```
-
-2. JudgeLM, refer to `configs/models/judge_llm/judgelm`
-
-```bibtex
-@article{zhu2023judgelm,
-  title={JudgeLM: Fine-tuned Large Language Models are Scalable Judges},
-  author={Zhu, Lianghui and Wang, Xinggang and Wang, Xinlong},
-  journal={arXiv preprint arXiv:2310.17631},
-  year={2023}
-}
-@misc{2023opencompass,
-    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
-    author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/open-compass/opencompass}},
-    year={2023}
-}
-```
-
-3. PandaLM, refer to `configs/models/judge_llm/pandalm`
-
-Consider cite the following paper if you find it helpful:
-
-```bibtex
-@article{wang2023pandalm,
-  title={PandaLM: An Automatic Evaluation Benchmark for LLM Instruction Tuning Optimization},
-  author={Wang, Yidong and Yu, Zhuohao and Zeng, Zhengran and Yang, Linyi and Wang, Cunxiang and Chen, Hao and Jiang, Chaoya and Xie, Rui and Wang, Jindong and Xie, Xing and others},
-  journal={arXiv preprint arXiv:2306.05087},
-  year={2023}
-}
-@misc{2023opencompass,
-    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
-    author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/open-compass/opencompass}},
-    year={2023}
-}
-```
-
 ## Multi-round Subjective Evaluation in OpenCompass
 
-In OpenCompass, we also support subjective multi-turn dialogue evaluation. For instance, the evaluation of MT-Bench can be referred to in `configs/eval_subjective_mtbench.py`.
+In OpenCompass, we also support subjective multi-turn dialogue evaluation. For instance, the evaluation of MT-Bench can be referred to in `configs/datasets/subjective/multiround`.
 
 In the multi-turn dialogue evaluation, you need to organize the data format into the following dialogue structure:
 
@@ -238,82 +168,3 @@ In the multi-turn dialogue evaluation, you need to organize the data format into
 ```
 
 It's important to note that due to the different question types in MTBench having different temperature settings, we need to divide the original data files into three different subsets according to the temperature for separate inference. For different subsets, we can set different temperatures. For specific settings, please refer to `configs\datasets\subjective\multiround\mtbench_single_judge_diff_temp.py`.
-
-Consider cite the following paper if you find it helpful:
-
-```bibtex
-@misc{zheng2023judging,
-      title={Judging LLM-as-a-judge with MT-Bench and Chatbot Arena},
-      author={Lianmin Zheng and Wei-Lin Chiang and Ying Sheng and Siyuan Zhuang and Zhanghao Wu and Yonghao Zhuang and Zi Lin and Zhuohan Li and Dacheng Li and Eric. P Xing and Hao Zhang and Joseph E. Gonzalez and Ion Stoica},
-      year={2023},
-      eprint={2306.05685},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
-}
-@misc{2023opencompass,
-    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
-    author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/open-compass/opencompass}},
-    year={2023}
-}
-```
-
-## Practice: AlignBench Evaluation
-
-### Dataset
-
-```bash
-mkdir -p ./data/subjective/
-
-cd ./data/subjective
-git clone https://github.com/THUDM/AlignBench.git
-
-# data format conversion
-python ../../../tools/convert_alignmentbench.py --mode json --jsonl data/data_release.jsonl
-
-```
-
-### Configuration
-
-Please edit the config `configs/eval_subjective_alignbench.py` according to your demand.
-
-### Evaluation
-
-```bash
-HF_EVALUATE_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python run.py workspace/eval_subjective_alignbench.py
-```
-
-### Submit to Official Leaderboard(Optional)
-
-If you need to submit your prediction into official leaderboard, you can use `tools/convert_alignmentbench.py` for format conversion.
-
-- Make sure you have the following results
-
-```bash
-outputs/
-└── 20231214_173632
-    ├── configs
-    ├── logs
-    ├── predictions # model's response
-    ├── results
-    └── summary
-```
-
-- Convert the data
-
-```bash
-python tools/convert_alignmentbench.py --mode csv --exp-folder outputs/20231214_173632
-```
-
-- Get `.csv`  in `submission/` for submission
-
-```bash
-outputs/
-└── 20231214_173632
-    ├── configs
-    ├── logs
-    ├── predictions
-    ├── results
-    ├── submission # 可提交文件
-    └── summary
-```

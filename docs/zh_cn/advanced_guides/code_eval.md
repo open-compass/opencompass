@@ -17,13 +17,13 @@
 对于绝大多数模型来说，模型支持HF的generation中带有`num_return_sequences` 参数，我们可以直接使用来获取多回复。可以参考以下配置文件。
 
 ```python
-from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
 
 with read_base():
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
     from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
 
-mbpp_datasets[0]['type'] = MBPPDataset_V2
+mbpp_datasets[0]['type'] = MBPPDatasetV2
 mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
 mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
 
@@ -60,7 +60,7 @@ models = [
 适用于一些没有设计好的API以及功能缺失的HF模型。这个时候我们需要重复构造数据集来达到多回复的效果。这里可以参考以下配置文件。
 
 ```python
-from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
 
 with read_base():
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
@@ -70,7 +70,7 @@ humaneval_datasets[0]['abbr'] = 'openai_humaneval_pass10'
 humaneval_datasets[0]['num_repeats'] = 10
 mbpp_datasets[0]['abbr'] = 'mbpp_pass10'
 mbpp_datasets[0]['num_repeats'] = 10
-mbpp_datasets[0]['type'] = MBPPDataset_V2
+mbpp_datasets[0]['type'] = MBPPDatasetV2
 mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
 mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
 

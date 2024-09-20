@@ -27,6 +27,7 @@ except ImportError:
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -38,6 +39,7 @@ class TACODataset(BaseDataset):
 
     @staticmethod
     def load(path: str, num_repeats: int = 1, difficulty='ALL'):
+        path = get_data_path(path, local_mode=True)
         dataset = load_from_disk(path)
         new_dataset = DatasetDict()
         # add new column "starter" in the prompt
@@ -234,7 +236,8 @@ class TACOEvaluator(BaseEvaluator):
         return pass_at_k
 
     def score(self, predictions, references, test_set):
-        assert len(predictions) == len(references)
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length'}
         generations = defaultdict(list)
         for refer, pred in zip(references, predictions):
             pred = self.post_process(pred)

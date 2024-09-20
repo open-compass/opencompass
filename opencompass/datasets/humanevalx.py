@@ -12,6 +12,7 @@ from typing import Dict, Iterable
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 from .humaneval import humaneval_postprocess_v2
@@ -30,6 +31,7 @@ class HumanevalXDataset(BaseDataset):
 
     @staticmethod
     def load(path, language, **kwargs):
+        path = get_data_path(path, local_mode=True)
         assert language in _LANGUAGE_NAME_DICT.keys(), (
             f'language must be in {list(_LANGUAGE_NAME_DICT.keys())}')
         file_path = osp.join(path, f'humanevalx_{language}.jsonl.gz')
@@ -74,7 +76,7 @@ class HumanevalXEvaluator(BaseEvaluator):
     def __init__(self,
                  language,
                  ip_address='localhost',
-                 port=5000,
+                 port='',
                  retry=2,
                  timeout=600) -> None:
         assert language in _LANGUAGE_NAME_DICT.keys(), (
@@ -139,10 +141,13 @@ class HumanevalXEvaluator(BaseEvaluator):
                 f'\nError Information: {output}')
 
     def _code_eval_service(self, file_path):
+        if self.port:
+            eval_server_url = f'{self.ip_address}:{self.port}/evaluate'
+        else:
+            eval_server_url = f'{self.ip_address}/evaluate'
         exec_result = subprocess.run([
             'curl', '-X', 'POST', '-F', f'file=@{file_path}', '-F',
-            f'dataset=humanevalx/{self.language}',
-            f'{self.ip_address}:{self.port}/evaluate'
+            f'dataset=humanevalx/{self.language}', f'{eval_server_url}'
         ],
                                      timeout=self.timeout,
                                      capture_output=True)

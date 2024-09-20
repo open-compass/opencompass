@@ -2,11 +2,11 @@
 import json
 import os.path as osp
 import re
-from typing import Optional
 
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -166,7 +166,14 @@ def prompt_construct(problem, multi_turn=False, judge_type='single'):
 @LOAD_DATASET.register_module()
 class MTBenchDataset(BaseDataset):
 
-    def load(self, path: str, name: str, multi_turn=True, judge_type='single'):
+    def load(self,
+             path: str,
+             name: str,
+             judge_type='single',
+             multi_turn=True,
+             *args,
+             **kwargs):
+        path = get_data_path(path, local_mode=True)
         filename = osp.join(path, f'{name}.json')
         dataset = DatasetDict()
         raw_data = []

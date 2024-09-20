@@ -322,11 +322,14 @@ class MiniMaxChatCompletionV2(BaseAPIModel):
                     code = response.get('base_resp', {}).get('status_code')
                     if code == 1002:
                         # rate limit
+                        self.logger.debug('Rate limit, wait for 1s')
                         time.sleep(1)
                         continue
+                    elif code == 1026:
+                        return 'The request was rejected because new risk'
                     elif code == 1027:
                         return 'The request was rejected because high risk'
-                    print(messages, response)
+                    self.logger.debug(f'Resp 200, Error: {response}')
                     pass
 
             elif raw_response.status_code == 401:

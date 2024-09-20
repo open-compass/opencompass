@@ -7,6 +7,7 @@ from typing import Optional
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .subjective_cmp import SubjectiveCmpDataset
 
@@ -15,6 +16,8 @@ class Config:
 
     def __init__(self, alignment_bench_config_path,
                  alignment_bench_config_name) -> None:
+        alignment_bench_config_path = get_data_path(
+            alignment_bench_config_path, local_mode=True)
         config_file_path = osp.join(alignment_bench_config_path,
                                     alignment_bench_config_name + '.json')
         with open(config_file_path, 'r') as config_file:
@@ -88,7 +91,9 @@ class AlignmentBenchDataset(SubjectiveCmpDataset):
              path: str,
              name: str,
              alignment_bench_config_path: Optional[str] = '',
-             alignment_bench_config_name: Optional[str] = ''):
+             alignment_bench_config_name: Optional[str] = '',
+             *args,
+             **kwargs):
         if alignment_bench_config_path != '':
             alignmentbench_config = Config(alignment_bench_config_path,
                                            alignment_bench_config_name)
@@ -106,17 +111,3 @@ class AlignmentBenchDataset(SubjectiveCmpDataset):
             alignbench_dataset.append(data)
         dataset = Dataset.from_list(alignbench_dataset)
         return dataset
-
-
-if __name__ == '__main__':
-    data = {
-        'question': '高音单簧管和高音萨克斯的调性相同吗？如果相同，请说出他们的调性，如果不同，请分别说出他们的调性',
-        'capability': '专业能力',
-        'others': {
-            'subcategory': '音乐',
-            'reference': '高音单簧管和高音萨克斯的调性不同。高音单簧管的调性通常为E♭，而高音萨克斯的调性则为B♭。\n',
-            'question_id': 1
-        }
-    }
-    prefix = prompt_construct(data, alignmentbench_config)
-    print(prefix)

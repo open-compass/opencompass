@@ -6,7 +6,7 @@ The Needle In A Haystack test (inspired by [NeedleInAHaystack](https://github.co
 
 ## Task Overview
 
-Within the `NeedleBench` framework of `OpenCompass`, we have designed a series of increasingly challenging test scenarios to comprehensively evaluate the models' abilities in long text information extraction and reasoning:
+Within the `NeedleBench` framework of `OpenCompass`, we have designed a series of increasingly challenging test scenarios to comprehensively evaluate the models' abilities in long text information extraction and reasoning. For a complete introduction, refer to our [technical report](https://arxiv.org/abs/2407.11963):
 
 - **Single-Needle Retrieval Task (S-RT)**: Assesses an LLM's ability to extract a single key piece of information from a long text, testing its precision in recalling specific details within broad narratives. This corresponds to the **original Needle In A Haystack test** setup.
 
@@ -17,6 +17,8 @@ Within the `NeedleBench` framework of `OpenCompass`, we have designed a series o
 - **Ancestral Trace Challenge (ATC)**: Uses the "relational needle" to test an LLM's ability to handle multi-layer logical challenges in real long texts. In the ATC task, a series of logical reasoning questions are used to test the model's memory and analytical skills for every detail in the text. For this task, we remove the irrelevant text (Haystack) setting, designing all texts as critical information, requiring the LLM to use all the content and reasoning in the text accurately to answer the questions.
 
 ### Evaluation Steps
+
+> Note: In the latest code, OpenCompass has been set to automatically load the dataset from [Huggingface API](https://huggingface.co/datasets/opencompass/NeedleBench), so you can **skip directly** the following steps of manually downloading and placing the dataset.
 
 1. Download the dataset from [here](https://github.com/open-compass/opencompass/files/14741330/needlebench.zip).
 
@@ -77,11 +79,11 @@ python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --su
 
 ##### Evaluation on a Slurm Cluster
 
-If using `Slurm`, you can add parameters such as `--slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000`, as shown below:
+If using `Slurm`, you can add parameters such as `--slurm -p partition_name -q reserved --max-num-workers 16`, as shown below:
 
 ```bash
 # Slurm Evaluation
-python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 ##### Evaluating a Subdataset Only
@@ -89,13 +91,13 @@ python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --su
 If you only want to test the original NeedleInAHaystack task setup, you could change the dataset parameter to `needlebench_single_4k`, which corresponds to the single needle version of the NeedleInAHaystack test at 4k length:
 
 ```bash
-python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 You can also choose to evaluate a specific subdataset, such as changing the `--datasets` parameter to `needlebench_single_4k/needlebench_zh_datasets` for testing just the Chinese version of the single needle 4K length NeedleInAHaystack task. The parameter after `/` represents the subdataset, which can be found in the dataset variable of `configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py` :
 
 ```bash
-python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 Be sure to install the [LMDeploy](https://github.com/InternLM/lmdeploy) tool before starting the evaluation:
@@ -104,7 +106,7 @@ Be sure to install the [LMDeploy](https://github.com/InternLM/lmdeploy) tool bef
 pip install lmdeploy
 ```
 
-This command initiates the evaluation process, with parameters `-p partition_name -q auto` and `--max-num-workers 32` used to specify the Slurm partition name and the maximum number of worker processes.
+This command initiates the evaluation process, with parameters `-p partition_name -q auto` and `--max-num-workers 16` used to specify the Slurm partition name and the maximum number of worker processes.
 
 #### Evaluating Other `Huggingface` Models
 
@@ -112,8 +114,10 @@ For other models, we recommend writing an additional configuration file to modif
 
 ```python
 from mmengine.config import read_base
+# We use mmengine.config to import variables from other configuration files
+
 with read_base():
-    from .models.hf_internlm.lmdeploy_internlm2_chat_7b import models as internlm2_chat_7b_200k
+    # from .models.hf_internlm.lmdeploy_internlm2_chat_7b import models as internlm2_chat_7b_200k
     from .models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
 
     # Evaluate needlebench_4k, adjust the configuration to use 8k, 32k, 128k, 200k, or 1000k if necessary.
@@ -131,7 +135,7 @@ with read_base():
 datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
 
 for m in internlm2_chat_7b:
-    m['max_seq_len'] = 32768 # Ensure InternLM2-7B model can receive the complete long text, other models need to adjust according to their maximum sequence length support.
+    m['max_seq_len'] = 30768 # Ensure InternLM2-7B model can receive the complete long text, other models need to adjust according to their maximum sequence length support.
     m['max_out_len'] = 2000 # Ensure that in the multi-needle recall task, the model can receive a complete response
 
 models = internlm2_chat_7b
@@ -142,10 +146,10 @@ work_dir = './outputs/needlebench'
 Once the test `config` file is written, we can pass the corresponding config file path through the `run.py` file in the command line, such as:
 
 ```bash
-python run.py configs/eval_needlebench.py --slurm -p partition_name -q reserved --max-num-workers 128 --max-partition-size 8000
+python run.py configs/eval_needlebench.py --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-Note, at this point, we do not need to pass in the `--dataset, --models, --summarizer` parameters, as we have already defined these configurations in the config file. You can manually adjust the `--max-partition-size` setting to achieve the best task slicing strategy to improve evaluation efficiency.
+Note, at this point, we do not need to pass in the `--dataset, --models, --summarizer` parameters, as we have already defined these configurations in the config file. You can manually adjust the `--max-num-workers` setting to adjust the number of parallel workers.
 
 ### Visualization
 
@@ -154,6 +158,16 @@ We have built-in result visualization into the `summarizer` implementation in th
 If you use this method, please add a reference:
 
 ```bibtex
+
+@misc{li2024needlebenchllmsretrievalreasoning,
+      title={NeedleBench: Can LLMs Do Retrieval and Reasoning in 1 Million Context Window?},
+      author={Mo Li and Songyang Zhang and Yunxin Liu and Kai Chen},
+      year={2024},
+      eprint={2407.11963},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2407.11963},
+}
 
 @misc{2023opencompass,
     title={OpenCompass: A Universal Evaluation Platform for Foundation Models},

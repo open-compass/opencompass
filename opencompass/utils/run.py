@@ -17,31 +17,42 @@ from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
 
+logger = get_logger()
 
-def match_cfg_file(workdir: str,
+def match_cfg_file(workdir: Union[str, List[str]],
                    pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
     """Match the config file in workdir recursively given the pattern.
 
     Additionally, if the pattern itself points to an existing file, it will be
     directly returned.
     """
+    def _mf_with_multi_workdirs(workdir, pattern, fuzzy=False):
+        if isinstance(workdir, str):
+            workdir = [workdir]
+        files = []
+        for wd in workdir:
+            files += match_files(wd, pattern, fuzzy=fuzzy)
+        return files
+
     if isinstance(pattern, str):
         pattern = [pattern]
     pattern = [p + '.py' if not p.endswith('.py') else p for p in pattern]
-    files = match_files(workdir, pattern, fuzzy=False)
+    files = _mf_with_multi_workdirs(workdir, pattern, fuzzy=False)
     if len(files) != len(pattern):
         nomatched = []
         ambiguous = []
+        ambiguous_return_list = []
         err_msg = ('The provided pattern matches 0 or more than one '
                    'config. Please verify your pattern and try again. '
                    'You may use tools/list_configs.py to list or '
                    'locate the configurations.\n')
         for p in pattern:
-            files = match_files(workdir, p, fuzzy=False)
-            if len(files) == 0:
+            files_ = _mf_with_multi_workdirs(workdir, p, fuzzy=False)
+            if len(files_) == 0:
                 nomatched.append([p[:-3]])
-            elif len(files) > 1:
-                ambiguous.append([p[:-3], '\n'.join(f[1] for f in files)])
+            elif len(files_) > 1:
+                ambiguous.append([p[:-3], '\n'.join(f[1] for f in files_)])
+                ambiguous_return_list.append(files_[0])
         if nomatched:
             table = [['Not matched patterns'], *nomatched]
             err_msg += tabulate.tabulate(table,
@@ -49,9 +60,13 @@ def match_cfg_file(workdir: str,
                                          tablefmt='psql')
         if ambiguous:
             table = [['Ambiguous patterns', 'Matched files'], *ambiguous]
-            err_msg += tabulate.tabulate(table,
+            warning_msg = 'Found ambiguous patterns, using the first matched config.\n'
+            warning_msg += tabulate.tabulate(table,
                                          headers='firstrow',
                                          tablefmt='psql')
+            logger.warning(warning_msg)
+            return ambiguous_return_list
+
         raise ValueError(err_msg)
     return files
 
@@ -77,7 +92,7 @@ def get_config_from_arg(args) -> Config:
     2. args.models and args.datasets
     3. Huggingface parameter groups and args.datasets
     """
-    logger = get_logger()
+
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
@@ -86,8 +101,14 @@ def get_config_from_arg(args) -> Config:
             config['models'] = change_accelerator(config['models'], args.accelerator)
             if config.get('eval', {}).get('partitioner', {}).get('models') is not None:
                 config['eval']['partitioner']['models'] = change_accelerator(config['eval']['partitioner']['models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('base_models') is not None:
+                config['eval']['partitioner']['base_models'] = change_accelerator(config['eval']['partitioner']['base_models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('compare_models') is not None:
+                config['eval']['partitioner']['compare_models'] = change_accelerator(config['eval']['partitioner']['compare_models'], args.accelerator)
             if config.get('eval', {}).get('partitioner', {}).get('judge_models') is not None:
                 config['eval']['partitioner']['judge_models'] = change_accelerator(config['eval']['partitioner']['judge_models'], args.accelerator)
+            if config.get('judge_models') is not None:
+                config['judge_models'] = change_accelerator(config['judge_models'], args.accelerator)
         return config
 
     # parse dataset args
@@ -95,7 +116,16 @@ def get_config_from_arg(args) -> Config:
         raise ValueError('You must specify "--datasets" or "--custom-dataset-path" if you do not specify a config file path.')
     datasets = []
     if args.datasets:
-        datasets_dir = os.path.join(args.config_dir, 'datasets')
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(script_dir)
+        default_configs_dir = os.path.join(parent_dir, 'configs')
+        datasets_dir = [
+            os.path.join(args.config_dir, 'datasets'),
+            os.path.join(args.config_dir, 'dataset_collections'),
+            os.path.join(default_configs_dir, './datasets'),
+            os.path.join(default_configs_dir, './dataset_collections')
+
+        ]
         for dataset_arg in args.datasets:
             if '/' in dataset_arg:
                 dataset_name, dataset_suffix = dataset_arg.split('/', 1)
@@ -125,14 +155,22 @@ def get_config_from_arg(args) -> Config:
     if not args.models and not args.hf_path:
         raise ValueError('You must specify a config file path, or specify --models and --datasets, or specify HuggingFace model parameters and --datasets.')
     models = []
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    default_configs_dir = os.path.join(parent_dir, 'configs')
+    models_dir = [
+        os.path.join(args.config_dir, 'models'),
+        os.path.join(default_configs_dir, './models'),
+
+    ]
     if args.models:
-        model_dir = os.path.join(args.config_dir, 'models')
-        for model in match_cfg_file(model_dir, args.models):
-            logger.info(f'Loading {model[0]}: {model[1]}')
-            cfg = Config.fromfile(model[1])
-            if 'models' not in cfg:
-                raise ValueError(f'Config file {model[1]} does not contain "models" field')
-            models += cfg['models']
+        for model_arg in args.models:
+            for model in match_cfg_file(models_dir, [model_arg]):
+                logger.info(f'Loading {model[0]}: {model[1]}')
+                cfg = Config.fromfile(model[1])
+                if 'models' not in cfg:
+                    raise ValueError(f'Config file {model[1]} does not contain "models" field')
+                models += cfg['models']
     else:
         if args.hf_type == 'chat':
             mod = HuggingFacewithChatTemplate
@@ -144,6 +182,7 @@ def get_config_from_arg(args) -> Config:
                      model_kwargs=args.model_kwargs,
                      tokenizer_path=args.tokenizer_path,
                      tokenizer_kwargs=args.tokenizer_kwargs,
+                     generation_kwargs=args.generation_kwargs,
                      peft_path=args.peft_path,
                      peft_kwargs=args.peft_kwargs,
                      max_seq_len=args.max_seq_len,
@@ -151,7 +190,7 @@ def get_config_from_arg(args) -> Config:
                      batch_size=args.batch_size,
                      pad_token_id=args.pad_token_id,
                      stop_words=args.stop_words,
-                     run_cfg=dict(num_gpus=args.num_gpus))
+                     run_cfg=dict(num_gpus=args.hf_num_gpus))
         logger.debug(f'Using model: {model}')
         models.append(model)
     # set infer accelerator if needed
@@ -159,7 +198,14 @@ def get_config_from_arg(args) -> Config:
         models = change_accelerator(models, args.accelerator)
     # parse summarizer args
     summarizer_arg = args.summarizer if args.summarizer is not None else 'example'
-    summarizers_dir = os.path.join(args.config_dir, 'summarizers')
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    default_configs_dir = os.path.join(parent_dir, 'configs')
+    summarizers_dir = [
+        os.path.join(args.config_dir, 'summarizers'),
+        os.path.join(default_configs_dir, './summarizers'),
+
+    ]
 
     # Check if summarizer_arg contains '/'
     if '/' in summarizer_arg:
@@ -188,7 +234,7 @@ def change_accelerator(models, accelerator):
     for model in models:
         logger.info(f'Transforming {model["abbr"]} to {accelerator}')
         # change HuggingFace model to VLLM or TurboMindModel
-        if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3]:
+        if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3, f'{HuggingFaceBaseModel.__module__}.{HuggingFaceBaseModel.__name__}']:
             gen_args = dict()
             if model.get('generation_kwargs') is not None:
                 generation_kwargs = model['generation_kwargs'].copy()
@@ -197,7 +243,7 @@ def change_accelerator(models, accelerator):
                 gen_args['top_p'] = generation_kwargs.get('top_p', 0.9)
                 gen_args['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
                 generation_kwargs['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
-                generation_kwargs.pop('eos_token_id')
+                generation_kwargs.pop('eos_token_id') if 'eos_token_id' in generation_kwargs else None
             else:
                 # if generation_kwargs is not provided, set default values
                 generation_kwargs = dict()
@@ -211,7 +257,7 @@ def change_accelerator(models, accelerator):
                 mod = TurboMindModel
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
-                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
+                    abbr=model['abbr'].replace('hf', 'turbomind') if '-hf' in model['abbr'] else model['abbr'] + '-turbomind',
                     path=model['path'],
                     engine_config=dict(session_len=model['max_seq_len'],
                                        max_batch_size=model['batch_size'],
@@ -249,16 +295,16 @@ def change_accelerator(models, accelerator):
                         acc_model[item] = model[item]
             else:
                 raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
-        elif model['type'] in [HuggingFacewithChatTemplate]:
+        elif model['type'] in [HuggingFacewithChatTemplate, f'{HuggingFacewithChatTemplate.__module__}.{HuggingFacewithChatTemplate.__name__}']:
             if accelerator == 'vllm':
                 mod = VLLMwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
-                    abbr='-hf'.join(model['abbr'].split('-hf')[:-1]) + '-vllm',
+                    abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
                     path=model['path'],
                     model_kwargs=dict(tensor_parallel_size=model['run_cfg']['num_gpus']),
                     max_out_len=model['max_out_len'],
-                    batch_size=32768,
+                    batch_size=16,
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
@@ -266,20 +312,21 @@ def change_accelerator(models, accelerator):
                 mod = LMDeploywithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
-                    abbr='-hf'.join(model['abbr'].split('-hf')[:-1]) + '-turbomind',
+                    abbr=model['abbr'].replace('hf', 'turbomind') if '-hf' in model['abbr'] else model['abbr'] + '-turbomind',
                     path=model['path'],
                     engine_config=dict(max_batch_size=model.get('batch_size', 16), tp=model['run_cfg']['num_gpus']),
                     gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
                     max_seq_len=model.get('max_seq_len', 2048),
                     max_out_len=model['max_out_len'],
-                    batch_size=32768,
+                    batch_size=16,
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
             else:
                 raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
         else:
-            raise ValueError(f'Unsupported model type {model["type"]}')
+            acc_model = model
+            logger.warning(f'Unsupported model type {model["type"]}, will keep the original model.')
         model_accels.append(acc_model)
     return model_accels
 

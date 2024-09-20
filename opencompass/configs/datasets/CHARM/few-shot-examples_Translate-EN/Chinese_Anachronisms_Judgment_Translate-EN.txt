@@ -1,0 +1,25 @@
+Identify whether a given statement contains an era error.
+
+Q: Choose the correct option if the following statement contains an anachronism. How would a person with compulsory education and basic common sense choose?
+Li Bai wrote poetry with a fountain pen.
+Options:
+(A) Yes
+(B) No
+A: Let's think step by step.
+The statement mentions "Li Bai", a Chinese poet from the Tang Dynasty. The "fountain pen" mentioned in the statement is a modern device, so Li Bai could not have used a fountain pen to write his poems, and the statement contains an anachronism. The answer is (A).
+
+Q: Choose the correct option if the following statement contains an anachronism. What would a person with compulsory education and basic common sense choose?
+During the Tang Dynasty, people could buy Dream of Red Mansions on the streets.
+Options:
+(A) Yes
+(B) No
+A: Let's think step by step.
+This statement mentions Dream of Red Mansions, which was written by Cao Xueqin, a writer of the Qing Dynasty, and there was no Dream of Red Mansions during the Tang Dynasty, so the statement contains a period error. So the answer is (A).
+
+Q: Whether the following statement contains an epochal error, choose the correct option. What would a person with compulsory education and basic common sense choose?
+On October 1, 1998, people held the five-star red flag in their hands and celebrated the National Day in Tiananmen Square
+Options:
+(A) Yes
+(B) No
+A: Let's think step by step.
+The statement mentions the year 1998, New China was founded in 1949 and the five-star red flag was established as the national flag of China in 1949, so it is reasonable to expect that October 1, 1998 was a National Day and people celebrated the National Day in Tiananmen Square, so the statement does not contain an anachronism. So the answer is (B).

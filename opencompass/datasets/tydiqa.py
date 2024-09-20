@@ -2,10 +2,12 @@ import json
 import os
 import re
 from collections import Counter
+from os import environ
 
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.utils import get_data_path
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
@@ -15,14 +17,25 @@ class TydiQADataset(BaseDataset):
 
     @staticmethod
     def load(path, lang):
-        path = os.path.join(path, 'dev', f'{lang}-dev.jsonl')
-        dataset_list = []
-        with open(path, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = json.loads(line)
+        path = get_data_path(path)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            ms_dataset = MsDataset.load(path, subset_name=lang, split='dev')
+            dataset_list = []
+            for line in ms_dataset:
+                row = line
                 answer = list(set([i['text'] for i in line['answers']]))
-                line['answer'] = answer
-                dataset_list.append(line)
+                row['answer'] = answer
+                dataset_list.append(row)
+        else:
+            path = os.path.join(path, 'dev', f'{lang}-dev.jsonl')
+            dataset_list = []
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = json.loads(line)
+                    answer = list(set([i['text'] for i in line['answers']]))
+                    line['answer'] = answer
+                    dataset_list.append(line)
         return Dataset.from_list(dataset_list)
 
 

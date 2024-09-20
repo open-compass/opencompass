@@ -43,7 +43,8 @@ class BaseAPIModel(BaseModel):
                  retry: int = 2,
                  max_seq_len: int = 2048,
                  meta_template: Optional[Dict] = None,
-                 generation_kwargs: Dict = dict()):
+                 generation_kwargs: Dict = dict(),
+                 verbose: bool = False):
         self.path = path
         self.max_seq_len = max_seq_len
         self.meta_template = meta_template
@@ -53,6 +54,7 @@ class BaseAPIModel(BaseModel):
         self.template_parser = APITemplateParser(meta_template)
         self.logger = get_logger()
         self.generation_kwargs = generation_kwargs
+        self.verbose = verbose
 
     @abstractmethod
     def generate(self, inputs: List[PromptType],
@@ -281,6 +283,9 @@ class APITemplateParser:
                     new_prompt.append(item)
             prompt = new_prompt
 
+            if self.meta_template.get('begin', None):
+                prompt.insert(0, self.meta_template['begin'])
+
         else:
             # in case the model does not have any meta template
             prompt = ''
@@ -351,7 +356,7 @@ class APITemplateParser:
     def _prompt2api(self,
                     prompts: Union[List, str],
                     role_dict: Dict[str, Dict],
-                    for_gen: bool = False) -> Tuple[str, bool]:
+                    for_gen: bool = False) -> Tuple[List, bool]:
         """Convert the prompts to a API-style prompts, given an updated
         role_dict.
 
@@ -363,7 +368,7 @@ class APITemplateParser:
                 role whose "generate" is set to True.
 
         Returns:
-            Tuple[str, bool]: The converted string, and whether the follow-up
+            Tuple[List, bool]: The converted string, and whether the follow-up
             conversion should be proceeded.
         """
         cont = True
@@ -376,7 +381,7 @@ class APITemplateParser:
         res = []
         for prompt in prompts:
             if isinstance(prompt, str):
-                raise TypeError('Mixing str without explictt role is not '
+                raise TypeError('Mixing str without explicit role is not '
                                 'allowed in API models!')
             else:
                 api_role, cont = self._role2api_role(prompt, role_dict,
@@ -390,7 +395,7 @@ class APITemplateParser:
     def _role2api_role(self,
                        role_prompt: Dict,
                        role_dict: Dict[str, Dict],
-                       for_gen: bool = False) -> Tuple[str, bool]:
+                       for_gen: bool = False) -> Tuple[Dict, bool]:
         """Convert a role prompt to a string, given an updated role_dict.
 
         Args:
@@ -401,7 +406,7 @@ class APITemplateParser:
                 role whose "generate" is set to True.
 
         Returns:
-            Tuple[str, bool]: The converted string, and whether the follow-up
+            Tuple[Dict, bool]: The converted string, and whether the follow-up
             conversion should be proceeded.
         """
         merged_prompt = role_dict.get(

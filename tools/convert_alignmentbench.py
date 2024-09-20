@@ -77,7 +77,7 @@ def parse_args():
                         default='./data_release.jsonl',
                         help='The original jsonl path')
     parser.add_argument('--json',
-                        default='your prediction file path',
+                        default='./alignment_bench.json',
                         help='The results json path')
     parser.add_argument('--exp-folder', help='The results json name')
     args = parser.parse_args()
@@ -89,6 +89,6 @@ if __name__ == '__main__':
     mode = args.mode
     if mode == 'json':
         processed_data = process_jsonl(args.jsonl)
-        save_as_json(processed_data)
+        save_as_json(processed_data, args.json)
     elif mode == 'csv':
         extract_predictions_from_json(args.exp_folder)

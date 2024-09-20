@@ -15,11 +15,65 @@
 
 ## 目前已支持的主观评测数据集
 
-1. AlignBench（https://github.com/THUDM/AlignBench）
-2. MTBench （https://github.com/lm-sys/FastChat）
-3. AlpacaEvalv2 （https://github.com/tatsu-lab/alpaca_eval）
-4. ArenaHard (https://github.com/lm-sys/arena-hard/tree/main)
-5. CompassArena（内部数据集）
+1. AlignBench 中文Scoring数据集（https://github.com/THUDM/AlignBench）
+2. MTBench 英文Scoring数据集，两轮对话（https://github.com/lm-sys/FastChat）
+3. MTBench101 英文Scoring数据集，多轮对话（https://github.com/mtbench101/mt-bench-101）
+4. AlpacaEvalv2 英文Compare数据集（https://github.com/tatsu-lab/alpaca_eval）
+5. ArenaHard 英文Compare数据集，主要面向coding(https://github.com/lm-sys/arena-hard/tree/main)
+6. Fofo  英文Socring数据集（https://github.com/SalesforceAIResearch/FoFo/）
+7. Wildbench 英文Score和Compare数据集（https://github.com/allenai/WildBench）
+
+## 启动主观评测
+
+类似于已有的客观评测方式，可以在configs/eval_subjective.py中进行相关配置
+
+### 基本参数models, datasets 和 judgemodels的指定
+
+类似于客观评测的方式，导入需要评测的models和datasets，例如
+
+```
+with read_base():
+    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
+    from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
+    from .models.qwen.hf_qwen_7b import models
+```
+
+值得注意的是，由于主观评测的模型设置参数通常与客观评测不同，往往需要设置`do_sample`的方式进行推理而不是`greedy`，故可以在配置文件中自行修改相关参数，例如
+
+```
+models = [
+    dict(
+        type=HuggingFaceChatGLM3,
+        abbr='chatglm3-6b-hf2',
+        path='THUDM/chatglm3-6b',
+        tokenizer_path='THUDM/chatglm3-6b',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(
+            do_sample=True,
+        ),
+        meta_template=api_meta_template,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=8,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+]
+```
+
+judgemodel通常被设置为GPT4等强力模型，可以直接按照config文件中的配置填入自己的API key，或使用自定义的模型作为judgemodel
+
+### 其他参数的指定
+
+除了基本参数以外，还可以在config中修改`infer`和`eval`字段里的partitioner，从而设置更合适的分片方式，目前支持的分片方式主要有三种：NaivePartitoner, SizePartitioner和NumberWorkPartitioner
+以及可以指定自己的workdir用以保存相关文件。
 
 ## 自定义主观数据集评测
 
@@ -32,6 +86,9 @@
 
 ### 第一步：数据准备
 
+这一步需要准备好数据集文件以及在`Opencompass/datasets/subjective/`下实现自己数据集的类，将读取到的数据以`list of dict`的格式return
+
+实际上可以按照自己喜欢的任意格式进行数据准备(csv, json, jsonl)等皆可，不过为了方便上手，推荐按照已有的主观数据集的格式进行构建或按照如下的json格式进行构建。
 对于对战模式和打分模式，我们各提供了一个demo测试集如下：
 
 ```python
@@ -64,85 +121,19 @@
 
 以上三个字段是必要的，用户也可以添加其他字段，如果需要对每个问题的prompt进行单独处理，可以在'others'字段中进行一些额外设置，并在Dataset类中添加相应的字段。
 
-### 第二步：构建评测配置（对战模式）
+### 第二步：构建评测配置
 
-对于两回答比较，更详细的config setting请参考 `config/eval_subjective_compare.py`，下面我们提供了部分简略版的注释，方便用户理解配置文件的含义。
+以Alignbench为例`configs/datasets/subjective/alignbench/alignbench_judgeby_critiquellm.py`，
 
-```python
-from mmengine.config import read_base
-from opencompass.models import HuggingFaceCausalLM, HuggingFace, OpenAI
-
-from opencompass.partitioners import NaivePartitioner
-from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
-from opencompass.runners import LocalRunner
-from opencompass.runners import SlurmSequentialRunner
-from opencompass.tasks import OpenICLInferTask
-from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import Corev2Summarizer
-
-with read_base():
-    # 导入预设模型
-    from .models.qwen.hf_qwen_7b_chat import models as hf_qwen_7b_chat
-    from .models.chatglm.hf_chatglm3_6b import models as hf_chatglm3_6b
-    from .models.qwen.hf_qwen_14b_chat import models as hf_qwen_14b_chat
-    from .models.openai.gpt_4 import models as gpt4_model
-    from .datasets.subjective_cmp.subjective_corev2 import subjective_datasets
-
-# 评测数据集
-datasets = [*subjective_datasets]
-
-# 待测模型列表
-models = [*hf_qwen_7b_chat, *hf_chatglm3_6b]
-
-# 推理配置
-infer = dict(
-    partitioner=dict(type=NaivePartitioner),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(type=OpenICLInferTask)),
-)
-# 评测配置
-eval = dict(
-    partitioner=dict(
-        type=SubjectiveNaivePartitioner,
-        mode='m2n', # m个模型 与 n个模型进行对战
-        #  在m2n模式下，需要指定base_models和compare_models，将会对base_models和compare_models生成对应的两两pair（去重且不会与自身进行比较）
-        base_models = [*hf_qwen_14b_chat], # 用于对比的基线模型
-        compare_models = [*hf_baichuan2_7b, *hf_chatglm3_6b] # 待评测模型
-    ),
-    runner=dict(
-        type=SlurmSequentialRunner,
-        partition='llmeval',
-        quotatype='auto',
-        max_num_workers=256,
-        task=dict(
-            type=SubjectiveEvalTask,
-        judge_cfg=gpt4_model # 评价模型
-        )),
-)
-work_dir = './outputs/subjective/' #指定工作目录，在此工作目录下，若使用--reuse参数启动评测，将自动复用该目录下已有的所有结果
-
-summarizer = dict(
-    type=Corev2Summarizer,  #自定义数据集Summarizer
-    match_method='smart', #自定义答案提取方式
-)
-```
-
-此外，在数据集的配置config中，还可以选择两回答比较时的回答顺序，请参考`config/eval_subjective_compare.py`,
-当`infer_order`设置为`random`时，将对两模型的回复顺序进行随机打乱,
-当`infer_order`设置为`double`时，将把两模型的回复按两种先后顺序进行判断。
-
-### 第二步：构建评测配置（打分模式）
-
-对于单回答打分，更详细的config setting请参考 `config/eval_subjective_score.py`，该config的大部分都与两回答比较的config相同，只需要修改评测模式即可，将评测模式设置为`singlescore`。
+1. 首先需要设置`subjective_reader_cfg`，用以接收从自定义的Dataset类里return回来的相关字段并指定保存文件时的output字段
+2. 然后需要指定数据集的根路径`data_path`以及数据集的文件名`subjective_all_sets`，如果有多个子文件，在这个list里进行添加即可
+3. 指定`subjective_infer_cfg`和`subjective_eval_cfg`，配置好相应的推理和评测的prompt
+4. 最后在相应的位置指定`mode`，`summarizer`等额外信息，注意，对于不同的主观数据集，所需指定的字段可能不尽相同。此外，相应数据集的summarizer类也需要自己实现以进行数据的统计，可以参考其他数据集的summarizer实现，位于`opencompass/opencompass/summarizers/subjective`
 
 ### 第三步 启动评测并输出评测结果
 
 ```shell
-python run.py configs/eval_subjective_score.py -r
+python run.py configs/eval_subjective.py -r
 ```
 
 - `-r` 参数支持复用模型推理和评估结果。
@@ -150,69 +141,9 @@ python run.py configs/eval_subjective_score.py -r
 JudgeLLM的评测回复会保存在 `output/.../results/timestamp/xxmodel/xxdataset/.json`
 评测报告则会输出到 `output/.../summary/timestamp/report.csv`。
 
-Opencompass 已经支持了很多的JudgeLLM，实际上，你可以将Opencompass中所支持的所有模型都当作JudgeLLM使用。
-我们列出目前比较流行的开源JudgeLLM：
-
-1. Auto-J，请参考 `configs/models/judge_llm/auto_j`
-
-如果使用了该方法，请添加引用:
-
-```bibtex
-@article{li2023generative,
-  title={Generative judge for evaluating alignment},
-  author={Li, Junlong and Sun, Shichao and Yuan, Weizhe and Fan, Run-Ze and Zhao, Hai and Liu, Pengfei},
-  journal={arXiv preprint arXiv:2310.05470},
-  year={2023}
-}
-@misc{2023opencompass,
-    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
-    author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/open-compass/opencompass}},
-    year={2023}
-}
-```
-
-2. JudgeLM，请参考 `configs/models/judge_llm/judgelm`
-
-如果使用了该方法，请添加引用:
-
-```bibtex
-@article{zhu2023judgelm,
-  title={JudgeLM: Fine-tuned Large Language Models are Scalable Judges},
-  author={Zhu, Lianghui and Wang, Xinggang and Wang, Xinlong},
-  journal={arXiv preprint arXiv:2310.17631},
-  year={2023}
-}
-@misc{2023opencompass,
-    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
-    author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/open-compass/opencompass}},
-    year={2023}
-}
-```
-
-3. PandaLM，请参考 `configs/models/judge_llm/pandalm`
-
-如果使用了该方法，请添加引用:
-
-```bibtex
-@article{wang2023pandalm,
-  title={PandaLM: An Automatic Evaluation Benchmark for LLM Instruction Tuning Optimization},
-  author={Wang, Yidong and Yu, Zhuohao and Zeng, Zhengran and Yang, Linyi and Wang, Cunxiang and Chen, Hao and Jiang, Chaoya and Xie, Rui and Wang, Jindong and Xie, Xing and others},
-  journal={arXiv preprint arXiv:2306.05087},
-  year={2023}
-}
-@misc{2023opencompass,
-    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
-    author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/open-compass/opencompass}},
-    year={2023}
-}
-```
-
 ## 主观多轮对话评测
 
-在OpenCompass中我们同样支持了主观的多轮对话评测，以MT-Bench为例，对MTBench的评测可以参见`configs/eval_subjective_mtbench.py`
+在OpenCompass中我们同样支持了主观的多轮对话评测，以MT-Bench为例，对MTBench的评测可以参见`configs/datasets/subjective/multiround`
 
 在多轮对话评测中，你需要将数据格式整理为如下的dialogue格式
 
@@ -238,84 +169,3 @@ Opencompass 已经支持了很多的JudgeLLM，实际上，你可以将Opencompa
 ```
 
 值得注意的是，由于MTBench各不同的题目类型设置了不同的温度，因此我们需要将原始数据文件按照温度分成三个不同的子集以分别推理，针对不同的子集我们可以设置不同的温度，具体设置参加`configs\datasets\subjective\multiround\mtbench_single_judge_diff_temp.py`
-
-如果使用了该方法，请添加引用:
-
-```bibtex
-@misc{zheng2023judging,
-      title={Judging LLM-as-a-judge with MT-Bench and Chatbot Arena},
-      author={Lianmin Zheng and Wei-Lin Chiang and Ying Sheng and Siyuan Zhuang and Zhanghao Wu and Yonghao Zhuang and Zi Lin and Zhuohan Li and Dacheng Li and Eric. P Xing and Hao Zhang and Joseph E. Gonzalez and Ion Stoica},
-      year={2023},
-      eprint={2306.05685},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
-}
-@misc{2023opencompass,
-    title={OpenCompass: A Universal Evaluation Platform for Foundation Models},
-    author={OpenCompass Contributors},
-    howpublished = {\url{https://github.com/open-compass/opencompass}},
-    year={2023}
-}
-```
-
-## 实战：AlignBench 主观评测
-
-### 数据集准备
-
-```bash
-mkdir -p ./data/subjective/
-
-cd ./data/subjective
-git clone https://github.com/THUDM/AlignBench.git
-
-# data format conversion
-python ../../../tools/convert_alignmentbench.py --mode json --jsonl data/data_release.jsonl
-
-```
-
-### 配置文件
-
-请根据需要修改配置文件 `configs/eval_subjective_alignbench.py`
-
-### 启动评测
-
-按如下方式执行命令后，将会开始答案推理和主观打分，如只需进行推理，可以通过制定 `-m infer`实现
-
-```bash
-HF_EVALUATE_OFFLINE=1 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python run.py configs/eval_subjective_alignbench.py
-```
-
-### 提交官方评测（Optional）
-
-完成评测后，如需提交官方榜单进行评测，可以使用它`tools/convert_alignmentbench.py`进行格式转换。
-
-- 请确保已完成推理，并获得如下所示的文件:
-
-```bash
-outputs/
-└── 20231214_173632
-    ├── configs
-    ├── logs
-    ├── predictions # 模型回复
-    ├── results
-    └── summary
-```
-
-- 执行如下命令获得可用于提交的结果
-
-```bash
-python tools/convert_alignmentbench.py --mode csv --exp-folder outputs/20231214_173632
-```
-
-- 进入 `submission`文件夹获得可用于提交的`.csv`文件
-
-```bash
-outputs/
-└── 20231214_173632
-    ├── configs
-    ├── logs
-    ├── predictions
-    ├── results
-    ├── submission # 可提交文件
-    └── summary
-```

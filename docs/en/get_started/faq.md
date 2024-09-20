@@ -37,9 +37,9 @@ This is a complex issue that needs to be explained from both the supply and dema
 
 The supply side refers to how many tasks are being run. A task is a combination of a model and a dataset, and it primarily depends on how many models and datasets need to be tested. Additionally, since OpenCompass splits a larger task into multiple smaller tasks, the number of data entries per sub-task (`--max-partition-size`) also affects the number of tasks. (The `--max-partition-size` is proportional to the actual number of data entries, but the relationship is not 1:1).
 
-The demand side refers to how many workers are running. Since OpenCompass instantiates multiple models for inference simultaneously, we use `--num-gpus` to specify how many GPUs each instance uses. Note that `--num-gpus` is a parameter specific to HuggingFace models and setting this parameter for non-HuggingFace models will not have any effect. We also use `--max-num-workers` to indicate the maximum number of instances running at the same time. Lastly, due to issues like GPU memory and insufficient load, OpenCompass also supports running multiple instances on the same GPU, which is managed by the parameter `--max-num-workers-per-gpu`. Therefore, it can be generally assumed that we will use a total of `--num-gpus` * `--max-num-workers` / `--max-num-workers-per-gpu` GPUs.
+The demand side refers to how many workers are running. Since OpenCompass instantiates multiple models for inference simultaneously, we use `--hf-num-gpus` to specify how many GPUs each instance uses. Note that `--hf-num-gpus` is a parameter specific to HuggingFace models and setting this parameter for non-HuggingFace models will not have any effect. We also use `--max-num-workers` to indicate the maximum number of instances running at the same time. Lastly, due to issues like GPU memory and insufficient load, OpenCompass also supports running multiple instances on the same GPU, which is managed by the parameter `--max-num-workers-per-gpu`. Therefore, it can be generally assumed that we will use a total of `--hf-num-gpus` * `--max-num-workers` / `--max-num-workers-per-gpu` GPUs.
 
-In summary, when tasks run slowly or the GPU load is low, we first need to check if the supply is sufficient. If not, consider reducing `--max-partition-size` to split the tasks into finer parts. Next, we need to check if the demand is sufficient. If not, consider increasing `--max-num-workers` and `--max-num-workers-per-gpu`. Generally, **we set `--num-gpus` to the minimum value that meets the demand and do not adjust it further.**
+In summary, when tasks run slowly or the GPU load is low, we first need to check if the supply is sufficient. If not, consider reducing `--max-partition-size` to split the tasks into finer parts. Next, we need to check if the demand is sufficient. If not, consider increasing `--max-num-workers` and `--max-num-workers-per-gpu`. Generally, **we set `--hf-num-gpus` to the minimum value that meets the demand and do not adjust it further.**
 
 ### How do I control the number of GPUs that OpenCompass occupies?
 
@@ -114,17 +114,15 @@ Hence, if users find that the number of tasks greatly exceeds the available GPUs
 
 ### How to use the downloaded huggingface models?
 
-If you have already download the checkpoints of the model, you can specify the local path of the model and tokenizer, and add `trust_remote_code=True` for `--model-kwargs` and `--tokenizer-kwargs`. For example
+If you have already download the checkpoints of the model, you can specify the local path of the model. For example
 
 ```bash
-python run.py --datasets siqa_gen winograd_ppl \
---hf-path /path/to/model \  # HuggingFace 模型地址
---tokenizer-path /path/to/model \  # HuggingFace 模型地址
---model-kwargs device_map='auto' trust_remote_code=True \  # 构造 model 的参数
---tokenizer-kwargs padding_side='left' truncation='left' use_fast=False trust_remote_code=True \  # 构造 tokenizer 的参数
---max-out-len 100 \  # 模型能接受的最大序列长度
---max-seq-len 2048 \  # 最长生成 token 数
---batch-size 8 \  # 批次大小
---no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
---num-gpus 1  # 所需 gpu 数
+python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to/model
 ```
+
+## Dataset
+
+### How to build a new dataset?
+
+- For building new objective dataset: [new_dataset](../advanced_guides/new_dataset.md)
+- For building new subjective dataset: [subjective_evaluation](../advanced_guides/subjective_evaluation.md)

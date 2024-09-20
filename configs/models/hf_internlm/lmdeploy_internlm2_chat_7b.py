@@ -36,6 +36,5 @@ models = [
         # in `generate` function
         batch_size=5000,
         run_cfg=dict(num_gpus=1),
-        stop_words=['</s>', '<|im_end|>'],
     )
 ]

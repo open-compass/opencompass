@@ -161,6 +161,9 @@ class DLCRunner(BaseRunner):
             shell_cmd += 'umask 0000; '
             shell_cmd += '{task_cmd}'
 
+            # set priority to 1 as default
+            task_priority = self.aliyun_cfg.get('priority', 1)
+
             tmpl = (
                 'dlc submit pytorchjob'
                 f" --command '{shell_cmd}'"
@@ -168,6 +171,7 @@ class DLCRunner(BaseRunner):
                 f" --config {self.aliyun_cfg['dlc_config_path']}"
                 f" --workspace_id {self.aliyun_cfg['workspace_id']}"
                 f" --resource_id {self.aliyun_cfg['resource_id']}"
+                f' --priority {task_priority}'
                 ' --workers 1'
                 f' --worker_cpu {max(num_gpus * 8, 12)}'
                 f' --worker_gpu {num_gpus}'
@@ -228,14 +232,18 @@ class DLCRunner(BaseRunner):
                 while True:
                     # 1. Avoid to request dlc too frequently.
                     # 2. DLC job may not be ready immediately after creation.
-                    for _ in range(20):
+                    num_retry = 60
+                    for retry_index in range(num_retry):
                         time.sleep(2)
                         try:
                             job_info = json.loads(
                                 subprocess.getoutput(f'dlc get job {job_id}'))
                             break
                         except:  # noqa: E722
-                            pass
+                            if retry_index > num_retry // 3:
+                                logger.warning(
+                                    f'Failed to get job info for {job_id}, '
+                                    'retrying...')
                     else:
                         raise RuntimeError(
                             f'Failed to get job info for {job_id}')

@@ -25,15 +25,7 @@ python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--deb
 - 对于 HuggingFace 相关模型，用户也可以通过 HuggingFace 参数快速在命令行中定义一个模型，再通过 `--datasets DATASET1 DATASET2 ...` 定义数据集。
 
   ```bash
-  python run.py --datasets siqa_gen winograd_ppl \
-  --hf-path huggyllama/llama-7b \  # HuggingFace 模型地址
-  --model-kwargs device_map='auto' \  # 构造 model 的参数
-  --tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # 构造 tokenizer 的参数
-  --max-out-len 100 \  # 模型能接受的最大序列长度
-  --max-seq-len 2048 \  # 最长生成 token 数
-  --batch-size 8 \  # 批次大小
-  --no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
-  --num-gpus 1  # 所需 gpu 数
+  python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path huggyllama/llama-7b
   ```
 
   HuggingFace 全量参数介绍如下：
@@ -45,16 +37,15 @@ python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--deb
   - `--tokenizer-kwargs`: 构造 tokenizer 的参数
   - `--max-out-len`: 最长生成 token 数
   - `--max-seq-len`: 模型能接受的最大序列长度
-  - `--no-batch-padding`: 不打开 batch padding，通过 for loop 推理，避免精度损失
   - `--batch-size`: 批次大小
-  - `--num-gpus`: 运行模型所需的gpu数
+  - `--hf-num-gpus`: 运行模型所需的gpu数
 
 启动方式：
 
 - 本地机器运行: `run.py $EXP`。
 - srun运行: `run.py $EXP --slurm -p $PARTITION_name`。
 - dlc运行： `run.py $EXP --dlc --aliyun-cfg $AliYun_Cfg`
-- 定制化启动: `run.py $EXP`。这里 $EXP 为配置文件，且里面包含 `eval` 和 `infer` 字段，详细配置请参考 [高效评测](./evaluation.md)。
+- 定制化启动: `run.py $EXP`。这里 $EXP 为配置文件，且里面包含 `eval` 和 `infer` 字段，详细配置请参考 [数据分片](./evaluation.md)。
 
 参数解释如下：
 

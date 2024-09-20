@@ -66,12 +66,19 @@ class LMDeploywithChatTemplate(BaseModel):
         potential_stop_words = []
         try:
             generation_config = GenerationConfig.from_pretrained(path)
-            for token_id in generation_config.eos_token_id:
-                potential_stop_words.append(self.tokenizer.decode(token_id))
         except:
-            pass
-        potential_stop_words.append(self.tokenizer.eos_token)
+            generation_config = None
+        if generation_config and hasattr(generation_config, 'eos_token_id'):
+            if isinstance(generation_config.eos_token_id, int):
+                potential_stop_words.append(self.origin_tokenizer.decode(generation_config.eos_token_id))
+            else:
+                assert isinstance(generation_config.eos_token_id, list)
+                for token_id in generation_config.eos_token_id:
+                    potential_stop_words.append(self.origin_tokenizer.decode(token_id))
+        if self.origin_tokenizer.eos_token is not None:
+            potential_stop_words.append(self.origin_tokenizer.eos_token)
         potential_stop_words = list(set(potential_stop_words))
+        potential_stop_words = [s for s in potential_stop_words if s]
         return potential_stop_words
 
     def generate(self,
@@ -99,25 +106,29 @@ class LMDeploywithChatTemplate(BaseModel):
             messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
 
         stop_words = list(set(self.stop_words + stopping_criteria))
+        encode_stop_words = []
+        if stop_words is not None and len(stop_words) > 0:
+            for words in stop_words:
+                encode_stop_words += self.tokenizer.encode(words, add_bos=False)
+
         DEFAULT_GEN_CONFIG = {
             'max_new_tokens': max_out_len,
             'min_new_tokens': 1,
             'top_k': 1,
-            'stop_words': stop_words,
+            'stop_words': encode_stop_words,
         }
+
         gen_config = copy.deepcopy(DEFAULT_GEN_CONFIG)
         gen_config.update(self.gen_config)
         if do_sample:
             gen_config['top_k'] = 40
             gen_config['temperature'] = temperature
-        # if stopping_criteria:
-        #     stop_words = gen_config.get('stop_words', [])
-        #     for t in stopping_criteria:
-        #         t = self.tokenizer.encode(t, add_bos=False)
-        #         stop_words.append(t[0])
-        #     gen_config['stop_words'] = list(set(stop_words))
+
         from lmdeploy.messages import GenerationConfig
         gen_config = GenerationConfig(**gen_config)
+        if self.version_info >= (0, 6, 0):
+            gen_config.stop_words = stop_words
+            gen_config.convert_stop_bad_words_to_ids(self.tokenizer)
 
         results = []
         outputs = self.pipe(messages, do_preprocess=False)
@@ -142,6 +153,7 @@ class LMDeploywithChatTemplate(BaseModel):
         return len(t['input_ids'])
 
     def _build_pipe(self, model_path, engine_config):
+        from lmdeploy import pipeline, TurbomindEngineConfig, PytorchEngineConfig
         assert 'backend' in engine_config, \
                 f'miss "backend" key in config {engine_config}'
 
@@ -150,13 +162,10 @@ class LMDeploywithChatTemplate(BaseModel):
                 f'unsupported backend type: {backend}'
 
         if backend == 'turbomind':
-            from lmdeploy import TurbomindEngineConfig
             filtered = {k: v for k, v in engine_config.items() if hasattr(TurbomindEngineConfig, k)}
             backend_config = TurbomindEngineConfig(**filtered)
         else:
-            from lmdeploy import PytorchEngineConfig
             filtered = {k: v for k, v in engine_config.items() if hasattr(PytorchEngineConfig, k)}
             backend_config = PytorchEngineConfig(**filtered)
 
-        from lmdeploy import pipeline
         return pipeline(model_path, backend_config=backend_config)

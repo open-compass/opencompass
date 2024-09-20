@@ -1,9 +1,9 @@
 # Most of the code in this file is copied from https://github.com/openai/simple-evals/blob/main/math_eval.py
 from mmengine.config import read_base
 with read_base():
-    from .models.hf_llama.hf_llama3_8b_instruct import models as hf_llama3_8b_instruct_model # noqa: F401, F403
-    from .models.hf_llama.hf_llama3_70b_instruct import models as hf_llama3_70b_instruct_model  # noqa: F401, F403
-    from .datasets.math.math_llm_judge import math_datasets  # noqa: F401, F403
+    from opencompass.configs.models.hf_llama.hf_llama3_8b_instruct import models as hf_llama3_8b_instruct_model # noqa: F401, F403
+    from opencompass.configs.models.hf_llama.hf_llama3_70b_instruct import models as hf_llama3_70b_instruct_model  # noqa: F401, F403
+    from opencompass.configs.datasets.math.math_llm_judge import math_datasets  # noqa: F401, F403
 from opencompass.datasets import math_judement_preprocess
 from opencompass.partitioners import NaivePartitioner, SizePartitioner
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner

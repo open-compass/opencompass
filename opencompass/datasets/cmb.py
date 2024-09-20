@@ -4,6 +4,7 @@ import os.path as osp
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -13,6 +14,7 @@ class CMBDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         with open(osp.join(path, 'val.json'), 'r', encoding='utf-8') as f:
             val_data = json.load(f)
         for d in val_data:

@@ -5,6 +5,7 @@ from datasets import Dataset
 
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .utils import iter_jsonl
@@ -15,6 +16,7 @@ class InfiniteBenchmathcalcDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
 
         dataset = list(iter_jsonl(path))
 

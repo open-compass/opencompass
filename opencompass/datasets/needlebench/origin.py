@@ -2,7 +2,6 @@ import json
 import os
 import random
 import re
-from pathlib import Path
 
 import tiktoken
 from datasets import Dataset
@@ -10,6 +9,7 @@ from datasets import Dataset
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 
 def get_random_line_by_language(counter, file_path, language):
@@ -128,18 +128,29 @@ class NeedleBenchOriginDataset(BaseDataset):
 
             return prompt
 
-        files = Path(path).glob('*.jsonl')
-        for file in files:
-            if file.name not in file_list:
+        file_names = [
+            'PaulGrahamEssays.jsonl', 'multi_needle_reasoning_en.json',
+            'multi_needle_reasoning_zh.json', 'zh_finance.jsonl',
+            'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
+            'zh_movie.jsonl', 'zh_tech.jsonl'
+        ]
+        path = get_data_path(path)
+        if os.environ.get('DATASET_SOURCE') == 'HF':
+            from huggingface_hub import snapshot_download
+            path = snapshot_download(repo_id=path, repo_type='dataset')
+        needle_file_path = os.path.join(path, needle_file_name)
+
+        for file_name in file_names:
+            file_path = os.path.join(path, file_name)
+            if file_name not in file_list:
                 continue
 
-            with open(file, 'r', encoding='utf-8') as f:
+            with open(file_path, 'r', encoding='utf-8') as f:
                 lines_bak = [json.loads(line.strip()) for line in f]
             lines = lines_bak.copy()
             for counter in range(num_repeats_per_file):
                 random.seed(counter)
                 random.shuffle(lines)
-                needle_file_path = os.path.join(path, needle_file_name)
                 random_needle = get_random_line_by_language(
                     counter, needle_file_path, language)
                 needle = '\n' + random_needle['needle'] + '\n'

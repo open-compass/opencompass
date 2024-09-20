@@ -5,9 +5,9 @@ from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
 
 with read_base():
-    # from .datasets.collections.chat_medium import datasets
-    from ..summarizers.medium import summarizer
-    from ..datasets.ceval.ceval_gen import ceval_datasets
+    # from opencompass.configs.datasets.collections.chat_medium import datasets
+    from opencompass.configs.summarizers.medium import summarizer
+    from opencompass.configs.datasets.ceval.ceval_gen import ceval_datasets
 
 datasets = [
     *ceval_datasets,

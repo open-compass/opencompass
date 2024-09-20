@@ -16,8 +16,8 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
                                model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
 
-METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth', 'f1', 'exact_match']
-METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
+METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth', 'f1', 'exact_match', 'extract_rate']
+METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len', 'type']
 
 def model_abbr_from_cfg_used_in_summarizer(model):
     if model.get('summarizer_abbr', None):
@@ -167,6 +167,8 @@ class DefaultSummarizer:
                     need_smart_metric = True
                     if sg.get('std', False):
                         default_metric = 'standard_deviation'
+                    elif sg.get('sum', False):
+                        default_metric = 'sum'
                     elif sg.get('weights', []):
                         default_metric = 'weighted_average'
                     else:
@@ -208,13 +210,16 @@ class DefaultSummarizer:
                             try:
                                 numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
                             except KeyError:
-                                tmp_scores = {metric: {k.split('@')[0]: v for k, v in scores[metric].items()} for metric in scores}
+                                tmp_scores = {metric: {k.split('@')[0]: v for k, v in scores[metric].items()}}
                                 numerator = sum(tmp_scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
                             denominator = sum(sg['weights'].values())
                         else:
                             numerator = sum(scores[metric].values())
                             denominator = len(scores[metric])
-                        scores[metric] = result[metric] = numerator / denominator
+                        if default_metric == 'sum':
+                            scores[metric] = result[metric] = numerator
+                        else:
+                            scores[metric] = result[metric] = numerator / denominator
                     eval_modes = list(set(eval_modes))
                     eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
 
@@ -226,7 +231,7 @@ class DefaultSummarizer:
 
         return raw_results, parsed_results, dataset_metrics, dataset_eval_mode
 
-    def _format_table(self, parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=None):
+    def _format_table(self, parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=None, skip_all_slash=False):
         dataset_abbrs = [dataset_abbr_from_cfg(dataset) for dataset in self.dataset_cfgs]
         prompt_version = {dataset_abbr_from_cfg(d): get_prompt_hash(d)[:6] for d in self.dataset_cfgs}
 
@@ -257,14 +262,16 @@ class DefaultSummarizer:
         table.append(header)
         for dataset_abbr, metric in summarizer_dataset_abbrs:
             if dataset_abbr not in dataset_metrics:
-                table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
+                if not skip_all_slash:
+                    table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
                 continue
             if metric is None:
                 metric = dataset_metrics[dataset_abbr][0]
             elif metric in dataset_metrics[dataset_abbr]:
                 pass
             else:
-                table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
+                if not skip_all_slash:
+                    table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
                 continue
 
             row = [dataset_abbr, prompt_version.get(dataset_abbr, '-'), metric, dataset_eval_mode.get(dataset_abbr, '-')]

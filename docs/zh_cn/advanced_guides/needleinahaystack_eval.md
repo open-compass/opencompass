@@ -6,7 +6,7 @@
 
 ## 任务介绍
 
-在`OpenCompass`的`NeedleBench`框架中，为了全面评估模型在长文本信息提取和推理方面的能力，我们设计了一系列逐渐增加难度的测试方案。
+在`OpenCompass`的`NeedleBench`框架中，为了全面评估模型在长文本信息提取和推理方面的能力，我们设计了一系列逐渐增加难度的测试方案。完整的介绍参见我们的[技术报告](https://arxiv.org/abs/2407.11963)。
 
 - **单一信息检索任务(Single-Needle Retrieval Task, S-RT)**：评估LLM在长文本中提取单一关键信息的能力，测试其对广泛叙述中特定细节的精确回忆能力。这对应于**原始的大海捞针测试**任务设定。
 
@@ -17,6 +17,8 @@
 - **祖先追溯挑战(Ancestral Trace Challenge, ATC)**：通过设计“亲属关系针”，测试LLM处理真实长文本中多层逻辑挑战的能力。在ATC任务中，通过一系列逻辑推理问题，检验模型对长文本中每个细节的记忆和分析能力，在此任务中，我们去掉了无关文本(Haystack)的设定，而是将所有文本设计为关键信息，LLM必须综合运用长文本中的所有内容和推理才能准确回答问题。
 
 ### 评估步骤
+
+> 注意：在最新代码中，OpenCompass已经设置数据集从[Huggingface的接口](https://huggingface.co/datasets/opencompass/NeedleBench)中自动加载，可以直接跳过下面的手动下载安放数据集。
 
 1. 从[这里](https://github.com/open-compass/opencompass/files/14741330/needlebench.zip)下载数据集。
 
@@ -77,11 +79,11 @@ python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --su
 
 ##### 在Slurm集群上评估
 
-如果使用 `Slurm`，可以添加 `--slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000`等参数，例如下面：
+如果使用 `Slurm`，可以添加 `--slurm -p partition_name -q reserved --max-num-workers 16 `等参数，例如下面：
 
 ```bash
 # Slurm评估
-python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 ##### 只评估子数据集
@@ -89,13 +91,13 @@ python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --su
 如果只想测试原始的大海捞针任务设定，比如可以更换数据集的参数为`needlebench_single_4k`，这对应于4k长度下的单针版本的大海捞针测试：
 
 ```bash
-python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_4k/needlebench_zh_datasets`，仅仅进行中文版本的单针4K长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py`中找到可选的子数据集变量，如：
 
 ```bash
-python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 32 --max-partition-size 8000
+python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 注意在评估前预先安装[LMDeploy](https://github.com/InternLM/lmdeploy)工具
@@ -112,8 +114,10 @@ pip install lmdeploy
 
 ```python
 from mmengine.config import read_base
+# 我们使用mmengine.config来import其他的配置文件中的变量
+
 with read_base():
-    from .models.hf_internlm.lmdeploy_internlm2_chat_7b import models as internlm2_chat_7b_200k
+    # from .models.hf_internlm.lmdeploy_internlm2_chat_7b import models as internlm2_chat_7b_200k
     from .models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
 
     # Evaluate needlebench_4k, adjust the configuration to use 8k, 32k, 128k, 200k, or 1000k if necessary.
@@ -131,7 +135,7 @@ with read_base():
 datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
 
 for m in internlm2_chat_7b:
-    m['max_seq_len'] = 32768 # 保证InternLM2-7B模型能接收到完整的长文本，其他模型需要根据各自支持的最大序列长度修改。
+    m['max_seq_len'] = 30768 # 保证InternLM2-7B模型能接收到完整的长文本，其他模型需要根据各自支持的最大序列长度修改。
     m['max_out_len'] = 2000 # 保证在多针召回任务中能接收到模型完整的回答
 
 models = internlm2_chat_7b
@@ -142,10 +146,10 @@ work_dir = './outputs/needlebench'
 当书写好测试的`config`文件后，我们可以命令行中通过`run.py`文件传入对应的config文件路径，例如：
 
 ```bash
-python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved --max-num-workers 128 --max-partition-size 8000
+python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-注意，此时我们不需传入`--dataset, --models, --summarizer `等参数，因为我们已经在config文件中定义了这些配置。你可以自己手动调节`--max-partition-size`的设定以实现最好的任务分片策略以提高评估效率。
+注意，此时我们不需传入`--dataset, --models, --summarizer `等参数，因为我们已经在config文件中定义了这些配置。你可以自己手动调节`--max-num-workers`的设定以调节并行工作的workers的数量。
 
 ### 可视化
 
@@ -154,6 +158,16 @@ python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved
 如果使用了该方法，请添加引用:
 
 ```bibtex
+
+@misc{li2024needlebenchllmsretrievalreasoning,
+      title={NeedleBench: Can LLMs Do Retrieval and Reasoning in 1 Million Context Window?},
+      author={Mo Li and Songyang Zhang and Yunxin Liu and Kai Chen},
+      year={2024},
+      eprint={2407.11963},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2407.11963},
+}
 
 @misc{2023opencompass,
     title={OpenCompass: A Universal Evaluation Platform for Foundation Models},

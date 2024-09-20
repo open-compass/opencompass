@@ -17,13 +17,13 @@ If you need to generate multiple responses for a single example to evaluate the 
 For most models that support the `num_return_sequences` parameter in HF's generation, we can use it directly to obtain multiple responses. Refer to the following configuration file:
 
 ```python
-from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
 
 with read_base():
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
     from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
 
-mbpp_datasets[0]['type'] = MBPPDataset_V2
+mbpp_datasets[0]['type'] = MBPPDatasetV2
 mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
 mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
 
@@ -59,7 +59,7 @@ You can specifically refer to the following configuration file [configs/eval_cod
 This applies to some HF models with poorly designed APIs or missing features. In this case, we need to repeatedly construct datasets to achieve multiple response effects. Refer to the following configuration:
 
 ```python
-from opencompass.datasets import MBPPDataset_V2, MBPPPassKEvaluator
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
 
 with read_base():
     from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
@@ -69,7 +69,7 @@ humaneval_datasets[0]['abbr'] = 'openai_humaneval_pass10'
 humaneval_datasets[0]['num_repeats'] = 10
 mbpp_datasets[0]['abbr'] = 'mbpp_pass10'
 mbpp_datasets[0]['num_repeats'] = 10
-mbpp_datasets[0]['type'] = MBPPDataset_V2
+mbpp_datasets[0]['type'] = MBPPDatasetV2
 mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
 mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
 

@@ -1,11 +1,11 @@
 from mmengine.config import read_base
 
 with read_base():
-    from .dataset_collections.chat_OC15 import datasets
+    from opencompass.configs.dataset_collections.chat_OC15 import datasets
 
-    from .models.hf_llama.hf_llama3_8b_instruct import models as hf_llama3_8b_instruct_model
+    from opencompass.configs.models.hf_llama.hf_llama3_8b_instruct import models as hf_llama3_8b_instruct_model
 
-    from .summarizers.chat_OC15 import summarizer
+    from opencompass.configs.summarizers.chat_OC15 import summarizer
 
 
 work_dir = 'outputs/debug/llama3-instruct'
