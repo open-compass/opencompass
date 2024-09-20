@@ -37,6 +37,18 @@ with read_base():
 #######################################################################
 # datasets list for evaluation
 
+datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
+
+
+#######################################################################
+#                       PART 2  Datset Summarizer                     #
+#######################################################################
+summarizer = dict(type=SubjectiveSummarizer, function='subjective')
+
+#######################################################################
+#                        PART 3  Models  List                         #
+#######################################################################
+
 models = [
     dict(
         type=TurboMindModelwithChatTemplate,
@@ -52,21 +64,6 @@ models = [
 ]
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], models)
-
-
-
-
-
-#######################################################################
-#                       PART 2  Datset Summarizer                     #
-#######################################################################
-summarizer = dict(type=SubjectiveSummarizer, function='subjective')
-
-#######################################################################
-#                        PART 3  Models  List                         #
-#######################################################################
-
-models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 
 
