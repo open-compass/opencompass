@@ -183,10 +183,22 @@ class BailingAPI(BaseAPIModel):
         }
         request.update(self.generation_kwargs)
         try:
-            response = self._infer_result(request, sess)
+            retry_num = 0
+            while retry_num < self.retry:
+                response = self._infer_result(request, sess)
+                if response.status_code == 200:
+                    break  # success
+                elif response.status_code == 426:
+                    retry_num += 1  # retry
+                else:
+                    raise ValueError(f"Status code = {response.status_code}")
+            else:
+                raise ValueError(
+                    f"Exceed the maximal retry times. Last status code = {response.status_code}"
+                )
         except Exception as e:
             self.logger.error(
-                f"Fail to inference request={request}; model_name={self.path};  error={traceback.format_exc()}"
+                f"Fail to inference request={request}; model_name={self.path};  error={e}, stack:{traceback.format_exc()}"
             )
             raise e
         return response
