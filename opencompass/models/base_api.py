@@ -43,7 +43,8 @@ class BaseAPIModel(BaseModel):
                  retry: int = 2,
                  max_seq_len: int = 2048,
                  meta_template: Optional[Dict] = None,
-                 generation_kwargs: Dict = dict()):
+                 generation_kwargs: Dict = dict(),
+                 verbose: bool = False):
         self.path = path
         self.max_seq_len = max_seq_len
         self.meta_template = meta_template
@@ -53,6 +54,7 @@ class BaseAPIModel(BaseModel):
         self.template_parser = APITemplateParser(meta_template)
         self.logger = get_logger()
         self.generation_kwargs = generation_kwargs
+        self.verbose = verbose
 
     @abstractmethod
     def generate(self, inputs: List[PromptType],
