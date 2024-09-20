@@ -44,6 +44,7 @@ jobs:
   daily_run_test:
     needs: build-pypi
     strategy:
+      fail-fast: false
       matrix:
         cuda_env: [dsw_cu11, dsw_cu12]
     runs-on: ${{ matrix.cuda_env }}
