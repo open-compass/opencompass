@@ -10,8 +10,7 @@ from opencompass.datasets.custom import make_custom_dataset_config
 from opencompass.models import (VLLM, HuggingFace, HuggingFaceBaseModel,
                                 HuggingFaceCausalLM, HuggingFaceChatGLM3,
                                 HuggingFacewithChatTemplate,
-                                LMDeploywithChatTemplate,
-                                VLLMwithChatTemplate)
+                                LMDeploywithChatTemplate, VLLMwithChatTemplate)
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask

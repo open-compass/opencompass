@@ -3,6 +3,11 @@
 import copy
 from typing import Dict, List, Optional, Union
 
+import numpy as np
+from lmdeploy import PytorchEngineConfig, TurbomindEngineConfig, pipeline
+from lmdeploy.version import version_info
+from transformers import AutoTokenizer
+
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
@@ -11,12 +16,6 @@ from .huggingface_above_v4_33 import (_convert_chat_messages,
                                       _format_with_fast_chat_template,
                                       _get_meta_template,
                                       _get_possible_max_seq_len)
-
-from lmdeploy.version import version_info
-from lmdeploy import pipeline, TurbomindEngineConfig, PytorchEngineConfig
-from transformers import AutoTokenizer
-import numpy as np
-
 
 PromptType = Union[PromptList, str]
 
@@ -36,6 +35,7 @@ class LMDeploywithChatTemplate(BaseModel):
         self,
         path: str,
         tokenizer_only: bool = False,
+        backend: str = 'turbomind',
         engine_config: Dict = {},
         gen_config: Dict = {},
         max_seq_len: int = None,
@@ -54,7 +54,7 @@ class LMDeploywithChatTemplate(BaseModel):
             DEFAULT_ENGING_CONFIG = {'session_len': self.max_seq_len}
             _engine_config = DEFAULT_ENGING_CONFIG.copy()
             _engine_config.update(engine_config)
-            self.pipe = self._build_pipe(path, _engine_config)
+            self.pipe = self._build_pipe(path, backend, _engine_config)
         else:
             self.pipe = None
         self.gen_config = gen_config
@@ -124,7 +124,6 @@ class LMDeploywithChatTemplate(BaseModel):
 
         if self.version_info >= (0, 6, 0):
             gen_config.stop_words = stop_words
-            gen_config.convert_stop_bad_words_to_ids(self.pipe.tokenizer)
 
         results = []
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
@@ -149,11 +148,7 @@ class LMDeploywithChatTemplate(BaseModel):
         t = self.tokenizer.apply_chat_template(m, add_generation_prompt=True, return_dict=True)
         return len(t['input_ids'])
 
-    def _build_pipe(self, model_path, engine_config):
-        assert 'backend' in engine_config, \
-                f'miss "backend" key in config {engine_config}'
-
-        backend = engine_config['backend']
+    def _build_pipe(self, model_path, backend, engine_config):
         assert backend in ['pytorch', 'turbomind'], \
                 f'unsupported backend type: {backend}'
 
@@ -163,8 +158,7 @@ class LMDeploywithChatTemplate(BaseModel):
         else:
             filtered = {k: v for k, v in engine_config.items() if hasattr(PytorchEngineConfig, k)}
             backend_config = PytorchEngineConfig(**filtered)
-
-        return pipeline(model_path, backend_config=backend_config)
+        return pipeline(model_path, backend_config=backend_config, log_level='INFO', max_log_len=10)
 
 
     def get_token_len(self, prompt: str) -> int:
@@ -177,7 +171,7 @@ class LMDeploywithChatTemplate(BaseModel):
         Applicable in both single-thread and multi-thread environments.
         """
         return self.token_bucket.get_token()
-    
+
     def get_ppl(self,
                 inputs: List[str],
                 mask_length: Optional[List[int]] = None) -> List[float]:

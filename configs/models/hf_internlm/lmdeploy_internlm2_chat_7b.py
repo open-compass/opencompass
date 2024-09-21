@@ -1,37 +1,26 @@
 from opencompass.models import LMDeploywithChatTemplate
 
-# inference backend of LMDeploy. It can be one of ['turbomind', 'pytorch']
-backend = 'turbomind'
-# the config of the inference backend
-# For the detailed config, please refer to
-# https://github.com/InternLM/lmdeploy/blob/main/lmdeploy/messages.py
-engine_config = dict(
-    backend=backend,
-    turbomind=dict(
-        max_batch_size=1,
-        tp=1,
-        quant_policy='0',
-        model_format='hf',
-        enable_prefix_caching=False,
-    ),
-    pytorch=dict(
-        max_batch_size=128,
-        tp=1,
-        enable_prefix_caching=False
-    )
-)
 
 models = [
     dict(
         type=LMDeploywithChatTemplate,
-        abbr=f'internlm2-chat-7b-{backend}',
+        abbr=f'internlm2-chat-7b-lmdeploy',
         path='internlm/internlm2-chat-7b',
-        engine_config=engine_config,
+        # inference backend of LMDeploy. It can be one of ['turbomind', 'pytorch']
+        backend='turbomind',
+        # For the detailed config, please refer to
+        # https://github.com/InternLM/lmdeploy/blob/main/lmdeploy/messages.py
+        engine_config=dict(
+            dtype='auto',
+            max_batch_size=256,
+            tp=1,
+            quant_policy=0,
+            enable_prefix_caching=False,
+        ),
         gen_config=dict(
-            top_k=1,
+            do_sample=False
         ),
         max_seq_len=8000,
-        max_out_len=1024,
         # the max number of prompts that LMDeploy receives
         # in `generate` function
         batch_size=5000,
