@@ -10,7 +10,8 @@ from opencompass.datasets.custom import make_custom_dataset_config
 from opencompass.models import (VLLM, HuggingFace, HuggingFaceBaseModel,
                                 HuggingFaceCausalLM, HuggingFaceChatGLM3,
                                 HuggingFacewithChatTemplate,
-                                LMDeploywithChatTemplate, VLLMwithChatTemplate)
+                                TurboMindModelwithChatTemplate,
+                                VLLMwithChatTemplate)
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
@@ -253,7 +254,7 @@ def change_accelerator(models, accelerator):
 
             if accelerator == 'lmdeploy':
                 logger.info(f'Transforming {model["abbr"]} to {accelerator}')
-                mod = LMDeploywithChatTemplate
+                mod = TurboMindModelwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
                     abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
@@ -308,7 +309,7 @@ def change_accelerator(models, accelerator):
                     stop_words=model.get('stop_words', []),
                 )
             elif accelerator == 'lmdeploy':
-                mod = LMDeploywithChatTemplate
+                mod = TurboMindModelwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
                     abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',

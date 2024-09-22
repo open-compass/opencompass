@@ -30,7 +30,7 @@ def valid_str(string, coding='utf-8'):
     return ret
 
 
-class LMDeploywithChatTemplate(BaseModel):
+class TurboMindModelwithChatTemplate(BaseModel):
     def __init__(
         self,
         path: str,
