@@ -23,7 +23,6 @@ from .intern_model import InternLM  # noqa: F401
 from .krgpt_api import KrGPT  # noqa: F401
 from .lightllm_api import LightllmAPI, LightllmChatAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401
-from .lmdeploy_tis import LmdeployTisModel  # noqa: F401
 from .minimax_api import MiniMax, MiniMaxChatCompletionV2  # noqa: F401
 from .mistral_api import Mistral  # noqa: F401
 from .mixtral import Mixtral  # noqa: F401
@@ -38,7 +37,6 @@ from .rendu_api import Rendu  # noqa: F401
 from .sensetime_api import SenseTime  # noqa: F401
 from .stepfun_api import StepFun  # noqa: F401
 from .turbomind import TurboMindModel  # noqa: F401
-from .turbomind_tis import TurboMindTisModel  # noqa: F401
 from .turbomind_with_tf_above_v4_33 import \
     TurboMindModelwithChatTemplate  # noqa: F401
 from .unigpt_api import UniGPT  # noqa: F401
