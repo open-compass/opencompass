@@ -127,9 +127,6 @@ class TurboMindModelwithChatTemplate(BaseModel):
         from lmdeploy.messages import GenerationConfig
         gen_config = GenerationConfig(**gen_config)
 
-        # if self.version_info >= (0, 6, 0):
-        #     gen_config.stop_words = stop_words
-
         results = []
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
         for output in outputs:
