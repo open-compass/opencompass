@@ -108,22 +108,27 @@ class TurboMindModelwithChatTemplate(BaseModel):
 
         stop_words = list(set(self.stop_words + stopping_criteria))
 
-        from lmdeploy.messages import GenerationConfig
-        gen_config = GenerationConfig(
-            max_new_tokens=max_out_len,
-            min_new_tokens=1,
-            stop_words=stop_words
-        )
-        # gen_config.update(self.gen_config)
-        if do_sample:
-            gen_config.do_sample = True
-            gen_config.top_k = 40
-            gen_config.temperature = temperature
-        else:
-            gen_config.do_sample = False
+        DEFAULT_GEN_CONFIG = {
+            'max_new_tokens': max_out_len,
+            'min_new_tokens': 1,
+            'top_k': 1,
+            'stop_words': stop_words,
+        }
 
-        if self.version_info >= (0, 6, 0):
-            gen_config.stop_words = stop_words
+        gen_config = copy.deepcopy(DEFAULT_GEN_CONFIG)
+        gen_config.update(self.gen_config)
+        if do_sample:
+            gen_config['top_k'] = 40
+            gen_config['temperature'] = temperature
+        else:
+            gen_config['do_sample'] = False
+
+
+        from lmdeploy.messages import GenerationConfig
+        gen_config = GenerationConfig(**gen_config)
+
+        # if self.version_info >= (0, 6, 0):
+        #     gen_config.stop_words = stop_words
 
         results = []
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
@@ -159,60 +164,3 @@ class TurboMindModelwithChatTemplate(BaseModel):
             filtered = {k: v for k, v in engine_config.items() if hasattr(PytorchEngineConfig, k)}
             backend_config = PytorchEngineConfig(**filtered)
         return pipeline(model_path, backend_config=backend_config, log_level='INFO', max_log_len=10)
-
-
-    def get_token_len(self, prompt: str) -> int:
-        input_ids = self.tokenizer.encode(prompt)
-        return len(input_ids)
-
-    def wait(self):
-        """Wait till the next query can be sent.
-
-        Applicable in both single-thread and multi-thread environments.
-        """
-        return self.token_bucket.get_token()
-
-    def get_ppl(self,
-                inputs: List[str],
-                mask_length: Optional[List[int]] = None) -> List[float]:
-        """Get perplexity scores given a list of inputs.
-
-        Args:
-            inputs (List[str]): A list of strings.
-            mask_length (Optional[List[int]]): A list of mask lengths. If
-                provided, the perplexity scores will be calculated with the
-                first mask_length[i] tokens masked out. It's okay to skip
-                its implementation if advanced features in PPLInfernecer is
-                not needed.
-
-        Returns:
-            np.ndarray:  The perplexity scores in shape of (N,)
-        """
-        assert isinstance(
-            inputs, List), f'List(str) is expected, but got {type(inputs)}'
-        results = []
-        for text in inputs:
-            input_ids = self.tokenizer.encode(text)
-            res = self.pipe.get_ppl(input_ids)
-            results.append(res)
-        results = np.concatenate(results)
-        return results
-
-    def get_loglikelihood(
-            self,
-            inputs: List[str],
-            conts: List[str],
-            mask_length: Optional[List[int]] = None) -> List[float]:
-        assert isinstance(
-            inputs, List), f'List(str) is expected, but got {type(inputs)}'
-        results = []
-        for text, cont in zip(inputs, conts):
-            input_ids = self.tokenizer.encode(text)
-            res = self.generators[0].get_ppl(input_ids)
-            logit_sum = res * len(input_ids)
-            input_ids = self.tokenizer.encode(text.replace(cont, ''))
-            res = self.generators[0].get_ppl(input_ids)
-            logit_part = res * len(input_ids)
-            results.append(-(logit_sum - logit_part))
-        results = np.concatenate(results)
-        return results
