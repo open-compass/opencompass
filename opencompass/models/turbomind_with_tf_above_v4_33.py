@@ -5,7 +5,6 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 from lmdeploy import PytorchEngineConfig, TurbomindEngineConfig, pipeline
-from lmdeploy.version import version_info
 from transformers import AutoTokenizer
 
 from opencompass.models.base import BaseModel
@@ -58,7 +57,6 @@ class TurboMindModelwithChatTemplate(BaseModel):
         else:
             self.pipe = None
         self.gen_config = gen_config
-        self.version_info = version_info
         self.fastchat_template = fastchat_template
         self.stop_words = list(set(stop_words + self._get_potential_stop_words(path)))
         self.logger.info(f'using stop words: {self.stop_words}')
@@ -111,7 +109,6 @@ class TurboMindModelwithChatTemplate(BaseModel):
         DEFAULT_GEN_CONFIG = {
             'max_new_tokens': max_out_len,
             'min_new_tokens': 1,
-            'top_k': 1,
             'stop_words': stop_words,
         }
 
@@ -123,8 +120,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         else:
             gen_config['do_sample'] = False
 
-
-        from lmdeploy.messages import GenerationConfig
+        from lmdeploy import GenerationConfig
         gen_config = GenerationConfig(**gen_config)
 
         results = []
