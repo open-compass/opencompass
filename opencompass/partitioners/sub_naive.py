@@ -117,8 +117,6 @@ def get_model_combinations(
         model_combinations = list(product(base_models, compare_models))
         unique_combinations = remove_duplicate_pairs(
             [combo for combo in model_combinations if combo[0] != combo[1]])
-        print(unique_combinations)
-        exit()
         return unique_combinations
     elif mode == 'fixed':
         pass
