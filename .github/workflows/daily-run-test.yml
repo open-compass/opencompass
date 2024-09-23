@@ -86,7 +86,7 @@ jobs:
           pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes modelscope --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes modelscope lmdeploy==0.6.0 --cache-dir ${{env.PIP_CACHE_PATH}}
           pip uninstall torch torchvision torchaudio -y
           pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}}
           FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu123torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
