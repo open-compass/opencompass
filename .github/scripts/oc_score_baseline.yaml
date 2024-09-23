@@ -48,6 +48,11 @@ gemma-7b-it-hf:
     race-middle: 74
     race-high: 71
 
+gemma-7b-it-vllm:
+    gsm8k: 38
+    race-middle: 75
+    race-high: 70
+
 gemma2-2b-it-hf:
     gsm8k: 62
     race-middle: 75
