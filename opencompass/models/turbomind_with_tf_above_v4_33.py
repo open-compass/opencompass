@@ -3,10 +3,6 @@
 import copy
 from typing import Dict, List, Optional, Union
 
-import numpy as np
-from lmdeploy import PytorchEngineConfig, TurbomindEngineConfig, pipeline
-from transformers import AutoTokenizer
-
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
@@ -48,6 +44,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         self.template_parser = _get_meta_template(meta_template)
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
 
+        from transformers import AutoTokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
         if not tokenizer_only:
             DEFAULT_ENGING_CONFIG = {'session_len': self.max_seq_len}
@@ -147,6 +144,9 @@ class TurboMindModelwithChatTemplate(BaseModel):
         return len(t['input_ids'])
 
     def _build_pipe(self, model_path, backend, engine_config):
+        from lmdeploy import (PytorchEngineConfig, TurbomindEngineConfig,
+                              pipeline)
+
         assert backend in ['pytorch', 'turbomind'], \
                 f'unsupported backend type: {backend}'
 
