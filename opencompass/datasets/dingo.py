@@ -18,12 +18,12 @@ class DingoDataset(BaseDataset):
     @staticmethod
     def load(path: str):
         raw_data = []
-        with open(path, encoding='utf-8') as f:
+        with open(path, encoding="utf-8") as f:
             reader = csv.reader(f, delimiter=';')
             for row in reader:
                 if len(row) < 1:
-                    row = ['']
-                raw_data.append({'input': row[0]})
+                    row = [""]
+                raw_data.append({"input": row[0]})
         return Dataset.from_list(raw_data)
 
 
@@ -33,9 +33,9 @@ class DingoLongDataset(BaseDataset):
     @staticmethod
     def load(path: str):
         raw_data = []
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, "r", encoding="utf-8") as f:
             for line in f:
-                raw_data.append({'input': json.loads(line).get('input')})
+                raw_data.append({"input": json.loads(line).get("input")})
         return Dataset.from_list(raw_data)
 
 
@@ -44,17 +44,17 @@ class DingoEvaluator(BaseEvaluator):
 
     def score(self, origin_prompt: List, predictions: List) -> dict:
         try:
-            from dingo.model.model import Model
+            # from dingo.model.model import Model
             from dingo.io import InputArgs
             from dingo.exec import Executor
         except Exception:
             raise ModuleNotFoundError(
-                '=========== dingo register fail. please try: pip install dingo-python. ===========')
+                "=========== dingo register fail. please try: pip install dingo-python. ===========")
 
-        current_time = time.strftime('%Y%m%d_%H%M%S', time.localtime())
-        file_data = [{'prompt':pmt, 'prediction':prd} for pmt, prd in zip(origin_prompt, predictions)]
-        file_name = 'dingo_file_' + current_time + '.jsonl'
-        with open(file_name, 'a', encoding='utf-8') as f:
+        current_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+        file_data = [{"prompt": pmt, "prediction": prd} for pmt, prd in zip(origin_prompt, predictions)]
+        file_name = "dingo_file_" + current_time + ".jsonl"
+        with open(file_name, "a", encoding="utf-8") as f:
             for d in file_data:
                 json.dump(d, f, ensure_ascii=False)
                 f.write('\n')
