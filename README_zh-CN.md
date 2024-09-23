@@ -218,7 +218,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
   ### 进阶设定(一般情况下默认即可)
   infer = dict(
-      partitioner=dict(type=NaivePartitioner),
+      partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
       runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=OpenICLInferTask)),
   )
   eval = dict(
