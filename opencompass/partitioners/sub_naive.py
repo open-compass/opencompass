@@ -18,6 +18,8 @@ def remove_duplicate_pairs(model_combinations):
     combo_dict = {}
     for i, combo in enumerate(model_combinations):
         sorted_names = tuple(sorted((combo[0]['abbr'], combo[1]['abbr'])))
+        if sorted_names[0] == sorted_names[1]:
+            continue
         if sorted_names not in combo_dict:
             combo_dict[sorted_names] = i
     new_model_combinations = [
@@ -115,6 +117,8 @@ def get_model_combinations(
         model_combinations = list(product(base_models, compare_models))
         unique_combinations = remove_duplicate_pairs(
             [combo for combo in model_combinations if combo[0] != combo[1]])
+        print(unique_combinations)
+        exit()
         return unique_combinations
     elif mode == 'fixed':
         pass
