@@ -2,8 +2,6 @@ import copy
 from typing import Dict, List, Optional, Union
 
 import numpy as np
-from lmdeploy import PytorchEngineConfig, TurbomindEngineConfig, pipeline
-from transformers import AutoTokenizer
 
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
@@ -60,6 +58,9 @@ class TurboMindModel(BaseModel):
                          meta_template=meta_template)
         self.logger = get_logger()
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
+        from lmdeploy import version_info
+        from transformers import AutoTokenizer
+        self.version_info = version_info
         self.tokenizer = AutoTokenizer.from_pretrained(path,
                                                        trust_remote_code=True)
 
@@ -103,9 +104,16 @@ class TurboMindModel(BaseModel):
             gen_config['top_k'] = 40
             gen_config['temperature'] = temperature
         else:
-            gen_config['do_sample'] = False
+            if self.version_info >= (0, 6, 0):
+                gen_config['do_sample'] = False
+            else:
+                gen_config['top_k'] = 1
 
         from lmdeploy import GenerationConfig
+        gen_config = {
+            k: v
+            for k, v in gen_config.items() if hasattr(GenerationConfig, k)
+        }
         gen_config = GenerationConfig(**gen_config)
 
         results = []
@@ -177,6 +185,8 @@ class TurboMindModel(BaseModel):
         assert backend in ['pytorch', 'turbomind'], \
                 f'unsupported backend type: {backend}'
 
+        from lmdeploy import (PytorchEngineConfig, TurbomindEngineConfig,
+                              pipeline)
         if backend == 'turbomind':
             filtered = {
                 k: v
