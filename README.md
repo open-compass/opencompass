@@ -206,7 +206,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
       from opencompass.configs.models.qwen.lmdeploy_qwen2_7b_instruct import models as lmdeploy_qwen2_7b_instruct
       from opencompass.configs.models.qwen.lmdeploy_qwen2_72b_instruct import models as lmdeploy_qwen2_72b_instruct
 
-  from opencompass.partitioners import NaivePartitioner
+  from opencompass.partitioners import NumWorkerPartitioner
   from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
   from opencompass.runners import LocalRunner
   from opencompass.tasks import OpenICLInferTask
