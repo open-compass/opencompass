@@ -222,7 +222,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
 
   ### Advanced Configuration
   infer = dict(
-      partitioner=dict(type=NaivePartitioner),
+    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
       runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=OpenICLInferTask)),
   )
   eval = dict(
