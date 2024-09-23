@@ -21,8 +21,6 @@ with read_base():
         models as hf_deepseek_7b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_moe_16b_chat import \
         models as hf_deepseek_moe_16b_chat_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_v2_chat import \
-        models as hf_deepseek_v2_chat_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_v2_lite_chat import \
         models as hf_deepseek_v2_lite_chat_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.vllm_deepseek_7b_chat import \

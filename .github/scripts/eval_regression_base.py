@@ -8,8 +8,6 @@ with read_base():
         race_datasets  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_moe_16b_base import \
         models as hf_deepseek_moe_16b_base_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_v2 import \
-        models as hf_deepseek_v2_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_v2_lite import \
         models as hf_deepseek_v2_lite_model  # noqa: F401, E501
     # read hf models - chat models
