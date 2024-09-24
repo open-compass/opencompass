@@ -40,6 +40,7 @@ class TurboMindAPIModel(BaseModel):
 
     def __init__(self,
                  api_addr: str = 'http://0.0.0.0:23333',
+                 api_key: str | None = None,
                  max_seq_len: int = 2048,
                  meta_template: Optional[Dict] = None,
                  end_str: Optional[str] = None,
@@ -48,7 +49,7 @@ class TurboMindAPIModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.serve.openai.api_client import APIClient
-        self.chatbot = APIClient(api_addr)
+        self.chatbot = APIClient(api_addr, api_key)
         self.model_name = self.chatbot.available_models[0]
         self.logger = get_logger()
         self.template_parser = LMTemplateParser(meta_template)

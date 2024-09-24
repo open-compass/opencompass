@@ -20,6 +20,7 @@ from .huggingface_above_v4_33 import HuggingFaceBaseModel  # noqa: F401
 from .huggingface_above_v4_33 import HuggingFacewithChatTemplate  # noqa: F401
 from .hunyuan_api import Hunyuan  # noqa: F401
 from .intern_model import InternLM  # noqa: F401
+from .interntrain import InternTrain  # noqa: F401
 from .krgpt_api import KrGPT  # noqa: F401
 from .lightllm_api import LightllmAPI, LightllmChatAPI  # noqa: F401
 from .llama2 import Llama2, Llama2Chat  # noqa: F401
@@ -37,6 +38,7 @@ from .openai_api import AsyncOpenAI   # noqa: F401
 from .openai_api import OpenAISDK  # noqa: F401
 from .pangu_api import PanGu  # noqa: F401
 from .qwen_api import Qwen  # noqa: F401
+from .rendu_api import Rendu  # noqa: F401
 from .sensetime_api import SenseTime  # noqa: F401
 from .stepfun_api import StepFun  # noqa: F401
 from .turbomind import TurboMindModel  # noqa: F401

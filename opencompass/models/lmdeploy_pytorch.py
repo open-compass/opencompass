@@ -60,8 +60,8 @@ class LmdeployPytorchModel(BaseModel):
                 engine_config.thread_safe = True
 
         if gen_config is not None:
-            from lmdeploy.messages import EngineGenerationConfig
-            gen_config = EngineGenerationConfig(**gen_config)
+            from lmdeploy.messages import GenerationConfig
+            gen_config = GenerationConfig(**gen_config)
 
         self.logger = get_logger()
         tm_model = tm.Engine(path, engine_config)
@@ -70,9 +70,27 @@ class LmdeployPytorchModel(BaseModel):
             tm_model.create_instance() for i in range(concurrency)
         ]
         self.generator_ids = [i + 1 for i in range(concurrency)]
+
+        from transformers import GenerationConfig
+        try:
+            generation_config = GenerationConfig.from_pretrained(path)
+        except Exception:
+            generation_config = None
+        if generation_config and hasattr(generation_config, 'eos_token_id'):
+            if gen_config.stop_words is None:
+                stop_words = []
+            if isinstance(generation_config.eos_token_id, int):
+                stop_words.append(generation_config.eos_token_id)
+            else:
+                assert isinstance(generation_config.eos_token_id, list)
+                for token_id in generation_config.eos_token_id:
+                    stop_words.append(token_id)
+            gen_config.stop_words = stop_words
+            if version_info >= (0, 6, 0):
+                gen_config.stop_token_ids = stop_words
         self.gen_config = gen_config
         self.end_str = end_str
-        self.major_version, self.minor_version, _ = version_info
+        self.major_version, self.minor_version = version_info[:2]
 
     def generate(
         self,
@@ -135,7 +153,7 @@ class LmdeployPytorchModel(BaseModel):
             prompt (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
-            gen_config (EngineGenerationConfig, optional): Generation
+            gen_config (GenerationConfig, optional): Generation
                 config to set arguments like top_k, top_p, temperature.
             end_str (str, optional): Whether to trim generated strings
                 with end_str if the model has special ending strings

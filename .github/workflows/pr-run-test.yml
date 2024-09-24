@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Prepare - Install opencompass
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           python3 -m pip uninstall opencompass -y
           python3 -m pip install -e . --cache-dir ${{env.USERSPACE_PREFIX}}/.cache/pip
@@ -47,7 +47,7 @@ jobs:
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run test
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           rm -rf regression_result
@@ -65,7 +65,7 @@ jobs:
       - name:  Uninstall opencompass
         if: always()
         run: |
-          eval "$(conda shell.bash hook)"
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           python3 -m pip uninstall opencompass -y
           conda info --envs

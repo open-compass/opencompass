@@ -3,7 +3,7 @@ from opencompass.models import TurboMindModelwithChatTemplate
 models = [
     dict(
         type=TurboMindModelwithChatTemplate,
-        abbr='llama-3.1-8b-instruct-turbomind',
+        abbr='llama-3_1-8b-instruct-turbomind',
         path='meta-llama/Meta-Llama-3.1-8B-Instruct',
         engine_config=dict(max_batch_size=16, tp=1),
         gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9, max_new_tokens=1024),

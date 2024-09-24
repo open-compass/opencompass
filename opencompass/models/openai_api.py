@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import re
@@ -21,6 +20,13 @@ PromptType = Union[PromptList, str]
 OPENAI_API_BASE = os.path.join(
     os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
     'chat/completions')
+
+O1_MODEL_LIST = [
+    'o1-preview-2024-09-12',
+    'o1-mini-2024-09-12',
+    'o1-preview',
+    'o1-mini',
+]
 
 
 @MODELS.register_module()
@@ -85,6 +91,8 @@ class OpenAI(BaseAPIModel):
                  temperature: Optional[float] = 0.0,
                  tokenizer_path: Optional[str] = None,
                  extra_body: Optional[Dict] = None,
+                 max_completion_tokens: int = 16384,
+                 verbose: bool = False,
                  is_chat: bool = True,
                  **kwargs):
 
@@ -93,7 +101,8 @@ class OpenAI(BaseAPIModel):
                          meta_template=meta_template,
                          query_per_second=query_per_second,
                          rpm_verbose=rpm_verbose,
-                         retry=retry)
+                         retry=retry,
+                         verbose=verbose)
         import tiktoken
         self.tiktoken = tiktoken
         self.temperature = temperature
@@ -135,6 +144,9 @@ class OpenAI(BaseAPIModel):
             self.proxy_url = openai_proxy_url
 
         self.path = path
+        self.max_completion_tokens = max_completion_tokens
+        self.logger.warning(
+            f'Max Completion tokens for {path} is :{max_completion_tokens}')
         self.is_chat = is_chat
 
     def generate(self,
@@ -287,20 +299,16 @@ class OpenAI(BaseAPIModel):
                 def remove_none_val(input_d: dict):
                     return {k: v for k, v in input_d.items() if v is not None}
                 data = remove_none_val(data)
-                print(f'>>data: {data}')
 
                 raw_response = requests.post(self.url,
                                              headers=header,
                                              data=json.dumps(data))
-
-                print(f'>>raw_response: {raw_response}')
 
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')
                 continue
             try:
                 response = raw_response.json()
-                # print(f'>> raw_resp: {raw_response.json()}')
             except requests.JSONDecodeError:
                 self.logger.error('JsonDecode error, got',
                                   str(raw_response.content))
