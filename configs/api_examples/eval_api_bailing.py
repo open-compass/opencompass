@@ -16,7 +16,7 @@ datasets = [
 models = [
     dict(
         path="Bailing-Lite-0830",
-        token="xxxxxx",  # please give your key
+        token="xxxxxx",  # set your key here or in environment variable BAILING_API_KEY
         url="https://bailingchat.alipay.com/chat/completions",
         type=BailingAPI,
         generation_kwargs={},
