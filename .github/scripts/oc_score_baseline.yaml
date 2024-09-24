@@ -249,9 +249,9 @@ gemma2-2b-hf:
     race-high: 30
 
 gemma2-9b-hf:
-    gsm8k: 8
-    race-middle: 31
-    race-high: 30
+    gsm8k: 20
+    race-middle: 42
+    race-high: 35
 
 internlm2_5-7b-hf:
     gsm8k: 47
