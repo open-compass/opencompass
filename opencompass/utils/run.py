@@ -270,7 +270,6 @@ def change_accelerator(models, accelerator):
                     max_out_len=model['max_out_len'],
                     max_seq_len=model['max_seq_len'],
                     batch_size=model['batch_size'],
-                    concurrency=model['batch_size'],
                     run_cfg=model['run_cfg'],
                 )
                 for item in ['meta_template']:
