@@ -7,18 +7,22 @@ import requests
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
+import time
+import hashlib
+import uuid
+import fake_useragent
 
 PromptType = Union[PromptList, str]
 
 
-class TeleChat(BaseAPIModel):
-    """Model wrapper around TeleChat.
+class DianXin(BaseAPIModel):
+    """Model wrapper around DianXin.
 
     Documentation:
 
     Args:
-        path (str): The name of TeleChat model.
-            e.g. `TeleChat-v2`
+        path (str): The name of DianXin model.
+            e.g. `DianXin-v2`
         key (str): Authorization key.
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
@@ -34,25 +38,24 @@ class TeleChat(BaseAPIModel):
         path: str,
         key: str,
         url: str,
+        apiKey: str = 'CA159B1FFFFA44C793B530843D8F6D12', 
+        traceId: str = 'ODNkYmZhMDItMzBmYS00MmUxLTk1Y2UtZDcxZjdiMTFmMDI0',
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
-        system_prompt: str = '',
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
-        self.headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + key,
-        }
-        self.url = url
+        
         self.model = path
-        self.system_prompt = system_prompt
-
+        self.apiKey = apiKey
+        self.key = key
+        self.url = url
+    
     def generate(
         self,
         inputs: List[PromptType],
@@ -98,31 +101,44 @@ class TeleChat(BaseAPIModel):
             messages = [{'role': 'user', 'content': input}]
         else:
             messages = []
-            msg_buffer, last_role = [], None
             for item in input:
-                item['role'] = 'assistant' if item['role'] == 'BOT' else 'user'
-                if item['role'] != last_role and last_role is not None:
-                    messages.append({
-                        'content': '\n'.join(msg_buffer),
-                        'role': last_role
-                    })
-                    msg_buffer = []
-                msg_buffer.append(item['prompt'])
-                last_role = item['role']
-            messages.append({
-                'content': '\n'.join(msg_buffer),
-                'role': last_role
-            })
+                msg = {'content': item['prompt']}
+                if item['role'] == 'HUMAN':
+                    msg['role'] = 'user'
+                elif item['role'] == 'BOT':
+                    msg['role'] = 'assistant'
+                elif item['role'] == 'SYSTEM':
+                    msg['role'] = 'system'
+                messages.append(msg)
 
-        if self.system_prompt:
-            system = {'role': 'system', 'content': self.system_prompt}
-            messages.insert(0, system)
+        self.timestamp = int(time.time())
+        traceId = uuid.uuid4()
+        # sign_str = f"{self.apiKey}-{self.key}-{traceId}-{self.timestamp}"
+        # sign = hashlib.sha256(sign_str.encode('utf-8')).hexdigest()
 
-        data = {'model': self.model, 'messages': messages}
+        # self.headers = {
+        #     'User-Agent':f'{fake_useragent.UserAgent().random}',
+        #     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
+        #     'Content-Type': 'application/json',
+        #     'App-Sign': sign,
+        # }
+        
+        data = {'model': self.model, 'messages': messages, 'traceId':str(traceId), 'timestamp':self.timestamp}
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
+            # print('headers is', self.headers)
+            print(data)
+            sign_str = f"{self.apiKey}-{self.key}-{traceId}-{self.timestamp}"
+            sign = hashlib.sha256(sign_str.encode('utf-8')).hexdigest()
+
+            self.headers = {
+                'User-Agent':f'{fake_useragent.UserAgent().random}',
+                # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
+                'Content-Type': 'application/json',
+                'App-Sign': sign,
+            }
             try:
                 raw_response = requests.request('POST',
                                                 url=self.url,
@@ -147,6 +163,7 @@ class TeleChat(BaseAPIModel):
             if raw_response.status_code == 200:
                 # msg = json.load(response.text)
                 # response
+                print(response)
                 msg = response['choices'][0]['message']['content']
                 return msg
 

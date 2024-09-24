@@ -1,5 +1,5 @@
 from mmengine.config import read_base
-from opencompass.models import TeleChat
+from opencompass.models import DianXin
 from opencompass.partitioners import NaivePartitioner
 from opencompass.runners.local_api import LocalAPIRunner
 from opencompass.tasks import OpenICLInferTask
@@ -14,15 +14,11 @@ datasets = [
 
 models = [
     dict(
-        abbr='TeleChat',
-        type=TeleChat,
-        path='TeleChat',
-        key='xxxxxx',
-        url='xxxxxx',
-        generation_kwargs={
-            'temperature': 0.1,
-            'top_p': 0.9,
-        },
+        abbr='DianXin',
+        type=DianXin,
+        path='DianXin',
+        key='870C68A2E4744F07BB0647BC1206698A',
+        url='https://150.223.245.42/csrobot/cschannels/openapi/evaluation/chat/dialog?apiKey=CA159B1FFFFA44C793B530843D8F6D12',
         query_per_second=10,
         max_out_len=2048,
         max_seq_len=2048,
@@ -36,4 +32,4 @@ infer = dict(partitioner=dict(type=NaivePartitioner),
                  concurrent_users=1,
                  task=dict(type=OpenICLInferTask)), )
 
-work_dir = 'outputs/api_telechat/'
+work_dir = 'outputs/api_DianXin/'
