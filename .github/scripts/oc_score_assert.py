@@ -22,7 +22,8 @@ chat_model_list = [
     'minicpm-2b-sft-fp32-hf', 'phi-3-mini-4k-instruct-hf',
     'qwen1.5-0.5b-chat-hf', 'qwen2-1.5b-instruct-hf', 'qwen2-7b-instruct-hf',
     'qwen2-1.5b-instruct-turbomind', 'qwen2-7b-instruct-turbomind',
-    'qwen1.5-0.5b-chat-vllm', 'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf'
+    'qwen1.5-0.5b-chat-vllm', 'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf',
+    'lmdeploy-api-test'
 ]
 base_model_list = [
     'deepseek-moe-16b-base-hf', 'deepseek-v2-lite-hf',
