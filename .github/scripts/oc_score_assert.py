@@ -25,13 +25,15 @@ chat_model_list = [
     'qwen1.5-0.5b-chat-vllm', 'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf'
 ]
 base_model_list = [
-    'deepseek-moe-16b-base-hf', 'deepseek-7b-base-turbomind',
-    'deepseek-moe-16b-base-vllm', 'internlm2_5-7b-hf', 'internlm2-7b-hf',
-    'internlm2-base-7b-hf', 'internlm2_5-7b-turbomind',
-    'internlm2-1.8b-turbomind', 'internlm2-7b-turbomind',
-    'internlm2-base-7b-hf', 'internlm2-base-7b-turbomind',
-    'llama-3-8b-turbomind', 'mistral-7b-v0.2-hf', 'mistral-7b-v0.2-vllm',
-    'qwen1.5-moe-a2.7b-hf', 'qwen2-0.5b-hf', 'qwen2-1.5b-turbomind',
+    'deepseek-moe-16b-base-hf', 'deepseek-v2-lite-hf',
+    'deepseek-7b-base-turbomind', 'deepseek-moe-16b-base-vllm', 'gemma2-2b-hf',
+    'gemma2-9b-hf', 'internlm2_5-7b-hf', 'internlm2-7b-hf',
+    'internlm2-base-7b-hf', 'internlm2-1.8b-turbomind',
+    'internlm2_5-7b-turbomind', 'internlm2-7b-turbomind',
+    'internlm2-base-7b-turbomind', 'llama-2-7b-hf', 'llama-3-8b-hf',
+    'llama-3.1-8b-turbomind', 'llama-3-8b-turbomind', 'mistral-7b-v0.3-hf',
+    'mistral-7b-v0.2-vllm', 'qwen1.5-moe-a2.7b-hf', 'qwen2-0.5b-hf',
+    'qwen2-1.5b-hf', 'qwen2-7b-hf', 'qwen2-1.5b-turbomind',
     'qwen2-7b-turbomind', 'qwen1.5-0.5b-vllm', 'yi-1.5-6b-hf', 'yi-1.5-9b-hf'
 ]
 dataset_list = ['gsm8k', 'race-middle', 'race-high']
