@@ -287,10 +287,13 @@ class OpenAI(BaseAPIModel):
                 def remove_none_val(input_d: dict):
                     return {k: v for k, v in input_d.items() if v is not None}
                 data = remove_none_val(data)
+                print(f'>>data: {data}')
 
                 raw_response = requests.post(self.url,
                                              headers=header,
                                              data=json.dumps(data))
+
+                print(f'>>raw_response: {raw_response}')
 
             except requests.ConnectionError:
                 self.logger.error('Got connection error, retrying...')
