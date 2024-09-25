@@ -38,8 +38,7 @@ class DianXin(BaseAPIModel):
         path: str,
         key: str,
         url: str,
-        apiKey: str = 'CA159B1FFFFA44C793B530843D8F6D12', 
-        traceId: str = 'ODNkYmZhMDItMzBmYS00MmUxLTk1Y2UtZDcxZjdiMTFmMDI0',
+        apiKey: str, 
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
@@ -113,32 +112,20 @@ class DianXin(BaseAPIModel):
 
         self.timestamp = int(time.time())
         traceId = uuid.uuid4()
-        # sign_str = f"{self.apiKey}-{self.key}-{traceId}-{self.timestamp}"
-        # sign = hashlib.sha256(sign_str.encode('utf-8')).hexdigest()
+        sign_str = f"{self.apiKey}-{self.key}-{traceId}-{self.timestamp}"
+        sign = hashlib.sha256(sign_str.encode('utf-8')).hexdigest()
 
-        # self.headers = {
-        #     'User-Agent':f'{fake_useragent.UserAgent().random}',
-        #     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
-        #     'Content-Type': 'application/json',
-        #     'App-Sign': sign,
-        # }
+        self.headers = {
+            'User-Agent':f'{fake_useragent.UserAgent().random}',
+            'Content-Type': 'application/json',
+            'App-Sign': sign,
+        }
         
         data = {'model': self.model, 'messages': messages, 'traceId':str(traceId), 'timestamp':self.timestamp}
 
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
-            # print('headers is', self.headers)
-            print(data)
-            sign_str = f"{self.apiKey}-{self.key}-{traceId}-{self.timestamp}"
-            sign = hashlib.sha256(sign_str.encode('utf-8')).hexdigest()
-
-            self.headers = {
-                'User-Agent':f'{fake_useragent.UserAgent().random}',
-                # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
-                'Content-Type': 'application/json',
-                'App-Sign': sign,
-            }
             try:
                 raw_response = requests.request('POST',
                                                 url=self.url,

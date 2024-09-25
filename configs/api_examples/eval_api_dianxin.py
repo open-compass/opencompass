@@ -17,12 +17,13 @@ models = [
         abbr='DianXin',
         type=DianXin,
         path='DianXin',
-        key='870C68A2E4744F07BB0647BC1206698A',
-        url='https://150.223.245.42/csrobot/cschannels/openapi/evaluation/chat/dialog?apiKey=CA159B1FFFFA44C793B530843D8F6D12',
+        key='xxxxxx',
+        apiKey='xxxxxx', 
+        url='xxxxxx',
         query_per_second=10,
         max_out_len=2048,
         max_seq_len=2048,
-        batch_size=8),
+        batch_size=1),
 ]
 
 infer = dict(partitioner=dict(type=NaivePartitioner),
