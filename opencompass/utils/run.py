@@ -44,7 +44,7 @@ def match_cfg_file(workdir: Union[str, List[str]],
         ambiguous_return_list = []
         err_msg = ('The provided pattern matches 0 or more than one '
                    'config. Please verify your pattern and try again. '
-                   'You may use tools/list_configs.py to list or '
+                   'You may use opencompass/tools/list_configs.py to list or '
                    'locate the configurations.\n')
         for p in pattern:
             files_ = _mf_with_multi_workdirs(workdir, p, fuzzy=False)

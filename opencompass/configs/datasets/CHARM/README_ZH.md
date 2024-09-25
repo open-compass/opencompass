@@ -140,13 +140,13 @@ outputs
 cd ${path_to_CHARM_repo}
 
 # 生成论文中的Table5, Table6, Table9 and Table10，详见https://arxiv.org/abs/2403.14112
-PYTHONPATH=. python tools/summarize_reasoning.py ${REASON_SUMMARY_CSV}
+PYTHONPATH=. python opencompass/tools/summarize_reasoning.py ${REASON_SUMMARY_CSV}
 
 # 生成论文中的Figure3 and Figure9，详见https://arxiv.org/abs/2403.14112
-PYTHONPATH=. python tools/summarize_mem_rea.py ${REASON_SUMMARY_CSV} ${MEMORY_SUMMARY_CSV}
+PYTHONPATH=. python opencompass/tools/summarize_mem_rea.py ${REASON_SUMMARY_CSV} ${MEMORY_SUMMARY_CSV}
 
 # 生成论文中的Table7, Table12, Table13 and Figure11，详见https://arxiv.org/abs/2403.14112
-PYTHONPATH=. python tools/analyze_mem_indep_rea.py data/CHARM ${REASON_RESULTS_DIR} ${MEMORY_SUMMARY_DIR} ${MEMORY_SUMMARY_CSV}
+PYTHONPATH=. python opencompass/tools/analyze_mem_indep_rea.py data/CHARM ${REASON_RESULTS_DIR} ${MEMORY_SUMMARY_DIR} ${MEMORY_SUMMARY_CSV}
 ```
 
 ## 🖊️ 引用

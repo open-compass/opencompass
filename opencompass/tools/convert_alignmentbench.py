@@ -56,8 +56,8 @@ def process_jsonl(file_path):
                 'others': {
                     'subcategory': json_data['subcategory'],
                     'reference': json_data['reference'],
-                    'question_id': json_data['question_id']
-                }
+                    'question_id': json_data['question_id'],
+                },
             }
             new_data.append(new_dict)
     return new_data
@@ -68,8 +68,8 @@ def save_as_json(data, output_file='./alignment_bench.json'):
         json.dump(data, file, indent=4, ensure_ascii=False)
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='File Converter')
+def parse_args(parser):
+
     parser.add_argument('--mode',
                         default='json',
                         help='The mode of convert to json or convert to csv')
@@ -80,15 +80,20 @@ def parse_args():
                         default='./alignment_bench.json',
                         help='The results json path')
     parser.add_argument('--exp-folder', help='The results json name')
-    args = parser.parse_args()
-    return args
+    return parser
 
 
-if __name__ == '__main__':
-    args = parse_args()
+def main(args):
     mode = args.mode
     if mode == 'json':
         processed_data = process_jsonl(args.jsonl)
         save_as_json(processed_data, args.json)
     elif mode == 'csv':
         extract_predictions_from_json(args.exp_folder)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='File Converter')
+    parser = parse_args(parser)
+    args = parser.parse_args()
+    main(args)

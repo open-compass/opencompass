@@ -9,16 +9,13 @@ from mmengine.config import Config, ConfigDict
 from opencompass.utils import build_dataset_from_cfg, get_infer_output_path
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Merge patitioned predictions')
+def parse_args(parser):
     parser.add_argument('config', help='Train config file path')
     parser.add_argument('-w', '--work-dir', default=None, type=str)
     parser.add_argument('-r', '--reuse', default='latest', type=str)
     parser.add_argument('-c', '--clean', action='store_true')
     parser.add_argument('-f', '--force', action='store_true')
-    args = parser.parse_args()
-    return args
+    return parser
 
 
 class PredictionMerger:
@@ -84,8 +81,7 @@ def dispatch_tasks(cfg):
             }).run()
 
 
-def main():
-    args = parse_args()
+def main(args):
     cfg = Config.fromfile(args.config)
     # set work_dir
     if args.work_dir is not None:
@@ -113,4 +109,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Merge patitioned predictions')
+    parser = parse_args(parser)
+    args = parser.parse_args()
+    main(args)

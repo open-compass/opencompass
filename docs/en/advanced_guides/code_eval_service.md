@@ -120,7 +120,7 @@ In OpenCompass's tools folder, there is a script called `collect_code_preds.py` 
 It is the same with `-r` option in `run.py`. More details can be referred through the [documentation](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html#launching-evaluation).
 
 ```shell
-python tools/collect_code_preds.py [config] [-r latest]
+python opencompass/tools/collect_code_preds.py [config] [-r latest]
 ```
 
 The collected results will be organized as following under the `-r` folder:

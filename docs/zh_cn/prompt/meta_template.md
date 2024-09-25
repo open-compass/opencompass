@@ -260,4 +260,4 @@ meta_template=dict(
 
 ## 调试
 
-如果需要调试 prompt，建议在准备好配置文件后，使用 `tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读[这里](../tools.md#prompt-viewer)了解更多。
+如果需要调试 prompt，建议在准备好配置文件后，使用 `opencompass/tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读[这里](../tools.md#prompt-viewer)了解更多。

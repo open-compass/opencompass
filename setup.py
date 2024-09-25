@@ -155,6 +155,7 @@ def do_setup():
         entry_points={
             'console_scripts': [
                 'opencompass = opencompass.cli.main:main',
+                'opencompass-tool = opencompass.cli.tool_main:main',
             ],
         },
     )

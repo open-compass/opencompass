@@ -6,6 +6,22 @@ import os
 from mmengine.logging import MMLogger
 
 
+def parse_args(parser):
+    parser.add_argument('folder1', help='Path to the first folder')
+    parser.add_argument('folder2', help='Path to the second folder')
+    parser.add_argument(
+        '--extensions',
+        nargs='+',
+        default=['.py', '.json', '.md', '.yml', '.txt'],
+        help='File extensions to compare (default: .py .json .md .yml .txt)',
+    )
+    parser.add_argument('--ignore',
+                        nargs='+',
+                        default=[],
+                        help='Folder of ignored case')
+    return parser
+
+
 def get_files(folder, extensions, ignore_folder=[]):
     """Get all file paths in the folder with specified extensions."""
     files = []
@@ -43,8 +59,8 @@ def compare_folders(folder1, folder2, extensions, ignore_folder):
     common_files = files1 & files2
 
     if only_in_folder1:
-        message = f'Only in {folder1}: {only_in_folder1}, '\
-            'please copy files into {folder2}'
+        message = (f'Only in {folder1}: {only_in_folder1}, '
+                   'please copy files into {folder2}')
         raise ValueError(message)
     if only_in_folder2:
         print(f'Only in {folder2}: {only_in_folder2}')
@@ -61,24 +77,13 @@ def compare_folders(folder1, folder2, extensions, ignore_folder):
             # logger.info(f"Files are the same: {file1} and {file2}")
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Compare specified files in two folders')
-    parser.add_argument('folder1', help='Path to the first folder')
-    parser.add_argument('folder2', help='Path to the second folder')
-    parser.add_argument(
-        '--extensions',
-        nargs='+',
-        default=['.py', '.json', '.md', '.yml', '.txt'],
-        help='File extensions to compare (default: .py .json .md .yml .txt)')
-    parser.add_argument('--ignore',
-                        nargs='+',
-                        default=[],
-                        help='Folder of ignored case')
-    args = parser.parse_args()
-
+def main(args):
     compare_folders(args.folder1, args.folder2, args.extensions, args.ignore)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Compare specified files in two folders')
+    parser = parse_args(parser)
+    args = parser.parse_args()
+    main(args)

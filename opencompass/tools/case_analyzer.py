@@ -12,26 +12,28 @@ from opencompass.registry import TEXT_POSTPROCESSORS
 from opencompass.utils import build_dataset_from_cfg, get_infer_output_path
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='Run case analyzer')
+def parse_args(parser):
+
     parser.add_argument('config', help='Train config file path')
     parser.add_argument(
         '-f',
         '--force',
         help='Force to run the task even if the results already exist',
         action='store_true',
-        default=False)
-    parser.add_argument('-w',
-                        '--work-dir',
-                        help='Work path, all the outputs will be '
-                        'saved in this path, including the slurm logs, '
-                        'the evaluation results, the summary results, etc.'
-                        'If not specified, the work_dir will be set to '
-                        './outputs/default.',
-                        default=None,
-                        type=str)
-    args = parser.parse_args()
-    return args
+        default=False,
+    )
+    parser.add_argument(
+        '-w',
+        '--work-dir',
+        help='Work path, all the outputs will be '
+        'saved in this path, including the slurm logs, '
+        'the evaluation results, the summary results, etc.'
+        'If not specified, the work_dir will be set to '
+        './outputs/default.',
+        default=None,
+        type=str,
+    )
+    return parser
 
 
 class BadcaseShower:
@@ -126,7 +128,7 @@ class BadcaseShower:
                     'prediction_PPL': pred_PPL,
                     'reference_prompt': ref_prompt,
                     'reference': ref_str,
-                    'reference_PPL': ref_PPL
+                    'reference_PPL': ref_PPL,
                 }
                 if pred_str != ref_str:
                     badcase.append(item)
@@ -143,7 +145,7 @@ class BadcaseShower:
                 item = {
                     'origin_prompt': origin_prompt,
                     'prediction': pred_str,
-                    'reference': ref_str
+                    'reference': ref_str,
                 }
                 # FIXME: we now consider all cases as bad cases
                 badcase.append(item)
@@ -151,15 +153,19 @@ class BadcaseShower:
 
         # Save result
         out_path = get_infer_output_path(
-            self.cfg['model'], self.cfg['dataset'],
-            osp.join(self.work_dir, 'case_analysis/bad'))
+            self.cfg['model'],
+            self.cfg['dataset'],
+            osp.join(self.work_dir, 'case_analysis/bad'),
+        )
         mkdir_or_exist(osp.split(out_path)[0])
         with open(out_path, 'w', encoding='utf-8') as f:
             json.dump(badcase, f, indent=4, ensure_ascii=False)
 
         out_path = get_infer_output_path(
-            self.cfg['model'], self.cfg['dataset'],
-            osp.join(self.work_dir, 'case_analysis/all'))
+            self.cfg['model'],
+            self.cfg['dataset'],
+            osp.join(self.work_dir, 'case_analysis/all'),
+        )
         mkdir_or_exist(osp.split(out_path)[0])
         with open(out_path, 'w', encoding='utf-8') as f:
             json.dump(allcase, f, indent=4, ensure_ascii=False)
@@ -179,8 +185,7 @@ def dispatch_tasks(cfg, force=False):
                 }).run()
 
 
-def main():
-    args = parse_args()
+def main(args):
     cfg = Config.fromfile(args.config)
     # set work_dir
     if args.work_dir is not None:
@@ -191,4 +196,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Run case analyzer')
+    parser = parse_args(parser)
+    args = parser.parse_args()
+    main(args)

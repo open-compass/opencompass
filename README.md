@@ -174,6 +174,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
 
   ```bash
   # CLI
+
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
   # Python scripts
@@ -215,9 +216,12 @@ After ensuring that OpenCompass is installed correctly according to the above st
 
   ```bash
   # List all configurations
-  python tools/list_configs.py
+  opencompass-tool list-configs
+  # It is equal to: python opencompass/tools/list_configs.py
+
   # List all configurations related to llama and mmlu
-  python tools/list_configs.py llama mmlu
+  opencompass-tool list-configs llama mmlu
+  # python opencompass/tools/list_configs.py llama mmlu
   ```
 
   If the model is not on the list but supported by Huggingface AutoModel class, you can also evaluate it with OpenCompass. You are welcome to contribute to the maintenance of the OpenCompass supported model and dataset lists.

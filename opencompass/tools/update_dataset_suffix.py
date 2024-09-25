@@ -40,17 +40,19 @@ def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
     # for regular datasets
     if 'reader_cfg' in dataset_cfg.infer_cfg:
         # new config
-        reader_cfg = dict(type='DatasetReader',
-                          input_columns=dataset_cfg.reader_cfg.input_columns,
-                          output_column=dataset_cfg.reader_cfg.output_column)
+        reader_cfg = dict(
+            type='DatasetReader',
+            input_columns=dataset_cfg.reader_cfg.input_columns,
+            output_column=dataset_cfg.reader_cfg.output_column,
+        )
         dataset_cfg.infer_cfg.reader = reader_cfg
         if 'train_split' in dataset_cfg.infer_cfg.reader_cfg:
             dataset_cfg.infer_cfg.retriever[
                 'index_split'] = dataset_cfg.infer_cfg['reader_cfg'][
                     'train_split']
         if 'test_split' in dataset_cfg.infer_cfg.reader_cfg:
-            dataset_cfg.infer_cfg.retriever[
-                'test_split'] = dataset_cfg.infer_cfg.reader_cfg.test_split
+            dataset_cfg.infer_cfg.retriever['test_split'] = (
+                dataset_cfg.infer_cfg.reader_cfg.test_split)
         for k, v in dataset_cfg.infer_cfg.items():
             dataset_cfg.infer_cfg[k]['type'] = v['type'].split('.')[-1]
     # A compromise for the hash consistency
@@ -106,13 +108,14 @@ def update_imports(data):
             # print(f"Updated imports in {python_file}")
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def parse_args(parser):
     parser.add_argument('python_files', nargs='*')
     # Could be opencompass/configs/datasets and configs/datasets
     parser.add_argument('--root_folder', default='configs/datasets')
-    args = parser.parse_args()
+    return parser
 
+
+def main(args):
     root_folder = args.root_folder
     if args.python_files:
         python_files = [
@@ -137,4 +140,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Test if a given API model wrapper works properly')
+    parser = parse_args(parser)
+    args = parser.parse_args()
+    main(args)

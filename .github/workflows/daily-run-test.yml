@@ -97,7 +97,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           export from_tf=TRUE
-          python tools/list_configs.py internlm2_5 mmlu
+          python opencompass/tools/list_configs.py internlm2_5 mmlu
           python run.py --models hf_internlm2_5_7b --datasets race_ppl --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1 --reuse
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1/*/summary regression_result_daily
           python -m pytest -m case1 -s -v --color=yes .github/scripts/oc_score_assert.py

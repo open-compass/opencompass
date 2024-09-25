@@ -43,7 +43,7 @@ OpenCompass 默认使用 num_worker_partitioner。OpenCompass 的评测从本质
 
 根据上述过程，有如下推论：
 
-- 在已有输出文件夹的基础上断点继续时，不可以更换 partitioner 的切片方式，或者不可以修改 `--max-num-workers` 的入参。(除非使用了 `tools/prediction_merger.py` 工具)
+- 在已有输出文件夹的基础上断点继续时，不可以更换 partitioner 的切片方式，或者不可以修改 `--max-num-workers` 的入参。(除非使用了 `opencompass/tools/prediction_merger.py` 工具)
 - 如果数据集有了任何修改，不要断点继续，或者根据需要将原有的输出文件进行删除后，全部重跑。
 
 ### OpenCompass 如何分配 GPU？

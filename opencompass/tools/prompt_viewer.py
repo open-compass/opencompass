@@ -15,9 +15,7 @@ from opencompass.utils import (Menu, build_dataset_from_cfg,
                                model_abbr_from_cfg)
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='View generated prompts based on datasets (and models)')
+def parse_args(parser):
     parser.add_argument('config', help='Train config file path')
     parser.add_argument('-n', '--non-interactive', action='store_true')
     parser.add_argument('-a', '--all', action='store_true')
@@ -30,8 +28,7 @@ def parse_args():
                         type=int,
                         default=1,
                         help='Number of prompts to print')
-    args = parser.parse_args()
-    return args
+    return parser
 
 
 def parse_model_cfg(model_cfg: ConfigDict) -> Dict[str, ConfigDict]:
@@ -81,8 +78,13 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
     ice_idx_list = retriever.retrieve()
 
     supported_inferencer = [
-        AgentInferencer, PPLInferencer, GenInferencer, CLPInferencer,
-        PPLOnlyInferencer, ChatInferencer, LLInferencer
+        AgentInferencer,
+        PPLInferencer,
+        GenInferencer,
+        CLPInferencer,
+        PPLOnlyInferencer,
+        ChatInferencer,
+        LLInferencer,
     ]
     if infer_cfg.inferencer.type not in supported_inferencer:
         print(f'Only {supported_inferencer} are supported')
@@ -107,15 +109,18 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
                     label,
                     ice_template=ice_template,
                     prompt_template=prompt_template,
-                    remain_sep=None)
+                    remain_sep=None,
+                )
                 if max_seq_len is not None:
                     prompt_token_num = model.get_token_len_from_template(
                         prompt)
                     while len(ice_idx_list[idx]
                               ) > 0 and prompt_token_num > max_seq_len:
                         num_ice = len(ice_idx_list[idx])
-                        print(f'Truncating ice {num_ice} -> {num_ice - 1}',
-                              f'Number of tokens: {prompt_token_num} -> ...')
+                        print(
+                            f'Truncating ice {num_ice} -> {num_ice - 1}',
+                            f'Number of tokens: {prompt_token_num} -> ...',
+                        )
                         ice_idx_list[idx] = ice_idx_list[idx][:-1]
                         ice = retriever.generate_ice(ice_idx_list[idx],
                                                      ice_template=ice_template)
@@ -124,7 +129,8 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
                             ice,
                             label,
                             ice_template=ice_template,
-                            prompt_template=prompt_template)
+                            prompt_template=prompt_template,
+                        )
                         prompt_token_num = model.get_token_len_from_template(
                             prompt)
                     print(f'Number of tokens: {prompt_token_num}')
@@ -145,13 +151,16 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
                 gen_field_replace_token=infer_cfg.inferencer.get(
                     'gen_field_replace_token', ''),
                 ice_template=ice_template,
-                prompt_template=prompt_template)
+                prompt_template=prompt_template,
+            )
             if max_seq_len is not None:
                 prompt_token_num = model.get_token_len_from_template(prompt)
                 while len(ice_idx) > 0 and prompt_token_num > max_seq_len:
                     num_ice = len(ice_idx)
-                    print(f'Truncating ice {num_ice} -> {num_ice - 1}',
-                          f'Number of tokens: {prompt_token_num} -> ...')
+                    print(
+                        f'Truncating ice {num_ice} -> {num_ice - 1}',
+                        f'Number of tokens: {prompt_token_num} -> ...',
+                    )
                     ice_idx = ice_idx[:-1]
                     ice = retriever.generate_ice(ice_idx,
                                                  ice_template=ice_template)
@@ -161,7 +170,8 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
                         gen_field_replace_token=infer_cfg.inferencer.get(
                             'gen_field_replace_token', ''),
                         ice_template=ice_template,
-                        prompt_template=prompt_template)
+                        prompt_template=prompt_template,
+                    )
                     prompt_token_num = model.get_token_len_from_template(
                         prompt)
                 print(f'Number of tokens:  {prompt_token_num}')
@@ -174,8 +184,7 @@ def print_prompts(model_cfg, dataset_cfg, count=1):
             print('-' * 100)
 
 
-def main():
-    args = parse_args()
+def main(args):
     cfg = Config.fromfile(args.config)
     # cfg.models =
     model2cfg = parse_model_cfg(cfg.models) if 'models' in cfg else {
@@ -201,10 +210,12 @@ def main():
         if not args.non_interactive:
             model, dataset = Menu(
                 [list(model2cfg.keys()),
-                 list(dataset2cfg.keys())], [
-                     f'Please make a selection of {s}:'
-                     for s in ['model', 'dataset']
-                 ]).run()
+                 list(dataset2cfg.keys())],
+                [
+                    f'Please make a selection of {s}:'
+                    for s in ['model', 'dataset']
+                ],
+            ).run()
         else:
             model = list(model2cfg.keys())[0]
             dataset = list(dataset2cfg.keys())[0]
@@ -224,4 +235,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='View generated prompts based on datasets (and models)')
+    parser = parse_args(parser)
+    args = parser.parse_args()
+    main(args)

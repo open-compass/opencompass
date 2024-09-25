@@ -7,7 +7,7 @@ This tool allows you to directly view the generated prompt without starting the 
 Running method:
 
 ```bash
-python tools/prompt_viewer.py CONFIG_PATH [-n] [-a] [-p PATTERN]
+python opencompass/tools/prompt_viewer.py CONFIG_PATH [-n] [-a] [-p PATTERN]
 ```
 
 - `-n`: Do not enter interactive mode, select the first model (if any) and dataset by default.
@@ -21,7 +21,7 @@ Based on existing evaluation results, this tool produces inference error samples
 Running method:
 
 ```bash
-python tools/case_analyzer.py CONFIG_PATH [-w WORK_DIR]
+python opencompass/tools/case_analyzer.py CONFIG_PATH [-w WORK_DIR]
 ```
 
 - `-w`: Work path, default is `'./outputs/default'`.
@@ -55,7 +55,7 @@ This tool can quickly test whether the functionality of the API model is normal.
 Running method:
 
 ```bash
-python tools/test_api_model.py [CONFIG_PATH] -n
+python opencompass/tools/test_api_model.py [CONFIG_PATH] -n
 ```
 
 ## Prediction Merger
@@ -65,7 +65,7 @@ This tool can merge patitioned predictions.
 Running method:
 
 ```bash
-python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
+python opencompass/tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
 ```
 
 - `-w`: Work path, default is `'./outputs/default'`.
@@ -77,7 +77,7 @@ This tool can list or search all available model and dataset configurations. It 
 Usage:
 
 ```bash
-python tools/list_configs.py [PATTERN1] [PATTERN2] [...]
+python opencompass/tools/list_configs.py [PATTERN1] [PATTERN2] [...]
 ```
 
 If executed without any parameters, it will list all model configurations in the `configs/models` and `configs/dataset` directories by default.
@@ -85,7 +85,7 @@ If executed without any parameters, it will list all model configurations in the
 Users can also pass any number of parameters. The script will list all configurations related to the provided strings, supporting fuzzy search and the use of the * wildcard. For example, the following command will list all configurations related to `mmlu` and `llama`:
 
 ```bash
-python tools/list_configs.py mmlu llama
+python opencompass/tools/list_configs.py mmlu llama
 ```
 
 Its output could be:
@@ -129,5 +129,5 @@ This tool can quickly modify the suffixes of configuration files located under t
 How to run:
 
 ```bash
-python tools/update_dataset_suffix.py
+python opencompass/tools/update_dataset_suffix.py
 ```

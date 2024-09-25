@@ -118,7 +118,7 @@ humanevalx_datasets = [
 OpenCompass 在 `tools` 中提供了 `collect_code_preds.py` 脚本对推理结果进行后处理并收集，我们只需要提供启动任务时的配置文件，以及指定复用对应任务的工作目录，其配置与 `run.py` 中的 `-r` 一致，细节可参考[文档](https://opencompass.readthedocs.io/zh-cn/latest/get_started/quick_start.html#id4)。
 
 ```shell
-python tools/collect_code_preds.py [config] [-r latest]
+python opencompass/tools/collect_code_preds.py [config] [-r latest]
 ```
 
 收集到的结果将会按照以下的目录结构保存到 `-r` 对应的工作目录中：
@@ -201,7 +201,7 @@ curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' -F 'debug=er
 ### 修改后处理
 
 1. 本地评测中，可以按照支持新数据集教程中的后处理部分来修改后处理方法；
-2. 异地评测中，可以修改 `tools/collect_code_preds.py` 中的后处理部分；
+2. 异地评测中，可以修改 `opencompass/tools/collect_code_preds.py` 中的后处理部分；
 3. 代码评测服务中，存在部分后处理也可以进行修改，详情参考下一部分教程；
 
 ### 代码评测服务 Debug

@@ -202,15 +202,18 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
   ```
 
-  OpenCompass 预定义了许多模型和数据集的配置，你可以通过 [工具](./docs/zh_cn/tools.md#ListConfigs) 列出所有可用的模型和数据集配置。
-
 - ### 支持的模型
+
+  OpenCompass 预定义了许多模型和数据集的配置，你可以通过OpenCompass提供的[工具](./docs/zh_cn/tools.md#ListConfigs) 列出所有可用的模型和数据集配置。
 
   ```bash
   # 列出所有配置
-  python tools/list_configs.py
+  opencompass-tool list-configs
+  # It is equal to: python opencompass/tools/list_configs.py
+
   # 列出所有跟 llama 及 mmlu 相关的配置
-  python tools/list_configs.py llama mmlu
+  opencompass-tool list-configs llama mmlu
+  # python opencompass/tools/list_configs.py llama mmlu
   ```
 
   如果模型不在列表中但支持 Huggingface AutoModel 类，您仍然可以使用 OpenCompass 对其进行评估。欢迎您贡献维护 OpenCompass 支持的模型和数据集列表。

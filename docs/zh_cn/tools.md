@@ -7,7 +7,7 @@
 运行方式：
 
 ```bash
-python tools/prompt_viewer.py CONFIG_PATH [-n] [-a] [-p PATTERN]
+python opencompass/tools/prompt_viewer.py CONFIG_PATH [-n] [-a] [-p PATTERN]
 ```
 
 - `-n`: 不进入交互模式，默认选择第一个 model （如有）和 dataset。
@@ -21,7 +21,7 @@ python tools/prompt_viewer.py CONFIG_PATH [-n] [-a] [-p PATTERN]
 运行方式：
 
 ```bash
-python tools/case_analyzer.py CONFIG_PATH [-w WORK_DIR]
+python opencompass/tools/case_analyzer.py CONFIG_PATH [-w WORK_DIR]
 ```
 
 - `-w`：工作路径，默认为 `'./outputs/default'`。
@@ -64,7 +64,7 @@ python tools/case_analyzer.py CONFIG_PATH [-w WORK_DIR]
 运行方式：
 
 ```bash
-python tools/test_api_model.py [CONFIG_PATH] -n
+python opencompass/tools/test_api_model.py [CONFIG_PATH] -n
 ```
 
 ## Prediction Merger
@@ -74,7 +74,7 @@ python tools/test_api_model.py [CONFIG_PATH] -n
 运行方式：
 
 ```bash
-python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
+python opencompass/tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
 ```
 
 - `-w`：工作路径，默认为 `'./outputs/default'`。
@@ -86,7 +86,7 @@ python tools/prediction_merger.py CONFIG_PATH [-w WORK_DIR]
 运行方式：
 
 ```bash
-python tools/list_configs.py [PATTERN1] [PATTERN2] [...]
+python opencompass/tools/list_configs.py [PATTERN1] [PATTERN2] [...]
 ```
 
 若运行时不加任何参数，则默认列出所有在 `configs/models` 和 `configs/dataset` 下的模型配置。
@@ -94,7 +94,7 @@ python tools/list_configs.py [PATTERN1] [PATTERN2] [...]
 用户同样可以传入任意数量的参数，脚本会列出所有跟传入字符串相关的配置，支持模糊搜索及 * 号匹配。如下面的命令会列出所有跟 `mmlu` 和 `llama` 相关的配置：
 
 ```bash
-python tools/list_configs.py mmlu llama
+python opencompass/tools/list_configs.py mmlu llama
 ```
 
 它的输出可以是：
@@ -138,5 +138,5 @@ python tools/list_configs.py mmlu llama
 运行方式：
 
 ```bash
-python tools/update_dataset_suffix.py
+python opencompass/tools/update_dataset_suffix.py
 ```
