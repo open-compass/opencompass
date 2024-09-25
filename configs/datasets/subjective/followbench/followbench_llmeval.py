@@ -15,7 +15,7 @@ subjective_all_sets = [
 ]
 data_path ='data/subjective/followbench/converted_data'
 
-followbench_llmeval_dataset = []
+followbench_llmeval_datasets = []
 
 for _name in subjective_all_sets:
     subjective_infer_cfg = dict(
@@ -48,7 +48,7 @@ for _name in subjective_all_sets:
         pred_role='BOT',
     )
 
-    followbench_llmeval_dataset.append(
+    followbench_llmeval_datasets.append(
         dict(
             abbr=f'{_name}',
             type=FollowBenchDataset,
