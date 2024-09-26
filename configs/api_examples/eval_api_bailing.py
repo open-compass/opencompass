@@ -15,9 +15,9 @@ datasets = [
 
 models = [
     dict(
-        path="Bailing-Lite-0830",
-        token="xxxxxx",  # set your key here or in environment variable BAILING_API_KEY
-        url="https://bailingchat.alipay.com/chat/completions",
+        path='Bailing-Lite-0830',
+        token='xxxxxx',  # set your key here or in environment variable BAILING_API_KEY
+        url='https://bailingchat.alipay.com/chat/completions',
         type=BailingAPI,
         generation_kwargs={},
         query_per_second=1,
@@ -35,4 +35,4 @@ infer = dict(
     ),
 )
 
-work_dir = "outputs/api_bailing/"
+work_dir = 'outputs/api_bailing/'
