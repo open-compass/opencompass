@@ -211,7 +211,7 @@ class BailingAPI(BaseAPIModel):
             raise e
         return response
 
-    @retry(stop_max_attempt_number=3, wait_fixed=16000)  # ms
+    # @retry(stop_max_attempt_number=3, wait_fixed=16000)  # ms
     def _infer_result(self, request, sess):
         response = sess.request(
             'POST',
