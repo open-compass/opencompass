@@ -3,6 +3,7 @@ from .ai360_api import AI360GPT  # noqa: F401
 from .alaya import AlayaLM  # noqa: F401
 from .baichuan_api import BaiChuan  # noqa: F401
 from .baidu_api import ERNIEBot  # noqa: F401
+from .bailing_api_oc import BailingAPI  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa: F401
 from .base_api import APITemplateParser, BaseAPIModel  # noqa: F401
 from .bytedance_api import ByteDance  # noqa: F401
@@ -41,8 +42,7 @@ from .sensetime_api import SenseTime  # noqa: F401
 from .stepfun_api import StepFun  # noqa: F401
 from .turbomind import TurboMindModel  # noqa: F401
 from .turbomind_tis import TurboMindTisModel  # noqa: F401
-from .turbomind_with_tf_above_v4_33 import \
-    TurboMindModelwithChatTemplate  # noqa: F401
+from .turbomind_with_tf_above_v4_33 import TurboMindModelwithChatTemplate  # noqa: F401
 from .unigpt_api import UniGPT  # noqa: F401
 from .vllm import VLLM  # noqa: F401
 from .vllm_with_tf_above_v4_33 import VLLMwithChatTemplate  # noqa: F401
