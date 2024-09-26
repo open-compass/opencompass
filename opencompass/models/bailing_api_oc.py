@@ -13,7 +13,6 @@ try:
     from retrying import retry
 except ImportError:
     retry = None
-    print('please install retrying by `pip install retrying`')
 
 from opencompass.utils.prompt import PromptList
 
