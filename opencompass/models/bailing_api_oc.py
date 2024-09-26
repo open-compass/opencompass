@@ -7,8 +7,13 @@ from typing import Dict, List, Optional, Union
 
 import requests
 from requests.adapters import HTTPAdapter
-from retrying import retry
 from urllib3.connection import HTTPConnection
+
+try:
+    from retrying import retry
+except ImportError:
+    retry = None
+    print('please install retrying by `pip install retrying`')
 
 from opencompass.utils.prompt import PromptList
 
