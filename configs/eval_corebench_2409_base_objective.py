@@ -81,7 +81,7 @@ core_summary_groups = [
             ['drop', 'accuracy'],
             ['math', 'accuracy'],
             ['gsm8k', 'accuracy'],
-            ['mathbench-t (average)', 'naive_average']
+            ['mathbench-t (average)', 'naive_average'],
             ['GPQA_diamond', 'accuracy'],
             ['openai_humaneval', 'humaneval_pass@1'],
             ['IFEval', 'Prompt-level-strict-accuracy'],
@@ -101,7 +101,7 @@ summarizer = dict(
         ['drop', 'accuracy'],
         ['math', 'accuracy'],
         ['gsm8k', 'accuracy'],
-        ['mathbench-t (average)', 'naive_average']
+        ['mathbench-t (average)', 'naive_average'],
         ['GPQA_diamond', 'accuracy'],
         ['openai_humaneval', 'humaneval_pass@1'],
         ['IFEval', 'Prompt-level-strict-accuracy'],
@@ -185,4 +185,4 @@ eval = dict(
 #                      PART 5  Utils Configuaration                   #
 #######################################################################
 base_exp_dir = 'outputs/corebench_2409_objective/'
-work_dir = osp.join(base_exp_dir, 'chat_objective')
+work_dir = osp.join(base_exp_dir, 'base_objective')
