@@ -7,8 +7,13 @@ from typing import Dict, List, Optional, Union
 
 import requests
 from requests.adapters import HTTPAdapter
-from retrying import retry
 from urllib3.connection import HTTPConnection
+
+try:
+    from retrying import retry
+except ImportError:
+    retry = None
+    print('please install retrying by `pip install retrying`')
 
 from opencompass.utils.prompt import PromptList
 
@@ -18,6 +23,7 @@ PromptType = Union[PromptList, str]
 
 
 class HTTPAdapterWithSocketOptions(HTTPAdapter):
+
     def __init__(self, *args, **kwargs):
         self._socket_options = HTTPConnection.default_socket_options + [
             (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
@@ -29,8 +35,9 @@ class HTTPAdapterWithSocketOptions(HTTPAdapter):
 
     def init_poolmanager(self, *args, **kwargs):
         if self._socket_options is not None:
-            kwargs["socket_options"] = self._socket_options
-        super(HTTPAdapterWithSocketOptions, self).init_poolmanager(*args, **kwargs)
+            kwargs['socket_options'] = self._socket_options
+        super(HTTPAdapterWithSocketOptions,
+              self).init_poolmanager(*args, **kwargs)
 
 
 class BailingAPI(BaseAPIModel):
@@ -64,31 +71,29 @@ class BailingAPI(BaseAPIModel):
             generation_kwargs=generation_kwargs,
         )
 
-        self.logger.info(f"Bailing API Model Init path: {path} url={url}")
+        self.logger.info(f'Bailing API Model Init path: {path} url={url}')
         if not token:
-            token = os.environ.get("BAILING_API_KEY")
+            token = os.environ.get('BAILING_API_KEY')
             if token:
-                self._headers = {"Authorization": f"Bearer {token}"}
+                self._headers = {'Authorization': f'Bearer {token}'}
             else:
-                raise RuntimeError(f"There is not valid token.")
-        self._headers["Content-Type"] = "application/json"
-        self._url = url if url else "https://bailingchat.alipay.com/chat/completions"
+                raise RuntimeError('There is not valid token.')
+        self._headers['Content-Type'] = 'application/json'
+        self._url = url if url else \
+            'https://bailingchat.alipay.com/chat/completions'
         self._model = path
         self._sessions = []
-        self._num = (
-            int(os.environ.get("BAILING_API_PARALLEL_NUM"))
-            if os.environ.get("BAILING_API_PARALLEL_NUM")
-            else 1
-        )
+        self._num = (int(os.environ.get('BAILING_API_PARALLEL_NUM'))
+                     if os.environ.get('BAILING_API_PARALLEL_NUM') else 1)
         try:
             for _ in range(self._num):
                 adapter = HTTPAdapterWithSocketOptions()
                 sess = requests.Session()
-                sess.mount("http://", adapter)
-                sess.mount("https://", adapter)
+                sess.mount('http://', adapter)
+                sess.mount('https://', adapter)
                 self._sessions.append(sess)
         except Exception as e:
-            self.logger.error(f"Fail to setup the session. {e}")
+            self.logger.error(f'Fail to setup the session. {e}')
             raise e
 
     def generate(
@@ -99,7 +104,8 @@ class BailingAPI(BaseAPIModel):
         """Generate results given a list of inputs.
 
         Args:
-            inputs (Union[List[str], PromptList]): A list of strings or PromptDicts.
+            inputs (Union[List[str], PromptList]):
+                A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass' API format.
             max_out_len (int): The maximum length of the output.
 
@@ -107,8 +113,7 @@ class BailingAPI(BaseAPIModel):
             List[str]: A list of generated strings.
         """
         with concurrent.futures.ThreadPoolExecutor(
-            max_workers=self._num,
-        ) as executor:
+                max_workers=self._num, ) as executor:
             future_to_m = {
                 executor.submit(
                     self._generate,
@@ -120,22 +125,22 @@ class BailingAPI(BaseAPIModel):
             }
             results = []
             for future in concurrent.futures.as_completed(future_to_m):
-                m = future_to_m[future]
+                m = future_to_m[future]  # noqa F841
                 resp = future.result()
                 if resp and resp.status_code == 200:
                     try:
                         result = resp.json()
-                    except:
-                        results.append("")
+                    except Exception as e:  # noqa F841
+                        results.append('')
                     else:
-                        if (
-                            result.get("choices")
-                            and result["choices"][0].get("message")
-                            and result["choices"][0]["message"].get("content")
-                        ):
-                            results.append(result["choices"][0]["message"]["content"])
+                        if (result.get('choices')
+                                and result['choices'][0].get('message')
+                                and result['choices'][0]['message'].get(
+                                    'content')):
+                            results.append(
+                                result['choices'][0]['message']['content'])
                 else:
-                    results.append("")
+                    results.append('')
         self.flush()
         return results
 
@@ -156,27 +161,30 @@ class BailingAPI(BaseAPIModel):
             str: The generated string.
         """
         if isinstance(input, str):
-            messages = [{"role": "user", "content": input}]
+            messages = [{'role': 'user', 'content': input}]
         else:
             messages = []
             for item in input:
-                content = item["prompt"]
+                content = item['prompt']
                 if not content:
                     continue
-                message = {"content": content}
-                if item["role"] == "HUMAN":
-                    message["role"] = "user"
-                elif item["role"] == "BOT":
-                    message["role"] = "assistant"
-                elif item["role"] == "SYSTEM":
-                    message["role"] = "system"
+                message = {'content': content}
+                if item['role'] == 'HUMAN':
+                    message['role'] = 'user'
+                elif item['role'] == 'BOT':
+                    message['role'] = 'assistant'
+                elif item['role'] == 'SYSTEM':
+                    message['role'] = 'system'
                 else:
-                    message["role"] = item["role"]
+                    message['role'] = item['role']
                 messages.append(message)
         request = {
-            "model": self._model,
-            "messages": messages,
-            "max_seq_len": max(
+            'model':
+            self._model,
+            'messages':
+            messages,
+            'max_seq_len':
+            max(
                 max_out_len if max_out_len else 4096,
                 self.max_seq_len if self.max_seq_len else 4096,
             ),
@@ -191,22 +199,22 @@ class BailingAPI(BaseAPIModel):
                 elif response.status_code == 426:
                     retry_num += 1  # retry
                 else:
-                    raise ValueError(f"Status code = {response.status_code}")
+                    raise ValueError(f'Status code = {response.status_code}')
             else:
                 raise ValueError(
-                    f"Exceed the maximal retry times. Last status code = {response.status_code}"
-                )
+                    f'Exceed the maximal retry times. Last status code '
+                    f'= {response.status_code}')
         except Exception as e:
-            self.logger.error(
-                f"Fail to inference request={request}; model_name={self.path};  error={e}, stack:{traceback.format_exc()}"
-            )
+            self.logger.error(f'Fail to inference request={request}; '
+                              f'model_name={self.path};  error={e}, '
+                              f'stack:{traceback.format_exc()}')
             raise e
         return response
 
     @retry(stop_max_attempt_number=3, wait_fixed=16000)  # ms
     def _infer_result(self, request, sess):
         response = sess.request(
-            "POST",
+            'POST',
             self._url,
             json=request,
             headers=self._headers,

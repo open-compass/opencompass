@@ -42,7 +42,8 @@ from .sensetime_api import SenseTime  # noqa: F401
 from .stepfun_api import StepFun  # noqa: F401
 from .turbomind import TurboMindModel  # noqa: F401
 from .turbomind_tis import TurboMindTisModel  # noqa: F401
-from .turbomind_with_tf_above_v4_33 import TurboMindModelwithChatTemplate  # noqa: F401
+from .turbomind_with_tf_above_v4_33 import \
+    TurboMindModelwithChatTemplate  # noqa: F401
 from .unigpt_api import UniGPT  # noqa: F401
 from .vllm import VLLM  # noqa: F401
 from .vllm_with_tf_above_v4_33 import VLLMwithChatTemplate  # noqa: F401
