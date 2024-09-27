@@ -77,6 +77,9 @@ class BailingAPI(BaseAPIModel):
                 self._headers = {'Authorization': f'Bearer {token}'}
             else:
                 raise RuntimeError('There is not valid token.')
+        else:
+            self._headers = {'Authorization': f'Bearer {token}'}
+
         self._headers['Content-Type'] = 'application/json'
         self._url = url if url else \
             'https://bailingchat.alipay.com/chat/completions'
