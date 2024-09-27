@@ -594,7 +594,7 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 ## 🔜 Roadmap
 
 - [x] Subjective Evaluation
-  - [x] Release CompassAreana
+  - [x] Release CompassAreana.
   - [x] Subjective evaluation.
 - [x] Long-context
   - [x] Long-context evaluation with extensive datasets.
@@ -603,10 +603,10 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
   - [ ] Coding evaluation leaderboard.
   - [x] Non-python language evaluation service.
 - [x] Agent
-  - [ ] Support various agenet framework.
+  - [ ] Support various agent frameworks.
   - [x] Evaluation of tool use of the LLMs.
 - [x] Robustness
-  - [x] Support various attack method
+  - [x] Support various attack methods.
 
 ## 👷‍♂️ Contributing
 
