@@ -138,7 +138,7 @@ class TurboMindModel(BaseModel):
 
     def get_ppl(self,
                 inputs: List[str],
-                mask_length: Optional[List[int]] = None) -> List[float]:
+                mask_length: Optional[List[int]] = None) -> np.ndarray:
         """Get perplexity scores given a list of inputs.
 
         Args:
@@ -155,11 +155,28 @@ class TurboMindModel(BaseModel):
         assert isinstance(
             inputs, List), f'List(str) is expected, but got {type(inputs)}'
         results = []
-        for text in inputs:
-            input_ids = self.tokenizer.encode(text)
-            res = self.pipe.get_ppl(input_ids)
-            results.append(res)
-        results = np.concatenate(results)
+        if self.version_info <= (0, 6, 0):
+            for text in inputs:
+                input_ids = self.tokenizer.encode(text)
+                res = self.pipe.get_ppl(input_ids)
+                results.append(res)
+            results = np.concatenate(results)
+        else:
+            if self.batch_padding and len(inputs) > 1:
+                assert self.tokenizer.pad_token
+                input_ids = self.tokenizer(
+                    inputs,
+                    padding=True,
+                    truncation=True,
+                    max_length=self.max_seq_len)['input_ids']
+            else:
+                input_ids = [
+                    self.tokenizer(text)['input_ids'] for text in inputs
+                ]
+            for i in range(0, len(input_ids), 128):
+                results.append(self.pipe.get_ppl(input_ids[i:i + 128]))
+            results = np.concatenate(results)
+
         return results
 
     def get_loglikelihood(
