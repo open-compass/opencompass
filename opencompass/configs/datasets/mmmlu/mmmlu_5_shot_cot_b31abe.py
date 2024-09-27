@@ -278,9 +278,9 @@ for _name in mmmlu_all_sets:
 
     mmmlu_datasets.append(
         dict(
-            abbr=f'openai_mmmlu_{_name}',
+            abbr=f'openai_m{_name}',
             type=MMMLUDataset,
-            path='./data/mmmlu',
+            path='openai/MMMLU',
             name=_name,
             reader_cfg=mmmlu_reader_cfg,
             infer_cfg=mmmlu_infer_cfg,
