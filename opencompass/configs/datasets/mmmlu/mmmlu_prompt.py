@@ -1,6 +1,6 @@
-_hint = "هذا تلميح يساعدك في حل السؤال."
+_hint = "This is a hint that helps you solve the question."
 
-_hint_hint = "يرجى إدخال سؤالك هنا."
+_prompt = "Please enter your question here."
 
 def get_few_shot_prompts_ar(_hint, _prompt):
     return [
