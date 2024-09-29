@@ -1,16 +1,18 @@
 # flake8: nodingo
 # yapf: disable
-import os
 import csv
 import json
+import os
 import time
 from typing import List
+
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
 from .base import BaseDataset
+
 
 @LOAD_DATASET.register_module()
 class DingoDataset(BaseDataset):
@@ -19,7 +21,7 @@ class DingoDataset(BaseDataset):
     def load(path: str):
         raw_data = []
         with open(path, encoding="utf-8") as f:
-            reader = csv.reader(f, delimiter=';')
+            reader = csv.reader(f, delimiter=";")
             for row in reader:
                 if len(row) < 1:
                     row = [""]
@@ -45,31 +47,34 @@ class DingoEvaluator(BaseEvaluator):
     def score(self, origin_prompt: List, predictions: List) -> dict:
         try:
             # from dingo.model.model import Model
-            from dingo.io import InputArgs
             from dingo.exec import Executor
+            from dingo.io import InputArgs
         except Exception:
             raise ModuleNotFoundError(
-                "=========== dingo register fail. please try: pip install dingo-python. ===========")
+                "=========== "
+                "dingo register fail. please try: pip install dingo-python."
+                " ===========")
 
         current_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-        file_data = [{"prompt": pmt, "prediction": prd} for pmt, prd in zip(origin_prompt, predictions)]
+        file_data = [{"prompt": pmt, "prediction": prd}
+                     for pmt, prd in zip(origin_prompt, predictions)]
         file_name = "dingo_file_" + current_time + ".jsonl"
         with open(file_name, "a", encoding="utf-8") as f:
             for d in file_data:
                 json.dump(d, f, ensure_ascii=False)
-                f.write('\n')
+                f.write("\n")
 
         input_data = {
             "eval_models": ["llm_base"],
             "input_path": file_name,
             "output_path": "./outputs/dingo/",
             "dataset": "local",
-            "datasource": "local",  # If not fill in this item, it will be the same as "dataset"
+            "datasource": "local",
             "data_format": "jsonl",
             "column_prompt": ["prompt"],
             "column_content": ["prediction"],
         }
-        # Model.apply_config(input_data['custom_config_path'])
+        # Model.apply_config(input_data["custom_config_path"])
         input_args = InputArgs(**input_data)
         executor = Executor.exec_map["local"](input_args)
         result = executor.execute()
