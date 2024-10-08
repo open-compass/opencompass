@@ -601,6 +601,10 @@ class OpenAISDK(OpenAI):
                 if self.verbose:
                     self.logger.info(
                         'Successfully get response from OpenAI API')
+                    try:
+                        self.logger.info(responses)
+                    except Exception as e:  # noqa F841
+                        pass
                 return responses.choices[0].message.content
             except Exception as e:
                 self.logger.error(e)
