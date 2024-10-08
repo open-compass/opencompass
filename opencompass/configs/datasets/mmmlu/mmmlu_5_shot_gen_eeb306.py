@@ -68,8 +68,8 @@ for _name in mmmlu_all_sets:
         _prompt = f'''C'est à propos de {{subject}} \nQuestion : {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nRéponse :'''
         _round = get_few_shot_prompts_fr(_hint, _prompt)
     elif 'HI' in _name:
-        _hint = f'Gen yon kesyon chwa sèl. Reponn kesyon an pa reponn A, B, C oswa D.'
-        _prompt = f'Sa se sou {{subject}} \nKestyon: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nRepons:'
+        _hint = f'यह एक एकल विकल्प प्रश्न है। प्रश्न का उत्तर A, B, C या D में से कोई भी उत्तर देकर दें।'
+        _prompt = f'यह {{subject}} के बारे में है \nप्रश्न: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nउत्तर:'
         _round = get_few_shot_prompts_hi(_hint, _prompt)
     elif 'ID' in _name:
         _hint = f'Ada pertanyaan pilihan tunggal. Jawablah pertanyaan dengan menjawab A, B, C, atau D.'
