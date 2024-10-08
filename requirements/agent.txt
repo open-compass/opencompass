@@ -1,11 +1,11 @@
 antlr4-python3-runtime==4.11
+git+https://github.com/open-compass/lagent-cibench
 ipykernel
 ipython
 json5
 jupyter
 jupyter_client
 jupytext
-git+https://github.com/open-compass/lagent-cibench
 lightgbm==4.1.0
 networkx
 scikit-image
