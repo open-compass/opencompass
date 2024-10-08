@@ -19,6 +19,7 @@ summarizer = dict(
         'openai_mmmlu_SW-KE',
         'openai_mmmlu_YO-NG',
         'openai_mmmlu_ZH-CN',
+        'mmmlu',
     ],
     summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )
