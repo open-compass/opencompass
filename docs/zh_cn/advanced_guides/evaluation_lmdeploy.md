@@ -73,7 +73,7 @@ models = [
         max_out_len=1024,
         # the max number of prompts that LMDeploy receives
         # in `generate` function
-        batch_size=5000,
+        batch_size=32,
         run_cfg=dict(num_gpus=1),
     )
 ]
