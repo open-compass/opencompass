@@ -1,5 +1,13 @@
 # 新闻
 
+- **\[2024.05.08\]** 我们支持了以下四个MoE模型的评测配置文件: [Mixtral-8x22B-v0.1](configs/models/mixtral/hf_mixtral_8x22b_v0_1.py), [Mixtral-8x22B-Instruct-v0.1](configs/models/mixtral/hf_mixtral_8x22b_instruct_v0_1.py), [Qwen1.5-MoE-A2.7B](configs/models/qwen/hf_qwen1_5_moe_a2_7b.py), [Qwen1.5-MoE-A2.7B-Chat](configs/models/qwen/hf_qwen1_5_moe_a2_7b_chat.py) 。欢迎试用!
+- **\[2024.04.30\]** 我们支持了计算模型在给定[数据集](configs/datasets/llm_compression/README.md)上的压缩率（Bits per Character）的评测方法（[官方文献](https://github.com/hkust-nlp/llm-compression-intelligence)）。欢迎试用[llm-compression](configs/eval_llm_compression.py)评测集! 🔥🔥🔥
+- **\[2024.04.26\]** 我们报告了典型LLM在常用基准测试上的表现，欢迎访问[文档](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/corebench.html)以获取更多信息！🔥🔥🔥.
+- **\[2024.04.26\]** 我们废弃了 OpenCompass 进行多模态大模型评测的功能，相关功能转移至 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，推荐使用！🔥🔥🔥.
+- **\[2024.04.26\]** 我们支持了 [ArenaHard评测](configs/eval_subjective_arena_hard.py) 欢迎试用！🔥🔥🔥.
+- **\[2024.04.22\]** 我们支持了 [LLaMA3](configs/models/hf_llama/hf_llama3_8b.py) 和 [LLaMA3-Instruct](configs/models/hf_llama/hf_llama3_8b_instruct.py) 的评测，欢迎试用！🔥🔥🔥.
+- **\[2024.02.29\]** 我们支持了MT-Bench、AlpacalEval和AlignBench，更多信息可以在[这里](https://opencompass.readthedocs.io/en/latest/advanced_guides/subjective_evaluation.html)找到。
+- **\[2024.01.30\]** 我们发布了OpenCompass 2.0。更多信息，请访问[CompassKit](https://github.com/open-compass)、[CompassHub](https://hub.opencompass.org.cn/home)和[CompassRank](https://rank.opencompass.org.cn/home)。
 - **\[2024.01.17\]** 我们支持了 [InternLM2](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py) 和 [InternLM2-Chat](https://github.com/open-compass/opencompass/blob/main/configs/eval_internlm2_chat_keyset.py) 的相关评测，InternLM2 在这些测试中表现出非常强劲的性能，欢迎试用！.
 - **\[2024.01.17\]** 我们支持了多根针版本的大海捞针测试，更多信息见[这里](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/needleinahaystack_eval.html#id8).
 - **\[2023.12.28\]** 我们支持了对使用[LLaMA2-Accessory](https://github.com/Alpha-VLLM/LLaMA2-Accessory)（一款强大的LLM开发工具箱）开发的所有模型的无缝评估!

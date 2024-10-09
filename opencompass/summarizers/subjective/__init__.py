@@ -4,6 +4,7 @@ from .all_obj import AllObjSummarizer
 from .alpacaeval import AlpacaSummarizer
 from .arenahard import ArenaHardSummarizer
 from .charm import CharmMemSummarizer
+from .common_summarizer import CommonSummarizer
 from .compass_arena import CompassArenaSummarizer
 from .compassbench import CompassBenchSummarizer
 from .corev2 import Corev2Summarizer
