@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CONDA_ENV: opencompass_base
+  CONDA_ENV: opencompass_
   USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HF_DATASETS_OFFLINE: 1
@@ -38,7 +38,7 @@ jobs:
       - name: Prepare - Install opencompass
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}
+          conda activate ${{env.CONDA_ENV}}${{ runner.name }}
           python3 -m pip uninstall opencompass -y
           python3 -m pip install -e . --cache-dir ${{env.USERSPACE_PREFIX}}/.cache/pip
           conda info --envs
@@ -49,9 +49,8 @@ jobs:
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run test
         run: |
-          echo ${{ runner.name }}
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}
+          conda activate ${{env.CONDA_ENV}}${{ runner.name }}
           conda info --envs
           rm -rf regression_result
           opencompass --models hf_internlm2_5_20b_chat --datasets demo_gsm8k_chat_gen --work-dir regression_result1 --debug
@@ -85,7 +84,7 @@ jobs:
         if: always()
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}
+          conda activate ${{env.CONDA_ENV}}${{ runner.name }}
           python3 -m pip uninstall opencompass -y
           conda info --envs
 
