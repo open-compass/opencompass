@@ -61,7 +61,7 @@ OpenCompass 上手路线
    advanced_guides/new_dataset.md
    advanced_guides/custom_dataset.md
    advanced_guides/new_model.md
-   advanced_guides/evaluation_turbomind.md
+   advanced_guides/evaluation_lmdeploy.md
    advanced_guides/evaluation_lightllm.md
    advanced_guides/accelerator_intro.md
    advanced_guides/code_eval.md
