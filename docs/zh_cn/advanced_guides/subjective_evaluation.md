@@ -33,9 +33,9 @@
 
 ```
 with read_base():
-    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
-    from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
-    from .models.qwen.hf_qwen_7b import models
+    from opencompass.configs.datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
+    from opencompass.configs.datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import alpacav2_datasets
+    from opencompass.configs.models.qwen.hf_qwen_7b import models
 ```
 
 值得注意的是，由于主观评测的模型设置参数通常与客观评测不同，往往需要设置`do_sample`的方式进行推理而不是`greedy`，故可以在配置文件中自行修改相关参数，例如
