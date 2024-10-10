@@ -232,6 +232,8 @@ class DLCRunner(BaseRunner):
                 while True:
                     # 1. Avoid to request dlc too frequently.
                     # 2. DLC job may not be ready immediately after creation.
+                    dlc_sleep_time = self.aliyun_cfg.get('dlc_sleep_time', 10)
+                    time.sleep(dlc_sleep_time)
                     num_retry = 60
                     for retry_index in range(num_retry):
                         time.sleep(2)
