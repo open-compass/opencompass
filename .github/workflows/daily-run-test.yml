@@ -67,8 +67,10 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
-          pip install -r /cpfs01/shared/public/qa-llm-cicd/requirements-cu11.txt --cache-dir ${{env.PIP_CACHE_PATH}} --no-deps
+          pip install -r /cpfs01/shared/public/qa-llm-cicd/requirements-cu11.txt --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.6.1+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.6.1.post1+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           pip uninstall torch torchvision torchaudio -y
           pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
           FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu118torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
