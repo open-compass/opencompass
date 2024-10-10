@@ -49,6 +49,7 @@ jobs:
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run test
         run: |
+          echo ${{ runner.temp }}
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
