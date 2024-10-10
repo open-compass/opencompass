@@ -35,7 +35,7 @@ jobs:
           python-version: 3.10
       - name: Build lagent
         run: |
-          pip install wheel
+          pip install wheel setuptools
           python setup.py sdist bdist_wheel
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
