@@ -83,7 +83,7 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
-          pip install -r /cpfs01/shared/public/qa-llm-cicd/requirements-cu12.txt --cache-dir ${{env.PIP_CACHE_PATH}} --no-deps
+          pip install -r /cpfs01/shared/public/qa-llm-cicd/requirements-cu12.txt --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
