@@ -44,3 +44,4 @@ tqdm        # ==4.64.1
 transformers>=4.29.1
 typer
 dacite
+human-eval
