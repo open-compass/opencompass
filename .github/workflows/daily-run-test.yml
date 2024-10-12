@@ -2,6 +2,17 @@ name: daily_run_test
 
 on:
   workflow_dispatch:
+    inputs:
+      repo_org:
+        required: false
+        description: 'Tested repository organization name. Default is open-compass/opencompass'
+        type: string
+        default: 'open-compass/opencompass'
+      repo_ref:
+        required: false
+        description: 'Set branch or tag or commit id. Default is "main"'
+        type: string
+        default: 'main'
   schedule:
     - cron:  '56 16 * * *'
 
@@ -29,6 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.repo_org || 'open-compass/opencompass' }}
+          ref: ${{github.event.inputs.repo_ref || 'main'}}
       - name: Set up Python 3.x
         uses: actions/setup-python@v2
         with:
@@ -57,6 +71,9 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.repo_org || 'open-compass/opencompass' }}
+          ref: ${{github.event.inputs.repo_ref || 'main'}}
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
