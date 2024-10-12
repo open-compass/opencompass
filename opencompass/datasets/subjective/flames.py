@@ -9,7 +9,7 @@ from datasets import Dataset, DatasetDict
 from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
 
-from .subjective.subjective_cmp import SubjectiveCmpDataset
+from .subjective_cmp import SubjectiveCmpDataset
 
 
 class Config:
@@ -36,11 +36,7 @@ def prompt_construct(sample, config: Config):
 @LOAD_DATASET.register_module()
 class FlamesDataset(SubjectiveCmpDataset):
 
-    def load(
-        self,
-        path: str,
-        name: str,
-    ):
+    def load(self, path: str, name: str, *args, **kwargs):
         path = get_data_path(path, local_mode=True)
         config = Config(path, f'{name}_config.txt')
 
