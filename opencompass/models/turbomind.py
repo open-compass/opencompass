@@ -52,6 +52,7 @@ class TurboMindModel(BaseModel):
                  meta_template: Optional[Dict] = None,
                  engine_config: Dict = {},
                  gen_config: Dict = {},
+                 batch_padding: bool = False,
                  end_str: Optional[str] = None):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -69,6 +70,7 @@ class TurboMindModel(BaseModel):
         _engine_config.update(engine_config)
         self.pipe = self._build_pipe(path, backend, _engine_config)
         self.gen_config = gen_config
+        self.batch_padding = batch_padding
         self.end_str = end_str
 
     def generate(self,
