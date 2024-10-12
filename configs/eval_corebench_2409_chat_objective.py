@@ -18,20 +18,22 @@ with read_base():
 
     # ## Reasoning
     from opencompass.configs.datasets.bbh.bbh_gen_4a31fa import bbh_datasets
-    # TODO: Add HellaSwag
-    # TODO: Add DROP
+    from opencompass.configs.datasets.hellaswag.hellaswag_10shot_gen_e42710 import \
+        hellaswag_datasets
+    from opencompass.configs.datasets.drop.drop_openai_simple_evals_gen_3857b0 import drop_datasets
 
     # ## Math
     from opencompass.configs.datasets.math.math_0shot_gen_393424 import math_datasets
-    # TODO: Add GSM8K
-    # TODO: Add MathBench
+    from opencompass.configs.datasets.gsm8k.gsm8k_0shot_v2_gen_a58960 import \
+        gsm8k_datasets
+    from opencompass.configs.datasets.MathBench.mathbench_2024_gen_50a320 import mathbench_datasets
 
     # ## Scientific
     from opencompass.configs.datasets.gpqa.gpqa_openai_simple_evals_gen_5aeece import gpqa_datasets
 
     # ## Coding
     from opencompass.configs.datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
-    # TODO: Add MBPP
+    from opencompass.configs.datasets.mbpp.sanitized_mbpp_mdblock_gen_a447ff import sanitized_mbpp_datasets
     # TODO: Add LiveCodeBench
 
     # ## Instruction Following
@@ -70,13 +72,17 @@ core_summary_groups = [
         'subsets': [
             ['mmlu', 'accuracy'],
             ['mmlu_pro', 'accuracy'],
-            # ['cmmlu', 'naive_average'],
             ['cmmlu', 'accuracy'],
             ['bbh', 'score'],
             ['math', 'accuracy'],
             ['openai_humaneval', 'humaneval_pass@1'],
             ['GPQA_diamond', 'accuracy'],
             ['IFEval', 'Prompt-level-strict-accuracy'],
+            ['drop', 'accuracy'],
+            ['sanitized_mbpp', 'score'],
+            ['gsm8k', 'accuracy'],
+            ['hellaswag', 'accuracy'],
+            ['mathbench-t (average)', 'naive_average']
         ],
     },
 ]
@@ -92,6 +98,12 @@ summarizer = dict(
         ['openai_humaneval', 'humaneval_pass@1'],
         ['GPQA_diamond', 'accuracy'],
         ['IFEval', 'Prompt-level-strict-accuracy'],
+        ['drop', 'accuracy'],
+        ['sanitized_mbpp', 'score'],
+        ['gsm8k', 'accuracy'],
+        ['hellaswag', 'accuracy'],
+        'mathbench-a (average)',
+        'mathbench-t (average)'
         '',
 
         ['mmlu', 'accuracy'],
@@ -204,5 +216,5 @@ eval = dict(
 #######################################################################
 #                      PART 5  Utils Configuaration                   #
 #######################################################################
-base_exp_dir = 'outputs/corebench/'
+base_exp_dir = 'outputs/corebench_2409_objective/'
 work_dir = osp.join(base_exp_dir, 'chat_objective')

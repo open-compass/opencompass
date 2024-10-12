@@ -7,8 +7,7 @@ import yaml
 output_path = 'regression_result_daily'
 
 chat_model_list = [
-    'baichuan2-7b-chat-hf', 'glm-4-9b-chat-turbomind', 'glm-4-9b-chat-vllm',
-    'deepseek-7b-chat-hf', 'deepseek-moe-16b-chat-hf',
+    'baichuan2-7b-chat-hf', 'deepseek-7b-chat-hf', 'deepseek-moe-16b-chat-hf',
     'deepseek-v2-lite-chat-hf', 'deepseek-7b-chat-vllm', 'gemma2-2b-it-hf',
     'gemma2-9b-it-hf', 'gemma-7b-it-vllm', 'internlm2_5-7b-chat-hf',
     'internlm2_5-20b-chat-hf', 'internlm2_5-7b-chat-turbomind',
