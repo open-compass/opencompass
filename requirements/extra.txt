@@ -5,7 +5,7 @@ dingo-python
 # Icl topk retriever
 faiss_gpu==1.7.2
 # Humaneval, Humaneval X
-git+https://github.com/open-compass/human-eval.git#egg=human-eval
+-e git+https://github.com/open-compass/human-eval.git#egg=human-eval
 # IFEval
 langdetect
 # TheoremQA
