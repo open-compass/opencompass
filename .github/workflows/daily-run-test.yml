@@ -13,6 +13,11 @@ on:
         description: 'Set branch or tag or commit id. Default is "main"'
         type: string
         default: 'main'
+      regression_func:
+        required: true
+        description: 'regression functions'
+        type: string
+        default: "['chat','base','cmd']"
   schedule:
     - cron:  '56 16 * * *'
 
@@ -60,6 +65,7 @@ jobs:
           name: my-artifact-${{ github.run_id }}
 
   daily_run_test:
+    if: ${{!cancelled()}}
     needs: build-pypi
     strategy:
       fail-fast: false
@@ -116,6 +122,7 @@ jobs:
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run chat model test
+        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'chat')
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -125,6 +132,7 @@ jobs:
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test
+        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'base')
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -133,6 +141,7 @@ jobs:
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run command testcase
+        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'cmd')
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
