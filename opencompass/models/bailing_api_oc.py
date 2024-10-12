@@ -81,8 +81,8 @@ class BailingAPI(BaseAPIModel):
             self._headers = {'Authorization': f'Bearer {token}'}
 
         self._headers['Content-Type'] = 'application/json'
-        self._url = url if url else \
-            'https://bailingchat.alipay.com/chat/completions'
+        self._url = (url if url else
+                     'https://bailingchat.alipay.com/chat/completions')
         self._model = path
         self._sessions = []
         self._num = (int(os.environ.get('BAILING_API_PARALLEL_NUM'))
@@ -136,9 +136,9 @@ class BailingAPI(BaseAPIModel):
                         results.append('')
                     else:
                         if (result.get('choices')
-                                and result['choices'][0].get('message')
-                                and result['choices'][0]['message'].get(
-                                    'content')):
+                                and result['choices'][0].get('message') and
+                                result['choices'][0]['message'].get('content')
+                                is not None):
                             results.append(
                                 result['choices'][0]['message']['content'])
                 else:

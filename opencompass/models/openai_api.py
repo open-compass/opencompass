@@ -466,25 +466,28 @@ class OpenAI(BaseAPIModel):
 
 class OpenAISDK(OpenAI):
 
-    def __init__(self,
-                 path: str = 'gpt-3.5-turbo',
-                 max_seq_len: int = 4096,
-                 query_per_second: int = 1,
-                 rpm_verbose: bool = False,
-                 retry: int = 2,
-                 key: str | List[str] = 'ENV',
-                 org: str | List[str] | None = None,
-                 meta_template: Dict | None = None,
-                 openai_api_base: str = OPENAI_API_BASE,
-                 openai_proxy_url: Optional[str] = None,
-                 mode: str = 'none',
-                 logprobs: bool | None = False,
-                 top_logprobs: int | None = None,
-                 temperature: float | None = None,
-                 tokenizer_path: str | None = None,
-                 extra_body: Dict | None = None,
-                 max_completion_tokens: int = 16384,
-                 verbose: bool = False):
+    def __init__(
+        self,
+        path: str = 'gpt-3.5-turbo',
+        max_seq_len: int = 4096,
+        query_per_second: int = 1,
+        rpm_verbose: bool = False,
+        retry: int = 2,
+        key: str | List[str] = 'ENV',
+        org: str | List[str] | None = None,
+        meta_template: Dict | None = None,
+        openai_api_base: str = OPENAI_API_BASE,
+        openai_proxy_url: Optional[str] = None,
+        mode: str = 'none',
+        logprobs: bool | None = False,
+        top_logprobs: int | None = None,
+        temperature: float | None = None,
+        tokenizer_path: str | None = None,
+        extra_body: Dict | None = None,
+        max_completion_tokens: int = 16384,
+        verbose: bool = False,
+        status_code_mappings: dict = {},
+    ):
         super().__init__(path,
                          max_seq_len,
                          query_per_second,
@@ -519,9 +522,11 @@ class OpenAISDK(OpenAI):
                 http_client=httpx.Client(proxies=proxies))
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
+        self.status_code_mappings = status_code_mappings
 
     def _generate(self, input: PromptList | str, max_out_len: int,
                   temperature: float) -> str:
+        from openai import BadRequestError
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097
@@ -605,7 +610,30 @@ class OpenAISDK(OpenAI):
                         self.logger.info(responses)
                     except Exception as e:  # noqa F841
                         pass
+                if not responses.choices:
+                    self.logger.error(
+                        'Response is empty, it is an internal server error \
+                            from the API provider.')
                 return responses.choices[0].message.content
+
+            except BadRequestError as e:
+                # Handle BadRequest status
+                # You can specify self.status_code_mappings to bypass \
+                # API sensitivity blocks
+                # For example: status_code_mappings={400: 'Input data \
+                # may contain inappropriate content.'}
+                status_code = e.status_code
+                if (status_code is not None
+                        and status_code in self.status_code_mappings):
+                    original_error_message = e.body.get('message')
+                    error_message = self.status_code_mappings[status_code]
+                    self.logger.info(
+                        f'Status Code: {status_code}, '
+                        f'Original Error Message: {original_error_message},'
+                        f'Return Message: {error_message} ')
+                    return error_message
+                else:
+                    self.logger.error(e)
             except Exception as e:
                 self.logger.error(e)
             num_retries += 1
