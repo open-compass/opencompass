@@ -36,13 +36,7 @@ def prompt_construct(sample, config: Config):
 @LOAD_DATASET.register_module()
 class FlamesDataset(SubjectiveCmpDataset):
 
-    def load(
-        self,
-        path: str,
-        name: str,
-        *args,
-        **kwargs
-    ):
+    def load(self, path: str, name: str, *args, **kwargs):
         path = get_data_path(path, local_mode=True)
         config = Config(path, f'{name}_config.txt')
 
