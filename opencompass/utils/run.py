@@ -9,7 +9,7 @@ from mmengine.config import Config
 from opencompass.datasets.custom import make_custom_dataset_config
 from opencompass.models import (VLLM, HuggingFace, HuggingFaceBaseModel,
                                 HuggingFaceCausalLM, HuggingFaceChatGLM3,
-                                HuggingFacewithChatTemplate, TurboMindModel,
+                                HuggingFacewithChatTemplate,
                                 TurboMindModelwithChatTemplate,
                                 VLLMwithChatTemplate)
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
@@ -233,7 +233,7 @@ def change_accelerator(models, accelerator):
     model_accels = []
     for model in models:
         logger.info(f'Transforming {model["abbr"]} to {accelerator}')
-        # change HuggingFace model to VLLM or TurboMindModel
+        # change HuggingFace model to VLLM or LMDeploy
         if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3, f'{HuggingFaceBaseModel.__module__}.{HuggingFaceBaseModel.__name__}']:
             gen_args = dict()
             if model.get('generation_kwargs') is not None:
@@ -254,10 +254,10 @@ def change_accelerator(models, accelerator):
 
             if accelerator == 'lmdeploy':
                 logger.info(f'Transforming {model["abbr"]} to {accelerator}')
-                mod = TurboMindModel
+                mod = TurboMindModelwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
-                    abbr=model['abbr'].replace('hf', 'turbomind') if '-hf' in model['abbr'] else model['abbr'] + '-turbomind',
+                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
                     path=model['path'],
                     engine_config=dict(session_len=model['max_seq_len'],
                                        max_batch_size=model['batch_size'],
@@ -270,7 +270,6 @@ def change_accelerator(models, accelerator):
                     max_out_len=model['max_out_len'],
                     max_seq_len=model['max_seq_len'],
                     batch_size=model['batch_size'],
-                    concurrency=model['batch_size'],
                     run_cfg=model['run_cfg'],
                 )
                 for item in ['meta_template']:
@@ -312,7 +311,7 @@ def change_accelerator(models, accelerator):
                 mod = TurboMindModelwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
-                    abbr=model['abbr'].replace('hf', 'turbomind') if '-hf' in model['abbr'] else model['abbr'] + '-turbomind',
+                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
                     path=model['path'],
                     engine_config=dict(max_batch_size=model.get('batch_size', 16), tp=model['run_cfg']['num_gpus']),
                     gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
