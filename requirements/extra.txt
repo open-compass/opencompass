@@ -1,6 +1,7 @@
 # Alpaca-eval
 alpaca-eval==0.6
 cn2an
+dingo-python
 # Icl topk retriever
 faiss_gpu==1.7.2
 # Humaneval, Humaneval X

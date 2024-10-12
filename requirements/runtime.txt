@@ -23,6 +23,7 @@ python-Levenshtein
 rank_bm25==0.2.2
 rapidfuzz
 requests>=2.31.0
+retrying
 rich
 rouge
 -e git+https://github.com/Isaac-JL-Chen/rouge_chinese.git@master#egg=rouge_chinese
