@@ -7,9 +7,11 @@ from datasets import Dataset
 from opencompass.models import OpenAISDK
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET, MODELS
-from opencompass.utils import get_data_path
 
 from .base import BaseDataset
+
+# from opencompass.utils import get_data_path
+
 
 EVAL_PROMPT = """
 请你作为一个数学高考阅卷专家，判断下面的答案是否与标准答案一致，即考生是否回答正确。下面是一些评判标准：
@@ -38,8 +40,10 @@ class GaoKaoMATHDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        path = get_data_path(path, local_mode=True)
+        # path = get_data_path(path, local_mode=True)
         data = json.load(open(path))
+        for i in range(len(data)):
+            data[i]['extract_answer'] = str(data[i]['extract_answer'])
         dataset = Dataset.from_list(data)
         return dataset
 

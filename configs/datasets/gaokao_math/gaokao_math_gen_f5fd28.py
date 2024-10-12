@@ -10,7 +10,7 @@ MATH_CN_PROMPT="""
 我将为你提供一个问题、回答句子和问题类型。回答句子是对所提供问题的回应。利用提供的信息，你必须准确而精确地确定并从回答句子中提取预期的关键答案。请不要对问题发表主观看法。
 
 对于单选题，答案应该是选项字母，例如 "A"；
-对于多选题，答案应该是一个选项字母的列表，例如 "A" 或 "A", "B", "C"；
+对于多选题，答案应该是一个选项字母的列表，例如 ["A"] 或 ["A", "B", "C"]；
 对于填空题，答案应该是一个填入空白处的答案列表，列表的数量应该与问题中的空白数量相同，例如 ["$$\\frac{{1}}{{2}}$$"] 或 ["$$\\frac{{1}}{{2}}$$", "2"]。
 对于问答题，类似填空题，为每个小问抽出相应答案，例如 ["$$\\frac{{1}}{{2}}$$"] 或 ["$$\\frac{{1}}{{2}}$$", "2"]。
 
@@ -35,7 +35,7 @@ gaokao_math_infer_cfg = dict(
     inferencer=dict(type=GenInferencer, max_out_len=512))
 
 gaokao_math_eval_cfg = dict(
-    evaluator=dict(type=GaoKaoMATHEvaluator, url='http://0.0.0.0:23333/v1'))
+    evaluator=dict(type=GaoKaoMATHEvaluator, model_name='Qwen/Qwen2.5-72B-Instruct', url=['http://22.8.73.119:23333/v1', 'http://22.8.4.97:23333/v1', 'http://22.8.22.254:23333/v1', 'http://22.8.17.14:23333/v1']))
 
 gaokao_math_datasets = [
     dict(
