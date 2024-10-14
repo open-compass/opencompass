@@ -59,6 +59,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.10.14\]** 现已支持OpenAI多语言问答数据集[MMMLU](https://huggingface.co/datasets/openai/MMMLU)，欢迎尝试! 🔥🔥🔥
 - **\[2024.09.19\]** 现已支持[Qwen2.5](https://huggingface.co/Qwen)(0.5B to 72B) ，可以使用多种推理后端(huggingface/vllm/lmdeploy), 欢迎尝试! 🔥🔥🔥
 - **\[2024.09.05\]** 现已支持OpenAI o1 模型(`o1-mini-2024-09-12` and `o1-preview-2024-09-12`), 欢迎尝试! 🔥🔥🔥
 - **\[2024.09.05\]** OpenCompass 现在支持通过模型后处理来进行答案提取，以更准确地展示模型的能力。作为此次更新的一部分，我们集成了 [XFinder](https://github.com/IAAR-Shanghai/xFinder) 作为首个后处理模型。具体信息请参阅 [文档](opencompass/utils/postprocessors/xfinder/README.md)，欢迎尝试！ 🔥🔥🔥
