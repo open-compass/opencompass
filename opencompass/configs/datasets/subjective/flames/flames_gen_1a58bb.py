@@ -58,5 +58,6 @@ for _name in subjective_all_sets:
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
-            eval_cfg=subjective_eval_cfg
+            eval_cfg=subjective_eval_cfg,
+            mode='singlescore',
         ))
