@@ -121,25 +121,6 @@ jobs:
           ln -s ${{env.DATEASET_CACHE_PATH}} data
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
-      - name:  Run chat model test
-        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'chat')
-        run: |
-          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
-          conda info --envs
-          sed -i 's/judgemodel/'$(tail -n 1 /cpfs01/shared/public/llmeval/share_info/compassjuder_ip.txt)'/g' .github/scripts/eval_regression_chat.py
-          opencompass .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }} --reuse --max-num-workers 2
-          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
-      - name:  Run base model test
-        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'base')
-        run: |
-          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
-          conda info --envs
-          opencompass .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base_${{ matrix.cuda_env }} --reuse --max-num-workers 2
-          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run command testcase
         if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'cmd')
         run: |
@@ -160,6 +141,25 @@ jobs:
           opencompass --datasets race_gen --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4 --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
+      - name:  Run chat model test
+        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'chat')
+        run: |
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
+          conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
+          conda info --envs
+          sed -i 's/judgemodel/'$(tail -n 1 /cpfs01/shared/public/llmeval/share_info/compassjuder_ip.txt)'/g' .github/scripts/eval_regression_chat.py
+          opencompass .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }} --reuse --max-num-workers 2
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
+      - name:  Run base model test
+        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'base')
+        run: |
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
+          conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
+          conda info --envs
+          opencompass .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base_${{ matrix.cuda_env }} --reuse --max-num-workers 2
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
         if: always()
         run: |
