@@ -105,8 +105,8 @@ class TestCmdCase:
 
     @pytest.mark.case2
     @pytest.mark.parametrize('model, dataset',
-                             [('internlm2_5-7b-chat-turbomind', 'race-middle'),
-                              ('internlm2_5-7b-chat-turbomind', 'race-high')])
+                             [('internlm2_5-7b-chat-lmdeploy', 'race-middle'),
+                              ('internlm2_5-7b-chat-lmdeploy', 'race-high')])
     def test_cmd_case2(self, result_scores, model, dataset):
         if len(result_scores.keys()) != 1:
             assert False, 'result is none'
