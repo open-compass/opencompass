@@ -15,6 +15,7 @@
 
 import datasets
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import recall_score
 
 import evaluate
 
@@ -99,6 +100,7 @@ class Accuracy(evaluate.Metric):
         )
 
     def _compute(self, predictions, references, normalize=True, sample_weight=None):
+        print(f"kkkkk*******{predictions}-{references}************")
         return {
             "accuracy": float(
                 accuracy_score(references, predictions, normalize=normalize, sample_weight=sample_weight)

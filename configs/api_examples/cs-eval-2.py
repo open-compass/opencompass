@@ -2,7 +2,6 @@
 import json
 import re
 import argparse
-import time
 
 from openai import OpenAI
 from tqdm import tqdm  # 导入tqdm
@@ -27,12 +26,6 @@ models = client.models.list()
 model = args.model  # 使用命令行参数中的模型ID
 print(model)
 
-def get_json_time(day):
-    if day == 0:
-        return int(round(time.time()))  # 如果是零返回今天时间戳
-    else:
-        now = int(round(time.time()))
-        return now + 3600 * 24 * day
 def clean_answer(answer):
     pattern = re.compile(r'[ABCD对错]')
     matches = pattern.finditer(answer)
@@ -78,16 +71,27 @@ if __name__ == '__main__':
     for i in range(4670):
         text = dataset['test'][i]["prompt"]
         id = dataset['test'][i]["id"]
-        prompt = "你是一个考生，会有中文英文问题，你要做出回答，只帮我选出正确选项的序号如：以这种格式回答：A"
-        ret = ask_model(prompt, text)
-        if ret is not None:
-            ret = clean_answer(ret)
-            json_data.append({"question_id": id, "answer": ret})  # 将数据添加到列表
+        if "单选" in text:
+            prompt = "你是一个考生，你需要根据考试内容，做出回答，只帮我选出唯一正确选项，以这种格式回答：A"
+
+        if "多选" in text:
+            prompt = "你是一个考生，你需要根据考试内容，做出回答，只帮我选出多个正确选项，以这种格式回答：A"
+            ret = ask_model(prompt, text)
+
+        else:
+            prompt = "你是一个考生，会有中文英文问题，你要做出回答，只帮我选出正确选项的序号如：以这种格式回答：A"
+            ret = ask_model(prompt, text)
+            #  print("*****回答内容:：{}******** \n".format(ret))
+
+        ret = clean_answer(ret)
+
+        #  print("*****回答内容:：{}******** \n".format(ret))
+        re_str = f'{{"question_id": "{id}", "answer": "{ret}"}}'
+        with open(f"{model}.json", "a+", encoding="utf-8") as f:
+            f.write(re_str + "," + "\n")
         pbar.update(1)  # 更新进度条
     pbar.close()  # 确保进度条正确关闭
 
-    # 将 JSON 数据写入文件
-    with open(f"{model}_{get_json_time(0)}.json", "w", encoding="utf-8") as f:
-        json.dump(json_data, f, ensure_ascii=False, indent=4)
+
 
     print("Script executed successfully.")

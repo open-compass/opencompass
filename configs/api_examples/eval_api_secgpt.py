@@ -9,19 +9,27 @@ from opencompass.tasks import OpenICLInferTask
 with read_base():
     from ..summarizers.medium import summarizer
     from ..datasets.ceval.ceval_gen import ceval_datasets
+    from ..datasets.flames.flames_gen import flames_datasets
+
+   # ds = MsDataset.load('yuanxiaohan/S-Eval')
     from ..datasets.gsm8k.gsm8k_gen_1d7fe4 import gsm8k_datasets
 
-
 datasets = [
-    *gsm8k_datasets,
+  #{"path": "./data/clouditera/fuzz.jsonl", "data_type": "mcq", "infer_method": "gen"},
+  {"path": "./data/mymath/mymath.jsonl", "data_type": "mcq", "infer_method": "gen"},
+   #  *gsm8k_datasets,
+   # *ceval_datasets
+  # *flames_datasets
 ]
 
 models = [
     dict(
-       # abbr='SecGPT',
-        abbr='diaoyu',
+        #abbr='Qwen2-7B-Instruct',
+        abbr='CTFGPT',
+        #  abbr='SecGPT2',
         type=MyOpenAI,
-        path='SecGPT',
+        path='CTFGPT',
+#path='Qwen2-7B-Instruct',
         key='test',  # please give you key
         # generation_kwargs={
         #     'enable_search': False,
@@ -43,6 +51,3 @@ infer = dict(
 )
 
 work_dir = 'outputs/api_SecGPT/'
-summarizer = dict(
-    type=MultiroundSummarizer
-)

@@ -16,6 +16,10 @@ from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
 OPENAI_API_BASE = 'http://192.168.31.10:9997/v1/chat/completions'
+#OPENAI_API_BASE = 'http://175.6.27.232:8811/v1/chat/completions'
+#OPENAI_API_BASE = 'http://192.168.34.179:9997/v1/chat/completions'
+
+#OPENAI_API_BASE = 'http://192.168.32.49:1234/v1/chat/completions'
 
 
 @MODELS.register_module()

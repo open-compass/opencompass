@@ -5,18 +5,20 @@ from openai import OpenAI
 
 # Modify OpenAI's API key and API base to use vLLM's API server.
 openai_api_key = "EMPTY"
-# openai_api_base = "http://192.168.31.10:9997/v1"
 openai_api_base = "http://192.168.31.10:9997/v1"
+#openai_api_base = "http://192.168.31.10:9997/v1"
+#openai_api_base = "http://175.6.27.232:8811/v1"
 
 client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
     api_key=openai_api_key,
     base_url=openai_api_base,
+
 )
 
 models = client.models.list()
-model = models.data[3].id
-
+model = models.data[0].id
+print(model)
 
 def clean_answer(answer):
     # 使用正则表达式编译模式
@@ -62,11 +64,11 @@ if __name__ == '__main__':
 
     dataset = load_dataset(r"cseval/cs-eval")
     submmit_json = {}
-    for i in range(5):  #13107
+    for i in range(4669):  #13107
         text = dataset['test'][i]["prompt"]
         id = dataset['test'][i]["id"]
-        print("******提问内容为：{}********\n".format(text))
-        print("******提问id为：{}********\n".format(id))
+     #   print("******提问内容为：{}********\n".format(text))
+      #  print("******提问id为：{}********\n".format(id))
         if "单选" in text:
             prompt = "你是一个考生，你需要根据考试内容，做出回答，只帮我选出唯一正确选项，以这种格式回答：A"
 
@@ -77,11 +79,11 @@ if __name__ == '__main__':
         else:
             prompt = "你是一个考生，会有中文英文问题，你要做出回答，只帮我选出正确选项的序号如：以这种格式回答：A"
             ret = ask_model(prompt, text)
-        print("*****回答内容:：{}******** \n".format(ret))
+      #  print("*****回答内容:：{}******** \n".format(ret))
 
         ret=clean_answer(ret)
 
-        print("*****回答内容:：{}******** \n".format(ret))
+      #  print("*****回答内容:：{}******** \n".format(ret))
         re_str = f'{{"question_id": "{id}", "answer": "{ret}"}}'
-        with open("diaoyu_submit.json", "a+", encoding="utf-8") as f:
+        with open(f"{model}.json", "a+", encoding="utf-8") as f:
             f.write(re_str + "," + "\n")

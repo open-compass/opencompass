@@ -30,14 +30,23 @@ def get_source(prompt):
     data = {
         "context": prompt+"回答内容，只回答选项，例如：A"  # 问题
     }
-    r = requests.post(url, stream=True, json=data)
-    for line in r.iter_lines():
-        response = line.decode('utf-8', 'ignore')  # 使用 UTF-8 编码并忽略不能解码的字符
+    for attempt in range(3):
+        try:
+            r = requests.post(url, stream=True, json=data,timeout=300)
+            for line in r.iter_lines():
+                response = line.decode('utf-8', 'ignore')  # 使用 UTF-8 编码并忽略不能解码的字符
 
-    print(prompt, response)
-    answer=json.loads(response)
-    return answer["content"]
-
+            print(prompt, response)
+            answer=json.loads(response)
+            return answer["content"]
+        except requests.exceptions.Timeout:
+            print(f"请求超时，尝试次数 {attempt + 1}/{3}，将在 {30} 秒后重试...")
+            time.sleep(30)
+        except requests.exceptions.RequestException as e:
+            # 处理其他请求异常
+            print(f"请求失败：{e}")
+            break
+    return None  # 如果重试次数用完，返回 None
 def get_user_response():
     """
     提供用户反馈学习功能，支持用户对模型使用效果的评价
@@ -57,7 +66,7 @@ if __name__ == "__main__":
     from datasets import load_dataset
 
     dataset = load_dataset(r"cseval/cs-eval")
-    for i in range(13107):  # 13107
+    for i in range(13108):  # 13107
         text = dataset['test'][i]["prompt"]
         id = dataset['test'][i]["id"]
 

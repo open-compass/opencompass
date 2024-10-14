@@ -168,6 +168,7 @@ class CustomDataset(BaseDataset):
         if path.endswith('.jsonl'):
             with open(path, 'r', encoding='utf-8-sig') as f:
                 data = [json.loads(line) for line in f]
+                print("Data being loade:dkkk:", data)
         elif path.endswith('.csv'):
             with open(path, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
