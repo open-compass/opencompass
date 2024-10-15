@@ -8,9 +8,11 @@ from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
+from opencompass.summarizers import DefaultSubjectiveSummarizer
 
 # -------------Inference Stage ----------------------------------------
 # For subjective evaluation, we often set do sample for models
+# make sure your models' generation parameters are set properly, for example, if you set temperature=0.8, make sure you set all models' temperature to 0.8
 models = [
     dict(
         type=HuggingFacewithChatTemplate,
@@ -40,6 +42,7 @@ infer = dict(
 # -------------Evalation Stage ----------------------------------------
 
 # ------------- JudgeLLM Configuration
+# we recommand to use gpt4o-mini as the judge model
 judge_models = [
     dict(
         type=HuggingFacewithChatTemplate,
@@ -66,4 +69,5 @@ eval = dict(
     runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=SubjectiveEvalTask)),
 )
 
+summarizer = dict(type=DefaultSubjectiveSummarizer)
 work_dir = 'outputs/hellobench/'
