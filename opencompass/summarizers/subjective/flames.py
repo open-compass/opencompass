@@ -21,7 +21,7 @@ def post_process_flames(judgement: str):
 
     分数=3 and extract the score
     """
-    matches = re.findall(r'分数=(\d+)', text)
+    matches = re.findall(r'分数=(\d+)', judgement)
     if matches:
         matches = matches[0]
         return int(matches)
