@@ -428,7 +428,10 @@ class JudgerBenchEvaluator(BaseEvaluator):
 
                 if category not in category_stats:
                     category_stats[category] = {'correct': 0, 'total': 0}
-
+                if 'A' in pred:
+                    pred = 'A'
+                elif 'B' in pred:
+                    pred = 'B'
                 is_correct = pred == ref_winner
                 if is_correct:
                     category_stats[category]['correct'] += 1
