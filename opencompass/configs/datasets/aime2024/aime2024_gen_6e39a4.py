@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import Aime2024Dataset, aime2024_postprocess, Aime2024Evaluator, MATHEvaluator, math_postprocess_v2
+from opencompass.datasets import Aime2024Dataset, MATHEvaluator, math_postprocess_v2
 
 
 aime2024_reader_cfg = dict(
