@@ -495,6 +495,14 @@ class JudgerBenchEvaluator(BaseEvaluator):
                 self_scores = [model['self'] for model in models.values()]
                 correlation = np.corrcoef(meta_scores, self_scores)[0, 1]
                 correlations['corr_' + dataset] = round(correlation, 3)
+            average_correlation = sum(
+                correlations.values()) / len(correlations)
+
+            # 将平均值添加到字典的开始处
+            correlations = {
+                f'avg_corr': round(average_correlation, 3),
+                **correlations
+            }
         results = {'accuracy': round(correct / total, 3) if total > 0 else 0.0}
 
         for category, stats in category_stats.items():

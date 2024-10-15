@@ -199,10 +199,10 @@ def check_rating(rating, all_dimensions):
     return rating
 
 
-def post_process_alignbench(judgement: str,
+def post_process_alignbench(judgement: dict,
                             all_dimensions=All_Dimensions,
                             possible_keys=['综合得分']):
-    """Input a string like below:
+    """Input a dict item must contain string like below:
 
     xxx{'事实正确性': 1, '满足用户需求': 1, '清晰度': 2, '完备性': 1, '综合得分': 1}xxx,
     and extract each score

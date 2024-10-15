@@ -2,8 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import ChatInferencer, GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import MTBenchDataset
-from opencompass.summarizers import MTBenchSummarizer
+from opencompass.datasets import MTBenchDataset, mtbench_postprocess
 
 subjective_reader_cfg = dict(
     input_columns=['dialogue', 'capability', 'system_prompt', 'prompt_template'],
@@ -48,6 +47,7 @@ for _name in subjective_all_sets:
                     ),
                 ]),
             ),
+            dict_postprocessor=dict(type=mtbench_postprocess),
         ),
         pred_role='BOT',
     )
@@ -62,5 +62,4 @@ for _name in subjective_all_sets:
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
             mode='singlescore',
-            summarizer = dict(type=MTBenchSummarizer, judge_type='single')
         ))
