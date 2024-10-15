@@ -15,7 +15,7 @@ cmo_fib_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt='{question}\n请一步一步地推理，并将您的最终答案写入\\boxed{}.'),
+                dict(role='HUMAN', prompt='{question}\n请一步一步地推理，并将最终答案写入\\boxed{}.'),
             ],
         )
     ),
