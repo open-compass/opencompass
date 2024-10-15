@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import ChatInferencer, GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import WildBenchDataset
+from opencompass.datasets import WildBenchDataset, wildbench_postprocess
 from opencompass.summarizers import WildBenchPairSummarizer
 
 subjective_reader_cfg = dict(
@@ -30,6 +30,7 @@ subjective_eval_cfg = dict(
             type=PromptTemplate,
             template="""{prompt}"""
         ),
+        dict_postprocessor=dict(type=wildbench_postprocess),
     ),
     pred_role='BOT',
 )
@@ -62,5 +63,4 @@ wildbench_datasets.append(
         mode='m2n', # m个模型 与 n个模型进行对战
         infer_order='random',
         base_models = [llama_2_70b, gpt4, claude],
-        summarizer = dict(type=WildBenchPairSummarizer),
     ))
