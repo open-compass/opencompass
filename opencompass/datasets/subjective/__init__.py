@@ -16,6 +16,7 @@ from .flames import FlamesDataset  # noqa: F401, F403
 from .fofo import FofoDataset, fofo_postprocess  # noqa: F401, F403
 from .followbench import FollowBenchDataset  # noqa: F401, F403
 from .followbench import followbench_postprocess
+from .hellobench import *  # noqa: F401, F403
 from .judgerbench import JudgerBenchDataset  # noqa: F401, F403
 from .judgerbench import JudgerBenchEvaluator  # noqa: F401, F403
 from .mtbench import MTBenchDataset, mtbench_postprocess  # noqa: F401, F403

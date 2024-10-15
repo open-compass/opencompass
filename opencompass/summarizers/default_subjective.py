@@ -324,7 +324,9 @@ class DefaultSubjectiveSummarizer:
         else:
             output_csv_path = output_path.replace('.txt', '.csv')
         output_path = output_path.split('.txt')[0] + '_by_' + judge_abbr + '.txt'
+
         output_csv_path = output_csv_path.split('.csv')[0] + '_by_' + judge_abbr + '.csv'
+
         output_dir = osp.split(output_path)[0]
         mmengine.mkdir_or_exist(output_dir)
         with open(output_path, 'w', encoding='utf-8') as f:
