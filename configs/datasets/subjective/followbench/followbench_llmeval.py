@@ -2,8 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import FollowBenchDataset
-from opencompass.summarizers import FollowBenchSummarizer
+from opencompass.datasets import FollowBenchDataset, followbench_postprocess
 
 subjective_reader_cfg = dict(
     input_columns=['instruction', 'judge_prompt',],
@@ -44,6 +43,7 @@ for _name in subjective_all_sets:
                     ),
                 ]),
             ),
+            dict_postprocessor=dict(type=followbench_postprocess),
         ),
         pred_role='BOT',
     )
@@ -59,5 +59,4 @@ for _name in subjective_all_sets:
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
-            summarizer = dict(type=FollowBenchSummarizer,)
         ))
