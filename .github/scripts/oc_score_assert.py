@@ -12,7 +12,7 @@ chat_model_list = [
     'gemma2-9b-it-hf', 'gemma-7b-it-vllm', 'internlm2_5-7b-chat-hf',
     'internlm2_5-20b-chat-hf', 'internlm2_5-7b-chat-turbomind',
     'internlm2_5-20b-chat-turbomind', 'internlm2-chat-1.8b-turbomind',
-    'internlm2-chat-1.8b-sft-turbomind', 'internlm2-chat-7b-turbomind',
+    'internlm2-chat-1.8b-sft-turbomind', 'internlm2-chat-7b-lmdeploy',
     'internlm2-chat-7b-sft-turbomind', 'internlm2-chat-7b-vllm',
     'llama-3_1-8b-instruct-hf', 'llama-3-8b-instruct-hf',
     'llama-3_1-8b-instruct-turbomind', 'llama-3-8b-instruct-turbomind',
@@ -105,8 +105,8 @@ class TestCmdCase:
 
     @pytest.mark.case2
     @pytest.mark.parametrize('model, dataset',
-                             [('internlm2_5-7b-chat-turbomind', 'race-middle'),
-                              ('internlm2_5-7b-chat-turbomind', 'race-high')])
+                             [('internlm2_5-7b-chat-lmdeploy', 'race-middle'),
+                              ('internlm2_5-7b-chat-lmdeploy', 'race-high')])
     def test_cmd_case2(self, result_scores, model, dataset):
         if len(result_scores.keys()) != 1:
             assert False, 'result is none'

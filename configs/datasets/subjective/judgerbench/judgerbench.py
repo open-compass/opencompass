@@ -1,20 +1,19 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import CreationBenchDataset
+from opencompass.datasets.subjective import JudgerBenchDataset, JudgerBenchEvaluator
+from mmengine.config import read_base
 
 subjective_reader_cfg = dict(
-    input_columns=['question', 'capability', 'gpt4_prefix', 'gpt4_suffix'],
+    input_columns=['judge_prompt'],
     output_column='judge',
     )
 
 subjective_all_sets = [
-    'creationbench',
+    'judgerbench_A_cn', 'judgerbench_A_en', 'judgerbench_B'
 ]
-data_path ='data/subjective/'
 
-subjective_datasets = []
+judgerbench_datasets = []
 
 for _name in subjective_all_sets:
     subjective_infer_cfg = dict(
@@ -23,38 +22,33 @@ for _name in subjective_all_sets:
                 template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt='{question}'
+                        prompt='{judge_prompt}'
                     ),
                 ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_seq_len=4096, max_out_len=2048),
+            inferencer=dict(type=GenInferencer, max_out_len=4096),
         )
 
     subjective_eval_cfg = dict(
         evaluator=dict(
-            type=LMEvaluator,
-            prompt_template=dict(
-                type=PromptTemplate,
-                template=dict(round=[
-                    dict(
-                        role='HUMAN',
-                        prompt = '{gpt4_prefix}{prediction}{gpt4_suffix}'
-                    ),
-                ]),
-            ),
+            type=JudgerBenchEvaluator,
         ),
         pred_role='BOT',
     )
 
-    subjective_datasets.append(
+    judgerbench_datasets.append(
         dict(
             abbr=f'{_name}',
-            type=CreationBenchDataset,
-            multi_dimension=True,
-            path=data_path,
+            type=JudgerBenchDataset,
+            path='./data/subjective/judgerbench',
             name=_name,
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
-            eval_cfg=subjective_eval_cfg
+            eval_cfg=subjective_eval_cfg,
         ))
+# ds1000_eval_cfg = dict(
+#     evaluator=dict(type=DS1000Evaluator),
+#     pred_role='BOT',
+#     pred_postprocessor=dict(type=ds1000_postprocess),
+# )

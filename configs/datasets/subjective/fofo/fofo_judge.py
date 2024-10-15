@@ -2,8 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import FofoDataset
-from opencompass.summarizers import FofoSummarizer
+from opencompass.datasets import FofoDataset, fofo_postprocess
 from mmengine.config import read_base
 
 subjective_reader_cfg = dict(
@@ -81,6 +80,7 @@ for _name in subjective_all_sets:
                     ),
                 ]),
             ),
+            dict_postprocessor=dict(type=fofo_postprocess),
         ),
         pred_role='BOT',
     )
@@ -95,5 +95,4 @@ for _name in subjective_all_sets:
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
             mode='singlescore',
-            summarizer = dict(type=FofoSummarizer, judge_type='general')
         ))
