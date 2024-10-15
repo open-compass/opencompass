@@ -182,7 +182,11 @@ class DLCRunner(BaseRunner):
                               cfg_path=param_file,
                               template=tmpl)
             cmd = get_cmd()
-
+            # Use specified python env instead of sys.executable
+            if self.aliyun_cfg['python_env_path']:
+                cmd = cmd.replace(
+                    sys.executable,
+                    f'{self.aliyun_cfg["python_env_path"]}/bin/python')
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')
 
@@ -232,6 +236,8 @@ class DLCRunner(BaseRunner):
                 while True:
                     # 1. Avoid to request dlc too frequently.
                     # 2. DLC job may not be ready immediately after creation.
+                    dlc_sleep_time = self.aliyun_cfg.get('dlc_sleep_time', 10)
+                    time.sleep(dlc_sleep_time)
                     num_retry = 60
                     for retry_index in range(num_retry):
                         time.sleep(2)

@@ -8,6 +8,16 @@ glm-4-9b-chat-hf:
     race-middle: 88
     race-high: 88
 
+glm-4-9b-chat-turbomind:
+    gsm8k: 69
+    race-middle: 82
+    race-high: 77
+
+glm-4-9b-chat-vllm:
+    gsm8k: 73
+    race-middle: 87
+    race-high: 87
+
 deepseek-7b-chat-hf:
     gsm8k: 60
     race-middle: 74
@@ -17,6 +27,11 @@ deepseek-moe-16b-chat-hf:
     gsm8k: 62
     race-middle: 62
     race-high: 70
+
+deepseek-v2-lite-chat-hf:
+    gsm8k: 59
+    race-middle: 82
+    race-high: 79
 
 deepseek-7b-chat-vllm:
     gsm8k: 63
@@ -33,15 +48,40 @@ gemma-7b-it-hf:
     race-middle: 74
     race-high: 71
 
+gemma-7b-it-vllm:
+    gsm8k: 38
+    race-middle: 75
+    race-high: 70
+
+gemma2-2b-it-hf:
+    gsm8k: 62
+    race-middle: 75
+    race-high: 67
+
+gemma2-9b-it-hf:
+    gsm8k: 80
+    race-middle: 89
+    race-high: 85
+
 internlm2_5-7b-chat-hf:
     gsm8k: 86
     race-middle: 92
     race-high: 93
 
+internlm2_5-20b-chat-hf:
+    gsm8k: 91
+    race-middle: 95
+    race-high: 91
+
 internlm2_5-7b-chat-turbomind:
     gsm8k: 87
     race-middle: 92
     race-high: 93
+
+internlm2_5-20b-chat-turbomind:
+    gsm8k: 91
+    race-middle: 95
+    race-high: 91
 
 internlm2-chat-1.8b-turbomind:
     gsm8k: 40
@@ -49,7 +89,7 @@ internlm2-chat-1.8b-turbomind:
     race-high: 83
 
 internlm2-chat-1.8b-sft-turbomind:
-    gsm8k: 32
+    gsm8k: 34
     race-middle: 81
     race-high: 83
 
@@ -68,10 +108,20 @@ internlm2-chat-7b-vllm:
     race-middle: 90
     race-high: 91
 
+llama-3_1-8b-instruct-hf:
+    gsm8k: 82
+    race-middle: 82
+    race-high: 88
+
 llama-3-8b-instruct-hf:
     gsm8k: 77
     race-middle: 85
     race-high: 87
+
+llama-3_1-8b-instruct-turbomind:
+    gsm8k: 79
+    race-middle: 82
+    race-high: 88
 
 llama-3-8b-instruct-turbomind:
     gsm8k: 77
@@ -81,6 +131,11 @@ llama-3-8b-instruct-turbomind:
 mistral-7b-instruct-v0.2-hf:
     gsm8k: 48
     race-middle: 82
+    race-high: 78
+
+mistral-7b-instruct-v0.3-hf:
+    gsm8k: 53
+    race-middle: 80
     race-high: 78
 
 mistral-7b-instruct-v0.2-vllm:
@@ -118,6 +173,11 @@ qwen1.5-0.5b-chat-hf:
     race-middle: 55
     race-high: 50
 
+qwen2-1.5b-instruct-hf:
+    gsm8k: 63
+    race-middle: 77
+    race-high: 86
+
 qwen2-1.5b-instruct-turbomind:
     gsm8k: 60
     race-middle: 77
@@ -127,6 +187,11 @@ qwen2-7b-instruct-turbomind:
     gsm8k: 88
     race-middle: 87
     race-high: 89
+
+qwen2-7b-instruct-hf:
+    gsm8k: 85
+    race-middle: 87
+    race-high: 91
 
 qwen1.5-0.5b-chat-vllm:
     gsm8k: 5
@@ -153,6 +218,11 @@ deepseek-moe-16b-base-hf:
     race-middle: 35
     race-high: 23
 
+deepseek-v2-lite-hf:
+    gsm8k: 37
+    race-middle: 56
+    race-high: 62
+
 deepseek-7b-base-turbomind:
     gsm8k: 21
     race-middle: 42
@@ -173,8 +243,18 @@ gemma-7b-hf:
     race-middle: 59
     race-high: 66
 
+gemma2-2b-hf:
+    gsm8k: 33
+    race-middle: 56
+    race-high: 58
+
+gemma2-9b-hf:
+    gsm8k: 70
+    race-middle: 82
+    race-high: 84
+
 internlm2_5-7b-hf:
-    gsm8k: 46
+    gsm8k: 47
     race-middle: 92
     race-high: 91
 
@@ -208,12 +288,32 @@ internlm2-base-7b-turbomind:
     race-middle: 75
     race-high: 81
 
+llama-2-7b-hf:
+    gsm8k: 17
+    race-middle: 32
+    race-high: 38
+
+llama-3-8b-hf:
+    gsm8k: 48
+    race-middle: 64
+    race-high: 70
+
+llama-3.1-8b-turbomind:
+    gsm8k: 57
+    race-middle: 67
+    race-high: 75
+
 llama-3-8b-turbomind:
     gsm8k: 52
     race-middle: 63
     race-high: 70
 
 mistral-7b-v0.2-hf:
+    gsm8k: 43
+    race-middle: 42
+    race-high: 60
+
+mistral-7b-v0.3-hf:
     gsm8k: 43
     race-middle: 42
     race-high: 60
@@ -228,10 +328,20 @@ qwen1.5-moe-a2.7b-hf:
     race-middle: 78
     race-high: 90
 
+qwen2-1.5b-hf:
+    gsm8k: 58
+    race-middle: 65
+    race-high: 78
+
 qwen2-0.5b-hf:
     gsm8k: 35
     race-middle: 52
     race-high: 48
+
+qwen2-7b-hf:
+    gsm8k: 82
+    race-middle: 88
+    race-high: 89
 
 qwen2-1.5b-turbomind:
     gsm8k: 57

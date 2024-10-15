@@ -33,6 +33,7 @@ from .crowspairs_cn import *  # noqa: F401, F403
 from .csl import *  # noqa: F401, F403
 from .custom import *  # noqa: F401, F403
 from .cvalues import *  # noqa: F401, F403
+from .dingo import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
 from .drop_simple_eval import *  # noqa: F401, F403
@@ -40,9 +41,9 @@ from .ds1000 import *  # noqa: F401, F403
 from .ds1000_interpreter import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
 from .FinanceIQ import *  # noqa: F401, F403
-from .flames import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
+from .gaokao_math import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403

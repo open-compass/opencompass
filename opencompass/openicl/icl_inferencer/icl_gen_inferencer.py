@@ -127,6 +127,7 @@ class GenInferencer(BaseInferencer):
                 index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
+        logger.info('Starting build dataloader')
         dataloader = self.get_dataloader(prompt_list[index:], self.batch_size)
 
         # 5. Inference for prompts in each batch

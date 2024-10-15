@@ -13,6 +13,7 @@ from .compassbench_control_length_bias import \
 from .corev2 import Corev2Dataset  # noqa: F401, F403
 from .creationbench import CreationBenchDataset  # noqa: F401, F403
 from .fofo import FofoDataset, fofo_postprocess  # noqa: F401, F403
+from .flames import FlamesDataset  # noqa: F401, F403
 from .followbench import FollowBenchDataset  # noqa: F401, F403
 from .information_retrival import IRDataset  # noqa: F401, F403
 from .judgerbench import JudgerBenchDataset  # noqa: F401, F403
