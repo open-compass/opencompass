@@ -128,7 +128,8 @@ judgemodel通常被设置为GPT4等强力模型，可以直接按照config文件
 1. 首先需要设置`subjective_reader_cfg`，用以接收从自定义的Dataset类里return回来的相关字段并指定保存文件时的output字段
 2. 然后需要指定数据集的根路径`data_path`以及数据集的文件名`subjective_all_sets`，如果有多个子文件，在这个list里进行添加即可
 3. 指定`subjective_infer_cfg`和`subjective_eval_cfg`，配置好相应的推理和评测的prompt
-4. 最后在相应的位置指定`mode`，`summarizer`等额外信息，注意，对于不同的主观数据集，所需指定的字段可能不尽相同。此外，相应数据集的summarizer类也需要自己实现以进行数据的统计，可以参考其他数据集的summarizer实现，位于`opencompass/opencompass/summarizers/subjective`
+4. 在相应的位置指定`mode`等额外信息，注意，对于不同的主观数据集，所需指定的字段可能不尽相同。
+5. 定义后处理与得分统计。例如opencompass/opencompass/datasets/subjective/alignbench下的alignbench_postprocess处理函数
 
 ### 第三步 启动评测并输出评测结果
 

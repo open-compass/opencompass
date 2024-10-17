@@ -5,6 +5,7 @@ from .alpacaeval import AlpacaEvalDataset  # noqa: F401, F403
 from .alpacaeval import alpacaeval_postprocess  # noqa: F401, F403
 from .arena_hard import ArenaHardDataset  # noqa: F401, F403
 from .arena_hard import arenahard_postprocess  # noqa: F401, F403
+from .compass_arena import CompassArenaDataset, compassarena_postprocess
 from .compassbench import CompassBenchDataset  # noqa: F401, F403
 from .compassbench_checklist import \
     CompassBenchCheklistDataset  # noqa: F401, F403
@@ -16,6 +17,7 @@ from .flames import FlamesDataset  # noqa: F401, F403
 from .fofo import FofoDataset, fofo_postprocess  # noqa: F401, F403
 from .followbench import FollowBenchDataset  # noqa: F401, F403
 from .followbench import followbench_postprocess
+from .hellobench import *  # noqa: F401, F403
 from .judgerbench import JudgerBenchDataset  # noqa: F401, F403
 from .judgerbench import JudgerBenchEvaluator  # noqa: F401, F403
 from .mtbench import MTBenchDataset, mtbench_postprocess  # noqa: F401, F403
