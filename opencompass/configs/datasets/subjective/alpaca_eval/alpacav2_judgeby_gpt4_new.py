@@ -2,8 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import SubjectiveCmpDataset
-from opencompass.summarizers import AlpacaSummarizer
+from opencompass.datasets import AlpacaEvalDataset, alpacaeval_postprocess
 from mmengine.config import read_base
 
 subjective_reader_cfg = dict(
@@ -95,6 +94,7 @@ for _name in subjective_all_sets:
                     ),
                 ]),
             ),
+            dict_postprocessor=dict(type=alpacaeval_postprocess),
         ),
         pred_role='BOT',
     )
@@ -102,7 +102,7 @@ for _name in subjective_all_sets:
     alpacav2_datasets.append(
         dict(
             abbr=f'{_name}',
-            type=SubjectiveCmpDataset,
+            type=AlpacaEvalDataset,
             path='./data/subjective/alpaca_eval',
             name=_name,
             reader_cfg=subjective_reader_cfg,
@@ -111,6 +111,5 @@ for _name in subjective_all_sets:
             mode='m2n',
             infer_order='random',
             base_models=gpt4,
-            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/alpaca_eval/gpt4-turbo'}],
-            summarizer=dict(type=AlpacaSummarizer, judge_type='v2'),
+            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/alpaca_eval/gpt4-turbo'}]
         ))
