@@ -9,6 +9,7 @@ from opencompass.models.base_api import APITemplateParser
 from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
+from mmengine.device import is_npu_available
 
 PromptType = Union[PromptList, str]
 
@@ -224,6 +225,8 @@ class HuggingFacewithChatTemplate(BaseModel):
         model_kwargs.update(kwargs)
         model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
         self.logger.debug(f'using model_kwargs: {model_kwargs}')
+        if is_npu_available():
+            model_kwargs['device_map'] = 'npu'
 
         try:
             self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
