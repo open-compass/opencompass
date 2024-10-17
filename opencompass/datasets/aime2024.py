@@ -3,6 +3,7 @@ import json
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -12,6 +13,7 @@ class Aime2024Dataset(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         dataset = []
         with open(path, 'r') as f:
             for line in f:
@@ -19,7 +21,7 @@ class Aime2024Dataset(BaseDataset):
                 origin_prompt = line['origin_prompt']
                 line['question'] = origin_prompt[origin_prompt.find('user\n') +
                                                  len('user\n'):origin_prompt.
-                                                 find('[UNUSED_TOKEN_145]')]
+                                                 find('assistant')]
                 line['answer'] = line['gold_answer']
                 dataset.append(line)
         return Dataset.from_list(dataset)
