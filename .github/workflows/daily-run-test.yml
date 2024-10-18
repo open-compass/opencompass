@@ -148,9 +148,11 @@ jobs:
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           conda info --envs
           sed -i 's/judgemodel/'$(tail -n 1 /cpfs01/shared/public/llmeval/share_info/compassjuder_ip.txt)'/g' .github/scripts/eval_regression_chat.py
-          opencompass .github/scripts/eval_regression_chat.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }} --reuse --max-num-workers 2
+          opencompass .github/scripts/eval_regression_chat_objecitve.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }} --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
+
+          opencompass .github/scripts/eval_regression_chat_subjective.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }} --reuse --max-num-workers 2
       - name:  Run base model test
         if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'base')
         run: |

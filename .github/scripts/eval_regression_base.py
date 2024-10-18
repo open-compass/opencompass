@@ -6,6 +6,8 @@ with read_base():
         gsm8k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.race.race_ppl import \
         race_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.winogrande.winogrande_5shot_ll_252f01 import \
+        winogrande_datasets  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_moe_16b_base import \
         models as hf_deepseek_moe_16b_base_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_v2_lite import \
