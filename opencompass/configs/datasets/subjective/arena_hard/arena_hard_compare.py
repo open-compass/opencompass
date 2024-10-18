@@ -2,7 +2,8 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import ArenaHardDataset, arenahard_postprocess
+from opencompass.datasets import ArenaHardDataset
+from opencompass.summarizers import ArenaHardSummarizer
 from mmengine.config import read_base
 
 subjective_reader_cfg = dict(
@@ -59,7 +60,6 @@ for _name in subjective_all_sets:
                     ),
                 ]),
             ),
-            dict_postprocessor=dict(type=arenahard_postprocess),
         ),
         pred_role='BOT',
     )
@@ -76,5 +76,6 @@ for _name in subjective_all_sets:
             mode='m2n',
             infer_order='double',
             base_models=gpt4,
-            given_pred = [{'abbr':'gpt4-0314', 'path':'./data/subjective/arena_hard'}]
+            given_pred = [{'abbr':'gpt4-0314', 'path':'./data/subjective/arena_hard'}],
+            summarizer = dict(type=ArenaHardSummarizer),
         ))

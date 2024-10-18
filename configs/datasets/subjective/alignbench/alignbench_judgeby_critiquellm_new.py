@@ -2,8 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.summarizers import AlignmentBenchSummarizer
-from opencompass.datasets import AlignmentBenchDataset
+from opencompass.datasets import AlignmentBenchDataset, alignbench_postprocess
 
 subjective_reader_cfg = dict(
     input_columns=['question', 'capability', 'critiquellm_prefix'],
@@ -11,7 +10,7 @@ subjective_reader_cfg = dict(
     )
 
 subjective_all_sets = [
-    'alignment_bench_v1_1', # Changed to Alignbench_v1_1 since 06/15/2024, refer to https://github.com/THUDM/AlignBench
+    'alignment_bench',
 ]
 data_path ='data/subjective/alignment_bench'
 
@@ -47,6 +46,7 @@ for _name in subjective_all_sets:
                     ),
                 ]),
             ),
+            dict_postprocessor=dict(type=alignbench_postprocess, judge_type='general'),
         ),
         pred_role='BOT',
     )
@@ -63,5 +63,4 @@ for _name in subjective_all_sets:
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
             mode='singlescore',
-            summarizer = dict(type=AlignmentBenchSummarizer, judge_type='general')
         ))
