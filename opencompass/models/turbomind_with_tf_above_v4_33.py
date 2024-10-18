@@ -108,7 +108,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
             # from messages as a workaround
             if self.tokenizer.bos_token:
                 bos_token = self.tokenizer.bos_token
-                messages = [message.removeprefix(bos_token) for message in messages if message.startswith(bos_token)]
+                messages = [message.removeprefix(bos_token) if message.startswith(bos_token) else message for message in messages]
         stop_words = list(set(self.stop_words + stopping_criteria))
 
         DEFAULT_GEN_CONFIG = {
