@@ -19,9 +19,7 @@ class Aime2024Dataset(BaseDataset):
             for line in f:
                 line = json.loads(line)
                 origin_prompt = line['origin_prompt']
-                line['question'] = origin_prompt[origin_prompt.find('user\n') +
-                                                 len('user\n'):origin_prompt.
-                                                 find('assistant')]
+                line['question'] = origin_prompt[:]
                 line['answer'] = line['gold_answer']
                 dataset.append(line)
         return Dataset.from_list(dataset)
