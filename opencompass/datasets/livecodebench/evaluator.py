@@ -445,11 +445,7 @@ class LCBTestOutputEvaluator(BaseEvaluator):
         predictions = [[extract_test_output_code(item)]
                        for item in predictions]
         references = [json.loads(item) for item in references]
-        import pdb
-        pdb.set_trace()
         metrics, results = test_output_metrics(references,
                                                predictions,
                                                k_list=[1])
-        import pdb
-        pdb.set_trace()
         return metrics
