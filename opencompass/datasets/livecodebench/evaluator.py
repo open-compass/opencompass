@@ -14,6 +14,7 @@ from opencompass.utils import get_logger
 from .execute_utils import BASE_IMPORTS, codeexecute_check_correctness
 from .extract_utils import (extract_code_execution, extract_code_generation,
                             extract_test_output_code)
+from .livecodebench import LCBCodeGenerationDataset
 from .pass_k_utils import compute_metrics_from_results
 from .testing_util import run_test
 
@@ -231,9 +232,18 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
         super().__init__()
         self.num_process_evaluate = num_process_evaluate
         self.timeout = timeout
+        self.dataset = LCBCodeGenerationDataset.load()['test']
 
     def score(self, predictions, references):
         predictions = [[extract_code_generation(item)] for item in predictions]
+
+        evaluation_samples = dict()
+        for idx in range(len(self.dataset)):
+            evaluation_samples[self.dataset[idx][
+                'question_id']] = self.dataset[idx]['evaluation_sample']
+
+        references = [evaluation_samples[item] for item in references]
+
         references = [{'input_output': item} for item in references]
 
         BaseEvaluator.is_num_equal(predictions, references)

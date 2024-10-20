@@ -276,6 +276,21 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "opencompass/needlebench",
         "local": "./data/needlebench",
+    },
+    "opencompass/code_generation_lite": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/code_generation_lite",
+    },
+    "opencompass/execution-v2": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/execution-v2",
+    },
+    "opencompass/test_generation": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/test_generation",
     }
 }
 
@@ -427,5 +442,17 @@ DATASETS_URL = {
     "/teval": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/teval.zip",
         "md5": "7628ab5891a26bf96ca17becfd044867",
+    },
+    "/code_generation_lite": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/code_generation_lite.zip",
+        "md5": "60103a18ca63b05ea06e98d24170f23d",
+    },
+    "/execution-v2": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/execution-v2.zip",
+        "md5": "019ef1a0686ee6ca34f51c8af104fcd9",
+    },
+    "/test_generation": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/test_generation.zip",
+        "md5": "918a6ea2b1eee6f2b1314db3c21cb4c7",
     },
 }

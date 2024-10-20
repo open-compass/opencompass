@@ -51,7 +51,7 @@ class Test:
 class LCBCodeGenerationDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str = 'livecodebench/code_generation_lite',
+    def load(path: str = 'opencompass/code_generation_lite',
              local_mode: bool = False,
              release_version: str = 'release_v1'):
 
@@ -97,12 +97,13 @@ class LCBCodeGenerationDataset(BaseDataset):
 
             return item
 
-        # path = get_data_path(path, local_mode=local_mode)
+        path = get_data_path(path, local_mode=local_mode)
 
-        dataset = load_dataset(path,
-                               split='test',
-                               version_tag=release_version,
-                               trust_remote_code=True)
+        dataset = load_dataset(
+            path,  # 'livecodebench/code_generation_lite'
+            split='test',
+            version_tag=release_version,
+            trust_remote_code=True)
 
         dataset = dataset.map(transform)
 
@@ -113,7 +114,7 @@ class LCBCodeExecutionDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str = 'livecodebench/execution-v2',
+        path: str = 'opencompass/execution-v2',
         local_mode: bool = False,
         cot: bool = False,
         # release_version: str = "release_v1"
@@ -135,7 +136,9 @@ class LCBCodeExecutionDataset(BaseDataset):
 
             return item
 
-        dataset = load_dataset(path, split='test')
+        path = get_data_path(path, local_mode=local_mode)
+        dataset = load_dataset(path,
+                               split='test')  # 'livecodebench/execution-v2'
         dataset = dataset.map(transform)
 
         return DatasetDict({'test': dataset, 'train': dataset})
@@ -145,7 +148,7 @@ class LCBTestOutputPredictionDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path: str = 'livecodebench/test_generation',
+        path: str = 'opencompass/test_generation',
         local_mode: bool = False,
         # release_version: str = "release_v1"
     ):
@@ -177,6 +180,8 @@ class LCBTestOutputPredictionDataset(BaseDataset):
 
             return item
 
+        path = get_data_path(path, local_mode=local_mode)
+        # 'livecodebench/test_generation',
         dataset = load_dataset(path, split='test', trust_remote_code=True)
         dataset = dataset.map(transform)
 
