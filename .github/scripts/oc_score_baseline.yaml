@@ -84,7 +84,7 @@ internlm2_5-20b-chat-turbomind:
     race-high: 91
 
 internlm2-chat-1.8b-turbomind:
-    gsm8k: 30
+    gsm8k: 40
     race-middle: 82
     race-high: 83
 
@@ -121,7 +121,7 @@ llama-3-8b-instruct-hf:
 llama-3_1-8b-instruct-turbomind:
     gsm8k: 79
     race-middle: 82
-    race-high: 82
+    race-high: 88
 
 llama-3-8b-instruct-turbomind:
     gsm8k: 77

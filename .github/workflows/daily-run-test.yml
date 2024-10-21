@@ -73,7 +73,7 @@ jobs:
         cuda_env: [dsw_cu11, dsw_cu12]
     runs-on: ${{ matrix.cuda_env }}
     environment: 'prod'
-    timeout-minutes: 420 #7hours
+    timeout-minutes: 600 #10hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
