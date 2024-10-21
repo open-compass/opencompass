@@ -16,7 +16,6 @@ from .extract_utils import (extract_code_execution, extract_code_generation,
                             extract_test_output_code)
 from .livecodebench import LCBCodeGenerationDataset
 from .pass_k_utils import compute_metrics_from_results
-from .testing_util import run_test
 
 
 def codegen_check_correctness(sample, generation, timeout, debug=True):
@@ -27,6 +26,7 @@ def codegen_check_correctness(sample, generation, timeout, debug=True):
     """
 
     def _temp_run(sample, generation, debug, result, metadata_list, timeout):
+        from .testing_util import run_test
         res, metadata = run_test(sample,
                                  test=generation,
                                  debug=debug,
