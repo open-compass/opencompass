@@ -3,13 +3,13 @@
 from typing import Dict, List, Optional, Union
 
 import torch
+from mmengine.device import is_npu_available
 
 from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.models.base_api import APITemplateParser
 from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
-from mmengine.device import is_npu_available
 
 PromptType = Union[PromptList, str]
 

@@ -2,11 +2,11 @@ import evaluate
 import numpy as np
 import torch
 from datasets import load_dataset
+from mmengine.device import is_npu_available
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
-from mmengine.device import is_npu_available
 
 from .base import BaseDataset
 
