@@ -9,7 +9,7 @@ gpqa_reader_cfg = dict(
     input_columns=['question', 'A', 'B', 'C', 'D'],
     output_column='answer')
 
-hint = f'对下面的单项选择题，请直接给出正确答案的选项。'
+hint = f'For the multiple choice question below, please provide the correct answer option directly.'
 question_and_options = 'Question: {question}\n(A){A}\n(B){B}\n(C){C}\n(D){D}\n'
 gpqa_infer_cfg = dict(
     ice_template=dict(
