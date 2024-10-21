@@ -1,30 +1,34 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import ChatInferencer, GenInferencer
+from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import MTBench101Dataset
-from opencompass.summarizers import MTBench101Summarizer
+from opencompass.datasets import FollowBenchDataset, followbench_postprocess
 
 subjective_reader_cfg = dict(
-    input_columns=['dialogue','task','multi_id','turn_id','system_prompt','prompt_template'],
+    input_columns=['instruction', 'judge_prompt',],
     output_column='judge',
     )
 
 subjective_all_sets = [
-    'mtbench101',
+    'followbench_llmeval_cn', 'followbench_llmeval_en',
 ]
-data_path ='data/subjective/'
+data_path ='data/subjective/followbench/converted_data'
 
-mtbench101_datasets = []
+followbench_llmeval_datasets = []
 
 for _name in subjective_all_sets:
     subjective_infer_cfg = dict(
             prompt_template=dict(
                 type=PromptTemplate,
-                template="""{dialogue}""",
+                template=dict(round=[
+                    dict(
+                        role='HUMAN',
+                        prompt='{instruction}'
+                    ),
+                ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=ChatInferencer, max_seq_len=4096, max_out_len=4096, infer_mode='last'),
+            inferencer=dict(type=GenInferencer, max_out_len=2048),
         )
 
     subjective_eval_cfg = dict(
@@ -32,33 +36,27 @@ for _name in subjective_all_sets:
             type=LMEvaluator,
             prompt_template=dict(
                 type=PromptTemplate,
-                template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt='{system_prompt}')
-                ],
-                    round=[
+                template=dict(round=[
                     dict(
                         role='HUMAN',
-                        prompt = '{prompt_template}'
+                        prompt = '{judge_prompt}'
                     ),
                 ]),
             ),
+            dict_postprocessor=dict(type=followbench_postprocess),
         ),
         pred_role='BOT',
     )
 
-    mtbench101_datasets.append(
+    followbench_llmeval_datasets.append(
         dict(
             abbr=f'{_name}',
-            type=MTBench101Dataset,
+            type=FollowBenchDataset,
             path=data_path,
             name=_name,
+            mode='singlescore',
+            cate='llm',
             reader_cfg=subjective_reader_cfg,
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
-            mode='singlescore',
-            summarizer = dict(type=MTBench101Summarizer, judge_type='single')
         ))
