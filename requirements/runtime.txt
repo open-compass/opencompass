@@ -7,6 +7,7 @@ evaluate>=0.3.0
 func_timeout
 fuzzywuzzy
 h5py
+huggingface_hub<=0.24.7
 immutabledict
 jieba
 json5
