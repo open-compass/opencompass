@@ -23,6 +23,9 @@ MODELS = Registry('model', locations=['opencompass.models'])
 LOAD_DATASET = Registry('load_dataset', locations=['opencompass.datasets'])
 TEXT_POSTPROCESSORS = Registry(
     'text_postprocessors', locations=['opencompass.utils.text_postprocessors'])
+DICT_POSTPROCESSORS = Registry(
+    'dict_postprocessors', locations=['opencompass.utils.dict_postprocessors'])
+
 EVALUATORS = Registry('evaluators', locations=['opencompass.evaluators'])
 
 ICL_INFERENCERS = Registry('icl_inferencers',

@@ -69,6 +69,7 @@ from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
+from .livecodebench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
@@ -83,6 +84,7 @@ from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
+from .mmmlu import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403
