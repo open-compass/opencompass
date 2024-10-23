@@ -67,6 +67,7 @@ from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
+from .livecodebench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
