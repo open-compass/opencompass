@@ -164,20 +164,27 @@ class DLCRunner(BaseRunner):
             # set priority to 1 as default
             task_priority = self.aliyun_cfg.get('priority', 1)
 
+            # Different dlc versions has different commands
+            if self.aliyun_cfg.get('dlc_job_cmd') == 'create':
+                dlc_job_cmd = 'create job --kind PyTorchJob'
+                worker_cmd = ' --worker_count 1'
+            else:
+                dlc_job_cmd = 'submit pytorchjob'
+                worker_cmd = ' --workers 1'
             tmpl = (
-                'dlc submit pytorchjob'
+                f'dlc {dlc_job_cmd}'
                 f" --command '{shell_cmd}'"
                 f' --name {task_name[:512]}'
                 f" --config {self.aliyun_cfg['dlc_config_path']}"
                 f" --workspace_id {self.aliyun_cfg['workspace_id']}"
-                f" --resource_id {self.aliyun_cfg['resource_id']}"
+                f" --resource_id={self.aliyun_cfg['resource_id']}"
                 f' --priority {task_priority}'
-                ' --workers 1'
+                f'{worker_cmd}'
                 f' --worker_cpu {max(num_gpus * 8, 12)}'
                 f' --worker_gpu {num_gpus}'
                 f' --worker_memory {max(num_gpus * 128, 192)}Gi'
                 f" --worker_image {self.aliyun_cfg['worker_image']}"
-                f" --data_sources {','.join(self.aliyun_cfg['data_sources'])}")
+                f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}")
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
