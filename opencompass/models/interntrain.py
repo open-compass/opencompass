@@ -318,9 +318,14 @@ class InternTrain(BaseModel):
             # keep same with InternTrain's default value
             min_out_len = 1
 
-        tokens = self.batch_encode(inputs,
-                                   self.max_seq_len - max_out_len,
-                                   left_padding=True)
+        if self.mode == 'none':
+            tokens = self.batch_encode(inputs,
+                                       self.max_seq_len,
+                                       left_padding=True)
+        else:
+            tokens = self.batch_encode(inputs,
+                                       self.max_seq_len - max_out_len,
+                                       left_padding=True)
 
         # random seed for pass@k
         seed = torch.tensor(time.time(), dtype=torch.int64).cuda()

@@ -3,6 +3,7 @@
 from typing import Dict, List, Optional, Union
 
 import torch
+from mmengine.device import is_npu_available
 
 from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.models.base_api import APITemplateParser
@@ -224,6 +225,8 @@ class HuggingFacewithChatTemplate(BaseModel):
         model_kwargs.update(kwargs)
         model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
         self.logger.debug(f'using model_kwargs: {model_kwargs}')
+        if is_npu_available():
+            model_kwargs['device_map'] = 'npu'
 
         try:
             self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)

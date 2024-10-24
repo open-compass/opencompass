@@ -11,7 +11,7 @@ from mmengine.config import ConfigDict
 
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.registry import ICL_PROMPT_TEMPLATES
+from opencompass.registry import DICT_POSTPROCESSORS, ICL_PROMPT_TEMPLATES
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
 
@@ -94,6 +94,7 @@ class LMEvaluator:
         pack_all_predictions: Optional[bool] = False,
         dataset_cfg: Optional[ConfigDict] = None,
         pred_postprocessor: Optional[ConfigDict] = None,
+        dict_postprocessor: Optional[ConfigDict] = None,
     ) -> None:
         self.output_path = output_path
         out_dir, out_name = osp.split(output_path)
@@ -115,6 +116,8 @@ class LMEvaluator:
         self.logger = get_logger()
         self.dataset_cfg = dataset_cfg
         self.pack_all_predictions = pack_all_predictions
+        self.pred_postprocessor = pred_postprocessor
+        self.dict_postprocessor = dict_postprocessor
 
     def score(self,
               predictions,
@@ -226,11 +229,15 @@ class LMEvaluator:
             self.inferencer.inference(retriever=retriever, prompt_template=self.meta_review_prompt_tmpl)
         else:
             self.inferencer.inference(retriever=retriever, prompt_template=self.prompt_tmpl)
-
         output = mmengine.load(self.output_path)
         return self.postprocess(output)
 
     def postprocess(self, output: Dict) -> Dict:
         """Postprocess output by adding necessary statistics or data into
         it."""
-        return output
+        if self.dict_postprocessor is None:
+            return output
+        else:
+            kwargs = self.dict_postprocessor
+            proc = DICT_POSTPROCESSORS.get(kwargs.pop('type'))
+            return proc(output, self.output_path, **kwargs)
