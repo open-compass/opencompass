@@ -184,3 +184,17 @@ def humaneval_postprocess_v2(text: str) -> str:
     if len(blocks) >= 1:
         text = blocks[0]
     return text
+
+
+def humaneval_internal_v2_postprocess(text: str):
+    if text.startswith('   ') and not text.startswith('    '):
+        text = ' ' + text
+    prediction = text.split('\n\n\n')[0]
+    prediction = prediction.split('\n```')[0]
+    prediction_list = prediction.split('\n')
+    return_list = []
+    for line in prediction_list:
+        if line and line[0] != ' ':
+            break
+        return_list.append(line)
+    return '\n'.join(return_list)

@@ -28,7 +28,7 @@ def post_process_single_rate(judgement: str):
 
     xxx[[5]]xxx, and extract the score
     """
-    pattern = r'Rating:\s*\[\[([\d.]+)\]\]'
+    pattern = r'\[\[([\d.]+)\]\]'
     matched_result = re.findall(pattern, judgement)
     if matched_result:
         score = float(matched_result[0])
