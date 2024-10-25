@@ -42,14 +42,15 @@ class DLCRunner(BaseRunner):
                  eval_with_gpu: list = ['plugin_eval'],
                  retry: int = 2,
                  debug: bool = False,
-                 lark_bot_url: str = None):
+                 lark_bot_url: str = None,
+                 keep_tmp_file: bool = False):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.aliyun_cfg = aliyun_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
 
         self.eval_with_gpu = eval_with_gpu
-
+        self.keep_tmp_file = keep_tmp_file
         logger = get_logger()
         logger.warning(
             'To ensure the integrity of the log results, the log displayed '
@@ -106,7 +107,10 @@ class DLCRunner(BaseRunner):
 
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_params.py'
+        # Using uuid to avoid filename conflict
+        import uuid
+        uuid_str = str(uuid.uuid4())
+        param_file = f'tmp/{uuid_str}_params.py'
         pwd = os.getcwd()
         try:
             cfg.dump(param_file)
@@ -305,7 +309,10 @@ class DLCRunner(BaseRunner):
                 return_code = _run_within_retry()
         finally:
             # Clean up
-            os.remove(param_file)
+            if not self.keep_tmp_file:
+                os.remove(param_file)
+            else:
+                pass
 
         return task_name, return_code
 
