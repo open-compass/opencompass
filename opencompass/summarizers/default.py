@@ -299,16 +299,34 @@ class DefaultSummarizer:
         raw_txts = '\n'.join(raw_txts)
         return raw_txts
 
+    @staticmethod
+    def _format_md_table(table):
+        table_head_str = '| ' + ' | '.join(table[0]) + ' |\n'
+        table_mid_list = ['-----' for _ in range(len(table[0]))]
+        table_mid_str = '|' + ' | '.join(table_mid_list) + '|\n'
+
+        md_table_str = table_head_str + table_mid_str
+        for row in table[1:]:
+            curr_str = '| ' + ' | '.join(row) + ' |\n'
+            md_table_str += curr_str
+        return md_table_str
+
     def _output_to_file(self, output_path, time_str, table, raw_txts):
         # output to file
         if output_path is None:
             output_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.txt')
             output_csv_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.csv')
+            output_md_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.md')
         else:
             output_csv_path = output_path.replace('.txt', '.csv')
+            output_md_path = output_path.replace('.txt', '.md')
 
         output_dir = osp.split(output_path)[0]
         mmengine.mkdir_or_exist(output_dir)
+
+        # process md table
+        md_table = self._format_md_table(table)
+
         with open(output_path, 'w', encoding='utf-8') as f:
             text = f'{time_str}\n' + \
                     'tabulate format\n' + \
@@ -320,6 +338,10 @@ class DefaultSummarizer:
                     '^' * 128 + '\n' + \
                     '\n'.join([','.join(row) for row in table]) + '\n' + \
                     '$' * 128 + '\n\n' + \
+                    'markdown format\n' + \
+                    '^' * 128 + '\n' + \
+                    md_table + '\n' + \
+                    '$' * 128 + '\n' + \
                     '-' * 128 + ' THIS IS A DIVIDER ' + '-' * 128 + '\n\n' + \
                     'raw format\n' + \
                     '^' * 128 + '\n' + \
@@ -331,6 +353,11 @@ class DefaultSummarizer:
         with open(output_csv_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
+
+        with open(output_md_path, 'w', encoding='utf-8') as f:
+            f.write(md_table)
+        print(f'\n\nThe markdown format results is as below:\n\n{md_table}')
+        self.logger.info(f'write markdown summary to {osp.abspath(output_md_path)}')
 
     def summarize(
         self,
