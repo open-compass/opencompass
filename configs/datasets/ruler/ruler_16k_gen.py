@@ -21,7 +21,7 @@ ruler_datasets = []
 
 # Different seq length
 for max_seq_len, abbr_suffix in zip(max_seq_lens, abbr_suffixs):
-    for dataset in import_datasets:
+    for dataset in import_ds:
         tmp_dataset = dataset.deepcopy()
         tmp_dataset['abbr'] = tmp_dataset['abbr'] + '_' + abbr_suffix
         tmp_dataset['num_samples'] = NUM_SAMPLES
