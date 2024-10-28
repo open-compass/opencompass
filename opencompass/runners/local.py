@@ -136,7 +136,7 @@ class LocalRunner(BaseRunner):
                             task.run()
                     else:
                         tmp_logs = f'tmp/{os.getpid()}_debug.log'
-                        get_logger().debug(
+                        get_logger().warning(
                             f'Debug mode, log will be saved to {tmp_logs}')
                         with open(tmp_logs, 'a') as log_file:
                             subprocess.run(cmd,
