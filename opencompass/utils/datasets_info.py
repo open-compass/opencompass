@@ -224,7 +224,7 @@ DATASETS_MAPPING = {
         "local": "./data/xstory_cloze",
     },
     # StrategyQA
-    "opencompass/strategy_qa":{
+    "opencompass/strategy_qa": {
         "ms_id": "opencompass/strategy_qa",
         "hf_id": "opencompass/strategy_qa",
         "local": "./data/strategyqa/strategyQA_train.json",
@@ -381,15 +381,15 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/alignment_bench.zip",
         "md5": "d8ae9a0398526479dbbcdb80fafabceb",
     },
-    "subjective/alpaca_eval":{
+    "subjective/alpaca_eval": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/alpaca_eval.zip",
         "md5": "d7399d63cb46c82f089447160ef49b6a",
     },
-    "subjective/arena_hard":{
+    "subjective/arena_hard": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/arena_hard.zip",
         "md5": "02cd09a482cb0f0cd9d2c2afe7a1697f",
     },
-    "subjective/mtbench":{
+    "subjective/mtbench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mtbench.zip",
         "md5": "d1afc0787aeac7f1f24872742e161069",
     },
