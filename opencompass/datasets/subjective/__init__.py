@@ -27,3 +27,4 @@ from .multiround import MultiroundDataset  # noqa: F401, F403
 from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403
 from .wildbench import WildBenchDataset  # noqa: F401, F403
 from .wildbench import wildbench_postprocess  # noqa: F401, F403
+from .compass_arena_subjective_bench import CompassArenaSubjectiveBench
