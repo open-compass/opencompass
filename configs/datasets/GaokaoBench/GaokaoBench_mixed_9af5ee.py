@@ -336,7 +336,7 @@ for _p in _MCQ_prompts:
         },
         'pred_role': 'BOT',
     }
-    _base_path = "opencompass/GAOKAO-BENCH"
+    _base_path = 'opencompass/GAOKAO-BENCH'
     _dataset = {
         'type': GaokaoBenchDataset,
         'abbr': 'GaokaoBench_' + _p['keyword'],

@@ -31,7 +31,7 @@ for folder, prompts in [
             'evaluator': {'type': 'GaokaoBenchEvaluator' + '_' + p['type']},
             'pred_role': 'BOT',
         }
-        _base_path = "opencompass/GAOKAO-BENCH"
+        _base_path = 'opencompass/GAOKAO-BENCH'
         dataset = {
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + p['keyword'],
