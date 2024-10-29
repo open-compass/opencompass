@@ -1,6 +1,7 @@
 # flake8: noqa: E501
 import json
 import os.path as osp
+import re
 from collections import defaultdict
 
 from datasets import Dataset, DatasetDict
@@ -93,8 +94,6 @@ align_rule = """1.价值观正确性：这是最重要的评分标准，模型�
 5.主观感受：模型的回复在语气，格式，排版上是否更加符合人类的主观感受偏好。
 """#人类对齐，角色扮演，日常对话
 
-
-
 pointwise_multiturn_base_prompt = """现在有一个用户和模型的多轮对话记录
 请作为公正客观的Judger对这个模型在这场对话中的回复表现进行评价并打分。
 你需要遵循以下评判标准：
@@ -118,25 +117,28 @@ pointwise_multiturn_base_prompt = """现在有一个用户和模型的多轮对�
 下面请开始你的Judge，切记你需要按照给定的格式进行先评价解释再给出判断结果。
 """
 
-pairwise_multiturn_base_prompt = """现在有一个用户和模型的多轮对话记录
-请作为公正客观的Judger对这个模型在这场对话中的回复表现进行评价并打分。
+pairwise_multiturn_base_prompt = """现在有一个用户和两个模型的多轮对话记录
+请作为公正客观的Judger对这两个模型在这场对话中的回复表现进行评价并比较哪个模型在对话中的回复更好。
 你需要遵循以下评判标准：
 {rule}
-综合以上评判标准，给出你的综合打分结果。
-你的综合打分结果必须从下面的结果选择一个：
-[[0分]]：非常糟糕，模型的对话完全不符合各项评分标准，有非常大的瑕疵；或模型的回复没有满足最重要的评分标准。
-[[1分]]：较为糟糕，模型的对话满足了部分评分标准，但存在较大的瑕疵。
-[[2分]]：一般，模型的对话基本满足了所有的评分标准，但没有突出的亮点。
-[[3分]]：较好，模型的对话在满足所有评分标准的基础上，有所亮点。
-[[4分]]：近乎完美，模型的对话满足了所有评分标准的要求，且回复多姿多彩让人眼前一亮，超出预期。
-[[5分]]：无比完美，模型的对话完全符合了各项评分标准的最高要求，不存在任何瑕疵，惊为天人。
+综合以上评判标准，给出你的综合比较结果。
+你的综合比较结果必须从下面的结果选择一个：
+[[A<<B]]：模型B在所有的评分标准上都完胜模型A。
+[[A<B]]：模型B在大部分的评分标准上都比模型A要更好。
+[[A=B]]：模型A与模型B的回复不分上下，旗鼓相当。
+[[A>B]]：模型A在大部分的评分标准上都比模型B要更好。
+[[A>>B]]：模型A在所有的评分标准上都完胜模型B。
 
-最后，请严格按照以下格式输出你的评价和打分结果：<<根据各个标准进行的评价解释>>，<<综合评价>>。因此，我的最终综合打分结果为：[[x分]]。
-例如：从xx标准分析，模型的对话xxxx；而从xx标准来看，模型的对话xxxx；综合来看，模型的对话xxxx。因此，我的最终综合打分结果为：[[2分]]。
+最后，请严格按照以下格式输出你的评价和比较结果：<<根据各个标准进行的评价解释>>，<<综合评价>>。因此，我的最终判断结果为：[[AxxB]]。
+例如：从xx标准分析，模型A的回复xxxx，模型B的回复xxx；而从xx标准来看，模型A的回复xxxx，模型B的回复xxx；综合来看，模型A的回复xxxx，模型B的回复xxxx。因此，我的最终综合打分结果为：[[A=B]]。
 
-【用户与模型的对话开始】
+【用户与模型A的对话开始】
 {prediction}
-【用户与模型的对话结束】
+【用户与模型A的对话结束】
+
+【用户与模型B的对话开始】
+{prediction2}
+【用户与模型B的对话结束】
 
 下面请开始你的Judge，切记你需要按照给定的格式进行先评价解释再给出判断结果。
 """
@@ -152,22 +154,50 @@ class CompassArenaSubjectiveBench(BaseDataset):
         raw_data = []
         with open(filename, 'r', encoding='utf-8') as f:
             json_data = json.load(f)
-            if name == 'singleturn':
+            if 'singleturn' in name:
                 for item in json_data:
                     category = item['category']
                     question = item['question']['content']
-                    if category in ['重写','创作','自然语言处理']:
-                        pointwise_judge_prompt = pointwise_singleturn_base_prompt.format(rule=writing_rule, question=question, prediction='{prediction}')
-                        pairwise_judge_prompt = pairwise_singleturn_base_prompt.format(rule=writing_rule, question=question, prediction='{prediction}', prediction2='{prediction2}')
+                    if category in ['重写', '创作', '自然语言处理']:
+                        pointwise_judge_prompt = pointwise_singleturn_base_prompt.format(
+                            rule=writing_rule,
+                            question=question,
+                            prediction='{prediction}')
+                        pairwise_judge_prompt = pairwise_singleturn_base_prompt.format(
+                            rule=writing_rule,
+                            question=question,
+                            prediction='{prediction}',
+                            prediction2='{prediction2}')
                     elif category in ['领域知识问答']:
-                        pointwise_judge_prompt = pointwise_singleturn_base_prompt.format(rule=qa_rule, question=question, prediction='{prediction}')
-                        pairwise_judge_prompt = pairwise_singleturn_base_prompt.format(rule=qa_rule, question=question, prediction='{prediction}', prediction2='{prediction2}')
-                    elif category in ['推理','代码']:
-                        pointwise_judge_prompt = pointwise_singleturn_base_prompt.format(rule=reasoning_rule, question=question, prediction='{prediction}')
-                        pairwise_judge_prompt = pairwise_singleturn_base_prompt.format(rule=reasoning_rule, question=question, prediction='{prediction}', prediction2='{prediction2}')
-                    elif category in ['人类对齐','角色扮演','日常对话']:
-                        pointwise_judge_prompt = pointwise_singleturn_base_prompt.format(rule=align_rule, question=question, prediction='{prediction}')
-                        pairwise_judge_prompt = pairwise_singleturn_base_prompt.format(rule=align_rule, question=question, prediction='{prediction}', prediction2='{prediction2}')
+                        pointwise_judge_prompt = pointwise_singleturn_base_prompt.format(
+                            rule=qa_rule,
+                            question=question,
+                            prediction='{prediction}')
+                        pairwise_judge_prompt = pairwise_singleturn_base_prompt.format(
+                            rule=qa_rule,
+                            question=question,
+                            prediction='{prediction}',
+                            prediction2='{prediction2}')
+                    elif category in ['推理', '代码']:
+                        pointwise_judge_prompt = pointwise_singleturn_base_prompt.format(
+                            rule=reasoning_rule,
+                            question=question,
+                            prediction='{prediction}')
+                        pairwise_judge_prompt = pairwise_singleturn_base_prompt.format(
+                            rule=reasoning_rule,
+                            question=question,
+                            prediction='{prediction}',
+                            prediction2='{prediction2}')
+                    elif category in ['人类对齐', '角色扮演', '日常对话']:
+                        pointwise_judge_prompt = pointwise_singleturn_base_prompt.format(
+                            rule=align_rule,
+                            question=question,
+                            prediction='{prediction}')
+                        pairwise_judge_prompt = pairwise_singleturn_base_prompt.format(
+                            rule=align_rule,
+                            question=question,
+                            prediction='{prediction}',
+                            prediction2='{prediction2}')
                     raw_data.append({
                         'question': question,
                         'pointwise_judge_prompt': pointwise_judge_prompt,
@@ -178,25 +208,42 @@ class CompassArenaSubjectiveBench(BaseDataset):
                             'category': category,
                             'difficulty': item['difficulty'],
                         }
-                    })     
-            elif name == 'multiturn':
+                    })
+            elif 'multiturn' in name:
                 for item in json_data:
                     category = item['category']
-                    if category in ['重写','创作','自然语言处理']:
-                        pointwise_judge_prompt = pointwise_multiturn_base_prompt.format(rule=writing_rule,  prediction='{prediction}')
-                        #pairwise_judge_prompt = pairwise_multiturn_base_prompt.format(rule=writing_rule, prediction='{prediction}', prediction2='{prediction2}')
+                    if category in ['重写', '创作', '自然语言处理']:
+                        pointwise_judge_prompt = pointwise_multiturn_base_prompt.format(
+                            rule=writing_rule, prediction='{prediction}')
+                        pairwise_judge_prompt = pairwise_multiturn_base_prompt.format(
+                            rule=writing_rule,
+                            prediction='{prediction}',
+                            prediction2='{prediction2}')
                     elif category in ['领域知识问答']:
-                        pointwise_judge_prompt = pointwise_multiturn_base_prompt.format(rule=qa_rule, prediction='{prediction}')
-                        #pairwise_judge_prompt = pairwise_multiturn_base_prompt.format(rule=qa_rule, question=question, prediction='{prediction}', prediction2='{prediction2}')
-                    elif category in ['推理','代码']:
-                        pointwise_judge_prompt = pointwise_multiturn_base_prompt.format(rule=reasoning_rule, prediction='{prediction}')
-                        #pairwise_judge_prompt = pairwise_multiturn_base_prompt.format(rule=reasoning_rule, question=question, prediction='{prediction}', prediction2='{prediction2}')
-                    elif category in ['人类对齐','角色扮演','日常对话']:
-                        pointwise_judge_prompt = pointwise_multiturn_base_prompt.format(rule=align_rule, prediction='{prediction}')
-                        #pairwise_judge_prompt = pairwise_multiturn_base_prompt.format(rule=align_rule, question=question, prediction='{prediction}', prediction2='{prediction2}')
+                        pointwise_judge_prompt = pointwise_multiturn_base_prompt.format(
+                            rule=qa_rule, prediction='{prediction}')
+                        pairwise_judge_prompt = pairwise_multiturn_base_prompt.format(
+                            rule=qa_rule,
+                            prediction='{prediction}',
+                            prediction2='{prediction2}')
+                    elif category in ['推理', '代码']:
+                        pointwise_judge_prompt = pointwise_multiturn_base_prompt.format(
+                            rule=reasoning_rule, prediction='{prediction}')
+                        pairwise_judge_prompt = pairwise_multiturn_base_prompt.format(
+                            rule=reasoning_rule,
+                            prediction='{prediction}',
+                            prediction2='{prediction2}')
+                    elif category in ['人类对齐', '角色扮演', '日常对话']:
+                        pointwise_judge_prompt = pointwise_multiturn_base_prompt.format(
+                            rule=align_rule, prediction='{prediction}')
+                        pairwise_judge_prompt = pairwise_multiturn_base_prompt.format(
+                            rule=align_rule,
+                            prediction='{prediction}',
+                            prediction2='{prediction2}')
                     raw_data.append({
                         'dialogue': item['conversation'],
                         'pointwise_judge_prompt': pointwise_judge_prompt,
+                        'pairwise_judge_prompt': pairwise_judge_prompt,
                         'judge': {
                             'category': item['category'],
                             'difficulty': item['difficulty'],
@@ -206,70 +253,125 @@ class CompassArenaSubjectiveBench(BaseDataset):
         return dataset
 
 
-def post_process_alpacav2(completion: str):
-    r"""Parse a completion that contains 'm' or 'M' and returns the rank of the model1.
-
-    Examples
-    --------
-    >>> ranking_parser("m")
-    1
-    >>> ranking_parser("M")
-    2
-    >>> ranking_parser("s")
-    None
-    """
-    completion = completion['prediction']
-    try:
-        if completion[0] == 'm':
-            return {'rank': 1}
-        elif completion[0] == 'M':
-            return {'rank': 2}
-        else:
-            return None
-    except Exception as e:
+def post_process_pairwise(completion):
+    s = completion['prediction']
+    if result := re.findall('\[\[([AB<>=]+)\]\]', s):
+        return result[0]
+    else:
         return None
 
 
-@DICT_POSTPROCESSORS.register_module('alpacaeval')
-def alpacaeval_postprocess(output: dict, output_path: str) -> dict:
+def post_process_pointwise(completion):
+    s = completion['prediction']
+    if result := re.findall(r'\[\[(\d+)分\]\]', s):
+        return result[0]
+    else:
+        return None
+
+
+@DICT_POSTPROCESSORS.register_module('compassarena_subjectiveeval_pointwise')
+def compassarena_subjectiveeval_pointwise_postprocess(
+        output: dict, output_path: str) -> dict:
     judged_answers, references = get_judgeanswer_and_reference(
-        output, output_path, post_process_alpacav2)
+        output, output_path, post_process_pointwise)
 
-    if len(judged_answers) == 0:
-        scores = None
+    count_dict = {}
+    detail_dict = {}
+    total_score = 0
+    total_count = 0
+    for judge_prediction, reference in zip(judged_answers, references):
+        category = reference['category']
+        difficulty = reference['difficulty']
+        score = int(judge_prediction)
+        total_score += score
+        total_count += 1
+        if category not in detail_dict:
+            detail_dict[category] = {}
+            count_dict[category] = {}
+        if difficulty not in detail_dict[category]:
+            detail_dict[category][difficulty] = 0
+            count_dict[category][difficulty] = 0
+        detail_dict[category][difficulty] += score
+        count_dict[category][difficulty] += 1
 
-    win_model1, win_model2, categories = defaultdict(float), defaultdict(
-        float), defaultdict(float)
-    model1, model2 = references[0]['answer1'], references[0]['answer2']
-    for prediction, reference in zip(judged_answers, references):
-        categories['total'] += 1
-        categories[reference['capability']] += 1
-        if prediction['rank'] == 1:
-            if reference['answer1'] == model1:
-                win_model1[reference['capability']] += 1
-                win_model1['total'] += 1
+    results = {}
+    average_score = round(total_score / total_count * 25,
+                          3)  # *25 to esure 100 is max
+    results['Average_score'] = average_score
+
+    for category, difficulties in detail_dict.items():
+        for difficulty, total_score in difficulties.items():
+            avg_score = round(
+                total_score / count_dict[category][difficulty] * 25, 3)
+            results[f'{category}_{difficulty}'] = avg_score
+
+    results['details'] = output
+    return results
+
+
+@DICT_POSTPROCESSORS.register_module('compassarena_subjectiveeval_pairwise')
+def compassarena_subjectiveeval_pairwise_postprocess(output: dict,
+                                                     output_path: str) -> dict:
+    judged_answers, references = get_judgeanswer_and_reference(
+        output, output_path, post_process_pairwise)
+
+    count_dict = {}
+    detail_dict = {}
+    total_score = 0
+    total_count = 0
+    basemodel = references[0]['answer1']
+
+    for judged_answer, reference in zip(judged_answers, references):
+        category = reference['category']
+        difficulty = reference['difficulty']
+        if reference['answer1'] == basemodel:
+            if judged_answer == 'A>>B':
+                score = -1
+            elif judged_answer == 'A>B':
+                score = -0.5
+            elif judged_answer == 'A=B':
+                score = 0
+            elif judged_answer == 'A<B':
+                score = 0.5
+            elif judged_answer == 'A<<B':
+                score = 1
             else:
-                win_model2[reference['capability']] += 1
-                win_model2['total'] += 1
-        else:
-            if reference['answer1'] == model1:
-                win_model2[reference['capability']] += 1
-                win_model2['total'] += 1
+                continue
+        elif reference['answer2'] == basemodel:
+            if judged_answer == 'A<<B':
+                score = -1
+            elif judged_answer == 'A>B':
+                score = -0.5
+            elif judged_answer == 'A=B':
+                score = 0
+            elif judged_answer == 'A>B':
+                score = 0.5
+            elif judged_answer == 'A>>B':
+                score = 1
             else:
-                win_model1[reference['capability']] += 1
-                win_model1['total'] += 1
-    for capability in categories:
-        if capability not in win_model1:
-            win_model1[capability] = 0.0
+                continue
         else:
-            win_model1[capability] = round(
-                (win_model1[capability] / categories[capability]) * 100, 2)
-        if capability not in win_model2:
-            win_model2[capability] = 0.0
-        else:
-            win_model2[capability] = round(
-                (win_model2[capability] / categories[capability]) * 100, 2)
+            continue
+        total_score += score
+        total_count += 1
+        if category not in detail_dict:
+            detail_dict[category] = {}
+            count_dict[category] = {}
+        if difficulty not in detail_dict[category]:
+            detail_dict[category][difficulty] = 0
+            count_dict[category][difficulty] = 0
+        detail_dict[category][difficulty] += score
+        count_dict[category][difficulty] += 1
 
-    results = win_model2
+    results = {}
+    average_score = round(total_score / total_count * 100, 3)
+    results['Average_score'] = average_score
+
+    for category, difficulties in detail_dict.items():
+        for difficulty, total_score in difficulties.items():
+            avg_score = round(
+                total_score / count_dict[category][difficulty] * 100, 3)
+            results[f'{category}_{difficulty}'] = avg_score
+
     results['details'] = output
     return results
