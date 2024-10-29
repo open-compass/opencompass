@@ -73,7 +73,11 @@ class TurboMindModelwithChatTemplate(BaseModel):
             else:
                 assert isinstance(generation_config.eos_token_id, list)
                 for token_id in generation_config.eos_token_id:
-                    potential_stop_words.append(self.tokenizer.decode(token_id))
+                    stop_word = self.tokenizer.decode(token_id)
+                    if stop_word.startswith(' '):
+                        self.logger.warning(f'stop_word "{stop_word}" contains blanks, which will be stripped')
+                        stop_word = stop_word.strip()
+                    potential_stop_words.append(stop_word)
         if self.tokenizer.eos_token is not None:
             potential_stop_words.append(self.tokenizer.eos_token)
         potential_stop_words = list(set(potential_stop_words))
@@ -102,7 +106,13 @@ class TurboMindModelwithChatTemplate(BaseModel):
             messages = _format_with_fast_chat_template(messages, self.fastchat_template)
         else:
             messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
-
+            # LMDeploy tokenize prompts by AutoTokenizer with its default parameter "add_special_token=True"
+            # OC add bos_token in the prompt, which requires tokenizing prompts using "add_speicial_token=False"
+            # But LMDeploy doesn't have "add_speicial_token" in the pipeline API. So, we remove bos_token
+            # from messages as a workaround
+            if self.tokenizer.bos_token:
+                bos_token = self.tokenizer.bos_token
+                messages = [message.removeprefix(bos_token) if message.startswith(bos_token) else message for message in messages]
         stop_words = list(set(self.stop_words + stopping_criteria))
 
         DEFAULT_GEN_CONFIG = {
@@ -129,8 +139,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         results = []
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
         for output in outputs:
-            text = self.tokenizer.decode(output.token_ids)
-            results.append(text)
+            results.append(output.text)
 
         for s in stop_words:
             results = [r.split(s)[0] for r in results]
@@ -162,4 +171,4 @@ class TurboMindModelwithChatTemplate(BaseModel):
         else:
             filtered = {k: v for k, v in engine_config.items() if hasattr(PytorchEngineConfig, k)}
             backend_config = PytorchEngineConfig(**filtered)
-        return pipeline(model_path, backend_config=backend_config, log_level='INFO', max_log_len=10)
+        return pipeline(model_path, backend_config=backend_config, log_level='WARNING')

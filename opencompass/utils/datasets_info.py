@@ -276,6 +276,31 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "opencompass/needlebench",
         "local": "./data/needlebench",
+    },
+    "opencompass/code_generation_lite": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/code_generation_lite",
+    },
+    "opencompass/execution-v2": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/execution-v2",
+    },
+    "opencompass/test_generation": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/test_generation",
+    },
+    "opencompass/aime2024": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/aime.jsonl",
+    },
+    "opencompass/cmo_fib": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/cmo.jsonl",
     }
 }
 
@@ -422,10 +447,30 @@ DATASETS_URL = {
     },
     "/needlebench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/needlebench.zip",
-        "md5": "b546da0397746eaff4d3ff0f20d6ede2",
+        "md5": "dad5c903ebfea16eaf186b8997aeedad",
     },
     "/teval": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/teval.zip",
         "md5": "7628ab5891a26bf96ca17becfd044867",
     },
+    "/code_generation_lite": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/code_generation_lite.zip",
+        "md5": "60103a18ca63b05ea06e98d24170f23d",
+    },
+    "/execution-v2": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/execution-v2.zip",
+        "md5": "019ef1a0686ee6ca34f51c8af104fcd9",
+    },
+    "/test_generation": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/test_generation.zip",
+        "md5": "918a6ea2b1eee6f2b1314db3c21cb4c7",
+    },
+    "/aime": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aime.zip",
+        "md5": "fbe2d0577fc210962a549f8cea1a00c8"
+    },
+    "/cmo": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmo.zip",
+        "md5": "fad52c81290506a8ca74f46b5400d8fc"
+    }
 }

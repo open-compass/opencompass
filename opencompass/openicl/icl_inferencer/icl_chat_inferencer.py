@@ -245,7 +245,6 @@ class ChatInferencer(BaseInferencer):
         logger.info('Starting inference process...')
         for datum in tqdm(dataloader, disable=not self.is_main_process):
             chat = datum[0]
-
             if self.infer_mode == 'last':
                 self.infer_last(chat, index, output_handler)
             elif self.infer_mode == 'every':

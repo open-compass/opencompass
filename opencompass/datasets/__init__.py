@@ -1,6 +1,7 @@
 from .advglue import *  # noqa: F401, F403
 from .afqmcd import *  # noqa: F401, F403
 from .agieval import *  # noqa: F401, F403
+from .aime2024 import *  # noqa: F401, F403
 from .anli import AnliDataset  # noqa: F401, F403
 from .anthropics_evals import *  # noqa: F401, F403
 from .apps import *  # noqa: F401, F403
@@ -24,6 +25,7 @@ from .cluewsc import *  # noqa: F401, F403
 from .cmb import *  # noqa: F401, F403
 from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
+from .cmo_fib import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .commonsenseqa_cn import *  # noqa: F401, F403
@@ -43,6 +45,7 @@ from .eprstmt import *  # noqa: F401, F403
 from .FinanceIQ import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
+from .gaokao_math import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
@@ -66,6 +69,7 @@ from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
+from .livecodebench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
@@ -80,6 +84,7 @@ from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
+from .mmmlu import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403

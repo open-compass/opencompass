@@ -42,14 +42,15 @@ class DLCRunner(BaseRunner):
                  eval_with_gpu: list = ['plugin_eval'],
                  retry: int = 2,
                  debug: bool = False,
-                 lark_bot_url: str = None):
+                 lark_bot_url: str = None,
+                 keep_tmp_file: bool = False):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.aliyun_cfg = aliyun_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
 
         self.eval_with_gpu = eval_with_gpu
-
+        self.keep_tmp_file = keep_tmp_file
         logger = get_logger()
         logger.warning(
             'To ensure the integrity of the log results, the log displayed '
@@ -106,7 +107,10 @@ class DLCRunner(BaseRunner):
 
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_params.py'
+        # Using uuid to avoid filename conflict
+        import uuid
+        uuid_str = str(uuid.uuid4())
+        param_file = f'tmp/{uuid_str}_params.py'
         pwd = os.getcwd()
         try:
             cfg.dump(param_file)
@@ -164,25 +168,36 @@ class DLCRunner(BaseRunner):
             # set priority to 1 as default
             task_priority = self.aliyun_cfg.get('priority', 1)
 
+            # Different dlc versions has different commands
+            if self.aliyun_cfg.get('dlc_job_cmd') == 'create':
+                dlc_job_cmd = 'create job --kind PyTorchJob'
+                worker_cmd = ' --worker_count 1'
+            else:
+                dlc_job_cmd = 'submit pytorchjob'
+                worker_cmd = ' --workers 1'
             tmpl = (
-                'dlc submit pytorchjob'
+                f'dlc {dlc_job_cmd}'
                 f" --command '{shell_cmd}'"
                 f' --name {task_name[:512]}'
                 f" --config {self.aliyun_cfg['dlc_config_path']}"
                 f" --workspace_id {self.aliyun_cfg['workspace_id']}"
-                f" --resource_id {self.aliyun_cfg['resource_id']}"
+                f" --resource_id={self.aliyun_cfg['resource_id']}"
                 f' --priority {task_priority}'
-                ' --workers 1'
+                f'{worker_cmd}'
                 f' --worker_cpu {max(num_gpus * 8, 12)}'
                 f' --worker_gpu {num_gpus}'
                 f' --worker_memory {max(num_gpus * 128, 192)}Gi'
                 f" --worker_image {self.aliyun_cfg['worker_image']}"
-                f" --data_sources {','.join(self.aliyun_cfg['data_sources'])}")
+                f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}")
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
             cmd = get_cmd()
-
+            # Use specified python env instead of sys.executable
+            if self.aliyun_cfg['python_env_path']:
+                cmd = cmd.replace(
+                    sys.executable,
+                    f'{self.aliyun_cfg["python_env_path"]}/bin/python')
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')
 
@@ -294,7 +309,10 @@ class DLCRunner(BaseRunner):
                 return_code = _run_within_retry()
         finally:
             # Clean up
-            os.remove(param_file)
+            if not self.keep_tmp_file:
+                os.remove(param_file)
+            else:
+                pass
 
         return task_name, return_code
 

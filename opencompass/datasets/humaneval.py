@@ -184,3 +184,71 @@ def humaneval_postprocess_v2(text: str) -> str:
     if len(blocks) >= 1:
         text = blocks[0]
     return text
+
+
+def humaneval_internal_v2_postprocess(text: str):
+    if text.startswith('   ') and not text.startswith('    '):
+        text = ' ' + text
+    prediction = text.split('\n\n\n')[0]
+    prediction = prediction.split('\n```')[0]
+    prediction_list = prediction.split('\n')
+    return_list = []
+    for line in prediction_list:
+        if line and line[0] != ' ':
+            break
+        return_list.append(line)
+    return '\n'.join(return_list)
+
+def humaneval_internal_v1_postprocess(text: str) -> str:
+    """This is an advanced version of previous postprocess to handle more
+    situations, better to use this one."""
+    try:
+        # for chatGLM related text
+        eval_text = eval(text)
+    except Exception:
+        pass
+    else:
+        if isinstance(eval_text, str):
+            text = eval_text
+    text = text.lstrip('\n')
+    if '```' in text:
+        blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+        if len(blocks) == 0:
+            text = text.split('```')[1]  # fall back to default strategy
+        else:
+            text = blocks[0]  # fetch the first code block
+            if not text.startswith('\n'):  # in case starting with ```python
+                text = text[max(text.find('\n') + 1, 0) :]
+    if text.strip().startswith('from') or text.strip().startswith('import'):
+        def_idx = text.find('def')
+        if def_idx != -1:
+            text = text[max(text.find('\n', def_idx) + 1, 0) :]
+    # remove empty lines
+    text = '\n'.join([line for line in text.split('\n') if line != ''])
+    text = text.lstrip('\n')
+    if text.strip().startswith('def'):
+        text = '\n'.join(text.split('\n')[1:])
+    # deal with the indentation error
+    if text.startswith(' '):
+        text = '    ' + text.lstrip()
+    else:
+        text = '\n'.join(['    ' + line for line in text.split('\n')])
+    text = text.split('\n')
+
+    # If number of leading space reduces, we assume that the code block ends.
+    min_leading_space = None
+    end_index = None
+    for index, line in enumerate(text):
+        if line.strip() == '' or line.strip()[0] in ["'", '"', '#']:
+            continue
+        current_leading_space = len(line.rstrip()) - len(line.strip())
+        if min_leading_space is None:
+            min_leading_space = current_leading_space
+        elif current_leading_space < min_leading_space:
+            end_index = index
+            break
+    if end_index is not None:
+        text = '\n'.join(text[:end_index])
+    else:
+        text = '\n'.join(text)
+    return text

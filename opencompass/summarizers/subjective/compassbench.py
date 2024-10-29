@@ -22,7 +22,7 @@ from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
 
 
 def post_process_wildbench_pair(judgement: str):
-    pattern = r"\"choice\": \"(.*?)\""
+    pattern = r'\"choice\": \"(.*?)\"'
     matched_result = re.findall(pattern, judgement)
     if matched_result:
         return matched_result[0]

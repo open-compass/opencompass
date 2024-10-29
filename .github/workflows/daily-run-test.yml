@@ -2,6 +2,22 @@ name: daily_run_test
 
 on:
   workflow_dispatch:
+    inputs:
+      repo_org:
+        required: false
+        description: 'Tested repository organization name. Default is open-compass/opencompass'
+        type: string
+        default: 'open-compass/opencompass'
+      repo_ref:
+        required: false
+        description: 'Set branch or tag or commit id. Default is "main"'
+        type: string
+        default: 'main'
+      regression_func:
+        required: true
+        description: 'regression functions'
+        type: string
+        default: "['chat','base','cmd']"
   schedule:
     - cron:  '56 16 * * *'
 
@@ -12,7 +28,6 @@ concurrency:
 env:
   CONDA_ENV: opencompass_regression
   PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
-  USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HUGGINGFACE_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HF_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
@@ -30,13 +45,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          repository: ${{ github.event.inputs.repo_org || 'open-compass/opencompass' }}
+          ref: ${{github.event.inputs.repo_ref || 'main'}}
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
       - name: Build lagent
         run: |
-          pip install wheel
+          pip install wheel setuptools
           python setup.py sdist bdist_wheel
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -47,6 +65,7 @@ jobs:
           name: my-artifact-${{ github.run_id }}
 
   daily_run_test:
+    if: ${{!cancelled()}}
     needs: build-pypi
     strategy:
       fail-fast: false
@@ -54,10 +73,13 @@ jobs:
         cuda_env: [dsw_cu11, dsw_cu12]
     runs-on: ${{ matrix.cuda_env }}
     environment: 'prod'
-    timeout-minutes: 420 #7hours
+    timeout-minutes: 600 #10hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.repo_org || 'open-compass/opencompass' }}
+          ref: ${{github.event.inputs.repo_ref || 'main'}}
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -68,10 +90,10 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
+          pip install -r /cpfs01/shared/public/qa-llm-cicd/requirements-cu11.txt --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.6.0+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+          pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.6.1+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.6.1.post1+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes modelscope --cache-dir ${{env.PIP_CACHE_PATH}}
           pip uninstall torch torchvision torchaudio -y
           pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
           FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu118torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
@@ -84,10 +106,10 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
+          pip install -r /cpfs01/shared/public/qa-llm-cicd/requirements-cu12.txt --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install lmdeploy==0.6.0 --cache-dir ${{env.PIP_CACHE_PATH}} --no-cache-dir
+          pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
           pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
-          pip install human_eval transformers protobuf pytest gguf msgspec librosa vllm_flash_attn bitsandbytes modelscope --cache-dir ${{env.PIP_CACHE_PATH}}
           pip uninstall torch torchvision torchaudio -y
           pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}}
           FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu123torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
@@ -99,7 +121,28 @@ jobs:
           ln -s ${{env.DATEASET_CACHE_PATH}} data
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
+      - name:  Run command testcase
+        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'cmd')
+        run: |
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
+          conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
+          conda info --envs
+          export from_tf=TRUE
+          python tools/list_configs.py internlm2_5 mmlu
+          opencompass --models hf_internlm2_5_7b --datasets race_ppl --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1_${{ matrix.cuda_env }} --reuse --max-num-workers 2
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          python -m pytest -m case1 -s -v --color=yes .github/scripts/oc_score_assert.py
+          opencompass --models hf_internlm2_5_7b_chat --datasets race_gen -a lmdeploy --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2_${{ matrix.cuda_env }} --reuse --max-num-workers 2
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          python -m pytest -m case2 -s -v --color=yes .github/scripts/oc_score_assert.py
+          opencompass --datasets race_ppl --hf-type base --hf-path internlm/internlm2_5-7b --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3_${{ matrix.cuda_env }} --reuse --max-num-workers 2
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          python -m pytest -m case3 -s -v --color=yes .github/scripts/oc_score_assert.py
+          opencompass --datasets race_gen --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4_${{ matrix.cuda_env }} --reuse --max-num-workers 2
+          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run chat model test
+        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'chat')
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -109,6 +152,7 @@ jobs:
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/chat_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test
+        if: github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_func), 'base')
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -116,25 +160,6 @@ jobs:
           opencompass .github/scripts/eval_regression_base.py --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base_${{ matrix.cuda_env }} --reuse --max-num-workers 2
           rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/base_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
-      - name:  Run command testcase
-        run: |
-          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
-          conda info --envs
-          export from_tf=TRUE
-          python tools/list_configs.py internlm2_5 mmlu
-          opencompass --models hf_internlm2_5_7b --datasets race_ppl --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1_${{ matrix.cuda_env }} --reuse
-          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd1_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m case1 -s -v --color=yes .github/scripts/oc_score_assert.py
-          opencompass --models hf_internlm2_5_7b_chat --datasets race_gen -a lmdeploy --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2_${{ matrix.cuda_env }} --reuse
-          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd2_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m case2 -s -v --color=yes .github/scripts/oc_score_assert.py
-          opencompass --datasets race_ppl --hf-type base --hf-path internlm/internlm2_5-7b --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3_${{ matrix.cuda_env }} --reuse
-          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd3_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m case3 -s -v --color=yes .github/scripts/oc_score_assert.py
-          opencompass --datasets race_gen --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4_${{ matrix.cuda_env }} --reuse
-          rm regression_result_daily -f && ln -s /cpfs01/user/qa-llm-cicd/report/${{ github.run_id }}/cmd4_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
         if: always()
         run: |
