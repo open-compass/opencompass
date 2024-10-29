@@ -66,5 +66,5 @@ for _name in subjective_all_sets:
             mode='m2n',
             infer_order='double',
             base_models=qwen_2_5_72b,
-            #given_pred = [{'abbr':'gpt4-0314', 'path':'./data/subjective/arena_hard'}],
+            given_pred = [{'abbr':'Qwen-2.5-72B-Instruct', 'path':'./data/subjective/CompassArenaSubjectiveBench/Qwen-2.5-72B-Instruct'}],
         ))

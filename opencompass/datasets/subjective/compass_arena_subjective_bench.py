@@ -295,14 +295,14 @@ def compassarena_subjectiveeval_pointwise_postprocess(
         count_dict[category][difficulty] += 1
 
     results = {}
-    average_score = round(total_score / total_count * 25,
-                          3)  # *25 to esure 100 is max
+    average_score = round(total_score / total_count * 20,
+                          3)  # *20 to esure 100 is max
     results['Average_score'] = average_score
 
     for category, difficulties in detail_dict.items():
         for difficulty, total_score in difficulties.items():
             avg_score = round(
-                total_score / count_dict[category][difficulty] * 25, 3)
+                total_score / count_dict[category][difficulty] * 20, 3)
             results[f'{category}_{difficulty}'] = avg_score
 
     results['details'] = output
@@ -325,28 +325,28 @@ def compassarena_subjectiveeval_pairwise_postprocess(output: dict,
         category = reference['category']
         difficulty = reference['difficulty']
         if reference['answer1'] == basemodel:
-            if judged_answer == 'A>>B':
+            if judged_answer == 'A>>B' or judged_answer == 'B<<A':
                 score = -1
-            elif judged_answer == 'A>B':
+            elif judged_answer == 'A>B' or judged_answer == 'B<A':
                 score = -0.5
-            elif judged_answer == 'A=B':
+            elif judged_answer == 'A=B' or judged_answer == 'B=A':
                 score = 0
-            elif judged_answer == 'A<B':
+            elif judged_answer == 'A<B' or judged_answer == 'B>A':
                 score = 0.5
-            elif judged_answer == 'A<<B':
+            elif judged_answer == 'A<<B' or judged_answer == 'B>>A':
                 score = 1
             else:
                 continue
         elif reference['answer2'] == basemodel:
-            if judged_answer == 'A<<B':
+            if judged_answer == 'A<<B' or judged_answer == 'B>>A':
                 score = -1
-            elif judged_answer == 'A>B':
+            elif judged_answer == 'A<B' or judged_answer == 'B>A':
                 score = -0.5
-            elif judged_answer == 'A=B':
+            elif judged_answer == 'A=B' or judged_answer == 'B=A':
                 score = 0
-            elif judged_answer == 'A>B':
+            elif judged_answer == 'A>B' or judged_answer == 'B<A':
                 score = 0.5
-            elif judged_answer == 'A>>B':
+            elif judged_answer == 'A>>B' or judged_answer == 'B<<A':
                 score = 1
             else:
                 continue

@@ -1,8 +1,8 @@
 from mmengine.config import read_base
 
 with read_base():
-    from opencompass.configs.datasets.subjective.compass_arena_subjective_bench.singleturn.pointwise_judge import compassarena_subjectivebench_singleturn_datasets
-    from opencompass.configs.datasets.subjective.compass_arena_subjective_bench.multiturn.pointwise_judge import compassarena_subjectivebench_multiturn_datasets
+    from opencompass.configs.datasets.subjective.compass_arena_subjective_bench.singleturn.pairwise_judge import compassarena_subjectivebench_singleturn_datasets
+    from opencompass.configs.datasets.subjective.compass_arena_subjective_bench.multiturn.pairwise_judge import compassarena_subjectivebench_multiturn_datasets
 
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import models as lmdeploy_internlm2_5_7b_chat
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_20b_chat import models as lmdeploy_internlm2_5_20b_chat
@@ -26,8 +26,7 @@ from opencompass.runners import LocalRunner
 from opencompass.runners import SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-from opencompass.summarizers import SubjectiveSummarizer
-
+from opencompass.summarizers import DefaultSubjectiveSummarizer
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),
@@ -51,7 +50,7 @@ api_meta_template = dict(
 #     )
 # ]
 
-models = [*lmdeploy_qwen2_5_14b_instruct, *lmdeploy_qwen2_5_32b_instruct, *lmdeploy_qwen2_5_72b_instruct, *lmdeploy_qwen2_7b_instruct]
+models = [*lmdeploy_qwen2_5_14b_instruct, *lmdeploy_qwen2_5_32b_instruct, *lmdeploy_qwen2_5_7b_instruct, *lmdeploy_qwen2_7b_instruct]
 
 datasets = [*compassarena_subjectivebench_singleturn_datasets, *compassarena_subjectivebench_multiturn_datasets] # add datasets you want
 
