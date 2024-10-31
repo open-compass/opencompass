@@ -32,16 +32,22 @@ class InternTrainManager:
 class CurrentInternTrainManager(InternTrainManager):
 
     def load_config(self, path, model_config=None):
-        from internlm.config import Config
         if model_config is None:
-            model_config = torch.load(os.path.join(path, 'model_config.pt'))
-        elif isinstance(model_config, dict):
-            model_config = Config(model_config)
-        elif isinstance(model_config, str):
-            model_config = Config.fromfile(model_config).model
+            from internlm.checkpoint.checkpoint_manager import try_load_config
+            model_config = try_load_config(
+                os.path.join(path, 'model_config.pt'))
+        elif isinstance(model_config, str) and model_config.endswith('.pt'):
+            from internlm.checkpoint.checkpoint_manager import try_load_config
+            model_config = try_load_config(model_config)
         else:
-            raise NotImplementedError(
-                'model_config should be None, dict or filename.')
+            from internlm.config import Config
+            if isinstance(model_config, dict):
+                model_config = Config(model_config)
+            elif isinstance(model_config, str):
+                model_config = Config.fromfile(model_config).model
+            else:
+                raise NotImplementedError(
+                    'model_config should be None, dict or filename.')
 
         return model_config
 
@@ -60,6 +66,8 @@ class LegacyInternTrainManager(InternTrainManager):
         from internlm.core.context import Config
         if model_config is None:
             model_config = torch.load(os.path.join(path, 'model_config.pt'))
+        elif isinstance(model_config, str) and model_config.endswith('.pt'):
+            model_config = torch.load(model_config)
         elif isinstance(model_config, dict):
             model_config = Config(model_config)
         elif isinstance(model_config, str):
@@ -132,6 +140,7 @@ class InternTrain(BaseModel):
                  tokenizer_path: Optional[str] = None,
                  tokenizer_type: str = 'INTERNLM',
                  model_config: Optional[Union[str, Dict]] = None,
+                 parallel_config: Optional[str] = None,
                  model_type: str = 'INTERNLM2',
                  ckpt_type: Optional[str] = None,
                  meta_template: Optional[Dict] = None,
@@ -140,11 +149,13 @@ class InternTrain(BaseModel):
                  sync_rank: bool = False,
                  mode='none',
                  end_str: Optional[str] = None):
+
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          tokenizer_only=tokenizer_only,
                          meta_template=meta_template,
                          sync_rank=sync_rank)
+
         self.logger = get_logger()
         # insert interntrain module
         self.manager = InternTrainManager.build(module_path)
@@ -162,6 +173,7 @@ class InternTrain(BaseModel):
         if not tokenizer_only:
             self._load_model(path=path,
                              model_config=model_config,
+                             parallel_config=parallel_config,
                              model_type=model_type,
                              model_dtype=model_dtype,
                              ckpt_type=ckpt_type)
@@ -196,6 +208,7 @@ class InternTrain(BaseModel):
     def _load_model(self,
                     path: str,
                     model_config: Optional[str] = None,
+                    parallel_config: Optional[str] = None,
                     model_type: str = 'INTERNLM2',
                     model_dtype: Optional[str] = None,
                     ckpt_type: Optional[str] = None):
@@ -216,10 +229,11 @@ class InternTrain(BaseModel):
         world_size = int(os.getenv('WORLD_SIZE', '1'))
         tp_size = world_size  # TODO
         self.logger.info(f'world size: {world_size} tp: {tp_size}')
-        parallel_config = dict(zero1=dict(size=1, fsdp=False),
-                               pipeline=dict(size=1),
-                               tensor=dict(size=tp_size, mode='mtp'),
-                               sequence_parallel=False)
+        if parallel_config is None:
+            parallel_config = dict(zero1=dict(size=1, fsdp=False),
+                                   pipeline=dict(size=1),
+                                   tensor=dict(size=tp_size, mode='mtp'),
+                                   sequence_parallel=False)
         config = dict(model=model_config,
                       parallel=parallel_config,
                       data=dict(use_packed_dataset=False),
@@ -253,7 +267,10 @@ class InternTrain(BaseModel):
             load_func = LOAD_FUNC_DICT[ckpt_type]
             load_func(path, self.model)
 
-        self.model.to(model_config['dtype']).eval().cuda()
+        if 'moe' in model_type.lower():
+            self.model.eval().cuda()
+        else:
+            self.model.to(model_config['dtype']).eval().cuda()
 
     def _load_tokenizer(self, tokenizer_path: str, tokenizer_type: str):
         from internlm.core.context.registry import TOKENIZER_INITIALIZER

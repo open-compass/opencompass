@@ -167,6 +167,8 @@ class DLCRunner(BaseRunner):
 
             # set priority to 1 as default
             task_priority = self.aliyun_cfg.get('priority', 1)
+            worker_cpu = self.aliyun_cfg.get('worker_cpu', 12)
+            worker_memory = self.aliyun_cfg.get('worker_memory', 192)
 
             # Different dlc versions has different commands
             if self.aliyun_cfg.get('dlc_job_cmd') == 'create':
@@ -184,9 +186,9 @@ class DLCRunner(BaseRunner):
                 f" --resource_id={self.aliyun_cfg['resource_id']}"
                 f' --priority {task_priority}'
                 f'{worker_cmd}'
-                f' --worker_cpu {max(num_gpus * 8, 12)}'
+                f' --worker_cpu {max(num_gpus * 8, worker_cpu)}'
                 f' --worker_gpu {num_gpus}'
-                f' --worker_memory {max(num_gpus * 128, 192)}Gi'
+                f' --worker_memory {max(num_gpus * 128, worker_memory)}Gi'
                 f" --worker_image {self.aliyun_cfg['worker_image']}"
                 f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}")
             get_cmd = partial(task.get_command,
