@@ -1,9 +1,6 @@
 from mmengine.config import read_base
-from opencompass.models import TurboMindModel, TurboMindModelwithChatTemplate
 
-from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks.subjective_eval import SubjectiveEvalTask
+from opencompass.models import TurboMindModel, TurboMindModelwithChatTemplate
 
 with read_base():
     # choose a list of datasets
@@ -11,8 +8,6 @@ with read_base():
         gsm8k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.race.race_gen import \
         race_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.subjective.fofo.fofo_bilingual_judge import \
-        fofo_datasets  # noqa: F401, E501
     # read hf models - chat models
     from opencompass.configs.models.baichuan.hf_baichuan2_7b_chat import \
         models as hf_baichuan2_7b_chat_model  # noqa: F401, E501
@@ -111,26 +106,13 @@ api_meta_template = dict(
     reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
 
-
 for d in datasets:
     d['reader_cfg']['test_range'] = '[0:10]'
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 for m in models:
-    if m['type'] is TurboMindModel or m['type'] is TurboMindModelwithChatTemplate:
+    if m['type'] is TurboMindModel or m[
+            'type'] is TurboMindModelwithChatTemplate:
         m['engine_config']['max_batch_size'] = 1
         m['batch_size'] = 1
-
-judge_models = [*hf_internlm2_5_7b_chat_model]
-
-eval = dict(
-    partitioner=dict(
-        type=SubjectiveNaivePartitioner,
-        models=models,
-        judge_models=judge_models,
-    ),
-    runner=dict(type=LocalRunner,
-                max_num_workers=16,
-                task=dict(type=SubjectiveEvalTask)),
-)
