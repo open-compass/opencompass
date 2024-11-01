@@ -189,15 +189,26 @@ class TurboMindModel(BaseModel):
         assert isinstance(
             inputs, List), f'List(str) is expected, but got {type(inputs)}'
         results = []
-        for text, cont in zip(inputs, conts):
-            input_ids = self.tokenizer.encode(text)
-            res = self.pipe.get_ppl(input_ids)
-            logit_sum = res * len(input_ids)
-            input_ids = self.tokenizer.encode(text.replace(cont, ''))
-            res = self.pipe.get_ppl(input_ids)
-            logit_part = res * len(input_ids)
-            results.append(-(logit_sum - logit_part))
-        results = np.concatenate(results)
+        if self.version_info <= (0, 6, 0):
+            for text, cont in zip(inputs, conts):
+                input_ids = self.tokenizer.encode(text)
+                res = self.pipe.get_ppl(input_ids)
+                logit_sum = res * len(input_ids)
+                input_ids = self.tokenizer.encode(text.replace(cont, ''))
+                res = self.pipe.get_ppl(input_ids)
+                logit_part = res * len(input_ids)
+                results.append(-(logit_sum - logit_part))
+            results = np.concatenate(results)
+        else:
+            for text, cont in zip(inputs, conts):
+                input_ids = self.tokenizer.encode(text)
+                res = self.pipe.get_ppl(input_ids)
+                logit_sum = res * len(input_ids)
+                input_ids = self.tokenizer.encode(text.replace(cont, ''))
+                res = self.pipe.get_ppl(input_ids)
+                logit_part = res * len(input_ids)
+                results.append(-(logit_sum[0] - logit_part[0]))
+            results = np.array(results)
         return results
 
     def _build_pipe(self, model_path, backend, engine_config):
