@@ -240,13 +240,13 @@ class VOLCRunner(BaseRunner):
                     task_status = json.loads(ret.stdout)[0]['Status']
                 except JSONDecodeError:
                     print('The task is not yet in the queue for '
-                          f"{ret.stdout}, waiting...")
+                          f'{ret.stdout}, waiting...')
                     time.sleep(poll_interval)
                     continue
                 finally:
                     if task_status not in VolcStatus.__members__.values():
                         warnings.warn(
-                            f"Unrecognized task status: {task_status}. "
+                            f'Unrecognized task status: {task_status}. '
                             'This might be due to a newer version of Volc. '
                             'Please report this issue to the OpenCompass.')
 
@@ -281,9 +281,9 @@ class VOLCRunner(BaseRunner):
                     time.sleep(poll_interval)
                     continue
         else:
-            print(f"Failed to submit the task for：{result.stdout}")
+            print(f'Failed to submit the task for：{result.stdout}')
             task_status = VolcStatus.exception
-            f.write(f"{result.stdout}: {result.returncode}")
+            f.write(f'{result.stdout}: {result.returncode}')
 
         f.close()
         return task_status, result.returncode
