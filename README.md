@@ -53,9 +53,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 🔥🔥🔥 We are delighted to announce that **the OpenCompass has been recommended by the Meta AI**, click [Get Started](https://ai.meta.com/llama/get-started/#validation) of Llama for more information.
 
 > **Attention**<br />
-> We launch the OpenCompass Collaboration project, welcome to support diverse evaluation benchmarks into OpenCompass!
-> Clike [Issue](https://github.com/open-compass/opencompass/issues/248) for more information.
-> Let's work together to build a more powerful OpenCompass toolkit!
+> Breaking Change Notice: In version 0.4.0, we are consolidating all AMOTIC configuration files (previously located in ./configs/datasets, ./configs/models, and ./configs/summarizers) into the opencompass package. Users are advised to update their configuration references to reflect this structural change.
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
