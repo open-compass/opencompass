@@ -69,7 +69,7 @@ class TestChat:
                                  dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(result_score, base_score)
+        assert_score(model, result_score, base_score)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -87,7 +87,7 @@ class TestBase:
             return
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(result_score, base_score)
+        assert_score(model, result_score, base_score)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -101,7 +101,7 @@ class TestCmdCase:
         if len(result_scores.keys()) != 1:
             assert False, 'result is none'
         result_score = result_scores.get(model).get(dataset)
-        assert_score(result_score, 91)
+        assert_score(model, result_score, 91)
 
     @pytest.mark.case2
     @pytest.mark.parametrize('model, dataset',
@@ -111,7 +111,7 @@ class TestCmdCase:
         if len(result_scores.keys()) != 1:
             assert False, 'result is none'
         result_score = result_scores.get(model).get(dataset)
-        assert_score(result_score, 91)
+        assert_score(model, result_score, 91)
 
     @pytest.mark.case3
     @pytest.mark.parametrize('model, dataset',
@@ -121,7 +121,7 @@ class TestCmdCase:
         if len(result_scores.keys()) != 1:
             assert False, 'result is none'
         result_score = result_scores.get(model).get(dataset)
-        assert_score(result_score, 91)
+        assert_score(model, result_score, 91)
 
     @pytest.mark.case4
     @pytest.mark.parametrize('model, dataset',
@@ -131,19 +131,27 @@ class TestCmdCase:
         if len(result_scores.keys()) != 1:
             assert False, 'result is none'
         result_score = result_scores.get(model).get(dataset)
-        assert_score(result_score, 91)
+        assert_score(model, result_score, 91)
 
 
-def assert_score(score, baseline):
+def assert_score(model, score, baseline):
     if score is None or score == '-':
         assert False, 'value is none'
-    if float(score) <= (baseline + 5) and float(score) >= (baseline - 5):
-        print(score + ' between ' + str(baseline - 5) + ' and ' +
-              str(baseline + 5))
-        assert True
+    if 'vllm' in model:
+        if float(score) <= (baseline + 5) and float(score) >= (baseline - 5):
+            print(score + ' between ' + str(baseline - 5) + ' and ' +
+                  str(baseline + 5))
+            assert True
+        else:
+            assert False, score + ' not between ' + str(
+                baseline - 5) + ' and ' + str(baseline + 5)
     else:
-        assert False, score + ' not between ' + str(
-            baseline - 5) + ' and ' + str(baseline + 5)
+        if float(score) <= (baseline + 0.01) and float(score) >= (baseline -
+                                                                  0.01):
+            print(score + ' is equal ' + str(baseline))
+            assert True
+        else:
+            assert False, score + ' not equal ' + str(baseline)
 
 
 def find_csv_files(directory):

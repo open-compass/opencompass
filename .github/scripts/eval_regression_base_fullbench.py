@@ -151,3 +151,4 @@ for m in models:
             'type'] is TurboMindModelwithChatTemplate:
         m['engine_config']['max_batch_size'] = 1
         m['batch_size'] = 1
+models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
