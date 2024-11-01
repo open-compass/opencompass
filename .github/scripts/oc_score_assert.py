@@ -137,21 +137,13 @@ class TestCmdCase:
 def assert_score(model, score, baseline):
     if score is None or score == '-':
         assert False, 'value is none'
-    if 'vllm' in model:
-        if float(score) <= (baseline + 5) and float(score) >= (baseline - 5):
-            print(score + ' between ' + str(baseline - 5) + ' and ' +
-                  str(baseline + 5))
-            assert True
-        else:
-            assert False, score + ' not between ' + str(
-                baseline - 5) + ' and ' + str(baseline + 5)
+
+    if float(score) <= (baseline + 0.01) and float(score) >= (baseline -
+                                                                0.01):
+        print(score + ' is equal ' + str(baseline))
+        assert True
     else:
-        if float(score) <= (baseline + 0.01) and float(score) >= (baseline -
-                                                                  0.01):
-            print(score + ' is equal ' + str(baseline))
-            assert True
-        else:
-            assert False, score + ' not equal ' + str(baseline)
+        assert False, score + ' not equal ' + str(baseline)
 
 
 def find_csv_files(directory):

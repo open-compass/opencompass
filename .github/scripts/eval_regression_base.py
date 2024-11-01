@@ -78,13 +78,6 @@ with read_base():
     from opencompass.configs.summarizers.medium import \
         summarizer  # noqa: F401, E501
 
-for model in [
-        v for k, v in locals().items()
-        if k.endswith('_model') and 'lmdeploy' in k
-]:
-    model['engine_config']['max_batch_size'] = 1
-    model['batch_size'] = 1
-
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
