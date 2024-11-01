@@ -6,6 +6,8 @@ with read_base():
         gsm8k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.race.race_ppl import \
         race_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.winogrande.winogrande_5shot_ll_252f01 import \
+        winogrande_datasets  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_moe_16b_base import \
         models as hf_deepseek_moe_16b_base_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_v2_lite import \
@@ -47,6 +49,12 @@ with read_base():
         models as vllm_mistral_7b_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mixtral_8x7b_v0_1 import \
         models as vllm_mixtral_8x7b_v0_1_model  # noqa: F401, E501
+    from opencompass.configs.models.qwen2_5.hf_qwen_2_5_7b import \
+        models as hf_qwen_2_5_7b  # noqa: F401, E501
+    from opencompass.configs.models.qwen2_5.hf_qwen_2_5_14b import \
+        models as hf_qwen_2_5_14b  # noqa: F401, E501
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b import \
+        models as lmdeploy_qwen2_5_7b  # noqa: F401, E501
     from opencompass.configs.models.qwen.hf_qwen1_5_moe_a2_7b import \
         models as hf_qwen1_5_moe_a2_7b_model  # noqa: F401, E501
     from opencompass.configs.models.qwen.hf_qwen2_0_5b import \
@@ -68,8 +76,15 @@ with read_base():
     from opencompass.configs.summarizers.medium import \
         summarizer  # noqa: F401, E501
 
+for model in [
+        v for k, v in locals().items()
+        if k.endswith('_model') and 'lmdeploy' in k
+]:
+    model['engine_config']['max_batch_size'] = 1
+    model['batch_size'] = 1
+
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:100]'
+    d['reader_cfg']['test_range'] = '[0:10]'

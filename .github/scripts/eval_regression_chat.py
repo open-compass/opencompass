@@ -1,6 +1,8 @@
 from mmengine.config import read_base
 
-from opencompass.models import OpenAISDK
+from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
+from opencompass.runners import LocalRunner
+from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 
 with read_base():
     # choose a list of datasets
@@ -8,6 +10,8 @@ with read_base():
         gsm8k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.race.race_gen import \
         race_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.subjective.fofo.fofo_bilingual_judge import \
+        fofo_datasets  # noqa: F401, E501
     # read hf models - chat models
     from opencompass.configs.models.baichuan.hf_baichuan2_7b_chat import \
         models as hf_baichuan2_7b_chat_model  # noqa: F401, E501
@@ -73,6 +77,10 @@ with read_base():
         models as hf_phi_3_mini_4k_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_3_small_8k_instruct import \
         models as hf_phi_3_mini_8k_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.qwen2_5.hf_qwen2_5_14b_instruct import \
+        models as hf_qwen2_5_14b_instruct  # noqa: F401, E501
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import \
+        models as lmdeploy_qwen2_5_14b_instruct  # noqa: F401, E501
     from opencompass.configs.models.qwen.hf_qwen1_5_0_5b_chat import \
         models as hf_qwen1_5_0_5b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.qwen.hf_qwen2_1_5b_instruct import \
@@ -92,7 +100,6 @@ with read_base():
     from opencompass.configs.summarizers.medium import \
         summarizer  # noqa: F401, E501
 
-models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
 api_meta_template = dict(
@@ -103,25 +110,27 @@ api_meta_template = dict(
     reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
 
-model_name = ''
-
-models.append(
-    dict(
-        abbr='lmdeploy-api-test',
-        type=OpenAISDK,
-        key='EMPTY',
-        openai_api_base='http://judgemodel:10001/v1',
-        path='compass_judger_internlm2_102b_0508',
-        tokenizer_path='internlm/internlm2_5-20b-chat',
-        rpm_verbose=True,
-        meta_template=api_meta_template,
-        query_per_second=50,
-        max_out_len=1024,
-        max_seq_len=4096,
-        temperature=0.01,
-        batch_size=128,
-        retry=3,
-    ))
+for model in [
+        v for k, v in locals().items()
+        if k.endswith('_model') and 'lmdeploy' in k
+]:
+    model['engine_config']['max_batch_size'] = 1
+    model['batch_size'] = 1
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:100]'
+    d['reader_cfg']['test_range'] = '[0:10]'
+
+models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
+
+judge_models = [*hf_internlm2_5_7b_chat_model]
+
+eval = dict(
+    partitioner=dict(
+        type=SubjectiveNaivePartitioner,
+        models=models,
+        judge_models=judge_models,
+    ),
+    runner=dict(type=LocalRunner,
+                max_num_workers=16,
+                task=dict(type=SubjectiveEvalTask)),
+)

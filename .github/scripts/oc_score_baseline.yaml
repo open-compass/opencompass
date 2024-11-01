@@ -208,11 +208,6 @@ yi-1.5-9b-chat-hf:
     race-middle: 89
     race-high: 91
 
-lmdeploy-api-test:
-    gsm8k: 90
-    race-middle: 95
-    race-high: 96
-
 deepseek-moe-16b-base-hf:
     gsm8k: 25
     race-middle: 35
