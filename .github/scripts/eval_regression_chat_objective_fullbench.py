@@ -1,4 +1,5 @@
 from mmengine.config import read_base
+from opencompass.models import TurboMindModel, TurboMindModelwithChatTemplate
 
 with read_base():
     # read hf models - chat models
@@ -139,14 +140,12 @@ summarizer = dict(
         [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )
 
-for model in [
-        v for k, v in locals().items()
-        if k.endswith('_model') and 'lmdeploy' in k
-]:
-    model['engine_config']['max_batch_size'] = 1
-    model['batch_size'] = 1
 
 for d in datasets:
     d['reader_cfg']['test_range'] = '[0:10]'
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
+for m in models:
+    if m['type'] is TurboMindModel or m['type'] is TurboMindModelwithChatTemplate:
+        m['engine_config']['max_batch_size'] = 1
+        m['batch_size'] = 1

@@ -1,4 +1,5 @@
 from mmengine.config import read_base
+from opencompass.models import TurboMindModel, TurboMindModelwithChatTemplate
 
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
@@ -110,17 +111,16 @@ api_meta_template = dict(
     reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
 
-for model in [
-        v for k, v in locals().items()
-        if k.endswith('_model') and 'lmdeploy' in k
-]:
-    model['engine_config']['max_batch_size'] = 1
-    model['batch_size'] = 1
 
 for d in datasets:
     d['reader_cfg']['test_range'] = '[0:10]'
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
+
+for m in models:
+    if m['type'] is TurboMindModel or m['type'] is TurboMindModelwithChatTemplate:
+        m['engine_config']['max_batch_size'] = 1
+        m['batch_size'] = 1
 
 judge_models = [*hf_internlm2_5_7b_chat_model]
 
