@@ -237,7 +237,8 @@ class VOLCRunner(BaseRunner):
                                      text=True,
                                      capture_output=True)
                 try:
-                    task_status = json.loads(ret.stdout)[0]['Status']
+                    task_status = json.loads(
+                        ret.stdout.split()[-1])[0]['Status']
                 except JSONDecodeError:
                     print('The task is not yet in the queue for '
                           f'{ret.stdout}, waiting...')
