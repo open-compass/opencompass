@@ -72,7 +72,7 @@ jobs:
       fail-fast: false
       matrix:
         cuda_env: [dsw_cu11, dsw_cu12]
-        regression_func: ${{github.event.inputs.regression_func}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func)}}
     runs-on: ${{ matrix.cuda_env }}
     environment: 'prod'
     timeout-minutes: 240 #4hours
