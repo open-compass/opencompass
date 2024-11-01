@@ -107,7 +107,7 @@ api_meta_template = dict(
 )
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:10]'
+    d['reader_cfg']['test_range'] = '[0:20]'
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
