@@ -321,6 +321,11 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/mmmlu_lite",
+    },
+    "opencompass/mmmlu_lite": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mmmlu_lite",
     }
 }
 
