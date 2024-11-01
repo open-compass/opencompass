@@ -13,7 +13,7 @@ models = [
         ),
         gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
         max_seq_len=7168,
-        max_out_len=1024,
+        max_out_len=2048,
         batch_size=4,
         run_cfg=dict(num_gpus=8),
     )
