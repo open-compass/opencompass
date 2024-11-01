@@ -31,11 +31,8 @@ MMMLU contains the MMLU test set translated into the following locales:
 
 
 ## How to Use
-Download file from [link](https://hf-mirror.com/datasets/openai/MMMLU)
 
 ```python
 from datasets import load_dataset
-ds = load_dataset("openai/MMMLU", "default")
-from datasets import load_dataset
-ds = load_dataset("openai/MMMLU", "by_language")
+ds = load_dataset("opencompass/mmmlu_lite", "AR_XY")
 ```

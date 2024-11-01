@@ -316,6 +316,16 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/WikiBench/",
+    },
+    "opencompass/mmmlu_lite": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mmmlu_lite",
+    },
+    "opencompass/mmmlu_lite": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mmmlu_lite",
     }
 }
 
@@ -323,6 +333,10 @@ DATASETS_URL = {
     "/mmlu/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip",
         "md5": "761310671509a239e41c4b717f7fab9c",
+    },
+    "/mmmlu_lite": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmmlu_lite.zip",
+        "md5": "a776af1220e1826fd0608eda1bc4425e",
     },
     "/gpqa/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gpqa.zip",
