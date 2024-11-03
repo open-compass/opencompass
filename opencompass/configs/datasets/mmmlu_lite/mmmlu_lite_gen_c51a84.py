@@ -95,8 +95,7 @@ for _name in mmmlu_lite_all_sets:
         dict(
             abbr=f'openai_m{_name}',
             type=MMMLULiteDataset,
-            # path='opencompass/mmmlu_lite',
-            path = './data/mmmlu_lite',
+            path='opencompass/mmmlu_lite',
             name=f'openai_m{_name}',
             reader_cfg=mmmlu_lite_reader_cfg,
             infer_cfg=mmmlu_lite_infer_cfg,

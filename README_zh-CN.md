@@ -53,9 +53,7 @@
 🔥🔥🔥 祝贺 **OpenCompass 作为大模型标准测试工具被Meta AI官方推荐**, 点击 Llama 的 [入门文档](https://ai.meta.com/llama/get-started/#validation) 获取更多信息。
 
 > **注意**<br />
-> 我们正式启动 OpenCompass 共建计划，诚邀社区用户为 OpenCompass 提供更具代表性和可信度的客观评测数据集!
-> 点击 [Issue](https://github.com/open-compass/opencompass/issues/248) 获取更多数据集.
-> 让我们携手共进，打造功能强大易用的大模型评测平台！
+> 重要通知：从 v0.4.0 版本开始，所有位于 ./configs/datasets、./configs/models 和 ./configs/summarizers 目录下的 AMOTIC 配置文件将迁移至 opencompass 包中。请及时更新您的配置文件路径。
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
