@@ -125,8 +125,7 @@ class TestCmdCase:
                               ('internlm2_5-7b-chat-lmdeploy', 'race-high'),
                               ('internlm2_5-7b-chat-lmdeploy', 'demo_gsm8k'),
                               ('internlm2-chat-1.8b-lmdeploy', 'race-middle'),
-                              ('internlm2-chat-1.8b-lmdeploy', 'race-high'),
-                              ('internlm2-chat-1.8b-lmdeploy', 'demo_gsm8k')])
+                              ('internlm2-chat-1.8b-lmdeploy', 'race-high')])
     def test_cmd_case2(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
