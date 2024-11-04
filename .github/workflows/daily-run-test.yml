@@ -36,7 +36,7 @@ env:
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HUGGINGFACE_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HF_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
-  COMPASS_DATA_CACHE: /cpfs01/shared/public/public_hdd/llmeval/llm-evaluation-datasets
+  COMPASS_DATA_CACHE: /cpfs01/shared/public/llmeval/compass_data_cache
   HF_DATASETS_OFFLINE: 1
   HF_EVALUATE_OFFLINE: 1
   TRANSFORMERS_OFFLINE: 1
