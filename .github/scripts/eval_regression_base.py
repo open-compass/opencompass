@@ -90,3 +90,14 @@ for m in models:
         m['engine_config']['max_batch_size'] = 1
         m['batch_size'] = 1
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
+
+summarizer = dict(
+    dataset_abbrs=[
+        'gsm8k',
+        'race-middle',
+        'race-high',
+        'winogrande',
+    ],
+    summary_groups=sum(
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
+)

@@ -25,8 +25,6 @@ with read_base():
         mtbench101_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.wildbench.wildbench_pair_judge import \
         wildbench_datasets  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import \
-        models as lmdeploy_internlm2_5_7b_chat_model  # noqa: F401, E501
 
 summarizer = dict(type=SubjectiveSummarizer, function='subjective')
 
@@ -55,12 +53,12 @@ models = [(dict(
     tokenizer_path='internlm/internlm2_5-7b-chat',
     rpm_verbose=True,
     meta_template=api_meta_template,
-    query_per_second=50,
+    query_per_second=128,
     max_out_len=1024,
     max_seq_len=4096,
     temperature=0.01,
     batch_size=128,
-    retry=3,
+    retry=5,
 ))]
 
 judge_models = models
