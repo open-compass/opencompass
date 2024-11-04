@@ -65,8 +65,6 @@ with read_base():
         models as hf_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_3 import \
         models as hf_mistral_7b_instruct_v0_3_model  # noqa: F401, E501
-    from opencompass.configs.models.mistral.hf_mixtral_8x22b_instruct_v0_1 import \
-        models as hf_mixtral_8x22b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_1 import \
         models as vllm_mistral_7b_instruct_v0_1  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_2 import \
