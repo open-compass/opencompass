@@ -7,22 +7,26 @@ import yaml
 output_path = 'regression_result_daily'
 
 chat_model_list = [
-    'baichuan2-7b-chat-hf', 'deepseek-7b-chat-hf', 'deepseek-moe-16b-chat-hf',
-    'deepseek-v2-lite-chat-hf', 'deepseek-7b-chat-vllm', 'gemma2-2b-it-hf',
-    'gemma2-9b-it-hf', 'gemma-7b-it-vllm', 'internlm2_5-7b-chat-hf',
-    'internlm2_5-20b-chat-hf', 'internlm2_5-7b-chat-turbomind',
-    'internlm2_5-20b-chat-turbomind', 'internlm2-chat-1.8b-turbomind',
-    'internlm2-chat-1.8b-sft-turbomind', 'internlm2-chat-7b-lmdeploy',
-    'internlm2-chat-7b-sft-turbomind', 'internlm2-chat-7b-vllm',
-    'llama-3_1-8b-instruct-hf', 'llama-3-8b-instruct-hf',
-    'llama-3_1-8b-instruct-turbomind', 'llama-3-8b-instruct-turbomind',
-    'mistral-7b-instruct-v0.3-hf', 'mistral-7b-instruct-v0.2-vllm',
-    'minicpm-2b-dpo-fp32-hf', 'minicpm-2b-sft-bf16-hf',
-    'minicpm-2b-sft-fp32-hf', 'phi-3-mini-4k-instruct-hf',
-    'qwen1.5-0.5b-chat-hf', 'qwen2-1.5b-instruct-hf', 'qwen2-7b-instruct-hf',
+    'baichuan2-7b-chat-hf', 'glm-4-9b-chat-hf', 'glm-4-9b-chat-turbomind',
+    'glm-4-9b-chat-vllm', 'deepseek-7b-chat-hf', 'deepseek-moe-16b-chat-hf',
+    'deepseek-7b-chat-vllm', 'gemma2-2b-it-hf', 'gemma2-9b-it-hf',
+    'gemma-2b-it-hf', 'gemma-7b-it-hf', 'gemma-7b-it-vllm',
+    'internlm2_5-7b-chat-hf', 'internlm2_5-7b-chat-turbomind',
+    'internlm2-chat-1.8b-turbomind', 'internlm2-chat-1.8b-sft-turbomind',
+    'internlm2-chat-7b-lmdeploy', 'internlm2-chat-7b-sft-turbomind',
+    'internlm2-chat-7b-vllm', 'llama-3_1-8b-instruct-hf',
+    'llama-3-8b-instruct-hf', 'llama-3_1-8b-instruct-turbomind',
+    'llama-3-8b-instruct-turbomind', 'mistral-7b-instruct-v0.2-hf',
+    'mistral-7b-instruct-v0.3-hf', 'mistral-7b-instruct-v0.1-vllm',
+    'mistral-7b-instruct-v0.2-vllm', 'minicpm-2b-dpo-fp32-hf',
+    'minicpm-2b-sft-bf16-hf', 'minicpm-2b-sft-fp32-hf',
+    'phi-3-mini-4k-instruct-hf', 'qwen1.5-0.5b-chat-hf',
+    'qwen2-1.5b-instruct-hf', 'qwen2-7b-instruct-hf',
     'qwen2-1.5b-instruct-turbomind', 'qwen2-7b-instruct-turbomind',
     'qwen1.5-0.5b-chat-vllm', 'yi-1.5-6b-chat-hf', 'yi-1.5-9b-chat-hf',
-    'lmdeploy-api-test'
+    'deepseek-v2-lite-chat-hf', 'internlm2_5-20b-chat-hf',
+    'internlm2_5-20b-chat-turbomind', 'qwen2.5-14b-instruct-hf',
+    'qwen2.5-14b-instruct-turbomind'
 ]
 base_model_list = [
     'deepseek-moe-16b-base-hf', 'deepseek-v2-lite-hf',
@@ -138,8 +142,7 @@ def assert_score(model, score, baseline):
     if score is None or score == '-':
         assert False, 'value is none'
 
-    if float(score) <= (baseline + 0.01) and float(score) >= (baseline -
-                                                                0.01):
+    if float(score) <= (baseline + 0.01) and float(score) >= (baseline - 0.01):
         print(score + ' is equal ' + str(baseline))
         assert True
     else:
