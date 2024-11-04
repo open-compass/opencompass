@@ -301,6 +301,31 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/cmo.jsonl",
+    },
+    "opencompass/nq_open": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/nq-open/",
+    },
+    "opencompass/GAOKAO-BENCH": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/GAOKAO-BENCH/data",
+    },
+    "opencompass/WikiBench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/WikiBench/",
+    },
+    "opencompass/mmmlu_lite": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mmmlu_lite",
+    },
+    "opencompass/mmmlu_lite": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mmmlu_lite",
     }
 }
 
@@ -308,6 +333,10 @@ DATASETS_URL = {
     "/mmlu/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip",
         "md5": "761310671509a239e41c4b717f7fab9c",
+    },
+    "/mmmlu_lite": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmmlu_lite.zip",
+        "md5": "a776af1220e1826fd0608eda1bc4425e",
     },
     "/gpqa/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gpqa.zip",
@@ -472,5 +501,25 @@ DATASETS_URL = {
     "/cmo": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmo.zip",
         "md5": "fad52c81290506a8ca74f46b5400d8fc"
+    },
+    "/nq-open": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/nq-open.zip",
+        "md5": "a340521e5c9ec591227dcb367f718b25",
+    },
+    "/winogrande": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/winogrande.zip",
+        "md5": "9e949a75eacc26ed4fd2b9aa870b495b",
+    },
+    "/triviaqa": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/triviaqa.zip",
+        "md5": "e6a118d744236814926b2ec7ec66c034",
+    },
+    "/GAOKAO-BENCH": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/GAOKAO-BENCH.zip",
+        "md5": "ba3c71b8b9db96d2a0664b977c4f9784",
+    },
+    "/WikiBench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/WikiBench.zip",
+        "md5": "6dac1d1a3133fe1effff185cbf71d928",
     }
 }

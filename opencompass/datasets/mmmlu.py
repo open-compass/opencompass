@@ -2,7 +2,7 @@
 # yapf: disable
 
 import json
-import os
+import os.path as osp
 
 from datasets import Dataset, DatasetDict, load_dataset
 
@@ -43,10 +43,12 @@ class MMMLULiteDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path, local_mode=False)
         dataset = DatasetDict()
-        path = os.path.join(path, name + '.jsonl')
-        dataset_list = []
-        with open(path, 'r') as f:
-            dataset_list = [json.loads(line) for line in f.readlines()]
-        dataset['test'] = Dataset.from_list(dataset_list)
+        name = name.split('_')[-1]
+        raw_data = []
+        filename = osp.join(path, name, 'test.jsonl')
+        with open(filename, encoding='utf-8') as f:
+            raw_data = [json.loads(line) for line in f.readlines()]
+        dataset['test'] = Dataset.from_list(raw_data)
         return dataset
