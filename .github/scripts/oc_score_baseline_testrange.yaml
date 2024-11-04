@@ -159,9 +159,9 @@ mistral-7b-instruct-v0.2-vllm:
     race-high: 75
 
 MiniCPM3-4B-hf:
-    gsm8k: 43.75
-    race-middle: 78.12
-    race-high: 75
+    gsm8k: 68.75
+    race-middle: 90.62
+    race-high: 84.38
 
 minicpm-2b-dpo-fp32-hf:
     gsm8k: 56.25
