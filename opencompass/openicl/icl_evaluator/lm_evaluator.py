@@ -179,6 +179,7 @@ class LMEvaluator:
             if self.pack_all_predictions:
                 for i in range(len(predictions)):
                     key = 'prediction' if i == 0 else f'prediction{i + 1}'
+                    predictions[i] = [str(_) for _ in predictions[i]] # Fix the dictionary order to prevent the following situations: {'assistant':'', 'round':2, 'user':''}
                     pred_dict[key] = predictions[i]
             else:
                 for i in range(len(predictions)):
