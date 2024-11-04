@@ -18,6 +18,11 @@ on:
         description: 'regression functions'
         type: string
         default: "['chat_models','base_models', 'chat_obj_fullbench', 'chat_sub_fullbench', 'base_fullbench','cmd']"
+      cuda_env:
+        required: true
+        description: "regression conda env, eg. ['dsw_cu11','dsw_cu12']"
+        type: string
+        default: "['dsw_cu12']"
   schedule:
     - cron:  '56 16 * * *'
 
@@ -71,7 +76,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cuda_env: [dsw_cu11, dsw_cu12]
+        cuda_env: ${{ fromJSON(inputs.cuda_env) || fromJSON('["dsw_cu12"]')}}
         regression_func: ${{fromJSON(github.event.inputs.regression_func)}}
     runs-on: ${{ matrix.cuda_env }}
     environment: 'prod'

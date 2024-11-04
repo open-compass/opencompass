@@ -29,6 +29,10 @@ with read_base():
         models as hf_gemma2_2b_it_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma2_9b_it import \
         models as hf_gemma2_9b_it_model  # noqa: F401, E501
+    from opencompass.configs.models.gemma.hf_gemma_2b_it import \
+        models as hf_gemma_2b_it  # noqa: F401, E501
+    from opencompass.configs.models.gemma.hf_gemma_7b_it import \
+        models as hf_gemma_7b_it  # noqa: F401, E501
     from opencompass.configs.models.gemma.vllm_gemma_7b_it import \
         models as vllm_gemma_7b_it_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.hf_internlm2_5_7b_chat import \
@@ -57,12 +61,16 @@ with read_base():
         models as lmdeploy_llama3_1_8b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import \
         models as lmdeploy_llama3_8b_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_2 import \
+        models as hf_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_3 import \
         models as hf_mistral_7b_instruct_v0_3_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.hf_mixtral_8x22b_instruct_v0_1 import \
+        models as hf_mixtral_8x22b_instruct_v0_1_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_1 import \
+        models as vllm_mistral_7b_instruct_v0_1  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_2 import \
         models as vllm_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
-    from opencompass.configs.models.mistral.vllm_mixtral_8x7b_instruct_v0_1 import \
-        models as vllm_mixtral_8x7b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.openbmb.hf_minicpm_2b_dpo_fp32 import \
         models as hf_minicpm_2b_dpo_fp32_model  # noqa: F401, E501
     from opencompass.configs.models.openbmb.hf_minicpm_2b_sft_bf16 import \
@@ -93,8 +101,6 @@ with read_base():
         models as hf_yi_1_5_6b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.yi.hf_yi_1_5_9b_chat import \
         models as hf_yi_1_5_9b_chat_model  # noqa: F401, E501
-    from opencompass.configs.summarizers.medium import \
-        summarizer  # noqa: F401, E501
 
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
@@ -118,3 +124,13 @@ for m in models:
         m['batch_size'] = 1
 
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
+
+summarizer = dict(
+    dataset_abbrs=[
+        'gsm8k',
+        'race-middle',
+        'race-high',
+    ],
+    summary_groups=sum(
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
+)
