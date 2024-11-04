@@ -13,6 +13,21 @@ on:
         description: 'Set branch or tag or commit id. Default is "main"'
         type: string
         default: 'main'
+      build_lmdeploy:
+        required: false
+        description: 'whether to build lmdeploy'
+        type:  boolean
+        default: false
+      repo_org_lmdeploy:
+        required: false
+        description: 'Tested repository organization name. Default is internlm/lmdeploy'
+        type: string
+        default: 'InternLM/lmdeploy'
+      repo_ref_lmdeploy:
+        required: false
+        description: 'Set branch or tag or commit id. Default is "main"'
+        type: string
+        default: 'main'
       regression_func:
         required: true
         description: 'regression functions'
@@ -45,6 +60,7 @@ env:
   HF_HUB_OFFLINE: 1
   TRITON_PTXAS_PATH: /usr/local/cuda/bin/ptxas
   REPORT_ROOT: /cpfs01/shared/public/qa-llm-cicd/report
+  OUTPUT_FOLDER: cuda12.1_dist_${{ github.run_id }}
 
 jobs:
   build-pypi:
@@ -70,9 +86,44 @@ jobs:
           retention-days: 1
           name: my-artifact-${{ github.run_id }}
 
+  build-pypi-lmdeploy:
+    if: ${{!cancelled() && (github.event_name != 'schedule' && inputs.build_lmdeploy)}}
+    strategy:
+      matrix:
+        pyver: [py310]
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: ${{ matrix.pyver }}
+      PLAT_NAME: manylinux2014_x86_64
+      DOCKER_TAG: cuda12.1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.inputs.repo_org_lmdeploy || 'InternLM/lmdeploy' }}
+          ref: ${{github.event.inputs.repo_ref_lmdeploy || 'main'}}
+      - name: Build
+        run: |
+          echo ${PYTHON_VERSION}
+          echo ${PLAT_NAME}
+          echo ${DOCKER_TAG}
+          echo ${OUTPUT_FOLDER}
+          echo ${GITHUB_RUN_ID}
+          # remove -it
+          sed -i 's/docker run --rm -it/docker run --rm/g' builder/manywheel/build_wheel.sh
+          bash builder/manywheel/build_wheel.sh ${PYTHON_VERSION} ${PLAT_NAME} ${DOCKER_TAG} ${OUTPUT_FOLDER}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          path: builder/manywheel/${{ env.OUTPUT_FOLDER }}
+          retention-days: 1
+          name: my-artifact-${{ github.run_id }}-${{ matrix.pyver }}
+
+
   daily_run_test:
     if: ${{!cancelled()}}
-    needs: build-pypi
+    needs: ['build-pypi', 'build-pypi-lmdeploy']
     strategy:
       fail-fast: false
       matrix:
@@ -123,9 +174,17 @@ jobs:
           pip install /cpfs01/user/qa-llm-cicd/packages/xformers-0.0.27.post2-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
           pip list
+      - name: Prepare - reinstall lmdeploy - cu12
+        if: ${{matrix.cuda_env == 'dsw_cu12' && inputs.build_lmdeploy}}
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact-${{ github.run_id }}-py310
+      - name: Prepare - reinstall lmdeploy - cu12
+        if: ${{matrix.cuda_env == 'dsw_cu12' && inputs.build_lmdeploy}}
+        run: |
+          pip install lmdeploy-*.whl --no-deps
       - name: Prepare - prepare data and hf model
         run: |
-          ln -s ${{env.DATEASET_CACHE_PATH}} data
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run command testcase

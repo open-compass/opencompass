@@ -33,6 +33,8 @@ with read_base():
         models as hf_gemma_2b_it_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma_7b_it import \
         models as hf_gemma_7b_it_model  # noqa: F401, E501
+    from opencompass.configs.models.gemma.lmdeploy_gemma_9b_it import \
+        models as lmdeploy_gemma_9b_it_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.vllm_gemma_7b_it import \
         models as vllm_gemma_7b_it_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.hf_internlm2_5_7b_chat import \
@@ -55,20 +57,37 @@ with read_base():
         models as vllm_internlm2_chat_7b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.hf_llama3_1_8b_instruct import \
         models as hf_llama3_1_8b_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_llama.hf_llama3_2_3b_instruct import \
+        models as hf_llama3_2_3b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.hf_llama3_8b_instruct import \
         models as hf_llama3_8b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_8b_instruct import \
         models as lmdeploy_llama3_1_8b_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_llama.lmdeploy_llama3_2_3b_instruct import \
+        models as lmdeploy_llama3_2_3b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import \
         models as lmdeploy_llama3_8b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_2 import \
         models as hf_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_3 import \
         models as hf_mistral_7b_instruct_v0_3_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.hf_mistral_nemo_instruct_2407 import \
+        models as hf_mistral_nemo_instruct_2407_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.hf_mistral_small_instruct_2409 import \
+        models as hf_mistral_small_instruct_2409_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.lmdeploy_mistral_nemo_instruct_2407 import \
+        models as lmdeploy_mistral_nemo_instruct_2407_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.lmdeploy_mistral_small_instruct_2409 import \
+        models as \
+        lmdeploy_mistral_small_instruct_2409_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_1 import \
         models as vllm_mistral_7b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_2 import \
         models as vllm_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.vllm_mixtral_8x7b_instruct_v0_1 import \
+        models as vllm_mixtral_8x7b_instruct_v0_1_model  # noqa: F401, E501
+    from opencompass.configs.models.openbmb.hf_minicpm3_4b import \
+        models as hf_minicpm3_4b_model  # noqa: F401, E501
     from opencompass.configs.models.openbmb.hf_minicpm_2b_dpo_fp32 import \
         models as hf_minicpm_2b_dpo_fp32_model  # noqa: F401, E501
     from opencompass.configs.models.openbmb.hf_minicpm_2b_sft_bf16 import \
