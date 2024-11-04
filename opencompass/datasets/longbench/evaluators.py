@@ -262,13 +262,3 @@ class LongBenchClassificationEvaluator(BaseEvaluator):
 
         score = score / len(predictions) * 100
         return {'score': score}
-
-
-def long_qa_post_process(text):
-    if '\n' in text:
-        text = text.split('\n')[-1]
-    if ':' in text:
-        text = text.split(':')[-1]
-    if '：' in text:
-        text = text.split('：')[-1]
-    return text
