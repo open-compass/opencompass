@@ -30,9 +30,9 @@ with read_base():
     from opencompass.configs.models.gemma.hf_gemma2_9b_it import \
         models as hf_gemma2_9b_it_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma_2b_it import \
-        models as hf_gemma_2b_it  # noqa: F401, E501
+        models as hf_gemma_2b_it_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma_7b_it import \
-        models as hf_gemma_7b_it  # noqa: F401, E501
+        models as hf_gemma_7b_it_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.vllm_gemma_7b_it import \
         models as vllm_gemma_7b_it_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.hf_internlm2_5_7b_chat import \
@@ -66,7 +66,7 @@ with read_base():
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_3 import \
         models as hf_mistral_7b_instruct_v0_3_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_1 import \
-        models as vllm_mistral_7b_instruct_v0_1  # noqa: F401, E501
+        models as vllm_mistral_7b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_2 import \
         models as vllm_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.openbmb.hf_minicpm_2b_dpo_fp32 import \
@@ -80,9 +80,9 @@ with read_base():
     from opencompass.configs.models.phi.hf_phi_3_small_8k_instruct import \
         models as hf_phi_3_mini_8k_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.hf_qwen2_5_14b_instruct import \
-        models as hf_qwen2_5_14b_instruct  # noqa: F401, E501
+        models as hf_qwen2_5_14b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import \
-        models as lmdeploy_qwen2_5_14b_instruct  # noqa: F401, E501
+        models as lmdeploy_qwen2_5_14b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen.hf_qwen1_5_0_5b_chat import \
         models as hf_qwen1_5_0_5b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.qwen.hf_qwen2_1_5b_instruct import \

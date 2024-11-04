@@ -48,10 +48,10 @@ with read_base():
         wikibench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.winogrande.winogrande_5shot_ll_252f01 import \
         winogrande_datasets  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.hf_internlm2_5_7b_chat import \
-        models as hf_internlm2_5_7b_chat_model  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import \
-        models as lmdeploy_internlm2_5_7b_chat_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.hf_internlm2_5_7b import \
+        models as hf_internlm2_5_7b_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b import \
+        models as lmdeploy_internlm2_5_7b_model  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.bbh import \
         bbh_summary_groups  # noqa: F401, E501
     # Summary Groups
