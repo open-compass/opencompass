@@ -44,9 +44,10 @@ dataset_list = ['gsm8k', 'race-middle', 'race-high']
 
 
 @pytest.fixture()
-def baseline_scores(request):
-    config_path = os.path.join(request.config.rootdir,
-                               '.github/scripts/oc_score_baseline.yaml')
+def baseline_scores_testrange(request):
+    config_path = os.path.join(
+        request.config.rootdir,
+        '.github/scripts/oc_score_baseline_testrange.yaml')
     with open(config_path) as f:
         config = yaml.load(f.read(), Loader=yaml.SafeLoader)
     return config
@@ -60,8 +61,17 @@ def result_scores():
     return read_csv_file(file)
 
 
+@pytest.fixture()
+def baseline_scores(request):
+    config_path = os.path.join(request.config.rootdir,
+                               '.github/scripts/oc_score_baseline.yaml')
+    with open(config_path) as f:
+        config = yaml.load(f.read(), Loader=yaml.SafeLoader)
+    return config
+
+
 @pytest.mark.usefixtures('result_scores')
-@pytest.mark.usefixtures('baseline_scores')
+@pytest.mark.usefixtures('baseline_scores_testrange')
 @pytest.mark.chat
 class TestChat:
     """Test cases for chat model."""
@@ -77,7 +87,7 @@ class TestChat:
 
 
 @pytest.mark.usefixtures('result_scores')
-@pytest.mark.usefixtures('baseline_scores')
+@pytest.mark.usefixtures('baseline_scores_testrange')
 @pytest.mark.base
 class TestBase:
     """Test cases for base model."""
@@ -87,66 +97,80 @@ class TestBase:
                                                 for p2 in dataset_list])
     def test_model_dataset_score(self, baseline_scores, result_scores, model,
                                  dataset):
-        if model == 'mistral-7b-v0.2-vllm' and dataset == 'race-high':
-            return
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
 
 @pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores')
 class TestCmdCase:
 
     @pytest.mark.case1
     @pytest.mark.parametrize('model, dataset',
                              [('internlm2_5-7b-hf', 'race-middle'),
-                              ('internlm2_5-7b-hf', 'race-high')])
-    def test_cmd_case1(self, result_scores, model, dataset):
-        if len(result_scores.keys()) != 1:
-            assert False, 'result is none'
+                              ('internlm2_5-7b-hf', 'race-high'),
+                              ('internlm2_5-7b-hf', 'demo_gsm8k'),
+                              ('internlm2-1.8b-hf', 'race-middle'),
+                              ('internlm2-1.8b-hf', 'race-high'),
+                              ('internlm2-1.8b-hf', 'demo_gsm8k')])
+    def test_cmd_case1(self, baseline_scores, result_scores, model, dataset):
+        base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, 91)
+        assert_score(model, result_score, base_score)
 
     @pytest.mark.case2
     @pytest.mark.parametrize('model, dataset',
                              [('internlm2_5-7b-chat-lmdeploy', 'race-middle'),
-                              ('internlm2_5-7b-chat-lmdeploy', 'race-high')])
-    def test_cmd_case2(self, result_scores, model, dataset):
-        if len(result_scores.keys()) != 1:
-            assert False, 'result is none'
+                              ('internlm2_5-7b-chat-lmdeploy', 'race-high'),
+                              ('internlm2_5-7b-chat-lmdeploy', 'demo_gsm8k'),
+                              ('internlm2-chat-1.8b-lmdeploy', 'race-middle'),
+                              ('internlm2-chat-1.8b-lmdeploy', 'race-high'),
+                              ('internlm2-chat-1.8b-lmdeploy', 'demo_gsm8k')])
+    def test_cmd_case2(self, baseline_scores, result_scores, model, dataset):
+        base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, 91)
+        assert_score(model + 'batch256', result_score, base_score)
 
     @pytest.mark.case3
     @pytest.mark.parametrize('model, dataset',
-                             [('internlm2_5-7b_hf', 'race-middle'),
-                              ('internlm2_5-7b_hf', 'race-high')])
-    def test_cmd_case3(self, result_scores, model, dataset):
-        if len(result_scores.keys()) != 1:
-            assert False, 'result is none'
+                             [('internlm2_5-7b-hf', 'race-middle'),
+                              ('internlm2_5-7b-hf', 'race-high'),
+                              ('internlm2_5-7b-hf', 'demo_gsm8k')])
+    def test_cmd_case3(self, baseline_scores, result_scores, model, dataset):
+        base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, 91)
+        assert_score(model, result_score, base_score)
 
     @pytest.mark.case4
     @pytest.mark.parametrize('model, dataset',
-                             [('internlm2_5-7b-chat_hf', 'race-middle'),
-                              ('internlm2_5-7b-chat_hf', 'race-high')])
-    def test_cmd_case4(self, result_scores, model, dataset):
-        if len(result_scores.keys()) != 1:
-            assert False, 'result is none'
+                             [('internlm2_5-7b-chat-lmdeploy', 'race-middle'),
+                              ('internlm2_5-7b-chat-lmdeploy', 'race-high'),
+                              ('internlm2_5-7b-chat-lmdeploy', 'demo_gsm8k')])
+    def test_cmd_case4(self, baseline_scores, result_scores, model, dataset):
+        base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, 91)
+        assert_score(model, result_score, base_score)
 
 
-def assert_score(model, score, baseline):
+def assert_score(model_type, score, baseline):
     if score is None or score == '-':
         assert False, 'value is none'
 
-    if float(score) <= (baseline + 0.01) and float(score) >= (baseline - 0.01):
-        print(score + ' is equal ' + str(baseline))
-        assert True
+    if 'batch' not in model_type:
+        if float(score) <= (baseline + 0.01) and float(score) >= (baseline -
+                                                                  0.01):
+            print(score + ' is equal ' + str(baseline))
+            assert True
+        else:
+            assert False, score + ' not equal ' + str(baseline)
     else:
-        assert False, score + ' not equal ' + str(baseline)
+        if float(score) <= (baseline + 2) and float(score) >= (baseline - 2):
+            print(score + ' is between ' + str(baseline - 2) + ' and ' +
+                  str(baseline + 2))
+            assert True
+        else:
+            assert False, score + ' not equal ' + str(baseline)
 
 
 def find_csv_files(directory):
@@ -168,12 +192,13 @@ def read_csv_file(file_path):
         filtered_data = []
 
         for row in reader:
-            filtered_row = {
-                k: v
-                for k, v in row.items()
-                if k not in ['version', 'metric', 'mode']
-            }
-            filtered_data.append(filtered_row)
+            if row['metric'] == 'accuracy':
+                filtered_row = {
+                    k: v
+                    for k, v in row.items()
+                    if k not in ['version', 'metric', 'mode']
+                }
+                filtered_data.append(filtered_row)
 
     result = {}
     for data in filtered_data:
