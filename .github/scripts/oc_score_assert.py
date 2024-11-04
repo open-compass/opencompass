@@ -79,9 +79,9 @@ class TestChat:
     @pytest.mark.parametrize('model, dataset', [(p1, p2)
                                                 for p1 in chat_model_list
                                                 for p2 in dataset_list])
-    def test_model_dataset_score(self, baseline_scores, result_scores, model,
-                                 dataset):
-        base_score = baseline_scores.get(model).get(dataset)
+    def test_model_dataset_score(self, baseline_scores_testrange,
+                                 result_scores, model, dataset):
+        base_score = baseline_scores_testrange.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
@@ -95,9 +95,9 @@ class TestBase:
     @pytest.mark.parametrize('model, dataset', [(p1, p2)
                                                 for p1 in base_model_list
                                                 for p2 in dataset_list])
-    def test_model_dataset_score(self, baseline_scores, result_scores, model,
-                                 dataset):
-        base_score = baseline_scores.get(model).get(dataset)
+    def test_model_dataset_score(self, baseline_scores_testrange,
+                                 result_scores, model, dataset):
+        base_score = baseline_scores_testrange.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
