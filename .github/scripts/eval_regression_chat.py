@@ -1,7 +1,5 @@
 from mmengine.config import read_base
 
-from opencompass.models import TurboMindModel, TurboMindModelwithChatTemplate
-
 with read_base():
     # choose a list of datasets
     from opencompass.configs.datasets.gsm8k.gsm8k_gen import \
@@ -133,8 +131,7 @@ for d in datasets:
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 for m in models:
-    if m['type'] is TurboMindModel or m[
-            'type'] is TurboMindModelwithChatTemplate:
+    if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
         m['engine_config']['max_batch_size'] = 1
         m['batch_size'] = 1
 

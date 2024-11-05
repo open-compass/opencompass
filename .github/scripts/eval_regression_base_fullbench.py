@@ -1,7 +1,5 @@
 from mmengine.config import read_base
 
-from opencompass.models import TurboMindModel, TurboMindModelwithChatTemplate
-
 with read_base():
     from opencompass.configs.datasets.ARC_c.ARC_c_few_shot_ppl import \
         ARC_c_datasets  # noqa: F401, E501
@@ -148,8 +146,7 @@ for d in datasets:
 
 for m in models:
     m['abbr'] = m['abbr'] + '_fullbench'
-    if m['type'] is TurboMindModel or m[
-            'type'] is TurboMindModelwithChatTemplate:
+    if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
         m['engine_config']['max_batch_size'] = 1
         m['batch_size'] = 1
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
