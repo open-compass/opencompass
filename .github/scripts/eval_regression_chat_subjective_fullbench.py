@@ -34,7 +34,7 @@ datasets += mtbench101_datasets  # noqa: F401, E501
 datasets += wildbench_datasets  # noqa: F401, E501
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:16]'
+    d['reader_cfg']['test_range'] = '[0:5]'
 
 api_meta_template = dict(
     round=[
@@ -54,11 +54,11 @@ models = [
         tokenizer_path='internlm/internlm2_5-7b-chat',
         rpm_verbose=True,
         meta_template=api_meta_template,
-        query_per_second=128,
+        query_per_second=25,
         max_out_len=1024,
         max_seq_len=4096,
         temperature=0.01,
-        batch_size=128,
+        batch_size=1,
         retry=5,
     )
 ]
