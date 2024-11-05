@@ -199,7 +199,7 @@ summarizer = dict(
 )
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:32]'
+    d['reader_cfg']['test_range'] = '[0:16]'
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 for m in models:

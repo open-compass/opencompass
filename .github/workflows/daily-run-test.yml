@@ -233,8 +233,8 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           conda info --envs
-          opencompass .github/scripts/eval_regression_chat_objective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
-          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          opencompass .github/scripts/eval_regression_chat_objective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_obj_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
+          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_obj_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run chat model test - fullbench
         if: github.event_name == 'schedule' || matrix.regression_func == 'chat_sub_fullbench'
@@ -244,8 +244,8 @@ jobs:
           conda info --envs
           lmdeploy serve api_server internlm/internlm2_5-7b-chat > restful.log  2>&1  &
           sleep 120s
-          opencompass .github/scripts/eval_regression_chat_subjective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
-          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          opencompass .github/scripts/eval_regression_chat_subjective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
+          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test - fullbench
         if: github.event_name == 'schedule' || matrix.regression_func == 'base_fullbench'
@@ -253,8 +253,8 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           conda info --envs
-          opencompass .github/scripts/eval_regression_base_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
-          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_${{ matrix.cuda_env }}/*/summary regression_result_daily
+          opencompass .github/scripts/eval_regression_base_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_full_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
+          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_full_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
         if: always()

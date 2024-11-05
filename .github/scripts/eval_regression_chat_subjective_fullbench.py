@@ -34,7 +34,7 @@ datasets += mtbench101_datasets  # noqa: F401, E501
 datasets += wildbench_datasets  # noqa: F401, E501
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:32]'
+    d['reader_cfg']['test_range'] = '[0:16]'
 
 api_meta_template = dict(
     round=[
@@ -44,22 +44,24 @@ api_meta_template = dict(
     reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
 
-models = [(dict(
-    abbr='lmdeploy-api-test',
-    type=OpenAISDK,
-    key='EMPTY',
-    openai_api_base='http://localhost:23333/v1',
-    path='compass_judger_internlm2_5-7b-chat',
-    tokenizer_path='internlm/internlm2_5-7b-chat',
-    rpm_verbose=True,
-    meta_template=api_meta_template,
-    query_per_second=128,
-    max_out_len=1024,
-    max_seq_len=4096,
-    temperature=0.01,
-    batch_size=128,
-    retry=5,
-))]
+models = [
+    dict(
+        abbr='lmdeploy-api-test',
+        type=OpenAISDK,
+        key='EMPTY',
+        openai_api_base='http://localhost:23333/v1',
+        path='compass_judger_internlm2_5-7b-chat',
+        tokenizer_path='internlm/internlm2_5-7b-chat',
+        rpm_verbose=True,
+        meta_template=api_meta_template,
+        query_per_second=128,
+        max_out_len=1024,
+        max_seq_len=4096,
+        temperature=0.01,
+        batch_size=128,
+        retry=5,
+    )
+]
 
 judge_models = models
 eval = dict(
