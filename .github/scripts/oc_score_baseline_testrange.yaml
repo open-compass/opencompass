@@ -9,7 +9,7 @@ glm-4-9b-chat-hf:
     race-high: 90.62
 
 glm-4-9b-chat-turbomind:
-    gsm8k: 71.88
+    gsm8k: 75.00
     race-middle: 90.62
     race-high: 90.62
 
@@ -56,7 +56,7 @@ gemma-7b-it-hf:
 gemma-2-9b-it-turbomind:
     gsm8k: 68.75
     race-middle: 87.5
-    race-high: 84.38
+    race-high: 81.25
 
 gemma-7b-it-vllm:
     gsm8k: 28.12
@@ -79,17 +79,17 @@ internlm2-chat-1.8b-turbomind:
     race-high: 84.38
 
 internlm2-chat-1.8b-sft-turbomind:
-    gsm8k: 31.25
+    gsm8k: 21.88
     race-middle: 93.75
     race-high: 84.38
 
 internlm2-chat-7b-lmdeploy:
-    gsm8k: 62.5
+    gsm8k: 53.12
     race-middle: 90.62
-    race-high: 87.5
+    race-high: 84.38
 
 internlm2-chat-7b-sft-turbomind:
-    gsm8k: 53.12
+    gsm8k: 50
     race-middle: 90.62
     race-high: 90.62
 
@@ -104,7 +104,7 @@ llama-3_1-8b-instruct-hf:
     race-high: 90.62
 
 llama-3_2-3b-instruct-hf:
-    gsm8k: 65.62
+    gsm8k: 68.75
     race-middle: 84.38
     race-high: 81.25
 
@@ -114,13 +114,13 @@ llama-3-8b-instruct-hf:
     race-high: 87.5
 
 llama-3_1-8b-instruct-turbomind:
-    gsm8k: 81.25
+    gsm8k: 78.12
     race-middle: 84.38
     race-high: 90.62
 
 llama-3_2-3b-instruct-turbomind:
     gsm8k: 68.75
-    race-middle: 84.38
+    race-middle: 81.25
     race-high: 81.25
 
 llama-3-8b-instruct-turbomind:
@@ -145,7 +145,7 @@ mistral-nemo-instruct-2407-hf:
 
 mistral-nemo-instruct-2407-turbomind:
     gsm8k: 75
-    race-middle: 84.38
+    race-middle: 87.50
     race-high: 81.25
 
 mistral-7b-instruct-v0.1-vllm:
@@ -199,12 +199,12 @@ qwen2-7b-instruct-hf:
     race-high: 90.62
 
 qwen2-1.5b-instruct-turbomind:
-    gsm8k: 56.25
+    gsm8k: 62.50
     race-middle: 81.25
     race-high: 84.38
 
 qwen2-7b-instruct-turbomind:
-    gsm8k: 78.12
+    gsm8k: 81.25
     race-middle: 87.5
     race-high: 87.5
 
@@ -234,7 +234,7 @@ internlm2_5-20b-chat-hf:
     race-high: 87.5
 
 internlm2_5-20b-chat-turbomind:
-    gsm8k: 87.5
+    gsm8k: 84.38
     race-middle: 93.75
     race-high: 87.5
 
@@ -244,9 +244,9 @@ mistral-small-instruct-2409-hf:
     race-high: 90.62
 
 mistral-small-instruct-2409-turbomind:
-    gsm8k: 81.25
+    gsm8k: 78.12
     race-middle: 87.5
-    race-high: 87.5
+    race-high: 90.62
 
 qwen2.5-14b-instruct-hf:
     gsm8k: 71.88
@@ -254,7 +254,7 @@ qwen2.5-14b-instruct-hf:
     race-high: 93.75
 
 qwen2.5-14b-instruct-turbomind:
-    gsm8k: 75
+    gsm8k: 71.88
     race-middle: 90.62
     race-high: 93.75
 
