@@ -96,6 +96,17 @@ for item in ds1000_datasets:
         'ip_address'] = 'codeeval.opencompass.org.cn/ds1000'
     item['eval_cfg']['evaluator']['port'] = ''
 
+bbh_datasets = [
+    x for x in bbh_datasets if 'temporal_sequences' in x['abbr']
+    or 'multistep_arithmetic_two' in x['abbr']
+]
+cmmlu_datasets = [cmmlu_datasets[0]]
+mmlu_datasets = [mmlu_datasets[0]]
+mmlu_pro_datasets = [mmlu_pro_datasets[0]]
+mathbench_datasets = [
+    x for x in mathbench_datasets if 'college_knowledge' in x['abbr']
+]
+
 datasets = sum(
     (v for k, v in locals().items() if k.endswith('_datasets')
      and 'scicode' not in k.lower() and 'teval' not in k),
@@ -197,7 +208,7 @@ summarizer = dict(
 )
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:5]'
+    d['reader_cfg']['test_range'] = '[0:16]'
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 for m in models:

@@ -34,7 +34,7 @@ datasets += mtbench101_datasets  # noqa: F401, E501
 datasets += wildbench_datasets  # noqa: F401, E501
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:5]'
+    d['reader_cfg']['test_range'] = '[0:16]'
 
 api_meta_template = dict(
     round=[

@@ -127,8 +127,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cuda_env: ${{ fromJSON(inputs.cuda_env) || fromJSON('["dsw_cu12"]')}}
-        regression_func: ${{fromJSON(github.event.inputs.regression_func)}}
+        cuda_env: ${{ fromJSON(github.event.inputs.cuda_env) || fromJSON('["dsw_cu12"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func) || fromJSON('["chat_models","base_models", "chat_obj_fullbench", "chat_sub_fullbench", "base_fullbench","cmd"]')}}
     runs-on: ${{ matrix.cuda_env }}
     environment: 'prod'
     timeout-minutes: 240 #4hours

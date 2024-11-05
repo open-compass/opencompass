@@ -66,6 +66,16 @@ with read_base():
 
 race_datasets = [race_datasets[1]]  # Only take RACE-High
 humaneval_v2_datasets[0]['abbr'] = 'openai_humaneval_v2'
+bbh_datasets = [
+    x for x in bbh_datasets if 'temporal_sequences' in x['abbr']
+    or 'multistep_arithmetic_two' in x['abbr']
+]
+cmmlu_datasets = [cmmlu_datasets[0]]
+mmlu_datasets = [mmlu_datasets[0]]
+mmlu_pro_datasets = [mmlu_pro_datasets[0]]
+mathbench_datasets = [
+    x for x in mathbench_datasets if 'college_knowledge' in x['abbr']
+]
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 summarizer = dict(
@@ -142,7 +152,7 @@ models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:5]'
+    d['reader_cfg']['test_range'] = '[0:16]'
 
 for m in models:
     m['abbr'] = m['abbr'] + '_fullbench'
