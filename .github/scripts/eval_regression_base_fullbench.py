@@ -147,6 +147,7 @@ for d in datasets:
     d['reader_cfg']['test_range'] = '[0:5]'
 
 for m in models:
+    m['abbr'] = m['abbr'] + '_fullbench'
     if m['type'] is TurboMindModel or m[
             'type'] is TurboMindModelwithChatTemplate:
         m['engine_config']['max_batch_size'] = 1
