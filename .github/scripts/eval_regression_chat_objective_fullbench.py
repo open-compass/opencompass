@@ -118,7 +118,7 @@ datasets = sum(
 )
 datasets += teval_en_datasets
 datasets += teval_zh_datasets
-datasets += SciCode_datasets
+# datasets += SciCode_datasets
 
 summarizer = dict(
     dataset_abbrs=[
