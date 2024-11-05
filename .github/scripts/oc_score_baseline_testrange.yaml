@@ -258,159 +258,296 @@ qwen2.5-14b-instruct-turbomind:
     race-middle: 90.62
     race-high: 93.75
 
-deepseek-v2-lite-hf:
-    gsm8k: 37
-    race-middle: 56
-    race-high: 62
-
-
-
-deepseek-7b-base-turbomind:
-    gsm8k: 21
-    race-middle: 42
-    race-high: 42
-
-deepseek-moe-16b-base-vllm:
-    gsm8k: 22
-    race-middle: 35
-    race-high: 20
+glm-4-9b-hf:
+    gsm8k: 68.75
+    GPQA_diamond: 31.25
+    race-middle: 96.88
+    race-high: 93.75
+    winogrande: 84.38
 
 deepseek-moe-16b-base-hf:
-    gsm8k: 25
-    race-middle: 35
-    race-high: 23
+    gsm8k: 21.88
+    GPQA_diamond: 0
+    race-middle: 25
+    race-high: 21.88
+    winogrande: 65.62
 
-gemma-2b-hf:
-    gsm8k: 19
-    race-middle: 33
-    race-high: 26
+deepseek-7b-base-turbomind:
+    gsm8k: 21.88
+    GPQA_diamond: 0
+    race-middle: 34.38
+    race-high: 50
+    winogrande: 84.38
 
-gemma-7b-hf:
-    gsm8k: 65
-    race-middle: 59
-    race-high: 66
+deepseek-moe-16b-base-vllm:
+    gsm8k: 21.88
+    GPQA_diamond: 0
+    race-middle: 25
+    race-high: 25
+    winogrande: 68.75
 
 gemma2-2b-hf:
-    gsm8k: 33
-    race-middle: 56
-    race-high: 58
+    gsm8k: 31.25
+    GPQA_diamond: 3.12
+    race-middle: 53.12
+    race-high: 56.25
+    winogrande: 71.88
 
 gemma2-9b-hf:
-    gsm8k: 70
-    race-middle: 82
-    race-high: 84
+    gsm8k: 68.75
+    GPQA_diamond: 0
+    race-middle: 81.25
+    race-high: 81.25
+    winogrande: 84.38
+
+gemma-2b-hf:
+    gsm8k: 18.75
+    GPQA_diamond: 3.12
+    race-middle: 28.12
+    race-high: 25
+    winogrande: 53.12
+
+gemma-7b-hf:
+    gsm8k: 56.25
+    GPQA_diamond: 6.25
+    race-middle: 68.75
+    race-high: 65.62
+    winogrande: 78.12
+
+gemma-2b-vllm:
+    gsm8k: 18.75
+    GPQA_diamond: 6.25
+    race-middle: 40.62
+    race-high:
+    winogrande:
+
+gemma-7b-vllm:
+    gsm8k: 59.38
+    GPQA_diamond: 6.25
+    race-middle: 68.75
+    race-high:
+    winogrande:
 
 internlm2_5-7b-hf:
-    gsm8k: 47
-    race-middle: 92
-    race-high: 91
+    gsm8k: 37.5
+    GPQA_diamond: 25
+    race-middle: 90.62
+    race-high: 93.75
+    winogrande: 71.88
 
 internlm2-7b-hf:
-    gsm8k: 65
-    race-middle: 77
-    race-high: 72
+    gsm8k: 53.12
+    GPQA_diamond: 18.75
+    race-middle: 75
+    race-high: 62.5
+    winogrande: 78.12
 
 internlm2-base-7b-hf:
-    gsm8k: 5
-    race-middle: 71
-    race-high: 74
-
-internlm2_5-7b-turbomind:
-    gsm8k: 73
-    race-middle: 90
-    race-high: 91
+    gsm8k: 3.12
+    GPQA_diamond: 21.88
+    race-middle: 75
+    race-high: 75
+    winogrande: 65.62
 
 internlm2-1.8b-turbomind:
-    gsm8k: 25
+    gsm8k: 9.38
+    GPQA_diamond: 15.62
     race-middle: 75
-    race-high: 72
+    race-high: 71.88
+    winogrande: 75
+
+internlm2_5-7b-turbomind:
+    gsm8k: 65.62
+    GPQA_diamond: 31.25
+    race-middle: 87.5
+    race-high: 93.75
+    winogrande: 84.38
 
 internlm2-7b-turbomind:
-    gsm8k: 67
-    race-middle: 78
-    race-high: 76
+    gsm8k: 53.12
+    GPQA_diamond: 21.88
+    race-middle: 84.38
+    race-high: 71.88
+    winogrande: 81.25
 
 internlm2-base-7b-turbomind:
-    gsm8k: 39
-    race-middle: 75
-    race-high: 81
+    gsm8k: 31.25
+    GPQA_diamond: 28.12
+    race-middle: 78.12
+    race-high: 84.38
+    winogrande: 71.88
 
 llama-2-7b-hf:
-    gsm8k: 17
-    race-middle: 32
-    race-high: 38
+    gsm8k: 21.88
+    GPQA_diamond: 21.88
+    race-middle: 34.38
+    race-high: 40.62
+    winogrande: 71.88
+
+llama-3_1-8b-hf:
+    gsm8k: 78.12
+    GPQA_diamond: 25
+    race-middle: 81.25
+    race-high: 90.62
+    winogrande: 62.5
 
 llama-3-8b-hf:
-    gsm8k: 48
-    race-middle: 64
-    race-high: 70
+    gsm8k: 46.88
+    GPQA_diamond: 6.25
+    race-middle: 68.75
+    race-high: 65.62
+    winogrande: 65.62
 
 llama-3.1-8b-turbomind:
-    gsm8k: 57
-    race-middle: 67
-    race-high: 75
+    gsm8k: 59.38
+    GPQA_diamond: 6.25
+    race-middle: 65.62
+    race-high: 78.12
+    winogrande: 78.12
 
 llama-3-8b-turbomind:
-    gsm8k: 52
-    race-middle: 63
-    race-high: 70
+    gsm8k: 50
+    GPQA_diamond: 12.5
+    race-middle: 68.75
+    race-high: 65.62
+    winogrande: 78.12
 
 mistral-7b-v0.2-hf:
-    gsm8k: 43
-    race-middle: 42
-    race-high: 60
+    gsm8k: 31.25
+    GPQA_diamond: 6.25
+    race-middle: 40.62
+    race-high: 62.5
+    winogrande: 59.38
 
 mistral-7b-v0.3-hf:
-    gsm8k: 43
-    race-middle: 42
-    race-high: 60
+    gsm8k: 31.25
+    GPQA_diamond: 6.25
+    race-middle: 40.62
+    race-high: 62.5
+    winogrande: 59.38
 
 mistral-7b-v0.2-vllm:
-    gsm8k: 45
-    race-middle: 42
-    race-high: 58
+    gsm8k: 34.38
+    GPQA_diamond: 6.25
+    race-middle: 40.62
+    race-high: 62.5
+    winogrande: 65.62
+
+qwen2.5-7b-hf:
+    gsm8k: 81.25
+    GPQA_diamond: 18.75
+    race-middle: 93.75
+    race-high: 87.5
+    winogrande: 71.88
+
+qwen2.5-1.5b-turbomind:
+    gsm8k: 53.12
+    GPQA_diamond: 15.62
+    race-middle: 90.62
+    race-high: 78.12
+    winogrande: 71.88
+
+qwen2.5-7b-turbomind:
+    gsm8k: 75
+    GPQA_diamond: 21.88
+    race-middle: 93.75
+    race-high: 87.5
+    winogrande: 71.88
 
 qwen1.5-moe-a2.7b-hf:
-    gsm8k: 64
-    race-middle: 78
-    race-high: 90
-
-qwen2-1.5b-hf:
-    gsm8k: 58
-    race-middle: 65
-    race-high: 78
+    gsm8k: 62.5
+    GPQA_diamond: 18.75
+    race-middle: 90.62
+    race-high: 84.38
+    winogrande: 75
 
 qwen2-0.5b-hf:
-    gsm8k: 35
-    race-middle: 52
-    race-high: 48
+    gsm8k: 25
+    GPQA_diamond: 0
+    race-middle: 46.88
+    race-high: 40.62
+    winogrande: 62.5
+
+qwen2-1.5b-hf:
+    gsm8k: 59.38
+    GPQA_diamond: 9.38
+    race-middle: 71.88
+    race-high: 81.25
+    winogrande: 62.5
 
 qwen2-7b-hf:
-    gsm8k: 82
-    race-middle: 88
-    race-high: 89
+    gsm8k: 68.75
+    GPQA_diamond: 9.38
+    race-middle: 90.62
+    race-high: 87.5
+    winogrande: 68.75
 
 qwen2-1.5b-turbomind:
-    gsm8k: 57
-    race-middle: 64
-    race-high: 78
+    gsm8k: 59.38
+    GPQA_diamond: 3.12
+    race-middle: 68.75
+    race-high: 81.25
+    winogrande: 75
 
 qwen2-7b-turbomind:
-    gsm8k: 83
-    race-middle: 88
-    race-high: 88
+    gsm8k: 68.75
+    GPQA_diamond: 15.62
+    race-middle: 90.62
+    race-high: 87.5
+    winogrande: 71.88
 
 qwen1.5-0.5b-vllm:
-    gsm8k: 12
-    race-middle: 54
-    race-high: 59
+    gsm8k: 9.38
+    GPQA_diamond: 0
+    race-middle: 62.5
+    race-high: 56.25
+    winogrande: 62.5
 
 yi-1.5-6b-hf:
-    gsm8k: 59
-    race-middle: 81
-    race-high: 89
+    gsm8k: 62.5
+    GPQA_diamond: 3.12
+    race-middle: 87.5
+    race-high: 87.5
+    winogrande: 62.5
 
 yi-1.5-9b-hf:
-    gsm8k: 77
-    race-middle: 90
-    race-high: 90
+    gsm8k: 75
+    GPQA_diamond: 40.62
+    race-middle: 96.88
+    race-high: 87.5
+    winogrande: 59.38
+
+deepseek-v2-lite-hf:
+    gsm8k: 28.12
+    GPQA_diamond: 21.88
+    race-middle: 68.75
+    race-high: 59.38
+    winogrande: 75
+
+internlm2-20b-hf:
+    gsm8k: 56.25
+    GPQA_diamond: 15.62
+    race-middle: 87.5
+    race-high: 68.75
+    winogrande: 75
+
+internlm2-base-20b-hf:
+    gsm8k: 12.5
+    GPQA_diamond: 9.38
+    race-middle: 68.75
+    race-high: 84.38
+    winogrande: 65.62
+
+internlm2-20b-turbomind:
+    gsm8k: 65.62
+    GPQA_diamond: 18.75
+    race-middle: 84.38
+    race-high: 68.75
+    winogrande: 81.25
+
+qwen2.5-14b-hf:
+    gsm8k: 75
+    GPQA_diamond: 37.5
+    race-middle: 93.75
+    race-high: 93.75
+    winogrande: 84.38

@@ -253,7 +253,7 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           conda info --envs
-          opencompass .github/scripts/eval_regression_base.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
+          opencompass .github/scripts/eval_regression_base_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Remove Conda Env
