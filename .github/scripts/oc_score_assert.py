@@ -164,17 +164,30 @@ def assert_score(model_type, score, baseline):
     if 'batch' not in model_type:
         if float(score) <= (baseline + 0.01) and float(score) >= (baseline -
                                                                   0.01):
-            print(score + ' is equal ' + str(baseline))
+            print(' '.join([score, 'is equal', str(baseline)]))
             assert True
         else:
-            assert False, score + ' not equal ' + str(baseline)
+            print(' '.join([score, 'is not equal', str(baseline)]))
+            assert False, ' '.join([score, 'is not equal', str(baseline)])
     else:
         if float(score) <= (baseline + 2) and float(score) >= (baseline - 2):
-            print(score + ' is between ' + str(baseline - 2) + ' and ' +
-                  str(baseline + 2))
+            print(' '.join([
+                score, 'is between',
+                str(baseline - 2), 'and',
+                str(baseline + 2)
+            ]))
             assert True
         else:
-            assert False, score + ' not equal ' + str(baseline)
+            print(' '.join([
+                score, 'is not etween',
+                str(baseline - 2), 'and',
+                str(baseline + 2)
+            ]))
+            assert False, ' '.join([
+                score, 'is not etween',
+                str(baseline - 2), 'and',
+                str(baseline + 2)
+            ])
 
 
 def find_csv_files(directory):

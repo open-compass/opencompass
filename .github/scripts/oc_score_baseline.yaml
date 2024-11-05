@@ -4,8 +4,8 @@ internlm2_5-7b-hf:
     race-high: 90.02
 
 internlm2-1.8b-hf:
-    demo_gsm8k: 71.66
-    race-middle: 91.78
+    demo_gsm8k: 15.62
+    race-middle: 71.66
     race-high: 66.38
 
 internlm2_5-7b-chat-lmdeploy:
