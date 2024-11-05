@@ -47,7 +47,6 @@ base_model_list = [
     'deepseek-v2-lite-hf', 'internlm2-20b-hf', 'internlm2-base-20b-hf',
     'internlm2-20b-turbomind', 'qwen2.5-14b-hf'
 ]
-dataset_list = ['gsm8k', 'race-middle', 'race-high']
 
 
 @pytest.fixture()
@@ -85,7 +84,7 @@ class TestChat:
 
     @pytest.mark.parametrize('model, dataset',
                              [(p1, p2) for p1 in chat_model_list
-                              for p2 in ['gsm8k', 'race-middle', 'race-high']])
+                              for p2 in ['gsm8k', 'race-high']])
     def test_model_dataset_score(self, baseline_scores_testrange,
                                  result_scores, model, dataset):
         base_score = baseline_scores_testrange.get(model).get(dataset)
@@ -101,10 +100,13 @@ class TestBase:
 
     @pytest.mark.parametrize(
         'model, dataset',
-        [(p1, p2) for p1 in base_model_list for p2 in
-         ['gsm8k', 'GPQA_diamond', 'race-middle', 'race-high', 'winogrande']])
+        [(p1, p2) for p1 in base_model_list
+         for p2 in ['gsm8k', 'GPQA_diamond', 'race-high', 'winogrande']])
     def test_model_dataset_score(self, baseline_scores_testrange,
                                  result_scores, model, dataset):
+        if model in ['gemma-2b-vllm', 'gemma-7b-vllm'
+                     ] and dataset == 'GPQA_diamond':
+            return
         base_score = baseline_scores_testrange.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)

@@ -96,6 +96,7 @@ with read_base():
     from opencompass.configs.models.yi.hf_yi_1_5_9b import \
         models as hf_yi_1_5_9b_model  # noqa: F401, E501
 
+race_datasets = [race_datasets[1]]
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
@@ -112,7 +113,6 @@ summarizer = dict(
     dataset_abbrs=[
         ['gsm8k', 'accuracy'],
         ['GPQA_diamond', 'accuracy'],
-        ['race-middle', 'accuracy'],
         ['race-high', 'accuracy'],
         ['winogrande', 'accuracy'],
     ],

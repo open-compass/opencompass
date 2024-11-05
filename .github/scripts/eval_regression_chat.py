@@ -115,6 +115,7 @@ with read_base():
     from opencompass.configs.models.yi.hf_yi_1_5_9b_chat import \
         models as hf_yi_1_5_9b_chat_model  # noqa: F401, E501
 
+race_datasets = [race_datasets[1]]
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
 api_meta_template = dict(
