@@ -60,20 +60,30 @@ def baseline_scores_testrange(request):
 
 
 @pytest.fixture()
-def result_scores():
-    file = find_csv_files(output_path)
-    if file is None:
-        return None
-    return read_csv_file(file)
-
-
-@pytest.fixture()
 def baseline_scores(request):
     config_path = os.path.join(request.config.rootdir,
                                '.github/scripts/oc_score_baseline.yaml')
     with open(config_path) as f:
         config = yaml.load(f.read(), Loader=yaml.SafeLoader)
     return config
+
+
+@pytest.fixture()
+def baseline_scores_fullbench(request):
+    config_path = os.path.join(
+        request.config.rootdir,
+        '.github/scripts/oc_score_baseline_fullbench.yaml')
+    with open(config_path) as f:
+        config = yaml.load(f.read(), Loader=yaml.SafeLoader)
+    return config
+
+
+@pytest.fixture()
+def result_scores():
+    file = find_csv_files(output_path)
+    if file is None:
+        return None
+    return read_csv_file(file)
 
 
 @pytest.mark.usefixtures('result_scores')
