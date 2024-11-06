@@ -200,7 +200,7 @@ class TestCmdCase:
     def test_cmd_case2(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score)
 
     @pytest.mark.case3
     @pytest.mark.parametrize('model, dataset',
