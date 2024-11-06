@@ -101,7 +101,7 @@ bbh_datasets = [
     or 'multistep_arithmetic_two' in x['abbr']
 ]
 cmmlu_datasets = [
-    x for x in cmmlu_datasets if x.replace('cmmlu-', '') in [
+    x for x in cmmlu_datasets if x['abbr'].replace('cmmlu-', '') in [
         'ancient_chinese', 'chinese_civil_service_exam',
         'chinese_driving_rule', 'chinese_food_culture',
         'chinese_foreign_policy', 'chinese_history', 'chinese_literature',
@@ -112,7 +112,7 @@ cmmlu_datasets = [
     ]
 ]
 mmlu_datasets = [
-    x for x in mmlu_datasets if x.replace('lukaemon_mmlu_', '') in [
+    x for x in mmlu_datasets if x['abbr'].replace('lukaemon_mmlu_', '') in [
         'business_ethics', 'clinical_knowledge', 'college_medicine',
         'global_facts', 'human_aging', 'management', 'marketing',
         'medical_genetics', 'miscellaneous', 'nutrition',
