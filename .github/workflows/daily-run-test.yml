@@ -47,7 +47,7 @@ concurrency:
 
 env:
   CONDA_ENV: opencompass_regression
-  PIP_CACHE_PATH: /cpfs01/shared/public/qa-llm-cicd/.cache/pip
+  PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HUGGINGFACE_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HF_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
