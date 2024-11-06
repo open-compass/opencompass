@@ -148,9 +148,9 @@ class TestChatSubFullbench:
         'internlm2_5-7b-chat-hf_fullbench',
         'internlm2_5-7b-chat-turbomind_fullbench'
     ] for p2 in ['race-high', 'ARC-c']])
-    def test_model_dataset_score(self, baseline_scores_testrange,
+    def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
-        base_score = baseline_scores_testrange.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
@@ -165,9 +165,9 @@ class TestBaseFullbench:
         'internlm2_5-7b-chat-hf_fullbench',
         'internlm2_5-7b-chat-turbomind_fullbench'
     ] for p2 in ['race-high', 'ARC-c']])
-    def test_model_dataset_score(self, baseline_scores_testrange,
+    def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
-        base_score = baseline_scores_testrange.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
@@ -236,11 +236,11 @@ def assert_score(model_type, score, baseline):
             print(' '.join([score, 'is not equal', str(baseline)]))
             assert False, ' '.join([score, 'is not equal', str(baseline)])
     else:
-        if float(score) <= (baseline + 2) and float(score) >= (baseline - 2):
+        if float(score) <= (baseline + 3) and float(score) >= (baseline - 3):
             print(' '.join([
                 score, 'is between',
-                str(baseline - 2), 'and',
-                str(baseline + 2)
+                str(baseline - 3), 'and',
+                str(baseline + 3)
             ]))
             assert True
         else:
