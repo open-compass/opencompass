@@ -200,7 +200,7 @@ jobs:
           opencompass --models hf_internlm2_5_7b hf_internlm2_1_8b --datasets race_ppl demo_gsm8k_chat_gen --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd1_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd1_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m case1 -s -v --color=yes .github/scripts/oc_score_assert.py
-          opencompass --models hf_internlm2_5_7b_chat hf_internlm2_chat_1_8b --datasets race_gen demo_gsm8k_chat_gen -a lmdeploy --batch-size 256 --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd2_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
+          opencompass --models hf_internlm2_5_7b_chat hf_internlm2_chat_1_8b --datasets race_gen demo_gsm8k_chat_gen -a lmdeploy --batch-size 1 --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd2_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}${{ github.run_id }}/cmd2_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m case2 -s -v --color=yes .github/scripts/oc_score_assert.py
           opencompass --datasets race_ppl demo_gsm8k_chat_gen --hf-type base --hf-path internlm/internlm2_5-7b --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd3_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
