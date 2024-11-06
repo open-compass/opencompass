@@ -121,14 +121,14 @@ jobs:
           name: my-artifact-${{ github.run_id }}-${{ matrix.pyver }}
 
 
-  prepare_env:
+  daily_run_test:
     if: ${{!cancelled()}}
     needs: ['build-pypi', 'build-pypi-lmdeploy']
     strategy:
       fail-fast: false
       matrix:
-        cuda_env: ${{ fromJSON(github.event.inputs.cuda_env) || fromJSON('["dsw_cu12"]')}}
-        regression_func: ${{fromJSON(github.event.inputs.regression_func) || fromJSON('["chat_models","base_models", "chat_obj_fullbench", "chat_sub_fullbench", "base_fullbench","cmd"]')}}
+        cuda_env: ${{ fromJSON(inputs.cuda_env) || fromJSON('["dsw_cu12"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func)}}
     runs-on: ${{ matrix.cuda_env }}
     environment: 'prod'
     timeout-minutes: 240 #4hours
@@ -142,13 +142,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: my-artifact-${{ github.run_id }}
-      - name:  Remove Conda Env
-        if: always()
-        run: |
-          rm -rf regression_result_daily
-          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda env remove -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
-          conda info --envs
       - name: Prepare - create conda env and install torch - cu11
         if: ${{matrix.cuda_env == 'dsw_cu11'}}
         run: |
@@ -192,24 +185,6 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           pip install lmdeploy-*.whl --no-deps
-
-  daily_run_test:
-    if: ${{!cancelled()}}
-    needs: prepare_env
-    strategy:
-      fail-fast: false
-      matrix:
-        cuda_env: ${{ fromJSON(github.event.inputs.cuda_env) || fromJSON('["dsw_cu12"]')}}
-        regression_func: ${{fromJSON(github.event.inputs.regression_func) || fromJSON('["chat_models","base_models", "chat_obj_fullbench", "chat_sub_fullbench", "base_fullbench","cmd"]')}}
-    runs-on: ${{ matrix.cuda_env }}
-    environment: 'prod'
-    timeout-minutes: 240 #4hours
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ github.event.inputs.repo_org || 'open-compass/opencompass' }}
-          ref: ${{github.event.inputs.repo_ref || 'main'}}
       - name: Prepare - prepare data and hf model
         run: |
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
@@ -260,18 +235,18 @@ jobs:
           conda info --envs
           opencompass .github/scripts/eval_regression_chat_objective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_obj_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_obj_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -m chat_obj_fullbench -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run chat model test - fullbench
         if: github.event_name == 'schedule' || matrix.regression_func == 'chat_sub_fullbench'
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           conda info --envs
-          lmdeploy serve api_server internlm/internlm2_5-7b-chat --max-batch-size 1 > restful.log  2>&1  &
+          lmdeploy serve api_server internlm/internlm2_5-7b-chat --max-batch-size 1 --model-name internlm2 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }}/restful.log  2>&1  &
           sleep 120s
           opencompass .github/scripts/eval_regression_chat_subjective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -m chat_sub_fullbench -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test - fullbench
         if: github.event_name == 'schedule' || matrix.regression_func == 'base_fullbench'
         run: |
@@ -280,8 +255,14 @@ jobs:
           conda info --envs
           opencompass .github/scripts/eval_regression_base_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_full_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_full_${{ matrix.cuda_env }}/*/summary regression_result_daily
-          python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
-
+          python -m pytest -m base_fullbench -s -v --color=yes .github/scripts/oc_score_assert.py
+      - name:  Remove Conda Env
+        if: always()
+        run: |
+          rm -rf regression_result_daily
+          . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
+          conda env remove -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
+          conda info --envs
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
     needs: [daily_run_test]

@@ -123,6 +123,57 @@ class TestBase:
 
 
 @pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores_fullbench')
+@pytest.mark.chat_obj_fullbench
+class TestChatObjFullbench:
+    """Test cases for chat model."""
+
+    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
+        'internlm2_5-7b-chat-hf_fullbench',
+        'internlm2_5-7b-chat-turbomind_fullbench'
+    ] for p2 in ['race-high', 'ARC-c']])
+    def test_model_dataset_score(self, baseline_scores_testrange,
+                                 result_scores, model, dataset):
+        base_score = baseline_scores_testrange.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model, result_score, base_score)
+
+
+@pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores_fullbench')
+@pytest.mark.chat_sub_fullbench
+class TestChatSubFullbench:
+    """Test cases for chat model."""
+
+    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
+        'internlm2_5-7b-chat-hf_fullbench',
+        'internlm2_5-7b-chat-turbomind_fullbench'
+    ] for p2 in ['race-high', 'ARC-c']])
+    def test_model_dataset_score(self, baseline_scores_testrange,
+                                 result_scores, model, dataset):
+        base_score = baseline_scores_testrange.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model, result_score, base_score)
+
+
+@pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores_fullbench')
+@pytest.mark.base_fullbench
+class TestBaseFullbench:
+    """Test cases for chat model."""
+
+    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
+        'internlm2_5-7b-chat-hf_fullbench',
+        'internlm2_5-7b-chat-turbomind_fullbench'
+    ] for p2 in ['race-high', 'ARC-c']])
+    def test_model_dataset_score(self, baseline_scores_testrange,
+                                 result_scores, model, dataset):
+        base_score = baseline_scores_testrange.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model, result_score, base_score)
+
+
+@pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores')
 class TestCmdCase:
 
@@ -224,7 +275,7 @@ def read_csv_file(file_path):
         filtered_data = []
 
         for row in reader:
-            if row['metric'] == 'accuracy':
+            if row['metric'] is not None and 'bpb' not in row['metric']:
                 filtered_row = {
                     k: v
                     for k, v in row.items()

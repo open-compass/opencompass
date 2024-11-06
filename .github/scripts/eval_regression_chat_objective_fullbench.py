@@ -100,8 +100,26 @@ bbh_datasets = [
     x for x in bbh_datasets if 'temporal_sequences' in x['abbr']
     or 'multistep_arithmetic_two' in x['abbr']
 ]
-cmmlu_datasets = [cmmlu_datasets[0]]
-mmlu_datasets = [mmlu_datasets[0]]
+cmmlu_datasets = [
+    x for x in cmmlu_datasets if x.replace('cmmlu-', '') in [
+        'ancient_chinese', 'chinese_civil_service_exam',
+        'chinese_driving_rule', 'chinese_food_culture',
+        'chinese_foreign_policy', 'chinese_history', 'chinese_literature',
+        'chinese_teacher_qualification', 'construction_project_management',
+        'elementary_chinese', 'elementary_commonsense', 'ethnology',
+        'high_school_politics', 'modern_chinese',
+        'traditional_chinese_medicine'
+    ]
+]
+mmlu_datasets = [
+    x for x in mmlu_datasets if x.replace('lukaemon_mmlu_', '') in [
+        'business_ethics', 'clinical_knowledge', 'college_medicine',
+        'global_facts', 'human_aging', 'management', 'marketing',
+        'medical_genetics', 'miscellaneous', 'nutrition',
+        'professional_accounting', 'professional_medicine', 'virology'
+    ]
+]
+
 mmlu_pro_datasets = [mmlu_pro_datasets[0]]
 mathbench_datasets = [
     x for x in mathbench_datasets if 'college_knowledge' in x['abbr']
@@ -163,6 +181,8 @@ summarizer = dict(
         '###### Overall: Average between MathBench-A and MathBench-T ######',
         'Overall',
         '',
+        'bbh-temporal_sequences',
+        'bbh-multistep_arithmetic_two',
         ''
         'mmlu',
         'mmlu-stem',
