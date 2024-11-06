@@ -130,10 +130,18 @@ class TestChatObjFullbench:
     @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
         'internlm2_5-7b-chat-hf_fullbench',
         'internlm2_5-7b-chat-turbomind_fullbench'
-    ] for p2 in ['race-high', 'ARC-c']])
-    def test_model_dataset_score(self, baseline_scores_testrange,
+    ] for p2 in [
+        'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
+        'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'ds1000',
+        'gsm8k', 'triviaqa_wiki_1shot', 'nq_open_1shot', 'hellaswag',
+        'TheoremQA', 'college_knowledge', 'bbh-temporal_sequences',
+        'bbh-multistep_arithmetic_two', 'mmlu-other', 'cmmlu-china-specific',
+        'mmlu_pro_math', 'ds1000_Pandas', 'ds1000_Numpy', 'ds1000_Tensorflow',
+        'ds1000_Scipy', 'ds1000_Sklearn', 'ds1000_Pytorch', 'ds1000_Matplotlib'
+    ]])
+    def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
-        base_score = baseline_scores_testrange.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
