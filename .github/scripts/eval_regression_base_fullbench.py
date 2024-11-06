@@ -67,7 +67,7 @@ with read_base():
 race_datasets = [race_datasets[1]]  # Only take RACE-High
 humaneval_v2_datasets[0]['abbr'] = 'openai_humaneval_v2'
 bbh_datasets = [
-    x for x in bbh_datasets if 'temporal_sequences' in x['abbr']
+    x for x in bbh_datasets if 'logical_deduction_seven_objects' in x['abbr']
     or 'multistep_arithmetic_two' in x['abbr']
 ]
 cmmlu_datasets = [
@@ -90,9 +90,7 @@ mmlu_datasets = [
     ]
 ]
 mmlu_pro_datasets = [mmlu_pro_datasets[0]]
-mathbench_datasets = [
-    x for x in mathbench_datasets if 'college_knowledge' in x['abbr']
-]
+mathbench_datasets = [x for x in mathbench_datasets if 'college' in x['abbr']]
 GaokaoBench_datasets = [
     x for x in GaokaoBench_datasets if '2010-2022_Math_II_MCQs' in x['abbr']
     or '2010-2022_Math_II_Fill-in-the-Blank' in x['abbr']
@@ -138,7 +136,7 @@ summarizer = dict(
         '###### Overall: Average between MathBench-A and MathBench-T ######',
         'Overall',
         '',
-        'bbh-temporal_sequences',
+        'bbh-logical_deduction_seven_objects',
         'bbh-multistep_arithmetic_two',
         '',
         'mmlu',

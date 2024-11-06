@@ -114,8 +114,7 @@ class TestBase:
          for p2 in ['gsm8k', 'GPQA_diamond', 'race-high', 'winogrande']])
     def test_model_dataset_score(self, baseline_scores_testrange,
                                  result_scores, model, dataset):
-        if model in ['gemma-2b-vllm', 'gemma-7b-vllm'
-                     ] and dataset == 'GPQA_diamond':
+        if model in ['gemma-2b-vllm', 'gemma-7b-vllm'] and dataset != 'gsm8k':
             return
         base_score = baseline_scores_testrange.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)

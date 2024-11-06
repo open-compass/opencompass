@@ -84,6 +84,7 @@ with read_base():
 
 # For HumanEval-X Evaluation
 # Apply the evaluator ip_address and port
+race_datasets = [race_datasets[1]]
 for item in humanevalx_datasets:
     item['eval_cfg']['evaluator'][
         'ip_address'] = 'codeeval.opencompass.org.cn/humanevalx'
@@ -97,7 +98,7 @@ for item in ds1000_datasets:
     item['eval_cfg']['evaluator']['port'] = ''
 
 bbh_datasets = [
-    x for x in bbh_datasets if 'temporal_sequences' in x['abbr']
+    x for x in bbh_datasets if 'logical_deduction_seven_objects' in x['abbr']
     or 'multistep_arithmetic_two' in x['abbr']
 ]
 cmmlu_datasets = [
@@ -121,9 +122,7 @@ mmlu_datasets = [
 ]
 
 mmlu_pro_datasets = [mmlu_pro_datasets[0]]
-mathbench_datasets = [
-    x for x in mathbench_datasets if 'college_knowledge' in x['abbr']
-]
+mathbench_datasets = [x for x in mathbench_datasets if 'college' in x['abbr']]
 GaokaoBench_datasets = [
     x for x in GaokaoBench_datasets if '2010-2022_Math_II_MCQs' in x['abbr']
     or '2010-2022_Math_II_Fill-in-the-Blank' in x['abbr']
@@ -181,7 +180,7 @@ summarizer = dict(
         '###### Overall: Average between MathBench-A and MathBench-T ######',
         'Overall',
         '',
-        'bbh-temporal_sequences',
+        'bbh-logical_deduction_seven_objects',
         'bbh-multistep_arithmetic_two',
         ''
         'mmlu',
@@ -212,6 +211,9 @@ summarizer = dict(
         'mmlu_pro_physics',
         'mmlu_pro_psychology',
         'mmlu_pro_other',
+        '',
+        'GaokaoBench_2010-2022_Math_II_MCQs',
+        'GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank',
         '',
         'humanevalx-python',
         'humanevalx-cpp',

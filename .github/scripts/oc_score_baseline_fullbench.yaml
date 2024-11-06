@@ -12,13 +12,26 @@ internlm2_5-7b-chat-hf_fullbench:
     triviaqa_wiki_1shot: 50
     nq_open_1shot: 25
     hellaswag: 87.5
+    TheoremQA: 18.75
     college_knowledge: 87.5
+    bbh-temporal_sequences: 100
+    bbh-multistep_arithmetic_two: 68.75
+    mmlu-other: 72.6
+    cmmlu-china-specific: 76.25
     mmlu_pro_math: 25
+    ds1000_Pandas: 12.5
+    ds1000_Numpy: 0
+    ds1000_Tensorflow: 12.5
+    ds1000_Scipy: 18.75
+    ds1000_Sklearn: 18.75
+    ds1000_Pytorch: 12.5
+    ds1000_Matplotlib: 43.75
+
 
 internlm2_5-7b-chat-turbomind_fullbench:
     race-high: 93.75
     ARC-c: 87.5
-    BoolQ: 868.75
+    BoolQ: 68.75
     drop: 75
     GPQA_diamond: 25
     math: 75
@@ -29,5 +42,17 @@ internlm2_5-7b-chat-turbomind_fullbench:
     triviaqa_wiki_1shot: 50
     nq_open_1shot: 25
     hellaswag: 81.25
+    TheoremQA: 6.25
     college_knowledge: 87.5
+    bbh-temporal_sequences: 100
+    bbh-multistep_arithmetic_two: 68.75
+    mmlu-other: 74.04
+    cmmlu-china-specific: 76.25
     mmlu_pro_math: 25
+    ds1000_Pandas: 0
+    ds1000_Numpy: 0
+    ds1000_Tensorflow: 12.5
+    ds1000_Scipy: 18.75
+    ds1000_Sklearn: 18.75
+    ds1000_Pytorch: 6.25
+    ds1000_Matplotlib: 37.5

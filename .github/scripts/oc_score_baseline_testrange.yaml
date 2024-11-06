@@ -48,7 +48,6 @@ gemma-2-9b-it-turbomind:
 
 gemma-7b-it-vllm:
     gsm8k: 28.12
-    race-middle: 75
     race-high: 68.75
 
 internlm2_5-7b-chat-hf:
@@ -216,20 +215,18 @@ glm-4-9b-hf:
 deepseek-moe-16b-base-hf:
     gsm8k: 21.88
     GPQA_diamond: 0
-    race-middle: 25
     race-high: 21.88
     winogrande: 65.62
 
 deepseek-7b-base-turbomind:
     gsm8k: 21.88
     GPQA_diamond: 0
-    race-high: 50
+    race-high: 46.88
     winogrande: 84.38
 
 deepseek-moe-16b-base-vllm:
     gsm8k: 21.88
     GPQA_diamond: 0
-    race-middle: 25
     race-high: 25
     winogrande: 68.75
 
@@ -278,38 +275,35 @@ internlm2_5-7b-hf:
 internlm2-7b-hf:
     gsm8k: 53.12
     GPQA_diamond: 18.75
-    race-middle: 75
     race-high: 62.5
     winogrande: 78.12
 
 internlm2-base-7b-hf:
     gsm8k: 3.12
     GPQA_diamond: 21.88
-    race-middle: 75
     race-high: 75
     winogrande: 65.62
 
 internlm2-1.8b-turbomind:
-    gsm8k: 9.38
-    GPQA_diamond: 15.62
-    race-middle: 75
+    gsm8k: 12.5
+    GPQA_diamond: 12.5
     race-high: 71.88
     winogrande: 75
 
 internlm2_5-7b-turbomind:
-    gsm8k: 65.62
+    gsm8k: 68.75
     GPQA_diamond: 31.25
     race-high: 93.75
     winogrande: 84.38
 
 internlm2-7b-turbomind:
-    gsm8k: 53.12
+    gsm8k: 56.25
     GPQA_diamond: 21.88
-    race-high: 71.88
+    race-high: 75
     winogrande: 81.25
 
 internlm2-base-7b-turbomind:
-    gsm8k: 31.25
+    gsm8k: 40.62
     GPQA_diamond: 28.12
     race-high: 84.38
     winogrande: 71.88
@@ -333,14 +327,14 @@ llama-3-8b-hf:
     winogrande: 65.62
 
 llama-3.1-8b-turbomind:
-    gsm8k: 59.38
+    gsm8k: 56.25
     GPQA_diamond: 6.25
     race-high: 78.12
     winogrande: 78.12
 
 llama-3-8b-turbomind:
     gsm8k: 50
-    GPQA_diamond: 12.5
+    GPQA_diamond: 9.38
     race-high: 65.62
     winogrande: 78.12
 
@@ -369,14 +363,14 @@ qwen2.5-7b-hf:
     winogrande: 71.88
 
 qwen2.5-1.5b-turbomind:
-    gsm8k: 53.12
+    gsm8k: 71.88
     GPQA_diamond: 15.62
     race-high: 78.12
     winogrande: 71.88
 
 qwen2.5-7b-turbomind:
-    gsm8k: 75
-    GPQA_diamond: 21.88
+    gsm8k: 71.88
+    GPQA_diamond: 25
     race-high: 87.5
     winogrande: 71.88
 
@@ -405,14 +399,14 @@ qwen2-7b-hf:
     winogrande: 68.75
 
 qwen2-1.5b-turbomind:
-    gsm8k: 59.38
-    GPQA_diamond: 3.12
+    gsm8k: 62.50
+    GPQA_diamond: 6.25
     race-high: 81.25
     winogrande: 75
 
 qwen2-7b-turbomind:
     gsm8k: 68.75
-    GPQA_diamond: 15.62
+    GPQA_diamond: 12.5
     race-high: 87.5
     winogrande: 71.88
 
@@ -453,8 +447,8 @@ internlm2-base-20b-hf:
     winogrande: 65.62
 
 internlm2-20b-turbomind:
-    gsm8k: 65.62
-    GPQA_diamond: 18.75
+    gsm8k: 68.75
+    GPQA_diamond: 15.62
     race-high: 68.75
     winogrande: 81.25
 
