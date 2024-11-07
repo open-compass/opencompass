@@ -171,8 +171,7 @@ class TestBaseFullbench:
     """Test cases for chat model."""
 
     @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
-        'internlm2_5-7b-chat-hf_fullbench',
-        'internlm2_5-7b-chat-turbomind_fullbench'
+        'internlm2_5-7b-hf_fullbench', 'internlm2_5-7b-turbomind_fullbench'
     ] for p2 in [
         'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
         'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'gsm8k',
@@ -239,6 +238,9 @@ class TestCmdCase:
         assert_score(model, result_score, base_score)
 
 
+THRESHOLD = 3
+
+
 def assert_score(model_type, score, baseline):
     if score is None or score == '-':
         assert False, 'value is none'
@@ -252,23 +254,24 @@ def assert_score(model_type, score, baseline):
             print(' '.join([score, 'is not equal', str(baseline)]))
             assert False, ' '.join([score, 'is not equal', str(baseline)])
     else:
-        if float(score) <= (baseline + 3) and float(score) >= (baseline - 3):
+        if float(score) <= (baseline + THRESHOLD) and float(score) >= (
+                baseline - THRESHOLD):
             print(' '.join([
                 score, 'is between',
-                str(baseline - 3), 'and',
-                str(baseline + 3)
+                str(baseline - THRESHOLD), 'and',
+                str(baseline + THRESHOLD)
             ]))
             assert True
         else:
             print(' '.join([
                 score, 'is not etween',
-                str(baseline - 2), 'and',
-                str(baseline + 2)
+                str(baseline - THRESHOLD), 'and',
+                str(baseline + THRESHOLD)
             ]))
             assert False, ' '.join([
                 score, 'is not etween',
-                str(baseline - 2), 'and',
-                str(baseline + 2)
+                str(baseline - THRESHOLD), 'and',
+                str(baseline + THRESHOLD)
             ])
 
 
