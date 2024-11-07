@@ -3,6 +3,11 @@ internlm2_5-7b-hf:
     race-middle: 91.78
     race-high: 90.02
 
+internlm2_5-7b_hf:
+    demo_gsm8k: 42.19
+    race-middle: 91.78
+    race-high: 90.02
+
 internlm2-1.8b-hf:
     demo_gsm8k: 15.62
     race-middle: 71.66

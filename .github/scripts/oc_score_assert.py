@@ -219,9 +219,9 @@ class TestCmdCase:
 
     @pytest.mark.case3
     @pytest.mark.parametrize('model, dataset',
-                             [('internlm2_5-7b-hf', 'race-middle'),
-                              ('internlm2_5-7b-hf', 'race-high'),
-                              ('internlm2_5-7b-hf', 'demo_gsm8k')])
+                             [('internlm2_5-7b_hf', 'race-middle'),
+                              ('internlm2_5-7b_hf', 'race-high'),
+                              ('internlm2_5-7b_hf', 'demo_gsm8k')])
     def test_cmd_case3(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
