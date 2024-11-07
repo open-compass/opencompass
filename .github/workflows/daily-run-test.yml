@@ -264,7 +264,6 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           conda info --envs
-          mkidr ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }}
           lmdeploy serve api_server internlm/internlm2_5-7b-chat --max-batch-size 1 --model-name internlm2 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/restful.log  2>&1  &
           sleep 120s
           opencompass .github/scripts/eval_regression_chat_subjective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
