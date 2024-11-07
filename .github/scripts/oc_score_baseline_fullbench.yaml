@@ -13,8 +13,9 @@ internlm2_5-7b-chat-hf_fullbench:
     nq_open_1shot: 25
     hellaswag: 87.5
     TheoremQA: 18.75
+    college: 12.5
     college_knowledge: 87.5
-    bbh-temporal_sequences: 100
+    bbh-logical_deduction_seven_objects: 50
     bbh-multistep_arithmetic_two: 68.75
     mmlu-other: 72.6
     cmmlu-china-specific: 76.25
@@ -43,8 +44,9 @@ internlm2_5-7b-chat-turbomind_fullbench:
     nq_open_1shot: 25
     hellaswag: 81.25
     TheoremQA: 6.25
+    college: 0
     college_knowledge: 87.5
-    bbh-temporal_sequences: 100
+    bbh-logical_deduction_seven_objects: 56.25
     bbh-multistep_arithmetic_two: 68.75
     mmlu-other: 74.04
     cmmlu-china-specific: 76.25
@@ -56,3 +58,49 @@ internlm2_5-7b-chat-turbomind_fullbench:
     ds1000_Sklearn: 18.75
     ds1000_Pytorch: 6.25
     ds1000_Matplotlib: 37.5
+
+internlm2_5-7b-hf_fullbench:
+    race-high: 100
+    ARC-c: 68.75
+    BoolQ: 87.5
+    GPQA_diamond: 62.5
+    drop: 62.5
+    math: 12.5
+    wikibench-wiki-single_choice_cncircular: 25
+    sanitized_mbpp: 56.25
+    gsm8k: 37.5
+    triviaqa_wiki_1shot: 43.75
+    nq_open_1shot: 43.75
+    winogrande: 75
+    hellaswag: 93.75
+    TheoremQA: 25
+    college: 12.5
+    college_knowledge: 87.5
+    bbh-logical_deduction_seven_objects: 43.75
+    bbh-multistep_arithmetic_two: 56.25
+    mmlu-other: 76.92
+    cmmlu-china-specific: 84.17
+    mmlu_pro_math: 18.75
+
+internlm2_5-7b-turbomind_fullbench:
+    race-high: 100
+    ARC-c: 68.75
+    BoolQ: 87.5
+    GPQA_diamond: 62.5
+    drop: 62.5
+    math: 18.75
+    wikibench-wiki-single_choice_cncircular: 25
+    sanitized_mbpp: 56.25
+    gsm8k: 68.75
+    triviaqa_wiki_1shot: 43.75
+    nq_open_1shot: 43.75
+    winogrande: 87.5
+    hellaswag: 93.75
+    TheoremQA: 31.25
+    college: 12.5
+    college_knowledge: 87.5
+    bbh-logical_deduction_seven_objects: 50
+    bbh-multistep_arithmetic_two: 56.25
+    mmlu-other: 76.92
+    cmmlu-china-specific: 84.17
+    mmlu_pro_math: 18.75
