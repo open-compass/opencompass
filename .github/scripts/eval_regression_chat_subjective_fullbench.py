@@ -1,6 +1,7 @@
+from copy import deepcopy
+
 from mmengine.config import read_base
 
-from opencompass.models import OpenAISDK
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.runners import LocalRunner
 from opencompass.summarizers import SubjectiveSummarizer
@@ -25,6 +26,10 @@ with read_base():
         mtbench101_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.wildbench.wildbench_pair_judge import \
         wildbench_datasets  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.hf_internlm2_5_7b_chat import \
+        models as hf_internlm2_5_7b_chat_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import \
+        models as lmdeploy_internlm2_5_7b_chat_model  # noqa: F401, E501
 
 summarizer = dict(type=SubjectiveSummarizer, function='subjective')
 
@@ -32,9 +37,6 @@ datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')
                 and 'mtbench101' not in k and 'wildbench' not in k), [])
 datasets += mtbench101_datasets  # noqa: F401, E501
 datasets += wildbench_datasets  # noqa: F401, E501
-
-for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:16]'
 
 api_meta_template = dict(
     round=[
@@ -44,26 +46,18 @@ api_meta_template = dict(
     reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
 
-models = [
-    dict(
-        abbr='lmdeploy-api-test',
-        type=OpenAISDK,
-        key='EMPTY',
-        openai_api_base='http://localhost:23333/v1',
-        path='internlm2',
-        tokenizer_path='internlm/internlm2_5-7b-chat',
-        rpm_verbose=True,
-        meta_template=api_meta_template,
-        query_per_second=25,
-        max_out_len=1024,
-        max_seq_len=4096,
-        temperature=0.01,
-        batch_size=1,
-        retry=5,
-    )
-]
+models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
+for m in models:
+    m['abbr'] = m['abbr'] + '_fullbench'
+    if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
+        m['engine_config']['max_batch_size'] = 1
+        m['batch_size'] = 1
 
-judge_models = models
+models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
+
+judge_models = deepcopy([models[0]])
+judge_models[0]['abbr'] = judge_models[0]['abbr'] + '-judge'
+
 eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
