@@ -295,7 +295,8 @@ def find_csv_files(directory):
     csv_files = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith('.csv'):
+            if file.endswith('.csv') and (file.startwith('summary')
+                                          or file.startwith('Subjective_all')):
                 csv_files.append(os.path.join(root, file))
 
     csv_files_with_time = {f: os.path.getctime(f) for f in csv_files}
