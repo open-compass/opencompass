@@ -49,7 +49,6 @@ class DingoEvaluator(BaseEvaluator):
 
     def score(self, origin_prompt: List, predictions: List) -> dict:
         try:
-            # from dingo.model.model import Model
             from dingo.exec import Executor
             from dingo.io import InputArgs
         except Exception:
@@ -72,13 +71,13 @@ class DingoEvaluator(BaseEvaluator):
             'eval_model': 'llm_base',
             'input_path': file_name,
             'output_path': './outputs/dingo/',
+            'save_data': True,
             'dataset': 'local',
             'data_format': 'jsonl',
             'column_prompt': 'prompt',
             'column_content': 'prediction',
         }
         try:
-            # Model.apply_config(input_data["custom_config_path"])
             input_args = InputArgs(**input_data)
             executor = Executor.exec_map['local'](input_args)
             result = executor.execute()
