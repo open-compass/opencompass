@@ -212,7 +212,7 @@ jobs:
           rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
           ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
       - name:  Run command testcase
-        if: github.event_name == 'schedule' || matrix.regression_func == 'cmd'
+        if: matrix.regression_func == 'cmd'
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -232,7 +232,7 @@ jobs:
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd4_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run chat model test
-        if: github.event_name == 'schedule' || matrix.regression_func == 'chat_models'
+        if: matrix.regression_func == 'chat_models'
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -241,7 +241,7 @@ jobs:
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test
-        if: github.event_name == 'schedule' || matrix.regression_func == 'base_models'
+        if: matrix.regression_func == 'base_models'
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -250,7 +250,7 @@ jobs:
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m base -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run chat model test - fullbench
-        if: github.event_name == 'schedule' || matrix.regression_func == 'chat_obj_fullbench'
+        if: matrix.regression_func == 'chat_obj_fullbench'
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -259,7 +259,7 @@ jobs:
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_obj_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat_obj_fullbench -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run chat model test - fullbench
-        if: github.event_name == 'schedule' || matrix.regression_func == 'chat_sub_fullbench'
+        if: matrix.regression_func == 'chat_sub_fullbench'
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -268,7 +268,7 @@ jobs:
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat_sub_fullbench -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test - fullbench
-        if: github.event_name == 'schedule' || matrix.regression_func == 'base_fullbench'
+        if: matrix.regression_func == 'base_fullbench'
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
@@ -277,16 +277,21 @@ jobs:
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/base_full_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m base_fullbench -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run model test - api
-        if: github.event_name == 'schedule' || matrix.regression_func == 'api'
+        if: matrix.regression_func == 'api'
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           conda info --envs
           lmdeploy serve api_server internlm/internlm2_5-7b-chat --max-batch-size 256 --model-name internlm2 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/restful.log  2>&1  &
+          echo "restful_pid=$!" >> "$GITHUB_ENV"
           sleep 120s
           opencompass .github/scripts/eval_regression_api.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/api_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/api_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m api -s -v --color=yes .github/scripts/oc_score_assert.py
+      - name:  Run model test - api kill
+        if: always() && matrix.regression_func == 'api'
+        run: |
+          kill -15 "$restful_pid"
 
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
