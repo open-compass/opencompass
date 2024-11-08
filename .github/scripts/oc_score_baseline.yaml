@@ -27,3 +27,8 @@ internlm2_5-7b-chat_hf:
     demo_gsm8k: 87.50
     race-middle: 92.76
     race-high: 90.48
+
+lmdeploy-api-test:
+    gsm8k: 83.78
+    race-middle: 92.41
+    race-high: 90.37

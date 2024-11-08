@@ -206,9 +206,9 @@ class TestApibench:
     """Test cases for chat model."""
 
     @pytest.mark.parametrize('model, dataset',
-                             [('internlm2_5-7b-chat-lmdeploy', 'race-middle'),
-                              ('internlm2_5-7b-chat-lmdeploy', 'race-high'),
-                              ('internlm2_5-7b-chat-lmdeploy', 'demo_gsm8k')])
+                             [('lmdeploy-api-test', 'race-middle'),
+                              ('lmdeploy-api-test', 'race-high'),
+                              ('lmdeploy-api-test', 'gsm8k')])
     def test_api(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
