@@ -264,7 +264,8 @@ jobs:
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.CONDA_ENV}}_${{ matrix.cuda_env }}
           conda info --envs
-          COMPASS_DATA_CACHE=/cpfs01/shared/public/llmeval/compass_data_cache_subset opencompass .github/scripts/eval_regression_chat_subjective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
+          export COMPASS_DATA_CACHE=/cpfs01/shared/public/llmeval/compass_data_cache_subset
+          opencompass .github/scripts/eval_regression_chat_subjective_fullbench.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }} --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/chat_sub_${{ matrix.cuda_env }}/*/summary regression_result_daily
           python -m pytest -m chat_sub_fullbench -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run base model test - fullbench
