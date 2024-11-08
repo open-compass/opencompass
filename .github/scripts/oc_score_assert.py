@@ -189,6 +189,22 @@ class TestBaseFullbench:
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores')
+@pytest.mark.api
+class TestApibench:
+    """Test cases for chat model."""
+
+    @pytest.mark.parametrize('model, dataset',
+                             [('internlm2_5-7b-chat-lmdeploy', 'race-middle'),
+                              ('internlm2_5-7b-chat-lmdeploy', 'race-high'),
+                              ('internlm2_5-7b-chat-lmdeploy', 'demo_gsm8k')])
+    def test_api(self, baseline_scores, result_scores, model, dataset):
+        base_score = baseline_scores.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model + '_batch', result_score, base_score)
+
+
+@pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores')
 class TestCmdCase:
 
     @pytest.mark.case1
