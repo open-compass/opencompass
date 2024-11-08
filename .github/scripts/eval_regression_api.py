@@ -1,9 +1,6 @@
 from mmengine.config import read_base
-from copy import deepcopy
+
 from opencompass.models.openai_api import OpenAI
-from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 
 with read_base():
     # choose a list of datasets
@@ -11,8 +8,6 @@ with read_base():
         gsm8k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.race.race_gen import \
         race_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.subjective.multiround.mtbench101_judge import \
-        mtbench101_datasets  # noqa: F401, E501
 
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
@@ -42,17 +37,3 @@ models = [
         retry=20,
     )
 ]
-
-judge_models=deepcopy(models)
-judge_models[0]['abbr'] = 'lmdeploy-api-test-judge'
-
-eval = dict(
-    partitioner=dict(
-        type=SubjectiveNaivePartitioner,
-        models=models,
-        judge_models=judge_models,
-    ),
-    runner=dict(type=LocalRunner,
-                max_num_workers=16,
-                task=dict(type=SubjectiveEvalTask)),
-)
