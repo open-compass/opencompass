@@ -1,6 +1,6 @@
 from mmengine.config import read_base
 
-from opencompass.models.openai_api import OpenAI
+from opencompass.models.openai_api import OpenAISDK
 
 with read_base():
     # choose a list of datasets
@@ -22,7 +22,7 @@ api_meta_template = dict(
 models = [
     dict(
         abbr='lmdeploy-api-test',
-        type=OpenAI,
+        type=OpenAISDK,
         key='EMPTY',
         openai_api_base='http://localhost:23333/v1',
         path='internlm2',
