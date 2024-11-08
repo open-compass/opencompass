@@ -81,6 +81,30 @@ internlm2_5-7b-hf_fullbench:
     mmlu-other: 76.92
     cmmlu-china-specific: 84.17
     mmlu_pro_math: 18.75
+    Alignbench总分: 0.65
+    Alignbench专业能力: 7.83
+    AlpacaEvaltotal: 0
+    AlpacaEvalhelpful_base: 0
+    CompassArenacompassarena_language: 59.5
+    CompassArenacompassarena_knowledge: 56
+    CompassArenacompassarena_reason_v2: 49.5
+    CompassArenacompassarena_math_v2: 53.5
+    CompassArenacompassarena_creationv2_zh: 49.17
+    Fofofofo_test_prompts: 1
+    followbenchHSR_AVG: 1
+    followbenchSSR_AVG: 1
+    followbenchHSR_L1: 1
+    followbenchHSR_L2: 1
+    followbenchHSR_L3: 1
+    followbenchHSR_L4: 1
+    followbenchHSR_L5: 1
+    followbenchSSR_L1: 1
+    followbenchSSR_L2: 1
+    followbenchSSR_L3: 1
+    followbenchSSR_L4: 1
+    followbenchSSR_L5: 1
+    MTBench101average: 8.1
+    Wildbenchscore: -3.3333333333333335
 
 internlm2_5-7b-turbomind_fullbench:
     race-high: 100
@@ -104,3 +128,27 @@ internlm2_5-7b-turbomind_fullbench:
     mmlu-other: 76.92
     cmmlu-china-specific: 84.17
     mmlu_pro_math: 18.75
+    Alignbench总分: 0.64
+    Alignbench专业能力: 7.6
+    AlpacaEvaltotal: 10
+    AlpacaEvalhelpful_base: 10
+    CompassArenacompassarena_language: 59
+    CompassArenacompassarena_knowledge: 57
+    CompassArenacompassarena_reason_v2: 49.5
+    CompassArenacompassarena_math_v2: 51
+    CompassArenacompassarena_creationv2_zh: 43.75
+    Fofofofo_test_prompts: 1
+    followbenchHSR_AVG: 1
+    followbenchSSR_AVG: 1
+    followbenchHSR_L1: 1
+    followbenchHSR_L2: 1
+    followbenchHSR_L3: 1
+    followbenchHSR_L4: 1
+    followbenchHSR_L5: 1
+    followbenchSSR_L1: 1
+    followbenchSSR_L2: 1
+    followbenchSSR_L3: 1
+    followbenchSSR_L4: 1
+    followbenchSSR_L5: 1
+    MTBench101average: 8.1
+    Wildbenchscore: -8.333333333333334

@@ -156,7 +156,19 @@ class TestChatSubFullbench:
     @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
         'internlm2_5-7b-chat-hf_fullbench',
         'internlm2_5-7b-chat-turbomind_fullbench'
-    ] for p2 in ['race-high', 'ARC-c']])
+    ] for p2 in [
+        'Alignbench总分', 'Alignbench专业能力', 'AlpacaEvaltotal',
+        'AlpacaEvalhelpful_base', 'CompassArenacompassarena_language',
+        'CompassArenacompassarena_knowledge',
+        'CompassArenacompassarena_reason_v2',
+        'CompassArenacompassarena_math_v2',
+        'CompassArenacompassarena_creationv2_zh', 'Fofofofo_test_prompts',
+        'Fofofofo_test_prompts_cn', 'followbenchHSR_AVG', 'followbenchSSR_AVG',
+        'followbenchHSR_L1', 'followbenchHSR_L2', 'followbenchHSR_L3',
+        'followbenchHSR_L4', 'followbenchHSR_L5', 'followbenchSSR_L1',
+        'followbenchSSR_L2', 'followbenchSSR_L3', 'followbenchSSR_L4',
+        'followbenchSSR_L5', 'MTBench101average', 'Wildbenchscore'
+    ]])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
         base_score = baseline_scores_fullbench.get(model).get(dataset)
@@ -295,8 +307,8 @@ def find_csv_files(directory):
     csv_files = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith('.csv') and (file.startwith('summary')
-                                          or file.startwith('Subjective_all')):
+            if file.endswith('.csv') and (file.startswith('summary') or
+                                          file.startswith('Subjective_all')):
                 csv_files.append(os.path.join(root, file))
 
     csv_files_with_time = {f: os.path.getctime(f) for f in csv_files}
@@ -309,15 +321,24 @@ def read_csv_file(file_path):
     with open(file_path, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         filtered_data = []
-
-        for row in reader:
-            if row['metric'] is not None and 'bpb' not in row['metric']:
-                filtered_row = {
-                    k: v
-                    for k, v in row.items()
-                    if k not in ['version', 'metric', 'mode']
-                }
-                filtered_data.append(filtered_row)
+        if 'Subjective_all' not in file_path:
+            for row in reader:
+                if row['metric'] is not None and 'bpb' not in row['metric']:
+                    filtered_row = {
+                        k: v
+                        for k, v in row.items()
+                        if k not in ['version', 'metric', 'mode']
+                    }
+                    filtered_data.append(filtered_row)
+        else:
+            for row in reader:
+                if row['Detailed Scores'] is not None:
+                    filtered_row = row
+                    filtered_row['dataset'] = filtered_row[
+                        'Dataset'] + filtered_row['Detailed Scores']
+                    del filtered_row['Dataset']
+                    del filtered_row['Detailed Scores']
+                    filtered_data.append(filtered_row)
 
     result = {}
     for data in filtered_data:
