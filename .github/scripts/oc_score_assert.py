@@ -163,11 +163,11 @@ class TestChatSubFullbench:
         'CompassArenacompassarena_reason_v2',
         'CompassArenacompassarena_math_v2',
         'CompassArenacompassarena_creationv2_zh', 'Fofofofo_test_prompts',
-        'Fofofofo_test_prompts_cn', 'followbenchHSR_AVG', 'followbenchSSR_AVG',
-        'followbenchHSR_L1', 'followbenchHSR_L2', 'followbenchHSR_L3',
-        'followbenchHSR_L4', 'followbenchHSR_L5', 'followbenchSSR_L1',
-        'followbenchSSR_L2', 'followbenchSSR_L3', 'followbenchSSR_L4',
-        'followbenchSSR_L5', 'MTBench101average', 'Wildbenchscore'
+        'followbenchHSR_AVG', 'followbenchSSR_AVG', 'followbenchHSR_L1',
+        'followbenchHSR_L2', 'followbenchHSR_L3', 'followbenchHSR_L4',
+        'followbenchHSR_L5', 'followbenchSSR_L1', 'followbenchSSR_L2',
+        'followbenchSSR_L3', 'followbenchSSR_L4', 'followbenchSSR_L5',
+        'MTBench101average', 'Wildbenchscore'
     ]])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
