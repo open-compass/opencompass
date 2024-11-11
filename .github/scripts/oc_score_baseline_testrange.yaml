@@ -83,7 +83,7 @@ llama-3_1-8b-instruct-hf:
     race-high: 90.62
 
 llama-3_2-3b-instruct-hf:
-    gsm8k: 65.62
+    gsm8k: 68.75
     race-high: 81.25
 
 llama-3-8b-instruct-hf:

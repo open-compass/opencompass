@@ -82,11 +82,11 @@ internlm2_5-7b-chat-turbomind_fullbench:
     ds1000_Pytorch: 6.25
     ds1000_Matplotlib: 37.5
     Alignbench总分: 0.64
-    Alignbench专业能力: 7.6
+    Alignbench专业能力: 7.71
     AlpacaEvaltotal: 10
     AlpacaEvalhelpful_base: 10
-    CompassArenacompassarena_language: 59
-    CompassArenacompassarena_knowledge: 57
+    CompassArenacompassarena_language: 59.5
+    CompassArenacompassarena_knowledge: 56.5
     CompassArenacompassarena_reason_v2: 49.5
     CompassArenacompassarena_math_v2: 51
     CompassArenacompassarena_creationv2_zh: 43.75
