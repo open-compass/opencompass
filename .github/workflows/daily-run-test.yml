@@ -153,6 +153,7 @@ jobs:
         id: retry1
         with:
           max_attempts: 3
+          timeout_minutes: 40
           command: |
             . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
             conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
@@ -173,6 +174,7 @@ jobs:
         id: retry2
         with:
           max_attempts: 3
+          timeout_minutes: 40
           command: |
             . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
             conda create -y --name ${{env.CONDA_ENV}}_${{ matrix.cuda_env }} python=3.10
