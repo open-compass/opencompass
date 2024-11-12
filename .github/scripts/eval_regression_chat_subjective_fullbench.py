@@ -51,6 +51,7 @@ for m in models:
     m['abbr'] = m['abbr'] + '_fullbench'
     if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
         m['engine_config']['max_batch_size'] = 1
+        m['engine_config']['cache_max_entry_count'] = 0.5
         m['batch_size'] = 1
 
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
