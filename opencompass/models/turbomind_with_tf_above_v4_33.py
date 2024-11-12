@@ -123,7 +123,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
 
         gen_config = copy.deepcopy(DEFAULT_GEN_CONFIG)
         gen_config.update(self.gen_config)
-        if do_sample:
+        if do_sample or self.gen_config['do_sample']:
             gen_config['top_k'] = 40
             gen_config['temperature'] = temperature
         else:
