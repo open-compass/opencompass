@@ -51,12 +51,11 @@ for m in models:
     m['abbr'] = m['abbr'] + '_fullbench'
     if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
         m['engine_config']['max_batch_size'] = 1
-        m['engine_config']['cache_max_entry_count'] = 0.5
         m['batch_size'] = 1
 
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
 
-judge_models = deepcopy([models[0]])
+judge_models = deepcopy([models[1]])
 judge_models[0]['abbr'] = judge_models[0]['abbr'] + '-judge'
 
 eval = dict(
