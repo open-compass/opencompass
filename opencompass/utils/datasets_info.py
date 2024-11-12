@@ -326,7 +326,12 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/mmmlu_lite",
-    }
+    },
+    "opencompass/babilong": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/babilong/data/",
+    },
 }
 
 DATASETS_URL = {
@@ -521,5 +526,9 @@ DATASETS_URL = {
     "/WikiBench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/WikiBench.zip",
         "md5": "6dac1d1a3133fe1effff185cbf71d928",
+    },
+    "/babilong":{
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/babilong.zip",
+        "md5": "e400864c31bc58d29eaa3e199751f99b",
     }
 }
