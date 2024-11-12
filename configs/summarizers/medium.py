@@ -21,6 +21,7 @@ summarizer = dict(
         'cmb',
         'agieval',
         'mmlu',
+        'cmmlu',
         'GaokaoBench',
         'ARC-c',
         'ARC-e',
