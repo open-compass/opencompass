@@ -101,7 +101,11 @@ class VLLM(BaseModel):
         if not self.lora_path:
             outputs = self.model.generate(inputs, sampling_kwargs)
         else:
-            outputs = self.model.generate(inputs, sampling_kwargs, lora_request=LoRARequest("sql_adapter", 1, self.lora_path))
+            outputs = self.model.generate(inputs,
+                                          sampling_kwargs,
+                                          lora_request=LoRARequest(
+                                              'sql_adapter', 1,
+                                              self.lora_path))
 
         prompt_list, output_strs = [], []
         for output in outputs:
