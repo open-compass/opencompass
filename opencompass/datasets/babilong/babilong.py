@@ -97,6 +97,7 @@ class BabiLongDataset(BaseDataset):
 class BabiLongEvaluator(BaseEvaluator):
 
     def score(self, predictions, gold):
+        assert len(predictions) == len(gold)
         score = (sum([
             compare_answers(str(ref[0]), pred)
             for pred, ref in zip(predictions, gold)
