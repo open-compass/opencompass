@@ -23,3 +23,15 @@ OpenCompass provides the results of some models on the BABILong dataset. The eva
 | babilong_32k | - | naive_average | gen | 50.86 | 62.66 | 59.56 | 53.52 |
 | babilong_128k | - | naive_average | gen | 39.33 | 27.79 | 52.01 | 3.20 |
 | babilong_256k | - | naive_average | gen | 17.31 | 7.30 | 23.35 | 9.50 |
+
+## Citation
+
+```bibtex
+@misc{kuratov2024babilong,
+    title={BABILong: Testing the Limits of LLMs with Long Context Reasoning-in-a-Haystack}, 
+    author={Yuri Kuratov and Aydar Bulatov and Petr Anokhin and Ivan Rodkin and Dmitry Sorokin and Artyom Sorokin and Mikhail Burtsev},
+    year={2024},
+    eprint={2406.10149},
+    archivePrefix={arXiv}
+}
+```

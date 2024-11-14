@@ -1,4 +1,5 @@
 # flake8: noqa: E501
+# Modifided from https://github.com/booydar/babilong/blob/main/babilong/babilong_utils.py
 import re
 
 import nltk
@@ -8,6 +9,12 @@ from torch.utils.data import Dataset
 
 
 def compare_answers(target, output):
+    """Compare target and output answers.
+
+    Takes only the first sentence from output and filters responses when model
+    tries to generate examples. We consider prediction correct if target is in
+    output.
+    """
     target = target.lower()
     output = output.lower()
     # take only the first sentence from output
@@ -23,8 +30,8 @@ def compare_answers(target, output):
     return False
 
 
-# preprocess babi text files
 def get_dataset_df(dataset_path, max_n_facts=None):
+    """Preprocess babi text files."""
     with open(dataset_path, 'r') as f:
         texts = f.read().strip()
         texts = texts.split('\n')
@@ -78,8 +85,8 @@ def get_dataset_df(dataset_path, max_n_facts=None):
     return df
 
 
-# babi task loader dataset
 class TaskDataset(Dataset):
+    """Babi task loader dataset."""
 
     def __init__(self, dataset_path, max_n_facts=None):
         self.fact_dataset = get_dataset_df(dataset_path,
@@ -105,8 +112,8 @@ def sum_lengths(sentences):
     return sum([len(s) for s in sentences])
 
 
-# sampler of background text
 class SentenceSampler:
+    """Sampler of background text."""
 
     def __init__(
         self,
@@ -190,10 +197,11 @@ class SentenceSampler:
         return True
 
 
-# combined dataset for noisy babi QA
-# it's recommended to use sample_size >= 1024
-# and task_end_pct - task_start_pct >= 0.2 in order to
 class NoiseInjectionDataset(Dataset):
+    """Combined dataset for noisy babi QA.
+
+    It's recommended to use sample_size >= 1024 and task_end_pct - task_start_pct >= 0.2
+    """
 
     def __init__(
         self,
