@@ -9,6 +9,7 @@ fuzzywuzzy
 h5py
 huggingface_hub<=0.24.7
 immutabledict
+importlib-metadata
 jieba
 json5
 mmengine-lite
