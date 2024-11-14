@@ -327,6 +327,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/mmmlu_lite",
     },
+     "opencompass/musr": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/musr",
+    },   
     "opencompass/babilong": {
         "ms_id": "",
         "hf_id": "",
@@ -335,6 +340,10 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/musr": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/musr.zip",
+        "md5": "7447d2a5bec4586035196102135e2af9",
+    },
     "/mmlu/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu.zip",
         "md5": "761310671509a239e41c4b717f7fab9c",
