@@ -10,17 +10,6 @@ on:
       - 'tools/**'
 
   workflow_dispatch:
-    inputs:
-      repo_org:
-        required: false
-        description: 'Tested repository organization name. Default is open-compass/opencompass'
-        type: string
-        default: 'open-compass/opencompass'
-      repo_ref:
-        required: false
-        description: 'Set branch or tag or commit id. Default is "main"'
-        type: string
-        default: 'main'
   schedule:
     - cron:  '56 22 * * *'
 
@@ -46,9 +35,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          repository: ${{ github.event.inputs.repo_org || 'open-compass/opencompass' }}
-          ref: ${{github.event.inputs.repo_ref || 'main'}}
       - name: Prepare - Install opencompass
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
