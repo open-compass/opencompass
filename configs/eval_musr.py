@@ -2,7 +2,7 @@ from mmengine.config import read_base
 import os.path as osp
 
 with read_base():
-    from opencompass.configs.datasets.musr.musr_gen import musr_datasets
+    from opencompass.configs.datasets.musr.musr_gen_3c6e15 import musr_datasets
     # from opencompass.configs.models.hf_internlm.hf_internlm2_5_1_8b_chat import models
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import (
     models as lmdeploy_internlm2_5_7b_chat_model,
