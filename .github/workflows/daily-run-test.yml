@@ -39,7 +39,7 @@ on:
         type: string
         default: "['dsw_cu12']"
   schedule:
-    - cron:  '56 16 * * *'
+    - cron:  '15 16 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
