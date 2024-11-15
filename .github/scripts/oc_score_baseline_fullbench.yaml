@@ -1,6 +1,6 @@
 internlm2_5-7b-chat-hf_fullbench:
     race-high: 93.75
-    ARC-c: 87.5
+    ARC-c: 93.75
     BoolQ: 81.25
     drop: 81.25
     GPQA_diamond: 25
