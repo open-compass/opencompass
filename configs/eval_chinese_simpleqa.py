@@ -2,7 +2,6 @@ from mmengine.config import read_base
 
 with read_base():
     from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa import csimpleqa_datasets, CsimpleqaSummarizer
-    from opencompass.configs.models.qwen2_5.qwen2_5.qwen2_5_3b_instruct import models as qwen2_5_3b_instruct_model
 from opencompass.models.openai_api import OpenAI
 from opencompass.runners import LocalRunner
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
@@ -11,9 +10,30 @@ from opencompass.models import HuggingFacewithChatTemplate
 from opencompass.partitioners import NaivePartitioner
 
 # -------------Inference Stage ----------------------------------------
-# For subjective evaluation, we often set do sample for models
+models = [
+    dict(
+        type=HuggingFacewithChatTemplate,
+        abbr='Qwen2.5-1.5B-Instruct',
+        path='Qwen/Qwen2.5-1.5B-Instruct',
+        model_kwargs=dict(
+            device_map='auto',
+            trust_remote_code=True,
+        ),
+        tokenizer_kwargs=dict(
+            padding_side='left',
+            truncation_side='left',
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(
+            do_sample=True,
+        ),
+        max_out_len=200,
+        max_seq_len=4096,
+        batch_size=8,
+        run_cfg=dict(num_gpus=1, num_procs=1),
+    )
+]
 
-models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
 
 # -------------Evalation Stage ----------------------------------------

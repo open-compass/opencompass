@@ -40,10 +40,10 @@ We provide three evaluation methods.
 
 (1) The first method is based on simple-evals evaluation. The startup command is as follows: 
 
-```bash
-python -m simple-evals.demo
-```
-This will launch evaluations through the OpenAI API.
+    ```bash
+    python -m simple-evals.demo
+    ```
+    This will launch evaluations through the OpenAI API.
 
 
 
@@ -69,7 +69,7 @@ This will launch evaluations through the OpenAI API.
 
   
 
-(3) We also integrated our Chinese SimpleQA benchmark into our forked [OpenCompass](https://github.com/xxx/opencompass). You can refer to the opencompass configuration script for evaluation
+(3) We also integrated our Chinese SimpleQA benchmark into our forked [OpenCompass](https://github.com/open-compass/opencompass). You can refer to the opencompass configuration script for evaluation
 - Step1: git clone Opencompass:
   ```shell
   cd ~

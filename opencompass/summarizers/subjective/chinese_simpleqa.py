@@ -187,7 +187,7 @@ class CsimpleqaSummarizer:
             score_by_judgemodel = {}
             judge_abbr = model_abbr_from_cfg(judge_model)
             dataset_cfgs = self.cfg['datasets']
-            dataset = dataset_cfgs[0]  # Alignbench just have only one subfile
+            dataset = dataset_cfgs[0]
             output_dir, results_folder = get_outdir(self.cfg, time_str)
             fout_flag = 0
            
