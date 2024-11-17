@@ -71,9 +71,6 @@ def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
         if processed_judge is not None:
             judged_answers.append(processed_judge)
             references.append(v['gold'])
-        # else:
-        #     print(v['prediction'])
-        #     print('-' * 128)
     if len(judged_answers) <= 0.95 * len(result):
         print('*' * 100)
         print(
@@ -117,10 +114,8 @@ def get_dimension_results(judged_answers, references, fout, fout_flag, model):
     results = get_results(judged_answers)
     f_score = results['F1']
     scores = {model: results}
-    print("scores: ", scores)
     rows = list(scores.keys())
     columns = list(scores[rows[0]].keys())
-    print(columns)
     with open(fout, 'a+', newline='') as csvfile:
         writer = csv.writer(csvfile)
         if fout_flag == 0:
@@ -207,8 +202,6 @@ class CsimpleqaSummarizer:
                 if os.path.isdir(subdir_path):
                     judged_answers, references = get_judgeanswer_and_reference(
                         dataset, subdir_path, self.judge_function)
-                    print("judged_answers: ", judged_answers)
-                    print("references: ", references)
                     if len(judged_answers) == 0:
                         score_by_judgemodel[model] = None
                         continue

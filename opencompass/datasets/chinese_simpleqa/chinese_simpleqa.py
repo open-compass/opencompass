@@ -179,7 +179,6 @@ def get_results(judged_answers):
 def csimpleqa_postprocess(output: dict,
                            output_path: str,
                            judge_type: Optional[str] = 'general') -> dict:
-    print("************line182")
     judged_answers = get_judgeanswer_and_reference(output, output_path, post_process_csimpleqa)
     if len(judged_answers) == 0:
         scores = None
