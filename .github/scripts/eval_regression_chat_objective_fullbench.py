@@ -3,12 +3,16 @@ from mmengine.config import read_base
 with read_base():
     # read hf models - chat models
     # Dataset
+    from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import \
+        aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ARC_c.ARC_c_cot_gen_926652 import \
         ARC_c_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bbh.bbh_gen_5b92b0 import \
         bbh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmmlu.cmmlu_0shot_cot_gen_305931 import \
         cmmlu_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.cmo_fib.cmo_fib_gen_ace24b import \
+        cmo_fib_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.drop.drop_openai_simple_evals_gen_3857b0 import \
         drop_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ds1000.ds1000_service_eval_gen_cbc84f import \
@@ -28,6 +32,8 @@ with read_base():
         humanevalx_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.IFEval.IFEval_gen_3321a3 import \
         ifeval_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.livecodebench.livecodebench_gen_b2b0fd import \
+        LCB_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.math.math_0shot_gen_393424 import \
         math_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.MathBench.mathbench_2024_gen_50a320 import \
@@ -38,6 +44,10 @@ with read_base():
         mmlu_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.mmlu_pro.mmlu_pro_0shot_cot_gen_08c1de import \
         mmlu_pro_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.mmmlu_lite.mmmlu_lite_gen_c51a84 import \
+        mmmlu_lite_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.musr.musr_gen_3c6e15 import \
+        musr_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.nq.nq_open_1shot_gen_2e45e5 import \
         nq_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.race.race_cot_gen_d95929 import \
@@ -77,10 +87,14 @@ with read_base():
         mmlu_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.mmlu_pro import \
         mmlu_pro_summary_groups  # noqa: F401, E501
+    from opencompass.configs.summarizers.groups.musr_average import \
+        summarizer as musr_summarizer  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.scicode import \
         scicode_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.teval import \
         teval_summary_groups  # noqa: F401, E501
+    from opencompass.configs.summarizers.mmmlu_lite import \
+        mmmlu_summary_groups  # noqa: F401, E501
 
 # For HumanEval-X Evaluation
 # Apply the evaluator ip_address and port
