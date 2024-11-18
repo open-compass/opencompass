@@ -128,7 +128,10 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         text = text.strip()
         match = re.search(pattern, text, re.DOTALL)
         if match:
-            outputs = match.group(1)
+            if match.group(1) is not None and match.group(1) != '':
+                outputs = match.group(1)
+            else:
+                outputs = match.group(0)
             for i in options:
                 if i in outputs:
                     return i
