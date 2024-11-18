@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from os import environ
 
@@ -140,7 +141,7 @@ def extract_answer(response_text: str):
 class MATHDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
+    def load(path: str, file_name: str = 'math.json'):
         path = get_data_path(path)
         dataset = DatasetDict()
         raw_data = []
@@ -155,7 +156,8 @@ class MATHDataset(BaseDataset):
                     extract_boxed_answer(item['solution'])
                 })
         else:
-            data = json.load(open(path))
+            file_path = os.path.join(path, file_name)
+            data = json.load(open(file_path))
             for i in data.keys():
                 raw_data.append({
                     'problem':

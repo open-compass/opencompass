@@ -167,7 +167,7 @@ DATASETS_MAPPING = {
     "opencompass/math": {
         "ms_id": "opencompass/math",
         "hf_id": "opencompass/math",
-        "local": "./data/math/math.json",
+        "local": "./data/math/",
     },
     # MMLU
     "opencompass/mmlu": {
@@ -327,11 +327,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/mmmlu_lite",
     },
-     "opencompass/musr": {
+    "opencompass/musr": {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/musr",
-    },   
+    },
     "opencompass/babilong": {
         "ms_id": "",
         "hf_id": "",
@@ -374,7 +374,7 @@ DATASETS_URL = {
     },
     "/math/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/math.zip",
-        "md5": "8b1b897259684672055e6fd4fc07c808",
+        "md5": "cb5b4c8378085929e20345174e731fdf",
     },
     "/hellaswag/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hellaswag.zip",
@@ -540,8 +540,8 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/WikiBench.zip",
         "md5": "6dac1d1a3133fe1effff185cbf71d928",
     },
-    "/babilong":{
+    "/babilong": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/babilong.zip",
         "md5": "e400864c31bc58d29eaa3e199751f99b",
-    }
+    },
 }
