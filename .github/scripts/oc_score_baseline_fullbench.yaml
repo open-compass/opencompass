@@ -137,6 +137,8 @@ internlm2_5-7b-hf_fullbench:
     winogrande: 75
     hellaswag: 93.75
     TheoremQA: 25
+    dingo_en_192: 37.5
+    dingo_zh_170: 100
     college: 12.5
     college_knowledge: 87.5
     bbh-logical_deduction_seven_objects: 43.75
@@ -160,6 +162,8 @@ internlm2_5-7b-turbomind_fullbench:
     winogrande: 87.5
     hellaswag: 93.75
     TheoremQA: 31.25
+    dingo_en_192: 43.75
+    dingo_zh_170: 100
     college: 12.5
     college_knowledge: 87.5
     bbh-logical_deduction_seven_objects: 50

@@ -190,9 +190,10 @@ class TestBaseFullbench:
         'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
         'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'gsm8k',
         'triviaqa_wiki_1shot', 'nq_open_1shot', 'winogrande', 'hellaswag',
-        'TheoremQA', 'college', 'college_knowledge',
-        'bbh-logical_deduction_seven_objects', 'bbh-multistep_arithmetic_two',
-        'mmlu-other', 'cmmlu-china-specific', 'mmlu_pro_math'
+        'TheoremQA', 'dingo_en_192', 'dingo_zh_170', 'college',
+        'college_knowledge', 'bbh-logical_deduction_seven_objects',
+        'bbh-multistep_arithmetic_two', 'mmlu-other', 'cmmlu-china-specific',
+        'mmlu_pro_math'
     ]])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):

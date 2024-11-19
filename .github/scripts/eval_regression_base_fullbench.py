@@ -122,6 +122,8 @@ summarizer = dict(
         ['winogrande', 'accuracy'],
         ['hellaswag', 'accuracy'],
         ['TheoremQA', 'score'],
+        ['dingo_en_192', 'score'],
+        ['dingo_zh_170', 'score'],
         '###### MathBench-A: Application Part ######',
         'college',
         'high',
