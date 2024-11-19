@@ -23,8 +23,8 @@ PromptType = Union[PromptList, str]
 
 BAILING_RETRY_DELAY: int = 30
 
-class HTTPAdapterWithSocketOptions(HTTPAdapter):
 
+class HTTPAdapterWithSocketOptions(HTTPAdapter):
 
     def __init__(self, *args, **kwargs):
         self._socket_options = HTTPConnection.default_socket_options + [
