@@ -136,6 +136,10 @@ mmlu_datasets = [
 ]
 
 mmlu_pro_datasets = [mmlu_pro_datasets[0]]
+
+mmmlu_lite_datasets = [
+    x for x in mmmlu_lite_datasets if 'mmlu_lite_AR-XY' in x['abbr']
+]
 mathbench_datasets = [x for x in mathbench_datasets if 'college' in x['abbr']]
 GaokaoBench_datasets = [
     x for x in GaokaoBench_datasets if '2010-2022_Math_II_MCQs' in x['abbr']
@@ -178,6 +182,12 @@ summarizer = dict(
         ['nq_open_1shot', 'score'],
         ['hellaswag', 'accuracy'],
         ['TheoremQA', 'score'],
+        ['cmo_fib', 'accuracy'],
+        ['aime2024', 'accuracy'],
+        ['lcb_code_generation', 'pass@1'],
+        ['lcb_code_execution', 'pass@1'],
+        ['lcb_test_output', 'pass@1'],
+        ['mmmlu_lite', 'naive_average'],
         '###### MathBench-A: Application Part ######',
         'college',
         'high',
@@ -242,6 +252,22 @@ summarizer = dict(
         'ds1000_Sklearn',
         'ds1000_Pytorch',
         'ds1000_Matplotlib',
+        '',
+        'mmmlu_lite',
+        'openai_mmmlu_lite_AR-XY',
+        'openai_mmmlu_lite_BN-BD',
+        'openai_mmmlu_lite_DE-DE',
+        'openai_mmmlu_lite_ES-LA',
+        'openai_mmmlu_lite_FR-FR',
+        'openai_mmmlu_lite_HI-IN',
+        'openai_mmmlu_lite_ID-ID',
+        'openai_mmmlu_lite_IT-IT',
+        'openai_mmmlu_lite_JA-JP',
+        'openai_mmmlu_lite_KO-KR',
+        'openai_mmmlu_lite_PT-BR',
+        'openai_mmmlu_lite_SW-KE',
+        'openai_mmmlu_lite_YO-NG',
+        'openai_mmmlu_lite_ZH-CN',
     ],
     summary_groups=sum(
         [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
