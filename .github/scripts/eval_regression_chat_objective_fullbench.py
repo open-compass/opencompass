@@ -136,6 +136,10 @@ mmlu_datasets = [
 ]
 
 mmlu_pro_datasets = [mmlu_pro_datasets[0]]
+
+mmmlu_lite_datasets = [
+    x for x in mmmlu_lite_datasets if 'mmlu_lite_AR-XY' in x['abbr']
+]
 mathbench_datasets = [x for x in mathbench_datasets if 'college' in x['abbr']]
 GaokaoBench_datasets = [
     x for x in GaokaoBench_datasets if '2010-2022_Math_II_MCQs' in x['abbr']
@@ -151,52 +155,65 @@ datasets += teval_en_datasets
 datasets += teval_zh_datasets
 # datasets += SciCode_datasets
 
+musr_summary_groups = musr_summarizer['summary_groups']
+summary_groups = sum(
+    [v for k, v in locals().items() if k.endswith('_summary_groups')], [])
+summary_groups.append(
+    {
+        'name': 'Mathbench',
+        'subsets': ['mathbench-a (average)', 'mathbench-t (average)'],
+    }, )
+
+# Summarizer
 summarizer = dict(
     dataset_abbrs=[
+        'Language',
         ['race-high', 'accuracy'],
         ['ARC-c', 'accuracy'],
         ['BoolQ', 'accuracy'],
-        ['mmlu_pro', 'naive_average'],
+        ['triviaqa_wiki_1shot', 'score'],
+        ['nq_open_1shot', 'score'],
+        ['mmmlu_lite', 'naive_average'],
+        '',
+        'Instruction Following',
+        ['IFEval', 'Prompt-level-strict-accuracy'],
+        '',
+        'General Reasoning',
         ['drop', 'accuracy'],
         ['bbh', 'naive_average'],
         ['GPQA_diamond', 'accuracy'],
+        ['hellaswag', 'accuracy'],
+        ['TheoremQA', 'score'],
+        ['musr_average', 'naive_average'],
+        '',
+        'Math Calculation',
+        ['gsm8k', 'accuracy'],
+        ['GaokaoBench', 'weighted_average'],
         ['math', 'accuracy'],
+        ['cmo_fib', 'accuracy'],
+        ['aime2024', 'accuracy'],
+        ['Mathbench', 'naive_average'],
+        '',
+        'Knowledge',
         ['wikibench-wiki-single_choice_cncircular', 'perf_4'],
-        ['openai_humaneval', 'humaneval_pass@1'],
-        ['sanitized_mbpp', 'score'],
         ['cmmlu', 'naive_average'],
         ['mmlu', 'naive_average'],
+        ['mmlu_pro', 'naive_average'],
+        '',
+        'Code',
+        ['openai_humaneval', 'humaneval_pass@1'],
+        ['sanitized_mbpp', 'score'],
+        ['humanevalx', 'naive_average'],
+        ['ds1000', 'naive_average'],
+        ['lcb_code_generation', 'pass@1'],
+        ['lcb_code_execution', 'pass@1'],
+        ['lcb_test_output', 'pass@1'],
+        '',
+        'Agent',
         ['teval', 'naive_average'],
         ['SciCode', 'accuracy'],
         ['SciCode', 'sub_accuracy'],
-        ['humanevalx', 'naive_average'],
-        ['ds1000', 'naive_average'],
-        ['IFEval', 'Prompt-level-strict-accuracy'],
-        ['gsm8k', 'accuracy'],
-        ['GaokaoBench', 'weighted_average'],
-        ['triviaqa_wiki_1shot', 'score'],
-        ['nq_open_1shot', 'score'],
-        ['hellaswag', 'accuracy'],
-        ['TheoremQA', 'score'],
-        '###### MathBench-A: Application Part ######',
-        'college',
-        'high',
-        'middle',
-        'primary',
-        'arithmetic',
-        'mathbench-a (average)',
-        '###### MathBench-T: Theory Part ######',
-        'college_knowledge',
-        'high_knowledge',
-        'middle_knowledge',
-        'primary_knowledge',
-        'mathbench-t (average)',
-        '###### Overall: Average between MathBench-A and MathBench-T ######',
-        'Overall',
         '',
-        'bbh-logical_deduction_seven_objects',
-        'bbh-multistep_arithmetic_two',
-        ''
         'mmlu',
         'mmlu-stem',
         'mmlu-social-science',
@@ -226,9 +243,6 @@ summarizer = dict(
         'mmlu_pro_psychology',
         'mmlu_pro_other',
         '',
-        'GaokaoBench_2010-2022_Math_II_MCQs',
-        'GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank',
-        '',
         'humanevalx-python',
         'humanevalx-cpp',
         'humanevalx-go',
@@ -242,9 +256,38 @@ summarizer = dict(
         'ds1000_Sklearn',
         'ds1000_Pytorch',
         'ds1000_Matplotlib',
+        '',
+        'mmmlu_lite',
+        'openai_mmmlu_lite_AR-XY',
+        'openai_mmmlu_lite_BN-BD',
+        'openai_mmmlu_lite_DE-DE',
+        'openai_mmmlu_lite_ES-LA',
+        'openai_mmmlu_lite_FR-FR',
+        'openai_mmmlu_lite_HI-IN',
+        'openai_mmmlu_lite_ID-ID',
+        'openai_mmmlu_lite_IT-IT',
+        'openai_mmmlu_lite_JA-JP',
+        'openai_mmmlu_lite_KO-KR',
+        'openai_mmmlu_lite_PT-BR',
+        'openai_mmmlu_lite_SW-KE',
+        'openai_mmmlu_lite_YO-NG',
+        'openai_mmmlu_lite_ZH-CN',
+        '',
+        '###### MathBench-A: Application Part ######',
+        'college',
+        'high',
+        'middle',
+        'primary',
+        'arithmetic',
+        'mathbench-a (average)',
+        '###### MathBench-T: Theory Part ######',
+        'college_knowledge',
+        'high_knowledge',
+        'middle_knowledge',
+        'primary_knowledge',
+        'mathbench-t (average)',
     ],
-    summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
+    summary_groups=summary_groups,
 )
 
 for d in datasets:

@@ -43,11 +43,11 @@ gemma-7b-it-hf:
     race-high: 68.75
 
 gemma-2-9b-it-turbomind:
-    gsm8k: 68.75
+    gsm8k: 65.62
     race-high: 84.38
 
 gemma-7b-it-vllm:
-    gsm8k: 28.12
+    gsm8k: 34.38
     race-high: 68.75
 
 internlm2_5-7b-chat-hf:
@@ -95,7 +95,7 @@ llama-3_1-8b-instruct-turbomind:
     race-high: 90.62
 
 llama-3_2-3b-instruct-turbomind:
-    gsm8k: 65.62
+    gsm8k: 62.50
     race-high: 81.25
 
 llama-3-8b-instruct-turbomind:
@@ -112,15 +112,15 @@ mistral-7b-instruct-v0.3-hf:
 
 mistral-nemo-instruct-2407-hf:
     gsm8k: 75
-    race-high: 84.38
+    race-high: 81.25
 
 mistral-nemo-instruct-2407-turbomind:
-    gsm8k: 75
-    race-high: 84.38
+    gsm8k: 68.75
+    race-high: 87.50
 
 mistral-7b-instruct-v0.1-vllm:
-    gsm8k: 37.5
-    race-high: 71.88
+    gsm8k: 34.38
+    race-high: 68.75
 
 mistral-7b-instruct-v0.2-vllm:
     gsm8k: 43.75
@@ -255,13 +255,13 @@ gemma-7b-hf:
     winogrande: 78.12
 
 gemma-2b-vllm:
-    gsm8k: 18.75
+    gsm8k: 15.62
     GPQA_diamond: 6.25
     race-high:
     winogrande:
 
 gemma-7b-vllm:
-    gsm8k: 59.38
+    gsm8k: 53.12
     GPQA_diamond: 6.25
     race-high:
     winogrande:
