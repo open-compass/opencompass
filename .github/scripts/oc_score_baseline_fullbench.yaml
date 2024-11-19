@@ -2,17 +2,24 @@ internlm2_5-7b-chat-hf_fullbench:
     race-high: 93.75
     ARC-c: 93.75
     BoolQ: 81.25
+    triviaqa_wiki_1shot: 50
+    nq_open_1shot: 25
+    IFEval: 50
     drop: 81.25
     GPQA_diamond: 25
+    hellaswag: 87.5
+    TheoremQA: 18.75
+    musr_average: 39.58
+    gsm8k: 56.25
     math: 75
+    cmo_fib: 6.25
+    aime2024: 6.25
     wikibench-wiki-single_choice_cncircular: 50
     sanitized_mbpp: 68.75
     ds1000: 16.96
-    gsm8k: 56.25
-    triviaqa_wiki_1shot: 50
-    nq_open_1shot: 25
-    hellaswag: 87.5
-    TheoremQA: 18.75
+    lcb_code_generation: 12.5
+    lcb_code_execution: 43.75
+    lcb_test_output: 18.75
     college: 12.5
     college_knowledge: 87.5
     bbh-logical_deduction_seven_objects: 50
