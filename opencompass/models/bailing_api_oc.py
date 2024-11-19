@@ -2,6 +2,7 @@ import concurrent
 import concurrent.futures
 import os
 import socket
+import time
 import traceback
 from typing import Dict, List, Optional, Union
 
@@ -20,8 +21,10 @@ from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
 
+BAILING_RETRY_DELAY: int = 30
 
 class HTTPAdapterWithSocketOptions(HTTPAdapter):
+
 
     def __init__(self, *args, **kwargs):
         self._socket_options = HTTPConnection.default_socket_options + [
@@ -199,6 +202,9 @@ class BailingAPI(BaseAPIModel):
                 if response.status_code == 200:
                     break  # success
                 elif response.status_code == 426:
+                    retry_num += 1  # retry
+                elif response.status_code in [429, 500, 504]:
+                    time.sleep(BAILING_RETRY_DELAY)
                     retry_num += 1  # retry
                 else:
                     raise ValueError(f'Status code = {response.status_code}')
