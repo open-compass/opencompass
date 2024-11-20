@@ -128,7 +128,7 @@ class BailingAPI(BaseAPIModel):
                 ): i
                 for i, input in enumerate(inputs)
             }
-            results = [""] * len(inputs)
+            results = [''] * len(inputs)
             for future in concurrent.futures.as_completed(future_to_m):
                 m = future_to_m[future]  # noqa F841
                 resp = future.result()
@@ -142,7 +142,8 @@ class BailingAPI(BaseAPIModel):
                                 and result['choices'][0].get('message') and
                                 result['choices'][0]['message'].get('content')
                                 is not None):
-                            results[m] = result['choices'][0]['message']['content']
+                            results[m] = \
+                                    result['choices'][0]['message']['content']
         self.flush()
         return results
 
