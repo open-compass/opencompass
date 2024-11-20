@@ -354,7 +354,7 @@ class korbench_GenInferencer(BaseInferencer):
         self.stopping_criteria = stopping_criteria
         self.dump_timer = kwargs.get('dump_timer', False)
         #clean the metadata path
-        metadata_dir = '/home/epsilon/miniforge3/my_opencompass_project/opencompass/outputs/metadata'
+        metadata_dir = f"{os.getenv('BASE_PATH')}/outputs/metadata"
         if os.path.exists(metadata_dir):
             for file in os.listdir(metadata_dir):
                 os.remove(os.path.join(metadata_dir, file))
@@ -381,9 +381,6 @@ class korbench_GenInferencer(BaseInferencer):
 
         # 2. Get results of retrieval process
         ice_idx_list = retriever.retrieve()
-        # TODO: Delete when the issue is fixed
-        if len(ice_idx_list) > 8:
-            ice_idx_list = ice_idx_list[:8]
 
         # 3. Generate prompts for testing input
         prompt_list = self.get_generation_prompt_list_from_retriever_indices(
@@ -474,7 +471,7 @@ class korbench_GenInferencer(BaseInferencer):
                 os.remove(tmp_json_filepath)
 
             # Create metadata directory if it doesn't exist
-            metadata_dir = '/home/epsilon/miniforge3/my_opencompass_project/opencompass/outputs/metadata'
+            metadata_dir = f"{os.getenv('BASE_PATH')}/outputs/metadata"
             os.makedirs(metadata_dir, exist_ok=True)
             # Define metadata file
             metadata_file = os.path.join(metadata_dir, 'metadata.json')

@@ -51,7 +51,7 @@ class korbenchlogicDataset(BaseDataset):
         """
         # Resolve the base path
         base_path = get_data_path(path)
-        fall_back_path = '/home/epsilon/miniforge3/my_opencompass_project/opencompass/data/korbench'
+        fall_back_path = f"{os.getenv('BASE_PATH')}/data/korbench"
         # Find rule and sample files
         rule_file = find_file(base_path, os.path.join("logic", "rule"))
         sample_file = find_file(base_path, os.path.join("logic", "sample"))
@@ -66,7 +66,7 @@ class korbenchlogicDataset(BaseDataset):
         samples = load_json_or_jsonl(sample_file) or []
 
         # Load the prompt template
-        template_path = '/home/epsilon/miniforge3/my_opencompass_project/opencompass/data/korbench/config/prompt/zero-shot.yaml'
+        template_path = f"{os.getenv('BASE_PATH')}/data/korbench/config/prompt/zero-shot.yaml"
         try:
             template = load_yaml(template_path)
         except FileNotFoundError:
@@ -108,8 +108,8 @@ from opencompass.registry import ICL_EVALUATORS
 class korbenchlogicEvaluator(BaseEvaluator):
     def __init__(self, metadata_file=None, output_folder=None):
         super().__init__()
-        self.metadata_file = metadata_file or '/home/epsilon/miniforge3/my_opencompass_project/opencompass/outputs/metadata/metadata.json'
-        self.output_folder = output_folder or '/home/epsilon/miniforge3/my_opencompass_project/opencompass/evaluation_results'
+        self.metadata_file = metadata_file or f"{os.getenv('BASE_PATH')}/outputs/metadata/metadata.json"
+        self.output_folder = output_folder or f"{os.getenv('BASE_PATH')}/evaluation_results"
 
     def load_metadata(self):
         """

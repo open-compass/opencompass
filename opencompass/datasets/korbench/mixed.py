@@ -52,7 +52,7 @@ from opencompass.registry import ICL_EVALUATORS
 from opencompass.datasets.korbench.korbench_utils import evaluate_responses
 
 
-
+#TODO fix the related code for mixed task
 @ICL_EVALUATORS.register_module()
 class korbenchmixedEvaluator(BaseEvaluator):
     def __init__(self, metadata_file=None, output_folder=None):

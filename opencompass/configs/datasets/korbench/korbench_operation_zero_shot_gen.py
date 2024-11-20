@@ -8,9 +8,9 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 # Configuration
-dataset_path = "/home/epsilon/miniforge3/my_opencompass_project/opencompass/data/korbench/operation/zero-shot.jsonl"
-output_path = "/home/epsilon/miniforge3/my_opencompass_project/opencompass/outputs/matrix_scripts/operation/zero-shot"
-metadata_file = "/home/epsilon/miniforge3/my_opencompass_project/opencompass/outputs/metadata/metadata_operation_zero-shot.json"
+dataset_path = f"{os.getenv('BASE_PATH')}/data/korbench/operation/zero-shot.jsonl"
+output_path = f"{os.getenv('BASE_PATH')}/outputs/matrix_scripts/operation/zero-shot"
+metadata_file = f"{os.getenv('BASE_PATH')}/outputs/metadata/metadata_operation_zero-shot.json"
 mode = "zero-shot"
 
 # Ensure output directories exist

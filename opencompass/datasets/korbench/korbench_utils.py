@@ -86,7 +86,7 @@ def read_yaml(config='default'):
     Read a YAML file and return its content.
     """
     # Construct the YAML file path
-    yaml_file = os.path.join("/home/epsilon/miniforge3/my_opencompass_project/opencompass/data/korbench/config/prompt", f"{config}.yaml")
+    yaml_file = os.path.join(f"{os.getenv('BASE_PATH')}/data/korbench/config/prompt", f"{config}.yaml")
 
     # Try the fallback path first
     if os.path.exists(yaml_file):

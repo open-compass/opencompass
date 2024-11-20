@@ -19,7 +19,7 @@ from tqdm import tqdm
 
 
 # Define the fallback base path
-FALLBACK_BASE_PATH = "/home/epsilon/miniforge3/my_opencompass_project/opencompass/data/korbench"
+FALLBACK_BASE_PATH = f"{os.getenv('BASE_PATH')}/data/korbench"
 
 
 def load_yaml(yaml_path):
@@ -115,7 +115,7 @@ def read_yaml(config='default'):
     Read a YAML file and return its content.
     """
     # Construct the YAML file path
-    yaml_file = os.path.join("/home/epsilon/miniforge3/my_opencompass_project/opencompass/data/korbench/config/prompt", f"{config}.yaml")
+    yaml_file = os.path.join(f"{os.getenv('BASE_PATH')}/data/korbench/config/prompt", f"{config}.yaml")
 
     # Try the fallback path first
     if os.path.exists(yaml_file):
@@ -283,9 +283,9 @@ MIXED_MODES = ["Multi-Q", "Multi-R", "Multi-RQ"]
 class korbenchEvaluator(BaseEvaluator):
     def __init__(self, metadata_file=None, output_folder=None, csv_file=None):
         super().__init__()
-        self.metadata_file = metadata_file or '/home/epsilon/miniforge3/my_opencompass_project/opencompass/outputs/metadata/metadata.json'
-        self.output_folder = output_folder or '/home/epsilon/miniforge3/my_opencompass_project/opencompass/evaluation_results'
-        self.csv_file = csv_file or '/home/epsilon/miniforge3/my_opencompass_project/opencompass/evaluation_results/summary.csv'
+        self.metadata_file = metadata_file or f"{os.getenv('BASE_PATH')}/outputs/metadata/metadata.json"
+        self.output_folder = output_folder or f"{os.getenv('BASE_PATH')}/evaluation_results"
+        self.csv_file = csv_file or f"{os.getenv('BASE_PATH')}/evaluation_results/summary.csv"
 
     def load_metadata(self):
         """Load metadata to get prediction file paths."""
