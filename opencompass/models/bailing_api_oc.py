@@ -128,7 +128,7 @@ class BailingAPI(BaseAPIModel):
                 ): i
                 for i, input in enumerate(inputs)
             }
-            results = []
+            results = [""] * len(inputs)
             for future in concurrent.futures.as_completed(future_to_m):
                 m = future_to_m[future]  # noqa F841
                 resp = future.result()
@@ -136,16 +136,13 @@ class BailingAPI(BaseAPIModel):
                     try:
                         result = resp.json()
                     except Exception as e:  # noqa F841
-                        results.append('')
+                        pass
                     else:
                         if (result.get('choices')
                                 and result['choices'][0].get('message') and
                                 result['choices'][0]['message'].get('content')
                                 is not None):
-                            results.append(
-                                result['choices'][0]['message']['content'])
-                else:
-                    results.append('')
+                            results[m] = result['choices'][0]['message']['content']
         self.flush()
         return results
 
