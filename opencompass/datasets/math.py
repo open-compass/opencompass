@@ -568,3 +568,4 @@ class MATHAgentEvaluator(MATHEvaluator):
             action_pct=100 * (action_scope + final_scope) / total,
         )
         return result
+

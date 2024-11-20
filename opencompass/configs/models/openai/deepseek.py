@@ -7,9 +7,9 @@ api_meta_template = dict(round=[
 
 models = [
     dict(
-        abbr='GPT-4o-2024-05-13',
+        abbr='deepseek-ai/DeepSeek-V2.5',
         type=OpenAI,
-        path='gpt-4o-2024-05-13',
+        path='deepseek-ai/DeepSeek-V2.5',
         key=
         'ENV',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
         meta_template=api_meta_template,
@@ -18,5 +18,3 @@ models = [
         max_seq_len=4096,
         batch_size=8),
 ]
-
-
