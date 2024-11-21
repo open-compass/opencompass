@@ -87,6 +87,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
     def generate(self,
                  inputs: List[str],
                  max_out_len: int,
+                 min_out_len: Optional[int] = None,
                  stopping_criteria: List[str] = [],
                  do_sample: Optional[bool] = None,
                  temperature: float = 1.0,
@@ -123,6 +124,10 @@ class TurboMindModelwithChatTemplate(BaseModel):
 
         gen_config = copy.deepcopy(DEFAULT_GEN_CONFIG)
         gen_config.update(self.gen_config)
+        if max_out_len is not None:
+            gen_config['max_new_tokens'] = max_out_len
+        if min_out_len is not None:
+            gen_config['min_new_tokens'] = min_out_len
         if do_sample or ('do_sample' in self.gen_config and self.gen_config['do_sample']):
             gen_config['top_k'] = 40
             gen_config['temperature'] = temperature

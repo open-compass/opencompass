@@ -526,7 +526,7 @@ class OpenAISDK(OpenAI):
 
     def _generate(self, input: PromptList | str, max_out_len: int,
                   temperature: float) -> str:
-        from openai import BadRequestError
+        from openai import APIStatusError, BadRequestError
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097
@@ -616,7 +616,7 @@ class OpenAISDK(OpenAI):
                             from the API provider.')
                 return responses.choices[0].message.content
 
-            except BadRequestError as e:
+            except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status
                 # You can specify self.status_code_mappings to bypass \
                 # API sensitivity blocks
