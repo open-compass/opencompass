@@ -163,9 +163,9 @@ jobs:
             pip install /cpfs01/user/qa-llm-cicd/packages/lmdeploy-0.6.1+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install /cpfs01/user/qa-llm-cicd/packages/vllm-0.6.1.post1+cu118-cp310-cp310-manylinux1_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             pip uninstall torch torchvision torchaudio -y
-            pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
-            FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu118torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
-            pip install /cpfs01/user/qa-llm-cicd/packages/xformers-0.0.27.post2+cu118-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --cache-dir ${{env.PIP_CACHE_PATH}} --index-url https://download.pytorch.org/whl/cu118
+            FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.7.0.post2+cu11torch2.5cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+            pip install /cpfs01/user/qa-llm-cicd/packages/xformers-0.0.28.post3-cp310-cp310-manylinux_2_28_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             conda info --envs
             pip list
       - name: Prepare - create conda env and install torch - cu12
@@ -183,9 +183,9 @@ jobs:
             pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
-            pip install torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 --cache-dir ${{env.PIP_CACHE_PATH}}
-            FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.6.3+cu123torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
-            pip install /cpfs01/user/qa-llm-cicd/packages/xformers-0.0.27.post2-cp310-cp310-manylinux2014_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --cache-dir ${{env.PIP_CACHE_PATH}}
+            FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /cpfs01/user/qa-llm-cicd/packages/flash_attn-2.7.0.post2+cu12torch2.5cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+            pip install /cpfs01/user/qa-llm-cicd/packages/xformers-0.0.28.post3-cp310-cp310-manylinux_2_28_x86_64.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             conda info --envs
             pip list
       - name: Prepare - reinstall lmdeploy - cu12

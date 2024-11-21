@@ -2,19 +2,24 @@ internlm2_5-7b-chat-hf_fullbench:
     race-high: 93.75
     ARC-c: 93.75
     BoolQ: 81.25
+    triviaqa_wiki_1shot: 50
+    nq_open_1shot: 25
+    IFEval: 50
     drop: 81.25
     GPQA_diamond: 25
+    hellaswag: 87.5
+    TheoremQA: 18.75
+    musr_average: 39.58
+    gsm8k: 56.25
     math: 75
+    cmo_fib: 6.25
+    aime2024: 6.25
     wikibench-wiki-single_choice_cncircular: 50
     sanitized_mbpp: 68.75
     ds1000: 16.96
-    gsm8k: 56.25
-    triviaqa_wiki_1shot: 50
-    nq_open_1shot: 25
-    hellaswag: 87.5
-    TheoremQA: 18.75
-    college: 12.5
-    college_knowledge: 87.5
+    lcb_code_generation: 12.5
+    lcb_code_execution: 43.75
+    lcb_test_output: 18.75
     bbh-logical_deduction_seven_objects: 50
     bbh-multistep_arithmetic_two: 68.75
     mmlu-other: 72.6
@@ -27,6 +32,9 @@ internlm2_5-7b-chat-hf_fullbench:
     ds1000_Sklearn: 18.75
     ds1000_Pytorch: 12.5
     ds1000_Matplotlib: 43.75
+    openai_mmmlu_lite_AR-XY: 37.5
+    college: 12.5
+    college_knowledge: 87.5
     Alignbench总分: 0.65
     Alignbench专业能力: 7.83
     AlpacaEvaltotal: 0
@@ -56,19 +64,24 @@ internlm2_5-7b-chat-turbomind_fullbench:
     race-high: 93.75
     ARC-c: 87.5
     BoolQ: 68.75
+    triviaqa_wiki_1shot: 50
+    nq_open_1shot: 25
+    IFEval: 50
     drop: 75
-    GPQA_diamond: 25
+    hellaswag: 81.25
+    TheoremQA: 6.25
+    musr_average: 39.58
+    gsm8k: 68.75
     math: 75
+    GPQA_diamond: 25
+    cmo_fib: 6.25
+    aime2024: 6.25
     wikibench-wiki-single_choice_cncircular: 25
     sanitized_mbpp: 68.75
     ds1000: 13.39
-    gsm8k: 68.75
-    triviaqa_wiki_1shot: 50
-    nq_open_1shot: 25
-    hellaswag: 81.25
-    TheoremQA: 6.25
-    college: 0
-    college_knowledge: 87.5
+    lcb_code_generation: 12.5
+    lcb_code_execution: 43.75
+    lcb_test_output: 12.5
     bbh-logical_deduction_seven_objects: 56.25
     bbh-multistep_arithmetic_two: 68.75
     mmlu-other: 74.04
@@ -81,6 +94,9 @@ internlm2_5-7b-chat-turbomind_fullbench:
     ds1000_Sklearn: 18.75
     ds1000_Pytorch: 6.25
     ds1000_Matplotlib: 37.5
+    openai_mmmlu_lite_AR-XY: 37.5
+    college: 0
+    college_knowledge: 87.5
     Alignbench总分: 0.64
     Alignbench专业能力: 7.6
     AlpacaEvaltotal: 10
@@ -121,6 +137,8 @@ internlm2_5-7b-hf_fullbench:
     winogrande: 75
     hellaswag: 93.75
     TheoremQA: 25
+    dingo_en_192: 37.5
+    dingo_zh_170: 100
     college: 12.5
     college_knowledge: 87.5
     bbh-logical_deduction_seven_objects: 43.75
@@ -144,6 +162,8 @@ internlm2_5-7b-turbomind_fullbench:
     winogrande: 87.5
     hellaswag: 93.75
     TheoremQA: 31.25
+    dingo_en_192: 43.75
+    dingo_zh_170: 100
     college: 12.5
     college_knowledge: 87.5
     bbh-logical_deduction_seven_objects: 50

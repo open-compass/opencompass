@@ -131,14 +131,16 @@ class TestChatObjFullbench:
         'internlm2_5-7b-chat-hf_fullbench',
         'internlm2_5-7b-chat-turbomind_fullbench'
     ] for p2 in [
-        'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
+        'race-high', 'ARC-c', 'BoolQ', 'triviaqa_wiki_1shot', 'nq_open_1shot',
+        'IFEval', 'drop', 'GPQA_diamond', 'hellaswag', 'TheoremQA',
+        'musr_average', 'gsm8k', 'math', 'cmo_fib', 'aime2024',
         'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'ds1000',
-        'gsm8k', 'triviaqa_wiki_1shot', 'nq_open_1shot', 'hellaswag',
-        'TheoremQA', 'college', 'college_knowledge',
+        'lcb_code_generation', 'lcb_code_execution', 'lcb_test_output',
         'bbh-logical_deduction_seven_objects', 'bbh-multistep_arithmetic_two',
         'mmlu-other', 'cmmlu-china-specific', 'mmlu_pro_math', 'ds1000_Pandas',
         'ds1000_Numpy', 'ds1000_Tensorflow', 'ds1000_Scipy', 'ds1000_Sklearn',
-        'ds1000_Pytorch', 'ds1000_Matplotlib'
+        'ds1000_Pytorch', 'ds1000_Matplotlib', 'openai_mmmlu_lite_AR-XY',
+        'college', 'college_knowledge'
     ]])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
@@ -188,9 +190,10 @@ class TestBaseFullbench:
         'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
         'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'gsm8k',
         'triviaqa_wiki_1shot', 'nq_open_1shot', 'winogrande', 'hellaswag',
-        'TheoremQA', 'college', 'college_knowledge',
-        'bbh-logical_deduction_seven_objects', 'bbh-multistep_arithmetic_two',
-        'mmlu-other', 'cmmlu-china-specific', 'mmlu_pro_math'
+        'TheoremQA', 'dingo_en_192', 'dingo_zh_170', 'college',
+        'college_knowledge', 'bbh-logical_deduction_seven_objects',
+        'bbh-multistep_arithmetic_two', 'mmlu-other', 'cmmlu-china-specific',
+        'mmlu_pro_math'
     ]])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
