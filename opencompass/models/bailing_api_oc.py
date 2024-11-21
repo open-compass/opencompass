@@ -186,7 +186,7 @@ class BailingAPI(BaseAPIModel):
             self._model,
             'messages':
             messages,
-            'max_seq_len':
+            'max_tokens':
             max(
                 max_out_len if max_out_len else 4096,
                 self.max_seq_len if self.max_seq_len else 4096,
