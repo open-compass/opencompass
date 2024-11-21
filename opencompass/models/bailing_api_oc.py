@@ -137,7 +137,8 @@ class BailingAPI(BaseAPIModel):
                         result = resp.json()
                     except Exception as e:  # noqa F841
                         self.logger.error(f'Fail to inference; '
-                                          f'model_name={self.path};  error={e}, '
+                                          f'model_name={self.path}; '
+                                          f'error={e}, '
                                           f'request={inputs[m]}')
                     else:
                         if (result.get('choices')
