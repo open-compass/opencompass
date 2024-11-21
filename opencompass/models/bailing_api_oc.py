@@ -203,7 +203,7 @@ class BailingAPI(BaseAPIModel):
             while retry_num < self.retry:
                 try:
                     response = self._infer_result(request, sess)
-                except ConnectionError as e:
+                except ConnectionError:
                     time.sleep(BAILING_RETRY_DELAY)
                     retry_num += 1  # retry
                 if response.status_code == 200:
