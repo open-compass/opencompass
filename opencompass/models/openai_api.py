@@ -625,12 +625,10 @@ class OpenAISDK(OpenAI):
                 status_code = e.status_code
                 if (status_code is not None
                         and status_code in self.status_code_mappings):
-                    original_error_message = e.body.get('message')
                     error_message = self.status_code_mappings[status_code]
-                    self.logger.info(
-                        f'Status Code: {status_code}, '
-                        f'Original Error Message: {original_error_message},'
-                        f'Return Message: {error_message} ')
+                    self.logger.info(f'Status Code: {status_code},\n'
+                                     f'Original Error Message: {e},\n'
+                                     f'Return Message: {error_message} ')
                     return error_message
                 else:
                     self.logger.error(e)
