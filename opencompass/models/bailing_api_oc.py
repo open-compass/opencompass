@@ -201,7 +201,11 @@ class BailingAPI(BaseAPIModel):
         try:
             retry_num = 0
             while retry_num < self.retry:
-                response = self._infer_result(request, sess)
+                try:
+                    response = self._infer_result(request, sess)
+                except ConnectionError as e:
+                    time.sleep(BAILING_RETRY_DELAY)
+                    retry_num += 1  # retry
                 if response.status_code == 200:
                     break  # success
                 elif response.status_code == 426:
@@ -217,8 +221,7 @@ class BailingAPI(BaseAPIModel):
                     f'= {response.status_code}')
         except Exception as e:
             self.logger.error(f'Fail to inference request={request}; '
-                              f'model_name={self.path};  error={e}, '
-                              f'stack:{traceback.format_exc()}')
+                              f'model_name={self.path};  error={e}')
             raise e
         return response
 
