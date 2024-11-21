@@ -3,11 +3,11 @@ import concurrent.futures
 import os
 import socket
 import time
-import traceback
 from typing import Dict, List, Optional, Union
 
 import requests
 from requests.adapters import HTTPAdapter
+from requests.exceptions import ConnectionError
 from urllib3.connection import HTTPConnection
 
 try:
@@ -104,7 +104,7 @@ class BailingAPI(BaseAPIModel):
     def generate(
         self,
         inputs: Union[List[str], PromptList],
-        max_out_len: int = 4096,
+        max_out_len: int = 11264,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -193,15 +193,9 @@ class BailingAPI(BaseAPIModel):
                     message['role'] = item['role']
                 messages.append(message)
         request = {
-            'model':
-            self._model,
-            'messages':
-            messages,
-            'max_tokens':
-            max(
-                max_out_len if max_out_len else 4096,
-                self.max_seq_len if self.max_seq_len else 4096,
-            ),
+            'model': self._model,
+            'messages': messages,
+            'max_tokens': 11264
         }
         request.update(self.generation_kwargs)
         try:
