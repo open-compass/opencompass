@@ -136,7 +136,9 @@ class BailingAPI(BaseAPIModel):
                     try:
                         result = resp.json()
                     except Exception as e:  # noqa F841
-                        pass
+                        self.logger.error(f'Fail to inference; '
+                                          f'model_name={self.path};  error={e}, '
+                                          f'request={inputs[m]}')
                     else:
                         if (result.get('choices')
                                 and result['choices'][0].get('message') and
@@ -144,6 +146,14 @@ class BailingAPI(BaseAPIModel):
                                 is not None):
                             results[m] = \
                                     result['choices'][0]['message']['content']
+                        else:
+                            self.logger.error(f'Receive invalid result. '
+                                              f'result={result}; '
+                                              f'request={inputs[m]}')
+                else:
+                    self.logger.error(f'Receive invalid response. '
+                                      f'response={resp}; '
+                                      f'request={inputs[m]}')
         self.flush()
         return results
 
