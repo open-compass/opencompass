@@ -198,31 +198,25 @@ class BailingAPI(BaseAPIModel):
             'max_tokens': 11264
         }
         request.update(self.generation_kwargs)
-        try:
-            retry_num = 0
-            while retry_num < self.retry:
-                try:
-                    response = self._infer_result(request, sess)
-                except ConnectionError:
-                    time.sleep(BAILING_RETRY_DELAY)
-                    retry_num += 1  # retry
-                if response.status_code == 200:
-                    break  # success
-                elif response.status_code == 426:
-                    retry_num += 1  # retry
-                elif response.status_code in [302, 429, 500, 504]:
-                    time.sleep(BAILING_RETRY_DELAY)
-                    retry_num += 1  # retry
-                else:
-                    raise ValueError(f'Status code = {response.status_code}')
+        retry_num = 0
+        while retry_num < self.retry:
+            try:
+                response = self._infer_result(request, sess)
+            except ConnectionError:
+                time.sleep(BAILING_RETRY_DELAY)
+                retry_num += 1  # retry
+            if response.status_code == 200:
+                break  # success
+            elif response.status_code == 426:
+                retry_num += 1  # retry
+            elif response.status_code in [302, 429, 500, 504]:
+                time.sleep(BAILING_RETRY_DELAY)
+                retry_num += 1  # retry
             else:
-                raise ValueError(
-                    f'Exceed the maximal retry times. Last status code '
-                    f'= {response.status_code}')
-        except Exception as e:
-            self.logger.error(f'Fail to inference request={request}; '
-                              f'model_name={self.path};  error={e}')
-            raise e
+                raise ValueError(f'Status code = {response.status_code}')
+        else:
+            # Exceed the maximal retry times.
+            return ''
         return response
 
     # @retry(stop_max_attempt_number=3, wait_fixed=16000)  # ms
