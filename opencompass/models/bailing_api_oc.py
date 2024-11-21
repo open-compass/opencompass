@@ -201,7 +201,7 @@ class BailingAPI(BaseAPIModel):
                     break  # success
                 elif response.status_code == 426:
                     retry_num += 1  # retry
-                elif response.status_code in [429, 500, 504]:
+                elif response.status_code in [302, 429, 500, 504]:
                     time.sleep(BAILING_RETRY_DELAY)
                     retry_num += 1  # retry
                 else:
