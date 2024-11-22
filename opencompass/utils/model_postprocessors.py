@@ -24,7 +24,7 @@ def gen_output_naive(ori_data, extractor):
 
 
 @TEXT_POSTPROCESSORS.register_module('naive')
-def navie_model_postprocess(preds: list,
+def naive_model_postprocess(preds: list,
                             model_name: str,
                             custom_instruction: str,
                             api_url: Union[str, list],
