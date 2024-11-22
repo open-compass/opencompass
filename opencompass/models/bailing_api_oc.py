@@ -1,6 +1,7 @@
 import concurrent
 import concurrent.futures
 import os
+import random
 import socket
 import time
 from typing import Dict, List, Optional, Union
@@ -20,8 +21,6 @@ from opencompass.utils.prompt import PromptList
 from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
-
-BAILING_RETRY_DELAY: int = 30
 
 
 class HTTPAdapterWithSocketOptions(HTTPAdapter):
@@ -203,7 +202,7 @@ class BailingAPI(BaseAPIModel):
             try:
                 response = self._infer_result(request, sess)
             except ConnectionError:
-                time.sleep(BAILING_RETRY_DELAY)
+                time.sleep(random.randint(10, 30))
                 retry_num += 1  # retry
                 continue
             if response.status_code == 200:
@@ -211,7 +210,7 @@ class BailingAPI(BaseAPIModel):
             elif response.status_code == 426:
                 retry_num += 1  # retry
             elif response.status_code in [302, 429, 500, 504]:
-                time.sleep(BAILING_RETRY_DELAY)
+                time.sleep(random.randint(10, 30))
                 retry_num += 1  # retry
             else:
                 raise ValueError(f'Status code = {response.status_code}')
