@@ -195,7 +195,7 @@ class BailingAPI(BaseAPIModel):
         request = {
             'model': self._model,
             'messages': messages,
-            'max_tokens': 11264
+            'max_tokens': max_out_len,
         }
         request.update(self.generation_kwargs)
         retry_num = 0
