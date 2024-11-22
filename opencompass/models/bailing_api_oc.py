@@ -205,6 +205,7 @@ class BailingAPI(BaseAPIModel):
             except ConnectionError:
                 time.sleep(BAILING_RETRY_DELAY)
                 retry_num += 1  # retry
+                continue
             if response.status_code == 200:
                 break  # success
             elif response.status_code == 426:
