@@ -27,7 +27,6 @@ models = [
             'top_k': -1,
             'n': 1,
             'logprobs': 1,
-            'use_beam_search': False,
         },
     ),
 ]
