@@ -2,8 +2,6 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MATHDataset, GaoKaoMATHEvaluator
-from opencompass.utils.model_postprocessors import naive_model_postprocess
-from opencompass.utils.postprocessors.naive import MATH_NAVIE_PROMPT_TEMPLATE
 
 # ----------------------------- Eval Parameters -----------------------------
 ## Postprocess info
@@ -28,22 +26,18 @@ math_infer_cfg = dict(
     inferencer=dict(type=GenInferencer, max_out_len=2048),
 )
 
-pred_postprocessor = dict(
-    type=naive_model_postprocess,
-    custom_instruction=MATH_NAVIE_PROMPT_TEMPLATE,
-    model_name=naive_model_name,
-    num_processes=128,
-    api_url=naive_model_url,
-)
-
 evaluator = dict(
     type=GaoKaoMATHEvaluator,
     model_name=naive_model_name,
     url=naive_model_url,
+    language='en',
+    with_postprocess=True,
+    post_url=naive_model_url,
+    post_model_name=naive_model_name,
 )
 
 math_eval_cfg = dict(
-    evaluator=evaluator, model_postprocessor=pred_postprocessor,
+    evaluator=evaluator,
 )
 
 math_datasets = [

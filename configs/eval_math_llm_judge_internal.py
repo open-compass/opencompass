@@ -18,8 +18,8 @@ models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 for dataset in datasets:
     dataset['eval_cfg']['evaluator']['model_name'] = eval_model_name
     dataset['eval_cfg']['evaluator']['url'] = eval_model_urls
-    dataset['eval_cfg']['model_postprocessor']['api_url'] = postprocessor_model_urls
-    dataset['eval_cfg']['model_postprocessor']['model_name'] = postprocessor_model_name
+    dataset['eval_cfg']['evaluator']['post_url'] = postprocessor_model_urls
+    dataset['eval_cfg']['evaluator']['post_model_name'] = postprocessor_model_name
 
 
 # -------------Inferen Stage ----------------------------------------
