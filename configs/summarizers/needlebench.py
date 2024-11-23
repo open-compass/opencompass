@@ -138,6 +138,10 @@ needlebench_256k_summarizer = create_summarizer(context_lengths_256k, depths_lis
 context_lengths_1000k = list([20000, 160000, 300000, 440000, 580000, 720000, 860000, 1000000])
 needlebench_1000k_summarizer = create_summarizer(context_lengths_1000k, depths_list_sparse, '1000k')
 
+depths_list_internal = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, ]
+needlebench_internal_32k_summarizer = create_summarizer([32000], depths_list_internal, '32000')
+needlebench_internal_100k_summarizer = create_summarizer([100000], depths_list_internal, '100000')
+needlebench_internal_200k_summarizer = create_summarizer([200000], depths_list_internal, '200000')
 
 _needlebench_8k_parallel_en_batch1 = []
 _needlebench_8k_parallel_en_batch5 = []

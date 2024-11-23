@@ -10,6 +10,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -19,6 +20,7 @@ class DingoDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         raw_data = []
         with open(path, encoding='utf-8') as f:
             reader = csv.reader(f, delimiter=';')
@@ -34,6 +36,7 @@ class DingoLongDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         raw_data = []
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -46,7 +49,6 @@ class DingoEvaluator(BaseEvaluator):
 
     def score(self, origin_prompt: List, predictions: List) -> dict:
         try:
-            # from dingo.model.model import Model
             from dingo.exec import Executor
             from dingo.io import InputArgs
         except Exception:
@@ -58,27 +60,30 @@ class DingoEvaluator(BaseEvaluator):
         current_time = time.strftime('%Y%m%d_%H%M%S', time.localtime())
         file_data = [{'prompt': pmt, 'prediction': prd}
                      for pmt, prd in zip(origin_prompt, predictions)]
-        file_name = 'dingo_file_' + current_time + '.jsonl'
+        os.makedirs('tmp', exist_ok=True)
+        file_name = os.path.join('tmp', 'dingo_file_' + current_time + '.jsonl')  # noqa: E501
+
         with open(file_name, 'a', encoding='utf-8') as f:
             for d in file_data:
                 json.dump(d, f, ensure_ascii=False)
                 f.write('\n')
-
         input_data = {
-            'eval_models': ['llm_base'],
+            'eval_model': 'llm_base',
             'input_path': file_name,
             'output_path': './outputs/dingo/',
+            'save_data': True,
             'dataset': 'local',
-            'datasource': 'local',
             'data_format': 'jsonl',
-            'column_prompt': ['prompt'],
-            'column_content': ['prediction'],
+            'column_prompt': 'prompt',
+            'column_content': 'prediction',
         }
-        # Model.apply_config(input_data["custom_config_path"])
-        input_args = InputArgs(**input_data)
-        executor = Executor.exec_map['local'](input_args)
-        result = executor.execute()
-        summary = result[0].to_dict()
-
-        os.remove(file_name)
+        try:
+            input_args = InputArgs(**input_data)
+            executor = Executor.exec_map['local'](input_args)
+            result = executor.execute()
+            summary = result[0].to_dict()
+        except Exception:
+            raise
+        finally:
+            os.remove(file_name)
         return summary

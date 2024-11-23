@@ -167,6 +167,10 @@ class DLCRunner(BaseRunner):
 
             # set priority to 1 as default
             task_priority = self.aliyun_cfg.get('priority', 1)
+            worker_cpu = self.aliyun_cfg.get('worker_cpu', 12)
+            worker_memory = self.aliyun_cfg.get('worker_memory', 192)
+            config_path = (f" --config {self.aliyun_cfg['dlc_config_path']}"
+                           if 'dlc_config_path' in self.aliyun_cfg else '')
 
             # Different dlc versions has different commands
             if self.aliyun_cfg.get('dlc_job_cmd') == 'create':
@@ -179,14 +183,14 @@ class DLCRunner(BaseRunner):
                 f'dlc {dlc_job_cmd}'
                 f" --command '{shell_cmd}'"
                 f' --name {task_name[:512]}'
-                f" --config {self.aliyun_cfg['dlc_config_path']}"
+                f'{config_path}'
                 f" --workspace_id {self.aliyun_cfg['workspace_id']}"
                 f" --resource_id={self.aliyun_cfg['resource_id']}"
                 f' --priority {task_priority}'
                 f'{worker_cmd}'
-                f' --worker_cpu {max(num_gpus * 8, 12)}'
+                f' --worker_cpu {max(num_gpus * 8, worker_cpu)}'
                 f' --worker_gpu {num_gpus}'
-                f' --worker_memory {max(num_gpus * 128, 192)}Gi'
+                f' --worker_memory {max(num_gpus * 128, worker_memory)}Gi'
                 f" --worker_image {self.aliyun_cfg['worker_image']}"
                 f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}")
             get_cmd = partial(task.get_command,
@@ -253,8 +257,15 @@ class DLCRunner(BaseRunner):
                     for retry_index in range(num_retry):
                         time.sleep(2)
                         try:
-                            job_info = json.loads(
-                                subprocess.getoutput(f'dlc get job {job_id}'))
+                            raw_job_info = subprocess.getoutput(
+                                f'dlc get job {job_id}{config_path}')
+                            if raw_job_info.startswith(
+                                    '/bin/bash') or raw_job_info.startswith(
+                                        '[OK]') or raw_job_info.startswith(
+                                            '[FAILED]'):
+                                raw_job_info = raw_job_info[raw_job_info.
+                                                            index('\n') + 1:]
+                            job_info = json.loads(raw_job_info)
                             break
                         except:  # noqa: E722
                             if retry_index > num_retry // 3:
@@ -287,7 +298,7 @@ class DLCRunner(BaseRunner):
                                 elasped_time).strftime('%Y-%m-%dT%H:%M:%SZ')
                     logs_cmd = ('dlc logs'
                                 f' {job_id} {job_id}-master-0'
-                                f" -c {self.aliyun_cfg['dlc_config_path']}"
+                                f'{config_path}'
                                 f' --start_time {pri_time}'
                                 f' --end_time {cur_time}')
                     try:
