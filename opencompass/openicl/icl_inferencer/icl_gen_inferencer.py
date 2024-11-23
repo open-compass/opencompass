@@ -19,8 +19,8 @@ from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
 from ..utils.logging import get_logger
 from .icl_base_inferencer import BaseInferencer, GenInferencerOutputHandler
-logger = get_logger(__name__)
 
+logger = get_logger(__name__)
 
 
 @ICL_INFERENCERS.register_module()

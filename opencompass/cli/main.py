@@ -223,6 +223,7 @@ def main():
         args.debug = True
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
+
     cfg = get_config_from_arg(args)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
