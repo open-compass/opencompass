@@ -8,6 +8,4 @@ with read_base():
     from opencompass.configs.summarizers.groups.korbench import summarizer
 
 datasets = zero_shot_datasets + three_shot_datasets + mixed_datasets
-for dataset in datasets:
-    dataset['reader_cfg']['test_range'] = '[0:8]'
 models = gpt4
