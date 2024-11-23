@@ -1,0 +1,40 @@
+summarizer = dict(
+    dataset_abbrs = [
+        'korbench_cipher_0_shot', 
+        'korbench_counterfactual_0_shot', 
+        'korbench_logic_0_shot', 
+        'korbench_operation_0_shot', 
+        'korbench_puzzle_0_shot',
+        'korbench_cipher_subquestions_0_shot',
+        'korbench_cipher_3_shot',
+        'korbench_counterfactual_3_shot',
+        'korbench_logic_3_shot',
+        'korbench_operation_3_shot',
+        'korbench_puzzle_3_shot',
+        'korbench_mixed_Multi-Q',
+        'korbench_mixed_Multi-R',
+        'korbench_mixed_Multi-RQ',
+        'korbench_average'
+    ],
+    summary_groups = [
+        {
+            'name':'korbench_average',
+            'subsets':[
+                'korbench_cipher_0_shot', 
+                'korbench_counterfactual_0_shot', 
+                'korbench_logic_0_shot', 
+                'korbench_operation_0_shot', 
+                'korbench_puzzle_0_shot',
+                'korbench_cipher_subquestions_0_shot',
+                'korbench_cipher_3_shot',
+                'korbench_counterfactual_3_shot',
+                'korbench_logic_3_shot',
+                'korbench_operation_3_shot',
+                'korbench_puzzle_3_shot',
+                'korbench_mixed_Multi-Q',
+                'korbench_mixed_Multi-R',
+                'korbench_mixed_Multi-RQ',
+            ],
+        }
+    ],
+)

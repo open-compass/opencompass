@@ -13,4 +13,3 @@ from .icl_ppl_only_inferencer import PPLOnlyInferencer  # noqa
 from .icl_sc_inferencer import SCInferencer  # noqa
 from .icl_sw_ce_loss_inferencer import SWCELossInferencer  # noqa
 from .icl_tot_inferencer import ToTInferencer  # noqa
-from .icl_gen_inferencer import SelfCorrectingGenInferencer, korbench_GenInferencer  # noqa

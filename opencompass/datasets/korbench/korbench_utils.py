@@ -10,7 +10,6 @@ from tqdm import tqdm
 import yaml
 
 
-
 def load_yaml(yaml_path):
     """
     Load a YAML file.
@@ -43,6 +42,32 @@ def find_file(base_path, sub_path, extensions=('json', 'jsonl')):
             return file_path
     return None
 
+
+def load_json_or_jsonl_with_idx(data_path, split='', idx=None):
+    base_path = os.path.join(data_path, split)
+    if os.path.exists(f'{base_path}.json'):
+        file_path = f'{base_path}.json'
+    elif os.path.exists(f'{base_path}.jsonl'):
+        file_path = f'{base_path}.jsonl'
+    elif base_path.endswith('.json') or base_path.endswith('.jsonl'):
+        file_path = base_path
+    else:
+        raise FileNotFoundError("No JSON or JSONL file found.")
+    
+    with open(file_path, 'r', encoding='utf-8') as file:
+        if file_path.endswith('.json'):
+            data = json.load(file)
+        elif file_path.endswith('.jsonl'):
+            data = [json.loads(line) for line in file]
+    
+    if idx is not None:
+        try:
+            return next(item for item in data if item.get('idx') == idx)
+        except StopIteration:
+            raise ValueError(f"No entry found for idx {idx}")
+    else:
+        return data
+    
 def load_split_data(base_path, split_name):
     """
     Load the rule and sample data for a specific split.
@@ -79,72 +104,6 @@ def process_mixed_data(base_path, mode):
     
     return processed
 
-
-
-def read_yaml(config='default'):
-    """
-    Read a YAML file and return its content.
-    """
-    # Construct the YAML file path
-    yaml_file = os.path.join(f"{os.getenv('BASE_PATH')}/data/korbench/config/prompt", f"{config}.yaml")
-
-    # Try the fallback path first
-    if os.path.exists(yaml_file):
-        pass
-    else:
-        raise FileNotFoundError(f"No YAML configuration file found for '{config}' in either 'config/prompt/' or fallback path.")
-
-    # Load and return YAML content
-    with open(yaml_file, 'r') as file:
-        return yaml.safe_load(file)
-
-def read_json_or_jsonl(base_path, split='', mapping_key=None):
-    """
-    Read data from a JSON or JSONL file, prioritizing the fallback path.
-    """
-    # Construct the full path
-    if split:
-        base_path = os.path.join(base_path, split)
-    else:
-        base_path = base_path
-
-    # Try the fallback path first
-    fallback_base_path = os.path.join(FALLBACK_BASE_PATH, split)
-    file_paths = [
-        f'{fallback_base_path}.json',
-        f'{fallback_base_path}.jsonl',
-        f'{base_path}.json',
-        f'{base_path}.jsonl'
-    ]
-
-    for file_path in file_paths:
-        if os.path.exists(file_path):
-            with open(file_path, 'r', encoding='utf-8') as file:
-                if file_path.endswith('.json'):
-                    data = json.load(file)
-                elif file_path.endswith('.jsonl'):
-                    data = [json.loads(line) for line in file]
-                if mapping_key:
-                    return {item[mapping_key]: item for item in data if mapping_key in item}
-                else:
-                    return data
-
-    # Log the missing file and return an empty list
-    print(f"[WARNING] No JSON or JSONL file found for '{split}' in {base_path} or fallback path.")
-    return []
-
-def read_json_or_jsonl_with_idx(base_path, split='', idx=None):
-    """
-    Read data from a JSON/JSONL file and find an entry with a specific index, prioritizing the fallback path.
-    """
-    data = read_json_or_jsonl(base_path, split)
-    if idx is not None:
-        try:
-            return next(item for item in data if str(item.get('idx')) == str(idx))
-        except StopIteration:
-            raise ValueError(f"No entry found for idx {idx}")
-    else:
-        return data
     
 class ConfigWrapper:
     def __init__(self, config_path):
@@ -563,7 +522,7 @@ def evaluate_response_vs_answer(response, answer, question_type, rule_id, idx):
         response_text = extract_text_from_brackets(response,"clean")
         return response_text == answer
 
-def compute_one_mixed_question_pass_rate(idx, question_list, response_json):
+def compute_one_mixed_question_pass_rate(idx, question_list, response_json,base_path=None):
     if response_json == 'NULL':
         result_dict = {
             "idx": idx,
@@ -578,7 +537,7 @@ def compute_one_mixed_question_pass_rate(idx, question_list, response_json):
     results = []
     for q_idx, question in enumerate(question_list):
         category, question_idx = question.rsplit('_', 1)
-        question_content = read_json_or_jsonl_with_idx(f'data/{category}', 'sample', idx=question_idx)
+        question_content = load_json_or_jsonl_with_idx(base_path, os.path.join(category, "sample"), idx=question_idx)
         answer = question_content['answer']
         if q_idx >= len(response_list):
             break  
@@ -607,18 +566,18 @@ def compute_one_mixed_question_pass_rate(idx, question_list, response_json):
     return result_dict
 
 
-def evaluate_responses(data, question_type, mode):
+def evaluate_responses(data , mode, base_path=None):
     results = []
     
     # Iterate over the values of the dictionary (numerical keys)
     for key, record in data.items():
         idx = key  # Use the dictionary key as the "idx"
         response = record.get("prediction", "")
-        
+        question_type = record.get("category", "")
         if mode == "mixed":
             question_list = record.get("question_list")
             response_json = extract_json(response)
-            result_dict = compute_one_mixed_question_pass_rate(idx, question_list, response_json)
+            result_dict = compute_one_mixed_question_pass_rate(idx, question_list, response_json,base_path)
             results.append(result_dict)
         else:
             response_text = extract_text_from_brackets(response)
