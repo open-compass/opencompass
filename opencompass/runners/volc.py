@@ -176,7 +176,7 @@ class VOLCRunner(BaseRunner):
             cmd = get_cmd()
 
             logger = get_logger()
-            logger.debug(f'Running command: {cmd}')
+            logger.info(f'Running command: {cmd}')
 
             out_path = task.get_log_path(file_extension='txt')
             mmengine.mkdir_or_exist(osp.split(out_path)[0])
@@ -205,10 +205,17 @@ class VOLCRunner(BaseRunner):
         return task_name, returncode
 
     def _run_task(self, cmd, log_path, poll_interval):
+        logger = get_logger()
         result = subprocess.run(cmd,
                                 shell=True,
                                 text=True,
                                 capture_output=True)
+
+        logger.info(f'Command output: {result.stdout}')
+        if result.stderr:
+            logger.error(f'Command error: {result.stderr}')
+        logger.info(f'Return code: {result.returncode}')
+
         pattern = r'(?<=task_id=).*(?=\n\n)'
         match = re.search(pattern, result.stdout)
         if match:
