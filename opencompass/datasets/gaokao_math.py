@@ -161,10 +161,7 @@ class GaoKaoMATHEvaluator(BaseEvaluator):
                 prompt.format(question=question,
                               response=response,
                               question_type=question_type))
-        print(input_prompts)
         result_responses = self.batch_response(self.post_model, input_prompts)
-        print('\n\n')
-        print(result_responses)
         return result_responses
 
     def score(self, predictions, references, origin_prompt, test_set):
@@ -176,7 +173,6 @@ class GaoKaoMATHEvaluator(BaseEvaluator):
         details = []
         results = []
 
-        from tqdm import tqdm
         if self.with_postprocess:
             if self.question_type:
                 self.question_type = [self.question_type] * len(questions)
@@ -193,7 +189,7 @@ class GaoKaoMATHEvaluator(BaseEvaluator):
                                            self.question_type)
 
         inputs = []
-        for pred, ref, ques in tqdm(zip(predictions, references, questions)):
+        for pred, ref, ques in zip(predictions, references, questions):
             inputs.append(
                 EVAL_PROMPT.format(answer=pred, gold_answer=ref,
                                    question=ques))
@@ -224,13 +220,3 @@ class GaoKaoMATHEvaluator(BaseEvaluator):
         }
 
         return detailed_result
-
-
-if __name__ == '__main__':
-    evaluator = GaoKaoMATHEvaluator('http://0.0.0.0:23333/v1',
-                                    temperature=0.01,
-                                    max_tokens=2048,
-                                    procs=8)
-    predictions = ['1', '2', '3']
-    references = ['1', '2', '3']
-    evaluator.score(predictions, references)
