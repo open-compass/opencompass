@@ -3,8 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MATHDataset, GaoKaoMATHEvaluator
 
-# ----------------------------- Eval Parameters -----------------------------
-## Postprocess info
+# ----------------------------- Model Eval Parameters -----------------------------
 
 naive_model_name = 'dlc_model' # replace with your model name
 naive_model_url = ['http://0.0.0.0:23333/v1'] # Multi-apis for accerlation
