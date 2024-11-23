@@ -437,7 +437,6 @@ def make_circular_mcq_ppl_config(meta):
 
 def parse_example_dataset(config):
     # config -> .meta.jsonl -> parsed_results
-    print(f"config: {config}")
     path = config['path']
 
     # load sample and get parsed_meta

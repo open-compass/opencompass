@@ -73,7 +73,6 @@ def match_cfg_file(workdir: Union[str, List[str]],
 
 def try_fill_in_custom_cfgs(config):
     for i, dataset in enumerate(config['datasets']):
-        print(f"dataset: {dataset}")
         if 'type' not in dataset:
             config['datasets'][i] = make_custom_dataset_config(dataset)
     if 'model_dataset_combinations' not in config:

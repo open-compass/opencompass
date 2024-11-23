@@ -114,4 +114,5 @@ infer = dict(
     runner=dict(
         type=LocalRunner,
         max_num_workers=4,
-        task=dict(type=
+        task=dict(type=OpenICLInferTask)),
+)

@@ -1,4 +1,4 @@
-prompt_format: 
+prompt_format:
   - |
     You are an intelligent assistant capable of handling all types of reasoning and problem-solving tasks. Below is the text of a set of rules. Your task is to apply the appropriate rules to solve a series of problems.
 
@@ -20,5 +20,3 @@ prompt_format:
     {}
 
     ### Answers:
-
-

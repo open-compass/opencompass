@@ -313,7 +313,6 @@ class APITemplateParser:
             if isinstance(prompt, dict):
                 role = prompt['role']
                 if role not in self.roles:
-                    print(f"self.rules: {self.roles}")
                     role = prompt.get('fallback_role', None)
                     if not role:
                         print(f'{prompt} neither has an appropriate role nor '

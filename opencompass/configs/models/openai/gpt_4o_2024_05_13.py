@@ -18,5 +18,3 @@ models = [
         max_seq_len=4096,
         batch_size=8),
 ]
-
-
