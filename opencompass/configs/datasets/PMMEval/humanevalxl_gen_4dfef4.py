@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import PMMEvalHumanEvalXLDataset, PMMEvalHumanEvalXLEvaluator
+from opencompass.datasets.PMMEval import PMMEvalHumanEvalXLDataset, PMMEvalHumanEvalXLEvaluator
 
 NATURAL_LANGUAGE_FULLNAMES = ['English', 'Chinese', 'Arabic', 'Spanish', 'French', 'Japanese', 'Korean', 'Portuguese', 'Thai', 'Vietnamese']
 
@@ -47,7 +47,7 @@ for lang_fullname in NATURAL_LANGUAGE_FULLNAMES:
             dict(
                 abbr=f'humanevalxl-{program_lang}-{lang_fullname}',
                 type=PMMEvalHumanEvalXLDataset,
-                path='P-MMEval/humaneval-xl',
+                path='P-MMEval',
                 lang=lang_fullname,
                 program_lang=program_lang,
                 local_mode=True,

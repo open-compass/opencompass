@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import PMMEvalMMMLUDataset, PMMEvalMMMLUEvaluator, pmmeval_mmmlu_postprocess
+from opencompass.datasets.PMMEval import PMMEvalMMMLUDataset, PMMEvalMMMLUEvaluator, pmmeval_mmmlu_postprocess
 
 NATURAL_LANGUAGE_CODES_MMMLU = ['EN-US', 'ZH-CN', 'AR-XY', 'ES-LA', 'FR-FR', 'JA-JP', 'KO-KR', 'PT-BR', 'TH-TL', 'VI-VT']
 
