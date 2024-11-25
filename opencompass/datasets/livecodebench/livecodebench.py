@@ -8,7 +8,7 @@ import zlib
 from dataclasses import dataclass
 from enum import Enum
 
-from datasets import DatasetDict, load_dataset
+from datasets import DatasetDict, load_dataset, load_from_disk
 
 from opencompass.utils import get_data_path  # noqa: F401, F403
 
@@ -212,6 +212,40 @@ class LCBSelfRepairDataset(BaseDataset):
                                split='test',
                                version_tag=release_version,
                                trust_remote_code=True)
+        dataset = dataset.map(transform)
+
+        return DatasetDict({'test': dataset, 'train': dataset})
+
+
+class CompassBenchCodeExecutionDataset(BaseDataset):
+
+    @staticmethod
+    def load(
+        path: str = 'opencompass/execution-v2',
+        local_mode: bool = False,
+        cot: bool = False,
+        # release_version: str = "release_v1"
+    ):
+        # path = get_data_path(path, local_mode=local_mode)
+
+        def transform(item):
+            code, input = item['code'], item['input']
+            prompt = make_code_execution_prompt(code, input, cot=cot)
+
+            item['prompt'] = prompt
+
+            evaluation_sample = json.dumps({
+                'code': item['code'],
+                'input': item['input'],
+                'output': item['output']
+            })
+            item['evaluation_sample'] = evaluation_sample
+
+            return item
+
+        path = get_data_path(path, local_mode=local_mode)
+        dataset = load_from_disk(path)  # 'livecodebench/execution-v2'
+        dataset = dataset['test']
         dataset = dataset.map(transform)
 
         return DatasetDict({'test': dataset, 'train': dataset})

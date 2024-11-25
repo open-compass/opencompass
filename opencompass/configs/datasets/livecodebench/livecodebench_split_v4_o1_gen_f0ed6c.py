@@ -49,19 +49,19 @@ lcb_code_generation_eval_cfg = dict(
         type=LCBCodeGenerationEvaluator,
         num_process_evaluate=4,
         timeout=6,
-        release_version='release_v4',
+        release_version='release_split_v4',
     ),
     pred_role='BOT',
 )
 
 LCBCodeGeneration_dataset = dict(
     type=LCBCodeGenerationDataset,
-    abbr='lcb_code_generation_v4',
+    abbr='lcb_code_generation_split_v4',
     path='opencompass/code_generation_lite',
     reader_cfg=lcb_code_generation_reader_cfg,
     infer_cfg=lcb_code_generation_infer_cfg,
     eval_cfg=lcb_code_generation_eval_cfg,
-    release_version='release_v4',
+    release_version='release_split_v4',
 )
 
 # Code Execution Dataset
