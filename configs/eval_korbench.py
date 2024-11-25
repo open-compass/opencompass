@@ -5,8 +5,5 @@ with read_base():
     from opencompass.configs.datasets.korbench.korbench_single_3_shot_gen import korbench_3shot_single_datasets as three_shot_datasets
     from opencompass.configs.datasets.korbench.korbench_mixed_d00bdd import korbench_mixed_datasets as mixed_datasets
     from opencompass.configs.models.hf_internlm.hf_internlm2_5_7b import models as hf_internlm2_5_7b
-    from opencompass.configs.models.openai.gpt_4o_mini import models as gpt_4
 datasets = zero_shot_datasets + three_shot_datasets + mixed_datasets
-models = gpt_4
-for dataset in datasets:
-    dataset['reader_cfg']['test_range'] = '[0:8]'
+models = hf_internlm2_5_7b
