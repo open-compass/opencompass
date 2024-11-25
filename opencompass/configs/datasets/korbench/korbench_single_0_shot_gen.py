@@ -1,7 +1,4 @@
-import os
-import json
-from opencompass.datasets.korbench.korbench_single_0shot import korbenchsingle0shotDataset, korbenchsingle0shotEvaluator
-
+from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
@@ -18,13 +15,13 @@ for category in categories:
             begin=[
                 dict(
                     role="HUMAN",
-                    prompt=f"You are an expert in {category}. Solve the following {category} problem."
+                    prompt=""
                 )
             ],
             round=[
                 dict(
                     role="HUMAN",
-                    prompt=f"### {category} Task::{{prompt}}" # f-string
+                    prompt="{prompt}" # f-string
                 )
             ]
         )
@@ -45,14 +42,15 @@ for category in categories:
 
     # Evaluation configuration
     eval_cfg = dict(
-        evaluator=dict(type=korbenchsingle0shotEvaluator),
+        evaluator=dict(type=korbenchEvaluator),
         pred_role="BOT",
     )
 
     korbench_dataset = dict(
-        type=korbenchsingle0shotDataset,
-        abbr=f"korbench_{category}_0_shot",
+        type=korbenchDataset,
+        abbr=f"korbench_{category}_0shot",
         path="opencompass/korbench",
+        mode='0_shot',
         category=category,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
@@ -60,52 +58,3 @@ for category in categories:
     )
 
     korbench_0shot_single_datasets.append(korbench_dataset)
-
-# specifically, add "subquestion" to the cipher category
-# Prompt template
-prompt_template = dict(
-    type=PromptTemplate,
-    template=dict(
-        begin=[
-            dict(
-                role="HUMAN",
-                prompt=f"You are an expert in cipher. Solve the following cipher problem."
-            )
-        ],
-        round=[
-            dict(
-                role="HUMAN",
-                prompt="### Cipher Task::{prompt}" 
-            )
-        ]
-    )
-)
-
-reader_cfg = dict(
-    input_columns=["prompt"],
-    output_column="answer",
-)
-
-infer_cfg = dict(
-    prompt_template=prompt_template,
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=1024),
-)
-
-eval_cfg = dict(
-    evaluator=dict(type=korbenchsingle0shotEvaluator),
-    pred_role="BOT",
-)
-
-korbench_dataset = dict(
-    type=korbenchsingle0shotDataset,
-    abbr=f"korbench_cipher_subquestions_0_shot",
-    path="opencompass/korbench",
-    subquestions=True,
-    category="cipher",
-    reader_cfg=reader_cfg,
-    infer_cfg=infer_cfg,
-    eval_cfg=eval_cfg,
-)
-
-korbench_0shot_single_datasets.append(korbench_dataset)

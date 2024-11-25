@@ -1,6 +1,4 @@
-import os
-import json
-from opencompass.datasets.korbench.korbench_single_3shot import korbenchsingle3shotDataset, korbenchsingle3shotEvaluator
+from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
 
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -18,13 +16,13 @@ for category in categories:
             begin=[
                 dict(
                     role="HUMAN",
-                    prompt=f"You are an expert in {category}. Solve the following {category} problem."
+                    prompt=""
                 )
             ],
             round=[
                 dict(
                     role="HUMAN",
-                    prompt=f"### {category} Task::{{prompt}}" # f-string
+                    prompt="{prompt}" # f-string
                 )
             ]
         )
@@ -45,14 +43,15 @@ for category in categories:
 
     # Evaluation configuration
     eval_cfg = dict(
-        evaluator=dict(type=korbenchsingle3shotEvaluator),
+        evaluator=dict(type=korbenchEvaluator),
         pred_role="BOT",
     )
 
     korbench_dataset = dict(
-        type=korbenchsingle3shotDataset,
-        abbr=f"korbench_{category}_3_shot",
+        type=korbenchDataset,
+        abbr=f"korbench_{category}_3shot",
         path="opencompass/korbench",
+        mode='3_shot',
         category=category,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,

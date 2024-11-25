@@ -1,13 +1,12 @@
-from opencompass.datasets.korbench.korbench_mixed import korbenchmixedDataset, korbenchmixedEvaluator
-
+from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 korbench_mixed_datasets = []
 
-modes = ["Multi-Q", "Multi-R", "Multi-RQ"]  # Define available modes for mixed mode
+categories = ["Multi-Q", "Multi-R", "Multi-RQ"]  # Define available modes for mixed mode
 
-for mode in modes:
+for category in categories:
     # Prompt template
     prompt_template = dict(
         type=PromptTemplate,
@@ -15,13 +14,13 @@ for mode in modes:
             begin=[
                 dict(
                     role="HUMAN",
-                    prompt=f"You are an expert in solving tasks that require integrating multiple rules and questions. The following task is in {mode} mode."
+                    prompt=""
                 )
             ],
             round=[
                 dict(
                     role="HUMAN",
-                    prompt=f"### Mixed Task (Mode: {mode})::{{prompt}}" # f-string
+                    prompt="{prompt}" # f-string
                 )
             ]
         )
@@ -42,15 +41,16 @@ for mode in modes:
 
     # Evaluation configuration
     eval_cfg = dict(
-        evaluator=dict(type=korbenchmixedEvaluator),
+        evaluator=dict(type=korbenchEvaluator),
         pred_role="BOT",
     )
 
     korbench_dataset = dict(
-        type=korbenchmixedDataset,
-        abbr=f"korbench_mixed_{mode}",
+        type=korbenchDataset,
+        abbr=f"korbench_mixed_{category}",
         path="opencompass/korbench",
-        mode=mode,
+        category=category,
+        mode='mixed',
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
         eval_cfg=eval_cfg,
