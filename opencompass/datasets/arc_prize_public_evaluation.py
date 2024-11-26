@@ -8,16 +8,13 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
-from opencompass.utils import DEFAULT_DATA_FOLDER
-from opencompass.utils.fileio import download_url
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
 class ARCPrizeDataset(BaseDataset):
-    base_url = ('https://raw.githubusercontent.com/fchollet/ARC-AGI/'
-                'refs/heads/master/data/evaluation/')
     task_file_names = [
         '2072aba6.json', 'bb52a14b.json', '136b0064.json', 'ea9794b1.json',
         '40f6cd08.json', 'f5aa3634.json', '7039b2d7.json', '712bf12e.json',
@@ -122,21 +119,8 @@ class ARCPrizeDataset(BaseDataset):
     ]
 
     @staticmethod
-    def load():
-        all_task_file_urls = [
-            ARCPrizeDataset.base_url + file_name
-            for file_name in ARCPrizeDataset.task_file_names
-        ]
-        task_file_dir = os.path.join(DEFAULT_DATA_FOLDER,
-                                     'arc_prize_public_evaluation')
-
-        for url, file_name in zip(all_task_file_urls,
-                                  ARCPrizeDataset.task_file_names):
-            download_url(
-                url=url,
-                root=task_file_dir,
-                filename=file_name,
-            )
+    def load(path: str):
+        task_file_dir = get_data_path(path)
 
         dataset = []
 

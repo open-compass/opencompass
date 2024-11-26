@@ -42,6 +42,6 @@ Here is an example of a simple ARC-AGI task that has three training pairs along 
 
 #### Performance
 
-| o1-preview | Claude 3.5 | o1-mini | GPT-4o | Gemini 1.5 | Qwen2.5-72B-Instruct | Qwen2.5-7B-Instruct | 
-| ----- | ----- | ----- | ----- | ----- | ----- | ----- | 
-| 0.21 | 0.21 | 0.13 | 0.09 | 0.08 | 0.00 | 0.00 |
+| Qwen2.5-72B-Instruct | LLaMA3.1-70B-Instruct | gemma-2-27b-it | 
+| ----- | ----- |  ----- | 
+| 0.09 | 0.06 | 0.05 |

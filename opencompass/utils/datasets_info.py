@@ -327,6 +327,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/mmmlu_lite",
     },
+    "opencompass/arc_prize_public_evaluation": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arc_prize_public_evaluation",
+    }
 }
 
 DATASETS_URL = {
@@ -526,4 +531,8 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/WikiBench.zip",
         "md5": "6dac1d1a3133fe1effff185cbf71d928",
     },
+    "/arc_prize_public_evaluation": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/arc_prize_public_evaluation.zip",
+        "md5": "367a33977651496efddba7670009807e"
+    }
 }
