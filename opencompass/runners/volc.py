@@ -1,10 +1,13 @@
+import json
 import os
 import os.path as osp
 import random
 import re
 import subprocess
 import time
+import warnings
 from functools import partial
+from json import JSONDecodeError
 from typing import Any, Dict, List, Optional, Tuple
 
 import mmengine
@@ -13,9 +16,20 @@ from mmengine.config import ConfigDict
 from mmengine.utils import track_parallel_progress
 
 from opencompass.registry import RUNNERS, TASKS
-from opencompass.utils import get_logger
+from opencompass.utils import StrEnum, get_logger
 
 from .base import BaseRunner
+
+
+class VolcStatus(StrEnum):
+    success = 'Success'
+    failed = 'Failed'
+    cancelled = 'Cancelled'
+    exception = 'Exception'
+    killing = 'Killing'
+    success_holding = 'SuccessHolding'
+    failed_holding = 'FailedHolding'
+    queue = 'Queue'
 
 
 @RUNNERS.register_module()
@@ -121,13 +135,13 @@ class VOLCRunner(BaseRunner):
 
                 conda_env_name = self.volcano_cfg['conda_env_name']
 
-                shell_cmd = (f'source {self.volcano_cfg["bashrc_path"]}; '
+                shell_cmd = (f"source {self.volcano_cfg['bashrc_path']}; "
                              f'source activate {conda_env_name}; ')
                 shell_cmd += f'export PYTHONPATH={pwd}:$PYTHONPATH; '
             else:
                 assert self.volcano_cfg.get('python_env_path') is not None
                 shell_cmd = (
-                    f'export PATH={self.volcano_cfg["python_env_path"]}/bin:$PATH; '  # noqa: E501
+                    f"export PATH={self.volcano_cfg['python_env_path']}/bin:$PATH; "  # noqa: E501
                     f'export PYTHONPATH={pwd}:$PYTHONPATH; ')
 
             huggingface_cache = self.volcano_cfg.get('huggingface_cache')
@@ -183,8 +197,6 @@ class VOLCRunner(BaseRunner):
 
             retry = self.retry
             while True:
-                if random_sleep:
-                    time.sleep(random.randint(0, 10))
                 task_status, returncode = self._run_task(cmd,
                                                          out_path,
                                                          poll_interval=20)
@@ -192,6 +204,8 @@ class VOLCRunner(BaseRunner):
                 if not (self._job_failed(task_status, output_paths)) \
                         or retry <= 0:
                     break
+                if random_sleep:
+                    time.sleep(random.randint(0, 10))
                 retry -= 1
 
         finally:
@@ -209,6 +223,7 @@ class VOLCRunner(BaseRunner):
                                 shell=True,
                                 text=True,
                                 capture_output=True)
+        f = open(log_path, 'w')
         pattern = r'(?<=task_id=).*(?=\n\n)'
         match = re.search(pattern, result.stdout)
         if match:
@@ -217,32 +232,67 @@ class VOLCRunner(BaseRunner):
                       '--format Status'
             log_cmd = f'volc ml_task logs --task {task_id} --instance worker_0'
             while True:
-                task_status = os.popen(ask_cmd).read()
-                pattern = r'(?<=\[{"Status":").*(?="}\])'
-                match = re.search(pattern, task_status)
-                if match:
-                    task_status = match.group()
-                else:
-                    task_status = 'Exception'
+                ret = subprocess.run(ask_cmd,
+                                     shell=True,
+                                     text=True,
+                                     capture_output=True)
+                try:
+                    task_status = json.loads(
+                        ret.stdout.split()[-1])[0]['Status']
+                except JSONDecodeError:
+                    print('The task is not yet in the queue for '
+                          f'{ret.stdout}, waiting...')
+                    time.sleep(poll_interval)
+                    continue
+                finally:
+                    if task_status not in VolcStatus.__members__.values():
+                        warnings.warn(
+                            f'Unrecognized task status: {task_status}. '
+                            'This might be due to a newer version of Volc. '
+                            'Please report this issue to the OpenCompass.')
+
+                if task_status != VolcStatus.queue:
+                    # Record task status when jobs is in Queue
+                    f.write(ret.stdout or ret.stderr)
+                    f.flush()
+                    time.sleep(poll_interval)
+                    continue
+
                 if self.debug:
                     print(task_status)
-                logs = os.popen(log_cmd).read()
-                with open(log_path, 'w', encoding='utf-8') as f:
-                    f.write(logs)
+
+                # TODO: volc log cmd is broken now, this should be double
+                # checked when log cli is fixed
+                ret = subprocess.run(log_cmd,
+                                     shell=True,
+                                     text=True,
+                                     capture_output=True)
+
+                f.write(log_cmd)
+                f.write(ret.stdout)
+                f.flush()
+                time.sleep(poll_interval)
+
                 if task_status in [
-                        'Success', 'Failed', 'Cancelled', 'Exception',
-                        'Killing', 'SuccessHolding', 'FailedHolding'
+                        VolcStatus.success,
+                        VolcStatus.success_holding,
                 ]:
                     break
-                time.sleep(poll_interval)
+                else:
+                    time.sleep(poll_interval)
+                    continue
         else:
-            task_status = 'Exception'
+            print(f'Failed to submit the task for：{result.stdout}')
+            task_status = VolcStatus.exception
+            f.write(f'{result.stdout}: {result.returncode}')
 
+        f.close()
         return task_status, result.returncode
 
     def _job_failed(self, task_status: str, output_paths: List[str]) -> bool:
-        return task_status != 'Success' or not all(
-            osp.exists(output_path) for output_path in output_paths)
+        return task_status not in [
+            VolcStatus.success, VolcStatus.success_holding
+        ] or not all(osp.exists(output_path) for output_path in output_paths)
 
     def _choose_flavor(self, num_gpus):
         config_path = self.volcano_cfg.volcano_config_path
