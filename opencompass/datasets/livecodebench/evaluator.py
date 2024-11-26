@@ -228,11 +228,15 @@ def codegen_metrics(
 @ICL_EVALUATORS.register_module()
 class LCBCodeGenerationEvaluator(BaseEvaluator):
 
-    def __init__(self, num_process_evaluate, timeout=6):
+    def __init__(self,
+                 num_process_evaluate,
+                 timeout=6,
+                 release_version='release_v1'):
         super().__init__()
         self.num_process_evaluate = num_process_evaluate
         self.timeout = timeout
-        self.dataset = LCBCodeGenerationDataset.load()['test']
+        self.dataset = LCBCodeGenerationDataset.load(
+            release_version=release_version)['test']
 
     def score(self, predictions, references):
         predictions = [[extract_code_generation(item)] for item in predictions]
