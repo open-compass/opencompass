@@ -343,6 +343,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/babilong/data/",
     },
+    "P-MMEval": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/P-MMEval/",
+    },
     "opencompass/arc_prize_public_evaluation": {
         "ms_id": "",
         "hf_id": "",
@@ -530,7 +535,7 @@ DATASETS_URL = {
     "/cmo": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmo.zip",
         "md5": "fad52c81290506a8ca74f46b5400d8fc",
-    },
+    },  
     "/nq-open": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/nq-open.zip",
         "md5": "a340521e5c9ec591227dcb367f718b25",
@@ -566,5 +571,9 @@ DATASETS_URL = {
     "/arc_prize_public_evaluation": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/arc_prize_public_evaluation.zip",
         "md5": "367a33977651496efddba7670009807e"
+    },
+    "P-MMEval": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/pmmeval.zip",
+        "md5": "589c8be1551a609d94231f1410cf22eb",
     }
 }
