@@ -343,6 +343,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/babilong/data/",
     },
+    "opencompass/arc_prize_public_evaluation": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arc_prize_public_evaluation",
+    }
 }
 
 DATASETS_URL = {
@@ -557,5 +562,9 @@ DATASETS_URL = {
     "subjective/judgerbench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/judgerbench.zip",
         "md5": "60d605883aa8cac9755819140ab42c6b"
+    },
+    "/arc_prize_public_evaluation": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/arc_prize_public_evaluation.zip",
+        "md5": "367a33977651496efddba7670009807e"
     }
 }
