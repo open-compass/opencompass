@@ -7,6 +7,7 @@ from .anthropics_evals import *  # noqa: F401, F403
 from .apps import *  # noqa: F401, F403
 from .arc import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
+from .babilong import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
@@ -64,6 +65,7 @@ from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
 from .jsonl import JsonlDataset  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
+from .korbench import *  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
@@ -86,6 +88,7 @@ from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
+from .musr import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403
 from .natural_question_cn import *  # noqa: F401, F403

@@ -3,12 +3,16 @@ from mmengine.config import read_base
 with read_base():
     # read hf models - chat models
     # Dataset
+    from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import \
+        aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ARC_c.ARC_c_cot_gen_926652 import \
         ARC_c_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bbh.bbh_gen_5b92b0 import \
         bbh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmmlu.cmmlu_0shot_cot_gen_305931 import \
         cmmlu_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.cmo_fib.cmo_fib_gen_ace24b import \
+        cmo_fib_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.drop.drop_openai_simple_evals_gen_3857b0 import \
         drop_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ds1000.ds1000_service_eval_gen_cbc84f import \
@@ -28,6 +32,8 @@ with read_base():
         humanevalx_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.IFEval.IFEval_gen_3321a3 import \
         ifeval_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.livecodebench.livecodebench_gen_b2b0fd import \
+        LCB_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.math.math_0shot_gen_393424 import \
         math_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.MathBench.mathbench_2024_gen_50a320 import \
@@ -38,6 +44,10 @@ with read_base():
         mmlu_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.mmlu_pro.mmlu_pro_0shot_cot_gen_08c1de import \
         mmlu_pro_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.mmmlu_lite.mmmlu_lite_gen_c51a84 import \
+        mmmlu_lite_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.musr.musr_gen_3c6e15 import \
+        musr_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.nq.nq_open_1shot_gen_2e45e5 import \
         nq_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.race.race_cot_gen_d95929 import \
@@ -77,10 +87,14 @@ with read_base():
         mmlu_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.mmlu_pro import \
         mmlu_pro_summary_groups  # noqa: F401, E501
+    from opencompass.configs.summarizers.groups.musr_average import \
+        summarizer as musr_summarizer  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.scicode import \
         scicode_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.teval import \
         teval_summary_groups  # noqa: F401, E501
+    from opencompass.configs.summarizers.mmmlu_lite import \
+        mmmlu_summary_groups  # noqa: F401, E501
 
 # For HumanEval-X Evaluation
 # Apply the evaluator ip_address and port
@@ -122,6 +136,10 @@ mmlu_datasets = [
 ]
 
 mmlu_pro_datasets = [mmlu_pro_datasets[0]]
+
+mmmlu_lite_datasets = [
+    x for x in mmmlu_lite_datasets if 'mmlu_lite_AR-XY' in x['abbr']
+]
 mathbench_datasets = [x for x in mathbench_datasets if 'college' in x['abbr']]
 GaokaoBench_datasets = [
     x for x in GaokaoBench_datasets if '2010-2022_Math_II_MCQs' in x['abbr']
@@ -137,52 +155,68 @@ datasets += teval_en_datasets
 datasets += teval_zh_datasets
 # datasets += SciCode_datasets
 
+musr_summary_groups = musr_summarizer['summary_groups']
+summary_groups = sum(
+    [v for k, v in locals().items() if k.endswith('_summary_groups')], [])
+summary_groups.append(
+    {
+        'name': 'Mathbench',
+        'subsets': ['mathbench-a (average)', 'mathbench-t (average)'],
+    }, )
+
+# Summarizer
 summarizer = dict(
     dataset_abbrs=[
+        'Language',
         ['race-high', 'accuracy'],
         ['ARC-c', 'accuracy'],
         ['BoolQ', 'accuracy'],
-        ['mmlu_pro', 'naive_average'],
+        ['triviaqa_wiki_1shot', 'score'],
+        ['nq_open_1shot', 'score'],
+        ['mmmlu_lite', 'naive_average'],
+        '',
+        'Instruction Following',
+        ['IFEval', 'Prompt-level-strict-accuracy'],
+        '',
+        'General Reasoning',
         ['drop', 'accuracy'],
         ['bbh', 'naive_average'],
         ['GPQA_diamond', 'accuracy'],
+        ['hellaswag', 'accuracy'],
+        ['TheoremQA', 'score'],
+        ['musr_average', 'naive_average'],
+        '',
+        'Math Calculation',
+        ['gsm8k', 'accuracy'],
+        ['GaokaoBench', 'weighted_average'],
         ['math', 'accuracy'],
+        ['cmo_fib', 'accuracy'],
+        ['aime2024', 'accuracy'],
+        ['Mathbench', 'naive_average'],
+        '',
+        'Knowledge',
         ['wikibench-wiki-single_choice_cncircular', 'perf_4'],
-        ['openai_humaneval', 'humaneval_pass@1'],
-        ['sanitized_mbpp', 'score'],
         ['cmmlu', 'naive_average'],
         ['mmlu', 'naive_average'],
+        ['mmlu_pro', 'naive_average'],
+        '',
+        'Code',
+        ['openai_humaneval', 'humaneval_pass@1'],
+        ['sanitized_mbpp', 'score'],
+        ['humanevalx', 'naive_average'],
+        ['ds1000', 'naive_average'],
+        ['lcb_code_generation', 'pass@1'],
+        ['lcb_code_execution', 'pass@1'],
+        ['lcb_test_output', 'pass@1'],
+        '',
+        'Agent',
         ['teval', 'naive_average'],
         ['SciCode', 'accuracy'],
         ['SciCode', 'sub_accuracy'],
-        ['humanevalx', 'naive_average'],
-        ['ds1000', 'naive_average'],
-        ['IFEval', 'Prompt-level-strict-accuracy'],
-        ['gsm8k', 'accuracy'],
-        ['GaokaoBench', 'weighted_average'],
-        ['triviaqa_wiki_1shot', 'score'],
-        ['nq_open_1shot', 'score'],
-        ['hellaswag', 'accuracy'],
-        ['TheoremQA', 'score'],
-        '###### MathBench-A: Application Part ######',
-        'college',
-        'high',
-        'middle',
-        'primary',
-        'arithmetic',
-        'mathbench-a (average)',
-        '###### MathBench-T: Theory Part ######',
-        'college_knowledge',
-        'high_knowledge',
-        'middle_knowledge',
-        'primary_knowledge',
-        'mathbench-t (average)',
-        '###### Overall: Average between MathBench-A and MathBench-T ######',
-        'Overall',
         '',
         'bbh-logical_deduction_seven_objects',
         'bbh-multistep_arithmetic_two',
-        ''
+        '',
         'mmlu',
         'mmlu-stem',
         'mmlu-social-science',
@@ -212,15 +246,6 @@ summarizer = dict(
         'mmlu_pro_psychology',
         'mmlu_pro_other',
         '',
-        'GaokaoBench_2010-2022_Math_II_MCQs',
-        'GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank',
-        '',
-        'humanevalx-python',
-        'humanevalx-cpp',
-        'humanevalx-go',
-        'humanevalx-java',
-        'humanevalx-js',
-        '',
         'ds1000_Pandas',
         'ds1000_Numpy',
         'ds1000_Tensorflow',
@@ -228,9 +253,38 @@ summarizer = dict(
         'ds1000_Sklearn',
         'ds1000_Pytorch',
         'ds1000_Matplotlib',
+        '',
+        'mmmlu_lite',
+        'openai_mmmlu_lite_AR-XY',
+        'openai_mmmlu_lite_BN-BD',
+        'openai_mmmlu_lite_DE-DE',
+        'openai_mmmlu_lite_ES-LA',
+        'openai_mmmlu_lite_FR-FR',
+        'openai_mmmlu_lite_HI-IN',
+        'openai_mmmlu_lite_ID-ID',
+        'openai_mmmlu_lite_IT-IT',
+        'openai_mmmlu_lite_JA-JP',
+        'openai_mmmlu_lite_KO-KR',
+        'openai_mmmlu_lite_PT-BR',
+        'openai_mmmlu_lite_SW-KE',
+        'openai_mmmlu_lite_YO-NG',
+        'openai_mmmlu_lite_ZH-CN',
+        '',
+        '###### MathBench-A: Application Part ######',
+        'college',
+        'high',
+        'middle',
+        'primary',
+        'arithmetic',
+        'mathbench-a (average)',
+        '###### MathBench-T: Theory Part ######',
+        'college_knowledge',
+        'high_knowledge',
+        'middle_knowledge',
+        'primary_knowledge',
+        'mathbench-t (average)',
     ],
-    summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
+    summary_groups=summary_groups,
 )
 
 for d in datasets:

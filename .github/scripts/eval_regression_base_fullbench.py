@@ -7,6 +7,8 @@ with read_base():
         bbh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmmlu.cmmlu_ppl_041cbf import \
         cmmlu_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.dingo.dingo_gen import \
+        datasets as dingo_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.drop.drop_gen_a2697c import \
         drop_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.GaokaoBench.GaokaoBench_no_subjective_gen_d21e37 import \
@@ -120,6 +122,8 @@ summarizer = dict(
         ['winogrande', 'accuracy'],
         ['hellaswag', 'accuracy'],
         ['TheoremQA', 'score'],
+        ['dingo_en_192', 'score'],
+        ['dingo_zh_170', 'score'],
         '###### MathBench-A: Application Part ######',
         'college',
         'high',

@@ -59,6 +59,8 @@ with read_base():
         models as hf_llama3_2_3b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.hf_llama3_8b_instruct import \
         models as hf_llama3_8b_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_llama.lmdeploy_llama2_7b_chat import \
+        models as lmdeploy_llama2_7b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_8b_instruct import \
         models as lmdeploy_llama3_1_8b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_2_3b_instruct import \
