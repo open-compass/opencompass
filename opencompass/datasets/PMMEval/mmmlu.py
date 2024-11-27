@@ -77,11 +77,11 @@ def pmmeval_mmmlu_postprocess(text: str, lang_code: str) -> Tuple[str]:
 class PMMEvalMMMLUDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, lang: str, difficulty: str, local_mode: bool):
+    def load(path: str, lang: str, difficulty: str):
         assert difficulty in [
             'easy', 'hard', 'all'
         ], '`difficulty` should be one choice among "easy", "hard", and "all"!'
-        data_path = get_data_path(path, local_mode=local_mode)
+        data_path = get_data_path(path)
 
         if os.environ.get('DATASET_SOURCE') == 'ModelScope':
             dataset_list = list()

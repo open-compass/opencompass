@@ -44,7 +44,6 @@ for lang_code in NATURAL_LANGUAGE_CODES:
             type=PMMEvalMLogiQADataset,
             path='P-MMEval',
             lang=lang_code,
-            local_mode=True,
             reader_cfg=PMMEval_MLogiQA_reader_cfg,
             infer_cfg=PMMEval_MLogiQA_infer_cfg,
             eval_cfg=PMMEval_MLogiQA_eval_cfg)

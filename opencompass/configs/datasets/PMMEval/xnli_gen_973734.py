@@ -54,7 +54,6 @@ for lang_code in NATURAL_LANGUAGE_CODES:
             type=PMMEvalXNLIDataset,
             path='P-MMEval',
             lang=lang_code,
-            local_mode=True,
             reader_cfg=PMMEval_XNLI_reader_cfg,
             infer_cfg=PMMEval_XNLI_infer_cfg,
             eval_cfg=PMMEval_XNLI_eval_cfg)

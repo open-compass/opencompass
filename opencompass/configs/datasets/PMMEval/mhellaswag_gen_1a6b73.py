@@ -48,7 +48,6 @@ for lang_code in NATURAL_LANGUAGE_CODES:
             type=PMMEvalMHellaswagDataset,
             path='P-MMEval',
             lang=lang_code,
-            local_mode=True,
             reader_cfg=PMMEval_MHellaswag_reader_cfg,
             infer_cfg=PMMEval_MHellaswag_infer_cfg,
             eval_cfg=PMMEval_MHellaswag_eval_cfg)

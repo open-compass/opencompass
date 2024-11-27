@@ -78,8 +78,8 @@ def pmmeval_mlogiqa_postprocess(text: str, lang_code: str) -> Tuple[str]:
 class PMMEvalMLogiQADataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, lang: str, local_mode: bool):
-        data_path = get_data_path(path, local_mode=local_mode)
+    def load(path: str, lang: str):
+        data_path = get_data_path(path)
 
         if os.environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset

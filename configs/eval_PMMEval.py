@@ -4,7 +4,7 @@ from opencompass.models import HuggingFacewithChatTemplate
 
 
 with read_base():
-    from opencompass.configs.models.qwen2_5.vllm_qwen2_5_7b_instruct import models
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import models
 
     # from opencompass.configs.datasets.PMMEval.flores_gen import PMMEval_flores_datasets
     # from opencompass.configs.datasets.PMMEval.humanevalxl_gen import PMMEval_HumanEvalXL_datasets

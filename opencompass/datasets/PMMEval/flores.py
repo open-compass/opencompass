@@ -114,8 +114,8 @@ def pmmeval_flores_postprocess(text: str, lang_fullname: str) -> Tuple[str]:
 class PMMEvalFloresDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, lang_fullname: str, local_mode: bool):
-        data_path = get_data_path(path, local_mode=local_mode)
+    def load(path: str, lang_fullname: str):
+        data_path = get_data_path(path)
 
         if os.environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset

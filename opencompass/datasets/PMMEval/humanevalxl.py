@@ -18,6 +18,7 @@ from opencompass.utils import get_data_path
 _LANGUAGE_NAME_DICT = {
     'java': 'Java',
     'javascript': 'JavaScript',
+    'js': 'JavaScript',
     'python': 'Python',
 }
 
@@ -26,8 +27,8 @@ _LANGUAGE_NAME_DICT = {
 class PMMEvalHumanEvalXLDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, lang: str, program_lang: str, local_mode: bool):
-        data_path = get_data_path(path, local_mode=local_mode)
+    def load(path: str, lang: str, program_lang: str):
+        data_path = get_data_path(path)
 
         if os.environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
@@ -52,6 +53,7 @@ class PMMEvalHumanEvalXLEvaluator(BaseEvaluator):
     def __init__(self,
                  language,
                  ip_address='localhost',
+                 text_language='',
                  port='',
                  retry=2,
                  timeout=600) -> None:
@@ -60,6 +62,7 @@ class PMMEvalHumanEvalXLEvaluator(BaseEvaluator):
         if language == 'rust':
             timeout *= 10  # rust need more time
         self.language = language
+        self.text_language = text_language
         self.ip_address = ip_address
         self.port = port
         self.retry = retry
@@ -74,8 +77,9 @@ class PMMEvalHumanEvalXLEvaluator(BaseEvaluator):
             _clean_up_code(pred, self.language, refer),
         } for i, (pred, refer) in enumerate(zip(predictions, references))]
         with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp_out_path = osp.join(tmp_dir,
-                                    f'humanevalx_{self.language}.json')
+            tmp_out_path = osp.join(
+                tmp_dir,
+                f'humanevalx_{self.language}_{self.text_language}.json')
             with open(tmp_out_path, 'w') as f:
                 for pred in predictions:
                     f.write(json.dumps(pred) + '\n')
@@ -127,7 +131,6 @@ class PMMEvalHumanEvalXLEvaluator(BaseEvaluator):
         ],
                                      timeout=self.timeout,
                                      capture_output=True)
-
         if exec_result.returncode == 0 and re.match(
                 "\"{.*:.*}\"", exec_result.stdout.decode('utf-8')):
             return True, json.loads(exec_result.stdout.decode('utf-8'))

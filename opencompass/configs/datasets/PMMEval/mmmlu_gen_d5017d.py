@@ -46,7 +46,6 @@ for lang_code in NATURAL_LANGUAGE_CODES_MMMLU:
             path='P-MMEval',
             lang=lang_code,
             difficulty='all',
-            local_mode=True,
             reader_cfg=PMMEval_MMMLU_reader_cfg,
             infer_cfg=PMMEval_MMMLU_infer_cfg,
             eval_cfg=PMMEval_MMMLU_eval_cfg)

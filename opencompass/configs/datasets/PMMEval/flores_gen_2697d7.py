@@ -59,7 +59,6 @@ for lang_fullname in NATURAL_LANGUAGE_FULLNAMES_FLORES:
             type=PMMEvalFloresDataset,
             path='P-MMEval',
             lang_fullname=lang_fullname,
-            local_mode=True,
             reader_cfg=PMMEval_flores_reader_cfg,
             infer_cfg=PMMEval_flores_infer_cfg,
             eval_cfg=PMMEval_flores_eval_cfg)
