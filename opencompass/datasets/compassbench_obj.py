@@ -63,6 +63,35 @@ class CompassBenchObjectiveV1_3(BaseDataset):
         return dataset
 
 
+@LOAD_DATASET.register_module()
+class CompassBenchObjectiveMath(BaseDataset):
+
+    @staticmethod
+    def load(path: str):
+        with open(path, 'r') as infile:
+            data = [json.loads(line) for line in infile]
+            for idx in range(len(data)):
+                item = data[idx]
+                prefix = ''
+                if item.get('question_type',
+                            None) and item['question_type'] in [
+                                'multiple-answer', '多选题'
+                            ]:
+                    if '_en_' in path:
+                        prefix = 'This question may has multiple answers, \
+please select all correct answers. like this: A, B, C as your final answer\n'
+
+                    else:
+                        prefix = '这道题可能有多个正确答案，请选择所有正确的答案，\
+例如：A, B, C 作为你的最终答案\n'
+
+                if item.get('options', None) and len(item['options']) != 0:
+                    item['question'] = prefix + item[
+                        'question'] + '\n' + get_number(item['options'])
+        dataset = Dataset.from_list(data)
+        return dataset
+
+
 @TEXT_POSTPROCESSORS.register_module()
 def compassbench_objective_v1_3_postprocess(text: str, name) -> str:
     split = False
