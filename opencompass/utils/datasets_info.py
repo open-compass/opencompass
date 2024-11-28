@@ -583,6 +583,6 @@ DATASETS_URL = {
     },
     "P-MMEval": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/pmmeval.zip",
-        "md5": "589c8be1551a609d94231f1410cf22eb",
+        "md5": "09e401e6229a50647b9e13c429e634d1",
     }
 }
