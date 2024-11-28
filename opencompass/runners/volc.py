@@ -47,7 +47,8 @@ class VOLCRunner(BaseRunner):
                  max_num_workers: int = 32,
                  retry: int = 2,
                  debug: bool = False,
-                 lark_bot_url: str = None):
+                 lark_bot_url: str = None,
+                 keep_tmp_file: bool = False):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.volcano_cfg = volcano_cfg
         self.max_num_workers = max_num_workers
@@ -55,6 +56,7 @@ class VOLCRunner(BaseRunner):
         self.queue_name = queue_name
         self.preemptible = preemptible
         self.priority = priority
+        self.keep_tmp_file = keep_tmp_file
 
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
         """Launch multiple tasks.
@@ -100,9 +102,12 @@ class VOLCRunner(BaseRunner):
         pwd = os.getcwd()
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
-        param_file = f'{pwd}/tmp/{os.getpid()}_params.py'
+        # Using uuid to avoid filename conflict
+        import uuid
+        uuid_str = str(uuid.uuid4())
+        param_file = f'{pwd}/tmp/{uuid_str}_params.py'
 
-        volc_cfg_file = f'{pwd}/tmp/{os.getpid()}_cfg.yaml'
+        volc_cfg_file = f'{pwd}/tmp/{uuid_str}_cfg.yaml'
         volc_cfg = self._choose_flavor(num_gpus)
         with open(volc_cfg_file, 'w') as fp:
             yaml.dump(volc_cfg, fp, sort_keys=False)
@@ -171,7 +176,7 @@ class VOLCRunner(BaseRunner):
             cmd = get_cmd()
 
             logger = get_logger()
-            logger.debug(f'Running command: {cmd}')
+            logger.info(f'Running command: {cmd}')
 
             out_path = task.get_log_path(file_extension='txt')
             mmengine.mkdir_or_exist(osp.split(out_path)[0])
@@ -191,15 +196,26 @@ class VOLCRunner(BaseRunner):
 
         finally:
             # Clean up
-            os.remove(param_file)
-            os.remove(volc_cfg_file)
+            if not self.keep_tmp_file:
+                os.remove(param_file)
+                os.remove(volc_cfg_file)
+            else:
+                pass
+
         return task_name, returncode
 
     def _run_task(self, cmd, log_path, poll_interval):
+        logger = get_logger()
         result = subprocess.run(cmd,
                                 shell=True,
                                 text=True,
                                 capture_output=True)
+
+        logger.info(f'Command output: {result.stdout}')
+        if result.stderr:
+            logger.error(f'Command error: {result.stderr}')
+        logger.info(f'Return code: {result.returncode}')
+
         pattern = r'(?<=task_id=).*(?=\n\n)'
         match = re.search(pattern, result.stdout)
         if match:
@@ -240,7 +256,7 @@ class VOLCRunner(BaseRunner):
         with open(config_path) as fp:
             volc_cfg = yaml.safe_load(fp)
         if num_gpus <= 0:
-            flavor = 'ml.c1ie.2xlarge'
+            flavor = 'ml.c3i.2xlarge'
         elif num_gpus == 1:
             flavor = 'ml.pni2l.3xlarge'
         elif num_gpus == 2:

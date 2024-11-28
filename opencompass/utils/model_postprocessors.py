@@ -24,8 +24,11 @@ def gen_output_naive(ori_data, extractor):
 
 
 @TEXT_POSTPROCESSORS.register_module('naive')
-def navie_model_postprocess(preds: list, model_name: str,
-                            custom_instruction: str, api_url: Union[str, list],
+def naive_model_postprocess(preds: list,
+                            model_name: str,
+                            custom_instruction: str,
+                            api_url: Union[str, list],
+                            num_processes: int = 8,
                             **kwargs) -> list:
     """Postprocess the text extracted by custom model.
     Args:
@@ -38,7 +41,7 @@ def navie_model_postprocess(preds: list, model_name: str,
         list: The postprocessed answers.
     """
 
-    def _eval_pred(texts, extractor, num_processes=8):
+    def _eval_pred(texts, extractor, num_processes):
         ori_data = texts
         extracted_answers = []
         batched_ori_data = []
@@ -60,7 +63,9 @@ def navie_model_postprocess(preds: list, model_name: str,
         model_name=model_name,
         custom_instruction=custom_instruction,
         url=api_url.split(',') if ',' in api_url else api_url)
-    calc_acc_func = partial(_eval_pred, extractor=extractor)
+    calc_acc_func = partial(_eval_pred,
+                            extractor=extractor,
+                            num_processes=num_processes)
     extracted_answers = calc_acc_func(format_data)
     return extracted_answers
 

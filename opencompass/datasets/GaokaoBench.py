@@ -15,8 +15,10 @@ from .base import BaseDataset
 class GaokaoBenchDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name: str):
-        data = get_data_path(path, local_mode=True)
+    def load(path: str, filename: str, name: str):
+        path = get_data_path(path)
+        path = path + filename
+
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             return MsDataset.load(path, subset_name=name, split='test')

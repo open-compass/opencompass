@@ -1,11 +1,13 @@
 from .advglue import *  # noqa: F401, F403
 from .afqmcd import *  # noqa: F401, F403
 from .agieval import *  # noqa: F401, F403
+from .aime2024 import *  # noqa: F401, F403
 from .anli import AnliDataset  # noqa: F401, F403
 from .anthropics_evals import *  # noqa: F401, F403
 # from .apps import *  # noqa: F401, F403  # Note: to be supported for python 3.11 (pyext issue)
 from .arc import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
+from .babilong import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
@@ -24,6 +26,7 @@ from .cluewsc import *  # noqa: F401, F403
 from .cmb import *  # noqa: F401, F403
 from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
+from .cmo_fib import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .commonsenseqa_cn import *  # noqa: F401, F403
@@ -33,6 +36,7 @@ from .crowspairs_cn import *  # noqa: F401, F403
 from .csl import *  # noqa: F401, F403
 from .custom import *  # noqa: F401, F403
 from .cvalues import *  # noqa: F401, F403
+from .dingo import *  # noqa: F401, F403
 from .drcd import *  # noqa: F401, F403
 from .drop import *  # noqa: F401, F403
 from .drop_simple_eval import *  # noqa: F401, F403
@@ -40,9 +44,9 @@ from .ds1000 import *  # noqa: F401, F403
 from .ds1000_interpreter import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
 from .FinanceIQ import *  # noqa: F401, F403
-from .flames import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
+from .gaokao_math import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
@@ -61,11 +65,13 @@ from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
 from .jsonl import JsonlDataset  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
+from .korbench import *  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
+from .livecodebench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
@@ -80,7 +86,9 @@ from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
+from .mmmlu import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
+from .musr import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
 from .natural_question import *  # noqa: F401, F403
 from .natural_question_cn import *  # noqa: F401, F403
@@ -100,6 +108,7 @@ from .ruler import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
 from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
 from .scicode import *  # noqa: F401, F403
+from .simpleqa import *  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
 from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403

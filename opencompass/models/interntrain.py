@@ -32,16 +32,22 @@ class InternTrainManager:
 class CurrentInternTrainManager(InternTrainManager):
 
     def load_config(self, path, model_config=None):
-        from internlm.config import Config
         if model_config is None:
-            model_config = torch.load(os.path.join(path, 'model_config.pt'))
-        elif isinstance(model_config, dict):
-            model_config = Config(model_config)
-        elif isinstance(model_config, str):
-            model_config = Config.fromfile(model_config).model
+            from internlm.checkpoint.checkpoint_manager import try_load_config
+            model_config = try_load_config(
+                os.path.join(path, 'model_config.pt'))
+        elif isinstance(model_config, str) and model_config.endswith('.pt'):
+            from internlm.checkpoint.checkpoint_manager import try_load_config
+            model_config = try_load_config(model_config)
         else:
-            raise NotImplementedError(
-                'model_config should be None, dict or filename.')
+            from internlm.config import Config
+            if isinstance(model_config, dict):
+                model_config = Config(model_config)
+            elif isinstance(model_config, str):
+                model_config = Config.fromfile(model_config).model
+            else:
+                raise NotImplementedError(
+                    'model_config should be None, dict or filename.')
 
         return model_config
 
@@ -60,6 +66,8 @@ class LegacyInternTrainManager(InternTrainManager):
         from internlm.core.context import Config
         if model_config is None:
             model_config = torch.load(os.path.join(path, 'model_config.pt'))
+        elif isinstance(model_config, str) and model_config.endswith('.pt'):
+            model_config = torch.load(model_config)
         elif isinstance(model_config, dict):
             model_config = Config(model_config)
         elif isinstance(model_config, str):
@@ -79,6 +87,50 @@ class LegacyInternTrainManager(InternTrainManager):
 
 @MODELS.register_module()
 class InternTrain(BaseModel):
+    """Model wrapper for InternTrain.
+
+    Args:
+        path (str): The name or path to HuggingFace's model.
+        module_path (str): Path of InternTrain repository.
+        max_seq_len (int): The maximum length of the input sequence. Defaults
+            to 2048.
+        tokenizer_only (bool): If True, only the tokenizer will be initialized.
+            Defaults to False.
+        tokenizer_path (str): The path to the tokenizer. Defaults to None.
+        tokenizer_type: InternTrain's tokenizer type. Defaults to 'InternLM'.
+        model_config (str, dict, optional): Config of model. There are several
+            options for this parameter:
+
+                - filename (str): The config items are defined in a python file
+                  so the model will load configs from this file.
+                - config (dict): The configuration items are defined in a dict
+                  and the model will be initialized from ```model_config```.
+                - None: The config is loaded from ```path```. In this case,
+                  please make sure that ```path``` contains a config file named
+                  ``model_config.pt``.
+
+            Defaults to None.
+        model_type: Type of model. Defaults to 'InternTrain'
+        ckpt_type: The type of load function in InternTrain when checkpoints
+            are loaded. Defaults to None, which means load the checkpoint
+            directlywith pipeline merged.
+        meta_template (Dict, optional): The model's meta prompt
+            template if needed, in case the requirement of injecting or
+            wrapping of any meta instructions.
+        model_dtype: The model's dtype. If None, will use dtype defined in
+            ```model_config```. Defaults to None.
+        generation_kwargs (Dict, optional): The generation kwargs for the
+            model. Defaults to dict().
+        sync_rank (bool): Whether to sync inputs between ranks. Do not use this
+            if you are not familiar with this behavior. Check `sync_inputs`
+            function for more details. Defaults to False.
+        mode (str, optional): The method of input truncation when input length
+            exceeds max_seq_len. 'mid' represents the part of input to
+            truncate. Defaults to 'none'.
+        end_str (str, optional): Whether to trim generated strings with end_str
+            if the model has special ending strings that are not handled well.
+            Defaults to None.
+    """
 
     def __init__(self,
                  path: str,
@@ -87,19 +139,23 @@ class InternTrain(BaseModel):
                  tokenizer_only: bool = False,
                  tokenizer_path: Optional[str] = None,
                  tokenizer_type: str = 'INTERNLM',
-                 model_config: Optional[str] = None,
+                 model_config: Optional[Union[str, Dict]] = None,
+                 parallel_config: Optional[str] = None,
                  model_type: str = 'INTERNLM2',
                  ckpt_type: Optional[str] = None,
                  meta_template: Optional[Dict] = None,
                  model_dtype: Optional[str] = None,
                  generation_kwargs={},
                  sync_rank: bool = False,
-                 mode='none'):
+                 mode='none',
+                 end_str: Optional[str] = None):
+
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
                          tokenizer_only=tokenizer_only,
                          meta_template=meta_template,
                          sync_rank=sync_rank)
+
         self.logger = get_logger()
         # insert interntrain module
         self.manager = InternTrainManager.build(module_path)
@@ -117,6 +173,7 @@ class InternTrain(BaseModel):
         if not tokenizer_only:
             self._load_model(path=path,
                              model_config=model_config,
+                             parallel_config=parallel_config,
                              model_type=model_type,
                              model_dtype=model_dtype,
                              ckpt_type=ckpt_type)
@@ -146,10 +203,12 @@ class InternTrain(BaseModel):
                                            bos_token_id=self.tokenizer.bos_id,
                                            pad_token_id=self.tokenizer.bos_id,
                                            eos_token_id=eos_token_ids)
+        self.end_str = end_str
 
     def _load_model(self,
                     path: str,
                     model_config: Optional[str] = None,
+                    parallel_config: Optional[str] = None,
                     model_type: str = 'INTERNLM2',
                     model_dtype: Optional[str] = None,
                     ckpt_type: Optional[str] = None):
@@ -170,10 +229,11 @@ class InternTrain(BaseModel):
         world_size = int(os.getenv('WORLD_SIZE', '1'))
         tp_size = world_size  # TODO
         self.logger.info(f'world size: {world_size} tp: {tp_size}')
-        parallel_config = dict(zero1=dict(size=1, fsdp=False),
-                               pipeline=dict(size=1),
-                               tensor=dict(size=tp_size, mode='mtp'),
-                               sequence_parallel=False)
+        if parallel_config is None:
+            parallel_config = dict(zero1=dict(size=1, fsdp=False),
+                                   pipeline=dict(size=1),
+                                   tensor=dict(size=tp_size, mode='mtp'),
+                                   sequence_parallel=False)
         config = dict(model=model_config,
                       parallel=parallel_config,
                       data=dict(use_packed_dataset=False),
@@ -207,7 +267,10 @@ class InternTrain(BaseModel):
             load_func = LOAD_FUNC_DICT[ckpt_type]
             load_func(path, self.model)
 
-        self.model.to(model_config['dtype']).eval().cuda()
+        if 'moe' in model_type.lower():
+            self.model.eval().cuda()
+        else:
+            self.model.to(model_config['dtype']).eval().cuda()
 
     def _load_tokenizer(self, tokenizer_path: str, tokenizer_type: str):
         from internlm.core.context.registry import TOKENIZER_INITIALIZER
@@ -242,7 +305,7 @@ class InternTrain(BaseModel):
         else:
             raise NotImplementedError(f'Unknown model dtype {model_dtype}')
 
-    def get_token_len(self, prompt: str) -> int:
+    def get_token_len(self, prompt: str, use_bos=None, use_eos=None) -> int:
         """Get lengths of the tokenized strings.
 
         Args:
@@ -251,7 +314,7 @@ class InternTrain(BaseModel):
         Returns:
             int: Length of the input tokens
         """
-        tokens = self.tokenizer(prompt, use_bos=True, use_eos=True)
+        tokens = self.tokenizer(prompt, use_bos=use_bos, use_eos=use_eos)
         return len(tokens)
 
     def generate(self,
@@ -272,9 +335,14 @@ class InternTrain(BaseModel):
             # keep same with InternTrain's default value
             min_out_len = 1
 
-        tokens = self.batch_encode(inputs,
-                                   self.max_seq_len - max_out_len,
-                                   left_padding=True)
+        if self.mode == 'none':
+            tokens = self.batch_encode(inputs,
+                                       self.max_seq_len,
+                                       left_padding=True)
+        else:
+            tokens = self.batch_encode(inputs,
+                                       self.max_seq_len - max_out_len,
+                                       left_padding=True)
 
         # random seed for pass@k
         seed = torch.tensor(time.time(), dtype=torch.int64).cuda()
@@ -287,8 +355,10 @@ class InternTrain(BaseModel):
             max_length=tokens.shape[1] + max_out_len,
             **self.generation_kwargs)  # bsz, num_return_sequences, max_length
         outputs = outputs[:, 0, tokens.shape[1]:]
-        output_text = self.batch_decode(outputs,
-                                        stopping_criteria=stopping_criteria)
+        output_text = self.batch_decode(
+            outputs,
+            eos_token_ids=self.generator.eos_token_id,
+            stopping_criteria=stopping_criteria)
 
         return output_text
 
@@ -343,7 +413,7 @@ class InternTrain(BaseModel):
             for input_text, cont in zip(input_texts, conts)
         ]
         replaced_lens = [
-            len(self.encode(input_text)[0]) for input_text in replaced_texts
+            self.get_token_len(input_text) for input_text in replaced_texts
         ]
         loglikelihoods = []
         for nloss, nlen, rlen in zip(loss, lens, replaced_lens):
@@ -407,11 +477,22 @@ class InternTrain(BaseModel):
 
         return torch.LongTensor(tokens).cuda()
 
-    def batch_decode(self, outputs, stopping_criteria: List[str] = []):
+    def batch_decode(self,
+                     outputs,
+                     eos_token_ids: List[int],
+                     stopping_criteria: List[str] = []):
         # outputs: bsz, seq_len
         output_text = []
+        outputs = outputs.tolist()
         for output in outputs:
-            text = self.tokenizer.decode(output.tolist())
+            # cut off by eos_token_ids
+            eos_idx = len(output)
+            for eos_id in eos_token_ids:
+                if eos_id in output:
+                    eos_idx = min(output.index(eos_id), eos_idx)
+            text = self.tokenizer.decode(output[:eos_idx])
+            if self.end_str is not None:
+                text = text.split(self.end_str)[0]
             for stop_word in stopping_criteria:
                 text = text.split(stop_word)[0]
             output_text.append(text)

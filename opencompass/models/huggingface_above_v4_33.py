@@ -3,6 +3,7 @@
 from typing import Dict, List, Optional, Union
 
 import torch
+from mmengine.device import is_npu_available
 
 from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.models.base_api import APITemplateParser
@@ -224,6 +225,8 @@ class HuggingFacewithChatTemplate(BaseModel):
         model_kwargs.update(kwargs)
         model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
         self.logger.debug(f'using model_kwargs: {model_kwargs}')
+        if is_npu_available():
+            model_kwargs['device_map'] = 'npu'
 
         try:
             self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
@@ -515,6 +518,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
                  max_seq_len: Optional[int] = None,
                  pad_token_id: Optional[int] = None,
                  stop_words: Optional[str] = [],
+                 drop_middle: bool = False,
                  **other_kwargs):
 
         self.logger = get_logger()
@@ -522,6 +526,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
         self.tokenizer_only = tokenizer_only
         self.template_parser = LMTemplateParser()
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
+        self.drop_middle = drop_middle
         self._load_tokenizer(tokenizer_path or path, tokenizer_kwargs, pad_token_id)
         if not tokenizer_only:
             self._load_model(path=path, kwargs=model_kwargs, peft_path=peft_path, peft_kwargs=peft_kwargs)
@@ -548,7 +553,17 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
             add_special_tokens=True,
             max_length=self.max_seq_len
         )
-        tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
+        if self.drop_middle:
+            assert len(inputs) == 1
+            input_ids = self.tokenizer(inputs, padding=False, truncation=False)['input_ids']
+            input_ids = torch.tensor(input_ids)
+            if input_ids.shape[-1] > self.max_seq_len:
+                input_ids = torch.cat([input_ids[:, : self.max_seq_len // 2], input_ids[:, - self.max_seq_len // 2:]], dim=-1)
+            tokens = {'input_ids': input_ids, }
+        else:
+            tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
 
         generation_kwargs = self.generation_kwargs.copy()
@@ -600,7 +615,17 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
             add_special_tokens=True,
             max_length=self.max_seq_len
         )
-        tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
+        if self.drop_middle:
+            assert len(inputs) == 1
+            input_ids = self.tokenizer(inputs, padding=False, truncation=False)['input_ids']
+            input_ids = torch.tensor(input_ids)
+            if input_ids.shape[-1] > self.max_seq_len:
+                input_ids = torch.cat([input_ids[:, : self.max_seq_len // 2], input_ids[:, - self.max_seq_len // 2:]], dim=-1)
+            tokens = {'input_ids': input_ids, }
+        else:
+            tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
         outputs = self.model(**tokens)[0]
 

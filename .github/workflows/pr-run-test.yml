@@ -18,12 +18,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CONDA_ENV: opencompass_base
+  CONDA_ENV: opencompass_
   USERSPACE_PREFIX: /cpfs01/user/qa-llm-cicd
   HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
   HF_DATASETS_OFFLINE: 1
   TRANSFORMERS_OFFLINE: 1
   HF_HUB_OFFLINE: 1
+  VLLM_USE_MODELSCOPE: false
+  LMDEPLOY_USE_MODELSCOPE: false
 
 jobs:
   pr_run_test:
@@ -36,7 +38,7 @@ jobs:
       - name: Prepare - Install opencompass
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}
+          conda activate ${{env.CONDA_ENV}}${{ runner.name }}
           python3 -m pip uninstall opencompass -y
           python3 -m pip install -e . --cache-dir ${{env.USERSPACE_PREFIX}}/.cache/pip
           conda info --envs
@@ -48,25 +50,41 @@ jobs:
       - name:  Run test
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}
+          conda activate ${{env.CONDA_ENV}}${{ runner.name }}
           conda info --envs
           rm -rf regression_result
-          python3 run.py --models hf_internlm2_chat_7b --datasets siqa_gen --work-dir regression_result --debug
+          opencompass --models hf_internlm2_5_20b_chat --datasets demo_gsm8k_chat_gen --work-dir regression_result1 --debug
+          opencompass --models hf_internlm2_5_7b_chat --datasets demo_gsm8k_chat_gen --work-dir regression_result2 --debug --max-num-workers 2
+          opencompass --models hf_internlm2_5_7b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy --work-dir regression_result3 --debug --max-num-workers 2
       - name:  Get result
         run: |
-          score=$(sed -n '$p' regression_result/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 79 && ${score%.*} <= 81 )); then
-             echo "score is $score between 79 and 81"
+          score=$(sed -n '$p' regression_result1/*/summary/*.csv | awk -F ',' '{print $NF}')
+          if (( ${score%.*} >= 88 && ${score%.*} <= 89 )); then
+             echo "score is $score between 88 and 89"
           else
-             echo "score is $score not between 79 and 81"
+             echo "score is $score not between 88 and 89"
              exit 1
           fi
-          rm -rf regression_result
+          score=$(sed -n '$p' regression_result2/*/summary/*.csv | awk -F ',' '{print $NF}')
+          if (( ${score%.*} >= 87 && ${score%.*} <= 88 )); then
+             echo "score is $score between 87 and 88"
+          else
+             echo "score is $score not between 87 and 88"
+             exit 1
+          fi
+          score=$(sed -n '$p' regression_result3/*/summary/*.csv | awk -F ',' '{print $NF}')
+          if (( ${score%.*} >= 84 && ${score%.*} <= 87 )); then
+             echo "score is $score between 84 and 87"
+          else
+             echo "score is $score not between 84 and 87"
+             exit 1
+          fi
+          rm -rf regression_result1 & rm -rf regression_result2 & rm -rf regression_result3
       - name:  Uninstall opencompass
         if: always()
         run: |
           . /cpfs01/shared/public/qa-llm-cicd/miniconda3/bin/activate
-          conda activate ${{env.CONDA_ENV}}
+          conda activate ${{env.CONDA_ENV}}${{ runner.name }}
           python3 -m pip uninstall opencompass -y
           conda info --envs
 

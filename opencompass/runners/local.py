@@ -56,10 +56,12 @@ class LocalRunner(BaseRunner):
                  debug: bool = False,
                  max_workers_per_gpu: int = 1,
                  lark_bot_url: str = None,
+                 keep_tmp_file: bool = False,
                  **kwargs):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.max_num_workers = max_num_workers
         self.max_workers_per_gpu = max_workers_per_gpu
+        self.keep_tmp_file = keep_tmp_file
         logger = get_logger()
         for k, v in kwargs.items():
             logger.warning(f'Ignored argument in {self.__module__}: {k}={v}')
@@ -100,7 +102,10 @@ class LocalRunner(BaseRunner):
                 assert len(all_gpu_ids) >= num_gpus
                 # get cmd
                 mmengine.mkdir_or_exist('tmp/')
-                param_file = f'tmp/{os.getpid()}_params.py'
+                import uuid
+                uuid_str = str(uuid.uuid4())
+
+                param_file = f'tmp/{uuid_str}_params.py'
                 try:
                     task.cfg.dump(param_file)
                     # if use torchrun, restrict it behaves the same as non
@@ -131,7 +136,7 @@ class LocalRunner(BaseRunner):
                             task.run()
                     else:
                         tmp_logs = f'tmp/{os.getpid()}_debug.log'
-                        get_logger().debug(
+                        get_logger().warning(
                             f'Debug mode, log will be saved to {tmp_logs}')
                         with open(tmp_logs, 'a') as log_file:
                             subprocess.run(cmd,
@@ -140,7 +145,10 @@ class LocalRunner(BaseRunner):
                                            stdout=log_file,
                                            stderr=subprocess.STDOUT)
                 finally:
-                    os.remove(param_file)
+                    if not self.keep_tmp_file:
+                        os.remove(param_file)
+                    else:
+                        pass
                 status.append((task_name, 0))
         else:
             if len(all_gpu_ids) > 0:

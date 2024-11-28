@@ -127,7 +127,8 @@ Taking Alignbench as an example, `configs/datasets/subjective/alignbench/alignbe
 1. First, you need to set `subjective_reader_cfg` to receive the relevant fields returned from the custom Dataset class and specify the output fields when saving files.
 2. Then, you need to specify the root path `data_path` of the dataset and the dataset filename `subjective_all_sets`. If there are multiple sub-files, you can add them to this list.
 3. Specify `subjective_infer_cfg` and `subjective_eval_cfg` to configure the corresponding inference and evaluation prompts.
-4. Finally, specify additional information such as `mode`, `summarizer`, etc., at the appropriate location. Note that for different subjective datasets, the fields that need to be specified may vary. Additionally, the summarizer class for the respective dataset also needs to be implemented to perform data statistics. You can refer to the summarizer implementations of other datasets, located in `opencompass/opencompass/summarizers/subjective`.
+4. Specify additional information such as `mode` at the corresponding location. Note that the fields required for different subjective datasets may vary.
+5. Define post-processing and score statistics. For example, the postprocessing function `alignbench_postprocess` located under `opencompass/opencompass/datasets/subjective/alignbench`.
 
 ### Step-3: Launch the Evaluation
 

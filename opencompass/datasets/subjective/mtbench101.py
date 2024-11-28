@@ -4,12 +4,15 @@ import os.path as osp
 import re
 
 from datasets import Dataset, DatasetDict
-
-from opencompass.registry import LOAD_DATASET
+from collections import defaultdict
 from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
+from typing import Optional
 
+from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
+
+from .utils import get_judgeanswer_and_reference
 skip_first_tasks = ['FR', 'CR', 'AR', 'SA', 'SC', 'CM']
 
 need_ref_tasks = ['MR', 'GR']
@@ -325,3 +328,58 @@ class MTBench101Dataset(BaseDataset):
 
         dataset = Dataset.from_list(raw_data)
         return dataset
+
+
+def post_process_mtbench101(judgement: str):
+    """Input a string like below:
+
+    xxx[[5]]xxx, and extract the score
+    """
+    judgement = judgement['prediction']
+    match = re.search(r'\[([0-9]+)\]', judgement)
+    if match:
+        score = int(match.group(1))
+
+    else:
+        return None
+
+    return {'score': score, 'judgement': judgement}
+
+
+def get_final_results(judged_answers, references):
+
+    task_multi_id_scores = defaultdict(list)
+    task_scores = defaultdict(list)
+
+    for ans, ref in zip(judged_answers, references):
+
+        task = ref['task']
+        multi_id = ref['multi_id']
+        score = ans['score']
+
+        task_multi_id_scores[(task, multi_id)].append(score)
+
+    for (task, multi_id), scores in task_multi_id_scores.items():
+        min_score = min(scores)
+        task_scores[task].append(min_score)
+
+    final_task_scores = {
+        task: sum(scores) / len(scores) if scores else 0
+        for task, scores in task_scores.items()
+    }
+    average_score = round(
+        sum(final_task_scores.values()) / len(final_task_scores), 3)
+
+    return {f'avg': average_score, **final_task_scores}
+
+
+@DICT_POSTPROCESSORS.register_module('mtbench101')
+def mtbench101_postprocess(output: dict,
+                           output_path: str,
+                           ) -> dict:
+    judged_answers, references = get_judgeanswer_and_reference(
+        output, output_path, post_process_mtbench101)
+
+    results = get_final_results(judged_answers, references)
+    results['details'] = output
+    return results

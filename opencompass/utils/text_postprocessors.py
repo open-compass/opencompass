@@ -71,6 +71,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案应该?是\s*([{options}])',
         f'答案应该?选\s*([{options}])',
         f'答案选项为?\s*：\s*([{options}])',
+        f'答案选项为?\s+\(?\*?\*?([{options}])\*?\*?\)?',
         f'答案选项是?\s*:\s*([{options}])',
         f'答案为\s*([{options}])',
         f'答案选\s*([{options}])',
@@ -100,6 +101,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案为\s?(\S+)(?:。|$)',
         f'(?i)ANSWER\s*:\s*([{options}])',
         f'[Tt]he answer is:?\s+\(?([{options}])\)?',
+        f'[Tt]he answer is:?\s+\(?\*?\*?([{options}])\*?\*?\)?',
         f'[Tt]he answer is option:?\s+\(?([{options}])\)?',
         f'[Tt]he correct answer is:?\s+\(?([{options}])\)?',
         f'[Tt]he correct answer is option:?\s+\(?([{options}])\)?',
@@ -126,7 +128,10 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         text = text.strip()
         match = re.search(pattern, text, re.DOTALL)
         if match:
-            outputs = match.group(0)
+            if match.group(1) is not None and match.group(1) != '':
+                outputs = match.group(1)
+            else:
+                outputs = match.group(0)
             for i in options:
                 if i in outputs:
                     return i

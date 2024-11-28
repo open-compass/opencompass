@@ -1,11 +1,15 @@
+# flake8: noqa: F401, F403
 import json
+import re
+from collections import defaultdict
 
 from datasets import Dataset, DatasetDict
 
-from opencompass.registry import LOAD_DATASET
+from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
 from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
+from .utils import get_judgeanswer_and_reference
 
 score_prompt = """# Instruction
 
@@ -249,3 +253,91 @@ class WildBenchDataset(BaseDataset):
                 })
         dataset = Dataset.from_list(raw_data)
         return dataset
+
+
+task_group_new = {
+    'Information seeking': 'Information/Advice seeking',
+    'Creative Writing': 'Creative Tasks',
+    'Coding & Debugging': 'Coding & Debugging',
+    'Reasoning': 'Planning & Reasoning',
+    'Editing': 'Creative Tasks',
+    'Math': 'Math & Data Analysis',
+    'Planning': 'Planning & Reasoning',
+    'Brainstorming': 'Creative Tasks',
+    'Role playing': 'Creative Tasks',
+    'Advice seeking': 'Information/Advice seeking',
+    'Data Analysis': 'Math & Data Analysis',
+    'Others': 'Creative Tasks'
+}
+
+
+def post_process_wildbench_pair(judgement: dict):
+    judgement = judgement['prediction']
+    pattern = r'\"choice\": \"(.*?)\"'
+    matched_result = re.findall(pattern, judgement)
+    if matched_result:
+        return matched_result[0]
+    else:
+        return None
+
+
+def post_process_wildbench_single(judgement: dict):
+    judgement = judgement['prediction']
+    pattern = r'\"score\": \"(.*?)\"'
+    matched_result = re.findall(pattern, judgement)
+    try:
+        score = float(matched_result[0])
+        return {'score': score}
+    except (ValueError, IndexError) as e:
+        return None
+
+    # if matched_result:
+    #     score = float(matched_result[0])
+    # else:
+    #     return None
+    # return {'score': score}
+
+
+@DICT_POSTPROCESSORS.register_module('wildbench')
+def wildbench_postprocess(output: dict, output_path: str) -> dict:
+    judged_answers, references = get_judgeanswer_and_reference(
+        output, output_path, post_process_wildbench_pair)
+
+    win_base_model = defaultdict(float)
+    win_compare_model = defaultdict(float)
+    categories = defaultdict(float)
+
+    score_mapping = {'A++': 1, 'A+': 0.5, 'A=B': 0, 'B+': -0.5, 'B++': -1}
+    for prediction, reference in zip(judged_answers, references):
+        if prediction not in score_mapping:
+            continue
+
+        flag = 1 if reference['answer1'] in [
+            'HaiKu', 'gpt4-turbo', 'llama-2-70b-chat-hf'
+        ] else -1
+        score_1 = score_mapping[prediction] * flag
+        score_2 = -score_1
+
+        tags = [reference['primary_tag']] + reference['secondary_tag']
+        for tag in tags:
+            win_base_model[task_group_new[tag]] += score_1
+            win_compare_model[task_group_new[tag]] += score_2
+            categories[task_group_new[tag]] += 1
+
+    for capability in categories:
+        win_base_model[capability] = win_base_model[capability] / categories[
+            capability] * 100
+        win_base_model[capability] = round(win_base_model[capability], 2)
+        win_compare_model[capability] = win_compare_model[
+            capability] / categories[capability] * 100
+        win_compare_model[capability] = round(win_compare_model[capability], 2)
+
+    # Calculating the mean of the values
+    average = sum(win_compare_model.values()) / len(win_compare_model)
+
+    # Adding the mean to the dictionary at the beginning
+    win_compare_model['average'] = average
+
+    results = win_compare_model
+    results['details'] = output
+    return results

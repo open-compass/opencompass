@@ -459,6 +459,7 @@ class OpenAISDK(OpenAI):
                   input: Union[str, PromptList],
                   max_out_len: int,
                   temperature: float) -> str:
+        from openai import APIStatusError, BadRequestError
         assert isinstance(input, (str, PromptList))
 
         # max num token for gpt-3.5-turbo is 4097

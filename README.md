@@ -53,12 +53,13 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 🔥🔥🔥 We are delighted to announce that **the OpenCompass has been recommended by the Meta AI**, click [Get Started](https://ai.meta.com/llama/get-started/#validation) of Llama for more information.
 
 > **Attention**<br />
-> We launch the OpenCompass Collaboration project, welcome to support diverse evaluation benchmarks into OpenCompass!
-> Clike [Issue](https://github.com/open-compass/opencompass/issues/248) for more information.
-> Let's work together to build a more powerful OpenCompass toolkit!
+> Breaking Change Notice: In version 0.4.0, we are consolidating all AMOTIC configuration files (previously located in ./configs/datasets, ./configs/models, and ./configs/summarizers) into the opencompass package. Users are advised to update their configuration references to reflect this structural change.
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2024.11.14\]** OpenCompass now offers support for a sophisticated benchmark designed to evaluate complex reasoning skills — [MuSR](https://arxiv.org/pdf/2310.16049). Check out the [demo](configs/eval_musr.py) and give it a spin! 🔥🔥🔥
+- **\[2024.11.14\]** OpenCompass now supports the brand new long-context language model evaluation benchmark — [BABILong](https://arxiv.org/pdf/2406.10149). Have a look at the [demo](configs/eval_babilong.py) and give it a try! 🔥🔥🔥
+- **\[2024.10.14\]** We now support the OpenAI multilingual QA dataset [MMMLU](https://huggingface.co/datasets/openai/MMMLU). Feel free to give it a try! 🔥🔥🔥
 - **\[2024.09.19\]** We now support [Qwen2.5](https://huggingface.co/Qwen)(0.5B to 72B) with multiple backend(huggingface/vllm/lmdeploy). Feel free to give them a try! 🔥🔥🔥
 - **\[2024.09.17\]** We now support OpenAI o1(`o1-mini-2024-09-12` and `o1-preview-2024-09-12`). Feel free to give them a try! 🔥🔥🔥
 - **\[2024.09.05\]** We now support answer extraction through model post-processing to provide a more accurate representation of the model's capabilities. As part of this update, we have integrated [XFinder](https://github.com/IAAR-Shanghai/xFinder) as our first post-processing model. For more detailed information, please refer to the [documentation](opencompass/utils/postprocessors/xfinder/README.md), and give it a try! 🔥🔥🔥
@@ -594,7 +595,7 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 ## 🔜 Roadmap
 
 - [x] Subjective Evaluation
-  - [x] Release CompassAreana
+  - [x] Release CompassAreana.
   - [x] Subjective evaluation.
 - [x] Long-context
   - [x] Long-context evaluation with extensive datasets.
@@ -603,10 +604,10 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
   - [ ] Coding evaluation leaderboard.
   - [x] Non-python language evaluation service.
 - [x] Agent
-  - [ ] Support various agenet framework.
+  - [ ] Support various agent frameworks.
   - [x] Evaluation of tool use of the LLMs.
 - [x] Robustness
-  - [x] Support various attack method
+  - [x] Support various attack methods.
 
 ## 👷‍♂️ Contributing
 
