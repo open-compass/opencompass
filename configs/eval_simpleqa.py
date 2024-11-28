@@ -8,7 +8,6 @@ from opencompass.summarizers import DefaultSubjectiveSummarizer
 
 with read_base():
     from opencompass.configs.datasets.SimpleQA.simpleqa_gen import simpleqa_datasets
-    # from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_72b_instruct import models as qwen2_5_72b_instruct_model
     from opencompass.configs.models.openai.gpt_4o_2024_05_13 import models as gpt_4o_2024_05_13_model
 
 models = gpt_4o_2024_05_13_model # model for generation
@@ -37,8 +36,8 @@ infer = dict(
 eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
-        models=[],
-        judge_models=[],
+        models=[gpt_4o_2024_05_13_model],
+        judge_models=[gpt_4o_2024_05_13_model],
     ),
     runner=dict(type=LocalRunner,
                 max_num_workers=256,
