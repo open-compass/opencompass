@@ -2,7 +2,7 @@ from mmengine.config import read_base
 
 with read_base():
     from .flores_gen_2697d7 import PMMEval_flores_datasets
-    from .humanevalxl_gen_4dfef4 import PMMEval_HumanEvalXL_datasets
+    from .humanevalxl_gen_bdec92 import PMMEval_HumanEvalXL_datasets
     from .mgsm_gen_679720 import PMMEval_MGSM_datasets
     from .mhellaswag_gen_1a6b73 import PMMEval_MHellaswag_datasets
     from .mifeval_gen_79f8fb import PMMEval_MIFEval_datasets
