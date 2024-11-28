@@ -377,10 +377,6 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa.zip",
         "md5": "1d83fc2e15798d39cb265c9a3cb5195a",
     },
-    "/simpleqa": {
-        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa.zip",
-        "md5": "1d83fc2e15798d39cb265c9a3cb5195a",
-    },
     "/gpqa/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gpqa.zip",
         "md5": "2e9657959030a765916f1f2aca29140d",
