@@ -11,7 +11,7 @@ with read_base():
     from .groups.jigsaw_multilingual import jigsaw_multilingual_summary_groups
     from .groups.tydiqa import tydiqa_summary_groups
     from .groups.xiezhi import xiezhi_summary_groups
-    from opencompass.configs.summarizers.groups.PMMEval import PMMEval_summary_groups
+    from .groups.PMMEval import PMMEval_summary_groups
 
 # TODO: obqa, storycloze
 summarizer = dict(
