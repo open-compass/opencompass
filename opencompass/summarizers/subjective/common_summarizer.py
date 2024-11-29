@@ -130,6 +130,7 @@ class CommonSummarizer(CompassArenaSummarizer):
                         tmp_result = get_capability_results(judged_answers, references, output_tmp_file, fout_flag, show_model_abbr, show_judge_model_abbr, show_dataset_abbr)
                         if show_judge_model_abbr not in json_result:
                             json_result[show_judge_model_abbr] = {}
+                        json_result[show_judge_model_abbr][show_model_abbr] = tmp_result
                         fout_flag += 1
                 else:
                     print(subdir_path + ' is not exist! please check!')
