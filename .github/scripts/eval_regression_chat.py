@@ -2,7 +2,7 @@ from mmengine.config import read_base
 
 with read_base():
     # choose a list of datasets
-    from opencompass.configs.datasets.gsm8k.gsm8k_gen import \
+    from opencompass.configs.datasets.gsm8k.gsm8k_0shot_v2_gen_6e39a4 import \
         gsm8k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.race.race_gen import \
         race_datasets  # noqa: F401, E501
