@@ -22,7 +22,7 @@ with read_base():
     from opencompass.configs.datasets.gpqa.gpqa_openai_simple_evals_gen_5aeece import \
         gpqa_datasets  # noqa: F401, E501
     # new datasets in Fullbench v1.1
-    from opencompass.configs.datasets.gsm8k.gsm8k_0shot_v2_gen_a58960 import \
+    from opencompass.configs.datasets.gsm8k.gsm8k_0shot_v2_gen_6e39a4 import \
         gsm8k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.hellaswag.hellaswag_10shot_gen_e42710 import \
         hellaswag_datasets  # noqa: F401, E501
@@ -46,7 +46,7 @@ with read_base():
         mmlu_pro_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.mmmlu_lite.mmmlu_lite_gen_c51a84 import \
         mmmlu_lite_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.musr.musr_gen_3c6e15 import \
+    from opencompass.configs.datasets.musr.musr_gen_3622bb import \
         musr_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.nq.nq_open_1shot_gen_2e45e5 import \
         nq_datasets  # noqa: F401, E501
