@@ -19,6 +19,8 @@ PromptType = Union[PromptList, str]
 OPENAI_API_BASE = os.path.join(
     os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
     'chat/completions')
+OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
+                                    'https://api.openai.com/v1/')
 
 O1_MODEL_LIST = [
     'o1-preview-2024-09-12',
@@ -476,7 +478,7 @@ class OpenAISDK(OpenAI):
         key: str | List[str] = 'ENV',
         org: str | List[str] | None = None,
         meta_template: Dict | None = None,
-        openai_api_base: str = OPENAI_API_BASE,
+        openai_api_base: str = OPENAISDK_API_BASE,
         openai_proxy_url: Optional[str] = None,
         mode: str = 'none',
         logprobs: bool | None = False,
