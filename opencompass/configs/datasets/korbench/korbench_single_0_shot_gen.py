@@ -48,7 +48,7 @@ for category in categories:
 
     korbench_dataset = dict(
         type=korbenchDataset,
-        abbr=f"korbench_{category}_0shot",
+        abbr=f"korbench_{category}",
         path="opencompass/korbench",
         mode='0_shot',
         category=category,

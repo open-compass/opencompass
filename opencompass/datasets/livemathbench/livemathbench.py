@@ -279,6 +279,8 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                 'dataset': '_'.join(key.split('_')[:-1])
             }
             all_dataset.add('_'.join(key.split('_')[:-1]))
+                'responses': []
+            }
             if_pass_list = []
             for single_run_examples in examples:
                 detail['responses'].append([])
@@ -312,7 +314,7 @@ class LiveMathBenchEvaluator(BaseEvaluator):
             details.append(detail)
 
         detailed_result = {'details': details}
-
+      
         i = 1
         while i <= K:
             detailed_result.update({
@@ -321,6 +323,7 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                 f'{i}@pass/std':
                 100. * np.mean([detail[f'{i}@pass/std'] for detail in details])
             })
+
             for d in sorted(list(all_dataset)):
                 detailed_result.update({
                     f'{d}_{i}@pass':
@@ -348,5 +351,9 @@ class LiveMathBenchEvaluator(BaseEvaluator):
             })
         detailed_result.update(
             {'pass-rate': 100. * sum(total_pass_num).sum() / sum(count).sum()})
+            i = i * 2
+          
+        detailed_result.update(
+            {'pass-rate': 100. * np.mean(sum(total_pass_num) / sum(count))})
 
         return detailed_result
