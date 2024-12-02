@@ -270,12 +270,15 @@ class LiveMathBenchEvaluator(BaseEvaluator):
         count = []
         total_pass_num = []
         details = []
+        all_dataset = set()
         for key, examples in key2example.items():
             detail = {
                 'question': examples[0][0]['question'],
                 'answer': examples[0][0]['answer'],
-                'responses': []
+                'responses': [],
+                'dataset': '_'.join(key.split('_')[:-1])
             }
+            all_dataset.add('_'.join(key.split('_')[:-1]))
             if_pass_list = []
             for single_run_examples in examples:
                 detail['responses'].append([])
@@ -309,6 +312,7 @@ class LiveMathBenchEvaluator(BaseEvaluator):
             details.append(detail)
 
         detailed_result = {'details': details}
+
         i = 1
         while i <= K:
             detailed_result.update({
@@ -317,8 +321,32 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                 f'{i}@pass/std':
                 100. * np.mean([detail[f'{i}@pass/std'] for detail in details])
             })
+            for d in sorted(list(all_dataset)):
+                detailed_result.update({
+                    f'{d}_{i}@pass':
+                    100. * np.mean([
+                        detail[f'{i}@pass']
+                        for detail in details if detail['dataset'] == d
+                    ]),
+                    f'{d}_{i}@pass/std':
+                    100. * np.mean([
+                        detail[f'{i}@pass/std']
+                        for detail in details if detail['dataset'] == d
+                    ])
+                })
             i = i * 2
+        for d in sorted(list(all_dataset)):
+            detailed_result.update({
+                f'{d}_pass-rate':
+                100. * sum([
+                    item for i, item in enumerate(total_pass_num)
+                    if details[i]['dataset'] == d
+                ]).sum() / sum([
+                    item for i, item in enumerate(count)
+                    if details[i]['dataset'] == d
+                ]).sum()
+            })
         detailed_result.update(
-            {'pass-rate': 100. * np.mean(sum(total_pass_num) / sum(count))})
+            {'pass-rate': 100. * sum(total_pass_num).sum() / sum(count).sum()})
 
         return detailed_result
