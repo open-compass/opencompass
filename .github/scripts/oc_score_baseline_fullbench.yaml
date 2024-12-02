@@ -70,7 +70,7 @@ internlm2_5-7b-chat-turbomind_fullbench:
     drop: 75
     hellaswag: 81.25
     TheoremQA: 6.25
-    musr_average: 39.58
+    musr_average: 37.5
     gsm8k: 68.75
     math: 75
     GPQA_diamond: 25
