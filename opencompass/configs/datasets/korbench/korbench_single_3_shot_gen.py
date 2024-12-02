@@ -49,7 +49,7 @@ for category in categories:
 
     korbench_dataset = dict(
         type=korbenchDataset,
-        abbr=f"korbench_{category}_3shot",
+        abbr=f"korbench_{category}",
         path="opencompass/korbench",
         mode='3_shot',
         category=category,
