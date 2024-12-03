@@ -17,4 +17,3 @@ from .mtbench101 import MTBench101Summarizer
 from .multiround import MultiroundSummarizer
 from .subjective import SubjectiveSummarizer
 from .wildbench import WildBenchPairSummarizer, WildBenchSingleSummarizer
-from .chinese_simpleqa import CsimpleqaSummarizer
