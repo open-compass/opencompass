@@ -118,7 +118,7 @@ for _name, _prompt in sub_map.items():
                 ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_seq_len=4096, max_out_len=2048),
+            inferencer=dict(type=GenInferencer, max_seq_len=4096, max_out_len=4096),
         )
 
     subjective_eval_cfg = dict(
