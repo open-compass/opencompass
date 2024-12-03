@@ -8,7 +8,6 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.models import HuggingFacewithChatTemplate
-from opencompass.partitioners import NaivePartitioner
 from opencompass.summarizers import DefaultSubjectiveSummarizer
 
 # -------------Inference Stage ----------------------------------------
