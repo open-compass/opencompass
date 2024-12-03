@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import MATHDataset, GaoKaoMATHEvaluator, MATHEvaluator, math_postprocess_v2
+from opencompass.datasets import MATHDataset, GaoKaoMATHEvaluator
 
 # ----------------------------- Model Eval Parameters -----------------------------
 
@@ -36,15 +36,14 @@ evaluator = dict(
 )
 
 math_eval_cfg = dict(
-    # evaluator=evaluator,
-    evaluator=dict(type=MATHEvaluator, version='v2'), pred_postprocessor=dict(type=math_postprocess_v2),
+    evaluator=evaluator,
 )
 
 math_datasets = [
     dict(
         type=MATHDataset,
         abbr='math',
-        path='/fs-computility/llmeval/liuhongwei/work/opencompass/data/math/',
+        path='opencompass/math',
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg,
