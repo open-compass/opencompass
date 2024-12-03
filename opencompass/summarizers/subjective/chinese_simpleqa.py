@@ -14,19 +14,22 @@ try:
 except ImportError:
     from_csv = None
 
-from opencompass.utils import model_abbr_from_cfg
-from .utils import get_outdir
-from opencompass.utils import dataset_abbr_from_cfg
 import mmengine
 
+from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
+
+from .utils import get_outdir
+
+
 def post_process_csimpleqa(prediction):
-    score = "C"
+    score = 'C'
     try:
-        match = re.search(r"(A|B|C)", prediction)
-        score = match.group(0) if match else "C" 
+        match = re.search(r'(A|B|C)', prediction)
+        score = match.group(0) if match else 'C'
     except:
-        score = "C"
+        score = 'C'
     return score
+
 
 def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
     """Extract judgements (scores) and references.
@@ -79,33 +82,40 @@ def get_judgeanswer_and_reference(dataset, subdir_path, post_process):
         print('*' * 100)
     return judged_answers, references
 
+
 def calculate_metrics(judged_answers):
     # judged_answers is a list like ["A", "B", "C", ...]
 
     total_questions = len(judged_answers)
-    total_correct = judged_answers.count("A")
-    total_incorrect = judged_answers.count("B")
-    total_not_attempted = judged_answers.count("C")
-    
+    total_correct = judged_answers.count('A')
+    total_incorrect = judged_answers.count('B')
+    total_not_attempted = judged_answers.count('C')
+
     total_correct_accuracy = total_correct / total_questions if total_questions > 0 else 0
     total_incorrect_accuracy = total_incorrect / total_questions if total_questions > 0 else 0
     total_not_attempted_accuracy = total_not_attempted / total_questions if total_questions > 0 else 0
-    
-    total_given_attempted_accuracy = total_correct / (total_correct + total_incorrect) if (total_correct + total_incorrect) > 0 else 0
-    
-    f1 = 2 * total_given_attempted_accuracy * total_correct_accuracy / (total_given_attempted_accuracy + total_correct_accuracy) if (total_given_attempted_accuracy + total_correct_accuracy) > 0 else 0
-    
+
+    total_given_attempted_accuracy = total_correct / (
+        total_correct + total_incorrect) if (total_correct +
+                                             total_incorrect) > 0 else 0
+
+    f1 = 2 * total_given_attempted_accuracy * total_correct_accuracy / (
+        total_given_attempted_accuracy + total_correct_accuracy) if (
+            total_given_attempted_accuracy + total_correct_accuracy) > 0 else 0
+
     return {
-        'correct': total_correct_accuracy, 
-        'incorrect': total_incorrect_accuracy, 
-        'not_attempted': total_not_attempted_accuracy, 
-        "given_attempted_accuracy": total_given_attempted_accuracy, 
-        "F1": f1
+        'correct': total_correct_accuracy,
+        'incorrect': total_incorrect_accuracy,
+        'not_attempted': total_not_attempted_accuracy,
+        'given_attempted_accuracy': total_given_attempted_accuracy,
+        'F1': f1
     }
-    
+
+
 def get_results(judged_answers):
     results = calculate_metrics(judged_answers)
     return results
+
 
 def get_dimension_results(judged_answers, references, fout, fout_flag, model):
     dimension_ratings = defaultdict(int)
@@ -124,34 +134,37 @@ def get_dimension_results(judged_answers, references, fout, fout_flag, model):
         for row in rows:
             writer.writerow([row] +
                             [scores[row][column] for column in columns])
-    return {
-        "f_score": f_score
-    }
+    return {'f_score': f_score}
+
 
 def calculate_metrics(judged_answers):
     # judged_answers is a list like ["A", "B", "C", ...]
 
     total_questions = len(judged_answers)
-    total_correct = judged_answers.count("A")
-    total_incorrect = judged_answers.count("B")
-    total_not_attempted = judged_answers.count("C")
-    
+    total_correct = judged_answers.count('A')
+    total_incorrect = judged_answers.count('B')
+    total_not_attempted = judged_answers.count('C')
+
     total_correct_accuracy = total_correct / total_questions if total_questions > 0 else 0
     total_incorrect_accuracy = total_incorrect / total_questions if total_questions > 0 else 0
     total_not_attempted_accuracy = total_not_attempted / total_questions if total_questions > 0 else 0
-    
-    total_given_attempted_accuracy = total_correct / (total_correct + total_incorrect) if (total_correct + total_incorrect) > 0 else 0
-    
-    f1 = 2 * total_given_attempted_accuracy * total_correct_accuracy / (total_given_attempted_accuracy + total_correct_accuracy) if (total_given_attempted_accuracy + total_correct_accuracy) > 0 else 0
-    
+
+    total_given_attempted_accuracy = total_correct / (
+        total_correct + total_incorrect) if (total_correct +
+                                             total_incorrect) > 0 else 0
+
+    f1 = 2 * total_given_attempted_accuracy * total_correct_accuracy / (
+        total_given_attempted_accuracy + total_correct_accuracy) if (
+            total_given_attempted_accuracy + total_correct_accuracy) > 0 else 0
+
     return {
-        'correct': total_correct_accuracy, 
-        'incorrect': total_incorrect_accuracy, 
-        'not_attempted': total_not_attempted_accuracy, 
-        "given_attempted_accuracy": total_given_attempted_accuracy, 
-        "F1": f1
+        'correct': total_correct_accuracy,
+        'incorrect': total_incorrect_accuracy,
+        'not_attempted': total_not_attempted_accuracy,
+        'given_attempted_accuracy': total_given_attempted_accuracy,
+        'F1': f1
     }
-    
+
 
 class CsimpleqaSummarizer:
     """Do the subjectivity analyze based on evaluation results.
@@ -190,7 +203,7 @@ class CsimpleqaSummarizer:
             dataset = dataset_cfgs[0]
             output_dir, results_folder = get_outdir(self.cfg, time_str)
             fout_flag = 0
-           
+
             fout = osp.join(
                 output_dir,
                 'Chinesesimpleqa-judged-by--' + judge_abbr + '-capability.csv')
@@ -206,8 +219,8 @@ class CsimpleqaSummarizer:
                         score_by_judgemodel[model] = None
                         continue
 
-                    scores = get_dimension_results(judged_answers, references, fout,
-                                              fout_flag, model)                              
+                    scores = get_dimension_results(judged_answers, references,
+                                                   fout, fout_flag, model)
                     fout_flag += 1
                     score_by_judgemodel[model] = scores
                 else:
