@@ -1,13 +1,15 @@
 from mmengine.config import read_base
 
 with read_base():
-    from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa import csimpleqa_datasets, CsimpleqaSummarizer
+    from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa import csimpleqa_datasets
+
 from opencompass.models.openai_api import OpenAI
 from opencompass.runners import LocalRunner
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
 from opencompass.models import HuggingFacewithChatTemplate
 from opencompass.partitioners import NaivePartitioner
+from opencompass.summarizers import DefaultSubjectiveSummarizer
 
 # -------------Inference Stage ----------------------------------------
 models = [
@@ -35,6 +37,7 @@ models = [
 ]
 
 datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
+summarizer = dict(type=DefaultSubjectiveSummarizer)
 
 # -------------Evalation Stage ----------------------------------------
 
@@ -54,7 +57,7 @@ judge_models = [
         type=OpenAI,
         # gpt-4o
         path='gpt-4o-0513-global',
-        key='xxx',  # provide OPENAI_API_KEY 
+        key='xxx',  # provide OPENAI_API_KEY
         meta_template=api_meta_template,
         query_per_second=16,
         max_out_len=1000,
@@ -68,6 +71,4 @@ eval = dict(
     runner=dict(type=LocalRunner, max_num_workers=16, task=dict(type=SubjectiveEvalTask)),
 )
 
-
-summarizer = dict(type=CsimpleqaSummarizer, judge_type='general')
 work_dir = 'outputs/chinese_simpleqa/'

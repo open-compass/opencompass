@@ -2,7 +2,6 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.summarizers import CsimpleqaSummarizer
 from opencompass.datasets import CsimpleqaDataset, csimpleqa_postprocess
 
 subjective_reader_cfg = dict(input_columns=['primary_category', 'question','gold_ans', 'messages', 'system_prompt','prompt_template'], output_column='judge')
@@ -55,6 +54,5 @@ csimpleqa_datasets = [
         infer_cfg=subjective_infer_cfg,
         eval_cfg=subjective_eval_cfg,
         mode='singlescore',
-        summarizer = dict(type=CsimpleqaSummarizer, judge_type='general')
     )
 ]

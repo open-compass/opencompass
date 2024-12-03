@@ -1,15 +1,14 @@
 import json
-import os
 import os.path as osp
 import re
-from datetime import datetime
-from typing import Optional
+
 from datasets import Dataset, DatasetDict
 
-from opencompass.registry import DICT_POSTPROCESSORS, TEXT_POSTPROCESSORS, LOAD_DATASET
+from opencompass.registry import (DICT_POSTPROCESSORS, LOAD_DATASET,
+                                  TEXT_POSTPROCESSORS)
 from opencompass.utils import get_data_path
-from ..base import BaseDataset
 
+from ..base import BaseDataset
 
 csimpleqa_judge_prompt_new = """
 请根据给定问题、标准答案和模型预测的答案来评估模型的回答是否正确。您的任务是将结果评定为：【正确】、【错误】或【未尝试】。
@@ -60,7 +59,7 @@ csimpleqa_judge_prompt_new = """
 另外注意以下几点：
 - 对于标准答案为数字的问题，预测答案应和标准答案一致。例如，考虑问题“金山铁路黄浦江特大桥的全长是多少米？”，标准答案为“3518.17”：
     - 预测答案“3518”、“3518.1”、“3518.17”均为【正确】。
-    - 预测答案“3520”和“3600”均为【错误】。 
+    - 预测答案“3520”和“3600”均为【错误】。
     - 预测答案“大约3500米”和“超过3000米”被视为【未尝试】，因为它们既不确认也不与标准答案矛盾。
 - 如果标准答案包含比问题更多的信息，预测答案只需包含问题中提到的信息。
     - 例如，考虑问题“菱镁矿的主要化学成分是什么？”标准答案为“碳酸镁（MgCO3）”。“碳酸镁”或“MgCO3”均视为【正确】答案。
@@ -82,13 +81,14 @@ B:【错误】
 C:【未尝试】
 
 只返回字母"A"、"B"或"C"，无须添加其他文本。
-""".strip()
+""".strip()  # noqa E501
 
 
 @TEXT_POSTPROCESSORS.register_module('chinese_simpleqa_preprocess')
 def chinese_simpleqa_preprocess(text: str) -> str:
-    text = text.split("问题：")[0].strip()
+    text = text.split('问题：')[0].strip()
     return text
+
 
 @LOAD_DATASET.register_module()
 class CsimpleqaDataset(BaseDataset):
@@ -98,14 +98,23 @@ class CsimpleqaDataset(BaseDataset):
         filename = osp.join(path, f'{name}.jsonl')
         dataset = DatasetDict()
         raw_data = []
-        lines = open(filename, "r", encoding="utf-8").readlines()
+        lines = open(filename, 'r', encoding='utf-8').readlines()
         for line in lines:
             data = json.loads(line)
             question = data['question']
-            cur_system_prompt = "你是一个智能助手。"
-            messages = [{"role": "system", "content": cur_system_prompt}, {"role": "user", "content": question}]
-            judge_system_prompt = "你是一个智能助手，请根据给定问题、标准答案和模型预测的答案来评估模型的回答是否正确。"
-            csimpleqa_judge_prompt_f = csimpleqa_judge_prompt_new.format(question = question, target = data['answer'], predicted_answer = "{prediction}")
+            cur_system_prompt = '你是一个智能助手。'
+            messages = [{
+                'role': 'system',
+                'content': cur_system_prompt
+            }, {
+                'role': 'user',
+                'content': question
+            }]
+            judge_system_prompt = '你是一个智能助手，请根据给定问题、标准答案和模型预测的答案来评估模型的回答是否正确。'
+            csimpleqa_judge_prompt_f = csimpleqa_judge_prompt_new.format(
+                question=question,
+                target=data['answer'],
+                predicted_answer='{prediction}')
             raw_data.append({
                 'primary_category': data['primary_category'],
                 'question': question,
@@ -122,15 +131,17 @@ class CsimpleqaDataset(BaseDataset):
         dataset = Dataset.from_list(raw_data)
         return dataset
 
+
 def post_process_csimpleqa(completion):
     s = completion['prediction']
-    score = "C"
+    score = 'C'
     try:
-        match = re.search(r"(A|B|C)", s)
-        score = match.group(0) if match else "C" 
-    except:
-        score = "C"
+        match = re.search(r'(A|B|C)', s)
+        score = match.group(0) if match else 'C'
+    except Exception:
+        score = 'C'
     return score
+
 
 def get_judgeanswer_and_reference(result, filename, post_process):
     judged_answers = []
@@ -140,49 +151,55 @@ def get_judgeanswer_and_reference(result, filename, post_process):
             judged_answers.append(processed_judge)
     if len(judged_answers) <= 0.95 * len(result):
         print('*' * 100)
-        print(
-            f'For your {filename} judge. Among {len(result)} judgements, successfully extracted {len(judged_answers)} judgements, please check!'
-        )
+        print(f'For your {filename} judge. \
+              Among {len(result)} judgements, \n\
+              successfully extracted {len(judged_answers)} judgements, \n\
+              please check!')
         print('*' * 100)
     return judged_answers
+
 
 def calculate_metrics(judged_answers):
     # judged_answers is a list like ["A", "B", "C", ...]
 
     total_questions = len(judged_answers)
-    total_correct = judged_answers.count("A")
-    total_incorrect = judged_answers.count("B")
-    total_not_attempted = judged_answers.count("C")
-    
-    total_correct_accuracy = total_correct / total_questions if total_questions > 0 else 0
-    total_incorrect_accuracy = total_incorrect / total_questions if total_questions > 0 else 0
-    total_not_attempted_accuracy = total_not_attempted / total_questions if total_questions > 0 else 0
-    
-    total_given_attempted_accuracy = total_correct / (total_correct + total_incorrect) if (total_correct + total_incorrect) > 0 else 0
-    
-    f1 = 2 * total_given_attempted_accuracy * total_correct_accuracy / (total_given_attempted_accuracy + total_correct_accuracy) if (total_given_attempted_accuracy + total_correct_accuracy) > 0 else 0
-    
+    total_correct = judged_answers.count('A')
+    total_incorrect = judged_answers.count('B')
+    total_not_attempted = judged_answers.count('C')
+
+    total_correct_accuracy = total_correct / total_questions \
+        if total_questions > 0 else 0
+    total_incorrect_accuracy = total_incorrect / total_questions \
+        if total_questions > 0 else 0
+    total_not_attempted_accuracy = total_not_attempted / total_questions \
+        if total_questions > 0 else 0
+
+    total_given_attempted_accuracy = total_correct / (
+        total_correct + total_incorrect) if (total_correct +
+                                             total_incorrect) > 0 else 0
+
+    f1 = 2 * total_given_attempted_accuracy * total_correct_accuracy / (
+        total_given_attempted_accuracy + total_correct_accuracy) if (
+            total_given_attempted_accuracy + total_correct_accuracy) > 0 else 0
+
     return {
-        'correct': total_correct_accuracy, 
-        'incorrect': total_incorrect_accuracy, 
-        'not_attempted': total_not_attempted_accuracy, 
-        "given_attempted_accuracy": total_given_attempted_accuracy, 
-        "F1": f1
+        'correct': total_correct_accuracy,
+        'incorrect': total_incorrect_accuracy,
+        'not_attempted': total_not_attempted_accuracy,
+        'given_attempted_accuracy': total_given_attempted_accuracy,
+        'F1': f1
     }
-    
+
+
 def get_results(judged_answers):
     results = calculate_metrics(judged_answers)
     return results
 
 
 @DICT_POSTPROCESSORS.register_module('csimpleqa')
-def csimpleqa_postprocess(output: dict,
-                           output_path: str,
-                           judge_type: Optional[str] = 'general') -> dict:
-    judged_answers = get_judgeanswer_and_reference(output, output_path, post_process_csimpleqa)
-    if len(judged_answers) == 0:
-        scores = None
+def csimpleqa_postprocess(output: dict, output_path: str) -> dict:
+    judged_answers = get_judgeanswer_and_reference(output, output_path,
+                                                   post_process_csimpleqa)
     results = get_results(judged_answers)
     results['details'] = output
     return results
-
