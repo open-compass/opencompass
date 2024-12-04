@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Union
 import httpx
 import jieba
 import requests
+from tqdm import tqdm
 
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
@@ -172,9 +173,11 @@ class OpenAI(BaseAPIModel):
 
         with ThreadPoolExecutor() as executor:
             results = list(
-                executor.map(self._generate, inputs,
-                             [max_out_len] * len(inputs),
-                             [temperature] * len(inputs)))
+                tqdm(executor.map(self._generate, inputs,
+                                  [max_out_len] * len(inputs),
+                                  [temperature] * len(inputs)),
+                     total=len(inputs),
+                     desc='Inferencing'))
         return results
 
     def _generate(self, input: PromptType, max_out_len: int,

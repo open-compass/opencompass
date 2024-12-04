@@ -56,8 +56,11 @@ class Gemini(BaseAPIModel):
             key = os.getenv('GEMINI_API_KEY')
 
         assert path in [
-            'gemini-1.0-pro', 'gemini-pro', 'gemini-1.5-flash',
-            'gemini-1.5-pro'
+            'gemini-1.0-pro',
+            'gemini-pro',
+            'gemini-1.5-flash',
+            'gemini-1.5-pro',
+            'gemini-1.5-pro-latest',
         ]  # https://ai.google.dev/gemini-api/docs/models/gemini#model-variations
 
         self.url = f'https://generativelanguage.googleapis.com/v1beta/models/{path}:generateContent?key={key}'

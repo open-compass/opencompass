@@ -17,40 +17,40 @@ class korbenchDataset(BaseDataset):
     """Dataset loader for the  task in KOR-Bench."""
 
     @staticmethod
-    def load(path, mode, category):
+    def load(path, prompt_mode, category, **kwargs):
         """Load the  dataset using shared ."""
         base_path = get_data_path(path)
         rule_file = None
         sample_file = None
         mixed_file = None
         mixed_data = None
-        if '0_shot' in mode or '3_shot' in mode:
+        if '0_shot' in prompt_mode or '3_shot' in prompt_mode:
             rule_file = find_file(base_path, os.path.join(category, 'rule'))
             sample_file = find_file(base_path,
                                     os.path.join(category, 'sample'))
-        elif mode == 'mixed':
+        elif prompt_mode == 'mixed':
             mixed_file = find_file(base_path, os.path.join('mixed', category))
             mixed_data = load_json_or_jsonl(mixed_file) or []
         else:
-            raise ValueError(f'Unsupported mode: {mode}')
+            raise ValueError(f'Unsupported prompt_mode: {prompt_mode}')
         three_shot_file = None
-        if mode == '3_shot':
+        if prompt_mode == '3_shot':
             ts_path = os.path.join(category, 'three-shot')
             three_shot_file = find_file(base_path, ts_path)
         # Load data
-        if mode in ['0_shot', '3_shot']:
+        if prompt_mode in ['0_shot', '3_shot']:
             rules = load_json_or_jsonl(rule_file) or []
             samples = load_json_or_jsonl(sample_file) or []
         template_path = None
-        if mode == '0_shot':
+        if prompt_mode == '0_shot':
             template_path = os.path.join(
                 os.path.dirname(__file__),
                 'korbench_dataset_config/prompt/0_shot.yaml')
-        elif mode == '3_shot':
+        elif prompt_mode == '3_shot':
             template_path = os.path.join(
                 os.path.dirname(__file__),
                 'korbench_dataset_config/prompt/3_shot.yaml')
-        elif mode == 'mixed':
+        elif prompt_mode == 'mixed':
             template_path = os.path.join(
                 os.path.dirname(__file__),
                 'korbench_dataset_config/prompt/mixed.yaml')
@@ -62,7 +62,7 @@ class korbenchDataset(BaseDataset):
 
         # Process data
         data = []
-        if mode == '0_shot':
+        if prompt_mode == '0_shot':
             for sample in samples:
                 rule_id = sample['rule_id']
                 rule = next((r for r in rules if r['idx'] == rule_id), None)
@@ -81,13 +81,13 @@ class korbenchDataset(BaseDataset):
                     'answer': sample['answer'],
                     'prompt': prompt,
                     'rule_id': rule['idx'],
-                    'mode': '0_shot',
+                    'prompt_mode': '0_shot',
                     'category': category,
                 })
 
             return Dataset.from_list(data)
 
-        if mode == '3_shot':
+        if prompt_mode == '3_shot':
             data = []
             three_shot = load_json_or_jsonl(three_shot_file) or []
             for sample in samples:
@@ -111,13 +111,13 @@ class korbenchDataset(BaseDataset):
                     'answer': sample['answer'],
                     'prompt': prompt,
                     'rule_id': rule['idx'],
-                    'mode': '3_shot',
+                    'prompt_mode': '3_shot',
                     'category': category,
                 })
 
             return Dataset.from_list(data)
 
-        if mode == 'mixed':
+        if prompt_mode == 'mixed':
             # Process data
             data = []
             for item in mixed_data:
@@ -159,7 +159,7 @@ class korbenchDataset(BaseDataset):
                     'rule_list': rule_list,
                     'question_list': question_list,
                     'prompt': prompt,
-                    'mode': 'mixed',
+                    'prompt_mode': 'mixed',
                     'answer': '',
                     'base_path': base_path,
                 })
@@ -174,14 +174,15 @@ class korbenchEvaluator(BaseEvaluator):
         super().__init__()
 
     def score(self, predictions, references, test_set):
-        """Evaluate predictions for a single mode in KOR-Bench."""
+        """Evaluate predictions for a single prompt_mode in KOR-Bench."""
         if not test_set:
             raise ValueError('Test set is empty.')
 
-        mode = test_set[0]['mode']  # Determine the mode from the first entry
+        prompt_mode = test_set[0][
+            'prompt_mode']  # Determine the prompt_mode from the first entry
         data = {}
 
-        # Organize data for the given mode
+        # Organize data for the given prompt_mode
         for i in range(len(predictions)):
             entry = {
                 'prediction': predictions[i],
@@ -195,18 +196,18 @@ class korbenchEvaluator(BaseEvaluator):
             data[i] = entry
 
         if not data:
-            raise ValueError(f"No data found for mode '{mode}'")
+            raise ValueError(f"No data found for prompt_mode '{prompt_mode}'")
 
-        # Evaluate based on the mode
-        if mode == '0_shot':
+        # Evaluate based on the prompt_mode
+        if prompt_mode == '0_shot':
             evaluation_results = evaluate_responses(data, '0_shot')
-        elif mode == '3_shot':
+        elif prompt_mode == '3_shot':
             evaluation_results = evaluate_responses(data, '3_shot')
-        elif mode in ['Multi-Q', 'Multi-R', 'Multi-RQ', 'mixed']:
+        elif prompt_mode in ['Multi-Q', 'Multi-R', 'Multi-RQ', 'mixed']:
             evaluation_results = evaluate_responses(data, 'mixed',
                                                     test_set[0]['base_path'])
         else:
-            raise ValueError(f'Unsupported mode: {mode}')
+            raise ValueError(f'Unsupported prompt_mode: {prompt_mode}')
         # Calculate accuracy
         correct_count = sum(res['is_correct'] for res in evaluation_results)
         accuracy = (correct_count / len(evaluation_results)) * 100
