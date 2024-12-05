@@ -96,7 +96,7 @@ for category in categories:
     # Dataset
     korbench_dataset = dict(
         type=korbenchDataset,
-        abbr=f"korbench_{category}_0shot",
+        abbr=f"korbench_{category}",
         path="opencompass/korbench",
         prompt_mode='0_shot',
         category=category,

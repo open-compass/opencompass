@@ -606,6 +606,6 @@ DATASETS_URL = {
     },
     "bigcodebench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bigcodebench.zip",
-        "md5": "xxxxx"
+        "md5": "2c1c7956ca49a1124617e8c037ec57d8"
     }
 }

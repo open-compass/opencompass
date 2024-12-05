@@ -260,12 +260,6 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
 
         BaseEvaluator.is_num_equal(predictions, references)
 
-        # results = {  # noqa: F841
-        #     'pass': 0,
-        #     'timeout': 0,
-        #     'failed': 0,
-        #     'wrong_answer': 0,
-        # }  # noqa: F401, F403
         extracted_predictions = {}
         for idx, content in enumerate(predictions):
             extracted_predictions[idx] = content

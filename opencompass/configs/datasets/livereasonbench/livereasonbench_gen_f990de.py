@@ -5,19 +5,6 @@ from opencompass.openicl.icl_evaluator import LMEvaluator
 # from opencompass.datasets import SimpleQADataset, simpleqa_postprocess
 from opencompass.datasets import LiveReasonBenchDataset, livereasonbench_postprocess
 
-# GRADER_TEMPLATE_CN = """
-#     请你作为一个评价专家，判断下面的考生的回答是否与标准答案一致，即考生是否回答正确。下面是一些评判标准：
-#     1. 请以给定的标准答案为准，你不需要重新计算问题答案，因为标准答案已经给出，只需要根据问题形式来判断考生的回答是否与标准答案一致，不要尝试解答原问题，你可以默认标准答案是一定正确的。
-#     2. 因为考生回答可能在表现形式上与标准答案不同，在判断之前，请你先理解题目和标准答案，再判断考生回答是否正确，但注意不要尝试解答原问题。
-#     3. 有些答案可能包含多项内容，如果标准答案有多种情况，只要考生回答满足一种解法也可以认为正确。
-#     4. 有些答案可能通过不同的方式表达，比如有些答案可能是一个数学表达式，有些答案可能是一个文字描述，只要表达的意思一致即可。且有些公式通过不同的方式表达，但等价，也是正确的。
-
-#     请你根据上述标准，判断下面考生的回答是否与标准答案一致，如果一致，请在最后输出\\boxed{{yes}}, 否则输出\\boxed{{no}}, 如果难以判断，请输出\\boxed{{no}}.
-#     原问题：{question}
-#     标准答案：{answer}
-#     考生答案：{prediction}
-#     考生答案正确性判别：
-# """
 
 GRADER_TEMPLATE = """
 Your job is to look at a question, a gold target, and a predicted answer, and then assign a grade of either ["CORRECT", "INCORRECT", "NOT_ATTEMPTED"].
