@@ -21,7 +21,7 @@ from .prompts import (EXTRACT_PROMPT_CN, EXTRACT_PROMPT_EN, JUDGE_PROMPT_CN,
 
 @LOAD_DATASET.register_module()
 class LiveMathBenchDataset(BaseDataset):
-    dataset_splits = ['AIMC', 'CEE', 'CMO', 'MATH500']
+    dataset_splits = ['AIMC', 'CEE', 'CMO', 'MATH500', 'AIME2024']
     dataset_languages = ['cn', 'en']
 
     @staticmethod
