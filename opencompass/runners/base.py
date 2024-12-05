@@ -77,7 +77,8 @@ class BaseRunner:
             else:
                 content = f'{getpass.getuser()}\'s '
                 content += f'{self.task_cfg.type} tasks finished. '
-                content += f'{num_succeeded} tasks succeeded.'
+                content += f'{num_succeeded} tasks succeeded.\n'
+                content += '\n'.join([task for task, _ in status])
                 self.lark_reporter.post(title='Great news: all tasks '
                                         'finished!',
                                         content=content)
