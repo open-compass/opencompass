@@ -10,7 +10,7 @@ from opencompass.datasets import generic_llmjudge_postprocess
 
 with read_base():
     # from .....configs.datasets.mmlu.mmlu_all_sets import mmlu_all_sets
-    from opencompass.configs.datasets.mmlu.mmlu_stem_sets import mmlu_all_sets
+    from .mmlu_stem_sets import mmlu_all_sets
 # None of the mmlu dataset in huggingface is correctly parsed, so we use our own dataset reader
 # Please download the dataset from https://people.eecs.berkeley.edu/~hendrycks/data.tar
 
