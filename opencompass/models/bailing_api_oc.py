@@ -1,13 +1,14 @@
 import concurrent
 import concurrent.futures
 import os
+import random
 import socket
 import time
-import traceback
 from typing import Dict, List, Optional, Union
 
 import requests
 from requests.adapters import HTTPAdapter
+from requests.exceptions import ConnectionError
 from urllib3.connection import HTTPConnection
 
 try:
@@ -20,8 +21,6 @@ from opencompass.utils.prompt import PromptList
 from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
-
-BAILING_RETRY_DELAY: int = 30
 
 
 class HTTPAdapterWithSocketOptions(HTTPAdapter):
@@ -104,7 +103,7 @@ class BailingAPI(BaseAPIModel):
     def generate(
         self,
         inputs: Union[List[str], PromptList],
-        max_out_len: int = 4096,
+        max_out_len: int = 11264,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -128,7 +127,7 @@ class BailingAPI(BaseAPIModel):
                 ): i
                 for i, input in enumerate(inputs)
             }
-            results = []
+            results = [''] * len(inputs)
             for future in concurrent.futures.as_completed(future_to_m):
                 m = future_to_m[future]  # noqa F841
                 resp = future.result()
@@ -136,16 +135,25 @@ class BailingAPI(BaseAPIModel):
                     try:
                         result = resp.json()
                     except Exception as e:  # noqa F841
-                        results.append('')
+                        self.logger.error(f'Fail to inference; '
+                                          f'model_name={self.path}; '
+                                          f'error={e}, '
+                                          f'request={inputs[m]}')
                     else:
                         if (result.get('choices')
                                 and result['choices'][0].get('message') and
                                 result['choices'][0]['message'].get('content')
                                 is not None):
-                            results.append(
-                                result['choices'][0]['message']['content'])
+                            results[m] = \
+                                    result['choices'][0]['message']['content']
+                        else:
+                            self.logger.error(f'Receive invalid result. '
+                                              f'result={result}; '
+                                              f'request={inputs[m]}')
                 else:
-                    results.append('')
+                    self.logger.error(f'Receive invalid response. '
+                                      f'response={resp}; '
+                                      f'request={inputs[m]}')
         self.flush()
         return results
 
@@ -184,39 +192,31 @@ class BailingAPI(BaseAPIModel):
                     message['role'] = item['role']
                 messages.append(message)
         request = {
-            'model':
-            self._model,
-            'messages':
-            messages,
-            'max_seq_len':
-            max(
-                max_out_len if max_out_len else 4096,
-                self.max_seq_len if self.max_seq_len else 4096,
-            ),
+            'model': self._model,
+            'messages': messages,
+            'max_tokens': max_out_len,
         }
         request.update(self.generation_kwargs)
-        try:
-            retry_num = 0
-            while retry_num < self.retry:
+        retry_num = 0
+        while retry_num < self.retry:
+            try:
                 response = self._infer_result(request, sess)
-                if response.status_code == 200:
-                    break  # success
-                elif response.status_code == 426:
-                    retry_num += 1  # retry
-                elif response.status_code in [429, 500, 504]:
-                    time.sleep(BAILING_RETRY_DELAY)
-                    retry_num += 1  # retry
-                else:
-                    raise ValueError(f'Status code = {response.status_code}')
+            except ConnectionError:
+                time.sleep(random.randint(10, 30))
+                retry_num += 1  # retry
+                continue
+            if response.status_code == 200:
+                break  # success
+            elif response.status_code == 426:
+                retry_num += 1  # retry
+            elif response.status_code in [302, 429, 500, 504]:
+                time.sleep(random.randint(10, 30))
+                retry_num += 1  # retry
             else:
-                raise ValueError(
-                    f'Exceed the maximal retry times. Last status code '
-                    f'= {response.status_code}')
-        except Exception as e:
-            self.logger.error(f'Fail to inference request={request}; '
-                              f'model_name={self.path};  error={e}, '
-                              f'stack:{traceback.format_exc()}')
-            raise e
+                raise ValueError(f'Status code = {response.status_code}')
+        else:
+            # Exceed the maximal retry times.
+            return ''
         return response
 
     # @retry(stop_max_attempt_number=3, wait_fixed=16000)  # ms

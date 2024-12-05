@@ -47,8 +47,3 @@ for _name in subjective_all_sets:
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
         ))
-# ds1000_eval_cfg = dict(
-#     evaluator=dict(type=DS1000Evaluator),
-#     pred_role='BOT',
-#     pred_postprocessor=dict(type=ds1000_postprocess),
-# )

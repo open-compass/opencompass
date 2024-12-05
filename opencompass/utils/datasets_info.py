@@ -151,6 +151,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/humaneval",
         "local": "./data/humaneval_cn/human-eval-cn-v2-20210705.jsonl",
     },
+    #KORBENCH
+    "opencompass/korbench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/korbench",
+    },
     # Lambada
     "opencompass/lambada": {
         "ms_id": "opencompass/lambada",
@@ -337,6 +343,21 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/babilong/data/",
     },
+    "P-MMEval": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/P-MMEval/",
+    },
+    "opencompass/arc_prize_public_evaluation": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arc_prize_public_evaluation",
+    },
+    "opencompass/simpleqa": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/simpleqa/simple_qa_test_set.csv",
+    }
 }
 
 DATASETS_URL = {
@@ -351,6 +372,10 @@ DATASETS_URL = {
     "/mmmlu_lite": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmmlu_lite.zip",
         "md5": "a776af1220e1826fd0608eda1bc4425e",
+    },
+    "/simpleqa": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa.zip",
+        "md5": "1d83fc2e15798d39cb265c9a3cb5195a",
     },
     "/gpqa/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gpqa.zip",
@@ -519,7 +544,7 @@ DATASETS_URL = {
     "/cmo": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmo.zip",
         "md5": "fad52c81290506a8ca74f46b5400d8fc",
-    },
+    },  
     "/nq-open": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/nq-open.zip",
         "md5": "a340521e5c9ec591227dcb367f718b25",
@@ -544,4 +569,20 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/babilong.zip",
         "md5": "e400864c31bc58d29eaa3e199751f99b",
     },
+    "/korbench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/korbench.zip",
+        "md5": "9107597d137e7362eaf7d218ddef7a6d",
+    },
+    "subjective/judgerbench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/judgerbench.zip",
+        "md5": "60d605883aa8cac9755819140ab42c6b"
+    },
+    "/arc_prize_public_evaluation": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/arc_prize_public_evaluation.zip",
+        "md5": "367a33977651496efddba7670009807e"
+    },
+    "P-MMEval": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/pmmeval.zip",
+        "md5": "09e401e6229a50647b9e13c429e634d1",
+    }
 }
