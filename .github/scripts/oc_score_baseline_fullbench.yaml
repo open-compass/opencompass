@@ -10,7 +10,7 @@ internlm2_5-7b-chat-hf_fullbench:
     hellaswag: 87.5
     TheoremQA: 18.75
     musr_average: 39.58
-    gsm8k: 56.25
+    gsm8k: 62.50
     math: 75
     cmo_fib: 6.25
     aime2024: 6.25

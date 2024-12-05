@@ -7,6 +7,8 @@ with read_base():
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ARC_c.ARC_c_cot_gen_926652 import \
         ARC_c_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.ARC_Prize_Public_Evaluation.arc_prize_public_evaluation_gen_872059 import \
+        arc_prize_public_evaluation_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bbh.bbh_gen_5b92b0 import \
         bbh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmmlu.cmmlu_0shot_cot_gen_305931 import \
@@ -32,6 +34,8 @@ with read_base():
         humanevalx_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.IFEval.IFEval_gen_3321a3 import \
         ifeval_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.korbench.korbench_single_0_shot_gen import \
+        korbench_0shot_single_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.livecodebench.livecodebench_gen_b2b0fd import \
         LCB_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.math.math_0shot_gen_393424 import \
@@ -71,6 +75,7 @@ with read_base():
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import \
         models as lmdeploy_internlm2_5_7b_chat_model  # noqa: F401, E501
     # Summary Groups
+    # Summary Groups
     from opencompass.configs.summarizers.groups.bbh import \
         bbh_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.cmmlu import \
@@ -81,6 +86,8 @@ with read_base():
         GaokaoBench_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.humanevalx import \
         humanevalx_summary_groups  # noqa: F401, E501
+    from opencompass.configs.summarizers.groups.korbench import \
+        korbench_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.mathbench_v1_2024 import \
         mathbench_2024_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.mmlu import \
@@ -185,6 +192,8 @@ summarizer = dict(
         ['hellaswag', 'accuracy'],
         ['TheoremQA', 'score'],
         ['musr_average', 'naive_average'],
+        ['korbench_single', 'naive_average'],
+        ['ARC_Prize_Public_Evaluation', 'accuracy'],
         '',
         'Math Calculation',
         ['gsm8k', 'accuracy'],
