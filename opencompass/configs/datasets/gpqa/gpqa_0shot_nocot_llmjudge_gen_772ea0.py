@@ -1,27 +1,21 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.datasets import GPQADataset, GPQA_Simple_Eval_postprocess, GPQAEvaluator
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import MATHDataset
 
+# openai_simple_eval prompt
+align_prompt = """
+Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of ABCD.
 
-# ----------------------------- Detailed Config -----------------------------
+{question}
 
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
-math_infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(role='HUMAN', prompt='{problem}\nRemember to put your final answer within \\boxed{}.'),
-            ]
-        ),
-    ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=8192),
-)
+A) {A}
+B) {B}
+C) {C}
+D) {D}
+""".strip()
 
 
 GRADER_TEMPLATE = """
@@ -32,7 +26,6 @@ GRADER_TEMPLATE = """
     2. Because the candidate's answer may be different from the standard answer in the form of expression, before making a judgment, please understand the question and the standard answer first, and then judge whether the candidate's answer is correct, but be careful not to try to answer the original question.
     3. Some answers may contain multiple items, such as multiple-choice questions, multiple-select questions, fill-in-the-blank questions, etc. As long as the answer is the same as the standard answer, it is enough. For multiple-select questions and multiple-blank fill-in-the-blank questions, the candidate needs to answer all the corresponding options or blanks correctly to be considered correct.
     4. Some answers may be expressed in different ways, such as some answers may be a mathematical expression, some answers may be a textual description, as long as the meaning expressed is the same. And some formulas are expressed in different ways, but they are equivalent and correct.
-    5. If the prediction is given with \\boxed{}, please ignore the \\boxed{} and only judge whether the candidate's answer is consistent with the standard answer.
 
     Please judge whether the following answers are consistent with the standard answer based on the above criteria. Grade the predicted answer of this new question as one of:
     A: CORRECT 
@@ -41,16 +34,29 @@ GRADER_TEMPLATE = """
 
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
-
-    <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{solution}\n<Gold Target End>\n\n
+    <Original Question Begin>: {question}\n A) {A}\n B) {B}\n C) {C}\n D) {D}\n<Original Question End>\n\n
+    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
-    
     Judging the correctness of candidates' answers:
 """.strip()
 
-# Evaluation configuration
-math_eval_cfg = dict(
+
+gpqa_reader_cfg = dict(
+    input_columns=['question', 'A', 'B', 'C', 'D'],
+    output_column='answer')
+
+gpqa_infer_cfg = dict(
+    prompt_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            round=[
+                dict(role='HUMAN', prompt=align_prompt),
+            ], )),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer))
+
+
+gpqa_eval_cfg = dict(
     evaluator=dict(
         type=LMEvaluator,
         prompt_template=dict(
@@ -73,17 +79,23 @@ math_eval_cfg = dict(
     ),
     pred_role='BOT',
 )
+gpqa_datasets = []
+gpqa_subsets = {
+    # 'extended': 'gpqa_extended.csv',
+    # 'main': 'gpqa_main.csv',
+    'diamond': 'gpqa_diamond.csv'
+}
 
-
-math_datasets = [
-    dict(
-        type=MATHDataset,
-        abbr='math_prm800k_500-llmjudge',
-        path='opencompass/math',
-        file_name = 'test_prm800k_500.json',
-        reader_cfg=math_reader_cfg,
-        infer_cfg=math_infer_cfg,
-        eval_cfg=math_eval_cfg,
-        mode='singlescore',
+for split in list(gpqa_subsets.keys()):
+    gpqa_datasets.append(
+        dict(
+            abbr='GPQA_' + split,
+            type=GPQADataset,
+            path='./data/gpqa/',
+            name=gpqa_subsets[split],
+            reader_cfg=gpqa_reader_cfg,
+            infer_cfg=gpqa_infer_cfg,
+            eval_cfg=gpqa_eval_cfg,
+            mode='singlescore',
+        )
     )
-]
