@@ -10,6 +10,7 @@ from .arc_prize_public_evaluation import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .babilong import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
+from .bigcodebench import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
@@ -49,6 +50,7 @@ from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
 from .gaokao_math import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
+from .generic import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
@@ -73,6 +75,8 @@ from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
 from .livecodebench import *  # noqa: F401, F403
+from .livemathbench import *  # noqa: F401, F403
+from .livereasonbench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403

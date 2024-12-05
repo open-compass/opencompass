@@ -4,13 +4,12 @@ import fnmatch
 import math
 import os
 import os.path as osp
-import re
 import statistics
 import sys
 import time
 from collections import Counter
 from inspect import signature
-from typing import List, Optional
+from typing import List
 
 import mmengine
 from mmengine.config import Config, ConfigDict
@@ -18,41 +17,10 @@ from mmengine.utils import mkdir_or_exist
 
 from opencompass.registry import (ICL_EVALUATORS, MODELS, TASKS,
                                   TEXT_POSTPROCESSORS)
-from opencompass.tasks.base import BaseTask
+from opencompass.tasks.base import BaseTask, extract_role_pred
 from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
                                get_infer_output_path, get_logger,
                                task_abbr_from_cfg)
-
-
-def extract_role_pred(s: str, begin_str: Optional[str],
-                      end_str: Optional[str]) -> str:
-    """Extract the role prediction from the full prediction string. The role
-    prediction may be the substring between the begin and end string.
-
-    Args:
-        s (str): Full prediction string.
-        begin_str (str): The beginning string of the role
-        end_str (str): The ending string of the role.
-
-    Returns:
-        str: The extracted role prediction.
-    """
-    start = 0
-    end = len(s)
-
-    if begin_str and re.match(r'\s*', begin_str) is None:
-        begin_idx = s.find(begin_str)
-        if begin_idx != -1:
-            start = begin_idx + len(begin_str)
-
-    if end_str and re.match(r'\s*', end_str) is None:
-        # TODO: Support calling tokenizer for the accurate eos token
-        # and avoid such hardcode
-        end_idx = s.find(end_str, start)
-        if end_idx != -1:
-            end = end_idx
-
-    return s[start:end]
 
 
 @TASKS.register_module()

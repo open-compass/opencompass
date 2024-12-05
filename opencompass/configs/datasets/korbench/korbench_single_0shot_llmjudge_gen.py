@@ -1,27 +1,11 @@
+from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
+from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import MATHDataset
 
-
-# ----------------------------- Detailed Config -----------------------------
-
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
-math_infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(role='HUMAN', prompt='{problem}\nRemember to put your final answer within \\boxed{}.'),
-            ]
-        ),
-    ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=8192),
-)
+categories = ["cipher", "counterfactual", "logic", "operation", "puzzle"]
 
 
 GRADER_TEMPLATE = """
@@ -42,48 +26,84 @@ GRADER_TEMPLATE = """
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
 
-    <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{solution}\n<Gold Target End>\n\n
+    <Original Question Begin>: \n{prompt}\n<Original Question End>\n\n
+    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     
     Judging the correctness of candidates' answers:
 """.strip()
 
-# Evaluation configuration
-math_eval_cfg = dict(
-    evaluator=dict(
-        type=LMEvaluator,
-        prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
+korbench_0shot_single_datasets = []
+
+for category in categories:
+    # Prompt template
+    prompt_template = dict(
+        type=PromptTemplate,
+        template=dict(
             begin=[
                 dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                    role="HUMAN",
+                    prompt=""
+                )
             ],
-                round=[
+            round=[
                 dict(
-                    role='HUMAN',
-                    prompt = GRADER_TEMPLATE
-                ),
-            ]),
+                    role="HUMAN",
+                    prompt="{prompt}" # f-string
+                )
+            ]
+        )
+    )
+
+    # Reader configuration
+    reader_cfg = dict(
+        input_columns=["prompt"],
+        output_column="answer",
+    )
+
+    # Inference configuration
+    infer_cfg = dict(
+        prompt_template=prompt_template,
+        retriever=dict(type=ZeroRetriever),
+        inferencer=dict(type=GenInferencer, max_out_len=1024),
+    )
+
+    # Evaluation configuration
+    eval_cfg = dict(
+        evaluator=dict(
+            type=LMEvaluator,
+            prompt_template=dict(
+                type=PromptTemplate,
+                template=dict(
+                begin=[
+                    dict(
+                        role='SYSTEM',
+                        fallback_role='HUMAN',
+                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                ],
+                    round=[
+                    dict(
+                        role='HUMAN',
+                        prompt = GRADER_TEMPLATE
+                    ),
+                ]),
+            ),
+            dict_postprocessor=dict(type=generic_llmjudge_postprocess),
         ),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-    ),
-    pred_role='BOT',
-)
+        pred_role='BOT',
+    )
 
-
-math_datasets = [
-    dict(
-        type=MATHDataset,
-        abbr='math_prm800k_500-llmjudge',
-        path='opencompass/math',
-        file_name = 'test_prm800k_500.json',
-        reader_cfg=math_reader_cfg,
-        infer_cfg=math_infer_cfg,
-        eval_cfg=math_eval_cfg,
+    # Dataset
+    korbench_dataset = dict(
+        type=korbenchDataset,
+        abbr=f"korbench_{category}",
+        path="opencompass/korbench",
+        prompt_mode='0_shot',
+        category=category,
+        reader_cfg=reader_cfg,
+        infer_cfg=infer_cfg,
+        eval_cfg=eval_cfg,
         mode='singlescore',
     )
-]
+
+    korbench_0shot_single_datasets.append(korbench_dataset)

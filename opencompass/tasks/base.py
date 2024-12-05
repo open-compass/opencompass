@@ -1,11 +1,43 @@
 import copy
 import os
+import re
 from abc import abstractmethod
-from typing import List
+from typing import List, Optional
 
 from mmengine.config import ConfigDict
 
 from opencompass.utils import get_infer_output_path, task_abbr_from_cfg
+
+
+def extract_role_pred(s: str, begin_str: Optional[str],
+                      end_str: Optional[str]) -> str:
+    """Extract the role prediction from the full prediction string. The role
+    prediction may be the substring between the begin and end string.
+
+    Args:
+        s (str): Full prediction string.
+        begin_str (str): The beginning string of the role
+        end_str (str): The ending string of the role.
+
+    Returns:
+        str: The extracted role prediction.
+    """
+    start = 0
+    end = len(s)
+
+    if begin_str and re.match(r'\s*', begin_str) is None:
+        begin_idx = s.find(begin_str)
+        if begin_idx != -1:
+            start = begin_idx + len(begin_str)
+
+    if end_str and re.match(r'\s*', end_str) is None:
+        # TODO: Support calling tokenizer for the accurate eos token
+        # and avoid such hardcode
+        end_idx = s.find(end_str, start)
+        if end_idx != -1:
+            end = end_idx
+
+    return s[start:end]
 
 
 class BaseTask:

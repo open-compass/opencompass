@@ -1,26 +1,27 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.datasets import Aime2024Dataset, MATHEvaluator, math_postprocess_v2
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import MATHDataset
+
+aime2024_reader_cfg = dict(
+    input_columns=['question'], 
+    output_column='answer'
+)
 
 
-# ----------------------------- Detailed Config -----------------------------
-
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
-math_infer_cfg = dict(
+aime2024_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt='{problem}\nRemember to put your final answer within \\boxed{}.'),
-            ]
-        ),
+                dict(role='HUMAN', prompt='{question}\nRemember to put your final answer within \\boxed{}.'),
+            ],
+        )
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=8192),
+    inferencer=dict(type=GenInferencer, max_out_len=2048)
 )
 
 
@@ -42,15 +43,14 @@ GRADER_TEMPLATE = """
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
 
-    <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{solution}\n<Gold Target End>\n\n
+    <Original Question Begin>: \n{question}\n<Original Question End>\n\n
+    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     
     Judging the correctness of candidates' answers:
 """.strip()
 
-# Evaluation configuration
-math_eval_cfg = dict(
+aime2024_eval_cfg = dict(
     evaluator=dict(
         type=LMEvaluator,
         prompt_template=dict(
@@ -74,16 +74,14 @@ math_eval_cfg = dict(
     pred_role='BOT',
 )
 
-
-math_datasets = [
+aime2024_datasets = [
     dict(
-        type=MATHDataset,
-        abbr='math_prm800k_500-llmjudge',
-        path='opencompass/math',
-        file_name = 'test_prm800k_500.json',
-        reader_cfg=math_reader_cfg,
-        infer_cfg=math_infer_cfg,
-        eval_cfg=math_eval_cfg,
+        abbr='aime2024',
+        type=Aime2024Dataset,
+        path='opencompass/aime2024',
+        reader_cfg=aime2024_reader_cfg,
+        infer_cfg=aime2024_infer_cfg,
+        eval_cfg=aime2024_eval_cfg,
         mode='singlescore',
     )
 ]
