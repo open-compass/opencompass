@@ -4,12 +4,13 @@
 
 | dataset | language | #single-choice | #multiple-choice | #fill-in-the-blank | #problem-solving |
 | -- | -- | -- | -- | -- | -- |
-| AIMC | cn | 46 | 0 | 0 | 0 |
-| AIMC | en | 46 | 0 | 0 | 0 |
-| CEE | cn | 28 | 9 | 13 | 3 |
-| CEE | en | 28 | 9 | 13 | 3 |
+| AIMC | cn | 0 | 0 | 0 | 46 |
+| AIMC | en | 0 | 0 | 0 | 46 |
+| CEE | cn | 0 | 0 | 13 | 40 |
+| CEE | en | 0 | 0 | 13 | 40 |
 | CMO | cn | 0 | 0 | 0 | 18 |
 | CMO | en | 0 | 0 | 0 | 18 |
+| MATH500 | en | 0 | 0 | 0 | 500 |
 
 
 ## How to use
@@ -23,6 +24,7 @@ with read_base():
 
 livemathbench_datasets[0].update(
     {
+        'abbr': 'livemathbench_${k}x${n}'
         'path': '/path/to/data/dir', 
         'k': 'k@pass', # the max value of k in k@pass
         'n': 'number of runs', # number of runs

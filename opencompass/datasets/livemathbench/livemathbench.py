@@ -20,7 +20,7 @@ from .prompts import (EXTRACT_PROMPT_CN, EXTRACT_PROMPT_EN, JUDGE_PROMPT_CN,
 
 @LOAD_DATASET.register_module()
 class LiveMathBenchDataset(BaseDataset):
-    dataset_splits = ['AIMC', 'CEE', 'CMO']
+    dataset_splits = ['AIMC', 'CEE', 'CMO', 'MATH500']
     dataset_languages = ['cn', 'en']
 
     @staticmethod
@@ -34,6 +34,8 @@ class LiveMathBenchDataset(BaseDataset):
         for split, language in product(LiveMathBenchDataset.dataset_splits,
                                        LiveMathBenchDataset.dataset_languages):
             file_path = os.path.join(path, f'{split}_{language}.jsonl')
+            if not os.path.exists(file_path):
+                continue
             dataset_info[f'{split}_{language}'] = {
                 'single-choice': 0,
                 'multiple-choice': 0,
@@ -270,12 +272,15 @@ class LiveMathBenchEvaluator(BaseEvaluator):
         count = []
         total_pass_num = []
         details = []
+        all_dataset = set()
         for key, examples in key2example.items():
             detail = {
                 'question': examples[0][0]['question'],
                 'answer': examples[0][0]['answer'],
-                'responses': []
+                'responses': [],
+                'dataset': '_'.join(key.split('_')[:-1])
             }
+            all_dataset.add('_'.join(key.split('_')[:-1]))
             if_pass_list = []
             for single_run_examples in examples:
                 detail['responses'].append([])
@@ -296,12 +301,25 @@ class LiveMathBenchEvaluator(BaseEvaluator):
             i = 1
             while i <= K:
                 detail.update({
-                    f'{i}@pass':
+                    f'pass-rate@{i}':
                     if_pass_list[:, :i].mean(axis=1).mean(axis=0).item(),
-                    f'{i}@pass/std':
-                    if_pass_list[:, :i].mean(axis=1).std(axis=0).item()
+                    f'pass-rate@{i}/std':
+                    if_pass_list[:, :i].mean(axis=1).std(axis=0).item(),
+                    f'pass@{i}':
+                    if_pass_list[:, :1].mean(axis=1).mean(axis=0).item(),
+                    f'pass@{i}/std':
+                    if_pass_list[:, :1].mean(axis=1).std(axis=0).item(),
                 })
                 i = i * 2
+
+            for threshold in [0.5, 0.75, 1.0]:
+                detail.update({
+                    f'{K}-pass@{threshold}':
+                    np.floor(
+                        np.where(
+                            if_pass_list.mean(axis=1) >= threshold, 1.0,
+                            0.0).mean(axis=0))
+                })
 
             count.append(np.ones_like(if_pass_list).sum(axis=1))
             total_pass_num.append(if_pass_list.sum(axis=1))
@@ -309,16 +327,73 @@ class LiveMathBenchEvaluator(BaseEvaluator):
             details.append(detail)
 
         detailed_result = {'details': details}
+
         i = 1
         while i <= K:
             detailed_result.update({
-                f'{i}@pass':
-                100. * np.mean([detail[f'{i}@pass'] for detail in details]),
-                f'{i}@pass/std':
-                100. * np.mean([detail[f'{i}@pass/std'] for detail in details])
+                f'pass-rate@{i}':
+                100. *
+                np.mean([detail[f'pass-rate@{i}'] for detail in details]),
+                f'pass-rate@{i}/std':
+                100. *
+                np.mean([detail[f'pass-rate@{i}/std'] for detail in details]),
+                f'pass@{i}':
+                100. * np.mean([detail[f'pass@{i}'] for detail in details]),
+                f'pass@{i}/std':
+                100. * np.mean([detail[f'pass@{i}/std'] for detail in details])
             })
+            for d in sorted(list(all_dataset)):
+                detailed_result.update({
+                    f'{d}/pass-rate@{i}':
+                    100. * np.mean([
+                        detail[f'pass-rate@{i}']
+                        for detail in details if detail['dataset'] == d
+                    ]),
+                    f'{d}/pass-rate@{i}/std':
+                    100. * np.mean([
+                        detail[f'pass-rate@{i}/std']
+                        for detail in details if detail['dataset'] == d
+                    ]),
+                    f'{d}/pass@{i}':
+                    100. * np.mean([
+                        detail[f'pass@{i}']
+                        for detail in details if detail['dataset'] == d
+                    ]),
+                    f'{d}/pass@{i}/std':
+                    100. * np.mean([
+                        detail[f'pass@{i}/std']
+                        for detail in details if detail['dataset'] == d
+                    ])
+                })
             i = i * 2
-        detailed_result.update(
-            {'pass-rate': 100. * np.mean(sum(total_pass_num) / sum(count))})
+
+            for threshold in [0.5, 0.75, 1.0]:
+                detailed_result.update({
+                    f'{K}-pass@{threshold}':
+                    100. * np.mean([
+                        detail[f'{K}-pass@{threshold}'] for detail in details
+                    ])
+                })
+                detailed_result.update({
+                    f'{K}-pass@{threshold}/std':
+                    100. * np.std([
+                        detail[f'{K}-pass@{threshold}'] for detail in details
+                    ])
+                })
+            for d in sorted(list(all_dataset)):
+                detailed_result.update({
+                    f'{d}/{K}-pass@{threshold}':
+                    100. * np.mean([
+                        detail[f'{K}-pass@{threshold}']
+                        for detail in details if detail['dataset'] == d
+                    ])
+                })
+                detailed_result.update({
+                    f'{d}/{K}-pass@{threshold}/std':
+                    100. * np.std([
+                        detail[f'{K}-pass@{threshold}']
+                        for detail in details if detail['dataset'] == d
+                    ])
+                })
 
         return detailed_result
