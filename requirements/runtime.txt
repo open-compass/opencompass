@@ -6,6 +6,7 @@ einops==0.5.0
 evaluate>=0.3.0
 func_timeout
 fuzzywuzzy
+gradio-client
 h5py
 huggingface_hub<=0.24.7
 immutabledict
