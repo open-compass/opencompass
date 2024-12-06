@@ -3,7 +3,7 @@ from opencompass.models import TurboMindModelwithChatTemplate
 models = [
     dict(
         type=TurboMindModelwithChatTemplate,
-        abbr='deepseek-v2_lite-turbomind',
+        abbr='deepseek-v2_lite-chat-turbomind',
         path='deepseek-ai/DeepSeek-V2-Lite-Chat',
         engine_config=dict(
             session_len=7168,

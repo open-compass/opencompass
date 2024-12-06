@@ -48,7 +48,7 @@ class VOLCRunner(BaseRunner):
                  retry: int = 2,
                  debug: bool = False,
                  lark_bot_url: str = None,
-                 keep_tmp_file: bool = False):
+                 keep_tmp_file: bool = True):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.volcano_cfg = volcano_cfg
         self.max_num_workers = max_num_workers

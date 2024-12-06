@@ -44,11 +44,13 @@ class Gemini(BaseAPIModel):
         top_p: float = 0.8,
         top_k: float = 10.0,
     ):
-        super().__init__(path=path,
-                         max_seq_len=max_seq_len,
-                         query_per_second=query_per_second,
-                         meta_template=meta_template,
-                         retry=retry)
+        super().__init__(
+            path=path,
+            max_seq_len=max_seq_len,
+            query_per_second=query_per_second,
+            meta_template=meta_template,
+            retry=retry,
+        )
         assert isinstance(key, str)
         if key == 'ENV':
             if 'GEMINI_API_KEY' not in os.environ:
@@ -150,19 +152,19 @@ class Gemini(BaseAPIModel):
             'safetySettings': [
                 {
                     'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                    'threshold': 'BLOCK_NONE'
+                    'threshold': 'BLOCK_NONE',
                 },
                 {
                     'category': 'HARM_CATEGORY_HATE_SPEECH',
-                    'threshold': 'BLOCK_NONE'
+                    'threshold': 'BLOCK_NONE',
                 },
                 {
                     'category': 'HARM_CATEGORY_HARASSMENT',
-                    'threshold': 'BLOCK_NONE'
+                    'threshold': 'BLOCK_NONE',
                 },
                 {
                     'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                    'threshold': 'BLOCK_NONE'
+                    'threshold': 'BLOCK_NONE',
                 },
             ],
             'generationConfig': {
@@ -170,8 +172,8 @@ class Gemini(BaseAPIModel):
                 'temperature': self.temperature,
                 'maxOutputTokens': 2048,
                 'topP': self.top_p,
-                'topK': self.top_k
-            }
+                'topK': self.top_k,
+            },
         }
 
         for _ in range(self.retry):

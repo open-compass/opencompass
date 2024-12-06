@@ -99,7 +99,7 @@ class DefaultSubjectiveSummarizer:
                 else:
                     base_models_list = [item['abbr'] for item in base_models]
 
-                for base_model_abbr in base_models_list:
+                for idx, base_model_abbr in enumerate(base_models_list):
                     dataset_abbr = dataset_abbr_from_cfg(dataset)
                     origin_path = get_infer_output_path(model, dataset, osp.join(self.work_dir, 'results'))
                     if base_model_abbr != '':
@@ -111,7 +111,13 @@ class DefaultSubjectiveSummarizer:
                         continue
                     result = mmengine.load(filepath)
                     result.pop('details', None)
-                    raw_results[model_abbr][dataset_abbr] = result
+                    if idx == 0:
+                        raw_results[model_abbr][dataset_abbr] = result
+                    else:
+                        for key, value in result.items():
+                            raw_results[model_abbr][dataset_abbr][key] = (raw_results[model_abbr][dataset_abbr][key] * idx + value) / (idx + 1)
+
+
                     if 'error' in result:
                         self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
                         continue
@@ -132,7 +138,12 @@ class DefaultSubjectiveSummarizer:
                         f'{dataset_abbr} has different metrics: {dataset_metrics[dataset_abbr]} vs {_dm}'
                     else:
                         dataset_metrics[dataset_abbr] = _dm
-                    parsed_results[model_abbr][dataset_abbr] = _rst
+                    if idx == 0:
+                        parsed_results[model_abbr][dataset_abbr] = _rst
+                    else:
+                        for key, value in _rst.items():
+                            parsed_results[model_abbr][dataset_abbr][key] = (parsed_results[model_abbr][dataset_abbr][key] * idx + value) / (idx + 1)
+
 
         # dataset_eval_mode: {dataset_abbr: eval_mode}
         dataset_eval_mode : Dict[str, str] = {}
