@@ -1,6 +1,7 @@
 import concurrent.futures
 import os
 import re
+from collections import OrderedDict
 from copy import deepcopy
 from itertools import product
 from typing import Any, Dict, List
@@ -21,7 +22,7 @@ from .prompts import (EXTRACT_PROMPT_CN, EXTRACT_PROMPT_EN, JUDGE_PROMPT_CN,
 
 @LOAD_DATASET.register_module()
 class LiveMathBenchDataset(BaseDataset):
-    dataset_splits = ['AIMC', 'CEE', 'CMO', 'MATH500']
+    dataset_splits = ['AIMC', 'CEE', 'CMO', 'MATH500', 'AIME2024']
     dataset_languages = ['cn', 'en']
 
     @staticmethod
@@ -276,12 +277,11 @@ class LiveMathBenchEvaluator(BaseEvaluator):
         details = []
         all_dataset = set()
         for key, examples in key2example.items():
-            detail = {
-                'question': examples[0][0]['question'],
-                'answer': examples[0][0]['answer'],
-                'responses': [],
-                'dataset': '_'.join(key.split('_')[:-1])
-            }
+            detail = OrderedDict()
+            detail['question'] = examples[0][0]['question']
+            detail['answer'] = examples[0][0]['answer']
+            detail['responses'] = []
+            detail['dataset'] = '_'.join(key.split('_')[:-1])
             all_dataset.add('_'.join(key.split('_')[:-1]))
             if_pass_list = []
             for single_run_examples in examples:
@@ -308,9 +308,11 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                     f'pass-rate@{i}/std':
                     if_pass_list[:, :i].mean(axis=1).std(axis=0).item(),
                     f'pass@{i}':
-                    if_pass_list[:, :1].mean(axis=1).mean(axis=0).item(),
+                    np.ceil(
+                        if_pass_list[:, :i].mean(axis=1)).mean(axis=0).item(),
                     f'pass@{i}/std':
-                    if_pass_list[:, :1].mean(axis=1).std(axis=0).item(),
+                    np.ceil(
+                        if_pass_list[:, :i].mean(axis=1)).std(axis=0).item(),
                 })
                 i = i * 2
 
@@ -328,7 +330,8 @@ class LiveMathBenchEvaluator(BaseEvaluator):
 
             details.append(detail)
 
-        detailed_result = {'details': details}
+        detailed_result = OrderedDict()
+        detailed_result['details'] = details
 
         i = 1
         while i <= K:
@@ -378,24 +381,26 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                 })
                 detailed_result.update({
                     f'{K}-pass@{threshold}/std':
-                    100. * np.std([
+                    100. * np.mean([
                         detail[f'{K}-pass@{threshold}'] for detail in details
                     ])
                 })
             for d in sorted(list(all_dataset)):
-                detailed_result.update({
-                    f'{d}/{K}-pass@{threshold}':
-                    100. * np.mean([
-                        detail[f'{K}-pass@{threshold}']
-                        for detail in details if detail['dataset'] == d
-                    ])
-                })
-                detailed_result.update({
-                    f'{d}/{K}-pass@{threshold}/std':
-                    100. * np.std([
-                        detail[f'{K}-pass@{threshold}']
-                        for detail in details if detail['dataset'] == d
-                    ])
-                })
+
+                for threshold in [0.5, 0.75, 1.0]:
+                    detailed_result.update({
+                        f'{d}/{K}-pass@{threshold}':
+                        100. * np.mean([
+                            detail[f'{K}-pass@{threshold}']
+                            for detail in details if detail['dataset'] == d
+                        ])
+                    })
+                    detailed_result.update({
+                        f'{d}/{K}-pass@{threshold}/std':
+                        100. * np.mean([
+                            detail[f'{K}-pass@{threshold}']
+                            for detail in details if detail['dataset'] == d
+                        ])
+                    })
 
         return detailed_result
