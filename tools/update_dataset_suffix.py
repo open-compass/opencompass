@@ -78,7 +78,12 @@ def check_and_rename(filepath):
     match = re.match(r'(.*)_(gen|ppl|ll|mixed)_(.*).py', base_name)
     if match:
         dataset, mode, old_hash = match.groups()
-        new_hash = get_hash(filepath)
+        try:
+            new_hash = get_hash(filepath)
+        except Exception:
+            print(f'Failed to get hash for {filepath}')
+            raise ModuleNotFoundError
+
         if not new_hash:
             return None, None
         if old_hash != new_hash:
