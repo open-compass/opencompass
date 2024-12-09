@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Union
 import httpx
 import jieba
 import requests
+from tqdm import tqdm
 
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
@@ -19,6 +20,8 @@ PromptType = Union[PromptList, str]
 OPENAI_API_BASE = os.path.join(
     os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
     'chat/completions')
+OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
+                                    'https://api.openai.com/v1/')
 
 O1_MODEL_LIST = [
     'o1-preview-2024-09-12',
@@ -170,9 +173,11 @@ class OpenAI(BaseAPIModel):
 
         with ThreadPoolExecutor() as executor:
             results = list(
-                executor.map(self._generate, inputs,
-                             [max_out_len] * len(inputs),
-                             [temperature] * len(inputs)))
+                tqdm(executor.map(self._generate, inputs,
+                                  [max_out_len] * len(inputs),
+                                  [temperature] * len(inputs)),
+                     total=len(inputs),
+                     desc='Inferencing'))
         return results
 
     def _generate(self, input: PromptType, max_out_len: int,
@@ -476,7 +481,7 @@ class OpenAISDK(OpenAI):
         key: str | List[str] = 'ENV',
         org: str | List[str] | None = None,
         meta_template: Dict | None = None,
-        openai_api_base: str = OPENAI_API_BASE,
+        openai_api_base: str = OPENAISDK_API_BASE,
         openai_proxy_url: Optional[str] = None,
         mode: str = 'none',
         logprobs: bool | None = False,

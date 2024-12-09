@@ -12,7 +12,7 @@ from .base import BaseDataset
 class Aime2024Dataset(BaseDataset):
 
     @staticmethod
-    def load(path):
+    def load(path, **kwargs):
         path = get_data_path(path)
         dataset = []
         with open(path, 'r') as f:

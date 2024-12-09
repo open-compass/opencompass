@@ -13,6 +13,7 @@ from datasets import Dataset
 from opencompass.models import OpenAISDK
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET, MODELS
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .prompts import (EXTRACT_PROMPT_CN, EXTRACT_PROMPT_EN, JUDGE_PROMPT_CN,
@@ -32,6 +33,7 @@ class LiveMathBenchDataset(BaseDataset):
     ) -> List[Dict[str, Any]]:
         dataset = []
         dataset_info = {}
+        path = get_data_path(path)
         for split, language in product(LiveMathBenchDataset.dataset_splits,
                                        LiveMathBenchDataset.dataset_languages):
             file_path = os.path.join(path, f'{split}_{language}.jsonl')
@@ -102,10 +104,10 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                     path=model_name,
                     openai_api_base=url,
                     key='EMPTY',
-                    query_per_second=2,
+                    query_per_second=128,
                     meta_template=self.api_meta_template,
-                    temperature=kwargs.get('temperature', 0.01),
-                    max_seq_len=kwargs.get('max_tokens', 2048),
+                    temperature=kwargs.get('temperature', 0.001),
+                    max_seq_len=kwargs.get('max_tokens', 16384),
                 )) for url in url
         ]
         self.with_postprocess = with_postprocess
@@ -280,7 +282,6 @@ class LiveMathBenchEvaluator(BaseEvaluator):
             detail['answer'] = examples[0][0]['answer']
             detail['responses'] = []
             detail['dataset'] = '_'.join(key.split('_')[:-1])
-
             all_dataset.add('_'.join(key.split('_')[:-1]))
             if_pass_list = []
             for single_run_examples in examples:
@@ -389,6 +390,7 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                     ])
                 })
             for d in sorted(list(all_dataset)):
+
                 for threshold in [0.5, 0.75, 1.0]:
                     detailed_result.update({
                         f'{d}/{K}-pass@{threshold}':

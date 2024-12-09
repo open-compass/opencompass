@@ -185,6 +185,11 @@ def humaneval_postprocess_v2(text: str) -> str:
         text = blocks[0]
     return text
 
+def humaneval_postprocess_v3(text: str) -> str:
+    blocks = re.findall(r'```\w*\n(.*?)```', text, re.DOTALL)
+    if len(blocks) >= 1:
+        text = blocks[-1]
+    return text
 
 def humaneval_internal_v2_postprocess(text: str):
     if text.startswith('   ') and not text.startswith('    '):

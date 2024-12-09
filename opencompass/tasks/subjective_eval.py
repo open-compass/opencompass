@@ -12,8 +12,7 @@ from mmengine.config import Config, ConfigDict
 from mmengine.utils import mkdir_or_exist
 
 from opencompass.registry import ICL_EVALUATORS, MODELS, TEXT_POSTPROCESSORS
-from opencompass.tasks.base import BaseTask
-from opencompass.tasks.openicl_eval import extract_role_pred
+from opencompass.tasks.base import BaseTask, extract_role_pred
 from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
                                deal_with_judge_model_abbr, get_data_path,
                                get_infer_output_path, get_logger,
