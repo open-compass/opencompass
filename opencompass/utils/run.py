@@ -317,11 +317,11 @@ def change_accelerator(models, accelerator):
                     engine_config=dict(
                         max_batch_size=model.get('batch_size', 16),
                         tp=model['run_cfg']['num_gpus'],
-                        session_len=model['max_seq_len'],
+                        session_len=model.get('max_seq_len', None),
                         max_new_tokens=model['max_out_len']
                     ),
                     gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
-                    max_seq_len=model['max_seq_len'],
+                    max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
                     batch_size=16,
                     run_cfg=model['run_cfg'],
