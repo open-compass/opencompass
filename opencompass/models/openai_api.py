@@ -1,5 +1,6 @@
 import json
 import os
+import random
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -481,7 +482,7 @@ class OpenAISDK(OpenAI):
         key: str | List[str] = 'ENV',
         org: str | List[str] | None = None,
         meta_template: Dict | None = None,
-        openai_api_base: str = OPENAISDK_API_BASE,
+        openai_api_base: str | List[str] = OPENAISDK_API_BASE,
         openai_proxy_url: Optional[str] = None,
         mode: str = 'none',
         logprobs: bool | None = False,
@@ -512,6 +513,10 @@ class OpenAISDK(OpenAI):
                          verbose=verbose,
                          max_completion_tokens=max_completion_tokens)
         from openai import OpenAI
+
+        # support multiple api_base for acceleration
+        if isinstance(openai_api_base, List):
+            openai_api_base = random.choice(openai_api_base)
 
         if self.proxy_url is None:
             self.openai_client = OpenAI(base_url=openai_api_base, api_key=key)
