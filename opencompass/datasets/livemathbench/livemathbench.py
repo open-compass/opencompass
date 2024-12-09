@@ -30,12 +30,15 @@ class LiveMathBenchDataset(BaseDataset):
         path: str,
         k: int,
         n: int,
+        dataset_splits: List[str] = [
+            'AIMC', 'CEE', 'CMO', 'MATH500', 'AIME2024'
+        ],
+        dataset_languages: List[str] = ['cn', 'en'],
     ) -> List[Dict[str, Any]]:
         dataset = []
         dataset_info = {}
         path = get_data_path(path)
-        for split, language in product(LiveMathBenchDataset.dataset_splits,
-                                       LiveMathBenchDataset.dataset_languages):
+        for split, language in product(dataset_splits, dataset_languages):
             file_path = os.path.join(path, f'{split}_{language}.jsonl')
             if not os.path.exists(file_path):
                 continue
