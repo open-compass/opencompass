@@ -21,7 +21,7 @@ from .prompts import (EXTRACT_PROMPT_CN, EXTRACT_PROMPT_EN, JUDGE_PROMPT_CN,
 
 @LOAD_DATASET.register_module()
 class LiveMathBenchDataset(BaseDataset):
-    dataset_splits = ['AIMC', 'CEE', 'CMO', 'MATH500', 'AIME2024']
+    dataset_splits = ['CMO', 'CCEE', 'AMC', 'MATH500', 'AIME2024']
     dataset_languages = ['cn', 'en']
 
     @staticmethod
@@ -318,10 +318,13 @@ class LiveMathBenchEvaluator(BaseEvaluator):
             for threshold in [0.5, 0.75, 1.0]:
                 detail.update({
                     f'{K}-pass@{threshold}':
-                    np.floor(
-                        np.where(
-                            if_pass_list.mean(axis=1) >= threshold, 1.0,
-                            0.0).mean(axis=0))
+                    np.where(if_pass_list.mean(axis=1) >= threshold, 1.0,
+                             0.0).mean(axis=0)
+                })
+                detail.update({
+                    f'{K}-pass@{threshold}/std':
+                    np.where(if_pass_list.mean(axis=1) >= threshold, 1.0,
+                             0.0).std(axis=0)
                 })
 
             count.append(np.ones_like(if_pass_list).sum(axis=1))
@@ -381,7 +384,8 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                 detailed_result.update({
                     f'{K}-pass@{threshold}/std':
                     100. * np.mean([
-                        detail[f'{K}-pass@{threshold}'] for detail in details
+                        detail[f'{K}-pass@{threshold}/std']
+                        for detail in details
                     ])
                 })
             for d in sorted(list(all_dataset)):
@@ -396,7 +400,7 @@ class LiveMathBenchEvaluator(BaseEvaluator):
                     detailed_result.update({
                         f'{d}/{K}-pass@{threshold}/std':
                         100. * np.mean([
-                            detail[f'{K}-pass@{threshold}']
+                            detail[f'{K}-pass@{threshold}/std']
                             for detail in details if detail['dataset'] == d
                         ])
                     })
