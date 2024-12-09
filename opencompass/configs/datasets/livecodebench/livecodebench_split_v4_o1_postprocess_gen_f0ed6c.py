@@ -80,7 +80,8 @@ lcb_code_execution_infer_cfg = dict(
             begin=[
                 dict(
                     role='SYSTEM',
-                    prompt='You are an expert at Python programming, code execution, test case generation, and fuzzing.'
+                    prompt='You are an expert at Python programming, code execution, test case generation, and fuzzing.',
+                    fallback_role='HUMAN',
                 ),
             ],
             round=[
@@ -161,6 +162,4 @@ LCBTestOutput_dataset = dict(
 
 LCB_datasets = [
     LCBCodeGeneration_dataset,
-    # LCBCodeExecution_dataset,
-    # LCBTestOutput_dataset,
 ]

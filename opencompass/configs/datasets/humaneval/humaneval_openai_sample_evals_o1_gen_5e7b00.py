@@ -16,7 +16,7 @@ humaneval_infer_cfg = dict(
                 prompt='Read the following function signature and docstring, and fully implement the function described. Your response should only contain the code for this function.\n{prompt}'),
         ])),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=512))
+    inferencer=dict(type=GenInferencer, max_out_len=8192))
 
 humaneval_eval_cfg = dict(
     evaluator=dict(type=HumanEvalEvaluator),
