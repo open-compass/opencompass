@@ -20,6 +20,7 @@ from .ceval import *  # noqa: F401, F403
 from .charm import *  # noqa: F401, F403
 from .chembench import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
+from .chinese_simpleqa import *  # noqa: F401, F403
 from .cibench import *  # noqa: F401, F403
 from .circular import *  # noqa: F401, F403
 from .civilcomments import *  # noqa: F401, F403
