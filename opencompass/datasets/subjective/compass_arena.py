@@ -65,7 +65,7 @@ def post_process_compassarena(item):
 @DICT_POSTPROCESSORS.register_module('compassarena')
 def compassarena_postprocess(output: dict,
                              output_path: str,
-                             summary_type='half_add',
+                             summary_type='single',
                              check_pos_bias=True) -> dict:
     judged_answers, references = get_judgeanswer_and_reference(
         output, output_path, post_process_compassarena)
@@ -81,6 +81,7 @@ def compassarena_postprocess(output: dict,
     model1 = references[0]['answer1']
 
     for prediction, reference in zip(judged_answers, references):
+
         categories[reference['capability']] += 1
 
         if prediction == 'A':
