@@ -143,6 +143,9 @@ class CompassArenaSummarizer:
                         win_model1[dataset_abbr] += score_1
                         win_model2[reference['capability']] += score_2
                         win_model2[dataset_abbr] += score_2
+                    print(self.summary_type)
+                    print(dataset_abbr)
+                    print(win_model2[dataset_abbr])
                     for capability in categories:
                         win_model1[capability] = win_model1[capability] / categories[capability] * 100
                         win_model1[capability] = round(win_model1[capability], 2)
