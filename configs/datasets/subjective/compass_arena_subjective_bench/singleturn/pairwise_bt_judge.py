@@ -2,6 +2,7 @@ from mmengine.config import read_base
 
 from opencompass.datasets import (
     CompassArenaSubjectiveBench,
+    compassarena_subjectiveeval_bradleyterry_postprocess,
     compassarena_subjectiveeval_pairwise_postprocess,
 )
 from opencompass.openicl.icl_evaluator import LMEvaluator
@@ -24,7 +25,7 @@ qwen_2_5_72b = [
     )
 ]
 
-compassarena_subjectivebench_singleturn_datasets = []
+compassarena_subjectivebench_bradleyterry_singleturn_datasets = []
 
 
 for _name in subjective_all_sets:
@@ -53,13 +54,14 @@ for _name in subjective_all_sets:
                 ),
             ),
             dict_postprocessor=dict(
-                type=compassarena_subjectiveeval_pairwise_postprocess
+                type=compassarena_subjectiveeval_bradleyterry_postprocess
             ),
+            keep_predictions=True,  # Must be turned on to save predictions from model pairs to calculate style features in postprocessor
         ),
         pred_role='BOT',
     )
 
-    compassarena_subjectivebench_singleturn_datasets.append(
+    compassarena_subjectivebench_bradleyterry_singleturn_datasets.append(
         dict(
             abbr=f'{_name}',
             type=CompassArenaSubjectiveBench,
