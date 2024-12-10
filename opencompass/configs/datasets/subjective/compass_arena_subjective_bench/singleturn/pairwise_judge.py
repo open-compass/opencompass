@@ -69,7 +69,7 @@ for _name in subjective_all_sets:
             infer_cfg=subjective_infer_cfg,
             eval_cfg=subjective_eval_cfg,
             mode='m2n',
-            infer_order='random',
+            infer_order='double',
             base_models=qwen_2_5_72b,
             given_pred=[
                 {
