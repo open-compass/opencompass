@@ -50,7 +50,7 @@ for category in categories:
         abbr=f"korbench_mixed_{category}",
         path="opencompass/korbench",
         category=category,
-        mode='mixed',
+        prompt_mode='mixed',
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
         eval_cfg=eval_cfg,

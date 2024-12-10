@@ -1,4 +1,7 @@
-from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
+from opencompass.datasets.korbench.korbench import (
+    korbenchDataset,
+    korbenchEvaluator,
+)
 
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -13,19 +16,9 @@ for category in categories:
     prompt_template = dict(
         type=PromptTemplate,
         template=dict(
-            begin=[
-                dict(
-                    role="HUMAN",
-                    prompt=""
-                )
-            ],
-            round=[
-                dict(
-                    role="HUMAN",
-                    prompt="{prompt}" # f-string
-                )
-            ]
-        )
+            begin=[dict(role="HUMAN", prompt="")],
+            round=[dict(role="HUMAN", prompt="{prompt}")],  # f-string
+        ),
     )
 
     # Reader configuration
@@ -51,7 +44,7 @@ for category in categories:
         type=korbenchDataset,
         abbr=f"korbench_{category}",
         path="opencompass/korbench",
-        mode='3_shot',
+        prompt_mode='3_shot',
         category=category,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,

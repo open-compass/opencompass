@@ -20,7 +20,7 @@ subjective_infer_cfg = dict(
             template="""{dialogue}"""
         ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=ChatInferencer, max_seq_len=4096, max_out_len=512, infer_mode='last'),
+        inferencer=dict(type=ChatInferencer, max_seq_len=32768, max_out_len=4096, infer_mode='last'),
     )
 
 subjective_eval_cfg = dict(
