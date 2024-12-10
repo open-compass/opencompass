@@ -23,8 +23,6 @@ from .prompts import (EXTRACT_PROMPT_CN, EXTRACT_PROMPT_EN, JUDGE_PROMPT_CN,
 
 @LOAD_DATASET.register_module()
 class LiveMathBenchDataset(BaseDataset):
-    dataset_splits = ['CMO', 'CCEE', 'AMC', 'WLPMC', 'MATH500', 'AIME2024']
-    dataset_languages = ['cn', 'en']
 
     @staticmethod
     def load(
@@ -32,7 +30,10 @@ class LiveMathBenchDataset(BaseDataset):
         k: int,
         n: int,
         dataset_splits: List[str] = [
-            'AIMC', 'CEE', 'CMO', 'MATH500', 'AIME2024'
+            'CMO',
+            'CCEE',
+            'AMC',
+            'WLPMC',  # 'MATH500', 'AIME2024'
         ],
         dataset_languages: List[str] = ['cn', 'en'],
     ) -> List[Dict[str, Any]]:
