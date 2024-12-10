@@ -78,10 +78,10 @@ def compassarena_postprocess(output: dict,
     win_model1 = defaultdict(float)
     win_model2 = defaultdict(float)
     categories = defaultdict(float)
-    
+    model1 = references[0]['answer1']
 
     for prediction, reference in zip(judged_answers, references):
-        model1 = references[0]['answer1']
+        
         categories[reference['capability']] += 1
 
         if prediction == 'A':
