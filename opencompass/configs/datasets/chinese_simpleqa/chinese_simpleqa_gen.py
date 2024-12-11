@@ -29,6 +29,7 @@ subjective_eval_cfg = dict(
                 begin=[
                     dict(
                         role='SYSTEM',
+                        fallback_role='HUMAN',
                         prompt='{system_prompt}')
                 ],
                 round=[
