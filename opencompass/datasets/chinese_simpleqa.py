@@ -94,7 +94,7 @@ def chinese_simpleqa_preprocess(text: str) -> str:
 class CsimpleqaDataset(BaseDataset):
 
     def load(self, path: str, name: str, *args, **kwargs):
-        path = get_data_path(path, local_mode=True)
+        path = get_data_path(path)
         filename = osp.join(path, f'{name}.jsonl')
         dataset = DatasetDict()
         raw_data = []

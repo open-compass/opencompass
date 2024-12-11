@@ -39,7 +39,7 @@ subjective_eval_cfg = dict(
                 ]
             ),
         ),
-        dict_postprocessor=dict(type=csimpleqa_postprocess, judge_type='general'),
+        dict_postprocessor=dict(type=csimpleqa_postprocess),
     ),
     pred_role='BOT',
 )
@@ -48,8 +48,8 @@ csimpleqa_datasets = [
     dict(
         abbr='chinese_simpleqa',
         type=CsimpleqaDataset,
-        path='data/chinese_simpleqa',
         name="chinese_simpleqa",
+        path='opencompass/chinese_simpleqa',
         reader_cfg=subjective_reader_cfg,
         infer_cfg=subjective_infer_cfg,
         eval_cfg=subjective_eval_cfg,

@@ -1,7 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa import csimpleqa_datasets
+    from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa_gen import csimpleqa_datasets
 
 from opencompass.models.openai_api import OpenAI
 from opencompass.runners import LocalRunner
