@@ -1,40 +1,11 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess_v2, normalize_final_answer
-from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess_v2, GaoKaoMATHEvaluator
-# from opencompass.utils.model_postprocessors import naive_model_postprocess, xfinder_postprocess
-from opencompass.utils.postprocessors.naive import MATH_NAVIE_PROMPT_TEMPLATE
-
-# ----------------------------- Eval Parameters -----------------------------
-## Postprocess function
-post_func = 're' # 're', 'xfinder_model', 'naive_model'
-
-## Evalute function
-eval_func = 'naive_model' # 're', 'naive_model'
+from opencompass.openicl.icl_evaluator import LMEvaluator
+from opencompass.datasets import generic_llmjudge_postprocess
+from opencompass.datasets import MATHDataset
 
 
-## Model api url
-# xfinder_url = 'http://0.0.0.0:23333/v1' # for 'xFinder-qwen1505' if post_func is 'xfinder_model'
-# naive_model_name = 'Qwen/Qwen2.5-72B-Instruct' # replace with your model name
-naive_model_name = 'dlc_model'
-# naive_model_url = [
-#     'http://172.30.56.38:23001/v1',
-# ] # Multi-apis for accerlation
-naive_model_url = [
-    "http://172.30.56.38:23001/v1",
-    "http://172.30.8.4:23003/v1",
-    "http://172.30.8.14:23002/v1",
-    "http://172.30.48.80:23004/v1",
-    "http://172.30.56.132:23005/v1",
-    "http://172.30.16.115:23006/v1",
-    "http://172.30.48.82:23007/v1",
-    "http://172.30.24.53:23008/v1",
-    "http://172.30.56.141:23009/v1",
-    "http://172.30.8.35:23010/v1",
-    "http://172.30.48.85:23011/v1",
-    "http://172.30.16.116:23012/v1"
-]
 # ----------------------------- Detailed Config -----------------------------
 
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
@@ -53,24 +24,56 @@ math_infer_cfg = dict(
 )
 
 
-if post_func == 're':
-    pred_postprocessor = dict(type=math_postprocess_v2)
+GRADER_TEMPLATE = """
+    Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
+    
+    Here are some evaluation criteria:
+    1. Please refer to the given standard answer. You don't need to re-generate the answer to the question because the standard answer has been given. You only need to judge whether the candidate's answer is consistent with the standard answer according to the form of the question. Don't try to answer the original question. You can assume that the standard answer is definitely correct.
+    2. Because the candidate's answer may be different from the standard answer in the form of expression, before making a judgment, please understand the question and the standard answer first, and then judge whether the candidate's answer is correct, but be careful not to try to answer the original question.
+    3. Some answers may contain multiple items, such as multiple-choice questions, multiple-select questions, fill-in-the-blank questions, etc. As long as the answer is the same as the standard answer, it is enough. For multiple-select questions and multiple-blank fill-in-the-blank questions, the candidate needs to answer all the corresponding options or blanks correctly to be considered correct.
+    4. Some answers may be expressed in different ways, such as some answers may be a mathematical expression, some answers may be a textual description, as long as the meaning expressed is the same. And some formulas are expressed in different ways, but they are equivalent and correct.
+    5. If the prediction is given with \\boxed{}, please ignore the \\boxed{} and only judge whether the candidate's answer is consistent with the standard answer.
+
+    Please judge whether the following answers are consistent with the standard answer based on the above criteria. Grade the predicted answer of this new question as one of:
+    A: CORRECT 
+    B: INCORRECT
+    Just return the letters "A" or "B", with no text around it.
+
+    Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
 
-if eval_func == 're':
-    evaluator = dict(type=MATHEvaluator, version='v2')
-elif eval_func == 'naive_model':
-    evaluator = dict(
-        type=GaoKaoMATHEvaluator,
-        judge_model_name=naive_model_name,
-        url=naive_model_url,
-    )
+    <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
+    <Gold Target Begin>: \n{solution}\n<Gold Target End>\n\n
+    <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
+    
+    Judging the correctness of candidates' answers:
+""".strip()
 
-# postprocess v2
+# Evaluation configuration
 math_eval_cfg = dict(
-    evaluator=evaluator,
-    pred_postprocessor=pred_postprocessor,
+    evaluator=dict(
+        type=LMEvaluator,
+        prompt_template=dict(
+            type=PromptTemplate,
+            template=dict(
+            begin=[
+                dict(
+                    role='SYSTEM',
+                    fallback_role='HUMAN',
+                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+            ],
+                round=[
+                dict(
+                    role='HUMAN',
+                    prompt = GRADER_TEMPLATE
+                ),
+            ]),
+        ),
+        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+    ),
+    pred_role='BOT',
 )
+
 
 math_datasets = [
     dict(
@@ -81,5 +84,6 @@ math_datasets = [
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg,
+        mode='singlescore',
     )
 ]

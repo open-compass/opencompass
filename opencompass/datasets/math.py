@@ -141,7 +141,7 @@ def extract_answer(response_text: str):
 class MATHDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, file_name: str = 'math.json'):
+    def load(path: str, file_name: str = 'math.json', **kwargs):
         path = get_data_path(path)
         dataset = DatasetDict()
         raw_data = []

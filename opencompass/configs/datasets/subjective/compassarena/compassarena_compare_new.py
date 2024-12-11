@@ -105,7 +105,7 @@ for _name, _prompt in sub_map.items():
                 ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_seq_len=4096, max_out_len=2048),
+            inferencer=dict(type=GenInferencer, max_seq_len=4096, max_out_len=4096),
         )
 
     subjective_eval_cfg = dict(
@@ -120,7 +120,7 @@ for _name, _prompt in sub_map.items():
                     ),
                 ]),
             ),
-            dict_postprocessor=dict(type=compassarena_postprocess, summary_type='half_add', check_pos_bias=True),
+            dict_postprocessor=dict(type=compassarena_postprocess, summary_type='single', check_pos_bias=True),
         ),
         pred_role='BOT',
     )

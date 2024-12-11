@@ -357,6 +357,21 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/simpleqa/simple_qa_test_set.csv",
+    },
+    "opencompass/LiveMathBench202412": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/LiveMathBench/",
+    },
+    "opencompass/LiveReasonBench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/LiveReasonBench/",    
+    },
+    "opencompass/bigcodebench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/bigcodebench/",
     }
 }
 
@@ -584,5 +599,13 @@ DATASETS_URL = {
     "P-MMEval": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/pmmeval.zip",
         "md5": "09e401e6229a50647b9e13c429e634d1",
+    },
+    "LiveMathBench": {
+        'url': "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/LiveMathBench.zip",
+        "md5": "789df4604260d5cf3ba7a891077cf6a0",
+    },
+    "bigcodebench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bigcodebench.zip",
+        "md5": "2c1c7956ca49a1124617e8c037ec57d8"
     }
 }
