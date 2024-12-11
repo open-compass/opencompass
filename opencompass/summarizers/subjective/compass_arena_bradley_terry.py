@@ -8,7 +8,7 @@ import os
 import os.path as osp
 from datetime import datetime
 from functools import partial
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import mmengine
 import numpy as np
@@ -459,7 +459,8 @@ def compute_style_control(
         _df = pd.get_dummies(
             data=df,
             columns=control_variables,
-            drop_first=True,
+            drop_first=
+            False,  # Since the model is fitted without an intercept, we keep all levels of each categorical
         )
 
         # One-hot encode categorical control variables
@@ -530,7 +531,8 @@ def compute_bootstrap_style_control(
         _df = pd.get_dummies(
             data=df,
             columns=control_variables,
-            drop_first=True,
+            drop_first=
+            False,  # Since the model is fitted without an intercept, we keep all levels of each categorical
         )
 
         # One-hot encode categorical control variables
@@ -741,7 +743,7 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
         matches: Dict,
         base_model: str = None,
         groups: List[str] = None,
-    ) -> pd.DataFrame:
+    ) -> Tuple[pd.DataFrame, Dict]:
 
         rating_system = self.rating_system
         num_bootstrap = self.num_bootstrap
@@ -904,6 +906,16 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
         output_csv_path = (output_csv_path.split('.csv')[0] + '_by_' +
                            judge_abbr + '.csv')
 
+        with pd.option_context(
+                'display.max_rows',
+                20,
+                'display.max_columns',
+                20,
+                'display.expand_frame_repr',
+                False,
+        ):
+            print(full_results_df.reset_index(drop=True).round(2))
+
         full_results_df.to_csv(
             output_csv_path,
             index=False,
@@ -941,6 +953,7 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
             time_str (str, optional): Timestamp for file suffix. Defaults to
             datetime.now().strftime('%Y%m%d_%H%M%S').
         """
+        all_scores = {}
         for judge_model in self.judge_models:
             control_coefficients = {}
             leaderboard_tables = {}
@@ -950,9 +963,13 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
             # pick up results
             raw_results, dataset_eval_mode = self._pick_up_results(judge_abbr)
 
+            all_matches = []
             for dataset_abbr, base_models in raw_results.items():
                 control_coefficients[dataset_abbr] = {}
                 leaderboard_tables[dataset_abbr] = {}
+
+                dataset_matches = base_models[list(base_models)[0]]
+                all_matches.extend(dataset_matches)
 
                 for base_model_abbr, matches in base_models.items():
                     cur_table_df, cur_ctrl_coefs = self._calculate_ratings(
@@ -969,7 +986,7 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
                     print('-' * 10 +
                           f"{dataset_abbr + ':' + base_model_abbr}\n" +
                           '-' * 10)
-                    print(cur_table_df)
+                    # print(cur_table_df)
                     print(cur_ctrl_coefs)
 
             leaderboard_tables = self.flip_dict_levels(leaderboard_tables)
@@ -983,3 +1000,20 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
                 judge_abbr=judge_abbr,
                 dataset_eval_mode=dataset_eval_mode,
             )
+
+            # Fit another BT model with the first base_model and combining matches from all datasets
+            all_scores_df, all_scores_ctrl_coefs = self._calculate_ratings(
+                matches=all_matches,
+                base_model=list(base_models)[0],
+                groups=self.groups,
+            )
+
+            all_scores[judge_abbr] = pd.Series(
+                all_scores_df['rating'],
+                index=all_scores_df['model_name'],
+            ).to_dict()
+
+        print(f'{all_scores=}')
+        print(f'{all_scores_ctrl_coefs=}')
+
+        return {'CompassArenaSubjBenchBradleyTerry': all_scores}

@@ -44,7 +44,7 @@ After inference by the judge model in the evaluation stage, we fit a Bradley-Ter
 
 - `odds_ratio`: Whether to report odds ratios ($e^{\beta_i}$) instead of the original coefficients. See section "Estimated Coefficients of Control variables" for more explanation.
 
-- `groups`: List of group variables to include while fitting the BT model. These must be available in the input dataset for each observation. Group variables are assumed to be categorical and one-hot encoding is automatically performed with the first category removed before model fitting.
+- `groups`: List of group variables to include while fitting the BT model. These must be available in the input dataset for each observation. Group variables are assumed to be categorical and one-hot encoding is automatically performed before model fitting.
 
 
 ### Config Files
@@ -65,17 +65,17 @@ After inference by the judge model in the evaluation stage, we fit a Bradley-Ter
 The rating of each model is a scaled version of the estimated "strength" coefficients of the fitted Bradley-Terry model. We use the Elo scale with an initial rating of 1000 and a scaling factor of 400 to match the scale used in [CompassArena](https://opencompass.org.cn/arena). Furthermore, we anchor the ratings on the base model as it naturally represents the reference model we are comparing against. This is why the base model always have a rating of 1000 with a zero standard deviation.
 
 ```
-dataset	version	base_model	metric	mode	ranking	ranking_ub	model_name	rating	rating_q975	rating_q025	std_dev	num_battles
-singleturn	635142	Qwen-2.5-72B-Instruct	bt_rating	gen	1	1	Qwen-2.5-72B-Instruct	1000	1000	1000	0	4229
-singleturn	635142	Qwen-2.5-72B-Instruct	bt_rating	gen	2	2	qwen2.5-32b-instruct-turbomind	926.2231474	945.0262849	908.2263054	9.019177299	1055
-singleturn	635142	Qwen-2.5-72B-Instruct	bt_rating	gen	3	2	qwen2.5-14b-instruct-turbomind	906.9859382	925.4317943	889.7925857	9.168838569	1055
-singleturn	635142	Qwen-2.5-72B-Instruct	bt_rating	gen	4	2	qwen2-7b-instruct-turbomind	901.7568797	918.0514477	882.8266488	9.270810688	1060
-singleturn	635142	Qwen-2.5-72B-Instruct	bt_rating	gen	5	3	qwen2.5-7b-instruct-turbomind	892.7376763	904.967507	879.0671151	7.582809959	1059
-multiturn	fff2b4	Qwen-2.5-72B-Instruct	bt_rating	unknown	1	1	Qwen-2.5-72B-Instruct	1000	1000	1000	0	1127
-multiturn	fff2b4	Qwen-2.5-72B-Instruct	bt_rating	unknown	2	2	qwen2.5-32b-instruct-turbomind	942.1016777	976.945207	907.3027472	19.27814565	282
-multiturn	fff2b4	Qwen-2.5-72B-Instruct	bt_rating	unknown	3	2	qwen2-7b-instruct-turbomind	940.0731684	970.5585368	892.3181852	22.04105572	282
-multiturn	fff2b4	Qwen-2.5-72B-Instruct	bt_rating	unknown	4	2	qwen2.5-14b-instruct-turbomind	928.7889118	964.8279798	892.5656754	19.08905489	282
-multiturn	fff2b4	Qwen-2.5-72B-Instruct	bt_rating	unknown	5	2	qwen2.5-7b-instruct-turbomind	906.7686895	932.9998533	874.5200202	17.2591473	281
+      dataset version             base_model     metric     mode  ranking  ranking_ub                      model_name   rating  rating_q975  rating_q025  std_dev  num_battles
+0  singleturn  635142  Qwen-2.5-72B-Instruct  bt_rating      gen        1           1           Qwen-2.5-72B-Instruct  1000.00      1000.00      1000.00     0.00         4229
+1  singleturn  635142  Qwen-2.5-72B-Instruct  bt_rating      gen        2           2  qwen2.5-32b-instruct-turbomind   926.54       941.72       908.29     8.21         1055
+2  singleturn  635142  Qwen-2.5-72B-Instruct  bt_rating      gen        3           2  qwen2.5-14b-instruct-turbomind   907.23       921.08       897.09     6.68         1055
+3  singleturn  635142  Qwen-2.5-72B-Instruct  bt_rating      gen        4           2     qwen2-7b-instruct-turbomind   901.99       919.06       885.95     8.44         1060
+4  singleturn  635142  Qwen-2.5-72B-Instruct  bt_rating      gen        5           2   qwen2.5-7b-instruct-turbomind   893.03       910.58       877.02     8.65         1059
+5   multiturn  fff2b4  Qwen-2.5-72B-Instruct  bt_rating  unknown        1           1           Qwen-2.5-72B-Instruct  1000.00      1000.00      1000.00     0.00         1127
+6   multiturn  fff2b4  Qwen-2.5-72B-Instruct  bt_rating  unknown        2           2  qwen2.5-32b-instruct-turbomind   942.53       972.14       903.84    18.89          282
+7   multiturn  fff2b4  Qwen-2.5-72B-Instruct  bt_rating  unknown        3           2     qwen2-7b-instruct-turbomind   940.34       974.22       895.80    21.72          282
+8   multiturn  fff2b4  Qwen-2.5-72B-Instruct  bt_rating  unknown        4           2  qwen2.5-14b-instruct-turbomind   929.09       959.98       896.80    18.16          282
+9   multiturn  fff2b4  Qwen-2.5-72B-Instruct  bt_rating  unknown        5           2   qwen2.5-7b-instruct-turbomind   907.07       936.71       876.88    16.87          281
 ```
 
 ### Estimated Coefficients of Control variables
@@ -100,46 +100,50 @@ For example, the following results are reported with `normalize_style_features==
 {
     "singleturn": {
         "Qwen-2.5-72B-Instruct": {
-            "sum_assistant_tokens": 6.53720403351394,
-            "header_count": 1.4792109070935404,
-            "list_count": 1.160034285851486,
-            "bold_count": 1.7895403566484283,
-            "difficulty_Easy": 0.9759045078292496,
-            "difficulty_Medium": 1.0871822638256954,
-            "category_代码": 1.354417670414851,
-            "category_创作": 1.1094959274269027,
-            "category_推理": 1.2357933187526577,
-            "category_日常对话": 1.0410875930674186,
-            "category_自然语言处理": 1.0709623294409785,
-            "category_角色扮演": 1.309683380779042,
-            "category_重写": 0.8467240295931602,
-            "category_领域知识问答": 1.1352276271498163
+            "sum_assistant_tokens": 6.577376545800252,
+            "header_count": 1.4880636137846999,
+            "list_count": 1.1558594451186806,
+            "bold_count": 1.7918326386585717,
+            "difficulty_Advanced": 1.0281620474711213,
+            "difficulty_Easy": 1.0557367496235666,
+            "difficulty_Medium": 1.1768581931447049,
+            "category_人类对齐": 0.8087074923883157,
+            "category_代码": 1.2717334332407775,
+            "category_创作": 1.0430652013278148,
+            "category_推理": 1.1592759054335746,
+            "category_日常对话": 0.979047716903164,
+            "category_自然语言处理": 1.006707704304149,
+            "category_角色扮演": 1.2296103927210726,
+            "category_重写": 0.7952522120597192,
+            "category_领域知识问答": 1.0658003517547319
         }
     },
     "multiturn": {
         "Qwen-2.5-72B-Instruct": {
-            "sum_assistant_tokens": 4.4598969821940715,
-            "header_count": 1.1290504434335653,
-            "list_count": 1.469607623465334,
-            "bold_count": 1.4738629875792915,
-            "difficulty_Easy": 1.0078742450843936,
-            "difficulty_Medium": 0.8526743244695739,
-            "category_代码": 1.0669382695680414,
-            "category_创作": 1.1813395478003295,
-            "category_推理": 0.9752426633584584,
-            "category_日常对话": 1.1967182467429063,
-            "category_自然语言处理": 1.5484033674244435,
-            "category_角色扮演": 1.190025282220524,
-            "category_重写": 0.8443945949829733,
-            "category_领域知识问答": 1.6758254499585854
+            "sum_assistant_tokens": 4.470153434554273,
+            "header_count": 1.130542616688942,
+            "list_count": 1.4753419673439991,
+            "bold_count": 1.476348454534956,
+            "difficulty_Advanced": 1.1668553174437737,
+            "difficulty_Easy": 1.142118410006132,
+            "difficulty_Medium": 0.9651479035385795,
+            "category_人类对齐": 0.9606676068409767,
+            "category_代码": 0.9348722519214725,
+            "category_创作": 1.0362490715530026,
+            "category_推理": 0.8546385641566406,
+            "category_日常对话": 1.0481269627721679,
+            "category_自然语言处理": 1.358391853082614,
+            "category_角色扮演": 1.0432636535119493,
+            "category_重写": 0.7398232857603452,
+            "category_领域知识问答": 1.4715970942932421
         }
     }
 }
 ```
 Example Interpretation:
-- For the single turn dataset with "Qwen-2.5-72B-Instruct" as the base model, if all else stay constant, the odds of winning is 6.5 times greater for every unit increase in the relative difference (unnormalized) in response length between model A and B.
+- For the single turn dataset with "Qwen-2.5-72B-Instruct" as the base model, if all else stay constant, the odds of winning is 6.6 times greater for every unit increase in the relative difference (unnormalized) in response length between model A and B.
 
-- For the multi-turn dataset with "Qwen-2.5-72B-Instruct" as the base model, if all else stay constant, the odds of winning is 16% smaller (1-0.84) for "rewrite" (重写) category questions compared to non-rewrite questions.
+- For the multi-turn dataset with "Qwen-2.5-72B-Instruct" as the base model, if all else stay constant, the odds of winning is 26% smaller (1-0.74) for "rewrite" (重写) category questions compared to non-rewrite questions.
 
 
 ## Citation
