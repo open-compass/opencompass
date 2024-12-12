@@ -23,6 +23,7 @@ livemathbench_infer_cfg = dict(
     inferencer=dict(
         type=GenInferencer, 
         max_out_len=2048,
+        do_sample=True,
         temperature=1.0
     )
 )
