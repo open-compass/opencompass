@@ -7,6 +7,7 @@ from .charm import CharmMemSummarizer
 from .common_summarizer import CommonSummarizer
 from .compass_arena import CompassArenaSummarizer
 from .compassbench import CompassBenchSummarizer
+from .qacompassbench import QaCompassBenchSummarizer
 from .corev2 import Corev2Summarizer
 from .creationbench import CreationBenchSummarizer
 from .flames import FlamesSummarizer

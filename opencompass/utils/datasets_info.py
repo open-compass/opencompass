@@ -377,7 +377,12 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/bigcodebench/",
-    }
+    },
+    "opencompass/qabench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/qabench",
+    },
 }
 
 DATASETS_URL = {
