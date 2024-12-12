@@ -6,12 +6,14 @@ einops==0.5.0
 evaluate>=0.3.0
 func_timeout
 fuzzywuzzy
+gradio-client
 h5py
 huggingface_hub<=0.24.7
 immutabledict
 importlib-metadata
 jieba
 json5
+jsonlines
 mmengine-lite
 nltk==3.8
 numpy>=1.23.4,<2.0.0
@@ -42,4 +44,6 @@ tokenizers>=0.13.3
 torch>=1.13.1
 tqdm>=4.64.1
 transformers>=4.29.1
+tree-sitter==0.21.3
+tree_sitter_languages>=1.10.2
 typer

@@ -357,6 +357,26 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/simpleqa/simple_qa_test_set.csv",
+    },
+    "opencompass/chinese_simpleqa": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/chinese_simpleqa",
+    },
+    "opencompass/LiveMathBench202412": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/LiveMathBench/",
+    },
+    "opencompass/LiveReasonBench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/LiveReasonBench/",    
+    },
+    "opencompass/bigcodebench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/bigcodebench/",
     }
 }
 
@@ -376,6 +396,10 @@ DATASETS_URL = {
     "/simpleqa": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa.zip",
         "md5": "1d83fc2e15798d39cb265c9a3cb5195a",
+    },
+    "/chinese_simpleqa": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/chinese_simpleqa.zip",
+        "md5": "4bdf854b291fc0ee29da57dc47ac47b5",
     },
     "/gpqa/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gpqa.zip",
@@ -584,5 +608,13 @@ DATASETS_URL = {
     "P-MMEval": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/pmmeval.zip",
         "md5": "09e401e6229a50647b9e13c429e634d1",
+    },
+    "LiveMathBench": {
+        'url': "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/LiveMathBench.zip",
+        "md5": "789df4604260d5cf3ba7a891077cf6a0",
+    },
+    "bigcodebench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bigcodebench.zip",
+        "md5": "2c1c7956ca49a1124617e8c037ec57d8"
     }
 }
