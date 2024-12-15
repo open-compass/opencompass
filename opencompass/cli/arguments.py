@@ -47,6 +47,7 @@ class Arguments:
     tokenizer_path: str = None
     work_dir: str = 'outputs/default'
     dump_extract_rate: bool = False
+    time_str: Optional[str] = None
 
     # refer to: test_range in `opencompass.openicl.icl_dataset_reader.DatasetReader`
     limit: Optional[Union[int, float, str]] = None

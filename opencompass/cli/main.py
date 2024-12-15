@@ -225,7 +225,10 @@ def run_task(args: Union[Arguments, Namespace]):
         cfg.setdefault('work_dir', os.path.join('outputs', 'default'))
 
     # cfg_time_str defaults to the current time
-    cfg_time_str = dir_time_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+    if args.time_str:
+        cfg_time_str = dir_time_str = args.time_str
+    else:
+        cfg_time_str = dir_time_str = datetime.now().strftime('%Y%m%d_%H%M%S')
     if args.reuse:
         if args.reuse == 'latest':
             if not os.path.exists(cfg.work_dir) or not os.listdir(
