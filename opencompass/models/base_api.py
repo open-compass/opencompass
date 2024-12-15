@@ -4,6 +4,7 @@ import threading
 import time
 import warnings
 from abc import abstractmethod
+from collections import deque
 from copy import deepcopy
 from queue import Queue
 from time import sleep
@@ -11,6 +12,8 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from opencompass.utils import get_logger
 from opencompass.utils.prompt import PromptList
+
+import asyncio
 
 from .base import BaseModel
 
@@ -51,7 +54,7 @@ class BaseAPIModel(BaseModel):
         self.retry = retry
         self.query_per_second = query_per_second
         self.token_bucket = TokenBucket(query_per_second, rpm_verbose)
-        self.template_parser = APITemplateParser(meta_template)
+        self.template_parser = APITemplateParser(meta_template)  # type: ignore
         self.logger = get_logger()
         self.generation_kwargs = generation_kwargs
         self.verbose = verbose
@@ -459,4 +462,69 @@ class TokenBucket:
                 else:
                     break
             self._request_queue.put(cur_time)
-            self.logger.info(f'Current RPM {self._request_queue.qsize()}.')
+            self.logger.info(f"Current RPM {self._request_queue.qsize()}.")
+
+
+
+class AsyncTokenBucket:
+    def __init__(self, rate: int = 1):
+        self._rate = rate
+        self._max_tokens = rate * 60
+        self._tokens: float = float(self._max_tokens)
+        self._last_refill_time: float | None = None
+
+        self._request_timestamps: deque[float] = deque()
+        self._max_window_size = 60
+
+        self._token_available = asyncio.Event()
+
+    async def _release(self) -> None:
+        if self._last_refill_time is None:
+            self._last_refill_time: float = time.monotonic()
+
+        now = time.monotonic()
+        elapsed = now - self._last_refill_time
+        tokens_to_add = elapsed * self._rate
+
+        self._tokens = min(self._max_tokens, self._tokens + tokens_to_add)
+        self._last_refill_time = now
+
+    async def acquire(self) -> bool:
+        while True:
+            await self._release()
+
+            if self._tokens >= 1:
+                self._tokens -= 1
+
+                now = time.monotonic()
+                self._request_timestamps.append(now)
+
+                while (
+                    self._request_timestamps
+                    and now - self._request_timestamps[0] > self._max_window_size
+                ):
+                    self._request_timestamps.popleft()
+
+                self._token_available.set()
+                return True
+
+            self._token_available.clear()
+
+            await self._token_available.wait()
+
+    @property
+    def rpm(self) -> int:
+        now = time.monotonic()
+
+        while (
+            self._request_timestamps
+            and now - self._request_timestamps[0] > self._max_window_size
+        ):
+            self._request_timestamps.popleft()
+
+        return len(self._request_timestamps)
+
+    @property
+    def available_tokens(self) -> float:
+        return self._tokens
+
