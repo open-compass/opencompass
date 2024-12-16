@@ -99,6 +99,14 @@ GaokaoBench_datasets = [
 ]
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
+summary_groups = sum(
+    [v for k, v in locals().items() if k.endswith('_summary_groups')], [])
+summary_groups.append(
+    {
+        'name': 'Mathbench',
+        'subsets': ['mathbench-a (average)', 'mathbench-t (average)'],
+    }, )
+
 summarizer = dict(
     dataset_abbrs=[
         'Language',
@@ -165,6 +173,8 @@ summarizer = dict(
         'mmlu_pro_psychology',
         'mmlu_pro_other',
         '',
+        'bbh-logical_deduction_seven_objects',
+        'bbh-multistep_arithmetic_two',
         '###### MathBench-A: Application Part ######',
         'college',
         'high',
@@ -179,8 +189,7 @@ summarizer = dict(
         'primary_knowledge',
         'mathbench-t (average)',
     ],
-    summary_groups=sum(
-        [v for k, v in locals().items() if k.endswith('_summary_groups')], []),
+    summary_groups=summary_groups,
 )
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])

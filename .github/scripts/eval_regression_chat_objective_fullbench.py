@@ -11,6 +11,10 @@ with read_base():
         arc_prize_public_evaluation_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bbh.bbh_gen_5b92b0 import \
         bbh_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.bigcodebench.bigcodebench_hard_complete_gen_faf748 import \
+        bigcodebench_hard_complete_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.bigcodebench.bigcodebench_hard_instruct_gen_8815eb import \
+        bigcodebench_hard_instruct_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmmlu.cmmlu_0shot_cot_gen_305931 import \
         cmmlu_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmo_fib.cmo_fib_gen_ace24b import \
@@ -28,17 +32,17 @@ with read_base():
         gsm8k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.hellaswag.hellaswag_10shot_gen_e42710 import \
         hellaswag_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.humaneval.humaneval_openai_sample_evals_gen_159614 import \
+    from opencompass.configs.datasets.humaneval.humaneval_openai_sample_evals_gen_dcae0e import \
         humaneval_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.humanevalx.humanevalx_gen_620cfa import \
+    from opencompass.configs.datasets.humanevalx.humanevalx_gen_3d84a3 import \
         humanevalx_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.IFEval.IFEval_gen_3321a3 import \
+    from opencompass.configs.datasets.IFEval.IFEval_gen_353ae7 import \
         ifeval_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.korbench.korbench_single_0_shot_gen import \
         korbench_0shot_single_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.livecodebench.livecodebench_gen_b2b0fd import \
         LCB_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.math.math_0shot_gen_393424 import \
+    from opencompass.configs.datasets.math.math_0shot_gen_11c4b5 import \
         math_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.MathBench.mathbench_2024_gen_50a320 import \
         mathbench_datasets  # noqa: F401, E501
@@ -217,6 +221,8 @@ summarizer = dict(
         ['lcb_code_generation', 'pass@1'],
         ['lcb_code_execution', 'pass@1'],
         ['lcb_test_output', 'pass@1'],
+        ['bigcodebench_hard_instruct', 'pass@1'],
+        ['bigcodebench_hard_complete', 'pass@1'],
         '',
         'Agent',
         ['teval', 'naive_average'],
