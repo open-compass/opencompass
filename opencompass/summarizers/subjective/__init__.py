@@ -15,5 +15,6 @@ from .followbench import FollowBenchSummarizer
 from .mtbench import MTBenchSummarizer
 from .mtbench101 import MTBench101Summarizer
 from .multiround import MultiroundSummarizer
+from .qacompassbench import QaCompassBenchSummarizer
 from .subjective import SubjectiveSummarizer
 from .wildbench import WildBenchPairSummarizer, WildBenchSingleSummarizer
