@@ -259,7 +259,44 @@ class TestVolcFullbench:
         'mathbench-t (average)'
     ]])
     @pytest.mark.chat_objective
-    def test_1(self, baseline_scores_fullbench, result_scores, model, dataset):
+    def test_chat_objective(self, baseline_scores_fullbench, result_scores,
+                            model, dataset):
+        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model + '_batch', result_score, base_score)
+
+    @pytest.mark.parametrize(
+        'model, dataset',
+        [(p1, p2) for p1 in ['internlm2_5-7b-chat-turbomind']
+         for p2 in [
+             'alignment_bench_v1_1_总分', 'alpaca_eval_total', 'arenahard_score',
+             'Followbench_naive_average', 'CompassArena_naive_average',
+             'FoFo_naive_average', 'mtbench101_avg', 'wildbench_average',
+             'simpleqa_accuracy_given_attempted',
+             'chinese_simpleqa_given_attempted_accuracy',
+             'alignment_bench_v1_1_专业能力', 'alignment_bench_v1_1_数学计算',
+             'alignment_bench_v1_1_基本任务', 'alignment_bench_v1_1_逻辑推理',
+             'alignment_bench_v1_1_中文理解', 'alignment_bench_v1_1_文本写作',
+             'alignment_bench_v1_1_角色扮演', 'alignment_bench_v1_1_综合问答',
+             'alpaca_eval_helpful_base', 'alpaca_eval_koala',
+             'alpaca_eval_oasst', 'alpaca_eval_selfinstruct',
+             'alpaca_eval_vicuna', 'compassarena_language_naive_average',
+             'compassarena_knowledge_naive_average',
+             'compassarena_reason_v2_naive_average',
+             'compassarena_math_v2_naive_average',
+             'compassarena_creationv2_zh_naive_average',
+             'fofo_test_prompts_overall', 'fofo_test_prompts_cn_overall',
+             'followbench_llmeval_en_HSR_AVG',
+             'followbench_llmeval_en_SSR_AVG', 'followbench_llmeval_en_HSR_L1',
+             'followbench_llmeval_en_HSR_L2', 'followbench_llmeval_en_HSR_L3',
+             'followbench_llmeval_en_HSR_L4', 'followbench_llmeval_en_HSR_L5',
+             'followbench_llmeval_en_SSR_L1', 'followbench_llmeval_en_SSR_L2',
+             'followbench_llmeval_en_SSR_L3', 'followbench_llmeval_en_SSR_L4',
+             'followbench_llmeval_en_SSR_L5', 'simpleqa_f1'
+         ]])
+    @pytest.mark.chat_subjective
+    def test_chat_subjective(self, baseline_scores_fullbench, result_scores,
+                             model, dataset):
         base_score = baseline_scores_fullbench.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model + '_batch', result_score, base_score)
@@ -375,9 +412,9 @@ def read_csv_file(file_path):
             for row in reader:
                 if row['metric'] is not None and 'bpb' not in row['metric']:
                     filtered_row = {
-                        k: v
-                        for k, v in row.items()
-                        if k not in ['version', 'metric', 'mode']
+                        k + '_' + m: v
+                        for k, m, v in row.items()
+                        if k not in ['version', 'mode']
                     }
                     filtered_data.append(filtered_row)
         else:
