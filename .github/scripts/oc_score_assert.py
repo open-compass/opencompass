@@ -227,36 +227,53 @@ class TestVolcFullbench:
     @pytest.mark.parametrize('model, dataset', [(
         p1, p2
     ) for p1 in ['internlm2_5-7b-chat-turbomind'] for p2 in [
-        'race-high', 'ARC-c', 'BoolQ', 'triviaqa_wiki_1shot', 'nq_open_1shot',
-        'mmmlu_lite', 'IFEval', 'drop', 'bbh', 'GPQA_diamond', 'hellaswag',
-        'TheoremQA', 'musr_average', 'korbench_single',
-        'ARC_Prize_Public_Evaluation', 'gsm8k', 'GaokaoBench', 'math',
-        'cmo_fib', 'aime2024', 'Mathbench',
-        'wikibench-wiki-single_choice_cncircular', 'cmmlu', 'mmlu', 'mmlu_pro',
-        'openai_humaneval', 'sanitized_mbpp', 'humanevalx', 'ds1000',
-        'lcb_code_generation', 'lcb_code_execution', 'lcb_test_output',
-        'bigcodebench_hard_instruct', 'bigcodebench_hard_complete', 'teval',
-        'qa_dingo_cn', 'mmlu-stem', 'mmlu-social-science', 'mmlu-humanities',
-        'mmlu-other', 'cmmlu-stem', 'cmmlu-social-science', 'cmmlu-humanities',
-        'cmmlu-other', 'cmmlu-china-specific', 'mmlu_pro_biology',
-        'mmlu_pro_business', 'mmlu_pro_chemistry', 'mmlu_pro_computer_science',
-        'mmlu_pro_economics', 'mmlu_pro_engineering', 'mmlu_pro_health',
-        'mmlu_pro_history', 'mmlu_pro_law', 'mmlu_pro_math',
-        'mmlu_pro_philosophy', 'mmlu_pro_physics', 'mmlu_pro_psychology',
-        'mmlu_pro_other', 'humanevalx-python', 'humanevalx-cpp',
-        'humanevalx-go', 'humanevalx-java', 'humanevalx-js', 'ds1000_Pandas',
-        'ds1000_Numpy', 'ds1000_Tensorflow', 'ds1000_Scipy', 'ds1000_Sklearn',
-        'ds1000_Pytorch', 'ds1000_Matplotlib', 'openai_mmmlu_lite_AR-XY',
-        'openai_mmmlu_lite_BN-BD', 'openai_mmmlu_lite_DE-DE',
-        'openai_mmmlu_lite_ES-LA', 'openai_mmmlu_lite_FR-FR',
-        'openai_mmmlu_lite_HI-IN', 'openai_mmmlu_lite_ID-ID',
-        'openai_mmmlu_lite_IT-IT', 'openai_mmmlu_lite_JA-JP',
-        'openai_mmmlu_lite_KO-KR', 'openai_mmmlu_lite_PT-BR',
-        'openai_mmmlu_lite_SW-KE', 'openai_mmmlu_lite_YO-NG',
-        'openai_mmmlu_lite_ZH-CN', 'college', 'high', 'middle', 'primary',
-        'arithmetic', 'mathbench-a (average)', 'college_knowledge',
-        'high_knowledge', 'middle_knowledge', 'primary_knowledge',
-        'mathbench-t (average)'
+        'race-high_accuracy', 'ARC-c_accuracy', 'BoolQ_accuracy',
+        'triviaqa_wiki_1shot_score', 'nq_open_1shot_score',
+        'mmmlu_lite_naive_average', 'IFEval_Prompt-level-strict-accuracy',
+        'drop_accuracy', 'bbh_naive_average', 'GPQA_diamond_accuracy',
+        'hellaswag_accuracy', 'TheoremQA_score', 'musr_average_naive_average',
+        'korbench_single_naive_average',
+        'ARC_Prize_Public_Evaluation_accuracy', 'gsm8k_accuracy',
+        'GaokaoBench_weighted_average', 'math_accuracy', 'cmo_fib_accuracy',
+        'aime2024_accuracy', 'Mathbench_naive_average',
+        'wikibench-wiki-single_choice_cncircular_perf_4',
+        'cmmlu_naive_average', 'mmlu_naive_average', 'mmlu_pro_naive_average',
+        'openai_humaneval_humaneval_pass@1', 'sanitized_mbpp_score',
+        'humanevalx_naive_average', 'ds1000_naive_average',
+        'lcb_code_generation_pass@1', 'lcb_code_execution_pass@1',
+        'lcb_test_output_pass@1', 'bigcodebench_hard_instruct_pass@1',
+        'bigcodebench_hard_complete_pass@1', 'teval_naive_average',
+        'qa_dingo_cn_score', 'mmlu-stem_naive_average',
+        'mmlu-social-science_naive_average', 'mmlu-humanities_naive_average',
+        'mmlu-other_naive_average', 'cmmlu-stem_naive_average',
+        'cmmlu-social-science_naive_average', 'cmmlu-humanities_naive_average',
+        'cmmlu-other_naive_average', 'cmmlu-china-specific_naive_average',
+        'mmlu_pro_biology_accuracy', 'mmlu_pro_business_accuracy',
+        'mmlu_pro_chemistry_accuracy', 'mmlu_pro_computer_science_accuracy',
+        'mmlu_pro_economics_accuracy', 'mmlu_pro_engineering_accuracy',
+        'mmlu_pro_health_accuracy', 'mmlu_pro_history_accuracy',
+        'mmlu_pro_law_accuracy', 'mmlu_pro_math_accuracy',
+        'mmlu_pro_philosophy_accuracy', 'mmlu_pro_physics_accuracy',
+        'mmlu_pro_psychology_accuracy', 'mmlu_pro_other_accuracy',
+        'humanevalx-python_pass@1', 'humanevalx-cpp_pass@1',
+        'humanevalx-go_pass@1', 'humanevalx-java_pass@1',
+        'humanevalx-js_pass@1', 'ds1000_Pandas_accuracy',
+        'ds1000_Numpy_accuracy', 'ds1000_Tensorflow_accuracy',
+        'ds1000_Scipy_accuracy', 'ds1000_Sklearn_accuracy',
+        'ds1000_Pytorch_accuracy', 'ds1000_Matplotlib_accuracy',
+        'openai_mmmlu_lite_AR-XY_accuracy', 'openai_mmmlu_lite_BN-BD_accuracy',
+        'openai_mmmlu_lite_DE-DE_accuracy', 'openai_mmmlu_lite_ES-LA_accuracy',
+        'openai_mmmlu_lite_FR-FR_accuracy', 'openai_mmmlu_lite_HI-IN_accuracy',
+        'openai_mmmlu_lite_ID-ID_accuracy', 'openai_mmmlu_lite_IT-IT_accuracy',
+        'openai_mmmlu_lite_JA-JP_accuracy', 'openai_mmmlu_lite_KO-KR_accuracy',
+        'openai_mmmlu_lite_PT-BR_accuracy', 'openai_mmmlu_lite_SW-KE_accuracy',
+        'openai_mmmlu_lite_YO-NG_accuracy', 'openai_mmmlu_lite_ZH-CN_accuracy',
+        'college_naive_average', 'high_naive_average', 'middle_naive_average',
+        'primary_naive_average', 'arithmetic_naive_average',
+        'mathbench-a (average)_naive_average',
+        'college_knowledge_naive_average', 'high_knowledge_naive_average',
+        'middle_knowledge_naive_average', 'primary_knowledge_naive_average',
+        'mathbench-t (average)_naive_average'
     ]])
     @pytest.mark.chat_objective
     def test_chat_objective(self, baseline_scores_fullbench, result_scores,
@@ -394,8 +411,7 @@ def find_csv_files(directory):
     csv_files = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith('.csv') and (file.startswith('summary') or
-                                          file.startswith('Subjective_all')):
+            if file.endswith('.csv') and file.startswith('summary'):
                 csv_files.append(os.path.join(root, file))
 
     csv_files_with_time = {f: os.path.getctime(f) for f in csv_files}
@@ -408,24 +424,14 @@ def read_csv_file(file_path):
     with open(file_path, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         filtered_data = []
-        if 'Subjective_all' not in file_path:
-            for row in reader:
-                if row['metric'] is not None and 'bpb' not in row['metric']:
-                    filtered_row = {
-                        k + '_' + m: v
-                        for k, m, v in row.items()
-                        if k not in ['version', 'mode']
-                    }
-                    filtered_data.append(filtered_row)
-        else:
-            for row in reader:
-                if row['Detailed Scores'] is not None:
-                    filtered_row = row
-                    filtered_row['dataset'] = filtered_row[
-                        'Dataset'] + filtered_row['Detailed Scores']
-                    del filtered_row['Dataset']
-                    del filtered_row['Detailed Scores']
-                    filtered_data.append(filtered_row)
+        for row in reader:
+            if row['metric'] is not None and 'bpb' not in row['metric']:
+                filtered_row = row
+                filtered_row['dataset'] = row['dataset'] + '_' + row['metric']
+                del filtered_row['version']
+                del filtered_row['metric']
+                del filtered_row['mode']
+                filtered_data.append(filtered_row)
 
     result = {}
     for data in filtered_data:
