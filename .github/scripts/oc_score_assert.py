@@ -222,7 +222,7 @@ class TestBaseFullbench:
     @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
         'internlm2_5-7b-hf_fullbench', 'internlm2_5-7b-turbomind_fullbench'
     ] for p2 in [
-        'race-high_accuracy_accuracy', 'ARC-c_accuracy', 'BoolQ_accuracy',
+        'race-high_accuracy', 'ARC-c_accuracy', 'BoolQ_accuracy',
         'triviaqa_wiki_1shot_score', 'nq_open_1shot_score', 'drop_accuracy',
         'GPQA_diamond_accuracy', 'hellaswag_accuracy', 'TheoremQA_score',
         'winogrande_accuracy', 'gsm8k_accuracy',
@@ -267,7 +267,7 @@ class TestVolcFullbench:
     @pytest.mark.parametrize('model, dataset', [(
         p1, p2
     ) for p1 in ['internlm2_5-7b-chat-turbomind'] for p2 in [
-        'race-high_accuracy_accuracy', 'ARC-c_accuracy', 'BoolQ_accuracy',
+        'race-high_accuracy', 'ARC-c_accuracy', 'BoolQ_accuracy',
         'triviaqa_wiki_1shot_score', 'nq_open_1shot_score',
         'mmmlu_lite_naive_average', 'IFEval_Prompt-level-strict-accuracy',
         'drop_accuracy', 'bbh_naive_average', 'GPQA_diamond_accuracy',
