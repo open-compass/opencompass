@@ -358,7 +358,6 @@ jobs:
           conda info --envs
           pip list
       - name:  Run command testcase
-        if: matrix.regression_func == 'cmd'
         run: |
           . /fs-computility/llm/qa-llm-cicd/miniconda3/bin/activate
           conda activate ${{env.FULLBENCH_CONDA_ENV}}
