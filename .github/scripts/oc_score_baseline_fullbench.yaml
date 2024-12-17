@@ -128,18 +128,15 @@ internlm2_5-7b-hf_fullbench:
     BoolQ: 87.5
     triviaqa_wiki_1shot: 43.75
     nq_open_1shot: 43.75
-
     drop: 62.5
     GPQA_diamond: 62.5
     hellaswag: 93.75
     TheoremQA: 25
     winogrande: 75
+    gsm8k: 37.5
     math: 12.5
     wikibench-wiki-single_choice_cncircular: 25
     sanitized_mbpp: 56.25
-    gsm8k: 37.5
-
-
     dingo_en_192: 37.5
     dingo_zh_170: 100
     college: 12.5
@@ -156,18 +153,15 @@ internlm2_5-7b-turbomind_fullbench:
     BoolQ: 87.5
     triviaqa_wiki_1shot: 43.75
     nq_open_1shot: 43.75
-
     drop: 62.5
     GPQA_diamond: 62.5
     hellaswag: 93.75
     TheoremQA: 31.25
     winogrande: 87.5
+    gsm8k: 68.75
     math: 18.75
     wikibench-wiki-single_choice_cncircular: 25
     sanitized_mbpp: 56.25
-    gsm8k: 68.75
-
-
     dingo_en_192: 43.75
     dingo_zh_170: 100
     college: 12.5
@@ -177,3 +171,103 @@ internlm2_5-7b-turbomind_fullbench:
     mmlu-other: 76.92
     cmmlu-china-specific: 84.17
     mmlu_pro_math: 18.75
+
+
+
+internlm2_5-7b-chat-turbomind:
+    race-high: 86.16
+    ARC-c: 90.17
+    BoolQ: 87.89
+    triviaqa_wiki_1shot: 64.91
+    nq_open_1shot: 22.69
+    mmmlu_lite: 44.96
+    IFEval: 58.04
+    drop: 77.68
+    bbh: 73.14
+    GPQA_diamond: 25.76
+    hellaswag: 94.79
+    TheoremQA: 21.5
+    musr_average: 51.03
+    korbench_single: 31.92
+    ARC_Prize_Public_Evaluation: 0.01
+    gsm8k: 86.73
+    GaokaoBench: 77.89
+    math: 61.5
+    cmo_fib: 12.5
+    aime2024: 3.33
+    Mathbench: 65.17
+    wikibench-wiki-single_choice_cncircular: 31.55
+    cmmlu: 74.14
+    mmlu: 70.52
+    mmlu_pro: 44.98
+    openai_humaneval: 70.73
+    sanitized_mbpp: 63.81
+    humanevalx: 38.17
+    ds1000: 14.15
+    lcb_code_generation: 17.75
+    lcb_code_execution: 32.57
+    lcb_test_output: 24.89
+    bigcodebench_hard_instruct: 0.08
+    bigcodebench_hard_complete: 0.06
+    teval: 80.03
+    qa_dingo_cn: 99.01
+    mmlu-stem: 68.2
+    mmlu-social-science: 76.11
+    mmlu-humanities: 68.71
+    mmlu-other: 70.56
+    cmmlu-stem: 66.27
+    cmmlu-social-science: 75.7
+    cmmlu-humanities: 77.7
+    cmmlu-other: 77.71
+    cmmlu-china-specific: 72.94
+    mmlu_pro_biology: 66.25
+    mmlu_pro_business: 48.42
+    mmlu_pro_chemistry: 35.25
+    mmlu_pro_computer_science: 47.56
+    mmlu_pro_economics: 55.92
+    mmlu_pro_engineering: 30.44
+    mmlu_pro_health: 45.97
+    mmlu_pro_history: 41.21
+    mmlu_pro_law: 25.79
+    mmlu_pro_math: 54.03
+    mmlu_pro_philosophy: 36.47
+    mmlu_pro_physics: 37.41
+    mmlu_pro_psychology: 58.77
+    mmlu_pro_other: 46.21
+    humanevalx-python: 53.66
+    humanevalx-cpp: 24.39
+    humanevalx-go: 0
+    humanevalx-java: 57.93
+    humanevalx-js: 54.88
+    ds1000_Pandas: 12.03
+    ds1000_Numpy: 4.09
+    ds1000_Tensorflow: 11.11
+    ds1000_Scipy: 8.49
+    ds1000_Sklearn: 6.96
+    ds1000_Pytorch: 7.35
+    ds1000_Matplotlib: 49.03
+    openai_mmmlu_lite_AR-XY: 17.89
+    openai_mmmlu_lite_BN-BD: 27.58
+    openai_mmmlu_lite_DE-DE: 51.16
+    openai_mmmlu_lite_ES-LA: 56.84
+    openai_mmmlu_lite_FR-FR: 57.96
+    openai_mmmlu_lite_HI-IN: 33.68
+    openai_mmmlu_lite_ID-ID: 51.02
+    openai_mmmlu_lite_IT-IT: 50.46
+    openai_mmmlu_lite_JA-JP: 50.53
+    openai_mmmlu_lite_KO-KR: 45.05
+    openai_mmmlu_lite_PT-BR: 57.68
+    openai_mmmlu_lite_SW-KE: 32.77
+    openai_mmmlu_lite_YO-NG: 31.79
+    openai_mmmlu_lite_ZH-CN: 65.05
+    college: 20.33
+    high: 47.67
+    middle: 62
+    primary: 72
+    arithmetic: 62.33
+    mathbench-a (average): 52.87
+    college_knowledge: 70.57
+    high_knowledge: 70.13
+    middle_knowledge: 81.17
+    primary_knowledge: 88.01
+    mathbench-t (average): 77.47

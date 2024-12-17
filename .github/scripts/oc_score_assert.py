@@ -224,37 +224,45 @@ class TestApibench:
 class TestVolcFullbench:
     """Test cases for chat model."""
 
-    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
-        'internlm2_5-7b-hf_fullbench', 'internlm2_5-7b-turbomind_fullbench'
-    ] for p2 in [
-        'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
-        'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'gsm8k',
-        'triviaqa_wiki_1shot', 'nq_open_1shot', 'winogrande', 'hellaswag',
-        'TheoremQA', 'dingo_en_192', 'dingo_zh_170', 'college',
-        'college_knowledge', 'bbh-logical_deduction_seven_objects',
-        'bbh-multistep_arithmetic_two', 'mmlu-other', 'cmmlu-china-specific',
-        'mmlu_pro_math'
+    @pytest.mark.parametrize('model, dataset', [(
+        p1, p2
+    ) for p1 in ['internlm2_5-7b-chat-turbomind'] for p2 in [
+        'race-high', 'ARC-c', 'BoolQ', 'triviaqa_wiki_1shot', 'nq_open_1shot',
+        'mmmlu_lite', 'IFEval', 'drop', 'bbh', 'GPQA_diamond', 'hellaswag',
+        'TheoremQA', 'musr_average', 'korbench_single',
+        'ARC_Prize_Public_Evaluation', 'gsm8k', 'GaokaoBench', 'math',
+        'cmo_fib', 'aime2024', 'Mathbench',
+        'wikibench-wiki-single_choice_cncircular', 'cmmlu', 'mmlu', 'mmlu_pro',
+        'openai_humaneval', 'sanitized_mbpp', 'humanevalx', 'ds1000',
+        'lcb_code_generation', 'lcb_code_execution', 'lcb_test_output',
+        'bigcodebench_hard_instruct', 'bigcodebench_hard_complete', 'teval',
+        'qa_dingo_cn', 'mmlu-stem', 'mmlu-social-science', 'mmlu-humanities',
+        'mmlu-other', 'cmmlu-stem', 'cmmlu-social-science', 'cmmlu-humanities',
+        'cmmlu-other', 'cmmlu-china-specific', 'mmlu_pro_biology',
+        'mmlu_pro_business', 'mmlu_pro_chemistry', 'mmlu_pro_computer_science',
+        'mmlu_pro_economics', 'mmlu_pro_engineering', 'mmlu_pro_health',
+        'mmlu_pro_history', 'mmlu_pro_law', 'mmlu_pro_math',
+        'mmlu_pro_philosophy', 'mmlu_pro_physics', 'mmlu_pro_psychology',
+        'mmlu_pro_other', 'humanevalx-python', 'humanevalx-cpp',
+        'humanevalx-go', 'humanevalx-java', 'humanevalx-js', 'ds1000_Pandas',
+        'ds1000_Numpy', 'ds1000_Tensorflow', 'ds1000_Scipy', 'ds1000_Sklearn',
+        'ds1000_Pytorch', 'ds1000_Matplotlib', 'openai_mmmlu_lite_AR-XY',
+        'openai_mmmlu_lite_BN-BD', 'openai_mmmlu_lite_DE-DE',
+        'openai_mmmlu_lite_ES-LA', 'openai_mmmlu_lite_FR-FR',
+        'openai_mmmlu_lite_HI-IN', 'openai_mmmlu_lite_ID-ID',
+        'openai_mmmlu_lite_IT-IT', 'openai_mmmlu_lite_JA-JP',
+        'openai_mmmlu_lite_KO-KR', 'openai_mmmlu_lite_PT-BR',
+        'openai_mmmlu_lite_SW-KE', 'openai_mmmlu_lite_YO-NG',
+        'openai_mmmlu_lite_ZH-CN', 'college', 'high', 'middle', 'primary',
+        'arithmetic', 'mathbench-a (average)', 'college_knowledge',
+        'high_knowledge', 'middle_knowledge', 'primary_knowledge',
+        'mathbench-t (average)'
     ]])
+    @pytest.mark.chat_objective
     def test_1(self, baseline_scores_fullbench, result_scores, model, dataset):
         base_score = baseline_scores_fullbench.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
-
-    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
-        'internlm2_5-7b-hf_fullbench', 'internlm2_5-7b-turbomind_fullbench'
-    ] for p2 in [
-        'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
-        'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'gsm8k',
-        'triviaqa_wiki_1shot', 'nq_open_1shot', 'winogrande', 'hellaswag',
-        'TheoremQA', 'dingo_en_192', 'dingo_zh_170', 'college',
-        'college_knowledge', 'bbh-logical_deduction_seven_objects',
-        'bbh-multistep_arithmetic_two', 'mmlu-other', 'cmmlu-china-specific',
-        'mmlu_pro_math'
-    ]])
-    def test_2(self, baseline_scores_fullbench, result_scores, model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
-        result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score)
 
 
 @pytest.mark.usefixtures('result_scores')
