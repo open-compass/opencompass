@@ -8,6 +8,7 @@ func_timeout
 fuzzywuzzy
 gradio-client
 h5py
+httpx==0.27.2
 huggingface_hub<=0.24.7
 immutabledict
 importlib-metadata
