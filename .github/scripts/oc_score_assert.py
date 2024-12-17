@@ -92,9 +92,9 @@ def result_scores():
 class TestChat:
     """Test cases for chat model."""
 
-    @pytest.mark.parametrize('model, dataset',
-                             [(p1, p2) for p1 in chat_model_list
-                              for p2 in ['gsm8k', 'race-high_accuracy']])
+    @pytest.mark.parametrize(
+        'model, dataset', [(p1, p2) for p1 in chat_model_list
+                           for p2 in ['gsm8k_accuracy', 'race-high_accuracy']])
     def test_model_dataset_score(self, baseline_scores_testrange,
                                  result_scores, model, dataset):
         base_score = baseline_scores_testrange.get(model).get(dataset)
@@ -108,13 +108,14 @@ class TestChat:
 class TestBase:
     """Test cases for base model."""
 
-    @pytest.mark.parametrize(
-        'model, dataset',
-        [(p1, p2) for p1 in base_model_list for p2 in
-         ['gsm8k', 'GPQA_diamond', 'race-high_accuracy', 'winogrande']])
+    @pytest.mark.parametrize('model, dataset', [
+        (p1, p2) for p1 in base_model_list for p2 in
+        ['gsm8k_accuracy', 'GPQA_diamond', 'race-high_accuracy', 'winogrande']
+    ])
     def test_model_dataset_score(self, baseline_scores_testrange,
                                  result_scores, model, dataset):
-        if model in ['gemma-2b-vllm', 'gemma-7b-vllm'] and dataset != 'gsm8k':
+        if model in ['gemma-2b-vllm', 'gemma-7b-vllm'
+                     ] and dataset != 'gsm8k_accuracy':
             return
         base_score = baseline_scores_testrange.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
@@ -133,9 +134,10 @@ class TestChatObjFullbench:
     ] for p2 in [
         'race-high_accuracy', 'ARC-c', 'BoolQ', 'triviaqa_wiki_1shot',
         'nq_open_1shot', 'IFEval', 'drop', 'GPQA_diamond', 'hellaswag',
-        'TheoremQA', 'musr_average', 'gsm8k', 'math', 'cmo_fib', 'aime2024',
-        'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'ds1000',
-        'lcb_code_generation', 'lcb_code_execution', 'lcb_test_output',
+        'TheoremQA', 'musr_average', 'gsm8k_accuracy', 'math', 'cmo_fib',
+        'aime2024', 'wikibench-wiki-single_choice_cncircular',
+        'sanitized_mbpp', 'ds1000', 'lcb_code_generation',
+        'lcb_code_execution', 'lcb_test_output',
         'bbh-logical_deduction_seven_objects', 'bbh-multistep_arithmetic_two',
         'mmlu-other', 'cmmlu-china-specific', 'mmlu_pro_math', 'ds1000_Pandas',
         'ds1000_Numpy', 'ds1000_Tensorflow', 'ds1000_Scipy', 'ds1000_Sklearn',
@@ -216,7 +218,7 @@ class TestApibench:
     @pytest.mark.parametrize('model, dataset',
                              [('lmdeploy-api-test', 'race-middle_accuracy'),
                               ('lmdeploy-api-test', 'race-high_accuracy'),
-                              ('lmdeploy-api-test', 'gsm8k')])
+                              ('lmdeploy-api-test', 'gsm8k_accuracy')])
     def test_api(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
