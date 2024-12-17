@@ -197,7 +197,7 @@ jobs:
           pip install lmdeploy-*.whl --no-deps
 
   daily_run_test:
-    if: ${{success() && !cancelled()}}
+    if: ${{!cancelled()}}
     needs: prepare_env
     strategy:
       fail-fast: false
@@ -322,7 +322,7 @@ jobs:
         function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '["base_long_context","base_objective","chat_long_context","chat_objective","chat_subjective"]')}}
     runs-on: volc_cu12
     environment: 'prod'
-    timeout-minutes: 240 #4hours
+    timeout-minutes: 360 #6hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -364,12 +364,13 @@ jobs:
           conda info --envs
           export from_tf=TRUE
           opencompass /fs-computility/llm/qa-llm-cicd/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.FULLBENCH_REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
-
+          rm regression_result_daily -f && ln -s ${{env.FULLBENCH_REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }}/*/summary regression_result_daily
+          python -m pytest -m api -s -v --color=yes .github/scripts/oc_score_assert.py
 
 
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
-    needs: [daily_run_test]
+    needs: [daily_run_test, fullbench_run_test]
     environment: 'prod'
     timeout-minutes: 5
     runs-on: self-hosted

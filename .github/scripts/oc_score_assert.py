@@ -219,6 +219,45 @@ class TestApibench:
 
 
 @pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores_fullbench')
+@pytest.mark.volc_fullbench
+class TestVolcFullbench:
+    """Test cases for chat model."""
+
+    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
+        'internlm2_5-7b-hf_fullbench', 'internlm2_5-7b-turbomind_fullbench'
+    ] for p2 in [
+        'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
+        'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'gsm8k',
+        'triviaqa_wiki_1shot', 'nq_open_1shot', 'winogrande', 'hellaswag',
+        'TheoremQA', 'dingo_en_192', 'dingo_zh_170', 'college',
+        'college_knowledge', 'bbh-logical_deduction_seven_objects',
+        'bbh-multistep_arithmetic_two', 'mmlu-other', 'cmmlu-china-specific',
+        'mmlu_pro_math'
+    ]])
+    def test_1(self, baseline_scores_fullbench, result_scores, model, dataset):
+        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model, result_score, base_score)
+
+    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
+        'internlm2_5-7b-hf_fullbench', 'internlm2_5-7b-turbomind_fullbench'
+    ] for p2 in [
+        'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
+        'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'gsm8k',
+        'triviaqa_wiki_1shot', 'nq_open_1shot', 'winogrande', 'hellaswag',
+        'TheoremQA', 'dingo_en_192', 'dingo_zh_170', 'college',
+        'college_knowledge', 'bbh-logical_deduction_seven_objects',
+        'bbh-multistep_arithmetic_two', 'mmlu-other', 'cmmlu-china-specific',
+        'mmlu_pro_math'
+    ]])
+    def test_2(self, baseline_scores_fullbench, result_scores, model, dataset):
+        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model, result_score, base_score)
+
+
+@pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores')
 class TestCmdCase:
 

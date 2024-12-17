@@ -126,17 +126,20 @@ internlm2_5-7b-hf_fullbench:
     race-high: 100
     ARC-c: 68.75
     BoolQ: 87.5
-    GPQA_diamond: 62.5
+    triviaqa_wiki_1shot: 43.75
+    nq_open_1shot: 43.75
+
     drop: 62.5
+    GPQA_diamond: 62.5
+    hellaswag: 93.75
+    TheoremQA: 25
+    winogrande: 75
     math: 12.5
     wikibench-wiki-single_choice_cncircular: 25
     sanitized_mbpp: 56.25
     gsm8k: 37.5
-    triviaqa_wiki_1shot: 43.75
-    nq_open_1shot: 43.75
-    winogrande: 75
-    hellaswag: 93.75
-    TheoremQA: 25
+
+
     dingo_en_192: 37.5
     dingo_zh_170: 100
     college: 12.5
@@ -151,17 +154,20 @@ internlm2_5-7b-turbomind_fullbench:
     race-high: 100
     ARC-c: 68.75
     BoolQ: 87.5
-    GPQA_diamond: 62.5
+    triviaqa_wiki_1shot: 43.75
+    nq_open_1shot: 43.75
+
     drop: 62.5
+    GPQA_diamond: 62.5
+    hellaswag: 93.75
+    TheoremQA: 31.25
+    winogrande: 87.5
     math: 18.75
     wikibench-wiki-single_choice_cncircular: 25
     sanitized_mbpp: 56.25
     gsm8k: 68.75
-    triviaqa_wiki_1shot: 43.75
-    nq_open_1shot: 43.75
-    winogrande: 87.5
-    hellaswag: 93.75
-    TheoremQA: 31.25
+
+
     dingo_en_192: 43.75
     dingo_zh_170: 100
     college: 12.5
