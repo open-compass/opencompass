@@ -95,7 +95,7 @@ llama-3_1-8b-instruct-turbomind:
     race-high_accuracy: 90.62
 
 llama-3_2-3b-instruct-turbomind:
-    gsm8k_accuracy: 62.50
+    gsm8k_accuracy: 65.62
     race-high_accuracy: 81.25
 
 llama-3-8b-instruct-turbomind:
