@@ -7,8 +7,8 @@ with read_base():
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ARC_c.ARC_c_cot_gen_926652 import \
         ARC_c_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.ARC_Prize_Public_Evaluation.arc_prize_public_evaluation_gen_872059 import \
-        arc_prize_public_evaluation_datasets  # noqa: F401, E501
+    # remove because of oom
+    # from opencompass.configs.datasets.ARC_Prize_Public_Evaluation.arc_prize_public_evaluation_gen_872059 import arc_prize_public_evaluation_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bbh.bbh_gen_5b92b0 import \
         bbh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bigcodebench.bigcodebench_hard_complete_gen_faf748 import \

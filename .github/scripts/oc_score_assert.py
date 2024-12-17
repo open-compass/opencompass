@@ -364,6 +364,35 @@ class TestVolcFullbench:
         result_score = result_scores.get(model).get(dataset)
         assert_score(model + '_batch', result_score, base_score)
 
+    @pytest.mark.parametrize(
+        'model, dataset',
+        [(p1, p2) for p1 in ['internlm2_5-7b-turbomind']
+         for p2 in [
+             'Single-Needle-Retrieval(S-RT)-32000_naive_average',
+             'Single-Needle-Retrieval-EN-32000_naive_average',
+             'Single-Needle-Retrieval-ZH-32000_naive_average',
+             'Single-Needle-Retrieval(S-RT)-100000_naive_average',
+             'Single-Needle-Retrieval-EN-100000_naive_average',
+             'Single-Needle-Retrieval-ZH-100000_naive_average',
+             'Single-Needle-Retrieval(S-RT)-200000_naive_average',
+             'Single-Needle-Retrieval-EN-200000_naive_average',
+             'Single-Needle-Retrieval-ZH-200000_naive_average',
+             'longbench_naive_average', 'longbench_zh_naive_average',
+             'longbench_en_naive_average',
+             'longbench_single-document-qa_naive_average',
+             'longbench_multi-document-qa_naive_average',
+             'longbench_summarization_naive_average',
+             'longbench_few-shot-learning_naive_average',
+             'longbench_synthetic-tasks_naive_average',
+             'longbench_code-completion_naive_average'
+         ]])
+    @pytest.mark.base_long_context
+    def test_base_long_context(self, baseline_scores_fullbench, result_scores,
+                               model, dataset):
+        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model + '_batch', result_score, base_score)
+
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores')

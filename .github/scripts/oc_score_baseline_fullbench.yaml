@@ -235,6 +235,24 @@ internlm2_5-7b-turbomind:
     middle_knowledge_naive_average: 71.15
     primary_knowledge_naive_average: 66.55
     mathbench-t (average)_naive_average: 64.97
+    Single-Needle-Retrieval(S-RT)-32000_naive_average: 100
+    Single-Needle-Retrieval-EN-32000_naive_average: 100
+    Single-Needle-Retrieval-ZH-32000_naive_average: 100
+    Single-Needle-Retrieval(S-RT)-100000_naive_average: 100
+    Single-Needle-Retrieval-EN-100000_naive_average: 100
+    Single-Needle-Retrieval-ZH-100000_naive_average: 100
+    Single-Needle-Retrieval(S-RT)-200000_naive_average: 100
+    Single-Needle-Retrieval-EN-200000_naive_average: 100
+    Single-Needle-Retrieval-ZH-200000_naive_average: 100
+    longbench_naive_average: 46.19
+    longbench_zh_naive_average: 49.3
+    longbench_en_naive_average: 43.97
+    longbench_single-document-qa_naive_average: 42.84
+    longbench_multi-document-qa_naive_average: 37.29
+    longbench_summarization_naive_average: 23.21
+    longbench_few-shot-learning_naive_average: 61.67
+    longbench_synthetic-tasks_naive_average: 60.05
+    longbench_code-completion_naive_average: 52.09
 
 internlm2_5-7b-chat-turbomind:
     race-high_accuracy: 86.16
