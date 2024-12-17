@@ -310,7 +310,7 @@ jobs:
           kill -15 "$restful_pid"
 
   fullbench_run_test:
-    if: ${{success() && !cancelled()}}
+    if: ${{!cancelled()}}
     needs: ['build-pypi', 'build-pypi-lmdeploy']
     env:
       FULLBENCH_CONDA_ENV: regression_test
