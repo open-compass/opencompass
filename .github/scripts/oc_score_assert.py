@@ -323,6 +323,45 @@ class TestVolcFullbench:
         result_score = result_scores.get(model).get(dataset)
         assert_score(model + '_batch', result_score, base_score)
 
+    @pytest.mark.parametrize('model, dataset', [(
+        p1, p2
+    ) for p1 in ['internlm2_5-7b-turbomind'] for p2 in [
+        'race-high_accuracy', 'ARC-c_accuracy', 'BoolQ_accuracy',
+        'triviaqa_wiki_1shot_score', 'nq_open_1shot_score', 'drop_accuracy',
+        'bbh_naive_average', 'GPQA_diamond_accuracy', 'hellaswag_accuracy',
+        'TheoremQA_score', 'winogrande_accuracy', 'gsm8k_accuracy',
+        'GaokaoBench_weighted_average', 'math_accuracy',
+        'Mathbench_naive_average',
+        'wikibench-wiki-single_choice_cncircular_perf_4',
+        'cmmlu_naive_average', 'mmlu_naive_average', 'mmlu_pro_naive_average',
+        'openai_humaneval_humaneval_pass@1',
+        'openai_humaneval_v2_humaneval_pass@1', 'sanitized_mbpp_score',
+        'dingo_en_192_score', 'dingo_zh_170_score', 'mmlu-stem_naive_average',
+        'mmlu-social-science_naive_average', 'mmlu-humanities_naive_average',
+        'mmlu-other_naive_average', 'cmmlu-stem_naive_average',
+        'cmmlu-social-science_naive_average', 'cmmlu-humanities_naive_average',
+        'cmmlu-other_naive_average', 'cmmlu-china-specific_naive_average',
+        'mmlu_pro_biology_accuracy', 'mmlu_pro_business_accuracy',
+        'mmlu_pro_chemistry_accuracy', 'mmlu_pro_computer_science_accuracy',
+        'mmlu_pro_economics_accuracy', 'mmlu_pro_engineering_accuracy',
+        'mmlu_pro_health_accuracy', 'mmlu_pro_history_accuracy',
+        'mmlu_pro_law_accuracy', 'mmlu_pro_math_accuracy',
+        'mmlu_pro_philosophy_accuracy', 'mmlu_pro_physics_accuracy',
+        'mmlu_pro_psychology_accuracy', 'mmlu_pro_other_accuracy',
+        'college_naive_average', 'high_naive_average', 'middle_naive_average',
+        'primary_naive_average', 'arithmetic_naive_average',
+        'mathbench-a (average)_naive_average',
+        'college_knowledge_naive_average', 'high_knowledge_naive_average',
+        'middle_knowledge_naive_average', 'primary_knowledge_naive_average',
+        'mathbench-t (average)_naive_average'
+    ]])
+    @pytest.mark.base_objective
+    def test_base_objective(self, baseline_scores_fullbench, result_scores,
+                            model, dataset):
+        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model + '_batch', result_score, base_score)
+
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores')

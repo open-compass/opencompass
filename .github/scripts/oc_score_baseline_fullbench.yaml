@@ -176,6 +176,65 @@ internlm2_5-7b-turbomind_fullbench:
     college_naive_average: 12.5
     college_knowledge_naive_average: 87.5
 
+internlm2_5-7b-turbomind:
+    race-high_accuracy: 89.28
+    ARC-c_accuracy: 52.2
+    BoolQ_accuracy: 89.72
+    triviaqa_wiki_1shot_score: 65.88
+    nq_open_1shot_score: 34.82
+    drop_accuracy: 68.1
+    bbh_naive_average: 72.15
+    GPQA_diamond_accuracy: 32.83
+    hellaswag_accuracy: 88.36
+    TheoremQA_score: 25
+    winogrande_accuracy: 81.29
+    gsm8k_accuracy: 74.68
+    GaokaoBench_weighted_average: 58.19
+    math_accuracy: 33.98
+    Mathbench_naive_average: 48.38
+    wikibench-wiki-single_choice_cncircular_perf_4: 29.1
+    cmmlu_naive_average: 78.94
+    mmlu_naive_average: 71.44
+    mmlu_pro_naive_average: 38.18
+    openai_humaneval_humaneval_pass@1: 59.76
+    openai_humaneval_v2_humaneval_pass@1: 51.22
+    sanitized_mbpp_score: 55.25
+    dingo_en_192_score: 60.94
+    dingo_zh_170_score: 67.65
+    mmlu-stem_naive_average: 63.72
+    mmlu-social-science_naive_average: 80.15
+    mmlu-humanities_naive_average: 74.27
+    mmlu-other_naive_average: 71.85
+    cmmlu-stem_naive_average: 67.07
+    cmmlu-social-science_naive_average: 81.49
+    cmmlu-humanities_naive_average: 85.84
+    cmmlu-other_naive_average: 82.69
+    cmmlu-china-specific_naive_average: 79.88
+    mmlu_pro_biology_accuracy: 58.58
+    mmlu_pro_business_accuracy: 28.01
+    mmlu_pro_chemistry_accuracy: 22.79
+    mmlu_pro_computer_science_accuracy: 39.02
+    mmlu_pro_economics_accuracy: 53.08
+    mmlu_pro_engineering_accuracy: 25.7
+    mmlu_pro_health_accuracy: 46.94
+    mmlu_pro_history_accuracy: 43.04
+    mmlu_pro_law_accuracy: 29.7
+    mmlu_pro_math_accuracy: 24.2
+    mmlu_pro_philosophy_accuracy: 42.48
+    mmlu_pro_physics_accuracy: 26.02
+    mmlu_pro_psychology_accuracy: 52.76
+    mmlu_pro_other_accuracy: 42.21
+    college_naive_average: 10.67
+    high_naive_average: 6.67
+    middle_naive_average: 26.67
+    primary_naive_average: 60
+    arithmetic_naive_average: 55
+    mathbench-a (average)_naive_average: 31.8
+    college_knowledge_naive_average: 62.34
+    high_knowledge_naive_average: 59.83
+    middle_knowledge_naive_average: 71.15
+    primary_knowledge_naive_average: 66.55
+    mathbench-t (average)_naive_average: 64.97
 
 internlm2_5-7b-chat-turbomind:
     race-high_accuracy: 86.16
