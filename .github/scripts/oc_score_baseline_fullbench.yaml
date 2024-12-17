@@ -123,55 +123,58 @@ internlm2_5-7b-chat-turbomind_fullbench:
     Wildbenchscore: -8.333333333333334
 
 internlm2_5-7b-hf_fullbench:
-    race-high: 100
-    ARC-c: 68.75
-    BoolQ: 87.5
-    triviaqa_wiki_1shot: 43.75
-    nq_open_1shot: 43.75
-    drop: 62.5
-    GPQA_diamond: 62.5
-    hellaswag: 93.75
-    TheoremQA: 25
-    winogrande: 75
-    gsm8k: 37.5
-    math: 12.5
-    wikibench-wiki-single_choice_cncircular: 25
-    sanitized_mbpp: 56.25
-    dingo_en_192: 37.5
-    dingo_zh_170: 100
-    college: 12.5
-    college_knowledge: 87.5
-    bbh-logical_deduction_seven_objects: 43.75
-    bbh-multistep_arithmetic_two: 56.25
-    mmlu-other: 76.92
-    cmmlu-china-specific: 84.17
-    mmlu_pro_math: 18.75
+    race-high_accuracy: 100
+    ARC-c_accuracy: 68.75
+    BoolQ_accuracy: 87.5
+    triviaqa_wiki_1shot_score: 43.75
+    nq_open_1shot_score: 43.75
+    drop_accuracy: 62.5
+    GPQA_diamond_accuracy: 62.5
+    hellaswag_accuracy: 93.75
+    TheoremQA_score: 25
+    winogrande_accuracy: 75
+    gsm8k_accuracy: 37.5
+    GaokaoBench_2010-2022_Math_II_MCQs_score: 62.5
+    GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
+    math_accuracy: 12.5
+    wikibench-wiki-single_choice_cncircular_perf_4: 25
+    sanitized_mbpp_score: 56.25
+    dingo_en_192_score: 37.5
+    dingo_zh_170_score: 100
+    mmlu-other_accuracy: 76.92
+    cmmlu-china-specific_accuracy: 84.17
+    mmlu_pro_math_accuracy: 18.75
+    bbh-logical_deduction_seven_objects_score: 43.75
+    bbh-multistep_arithmetic_two_score: 56.25
+    college_naive_average: 12.5
+    college_knowledge_naive_average: 87.5
 
 internlm2_5-7b-turbomind_fullbench:
-    race-high: 100
-    ARC-c: 68.75
-    BoolQ: 87.5
-    triviaqa_wiki_1shot: 43.75
-    nq_open_1shot: 43.75
-    drop: 62.5
-    GPQA_diamond: 62.5
-    hellaswag: 93.75
-    TheoremQA: 31.25
-    winogrande: 87.5
-    gsm8k: 68.75
-    math: 18.75
-    wikibench-wiki-single_choice_cncircular: 25
-    sanitized_mbpp: 56.25
-    dingo_en_192: 43.75
-    dingo_zh_170: 100
-    college: 12.5
-    college_knowledge: 87.5
-    bbh-logical_deduction_seven_objects: 50
-    bbh-multistep_arithmetic_two: 56.25
-    mmlu-other: 76.92
-    cmmlu-china-specific: 84.17
-    mmlu_pro_math: 18.75
-
+    race-high_accuracy: 100
+    ARC-c_accuracy: 68.75
+    BoolQ_accuracy: 87.5
+    triviaqa_wiki_1shot_score: 43.75
+    nq_open_1shot_score: 43.75
+    drop_accuracy: 62.5
+    GPQA_diamond_accuracy: 62.5
+    hellaswag_accuracy: 93.75
+    TheoremQA_score: 31.25
+    winogrande_accuracy: 87.5
+    gsm8k_accuracy: 68.75
+    GaokaoBench_2010-2022_Math_II_MCQs_score: 62.5
+    GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
+    math_accuracy: 18.75
+    wikibench-wiki-single_choice_cncircular_perf_4: 25
+    sanitized_mbpp_score: 56.25
+    dingo_en_192_score: 43.75
+    dingo_zh_170_score: 100
+    mmlu-other_accuracy: 76.92
+    cmmlu-china-specific_accuracy: 84.17
+    mmlu_pro_math_accuracy: 18.75
+    bbh-logical_deduction_seven_objects_score: 50
+    bbh-multistep_arithmetic_two_score: 56.25
+    college_naive_average: 12.5
+    college_knowledge_naive_average: 87.5
 
 
 internlm2_5-7b-chat-turbomind:

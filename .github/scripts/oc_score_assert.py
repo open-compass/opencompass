@@ -187,13 +187,18 @@ class TestBaseFullbench:
     @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
         'internlm2_5-7b-hf_fullbench', 'internlm2_5-7b-turbomind_fullbench'
     ] for p2 in [
-        'race-high', 'ARC-c', 'BoolQ', 'drop', 'GPQA_diamond', 'math',
-        'wikibench-wiki-single_choice_cncircular', 'sanitized_mbpp', 'gsm8k',
-        'triviaqa_wiki_1shot', 'nq_open_1shot', 'winogrande', 'hellaswag',
-        'TheoremQA', 'dingo_en_192', 'dingo_zh_170', 'college',
-        'college_knowledge', 'bbh-logical_deduction_seven_objects',
-        'bbh-multistep_arithmetic_two', 'mmlu-other', 'cmmlu-china-specific',
-        'mmlu_pro_math'
+        'race-high_accuracy', 'ARC-c_accuracy', 'BoolQ_accuracy',
+        'triviaqa_wiki_1shot_score', 'nq_open_1shot_score', 'drop_accuracy',
+        'GPQA_diamond_accuracy', 'hellaswag_accuracy', 'TheoremQA_score',
+        'winogrande_accuracy', 'gsm8k_accuracy',
+        'GaokaoBench_2010-2022_Math_II_MCQs_score',
+        'GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score',
+        'math_accuracy', 'wikibench-wiki-single_choice_cncircular_perf_4',
+        'sanitized_mbpp_score', 'dingo_en_192_score', 'dingo_zh_170_score',
+        'mmlu-other_accuracy', 'cmmlu-china-specific_accuracy',
+        'mmlu_pro_math_accuracy', 'bbh-logical_deduction_seven_objects_score',
+        'bbh-multistep_arithmetic_two_score', 'college_naive_average',
+        'college_knowledge_naive_average'
     ]])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
@@ -425,7 +430,8 @@ def read_csv_file(file_path):
         reader = csv.DictReader(csvfile)
         filtered_data = []
         for row in reader:
-            if row['metric'] is not None and 'bpb' not in row['metric']:
+            if row['metric'] is not None and 'bpb' not in row[
+                    'metric'] and '_' != row['metric']:
                 filtered_row = row
                 filtered_row['dataset'] = row['dataset'] + '_' + row['metric']
                 del filtered_row['version']
