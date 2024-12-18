@@ -396,3 +396,26 @@ internlm2_5-7b-chat-turbomind:
     followbench_llmeval_en_SSR_L4: 0.87
     followbench_llmeval_en_SSR_L5: 0.85
     simpleqa_f1: 0.04
+
+internlm2_5-7b-chat-1m-turbomind:
+    ruler_8k_naive_average: 88.53
+    ruler_32k_naive_average: 83.84
+    ruler_128k_naive_average: 70.94
+    NeedleBench-Overall-Score-8K_weighted_average: 91.89
+    NeedleBench-Overall-Score-32K_weighted_average: 91.42
+    NeedleBench-Overall-Score-128K_weighted_average: 88.57
+    longbench_naive_average: 46.44
+    longbench_zh_naive_average: 45.19
+    longbench_en_naive_average: 45.71
+    babilong_0k_naive_average: 79.3
+    babilong_4k_naive_average: 67
+    babilong_16k_naive_average: 52.7
+    babilong_32k_naive_average: 48.9
+    babilong_128k_naive_average: 40.8
+    babilong_256k_naive_average: 23.5
+    longbench_single-document-qa_naive_average: 43.56
+    longbench_multi-document-qa_naive_average: 46.24
+    longbench_summarization_naive_average: 24.32
+    longbench_few-shot-learning_naive_average: 51.67
+    longbench_synthetic-tasks_naive_average: 66.83
+    longbench_code-completion_naive_average: 45.99
