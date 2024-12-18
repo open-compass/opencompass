@@ -6,6 +6,7 @@ from .arenahard import ArenaHardSummarizer
 from .charm import CharmMemSummarizer
 from .common_summarizer import CommonSummarizer
 from .compass_arena import CompassArenaSummarizer
+from .compass_arena_bradley_terry import CompassArenaBradleyTerrySummarizer
 from .compassbench import CompassBenchSummarizer
 from .corev2 import Corev2Summarizer
 from .creationbench import CreationBenchSummarizer
@@ -15,5 +16,6 @@ from .followbench import FollowBenchSummarizer
 from .mtbench import MTBenchSummarizer
 from .mtbench101 import MTBench101Summarizer
 from .multiround import MultiroundSummarizer
+from .qacompassbench import QaCompassBenchSummarizer
 from .subjective import SubjectiveSummarizer
 from .wildbench import WildBenchPairSummarizer, WildBenchSingleSummarizer

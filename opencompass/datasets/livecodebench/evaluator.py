@@ -13,6 +13,7 @@ from opencompass.utils import get_logger
 
 from .execute_utils import BASE_IMPORTS, codeexecute_check_correctness
 from .extract_utils import (extract_code_execution, extract_code_generation,
+                            extract_code_generation_v2,
                             extract_test_output_code)
 from .livecodebench import LCBCodeGenerationDataset
 from .pass_k_utils import compute_metrics_from_results
@@ -231,15 +232,22 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
     def __init__(self,
                  num_process_evaluate,
                  timeout=6,
-                 release_version='release_v1'):
+                 release_version='release_v1',
+                 extractor_version='v1'):
         super().__init__()
         self.num_process_evaluate = num_process_evaluate
         self.timeout = timeout
         self.dataset = LCBCodeGenerationDataset.load(
             release_version=release_version)['test']
+        self.extractor_version = extractor_version
 
     def score(self, predictions, references):
-        predictions = [[extract_code_generation(item)] for item in predictions]
+        if self.extractor_version == 'v1':
+            predictions = [[extract_code_generation(item)]
+                           for item in predictions]
+        elif self.extractor_version == 'v2':
+            predictions = [[extract_code_generation_v2(item)]
+                           for item in predictions]
 
         evaluation_samples = dict()
         for idx in range(len(self.dataset)):
@@ -252,12 +260,9 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
 
         BaseEvaluator.is_num_equal(predictions, references)
 
-        results = {  # noqa: F841
-            'pass': 0,
-            'timeout': 0,
-            'failed': 0,
-            'wrong_answer': 0
-        }  # noqa: F401, F403
+        extracted_predictions = {}
+        for idx, content in enumerate(predictions):
+            extracted_predictions[idx] = content
 
         metrics, eval_results, final_metadata = codegen_metrics(
             references,
@@ -266,8 +271,13 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
             num_process_evaluate=self.num_process_evaluate,
             timeout=self.timeout,
         )
+        results = {
+            'extracted_predictions': extracted_predictions,
+            'eval_results': eval_results
+        }
+        results.update(metrics)
 
-        return metrics
+        return results
 
 
 def evaluate_score(args) -> list[bool]:

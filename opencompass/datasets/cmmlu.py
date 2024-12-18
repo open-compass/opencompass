@@ -14,7 +14,7 @@ from .base import BaseDataset
 class CMMLUDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name: str):
+    def load(path: str, name: str, **kwargs):
         path = get_data_path(path)
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset

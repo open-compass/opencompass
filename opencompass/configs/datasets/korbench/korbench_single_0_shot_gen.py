@@ -50,7 +50,7 @@ for category in categories:
         type=korbenchDataset,
         abbr=f"korbench_{category}",
         path="opencompass/korbench",
-        mode='0_shot',
+        prompt_mode='0_shot',
         category=category,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
