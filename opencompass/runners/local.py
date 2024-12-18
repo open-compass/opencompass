@@ -1,6 +1,7 @@
 import os
 import os.path as osp
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -208,8 +209,11 @@ class LocalRunner(BaseRunner):
         task_name = task.name
 
         # Dump task config to file
-        mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_{index}_params.py'
+        params_file_dir = os.path.join(task.cfg.work_dir, 'params')
+        mmengine.mkdir_or_exist(params_file_dir)
+        param_file = os.path.join(params_file_dir,
+                                  f'{os.getpid()}_{index}_params.py')
+
         try:
             task.cfg.dump(param_file)
             tmpl = get_command_template(gpu_ids)
@@ -236,5 +240,6 @@ class LocalRunner(BaseRunner):
                 logger.error(f'task {task_name} fail, see\n{out_path}')
         finally:
             # Clean up
-            os.remove(param_file)
+            if os.path.exists(param_file):
+                shutil.rmtree(params_file_dir)
         return task_name, result.returncode
