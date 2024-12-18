@@ -115,7 +115,7 @@ def result_scores():
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores_testrange')
-@pytest.mark.chat
+@pytest.mark.chat_models
 class TestChat:
     """Test cases for chat model."""
 
@@ -131,7 +131,7 @@ class TestChat:
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores_testrange')
-@pytest.mark.base
+@pytest.mark.base_models
 class TestBase:
     """Test cases for base model."""
 
