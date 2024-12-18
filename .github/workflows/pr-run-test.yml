@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CONDA_ENV: prtest
+  CONDA_ENV: pr_test
   HF_DATASETS_OFFLINE: 1
   HF_EVALUATE_OFFLINE: 1
   TRANSFORMERS_OFFLINE: 1
