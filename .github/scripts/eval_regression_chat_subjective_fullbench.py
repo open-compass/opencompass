@@ -16,7 +16,7 @@ with read_base():
         simpleqa_datasets  # noqa: F401, E501; noqa: F401, E501
     from opencompass.configs.datasets.subjective.alignbench.alignbench_v1_1_judgeby_critiquellm_new import \
         alignbench_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4_new import \
+    from opencompass.configs.datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import \
         alpacav2_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.arena_hard.arena_hard_compare_new import \
         arenahard_datasets  # noqa: F401, E501
