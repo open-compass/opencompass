@@ -176,7 +176,6 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          lmdeploy check_env
           pip list
 
   daily_run_test_volc:
@@ -200,7 +199,6 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          lmdeploy check_env
           pip list
       - name:  modify config
         if: matrix.regression_func != 'chat_sub_fullbench'
@@ -243,7 +241,6 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          lmdeploy check_env
           pip list
       - name:  Run command testcase
         if: matrix.regression_func == 'cmd'
@@ -303,7 +300,6 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          lmdeploy check_env
           pip list
       - name:  Run command testcase
         run: |

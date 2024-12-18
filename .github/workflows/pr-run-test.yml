@@ -47,11 +47,13 @@ jobs:
           python3 -m pip uninstall opencompass -y
           python3 -m pip install -e . --cache-dir ${{env.PIP_CACHE_PATH}}
           conda info --envs
-      - name: Prepare - prepare data and hf model
+      - name: conda env
         run: |
-          cp -r ${{env.USERSPACE_PREFIX}}/data .
-          rm -rf ~/.cache/huggingface/hub -f && mkdir ~/.cache -p && mkdir ~/.cache/huggingface -p
-          ln -s ${{env.HF_CACHE_PATH}} ~/.cache/huggingface/hub
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          conda info --envs
+          pip list
+          lmdeploy check_env
       - name:  Run test
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
