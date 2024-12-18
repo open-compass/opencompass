@@ -240,5 +240,5 @@ class LocalRunner(BaseRunner):
         finally:
             # Clean up
             if os.path.exists(param_file):
-                os.remove(params_file_dir)
+                os.remove(param_file)
         return task_name, result.returncode
