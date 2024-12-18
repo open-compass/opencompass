@@ -151,7 +151,7 @@ jobs:
           timeout_minutes: 40
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
-            conda create -y --name ${{env.CONDA_ENV}}_ python=3.10
+            conda create -y --name ${{env.CONDA_ENV}} python=3.10
             conda activate ${{env.CONDA_ENV}}
             pip install -r /cpfs01/shared/public/qa-llm-cicd/requirements-cu12.txt --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
