@@ -284,7 +284,7 @@ jobs:
 
   fullbench_run_test:
     if: ${{!cancelled()}}
-    needs: ['build-pypi', 'build-pypi-lmdeploy']
+    needs: prepare_env
     strategy:
       fail-fast: false
       matrix:
@@ -305,13 +305,6 @@ jobs:
           conda info --envs
           lmdeploy check_env
           pip list
-      - name: Conda env
-        if: ${{inputs.build_lmdeploy}}
-        run: |
-          . ${{env.CONDA_PATH}}/bin/activate
-          conda activate ${{env.CONDA_ENV}}
-          conda info --envs
-          pip list
       - name:  Run command testcase
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
@@ -325,7 +318,7 @@ jobs:
 
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
-    needs: [daily_run_test, fullbench_run_test]
+    needs: [daily_run_test_volc, daily_run_test_local, fullbench_run_test]
     environment: 'prod'
     timeout-minutes: 5
     runs-on: self-hosted
