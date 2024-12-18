@@ -10,12 +10,10 @@ from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 #######################################################################
 with read_base():
     # Datasets Part
-    ## Core Set
     # Knowledge
     from opencompass.configs.datasets.mmlu_pro.mmlu_pro_0shot_cot_gen_08c1de import (
         mmlu_pro_datasets,
     )
-
     # General Reasoning
     from opencompass.configs.datasets.gpqa.gpqa_openai_simple_evals_gen_5aeece import (
         gpqa_datasets,
@@ -23,15 +21,15 @@ with read_base():
     from opencompass.configs.datasets.bbh.bbh_0shot_nocot_gen_925fc4 import (
         bbh_datasets,
     )
-    from opencompass.configs.datasets.humaneval.humaneval_openai_sample_evals_gen_159614 import (
+    from opencompass.configs.datasets.humaneval.humaneval_openai_sample_evals_gen_dcae0e import (
         humaneval_datasets,
     )
 
     # Instruction Following
-    from opencompass.configs.datasets.IFEval.IFEval_gen_3321a3 import (
+    from opencompass.configs.datasets.IFEval.IFEval_gen_353ae7 import (
         ifeval_datasets,
     )
-    from opencompass.configs.datasets.livecodebench.livecodebench_gen_6966bc import (
+    from opencompass.configs.datasets.livecodebench.livecodebench_gen_a4f90b import (
         LCBCodeGeneration_dataset,
     )
 
