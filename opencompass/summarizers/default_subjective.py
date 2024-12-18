@@ -4,6 +4,7 @@ import functools
 import getpass
 import math
 import os.path as osp
+from collections import OrderedDict
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -110,6 +111,7 @@ class DefaultSubjectiveSummarizer:
                     if not osp.exists(filepath):
                         continue
                     result = mmengine.load(filepath)
+                    result = OrderedDict(sorted(result.items()))
                     result.pop('details', None)
                     if idx == 0:
                         raw_results[model_abbr][dataset_abbr] = result
