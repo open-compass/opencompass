@@ -307,8 +307,8 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           export from_tf=TRUE
-          opencompass /fs-computility/llm/qa-llm-cicd/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.FULLBENCH_REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
-          rm regression_result_daily -f && ln -s ${{env.FULLBENCH_REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }}/*/summary regression_result_daily
+          opencompass /fs-computility/llm/qa-llm-cicd/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
+          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }}/*/summary regression_result_daily
           python -m pytest -m ${{ matrix.function_type }} -s -v --color=yes .github/scripts/oc_score_assert.py
 
 
