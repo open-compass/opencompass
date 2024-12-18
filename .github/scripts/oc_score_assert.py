@@ -194,17 +194,27 @@ class TestChatSubFullbench:
         'internlm2_5-7b-chat-hf_fullbench',
         'internlm2_5-7b-chat-turbomind_fullbench'
     ] for p2 in [
-        'Alignbench总分', 'Alignbench专业能力', 'AlpacaEvaltotal',
-        'AlpacaEvalhelpful_base', 'CompassArenacompassarena_language',
-        'CompassArenacompassarena_knowledge',
-        'CompassArenacompassarena_reason_v2',
-        'CompassArenacompassarena_math_v2',
-        'CompassArenacompassarena_creationv2_zh', 'Fofofofo_test_prompts',
-        'followbenchHSR_AVG', 'followbenchSSR_AVG', 'followbenchHSR_L1',
-        'followbenchHSR_L2', 'followbenchHSR_L3', 'followbenchHSR_L4',
-        'followbenchHSR_L5', 'followbenchSSR_L1', 'followbenchSSR_L2',
-        'followbenchSSR_L3', 'followbenchSSR_L4', 'followbenchSSR_L5',
-        'MTBench101average', 'Wildbenchscore'
+        'alignment_bench_v1_1_总分', 'alpaca_eval_total', 'arenahard_score',
+        'Followbench_naive_average', 'CompassArena_naive_average',
+        'mtbench101_avg', 'wildbench_average',
+        'simpleqa_accuracy_given_attempted',
+        'chinese_simpleqa_given_attempted_accuracy',
+        'alignment_bench_v1_1_专业能力', 'alignment_bench_v1_1_数学计算',
+        'alignment_bench_v1_1_基本任务', 'alignment_bench_v1_1_逻辑推理',
+        'alignment_bench_v1_1_中文理解', 'alignment_bench_v1_1_文本写作',
+        'alignment_bench_v1_1_角色扮演', 'alignment_bench_v1_1_综合问答',
+        'alpaca_eval_helpful_base', 'compassarena_language_naive_average',
+        'compassarena_knowledge_naive_average',
+        'compassarena_reason_v2_naive_average',
+        'compassarena_math_v2_naive_average',
+        'compassarena_creationv2_zh_naive_average',
+        'fofo_test_prompts_overall', 'followbench_llmeval_en_HSR_AVG',
+        'followbench_llmeval_en_SSR_AVG', 'followbench_llmeval_en_HSR_L1',
+        'followbench_llmeval_en_HSR_L2', 'followbench_llmeval_en_HSR_L3',
+        'followbench_llmeval_en_HSR_L4', 'followbench_llmeval_en_HSR_L5',
+        'followbench_llmeval_en_SSR_L1', 'followbench_llmeval_en_SSR_L2',
+        'followbench_llmeval_en_SSR_L3', 'followbench_llmeval_en_SSR_L4',
+        'followbench_llmeval_en_SSR_L5', 'simpleqa_f1'
     ]])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):

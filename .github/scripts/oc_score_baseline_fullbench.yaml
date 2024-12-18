@@ -36,30 +36,43 @@ internlm2_5-7b-chat-hf_fullbench:
     openai_mmmlu_lite_AR-XY_accuracy: 37.5
     college_naive_average: 12.5
     college_knowledge_naive_average: 87.5
-    Alignbench总分: 0.65
-    Alignbench专业能力: 7.83
-    AlpacaEvaltotal: 0
-    AlpacaEvalhelpful_base: 0
-    CompassArenacompassarena_language: 60
-    CompassArenacompassarena_knowledge: 56
-    CompassArenacompassarena_reason_v2: 50
-    CompassArenacompassarena_math_v2: 53.5
-    CompassArenacompassarena_creationv2_zh: 48.75
-    Fofofofo_test_prompts: 1
-    followbenchHSR_AVG: 1
-    followbenchSSR_AVG: 1
-    followbenchHSR_L1: 1
-    followbenchHSR_L2: 1
-    followbenchHSR_L3: 1
-    followbenchHSR_L4: 1
-    followbenchHSR_L5: 1
-    followbenchSSR_L1: 1
-    followbenchSSR_L2: 1
-    followbenchSSR_L3: 1
-    followbenchSSR_L4: 1
-    followbenchSSR_L5: 1
-    MTBench101average: 8.1
-    Wildbenchscore: -3.3333333333333335
+    alignment_bench_v1_1_总分: 0.66
+    alpaca_eval_total: 0
+    arenahard_score: 50
+    Followbench_naive_average: 1
+    CompassArena_naive_average: 54.48
+    mtbench101_avg: 8.1
+    wildbench_average: -9.86
+    simpleqa_accuracy_given_attempted: 0
+    chinese_simpleqa_given_attempted_accuracy: 1
+    alignment_bench_v1_1_专业能力: 8
+    alignment_bench_v1_1_数学计算: 0
+    alignment_bench_v1_1_基本任务: 0
+    alignment_bench_v1_1_逻辑推理: 0
+    alignment_bench_v1_1_中文理解: 0
+    alignment_bench_v1_1_文本写作: 0
+    alignment_bench_v1_1_角色扮演: 0
+    alignment_bench_v1_1_综合问答: 0
+    alpaca_eval_helpful_base: 0
+    compassarena_language_naive_average: 62
+    compassarena_knowledge_naive_average: 56
+    compassarena_reason_v2_naive_average: 49
+    compassarena_math_v2_naive_average: 57.05
+    compassarena_creationv2_zh_naive_average: 48.34
+    fofo_test_prompts_overall: 1
+    followbench_llmeval_en_HSR_AVG: 1
+    followbench_llmeval_en_SSR_AVG: 1
+    followbench_llmeval_en_HSR_L1: 1
+    followbench_llmeval_en_HSR_L2: 1
+    followbench_llmeval_en_HSR_L3: 1
+    followbench_llmeval_en_HSR_L4: 1
+    followbench_llmeval_en_HSR_L5: 1
+    followbench_llmeval_en_SSR_L1: 1
+    followbench_llmeval_en_SSR_L2: 1
+    followbench_llmeval_en_SSR_L3: 1
+    followbench_llmeval_en_SSR_L4: 1
+    followbench_llmeval_en_SSR_L5: 1
+    simpleqa_f1: 0
 
 internlm2_5-7b-chat-turbomind_fullbench:
     race-high_accuracy:  93.75
@@ -99,30 +112,43 @@ internlm2_5-7b-chat-turbomind_fullbench:
     openai_mmmlu_lite_AR-XY_accuracy: 37.5
     college_naive_average: 0
     college_knowledge_naive_average: 87.5
-    Alignbench总分: 0.64
-    Alignbench专业能力: 7.6
-    AlpacaEvaltotal: 10
-    AlpacaEvalhelpful_base: 10
-    CompassArenacompassarena_language: 59
-    CompassArenacompassarena_knowledge: 57
-    CompassArenacompassarena_reason_v2: 49.5
-    CompassArenacompassarena_math_v2: 51
-    CompassArenacompassarena_creationv2_zh: 43.75
-    Fofofofo_test_prompts: 1
-    followbenchHSR_AVG: 1
-    followbenchSSR_AVG: 1
-    followbenchHSR_L1: 1
-    followbenchHSR_L2: 1
-    followbenchHSR_L3: 1
-    followbenchHSR_L4: 1
-    followbenchHSR_L5: 1
-    followbenchSSR_L1: 1
-    followbenchSSR_L2: 1
-    followbenchSSR_L3: 1
-    followbenchSSR_L4: 1
-    followbenchSSR_L5: 1
-    MTBench101average: 8.1
-    Wildbenchscore: -8.333333333333334
+    alignment_bench_v1_1_总分: 0.68
+    alpaca_eval_total: 10
+    arenahard_score: 50
+    Followbench_naive_average: 1
+    CompassArena_naive_average: 52.95
+    mtbench101_avg: 8.1
+    wildbench_average: -4.44
+    simpleqa_accuracy_given_attempted: 0
+    chinese_simpleqa_given_attempted_accuracy: 1
+    alignment_bench_v1_1_专业能力: 8.2
+    alignment_bench_v1_1_数学计算: 0
+    alignment_bench_v1_1_基本任务: 0
+    alignment_bench_v1_1_逻辑推理: 0
+    alignment_bench_v1_1_中文理解: 0
+    alignment_bench_v1_1_文本写作: 0
+    alignment_bench_v1_1_角色扮演: 0
+    alignment_bench_v1_1_综合问答: 0
+    alpaca_eval_helpful_base: 10
+    compassarena_language_naive_average: 61.5
+    compassarena_knowledge_naive_average: 56.5
+    compassarena_reason_v2_naive_average: 47.5
+    compassarena_math_v2_naive_average: 53.03
+    compassarena_creationv2_zh_naive_average: 46.22
+    fofo_test_prompts_overall: 1
+    followbench_llmeval_en_HSR_AVG: 1
+    followbench_llmeval_en_SSR_AVG: 1
+    followbench_llmeval_en_HSR_L1: 1
+    followbench_llmeval_en_HSR_L2: 1
+    followbench_llmeval_en_HSR_L3: 1
+    followbench_llmeval_en_HSR_L4: 1
+    followbench_llmeval_en_HSR_L5: 1
+    followbench_llmeval_en_SSR_L1: 1
+    followbench_llmeval_en_SSR_L2: 1
+    followbench_llmeval_en_SSR_L3: 1
+    followbench_llmeval_en_SSR_L4: 1
+    followbench_llmeval_en_SSR_L5: 1
+    simpleqa_f1: 0
 
 internlm2_5-7b-hf_fullbench:
     race-high_accuracy: 100
