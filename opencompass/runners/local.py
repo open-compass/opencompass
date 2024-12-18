@@ -1,7 +1,6 @@
 import os
 import os.path as osp
 import re
-import shutil
 import subprocess
 import sys
 import time
@@ -241,5 +240,5 @@ class LocalRunner(BaseRunner):
         finally:
             # Clean up
             if os.path.exists(param_file):
-                shutil.rmtree(params_file_dir)
+                os.remove(params_file_dir)
         return task_name, result.returncode
