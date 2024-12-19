@@ -207,11 +207,13 @@ class LocalRunner(BaseRunner):
 
         task_name = task.name
 
+        pwd = os.getcwd()
         # Dump task config to file
-        params_file_dir = os.path.join(task.cfg.work_dir, 'params')
-        mmengine.mkdir_or_exist(params_file_dir)
-        param_file = os.path.join(params_file_dir,
-                                  f'{os.getpid()}_{index}_params.py')
+        mmengine.mkdir_or_exist('tmp/')
+        # Using uuid to avoid filename conflict
+        import uuid
+        uuid_str = str(uuid.uuid4())
+        param_file = f'{pwd}/tmp/{uuid_str}_params.py'
 
         try:
             task.cfg.dump(param_file)
@@ -239,6 +241,8 @@ class LocalRunner(BaseRunner):
                 logger.error(f'task {task_name} fail, see\n{out_path}')
         finally:
             # Clean up
-            if os.path.exists(param_file):
+            if not self.keep_tmp_file:
                 os.remove(param_file)
+            else:
+                pass
         return task_name, result.returncode
