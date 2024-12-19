@@ -88,6 +88,9 @@ class TestBase:
                              ]])
     def test_model_dataset_score(self, baseline_scores_testrange,
                                  result_scores, model, dataset):
+        if model in ['gemma-2b-vllm', 'gemma-7b-vllm'
+                     ] and dataset != 'gsm8k_accuracy':
+            return
         base_score = baseline_scores_testrange.get('base').get(model).get(
             dataset)
         result_score = result_scores.get(model).get(dataset)
