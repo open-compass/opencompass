@@ -322,7 +322,7 @@ base:
         race-high_accuracy: 81.25
         winogrande_accuracy: 75
     qwen2-7b-turbomind:
-        gsm8k_accuracy: 68.75
+        gsm8k_accuracy: 75.00
         GPQA_diamond_accuracy: 12.5
         race-high_accuracy: 87.5
         winogrande_accuracy: 71.88
