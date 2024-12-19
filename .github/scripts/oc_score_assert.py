@@ -218,7 +218,8 @@ class TestVolcFullbench:
     @pytest.mark.base_long_context
     def test_base_long_context(self, baseline_scores_fullbench, result_scores,
                                model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get(
+            'long_context').get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model + '_batch', result_score, base_score)
 
