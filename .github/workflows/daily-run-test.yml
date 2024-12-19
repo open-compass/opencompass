@@ -38,28 +38,21 @@ on:
         description: "regression conda env, eg. ['dsw_cu11','dsw_cu12']"
         type: string
         default: "['dsw_cu12']"
+      fullbench_eval:
+        required: true
+        description: 'fullbench volc functions'
+        type: string
+        default: "['base_long_context','base_objective','chat_long_context','chat_objective','chat_subjective']"
   schedule:
-    - cron:  '15 16 * * *'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    - cron:  '15 14 * * *'
 
 env:
-  CONDA_ENV: opencompass_regression
-  PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
-  HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
-  HUGGINGFACE_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
-  HF_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
-  COMPASS_DATA_CACHE: /cpfs01/shared/public/llmeval/compass_data_cache
   HF_DATASETS_OFFLINE: 1
   HF_EVALUATE_OFFLINE: 1
   TRANSFORMERS_OFFLINE: 1
   VLLM_USE_MODELSCOPE: false
   LMDEPLOY_USE_MODELSCOPE: false
   HF_HUB_OFFLINE: 1
-  TRITON_PTXAS_PATH: /usr/local/cuda/bin/ptxas
-  REPORT_ROOT: /cpfs01/shared/public/qa-llm-cicd/report
   OUTPUT_FOLDER: cuda12.1_dist_${{ github.run_id }}
 
 jobs:
@@ -129,6 +122,9 @@ jobs:
       matrix:
         cuda_env: ${{ fromJSON(inputs.cuda_env || '["dsw_cu12"]')}}
     runs-on: ${{ matrix.cuda_env }}
+    env:
+      CONDA_ENV: opencompass_regression
+      PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
     environment: 'prod'
     timeout-minutes: 240 #4hours
     steps:
@@ -209,6 +205,14 @@ jobs:
         cuda_env: ${{ fromJSON(inputs.cuda_env || '["dsw_cu12"]')}}
         regression_func: ${{fromJSON(github.event.inputs.regression_func || '["chat_models","base_models","chat_obj_fullbench","chat_sub_fullbench","base_fullbench","cmd","api"]')}}
     runs-on: ${{ matrix.cuda_env }}
+    env:
+      CONDA_ENV: opencompass_regression
+      PIP_CACHE_PATH: /cpfs01/user/qa-llm-cicd/.cache/pip
+      HF_CACHE_PATH: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
+      HUGGINGFACE_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
+      HF_HUB_CACHE: /cpfs01/shared/public/public_hdd/llmeval/model_weights/hf_hub
+      COMPASS_DATA_CACHE: /cpfs01/shared/public/llmeval/compass_data_cache
+      REPORT_ROOT: /cpfs01/shared/public/qa-llm-cicd/report
     environment: 'prod'
     timeout-minutes: 240 #4hours
     steps:
@@ -305,9 +309,68 @@ jobs:
         run: |
           kill -15 "$restful_pid"
 
+  fullbench_run_test:
+    if: ${{!cancelled()}}
+    needs: ['build-pypi', 'build-pypi-lmdeploy']
+    env:
+      FULLBENCH_CONDA_ENV: regression_test
+      FULLBENCH_REPORT_ROOT: /fs-computility/llm/qa-llm-cicd/eval_report/regression
+      COMPASS_DATA_CACHE: /fs-computility/llm/shared/llmeval/datasets/compass_data_cache
+    strategy:
+      fail-fast: false
+      matrix:
+        function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '["base_long_context","base_objective","chat_long_context","chat_objective","chat_subjective"]')}}
+    runs-on: volc_cu12
+    environment: 'prod'
+    timeout-minutes: 360 #6hours
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.repo_org || 'open-compass/opencompass' }}
+          ref: ${{github.event.inputs.repo_ref || 'main'}}
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact-${{ github.run_id }}
+      - name: Prepare - reinstall opencompass - cu12
+        if: ${{matrix.cuda_env == 'dsw_cu12' && inputs.build_lmdeploy}}
+        run: |
+          . /fs-computility/llm/qa-llm-cicd/miniconda3/bin/activate
+          conda activate ${{env.FULLBENCH_CONDA_ENV}}
+          pip install opencompass*.whl --no-deps
+      - name: Prepare - reinstall lmdeploy - cu12
+        if: ${{matrix.cuda_env == 'dsw_cu12' && inputs.build_lmdeploy}}
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact-${{ github.run_id }}-py310
+      - name: Prepare - reinstall lmdeploy - cu12
+        if: ${{matrix.cuda_env == 'dsw_cu12' && inputs.build_lmdeploy}}
+        run: |
+          . /fs-computility/llm/qa-llm-cicd/miniconda3/bin/activate
+          conda activate ${{env.FULLBENCH_CONDA_ENV}}
+          pip install lmdeploy-*.whl --no-deps
+      - name: Conda env
+        if: ${{matrix.cuda_env == 'dsw_cu12' && inputs.build_lmdeploy}}
+        run: |
+          . /fs-computility/llm/qa-llm-cicd/miniconda3/bin/activate
+          conda activate ${{env.FULLBENCH_CONDA_ENV}}
+          conda info --envs
+          pip list
+      - name:  Run command testcase
+        run: |
+          . /fs-computility/llm/qa-llm-cicd/miniconda3/bin/activate
+          conda activate ${{env.FULLBENCH_CONDA_ENV}}
+          conda info --envs
+          export from_tf=TRUE
+          opencompass /fs-computility/llm/qa-llm-cicd/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.FULLBENCH_REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
+          rm regression_result_daily -f && ln -s ${{env.FULLBENCH_REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }}/*/summary regression_result_daily
+          python -m pytest -m ${{ matrix.function_type }} -s -v --color=yes .github/scripts/oc_score_assert.py
+
+
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
-    needs: [daily_run_test]
+    needs: [daily_run_test, fullbench_run_test]
     environment: 'prod'
     timeout-minutes: 5
     runs-on: self-hosted

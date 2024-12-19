@@ -358,6 +358,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/simpleqa/simple_qa_test_set.csv",
     },
+    "opencompass/chinese_simpleqa": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/chinese_simpleqa",
+    },
     "opencompass/LiveMathBench202412": {
         "ms_id": "",
         "hf_id": "",
@@ -372,7 +377,12 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/bigcodebench/",
-    }
+    },
+    "opencompass/qabench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/qabench",
+    },
 }
 
 DATASETS_URL = {
@@ -391,6 +401,10 @@ DATASETS_URL = {
     "/simpleqa": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa.zip",
         "md5": "1d83fc2e15798d39cb265c9a3cb5195a",
+    },
+    "/chinese_simpleqa": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/chinese_simpleqa.zip",
+        "md5": "4bdf854b291fc0ee29da57dc47ac47b5",
     },
     "/gpqa/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gpqa.zip",

@@ -29,7 +29,7 @@ env:
 
 jobs:
   pr_run_test:
-    runs-on: self-hosted
+    runs-on: dsw_cu12
     environment: 'prod'
     timeout-minutes: 30
     steps:
@@ -73,10 +73,10 @@ jobs:
              exit 1
           fi
           score=$(sed -n '$p' regression_result3/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 84 && ${score%.*} <= 87 )); then
-             echo "score is $score between 84 and 87"
+          if (( ${score%.*} >= 87 && ${score%.*} <= 89 )); then
+             echo "score is $score between 87 and 89"
           else
-             echo "score is $score not between 84 and 87"
+             echo "score is $score not between 87 and 89"
              exit 1
           fi
           rm -rf regression_result1 & rm -rf regression_result2 & rm -rf regression_result3

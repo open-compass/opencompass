@@ -5,6 +5,7 @@ models = [
         type=TurboMindModelwithChatTemplate,
         abbr='deepseek-v2_5-turbomind',
         path='deepseek-ai/DeepSeek-V2.5',
+        backend='pytorch',
         engine_config=dict(
             session_len=7168,
             max_batch_size=4,

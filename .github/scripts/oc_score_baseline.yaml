@@ -1,34 +1,34 @@
 internlm2_5-7b-hf:
-    demo_gsm8k: 42.19
-    race-middle: 91.78
-    race-high: 90.02
+    demo_gsm8k_accuracy: 42.19
+    race-middle_accuracy: 91.78
+    race-high_accuracy: 90.02
 
 internlm2_5-7b_hf:
-    demo_gsm8k: 42.19
-    race-middle: 91.78
-    race-high: 90.02
+    demo_gsm8k_accuracy: 42.19
+    race-middle_accuracy: 91.78
+    race-high_accuracy: 90.02
 
 internlm2-1.8b-hf:
-    demo_gsm8k: 15.62
-    race-middle: 71.66
-    race-high: 66.38
+    demo_gsm8k_accuracy: 15.62
+    race-middle_accuracy: 71.66
+    race-high_accuracy: 66.38
 
 internlm2_5-7b-chat-lmdeploy:
-    demo_gsm8k: 84.38
-    race-middle: 92.76
-    race-high: 90.54
+    demo_gsm8k_accuracy: 84.38
+    race-middle_accuracy: 92.76
+    race-high_accuracy: 90.54
 
 internlm2-chat-1.8b-lmdeploy:
-    demo_gsm8k: 31
-    race-middle: 81.34
-    race-high: 73.96
+    demo_gsm8k_accuracy: 31
+    race-middle_accuracy: 81.34
+    race-high_accuracy: 73.96
 
 internlm2_5-7b-chat_hf:
-    demo_gsm8k: 87.50
-    race-middle: 92.76
-    race-high: 90.48
+    demo_gsm8k_accuracy: 87.50
+    race-middle_accuracy: 92.76
+    race-high_accuracy: 90.48
 
 lmdeploy-api-test:
-    gsm8k: 83.78
-    race-middle: 92.41
-    race-high: 90.37
+    gsm8k_accuracy: 83.78
+    race-middle_accuracy: 92.41
+    race-high_accuracy: 90.37
