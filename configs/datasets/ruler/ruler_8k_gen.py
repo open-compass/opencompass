@@ -1,3 +1,4 @@
+import os
 
 from mmengine.config import read_base
 
@@ -13,6 +14,7 @@ import_ds = sum((cwe, fwe, niah, qa, vt), [])
 
 # Evaluation config
 NUM_SAMPLES = 100 # Change to the number of samples you need
+tokenizer_model = os.environ.get('TOKENIZER_MODEL', 'gpt-4')
 # Change the context lengths to be tested
 max_seq_lens = [1024 * 8]
 abbr_suffixs = ['8k']
@@ -26,4 +28,5 @@ for max_seq_len, abbr_suffix in zip(max_seq_lens, abbr_suffixs):
         tmp_dataset['abbr'] = tmp_dataset['abbr'] + '_' + abbr_suffix
         tmp_dataset['num_samples'] = NUM_SAMPLES
         tmp_dataset['max_seq_length'] = max_seq_len
+        tmp_dataset['tokenizer_model'] = tokenizer_model
         ruler_datasets.append(tmp_dataset)

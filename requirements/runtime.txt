@@ -2,7 +2,7 @@ absl-py
 accelerate>=0.19.0
 cpm_kernels
 datasets>=2.12.0
-einops==0.5.0
+einops>=0.5.0
 evaluate>=0.3.0
 func_timeout
 fuzzywuzzy
@@ -16,7 +16,7 @@ jieba
 json5
 jsonlines
 mmengine-lite
-nltk==3.8
+nltk>=3.7
 numpy>=1.23.4,<2.0.0
 openai
 OpenCC
