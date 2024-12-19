@@ -135,10 +135,11 @@ class TestChat:
 class TestBase:
     """Test cases for base model."""
 
-    @pytest.mark.parametrize('model, dataset', [
-        (p1, p2) for p1 in base_model_list for p2 in
-        ['gsm8k_accuracy', 'GPQA_diamond', 'race-high_accuracy', 'winogrande']
-    ])
+    @pytest.mark.parametrize('model, dataset',
+                             [(p1, p2) for p1 in base_model_list for p2 in [
+                                 'gsm8k_accuracy', 'GPQA_diamond_accuracy',
+                                 'race-high_accuracy', 'winogrande_accuracy'
+                             ]])
     def test_model_dataset_score(self, baseline_scores_testrange,
                                  result_scores, model, dataset):
         if model in ['gemma-2b-vllm', 'gemma-7b-vllm'
