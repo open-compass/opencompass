@@ -106,7 +106,8 @@ class TestChatObjFullbench:
     ] for p2 in dataset_list('internlm2_5-7b-chat-hf_fullbench', 'objective')])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get('objective').get(
+            dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
@@ -124,7 +125,8 @@ class TestChatSubFullbench:
                              )
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get(
+            'subjective').get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
@@ -142,7 +144,8 @@ class TestBaseFullbench:
          for p2 in dataset_list('internlm2_5-7b-hf_fullbench', 'objective')])
     def test_model_dataset_score(self, baseline_scores_fullbench,
                                  result_scores, model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get('objective').get(
+            dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score)
 
@@ -176,7 +179,8 @@ class TestVolcFullbench:
     @pytest.mark.chat_objective
     def test_chat_objective(self, baseline_scores_fullbench, result_scores,
                             model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get('objective').get(
+            dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model + '_batch', result_score, base_score)
 
@@ -187,7 +191,8 @@ class TestVolcFullbench:
     @pytest.mark.chat_subjective
     def test_chat_subjective(self, baseline_scores_fullbench, result_scores,
                              model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get(
+            'subjective').get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model + '_batch', result_score, base_score)
 
@@ -198,7 +203,8 @@ class TestVolcFullbench:
     @pytest.mark.base_objective
     def test_base_objective(self, baseline_scores_fullbench, result_scores,
                             model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get('objective').get(
+            dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model + '_batch', result_score, base_score)
 
@@ -221,7 +227,8 @@ class TestVolcFullbench:
     @pytest.mark.chat_long_context
     def test_chat_long_context(self, baseline_scores_fullbench, result_scores,
                                model, dataset):
-        base_score = baseline_scores_fullbench.get(model).get(dataset)
+        base_score = baseline_scores_fullbench.get(model).get(
+            'long_context').get(dataset)
         result_score = result_scores.get(model).get(dataset)
         assert_score(model + '_batch', result_score, base_score)
 
