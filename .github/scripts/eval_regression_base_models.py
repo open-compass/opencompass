@@ -32,7 +32,7 @@ with read_base():
     from opencompass.configs.models.deepseek.lmdeploy_deepseek_67b_base import \
         models as lmdeploy_deepseek_67b_base_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.lmdeploy_deepseek_v2 import \
-        models as lmdeploy_deepseek_v2_model  # noqa: F401, E501
+        lmdeploy_deepseek_v2_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.vllm_deepseek_moe_16b_base import \
         models as vllm_deepseek_moe_16b_base_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma2_2b import \
