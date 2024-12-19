@@ -34,9 +34,6 @@ with read_base():
     )
 
     # Math
-    from opencompass.configs.datasets.cmo_fib.cmo_fib_gen_ace24b import (
-        cmo_fib_datasets,
-    )
     from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import (
         aime2024_datasets,
     )
@@ -75,7 +72,6 @@ core_summary_groups = [
             ['IFEval', 'Prompt-level-strict-accuracy'],
             ['bbh', 'naive_average'],
             ['math_prm800k_500', 'accuracy'],
-            ['cmo_fib', 'accuracy'],
             ['aime2024', 'accuracy'],
             ['GPQA_diamond', 'accuracy'],
             ['mmlu_pro', 'naive_average'],
@@ -99,7 +95,6 @@ summarizer = dict(
         '',
         'Math Calculation',
         ['math_prm800k_500', 'accuracy'],
-        ['cmo_fib', 'accuracy'],
         ['aime2024', 'accuracy'],
         '',
         'Knowledge',
