@@ -79,41 +79,41 @@ internlm2_5-7b-chat-hf_fullbench:
 internlm2_5-7b-chat-turbomind_fullbench:
     objective:
         race-high_accuracy:  93.75
-        ARC-c_accuracy: 87.5
+        ARC-c_accuracy: 93.75
         BoolQ_accuracy: 68.75
         triviaqa_wiki_1shot_score: 50
         nq_open_1shot_score: 25
         IFEval_Prompt-level-strict-accuracy: 50
-        drop_accuracy: 75
-        GPQA_diamond_accuracy: 25
+        drop_accuracy: 81.25
+        GPQA_diamond_accuracy: 31.25
         hellaswag_accuracy: 81.25
         TheoremQA_score: 6.25
-        musr_average_naive_average: 37.5
+        musr_average_naive_average: 39.58
         korbench_single_naive_average: 41.25
         gsm8k_accuracy: 68.75
-        math_accuracy: 75
+        math_accuracy: 68.75
         cmo_fib_accuracy: 6.25
         aime2024_accuracy: 6.25
-        wikibench-wiki-single_choice_cncircular_perf_4: 25
+        wikibench-wiki-single_choice_cncircular_perf_4: 50.00
         sanitized_mbpp_score: 68.75
-        ds1000_naive_average: 13.39
+        ds1000_naive_average: 16.96
         lcb_code_generation_pass@1: 12.5
         lcb_code_execution_pass@1: 43.75
         lcb_test_output_pass@1: 12.5
-        bbh-logical_deduction_seven_objects_score: 56.25
+        bbh-logical_deduction_seven_objects_score: 50.00
         bbh-multistep_arithmetic_two_score: 68.75
-        mmlu-other_naive_average: 74.04
+        mmlu-other_naive_average: 69.71
         cmmlu-china-specific_naive_average: 76.25
-        mmlu_pro_math_accuracy: 25
+        mmlu_pro_math_accuracy: 31.25
         ds1000_Pandas_accuracy: 0
         ds1000_Numpy_accuracy: 0
         ds1000_Tensorflow_accuracy: 12.5
         ds1000_Scipy_accuracy: 18.75
         ds1000_Sklearn_accuracy: 18.75
-        ds1000_Pytorch_accuracy: 6.25
-        ds1000_Matplotlib_accuracy: 37.5
+        ds1000_Pytorch_accuracy: 18.75
+        ds1000_Matplotlib_accuracy: 50.00
         openai_mmmlu_lite_AR-XY_accuracy: 37.5
-        college_naive_average: 0
+        college_naive_average: 12.50
         college_knowledge_naive_average: 87.5
     subjective:
         alignment_bench_v1_1_总分: 0.68
@@ -192,16 +192,16 @@ internlm2_5-7b-turbomind_fullbench:
         drop_accuracy: 62.5
         GPQA_diamond_accuracy: 62.5
         hellaswag_accuracy: 93.75
-        TheoremQA_score: 31.25
+        TheoremQA_score: 25.00
         winogrande_accuracy: 87.5
-        gsm8k_accuracy: 68.75
-        GaokaoBench_2010-2022_Math_II_MCQs_score: 62.5
+        gsm8k_accuracy: 62.50
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 81.25
         GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
         math_accuracy: 18.75
         wikibench-wiki-single_choice_cncircular_perf_4: 25
-        sanitized_mbpp_score: 56.25
-        dingo_en_192_score: 43.75
-        dingo_zh_170_score: 100
+        sanitized_mbpp_score: 62.50
+        dingo_en_192_score: 31.25
+        dingo_zh_170_score: 93.75
         mmlu-other_accuracy: 76.92
         cmmlu-china-specific_accuracy: 84.17
         mmlu_pro_math_accuracy: 18.75
