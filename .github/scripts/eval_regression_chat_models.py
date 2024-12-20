@@ -147,8 +147,6 @@ with read_base():
         models as hf_yi_1_5_6b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.yi.hf_yi_1_5_9b_chat import \
         models as hf_yi_1_5_9b_chat_model  # noqa: F401, E501
-    from opencompass.configs.models.yi.hf_yi_34b_chat import \
-        models as hf_yi_34b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.yi.lmdeploy_yi_1_5_6b_chat import \
         models as lmdeploy_yi_1_5_6b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.yi.lmdeploy_yi_1_5_9b_chat import \

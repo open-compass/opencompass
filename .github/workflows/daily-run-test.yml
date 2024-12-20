@@ -185,7 +185,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","chat_sub_fullbench","base_fullbench"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models"]')}}
     runs-on: volc_cu12_daily
     environment: 'prod'
     timeout-minutes: 240 #4hours
@@ -227,7 +227,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_obj_fullbench","chat_sub_fullbench","base_fullbench"]')}}
     runs-on: volc_cu12_local
     environment: 'prod'
     timeout-minutes: 240 #4hours
@@ -279,6 +279,17 @@ jobs:
         if: always() && matrix.regression_func == 'api'
         run: |
           kill -15 "$restful_pid"
+      - name:  Run testcase
+        if: matrix.regression_func != 'api' && matrix.regression_func != 'cmd'
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          conda info --envs
+          export from_tf=TRUE
+          opencompass /fs-computility/llm/qa-llm-cicd/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
+          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }}/*/summary regression_result_daily
+          python -m pytest -m ${{ matrix.function_type }} -s -v --color=yes .github/scripts/oc_score_assert.py
+
 
   fullbench_run_test:
     if: ${{!cancelled()}}
@@ -302,7 +313,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           pip list
-      - name:  Run command testcase
+      - name:  Run testcase
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
