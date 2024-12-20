@@ -42,7 +42,7 @@ on:
         required: true
         description: 'fullbench volc functions'
         type: string
-        default: "['base_long_context','base_objective','chat_long_context','chat_objective','chat_subjective']"
+        default: "['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
   schedule:
     - cron:  '15 14 * * *'
 
@@ -243,6 +243,11 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           pip list
+      - name:  modify config
+        if: matrix.regression_func != 'cmd' && matrix.regression_func != 'api'
+        run: |
+          cp -r /fs-computility/llm/qa-llm-cicd/ocplayground/template/configs_cluster/volc.py .
+          cat /fs-computility/llm/qa-llm-cicd/config/test_config_local.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
       - name:  Run command testcase
         if: matrix.regression_func == 'cmd'
         run: |
@@ -297,7 +302,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '["base_long_context","base_objective","chat_long_context","chat_objective","chat_subjective"]')}}
+        function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '["base_objective","chat_objective","chat_subjective","base_long_context","chat_long_context"]')}}
     runs-on: volc_cu12
     environment: 'prod'
     timeout-minutes: 360 #6hours
