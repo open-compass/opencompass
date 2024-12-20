@@ -1,6 +1,5 @@
 from abc import abstractmethod
 from collections import OrderedDict
-from copy import deepcopy
 from typing import Any, Dict, List, Union
 
 import numpy as np
@@ -125,8 +124,17 @@ class GPassKEvaluator(BaseEvaluator):
         all_dataset = set()
         total_pass_num, count = 0, 0
         for example_abbr, examples in example2replications.items():
-            detail = OrderedDict(deepcopy(examples[0]))
-            detail['responses'] = []
+            detail = {
+                'question': examples[0]['question'],
+                'answer': examples[0]['answer'],
+                'question_type': examples[0]['question_type'],
+                'options': examples[0]['options'],
+                'subdivision': examples[0]['subdivision'],
+                'idx': examples[0]['idx'],
+                'prompt': examples[0]['prompt'],
+                'predictions': [example['prediction'] for example in examples],
+                'labels': [example['label'] for example in examples],
+            }
 
             all_dataset.add(examples[0]['subdivision'])
             current_example_labels = [e['label'] for e in examples]
