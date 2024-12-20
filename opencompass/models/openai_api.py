@@ -147,7 +147,7 @@ class OpenAI(BaseAPIModel):
         self.path = path
         self.max_completion_tokens = max_completion_tokens
         self.logger.warning(
-            f'Max Completion tokens for {path} is :{max_completion_tokens}')
+            f'Max Completion tokens for {path} is {max_completion_tokens}')
 
     def generate(self,
                  inputs: List[PromptType],
@@ -278,7 +278,7 @@ class OpenAI(BaseAPIModel):
                     self.logger.warning(
                         f"'max_token' is unsupported for model {self.path}")
                     self.logger.warning(
-                        f'We use max_completion_tokens:'
+                        f'We use max_completion_tokens: '
                         f'{self.max_completion_tokens}for this query')
                     data = dict(
                         model=self.path,
@@ -588,13 +588,12 @@ class OpenAISDK(OpenAI):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
                 self.logger.warning(
-                    f'We use max_completion_tokens:'
+                    f'We use max_completion_tokens: '
                     f'{self.max_completion_tokens}for this query')
                 query_data = dict(
                     model=self.path,
                     max_completion_tokens=self.max_completion_tokens,
                     n=1,
-                    temperature=self.temperature,
                     messages=messages,
                     extra_body=self.extra_body,
                 )
@@ -636,8 +635,8 @@ class OpenAISDK(OpenAI):
                 if (status_code is not None
                         and status_code in self.status_code_mappings):
                     error_message = self.status_code_mappings[status_code]
-                    self.logger.info(f'Status Code: {status_code},\n'
-                                     f'Original Error Message: {e},\n'
+                    self.logger.info(f'Status Code: {status_code}, \n'
+                                     f'Original Error Message: {e}, \n'
                                      f'Return Message: {error_message} ')
                     return error_message
                 else:

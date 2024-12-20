@@ -335,7 +335,7 @@ class DLCRunner(BaseRunner):
                 pass
 
         # Lark Report when failed
-        if return_code == -1:
+        if return_code == -1 and self.lark_reporter is not None:
             content = f'DLC job failed. Task name: {task_name}'
             self.lark_reporter.post(title='DLC job failed', content=content)
 
