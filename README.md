@@ -79,6 +79,8 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 We provide [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
+You can also refer to [CompassAcademic](configs/eval_academic_leaderboard_202412.py) to quickly reproduce the leaderboard results. The currently selected datasets include Knowledge Reasoning (MMLU-Pro/GPQA Diamond), Logical Reasoning (BBH), Mathematical Reasoning (MATH-500, AIME), Code Generation (LiveCodeBench, HumanEval), and Instruction Following (IFEval)."
+
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
 ## 🛠️ Installation
