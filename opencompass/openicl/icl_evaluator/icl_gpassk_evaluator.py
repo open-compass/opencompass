@@ -45,7 +45,7 @@ class GPassKEvaluator(BaseEvaluator):
 
     This Evaluator will firstly invoke task-specific `preprocess` on
     predictions to get a  consistency label for each prediction and
-    the corresponding reference, and then indicators are calculated.
+    the corresponding reference, and then metrics are calculated.
 
     This evaluator require the test dataset contains following keys:
         - subdivision: the name of subdivision or dataset split,
