@@ -57,13 +57,13 @@ chat:
         gsm8k_accuracy: 53.12
         race-high_accuracy: 90.62
     internlm2-chat-7b-vllm:
-        gsm8k_accuracy: 50
+        gsm8k_accuracy: 56.25
         race-high_accuracy: 84.38
     llama-3_1-8b-instruct-hf:
         gsm8k_accuracy: 84.38
         race-high_accuracy: 90.62
     llama-3_2-3b-instruct-hf:
-        gsm8k_accuracy: 68.75
+        gsm8k_accuracy: 71.88
         race-high_accuracy: 81.25
     llama-3-8b-instruct-hf:
         gsm8k_accuracy: 68.75
@@ -177,7 +177,7 @@ base:
         race-high_accuracy: 25
         winogrande_accuracy: 68.75
     gemma2-2b-hf:
-        gsm8k_accuracy: 31.25
+        gsm8k_accuracy: 28.12
         GPQA_diamond_accuracy: 3.12
         race-high_accuracy: 56.25
         winogrande_accuracy: 71.88
@@ -263,7 +263,7 @@ base:
         winogrande_accuracy: 78.12
     llama-3-8b-turbomind:
         gsm8k_accuracy: 50
-        GPQA_diamond_accuracy: 9.38
+        GPQA_diamond_accuracy: 12.50
         race-high_accuracy: 65.62
         winogrande_accuracy: 78.12
     mistral-7b-v0.2-hf:
