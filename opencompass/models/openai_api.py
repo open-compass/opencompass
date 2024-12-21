@@ -147,7 +147,7 @@ class OpenAI(BaseAPIModel):
         self.path = path
         self.max_completion_tokens = max_completion_tokens
         self.logger.warning(
-            f'Max Completion tokens for {path} is: {max_completion_tokens}')
+            f'Max Completion tokens for {path} is {max_completion_tokens}')
 
     def generate(self,
                  inputs: List[PromptType],
@@ -597,7 +597,6 @@ class OpenAISDK(OpenAI):
                     model=self.path,
                     max_completion_tokens=self.max_completion_tokens,
                     n=1,
-                    # temperature=self.temperature,
                     messages=messages,
                     extra_body=self.extra_body,
                 )
