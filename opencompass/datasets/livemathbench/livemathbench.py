@@ -129,20 +129,23 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
         if isinstance(url, str):
             url = [url]
 
-        self.judge_models = [
-            MODELS.build(
-                dict(
-                    type=OpenAISDK,
-                    path=model_name,
-                    openai_api_base=_url,
-                    key='EMPTY',
-                    query_per_second=2,
-                    retry=1000,
-                    meta_template=self.api_meta_template,
-                    temperature=0.0,
-                    max_seq_len=16384,
-                )) for _url in url
-        ]
+        if model_name == '' or len(url) == 0:
+            raise ValueError('model_name and url should not be empty')
+        else:
+            self.judge_models = [
+                MODELS.build(
+                    dict(
+                        type=OpenAISDK,
+                        path=model_name,
+                        openai_api_base=_url,
+                        key='EMPTY',
+                        query_per_second=2,
+                        retry=5,
+                        meta_template=self.api_meta_template,
+                        temperature=0.0,
+                        max_seq_len=16384,
+                    )) for _url in url
+            ]
         self.use_extract_model = use_extract_model
         self.extract_url = extract_url
         self.extract_model_name = extract_model_name
@@ -205,8 +208,8 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
                         path=self.extract_model_name,
                         openai_api_base=url,
                         key='EMPTY',
-                        query_per_second=1,
-                        retry=1000,
+                        query_per_second=2,
+                        retry=5,
                         meta_template=self.api_meta_template,
                         temperature=0.0,
                         max_seq_len=1024,
