@@ -16,7 +16,7 @@ def compute_pass_at_k(n, c, k):
     return 1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1))
 
 
-def _compute_pass_at_k(n, c, k, m):
+def _compute_g_pass_at_k(n, c, k, m):
     if m > min(c, k) or k > n or c < 0 or n <= 0 or m < 0:
         return 0.0
     return hypergeom.sf(m - 1, n, c, k)
@@ -24,7 +24,7 @@ def _compute_pass_at_k(n, c, k, m):
 
 def compute_g_pass_at_k(n, c, k, t):
     m = max(int(np.ceil(k * t)), 1)
-    return _compute_pass_at_k(n, c, k, m)
+    return _compute_g_pass_at_k(n, c, k, m)
 
 
 def compute_mg_pass_at_k(n, c, k):
@@ -32,7 +32,7 @@ def compute_mg_pass_at_k(n, c, k):
 
     mg_pass_at_k = 0.0
     for i in range(l + 1, r + 1):
-        mg_pass_at_k += _compute_pass_at_k(n, c, k, i)
+        mg_pass_at_k += _compute_g_pass_at_k(n, c, k, i)
     mg_pass_at_k = 2 * mg_pass_at_k / k
 
     return mg_pass_at_k
