@@ -83,13 +83,13 @@ internlm2_5-7b-chat-turbomind_fullbench:
         BoolQ_accuracy: 68.75
         triviaqa_wiki_1shot_score: 50
         nq_open_1shot_score: 25
-        IFEval_Prompt-level-strict-accuracy: 50
+        IFEval_Prompt-level-strict-accuracy: 56.25
         drop_accuracy: 81.25
         GPQA_diamond_accuracy: 31.25
         hellaswag_accuracy: 81.25
         TheoremQA_score: 6.25
         musr_average_naive_average: 39.58
-        korbench_single_naive_average: 41.25
+        korbench_single_naive_average: 37.50
         gsm8k_accuracy: 68.75
         math_accuracy: 68.75
         cmo_fib_accuracy: 6.25
@@ -99,11 +99,11 @@ internlm2_5-7b-chat-turbomind_fullbench:
         ds1000_naive_average: 16.96
         lcb_code_generation_pass@1: 12.5
         lcb_code_execution_pass@1: 43.75
-        lcb_test_output_pass@1: 12.5
+        lcb_test_output_pass@1: 25.00
         bbh-logical_deduction_seven_objects_score: 50.00
         bbh-multistep_arithmetic_two_score: 68.75
         mmlu-other_naive_average: 69.71
-        cmmlu-china-specific_naive_average: 76.25
+        cmmlu-china-specific_naive_average: 75.83
         mmlu_pro_math_accuracy: 31.25
         ds1000_Pandas_accuracy: 0
         ds1000_Numpy_accuracy: 0
