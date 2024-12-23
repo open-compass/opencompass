@@ -32,12 +32,12 @@ on:
         required: true
         description: 'regression functions'
         type: string
-        default: "['chat_models','base_models', 'chat_obj_fullbench', 'chat_sub_fullbench', 'base_fullbench']"
+        default: "['chat_models','base_models', 'chat_obj_fullbench', 'base_fullbench']"
       regression_func_local:
         required: true
         description: 'regression functions'
         type: string
-        default: "['cmd', 'api']"
+        default: "['cmd', 'api', 'chat_sub_fullbench']"
       fullbench_eval:
         required: true
         description: 'fullbench volc functions'
@@ -185,7 +185,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","chat_sub_fullbench","base_fullbench"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","base_fullbench"]')}}
     runs-on: volc_cu12_daily
     environment: 'prod'
     timeout-minutes: 240 #4hours
@@ -227,7 +227,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_sub_fullbench"]')}}
     runs-on: volc_cu12_local
     environment: 'prod'
     timeout-minutes: 240 #4hours
