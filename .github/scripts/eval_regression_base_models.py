@@ -39,8 +39,6 @@ with read_base():
         models as hf_gemma2_2b_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma2_9b import \
         models as hf_gemma2_9b_model  # noqa: F401, E501
-    from opencompass.configs.models.gemma.hf_gemma2_27b import \
-        models as hf_gemma2_27b_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma_2b import \
         models as hf_gemma_2b_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma_7b import \
