@@ -70,7 +70,7 @@ class LiveMathBenchDataset(BaseDataset):
                         examples.append(example)
             else:
                 hf_dataset = load_dataset(
-                    'jnanliu/LiveMathBench',
+                    'opencompass/LiveMathBench',
                     f'v{version}_{split}_{language}')['test']
                 examples = []
                 for example in hf_dataset:
