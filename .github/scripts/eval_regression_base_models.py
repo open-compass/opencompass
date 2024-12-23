@@ -45,8 +45,6 @@ with read_base():
         models as hf_gemma_7b_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.lmdeploy_gemma_9b import \
         models as lmdeploy_gemma_9b_model  # noqa: F401, E501
-    from opencompass.configs.models.gemma.lmdeploy_gemma_27b import \
-        models as lmdeploy_gemma_27b_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.vllm_gemma_2b import \
         models as vllm_gemma_2b_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.vllm_gemma_7b import \
