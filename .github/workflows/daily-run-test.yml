@@ -43,8 +43,6 @@ on:
         description: 'fullbench volc functions'
         type: string
         default: "['base_long_context','base_objective','chat_long_context','chat_objective','chat_subjective']"
-  schedule:
-    - cron:  '15 14 * * *'
 
 env:
   HF_DATASETS_OFFLINE: 1
