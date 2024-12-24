@@ -3,6 +3,7 @@ from opencompass.summarizers import MultiFacetedSummarizer
 
 with read_base():
     from .groups.mmlu import mmlu_summary_groups
+    from .groups.mmlu_cf import mmlu_cf_summary_groups
     from .groups.cmmlu import cmmlu_summary_groups
     from .groups.ceval import ceval_summary_groups
     from .groups.bbh import bbh_summary_groups
@@ -13,6 +14,7 @@ other_summary_groups = [
         'name': 'average',
         'subsets': [
             ['mmlu', 'naive_average'],
+            ['mmlu_cf', 'naive_average'],
             ['cmmlu', 'naive_average'],
             ['ceval', 'naive_average'],
             ['GaokaoBench', 'weighted_average'],
@@ -36,6 +38,7 @@ other_summary_groups = [
 overall_dataset_abbrs = [
     ['average', 'naive_average'],
     ['mmlu', 'naive_average'],
+    ['mmlu_cf', 'naive_average'],
     ['cmmlu', 'naive_average'],
     ['ceval', 'naive_average'],
     ['GaokaoBench', 'weighted_average'],
@@ -53,6 +56,12 @@ overall_dataset_abbrs = [
     ['GPQA_diamond', 'accuracy'],
     ['IFEval', 'Prompt-level-strict-accuracy'],
 ]
+
+mmlu_cf_summary_groups_dict = {g['name']: g['subsets'] for g in mmlu_cf_summary_groups}
+mmlu_cf_dataset_abbrs = [
+    ['mmlu_cf', 'naive_average'],
+]
+
 
 mmlu_summary_groups_dict = {g['name']: g['subsets'] for g in mmlu_summary_groups}
 mmlu_dataset_abbrs = [

@@ -2,6 +2,7 @@ from mmengine.config import read_base
 
 with read_base():
     from opencompass.configs.datasets.mmlu.mmlu_gen_4d595a import mmlu_datasets
+    from opencompass.configs.datasets.mmlu_cf.mmlu_cf_gen import mmlu_cf_datasets
     from opencompass.configs.datasets.cmmlu.cmmlu_gen_c13365 import cmmlu_datasets
     from opencompass.configs.datasets.ceval.ceval_gen_5f30c7 import ceval_datasets
     from opencompass.configs.datasets.GaokaoBench.GaokaoBench_no_subjective_gen_4c31db import GaokaoBench_datasets
