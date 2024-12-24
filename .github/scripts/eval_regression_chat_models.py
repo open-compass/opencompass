@@ -121,8 +121,6 @@ with read_base():
         models as hf_qwen2_5_3b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.hf_qwen2_5_14b_instruct import \
         models as hf_qwen2_5_14b_instruct_model  # noqa: F401, E501
-    from opencompass.configs.models.qwen2_5.hf_qwen2_5_72b_instruct import \
-        models as hf_qwen2_5_72b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_0_5b_instruct import \
         models as lmdeploy_qwen2_5_0_5b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_3b_instruct import \
