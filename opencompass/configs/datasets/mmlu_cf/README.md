@@ -14,13 +14,7 @@
   <a href="https://github.com/microsoft/MMLU-CF"><b>[🐱 GitHub]</b></a>
 </p>
 
-## 📢 News and Updates
-[2024.12.01] 🔥We have initialized the repository.  
-[2024.12.16] 🔥We have added the evaluation results of Phi-4-14B and Llama-3.3-70B-Instruct.  
-[2024.12.20] 🔥We have released the validation dataset of MMLU-CF.  
-
-
-## 1. The Motivation of MMLU-CF
+## The Motivation of MMLU-CF
 
 <!-- MMLU-CF is a contamination-free and more challenging multiple-choice question benchmark. This dataset contains 10K questions each for the validation set and test set, covering various disciplines. -->
 
@@ -28,12 +22,12 @@
 - (a) An instance of leakage in MMLU. When questions are used as prompt from the MMLU, certain LLMs, due to their memorization capabilities, directly provide **choices identical to the original ones**. (b) When questions are used as prompt from the MMLU-CF, LLMs only provide guessed choices.
 This indicates that the MMLU test set suffers from data contamination and memorization by some LLMs, while the proposed MMLU-CF avoids such leakage.
 <p float="center">
-  <img src="./Figures/Fig_1_a.png" alt="Fig1_a" width="45%" />
-  <img src="./Figures/Fig_1_b.png" alt="Fig1_b" width="45%" />
+  <img src="https://github.com/microsoft/MMLU-CF/blob/main/Figures/Fig_1_a.png" alt="Fig1_a" width="45%" />
+  <img src="https://github.com/microsoft/MMLU-CF/blob/main/Figures/Fig_1_b.png" alt="Fig1_b" width="45%" />
 </p>
 
 
-## 2. How to Evaluate Your Models on the MMLU-CF Validation/Test Set
+## How to Evaluate Your Models on the MMLU-CF Validation/Test Set
 
   #### (1) We perform automated testing only on Huggingface models. After following the steps outlined below and obtaining the validation set results from [OpenCompass](https://github.com/open-compass/opencompass), the test set results can then be accessed via GitHub Issues. 
   
@@ -43,7 +37,11 @@ This indicates that the MMLU test set suffers from data contamination and memori
 data
 └── mmlu_cf 
     ├── dev
+        ├── Biology_dev.csv
+        ├── ...
     └── val
+        ├── Biology_val.csv
+        ├── ...
 ```
   
   **Step 2**. **Test set evaluation**: With the validation results, submit a GitHub issue on the [MMLU-CF](https://github.com/) GitHub homepage to request the test set results. Please follow the format below:
@@ -57,7 +55,7 @@ The result on validation set: 68.5%
 ```
 Example 2,
 <p>
-  <img src="./Figures/Fig_6.png" alt="Fig6" width="80%" style="display: block; margin: 0 auto;" />
+  <img src="https://github.com/microsoft/MMLU-CF/blob/main/Figures/Fig_6.png" alt="Fig6" width="80%" style="display: block; margin: 0 auto;" />
 </p>
 
   **Notably**:
@@ -67,13 +65,11 @@ Example 2,
   #### (2) For API models, if OpenCompass updates the model interface, you can obtain the test set results by sending a temporary key to [Email](yangyu.huang@microsoft.com) after receiving the validation set results.
 
 
-## 3. What is the Difference between MMLU-CF and MMLU
+## What is the Difference between MMLU-CF and MMLU
 MMLU focuses on the breadth and reasoning without considering contamination prevention. We apply three decontamination rules to mitigate unintentional data leakage while collecting data from a broader domain. Meanwhile, our MMLU-CF benchmark maintains the test set closed-source to prevent malicious data leakage.
 
 <p float="left">
-  <img src="./Figures/Fig_4.png" alt="Fig4" width="55%" />
-  <span style="display:inline-block; width: 10%;"></span>
-  <img src="./Figures/Fig_5.png" alt="Fig5" width="30%" />
+  <img src="https://github.com/microsoft/MMLU-CF/blob/main/Figures/Fig_4.png" alt="Fig4" width="55%" />
 </p>
 
 
@@ -589,8 +585,8 @@ MMLU focuses on the breadth and reasoning without considering contamination prev
   </tbody>
 </table>
 
-## 5. Data Construction Pipeline
-![Fig3](./Figures/Fig_3.png)
+## Data Construction Pipeline
+![Fig3](https://github.com/microsoft/MMLU-CF/blob/main/Figures/Fig_3.png)
 The pipeline involves (1) MCQ Collection to gather a diverse set of questions; (2) MCQ Cleaning to ensure quality; (3) Difficulty Sampling to ensure an appropriate difficulty distribution for questions; (4) LLMs checking: The LLMs, including GPT-4o, Gemini, and Claude, are reviewing the accuracy and safety of the data; and (5) Contamination-Free Processing to prevent data leakage and maintain dataset purity. Ultimately, this process results in the MMLU-CF, consisting of 10,000 questions for the closed-source test set and 10,000 for the open-source validation set.
 
 ## 6. Contact
