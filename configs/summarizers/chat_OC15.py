@@ -13,7 +13,7 @@ other_summary_groups = [
     {
         'name': 'average',
         'subsets': [
-            ['mmlu', 'naive_average'],
+            ['mmlu', 'naive_average']
             ['mmlu_cf', 'naive_average'],
             ['cmmlu', 'naive_average'],
             ['ceval', 'naive_average'],
@@ -39,8 +39,8 @@ summarizer = dict(
     dataset_abbrs=[
         ['average', 'naive_average'],
         ['mmlu', 'naive_average'],
-        ['mmlu_cf', 'naive_average'],
         ['cmmlu', 'naive_average'],
+        ['mmlu_cf', 'naive_average'],    
         ['ceval', 'naive_average'],
         ['GaokaoBench', 'weighted_average'],
         ['triviaqa_wiki_1shot', 'score'],
