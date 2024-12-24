@@ -184,13 +184,13 @@ DATASETS_MAPPING = {
     # MMLU_CF
     "opencompass/mmlu_cf": {
         "ms_id": "",
-        "hf_id": "",
+        "hf_id": "microsoft/MMLU-CF",
         "local": "./data/mmlu_cf/",
     },
     # MMLU_PRO
     "opencompass/mmlu_pro": {
         "ms_id": "",
-        "hf_id": "microsoft/MMLU-CF",
+        "hf_id": "",
         "local": "./data/mmlu_pro",
     },
     # NQ
