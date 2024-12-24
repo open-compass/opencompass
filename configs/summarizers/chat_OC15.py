@@ -2,7 +2,6 @@ from mmengine.config import read_base
 
 with read_base():
     from .groups.mmlu import mmlu_summary_groups
-    from .groups.mmlu_cf import mmlu_cf_summary_groups
     from .groups.cmmlu import cmmlu_summary_groups
     from .groups.ceval import ceval_summary_groups
     from .groups.bbh import bbh_summary_groups
@@ -14,7 +13,6 @@ other_summary_groups = [
         'name': 'average',
         'subsets': [
             ['mmlu', 'naive_average'],
-            ['mmlu_cf', 'naive_average'],
             ['cmmlu', 'naive_average'],
             ['ceval', 'naive_average'],
             ['GaokaoBench', 'weighted_average'],
@@ -39,8 +37,7 @@ summarizer = dict(
     dataset_abbrs=[
         ['average', 'naive_average'],
         ['mmlu', 'naive_average'],
-        ['cmmlu', 'naive_average'],
-        ['mmlu_cf', 'naive_average'],    
+        ['cmmlu', 'naive_average'], 
         ['ceval', 'naive_average'],
         ['GaokaoBench', 'weighted_average'],
         ['triviaqa_wiki_1shot', 'score'],

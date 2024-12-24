@@ -13,7 +13,6 @@ with read_base():
     ## Core Set
     # ## Examination
     from opencompass.configs.datasets.mmlu.mmlu_ppl_ac766d import mmlu_datasets
-    from opencompass.configs.datasets.mmlu_cf.mmlu_cf_gen import mmlu_cf_datasets
     from opencompass.configs.datasets.mmlu_pro.mmlu_pro_few_shot_gen_bfaf90 import \
         mmlu_pro_datasets
     from opencompass.configs.datasets.cmmlu.cmmlu_ppl_041cbf import \
@@ -43,7 +42,6 @@ with read_base():
 
     # Summarizer
     from opencompass.configs.summarizers.groups.mmlu import mmlu_summary_groups
-    from opencompass.configs.summarizers.groups.mmlu_cf import mmlu_cf_summary_groups
     from opencompass.configs.summarizers.groups.mmlu_pro import mmlu_pro_summary_groups
     from opencompass.configs.summarizers.groups.cmmlu import cmmlu_summary_groups
     from opencompass.configs.summarizers.groups.bbh import bbh_summary_groups
@@ -77,7 +75,6 @@ core_summary_groups = [
         'subsets': [
             ['mmlu', 'accuracy'],
             ['mmlu_pro', 'accuracy'],
-            ['mmlu_cf', 'accuracy'],
             ['cmmlu', 'accuracy'],
             ['bbh', 'naive_average'],
             ['hellaswag', 'accuracy'],
@@ -98,7 +95,6 @@ summarizer = dict(
     dataset_abbrs=[
         ['mmlu', 'accuracy'],
         ['mmlu_pro', 'accuracy'],
-        ['mmlu_cf', 'accuracy'],
         ['cmmlu', 'accuracy'],
         ['bbh', 'naive_average'],
         ['hellaswag', 'accuracy'],
@@ -135,22 +131,7 @@ summarizer = dict(
         ['mmlu_pro_philosophy', 'accuracy'],
         ['mmlu_pro_computer_science','accuracy'],
         ['mmlu_pro_history', 'accuracy'],
-        '',
-        ['mmlu_cf', 'accuracy'],
-        ['mmlu_cf_math','accuracy'],
-        ['mmlu_cf_physics', 'accuracy'],
-        ['mmlu_cf_chemistry', 'accuracy'],
-        ['mmlu_cf_law', 'accuracy'],
-        ['mmlu_cf_engineering', 'accuracy'],
-        ['mmlu_cf_other', 'accuracy'],
-        ['mmlu_cf_economics', 'accuracy'],
-        ['mmlu_cf_health', 'accuracy'],
-        ['mmlu_cf_psychology', 'accuracy'],
-        ['mmlu_cf_business', 'accuracy'],
-        ['mmlu_cf_biology', 'accuracy'],
-        ['mmlu_cf_philosophy', 'accuracy'],
-        ['mmlu_cf_computer_science','accuracy'],
-        ['mmlu_cf_history', 'accuracy'],
+        
         '',
         ['cmmlu', 'accuracy'],
         ['cmmlu-stem', 'accuracy'],
