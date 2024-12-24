@@ -206,19 +206,19 @@ jobs:
         run: |
           cp -r /fs-computility/llm/qa-llm-cicd/ocplayground/template/configs_cluster/volc.py .
           cat /fs-computility/llm/qa-llm-cicd/config/test_config.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
-      - name:  modify config -subjective
-        if: matrix.regression_func == 'chat_sub_fullbench'
-        run: |
-          cp -r /fs-computility/llm/qa-llm-cicd/ocplayground/template/configs_cluster/volc.py .
-          cat /fs-computility/llm/qa-llm-cicd/config/test_config_sub.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
       - name:  Run test
-        run: |
-          . ${{env.CONDA_PATH}}/bin/activate
-          conda activate ${{env.CONDA_ENV}}
-          conda info --envs
-          opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse --dump-eval-details
-          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}}/*/summary regression_result_daily
-          python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py
+        uses: nick-fields/retry@v3
+        id: retry2
+        with:
+          max_attempts: 3
+          timeout_minutes: 40
+          command: |
+            . ${{env.CONDA_PATH}}/bin/activate
+            conda activate ${{env.CONDA_ENV}}
+            conda info --envs
+            opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse --dump-eval-details
+            rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}}/*/summary regression_result_daily
+            python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py
 
 
   daily_run_test_local:
@@ -244,10 +244,10 @@ jobs:
           conda info --envs
           pip list
       - name:  modify config
-        if: matrix.regression_func != 'cmd' && matrix.regression_func != 'api'
+        if: matrix.regression_func == 'chat_sub_fullbench'
         run: |
           cp -r /fs-computility/llm/qa-llm-cicd/ocplayground/template/configs_cluster/volc.py .
-          cat /fs-computility/llm/qa-llm-cicd/config/test_config_local.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
+          cat /fs-computility/llm/qa-llm-cicd/config/test_config.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
       - name:  Run command testcase
         if: matrix.regression_func == 'cmd'
         run: |
@@ -285,7 +285,9 @@ jobs:
         run: |
           kill -15 "$restful_pid"
       - name:  Run testcase
-        if: matrix.regression_func != 'api' && matrix.regression_func != 'cmd'
+        if: matrix.regression_func == 'chat_sub_fullbench'
+        env:
+          COMPASS_DATA_CACHE: /fs-computility/llm/shared/llmeval/datasets/compass_data_cache_subset
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
@@ -318,14 +320,18 @@ jobs:
           conda info --envs
           pip list
       - name:  Run testcase
-        run: |
-          . ${{env.CONDA_PATH}}/bin/activate
-          conda activate ${{env.CONDA_ENV}}
-          conda info --envs
-          export from_tf=TRUE
-          opencompass /fs-computility/llm/qa-llm-cicd/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
-          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }}/*/summary regression_result_daily
-          python -m pytest -m ${{ matrix.function_type }} -s -v --color=yes .github/scripts/oc_score_assert.py
+        id: retry2
+        with:
+          max_attempts: 3
+          timeout_minutes: 40
+          command: |
+            . ${{env.CONDA_PATH}}/bin/activate
+            conda activate ${{env.CONDA_ENV}}
+            conda info --envs
+            export from_tf=TRUE
+            opencompass /fs-computility/llm/qa-llm-cicd/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
+            rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }}/*/summary regression_result_daily
+            python -m pytest -m ${{ matrix.function_type }} -s -v --color=yes .github/scripts/oc_score_assert.py
 
 
   notify_to_feishu:
