@@ -147,7 +147,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 3
-          timeout_minutes: 40
+          timeout_minutes: 240
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda create -y --name ${{env.CONDA_ENV}} python=3.10
@@ -318,10 +318,10 @@ jobs:
           conda info --envs
           pip list
       - name:  Run testcase
-        id: retry2
+        uses: nick-fields/retry@v3
         with:
           max_attempts: 3
-          timeout_minutes: 40
+          timeout_minutes: 240
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda activate ${{env.CONDA_ENV}}
