@@ -145,7 +145,6 @@ jobs:
           conda info --envs
       - name: Prepare - create conda env and install torch - cu12
         uses: nick-fields/retry@v3
-        id: retry2
         with:
           max_attempts: 3
           timeout_minutes: 40
@@ -208,7 +207,6 @@ jobs:
           cat /fs-computility/llm/qa-llm-cicd/config/test_config.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
       - name:  Run test
         uses: nick-fields/retry@v3
-        id: retry2
         with:
           max_attempts: 3
           timeout_minutes: 40

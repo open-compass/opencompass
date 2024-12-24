@@ -203,9 +203,6 @@ chat:
     nvidia-3_1-Nemotron-70b-instruct-HF-turbomind:
         gsm8k_accuracy: 87.5
         race-high_accuracy: 46.88
-    qwen2.5-72b-instruct-hf:
-        gs8k_accuracy: 78.12
-        race-high_accuracy: 90.62
     qwen2.5-72b-instruct-turbomind:
         gsm8k_accuracy: 75
         race-high_accuracy: 93.75
