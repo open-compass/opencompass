@@ -1,7 +1,4 @@
 chat:
-    baichuan2-7b-chat-hf:
-        gsm8k_accuracy: 18.75
-        race-high_accuracy: 78.12
     glm-4-9b-chat-hf:
         gsm8k_accuracy: 68.75
         race-high_accuracy: 90.62
@@ -104,15 +101,6 @@ chat:
     MiniCPM3-4B-hf:
         gsm8k_accuracy: 68.75
         race-high_accuracy: 84.38
-    minicpm-2b-dpo-fp32-hf:
-        gsm8k_accuracy: 56.25
-        race-high_accuracy: 53.12
-    minicpm-2b-sft-bf16-hf:
-        gsm8k_accuracy: 46.88
-        race-high_accuracy: 65.62
-    minicpm-2b-sft-fp32-hf:
-        gsm8k_accuracy: 46.88
-        race-high_accuracy: 65.62
     phi-3-mini-4k-instruct-hf:
         gsm8k_accuracy: 56.25
         race-high_accuracy: 84.38

@@ -7,8 +7,6 @@ with read_base():
     from opencompass.configs.datasets.race.race_gen import \
         race_datasets  # noqa: F401, E501
     # read hf models - chat models
-    from opencompass.configs.models.baichuan.hf_baichuan2_7b_chat import \
-        models as hf_baichuan2_7b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.chatglm.hf_glm4_9b_chat import \
         models as hf_glm4_9b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.chatglm.lmdeploy_glm4_9b_chat import \
@@ -105,12 +103,6 @@ with read_base():
         models as lmdeploy_nemotron_70b_instruct_hf_model  # noqa: F401, E501
     from opencompass.configs.models.openbmb.hf_minicpm3_4b import \
         models as hf_minicpm3_4b_model  # noqa: F401, E501
-    from opencompass.configs.models.openbmb.hf_minicpm_2b_dpo_fp32 import \
-        models as hf_minicpm_2b_dpo_fp32_model  # noqa: F401, E501
-    from opencompass.configs.models.openbmb.hf_minicpm_2b_sft_bf16 import \
-        models as hf_minicpm_2b_sft_bf16_model  # noqa: F401, E501
-    from opencompass.configs.models.openbmb.hf_minicpm_2b_sft_fp32 import \
-        models as hf_minicpm_2b_sft_fp32_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_3_mini_4k_instruct import \
         models as hf_phi_3_mini_4k_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_3_small_8k_instruct import \
