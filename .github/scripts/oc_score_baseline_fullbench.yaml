@@ -61,7 +61,6 @@ internlm2_5-7b-chat-hf_fullbench:
         compassarena_reason_v2_naive_average: 45.00
         compassarena_math_v2_naive_average: 57.05
         compassarena_creationv2_zh_naive_average: 48.34
-        fofo_test_prompts_overall: 1
         followbench_llmeval_en_HSR_AVG: 1
         followbench_llmeval_en_SSR_AVG: 1
         followbench_llmeval_en_HSR_L1: 1
@@ -139,7 +138,6 @@ internlm2_5-7b-chat-turbomind_fullbench:
         compassarena_reason_v2_naive_average: 30
         compassarena_math_v2_naive_average: 53.03
         compassarena_creationv2_zh_naive_average: 46.22
-        fofo_test_prompts_overall: 1
         followbench_llmeval_en_HSR_AVG: 1
         followbench_llmeval_en_SSR_AVG: 1
         followbench_llmeval_en_HSR_L1: 1
