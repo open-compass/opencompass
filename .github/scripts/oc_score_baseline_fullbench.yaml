@@ -39,7 +39,7 @@ internlm2_5-7b-chat-hf_fullbench:
         college_knowledge_naive_average: 87.5
     subjective:
         alignment_bench_v1_1_总分: 0.66
-        alpaca_eval_total: 20
+        alpaca_eval_total: 0
         arenahard_score: 50
         Followbench_naive_average: 1
         CompassArena_naive_average: 54.48
@@ -136,7 +136,7 @@ internlm2_5-7b-chat-turbomind_fullbench:
         alpaca_eval_helpful_base: 0
         compassarena_language_naive_average: 61.5
         compassarena_knowledge_naive_average: 56.5
-        compassarena_reason_v2_naive_average: 47.5
+        compassarena_reason_v2_naive_average: 30
         compassarena_math_v2_naive_average: 53.03
         compassarena_creationv2_zh_naive_average: 46.22
         fofo_test_prompts_overall: 1
