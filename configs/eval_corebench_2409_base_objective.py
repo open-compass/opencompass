@@ -131,7 +131,6 @@ summarizer = dict(
         ['mmlu_pro_philosophy', 'accuracy'],
         ['mmlu_pro_computer_science','accuracy'],
         ['mmlu_pro_history', 'accuracy'],
-        
         '',
         ['cmmlu', 'accuracy'],
         ['cmmlu-stem', 'accuracy'],
