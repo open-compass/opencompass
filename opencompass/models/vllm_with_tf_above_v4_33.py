@@ -108,6 +108,8 @@ class VLLMwithChatTemplate(BaseModel):
         sampling_kwargs.update(self.generation_kwargs)
         sampling_kwargs.update(kwargs)
         sampling_kwargs = SamplingParams(**sampling_kwargs)
+        self.logger.info('Sampling Params of vLLM: ')
+        self.logger.info(sampling_kwargs)
 
         outputs = self.model.generate(messages, sampling_kwargs)
 

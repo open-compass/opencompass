@@ -106,7 +106,7 @@ def _format_with_fast_chat_template(inputs: List[str], name: str='vicuna'):
             elif item['role'] == 'system':
                 continue
             else:
-                raise ValueError(f'Unknown role {item["role"]}')
+                raise ValueError(f"Unknown role {item['role']}")
         template.append_message(template.roles[1], None)
         outputs.append(template.get_prompt())
     return outputs
@@ -474,6 +474,8 @@ class HuggingFacewithChatTemplate(BaseModel):
         if min_out_len is not None:
             generation_kwargs['min_new_tokens'] = min_out_len
         generation_kwargs['pad_token_id'] = self.tokenizer.pad_token_id
+        self.logger.info('Generation Args of Huggingface: ')
+        self.logger.info(generation_kwargs)
 
         # step-2: conduct model forward to generate output
         outputs = self.model.generate(**tokens, **generation_kwargs)
