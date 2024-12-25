@@ -74,25 +74,15 @@ eval = dict(
 
 summary_groups = []
 summary_groups.append({
-    'name':
-    'compassarena_language',
+    'name': 'compassarena_language',
     'subsets': [
         ['compassarena_language', '内容总结'],
-        ['compassarena_language', '情感分析'],
-        ['compassarena_language', 'Information Retrival'],
-        ['compassarena_language', '综合问答'],
-        ['compassarena_language', '中华文化'],
     ],
 })
 summary_groups.append({
-    'name':
-    'compassarena_knowledge',
+    'name': 'compassarena_knowledge',
     'subsets': [
         ['compassarena_knowledge', '生活常识_ZH'],
-        ['compassarena_knowledge', '自然科学工科_ZH'],
-        ['compassarena_knowledge', '人文科学_ZH'],
-        ['compassarena_knowledge', '自然科学理科_ZH'],
-        ['compassarena_knowledge', '社会科学_ZH'],
     ],
 })
 summary_groups.append({
@@ -102,21 +92,15 @@ summary_groups.append({
     ],
 })
 summary_groups.append({
-    'name':
-    'compassarena_math_v2',
+    'name': 'compassarena_math_v2',
     'subsets': [
         ['compassarena_math_v2', '高等数学_ZH'],
-        ['compassarena_math_v2', '初等数学_ZH'],
-        ['compassarena_math_v2', '中等数学_ZH'],
     ],
 })
 summary_groups.append({
-    'name':
-    'compassarena_creationv2_zh',
+    'name': 'compassarena_creationv2_zh',
     'subsets': [
         ['compassarena_creationv2_zh', '内容扩写_ZH'],
-        ['compassarena_creationv2_zh', '内容续写_ZH'],
-        ['compassarena_creationv2_zh', '内容改写_ZH'],
     ],
 })
 summary_groups.append({
