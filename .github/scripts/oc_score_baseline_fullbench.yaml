@@ -55,7 +55,7 @@ internlm2_5-7b-chat-hf_fullbench:
         alignment_bench_v1_1_文本写作: 0
         alignment_bench_v1_1_角色扮演: 0
         alignment_bench_v1_1_综合问答: 0
-        alpaca_eval_helpful_base: 0
+        alpaca_eval_helpful_base: 20
         compassarena_language_naive_average: 62
         compassarena_knowledge_naive_average: 56
         compassarena_reason_v2_naive_average: 45.00
