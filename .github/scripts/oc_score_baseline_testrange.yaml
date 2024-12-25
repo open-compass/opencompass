@@ -206,6 +206,16 @@ base:
         GPQA_diamond_accuracy: 31.25
         race-high_accuracy: 93.75
         winogrande_accuracy: 84.38
+    glm-4-9b-turbomind:
+        gsm8k_accuracy: 62.5
+        GPQA_diamond_accuracy: 28.12
+        race-high_accuracy: 93.75
+        winogrande_accuracy: 84.38
+    deepseek-7b-base-hf:
+        gsm8k_accuracy: 25
+        GPQA_diamond_accuracy: 0
+        race-high_accuracy: 46.88
+        winogrande_accuracy: 71.88
     deepseek-moe-16b-base-hf:
         gsm8k_accuracy: 21.88
         GPQA_diamond_accuracy: 0
@@ -386,6 +396,11 @@ base:
         GPQA_diamond_accuracy: 40.62
         race-high_accuracy: 87.5
         winogrande_accuracy: 59.38
+    yi-1.5-9b-turbomind:
+        gsm8k_accuracy: 78.12
+        GPQA_diamond_accuracy: 40.62
+        race-high_accuracy: 87.5
+        winogrande_accuracy: 71.88
     deepseek-v2-lite-hf:
         gsm8k_accuracy: 31.25
         GPQA_diamond_accuracy: 28.12
@@ -409,5 +424,45 @@ base:
     qwen2.5-14b-hf:
         gsm8k_accuracy: 75
         GPQA_diamond_accuracy: 37.5
+        race-high_accuracy: 93.75
+        winogrande_accuracy: 84.38
+    qwen2.5-32b-hf:
+        gsm8k_accuracy: 87.5
+        GPQA_diamond_accuracy: 31.25
+        race-high_accuracy: 93.75
+        winogrande_accuracy: 78.12
+    qwen2.5-32b-turbomind:
+        gsm8k_accuracy: 84.38
+        GPQA_diamond_accuracy: 28.12
+        race-high_accuracy: 93.75
+        winogrande_accuracy: 81.25
+    deepseek-67b-base-hf:
+        gsm8k_accuracy: 59.38
+        GPQA_diamond_accuracy: 31.25
+        race-high_accuracy: 81.25
+        winogrande_accuracy: 90.62
+    deepseek-67b-base-turbomind:
+        gsm8k_accuracy: 56.25
+        GPQA_diamond_accuracy: 28.12
+        race-high_accuracy: 81.25
+        winogrande_accuracy: 84.38
+    llama-3-70b-turbomind:
+        gsm8k_accuracy: 59.38
+        GPQA_diamond_accuracy: 9.38
+        race-high_accuracy: 93.75
+        winogrande_accuracy: 84.38
+    qwen2.5-72b-turbomind:
+        gsm8k_accuracy: 84.38
+        GPQA_diamond_accuracy: 34.38
+        race-high_accuracy: 93.75
+        winogrande_accuracy: 87.5
+    deepseek-v2-turbomind:
+        gsm8k_accuracy: 62.5
+        GPQA_diamond_accuracy: 3.12
+        race-high_accuracy: 81.25
+        winogrande_accuracy: 68.75
+    llama-3-70b-hf:
+        gsm8k_accuracy: 62.5
+        GPQA_diamond_accuracy: 3.12
         race-high_accuracy: 93.75
         winogrande_accuracy: 84.38

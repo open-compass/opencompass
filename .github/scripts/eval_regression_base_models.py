@@ -19,12 +19,8 @@ with read_base():
         models as hf_deepseek_7b_base_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_67b_base import \
         models as hf_deepseek_67b_base_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_coder_6_7b_instruct import \
-        models as hf_deepseek_coder_6_7b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_moe_16b_base import \
         models as hf_deepseek_moe_16b_base_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_v2 import \
-        models as hf_deepseek_v2_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_v2_lite import \
         models as hf_deepseek_v2_lite_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.lmdeploy_deepseek_7b_base import \
@@ -121,12 +117,8 @@ with read_base():
         models as hf_yi_1_5_6b_model  # noqa: F401, E501
     from opencompass.configs.models.yi.hf_yi_1_5_9b import \
         models as hf_yi_1_5_9b_model  # noqa: F401, E501
-    from opencompass.configs.models.yi.hf_yi_34b import \
-        models as hf_yi_34b_model  # noqa: F401, E501
     from opencompass.configs.models.yi.lmdeploy_yi_1_5_9b import \
         models as lmdeploy_yi_1_5_9b_model  # noqa: F401, E501
-    from opencompass.configs.models.yi.lmdeploy_yi_34b_chat import \
-        models as lmdeploy_yi_34b_chat_model  # noqa: F401, E501
 
     from ...volc import infer as volc_infer  # noqa: F401, E501
 
