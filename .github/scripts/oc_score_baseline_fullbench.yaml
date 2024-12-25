@@ -39,10 +39,10 @@ internlm2_5-7b-chat-hf_fullbench:
         college_knowledge_naive_average: 87.5
     subjective:
         alignment_bench_v1_1_总分: 0.66
-        alpaca_eval_total: 0
+        alpaca_eval_total: 20
         arenahard_score: 50
         Followbench_naive_average: 1
-        CompassArena_naive_average: 54.48
+        CompassArena_naive_average: 44.00
         mtbench101_avg: 7.8
         wildbench_average: -12.78
         simpleqa_accuracy_given_attempted: 0
@@ -56,11 +56,11 @@ internlm2_5-7b-chat-hf_fullbench:
         alignment_bench_v1_1_角色扮演: 0
         alignment_bench_v1_1_综合问答: 0
         alpaca_eval_helpful_base: 20
-        compassarena_language_naive_average: 62
-        compassarena_knowledge_naive_average: 56
+        compassarena_language_naive_average: 35
+        compassarena_knowledge_naive_average: 55
         compassarena_reason_v2_naive_average: 45.00
-        compassarena_math_v2_naive_average: 57.05
-        compassarena_creationv2_zh_naive_average: 48.34
+        compassarena_math_v2_naive_average: 55
+        compassarena_creationv2_zh_naive_average: 30
         followbench_llmeval_en_HSR_AVG: 1
         followbench_llmeval_en_SSR_AVG: 1
         followbench_llmeval_en_HSR_L1: 1
@@ -119,7 +119,7 @@ internlm2_5-7b-chat-turbomind_fullbench:
         alpaca_eval_total: 0
         arenahard_score: 50
         Followbench_naive_average: 1
-        CompassArena_naive_average: 52.95
+        CompassArena_naive_average: 38
         mtbench101_avg: 7.80
         wildbench_average: -4.86
         simpleqa_accuracy_given_attempted: 0
@@ -133,11 +133,11 @@ internlm2_5-7b-chat-turbomind_fullbench:
         alignment_bench_v1_1_角色扮演: 0
         alignment_bench_v1_1_综合问答: 0
         alpaca_eval_helpful_base: 0
-        compassarena_language_naive_average: 61.5
-        compassarena_knowledge_naive_average: 56.5
+        compassarena_language_naive_average: 35
+        compassarena_knowledge_naive_average: 50
         compassarena_reason_v2_naive_average: 30
-        compassarena_math_v2_naive_average: 53.03
-        compassarena_creationv2_zh_naive_average: 46.22
+        compassarena_math_v2_naive_average: 50
+        compassarena_creationv2_zh_naive_average: 25
         followbench_llmeval_en_HSR_AVG: 1
         followbench_llmeval_en_SSR_AVG: 1
         followbench_llmeval_en_HSR_L1: 1
