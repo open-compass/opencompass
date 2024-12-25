@@ -37,7 +37,7 @@ summarizer = dict(
     dataset_abbrs=[
         ['average', 'naive_average'],
         ['mmlu', 'naive_average'],
-        ['cmmlu', 'naive_average'], 
+        ['cmmlu', 'naive_average'],
         ['ceval', 'naive_average'],
         ['GaokaoBench', 'weighted_average'],
         ['triviaqa_wiki_1shot', 'score'],
