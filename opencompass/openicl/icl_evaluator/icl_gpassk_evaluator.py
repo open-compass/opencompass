@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from collections import OrderedDict
 from typing import Any, Dict, List, Union
 
 import numpy as np
@@ -40,28 +39,33 @@ def compute_mg_pass_at_k(n, c, k):
 
 @ICL_EVALUATORS.register_module()
 class GPassKEvaluator(BaseEvaluator):
-    """Evaluator for computing G-Pass@k Metric.
+    """Evaluator for computing the G-Pass@k Metric.
 
-    This Evaluator will firstly invoke task-specific `preprocess` on
-    predictions to get a  consistency label for each prediction and
-    the corresponding reference, and then metrics are calculated.
-
-    This evaluator require the test dataset contains following keys:
-        - subdivision: the name of subdivision or dataset split,
-        - idx: the idx of each example.
+    This evaluator performs the following steps:
+    1. Invokes task-specific `preprocess` on predictions to
+    assign a consistency label to each prediction and its
+    corresponding reference.
+    2. Calculates metrics for each input example based on
+    these labels.
+    3. Aggregates the overall metrics through a task-specific
+    `postprocess`.
 
     Args:
+        k (int or list of int): Number of predictions to be
+        considered in G-Pass@k. It can be a single integer
+        (e.g., `k=16` computes G-Pass@16) or a list of
+        integers (e.g., `[4, 8, 16]` computes G-Pass@4,
+        G-Pass@8, and G-Pass@16).
 
-        k: core parameter for G-Pass@k, can be single integer or a
-        list of integer, for example, k=16 will compute G-Pass@16,
-        and [4, 8, 16] will compute G-Pass@{4,8,16}.
+        replication (int): Controls the number of generations
+        used to estimate G-Pass@k. The total number of
+        generations is determined by multiplying the
+        maximum of `k` with `replication`. This parameter
+        should be a single integer.
 
-        replication: parameter to control the number of generations
-        for estimating G-Pass@k, shoulde be a single integer. The
-        total number of generations will be set to `k` * `replication`.
-
-        thresholds: a list of float to controld the threshold in
-        G-Pass@k.
+        thresholds (list of float): A list of floating-point
+        numbers that define the thresholds for the G-Pass@k
+        metric.
     """
 
     def __init__(
@@ -85,8 +89,7 @@ class GPassKEvaluator(BaseEvaluator):
         return self._out_dir
 
     @abstractmethod
-    def preprocess(self, predictions, references, origin_prompt,
-                   test_set) -> None:
+    def preprocess(self, predictions, references, test_set) -> None:
         """Perform operations on predictions before computing metrics, for
         example, do answer_extraction and model_judge in mathematical reasoning
         task.
@@ -96,56 +99,49 @@ class GPassKEvaluator(BaseEvaluator):
             prediction is consistency with reference at each position.
         """
 
-    def score(self, predictions, references, origin_prompt,
-              test_set) -> Dict[str, Any]:
+    @abstractmethod
+    def group(self, predictions, labels, test_set) -> Dict[str, Any]:
+        """Group the predictions and references.
+
+        Return:
+            A dict contains the grouped predictions and references.
+        """
+
+    @abstractmethod
+    def reduce(self, details) -> Dict[str, Any]:
+        """Aggregate the overall metrics.
+
+        Return:
+            A dict contains overall metrics, like:
+            {'details': details for each example, 'G-Pass@16': xxx}
+        """
+
+    def score(self, predictions, references, test_set) -> Dict[str, Any]:
         """Compute G-Pass@k metrics.
 
         Return:
-            A dict contains overall metrics, metrics for each subdivision
-            in test set, and details for each example in test set.
-            like
+            A dict contains  metrics for each dataset sample and
+            overall metrics reduced by `self.reduce`, like:
             {'details': details for each example, 'G-Pass@16': xxx}
         """
-        labels = self.preprocess(predictions, references, origin_prompt,
-                                 test_set)
-
-        example2replications = {}
-        for example, label, prediction in zip(test_set, labels, predictions):
-            example_abbr = f"{example['subdivision']}_{example['idx']}"
-            if example_abbr not in example2replications:
-                example2replications[example_abbr] = []
-            example.update({'prediction': prediction, 'label': label})
-            example2replications[example_abbr].append(example)
-        for _, replications in example2replications.items():
-            assert len(replications) == self.n, print(len(replications),
-                                                      self.n)
+        labels = self.preprocess(predictions, references, test_set)
+        grouped_examples = self.group(predictions, labels, test_set)
 
         details = []
-        all_dataset = set()
         total_pass_num, count = 0, 0
-        for example_abbr, examples in example2replications.items():
+        for example_abbr, examples in grouped_examples.items():
             detail = {
-                'question':
-                examples[0]['question'],
-                'answer':
-                examples[0]['answer'],
-                'question_type':
-                examples[0]['question_type'],
-                'options':
-                examples[0]['options'],
-                'subdivision':
-                examples[0]['subdivision'],
-                'idx':
-                examples[0]['idx'],
-                'prompt':
-                examples[0]['prompt'],
+                k: v
+                for k, v in examples[0].items()
+                if k not in ['prediction', 'label']
+            }
+            detail.update({
                 'predictions': [{
                     'prediction': example['prediction'],
                     'label': example['label']
                 } for example in examples],
-            }
+            })
 
-            all_dataset.add(examples[0]['subdivision'])
             current_example_labels = [e['label'] for e in examples]
             c = int(np.sum(current_example_labels))
 
@@ -161,30 +157,4 @@ class GPassKEvaluator(BaseEvaluator):
 
             details.append(detail)
 
-        g_passk_details = OrderedDict()
-        g_passk_details['details'] = details
-
-        for k in self.k:
-            for subdivision in sorted(list(all_dataset)):
-                for threshold in self.thresholds:
-                    g_passk_details[
-                        f'{subdivision}/G-Pass@{k}_{threshold}'] = \
-                            100. * np.mean(
-                            [
-                                detail[f'G-Pass@{k}_{threshold}']
-                                for detail in details
-                                if detail['subdivision'] == subdivision
-                            ])
-                g_passk_details[f'{subdivision}/mG-Pass@{k}'] = 100. * np.mean(
-                    [
-                        detail[f'mG-Pass@{k}'] for detail in details
-                        if detail['subdivision'] == subdivision
-                    ])
-
-            for threshold in self.thresholds:
-                g_passk_details[f'G-Pass@{k}_{threshold}'] = 100. * np.mean(
-                    [detail[f'G-Pass@{k}_{threshold}'] for detail in details])
-            g_passk_details[f'mG-Pass@{k}'] = 100. * np.mean(
-                [detail[f'mG-Pass@{k}'] for detail in details])
-
-        return g_passk_details
+        return self.reduce(details)

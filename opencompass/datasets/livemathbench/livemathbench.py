@@ -1,4 +1,6 @@
 import os
+import warnings
+from collections import OrderedDict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from functools import partial
@@ -7,9 +9,10 @@ from typing import Any, Callable, Dict, List, Union
 
 import jsonlines
 import mmengine
+import numpy as np
 from datasets import Dataset, load_dataset
 
-from opencompass.datasets.math import math_postprocess_v2
+from opencompass.datasets.math import MATHAgentEvaluator, math_postprocess_v2
 from opencompass.models import OpenAISDK
 from opencompass.openicl.icl_evaluator import GPassKEvaluator
 from opencompass.openicl.icl_inferencer.icl_base_inferencer import \
@@ -130,7 +133,12 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
             url = [url]
 
         if model_name == '' or len(url) == 0:
-            raise ValueError('model_name and url should not be empty')
+            warnings.warn('Unable to leverage LLM-as-judge abd backup to '
+                          'rule-based judge due to incomplete parameters, '
+                          'this may cause performance degradation, check '
+                          '`model_name` or `url` of evaluator if you do '
+                          'not want to do this.')
+            self.judge_models = []
         else:
             self.judge_models = [
                 MODELS.build(
@@ -272,23 +280,81 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
         predictions = self.extract(questions, predictions, question_types,
                                    languages)
 
-        inputs = []
-        for prediction, reference, question, language in zip(
-                predictions, references, questions, languages):
-            prompt = JUDGE_PROMPT_EN if language == 'en' else JUDGE_PROMPT_CN
-            inputs.append(
-                prompt.format(answer=prediction,
-                              gold_answer=reference,
-                              question=question))
+        if len(self.judge_models) > 0:
+            inputs = []
+            for prediction, reference, question, language in zip(
+                    predictions, references, questions, languages):
+                prompt = (JUDGE_PROMPT_EN
+                          if language == 'en' else JUDGE_PROMPT_CN)
+                inputs.append(
+                    prompt.format(answer=prediction,
+                                  gold_answer=reference,
+                                  question=question))
 
-        labels = self.batch_infer(
-            self.judge_models, inputs, completed_indexes,
-            self.judge_output_handler, lambda x:
-            (1 if extract_judge_label(x) == 'yes' else 0))
+            labels = self.batch_infer(
+                self.judge_models, inputs, completed_indexes,
+                self.judge_output_handler, lambda x:
+                (1 if extract_judge_label(x) == 'yes' else 0))
+        else:
+            is_equiv = MATHAgentEvaluator(version='v2').is_equiv
+            labels = [
+                1 if is_equiv(prediction, reference) else 0
+                for prediction, reference in zip(predictions, references)
+            ]
         return labels
 
-    def preprocess(self, predictions, references, origin_prompt, test_set):
+    def preprocess(self, predictions, references, test_set):
         return self.judge(predictions, references, test_set)
+
+    def group(self, predictions, labels, test_set):
+        example2replications = {}
+        for example, label, prediction in zip(test_set, labels, predictions):
+            example_abbr = f"{example['subdivision']}_{example['idx']}"
+            if example_abbr not in example2replications:
+                example2replications[example_abbr] = []
+            example.update({'prediction': prediction, 'label': label})
+            example2replications[example_abbr].append(example)
+        for _, replications in example2replications.items():
+            assert len(replications) == self.n, print(len(replications),
+                                                      self.n)
+        return example2replications
+
+    def reduce(self, details) -> Dict[str, Any]:
+        """Aggregate the overall metrics.
+
+        Return:
+            A dict contains overall metrics, like:
+            {'details': details for each example, 'G-Pass@16': xxx}
+        """
+        g_passk_details = OrderedDict()
+        g_passk_details['details'] = details
+
+        all_dataset = set([detail['subdivision'] for detail in details])
+
+        for k in self.k:
+            for subdivision in sorted(list(all_dataset)):
+                for threshold in self.thresholds:
+                    g_passk_details[
+                        f'{subdivision}/G-Pass@{k}_{threshold}'] = \
+                            100. * np.mean(
+                            [
+                                detail[f'G-Pass@{k}_{threshold}']
+                                for detail in details
+                                if detail['subdivision'] == subdivision
+                            ])
+                g_passk_details[f'{subdivision}/mG-Pass@{k}'] = 100. * np.mean(
+                    [
+                        detail[f'mG-Pass@{k}'] for detail in details
+                        if detail['subdivision'] == subdivision
+                    ])
+
+            for threshold in self.thresholds:
+                g_passk_details[f'G-Pass@{k}_{threshold}'] = 100. * np.mean(
+                    [detail[f'G-Pass@{k}_{threshold}'] for detail in details])
+            g_passk_details[f'mG-Pass@{k}'] = 100. * np.mean(
+                [detail[f'mG-Pass@{k}'] for detail in details])
+
+        return g_passk_details
 
 
 class LiveMathBenchOutputHandler:
