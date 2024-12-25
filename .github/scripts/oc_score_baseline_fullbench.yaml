@@ -39,15 +39,15 @@ internlm2_5-7b-chat-hf_fullbench:
         college_knowledge_naive_average: 87.5
     subjective:
         alignment_bench_v1_1_总分: 0.66
-        alpaca_eval_total: 0
+        alpaca_eval_total: 20
         arenahard_score: 50
         Followbench_naive_average: 1
         CompassArena_naive_average: 54.48
-        mtbench101_avg: 8.1
-        wildbench_average: -9.86
+        mtbench101_avg: 7.8
+        wildbench_average: -12.78
         simpleqa_accuracy_given_attempted: 0
         chinese_simpleqa_given_attempted_accuracy: 1
-        alignment_bench_v1_1_专业能力: 8
+        alignment_bench_v1_1_专业能力: 7.90
         alignment_bench_v1_1_数学计算: 0
         alignment_bench_v1_1_基本任务: 0
         alignment_bench_v1_1_逻辑推理: 0
@@ -58,7 +58,7 @@ internlm2_5-7b-chat-hf_fullbench:
         alpaca_eval_helpful_base: 0
         compassarena_language_naive_average: 62
         compassarena_knowledge_naive_average: 56
-        compassarena_reason_v2_naive_average: 49
+        compassarena_reason_v2_naive_average: 45.00
         compassarena_math_v2_naive_average: 57.05
         compassarena_creationv2_zh_naive_average: 48.34
         fofo_test_prompts_overall: 1
@@ -116,16 +116,16 @@ internlm2_5-7b-chat-turbomind_fullbench:
         college_naive_average: 12.50
         college_knowledge_naive_average: 87.5
     subjective:
-        alignment_bench_v1_1_总分: 0.68
-        alpaca_eval_total: 10
+        alignment_bench_v1_1_总分: 0.70
+        alpaca_eval_total: 0
         arenahard_score: 50
         Followbench_naive_average: 1
         CompassArena_naive_average: 52.95
-        mtbench101_avg: 8.1
-        wildbench_average: -4.44
+        mtbench101_avg: 7.80
+        wildbench_average: -4.86
         simpleqa_accuracy_given_attempted: 0
         chinese_simpleqa_given_attempted_accuracy: 1
-        alignment_bench_v1_1_专业能力: 8.2
+        alignment_bench_v1_1_专业能力: 8.4
         alignment_bench_v1_1_数学计算: 0
         alignment_bench_v1_1_基本任务: 0
         alignment_bench_v1_1_逻辑推理: 0
@@ -133,7 +133,7 @@ internlm2_5-7b-chat-turbomind_fullbench:
         alignment_bench_v1_1_文本写作: 0
         alignment_bench_v1_1_角色扮演: 0
         alignment_bench_v1_1_综合问答: 0
-        alpaca_eval_helpful_base: 10
+        alpaca_eval_helpful_base: 0
         compassarena_language_naive_average: 61.5
         compassarena_knowledge_naive_average: 56.5
         compassarena_reason_v2_naive_average: 47.5
