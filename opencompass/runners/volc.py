@@ -236,7 +236,8 @@ class VOLCRunner(BaseRunner):
                     task_status = match.group()
                     if task_status in [
                             'Success', 'Failed', 'Cancelled', 'Exception',
-                            'Killing', 'SuccessHolding', 'FailedHolding'
+                            'Killing', 'SuccessHolding', 'FailedHolding',
+                            'Killed'
                     ]:
                         break
                 # If pattern not found or command failed, sleep and retry
