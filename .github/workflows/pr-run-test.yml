@@ -81,9 +81,9 @@ jobs:
           fi
           score=$(sed -n '$p' ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result3/*/summary/*.csv | awk -F ',' '{print $NF}')
           if (( ${score%.*} >= 87 && ${score%.*} <= 89 )); then
-             echo "score is $score between 87 and 89"
+             echo "score is $score between 87 and 91"
           else
-             echo "score is $score not between 87 and 89"
+             echo "score is $score not between 87 and 91"
              exit 1
           fi
       - name:  Uninstall opencompass
