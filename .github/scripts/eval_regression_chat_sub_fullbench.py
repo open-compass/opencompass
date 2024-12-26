@@ -22,8 +22,7 @@ with read_base():
         arenahard_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.compassarena.compassarena_compare_new import \
         compassarena_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.subjective.fofo.fofo_bilingual_judge_new import \
-        fofo_datasets  # noqa: F401, E501
+    # from opencompass.configs.datasets.subjective.fofo.fofo_bilingual_judge_new import fofo_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.followbench.followbench_llmeval_new import \
         followbench_llmeval_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.multiround.mtbench101_judge_new import \
@@ -34,6 +33,8 @@ with read_base():
         models as hf_internlm2_5_7b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import \
         models as lmdeploy_internlm2_5_7b_chat_model  # noqa: F401, E501
+
+    from ...volc import infer as volc_infer  # noqa: F401, E501
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')
                 and 'mtbench101' not in k and 'wildbench' not in k), [])
@@ -73,25 +74,15 @@ eval = dict(
 
 summary_groups = []
 summary_groups.append({
-    'name':
-    'compassarena_language',
+    'name': 'compassarena_language',
     'subsets': [
         ['compassarena_language', '内容总结'],
-        ['compassarena_language', '情感分析'],
-        ['compassarena_language', 'Information Retrival'],
-        ['compassarena_language', '综合问答'],
-        ['compassarena_language', '中华文化'],
     ],
 })
 summary_groups.append({
-    'name':
-    'compassarena_knowledge',
+    'name': 'compassarena_knowledge',
     'subsets': [
         ['compassarena_knowledge', '生活常识_ZH'],
-        ['compassarena_knowledge', '自然科学工科_ZH'],
-        ['compassarena_knowledge', '人文科学_ZH'],
-        ['compassarena_knowledge', '自然科学理科_ZH'],
-        ['compassarena_knowledge', '社会科学_ZH'],
     ],
 })
 summary_groups.append({
@@ -101,21 +92,15 @@ summary_groups.append({
     ],
 })
 summary_groups.append({
-    'name':
-    'compassarena_math_v2',
+    'name': 'compassarena_math_v2',
     'subsets': [
         ['compassarena_math_v2', '高等数学_ZH'],
-        ['compassarena_math_v2', '初等数学_ZH'],
-        ['compassarena_math_v2', '中等数学_ZH'],
     ],
 })
 summary_groups.append({
-    'name':
-    'compassarena_creationv2_zh',
+    'name': 'compassarena_creationv2_zh',
     'subsets': [
         ['compassarena_creationv2_zh', '内容扩写_ZH'],
-        ['compassarena_creationv2_zh', '内容续写_ZH'],
-        ['compassarena_creationv2_zh', '内容改写_ZH'],
     ],
 })
 summary_groups.append({
