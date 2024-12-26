@@ -16,7 +16,7 @@ mmlu_cf_reader_cfg = dict(
 
 mmlu_cf_datasets = []
 for _name in categories:
-    _hint = f'There is a single choice question. Answer the question by replying A, B, C or D.'
+    _hint = f'There is a single choice question (with answers). Answer the question by replying A, B, C or D.'
     mmlu_cf_infer_cfg = dict(
         ice_template=dict(
             type=PromptTemplate,
@@ -42,7 +42,7 @@ for _name in categories:
             ),
             ice_token='</E>',
         ),
-        retriever=dict(type= ZeroRetriever),
+        retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer),
     )
 
