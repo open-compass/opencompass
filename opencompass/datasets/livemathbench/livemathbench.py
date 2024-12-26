@@ -174,7 +174,8 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
         result_indexes = []
 
         def thread_worker(inputs, max_out_len, temperature, indexes, model):
-            return model.generate(inputs, max_out_len, temperature), indexes
+            return model.generate(inputs, max_out_len,
+                                  temperature), inputs, indexes
 
         if len(indexes) > 0:
             with ThreadPoolExecutor(max_workers=len(models)) as pool:
@@ -186,9 +187,10 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
                     for i in range(batch_num)
                 ]
                 for completed_task in as_completed(tasks):
-                    responses, indexes = completed_task.result()
-                    for input, response, index in zip(inputs, responses,
-                                                      indexes):
+                    responses, current_inputs, indexes = completed_task.result(
+                    )
+                    for input, response, index in zip(current_inputs,
+                                                      responses, indexes):
                         output_handler.save(
                             index,
                             prompt=input,
