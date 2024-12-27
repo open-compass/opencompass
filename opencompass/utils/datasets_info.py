@@ -125,6 +125,7 @@ DATASETS_MAPPING = {
     "opencompass/gsm8k": {
         "ms_id": "opencompass/gsm8k",
         "hf_id": "opencompass/gsm8k",
+        "om_id": "OpenCompass/gsm8k",
         "local": "./data/gsm8k/",
     },
     # HellaSwag

@@ -37,6 +37,14 @@ def get_data_path(dataset_id: str, local_mode: bool = False):
         assert ms_id is not None, \
             f'{dataset_id} is not supported in ModelScope'
         return ms_id
+    if dataset_source == 'OpenMind':
+        try:
+            om_id = DATASETS_MAPPING[dataset_id]['om_id']
+        except KeyError as ex:
+            raise KeyError(f"{dataset_id} is not supported in OpenMind.") from ex
+        assert om_id is not None, \
+            f'{dataset_id} is not supported in OpenMind'
+        return om_id
     elif dataset_source == 'HF':
         # TODO: HuggingFace mode is currently not supported!
         hf_id = DATASETS_MAPPING[dataset_id]['hf_id']
