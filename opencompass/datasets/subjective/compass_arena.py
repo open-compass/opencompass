@@ -4,6 +4,8 @@ from collections import defaultdict
 
 from datasets import Dataset
 
+from opencompass.datasets.subjective.compass_arena_subjective_bench import \
+    get_element_counts
 from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
 
 from .subjective_cmp import SubjectiveCmpDataset
@@ -48,7 +50,8 @@ def check_position_bias(judged_answers, references, banned_choice=['C']):
             }
         else:
             first_judge = position_bias_dict[question_hash]['judge']
-            if judge == first_judge and first_judge not in banned_choice and judge not in banned_choice:
+            if (judge == first_judge and first_judge not in banned_choice
+                    and judge not in banned_choice):
                 # If second choice is same with first choice, there has position bias.
                 position_bias_flag += 1
     return position_bias_flag
@@ -63,10 +66,12 @@ def post_process_compassarena(item):
 
 
 @DICT_POSTPROCESSORS.register_module('compassarena')
-def compassarena_postprocess(output: dict,
-                             output_path: str,
-                             summary_type='single',
-                             check_pos_bias=True) -> dict:
+def compassarena_postprocess(
+    output: dict,
+    output_path: str,
+    summary_type='single',
+    check_pos_bias=True,
+) -> dict:
     judged_answers, references = get_judgeanswer_and_reference(
         output, output_path, post_process_compassarena)
 
@@ -115,4 +120,66 @@ def compassarena_postprocess(output: dict,
 
     results = win_model2
     results['details'] = output
+    return results
+
+
+@DICT_POSTPROCESSORS.register_module('compassarena_bradleyterry')
+def compassarena_bradleyterry_postprocess(
+    output: dict,
+    output_path: str,
+    count_ties: bool = True,
+) -> dict:
+    judged_answers, references = get_judgeanswer_and_reference(
+        result=output,
+        filename=output_path,
+        post_process=post_process_compassarena,
+    )
+
+    if 'prediction1' not in references[0]:
+        raise ValueError(
+            'prediction1 not in references. Set `keep_predictions=True` for LMEvaluator in dataset config and retry.'
+        )
+
+    if 'prediction2' not in references[0]:
+        raise ValueError(
+            'prediction2 not in references. Set `keep_predictions=True` for LMEvaluator in dataset config and retry.'
+        )
+
+    results = {}
+    matches = []
+    for judged_answer, reference in zip(judged_answers, references):
+        cur_dict = {}
+
+        if judged_answer.strip() == 'A':
+            cur_dict['winner'] = 'model_a'
+        elif judged_answer.strip() == 'B':
+            cur_dict['winner'] = 'model_b'
+        elif judged_answer.strip() == 'C' and count_ties:
+            cur_dict['winner'] = 'tie'
+        else:
+            continue
+
+        cur_dict['capability'] = reference['capability']
+        cur_dict['model_a'] = reference['answer1']
+        cur_dict['model_b'] = reference['answer2']
+        cur_dict['prediction1'] = reference['prediction1']
+        cur_dict['prediction2'] = reference['prediction2']
+
+        matches.append(cur_dict)
+
+    ### ---------- Add Style Metadata ---------- ###
+    matches = get_element_counts(
+        data=matches,
+        column='prediction1',
+        suffix='_a',
+    )
+    matches = get_element_counts(
+        data=matches,
+        column='prediction2',
+        suffix='_b',
+    )
+
+    results['matches'] = matches
+    # results["details"] = output
+
     return results
