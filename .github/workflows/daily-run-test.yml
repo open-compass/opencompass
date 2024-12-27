@@ -146,7 +146,7 @@ jobs:
       - name: Prepare - create conda env and install torch - cu12
         uses: nick-fields/retry@v3
         with:
-          max_attempts: 3
+          max_attempts: 1
           timeout_minutes: 240
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
@@ -208,8 +208,8 @@ jobs:
       - name:  Run test
         uses: nick-fields/retry@v3
         with:
-          max_attempts: 3
-          timeout_minutes: 40
+          max_attempts: 1
+          timeout_minutes: 120
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda activate ${{env.CONDA_ENV}}
@@ -320,7 +320,7 @@ jobs:
       - name:  Run testcase
         uses: nick-fields/retry@v3
         with:
-          max_attempts: 3
+          max_attempts: 1
           timeout_minutes: 240
           command: |
             . ${{env.CONDA_PATH}}/bin/activate

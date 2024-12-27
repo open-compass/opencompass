@@ -117,8 +117,6 @@ class CompassArenaSummarizer:
                     win_model1 = defaultdict(float)
                     win_model2 = defaultdict(float)
                     categories = defaultdict(float)
-                    model1 = references[0]['answer1']
-                    model2 = references[0]['answer2']
                     for prediction, reference in zip(judged_answers, references):
                         categories[dataset_abbr] += 1
                         categories[reference['capability']] += 1
