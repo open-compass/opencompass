@@ -14,12 +14,12 @@ internlm2-1.8b-hf:
     race-high_accuracy: 66.38
 
 internlm2_5-7b-chat-lmdeploy:
-    demo_gsm8k_accuracy: 84.38
+    demo_gsm8k_accuracy: 89.06
     race-middle_accuracy: 92.76
     race-high_accuracy: 90.54
 
 internlm2-chat-1.8b-lmdeploy:
-    demo_gsm8k_accuracy: 31
+    demo_gsm8k_accuracy: 32
     race-middle_accuracy: 81.34
     race-high_accuracy: 73.96
 
