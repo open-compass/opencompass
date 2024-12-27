@@ -133,8 +133,7 @@ class AlpacaSummarizer:
                         dataset, subdir_path, self.judge_function)
                     win_model1, win_model2, categories = defaultdict(
                         float), defaultdict(float), defaultdict(float)
-                    model1, model2 = references[0]['answer1'], references[0][
-                        'answer2']
+
                     for prediction, reference in zip(judged_answers,
                                                      references):
                         categories['total'] += 1
