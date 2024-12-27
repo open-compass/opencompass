@@ -1,13 +1,13 @@
 name: deploy
 
 on:
-  - push
-  - workflow_dispatch:
-      inputs:
-        confirm_publish:
-          description: 'Type YES to confirm publishing to PyPI'
-          required: true
-          type: string
+  push:
+  workflow_dispatch:
+    inputs:
+      confirm_publish:
+        description: 'Type YES to confirm publishing to PyPI'
+        required: true
+        type: string
 
 jobs:
   build-n-publish:
