@@ -1,33 +1,12 @@
 # MMLU-CF: A Contamination-free Multi-task Language Understanding Benchmark
 
-<div align="center">
-
-![](https://img.shields.io/badge/Task-MMLU_CF-orange)
-![](https://img.shields.io/badge/Data-Released-green)
-![](https://img.shields.io/badge/Code_License-MIT-blue)
-
-</div>
-
 <p align="center">
   <a href="https://arxiv.org/pdf/2412.15194"><b>[📜 Paper]</b></a> •
   <a href="https://huggingface.co/datasets/microsoft/MMLU-CF"><b>[🤗 HF Dataset]</b></a> •
   <a href="https://github.com/microsoft/MMLU-CF"><b>[🐱 GitHub]</b></a>
 </p>
 
-## 1. The Motivation of MMLU-CF
-
-<!-- MMLU-CF is a contamination-free and more challenging multiple-choice question benchmark. This dataset contains 10K questions each for the validation set and test set, covering various disciplines. -->
-
-- The open-source nature of these benchmarks and the broad sources of training data for LLMs have inevitably led to benchmark contamination, resulting in unreliable evaluation results. To alleviate this issue, we propose MMLU-CF.
-- (a) An instance of leakage in MMLU. When questions are used as prompt from the MMLU, certain LLMs, due to their memorization capabilities, directly provide **choices identical to the original ones**. (b) When questions are used as prompt from the MMLU-CF, LLMs only provide guessed choices.
-This indicates that the MMLU test set suffers from data contamination and memorization by some LLMs, while the proposed MMLU-CF avoids such leakage.
-<p float="center">
-  <img src="https://github.com/microsoft/MMLU-CF/blob/main/Figures/Fig_1_a.png" alt="Fig1_a" width="45%" />
-  <img src="https://github.com/microsoft/MMLU-CF/blob/main/Figures/Fig_1_b.png" alt="Fig1_b" width="45%" />
-</p>
-
-
-## 2. How to Evaluate Your Models on the MMLU-CF Validation/Test Set
+## How to Evaluate Your Models on the MMLU-CF Validation/Test Set
 
   #### (1) We perform automated testing only on Huggingface models. After following the steps outlined below and obtaining the validation set results from [OpenCompass](https://github.com/open-compass/opencompass), the test set results can then be accessed via GitHub Issues. 
   
@@ -65,7 +44,7 @@ Example 2,
   #### (2) For API models, if OpenCompass updates the model interface, you can obtain the test set results by sending a temporary key to [Email](yangyu.huang@microsoft.com) after receiving the validation set results.
 
 
-## 3. What is the Difference between MMLU-CF and MMLU
+## What is the Difference between MMLU-CF and MMLU
 MMLU focuses on the breadth and reasoning without considering contamination prevention. We apply three decontamination rules to mitigate unintentional data leakage while collecting data from a broader domain. Meanwhile, our MMLU-CF benchmark maintains the test set closed-source to prevent malicious data leakage.
 
 <p float="left">
@@ -73,7 +52,7 @@ MMLU focuses on the breadth and reasoning without considering contamination prev
 </p>
 
 
-## 4. Leaderboard
+## Leaderboard
 <table>
   <thead>
     <tr>
@@ -585,14 +564,10 @@ MMLU focuses on the breadth and reasoning without considering contamination prev
   </tbody>
 </table>
 
-## 5. Data Construction Pipeline
-![Fig3](https://github.com/microsoft/MMLU-CF/blob/main/Figures/Fig_3.png)
-The pipeline involves (1) MCQ Collection to gather a diverse set of questions; (2) MCQ Cleaning to ensure quality; (3) Difficulty Sampling to ensure an appropriate difficulty distribution for questions; (4) LLMs checking: The LLMs, including GPT-4o, Gemini, and Claude, are reviewing the accuracy and safety of the data; and (5) Contamination-Free Processing to prevent data leakage and maintain dataset purity. Ultimately, this process results in the MMLU-CF, consisting of 10,000 questions for the closed-source test set and 10,000 for the open-source validation set.
-
-## 6. Contact
+## Contact
 For any inquiries or concerns, feel free to reach out to us via Email: [Qihao Zhao](qhzhaoo@gmail.com) and [Yangyu Huang](yanghuan@microsoft.com).
 
-## 7. Citation
+## Citation
 ```
 @misc{zhao2024mmlucfcontaminationfreemultitasklanguage,
       title={MMLU-CF: A Contamination-free Multi-task Language Understanding Benchmark}, 
@@ -605,6 +580,6 @@ For any inquiries or concerns, feel free to reach out to us via Email: [Qihao Zh
 }
 ```
 
-## 8. License
+## License
 This repository is licensed under the [MIT](https://github.com/microsoft/PEACE/blob/main/LICENSE) License.
 The validation dataset of MMLU-CF is subject to the [CDLA-2.0](https://cdla.dev/permissive-2-0/) License.
