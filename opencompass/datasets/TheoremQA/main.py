@@ -30,6 +30,13 @@ def TheoremQA_postprocess_v3(text: str) -> str:
     answer = utils.answer_clean(["The answer is:", "The answer is", "the answer is"], text)
     return answer
 
+def TheoremQA_postprocess_v4(text: str) -> str:
+    # First clean the answer text
+    answer = utils.answer_clean(["The answer is:", "The answer is", "the answer is"], text)
+    # Remove LaTeX delimiters \( and \) and strip whitespace
+    answer = answer.strip('\\(').strip('\\)').strip()
+    return answer
+
 
 @ICL_EVALUATORS.register_module()
 class TheoremQAEvaluatorV3(BaseEvaluator):
