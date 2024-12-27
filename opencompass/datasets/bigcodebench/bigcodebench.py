@@ -163,6 +163,8 @@ class BigCodeBenchEvaluator(BaseEvaluator):
                 logger.info('Read timeout error. Retrying in 4s...')
                 time.sleep(4)
 
+        if 'pass@1' in pass_at_k.keys():
+            pass_at_k['pass@1'] *= 100
         dump_results = {'details': results}
         dump_results.update(pass_at_k)
 

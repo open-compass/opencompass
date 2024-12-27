@@ -207,9 +207,14 @@ class LocalRunner(BaseRunner):
 
         task_name = task.name
 
+        pwd = os.getcwd()
         # Dump task config to file
         mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_{index}_params.py'
+        # Using uuid to avoid filename conflict
+        import uuid
+        uuid_str = str(uuid.uuid4())
+        param_file = f'{pwd}/tmp/{uuid_str}_params.py'
+
         try:
             task.cfg.dump(param_file)
             tmpl = get_command_template(gpu_ids)
@@ -236,5 +241,8 @@ class LocalRunner(BaseRunner):
                 logger.error(f'task {task_name} fail, see\n{out_path}')
         finally:
             # Clean up
-            os.remove(param_file)
+            if not self.keep_tmp_file:
+                os.remove(param_file)
+            else:
+                pass
         return task_name, result.returncode
