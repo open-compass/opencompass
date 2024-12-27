@@ -98,6 +98,7 @@ class GPassKEvaluator(BaseEvaluator):
             labels: A list contains the label which indicates whether
             prediction is consistency with reference at each position.
         """
+        raise NotImplementedError
 
     @abstractmethod
     def group(self, predictions, labels, test_set) -> Dict[str, Any]:
@@ -106,6 +107,7 @@ class GPassKEvaluator(BaseEvaluator):
         Return:
             A dict contains the grouped predictions and references.
         """
+        raise NotImplementedError
 
     @abstractmethod
     def reduce(self, details) -> Dict[str, Any]:
@@ -115,6 +117,7 @@ class GPassKEvaluator(BaseEvaluator):
             A dict contains overall metrics, like:
             {'details': details for each example, 'G-Pass@16': xxx}
         """
+        raise NotImplementedError
 
     def score(self, predictions, references, test_set) -> Dict[str, Any]:
         """Compute G-Pass@k metrics.
