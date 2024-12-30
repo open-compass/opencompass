@@ -39,6 +39,7 @@ class SubjectiveEvalTask(BaseTask):
         judge_cfg = cfg.get('judge_model', None)
         meta_judge_cfg = cfg.get('meta_judge_model', None)
         judge_models = cfg.get('judge_models', None)
+        keep_judger_postfix = cfg.get('keep_judger_postfix', True)
 
         if judge_cfg is None and meta_judge_cfg is None:
             assert judge_cfg is not None, 'Both judge_cfg and meta_judge_cfg are None, but judge_models must be provided.'
@@ -56,6 +57,7 @@ class SubjectiveEvalTask(BaseTask):
         self.judge_models = judge_models
         self.infer_order = cfg.get('infer_order')
         self.given_pred = cfg['datasets'][0][0].get('given_pred', [])
+        self.keep_judger_postfix = keep_judger_postfix
 
     def get_command(self, cfg_path, template):
         """Get the command template for the task.
@@ -99,8 +101,11 @@ class SubjectiveEvalTask(BaseTask):
             'models': self.model_cfgs,
             'datasets': self.dataset_cfgs
         })
-        return self.name_prefix + task_name + \
-            '--judge-by--' + model_abbr_from_cfg(self.judge_cfg)
+        if self.keep_judger_postfix:
+            return self.name_prefix + task_name + \
+                '--judge-by--' + model_abbr_from_cfg(self.judge_cfg)
+        else:
+            return self.name_prefix + task_name
 
     def _load_model_pred(
         self,
