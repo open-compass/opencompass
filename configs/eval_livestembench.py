@@ -10,13 +10,9 @@ with read_base():
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import models as qwen2_5_7b_instruct_lmdeploy_model
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_72b_instruct import models as qwen2_5_72b_instruct_lmdeploy_model
 
-    from .mine.envs.volc import sub_eval
-
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 models = [*qwen2_5_7b_instruct_lmdeploy_model, *qwen2_5_72b_instruct_lmdeploy_model]
-
 summarizer = dict(type=DefaultSubjectiveSummarizer)
-
 
 judge_models = qwen2_5_72b_instruct_lmdeploy_model
 
