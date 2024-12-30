@@ -4,6 +4,7 @@ from .icl_base_evaluator import BaseEvaluator  # noqa
 from .icl_bpc_evaluator import BPCEvaluator  # noqa
 from .icl_circular_evaluator import CircularEvaluator  # noqa
 from .icl_em_evaluator import EMEvaluator  # noqa
+from .icl_gpassk_evaluator import GPassKEvaluator  # noqa
 from .icl_hf_evaluator import *  # noqa
 from .icl_jieba_rouge_evaluator import JiebaRougeEvaluator  # noqa
 from .icl_misc_evaluator import AverageInferencePPLEvaluator  # noqa

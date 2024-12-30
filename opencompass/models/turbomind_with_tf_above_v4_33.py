@@ -128,10 +128,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
             gen_config['max_new_tokens'] = max_out_len
         if min_out_len is not None:
             gen_config['min_new_tokens'] = min_out_len
-        if do_sample or ('do_sample' in self.gen_config and self.gen_config['do_sample']):
-            gen_config['top_k'] = 40
-            gen_config['temperature'] = temperature
-        else:
+        if not(do_sample or ('do_sample' in self.gen_config and self.gen_config['do_sample'])):
             if self.version_info >= (0, 6, 0):
                 gen_config['do_sample'] = False
             else:
@@ -140,6 +137,8 @@ class TurboMindModelwithChatTemplate(BaseModel):
         from lmdeploy import GenerationConfig
         gen_config = {k: v for k, v in gen_config.items() if hasattr(GenerationConfig, k)}
         gen_config = GenerationConfig(**gen_config)
+        self.logger.info('Generation Config of LMdeploy: ')
+        self.logger.info(gen_config)
 
         results = []
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
