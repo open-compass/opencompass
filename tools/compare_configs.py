@@ -58,7 +58,7 @@ def compare_folders(folder1, folder2, extensions, ignore_folder):
             raise ValueError(f'Files differ: {file1} and {file2}')
         else:
             pass
-            # logger.info(f"Files are the same: {file1} and {file2}")
+            logger.info(f"Files are the same: {file1} and {file2}")
 
 
 def main():
