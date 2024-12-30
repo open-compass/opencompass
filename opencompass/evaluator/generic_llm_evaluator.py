@@ -54,6 +54,8 @@ class GenericLLMEvaluator(BaseEvaluator):
         out_dir, out_name = osp.split(output_path)
         out_name = f'{out_name}.json'
 
+        self.logger.info(
+            f'Set self.output_path to {self.output_path} for current task')
         assert self.output_path is not None, 'output_path is None'
 
         # Build LLM Inference
