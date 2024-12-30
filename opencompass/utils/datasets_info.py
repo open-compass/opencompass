@@ -392,8 +392,8 @@ DATASETS_MAPPING = {
 
 DATASETS_URL = {
     "/livestembench": {
-        "url": "http://oss-cn-shanghai.aliyuncs.com/opencompass/datasets/data/livestembench.zip",
-        "md5": "ec1971c040503926701b893a175ec901",
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/livestembench.zip",
+        "md5": "0ff59d031c3dcff56a2e00e8c1489f5d",
     },
     "/musr": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/musr.zip",
