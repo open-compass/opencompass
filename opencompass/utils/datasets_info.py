@@ -383,9 +383,18 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/qabench",
     },
+    "opencompass/livestembench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/livestembench/",
+    },
 }
 
 DATASETS_URL = {
+    "/livestembench": {
+        "url": "http://oss-cn-shanghai.aliyuncs.com/opencompass/datasets/data/livestembench.zip",
+        "md5": "ec1971c040503926701b893a175ec901",
+    },
     "/musr": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/musr.zip",
         "md5": "7447d2a5bec4586035196102135e2af9",
