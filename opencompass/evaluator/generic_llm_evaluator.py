@@ -1,5 +1,4 @@
 import os.path as osp
-import re
 from typing import Dict, List, Optional
 
 import mmengine
@@ -11,16 +10,6 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.registry import DICT_POSTPROCESSORS, ICL_PROMPT_TEMPLATES
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
-
-
-def count_chinese_characters(text):
-    words = re.findall(r'[\u4e00-\u9fff]', text)
-    return len(words)
-
-
-def count_english_words(text):
-    words = re.findall(r'\b[a-zA-Z]+\b', text)
-    return len(words)
 
 
 class GenericLLMEvaluator(BaseEvaluator):
@@ -47,6 +36,7 @@ class GenericLLMEvaluator(BaseEvaluator):
 
         self.logger = get_logger()
         self.judge_cfg = judge_cfg
+        self.output_path = ''
 
         self.prompt_template = ICL_PROMPT_TEMPLATES.build(prompt_template)
 
@@ -63,6 +53,10 @@ class GenericLLMEvaluator(BaseEvaluator):
         self.output_path = f'{output_path}.json'
         out_dir, out_name = osp.split(output_path)
         out_name = f'{out_name}.json'
+
+        self.logger.info(
+            f'Set self.output_path to {self.output_path} for current task')
+        assert self.output_path is not None, 'output_path is None'
 
         # Build LLM Inference
         max_out_len = self.judge_cfg.get('max_out_len', None)
