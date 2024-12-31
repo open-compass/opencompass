@@ -41,8 +41,8 @@ for dataset in datasets:
 # -------------Inferen Stage ----------------------------------------
 
 from opencompass.runners import LocalRunner
-from opencompass.partitioners import NumWorkerPartitioner
-from opencompass.tasks import OpenICLInferTask
+from opencompass.partitioners import NumWorkerPartitioner, NaivePartitioner
+from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
 
 
 infer = dict(
@@ -51,6 +51,15 @@ infer = dict(
         type=LocalRunner,
         max_num_workers=8,
         task=dict(type=OpenICLInferTask)
+    ),
+)
+
+eval = dict(
+    partitioner=dict(type=NaivePartitioner, n=8),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=256,
+        task=dict(type=OpenICLEvalTask),
     ),
 )
 
