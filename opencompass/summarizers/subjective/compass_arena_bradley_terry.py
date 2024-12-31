@@ -757,16 +757,17 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
 
         # if rating_system == "bradleyterry":
         if with_control_vars:
-            bootstrap_df, bootstrap_coef = compute_bootstrap_style_control(
+            elo_rating_final, coef_final = compute_style_control(
                 df=matches_df,
-                num_round=num_bootstrap,
                 baseline_model=base_model,
                 normalize_style_features=self.normalize_style_features,
                 control_variables=groups,
                 odds_ratio=self.odds_ratio,
             )
-            elo_rating_final, coef_final = compute_style_control(
+
+            bootstrap_df, bootstrap_coef = compute_bootstrap_style_control(
                 df=matches_df,
+                num_round=num_bootstrap,
                 baseline_model=base_model,
                 normalize_style_features=self.normalize_style_features,
                 control_variables=groups,
@@ -953,7 +954,9 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
             time_str (str, optional): Timestamp for file suffix. Defaults to
             datetime.now().strftime('%Y%m%d_%H%M%S').
         """
+        all_scores_df_list = []
         all_scores = {}
+        all_scores_ctrl_coefs = {}
         for judge_model in self.judge_models:
             control_coefficients = {}
             leaderboard_tables = {}
@@ -986,7 +989,7 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
                     print('-' * 10 +
                           f"{dataset_abbr + ':' + base_model_abbr}\n" +
                           '-' * 10)
-                    # print(cur_table_df)
+                    print(cur_table_df)
                     print(cur_ctrl_coefs)
 
             leaderboard_tables = self.flip_dict_levels(leaderboard_tables)
@@ -1002,17 +1005,43 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
             )
 
             # Fit another BT model with the first base_model and combining matches from all datasets
-            all_scores_df, all_scores_ctrl_coefs = self._calculate_ratings(
-                matches=all_matches,
-                base_model=list(base_models)[0],
-                groups=self.groups,
-            )
+            cur_judge_all_scores_df, cur_judge_all_scores_ctrl_coefs = (
+                self._calculate_ratings(
+                    matches=all_matches,
+                    base_model=list(base_models)[0],
+                    groups=self.groups,
+                ))
+            cur_judge_all_scores_df['judge'] = judge_abbr
+
+            all_scores_df_list.append(cur_judge_all_scores_df)
 
             all_scores[judge_abbr] = pd.Series(
-                all_scores_df['rating'],
-                index=all_scores_df['model_name'],
+                cur_judge_all_scores_df['rating'],
+                index=cur_judge_all_scores_df['model_name'],
             ).to_dict()
 
+            all_scores_ctrl_coefs[judge_abbr] = cur_judge_all_scores_ctrl_coefs
+
+        all_scores_df = pd.concat(all_scores_df_list)
+
+        output_path_all_scores_df = osp.join(
+            self.work_dir, 'summary', f'summary_{time_str}_all_scores_df.csv')
+        output_path_all_scores = osp.join(
+            self.work_dir, 'summary', f'summary_{time_str}_all_scores.json')
+        output_path_all_scores_ctrl_coefs = osp.join(
+            self.work_dir, 'summary',
+            f'summary_{time_str}_all_scores_ctrl_coefs.json')
+
+        all_scores_df.to_csv(output_path_all_scores_df)
+
+        with open(output_path_all_scores, 'w', encoding='utf-8') as f:
+            json.dump(all_scores, f, ensure_ascii=False, indent=4)
+
+        with open(output_path_all_scores_ctrl_coefs, 'w',
+                  encoding='utf-8') as f:
+            json.dump(all_scores_ctrl_coefs, f, ensure_ascii=False, indent=4)
+
+        print(f'{all_scores_df=}')
         print(f'{all_scores=}')
         print(f'{all_scores_ctrl_coefs=}')
 
