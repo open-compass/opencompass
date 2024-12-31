@@ -125,6 +125,13 @@ for name, subset in livereasonbench_subsets.items():
                     ),
                 ]),
             ),
+            dataset_cfg=dict(
+                type=LiveStemBenchDataset,
+                path='opencompass/livestembench',
+                reader_cfg=livereasonbench_reader_cfg,
+                version=subset,
+            ),
+            judge_cfg=dict(),
             dict_postprocessor=dict(type=livereasonbench_postprocess),
         ),
         pred_role='BOT',
