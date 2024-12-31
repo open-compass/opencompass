@@ -1,5 +1,5 @@
+from opencompass.models import OpenAISDK
 from mmengine.config import read_base
-from opencompass.summarizers import DefaultSubjectiveSummarizer
 
 
 with read_base():
@@ -12,9 +12,30 @@ with read_base():
 
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 models = [*qwen2_5_7b_instruct_lmdeploy_model, *qwen2_5_72b_instruct_lmdeploy_model]
-summarizer = dict(type=DefaultSubjectiveSummarizer)
 
-judge_models = qwen2_5_72b_instruct_lmdeploy_model
+# Judge 模型配置
+api_meta_template = dict(round=[
+    dict(role='HUMAN', api_role='HUMAN'),
+    dict(role='BOT', api_role='BOT', generate=True),
+], )
+
+judge_cfg = dict(
+        abbr='qwen2-5-72b-instruct',
+        type=OpenAISDK,
+        path='YOUR_SERVER_MODEL_NAME', # 你的部署的模型名称
+        key='None',
+        openai_api_base=[
+            'http://localhost:23333/v1', # 你的模型部署的地址
+            ],
+        meta_template=api_meta_template,
+        query_per_second=16,
+        batch_size=16,
+        temperature=0.001,
+        max_completion_tokens=32768,
+)
+
+for dataset in datasets:
+    dataset['eval_cfg']['evaluator']['judge_cfg'] = judge_cfg
 
 
 # -------------Inferen Stage ----------------------------------------
@@ -22,9 +43,6 @@ judge_models = qwen2_5_72b_instruct_lmdeploy_model
 from opencompass.runners import LocalRunner
 from opencompass.partitioners import NumWorkerPartitioner
 from opencompass.tasks import OpenICLInferTask
-from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
-from opencompass.tasks.subjective_eval import SubjectiveEvalTask
-
 
 
 infer = dict(
@@ -35,22 +53,5 @@ infer = dict(
         task=dict(type=OpenICLInferTask)
     ),
 )
-
-sub_eval = dict(
-    partitioner=dict(
-        type=SubjectiveNaivePartitioner,
-        models=[],
-        judge_models=[],
-    ),
-    runner=dict(type=LocalRunner,
-                max_num_workers=64,
-                preemptible=True,
-                retry=0,
-                task=dict(type=SubjectiveEvalTask)),
-)
-
-eval = sub_eval
-eval['partitioner']['models'] = models
-eval['partitioner']['judge_models'] = judge_models
 
 work_dir = './outputs/livestembench'
