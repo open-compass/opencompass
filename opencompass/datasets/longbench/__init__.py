@@ -25,4 +25,4 @@ from .longbench_samsum import *  # noqa: F401, F403
 from .longbench_trec import *  # noqa: F401, F403
 from .longbench_trivia_qa import *  # noqa: F401, F403
 from .longbench_vcsum import *  # noqa: F401, F403
-from .longbenchv2 import * # noqa: F401, F403
+from .longbenchv2 import *  # noqa: F401, F403

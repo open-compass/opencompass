@@ -391,7 +391,7 @@ DATASETS_MAPPING = {
     "opencompass/longbenchv2": {
         "ms_id": "",
         "hf_id": "THUDM/LongBench-v2",
-        "local": "./data/longbenchv2",
+        "local": "./data/longbenchv2/data.json",
     },
 }
 

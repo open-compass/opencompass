@@ -37,6 +37,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         meta_template: Optional[Dict] = None,
         fastchat_template: Optional[str] = None,
         stop_words: List[str] = [],
+        drop_middle: bool = False,
     ):
         self.logger = get_logger()
         self.path = path
@@ -101,6 +102,22 @@ class TurboMindModelwithChatTemplate(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
+
+        if self.drop_middle:
+            inputs_drop_middle = []
+            for input in inputs:
+                input_ids = self.tokenizer([input],
+                                           padding=False,
+                                           truncation=False)['input_ids'][0]
+                if len(input_ids) > self.max_seq_len:
+                    input_ids = input_ids[:self.max_seq_len //
+                                          2] + input_ids[-self.max_seq_len //
+                                                         2:]
+                    input = self.tokenizer.decode(input_ids,
+                                                  skip_special_tokens=True)
+                inputs_drop_middle.append(input)
+            inputs = inputs_drop_middle
+
         assert isinstance(inputs, List), f'List(str) is expected, but got {type(inputs)}'
         messages = _convert_chat_messages(inputs)
         if self.fastchat_template:
@@ -139,6 +156,8 @@ class TurboMindModelwithChatTemplate(BaseModel):
         gen_config = GenerationConfig(**gen_config)
         self.logger.info('Generation Config of LMdeploy: ')
         self.logger.info(gen_config)
+
+
 
         results = []
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
