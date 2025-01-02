@@ -117,8 +117,8 @@ class TurboMindModelwithChatTemplate(BaseModel):
                 if len(input_ids) > effective_max_len:
                     self.logger.info(f'Input length {original_len} exceeds effective sequence length {effective_max_len} (max_seq_len {self.max_seq_len} - max_out_len {max_out_len}), truncating...')
                     input_ids = input_ids[:effective_max_len //
-                                          2 - 1] + input_ids[-effective_max_len //
-                                                         2 + 1:]
+                                          2] + input_ids[-effective_max_len //
+                                                         2:]
                     self.logger.info(f'Input length after truncation: {len(input_ids)}')
                     input = self.tokenizer.decode(input_ids,
                                                   skip_special_tokens=True)
