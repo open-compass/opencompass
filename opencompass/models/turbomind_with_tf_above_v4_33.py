@@ -42,6 +42,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         self.logger = get_logger()
         self.path = path
         self.tokenizer_only = tokenizer_only
+        self.drop_middle = drop_middle
         self.template_parser = _get_meta_template(meta_template)
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
 
@@ -109,10 +110,15 @@ class TurboMindModelwithChatTemplate(BaseModel):
                 input_ids = self.tokenizer([input],
                                            padding=False,
                                            truncation=False)['input_ids'][0]
-                if len(input_ids) > self.max_seq_len:
-                    input_ids = input_ids[:self.max_seq_len //
-                                          2] + input_ids[-self.max_seq_len //
+                original_len = len(input_ids)
+                # Reserve space for max_out_len in max_seq_len
+                effective_max_len = self.max_seq_len - max_out_len
+                if len(input_ids) > effective_max_len:
+                    self.logger.info(f'Input length {original_len} exceeds effective sequence length {effective_max_len} (max_seq_len {self.max_seq_len} - max_out_len {max_out_len}), truncating...')
+                    input_ids = input_ids[:effective_max_len //
+                                          2] + input_ids[-effective_max_len //
                                                          2:]
+                    self.logger.info(f'Input length after truncation: {len(input_ids)}')
                     input = self.tokenizer.decode(input_ids,
                                                   skip_special_tokens=True)
                 inputs_drop_middle.append(input)
