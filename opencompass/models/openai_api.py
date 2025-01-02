@@ -516,10 +516,13 @@ class OpenAISDK(OpenAI):
 
         # support multiple api_base for acceleration
         if isinstance(openai_api_base, List):
-            openai_api_base = random.choice(openai_api_base)
+            self.openai_api_base = random.choice(openai_api_base)
+        else:
+            self.openai_api_base = openai_api_base
 
         if self.proxy_url is None:
-            self.openai_client = OpenAI(base_url=openai_api_base, api_key=key)
+            self.openai_client = OpenAI(base_url=self.openai_api_base,
+                                        api_key=key)
         else:
             proxies = {
                 'http://': self.proxy_url,
@@ -527,7 +530,7 @@ class OpenAISDK(OpenAI):
             }
 
             self.openai_client = OpenAI(
-                base_url=openai_api_base,
+                base_url=self.openai_api_base,
                 api_key=key,
                 http_client=httpx.Client(proxies=proxies))
         if self.verbose:
@@ -617,8 +620,8 @@ class OpenAISDK(OpenAI):
                         'Successfully get response from OpenAI API')
                     try:
                         self.logger.info(responses)
-                    except Exception as e:  # noqa F841
-                        pass
+                    except Exception:
+                        pass  # noqa F841
                 if not responses.choices:
                     self.logger.error(
                         'Response is empty, it is an internal server error \
@@ -635,13 +638,18 @@ class OpenAISDK(OpenAI):
                 if (status_code is not None
                         and status_code in self.status_code_mappings):
                     error_message = self.status_code_mappings[status_code]
+                    self.logger.error(
+                        f'error occurs at {self.openai_api_base}')
                     self.logger.info(f'Status Code: {status_code}, \n'
                                      f'Original Error Message: {e}, \n'
                                      f'Return Message: {error_message} ')
                     return error_message
                 else:
+                    self.logger.error(
+                        f'error occurs at {self.openai_api_base}')
                     self.logger.error(e)
             except Exception as e:
+                self.logger.error(f'error occurs at {self.openai_api_base}')
                 self.logger.error(e)
             num_retries += 1
         raise RuntimeError('Calling OpenAI API failed after retrying for '
