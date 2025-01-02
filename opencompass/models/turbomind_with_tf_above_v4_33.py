@@ -103,10 +103,11 @@ class TurboMindModelwithChatTemplate(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
-
         if self.drop_middle:
             inputs_drop_middle = []
             for input in inputs:
+                if isinstance(input, PromptList):
+                    input = input[0]['prompt']
                 input_ids = self.tokenizer([input],
                                            padding=False,
                                            truncation=False)['input_ids'][0]
@@ -116,8 +117,8 @@ class TurboMindModelwithChatTemplate(BaseModel):
                 if len(input_ids) > effective_max_len:
                     self.logger.info(f'Input length {original_len} exceeds effective sequence length {effective_max_len} (max_seq_len {self.max_seq_len} - max_out_len {max_out_len}), truncating...')
                     input_ids = input_ids[:effective_max_len //
-                                          2] + input_ids[-effective_max_len //
-                                                         2:]
+                                          2 - 1] + input_ids[-effective_max_len //
+                                                         2 + 1:]
                     self.logger.info(f'Input length after truncation: {len(input_ids)}')
                     input = self.tokenizer.decode(input_ids,
                                                   skip_special_tokens=True)
