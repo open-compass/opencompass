@@ -13,7 +13,7 @@ with read_base():
     )
 
     # Datasets
-    from opencompass.configs.datasets.longbenchv2.longbenchv2_gen_75fbba import (
+    from opencompass.configs.datasets.longbenchv2.longbenchv2_gen import (
         LongBenchv2_datasets as LongBenchv2_datasets,
     )
 
@@ -26,6 +26,8 @@ for model in models:
     model['engine_config']['session_len'] = 128 * 1024
     model['engine_config']['tp'] = 2
     model['run_cfg']['num_gpus'] = 2
+    # Drop middle tokens to make input length shorter than session_len, use 128k to keep sync with Longbenchv2 original code
+    # Drop middle now only support LMDeploy models
     model['drop_middle'] = True
 
 
