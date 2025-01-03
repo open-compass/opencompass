@@ -1,6 +1,3 @@
-from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
-from opencompass.tasks import OpenICLInferTask, OpenICLEvalTask
-from opencompass.runners import LocalRunner, VOLCRunner
 from mmengine.config import read_base
 
 with read_base():
@@ -16,7 +13,7 @@ with read_base():
     )
 
     # Datasets
-    from opencompass.configs.datasets.longbench.longbenchv2.longbenchv2_gen import (
+    from opencompass.configs.datasets.longbenchv2.longbenchv2_gen_75fbba import (
         LongBenchv2_datasets as LongBenchv2_datasets,
     )
 
@@ -27,7 +24,6 @@ models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 for model in models:
     model['max_seq_len'] = 128 * 1024
     model['engine_config']['session_len'] = 128 * 1024
-    model['engine_config']['rope_scaling_factor'] = 2.5
     model['engine_config']['tp'] = 2
     model['run_cfg']['num_gpus'] = 2
     model['drop_middle'] = True
