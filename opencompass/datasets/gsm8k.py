@@ -18,9 +18,18 @@ class GSM8KDataset(BaseDataset):
     @staticmethod
     def load(path):
         path = get_data_path(path)
-        if environ.get('DATASET_SOURCE') == 'ModelScope':
+        dataset_source = environ.get('DATASET_SOURCE', None)
+
+        if dataset_source == 'ModelScope':
             from modelscope import MsDataset
             dataset = MsDataset.load(dataset_name=path)
+        elif dataset_source == 'OpenMind':
+            try:
+                from openmind.integrations.datasets import load_dataset
+            except ImportError as ex:
+                raise ImportError('Package `openmind` is required when setting environment variable '
+                                  '`DATASET_SOURCE` to `OpenMind`.') from ex
+            dataset = load_dataset(path)
         else:
             datasets = {}
             for split in ['train', 'test']:
