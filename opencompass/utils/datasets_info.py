@@ -388,9 +388,18 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/livestembench/",
     },
+    "opencompass/longbenchv2": {
+        "ms_id": "",
+        "hf_id": "THUDM/LongBench-v2",
+        "local": "./data/longbenchv2/data.json",
+    },
 }
 
 DATASETS_URL = {
+    "/longbenchv2":{
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/longbenchv2.zip",
+        "md5": "09b7e06e6f98c5cca8ad597b3d7b42f0",
+    },
     "/livestembench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/livestembench.zip",
         "md5": "0ff59d031c3dcff56a2e00e8c1489f5d",
