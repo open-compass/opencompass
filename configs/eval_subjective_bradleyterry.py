@@ -4,6 +4,11 @@ with read_base():
     from opencompass.configs.datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4_bradleyterry import (
         alpacav2_datasets,
     )
+
+    from opencompass.configs.datasets.subjective.arena_hard.arena_hard_compare_bradleyterry import (
+        arenahard_datasets,
+    )
+
     from opencompass.configs.datasets.subjective.compassarena.compassarena_compare_bradleyterry import (
         compassarena_datasets,
     )
@@ -71,6 +76,7 @@ models = [
 
 datasets = [
     *alpacav2_datasets,
+    *arenahard_datasets,
     *compassarena_datasets,
     *wildbench_datasets,
 ]
