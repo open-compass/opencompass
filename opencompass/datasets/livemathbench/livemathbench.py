@@ -64,6 +64,7 @@ class LiveMathBenchDataset(BaseDataset):
 
             if path != '':
                 file_path = os.path.join(path, f'{split}_{language}.jsonl')
+
                 if not os.path.exists(file_path):
                     raise FileNotFoundError(
                         f'File {file_path} does not exist, please check the '
