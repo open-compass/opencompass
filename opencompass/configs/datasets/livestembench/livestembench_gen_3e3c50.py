@@ -2,6 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
+from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import LiveStemBenchDataset, livereasonbench_postprocess
 
 
@@ -108,7 +109,7 @@ for name, subset in livereasonbench_subsets.items():
 
     livereasonbench_eval_cfg = dict(
         evaluator=dict(
-            type=LMEvaluator,
+            type=GenericLLMEvaluator,
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(

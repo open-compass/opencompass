@@ -7,7 +7,8 @@ from mmengine.config import ConfigDict
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.registry import DICT_POSTPROCESSORS, ICL_PROMPT_TEMPLATES
+from opencompass.registry import (DICT_POSTPROCESSORS, ICL_PROMPT_TEMPLATES,
+                                  TEXT_POSTPROCESSORS)
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
 
@@ -82,6 +83,8 @@ class GenericLLMEvaluator(BaseEvaluator):
         self.build_inferencer()
 
         # ---------------- Process Predictions ------------------
+        predictions = self.pred_postprocess(predictions)
+
         # For Single Round Dialogue
         prediction_dict = {}
         prediction_dict['prediction'] = predictions
@@ -119,9 +122,17 @@ class GenericLLMEvaluator(BaseEvaluator):
                                   prompt_template=self.prompt_template)
 
         output = mmengine.load(self.output_path)
-        return self.postprocess(output)
+        return self.output_postprocess(output)
 
-    def postprocess(self, output: Dict) -> Dict:
+    def pred_postprocess(self, predictions: List) -> Dict:
+        if self.pred_postprocessor is None:
+            return predictions
+        else:
+            kwargs = self.pred_postprocessor
+            proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+            return [proc(pred, **kwargs) for pred in predictions]
+
+    def output_postprocess(self, output: Dict) -> Dict:
         """Postprocess output by adding necessary statistics or data into
         it."""
         if self.dict_postprocessor is None:
