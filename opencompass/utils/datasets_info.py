@@ -368,6 +368,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/LiveMathBench/",
     },
+    "opencompass/LiveMathBench": {
+        "ms_id": "",
+        "hf_id": "opencompass/LiveMathBench",
+        "local": "./data/LiveMathBench/",
+    },
     "opencompass/LiveReasonBench": {
         "ms_id": "",
         "hf_id": "",
@@ -634,7 +639,7 @@ DATASETS_URL = {
     },
     "LiveMathBench": {
         'url': "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/LiveMathBench.zip",
-        "md5": "789df4604260d5cf3ba7a891077cf6a0",
+        "md5": "d0781f9185c9bb50e81e6e3ca8c59013",
     },
     "bigcodebench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bigcodebench.zip",

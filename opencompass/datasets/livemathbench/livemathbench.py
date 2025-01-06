@@ -10,8 +10,8 @@ from typing import Any, Callable, Dict, List, Union
 import jsonlines
 import mmengine
 import numpy as np
-from datasets import Dataset, load_dataset
 
+from datasets import Dataset, load_dataset
 from opencompass.datasets.math import MATHAgentEvaluator, math_postprocess_v2
 from opencompass.models import OpenAISDK
 from opencompass.openicl.icl_evaluator import GPassKEvaluator
@@ -47,8 +47,7 @@ class LiveMathBenchDataset(BaseDataset):
 
         if path != '':
             path = get_data_path(path)
-            head, tail = os.path.split(path)
-            path = os.path.join(head, f'{tail}-{version}')
+            path = os.path.join(path, version)
         for split, language in product(dataset_splits, dataset_languages):
             dataset_info[f'{split}_{language}'] = {
                 'single-choice': 0,
@@ -66,7 +65,9 @@ class LiveMathBenchDataset(BaseDataset):
             if path != '':
                 file_path = os.path.join(path, f'{split}_{language}.jsonl')
                 if not os.path.exists(file_path):
-                    continue
+                    raise FileNotFoundError(
+                        f'File {file_path} does not exist, please check the '
+                        f'path and try again.')
                 examples = []
                 with jsonlines.open(file_path, 'r') as file:
                     for example in file:
