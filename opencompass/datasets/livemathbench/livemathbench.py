@@ -10,8 +10,8 @@ from typing import Any, Callable, Dict, List, Union
 import jsonlines
 import mmengine
 import numpy as np
-from datasets import Dataset, load_dataset
 
+from datasets import Dataset, load_dataset
 from opencompass.datasets.math import MATHAgentEvaluator, math_postprocess_v2
 from opencompass.models import OpenAISDK
 from opencompass.openicl.icl_evaluator import GPassKEvaluator
