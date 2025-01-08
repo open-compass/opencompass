@@ -54,7 +54,7 @@ for _name in categories:
         dict(
             abbr=f'mmlu_cf_{_name}',
             type=MMLUCFDataset,
-            path='opencompass/mmlu_cf',
+            path='microsoft/MMLU-CF',
             name=_name,
             reader_cfg=mmlu_cf_reader_cfg,
             infer_cfg=mmlu_cf_infer_cfg,
