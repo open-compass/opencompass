@@ -5,7 +5,6 @@ with read_base():
 
 summarizer = dict(
     dataset_abbrs=[
-        'mmlu_cf',
         'mmlu_cf_Biology',
         'mmlu_cf_Business',
         'mmlu_cf_Chemistry',
@@ -20,6 +19,7 @@ summarizer = dict(
         'mmlu_cf_Physics',
         'mmlu_cf_Psychology',
         'mmlu_cf_Other',
+        'mmlu_cf',
     ],
     summary_groups=sum([v for k, v in locals().items() if k.endswith('_summary_groups')], []),
 )

@@ -92,7 +92,6 @@ def get_config_from_arg(args) -> Config:
     2. args.models and args.datasets
     3. Huggingface parameter groups and args.datasets
     """
-
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
@@ -116,6 +115,7 @@ def get_config_from_arg(args) -> Config:
         raise ValueError('You must specify "--datasets" or "--custom-dataset-path" if you do not specify a config file path.')
     datasets = []
     if args.datasets:
+        
         script_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(script_dir)
         default_configs_dir = os.path.join(parent_dir, 'configs')
@@ -124,7 +124,6 @@ def get_config_from_arg(args) -> Config:
             os.path.join(args.config_dir, 'dataset_collections'),
             os.path.join(default_configs_dir, './datasets'),
             os.path.join(default_configs_dir, './dataset_collections')
-
         ]
         for dataset_arg in args.datasets:
             if '/' in dataset_arg:
@@ -133,7 +132,6 @@ def get_config_from_arg(args) -> Config:
             else:
                 dataset_name = dataset_arg
                 dataset_key_suffix = '_datasets'
-
             for dataset in match_cfg_file(datasets_dir, [dataset_name]):
                 logger.info(f'Loading {dataset[0]}: {dataset[1]}')
                 cfg = Config.fromfile(dataset[1])
@@ -196,6 +194,7 @@ def get_config_from_arg(args) -> Config:
     # set infer accelerator if needed
     if args.accelerator in ['vllm', 'lmdeploy']:
         models = change_accelerator(models, args.accelerator)
+        
     # parse summarizer args
     summarizer_arg = args.summarizer if args.summarizer is not None else 'example'
     script_dir = os.path.dirname(os.path.abspath(__file__))
