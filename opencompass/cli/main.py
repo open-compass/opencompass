@@ -223,6 +223,7 @@ def main():
         args.debug = True
     # initialize logger
     logger = get_logger(log_level='DEBUG' if args.debug else 'INFO')
+
     cfg = get_config_from_arg(args)
     if args.work_dir is not None:
         cfg['work_dir'] = args.work_dir
@@ -252,7 +253,7 @@ def main():
     logger.info(f'Current exp folder: {current_workdir}')
 
     os.makedirs(osp.join(cfg.work_dir, 'configs'), exist_ok=True)
-    
+
     # dump config
     output_config_path = osp.join(cfg.work_dir, 'configs',
                                   f'{cfg_time_str}_{os.getpid()}.py')
