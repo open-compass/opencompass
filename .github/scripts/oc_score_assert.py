@@ -326,7 +326,7 @@ def assert_score(model_type, score, baseline, dataset: str = ''):
                 str(baseline + threshold)
             ]))
             assert False, ' '.join([
-                score, 'is not etween',
+                score, 'is not between',
                 str(baseline - threshold), 'and',
                 str(baseline + threshold)
             ])
