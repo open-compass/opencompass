@@ -338,6 +338,7 @@ jobs:
     needs: [daily_run_test_volc, daily_run_test_local, fullbench_run_test]
     timeout-minutes: 5
     runs-on: self-hosted
+    environment: 'prod'
     steps:
       - name: notify
         run: |
