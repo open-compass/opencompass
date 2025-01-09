@@ -276,7 +276,7 @@ class TestCmdCase:
     def test_cmd_case3(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score, dataset, dataset)
+        assert_score(model, result_score, base_score, dataset)
 
     @pytest.mark.case4
     @pytest.mark.parametrize(
@@ -286,7 +286,7 @@ class TestCmdCase:
     def test_cmd_case4(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score, dataset, dataset)
+        assert_score(model, result_score, base_score, dataset)
 
 
 def assert_score(model_type, score, baseline, dataset: str = ''):
