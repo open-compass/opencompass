@@ -63,7 +63,7 @@ chat:
         gsm8k_accuracy: 84.38
         race-high_accuracy: 90.62
     llama-3_2-3b-instruct-hf:
-        gsm8k_accuracy: 68.75
+        gsm8k_accuracy: 65.62
         race-high_accuracy: 81.25
     llama-3-8b-instruct-hf:
         gsm8k_accuracy: 68.75
@@ -75,7 +75,7 @@ chat:
         gsm8k_accuracy: 78.12
         race-high_accuracy: 90.62
     llama-3_2-3b-instruct-turbomind:
-        gsm8k_accuracy: 71.88
+        gsm8k_accuracy: 62.50
         race-high_accuracy: 81.25
     llama-3-8b-instruct-turbomind:
         gsm8k_accuracy: 71.88
