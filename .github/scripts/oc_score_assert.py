@@ -302,12 +302,12 @@ def assert_score(model_type, score, baseline, dataset: str = ''):
             print(' '.join([score, 'is not equal', str(baseline)]))
             assert False, ' '.join([score, 'is not equal', str(baseline)])
     else:
-        if 'dingo' in dataset or 'GPQA' in dataset or dataset.startswith(
-                'high') or dataset.startswith(
+        if 'dingo' in dataset or dataset.startswith(
+                'GPQA') or dataset.startswith('high') or dataset.startswith(
                     'mmlu_pro_') or dataset.startswith(
                         'alpaca_eval') or dataset.startswith('compassarena_'):
             threshold = 5
-        if 'humanevalx' in dataset:
+        elif dataset.startswith('humanevalx'):
             threshold = 10
         else:
             threshold = 2
