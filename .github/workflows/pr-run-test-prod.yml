@@ -1,16 +1,12 @@
-name: pr_run_test
+name: pr_run_test-prod
 
 on:
   pull_request:
-    paths-ignore:
-      - 'README.md'
-      - 'README_zh-CN.md'
-      - 'docs/**'
-      - 'configs/**'
-      - 'tools/**'
     paths:
-      - '!.github/**'
-
+      - '.github/**'
+  workflow_dispatch:
+  schedule:
+    - cron:  '56 22 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,6 +30,7 @@ env:
 jobs:
   pr_run_test:
     runs-on: volc_cu12_local
+    environment: 'prod'
     timeout-minutes: 30
     steps:
       - name: Checkout repository

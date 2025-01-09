@@ -101,12 +101,8 @@ with read_base():
         models as vllm_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.nvidia.lmdeploy_nemotron_70b_instruct_hf import \
         models as lmdeploy_nemotron_70b_instruct_hf_model  # noqa: F401, E501
-    from opencompass.configs.models.openbmb.hf_minicpm3_4b import \
-        models as hf_minicpm3_4b_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_3_mini_4k_instruct import \
         models as hf_phi_3_mini_4k_instruct_model  # noqa: F401, E501
-    from opencompass.configs.models.phi.hf_phi_3_small_8k_instruct import \
-        models as hf_phi_3_mini_8k_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.hf_qwen2_5_0_5b_instruct import \
         models as hf_qwen2_5_0_5b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.hf_qwen2_5_3b_instruct import \
