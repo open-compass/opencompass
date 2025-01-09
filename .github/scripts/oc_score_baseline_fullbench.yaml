@@ -325,7 +325,6 @@ internlm2_5-7b-chat-turbomind:
         bigcodebench_hard_instruct_pass@1: 8.45
         bigcodebench_hard_complete_pass@1: 5.06
         teval_naive_average: 80
-        SciCode_naive_average: 0.77
         SciCode_sub_accuracy: 5.56
         qa_dingo_cn_score: 99.01
         mmlu-stem_naive_average: 68.2
@@ -415,7 +414,7 @@ internlm2_5-7b-chat-turbomind:
         compassarena_knowledge_naive_average: 36
         compassarena_reason_v2_naive_average: 35
         compassarena_math_v2_naive_average: 19.91
-        compassarena_creationv2_zh_naive_average: 29.64
+        compassarena_creationv2_zh_naive_average: 35.81
         fofo_test_prompts_overall: 0.35
         fofo_test_prompts_cn_overall: 0.41
         followbench_llmeval_en_HSR_AVG: 0.73

@@ -307,7 +307,7 @@ def assert_score(model_type, score, baseline, dataset: str = ''):
                     'mmlu_pro_') or dataset.startswith(
                         'alpaca_eval') or dataset.startswith('compassarena_'):
             threshold = 5
-        elif dataset.startswith('humanevalx'):
+        elif dataset.startswith('humanevalx') or dataset == 'large_threshold':
             threshold = 10
         else:
             threshold = 3
