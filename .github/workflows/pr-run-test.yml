@@ -2,14 +2,13 @@ name: pr_run_test
 
 on:
   pull_request:
-    paths-ignore:
-      - 'README.md'
-      - 'README_zh-CN.md'
-      - 'docs/**'
-      - 'configs/**'
-      - 'tools/**'
     paths:
       - '!.github/**'
+      - '!README.md'
+      - '!README_zh-CN.md'
+      - '!docs/**'
+      - '!configs/**'
+      - '!tools/**'
 
 
 concurrency:
