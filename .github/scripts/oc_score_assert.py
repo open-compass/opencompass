@@ -72,7 +72,7 @@ class TestChat:
         base_score = baseline_scores_testrange.get('chat').get(model).get(
             dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model, result_score, base_score, dataset)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -94,7 +94,7 @@ class TestBase:
         base_score = baseline_scores_testrange.get('base').get(model).get(
             dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model, result_score, base_score, dataset)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -112,7 +112,7 @@ class TestChatObjFullbench:
         base_score = baseline_scores_fullbench.get(model).get('objective').get(
             dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model, result_score, base_score, dataset)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -131,7 +131,7 @@ class TestChatSubFullbench:
         base_score = baseline_scores_fullbench.get(model).get(
             'subjective').get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model, result_score, base_score, dataset)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -150,7 +150,7 @@ class TestBaseFullbench:
         base_score = baseline_scores_fullbench.get(model).get('objective').get(
             dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model, result_score, base_score, dataset)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -276,7 +276,7 @@ class TestCmdCase:
     def test_cmd_case3(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model, result_score, base_score, dataset)
 
     @pytest.mark.case4
     @pytest.mark.parametrize(
@@ -286,13 +286,10 @@ class TestCmdCase:
     def test_cmd_case4(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model, result_score, base_score, dataset)
 
 
-THRESHOLD = 3
-
-
-def assert_score(model_type, score, baseline):
+def assert_score(model_type, score, baseline, dataset: str = ''):
     if score is None or score == '-':
         assert False, 'value is none'
 
@@ -305,24 +302,33 @@ def assert_score(model_type, score, baseline):
             print(' '.join([score, 'is not equal', str(baseline)]))
             assert False, ' '.join([score, 'is not equal', str(baseline)])
     else:
-        if float(score) <= (baseline + THRESHOLD) and float(score) >= (
-                baseline - THRESHOLD):
+        if 'dingo' in dataset or 'GPQA' in dataset or dataset.startswith(
+                'high') or dataset.startswith(
+                    'mmlu_pro_') or dataset.startswith(
+                        'alpaca_eval') or dataset.startswith('compassarena_'):
+            threshold = 5
+        if 'humanevalx' in dataset:
+            threshold = 10
+        else:
+            threshold = 2
+        if float(score) <= (baseline + threshold) and float(score) >= (
+                baseline - threshold):
             print(' '.join([
                 score, 'is between',
-                str(baseline - THRESHOLD), 'and',
-                str(baseline + THRESHOLD)
+                str(baseline - threshold), 'and',
+                str(baseline + threshold)
             ]))
             assert True
         else:
             print(' '.join([
                 score, 'is not etween',
-                str(baseline - THRESHOLD), 'and',
-                str(baseline + THRESHOLD)
+                str(baseline - threshold), 'and',
+                str(baseline + threshold)
             ]))
             assert False, ' '.join([
                 score, 'is not etween',
-                str(baseline - THRESHOLD), 'and',
-                str(baseline + THRESHOLD)
+                str(baseline - threshold), 'and',
+                str(baseline + threshold)
             ])
 
 

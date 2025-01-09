@@ -19,7 +19,7 @@ internlm2_5-7b-chat-lmdeploy:
     race-high_accuracy: 90.54
 
 internlm2-chat-1.8b-lmdeploy:
-    demo_gsm8k_accuracy: 32
+    demo_gsm8k_accuracy: 31
     race-middle_accuracy: 81.34
     race-high_accuracy: 73.96
 

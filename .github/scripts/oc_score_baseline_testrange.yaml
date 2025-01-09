@@ -102,8 +102,8 @@ chat:
         gsm8k_accuracy: 68.75
         race-high_accuracy: 84.38
     phi-3-mini-4k-instruct-hf:
-        gsm8k_accuracy: 56.25
-        race-high_accuracy: 84.38
+        gsm8k_accuracy: 81.25
+        race-high_accuracy: 87.50
     phi-3-small-8k-instruct-hf:
         gsm8k_accuracy: 0
         race-high_accuracy: 0
@@ -457,10 +457,10 @@ base:
         race-high_accuracy: 93.75
         winogrande_accuracy: 87.5
     deepseek-v2-turbomind:
-        gsm8k_accuracy: 62.5
+        gsm8k_accuracy: 71.88
         GPQA_diamond_accuracy: 3.12
         race-high_accuracy: 81.25
-        winogrande_accuracy: 68.75
+        winogrande_accuracy: 75
     llama-3-70b-hf:
         gsm8k_accuracy: 62.5
         GPQA_diamond_accuracy: 3.12

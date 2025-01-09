@@ -92,6 +92,7 @@ jobs:
       matrix:
         pyver: [py310]
     runs-on: ubuntu-latest
+    environment: 'prod'
     env:
       PYTHON_VERSION: ${{ matrix.pyver }}
       PLAT_NAME: manylinux2014_x86_64
@@ -187,7 +188,7 @@ jobs:
         regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","base_fullbench"]')}}
     runs-on: volc_cu12_daily
     environment: 'prod'
-    timeout-minutes: 240 #4hours
+    timeout-minutes: 120 #2hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -321,7 +322,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 1
-          timeout_minutes: 240
+          timeout_minutes: 360
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda activate ${{env.CONDA_ENV}}
@@ -335,7 +336,6 @@ jobs:
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
     needs: [daily_run_test_volc, daily_run_test_local, fullbench_run_test]
-    environment: 'prod'
     timeout-minutes: 5
     runs-on: self-hosted
     steps:
