@@ -2,16 +2,15 @@ name: pr_run_test
 
 on:
   pull_request:
-    paths:
-      - 'opencompass/**'
+    paths-ignore:
+      - 'README.md'
+      - 'README_zh-CN.md'
+      - 'docs/**'
+      - 'configs/**'
       - 'tools/**'
-      - 'requirements/**'
-      - '!.github/**'
-      - '!README.md'
-      - '!README_zh-CN.md'
-      - '!docs/**'
-      - '!configs/**'
-      - '!tools/**'
+  workflow_dispatch:
+  schedule:
+    - cron:  '56 22 * * *'
 
 
 concurrency:
@@ -36,6 +35,7 @@ env:
 jobs:
   pr_run_test:
     runs-on: volc_cu12_local
+    environment: 'prod'
     timeout-minutes: 30
     steps:
       - name: Checkout repository
@@ -99,6 +99,7 @@ jobs:
     needs: [pr_run_test]
     timeout-minutes: 5
     runs-on: self-hosted
+    environment: 'prod'
     steps:
       - name: notify
         run: |
