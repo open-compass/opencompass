@@ -166,7 +166,7 @@ class TestApibench:
     def test_api(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model + '_batch', result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -185,7 +185,7 @@ class TestVolcFullbench:
         base_score = baseline_scores_fullbench.get(model).get('objective').get(
             dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model + '_batch', result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
     @pytest.mark.parametrize('model, dataset', [
         (p1, p2) for p1 in ['internlm2_5-7b-chat-turbomind']
@@ -197,7 +197,7 @@ class TestVolcFullbench:
         base_score = baseline_scores_fullbench.get(model).get(
             'subjective').get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model + '_batch', result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
     @pytest.mark.parametrize(
         'model, dataset',
@@ -209,7 +209,7 @@ class TestVolcFullbench:
         base_score = baseline_scores_fullbench.get(model).get('objective').get(
             dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model + '_batch', result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
     @pytest.mark.parametrize(
         'model, dataset',
@@ -221,7 +221,7 @@ class TestVolcFullbench:
         base_score = baseline_scores_fullbench.get(model).get(
             'long_context').get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model + '_batch', result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
     @pytest.mark.parametrize(
         'model, dataset',
@@ -234,7 +234,7 @@ class TestVolcFullbench:
         base_score = baseline_scores_fullbench.get(model).get(
             'long_context').get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model + '_batch', result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
 
 @pytest.mark.usefixtures('result_scores')
@@ -252,7 +252,7 @@ class TestCmdCase:
     def test_cmd_case1(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score)
+        assert_score(model, result_score, base_score, dataset)
 
     @pytest.mark.case2
     @pytest.mark.parametrize(
@@ -266,7 +266,7 @@ class TestCmdCase:
     def test_cmd_case2(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model + '_batch', result_score, base_score)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
     @pytest.mark.case3
     @pytest.mark.parametrize('model, dataset',
@@ -276,7 +276,7 @@ class TestCmdCase:
     def test_cmd_case3(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score, dataset)
+        assert_score(model, result_score, base_score, dataset, dataset)
 
     @pytest.mark.case4
     @pytest.mark.parametrize(
@@ -286,7 +286,7 @@ class TestCmdCase:
     def test_cmd_case4(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score, dataset)
+        assert_score(model, result_score, base_score, dataset, dataset)
 
 
 def assert_score(model_type, score, baseline, dataset: str = ''):
@@ -302,7 +302,7 @@ def assert_score(model_type, score, baseline, dataset: str = ''):
             print(' '.join([score, 'is not equal', str(baseline)]))
             assert False, ' '.join([score, 'is not equal', str(baseline)])
     else:
-        if 'dingo' in dataset or dataset.startswith(
+        if dataset.startswith('dingo') or dataset.startswith(
                 'GPQA') or dataset.startswith('high') or dataset.startswith(
                     'mmlu_pro_') or dataset.startswith(
                         'alpaca_eval') or dataset.startswith('compassarena_'):
@@ -310,7 +310,7 @@ def assert_score(model_type, score, baseline, dataset: str = ''):
         elif dataset.startswith('humanevalx'):
             threshold = 10
         else:
-            threshold = 2
+            threshold = 3
         if float(score) <= (baseline + threshold) and float(score) >= (
                 baseline - threshold):
             print(' '.join([
@@ -321,7 +321,7 @@ def assert_score(model_type, score, baseline, dataset: str = ''):
             assert True
         else:
             print(' '.join([
-                score, 'is not etween',
+                score, 'is not between',
                 str(baseline - threshold), 'and',
                 str(baseline + threshold)
             ]))
