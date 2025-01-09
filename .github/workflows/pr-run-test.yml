@@ -3,6 +3,9 @@ name: pr_run_test
 on:
   pull_request:
     paths:
+      - 'opencompass/**'
+      - 'tools/**'
+      - 'requirements/**'
       - '!.github/**'
       - '!README.md'
       - '!README_zh-CN.md'
