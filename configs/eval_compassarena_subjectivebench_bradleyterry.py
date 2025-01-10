@@ -121,6 +121,7 @@ eval = dict(
 summarizer = dict(
     type=CompassArenaBradleyTerrySummarizer,
     rating_system='bradleyterry',
+    report_pred_win_rates=True,
     num_bootstrap=100,
     num_cpu=None,
     with_control_vars=True,

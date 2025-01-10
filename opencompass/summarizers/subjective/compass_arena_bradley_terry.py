@@ -6,6 +6,7 @@ import math
 import multiprocessing as mp
 import os
 import os.path as osp
+from collections import defaultdict
 from datetime import datetime
 from functools import partial
 from typing import Any, Dict, List, Optional, Tuple
@@ -607,6 +608,7 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
         summary_groups (List, optional): Passed to DefaultSubjectiveSummarizer. Not used for this class. Defaults to None.
         prompt_db (_type_, optional): Legacy parameter kept for backward compatibility. Defaults to None.
         rating_system (str, optional): Rating system used. Currently only supports "bradleyterry". Defaults to "bradleyterry".
+        report_pred_win_rates (bool, optional): Whether to report the predicted win rates (against the baseline model) instead of the arena ratings. Defaults to True.
         num_bootstrap (int, optional): The number of bootstraps for estimating the confidence intervals. Defaults to 300.
         num_cpu (int, optional): The number of CPUs to use for the BT bootstrapping process. Defaults to None.
         with_control_vars (bool, optional): Whether to include additional covariates (including style features and group variables) when fitting the BT model. Defaults to True.
@@ -622,6 +624,7 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
         summary_groups: List = None,
         prompt_db=None,
         rating_system: str = 'bradleyterry',
+        report_pred_win_rates: bool = True,
         num_bootstrap: int = 300,
         num_cpu: int = None,
         with_control_vars: bool = True,
@@ -634,6 +637,7 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
 
         self.summarizer_cfg = self.cfg['summarizer']
         self.rating_system = 'bradleyterry'  # Only bradleyterry supported
+        self.report_pred_win_rates = report_pred_win_rates
         self.num_bootstrap = num_bootstrap
         self.num_cpu = num_cpu
         self.with_control_vars = with_control_vars
@@ -897,6 +901,7 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
             'ranking',
             'ranking_ub',
             'model_name',
+            'predicted_win_rate',
             'rating',
             'rating_q975',
             'rating_q025',
@@ -942,6 +947,55 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
 
         return flipped_dict
 
+    def predict_win_rate(
+        self,
+        ratings_df: pd.DataFrame,
+        baseline_model: str,
+        base: float = 10.0,
+        scaling_factor: float = 400.0,
+        round_win_rate: int = None,
+    ) -> pd.DataFrame:
+        """Predict win rates between all models using their ELO ratings.
+
+        Args:
+            ratings_df (pd.DataFrame): DataFrame containing model ratings with model names as index
+            baseline_model (str): Name of baseline model to use as reference
+            base (float): Base for the ELO formula (default 10.0)
+            scaling_factor (float): Scaling factor for rating differences (default 400.0)
+
+        Returns:
+            pd.DataFrame: DataFrame with an additional column 'predicted_win_rate' containing
+                the predicted win rate against the baseline model
+        """
+        if baseline_model not in ratings_df.index:
+            raise ValueError(
+                f'Baseline model {baseline_model} not found in ratings')
+
+        # Create a copy of the ratings dataframe to avoid modifying the original
+        result_df = ratings_df.copy()
+
+        # Initialize the predicted_win_rate column with 0.5 for the baseline model
+
+        result_df['predicted_win_rate'] = 0.5
+
+        # Get the baseline model's rating
+        baseline_rating = ratings_df.loc[baseline_model, 'rating']
+
+        # Calculate win probabilities for all models against the baseline
+        for model, row in ratings_df.iterrows():
+            if model != baseline_model:
+                model_rating = row['rating']
+                # ELO win probability formula
+                win_rate = 1 / (1 + base**(
+                    (baseline_rating - model_rating) / scaling_factor))
+                result_df.loc[model, 'predicted_win_rate'] = win_rate
+
+        if round_win_rate is not None:
+            result_df['predicted_win_rate'] = result_df[
+                'predicted_win_rate'].round(round_win_rate)
+
+        return result_df
+
     def summarize(
             self,
             output_path: str = None,
@@ -981,6 +1035,13 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
                         groups=self.groups,
                     )
 
+                    # Calculate predicted win_rate
+                    cur_table_df = self.predict_win_rate(
+                        ratings_df=cur_table_df,
+                        baseline_model=base_model_abbr,
+                        round_win_rate=4,
+                    )
+
                     control_coefficients[dataset_abbr][
                         base_model_abbr] = cur_ctrl_coefs
                     leaderboard_tables[dataset_abbr][
@@ -1011,12 +1072,24 @@ class CompassArenaBradleyTerrySummarizer(DefaultSubjectiveSummarizer):
                     base_model=list(base_models)[0],
                     groups=self.groups,
                 ))
+            # Calculate predicted win_rate
+            cur_judge_all_scores_df = self.predict_win_rate(
+                ratings_df=cur_judge_all_scores_df,
+                baseline_model=list(base_models)[0],
+                round_win_rate=4,
+            )
             cur_judge_all_scores_df['judge'] = judge_abbr
 
             all_scores_df_list.append(cur_judge_all_scores_df)
 
+            # Report predicted win rate or ratings
+            if self.report_pred_win_rates:
+                _scores = cur_judge_all_scores_df['predicted_win_rate']
+            else:
+                _scores = cur_judge_all_scores_df['rating']
+
             all_scores[judge_abbr] = pd.Series(
-                cur_judge_all_scores_df['rating'],
+                _scores,
                 index=cur_judge_all_scores_df['model_name'],
             ).to_dict()
 
