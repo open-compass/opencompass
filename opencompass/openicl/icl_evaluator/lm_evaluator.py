@@ -2,7 +2,7 @@
 import os.path as osp
 import random
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import mmengine
 from datasets import Dataset
@@ -32,6 +32,7 @@ def order_preds_and_record_references(
     infer_order: List,
     seed: int = 666,
     keep_preds: bool = False,
+    base_model_abbrs: List[str] = None,
 ):
     """Order predictions based on args and recording regrading references.
 
@@ -41,6 +42,7 @@ def order_preds_and_record_references(
         infer_order (str, optional): The mode of inference order.
         seed (int, optional): Random seed.
         keep_preds (bool, optional): Whether to save model predictions in references. This will be available as input in postprocessor. Defaults to False.
+        base_model_abbrs (List[str], optional): List of base models passed from dataset cfg.
     """
     random.seed(seed)
     list_of_preds = [[] for _ in range(len(predictions))]
@@ -55,6 +57,12 @@ def order_preds_and_record_references(
 
             if keep_preds:
                 references[i][f'prediction{j+1}'] = preds[j][0]
+
+        if base_model_abbrs is not None:
+            if isinstance(base_model_abbrs, str):
+                base_model_abbrs = [base_model_abbrs]
+
+            references[i]['base_models'] = base_model_abbrs
 
     if infer_order == 'double':
         assert len(predictions) == 2
@@ -77,6 +85,7 @@ def order_preds_and_record_references(
 
             reversed_references.append(reversed_item)
         references += reversed_references
+
     return list_of_preds, references
 
 
@@ -164,11 +173,24 @@ class LMEvaluator:
                     {} for _ in range(len(predictions[0]['model_preds']))
                 ]
 
+            base_model_abbrs = None
+            if self.dataset_cfg is not None:
+                if 'base_models' in self.dataset_cfg:
+                    base_models = self.dataset_cfg['base_models']
+
+                    if isinstance(base_models, Dict):
+                        base_models = [base_models]
+
+                    base_model_abbrs = [
+                        base_mdl['abbr'] for base_mdl in base_models
+                    ]
+
             predictions, references = order_preds_and_record_references(
                 predictions=predictions,
                 references=references,
                 infer_order=infer_order,
                 keep_preds=self.keep_predictions,
+                base_model_abbrs=base_model_abbrs,
             )
 
             # calculate dupicated predictions numbers

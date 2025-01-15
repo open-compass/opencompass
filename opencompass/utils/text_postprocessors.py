@@ -171,6 +171,34 @@ def multiple_select_postprocess(text: str) -> str:
     return ''.join(sorted(ret))
 
 
+@TEXT_POSTPROCESSORS.register_module('specific-xml-tag')
+def xml_tag_postprocessor(text, tag):
+    """Extracts content enclosed within a specified XML-style tag from a
+    string.
+
+    Args:
+        texts: The input string containing XML-style tags.
+        tag: The XML-style tag to extract content from (e.g., "<conclude>").  Must include the angle brackets.
+
+    Returns:
+        The content enclosed within the specified tag, or None if the tag is not found.
+    """
+
+    # Use a regular expression to find the content within the specified tag.  This handles cases where the tag might appear multiple times.
+    matches = re.findall(
+        rf'{tag}(.*?)</{tag[1:-1]}>', text,
+        re.DOTALL)  # re.DOTALL allows . to match newline characters
+
+    if matches:
+        # Only keep the last one
+        output = matches[-1].strip(
+        )  # Extract the content and remove leading/trailing whitespace
+    else:
+        output = 'NO ANSWER FOUND'
+
+    return output
+
+
 def general_eval_wrapper_postprocess(text: str,
                                      postprocess: Optional[Union[
                                          str, Callable]] = None,

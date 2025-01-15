@@ -37,3 +37,6 @@ models = [
         retry=20,
     )
 ]
+
+for d in datasets:
+    d['reader_cfg']['test_range'] = '[0:16]'

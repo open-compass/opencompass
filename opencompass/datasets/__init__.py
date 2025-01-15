@@ -78,8 +78,10 @@ from .leval import *  # noqa: F401, F403
 from .livecodebench import *  # noqa: F401, F403
 from .livemathbench import *  # noqa: F401, F403
 from .livereasonbench import *  # noqa: F401, F403
+from .livestembench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
+from .longbenchv2 import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
@@ -90,6 +92,7 @@ from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
 from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
+from .mmlu_cf import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403

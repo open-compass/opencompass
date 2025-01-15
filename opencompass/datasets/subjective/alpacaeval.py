@@ -5,6 +5,8 @@ from collections import defaultdict
 
 from datasets import Dataset, DatasetDict
 
+from opencompass.datasets.subjective.compass_arena_subjective_bench import \
+    get_element_counts
 from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
 from opencompass.utils import get_data_path
 
@@ -33,7 +35,7 @@ class AlpacaEvalDataset(BaseDataset):
                     'judge': {
                         'capability': capability,
                         'question': question
-                    }
+                    },
                 })
         dataset = Dataset.from_list(raw_data)
         return dataset
@@ -64,33 +66,54 @@ def post_process_alpacav2(completion: str):
 
 
 @DICT_POSTPROCESSORS.register_module('alpacaeval')
-def alpacaeval_postprocess(output: dict, output_path: str) -> dict:
+def alpacaeval_postprocess(
+    output: dict,
+    output_path: str,
+) -> dict:
+
     judged_answers, references = get_judgeanswer_and_reference(
-        output, output_path, post_process_alpacav2)
+        result=output,
+        filename=output_path,
+        post_process=post_process_alpacav2,
+    )
 
     if len(judged_answers) == 0:
         scores = None
 
-    win_model1, win_model2, categories = defaultdict(float), defaultdict(
-        float), defaultdict(float)
-    model1, model2 = references[0]['answer1'], references[0]['answer2']
-    for prediction, reference in zip(judged_answers, references):
+    win_model1, win_model2, categories = (
+        defaultdict(float),
+        defaultdict(float),
+        defaultdict(float),
+    )
+
+    if 'base_models' in references[0]:
+        base_models = references[0]['base_models']
+    else:
+        # TODO: Assuming the first model in the first record to be the base model
+        # Might not necessarily be the case if infer_order=="random"
+        base_models = [references[0]['answer1']]
+
+    if isinstance(base_models, str):
+        base_models = [base_models]
+
+    for judged_answer, reference in zip(judged_answers, references):
         categories['total'] += 1
         categories[reference['capability']] += 1
-        if prediction['rank'] == 1:
-            if reference['answer1'] == model1:
+        if judged_answer['rank'] == 1:
+            if reference['answer1'] in base_models:
                 win_model1[reference['capability']] += 1
                 win_model1['total'] += 1
             else:
                 win_model2[reference['capability']] += 1
                 win_model2['total'] += 1
         else:
-            if reference['answer1'] == model1:
+            if reference['answer1'] in base_models:
                 win_model2[reference['capability']] += 1
                 win_model2['total'] += 1
             else:
                 win_model1[reference['capability']] += 1
                 win_model1['total'] += 1
+
     for capability in categories:
         if capability not in win_model1:
             win_model1[capability] = 0.0
@@ -105,4 +128,79 @@ def alpacaeval_postprocess(output: dict, output_path: str) -> dict:
 
     results = win_model2
     results['details'] = output
+    return results
+
+
+@DICT_POSTPROCESSORS.register_module('alpacaeval_bradleyterry')
+def alpacaeval_bradleyterry_postprocess(
+    output: dict,
+    output_path: str,
+) -> dict:
+    judged_answers, references = get_judgeanswer_and_reference(
+        result=output,
+        filename=output_path,
+        post_process=post_process_alpacav2,
+    )
+
+    if 'prediction1' not in references[0]:
+        raise ValueError(
+            'prediction1 not in references. Set `keep_predictions=True` for LMEvaluator in dataset config and retry.'
+        )
+
+    if 'prediction2' not in references[0]:
+        raise ValueError(
+            'prediction2 not in references. Set `keep_predictions=True` for LMEvaluator in dataset config and retry.'
+        )
+
+    if 'base_models' in references[0]:
+        base_models = references[0]['base_models']
+    else:
+        # TODO: Assuming the first model in the first record to be the base model
+        # Might not necessarily be the case if infer_order=="random"
+        base_models = [references[0]['answer1']]
+
+    if isinstance(base_models, str):
+        base_models = [base_models]
+
+    results = {}
+    matches = []
+    for judged_answer, reference in zip(judged_answers, references):
+        cur_dict = {}
+
+        if judged_answer['rank'] == 1:
+            if reference['answer1'] in base_models:
+                cur_dict['winner'] = 'model_a'
+            else:
+                cur_dict['winner'] = 'model_b'
+        elif judged_answer['rank'] == 2:
+            if reference['answer1'] in base_models:
+                cur_dict['winner'] = 'model_b'
+            else:
+                cur_dict['winner'] = 'model_a'
+        else:
+            cur_dict['winner'] = 'tie'
+
+        cur_dict['capability'] = reference['capability']
+        cur_dict['model_a'] = reference['answer1']
+        cur_dict['model_b'] = reference['answer2']
+        cur_dict['prediction1'] = reference['prediction1']
+        cur_dict['prediction2'] = reference['prediction2']
+
+        matches.append(cur_dict)
+
+    ### ---------- Add Style Metadata ---------- ###
+    matches = get_element_counts(
+        data=matches,
+        column='prediction1',
+        suffix='_a',
+    )
+    matches = get_element_counts(
+        data=matches,
+        column='prediction2',
+        suffix='_b',
+    )
+
+    results['matches'] = matches
+    # results["details"] = output
+
     return results

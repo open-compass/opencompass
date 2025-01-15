@@ -4,6 +4,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 
 from opencompass.datasets.livemathbench import LiveMathBenchDataset, LiveMathBenchEvaluator
 
+
 reader_cfg = dict(
     input_columns=['prompt'], 
     output_column='answer'

@@ -10,6 +10,8 @@ import pandas as pd
 from datasets import Dataset, DatasetDict
 from sklearn.linear_model import LogisticRegression
 
+from opencompass.datasets.subjective.compass_arena_subjective_bench import \
+    get_element_counts
 from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
 from opencompass.utils import get_data_path
 
@@ -38,8 +40,8 @@ class ArenaHardDataset(BaseDataset):
                     'judge': {
                         'capability': cluster,
                         'question': question,
-                        'question_id': question_id
-                    }
+                        'question_id': question_id,
+                    },
                 })
         dataset = Dataset.from_list(raw_data)
         return dataset
@@ -133,11 +135,10 @@ def get_bootstrap_result(battles, func_compute_elo, num_round):
 
 
 def preety_print_two_ratings(ratings_1, ratings_2, column_names):
-    df = pd.DataFrame(
+    df = (pd.DataFrame(
         [[n, ratings_1[n], ratings_2[n]] for n in ratings_1.keys()],
-        columns=['Model', column_names[0], column_names[1]
-                 ]).sort_values(column_names[0],
-                                ascending=False).reset_index(drop=True)
+        columns=['Model', column_names[0], column_names[1]],
+    ).sort_values(column_names[0], ascending=False).reset_index(drop=True))
     df[column_names[0]] = (df[column_names[0]] + 0.5).astype(int)
     df[column_names[1]] = (df[column_names[1]] + 0.5).astype(int)
     df.index = df.index + 1
@@ -172,7 +173,10 @@ def get_win_rate_column(df, column, baseline='gpt4-0314'):
 
 
 @DICT_POSTPROCESSORS.register_module('arenahard')
-def arenahard_postprocess(output: dict, output_path: str) -> dict:
+def arenahard_postprocess(
+    output: dict,
+    output_path: str,
+) -> dict:
     judged_answers, references = get_judgeanswer_and_reference(
         output, output_path, post_process_arenahard)
 
@@ -210,4 +214,65 @@ def arenahard_postprocess(output: dict, output_path: str) -> dict:
 
     results = {'score': score}
     results['details'] = output
+    return results
+
+
+@DICT_POSTPROCESSORS.register_module('arenahard_bradleyterry')
+def arenahard_bradleyterry_postprocess(
+    output: dict,
+    output_path: str,
+) -> dict:
+    judged_answers, references = get_judgeanswer_and_reference(
+        result=output,
+        filename=output_path,
+        post_process=post_process_arenahard,
+    )
+
+    if 'prediction1' not in references[0]:
+        raise ValueError(
+            'prediction1 not in references. Set `keep_predictions=True` for LMEvaluator in dataset config and retry.'
+        )
+
+    if 'prediction2' not in references[0]:
+        raise ValueError(
+            'prediction2 not in references. Set `keep_predictions=True` for LMEvaluator in dataset config and retry.'
+        )
+
+    results = {}
+    matches = []
+    for judged_answer, reference in zip(judged_answers, references):
+        cur_dict = {}
+
+        if judged_answer in ['A>>B', 'B<<A', 'A>B', 'B<A']:
+            cur_dict['winner'] = 'model_a'
+        elif judged_answer in ['A=B', 'B=A']:
+            cur_dict['winner'] = 'tie'
+        elif judged_answer in ['A<B', 'B>A', 'A<<B', 'B>>A']:
+            cur_dict['winner'] = 'model_b'
+        else:
+            continue
+
+        cur_dict['capability'] = reference['capability']
+        cur_dict['model_a'] = reference['answer1']
+        cur_dict['model_b'] = reference['answer2']
+        cur_dict['prediction1'] = reference['prediction1']
+        cur_dict['prediction2'] = reference['prediction2']
+
+        matches.append(cur_dict)
+
+    ### ---------- Add Style Metadata ---------- ###
+    matches = get_element_counts(
+        data=matches,
+        column='prediction1',
+        suffix='_a',
+    )
+    matches = get_element_counts(
+        data=matches,
+        column='prediction2',
+        suffix='_b',
+    )
+
+    results['matches'] = matches
+    # results["details"] = output
+
     return results
