@@ -54,5 +54,31 @@
            eval_cfg=mydataset_eval_cfg)
    ]
    ```
+   
+   - 为了使用户提供的数据集能够被其他使用者更方便的获取，需要用户在配置文件中给出下载数据集的渠道。具体的方式是首先在`mydataset_datasets`配置中的`path`字段填写用户指定的数据集名称，具体示例如下：
+   
+   ```python
+    mmlu_datasets = [
+        dict(
+            abbr=f'lukaemon_mmlu_{_name}',
+            type=MMLUDataset,
+            path='opencompass/mmlu',
+            ...,
+        )
+   ]
+   ```
+   
+   - 接着，需要在`opencompass/utils/datasets_info.py`中创建对应名称的字典字段。如果用户已将数据集托管到huggingface或modelscope，那么请在`DATASETS_MAPPING`字典中添加对应名称的字段，并将对应的huggingface或modelscope数据集地址填入`ms_id`和`hf_id`；另外，还允许指定一个默认的`local`地址。具体示例如下：
+   
+   ```python
+   "opencompass/mmlu": {
+        "ms_id": "opencompass/mmlu",
+        "hf_id": "opencompass/mmlu",
+        "local": "./data/mmlu/",
+    }
+   ```
+   
+   - 如果希望提供的数据集在其他用户使用时能够直接从OpenCompass官方的OSS仓库获取，则需要在Pull Request阶段向我们提交数据集文件，我们将代为传输数据集至OSS，并在`DATASET_URL`新建字段。
 
-   详细的数据集配置文件以及其他需要的配置文件可以参考[配置文件](../user_guides/config.md)教程，启动任务相关的教程可以参考[快速开始](../get_started/quick_start.md)教程。
+
+  详细的数据集配置文件以及其他需要的配置文件可以参考[配置文件](../user_guides/config.md)教程，启动任务相关的教程可以参考[快速开始](../get_started/quick_start.md)教程。
