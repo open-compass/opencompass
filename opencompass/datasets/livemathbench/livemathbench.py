@@ -66,7 +66,7 @@ class LiveMathBenchDataset(BaseDataset):
             if path != '':
                 file_path = os.path.join(path, f'{split}_{language}.jsonl')
                 if not os.path.exists(file_path):
-                    continue
+                    raise ValueError(f'Cannot find {file_path}!!!!')
                 examples = []
                 with jsonlines.open(file_path, 'r') as file:
                     for example in file:
