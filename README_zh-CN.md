@@ -57,6 +57,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2025.01.16\]** 我们现已支持 [InternLM3-8B-Instruct](https://huggingface.co/internlm/internlm3-8b-instruct) 模型，该模型在推理、知识类任务上取得同量级最优性能，欢迎尝试。
 - **\[2024.12.17\]** 我们提供了12月CompassAcademic学术榜单评估脚本 [CompassAcademic](configs/eval_academic_leaderboard_202412.py)，你可以通过简单地配置复现官方评测结果。
 - **\[2024.10.14\]** 现已支持OpenAI多语言问答数据集[MMMLU](https://huggingface.co/datasets/openai/MMMLU)，欢迎尝试! 🔥🔥🔥
 - **\[2024.09.19\]** 现已支持[Qwen2.5](https://huggingface.co/Qwen)(0.5B to 72B) ，可以使用多种推理后端(huggingface/vllm/lmdeploy), 欢迎尝试! 🔥🔥🔥
