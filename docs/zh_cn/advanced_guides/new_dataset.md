@@ -77,10 +77,12 @@
     }
    ```
    
-   - 为了确保数据来源的可选择性，用户需要根据所提供数据集的下载路径类型来完善数据集脚本`mydataset.py`中的`load`方法的功能。具体而言，需要用户实现根据环境变量`DATASET_SOURCE`的不同设置来切换不同的下载数据源的功能。`opencompass/dataset/cmmlu.py`中的具体示例如下：
+   - 如果希望提供的数据集在其他用户使用时能够直接从OpenCompass官方的OSS仓库获取，则需要在Pull Request阶段向我们提交数据集文件，我们将代为传输数据集至OSS，并在`DATASET_URL`新建字段。
+
+   - 为了确保数据来源的可选择性，用户需要根据所提供数据集的下载路径类型来完善数据集脚本`mydataset.py`中的`load`方法的功能。具体而言，需要用户实现根据环境变量`DATASET_SOURCE`的不同设置来切换不同的下载数据源的功能。需要注意的是，若未设置`DATASET_SOURCE`的值，将默认从OSS仓库下载数据。`opencompass/dataset/cmmlu.py`中的具体示例如下：
    
    ```python
-       def load(path: str, name: str, **kwargs):
+    def load(path: str, name: str, **kwargs):
         ...
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             ...
@@ -88,10 +90,7 @@
             ...
         return dataset
    ```
+
    
-
-
-   - 如果希望提供的数据集在其他用户使用时能够直接从OpenCompass官方的OSS仓库获取，则需要在Pull Request阶段向我们提交数据集文件，我们将代为传输数据集至OSS，并在`DATASET_URL`新建字段。
-
 
   详细的数据集配置文件以及其他需要的配置文件可以参考[配置文件](../user_guides/config.md)教程，启动任务相关的教程可以参考[快速开始](../get_started/quick_start.md)教程。
