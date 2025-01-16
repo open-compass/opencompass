@@ -63,7 +63,7 @@ vllm serve facebook/opt-125m
 OpenCompass supports different commercial model API calls, which you can install via pip or by referring to the [API dependencies](https://github.com/open-compass/opencompass/blob/main/requirements/api.txt) for specific API model dependencies.
 
 ```bash
-pip install opencompass[api]
+pip install "opencompass[api]"
 
 # pip install openai # GPT-3.5-Turbo / GPT-4-Turbo / GPT-4 / GPT-4o (API)
 # pip install anthropic # Claude (API)
@@ -79,7 +79,7 @@ The basic installation supports most fundamental datasets. For certain datasets 
 You can install these through pip or refer to the [additional dependencies](<(https://github.com/open-compass/opencompass/blob/main/requirements/extra.txt)>) for specific dependencies.
 
 ```bash
-pip install opencompass[full]
+pip install "opencompass[full]"
 ```
 
 For HumanEvalX / HumanEval+ / MBPP+, you need to manually clone the Git repository and install it.
