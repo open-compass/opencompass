@@ -57,6 +57,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2025.01.16\]** We now support the [InternLM3-8B-Instruct](https://huggingface.co/internlm/internlm3-8b-instruct) model which has enhanced performance on reasoning and knowledge-intensive tasks.
 - **\[2024.12.17\]** We have provided the evaluation script for the December [CompassAcademic](configs/eval_academic_leaderboard_202412.py), which allows users to easily reproduce the official evaluation results by configuring it.
 - **\[2024.11.14\]** OpenCompass now offers support for a sophisticated benchmark designed to evaluate complex reasoning skills — [MuSR](https://arxiv.org/pdf/2310.16049). Check out the [demo](configs/eval_musr.py) and give it a spin! 🔥🔥🔥
 - **\[2024.11.14\]** OpenCompass now supports the brand new long-context language model evaluation benchmark — [BABILong](https://arxiv.org/pdf/2406.10149). Have a look at the [demo](configs/eval_babilong.py) and give it a try! 🔥🔥🔥
