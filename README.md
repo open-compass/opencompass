@@ -182,10 +182,10 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
   # Python scripts
-  opencompass ./configs/eval_chat_demo.py
+  opencompass examples/eval_chat_demo.py
   ```
 
-  You can find more script examples under [configs](./configs) folder.
+  You can find more script examples under [examples](./examples) folder.
 
 - API evaluation
 
@@ -197,7 +197,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
 
   # Python scripts
-  opencompass ./configs/eval_api_demo.py
+  opencompass examples/eval_api_demo.py
 
   # You can use o1_mini_2024_09_12/o1_preview_2024_09_12  for o1 models, we set max_completion_tokens=8192 as default.
   ```
@@ -211,7 +211,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
 
   # Python scripts
-  opencompass ./configs/eval_lmdeploy_demo.py
+  opencompass examples/eval_lmdeploy_demo.py
   ```
 
 - Supported Models

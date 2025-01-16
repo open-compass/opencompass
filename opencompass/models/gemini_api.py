@@ -57,14 +57,6 @@ class Gemini(BaseAPIModel):
                 raise ValueError('GEMINI API key is not set.')
             key = os.getenv('GEMINI_API_KEY')
 
-        assert path in [
-            'gemini-1.0-pro',
-            'gemini-pro',
-            'gemini-1.5-flash',
-            'gemini-1.5-pro',
-            'gemini-1.5-pro-latest',
-        ]  # https://ai.google.dev/gemini-api/docs/models/gemini#model-variations
-
         self.url = f'https://generativelanguage.googleapis.com/v1beta/models/{path}:generateContent?key={key}'
         self.temperature = temperature
         self.top_p = top_p
@@ -162,10 +154,6 @@ class Gemini(BaseAPIModel):
                     'category': 'HARM_CATEGORY_HARASSMENT',
                     'threshold': 'BLOCK_NONE',
                 },
-                {
-                    'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                    'threshold': 'BLOCK_NONE',
-                },
             ],
             'generationConfig': {
                 'candidate_count': 1,
@@ -195,14 +183,17 @@ class Gemini(BaseAPIModel):
                     if 'content' not in response['candidates'][0]:
                         return "Due to Google's restrictive policies, I am unable to respond to this question."
                     else:
-                        return response['candidates'][0]['content']['parts'][
-                            0]['text'].strip()
+                        if not response['candidates'][0]['content']:
+                            return ''
+                        else:
+                            return response['candidates'][0]['content'][
+                                'parts'][0]['text'].strip()
             try:
                 msg = response['error']['message']
                 self.logger.error(msg)
             except KeyError:
                 pass
             self.logger.error(response)
-            time.sleep(1)
+            time.sleep(20)
 
         raise RuntimeError('API call failed.')

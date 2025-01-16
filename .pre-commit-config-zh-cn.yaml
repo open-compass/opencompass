@@ -1,6 +1,7 @@
 exclude: |
     (?x)^(
       tests/data/|
+      tests/dataset/|
       opencompass/models/internal/|
       opencompass/utils/internal/|
       opencompass/openicl/icl_evaluator/hf_metrics/|
@@ -10,12 +11,9 @@ exclude: |
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
       opencompass/datasets/TheoremQA|
+      opencompass/datasets/subjective/mtbench101.py|
       docs/zh_cn/advanced_guides/compassbench_intro.md |
       docs/zh_cn/advanced_guides/compassbench_v2_0.md |
-      opencompass/configs/datasets/ |
-      opencompass/configs/models/|
-      opencompass/configs/summarizers/|
-      opencompass/configs/dataset_collections/ |
       opencompass/utils/datasets.py |
       opencompass/utils/datasets_info.py
     )
@@ -26,8 +24,8 @@ repos:
       - id: flake8
         exclude: |
             (?x)^(
-                configs/ |
-                example_scripts/
+                opencompass/configs/|
+                examples/
             )
   - repo: https://gitee.com/openmmlab/mirrors-isort
     rev: 5.11.5
@@ -35,8 +33,8 @@ repos:
       - id: isort
         exclude: |
             (?x)^(
-                configs/ |
-                example_scripts/
+                opencompass/configs/|
+                examples/
             )
   - repo: https://gitee.com/openmmlab/mirrors-yapf
     rev: v0.32.0
@@ -44,8 +42,8 @@ repos:
       - id: yapf
         exclude: |
             (?x)^(
-                configs/ |
-                example_scripts/
+                opencompass/configs/|
+                examples/
             )
   - repo: https://gitee.com/openmmlab/mirrors-codespell
     rev: v2.2.1
@@ -55,9 +53,8 @@ repos:
             (?x)^(
                 .*\.jsonl|
                 .*\.md.template|
-                configs/ |
                 opencompass/configs/ |
-                example_scripts/
+                examples/
             )
   - repo: https://gitee.com/openmmlab/mirrors-pre-commit-hooks
     rev: v4.3.0
@@ -67,7 +64,6 @@ repos:
             (?x)^(
               dicts/|
               projects/.*?/dicts/|
-              configs/.*?/.*\.txt
             )
       - id: check-yaml
       - id: end-of-file-fixer
@@ -75,7 +71,6 @@ repos:
             (?x)^(
               dicts/|
               projects/.*?/dicts/|
-              configs/.*?/.*\.txt
             )
       - id: requirements-txt-fixer
       - id: double-quote-string-fixer
@@ -107,7 +102,7 @@ repos:
         language: script
         pass_filenames: true
         require_serial: true
-        files: ^configs/datasets
+        files: ^opencompass/configs/datasets
   - repo: local
     hooks:
     -   id: update-dataset-suffix-pacakge
@@ -120,41 +115,6 @@ repos:
         args:
           - --root_folder
           - opencompass/configs/datasets
-  - repo: local
-    hooks:
-    -   id: compare-configs-datasets
-        name: compare configs datasets
-        entry: ./tools/compare_configs.py
-        language: script
-        pass_filenames: false
-        # require_serial: true
-        args:
-          - configs/datasets
-          - opencompass/configs/datasets
-  - repo: local
-    hooks:
-    -   id: compare-configs-models
-        name: compare configs models
-        entry: ./tools/compare_configs.py
-        language: script
-        pass_filenames: false
-        # require_serial: true
-        args:
-          - configs/models
-          - opencompass/configs/models
-          - --ignore
-          - llama
-  - repo: local
-    hooks:
-    -   id: compare-configs-summarizers
-        name: compare configs summarizers
-        entry: ./tools/compare_configs.py
-        language: script
-        pass_filenames: false
-        # require_serial: true
-        args:
-          - configs/summarizers
-          - opencompass/configs/summarizers
   # - repo: https://github.com/open-mmlab/pre-commit-hooks
   #   rev: v0.2.0  # Use the ref you want to point at
   #   hooks:
