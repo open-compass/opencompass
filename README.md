@@ -165,6 +165,23 @@ Then submit the evaluation task without downloading all the data to your local d
 humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ceval, math, LCSTS, Xsum, winogrande, openbookqa, AGIEval, gsm8k, nq, race, siqa, mbpp, mmlu, hellaswag, ARC, BBH, xstory_cloze, summedits, GAOKAO-BENCH, OCNLI, cmnli
 ```
 
+#### (Optional) Automatic Download with OpenMind
+
+Also you can use the [OpenMind](https://modelers.cn/) to load the datasets on demand.
+
+Installation:
+
+```bash
+pip install openmind
+export DATASET_SOURCE=OpenMind
+```
+
+Then submit the evaluation task without downloading all the data to your local disk. Available datasets include:
+
+```bash
+gsm8k
+```
+
 Some third-party features, like Humaneval and Llama, may require additional steps to work properly, for detailed steps please refer to the [Installation Guide](https://opencompass.readthedocs.io/en/latest/get_started/installation.html).
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
