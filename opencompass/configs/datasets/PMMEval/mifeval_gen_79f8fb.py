@@ -5,7 +5,7 @@ from opencompass.datasets.PMMEval import PMMEvalMIFEvalDataset, PMMEvalMIFEvalEv
 
 NATURAL_LANGUAGE_CODES = ['en', 'zh', 'ar', 'es', 'fr', 'ja', 'ko', 'pt', 'th', 'vi']
 
-PMMEVAL_MIFEVAL_TEMPLATE = "{prompt}"
+PMMEVAL_MIFEVAL_TEMPLATE = '{prompt}'
 
 PMMEval_MIFEval_datasets = list()
 

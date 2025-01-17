@@ -6,15 +6,15 @@ from opencompass.datasets.PMMEval import PMMEvalFloresDataset, PMMEvalFloresEval
 NATURAL_LANGUAGE_FULLNAMES_FLORES = ['Chinese', 'Arabic', 'Spanish', 'French', 'Japanese', 'Korean', 'Portuguese', 'Thai', 'Vietnamese']
 
 PROMPT = {
-    "Chinese": "将这个句子从英语翻译成中文。\n\n{src}",
-    "Arabic": "ترجم هذه الجملة من الإنجليزية إلى العربية.\n\n{src}",
-    "Spanish": "Traduce esta oración del inglés al español.\n\n{src}",
-    "Japanese": "この文を英語から日本語に翻訳してください。\n\n{src}",
-    "Korean": "이 문장을 영어에서 한국어로 번역하세요.\n\n{src}",
-    "Thai": "แปลประโยคนี้จากภาษาอังกฤษเป็นภาษาไทย.\n\n{src}",
-    "French": "Traduisez cette phrase de l'anglais en français.\n\n{src}",
-    "Portuguese": "Traduza esta frase do inglês para o português.\n\n{src}",
-    "Vietnamese": "Dịch câu này từ tiếng Anh sang tiếng Việt.\n\n{src}"
+    'Chinese': '将这个句子从英语翻译成中文。\n\n{src}',
+    'Arabic': 'ترجم هذه الجملة من الإنجليزية إلى العربية.\n\n{src}',
+    'Spanish': 'Traduce esta oración del inglés al español.\n\n{src}',
+    'Japanese': 'この文を英語から日本語に翻訳してください。\n\n{src}',
+    'Korean': '이 문장을 영어에서 한국어로 번역하세요.\n\n{src}',
+    'Thai': 'แปลประโยคนี้จากภาษาอังกฤษเป็นภาษาไทย.\n\n{src}',
+    'French': "Traduisez cette phrase de l'anglais en français.\n\n{src}",
+    'Portuguese': 'Traduza esta frase do inglês para o português.\n\n{src}',
+    'Vietnamese': 'Dịch câu này từ tiếng Anh sang tiếng Việt.\n\n{src}'
 }
 
 PMMEval_flores_datasets = list()
