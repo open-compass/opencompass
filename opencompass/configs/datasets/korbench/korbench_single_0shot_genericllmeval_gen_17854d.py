@@ -5,7 +5,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
 
-categories = ["cipher", "counterfactual", "logic", "operation", "puzzle"]
+categories = ['cipher', 'counterfactual', 'logic', 'operation', 'puzzle']
 
 
 GRADER_TEMPLATE = """
@@ -42,14 +42,14 @@ for category in categories:
         template=dict(
             begin=[
                 dict(
-                    role="HUMAN",
-                    prompt=""
+                    role='HUMAN',
+                    prompt=''
                 )
             ],
             round=[
                 dict(
-                    role="HUMAN",
-                    prompt="{prompt}" # f-string
+                    role='HUMAN',
+                    prompt='{prompt}' # f-string
                 )
             ]
         )
@@ -57,8 +57,8 @@ for category in categories:
 
     # Reader configuration
     reader_cfg = dict(
-        input_columns=["prompt"],
-        output_column="answer",
+        input_columns=['prompt'],
+        output_column='answer',
     )
 
     # Inference configuration
@@ -90,7 +90,7 @@ for category in categories:
             ),
             dataset_cfg=dict(
                 type=korbenchDataset,
-                path="opencompass/korbench",
+                path='opencompass/korbench',
                 prompt_mode='0_shot',
                 category=category,
                 reader_cfg=reader_cfg,
@@ -104,8 +104,8 @@ for category in categories:
     # Dataset
     korbench_dataset = dict(
         type=korbenchDataset,
-        abbr=f"korbench_{category}",
-        path="opencompass/korbench",
+        abbr=f'korbench_{category}',
+        path='opencompass/korbench',
         prompt_mode='0_shot',
         category=category,
         reader_cfg=reader_cfg,

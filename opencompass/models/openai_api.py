@@ -20,7 +20,8 @@ from .base_api import BaseAPIModel
 PromptType = Union[PromptList, str]
 OPENAI_API_BASE = os.path.join(
     os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
-    'chat/completions')
+    'chat/completions',
+)
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
@@ -77,34 +78,39 @@ class OpenAI(BaseAPIModel):
 
     is_api: bool = True
 
-    def __init__(self,
-                 path: str = 'gpt-3.5-turbo',
-                 max_seq_len: int = 4096,
-                 query_per_second: int = 1,
-                 rpm_verbose: bool = False,
-                 retry: int = 2,
-                 key: Union[str, List[str]] = 'ENV',
-                 org: Optional[Union[str, List[str]]] = None,
-                 meta_template: Optional[Dict] = None,
-                 openai_api_base: str = OPENAI_API_BASE,
-                 openai_proxy_url: Optional[str] = None,
-                 mode: str = 'none',
-                 logprobs: Optional[bool] = False,
-                 top_logprobs: Optional[int] = None,
-                 temperature: Optional[float] = None,
-                 tokenizer_path: Optional[str] = None,
-                 extra_body: Optional[Dict] = None,
-                 max_completion_tokens: int = 16384,
-                 verbose: bool = False):
+    def __init__(
+        self,
+        path: str = 'gpt-3.5-turbo',
+        max_seq_len: int = 16384,
+        query_per_second: int = 1,
+        rpm_verbose: bool = False,
+        retry: int = 2,
+        key: Union[str, List[str]] = 'ENV',
+        org: Optional[Union[str, List[str]]] = None,
+        meta_template: Optional[Dict] = None,
+        openai_api_base: str = OPENAI_API_BASE,
+        openai_proxy_url: Optional[str] = None,
+        mode: str = 'none',
+        logprobs: Optional[bool] = False,
+        top_logprobs: Optional[int] = None,
+        temperature: Optional[float] = None,
+        tokenizer_path: Optional[str] = None,
+        extra_body: Optional[Dict] = None,
+        max_completion_tokens: int = 16384,
+        verbose: bool = False,
+    ):
 
-        super().__init__(path=path,
-                         max_seq_len=max_seq_len,
-                         meta_template=meta_template,
-                         query_per_second=query_per_second,
-                         rpm_verbose=rpm_verbose,
-                         retry=retry,
-                         verbose=verbose)
+        super().__init__(
+            path=path,
+            max_seq_len=max_seq_len,
+            meta_template=meta_template,
+            query_per_second=query_per_second,
+            rpm_verbose=rpm_verbose,
+            retry=retry,
+            verbose=verbose,
+        )
         import tiktoken
+
         self.tiktoken = tiktoken
         self.temperature = temperature
         assert mode in ['none', 'front', 'mid', 'rear']
@@ -149,11 +155,13 @@ class OpenAI(BaseAPIModel):
         self.logger.warning(
             f'Max Completion tokens for {path} is {max_completion_tokens}')
 
-    def generate(self,
-                 inputs: List[PromptType],
-                 max_out_len: int = 512,
-                 temperature: float = 0.7,
-                 **kwargs) -> List[str]:
+    def generate(
+        self,
+        inputs: List[PromptType],
+        max_out_len: int = 512,
+        temperature: float = 0.7,
+        **kwargs,
+    ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
@@ -174,11 +182,16 @@ class OpenAI(BaseAPIModel):
 
         with ThreadPoolExecutor() as executor:
             results = list(
-                tqdm(executor.map(self._generate, inputs,
-                                  [max_out_len] * len(inputs),
-                                  [temperature] * len(inputs)),
-                     total=len(inputs),
-                     desc='Inferencing'))
+                tqdm(
+                    executor.map(
+                        self._generate,
+                        inputs,
+                        [max_out_len] * len(inputs),
+                        [temperature] * len(inputs),
+                    ),
+                    total=len(inputs),
+                    desc='Inferencing',
+                ))
         return results
 
     def _generate(self, input: PromptType, max_out_len: int,
@@ -200,46 +213,9 @@ class OpenAI(BaseAPIModel):
         """
         assert isinstance(input, (str, PromptList))
 
-        # max num token for gpt-3.5-turbo is 4097
-        # Most models' token limits are above 32k
-        context_window = 32768
-        if '32k' in self.path:
-            context_window = 32768
-        elif '16k' in self.path:
-            context_window = 16384
-        elif 'gpt-4' in self.path:
-            context_window = 8192
-        elif 'gpt-3.5' in self.path:
-            context_window = 4097
-
-        # will leave 100 tokens as prompt buffer, triggered if input is str
-        if isinstance(input, str) and self.mode != 'none':
-            context_window = self.max_seq_len
-            input = self.bin_trim(input, context_window - 100 - max_out_len)
-
-        if isinstance(input, str):
-            messages = [{'role': 'user', 'content': input}]
-        else:
-            messages = []
-            for item in input:
-                msg = {'content': item['prompt']}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
-                elif item['role'] == 'SYSTEM':
-                    msg['role'] = 'system'
-                messages.append(msg)
-
-        # Hold out 100 tokens due to potential errors in tiktoken calculation
-        try:
-            max_out_len = min(
-                max_out_len,
-                context_window - self.get_token_len(str(input)) - 100)
-        except KeyError:
-            max_out_len = max_out_len
-        if max_out_len <= 0:
-            return ''
+        messages, max_out_len = self._preprocess_messages(
+            input, max_out_len, self.max_seq_len, self.mode,
+            self.get_token_len)
 
         max_num_retries = 0
         while max_num_retries < self.retry:
@@ -305,6 +281,7 @@ class OpenAI(BaseAPIModel):
                     data.update(self.extra_body)
                 if isinstance(self.url, list):
                     import random
+
                     url = self.url[random.randint(0, len(self.url) - 1)]
                 else:
                     url = self.url
@@ -336,10 +313,16 @@ class OpenAI(BaseAPIModel):
                 self.logger.error('Got connection error, retrying...')
                 continue
             try:
+                if raw_response.status_code != 200:
+                    self.logger.error(f'Request failed with status code '
+                                      f'{raw_response.status_code}, response: '
+                                      f'{raw_response.content.decode()}')
+                    continue
                 response = raw_response.json()
             except requests.JSONDecodeError:
-                self.logger.error('JsonDecode error, got',
-                                  str(raw_response.content))
+                self.logger.error(f'JsonDecode error, got status code '
+                                  f'{raw_response.status_code}, response: '
+                                  f'{raw_response.content.decode()}')
                 continue
             self.logger.debug(str(response))
             try:
@@ -364,8 +347,10 @@ class OpenAI(BaseAPIModel):
                         self.logger.warn('Invalid prompt:', str(input))
                         return ''
 
-                    self.logger.error('Find error message in response: ',
-                                      str(response['error']))
+                    self.logger.error(
+                        'Find error message in response: ',
+                        str(response['error']),
+                    )
             max_num_retries += 1
 
         raise RuntimeError('Calling OpenAI failed after retrying for '
@@ -387,8 +372,8 @@ class OpenAI(BaseAPIModel):
         try:
             if self.verbose:
                 self.logger.info(f'Used tokenizer_path: {self.tokenizer_path}')
-            tokenizer_path = self.tokenizer_path if self.tokenizer_path \
-                else self.path
+            tokenizer_path = (self.tokenizer_path
+                              if self.tokenizer_path else self.path)
             try:
                 if self.verbose:
                     self.logger.info(
@@ -397,11 +382,12 @@ class OpenAI(BaseAPIModel):
                 if self.verbose:
                     self.logger.info(
                         f'Successfully tiktoken encoding: {tokenizer_path}')
-                return len(enc.encode(prompt))
+                return len(enc.encode(prompt, disallowed_special=()))
             except Exception as e:
                 self.logger.warn(f'{e}, tiktoken encoding cannot load '
                                  f'{tokenizer_path}')
                 from transformers import AutoTokenizer
+
                 if self.hf_tokenizer is None:
                     if self.verbose:
                         self.logger.info(
@@ -425,12 +411,14 @@ class OpenAI(BaseAPIModel):
                     f' {default_tokenizer}')
             return len(enc.encode(prompt))
 
-    def bin_trim(self, prompt: str, num_token: int) -> str:
+    def _bin_trim(self, prompt: str, num_token: int, mode: str) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.
 
         Args:
             prompt (str): Input string.
             num_token (int): The upper bound of token numbers.
+            mode (str): The method of input truncation
+            ('front', 'mid', or 'rear')
 
         Returns:
             str: The trimmed prompt.
@@ -449,11 +437,11 @@ class OpenAI(BaseAPIModel):
         l, r = 1, len(words)
         while l + 2 < r:
             mid = (l + r) // 2
-            if self.mode == 'front':
+            if mode == 'front':
                 cur_prompt = sep.join(words[-mid:])
-            elif self.mode == 'mid':
-                cur_prompt = sep.join(words[:mid]) + sep.join(words[-mid:])
-            elif self.mode == 'rear':
+            elif mode == 'mid':
+                cur_prompt = (sep.join(words[:mid]) + sep.join(words[-mid:]))
+            elif mode == 'rear':
                 cur_prompt = sep.join(words[:mid])
 
             if self.get_token_len(cur_prompt) <= num_token:
@@ -461,13 +449,90 @@ class OpenAI(BaseAPIModel):
             else:
                 r = mid
 
-        if self.mode == 'front':
+        if mode == 'front':
             prompt = sep.join(words[-l:])
-        elif self.mode == 'mid':
+        elif mode == 'mid':
             prompt = sep.join(words[:l]) + sep.join(words[-l:])
-        elif self.mode == 'rear':
+        elif mode == 'rear':
             prompt = sep.join(words[:l])
         return prompt
+
+    def _preprocess_messages(
+        self,
+        input: Union[str, PromptList],
+        max_out_len: int,
+        max_seq_len: int,
+        mode: str,
+        get_token_len_func,
+    ) -> tuple[List[Dict], int]:
+        """Preprocess input into messages format and calculate max output
+        length.
+
+        Args:
+            input: Input prompt as string or PromptList
+            max_out_len: Maximum output length
+            max_seq_len: Maximum sequence length
+            mode: The method of input truncation
+            get_token_len_func: Function to calculate token length
+
+        Returns:
+            tuple: (processed messages list, adjusted max_out_len)
+        """
+        # Check input length when mode is 'none'
+        if mode == 'none':
+            input_len = get_token_len_func(str(input))
+            if input_len > max_seq_len:
+                raise ValueError(
+                    f'Input length ({input_len}) exceeds max_seq_len '
+                    f'({max_seq_len}) and mode is set to "none". Please  '
+                    f'either change the mode or reduce the input length.')
+
+        # Trim input if needed
+        def bin_trim_wrapper(text):
+            return self._bin_trim(text, max_seq_len - 100 - max_out_len, mode)
+
+        if isinstance(input, str) and mode != 'none':
+            input = bin_trim_wrapper(input)
+        # Convert input to messages format
+        if isinstance(input, str):
+            messages = [{'role': 'user', 'content': input}]
+        else:
+            messages = []
+            for item in input:
+                input_content = item['prompt']
+                if mode != 'none':
+                    input_content = bin_trim_wrapper(input_content)
+                msg = {'content': input_content}
+                if item['role'] == 'HUMAN':
+                    msg['role'] = 'user'
+                elif item['role'] == 'BOT':
+                    msg['role'] = 'assistant'
+                elif item['role'] == 'SYSTEM':
+                    msg['role'] = 'system'
+                messages.append(msg)
+
+        # Adjust max_out_len
+        try:
+            original_max_out_len = max_out_len
+            max_out_len = min(
+                max_out_len,
+                max_seq_len - get_token_len_func(str(input)) - 100)
+            if max_out_len <= 0:
+                raise ValueError(
+                    f'max_out_len ({max_out_len}) is less than or equal to 0. '
+                    f'This may be due to input length '
+                    f'({get_token_len_func(str(input))}) being too close to '
+                    f'max_seq_len ({max_seq_len}). Please either increase '
+                    f'max_seq_len or use a truncation mode other than "none".')
+            if max_out_len < original_max_out_len:
+                self.logger.warning(
+                    f'max_out_len was truncated from {original_max_out_len} '
+                    f'to {max_out_len} due to input length')
+
+        except KeyError:
+            max_out_len = max_out_len
+
+        return messages, max_out_len
 
 
 class OpenAISDK(OpenAI):
@@ -475,7 +540,7 @@ class OpenAISDK(OpenAI):
     def __init__(
         self,
         path: str = 'gpt-3.5-turbo',
-        max_seq_len: int = 4096,
+        max_seq_len: int = 16384,
         query_per_second: int = 1,
         rpm_verbose: bool = False,
         retry: int = 2,
@@ -494,24 +559,26 @@ class OpenAISDK(OpenAI):
         verbose: bool = False,
         status_code_mappings: dict = {},
     ):
-        super().__init__(path,
-                         max_seq_len,
-                         query_per_second,
-                         rpm_verbose,
-                         retry,
-                         key,
-                         org,
-                         meta_template,
-                         openai_api_base,
-                         openai_proxy_url,
-                         mode,
-                         logprobs,
-                         top_logprobs,
-                         temperature,
-                         tokenizer_path,
-                         extra_body,
-                         verbose=verbose,
-                         max_completion_tokens=max_completion_tokens)
+        super().__init__(
+            path,
+            max_seq_len,
+            query_per_second,
+            rpm_verbose,
+            retry,
+            key,
+            org,
+            meta_template,
+            openai_api_base,
+            openai_proxy_url,
+            mode,
+            logprobs,
+            top_logprobs,
+            temperature,
+            tokenizer_path,
+            extra_body,
+            verbose=verbose,
+            max_completion_tokens=max_completion_tokens,
+        )
         from openai import OpenAI
 
         # support multiple api_base for acceleration
@@ -532,7 +599,8 @@ class OpenAISDK(OpenAI):
             self.openai_client = OpenAI(
                 base_url=self.openai_api_base,
                 api_key=key,
-                http_client=httpx.Client(proxies=proxies))
+                http_client=httpx.Client(proxies=proxies),
+            )
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
@@ -540,48 +608,12 @@ class OpenAISDK(OpenAI):
     def _generate(self, input: PromptList | str, max_out_len: int,
                   temperature: float) -> str:
         from openai import APIStatusError, BadRequestError
+
         assert isinstance(input, (str, PromptList))
 
-        # max num token for gpt-3.5-turbo is 4097
-        # Most models' token limits are above 32k
-        context_window = 32768
-        if '32k' in self.path:
-            context_window = 32768
-        elif '16k' in self.path:
-            context_window = 16384
-        elif 'gpt-4' in self.path:
-            context_window = 8192
-        elif 'gpt-3.5' in self.path:
-            context_window = 4097
-
-        # will leave 100 tokens as prompt buffer, triggered if input is str
-        if isinstance(input, str) and self.mode != 'none':
-            context_window = self.max_seq_len
-            input = self.bin_trim(input, context_window - 100 - max_out_len)
-
-        if isinstance(input, str):
-            messages = [{'role': 'user', 'content': input}]
-        else:
-            messages = []
-            for item in input:
-                msg = {'content': item['prompt']}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
-                elif item['role'] == 'SYSTEM':
-                    msg['role'] = 'system'
-                messages.append(msg)
-
-        # Hold out 100 tokens due to potential errors in tiktoken calculation
-        # try:
-        #     max_out_len = min(
-        #         max_out_len,
-        #         context_window - self.get_token_len(str(input)) - 100)
-        # except KeyError:
-        #     max_out_len = max_out_len
-        # if max_out_len <= 0:
-        #     return ''
+        messages, max_out_len = self._preprocess_messages(
+            input, max_out_len, self.max_seq_len, self.mode,
+            self.get_token_len)
 
         num_retries = 0
         while num_retries < self.retry:

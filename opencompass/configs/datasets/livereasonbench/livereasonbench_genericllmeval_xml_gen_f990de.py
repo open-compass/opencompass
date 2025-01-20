@@ -93,7 +93,7 @@ livereasonbench_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt="Question: {question}\n"),
+                dict(role='HUMAN', prompt='Question: {question}\n'),
             ],
         )),
     retriever=dict(type=ZeroRetriever),
@@ -125,7 +125,7 @@ livereasonbench_eval_cfg = dict(
         ),
         judge_cfg=dict(),
         dict_postprocessor=dict(type=livereasonbench_postprocess),
-        pred_postprocessor=dict(type=xml_tag_postprocessor, tag="<conclude>"),
+        pred_postprocessor=dict(type=xml_tag_postprocessor, tag='<conclude>'),
     ),
     pred_role='BOT',
 )

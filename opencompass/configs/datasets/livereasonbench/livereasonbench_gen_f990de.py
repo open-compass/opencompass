@@ -92,7 +92,7 @@ livereasonbench_infer_cfg = dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt="Question: {question}\n"),
+                dict(role='HUMAN', prompt='Question: {question}\n'),
             ],
         )),
     retriever=dict(type=ZeroRetriever),
