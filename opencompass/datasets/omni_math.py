@@ -1,5 +1,4 @@
 import concurrent.futures
-import re
 from typing import List
 
 import numpy as np
@@ -65,13 +64,6 @@ class OmniMathEvaluator(BaseEvaluator):
                 result_responses.extend(response)
 
         return result_responses
-
-    def extract_boxed_answer(self, text):
-        match = re.findall(r'\\boxed{(.+?)}', text)
-        if match:
-            return match[-1]
-
-        return None
 
     def parse_response(self, response):
         response = '## Student Final Answer\n' + response.strip()
