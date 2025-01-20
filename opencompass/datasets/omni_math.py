@@ -5,7 +5,6 @@ import numpy as np
 from datasets import load_dataset
 from transformers import AutoTokenizer
 
-from opencompass.models import OpenAISDK
 from opencompass.models.turbomind_api import TurboMindAPIModel
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET, MODELS
@@ -47,7 +46,7 @@ class OmniMathEvaluator(BaseEvaluator):
         self.tokenizer = AutoTokenizer.from_pretrained('KbsdJames/Omni-Judge',
                                                        trust_remote_code=True)
 
-    def batch_infer(self, models: List[OpenAISDK],
+    def batch_infer(self, models: List[TurboMindAPIModel],
                     inputs: List[str]) -> List[str]:
         batch_num = len(models)
         batch_size = (len(inputs) + batch_num - 1) // batch_num
