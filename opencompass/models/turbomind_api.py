@@ -39,18 +39,20 @@ class TurboMindAPIModel(BaseModel):
     is_api: bool = True
 
     def __init__(self,
+                 model_name: str = None,
                  api_addr: str = 'http://0.0.0.0:23333',
                  api_key: str | None = None,
                  max_seq_len: int = 2048,
                  meta_template: Optional[Dict] = None,
                  end_str: Optional[str] = None,
+                 temperature: float = None,
                  **kwargs):
         super().__init__(path='',
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.serve.openai.api_client import APIClient
         self.chatbot = APIClient(api_addr, api_key)
-        self.model_name = self.chatbot.available_models[0]
+        self.model_name = model_name
         self.logger = get_logger()
         self.template_parser = LMTemplateParser(meta_template)
         self.eos_token_id = None
@@ -58,6 +60,7 @@ class TurboMindAPIModel(BaseModel):
             self.eos_token_id = meta_template['eos_token_id']
         self.api_addr = api_addr
         self.end_str = end_str
+        self.temperature = temperature
 
     def generate(
         self,
@@ -83,6 +86,9 @@ class TurboMindAPIModel(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
+
+        if self.temperature is not None:
+            temperature = self.temperature
 
         with ThreadPoolExecutor() as executor:
             results = list(
@@ -125,13 +131,14 @@ class TurboMindAPIModel(BaseModel):
 
         response = ''
         for output in self.chatbot.completions_v1(
-                session_id=threading.currentThread().ident,
                 prompt=prompt,
                 model=self.model_name,
                 max_tokens=max_out_len,
                 temperature=temperature,
                 top_p=0.8,
-                top_k=1):
+                top_k=50,
+                session_id=threading.currentThread().ident,
+        ):
             response += output['choices'][0]['text']
         response = valid_str(response)
         if end_str:
