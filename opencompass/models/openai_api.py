@@ -500,7 +500,8 @@ class OpenAI(BaseAPIModel):
             messages = []
             for item in input:
                 input_content = item['prompt']
-                input_content = bin_trim_wrapper(input_content)
+                if mode != 'none':
+                    input_content = bin_trim_wrapper(input_content)
                 msg = {'content': input_content}
                 if item['role'] == 'HUMAN':
                     msg['role'] = 'user'
