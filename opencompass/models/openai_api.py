@@ -484,12 +484,15 @@ class OpenAI(BaseAPIModel):
             if input_len > max_seq_len:
                 raise ValueError(
                     f'Input length ({input_len}) exceeds max_seq_len '
-                    f'({max_seq_len}) and mode is set to "none". Please  '
-                    f'either change the mode or reduce the input length.')
+                    f'({max_seq_len}) and mode is set to "none". Please '
+                    f'either change the mode or increase the max_seq_len.')
 
         # Trim input if needed
         def bin_trim_wrapper(text):
-            return self._bin_trim(text, max_seq_len - 100 - max_out_len, mode)
+            trim_length = max_seq_len - 100
+            if max_out_len is not None:
+                trim_length -= max_out_len
+            return self._bin_trim(text, trim_length, mode)
 
         if isinstance(input, str) and mode != 'none':
             input = bin_trim_wrapper(input)
@@ -512,7 +515,7 @@ class OpenAI(BaseAPIModel):
                 messages.append(msg)
 
         # Adjust max_out_len
-        try:
+        if max_out_len is not None:
             original_max_out_len = max_out_len
             max_out_len = min(
                 max_out_len,
@@ -528,9 +531,6 @@ class OpenAI(BaseAPIModel):
                 self.logger.warning(
                     f'max_out_len was truncated from {original_max_out_len} '
                     f'to {max_out_len} due to input length')
-
-        except KeyError:
-            max_out_len = max_out_len
 
         return messages, max_out_len
 
