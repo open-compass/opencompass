@@ -27,7 +27,8 @@ class OlympiadBenchDataset(BaseDataset):
 
     Args:
         path (str): Path to dataset directory
-        name (str): Name of specific json file to load (e.g. 'OE_TO_maths_en_COMP')
+        name (str): Name of specific json file to load
+        e.g. 'OE_TO_maths_en_COMP'
     """
 
     @staticmethod
@@ -145,22 +146,21 @@ def get_single_answer_type_text(answer_type, is_chinese):
 def get_answer_type_text(answer_type, is_chinese, multiple_answer):
     if ('Need_human_evaluate' in answer_type) or ('Tuple' in answer_type):
         return ''
-
     if not multiple_answer:
         answer_text = get_single_answer_type_text(answer_type, is_chinese)
         if is_chinese:
             return f'，答案类型为{answer_text}'
         else:
-            return f'The answer of The problem should be {answer_text}. '
-
+            return (f'The answer of The problem should be '
+                    f'{answer_text}. ')
     # Multiple answers case
     if ',' not in answer_type:  # Same answer type for all answers
         answer_text = get_single_answer_type_text(answer_type, is_chinese)
         if is_chinese:
             return f'，题目有多个答案，答案类型均为{answer_text}'
         else:
-            return f'The problem has multiple answers, each of them should be {answer_text}. '
-
+            return (f'The problem has multiple answers, each of them '
+                    f'should be {answer_text}. ')
     # Different answer types
     answer_types = answer_type.split(',')
     answer_types = [
@@ -171,14 +171,16 @@ def get_answer_type_text(answer_type, is_chinese, multiple_answer):
         if is_chinese:
             return f'，题目有多个答案，答案类型均为{answer_text}'
         else:
-            return f'The problem has multiple answers, each of them should be {answer_text}. '
+            return (f'The problem has multiple answers, each of them '
+                    f'should be {answer_text}. ')
     else:
         if is_chinese:
             answer_text = '、'.join(answer_types)
             return f'，题目有多个答案，答案类型分别为{answer_text}'
         else:
             answer_text = ', '.join(answer_types)
-            return f'The problem has multiple answers, with the answers in order being {answer_text}. '
+            return (f'The problem has multiple answers, '
+                    f'with the answers in order being {answer_text}. ')
 
 
 class OlympiadBenchPrompter:
@@ -202,62 +204,74 @@ class OlympiadBenchPrompter:
         if self.is_chinese:
             subject_content = '数学' if self.is_math else '物理'
             if self.is_theorem_proving:
-                prompt = f'以下是中国{subject_content}竞赛中的证明题。请根据题目的要求，运用逻辑推理及常用定理证明题目中的命题。证明过程中使用的变量和公式请使用LaTeX格式表示。'
+                prompt = (f'以下是中国{subject_content}竞赛中的证明题。请根据题目的要求，'
+                          f'运用逻辑推理及常用定理证明题目中的命题。证明过程中使用的变量和公式请使用LaTeX格式表示。')
             else:
                 answer_type_text = get_answer_type_text(
                     answer_type,
                     is_chinese=True,
                     multiple_answer=is_multiple_answer,
                 )
-
                 if is_multiple_answer:
                     multiple_answer_text = '\\boxed{用英文逗号连接的多个答案}'
                 else:
                     multiple_answer_text = '\\boxed{答案}'
-
                 unit_text = ''
                 if unit:
                     multiple_answer_text += '(单位)'
                     unit_text = '，注意答案的单位不要放在\\boxed{}中'
-
-                prompt = f'以下是中国{subject_content}竞赛中的解答题{answer_type_text}。请根据题目的要求和所提供的信息计算得出答案。解答过程和结果中使用的变量和公式请使用LaTeX格式表示。请在最后以"所以最终答案是{multiple_answer_text}。"显式给出结果{unit_text}。'
+                prompt = (f'以下是中国{subject_content}竞赛中的解答题{answer_type_text}。'
+                          f'请根据题目的要求和所提供的信息计算得出答案。解答过程和结果中使用的'
+                          f'变量和公式请使用LaTeX格式表示。请在最后以"所以最终答案是'
+                          f'{multiple_answer_text}。"显式给出结果{unit_text}。')
         else:
             subject_content = 'Math' if self.is_math else 'Physics'
             if self.is_theorem_proving:
-                prompt = f'The following is a theorem proving problem from an International {subject_content} competition. Please use logical reasoning and common theorems to prove the proposition in the problem according to the given requirements. Please use LaTeX format to represent the variables and formulas used in the proof.'
+                prompt = (
+                    f'The following is a theorem proving problem from an '
+                    f'International {subject_content} competition. Please use '
+                    f'logical reasoning and common theorems to prove the '
+                    f'proposition in the problem according to the given '
+                    f'requirements. Please use LaTeX format to represent the '
+                    f'variables and formulas used in the proof.')
             else:
                 if is_multiple_answer:
                     multiple_answer_text = (
                         '\\boxed{multiple answers connected with commas}')
                 else:
                     multiple_answer_text = '\\boxed{answer}'
-
                 unit_text = ''
                 if unit:
                     multiple_answer_text += '(unit)'
-                    unit_text = ', note that the unit of the answer should not be included in \\boxed{}'
-
+                    unit_text = (', note that the unit of the answer should '
+                                 'not be included in \\boxed{}')
                 answer_type_text = get_answer_type_text(
                     answer_type,
                     is_chinese=False,
                     multiple_answer=is_multiple_answer,
                 )
-
-                prompt = f'The following is an open-ended problem from an International {subject_content} competition. {answer_type_text}Please calculate the answer according to the given requirements and the information provided. Please use LaTeX format to represent the variables and formulas used in the solution process and results. Please end your solution with "So the final answer is {multiple_answer_text}." and give the result explicitly{unit_text}.'
-
+                prompt = (
+                    f'The following is an open-ended problem from an '
+                    f'International {subject_content} competition. '
+                    f'{answer_type_text}Please calculate the answer according '
+                    f'to the given requirements and the information provided. '
+                    f'Please use LaTeX format to represent the variables and '
+                    f'formulas used in the solution process and results. '
+                    f'Please end your solution with "So the final answer is '
+                    f'{multiple_answer_text}." and give the result explicitly'
+                    f'{unit_text}.')
         # Add problem statement to the prompt
         prompt = prompt + '\n' + '{problem}' + '\n'
-
         # Add step-by-step reasoning instruction
         if self.is_chinese:
-            prompt += ('\n请通过逐步推理来解答问题，并把最终答案放置于\\boxed{}中。')
+            prompt += '\n请通过逐步推理来解答问题，并把最终答案放置于\\boxed{}中。'
         else:
-            prompt += '\nPlease reason step by step, and put your final answer within \\boxed{}.'
-
+            prompt += ('\nPlease reason step by step, and put your final '
+                       'answer within \\boxed{}.')
         return prompt
 
 
-### Evaluate
+# Evaluate
 
 
 class MathJudger:
@@ -461,9 +475,9 @@ class MathJudger:
                 try:
                     if not (self.can_compute_power(expr1_sym)
                             and self.can_compute_power(expr2_sym)):
-                        print(
-                            f'These two number can not be calculated by current computer for: "{str(expr1_sym)}" and "{str(expr2_sym)}"'
-                        )
+                        print(f'These two number can not be calculated by '
+                              f'current computer for: '
+                              f'"{str(expr1_sym)}" and "{str(expr2_sym)}"')
                         return False
 
                     if (abs(expr1_sym.evalf() - expr2_sym.evalf()) <=
@@ -488,7 +502,8 @@ class MathJudger:
         (expression1 is assumed to be Ground_Truth)
         Function: Check if two equations are mathematically equivalent
         Step 1: Simplify equations to standard form with right side equal to 0
-        Step 2: Use sympy library to calculate quotient of left sides, if quotient or its reciprocal is integer, equations are equivalent
+        Step 2: Use sympy library to calculate quotient of left sides,
+        if quotient or its reciprocal is integer, equations are equivalent
         """
 
         # Convert equations to sympy format with right side moved to left side
@@ -514,7 +529,8 @@ class MathJudger:
         division_result_1 = simplify(expr1_sym / expr2_sym)
         division_result_2 = simplify(expr2_sym / expr1_sym)
 
-        # If division result or its reciprocal is non-zero integer, equations are equivalent
+        # If division result or its reciprocal is
+        # non-zero integer, equations are equivalent
         if (division_result_1.is_Integer
                 and division_result_1 != 0) or (division_result_2.is_Integer
                                                 and division_result_2 != 0):
@@ -525,7 +541,9 @@ class MathJudger:
     def interval_equal(self, expression1, expression2):
         """
         Function: Check if two intervals are mathematically equivalent
-        Step 1: Simplify interval expressions, remove irrelevant symbols like "\left", "\right", and "x \in"
+        Step 1: Simplify interval expressions,
+                remove irrelevant symbols
+                like "\\left", "\\right", and "x \\in"
         Step 2: Compare brackets and mathematical expressions in between
         """
 
@@ -576,7 +594,8 @@ class MathJudger:
                 end_index = start_index
                 stack = 1
 
-                # Search from after \boxed{ until finding matching closing brace
+                # Search from after \boxed{ until
+                # finding matching closing brace
                 while stack > 0 and end_index < len(latex_str):
                     if latex_str[end_index] == '{':
                         stack += 1
@@ -609,7 +628,8 @@ class MathJudger:
             if '\\in ' in expression:
                 expression = expression.split('\\in ')[1]
 
-            # Replace special characters that don't affect LaTeX parsing (decorative)
+            # Replace special characters that
+            # don't affect LaTeX parsing (decorative)
             for signal in self.special_signal_map:
                 expression = expression.replace(
                     signal, self.special_signal_map[signal])
@@ -644,7 +664,8 @@ class MathJudger:
             # Check if the base and the exponent are numbers
             if base.is_number and exp.is_number:
                 # Set a threshold for the maximum size of the exponent
-                MAX_EXP = 1000  # This threshold can be adjusted based on the computing environment
+                # can be adjusted based on the computing environment
+                MAX_EXP = 1000
 
                 # Check if the exponent is greater than the threshold
                 if abs(exp.evalf()) > MAX_EXP:
@@ -652,10 +673,12 @@ class MathJudger:
                 else:
                     return True
             else:
-                # If the base or the exponent is not a number, we cannot compute the power
+                # If the base or the exponent is not a number,
+                # we cannot compute the power
                 return False
         else:
-            # If the expression is not a power expression, return True as it is not the case we are checking for
+            # If the expression is not a power expression,
+            # return True as it is not the case we are checking for
             return True
 
 

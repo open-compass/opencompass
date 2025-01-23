@@ -44,6 +44,7 @@ repos:
     rev: v0.32.0
     hooks:
       - id: yapf
+        args: ["--style=pep8", "--no-local-style"]
         exclude: |
             (?x)^(
                 configs/ |
@@ -96,12 +97,12 @@ repos:
           - mdformat_frontmatter
           - linkify-it-py
         exclude: configs/
-  - repo: https://github.com/myint/docformatter
-    rev: v1.3.1
-    hooks:
-      - id: docformatter
-        language: python
-        args: ["--in-place", "--wrap-descriptions", "79"]
+  # - repo: https://github.com/myint/docformatter
+  #   rev: v1.3.1
+  #   hooks:
+  #     - id: docformatter
+  #       language: system
+  #       args: ["--in-place", "--wrap-descriptions", "79"]
   - repo: local
     hooks:
     -   id: update-dataset-suffix
