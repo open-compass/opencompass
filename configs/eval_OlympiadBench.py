@@ -5,7 +5,7 @@ with read_base():
 
     # from opencompass.configs.models.qwen2_5.hf_qwen2_5_7b_instruct import models as hf_qwen2_5_7b_instruct_model
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import models as lmdeploy_qwen2_5_7b_instruct_model
-    from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import models as lmdeploy_llama3_8b_instruct_model
+    # from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import models as lmdeploy_llama3_8b_instruct_model
 
     from opencompass.configs.summarizers.OlympiadBench import summarizer
 

@@ -398,9 +398,18 @@ DATASETS_MAPPING = {
         "hf_id": "THUDM/LongBench-v2",
         "local": "./data/longbenchv2/data.json",
     },
+    "opencompass/OlympiadBench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/OlympiadBench",
+    },
 }
 
 DATASETS_URL = {
+    "/OlympiadBench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/OlympiadBench.zip",
+        "md5": "97e8b1ae7f6170d94817288a8930ef00",
+    },
     "/longbenchv2":{
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/longbenchv2.zip",
         "md5": "09b7e06e6f98c5cca8ad597b3d7b42f0",
