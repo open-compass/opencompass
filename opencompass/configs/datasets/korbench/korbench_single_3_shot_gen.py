@@ -7,7 +7,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
-categories = ["cipher", "counterfactual", "logic", "operation", "puzzle"]
+categories = ['cipher', 'counterfactual', 'logic', 'operation', 'puzzle']
 
 korbench_3shot_single_datasets = []
 
@@ -16,15 +16,15 @@ for category in categories:
     prompt_template = dict(
         type=PromptTemplate,
         template=dict(
-            begin=[dict(role="HUMAN", prompt="")],
-            round=[dict(role="HUMAN", prompt="{prompt}")],  # f-string
+            begin=[dict(role='HUMAN', prompt='')],
+            round=[dict(role='HUMAN', prompt='{prompt}')],  # f-string
         ),
     )
 
     # Reader configuration
     reader_cfg = dict(
-        input_columns=["prompt"],
-        output_column="answer",
+        input_columns=['prompt'],
+        output_column='answer',
     )
 
     # Inference configuration
@@ -37,13 +37,13 @@ for category in categories:
     # Evaluation configuration
     eval_cfg = dict(
         evaluator=dict(type=korbenchEvaluator),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     korbench_dataset = dict(
         type=korbenchDataset,
-        abbr=f"korbench_{category}",
-        path="opencompass/korbench",
+        abbr=f'korbench_{category}',
+        path='opencompass/korbench',
         prompt_mode='3_shot',
         category=category,
         reader_cfg=reader_cfg,

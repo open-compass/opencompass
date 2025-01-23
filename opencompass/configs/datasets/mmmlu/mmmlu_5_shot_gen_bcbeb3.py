@@ -106,7 +106,7 @@ for _name in mmmlu_all_sets:
     else:
         _hint = f'There is a single choice question. Answer the question by replying A, B, C or D.'
         _prompt = f'it is about {{subject}} \nQuestion: {{input}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer:'
-        _round = f'{_hint}\n{_prompt}\n'+"Please answer only with option A, B, C or D. \nAnswer:"
+        _round = f'{_hint}\n{_prompt}\n'+'Please answer only with option A, B, C or D. \nAnswer:'
     mmmlu_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,

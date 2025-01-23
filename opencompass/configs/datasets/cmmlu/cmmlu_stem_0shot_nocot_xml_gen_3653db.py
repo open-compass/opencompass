@@ -117,7 +117,7 @@ for _name in cmmlu_all_sets:
                     test_split='test'),
             ),
             dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-            pred_postprocessor=dict(type=xml_tag_postprocessor, tag="<conclude>"),
+            pred_postprocessor=dict(type=xml_tag_postprocessor, tag='<conclude>'),
             judge_cfg=dict(),
         ),
         pred_role='BOT',
