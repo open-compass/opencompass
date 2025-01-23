@@ -41,7 +41,7 @@ for _name in categories:
         dict(
             type=OlympiadBenchDataset,
             abbr=f'OlympiadBench_{_name}',
-            path='data/OlympiadBench',
+            path='opencompass/OlympiadBench',
             name=_name,
             reader_cfg=olympiadbench_reader_cfg,
             infer_cfg=olympiadbench_infer_cfg,
