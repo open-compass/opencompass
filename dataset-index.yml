@@ -1,0 +1,15 @@
+- pmmeval:
+    name: PMMEval
+    category: multilingual
+- bigcodebench:
+    name: BigCodeBench
+    category: code
+- lawbench:
+    name: LawBench
+    category: law
+
+
+
+
+
+
