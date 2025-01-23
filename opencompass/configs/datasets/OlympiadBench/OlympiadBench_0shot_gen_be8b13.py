@@ -3,7 +3,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 # from opencompass.datasets import MATHDataset, MATHEvaluator, math_postprocess_v2, normalize_final_answer
-from opencompass.datasets import OlympiadBenchPrompter, OlympiadBenchDataset, OlympiadBenchEvaluator, olympiadbench_postprocess_v2
+from opencompass.datasets import OlympiadBenchDataset, OlympiadBenchEvaluator, olympiadbench_postprocess_v2
 
 
 with read_base():
