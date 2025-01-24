@@ -105,7 +105,7 @@ models = [
         model_kwargs=dict(tensor_parallel_size=1),
         generation_kwargs=dict(do_sample=False),  # greedy
         max_seq_len=32768,
-        max_out_len=8192,
+        max_out_len=16384,
         batch_size=16,
         run_cfg=dict(num_gpus=1),
         meta_template=reasoning_meta_template,
