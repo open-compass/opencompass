@@ -1,3 +1,8 @@
+# To run this example, you need to do the following steps:
+# 1. Install latest opencompass
+# 2. Start a local server with Qwen2.5-72B-Instruct as LLMJudge server (i.e. using vLLM or LMDeploy)
+# 3. Change the judge_cfg openai_api_base to your corresponindg local server address
+# 4. Start this evaluation by running 'opencompass eval_internlm3_math500_thinking.py' 
 from opencompass.models import VLLMwithChatTemplate, OpenAISDK
 from mmengine.config import read_base
 
