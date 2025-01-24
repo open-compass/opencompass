@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 import re
 import warnings
 from collections import defaultdict
@@ -32,10 +33,8 @@ HEADER = ['name', 'category']
 def table_format(data_list):
     table_format_list = []
     for i in data_list:
-        print(i)
         table_format_list_sub = []
         for j in i:
-            print(i[j])
             for index in HEADER:
                 table_format_list_sub.append(i[j][index])
         table_format_list.append(table_format_list_sub)
