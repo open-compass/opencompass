@@ -94,6 +94,7 @@ from .mbpp_pro import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
 from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
+from .mmlu_cf import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403
@@ -104,6 +105,7 @@ from .natural_question import *  # noqa: F401, F403
 from .natural_question_cn import *  # noqa: F401, F403
 from .NPHardEval import *  # noqa: F401, F403
 from .obqa import *  # noqa: F401, F403
+from .OlympiadBench import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403

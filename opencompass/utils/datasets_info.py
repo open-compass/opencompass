@@ -368,6 +368,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/LiveMathBench/",
     },
+    "opencompass/LiveMathBench": {
+        "ms_id": "",
+        "hf_id": "opencompass/LiveMathBench",
+        "local": "./data/LiveMathBench/",
+    },
     "opencompass/LiveReasonBench": {
         "ms_id": "",
         "hf_id": "",
@@ -402,10 +407,19 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/mbpp_pro/mbpp_pro.json",
-    }
+    },
+    "opencompass/OlympiadBench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/OlympiadBench",
+    },
 }
 
 DATASETS_URL = {
+    "/OlympiadBench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/OlympiadBench.zip",
+        "md5": "97e8b1ae7f6170d94817288a8930ef00",
+    },
     "/longbenchv2":{
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/longbenchv2.zip",
         "md5": "09b7e06e6f98c5cca8ad597b3d7b42f0",
@@ -644,7 +658,7 @@ DATASETS_URL = {
     },
     "LiveMathBench": {
         'url': "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/LiveMathBench.zip",
-        "md5": "789df4604260d5cf3ba7a891077cf6a0",
+        "md5": "d0781f9185c9bb50e81e6e3ca8c59013",
     },
     "bigcodebench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bigcodebench.zip",
