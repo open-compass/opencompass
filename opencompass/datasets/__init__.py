@@ -61,6 +61,7 @@ from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
 from .humaneval_multi import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
+from .humaneval_pro import *  # noqa: F401, F403
 from .hungarian_math import *  # noqa: F401, F403
 from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
 from .inference_ppl import InferencePPLDataset  # noqa: F401, F403
@@ -89,6 +90,7 @@ from .math401 import *  # noqa: F401, F403
 from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
+from .mbpp_pro import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
 from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
