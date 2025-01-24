@@ -369,12 +369,18 @@ def fill_infer_cfg(cfg, args):
 
 
 def fill_eval_cfg(cfg, args):
+    # To avoid the overwriting of the configured subjective partitioner and task type.
+    partitioner_type = cfg.get("eval", {}).get("partitioner", {}).get("type", None)
+    partitioner_type = partitioner_type if partitioner_type else get_config_type(NaivePartitioner)
+    task_type = cfg.get("eval", {}).get("runner", {}).get("task", {}).get("type", None)
+    task_type = task_type if task_type else get_config_type(OpenICLEvalTask)
+
     new_cfg = dict(
-        eval=dict(partitioner=dict(type=get_config_type(NaivePartitioner)),
+        eval=dict(partitioner=dict(type=partitioner_type),
                   runner=dict(
                       max_num_workers=args.max_num_workers,
                       debug=args.debug,
-                      task=dict(type=get_config_type(OpenICLEvalTask)),
+                      task=dict(type=task_type),
                       lark_bot_url=cfg['lark_bot_url'],
                   )))
     if args.slurm:

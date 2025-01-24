@@ -65,6 +65,7 @@ def get_capability_results(
     fout,
     fout_flag,
     model_abbr,
+    customized_task_group=task_group_new,
 ):
     capability_ratings = defaultdict(float)
     capability_counts = defaultdict(float)
@@ -75,8 +76,8 @@ def get_capability_results(
         capability_counts['total'] += 1
         tags = [ref['primary_tag']] + ref['secondary_tag']
         for tag in tags:
-            capability_ratings[task_group_new[tag]] += ans
-            capability_counts[task_group_new[tag]] += 1
+            capability_ratings[customized_task_group[tag]] += ans
+            capability_counts[customized_task_group[tag]] += 1
 
     capability_avg_ratings = defaultdict(float)
 
@@ -102,7 +103,7 @@ class WildBenchSingleSummarizer(CompassArenaSummarizer):
             It's expected to be filled out at runtime.
     """
 
-    def __init__(self, config: ConfigDict) -> None:
+    def __init__(self, config: ConfigDict, customized_task_group_new=task_group_new) -> None:
         self.judge_type = 'single'
         self.tasks = []
         self.cfg = config
@@ -110,6 +111,7 @@ class WildBenchSingleSummarizer(CompassArenaSummarizer):
         self.eval_model_cfgs = self.cfg['eval']['partitioner']['models']
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
         self.judge_function = post_process_wildbench_single
+        self.task_group_new = customized_task_group_new
 
     def summarize(self, time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):
         """Summarize the subjectivity analysis based on evaluation results.
@@ -138,7 +140,13 @@ class WildBenchSingleSummarizer(CompassArenaSummarizer):
                     overall_judged_answers += judged_answers
                     overall_references += references
 
-                get_capability_results(overall_judged_answers, overall_references, fout, fout_flag, show_model_abbr)
+                get_capability_results(
+                    overall_judged_answers, 
+                    overall_references, 
+                    fout, fout_flag, 
+                    show_model_abbr, 
+                    self.task_group_new,
+                )
                 fout_flag += 1
             else:
                 print(subdir_path + ' is not exist! please check!')
