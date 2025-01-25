@@ -6,45 +6,40 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets.OpenHuEval.HuMatchingFIB import HuMatchingFIBDataset, HuMatchingFIBEvaluator
 
 with read_base():
-    from .HuMatchingFIB_setting import INSTRUCTIONS, DATASET_PATH
+    from .HuMatchingFIB_setting import INSTRUCTION, DATA_PATH, DATA_VERSION
 
-ALL_LANGUAGES = ['hu']
-PROMPT_VERSION = INSTRUCTIONS['version']
 
-FIB1_reader_cfg = dict(input_columns=['question', 'subject'],
-                         output_column='reference')
+instruction = INSTRUCTION['prompt_template']
+prompt_version = INSTRUCTION['version']
 
-FIB1_datasets = []
-for lan in ALL_LANGUAGES:
-    instruction = INSTRUCTIONS[lan]
-    FIB1_infer_cfg = dict(
-        prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin='</E>',
-                round=[
-                    dict(
-                        role='HUMAN',
-                        prompt=instruction
-                    ),
-                ],
-            ),
-            ice_token='</E>',
+hu_matching_fib_reader_cfg = dict(input_columns=['question', 'subject'],
+                                  output_column='reference')
+
+hu_matching_fib_datasets = []
+
+hu_matching_fib_infer_cfg = dict(
+    prompt_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin='</E>',
+            round=[
+                dict(role='HUMAN', prompt=instruction),
+            ],
         ),
-        retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer),
-    )
+        ice_token='</E>',
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer),
+)
 
-    FIB1_eval_cfg = dict(evaluator=dict(type=HuMatchingFIBEvaluator))
+hu_matching_fib_eval_cfg = dict(evaluator=dict(type=HuMatchingFIBEvaluator))
 
-    FIB1_datasets.append(
-        dict(
-            abbr=f'nkp_FIB1_humanities-{lan}-1shot-{PROMPT_VERSION}',
-            type=HuMatchingFIBDataset,
-            path=DATASET_PATH,
-            lan=lan,
-            reader_cfg=FIB1_reader_cfg,
-            infer_cfg=FIB1_infer_cfg,
-            eval_cfg=FIB1_eval_cfg,
-        )
-    )
+hu_matching_fib_datasets.append(
+    dict(
+        abbr=f'hu_matching_fib_{DATA_VERSION}-prompt_{prompt_version}',
+        type=HuMatchingFIBDataset,
+        filepath=DATA_PATH,
+        reader_cfg=hu_matching_fib_reader_cfg,
+        infer_cfg=hu_matching_fib_infer_cfg,
+        eval_cfg=hu_matching_fib_eval_cfg,
+    ))
