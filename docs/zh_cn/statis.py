@@ -10,7 +10,7 @@ from tabulate import tabulate
 import yaml
 
 OC_ROOT = Path(__file__).absolute().parents[2]
-GITHUB_PREFIX = 'https://github.com/open-compass/opencompass/tree/main/opencompass/'
+GITHUB_PREFIX = 'https://github.com/open-compass/opencompass/tree/main/'
 DATASETZOO_TEMPLATE = """\
 # 数据集统计
 
@@ -39,7 +39,13 @@ def table_format(data_list):
                 if index == 'paper':
                     table_format_list_sub.append('[链接](' + i[j][index] + ')')
                 elif index == 'configpath':
-                    table_format_list_sub.append('[链接](' + GITHUB_PREFIX + i[j][index] + ')')
+                    if isinstance(i[j][index], list):
+                        sub_list_text = ""
+                        for k in i[j][index]:
+                            sub_list_text += ('[链接](' + GITHUB_PREFIX + k + ') / ')
+                        table_format_list_sub.append(sub_list_text[:-2])
+                    else:
+                        table_format_list_sub.append('[链接](' + GITHUB_PREFIX + i[j][index] + ')')
                 else:
                     table_format_list_sub.append(i[j][index])
         table_format_list.append(table_format_list_sub)
