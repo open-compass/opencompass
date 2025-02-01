@@ -8,9 +8,9 @@ with read_base():
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import (
         models as lmdeploy_internlm2_5_7b_chat_model,
     )
-    from opencompass.configs.models.openai.gpt_4o_mini_20240718 import (
-        models as gpt_4o_mini_20240718_model,
-    )
+    # from opencompass.configs.models.openai.gpt_4o_mini_20240718 import (
+    #     models as gpt_4o_mini_20240718_model,
+    # )
 
 from opencompass.models import OpenAI
 from opencompass.partitioners import (
@@ -31,7 +31,7 @@ api_meta_template = dict(
 )
 
 models = [
-    *gpt_4o_mini_20240718_model,
+    # *gpt_4o_mini_20240718_model,
     *lmdeploy_internlm2_5_7b_chat_model,
 ]
 
