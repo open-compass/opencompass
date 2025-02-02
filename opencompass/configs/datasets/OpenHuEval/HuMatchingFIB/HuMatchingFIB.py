@@ -8,12 +8,12 @@ from opencompass.datasets.OpenHuEval.HuMatchingFIB import HuMatchingFIBDataset, 
 with read_base():
     from .HuMatchingFIB_setting import INSTRUCTION, DATA_PATH, DATA_VERSION
 
-
 instruction = INSTRUCTION['prompt_template']
 prompt_version = INSTRUCTION['version']
 
-hu_matching_fib_reader_cfg = dict(input_columns=['question', 'subject'],
-                                  output_column='reference')
+hu_matching_fib_reader_cfg = dict(
+    input_columns=['question', 'options', 'hu_specific_dim'],
+    output_column='reference')
 
 hu_matching_fib_datasets = []
 

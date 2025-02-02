@@ -24,10 +24,12 @@ class HuMatchingFIBDataset(BaseDataset):
             objs.append(obj)
         out_dict_list = []
         for obj in objs:
-            question = dict(q_main=obj['q_main'], options=obj['options'])
-            hu_specific_dim = obj['hu_specific_label_question']
+            question = obj['question']
+            options = obj['options']
+            hu_specific_dim = obj['hu_specific_dim']
             tmp = obj
             new_obj = dict(question=question,
+                           options=options,
                            hu_specific_dim=hu_specific_dim,
                            reference=tmp)
             out_dict_list.append(new_obj)
@@ -49,7 +51,7 @@ class HuMatchingFIBEvaluator(BaseEvaluator):
 
         for idx, (pred, refer, prompt) in enumerate(
                 zip(predictions, references, origin_prompt)):
-            std_ans = refer['std_ans']
+            std_ans = refer['answer']
             model_ans = []
             pred = pred.strip()
             match = re.search(r'\{.*?\}', pred, re.DOTALL)
@@ -88,7 +90,7 @@ class HuMatchingFIBEvaluator(BaseEvaluator):
 
             model_ans = []
             if to_end_flag:
-                model_ans = data.get('std_ans', [])
+                model_ans = data.get('answer', [])
                 is_question_correct = True
                 for index, ans in enumerate(std_ans):
                     if index >= len(model_ans):
