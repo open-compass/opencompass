@@ -12,6 +12,7 @@ models = [
         path='o1-preview-2024-09-12',
         key=
         'ENV',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
+        openai_proxy_url='ENV',
         meta_template=api_meta_template,
         query_per_second=1,
         batch_size=1,
