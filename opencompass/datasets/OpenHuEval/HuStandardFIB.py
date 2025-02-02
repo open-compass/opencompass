@@ -4,21 +4,20 @@ import re
 
 from datasets import Dataset, DatasetDict
 from fuzzywuzzy import fuzz
+
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+
 from ..base import BaseDataset
 
 
 class HuStandardFIBDataset(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        path = kwargs.get('path', None)
-        # lan = kwargs.get('lan', None)
+    def load(filepath):
+        assert os.path.isfile(filepath)
+        assert filepath.endswith('.jsonl')
         dataset = DatasetDict()
-        file_list = [os.path.join(path, file) for file in os.listdir(path)
-                     ]  # TODO only work for a single split.
-        f_path = file_list[0]
-        f = open(f_path, 'r', encoding='utf-8')
+        f = open(filepath, 'r', encoding='utf-8')
         lines = f.readlines()
         objs = []
 
@@ -29,11 +28,15 @@ class HuStandardFIBDataset(BaseDataset):
         out_dict_list = []
 
         for obj in objs:
-            question = dict(q_main=obj['q_main'],
-                            q_sub=obj['formatted_q_sub'])  # TODO
-            subject = obj['major']
+            instruction = obj['question']  # TODO: question -> instruction
+            questions = obj[
+                'question_sub']  # TODO: update question_sub -> questions
+            hu_specific_dim = obj['hu_specific_dim']
             tmp = obj
-            new_obj = dict(question=question, subject=subject, reference=tmp)
+            new_obj = dict(instruction=instruction,
+                           questions=questions,
+                           hu_specific_dim=hu_specific_dim,
+                           reference=tmp)
             out_dict_list.append(new_obj)
         dataset = Dataset.from_list(out_dict_list)
         return dataset
@@ -55,9 +58,8 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                 zip(predictions, references, origin_prompt)):
             std_ans = [
                 re.sub(r'#\d+#', '', ans).split(';')
-                for ans in refer['formatted_std_ans']
-            ]  # Remove "#0#" and "#1#", then split
-            # refer['formatted_std_ans']
+                for ans in refer['answer']  # TODO: answer -> answers
+            ]  # Remove "#0#" and "#1#", then split refer['formatted_std_ans']
             model_ans = []
             pred = pred.strip()
             match = re.search(r'\{.*?\}', pred, re.DOTALL)
@@ -99,7 +101,7 @@ class HuStandardFIBEvaluator(BaseEvaluator):
             if to_end_flag:
                 model_ans = [
                     re.sub(r'#\d+#', '', ans).split(';')
-                    for ans in data.get('formatted_std_ans', [])
+                    for ans in data.get('answers', [])
                 ]  # Preprocess model_ans in the same way as std_ans
                 is_question_correct = True
                 for idx, ans_list in enumerate(std_ans):
