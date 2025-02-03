@@ -30,6 +30,7 @@ O1_MODEL_LIST = [
     'o1-mini-2024-09-12',
     'o1-preview',
     'o1-mini',
+    'o3-mini-2025-01-31',
 ]
 
 
@@ -579,6 +580,7 @@ class OpenAISDK(OpenAI):
             verbose=verbose,
             max_completion_tokens=max_completion_tokens,
         )
+        key = random.choice(self.keys)
         from openai import OpenAI
 
         # support multiple api_base for acceleration
