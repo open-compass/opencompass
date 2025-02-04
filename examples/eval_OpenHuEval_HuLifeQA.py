@@ -5,12 +5,14 @@ with read_base():
         hu_life_qa_datasets,
         task_group_new,
     )
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import (
-        models as lmdeploy_internlm2_5_7b_chat_model,
-    )
-    # from opencompass.configs.models.openai.gpt_4o_mini_20240718 import (
-    #     models as gpt_4o_mini_20240718_model,
-    # )
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
+        models as lmdeploy_qwen2_5_7b_instruct_model, )
+    from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import (
+        models as lmdeploy_internlm3_8b_instruct_model, )
+    from opencompass.configs.models.openai.gpt_4o_mini_20240718 import (
+        models as gpt_4o_mini_20240718_model, )
+    from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import (
+        models as lmdeploy_qwq_32b_preview_model, )
 
 from opencompass.models import OpenAI
 from opencompass.partitioners import (
@@ -22,41 +24,39 @@ from opencompass.summarizers import WildBenchSingleSummarizer
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 
-api_meta_template = dict(
-    round=[
-        dict(role="SYSTEM", api_role="SYSTEM"),
-        dict(role="HUMAN", api_role="HUMAN"),
-        dict(role="BOT", api_role="BOT", generate=True),
-    ]
-)
+api_meta_template = dict(round=[
+    dict(role='SYSTEM', api_role='SYSTEM'),
+    dict(role='HUMAN', api_role='HUMAN'),
+    dict(role='BOT', api_role='BOT', generate=True),
+])
 
 models = [
     # *gpt_4o_mini_20240718_model,
-    *lmdeploy_internlm2_5_7b_chat_model,
+    *lmdeploy_qwen2_5_7b_instruct_model,
+    *lmdeploy_internlm3_8b_instruct_model,
+
+    *lmdeploy_qwq_32b_preview_model,
 ]
 
 judge_models = [
     dict(
-        abbr="GPT-4o-2024-08-06",
+        abbr='GPT-4o-2024-08-06',
         type=OpenAI,
-        path="gpt-4o-2024-08-06",
-        key="ENV",
+        path='gpt-4o-2024-08-06',
+        key='ENV',
+        openai_proxy_url='ENV',
+        verbose=True,
         meta_template=api_meta_template,
-        query_per_second=16,
-        max_out_len=4096,
-        max_seq_len=4096,
+        query_per_second=2,
+        max_out_len=8192,
+        max_seq_len=8192,
         batch_size=8,
         temperature=0,
     )
 ]
 
 for ds in hu_life_qa_datasets:
-    ds.update(
-        dict(
-            mode="singlescore",
-            eval_mode="single"
-        )
-    )
+    ds.update(dict(mode='singlescore', eval_mode='single'))
 del ds
 datasets = [*hu_life_qa_datasets]
 del hu_life_qa_datasets
@@ -80,11 +80,9 @@ eval = dict(
         models=models,
         judge_models=judge_models,
     ),
-    runner=dict(
-        type=LocalRunner, 
-        max_num_workers=16, 
-        task=dict(type=SubjectiveEvalTask)
-    ),
+    runner=dict(type=LocalRunner,
+                max_num_workers=16,
+                task=dict(type=SubjectiveEvalTask)),
 )
 
 summarizer = dict(
@@ -93,5 +91,5 @@ summarizer = dict(
 )
 
 work_dir = (
-    "./outputs/" + __file__.split("/")[-1].split(".")[0] + "/"
+    './outputs/' + __file__.split('/')[-1].split('.')[0] + '/'
 )  # do NOT modify this line, yapf: disable, pylint: disable
