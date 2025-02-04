@@ -3,8 +3,6 @@ import os
 
 from datasets import Dataset, DatasetDict
 
-from opencompass.configs.datasets.OpenHuEval.HuProverbRea.prompts import \
-    judge_prompt_template
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.utils.prompt import PromptList
 
@@ -14,12 +12,10 @@ from ..base import BaseDataset
 class HuProverbDataset2CQ(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        path = kwargs.get('path', None)
+    def load(filepath):
+        assert os.path.isfile(filepath)
         dataset = DatasetDict()
-        sub_dataset_file = os.path.join(path,
-                                        '{}.jsonl'.format('HuProverbRea'))
-        f = open(sub_dataset_file, 'r', encoding='utf-8')
+        f = open(filepath, 'r', encoding='utf-8')
         lines = f.readlines()
         out_dict_list = []
         for line in lines:
@@ -46,7 +42,7 @@ class HuProverbDataset2CQ(BaseDataset):
                 'option2': w_ops,
                 'out': {
                     'true_ans': '1',
-                    'id': obj['qid'],
+                    'qid': obj['qid'],
                     'source_id': obj['source_info']['source_id'],
                     'en_expl': obj['source_info']['en_expl'],
                     'en_trans': obj['source_info']['en_trans'],
@@ -69,7 +65,7 @@ class HuProverbDataset2CQ(BaseDataset):
                 'option2': cor_ops,
                 'out': {
                     'true_ans': '2',
-                    'id': obj['qid'],
+                    'qid': obj['qid'],
                     'source_id': obj['source_info']['source_id'],
                     'en_expl': obj['source_info']['en_expl'],
                     'en_trans': obj['source_info']['en_trans'],
@@ -93,12 +89,10 @@ class HuProverbDataset2CQ(BaseDataset):
 class HuProverbDatasetOE(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        path = kwargs.get('path', None)
+    def load(filepath):
+        assert os.path.isfile(filepath)
         dataset = DatasetDict()
-        sub_dataset_file = os.path.join(path,
-                                        '{}.jsonl'.format('HuProverbRea'))
-        f = open(sub_dataset_file, 'r', encoding='utf-8')
+        f = open(filepath, 'r', encoding='utf-8')
         lines = f.readlines()
         out_dict_list = []
         for line in lines:
@@ -121,7 +115,7 @@ class HuProverbDatasetOE(BaseDataset):
                 'en_expl': obj['source_info']['en_expl'],
                 'hu_expl': obj['source_info']['hu_expl'],
                 'out': {
-                    'id': obj['qid'],
+                    'qid': obj['qid'],
                     'source_id': obj['source_info']['source_id'],
                     'en_expl': obj['source_info']['en_expl'],
                     'en_trans': obj['source_info']['en_trans'],
@@ -152,7 +146,7 @@ class HuProverb_Evaluator_2CQ(BaseEvaluator):
         total, correct, incorrect, fail_parse = 0, 0, 0, 0
         for raw_pred, detail, ori_prompt in zip(predictions, references,
                                                 origin_prompt):
-            idx = detail['id']
+            qid = detail['qid']
             option1 = detail['option1']
             option2 = detail['option2']
             true_ans = detail['true_ans']
@@ -181,9 +175,9 @@ class HuProverb_Evaluator_2CQ(BaseEvaluator):
             else:
                 res_of_this_round['is_incorrect'] = True
 
-            if idx not in details:
+            if qid not in details:
                 total += 1
-                details[idx] = {
+                details[qid] = {
                     'detail': {
                         'hu_text': detail['hu_text'],
                         'en_trans': detail['en_trans'],
@@ -199,21 +193,21 @@ class HuProverb_Evaluator_2CQ(BaseEvaluator):
                     'is_fail_parse': False
                 }
             else:
-                details[idx]['flipped_variance'].append(res_of_this_round)
+                details[qid]['flipped_variance'].append(res_of_this_round)
                 # judge the results
-                if details[idx]['flipped_variance'][0][
-                        'is_correct'] and details[idx]['flipped_variance'][1][
+                if details[qid]['flipped_variance'][0][
+                        'is_correct'] and details[qid]['flipped_variance'][1][
                             'is_correct']:
                     correct += 1
-                    details[idx]['is_correct'] = True
-                elif details[idx]['flipped_variance'][0][
-                        'is_fail_parse'] or details[idx]['flipped_variance'][
+                    details[qid]['is_correct'] = True
+                elif details[qid]['flipped_variance'][0][
+                        'is_fail_parse'] or details[qid]['flipped_variance'][
                             1]['is_fail_parse']:
                     fail_parse += 1
-                    details[idx]['is_fail_parse'] = True
+                    details[qid]['is_fail_parse'] = True
                 else:
                     incorrect += 1
-                    details[idx]['is_incorrect'] = True
+                    details[qid]['is_incorrect'] = True
 
         assert total == correct + incorrect + fail_parse
         results = {
@@ -227,9 +221,16 @@ class HuProverb_Evaluator_2CQ(BaseEvaluator):
 
 
 class HuProverb_Evaluator_OE(BaseEvaluator):
-    """
-    ref: opencompass.openicl.icl_evaluator.AccwithDetailsEvaluator
-    """
+
+    def __init__(self,
+                 judge_prompt_template,
+                 openai_key='ENV',
+                 openai_proxy_url='ENV',
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.judge_prompt_template = judge_prompt_template
+        self.openai_key = openai_key
+        self.openai_proxy_url = openai_proxy_url
 
     def score(self, predictions, references, origin_prompt) -> dict:
 
@@ -239,13 +240,16 @@ class HuProverb_Evaluator_OE(BaseEvaluator):
         details = {}
         total, correct, wrong, unclear = 0, 0, 0, 0
         from opencompass.models import OpenAI
-        model = OpenAI(path='gpt-4o',
+        model = OpenAI(path='gpt-4o-2024-08-06',
+                       key=self.openai_key,
+                       openai_proxy_url=self.openai_proxy_url,
                        max_seq_len=8192,
                        retry=2,
-                       temperature=0.1)
+                       temperature=0,
+                       verbose=True)
         for raw_pred, detail in zip(predictions, references):
             total += 1
-            qid = detail['id']
+            qid = detail['qid']
             details[qid] = {
                 'proverb': detail['hu_text'],
                 'conversation': detail['context'],
@@ -256,12 +260,12 @@ class HuProverb_Evaluator_OE(BaseEvaluator):
             }
 
             # ------------------------------------------- openai judge
-            user_prompt = judge_prompt_template['en_user'].format(
+            user_prompt = self.judge_prompt_template['en_user'].format(
                 proverb=detail['hu_text'],
                 conversation=detail['context'],
                 answer=detail['correct'],
                 raw_pred=raw_pred)
-            system_prompt = judge_prompt_template['en_system']
+            system_prompt = self.judge_prompt_template['en_system']
             details[qid]['judge_user_prompt'] = user_prompt
 
             messages = PromptList([{

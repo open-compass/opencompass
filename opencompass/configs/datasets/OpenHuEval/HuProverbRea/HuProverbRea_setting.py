@@ -1,3 +1,5 @@
+# yapf: disable
+
 INSTRUCTIONS_DIRECT_QA = {
     'en': 'You are a language expert specialized in Hungarian. Given a Hungarian phrase:\n\n' +
     '######################\n' +
@@ -68,3 +70,8 @@ judge_prompt_template = {
     '[The end of the second analysis]\n\n' +
     'Your decision:'
 }
+
+
+OpenHuEval_Path = '/mnt/hwfile/opendatalab/wj/proj/polyglot_24July/OpenHuEval'
+DATA_VERSION = '250127'
+DATA_PATH = f'{OpenHuEval_Path}/data/HuProverbRea/HuProverbRea_{DATA_VERSION}/HuProverbRea.jsonl'
