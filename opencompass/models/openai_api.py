@@ -31,6 +31,8 @@ O1_MODEL_LIST = [
     'o1-preview',
     'o1-mini',
     'o3-mini-2025-01-31',
+    'deepseek-ai/DeepSeek-R1',
+    'DeepSeek-R1',
 ]
 
 
@@ -127,6 +129,14 @@ class OpenAI(BaseAPIModel):
                 if 'OPENAI_API_KEY' not in os.environ:
                     raise ValueError('OpenAI API key is not set.')
                 self.keys = os.getenv('OPENAI_API_KEY').split(',')
+            elif key == 'ENV_SILICONFLOW':
+                if 'SILICONFLOW_API_KEY' not in os.environ:
+                    raise ValueError('Siliconflow API key is not set.')
+                self.keys = os.getenv('SILICONFLOW_API_KEY').split(',')
+            elif key == 'ENV_DEEPSEEK':
+                if 'DEEPSEEK_API_KEY' not in os.environ:
+                    raise ValueError('Deepseek API key is not set.')
+                self.keys = os.getenv('DEEPSEEK_API_KEY').split(',')
             else:
                 self.keys = [key]
         else:
@@ -626,7 +636,7 @@ class OpenAISDK(OpenAI):
                     f"'max_token' is unsupported for model {self.path}")
                 self.logger.warning(
                     f'We use max_completion_tokens: '
-                    f'{self.max_completion_tokens}for this query')
+                    f'{self.max_completion_tokens} for this query')
                 query_data = dict(
                     model=self.path,
                     max_completion_tokens=self.max_completion_tokens,
