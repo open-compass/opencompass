@@ -28,9 +28,8 @@ class HuStandardFIBDataset(BaseDataset):
         out_dict_list = []
 
         for obj in objs:
-            instruction = obj['question']  # TODO: question -> instruction
-            questions = obj[
-                'question_sub']  # TODO: update question_sub -> questions
+            instruction = obj['instruction']
+            questions = obj['questions']
             hu_specific_dim = obj['hu_specific_dim']
             tmp = obj
             new_obj = dict(instruction=instruction,
@@ -54,11 +53,11 @@ class HuStandardFIBEvaluator(BaseEvaluator):
         blank_correct, blank_total = 0, 0
         question_correct, question_total = 0, 0
 
-        for idx, (pred, refer, prompt) in enumerate(
+        for i, (pred, refer, prompt) in enumerate(
                 zip(predictions, references, origin_prompt)):
             std_ans = [
                 re.sub(r'#\d+#', '', ans).split(';')
-                for ans in refer['answer']  # TODO: answer -> answers
+                for ans in refer['answers']
             ]  # Remove "#0#" and "#1#", then split refer['formatted_std_ans']
             model_ans = []
             pred = pred.strip()
@@ -68,12 +67,14 @@ class HuStandardFIBEvaluator(BaseEvaluator):
             else:
                 blank_total += len(std_ans)
                 question_total += 1
-                details[idx] = {
-                    'detail': refer,
+                details[i] = {
+                    'reference': refer,
                     'model_ans': model_ans,
                     'gt': std_ans,
                     'prompt': prompt,
                     'raw_pred': pred,
+                    'blank_wise_correctness': [False] * len(std_ans),
+                    'question_wise_correctness': False,
                 }
                 continue
             json_str = json_str.strip()
@@ -86,7 +87,7 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                     data = json.loads(formatted_json_str)
                     to_end_flag = True
                 except json.JSONDecodeError:
-                    print(f'Invalid JSON format. {idx}')
+                    print(f'Invalid JSON format. {i}')
                     blank_total += len(std_ans)
                     question_total += 1
 
@@ -98,18 +99,21 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                 question_total += 1
 
             model_ans = []
+            blank_wise_correctness = []
+            is_question_correct = True
             if to_end_flag:
                 model_ans = [
                     re.sub(r'#\d+#', '', ans).split(';')
                     for ans in data.get('answers', [])
                 ]  # Preprocess model_ans in the same way as std_ans
-                is_question_correct = True
                 for idx, ans_list in enumerate(std_ans):
                     if idx >= len(model_ans):
                         is_question_correct = False
-                        break
+                        blank_wise_correctness.append(False)
+                        continue
 
                     model_list = model_ans[idx]
+                    is_blank_correct = True
                     for ans in ans_list:
                         best_match = max(
                             model_list,
@@ -117,18 +121,22 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                         if fuzz.ratio(ans, best_match) > 70:  # check threshold
                             blank_correct += 1
                         else:
+                            is_blank_correct = False
                             is_question_correct = False
+                    blank_wise_correctness.append(is_blank_correct)
 
                 blank_total += len(std_ans)
                 question_total += 1
                 question_correct += 1 if is_question_correct else 0
 
-            details[idx] = {
-                'detail': refer,
+            details[i] = {
+                'reference': refer,
+                'std_ans': std_ans,
                 'model_ans': model_ans,
-                'gt': std_ans,
                 'prompt': prompt,
                 'raw_pred': pred,
+                'blank_wise_correctness': blank_wise_correctness,
+                'question_wise_correctness': is_question_correct,
             }
         results = {
             'blank_level_correctness':
