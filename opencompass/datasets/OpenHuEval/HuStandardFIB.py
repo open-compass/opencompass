@@ -53,7 +53,7 @@ class HuStandardFIBEvaluator(BaseEvaluator):
         blank_correct, blank_total = 0, 0
         question_correct, question_total = 0, 0
 
-        for i, (pred, refer, prompt) in enumerate(
+        for idx, (pred, refer, prompt) in enumerate(
                 zip(predictions, references, origin_prompt)):
             std_ans = [
                 re.sub(r'#\d+#', '', ans).split(';')
@@ -67,7 +67,7 @@ class HuStandardFIBEvaluator(BaseEvaluator):
             else:
                 blank_total += len(std_ans)
                 question_total += 1
-                details[i] = {
+                details[idx] = {
                     'reference': refer,
                     'model_ans': model_ans,
                     'gt': std_ans,
@@ -87,7 +87,7 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                     data = json.loads(formatted_json_str)
                     to_end_flag = True
                 except json.JSONDecodeError:
-                    print(f'Invalid JSON format. {i}')
+                    print(f'Invalid JSON format. {idx}')
                     blank_total += len(std_ans)
                     question_total += 1
 
@@ -106,13 +106,13 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                     re.sub(r'#\d+#', '', ans).split(';')
                     for ans in data.get('answers', [])
                 ]  # Preprocess model_ans in the same way as std_ans
-                for idx, ans_list in enumerate(std_ans):
-                    if idx >= len(model_ans):
+                for ans_idx, ans_list in enumerate(std_ans):
+                    if ans_idx >= len(model_ans):
                         is_question_correct = False
                         blank_wise_correctness.append(False)
                         continue
 
-                    model_list = model_ans[idx]
+                    model_list = model_ans[ans_idx]
                     is_blank_correct = True
                     for ans in ans_list:
                         best_match = max(
@@ -129,7 +129,7 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                 question_total += 1
                 question_correct += 1 if is_question_correct else 0
 
-            details[i] = {
+            details[idx] = {
                 'reference': refer,
                 'std_ans': std_ans,
                 'model_ans': model_ans,
