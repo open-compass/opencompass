@@ -61,10 +61,13 @@ class HuMatchingFIBEvaluator(BaseEvaluator):
                 blank_total += len(std_ans)
                 question_total += 1
                 details[idx] = {
-                    'detail': refer,
+                    'reference': refer,
+                    'std_ans': std_ans,
                     'model_ans': model_ans,
                     'prompt': prompt,
                     'raw_pred': pred,
+                    'blank_wise_correct': [False] * len(std_ans),
+                    'question_wise_correct': False,
                 }
                 continue
             json_str = json_str.strip()
@@ -89,27 +92,34 @@ class HuMatchingFIBEvaluator(BaseEvaluator):
                 question_total += 1
 
             model_ans = []
+            blank_wise_correct = []
+            is_question_correct = True
             if to_end_flag:
                 model_ans = data.get('answer', [])
-                is_question_correct = True
                 for index, ans in enumerate(std_ans):
                     if index >= len(model_ans):
                         is_question_correct = False
-                        break
+                        blank_wise_correct.append(False)
+                        continue
                     if ans == model_ans[index]:
                         blank_correct += 1
+                        blank_wise_correct.append(True)
                     else:
                         is_question_correct = False
+                        blank_wise_correct.append(False)
 
                 blank_total += len(std_ans)
                 question_total += 1
                 question_correct += 1 if is_question_correct else 0
 
             details[idx] = {
-                'detail': refer,
+                'reference': refer,
+                'std_ans': std_ans,
                 'model_ans': model_ans,
                 'prompt': prompt,
                 'raw_pred': pred,
+                'blank_wise_correct': blank_wise_correct,
+                'question_wise_correct': is_question_correct,
             }
         results = {
             'blank_level_correctness':

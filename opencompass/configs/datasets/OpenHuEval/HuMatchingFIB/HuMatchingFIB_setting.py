@@ -34,6 +34,6 @@ The question and options are:
     'description': 'Version 2, using 1shot, more incontext, "#0#" as place holder, output in JSON format'
 }
 
-OpenHuEval_Path = '/mnt/hwfile/opendatalab/wj/proj/polyglot_24July/OpenHuEval'
-DATA_VERSION = '250126'
+OpenHuEval_Path = '/mnt/hwfile/opendatalab/weixingjian/OpenHuEval'
+DATA_VERSION = '250205'
 DATA_PATH = f'{OpenHuEval_Path}/data/HuMatchingFIB/HuMatchingFIB_{DATA_VERSION}/HuMatchingFIB.jsonl'
