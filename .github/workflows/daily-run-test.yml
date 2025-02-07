@@ -70,10 +70,10 @@ jobs:
         with:
           repository: ${{ github.event.inputs.repo_org || 'open-compass/opencompass' }}
           ref: ${{github.event.inputs.repo_ref || 'main'}}
-      - name: Set up Python 3.x
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.x
+          python-version: '3.10'
       - name: Build lagent
         run: |
           pip install wheel setuptools
