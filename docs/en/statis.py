@@ -8,11 +8,11 @@ from tabulate import tabulate
 OC_ROOT = Path(__file__).absolute().parents[2]
 GITHUB_PREFIX = 'https://github.com/open-compass/opencompass/tree/main/'
 DATASETZOO_TEMPLATE = """\
-# 数据集统计
+# Dataset Statistics
 
-在本页面中，我们列举了OpenCompass所支持的所有数据集。
+On this page, we have listed all the datasets supported by OpenCompass.
 
-你可以使用排序和搜索功能找到需要的数据集。
+You can use sorting and search functions to find the dataset you need.
 
 """
 
@@ -34,16 +34,17 @@ def table_format(data_list):
         for j in i:
             for index in HEADER:
                 if index == 'paper':
-                    table_format_list_sub.append('[链接](' + i[j][index] + ')')
+                    table_format_list_sub.append('[link](' + i[j][index] + ')')
                 elif index == 'configpath':
                     if isinstance(i[j][index], list):
                         sub_list_text = ''
                         for k in i[j][index]:
-                            sub_list_text += ('[链接](' + GITHUB_PREFIX + k +
+                            sub_list_text += ('[link](' + GITHUB_PREFIX + k +
                                               ') / ')
                         table_format_list_sub.append(sub_list_text[:-2])
                     else:
-                        table_format_list_sub.append('[链接](' + GITHUB_PREFIX +
+                        table_format_list_sub.append('[link](' +
+                                                     GITHUB_PREFIX +
                                                      i[j][index] + ')')
                 else:
                     table_format_list_sub.append(i[j][index])
@@ -60,7 +61,7 @@ def generate_table(data_list, title=None):
         if title is not None:
             f.write(f'\n{title}')
         f.write("""\n```{table}\n:class: dataset\n""")
-        header = ['数据集名称', '数据集类型', '原文或资源地址', '配置文件链接']
+        header = ['Name', 'Category', 'Paper or Repository', 'Config File']
         table_cfg = dict(tablefmt='pipe',
                          floatfmt='.2f',
                          numalign='right',
@@ -71,5 +72,5 @@ def generate_table(data_list, title=None):
 
 generate_table(
     data_list=data_format_list,
-    title='## 支持数据集列表',
+    title='## Supported Dataset List',
 )
