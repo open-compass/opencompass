@@ -34,6 +34,9 @@ livemathbench_datasets[0]['eval_cfg']['evaluator'].update(
         ]  # set url of evaluation models
     }
 )
+livemathbench_dataset['infer_cfg']['inferencer'].update(dict(
+    max_out_len=32768 # for o1-like models you need to update max_out_len
+))
 
 ```
 
@@ -53,6 +56,9 @@ livemathbench_datasets[0]['eval_cfg']['evaluator'].update(
         ]  # set url of evaluation models
     }
 )
+livemathbench_dataset['infer_cfg']['inferencer'].update(dict(
+    max_out_len=32768 # for o1-like models you need to update max_out_len
+))
 
 ```
 
