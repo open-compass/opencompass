@@ -73,6 +73,8 @@ class BigCodeBenchEvaluator(BaseEvaluator):
             eval_type='instruct',
             remote_execute_api='https://bigcode-bigcodebench-evaluator.hf.space/',  # noqa
             dataset_version: str = 'full',
+            local_mode: bool = False,
+            path: str = 'opencompass/bigcodebench',
             pass_k: str = '1,5,10',
             parallel: int = -1,
             min_time_limit: float = 1,
@@ -84,7 +86,9 @@ class BigCodeBenchEvaluator(BaseEvaluator):
         super().__init__()
         self.dataset = BigCodeBenchDataset.load(
             release_version=release_version,
-            dataset_version=dataset_version)['test']
+            dataset_version=dataset_version,
+            local_mode=local_mode,
+            path=path)['test']
         self.eval_type = eval_type
         self.remote_execute_api = remote_execute_api
 
