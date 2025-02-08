@@ -1,0 +1,734 @@
+
+- ifeval:
+    name: IFEval
+    category: Instruction Following
+    paper: https://arxiv.org/pdf/2311.07911
+    configpath: opencompass/configs/datasets/IFEval
+- nphard:
+    name: NPHardEval
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2312.14890v2
+    configpath: opencompass/configs/datasets/NPHardEval
+- pmmeval:
+    name: PMMEval
+    category: Language
+    paper: https://arxiv.org/pdf/2411.09116v1
+    configpath: opencompass/configs/datasets/PMMEval
+- theoremqa:
+    name: TheroremQA
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2305.12524
+    configpath: opencompass/configs/datasets/TheroremQA
+- agieval:
+    name: AGIEval
+    category: Examination
+    paper: https://arxiv.org/pdf/2304.06364
+    configpath: opencompass/configs/datasets/agieval
+- babilong:
+    name: BABILong
+    category: Long Context
+    paper: https://arxiv.org/pdf/2406.10149
+    configpath: opencompass/configs/datasets/babilong
+- bigcodebench:
+    name: BigCodeBench
+    category: Code
+    paper: https://arxiv.org/pdf/2406.15877
+    configpath: opencompass/configs/datasets/bigcodebench
+- calm:
+    name: CaLM
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2405.00622
+    configpath: opencompass/configs/datasets/calm
+- infinitebench:
+    name: InfiniteBench (∞Bench)
+    category: Long Context
+    paper: https://aclanthology.org/2024.acl-long.814.pdf
+    configpath: opencompass/configs/datasets/infinitebench
+- korbench:
+    name: KOR-Bench
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2410.06526v1
+    configpath: opencompass/configs/datasets/korbench
+- lawbench:
+    name: LawBench
+    category: Knowledge / Law
+    paper: https://arxiv.org/pdf/2309.16289
+    configpath: opencompass/configs/datasets/lawbench
+- leval:
+    name: L-Eval
+    category: Long Context
+    paper: https://arxiv.org/pdf/2307.11088v1
+    configpath: opencompass/configs/datasets/leval
+- livecodebench:
+    name: LiveCodeBench
+    category: Code
+    paper: https://arxiv.org/pdf/2403.07974
+    configpath: opencompass/configs/datasets/livecodebench
+- livemathbench:
+    name: LiveMathBench
+    category: Math
+    paper: https://arxiv.org/pdf/2412.13147
+    configpath: opencompass/configs/datasets/livemathbench
+- longbench:
+    name: LongBench
+    category: Long Context
+    paper: https://github.com/THUDM/LongBench
+    configpath: opencompass/configs/datasets/livemathbench
+- lveval:
+    name: LV-Eval
+    category: Long Context
+    paper: https://arxiv.org/pdf/2402.05136
+    configpath: opencompass/configs/datasets/lveval
+- medbench:
+    name: MedBench
+    category: Knowledge / Medicine
+    paper: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10778138
+    configpath: opencompass/configs/datasets/MedBench
+- musr:
+    name: MuSR
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2310.16049
+    configpath: opencompass/configs/datasets/musr
+- needlebench:
+    name: NeedleBench
+    category: Long Context
+    paper: https://arxiv.org/pdf/2407.11963
+    configpath: opencompass/configs/datasets/needlebench
+- ruler:
+    name: RULER
+    category: Long Context
+    paper: https://arxiv.org/pdf/2404.06654
+    configpath: opencompass/configs/datasets/ruler
+- alignment:
+    name: AlignBench
+    category: Subjective / Alignment
+    paper: https://arxiv.org/pdf/2311.18743
+    configpath: opencompass/configs/datasets/subjective/alignbench
+- alpaca:
+    name: AlpacaEval
+    category: Subjective / Instruction Following
+    paper: https://github.com/tatsu-lab/alpaca_eval
+    configpath: opencompass/configs/datasets/subjective/aplaca_eval
+- arenahard:
+    name: Arena-Hard
+    category: Subjective / Chatbot
+    paper: https://lmsys.org/blog/2024-04-19-arena-hard/
+    configpath: opencompass/configs/datasets/subjective/arena_hard
+- flames:
+    name: FLAMES
+    category: Subjective / Alignment
+    paper: https://arxiv.org/pdf/2311.06899
+    configpath: opencompass/configs/datasets/subjective/flames
+- fofo:
+    name: FOFO
+    category: Subjective / Format Following
+    paper: https://arxiv.org/pdf/2402.18667
+    configpath: opencompass/configs/datasets/subjective/fofo
+- followbench:
+    name: FollowBench
+    category: Subjective / Instruction Following
+    paper: https://arxiv.org/pdf/2310.20410
+    configpath: opencompass/configs/datasets/subjective/followbench
+- hellobench:
+    name: HelloBench
+    category: Subjective / Long Context
+    paper: https://arxiv.org/pdf/2409.16191
+    configpath: opencompass/configs/datasets/subjective/hellobench
+- judgerbench:
+    name: JudgerBench
+    category: Subjective / Long Context
+    paper: https://arxiv.org/pdf/2410.16256
+    configpath: opencompass/configs/datasets/subjective/judgerbench
+- multiround:
+    name: MT-Bench-101
+    category: Subjective / Multi-Round
+    paper: https://arxiv.org/pdf/2402.14762
+    configpath: opencompass/configs/datasets/subjective/multiround
+- wildbench:
+    name: WildBench
+    category: Subjective / Real Task
+    paper: https://arxiv.org/pdf/2406.04770
+    configpath: opencompass/configs/datasets/subjective/wildbench
+- teval:
+    name: T-Eval
+    category: Tool Utilization
+    paper: https://arxiv.org/pdf/2312.14033
+    configpath: opencompass/configs/datasets/teval
+- finalceiq:
+    name: FinanceIQ
+    category: Knowledge / Finance
+    paper: https://github.com/Duxiaoman-DI/XuanYuan/tree/main/FinanceIQ
+    configpath: opencompass/configs/datasets/FinanceIQ
+- gaokaobench:
+    name: GAOKAOBench
+    category: Examination
+    paper: https://arxiv.org/pdf/2305.12474
+    configpath: opencompass/configs/datasets/GaokaoBench
+- lcbench:
+    name: LCBench
+    category: Code
+    paper: https://github.com/open-compass/CodeBench/
+    configpath: opencompass/configs/datasets/LCBench
+- MMLUArabic:
+    name: ArabicMMLU
+    category: Language
+    paper: https://arxiv.org/pdf/2402.12840
+    configpath: opencompass/configs/datasets/MMLUArabic
+- OpenFinData:
+    name: OpenFinData
+    category: Knowledge / Finance
+    paper: https://github.com/open-compass/OpenFinData
+    configpath: opencompass/configs/datasets/OpenFinData
+- QuALITY:
+    name: QuALITY
+    category: Long Context
+    paper: https://arxiv.org/pdf/2112.08608
+    configpath: opencompass/configs/datasets/QuALITY
+- advglue:
+    name: Adversarial GLUE
+    category: Safety
+    paper: https://openreview.net/pdf?id=GF9cSKI3A_q
+    configpath: opencompass/configs/datasets/adv_glue
+- afqmcd:
+    name: CLUE / AFQMC
+    category: Language
+    paper: https://arxiv.org/pdf/2004.05986
+    configpath: opencompass/configs/datasets/CLUE_afqmc
+- aime2024:
+    name: AIME2024
+    category: Examination
+    paper: https://huggingface.co/datasets/Maxwell-Jia/AIME_2024
+    configpath: opencompass/configs/datasets/aime2024
+- anli:
+    name: Adversarial NLI
+    category: Reasoning
+    paper: https://arxiv.org/pdf/1910.14599v2
+    configpath: opencompass/configs/datasets/anli
+- anthropics_evals:
+    name: Anthropics Evals
+    category: Safety
+    paper: https://arxiv.org/pdf/2212.09251
+    configpath: opencompass/configs/datasets/anthropics_evals
+- apps:
+    name: APPS
+    category: Code
+    paper: https://arxiv.org/pdf/2105.09938
+    configpath: opencompass/configs/datasets/apps
+- arc:
+    name: ARC
+    category: Reasoning
+    paper: https://arxiv.org/pdf/1803.05457
+    configpath: [opencompass/configs/datasets/ARC_c, opencompass/configs/datasets/ARC_e]
+- arc_prize_public_eval:
+    name: ARC Prize
+    category: ARC-AGI
+    paper: https://arcprize.org/guide#private
+    configpath: opencompass/configs/datasets/ARC_Prize_Public_Evaluation
+- ax:
+    name: SuperGLUE / AX
+    category: Reasoning
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: [opencompass/configs/datasets/SuperGLUE_AX_b, opencompass/configs/datasets/SuperGLUE_AX_g]
+- bbh:
+    name: BIG-Bench Hard
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2210.09261
+    configpath: opencompass/configs/datasets/bbh
+- BoolQ:
+    name: SuperGLUE / BoolQ
+    category: Knowledge
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: opencompass/configs/datasets/SuperGLUE_BoolQ
+- c3:
+    name: CLUE / C3 (C³)
+    category: Understanding
+    paper: https://arxiv.org/pdf/2004.05986
+    configpath: opencompass/configs/datasets/CLUE_C3
+- cb:
+    name: SuperGLUE / CB
+    category: Reasoning
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: opencompass/configs/datasets/SuperGLUE_CB
+- ceval:
+    name: C-EVAL
+    category: Examination
+    paper: https://arxiv.org/pdf/2305.08322v1
+    configpath: opencompass/configs/datasets/ceval
+- charm:
+    name: CHARM
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2403.14112
+    configpath: opencompass/configs/datasets/CHARM
+- chembench:
+    name: ChemBench
+    category: Knowledge / Chemistry
+    paper: https://arxiv.org/pdf/2404.01475
+    configpath: opencompass/configs/datasets/ChemBench
+- chid:
+    name: FewCLUE / CHID
+    category: Language
+    paper: https://arxiv.org/pdf/2107.07498
+    configpath: opencompass/configs/datasets/FewCLUE_chid
+- chinese_simpleqa:
+    name: Chinese SimpleQA
+    category: Knowledge
+    paper: https://arxiv.org/pdf/2411.07140
+    configpath: opencompass/configs/datasets/chinese_simpleqa
+- cibench:
+    name: CIBench
+    category: Code
+    paper: https://www.arxiv.org/pdf/2407.10499
+    configpath: opencompass/configs/datasets/CIBench
+- civilcomments:
+    name: CivilComments
+    category: Safety
+    paper: https://arxiv.org/pdf/1903.04561
+    configpath: opencompass/configs/datasets/civilcomments
+- clozeTest_maxmin:
+    name: Cloze Test-max/min
+    category: Code
+    paper: https://arxiv.org/pdf/2102.04664
+    configpath: opencompass/configs/datasets/clozeTest_maxmin
+- cluewsc:
+    name: FewCLUE / CLUEWSC
+    category: Language / WSC
+    paper: https://arxiv.org/pdf/2107.07498
+    configpath: opencompass/configs/datasets/FewCLUE_cluewsc
+- cmb:
+    name: CMB
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/pdf/2308.08833
+    configpath: opencompass/configs/datasets/cmb
+- cmmlu:
+    name: CMMLU
+    category: Understanding
+    paper: https://arxiv.org/pdf/2306.09212
+    configpath: opencompass/configs/datasets/cmmlu
+- cmnli:
+    name: CLUE / CMNLI
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2004.05986
+    configpath: opencompass/configs/datasets/CLUE_cmnli
+- cmo_fib:
+    name: cmo_fib
+    category: Examination
+    paper: ""
+    configpath: opencompass/configs/datasets/cmo_fib
+- cmrc:
+    name: CLUE / CMRC
+    category: Understanding
+    paper: https://arxiv.org/pdf/2004.05986
+    configpath: opencompass/configs/datasets/CLUE_CMRC
+- commonsenseqa:
+    name: CommonSenseQA
+    category: Knowledge
+    paper: https://arxiv.org/pdf/1811.00937v2
+    configpath: opencompass/configs/datasets/commonsenseqa
+- commonsenseqa_cn:
+    name: CommonSenseQA-CN
+    category: Knowledge
+    paper: ""
+    configpath: opencompass/configs/datasets/commonsenseqa_cn
+- copa:
+    name: SuperGLUE / COPA
+    category: Reasoning
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: opencompass/configs/datasets/SuperGLUE_COPA
+- crowspairs:
+    name: CrowsPairs
+    category: Safety
+    paper: https://arxiv.org/pdf/2010.00133
+    configpath: opencompass/configs/datasets/crowspairs
+- crowspairs_cn:
+    name: CrowsPairs-CN
+    category: Safety
+    paper: ""
+    configpath: opencompass/configs/datasets/crowspairs_cn
+- cvalues:
+    name: CVALUES
+    category: Safety
+    paper: http://xdp-expriment.oss-cn-zhangjiakou.aliyuncs.com/shanqi.xgh/release_github/CValues.pdf
+    configpath: opencompass/configs/datasets/cvalues
+- drcd:
+    name: CLUE / DRCD
+    category: Understanding
+    paper: https://arxiv.org/pdf/2004.05986
+    configpath: opencompass/configs/datasets/CLUE_DRCD
+- drop:
+    name: DROP (DROP Simple Eval)
+    category: Understanding
+    paper: https://arxiv.org/pdf/1903.00161
+    configpath: opencompass/configs/datasets/drop
+- ds1000:
+    name: DS-1000
+    category: Code
+    paper: https://arxiv.org/pdf/2211.11501
+    configpath: opencompass/configs/datasets/ds1000
+- eprstmt:
+    name: FewCLUE / EPRSTMT
+    category: Understanding
+    paper: https://arxiv.org/pdf/2107.07498
+    configpath: opencompass/configs/datasets/FewCLUE_eprstmt
+- flores:
+    name: Flores
+    category: Language
+    paper: https://aclanthology.org/D19-1632.pdf
+    configpath: opencompass/configs/datasets/flores
+- game24:
+    name: Game24
+    category: Math
+    paper: https://huggingface.co/datasets/nlile/24-game
+    configpath: opencompass/configs/datasets/game24
+- govrepcrs:
+    name: Government Report Dataset
+    category: Long Context
+    paper: https://aclanthology.org/2021.naacl-main.112.pdf
+    configpath: opencompass/configs/datasets/govrepcrs
+- gpqa:
+    name: GPQA
+    category: Knowledge
+    paper: https://arxiv.org/pdf/2311.12022v1
+    configpath: opencompass/configs/datasets/gpqa
+- gsm8k:
+    name: GSM8K
+    category: Math
+    paper: https://arxiv.org/pdf/2110.14168v2
+    configpath: opencompass/configs/datasets/gsm8k
+- gsm_hard:
+    name: GSM-Hard
+    category: Math
+    paper: https://proceedings.mlr.press/v202/gao23f/gao23f.pdf
+    configpath: opencompass/configs/datasets/gsm_hard
+- hellaswag:
+    name: HellaSwag
+    category: Reasoning
+    paper: https://arxiv.org/pdf/1905.07830
+    configpath: opencompass/configs/datasets/hellaswag
+- humaneval:
+    name: HumanEval
+    category: Code
+    paper: https://arxiv.org/pdf/2107.03374v2
+    configpath: opencompass/configs/datasets/humaneval
+- humaneval_cn:
+    name: HumanEval-CN
+    category: Code
+    paper: ""
+    configpath: opencompass/configs/datasets/humaneval_cn
+- humaneval_multi:
+    name: Multi-HumanEval
+    category: Code
+    paper: https://arxiv.org/pdf/2210.14868
+    configpath: opencompass/configs/datasets/humaneval_multi
+- humanevalx:
+    name: HumanEval-X
+    category: Code
+    paper: https://dl.acm.org/doi/pdf/10.1145/3580305.3599790
+    configpath: opencompass/configs/datasets/humanevalx
+- hungarian_math:
+    name: Hungarian_Math
+    category: Math
+    paper: https://huggingface.co/datasets/keirp/hungarian_national_hs_finals_exam
+    configpath: opencompass/configs/datasets/hungarian_exam
+- iwslt2017:
+    name: IWSLT2017
+    category: Language
+    paper: https://cris.fbk.eu/bitstream/11582/312796/1/iwslt17-overview.pdf
+    configpath: opencompass/configs/datasets/iwslt2017
+- jigsawmultilingual:
+    name: JigsawMultilingual
+    category: Safety
+    paper: https://www.kaggle.com/competitions/jigsaw-multilingual-toxic-comment-classification/data
+    configpath: opencompass/configs/datasets/jigsawmultilingual
+- lambada:
+    name: LAMBADA
+    category: Understanding
+    paper: https://arxiv.org/pdf/1606.06031
+    configpath: opencompass/configs/datasets/lambada
+- lcsts:
+    name: LCSTS
+    category: Understanding
+    paper: https://aclanthology.org/D15-1229.pdf
+    configpath: opencompass/configs/datasets/lcsts
+- livestembench:
+    name: LiveStemBench
+    category: ""
+    paper: ""
+    configpath: opencompass/configs/datasets/livestembench
+- llm_compression:
+    name: LLM Compression
+    category: Bits Per Character (BPC)
+    paper: https://arxiv.org/pdf/2404.09937
+    configpath: opencompass/configs/datasets/llm_compression
+- math:
+    name: MATH
+    category: Math
+    paper: https://arxiv.org/pdf/2103.03874
+    configpath: opencompass/configs/datasets/math
+- math401:
+    name: MATH 401
+    category: Math
+    paper: https://arxiv.org/pdf/2304.02015
+    configpath: opencompass/configs/datasets/math401
+- mathbench:
+    name: MathBench
+    category: Math
+    paper: https://arxiv.org/pdf/2405.12209
+    configpath: opencompass/configs/datasets/mathbench
+- mbpp:
+    name: MBPP
+    category: Code
+    paper: https://arxiv.org/pdf/2108.07732
+    configpath: opencompass/configs/datasets/mbpp
+- mbpp_cn:
+    name: MBPP-CN
+    category: Code
+    paper: ""
+    configpath: opencompass/configs/datasets/mbpp_cn
+- mbpp_plus:
+    name: MBPP-PLUS
+    category: Code
+    paper: ""
+    configpath: opencompass/configs/datasets/mbpp_plus
+- mgsm:
+    name: MGSM
+    category: Language / Math
+    paper: https://arxiv.org/pdf/2210.03057
+    configpath: opencompass/configs/datasets/mgsm
+- mmlu:
+    name: MMLU
+    category: Understanding
+    paper: https://arxiv.org/pdf/2009.03300
+    configpath: opencompass/configs/datasets/mmlu
+- mmlu_cf:
+    name: MMLU-CF
+    category: Understanding
+    paper: https://arxiv.org/pdf/2412.15194
+    configpath: opencompass/configs/datasets/mmlu_cf
+- mmlu_pro:
+    name: MMLU-Pro
+    category: Understanding
+    paper: https://arxiv.org/pdf/2406.01574
+    configpath: opencompass/configs/datasets/mmlu_pro
+- mmmlu:
+    name: MMMLU
+    category: Language / Understanding
+    paper: https://huggingface.co/datasets/openai/MMMLU
+    configpath: opencompass/configs/datasets/mmmlu
+- multirc:
+    name: SuperGLUE / MultiRC
+    category: Understanding
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: opencompass/configs/datasets/SuperGLUE_MultiRC
+- narrativeqa:
+    name: NarrativeQA
+    category: Understanding
+    paper: https://github.com/google-deepmind/narrativeqa
+    configpath: opencompass/configs/datasets/narrativeqa
+- natural_question:
+    name: NaturalQuestions
+    category: Knowledge
+    paper: https://github.com/google-research-datasets/natural-questions
+    configpath: opencompass/configs/datasets/nq
+- natural_question_cn:
+    name: NaturalQuestions-CN
+    category: Knowledge
+    paper: ""
+    configpath: opencompass/configs/datasets/nq_cn
+- obqa:
+    name: OpenBookQA
+    category: Knowledge
+    paper: https://arxiv.org/pdf/1809.02789v1
+    configpath: opencompass/configs/datasets/obqa
+- piqa:
+    name: OpenBookQA
+    category: Knowledge / Physics
+    paper: https://arxiv.org/pdf/1911.11641v1
+    configpath: opencompass/configs/datasets/piqa
+- py150:
+    name: py150
+    category: Code
+    paper: https://github.com/microsoft/CodeXGLUE/tree/main/Code-Code/CodeCompletion-line
+    configpath: opencompass/configs/datasets/py150
+- qasper:
+    name: Qasper
+    category: Long Context
+    paper: https://arxiv.org/pdf/2105.03011
+    configpath: opencompass/configs/datasets/qasper
+- qaspercut:
+    name: Qasper-Cut
+    category: Long Context
+    paper: ""
+    configpath: opencompass/configs/datasets/qaspercut
+- race:
+    name: RACE
+    category: Examination
+    paper: https://arxiv.org/pdf/1704.04683
+    configpath: opencompass/configs/datasets/race
+- realtoxicprompts:
+    name: RealToxicPrompts
+    category: Safety
+    paper: https://arxiv.org/pdf/2009.11462
+    configpath: opencompass/configs/datasets/realtoxicprompts
+- record:
+    name: SuperGLUE / ReCoRD
+    category: Understanding
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: opencompass/configs/datasets/SuperGLUE_ReCoRD
+- rte:
+    name: SuperGLUE / RTE
+    category: Reasoning
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: opencompass/configs/datasets/SuperGLUE_RTE
+- ocnli:
+    name: CLUE / OCNLI
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2004.05986
+    configpath: opencompass/configs/datasets/CLUE_ocnli
+- rolebench:
+    name: RoleBench
+    category: Role Play
+    paper: https://arxiv.org/pdf/2310.00746
+    configpath: opencompass/configs/datasets/rolebench
+- s3eval:
+    name: S3Eval
+    category: Long Context
+    paper: https://aclanthology.org/2024.naacl-long.69.pdf
+    configpath: opencompass/configs/datasets/s3eval
+- scibench:
+    name: SciBench
+    category: Reasoning
+    paper: https://sxkdz.github.io/files/publications/ICML/SciBench/SciBench.pdf
+    configpath: opencompass/configs/datasets/scibench
+- scicode:
+    name: SciCode
+    category: Code
+    paper: https://arxiv.org/pdf/2407.13168
+    configpath: opencompass/configs/datasets/scicode
+- simpleqa:
+    name: SimpleQA
+    category: Knowledge
+    paper: https://arxiv.org/pdf/2411.04368
+    configpath: opencompass/configs/datasets/SimpleQA
+- siqa:
+    name: SocialIQA
+    category: Reasoning
+    paper: https://arxiv.org/pdf/1904.09728
+    configpath: opencompass/configs/datasets/siqa
+- squad20:
+    name: SQuAD2.0
+    category: Understanding
+    paper: https://arxiv.org/pdf/1806.03822
+    configpath: opencompass/configs/datasets/squad20
+- storycloze:
+    name: StoryCloze
+    category: Reasoning
+    paper: https://aclanthology.org/2022.emnlp-main.616.pdf
+    configpath: opencompass/configs/datasets/storycloze
+- strategyqa:
+    name: StrategyQA
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2101.02235
+    configpath: opencompass/configs/datasets/strategyqa
+- summedits:
+    name: SummEdits
+    category: Language
+    paper: https://aclanthology.org/2023.emnlp-main.600.pdf
+    configpath: opencompass/configs/datasets/summedits
+- summscreen:
+    name: SummScreen
+    category: Understanding
+    paper: https://arxiv.org/pdf/2104.07091v1
+    configpath: opencompass/configs/datasets/summscreen
+- svamp:
+    name: SVAMP
+    category: Math
+    paper: https://aclanthology.org/2021.naacl-main.168.pdf
+    configpath: opencompass/configs/datasets/SVAMP
+- tabmwp:
+    name: TabMWP
+    category: Math / Table
+    paper: https://arxiv.org/pdf/2209.14610
+    configpath: opencompass/configs/datasets/TabMWP
+- taco:
+    name: TACO
+    category: Code
+    paper: https://arxiv.org/pdf/2312.14852
+    configpath: opencompass/configs/datasets/taco
+- tnews:
+    name: FewCLUE / TNEWS
+    category: Understanding
+    paper: https://arxiv.org/pdf/2107.07498
+    configpath: opencompass/configs/datasets/FewCLUE_tnews
+- bustm:
+    name: FewCLUE / BUSTM
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2107.07498
+    configpath: opencompass/configs/datasets/FewCLUE_bustm
+- csl:
+    name: FewCLUE / CSL
+    category: Understanding
+    paper: https://arxiv.org/pdf/2107.07498
+    configpath: opencompass/configs/datasets/FewCLUE_csl
+- ocnli_fc:
+    name: FewCLUE / OCNLI-FC
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2107.07498
+    configpath: opencompass/configs/datasets/FewCLUE_ocnli_fc
+- triviaqa:
+    name: TriviaQA
+    category: Knowledge
+    paper: https://arxiv.org/pdf/1705.03551v2
+    configpath: opencompass/configs/datasets/triviaqa
+- triviaqarc:
+    name: TriviaQA-RC
+    category: Knowledge / Understanding
+    paper: ""
+    configpath: opencompass/configs/datasets/triviaqarc
+- truthfulqa:
+    name: TruthfulQA
+    category: Safety
+    paper: https://arxiv.org/pdf/2109.07958v2
+    configpath: opencompass/configs/datasets/truthfulqa
+- tydiqa:
+    name: TyDi-QA
+    category: Language
+    paper: https://storage.googleapis.com/tydiqa/tydiqa.pdf
+    configpath: opencompass/configs/datasets/tydiqa
+- wic:
+    name: SuperGLUE / WiC
+    category: Language
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: opencompass/configs/datasets/SuperGLUE_WiC
+- wsc:
+    name: SuperGLUE / WSC
+    category: Language / WSC
+    paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
+    configpath: opencompass/configs/datasets/SuperGLUE_WSC
+- winogrande:
+    name: WinoGrande
+    category: Language / WSC
+    paper: https://arxiv.org/pdf/1907.10641v2
+    configpath: opencompass/configs/datasets/winogrande
+- xcopa:
+    name: XCOPA
+    category: Language
+    paper: https://arxiv.org/pdf/2005.00333
+    configpath: opencompass/configs/datasets/XCOPA
+- xiezhi:
+    name: Xiezhi
+    category: Knowledge
+    paper: https://arxiv.org/pdf/2306.05783
+    configpath: opencompass/configs/datasets/xiezhi
+- xlsum:
+    name: XLSum
+    category: Understanding
+    paper: https://arxiv.org/pdf/2106.13822v1
+    configpath: opencompass/configs/datasets/XLSum
+- xsum:
+    name: Xsum
+    category: Understanding
+    paper: https://arxiv.org/pdf/1808.08745
+    configpath: opencompass/configs/datasets/Xsum
+
+
+

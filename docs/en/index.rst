@@ -80,6 +80,13 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
 
    tools.md
 
+.. _Dataset List:
+.. toctree::
+   :maxdepth: 1
+   :caption: Dataset List
+
+   dataset_statistics.md
+
 .. _Notes:
 .. toctree::
    :maxdepth: 1

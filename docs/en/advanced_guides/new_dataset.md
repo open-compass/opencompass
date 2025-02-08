@@ -90,4 +90,16 @@ Although OpenCompass has already included most commonly used datasets, users nee
         return dataset
    ```
 
+3. After completing the dataset script and config file, you need to register the information of your new dataset in the file `dataset-index.yml` at the main directory, so that it can be added to the dataset statistics list on the OpenCompass website.
+
+   - The keys that need to be filled in include `name`: the name of your dataset, `category`: the category of your dataset, `paper`: the URL of the paper or project, and `configpath`: the path to the dataset config file. Here's an example:
+
+   ```
+   - mydataset:
+       name: MyDataset
+       category: Understanding
+       paper: https://arxiv.org/pdf/xxxxxxx
+       configpath: opencompass/configs/datasets/MyDataset
+   ```
+
    Detailed dataset configuration files and other required configuration files can be referred to in the [Configuration Files](../user_guides/config.md) tutorial. For guides on launching tasks, please refer to the [Quick Start](../get_started/quick_start.md) tutorial.

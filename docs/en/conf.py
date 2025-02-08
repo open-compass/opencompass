@@ -220,3 +220,11 @@ autodoc_typehints = 'none'
 
 # The not found page
 notfound_template = '404.html'
+
+
+def builder_inited_handler(app):
+    subprocess.run(['./statis.py'])
+
+
+def setup(app):
+    app.connect('builder-inited', builder_inited_handler)
