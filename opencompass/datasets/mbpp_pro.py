@@ -1,7 +1,5 @@
 import json
-import os.path as osp
 import os
-from typing import List
 
 from datasets import Dataset
 import evaluate
@@ -27,7 +25,7 @@ class MBPPProDataset(BaseDataset):
                 dataset.extend(
                         [data for _ in range(num_repeats)])
         return Dataset.from_list(dataset)
-    
+
 
 class MBPPProEvaluator(HuggingfaceEvaluator):
 
@@ -37,13 +35,13 @@ class MBPPProEvaluator(HuggingfaceEvaluator):
             'predictions': predictions,
             'references': references,
         }
-    
+
     def _postprocess(self, scores):
         scores = {f'humaneval_{k}': scores[k] * 100 for k in scores}
         return scores
 
     def score(self, predictions, references, test_set):
-        # predictions are LLM's output; references are the 'output_column' of 'humanevalpro_reader_cfg'
+        # predictions are LLM's output; references are the 'output_column' of 'humanevalpro_reader_cfg'  # noqa: E501
         if len(predictions) != len(references):
             return {
                 'error':
@@ -55,22 +53,24 @@ class MBPPProEvaluator(HuggingfaceEvaluator):
         # use codes pre-downloaded to opencompass repo, avoid downloading
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parrent_dir = os.path.dirname(current_dir)
-        local_path = os.path.join(parrent_dir, 'openicl', 'icl_evaluator', 'hf_metrics', self.metric)
+        local_path = os.path.join(parrent_dir,
+                                  'openicl', 'icl_evaluator', 'hf_metrics',
+                                  self.metric)
 
         if os.path.exists(local_path):
             metric = evaluate.load(local_path)
         else:
             metric = evaluate.load(self.metric)
-        scores, _ = metric.compute(**self._preprocess(predictions, references), 
-                                k=[1, 3, 5], 
-                                num_workers=4)
+        scores, _ = metric.compute(**self._preprocess(predictions, references),
+                                   k=[1, 3, 5],
+                                   num_workers=4)
         result = self._postprocess(scores)
         return result
 
 
 def mbpppro_postprocess_official(text):
     """
-    The official post-processing method for humaneval_pro, which is solely applicable to the complete generation paradigm. 
+    The official post-processing method for humaneval_pro, which is solely applicable to the complete generation paradigm.  # noqa: E501
     The chat template paradigm requires a different post-processing method.
     """
     text = text[: index if (index := text.find("```")) != -1 else len(text)]
@@ -79,7 +79,7 @@ def mbpppro_postprocess_official(text):
 
 def mbpppro_postprocess_oc(text):
     """
-    For those generated based on the chat template paradigm, this method is recommended.
+    For those generated based on the chat template paradigm, this method is recommended.  # noqa: E501
     """
     start = text.rfind("```python") + len("```python")
     end = text.find("```", start)
