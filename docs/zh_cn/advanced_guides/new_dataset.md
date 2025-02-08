@@ -92,9 +92,9 @@
    ```
 
 3. 在完成数据集脚本和配置文件的构建后，需要在OpenCompass主目录下的`dataset-index.yml`配置文件中登记新数据集的相关信息，以使其加入OpenCompass官网Doc的数据集统计列表中。
-   
+
    - 需要填写的字段包括数据集名称`name`、数据集类型`category`、原文或项目地址`paper`、以及数据集配置文件的路径`configpath`。具体示例如下：
-   
+
    ```
    - mydataset:
        name: MyDataset
