@@ -22,7 +22,10 @@ from .base import BaseDataset
 class LCDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, num_repeats: int = 1, difficulty='ALL', local_mode=False):
+    def load(path: str,
+             num_repeats: int = 1,
+             difficulty='ALL',
+             local_mode=False):
         """Load LC dataset for pass k mode.
 
         Note that you can use num_repeats > 1 when your model does not support
