@@ -56,6 +56,28 @@ def last_capital_postprocess(text: str) -> str:
             return t
     return ''
 
+@TEXT_POSTPROCESSORS.register_module('general_post_capital')
+def general_post_capital_postprocess(text: str) -> str:
+    patterns = [
+        "the answer is ([A-E])",
+        "the answer is([A-E])",
+        "the correct answer is ([A-E])",
+        "the correct answer is([A-E])",
+        "Answer: ([A-E])",
+        "Answer: \(([A-E])\)",
+        "Option \(([A-E])\)",
+        "Answer:([A-E])",
+        "Option ([A-E])",
+        "Opt ([A-E])"
+    ]
+    for pattern in patterns:
+        match = re.search(pattern,text,re.IGNORECASE)
+        if match:
+            return match.group(1)
+    match = re.findall("[A-D]", text)
+    if match:
+        return match[0]
+    return ""
 
 def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     """Find first valid option for text."""
