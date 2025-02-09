@@ -126,7 +126,7 @@ class VLLMwithChatTemplate(BaseModel):
             prompt_list.append(prompt)
             output_strs.append(generated_text)
 
-        return output_strs
+        return prompt_list, output_strs
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized strings.
