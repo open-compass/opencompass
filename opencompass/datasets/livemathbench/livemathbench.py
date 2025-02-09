@@ -48,6 +48,7 @@ class LiveMathBenchDataset(BaseDataset):
         if path != '':
             path = get_data_path(path)
             path = os.path.join(path, version)
+            
         for split, language in product(dataset_splits, dataset_languages):
             dataset_info[f'{split}_{language}'] = {
                 'single-choice': 0,
@@ -64,7 +65,6 @@ class LiveMathBenchDataset(BaseDataset):
 
             if path != '':
                 file_path = os.path.join(path, f'{split}_{language}.jsonl')
-
                 if not os.path.exists(file_path):
                     raise FileNotFoundError(
                         f'File {file_path} does not exist, please check the '
