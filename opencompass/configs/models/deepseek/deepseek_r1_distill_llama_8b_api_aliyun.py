@@ -2,9 +2,9 @@ from opencompass.models import OpenAISDK
 
 models = [
     dict(
-        abbr='deepseek_r1_api_distill_qwen_7b_aliyun',
+        abbr='deepseek_r1_distill_llama_8b_api_aliyun',
         type=OpenAISDK,
-        path='deepseek-r1-distill-qwen-7b',
+        path='deepseek-r1-distill-llama-8b',
         key='ENV_ALIYUN',
         openai_api_base='https://dashscope.aliyuncs.com/compatible-mode/v1',
         query_per_second=1,
