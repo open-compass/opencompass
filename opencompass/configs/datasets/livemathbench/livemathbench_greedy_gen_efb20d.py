@@ -6,15 +6,15 @@ from opencompass.datasets.livemathbench import LiveMathBenchDataset, LiveMathBen
 
 
 livemathbench_dataset = dict(
-    abbr='LiveMathBench-v202412-greedy', # If you change the K and replication, you need to change the dataset name.
     type=LiveMathBenchDataset,
-    path='opencompass/LiveMathBench',
+    path='',
     k=1,
     replication=1,
     dataset_splits=['CNMO', 'CCEE', 'AMC', 'WLPMC'],
     dataset_languages=['cn', 'en'],
-    cot=False,
+    cot=True,
     version='202412',
+    abbr='LiveMathBench-v202412',
     reader_cfg=dict(
         input_columns=['prompt'], 
         output_column='answer'
@@ -31,7 +31,7 @@ livemathbench_dataset = dict(
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(
             type=GenInferencer, 
-            max_out_len=16384,
+            max_out_len=8192
         ),
     ),
     eval_cfg=dict(
@@ -44,7 +44,7 @@ livemathbench_dataset = dict(
             extract_model_name='',
             k=[1],
             replication=1,
-            thresholds=[0.0, 0.25, 0.5, 0.75, 1.0]
+            thresholds=[0.0]
         )
     )
 )
