@@ -1,5 +1,5 @@
-INSTRUCTION = {
-    'prompt_template':
+INSTRUCTIONS = {
+    'en':
     """The following questions are in Hungarian language on {hu_specific_dim}, please read the questions, and try to fill in the blanks in the question list. Please organize the answer in a list. An example:
 {
     "instruction": "Írd be a megfelelő meghatározás mellé a fogalmat!",

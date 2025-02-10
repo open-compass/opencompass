@@ -40,7 +40,7 @@ HuProverbRea_eval_cfg = dict(evaluator=dict(type=HuProverb_Evaluator_2CQ))
 HuProverbRea_datasets.append(
     dict(
         abbr=
-        f'HuProverbRea_{DATA_VERSION}_2CQ-prompt_{prompt_template_language}',
+        f'OpenHuEval_HuProverbRea_{DATA_VERSION}_2CQ-prompt_{prompt_template_language}',
         type=HuProverbDataset2CQ,
         filepath=DATA_PATH,
         reader_cfg=HuProverbRea_reader_cfg,

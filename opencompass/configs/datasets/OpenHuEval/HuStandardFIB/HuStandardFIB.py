@@ -6,17 +6,17 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets.OpenHuEval.HuStandardFIB import HuStandardFIBDataset, HuStandardFIBEvaluator
 
 with read_base():
-    from .HuStandardFIB_setting import INSTRUCTION, DATA_PATH, DATA_VERSION
+    from .HuStandardFIB_setting import INSTRUCTIONS, DATA_PATH, DATA_VERSION
 
-instruction = INSTRUCTION['prompt_template']
-prompt_version = INSTRUCTION['version']
+prompt_lang = 'en'
+instruction = INSTRUCTIONS[prompt_lang]
 
-hu_standard_fib_reader_cfg = dict(input_columns=['question', 'subject'],
-                                  output_column='reference')
+HuStandardFIB_reader_cfg = dict(input_columns=['question', 'subject'],
+                                output_column='reference')
 
-hu_standard_fib_datasets = []
+HuStandardFIB_datasets = []
 
-hu_standard_fib_infer_cfg = dict(
+HuStandardFIB_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
@@ -31,14 +31,14 @@ hu_standard_fib_infer_cfg = dict(
     inferencer=dict(type=GenInferencer),
 )
 
-hu_standard_fib_eval_cfg = dict(evaluator=dict(type=HuStandardFIBEvaluator))
+HuStandardFIB_eval_cfg = dict(evaluator=dict(type=HuStandardFIBEvaluator))
 
-hu_standard_fib_datasets.append(
+HuStandardFIB_datasets.append(
     dict(
-        abbr=f'hu_standard_fib_{DATA_VERSION}-prompt_{prompt_version}',
+        abbr=f'OpenHuEval_HuStandardFIB_{DATA_VERSION}-prompt_{prompt_lang}',
         type=HuStandardFIBDataset,
         filepath=DATA_PATH,
-        reader_cfg=hu_standard_fib_reader_cfg,
-        infer_cfg=hu_standard_fib_infer_cfg,
-        eval_cfg=hu_standard_fib_eval_cfg,
+        reader_cfg=HuStandardFIB_reader_cfg,
+        infer_cfg=HuStandardFIB_infer_cfg,
+        eval_cfg=HuStandardFIB_eval_cfg,
     ))
