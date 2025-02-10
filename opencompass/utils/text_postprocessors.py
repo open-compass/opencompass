@@ -229,3 +229,15 @@ def match_answer_pattern(response_text: str, answer_pattern: str):
     match = re.search(answer_pattern, response_text)
     extracted_answer = match.group(1) if match else ''
     return extracted_answer
+
+
+@TEXT_POSTPROCESSORS.register_module('rm_<think>_before_eval')
+def remove_reasoning_part_before_evaluation(text: str):
+    if text.startswith('<think>'):
+        reasoning_end = text.rfind('</think>')
+        if reasoning_end == -1:
+            return text
+        else:
+            return text[reasoning_end + 8:]
+    else:
+        return text

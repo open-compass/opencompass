@@ -100,6 +100,7 @@ class OpenAI(BaseAPIModel):
         tokenizer_path: Optional[str] = None,
         extra_body: Optional[Dict] = None,
         max_completion_tokens: int = 16384,
+        return_reasoning_content: Optional[bool] = False,
         verbose: bool = False,
     ):
 
@@ -123,6 +124,7 @@ class OpenAI(BaseAPIModel):
         self.tokenizer_path = tokenizer_path
         self.hf_tokenizer = None
         self.extra_body = extra_body
+        self.return_reasoning_content = return_reasoning_content
 
         if isinstance(key, str):
             if key == 'ENV':
@@ -137,6 +139,10 @@ class OpenAI(BaseAPIModel):
                 if 'DEEPSEEK_API_KEY' not in os.environ:
                     raise ValueError('Deepseek API key is not set.')
                 self.keys = os.getenv('DEEPSEEK_API_KEY').split(',')
+            elif key == 'ENV_ALIYUN':
+                if 'DASHSCOPE_API_KEY' not in os.environ:
+                    raise ValueError('DASHSCOPE API key (aliyun) is not set.')
+                self.keys = os.getenv('DASHSCOPE_API_KEY').split(',')
             else:
                 self.keys = [key]
         else:
@@ -340,7 +346,16 @@ class OpenAI(BaseAPIModel):
                 if self.logprobs:
                     return response['choices']
                 else:
-                    return response['choices'][0]['message']['content'].strip()
+                    message = response['choices'][0]['message']
+                    content = message['content'].strip()
+                    if self.return_reasoning_content:
+                        r_content = message.get('reasoning_content',
+                                                '').strip()
+                        if r_content:
+                            r_content = '<think>' + r_content + '</think>'
+                        return r_content + content
+                    else:
+                        return content
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
@@ -567,6 +582,7 @@ class OpenAISDK(OpenAI):
         tokenizer_path: str | None = None,
         extra_body: Dict | None = None,
         max_completion_tokens: int = 16384,
+        return_reasoning_content: Optional[bool] = False,
         verbose: bool = False,
         status_code_mappings: dict = {},
     ):
@@ -588,6 +604,7 @@ class OpenAISDK(OpenAI):
             tokenizer_path,
             extra_body,
             verbose=verbose,
+            return_reasoning_content=return_reasoning_content,
             max_completion_tokens=max_completion_tokens,
         )
         key = random.choice(self.keys)
@@ -670,7 +687,18 @@ class OpenAISDK(OpenAI):
                     self.logger.error(
                         'Response is empty, it is an internal server error \
                             from the API provider.')
-                return responses.choices[0].message.content
+
+                message = responses.choices[0].message
+                content = message.content
+                if self.return_reasoning_content:
+                    try:
+                        r_content = message.reasoning_content
+                        r_content = '<think>' + r_content + '</think>'
+                    except AttributeError:
+                        r_content = ''
+                    return r_content + content
+                else:
+                    return content
 
             except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status
