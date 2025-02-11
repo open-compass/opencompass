@@ -13,6 +13,7 @@ from .creationbench import CreationBenchSummarizer
 from .flames import FlamesSummarizer
 from .fofo import FofoSummarizer
 from .followbench import FollowBenchSummarizer
+from .husimpleqa import HuSimpleQASummarizer
 from .mtbench import MTBenchSummarizer
 from .mtbench101 import MTBench101Summarizer
 from .multiround import MultiroundSummarizer
