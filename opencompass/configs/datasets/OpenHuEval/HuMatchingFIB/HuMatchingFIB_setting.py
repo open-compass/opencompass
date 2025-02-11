@@ -16,6 +16,23 @@ The question and options are:
     "options": {options},
 }
 """,
+    'hu':
+    """Egy magyar anyanyelvű tanár vagy. Az alábbi kérdés magyar nyelven érdeklődik a(z) {hu_specific_dim} témakörben. Kérlek, olvasd el a kérdést, és válaszd ki a megfelelő opciót a megadott "options" listából, hogy kitöltsd a szövegben lévő hiányosságokat a kontextus alapján. Olvasd el az egész szöveget, majd töltsd ki az üres helyeket. Néhány opciót többször is kiválaszthatsz. A választ listában szervezd. Példa:
+{
+    "question": "Egészítsd ki a Janus Pannonius életére vonatkozó rövid szöveget! Segítségként használd az internetet! Vigyázz, nem minden szót kell felhasználnod!\nJanus Pannonius nem csupán költőként volt jelentős személyisége kora Magyarországának. #0# unokaöccseként a politikából is hamar kivette a részét. #1# tanulmányai után pécsi #2# lett, majd a királyné mellett #3#. Főkincstartóként és a #4# báni cím elnyerésével komoly politikai karriert futott be Mátyás király udvarában. A királlyal megromló kapcsolata miatt részt vett a #5# elleni összeesküvésben, ezért menekülnie kellett. Ez, és az akkor már súlyosbodó betegsége okozta halálát #6#.",
+    "options": ["A.érsek", "B.szlavón", "C.Vitéz János", "D.püspök", "E.főpohárnok", "F.Ulászló", "G.1474-ben", "H.főkancellár", "I.Itáliai", "J.Kinizsi Pál", "K.Kálmán", "L.1472-ben", "M.Prágai", "N.Mátyás"],
+},
+A válasz:
+{
+    "answer": ["#0#C", "#1#I", "#2#D", "#3#H", "#4#B", "#5#N", "#6#L"]
+}
+Most próbáld megválaszolni a következő kérdést, a válaszod JSON formátumban legyen. Tartalmazza az "answer" mezőt, ahogy az a fenti példában is látható.
+A kérdés és az opciók:
+{
+    "question": {question},
+    "options": {options},
+}
+""",
 }
 
 OpenHuEval_Path = '/mnt/hwfile/opendatalab/weixingjian/OpenHuEval'

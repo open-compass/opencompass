@@ -10,7 +10,7 @@ with read_base():
 
 PROMPT_LANGUAGES = [
     'en',
-    # 'hu',
+    'hu',
 ]
 
 HuMatchingFIB_reader_cfg = dict(
