@@ -10,7 +10,7 @@ models = [
         query_per_second=1,
         max_out_len=8192,
         max_seq_len=32768,
-        batch_size=8,
+        batch_size=1,
         retry=30,
         verbose=True,
     ),
