@@ -31,8 +31,6 @@ O1_MODEL_LIST = [
     'o1-preview',
     'o1-mini',
     'o3-mini-2025-01-31',
-    'deepseek-ai/DeepSeek-R1',
-    'DeepSeek-R1',
 ]
 
 
