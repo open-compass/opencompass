@@ -5,6 +5,8 @@ from collections import defaultdict
 
 from datasets import Dataset, DatasetDict
 
+from opencompass.datasets.subjective.compass_arena_subjective_bench import \
+    get_element_counts
 from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
 from opencompass.utils import get_data_path
 
@@ -204,7 +206,7 @@ def parse_conversation(conversation):
     last_query = conversation[-1]['content']
     chat_round.append({
         'role': role_dict[conversation[-1]['role']],
-        'content': conversation[-1]['content']
+        'content': conversation[-1]['content'],
     })
     chat_round.append({'role': 'assistant', 'content': ''})
 
@@ -249,7 +251,7 @@ class WildBenchDataset(BaseDataset):
                         'primary_tag': item['primary_tag'],
                         'secondary_tag': item['secondary_tag'],
                         'question_id': item['session_id'],
-                    }
+                    },
                 })
         dataset = Dataset.from_list(raw_data)
         return dataset
@@ -267,13 +269,13 @@ task_group_new = {
     'Role playing': 'Creative Tasks',
     'Advice seeking': 'Information/Advice seeking',
     'Data Analysis': 'Math & Data Analysis',
-    'Others': 'Creative Tasks'
+    'Others': 'Creative Tasks',
 }
 
 
 def post_process_wildbench_pair(judgement: dict):
     judgement = judgement['prediction']
-    pattern = r'\"choice\": \"(.*?)\"'
+    pattern = r"\"choice\": \"(.*?)\""
     matched_result = re.findall(pattern, judgement)
     if matched_result:
         return matched_result[0]
@@ -283,7 +285,7 @@ def post_process_wildbench_pair(judgement: dict):
 
 def post_process_wildbench_single(judgement: dict):
     judgement = judgement['prediction']
-    pattern = r'\"score\": \"(.*?)\"'
+    pattern = r"\"score\": \"(.*?)\""
     matched_result = re.findall(pattern, judgement)
     try:
         score = float(matched_result[0])
@@ -299,23 +301,36 @@ def post_process_wildbench_single(judgement: dict):
 
 
 @DICT_POSTPROCESSORS.register_module('wildbench')
-def wildbench_postprocess(output: dict, output_path: str) -> dict:
+def wildbench_postprocess(
+    output: dict,
+    output_path: str,
+) -> dict:
+
     judged_answers, references = get_judgeanswer_and_reference(
-        output, output_path, post_process_wildbench_pair)
+        result=output,
+        filename=output_path,
+        post_process=post_process_wildbench_pair,
+    )
+
+    if 'base_models' in references[0]:
+        base_models = references[0]['base_models']
+    else:
+        base_models = ['HaiKu', 'gpt4-turbo', 'llama-2-70b-chat-hf']
+
+    if isinstance(base_models, str):
+        base_models = [base_models]
 
     win_base_model = defaultdict(float)
     win_compare_model = defaultdict(float)
     categories = defaultdict(float)
 
     score_mapping = {'A++': 1, 'A+': 0.5, 'A=B': 0, 'B+': -0.5, 'B++': -1}
-    for prediction, reference in zip(judged_answers, references):
-        if prediction not in score_mapping:
+    for judged_answer, reference in zip(judged_answers, references):
+        if judged_answer not in score_mapping:
             continue
 
-        flag = 1 if reference['answer1'] in [
-            'HaiKu', 'gpt4-turbo', 'llama-2-70b-chat-hf'
-        ] else -1
-        score_1 = score_mapping[prediction] * flag
+        flag = 1 if reference['answer1'] in base_models else -1
+        score_1 = score_mapping[judged_answer] * flag
         score_2 = -score_1
 
         tags = [reference['primary_tag']] + reference['secondary_tag']
@@ -325,11 +340,11 @@ def wildbench_postprocess(output: dict, output_path: str) -> dict:
             categories[task_group_new[tag]] += 1
 
     for capability in categories:
-        win_base_model[capability] = win_base_model[capability] / categories[
-            capability] * 100
+        win_base_model[capability] = (win_base_model[capability] /
+                                      categories[capability] * 100)
         win_base_model[capability] = round(win_base_model[capability], 2)
-        win_compare_model[capability] = win_compare_model[
-            capability] / categories[capability] * 100
+        win_compare_model[capability] = (win_compare_model[capability] /
+                                         categories[capability] * 100)
         win_compare_model[capability] = round(win_compare_model[capability], 2)
 
     # Calculating the mean of the values
@@ -340,4 +355,83 @@ def wildbench_postprocess(output: dict, output_path: str) -> dict:
 
     results = win_compare_model
     results['details'] = output
+    return results
+
+
+@DICT_POSTPROCESSORS.register_module('wildbench_bradleyterry')
+def wildbench_bradleyterry_postprocess(
+    output: dict,
+    output_path: str,
+) -> dict:
+
+    judged_answers, references = get_judgeanswer_and_reference(
+        result=output,
+        filename=output_path,
+        post_process=post_process_wildbench_pair,
+    )
+
+    if 'prediction1' not in references[0]:
+        raise ValueError(
+            'prediction1 not in references. Set `keep_predictions=True` for LMEvaluator in dataset config and retry.'
+        )
+
+    if 'prediction2' not in references[0]:
+        raise ValueError(
+            'prediction2 not in references. Set `keep_predictions=True` for LMEvaluator in dataset config and retry.'
+        )
+
+    score_mapping = {
+        'A++': 'model_a',
+        'A+': 'model_a',
+        'A=B': 'tie',
+        'B+': 'model_b',
+        'B++': 'model_b',
+    }
+
+    results = {}
+    matches = []
+    for judged_answer, reference in zip(judged_answers, references):
+        cur_dict = {}
+
+        if judged_answer in score_mapping:
+            cur_dict['winner'] = score_mapping[judged_answer]
+        else:
+            # cur_dict["winner"] = (
+            #     "tie"  # Count match as tie if judge answer cannot be parsed.
+            # )
+
+            # Skip if judge answer cannot be parsed
+            print('Judge answer cannot be parsed. Skipping record...')
+            continue
+
+        cur_dict['primary_tag'] = reference['primary_tag']
+        # Extract first tag from list and set as categorical level.
+        # Can be used as categorical variable in Bradley-Terry model
+        cur_dict['secondary_tag'] = (reference['secondary_tag'][0]
+                                     if len(reference['secondary_tag']) > 0
+                                     else 'Others')
+        # Keep original secondary tag list for reference
+        cur_dict['secondary_tags'] = reference['secondary_tag']
+        cur_dict['model_a'] = reference['answer1']
+        cur_dict['model_b'] = reference['answer2']
+        cur_dict['prediction1'] = reference['prediction1']
+        cur_dict['prediction2'] = reference['prediction2']
+
+        matches.append(cur_dict)
+
+    ### ---------- Add Style Metadata ---------- ###
+    matches = get_element_counts(
+        data=matches,
+        column='prediction1',
+        suffix='_a',
+    )
+    matches = get_element_counts(
+        data=matches,
+        column='prediction2',
+        suffix='_b',
+    )
+
+    results['matches'] = matches
+    # results["details"] = output
+
     return results

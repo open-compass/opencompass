@@ -98,7 +98,13 @@ class VLLMwithChatTemplate(BaseModel):
             messages = _format_with_fast_chat_template(messages, self.fastchat_template)
         else:
             messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
-
+            # vLLM tokenize prompts by AutoTokenizer with its default parameter "add_special_token=True"
+            # OC add bos_token in the prompt, which requires tokenizing prompts using "add_speicial_token=False"
+            # But vLLM doesn't have "add_speicial_token" in the pipeline API. So, we remove bos_token
+            # from messages as a workaround
+            if self.tokenizer.bos_token:
+                bos_token = self.tokenizer.bos_token
+                messages = [message.removeprefix(bos_token) if message.startswith(bos_token) else message for message in messages]
         DEFAULT_GENERATION_KWARGS = {
             'temperature': 0,
             'max_tokens': max_out_len,
@@ -108,6 +114,8 @@ class VLLMwithChatTemplate(BaseModel):
         sampling_kwargs.update(self.generation_kwargs)
         sampling_kwargs.update(kwargs)
         sampling_kwargs = SamplingParams(**sampling_kwargs)
+        self.logger.info('Sampling Params of vLLM: ')
+        self.logger.info(sampling_kwargs)
 
         outputs = self.model.generate(messages, sampling_kwargs)
 

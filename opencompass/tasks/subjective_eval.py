@@ -100,7 +100,7 @@ class SubjectiveEvalTask(BaseTask):
             'datasets': self.dataset_cfgs
         })
         return self.name_prefix + task_name + \
-            '--judge-by--' + model_abbr_from_cfg(self.judge_cfg)
+                '--judge-by--' + model_abbr_from_cfg(self.judge_cfg)
 
     def _load_model_pred(
         self,

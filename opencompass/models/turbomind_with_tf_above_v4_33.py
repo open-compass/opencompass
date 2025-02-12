@@ -37,10 +37,12 @@ class TurboMindModelwithChatTemplate(BaseModel):
         meta_template: Optional[Dict] = None,
         fastchat_template: Optional[str] = None,
         stop_words: List[str] = [],
+        drop_middle: bool = False,
     ):
         self.logger = get_logger()
         self.path = path
         self.tokenizer_only = tokenizer_only
+        self.drop_middle = drop_middle
         self.template_parser = _get_meta_template(meta_template)
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
 
@@ -101,6 +103,28 @@ class TurboMindModelwithChatTemplate(BaseModel):
         Returns:
             List[str]: A list of generated strings.
         """
+        if self.drop_middle:
+            inputs_drop_middle = []
+            for input in inputs:
+                if isinstance(input, PromptList):
+                    input = input[0]['prompt']
+                input_ids = self.tokenizer([input],
+                                           padding=False,
+                                           truncation=False)['input_ids'][0]
+                original_len = len(input_ids)
+                # Reserve space for max_out_len in max_seq_len
+                effective_max_len = self.max_seq_len - max_out_len
+                if len(input_ids) > effective_max_len:
+                    self.logger.info(f'Input length {original_len} exceeds effective sequence length {effective_max_len} (max_seq_len {self.max_seq_len} - max_out_len {max_out_len}), truncating...')
+                    input_ids = input_ids[:effective_max_len //
+                                          2] + input_ids[-effective_max_len //
+                                                         2:]
+                    self.logger.info(f'Input length after truncation: {len(input_ids)}')
+                    input = self.tokenizer.decode(input_ids,
+                                                  skip_special_tokens=True)
+                inputs_drop_middle.append(input)
+            inputs = inputs_drop_middle
+
         assert isinstance(inputs, List), f'List(str) is expected, but got {type(inputs)}'
         messages = _convert_chat_messages(inputs)
         if self.fastchat_template:
@@ -128,10 +152,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
             gen_config['max_new_tokens'] = max_out_len
         if min_out_len is not None:
             gen_config['min_new_tokens'] = min_out_len
-        if do_sample or ('do_sample' in self.gen_config and self.gen_config['do_sample']):
-            gen_config['top_k'] = 40
-            gen_config['temperature'] = temperature
-        else:
+        if not(do_sample or ('do_sample' in self.gen_config and self.gen_config['do_sample'])):
             if self.version_info >= (0, 6, 0):
                 gen_config['do_sample'] = False
             else:
@@ -140,6 +161,10 @@ class TurboMindModelwithChatTemplate(BaseModel):
         from lmdeploy import GenerationConfig
         gen_config = {k: v for k, v in gen_config.items() if hasattr(GenerationConfig, k)}
         gen_config = GenerationConfig(**gen_config)
+        self.logger.info('Generation Config of LMdeploy: ')
+        self.logger.info(gen_config)
+
+
 
         results = []
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)

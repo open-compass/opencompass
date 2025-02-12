@@ -161,7 +161,7 @@ def get_final_results(judged_answers, references, origial_responses):
         accuracy_given_attempted + is_correct) if (accuracy_given_attempted +
                                                    is_correct) > 0 else 0
     result = {
-        'accuracy_given_attempted': accuracy_given_attempted,
+        'accuracy_given_attempted': accuracy_given_attempted * 100,
         'f1': f1,
         'details': details
     }

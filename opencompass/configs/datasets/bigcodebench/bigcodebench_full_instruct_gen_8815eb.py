@@ -34,7 +34,7 @@ bigcodebench_full_eval_cfg = dict(
         type=BigCodeBenchEvaluator,
         release_version='v0.1.2',
         eval_type='instruct',
-        remote_execute_api="https://bigcode-bigcodebench-evaluator.hf.space/",
+        remote_execute_api='https://bigcode-bigcodebench-evaluator.hf.space/',
         dataset_version='full',
     ),
     pred_role='BOT',
@@ -44,7 +44,7 @@ bigcodebench_full_instruct_datasets = [
     dict(
         abbr='bigcodebench_full_instruct',
         type=BigCodeBenchDataset,
-        path="opencompass/bigcodebench",
+        path='opencompass/bigcodebench',
         reader_cfg=bigcodebench_full_reader_cfg,
         infer_cfg=bigcodebench_full_infer_cfg,
         eval_cfg=bigcodebench_full_eval_cfg,
