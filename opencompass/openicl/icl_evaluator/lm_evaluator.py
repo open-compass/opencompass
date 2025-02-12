@@ -1,4 +1,5 @@
 # flake8: noqa: E501
+import copy
 import os.path as osp
 import random
 import re
@@ -126,7 +127,7 @@ class LMEvaluator:
         meta_review_prompt_template: Optional[ConfigDict] = None,
         pack_all_predictions: Optional[bool] = False,
         dataset_cfg: Optional[ConfigDict] = None,
-        pred_postprocessor: Optional[ConfigDict] = None,
+        infer_pred_postprocess: Optional[ConfigDict] = None,
         dict_postprocessor: Optional[ConfigDict] = None,
         keep_predictions: bool = False,
     ) -> None:
@@ -153,7 +154,7 @@ class LMEvaluator:
         self.logger = get_logger()
         self.dataset_cfg = dataset_cfg
         self.pack_all_predictions = pack_all_predictions
-        self.pred_postprocessor = pred_postprocessor
+        self.infer_pred_postprocess = infer_pred_postprocess
         self.dict_postprocessor = dict_postprocessor
         self.keep_predictions = keep_predictions
 
@@ -167,6 +168,15 @@ class LMEvaluator:
     ) -> Dict:
         dup_indices = []
         if isinstance(predictions, list):
+            if self.infer_pred_postprocess:
+                temp_predictions = []
+                for prediction in predictions:
+                    kwargs = copy.deepcopy(self.infer_pred_postprocess)
+                    proc = DICT_POSTPROCESSORS.get(kwargs.pop('type'))
+                    prediction['model_preds'] = proc(prediction['model_preds'],
+                                                     **kwargs)
+                    temp_predictions.append(prediction)
+                predictions = temp_predictions
             """Apply to multi-model comparison."""
             if references is None:
                 references = [
@@ -204,6 +214,11 @@ class LMEvaluator:
                         dup_indices.append(i)
 
         elif isinstance(predictions, dict):
+            if self.infer_pred_postprocess:
+                kwargs = self.infer_pred_postprocess
+                proc = DICT_POSTPROCESSORS.get(kwargs.pop('type'))
+                predictions['model_preds'] = proc(predictions['model_preds'],
+                                                  **kwargs)
             """Apply to single-model scoring."""
             if references is None:
                 references = [
