@@ -1,7 +1,5 @@
 from mmengine.config import read_base
 
-from opencompass.utils.text_postprocessors import remove_reasoning_part_before_evaluation
-
 with read_base():
     from opencompass.configs.datasets.OpenHuEval.HuLifeQA import (
         hu_life_qa_datasets,
@@ -22,6 +20,8 @@ with read_base():
     from opencompass.configs.models.openai.o1_mini_2024_09_12 import models as o1_mini_2024_09_12_model
     from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import models as lmdeploy_qwq_32b_preview_model
     from opencompass.configs.models.deepseek.deepseek_r1_api_aliyun import models as deepseek_r1_api_aliyun_model
+    from opencompass.configs.models.deepseek.deepseek_r1_distill_llama_8b_api_aliyun import models as deepseek_r1_distill_llama_8b_api_aliyun_model
+    from opencompass.configs.models.deepseek.deepseek_r1_distill_qwen_7b_api_aliyun import models as deepseek_r1_distill_qwen_7b_api_aliyun_model
 
 from opencompass.models import OpenAI
 from opencompass.partitioners import (
@@ -54,6 +54,8 @@ models = [
     *o1_mini_2024_09_12_model,
     *deepseek_v3_api_aliyun_model,
     *deepseek_r1_api_aliyun_model,
+    *deepseek_r1_distill_llama_8b_api_aliyun_model,
+    *deepseek_r1_distill_qwen_7b_api_aliyun_model,
     *lmdeploy_qwen2_5_7b_instruct_model,
     *lmdeploy_qwen2_5_72b_instruct_model,
     *lmdeploy_llama3_1_8b_instruct_model,
@@ -73,7 +75,7 @@ judge_models = [
         meta_template=api_meta_template,
         query_per_second=2,
         max_out_len=8192,
-        max_seq_len=8192,
+        max_seq_len=16384,
         batch_size=8,
         temperature=0,
     )

@@ -20,8 +20,8 @@ hu_life_qa_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(
         type=ChatInferencer,
-        max_seq_len=4096,
-        max_out_len=2048,
+        max_seq_len=8192,
+        max_out_len=8192,
         infer_mode='last',
     ),
 )
