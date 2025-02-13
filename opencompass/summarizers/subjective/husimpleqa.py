@@ -44,12 +44,12 @@ def get_capability_results(
 
     col_name = ['model']
     column = [model_abbr]
-    # for dim, judges in chain({"total": dim_judges.pop('total')}.items(), dim_judges.items()):
     for dim, judges in dim_judges.items():
         c = Counter(judges)
         dim_count = dim_counts[dim]
-        for judge, count in c.items():
-            col_name.append(dim + '-' + judge)
+        for judge in ['correct', 'incorrect', 'not_attempted']:
+            count = c[judge]
+            col_name.append(dim + ' ' + judge)
             column.append(round(count / dim_count, 2))
         col_name.append(dim + ' count')
         column.append(dim_count)
