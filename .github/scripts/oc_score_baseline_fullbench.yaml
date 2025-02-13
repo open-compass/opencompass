@@ -366,7 +366,7 @@ internlm2_5-7b-chat-turbomind:
         openai_mmmlu_lite_DE-DE_accuracy: 51.27
         openai_mmmlu_lite_ES-LA_accuracy: 56.94
         openai_mmmlu_lite_FR-FR_accuracy: 58.22
-        openai_mmmlu_lite_HI-IN_accuracy: 33.75
+        openai_mmmlu_lite_HI-IN_accuracy: 30.75
         openai_mmmlu_lite_ID-ID_accuracy: 50.6
         openai_mmmlu_lite_IT-IT_accuracy: 50.6
         openai_mmmlu_lite_JA-JP_accuracy: 51.13
@@ -394,7 +394,7 @@ internlm2_5-7b-chat-turbomind:
         CompassArena_naive_average: 34.61
         FoFo_naive_average: 0.38
         mtbench101_avg: 8.01
-        wildbench_average: -15.69
+        wildbench_average: -10.49
         simpleqa_accuracy_given_attempted: 0.04
         chinese_simpleqa_given_attempted_accuracy: 0.34
         alignment_bench_v1_1_专业能力: 6.05
@@ -414,7 +414,7 @@ internlm2_5-7b-chat-turbomind:
         compassarena_knowledge_naive_average: 36
         compassarena_reason_v2_naive_average: 35
         compassarena_math_v2_naive_average: 19.91
-        compassarena_creationv2_zh_naive_average: 35.81
+        compassarena_creationv2_zh_naive_average: 43.64
         fofo_test_prompts_overall: 0.35
         fofo_test_prompts_cn_overall: 0.41
         followbench_llmeval_en_HSR_AVG: 0.73

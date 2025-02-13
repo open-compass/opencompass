@@ -17,7 +17,7 @@ on:
         required: false
         description: 'whether to build lmdeploy'
         type:  boolean
-        default: false
+        default: true
       repo_org_lmdeploy:
         required: false
         description: 'Tested repository organization name. Default is internlm/lmdeploy'
@@ -162,15 +162,16 @@ jobs:
             pip install xformers --index-url https://download.pytorch.org/whl/cu121 --cache-dir ${{env.PIP_CACHE_PATH}}
             cp -r /root/nltk_data ${{env.CONDA_PATH}}/envs/${{env.CONDA_ENV}}/nltk_data
       - name: Prepare - reinstall lmdeploy - cu12
-        if: ${{inputs.build_lmdeploy}}
+        if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
         uses: actions/download-artifact@v4
         with:
           name: my-artifact-${{ github.run_id }}-py310
       - name: Prepare - reinstall lmdeploy - cu12
-        if: ${{inputs.build_lmdeploy}}
+        if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
+          pip uninstall -y lmdeploy
           pip install lmdeploy-*.whl --no-deps
       - name: conda env
         run: |
@@ -188,7 +189,7 @@ jobs:
         regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","base_fullbench"]')}}
     runs-on: volc_cu12_daily
     environment: 'prod'
-    timeout-minutes: 120 #2hours
+    timeout-minutes: 180 #3hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -275,7 +276,7 @@ jobs:
           conda info --envs
           lmdeploy serve api_server internlm/internlm2_5-7b-chat --max-batch-size 256 --model-name internlm2 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/restful.log  2>&1  &
           echo "restful_pid=$!" >> "$GITHUB_ENV"
-          sleep 120s
+          sleep 180s
           opencompass .github/scripts/eval_regression_api.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/api --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/api/*/summary regression_result_daily
           python -m pytest -m api -s -v --color=yes .github/scripts/oc_score_assert.py
@@ -334,7 +335,7 @@ jobs:
 
 
   notify_to_feishu:
-    if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
+    if: ${{ always() && github.event_name == 'schedule' && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
     needs: [daily_run_test_volc, daily_run_test_local, fullbench_run_test]
     timeout-minutes: 5
     runs-on: self-hosted
