@@ -141,6 +141,10 @@ class OpenAI(BaseAPIModel):
                 if 'DASHSCOPE_API_KEY' not in os.environ:
                     raise ValueError('DASHSCOPE API key (aliyun) is not set.')
                 self.keys = os.getenv('DASHSCOPE_API_KEY').split(',')
+            elif key == 'ENV_SENSETIME':
+                if 'SENSETIME_API_KEY' not in os.environ:
+                    raise ValueError('SENSETIME API key is not set.')
+                self.keys = os.getenv('SENSETIME_API_KEY').split(',')
             else:
                 self.keys = [key]
         else:
