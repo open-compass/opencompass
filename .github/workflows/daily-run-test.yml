@@ -189,7 +189,7 @@ jobs:
         regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","base_fullbench"]')}}
     runs-on: volc_cu12_daily
     environment: 'prod'
-    timeout-minutes: 120 #2hours
+    timeout-minutes: 180 #3hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
