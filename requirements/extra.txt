@@ -1,5 +1,7 @@
 # Alpaca-eval
 alpaca-eval==0.6
+# OlympiadBench
+antlr4-python3-runtime==4.11
 cn2an
 # Dingo
 dingo-python==1.1.2

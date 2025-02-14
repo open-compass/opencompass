@@ -78,7 +78,7 @@ math_eval_cfg = dict(
         ),
         judge_cfg=dict(),
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-        pred_postprocessor=dict(type=xml_tag_postprocessor, tag="<conclude>"),
+        pred_postprocessor=dict(type=xml_tag_postprocessor, tag='<conclude>'),
 
     ),
     pred_role='BOT',
