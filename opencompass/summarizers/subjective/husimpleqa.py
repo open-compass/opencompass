@@ -60,6 +60,7 @@ def get_capability_results(
             writer.writerow(col_name)
         writer.writerow(column)
 
+
 class HuSimpleQASummarizer:
     """Do the subjectivity analyze based on evaluation results.
 
@@ -67,10 +68,11 @@ class HuSimpleQASummarizer:
         config (ConfigDict): The configuration object of the evaluation task.
     """
 
-    def __init__(self, config: ConfigDict) -> None:
+    def __init__(self, config: ConfigDict, prompt_languages) -> None:
         self.judge_type = 'single'
         self.tasks = []
         self.cfg = config
+        self.prompt_languages = prompt_languages
 
         self.eval_model_cfgs = self.cfg['eval']['partitioner']['models']
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
@@ -85,30 +87,32 @@ class HuSimpleQASummarizer:
         Returns:
             pd.DataFrame: The summary results.
         """
+        for language in self.prompt_languages:
+            dataset_cfgs = self.cfg['datasets']
+            output_dir, results_folder = get_outdir(self.cfg, time_str)
+            fout_flag = 0
+            for eval_model_cfg in self.eval_model_cfgs:
+                eval_model_abbr = model_abbr_from_cfg(eval_model_cfg)
+                show_model_abbr = model_abbr_from_cfg_used_in_summarizer(eval_model_cfg)
+                subdir_path = os.path.join(results_folder, eval_model_abbr + '_judged-by--' + self.judge_abbr)
+                if os.path.isdir(subdir_path):
+                    fout = osp.join(output_dir, 'judged-by--' + self.judge_abbr + '-capability' + '_' + language + '.csv')
+                    overall_judged_answers, overall_references = [], []
+                    for dataset in dataset_cfgs:
+                        if not dataset['abbr'].endswith('_' + language):
+                            continue
+                        judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
+                        judged_answers = [item['judge'] for item in judged_answers]
+                        overall_judged_answers += judged_answers
+                        overall_references += references
 
-        dataset_cfgs = self.cfg['datasets']
-        output_dir, results_folder = get_outdir(self.cfg, time_str)
-        fout_flag = 0
-        for eval_model_cfg in self.eval_model_cfgs:
-            eval_model_abbr = model_abbr_from_cfg(eval_model_cfg)
-            show_model_abbr = model_abbr_from_cfg_used_in_summarizer(eval_model_cfg)
-            subdir_path = os.path.join(results_folder, eval_model_abbr + '_judged-by--' + self.judge_abbr)
-            if os.path.isdir(subdir_path):
-                fout = osp.join(output_dir, 'judged-by--' + self.judge_abbr + '-capability.csv')
-                overall_judged_answers, overall_references = [], []
-                for dataset in dataset_cfgs:
-                    judged_answers, references = get_judgeanswer_and_reference(dataset, subdir_path, self.judge_function)
-                    judged_answers = [item['judge'] for item in judged_answers]
-                    overall_judged_answers += judged_answers
-                    overall_references += references
-
-                get_capability_results(
-                    overall_judged_answers,
-                    overall_references,
-                    fout,
-                    fout_flag,
-                    show_model_abbr,
-                )
-                fout_flag += 1
-            else:
-                print(subdir_path + ' is not exist! please check!')
+                    get_capability_results(
+                        overall_judged_answers,
+                        overall_references,
+                        fout,
+                        fout_flag,
+                        show_model_abbr,
+                    )
+                    fout_flag += 1
+                else:
+                    print(subdir_path + ' is not exist! please check!')
