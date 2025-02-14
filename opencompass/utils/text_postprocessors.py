@@ -241,3 +241,26 @@ def remove_reasoning_part_before_evaluation(text: str):
             return text[reasoning_end + 8:]
     else:
         return text
+
+
+@TEXT_POSTPROCESSORS.register_module('extract_qwq_answer_before_eval')
+def extract_answer_before_evaluation(text: str):
+    """Overall, there are three situations in responses of QWQ:
+
+    1. There is a **Final Answer** title in the whole context.
+        2. There is only one sentence in the context.
+        3. There are more than one sentences in the context, \
+    and the last one is the answer.
+    """
+    if '**Final Answer**' in text:
+        answer = text.split('\n\n**Final Answer**\n\n')[-1]
+    else:
+        if '\n\nHuman' in text:
+            text = text.split('\n\nHuman')[0]
+
+        text_split = text.split('.')
+        if text_split[-1] == '':
+            answer = text_split[-2] + '.'
+        else:
+            answer = text_split[-1] + '.'
+    return answer
