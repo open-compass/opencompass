@@ -81,6 +81,13 @@ OpenCompass 上手路线
 
    tools.md
 
+.. _数据集列表:
+.. toctree::
+   :maxdepth: 1
+   :caption: 数据集列表
+
+   dataset_statistics.md
+
 .. _其他说明:
 .. toctree::
    :maxdepth: 1
