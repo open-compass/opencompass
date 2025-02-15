@@ -46,6 +46,12 @@ for model in deepseek_r1_api_aliyun_model:
             'type': 'rm_<think>_before_eval'
         }
     }
+    if model['abbr'].startswith('QwQ'):
+        model['pred_postprocessor'] = {
+            'OpenHuEval_*': {
+                'type': 'extract_qwq_answer_before_eval'
+            }
+        }
 del model
 
 models = [
