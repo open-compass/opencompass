@@ -1,10 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
-    from opencompass.configs.datasets.OpenHuEval.HuLifeQA import (
-        hu_life_qa_datasets,
-        TASK_GROUP_NEW,
-    )
+    from opencompass.configs.datasets.subjective.wildbench.wildbench_single_judge import wildbench_datasets
 
     from opencompass.configs.models.openai.gpt_4o_mini_20240718 import models as gpt_4o_mini_20240718_model
     from opencompass.configs.models.openai.gpt_4o_2024_11_20 import models as gpt_4o_20241120_model
@@ -15,11 +12,11 @@ with read_base():
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_8b_instruct import models as lmdeploy_llama3_1_8b_instruct_model
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_70b_instruct import models as lmdeploy_llama3_1_70b_instruct_model
 
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import models as lmdeploy_internlm3_8b_instruct_model
+    # from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import models as lmdeploy_internlm3_8b_instruct_model
 
+    from opencompass.configs.models.openai.o1_mini_2024_09_12 import models as o1_mini_2024_09_12_model
     from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import models as lmdeploy_qwq_32b_preview_model
     from opencompass.configs.models.deepseek.deepseek_r1_api_aliyun import models as deepseek_r1_api_aliyun_model
-    from opencompass.configs.models.openai.o1_mini_2024_09_12 import models as o1_mini_2024_09_12_model
     # from opencompass.configs.models.openai.o3_mini_2025_01_31 import models as o3_mini_2025_01_31_model
 
 from opencompass.models import OpenAI
@@ -57,7 +54,7 @@ models = [
     *lmdeploy_qwen2_5_72b_instruct_model,
     *lmdeploy_llama3_1_8b_instruct_model,
     *lmdeploy_llama3_1_70b_instruct_model,
-    *lmdeploy_internlm3_8b_instruct_model,
+    # *lmdeploy_internlm3_8b_instruct_model,
     *lmdeploy_qwq_32b_preview_model,
 ]
 
@@ -78,11 +75,11 @@ judge_models = [
     )
 ]
 
-for ds in hu_life_qa_datasets:
-    ds.update(dict(mode='singlescore', eval_mode='single'))
+for ds in wildbench_datasets:
+    ds.update(dict(mode='singlescore'))
 del ds
-datasets = [*hu_life_qa_datasets]
-del hu_life_qa_datasets
+datasets = [*wildbench_datasets]
+del wildbench_datasets
 
 infer = dict(
     partitioner=dict(
@@ -108,10 +105,7 @@ eval = dict(
                 task=dict(type=SubjectiveEvalTask)),
 )
 
-summarizer = dict(
-    type=WildBenchSingleSummarizer,
-    customized_task_group_new=TASK_GROUP_NEW,
-)
+summarizer = dict(type=WildBenchSingleSummarizer)
 
 work_dir = (
     './outputs/' + __file__.split('/')[-1].split('.')[0] + '/'

@@ -15,7 +15,7 @@ models = [
         openai_proxy_url='ENV',
         meta_template=api_meta_template,
         query_per_second=1,
-        max_out_len=2048,
-        max_seq_len=4096,
+        max_out_len=8192,
+        max_seq_len=8192,
         batch_size=8),
 ]
