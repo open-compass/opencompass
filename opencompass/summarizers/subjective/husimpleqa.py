@@ -50,7 +50,7 @@ def get_capability_results(
         for judge in ['correct', 'incorrect', 'not_attempted']:
             count = c[judge]
             col_name.append(dim + ' ' + judge)
-            column.append(round(count / dim_count, 2))
+            column.append(round(count / dim_count, 4))
         col_name.append(dim + ' count')
         column.append(dim_count)
 
