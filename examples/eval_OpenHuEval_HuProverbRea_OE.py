@@ -33,7 +33,7 @@ for model in models:
     if model['abbr'].startswith('QwQ'):
         model['pred_postprocessor'] = {
             'OpenHuEval_*': {
-                'type': 'extract_qwq_answer_before_eval'
+                'type': 'extract_qwq_answer_before_eval_for_huproverbrea'
             }
         }
 del model

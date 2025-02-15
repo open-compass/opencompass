@@ -30,6 +30,12 @@ for model in models:
                 'type': 'rm_<think>_before_eval'
             }
         }
+    if model['abbr'].startswith('QwQ'):
+        model['pred_postprocessor'] = {
+            'OpenHuEval_*': {
+                'type': 'extract_qwq_answer_before_eval_for_huproverbrea'
+            }
+        }
 del model
 
 work_dir = './outputs/' + __file__.split('/')[-1].split('.')[0] + '/' # do NOT modify this line, yapf: disable, pylint: disable

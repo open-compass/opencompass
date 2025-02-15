@@ -243,7 +243,8 @@ def remove_reasoning_part_before_evaluation(text: str):
         return text
 
 
-@TEXT_POSTPROCESSORS.register_module('extract_qwq_answer_before_eval')
+@TEXT_POSTPROCESSORS.register_module(
+    'extract_qwq_answer_before_eval_for_huproverbrea')
 def extract_answer_before_evaluation(text: str):
     """Overall, there are three situations in responses of QWQ:
 
@@ -344,4 +345,41 @@ def extract_answer_before_evaluation(text: str):
 
     answer = '\n\n'.join(text_split[max(ans_start_idx - 1, 0):])
 
-    return answer, has_answer
+    return answer
+
+
+@TEXT_POSTPROCESSORS.register_module(
+    'extract_qwq_answer_before_eval_for_hustandardfib')
+def extract_answer_before_evaluation(text: str):
+    """The format of the answer from QwQ when inferring HuSimpleQA is \
+    different with others models due to the special prompt."""
+    max_sentence_len = 70
+    if len(re.findall(r'\n\n', text)) > 2:
+        split_mark = '\n\n'
+    else:
+        split_mark = '\n'
+    text_split = text.split(split_mark)
+    last_try_idx = max(len(text_split) - max_sentence_len, 0)
+    ans_start_idx = last_try_idx
+    has_answer = False
+    answer_flags = [
+        '#0#', '#0', 'summar', 'Final Answer', 'final answer', 'Final\nAnswer'
+    ]
+
+    for idx, s in enumerate(reversed(text_split)):
+        sen_idx = len(text_split) - 1 - idx
+        if sen_idx < last_try_idx:
+            break
+
+        for af in answer_flags:
+            if af in s:
+                has_answer = True
+                break
+
+        if has_answer:
+            ans_start_idx = sen_idx
+            break
+
+    answer = '\n\n'.join(text_split[max(ans_start_idx - 1, 0):])
+
+    return answer
