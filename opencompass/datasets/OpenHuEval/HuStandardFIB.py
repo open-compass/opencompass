@@ -59,14 +59,13 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                 re.sub(r'#\d+#', '', ans).split(';')
                 for ans in refer['answers']
             ]  # Remove "#0#" and "#1#", then split refer['formatted_std_ans']
+
+            blank_total += len(std_ans)
+            question_total += 1
             model_ans = []
             pred = pred.strip()
             match = re.search(r'\{.*?\}', pred, re.DOTALL)
-            if match:
-                json_str = match.group(0)
-            else:
-                blank_total += len(std_ans)
-                question_total += 1
+            if not match:
                 details[idx] = {
                     'reference': refer,
                     'model_ans': model_ans,
@@ -77,6 +76,8 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                     'question_wise_correctness': False,
                 }
                 continue
+
+            json_str = match.group(0)
             json_str = json_str.strip()
             json_str = json_str.replace('\\xa0', '')
             formatted_json_str = json_str
@@ -88,20 +89,14 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                     to_end_flag = True
                 except json.JSONDecodeError:
                     print(f'Invalid JSON format. {idx}')
-                    blank_total += len(std_ans)
-                    question_total += 1
 
             elif isinstance(formatted_json_str, dict):
                 data = formatted_json_str
                 to_end_flag = True
-            else:
-                blank_total += len(std_ans)
-                question_total += 1
 
-            model_ans = []
             blank_wise_correctness = []
-            is_question_correct = True
             if to_end_flag:
+                is_question_correct = True
                 model_ans = [
                     re.sub(r'#\d+#', '', ans).split(';')
                     for ans in data.get('answers', [])
@@ -125,9 +120,9 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                             is_question_correct = False
                     blank_wise_correctness.append(is_blank_correct)
 
-                blank_total += len(std_ans)
-                question_total += 1
                 question_correct += 1 if is_question_correct else 0
+            else:
+                is_question_correct = False
 
             details[idx] = {
                 'reference': refer,
@@ -138,6 +133,7 @@ class HuStandardFIBEvaluator(BaseEvaluator):
                 'blank_wise_correctness': blank_wise_correctness,
                 'question_wise_correctness': is_question_correct,
             }
+
         results = {
             'blank_level_correctness':
             round(blank_correct / blank_total * 100, 2),
