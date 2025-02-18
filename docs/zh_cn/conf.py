@@ -224,6 +224,7 @@ notfound_template = '404.html'
 
 def builder_inited_handler(app):
     subprocess.run(['./cp_origin_docs.sh'])
+    subprocess.run(['./statis.py'])
 
 
 def setup(app):
