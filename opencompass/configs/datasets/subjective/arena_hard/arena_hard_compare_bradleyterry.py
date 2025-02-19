@@ -1,6 +1,6 @@
 from mmengine.config import read_base
 
-from opencompass.datasets import ArenaHardDataset, arenahard_bradleyterry_postprocess
+from opencompass.datasets import ArenaHardDataset, arenahard_bradleyterry_postprocess, think_pred_postprocess
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -39,7 +39,7 @@ for _name in subjective_all_sets:
             ),
         ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_out_len=4096),
+        inferencer=dict(type=GenInferencer),
     )
 
     subjective_eval_cfg = dict(
@@ -59,6 +59,7 @@ for _name in subjective_all_sets:
             dict_postprocessor=dict(type=arenahard_bradleyterry_postprocess),
             keep_predictions=True,  # Must be turned on to save predictions from model pairs to calculate style features in postprocessor
         ),
+        pred_postprocessor=dict(type=think_pred_postprocess, re_pattern=r'</think>([\s\S]*)'),
         pred_role='BOT',
     )
 

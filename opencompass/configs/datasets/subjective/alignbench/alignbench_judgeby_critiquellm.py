@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.summarizers import AlignmentBenchSummarizer
-from opencompass.datasets import AlignmentBenchDataset, infer_pred_postprocess
+from opencompass.datasets import AlignmentBenchDataset, think_pred_postprocess
 
 subjective_reader_cfg = dict(
     input_columns=['question', 'capability', 'critiquellm_prefix'],
@@ -47,8 +47,8 @@ for _name in subjective_all_sets:
                     ),
                 ]),
             ),
-            infer_pred_postprocess=dict(type=infer_pred_postprocess, re_pattern=r'</think>([\s\S]*)'),
         ),
+        pred_postprocessor=dict(type=think_pred_postprocess, re_pattern=r'</think>([\s\S]*)'),
         pred_role='BOT',
     )
 

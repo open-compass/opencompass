@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import ChatInferencer, GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import MTBench101Dataset, infer_pred_postprocess
+from opencompass.datasets import MTBench101Dataset, think_pred_postprocess
 from opencompass.summarizers import MTBench101Summarizer
 
 subjective_reader_cfg = dict(
@@ -24,13 +24,12 @@ for _name in subjective_all_sets:
                 template="""{dialogue}""",
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=ChatInferencer, max_seq_len=4096, infer_mode='last'),
+            inferencer=dict(type=ChatInferencer, infer_mode='last'),
         )
 
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
-            infer_pred_postprocess=dict(type=infer_pred_postprocess, re_pattern=r'</think>([\s\S]*)'),
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
@@ -48,6 +47,7 @@ for _name in subjective_all_sets:
                 ]),
             ),
         ),
+        pred_postprocessor=dict(type=think_pred_postprocess, re_pattern=r'</think>([\s\S]*)'),
         pred_role='BOT',
     )
 
