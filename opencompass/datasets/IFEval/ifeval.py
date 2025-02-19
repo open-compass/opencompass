@@ -1,4 +1,5 @@
 import json
+import re
 
 from datasets import Dataset
 
@@ -95,3 +96,10 @@ class IFEvaluator(BaseEvaluator):
             details
         }
         return results
+
+
+def IFEval_academic_postprocess(text):
+    if '<think>' in text:
+        pattern = r'<think>[\s\S]*?<\/think>'
+        text = re.sub(pattern, '', text).strip()
+    return text
