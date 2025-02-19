@@ -114,8 +114,8 @@ class LMEvaluator:
         dataset_cfg (ConfigDict, optional): The config of the dataset to be
             evaluated.
         pack_all_predictions (bool, optional): For multiround evaluation, judge all round or judge every single round.
-        pred_postprocessor (ConfigDict): The model prediction's postprocessor
-            config.
+        infer_pred_postprocess (ConfigDict): The model prediction's postprocessor config, to use Re deal with model prediction, and thus convince for post-eval.
+            An example re parttern is like: re_pattern=r'</think>([\s\S]*)', to extract the real answer behind the cot content.
         keep_predictions (bool): Whether to save model predictions in references. Useful when postprocessor requires model predictions as input to calculate additional features (e.g. response length, markdown list counts, ...). Defaults to False.
     """
 
