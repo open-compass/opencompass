@@ -59,26 +59,6 @@ GRADER_TEMPLATE = """
 """.strip()
 
 
-def generic_llmjudge_aime_academic_postprocess(
-    output: dict,
-    output_path: str,
-) -> dict:
-    judged_answers = []
-    origial_responses = []
-    references = []
-    for k, v in output.items():
-        origial_responses.append(v['prediction'])
-        processed_judge = _generic_llmjudge_postprocess(v['prediction'])
-        if processed_judge is not None:
-            judged_answers.append(processed_judge)
-            references.append(v['gold'])
-    results = get_final_results(judged_answers, references, origial_responses)
-    results['details'] = output
-    # For academic summarizer
-    results.pop('f1', None)
-    return results
-
-
 aime2024_eval_cfg = dict(
     evaluator=dict(
         type=GenericLLMEvaluator,
