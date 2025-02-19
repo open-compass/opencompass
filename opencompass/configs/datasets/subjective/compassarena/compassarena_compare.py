@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import CompassArenaDataset, think_pred_postprocess
+from opencompass.datasets import CompassArenaDataset
 from opencompass.summarizers import CompassArenaSummarizer
 
 subjective_reader_cfg = dict(
@@ -134,7 +134,6 @@ for _name, _prompt in sub_map.items():
                 ]),
             ),
         ),
-        pred_postprocessor=dict(type=think_pred_postprocess, re_pattern=r'</think>([\s\S]*)'),
         pred_role='BOT',
     )
 

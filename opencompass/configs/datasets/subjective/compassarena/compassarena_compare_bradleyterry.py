@@ -1,7 +1,6 @@
 from opencompass.datasets import (
     CompassArenaDataset,
-    compassarena_bradleyterry_postprocess,
-    think_pred_postprocess
+    compassarena_bradleyterry_postprocess
 )
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -148,7 +147,6 @@ for _name, _prompt in sub_map.items():
             ),
             keep_predictions=True,  # Must be turned on to save predictions from model pairs to calculate style features in postprocessor
         ),
-        pred_postprocessor=dict(type=think_pred_postprocess, re_pattern=r'</think>([\s\S]*)'),
         pred_role='BOT',
     )
 
