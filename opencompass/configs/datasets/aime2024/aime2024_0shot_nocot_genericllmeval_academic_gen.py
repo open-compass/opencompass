@@ -6,10 +6,6 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import Aime2024Dataset
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets.generic import generic_llmjudge_academic_postprocess
-from opencompass.datasets.generic import (
-    _generic_llmjudge_postprocess,
-    get_final_results
-)
 
 
 aime2024_reader_cfg = dict(
