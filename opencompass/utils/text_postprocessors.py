@@ -37,6 +37,7 @@ def general_cn_postprocess(text: str) -> str:
 
     cleaned_text = re.sub(r'\s+', ' ', no_articles).strip()
     import jieba
+
     cleaned_text = ' '.join(jieba.cut(text))
     return cleaned_text
 
@@ -229,3 +230,14 @@ def match_answer_pattern(response_text: str, answer_pattern: str):
     match = re.search(answer_pattern, response_text)
     extracted_answer = match.group(1) if match else ''
     return extracted_answer
+
+
+def extract_non_reasoning_content(
+    text: str,
+    think_start_token: str = '<think>',
+    think_end_token: str = '</think>',
+) -> str:
+    reasoning_regex = re.compile(rf'{think_start_token}(.*?){think_end_token}',
+                                 re.DOTALL)
+    non_reasoning_content = reasoning_regex.sub('', text).strip()
+    return non_reasoning_content
