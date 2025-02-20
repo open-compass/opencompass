@@ -597,8 +597,23 @@ class OpenAISDK(OpenAI):
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
 
-    def _generate(self, input: PromptList | str, max_out_len: int,
-                  temperature: float) -> str:
+    def _generate(self,
+                  input: PromptList | str,
+                  max_out_len: int,
+                  temperature: float,
+                  timeout: int = 3600) -> str:
+        """Generate results given a list of inputs.
+
+        Args:
+            input (PromptType): A string or PromptDict.
+            max_out_len (int): The maximum length of the output.
+            temperature (float): What sampling temperature to use.
+            timeout (int, optional): Timeout in seconds for the API call.
+                Defaults to 3600 (60 minutes).
+
+        Returns:
+            str: The generated string.
+        """
         from openai import APIStatusError, BadRequestError
 
         assert isinstance(input, (str, PromptList))
@@ -636,7 +651,7 @@ class OpenAISDK(OpenAI):
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
                 responses = self.openai_client.chat.completions.create(
-                    **query_data, timeout=3600)  # timeout 60 min
+                    **query_data, timeout=timeout)  # timeout in seconds
 
                 if self.verbose:
                     self.logger.info(
