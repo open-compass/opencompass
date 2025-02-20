@@ -23,7 +23,7 @@ with read_base():
     from opencompass.configs.datasets.humaneval.humaneval_openai_sample_evals_gen_dcae0e import \
         humaneval_datasets
     # Instruction Following
-    from opencompass.configs.datasets.IFEval.IFEval_academic_gen import \
+    from opencompass.configs.datasets.IFEval.IFEval_gen_353ae7 import \
         ifeval_datasets
     from opencompass.configs.datasets.livecodebench.livecodebench_gen_a4f90b import \
         LCBCodeGeneration_dataset
@@ -46,6 +46,14 @@ with read_base():
 # Only take LCB generation for evaluation
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')),
                []) + [LCBCodeGeneration_dataset]
+
+# LLM judge config: using LLM to evaluate predictions
+judge_cfg = dict()
+for dataset in datasets:
+    dataset["infer_cfg"]["inferencer"]["max_out_len"] = 32768
+    if 'judge_cfg' in dataset['eval_cfg']['evaluator']:
+        dataset['eval_cfg']['evaluator']['judge_cfg'] = judge_cfg
+
 
 #######################################################################
 #                       PART 2  Datset Summarizer                     #

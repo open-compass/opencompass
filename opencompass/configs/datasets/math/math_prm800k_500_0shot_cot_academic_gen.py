@@ -8,7 +8,7 @@ from opencompass.datasets import (
     normalize_final_answer,
 )
 from opencompass.evaluator import GenericLLMEvaluator
-from opencompass.datasets import generic_llmjudge_postprocess
+from opencompass.datasets import generic_llmjudge_academic_postprocess
 
 
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
@@ -81,7 +81,7 @@ math_eval_cfg = dict(
             reader_cfg=math_reader_cfg,
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+        dict_postprocessor=dict(type=generic_llmjudge_academic_postprocess),
     ),
     pred_role='BOT',
 )
