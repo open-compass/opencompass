@@ -1,5 +1,6 @@
 from latex2sympy2_extended import NormalizationConfig
-from math_verify import LatexExtractionConfig, parse, verify
+from math_verify import (ExprExtractionConfig, LatexExtractionConfig, parse,
+                         verify)
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
@@ -9,6 +10,7 @@ from opencompass.registry import ICL_EVALUATORS
 class MATHEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
+
         self.is_num_equal(predictions, references)
 
         correct = 0
@@ -19,8 +21,23 @@ class MATHEvaluator(BaseEvaluator):
             gold_parsed = parse(
                 j,
                 extraction_mode='first_match',
-                extraction_config=[LatexExtractionConfig()],
+                extraction_config=[
+                    LatexExtractionConfig(),
+                    ExprExtractionConfig(),
+                ],
             )
+            # If parsing result is empty, try adding LaTeX
+            # environment and parse again
+            if len(gold_parsed) == 0:
+                j_with_env = f'${j}$'
+                gold_parsed = parse(
+                    j_with_env,
+                    extraction_mode='first_match',
+                    extraction_config=[
+                        LatexExtractionConfig(),
+                        ExprExtractionConfig(),
+                    ],
+                )
             if len(gold_parsed) != 0:
                 # We require the answer to be provided in correct
                 # latex (no malformed operators)
