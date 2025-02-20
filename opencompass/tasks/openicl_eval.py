@@ -1,6 +1,5 @@
 import argparse
 import copy
-import fnmatch
 import math
 import os
 import os.path as osp
@@ -18,9 +17,8 @@ from mmengine.utils import mkdir_or_exist
 from opencompass.registry import (ICL_EVALUATORS, MODELS, TASKS,
                                   TEXT_POSTPROCESSORS)
 from opencompass.tasks.base import BaseTask, extract_role_pred
-from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
-                               get_infer_output_path, get_logger,
-                               task_abbr_from_cfg)
+from opencompass.utils import (build_dataset_from_cfg, get_infer_output_path,
+                               get_logger, task_abbr_from_cfg)
 
 
 @TASKS.register_module()
@@ -60,19 +58,9 @@ class OpenICLEvalTask(BaseTask):
                 self.dataset_cfg = dataset_cfg
 
                 # Load Dataset
-                self.eval_cfg = self.dataset_cfg.get('eval_cfg')
-                self.output_column = dataset_cfg['reader_cfg']['output_column']
-
-                # overwrite postprocessor if the model has specified one
-                ds_abbr = dataset_abbr_from_cfg(self.dataset_cfg)
-                model_postprocessors = self.model_cfg.get(
-                    'pred_postprocessor', {})
-                for pattern in model_postprocessors.keys():
-                    if fnmatch.fnmatch(ds_abbr, pattern):
-                        self.eval_cfg[
-                            'pred_postprocessor'] = model_postprocessors[
-                                pattern]  # noqa
-                        break
+                self.eval_cfg = copy.deepcopy(dataset_cfg.get('eval_cfg'))
+                self.output_column = copy.deepcopy(
+                    dataset_cfg['reader_cfg']['output_column'])
 
                 out_path = get_infer_output_path(
                     self.model_cfg, self.dataset_cfg,
@@ -155,8 +143,20 @@ class OpenICLEvalTask(BaseTask):
                     ]
 
             # Postprocess predictions if necessary
+            # Model Specified Postprocessor
+            if 'pred_postprocessor' in self.model_cfg:
+                kwargs = copy.deepcopy(self.model_cfg['pred_postprocessor'])
+                proc = kwargs.pop('type')
+                if isinstance(proc, str):
+                    proc = TEXT_POSTPROCESSORS.get(proc)
+                if pred_list_flag:
+                    pred_strs = [[proc(s, **kwargs) for s in preds]
+                                 for preds in pred_strs]
+                else:
+                    pred_strs = [proc(s, **kwargs) for s in pred_strs]
+            # Dataset Specified Postprocessor
             if 'pred_postprocessor' in self.eval_cfg:
-                kwargs = self.eval_cfg['pred_postprocessor']
+                kwargs = copy.deepcopy(self.eval_cfg['pred_postprocessor'])
                 proc = kwargs.pop('type')
                 if isinstance(proc, str):
                     proc = TEXT_POSTPROCESSORS.get(proc)
