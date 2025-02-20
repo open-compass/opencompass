@@ -1,6 +1,6 @@
 from opencompass.datasets import (
     CompassArenaDataset,
-    compassarena_bradleyterry_postprocess,
+    compassarena_bradleyterry_postprocess
 )
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -127,7 +127,7 @@ for _name, _prompt in sub_map.items():
             ),
         ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_seq_len=4096, max_out_len=4096),
+        inferencer=dict(type=GenInferencer),
     )
 
     subjective_eval_cfg = dict(
