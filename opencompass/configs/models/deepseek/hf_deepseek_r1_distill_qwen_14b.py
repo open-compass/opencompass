@@ -6,7 +6,7 @@ models = [
         type=HuggingFacewithChatTemplate,
         abbr='deepseek-r1-distill-qwen-14b-hf',
         path='deepseek-ai/DeepSeek-R1-Distill-Qwen-14B',
-        max_out_len=4096,
+        max_out_len=16384,
         batch_size=16,
         run_cfg=dict(num_gpus=4),
         pred_postprocessor=dict(type=extract_non_reasoning_content)
