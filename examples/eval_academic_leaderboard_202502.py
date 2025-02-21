@@ -50,7 +50,7 @@ datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')),
 # LLM judge config: using LLM to evaluate predictions
 judge_cfg = dict()
 for dataset in datasets:
-    dataset["infer_cfg"]["inferencer"]["max_out_len"] = 32768
+    dataset['infer_cfg']['inferencer']['max_out_len'] = 32768
     if 'judge_cfg' in dataset['eval_cfg']['evaluator']:
         dataset['eval_cfg']['evaluator']['judge_cfg'] = judge_cfg
 
