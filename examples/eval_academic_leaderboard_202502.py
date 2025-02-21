@@ -1,4 +1,4 @@
-import os.path as osp
+# flake8: noqa
 
 from mmengine.config import read_base
 
