@@ -104,8 +104,7 @@ class GenInferencer(BaseInferencer):
             max_seq_len=self.max_seq_len,
             ice_template=ice_template,
             prompt_template=prompt_template)
-        
-        
+
         print(len(prompt_list))
 
         # 3.1 Fetch and zip prompt & gold answer if output column exists

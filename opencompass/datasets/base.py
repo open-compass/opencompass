@@ -1,6 +1,6 @@
 from abc import abstractstaticmethod
-from typing import Dict, Optional, Union, List
 from copy import deepcopy
+from typing import Dict, List, Optional, Union
 
 from datasets import Dataset, DatasetDict
 
@@ -9,10 +9,10 @@ from opencompass.openicl import DatasetReader
 
 class BaseDataset:
 
-    def __init__(self, 
-                 reader_cfg: Optional[Dict] = {}, 
-                 k: Union[int, List[int]] = 1, 
-                 repeat: int = 1, 
+    def __init__(self,
+                 reader_cfg: Optional[Dict] = {},
+                 k: Union[int, List[int]] = 1,
+                 repeat: int = 1,
                  **kwargs):
         abbr = kwargs.pop('abbr', 'dataset')
         dataset = self.load(**kwargs)
