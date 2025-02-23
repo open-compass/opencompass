@@ -2,7 +2,6 @@ import os
 import warnings
 from collections import OrderedDict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from copy import deepcopy
 from functools import partial
 from itertools import product
 from typing import Any, Callable, Dict, List, Union
@@ -31,8 +30,6 @@ class LiveMathBenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str,
-             k: Union[int, List[int]],
-             replication: int,
              dataset_splits: List[str] = [
                  'CNMO',
                  'CCEE',
@@ -104,11 +101,7 @@ class LiveMathBenchDataset(BaseDataset):
                                   ('' if 'options' not in example else
                                    ' '.join(example['options']))),
                 })
-                max_k = k if isinstance(k, int) else max(k)
-                for idx in range(max_k * replication):
-                    duplicated_example = deepcopy(example)
-                    duplicated_example.update({'replication_idx': idx})
-                    dataset.append(duplicated_example)
+                dataset.append(example)
 
         return Dataset.from_list(dataset)
 
@@ -127,9 +120,9 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
                  extract_url=[],
                  extract_model_name='',
                  k: Union[int, List[int]] = 16,
-                 replication: int = 3,
+                 repeat: int = 3,
                  thresholds: List[float] = [0.0, 0.25, 0.5, 0.75, 1.0]):
-        super().__init__(k, replication, thresholds)
+        super().__init__(k, repeat, thresholds)
 
         if isinstance(url, str):
             url = [url]

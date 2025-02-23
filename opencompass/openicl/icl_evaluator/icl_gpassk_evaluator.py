@@ -57,10 +57,10 @@ class GPassKEvaluator(BaseEvaluator):
         integers (e.g., `[4, 8, 16]` computes G-Pass@4,
         G-Pass@8, and G-Pass@16).
 
-        replication (int): Controls the number of generations
+        repeat (int): Controls the number of generations
         used to estimate G-Pass@k. The total number of
         generations is determined by multiplying the
-        maximum of `k` with `replication`. This parameter
+        maximum of `k` with `repeat`. This parameter
         should be a single integer.
 
         thresholds (list of float): A list of floating-point
@@ -71,7 +71,7 @@ class GPassKEvaluator(BaseEvaluator):
     def __init__(
             self,
             k: Union[int, List[int]] = 16,
-            replication: int = 3,
+            repeat: int = 3,
             thresholds: List[float] = [0.0, 0.25, 0.5, 0.75, 1.0]) -> None:
         super().__init__()
 
@@ -79,8 +79,8 @@ class GPassKEvaluator(BaseEvaluator):
             k = [k]
 
         self.k = k
-        self.replication = replication
-        self.n = max(k) * replication
+        self.repeat = repeat
+        self.n = max(k) * repeat
         self.thresholds = thresholds
 
     @property

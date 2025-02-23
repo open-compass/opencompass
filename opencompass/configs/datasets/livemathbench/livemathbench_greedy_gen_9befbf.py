@@ -9,7 +9,7 @@ livemathbench_dataset = dict(
     type=LiveMathBenchDataset,
     path='',
     k=1,
-    replication=1,
+    repeat=1,
     dataset_splits=['CNMO', 'CCEE', 'AMC', 'WLPMC'],
     dataset_languages=['cn', 'en'],
     cot=True,
@@ -43,7 +43,7 @@ livemathbench_dataset = dict(
             extract_url=[],
             extract_model_name='',
             k=[1],
-            replication=1,
+            repeat=1,
             thresholds=[0.0]
         )
     )
