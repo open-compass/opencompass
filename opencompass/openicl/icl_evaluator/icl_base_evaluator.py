@@ -119,13 +119,13 @@ class BaseEvaluator:
                 eval_results[key] = eval_results[key][0]
 
         grouped_examples = self.group(n, all_details, test_set)
+        can_calculate = False
         if len(all_details) != 0:
             eval_details = []
             for example_abbr, examples in grouped_examples.items():
                 detail = {'predictions': [], 'example_abbr': example_abbr}
 
                 c = 0
-                can_calculate = False
                 for example in examples:
                     detail['predictions'].append(example['detail'])
                     # only compute G-Pass@k when details have correct labels
@@ -136,7 +136,7 @@ class BaseEvaluator:
                         can_calculate = True
                         c += int(example['detail']['is_correct'])
 
-                if can_calculate:
+                if can_calculate and n > 1:
                     thresholds = [0.0, 0.25, 0.5, 0.75, 1.0]
                     for _k in ([k] if isinstance(k, int) else k):
                         for threshold in thresholds:
@@ -151,7 +151,8 @@ class BaseEvaluator:
 
                 eval_details.append(detail)
 
-            eval_results.update(self.reduce(eval_details))
+            if can_calculate and n > 1:
+                eval_results.update(self.reduce(eval_details))
             eval_results['details'] = eval_details
 
         return eval_results

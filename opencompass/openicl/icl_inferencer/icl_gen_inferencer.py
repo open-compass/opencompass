@@ -105,8 +105,6 @@ class GenInferencer(BaseInferencer):
             ice_template=ice_template,
             prompt_template=prompt_template)
 
-        print(len(prompt_list))
-
         # 3.1 Fetch and zip prompt & gold answer if output column exists
         ds_reader = retriever.dataset_reader
         if ds_reader.output_column:
