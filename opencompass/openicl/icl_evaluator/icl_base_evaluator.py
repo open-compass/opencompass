@@ -81,9 +81,8 @@ class BaseEvaluator:
                 [detail[metric] for detail in details])
         return g_passk_details
 
-    def evaluate(self, k: Union[int, List[int]], repeat: int,
+    def evaluate(self, k: Union[int, List[int]], n: int,
                  original_dataset: Dataset, **score_kwargs):
-        n = (max(k) if isinstance(k, List) else k) * repeat
         real_size = len(original_dataset) // n
         all_details = []
         all_results = []
@@ -119,10 +118,8 @@ class BaseEvaluator:
             if isinstance(eval_results[key][0], float) or isinstance(
                     eval_results[key][0], int):
                 if n > 1:
-                    m = n // repeat
-                    eval_results[
-                        key + f' ({m}x{repeat}={n} runs average)'] = np.mean(
-                            eval_results[key])
+                    eval_results[key + f' ({n} runs average)'] = np.mean(
+                        eval_results[key])
                     eval_results.pop(key)
                 else:
                     eval_results[key] = np.mean(eval_results[key])
@@ -147,7 +144,7 @@ class BaseEvaluator:
                         can_calculate = True
                         c += int(example['detail']['is_correct'])
 
-                if can_calculate and n > 1:
+                if can_calculate and n > 1 and k > 1:
                     thresholds = [0.0, 0.25, 0.5, 0.75, 1.0]
                     for _k in ([k] if isinstance(k, int) else k):
                         for threshold in thresholds:
@@ -162,7 +159,7 @@ class BaseEvaluator:
 
                 eval_details.append(detail)
 
-            if can_calculate and n > 1:
+            if can_calculate and n > 1 and k > 1:
                 eval_results.update(self.reduce(eval_details))
             eval_results['details'] = eval_details
 
