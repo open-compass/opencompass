@@ -177,8 +177,6 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
-
-
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
     hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat', help='The type of the HuggingFace model, base or chat')
