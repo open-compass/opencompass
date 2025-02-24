@@ -88,9 +88,7 @@ def generic_llmjudge_academic_postprocess(
         if processed_judge is not None:
             judged_answers.append(processed_judge)
             references.append(v['gold'])
-    results = get_final_results(judged_answers,
-                                references,
-                                origial_responses,
+    results = get_final_results(judged_answers, references, origial_responses,
                                 metric_name)
     results['details'] = output
     # For academic summarizer
