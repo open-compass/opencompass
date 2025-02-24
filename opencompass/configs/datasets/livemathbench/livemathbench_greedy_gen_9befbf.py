@@ -41,10 +41,7 @@ livemathbench_dataset = dict(
             url=[],
             use_extract_model=False,
             extract_url=[],
-            extract_model_name='',
-            k=[1],
-            repeat=1,
-            thresholds=[0.0]
+            extract_model_name=''
         )
     )
 )

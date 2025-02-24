@@ -41,6 +41,11 @@ class BaseEvaluator:
     def __init__(self) -> None:
         pass
 
+    @property
+    def output_dir(self):
+        # please see opencompass/opencompass/tasks/openicl_eval.py Line 197-200
+        return self._out_dir
+
     def group(self, n: int, details: List[Dict[str, Any]],
               test_set: Dataset) -> Dict[str, Any]:
         example2replications = {}
@@ -77,18 +82,24 @@ class BaseEvaluator:
         return g_passk_details
 
     def evaluate(self, k: Union[int, List[int]], repeat: int,
-                 test_set: Dataset, **score_kwargs):
+                 original_dataset: Dataset, **score_kwargs):
         n = (max(k) if isinstance(k, List) else k) * repeat
-        print(len(score_kwargs['predictions']))
-        real_size = len(test_set) // n
+        real_size = len(original_dataset) // n
         all_details = []
         all_results = []
         for i in range(n):
+
+            def select_fn(i, real_size, x):
+                if isinstance(x, Dataset):
+                    return x.select(range(i * real_size, (i + 1) * real_size))
+                elif isinstance(x, Iterable):
+                    return x[i * real_size:(i + 1) * real_size]
+                else:
+                    return x
+
             results = self.score(
                 **{
-                    key:
-                    value[i * real_size:(i + 1) *
-                          real_size] if isinstance(value, Iterable) else value
+                    key: select_fn(i, real_size, value)
                     for key, value in score_kwargs.items()
                 })
             details = results.pop('details', None)
@@ -118,7 +129,7 @@ class BaseEvaluator:
             else:
                 eval_results[key] = eval_results[key][0]
 
-        grouped_examples = self.group(n, all_details, test_set)
+        grouped_examples = self.group(n, all_details, original_dataset)
         can_calculate = False
         if len(all_details) != 0:
             eval_details = []

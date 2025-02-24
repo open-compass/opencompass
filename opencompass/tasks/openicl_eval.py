@@ -217,7 +217,8 @@ class OpenICLEvalTask(BaseTask):
             }
             k = self.dataset_cfg.get('k', 1)
             repeat = self.dataset_cfg.get('repeat', 1)
-            result = icl_evaluator.evaluate(k, repeat, test_set, **preds)
+            result = icl_evaluator.evaluate(k, repeat, copy.deepcopy(test_set),
+                                            **preds)
 
             # Get model postprocess result
             model_details = None
@@ -225,7 +226,8 @@ class OpenICLEvalTask(BaseTask):
             if 'model_postprocessor' in self.eval_cfg:
                 model_preds = copy.deepcopy(preds)
                 model_preds['predictions'] = model_pred_strs
-                model_result = icl_evaluator.evaluate(k, repeat, test_set,
+                model_result = icl_evaluator.evaluate(k, repeat,
+                                                      copy.deepcopy(test_set),
                                                       **model_preds)
                 for key in model_result:
                     if key == 'details':
