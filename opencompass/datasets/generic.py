@@ -1,7 +1,10 @@
 import re
 
 
-def get_final_results(judged_answers, references, origial_responses):
+def get_final_results(judged_answers,
+                      references,
+                      origial_responses,
+                      metric_name='accuracy'):
     count = 0
     is_correct_count = 0
     is_incorrect_count = 0
@@ -39,7 +42,7 @@ def get_final_results(judged_answers, references, origial_responses):
                                                    is_correct) > 0 else 0
     result = {
         # 'accuracy_given_attempted': accuracy_given_attempted,
-        'accuracy': accuracy_given_attempted * 100,
+        metric_name: accuracy_given_attempted * 100,
         'f1': f1,
         'details': details
     }
@@ -68,4 +71,26 @@ def generic_llmjudge_postprocess(
             references.append(v['gold'])
     results = get_final_results(judged_answers, references, origial_responses)
     results['details'] = output
+    return results
+
+
+def generic_llmjudge_academic_postprocess(
+    output: dict,
+    output_path: str,
+    metric_name: str = 'accuracy',
+) -> dict:
+    judged_answers = []
+    origial_responses = []
+    references = []
+    for k, v in output.items():
+        origial_responses.append(v['prediction'])
+        processed_judge = _generic_llmjudge_postprocess(v['prediction'])
+        if processed_judge is not None:
+            judged_answers.append(processed_judge)
+            references.append(v['gold'])
+    results = get_final_results(judged_answers, references, origial_responses,
+                                metric_name)
+    results['details'] = output
+    # For academic summarizer
+    results.pop('f1', None)
     return results
