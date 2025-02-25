@@ -13,6 +13,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer, PPLInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -114,7 +115,7 @@ class CircularOptionSimAccEvaluator(OptionSimAccEvaluator):
             circular_pattern = origin_item['circular_pattern']
             for k in circular_patterns:
                 if tuple(circular_pattern) in circular_patterns[k]:
-                    tmp_metrics[f'correct_{k}'] += (1 if parsed == refr else 0)
+                    tmp_metrics[f'correct_{k}'] += 1 if parsed == refr else 0
                     tmp_metrics[f'count_{k}'] += 1
 
         for k in circular_patterns:
@@ -164,7 +165,10 @@ class CircularOptionSimAccEvaluator(OptionSimAccEvaluator):
 class CustomDataset(BaseDataset):
 
     @staticmethod
-    def load(path):
+    def load(path, file_name=None, local_mode=False):
+        path = get_data_path(path, local_mode=local_mode)
+        if file_name is not None:
+            path = os.path.join(path, file_name)
         if path.endswith('.jsonl'):
             with open(path, 'r', encoding='utf-8-sig') as f:
                 data = [json.loads(line) for line in f]
@@ -222,9 +226,10 @@ def make_mcq_gen_config(meta):
     )
 
     eval_cfg = dict(
-        evaluator=dict(type=meta.get('evaluator', OptionSimAccEvaluator),
-                       **meta.get('evaluator_kwargs',
-                                  {'options': meta['options']})),
+        evaluator=dict(
+            type=meta.get('evaluator', OptionSimAccEvaluator),
+            **meta.get('evaluator_kwargs', {'options': meta['options']}),
+        ),
         pred_role='BOT',
     )
 
@@ -269,10 +274,10 @@ def make_circular_mcq_gen_config(meta):
     )
 
     eval_cfg = dict(
-        evaluator=dict(type=meta.get('evaluator',
-                                     CircularOptionSimAccEvaluator),
-                       **meta.get('evaluator_kwargs',
-                                  {'options': meta['options']})),
+        evaluator=dict(
+            type=meta.get('evaluator', CircularOptionSimAccEvaluator),
+            **meta.get('evaluator_kwargs', {'options': meta['options']}),
+        ),
         pred_role='BOT',
     )
 
@@ -320,8 +325,10 @@ def make_qa_gen_config(meta):
     )
 
     eval_cfg = dict(
-        evaluator=dict(type=meta.get('evaluator', AccEvaluator),
-                       **meta.get('evaluator_kwargs', {})),
+        evaluator=dict(
+            type=meta.get('evaluator', AccEvaluator),
+            **meta.get('evaluator_kwargs', {}),
+        ),
         pred_role='BOT',
     )
 
@@ -346,9 +353,11 @@ def make_mcq_ppl_config(meta):
         template = {
             answer: dict(round=[
                 dict(role='HUMAN', prompt=human_prompt),
-                dict(role='BOT',
-                     prompt=bot_prompt.format(
-                         **{meta['output_column']: answer})),
+                dict(
+                    role='BOT',
+                    prompt=bot_prompt.format(
+                        **{meta['output_column']: answer}),
+                ),
             ], )
             for answer in meta['options']
         }
@@ -370,8 +379,10 @@ def make_mcq_ppl_config(meta):
         inferencer=dict(type=PPLInferencer),
     )
 
-    eval_cfg = dict(evaluator=dict(type=meta.get('evaluator', AccEvaluator),
-                                   **meta.get('evaluator_kwargs', {})))
+    eval_cfg = dict(evaluator=dict(
+        type=meta.get('evaluator', AccEvaluator),
+        **meta.get('evaluator_kwargs', {}),
+    ))
 
     dataset = dict(
         abbr=meta['abbr'],
@@ -394,9 +405,11 @@ def make_circular_mcq_ppl_config(meta):
         template = {
             answer: dict(round=[
                 dict(role='HUMAN', prompt=human_prompt),
-                dict(role='BOT',
-                     prompt=bot_prompt.format(
-                         **{meta['output_column']: answer})),
+                dict(
+                    role='BOT',
+                    prompt=bot_prompt.format(
+                        **{meta['output_column']: answer}),
+                ),
             ], )
             for answer in meta['options']
         }
@@ -418,9 +431,10 @@ def make_circular_mcq_ppl_config(meta):
         inferencer=dict(type=PPLInferencer),
     )
 
-    eval_cfg = dict(
-        evaluator=dict(type=meta.get('evaluator', CircularEvaluator),
-                       **meta.get('evaluator_kwargs', {})))
+    eval_cfg = dict(evaluator=dict(
+        type=meta.get('evaluator', CircularEvaluator),
+        **meta.get('evaluator_kwargs', {}),
+    ))
 
     dataset = dict(
         abbr=meta['abbr'],

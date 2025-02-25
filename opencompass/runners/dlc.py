@@ -286,7 +286,7 @@ class DLCRunner(BaseRunner):
                             f'Failed to get job info for {job_id}')
 
                     status = job_info['Status']
-                    if status == 'Failed':
+                    if status == 'Failed' or status == 'Stopped':
                         return -1
                     elif status == 'Succeeded':
                         return 0

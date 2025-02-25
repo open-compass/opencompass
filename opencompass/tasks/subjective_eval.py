@@ -198,14 +198,24 @@ class SubjectiveEvalTask(BaseTask):
             if fnmatch.fnmatch(ds_abbr, pattern):
                 pred_postprocessor = model_postprocessors[pattern]
                 break
+
         if 'pred_postprocessor' in eval_cfg['evaluator'] or pred_postprocessor:
             kwargs = pred_postprocessor or eval_cfg['evaluator'][
                 'pred_postprocessor']
-            proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+            temp_kwargs = copy.deepcopy(kwargs)
+            proc = TEXT_POSTPROCESSORS.get(temp_kwargs.pop('type'))
             self.logger.info('Get postprocessor {postprocessor}.')
-            pred_strs = [proc(s, **kwargs) for s in pred_strs]
+            pred_strs = [proc(s, **temp_kwargs) for s in pred_strs]
         else:
-            self.logger.info('No postprocessor found.')
+            self.logger.info('No dataset postprocessor found.')
+
+        if 'pred_postprocessor' in model_cfg or pred_postprocessor:
+            kwargs = pred_postprocessor or model_cfg['pred_postprocessor']
+            temp_kwargs = copy.deepcopy(kwargs)
+            proc = TEXT_POSTPROCESSORS.get(temp_kwargs.pop('type'))
+            pred_strs = [proc(s, **temp_kwargs) for s in pred_strs]
+        else:
+            self.logger.info('No model postprocessor found.')
 
         return {
             'model_name': model_abbr_from_cfg(model_cfg),
@@ -329,7 +339,9 @@ class SubjectiveEvalTask(BaseTask):
             if fnmatch.fnmatch(ds_abbr, pattern):
                 pred_postprocessor = model_postprocessors[pattern]
                 break
+
         if 'pred_postprocessor' in eval_cfg or pred_postprocessor:
+
             kwargs = pred_postprocessor or eval_cfg['pred_postprocessor']
             proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
             pred_strs = [proc(s, **kwargs) for s in pred_strs]
