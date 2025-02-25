@@ -95,7 +95,6 @@ eval_cfg = dict(
         judge_cfg=YOUR_JUDGE_MODEL_CONFIG,  # Configuration for the judge model
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),  # Post-processing the judge's output
     ),
-    pred_role='BOT',
 )
 ```
 

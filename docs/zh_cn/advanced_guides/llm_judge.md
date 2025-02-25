@@ -95,7 +95,6 @@ eval_cfg = dict(
         judge_cfg=YOUR_JUDGE_MODEL_CONFIG,  # 评判模型的配置
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),  # 处理评判器输出的后处理器
     ),
-    pred_role='BOT',
 )
 ```
 
