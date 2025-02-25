@@ -39,7 +39,6 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    user_guides/evaluation.md
    user_guides/experimentation.md
    user_guides/metrics.md
-   user_guides/summarizer.md
 
 .. _Prompt:
 .. toctree::
@@ -60,13 +59,13 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    advanced_guides/new_dataset.md
    advanced_guides/custom_dataset.md
    advanced_guides/new_model.md
+   advanced_guides/evaluation_lmdeploy.md
    advanced_guides/accelerator_intro.md
    advanced_guides/general_math.md
+   advanced_guides/llm_judge.md
    advanced_guides/code_eval.md
    advanced_guides/code_eval_service.md
    advanced_guides/subjective_evaluation.md
-   advanced_guides/circular_eval.md
-   advanced_guides/needleinahaystack_eval.md
 
 .. _Tools:
 .. toctree::

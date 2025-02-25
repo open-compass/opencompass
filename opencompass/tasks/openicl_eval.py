@@ -3,6 +3,7 @@ import copy
 import math
 import os
 import os.path as osp
+import random
 import statistics
 import sys
 import time
@@ -37,18 +38,31 @@ class OpenICLEvalTask(BaseTask):
         super().__init__(cfg)
         self.logger = get_logger()
         self.num_gpus = max(
-            c.get('eval_cfg', {}).get('num_gpus', 0)
+            max(
+                c.get('eval_cfg', {}).get('num_gpus', 0),
+                c.get('eval_cfg', {}).get('evaluator', {}).get(
+                    'judge_cfg', {}).get('run_cfg', {}).get('num_gpus', 0),
+            ) for c in sum(self.dataset_cfgs, []))
+        self.num_procs = max(
+            c.get('eval_cfg', {}).get('evaluator', {}).get(
+                'judge_cfg', {}).get('run_cfg', {}).get('num_procs', 1)
             for c in sum(self.dataset_cfgs, []))
-        self.dump_details = cfg.get('eval', {}).get('runner', {}).get(
-            'task', {}).get('dump_details', False)
-        self.cal_extract_rate = cfg.get('eval', {}).get('runner', {}).get(
-            'task', {}).get('cal_extract_rate', False)
+        self.dump_details = (cfg.get('eval', {}).get('runner', {}).get(
+            'task', {}).get('dump_details', False))
+        self.cal_extract_rate = (cfg.get('eval', {}).get('runner', {}).get(
+            'task', {}).get('cal_extract_rate', False))
 
     def get_command(self, cfg_path, template):
         sys.path.append(os.getcwd())
         script_path = __file__
-        python = sys.executable
-        command = f'{python} {script_path} {cfg_path}'
+        if self.num_gpus > 1:
+            port = random.randint(12000, 32000)
+            command = (f'torchrun --master_port={port} '
+                       f'--nproc_per_node {self.num_procs} '
+                       f'{script_path} {cfg_path}')
+        else:
+            python = sys.executable
+            command = f'{python} {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
     def run(self):
@@ -63,8 +77,10 @@ class OpenICLEvalTask(BaseTask):
                     dataset_cfg['reader_cfg']['output_column'])
 
                 out_path = get_infer_output_path(
-                    self.model_cfg, self.dataset_cfg,
-                    osp.join(self.work_dir, 'results'))
+                    self.model_cfg,
+                    self.dataset_cfg,
+                    osp.join(self.work_dir, 'results'),
+                )
                 if osp.exists(out_path):
                     continue
                 self._score()
@@ -86,8 +102,10 @@ class OpenICLEvalTask(BaseTask):
 
         # Load predictions
         filename = get_infer_output_path(
-            self.model_cfg, self.dataset_cfg,
-            osp.join(self.work_dir, 'predictions'))
+            self.model_cfg,
+            self.dataset_cfg,
+            osp.join(self.work_dir, 'predictions'),
+        )
         # in case the prediction is partial
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
@@ -123,6 +141,7 @@ class OpenICLEvalTask(BaseTask):
                     and not MODELS.get(self.model_cfg['type']).is_api):
                 # Create a prompt template for role config parsing
                 from opencompass.models.base import LMTemplateParser
+
                 parser = LMTemplateParser(self.model_cfg['meta_template'])
                 role = parser.roles[self.eval_cfg['pred_role']]
                 if sc_size is not None:
@@ -131,15 +150,19 @@ class OpenICLEvalTask(BaseTask):
                         'must be list.')
                 if pred_list_flag:
                     pred_strs = [[
-                        extract_role_pred(_pred, role.get('begin', None),
-                                          role.get('end', None))
-                        for _pred in pred
+                        extract_role_pred(
+                            _pred,
+                            role.get('begin', None),
+                            role.get('end', None),
+                        ) for _pred in pred
                     ] for pred in pred_strs]
                 else:
                     pred_strs = [
-                        extract_role_pred(pred, role.get('begin', None),
-                                          role.get('end', None))
-                        for pred in pred_strs
+                        extract_role_pred(
+                            pred,
+                            role.get('begin', None),
+                            role.get('end', None),
+                        ) for pred in pred_strs
                     ]
 
             # Postprocess predictions if necessary
@@ -195,8 +218,10 @@ class OpenICLEvalTask(BaseTask):
             icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
             # need results dir to save other files
             out_path = get_infer_output_path(
-                self.model_cfg, self.dataset_cfg,
-                osp.join(self.work_dir, 'results'))
+                self.model_cfg,
+                self.dataset_cfg,
+                osp.join(self.work_dir, 'results'),
+            )
             icl_evaluator._out_dir = osp.splitext(out_path)[
                 0]  # strip extension
 
@@ -235,9 +260,13 @@ class OpenICLEvalTask(BaseTask):
                 details = result.get('details', None)
                 try:
                     result['details'] = self.format_details(
-                        pred_strs, model_pred_strs,
-                        test_set[self.output_column], details, model_details,
-                        pred_dicts)
+                        pred_strs,
+                        model_pred_strs,
+                        test_set[self.output_column],
+                        details,
+                        model_details,
+                        pred_dicts,
+                    )
                     self.logger.warning(
                         f"result['details'] : {result['details']}"),
                     result['type'] = result['details'].pop('type', None)
@@ -247,8 +276,8 @@ class OpenICLEvalTask(BaseTask):
 
                     if 'PPL' in str(
                             self.dataset_cfg.infer_cfg.inferencer.type):
-                        result['correct_bpb'], result['incorrect_bpb'] = \
-                            self.calculate_bpb(pred_dicts)
+                        result['correct_bpb'], result['incorrect_bpb'] = (
+                            self.calculate_bpb(pred_dicts))
                 except Exception as e:
                     self.logger.warning(f'Skip dumping details due to: {e}.')
             else:
@@ -281,8 +310,11 @@ class OpenICLEvalTask(BaseTask):
                 f'{task_abbr_from_cfg(self.cfg)}:{model_result_wo_details}')
 
         # Save result
-        out_path = get_infer_output_path(self.model_cfg, self.dataset_cfg,
-                                         osp.join(self.work_dir, 'results'))
+        out_path = get_infer_output_path(
+            self.model_cfg,
+            self.dataset_cfg,
+            osp.join(self.work_dir, 'results'),
+        )
         mkdir_or_exist(osp.split(out_path)[0])
         mmengine.dump(result, out_path, ensure_ascii=False, indent=4)
 
@@ -305,8 +337,15 @@ class OpenICLEvalTask(BaseTask):
         success_rate = 100 - len(invalid_extractions) / len(details) * 100
         return success_rate
 
-    def format_details(self, predictions, model_pred_strs, references, details,
-                       model_details, pred_dicts):
+    def format_details(
+        self,
+        predictions,
+        model_pred_strs,
+        references,
+        details,
+        model_details,
+        pred_dicts,
+    ):
         """This function is responsible for formatting prediction details.
 
         Args:
@@ -344,8 +383,9 @@ class OpenICLEvalTask(BaseTask):
                 result['references'] = str(references[i])
                 result['correct'] = str(predictions[i]) == str(references[i])
             elif details is not None and model_details is not None:
-                assert model_pred_strs != [], \
-                    'Model details is not None, but model_pred_strs is empty'
+                assert (
+                    model_pred_strs != []
+                ), 'Model details is not None, but model_pred_strs is empty'
                 self.logger.info(
                     f"model_details[i]['pred']: {model_details[i]['pred']}")
                 results['type'] = 'GEN'
