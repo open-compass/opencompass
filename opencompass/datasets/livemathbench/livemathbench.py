@@ -48,7 +48,7 @@ class LiveMathBenchDataset(BaseDataset):
         if path != '':
             path = get_data_path(path)
             path = os.path.join(path, version)
-            
+
         for split, language in product(dataset_splits, dataset_languages):
             dataset_info[f'{split}_{language}'] = {
                 'single-choice': 0,
