@@ -10,11 +10,11 @@ livemathbench_dataset = dict(
     path='',
     k=16,
     replication=3,
-    dataset_splits=['CNMO', 'CCEE', 'AMC', 'WLPMC'],
+    dataset_splits=['hard'],
     dataset_languages=['cn', 'en'],
     cot=True,
     version='202412',
-    abbr='LiveMathBench-v202412',
+    abbr='LiveMathBench-v202412-Hard',
     reader_cfg=dict(
         input_columns=['prompt'], 
         output_column='answer'
@@ -30,8 +30,7 @@ livemathbench_dataset = dict(
         ),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(
-            type=GenInferencer, 
-            max_out_len=8192
+            type=GenInferencer
         ),
     ),
     eval_cfg=dict(
