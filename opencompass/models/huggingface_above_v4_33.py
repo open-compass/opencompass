@@ -444,6 +444,7 @@ class HuggingFacewithChatTemplate(BaseModel):
             tokenize_kwargs['add_special_tokens'] = False
             tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
 
+        prompt_list = messages
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
 
         if self.mode == 'mid':
@@ -486,7 +487,7 @@ class HuggingFacewithChatTemplate(BaseModel):
         for stop in stopping_criteria:
             decodeds = [t.split(stop)[0] for t in decodeds]
 
-        return decodeds
+        return prompt_list, decodeds
 
     def get_token_len(self, prompt: str) -> int:
         m = _convert_chat_messages([prompt])[0]
