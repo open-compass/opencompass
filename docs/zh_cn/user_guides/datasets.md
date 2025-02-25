@@ -100,8 +100,8 @@ afqmc_datasets = [
 ]
 ```
 
-> \[!TIP\]
-> 另外，对于二值评测指标（例如accuracy，pass-rate等），还可以通过设置参数`k`配合`n`进行[G-Pass@$k$](http://arxiv.org/abs/2412.13147)评测。G-Pass@$k$计算公式为：$$\\text{G-Pass@}k\_\\tau=\\mathbb{E}_{\\text{Data}}\\left\[ \\sum_{j=\\lceil \\tau \\cdot k \\rceil}^c \\frac{{c \\choose j} \\cdot {n - c \\choose k - j}}{{n \\choose k}} \\right\],$$ 其中$n$为评测次数，$c$为$n$次运行中通过或正确的次数。配置例子如下：
+> [!TIP]
+> 另外，对于二值评测指标（例如accuracy，pass-rate等），还可以通过设置参数`k`配合`n`进行[G-Pass@$k$](http://arxiv.org/abs/2412.13147)评测。G-Pass@$k$计算公式为：$$\text{G-Pass@}k_\tau=\mathbb{E}_{\text{Data}}\left\[ \sum_{j=\lceil \tau \cdot k \rceil}^c \frac{{c \choose j} \cdot {n - c \choose k - j}}{{n \choose k}} \right],$$ 其中 $n$ 为评测次数, $c$ 为 $n$ 次运行中通过或正确的次数。配置例子如下：
 
 ```python
 aime2024_datasets = [
@@ -112,5 +112,6 @@ aime2024_datasets = [
         k=[2, 4], # 返回 G-Pass@2和G-Pass@4的结果
         n=12, # 12次评测
         ...
+    )
 ]
 ```
