@@ -73,6 +73,8 @@ class BigCodeBenchEvaluator(BaseEvaluator):
             eval_type='instruct',
             remote_execute_api='https://bigcode-bigcodebench-evaluator.hf.space/',  # noqa
             dataset_version: str = 'full',
+            local_mode: bool = False,
+            path: str = 'opencompass/bigcodebench',
             pass_k: str = '1,5,10',
             parallel: int = -1,
             min_time_limit: float = 1,
@@ -84,7 +86,9 @@ class BigCodeBenchEvaluator(BaseEvaluator):
         super().__init__()
         self.dataset = BigCodeBenchDataset.load(
             release_version=release_version,
-            dataset_version=dataset_version)['test']
+            dataset_version=dataset_version,
+            local_mode=local_mode,
+            path=path)['test']
         self.eval_type = eval_type
         self.remote_execute_api = remote_execute_api
 
@@ -117,8 +121,40 @@ class BigCodeBenchEvaluator(BaseEvaluator):
         logger.info('Start to extract code from predictions')
         sanitized_predictions = []
         for prediction, entrypoint in zip(predictions, entrypoints):
-            sanitized_prediction = extract_code_generation(
-                prediction, entrypoint=entrypoint)
+            try:
+                import signal
+                from contextlib import contextmanager
+
+                @contextmanager
+                def timeout_handler(seconds):
+
+                    def _handle_timeout(signum, frame):
+                        raise TimeoutError(f'Code extraction timed out'
+                                           f'after {seconds} seconds')
+
+                    original_handler = signal.signal(signal.SIGALRM,
+                                                     _handle_timeout)
+                    signal.alarm(seconds)
+                    try:
+                        yield
+                    finally:
+                        signal.alarm(0)
+                        signal.signal(signal.SIGALRM, original_handler)
+
+                with timeout_handler(10):
+                    sanitized_prediction = extract_code_generation(
+                        prediction, entrypoint=entrypoint)
+
+            except TimeoutError as e:
+                logger.warning(
+                    f'Code extraction timeout for entrypoint {entrypoint}: '
+                    f'{str(e)}')
+                sanitized_prediction = ''
+            except Exception as e:
+                logger.warning(
+                    f'Code extraction failed for entrypoint {entrypoint}: '
+                    f'{str(e)}')
+                sanitized_prediction = ''
             sanitized_predictions.append(sanitized_prediction)
 
         # Prepare for submission

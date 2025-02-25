@@ -99,7 +99,7 @@ for name in mmlu_all_sets:
                 reader_cfg=mmlu_reader_cfg,
             ),
             dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-            pred_postprocessor=dict(type=xml_tag_postprocessor, tag="<conclude>"),
+            pred_postprocessor=dict(type=xml_tag_postprocessor, tag='<conclude>'),
             judge_cfg=dict(),
         ),
     )

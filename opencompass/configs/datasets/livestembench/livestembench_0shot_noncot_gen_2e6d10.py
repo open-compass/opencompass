@@ -101,7 +101,7 @@ for name, subset in livereasonbench_subsets.items():
             type=PromptTemplate,
             template=dict(
                 round=[
-                    dict(role='HUMAN', prompt="问题: {question}\n 请回答这道问题"),
+                    dict(role='HUMAN', prompt='问题: {question}\n 请回答这道问题'),
                 ],
             )),
         retriever=dict(type=ZeroRetriever),

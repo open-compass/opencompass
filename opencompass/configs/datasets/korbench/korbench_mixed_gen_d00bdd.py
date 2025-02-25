@@ -4,7 +4,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 korbench_mixed_datasets = []
 
-categories = ["Multi-Q", "Multi-R", "Multi-RQ"]  # Define available modes for mixed mode
+categories = ['Multi-Q', 'Multi-R', 'Multi-RQ']  # Define available modes for mixed mode
 
 for category in categories:
     # Prompt template
@@ -13,14 +13,14 @@ for category in categories:
         template=dict(
             begin=[
                 dict(
-                    role="HUMAN",
-                    prompt=""
+                    role='HUMAN',
+                    prompt=''
                 )
             ],
             round=[
                 dict(
-                    role="HUMAN",
-                    prompt="{prompt}" # f-string
+                    role='HUMAN',
+                    prompt='{prompt}' # f-string
                 )
             ]
         )
@@ -28,8 +28,8 @@ for category in categories:
 
     # Reader configuration
     reader_cfg = dict(
-        input_columns=["prompt"],
-        output_column="answer",
+        input_columns=['prompt'],
+        output_column='answer',
     )
 
     # Inference configuration
@@ -42,13 +42,13 @@ for category in categories:
     # Evaluation configuration
     eval_cfg = dict(
         evaluator=dict(type=korbenchEvaluator),
-        pred_role="BOT",
+        pred_role='BOT',
     )
 
     korbench_dataset = dict(
         type=korbenchDataset,
-        abbr=f"korbench_mixed_{category}",
-        path="opencompass/korbench",
+        abbr=f'korbench_mixed_{category}',
+        path='opencompass/korbench',
         category=category,
         prompt_mode='mixed',
         reader_cfg=reader_cfg,

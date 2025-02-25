@@ -57,9 +57,10 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **\[2024.12.17\]** We have provided the evaluation script for the December [CompassAcademic](configs/eval_academic_leaderboard_202412.py), which allows users to easily reproduce the official evaluation results by configuring it.
-- **\[2024.11.14\]** OpenCompass now offers support for a sophisticated benchmark designed to evaluate complex reasoning skills — [MuSR](https://arxiv.org/pdf/2310.16049). Check out the [demo](configs/eval_musr.py) and give it a spin! 🔥🔥🔥
-- **\[2024.11.14\]** OpenCompass now supports the brand new long-context language model evaluation benchmark — [BABILong](https://arxiv.org/pdf/2406.10149). Have a look at the [demo](configs/eval_babilong.py) and give it a try! 🔥🔥🔥
+- **\[2025.01.16\]** We now support the [InternLM3-8B-Instruct](https://huggingface.co/internlm/internlm3-8b-instruct) model which has enhanced performance on reasoning and knowledge-intensive tasks.
+- **\[2024.12.17\]** We have provided the evaluation script for the December [CompassAcademic](examples/eval_academic_leaderboard_202412.py), which allows users to easily reproduce the official evaluation results by configuring it.
+- **\[2024.11.14\]** OpenCompass now offers support for a sophisticated benchmark designed to evaluate complex reasoning skills — [MuSR](https://arxiv.org/pdf/2310.16049). Check out the [demo](examples/eval_musr.py) and give it a spin! 🔥🔥🔥
+- **\[2024.11.14\]** OpenCompass now supports the brand new long-context language model evaluation benchmark — [BABILong](https://arxiv.org/pdf/2406.10149). Have a look at the [demo](examples/eval_babilong.py) and give it a try! 🔥🔥🔥
 - **\[2024.10.14\]** We now support the OpenAI multilingual QA dataset [MMMLU](https://huggingface.co/datasets/openai/MMMLU). Feel free to give it a try! 🔥🔥🔥
 - **\[2024.09.19\]** We now support [Qwen2.5](https://huggingface.co/Qwen)(0.5B to 72B) with multiple backend(huggingface/vllm/lmdeploy). Feel free to give them a try! 🔥🔥🔥
 - **\[2024.09.17\]** We now support OpenAI o1(`o1-mini-2024-09-12` and `o1-preview-2024-09-12`). Feel free to give them a try! 🔥🔥🔥
@@ -181,10 +182,10 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
   # Python scripts
-  opencompass ./configs/eval_chat_demo.py
+  opencompass examples/eval_chat_demo.py
   ```
 
-  You can find more script examples under [configs](./configs) folder.
+  You can find more script examples under [examples](./examples) folder.
 
 - API evaluation
 
@@ -196,7 +197,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
 
   # Python scripts
-  opencompass ./configs/eval_api_demo.py
+  opencompass examples/eval_api_demo.py
 
   # You can use o1_mini_2024_09_12/o1_preview_2024_09_12  for o1 models, we set max_completion_tokens=8192 as default.
   ```
@@ -210,7 +211,7 @@ After ensuring that OpenCompass is installed correctly according to the above st
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
 
   # Python scripts
-  opencompass ./configs/eval_lmdeploy_demo.py
+  opencompass examples/eval_lmdeploy_demo.py
   ```
 
 - Supported Models
@@ -278,263 +279,13 @@ OpenCompass is a one-stop platform for large model evaluation, aiming to provide
 
 ## 📖 Dataset Support
 
-<table align="center">
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>Language</b>
-      </td>
-      <td>
-        <b>Knowledge</b>
-      </td>
-      <td>
-        <b>Reasoning</b>
-      </td>
-      <td>
-        <b>Examination</b>
-      </td>
-    </tr>
-    <tr valign="top">
-      <td>
-<details open>
-<summary><b>Word Definition</b></summary>
+We have supported a statistical list of all datasets that can be used on this platform in the documentation on the OpenCompass website.
 
-- WiC
-- SummEdits
+You can quickly find the dataset you need from the list through sorting, filtering, and searching functions.
 
-</details>
+Please refer to the dataset statistics chapter of [official document](https://opencompass.org.cn/doc) for details.
 
-<details open>
-<summary><b>Idiom Learning</b></summary>
-
-- CHID
-
-</details>
-
-<details open>
-<summary><b>Semantic Similarity</b></summary>
-
-- AFQMC
-- BUSTM
-
-</details>
-
-<details open>
-<summary><b>Coreference Resolution</b></summary>
-
-- CLUEWSC
-- WSC
-- WinoGrande
-
-</details>
-
-<details open>
-<summary><b>Translation</b></summary>
-
-- Flores
-- IWSLT2017
-
-</details>
-
-<details open>
-<summary><b>Multi-language Question Answering</b></summary>
-
-- TyDi-QA
-- XCOPA
-
-</details>
-
-<details open>
-<summary><b>Multi-language Summary</b></summary>
-
-- XLSum
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Knowledge Question Answering</b></summary>
-
-- BoolQ
-- CommonSenseQA
-- NaturalQuestions
-- TriviaQA
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Textual Entailment</b></summary>
-
-- CMNLI
-- OCNLI
-- OCNLI_FC
-- AX-b
-- AX-g
-- CB
-- RTE
-- ANLI
-
-</details>
-
-<details open>
-<summary><b>Commonsense Reasoning</b></summary>
-
-- StoryCloze
-- COPA
-- ReCoRD
-- HellaSwag
-- PIQA
-- SIQA
-
-</details>
-
-<details open>
-<summary><b>Mathematical Reasoning</b></summary>
-
-- MATH
-- GSM8K
-
-</details>
-
-<details open>
-<summary><b>Theorem Application</b></summary>
-
-- TheoremQA
-- StrategyQA
-- SciBench
-
-</details>
-
-<details open>
-<summary><b>Comprehensive Reasoning</b></summary>
-
-- BBH
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Junior High, High School, University, Professional Examinations</b></summary>
-
-- C-Eval
-- AGIEval
-- MMLU
-- GAOKAO-Bench
-- CMMLU
-- ARC
-- Xiezhi
-
-</details>
-
-<details open>
-<summary><b>Medical Examinations</b></summary>
-
-- CMB
-
-</details>
-      </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>Understanding</b>
-      </td>
-      <td>
-        <b>Long Context</b>
-      </td>
-      <td>
-        <b>Safety</b>
-      </td>
-      <td>
-        <b>Code</b>
-      </td>
-    </tr>
-    <tr valign="top">
-      <td>
-<details open>
-<summary><b>Reading Comprehension</b></summary>
-
-- C3
-- CMRC
-- DRCD
-- MultiRC
-- RACE
-- DROP
-- OpenBookQA
-- SQuAD2.0
-
-</details>
-
-<details open>
-<summary><b>Content Summary</b></summary>
-
-- CSL
-- LCSTS
-- XSum
-- SummScreen
-
-</details>
-
-<details open>
-<summary><b>Content Analysis</b></summary>
-
-- EPRSTMT
-- LAMBADA
-- TNEWS
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Long Context Understanding</b></summary>
-
-- LEval
-- LongBench
-- GovReports
-- NarrativeQA
-- Qasper
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Safety</b></summary>
-
-- CivilComments
-- CrowsPairs
-- CValues
-- JigsawMultilingual
-- TruthfulQA
-
-</details>
-<details open>
-<summary><b>Robustness</b></summary>
-
-- AdvGLUE
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>Code</b></summary>
-
-- HumanEval
-- HumanEvalX
-- MBPP
-- APPs
-- DS1000
-
-</details>
-      </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-</table>
+<p align="right"><a href="#top">🔝Back to top</a></p>
 
 ## 📖 Model Support
 

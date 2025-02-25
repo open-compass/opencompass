@@ -22,7 +22,10 @@ from .base import BaseDataset
 class LCDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, num_repeats: int = 1, difficulty='ALL'):
+    def load(path: str,
+             num_repeats: int = 1,
+             difficulty='ALL',
+             local_mode=False):
         """Load LC dataset for pass k mode.
 
         Note that you can use num_repeats > 1 when your model does not support
@@ -38,7 +41,7 @@ class LCDataset(BaseDataset):
             num_repeats(int): Number of repetition for this dataset to get
         multiple responses in special cases.
         """
-        path = get_data_path(path, local_mode=True)
+        path = get_data_path(path, local_mode=local_mode)
 
         def processing_test(example):
             example['test_case'] = example['test_list']

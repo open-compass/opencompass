@@ -57,6 +57,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2025.01.16\]** 我们现已支持 [InternLM3-8B-Instruct](https://huggingface.co/internlm/internlm3-8b-instruct) 模型，该模型在推理、知识类任务上取得同量级最优性能，欢迎尝试。
 - **\[2024.12.17\]** 我们提供了12月CompassAcademic学术榜单评估脚本 [CompassAcademic](configs/eval_academic_leaderboard_202412.py)，你可以通过简单地配置复现官方评测结果。
 - **\[2024.10.14\]** 现已支持OpenAI多语言问答数据集[MMMLU](https://huggingface.co/datasets/openai/MMMLU)，欢迎尝试! 🔥🔥🔥
 - **\[2024.09.19\]** 现已支持[Qwen2.5](https://huggingface.co/Qwen)(0.5B to 72B) ，可以使用多种推理后端(huggingface/vllm/lmdeploy), 欢迎尝试! 🔥🔥🔥
@@ -168,17 +169,17 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
 - ### 首次评测
 
-  OpenCompass 支持通过命令行界面 (CLI) 或 Python 脚本来设置配置。对于简单的评估设置，我们推荐使用 CLI；而对于更复杂的评估，则建议使用脚本方式。你可以在configs文件夹下找到更多脚本示例。
+  OpenCompass 支持通过命令行界面 (CLI) 或 Python 脚本来设置配置。对于简单的评估设置，我们推荐使用 CLI；而对于更复杂的评估，则建议使用脚本方式。你可以在examples文件夹下找到更多脚本示例。
 
   ```bash
   # 命令行界面 (CLI)
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
   # Python 脚本
-  opencompass ./configs/eval_chat_demo.py
+  opencompass examples/eval_chat_demo.py
   ```
 
-  你可以在[configs](./configs) 文件夹下找到更多的脚本示例。
+  你可以在[examples](./examples) 文件夹下找到更多的脚本示例。
 
 - ### API评测
 
@@ -190,7 +191,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
   opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
 
   # Python 脚本
-  opencompass  ./configs/eval_api_demo.py
+  opencompass  examples/eval_api_demo.py
 
 
   # 现已支持 o1_mini_2024_09_12/o1_preview_2024_09_12  模型, 默认情况下 max_completion_tokens=8192.
@@ -273,263 +274,11 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 ## 📖 数据集支持
 
-<table align="center">
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>语言</b>
-      </td>
-      <td>
-        <b>知识</b>
-      </td>
-      <td>
-        <b>推理</b>
-      </td>
-      <td>
-        <b>考试</b>
-      </td>
-    </tr>
-    <tr valign="top">
-      <td>
-<details open>
-<summary><b>字词释义</b></summary>
+我们已经在OpenCompass官网的文档中支持了所有可在本平台上使用的数据集的统计列表。
 
-- WiC
-- SummEdits
+您可以通过排序、筛选和搜索等功能从列表中快速找到您需要的数据集。
 
-</details>
-
-<details open>
-<summary><b>成语习语</b></summary>
-
-- CHID
-
-</details>
-
-<details open>
-<summary><b>语义相似度</b></summary>
-
-- AFQMC
-- BUSTM
-
-</details>
-
-<details open>
-<summary><b>指代消解</b></summary>
-
-- CLUEWSC
-- WSC
-- WinoGrande
-
-</details>
-
-<details open>
-<summary><b>翻译</b></summary>
-
-- Flores
-- IWSLT2017
-
-</details>
-
-<details open>
-<summary><b>多语种问答</b></summary>
-
-- TyDi-QA
-- XCOPA
-
-</details>
-
-<details open>
-<summary><b>多语种总结</b></summary>
-
-- XLSum
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>知识问答</b></summary>
-
-- BoolQ
-- CommonSenseQA
-- NaturalQuestions
-- TriviaQA
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>文本蕴含</b></summary>
-
-- CMNLI
-- OCNLI
-- OCNLI_FC
-- AX-b
-- AX-g
-- CB
-- RTE
-- ANLI
-
-</details>
-
-<details open>
-<summary><b>常识推理</b></summary>
-
-- StoryCloze
-- COPA
-- ReCoRD
-- HellaSwag
-- PIQA
-- SIQA
-
-</details>
-
-<details open>
-<summary><b>数学推理</b></summary>
-
-- MATH
-- GSM8K
-
-</details>
-
-<details open>
-<summary><b>定理应用</b></summary>
-
-- TheoremQA
-- StrategyQA
-- SciBench
-
-</details>
-
-<details open>
-<summary><b>综合推理</b></summary>
-
-- BBH
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>初中/高中/大学/职业考试</b></summary>
-
-- C-Eval
-- AGIEval
-- MMLU
-- GAOKAO-Bench
-- CMMLU
-- ARC
-- Xiezhi
-
-</details>
-
-<details open>
-<summary><b>医学考试</b></summary>
-
-- CMB
-
-</details>
-      </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>理解</b>
-      </td>
-      <td>
-        <b>长文本</b>
-      </td>
-      <td>
-        <b>安全</b>
-      </td>
-      <td>
-        <b>代码</b>
-      </td>
-    </tr>
-    <tr valign="top">
-      <td>
-<details open>
-<summary><b>阅读理解</b></summary>
-
-- C3
-- CMRC
-- DRCD
-- MultiRC
-- RACE
-- DROP
-- OpenBookQA
-- SQuAD2.0
-
-</details>
-
-<details open>
-<summary><b>内容总结</b></summary>
-
-- CSL
-- LCSTS
-- XSum
-- SummScreen
-
-</details>
-
-<details open>
-<summary><b>内容分析</b></summary>
-
-- EPRSTMT
-- LAMBADA
-- TNEWS
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>长文本理解</b></summary>
-
-- LEval
-- LongBench
-- GovReports
-- NarrativeQA
-- Qasper
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>安全</b></summary>
-
-- CivilComments
-- CrowsPairs
-- CValues
-- JigsawMultilingual
-- TruthfulQA
-
-</details>
-<details open>
-<summary><b>健壮性</b></summary>
-
-- AdvGLUE
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>代码</b></summary>
-
-- HumanEval
-- HumanEvalX
-- MBPP
-- APPs
-- DS1000
-
-</details>
-      </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-</table>
+详情请参阅 [官方文档](https://opencompass.org.cn/doc) 的数据集统计章节。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 

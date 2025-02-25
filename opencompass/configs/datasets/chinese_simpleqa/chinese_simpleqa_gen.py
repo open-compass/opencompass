@@ -49,7 +49,7 @@ csimpleqa_datasets = [
     dict(
         abbr='chinese_simpleqa',
         type=CsimpleqaDataset,
-        name="chinese_simpleqa",
+        name='chinese_simpleqa',
         path='opencompass/chinese_simpleqa',
         reader_cfg=subjective_reader_cfg,
         infer_cfg=subjective_infer_cfg,
