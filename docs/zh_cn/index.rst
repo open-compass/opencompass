@@ -61,7 +61,7 @@ OpenCompass 上手路线
    advanced_guides/new_model.md
    advanced_guides/evaluation_lmdeploy.md
    advanced_guides/accelerator_intro.md
-   advanced_guides/general_math.md
+   advanced_guides/math_verify.md
    advanced_guides/llm_judge.md
    advanced_guides/code_eval.md
    advanced_guides/code_eval_service.md
