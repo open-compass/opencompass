@@ -55,6 +55,6 @@ class BaseDataset:
     def test(self):
         return self.reader.dataset['test']
 
-    @abstractstaticmethod
+    @staticmethod
     def load(**kwargs) -> Union[Dataset, DatasetDict]:
         pass

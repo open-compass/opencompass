@@ -164,8 +164,6 @@ class TurboMindModelwithChatTemplate(BaseModel):
         self.logger.info('Generation Config of LMdeploy: ')
         self.logger.info(gen_config)
 
-
-
         results = []
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
         for output in outputs:
