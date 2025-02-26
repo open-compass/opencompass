@@ -101,7 +101,6 @@ afqmc_datasets = [
 
 ```
 
-> \[!TIP\]
 > Additionally, for binary evaluation metrics (such as accuracy, pass-rate, etc.), you can also set the parameter `k` in conjunction with `n` for [G-Pass@k](http://arxiv.org/abs/2412.13147) evaluation. The formula for G-Pass@k is:
 >
 > ```{math}

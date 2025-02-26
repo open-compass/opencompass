@@ -100,7 +100,6 @@ afqmc_datasets = [
 ]
 ```
 
-> \[!TIP\]
 > 另外，对于二值评测指标（例如accuracy，pass-rate等），还可以通过设置参数`k`配合`n`进行[G-Pass@k](http://arxiv.org/abs/2412.13147)评测。G-Pass@k计算公式为：
 >
 > ```{math}

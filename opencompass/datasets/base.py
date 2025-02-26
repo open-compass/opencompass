@@ -1,4 +1,3 @@
-from abc import abstractstaticmethod
 from copy import deepcopy
 from typing import Dict, List, Optional, Union
 
@@ -55,6 +54,6 @@ class BaseDataset:
     def test(self):
         return self.reader.dataset['test']
 
-    @abstractstaticmethod
+    @staticmethod
     def load(**kwargs) -> Union[Dataset, DatasetDict]:
         pass
