@@ -38,10 +38,7 @@ livemathbench_dataset = dict(
         evaluator=dict(
             type=LiveMathBenchEvaluator,
             model_name='',
-            url=[],
-            use_extract_model=False,
-            extract_url=[],
-            extract_model_name=''
+            url=[]
         )
     )
 )
