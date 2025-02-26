@@ -88,12 +88,7 @@ repos:
           - mdformat-openmmlab
           - mdformat_frontmatter
           - linkify-it-py
-        exclude: |
-          (?x)^(
-            configs/ |
-            docs/zh_cn/user_guides/datasets.md |
-            docs/en/user_guides/datasets.md
-          )
+        exclude: configs/
   - repo: https://gitee.com/openmmlab/mirrors-docformatter
     rev: v1.3.1
     hooks:

@@ -82,7 +82,6 @@ Users can choose different abilities, different datasets and different evaluatio
 
 For information on how to start an evaluation task and how to evaluate self-built datasets, please refer to the relevant documents.
 
-
 ### Multiple Evaluations on the Dataset
 
 In the dataset configuration, you can set the parameter `n` to perform multiple evaluations on the same dataset and return the average metrics, for example:
@@ -99,11 +98,15 @@ afqmc_datasets = [
         eval_cfg=afqmc_eval_cfg,
     ),
 ]
+
 ```
-> [!TIP]
+
+> \[!TIP\]
 > Additionally, for binary evaluation metrics (such as accuracy, pass-rate, etc.), you can also set the parameter `k` in conjunction with `n` for [G-Pass@k](http://arxiv.org/abs/2412.13147) evaluation. The formula for G-Pass@k is:
 >
-> $$ \text{G-Pass@}k_\tau=E_{\text{Data}}\left[ \sum_{j=\lceil \tau \cdot k \rceil}^c \frac{{c \choose j} \cdot {n - c \choose k - j}}{{n \choose k}} \right], $$ 
+> ```{math}
+> \text{G-Pass@}k_\tau=E_{\text{Data}}\left[ \sum_{j=\lceil \tau \cdot k \rceil}^c \frac{{c \choose j} \cdot {n - c \choose k - j}}{{n \choose k}} \right], 
+> ```
 >
 > where $n$ is the number of evaluations, and $c$ is the number of times that passed or were correct out of $n$ runs. An example configuration is as follows:
 
