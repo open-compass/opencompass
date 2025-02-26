@@ -42,7 +42,7 @@ internlm2_5-7b-chat-hf_fullbench:
         alpaca_eval_total: 20
         arenahard_score: 50
         Followbench_naive_average: 1
-        CompassArena_naive_average: 44.00
+        CompassArena_naive_average: 43
         mtbench101_avg: 7.8
         wildbench_average: -12.78
         simpleqa_accuracy_given_attempted: 0
@@ -58,7 +58,7 @@ internlm2_5-7b-chat-hf_fullbench:
         alpaca_eval_helpful_base: 20
         compassarena_language_naive_average: 35
         compassarena_knowledge_naive_average: 55
-        compassarena_reason_v2_naive_average: 45.00
+        compassarena_reason_v2_naive_average: 40
         compassarena_math_v2_naive_average: 55
         compassarena_creationv2_zh_naive_average: 30
         followbench_llmeval_en_HSR_AVG: 1
