@@ -8,13 +8,13 @@ from opencompass.datasets.livemathbench import LiveMathBenchDataset, LiveMathBen
 livemathbench_dataset = dict(
     type=LiveMathBenchDataset,
     path='',
-    k=16,
-    replication=3,
-    dataset_splits=['CNMO', 'CCEE', 'AMC', 'WLPMC'],
+    k=1,
+    replication=1,
+    dataset_splits=['hard'],
     dataset_languages=['cn', 'en'],
     cot=True,
     version='202412',
-    abbr='LiveMathBench-v202412',
+    abbr='LiveMathBench-v202412-Hard',
     reader_cfg=dict(
         input_columns=['prompt'], 
         output_column='answer'
@@ -30,8 +30,7 @@ livemathbench_dataset = dict(
         ),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(
-            type=GenInferencer, 
-            max_out_len=8192
+            type=GenInferencer
         ),
     ),
     eval_cfg=dict(
@@ -42,9 +41,9 @@ livemathbench_dataset = dict(
             use_extract_model=False,
             extract_url=[],
             extract_model_name='',
-            k=[4, 8, 16],
-            replication=3,
-            thresholds=[0.0, 0.25, 0.5, 0.75, 1.0]
+            k=[1],
+            replication=1,
+            thresholds=[0.0]
         )
     )
 )

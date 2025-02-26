@@ -36,8 +36,8 @@ infer = dict(
 eval = dict(
     partitioner=dict(
         type=SubjectiveNaivePartitioner,
-        models=[gpt_4o_2024_05_13_model],
-        judge_models=[gpt_4o_2024_05_13_model],
+        models=models,
+        judge_models=judge_models,
     ),
     runner=dict(type=LocalRunner,
                 max_num_workers=256,
