@@ -398,6 +398,16 @@ DATASETS_MAPPING = {
         "hf_id": "THUDM/LongBench-v2",
         "local": "./data/longbenchv2/data.json",
     },
+    "opencompass/humaneval_pro": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/humaneval_pro/humaneval_pro.json",
+    },
+    "opencompass/mbpp_pro": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mbpp_pro/mbpp_pro.json",
+    },
     "opencompass/OlympiadBench": {
         "ms_id": "",
         "hf_id": "",
@@ -653,5 +663,13 @@ DATASETS_URL = {
     "bigcodebench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bigcodebench.zip",
         "md5": "2c1c7956ca49a1124617e8c037ec57d8"
-    }
+    },
+    "humaneval_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/humaneval_pro.zip",
+        "md5": "4c6fe556e84e905e4f0902d699e46de5",
+    },
+    "mbpp": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_pro.zip",
+        "md5": "54b939ce0b094b29a244272d658b936d",
+    },
 }
