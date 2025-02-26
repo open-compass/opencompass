@@ -1,31 +1,26 @@
-# CoT: No CoT
-# K-Shot: 0-Shot
-# Verify: LLM Verify
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from mmengine.config import read_base
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.datasets import OlympiadBenchDataset, OlympiadBenchEvaluator, olympiadbench_postprocess_v2
+from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import MATHDataset
 
+with read_base():
+    from .OlympiadBench_categories import math_categories as categories
 
-# ----------------------------- Detailed Config -----------------------------
-
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
-math_infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(role='HUMAN', prompt='{problem}\nRemember to put your final answer within \\boxed{}.'),
-            ]
-        ),
-    ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+# Create prompter instance for problems
+olympiadbench_prompter_cfg = dict(
+    type='OlympiadBenchPrompter'
 )
 
+olympiadbench_reader_cfg = dict(
+    input_columns=[
+        'problem', 'language', 'subject', 'question_type', 
+        'answer_type', 'is_multiple_answer', 'unit', 'questions'
+    ], 
+    output_column='solution'
+)
 
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
@@ -52,49 +47,59 @@ GRADER_TEMPLATE = """
     Judging the correctness of candidates' answers:
 """.strip()
 
-# Evaluation configuration
-math_eval_cfg = dict(
-    evaluator=dict(
-        type=GenericLLMEvaluator,
+
+olympiadbenchMath_datasets = []
+for _name in categories:
+    olympiadbench_infer_cfg = dict(
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-            begin=[
-                dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
-            ],
-                round=[
-                dict(
-                    role='HUMAN',
-                    prompt = GRADER_TEMPLATE
-                ),
-            ]),
+            type='OlympiadBenchTemplate'
         ),
-        dataset_cfg=dict(
-            type=MATHDataset,
-            path='opencompass/math',
-            file_name = 'test_prm800k_500.json',
-            reader_cfg=math_reader_cfg,
-        ),
-        judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-    ),
-    pred_role='BOT',
-)
-
-
-math_datasets = [
-    dict(
-        type=MATHDataset,
-        abbr=f'math_prm800k_500-llmverify-run{idx}',
-        path='opencompass/math',
-        file_name = 'test_prm800k_500.json',
-        reader_cfg=math_reader_cfg,
-        infer_cfg=math_infer_cfg,
-        eval_cfg=math_eval_cfg,
-        mode='singlescore',
+        retriever=dict(type=ZeroRetriever),
+        inferencer=dict(type=GenInferencer),
     )
-    for idx in range(4)
-]
+
+    # Evaluation configuration
+    olympiadbench_eval_cfg = dict(
+        evaluator=dict(
+            type=GenericLLMEvaluator,
+            prompt_template=dict(
+                type=PromptTemplate,
+                template=dict(
+                begin=[
+                    dict(
+                        role='SYSTEM',
+                        fallback_role='HUMAN',
+                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                ],
+                    round=[
+                    dict(
+                        role='HUMAN',
+                        prompt = GRADER_TEMPLATE
+                    ),
+                ]),
+            ),
+            dataset_cfg=dict(
+                type=OlympiadBenchDataset,
+                path='opencompass/OlympiadBench',
+                name=_name,
+                reader_cfg=olympiadbench_reader_cfg,
+            ),
+            judge_cfg=dict(),
+            dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+        ),
+        pred_role='BOT',
+    )
+
+    olympiadbenchMath_datasets.append(
+        dict(
+            type=OlympiadBenchDataset,
+            abbr=f'OlympiadBench_{_name}',
+            path='opencompass/OlympiadBench',
+            name=_name,
+            reader_cfg=olympiadbench_reader_cfg,
+            infer_cfg=olympiadbench_infer_cfg,
+            eval_cfg=olympiadbench_eval_cfg,
+        )
+    )
+
+del _name
