@@ -81,3 +81,43 @@ datasets += cmnli_datasets
 Users can choose different abilities, different datasets and different evaluation methods configuration files to build the part of the dataset in the evaluation script according to their needs.
 
 For information on how to start an evaluation task and how to evaluate self-built datasets, please refer to the relevant documents.
+
+### Multiple Evaluations on the Dataset
+
+In the dataset configuration, you can set the parameter `n` to perform multiple evaluations on the same dataset and return the average metrics, for example:
+
+```python
+afqmc_datasets = [
+    dict(
+        abbr="afqmc-dev",
+        type=AFQMCDatasetV2,
+        path="./data/CLUE/AFQMC/dev.json",
+        n=10, # Perform 10 evaluations
+        reader_cfg=afqmc_reader_cfg,
+        infer_cfg=afqmc_infer_cfg,
+        eval_cfg=afqmc_eval_cfg,
+    ),
+]
+
+```
+
+Additionally, for binary evaluation metrics (such as accuracy, pass-rate, etc.), you can also set the parameter `k` in conjunction with `n` for [G-Pass@k](http://arxiv.org/abs/2412.13147) evaluation. The formula for G-Pass@k is:
+
+```{math}
+\text{G-Pass@}k_\tau=E_{\text{Data}}\left[ \sum_{j=\lceil \tau \cdot k \rceil}^c \frac{{c \choose j} \cdot {n - c \choose k - j}}{{n \choose k}} \right], 
+```
+
+where $n$ is the number of evaluations, and $c$ is the number of times that passed or were correct out of $n$ runs. An example configuration is as follows:
+
+```python
+aime2024_datasets = [
+    dict(
+        abbr='aime2024',
+        type=Aime2024Dataset,
+        path='opencompass/aime2024',
+        k=[2, 4], # Return results for G-Pass@2 and G-Pass@4
+        n=12, # 12 evaluations
+        ...
+    )
+]
+```
