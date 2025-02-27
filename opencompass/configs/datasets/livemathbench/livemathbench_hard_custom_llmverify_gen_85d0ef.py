@@ -9,7 +9,7 @@ from itertools import product
 # from opencompass.datasets.livemathbench import LiveMathBenchDataset, LiveMathBenchEvaluator
 
 
-livemathbench_reader_cfg = dict(input_columns=['prompt'], output_column='answer')
+livemathbench_reader_cfg = dict(input_columns=['question'], output_column='answer')
 
 
 # Inference configuration
@@ -20,7 +20,7 @@ livemathbench_infer_cfg = dict(
             round=[
                 dict(
                     role='HUMAN',
-                    prompt='{prompt}\nRemember to put your final answer within \\boxed{}.',
+                    prompt='{question}\n',
                 ),
             ]
         ),
@@ -45,7 +45,7 @@ GRADER_TEMPLATE = """
     B: INCORRECT
     Just return the letters "A" or "B", with no text around it.
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
-    <Original Question Begin>: \n{prompt}\n<Original Question End>\n\n
+    <Original Question Begin>: \n{question}\n<Original Question End>\n\n
     <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     
