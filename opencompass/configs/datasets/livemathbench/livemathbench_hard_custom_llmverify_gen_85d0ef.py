@@ -6,9 +6,6 @@ from opencompass.datasets import CustomDataset
 from opencompass.datasets import generic_llmjudge_postprocess
 from itertools import product
 
-# from opencompass.datasets.livemathbench import LiveMathBenchDataset, LiveMathBenchEvaluator
-
-
 livemathbench_reader_cfg = dict(input_columns=['question'], output_column='answer')
 
 
