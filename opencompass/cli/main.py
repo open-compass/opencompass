@@ -12,7 +12,7 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import LarkReporter, get_logger
+from opencompass.utils import LarkReporter, get_logger, Save_To_Station
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 
@@ -127,6 +127,26 @@ def parse_args():
         'correctness of each sample, bpb, etc.',
         action='store_true',
     )
+    parser.add_argument(
+        '--save-to-station',
+        help='Whether to save the evaluation results to the '
+             'data station.',
+        action='store_true',
+    )
+    parser.add_argument(
+        '--read-station',
+        help='Whether to read the evaluation results from the '
+             'data station.',
+        action='store_true',
+    )
+    parser.add_argument(
+        '--station-path',
+        help='Path to your reuslts station.',
+        type=str,
+        default=None,
+    )
+
+
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -269,6 +289,7 @@ def main():
         content = f'{getpass.getuser()}\'s task has been launched!'
         LarkReporter(cfg['lark_bot_url']).post(content)
 
+    # infer
     if args.mode in ['all', 'infer']:
         # When user have specified --slurm or --dlc, or have not set
         # "infer" in config, we will provide a default configuration
@@ -349,6 +370,15 @@ def main():
                 runner(task_part)
         else:
             runner(tasks)
+
+    # save to station
+    if args.save_to_station:
+        if Save_To_Station(cfg, args):
+            logger.info('Successfully saved to station.')
+        else:
+            logger.warning('Failed to save result to station.')
+
+
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
