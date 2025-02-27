@@ -258,7 +258,7 @@ def main():
     cfg.dump(output_config_path)
     # Config is intentally reloaded here to avoid initialized
     # types cannot be serialized
-    cfg = Config.fromfile(output_config_path, format_python_code=False)
+    # cfg = Config.fromfile(output_config_path, format_python_code=False)
 
     # report to lark bot if specify --lark
     if not args.lark:

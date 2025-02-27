@@ -92,13 +92,14 @@ class OpenICLInferTask(BaseTask):
         self.logger.info(
             f'Start inferencing {task_abbr_from_cfg(self.sub_cfg)}')
 
-        assert hasattr(self.infer_cfg, 'ice_template') or hasattr(self.infer_cfg, 'prompt_template'), \
+
+        assert 'ice_template' in self.infer_cfg or 'prompt_template' in self.infer_cfg, \
             'Both ice_template and prompt_template cannot be None simultaneously.'  # noqa: E501
-        if hasattr(self.infer_cfg, 'ice_template'):
+        if 'ice_template' in self.infer_cfg:
             ice_template = ICL_PROMPT_TEMPLATES.build(
                 self.infer_cfg['ice_template'])
 
-        if hasattr(self.infer_cfg, 'prompt_template'):
+        if 'prompt_template' in self.infer_cfg:
             prompt_template = ICL_PROMPT_TEMPLATES.build(
                 self.infer_cfg['prompt_template'])
 
@@ -123,15 +124,15 @@ class OpenICLInferTask(BaseTask):
         out_dir, out_file = osp.split(out_path)
         mkdir_or_exist(out_dir)
 
-        if hasattr(self.infer_cfg, 'prompt_template') and \
-                hasattr(self.infer_cfg, 'ice_template'):
+        if 'prompt_template' in self.infer_cfg  and \
+                'ice_template' in self.infer_cfg:
             inferencer.inference(retriever,
                                  ice_template=ice_template,
                                  prompt_template=prompt_template,
                                  output_json_filepath=out_dir,
                                  output_json_filename=out_file)
-        elif hasattr(self.infer_cfg, 'prompt_template'):
-            inferencer.inference(retriever,
+        elif "prompt_template" in self.infer_cfg:
+                    inferencer.inference(retriever,
                                  prompt_template=prompt_template,
                                  output_json_filepath=out_dir,
                                  output_json_filename=out_file)

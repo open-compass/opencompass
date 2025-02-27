@@ -9,7 +9,9 @@ from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.models.base_api import APITemplateParser
 from opencompass.registry import MODELS
 from opencompass.utils.logging import get_logger
+from opencompass.models import HuggingFaceCausalLM
 from opencompass.utils.prompt import PromptList
+
 
 PromptType = Union[PromptList, str]
 
@@ -506,7 +508,7 @@ def  _convert_base_messages(inputs):
     return outputs
 
 
-class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
+class HuggingFaceBaseModel(HuggingFaceCausalLM):
 
     def __init__(self,
                  path: str,
@@ -529,7 +531,8 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
         self.template_parser = LMTemplateParser()
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
         self.drop_middle = drop_middle
-        self._load_tokenizer(tokenizer_path or path, tokenizer_kwargs, pad_token_id)
+        self.pad_token_id = None
+        self._load_tokenizer(tokenizer_path or path, None, tokenizer_kwargs)
         if not tokenizer_only:
             self._load_model(path=path, kwargs=model_kwargs, peft_path=peft_path, peft_kwargs=peft_kwargs)
         self.generation_kwargs = generation_kwargs
