@@ -12,7 +12,8 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import LarkReporter, get_logger, Save_To_Station
+from opencompass.utils import (LarkReporter, Read_From_Station,
+                               Save_To_Station, get_logger)
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 
@@ -64,8 +65,9 @@ def parse_args():
                         help='Running mode. You can choose "infer" if you '
                         'only want the inference results, or "eval" if you '
                         'already have the results and want to evaluate them, '
-                        'or "viz" if you want to visualize the results.',
-                        choices=['all', 'infer', 'eval', 'viz'],
+                        'or "viz" if you want to visualize the results,'
+                        'or "rs" if you want to search results from your station.',
+                        choices=['all', 'infer', 'eval', 'viz', 'rs'],
                         default='all',
                         type=str)
     parser.add_argument('-r',
@@ -133,13 +135,7 @@ def parse_args():
              'data station.',
         action='store_true',
     )
-    parser.add_argument(
-        '--read-station',
-        help='Whether to read the evaluation results from the '
-             'data station.',
-        action='store_true',
-    )
-    parser.add_argument(
+    parser.add_argument('-sp',
         '--station-path',
         help='Path to your reuslts station.',
         type=str,
@@ -260,6 +256,8 @@ def main():
             else:
                 dirs = os.listdir(cfg.work_dir)
                 dir_time_str = sorted(dirs)[-1]
+        elif args.reuse == 'station':
+            Read_From_Station(cfg, args, dir_time_str)
         else:
             dir_time_str = args.reuse
         logger.info(f'Reusing experiements from {dir_time_str}')
