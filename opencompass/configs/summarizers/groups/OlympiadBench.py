@@ -9,3 +9,14 @@ categories = [
 OlympiadBench_summary_groups = [
     {'name': 'OlympiadBench', 'subsets': ['OlympiadBench_' + c.replace(' ', '_') for c in categories]},
 ]
+
+math_categories = [
+    'OE_TO_maths_en_COMP', # OpenEnded - TextOnly - maths - COMP
+    'OE_TO_maths_zh_COMP', # OpenEnded - TextOnly - maths - COMP
+    'OE_TO_maths_zh_CEE', # OpenEnded - TextOnly - maths - CEE
+]
+
+
+OlympiadBenchMath_summary_groups = [
+    {'name': 'OlympiadBenchMath', 'subsets': ['OlympiadBench_' + c.replace(' ', '_') for c in math_categories]},
+]

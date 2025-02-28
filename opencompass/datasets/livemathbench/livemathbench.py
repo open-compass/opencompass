@@ -41,9 +41,8 @@ class LiveMathBenchDataset(BaseDataset):
         dataset = []
         dataset_info = {}
 
-        if path != '':
-            path = get_data_path(path)
-            path = os.path.join(path, version)
+        # Use dataset mapping to generate path
+        data_dir = get_data_path(path)
 
         for split, language in product(dataset_splits, dataset_languages):
             dataset_info[f'{split}_{language}'] = {
@@ -59,8 +58,17 @@ class LiveMathBenchDataset(BaseDataset):
                 '问答': 'problem-solving'
             }
 
-            if path != '':
-                file_path = os.path.join(path, f'{split}_{language}.jsonl')
+            examples = []
+            if data_dir.startswith('opencompass/'):
+                # Using HF Dataset
+                hf_dataset = load_dataset(
+                    data_dir, f'v{version}_{split}_{language}')['test']
+                for example in hf_dataset:
+                    examples.append(example)
+            else:
+                file_path = os.path.join(data_dir, version,
+                                         f'{split}_{language}.jsonl')
+
                 if not os.path.exists(file_path):
                     raise FileNotFoundError(
                         f'File {file_path} does not exist, please check the '
@@ -69,13 +77,6 @@ class LiveMathBenchDataset(BaseDataset):
                 with jsonlines.open(file_path, 'r') as file:
                     for example in file:
                         examples.append(example)
-            else:
-                hf_dataset = load_dataset(
-                    'opencompass/LiveMathBench',
-                    f'v{version}_{split}_{language}')['test']
-                examples = []
-                for example in hf_dataset:
-                    examples.append(example)
 
             for example_idx, example in enumerate(examples):
                 dataset_info[f'{split}_{language}'][
