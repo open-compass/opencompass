@@ -22,11 +22,13 @@ from opencompass.models import (
 with read_base():
     # You can comment out the datasets you don't want to evaluate
 
+    # Datasets
     # from opencompass.configs.datasets.math.math_prm800k_500_llmverify_gen_6ff468 import math_datasets # 1 Run
     from opencompass.configs.datasets.aime2024.aime2024_llmverify_repeat8_gen_e8fcee import aime2024_datasets # 8 Run
     # from opencompass.configs.datasets.OlympiadBench.OlympiadBench_0shot_llmverify_gen_be8b13 import olympiadbench_datasets
     # from opencompass.configs.datasets.omni_math.omni_math_llmverify_gen_ccf9c0 import omnimath_datasets # 1 Run
     # from opencompass.configs.datasets.livemathbench.livemathbench_hard_custom_llmverify_gen_85d0ef import livemathbench_datasets
+
 
     # Summarizer
     from opencompass.configs.summarizers.groups.OlympiadBench import OlympiadBenchMath_summary_groups
@@ -205,6 +207,6 @@ summarizer = dict(
 #                          PART 5  Utils                              #
 #######################################################################
 
-work_dir = "outputs/deepseek_r1_reasoning"
+work_dir = 'outputs/deepseek_r1_reasoning'
 
 
