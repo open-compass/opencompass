@@ -12,7 +12,8 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import LarkReporter, get_logger
+from opencompass.utils import (LarkReporter, Read_From_Station,
+                               Save_To_Station, get_logger)
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 
@@ -64,8 +65,9 @@ def parse_args():
                         help='Running mode. You can choose "infer" if you '
                         'only want the inference results, or "eval" if you '
                         'already have the results and want to evaluate them, '
-                        'or "viz" if you want to visualize the results.',
-                        choices=['all', 'infer', 'eval', 'viz'],
+                        'or "viz" if you want to visualize the results,'
+                        'or "rs" if you want to search results from your station.',
+                        choices=['all', 'infer', 'eval', 'viz', 'rs'],
                         default='all',
                         type=str)
     parser.add_argument('-r',
@@ -127,6 +129,20 @@ def parse_args():
         'correctness of each sample, bpb, etc.',
         action='store_true',
     )
+    parser.add_argument(
+        '--save-to-station',
+        help='Whether to save the evaluation results to the '
+             'data station.',
+        action='store_true',
+    )
+    parser.add_argument('-sp',
+        '--station-path',
+        help='Path to your reuslts station.',
+        type=str,
+        default=None,
+    )
+
+
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -238,6 +254,8 @@ def main():
             else:
                 dirs = os.listdir(cfg.work_dir)
                 dir_time_str = sorted(dirs)[-1]
+        elif args.reuse == 'station':
+            Read_From_Station(cfg, args, dir_time_str)
         else:
             dir_time_str = args.reuse
         logger.info(f'Reusing experiements from {dir_time_str}')
@@ -267,6 +285,7 @@ def main():
         content = f'{getpass.getuser()}\'s task has been launched!'
         LarkReporter(cfg['lark_bot_url']).post(content)
 
+    # infer
     if args.mode in ['all', 'infer']:
         # When user have specified --slurm or --dlc, or have not set
         # "infer" in config, we will provide a default configuration
@@ -347,6 +366,15 @@ def main():
                 runner(task_part)
         else:
             runner(tasks)
+
+    # save to station
+    if args.save_to_station:
+        if Save_To_Station(cfg, args):
+            logger.info('Successfully saved to station.')
+        else:
+            logger.warning('Failed to save result to station.')
+
+
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
