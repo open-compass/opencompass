@@ -9,7 +9,7 @@ livemathbench_dataset = dict(
     type=LiveMathBenchDataset,
     path='',
     k=1,
-    replication=1,
+    n=1,
     dataset_splits=['hard'],
     dataset_languages=['cn', 'en'],
     cot=True,
@@ -37,13 +37,7 @@ livemathbench_dataset = dict(
         evaluator=dict(
             type=LiveMathBenchEvaluator,
             model_name='',
-            url=[],
-            use_extract_model=False,
-            extract_url=[],
-            extract_model_name='',
-            k=[1],
-            replication=1,
-            thresholds=[0.0]
+            url=[]
         )
     )
 )
