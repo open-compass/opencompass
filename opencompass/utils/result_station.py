@@ -24,12 +24,18 @@ def Save_To_Station(cfg, args):
     # model_list = [i['abbr'] for i in cfg['models']]
     # dataset_list = [i['abbr'] for i in cfg['datasets']]
 
+    rs_exist_results = []
+    if 'rs_exist_results' in cfg.keys():
+        rs_exist_results = cfg['rs_exist_results']
+
     for dataset in dataset_list:
         result_path = osp.join(station_path, dataset)
         if not osp.exists(result_path):
             os.makedirs(result_path)
 
         for model in model_list:
+            if [model, dataset] in rs_exist_results:
+                continue
             result_file_name = model + '.json'
             if osp.exists(osp.join(result_path, result_file_name)):
                 print('result of {} with {} already exists'.format(
