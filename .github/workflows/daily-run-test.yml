@@ -44,7 +44,7 @@ on:
         type: string
         default: "['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
   schedule:
-    - cron:  '15 14 * * *'
+    - cron:  '15 14 * * 0,2'
 
 env:
   HF_DATASETS_OFFLINE: 1
@@ -87,7 +87,7 @@ jobs:
           name: my-artifact-${{ github.run_id }}
 
   build-pypi-lmdeploy:
-    if: ${{!cancelled() && (github.event_name != 'schedule' && inputs.build_lmdeploy)}}
+    if: ${{!cancelled() && (github.event_name == 'schedule' || inputs.build_lmdeploy)}}
     strategy:
       matrix:
         pyver: [py310]
@@ -127,7 +127,7 @@ jobs:
     needs: ['build-pypi', 'build-pypi-lmdeploy']
     runs-on: volc_cu12
     environment: 'prod'
-    timeout-minutes: 240 #4hours
+    timeout-minutes: 120 #2hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -148,7 +148,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 1
-          timeout_minutes: 240
+          timeout_minutes: 120
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda create -y --name ${{env.CONDA_ENV}} python=3.10
@@ -211,7 +211,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 1
-          timeout_minutes: 120
+          timeout_minutes: 180
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda activate ${{env.CONDA_ENV}}
@@ -230,7 +230,7 @@ jobs:
         regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_sub_fullbench"]')}}
     runs-on: volc_cu12_local
     environment: 'prod'
-    timeout-minutes: 240 #4hours
+    timeout-minutes: 480 #6hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -306,7 +306,7 @@ jobs:
         function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '["base_objective","chat_objective","chat_subjective","base_long_context","chat_long_context"]')}}
     runs-on: volc_cu12
     environment: 'prod'
-    timeout-minutes: 360 #6hours
+    timeout-minutes: 480 #6hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -323,7 +323,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 1
-          timeout_minutes: 360
+          timeout_minutes: 480
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda activate ${{env.CONDA_ENV}}
