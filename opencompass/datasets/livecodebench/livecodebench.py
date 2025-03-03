@@ -7,6 +7,7 @@ import pickle
 import zlib
 from dataclasses import dataclass
 from enum import Enum
+from datetime import datetime
 
 from datasets import DatasetDict, load_dataset, load_from_disk
 
@@ -53,7 +54,9 @@ class LCBCodeGenerationDataset(BaseDataset):
     @staticmethod
     def load(path: str = 'opencompass/code_generation_lite',
              local_mode: bool = False,
-             release_version: str = 'release_v1'):
+             release_version: str = 'release_v1',
+             start_date: str = None,
+             end_date: str = None):
 
         def transform(item):
             # Define the dataitem mapping logic
@@ -106,6 +109,15 @@ class LCBCodeGenerationDataset(BaseDataset):
             trust_remote_code=True)
 
         dataset = dataset.map(transform)
+
+        if start_date is not None:
+            p_start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            dataset = dataset.filter(
+                lambda e: p_start_date <= datetime.fromisoformat(e['contest_date']))  # noqa: E501
+        if end_date is not None:
+            p_end_date = datetime.strptime(end_date, "%Y-%m-%d")
+            dataset = dataset.filter(
+                lambda e: datetime.fromisoformat(e['contest_date']) <= p_end_date)  # noqa: E501
 
         return DatasetDict({'test': dataset, 'train': dataset})
 
