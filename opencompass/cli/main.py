@@ -141,6 +141,12 @@ def parse_args():
         type=str,
         default=None,
     )
+    parser.add_argument(
+        '--read-from-station',
+        help='Whether to save the evaluation results to the '
+             'data station.',
+        action='store_true',
+    )
 
 
     # set srun args
@@ -256,8 +262,6 @@ def main():
             else:
                 dirs = os.listdir(cfg.work_dir)
                 dir_time_str = sorted(dirs)[-1]
-        elif args.reuse == 'station':
-            Read_From_Station(cfg, args, dir_time_str)
         else:
             dir_time_str = args.reuse
         logger.info(f'Reusing experiements from {dir_time_str}')
@@ -279,6 +283,13 @@ def main():
     # Config is intentally reloaded here to avoid initialized
     # types cannot be serialized
     cfg = Config.fromfile(output_config_path, format_python_code=False)
+
+    # get existed results from station
+    if args.read_from_station:
+        existing_results_list = Read_From_Station(cfg, args)
+        rs_exist_results = [comb['combination'] for comb in existing_results_list]
+        cfg['rs_exist_results'] = rs_exist_results
+
 
     # report to lark bot if specify --lark
     if not args.lark:
@@ -371,12 +382,7 @@ def main():
 
     # save to station
     if args.save_to_station:
-        if Save_To_Station(cfg, args):
-            logger.info('Successfully saved to station.')
-        else:
-            logger.warning('Failed to save result to station.')
-
-
+        Save_To_Station(cfg, args)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:

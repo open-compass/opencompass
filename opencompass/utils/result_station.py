@@ -3,6 +3,8 @@ import os
 import os.path as osp
 import re
 
+from opencompass.utils.abbr import dataset_abbr_from_cfg, model_abbr_from_cfg
+
 
 def Save_To_Station(cfg, args):
 
@@ -14,8 +16,13 @@ def Save_To_Station(cfg, args):
         station_path = args.station_path
 
     work_dict = cfg['work_dir']
-    model_list = [i['abbr'] for i in cfg['models']]
-    dataset_list = [i['abbr'] for i in cfg['datasets']]
+    model_list = [model_abbr_from_cfg(model) for model in cfg['models']]
+    dataset_list = [
+        dataset_abbr_from_cfg(dataset) for dataset in cfg['datasets']
+    ]
+
+    # model_list = [i['abbr'] for i in cfg['models']]
+    # dataset_list = [i['abbr'] for i in cfg['datasets']]
 
     for dataset in dataset_list:
         result_path = osp.join(station_path, dataset)
@@ -61,10 +68,21 @@ def Save_To_Station(cfg, args):
                         this_prediction.append(
                             this_prediction_load_json[prekey])
 
+                # get config dict
+                model_cfg = [
+                    i for i in cfg['models'] if model_abbr_from_cfg(i) == model
+                ][0]
+                dataset_cfg = [
+                    i for i in cfg['datasets']
+                    if dataset_abbr_from_cfg(i) == dataset
+                ][0]
+                this_cfg = {'models': model_cfg, 'datasets': dataset_cfg}
+
                 # dict combine
                 data_model_results = {
                     'predictions': this_prediction,
-                    'results': this_result
+                    'results': this_result,
+                    'cfg': this_cfg
                 }
                 with open(osp.join(result_path, result_file_name), 'w') as f:
                     json.dump(data_model_results,
@@ -72,13 +90,13 @@ def Save_To_Station(cfg, args):
                               ensure_ascii=False,
                               indent=4)
                 f.close()
-                print('result of {} with {} already exists'.format(
-                    dataset, model))
+                print('successfully save result of {} with {} to the station'.
+                      format(dataset, model))
 
     return True
 
 
-def Read_From_Station(cfg, args, dir_time_str):
+def Read_From_Station(cfg, args):
 
     assert args.station_path is not None or 'station_path' in cfg.keys(
     ) and cfg['station_path'] is not None
@@ -87,70 +105,50 @@ def Read_From_Station(cfg, args, dir_time_str):
     else:
         station_path = args.station_path
 
-    work_dict = osp.join(cfg.work_dir, dir_time_str)
-    model_list = [i['abbr'] for i in cfg['models']]
-    dataset_list = [i['abbr'] for i in cfg['datasets']]
+    model_list = [model_abbr_from_cfg(model) for model in cfg['models']]
+    dataset_list = [
+        dataset_abbr_from_cfg(dataset) for dataset in cfg['datasets']
+    ]
+    # model_list = [i['abbr'] for i in cfg['models']]
+    # dataset_list = [i['abbr'] for i in cfg['datasets']]
 
-    if not osp.exists(work_dict):
-        os.makedirs(work_dict)
-    local_prediction_path = osp.join(work_dict, 'predictions')
-    if not osp.exists(local_prediction_path):
-        os.makedirs(local_prediction_path)
-    local_result_path = osp.join(work_dict, 'results')
-    if not osp.exists(local_result_path):
-        os.makedirs(local_result_path)
+    existing_results_list = []
 
     for model in model_list:
-
-        for data in dataset_list:
-            result_file_path = osp.join(station_path, data, model + '.json')
+        for dataset in dataset_list:
+            result_file_path = osp.join(station_path, dataset, model + '.json')
             if not osp.exists(result_file_path):
                 print('do not find result file: {} with {} at station'.format(
-                    model, data))
+                    model, dataset))
                 continue
             else:
                 print('find result file: {} with {} at station'.format(
-                    model, data))
-
+                    model, dataset))
                 with open(result_file_path, 'r') as f:
                     download_json = json.load(f)
                 f.close()
+                existing_results_list.append({
+                    'combination': [model, dataset],
+                    'file': download_json
+                })
 
-                this_local_prediction_path = osp.join(local_prediction_path,
-                                                      model)
-                if not osp.exists(this_local_prediction_path):
-                    os.makedirs(this_local_prediction_path)
-                this_local_result_path = osp.join(local_result_path, model)
-                if not osp.exists(this_local_result_path):
-                    os.makedirs(this_local_result_path)
+    # save results to local
+    result_local_path = osp.join(cfg['work_dir'], 'results')
+    if not osp.exists(result_local_path):
+        os.makedirs(result_local_path)
+    for i in existing_results_list:
+        this_result = i['file']['results']
+        this_result_local_path = osp.join(result_local_path,
+                                          i['combination'][0])
+        if not osp.exists(this_result_local_path):
+            os.makedirs(this_result_local_path)
+        this_result_local_file_path = osp.join(this_result_local_path,
+                                               i['combination'][1] + '.json')
+        with open(this_result_local_file_path, 'w') as f:
+            json.dump(this_result, f, ensure_ascii=False, indent=4)
+        f.close()
 
-                this_local_prediction_path = osp.join(
-                    this_local_prediction_path, data + '.json')
-                this_local_result_path = osp.join(this_local_result_path,
-                                                  data + '.json')
-
-                download_json_prediction = download_json['predictions']
-                download_json_result = download_json['results']
-
-                # save predictions
-                local_prediction = {}
-                for i in range(len(download_json_prediction)):
-                    local_prediction[str(i)] = download_json_prediction[i]
-                with open(this_local_prediction_path, 'w') as f:
-                    json.dump(local_prediction,
-                              f,
-                              ensure_ascii=False,
-                              indent=4)
-                f.close()
-
-                # save results
-                with open(this_local_result_path, 'w') as f:
-                    json.dump(download_json_result,
-                              f,
-                              ensure_ascii=False,
-                              indent=4)
-                f.close()
-    return True
+    return existing_results_list
 
 
 def find_files_by_regex(directory, pattern):
