@@ -129,18 +129,19 @@ def parse_args():
         'correctness of each sample, bpb, etc.',
         action='store_true',
     )
-    parser.add_argument(
-        '--save-to-station',
-        help='Whether to save the evaluation results to the '
-             'data station.',
-        action='store_true',
-    )
+
     parser.add_argument('-sp',
         '--station-path',
-        help='Path to your reuslts station.',
+        help='Path to your results station.',
         type=str,
         default=None,
     )
+
+    parser.add_argument('--station-overwrite',
+        help='Whether to overwrite the results at station.',
+        action='store_true',
+    )
+
     parser.add_argument(
         '--read-from-station',
         help='Whether to save the evaluation results to the '
@@ -290,7 +291,6 @@ def main():
         rs_exist_results = [comb['combination'] for comb in existing_results_list]
         cfg['rs_exist_results'] = rs_exist_results
 
-
     # report to lark bot if specify --lark
     if not args.lark:
         cfg['lark_bot_url'] = None
@@ -381,7 +381,7 @@ def main():
             runner(tasks)
 
     # save to station
-    if args.save_to_station:
+    if args.station_path is not None or cfg.get('station_path') is not None:
         Save_To_Station(cfg, args)
 
     # visualize
