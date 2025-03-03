@@ -588,7 +588,7 @@ DATASETS_URL = {
     },
     "/code_generation_lite": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/code_generation_lite.zip",
-        "md5": "60103a18ca63b05ea06e98d24170f23d",
+        "md5": "ebcf8db56f5c817ca8202a542be30cb4",
     },
     "/execution-v2": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/execution-v2.zip",
@@ -652,6 +652,6 @@ DATASETS_URL = {
     },
     "bigcodebench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bigcodebench.zip",
-        "md5": "2c1c7956ca49a1124617e8c037ec57d8"
+        "md5": "270f399f4142b74f47ecff116cc3b21d"
     }
 }

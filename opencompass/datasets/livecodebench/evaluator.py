@@ -245,7 +245,7 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
             end_date=end_date)['test']
         self.extractor_version = extractor_version
 
-    def score(self, predictions, references, test_set):
+    def score(self, predictions, references):
         if len(predictions) != len(references):
             return {
                 'error':
