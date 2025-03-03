@@ -37,7 +37,7 @@ rouge_score
 sacrebleu
 scikit_learn==1.5.0
 seaborn
-sentence_transformers==2.2.2
+sentence_transformers
 tabulate
 tiktoken
 timeout_decorator
