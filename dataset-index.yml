@@ -399,8 +399,8 @@
     category: Math
     paper: https://proceedings.mlr.press/v202/gao23f/gao23f.pdf
     configpath: opencompass/configs/datasets/gsm_hard
-- hellaswag:
-    name: HLE
+- hle:
+    name: HLE(Humanity's Last Exam)
     category: Reasoning
     paper: https://lastexam.ai/paper
     configpath: opencompass/configs/datasets/HLE
