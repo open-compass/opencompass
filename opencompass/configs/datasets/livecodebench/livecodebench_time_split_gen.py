@@ -1,15 +1,12 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import (
-    LCBCodeGenerationDataset,
-    LCBCodeExecutionDataset,
-    LCBTestOutputPredictionDataset,
-    LCBCodeGenerationEvaluator,
-    LCBCodeExecutionEvaluator,
-    LCBTestOutputEvaluator
-)
-
+from opencompass.datasets import (LCBCodeGenerationDataset,
+                                  LCBCodeExecutionDataset,
+                                  LCBTestOutputPredictionDataset,
+                                  LCBCodeGenerationEvaluator,
+                                  LCBCodeExecutionEvaluator,
+                                  LCBTestOutputEvaluator)
 
 lcb_code_generation_reader_cfg = dict(
     input_columns=[
@@ -25,33 +22,20 @@ SYSTEM_MESSAGE_GENERIC = 'You are an expert Python programmer. You will be given
 prompt_template = '### Question:\n{question_content}\n\n{format_prompt}' + \
                     '### Answer: (use the provided format with backticks)\n\n'
 
-
 # Code Generation Tasks
-lcb_code_generation_infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt=prompt_template
-                )
-            ]
-        )
-    ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer)
-)
+lcb_code_generation_infer_cfg = dict(prompt_template=dict(
+    type=PromptTemplate,
+    template=dict(round=[dict(role='HUMAN', prompt=prompt_template)])),
+                                     retriever=dict(type=ZeroRetriever),
+                                     inferencer=dict(type=GenInferencer))
 
 lcb_code_generation_eval_cfg = dict(
-    evaluator=dict(
-        type=LCBCodeGenerationEvaluator,
-        num_process_evaluate=4,
-        timeout=6,
-        release_version='release_v5',
-        start_date='2024-08-01',
-        end_date='2025-02-01'
-    ),
+    evaluator=dict(type=LCBCodeGenerationEvaluator,
+                   num_process_evaluate=4,
+                   timeout=6,
+                   release_version='release_v5',
+                   start_date='2024-08-01',
+                   end_date='2025-02-01'),
     pred_role='BOT',
 )
 
@@ -81,25 +65,16 @@ lcb_code_execution_infer_cfg = dict(
                 dict(
                     role='SYSTEM',
                     fallback_role='HUMAN',
-                    prompt='You are an expert at Python programming, code execution, test case generation, and fuzzing.'  # noqa: E501
+                    prompt=
+                    'You are an expert at Python programming, code execution, test case generation, and fuzzing.'  # noqa: E501
                 ),
             ],
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{prompt}'
-                )
-            ]
-        )
-    ),
+            round=[dict(role='HUMAN', prompt='{prompt}')])),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer)
-)
+    inferencer=dict(type=GenInferencer))
 
 lcb_code_execution_eval_cfg = dict(
-    evaluator=dict(
-        type=LCBCodeExecutionEvaluator,
-    ),
+    evaluator=dict(type=LCBCodeExecutionEvaluator, ),
     pred_role='BOT',
 )
 
@@ -132,22 +107,12 @@ lcb_test_output_infer_cfg = dict(
             #         prompt=system_prompt
             #     ),
             # ],
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{prompt}'
-                )
-            ]
-        )
-    ),
+            round=[dict(role='HUMAN', prompt='{prompt}')])),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer)
-)
+    inferencer=dict(type=GenInferencer))
 
 lcb_test_output_eval_cfg = dict(
-    evaluator=dict(
-        type=LCBTestOutputEvaluator,
-    ),
+    evaluator=dict(type=LCBTestOutputEvaluator, ),
     pred_role='BOT',
 )
 

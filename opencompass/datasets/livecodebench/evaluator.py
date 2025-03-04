@@ -146,9 +146,12 @@ def evaluate_generations(
         with ProcessPoolExecutor(
                 max_workers=1 if debug else num_process_evaluate) as executor:
             futures = {
-                executor.submit(evaluate_generations_by_problem,
-                                problem_generations, sample, debug, timeout):
-                index
+                executor.submit(
+                    evaluate_generations_by_problem,  # noqa: E501
+                    problem_generations,
+                    sample,
+                    debug,
+                    timeout): index
                 for (problem_generations, sample, debug,
                      timeout), index in inputs
             }
@@ -273,9 +276,13 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
                 filtered_predictions.append(predictions[idx])
                 filtered_references.append(item)
 
-        filtered_references = [evaluation_samples[item] for item in filtered_references]  # noqa: E501
+        filtered_references = [
+            evaluation_samples[item] for item in filtered_references
+        ]  # noqa: E501
 
-        filtered_references = [{'input_output': item} for item in filtered_references]  # noqa: E501
+        filtered_references = [{
+            'input_output': item
+        } for item in filtered_references]  # noqa: E501
 
         extracted_predictions = {}
         for idx, content in enumerate(filtered_predictions):
