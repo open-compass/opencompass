@@ -197,11 +197,21 @@ class BigCodeBenchEvaluator(BaseEvaluator):
                 break
             except (httpx.ReadTimeout, CancelledError):
                 logger.info('Read timeout error. Retrying in 4s...')
-                time.sleep(4)
+                time.sleep(10)
 
         if 'pass@1' in pass_at_k.keys():
             pass_at_k['pass@1'] *= 100
-        dump_results = {'details': results}
+        dump_results = {'details': self._results_processor(results)}
         dump_results.update(pass_at_k)
 
         return dump_results
+
+    def _results_processor(self, results):
+        details = []
+        for key, value in results['eval'].items():
+            if value[0]['status'] == 'pass':
+                value[0]['correct'] = True
+            else:
+                value[0]['correct'] = False
+            details.append(value[0])
+        return details
