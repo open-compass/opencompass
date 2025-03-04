@@ -34,7 +34,8 @@ bigcodebench_hard_eval_cfg = dict(
         type=BigCodeBenchEvaluator,
         release_version='v0.1.2',
         eval_type='instruct',
-        remote_execute_api='https://bigcode-bigcodebench-evaluator.hf.space/',
+        # remote_execute_api='https://bigcode-bigcodebench-evaluator.hf.space/',
+        remote_execute_api='https://opencompass-opencompass-bigcodebench-evaluator.hf.space',  # noqa: E501
         dataset_version='hard',
     ),
     pred_role='BOT',
