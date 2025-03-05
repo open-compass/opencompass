@@ -38,6 +38,12 @@ opencompass  ...  -sp '/your_path' --station-overwrite
 opencompass  ...  -sp '/your_path' --read-from-station
 ```
 
+### 指令组合
+1. 仅向数据站上传最新工作目录下结果，不补充运行缺失结果的任务：
+```bash
+opencompass  ...  -sp '/your_path' -r latest -m viz
+```
+
 ## 数据站存储格式
 
 在数据站中，评测结果按照每个`model-dataset`对的结果存储为`json`文件。具体的目录组织形式为`/your_path/dataset_name/model_name.json`。每个`json`文件都存储了对应结果的字典，包括`predictions`、`results`以及`cfg`三个子项，具体示例如下：
@@ -47,8 +53,9 @@ Result = {
     'predictions': List[Dict],
     'results': Dict,
     'cfg': Dict = {
-        'model': Dict,
-        'dataset': Dict
+        'models': Dict,
+        'datasets': Dict,
+        (Only subjective datasets)'judge_models': Dict
     }
 }
 ```

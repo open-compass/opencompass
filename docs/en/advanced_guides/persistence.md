@@ -38,6 +38,12 @@ You can directly read existing results from the data station to avoid duplicate 
 opencompass  ...  -sp '/your_path' --read-from-station
 ```
 
+### Command Combination
+1. Only upload the results under your latest working directory to the data station, without supplementing tasks that missing results:
+```bash
+opencompass  ...  -sp '/your_path' -r latest -m viz
+```
+
 ## Storage Format of the Data Station
 
 In the data station, the evaluation results are stored as `json` files for each `model-dataset` pair. The specific directory form is `/your_path/dataset_name/model_name.json `. Each `json` file stores a dictionary corresponding to the results, including `predictions`, `results`, and `cfg`, here is an example:
@@ -47,8 +53,9 @@ Result = {
     'predictions': List[Dict],
     'results': Dict,
     'cfg': Dict = {
-        'model': Dict,
-        'dataset': Dict
+        'models': Dict,
+        'datasets': Dict,
+        (Only subjective datasets)'judge_models': Dict
     }
 }
 ```
