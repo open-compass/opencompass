@@ -67,6 +67,7 @@ OpenCompass 上手路线
    advanced_guides/code_eval.md
    advanced_guides/code_eval_service.md
    advanced_guides/subjective_evaluation.md
+   advanced_guides/persistence.md
 
 .. _工具:
 .. toctree::

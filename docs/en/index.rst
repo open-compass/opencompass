@@ -67,6 +67,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    advanced_guides/code_eval.md
    advanced_guides/code_eval_service.md
    advanced_guides/subjective_evaluation.md
+   advanced_guides/persistence.md
 
 .. _Tools:
 .. toctree::
