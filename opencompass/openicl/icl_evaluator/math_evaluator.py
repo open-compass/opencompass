@@ -5,9 +5,6 @@ from opencompass.registry import ICL_EVALUATORS
 @ICL_EVALUATORS.register_module()
 class MATHEvaluator(BaseEvaluator):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def score(self, predictions, references):
         try:
             from latex2sympy2_extended import NormalizationConfig
