@@ -1,4 +1,4 @@
-# Use public data stations to share and persist evaluation results
+# Evaluation Results Persistence
 
 ## Introduction
 
@@ -39,7 +39,9 @@ opencompass  ...  -sp '/your_path' --read-from-station
 ```
 
 ### Command Combination
+
 1. Only upload the results under your latest working directory to the data station, without supplementing tasks that missing results:
+
 ```bash
 opencompass  ...  -sp '/your_path' -r latest -m viz
 ```

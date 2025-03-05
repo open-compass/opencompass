@@ -1,4 +1,4 @@
-# 使用公共数据站来进行评测结果共享与持久化
+# 评测结果持久化
 
 ## 介绍
 
@@ -39,7 +39,9 @@ opencompass  ...  -sp '/your_path' --read-from-station
 ```
 
 ### 指令组合
+
 1. 仅向数据站上传最新工作目录下结果，不补充运行缺失结果的任务：
+
 ```bash
 opencompass  ...  -sp '/your_path' -r latest -m viz
 ```
