@@ -122,8 +122,8 @@ def Save_To_Station(cfg, args):
 
         dataset_list = [[
             dataset_abbr_from_cfg(dataset),
-            [dataset_abbr_from_cfg(base) for base in dataset['given_pred']]
-        ] if 'base_models' in dataset.keys() and 'eval_cfg' in dataset.keys()
+            [dataset_abbr_from_cfg(base) for base in dataset['base_models']]
+        ] if 'base_models' in dataset.keys()
                         else [dataset_abbr_from_cfg(dataset), ['']]
                         for dataset in cfg['datasets']]
 
@@ -306,8 +306,8 @@ def Read_From_Station(cfg, args):
 
         dataset_list = [[
             dataset_abbr_from_cfg(dataset),
-            [dataset_abbr_from_cfg(base) for base in dataset['given_pred']]
-        ] if 'base_models' in dataset.keys() and 'eval_cfg' in dataset.keys()
+            [dataset_abbr_from_cfg(base) for base in dataset['base_models']]
+        ] if 'base_models' in dataset.keys()
                         else [dataset_abbr_from_cfg(dataset), ['']]
                         for dataset in cfg['datasets']]
 
