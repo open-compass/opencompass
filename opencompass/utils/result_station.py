@@ -8,7 +8,7 @@ from opencompass.utils.abbr import (dataset_abbr_from_cfg,
                                     model_abbr_from_cfg)
 
 
-def Save_To_Station(cfg, args):
+def save_to_station(cfg, args):
 
     if args.station_path is not None:
         station_path = args.station_path
@@ -238,7 +238,7 @@ def Save_To_Station(cfg, args):
         return True
 
 
-def Read_From_Station(cfg, args):
+def read_from_station(cfg, args):
 
     assert args.station_path is not None or cfg.get('station_path') is not None
     if args.station_path is not None:

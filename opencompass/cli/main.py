@@ -12,8 +12,8 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import (LarkReporter, Read_From_Station,
-                               Save_To_Station, get_logger)
+from opencompass.utils import (LarkReporter, read_from_station,
+                               save_to_station, get_logger)
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 
@@ -65,8 +65,7 @@ def parse_args():
                         help='Running mode. You can choose "infer" if you '
                         'only want the inference results, or "eval" if you '
                         'already have the results and want to evaluate them, '
-                        'or "viz" if you want to visualize the results,'
-                        'or "rs" if you want to search results from your station.',
+                        'or "viz" if you want to visualize the results.',
                         choices=['all', 'infer', 'eval', 'viz'],
                         default='all',
                         type=str)
@@ -287,7 +286,7 @@ def main():
 
     # get existed results from station
     if args.read_from_station:
-        existing_results_list = Read_From_Station(cfg, args)
+        existing_results_list = read_from_station(cfg, args)
         rs_exist_results = [comb['combination'] for comb in existing_results_list]
         cfg['rs_exist_results'] = rs_exist_results
 
@@ -382,7 +381,7 @@ def main():
 
     # save to station
     if args.station_path is not None or cfg.get('station_path') is not None:
-        Save_To_Station(cfg, args)
+        save_to_station(cfg, args)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
