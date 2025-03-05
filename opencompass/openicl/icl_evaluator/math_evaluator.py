@@ -1,4 +1,3 @@
-# flake8: noqa: E501
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
 
@@ -15,9 +14,9 @@ class MATHEvaluator(BaseEvaluator):
             from math_verify import (ExprExtractionConfig,
                                      LatexExtractionConfig, parse, verify)
         except ImportError:
-            raise ImportError(
-                'Failed to import required modules. Please install the necessary packages: '
-                'pip install math_verify latex2sympy2_extended')
+            raise ImportError('Failed to import required modules. Please '
+                              'install the necessary packages: '
+                              'pip install math_verify latex2sympy2_extended')
 
         self.is_num_equal(predictions, references)
 
