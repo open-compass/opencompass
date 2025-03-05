@@ -67,7 +67,7 @@ def parse_args():
                         'already have the results and want to evaluate them, '
                         'or "viz" if you want to visualize the results,'
                         'or "rs" if you want to search results from your station.',
-                        choices=['all', 'infer', 'eval', 'viz', 'rs'],
+                        choices=['all', 'infer', 'eval', 'viz'],
                         default='all',
                         type=str)
     parser.add_argument('-r',
