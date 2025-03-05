@@ -12,8 +12,8 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import (LarkReporter, read_from_station,
-                               save_to_station, get_logger)
+from opencompass.utils import (LarkReporter, get_logger, read_from_station,
+                               save_to_station)
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 

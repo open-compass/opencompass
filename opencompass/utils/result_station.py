@@ -123,8 +123,8 @@ def save_to_station(cfg, args):
         dataset_list = [[
             dataset_abbr_from_cfg(dataset),
             [dataset_abbr_from_cfg(base) for base in dataset['base_models']]
-        ] if 'base_models' in dataset.keys()
-                        else [dataset_abbr_from_cfg(dataset), ['']]
+        ] if 'base_models' in dataset.keys() else
+                        [dataset_abbr_from_cfg(dataset), ['']]
                         for dataset in cfg['datasets']]
 
         rs_exist_results = []
@@ -307,8 +307,8 @@ def read_from_station(cfg, args):
         dataset_list = [[
             dataset_abbr_from_cfg(dataset),
             [dataset_abbr_from_cfg(base) for base in dataset['base_models']]
-        ] if 'base_models' in dataset.keys()
-                        else [dataset_abbr_from_cfg(dataset), ['']]
+        ] if 'base_models' in dataset.keys() else
+                        [dataset_abbr_from_cfg(dataset), ['']]
                         for dataset in cfg['datasets']]
 
         existing_results_list = []
