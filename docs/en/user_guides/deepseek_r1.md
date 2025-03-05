@@ -12,7 +12,7 @@ Please follow OpenCompass's installation guide.
 
 ## Evaluation Configuration Setup
 
-We provide example configurations in `example/eval_deepseek_r1.py`. Below is the configuration explanation:
+We provide example configurations in `examples/eval_deepseek_r1.py`. Below is the configuration explanation:
 
 ### Configuration Interpretation
 
@@ -116,7 +116,7 @@ work_dir = "outputs/deepseek_r1_reasoning"
 ### Scenario 1: Model loaded on 1 GPU, data evaluated by 1 worker, using a total of 1 GPU
 
 ```bash
-opencompass example/eval_deepseek_r1.py --debug --dump-eval-details
+opencompass examples/eval_deepseek_r1.py --debug --dump-eval-details
 ```
 
 Evaluation logs will be output in the command line.
@@ -135,7 +135,7 @@ infer = dict(
 At the same time, remove the `--debug` parameter from the evaluation command
 
 ```bash
-opencompass example/eval_deepseek_r1.py --dump-eval-details
+opencompass examples/eval_deepseek_r1.py --dump-eval-details
 ```
 
 In this mode, OpenCompass will use multithreading to start `$num_worker` tasks. Specific logs will not be displayed in the command line, instead, detailed evaluation logs will be shown under `$work_dir`.
