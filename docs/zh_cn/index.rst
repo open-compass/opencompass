@@ -69,7 +69,7 @@ OpenCompass 上手路线
    advanced_guides/subjective_evaluation.md
    advanced_guides/persistence.md
 
-.. _工具:e
+.. _工具:
 .. toctree::
    :maxdepth: 1
    :caption: 工具
