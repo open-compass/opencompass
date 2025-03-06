@@ -146,9 +146,12 @@ def evaluate_generations(
         with ProcessPoolExecutor(
                 max_workers=1 if debug else num_process_evaluate) as executor:
             futures = {
-                executor.submit(evaluate_generations_by_problem,
-                                problem_generations, sample, debug, timeout):
-                index
+                executor.submit(
+                    evaluate_generations_by_problem,  # noqa: E501
+                    problem_generations,
+                    sample,
+                    debug,
+                    timeout): index
                 for (problem_generations, sample, debug,
                      timeout), index in inputs
             }
@@ -233,15 +236,27 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
                  num_process_evaluate,
                  timeout=6,
                  release_version='release_v1',
-                 extractor_version='v1'):
+                 extractor_version='v1',
+                 start_date=None,
+                 end_date=None):
         super().__init__()
         self.num_process_evaluate = num_process_evaluate
         self.timeout = timeout
         self.dataset = LCBCodeGenerationDataset.load(
-            release_version=release_version)['test']
+            release_version=release_version,
+            start_date=start_date,
+            end_date=end_date)['test']
         self.extractor_version = extractor_version
 
     def score(self, predictions, references):
+        if len(predictions) != len(references):
+            return {
+                'error':
+                'predictions and references have different '
+                f'length. len(predictions): {len(predictions)}, '
+                f'len(references): {len(references)}'
+            }
+
         if self.extractor_version == 'v1':
             predictions = [[extract_code_generation(item)]
                            for item in predictions]
@@ -254,19 +269,28 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
             evaluation_samples[self.dataset[idx][
                 'question_id']] = self.dataset[idx]['evaluation_sample']
 
-        references = [evaluation_samples[item] for item in references]
+        filtered_predictions = []
+        filtered_references = []
+        for idx, item in enumerate(references):
+            if item in self.dataset['question_id']:
+                filtered_predictions.append(predictions[idx])
+                filtered_references.append(item)
 
-        references = [{'input_output': item} for item in references]
+        filtered_references = [
+            evaluation_samples[item] for item in filtered_references
+        ]  # noqa: E501
 
-        BaseEvaluator.is_num_equal(predictions, references)
+        filtered_references = [{
+            'input_output': item
+        } for item in filtered_references]  # noqa: E501
 
         extracted_predictions = {}
-        for idx, content in enumerate(predictions):
+        for idx, content in enumerate(filtered_predictions):
             extracted_predictions[idx] = content
 
         metrics, eval_results, final_metadata = codegen_metrics(
-            references,
-            predictions,
+            filtered_references,
+            filtered_predictions,
             k_list=[1],
             num_process_evaluate=self.num_process_evaluate,
             timeout=self.timeout,

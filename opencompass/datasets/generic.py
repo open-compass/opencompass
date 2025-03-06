@@ -1,5 +1,7 @@
 import re
 
+from opencompass.utils import get_logger
+
 
 def get_final_results(judged_answers,
                       references,
@@ -68,7 +70,13 @@ def generic_llmjudge_postprocess(
         processed_judge = _generic_llmjudge_postprocess(v['prediction'])
         if processed_judge is not None:
             judged_answers.append(processed_judge)
-            references.append(v['gold'])
+            try:
+                references.append(v['gold'])
+
+            except KeyError:
+                get_logger().warning(
+                    f'No gold answer for {k}, use empty string as reference!')
+                references.append('')
     results = get_final_results(judged_answers, references, origial_responses)
     results['details'] = output
     return results

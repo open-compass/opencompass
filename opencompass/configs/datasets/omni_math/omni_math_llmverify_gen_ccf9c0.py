@@ -1,30 +1,29 @@
-# CoT: No CoT
-# K-Shot: 0-Shot
-# Verify: LLM Verify
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import MATHDataset
+from opencompass.datasets.omni_math import OmniMathDataset
 
 
-# ----------------------------- Detailed Config -----------------------------
+omnimath_reader_cfg = dict(
+    input_columns=['problem'], 
+    output_column='answer'
+)
 
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
-math_infer_cfg = dict(
+omnimath_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt='{problem}\nRemember to put your final answer within \\boxed{}.'),
+                dict(role='HUMAN', prompt='please answer the following mathematical question, put your final answer in \\boxed{}.\n\n{problem}'),
             ]
-        ),
+        )
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+    inferencer=dict(type=GenInferencer)
 )
+
 
 
 GRADER_TEMPLATE = """
@@ -46,14 +45,13 @@ GRADER_TEMPLATE = """
 
 
     <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{solution}\n<Gold Target End>\n\n
+    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     
     Judging the correctness of candidates' answers:
 """.strip()
 
-# Evaluation configuration
-math_eval_cfg = dict(
+omnimath_eval_cfg = dict(
     evaluator=dict(
         type=GenericLLMEvaluator,
         prompt_template=dict(
@@ -73,28 +71,19 @@ math_eval_cfg = dict(
             ]),
         ),
         dataset_cfg=dict(
-            type=MATHDataset,
-            path='opencompass/math',
-            file_name = 'test_prm800k_500.json',
-            reader_cfg=math_reader_cfg,
+            type=OmniMathDataset,
+            reader_cfg=omnimath_reader_cfg,
         ),
         judge_cfg=dict(),
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
-    pred_role='BOT',
 )
-
-
-math_datasets = [
+omnimath_datasets = [
     dict(
-        type=MATHDataset,
-        abbr=f'math_prm800k_500-llmverify-run{idx}',
-        path='opencompass/math',
-        file_name = 'test_prm800k_500.json',
-        reader_cfg=math_reader_cfg,
-        infer_cfg=math_infer_cfg,
-        eval_cfg=math_eval_cfg,
-        mode='singlescore',
+        type=OmniMathDataset,
+        abbr='OmniMath',
+        reader_cfg=omnimath_reader_cfg,
+        infer_cfg=omnimath_infer_cfg,
+        eval_cfg=omnimath_eval_cfg
     )
-    for idx in range(4)
 ]
