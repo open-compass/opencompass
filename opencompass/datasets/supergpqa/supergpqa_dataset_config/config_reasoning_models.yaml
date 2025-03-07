@@ -1,0 +1,17 @@
+response_key: 'response'
+error_key: 'error'
+id_key:
+  - 'uuid'
+prompt_key: 'prompt'
+
+
+
+history_key: 'history'
+status_key: 'status'
+
+save_prompt: True
+max_tokens: 32768
+temperatrue: 0.0
+
+max_rounds: 30
+BoN: 32
