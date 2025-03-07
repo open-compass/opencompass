@@ -1,31 +1,26 @@
-# CoT: No CoT
-# K-Shot: 0-Shot
-# Verify: LLM Verify
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import MATHDataset
-
+from opencompass.datasets import HLEDataset
 
 # ----------------------------- Detailed Config -----------------------------
 
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
+math_reader_cfg = dict(input_columns=['problem'], output_column='answer')
 
 math_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt='{problem}\nRemember to put your final answer within \\boxed{}.'),
+                dict(role='HUMAN', prompt='{problem}\nRemember to put your final answer within \\boxed{}.'), 
             ]
         ),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
 )
-
 
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
@@ -46,7 +41,7 @@ GRADER_TEMPLATE = """
 
 
     <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{solution}\n<Gold Target End>\n\n
+    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     
     Judging the correctness of candidates' answers:
@@ -73,9 +68,8 @@ math_eval_cfg = dict(
             ]),
         ),
         dataset_cfg=dict(
-            type=MATHDataset,
-            path='opencompass/math',
-            file_name = 'test_prm800k_500.json',
+            type=HLEDataset,
+            path='cais/hle',
             reader_cfg=math_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -85,16 +79,13 @@ math_eval_cfg = dict(
 )
 
 
-math_datasets = [
+hle_datasets = [
     dict(
-        type=MATHDataset,
-        abbr=f'math_prm800k_500-llmverify-run{idx}',
-        path='opencompass/math',
-        file_name = 'test_prm800k_500.json',
+        type=HLEDataset,
+        abbr='hle_llmjudge',
+        path='cais/hle',
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg,
-        mode='singlescore',
     )
-    for idx in range(4)
 ]

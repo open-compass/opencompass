@@ -12,7 +12,8 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import LarkReporter, get_logger
+from opencompass.utils import (LarkReporter, get_logger, read_from_station,
+                               save_to_station)
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 
@@ -127,6 +128,27 @@ def parse_args():
         'correctness of each sample, bpb, etc.',
         action='store_true',
     )
+
+    parser.add_argument('-sp',
+        '--station-path',
+        help='Path to your results station.',
+        type=str,
+        default=None,
+    )
+
+    parser.add_argument('--station-overwrite',
+        help='Whether to overwrite the results at station.',
+        action='store_true',
+    )
+
+    parser.add_argument(
+        '--read-from-station',
+        help='Whether to save the evaluation results to the '
+             'data station.',
+        action='store_true',
+    )
+
+
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -260,6 +282,12 @@ def main():
     # types cannot be serialized
     cfg = Config.fromfile(output_config_path, format_python_code=False)
 
+    # get existed results from station
+    if args.read_from_station:
+        existing_results_list = read_from_station(cfg, args)
+        rs_exist_results = [comb['combination'] for comb in existing_results_list]
+        cfg['rs_exist_results'] = rs_exist_results
+
     # report to lark bot if specify --lark
     if not args.lark:
         cfg['lark_bot_url'] = None
@@ -267,6 +295,7 @@ def main():
         content = f'{getpass.getuser()}\'s task has been launched!'
         LarkReporter(cfg['lark_bot_url']).post(content)
 
+    # infer
     if args.mode in ['all', 'infer']:
         # When user have specified --slurm or --dlc, or have not set
         # "infer" in config, we will provide a default configuration
@@ -347,6 +376,10 @@ def main():
                 runner(task_part)
         else:
             runner(tasks)
+
+    # save to station
+    if args.station_path is not None or cfg.get('station_path') is not None:
+        save_to_station(cfg, args)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
