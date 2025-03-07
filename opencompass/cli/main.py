@@ -265,7 +265,8 @@ def main():
         logger.info(f'Reusing experiements from {dir_time_str}')
     elif args.mode in ['eval', 'viz'] and not args.read_from_station:
         raise ValueError(
-            'You must specify -r or --reuse, or you have to specify --read-from-station and --station-path when running in eval '
+            'You must specify -r or --reuse, or you have to specify '
+            '--read-from-station and --station-path when running in eval '
             'or viz mode!')
 
     # update "actual" work_dir
