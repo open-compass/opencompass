@@ -31,6 +31,7 @@ from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
 from .cmo_fib import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
+from .codereval import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .commonsenseqa_cn import *  # noqa: F401, F403
 from .copa import *  # noqa: F401, F403
