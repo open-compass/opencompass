@@ -286,7 +286,9 @@ class MiniMaxChatCompletionV2(BaseAPIModel):
         data = {
             'model': self.model,
             'messages': messages,
-            'max_tokens': max_out_len
+            'max_tokens': max_out_len,
+            'temperature ': 0.6,
+            'top_p': 0.95,
         }
 
         max_num_retries = 0
