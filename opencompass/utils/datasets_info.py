@@ -33,6 +33,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/bbh",
         "local": "./data/BBH/data",
     },
+    # bbeh
+    "opencompass/bbeh": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/bbeh/",
+    },
     # C-Eval
     "opencompass/ceval-exam": {
         "ms_id": "opencompass/ceval-exam",
@@ -690,6 +696,10 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/korbench.zip",
         "md5": "9107597d137e7362eaf7d218ddef7a6d",
+    },
+    "/bbeh": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bbeh.zip",
+        "md5": "43a3c2d73aee731ac68ac790bc9a358e",
     },
     "subjective/judgerbench": {
         "url":

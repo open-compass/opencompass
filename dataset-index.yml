@@ -234,6 +234,11 @@
     category: Reasoning
     paper: https://arxiv.org/pdf/2210.09261
     configpath: opencompass/configs/datasets/bbh
+- bbeh:
+    name: BIG-Bench Extra Hard
+    category: Reasoning
+    paper: https://arxiv.org/abs/2502.19187
+    configpath: opencompass/configs/datasets/bbeh
 - BoolQ:
     name: SuperGLUE / BoolQ
     category: Knowledge
