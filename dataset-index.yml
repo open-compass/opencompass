@@ -237,6 +237,11 @@
 - bbeh:
     name: BIG-Bench Extra Hard
     category: Reasoning
+    paper:https://arxiv.org/abs/2502.19187
+    configpath: opencompass/configs/datasets/bbeh
+- bbeh:
+    name: BIG-Bench Extra Hard
+    category: Reasoning
     paper: https://arxiv.org/abs/2502.19187
     configpath: opencompass/configs/datasets/bbeh
 - BoolQ:
