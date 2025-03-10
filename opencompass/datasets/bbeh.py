@@ -15,6 +15,7 @@ from .base import BaseDataset
 
 @LOAD_DATASET.register_module()
 class BBEHDataset(BaseDataset):
+
     @staticmethod
     def load(path: str, name: str):
         path = get_data_path(path)
@@ -32,9 +33,7 @@ class BBEHDataset(BaseDataset):
 def bbeh_freeform_postprocess(text: str) -> str:
     # Extract answer using specified prefixes
     prefixes = [
-        'The answer is: ',
-        'The answer is ',
-        'The final answer is: ',
+        'The answer is: ', 'The answer is ', 'The final answer is: ',
         'The final answer is '
     ]
     answer = text
@@ -62,9 +61,7 @@ def bbeh_freeform_postprocess(text: str) -> str:
 def bbeh_mcq_postprocess(text: str) -> str:
     # Extract answer using specified prefixes
     prefixes = [
-        'The answer is: ',
-        'The answer is ',
-        'The final answer is: ',
+        'The answer is: ', 'The answer is ', 'The final answer is: ',
         'The final answer is '
     ]
     answer = text
@@ -85,12 +82,16 @@ def bbeh_mcq_postprocess(text: str) -> str:
 
 @ICL_EVALUATORS.register_module()
 class BBEHEvaluator(BaseEvaluator):
+
     def score(self, predictions, references):
         if len(predictions) != len(references):
-            return {'error': 'predictions and references have different length'}
+            return {
+                'error': 'predictions and references have different length'
+            }
 
         processed_preds = [bbeh_freeform_postprocess(p) for p in predictions]
-        processed_refs = [r.lower() for r in references]  # References are already in correct format
+        # References are already in correct format
+        processed_refs = [r.lower() for r in references]
 
         details = []
         correct_count = 0
@@ -111,11 +112,7 @@ class BBEHEvaluator(BaseEvaluator):
                 if norm_pred == norm_ref:
                     correct = True
 
-            details.append({
-                'pred': pred,
-                'answer': ref,
-                'correct': correct
-            })
+            details.append({'pred': pred, 'answer': ref, 'correct': correct})
             correct_count += int(correct)
 
         score = (correct_count / len(predictions)) * 100
@@ -124,12 +121,16 @@ class BBEHEvaluator(BaseEvaluator):
 
 @ICL_EVALUATORS.register_module()
 class BBEHEvaluator_mcq(BaseEvaluator):
+
     def score(self, predictions, references):
         if len(predictions) != len(references):
-            return {'error': 'predictions and references have different length'}
+            return {
+                'error': 'predictions and references have different length'
+            }
 
         processed_preds = [bbeh_mcq_postprocess(p) for p in predictions]
-        processed_refs = [r.lower().strip('()') for r in references]  # References are already in correct format
+        # References are already in correct format
+        processed_refs = [r.lower().strip('()') for r in references]
 
         details = []
         correct_count = 0
@@ -141,11 +142,7 @@ class BBEHEvaluator_mcq(BaseEvaluator):
             if pred == ref:
                 correct = True
 
-            details.append({
-                'pred': pred,
-                'answer': ref,
-                'correct': correct
-            })
+            details.append({'pred': pred, 'answer': ref, 'correct': correct})
             correct_count += int(correct)
 
         score = (correct_count / len(predictions)) * 100
