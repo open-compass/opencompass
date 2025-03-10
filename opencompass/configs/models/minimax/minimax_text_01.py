@@ -7,7 +7,7 @@ api_meta_template = dict(
     ],
 )
 
-minimax_text_01 = [
+models = [
     dict(abbr='MiniMax-Text-01',
          type=MiniMaxChatCompletionV2,
          path='MiniMax-Text-01',
