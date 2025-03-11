@@ -144,7 +144,7 @@ class SuperGPQAEvaluator(BaseEvaluator):
                     sample['status'] = 'correct'
                     stats[level][key]['correct'] += 1
                     stats[level][key]['difficulty'][difficulty]['correct'] += 1
-                elif predict == None or predict == '':
+                elif predict is None or predict == '':
                     miss += 1
                     sample['status'] = 'miss'
                     stats[level][key]['miss'] += 1
