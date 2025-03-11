@@ -127,6 +127,7 @@ from .strategyqa import *  # noqa: F401, F403
 from .subjective import *  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
+from .supergpqa import *  # noqa: F401, F403
 from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
 from .taco import *  # noqa: F401, F403
