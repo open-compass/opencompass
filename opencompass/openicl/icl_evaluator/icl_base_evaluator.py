@@ -188,8 +188,6 @@ class BaseEvaluator:
 
                 # Remove the original predictions field
                 detail.pop('predictions')
-            import ipdb
-            ipdb.set_trace()
             return eval_results
 
         # If there are no details, return an empty dictionary
