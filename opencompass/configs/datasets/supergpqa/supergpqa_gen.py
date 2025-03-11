@@ -11,13 +11,13 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 reader_cfg = dict(
     input_columns=[
         'question',
-        "options",
+        'options',
         'discipline',
         'field',
         'subfield',
         'difficulty',
-        "infer_prompt",
-        "prompt_mode",
+        'infer_prompt',
+        'prompt_mode',
     ],
     output_column='answer_letter',
 )
@@ -47,7 +47,7 @@ eval_cfg = dict(
 supergpqa_dataset = dict(
     type=SuperGPQADataset,
     abbr='supergpqa',
-    path="m-a-p/SuperGPQA",
+    path='m-a-p/SuperGPQA',
     prompt_mode='zero-shot',
     reader_cfg=reader_cfg,
     infer_cfg=infer_cfg,

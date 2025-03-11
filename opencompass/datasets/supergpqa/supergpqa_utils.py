@@ -6,6 +6,7 @@ import sympy as sp
 import yaml
 from sympy.parsing.latex import parse_latex
 
+
 def load_yaml(yaml_path):
     """Load a YAML file."""
     if not os.path.exists(yaml_path):
@@ -670,8 +671,7 @@ def evaluate_responses(data, mode, base_path=None):
         answer = record.get('gold', '')
         rule_id = record.get('rule_id', '')
         is_correct = evaluate_response_vs_answer(response, answer,
-                                                    question_type, rule_id,
-                                                    idx)
+                                                 question_type, rule_id, idx)
         result_dict = {
             'idx': idx,
             'response': response,
@@ -681,8 +681,10 @@ def evaluate_responses(data, mode, base_path=None):
         }
         if question_type == 'counterfactual':
             real_life_answer = record.get('real_life_answer', '')
-            is_real_life = evaluate_response_vs_answer(
-                response, real_life_answer, question_type, rule_id, idx)
+            is_real_life = evaluate_response_vs_answer(response,
+                                                       real_life_answer,
+                                                       question_type, rule_id,
+                                                       idx)
             result_dict['real_life_answer'] = real_life_answer
             result_dict['is_real_life'] = is_real_life
         if question_type == 'cipher' and mode == 'subquestions':
