@@ -403,11 +403,6 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/OlympiadBench",
     },
-    "opencompass/supergpqa": {
-        "ms_id": "",
-        "hf_id": "m-a-p/SuperGPQA",
-        "local": "./data/supergpqa",
-    },
 }
 
 DATASETS_URL = {
