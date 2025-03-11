@@ -734,6 +734,8 @@
     category: Understanding
     paper: https://arxiv.org/pdf/1808.08745
     configpath: opencompass/configs/datasets/Xsum
-
-
-
+- supergpqa:
+    name: SuperGPQA
+    category: Knowledge
+    paper: https://arxiv.org/pdf/2502.14739
+    configpath: opencompass/configs/datasets/supergpqa
