@@ -210,7 +210,7 @@ def save_to_station(cfg, args):
                                 i for i in cfg['judge_models']
                                 if 'judged-by--' + model_abbr_from_cfg(i) ==
                                 model_abbr_from_cfg(model_pair[1])
-                            ]
+                            ][0]
 
                             this_cfg = {
                                 'models': model_cfg,
