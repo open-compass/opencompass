@@ -1,4 +1,5 @@
 """Base Evaluator."""
+
 from collections import OrderedDict
 from copy import deepcopy
 from typing import Any, Dict, Iterable, List, Union
@@ -46,8 +47,9 @@ class BaseEvaluator:
         # please see opencompass/opencompass/tasks/openicl_eval.py Line 197-200
         return self._out_dir
 
-    def group(self, n: int, details: List[Dict[str, Any]],
-              test_set: Dataset) -> Dict[str, Any]:
+    def group(
+        self, n: int, details: List[Dict[str, Any]], test_set: Dataset
+    ) -> Dict[str, Any]:
         example2replications = {}
         for detail, example in zip(details, test_set):
             example_abbr = f"{example['subdivision']}_{example['idx']}"
@@ -62,27 +64,37 @@ class BaseEvaluator:
     def reduce(self, details: List[Dict[str, Any]]) -> Dict[str, Any]:
         g_passk_details = OrderedDict()
         all_subdivisions = set(
-            [detail['example_abbr'].split('_')[0] for detail in details])
+            [detail['example_abbr'].split('_')[0] for detail in details]
+        )
         all_metrics = list(details[0].keys())
 
         for subdivision in sorted(list(all_subdivisions)):
             for metric in all_metrics:
                 if metric in ['predictions', 'example_abbr']:
                     continue
-                g_passk_details[f'{subdivision}/{metric}'] = 100 * np.mean([
-                    detail[metric] for detail in details
-                    if detail['example_abbr'].split('_')[0] == subdivision
-                ])
+                g_passk_details[f'{subdivision}/{metric}'] = 100 * np.mean(
+                    [
+                        detail[metric]
+                        for detail in details
+                        if detail['example_abbr'].split('_')[0] == subdivision
+                    ]
+                )
 
         for metric in all_metrics:
             if metric in ['predictions', 'example_abbr']:
                 continue
-            g_passk_details[metric] = 100. * np.mean(
-                [detail[metric] for detail in details])
+            g_passk_details[metric] = 100.0 * np.mean(
+                [detail[metric] for detail in details]
+            )
         return g_passk_details
 
-    def evaluate(self, k: Union[int, List[int]], n: int,
-                 original_dataset: Dataset, **score_kwargs):
+    def evaluate(
+        self,
+        k: Union[int, List[int]],
+        n: int,
+        original_dataset: Dataset,
+        **score_kwargs,
+    ):
         real_size = len(original_dataset) // n
         all_details = []
         all_results = []
@@ -92,7 +104,7 @@ class BaseEvaluator:
                 if isinstance(x, Dataset):
                     return x.select(range(i * real_size, (i + 1) * real_size))
                 elif isinstance(x, Iterable):
-                    return x[i * real_size:(i + 1) * real_size]
+                    return x[i * real_size : (i + 1) * real_size]
                 else:
                     return x
 
@@ -100,7 +112,8 @@ class BaseEvaluator:
                 **{
                     key: select_fn(i, real_size, value)
                     for key, value in score_kwargs.items()
-                })
+                }
+            )
             details = results.pop('details', None)
             if details is not None:
                 if isinstance(details, Dict):
@@ -116,10 +129,12 @@ class BaseEvaluator:
                 eval_results[key].append(single_results[key])
         for key in deepcopy(eval_results):
             if isinstance(eval_results[key][0], float) or isinstance(
-                    eval_results[key][0], int):
+                eval_results[key][0], int
+            ):
                 if n > 1:
                     eval_results[key + f' ({n} runs average)'] = np.mean(
-                        eval_results[key])
+                        eval_results[key]
+                    )
                     eval_results.pop(key)
                 else:
                     eval_results[key] = np.mean(eval_results[key])
@@ -146,24 +161,46 @@ class BaseEvaluator:
 
                 if can_calculate and n > 1 and k > 1:
                     thresholds = [0.0, 0.25, 0.5, 0.75, 1.0]
-                    for _k in ([k] if isinstance(k, int) else k):
+                    for _k in [k] if isinstance(k, int) else k:
                         for threshold in thresholds:
-                            g_pass = compute_g_pass_at_k(n=n,
-                                                         c=c,
-                                                         k=_k,
-                                                         t=threshold)
+                            g_pass = compute_g_pass_at_k(
+                                n=n, c=c, k=_k, t=threshold
+                            )
                             detail[f'G-Pass@{_k}_{threshold}'] = g_pass
-                        detail[f'mG-Pass@{_k}'] = compute_mg_pass_at_k(n=n,
-                                                                       c=c,
-                                                                       k=_k)
+                        detail[f'mG-Pass@{_k}'] = compute_mg_pass_at_k(
+                            n=n, c=c, k=_k
+                        )
 
                 eval_details.append(detail)
 
             if can_calculate and n > 1 and k > 1:
                 eval_results.update(self.reduce(eval_details))
+            
+            # Store eval_details in eval_results
             eval_results['details'] = eval_details
-
-        return eval_results
+            
+            # Process details to flatten the predictions
+            for detail in eval_details:
+                # Extract all prediction fields and flatten them
+                flattened_predictions = {}
+                for pred in detail['predictions']:
+                    for k, v in pred.items():
+                        if k not in flattened_predictions:
+                            flattened_predictions[k] = [v]
+                        else:
+                            flattened_predictions[k].append(v)
+                
+                # Replace the predictions list with the flattened dictionary
+                for k, v in flattened_predictions.items():
+                    detail[k] = v
+                
+                # Remove the original predictions field
+                detail.pop('predictions')
+            import ipdb; ipdb.set_trace()
+            return eval_results
+        
+        # If there are no details, return an empty dictionary
+        return {}
 
     def score(self):
         raise NotImplementedError("Method hasn't been implemented yet")
