@@ -174,7 +174,8 @@ Answer (Yes or No ?):""",
 
 def get_prompt(task_name, prompt_style, item, prompt_style_str=''):
     base = base_prompt_dict[prompt_style]
-
+    if item['bi_edges'] == []:
+        item['bi_edges'] = ""
     prompt = prompt_style_str + base % (item['di_edges'], item['bi_edges'],
                                         item['treatment'], item['outcome'])
     return prompt
