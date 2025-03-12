@@ -51,6 +51,13 @@ def get_capability_results(
             count = c[judge]
             col_name.append(dim + ' ' + judge)
             column.append(round(count / dim_count, 4))
+
+        col_name.append(dim + ' correct given attempted')
+        column.append(round(c['correct'] / (c['correct'] + c['incorrect']), 4))
+
+        col_name.append(dim + ' F-Score')
+        column.append(round((2 * c['correct']) / (2 * (c['correct'] + c['incorrect']) + c['not_attempted']),4))
+
         col_name.append(dim + ' count')
         column.append(dim_count)
 
