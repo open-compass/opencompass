@@ -1,36 +1,20 @@
-from mmengine.config import read_base
+from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
+from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import DropOpenAIDataset, DropOpenAIEvaluator, generic_llmjudge_postprocess
 from opencompass.evaluator import GenericLLMEvaluator
+from opencompass.datasets import generic_llmjudge_postprocess
 
-with read_base():
-    from .drop_examples import drop_examples  # noqa: F401, F403
-
-drop_reader_cfg = dict(
-    input_columns=['prompt'],
-    output_column='answers',
-    train_split='validation',
-    test_split='validation',
-)
-
-template = f'You will be asked to read a passage and answer a question. Some examples of passages and Q&A are provided below.\n\n{drop_examples}\n\n# Your Task\n\n---\n{{prompt}}\n\nThink step by step, then write a line of the form "Answer: $ANSWER" at the end of your response.'
-
-drop_infer_cfg = dict(
-    prompt_template=dict(type=PromptTemplate, template=dict(round=[dict(role='HUMAN', prompt=template)])),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer))
+categories = ['cipher', 'counterfactual', 'logic', 'operation', 'puzzle']
 
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
-    
+
     Here are some evaluation criteria:
     1. Please refer to the given standard answer. You don't need to re-generate the answer to the question because the standard answer has been given. You only need to judge whether the candidate's answer is consistent with the standard answer according to the form of the question. Don't try to answer the original question. You can assume that the standard answer is definitely correct.
     2. Because the candidate's answer may be different from the standard answer in the form of expression, before making a judgment, please understand the question and the standard answer first, and then judge whether the candidate's answer is correct, but be careful not to try to answer the original question.
     3. Some answers may contain multiple items, such as multiple-choice questions, multiple-select questions, fill-in-the-blank questions, etc. As long as the answer is the same as the standard answer, it is enough. For multiple-select questions and multiple-blank fill-in-the-blank questions, the candidate needs to answer all the corresponding options or blanks correctly to be considered correct.
     4. Some answers may be expressed in different ways, such as some answers may be a mathematical expression, some answers may be a textual description, as long as the meaning expressed is the same. And some formulas are expressed in different ways, but they are equivalent and correct.
-    5. If the prediction is given with \\boxed{}, please ignore the \\boxed{} and only judge whether the candidate's answer is consistent with the standard answer.
 
     Please judge whether the following answers are consistent with the standard answer based on the above criteria. Grade the predicted answer of this new question as one of:
     A: CORRECT 
@@ -39,7 +23,6 @@ GRADER_TEMPLATE = """
 
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
-
     <Original Question Begin>: {question}\n {options_str} \n<Original Question End>\n\n
     <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
@@ -47,43 +30,84 @@ GRADER_TEMPLATE = """
 """.strip()
 
 
-drop_eval_cfg = dict(
-    evaluator=dict(
-        type=GenericLLMEvaluator,
-        prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
+
+korbench_0shot_single_datasets = []
+
+for category in categories:
+    # Prompt template
+    prompt_template = dict(
+        type=PromptTemplate,
+        template=dict(
             begin=[
                 dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                    role='HUMAN',
+                    prompt=''
+                )
             ],
-                round=[
+            round=[
                 dict(
                     role='HUMAN',
-                    prompt = GRADER_TEMPLATE
-                ),
-            ]),
-        ),
-        dataset_cfg=dict(
-            type=DropOpenAIDataset,
-            path='data/drop_simple_eval/dev.jsonl',
-            reader_cfg=drop_reader_cfg,
-        ),
-        judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-    ),
-    pred_role='BOT',
-)
+                    prompt='{prompt}' # f-string
+                )
+            ]
+        )
+    )
 
+    # Reader configuration
+    reader_cfg = dict(
+        input_columns=['prompt'],
+        output_column='answer',
+    )
 
-drop_datasets = [
-    dict(
-        abbr='drop',
-        type=DropOpenAIDataset,
-        path='data/drop_simple_eval/dev.jsonl',
-        reader_cfg=drop_reader_cfg,
-        infer_cfg=drop_infer_cfg,
-        eval_cfg=drop_eval_cfg)
-]
+    # Inference configuration
+    infer_cfg = dict(
+        prompt_template=prompt_template,
+        retriever=dict(type=ZeroRetriever),
+        inferencer=dict(type=GenInferencer, max_out_len=1024),
+    )
+
+    # Evaluation configuration
+    eval_cfg = dict(
+        evaluator=dict(
+            type=GenericLLMEvaluator,
+            prompt_template=dict(
+                type=PromptTemplate,
+                template=dict(
+                    begin=[
+                        dict(
+                            role='SYSTEM',
+                            fallback_role='HUMAN',
+                            prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                    ],
+                    round=[
+                        dict(
+                            role='HUMAN',
+                            prompt=GRADER_TEMPLATE
+                        ),
+                    ]),
+            ),
+            dataset_cfg=dict(
+                type=korbenchDataset,
+                path='opencompass/korbench',
+                reader_cfg=reader_cfg,
+                prompt_mode='0_shot',
+                category=category,
+            ),
+            judge_cfg=dict(),
+            dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+        ),
+        pred_role='BOT',
+    )
+
+    korbench_dataset = dict(
+        type=korbenchDataset,
+        abbr=f'korbench_{category}',
+        path='opencompass/korbench',
+        prompt_mode='0_shot',
+        category=category,
+        reader_cfg=reader_cfg,
+        infer_cfg=infer_cfg,
+        eval_cfg=eval_cfg,
+    )
+
+    korbench_0shot_single_datasets.append(korbench_dataset)
