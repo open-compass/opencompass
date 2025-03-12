@@ -3,7 +3,7 @@ from mmengine.config import read_base
 with read_base():
     from opencompass.configs.datasets.OpenHuEval.HuLifeQA import (
         hu_life_qa_datasets,
-        task_group_new,
+        TASK_GROUP_NEW,
     )
 
     from opencompass.configs.models.openai.gpt_4o_mini_20240718 import models as gpt_4o_mini_20240718_model
@@ -119,7 +119,7 @@ eval = dict(
 
 summarizer = dict(
     type=WildBenchSingleSummarizer,
-    customized_task_group_new=task_group_new,
+    customized_task_group_new=TASK_GROUP_NEW,
 )
 
 work_dir = (

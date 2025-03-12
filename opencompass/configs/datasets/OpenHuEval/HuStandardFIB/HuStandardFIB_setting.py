@@ -22,6 +22,6 @@ The questions are:
     'Initial version, using 1shot, incontext, #0# as place holder, output in JSON format',
 }
 
-OpenHuEval_Path = '/mnt/hwfile/opendatalab/weixingjian/OpenHuEval'
+OpenHuEval_Path = '/mnt/hwfile/opendatalab/MinerU4S/yanghaote/XYZ/OpenHuEval'
 DATA_VERSION = '250205'
 DATA_PATH = f'{OpenHuEval_Path}/data/HuStandardFIB/HuStandardFIB_{DATA_VERSION}/HuStandardFIB.jsonl'

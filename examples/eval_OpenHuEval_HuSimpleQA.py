@@ -10,22 +10,21 @@ with read_base():
     from opencompass.configs.models.deepseek.deepseek_v3_api_aliyun import models as deepseek_v3_api_aliyun_model
 
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import models as lmdeploy_qwen2_5_7b_instruct_model
-    # from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_32b_instruct import models as lmdeploy_qwen2_5_32b_instruct_model
-    # from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import models as lmdeploy_qwen2_5_14b_instruct_model
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_32b_instruct import models as lmdeploy_qwen2_5_32b_instruct_model
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import models as lmdeploy_qwen2_5_14b_instruct_model
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_72b_instruct import models as lmdeploy_qwen2_5_72b_instruct_model
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_8b_instruct import models as lmdeploy_llama3_1_8b_instruct_model
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_70b_instruct import models as lmdeploy_llama3_1_70b_instruct_model
-    # from opencompass.configs.models.hf_llama.llama3_3_70b_api_siliconflow import models as llama3_3_70b_api_siliconflow_model
-
+    from opencompass.configs.models.hf_llama.llama3_3_70b_api_siliconflow import models as llama3_3_70b_api_siliconflow_model
 
     # from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import models as lmdeploy_internlm3_8b_instruct_model
 
     from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import models as lmdeploy_qwq_32b_preview_model
     from opencompass.configs.models.deepseek.deepseek_r1_api_aliyun import models as deepseek_r1_api_aliyun_model
-    # from opencompass.configs.models.deepseek.deepseek_r1_distill_llama_8b_api_aliyun import models as deepseek_r1_distill_llama_8b_api_aliyun_model
-    # from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_32b_instruct import models as deepseek_r1_distill_qwen_32b_instruct_model
-    # from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_14b_instruct import models as deepseek_r1_distill_qwen_14b_instruct_model
-    # from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_llama_70b_instruct import models as deepseek_r1_distill_llama_70b_instruct_model
+    from opencompass.configs.models.deepseek.deepseek_r1_distill_llama_8b_api_aliyun import models as deepseek_r1_distill_llama_8b_api_aliyun_model
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_32b_instruct import models as deepseek_r1_distill_qwen_32b_instruct_model
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_14b_instruct import models as deepseek_r1_distill_qwen_14b_instruct_model
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_llama_70b_instruct import models as deepseek_r1_distill_llama_70b_instruct_model
     from opencompass.configs.models.openai.o1_mini_2024_09_12 import models as o1_mini_2024_09_12_model
     # from opencompass.configs.models.openai.o3_mini_2025_01_31 import models as o3_mini_2025_01_31_model
 

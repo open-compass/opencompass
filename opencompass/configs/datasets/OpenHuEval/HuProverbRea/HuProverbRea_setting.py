@@ -72,6 +72,6 @@ judge_prompt_template = {
 }
 
 
-OpenHuEval_Path = '/mnt/hwfile/opendatalab/wj/proj/polyglot_24July/OpenHuEval'
+OpenHuEval_Path = '/mnt/hwfile/opendatalab/MinerU4S/yanghaote/XYZ/OpenHuEval'
 DATA_VERSION = '250127'
 DATA_PATH = f'{OpenHuEval_Path}/data/HuProverbRea/HuProverbRea_{DATA_VERSION}/HuProverbRea.jsonl'

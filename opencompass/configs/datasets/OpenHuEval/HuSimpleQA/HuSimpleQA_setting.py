@@ -17,6 +17,6 @@ Kérjük, magyar nyelven adja meg a legjobb választ erre a kérdésre, és 0-t�
 """
 }
 
-OpenHuEval_Path = '/mnt/hwfile/opendatalab/weixingjian/OpenHuEval'
+OpenHuEval_Path = '/mnt/hwfile/opendatalab/MinerU4S/yanghaote/XYZ/OpenHuEval'
 DATA_VERSION = '250208'
 DATA_PATH = f'{OpenHuEval_Path}/data/HuSimpleQA/HuSimpleQA_{DATA_VERSION}/HuSimpleQA.jsonl'
