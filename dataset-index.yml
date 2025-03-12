@@ -234,6 +234,11 @@
     category: Reasoning
     paper: https://arxiv.org/pdf/2210.09261
     configpath: opencompass/configs/datasets/bbh
+- bbeh:
+    name: BIG-Bench Extra Hard
+    category: Reasoning
+    paper: https://arxiv.org/abs/2502.19187
+    configpath: opencompass/configs/datasets/bbeh
 - BoolQ:
     name: SuperGLUE / BoolQ
     category: Knowledge
@@ -734,6 +739,8 @@
     category: Understanding
     paper: https://arxiv.org/pdf/1808.08745
     configpath: opencompass/configs/datasets/Xsum
-
-
-
+- supergpqa:
+    name: SuperGPQA
+    category: Knowledge
+    paper: https://arxiv.org/pdf/2502.14739
+    configpath: opencompass/configs/datasets/supergpqa
