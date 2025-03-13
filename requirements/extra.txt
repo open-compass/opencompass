@@ -12,7 +12,7 @@ faiss_gpu==1.7.2
 # IFEval
 langdetect
 # TheoremQA
-latex2sympy2
+latex2sympy2==1.9.1
 # Lawbench, leval
 ltp
 # Math

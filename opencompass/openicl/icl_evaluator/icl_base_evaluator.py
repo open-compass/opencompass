@@ -190,8 +190,8 @@ class BaseEvaluator:
                 detail.pop('predictions')
             return eval_results
 
-        # If there are no details, return an empty dictionary
-        return {}
+        # If there are no details, return results
+        return results
 
     def score(self):
         raise NotImplementedError("Method hasn't been implemented yet")
