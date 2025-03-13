@@ -42,6 +42,7 @@ with read_base():
 
     # from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import models as lmdeploy_internlm3_8b_instruct_model
 
+<<<<<<< HEAD
     from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import (
         models as lmdeploy_qwq_32b_preview_model,
     )
@@ -67,6 +68,17 @@ with read_base():
     from opencompass.configs.models.openai.o1_mini_2024_09_12 import (
         models as o1_mini_2024_09_12_model,
     )
+=======
+    from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import models as lmdeploy_qwq_32b_preview_model
+    from opencompass.configs.models.qwq.qwq_32b import models as qwq_32b_model
+    from opencompass.configs.models.qwq.qwq_plus_2025_03_05 import models as qwq_plus_2025_03_05_model
+    from opencompass.configs.models.deepseek.deepseek_r1_api_aliyun import models as deepseek_r1_api_aliyun_model
+    from opencompass.configs.models.deepseek.deepseek_r1_distill_llama_8b_api_aliyun import models as deepseek_r1_distill_llama_8b_api_aliyun_model
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_32b_instruct import models as deepseek_r1_distill_qwen_32b_instruct_model
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_14b_instruct import models as deepseek_r1_distill_qwen_14b_instruct_model
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_llama_70b_instruct import models as deepseek_r1_distill_llama_70b_instruct_model
+    from opencompass.configs.models.openai.o1_mini_2024_09_12 import models as o1_mini_2024_09_12_model
+>>>>>>> 6b84df9... add_qwen_api_qwq_32b
     # from opencompass.configs.models.openai.o3_mini_2025_01_31 import models as o3_mini_2025_01_31_model
 
 from opencompass.models import OpenAI
@@ -146,7 +158,12 @@ eval = dict(
     ),
 )
 
+<<<<<<< HEAD
 summarizer = dict(type=HuSimpleQASummarizer, prompt_languages=PROMPT_LANGUAGES)
+=======
+summarizer = dict(type=HuSimpleQASummarizer,
+                  prompt_languages=PROMPT_LANGUAGES)
+>>>>>>> 6b84df9... add_qwen_api_qwq_32b
 
 work_dir = (
     './outputs/' + __file__.split('/')[-1].split('.')[0] + '/'
