@@ -1,11 +1,26 @@
-from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
-from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.datasets import RaceDataset
+from opencompass.utils.text_postprocessors import (
+    first_option_postprocess,
+)
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
 
-categories = ['cipher', 'counterfactual', 'logic', 'operation', 'puzzle']
+QUERY_TEMPLATE = """
+Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering.
+
+Article: {article}
+
+Q: {question}
+
+A. {A}
+B. {B}
+C. {C}
+D. {D}
+""".strip()
 
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
@@ -23,91 +38,80 @@ GRADER_TEMPLATE = """
 
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
-    <Original Question Begin>: {question}\n {options_str} \n<Original Question End>\n\n
+    <Original Question Begin>: {question}\n A) {A}\n B) {B}\n C) {C}\n D) {D}\n<Original Question End>\n\n
     <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     Judging the correctness of candidates' answers:
 """.strip()
 
 
+race_reader_cfg = dict(
+    input_columns=['article', 'question', 'A', 'B', 'C', 'D'],
+    output_column='answer',
+    train_split='validation',
+    test_split='test',
+)
 
-korbench_0shot_single_datasets = []
-
-for category in categories:
-    # Prompt template
-    prompt_template = dict(
+race_infer_cfg = dict(
+    prompt_template=dict(
         type=PromptTemplate,
         template=dict(
-            begin=[
-                dict(
-                    role='HUMAN',
-                    prompt=''
-                )
-            ],
             round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{prompt}' # f-string
-                )
+                dict(role='HUMAN', prompt=QUERY_TEMPLATE),
             ]
-        )
-    )
-
-    # Reader configuration
-    reader_cfg = dict(
-        input_columns=['prompt'],
-        output_column='answer',
-    )
-
-    # Inference configuration
-    infer_cfg = dict(
-        prompt_template=prompt_template,
-        retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_out_len=1024),
-    )
-
-    # Evaluation configuration
-    eval_cfg = dict(
-        evaluator=dict(
-            type=GenericLLMEvaluator,
-            prompt_template=dict(
-                type=PromptTemplate,
-                template=dict(
-                    begin=[
-                        dict(
-                            role='SYSTEM',
-                            fallback_role='HUMAN',
-                            prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
-                    ],
-                    round=[
-                        dict(
-                            role='HUMAN',
-                            prompt=GRADER_TEMPLATE
-                        ),
-                    ]),
-            ),
-            dataset_cfg=dict(
-                type=korbenchDataset,
-                path='opencompass/korbench',
-                reader_cfg=reader_cfg,
-                prompt_mode='0_shot',
-                category=category,
-            ),
-            judge_cfg=dict(),
-            dict_postprocessor=dict(type=generic_llmjudge_postprocess, metric_name='score'),
         ),
-        pred_role='BOT',
-    )
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer),
+)
 
-    korbench_dataset = dict(
-        type=korbenchDataset,
-        abbr=f'korbench_{category}',
-        path='opencompass/korbench',
-        prompt_mode='0_shot',
-        category=category,
-        reader_cfg=reader_cfg,
-        infer_cfg=infer_cfg,
-        eval_cfg=eval_cfg,
-    )
+race_eval_cfg = dict(
+    evaluator=dict(
+        type=GenericLLMEvaluator,
+        prompt_template=dict(
+            type=PromptTemplate,
+            template=dict(
+                begin=[
+                    dict(
+                        role='SYSTEM',
+                        fallback_role='HUMAN',
+                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                ],
+                round=[
+                    dict(
+                        role='HUMAN',
+                        prompt=GRADER_TEMPLATE
+                    ),
+                ]),
+        ),
+        dataset_cfg=dict(
+            type=RaceDataset,
+            path='./data/gpqa/',
+            reader_cfg=race_reader_cfg,
+        ),
+        judge_cfg=dict(),
+        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+    ),
+    pred_role='BOT',
+)
 
-    korbench_0shot_single_datasets.append(korbench_dataset)
+race_datasets = [
+    dict(
+        abbr='race-middle',
+        type=RaceDataset,
+        path='opencompass/race',
+        name='middle',
+        reader_cfg=race_reader_cfg,
+        infer_cfg=race_infer_cfg,
+        eval_cfg=race_eval_cfg,
+    ),
+    dict(
+        abbr='race-high',
+        type=RaceDataset,
+        path='opencompass/race',
+        name='high',
+        reader_cfg=race_reader_cfg,
+        infer_cfg=race_infer_cfg,
+        eval_cfg=race_eval_cfg,
+    ),
+]

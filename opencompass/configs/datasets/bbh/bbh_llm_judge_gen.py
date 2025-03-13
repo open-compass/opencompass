@@ -164,7 +164,7 @@ for _name in bbh_free_form_sets:
                 name=_name,
             ),
             judge_cfg=dict(),
-            dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+            dict_postprocessor=dict(type=generic_llmjudge_postprocess, metric_name='score'),
         ),
         pred_role='BOT',
     )
