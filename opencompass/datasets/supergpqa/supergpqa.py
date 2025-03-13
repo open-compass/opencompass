@@ -7,7 +7,6 @@ from opencompass.datasets.supergpqa.supergpqa_eval import (
 from opencompass.datasets.supergpqa.supergpqa_utils import load_yaml
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
-from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -29,7 +28,6 @@ class SuperGPQADataset(BaseDataset):
 
     @staticmethod
     def load(path: str, prompt_mode: str, **kwargs):
-        path = get_data_path(path, local_mode=True)
         dataset = load_dataset(path, split='train')
 
         # get prompt template

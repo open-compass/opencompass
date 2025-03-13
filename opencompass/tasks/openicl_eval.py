@@ -263,28 +263,34 @@ class OpenICLEvalTask(BaseTask):
 
             if self.dump_details:
                 details = result.get('details', None)
-                try:
-                    result['details'] = self.format_details(
-                        pred_strs,
-                        model_pred_strs,
-                        test_set[self.output_column],
-                        details,
-                        model_details,
-                        pred_dicts,
-                    )
-                    self.logger.warning(
-                        f"result['details'] : {result['details']}"),
-                    result['type'] = result['details'].pop('type', None)
-                    if self.cal_extract_rate:
-                        # Calculate the extraction success rate for prediction
-                        result['extract_rate'] = self.extract_rate(result)
+                # Try to format details is details is not provided by evaluator
+                if details is None:
+                    self.logger.info(
+                        'Details is not give by evaluator, try to format it')
+                    try:
+                        result['details'] = self.format_details(
+                            pred_strs,
+                            model_pred_strs,
+                            test_set[self.output_column],
+                            details,
+                            model_details,
+                            pred_dicts,
+                        )
+                        self.logger.warning(
+                            f"result['details'] : {result['details']}"),
+                        result['type'] = result['details'].pop('type', None)
+                        if self.cal_extract_rate:
+                            # Calculate the extraction success
+                            # rate for prediction
+                            result['extract_rate'] = self.extract_rate(result)
 
-                    if 'PPL' in str(
-                            self.dataset_cfg.infer_cfg.inferencer.type):
-                        result['correct_bpb'], result['incorrect_bpb'] = (
-                            self.calculate_bpb(pred_dicts))
-                except Exception as e:
-                    self.logger.warning(f'Skip dumping details due to: {e}.')
+                        if 'PPL' in str(
+                                self.dataset_cfg.infer_cfg.inferencer.type):
+                            result['correct_bpb'], result['incorrect_bpb'] = (
+                                self.calculate_bpb(pred_dicts))
+                    except Exception as e:
+                        self.logger.warning(
+                            f'Skip dumping details due to: {e}.')
             else:
                 result.pop('details', None)
 
