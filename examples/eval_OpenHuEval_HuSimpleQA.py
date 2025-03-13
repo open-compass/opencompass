@@ -3,29 +3,70 @@ from mmengine.config import read_base
 from opencompass.summarizers.subjective.husimpleqa import HuSimpleQASummarizer
 
 with read_base():
-    from opencompass.configs.datasets.OpenHuEval.HuSimpleQA.HuSimpleQA import HuSimpleQA_datasets, PROMPT_LANGUAGES
+    from opencompass.configs.datasets.OpenHuEval.HuSimpleQA.HuSimpleQA import (
+        HuSimpleQA_datasets,
+        PROMPT_LANGUAGES,
+    )
 
-    from opencompass.configs.models.openai.gpt_4o_mini_20240718 import models as gpt_4o_mini_20240718_model
-    from opencompass.configs.models.openai.gpt_4o_2024_11_20 import models as gpt_4o_2024_11_20_model
-    from opencompass.configs.models.deepseek.deepseek_v3_api_aliyun import models as deepseek_v3_api_aliyun_model
+    from opencompass.configs.models.openai.gpt_4o_mini_20240718 import (
+        models as gpt_4o_mini_20240718_model,
+    )
+    from opencompass.configs.models.openai.gpt_4o_2024_11_20 import (
+        models as gpt_4o_2024_11_20_model,
+    )
+    from opencompass.configs.models.deepseek.deepseek_v3_api_aliyun import (
+        models as deepseek_v3_api_aliyun_model,
+    )
 
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import models as lmdeploy_qwen2_5_7b_instruct_model
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_32b_instruct import models as lmdeploy_qwen2_5_32b_instruct_model
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import models as lmdeploy_qwen2_5_14b_instruct_model
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_72b_instruct import models as lmdeploy_qwen2_5_72b_instruct_model
-    from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_8b_instruct import models as lmdeploy_llama3_1_8b_instruct_model
-    from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_70b_instruct import models as lmdeploy_llama3_1_70b_instruct_model
-    from opencompass.configs.models.hf_llama.llama3_3_70b_api_siliconflow import models as llama3_3_70b_api_siliconflow_model
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
+        models as lmdeploy_qwen2_5_7b_instruct_model,
+    )
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_32b_instruct import (
+        models as lmdeploy_qwen2_5_32b_instruct_model,
+    )
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import (
+        models as lmdeploy_qwen2_5_14b_instruct_model,
+    )
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_72b_instruct import (
+        models as lmdeploy_qwen2_5_72b_instruct_model,
+    )
+    from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_8b_instruct import (
+        models as lmdeploy_llama3_1_8b_instruct_model,
+    )
+    from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_70b_instruct import (
+        models as lmdeploy_llama3_1_70b_instruct_model,
+    )
+    from opencompass.configs.models.hf_llama.llama3_3_70b_api_siliconflow import (
+        models as llama3_3_70b_api_siliconflow_model,
+    )
 
     # from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import models as lmdeploy_internlm3_8b_instruct_model
 
-    from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import models as lmdeploy_qwq_32b_preview_model
-    from opencompass.configs.models.deepseek.deepseek_r1_api_aliyun import models as deepseek_r1_api_aliyun_model
-    from opencompass.configs.models.deepseek.deepseek_r1_distill_llama_8b_api_aliyun import models as deepseek_r1_distill_llama_8b_api_aliyun_model
-    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_32b_instruct import models as deepseek_r1_distill_qwen_32b_instruct_model
-    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_14b_instruct import models as deepseek_r1_distill_qwen_14b_instruct_model
-    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_llama_70b_instruct import models as deepseek_r1_distill_llama_70b_instruct_model
-    from opencompass.configs.models.openai.o1_mini_2024_09_12 import models as o1_mini_2024_09_12_model
+    from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import (
+        models as lmdeploy_qwq_32b_preview_model,
+    )
+    from opencompass.configs.models.qwq.qwq_32b import models as qwq_32b_model
+    from opencompass.configs.models.qwq.qwq_plus_2025_03_05 import (
+        models as qwq_plus_2025_03_05_model,
+    )
+    from opencompass.configs.models.deepseek.deepseek_r1_api_aliyun import (
+        models as deepseek_r1_api_aliyun_model,
+    )
+    from opencompass.configs.models.deepseek.deepseek_r1_distill_llama_8b_api_aliyun import (
+        models as deepseek_r1_distill_llama_8b_api_aliyun_model,
+    )
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_32b_instruct import (
+        models as deepseek_r1_distill_qwen_32b_instruct_model,
+    )
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_14b_instruct import (
+        models as deepseek_r1_distill_qwen_14b_instruct_model,
+    )
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_llama_70b_instruct import (
+        models as deepseek_r1_distill_llama_70b_instruct_model,
+    )
+    from opencompass.configs.models.openai.o1_mini_2024_09_12 import (
+        models as o1_mini_2024_09_12_model,
+    )
     # from opencompass.configs.models.openai.o3_mini_2025_01_31 import models as o3_mini_2025_01_31_model
 
 from opencompass.models import OpenAI
@@ -37,26 +78,26 @@ from opencompass.runners import LocalRunner, SlurmSequentialRunner
 from opencompass.tasks import OpenICLInferTask
 from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 
-api_meta_template = dict(round=[
-    dict(role='HUMAN', api_role='HUMAN'),
-    dict(role='BOT', api_role='BOT', generate=True),
-])
+api_meta_template = dict(
+    round=[
+        dict(role='HUMAN', api_role='HUMAN'),
+        dict(role='BOT', api_role='BOT', generate=True),
+    ]
+)
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
 for model in models:
-    if model['abbr'].startswith('deepseek_r1_api_'):
+    if model['abbr'].startswith('deepseek_r1_api_') or (
+        model['abbr'].startswith('QwQ') and model['abbr'] != 'QwQ-32B-Preview'
+    ):
         model['return_reasoning_content'] = True
         model['pred_postprocessor'] = {
-            'OpenHuEval_*': {
-                'type': 'rm_<think>_before_eval'
-            }
+            'OpenHuEval_*': {'type': 'rm_<think>_before_eval'}
         }
-    if model['abbr'].startswith('QwQ'):
+    if model['abbr'] == 'QwQ-32B-Preview':
         model['pred_postprocessor'] = {
-            'OpenHuEval_*': {
-                'type': 'extract_qwq_answer_before_eval_for_husimpleqa'
-            }
+            'OpenHuEval_*': {'type': 'extract_qwq_answer_before_eval_for_husimpleqa'}
         }
 del model
 
@@ -100,14 +141,13 @@ eval = dict(
         models=models,
         judge_models=judge_models,
     ),
-    runner=dict(type=LocalRunner,
-                max_num_workers=16,
-                task=dict(type=SubjectiveEvalTask)),
+    runner=dict(
+        type=LocalRunner, max_num_workers=16, task=dict(type=SubjectiveEvalTask)
+    ),
 )
 
-summarizer = dict(type=HuSimpleQASummarizer, 
-                  prompt_languages=PROMPT_LANGUAGES)
+summarizer = dict(type=HuSimpleQASummarizer, prompt_languages=PROMPT_LANGUAGES)
 
 work_dir = (
-    './outputs/' + __file__.split('/')[-1].split('.')[0] + '/' 
+    './outputs/' + __file__.split('/')[-1].split('.')[0] + '/'
 )  # do NOT modify this line, yapf: disable, pylint: disable
