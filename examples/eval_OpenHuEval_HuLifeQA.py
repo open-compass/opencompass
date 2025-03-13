@@ -19,6 +19,7 @@ with read_base():
 
     from opencompass.configs.models.openai.o1_mini_2024_09_12 import models as o1_mini_2024_09_12_model
     from opencompass.configs.models.qwq.lmdeploy_qwq_32b_preview import models as lmdeploy_qwq_32b_preview_model
+    from opencompass.configs.models.qwq.qwq_32b import models as qwq_32b_model
     from opencompass.configs.models.deepseek.deepseek_r1_api_aliyun import models as deepseek_r1_api_aliyun_model
     from opencompass.configs.models.deepseek.deepseek_r1_distill_llama_8b_api_aliyun import models as deepseek_r1_distill_llama_8b_api_aliyun_model
     from opencompass.configs.models.deepseek.deepseek_r1_distill_qwen_7b_api_aliyun import models as deepseek_r1_distill_qwen_7b_api_aliyun_model
@@ -58,6 +59,7 @@ models = [
     *gpt_4o_mini_20240718_model,
     *gpt_4o_20241120_model,
     *o1_mini_2024_09_12_model,
+    *qwq_32b_model,
     *deepseek_v3_api_aliyun_model,
     *deepseek_r1_api_aliyun_model,
     *deepseek_r1_distill_llama_8b_api_aliyun_model,

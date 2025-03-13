@@ -1,3 +1,5 @@
+import os
+import random
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
@@ -43,7 +45,16 @@ class Qwen(BaseAPIModel):
                          retry=retry,
                          generation_kwargs=generation_kwargs)
         import dashscope
-        dashscope.api_key = key
+        if isinstance(key, str):
+            if key == 'ENV':
+                if 'DASHSCOPE_API_KEY' not in os.environ:
+                    raise ValueError('DASHSCOPE API key is not set.')
+                self.keys = os.getenv('DASHSCOPE_API_KEY').split(',')
+            else:
+                self.keys = [key]
+        else:
+            self.keys = key
+        self.path = path
         self.dashscope = dashscope
 
     def generate(
@@ -131,7 +142,9 @@ class Qwen(BaseAPIModel):
             self.acquire()
             try:
                 response = self.dashscope.Generation.call(
+                    api_key=random.choice(self.keys),
                     model=self.path,
+                    stream=True,
                     **data,
                 )
             except Exception as err:
@@ -148,34 +161,51 @@ class Qwen(BaseAPIModel):
                 # to slow down the request
                 self.wait()
                 continue
+            #
+            reasoning_content = ""  # 定义完整思考过程
+            answer_content = ""     # 定义完整回复
+            is_answering = False   # 判断是否结束思考过程并开始回复
+            for chunk in response:
+                if (chunk.output.choices[0].message.content == "" and
+                        chunk.output.choices[0].message.reasoning_content == ""):
+                    pass
+                else:
+                    if (chunk.output.choices[0].message.reasoning_content != "" and
+                            chunk.output.choices[0].message.content == ""):
+                        reasoning_content += chunk.output.choices[0].message.reasoning_content
+                    elif chunk.output.choices[0].message.content != "":
+                        if not is_answering:
+                            is_answering = True
+                        answer_content += chunk.output.choices[0].message.content
+            reasoning_content = '<think>' + reasoning_content + '</think>'
+            return reasoning_content + answer_content
+            # if response.status_code == 200:
+            #     try:
+            #         msg = response.output.text
+            #         self.logger.debug(msg)
+            #         return msg
+            #     except KeyError:
+            #         print(response)
+            #         self.logger.error(str(response.status_code))
+            #         time.sleep(1)
+            #         continue
+            # if response.status_code == 429:
+            #     print(response)
+            #     time.sleep(2)
+            #     continue
+            # if response.status_code == 400:
+            #     print('=' * 128)
+            #     print(response)
+            #     msg = 'Output data may contain inappropriate content.'
+            #     return msg
 
-            if response.status_code == 200:
-                try:
-                    msg = response.output.text
-                    self.logger.debug(msg)
-                    return msg
-                except KeyError:
-                    print(response)
-                    self.logger.error(str(response.status_code))
-                    time.sleep(1)
-                    continue
-            if response.status_code == 429:
-                print(response)
-                time.sleep(2)
-                continue
-            if response.status_code == 400:
-                print('=' * 128)
-                print(response)
-                msg = 'Output data may contain inappropriate content.'
-                return msg
-
-            if ('Range of input length should be ' in response.message
-                    or  # input too long
-                    'Input data may contain inappropriate content.'
-                    in response.message):  # bad input
-                print(response.message)
-                return ''
-            print(response)
-            max_num_retries += 1
+            # if ('Range of input length should be ' in response.message
+            #         or  # input too long
+            #         'Input data may contain inappropriate content.'
+            #         in response.message):  # bad input
+            #     print(response.message)
+            #     return ''
+            # print(response)
+            # max_num_retries += 1
 
         raise RuntimeError(response.message)
