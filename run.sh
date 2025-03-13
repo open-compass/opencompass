@@ -1,0 +1,1 @@
+CUDA_VISIBLE_DEVICES=0 python3 run.py --models hf_llama3_1_8b_instruct --datasets xhumaneval_plus_gen -a vllm --max-num-worker 1
