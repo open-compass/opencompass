@@ -203,6 +203,17 @@ class MultiModelSummarizer:
                         numerator = sum(results[k] * sg['weights'][k] for k in sg['weights'])
                         denominator = sum(sg['weights'].values())
                         metric = 'weighted_average'
+                    elif 'harmonic_mean' in sg:
+                        # Check for non-positive values that would cause issues in harmonic mean
+                        if any(results[k] <= 0 for k in results):
+                            self.logger.warning(f'Non-positive values found when calculating harmonic mean for {sg["name"]}')
+                            # Handle non-positive values (either skip or use a small positive value)
+                            numerator = len(results)
+                            denominator = sum(1 / max(results[k], 1e-10) for k in results)
+                        else:
+                            numerator = len(results)
+                            denominator = sum(1 / results[k] for k in results)
+                        metric = 'harmonic_mean'
                     else:
                         numerator = sum(results[k] for k in results)
                         denominator = len(results)
