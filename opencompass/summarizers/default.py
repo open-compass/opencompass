@@ -171,6 +171,8 @@ class DefaultSummarizer:
                         default_metric = 'sum'
                     elif sg.get('weights', []):
                         default_metric = 'weighted_average'
+                    elif sg.get('harmonic_mean', False):
+                        default_metric = 'harmonic_mean'
                     else:
                         default_metric = 'naive_average'
 
@@ -204,6 +206,17 @@ class DefaultSummarizer:
                         avg = sum(scores[metric].values()) / len(scores[metric])
                         variance = sum((scores[metric][k] - avg) ** 2 for k in scores[metric]) / len(scores[metric])
                         scores[metric] = result[metric] = math.sqrt(variance)
+                    elif default_metric == 'harmonic_mean':
+                        # Check for non-positive values that would cause issues in harmonic mean
+                        if any(scores[metric][k] <= 0 for k in scores[metric]):
+                            self.logger.warning(f'Non-positive values found when calculating harmonic mean for {sg["name"]}')
+                            # Handle non-positive values (either skip or use a small positive value)
+                            numerator = len(scores[metric])
+                            denominator = sum(1 / max(scores[metric][k], 1) for k in scores[metric])
+                        else:
+                            numerator = len(scores[metric])
+                            denominator = sum(1 / scores[metric][k] for k in scores[metric])
+                        scores[metric] = result[metric] = numerator / denominator
                     else:
                         if sg.get('weights', []):
                             # check sg['weights'][k] != 0 in case of scores[metric][k] is NaN
