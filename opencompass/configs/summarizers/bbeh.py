@@ -12,14 +12,14 @@ for group in bbeh_summary_groups:
 
 summarizer = dict(
     # Include both individual datasets and the summary metrics we want to see
-    dataset_abbrs=bbeh_subsets + ['bbeh'] + ['bbeh_harmonic_mean', 'bbeh_standard_deviation', 'bbeh_sum'],
+    dataset_abbrs=bbeh_subsets + ['bbeh_naive_average'] + ['bbeh_harmonic_mean'],
     
     # Define the summary group for bbeh
     summary_groups=[
         {
-            'name': 'bbeh',
+            'name': 'bbeh_naive_average',
             'subsets': bbeh_subsets,
-            'metric': 'score'  # Explicitly specify the metric to use
+            'metric': 'naive_average'  # Explicitly specify the metric to use
         },
         {
             'name': 'bbeh_harmonic_mean',
