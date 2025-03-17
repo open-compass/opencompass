@@ -175,7 +175,7 @@ class DefaultSummarizer:
                         default_metric = 'harmonic_mean'
                     else:
                         default_metric = 'naive_average'
-                
+
                 scores, eval_modes, group_metrics = {}, [], None
                 if any(isinstance(dataset_abbr, (list, tuple)) for dataset_abbr in sg['subsets']) and \
                     any(isinstance(dataset_abbr, str) for dataset_abbr in sg['subsets']):
