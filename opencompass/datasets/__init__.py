@@ -11,8 +11,6 @@ from .ax import *  # noqa: F401, F403
 from .babilong import *  # noqa: F401, F403
 from .bbeh import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
-from .bbeh import *  # noqa: F401, F403
-from .bbh import *  # noqa: F401, F403
 from .bigcodebench import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
