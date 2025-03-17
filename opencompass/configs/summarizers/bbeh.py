@@ -25,16 +25,6 @@ summarizer = dict(
             'name': 'bbeh_harmonic_mean',
             'subsets': bbeh_subsets,
             'metric': 'harmonic_mean'
-        },
-        {
-            'name': 'bbeh_standard_deviation',
-            'subsets': bbeh_subsets,
-            'metric': 'standard_deviation'
-        },
-        {
-            'name': 'bbeh_sum',
-            'subsets': bbeh_subsets,
-            'metric': 'sum'
         }
     ]
 )
