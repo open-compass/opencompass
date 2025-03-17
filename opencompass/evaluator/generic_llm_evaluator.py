@@ -1,3 +1,4 @@
+import os
 import os.path as osp
 from typing import Dict, List, Optional
 
@@ -36,7 +37,11 @@ class GenericLLMEvaluator(BaseEvaluator):
     ) -> None:
 
         self.logger = get_logger()
-        self.judge_cfg = judge_cfg
+        # If judge_cfg is not provided, fall back to the default configuration
+        if not judge_cfg:
+            self.judge_cfg = self.default_judge_cfg
+        else:
+            self.judge_cfg = judge_cfg
         self.output_path = ''
 
         self.prompt_template = ICL_PROMPT_TEMPLATES.build(prompt_template)
@@ -141,3 +146,30 @@ class GenericLLMEvaluator(BaseEvaluator):
             kwargs = self.dict_postprocessor
             proc = DICT_POSTPROCESSORS.get(kwargs.pop('type'))
             return proc(output, self.output_path, **kwargs)
+
+    @property
+    def default_judge_cfg(self):
+        from opencompass.models import OpenAISDK
+
+        DEFAULT_JUDGE_CFG = dict(
+            type=OpenAISDK,
+            path=os.environ['OC_JUDGE_MODEL'],
+            key=os.environ['OC_JUDGE_API_KEY'],
+            openai_api_base=[
+                os.environ.get('OC_JUDGE_API_BASE',
+                               'https://api.openai.com/v1/')
+            ],
+            meta_template=dict(round=[
+                dict(role='HUMAN', api_role='HUMAN'),
+                dict(role='BOT', api_role='BOT', generate=True),
+            ], ),
+            query_per_second=16,
+            batch_size=1024,
+            temperature=0.001,
+            tokenizer_path='gpt-4o-2024-05-13',
+            verbose=True,
+            max_out_len=16384,
+            max_seq_len=49152,
+        )
+
+        return DEFAULT_JUDGE_CFG

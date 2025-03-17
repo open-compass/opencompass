@@ -34,7 +34,24 @@ problem,answer
 
 ## 配置说明
 
-要设置LLM评判评估，你需要配置三个主要组件：
+### 基于命令行使用LLM进行评估
+
+OpenCompass中部分数据集已经包含了LLM评判器的配置。
+你需要使用一个模型服务（如OpenAI或DeepSeek官方提供的API）或本地使用LMDeploy、vLLM、SGLang等工具启动一个模型服务。
+
+然后，你可以通过以下命令设置相关评估服务的环境变量，并对模型进行评估：
+
+```bash
+export OC_JUDGE_MODEL=Qwen/Qwen2.5-32B-Instruct
+export OC_JUDGE_API_KEY=sk-1234
+export OC_JUDGE_API_BASE=http://172.30.56.1:4000/v1 
+```
+
+注意，默认情况下，OpenCompass会使用这三个环境变量，但如果你使用了基于配置文件的方式配置评估服务，这三个环境变量将不会生效。
+
+### 基于配置文件使用LLM进行评估
+
+对一个数据集设置LLM评判评估，你需要配置三个主要组件：
 
 1. 数据集读取配置
 
