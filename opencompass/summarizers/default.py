@@ -188,18 +188,18 @@ class DefaultSummarizer:
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 else:
                     group_metrics = list(functools.reduce(lambda a, b: a & b, [set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']]))
-                    if need_smart_metric and len(group_metrics) > 1:
-                        for metric in group_metrics:
-                            for dataset_abbr in sg['subsets']:
-                                scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
-                                eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
-                    else:
-                        group_metrics = [default_metric]
+                    group_metrics.append(default_metric)
+                    for metric in group_metrics:
                         for dataset_abbr in sg['subsets']:
-                            metric = dataset_metrics[dataset_abbr][0]
-                            scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
-                            eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
-
+                            if metric == default_metric:
+                                metric_default = dataset_metrics[dataset_abbr][0]
+                                scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric_default] = \
+                                parsed_results[model_abbr][dataset_abbr][metric_default]
+                                eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
+                            else:
+                                scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = \
+                                parsed_results[model_abbr][dataset_abbr][metric]
+                                eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
                 result = {}
                 for metric in scores:
                     if default_metric == 'standard_deviation':
