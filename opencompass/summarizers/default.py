@@ -171,11 +171,11 @@ class DefaultSummarizer:
                         default_metric = 'sum'
                     elif sg.get('weights', []):
                         default_metric = 'weighted_average'
-                    elif 'harmonic_mean' in sg:
+                    elif sg.get('harmonic_mean', False):
                         default_metric = 'harmonic_mean'
                     else:
                         default_metric = 'naive_average'
-
+                
                 scores, eval_modes, group_metrics = {}, [], None
                 if any(isinstance(dataset_abbr, (list, tuple)) for dataset_abbr in sg['subsets']) and \
                     any(isinstance(dataset_abbr, str) for dataset_abbr in sg['subsets']):
@@ -212,7 +212,7 @@ class DefaultSummarizer:
                             self.logger.warning(f'Non-positive values found when calculating harmonic mean for {sg["name"]}')
                             # Handle non-positive values (either skip or use a small positive value)
                             numerator = len(scores[metric])
-                            denominator = sum(1 / max(scores[metric][k], 1e-10) for k in scores[metric])
+                            denominator = sum(1 / max(scores[metric][k], 1) for k in scores[metric])
                         else:
                             numerator = len(scores[metric])
                             denominator = sum(1 / scores[metric][k] for k in scores[metric])
