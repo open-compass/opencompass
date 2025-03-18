@@ -3,7 +3,7 @@
     name: IFEval
     category: Instruction Following
     paper: https://arxiv.org/pdf/2311.07911
-    configpath: opencompass/configs/datasets/IFEval/IFEval_gen.py
+    configpath: opencompass/configs/datasets/IFEval/IFEval
 - nphard:
     name: NPHardEval
     category: Reasoning
