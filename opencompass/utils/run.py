@@ -313,6 +313,14 @@ def change_accelerator(models, accelerator):
                     stop_words=model.get('stop_words', []),
                 )
             elif accelerator == 'lmdeploy':
+
+                if model.get('generation_kwargs') is not None:
+                    logger.warning(f'LMDeploy uses do_sample=False as default, and you need to set do_sample=True for sampling mode')
+                    gen_config = model['generation_kwargs'].copy()
+                else:
+                    logger.info('OpenCompass uses greedy decoding as default, you can set generation-kwargs for your purpose')
+                    gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9)
+
                 mod = TurboMindModelwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
@@ -324,7 +332,7 @@ def change_accelerator(models, accelerator):
                         session_len=model.get('max_seq_len', None),
                         max_new_tokens=model['max_out_len']
                     ),
-                    gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
+                    gen_config=gen_config,
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
                     batch_size=16,

@@ -34,6 +34,23 @@ problem,answer
 
 ## Configuration
 
+### Using LLM for Evaluation via Command Line
+
+Some datasets in OpenCompass already include LLM judge configurations.
+You need to use a model service (such as OpenAI or DeepSeek's official API) or start a model service locally using tools like LMDeploy, vLLM, or SGLang.
+
+Then, you can set the environment variables for the evaluation service and evaluate models using the following commands:
+
+```bash
+export OC_JUDGE_MODEL=Qwen/Qwen2.5-32B-Instruct
+export OC_JUDGE_API_KEY=sk-1234
+export OC_JUDGE_API_BASE=http://172.30.56.1:4000/v1
+```
+
+Note that by default, OpenCompass will use these three environment variables, but if you use configuration files to configure the evaluation service, these environment variables will not take effect.
+
+### ### Using LLM for Evaluation via Configuration Files
+
 To set up an LLM judge evaluation, you'll need to configure three main components:
 
 1. Dataset Reader Configuration
