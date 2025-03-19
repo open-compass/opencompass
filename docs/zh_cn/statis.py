@@ -24,7 +24,7 @@ load_path = str(OC_ROOT / 'dataset-index.yml')
 with open(load_path, 'r') as f2:
     data_list = yaml.load(f2, Loader=yaml.FullLoader)
 
-HEADER = ['name', 'category', 'paper', 'configpath']
+HEADER = ['name', 'category', 'paper', 'configpath', 'configpath_llmjudge']
 
 
 def table_format(data_list):
@@ -35,7 +35,7 @@ def table_format(data_list):
             for index in HEADER:
                 if index == 'paper':
                     table_format_list_sub.append('[链接](' + i[j][index] + ')')
-                elif index == 'configpath':
+                elif index != 'name' and index != 'category':
                     if isinstance(i[j][index], list):
                         sub_list_text = ''
                         for k in i[j][index]:
@@ -60,7 +60,7 @@ def generate_table(data_list, title=None):
         if title is not None:
             f.write(f'\n{title}')
         f.write("""\n```{table}\n:class: dataset\n""")
-        header = ['数据集名称', '数据集类型', '原文或资源地址', '配置文件链接']
+        header = ['数据集名称', '数据集类型', '原文或资源地址', '推荐配置(基于规则评估)', '推荐配置(基于LLM评估)']
         table_cfg = dict(tablefmt='pipe',
                          floatfmt='.2f',
                          numalign='right',
