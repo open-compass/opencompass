@@ -94,21 +94,21 @@ def check_and_rename(filepath):
     return None, None
 
 
-def update_imports(data):
-    python_file, name_pairs = data
-    for filepath, new_file in name_pairs:
-        old_name = os.path.basename(filepath)[:-3]
-        new_name = os.path.basename(new_file)[:-3]
-        if not os.path.exists(python_file):
-            return
-        with open(python_file, 'r') as file:
-            filedata = file.read()
-        # Replace the old name with new name
-        new_data = filedata.replace(old_name, new_name)
-        if filedata != new_data:
-            with open(python_file, 'w') as file:
-                file.write(new_data)
-            # print(f"Updated imports in {python_file}")
+# def update_imports(data):
+#     python_file, name_pairs = data
+#     for filepath, new_file in name_pairs:
+#         old_name = os.path.basename(filepath)[:-3]
+#         new_name = os.path.basename(new_file)[:-3]
+#         if not os.path.exists(python_file):
+#             return
+#         with open(python_file, 'r') as file:
+#             filedata = file.read()
+#         # Replace the old name with new name
+#         new_data = filedata.replace(old_name, new_name)
+#         if filedata != new_data:
+#             with open(python_file, 'w') as file:
+#                 file.write(new_data)
+#             # print(f"Updated imports in {python_file}")
 
 
 def main():
@@ -134,11 +134,11 @@ def main():
         return
     with Pool(16) as p:
         p.starmap(os.rename, name_pairs)
-    root_folder = 'configs'
-    python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
-    update_data = [(python_file, name_pairs) for python_file in python_files]
-    with Pool(16) as p:
-        p.map(update_imports, update_data)
+    # root_folder = 'configs'
+    # python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
+    # update_data = [(python_file, name_pairs) for python_file in python_files]
+    # with Pool(16) as p:
+    #     p.map(update_imports, update_data)
 
 
 if __name__ == '__main__':
