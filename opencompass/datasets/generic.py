@@ -61,7 +61,6 @@ def _generic_llmjudge_postprocess(judgement: str):
 def generic_llmjudge_postprocess(
     output: dict,
     output_path: str,
-    metric_name='accuracy',
 ) -> dict:
     judged_answers = []
     origial_responses = []
@@ -78,8 +77,8 @@ def generic_llmjudge_postprocess(
                 get_logger().warning(
                     f'No gold answer for {k}, use empty string as reference!')
                 references.append('')
-    results = get_final_results(judged_answers, references, origial_responses,
-                                metric_name)
+    results = get_final_results(judged_answers, references, origial_responses)
+
     results['details'] = output
     return results
 

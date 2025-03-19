@@ -314,8 +314,6 @@ class OpenICLEvalTask(BaseTask):
                 'Model Postprocess Task: ' +
                 f'{task_abbr_from_cfg(self.cfg)}:{model_result_wo_details}')
 
-        # save evaluator config
-
         # Save result
         out_path = get_infer_output_path(
             self.model_cfg,

@@ -72,7 +72,7 @@ math_eval_cfg = dict(
             reader_cfg=math_reader_cfg,
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess, metric_name='score'),
+        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
     pred_role='BOT',
 )

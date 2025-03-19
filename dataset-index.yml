@@ -2,7 +2,7 @@
     name: IFEval
     category: Instruction Following
     paper: https://arxiv.org/pdf/2311.07911
-    configpath: opencompass/configs/datasets/IFEval/IFEval
+    configpath: opencompass/configs/datasets/IFEval/IFEval_gen.py
     configpath_llmjudge: ''
 - nphard:
     name: NPHardEval
@@ -38,7 +38,7 @@
     name: BigCodeBench
     category: Code
     paper: https://arxiv.org/pdf/2406.15877
-    configpath: opencompass/configs/datasets/bigcodebench
+    configpath: opencompass/configs/datasets/bigcodebench/bigcodebench_gen.py
     configpath_llmjudge: ''
 - calm:
     name: CaLM
@@ -56,8 +56,8 @@
     name: KOR-Bench
     category: Reasoning
     paper: https://arxiv.org/pdf/2410.06526v1
-    configpath: opencompass/configs/datasets/korbench
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/korbench/korbench_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/korbench/korbench_llm_judge_gen.py
 - lawbench:
     name: LawBench
     category: Knowledge / Law
@@ -74,7 +74,7 @@
     name: LiveCodeBench
     category: Code
     paper: https://arxiv.org/pdf/2403.07974
-    configpath: opencompass/configs/datasets/livecodebench
+    configpath: opencompass/configs/datasets/livecodebench/livecodebench_gen.py
     configpath_llmjudge: ''
 - livemathbench:
     name: LiveMathBench
@@ -104,8 +104,8 @@
     name: MuSR
     category: Reasoning
     paper: https://arxiv.org/pdf/2310.16049
-    configpath: opencompass/configs/datasets/musr
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/musr/musr_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
 - needlebench:
     name: NeedleBench
     category: Long Context
@@ -236,8 +236,8 @@
     name: AIME2024
     category: Examination
     paper: https://huggingface.co/datasets/Maxwell-Jia/AIME_2024
-    configpath: opencompass/configs/datasets/aime2024
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/aime2024/aime2024_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/aime2024/aime2024_llm_judge_gen.py
 - anli:
     name: Adversarial NLI
     category: Reasoning
@@ -282,8 +282,8 @@
     name: BIG-Bench Hard
     category: Reasoning
     paper: https://arxiv.org/pdf/2210.09261
-    configpath: opencompass/configs/datasets/bbh
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/bbh/bbh_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/bbh/bbh_llm_judge_gen.py
 - BoolQ:
     name: SuperGLUE / BoolQ
     category: Knowledge
@@ -366,8 +366,8 @@
     name: CMMLU
     category: Understanding
     paper: https://arxiv.org/pdf/2306.09212
-    configpath: opencompass/configs/datasets/cmmlu
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/cmmlu/cmmlu_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/cmmlu/cmmlu_llm_judge_gen.py
 - cmnli:
     name: CLUE / CMNLI
     category: Reasoning
@@ -432,8 +432,8 @@
     name: DROP (DROP Simple Eval)
     category: Understanding
     paper: https://arxiv.org/pdf/1903.00161
-    configpath: opencompass/configs/datasets/drop
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/drop/drop_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/drop/drop_llm_judge_gen.py
 - ds1000:
     name: DS-1000
     category: Code
@@ -468,8 +468,8 @@
     name: GPQA
     category: Knowledge
     paper: https://arxiv.org/pdf/2311.12022v1
-    configpath: opencompass/configs/datasets/gpqa
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/gpqa/gpqa_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/gpqa/gpqa_llm_judge_gen.py
 - gsm8k:
     name: GSM8K
     category: Math
@@ -492,13 +492,13 @@
     name: HellaSwag
     category: Reasoning
     paper: https://arxiv.org/pdf/1905.07830
-    configpath: opencompass/configs/datasets/hellaswag
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/hellaswag/hellaswag_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/hellaswag/hellaswag_llm_judge_gen.py
 - humaneval:
     name: HumanEval
     category: Code
     paper: https://arxiv.org/pdf/2107.03374v2
-    configpath: opencompass/configs/datasets/humaneval
+    configpath: opencompass/configs/datasets/humaneval/humaneval_gen.py
     configpath_llmjudge: ''
 - humaneval_cn:
     name: HumanEval-CN
@@ -566,6 +566,12 @@
     paper: https://arxiv.org/pdf/2103.03874
     configpath: opencompass/configs/datasets/math
     configpath_llmjudge: ''
+- math500:
+    name: MATH500
+    category: Math
+    paper: https://github.com/openai/prm800k
+    configpath: opencompass/configs/datasets/math/math_prm800k_500_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/math/math_prm800k_500_llm_judge_gen.py
 - math401:
     name: MATH 401
     category: Math
@@ -606,8 +612,8 @@
     name: MMLU
     category: Understanding
     paper: https://arxiv.org/pdf/2009.03300
-    configpath: opencompass/configs/datasets/mmlu
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/mmlu/mmlu_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
 - mmlu_cf:
     name: MMLU-CF
     category: Understanding
@@ -618,8 +624,8 @@
     name: MMLU-Pro
     category: Understanding
     paper: https://arxiv.org/pdf/2406.01574
-    configpath: opencompass/configs/datasets/mmlu_pro
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/mmlu_pro/mmlu_pro_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/mmlu_pro/mmlu_pro_llm_judge_gen.py
 - mmmlu:
     name: MMMLU
     category: Language / Understanding
