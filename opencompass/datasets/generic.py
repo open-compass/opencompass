@@ -78,7 +78,6 @@ def generic_llmjudge_postprocess(
                     f'No gold answer for {k}, use empty string as reference!')
                 references.append('')
     results = get_final_results(judged_answers, references, origial_responses)
-
     results['details'] = output
     return results
 
