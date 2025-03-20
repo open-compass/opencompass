@@ -21,7 +21,7 @@ multiple_eval_cfg = {
         evaluator=dict(
             type=MultiplEEvaluator,
             language=lang,
-            ip_address='https://dongsheng-docker-test.hf.space', # https://opencompass-multiple-evaluator.hf.space
+            ip_address='https://opencompass-multiple-evaluator.hf.space',
         ),
         pred_role='BOT',
     ) for lang in _TOP_TEN_LANGUAGE_
