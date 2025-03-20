@@ -399,7 +399,7 @@ class OpenAI(BaseAPIModel):
                 self.logger.info(
                     f'Successfully load default tiktoken tokenizer: '
                     f' {default_tokenizer}')
-            return len(enc.encode(prompt))
+            return len(enc.encode(prompt, disallowed_special=()))
 
     def _bin_trim(self, prompt: str, num_token: int, mode: str) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.

@@ -53,7 +53,7 @@ def compute_metrics_from_results(results, k_list=[1, 5]):
         k: dict(zip(task_ids, v))
         for k, v in detail_pass_at_k.items()
     }
-    pass_at_k['detail'] = detail_metrics
+    pass_at_k['details'] = detail_metrics
     return pass_at_k
 
 
