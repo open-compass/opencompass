@@ -193,6 +193,12 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/mmlu_pro",
     },
+    # MultiPL-E
+    "opencompass/multipl_e": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/multipl_e",
+    },
     # NQ
     "opencompass/natural_question": {
         "ms_id": "opencompass/natural_question",
@@ -626,6 +632,11 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
         "md5": "e3200c7380f4cea5f13c768f2815fabb",
+    },
+    "multipl_e": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/multipl_e.zip",
+        "md5": "24462aac7a38a4a62f5c5e89eb614e20",
     },
     "/Longbench": {
         "url":
