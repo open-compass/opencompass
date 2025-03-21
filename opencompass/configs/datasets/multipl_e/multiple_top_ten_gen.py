@@ -13,7 +13,7 @@ multiple_reader_cfg = dict(input_columns=['language', 'prompt'], output_column='
 multiple_infer_cfg = dict(
     prompt_template=dict(type=PromptTemplate, template='Based on the provided {language} code snippet, complete the subsequent content. The initial part of the completed code must match the provided code snippet exactly:\n{prompt}'),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=2048),
+    inferencer=dict(type=GenInferencer),
 )
 
 multiple_eval_cfg = {
