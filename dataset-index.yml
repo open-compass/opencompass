@@ -529,6 +529,11 @@
     category: Understanding
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
     configpath: opencompass/configs/datasets/SuperGLUE_MultiRC
+- multipl_e:
+    name: MultiPL-E
+    category: Code
+    paper: https://arxiv.org/pdf/2210.14868
+    configpath: opencompass/configs/datasets/multipl_e
 - narrativeqa:
     name: NarrativeQA
     category: Understanding
