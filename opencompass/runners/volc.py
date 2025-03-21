@@ -256,7 +256,7 @@ class VOLCRunner(BaseRunner):
         with open(config_path) as fp:
             volc_cfg = yaml.safe_load(fp)
         if num_gpus <= 0:
-            flavor = 'ml.c3i.2xlarge'
+            flavor = 'ml.r3i.2xlarge'
         elif num_gpus == 1:
             flavor = 'ml.pni2l.3xlarge'
         elif num_gpus == 2:
