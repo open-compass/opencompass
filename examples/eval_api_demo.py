@@ -7,6 +7,8 @@ with read_base():
         math_datasets
     from opencompass.configs.models.openai.gpt_4o_2024_05_13 import \
         models as gpt4
+    from opencompass.configs.models.minimax.minimax_deepseek_r1 import models as minimax_ds_r1
 
-datasets = gsm8k_datasets + math_datasets
-models = gpt4
+
+datasets = gsm8k_datasets
+models = minimax_ds_r1
