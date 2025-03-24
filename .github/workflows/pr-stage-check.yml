@@ -106,7 +106,7 @@ jobs:
       - name: Upgrade pip
         run: python -m pip install pip --upgrade
       - name: Install PyTorch
-        run: pip install torch==2.0.0+${{matrix.platform}} -f https://download.pytorch.org/whl/${{matrix.platform}}/torch_stable.html
+        run: pip install torch==${{matrix.torch}} -f https://download.pytorch.org/whl/${{matrix.platform}}/torch_stable.html
       - name: Install opencompass dependencies
         run: |
           pip install -r requirements.txt
