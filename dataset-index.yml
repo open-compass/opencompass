@@ -313,6 +313,12 @@
     paper: https://arxiv.org/pdf/2210.09261
     configpath: opencompass/configs/datasets/bbh/bbh_gen.py
     configpath_llmjudge: opencompass/configs/datasets/bbh/bbh_llm_judge_gen.py
+- bbeh:
+    name: BIG-Bench Extra Hard
+    category: Reasoning
+    paper: https://arxiv.org/abs/2502.19187
+    configpath: opencompass/configs/datasets/bbeh
+    configpath_llmjudge: ''
 - BoolQ:
     name: SuperGLUE / BoolQ
     category: Knowledge

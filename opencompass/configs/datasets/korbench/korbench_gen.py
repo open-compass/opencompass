@@ -37,7 +37,7 @@ for category in categories:
     infer_cfg = dict(
         prompt_template=prompt_template,
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_out_len=1024),
+        inferencer=dict(type=GenInferencer),
     )
 
     # Evaluation configuration
