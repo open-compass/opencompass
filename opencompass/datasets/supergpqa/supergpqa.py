@@ -1,4 +1,5 @@
 import os
+import re
 
 from datasets import Dataset, load_dataset
 
@@ -7,6 +8,7 @@ from opencompass.datasets.supergpqa.supergpqa_eval import (
 from opencompass.datasets.supergpqa.supergpqa_utils import load_yaml
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_logger
 
 from ..base import BaseDataset
 
@@ -180,3 +182,133 @@ class SuperGPQAEvaluator(BaseEvaluator):
             'details':
             details,
         }
+
+
+def _generic_llmjudge_postprocess(judgement: str):
+    match = re.search(r'(A|B)', judgement)
+    grade_letter = (match.group(0) if match else 'B'
+                    )  # Default to "INCORRECT" if no match
+    return grade_letter
+
+
+def supergpqa_llmjudge_postprocess(
+    output: dict,
+    output_path: str,
+    dataset: Dataset,
+) -> dict:
+    # Get the original dataset
+    original_dataset = dataset.reader.dataset['test']
+
+    judged_answers = []
+    original_responses = []
+    references = []
+    details = []
+
+    # Initialize statistics dictionaries
+    stats = {'discipline': {}, 'field': {}, 'subfield': {}}
+
+    total_correct = 0
+    total_count = 0
+
+    # Process each sample
+    for k, v in output.items():
+        idx = int(k)  # Convert key to integer for indexing
+        original_responses.append(v['prediction'])
+        processed_judge = _generic_llmjudge_postprocess(v['prediction'])
+
+        # Get category information from the dataset
+        sample = original_dataset[idx]
+        discipline = sample.get('discipline', 'unknown')
+        field = sample.get('field', 'unknown')
+        subfield = sample.get('subfield', 'unknown')
+
+        # Initialize category stats if not exists
+        for level, key in [
+            ('discipline', discipline),
+            ('field', f'{discipline}/{field}'),
+            ('subfield', f'{discipline}/{field}/{subfield}'),
+        ]:
+            if key not in stats[level]:
+                stats[level][key] = {'correct': 0, 'total': 0}
+
+        # Record the judgment
+        if processed_judge is not None:
+            judged_answers.append(processed_judge)
+            try:
+                gold = v['gold']
+                references.append(gold)
+            except KeyError:
+                get_logger().warning(
+                    f'No gold answer for {k}, use empty string as reference!')
+                gold = ''
+                references.append('')
+
+            # Check if the answer is correct (A means correct)
+            is_correct = processed_judge == 'A'
+            total_count += 1
+
+            if is_correct:
+                total_correct += 1
+                # Update category stats
+                for level, key in [
+                    ('discipline', discipline),
+                    ('field', f'{discipline}/{field}'),
+                    ('subfield', f'{discipline}/{field}/{subfield}'),
+                ]:
+                    stats[level][key]['correct'] += 1
+
+            # Update category totals
+            for level, key in [
+                ('discipline', discipline),
+                ('field', f'{discipline}/{field}'),
+                ('subfield', f'{discipline}/{field}/{subfield}'),
+            ]:
+                stats[level][key]['total'] += 1
+            # Add to details
+            details.append({
+                'id': k,
+                'question': sample['question'],
+                'options': sample['options'],
+                'origin_prompt': v['origin_prompt'],
+                'llm_judge': processed_judge,
+                'gold': gold,
+                'is_correct': is_correct,
+                'discipline': discipline,
+                'field': field,
+                'subfield': subfield,
+            })
+
+    # Calculate overall accuracy with two decimal places
+    overall_accuracy = (round(
+        (total_correct / total_count * 100), 2) if total_count > 0 else 0.00)
+
+    # Initialize results dictionary
+    results = {
+        'accuracy': overall_accuracy,
+        'total_correct': total_correct,
+        'total_count': total_count,
+        'details': details,
+    }
+
+    # Calculate accuracy for each category and flatten into results
+    for level in stats:
+        for key, value in stats[level].items():
+            if value['total'] > 0:
+                # Calculate accuracy with two decimal places
+                accuracy = round((value['correct'] / value['total'] * 100), 2)
+
+                # Create a flattened key for the category
+                flat_key = f'SuperGPQA-{level}'
+                if level == 'discipline':
+                    flat_key = f'SuperGPQA-{key}'
+                elif level == 'field':
+                    discipline, field = key.split('/')
+                    flat_key = f'SuperGPQA-{discipline}-{field}'
+                elif level == 'subfield':
+                    discipline, field, subfield = key.split('/')
+                    flat_key = f'SuperGPQA-{discipline}-{field}-{subfield}'
+
+                # Add to results
+                results[flat_key] = accuracy
+
+    return results

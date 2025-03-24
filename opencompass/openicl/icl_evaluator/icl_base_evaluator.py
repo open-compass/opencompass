@@ -89,6 +89,14 @@ class BaseEvaluator:
         original_dataset: Dataset,
         **score_kwargs,
     ):
+        # Check if predictions and references have the
+        # same length if both are provided
+        if 'predictions' in score_kwargs and 'references' in score_kwargs:
+            if len(score_kwargs['predictions']) != len(
+                    score_kwargs['references']):
+                raise ValueError(
+                    'Predictions and references must have the same length')
+
         real_size = len(original_dataset) // n
         all_details = []
         all_results = []
