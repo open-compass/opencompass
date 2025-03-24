@@ -1,20 +1,21 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever,  RandomRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import NQOpenDataset, NQEvaluator
+from opencompass.datasets import TriviaQADatasetV2, TriviaQAEvaluator
 
-nq_datasets = []
+
+triviaqa_datasets = []
 for k in [1]:
-    nq_reader_cfg = dict(
+    triviaqa_reader_cfg = dict(
         input_columns=['question'], output_column='answer', train_split='train', test_split='validation')
 
     if k == 0:
-        nq_infer_cfg = dict(
+        triviaqa_infer_cfg = dict(
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
                     round=[
-                        dict(role='HUMAN', prompt='Q: {question}?'),
+                        dict(role='HUMAN', prompt='Q: {question}'),
                         dict(role='BOT', prompt='A:'),
                     ]
                 )
@@ -23,12 +24,12 @@ for k in [1]:
             inferencer=dict(type=GenInferencer)
         )
     else:
-        nq_infer_cfg = dict(
+        triviaqa_infer_cfg = dict(
             ice_template=dict(
                 type=PromptTemplate,
                 template=dict(
                     round=[
-                        dict(role='HUMAN', prompt='Q: {question}?'),
+                        dict(role='HUMAN', prompt='Q: {question}'),
                         dict(role='BOT', prompt='A: {answer}.\n'),
                     ]
                 ),
@@ -38,24 +39,24 @@ for k in [1]:
                 template=dict(
                     begin='</E>',
                     round=[
-                        dict(role='HUMAN', prompt='Q: {question}?'),
+                        dict(role='HUMAN', prompt='Q: {question}'),
                         dict(role='BOT', prompt='A:'),
                     ]
                 ),
                 ice_token='</E>',
             ),
             retriever=dict(type=FixKRetriever, fix_id_list=list(range(k))),
-            inferencer=dict(type=GenInferencer, max_out_len=50),
+            inferencer=dict(type=GenInferencer),
         )
 
-    nq_eval_cfg = dict(evaluator=dict(type=NQEvaluator), pred_role='BOT')
+    triviaqa_eval_cfg = dict(evaluator=dict(type=TriviaQAEvaluator), pred_role='BOT')
 
-    nq_datasets.append(
-        dict(
-            type=NQOpenDataset,
-            abbr=f'nq_open_{k}shot',
-            path='opencompass/nq_open',
-            reader_cfg=nq_reader_cfg,
-            infer_cfg=nq_infer_cfg,
-            eval_cfg=nq_eval_cfg)
-        )
+    triviaqa_datasets.append(
+    dict(
+        type=TriviaQADatasetV2,
+        abbr=f'triviaqa_wiki_{k}shot',
+        path='opencompass/trivia_qa',
+        reader_cfg=triviaqa_reader_cfg,
+        infer_cfg=triviaqa_infer_cfg,
+        eval_cfg=triviaqa_eval_cfg)
+    )
