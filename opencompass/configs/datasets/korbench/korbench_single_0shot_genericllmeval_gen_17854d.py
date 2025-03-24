@@ -4,7 +4,6 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.utils import xml_tag_postprocessor
 
 categories = ['cipher', 'counterfactual', 'logic', 'operation', 'puzzle']
 
@@ -97,7 +96,6 @@ for category in categories:
             ),
             judge_cfg=dict(),
             dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-            pred_postprocessor=dict(type=xml_tag_postprocessor, tag='<conclude>'),
         ),
         pred_role='BOT',
     )
