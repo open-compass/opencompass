@@ -1,7 +1,3 @@
-from latex2sympy2_extended import NormalizationConfig
-from math_verify import (ExprExtractionConfig, LatexExtractionConfig, parse,
-                         verify)
-
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
 
@@ -10,6 +6,14 @@ from opencompass.registry import ICL_EVALUATORS
 class MATHEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
+        try:
+            from latex2sympy2_extended import NormalizationConfig
+            from math_verify import (ExprExtractionConfig,
+                                     LatexExtractionConfig, parse, verify)
+        except ImportError:
+            raise ImportError('Failed to import required modules. Please '
+                              'install the necessary packages: '
+                              'pip install math_verify latex2sympy2_extended')
 
         self.is_num_equal(predictions, references)
 
@@ -75,7 +79,7 @@ class MATHEvaluator(BaseEvaluator):
 
 if __name__ == '__main__':
     import sympy
-
+    from math_verify import parse
     test_cases = [
         # 1. Basic arithmetic operations
         r'Simple fraction: \boxed{\frac{1}{2}}',

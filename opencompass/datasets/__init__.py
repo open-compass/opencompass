@@ -9,6 +9,7 @@ from .arc import *  # noqa: F401, F403
 from .arc_prize_public_evaluation import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .babilong import *  # noqa: F401, F403
+from .bbeh import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
 from .bigcodebench import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
@@ -97,6 +98,7 @@ from .mmlu_cf import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403
+from .multipl_e import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .musr import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
@@ -127,6 +129,7 @@ from .strategyqa import *  # noqa: F401, F403
 from .subjective import *  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
+from .supergpqa import *  # noqa: F401, F403
 from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
 from .taco import *  # noqa: F401, F403
