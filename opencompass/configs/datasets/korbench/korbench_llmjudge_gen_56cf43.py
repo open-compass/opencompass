@@ -2,7 +2,7 @@ from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEval
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_evaluator import LMEvaluator
+from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
 
 categories = ['cipher', 'counterfactual', 'logic', 'operation', 'puzzle']
@@ -71,7 +71,7 @@ for category in categories:
     # Evaluation configuration
     eval_cfg = dict(
         evaluator=dict(
-            type=LMEvaluator,
+            type=GenericLLMEvaluator,
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
@@ -88,6 +88,14 @@ for category in categories:
                     ),
                 ]),
             ),
+            dataset_cfg=dict(
+                type=korbenchDataset,
+                path='opencompass/korbench',
+                prompt_mode='0_shot',
+                category=category,
+                reader_cfg=reader_cfg,
+            ),
+            judge_cfg=dict(),
             dict_postprocessor=dict(type=generic_llmjudge_postprocess),
         ),
         pred_role='BOT',
