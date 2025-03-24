@@ -171,6 +171,8 @@ class DefaultSummarizer:
                         default_metric = 'sum'
                     elif sg.get('weights', []):
                         default_metric = 'weighted_average'
+                    elif sg.get('harmonic_mean', False):
+                        default_metric = 'harmonic_mean'
                     else:
                         default_metric = 'naive_average'
 
@@ -186,24 +188,35 @@ class DefaultSummarizer:
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 else:
                     group_metrics = list(functools.reduce(lambda a, b: a & b, [set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']]))
-                    if need_smart_metric and len(group_metrics) > 1:
-                        for metric in group_metrics:
-                            for dataset_abbr in sg['subsets']:
-                                scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
-                                eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
-                    else:
-                        group_metrics = [default_metric]
+                    group_metrics.append(default_metric)
+                    for metric in group_metrics:
                         for dataset_abbr in sg['subsets']:
-                            metric = dataset_metrics[dataset_abbr][0]
-                            scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
-                            eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
-
+                            if metric == default_metric:
+                                metric_default = dataset_metrics[dataset_abbr][0]
+                                scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric_default] = \
+                                parsed_results[model_abbr][dataset_abbr][metric_default]
+                                eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
+                            else:
+                                scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = \
+                                parsed_results[model_abbr][dataset_abbr][metric]
+                                eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
                 result = {}
                 for metric in scores:
                     if default_metric == 'standard_deviation':
                         avg = sum(scores[metric].values()) / len(scores[metric])
                         variance = sum((scores[metric][k] - avg) ** 2 for k in scores[metric]) / len(scores[metric])
                         scores[metric] = result[metric] = math.sqrt(variance)
+                    elif default_metric == 'harmonic_mean':
+                        # Check for non-positive values that would cause issues in harmonic mean
+                        if any(scores[metric][k] <= 0 for k in scores[metric]):
+                            self.logger.warning(f'Non-positive values found when calculating harmonic mean for {sg["name"]}')
+                            # Handle non-positive values (either skip or use a small positive value)
+                            numerator = len(scores[metric])
+                            denominator = sum(1 / max(scores[metric][k], 1) for k in scores[metric])
+                        else:
+                            numerator = len(scores[metric])
+                            denominator = sum(1 / scores[metric][k] for k in scores[metric])
+                        scores[metric] = result[metric] = numerator / denominator
                     else:
                         if sg.get('weights', []):
                             # check sg['weights'][k] != 0 in case of scores[metric][k] is NaN

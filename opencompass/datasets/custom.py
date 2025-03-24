@@ -183,6 +183,33 @@ class CustomDataset(BaseDataset):
         return Dataset.from_list(data)
 
 
+@LOAD_DATASET.register_module()
+class CodeCustomDataset(BaseDataset):
+
+    @staticmethod
+    def load(path, file_name=None, local_mode=False, num_repeats=1, **kwargs):
+        path = get_data_path(path, local_mode=local_mode)
+        if file_name is not None:
+            path = os.path.join(path, file_name)
+        data = []
+        if path.endswith('.jsonl'):
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    data.extend(
+                        [json.loads(line.strip()) for _ in range(num_repeats)])
+        elif path.endswith('.csv'):
+            with open(path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.reader(f)
+                header = next(reader)
+                for row in reader:
+                    data.extend(
+                        [dict(zip(header, row)) for _ in range(num_repeats)])
+        else:
+            raise ValueError(f'Unsupported file format: {path}')
+
+        return Dataset.from_list(data)
+
+
 class CircularCustomDataset(CustomDataset, metaclass=CircularDatasetMeta):
     dataset_class = CustomDataset
 

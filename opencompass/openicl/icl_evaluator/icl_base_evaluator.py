@@ -1,4 +1,5 @@
 """Base Evaluator."""
+
 from collections import OrderedDict
 from copy import deepcopy
 from typing import Any, Dict, Iterable, List, Union
@@ -77,12 +78,25 @@ class BaseEvaluator:
         for metric in all_metrics:
             if metric in ['predictions', 'example_abbr']:
                 continue
-            g_passk_details[metric] = 100. * np.mean(
+            g_passk_details[metric] = 100.0 * np.mean(
                 [detail[metric] for detail in details])
         return g_passk_details
 
-    def evaluate(self, k: Union[int, List[int]], n: int,
-                 original_dataset: Dataset, **score_kwargs):
+    def evaluate(
+        self,
+        k: Union[int, List[int]],
+        n: int,
+        original_dataset: Dataset,
+        **score_kwargs,
+    ):
+        # Check if predictions and references have the
+        # same length if both are provided
+        if 'predictions' in score_kwargs and 'references' in score_kwargs:
+            if len(score_kwargs['predictions']) != len(
+                    score_kwargs['references']):
+                raise ValueError(
+                    'Predictions and references must have the same length')
+
         real_size = len(original_dataset) // n
         all_details = []
         all_results = []
@@ -146,7 +160,7 @@ class BaseEvaluator:
 
                 if can_calculate and n > 1 and k > 1:
                     thresholds = [0.0, 0.25, 0.5, 0.75, 1.0]
-                    for _k in ([k] if isinstance(k, int) else k):
+                    for _k in [k] if isinstance(k, int) else k:
                         for threshold in thresholds:
                             g_pass = compute_g_pass_at_k(n=n,
                                                          c=c,
@@ -161,9 +175,31 @@ class BaseEvaluator:
 
             if can_calculate and n > 1 and k > 1:
                 eval_results.update(self.reduce(eval_details))
+
+            # Store eval_details in eval_results
             eval_results['details'] = eval_details
 
-        return eval_results
+            # Process details to flatten the predictions
+            for detail in eval_details:
+                # Extract all prediction fields and flatten them
+                flattened_predictions = {}
+                for pred in detail['predictions']:
+                    for k, v in pred.items():
+                        if k not in flattened_predictions:
+                            flattened_predictions[k] = [v]
+                        else:
+                            flattened_predictions[k].append(v)
+
+                # Replace the predictions list with the flattened dictionary
+                for k, v in flattened_predictions.items():
+                    detail[k] = v
+
+                # Remove the original predictions field
+                detail.pop('predictions')
+            return eval_results
+
+        # If there are no details, return results
+        return results
 
     def score(self):
         raise NotImplementedError("Method hasn't been implemented yet")

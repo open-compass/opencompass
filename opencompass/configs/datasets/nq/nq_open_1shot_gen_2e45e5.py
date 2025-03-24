@@ -20,7 +20,7 @@ for k in [1]:
                 )
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_out_len=50)
+            inferencer=dict(type=GenInferencer)
         )
     else:
         nq_infer_cfg = dict(
