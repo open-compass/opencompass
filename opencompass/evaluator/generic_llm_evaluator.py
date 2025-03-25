@@ -84,6 +84,8 @@ class GenericLLMEvaluator(BaseEvaluator):
         references: Optional[List] = None,
     ) -> Dict:
         """Apply to single-model scoring."""
+        assert len(predictions) == len(
+            references), 'predictions and references must have the same length'
         # -------------- Build Inferencer ----------------
         self.build_inferencer()
 
@@ -127,7 +129,7 @@ class GenericLLMEvaluator(BaseEvaluator):
                                   prompt_template=self.prompt_template)
 
         output = mmengine.load(self.output_path)
-        return self.output_postprocess(output)
+        return self.output_postprocess(output, dataset)
 
     def pred_postprocess(self, predictions: List) -> Dict:
         if self.pred_postprocessor is None:
@@ -137,15 +139,24 @@ class GenericLLMEvaluator(BaseEvaluator):
             proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
             return [proc(pred, **kwargs) for pred in predictions]
 
-    def output_postprocess(self, output: Dict) -> Dict:
+    def output_postprocess(self, output: Dict, dataset=None) -> Dict:
         """Postprocess output by adding necessary statistics or data into
         it."""
+        import inspect
+
         if self.dict_postprocessor is None:
             return output
         else:
             kwargs = self.dict_postprocessor
             proc = DICT_POSTPROCESSORS.get(kwargs.pop('type'))
-            return proc(output, self.output_path, **kwargs)
+            sig = inspect.signature(proc)
+            if 'dataset' in sig.parameters:
+                return proc(output,
+                            self.output_path,
+                            dataset=dataset,
+                            **kwargs)
+            else:
+                return proc(output, self.output_path, **kwargs)
 
     @property
     def default_judge_cfg(self):
