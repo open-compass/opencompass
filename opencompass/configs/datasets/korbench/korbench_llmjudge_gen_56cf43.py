@@ -16,11 +16,14 @@ GRADER_TEMPLATE = """
     3. Some answers may contain multiple items, such as multiple-choice questions, multiple-select questions, fill-in-the-blank questions, etc. As long as the answer is the same as the standard answer, it is enough. For multiple-select questions and multiple-blank fill-in-the-blank questions, the candidate needs to answer all the corresponding options or blanks correctly to be considered correct.
     4. Some answers may be expressed in different ways, such as some answers may be a mathematical expression, some answers may be a textual description, as long as the meaning expressed is the same. And some formulas are expressed in different ways, but they are equivalent and correct.
     5. If the prediction is given with \\boxed{}, please ignore the \\boxed{} and only judge whether the candidate's answer is consistent with the standard answer.
+
     Please judge whether the following answers are consistent with the standard answer based on the above criteria. Grade the predicted answer of this new question as one of:
     A: CORRECT 
     B: INCORRECT
     Just return the letters "A" or "B", with no text around it.
+
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+
     <Original Question Begin>: \n{prompt}\n<Original Question End>\n\n
     <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
@@ -44,7 +47,7 @@ for category in categories:
             round=[
                 dict(
                     role='HUMAN',
-                    prompt='{prompt}'  # f-string
+                    prompt='{prompt}' # f-string
                 )
             ]
         )
@@ -70,18 +73,18 @@ for category in categories:
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
-                    begin=[
-                        dict(
-                            role='SYSTEM',
-                            fallback_role='HUMAN',
-                            prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
-                    ],
-                    round=[
-                        dict(
-                            role='HUMAN',
-                            prompt=GRADER_TEMPLATE
-                        ),
-                    ]),
+                  begin=[
+                      dict(
+                          role='SYSTEM',
+                          fallback_role='HUMAN',
+                          prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                  ],
+                      round=[
+                      dict(
+                          role='HUMAN',
+                          prompt = GRADER_TEMPLATE
+                      ),
+                  ]),
             ),
             dataset_cfg=dict(
                 type=korbenchDataset,
