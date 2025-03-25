@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import MATHEvaluator
-from opencompass.datasets import CustomDataset
+from opencompass.datasets import Aime2024Dataset
 
 
 aime2024_reader_cfg = dict(
@@ -31,7 +31,7 @@ aime2024_eval_cfg = dict(
 aime2024_datasets = [
     dict(
         abbr='aime2024',
-        type=CustomDataset,
+        type=Aime2024Dataset,
         path='opencompass/aime2024',
         reader_cfg=aime2024_reader_cfg,
         infer_cfg=aime2024_infer_cfg,
