@@ -984,3 +984,4 @@
     category: Knowledge
     paper: https://arxiv.org/pdf/2502.14739
     configpath: opencompass/configs/datasets/supergpqa
+    configpath_llmjudge: ''
