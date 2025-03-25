@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import CustomDataset
+from opencompass.datasets import Aime2024Dataset
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
 
@@ -69,8 +69,8 @@ aime2024_eval_cfg = dict(
             ),
         ),
         dataset_cfg=dict(
-            type=CustomDataset,
-            path='opencompass/aime2025',
+            type=Aime2024Dataset,
+            path='opencompass/aime2024',
             reader_cfg=aime2024_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -81,8 +81,8 @@ aime2024_eval_cfg = dict(
 aime2024_datasets = [
     dict(
         abbr='aime2024',
-        type=CustomDataset,
-        path='opencompass/aime2025',
+        type=Aime2024Dataset,
+        path='opencompass/aime2024',
         reader_cfg=aime2024_reader_cfg,
         infer_cfg=aime2024_infer_cfg,
         eval_cfg=aime2024_eval_cfg,
