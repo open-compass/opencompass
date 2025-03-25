@@ -14,6 +14,12 @@ On this page, we have listed all the datasets supported by OpenCompass.
 
 You can use sorting and search functions to find the dataset you need.
 
+We provide recommended running configurations for each dataset,
+and in some datasets also offer recommended configurations based on LLM Judge.
+
+You can quickly start evaluation tasks based on the recommended configurations.
+However, please note that these configurations may be updated over time.
+
 """
 
 with open('dataset_statistics.md', 'w') as f:
@@ -24,7 +30,7 @@ load_path = str(OC_ROOT / 'dataset-index.yml')
 with open(load_path, 'r') as f2:
     data_list = yaml.load(f2, Loader=yaml.FullLoader)
 
-HEADER = ['name', 'category', 'paper', 'configpath']
+HEADER = ['name', 'category', 'paper', 'configpath', 'configpath_llmjudge']
 
 
 def table_format(data_list):
@@ -35,6 +41,13 @@ def table_format(data_list):
             for index in HEADER:
                 if index == 'paper':
                     table_format_list_sub.append('[link](' + i[j][index] + ')')
+                elif index == 'configpath_llmjudge':
+                    if i[j][index] == '':
+                        table_format_list_sub.append(i[j][index])
+                    else:
+                        table_format_list_sub.append('[link](' +
+                                                     GITHUB_PREFIX +
+                                                     i[j][index] + ')')
                 elif index == 'configpath':
                     if isinstance(i[j][index], list):
                         sub_list_text = ''
@@ -61,7 +74,10 @@ def generate_table(data_list, title=None):
         if title is not None:
             f.write(f'\n{title}')
         f.write("""\n```{table}\n:class: dataset\n""")
-        header = ['Name', 'Category', 'Paper or Repository', 'Config File']
+        header = [
+            'Name', 'Category', 'Paper or Repository', 'Recommended Config',
+            'Recommended Config (LLM Judge)'
+        ]
         table_cfg = dict(tablefmt='pipe',
                          floatfmt='.2f',
                          numalign='right',

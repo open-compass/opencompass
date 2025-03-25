@@ -286,6 +286,8 @@ We have supported a statistical list of all datasets that can be used on this pl
 
 You can quickly find the dataset you need from the list through sorting, filtering, and searching functions.
 
+In addition, we provide a recommended configuration for each dataset, and some datasets also support LLM Judge-based configurations.
+
 Please refer to the dataset statistics chapter of [official document](https://opencompass.org.cn/doc) for details.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>

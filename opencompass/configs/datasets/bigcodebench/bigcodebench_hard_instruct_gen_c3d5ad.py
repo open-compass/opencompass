@@ -15,8 +15,9 @@ bigcodebench_hard_infer_cfg = dict(prompt_template=dict(
         round=[
             dict(role='HUMAN', prompt='{instruct_prompt}'),
         ])),
-                                   retriever=dict(type=ZeroRetriever),
-                                   inferencer=dict(type=GenInferencer))
+       retriever=dict(type=ZeroRetriever),
+       inferencer=dict(type=GenInferencer)
+)
 
 bigcodebench_hard_eval_cfg = dict(
     evaluator=dict(

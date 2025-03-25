@@ -14,6 +14,10 @@ DATASETZOO_TEMPLATE = """\
 
 你可以使用排序和搜索功能找到需要的数据集。
 
+我们对每一个数据集都给出了推荐的运行配置，部分数据集中还提供了基于LLM Judge的推荐配置。
+
+你可以基于推荐配置快速启动评测。但请注意，推荐配置可能随时间推移被更新。
+
 """
 
 with open('dataset_statistics.md', 'w') as f:
@@ -24,7 +28,7 @@ load_path = str(OC_ROOT / 'dataset-index.yml')
 with open(load_path, 'r') as f2:
     data_list = yaml.load(f2, Loader=yaml.FullLoader)
 
-HEADER = ['name', 'category', 'paper', 'configpath']
+HEADER = ['name', 'category', 'paper', 'configpath', 'configpath_llmjudge']
 
 
 def table_format(data_list):
@@ -35,6 +39,12 @@ def table_format(data_list):
             for index in HEADER:
                 if index == 'paper':
                     table_format_list_sub.append('[链接](' + i[j][index] + ')')
+                elif index == 'configpath_llmjudge':
+                    if i[j][index] == '':
+                        table_format_list_sub.append(i[j][index])
+                    else:
+                        table_format_list_sub.append('[链接](' + GITHUB_PREFIX +
+                                                     i[j][index] + ')')
                 elif index == 'configpath':
                     if isinstance(i[j][index], list):
                         sub_list_text = ''
@@ -60,7 +70,7 @@ def generate_table(data_list, title=None):
         if title is not None:
             f.write(f'\n{title}')
         f.write("""\n```{table}\n:class: dataset\n""")
-        header = ['数据集名称', '数据集类型', '原文或资源地址', '配置文件链接']
+        header = ['数据集名称', '数据集类型', '原文或资源地址', '推荐配置', '推荐配置(基于LLM评估)']
         table_cfg = dict(tablefmt='pipe',
                          floatfmt='.2f',
                          numalign='right',

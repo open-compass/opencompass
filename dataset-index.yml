@@ -1,751 +1,987 @@
-
 - ifeval:
     name: IFEval
     category: Instruction Following
     paper: https://arxiv.org/pdf/2311.07911
-    configpath: opencompass/configs/datasets/IFEval
+    configpath: opencompass/configs/datasets/IFEval/IFEval_gen.py
+    configpath_llmjudge: ''
 - nphard:
     name: NPHardEval
     category: Reasoning
     paper: https://arxiv.org/pdf/2312.14890v2
-    configpath: opencompass/configs/datasets/NPHardEval
+    configpath: opencompass/configs/datasets/NPHardEval/NPHardEval_gen.py
+    configpath_llmjudge: ''
 - pmmeval:
     name: PMMEval
     category: Language
     paper: https://arxiv.org/pdf/2411.09116v1
-    configpath: opencompass/configs/datasets/PMMEval
+    configpath: opencompass/configs/datasets/PMMEval/pmmeval_gen.py
+    configpath_llmjudge: ''
 - theoremqa:
     name: TheroremQA
     category: Reasoning
     paper: https://arxiv.org/pdf/2305.12524
-    configpath: opencompass/configs/datasets/TheroremQA
+    configpath: opencompass/configs/datasets/TheroremQA/TheoremQA_gen.py
+    configpath_llmjudge: ''
 - agieval:
     name: AGIEval
     category: Examination
     paper: https://arxiv.org/pdf/2304.06364
-    configpath: opencompass/configs/datasets/agieval
+    configpath: opencompass/configs/datasets/agieval/agieval_gen.py
+    configpath_llmjudge: ''
 - babilong:
     name: BABILong
     category: Long Context
     paper: https://arxiv.org/pdf/2406.10149
     configpath: opencompass/configs/datasets/babilong
+    configpath_llmjudge: ''
 - bigcodebench:
     name: BigCodeBench
     category: Code
     paper: https://arxiv.org/pdf/2406.15877
-    configpath: opencompass/configs/datasets/bigcodebench
+    configpath: opencompass/configs/datasets/bigcodebench/bigcodebench_gen.py
+    configpath_llmjudge: ''
 - calm:
     name: CaLM
     category: Reasoning
     paper: https://arxiv.org/pdf/2405.00622
-    configpath: opencompass/configs/datasets/calm
+    configpath: opencompass/configs/datasets/calm/calm.py
+    configpath_llmjudge: ''
 - infinitebench:
     name: InfiniteBench (∞Bench)
     category: Long Context
     paper: https://aclanthology.org/2024.acl-long.814.pdf
-    configpath: opencompass/configs/datasets/infinitebench
+    configpath: opencompass/configs/datasets/infinitebench/infinitebench.py
+    configpath_llmjudge: ''
 - korbench:
     name: KOR-Bench
     category: Reasoning
     paper: https://arxiv.org/pdf/2410.06526v1
-    configpath: opencompass/configs/datasets/korbench
+    configpath: opencompass/configs/datasets/korbench/korbench_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/korbench/korbench_llm_judge_gen.py
 - lawbench:
     name: LawBench
     category: Knowledge / Law
     paper: https://arxiv.org/pdf/2309.16289
-    configpath: opencompass/configs/datasets/lawbench
+    configpath:
+      - opencompass/configs/datasets/lawbench/lawbench_zero_shot_gen_002588.py
+      - opencompass/configs/datasets/lawbench/lawbench_one_shot_gen_002588.py
+    configpath_llmjudge: ''
 - leval:
     name: L-Eval
     category: Long Context
     paper: https://arxiv.org/pdf/2307.11088v1
-    configpath: opencompass/configs/datasets/leval
+    configpath: opencompass/configs/datasets/leval/leval.py
+    configpath_llmjudge: ''
 - livecodebench:
     name: LiveCodeBench
     category: Code
     paper: https://arxiv.org/pdf/2403.07974
-    configpath: opencompass/configs/datasets/livecodebench
+    configpath: opencompass/configs/datasets/livecodebench/livecodebench_gen.py
+    configpath_llmjudge: ''
 - livemathbench:
     name: LiveMathBench
     category: Math
     paper: https://arxiv.org/pdf/2412.13147
-    configpath: opencompass/configs/datasets/livemathbench
+    configpath: opencompass/configs/datasets/livemathbench/livemathbench_gen.py
+    configpath_llmjudge: ''
+- livereasonbench:
+    name: LiveReasonBench
+    category: Reasoning
+    paper: ''
+    configpath: opencompass/configs/datasets/livereasonbench/livereasonbench_gen.py
+    configpath_llmjudge: ''
 - longbench:
     name: LongBench
     category: Long Context
     paper: https://github.com/THUDM/LongBench
-    configpath: opencompass/configs/datasets/livemathbench
+    configpath:
+      - opencompass/configs/datasets/longbench/longbench.py
+      - opencompass/configs/datasets/longbenchv2/longbenchv2_gen.py
+    configpath_llmjudge: ''
 - lveval:
     name: LV-Eval
     category: Long Context
     paper: https://arxiv.org/pdf/2402.05136
-    configpath: opencompass/configs/datasets/lveval
+    configpath: opencompass/configs/datasets/lveval/lveval.py
+    configpath_llmjudge: ''
+- mastermath2024v1:
+    name: Mastermath2024v1
+    category: Math
+    paper: ''
+    configpath: opencompass/configs/datasets/mastermath2024v1/mastermath2024v1_gen.py
+    configpath_llmjudge: ''
 - medbench:
     name: MedBench
     category: Knowledge / Medicine
     paper: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10778138
-    configpath: opencompass/configs/datasets/MedBench
+    configpath: opencompass/configs/datasets/MedBench/medbench_gen.py
+    configpath_llmjudge: ''
 - musr:
     name: MuSR
     category: Reasoning
     paper: https://arxiv.org/pdf/2310.16049
-    configpath: opencompass/configs/datasets/musr
+    configpath: opencompass/configs/datasets/musr/musr_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
 - needlebench:
     name: NeedleBench
     category: Long Context
     paper: https://arxiv.org/pdf/2407.11963
     configpath: opencompass/configs/datasets/needlebench
+    configpath_llmjudge: ''
 - ruler:
     name: RULER
     category: Long Context
     paper: https://arxiv.org/pdf/2404.06654
     configpath: opencompass/configs/datasets/ruler
+    configpath_llmjudge: ''
 - alignment:
     name: AlignBench
     category: Subjective / Alignment
     paper: https://arxiv.org/pdf/2311.18743
     configpath: opencompass/configs/datasets/subjective/alignbench
+    configpath_llmjudge: ''
 - alpaca:
     name: AlpacaEval
     category: Subjective / Instruction Following
     paper: https://github.com/tatsu-lab/alpaca_eval
     configpath: opencompass/configs/datasets/subjective/aplaca_eval
+    configpath_llmjudge: ''
 - arenahard:
     name: Arena-Hard
     category: Subjective / Chatbot
     paper: https://lmsys.org/blog/2024-04-19-arena-hard/
     configpath: opencompass/configs/datasets/subjective/arena_hard
+    configpath_llmjudge: ''
 - flames:
     name: FLAMES
     category: Subjective / Alignment
     paper: https://arxiv.org/pdf/2311.06899
-    configpath: opencompass/configs/datasets/subjective/flames
+    configpath: opencompass/configs/datasets/subjective/flames/flames_gen.py
+    configpath_llmjudge: ''
 - fofo:
     name: FOFO
     category: Subjective / Format Following
     paper: https://arxiv.org/pdf/2402.18667
     configpath: opencompass/configs/datasets/subjective/fofo
+    configpath_llmjudge: ''
 - followbench:
     name: FollowBench
     category: Subjective / Instruction Following
     paper: https://arxiv.org/pdf/2310.20410
     configpath: opencompass/configs/datasets/subjective/followbench
+    configpath_llmjudge: ''
 - hellobench:
     name: HelloBench
     category: Subjective / Long Context
     paper: https://arxiv.org/pdf/2409.16191
     configpath: opencompass/configs/datasets/subjective/hellobench
+    configpath_llmjudge: ''
 - judgerbench:
     name: JudgerBench
     category: Subjective / Long Context
     paper: https://arxiv.org/pdf/2410.16256
     configpath: opencompass/configs/datasets/subjective/judgerbench
+    configpath_llmjudge: ''
 - multiround:
     name: MT-Bench-101
     category: Subjective / Multi-Round
     paper: https://arxiv.org/pdf/2402.14762
     configpath: opencompass/configs/datasets/subjective/multiround
+    configpath_llmjudge: ''
 - wildbench:
     name: WildBench
     category: Subjective / Real Task
     paper: https://arxiv.org/pdf/2406.04770
     configpath: opencompass/configs/datasets/subjective/wildbench
+    configpath_llmjudge: ''
 - teval:
     name: T-Eval
     category: Tool Utilization
     paper: https://arxiv.org/pdf/2312.14033
-    configpath: opencompass/configs/datasets/teval
+    configpath:
+      - opencompass/configs/datasets/teval/teval_en_gen.py
+      - opencompass/configs/datasets/teval/teval_zh_gen.py
+    configpath_llmjudge: ''
 - finalceiq:
     name: FinanceIQ
     category: Knowledge / Finance
     paper: https://github.com/Duxiaoman-DI/XuanYuan/tree/main/FinanceIQ
-    configpath: opencompass/configs/datasets/FinanceIQ
+    configpath: opencompass/configs/datasets/FinanceIQ/FinanceIQ_gen.py
+    configpath_llmjudge: ''
 - gaokaobench:
     name: GAOKAOBench
     category: Examination
     paper: https://arxiv.org/pdf/2305.12474
-    configpath: opencompass/configs/datasets/GaokaoBench
+    configpath: opencompass/configs/datasets/GaokaoBench/GaokaoBench_gen.py
+    configpath_llmjudge: ''
 - lcbench:
     name: LCBench
     category: Code
     paper: https://github.com/open-compass/CodeBench/
-    configpath: opencompass/configs/datasets/LCBench
+    configpath: opencompass/configs/datasets/LCBench/lcbench_gen.py
+    configpath_llmjudge: ''
 - MMLUArabic:
     name: ArabicMMLU
     category: Language
     paper: https://arxiv.org/pdf/2402.12840
-    configpath: opencompass/configs/datasets/MMLUArabic
+    configpath: opencompass/configs/datasets/MMLUArabic/MMLUArabic_gen.py
+    configpath_llmjudge: ''
 - OpenFinData:
     name: OpenFinData
     category: Knowledge / Finance
     paper: https://github.com/open-compass/OpenFinData
-    configpath: opencompass/configs/datasets/OpenFinData
+    configpath: opencompass/configs/datasets/OpenFinData/OpenFinData_gen.py
+    configpath_llmjudge: ''
 - QuALITY:
     name: QuALITY
     category: Long Context
     paper: https://arxiv.org/pdf/2112.08608
-    configpath: opencompass/configs/datasets/QuALITY
+    configpath: opencompass/configs/datasets/QuALITY/QuALITY_gen.py
+    configpath_llmjudge: ''
 - advglue:
     name: Adversarial GLUE
     category: Safety
     paper: https://openreview.net/pdf?id=GF9cSKI3A_q
-    configpath: opencompass/configs/datasets/adv_glue
+    configpath:
+    - opencompass/configs/datasets/adv_glue/adv_glue_mnli/adv_glue_mnli_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_mm/adv_glue_mnli_mm_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_qnli/adv_glue_qnli_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_qqp/adv_glue_qqp_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_rte/adv_glue_rte_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_sst2/adv_glue_sst2_gen.py
+    configpath_llmjudge: ''
 - afqmcd:
     name: CLUE / AFQMC
     category: Language
     paper: https://arxiv.org/pdf/2004.05986
-    configpath: opencompass/configs/datasets/CLUE_afqmc
+    configpath: opencompass/configs/datasets/CLUE_afqmc/CLUE_afqmc_gen.py
+    configpath_llmjudge: ''
 - aime2024:
     name: AIME2024
     category: Examination
     paper: https://huggingface.co/datasets/Maxwell-Jia/AIME_2024
-    configpath: opencompass/configs/datasets/aime2024
+    configpath: opencompass/configs/datasets/aime2024/aime2024_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/aime2024/aime2024_llm_judge_gen.py
 - anli:
     name: Adversarial NLI
     category: Reasoning
     paper: https://arxiv.org/pdf/1910.14599v2
-    configpath: opencompass/configs/datasets/anli
+    configpath: opencompass/configs/datasets/anli/anli_gen.py
+    configpath_llmjudge: ''
 - anthropics_evals:
     name: Anthropics Evals
     category: Safety
     paper: https://arxiv.org/pdf/2212.09251
-    configpath: opencompass/configs/datasets/anthropics_evals
+    configpath:
+    - opencompass/configs/datasets/anthropics_evals/airisk_gen.py
+    - opencompass/configs/datasets/anthropics_evals/persona_gen.py
+    - opencompass/configs/datasets/anthropics_evals/sycophancy_gen.py
+    configpath_llmjudge: ''
 - apps:
     name: APPS
     category: Code
     paper: https://arxiv.org/pdf/2105.09938
-    configpath: opencompass/configs/datasets/apps
+    configpath:
+    - opencompass/configs/datasets/apps/apps_gen.py
+    - opencompass/configs/datasets/apps/apps_mini_gen.py
+    configpath_llmjudge: ''
 - arc:
     name: ARC
     category: Reasoning
     paper: https://arxiv.org/pdf/1803.05457
-    configpath: [opencompass/configs/datasets/ARC_c, opencompass/configs/datasets/ARC_e]
+    configpath:
+    - opencompass/configs/datasets/ARC_c/ARC_c_gen.py
+    - opencompass/configs/datasets/ARC_e/ARC_e_gen.py
+    configpath_llmjudge: ''
 - arc_prize_public_eval:
     name: ARC Prize
     category: ARC-AGI
     paper: https://arcprize.org/guide#private
-    configpath: opencompass/configs/datasets/ARC_Prize_Public_Evaluation
+    configpath: opencompass/configs/datasets/ARC_Prize_Public_Evaluation/arc_prize_public_evaluation_gen.py
+    configpath_llmjudge: ''
 - ax:
     name: SuperGLUE / AX
     category: Reasoning
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: [opencompass/configs/datasets/SuperGLUE_AX_b, opencompass/configs/datasets/SuperGLUE_AX_g]
+    configpath:
+    - opencompass/configs/datasets/SuperGLUE_AX_b/SuperGLUE_AX_b_gen.py
+    - opencompass/configs/datasets/SuperGLUE_AX_g/SuperGLUE_AX_g_gen.py
+    configpath_llmjudge: ''
 - bbh:
     name: BIG-Bench Hard
     category: Reasoning
     paper: https://arxiv.org/pdf/2210.09261
-    configpath: opencompass/configs/datasets/bbh
+    configpath: opencompass/configs/datasets/bbh/bbh_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/bbh/bbh_llm_judge_gen.py
 - bbeh:
     name: BIG-Bench Extra Hard
     category: Reasoning
     paper: https://arxiv.org/abs/2502.19187
     configpath: opencompass/configs/datasets/bbeh
+    configpath_llmjudge: ''
 - BoolQ:
     name: SuperGLUE / BoolQ
     category: Knowledge
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: opencompass/configs/datasets/SuperGLUE_BoolQ
+    configpath: opencompass/configs/datasets/SuperGLUE_BoolQ/SuperGLUE_BoolQ_gen.py
+    configpath_llmjudge: ''
 - c3:
     name: CLUE / C3 (C³)
     category: Understanding
     paper: https://arxiv.org/pdf/2004.05986
-    configpath: opencompass/configs/datasets/CLUE_C3
+    configpath: opencompass/configs/datasets/CLUE_C3/CLUE_C3_gen.py
+    configpath_llmjudge: ''
 - cb:
     name: SuperGLUE / CB
     category: Reasoning
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: opencompass/configs/datasets/SuperGLUE_CB
+    configpath: opencompass/configs/datasets/SuperGLUE_CB/SuperGLUE_CB_gen.py
+    configpath_llmjudge: ''
 - ceval:
     name: C-EVAL
     category: Examination
     paper: https://arxiv.org/pdf/2305.08322v1
-    configpath: opencompass/configs/datasets/ceval
+    configpath: opencompass/configs/datasets/ceval/ceval_gen.py
+    configpath_llmjudge: ''
 - charm:
     name: CHARM
     category: Reasoning
     paper: https://arxiv.org/pdf/2403.14112
-    configpath: opencompass/configs/datasets/CHARM
+    configpath: opencompass/configs/datasets/CHARM/charm_reason_gen.py
+    configpath_llmjudge: ''
 - chembench:
     name: ChemBench
     category: Knowledge / Chemistry
     paper: https://arxiv.org/pdf/2404.01475
-    configpath: opencompass/configs/datasets/ChemBench
+    configpath: opencompass/configs/datasets/ChemBench/ChemBench_gen.py
+    configpath_llmjudge: ''
 - chid:
     name: FewCLUE / CHID
     category: Language
     paper: https://arxiv.org/pdf/2107.07498
-    configpath: opencompass/configs/datasets/FewCLUE_chid
+    configpath: opencompass/configs/datasets/FewCLUE_chid/FewCLUE_chid_gen.py
+    configpath_llmjudge: ''
 - chinese_simpleqa:
     name: Chinese SimpleQA
     category: Knowledge
     paper: https://arxiv.org/pdf/2411.07140
-    configpath: opencompass/configs/datasets/chinese_simpleqa
+    configpath: opencompass/configs/datasets/chinese_simpleqa/chinese_simpleqa_gen.py
+    configpath_llmjudge: ''
 - cibench:
     name: CIBench
     category: Code
     paper: https://www.arxiv.org/pdf/2407.10499
-    configpath: opencompass/configs/datasets/CIBench
+    configpath:
+      - opencompass/configs/datasets/CIBench/CIBench_generation_gen_8ab0dc.py
+      - opencompass/configs/datasets/CIBench/CIBench_template_gen_e6b12a.py
+      - opencompass/configs/datasets/CIBench/CIBench_template_oracle_gen_fecda1.py
+    configpath_llmjudge: ''
 - civilcomments:
     name: CivilComments
     category: Safety
     paper: https://arxiv.org/pdf/1903.04561
-    configpath: opencompass/configs/datasets/civilcomments
+    configpath: opencompass/configs/datasets/civilcomments/civilcomments_clp.py
+    configpath_llmjudge: ''
 - clozeTest_maxmin:
     name: Cloze Test-max/min
     category: Code
     paper: https://arxiv.org/pdf/2102.04664
-    configpath: opencompass/configs/datasets/clozeTest_maxmin
+    configpath: opencompass/configs/datasets/clozeTest_maxmin/clozeTest_maxmin_gen.py
+    configpath_llmjudge: ''
 - cluewsc:
     name: FewCLUE / CLUEWSC
     category: Language / WSC
     paper: https://arxiv.org/pdf/2107.07498
-    configpath: opencompass/configs/datasets/FewCLUE_cluewsc
+    configpath: opencompass/configs/datasets/FewCLUE_cluewsc/FewCLUE_cluewsc_gen.py
+    configpath_llmjudge: ''
 - cmb:
     name: CMB
     category: Knowledge / Medicine
     paper: https://arxiv.org/pdf/2308.08833
-    configpath: opencompass/configs/datasets/cmb
+    configpath: opencompass/configs/datasets/cmb/cmb_gen.py
+    configpath_llmjudge: ''
 - cmmlu:
     name: CMMLU
     category: Understanding
     paper: https://arxiv.org/pdf/2306.09212
-    configpath: opencompass/configs/datasets/cmmlu
+    configpath: opencompass/configs/datasets/cmmlu/cmmlu_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/cmmlu/cmmlu_llm_judge_gen.py
 - cmnli:
     name: CLUE / CMNLI
     category: Reasoning
     paper: https://arxiv.org/pdf/2004.05986
-    configpath: opencompass/configs/datasets/CLUE_cmnli
+    configpath: opencompass/configs/datasets/CLUE_cmnli/CLUE_cmnli_gen.py
+    configpath_llmjudge: ''
 - cmo_fib:
     name: cmo_fib
     category: Examination
-    paper: ""
-    configpath: opencompass/configs/datasets/cmo_fib
+    paper: ''
+    configpath: opencompass/configs/datasets/cmo_fib/cmo_fib_gen.py
+    configpath_llmjudge: ''
 - cmrc:
     name: CLUE / CMRC
     category: Understanding
     paper: https://arxiv.org/pdf/2004.05986
-    configpath: opencompass/configs/datasets/CLUE_CMRC
+    configpath: opencompass/configs/datasets/CLUE_CMRC/CLUE_CMRC_gen.py
+    configpath_llmjudge: ''
 - commonsenseqa:
     name: CommonSenseQA
     category: Knowledge
     paper: https://arxiv.org/pdf/1811.00937v2
-    configpath: opencompass/configs/datasets/commonsenseqa
+    configpath: opencompass/configs/datasets/commonsenseqa/commonsenseqa_gen.py
+    configpath_llmjudge: ''
 - commonsenseqa_cn:
     name: CommonSenseQA-CN
     category: Knowledge
-    paper: ""
-    configpath: opencompass/configs/datasets/commonsenseqa_cn
+    paper: ''
+    configpath: opencompass/configs/datasets/commonsenseqa_cn/commonsenseqacn_gen.py
+    configpath_llmjudge: ''
 - copa:
     name: SuperGLUE / COPA
     category: Reasoning
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: opencompass/configs/datasets/SuperGLUE_COPA
+    configpath: opencompass/configs/datasets/SuperGLUE_COPA/SuperGLUE_COPA_gen.py
+    configpath_llmjudge: ''
 - crowspairs:
     name: CrowsPairs
     category: Safety
     paper: https://arxiv.org/pdf/2010.00133
-    configpath: opencompass/configs/datasets/crowspairs
+    configpath: opencompass/configs/datasets/crowspairs/crowspairs_gen.py
+    configpath_llmjudge: ''
 - crowspairs_cn:
     name: CrowsPairs-CN
     category: Safety
-    paper: ""
-    configpath: opencompass/configs/datasets/crowspairs_cn
+    paper: ''
+    configpath: opencompass/configs/datasets/crowspairs_cn/crowspairscn_gen.py
+    configpath_llmjudge: ''
 - cvalues:
     name: CVALUES
     category: Safety
     paper: http://xdp-expriment.oss-cn-zhangjiakou.aliyuncs.com/shanqi.xgh/release_github/CValues.pdf
-    configpath: opencompass/configs/datasets/cvalues
+    configpath: opencompass/configs/datasets/cvalues/cvalues_responsibility_gen.py
+    configpath_llmjudge: ''
 - drcd:
     name: CLUE / DRCD
     category: Understanding
     paper: https://arxiv.org/pdf/2004.05986
-    configpath: opencompass/configs/datasets/CLUE_DRCD
+    configpath: opencompass/configs/datasets/CLUE_DRCD/CLUE_DRCD_gen.py
+    configpath_llmjudge: ''
 - drop:
     name: DROP (DROP Simple Eval)
     category: Understanding
     paper: https://arxiv.org/pdf/1903.00161
-    configpath: opencompass/configs/datasets/drop
+    configpath: opencompass/configs/datasets/drop/drop_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/drop/drop_llm_judge_gen.py
 - ds1000:
     name: DS-1000
     category: Code
     paper: https://arxiv.org/pdf/2211.11501
-    configpath: opencompass/configs/datasets/ds1000
+    configpath:
+    - opencompass/configs/datasets/ds1000/ds1000_gen_5c4bec.py
+    configpath_llmjudge: ''
 - eprstmt:
     name: FewCLUE / EPRSTMT
     category: Understanding
     paper: https://arxiv.org/pdf/2107.07498
-    configpath: opencompass/configs/datasets/FewCLUE_eprstmt
+    configpath: opencompass/configs/datasets/FewCLUE_eprstmt/FewCLUE_eprstmt_gen.py
+    configpath_llmjudge: ''
 - flores:
     name: Flores
     category: Language
     paper: https://aclanthology.org/D19-1632.pdf
-    configpath: opencompass/configs/datasets/flores
+    configpath: opencompass/configs/datasets/flores/flores_gen.py
+    configpath_llmjudge: ''
 - game24:
     name: Game24
     category: Math
     paper: https://huggingface.co/datasets/nlile/24-game
-    configpath: opencompass/configs/datasets/game24
+    configpath: opencompass/configs/datasets/game24/game24_gen.py
+    configpath_llmjudge: ''
 - govrepcrs:
     name: Government Report Dataset
     category: Long Context
     paper: https://aclanthology.org/2021.naacl-main.112.pdf
-    configpath: opencompass/configs/datasets/govrepcrs
+    configpath: opencompass/configs/datasets/govrepcrs/govrepcrs_gen.py
+    configpath_llmjudge: ''
 - gpqa:
     name: GPQA
     category: Knowledge
     paper: https://arxiv.org/pdf/2311.12022v1
-    configpath: opencompass/configs/datasets/gpqa
+    configpath: opencompass/configs/datasets/gpqa/gpqa_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/gpqa/gpqa_llm_judge_gen.py
 - gsm8k:
     name: GSM8K
     category: Math
     paper: https://arxiv.org/pdf/2110.14168v2
-    configpath: opencompass/configs/datasets/gsm8k
+    configpath: opencompass/configs/datasets/gsm8k/gsm8k_gen.py
+    configpath_llmjudge: ''
 - gsm_hard:
     name: GSM-Hard
     category: Math
     paper: https://proceedings.mlr.press/v202/gao23f/gao23f.pdf
-    configpath: opencompass/configs/datasets/gsm_hard
+    configpath: opencompass/configs/datasets/gsm_hard/gsmhard_gen.py
+    configpath_llmjudge: ''
 - hle:
     name: HLE(Humanity's Last Exam)
     category: Reasoning
     paper: https://lastexam.ai/paper
-    configpath: opencompass/configs/datasets/HLE
+    configpath: opencompass/configs/datasets/HLE/hle_gen.py
+    configpath_llmjudge: ''
 - hellaswag:
     name: HellaSwag
     category: Reasoning
     paper: https://arxiv.org/pdf/1905.07830
-    configpath: opencompass/configs/datasets/hellaswag
+    configpath: opencompass/configs/datasets/hellaswag/hellaswag_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/hellaswag/hellaswag_llm_judge_gen.py
 - humaneval:
     name: HumanEval
     category: Code
     paper: https://arxiv.org/pdf/2107.03374v2
-    configpath: opencompass/configs/datasets/humaneval
+    configpath: opencompass/configs/datasets/humaneval/humaneval_gen.py
+    configpath_llmjudge: ''
 - humaneval_cn:
     name: HumanEval-CN
     category: Code
-    paper: ""
-    configpath: opencompass/configs/datasets/humaneval_cn
+    paper: ''
+    configpath: opencompass/configs/datasets/humaneval_cn/humaneval_cn_gen.py
+    configpath_llmjudge: ''
 - humaneval_multi:
     name: Multi-HumanEval
     category: Code
     paper: https://arxiv.org/pdf/2210.14868
-    configpath: opencompass/configs/datasets/humaneval_multi
+    configpath: opencompass/configs/datasets/humaneval_multi/humaneval_multi_gen.py
+    configpath_llmjudge: ''
+- humaneval_multi:
+    name: HumanEval+
+    category: Code
+    paper: https://arxiv.org/pdf/2305.01210
+    configpath: opencompass/configs/datasets/humaneval_plus/humaneval_plus_gen.py
+    configpath_llmjudge: ''
 - humanevalx:
     name: HumanEval-X
     category: Code
     paper: https://dl.acm.org/doi/pdf/10.1145/3580305.3599790
-    configpath: opencompass/configs/datasets/humanevalx
+    configpath: opencompass/configs/datasets/humanevalx/humanevalx_gen.py
+    configpath_llmjudge: ''
 - hungarian_math:
     name: Hungarian_Math
     category: Math
     paper: https://huggingface.co/datasets/keirp/hungarian_national_hs_finals_exam
-    configpath: opencompass/configs/datasets/hungarian_exam
+    configpath: opencompass/configs/datasets/hungarian_exam/hungarian_exam_gen.py
+    configpath_llmjudge: ''
 - iwslt2017:
     name: IWSLT2017
     category: Language
     paper: https://cris.fbk.eu/bitstream/11582/312796/1/iwslt17-overview.pdf
-    configpath: opencompass/configs/datasets/iwslt2017
+    configpath: opencompass/configs/datasets/iwslt2017/iwslt2017_gen.py
+    configpath_llmjudge: ''
 - jigsawmultilingual:
     name: JigsawMultilingual
     category: Safety
     paper: https://www.kaggle.com/competitions/jigsaw-multilingual-toxic-comment-classification/data
-    configpath: opencompass/configs/datasets/jigsawmultilingual
+    configpath: opencompass/configs/datasets/jigsawmultilingual/jigsawmultilingual_clp.py
+    configpath_llmjudge: ''
 - lambada:
     name: LAMBADA
     category: Understanding
     paper: https://arxiv.org/pdf/1606.06031
-    configpath: opencompass/configs/datasets/lambada
+    configpath: opencompass/configs/datasets/lambada/lambada_gen.py
+    configpath_llmjudge: ''
 - lcsts:
     name: LCSTS
     category: Understanding
     paper: https://aclanthology.org/D15-1229.pdf
-    configpath: opencompass/configs/datasets/lcsts
+    configpath: opencompass/configs/datasets/lcsts/lcsts_gen.py
+    configpath_llmjudge: ''
 - livestembench:
     name: LiveStemBench
-    category: ""
-    paper: ""
-    configpath: opencompass/configs/datasets/livestembench
+    category: ''
+    paper: ''
+    configpath: opencompass/configs/datasets/livestembench/livestembench_gen.py
+    configpath_llmjudge: ''
 - llm_compression:
     name: LLM Compression
     category: Bits Per Character (BPC)
     paper: https://arxiv.org/pdf/2404.09937
-    configpath: opencompass/configs/datasets/llm_compression
+    configpath: opencompass/configs/datasets/llm_compression/llm_compression.py
+    configpath_llmjudge: ''
 - math:
     name: MATH
     category: Math
     paper: https://arxiv.org/pdf/2103.03874
     configpath: opencompass/configs/datasets/math
+    configpath_llmjudge: ''
+- math500:
+    name: MATH500
+    category: Math
+    paper: https://github.com/openai/prm800k
+    configpath: opencompass/configs/datasets/math/math_prm800k_500_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/math/math_prm800k_500_llm_judge_gen.py
 - math401:
     name: MATH 401
     category: Math
     paper: https://arxiv.org/pdf/2304.02015
-    configpath: opencompass/configs/datasets/math401
+    configpath: opencompass/configs/datasets/math401/math401_gen.py
+    configpath_llmjudge: ''
 - mathbench:
     name: MathBench
     category: Math
     paper: https://arxiv.org/pdf/2405.12209
-    configpath: opencompass/configs/datasets/mathbench
+    configpath: opencompass/configs/datasets/mathbench/mathbench_gen.py
+    configpath_llmjudge: ''
 - mbpp:
     name: MBPP
     category: Code
     paper: https://arxiv.org/pdf/2108.07732
-    configpath: opencompass/configs/datasets/mbpp
+    configpath: opencompass/configs/datasets/mbpp/mbpp_gen.py
+    configpath_llmjudge: ''
 - mbpp_cn:
     name: MBPP-CN
     category: Code
-    paper: ""
-    configpath: opencompass/configs/datasets/mbpp_cn
+    paper: ''
+    configpath: opencompass/configs/datasets/mbpp_cn/mbpp_cn_gen.py
+    configpath_llmjudge: ''
 - mbpp_plus:
     name: MBPP-PLUS
     category: Code
-    paper: ""
-    configpath: opencompass/configs/datasets/mbpp_plus
+    paper: ''
+    configpath: opencompass/configs/datasets/mbpp_plus/mbpp_plus_gen.py
+    configpath_llmjudge: ''
 - mgsm:
     name: MGSM
     category: Language / Math
     paper: https://arxiv.org/pdf/2210.03057
-    configpath: opencompass/configs/datasets/mgsm
+    configpath: opencompass/configs/datasets/mgsm/mgsm_gen.py
+    configpath_llmjudge: ''
 - mmlu:
     name: MMLU
     category: Understanding
     paper: https://arxiv.org/pdf/2009.03300
-    configpath: opencompass/configs/datasets/mmlu
+    configpath: opencompass/configs/datasets/mmlu/mmlu_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
 - mmlu_cf:
     name: MMLU-CF
     category: Understanding
     paper: https://arxiv.org/pdf/2412.15194
-    configpath: opencompass/configs/datasets/mmlu_cf
+    configpath: opencompass/configs/datasets/mmlu_cf/mmlu_cf_gen.py
+    configpath_llmjudge: ''
 - mmlu_pro:
     name: MMLU-Pro
     category: Understanding
     paper: https://arxiv.org/pdf/2406.01574
-    configpath: opencompass/configs/datasets/mmlu_pro
+    configpath: opencompass/configs/datasets/mmlu_pro/mmlu_pro_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/mmlu_pro/mmlu_pro_llm_judge_gen.py
 - mmmlu:
     name: MMMLU
     category: Language / Understanding
     paper: https://huggingface.co/datasets/openai/MMMLU
-    configpath: opencompass/configs/datasets/mmmlu
+    configpath:
+      - opencompass/configs/datasets/mmmlu/mmmlu_gen.py
+      - opencompass/configs/datasets/mmmlu_lite/mmmlu_lite_gen.py
+    configpath_llmjudge: ''
 - multirc:
     name: SuperGLUE / MultiRC
     category: Understanding
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: opencompass/configs/datasets/SuperGLUE_MultiRC
+    configpath: opencompass/configs/datasets/SuperGLUE_MultiRC/SuperGLUE_MultiRC_gen.py
+    configpath_llmjudge: ''
 - multipl_e:
     name: MultiPL-E
     category: Code
     paper: https://arxiv.org/pdf/2210.14868
     configpath: opencompass/configs/datasets/multipl_e
+    configpath_llmjudge: ''
 - narrativeqa:
     name: NarrativeQA
     category: Understanding
     paper: https://github.com/google-deepmind/narrativeqa
-    configpath: opencompass/configs/datasets/narrativeqa
+    configpath: opencompass/configs/datasets/narrativeqa/narrativeqa_gen.py
+    configpath_llmjudge: ''
 - natural_question:
     name: NaturalQuestions
     category: Knowledge
     paper: https://github.com/google-research-datasets/natural-questions
-    configpath: opencompass/configs/datasets/nq
+    configpath: opencompass/configs/datasets/nq/nq_gen.py
+    configpath_llmjudge: ''
 - natural_question_cn:
     name: NaturalQuestions-CN
     category: Knowledge
-    paper: ""
-    configpath: opencompass/configs/datasets/nq_cn
+    paper: ''
+    configpath: opencompass/configs/datasets/nq_cn/nqcn_gen.py
+    configpath_llmjudge: ''
 - obqa:
     name: OpenBookQA
     category: Knowledge
     paper: https://arxiv.org/pdf/1809.02789v1
-    configpath: opencompass/configs/datasets/obqa
+    configpath: opencompass/configs/datasets/obqa/obqa_gen.py
+    configpath_llmjudge: ''
 - piqa:
     name: OpenBookQA
     category: Knowledge / Physics
     paper: https://arxiv.org/pdf/1911.11641v1
-    configpath: opencompass/configs/datasets/piqa
+    configpath: opencompass/configs/datasets/piqa/piqa_gen.py
+    configpath_llmjudge: ''
 - py150:
     name: py150
     category: Code
     paper: https://github.com/microsoft/CodeXGLUE/tree/main/Code-Code/CodeCompletion-line
-    configpath: opencompass/configs/datasets/py150
+    configpath: opencompass/configs/datasets/py150/py150_gen.py
+    configpath_llmjudge: ''
 - qasper:
     name: Qasper
     category: Long Context
     paper: https://arxiv.org/pdf/2105.03011
-    configpath: opencompass/configs/datasets/qasper
+    configpath: opencompass/configs/datasets/qasper/qasper_gen.py
+    configpath_llmjudge: ''
 - qaspercut:
     name: Qasper-Cut
     category: Long Context
-    paper: ""
-    configpath: opencompass/configs/datasets/qaspercut
+    paper: ''
+    configpath: opencompass/configs/datasets/qaspercut/qaspercut_gen.py
+    configpath_llmjudge: ''
 - race:
     name: RACE
     category: Examination
     paper: https://arxiv.org/pdf/1704.04683
-    configpath: opencompass/configs/datasets/race
+    configpath: opencompass/configs/datasets/race/race_gen.py
+    configpath_llmjudge: ''
 - realtoxicprompts:
     name: RealToxicPrompts
     category: Safety
     paper: https://arxiv.org/pdf/2009.11462
-    configpath: opencompass/configs/datasets/realtoxicprompts
+    configpath: opencompass/configs/datasets/realtoxicprompts/realtoxicprompts_gen.py
+    configpath_llmjudge: ''
 - record:
     name: SuperGLUE / ReCoRD
     category: Understanding
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: opencompass/configs/datasets/SuperGLUE_ReCoRD
+    configpath: opencompass/configs/datasets/SuperGLUE_ReCoRD/SuperGLUE_ReCoRD_gen.py
+    configpath_llmjudge: ''
 - rte:
     name: SuperGLUE / RTE
     category: Reasoning
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: opencompass/configs/datasets/SuperGLUE_RTE
+    configpath: opencompass/configs/datasets/SuperGLUE_RTE/SuperGLUE_RTE_gen.py
+    configpath_llmjudge: ''
 - ocnli:
     name: CLUE / OCNLI
     category: Reasoning
     paper: https://arxiv.org/pdf/2004.05986
-    configpath: opencompass/configs/datasets/CLUE_ocnli
+    configpath: opencompass/configs/datasets/CLUE_ocnli/CLUE_ocnli_gen.py
+    configpath_llmjudge: ''
+- ocnlifc:
+    name: FewCLUE / OCNLI-FC
+    category: Reasoning
+    paper: https://arxiv.org/pdf/2107.07498
+    configpath: opencompass/configs/datasets/FewCLUE_ocnli_fc/FewCLUE_ocnli_fc_gen.py
+    configpath_llmjudge: ''
 - rolebench:
     name: RoleBench
     category: Role Play
     paper: https://arxiv.org/pdf/2310.00746
     configpath: opencompass/configs/datasets/rolebench
+    configpath_llmjudge: ''
 - s3eval:
     name: S3Eval
     category: Long Context
     paper: https://aclanthology.org/2024.naacl-long.69.pdf
-    configpath: opencompass/configs/datasets/s3eval
+    configpath: opencompass/configs/datasets/s3eval/s3eval_gen.py
+    configpath_llmjudge: ''
 - scibench:
     name: SciBench
     category: Reasoning
     paper: https://sxkdz.github.io/files/publications/ICML/SciBench/SciBench.pdf
-    configpath: opencompass/configs/datasets/scibench
+    configpath: opencompass/configs/datasets/scibench/scibench_gen.py
+    configpath_llmjudge: ''
 - scicode:
     name: SciCode
     category: Code
     paper: https://arxiv.org/pdf/2407.13168
-    configpath: opencompass/configs/datasets/scicode
+    configpath: opencompass/configs/datasets/scicode/scicode_gen.py
+    configpath_llmjudge: ''
 - simpleqa:
     name: SimpleQA
     category: Knowledge
     paper: https://arxiv.org/pdf/2411.04368
-    configpath: opencompass/configs/datasets/SimpleQA
+    configpath: opencompass/configs/datasets/SimpleQA/simpleqa_gen.py
+    configpath_llmjudge: ''
 - siqa:
     name: SocialIQA
     category: Reasoning
     paper: https://arxiv.org/pdf/1904.09728
-    configpath: opencompass/configs/datasets/siqa
+    configpath: opencompass/configs/datasets/siqa/siqa_gen.py
+    configpath_llmjudge: ''
 - squad20:
     name: SQuAD2.0
     category: Understanding
     paper: https://arxiv.org/pdf/1806.03822
-    configpath: opencompass/configs/datasets/squad20
+    configpath: opencompass/configs/datasets/squad20/squad20_gen.py
+    configpath_llmjudge: ''
 - storycloze:
     name: StoryCloze
     category: Reasoning
     paper: https://aclanthology.org/2022.emnlp-main.616.pdf
-    configpath: opencompass/configs/datasets/storycloze
+    configpath: opencompass/configs/datasets/storycloze/storycloze_gen.py
+    configpath_llmjudge: ''
 - strategyqa:
     name: StrategyQA
     category: Reasoning
     paper: https://arxiv.org/pdf/2101.02235
-    configpath: opencompass/configs/datasets/strategyqa
+    configpath: opencompass/configs/datasets/strategyqa/strategyqa_gen.py
+    configpath_llmjudge: ''
 - summedits:
     name: SummEdits
     category: Language
     paper: https://aclanthology.org/2023.emnlp-main.600.pdf
-    configpath: opencompass/configs/datasets/summedits
+    configpath: opencompass/configs/datasets/summedits/summedits_gen.py
+    configpath_llmjudge: ''
 - summscreen:
     name: SummScreen
     category: Understanding
     paper: https://arxiv.org/pdf/2104.07091v1
-    configpath: opencompass/configs/datasets/summscreen
+    configpath: opencompass/configs/datasets/summscreen/summscreen_gen.py
+    configpath_llmjudge: ''
 - svamp:
     name: SVAMP
     category: Math
     paper: https://aclanthology.org/2021.naacl-main.168.pdf
-    configpath: opencompass/configs/datasets/SVAMP
+    configpath: opencompass/configs/datasets/SVAMP/svamp_gen.py
+    configpath_llmjudge: ''
 - tabmwp:
     name: TabMWP
     category: Math / Table
     paper: https://arxiv.org/pdf/2209.14610
-    configpath: opencompass/configs/datasets/TabMWP
+    configpath: opencompass/configs/datasets/TabMWP/TabMWP_gen.py
+    configpath_llmjudge: ''
 - taco:
     name: TACO
     category: Code
     paper: https://arxiv.org/pdf/2312.14852
-    configpath: opencompass/configs/datasets/taco
+    configpath: opencompass/configs/datasets/taco/taco_gen.py
+    configpath_llmjudge: ''
 - tnews:
     name: FewCLUE / TNEWS
     category: Understanding
     paper: https://arxiv.org/pdf/2107.07498
-    configpath: opencompass/configs/datasets/FewCLUE_tnews
+    configpath: opencompass/configs/datasets/FewCLUE_tnews/FewCLUE_tnews_gen.py
+    configpath_llmjudge: ''
 - bustm:
     name: FewCLUE / BUSTM
     category: Reasoning
     paper: https://arxiv.org/pdf/2107.07498
-    configpath: opencompass/configs/datasets/FewCLUE_bustm
+    configpath: opencompass/configs/datasets/FewCLUE_bustm/FewCLUE_bustm_gen.py
+    configpath_llmjudge: ''
 - csl:
     name: FewCLUE / CSL
     category: Understanding
     paper: https://arxiv.org/pdf/2107.07498
-    configpath: opencompass/configs/datasets/FewCLUE_csl
+    configpath: opencompass/configs/datasets/FewCLUE_csl/FewCLUE_csl_gen.py
+    configpath_llmjudge: ''
 - ocnli_fc:
     name: FewCLUE / OCNLI-FC
     category: Reasoning
     paper: https://arxiv.org/pdf/2107.07498
     configpath: opencompass/configs/datasets/FewCLUE_ocnli_fc
+    configpath_llmjudge: ''
 - triviaqa:
     name: TriviaQA
     category: Knowledge
     paper: https://arxiv.org/pdf/1705.03551v2
-    configpath: opencompass/configs/datasets/triviaqa
+    configpath: opencompass/configs/datasets/triviaqa/triviaqa_gen.py
+    configpath_llmjudge: ''
 - triviaqarc:
     name: TriviaQA-RC
     category: Knowledge / Understanding
-    paper: ""
-    configpath: opencompass/configs/datasets/triviaqarc
+    paper: ''
+    configpath: opencompass/configs/datasets/triviaqarc/triviaqarc_gen.py
+    configpath_llmjudge: ''
 - truthfulqa:
     name: TruthfulQA
     category: Safety
     paper: https://arxiv.org/pdf/2109.07958v2
-    configpath: opencompass/configs/datasets/truthfulqa
+    configpath: opencompass/configs/datasets/truthfulqa/truthfulqa_gen.py
+    configpath_llmjudge: ''
 - tydiqa:
     name: TyDi-QA
     category: Language
     paper: https://storage.googleapis.com/tydiqa/tydiqa.pdf
-    configpath: opencompass/configs/datasets/tydiqa
+    configpath: opencompass/configs/datasets/tydiqa/tydiqa_gen.py
+    configpath_llmjudge: ''
 - wic:
     name: SuperGLUE / WiC
     category: Language
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: opencompass/configs/datasets/SuperGLUE_WiC
+    configpath: opencompass/configs/datasets/SuperGLUE_WiC/SuperGLUE_WiC_gen.py
+    configpath_llmjudge: ''
 - wsc:
     name: SuperGLUE / WSC
     category: Language / WSC
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
-    configpath: opencompass/configs/datasets/SuperGLUE_WSC
+    configpath: opencompass/configs/datasets/SuperGLUE_WSC/SuperGLUE_WSC_gen.py
+    configpath_llmjudge: ''
 - winogrande:
     name: WinoGrande
     category: Language / WSC
     paper: https://arxiv.org/pdf/1907.10641v2
-    configpath: opencompass/configs/datasets/winogrande
+    configpath: opencompass/configs/datasets/winogrande/winogrande_gen.py
+    configpath_llmjudge: ''
 - xcopa:
     name: XCOPA
     category: Language
     paper: https://arxiv.org/pdf/2005.00333
-    configpath: opencompass/configs/datasets/XCOPA
+    configpath: opencompass/configs/datasets/XCOPA/XCOPA_ppl.py
+    configpath_llmjudge: ''
 - xiezhi:
     name: Xiezhi
     category: Knowledge
     paper: https://arxiv.org/pdf/2306.05783
-    configpath: opencompass/configs/datasets/xiezhi
+    configpath: opencompass/configs/datasets/xiezhi/xiezhi_gen.py
+    configpath_llmjudge: ''
 - xlsum:
     name: XLSum
     category: Understanding
     paper: https://arxiv.org/pdf/2106.13822v1
-    configpath: opencompass/configs/datasets/XLSum
+    configpath: opencompass/configs/datasets/XLSum/XLSum_gen.py
+    configpath_llmjudge: ''
 - xsum:
     name: Xsum
     category: Understanding
     paper: https://arxiv.org/pdf/1808.08745
-    configpath: opencompass/configs/datasets/Xsum
+    configpath: opencompass/configs/datasets/Xsum/Xsum_gen.py
+    configpath_llmjudge: ''
+- cola:
+    name: GLUE / CoLA
+    category: Understanding
+    paper: https://arxiv.org/pdf/1804.07461
+    configpath: opencompass/configs/datasets/GLUE_CoLA/GLUE_CoLA_ppl.py
+    configpath_llmjudge: ''
+- mprc:
+    name: GLUE / MPRC
+    category: Understanding
+    paper: https://arxiv.org/pdf/1804.07461
+    configpath: opencompass/configs/datasets/GLUE_MRPC/GLUE_MRPC_ppl.py
+    configpath_llmjudge: ''
+- qqp:
+    name: GLUE / QQP
+    category: Understanding
+    paper: https://arxiv.org/pdf/1804.07461
+    configpath: opencompass/configs/datasets/GLUE_QQP/GLUE_QQP_ppl.py
+    configpath_llmjudge: ''
+- omni_math:
+    name: Omni-MATH
+    category: Math
+    paper: https://omni-math.github.io/
+    configpath: opencompass/configs/datasets/omni_math/omni_math_gen.py
+    configpath_llmjudge: ''
+- wikibench:
+    name: WikiBench
+    category: Knowledge
+    paper: ''
+    configpath: opencompass/configs/datasets/wikibench/wikibench_gen.py
+    configpath_llmjudge: ''
 - supergpqa:
     name: SuperGPQA
     category: Knowledge
     paper: https://arxiv.org/pdf/2502.14739
     configpath: opencompass/configs/datasets/supergpqa
+    configpath_llmjudge: ''
