@@ -162,6 +162,22 @@ export DATASET_SOURCE=ModelScope
 humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ceval, math, LCSTS, Xsum, winogrande, openbookqa, AGIEval, gsm8k, nq, race, siqa, mbpp, mmlu, hellaswag, ARC, BBH, xstory_cloze, summedits, GAOKAO-BENCH, OCNLI, cmnli
 ```
 
+#### (可选) 使用 OpenMind 自动下载
+
+另外，您还可以使用[OpenMind](https://modelers.cn/)来加载数据集：
+环境准备：
+
+```bash
+pip install openmind
+export DATASET_SOURCE=OpenMind
+```
+
+配置好环境后，无需下载全部数据，直接提交评测任务即可。目前支持的数据集有：
+
+```bash
+gsm8k
+```
+
 有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html)。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
