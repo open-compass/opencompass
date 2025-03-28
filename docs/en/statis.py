@@ -32,6 +32,8 @@ with open(load_path, 'r') as f2:
 
 HEADER = ['name', 'category', 'paper', 'configpath', 'configpath_llmjudge']
 
+recommanded_dataset_list = []
+
 
 def table_format(data_list):
     table_format_list = []
