@@ -1,9 +1,8 @@
 # OlymMATH
 [GitHub Link](https://github.com/RUCAIBox/OlymMATH)
 
-This is a implementation of HLE dataset, which evaluates 2370 text-based questions without images. The default setting is to use LLM as a judge.
-
-Challenging the Boundaries of Reasoning: An Olympiad-Level Math Benchmark for Large Language Models
+Dataset OlymMATH, please refer to the paper:
+Challenging the Boundaries of Reasoning: An Olympiad-Level Math Benchmark for Large Language Models by Haoxiang Sun, Yingqian Min, Zhipeng Chen, Wayne Xin Zhao, Zheng Liu, Zhongyuan Wang, Lei Fang, and Ji-Rong Wen.
 
 
 ## How to eval OlymMATH with model judge
