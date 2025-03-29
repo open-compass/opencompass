@@ -24,7 +24,7 @@ opencv-python-headless
 pandas<2.0.0
 prettytable
 protobuf
-pyext
+git+https://github.com/ShaohonChen/PyExt.git@a95f488490fc57ec17d0c00a99c6bc0a4726824f
 python-Levenshtein
 rank_bm25==0.2.2
 rapidfuzz
