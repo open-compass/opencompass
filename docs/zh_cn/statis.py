@@ -30,12 +30,23 @@ with open(load_path, 'r') as f2:
 
 HEADER = ['name', 'category', 'paper', 'configpath', 'configpath_llmjudge']
 
+recommanded_dataset_list = [
+    'ifeval', 'aime2024', 'bbh', 'bigcodebench', 'cmmlu', 'drop', 'gpqa',
+    'hellaswag', 'humaneval', 'korbench', 'livecodebench', 'math', 'mmlu',
+    'mmlu_pro', 'musr'
+]
+
 
 def table_format(data_list):
     table_format_list = []
     for i in data_list:
         table_format_list_sub = []
         for j in i:
+            if j in recommanded_dataset_list:
+                link_token = '[链接]('
+            else:
+                link_token = '[链接(TBD)]('
+
             for index in HEADER:
                 if index == 'paper':
                     table_format_list_sub.append('[链接](' + i[j][index] + ')')
@@ -43,17 +54,19 @@ def table_format(data_list):
                     if i[j][index] == '':
                         table_format_list_sub.append(i[j][index])
                     else:
-                        table_format_list_sub.append('[链接](' + GITHUB_PREFIX +
+                        table_format_list_sub.append(link_token +
+                                                     GITHUB_PREFIX +
                                                      i[j][index] + ')')
                 elif index == 'configpath':
                     if isinstance(i[j][index], list):
                         sub_list_text = ''
                         for k in i[j][index]:
-                            sub_list_text += ('[链接](' + GITHUB_PREFIX + k +
+                            sub_list_text += (link_token + GITHUB_PREFIX + k +
                                               ') / ')
                         table_format_list_sub.append(sub_list_text[:-2])
                     else:
-                        table_format_list_sub.append('[链接](' + GITHUB_PREFIX +
+                        table_format_list_sub.append(link_token +
+                                                     GITHUB_PREFIX +
                                                      i[j][index] + ')')
                 else:
                     table_format_list_sub.append(i[j][index])
