@@ -302,7 +302,7 @@ You can quickly find the dataset you need from the list through sorting, filteri
 
 In addition, we provide a recommended configuration for each dataset, and some datasets also support LLM Judge-based configurations.
 
-Please refer to the dataset statistics chapter of [Docs](https://opencompass.org.cn/doc) for details.
+Please refer to the dataset statistics chapter of [docs](https://opencompass.readthedocs.io/en/latest/dataset_statistics.html) for details.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
