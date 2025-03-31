@@ -121,7 +121,7 @@
     category: Reasoning
     paper: https://arxiv.org/pdf/2310.16049
     configpath: opencompass/configs/datasets/musr/musr_gen.py
-    configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/musr/musr_llm_judge_gen.py
 - needlebench:
     name: NeedleBench
     category: Long Context
