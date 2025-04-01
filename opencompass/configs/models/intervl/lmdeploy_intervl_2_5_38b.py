@@ -1,8 +1,8 @@
-from opencompass.models import TurboMindModel
+from opencompass.models import TurboMindModelwithChatTemplate
 
 models = [
     dict(
-        type=TurboMindModel,
+        type=TurboMindModelwithChatTemplate,
         abbr='internvl2_5-38b-turbomind',
         path='OpenGVLab/InternVL2_5-38B',
         engine_config=dict(session_len=8192, max_batch_size=8, tp=4),
