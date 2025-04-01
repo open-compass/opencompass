@@ -24,8 +24,8 @@ internlm2_5-7b-chat-hf_fullbench:
         lcb_test_output_pass@1: 18.75
         bbh-logical_deduction_seven_objects_score: 50
         bbh-multistep_arithmetic_two_score: 68.75
-        mmlu-other_naive_average: 72.6
-        cmmlu-china-specific_naive_average: 76.25
+        mmlu-other_accuracy: 72.6
+        cmmlu-china-specific_accuracy: 76.25
         mmlu_pro_math_accuracy: 25
         ds1000_Pandas_accuracy: 12.5
         ds1000_Numpy_accuracy: 0
@@ -101,8 +101,8 @@ internlm2_5-7b-chat-turbomind_fullbench:
         lcb_test_output_pass@1: 25.00
         bbh-logical_deduction_seven_objects_score: 50.00
         bbh-multistep_arithmetic_two_score: 68.75
-        mmlu-other_naive_average: 69.71
-        cmmlu-china-specific_naive_average: 75.83
+        mmlu-other_accuracy: 69.71
+        cmmlu-china-specific_accuracy: 75.83
         mmlu_pro_math_accuracy: 31.25
         ds1000_Pandas_accuracy: 0
         ds1000_Numpy_accuracy: 0
