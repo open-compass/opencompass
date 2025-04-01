@@ -48,7 +48,7 @@ def clean_units(pred_str: str):
 
 
 def number_it(num):
-    from latex2sympy2 import latex2sympy
+    from latex2sympy2_extended import latex2sympy
     if isinstance(num, (int, float)):
         return num
 
