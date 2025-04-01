@@ -282,7 +282,7 @@ internlm2_5-7b-turbomind:
         longbench_zh_naive_average: 49.3
         longbench_en_naive_average: 43.97
         longbench_single-document-qa_score: 42.84
-        longbench_multi-document-qa_score: 37.29
+        longbench_multi-document-qa_score: 41.25
         longbench_summarization_score: 23.21
         longbench_few-shot-learning_score: 61.67
         longbench_synthetic-tasks_score: 60.05
