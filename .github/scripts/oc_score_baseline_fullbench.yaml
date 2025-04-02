@@ -190,20 +190,20 @@ internlm2_5-7b-turbomind_fullbench:
         drop_accuracy: 62.5
         GPQA_diamond_accuracy: 62.5
         hellaswag_accuracy: 93.75
-        TheoremQA_score: 25.00
+        TheoremQA_score: 31.25
         winogrande_accuracy: 87.5
-        gsm8k_accuracy: 62.50
-        GaokaoBench_2010-2022_Math_II_MCQs_score: 81.25
+        gsm8k_accuracy: 56.25
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 68.75
         GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
         math_accuracy: 18.75
         wikibench-wiki-single_choice_cncircular_perf_4: 25
         sanitized_mbpp_score: 62.50
-        dingo_en_192_score: 31.25
+        dingo_en_192_score: 50.00
         dingo_zh_170_score: 93.75
         mmlu-other_accuracy: 76.92
         cmmlu-china-specific_accuracy: 84.17
         mmlu_pro_math_accuracy: 18.75
-        bbh-logical_deduction_seven_objects_score: 50
+        bbh-logical_deduction_seven_objects_score: 43.75
         bbh-multistep_arithmetic_two_score: 56.25
         college_naive_average: 12.5
         college_knowledge_naive_average: 87.5
