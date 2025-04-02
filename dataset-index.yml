@@ -715,6 +715,12 @@
     paper: https://arxiv.org/pdf/1809.02789v1
     configpath: opencompass/configs/datasets/obqa/obqa_gen.py
     configpath_llmjudge: ''
+- olymmath:
+    name: OlymMATH
+    category: Math
+    paper: https://arxiv.org/abs/2503.21380
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/OlymMATH/olymmath_llm_judeg_gen.py
 - piqa:
     name: OpenBookQA
     category: Knowledge / Physics
