@@ -101,8 +101,6 @@ with read_base():
         models as hf_mistral_nemo_instruct_2407_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_small_instruct_2409 import \
         models as hf_mistral_small_instruct_2409_model  # noqa: F401, E501
-    from opencompass.configs.models.mistral.hf_mixtral_8x7b_instruct_v0_1 import \
-        models as hf_mixtral_8x7b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mixtral_8x22b_instruct_v0_1 import \
         models as hf_mixtral_8x22b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.lmdeploy_mistral_large_instruct_2411 import \
@@ -113,10 +111,15 @@ with read_base():
     from opencompass.configs.models.mistral.lmdeploy_mistral_small_instruct_2409 import \
         models as \
         lmdeploy_mistral_small_instruct_2409_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.lmdeploy_mixtral_8x22b_instruct_v0_1 import \
+        models as \
+        lmdeploy_mixtral_8x22b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_1 import \
         models as vllm_mistral_7b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_2 import \
         models as vllm_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
+    from opencompass.configs.models.mistral.vllm_mixtral_8x22b_instruct_v0_1 import \
+        models as vllm_mixtral_8x22b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.nvidia.lmdeploy_nemotron_70b_instruct_hf import \
         models as lmdeploy_nemotron_70b_instruct_hf_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_3_5_mini_instruct import \
@@ -170,7 +173,7 @@ with read_base():
 
     from ...volc import infer as volc_infer  # noqa: F401, E501
 
-hf_glm4_9b_chat_model[0]['abbr'] = 'THUDM/glm-4-9b-chat-hf'
+hf_glm4_9b_chat_model[0]['path'] = 'THUDM/glm-4-9b-chat-hf'
 
 race_datasets = [race_datasets[1]]
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
