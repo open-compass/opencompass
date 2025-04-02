@@ -652,7 +652,6 @@ class OpenAISDK(OpenAI):
                     self.logger.info('Start calling OpenAI API')
                 responses = self.openai_client.chat.completions.create(
                     **query_data, timeout=timeout)  # timeout in seconds
-
                 if self.verbose:
                     self.logger.info(
                         'Successfully get response from OpenAI API')
@@ -660,10 +659,18 @@ class OpenAISDK(OpenAI):
                         self.logger.info(responses)
                     except Exception:
                         pass  # noqa F841
-                if not responses.choices:
+
+                # Check if response is empty or content is empty
+                if not responses.choices or not responses.choices[
+                        0].message.content:
                     self.logger.error(
-                        'Response is empty, it is an internal server error \
-                            from the API provider.')
+                        'API response is empty, it might be due to excessive '
+                        'input length or an internal server error '
+                        'from your API provider.')
+                    num_retries += 1
+                    # Continue to retry instead of returning empty response
+                    continue
+
                 return responses.choices[0].message.content
 
             except (BadRequestError, APIStatusError) as e:

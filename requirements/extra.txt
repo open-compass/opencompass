@@ -11,12 +11,10 @@ faiss_gpu==1.7.2
 -e git+https://github.com/open-compass/human-eval.git#egg=human-eval
 # IFEval
 langdetect
-# TheoremQA
-latex2sympy2==1.9.1
 # Lawbench, leval
 ltp
 # Math
-math-verify
+math-verify[antlr4_11_0]
 # Taco, apps Dataset
 pyext
 # Law Bench
