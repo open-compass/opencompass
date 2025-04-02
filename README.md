@@ -176,69 +176,83 @@ Some third-party features, like Humaneval and Llama, may require additional step
 
 After ensuring that OpenCompass is installed correctly according to the above steps and the datasets are prepared. Now you can start your first evaluation using OpenCompass!
 
-- Your first evaluation with OpenCompass!
+### Your first evaluation with OpenCompass!
 
-  OpenCompass support setting your configs via CLI or a python script. For simple evaluation settings we recommend using CLI, for more complex evaluation, it is suggested using the script way. You can find more example scripts under the configs folder.
+OpenCompass support setting your configs via CLI or a python script. For simple evaluation settings we recommend using CLI, for more complex evaluation, it is suggested using the script way. You can find more example scripts under the configs folder.
 
-  ```bash
-  # CLI
-  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
+```bash
+# CLI
+opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen
 
-  # Python scripts
-  opencompass examples/eval_chat_demo.py
-  ```
+# Python scripts
+opencompass examples/eval_chat_demo.py
+```
 
-  You can find more script examples under [examples](./examples) folder.
+You can find more script examples under [examples](./examples) folder.
 
-- API evaluation
+### API evaluation
 
-  OpenCompass, by its design, does not really discriminate between open-source models and API models. You can evaluate both model types in the same way or even in one settings.
+OpenCompass, by its design, does not really discriminate between open-source models and API models. You can evaluate both model types in the same way or even in one settings.
 
-  ```bash
-  export OPENAI_API_KEY="YOUR_OPEN_API_KEY"
-  # CLI
-  opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
+```bash
+export OPENAI_API_KEY="YOUR_OPEN_API_KEY"
+# CLI
+opencompass --models gpt_4o_2024_05_13 --datasets demo_gsm8k_chat_gen
 
-  # Python scripts
-  opencompass examples/eval_api_demo.py
+# Python scripts
+opencompass examples/eval_api_demo.py
 
-  # You can use o1_mini_2024_09_12/o1_preview_2024_09_12  for o1 models, we set max_completion_tokens=8192 as default.
-  ```
+# You can use o1_mini_2024_09_12/o1_preview_2024_09_12  for o1 models, we set max_completion_tokens=8192 as default.
+```
 
-- Accelerated Evaluation
+### Accelerated Evaluation
 
-  Additionally, if you want to use an inference backend other than HuggingFace for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Please ensure that you have installed the necessary packages for the chosen backend and that your model supports accelerated inference with it. For more information, see the documentation on inference acceleration backends [here](docs/en/advanced_guides/accelerator_intro.md). Below is an example using LMDeploy:
+Additionally, if you want to use an inference backend other than HuggingFace for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Please ensure that you have installed the necessary packages for the chosen backend and that your model supports accelerated inference with it. For more information, see the documentation on inference acceleration backends [here](docs/en/advanced_guides/accelerator_intro.md). Below is an example using LMDeploy:
 
-  ```bash
-  # CLI
-  opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
+```bash
+# CLI
+opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
 
-  # Python scripts
-  opencompass examples/eval_lmdeploy_demo.py
-  ```
+# Python scripts
+opencompass examples/eval_lmdeploy_demo.py
+```
 
-- Supported Models
+### Supported Models and Datasets
 
-  OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
+OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
 
-  ```bash
-  # List all configurations
-  python tools/list_configs.py
-  # List all configurations related to llama and mmlu
-  python tools/list_configs.py llama mmlu
-  ```
+```bash
+# List all configurations
+python tools/list_configs.py
+# List all configurations related to llama and mmlu
+python tools/list_configs.py llama mmlu
+```
 
-  If the model is not on the list but supported by Huggingface AutoModel class, you can also evaluate it with OpenCompass. You are welcome to contribute to the maintenance of the OpenCompass supported model and dataset lists.
+#### Supported Models
 
-  ```bash
-  opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat
-  ```
+If the model is not on the list but supported by Huggingface AutoModel class or encapsulation of inference engine based on OpenAI interface (see [docs](https://opencompass.readthedocs.io/en/latest/advanced_guides/new_model.html) for details), you can also evaluate it with OpenCompass. You are welcome to contribute to the maintenance of the OpenCompass supported model and dataset lists.
 
-  If you want to use multiple GPUs to evaluate the model in data parallel, you can use `--max-num-worker`.
+```bash
+opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat
+```
 
-  ```bash
-  CUDA_VISIBLE_DEVICES=0,1 opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat --max-num-worker 2
-  ```
+#### Supported Datasets
+
+Currently, OpenCompass have provided standard recommended configurations for datasets. Generally, config files ending with `_gen.py` or `_llm_judge_gen.py` will point to the recommended config we provide for this dataset. You can refer to [docs](https://opencompass.readthedocs.io/en/latest/dataset_statistics.html) for more details.
+
+```bash
+# Recommended Evaluation Config based on Rules
+opencompass --datasets aime2024_gen --models hf_internlm2_5_1_8b_chat
+
+# Recommended Evaluation Config based on LLM Judge
+opencompass --datasets aime2024_llm_judge_gen --models hf_internlm2_5_1_8b_chat
+```
+
+If you want to use multiple GPUs to evaluate the model in data parallel, you can use `--max-num-worker`.
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1 opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat --max-num-worker 2
+```
 
 > \[!TIP\]
 >
@@ -288,7 +302,7 @@ You can quickly find the dataset you need from the list through sorting, filteri
 
 In addition, we provide a recommended configuration for each dataset, and some datasets also support LLM Judge-based configurations.
 
-Please refer to the dataset statistics chapter of [official document](https://opencompass.org.cn/doc) for details.
+Please refer to the dataset statistics chapter of [docs](https://opencompass.readthedocs.io/en/latest/dataset_statistics.html) for details.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
