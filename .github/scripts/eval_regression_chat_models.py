@@ -17,12 +17,22 @@ with read_base():
         models as hf_deepseek_7b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_67b_chat import \
         models as hf_deepseek_67b_chat_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_moe_16b_chat import \
-        models as hf_deepseek_moe_16b_chat_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_v2_lite_chat import \
-        models as hf_deepseek_v2_lite_chat_model  # noqa: F401, E501
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_llama_8b import \
+        models as \
+        lmdeploy_deepseek_r1_distill_llama_8b_model  # noqa: F401, E501
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_llama_70b import \
+        models as \
+        lmdeploy_deepseek_r1_distill_llama_70b_model  # noqa: F401, E501
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_1_5b import \
+        models as \
+        lmdeploy_deepseek_r1_distill_qwen_1_5b_model  # noqa: F401, E501
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_r1_distill_qwen_32b import \
+        models as \
+        lmdeploy_deepseek_r1_distill_qwen_32b_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.lmdeploy_deepseek_v2_5_1210 import \
         models as lmdeploy_deepseek_v2_5_1210_model  # noqa: F401, E501
+    from opencompass.configs.models.deepseek.lmdeploy_deepseek_v2_lite import \
+        models as lmdeploy_deepseek_v2_lite_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.vllm_deepseek_7b_chat import \
         models as vllm_deepseek_7b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.gemma.hf_gemma2_2b_it import \
@@ -45,6 +55,8 @@ with read_base():
         models as hf_internlm2_5_7b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.hf_internlm2_5_20b_chat import \
         models as hf_internlm2_5_20b_chat_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.hf_internlm3_8b_instruct import \
+        models as hf_internlm3_8b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import \
         models as lmdeploy_internlm2_5_7b_chat_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_20b_chat import \
@@ -57,6 +69,8 @@ with read_base():
         models as lmdeploy_internlm2_chat_7b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_chat_7b_sft import \
         models as lmdeploy_internlm2_chat_7b_sft_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import \
+        models as lmdeploy_internlm3_8b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.vllm_internlm2_chat_7b import \
         models as vllm_internlm2_chat_7b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.hf_llama3_1_8b_instruct import \
@@ -75,6 +89,10 @@ with read_base():
         models as lmdeploy_llama3_3_70b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import \
         models as lmdeploy_llama3_8b_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.intervl.lmdeploy_intervl_2_5_8b import \
+        models as lmdeploy_intervl_2_5_8b_model  # noqa: F401, E501
+    from opencompass.configs.models.intervl.lmdeploy_intervl_2_5_38b import \
+        models as lmdeploy_intervl_2_5_38b_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_2 import \
         models as hf_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_3 import \
@@ -101,8 +119,18 @@ with read_base():
         models as vllm_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.nvidia.lmdeploy_nemotron_70b_instruct_hf import \
         models as lmdeploy_nemotron_70b_instruct_hf_model  # noqa: F401, E501
+    from opencompass.configs.models.phi.hf_phi_3_5_mini_instruct import \
+        models as hf_phi_3_5_mini_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.phi.hf_phi_3_5_MoE_instruct import \
+        models as hf_phi_3_5_MoE_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.phi.hf_phi_3_medium_4k_instruct import \
+        models as hf_phi_3_medium_4k_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_3_mini_4k_instruct import \
         models as hf_phi_3_mini_4k_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.phi.hf_phi_3_small_8k_instruct import \
+        models as hf_phi_3_small_8k_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.phi.hf_phi_4 import \
+        models as hf_phi_4_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.hf_qwen2_5_0_5b_instruct import \
         models as hf_qwen2_5_0_5b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.qwen2_5.hf_qwen2_5_3b_instruct import \
@@ -141,6 +169,8 @@ with read_base():
         models as lmdeploy_yi_1_5_34b_chat_model  # noqa: F401, E501
 
     from ...volc import infer as volc_infer  # noqa: F401, E501
+
+hf_glm4_9b_chat_model[0]['abbr'] = 'THUDM/glm-4-9b-chat-hf'
 
 race_datasets = [race_datasets[1]]
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
