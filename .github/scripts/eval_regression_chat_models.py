@@ -101,8 +101,6 @@ with read_base():
         models as hf_mistral_nemo_instruct_2407_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_small_instruct_2409 import \
         models as hf_mistral_small_instruct_2409_model  # noqa: F401, E501
-    from opencompass.configs.models.mistral.hf_mixtral_8x22b_instruct_v0_1 import \
-        models as hf_mixtral_8x22b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.lmdeploy_mistral_large_instruct_2411 import \
         models as \
         lmdeploy_mistral_large_instruct_2411_model  # noqa: F401, E501
@@ -128,8 +126,6 @@ with read_base():
         models as hf_phi_3_5_MoE_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_3_medium_4k_instruct import \
         models as hf_phi_3_medium_4k_instruct_model  # noqa: F401, E501
-    from opencompass.configs.models.phi.hf_phi_3_mini_4k_instruct import \
-        models as hf_phi_3_mini_4k_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_3_small_8k_instruct import \
         models as hf_phi_3_small_8k_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_4 import \
@@ -174,6 +170,7 @@ with read_base():
     from ...volc import infer as volc_infer  # noqa: F401, E501
 
 hf_glm4_9b_chat_model[0]['path'] = 'THUDM/glm-4-9b-chat-hf'
+hf_deepseek_67b_chat_model[0]['run_cfg']['num_gpus'] = 8
 
 race_datasets = [race_datasets[1]]
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])

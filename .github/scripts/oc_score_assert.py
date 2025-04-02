@@ -175,10 +175,11 @@ class TestApibench:
 class TestVolcFullbench:
     """Test cases for chat model."""
 
-    @pytest.mark.parametrize(
-        'model, dataset',
-        [(p1, p2) for p1 in ['internlm2_5-7b-chat-turbomind']
-         for p2 in dataset_list('internlm2_5-7b-chat-turbomind', 'objective')])
+    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
+        'internlm2_5-7b-chat-turbomind', 'qwen2.5-7b-instruct-turbomind',
+        'internlm2_5-7b-chat-pytorch', 'qwen2.5-7b-instruct-pytorch',
+        'internlm3-8b-instruct-turbomind', 'internlm3-8b-instruct-pytorch'
+    ] for p2 in dataset_list(p1, 'objective')])
     @pytest.mark.chat_objective
     def test_chat_objective(self, baseline_scores_fullbench, result_scores,
                             model, dataset):
