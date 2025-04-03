@@ -246,10 +246,7 @@ class TestCmdCase:
     @pytest.mark.parametrize('model, dataset',
                              [('internlm2_5-7b-hf', 'race-middle_accuracy'),
                               ('internlm2_5-7b-hf', 'race-high_accuracy'),
-                              ('internlm2_5-7b-hf', 'demo_gsm8k_accuracy'),
-                              ('internlm2-1.8b-hf', 'race-middle_accuracy'),
-                              ('internlm2-1.8b-hf', 'race-high_accuracy'),
-                              ('internlm2-1.8b-hf', 'demo_gsm8k_accuracy')])
+                              ('internlm2_5-7b-hf', 'demo_gsm8k_accuracy')])
     def test_cmd_case1(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)

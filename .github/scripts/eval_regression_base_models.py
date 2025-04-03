@@ -11,14 +11,10 @@ with read_base():
     from opencompass.configs.datasets.winogrande.winogrande_5shot_ll_252f01 import \
         winogrande_datasets  # noqa: F401, E501
     # read hf models - chat models
-    from opencompass.configs.models.chatglm.hf_glm4_9b import \
-        models as hf_glm4_9b_model  # noqa: F401, E501
     from opencompass.configs.models.chatglm.lmdeploy_glm4_9b import \
         models as lmdeploy_glm4_9b_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_7b_base import \
         models as hf_deepseek_7b_base_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_v2_lite import \
-        models as hf_deepseek_v2_lite_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.lmdeploy_deepseek_7b_base import \
         models as lmdeploy_deepseek_7b_base_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.lmdeploy_deepseek_67b_base import \
@@ -109,8 +105,6 @@ with read_base():
         models as lmdeploy_yi_1_5_9b_model  # noqa: F401, E501
 
     from ...volc import infer as volc_infer  # noqa: F401, E501
-
-hf_glm4_9b_model[0]['path'] = 'THUDM/glm-4-9b-hf'
 
 race_datasets = [race_datasets[1]]
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
