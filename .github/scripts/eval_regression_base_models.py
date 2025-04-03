@@ -116,6 +116,8 @@ with read_base():
 
     from ...volc import infer as volc_infer  # noqa: F401, E501
 
+hf_glm4_9b_model[0]['path'] = 'THUDM/glm-4-9b-hf'
+
 race_datasets = [race_datasets[1]]
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
