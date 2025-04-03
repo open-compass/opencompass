@@ -117,9 +117,9 @@ html_js_files = [
     'js/custom.js'
 ]
 
-# html_context = {
-#     'github_version': 'main',
-# }
+html_context = {
+    'github_version': 'main',
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
