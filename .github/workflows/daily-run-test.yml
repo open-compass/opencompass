@@ -92,7 +92,6 @@ jobs:
       matrix:
         pyver: [py310]
     runs-on: ubuntu-latest
-    environment: 'prod'
     env:
       PYTHON_VERSION: ${{ matrix.pyver }}
       PLAT_NAME: manylinux2014_x86_64
@@ -126,7 +125,6 @@ jobs:
     if: ${{!cancelled()}}
     needs: ['build-pypi', 'build-pypi-lmdeploy']
     runs-on: volc_cu12
-    environment: 'prod'
     timeout-minutes: 120 #2hours
     steps:
       - name: Clone repository
@@ -190,7 +188,6 @@ jobs:
       matrix:
         regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","base_fullbench"]')}}
     runs-on: volc_cu12_daily
-    environment: 'prod'
     timeout-minutes: 180 #3hours
     steps:
       - name: Clone repository
@@ -231,7 +228,6 @@ jobs:
       matrix:
         regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_sub_fullbench"]')}}
     runs-on: volc_cu12_local
-    environment: 'prod'
     timeout-minutes: 480 #6hours
     steps:
       - name: Clone repository
@@ -310,7 +306,6 @@ jobs:
       matrix:
         function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '["base_objective","chat_objective","chat_subjective","base_long_context","chat_long_context"]')}}
     runs-on: volc_cu12
-    environment: 'prod'
     timeout-minutes: 480 #6hours
     steps:
       - name: Clone repository
@@ -344,7 +339,6 @@ jobs:
     needs: [daily_run_test_volc, daily_run_test_local, fullbench_run_test]
     timeout-minutes: 5
     runs-on: self-hosted
-    environment: 'prod'
     steps:
       - name: notify
         run: |
