@@ -34,6 +34,6 @@ internlm2_5-7b-chat_hf:
     race-high_accuracy: 90.48
 
 lmdeploy-api-test:
-    gsm8k_accuracy: 68.75
-    race-middle_accuracy: 87.50
+    gsm8k_accuracy: 56.25
+    race-middle_accuracy: 93.75
     race-high_accuracy: 93.75

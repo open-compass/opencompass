@@ -279,6 +279,9 @@ jobs:
           lmdeploy serve api_server internlm/internlm3-8b-instruct --max-batch-size 256 --model-name internlm3 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/restful.log  2>&1  &
           echo "restful_pid=$!" >> "$GITHUB_ENV"
           sleep 180s
+          env | grep PROXY
+          env | grep proxy
+          unset HTTP_PROXY;unset HTTPS_PROXY;unset http_proxy;unset https_proxy;
           opencompass .github/scripts/eval_regression_api.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/api --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/api/*/summary regression_result_daily
           python -m pytest -m api -s -v --color=yes .github/scripts/oc_score_assert.py
