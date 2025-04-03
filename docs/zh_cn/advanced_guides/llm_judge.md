@@ -364,6 +364,6 @@ eval_cfg = dict(evaluator=cascade_evaluator)
 
 ## 完整示例
 
-如果希望了解如何使用LLM评判器评估数学问题解决能力。请参考examples目录中的`eval_llm_judge.py`文件。
+如果希望了解通用LLM评判器，请参考examples目录中的`eval_llm_judge.py`文件，该示例展示了如何使用LLM评判器评估数学问题。
 
-如果希望了解如何使用级联评估器评估数学问题解决能力。请参考examples目录中的`eval_cascade_evaluator.py`文件。
+如果希望了解级联评估器请参考examples目录中的`eval_cascade_evaluator.py`文件，该示例展示了如何使用级联评估器评估数学问题。
