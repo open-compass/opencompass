@@ -19,8 +19,6 @@ with read_base():
         models as hf_deepseek_7b_base_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_67b_base import \
         models as hf_deepseek_67b_base_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_moe_16b_base import \
-        models as hf_deepseek_moe_16b_base_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_v2_lite import \
         models as hf_deepseek_v2_lite_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.lmdeploy_deepseek_7b_base import \
