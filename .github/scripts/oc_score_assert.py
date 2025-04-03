@@ -258,9 +258,9 @@ class TestCmdCase:
         [('internlm2_5-7b-chat-lmdeploy', 'race-middle_accuracy'),
          ('internlm2_5-7b-chat-lmdeploy', 'race-high_accuracy'),
          ('internlm2_5-7b-chat-lmdeploy', 'demo_gsm8k_accuracy'),
-         ('internlm2-chat-1.8b-lmdeploy', 'race-middle_accuracy'),
-         ('internlm2-chat-1.8b-lmdeploy', 'race-high_accuracy'),
-         ('internlm2-chat-1.8b-lmdeploy', 'demo_gsm8k_accuracy')])
+         ('internlm3-8b-instruct-lmdeploy', 'race-middle_accuracy'),
+         ('internlm3-8b-instruct-lmdeploy', 'race-high_accuracy'),
+         ('internlm3-8b-instruct-lmdeploy', 'demo_gsm8k_accuracy')])
     def test_cmd_case2(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
@@ -278,13 +278,23 @@ class TestCmdCase:
 
     @pytest.mark.case4
     @pytest.mark.parametrize(
-        'model, dataset', [('internlm2_5-7b-chat_hf', 'race-middle_accuracy'),
-                           ('internlm2_5-7b-chat_hf', 'race-high_accuracy'),
-                           ('internlm2_5-7b-chat_hf', 'demo_gsm8k_accuracy')])
+        'model, dataset', [('internlm3-8b-instruct_hf-lmdeploy', 'race-middle_accuracy'),
+                           ('internlm3-8b-instruct_hf-lmdeploy', 'race-high_accuracy'),
+                           ('internlm3-8b-instruct_hf-lmdeploy', 'demo_gsm8k_accuracy')])
     def test_cmd_case4(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score, dataset)
+        assert_score(model + '_batch', result_score, base_score, dataset)
+
+    @pytest.mark.case5
+    @pytest.mark.parametrize(
+        'model, dataset', [('internlm3-8b-instruct_hf-vllm', 'race-middle_accuracy'),
+                           ('internlm3-8b-instruct_hf-vllm', 'race-high_accuracy'),
+                           ('internlm3-8b-instruct_hf-vllm', 'demo_gsm8k_accuracy')])
+    def test_cmd_case5(self, baseline_scores, result_scores, model, dataset):
+        base_score = baseline_scores.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
 
 def assert_score(model_type, score, baseline, dataset: str = ''):

@@ -61,6 +61,7 @@ env:
   HUGGINGFACE_HUB_CACHE: /fs-computility/llm/shared/llmeval/models/opencompass_hf_hub
   HF_HUB_CACHE: /fs-computility/llm/shared/llmeval/models/opencompass_hf_hub
   CONDA_ENV: regression_test
+  export VLLM_WORKER_MULTIPROC_METHOD: spawn
 
 jobs:
   build-pypi:
@@ -263,10 +264,10 @@ jobs:
           opencompass --datasets race_ppl demo_gsm8k_chat_gen --hf-type base --hf-path internlm/internlm2_5-7b --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd3 --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd3/*/summary regression_result_daily
           python -m pytest -m case3 -s -v --color=yes .github/scripts/oc_score_assert.py
-          opencompass --datasets race_gen demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm3_8b-instruct -a lmdeploy--work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd4 --reuse --max-num-workers 2 --dump-eval-details
+          opencompass --datasets race_gen demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm3-8b-instruct -a lmdeploy --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd4 --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd4/*/summary regression_result_daily
           python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
-          opencompass --datasets race_gen demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm3_8b-instruct -a vllm --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd5 --reuse --max-num-workers 2 --dump-eval-details
+          opencompass --datasets race_gen demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm3-8b-instruct -a vllm --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd5 --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd5/*/summary regression_result_daily
           python -m pytest -m case5 -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run model test - api
@@ -275,7 +276,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          lmdeploy serve api_server internlm/internlm2_5-7b-chat --max-batch-size 256 --model-name internlm2 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/restful.log  2>&1  &
+          lmdeploy serve api_server internlm/internlm3-8b-instruct --max-batch-size 256 --model-name internlm3 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/restful.log  2>&1  &
           echo "restful_pid=$!" >> "$GITHUB_ENV"
           sleep 180s
           opencompass .github/scripts/eval_regression_api.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/api --reuse --max-num-workers 2 --dump-eval-details
