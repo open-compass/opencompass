@@ -147,6 +147,5 @@ class CommonSummarizer(CompassArenaSummarizer):
             f.write(','.join(new_header) + '\n')
             for line in new_table:
                 f.write(','.join(map(str, line)) + '\n')
-            print(t)
             print(output_file)
         return {'qa_bench_' + show_dataset_abbr:json_result}
