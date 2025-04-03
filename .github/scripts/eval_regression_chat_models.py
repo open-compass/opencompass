@@ -89,10 +89,6 @@ with read_base():
         models as lmdeploy_llama3_3_70b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import \
         models as lmdeploy_llama3_8b_instruct_model  # noqa: F401, E501
-    from opencompass.configs.models.intervl.lmdeploy_intervl_2_5_8b import \
-        models as lmdeploy_intervl_2_5_8b_model  # noqa: F401, E501
-    from opencompass.configs.models.intervl.lmdeploy_intervl_2_5_38b import \
-        models as lmdeploy_intervl_2_5_38b_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_2 import \
         models as hf_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.hf_mistral_7b_instruct_v0_3 import \
