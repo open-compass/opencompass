@@ -17,8 +17,6 @@ with read_base():
         models as lmdeploy_glm4_9b_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_7b_base import \
         models as hf_deepseek_7b_base_model  # noqa: F401, E501
-    from opencompass.configs.models.deepseek.hf_deepseek_67b_base import \
-        models as hf_deepseek_67b_base_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.hf_deepseek_v2_lite import \
         models as hf_deepseek_v2_lite_model  # noqa: F401, E501
     from opencompass.configs.models.deepseek.lmdeploy_deepseek_7b_base import \
@@ -49,10 +47,6 @@ with read_base():
         models as hf_internlm2_7b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.hf_internlm2_20b import \
         models as hf_internlm2_20b_model  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.hf_internlm2_base_7b import \
-        models as hf_internlm2_base_7b_model  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.hf_internlm2_base_20b import \
-        models as hf_internlm2_base_20b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_1_8b import \
         models as lmdeploy_internlm2_1_8b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b import \
@@ -63,14 +57,14 @@ with read_base():
         models as lmdeploy_internlm2_20b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_base_7b import \
         models as lmdeploy_internlm2_base_7b_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_base_20b import \
+        models as lmdeploy_internlm2_base_20b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.hf_llama2_7b import \
         models as hf_llama2_7b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.hf_llama3_1_8b import \
         models as hf_llama3_1_8b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.hf_llama3_8b import \
         models as hf_llama3_8b_model  # noqa: F401, E501
-    from opencompass.configs.models.hf_llama.hf_llama3_70b import \
-        models as hf_llama3_70b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_8b import \
         models as lmdeploy_llama3_1_8b_model  # noqa: F401, E501
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b import \
