@@ -7,7 +7,6 @@ import random
 import statistics
 import sys
 import time
-from collections import Counter
 from inspect import signature
 from typing import List
 
@@ -19,7 +18,7 @@ from opencompass.registry import (ICL_EVALUATORS, MODELS, TASKS,
                                   TEXT_POSTPROCESSORS)
 from opencompass.tasks.base import BaseTask, extract_role_pred
 from opencompass.utils import (build_dataset_from_cfg, get_infer_output_path,
-                               get_logger, task_abbr_from_cfg)
+                               get_logger)
 
 
 @TASKS.register_module()
@@ -86,6 +85,26 @@ class OpenICLEvalTask(BaseTask):
                 self._score()
 
     def _score(self):
+        # Load and preprocess test data
+        test_set = self._load_and_preprocess_test_data()
+        # Load predictions
+        pred_dicts, pred_strs = self._load_predictions()
+
+        # Process predictions
+        pred_strs = self._process_predictions(pred_strs)
+
+        # Evaluate predictions
+        result = self._evaluate_predictions(
+            pred_strs,
+            test_set,
+            pred_dicts,
+        )
+
+        # Save results
+        self._save_results(result)
+
+    def _load_and_preprocess_test_data(self):
+        """Load test dataset and apply postprocessing if needed."""
         test_set = build_dataset_from_cfg(self.dataset_cfg).test
         # Postprocess dataset if necessary
         if 'dataset_postprocessor' in self.eval_cfg:
@@ -100,7 +119,10 @@ class OpenICLEvalTask(BaseTask):
 
             test_set = test_set.map(postprocess)
 
-        # Load predictions
+        return test_set
+
+    def _load_predictions(self):
+        """Load model predictions from files."""
         filename = get_infer_output_path(
             self.model_cfg,
             self.dataset_cfg,
@@ -110,217 +132,188 @@ class OpenICLEvalTask(BaseTask):
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
 
-        # Get sc_size if use Self-Consistency
-        sc_size = self.eval_cfg.get('sc_size')
-
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
-            result = {'error': 'No predictions found.'}
+            raise FileNotFoundError(
+                f'Prediction files not found: neither {filename} '
+                f'nor {partial_filename} exists')
+
+        if osp.exists(osp.realpath(filename)):
+            preds = mmengine.load(filename)
+            preds = [preds[str(i)] for i in range(len(preds))]
         else:
-            if osp.exists(osp.realpath(filename)):
-                preds = mmengine.load(filename)
-                preds = [preds[str(i)] for i in range(len(preds))]
+            filename = partial_filename
+            preds = []
+            i = 1
+            while osp.exists(osp.realpath(filename)):
+                sub_preds = mmengine.load(filename)
+                preds.extend(
+                    [sub_preds[str(i)] for i in range(len(sub_preds))])
+                filename = root + f'_{i}' + ext
+                i += 1
+
+        pred_dicts = copy.deepcopy(preds)
+        preds = {k: [pred.get(k) for pred in preds] for k in preds[0]}
+
+        pred_strs = preds.pop('prediction', None)
+
+        return pred_dicts, pred_strs
+
+    def _process_predictions(self, pred_strs):
+        """Apply various processing steps to predictions."""
+        # Check if we're dealing with a list of lists (pred_list_flag)
+        pred_list_flag = pred_strs is not None and isinstance(
+            pred_strs[0], list)
+
+        # Extract role predictions if needed
+        if ('pred_role' in self.eval_cfg and 'meta_template' in self.model_cfg
+                and not MODELS.get(self.model_cfg['type']).is_api):
+            # Create a prompt template for role config parsing
+            from opencompass.models.base import LMTemplateParser
+
+            parser = LMTemplateParser(self.model_cfg['meta_template'])
+            role = parser.roles[self.eval_cfg['pred_role']]
+            if pred_list_flag:
+                pred_strs = [[
+                    extract_role_pred(
+                        _pred,
+                        role.get('begin', None),
+                        role.get('end', None),
+                    ) for _pred in pred
+                ] for pred in pred_strs]
             else:
-                filename = partial_filename
-                preds = []
-                i = 1
-                while osp.exists(osp.realpath(filename)):
-                    sub_preds = mmengine.load(filename)
-                    preds.extend(
-                        [sub_preds[str(i)] for i in range(len(sub_preds))])
-                    filename = root + f'_{i}' + ext
-                    i += 1
-            pred_dicts = copy.deepcopy(preds)
-            preds = {k: [pred.get(k) for pred in preds] for k in preds[0]}
-
-            pred_strs = preds.pop('prediction', None)
-            pred_list_flag = pred_strs is not None and isinstance(
-                pred_strs[0], list)
-            if ('pred_role' in self.eval_cfg
-                    and 'meta_template' in self.model_cfg
-                    and not MODELS.get(self.model_cfg['type']).is_api):
-                # Create a prompt template for role config parsing
-                from opencompass.models.base import LMTemplateParser
-
-                parser = LMTemplateParser(self.model_cfg['meta_template'])
-                role = parser.roles[self.eval_cfg['pred_role']]
-                if sc_size is not None:
-                    assert pred_list_flag, (
-                        'The prediction for Self-Consistency'
-                        'must be list.')
-                if pred_list_flag:
-                    pred_strs = [[
-                        extract_role_pred(
-                            _pred,
-                            role.get('begin', None),
-                            role.get('end', None),
-                        ) for _pred in pred
-                    ] for pred in pred_strs]
-                else:
-                    pred_strs = [
-                        extract_role_pred(
-                            pred,
-                            role.get('begin', None),
-                            role.get('end', None),
-                        ) for pred in pred_strs
-                    ]
-
-            # Postprocess predictions if necessary
-            # Model Specified Postprocessor
-            if 'pred_postprocessor' in self.model_cfg:
-                kwargs = copy.deepcopy(self.model_cfg['pred_postprocessor'])
-                proc = kwargs.pop('type')
-                if isinstance(proc, str):
-                    proc = TEXT_POSTPROCESSORS.get(proc)
-                if pred_list_flag:
-                    pred_strs = [[proc(s, **kwargs) for s in preds]
-                                 for preds in pred_strs]
-                else:
-                    pred_strs = [proc(s, **kwargs) for s in pred_strs]
-            # Dataset Specified Postprocessor
-            if 'pred_postprocessor' in self.eval_cfg:
-                kwargs = copy.deepcopy(self.eval_cfg['pred_postprocessor'])
-                proc = kwargs.pop('type')
-                if isinstance(proc, str):
-                    proc = TEXT_POSTPROCESSORS.get(proc)
-                if pred_list_flag:
-                    pred_strs = [[proc(s, **kwargs) for s in preds]
-                                 for preds in pred_strs]
-                else:
-                    pred_strs = [proc(s, **kwargs) for s in pred_strs]
-
-            model_pred_strs = []
-            if 'model_postprocessor' in self.eval_cfg:
-                references = (test_set[self.output_column]
-                              if self.output_column else None)
-                model_pred_dicts = copy.deepcopy(pred_dicts)
-                for i, pred_dict in enumerate(model_pred_dicts):
-                    pred_dict['reference'] = [references[i]]
-                self.logger.info('Postprocessing model predictions...')
-                kwargs = self.eval_cfg['model_postprocessor']
-                proc = kwargs.pop('type')
-                if isinstance(proc, str):
-                    proc = TEXT_POSTPROCESSORS.get(proc)
-                if pred_list_flag:
-                    model_pred_strs = [[
-                        proc(model_pred_dict, **kwargs)
-                        for model_pred_dict in model_pred_dicts
-                    ]]
-                else:
-                    model_pred_strs = proc(model_pred_dicts, **kwargs)
-
-            # Get majority voting predictions if use self-consistency
-            if sc_size is not None:
                 pred_strs = [
-                    Counter(s).most_common(1)[0][0] for s in pred_strs
+                    extract_role_pred(
+                        pred,
+                        role.get('begin', None),
+                        role.get('end', None),
+                    ) for pred in pred_strs
                 ]
 
-            icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
-            # need results dir to save other files
-            out_path = get_infer_output_path(
-                self.model_cfg,
-                self.dataset_cfg,
-                osp.join(self.work_dir, 'results'),
-            )
-            icl_evaluator._out_dir = osp.splitext(out_path)[
-                0]  # strip extension
-
-            preds['predictions'] = pred_strs
-            preds['references'] = (test_set[self.output_column]
-                                   if self.output_column else None)
-            preds['test_set'] = test_set
-            if 'origin_prompt' not in preds:
-                try:
-                    preds['origin_prompt'] = [
-                        None for _ in range(len(pred_strs))
-                    ]
-                except TypeError:
-                    preds['origin_prompt'] = None
-            preds = {
-                k: preds[k]
-                for k in signature(icl_evaluator.score).parameters
-            }
-            k = self.dataset_cfg.get('k', 1)
-            n = self.dataset_cfg.get('n', 1)
-            result = icl_evaluator.evaluate(k, n, copy.deepcopy(test_set),
-                                            **preds)
-
-            # Get model postprocess result
-            model_details = None
-            model_result = None
-            if 'model_postprocessor' in self.eval_cfg:
-                model_preds = copy.deepcopy(preds)
-                model_preds['predictions'] = model_pred_strs
-                model_result = icl_evaluator.evaluate(k, n,
-                                                      copy.deepcopy(test_set),
-                                                      **model_preds)
-                for key in model_result:
-                    if key == 'details':
-                        model_details = model_result[key]
-                        continue
-                    new_key = 'model_postprocess_' + key
-                    result[new_key] = model_result[key]
-
-            if self.dump_details:
-                details = result.get('details', None)
-                # Try to format details is details is not provided by evaluator
-                if details is None:
-                    self.logger.info(
-                        'Details is not give by evaluator, try to format it')
-                    try:
-                        result['details'] = self.format_details(
-                            pred_strs,
-                            model_pred_strs,
-                            test_set[self.output_column],
-                            details,
-                            model_details,
-                            pred_dicts,
-                        )
-                        self.logger.warning(
-                            f"result['details'] : {result['details']}"),
-                        result['type'] = result['details'].pop('type', None)
-                        if self.cal_extract_rate:
-                            # Calculate the extraction success
-                            # rate for prediction
-                            result['extract_rate'] = self.extract_rate(result)
-
-                        if 'PPL' in str(
-                                self.dataset_cfg.infer_cfg.inferencer.type):
-                            result['correct_bpb'], result['incorrect_bpb'] = (
-                                self.calculate_bpb(pred_dicts))
-                    except Exception as e:
-                        self.logger.warning(
-                            f'Skip dumping details due to: {e}.')
+        # Apply postprocessors if configured
+        # Postprocess predictions if necessary
+        # Model Specified Postprocessor
+        if 'pred_postprocessor' in self.model_cfg:
+            kwargs = copy.deepcopy(self.model_cfg['pred_postprocessor'])
+            proc = kwargs.pop('type')
+            if isinstance(proc, str):
+                proc = TEXT_POSTPROCESSORS.get(proc)
+            if pred_list_flag:
+                pred_strs = [[proc(s, **kwargs) for s in preds]
+                             for preds in pred_strs]
             else:
-                result.pop('details', None)
+                pred_strs = [proc(s, **kwargs) for s in pred_strs]
 
-        if 'error' in result:
-            self.logger.error(
-                f'Task {task_abbr_from_cfg(self.cfg)}: {result["error"]}')
-            return
-        elif model_result is None:
-            result_wo_details = {
-                i: result[i]
-                for i in result if i != 'details'
-            }
-            self.logger.info(
-                f'Task {task_abbr_from_cfg(self.cfg)}: {result_wo_details}')
+        # Dataset Specified Postprocessor
+        if 'pred_postprocessor' in self.eval_cfg:
+            kwargs = copy.deepcopy(self.eval_cfg['pred_postprocessor'])
+            proc = kwargs.pop('type')
+            if isinstance(proc, str):
+                proc = TEXT_POSTPROCESSORS.get(proc)
+            if pred_list_flag:
+                pred_strs = [[proc(s, **kwargs) for s in preds]
+                             for preds in pred_strs]
+            else:
+                pred_strs = [proc(s, **kwargs) for s in pred_strs]
+
+        return pred_strs
+
+    def _evaluate_predictions(
+        self,
+        pred_strs,
+        test_set,
+        pred_dicts,
+    ):
+        """Evaluate predictions using the configured evaluator."""
+        # Get references from test set
+        references = (None if self.output_column is None else
+                      [sample[self.output_column] for sample in test_set])
+        # Build evaluator from config
+        evaluator_cfg = self.eval_cfg.get('evaluator', {})
+        evaluator_type = evaluator_cfg.get('type')
+        if isinstance(evaluator_type, str):
+            evaluator_type = ICL_EVALUATORS.get(evaluator_type)
+
+        # Prepare evaluator inputs
+        evaluator_cfg_copy = copy.deepcopy(evaluator_cfg)
+        evaluator_cfg_copy.pop('type', None)
+        # Initialize evaluator with appropriate parameters
+        sig = signature(evaluator_type)
+        if 'predictions' in sig.parameters and 'references' in sig.parameters:
+            evaluator = evaluator_type(
+                predictions=pred_strs,
+                references=references,
+                **evaluator_cfg_copy,
+            )
         else:
-            result_wo_details = {
-                i: result[i]
-                for i in result if i != 'details'
-            }
-            model_result_wo_details = {
-                i: model_result[i]
-                for i in model_result if i != 'details'
-            }
-            self.logger.info(
-                f'Task {task_abbr_from_cfg(self.cfg)}: {result_wo_details}')
-            self.logger.info(
-                'Model Postprocess Task: ' +
-                f'{task_abbr_from_cfg(self.cfg)}:{model_result_wo_details}')
+            evaluator = evaluator_type(**evaluator_cfg_copy)
 
-        # Save result
+        # Set output directory for the evaluator
+        out_path = get_infer_output_path(
+            self.model_cfg,
+            self.dataset_cfg,
+            osp.join(self.work_dir, 'results'),
+        )
+        evaluator._out_dir = osp.splitext(out_path)[0]  # strip extension
+
+        # If preds contains keys that match the score method
+        # parameters, include them
+        if pred_dicts:
+            preds = {
+                k: [pred.get(k) for pred in pred_dicts]
+                for k in pred_dicts[0]
+            }
+        # Add predictions and references if they're expected
+        # by the score method
+        preds['predictions'] = pred_strs
+        preds['references'] = (test_set[self.output_column]
+                               if self.output_column else None)
+        preds['test_set'] = test_set
+        if 'origin_prompt' not in preds:
+            try:
+                preds['origin_prompt'] = [None for _ in range(len(pred_strs))]
+            except TypeError:
+                preds['origin_prompt'] = None
+        preds = {k: preds[k] for k in signature(evaluator.score).parameters}
+        # Call evaluate with the appropriate parameters
+        k = self.dataset_cfg.get('k', 1)
+        n = self.dataset_cfg.get('n', 1)
+        result = evaluator.evaluate(k, n, copy.deepcopy(test_set), **preds)
+
+        # Format details if needed
+        if self.dump_details:
+            # Get detailed results if available
+            details = result.get('details', None)
+            if details is None:
+                self.logger.info(
+                    'Details is not give by evaluator, try to format it')
+                try:
+                    result['details'] = self.format_details(
+                        pred_strs,
+                        references,
+                        details,
+                        pred_dicts,
+                    )
+
+                    # Calculate extraction rate if needed
+                    if self.cal_extract_rate and details is not None:
+                        result['extract_rate'] = self.extract_rate(result)
+
+                    # Calculate BPB if applicable
+                    if pred_dicts and 'BPB' in pred_dicts[0].get(
+                            list(pred_dicts[0].keys())[0], {}):
+                        correct_bpb, incorrect_bpb = self.calculate_bpb(
+                            pred_dicts)
+                        result['correct_bpb'] = correct_bpb
+                        result['incorrect_bpb'] = incorrect_bpb
+                except Exception as e:
+                    self.logger.warning(f'Skip dumping details due to: {e}.')
+        else:
+            result.pop('details', None)
+        return result
+
+    def _save_results(self, result):
+        """Save evaluation results to file."""
         out_path = get_infer_output_path(
             self.model_cfg,
             self.dataset_cfg,
@@ -351,10 +344,8 @@ class OpenICLEvalTask(BaseTask):
     def format_details(
         self,
         predictions,
-        model_pred_strs,
         references,
         details,
-        model_details,
         pred_dicts,
     ):
         """This function is responsible for formatting prediction details.
@@ -393,20 +384,6 @@ class OpenICLEvalTask(BaseTask):
                 result['predictions'] = str(predictions[i])
                 result['references'] = str(references[i])
                 result['correct'] = str(predictions[i]) == str(references[i])
-            elif details is not None and model_details is not None:
-                assert (
-                    model_pred_strs != []
-                ), 'Model details is not None, but model_pred_strs is empty'
-                self.logger.info(
-                    f"model_details[i]['pred']: {model_details[i]['pred']}")
-                results['type'] = 'GEN'
-                result['prompt'] = origin_prediction['origin_prompt']
-                result['origin_prediction'] = pred_dicts[i]['prediction']
-                result['predictions'] = details[i]['pred']
-                result['model_extract_predictions'] = model_details[i]['pred']
-                result['references'] = details[i]['answer']
-                result['correct'] = details[i]['correct']
-                result['model_extract_correct'] = model_details[i]['correct']
             elif details is not None:
                 results['type'] = 'GEN'
                 result['prompt'] = origin_prediction['origin_prompt']
