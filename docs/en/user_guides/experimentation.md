@@ -57,7 +57,7 @@ The parameter explanation is as follows:
 - `-w`: Specify the working path, default is `./outputs/default`.
 - `-l`: Enable status reporting via Lark bot.
 - `--dry-run`: When enabled, inference and evaluation tasks will be dispatched but won't actually run for debugging.
-- `--dump-eval-details`: When enabled，evaluation under the `results` folder will include more details, such as the correctness of each sample.
+- `--dump-eval-details`: Default enabled，evaluation under the `results` folder will include more details, such as the correctness of each sample. Set `--dump-eval-details False` to disable it。
 
 Using run mode `-m all` as an example, the overall execution flow is as follows:
 

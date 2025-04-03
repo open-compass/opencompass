@@ -119,8 +119,11 @@ def parse_args():
     parser.add_argument(
         '--dump-eval-details',
         help='Whether to dump the evaluation details, including the '
-        'correctness of each sample, bpb, etc.',
-        action='store_true',
+        'correctness of each sample, bpb, etc. Defaults to True.',
+        nargs='?',
+        const=True,
+        default=True,
+        type=lambda x: False if x and x.lower() == 'false' else True
     )
     parser.add_argument(
         '--dump-extract-rate',
@@ -233,7 +236,6 @@ def parse_custom_dataset_args(custom_dataset_parser):
 
 def main():
     args = parse_args()
-
     if args.num_gpus is not None:
         raise ValueError('The `--num-gpus` argument is deprecated, please use '
                          '`--hf-num-gpus` to describe number of gpus used for '

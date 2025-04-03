@@ -57,7 +57,7 @@ python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--deb
 - `-w`: 指定工作路径，默认为 `./outputs/default`
 - `-l`: 打开飞书机器人状态上报。
 - `--dry-run`: 开启时，推理和评测任务仅会分发但不会真正运行，便于调试；
-- `--dump-eval-details`: 开启时，`results` 下的评测结果中将会包含更加详细的评测结果信息，例如每条样本是否正确等。
+- `--dump-eval-details`: 默认开启，`results` 下的评测结果中将会包含更加详细的评测结果信息，例如每条样本是否正确等。如不需要开启，需设置`--dump-eval-details False`。
 
 以运行模式 `-m all` 为例，整体运行流如下：
 
