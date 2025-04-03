@@ -490,8 +490,8 @@ qwen2.5-7b-instruct-turbomind:
         lcb_code_generation_pass@1: 39.5
         lcb_code_execution_pass@1: 42.38
         lcb_test_output_pass@1: 50.68
-        bigcodebench_hard_instruct_pass@1: 100
-        bigcodebench_hard_complete_pass@1: 100
+        bigcodebench_hard_instruct_pass@1: 16.22
+        bigcodebench_hard_complete_pass@1: 11.49
         teval_naive_average: 79.72
         SciCode_sub_accuracy: 100
         qa_dingo_cn_score: 99.01
@@ -598,8 +598,8 @@ internlm2_5-7b-chat-pytorch:
         lcb_code_execution_pass@1: 33.82
         lcb_test_output_pass@1: 22.62
         bigcodebench_hard_instruct_pass@1: 6.08
-        bigcodebench_hard_complete_pass@1: 100
-        teval_naive_average: 100
+        bigcodebench_hard_complete_pass@1: 6.76
+        teval_naive_average: 79.73
         SciCode_sub_accuracy: 100
         qa_dingo_cn_score: 100
         mmlu_accuracy: 70.2
@@ -702,9 +702,9 @@ qwen2.5-7b-instruct-pytorch:
         lcb_code_generation_pass@1: 38.75
         lcb_code_execution_pass@1: 42.38
         lcb_test_output_pass@1: 50.45
-        bigcodebench_hard_instruct_pass@1: 100
-        bigcodebench_hard_complete_pass@1: 100
-        teval_naive_average: 100
+        bigcodebench_hard_instruct_pass@1: 16.89
+        bigcodebench_hard_complete_pass@1: 12.16
+        teval_naive_average: 79.46
         SciCode_sub_accuracy: 100
         qa_dingo_cn_score: 100
         mmlu_accuracy: 76.27
@@ -807,9 +807,9 @@ internlm3-8b-instruct-turbomind:
         lcb_code_generation_pass@1: 34.75
         lcb_code_execution_pass@1: 49.9
         lcb_test_output_pass@1: 48.19
-        bigcodebench_hard_instruct_pass@1: 100
-        bigcodebench_hard_complete_pass@1: 100
-        teval_naive_average: 100
+        bigcodebench_hard_instruct_pass@1: 13.51
+        bigcodebench_hard_complete_pass@1: 15.54
+        teval_naive_average: 82.86
         SciCode_sub_accuracy: 100
         qa_dingo_cn_score: 100
         mmlu_accuracy: 76.21
@@ -912,9 +912,9 @@ internlm3-8b-instruct-pytorch:
         lcb_code_generation_pass@1: 34.5
         lcb_code_execution_pass@1: 48.02
         lcb_test_output_pass@1: 47.74
-        bigcodebench_hard_instruct_pass@1: 100
-        bigcodebench_hard_complete_pass@1: 100
-        teval_naive_average: 100
+        bigcodebench_hard_instruct_pass@1: 12.84
+        bigcodebench_hard_complete_pass@1: 15.54
+        teval_naive_average: 82.86
         SciCode_sub_accuracy: 100
         qa_dingo_cn_score: 100
         mmlu_accuracy: 76.23
