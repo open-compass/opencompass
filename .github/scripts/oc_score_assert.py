@@ -278,9 +278,10 @@ class TestCmdCase:
 
     @pytest.mark.case4
     @pytest.mark.parametrize(
-        'model, dataset', [('internlm3-8b-instruct_hf-lmdeploy', 'race-middle_accuracy'),
-                           ('internlm3-8b-instruct_hf-lmdeploy', 'race-high_accuracy'),
-                           ('internlm3-8b-instruct_hf-lmdeploy', 'demo_gsm8k_accuracy')])
+        'model, dataset',
+        [('internlm3-8b-instruct_hf-lmdeploy', 'race-middle_accuracy'),
+         ('internlm3-8b-instruct_hf-lmdeploy', 'race-high_accuracy'),
+         ('internlm3-8b-instruct_hf-lmdeploy', 'demo_gsm8k_accuracy')])
     def test_cmd_case4(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
@@ -288,9 +289,10 @@ class TestCmdCase:
 
     @pytest.mark.case5
     @pytest.mark.parametrize(
-        'model, dataset', [('internlm3-8b-instruct_hf-vllm', 'race-middle_accuracy'),
-                           ('internlm3-8b-instruct_hf-vllm', 'race-high_accuracy'),
-                           ('internlm3-8b-instruct_hf-vllm', 'demo_gsm8k_accuracy')])
+        'model, dataset',
+        [('internlm3-8b-instruct_hf-vllm', 'race-middle_accuracy'),
+         ('internlm3-8b-instruct_hf-vllm', 'race-high_accuracy'),
+         ('internlm3-8b-instruct_hf-vllm', 'demo_gsm8k_accuracy')])
     def test_cmd_case5(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
