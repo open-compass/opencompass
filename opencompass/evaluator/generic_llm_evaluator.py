@@ -3,6 +3,7 @@ import os.path as osp
 from typing import Dict, List, Optional
 
 import mmengine
+from datasets import Dataset
 from mmengine.config import ConfigDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
@@ -82,10 +83,19 @@ class GenericLLMEvaluator(BaseEvaluator):
         self,
         predictions,
         references: Optional[List] = None,
+        test_set: Optional[Dataset] = None,
     ) -> Dict:
-        """Apply to single-model scoring."""
+        """Apply to single-model scoring.
+
+        Args:
+            predictions: List of model predictions
+            references: List of reference answers
+            test_set: Optional Dataset containing additional
+            context for evaluation
+        """
         assert len(predictions) == len(
             references), 'predictions and references must have the same length'
+
         # -------------- Build Inferencer ----------------
         self.build_inferencer()
 
@@ -93,9 +103,7 @@ class GenericLLMEvaluator(BaseEvaluator):
         predictions = self.pred_postprocess(predictions)
 
         # For Single Round Dialogue
-        prediction_dict = {}
-        prediction_dict['prediction'] = predictions
-        prediction_dict['obj_gold'] = references
+        prediction_dict = {'prediction': predictions, 'obj_gold': references}
 
         # ---------------- Build Dataset for LLM Judge -----------------
         if self.dataset_cfg:
@@ -109,19 +117,42 @@ class GenericLLMEvaluator(BaseEvaluator):
                 dataset.reader.dataset['test'] = dataset.test.add_column(
                     'reference', references)
         else:
-            # build a default dataset just for comparison
+            # Handle test_set in the else branch
             from opencompass.datasets.lmeval import LMEvalDataset
 
-            input_columns = list(prediction_dict.keys())
-            if references:
-                input_columns.append('reference')
+            if test_set is not None:
+                # If test_set is provided, use it as the base
+                # Ensure necessary columns exist
+                if 'prediction' not in test_set.column_names:
+                    test_set = test_set.add_column('prediction', predictions)
+                if 'reference' not in test_set.column_names:
+                    test_set = test_set.add_column('reference', references)
+
+                # Prepare input_columns and data dictionary
+                input_columns = test_set.column_names
+                data_dict = {
+                    column: test_set[column]
+                    for column in test_set.column_names
+                }
+            else:
+                # Original default dataset building logic
+                input_columns = list(prediction_dict.keys())
+                if references:
+                    input_columns.append('reference')
+                data_dict = prediction_dict.copy()
+                if references:
+                    data_dict['reference'] = references
+
+            # Create LMEvalDataset
             dataset = LMEvalDataset(
-                reader_cfg=dict(input_columns=input_columns,
-                                output_column=None,
-                                train_split='test'),
-                reference=references,
-                **prediction_dict,
+                reader_cfg=dict(
+                    input_columns=input_columns,
+                    output_column=None,
+                    train_split='test',
+                ),
+                **data_dict,
             )
+
         dataset.reader.output_column = 'reference'
         retriever = ZeroRetriever(dataset)
         # ----------------- LLM Judge ----------------
