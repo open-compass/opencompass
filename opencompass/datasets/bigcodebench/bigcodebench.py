@@ -4,6 +4,7 @@
 import os
 import time
 from concurrent.futures._base import CancelledError
+from typing import List, Sequence, Tuple, Union
 
 import httpx
 from datasets import Dataset, DatasetDict
@@ -24,7 +25,8 @@ class BigCodeBenchDataset(BaseDataset):
     def load(path: str = 'opencompass/bigcodebench',
              local_mode: bool = False,
              release_version: str = 'v0.1.2',
-             dataset_version: str = 'full'):
+             dataset_version: str = 'full',
+             num_repeats: int = 1):
         """
         Args:
             path (str): The path to the dataset.
@@ -33,6 +35,7 @@ class BigCodeBenchDataset(BaseDataset):
             release_version (str): The release version of the dataset.
             dataset_version (str): The data version of the dataset.
                 only support ['full', 'hard']
+            num_repeats (int): Number of times to repeat dataset for pass@k.
         """
         assert dataset_version in ['full', 'hard'], \
             'dataset_version should be one of ["full", "hard"], '
@@ -45,11 +48,13 @@ class BigCodeBenchDataset(BaseDataset):
         # 'entry_point', 'doc_struct', 'libs'
         if dataset_version == 'full':
             items = JSONToolkit.read_jsonl(
-                os.path.join(path, f'BigCodeBench-{release_version}.jsonl'))
+                os.path.join(path, f'BigCodeBench-{release_version}.jsonl'),
+                num_repeats)
         else:
             items = JSONToolkit.read_jsonl(
                 os.path.join(path,
-                             f'BigCodeBench-Hard-{release_version}.jsonl'))
+                             f'BigCodeBench-Hard-{release_version}.jsonl'),
+                num_repeats)
 
         dataset['train'] = Dataset.from_list(items)
         dataset['test'] = Dataset.from_list(items)
@@ -61,10 +66,10 @@ class BigCodeBenchEvaluator(BaseEvaluator):
     """Evaluator for BigCodeBench.
 
     Args:
-        num_process_evaluate (int): number of processes to evaluate
         timeout (int): timeout for each evaluation
         release_version (str): release version of BigCodeBench
         eval_type (str): type of evaluation, either 'instruct' or 'completion'
+        k (str): pass@k for evaluation
     """
 
     def __init__(
@@ -75,7 +80,9 @@ class BigCodeBenchEvaluator(BaseEvaluator):
             dataset_version: str = 'full',
             local_mode: bool = False,
             path: str = 'opencompass/bigcodebench',
+            num_repeats=1,
             pass_k: str = '1,5,10',
+            k: Union[int, Tuple[int, ...], List[int]] = 1,
             parallel: int = -1,
             min_time_limit: float = 1,
             max_as_limit: int = 30 * 1024,
@@ -88,12 +95,17 @@ class BigCodeBenchEvaluator(BaseEvaluator):
             release_version=release_version,
             dataset_version=dataset_version,
             local_mode=local_mode,
-            path=path)['test']
+            path=path,
+            num_repeats=num_repeats)['test']
         self.eval_type = eval_type
+        if not isinstance(k, Sequence):
+            k = (k, )
+        k = ', '.join(map(str, k))
+        self.k = k
         self.remote_execute_api = remote_execute_api
 
         self.eval_kwargs = dict(subset=dataset_version,
-                                pass_k=pass_k,
+                                pass_k=self.k,
                                 parallel=parallel,
                                 min_time_limit=min_time_limit,
                                 max_as_limit=max_as_limit,
@@ -141,7 +153,7 @@ class BigCodeBenchEvaluator(BaseEvaluator):
                         signal.alarm(0)
                         signal.signal(signal.SIGALRM, original_handler)
 
-                with timeout_handler(10):
+                with timeout_handler(300):
                     sanitized_prediction = extract_code_generation(
                         prediction, entrypoint=entrypoint)
 
@@ -188,7 +200,9 @@ class BigCodeBenchEvaluator(BaseEvaluator):
         while True:
             try:
                 eval_client = Client(self.remote_execute_api,
-                                     httpx_kwargs=dict(proxies=proxies))
+                                     httpx_kwargs=dict(
+                                         proxies=proxies,
+                                         timeout=httpx.Timeout(100.0)))
                 results, pass_at_k = eval_client.predict(
                     split=self.eval_type,
                     samples=handle_file(submitted_contents_path),
@@ -196,22 +210,25 @@ class BigCodeBenchEvaluator(BaseEvaluator):
                     **self.eval_kwargs)
                 break
             except (httpx.ReadTimeout, CancelledError):
-                logger.info('Read timeout error. Retrying in 4s...')
+                logger.info('Read timeout error. Retrying in 10s...')
                 time.sleep(10)
 
-        if 'pass@1' in pass_at_k.keys():
-            pass_at_k['pass@1'] *= 100
-        dump_results = {'details': self._results_processor(results)}
-        dump_results.update(pass_at_k)
-
-        return dump_results
+        pass_at_k = {
+            k: v * 100 if isinstance(v, (int, float)) else v
+            for k, v in pass_at_k.items()
+        }
+        return {
+            **pass_at_k,
+            'details': self._results_processor(results),
+        }
 
     def _results_processor(self, results):
         details = []
         for key, value in results['eval'].items():
-            if value[0]['status'] == 'pass':
-                value[0]['correct'] = True
-            else:
-                value[0]['correct'] = False
-            details.append(value[0])
+            detail = {'correct': False, 'results_details': value}
+            for v in value:
+                if v['status'] == 'pass':
+                    detail['correct'] = True
+                    break
+            details.append(detail)
         return details
