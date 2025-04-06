@@ -150,5 +150,4 @@ summarizer = dict(
     summary_groups=summary_groups,
 )
 
-# work_dir = 'outputs/code'
-work_dir = 'outputs/code_2'
+work_dir = 'outputs/code'
