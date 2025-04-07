@@ -4,7 +4,7 @@ alpaca-eval==0.6
 antlr4-python3-runtime==4.11
 cn2an
 # Dingo
-dingo-python==1.1.2
+dingo-python==1.5.0
 # Icl topk retriever
 faiss_gpu==1.7.2
 # Humaneval, Humaneval X
