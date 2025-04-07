@@ -35,7 +35,7 @@ HEADER = ['name', 'category', 'paper', 'configpath', 'configpath_llmjudge']
 recommanded_dataset_list = [
     'ifeval', 'aime2024', 'bbh', 'bigcodebench', 'cmmlu', 'drop', 'gpqa',
     'hellaswag', 'humaneval', 'korbench', 'livecodebench', 'math', 'mmlu',
-    'mmlu_pro', 'musr'
+    'mmlu_pro', 'musr', 'math500'
 ]
 
 
