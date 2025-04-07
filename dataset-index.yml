@@ -116,6 +116,12 @@
     paper: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10778138
     configpath: opencompass/configs/datasets/MedBench/medbench_gen.py
     configpath_llmjudge: ''
+- MedXpertQA:
+    name: MedXpertQA
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2501.18362
+    configpath: opencompass/configs/datasets/MedXpertQA/MedXpertQA_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/MedXpertQA/MedXpertQA_llmjudge_gen.py
 - musr:
     name: MuSR
     category: Reasoning
