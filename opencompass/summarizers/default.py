@@ -111,8 +111,12 @@ class DefaultSummarizer:
                 _dm = sorted(_dm, key=lambda i: METRIC_WHITELIST.index(i) if i in METRIC_WHITELIST else len(METRIC_WHITELIST))
 
                 if dataset_abbr in dataset_metrics:
-                    assert tuple(dataset_metrics[dataset_abbr]) == tuple(_dm), \
-                    f'{dataset_abbr} has different metrics: {dataset_metrics[dataset_abbr]} vs {_dm}'
+                    if len(_dm) == 1:
+                        if _dm in dataset_metrics[dataset_abbr]:
+                            dataset_metrics[dataset_abbr] = _dm
+                    else:
+                        assert tuple(dataset_metrics[dataset_abbr]) == tuple(_dm) or dataset_metrics[dataset_abbr][0] in _dm, \
+                        f'{dataset_abbr} has different metrics: {dataset_metrics[dataset_abbr]} vs {_dm}'
                 else:
                     dataset_metrics[dataset_abbr] = _dm
                 parsed_results[model_abbr][dataset_abbr] = _rst
@@ -197,9 +201,12 @@ class DefaultSummarizer:
                                 parsed_results[model_abbr][dataset_abbr][metric_default]
                                 eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                             else:
-                                scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = \
-                                parsed_results[model_abbr][dataset_abbr][metric]
-                                eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
+                                try:
+                                    scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = \
+                                    parsed_results[model_abbr][dataset_abbr][metric]
+                                    eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
+                                except:
+                                    continue
                 result = {}
                 for metric in scores:
                     if default_metric == 'standard_deviation':
