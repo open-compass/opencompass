@@ -263,6 +263,106 @@ GenericLLMEvaluator专为使用LLM作为评判器评估模型输出而设计。�
 }
 ```
 
+## 级联评估器 (CascadeEvaluator)
+
+OpenCompass还提供了级联评估器`CascadeEvaluator`，它结合了规则式评估和LLM评估的优势。级联评估器有两种模式：
+
+1. **级联模式（Cascade Mode, parallel=False）**：首先使用规则式评估器评估所有样本，然后只将规则式评估认为不正确的样本发送给LLM评判器进行重新评估。这种方式可以在保持准确性的同时减少对LLM评判的依赖，从而降低评估成本和时间。
+
+2. **并行模式（Parallel Mode, parallel=True）**：使用规则式评估器和LLM评判器同时评估所有样本，如果任何一个评估器认为样本是正确的，则将该样本视为正确。这种方式可以提高评估的宽容度，但可能会导致更高的成本，因为所有样本都需要LLM评估。
+
+### 配置CascadeEvaluator
+
+以下是配置`CascadeEvaluator`的示例：
+
+```python
+# 定义规则式评估器
+rule_evaluator = dict(type=MATHEvaluator)
+
+# 定义LLM评判器
+llm_judge_evaluator = dict(
+    type=GenericLLMEvaluator,
+    prompt_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin=[
+                dict(
+                    role='SYSTEM',
+                    fallback_role='HUMAN',
+                    prompt="你是一个负责评估模型输出正确性和质量的助手。",
+                )
+            ],
+            round=[
+                dict(role='HUMAN', prompt=YOUR_JUDGE_TEMPLATE),
+            ],
+        ),
+    ),
+    dataset_cfg=dict(
+        type=YourDataset,
+        path='path/to/your/dataset',
+        reader_cfg=reader_cfg,
+    ),
+    judge_cfg=dict(),  # 可以使用环境变量配置评判模型
+)
+
+# 配置级联评估器（级联模式）
+cascade_evaluator = dict(
+    type=CascadeEvaluator,
+    llm_evaluator=llm_judge_evaluator,
+    rule_evaluator=rule_evaluator,
+    parallel=False  # 级联模式
+)
+
+# 如果需要并行模式，可以设置parallel=True
+parallel_evaluator = dict(
+    type=CascadeEvaluator,
+    llm_evaluator=llm_judge_evaluator,
+    rule_evaluator=rule_evaluator,
+    parallel=True  # 并行模式
+)
+
+# 在数据集评估配置中使用级联评估器
+eval_cfg = dict(evaluator=cascade_evaluator)
+```
+
+### 评估结果
+
+级联评估器会输出详细的评估统计信息，包括：
+
+- 规则评估的准确率
+- LLM评估的准确率（针对规则评估失败的样本）
+- 最终的综合准确率
+
+输出示例：
+
+```python
+{
+    'accuracy': 85.0,  # 最终准确率
+    'cascade_stats': {
+        'total_samples': 100,
+        'rule_correct': 70,  # 规则评估认为正确的样本数
+        'rule_accuracy': 70.0,  # 规则评估的准确率
+        'llm_evaluated': 30,  # LLM评估的样本数（级联模式下为规则评估失败的样本数）
+        'llm_correct': 15,  # LLM评估认为正确的样本数
+        'llm_accuracy': 50.0,  # LLM评估的准确率
+        'final_correct': 85,  # 最终正确的样本数
+        'final_accuracy': 85.0,  # 最终准确率
+        'parallel_mode': False,  # 是否是并行模式
+    },
+    'details': [
+        # 每个样本的详细评估结果
+    ]
+}
+```
+
+级联评估器特别适用于：
+
+1. 需要平衡评估成本和准确性的场景
+2. 有可用的规则式评估器但可能不够完善的情况
+3. 需要对边界情况进行更精确判断的评估任务
+
 ## 完整示例
 
-有关完整的工作示例，请参考examples目录中的`eval_llm_judge.py`文件，该文件演示了如何使用LLM评判器评估数学问题解决能力。
+如果希望了解通用LLM评判器，请参考examples目录中的`eval_llm_judge.py`文件，该示例展示了如何使用LLM评判器评估数学问题。
+
+如果希望了解级联评估器请参考examples目录中的`eval_cascade_evaluator.py`文件，该示例展示了如何使用级联评估器评估数学问题。
