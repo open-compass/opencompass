@@ -304,7 +304,6 @@ llm_judge_evaluator = dict(
         reader_cfg=reader_cfg,
     ),
     judge_cfg=dict(),  # Can use environment variables to configure the judge model
-    dict_postprocessor=dict(type=generic_llmjudge_postprocess),
 )
 
 # Configure cascade evaluator (cascade mode)

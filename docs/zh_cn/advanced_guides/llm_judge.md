@@ -303,7 +303,6 @@ llm_judge_evaluator = dict(
         reader_cfg=reader_cfg,
     ),
     judge_cfg=dict(),  # 可以使用环境变量配置评判模型
-    dict_postprocessor=dict(type=generic_llmjudge_postprocess),
 )
 
 # 配置级联评估器（级联模式）
