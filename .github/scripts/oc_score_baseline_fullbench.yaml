@@ -9,7 +9,7 @@ internlm2_5-7b-chat-hf_fullbench:
         drop_accuracy: 81.25
         GPQA_diamond_accuracy: 25
         hellaswag_accuracy: 87.5
-        TheoremQA_score: 18.75
+        TheoremQA_score: 12.50
         musr_average_naive_average: 39.58
         korbench_single_naive_average: 40
         gsm8k_accuracy: 62.50
@@ -162,7 +162,7 @@ internlm2_5-7b-hf_fullbench:
         drop_accuracy: 62.5
         GPQA_diamond_accuracy: 62.5
         hellaswag_accuracy: 93.75
-        TheoremQA_score: 25
+        TheoremQA_score: 12.50
         winogrande_accuracy: 75
         gsm8k_accuracy: 37.5
         GaokaoBench_2010-2022_Math_II_MCQs_score: 62.5
@@ -190,7 +190,7 @@ internlm2_5-7b-turbomind_fullbench:
         drop_accuracy: 62.5
         GPQA_diamond_accuracy: 62.5
         hellaswag_accuracy: 93.75
-        TheoremQA_score: 31.25
+        TheoremQA_score: 12.50
         winogrande_accuracy: 87.5
         gsm8k_accuracy: 56.25
         GaokaoBench_2010-2022_Math_II_MCQs_score: 68.75
@@ -391,7 +391,7 @@ internlm2_5-7b-chat-turbomind:
         alpaca_eval_total: 25.96
         arenahard_score: 17.15
         Followbench_naive_average: 0.81
-        CompassArena_naive_average: 34.61
+        CompassArena_naive_average: 39.49
         FoFo_naive_average: 0.38
         mtbench101_avg: 8.01
         wildbench_average: -10.49
@@ -410,10 +410,10 @@ internlm2_5-7b-chat-turbomind:
         alpaca_eval_oasst: 23.4
         alpaca_eval_selfinstruct: 30.95
         alpaca_eval_vicuna: 33.75
-        compassarena_language_naive_average: 52.5
+        compassarena_language_naive_average: 58.50
         compassarena_knowledge_naive_average: 36
         compassarena_reason_v2_naive_average: 35
-        compassarena_math_v2_naive_average: 19.91
+        compassarena_math_v2_naive_average: 25.95
         compassarena_creationv2_zh_naive_average: 43.64
         fofo_test_prompts_overall: 0.35
         fofo_test_prompts_cn_overall: 0.41
@@ -493,7 +493,7 @@ qwen2.5-7b-instruct-turbomind:
         bigcodebench_hard_instruct_pass@1: 16.22
         bigcodebench_hard_complete_pass@1: 11.49
         teval_naive_average: 79.72
-        SciCode_sub_accuracy: 100
+        SciCode_sub_accuracy: 10.76
         qa_dingo_cn_score: 99.01
         mmlu_accuracy: 76.01
         mmlu-stem_accuracy: 77.59
@@ -600,7 +600,7 @@ internlm2_5-7b-chat-pytorch:
         bigcodebench_hard_instruct_pass@1: 6.08
         bigcodebench_hard_complete_pass@1: 6.76
         teval_naive_average: 79.73
-        SciCode_sub_accuracy: 100
+        SciCode_sub_accuracy: 3.47
         qa_dingo_cn_score: 100
         mmlu_accuracy: 70.2
         mmlu-stem_accuracy: 67.73
@@ -689,7 +689,7 @@ qwen2.5-7b-instruct-pytorch:
         GaokaoBench_weighted_average: 80.02
         math_accuracy: 73.74
         cmo_fib_accuracy: 26.44
-        aime2024_accuracy: 10
+        aime2024_accuracy: 13.33
         Mathbench_naive_average: 77.08
         wikibench-wiki-single_choice_cncircular_perf_4: 34
         cmmlu_naive_average: 75.9
@@ -705,7 +705,7 @@ qwen2.5-7b-instruct-pytorch:
         bigcodebench_hard_instruct_pass@1: 16.89
         bigcodebench_hard_complete_pass@1: 12.16
         teval_naive_average: 79.46
-        SciCode_sub_accuracy: 100
+        SciCode_sub_accuracy: 10.42
         qa_dingo_cn_score: 100
         mmlu_accuracy: 76.27
         mmlu-stem_accuracy: 77.75
@@ -810,7 +810,7 @@ internlm3-8b-instruct-turbomind:
         bigcodebench_hard_instruct_pass@1: 13.51
         bigcodebench_hard_complete_pass@1: 15.54
         teval_naive_average: 82.86
-        SciCode_sub_accuracy: 100
+        SciCode_sub_accuracy: 11.11
         qa_dingo_cn_score: 100
         mmlu_accuracy: 76.21
         mmlu-stem_accuracy: 77.7
@@ -889,7 +889,7 @@ internlm3-8b-instruct-pytorch:
         IFEval_Prompt-level-strict-accuracy: 79.11
         drop_accuracy: 83.32
         bbh_naive_average: 54.76
-        GPQA_diamond_accuracy: 42.42
+        GPQA_diamond_accuracy: 33.84
         hellaswag_accuracy: 91.31
         TheoremQA_score: 18
         musr_average_naive_average: 36.62
@@ -915,7 +915,7 @@ internlm3-8b-instruct-pytorch:
         bigcodebench_hard_instruct_pass@1: 12.84
         bigcodebench_hard_complete_pass@1: 15.54
         teval_naive_average: 82.86
-        SciCode_sub_accuracy: 100
+        SciCode_sub_accuracy: 9.38
         qa_dingo_cn_score: 100
         mmlu_accuracy: 76.23
         mmlu-stem_accuracy: 78.08
