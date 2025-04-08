@@ -615,8 +615,8 @@
     name: MATH
     category: Math
     paper: https://arxiv.org/pdf/2103.03874
-    configpath: opencompass/configs/datasets/math
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/math/math_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/math/math_llm_judge_gen.py
 - math500:
     name: MATH500
     category: Math

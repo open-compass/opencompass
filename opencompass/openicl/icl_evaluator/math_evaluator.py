@@ -22,26 +22,16 @@ class MATHEvaluator(BaseEvaluator):
         details = []
         for i, j in zip(predictions, references):
             count += 1
+            j_with_env = f'${j}$'
             gold_parsed = parse(
-                j,
+                j_with_env,
                 extraction_mode='first_match',
                 extraction_config=[
                     LatexExtractionConfig(),
                     ExprExtractionConfig(),
                 ],
             )
-            # If parsing result is empty, try adding LaTeX
-            # environment and parse again
-            if len(gold_parsed) == 0:
-                j_with_env = f'${j}$'
-                gold_parsed = parse(
-                    j_with_env,
-                    extraction_mode='first_match',
-                    extraction_config=[
-                        LatexExtractionConfig(),
-                        ExprExtractionConfig(),
-                    ],
-                )
+
             if len(gold_parsed) != 0:
                 # We require the answer to be provided in correct
                 # latex (no malformed operators)
