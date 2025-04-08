@@ -3,6 +3,8 @@ import re
 from collections import defaultdict
 from typing import Optional
 
+from opencompass.registry import DICT_POSTPROCESSORS
+
 from .utils import get_judgeanswer_and_reference
 
 
