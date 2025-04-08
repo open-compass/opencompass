@@ -352,7 +352,7 @@ def main():
         if args.dlc or args.slurm or cfg.get('eval', None) is None:
             fill_eval_cfg(cfg, args)
         if args.dump_eval_details:
-            logger.info('Default to dump eval details, it might take extra'
+            logger.warning('Default to dump eval details, it might take extra'
                         'space to save all the evaluation details. '
                         'Set --dump-eval-details False to skip the details dump')
             cfg.eval.runner.task.dump_details = True
