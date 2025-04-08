@@ -5,7 +5,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.evaluator import GenericLLMEvaluator
 
 SYSTEM_PROMPT = 'You are a helpful medical assistant.\n\n' # Where to put this?
-ZERO_SHOT_PROMPT = "Q: {question}\nA: Among {start} through {end}, the answer is"
+ZERO_SHOT_PROMPT = 'Q: {question}\nA: Among {start} through {end}, the answer is'
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
     

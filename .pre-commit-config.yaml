@@ -89,11 +89,11 @@ repos:
           - mdformat_frontmatter
           - linkify-it-py
         exclude: configs/
-  # - repo: https://github.com/myint/docformatter
-  #   rev: v1.3.1
-  #   hooks:
-  #     - id: docformatter
-  #       args: ["--in-place", "--wrap-descriptions", "79"]
+  - repo: https://github.com/myint/docformatter
+    rev: v1.3.1
+    hooks:
+      - id: docformatter
+        args: ["--in-place", "--wrap-descriptions", "79"]
   - repo: local
     hooks:
     -   id: update-dataset-suffix

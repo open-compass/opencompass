@@ -4,7 +4,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 SYSTEM_PROMPT = 'You are a helpful medical assistant.\n\n' # Where to put this?
-ZERO_SHOT_PROMPT = "Q: {question}\nA: Among {start} through {end}, the answer is"
+ZERO_SHOT_PROMPT = 'Q: {question}\nA: Among {start} through {end}, the answer is'
 
 # Reader configuration
 reader_cfg = dict(
