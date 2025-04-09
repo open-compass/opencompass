@@ -34,11 +34,13 @@ def get_capability_results(judged_answers, references):
 
     capability_avg_ratings = defaultdict(float)
 
+    print(capability_ratings)
     for capability, total_score in capability_ratings.items():
         s = total_score / capability_counts[capability]
         s = round(s, 2)
         capability_avg_ratings[capability] = s
 
+    print(capability_avg_ratings)
     return capability_avg_ratings
 
 
