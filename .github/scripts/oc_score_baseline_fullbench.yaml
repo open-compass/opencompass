@@ -9,7 +9,7 @@ internlm2_5-7b-chat-hf_fullbench:
         drop_accuracy: 81.25
         GPQA_diamond_accuracy: 25
         hellaswag_accuracy: 87.5
-        TheoremQA_score: 18.75
+        TheoremQA_score: 12.50
         musr_average_naive_average: 39.58
         korbench_single_naive_average: 40
         gsm8k_accuracy: 62.50
@@ -24,8 +24,8 @@ internlm2_5-7b-chat-hf_fullbench:
         lcb_test_output_pass@1: 18.75
         bbh-logical_deduction_seven_objects_score: 50
         bbh-multistep_arithmetic_two_score: 68.75
-        mmlu-other_naive_average: 72.6
-        cmmlu-china-specific_naive_average: 76.25
+        mmlu-other_accuracy: 72.6
+        cmmlu-china-specific_accuracy: 76.25
         mmlu_pro_math_accuracy: 25
         ds1000_Pandas_accuracy: 12.5
         ds1000_Numpy_accuracy: 0
@@ -39,15 +39,15 @@ internlm2_5-7b-chat-hf_fullbench:
         college_knowledge_naive_average: 87.5
     subjective:
         alignment_bench_v1_1_总分: 0.66
-        alpaca_eval_total: 20
+        alpaca_eval_total: 0
         arenahard_score: 50
         Followbench_naive_average: 1
-        CompassArena_naive_average: 44.00
+        CompassArena_naive_average: 43
         mtbench101_avg: 7.8
-        wildbench_average: -12.78
+        wildbench_average: -15.56
         simpleqa_accuracy_given_attempted: 0
         chinese_simpleqa_given_attempted_accuracy: 1
-        alignment_bench_v1_1_专业能力: 7.90
+        alignment_bench_v1_1_专业能力: 8.00
         alignment_bench_v1_1_数学计算: 0
         alignment_bench_v1_1_基本任务: 0
         alignment_bench_v1_1_逻辑推理: 0
@@ -55,10 +55,10 @@ internlm2_5-7b-chat-hf_fullbench:
         alignment_bench_v1_1_文本写作: 0
         alignment_bench_v1_1_角色扮演: 0
         alignment_bench_v1_1_综合问答: 0
-        alpaca_eval_helpful_base: 20
+        alpaca_eval_helpful_base: 0
         compassarena_language_naive_average: 35
         compassarena_knowledge_naive_average: 55
-        compassarena_reason_v2_naive_average: 45.00
+        compassarena_reason_v2_naive_average: 40
         compassarena_math_v2_naive_average: 55
         compassarena_creationv2_zh_naive_average: 30
         followbench_llmeval_en_HSR_AVG: 1
@@ -78,53 +78,53 @@ internlm2_5-7b-chat-hf_fullbench:
 internlm2_5-7b-chat-turbomind_fullbench:
     objective:
         race-high_accuracy:  93.75
-        ARC-c_accuracy: 93.75
+        ARC-c_accuracy: 87.50
         BoolQ_accuracy: 68.75
         triviaqa_wiki_1shot_score: 50
         nq_open_1shot_score: 25
         IFEval_Prompt-level-strict-accuracy: 56.25
-        drop_accuracy: 81.25
+        drop_accuracy: 75
         GPQA_diamond_accuracy: 31.25
-        hellaswag_accuracy: 81.25
-        TheoremQA_score: 6.25
+        hellaswag_accuracy: 87.5
+        TheoremQA_score: 12.5
         musr_average_naive_average: 39.58
-        korbench_single_naive_average: 37.50
-        gsm8k_accuracy: 68.75
-        math_accuracy: 68.75
+        korbench_single_naive_average: 40
+        gsm8k_accuracy: 62.5
+        math_accuracy: 75
         cmo_fib_accuracy: 6.25
         aime2024_accuracy: 6.25
-        wikibench-wiki-single_choice_cncircular_perf_4: 50.00
+        wikibench-wiki-single_choice_cncircular_perf_4: 25
         sanitized_mbpp_score: 68.75
-        ds1000_naive_average: 16.96
+        ds1000_naive_average: 17.86
         lcb_code_generation_pass@1: 12.5
         lcb_code_execution_pass@1: 43.75
-        lcb_test_output_pass@1: 25.00
-        bbh-logical_deduction_seven_objects_score: 50.00
-        bbh-multistep_arithmetic_two_score: 68.75
-        mmlu-other_naive_average: 69.71
-        cmmlu-china-specific_naive_average: 75.83
+        lcb_test_output_pass@1: 18.75
+        bbh-logical_deduction_seven_objects_score: 56.25
+        bbh-multistep_arithmetic_two_score: 75
+        mmlu-other_accuracy: 72.6
+        cmmlu-china-specific_accuracy: 78.33
         mmlu_pro_math_accuracy: 31.25
-        ds1000_Pandas_accuracy: 0
+        ds1000_Pandas_accuracy: 12.5
         ds1000_Numpy_accuracy: 0
         ds1000_Tensorflow_accuracy: 12.5
-        ds1000_Scipy_accuracy: 18.75
+        ds1000_Scipy_accuracy: 25
         ds1000_Sklearn_accuracy: 18.75
-        ds1000_Pytorch_accuracy: 18.75
+        ds1000_Pytorch_accuracy: 6.25
         ds1000_Matplotlib_accuracy: 50.00
         openai_mmmlu_lite_AR-XY_accuracy: 37.5
         college_naive_average: 12.50
         college_knowledge_naive_average: 87.5
     subjective:
-        alignment_bench_v1_1_总分: 0.70
+        alignment_bench_v1_1_总分: 0.66
         alpaca_eval_total: 0
         arenahard_score: 50
         Followbench_naive_average: 1
-        CompassArena_naive_average: 38
-        mtbench101_avg: 7.80
-        wildbench_average: -4.86
+        CompassArena_naive_average: 40
+        mtbench101_avg: 8
+        wildbench_average: -6.81
         simpleqa_accuracy_given_attempted: 0
         chinese_simpleqa_given_attempted_accuracy: 1
-        alignment_bench_v1_1_专业能力: 8.4
+        alignment_bench_v1_1_专业能力: 7.9
         alignment_bench_v1_1_数学计算: 0
         alignment_bench_v1_1_基本任务: 0
         alignment_bench_v1_1_逻辑推理: 0
@@ -134,10 +134,10 @@ internlm2_5-7b-chat-turbomind_fullbench:
         alignment_bench_v1_1_综合问答: 0
         alpaca_eval_helpful_base: 0
         compassarena_language_naive_average: 35
-        compassarena_knowledge_naive_average: 50
-        compassarena_reason_v2_naive_average: 30
-        compassarena_math_v2_naive_average: 50
-        compassarena_creationv2_zh_naive_average: 25
+        compassarena_knowledge_naive_average: 45
+        compassarena_reason_v2_naive_average: 25
+        compassarena_math_v2_naive_average: 60
+        compassarena_creationv2_zh_naive_average: 35
         followbench_llmeval_en_HSR_AVG: 1
         followbench_llmeval_en_SSR_AVG: 1
         followbench_llmeval_en_HSR_L1: 1
@@ -162,7 +162,7 @@ internlm2_5-7b-hf_fullbench:
         drop_accuracy: 62.5
         GPQA_diamond_accuracy: 62.5
         hellaswag_accuracy: 93.75
-        TheoremQA_score: 25
+        TheoremQA_score: 12.50
         winogrande_accuracy: 75
         gsm8k_accuracy: 37.5
         GaokaoBench_2010-2022_Math_II_MCQs_score: 62.5
@@ -190,20 +190,20 @@ internlm2_5-7b-turbomind_fullbench:
         drop_accuracy: 62.5
         GPQA_diamond_accuracy: 62.5
         hellaswag_accuracy: 93.75
-        TheoremQA_score: 25.00
+        TheoremQA_score: 12.50
         winogrande_accuracy: 87.5
-        gsm8k_accuracy: 62.50
-        GaokaoBench_2010-2022_Math_II_MCQs_score: 81.25
+        gsm8k_accuracy: 56.25
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 68.75
         GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
         math_accuracy: 18.75
         wikibench-wiki-single_choice_cncircular_perf_4: 25
         sanitized_mbpp_score: 62.50
-        dingo_en_192_score: 31.25
+        dingo_en_192_score: 50.00
         dingo_zh_170_score: 93.75
         mmlu-other_accuracy: 76.92
         cmmlu-china-specific_accuracy: 84.17
         mmlu_pro_math_accuracy: 18.75
-        bbh-logical_deduction_seven_objects_score: 50
+        bbh-logical_deduction_seven_objects_score: 43.75
         bbh-multistep_arithmetic_two_score: 56.25
         college_naive_average: 12.5
         college_knowledge_naive_average: 87.5
@@ -234,15 +234,15 @@ internlm2_5-7b-turbomind:
         sanitized_mbpp_score: 55.25
         dingo_en_192_score: 60.94
         dingo_zh_170_score: 67.65
-        mmlu-stem_naive_average: 63.72
-        mmlu-social-science_naive_average: 80.15
-        mmlu-humanities_naive_average: 74.27
-        mmlu-other_naive_average: 71.85
-        cmmlu-stem_naive_average: 67.07
-        cmmlu-social-science_naive_average: 81.49
-        cmmlu-humanities_naive_average: 85.84
-        cmmlu-other_naive_average: 82.69
-        cmmlu-china-specific_naive_average: 79.88
+        mmlu-stem_accuracy: 63.72
+        mmlu-social-science_accuracy: 80.15
+        mmlu-humanities_accuracy: 74.27
+        mmlu-other_accuracy: 71.85
+        cmmlu-stem_accuracy: 67.07
+        cmmlu-social-science_accuracy: 81.49
+        cmmlu-humanities_accuracy: 85.84
+        cmmlu-other_accuracy: 82.69
+        cmmlu-china-specific_accuracy: 79.88
         mmlu_pro_biology_accuracy: 58.58
         mmlu_pro_business_accuracy: 28.01
         mmlu_pro_chemistry_accuracy: 22.79
@@ -281,12 +281,12 @@ internlm2_5-7b-turbomind:
         longbench_naive_average: 46.19
         longbench_zh_naive_average: 49.3
         longbench_en_naive_average: 43.97
-        longbench_single-document-qa_naive_average: 42.84
-        longbench_multi-document-qa_naive_average: 37.29
-        longbench_summarization_naive_average: 23.21
-        longbench_few-shot-learning_naive_average: 61.67
-        longbench_synthetic-tasks_naive_average: 60.05
-        longbench_code-completion_naive_average: 52.09
+        longbench_single-document-qa_score: 42.84
+        longbench_multi-document-qa_score: 41.25
+        longbench_summarization_score: 23.21
+        longbench_few-shot-learning_score: 61.67
+        longbench_synthetic-tasks_score: 60.05
+        longbench_code-completion_score: 52.09
 
 internlm2_5-7b-chat-turbomind:
     objective:
@@ -327,15 +327,15 @@ internlm2_5-7b-chat-turbomind:
         teval_naive_average: 80
         SciCode_sub_accuracy: 5.56
         qa_dingo_cn_score: 99.01
-        mmlu-stem_naive_average: 68.2
-        mmlu-social-science_naive_average: 75.8
-        mmlu-humanities_naive_average: 69.3
-        mmlu-other_naive_average: 71.3
-        cmmlu-stem_naive_average: 66.64
-        cmmlu-social-science_naive_average: 76
-        cmmlu-humanities_naive_average: 77.9
-        cmmlu-other_naive_average: 77.25
-        cmmlu-china-specific_naive_average: 73.6
+        mmlu-stem_accuracy: 68.2
+        mmlu-social-science_accuracy: 75.8
+        mmlu-humanities_accuracy: 69.3
+        mmlu-other_accuracy: 71.3
+        cmmlu-stem_accuracy: 66.64
+        cmmlu-social-science_accuracy: 76
+        cmmlu-humanities_accuracy: 77.9
+        cmmlu-other_accuracy: 77.25
+        cmmlu-china-specific_accuracy: 73.6
         mmlu_pro_biology_accuracy: 66.67
         mmlu_pro_business_accuracy: 47.91
         mmlu_pro_chemistry_accuracy: 35
@@ -366,7 +366,7 @@ internlm2_5-7b-chat-turbomind:
         openai_mmmlu_lite_DE-DE_accuracy: 51.27
         openai_mmmlu_lite_ES-LA_accuracy: 56.94
         openai_mmmlu_lite_FR-FR_accuracy: 58.22
-        openai_mmmlu_lite_HI-IN_accuracy: 33.75
+        openai_mmmlu_lite_HI-IN_accuracy: 30.75
         openai_mmmlu_lite_ID-ID_accuracy: 50.6
         openai_mmmlu_lite_IT-IT_accuracy: 50.6
         openai_mmmlu_lite_JA-JP_accuracy: 51.13
@@ -391,10 +391,10 @@ internlm2_5-7b-chat-turbomind:
         alpaca_eval_total: 25.96
         arenahard_score: 17.15
         Followbench_naive_average: 0.81
-        CompassArena_naive_average: 34.61
+        CompassArena_naive_average: 39.49
         FoFo_naive_average: 0.38
         mtbench101_avg: 8.01
-        wildbench_average: -15.69
+        wildbench_average: -10.49
         simpleqa_accuracy_given_attempted: 0.04
         chinese_simpleqa_given_attempted_accuracy: 0.34
         alignment_bench_v1_1_专业能力: 6.05
@@ -409,12 +409,12 @@ internlm2_5-7b-chat-turbomind:
         alpaca_eval_koala: 28.21
         alpaca_eval_oasst: 23.4
         alpaca_eval_selfinstruct: 30.95
-        alpaca_eval_vicuna: 25
-        compassarena_language_naive_average: 52.5
+        alpaca_eval_vicuna: 33.75
+        compassarena_language_naive_average: 58.50
         compassarena_knowledge_naive_average: 36
         compassarena_reason_v2_naive_average: 35
-        compassarena_math_v2_naive_average: 19.91
-        compassarena_creationv2_zh_naive_average: 35.81
+        compassarena_math_v2_naive_average: 25.95
+        compassarena_creationv2_zh_naive_average: 43.64
         fofo_test_prompts_overall: 0.35
         fofo_test_prompts_cn_overall: 0.41
         followbench_llmeval_en_HSR_AVG: 0.73
@@ -448,9 +448,536 @@ internlm2_5-7b-chat-1m-turbomind:
         babilong_32k_naive_average: 48.9
         babilong_128k_naive_average: 40.8
         babilong_256k_naive_average: 23.5
-        longbench_single-document-qa_naive_average: 43.56
-        longbench_multi-document-qa_naive_average: 46.24
-        longbench_summarization_naive_average: 24.32
-        longbench_few-shot-learning_naive_average: 51.67
-        longbench_synthetic-tasks_naive_average: 66.83
-        longbench_code-completion_naive_average: 45.99
+        longbench_single-document-qa_score: 43.56
+        longbench_multi-document-qa_score: 46.24
+        longbench_summarization_score: 24.32
+        longbench_few-shot-learning_score: 51.67
+        longbench_synthetic-tasks_score: 66.83
+        longbench_code-completion_score: 45.99
+
+
+qwen2.5-7b-instruct-turbomind:
+    objective:
+        race-high_accuracy: 84.99
+        ARC-c_accuracy: 92.2
+        BoolQ_accuracy: 86.7
+        triviaqa_wiki_1shot_score: 53.06
+        nq_open_1shot_score: 17.51
+        mmmlu_lite_naive_average: 54.96
+        IFEval_Prompt-level-strict-accuracy: 71.53
+        drop_accuracy: 80.07
+        bbh_naive_average: 68.81
+        GPQA_diamond_accuracy: 34.34
+        hellaswag_accuracy: 85.42
+        TheoremQA_score: 18.38
+        musr_average_naive_average: 43.44
+        korbench_single_naive_average: 39.44
+        ARC_Prize_Public_Evaluation_accuracy: 0
+        gsm8k_accuracy: 92.57
+        GaokaoBench_weighted_average: 80.14
+        math_accuracy: 73.58
+        cmo_fib_accuracy: 25
+        aime2024_accuracy: 16.67
+        Mathbench_naive_average: 77.33
+        wikibench-wiki-single_choice_cncircular_perf_4: 34.9
+        cmmlu_naive_average: 75.97
+        mmlu_naive_average: 76.01
+        mmlu_pro_naive_average: 56.12
+        openai_humaneval_humaneval_pass@1: 83.54
+        sanitized_mbpp_score: 74.71
+        humanevalx_naive_average: 48.29
+        ds1000_naive_average: 18.66
+        lcb_code_generation_pass@1: 39.5
+        lcb_code_execution_pass@1: 42.38
+        lcb_test_output_pass@1: 50.68
+        bigcodebench_hard_instruct_pass@1: 16.22
+        bigcodebench_hard_complete_pass@1: 11.49
+        teval_naive_average: 79.72
+        SciCode_sub_accuracy: 10.76
+        qa_dingo_cn_score: 99.01
+        mmlu_accuracy: 76.01
+        mmlu-stem_accuracy: 77.59
+        mmlu-social-science_accuracy: 79.02
+        mmlu-humanities_accuracy: 72.07
+        mmlu-other_accuracy: 74.86
+        cmmlu_accuracy: 75.97
+        cmmlu-stem_accuracy: 73.09
+        cmmlu-social-science_accuracy: 75.95
+        cmmlu-humanities_accuracy: 76.53
+        cmmlu-other_accuracy: 78.79
+        cmmlu-china-specific_accuracy: 73.17
+        mmlu_pro_accuracy: 56.12
+        mmlu_pro_biology_accuracy: 71.41
+        mmlu_pro_business_accuracy: 67.68
+        mmlu_pro_chemistry_accuracy: 54.59
+        mmlu_pro_computer_science_accuracy: 58.29
+        mmlu_pro_economics_accuracy: 66.82
+        mmlu_pro_engineering_accuracy: 42.41
+        mmlu_pro_health_accuracy: 55.87
+        mmlu_pro_history_accuracy: 46.46
+        mmlu_pro_law_accuracy: 28.97
+        mmlu_pro_math_accuracy: 73.13
+        mmlu_pro_philosophy_accuracy: 44.89
+        mmlu_pro_physics_accuracy: 58.43
+        mmlu_pro_psychology_accuracy: 63.16
+        mmlu_pro_other_accuracy: 53.57
+        humanevalx-python_pass@1: 50
+        humanevalx-cpp_pass@1: 42.07
+        humanevalx-go_pass@1: 0
+        humanevalx-java_pass@1: 74.39
+        humanevalx-js_pass@1: 75
+        ds1000_Pandas_accuracy: 14.09
+        ds1000_Numpy_accuracy: 8.18
+        ds1000_Tensorflow_accuracy: 17.78
+        ds1000_Scipy_accuracy: 15.09
+        ds1000_Sklearn_accuracy: 10.43
+        ds1000_Pytorch_accuracy: 4.41
+        ds1000_Matplotlib_accuracy: 60.65
+        mmmlu_lite_accuracy: 54.96
+        openai_mmmlu_lite_AR-XY_accuracy: 42.32
+        openai_mmmlu_lite_BN-BD_accuracy: 42.25
+        openai_mmmlu_lite_DE-DE_accuracy: 59.93
+        openai_mmmlu_lite_ES-LA_accuracy: 66.53
+        openai_mmmlu_lite_FR-FR_accuracy: 66.88
+        openai_mmmlu_lite_HI-IN_accuracy: 49.26
+        openai_mmmlu_lite_ID-ID_accuracy: 61.26
+        openai_mmmlu_lite_IT-IT_accuracy: 65.47
+        openai_mmmlu_lite_JA-JP_accuracy: 61.54
+        openai_mmmlu_lite_KO-KR_accuracy: 60.28
+        openai_mmmlu_lite_PT-BR_accuracy: 55.51
+        openai_mmmlu_lite_SW-KE_accuracy: 36.42
+        openai_mmmlu_lite_YO-NG_accuracy: 32.14
+        openai_mmmlu_lite_ZH-CN_accuracy: 69.61
+        college_naive_average: 48
+        high_naive_average: 59
+        middle_naive_average: 78
+        primary_naive_average: 85.67
+        arithmetic_naive_average: 75.67
+        mathbench-a (average)_naive_average: 69.27
+        college_knowledge_naive_average: 83.86
+        high_knowledge_naive_average: 80.29
+        middle_knowledge_naive_average: 84.26
+        primary_knowledge_naive_average: 93.16
+        mathbench-t (average)_naive_average: 85.39
+
+
+
+
+internlm2_5-7b-chat-pytorch:
+    objective:
+        race-high_accuracy: 86.39
+        ARC-c_accuracy: 90.51
+        BoolQ_accuracy: 88.01
+        triviaqa_wiki_1shot_score: 64.77
+        nq_open_1shot_score: 22.71
+        mmmlu_lite_naive_average: 45.02
+        IFEval_Prompt-level-strict-accuracy: 56.56
+        drop_accuracy: 75.46
+        bbh_naive_average: 73.34
+        GPQA_diamond_accuracy: 32.83
+        hellaswag_accuracy: 94.81
+        TheoremQA_score: 23.88
+        musr_average_naive_average: 51.31
+        korbench_single_naive_average: 32
+        ARC_Prize_Public_Evaluation_accuracy: 0.01
+        gsm8k_accuracy: 86.96
+        GaokaoBench_weighted_average: 78.05
+        math_accuracy: 60.34
+        cmo_fib_accuracy: 12.98
+        aime2024_accuracy: 3.33
+        Mathbench_naive_average: 64.82
+        wikibench-wiki-single_choice_cncircular_perf_4: 31.7
+        cmmlu_naive_average: 74.24
+        mmlu_naive_average: 70.2
+        mmlu_pro_naive_average: 45.39
+        openai_humaneval_humaneval_pass@1: 70.12
+        sanitized_mbpp_score: 64.59
+        humanevalx_naive_average: 38.78
+        ds1000_naive_average: 14.19
+        lcb_code_generation_pass@1: 16.5
+        lcb_code_execution_pass@1: 33.82
+        lcb_test_output_pass@1: 22.62
+        bigcodebench_hard_instruct_pass@1: 6.08
+        bigcodebench_hard_complete_pass@1: 6.76
+        teval_naive_average: 79.73
+        SciCode_sub_accuracy: 3.47
+        qa_dingo_cn_score: 100
+        mmlu_accuracy: 70.2
+        mmlu-stem_accuracy: 67.73
+        mmlu-social-science_accuracy: 75.49
+        mmlu-humanities_accuracy: 68.56
+        mmlu-other_accuracy: 70.58
+        cmmlu_accuracy: 74.24
+        cmmlu-stem_accuracy: 66.7
+        cmmlu-social-science_accuracy: 75.88
+        cmmlu-humanities_accuracy: 77.56
+        cmmlu-other_accuracy: 77.52
+        cmmlu-china-specific_accuracy: 73.46
+        mmlu_pro_accuracy: 45.39
+        mmlu_pro_biology_accuracy: 65.83
+        mmlu_pro_business_accuracy: 51.96
+        mmlu_pro_chemistry_accuracy: 36.84
+        mmlu_pro_computer_science_accuracy: 48.29
+        mmlu_pro_economics_accuracy: 56.16
+        mmlu_pro_engineering_accuracy: 29.1
+        mmlu_pro_health_accuracy: 44.5
+        mmlu_pro_history_accuracy: 42.26
+        mmlu_pro_law_accuracy: 24.98
+        mmlu_pro_math_accuracy: 54.85
+        mmlu_pro_philosophy_accuracy: 39.28
+        mmlu_pro_physics_accuracy: 37.41
+        mmlu_pro_psychology_accuracy: 58.27
+        mmlu_pro_other_accuracy: 45.78
+        humanevalx-python_pass@1: 56.1
+        humanevalx-cpp_pass@1: 20.73
+        humanevalx-go_pass@1: 0
+        humanevalx-java_pass@1: 59.15
+        humanevalx-js_pass@1: 57.93
+        ds1000_Pandas_accuracy: 8.93
+        ds1000_Numpy_accuracy: 4.09
+        ds1000_Tensorflow_accuracy: 11.11
+        ds1000_Scipy_accuracy: 7.55
+        ds1000_Sklearn_accuracy: 7.83
+        ds1000_Pytorch_accuracy: 8.82
+        ds1000_Matplotlib_accuracy: 50.97
+        mmmlu_lite_accuracy: 45.02
+        openai_mmmlu_lite_AR-XY_accuracy: 18.6
+        openai_mmmlu_lite_BN-BD_accuracy: 27.58
+        openai_mmmlu_lite_DE-DE_accuracy: 51.23
+        openai_mmmlu_lite_ES-LA_accuracy: 56.63
+        openai_mmmlu_lite_FR-FR_accuracy: 58.11
+        openai_mmmlu_lite_HI-IN_accuracy: 33.82
+        openai_mmmlu_lite_ID-ID_accuracy: 50.39
+        openai_mmmlu_lite_IT-IT_accuracy: 50.39
+        openai_mmmlu_lite_JA-JP_accuracy: 50.95
+        openai_mmmlu_lite_KO-KR_accuracy: 45.05
+        openai_mmmlu_lite_PT-BR_accuracy: 57.89
+        openai_mmmlu_lite_SW-KE_accuracy: 32.14
+        openai_mmmlu_lite_YO-NG_accuracy: 32.14
+        openai_mmmlu_lite_ZH-CN_accuracy: 65.33
+        college_naive_average: 21
+        high_naive_average: 47
+        middle_naive_average: 59.67
+        primary_naive_average: 76
+        arithmetic_naive_average: 62
+        mathbench-a (average)_naive_average: 53.13
+        college_knowledge_naive_average: 68.99
+        high_knowledge_naive_average: 70.06
+        middle_knowledge_naive_average: 78.53
+        primary_knowledge_naive_average: 88.49
+        mathbench-t (average)_naive_average: 76.51
+
+
+qwen2.5-7b-instruct-pytorch:
+    objective:
+        race-high_accuracy: 85.16
+        ARC-c_accuracy: 90.85
+        BoolQ_accuracy: 86.61
+        triviaqa_wiki_1shot_score: 52.96
+        nq_open_1shot_score: 17.62
+        mmmlu_lite_naive_average: 54.7
+        IFEval_Prompt-level-strict-accuracy: 71.35
+        drop_accuracy: 80.23
+        bbh_naive_average: 68.88
+        GPQA_diamond_accuracy: 36.36
+        hellaswag_accuracy: 85.49
+        TheoremQA_score: 18.38
+        musr_average_naive_average: 43.3
+        korbench_single_naive_average: 39.44
+        ARC_Prize_Public_Evaluation_accuracy: 0
+        gsm8k_accuracy: 91.66
+        GaokaoBench_weighted_average: 80.02
+        math_accuracy: 73.74
+        cmo_fib_accuracy: 26.44
+        aime2024_accuracy: 13.33
+        Mathbench_naive_average: 77.08
+        wikibench-wiki-single_choice_cncircular_perf_4: 34
+        cmmlu_naive_average: 75.9
+        mmlu_naive_average: 76.27
+        mmlu_pro_naive_average: 56.14
+        openai_humaneval_humaneval_pass@1: 84.76
+        sanitized_mbpp_score: 74.71
+        humanevalx_naive_average: 48.17
+        ds1000_naive_average: 18.57
+        lcb_code_generation_pass@1: 38.75
+        lcb_code_execution_pass@1: 42.38
+        lcb_test_output_pass@1: 50.45
+        bigcodebench_hard_instruct_pass@1: 16.89
+        bigcodebench_hard_complete_pass@1: 12.16
+        teval_naive_average: 79.46
+        SciCode_sub_accuracy: 10.42
+        qa_dingo_cn_score: 100
+        mmlu_accuracy: 76.27
+        mmlu-stem_accuracy: 77.75
+        mmlu-social-science_accuracy: 78.65
+        mmlu-humanities_accuracy: 73.12
+        mmlu-other_accuracy: 75.05
+        cmmlu_accuracy: 75.9
+        cmmlu-stem_accuracy: 73.41
+        cmmlu-social-science_accuracy: 75.97
+        cmmlu-humanities_accuracy: 76.42
+        cmmlu-other_accuracy: 78.15
+        cmmlu-china-specific_accuracy: 73.27
+        mmlu_pro_accuracy: 56.14
+        mmlu_pro_biology_accuracy: 72.25
+        mmlu_pro_business_accuracy: 66.16
+        mmlu_pro_chemistry_accuracy: 55.65
+        mmlu_pro_computer_science_accuracy: 60.24
+        mmlu_pro_economics_accuracy: 66.82
+        mmlu_pro_engineering_accuracy: 41.38
+        mmlu_pro_health_accuracy: 54.89
+        mmlu_pro_history_accuracy: 46.46
+        mmlu_pro_law_accuracy: 29.06
+        mmlu_pro_math_accuracy: 73.58
+        mmlu_pro_philosophy_accuracy: 44.89
+        mmlu_pro_physics_accuracy: 60.05
+        mmlu_pro_psychology_accuracy: 61.9
+        mmlu_pro_other_accuracy: 52.6
+        humanevalx-python_pass@1: 51.83
+        humanevalx-cpp_pass@1: 42.68
+        humanevalx-go_pass@1: 0
+        humanevalx-java_pass@1: 73.78
+        humanevalx-js_pass@1: 72.56
+        ds1000_Pandas_accuracy: 14.09
+        ds1000_Numpy_accuracy: 8.64
+        ds1000_Tensorflow_accuracy: 17.78
+        ds1000_Scipy_accuracy: 15.09
+        ds1000_Sklearn_accuracy: 8.7
+        ds1000_Pytorch_accuracy: 4.41
+        ds1000_Matplotlib_accuracy: 61.29
+        mmmlu_lite_accuracy: 54.7
+        openai_mmmlu_lite_AR-XY_accuracy: 42.32
+        openai_mmmlu_lite_BN-BD_accuracy: 42.18
+        openai_mmmlu_lite_DE-DE_accuracy: 60
+        openai_mmmlu_lite_ES-LA_accuracy: 66.18
+        openai_mmmlu_lite_FR-FR_accuracy: 66.88
+        openai_mmmlu_lite_HI-IN_accuracy: 48.63
+        openai_mmmlu_lite_ID-ID_accuracy: 61.26
+        openai_mmmlu_lite_IT-IT_accuracy: 65.26
+        openai_mmmlu_lite_JA-JP_accuracy: 60.7
+        openai_mmmlu_lite_KO-KR_accuracy: 60.63
+        openai_mmmlu_lite_PT-BR_accuracy: 54.46
+        openai_mmmlu_lite_SW-KE_accuracy: 36
+        openai_mmmlu_lite_YO-NG_accuracy: 31.86
+        openai_mmmlu_lite_ZH-CN_accuracy: 69.4
+        college_naive_average: 48.33
+        high_naive_average: 59.33
+        middle_naive_average: 76.67
+        primary_naive_average: 86.67
+        arithmetic_naive_average: 74.33
+        mathbench-a (average)_naive_average: 69.07
+        college_knowledge_naive_average: 83.54
+        high_knowledge_naive_average: 80.82
+        middle_knowledge_naive_average: 83.79
+        primary_knowledge_naive_average: 92.22
+        mathbench-t (average)_naive_average: 85.1
+
+
+internlm3-8b-instruct-turbomind:
+    objective:
+        race-high_accuracy: 89.22
+        ARC-c_accuracy: 92.54
+        BoolQ_accuracy: 86.45
+        triviaqa_wiki_1shot_score: 60.72
+        nq_open_1shot_score: 20.25
+        mmmlu_lite_naive_average: 41.82
+        IFEval_Prompt-level-strict-accuracy: 77.45
+        drop_accuracy: 83.27
+        bbh_naive_average: 55.22
+        GPQA_diamond_accuracy: 37.88
+        hellaswag_accuracy: 91.28
+        TheoremQA_score: 20.12
+        musr_average_naive_average: 36.86
+        korbench_single_naive_average: 41.2
+        ARC_Prize_Public_Evaluation_accuracy: 0.06
+        gsm8k_accuracy: 91.28
+        GaokaoBench_weighted_average: 86.59
+        math_accuracy: 76.96
+        cmo_fib_accuracy: 35.1
+        aime2024_accuracy: 16.67
+        Mathbench_naive_average: 78.96
+        wikibench-wiki-single_choice_cncircular_perf_4: 37.45
+        cmmlu_naive_average: 83.33
+        mmlu_naive_average: 76.21
+        mmlu_pro_naive_average: 57.96
+        openai_humaneval_humaneval_pass@1: 81.71
+        sanitized_mbpp_score: 69.65
+        humanevalx_naive_average: 40.73
+        ds1000_naive_average: 27.23
+        lcb_code_generation_pass@1: 34.75
+        lcb_code_execution_pass@1: 49.9
+        lcb_test_output_pass@1: 48.19
+        bigcodebench_hard_instruct_pass@1: 13.51
+        bigcodebench_hard_complete_pass@1: 15.54
+        teval_naive_average: 82.86
+        SciCode_sub_accuracy: 11.11
+        qa_dingo_cn_score: 100
+        mmlu_accuracy: 76.21
+        mmlu-stem_accuracy: 77.7
+        mmlu-social-science_accuracy: 80.98
+        mmlu-humanities_accuracy: 70.83
+        mmlu-other_accuracy: 75.01
+        cmmlu_accuracy: 83.33
+        cmmlu-stem_accuracy: 79.66
+        cmmlu-social-science_accuracy: 83.39
+        cmmlu-humanities_accuracy: 84.73
+        cmmlu-other_accuracy: 86.2
+        cmmlu-china-specific_accuracy: 81.77
+        mmlu_pro_accuracy: 57.96
+        mmlu_pro_biology_accuracy: 75.45
+        mmlu_pro_business_accuracy: 64.64
+        mmlu_pro_chemistry_accuracy: 59.81
+        mmlu_pro_computer_science_accuracy: 60.24
+        mmlu_pro_economics_accuracy: 68.6
+        mmlu_pro_engineering_accuracy: 44.79
+        mmlu_pro_health_accuracy: 58.31
+        mmlu_pro_history_accuracy: 49.87
+        mmlu_pro_law_accuracy: 32.43
+        mmlu_pro_math_accuracy: 70.17
+        mmlu_pro_philosophy_accuracy: 46.89
+        mmlu_pro_physics_accuracy: 59.58
+        mmlu_pro_psychology_accuracy: 66.29
+        mmlu_pro_other_accuracy: 54.33
+        humanevalx-python_pass@1: 43.9
+        humanevalx-cpp_pass@1: 20.12
+        humanevalx-go_pass@1: 0
+        humanevalx-java_pass@1: 74.39
+        humanevalx-js_pass@1: 65.24
+        ds1000_Pandas_accuracy: 16.49
+        ds1000_Numpy_accuracy: 34.09
+        ds1000_Tensorflow_accuracy: 26.67
+        ds1000_Scipy_accuracy: 17.92
+        ds1000_Sklearn_accuracy: 20.87
+        ds1000_Pytorch_accuracy: 19.12
+        ds1000_Matplotlib_accuracy: 55.48
+        mmmlu_lite_accuracy: 41.82
+        openai_mmmlu_lite_AR-XY_accuracy: 32.56
+        openai_mmmlu_lite_BN-BD_accuracy: 4.56
+        openai_mmmlu_lite_DE-DE_accuracy: 24.91
+        openai_mmmlu_lite_ES-LA_accuracy: 51.09
+        openai_mmmlu_lite_FR-FR_accuracy: 61.68
+        openai_mmmlu_lite_HI-IN_accuracy: 24.98
+        openai_mmmlu_lite_ID-ID_accuracy: 44.56
+        openai_mmmlu_lite_IT-IT_accuracy: 52.35
+        openai_mmmlu_lite_JA-JP_accuracy: 51.02
+        openai_mmmlu_lite_KO-KR_accuracy: 47.93
+        openai_mmmlu_lite_PT-BR_accuracy: 53.89
+        openai_mmmlu_lite_SW-KE_accuracy: 33.47
+        openai_mmmlu_lite_YO-NG_accuracy: 33.47
+        openai_mmmlu_lite_ZH-CN_accuracy: 69.05
+        college_naive_average: 45.67
+        high_naive_average: 64.67
+        middle_naive_average: 82.33
+        primary_naive_average: 90.33
+        arithmetic_naive_average: 74
+        mathbench-a (average)_naive_average: 71.4
+        college_knowledge_naive_average: 85.28
+        high_knowledge_naive_average: 79.43
+        middle_knowledge_naive_average: 87.9
+        primary_knowledge_naive_average: 93.42
+        mathbench-t (average)_naive_average: 86.51
+
+
+internlm3-8b-instruct-pytorch:
+    objective:
+        race-high_accuracy: 89.02
+        ARC-c_accuracy: 93.56
+        BoolQ_accuracy: 86.67
+        triviaqa_wiki_1shot_score: 60.54
+        nq_open_1shot_score: 20.3
+        mmmlu_lite_naive_average: 42.6
+        IFEval_Prompt-level-strict-accuracy: 79.11
+        drop_accuracy: 83.32
+        bbh_naive_average: 54.76
+        GPQA_diamond_accuracy: 33.84
+        hellaswag_accuracy: 91.31
+        TheoremQA_score: 18
+        musr_average_naive_average: 36.62
+        korbench_single_naive_average: 41.84
+        ARC_Prize_Public_Evaluation_accuracy: 0.06
+        gsm8k_accuracy: 90.67
+        GaokaoBench_weighted_average: 86.27
+        math_accuracy: 76.68
+        cmo_fib_accuracy: 33.65
+        aime2024_accuracy: 10
+        Mathbench_naive_average: 78.92
+        wikibench-wiki-single_choice_cncircular_perf_4: 37.35
+        cmmlu_naive_average: 83.11
+        mmlu_naive_average: 76.23
+        mmlu_pro_naive_average: 58.16
+        openai_humaneval_humaneval_pass@1: 82.32
+        sanitized_mbpp_score: 70.04
+        humanevalx_naive_average: 39.76
+        ds1000_naive_average: 27.84
+        lcb_code_generation_pass@1: 34.5
+        lcb_code_execution_pass@1: 48.02
+        lcb_test_output_pass@1: 47.74
+        bigcodebench_hard_instruct_pass@1: 12.84
+        bigcodebench_hard_complete_pass@1: 15.54
+        teval_naive_average: 82.86
+        SciCode_sub_accuracy: 9.38
+        qa_dingo_cn_score: 100
+        mmlu_accuracy: 76.23
+        mmlu-stem_accuracy: 78.08
+        mmlu-social-science_accuracy: 80.31
+        mmlu-humanities_accuracy: 71.38
+        mmlu-other_accuracy: 74.63
+        cmmlu_accuracy: 83.11
+        cmmlu-stem_accuracy: 79.42
+        cmmlu-social-science_accuracy: 83.34
+        cmmlu-humanities_accuracy: 83.95
+        cmmlu-other_accuracy: 86.22
+        cmmlu-china-specific_accuracy: 81.5
+        mmlu_pro_accuracy: 58.16
+        mmlu_pro_biology_accuracy: 74.62
+        mmlu_pro_business_accuracy: 65.02
+        mmlu_pro_chemistry_accuracy: 60.69
+        mmlu_pro_computer_science_accuracy: 61.46
+        mmlu_pro_economics_accuracy: 68.25
+        mmlu_pro_engineering_accuracy: 45.3
+        mmlu_pro_health_accuracy: 60.15
+        mmlu_pro_history_accuracy: 50.66
+        mmlu_pro_law_accuracy: 31.7
+        mmlu_pro_math_accuracy: 70.32
+        mmlu_pro_philosophy_accuracy: 47.7
+        mmlu_pro_physics_accuracy: 59.51
+        mmlu_pro_psychology_accuracy: 65.41
+        mmlu_pro_other_accuracy: 53.46
+        humanevalx-python_pass@1: 42.68
+        humanevalx-cpp_pass@1: 19.51
+        humanevalx-go_pass@1: 0
+        humanevalx-java_pass@1: 72.56
+        humanevalx-js_pass@1: 64.02
+        ds1000_Pandas_accuracy: 14.09
+        ds1000_Numpy_accuracy: 35
+        ds1000_Tensorflow_accuracy: 24.44
+        ds1000_Scipy_accuracy: 20.75
+        ds1000_Sklearn_accuracy: 21.74
+        ds1000_Pytorch_accuracy: 22.06
+        ds1000_Matplotlib_accuracy: 56.77
+        mmmlu_lite_accuracy: 42.6
+        openai_mmmlu_lite_AR-XY_accuracy: 32.84
+        openai_mmmlu_lite_BN-BD_accuracy: 10.46
+        openai_mmmlu_lite_DE-DE_accuracy: 24.56
+        openai_mmmlu_lite_ES-LA_accuracy: 50.95
+        openai_mmmlu_lite_FR-FR_accuracy: 61.05
+        openai_mmmlu_lite_HI-IN_accuracy: 30.6
+        openai_mmmlu_lite_ID-ID_accuracy: 45.89
+        openai_mmmlu_lite_IT-IT_accuracy: 51.79
+        openai_mmmlu_lite_JA-JP_accuracy: 51.65
+        openai_mmmlu_lite_KO-KR_accuracy: 48.77
+        openai_mmmlu_lite_PT-BR_accuracy: 52.7
+        openai_mmmlu_lite_SW-KE_accuracy: 32.91
+        openai_mmmlu_lite_YO-NG_accuracy: 32.84
+        openai_mmmlu_lite_ZH-CN_accuracy: 69.33
+        college_naive_average: 47
+        high_naive_average: 66.67
+        middle_naive_average: 81.67
+        primary_naive_average: 89.33
+        arithmetic_naive_average: 73.67
+        mathbench-a (average)_naive_average: 71.67
+        college_knowledge_naive_average: 82.91
+        high_knowledge_naive_average: 79.86
+        middle_knowledge_naive_average: 88.92
+        primary_knowledge_naive_average: 92.96
+        mathbench-t (average)_naive_average: 86.16

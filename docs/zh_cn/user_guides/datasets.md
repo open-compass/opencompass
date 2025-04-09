@@ -81,3 +81,42 @@ datasets += cmnli_datasets
 用户可以根据需要，选择不同能力不同数据集以及不同评测方式的配置文件来构建评测脚本中数据集的部分。
 
 有关如何启动评测任务，以及如何评测自建数据集可以参考相关文档。
+
+### 数据集多次评测
+
+在数据集配置中可以通过设置参数`n`来对同一数据集进行多次评测，最终返回平均指标，例如：
+
+```python
+afqmc_datasets = [
+    dict(
+        abbr="afqmc-dev",
+        type=AFQMCDatasetV2,
+        path="./data/CLUE/AFQMC/dev.json",
+        n=10, # 进行10次评测
+        reader_cfg=afqmc_reader_cfg,
+        infer_cfg=afqmc_infer_cfg,
+        eval_cfg=afqmc_eval_cfg,
+    ),
+]
+```
+
+另外，对于二值评测指标（例如accuracy，pass-rate等），还可以通过设置参数`k`配合`n`进行[G-Pass@k](http://arxiv.org/abs/2412.13147)评测。G-Pass@k计算公式为：
+
+```{math}
+\text{G-Pass@}k_\tau=E_{\text{Data}}\left[ \sum_{j=\lceil \tau \cdot k \rceil}^c \frac{{c \choose j} \cdot {n - c \choose k - j}}{{n \choose k}} \right], 
+```
+
+其中 $n$ 为评测次数, $c$ 为 $n$ 次运行中通过或正确的次数。配置例子如下：
+
+```python
+aime2024_datasets = [
+    dict(
+        abbr='aime2024',
+        type=Aime2024Dataset,
+        path='opencompass/aime2024',
+        k=[2, 4], # 返回 G-Pass@2和G-Pass@4的结果
+        n=12, # 12次评测
+        ...
+    )
+]
+```

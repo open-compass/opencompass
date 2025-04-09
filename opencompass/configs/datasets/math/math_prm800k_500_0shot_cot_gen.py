@@ -9,7 +9,6 @@ from opencompass.datasets import (
 )
 
 math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
 math_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,

@@ -175,10 +175,11 @@ class TestApibench:
 class TestVolcFullbench:
     """Test cases for chat model."""
 
-    @pytest.mark.parametrize(
-        'model, dataset',
-        [(p1, p2) for p1 in ['internlm2_5-7b-chat-turbomind']
-         for p2 in dataset_list('internlm2_5-7b-chat-turbomind', 'objective')])
+    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
+        'internlm2_5-7b-chat-turbomind', 'qwen2.5-7b-instruct-turbomind',
+        'internlm2_5-7b-chat-pytorch', 'qwen2.5-7b-instruct-pytorch',
+        'internlm3-8b-instruct-turbomind', 'internlm3-8b-instruct-pytorch'
+    ] for p2 in dataset_list(p1, 'objective')])
     @pytest.mark.chat_objective
     def test_chat_objective(self, baseline_scores_fullbench, result_scores,
                             model, dataset):
@@ -245,10 +246,7 @@ class TestCmdCase:
     @pytest.mark.parametrize('model, dataset',
                              [('internlm2_5-7b-hf', 'race-middle_accuracy'),
                               ('internlm2_5-7b-hf', 'race-high_accuracy'),
-                              ('internlm2_5-7b-hf', 'demo_gsm8k_accuracy'),
-                              ('internlm2-1.8b-hf', 'race-middle_accuracy'),
-                              ('internlm2-1.8b-hf', 'race-high_accuracy'),
-                              ('internlm2-1.8b-hf', 'demo_gsm8k_accuracy')])
+                              ('internlm2_5-7b-hf', 'demo_gsm8k_accuracy')])
     def test_cmd_case1(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
@@ -260,9 +258,9 @@ class TestCmdCase:
         [('internlm2_5-7b-chat-lmdeploy', 'race-middle_accuracy'),
          ('internlm2_5-7b-chat-lmdeploy', 'race-high_accuracy'),
          ('internlm2_5-7b-chat-lmdeploy', 'demo_gsm8k_accuracy'),
-         ('internlm2-chat-1.8b-lmdeploy', 'race-middle_accuracy'),
-         ('internlm2-chat-1.8b-lmdeploy', 'race-high_accuracy'),
-         ('internlm2-chat-1.8b-lmdeploy', 'demo_gsm8k_accuracy')])
+         ('internlm3-8b-instruct-lmdeploy', 'race-middle_accuracy'),
+         ('internlm3-8b-instruct-lmdeploy', 'race-high_accuracy'),
+         ('internlm3-8b-instruct-lmdeploy', 'demo_gsm8k_accuracy')])
     def test_cmd_case2(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
@@ -280,13 +278,25 @@ class TestCmdCase:
 
     @pytest.mark.case4
     @pytest.mark.parametrize(
-        'model, dataset', [('internlm2_5-7b-chat_hf', 'race-middle_accuracy'),
-                           ('internlm2_5-7b-chat_hf', 'race-high_accuracy'),
-                           ('internlm2_5-7b-chat_hf', 'demo_gsm8k_accuracy')])
+        'model, dataset',
+        [('internlm3-8b-instruct_hf-lmdeploy', 'race-middle_accuracy'),
+         ('internlm3-8b-instruct_hf-lmdeploy', 'race-high_accuracy'),
+         ('internlm3-8b-instruct_hf-lmdeploy', 'demo_gsm8k_accuracy')])
     def test_cmd_case4(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
-        assert_score(model, result_score, base_score, dataset)
+        assert_score(model + '_batch', result_score, base_score, dataset)
+
+    @pytest.mark.case5
+    @pytest.mark.parametrize(
+        'model, dataset',
+        [('internlm3-8b-instruct_hf-vllm', 'race-middle_accuracy'),
+         ('internlm3-8b-instruct_hf-vllm', 'race-high_accuracy'),
+         ('internlm3-8b-instruct_hf-vllm', 'demo_gsm8k_accuracy')])
+    def test_cmd_case5(self, baseline_scores, result_scores, model, dataset):
+        base_score = baseline_scores.get(model).get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model + '_batch', result_score, base_score, dataset)
 
 
 def assert_score(model_type, score, baseline, dataset: str = ''):

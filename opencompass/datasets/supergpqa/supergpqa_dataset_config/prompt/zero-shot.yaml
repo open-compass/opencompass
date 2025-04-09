@@ -1,0 +1,5 @@
+prompt_format: 
+  - |
+    Answer the following multiple choice question. There is only one correct answer. The last line of your response should be in the format 'Answer: $LETTER' (without quotes), where LETTER is one of A, B, C, D, E, F, G, H, I, or J.
+    
+    {}

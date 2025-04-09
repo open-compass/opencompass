@@ -65,7 +65,7 @@ class TheoremQAEvaluatorV3(BaseEvaluator):
                 {
                     # "question": question,
                     # "solution": output,
-                    "correct": groundtruth,
+                    # "correct": groundtruth,
                     "pred": answer,
                     "is_correct": is_correct,
                 }

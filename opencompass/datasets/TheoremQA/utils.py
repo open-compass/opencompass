@@ -17,7 +17,7 @@ def time_limit(seconds: float):
 
 
 def extract_theoremqa_answer(pred: str, answer_flag: bool = True):
-    from latex2sympy2 import latex2sympy
+    from latex2sympy2_extended import latex2sympy
 
     if any([option in pred.lower() for option in ['yes', 'true']]):
         pred = 'True'

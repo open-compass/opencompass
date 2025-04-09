@@ -33,6 +33,7 @@ class ClaudeSDK(BaseAPIModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
         temperature: Optional[float] = 0.0,
+        thinking: Optional[Dict] = None,
         retry: int = 2,
     ):
         super().__init__(path=path,
@@ -49,6 +50,7 @@ class ClaudeSDK(BaseAPIModel):
         self.anthropic = Anthropic(api_key=key)
         self.model = path
         self.temperature = temperature
+        self.thinking = thinking
 
     def generate(
         self,
@@ -108,11 +110,26 @@ class ClaudeSDK(BaseAPIModel):
         while num_retries < self.retry:
             self.wait()
             try:
-                responses = self.anthropic.messages.create(
-                    model=self.model,
-                    max_tokens=max_out_len,
-                    temperature=self.temperature,
-                    messages=messages)
+                api_params = {
+                    'model': self.model,
+                    'max_tokens': max_out_len,
+                    'temperature': self.temperature,
+                    'messages': messages,
+                }
+
+                if self.thinking is not None:
+                    api_params['thinking'] = self.thinking
+                    api_params['stream'] = True
+
+                responses = self.anthropic.messages.create(**api_params)
+
+                # Handle new response format
+                for content in responses.content:
+                    if content.type == 'text':
+                        return content.text
+
+                # If no text type content is found, return the first
+                # content (backward compatibility)
                 return responses.content[0].text
             except Exception as e:
                 self.logger.error(e)

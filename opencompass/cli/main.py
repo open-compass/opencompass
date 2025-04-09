@@ -12,7 +12,8 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import LarkReporter, get_logger
+from opencompass.utils import (LarkReporter, get_logger, read_from_station,
+                               save_to_station)
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 
@@ -118,8 +119,11 @@ def parse_args():
     parser.add_argument(
         '--dump-eval-details',
         help='Whether to dump the evaluation details, including the '
-        'correctness of each sample, bpb, etc.',
-        action='store_true',
+        'correctness of each sample, bpb, etc. Defaults to True.',
+        nargs='?',
+        const=True,
+        default=True,
+        type=lambda x: False if x and x.lower() == 'false' else True
     )
     parser.add_argument(
         '--dump-extract-rate',
@@ -127,6 +131,27 @@ def parse_args():
         'correctness of each sample, bpb, etc.',
         action='store_true',
     )
+
+    parser.add_argument('-sp',
+        '--station-path',
+        help='Path to your results station.',
+        type=str,
+        default=None,
+    )
+
+    parser.add_argument('--station-overwrite',
+        help='Whether to overwrite the results at station.',
+        action='store_true',
+    )
+
+    parser.add_argument(
+        '--read-from-station',
+        help='Whether to save the evaluation results to the '
+             'data station.',
+        action='store_true',
+    )
+
+
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -177,8 +202,6 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
-
-
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
     hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat', help='The type of the HuggingFace model, base or chat')
@@ -213,7 +236,6 @@ def parse_custom_dataset_args(custom_dataset_parser):
 
 def main():
     args = parse_args()
-
     if args.num_gpus is not None:
         raise ValueError('The `--num-gpus` argument is deprecated, please use '
                          '`--hf-num-gpus` to describe number of gpus used for '
@@ -243,9 +265,11 @@ def main():
         else:
             dir_time_str = args.reuse
         logger.info(f'Reusing experiements from {dir_time_str}')
-    elif args.mode in ['eval', 'viz']:
-        raise ValueError('You must specify -r or --reuse when running in eval '
-                         'or viz mode!')
+    elif args.mode in ['eval', 'viz'] and not args.read_from_station:
+        raise ValueError(
+            'You must specify -r or --reuse, or you have to specify '
+            '--read-from-station and --station-path when running in eval '
+            'or viz mode!')
 
     # update "actual" work_dir
     cfg['work_dir'] = osp.join(cfg.work_dir, dir_time_str)
@@ -262,6 +286,12 @@ def main():
     # types cannot be serialized
     cfg = Config.fromfile(output_config_path, format_python_code=False)
 
+    # get existed results from station
+    if args.read_from_station:
+        existing_results_list = read_from_station(cfg, args)
+        rs_exist_results = [comb['combination'] for comb in existing_results_list]
+        cfg['rs_exist_results'] = rs_exist_results
+
     # report to lark bot if specify --lark
     if not args.lark:
         cfg['lark_bot_url'] = None
@@ -269,6 +299,7 @@ def main():
         content = f'{getpass.getuser()}\'s task has been launched!'
         LarkReporter(cfg['lark_bot_url']).post(content)
 
+    # infer
     if args.mode in ['all', 'infer']:
         # When user have specified --slurm or --dlc, or have not set
         # "infer" in config, we will provide a default configuration
@@ -321,6 +352,9 @@ def main():
         if args.dlc or args.slurm or cfg.get('eval', None) is None:
             fill_eval_cfg(cfg, args)
         if args.dump_eval_details:
+            logger.warning('Default to dump eval details, it might take extra'
+                        'space to save all the evaluation details. '
+                        'Set --dump-eval-details False to skip the details dump')
             cfg.eval.runner.task.dump_details = True
         if args.dump_extract_rate:
             cfg.eval.runner.task.cal_extract_rate = True
@@ -349,6 +383,10 @@ def main():
                 runner(task_part)
         else:
             runner(tasks)
+
+    # save to station
+    if args.station_path is not None or cfg.get('station_path') is not None:
+        save_to_station(cfg, args)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:

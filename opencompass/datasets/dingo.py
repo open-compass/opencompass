@@ -68,7 +68,7 @@ class DingoEvaluator(BaseEvaluator):
                 json.dump(d, f, ensure_ascii=False)
                 f.write('\n')
         input_data = {
-            'eval_model': 'llm_base',
+            'eval_group': 'llm_base',
             'input_path': file_name,
             'output_path': './outputs/dingo/',
             'save_data': True,

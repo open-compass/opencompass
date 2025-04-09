@@ -117,6 +117,10 @@ html_js_files = [
     'js/custom.js'
 ]
 
+html_context = {
+    'github_version': 'main',
+}
+
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -224,6 +228,7 @@ notfound_template = '404.html'
 
 def builder_inited_handler(app):
     subprocess.run(['./cp_origin_docs.sh'])
+    subprocess.run(['./statis.py'])
 
 
 def setup(app):

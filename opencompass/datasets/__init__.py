@@ -9,6 +9,7 @@ from .arc import *  # noqa: F401, F403
 from .arc_prize_public_evaluation import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .babilong import *  # noqa: F401, F403
+from .bbeh import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
 from .bigcodebench import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
@@ -57,6 +58,7 @@ from .gpqa import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
 from .hellaswag import *  # noqa: F401, F403
+from .hle import *  # noqa: F401, F403
 from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
 from .humaneval_multi import *  # noqa: F401, F403
@@ -90,12 +92,14 @@ from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
+from .MedXpertQA import *  # noqa: F401, F403
 from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
 from .mmlu_cf import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403
+from .multipl_e import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .musr import *  # noqa: F401, F403
 from .narrativeqa import *  # noqa: F401, F403
@@ -103,6 +107,7 @@ from .natural_question import *  # noqa: F401, F403
 from .natural_question_cn import *  # noqa: F401, F403
 from .NPHardEval import *  # noqa: F401, F403
 from .obqa import *  # noqa: F401, F403
+from .olymmath import *  # noqa: F401, F403
 from .OlympiadBench import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
@@ -126,6 +131,7 @@ from .strategyqa import *  # noqa: F401, F403
 from .subjective import *  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
+from .supergpqa import *  # noqa: F401, F403
 from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
 from .taco import *  # noqa: F401, F403

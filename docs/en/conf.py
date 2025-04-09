@@ -117,6 +117,10 @@ html_js_files = [
     'js/custom.js'
 ]
 
+html_context = {
+    'github_version': 'main',
+}
+
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -220,3 +224,11 @@ autodoc_typehints = 'none'
 
 # The not found page
 notfound_template = '404.html'
+
+
+def builder_inited_handler(app):
+    subprocess.run(['./statis.py'])
+
+
+def setup(app):
+    app.connect('builder-inited', builder_inited_handler)

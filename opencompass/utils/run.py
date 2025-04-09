@@ -276,13 +276,15 @@ def change_accelerator(models, accelerator):
                     if model.get(item) is not None:
                         acc_model[item] = model[item]
             elif accelerator == 'vllm':
+                model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
+                model_kwargs.update(model.get('model_kwargs'))
                 logger.info(f'Transforming {model["abbr"]} to {accelerator}')
 
                 acc_model = dict(
                     type=f'{VLLM.__module__}.{VLLM.__name__}',
                     abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
                     path=model['path'],
-                    model_kwargs=dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None)),
+                    model_kwargs=model_kwargs,
                     max_out_len=model['max_out_len'],
                     max_seq_len=model.get('max_seq_len', None),
                     batch_size=model['batch_size'],
@@ -296,12 +298,14 @@ def change_accelerator(models, accelerator):
                 raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
         elif model['type'] in [HuggingFacewithChatTemplate, f'{HuggingFacewithChatTemplate.__module__}.{HuggingFacewithChatTemplate.__name__}']:
             if accelerator == 'vllm':
+                model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
+                model_kwargs.update(model.get('model_kwargs'))
                 mod = VLLMwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
                     abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
                     path=model['path'],
-                    model_kwargs=dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None)),
+                    model_kwargs=model_kwargs,
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
                     batch_size=16,
@@ -309,6 +313,14 @@ def change_accelerator(models, accelerator):
                     stop_words=model.get('stop_words', []),
                 )
             elif accelerator == 'lmdeploy':
+
+                if model.get('generation_kwargs') is not None:
+                    logger.warning(f'LMDeploy uses do_sample=False as default, and you need to set do_sample=True for sampling mode')
+                    gen_config = model['generation_kwargs'].copy()
+                else:
+                    logger.info('OpenCompass uses greedy decoding as default, you can set generation-kwargs for your purpose')
+                    gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9)
+
                 mod = TurboMindModelwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
@@ -320,7 +332,7 @@ def change_accelerator(models, accelerator):
                         session_len=model.get('max_seq_len', None),
                         max_new_tokens=model['max_out_len']
                     ),
-                    gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9),
+                    gen_config=gen_config,
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
                     batch_size=16,

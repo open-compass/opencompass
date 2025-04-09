@@ -7,10 +7,9 @@ from opencompass.datasets import generic_llmjudge_postprocess
 
 categories = ['cipher', 'counterfactual', 'logic', 'operation', 'puzzle']
 
-
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
-    
+
     Here are some evaluation criteria:
     1. Please refer to the given standard answer. You don't need to re-generate the answer to the question because the standard answer has been given. You only need to judge whether the candidate's answer is consistent with the standard answer according to the form of the question. Don't try to answer the original question. You can assume that the standard answer is definitely correct.
     2. Because the candidate's answer may be different from the standard answer in the form of expression, before making a judgment, please understand the question and the standard answer first, and then judge whether the candidate's answer is correct, but be careful not to try to answer the original question.
@@ -29,7 +28,7 @@ GRADER_TEMPLATE = """
     <Original Question Begin>: \n{prompt}\n<Original Question End>\n\n
     <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
-    
+
     Judging the correctness of candidates' answers:
 """.strip()
 
@@ -49,7 +48,7 @@ for category in categories:
             round=[
                 dict(
                     role='HUMAN',
-                    prompt='{prompt}' # f-string
+                    prompt='{prompt}'  # f-string
                 )
             ]
         )
@@ -75,18 +74,18 @@ for category in categories:
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
-                ],
+                    begin=[
+                        dict(
+                            role='SYSTEM',
+                            fallback_role='HUMAN',
+                            prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                    ],
                     round=[
-                    dict(
-                        role='HUMAN',
-                        prompt = GRADER_TEMPLATE
-                    ),
-                ]),
+                        dict(
+                            role='HUMAN',
+                            prompt=GRADER_TEMPLATE
+                        ),
+                    ]),
             ),
             dataset_cfg=dict(
                 type=korbenchDataset,

@@ -17,7 +17,7 @@ on:
         required: false
         description: 'whether to build lmdeploy'
         type:  boolean
-        default: false
+        default: true
       repo_org_lmdeploy:
         required: false
         description: 'Tested repository organization name. Default is internlm/lmdeploy'
@@ -44,7 +44,7 @@ on:
         type: string
         default: "['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
   schedule:
-    - cron:  '15 14 * * *'
+    - cron:  '15 14 * * 0,3'
 
 env:
   HF_DATASETS_OFFLINE: 1
@@ -61,6 +61,7 @@ env:
   HUGGINGFACE_HUB_CACHE: /fs-computility/llm/shared/llmeval/models/opencompass_hf_hub
   HF_HUB_CACHE: /fs-computility/llm/shared/llmeval/models/opencompass_hf_hub
   CONDA_ENV: regression_test
+  export VLLM_WORKER_MULTIPROC_METHOD: spawn
 
 jobs:
   build-pypi:
@@ -87,12 +88,11 @@ jobs:
           name: my-artifact-${{ github.run_id }}
 
   build-pypi-lmdeploy:
-    if: ${{!cancelled() && (github.event_name != 'schedule' && inputs.build_lmdeploy)}}
+    if: ${{!cancelled() && (github.event_name == 'schedule' || inputs.build_lmdeploy)}}
     strategy:
       matrix:
         pyver: [py310]
     runs-on: ubuntu-latest
-    environment: 'prod'
     env:
       PYTHON_VERSION: ${{ matrix.pyver }}
       PLAT_NAME: manylinux2014_x86_64
@@ -126,8 +126,7 @@ jobs:
     if: ${{!cancelled()}}
     needs: ['build-pypi', 'build-pypi-lmdeploy']
     runs-on: volc_cu12
-    environment: 'prod'
-    timeout-minutes: 240 #4hours
+    timeout-minutes: 120 #2hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -148,7 +147,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 1
-          timeout_minutes: 240
+          timeout_minutes: 120
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda create -y --name ${{env.CONDA_ENV}} python=3.10
@@ -157,20 +156,23 @@ jobs:
             pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
-            pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install opencompass[full] --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install opencompass[api] --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --cache-dir ${{env.PIP_CACHE_PATH}}
             FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /fs-computility/llm/qa-llm-cicd/packages/flash_attn-2.7.0.post2+cu12torch2.5cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             pip install xformers --index-url https://download.pytorch.org/whl/cu121 --cache-dir ${{env.PIP_CACHE_PATH}}
             cp -r /root/nltk_data ${{env.CONDA_PATH}}/envs/${{env.CONDA_ENV}}/nltk_data
       - name: Prepare - reinstall lmdeploy - cu12
-        if: ${{inputs.build_lmdeploy}}
+        if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
         uses: actions/download-artifact@v4
         with:
           name: my-artifact-${{ github.run_id }}-py310
       - name: Prepare - reinstall lmdeploy - cu12
-        if: ${{inputs.build_lmdeploy}}
+        if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
+          pip uninstall -y lmdeploy
           pip install lmdeploy-*.whl --no-deps
       - name: conda env
         run: |
@@ -187,8 +189,7 @@ jobs:
       matrix:
         regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","base_fullbench"]')}}
     runs-on: volc_cu12_daily
-    environment: 'prod'
-    timeout-minutes: 120 #2hours
+    timeout-minutes: 180 #3hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -210,7 +211,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 1
-          timeout_minutes: 120
+          timeout_minutes: 180
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda activate ${{env.CONDA_ENV}}
@@ -228,8 +229,7 @@ jobs:
       matrix:
         regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_sub_fullbench"]')}}
     runs-on: volc_cu12_local
-    environment: 'prod'
-    timeout-minutes: 240 #4hours
+    timeout-minutes: 480 #6hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -255,27 +255,33 @@ jobs:
           conda info --envs
           export from_tf=TRUE
           python tools/list_configs.py internlm2_5 mmlu
-          opencompass --models hf_internlm2_5_7b hf_internlm2_1_8b --datasets race_ppl demo_gsm8k_chat_gen --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd1 --reuse --max-num-workers 2 --dump-eval-details
+          opencompass --models hf_internlm2_5_7b --datasets race_ppl demo_gsm8k_chat_gen --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd1 --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd1/*/summary regression_result_daily
           python -m pytest -m case1 -s -v --color=yes .github/scripts/oc_score_assert.py
-          opencompass --models hf_internlm2_5_7b_chat hf_internlm2_chat_1_8b --datasets race_gen demo_gsm8k_chat_gen -a lmdeploy --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd2 --reuse --max-num-workers 2 --dump-eval-details
+          opencompass --models hf_internlm2_5_7b_chat hf_internlm3_8b_instruct --datasets race_gen demo_gsm8k_chat_gen -a lmdeploy --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd2 --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd2/*/summary regression_result_daily
           python -m pytest -m case2 -s -v --color=yes .github/scripts/oc_score_assert.py
           opencompass --datasets race_ppl demo_gsm8k_chat_gen --hf-type base --hf-path internlm/internlm2_5-7b --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd3 --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd3/*/summary regression_result_daily
           python -m pytest -m case3 -s -v --color=yes .github/scripts/oc_score_assert.py
-          opencompass --datasets race_gen demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-7b-chat --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd4 --reuse --max-num-workers 2 --dump-eval-details
+          opencompass --datasets race_gen demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm3-8b-instruct -a lmdeploy --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd4 --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd4/*/summary regression_result_daily
           python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
+          opencompass --datasets race_gen demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm3-8b-instruct -a vllm --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd5 --reuse --max-num-workers 2 --dump-eval-details
+          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd5/*/summary regression_result_daily
+          python -m pytest -m case5 -s -v --color=yes .github/scripts/oc_score_assert.py
       - name:  Run model test - api
         if: matrix.regression_func == 'api'
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          lmdeploy serve api_server internlm/internlm2_5-7b-chat --max-batch-size 256 --model-name internlm2 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/restful.log  2>&1  &
+          lmdeploy serve api_server internlm/internlm3-8b-instruct --max-batch-size 256 --model-name internlm3 > ${{env.REPORT_ROOT}}/${{ github.run_id }}/restful.log  2>&1  &
           echo "restful_pid=$!" >> "$GITHUB_ENV"
-          sleep 120s
+          sleep 180s
+          env | grep PROXY
+          env | grep proxy
+          unset HTTP_PROXY;unset HTTPS_PROXY;unset http_proxy;unset https_proxy;
           opencompass .github/scripts/eval_regression_api.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/api --reuse --max-num-workers 2 --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/api/*/summary regression_result_daily
           python -m pytest -m api -s -v --color=yes .github/scripts/oc_score_assert.py
@@ -304,8 +310,7 @@ jobs:
       matrix:
         function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '["base_objective","chat_objective","chat_subjective","base_long_context","chat_long_context"]')}}
     runs-on: volc_cu12
-    environment: 'prod'
-    timeout-minutes: 360 #6hours
+    timeout-minutes: 480 #6hours
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -322,7 +327,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 1
-          timeout_minutes: 360
+          timeout_minutes: 480
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
             conda activate ${{env.CONDA_ENV}}
@@ -334,11 +339,10 @@ jobs:
 
 
   notify_to_feishu:
-    if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
+    if: ${{ always() && github.event_name == 'schedule' && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
     needs: [daily_run_test_volc, daily_run_test_local, fullbench_run_test]
     timeout-minutes: 5
     runs-on: self-hosted
-    environment: 'prod'
     steps:
       - name: notify
         run: |

@@ -1,11 +1,9 @@
 import os
 import warnings
-from collections import OrderedDict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from copy import deepcopy
 from functools import partial
 from itertools import product
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List
 
 import jsonlines
 import mmengine
@@ -14,7 +12,7 @@ from datasets import Dataset, load_dataset
 
 from opencompass.datasets.math import MATHAgentEvaluator, math_postprocess_v2
 from opencompass.models import OpenAISDK
-from opencompass.openicl.icl_evaluator import GPassKEvaluator
+from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.openicl.icl_inferencer.icl_base_inferencer import \
     dump_results_dict
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET, MODELS
@@ -31,8 +29,6 @@ class LiveMathBenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str,
-             k: Union[int, List[int]],
-             replication: int,
              dataset_splits: List[str] = [
                  'CNMO',
                  'CCEE',
@@ -45,9 +41,9 @@ class LiveMathBenchDataset(BaseDataset):
         dataset = []
         dataset_info = {}
 
-        if path != '':
-            path = get_data_path(path)
-            path = os.path.join(path, version)
+        # Use dataset mapping to generate path
+        data_dir = get_data_path(path)
+
         for split, language in product(dataset_splits, dataset_languages):
             dataset_info[f'{split}_{language}'] = {
                 'single-choice': 0,
@@ -62,8 +58,16 @@ class LiveMathBenchDataset(BaseDataset):
                 '问答': 'problem-solving'
             }
 
-            if path != '':
-                file_path = os.path.join(path, f'{split}_{language}.jsonl')
+            examples = []
+            if data_dir.startswith('opencompass/'):
+                # Using HF Dataset
+                hf_dataset = load_dataset(
+                    data_dir, f'v{version}_{split}_{language}')['test']
+                for example in hf_dataset:
+                    examples.append(example)
+            else:
+                file_path = os.path.join(data_dir, version,
+                                         f'{split}_{language}.jsonl')
 
                 if not os.path.exists(file_path):
                     raise FileNotFoundError(
@@ -73,13 +77,6 @@ class LiveMathBenchDataset(BaseDataset):
                 with jsonlines.open(file_path, 'r') as file:
                     for example in file:
                         examples.append(example)
-            else:
-                hf_dataset = load_dataset(
-                    'opencompass/LiveMathBench',
-                    f'v{version}_{split}_{language}')['test']
-                examples = []
-                for example in hf_dataset:
-                    examples.append(example)
 
             for example_idx, example in enumerate(examples):
                 dataset_info[f'{split}_{language}'][
@@ -104,17 +101,13 @@ class LiveMathBenchDataset(BaseDataset):
                                   ('' if 'options' not in example else
                                    ' '.join(example['options']))),
                 })
-                max_k = k if isinstance(k, int) else max(k)
-                for idx in range(max_k * replication):
-                    duplicated_example = deepcopy(example)
-                    duplicated_example.update({'replication_idx': idx})
-                    dataset.append(duplicated_example)
+                dataset.append(example)
 
         return Dataset.from_list(dataset)
 
 
 @ICL_EVALUATORS.register_module()
-class LiveMathBenchEvaluator(GPassKEvaluator):
+class LiveMathBenchEvaluator(BaseEvaluator):
     api_meta_template = dict(round=[
         dict(role='HUMAN', api_role='HUMAN'),
         dict(role='BOT', api_role='BOT', generate=True),
@@ -125,11 +118,8 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
                  url,
                  use_extract_model=False,
                  extract_url=[],
-                 extract_model_name='',
-                 k: Union[int, List[int]] = 16,
-                 replication: int = 3,
-                 thresholds: List[float] = [0.0, 0.25, 0.5, 0.75, 1.0]):
-        super().__init__(k, replication, thresholds)
+                 extract_model_name=''):
+        super().__init__()
 
         if isinstance(url, str):
             url = [url]
@@ -310,55 +300,18 @@ class LiveMathBenchEvaluator(GPassKEvaluator):
     def preprocess(self, predictions, references, test_set):
         return self.judge(predictions, references, test_set)
 
-    def group(self, predictions, labels, test_set):
-        example2replications = {}
-        for example, label, prediction in zip(test_set, labels, predictions):
-            example_abbr = f"{example['subdivision']}_{example['idx']}"
-            if example_abbr not in example2replications:
-                example2replications[example_abbr] = []
-            example.update({'prediction': prediction, 'label': label})
-            example2replications[example_abbr].append(example)
-        for _, replications in example2replications.items():
-            assert len(replications) == self.n, print(len(replications),
-                                                      self.n)
-        return example2replications
+    def score(self, predictions, references, test_set) -> Dict[str, Any]:
+        labels = self.preprocess(predictions, references, test_set)
+        results = {'accuracy': 100 * np.mean(labels), 'details': []}
 
-    def reduce(self, details) -> Dict[str, Any]:
-        """Aggregate the overall metrics.
+        for pred, ref, label in zip(predictions, references, labels):
+            results['details'].append({
+                'pred': pred,
+                'ref': ref,
+                'correct': label
+            })
 
-        Return:
-            A dict contains overall metrics, like:
-            {'details': details for each example, 'G-Pass@16': xxx}
-        """
-        g_passk_details = OrderedDict()
-        g_passk_details['details'] = details
-
-        all_dataset = set([detail['subdivision'] for detail in details])
-
-        for k in self.k:
-            for subdivision in sorted(list(all_dataset)):
-                for threshold in self.thresholds:
-                    g_passk_details[
-                        f'{subdivision}/G-Pass@{k}_{threshold}'] = \
-                            100. * np.mean(
-                            [
-                                detail[f'G-Pass@{k}_{threshold}']
-                                for detail in details
-                                if detail['subdivision'] == subdivision
-                            ])
-                g_passk_details[f'{subdivision}/mG-Pass@{k}'] = 100. * np.mean(
-                    [
-                        detail[f'mG-Pass@{k}'] for detail in details
-                        if detail['subdivision'] == subdivision
-                    ])
-
-            for threshold in self.thresholds:
-                g_passk_details[f'G-Pass@{k}_{threshold}'] = 100. * np.mean(
-                    [detail[f'G-Pass@{k}_{threshold}'] for detail in details])
-            g_passk_details[f'mG-Pass@{k}'] = 100. * np.mean(
-                [detail[f'mG-Pass@{k}'] for detail in details])
-
-        return g_passk_details
+        return results
 
 
 class LiveMathBenchOutputHandler:

@@ -102,6 +102,7 @@ class BasePartitioner:
         return tasks
 
     def parse_model_dataset_args(self, cfg: ConfigDict):
+
         models = cfg['models']
         datasets = cfg['datasets']
 
@@ -109,7 +110,24 @@ class BasePartitioner:
         if 'model_dataset_combinations' in sig.parameters:
             combs = cfg.get('model_dataset_combinations', None)
             if combs is None:
-                combs = [{'models': models, 'datasets': datasets}]
+                if 'rs_exist_results' in cfg.keys():
+                    rs_exist_results = cfg['rs_exist_results']
+                    combs = []
+                    for model in models:
+                        comb = {'models': [model], 'datasets': datasets}
+                        combs.append(comb)
+                    for i in range(len(combs)):
+                        combs[i]['datasets'] = [
+                            dataset for dataset in combs[i]['datasets'] if [
+                                model_abbr_from_cfg(combs[i]['models'][0]),
+                                dataset_abbr_from_cfg(dataset)
+                            ] not in rs_exist_results
+                        ]
+                    combs = [
+                        comb for comb in combs if len(comb['datasets']) != 0
+                    ]
+                else:
+                    combs = [{'models': models, 'datasets': datasets}]
             else:
                 # sanity check
                 model_abbrs = [model_abbr_from_cfg(model) for model in models]
