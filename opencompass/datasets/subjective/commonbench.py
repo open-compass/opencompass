@@ -8,7 +8,7 @@ from opencompass.registry import DICT_POSTPROCESSORS
 from .utils import get_judgeanswer_and_reference
 
 
-def post_process_mtbench(judgement: str):
+def post_process(judgement: str):
     """Input a string like below:
 
     xxx[[5]]xxx, and extract the score
@@ -38,8 +38,6 @@ def get_capability_results(judged_answers, references):
         s = total_score / capability_counts[capability]
         s = round(s, 2)
         capability_avg_ratings[capability] = s
-    columns = list(capability_avg_ratings.keys())
-    columns.insert(0, columns.pop(columns.index('total')))
 
     return capability_avg_ratings
 
@@ -48,7 +46,7 @@ def get_capability_results(judged_answers, references):
 def commonbench_postprocess(
     output: dict,
     output_path: str,
-    post_process: Optional[callable] = post_process_mtbench,
+    post_process: Optional[callable] = post_process,
 ) -> dict:
     judged_answers, references = get_judgeanswer_and_reference(
         output, output_path, post_process)
