@@ -13,6 +13,7 @@ def post_process(judgement: str):
 
     xxx[[5]]xxx, and extract the score
     """
+    judgement = judgement['prediction']
     pattern = r'\[\[([\d.]+)\]\]'
     matched_result = re.findall(pattern, judgement)
     if matched_result:
