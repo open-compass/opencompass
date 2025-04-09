@@ -7,6 +7,7 @@ from opencompass.registry import DICT_POSTPROCESSORS
 
 from .utils import get_judgeanswer_and_reference
 
+
 def post_process(judgement: str):
     """Input a string like below:
 
