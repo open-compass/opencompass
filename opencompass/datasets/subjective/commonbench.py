@@ -7,14 +7,12 @@ from opencompass.registry import DICT_POSTPROCESSORS
 
 from .utils import get_judgeanswer_and_reference
 
-
 def post_process(judgement: str):
     """Input a string like below:
 
     xxx[[5]]xxx, and extract the score
     """
-    judgement = judgement['prediction']
-    pattern = r'Rating:\s*\[\[([\d.]+)\]\]'
+    pattern = r'\[\[([\d.]+)\]\]'
     matched_result = re.findall(pattern, judgement)
     if matched_result:
         score = float(matched_result[0])
@@ -34,13 +32,11 @@ def get_capability_results(judged_answers, references):
 
     capability_avg_ratings = defaultdict(float)
 
-    print(capability_ratings)
     for capability, total_score in capability_ratings.items():
         s = total_score / capability_counts[capability]
         s = round(s, 2)
         capability_avg_ratings[capability] = s
 
-    print(capability_avg_ratings)
     return capability_avg_ratings
 
 
