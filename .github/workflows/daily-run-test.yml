@@ -44,7 +44,7 @@ on:
         type: string
         default: "['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
   schedule:
-    - cron:  '15 14 * * 0,2'
+    - cron:  '15 14 * * 0,3'
 
 env:
   HF_DATASETS_OFFLINE: 1
