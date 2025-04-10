@@ -49,7 +49,7 @@ export OC_JUDGE_API_BASE=http://172.30.56.1:4000/v1
 
 Note that by default, OpenCompass will use these three environment variables, but if you use configuration files to configure the evaluation service, these environment variables will not take effect.
 
-### ### Using LLM for Evaluation via Configuration Files
+### Using LLM for Evaluation via Configuration Files
 
 To set up an LLM judge evaluation, you'll need to configure three main components:
 
@@ -264,6 +264,107 @@ Example evaluation output:
 }
 ```
 
+## CascadeEvaluator
+
+OpenCompass also provides a CascadeEvaluator that combines the strengths of rule-based evaluation and LLM-based evaluation. The cascade evaluator has two modes:
+
+1. **Cascade Mode (parallel=False)**: First evaluates all samples with a rule-based evaluator, then only sends samples that were deemed incorrect by the rule-based evaluation to an LLM judge for re-evaluation. This approach reduces reliance on LLM judgments while maintaining accuracy, thus lowering evaluation costs and time.
+
+2. **Parallel Mode (parallel=True)**: Evaluates all samples with both the rule-based evaluator and LLM judge, then considers a sample correct if either method marks it as correct. This approach can increase the leniency of evaluation but may result in higher costs since all samples require LLM evaluation.
+
+### Configuring CascadeEvaluator
+
+Here's an example of how to configure the CascadeEvaluator:
+
+```python
+# Define a rule-based evaluator
+rule_evaluator = dict(type=MATHEvaluator)
+
+# Define an LLM judge evaluator
+llm_judge_evaluator = dict(
+    type=GenericLLMEvaluator,
+    prompt_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin=[
+                dict(
+                    role='SYSTEM',
+                    fallback_role='HUMAN',
+                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
+                )
+            ],
+            round=[
+                dict(role='HUMAN', prompt=YOUR_JUDGE_TEMPLATE),
+            ],
+        ),
+    ),
+    dataset_cfg=dict(
+        type=YourDataset,
+        path='path/to/your/dataset',
+        reader_cfg=reader_cfg,
+    ),
+    judge_cfg=dict(),  # Can use environment variables to configure the judge model
+)
+
+# Configure cascade evaluator (cascade mode)
+cascade_evaluator = dict(
+    type=CascadeEvaluator,
+    llm_evaluator=llm_judge_evaluator,
+    rule_evaluator=rule_evaluator,
+    parallel=False  # Cascade mode
+)
+
+# For parallel mode, set parallel=True
+parallel_evaluator = dict(
+    type=CascadeEvaluator,
+    llm_evaluator=llm_judge_evaluator,
+    rule_evaluator=rule_evaluator,
+    parallel=True  # Parallel mode
+)
+
+# Use the cascade evaluator in your dataset evaluation config
+eval_cfg = dict(evaluator=cascade_evaluator)
+```
+
+### Evaluation Results
+
+The cascade evaluator outputs detailed evaluation statistics including:
+
+- Accuracy of the rule-based evaluation
+- Accuracy of the LLM evaluation (for samples that failed rule-based evaluation in cascade mode)
+- Final combined accuracy
+
+Example output:
+
+```python
+{
+    'accuracy': 85.0,  # Final accuracy
+    'cascade_stats': {
+        'total_samples': 100,
+        'rule_correct': 70,  # Number of samples correct by rule evaluation
+        'rule_accuracy': 70.0,  # Accuracy of rule evaluation
+        'llm_evaluated': 30,  # Number of samples evaluated by LLM (failed samples in cascade mode)
+        'llm_correct': 15,  # Number of samples correct by LLM evaluation
+        'llm_accuracy': 50.0,  # Accuracy of LLM evaluation
+        'final_correct': 85,  # Total correct samples
+        'final_accuracy': 85.0,  # Final accuracy
+        'parallel_mode': False,  # Whether parallel mode was used
+    },
+    'details': [
+        # Detailed evaluation results for each sample
+    ]
+}
+```
+
+The cascade evaluator is particularly useful for:
+
+1. Scenarios that require balancing evaluation cost and accuracy
+2. Cases where rule-based evaluators are available but might not be comprehensive
+3. Evaluation tasks that need more nuanced judgment for edge cases
+
 ## Complete Example
 
-For a complete working example, refer to the `eval_llm_judge.py` file in the examples directory, which demonstrates how to evaluate mathematical problem-solving using an LLM judge.
+For a complete working example using GenericLLMEvaluator
+, refer to the `eval_llm_judge.py` file in the examples directory, which demonstrates how to evaluate mathematical problem-solving .
+
+For a complete working example using CascadeEvaluator, refer to the `eval_cascade_evaluator.py` file in the examples directory, which demonstrates how to evaluate mathematical problem-solving .
