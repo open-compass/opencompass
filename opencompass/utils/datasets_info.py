@@ -422,7 +422,7 @@ DATASETS_MAPPING = {
     },
     "opencompass/maritimebench": {
         "ms_id": "HiDolphin/MaritimeBench",
-        "hf_id": "",
+        "hf_id": "Hi-Dolphin/MaritimeBench",
         "local": "./data/maritimebench",
     },
 }
