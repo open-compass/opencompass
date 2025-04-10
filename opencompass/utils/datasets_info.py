@@ -1,4 +1,10 @@
 DATASETS_MAPPING = {
+    # GAIA Datasets
+    "opencompass/gaia": {
+        "ms_id": None,
+        "hf_id": "gaia-benchmark/GAIA",
+        "local": "./data/gaia/",
+    },
     # ADVGLUE Datasets
     "opencompass/advglue-dev": {
         "ms_id": None,
