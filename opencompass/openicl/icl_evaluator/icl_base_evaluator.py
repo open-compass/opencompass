@@ -174,7 +174,7 @@ class BaseEvaluator:
 
                 eval_details.append(detail)
 
-            if can_calculate and n > 1 and k > 1:
+            if can_calculate and n > 1 and max(k_list) > 1:
                 eval_results.update(self.reduce(eval_details))
 
             # Store eval_details in eval_results
