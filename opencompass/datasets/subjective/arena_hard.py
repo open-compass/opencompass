@@ -146,7 +146,7 @@ def preety_print_two_ratings(ratings_1, ratings_2, column_names):
 
 
 def predict_win_rate(elo_ratings, SCALE=400, BASE=10, INIT_RATING=1000):
-    names = sorted(list(elo_ratings.keys()))
+    names = list(elo_ratings.keys())
     wins = defaultdict(lambda: defaultdict(lambda: 0))
     for a in names:
         for b in names:
