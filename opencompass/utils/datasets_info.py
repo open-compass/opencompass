@@ -420,6 +420,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/OlympiadBench",
     },
+    "opencompass/maritimebench": {
+        "ms_id": "HiDolphin/MaritimeBench",
+        "hf_id": "",
+        "local": "./data/maritimebench",
+    },
 }
 
 DATASETS_URL = {
