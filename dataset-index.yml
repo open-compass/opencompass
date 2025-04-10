@@ -997,3 +997,11 @@
     paper: https://arxiv.org/pdf/2502.14739
     configpath: opencompass/configs/datasets/supergpqa
     configpath_llmjudge: ''
+- climateqa:
+    name: ClimateQA
+    category: Science
+    paper: https://arxiv.org/pdf/2410.16701
+    comfigpath: ''
+    configpath_llmjudge:
+        - opencompass/configs/datasets/ClimateQA/ClimateQA_Gold_llm_judge.py
+        - opencompass/configs/datasets/ClimateQA/ClimateQA_Silver_llm_judge.py
