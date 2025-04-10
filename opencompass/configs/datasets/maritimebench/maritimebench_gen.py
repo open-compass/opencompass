@@ -1,6 +1,6 @@
 from opencompass.datasets import MaritimeBenchDataset
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.utils.text_postprocessors import first_option_postprocess
+from opencompass.utils.text_postprocessors import parse_bracketed_answer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -26,7 +26,7 @@ maritimebench_infer_cfg = dict(
 
 maritimebench_eval_cfg = dict(
     evaluator=dict(type=AccEvaluator),
-    pred_postprocessor=dict(type=first_option_postprocess, options='ABCD')
+    pred_postprocessor=dict(type=parse_bracketed_answer, options='A|B|C|D')
 )
 
 maritimebench_datasets = [
