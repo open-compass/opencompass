@@ -1005,3 +1005,9 @@
     configpath_llmjudge:
         - opencompass/configs/datasets/ClimateQA/ClimateQA_Gold_llm_judge.py
         - opencompass/configs/datasets/ClimateQA/ClimateQA_Silver_llm_judge.py
+- physics:
+    name: PHYSICS
+    category: Science
+    paper: https://arxiv.org/pdf/2503.21821
+    comfigpath: ''
+    configpath_llmjudge: ''
