@@ -19,9 +19,9 @@ humaneval_infer_cfg = dict(
     inferencer=dict(type=GenInferencer, max_out_len=512))
 
 humaneval_eval_cfg = dict(
-    evaluator=dict(type=HumanEvalEvaluator),
+    evaluator=dict(type=HumanEvalEvaluator,
+                   k=1),
     pred_role='BOT',
-    k=[1, 10, 100],  # the parameter only for humaneval
     pred_postprocessor=dict(type=humaneval_postprocess_v2),
 )
 
@@ -32,5 +32,6 @@ humaneval_datasets = [
         path='opencompass/humaneval',
         reader_cfg=humaneval_reader_cfg,
         infer_cfg=humaneval_infer_cfg,
-        eval_cfg=humaneval_eval_cfg)
+        eval_cfg=humaneval_eval_cfg,
+        num_repeats=1)
 ]

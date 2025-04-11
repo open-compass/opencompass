@@ -56,7 +56,8 @@ class LCBCodeGenerationDataset(BaseDataset):
              local_mode: bool = False,
              release_version: str = 'release_v1',
              start_date: str = None,
-             end_date: str = None):
+             end_date: str = None,
+             num_repeats: int = None):
 
         def transform(item):
             # Define the dataitem mapping logic
@@ -118,7 +119,13 @@ class LCBCodeGenerationDataset(BaseDataset):
         if end_date is not None:
             p_end_date = datetime.strptime(end_date, '%Y-%m-%d')
             dataset = dataset.filter(lambda e: datetime.fromisoformat(e[
-                'contest_date']) <= p_end_date)  # noqa: E501
+                'contest_date']) <= p_end_date)
+
+        if num_repeats and num_repeats > 1:
+            indices = []
+            for idx in range(len(dataset)):
+                indices.extend([idx] * num_repeats)
+            dataset = dataset.select(indices)
 
         return DatasetDict({'test': dataset, 'train': dataset})
 

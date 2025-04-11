@@ -3,6 +3,7 @@ import json
 import multiprocessing
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Sequence
 
 import numpy as np
 from tqdm import tqdm
@@ -174,7 +175,7 @@ def codegen_metrics(
     samples_list,
     generations_list,
     k_list=[1, 5, 10, 20, 40, 50, 75, 100, 125, 150, 200, 500, 1000],
-    num_process_evaluate=16,
+    num_process_evaluate=8,
     timeout=6,
     debug=False,
 ):
@@ -238,14 +239,20 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
                  release_version='release_v1',
                  extractor_version='v1',
                  start_date=None,
-                 end_date=None):
+                 end_date=None,
+                 num_repeats=1,
+                 k=1):
         super().__init__()
         self.num_process_evaluate = num_process_evaluate
         self.timeout = timeout
+        if not isinstance(k, Sequence):
+            k = (k, )
+        self.k = k
         self.dataset = LCBCodeGenerationDataset.load(
             release_version=release_version,
             start_date=start_date,
-            end_date=end_date)['test']
+            end_date=end_date,
+            num_repeats=num_repeats)['test']
         self.extractor_version = extractor_version
 
     def score(self, predictions, references):
@@ -273,8 +280,11 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
         filtered_references = []
         for idx, item in enumerate(references):
             if item in self.dataset['question_id']:
-                filtered_predictions.append(predictions[idx])
-                filtered_references.append(item)
+                if filtered_references and item == filtered_references[-1]:
+                    filtered_predictions[-1].extend(predictions[idx])
+                else:
+                    filtered_predictions.append(predictions[idx])
+                    filtered_references.append(item)
 
         filtered_references = [
             evaluation_samples[item] for item in filtered_references
@@ -291,7 +301,7 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
         metrics, eval_results, final_metadata = codegen_metrics(
             filtered_references,
             filtered_predictions,
-            k_list=[1],
+            k_list=self.k,
             num_process_evaluate=self.num_process_evaluate,
             timeout=self.timeout,
         )

@@ -436,7 +436,7 @@ class MBPPPassKEvaluator(MBPPEvaluator):
     """Better use for pass k evaluation.
 
     Args:
-        k(Tuple[int]): Choices of Pass@k. Defaults to (1, 10, 100)
+        k(Union[int, Tuple[int, ...], List[int]]): Choices of Pass@k.
     """
 
     def __init__(self, k=(1, 10, 100)) -> None:
@@ -478,7 +478,7 @@ class MBPPPassKEvaluator(MBPPEvaluator):
         task_total = defaultdict(int)
 
         result = {'pass': 0, 'timeout': 0, 'failed': 0, 'wrong_answer': 0}
-        with ProcessPoolExecutor() as executor:
+        with ProcessPoolExecutor(max_workers=8) as executor:
             futures = []
             for refer, preds in zip(references, predictions):
                 # suits for two case
@@ -494,7 +494,7 @@ class MBPPPassKEvaluator(MBPPEvaluator):
                 for pred in preds:
                     pred = self._process_answer(pred)
                     programs = self._process_test(test_case, pred)
-                    future = executor.submit(execution, programs, task_id, 10)
+                    future = executor.submit(execution, programs, task_id, 8)
                     futures.append(future)
 
             from tqdm import tqdm

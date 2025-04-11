@@ -21,6 +21,7 @@ multiple_eval_cfg = {
         evaluator=dict(
             type=MultiplEEvaluator,
             language=lang,
+            k = 1,
             ip_address='https://opencompass-multiple-evaluator.hf.space',
         ),
         pred_role='BOT',

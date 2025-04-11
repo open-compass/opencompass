@@ -51,7 +51,8 @@ class JSONToolkit:
             raise
 
     @staticmethod
-    def read_jsonl(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
+    def read_jsonl(file_path: Union[str, Path],
+                   num_repeats: int = 1) -> List[Dict[str, Any]]:
         """Read a JSONL file and return its contents as a list of dictionaries.
 
         Args:
@@ -73,7 +74,9 @@ class JSONToolkit:
                     if not line:  # Skip empty lines
                         continue
                     try:
-                        results.append(json.loads(line))
+                        # results.append(json.loads(line))
+                        results.extend(
+                            [json.loads(line) for _ in range(num_repeats)])
                     except json.JSONDecodeError as e:
                         logger.error(
                             f'Invalid JSON on line {line_num}: {str(e)}')

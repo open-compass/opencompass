@@ -28,7 +28,9 @@ mbpp_infer_cfg = dict(
     inferencer=dict(type=GenInferencer, max_out_len=512),
 )
 
-mbpp_eval_cfg = dict(evaluator=dict(type=MBPPPassKEvaluator), pred_role='BOT')
+mbpp_eval_cfg = dict(evaluator=dict(type=MBPPPassKEvaluator,
+                                    k=1), 
+                    pred_role='BOT')
 
 mbpp_datasets = [
     dict(
@@ -38,5 +40,6 @@ mbpp_datasets = [
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,
         eval_cfg=mbpp_eval_cfg,
+        num_repeats=1,
     )
 ]

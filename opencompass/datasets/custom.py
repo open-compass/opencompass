@@ -191,14 +191,19 @@ class CodeCustomDataset(BaseDataset):
         path = get_data_path(path, local_mode=local_mode)
         if file_name is not None:
             path = os.path.join(path, file_name)
+        files = os.listdir(path)
         data = []
-        if path.endswith('.jsonl'):
-            with open(path, 'r', encoding='utf-8') as f:
+        if any(f.endswith('.jsonl') for f in files):
+            target_file = next(f for f in files if f.endswith('.jsonl'))
+            target_path = os.path.join(path, target_file)
+            with open(target_path, 'r', encoding='utf-8') as f:
                 for line in f:
                     data.extend(
                         [json.loads(line.strip()) for _ in range(num_repeats)])
-        elif path.endswith('.csv'):
-            with open(path, 'r', encoding='utf-8-sig') as f:
+        elif any(f.endswith('.csv') for f in files):
+            target_file = next(f for f in files if f.endswith('.csv'))
+            target_path = os.path.join(path, target_file)
+            with open(target_path, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
                 header = next(reader)
                 for row in reader:
