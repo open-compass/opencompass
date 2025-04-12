@@ -6,7 +6,7 @@ import os.path as osp
 import re
 import tempfile
 from os import environ
-from typing import List
+from typing import List, Sequence, Tuple, Union
 
 from datasets import Dataset
 
@@ -70,12 +70,16 @@ class HumanevalDataset(BaseDataset):
 class HumanEvalEvaluator(BaseEvaluator):
     """Evaluator for HumanEval or EvalPlus."""
 
-    def __init__(self, k: List[int] = [1, 10, 100]) -> None:
+    def __init__(self, k: Union[int, Tuple[int, ...], List[int]] = 1,
+                 num_repeats: int = 1) -> None:
         try:
             import human_eval
         except ImportError:
             raise ImportError(HUMANEVAL_IMPORT_ERROR)
 
+        self.n = num_repeats
+        if not isinstance(k, Sequence):
+            k = (k, )
         self.k = k
         super().__init__()
 
@@ -87,16 +91,24 @@ class HumanEvalEvaluator(BaseEvaluator):
         from human_eval.evaluation import evaluate_functional_correctness
 
         prompts = [item['prompt'] for item in test_set]
-        humaneval_preds = []
+        predictions_processed, references_processed = [], []
+        for pred, refer in zip(predictions, references):
+            if references_processed and refer == references_processed[-1]:
+                predictions_processed[-1].extend([pred])
+            else:
+                references_processed.append(refer)
+                predictions_processed.append([pred])
+
         # create json file in human_eval format
-        for preds, refer in zip(predictions, references):
+        humaneval_preds = []
+        for preds_p, refer_p in zip(predictions_processed, references_processed):
             # suits for two case
             # 1. use repeated dataset
             # 2. use `num_return_sequences` to generate multiple responses
-            if not isinstance(preds, list):
-                preds = [preds]
-            for pred in preds:
-                humaneval_preds.append({'task_id': refer, 'completion': pred})
+            if not isinstance(preds_p, list):
+                preds_p = [preds_p]
+            for pred_p in preds_p:
+                humaneval_preds.append({'task_id': refer_p, 'completion': pred_p})
         with tempfile.TemporaryDirectory() as tmp_dir:
             out_dir = osp.join(tmp_dir, 'human_eval.json')
             write_jsonl(out_dir, humaneval_preds)
@@ -183,13 +195,13 @@ def humaneval_postprocess_v2(text: str) -> str:
     blocks = re.findall(r'```\w*\n(.*?)```', text, re.DOTALL)
     if len(blocks) >= 1:
         text = blocks[0]
-    return text
+    return text.lstrip()
 
 def humaneval_postprocess_v3(text: str) -> str:
     blocks = re.findall(r'```\w*\n(.*?)```', text, re.DOTALL)
     if len(blocks) >= 1:
         text = blocks[-1]
-    return text
+    return text.lstrip()
 
 def humaneval_internal_v2_postprocess(text: str):
     if text.startswith('   ') and not text.startswith('    '):

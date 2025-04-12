@@ -90,7 +90,7 @@ class HumanevalXEvaluator(BaseEvaluator):
         self.timeout = timeout
         super().__init__()
 
-    def score(self, predictions, references):
+    def score(self, predictions, references, test_set):
         predictions = [{
             'task_id':
             f'{_LANGUAGE_NAME_DICT[self.language]}/{i}',

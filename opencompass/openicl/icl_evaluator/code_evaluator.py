@@ -1,12 +1,14 @@
 # flake8: noqa: E501
 
 import difflib
+import itertools
 import os
 import re
 import tempfile
 import time
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
+import numpy as np
 from datasets import Dataset
 from gradio_client import Client
 
@@ -24,19 +26,24 @@ class CodeEvaluator(BaseEvaluator):
     """
 
     def __init__(self,
-                 language: str,
+                 language: str = 'py',
                  ip_address: str = 'localhost',
+                 k: Union[int, Tuple[int, ...], List[int]] = 1,
                  retry: int = 3) -> None:
         """Initialize the CodeEvaluator.
 
         Args:
             language (str): Programming language of the code to evaluate.
             ip_address (str, optional): IP address of the evaluation service. Defaults to 'localhost'.
+            k: Union[int, Tuple[int,...], List[int,...]]: The number k of pass@k to evaluate the code. Defaults to 1.
             retry (int, optional): Number of retry attempts for failed connections. Defaults to 3.
         """
         self.language = language
         self.retry = retry
         self.client = Client(ip_address)
+        if not isinstance(k, Sequence):
+            k = (k, )
+        self.k = k
         super().__init__()
 
     def _extract_code(self, text: str) -> str:
@@ -195,6 +202,31 @@ class CodeEvaluator(BaseEvaluator):
 
         return True, output, None
 
+    def estimate_pass_at_k(self, num_samples: Union[int, List[int],
+                                                    np.ndarray],
+                           num_correct: Union[List[int], np.ndarray],
+                           k: int) -> np.ndarray:
+        """Estimates pass@k of each problem and returns them in an array."""
+
+        def estimator(n: int, c: int, k: int) -> float:
+            """
+            Calculates 1 - comb(n - c, k) / comb(n, k).
+            """
+            if n - c < k:
+                return 1.0
+            return 1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1))
+
+        if isinstance(num_samples, int):
+            num_samples_it = itertools.repeat(num_samples, len(num_correct))
+        else:
+            assert len(num_samples) == len(num_correct)
+            num_samples_it = iter(num_samples)
+
+        return np.array([
+            estimator(int(n), int(c), k)
+            for n, c in zip(num_samples_it, num_correct)
+        ])
+
     def score(self, predictions: List, references: List,
               test_set: Dataset) -> Dict:
         """Score code generation predictions against references.
@@ -233,7 +265,7 @@ class CodeEvaluator(BaseEvaluator):
             processed_completions = self._process_completions(
                 test_case, completions)
 
-            result_dict = {
+            sub_data_dict = {
                 'name': test_case['name'],
                 'language': test_case['language'],
                 'prompt': test_case['prompt'],
@@ -242,7 +274,7 @@ class CodeEvaluator(BaseEvaluator):
                 'completions': completions
             }
 
-            all_test_cases.append(result_dict)
+            all_test_cases.append(sub_data_dict)
 
         # 2. Send all test cases to the evaluation service
         success, outputs, error_message = self._evaluate(all_test_cases)
@@ -251,17 +283,22 @@ class CodeEvaluator(BaseEvaluator):
 
         # 3. Process the returned results
         details = []
-        correct = 0
+        total, correct = [], []
         for output in outputs:
-            if output.get('status') == 'OK':
-                output['correct'] = True
-                correct += 1
-            else:
-                output['correct'] = False
-
+            passed = [m['status'] == 'OK' for m in output['meta_data']]
+            total.append(len(passed))
+            correct.append(sum(passed))
             details.append(output)
+        total = np.array(total)
+        correct = np.array(correct)
+
+        pass_at_k = {
+            f'pass@{k}':
+            self.estimate_pass_at_k(total, correct, k).mean() * 100
+            for k in self.k if (total >= k).all()
+        }
 
         return {
-            f'pass@{num_repeats}': 100 * correct / len(test_set_origin),
-            'details': details
+            **pass_at_k,
+            'details': details,
         }
