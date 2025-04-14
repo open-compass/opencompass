@@ -182,7 +182,7 @@ class CascadeEvaluator(BaseEvaluator):
             self.llm_evaluator._out_dir = f'{self._out_dir}_llm_judge'
 
             # Generate random hash suffix
-            llm_results_path = f'{self.llm_evaluator._out_dir}_{self.dataset_replica_idx}'  # noqa
+            llm_results_path = f'{self.llm_evaluator._out_dir}_replica{self.dataset_replica_idx}'  # noqa
 
             # Check if results already exist to avoid re-evaluation
             if os.path.exists(llm_results_path):
