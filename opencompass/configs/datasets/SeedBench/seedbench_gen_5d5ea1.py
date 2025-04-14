@@ -53,7 +53,6 @@ dataset_configs = [
     {'abbr': 'seedbench_3-5', 'data_file': '3-5.json', 'evaluator': 'AccScoreStr_Evaluator'},
 ]
 
-
 seedbench_datasets = []
 for stage in ['zero-shot','one-shot']:
     for config in dataset_configs:
