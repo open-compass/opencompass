@@ -17,7 +17,7 @@ GRADER_TEMPLATE_mcq = """
     Here are some evaluation criteria:
     1. Please refer to the given standard answer. You don't need to re-generate the answer to the question because the standard answer has been given. You only need to judge whether the candidate's answer is consistent with the standard answer according to the form of the question. Don't try to answer the original question. You can assume that the standard answer is definitely correct.
     2. The answer may be one of the four options: a, b, c, or d. Only when the options given by prediction are strictly consistent with the answer, the prediction can be considered correct.
-    5. If the prediction is given with 'The answer is:', please ignore the 'The answer is:', and only judge whether the candidate's answer is consistent with the standard answer.
+    3. If the prediction is given with 'The answer is:', please ignore the 'The answer is:', and only judge whether the candidate's answer is consistent with the standard answer.
     
 
     Please judge whether the following answers are consistent with the standard answer based on the above criteria. Grade the predicted answer of this new question as one of:
