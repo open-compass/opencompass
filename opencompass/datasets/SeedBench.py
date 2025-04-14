@@ -121,6 +121,7 @@ class F1Evaluator(BaseEvaluator):
         random.setstate(random_state)
         np.random.set_state(np_random_state)
         return self._postprocess(result)
+
     
 @ICL_EVALUATORS.register_module()
 class F1ScoreEvaluator(F1Evaluator):
