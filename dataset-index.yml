@@ -1001,7 +1001,7 @@
     name: ClimaQA
     category: Science
     paper: https://arxiv.org/pdf/2410.16701
-    comfigpath: ''
+    configpath: ''
     configpath_llmjudge:
         - opencompass/configs/datasets/ClimaQA/ClimaQA_Gold_llm_judge.py
         - opencompass/configs/datasets/ClimaQA/ClimaQA_Silver_llm_judge.py
@@ -1009,5 +1009,5 @@
     name: PHYSICS
     category: Science
     paper: https://arxiv.org/pdf/2503.21821
-    comfigpath: ''
+    configpath: ''
     configpath_llmjudge: opencompass/configs/datasets/PHYSICS/PHYSICS_llm_judge_gen_a133a2.py
