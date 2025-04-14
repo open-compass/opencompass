@@ -6,8 +6,6 @@ from opencompass.datasets.SeedBench import SeedBenchDataset, F1ScoreEvaluator, m
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 
-agri_data_dir = './data/SeedBench'
-
 agri_reader_cfg = dict(
     input_columns=['instruction', 'question'],
     output_column='answer'
@@ -61,14 +59,14 @@ for stage in ['zero-shot','one-shot']:
         )
         if 'pred_postprocessor' in config:
             eval_cfg['pred_postprocessor'] = config['pred_postprocessor']
-        data_file = f"{agri_data_dir}/{stage}/{config['data_file']}"
+        data_file = f"{stage}/{config['data_file']}"
         abbr_name = f"{config['abbr']}_{stage}"
         seedbench_datasets.append(
             dict(
                 type=SeedBenchDataset,
                 abbr=abbr_name,
                 data_files=data_file,
-                path='json',
+                path='opencompass/seedbench',
                 reader_cfg=agri_reader_cfg,
                 infer_cfg=agri_infer_cfg,
                 eval_cfg=eval_cfg

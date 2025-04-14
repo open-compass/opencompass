@@ -1,5 +1,6 @@
 import random
 import re
+from os import environ
 from typing import List
 
 import datasets
@@ -8,23 +9,37 @@ import numpy as np
 from rouge_chinese import Rouge
 
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
-from opencompass.registry import ICL_EVALUATORS, TEXT_POSTPROCESSORS
+from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
+                                  TEXT_POSTPROCESSORS)
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 
+@LOAD_DATASET.register_module()
 class SeedBenchDataset(BaseDataset):
 
     @staticmethod
     def load(data_files: str,
-             path: str = 'json',
+             path: str,
              split: str = None,
              **kwargs) -> datasets.Dataset:
-        dataset = datasets.load_dataset(path, data_files=data_files, **kwargs)
+
+        path = get_data_path(path)
+        if environ.get('DATASET_SOURCE', None) == 'ModelScope':
+            from modelscope import MsDataset
+            dataset = MsDataset.load(path,
+                                     subset_name='default',
+                                     split=split,
+                                     data_files=data_files,
+                                     **kwargs)
+        else:
+            dataset = datasets.load_dataset(path,
+                                            data_files=data_files,
+                                            **kwargs)
 
         if split is None:
             split = list(dataset.keys())[0]
-            print(f'my datasets split :  {split}')
 
         if split not in dataset:
             raise ValueError(f"Split '{split}' not found. \
