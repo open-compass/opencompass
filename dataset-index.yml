@@ -1010,4 +1010,4 @@
     category: Science
     paper: https://arxiv.org/pdf/2503.21821
     comfigpath: ''
-    configpath_llmjudge: ''
+    configpath_llmjudge: opencompass/configs/datasets/PHYSICS/PHYSICS_llm_judge_gen_a133a2.py
