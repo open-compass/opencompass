@@ -58,8 +58,6 @@ class GenericLLMEvaluator(BaseEvaluator):
     def build_inferencer(self):
         """Build LLM Inference."""
         if not self.output_path:
-            # output_path = self._out_dir
-            # self.output_path = f'{output_path}.json'
             self.output_path = self._out_dir
 
         out_dir, out_name = osp.split(self.output_path)
