@@ -3,7 +3,7 @@ from opencompass.registry import ICL_EVALUATORS
 
 
 @ICL_EVALUATORS.register_module()
-class MATHEvaluator(BaseEvaluator):
+class MATHVerifyEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
         try:

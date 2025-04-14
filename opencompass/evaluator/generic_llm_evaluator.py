@@ -1,5 +1,6 @@
 import os
 import os.path as osp
+from copy import deepcopy
 from typing import Dict, List, Optional
 
 import mmengine
@@ -54,12 +55,16 @@ class GenericLLMEvaluator(BaseEvaluator):
         self.dict_postprocessor = dict_postprocessor
         self.pred_postprocessor = pred_postprocessor
 
-    def build_inferencer(self, ):
+    def build_inferencer(self):
         """Build LLM Inference."""
-        output_path = self._out_dir
-        self.output_path = f'{output_path}.json'
-        out_dir, out_name = osp.split(output_path)
+        if not self.output_path:
+            # output_path = self._out_dir
+            # self.output_path = f'{output_path}.json'
+            self.output_path = self._out_dir
+
+        out_dir, out_name = osp.split(self.output_path)
         out_name = f'{out_name}.json'
+        self.output_path = osp.join(out_dir, out_name)
 
         self.logger.info(
             f'Set self.output_path to {self.output_path} for current task')
@@ -96,9 +101,9 @@ class GenericLLMEvaluator(BaseEvaluator):
         assert len(predictions) == len(
             references), 'predictions and references must have the same length'
 
+        # import pdb;pdb.set_trace()
         # -------------- Build Inferencer ----------------
         self.build_inferencer()
-
         # ---------------- Process Predictions ------------------
         predictions = self.pred_postprocess(predictions)
 
@@ -178,7 +183,7 @@ class GenericLLMEvaluator(BaseEvaluator):
         if self.dict_postprocessor is None:
             return output
         else:
-            kwargs = self.dict_postprocessor
+            kwargs = deepcopy(self.dict_postprocessor)
             proc = DICT_POSTPROCESSORS.get(kwargs.pop('type'))
             sig = inspect.signature(proc)
             if 'dataset' in sig.parameters:
@@ -192,7 +197,8 @@ class GenericLLMEvaluator(BaseEvaluator):
     @property
     def default_judge_cfg(self):
         from opencompass.models import OpenAISDK
-
+        self.logger.info('Please set your judge model in `OC_JUDGE_MODEL`, \
+            `OC_JUDGE_API_KEY`, `OC_JUDGE_API_BASE` environment variables.')
         DEFAULT_JUDGE_CFG = dict(
             type=OpenAISDK,
             path=os.environ['OC_JUDGE_MODEL'],
