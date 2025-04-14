@@ -9,32 +9,28 @@ Setting:
 Avaliable Models:
     - Instruct/Chat Models
 """
-from opencompass.datasets.arc_prize_public_evaluation import pad_array_with_value
+
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import Aime2024Dataset
+from opencompass.datasets import MATHDataset
 from opencompass.evaluator import (
     CascadeEvaluator,
     GenericLLMEvaluator,
     MATHVerifyEvaluator
 )
 
+# ----------------------------- Detailed Config -----------------------------
 
-aime2024_reader_cfg = dict(input_columns=['question'], output_column='answer')
-
-
-aime2024_infer_cfg = dict(
+math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
+math_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{question}\nRemember to put your final answer within \\boxed{}.',
-                ),
-            ],
+                dict(role='HUMAN', prompt='{problem}\nRemember to put your final answer within \\boxed{}.'),
+            ]
         ),
     ),
     retriever=dict(type=ZeroRetriever),
@@ -60,12 +56,13 @@ GRADER_TEMPLATE = """
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
 
-    <Original Question Begin>: \n{question}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
+    <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
+    <Gold Target Begin>: \n{solution}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     
     Judging the correctness of candidates' answers:
 """.strip()
+
 
 cascade_evaluator = dict(
     type=CascadeEvaluator,
@@ -91,10 +88,11 @@ cascade_evaluator = dict(
                 ),
             ),
             dataset_cfg=dict(
-                type=Aime2024Dataset,
-                path='opencompass/aime2024',
-                reader_cfg=aime2024_reader_cfg,
-                n=32,
+                type=MATHDataset,
+                path='opencompass/math',
+                file_name = 'test_prm800k_500.json',
+                reader_cfg=math_reader_cfg,
+                n=4,
             ),
             judge_cfg=dict(),
             dict_postprocessor=dict(type=generic_llmjudge_postprocess),
@@ -103,19 +101,17 @@ cascade_evaluator = dict(
     parallel=False,
 )
 
-
-aime2024_eval_cfg = dict(
-    evaluator=cascade_evaluator,
-)
-
-aime2024_datasets = [
+math_datasets = [
     dict(
-        abbr='aime2024',
-        type=Aime2024Dataset,
-        path='opencompass/aime2024',
-        reader_cfg=aime2024_reader_cfg,
-        infer_cfg=aime2024_infer_cfg,
-        eval_cfg=aime2024_eval_cfg,
-        n=32,# Evaluate the dataset with 2 times
+        type=MATHDataset,
+        abbr=f'math_prm800k_500',
+        path='opencompass/math',
+        file_name = 'test_prm800k_500.json',
+        reader_cfg=math_reader_cfg,
+        infer_cfg=math_infer_cfg,
+        eval_cfg=dict(
+            evaluator=cascade_evaluator,
+        ),
+        n=4,
     )
 ]
