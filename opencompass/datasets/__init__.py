@@ -25,6 +25,7 @@ from .chinese_simpleqa import *  # noqa: F401, F403
 from .cibench import *  # noqa: F401, F403
 from .circular import *  # noqa: F401, F403
 from .civilcomments import *  # noqa: F401, F403
+from .climaqa import *  # noqa: F401, F403
 from .clozeTest_maxmin import *  # noqa: F401, F403
 from .cluewsc import *  # noqa: F401, F403
 from .cmb import *  # noqa: F401, F403
@@ -110,6 +111,7 @@ from .obqa import *  # noqa: F401, F403
 from .olymmath import *  # noqa: F401, F403
 from .OlympiadBench import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
+from .physics import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
