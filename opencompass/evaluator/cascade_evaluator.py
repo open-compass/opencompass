@@ -181,8 +181,10 @@ class CascadeEvaluator(BaseEvaluator):
             original_out_dir = getattr(self.llm_evaluator, '_out_dir', None)
             self.llm_evaluator._out_dir = f'{self._out_dir}_llm_judge'
 
+            # Generate random hash suffix
+            llm_results_path = f'{self.llm_evaluator._out_dir}_{self.dataset_replica_idx}'  # noqa
+
             # Check if results already exist to avoid re-evaluation
-            llm_results_path = f'{self.llm_evaluator._out_dir}.json'
             if os.path.exists(llm_results_path):
                 self.logger.info(
                     f'Loading existing LLM evaluation results from '
@@ -212,7 +214,9 @@ class CascadeEvaluator(BaseEvaluator):
                 # Use GenericLLMEvaluator to evaluate samples
                 # unset dataset_cfg for GenericLLMEvaluator to
                 # directly use test_set
+                self.llm_evaluator.output_path = llm_results_path
                 self.llm_evaluator.dataset_cfg = None
+
                 llm_results = self.llm_evaluator.score(
                     predictions=failed_predictions,
                     references=failed_references,

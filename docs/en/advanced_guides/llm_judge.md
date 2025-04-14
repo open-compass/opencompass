@@ -278,7 +278,7 @@ Here's an example of how to configure the CascadeEvaluator:
 
 ```python
 # Define a rule-based evaluator
-rule_evaluator = dict(type=MATHEvaluator)
+rule_evaluator = dict(type=MATHVerifyEvaluator)
 
 # Define an LLM judge evaluator
 llm_judge_evaluator = dict(
