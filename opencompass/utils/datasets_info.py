@@ -27,9 +27,10 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/ai2_arc",
         "local": "./data/ARC/ARC-e/ARC-Easy-Dev.jsonl",
     },
+    # Matbench
     "opencompass/Matbench": {
     # "ms_id": "opencompass/Matbench",
-    # "hf_id": "opencompass/Matbench",
+    "hf_id": "opencompass/Matbench",
     "local": "./data/Matbench",
     },
     # BBH
