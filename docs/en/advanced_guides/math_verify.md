@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Mathematical reasoning is a crucial capability for large language models (LLMs). To evaluate a model's mathematical abilities, we need to test its capability to solve mathematical problems step by step and provide accurate final answers. OpenCompass provides a convenient way to evaluate mathematical reasoning through the CustomDataset and MATHEvaluator components.
+Mathematical reasoning is a crucial capability for large language models (LLMs). To evaluate a model's mathematical abilities, we need to test its capability to solve mathematical problems step by step and provide accurate final answers. OpenCompass provides a convenient way to evaluate mathematical reasoning through the CustomDataset and MATHVerifyEvaluator components.
 
 ## Dataset Format
 
@@ -61,7 +61,7 @@ math_infer_cfg = dict(
 
 ```python
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator),
+    evaluator=dict(type=MATHVerifyEvaluator),
 )
 ```
 
@@ -86,11 +86,11 @@ math_datasets = [
 ]
 ```
 
-## MATHEvaluator
+## MATHVerifyEvaluator
 
-The MATHEvaluator is specifically designed to evaluate mathematical answers. It is developed based on the math_verify library, which provides mathematical expression parsing and verification capabilities, supporting extraction and equivalence verification for both LaTeX and general expressions.
+The MATHVerifyEvaluator is specifically designed to evaluate mathematical answers. It is developed based on the math_verify library, which provides mathematical expression parsing and verification capabilities, supporting extraction and equivalence verification for both LaTeX and general expressions.
 
-The MATHEvaluator implements:
+The MATHVerifyEvaluator implements:
 
 1. Extracts answers from both predictions and references using LaTeX extraction
 2. Handles various LaTeX formats and environments
@@ -133,7 +133,7 @@ Here's a complete example of how to set up math evaluation:
 from mmengine.config import read_base
 from opencompass.models import TurboMindModelwithChatTemplate
 from opencompass.datasets import CustomDataset
-from opencompass.openicl.icl_evaluator.math_evaluator import MATHEvaluator
+from opencompass.openicl.icl_evaluator.math_evaluator import MATHVerifyEvaluator
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -160,7 +160,7 @@ math_infer_cfg = dict(
 
 # Evaluation configuration
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator),
+    evaluator=dict(type=MATHVerifyEvaluator),
 )
 
 # Dataset configuration

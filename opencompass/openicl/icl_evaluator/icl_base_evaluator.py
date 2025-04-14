@@ -47,6 +47,10 @@ class BaseEvaluator:
         # please see opencompass/opencompass/tasks/openicl_eval.py Line 197-200
         return self._out_dir
 
+    @property
+    def dataset_replica_idx(self):
+        return self._dataset_replica_idx
+
     def group(self, n: int, details: List[Dict[str, Any]],
               test_set: Dataset) -> Dict[str, Any]:
         example2replications = {}
@@ -102,6 +106,7 @@ class BaseEvaluator:
         all_details = []
         all_results = []
         for i in range(n):
+            self._dataset_replica_idx = i
 
             def select_fn(i, real_size, x):
                 if isinstance(x, Dataset):
@@ -111,11 +116,13 @@ class BaseEvaluator:
                 else:
                     return x
 
-            results = self.score(
-                **{
-                    key: select_fn(i, real_size, value)
-                    for key, value in score_kwargs.items()
-                })
+            current_params = {
+                key: select_fn(i, real_size, value)
+                for key, value in score_kwargs.items()
+            }
+
+            results = self.score(**current_params)
+
             details = results.pop('details', None)
             if details is not None:
                 if isinstance(details, Dict):
@@ -138,8 +145,6 @@ class BaseEvaluator:
                     eval_results.pop(key)
                 else:
                     eval_results[key] = np.mean(eval_results[key])
-            else:
-                eval_results[key] = eval_results[key][0]
 
         grouped_examples = self.group(n, all_details, original_dataset)
         can_calculate = False
