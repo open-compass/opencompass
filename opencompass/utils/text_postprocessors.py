@@ -283,3 +283,10 @@ def extract_non_reasoning_content(
                                  re.DOTALL)
     non_reasoning_content = reasoning_regex.sub('', text).strip()
     return non_reasoning_content
+
+
+def parse_bracketed_answer(text: str, options: str) -> str:
+    match = re.search(rf'<({options})>', text)
+    if match:
+        return match.group(1)
+    return ''
