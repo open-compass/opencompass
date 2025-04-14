@@ -1,3 +1,5 @@
+import os
+
 from datasets import load_dataset
 
 from opencompass.datasets.base import BaseDataset
@@ -6,12 +8,13 @@ from opencompass.utils import get_data_path
 
 
 @LOAD_DATASET.register_module()
-class ClimateQADataset(BaseDataset):
+class ClimaQADataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, **kwargs):
+    def load(path: str, task: str, **kwargs):
 
-        path = get_data_path(path, local_mode=True)
+        path = get_data_path(path)
+        path = os.path.join(path, task)
         climateqa = load_dataset(path)['train']
 
         input_column = []
@@ -23,4 +26,5 @@ class ClimateQADataset(BaseDataset):
             else:
                 input_column.append(climateqa[i]['Question'])
         climateqa = climateqa.add_column(name='input', column=input_column)
+        climateqa = climateqa.rename_column('Answer', 'target')
         return climateqa

@@ -420,9 +420,40 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/OlympiadBench",
     },
+    "opencompass/ClimaQA-Gold": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/climaqa_gold",
+    },
+    "opencompass/ClimaQA-Silver": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/climaqa_silver",
+    },
+    "opencompass/PHYSICS-textonly": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/PHYSICS-textonly",
+    },
+
 }
 
 DATASETS_URL = {
+    "/climaqa_gold": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/climaqa_gold.zip",
+        "md5": "310cd0dc96db2bbbce798c40e2163ac2",
+    },
+    "/climaqa_silver": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/climaqa_silver.zip",
+        "md5": "acdd955f1c170539c5233c12f7227c58",
+    },
+    "/PHYSICS-textonly": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/PHYSICS-textonly.zip",
+        "md5": "92be6846a22dd4da942ca43f0638c709",
+    },
     "/OlympiadBench": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/OlympiadBench.zip",
