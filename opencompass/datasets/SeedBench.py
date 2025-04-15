@@ -26,7 +26,7 @@ class SeedBenchDataset(BaseDataset):
              **kwargs) -> datasets.Dataset:
 
         path = get_data_path(path)
-        if environ.get('DATASET_SOURCE', None) == 'ModelScope':
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
             dataset = MsDataset.load(path,
                                      subset_name='default',

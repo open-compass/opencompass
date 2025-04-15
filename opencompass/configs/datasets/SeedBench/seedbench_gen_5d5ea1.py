@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator, JiebaRougeEvaluator, RougeEvaluator
-from opencompass.datasets.SeedBench import SeedBenchDataset, F1ScoreEvaluator, my_multiple_select_postprocess, AverageRougeScoreEvaluator
+from opencompass.datasets import SeedBenchDataset, F1ScoreEvaluator, my_multiple_select_postprocess, AverageRougeScoreEvaluator
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
 
