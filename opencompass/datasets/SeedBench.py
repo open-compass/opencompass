@@ -124,7 +124,7 @@ class F1Evaluator(BaseEvaluator):
               recall) / (precision + recall) if (precision + recall) > 0 else 0
 
         result = {
-            'ours_F1Score': f1 * 100,  # 总体 F1 分数
+            'F1Score': f1 * 100,  # 总体 F1 分数
             'details': details
         }
         random.setstate(random_state)

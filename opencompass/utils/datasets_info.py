@@ -232,7 +232,7 @@ DATASETS_MAPPING = {
     # SeedBench
     "opencompass/seedbench": {
         "ms_id": "y12869741/SeedBench",
-        "hf_id": "y12869741/SeedBench",
+        "hf_id": "yj12869741/SeedBench",
         "local": "./data/SeedBench",
     },
     # SIQA
