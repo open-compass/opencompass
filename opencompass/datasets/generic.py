@@ -37,7 +37,6 @@ def get_final_results(judged_answers,
     is_correct = is_correct_count / count
     is_incorrect = is_incorrect_count / count
     is_given_attempted = is_correct + is_incorrect
-    loose_accuracy = is_correct / count
     accuracy_given_attempted = (is_correct / is_given_attempted
                                 if is_given_attempted > 0 else 0)
     attempted_judge_ratio = attempted_judge_count / count
@@ -46,7 +45,7 @@ def get_final_results(judged_answers,
           (accuracy_given_attempted + is_correct) if
           (accuracy_given_attempted + is_correct) > 0 else 0)
     result = {
-        metric_name: loose_accuracy * 100,
+        metric_name: is_correct * 100,
         f'{metric_name}_given_attempted': accuracy_given_attempted * 100,
         'f1': f1,
         'attempted_ratio': attempted_judge_ratio * 100,
