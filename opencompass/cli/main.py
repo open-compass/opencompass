@@ -299,6 +299,8 @@ def main():
         content = f'{getpass.getuser()}\'s task has been launched!'
         LarkReporter(cfg['lark_bot_url']).post(content)
 
+    logger.info(f'The full config is \n{cfg.pretty_text}')
+
     # infer
     if args.mode in ['all', 'infer']:
         # When user have specified --slurm or --dlc, or have not set

@@ -1,5 +1,5 @@
 """
-Summary: A config for AIME-2024 Evaluation.
+Summary: A config for AIME-2025 Evaluation.
 Setting:
     Shot: 0-shot
     Evaluator:
@@ -13,19 +13,18 @@ Avaliable Models:
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.datasets import CustomDataset
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import Aime2024Dataset
 from opencompass.evaluator import (
     CascadeEvaluator,
     GenericLLMEvaluator,
     MATHVerifyEvaluator
 )
 
+aime2025_reader_cfg = dict(input_columns=['question'], output_column='answer')
 
-aime2024_reader_cfg = dict(input_columns=['question'], output_column='answer')
 
-
-aime2024_infer_cfg = dict(
+aime2025_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
@@ -67,12 +66,12 @@ GRADER_TEMPLATE = """
     Judging the correctness of candidates' answers:
 """.strip()
 
-cascade_evaluator = dict(
+aime2025_eval_cfg = dict(
     type=CascadeEvaluator,
     rule_evaluator=dict(
         type=MATHVerifyEvaluator,
     ),
-    llm_evaluator= dict(
+    llm_evaluator=dict(
         type=GenericLLMEvaluator,
         prompt_template=dict(
             type=PromptTemplate,
@@ -90,9 +89,9 @@ cascade_evaluator = dict(
             ),
         ),
         dataset_cfg=dict(
-            type=Aime2024Dataset,
-            path='opencompass/aime2024',
-            reader_cfg=aime2024_reader_cfg,
+            type=CustomDataset,
+            path='opencompass/aime2025',
+            reader_cfg=aime2025_reader_cfg,
         ),
         judge_cfg=dict(),
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
@@ -100,19 +99,13 @@ cascade_evaluator = dict(
     parallel=False,
 )
 
-
-aime2024_eval_cfg = dict(
-    evaluator=cascade_evaluator,
-)
-
-aime2024_datasets = [
+aime2025_datasets = [
     dict(
-        abbr='aime2024',
-        type=Aime2024Dataset,
-        path='opencompass/aime2024',
-        reader_cfg=aime2024_reader_cfg,
-        infer_cfg=aime2024_infer_cfg,
-        eval_cfg=aime2024_eval_cfg,
-        n=32,# Evaluate the dataset with 2 times
+        type=CustomDataset,
+        abbr='aime2025',
+        path='opencompass/aime2025',
+        reader_cfg=aime2025_reader_cfg,
+        infer_cfg=aime2025_infer_cfg,
+        eval_cfg=aime2025_eval_cfg,
     )
 ]
