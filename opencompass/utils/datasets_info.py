@@ -435,6 +435,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/PHYSICS-textonly",
     },
+     "opencompass/ChemBench4K": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/ChemBench4K",
+    },
 
 }
 
@@ -777,5 +782,11 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/bigcodebench.zip",
         "md5": "270f399f4142b74f47ecff116cc3b21d"
+    },
+    "ChemBench4K": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ChemBench4K.zip",
+        "md5": "fc23fd21b2566a5dbbebfa4601d7779c"
     }
+    
 }
