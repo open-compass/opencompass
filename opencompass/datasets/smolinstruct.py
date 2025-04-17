@@ -4,10 +4,6 @@ from collections import defaultdict
 
 import numpy as np
 from datasets import Dataset, DatasetDict, load_dataset
-from nltk.translate.meteor_score import meteor_score
-from rdkit import Chem
-from rdkit.Chem import DataStructs
-from rdkit.Chem.rdFingerprintGenerator import GetMorganGenerator
 
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
@@ -369,6 +365,7 @@ class FTSEvaluator(BaseEvaluator):
             pred = pred[0]
             detail = {'pred': pred, 'answer': ans}
             # 将 SMILES 转换为 RDKit 分子对象
+            from rdkit import Chem
             mol1 = Chem.MolFromSmiles(pred)
             mol2 = Chem.MolFromSmiles(ans)
             if mol1 is None or mol2 is None:
@@ -379,9 +376,11 @@ class FTSEvaluator(BaseEvaluator):
             # 生成 Morgan 指纹（等同于 ECFP4）
             # fp1 = AllChem.GetMorganFingerprintAsBitVect(mol1, radius=2, nBits=2048)
             # fp2 = AllChem.GetMorganFingerprintAsBitVect(mol2, radius=2, nBits=2048)
+            from rdkit.Chem.rdFingerprintGenerator import GetMorganGenerator
             generator = GetMorganGenerator(radius=2, fpSize=2048)
             fp1 = generator.GetFingerprint(mol1)
             fp2 = generator.GetFingerprint(mol2)
+            from rdkit.Chem import DataStructs
             similarity = DataStructs.TanimotoSimilarity(fp1, fp2) * 100
             detail['score'] = similarity
             avg_score += similarity
@@ -406,7 +405,6 @@ class MeteorEvaluator(BaseEvaluator):
                 'error': 'predictions and references have different '
                 'length'
             }
-
         avg_score = 0
         details = []
         for pred, ans in zip(predictions, references):
