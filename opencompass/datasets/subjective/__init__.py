@@ -35,3 +35,4 @@ from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403
 from .wildbench import WildBenchDataset  # noqa: F401, F403
 from .wildbench import wildbench_bradleyterry_postprocess  # noqa: F401, F403
 from .wildbench import wildbench_postprocess  # noqa: F401, F403
+from .writingbench import *
