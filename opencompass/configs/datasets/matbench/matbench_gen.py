@@ -47,6 +47,7 @@ for task in matbench_tasks:
         dict(
             type=MatbenchDataset,
             path=f'opencompass/Matbench',
+            task=task,
             abbr=task,
             reader_cfg=matbench_reader_cfg,
             infer_cfg=matbench_infer_cfg,

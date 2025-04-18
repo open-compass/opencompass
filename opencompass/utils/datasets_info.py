@@ -634,6 +634,11 @@ DATASETS_URL = {
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SQuAD2.0.zip",
         "md5": "1321cbf9349e1102a57d31d1b2bfdd7e",
     },
+    "/Matbench":{
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/Matbench.zip",
+        "md5": "99f9457f54f4f419da9556af56ac4c24",
+    },
     "mmlu_pro": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mmlu_pro.zip",
