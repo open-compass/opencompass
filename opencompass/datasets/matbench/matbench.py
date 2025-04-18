@@ -9,8 +9,8 @@ from opencompass.datasets.matbench.post_process import (parse_float_answer,
                                                         parse_true_false_answer
                                                         )
 from opencompass.openicl.icl_evaluator import BaseEvaluator
-from opencompass.utils import get_data_path
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -21,7 +21,8 @@ class MatbenchDataset(BaseDataset):
     @staticmethod
     def load(path, task):
         path = get_data_path(path)
-        path = os.path.join(path, 'matbench_base_fold_0_' + task + '_test.json')
+        path = os.path.join(path,
+                            'matbench_base_fold_0_' + task + '_test.json')
         dataset = []
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)
