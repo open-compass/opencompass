@@ -12,7 +12,6 @@ from opencompass.utils import get_data_path
 from ..base import BaseDataset
 from .utils import get_judgeanswer_and_reference
 
-
 base_prompt = """Evaluate the Response based on the Query and criteria provided.
 
 ** Criteria **
@@ -43,6 +42,7 @@ Return the results in the following JSON format, Only output this JSON format an
 ```
 """
 
+
 @LOAD_DATASET.register_module()
 class WritingBenchDataset(BaseDataset):
 
@@ -59,7 +59,9 @@ class WritingBenchDataset(BaseDataset):
                 criteria = data['criteria']
                 judge_prompt_list = []
                 for criteria_item in criteria:
-                    temp_prompt = base_prompt.format(question=query, criteria=criteria_item, prediction='{prediction}')
+                    temp_prompt = base_prompt.format(question=query,
+                                                     criteria=criteria_item,
+                                                     prediction='{prediction}')
                     judge_prompt_list.append(temp_prompt)
                 idx = data['index']
                 raw_data.append({

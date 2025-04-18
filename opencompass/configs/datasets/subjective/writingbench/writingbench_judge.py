@@ -42,7 +42,7 @@ for _name in subjective_all_sets:
                     dict(
                         role='SYSTEM',
                         fallback_role='HUMAN',
-                        prompt="You are an expert evaluator with extensive experience in evaluating response of given query.")
+                        prompt='You are an expert evaluator with extensive experience in evaluating response of given query.')
                 ],
                     round=[
                     dict(
