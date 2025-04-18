@@ -1015,5 +1015,5 @@
     name: SmolInstruct
     category: Science /Chemistry
     paper: https://arxiv.org/pdf/2402.09391
-    configpath: 'opencompass/configs/datasets/SmolInstruct/smolinstruct_gen.py'
+    configpath: opencompass/configs/datasets/SmolInstruct/smolinstruct_gen.py
     configpath_llmjudge: ''
