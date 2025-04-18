@@ -1011,3 +1011,9 @@
     paper: https://arxiv.org/pdf/2503.21821
     configpath: ''
     configpath_llmjudge: opencompass/configs/datasets/PHYSICS/PHYSICS_llm_judge_gen_a133a2.py
+- smolinstruct:
+    name: SmolInstruct
+    category: Science /Chemistry
+    paper: https://arxiv.org/pdf/2402.09391
+    configpath: opencompass/configs/datasets/SmolInstruct/smolinstruct_gen.py
+    configpath_llmjudge: ''
