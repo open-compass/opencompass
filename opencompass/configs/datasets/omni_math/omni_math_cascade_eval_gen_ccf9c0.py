@@ -1,52 +1,46 @@
-
-from mmengine.config import read_base
-
+"""
+Summary: A config for OmniMath Dataset Evaluation.
+Setting:
+    Shot: 0-shot
+    Evaluator:
+        - CascadeEvaluator
+            - MATHVerifyEvaluator
+            - GenericLLMEvaluator
+    Repeat: 1
+Avaliable Models:
+    - Instruct/Chat Models
+"""
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.datasets import generic_llmjudge_postprocess
+from opencompass.datasets.omni_math import OmniMathDataset
 from opencompass.evaluator import (
-    GenericLLMEvaluator,
     CascadeEvaluator,
+    GenericLLMEvaluator,
     MATHVerifyEvaluator,
 )
-from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import (
-    MATHDataset,
-    math_postprocess_v2,
-    normalize_final_answer,
+
+omnimath_reader_cfg = dict(
+    input_columns=['problem'], 
+    output_column='answer'
 )
-#######################################################################
-#                          PART 0  Essential Configs                  #
-#######################################################################
 
-with read_base():
-    # Datasets, Summarizer
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
-        models as lmdeploy_qwen2_5_7b_instruct_model,
-    )
-
-reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
-infer_cfg = dict(
+omnimath_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\nPlease reason step by step, and put your final answer within \\boxed{}.',
-                ),
+                dict(role='HUMAN', prompt='please answer the following mathematical question, put your final answer in \\boxed{}.\n\n{problem}'),
             ]
-        ),
+        )
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+    inferencer=dict(type=GenInferencer)
 )
 
-########################## Evaluator  #################################
+
+
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
     
@@ -66,65 +60,56 @@ GRADER_TEMPLATE = """
 
 
     <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{solution}\n<Gold Target End>\n\n
+    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     
     Judging the correctness of candidates' answers:
 """.strip()
 
-llm_judge_evaluator =   dict(
+cascade_evaluator = dict(
+    type=CascadeEvaluator,
+    rule_evaluator=dict(
+        type=MATHVerifyEvaluator,
+    ),
+    llm_evaluator=dict(
         type=GenericLLMEvaluator,
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
-                    )
-                ],
+            begin=[
+                dict(
+                    role='SYSTEM',
+                    fallback_role='HUMAN',
+                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+            ],
                 round=[
-                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-                ],
-            ),
+                dict(
+                    role='HUMAN',
+                    prompt = GRADER_TEMPLATE
+                ),
+            ]),
         ),
         dataset_cfg=dict(
-        type=MATHDataset,
-        path='opencompass/math',
-        file_name='test_prm800k_500.json',
+            type=OmniMathDataset,
+            reader_cfg=omnimath_reader_cfg,
         ),
         judge_cfg=dict(),
-    )
+        dict_postprocessor=dict(type=generic_llmjudge_postprocess),    
+    ),
+    parallel=False,
+)
 
-rule_evaluator =dict(type=MATHVerifyEvaluator)
-cascade_evaluator = dict(type=CascadeEvaluator,
-                   llm_evaluator=llm_judge_evaluator,
-                   rule_evaluator=rule_evaluator,
-                   parallel=False
-                   )
-########################## #################################
-eval_cfg = dict()
+omnimath_eval_cfg = dict(
+    evaluator=cascade_evaluator,
+)
 
-# eval_cfg['evaluator'] = rule_evaluator
-# eval_cfg['evaluator'] = llm_judge_evaluator
-eval_cfg['evaluator'] = cascade_evaluator 
-
-math_datasets = [
+omnimath_datasets = [
     dict(
-        abbr='math_prm800k_500',
-        type=MATHDataset,
-        path='opencompass/math',
-        file_name='test_prm800k_500.json',
-        reader_cfg=reader_cfg,
-        infer_cfg=infer_cfg,
-        eval_cfg=eval_cfg,
+        type=OmniMathDataset,
+        abbr='OmniMath',
+        reader_cfg=omnimath_reader_cfg,
+        infer_cfg=omnimath_infer_cfg,
+        eval_cfg=omnimath_eval_cfg,
+        n=1,
     )
 ]
-
-
-datasets = math_datasets
-models = lmdeploy_qwen2_5_7b_instruct_model
-
-
-work_dir = 'math_prm800k_500_cascade_evaluator'

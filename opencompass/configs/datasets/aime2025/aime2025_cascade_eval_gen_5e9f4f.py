@@ -1,27 +1,43 @@
+"""
+Summary: A config for AIME-2025 Evaluation.
+Setting:
+    Shot: 0-shot
+    Evaluator:
+        - CascadeEvaluator
+            - MATHVerifyEvaluator
+            - GenericLLMEvaluator
+    Repeat: 32
+Avaliable Models:
+    - Instruct/Chat Models
+"""
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import Aime2024Dataset, MATHEvaluator, math_postprocess_v2
-from opencompass.openicl.icl_evaluator import LMEvaluator
+from opencompass.datasets import CustomDataset
 from opencompass.datasets import generic_llmjudge_postprocess
-
-aime2024_reader_cfg = dict(
-    input_columns=['question'], 
-    output_column='answer'
+from opencompass.evaluator import (
+    CascadeEvaluator,
+    GenericLLMEvaluator,
+    MATHVerifyEvaluator
 )
 
+aime2025_reader_cfg = dict(input_columns=['question'], output_column='answer')
 
-aime2024_infer_cfg = dict(
+
+aime2025_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
-                dict(role='HUMAN', prompt='{question}\nRemember to put your final answer within \\boxed{}.'),
+                dict(
+                    role='HUMAN',
+                    prompt='{question}\nRemember to put your final answer within \\boxed{}.',
+                ),
             ],
-        )
+        ),
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=2048)
+    inferencer=dict(type=GenInferencer),
 )
 
 
@@ -50,38 +66,46 @@ GRADER_TEMPLATE = """
     Judging the correctness of candidates' answers:
 """.strip()
 
-aime2024_eval_cfg = dict(
-    evaluator=dict(
-        type=LMEvaluator,
+aime2025_eval_cfg = dict(
+    type=CascadeEvaluator,
+    rule_evaluator=dict(
+        type=MATHVerifyEvaluator,
+    ),
+    llm_evaluator=dict(
+        type=GenericLLMEvaluator,
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-            begin=[
-                dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
-            ],
+                begin=[
+                    dict(
+                        role='SYSTEM',
+                        fallback_role='HUMAN',
+                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
+                    )
+                ],
                 round=[
-                dict(
-                    role='HUMAN',
-                    prompt = GRADER_TEMPLATE
-                ),
-            ]),
+                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
+                ],
+            ),
         ),
+        dataset_cfg=dict(
+            type=CustomDataset,
+            path='opencompass/aime2025',
+            reader_cfg=aime2025_reader_cfg,
+        ),
+        judge_cfg=dict(),
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
-    pred_role='BOT',
+    parallel=False,
 )
 
-aime2024_datasets = [
+aime2025_datasets = [
     dict(
-        abbr='aime2024',
-        type=Aime2024Dataset,
-        path='opencompass/aime2024',
-        reader_cfg=aime2024_reader_cfg,
-        infer_cfg=aime2024_infer_cfg,
-        eval_cfg=aime2024_eval_cfg,
-        mode='singlescore',
+        type=CustomDataset,
+        abbr='aime2025',
+        path='opencompass/aime2025',
+        reader_cfg=aime2025_reader_cfg,
+        infer_cfg=aime2025_infer_cfg,
+        eval_cfg=aime2025_eval_cfg,
     )
 ]

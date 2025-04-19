@@ -204,7 +204,6 @@ def get_config_from_arg(args) -> Config:
     summarizers_dir = [
         os.path.join(args.config_dir, 'summarizers'),
         os.path.join(default_configs_dir, './summarizers'),
-
     ]
 
     # Check if summarizer_arg contains '/'
@@ -308,7 +307,7 @@ def change_accelerator(models, accelerator):
                     model_kwargs=model_kwargs,
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
-                    batch_size=16,
+                    batch_size=model['batch_size'],
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
@@ -335,7 +334,7 @@ def change_accelerator(models, accelerator):
                     gen_config=gen_config,
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
-                    batch_size=16,
+                    batch_size=model.get('batch_size', 16),
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
