@@ -27,6 +27,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/ai2_arc",
         "local": "./data/ARC/ARC-e/ARC-Easy-Dev.jsonl",
     },
+    # Matbench
+    "opencompass/Matbench": {
+    # "ms_id": "opencompass/Matbench",
+    "hf_id": "opencompass/Matbench",
+    "local": "./data/Matbench",
+    },
     # BBH
     "opencompass/bbh": {
         "ms_id": "opencompass/bbh",
@@ -663,6 +669,11 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SQuAD2.0.zip",
         "md5": "1321cbf9349e1102a57d31d1b2bfdd7e",
+    },
+    "/Matbench":{
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/Matbench.zip",
+        "md5": "99f9457f54f4f419da9556af56ac4c24",
     },
     "mmlu_pro": {
         "url":
