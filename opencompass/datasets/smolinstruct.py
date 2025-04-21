@@ -4,6 +4,7 @@ from collections import defaultdict
 
 import numpy as np
 from datasets import Dataset, DatasetDict, load_dataset
+from nltk.translate.meteor_score import meteor_score
 
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,

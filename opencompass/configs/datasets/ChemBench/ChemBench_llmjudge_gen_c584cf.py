@@ -86,7 +86,7 @@ for _name in chembench_all_sets:
             ),
             dataset_cfg=dict(
                 type=ChemBenchDataset,
-                path='/fs-computility/llm/xiaolinchen/opencompass_fork/data/ChemBench4K',
+                path='opencompass/ChemBench4K',
                 name=_name,
                 reader_cfg=chembench_reader_cfg,
             ),
