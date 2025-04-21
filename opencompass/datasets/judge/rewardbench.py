@@ -14,28 +14,6 @@ from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
-prompt_choice_prefix = """
-Please act as an impartial judge to evaluate the responses provided by two AI assistants to the user question below. Your evaluation should focus on the following criteria: helpfulness, relevance, accuracy, depth, creativity, and level of detail.
-
-- Do not let the order of presentation, response length, or assistant names influence your judgment.
-- Base your decision solely on how well each response addresses the user’s question and adheres to the instructions.
-
-Your final reply must be structured in the following format:
-{
-  "Choice": "[Model A or Model B]"
-}
-"""
-
-prompt_choice_en = """User Question: {question}
-
-Model A's Response: {answerA}
-
-Model B's Response: {answerB}
-
-Now it's your turn. Please provide selection result as required:
-"""
-
-
 @LOAD_DATASET.register_module()
 class RewardBenchDataset(BaseDataset):
 
@@ -57,13 +35,11 @@ class RewardBenchDataset(BaseDataset):
                     conversation_a, conversation_b = conversation_b, conversation_a
                     model_a, model_b = model_b, model_a
                 subset = item['subset']
-                prompt = prompt_choice_prefix + prompt_choice_en.format(
-                    question=question,
-                    answerA=conversation_a,
-                    answerB=conversation_b)
                 lan = 'en'
                 raw_data.append({
-                    'prompt': prompt,
+                    'question': question,
+                    'answerA': conversation_a,
+                    'answerB': conversation_b,
                     'judge': {
                         'prompt': item['prompt'],
                         'Answer_A': conversation_a,
