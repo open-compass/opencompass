@@ -409,7 +409,13 @@ class MeteorEvaluator(BaseEvaluator):
         avg_score = 0
         details = []
         for pred, ans in zip(predictions, references):
-            score = meteor_score([ans.split()], pred.split())
+            try:
+                score = (meteor_score([ans.split()], pred.split())
+                         if ans and pred else 0.0)
+            except AttributeError:
+                logging.error(f'Failed to compute METEOR'
+                              f"score:\npred='{pred}'\nans='{ans}'")
+                score = 0.0
             avg_score += score
             detail = {'pred': pred, 'answer': ans, 'score': score}
             details.append(detail)
