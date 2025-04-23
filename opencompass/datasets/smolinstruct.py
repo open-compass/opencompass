@@ -9,6 +9,7 @@ from nltk.translate.meteor_score import meteor_score
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
+from opencompass.utils import get_logger
 
 from .base import BaseDataset
 
@@ -413,8 +414,9 @@ class MeteorEvaluator(BaseEvaluator):
                 score = (meteor_score([ans.split()], pred.split())
                          if ans and pred else 0.0)
             except AttributeError:
-                logging.error(f'Failed to compute METEOR'
-                              f"score:\npred='{pred}'\nans='{ans}'")
+                self.logger = get_logger()
+                self.logger.warning(f'Failed to compute METEOR'
+                                    f"score:\npred='{pred}'\nans='{ans}'")
                 score = 0.0
             avg_score += score
             detail = {'pred': pred, 'answer': ans, 'score': score}
