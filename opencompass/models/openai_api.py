@@ -661,18 +661,22 @@ class OpenAISDK(OpenAI):
                         pass  # noqa F841
 
                 # Check if response is empty or content is empty
-                if not responses.choices or not responses.choices[
-                        0].message.content:
+                if (not responses.choices or not responses.choices[0].message
+                        or not responses.choices[0].message.content):
+                    # self.logger.info('API responses: %s', responses)
                     self.logger.error(
-                        'API response is empty, it might be due to excessive '
-                        'input length or an internal server error '
-                        'from your API provider.')
+                        'Failed to extract content from the responses. '
+                        'Please check the API response for detail information.'
+                        'API responses: %s',
+                        responses,
+                    )
                     num_retries += 1
                     # Continue to retry instead of returning empty response
                     continue
-                # If the model has reasoning_content, concat it
-                # with the content
-                if hasattr(responses.choices[0].message, 'reasoning_content'):
+
+                # Concat Reasoning Content and tags to content
+                if (hasattr(responses.choices[0].message, 'reasoning_content')
+                        and responses.choices[0].message.reasoning_content):
                     return (responses.choices[0].message.reasoning_content +
                             self.think_tag +
                             responses.choices[0].message.content)
