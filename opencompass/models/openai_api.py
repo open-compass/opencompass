@@ -663,7 +663,6 @@ class OpenAISDK(OpenAI):
                 # Check if response is empty or content is empty
                 if (not responses.choices or not responses.choices[0].message
                         or not responses.choices[0].message.content):
-                    # self.logger.info('API responses: %s', responses)
                     self.logger.error(
                         'Failed to extract content from the responses. '
                         'Please check the API response for detail information.'
