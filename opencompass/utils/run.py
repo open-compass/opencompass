@@ -150,6 +150,12 @@ def get_config_from_arg(args) -> Config:
             dataset['meta_path'] = args.custom_dataset_meta_path
         dataset = make_custom_dataset_config(dataset)
         datasets.append(dataset)
+    ## apply the dataset repeat runs
+    if len(datasets) > 0 and args.dataset_num_runs > 1:
+        logger.warning(f'User has set the --dataset-num-runs, the datasets will be evaluated with {args.dataset_num_runs} runs.')
+        for _dataset in datasets:
+            logger.warning(f"The default num runs of {_dataset['abbr']} is: {_dataset['n']}, changed into: {args.dataset_num_runs}")
+            _dataset['n'] = args.dataset_num_runs
 
     # parse model args
     if not args.models and not args.hf_path:

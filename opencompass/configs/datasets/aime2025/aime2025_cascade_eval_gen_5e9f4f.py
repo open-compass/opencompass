@@ -6,7 +6,7 @@ Setting:
         - CascadeEvaluator
             - MATHVerifyEvaluator
             - GenericLLMEvaluator
-    Repeat: 32
+    Repeat: 1
 Avaliable Models:
     - Instruct/Chat Models
 """
@@ -66,7 +66,7 @@ GRADER_TEMPLATE = """
     Judging the correctness of candidates' answers:
 """.strip()
 
-aime2025_eval_cfg = dict(
+cascade_evaluator = dict(
     type=CascadeEvaluator,
     rule_evaluator=dict(
         type=MATHVerifyEvaluator,
@@ -98,6 +98,9 @@ aime2025_eval_cfg = dict(
     ),
     parallel=False,
 )
+aime2025_eval_cfg = dict(
+    evaluator=cascade_evaluator,
+)
 
 aime2025_datasets = [
     dict(
@@ -107,5 +110,6 @@ aime2025_datasets = [
         reader_cfg=aime2025_reader_cfg,
         infer_cfg=aime2025_infer_cfg,
         eval_cfg=aime2025_eval_cfg,
+        n=1,
     )
 ]

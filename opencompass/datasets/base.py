@@ -3,6 +3,9 @@ from typing import Dict, List, Optional, Union
 from datasets import Dataset, DatasetDict, concatenate_datasets
 
 from opencompass.openicl import DatasetReader
+from opencompass.utils import get_logger
+
+logger = get_logger()
 
 
 class BaseDataset:

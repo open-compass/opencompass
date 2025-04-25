@@ -112,6 +112,6 @@ math_datasets = [
         eval_cfg=dict(
             evaluator=cascade_evaluator,
         ),
-        n=4,
+        n=1,
     )
 ]

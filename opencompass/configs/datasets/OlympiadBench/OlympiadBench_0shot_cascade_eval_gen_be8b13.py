@@ -109,8 +109,6 @@ for _name in categories:
             reader_cfg=olympiadbench_reader_cfg,
             infer_cfg=olympiadbench_infer_cfg,
             eval_cfg=olympiadbench_eval_cfg,
-            n=4,
+            n=1,
         )
     )
-
-del _name

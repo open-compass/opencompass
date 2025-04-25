@@ -99,7 +99,6 @@ class GenericLLMEvaluator(BaseEvaluator):
         assert len(predictions) == len(
             references), 'predictions and references must have the same length'
 
-        # import pdb;pdb.set_trace()
         # -------------- Build Inferencer ----------------
         self.build_inferencer()
         # ---------------- Process Predictions ------------------

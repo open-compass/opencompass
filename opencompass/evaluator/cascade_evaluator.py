@@ -239,6 +239,9 @@ class CascadeEvaluator(BaseEvaluator):
 
             # Update the details for samples that were evaluated by LLM
             for i, llm_detail in enumerate(llm_details.values()):
+                # Add dataset replica index to LLM evaluation result
+                llm_detail['dataset_replica_idx'] = self.dataset_replica_idx
+
                 original_index = failed_indices[i]
                 # Store original rule-based evaluation result
                 rule_result = details[original_index].copy()
