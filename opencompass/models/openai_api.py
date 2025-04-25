@@ -676,6 +676,15 @@ class OpenAISDK(OpenAI):
                 # Concat Reasoning Content and tags to content
                 if (hasattr(responses.choices[0].message, 'reasoning_content')
                         and responses.choices[0].message.reasoning_content):
+                    if self.verbose:
+                        self.logger.info(
+                            'Concat Reasoning Content and tags to content'
+                            'Reasoning Content: %s, \n'
+                            'Tags: %s, \n'
+                            'Content: %s',
+                            responses.choices[0].message.reasoning_content,
+                            self.think_tag,
+                            responses.choices[0].message.content)
                     return (responses.choices[0].message.reasoning_content +
                             self.think_tag +
                             responses.choices[0].message.content)
