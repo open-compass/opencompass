@@ -313,7 +313,7 @@ def change_accelerator(models, accelerator):
                     model_kwargs=model_kwargs,
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
-                    batch_size=model['batch_size'],
+                    batch_size=model.get('batch_size', 16),
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
