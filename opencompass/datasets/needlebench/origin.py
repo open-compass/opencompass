@@ -114,8 +114,9 @@ The content of the long document is as follows
 
 '''
                 else:
-                    raise ValueError(f'Unsupported quesiton_position {quesiton_position}. '
-                                     'Position must be "End" or "Start".')
+                    raise ValueError(
+                        f'Unsupported quesiton_position {quesiton_position}. '
+                        'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
 
@@ -201,11 +202,7 @@ class NeedleBenchOriginEvaluator(BaseEvaluator):
             else:
                 score = 0
 
-            detail = {
-                'pred': prediction,
-                'answer': reference,
-                'score': score
-            }
+            detail = {'pred': prediction, 'answer': reference, 'score': score}
             total_score += score
             details.append(detail)
 

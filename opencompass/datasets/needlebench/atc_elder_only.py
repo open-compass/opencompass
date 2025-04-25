@@ -3,14 +3,15 @@ import json
 import os
 import random
 import re
+
 from datasets import Dataset
 
 from opencompass.datasets.base import BaseDataset
-from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET, TEXT_POSTPROCESSORS
-from opencompass.openicl.icl_evaluator import BaseEvaluator
-
-from opencompass.utils import get_data_path
 from opencompass.datasets.math import extract_boxed_answer
+from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
+                                  TEXT_POSTPROCESSORS)
+from opencompass.utils import get_data_path
 
 relationship_templates_zh_CN = [
     '{A}是{B}的{relationship}。',
@@ -57,7 +58,7 @@ relationship_templates_en = [
     '{B} is the child of {A}.',
     ('For {B}, {A} is not just a {relationship}, '
      'but also a friend.'),
-    "For {B}, {A} is more than just a {relationship}; {A} is a lifelong mentor of {B}.",
+    'For {B}, {A} is more than just a {relationship}; {A} is a lifelong mentor of {B}.',
 ]
 
 shuffled_story_with_prompt_zh_CN = """下面是对你的多步推理能力的测试，这个测试叫做祖先追溯测试，我们会模拟不同人的家庭亲属关系，你的任务是在其中不断推理，直到找到最年长的祖先。
@@ -125,7 +126,7 @@ class NeedleBenchATCDataset(BaseDataset):
             # 使用固定种子来保持样本稳定性
             seed = i
             random.seed(seed)
-            
+
             names = random.sample(all_names, num_needles)
             if language == 'Chinese':
                 relationship_terms = relationship_terms_zh_CN
@@ -163,9 +164,11 @@ class NeedleBenchATCDataset(BaseDataset):
 
             # Generating the prompt based on the language
             if language == 'Chinese':
-                shuffled_story_with_prompt = shuffled_story_with_prompt_zh_CN.format(shuffled_story=shuffled_story, last_person=last_person)
+                shuffled_story_with_prompt = shuffled_story_with_prompt_zh_CN.format(
+                    shuffled_story=shuffled_story, last_person=last_person)
             elif language == 'English':
-                shuffled_story_with_prompt = shuffled_story_with_prompt_en.format(shuffled_story=shuffled_story, last_person=last_person)
+                shuffled_story_with_prompt = shuffled_story_with_prompt_en.format(
+                    shuffled_story=shuffled_story, last_person=last_person)
             else:
                 prompt = 'Language not supported.'
                 raise Exception('Unsupported language specified. '
@@ -182,46 +185,47 @@ class NeedleBenchATCDataset(BaseDataset):
 
 
 def clean_atc_answer(text: str) -> str:
-    """Clean answer format specifically for QwQ-32B-Preview model
-    
+    """Clean answer format specifically for QwQ-32B-Preview model.
+
     Args:
         text: Raw prediction text
-        
+
     Returns:
         Standardized name format after cleaning
     """
-    if not text or text == "None":
-        return "None"
-    
+    if not text or text == 'None':
+        return 'None'
+
     # Remove LaTeX commands but keep content
     text = re.sub(r'\\text\{([^}]+)\}', r'\1', text)
     text = re.sub(r'\\boxed\{([^}]+)\}', r'\1', text)
     text = re.sub(r'\\[\[\]]', '', text)
-    
+
     # Remove extra backslashes
     text = text.replace('\\\\', '').replace('\\', '')
-    
+
     # Handle extra spaces
     text = re.sub(r'\s+', ' ', text).strip()
-    
+
     # Remove quotes
     text = text.replace('"', '').replace("'", '')
     # Remove tildes (波浪符号)
     text = text.replace('~', ' ')
-        
+
     return text
+
 
 @TEXT_POSTPROCESSORS.register_module('needlebench_atc_postprocess_v2')
 def needlebench_atc_postprocess_v2(text: str) -> str:
 
     cand_ans = extract_boxed_answer(text, strip_double_curly_brace=True)
-    
+
     if cand_ans:
         return clean_atc_answer(cand_ans)
-    return "None"
+    return 'None'
 
 
-@ICL_EVALUATORS.register_module("needlebench_atc_evaluator")
+@ICL_EVALUATORS.register_module('needlebench_atc_evaluator')
 class NeedleBenchATCEvaluator(BaseEvaluator):
 
     def score(self, predictions, gold):
@@ -230,12 +234,12 @@ class NeedleBenchATCEvaluator(BaseEvaluator):
 
         correct_count = 0
         details = []
-        
+
         for prediction, reference in zip(predictions, gold):
             reference_name = reference
             if prediction.strip() == reference_name.strip():
                 correct_count += 1
-            
+
             detail = {
                 'pred': prediction,
                 'answer': reference_name,
@@ -243,6 +247,7 @@ class NeedleBenchATCEvaluator(BaseEvaluator):
             }
             details.append(detail)
 
-        accuracy = (correct_count / len(predictions)) * 100 if predictions else 0
+        accuracy = (correct_count /
+                    len(predictions)) * 100 if predictions else 0
         result = {'score': accuracy, 'details': details}
         return result

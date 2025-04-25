@@ -4,14 +4,16 @@ import json
 import os
 import random
 
-from datasets import Dataset
 import numpy as np
+from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
-from .atc import relationship_terms_zh_CN, relationship_templates_zh_CN, relationship_terms_en, relationship_templates_en
+from .atc import (relationship_templates_en, relationship_templates_zh_CN,
+                  relationship_terms_en, relationship_terms_zh_CN)
+
 
 def get_number(options):
     result_string = ''
@@ -173,10 +175,13 @@ Example 3: If Xiao Ming is Zhang Hong's great-granddaughter, Zhang Hong's grandm
                 )
                 names.extend(additional_names)
 
-            num_samples = 3  
+            num_samples = 3
             if len(names) > 1:
-                indices = np.linspace(1, len(names) - 1, num_samples, dtype=int)  # Generate evenly spaced indices
-                sampled_names = [names[i] for i in indices]  # Select corresponding elements
+                indices = np.linspace(
+                    1, len(names) - 1, num_samples,
+                    dtype=int)  # Generate evenly spaced indices
+                sampled_names = [names[i] for i in indices
+                                 ]  # Select corresponding elements
                 entry['options'] = names[:1] + sampled_names
             else:
                 entry['options'] = names  # Return directly if only one element

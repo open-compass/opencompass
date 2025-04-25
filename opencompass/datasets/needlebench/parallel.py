@@ -158,8 +158,9 @@ class NeedleBenchParallelDataset(BaseDataset):
 
 '''
                 else:
-                    raise ValueError(f'Unsupported quesiton_position {quesiton_position}. '
-                                     'Position must be "End" or "Start".')
+                    raise ValueError(
+                        f'Unsupported quesiton_position {quesiton_position}. '
+                        'Position must be "End" or "Start".')
             elif language == 'English':
                 if quesiton_position == 'End':
                     prompt = f'''This is a test of long-text capability. You need to first read the long document below, and then answer the final questions one by one based on the information in the document.
@@ -183,8 +184,9 @@ The content of the long document is as follows
 
 '''
                 else:
-                    raise ValueError(f'Unsupported quesiton_position {quesiton_position}. '
-                                     'Position must be "End" or "Start".')
+                    raise ValueError(
+                        f'Unsupported quesiton_position {quesiton_position}. '
+                        'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
 
@@ -269,6 +271,7 @@ The content of the long document is as follows
 
 
 class NeedleBenchParallelEvaluator(BaseEvaluator):
+
     def score(self, predictions, gold):
         if len(predictions) != len(gold):
             return {'error': 'predictions and gold have different lengths'}

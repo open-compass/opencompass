@@ -4,20 +4,24 @@ import os
 import random
 import re
 from enum import Enum
+
 from datasets import Dataset
 
 from opencompass.datasets.base import BaseDataset
-from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET, TEXT_POSTPROCESSORS
-from opencompass.datasets.needlebench.atc_elder_only import clean_atc_answer, needlebench_atc_postprocess_v2, NeedleBenchATCEvaluator
+from opencompass.datasets.needlebench.atc_elder_only import (
+    NeedleBenchATCEvaluator, clean_atc_answer, needlebench_atc_postprocess_v2)
+from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
+                                  TEXT_POSTPROCESSORS)
 from opencompass.utils import get_data_path
 
 
 # 定义问题类型枚举
 class QuestionType(Enum):
-    ELDEST_ANCESTOR = 0       # 最年长祖先
-    NTH_ANCESTOR = 1          # N级祖先
-    NTH_DESCENDANT = 2        # N级子节点
-    RELATIONSHIP_DISTANCE = 3 # 关系距离
+    ELDEST_ANCESTOR = 0  # 最年长祖先
+    NTH_ANCESTOR = 1  # N级祖先
+    NTH_DESCENDANT = 2  # N级子节点
+    RELATIONSHIP_DISTANCE = 3  # 关系距离
+
 
 # 定义关系术语的代数映射（一代关系还是两代关系）
 relationship_generation_map_zh = {
@@ -92,7 +96,7 @@ relationship_templates_en = [
      "but also {B}'s guardian."),
     ('For {B}, {A} is not just a {relationship}, '
      'but also a friend.'),
-    "For {B}, {A} is more than just a {relationship}; {A} is a lifelong mentor of {B}.",
+    'For {B}, {A} is more than just a {relationship}; {A} is a lifelong mentor of {B}.',
 ]
 
 # Eldest ancestor problem template
@@ -249,23 +253,24 @@ Now, the scrambled family relationships are provided below:
 Given the scrambled family relationships described above, what is the relationship distance between '{person_a}' and '{person_b}'?
 """
 
+
 @LOAD_DATASET.register_module()
 class NeedleBenchATCDataset(BaseDataset):
 
     @staticmethod
     def load(
-        path,
-        file_name: str,
-        num_needles: int,
-        language: str,
-        repeats: int,
-        # This parameter cannot be passed through mmengine because it is blocked as lazy
-        question_types: list[QuestionType] = [
-            QuestionType.ELDEST_ANCESTOR,
-            QuestionType.NTH_ANCESTOR,
-            QuestionType.NTH_DESCENDANT,
-            QuestionType.RELATIONSHIP_DISTANCE,
-        ],  # Support specifying a list of question types
+            path,
+            file_name: str,
+            num_needles: int,
+            language: str,
+            repeats: int,
+            # This parameter cannot be passed through mmengine because it is blocked as lazy
+            question_types: list[QuestionType] = [
+                QuestionType.ELDEST_ANCESTOR,
+                QuestionType.NTH_ANCESTOR,
+                QuestionType.NTH_DESCENDANT,
+                QuestionType.RELATIONSHIP_DISTANCE,
+            ],  # Support specifying a list of question types
     ):
         data = {'prompt': [], 'answer': [], 'question_type': []}
         path = get_data_path(path)
@@ -282,7 +287,7 @@ class NeedleBenchATCDataset(BaseDataset):
         # Ensure question_types is not empty
         if not question_types:
             raise ValueError('question_types cannot be empty')
-        
+
         for question_type in question_types:
             # Generate the specified number of examples for each question type
             for i in range(repeats):
@@ -290,11 +295,11 @@ class NeedleBenchATCDataset(BaseDataset):
                 # Use the enum value of the question type multiplied by 10000 as the base to ensure non-overlapping seed ranges
                 seed = (i + 1) + (10000 * question_type.value)
                 random.seed(seed)
-                
+
                 # Randomly select the specified number of names from all names
                 # The number of names is num_needles + 1
-                names = random.sample(all_names, num_needles+1)
-                
+                names = random.sample(all_names, num_needles + 1)
+
                 # Select the corresponding relationship terms and templates according to the language
                 if language == 'Chinese':
                     relationship_terms = relationship_terms_zh_CN
@@ -305,10 +310,13 @@ class NeedleBenchATCDataset(BaseDataset):
                     relationship_templates = relationship_templates_en
                     relationship_map = relationship_generation_map_en
                 else:
-                    raise ValueError('Unsupported language specified. '
-                                    'Please choose either "Chinese" or "English".')
+                    raise ValueError(
+                        'Unsupported language specified. '
+                        'Please choose either "Chinese" or "English".')
 
-                def generate_chain_family_story(names, templates, relationship_terms, relationship_map):
+                def generate_chain_family_story(names, templates,
+                                                relationship_terms,
+                                                relationship_map):
                     story = ''
                     relationships = []
                     total_generations = 0  # Track the total generational difference
@@ -317,25 +325,30 @@ class NeedleBenchATCDataset(BaseDataset):
                         template = random.choice(templates)
                         relation_term = random.choice(relationship_terms)
                         relation = template.format(A=names[i],
-                                                  B=names[i + 1],
-                                                  relationship=relation_term)
+                                                   B=names[i + 1],
+                                                   relationship=relation_term)
                         story += f'{relation}*'
 
                         # Get the generation difference for this relationship
-                        gen_diff = relationship_map.get(relation_term, 1)  # Default to 1 generation
+                        gen_diff = relationship_map.get(
+                            relation_term, 1)  # Default to 1 generation
                         total_generations += gen_diff
 
                         # Record relationship information for later use
-                        relationships.append((names[i], names[i + 1], relation_term, gen_diff))
+                        relationships.append(
+                            (names[i], names[i + 1], relation_term, gen_diff))
 
                     return story, relationships, total_generations
 
                 chain_story, relationships, total_generations = generate_chain_family_story(
-                    names, relationship_templates, relationship_terms, relationship_map)
+                    names, relationship_templates, relationship_terms,
+                    relationship_map)
 
                 # Split the chain_story into a list of fragments
                 family_story_fragments = chain_story.split('*')
-                family_story_fragments = [f for f in family_story_fragments if f]
+                family_story_fragments = [
+                    f for f in family_story_fragments if f
+                ]
 
                 # Shuffle the list of fragments
                 random.shuffle(family_story_fragments)
@@ -348,15 +361,19 @@ class NeedleBenchATCDataset(BaseDataset):
                     last_person = names[-1]
                     if language == 'Chinese':
                         prompt = shuffled_story_with_prompt_zh_CN.format(
-                            shuffled_story=shuffled_story, last_person=last_person)
+                            shuffled_story=shuffled_story,
+                            last_person=last_person)
                     else:
                         prompt = shuffled_story_with_prompt_en.format(
-                            shuffled_story=shuffled_story, last_person=last_person)
-                    answer = names[0]  # The first person is the eldest ancestor
+                            shuffled_story=shuffled_story,
+                            last_person=last_person)
+                    answer = names[
+                        0]  # The first person is the eldest ancestor
 
                 elif question_type == QuestionType.NTH_ANCESTOR:
                     # Nth ancestor question - trace from the youngest person to the oldest
-                    person = names[-1]  # The youngest person (end of the chain)
+                    person = names[
+                        -1]  # The youngest person (end of the chain)
                     n = total_generations  # Use the calculated total generational difference
                     if language == 'Chinese':
                         prompt = nth_ancestor_prompt_zh_CN.format(
@@ -364,7 +381,8 @@ class NeedleBenchATCDataset(BaseDataset):
                     else:
                         prompt = nth_ancestor_prompt_en.format(
                             shuffled_story=shuffled_story, person=person, n=n)
-                    answer = names[0]  # The oldest person (start of the chain) is the nth ancestor
+                    answer = names[
+                        0]  # The oldest person (start of the chain) is the nth ancestor
 
                 elif question_type == QuestionType.NTH_DESCENDANT:
                     # Nth descendant question - trace from the oldest person to the youngest
@@ -376,7 +394,8 @@ class NeedleBenchATCDataset(BaseDataset):
                     else:
                         prompt = nth_descendant_prompt_en.format(
                             shuffled_story=shuffled_story, person=person, n=n)
-                    answer = names[-1]  # The youngest person (end of the chain) is the nth descendant
+                    answer = names[
+                        -1]  # The youngest person (end of the chain) is the nth descendant
 
                 elif question_type == QuestionType.RELATIONSHIP_DISTANCE:
                     # Relationship distance question - calculate the relationship distance between the two ends of the chain
@@ -384,10 +403,14 @@ class NeedleBenchATCDataset(BaseDataset):
                     person_b = names[-1]  # The youngest person
                     if language == 'Chinese':
                         prompt = relationship_distance_prompt_zh_CN.format(
-                            shuffled_story=shuffled_story, person_a=person_a, person_b=person_b)
+                            shuffled_story=shuffled_story,
+                            person_a=person_a,
+                            person_b=person_b)
                     else:
                         prompt = relationship_distance_prompt_en.format(
-                            shuffled_story=shuffled_story, person_a=person_a, person_b=person_b)
+                            shuffled_story=shuffled_story,
+                            person_a=person_a,
+                            person_b=person_b)
                     # Use the calculated total generations as the relationship distance
                     answer = str(total_generations)
 
@@ -396,11 +419,14 @@ class NeedleBenchATCDataset(BaseDataset):
                     last_person = names[-1]
                     if language == 'Chinese':
                         prompt = shuffled_story_with_prompt_zh_CN.format(
-                            shuffled_story=shuffled_story, last_person=last_person)
+                            shuffled_story=shuffled_story,
+                            last_person=last_person)
                     else:
                         prompt = shuffled_story_with_prompt_en.format(
-                            shuffled_story=shuffled_story, last_person=last_person)
-                    answer = names[0]  # The first person is the eldest ancestor
+                            shuffled_story=shuffled_story,
+                            last_person=last_person)
+                    answer = names[
+                        0]  # The first person is the eldest ancestor
 
                 data['prompt'].append(prompt)
                 data['answer'].append(answer)

@@ -7,8 +7,12 @@ from datasets import Dataset
 from huggingface_hub import hf_hub_download
 
 from opencompass.datasets.base import BaseDataset
+from opencompass.datasets.needlebench.atc import (relationship_templates_en,
+                                                  relationship_templates_zh_CN,
+                                                  relationship_terms_en,
+                                                  relationship_terms_zh_CN)
 from opencompass.registry import LOAD_DATASET
-from opencompass.datasets.needlebench.atc import relationship_templates_zh_CN, relationship_terms_zh_CN, relationship_templates_en, relationship_terms_en
+
 
 def get_random_needles(counter, file_path, num_needles, language):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -33,18 +37,23 @@ def get_random_needles(counter, file_path, num_needles, language):
         for i in range(len(names) - 1):
             template = random.choice(templates)
             relation_term = random.choice(relationship_terms)
-            relation = template.format(A=names[i], B=names[i + 1], relationship=relation_term)
+            relation = template.format(A=names[i],
+                                       B=names[i + 1],
+                                       relationship=relation_term)
             story += f'{relation}*'
         return story
 
-    chain_story = generate_chain_family_story(names, relationship_templates, relationship_terms)
-    
+    chain_story = generate_chain_family_story(names, relationship_templates,
+                                              relationship_terms)
+
     # Splitting the chain_story into a list of fragments
     family_story_fragments = chain_story.split('*')
 
     # Removing the empty string from the list
-    family_story_fragments = [fragment for fragment in family_story_fragments if fragment]
-    
+    family_story_fragments = [
+        fragment for fragment in family_story_fragments if fragment
+    ]
+
     # Shuffling the list of fragments
     random.shuffle(family_story_fragments)
 
@@ -55,7 +64,7 @@ def get_random_needles(counter, file_path, num_needles, language):
         retrieval_question = f"在上面提供的文本中，'{last_person}'的能够向上追溯到的最年长的亲人是谁？"
     elif language == 'English':
         retrieval_question = f"Given the context described above, who is the eldest relative that '{last_person}' can trace back to in the context?"
-    
+
     # Returning the story, answer, and retrieval question
     return {
         'needles': family_story_fragments,
@@ -63,7 +72,6 @@ def get_random_needles(counter, file_path, num_needles, language):
         'retrieval_question': retrieval_question,
         'last_person': last_person
     }
-
 
 
 @LOAD_DATASET.register_module()
@@ -216,8 +224,9 @@ The content of the long document is as follows
 
 '''
                 else:
-                    raise ValueError(f'Unsupported quesiton_position {quesiton_position}. '
-                                     'Position must be "End" or "Start".')
+                    raise ValueError(
+                        f'Unsupported quesiton_position {quesiton_position}. '
+                        'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
 
@@ -225,7 +234,7 @@ The content of the long document is as follows
 
         repo_id = 'opencompass/NeedleBench'
         file_names = [
-            'PaulGrahamEssays.jsonl','names.json', 'zh_finance.jsonl',
+            'PaulGrahamEssays.jsonl', 'names.json', 'zh_finance.jsonl',
             'zh_game.jsonl', 'zh_general.jsonl', 'zh_government.jsonl',
             'zh_movie.jsonl', 'zh_tech.jsonl'
         ]
@@ -250,7 +259,7 @@ The content of the long document is as follows
                 random.seed(counter)
                 random.shuffle(lines)
                 random_needle_data = get_random_needles(
-                    counter, needle_file_path, num_needles+1, language)
+                    counter, needle_file_path, num_needles + 1, language)
                 last_person = random_needle_data['last_person']
                 needles = [
                     '\n' + needle + '\n'
@@ -278,7 +287,8 @@ The content of the long document is as follows
                     needles)
 
                 processed_prompt = _generate_prompt(processed_text,
-                                                    retrieval_question, last_person)
+                                                    retrieval_question,
+                                                    last_person)
 
                 data['prompt'].append(processed_prompt)
                 data['answer'].append(keyword)
