@@ -1,4 +1,4 @@
-# noqa: E501
+# flake8: noqa: E501
 import json
 import os
 import random
