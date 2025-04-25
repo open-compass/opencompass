@@ -230,7 +230,7 @@ def save_results_to_plots(txt_results_save_path):
             folder_path = os.path.join(plot_path, dataset_mapping_dict[dataset_abbr])
             ensure_directory(folder_path)
 
-            save_path = os.path.join(folder_path, f'{model_name}.pdf')
+            save_path = os.path.join(folder_path, f'{model_name}.png')
 
             df = create_model_dataframe(parsed_data, model_name, dataset_abbr, parallel=parallel_flag)
 
@@ -239,25 +239,25 @@ def save_results_to_plots(txt_results_save_path):
             model_datasets_scores[dataset_abbr] = '{:.02f}'.format(score)
 
         overall_dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + parallel_dataset_abbrs
-        overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.pdf')
+        overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.png')
         merged_df = merge_dataframes(model_name, overall_dataset_abbrs, parsed_data)
         averaged_df = calculate_elementwise_average(model_name, merged_df)
         overall_score = visualize(averaged_df, overall_score_pic_path, model_name, 'Overall Score')
 
         # Single-Retrieval
-        single_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_single_retrieval_overall.pdf')
+        single_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_single_retrieval_overall.png')
         single_retrieval_merged_df = merge_dataframes(model_name, origin_dataset_abbrs, parsed_data)
         single_retrieval_averaged_df = calculate_elementwise_average(model_name, single_retrieval_merged_df)
         single_retrieval_overall_score = visualize(single_retrieval_averaged_df, single_retrieval_score_pic_path, model_name, 'Single-Retrieval Overall Score')
 
         # Multi-Retrieval
-        multi_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_retrieval_overall.pdf')
+        multi_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_retrieval_overall.png')
         multi_retrieval_merged_df = merge_dataframes(model_name, parallel_dataset_abbrs, parsed_data)
         multi_retrieval_averaged_df = calculate_elementwise_average(model_name, multi_retrieval_merged_df)
         multi_retrieval_overall_score = visualize(multi_retrieval_averaged_df, multi_retrieval_score_pic_path, model_name, 'Multi-Retrieval Overall Score')
 
         # Multi-Reasoning
-        multi_reasoning_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_reasoning_overall.pdf')
+        multi_reasoning_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_reasoning_overall.png')
         multi_reasoning_merged_df = merge_dataframes(model_name, multi_dataset_abbrs, parsed_data)
         multi_reasoning_averaged_df = calculate_elementwise_average(model_name, multi_reasoning_merged_df)
         multi_reasoning_overall_score = visualize(multi_reasoning_averaged_df, multi_reasoning_score_pic_path, model_name, 'Multi-Reasoning Overall Score')
@@ -366,7 +366,7 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
         directory_path, original_filename = os.path.split(save_path)
 
         filename_suffix = (title_name+'_'+dataset_name).replace(' ', '_')
-        new_filename = f'{filename_suffix}.pdf'
+        new_filename = f'{filename_suffix}.png'
 
         new_save_path = os.path.join(directory_path, new_filename)
 
