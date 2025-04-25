@@ -70,9 +70,8 @@ class NeedleBenchParallelDataset(BaseDataset):
         file_list: list[str],
         num_repeats_per_file: int,
         length_buffer: int,
-        guide: bool,
         language: str,
-        position: str = 'End',
+        quesiton_position: str = 'End',
     ):
         data = {'prompt': [], 'answer': []}
         tokenizer = tiktoken.encoding_for_model(tokenizer_model)
@@ -135,65 +134,56 @@ class NeedleBenchParallelDataset(BaseDataset):
         def _decode_tokens(tokens):
             return tokenizer.decode(tokens)
 
-        def _modify_retrieval_question(retrieval_question):
-            if language == 'Chinese':
-                parts = retrieval_question.split('请按照')
-                guide_retrieval_question = (parts[0] + '在回答之前，请思考文档中与此问题'
-                                            '最相关的内容是什么。请按照' + parts[1])
-                return guide_retrieval_question
-            elif language == 'English':
-                parts = retrieval_question.split('Please answer in the format')
-                guide_retrieval_question = (
-                    parts[0] + 'Before answering, please consider'
-                    ' what in the document is most relevant to this question.'
-                    ' Please answer in the format' + parts[1])
-                return guide_retrieval_question
-            else:
-                raise ValueError(f"Language '{language}' is not supported.")
-
         def _generate_prompt(context, retrieval_question):
-            if guide:
-                retrieval_question = _modify_retrieval_question(
-                    retrieval_question)
-
             if language == 'Chinese':
-                if position == 'End':
-                    prompt = ('你是一个善于回答用户问题的智能AI助手\n'
-                              '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
-                              '，或重复你的回答\n请先仔细阅读下面的文档再依次回答'
-                              f'最后提出的问题\n用户现在给你的文档是{context}\n\n'
-                              f'现在请问：{retrieval_question}\n')
-                elif position == 'Start':
-                    prompt = ('你是一个善于回答用户问题的智能AI助手\n'
-                              '请保持你的回答简洁清楚。不要说和下面文档中的无关的话'
-                              '，或重复你的回答\n请先仔细阅读下面的文档再依次回答'
-                              f'最后提出的问题\n现在请问：{retrieval_question}\n\n'
-                              f'用户现在给你的文档是{context}\n')
-                else:
-                    raise ValueError(f'Unsupported position {position}. '
-                                     'Position must be "End" or "Start".')
+                if quesiton_position == 'End':
+                    prompt = f'''这是一个长文本能力的测试，你需要首先阅读下面的长文档，然后根据文档中的信息，依次回答最后的问题。
+长文档的内容如下
 
-            elif language == 'English':
-                if position == 'End':
-                    prompt = (
-                        'You are an intelligent AI assistant skilled in '
-                        'answering user questions.\n'
-                        'Please keep your answers concise and clear. Do not'
-                        ' talk about irrelevant topics or repeat your '
-                        'answers.\n'
-                        f'The document given to you by the user is {context}'
-                        f'\n\nNow, the questions are: {retrieval_question}\n')
-                elif position == 'Start':
-                    prompt = (
-                        'You are an intelligent AI assistant skilled in '
-                        'answering user questions.\n'
-                        'Please keep your answers concise and clear. Do not'
-                        ' talk about irrelevant topics or repeat your '
-                        'answers.\n'
-                        f'\nNow, the questions are: {retrieval_question}\n\n'
-                        f'The document given to you by the user is {context}')
+<文档>
+{context}
+</文档>
+
+根据文档中的信息，现在请问：{retrieval_question}
+'''
+                elif quesiton_position == 'Start':
+                    prompt = f'''这是一个长文本能力的测试，你需要首先阅读下面的问题，然后根据最后长文档中的信息，依次回答下面的问题。
+现在请问：{retrieval_question}
+
+长文档内容的如下
+
+<文档>
+{context}
+</文档>
+
+'''
                 else:
-                    raise ValueError(f'Unsupported position {position}. '
+                    raise ValueError(f'Unsupported quesiton_position {quesiton_position}. '
+                                     'Position must be "End" or "Start".')
+            elif language == 'English':
+                if quesiton_position == 'End':
+                    prompt = f'''This is a test of long-text capability. You need to first read the long document below, and then answer the final questions one by one based on the information in the document.
+The content of the long document is as follows
+
+<Document>
+{context}
+</Document>
+
+Based on the information in the document, now please answer: {retrieval_question}
+'''
+                elif quesiton_position == 'Start':
+                    prompt = f'''This is a test of long-text capability. You need to first read the questions below, and then answer them one by one based on the information in the long document that follows.
+Now please answer: {retrieval_question}
+
+The content of the long document is as follows
+
+<Document>
+{context}
+</Document>
+
+'''
+                else:
+                    raise ValueError(f'Unsupported quesiton_position {quesiton_position}. '
                                      'Position must be "End" or "Start".')
             else:
                 raise ValueError(f"Language '{language}' is not supported.")
@@ -279,26 +269,6 @@ class NeedleBenchParallelDataset(BaseDataset):
 
 
 class NeedleBenchParallelEvaluator(BaseEvaluator):
-
-    def levenshtein_distance(self, s1, s2):
-        if len(s1) < len(s2):
-            return self.levenshtein_distance(s2, s1)
-
-        if len(s2) == 0:
-            return len(s1)
-
-        previous_row = range(len(s2) + 1)
-        for i, c1 in enumerate(s1):
-            current_row = [i + 1]
-            for j, c2 in enumerate(s2):
-                insertions = previous_row[j + 1] + 1
-                deletions = current_row[j] + 1
-                substitutions = previous_row[j] + (c1 != c2)
-                current_row.append(min(insertions, deletions, substitutions))
-            previous_row = current_row
-
-        return previous_row[-1]
-
     def score(self, predictions, gold):
         if len(predictions) != len(gold):
             return {'error': 'predictions and gold have different lengths'}

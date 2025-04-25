@@ -53,11 +53,8 @@ path = 'opencompass/needlebench'
 file_name = 'names.json'
 repeats = 10
 
-# Use Zero-Shot or not
-with_few_shot = True
-
-# Max for this dataset is 4, should be set with `with_few_shot`
-few_shot_samples = 4
+# Max for this dataset is 4, if you don't want to use few shot, set few_shot_samples to 0
+few_shot_samples = 0
 
 # Generate reasoning path or not, only for single choice
 with_reasoning = True
@@ -70,11 +67,10 @@ single_choice_prompts = needlebench_prompts['single_choice_prompts']
 
 # Set few shot prompt number
 for _name in list(single_choice_prompts.keys()):
-    if with_few_shot:
-        assert few_shot_samples > 0 and few_shot_samples <= 4
-        single_choice_prompts[_name] = single_choice_prompts[_name][
-            -few_shot_samples * 2 - 1 :
-        ]
+    assert few_shot_samples >= 0 and few_shot_samples <= 4
+    single_choice_prompts[_name] = single_choice_prompts[_name][
+        -few_shot_samples * 2 - 1 :
+    ]
 
 # ----------------------- Dataset Settings ----------------------- #
 

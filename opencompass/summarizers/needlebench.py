@@ -61,15 +61,28 @@ model_name_mapping = {
     'qwen1.5-4b-chat-hf': 'Qwen-1.5-4B',
     'qwen1.5-14b-chat-hf': 'Qwen-1.5-14B',
     'qwen1.5-72b-chat-hf': 'Qwen-1.5-72B',
+    'qwen1.5-1.8b-chat-vllm': 'Qwen-1.5-1.8B',
     'qwen1.5-14b-chat-vllm': 'Qwen-1.5-14B-vLLM',
     'qwen1.5-72b-chat-vllm': 'Qwen-1.5-72B-vLLM',
     'glm4_notools': 'GLM-4',
     'claude-3-opus': 'Claude-3-Opus',
     'glm-4-9b-chat-1m-vllm': 'GLM4-9B-Chat-1M',
     'internlm2_5-7b-chat-1m-turbomind': 'InternLM2.5-7B-Chat-1M',
+    'internlm3-8b-instruct-turbomind': 'InternLM3-8B-Instruct',
+    'llama-3.1-8b-instruct-vllm': 'LLaMA-3.1-8B',
+    'qwen2.5-1.5b-instruct-vllm': 'Qwen-2.5-1.5B',
+    'qwen2.5-7b-instruct-vllm': 'Qwen-2.5-7B',
+    'qwen2.5-14b-instruct-vllm': 'Qwen-2.5-14B',
+    'qwen2.5-32b-instruct-vllm': 'Qwen-2.5-32B',
+    'qwen2_5-72b-instruct-vllm': 'Qwen-2.5-72B',
+    'gemma-3-4b-it-vllm': 'Gemma-3-4B',
+    'gemma-3-12b-it-vllm': 'Gemma-3-12B',
+    'gemma-3-27b-it-vllm': 'Gemma-3-27B',
+    'glm-4-9b-chat-vllm': 'GLM4-9B-Chat',
+    'llama-3.1-8b-instruct-vllm': 'LLaMA-3.1-8B',
+    'llama-3.1-70b-instruct-vllm': 'LLaMA-3.1-70B',
     # Add more mappings as necessary
 }
-
 dataset_mapping_dict = {}
 
 needle_counts = ['2', '3', '4', '5']
@@ -103,10 +116,10 @@ def calculate_elementwise_average(model_name, merged_df):
     multi_columns = [col for col in score_columns if 'needle' in col]
 
     if origin_columns and parallel_columns and multi_columns:
-        origin_avg = merged_df[origin_columns].mean(axis=1) * 0.4
-        parallel_avg = merged_df[parallel_columns].mean(axis=1) * 0.3
-        multi_avg = merged_df[multi_columns].mean(axis=1) * 0.3
-        merged_df[model_name] = origin_avg + parallel_avg + multi_avg
+        origin_avg = merged_df[origin_columns].mean(axis=1)
+        parallel_avg = merged_df[parallel_columns].mean(axis=1)
+        multi_avg = merged_df[multi_columns].mean(axis=1)
+        merged_df[model_name] = (origin_avg + parallel_avg + multi_avg) / 3
     else:
         relevant_columns = origin_columns or parallel_columns or multi_columns
         if relevant_columns:
@@ -217,7 +230,7 @@ def save_results_to_plots(txt_results_save_path):
             folder_path = os.path.join(plot_path, dataset_mapping_dict[dataset_abbr])
             ensure_directory(folder_path)
 
-            save_path = os.path.join(folder_path, f'{model_name}.png')
+            save_path = os.path.join(folder_path, f'{model_name}.pdf')
 
             df = create_model_dataframe(parsed_data, model_name, dataset_abbr, parallel=parallel_flag)
 
@@ -226,25 +239,25 @@ def save_results_to_plots(txt_results_save_path):
             model_datasets_scores[dataset_abbr] = '{:.02f}'.format(score)
 
         overall_dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + parallel_dataset_abbrs
-        overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.png')
+        overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.pdf')
         merged_df = merge_dataframes(model_name, overall_dataset_abbrs, parsed_data)
         averaged_df = calculate_elementwise_average(model_name, merged_df)
         overall_score = visualize(averaged_df, overall_score_pic_path, model_name, 'Overall Score')
 
         # Single-Retrieval
-        single_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_single_retrieval_overall.png')
+        single_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_single_retrieval_overall.pdf')
         single_retrieval_merged_df = merge_dataframes(model_name, origin_dataset_abbrs, parsed_data)
         single_retrieval_averaged_df = calculate_elementwise_average(model_name, single_retrieval_merged_df)
         single_retrieval_overall_score = visualize(single_retrieval_averaged_df, single_retrieval_score_pic_path, model_name, 'Single-Retrieval Overall Score')
 
         # Multi-Retrieval
-        multi_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_retrieval_overall.png')
+        multi_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_retrieval_overall.pdf')
         multi_retrieval_merged_df = merge_dataframes(model_name, parallel_dataset_abbrs, parsed_data)
         multi_retrieval_averaged_df = calculate_elementwise_average(model_name, multi_retrieval_merged_df)
         multi_retrieval_overall_score = visualize(multi_retrieval_averaged_df, multi_retrieval_score_pic_path, model_name, 'Multi-Retrieval Overall Score')
 
         # Multi-Reasoning
-        multi_reasoning_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_reasoning_overall.png')
+        multi_reasoning_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_reasoning_overall.pdf')
         multi_reasoning_merged_df = merge_dataframes(model_name, multi_dataset_abbrs, parsed_data)
         multi_reasoning_averaged_df = calculate_elementwise_average(model_name, multi_reasoning_merged_df)
         multi_reasoning_overall_score = visualize(multi_reasoning_averaged_df, multi_reasoning_score_pic_path, model_name, 'Multi-Reasoning Overall Score')
@@ -279,7 +292,7 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
 
         mean_scores = pivot_table.mean().values
         overall_score = mean_scores.mean()
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(7.5, 4.5))
         ax = plt.gca()
         cmap = LinearSegmentedColormap.from_list(
             'custom_cmap', ['#F0496E', '#EBB839', '#0CD79F'])
@@ -353,11 +366,11 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
         directory_path, original_filename = os.path.split(save_path)
 
         filename_suffix = (title_name+'_'+dataset_name).replace(' ', '_')
-        new_filename = f'{filename_suffix}.png'
+        new_filename = f'{filename_suffix}.pdf'
 
         new_save_path = os.path.join(directory_path, new_filename)
 
-        plt.savefig(new_save_path, format='png', bbox_inches='tight', pad_inches=0)
+        plt.savefig(new_save_path, format='pdf', bbox_inches='tight', pad_inches=0)
         print(f'Saved: {new_save_path}')
 
         plt.close()
