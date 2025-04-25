@@ -110,6 +110,12 @@
     paper: ''
     configpath: opencompass/configs/datasets/mastermath2024v1/mastermath2024v1_gen.py
     configpath_llmjudge: ''
+- matbench:
+    name: matbench
+    category: Science / Material
+    paper: 'https://www.nature.com/articles/s41524-020-00406-3'
+    configpath: opencompass/configs/datasets/matbench/matbench_gen_f71840.py
+    configpath_llmjudge: ''
 - medbench:
     name: MedBench
     category: Knowledge / Medicine
