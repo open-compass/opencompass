@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import HLEDataset
+from opencompass.datasets import HLEDataset_Bio_Med
 
 # ----------------------------- Detailed Config -----------------------------
 
@@ -68,7 +68,7 @@ math_eval_cfg = dict(
             ]),
         ),
         dataset_cfg=dict(
-            type=HLEDataset,
+            type=HLEDataset_Bio_Med,
             path='cais/hle',
             reader_cfg=math_reader_cfg,
         ),
@@ -81,7 +81,7 @@ math_eval_cfg = dict(
 
 hle_datasets = [
     dict(
-        type=HLEDataset,
+        type=HLEDataset_Bio_Med,
         abbr='hle_llmjudge',
         path='cais/hle',
         reader_cfg=math_reader_cfg,
