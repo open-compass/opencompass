@@ -47,7 +47,6 @@ for config in language_configs:
             'file_list': config['file_list'],
             'num_repeats_per_file': 25,
             'length_buffer': config['length_buffer'],
-            'guide': True,
             'language': config['language'],
             'reader_cfg': needlebench_reader_cfg,
             'infer_cfg': needlebench_infer_cfg,

@@ -73,7 +73,6 @@ for config in language_configs:
                 'file_list': config['file_list'],
                 'num_repeats_per_file': 10,
                 'length_buffer': config['length_buffer'],
-                'guide': True,
                 'language': config['language'],
                 'needle_file_name': needle_file_name,
                 'reader_cfg': needlebench_reader_cfg,
