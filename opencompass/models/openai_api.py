@@ -678,7 +678,9 @@ class OpenAISDK(OpenAI):
                         and responses.choices[0].message.reasoning_content):
                     if self.verbose:
                         self.logger.info(
-                            'Concat Reasoning Content and tags to content'
+                            'Follow'
+                            'vllm/reasoning/deepseek_r1_reasoning_parser'
+                            'to parse the reasoning content and tags'
                             'Reasoning Content: %s, \n'
                             'Tags: %s, \n'
                             'Content: %s',
