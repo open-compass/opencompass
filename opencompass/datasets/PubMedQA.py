@@ -1,6 +1,4 @@
-import json
-
-from datasets import Dataset, DatasetDict
+from datasets import Dataset, DatasetDict, load_dataset
 
 from opencompass.registry import LOAD_DATASET
 
@@ -11,18 +9,12 @@ from .base import BaseDataset
 class PubMedQADataset(BaseDataset):
 
     @staticmethod
-    def load_single(file_path):
+    def load_single():
         dataset = []
-        with open(file_path, 'r') as file:
-            data_lines = json.load(file)
-        num = 0
-        for name in data_lines:
-            data = data_lines[name]
-            num += 1
-            # if num > 10:
-            #     break
-            data['question'] = (f"CONTEXTS: {data['CONTEXTS']}\n"
-                                f"QUESTION: {data['QUESTION']}")
+        ds = load_dataset('qiaojin/PubMedQA', 'pqa_labeled')
+        for data in ds['train']:
+            data['question'] = (f"CONTEXTS: {data['context']}\n"
+                                f"QUESTION: {data['question']}")
             choices = 'A. yes\nB. no\nC. maybe'
             data['choices'] = choices
             if data['final_decision'] == 'yes':
@@ -31,7 +23,6 @@ class PubMedQADataset(BaseDataset):
                 data['label'] = 'B. no'
             else:
                 data['label'] = 'C. maybe'
-            # print(data)
 
             dataset.append(data)
 
@@ -40,9 +31,7 @@ class PubMedQADataset(BaseDataset):
     @staticmethod
     def load(path):
         train_dataset = Dataset.from_list([])
-        val_dataset = PubMedQADataset.load_single(
-            '/fs-computility/ai4sData/shared/'
-            'lifescience/benchmark/raw/PubMedQA/ori_pqal.json')
+        val_dataset = PubMedQADataset.load_single()
         dataset = DatasetDict({
             'train': train_dataset,
             'validation': val_dataset

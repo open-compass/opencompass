@@ -12,12 +12,8 @@ class ScienceQADataset(BaseDataset):
     def load_single():
         dataset = []
         ds = load_dataset('derek-thomas/ScienceQA')
-        num = 0
         for data in ds['test']:
-            if data['image'] is None and data['topic'] == 'biology':
-                num += 1
-                # if num > 10:
-                #     break
+            if data['image'] is None:
                 data['label'] = chr(65 + data['answer']
                                     ) + '. ' + data['choices'][data['answer']]
                 choices = ''
