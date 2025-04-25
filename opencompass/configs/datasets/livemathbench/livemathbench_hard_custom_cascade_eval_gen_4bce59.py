@@ -114,6 +114,6 @@ livemathbench_datasets = [
                 ),
             ),
         ),
-        n=32, # repeat 32 times
+        n=1, # repeat n times
     ) for split in splits
 ]

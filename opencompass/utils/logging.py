@@ -2,6 +2,8 @@ import logging
 import os
 
 from mmengine.logging import MMLogger
+from rich.console import Console
+from rich.syntax import Syntax
 
 _nameToLevel = {
     'CRITICAL': logging.CRITICAL,
@@ -79,3 +81,14 @@ class FilterDuplicateMessage(logging.Filter):
             self.seen.add(record.msg)
             return True
         return False
+
+
+def pretty_print_config(cfg):
+    """使用rich库美化配置输出."""
+    console = Console()
+    config_str = cfg.pretty_text
+    syntax = Syntax(config_str,
+                    'python',
+                    theme='solarized-dark',
+                    line_numbers=True)
+    console.print(syntax)

@@ -8,6 +8,8 @@ import numpy as np
 from datasets import Dataset
 from scipy.stats import hypergeom
 
+from opencompass.registry import TEXT_POSTPROCESSORS
+
 
 def compute_pass_at_k(n, c, k):
     if n - c < k:
@@ -39,8 +41,8 @@ def compute_mg_pass_at_k(n, c, k):
 
 class BaseEvaluator:
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, pred_postprocessor=None) -> None:
+        self.pred_postprocessor = pred_postprocessor
 
     @property
     def output_dir(self):
@@ -85,6 +87,14 @@ class BaseEvaluator:
             g_passk_details[metric] = 100.0 * np.mean(
                 [detail[metric] for detail in details])
         return g_passk_details
+
+    def pred_postprocess(self, predictions: List) -> Dict:
+        if self.pred_postprocessor is None:
+            return predictions
+        else:
+            kwargs = self.pred_postprocessor
+            proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+            return [proc(pred, **kwargs) for pred in predictions]
 
     def evaluate(
         self,
