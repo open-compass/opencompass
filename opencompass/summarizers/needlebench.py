@@ -370,7 +370,7 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
 
         new_save_path = os.path.join(directory_path, new_filename)
 
-        plt.savefig(new_save_path, format='pdf', bbox_inches='tight', pad_inches=0)
+        plt.savefig(new_save_path, format='png', bbox_inches='tight', pad_inches=0)
         print(f'Saved: {new_save_path}')
 
         plt.close()
