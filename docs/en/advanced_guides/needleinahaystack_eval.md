@@ -1,4 +1,4 @@
-# Needle In A Haystack (NeedleBench) Evaluation
+# Needle In A Haystack Evaluation
 
 ## Introduction to the Needle In A Haystack Test
 
