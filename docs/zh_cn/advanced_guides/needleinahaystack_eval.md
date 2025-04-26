@@ -90,7 +90,7 @@ pip install vllm
 
 ```python
 from mmengine.config import read_base
-# 我们使用mmengine.config来import其他的配置文件中的变量
+# we use mmengine.config to import other config files
 
 with read_base():
     from .models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
@@ -129,6 +129,8 @@ python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved
 ### 可视化
 
 我们已经在最新的代码中将结果可视化内置到`summarizer`实现中，您在对应的output文件夹的plots目录下可以看到相应的可视化。而不需要自己手动可视化各个深度和长度下的分数。
+
+### 引用
 
 如果使用了该方法，请添加引用:
 
