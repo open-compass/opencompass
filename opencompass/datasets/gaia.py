@@ -1,11 +1,10 @@
 import json
-from os import environ
 import os
+from os import environ
 
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
-from opencompass.utils import get_data_path
 from opencompass.utils.datasets_info import DATASETS_MAPPING
 
 from .base import BaseDataset
@@ -33,7 +32,7 @@ class GAIADataset(BaseDataset):
                         'level': item['Level']
                     })
             except Exception as e:
-                print(f"Error loading local file: {e}")
+                print(f'Error loading local file: {e}')
         else:
             # 从本地读取
             compass_data_cache = os.environ.get('COMPASS_DATA_CACHE')
@@ -49,12 +48,13 @@ class GAIADataset(BaseDataset):
                         'file_name': line['file_name'],
                         'level': line['Level']
                     }
-                    
+
                     # 只有在file_name不为空时设置file_path
                     if line['file_name']:
-                        row_data['file_path'] = f'{local_path}/{line["file_name"]}'
+                        file_name = line['file_name']
+                        row_data['file_path'] = f'{local_path}/{file_name}'
                     else:
                         row_data['file_path'] = ''
-                    
+
                     rows.append(row_data)
         return Dataset.from_list(rows)
