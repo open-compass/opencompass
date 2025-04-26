@@ -61,13 +61,13 @@ python run.py --dataset needlebench_128k --models vllm_qwen2_5_7b_instruct_128k 
 
 ##### 只评估子数据集
 
-如果只想测试原始的大海捞针任务设定，比如可以更换数据集的参数为`needlebench_single_128k`，这对应于4k长度下的单针版本的大海捞针测试：
+如果只想测试原始的大海捞针任务设定，比如可以更换数据集的参数为`needlebench_single_128k`，这对应于128k长度下的单针版本的大海捞针测试：
 
 ```bash
 python run.py --dataset needlebench_single_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_128k/needlebench_zh_datasets`，仅仅进行中文版本的单针4K长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`opencompass/configs/datasets/needlebench/needlebench_128k/needlebench_single_128k.py`中找到可选的子数据集变量，如：
+您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_128k/needlebench_zh_datasets`，仅仅进行中文版本的单针128k长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`opencompass/configs/datasets/needlebench/needlebench_128k/needlebench_single_128k.py`中找到可选的子数据集变量，如：
 
 ```bash
 python run.py --dataset needlebench_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
