@@ -531,27 +531,26 @@ class OpenAI(BaseAPIModel):
 
 class OpenAISDK(OpenAI):
 
-    def __init__(
-        self,
-        path: str = 'gpt-3.5-turbo',
-        max_seq_len: int = 16384,
-        query_per_second: int = 1,
-        rpm_verbose: bool = False,
-        retry: int = 2,
-        key: str | List[str] = 'ENV',
-        org: str | List[str] | None = None,
-        meta_template: Dict | None = None,
-        openai_api_base: str | List[str] = OPENAISDK_API_BASE,
-        openai_proxy_url: Optional[str] = None,
-        mode: str = 'none',
-        logprobs: bool | None = False,
-        top_logprobs: int | None = None,
-        temperature: float | None = None,
-        tokenizer_path: str | None = None,
-        extra_body: Dict | None = None,
-        verbose: bool = False,
-        status_code_mappings: dict = {},
-    ):
+    def __init__(self,
+                 path: str = 'gpt-3.5-turbo',
+                 max_seq_len: int = 16384,
+                 query_per_second: int = 1,
+                 rpm_verbose: bool = False,
+                 retry: int = 2,
+                 key: str | List[str] = 'ENV',
+                 org: str | List[str] | None = None,
+                 meta_template: Dict | None = None,
+                 openai_api_base: str | List[str] = OPENAISDK_API_BASE,
+                 openai_proxy_url: Optional[str] = None,
+                 mode: str = 'none',
+                 logprobs: bool | None = False,
+                 top_logprobs: int | None = None,
+                 temperature: float | None = None,
+                 tokenizer_path: str | None = None,
+                 extra_body: Dict | None = None,
+                 verbose: bool = False,
+                 status_code_mappings: dict = {},
+                 think_tag: str = '</think>'):
         super().__init__(
             path,
             max_seq_len,
@@ -596,6 +595,7 @@ class OpenAISDK(OpenAI):
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
+        self.think_tag = think_tag
 
     def _generate(self,
                   input: PromptList | str,
@@ -661,15 +661,35 @@ class OpenAISDK(OpenAI):
                         pass  # noqa F841
 
                 # Check if response is empty or content is empty
-                if not responses.choices or not responses.choices[
-                        0].message.content:
+                if (not responses.choices or not responses.choices[0].message
+                        or not responses.choices[0].message.content):
                     self.logger.error(
-                        'API response is empty, it might be due to excessive '
-                        'input length or an internal server error '
-                        'from your API provider.')
+                        'Failed to extract content from the responses. '
+                        'Please check the API response for detail information.'
+                        'API responses: %s',
+                        responses,
+                    )
                     num_retries += 1
                     # Continue to retry instead of returning empty response
                     continue
+
+                # Concat Reasoning Content and tags to content
+                if (hasattr(responses.choices[0].message, 'reasoning_content')
+                        and responses.choices[0].message.reasoning_content):
+                    if self.verbose:
+                        self.logger.info(
+                            'Follow'
+                            'vllm/reasoning/deepseek_r1_reasoning_parser'
+                            'to parse the reasoning content and tags'
+                            'Reasoning Content: %s, \n'
+                            'Tags: %s, \n'
+                            'Content: %s',
+                            responses.choices[0].message.reasoning_content,
+                            self.think_tag,
+                            responses.choices[0].message.content)
+                    return (responses.choices[0].message.reasoning_content +
+                            self.think_tag +
+                            responses.choices[0].message.content)
 
                 return responses.choices[0].message.content
 
