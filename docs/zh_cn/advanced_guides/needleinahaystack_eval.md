@@ -20,7 +20,6 @@
 
 > 注意：在最新的OpenCompass代码中，NeedleBench数据集会自动从[Huggingface接口](https://huggingface.co/datasets/opencompass/NeedleBench)加载，无需手动下载或配置数据集，您可以直接运行评测命令。
 
-
 ### `OpenCompass`环境配置
 
 ```bash
