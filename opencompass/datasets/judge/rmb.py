@@ -14,9 +14,6 @@ from opencompass.utils import get_data_path
 from ..base import BaseDataset
 
 
-
-
-
 @LOAD_DATASET.register_module()
 class RMBDataset(BaseDataset):
 
@@ -35,7 +32,7 @@ class RMBDataset(BaseDataset):
                     raise NotImplementedError
         dataset = Dataset.from_list(raw_data)
         return dataset
-    
+
     def load_pair(self, item):
         raw_item_list = []
         conversation_a = item['chosen']['answer']
@@ -47,7 +44,7 @@ class RMBDataset(BaseDataset):
             else:
                 question += '\n\n ### Assistant:' + line['content']
         question += '\n\n ### Assistant:'
-        winner = "A"
+        winner = 'A'
         pair_uid = item['pair_uid']
         subset = item['subset']
         goal = item['goal']
@@ -67,7 +64,7 @@ class RMBDataset(BaseDataset):
         }
         raw_item_list.append(raw_item)
         return raw_item_list
-    
+
     def loadbon(self, item):
         raw_item_list = []
         conversation_a = item['bon_best']['answer']
@@ -83,7 +80,7 @@ class RMBDataset(BaseDataset):
         goal = item['goal']
         for loser in item['loser_list']:
             conversation_b = loser['answer']
-            winner = "A"
+            winner = 'A'
             raw_item = {
                 'question': question,
                 'answerA': conversation_a,
@@ -100,4 +97,3 @@ class RMBDataset(BaseDataset):
             }
             raw_item_list.append(raw_item)
         return raw_item_list
-
