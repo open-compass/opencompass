@@ -85,22 +85,22 @@ pip install vllm
 
 #### 评估其他`Huggingface`模型
 
-对于其他模型，我们建议额外书写一个运行的配置文件以便对模型的`max_seq_len`, `max_out_len`参数进行修改，以便模型可以接收到完整的长文本内容。如这里的的`configs/eval_needlebench.py`文件。完整内容如下
+对于其他模型，我们建议额外书写一个运行的配置文件以便对模型的`max_seq_len`, `max_out_len`参数进行修改，以便模型可以接收到完整的长文本内容。如这里的的`examples/eval_needlebench.py`文件。完整内容如下
 
 ```python
 from mmengine.config import read_base
 # we use mmengine.config to import other config files
 
 with read_base():
-    from .models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
+    from opencompass.configs.models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
 
     # Evaluate needlebench_32k, adjust the configuration to use 4k, 32k, 128k, 200k, or 1000k if necessary.
     # from .datasets.needlebench.needlebench_32k.needlebench_32k import needlebench_datasets
     # from .summarizers.needlebench import needlebench_32k_summarizer as summarizer
 
     # only eval original "needle in a haystack test" in needlebench_32k
-    from .datasets.needlebench.needlebench_32k.needlebench_single_32k import needlebench_zh_datasets, needlebench_en_datasets
-    from .summarizers.needlebench import needlebench_32k_summarizer as summarizer
+    from opencompass.configs.datasets.needlebench.needlebench_32k.needlebench_single_32k import needlebench_zh_datasets, needlebench_en_datasets
+    from opencompass.configs.summarizers.needlebench import needlebench_32k_summarizer as summarizer
 
     # eval Ancestral Tracing Challenge(ATC)
     # from .datasets.needlebench.atc.atc_0shot_nocot_2_power_en import needlebench_datasets
