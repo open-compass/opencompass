@@ -8,6 +8,7 @@ exclude: |
       opencompass/datasets/lawbench/utils|
       opencompass/datasets/lawbench/evaluation_functions/|
       opencompass/datasets/medbench/|
+      opencompass/datasets/matbench/|
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
       opencompass/datasets/TheoremQA|

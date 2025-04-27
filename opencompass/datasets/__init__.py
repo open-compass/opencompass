@@ -88,6 +88,7 @@ from .longbench import *  # noqa: F401, F403
 from .longbenchv2 import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
+from .matbench import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
 from .math401 import *  # noqa: F401, F403
 from .math_intern import *  # noqa: F401, F403
@@ -128,6 +129,7 @@ from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
 from .scicode import *  # noqa: F401, F403
 from .simpleqa import *  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
+from .smolinstruct import *  # noqa: F401, F403
 from .squad20 import SQuAD20Dataset, SQuAD20Evaluator  # noqa: F401, F403
 from .storycloze import *  # noqa: F401, F403
 from .strategyqa import *  # noqa: F401, F403
