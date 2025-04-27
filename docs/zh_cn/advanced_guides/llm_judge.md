@@ -194,6 +194,8 @@ eval_cfg = dict(
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
     pred_role='BOT',
+    #num_gpus=1
+    #使用本地模型评估时，设置num_gpus为希望在评估阶段使用的GPU数量
 )
 
 # 数据集配置
