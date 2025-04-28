@@ -1026,6 +1026,6 @@
 - internsandbox:
     name: InternSandbox
     category: Reasoning/Code/Agent
-    paper: 
+    paper: ''
     configpath: opencompass/configs/datasets/internsandbox/internsandbox_gen_44b982.py
     configpath_llmjudge: ''
