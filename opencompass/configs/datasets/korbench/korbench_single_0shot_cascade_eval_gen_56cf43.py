@@ -1,17 +1,27 @@
+"""
+Summary: A config for KoR-Bench Evaluation.
+Setting:
+    Shot: 0-shot
+    Evaluator:
+        - CascadeEvaluator
+            - korbenchEvaluator
+            - GenericLLMEvaluator
+    Repeat: 1
+Avaliable Models:
+    - Instruct/Chat Models
+"""
 from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.evaluator import GenericLLMEvaluator
+from opencompass.evaluator import GenericLLMEvaluator, CascadeEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.utils import xml_tag_postprocessor
 
 categories = ['cipher', 'counterfactual', 'logic', 'operation', 'puzzle']
 
-
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
-    
+
     Here are some evaluation criteria:
     1. Please refer to the given standard answer. You don't need to re-generate the answer to the question because the standard answer has been given. You only need to judge whether the candidate's answer is consistent with the standard answer according to the form of the question. Don't try to answer the original question. You can assume that the standard answer is definitely correct.
     2. Because the candidate's answer may be different from the standard answer in the form of expression, before making a judgment, please understand the question and the standard answer first, and then judge whether the candidate's answer is correct, but be careful not to try to answer the original question.
@@ -30,7 +40,7 @@ GRADER_TEMPLATE = """
     <Original Question Begin>: \n{prompt}\n<Original Question End>\n\n
     <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
-    
+
     Judging the correctness of candidates' answers:
 """.strip()
 
@@ -50,7 +60,7 @@ for category in categories:
             round=[
                 dict(
                     role='HUMAN',
-                    prompt='{prompt}' # f-string
+                    prompt='{prompt}'  # f-string
                 )
             ]
         )
@@ -66,41 +76,45 @@ for category in categories:
     infer_cfg = dict(
         prompt_template=prompt_template,
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_out_len=1024),
+        inferencer=dict(type=GenInferencer),
     )
 
     # Evaluation configuration
     eval_cfg = dict(
         evaluator=dict(
-            type=GenericLLMEvaluator,
-            prompt_template=dict(
-                type=PromptTemplate,
-                template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
-                ],
-                    round=[
-                    dict(
-                        role='HUMAN',
-                        prompt = GRADER_TEMPLATE
-                    ),
-                ]),
+            type=CascadeEvaluator,
+            rule_evaluator=dict(
+                type=korbenchEvaluator,
             ),
-            dataset_cfg=dict(
-                type=korbenchDataset,
-                path='opencompass/korbench',
-                prompt_mode='0_shot',
-                category=category,
-                reader_cfg=reader_cfg,
+            llm_evaluator=dict(
+                type=GenericLLMEvaluator,
+                prompt_template=dict(
+                    type=PromptTemplate,
+                    template=dict(
+                        begin=[
+                            dict(
+                                role='SYSTEM',
+                                fallback_role='HUMAN',
+                                prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                        ],
+                        round=[
+                            dict(
+                                role='HUMAN',
+                                prompt=GRADER_TEMPLATE
+                            ),
+                        ]),
+                ),
+                dataset_cfg=dict(
+                    type=korbenchDataset,
+                    path='opencompass/korbench',
+                    prompt_mode='0_shot',
+                    category=category,
+                    reader_cfg=reader_cfg,
+                ),
+                judge_cfg=dict(),
+                dict_postprocessor=dict(type=generic_llmjudge_postprocess),
             ),
-            judge_cfg=dict(),
-            dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-            pred_postprocessor=dict(type=xml_tag_postprocessor, tag='<conclude>'),
-        ),
-        pred_role='BOT',
+        )
     )
 
     # Dataset
@@ -113,7 +127,7 @@ for category in categories:
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
         eval_cfg=eval_cfg,
-        mode='singlescore',
+        n=1,
     )
 
     korbench_0shot_single_datasets.append(korbench_dataset)
