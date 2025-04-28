@@ -20,7 +20,7 @@ exclude: |
     )
 repos:
   - repo: https://github.com/PyCQA/flake8
-    rev: 5.0.4
+    rev: 7.2.0
     hooks:
       - id: flake8
         exclude: |
@@ -29,7 +29,7 @@ repos:
                 examples/
             )
   - repo: https://github.com/PyCQA/isort
-    rev: 5.11.5
+    rev: 6.0.1
     hooks:
       - id: isort
         exclude: |
@@ -47,7 +47,7 @@ repos:
                 examples/
             )
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.1
+    rev: v2.4.1
     hooks:
       - id: codespell
         exclude: |
@@ -58,7 +58,7 @@ repos:
                 examples/
             )
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         exclude: |
@@ -81,7 +81,7 @@ repos:
       - id: mixed-line-ending
         args: ["--fix=lf"]
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.9
+    rev: 0.7.22
     hooks:
       - id: mdformat
         args: ["--number", "--table-width", "200"]
