@@ -116,6 +116,7 @@ class LMEvaluator:
         pred_postprocessor (ConfigDict): The model prediction's postprocessor
             config.
         keep_predictions (bool): Whether to save model predictions in references. Useful when postprocessor requires model predictions as input to calculate additional features (e.g. response length, markdown list counts, ...). Defaults to False.
+        multi_eval (bool): Whether to do multiple evaluation with different prompt settings.
     """
 
     def __init__(
@@ -129,7 +130,7 @@ class LMEvaluator:
         pred_postprocessor: Optional[ConfigDict] = None,
         dict_postprocessor: Optional[ConfigDict] = None,
         keep_predictions: bool = False,
-        multi_eval=False,
+        multi_eval: bool =False,
     ) -> None:
         self.multi_eval = multi_eval
         self.output_path = output_path
