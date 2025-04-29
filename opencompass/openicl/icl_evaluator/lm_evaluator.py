@@ -116,6 +116,7 @@ class LMEvaluator:
         pred_postprocessor (ConfigDict): The model prediction's postprocessor
             config.
         keep_predictions (bool): Whether to save model predictions in references. Useful when postprocessor requires model predictions as input to calculate additional features (e.g. response length, markdown list counts, ...). Defaults to False.
+        multi_eval (bool): Whether to do multiple evaluation with different prompt settings.
     """
 
     def __init__(
@@ -129,7 +130,9 @@ class LMEvaluator:
         pred_postprocessor: Optional[ConfigDict] = None,
         dict_postprocessor: Optional[ConfigDict] = None,
         keep_predictions: bool = False,
+        multi_eval: bool = False,
     ) -> None:
+        self.multi_eval = multi_eval
         self.output_path = output_path
         out_dir, out_name = osp.split(output_path)
         if not out_dir:
@@ -209,6 +212,33 @@ class LMEvaluator:
                 references = [
                     {} for _ in range(len(predictions[0]['model_preds']))
                 ]
+            if self.multi_eval:
+                assert references is not None
+                assert 'judge_prompt_list' in references[0]
+                self.multi_eval_times = len(references[0]['judge_prompt_list'])
+                temp_predictions_save_list = []
+                for idx, pred in enumerate(predictions['model_preds']):
+                    for judge_prompt in references[idx]['judge_prompt_list']:
+                        temp_prediction = judge_prompt.replace(
+                            '{prediction}', pred)
+                        temp_predictions_save_list.append(temp_prediction)
+                predictions['model_preds'] = temp_predictions_save_list
+
+                temp_references_save_list = []
+                for item in references:
+                    new_item = {
+                        key: value
+                        for key, value in item.items()
+                        if key != 'judge_prompt_list'
+                    }
+                    if 'judge_prompt_list' in item:
+                        for prompt in item['judge_prompt_list']:
+                            temp_item = new_item.copy()
+                            temp_item['judge_prompt'] = prompt
+                            temp_references_save_list.append(temp_item)
+                    else:
+                        temp_references_save_list.append(item)
+                references = temp_references_save_list
             predictions = [predictions['model_preds']]
 
         # Due to the rarity of identical predictions, we have temporarily disabled the plagiarism detection feature.
@@ -268,7 +298,12 @@ class LMEvaluator:
 
         if self.dataset_cfg:
             dataset = build_dataset_from_cfg(self.dataset_cfg)
-
+            if self.multi_eval:
+                new_ds = {
+                    k: dataset.test[k] * self.multi_eval_times
+                    for k in dataset.test.column_names
+                }
+                dataset.reader.dataset['test'] = Dataset.from_dict(new_ds)
             if infer_order == 'double':
                 new_ds = {
                     k: dataset.test[k] * 2
