@@ -130,7 +130,7 @@ class LMEvaluator:
         pred_postprocessor: Optional[ConfigDict] = None,
         dict_postprocessor: Optional[ConfigDict] = None,
         keep_predictions: bool = False,
-        multi_eval: bool =False,
+        multi_eval: bool = False,
     ) -> None:
         self.multi_eval = multi_eval
         self.output_path = output_path
