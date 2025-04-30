@@ -15,6 +15,8 @@ from opencompass.registry import (DICT_POSTPROCESSORS, ICL_PROMPT_TEMPLATES,
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
 
+logger = get_logger(__name__)
+
 
 class GenericLLMEvaluator(BaseEvaluator):
     """Generic LLM evaluator.
@@ -37,8 +39,7 @@ class GenericLLMEvaluator(BaseEvaluator):
         dict_postprocessor: Optional[ConfigDict] = None,
         keep_predictions: bool = False,
     ) -> None:
-
-        self.logger = get_logger()
+        super().__init__(pred_postprocessor=pred_postprocessor)
         # If judge_cfg is not provided, fall back to the default configuration
         if not judge_cfg:
             self.judge_cfg = self.default_judge_cfg
@@ -57,14 +58,12 @@ class GenericLLMEvaluator(BaseEvaluator):
 
     def build_inferencer(self):
         """Build LLM Inference."""
-        if not self.output_path:
-            self.output_path = self._out_dir
 
+        self.output_path = f'{self._out_dir}_replica{self.dataset_replica_idx}.json'  # noqa
+        logger.info(f'LLM judge details will be saved at:{self.output_path}')
         out_dir, out_name = osp.split(self.output_path)
-        out_name = f'{out_name}.json'
-        self.output_path = osp.join(out_dir, out_name)
 
-        self.logger.info(
+        logger.info(
             f'Set self.output_path to {self.output_path} for current task')
         assert self.output_path is not None, 'output_path is None'
 
@@ -194,7 +193,7 @@ class GenericLLMEvaluator(BaseEvaluator):
     @property
     def default_judge_cfg(self):
         from opencompass.models import OpenAISDK
-        self.logger.info('Please set your judge model in `OC_JUDGE_MODEL`, \
+        logger.info('Please set your judge model in `OC_JUDGE_MODEL`, \
             `OC_JUDGE_API_KEY`, `OC_JUDGE_API_BASE` environment variables.')
         DEFAULT_JUDGE_CFG = dict(
             type=OpenAISDK,

@@ -9,6 +9,9 @@ from datasets import Dataset
 from scipy.stats import hypergeom
 
 from opencompass.registry import TEXT_POSTPROCESSORS
+from opencompass.utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 def compute_pass_at_k(n, c, k):
@@ -43,6 +46,7 @@ class BaseEvaluator:
 
     def __init__(self, pred_postprocessor=None) -> None:
         self.pred_postprocessor = pred_postprocessor
+        self._dataset_replica_idx = 0  # Default value for dataset_replica_idx
 
     @property
     def output_dir(self):
@@ -117,6 +121,7 @@ class BaseEvaluator:
         all_results = []
         for i in range(n):
             self._dataset_replica_idx = i
+            logger.info(f'Running {i}-th replica of evaluation')
 
             def select_fn(i, real_size, x):
                 if isinstance(x, Dataset):

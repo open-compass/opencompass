@@ -34,7 +34,8 @@ class CascadeEvaluator(BaseEvaluator):
         sample_score_fn: Optional[Callable] = None,
         parallel: bool = True,
     ) -> None:
-        self.logger = get_logger()
+        super().__init__()
+        self.logger = get_logger(__name__)
 
         # Initialize the LLM evaluator
         llm_evaluator_type = llm_evaluator.pop('type')
@@ -58,7 +59,10 @@ class CascadeEvaluator(BaseEvaluator):
             raise ValueError(
                 'Either rule_evaluator or sample_score_fn must be provided')
 
-    def sample_score(self, prediction: str, reference: str) -> Dict[str, Any]:
+    def sample_score(self,
+                     prediction: str,
+                     reference: str,
+                     test_set=None) -> Dict[str, Any]:
         """Score a single sample using sample_score_fn or rule_evaluator.
 
         Args:
@@ -70,7 +74,7 @@ class CascadeEvaluator(BaseEvaluator):
         """
         if self.sample_score_fn:
             # Use user-provided function to evaluate a single sample
-            result = self.sample_score_fn(prediction, reference)
+            result = self.sample_score_fn(prediction, reference, test_set)
             if not isinstance(result, dict):
                 # Ensure result is a dictionary with at least 'correct' field
                 result = {
@@ -82,7 +86,8 @@ class CascadeEvaluator(BaseEvaluator):
         else:
             # Use rule_evaluator to evaluate a single sample by calling
             # the score method with single-element lists
-            result = self.rule_evaluator.score([prediction], [reference])
+            result = self.rule_evaluator.score([prediction], [reference],
+                                               [test_set])
             if 'details' in result and len(result['details']) > 0:
                 return result['details'][0]
             else:
@@ -137,7 +142,11 @@ class CascadeEvaluator(BaseEvaluator):
         failed_indices = []
 
         for i, (pred, ref) in enumerate(zip(predictions, references)):
-            result = self.sample_score(pred, ref)
+            if test_set is not None:
+                test_item = test_set[i]
+            else:
+                test_item = None
+            result = self.sample_score(pred, ref, test_item)
             result['evaluation_method'] = 'rule'
             details.append({'rule_evaluation': result})
 
@@ -182,8 +191,9 @@ class CascadeEvaluator(BaseEvaluator):
             self.llm_evaluator._out_dir = f'{self._out_dir}_llm_judge'
 
             # Generate random hash suffix
-            llm_results_path = f'{self.llm_evaluator._out_dir}_replica{self.dataset_replica_idx}'  # noqa
-
+            llm_results_path = f'{self.llm_evaluator._out_dir}_replica{self.dataset_replica_idx}.json'  # noqa
+            self.logger.info(f'LLM evaluation results will be saved at '
+                             f'{llm_results_path}')
             # Check if results already exist to avoid re-evaluation
             if os.path.exists(llm_results_path):
                 self.logger.info(
@@ -214,7 +224,9 @@ class CascadeEvaluator(BaseEvaluator):
                 # Use GenericLLMEvaluator to evaluate samples
                 # unset dataset_cfg for GenericLLMEvaluator to
                 # directly use test_set
-                self.llm_evaluator.output_path = llm_results_path
+                # self.llm_evaluator.output_path = llm_results_path
+                self.llm_evaluator._dataset_replica_idx = \
+                    self._dataset_replica_idx
                 self.llm_evaluator.dataset_cfg = None
 
                 llm_results = self.llm_evaluator.score(

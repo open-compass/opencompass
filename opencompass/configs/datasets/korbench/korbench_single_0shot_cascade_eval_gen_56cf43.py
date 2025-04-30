@@ -10,6 +10,7 @@ Setting:
 Avaliable Models:
     - Instruct/Chat Models
 """
+from datasets import parallel
 from opencompass.datasets.korbench.korbench import korbenchDataset, korbenchEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -114,6 +115,7 @@ for category in categories:
                 judge_cfg=dict(),
                 dict_postprocessor=dict(type=generic_llmjudge_postprocess),
             ),
+            parallel=False,
         )
     )
 
