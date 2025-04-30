@@ -11,7 +11,10 @@ from .base import BaseDataset
 
 def _parse(item, prompt_mode, discipline):
     choices = item['choices']
-    item['q4'] = f'You are an expert in {discipline}.\n' + item['prompt']['default'] + '\n' + item['question'] + '\n' + '\n'.join([f'{l}. {t}' for l, t in zip(choices['label'], choices['text'])])  # noqa: E501, E741, E741
+    item['q4'] = f'You are an expert in {discipline}.\n' + item['prompt'][
+        'default'] + '\n' + item['question'] + '\n' + '\n'.join([
+            f'{l}. {t}' for l, t in zip(choices['label'], choices['text'])
+        ])  # noqa: E501, E741, E741
     item['start'] = chr(65)
     item['end'] = chr(65 + len(item.get('choices', {'label': []})['label']) -
                       1)
@@ -107,4 +110,3 @@ def answer_cleansing(
                 prediction[0] = prediction[0][:-1]
 
     return prediction[0]
-
