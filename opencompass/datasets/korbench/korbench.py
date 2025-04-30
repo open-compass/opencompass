@@ -173,44 +173,76 @@ class korbenchEvaluator(BaseEvaluator):
     def __init__(self):
         super().__init__()
 
-    def score(self, predictions, references, test_set):
-        """Evaluate predictions for a single prompt_mode in KOR-Bench."""
-        if not test_set:
-            raise ValueError('Test set is empty.')
+    def sample_score(self, prediction, reference, test_item=None):
+        """对单个样本进行评测。
 
-        prompt_mode = test_set[0][
-            'prompt_mode']  # Determine the prompt_mode from the first entry
-        data = {}
+        Args:
+            prediction: 模型的预测结果
+            reference: 参考答案
+            test_item: 测试样本的其他信息
 
-        # Organize data for the given prompt_mode
-        for i in range(len(predictions)):
-            entry = {
-                'prediction': predictions[i],
-                'gold': references[i],
-                'rule_id': test_set[i].get('rule_id', None),
-                'category': test_set[i].get('category', None),
-                'rule_list': test_set[i].get('rule_list', None),
-                'question_list': test_set[i].get('question_list', None),
-                'base_path': test_set[i].get('base_path', None),
-            }
-            data[i] = entry
+        Returns:
+            Dict: 包含评测结果的字典
+        """
+        if test_item is None:
+            raise ValueError('Test item is required.')
 
-        if not data:
-            raise ValueError(f"No data found for prompt_mode '{prompt_mode}'")
+        prompt_mode = test_item.get('prompt_mode')
 
-        # Evaluate based on the prompt_mode
+        # 构建单个样本的数据
+        entry = {
+            'prediction': prediction,
+            'gold': reference,
+            'rule_id': test_item.get('rule_id', None),
+            'category': test_item.get('category', None),
+            'rule_list': test_item.get('rule_list', None),
+            'question_list': test_item.get('question_list', None),
+            'base_path': test_item.get('base_path', None),
+        }
+
+        # 对单个样本进行评测
+        data = {0: entry}
+
+        # 根据不同的 prompt_mode 进行评测
         if prompt_mode == '0_shot':
             evaluation_results = evaluate_responses(data, '0_shot')
         elif prompt_mode == '3_shot':
             evaluation_results = evaluate_responses(data, '3_shot')
         elif prompt_mode in ['Multi-Q', 'Multi-R', 'Multi-RQ', 'mixed']:
             evaluation_results = evaluate_responses(data, 'mixed',
-                                                    test_set[0]['base_path'])
+                                                    test_item.get('base_path'))
         else:
-            raise ValueError(f'Unsupported prompt_mode: {prompt_mode}')
-        # Calculate accuracy
-        correct_count = sum(res['is_correct'] for res in evaluation_results)
-        accuracy = (correct_count / len(evaluation_results)) * 100
+            return {
+                'is_correct': False,
+                'pred': prediction,
+                'answer': reference
+            }
 
-        # Return scores
-        return {'accuracy': accuracy}
+        # 返回评测结果
+        result = evaluation_results[0]
+        result['correct'] = result['is_correct']
+        result.update({'pred': prediction, 'answer': reference})
+        return result
+
+    def score(self, predictions, references, test_set):
+        """使用 sample_score 对每个样本进行评测。"""
+        if not test_set:
+            raise ValueError('Test set is empty.')
+
+        details = []
+        correct_count = 0
+
+        # 对每个样本调用 sample_score 进行评测
+        for i in range(len(predictions)):
+            result = self.sample_score(predictions[i], references[i],
+                                       test_set[i])
+            details.append(result)
+            if result.get('is_correct', False):
+                correct_count += 1
+
+        # 计算准确率
+        accuracy = (correct_count /
+                    len(predictions)) * 100 if predictions else 0
+
+        # 返回评测结果
+        return {'accuracy': accuracy, 'details': details}
