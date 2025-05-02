@@ -10,7 +10,7 @@ from datasets import Dataset, load_dataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 from opencompass.utils import get_logger
-
+import math
 from .base import BaseDataset
 
 
