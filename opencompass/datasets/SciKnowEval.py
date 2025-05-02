@@ -34,7 +34,7 @@ class SciKnowEvalDataset(BaseDataset):
         subset = kwargs['subset']
         data_files = {'test': f'data/{capitalize_first_letter(subset)}/sciknoweval_{subset}_test.jsonl'}
         dataset = load_dataset(path,  data_files=data_files, split='test')
-        dataset = dataset.select(range(20))
+        # dataset = dataset.select(range(20))
         if prompt_mode == 'zero-shot':
             dataset = dataset.map(
                 lambda item: _parse(item, prompt_mode, subset),
