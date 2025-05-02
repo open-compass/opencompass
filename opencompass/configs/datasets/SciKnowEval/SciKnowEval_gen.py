@@ -3,7 +3,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
-ZERO_SHOT_PROMPT = '\n{q4}'
+ZERO_SHOT_PROMPT = '{q4}'
 
 # Reader configuration
 reader_cfg = dict(
@@ -49,6 +49,7 @@ sciknoweval_dataset_biology = dict(
     abbr='sciknoweval_biology',
     path='hicai-zju/SciKnowEval',
     prompt_mode='zero-shot',
+    subset='biology',
     reader_cfg=reader_cfg,
     infer_cfg=infer_cfg,
     eval_cfg=eval_cfg,
@@ -58,6 +59,7 @@ sciknoweval_dataset_chemistry = dict(
     type=SciKnowEvalDataset,
     abbr='sciknoweval_chemistry',
     path='hicai-zju/SciKnowEval',
+    subset='chemistry',
     prompt_mode='zero-shot',
     reader_cfg=reader_cfg,
     infer_cfg=infer_cfg,
@@ -67,6 +69,7 @@ sciknoweval_dataset_material = dict(
     type=SciKnowEvalDataset,
     abbr='sciknoweval_material',
     path='hicai-zju/SciKnowEval',
+    subset='material',
     prompt_mode='zero-shot',
     reader_cfg=reader_cfg,
     infer_cfg=infer_cfg,
@@ -78,6 +81,7 @@ sciknoweval_dataset_physics = dict(
     abbr='sciknoweval_physics',
     path='hicai-zju/SciKnowEval',
     prompt_mode='zero-shot',
+    subset='physics',
     reader_cfg=reader_cfg,
     infer_cfg=infer_cfg,
     eval_cfg=eval_cfg,
