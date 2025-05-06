@@ -112,6 +112,7 @@ livemathbench_datasets = [
                     judge_cfg={},
                     dict_postprocessor=dict(type=generic_llmjudge_postprocess),
                 ),
+                parallel=False
             ),
         ),
         n=1, # repeat n times

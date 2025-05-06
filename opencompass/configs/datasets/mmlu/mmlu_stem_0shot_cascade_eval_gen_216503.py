@@ -110,6 +110,7 @@ for name in mmlu_all_sets:
                 dict_postprocessor=dict(type=generic_llmjudge_postprocess),
                 judge_cfg=dict(),
             ),
+            parallel=False
         ),
     )
 
