@@ -135,17 +135,17 @@ class NumWorkerPartitioner(BasePartitioner):
         dataset_abbr = dataset_abbr_from_cfg(dataset)
         test_range = dataset.reader_cfg.get('test_range', '')
 
-        # 如果不强制重建且缓存中有数据，则使用缓存
+        # If not forcing rebuild and data exists in cache, use the cache
         if not self.force_rebuild and dataset_abbr in self.dataset_size:
             actual_size = eval('len(range(self.dataset_size[dataset_abbr])'
                                f'{test_range})')
             return actual_size
 
-        # 否则重新构建数据集获取大小
+        # Otherwise, rebuild the dataset to get its size
         dataset = build_dataset_from_cfg(dataset)
         self.dataset_size[dataset_abbr] = len(dataset.test)
 
-        # 保存到缓存文件
+        # Save to cache file
         if self.dataset_size_path:
             mmengine.mkdir_or_exist('.cache/')
             mmengine.dump(self.dataset_size,
