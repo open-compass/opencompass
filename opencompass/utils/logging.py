@@ -84,7 +84,7 @@ class FilterDuplicateMessage(logging.Filter):
 
 
 def pretty_print_config(cfg):
-    """使用rich库美化配置输出."""
+    """Pretty print config using the rich library."""
     console = Console()
     config_str = cfg.pretty_text
     syntax = Syntax(config_str,
