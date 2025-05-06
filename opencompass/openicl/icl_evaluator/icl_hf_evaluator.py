@@ -57,7 +57,10 @@ class HuggingfaceEvaluator(BaseEvaluator):
         """
         return scores
 
-    def score(self, predictions: List, references: List) -> dict:
+    def score(self,
+              predictions: List,
+              references: List,
+              test_set=None) -> dict:
         """Calculate scores.
 
         Args:
@@ -102,7 +105,10 @@ class AccEvaluator(HuggingfaceEvaluator):
         super().__init__(metric='accuracy',
                          pred_postprocessor=pred_postprocessor)
 
-    def _preprocess(self, predictions: List, references: List) -> dict:
+    def _preprocess(self,
+                    predictions: List,
+                    references: List,
+                    test_set=None) -> dict:
         """Preprocess the final predictions and references to needed format.
 
         Args:
