@@ -20,7 +20,8 @@ class HuggingfaceEvaluator(BaseEvaluator):
         seed (int): There exists some randomness during the calculation of some
             metrics, thus we set a fixed random seed for reproducing. Defaults
             to 0.
-        pred_postprocessor (optional): 用于预测后处理的函数或配置。
+        pred_postprocessor (optional): Function or configuration for prediction
+            post-processing.
     """
 
     def __init__(self,
