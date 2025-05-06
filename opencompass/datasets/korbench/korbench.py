@@ -174,22 +174,22 @@ class korbenchEvaluator(BaseEvaluator):
         super().__init__()
 
     def sample_score(self, prediction, reference, test_item=None):
-        """对单个样本进行评测。
+        """Evaluate a single sample.
 
         Args:
-            prediction: 模型的预测结果
-            reference: 参考答案
-            test_item: 测试样本的其他信息
+            prediction: The model's prediction
+            reference: The reference answer
+            test_item: Additional information about the test sample
 
         Returns:
-            Dict: 包含评测结果的字典
+            Dict: A dictionary containing evaluation results
         """
         if test_item is None:
             raise ValueError('Test item is required.')
 
         prompt_mode = test_item.get('prompt_mode')
 
-        # 构建单个样本的数据
+        # Build data for a single sample
         entry = {
             'prediction': prediction,
             'gold': reference,
@@ -200,10 +200,10 @@ class korbenchEvaluator(BaseEvaluator):
             'base_path': test_item.get('base_path', None),
         }
 
-        # 对单个样本进行评测
+        # Evaluate the single sample
         data = {0: entry}
 
-        # 根据不同的 prompt_mode 进行评测
+        # Evaluate based on different prompt_mode
         if prompt_mode == '0_shot':
             evaluation_results = evaluate_responses(data, '0_shot')
         elif prompt_mode == '3_shot':
@@ -218,21 +218,21 @@ class korbenchEvaluator(BaseEvaluator):
                 'answer': reference
             }
 
-        # 返回评测结果
+        # Return evaluation results
         result = evaluation_results[0]
         result['correct'] = result['is_correct']
         result.update({'pred': prediction, 'answer': reference})
         return result
 
     def score(self, predictions, references, test_set):
-        """使用 sample_score 对每个样本进行评测。"""
+        """Evaluate each sample using sample_score."""
         if not test_set:
             raise ValueError('Test set is empty.')
 
         details = []
         correct_count = 0
 
-        # 对每个样本调用 sample_score 进行评测
+        # Call sample_score for each sample
         for i in range(len(predictions)):
             result = self.sample_score(predictions[i], references[i],
                                        test_set[i])
@@ -240,9 +240,9 @@ class korbenchEvaluator(BaseEvaluator):
             if result.get('is_correct', False):
                 correct_count += 1
 
-        # 计算准确率
+        # Calculate accuracy
         accuracy = (correct_count /
                     len(predictions)) * 100 if predictions else 0
 
-        # 返回评测结果
+        # Return evaluation results
         return {'accuracy': accuracy, 'details': details}
