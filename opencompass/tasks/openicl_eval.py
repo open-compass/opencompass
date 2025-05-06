@@ -146,11 +146,16 @@ class OpenICLEvalTask(BaseTask):
             preds = []
             i = 1
             while osp.exists(osp.realpath(filename)):
-                sub_preds = mmengine.load(filename)
-                preds.extend(
-                    [sub_preds[str(i)] for i in range(len(sub_preds))])
-                filename = root + f'_{i}' + ext
-                i += 1
+                try:
+                    sub_preds = mmengine.load(filename)
+                    preds.extend(
+                        [sub_preds[str(i)] for i in range(len(sub_preds))])
+                    filename = root + f'_{i}' + ext
+                    i += 1
+                except Exception as e:
+                    self.logger.error(
+                        f'Error loading prediction file {filename}: {e}')
+                    break
 
         pred_dicts = copy.deepcopy(preds)
         preds = {k: [pred.get(k) for pred in preds] for k in preds[0]}
