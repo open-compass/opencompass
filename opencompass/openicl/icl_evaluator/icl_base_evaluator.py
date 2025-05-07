@@ -8,6 +8,11 @@ import numpy as np
 from datasets import Dataset
 from scipy.stats import hypergeom
 
+from opencompass.registry import TEXT_POSTPROCESSORS
+from opencompass.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 def compute_pass_at_k(n, c, k):
     if n - c < k:
@@ -39,13 +44,18 @@ def compute_mg_pass_at_k(n, c, k):
 
 class BaseEvaluator:
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, pred_postprocessor=None) -> None:
+        self.pred_postprocessor = pred_postprocessor
+        self._dataset_replica_idx = 0  # Default value for dataset_replica_idx
 
     @property
     def output_dir(self):
         # please see opencompass/opencompass/tasks/openicl_eval.py Line 197-200
         return self._out_dir
+
+    @property
+    def dataset_replica_idx(self):
+        return self._dataset_replica_idx
 
     def group(self, n: int, details: List[Dict[str, Any]],
               test_set: Dataset) -> Dict[str, Any]:
@@ -82,6 +92,14 @@ class BaseEvaluator:
                 [detail[metric] for detail in details])
         return g_passk_details
 
+    def pred_postprocess(self, predictions: List) -> Dict:
+        if self.pred_postprocessor is None:
+            return predictions
+        else:
+            kwargs = self.pred_postprocessor
+            proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+            return [proc(pred, **kwargs) for pred in predictions]
+
     def evaluate(
         self,
         k: Union[int, List[int]],
@@ -102,6 +120,8 @@ class BaseEvaluator:
         all_details = []
         all_results = []
         for i in range(n):
+            self._dataset_replica_idx = i
+            logger.info(f'Running {i}-th replica of evaluation')
 
             def select_fn(i, real_size, x):
                 if isinstance(x, Dataset):
@@ -111,11 +131,13 @@ class BaseEvaluator:
                 else:
                     return x
 
-            results = self.score(
-                **{
-                    key: select_fn(i, real_size, value)
-                    for key, value in score_kwargs.items()
-                })
+            current_params = {
+                key: select_fn(i, real_size, value)
+                for key, value in score_kwargs.items()
+            }
+
+            results = self.score(**current_params)
+
             details = results.pop('details', None)
             if details is not None:
                 if isinstance(details, Dict):
@@ -138,8 +160,6 @@ class BaseEvaluator:
                     eval_results.pop(key)
                 else:
                     eval_results[key] = np.mean(eval_results[key])
-            else:
-                eval_results[key] = eval_results[key][0]
 
         grouped_examples = self.group(n, all_details, original_dataset)
         can_calculate = False

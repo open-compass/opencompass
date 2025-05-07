@@ -549,6 +549,7 @@ class OpenAISDK(OpenAI):
                  tokenizer_path: str | None = None,
                  extra_body: Dict | None = None,
                  verbose: bool = False,
+                 http_client_cfg: dict = {},
                  status_code_mappings: dict = {},
                  think_tag: str = '</think>'):
         super().__init__(
@@ -578,20 +579,20 @@ class OpenAISDK(OpenAI):
         else:
             self.openai_api_base = openai_api_base
 
-        if self.proxy_url is None:
-            self.openai_client = OpenAI(base_url=self.openai_api_base,
-                                        api_key=key)
-        else:
-            proxies = {
-                'http://': self.proxy_url,
-                'https://': self.proxy_url,
-            }
+        if self.proxy_url or http_client_cfg:
+            if self.proxy_url:
+                http_client_cfg['proxies'] = {
+                    'http://': self.proxy_url,
+                    'https://': self.proxy_url,
+                }
 
-            self.openai_client = OpenAI(
-                base_url=self.openai_api_base,
-                api_key=key,
-                http_client=httpx.Client(proxies=proxies),
-            )
+        self.openai_client = OpenAI(
+            base_url=self.openai_api_base,
+            api_key=key,
+            http_client=httpx.Client(
+                **http_client_cfg) if http_client_cfg else None,
+        )
+
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
@@ -650,6 +651,7 @@ class OpenAISDK(OpenAI):
             try:
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
+
                 responses = self.openai_client.chat.completions.create(
                     **query_data, timeout=timeout)  # timeout in seconds
                 if self.verbose:
@@ -659,7 +661,6 @@ class OpenAISDK(OpenAI):
                         self.logger.info(responses)
                     except Exception:
                         pass  # noqa F841
-
                 # Check if response is empty or content is empty
                 if (not responses.choices or not responses.choices[0].message
                         or not responses.choices[0].message.content):

@@ -173,44 +173,76 @@ class korbenchEvaluator(BaseEvaluator):
     def __init__(self):
         super().__init__()
 
-    def score(self, predictions, references, test_set):
-        """Evaluate predictions for a single prompt_mode in KOR-Bench."""
-        if not test_set:
-            raise ValueError('Test set is empty.')
+    def sample_score(self, prediction, reference, test_item=None):
+        """Evaluate a single sample.
 
-        prompt_mode = test_set[0][
-            'prompt_mode']  # Determine the prompt_mode from the first entry
-        data = {}
+        Args:
+            prediction: The model's prediction
+            reference: The reference answer
+            test_item: Additional information about the test sample
 
-        # Organize data for the given prompt_mode
-        for i in range(len(predictions)):
-            entry = {
-                'prediction': predictions[i],
-                'gold': references[i],
-                'rule_id': test_set[i].get('rule_id', None),
-                'category': test_set[i].get('category', None),
-                'rule_list': test_set[i].get('rule_list', None),
-                'question_list': test_set[i].get('question_list', None),
-                'base_path': test_set[i].get('base_path', None),
-            }
-            data[i] = entry
+        Returns:
+            Dict: A dictionary containing evaluation results
+        """
+        if test_item is None:
+            raise ValueError('Test item is required.')
 
-        if not data:
-            raise ValueError(f"No data found for prompt_mode '{prompt_mode}'")
+        prompt_mode = test_item.get('prompt_mode')
 
-        # Evaluate based on the prompt_mode
+        # Build data for a single sample
+        entry = {
+            'prediction': prediction,
+            'gold': reference,
+            'rule_id': test_item.get('rule_id', None),
+            'category': test_item.get('category', None),
+            'rule_list': test_item.get('rule_list', None),
+            'question_list': test_item.get('question_list', None),
+            'base_path': test_item.get('base_path', None),
+        }
+
+        # Evaluate the single sample
+        data = {0: entry}
+
+        # Evaluate based on different prompt_mode
         if prompt_mode == '0_shot':
             evaluation_results = evaluate_responses(data, '0_shot')
         elif prompt_mode == '3_shot':
             evaluation_results = evaluate_responses(data, '3_shot')
         elif prompt_mode in ['Multi-Q', 'Multi-R', 'Multi-RQ', 'mixed']:
             evaluation_results = evaluate_responses(data, 'mixed',
-                                                    test_set[0]['base_path'])
+                                                    test_item.get('base_path'))
         else:
-            raise ValueError(f'Unsupported prompt_mode: {prompt_mode}')
-        # Calculate accuracy
-        correct_count = sum(res['is_correct'] for res in evaluation_results)
-        accuracy = (correct_count / len(evaluation_results)) * 100
+            return {
+                'is_correct': False,
+                'pred': prediction,
+                'answer': reference
+            }
 
-        # Return scores
-        return {'accuracy': accuracy}
+        # Return evaluation results
+        result = evaluation_results[0]
+        result['correct'] = result['is_correct']
+        result.update({'pred': prediction, 'answer': reference})
+        return result
+
+    def score(self, predictions, references, test_set):
+        """Evaluate each sample using sample_score."""
+        if not test_set:
+            raise ValueError('Test set is empty.')
+
+        details = []
+        correct_count = 0
+
+        # Call sample_score for each sample
+        for i in range(len(predictions)):
+            result = self.sample_score(predictions[i], references[i],
+                                       test_set[i])
+            details.append(result)
+            if result.get('is_correct', False):
+                correct_count += 1
+
+        # Calculate accuracy
+        accuracy = (correct_count /
+                    len(predictions)) * 100 if predictions else 0
+
+        # Return evaluation results
+        return {'accuracy': accuracy, 'details': details}

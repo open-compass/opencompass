@@ -2,7 +2,7 @@
 
 ## 简介
 
-数学推理能力是大语言模型(LLMs)的一项关键能力。为了评估模型的数学能力，我们需要测试其逐步解决数学问题并提供准确最终答案的能力。OpenCompass 通过 CustomDataset 和 MATHEvaluator 组件提供了一种便捷的数学推理评测方式。
+数学推理能力是大语言模型(LLMs)的一项关键能力。为了评估模型的数学能力，我们需要测试其逐步解决数学问题并提供准确最终答案的能力。OpenCompass 通过 CustomDataset 和 MATHVerifyEvaluator 组件提供了一种便捷的数学推理评测方式。
 
 ## 数据集格式
 
@@ -61,7 +61,7 @@ math_infer_cfg = dict(
 
 ```python
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator),
+    evaluator=dict(type=MATHVerifyEvaluator),
 )
 ```
 
@@ -86,11 +86,11 @@ math_datasets = [
 ]
 ```
 
-## MATHEvaluator
+## MATHVerifyEvaluator
 
-MATHEvaluator 是专门设计用于评估数学答案的评测器。它基于 math_verify 库进行开发，该库提供了数学表达式解析和验证功能，支持 LaTeX 和一般表达式的提取与等价性验证。
+MATHVerifyEvaluator 是专门设计用于评估数学答案的评测器。它基于 math_verify 库进行开发，该库提供了数学表达式解析和验证功能，支持 LaTeX 和一般表达式的提取与等价性验证。
 
-MATHEvaluator 具有以下功能：
+MATHVerifyEvaluator 具有以下功能：
 
 1. 使用 LaTeX 提取器从预测和参考答案中提取答案
 2. 处理各种 LaTeX 格式和环境
@@ -133,7 +133,7 @@ MATHEvaluator 具有以下功能：
 from mmengine.config import read_base
 from opencompass.models import TurboMindModelwithChatTemplate
 from opencompass.datasets import CustomDataset
-from opencompass.openicl.icl_evaluator.math_evaluator import MATHEvaluator
+from opencompass.evaluator import MATHVerifyEvaluator
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
@@ -160,7 +160,7 @@ math_infer_cfg = dict(
 
 # 评测配置
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator),
+    evaluator=dict(type=MATHVerifyEvaluator),
 )
 
 # 数据集配置

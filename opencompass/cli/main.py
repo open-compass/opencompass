@@ -12,8 +12,8 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import (LarkReporter, get_logger, read_from_station,
-                               save_to_station)
+from opencompass.utils import (LarkReporter, get_logger, pretty_print_config,
+                               read_from_station, save_to_station)
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 
@@ -94,6 +94,11 @@ def parse_args():
         help='Use the custom config directory instead of config/ to '
         'search the configs for datasets, models and summarizers',
         type=str)
+    parser.add_argument(
+        '--config-verbose',
+        default=False,
+        action='store_true',
+        help='Whether to print the config in verbose mode.')
     parser.add_argument('-l',
                         '--lark',
                         help='Report the running status to lark bot',
@@ -131,7 +136,7 @@ def parse_args():
         'correctness of each sample, bpb, etc.',
         action='store_true',
     )
-
+    # for the results persistence
     parser.add_argument('-sp',
         '--station-path',
         help='Path to your results station.',
@@ -150,7 +155,12 @@ def parse_args():
              'data station.',
         action='store_true',
     )
-
+    # for evaluation with multiple runs
+    parser.add_argument('--dataset-num-runs',
+        help='How many runs for one dataset',
+        type=int,
+        default=1,
+    )
 
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
@@ -298,6 +308,11 @@ def main():
     elif cfg.get('lark_bot_url', None):
         content = f'{getpass.getuser()}\'s task has been launched!'
         LarkReporter(cfg['lark_bot_url']).post(content)
+
+
+    # print config if specified --config-verbose
+    if args.config_verbose:
+        pretty_print_config(cfg)
 
     # infer
     if args.mode in ['all', 'infer']:
