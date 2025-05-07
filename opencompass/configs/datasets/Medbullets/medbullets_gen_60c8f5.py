@@ -8,14 +8,6 @@ import os
 SYSTEM_PROMPT = 'You are a helpful medical assistant.\n\n' # Where to put this?
 ZERO_SHOT_PROMPT = 'Q: {question}\n Please select the correct answer from the options above and output only the corresponding letter (A, B, C, D, or E) without any explanation or additional text.\n'
 
-# 将相对于当前文件的相对路径转换为绝对路径
-def to_abs_path(relative_path: str) -> str:
-    # 当前脚本所在目录
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    # 拼接并规范化绝对路径
-    abs_path = os.path.abspath(os.path.join(base_dir, relative_path))
-    return abs_path
-
 # Reader configuration
 reader_cfg = dict(
     input_columns=[
@@ -56,7 +48,7 @@ eval_cfg = dict(
 medbullets_dataset = dict(
     type=MedbulletsDataset,
     abbr='medbullets',
-    path=to_abs_path('data/medbullets.csv'),
+    path='opencompass/medbullets',
     prompt_mode='zero-shot',
     reader_cfg=reader_cfg,
     infer_cfg=infer_cfg,

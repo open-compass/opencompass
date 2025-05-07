@@ -446,6 +446,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/ChemBench4K",
     },
+    "opencompass/medbullets": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./opencompass/configs/datasets/Medbullets/data/medbullets.csv",
+    },
 
 }
 
