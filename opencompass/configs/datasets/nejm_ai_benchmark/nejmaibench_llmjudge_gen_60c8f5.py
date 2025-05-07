@@ -1,4 +1,4 @@
-from opencompass.datasets import nejmaibenchDataset, nejmaibench_llmjudge_postprocess
+from opencompass.datasets import NejmaibenchDataset, nejmaibench_llmjudge_postprocess
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
@@ -28,15 +28,6 @@ GRADER_TEMPLATE = """
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
     Judging the correctness of candidates' answers:
 """.strip()
-
-
-# 将相对于当前文件的相对路径转换为绝对路径
-def to_abs_path(relative_path: str) -> str:
-    # 当前脚本所在目录
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    # 拼接并规范化绝对路径
-    abs_path = os.path.abspath(os.path.join(base_dir, relative_path))
-    return abs_path
 
 # Reader configuration
 reader_cfg = dict(
@@ -91,8 +82,8 @@ eval_cfg = dict(
             ),
         ),
         dataset_cfg=dict(
-            type=nejmaibenchDataset,
-            path=to_abs_path('data/NEJM_All_Questions_And_Answers.csv'),
+            type=NejmaibenchDataset,
+            path='opencompass/nejmaibench',
             prompt_mode='zero-shot',
             reader_cfg=reader_cfg,
         ),
@@ -103,9 +94,9 @@ eval_cfg = dict(
 
 
 nejmaibench_dataset = dict(
-    type=nejmaibenchDataset,
+    type=NejmaibenchDataset,
     abbr='nejmaibench',
-    path=to_abs_path('data/NEJM_All_Questions_And_Answers.csv'),
+    path='opencompass/nejmaibench',
     prompt_mode='zero-shot',
     reader_cfg=reader_cfg,
     infer_cfg=infer_cfg,

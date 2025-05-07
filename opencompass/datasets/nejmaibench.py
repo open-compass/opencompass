@@ -5,7 +5,7 @@ from datasets import Dataset
 
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-from opencompass.utils import get_logger
+from opencompass.utils import get_data_path, get_logger
 
 from .base import BaseDataset
 
@@ -39,11 +39,12 @@ def _parse(item, prompt_mode):
 
 
 @LOAD_DATASET.register_module()
-class nejmaibenchDataset(BaseDataset):
+class NejmaibenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, prompt_mode: str = 'zero-shot', **kwargs):
         # 读取 CSV 文件为 DataFrame，并将 NaN 转为空字符串
+        path = get_data_path(path)
         df = pd.read_csv(path, encoding='utf-8')
         df = df.fillna('')
 
@@ -61,7 +62,7 @@ class nejmaibenchDataset(BaseDataset):
         return dataset
 
 
-class nejmaibenchEvaluator(BaseEvaluator):
+class NejmaibenchEvaluator(BaseEvaluator):
 
     def score(self, predictions, references, test_set):
         method = test_set['prompt_mode'][0]

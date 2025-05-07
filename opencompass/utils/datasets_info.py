@@ -446,6 +446,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/ChemBench4K",
     },
+    "opencompass/nejmaibench": {
+        "ms_id": "",
+        "hf_id": "SeanWu25/NEJM-AI_Benchmarking_Medical_Language_Models",
+        "local": "./opencompass/configs/datasets/nejm_ai_benchmark/data/NEJM_All_Questions_And_Answers.csv",
+    },
 
 }
 
