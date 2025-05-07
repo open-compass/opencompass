@@ -700,7 +700,8 @@ class OpenAISDK(OpenAI):
                         )
                     if content:
                         return reasoning_content + self.think_tag + content
-                    return reasoning_content
+                    else:
+                        return reasoning_content
 
                 return content
 
