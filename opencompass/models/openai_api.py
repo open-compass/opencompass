@@ -531,26 +531,28 @@ class OpenAI(BaseAPIModel):
 
 class OpenAISDK(OpenAI):
 
-    def __init__(self,
-                 path: str = 'gpt-3.5-turbo',
-                 max_seq_len: int = 16384,
-                 query_per_second: int = 1,
-                 rpm_verbose: bool = False,
-                 retry: int = 2,
-                 key: str | List[str] = 'ENV',
-                 org: str | List[str] | None = None,
-                 meta_template: Dict | None = None,
-                 openai_api_base: str | List[str] = OPENAISDK_API_BASE,
-                 openai_proxy_url: Optional[str] = None,
-                 mode: str = 'none',
-                 logprobs: bool | None = False,
-                 top_logprobs: int | None = None,
-                 temperature: float | None = None,
-                 tokenizer_path: str | None = None,
-                 extra_body: Dict | None = None,
-                 verbose: bool = False,
-                 status_code_mappings: dict = {},
-                 think_tag: str = '</think>'):
+    def __init__(
+        self,
+        path: str = 'gpt-3.5-turbo',
+        max_seq_len: int = 16384,
+        query_per_second: int = 1,
+        rpm_verbose: bool = False,
+        retry: int = 2,
+        key: str | List[str] = 'ENV',
+        org: str | List[str] | None = None,
+        meta_template: Dict | None = None,
+        openai_api_base: str | List[str] = OPENAISDK_API_BASE,
+        openai_proxy_url: Optional[str] = None,
+        mode: str = 'none',
+        logprobs: bool | None = False,
+        top_logprobs: int | None = None,
+        temperature: float | None = None,
+        tokenizer_path: str | None = None,
+        extra_body: Dict | None = None,
+        verbose: bool = False,
+        status_code_mappings: dict = {},
+        think_tag: str = '</think>',
+    ):
         super().__init__(
             path,
             max_seq_len,
@@ -597,11 +599,13 @@ class OpenAISDK(OpenAI):
         self.status_code_mappings = status_code_mappings
         self.think_tag = think_tag
 
-    def _generate(self,
-                  input: PromptList | str,
-                  max_out_len: int,
-                  temperature: float,
-                  timeout: int = 3600) -> str:
+    def _generate(
+        self,
+        input: PromptList | str,
+        max_out_len: int,
+        temperature: float,
+        timeout: int = 3600,
+    ) -> str:
         """Generate results given a list of inputs.
 
         Args:
@@ -662,7 +666,12 @@ class OpenAISDK(OpenAI):
 
                 # Check if response is empty or content is empty
                 if (not responses.choices or not responses.choices[0].message
-                        or not responses.choices[0].message.content):
+                        or
+                    (not responses.choices[0].message.content and not getattr(
+                        responses.choices[0].message,
+                        'reasoning_content',
+                        '',
+                    ))):  # noqa: E125
                     self.logger.error(
                         'Failed to extract content from the responses. '
                         'Please check the API response for detail information.'
@@ -670,12 +679,13 @@ class OpenAISDK(OpenAI):
                         responses,
                     )
                     num_retries += 1
-                    # Continue to retry instead of returning empty response
                     continue
 
+                reasoning_content = (getattr(responses.choices[0].message,
+                                             'reasoning_content', '') or '')
+                content = responses.choices[0].message.content or ''
                 # Concat Reasoning Content and tags to content
-                if (hasattr(responses.choices[0].message, 'reasoning_content')
-                        and responses.choices[0].message.reasoning_content):
+                if reasoning_content:
                     if self.verbose:
                         self.logger.info(
                             'Follow'
@@ -684,14 +694,17 @@ class OpenAISDK(OpenAI):
                             'Reasoning Content: %s, \n'
                             'Tags: %s, \n'
                             'Content: %s',
-                            responses.choices[0].message.reasoning_content,
+                            reasoning_content,
                             self.think_tag,
-                            responses.choices[0].message.content)
-                    return (responses.choices[0].message.reasoning_content +
-                            self.think_tag +
-                            responses.choices[0].message.content)
+                            content,
+                        )
+                    if content:
+                        return reasoning_content + self.think_tag + content
+                    else:
+                        return reasoning_content
 
-                return responses.choices[0].message.content
+                else:
+                    return content
 
             except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status
