@@ -1023,3 +1023,9 @@
     paper: https://arxiv.org/pdf/2402.09391
     configpath: opencompass/configs/datasets/SmolInstruct/smolinstruct_gen.py
     configpath_llmjudge: ''
+- internsandbox:
+    name: InternSandbox
+    category: Reasoning/Code/Agent
+    paper: ''
+    configpath: opencompass/configs/datasets/internsandbox/internsandbox_gen_44b982.py
+    configpath_llmjudge: ''
