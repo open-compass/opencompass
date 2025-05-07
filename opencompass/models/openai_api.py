@@ -703,7 +703,8 @@ class OpenAISDK(OpenAI):
                     else:
                         return reasoning_content
 
-                return content
+                else:
+                    return content
 
             except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status
