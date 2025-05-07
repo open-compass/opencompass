@@ -1,6 +1,7 @@
-from datasets import Dataset, DatasetDict, load_dataset
+from datasets import Dataset, load_dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -9,9 +10,9 @@ from .base import BaseDataset
 class PubMedQADataset(BaseDataset):
 
     @staticmethod
-    def load_single():
+    def load_single(path):
         dataset = []
-        ds = load_dataset('qiaojin/PubMedQA', 'pqa_labeled')
+        ds = load_dataset(path, 'pqa_labeled')
         for data in ds['train']:
             data['question'] = (f"CONTEXTS: {data['context']}\n"
                                 f"QUESTION: {data['question']}")
@@ -30,10 +31,6 @@ class PubMedQADataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        train_dataset = Dataset.from_list([])
-        val_dataset = PubMedQADataset.load_single()
-        dataset = DatasetDict({
-            'train': train_dataset,
-            'validation': val_dataset
-        })
+        path = get_data_path(path)
+        dataset = PubMedQADataset.load_single(path)
         return dataset

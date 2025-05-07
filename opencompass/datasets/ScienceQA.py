@@ -1,6 +1,7 @@
-from datasets import Dataset, DatasetDict, load_dataset
+from datasets import Dataset, load_dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -9,9 +10,9 @@ from .base import BaseDataset
 class ScienceQADataset(BaseDataset):
 
     @staticmethod
-    def load_single():
+    def load_single(path):
         dataset = []
-        ds = load_dataset('derek-thomas/ScienceQA')
+        ds = load_dataset(path)
         for data in ds['test']:
             if data['image'] is None:
                 data['label'] = chr(65 + data['answer']
@@ -28,10 +29,6 @@ class ScienceQADataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        train_dataset = Dataset.from_list([])
-        val_dataset = ScienceQADataset.load_single()
-        dataset = DatasetDict({
-            'train': train_dataset,
-            'validation': val_dataset
-        })
+        path = get_data_path(path)
+        dataset = ScienceQADataset.load_single(path)
         return dataset

@@ -39,7 +39,6 @@ PubMedQA_datasets = []
 PubMedQA_reader_cfg = dict(
     input_columns=['question', 'choices'],
     output_column='label',
-    test_split='validation',
 )
 
 PubMedQA_infer_cfg = dict(

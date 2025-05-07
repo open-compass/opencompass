@@ -45,7 +45,6 @@ ClinicBench_datasets = []
 ClinicBench_reader_cfg = dict(
     input_columns=['question', 'choices'],
     output_column='label',
-    test_split='validation',
 )
 
 ClinicBench_infer_cfg = dict(

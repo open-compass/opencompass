@@ -1,6 +1,7 @@
-from datasets import Dataset, DatasetDict, load_dataset
+from datasets import load_dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -9,16 +10,12 @@ from .base import BaseDataset
 class ClinicBenchDataset(BaseDataset):
 
     @staticmethod
-    def load_single():
-        dataset = load_dataset('xuxuxuxuxu/Pharmacology-QA')['train']
+    def load_single(path):
+        dataset = load_dataset(path)['train']
         return dataset
 
     @staticmethod
     def load(path):
-        train_dataset = Dataset.from_list([])
-        val_dataset = ClinicBenchDataset.load_single()
-        dataset = DatasetDict({
-            'train': train_dataset,
-            'validation': val_dataset
-        })
+        path = get_data_path(path)
+        dataset = ClinicBenchDataset.load_single(path)
         return dataset

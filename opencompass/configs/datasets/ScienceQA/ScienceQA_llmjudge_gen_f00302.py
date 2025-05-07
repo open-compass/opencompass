@@ -39,7 +39,6 @@ ScienceQA_datasets = []
 ScienceQA_reader_cfg = dict(
     input_columns=['question', 'choices'],
     output_column='label',
-    test_split='validation',
 )
 
 ScienceQA_infer_cfg = dict(
