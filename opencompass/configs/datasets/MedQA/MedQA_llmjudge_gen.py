@@ -43,9 +43,8 @@ GRADER_TEMPLATE = """
 MedQA_datasets = []
 
 MedQA_reader_cfg = dict(
-    input_columns=['question', 'A', 'B', 'C', 'D', 'choices'],
+    input_columns=['question', 'choices'],
     output_column='label',
-    test_split='validation',
 )
 
 MedQA_infer_cfg = dict(
@@ -61,41 +60,49 @@ MedQA_infer_cfg = dict(
     inferencer=dict(type=GenInferencer),
 )
 
-MedQA_eval_cfg = dict(
-    evaluator=dict(
-        type=GenericLLMEvaluator,
-        prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
-                    )
-                ],
-                round=[
-                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-                ],
-            ),
-        ),
-        dataset_cfg=dict(
-            type=MedQADataset,
-            path='opencompass/MedQA',
-            reader_cfg=MedQA_reader_cfg,
-        ),
-        judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
-    ),
-)
+MedQA_subsets = {
+    'US': 'xuxuxuxuxu/MedQA_US_test',
+    'Mainland': 'xuxuxuxuxu/MedQA_Mainland_test',
+    'Taiwan': 'xuxuxuxuxu/MedQA_Taiwan_test',
+}
 
-MedQA_datasets.append(
-    dict(
-        abbr=f'MedQA',
-        type=MedQADataset,
-        path='opencompass/MedQA',
-        reader_cfg=MedQA_reader_cfg,
-        infer_cfg=MedQA_infer_cfg,
-        eval_cfg=MedQA_eval_cfg,
+for split in list(MedQA_subsets.keys()):
+
+    MedQA_eval_cfg = dict(
+        evaluator=dict(
+            type=GenericLLMEvaluator,
+            prompt_template=dict(
+                type=PromptTemplate,
+                template=dict(
+                    begin=[
+                        dict(
+                            role='SYSTEM',
+                            fallback_role='HUMAN',
+                            prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
+                        )
+                    ],
+                    round=[
+                        dict(role='HUMAN', prompt=GRADER_TEMPLATE),
+                    ],
+                ),
+            ),
+            dataset_cfg=dict(
+                type=MedQADataset,
+                path=MedQA_subsets[split],
+                reader_cfg=MedQA_reader_cfg,
+            ),
+            judge_cfg=dict(),
+            dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+        ),
     )
-)
+
+    MedQA_datasets.append(
+        dict(
+            abbr=f'MedQA_{split}',
+            type=MedQADataset,
+            path=MedQA_subsets[split],
+            reader_cfg=MedQA_reader_cfg,
+            infer_cfg=MedQA_infer_cfg,
+            eval_cfg=MedQA_eval_cfg,
+        )
+    )
