@@ -1,7 +1,6 @@
 from datasets import Dataset, load_dataset
 
 from opencompass.registry import LOAD_DATASET
-from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -31,6 +30,5 @@ class PubMedQADataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        path = get_data_path(path)
         dataset = PubMedQADataset.load_single(path)
         return dataset

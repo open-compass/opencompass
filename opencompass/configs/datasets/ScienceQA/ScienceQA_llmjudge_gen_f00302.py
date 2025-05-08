@@ -74,7 +74,7 @@ ScienceQA_eval_cfg = dict(
         ),
         dataset_cfg=dict(
             type=ScienceQADataset,
-            path='opencompass/ScienceQA',
+            path='derek-thomas/ScienceQA',
             reader_cfg=ScienceQA_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -86,7 +86,7 @@ ScienceQA_datasets.append(
     dict(
         abbr=f'ScienceQA',
         type=ScienceQADataset,
-        path='opencompass/ScienceQA',
+        path='derek-thomas/ScienceQA',
         reader_cfg=ScienceQA_reader_cfg,
         infer_cfg=ScienceQA_infer_cfg,
         eval_cfg=ScienceQA_eval_cfg,

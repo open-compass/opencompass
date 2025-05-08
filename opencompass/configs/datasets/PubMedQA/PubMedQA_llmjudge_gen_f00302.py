@@ -74,7 +74,7 @@ PubMedQA_eval_cfg = dict(
         ),
         dataset_cfg=dict(
             type=PubMedQADataset,
-            path='opencompass/PubMedQA',
+            path='qiaojin/PubMedQA',
             reader_cfg=PubMedQA_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -86,7 +86,7 @@ PubMedQA_datasets.append(
     dict(
         abbr=f'PubMedQA',
         type=PubMedQADataset,
-        path='opencompass/PubMedQA',
+        path='qiaojin/PubMedQA',
         reader_cfg=PubMedQA_reader_cfg,
         infer_cfg=PubMedQA_infer_cfg,
         eval_cfg=PubMedQA_eval_cfg,

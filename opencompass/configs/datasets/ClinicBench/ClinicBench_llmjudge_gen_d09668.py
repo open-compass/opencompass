@@ -80,7 +80,7 @@ ClinicBench_eval_cfg = dict(
         ),
         dataset_cfg=dict(
             type=ClinicBenchDataset,
-            path='opencompass/ClinicBench',
+            path='xuxuxuxuxu/Pharmacology-QA',
             reader_cfg=ClinicBench_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -92,7 +92,7 @@ ClinicBench_datasets.append(
     dict(
         abbr=f'ClinicBench',
         type=ClinicBenchDataset,
-        path='opencompass/ClinicBench',
+        path='xuxuxuxuxu/Pharmacology-QA',
         reader_cfg=ClinicBench_reader_cfg,
         infer_cfg=ClinicBench_infer_cfg,
         eval_cfg=ClinicBench_eval_cfg,

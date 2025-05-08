@@ -446,21 +446,6 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/ChemBench4K",
     },
-     "opencompass/ClinicBench": {
-        "ms_id": "",
-        "hf_id": "xuxuxuxuxu/Pharmacology-QA",
-        "local": "",
-    },
-     "opencompass/ScienceQA": {
-        "ms_id": "",
-        "hf_id": "derek-thomas/ScienceQA",
-        "local": "",
-    },
-     "opencompass/PubMedQA": {
-        "ms_id": "",
-        "hf_id": "qiaojin/PubMedQA",
-        "local": "",
-    },
 
 }
 
