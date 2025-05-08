@@ -42,7 +42,6 @@ reader_cfg = dict(
     ],
     output_column='answer',
 )
-
 # Inference configuration
 infer_cfg = dict(
     prompt_template=dict(

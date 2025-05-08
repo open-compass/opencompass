@@ -1,10 +1,6 @@
-import re
+from datasets import load_dataset
 
-from datasets import Dataset, load_dataset
-
-from opencompass.openicl import BaseEvaluator
-from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-from opencompass.utils import get_logger
+from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
