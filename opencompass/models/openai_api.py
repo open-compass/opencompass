@@ -25,7 +25,7 @@ OPENAI_API_BASE = os.path.join(
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3', 'o4-mini']
+O1_MODEL_LIST = ['o1', 'o3', 'o4']
 
 
 @MODELS.register_module()
@@ -254,8 +254,7 @@ class OpenAI(BaseAPIModel):
                         logprobs=self.logprobs,
                         top_logprobs=self.top_logprobs,
                         stop=None,
-                        # Only the default (1) value is supported.
-                        temperature=1,
+                        temperature=temperature,
                     )
                 else:
                     data = dict(
