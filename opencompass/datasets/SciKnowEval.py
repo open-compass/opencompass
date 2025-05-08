@@ -1,23 +1,22 @@
 import re
 
-from datasets import Dataset, load_dataset
+from datasets import load_dataset
 
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-from opencompass.utils import get_logger
 
 from .base import BaseDataset
 
 
 def _parse(item, prompt_mode, discipline):
     choices = item['choices']
-    item['q4'] = f'You are an expert in {discipline}.\n' + item['prompt'][
-        'default'] + '\n' + item['question'] + '\n' + '\n'.join([
-            f'{l}. {t}' for l, t in zip(choices['label'], choices['text'])
-        ])  # noqa: E501, E741, E741
-    item['start'] = chr(65)
-    item['end'] = chr(65 + len(item.get('choices', {'label': []})['label']) -
-                      1)
+
+    item['q4'] = f'You are an expert in {discipline}.\n'
+    item['q4'] += item['prompt']['default'] + '\n' + item['question'] + '\n'
+    label_texts = []
+    for label_meta, text_meta in zip(choices['label'], choices['text']):
+        label_texts.append(f'{label_meta}. {text_meta}')
+    item['q4'] += '\n'.join(label_texts)  # noqa: E501, E741, E741
     item['prompt_mode'] = prompt_mode
     return item
 
@@ -34,10 +33,10 @@ class SciKnowEvalDataset(BaseDataset):
             return s[0].upper() + s[1:]
 
         subset = kwargs['subset']
-        data_files = {
-            'test':
-            f'data/{capitalize_first_letter(subset)}/sciknoweval_{subset}_test.jsonl'
-        }
+        data_files = {}
+        test_file = f'data/{capitalize_first_letter(subset)}/'
+        test_file += f'sciknoweval_{subset}_test.jsonl'
+        data_files['test'] = test_file
         dataset = load_dataset(path, data_files=data_files, split='test')
         # dataset = dataset.select(range(20))
         if prompt_mode == 'zero-shot':
