@@ -1,4 +1,4 @@
-from opencompass.datasets import CARDBiomedBenchDataset, CARDBiomedBench_llmjudge_postprocess
+from opencompass.datasets import CARDBiomedBenchDataset
 from opencompass.datasets import generic_llmjudge_postprocess
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -87,7 +87,7 @@ eval_cfg = dict(
             reader_cfg=reader_cfg,
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=CARDBiomedBench_llmjudge_postprocess),
+        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
 )
 cardbiomedbench_dataset = dict(
