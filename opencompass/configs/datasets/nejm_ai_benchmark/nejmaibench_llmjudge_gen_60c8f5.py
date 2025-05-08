@@ -1,7 +1,8 @@
-from opencompass.datasets import NejmaibenchDataset, nejmaibench_llmjudge_postprocess
+from opencompass.datasets import NejmaibenchDataset
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.datasets import generic_llmjudge_postprocess
 from opencompass.evaluator import GenericLLMEvaluator
 import os
 
@@ -88,7 +89,7 @@ eval_cfg = dict(
             reader_cfg=reader_cfg,
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=nejmaibench_llmjudge_postprocess),
+        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
 )
 
