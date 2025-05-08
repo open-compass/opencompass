@@ -128,6 +128,24 @@
     paper: https://arxiv.org/abs/2501.18362
     configpath: opencompass/configs/datasets/MedXpertQA/MedXpertQA_gen.py
     configpath_llmjudge: opencompass/configs/datasets/MedXpertQA/MedXpertQA_llmjudge_gen.py
+- ClinicBench:
+    name: ClinicBench
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2405.00716
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/ClinicBench/ClinicBench_llmjudge_gen.py
+- ScienceQA:
+    name: ScienceQA
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2209.09513
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/ScienceQA/ScienceQA_llmjudge_gen.py
+- PubMedQA:
+    name: PubMedQA
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/1909.06146
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/PubMedQA/PubMedQA_llmjudge_gen.py
 - musr:
     name: MuSR
     category: Reasoning
