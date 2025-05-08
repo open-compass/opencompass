@@ -1,4 +1,5 @@
 import argparse
+import math
 import os
 import re
 from datetime import datetime
@@ -10,12 +11,15 @@ from datasets import Dataset, load_dataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 from opencompass.utils import get_logger
-import math
+
 from .base import BaseDataset
+"""
+the original evaluation codes are from
+https://github.com/ncbi-nlp/MedCalc-Bench/blob/main/evaluation/evaluate.py
+https://github.com/ncbi-nlp/MedCalc-Bench/blob/main/evaluation/run.py
+"""
 
 
-# https://github.com/ncbi-nlp/MedCalc-Bench/blob/main/evaluation/evaluate.py
-# https://github.com/ncbi-nlp/MedCalc-Bench/blob/main/evaluation/run.py
 def check_correctness(answer: str, ground_truth, calid, upper_limit,
                       lower_limit):
     """"""
@@ -322,75 +326,3 @@ class MedCalcOfficial_Evaluator(BaseEvaluator):
 
         result = {'accuracy': 100 * correct / count, 'details': details}
         return result
-
-
-# def _generic_llmjudge_postprocess(judgement: str):
-#     match = re.search(r'(A|B)', judgement)
-#     grade_letter = (match.group(0) if match else 'B'
-#                     )  # Default to "INCORRECT" if no match
-#     return grade_letter
-
-# def MedCalc_Bench_llmjudge_postprocess(
-#     output: dict,
-#     output_path: str,
-#     dataset: Dataset,
-# ) -> dict:
-#     # Get the original dataset
-#     original_dataset = dataset.reader.dataset['test']
-
-#     judged_answers = []
-#     original_responses = []
-#     references = []
-#     details = []
-
-#     total_correct = 0
-#     total_count = 0
-
-#     for k, v in output.items():
-#         idx = int(k)  # Convert key to integer for indexing
-#         original_responses.append(v['prediction'])
-#         processed_judge = _generic_llmjudge_postprocess(v['prediction'])
-
-#         sample = original_dataset[idx]
-#         # Record the judgment
-#         if processed_judge is not None:
-#             judged_answers.append(processed_judge)
-#             try:
-#                 gold = v['gold']
-#                 references.append(gold)
-#             except KeyError:
-#                 get_logger().warning(
-#                     f'No gold answer for {k}, use empty string as reference!')
-#                 gold = ''
-#                 references.append('')
-
-#             # Check if the answer is correct (A means correct)
-#             is_correct = processed_judge == 'A'
-#             total_count += 1
-
-#             if is_correct:
-#                 total_correct += 1
-
-#             # Add to details
-#             details.append({
-#                 'id': k,
-#                 'question': sample['question'],
-#                 'prediction': sample['prediction'],
-#                 'origin_prompt': v['origin_prompt'],
-#                 'llm_judge': processed_judge,
-#                 'gold': gold,
-#                 'is_correct': is_correct,
-#             })
-
-#     # Calculate overall accuracy with two decimal places
-#     overall_accuracy = (round(
-#         (total_correct / total_count * 100), 2) if total_count > 0 else 0.00)
-
-#     # Initialize results dictionary
-#     results = {
-#         'accuracy': overall_accuracy,
-#         'total_correct': total_correct,
-#         'total_count': total_count,
-#         'details': details,
-#     }
-#     return results
