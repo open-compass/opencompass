@@ -1,16 +1,12 @@
-import argparse
 import math
-import os
 import re
 from datetime import datetime
 
 import numpy as np
-import pandas as pd
-from datasets import Dataset, load_dataset
+from datasets import load_dataset
 
 from opencompass.openicl import BaseEvaluator
-from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-from opencompass.utils import get_logger
+from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 """
@@ -97,7 +93,13 @@ def extract_answer(answer, calid):
         extracted_answer = 'Not Found'
     else:
         extracted_answer = extracted_answer[-1].strip().strip('"')
-        if extracted_answer == 'str(short_and_direct_answer_of_the_question)' or extracted_answer == 'str(value which is the answer to the question)' or extracted_answer == 'X.XX':
+        if extracted_answer == 'str(short_and_direct\
+                _answer_of_the_question)':
+            extracted_answer = 'Not Found'
+        if extracted_answer == 'str(value which is\
+                the answer to the question)':
+            extracted_answer = 'Not Found'
+        if extracted_answer == 'X.XX':
             extracted_answer = 'Not Found'
 
     if calid in [13, 68]:
@@ -116,9 +118,8 @@ def extract_answer(answer, calid):
     elif calid in [69]:
         # Output Type: integer (A, B)
         match = re.search(
-            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,?\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?",
+            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,\?\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?",
             extracted_answer)
-        ground_truth = f'({match.group(1)}, {match.group(3)})'
         extracted_answer = extracted_answer.replace('[', '(').replace(
             ']', ')').replace("'", '').replace('"', '')
         match = re.search(
@@ -157,7 +158,7 @@ def extract_answer(answer, calid):
     ]:
         # Output Type: decimal
         match = re.search(r'str\((.*)\)', extracted_answer)
-        if match:  # cases like "str(round((140 * (3.15 - 136) / 1400) * 72.36)"
+        if match:
             expression = match.group(1).replace('^', '**').replace(
                 'is odd', '% 2 == 1').replace('is even', '% 2 == 0').replace(
                     'sqrt', 'math.sqrt').replace('.math', '').replace(
@@ -166,9 +167,7 @@ def extract_answer(answer, calid):
                             'g/dl', '').replace('mmol/L', '').replace(
                                 'kg', '').replace('g',
                                                   '').replace('mEq/L', '')
-            expression = expression.split(
-                '#'
-            )[0]  # cases like round(45.5 * 166 - 45.3 + 0.4 * (75 - (45.5 * 166 - 45.3))))) # Calculation: ...
+            expression = expression.split('#')[0]
             if expression.count('(') > expression.count(')'):  # add missing ')
                 expression += ')' * (expression.count('(') -
                                      expression.count(')'))
@@ -188,7 +187,7 @@ def extract_answer(answer, calid):
                     'np': np,
                     'numpy': np
                 })
-            except:
+            except Exception:
                 print(f'Error in evaluating expression: {expression}')
                 answer = 'N/A'
         else:
