@@ -66,6 +66,7 @@ sciknoweval_dataset_chemistry = dict(
     infer_cfg=infer_cfg,
     eval_cfg=eval_cfg,
 )
+
 sciknoweval_dataset_material = dict(
     type=SciKnowEvalDataset,
     abbr='sciknoweval_material',
