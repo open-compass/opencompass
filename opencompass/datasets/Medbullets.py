@@ -166,7 +166,6 @@ def medbullets_llmjudge_postprocess(
         processed_judge = _generic_llmjudge_postprocess(v['prediction'])
 
         # Get category information from the dataset
-        print('检查内容original_dataset', original_dataset)
         sample = original_dataset[idx]
         question_type = sample.get('question_type', 'unknown')
 
