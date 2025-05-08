@@ -1047,3 +1047,9 @@
     paper: ''
     configpath: opencompass/configs/datasets/internsandbox/internsandbox_gen_44b982.py
     configpath_llmjudge: ''
+- nejmaibench:
+    name: nejmaibench
+    category: Science /Medicine
+    paper: https://arxiv.org/pdf/2308.04709
+    configpath: opencompass/configs/datasets/nejm_ai_benchmark/nejmaibench_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/nejm_ai_benchmark/nejmaibench_llmjudge_gen.py
