@@ -361,6 +361,12 @@
     paper: https://arxiv.org/pdf/2004.05986
     configpath: opencompass/configs/datasets/CLUE_C3/CLUE_C3_gen.py
     configpath_llmjudge: ''
+- CARDBiomedBench:
+    name: CARDBiomedBench
+    category: Knowledge / Medicine
+    paper: https://www.biorxiv.org/content/10.1101/2025.01.15.633272v1
+    configpath: opencompass/configs/datasets/CARDBiomedBench
+    configpath_llmjudge: 'opencompass/configs/datasets/CARDBiomedBench/CARDBiomedBench_llmjudge_gen_99a231.py'
 - cb:
     name: SuperGLUE / CB
     category: Reasoning
