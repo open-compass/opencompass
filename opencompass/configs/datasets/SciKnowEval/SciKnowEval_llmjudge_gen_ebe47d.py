@@ -1,6 +1,5 @@
-from opencompass.datasets import SciKnowEvalDataset, SciKnowEvalEvaluator
+from opencompass.datasets import SciKnowEvalDataset, SciKnowEvalEvaluator, SciKnowEval_llmjudge_postprocess
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import generic_llmjudge_postprocess
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.evaluator import GenericLLMEvaluator
@@ -91,7 +90,7 @@ eval_cfg_biology = dict(
             reader_cfg=reader_cfg,
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+        dict_postprocessor=dict(type=SciKnowEval_llmjudge_postprocess),
     ),
 )
 
@@ -121,7 +120,7 @@ eval_cfg_chemistry = dict(
             subset='chemistry',
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+        dict_postprocessor=dict(type=SciKnowEval_llmjudge_postprocess),
     ),
 )
 
@@ -151,7 +150,7 @@ eval_cfg_material = dict(
             subset='material',
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+        dict_postprocessor=dict(type=SciKnowEval_llmjudge_postprocess),
     ),
 )
 
@@ -181,7 +180,7 @@ eval_cfg_physics = dict(
             subset='physics',
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+        dict_postprocessor=dict(type=SciKnowEval_llmjudge_postprocess),
     ),
 )
 
