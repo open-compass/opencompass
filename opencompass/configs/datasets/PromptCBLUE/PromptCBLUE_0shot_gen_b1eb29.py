@@ -15,7 +15,7 @@ PromptCBLUE_lifescience_sets = [
 reader_cfg = dict(
     input_columns=['input', 'answer_choices', 'options_str'],
     output_column='target',
-    train_split='dev',
+    train_split='validation',
 )
 
 # 3. Prompt 模板：末行固定 ANSWER: $LETTER
@@ -41,7 +41,7 @@ infer_cfg_common = dict(
     inferencer=dict(type=GenInferencer),
 )
 
-# 4. 评估配置：与 MMLU 同款
+# 4. 评估配置
 eval_cfg_common = dict(
     evaluator=dict(type=AccEvaluator),
     pred_postprocessor=dict(type=first_capital_postprocess),
@@ -53,7 +53,7 @@ for ds_name in PromptCBLUE_lifescience_sets:
     promptcblue_datasets.append(dict(
         abbr=f'promptcblue_{ds_name.lower().replace("-", "_")}_norm',
         type=PromptCBLUEDataset,
-        path='/fs-computility/ai4sData/shared/lifescience/tangcheng/LifeScience/opencompass_val/datasets/PromptCBLUE',
+        path='tchenglv/PromptCBLUE',
         name=ds_name,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg_common,

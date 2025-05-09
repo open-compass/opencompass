@@ -41,7 +41,7 @@ Candidate answer: {prediction}
 reader_cfg = dict(
     input_columns=['input', 'answer_choices', 'options_str'],
     output_column='target',
-    train_split='dev'
+    train_split='validation'
 )
 
 # Assemble LLM evaluation datasets
@@ -78,7 +78,7 @@ for name in PromptCBLUE_lifescience_sets:
             ),
             dataset_cfg=dict(
                 type=PromptCBLUEDataset,
-                path='/fs-computility/ai4sData/shared/lifescience/tangcheng/LifeScience/opencompass_val/datasets/PromptCBLUE',
+                path='tchenglv/PromptCBLUE',
                 name=name,
                 reader_cfg=reader_cfg,
             ),
@@ -92,7 +92,7 @@ for name in PromptCBLUE_lifescience_sets:
         dict(
             abbr=f"promptcblue_{name.lower().replace('-', '_')}_norm_llm",
             type=PromptCBLUEDataset,
-            path='/fs-computility/ai4sData/shared/lifescience/tangcheng/LifeScience/opencompass_val/datasets/PromptCBLUE',
+            path='tchenglv/PromptCBLUE',
             name=name,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
