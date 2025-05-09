@@ -9,11 +9,6 @@ from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
-"""
-the original evaluation codes are from
-https://github.com/ncbi-nlp/MedCalc-Bench/blob/main/evaluation/evaluate.py
-https://github.com/ncbi-nlp/MedCalc-Bench/blob/main/evaluation/run.py
-"""
 
 
 def check_correctness(answer: str, ground_truth, calid, upper_limit,
@@ -34,12 +29,12 @@ def check_correctness(answer: str, ground_truth, calid, upper_limit,
     elif calid in [69]:
         # Output Type: integer (A, B)
         match = re.search(
-            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,?\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?",
-            ground_truth)
+            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,?"
+            r"\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?", ground_truth)
         ground_truth = f'({match.group(1)}, {match.group(3)})'
         match = re.search(
-            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,?\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?",
-            answer)
+            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,?"
+            r"\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?", answer)
         if match:
             weeks = match.group(1)
             days = match.group(3)
@@ -80,7 +75,8 @@ def extract_answer(answer, calid):
     calid = int(calid)
     extracted_answer = re.findall(r'[Aa]nswer":\s*(.*?)\}', answer)
     matches = re.findall(
-        r'"step_by_step_thinking":\s*"([^"]+)"\s*,\s*"[Aa]nswer"', answer)
+        r'"step_by_step_thinking":\s*"'
+        r'([^"]+)"\s*,\s*"[Aa]nswer"', answer)
 
     if matches:
         # Select the last match
@@ -105,8 +101,8 @@ def extract_answer(answer, calid):
     if calid in [13, 68]:
         # Output Type: date
         match = re.search(
-            r'^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/(\d{4})',
-            extracted_answer)
+            r'^(0?[1-9]|1[0-2])\/(0?[1-9]'
+            r'|[12][0-9]|3[01])\/(\d{4})', extracted_answer)
         if match:
             month = int(match.group(1))
             day = int(match.group(2))
@@ -118,13 +114,13 @@ def extract_answer(answer, calid):
     elif calid in [69]:
         # Output Type: integer (A, B)
         match = re.search(
-            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,\?\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?",
-            extracted_answer)
+            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,"
+            r"\?\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?", extracted_answer)
         extracted_answer = extracted_answer.replace('[', '(').replace(
             ']', ')').replace("'", '').replace('"', '')
         match = re.search(
-            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,?\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?",
-            extracted_answer)
+            r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,"
+            r"?\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?", extracted_answer)
         if match:
             weeks = match.group(1)
             days = match.group(3)
