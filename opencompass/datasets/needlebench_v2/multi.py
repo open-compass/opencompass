@@ -8,10 +8,9 @@ from datasets import Dataset
 from huggingface_hub import hf_hub_download
 
 from opencompass.datasets.base import BaseDataset
-from opencompass.datasets.needlebench_v2.atc import (relationship_templates_en,
-                                                  relationship_templates_zh_CN,
-                                                  relationship_terms_en,
-                                                  relationship_terms_zh_CN)
+from opencompass.datasets.needlebench_v2.atc import (
+    relationship_templates_en, relationship_templates_zh_CN,
+    relationship_terms_en, relationship_terms_zh_CN)
 from opencompass.registry import LOAD_DATASET
 
 

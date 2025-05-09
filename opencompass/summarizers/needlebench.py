@@ -561,9 +561,9 @@ class NeedleBenchSummarizer(DefaultSummarizer):
 
 class NeedleBenchSummarizerV2(NeedleBenchSummarizer):
     """NeedleBench summarizer V2 in OpenCompass.
-    
+
     This version calls save_results_to_plots with mean=True.
-    
+
     Args:
         config (ConfigDict): The configuration object of the evaluation task. It's expected to be filled out at runtime.
         dataset_abbrs (list[str], optional): Dataset abbreviations to be listed in the summary.
@@ -572,7 +572,7 @@ class NeedleBenchSummarizerV2(NeedleBenchSummarizer):
             'weights' if weighted average is needed.
         prompt_db: A deprecated field.
     """
-    
+
     def summarize(
         self,
         output_path: str = None,
