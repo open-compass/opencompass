@@ -1,11 +1,10 @@
-from opencompass.datasets import SciKnowEvalDataset, SciKnowEvalEvaluator
+from opencompass.datasets import SciKnowEvalDataset
 from opencompass.datasets import generic_llmjudge_postprocess
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.evaluator import GenericLLMEvaluator
 ZERO_SHOT_PROMPT = '{q4}'
-
 
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
