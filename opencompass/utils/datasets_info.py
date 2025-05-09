@@ -451,6 +451,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/nejmaibench/NEJM_All_Questions_And_Answers.csv",
     },
+    "opencompass/medbullets": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./opencompass/configs/datasets/Medbullets/data/medbullets.csv",
+    },
 
 }
 
