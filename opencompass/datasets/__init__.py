@@ -97,6 +97,8 @@ from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
+from .MedCalc_Bench import MedCalc_BenchDataset  # noqa: F401
+from .MedCalc_Bench import MedCalcOfficial_Evaluator  # noqa: F401
 from .MedQA import *  # noqa: F401, F403
 from .MedXpertQA import *  # noqa: F401, F403
 from .mgsm import *  # noqa: F401, F403
