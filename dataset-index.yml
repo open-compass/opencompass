@@ -122,6 +122,12 @@
     paper: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10778138
     configpath: opencompass/configs/datasets/MedBench/medbench_gen.py
     configpath_llmjudge: ''
+- MedCalc_Bench:
+    name: MedCalc_Bench
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2406.12036
+    configpath: opencompass/configs/datasets/MedCalc_Bench/MedCalcBench_official_gen_a5155f.py
+    configpath_llmjudge: ''
 - MedXpertQA:
     name: MedQA
     category: Knowledge / Medicine
