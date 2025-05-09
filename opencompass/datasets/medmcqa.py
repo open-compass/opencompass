@@ -29,7 +29,7 @@ def _parse(item, prompt_mode):
 
 
 @LOAD_DATASET.register_module()
-class medmcqaDataset(BaseDataset):
+class MedmcqaDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, prompt_mode: str = 'zero-shot', **kwargs):
@@ -45,7 +45,7 @@ class medmcqaDataset(BaseDataset):
         return dataset
 
 
-class medmcqaEvaluator(BaseEvaluator):
+class MedmcqaEvaluator(BaseEvaluator):
 
     def score(self, predictions, references, test_set):
         method = test_set['prompt_mode'][0]

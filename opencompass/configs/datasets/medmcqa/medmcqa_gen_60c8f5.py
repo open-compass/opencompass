@@ -1,4 +1,4 @@
-from opencompass.datasets import medmcqaDataset, medmcqaEvaluator
+from opencompass.datasets import MedmcqaDataset, MedmcqaEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
@@ -41,11 +41,11 @@ infer_cfg = dict(
 
 # Evaluation configuration
 eval_cfg = dict(
-    evaluator=dict(type=medmcqaEvaluator),
+    evaluator=dict(type=MedmcqaEvaluator),
     pred_role='BOT',
 )
 medmcqa_dataset = dict(
-    type=medmcqaDataset,
+    type=MedmcqaDataset,
     abbr='medmcqa',
     path='openlifescienceai/medmcqa',
     prompt_mode='zero-shot',

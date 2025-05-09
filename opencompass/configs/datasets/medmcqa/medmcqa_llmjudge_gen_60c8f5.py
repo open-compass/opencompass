@@ -1,4 +1,4 @@
-from opencompass.datasets import medmcqaDataset, medmcqa_llmjudge_postprocess
+from opencompass.datasets import MedmcqaDataset, medmcqa_llmjudge_postprocess
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
@@ -82,7 +82,7 @@ eval_cfg = dict(
             ),
         ),
         dataset_cfg=dict(
-            type=medmcqaDataset,
+            type=MedmcqaDataset,
             path='openlifescienceai/medmcqa',
             prompt_mode='zero-shot',
             reader_cfg=reader_cfg,
@@ -92,7 +92,7 @@ eval_cfg = dict(
     ),
 )
 medmcqa_dataset = dict(
-    type=medmcqaDataset,
+    type=MedmcqaDataset,
     abbr='medmcqa',
     path='openlifescienceai/medmcqa',
     prompt_mode='zero-shot',
