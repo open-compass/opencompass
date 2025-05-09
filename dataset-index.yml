@@ -123,6 +123,12 @@
     configpath: opencompass/configs/datasets/MedBench/medbench_gen.py
     configpath_llmjudge: ''
 - MedXpertQA:
+    name: MedQA
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2009.13081
+    configpath: opencompass/configs/datasets/MedQA/MedQA_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/MedQA/MedQA_llmjudge_gen.py
+- MedXpertQA:
     name: MedXpertQA
     category: Knowledge / Medicine
     paper: https://arxiv.org/abs/2501.18362
@@ -763,6 +769,12 @@
     paper: https://arxiv.org/pdf/1911.11641v1
     configpath: opencompass/configs/datasets/piqa/piqa_gen.py
     configpath_llmjudge: ''
+- ProteinLMBench:
+    name: ProteinLMBench
+    category: Knowledge / Biology (Protein)
+    paper: https://arxiv.org/abs/2406.05540
+    configpath: opencompass/configs/datasets/ProteinLMBench/ProteinLMBench_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/ProteinLMBench/ProteinLMBench_llmjudge_gen.py
 - py150:
     name: py150
     category: Code

@@ -97,6 +97,7 @@ from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
+from .MedQA import *  # noqa: F401, F403
 from .MedXpertQA import *  # noqa: F401, F403
 from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
@@ -118,6 +119,7 @@ from .OlympiadBench import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
 from .physics import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
+from .ProteinLMBench import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
 from .qaspercut import *  # noqa: F401, F403
