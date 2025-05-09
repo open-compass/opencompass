@@ -1,12 +1,14 @@
 # flake8: noqa: E501
 
 import difflib
+import itertools
 import os
 import re
 import tempfile
 import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import numpy as np
 from datasets import Dataset
 from gradio_client import Client
 
@@ -24,7 +26,7 @@ class CodeEvaluator(BaseEvaluator):
     """
 
     def __init__(self,
-                 language: str,
+                 language: str = 'py',
                  ip_address: str = 'localhost',
                  retry: int = 3) -> None:
         """Initialize the CodeEvaluator.
@@ -221,19 +223,18 @@ class CodeEvaluator(BaseEvaluator):
         test_set = test_set.to_pandas()
         # Use the first column as the unique identifier
         test_set_origin = test_set.drop_duplicates(subset=test_set.columns[0])
-        num_repeats = int(len(test_set) / len(test_set_origin))
 
         # 1. Prepare data for all test cases
         all_test_cases = []
         for i in range(len(test_set_origin)):
             test_case = test_set_origin.iloc[i]
-            completions = predictions[i * num_repeats:(i + 1) * num_repeats]
+            completions = predictions[i]
 
             # Process code completions
             processed_completions = self._process_completions(
                 test_case, completions)
 
-            result_dict = {
+            sub_data_dict = {
                 'name': test_case['name'],
                 'language': test_case['language'],
                 'prompt': test_case['prompt'],
@@ -242,7 +243,7 @@ class CodeEvaluator(BaseEvaluator):
                 'completions': completions
             }
 
-            all_test_cases.append(result_dict)
+            all_test_cases.append(sub_data_dict)
 
         # 2. Send all test cases to the evaluation service
         success, outputs, error_message = self._evaluate(all_test_cases)
@@ -262,6 +263,6 @@ class CodeEvaluator(BaseEvaluator):
             details.append(output)
 
         return {
-            f'pass@{num_repeats}': 100 * correct / len(test_set_origin),
+            f'pass@1': 100 * correct / len(test_set_origin),
             'details': details
         }
