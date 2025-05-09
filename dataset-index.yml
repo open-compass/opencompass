@@ -129,11 +129,35 @@
     configpath: opencompass/configs/datasets/MedCalc_Bench/MedCalcBench_official_gen_a5155f.py
     configpath_llmjudge: ''
 - MedXpertQA:
+    name: MedQA
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2009.13081
+    configpath: opencompass/configs/datasets/MedQA/MedQA_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/MedQA/MedQA_llmjudge_gen.py
+- MedXpertQA:
     name: MedXpertQA
     category: Knowledge / Medicine
     paper: https://arxiv.org/abs/2501.18362
     configpath: opencompass/configs/datasets/MedXpertQA/MedXpertQA_gen.py
     configpath_llmjudge: opencompass/configs/datasets/MedXpertQA/MedXpertQA_llmjudge_gen.py
+- ClinicBench:
+    name: ClinicBench
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2405.00716
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/ClinicBench/ClinicBench_llmjudge_gen.py
+- ScienceQA:
+    name: ScienceQA
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2209.09513
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/ScienceQA/ScienceQA_llmjudge_gen.py
+- PubMedQA:
+    name: PubMedQA
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/1909.06146
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/PubMedQA/PubMedQA_llmjudge_gen.py
 - musr:
     name: MuSR
     category: Reasoning
@@ -349,6 +373,12 @@
     paper: https://arxiv.org/pdf/2004.05986
     configpath: opencompass/configs/datasets/CLUE_C3/CLUE_C3_gen.py
     configpath_llmjudge: ''
+- CARDBiomedBench:
+    name: CARDBiomedBench
+    category: Knowledge / Medicine
+    paper: https://www.biorxiv.org/content/10.1101/2025.01.15.633272v1
+    configpath: opencompass/configs/datasets/CARDBiomedBench
+    configpath_llmjudge: 'opencompass/configs/datasets/CARDBiomedBench/CARDBiomedBench_llmjudge_gen_99a231.py'
 - cb:
     name: SuperGLUE / CB
     category: Reasoning
@@ -745,6 +775,12 @@
     paper: https://arxiv.org/pdf/1911.11641v1
     configpath: opencompass/configs/datasets/piqa/piqa_gen.py
     configpath_llmjudge: ''
+- ProteinLMBench:
+    name: ProteinLMBench
+    category: Knowledge / Biology (Protein)
+    paper: https://arxiv.org/abs/2406.05540
+    configpath: opencompass/configs/datasets/ProteinLMBench/ProteinLMBench_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/ProteinLMBench/ProteinLMBench_llmjudge_gen.py
 - py150:
     name: py150
     category: Code
@@ -1029,3 +1065,15 @@
     paper: https://arxiv.org/pdf/2402.09391
     configpath: opencompass/configs/datasets/SmolInstruct/smolinstruct_gen.py
     configpath_llmjudge: ''
+- internsandbox:
+    name: InternSandbox
+    category: Reasoning/Code/Agent
+    paper: ''
+    configpath: opencompass/configs/datasets/internsandbox/internsandbox_gen_44b982.py
+    configpath_llmjudge: ''
+- nejmaibench:
+    name: nejmaibench
+    category: Science /Medicine
+    paper: https://arxiv.org/pdf/2308.04709
+    configpath: opencompass/configs/datasets/nejm_ai_benchmark/nejmaibench_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/nejm_ai_benchmark/nejmaibench_llmjudge_gen.py
