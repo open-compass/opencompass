@@ -132,6 +132,7 @@ from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
 from .scicode import *  # noqa: F401, F403
 from .SciKnowEval import SciKnowEvalDataset  # noqa: F401, F403
 from .SciKnowEval import SciKnowEvalEvaluator  # noqa: F401, F403
+from .SciEval_lifescience import SciEvalDataset  # noqa: F401
 from .simpleqa import *  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
 from .smolinstruct import *  # noqa: F401, F403
