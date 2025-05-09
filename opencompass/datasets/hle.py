@@ -9,7 +9,7 @@ from .base import BaseDataset
 class HLEDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, category: str):
+    def load(path: str, category: str | None = None):
         dataset = load_dataset(path)
         ds = dataset['test'].filter(lambda x: x['image'] == '')
         if category:
