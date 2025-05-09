@@ -675,8 +675,8 @@
     name: SciEval
     category: Understanding
     paper: https://arxiv.org/pdf/2308.13149
-    configpath: opencompass/configs/datasets/SciEval_lifscience/SciEval_lifscience_gen.py
-    configpath_llmjudge: opencompass/configs/datasets/SciEval_lifscience/SciEval_lifscience_llm_judge_gen.py
+    configpath: opencompass/configs/datasets/SciEval/SciEval_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/SciEval/SciEval_llm_judge_gen.py
 - mmlu_cf:
     name: MMLU-CF
     category: Understanding

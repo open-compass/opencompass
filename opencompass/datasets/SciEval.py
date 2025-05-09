@@ -19,11 +19,13 @@ _PATTERN_MC = (
 
 @LOAD_DATASET.register_module()
 class SciEvalDataset(BaseDataset):
-    """Biology multiple-choice subset of SciEval."""
+    """多选题子集，支持所有类别（可选指定 category 过滤）"""
 
     @staticmethod
     def load(path: str, name: str, **kwargs) -> DatasetDict:
-        dataset = DatasetDict()
+        # 如果传入 category，则仅保留该类别，否则包含所有类别
+        category = kwargs.get('category')
+        dataset: DatasetDict = DatasetDict()
 
         for split in ('test', ):
             raw_iter = load_dataset(
@@ -32,14 +34,18 @@ class SciEvalDataset(BaseDataset):
                 split=split,
                 streaming=True,
             )
-
             examples: List[dict] = []
+
             for ex in raw_iter:
-                if (ex.get('category') != 'biology'
-                        or ex.get('type') != 'multiple-choice'):
+                # 仅保留多选题
+                if ex.get('type') != 'multiple-choice':
+                    continue
+                # 如指定了 category，则进行过滤
+                if category is not None \
+                   and ex.get('category') != category:
                     continue
 
-                ans_list = ex.get('answer') or ex.get('answers') or []
+                ans_list = (ex.get('answer') or ex.get('answers') or [])
                 if not ans_list:
                     continue
                 target = ans_list[0]

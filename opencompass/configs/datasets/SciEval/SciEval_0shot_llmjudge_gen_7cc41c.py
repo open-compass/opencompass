@@ -11,6 +11,10 @@ from opencompass.datasets import SciEvalDataset
 
 with read_base():
     from .SciEval_lifescience_sets import SciEval_lifescience_subsets
+    
+category = [
+    'biology',
+]
 
 QUERY_TEMPLATE = """
 Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of ABCD. 
@@ -117,6 +121,7 @@ for name in SciEval_lifescience_subsets:
             type=SciEvalDataset,
             path='OpenDFM/SciEval',
             name='default',
+            category=category, 
             reader_cfg=scieval_reader_cfg,
             infer_cfg=scieval_infer_cfg,
             eval_cfg=scieval_eval_cfg,

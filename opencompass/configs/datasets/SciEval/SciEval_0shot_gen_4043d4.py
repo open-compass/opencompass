@@ -3,11 +3,14 @@ from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccwithDetailsEvaluator
 from opencompass.utils.text_postprocessors import first_option_postprocess
-from opencompass.datasets import SciEvalDataset  # 你自己实现的类
+from opencompass.datasets import SciEvalDataset  
 
 # 只评测 biology + multiple-choice 的 test split
 _hint = ('Given a question and four options, please select the right answer. '
          "Your answer should be 'A', 'B', 'C' or 'D'.")
+category = [
+    'biology',
+]
 
 scieval_reader_cfg = dict(
     input_columns=['input', 'A', 'B', 'C', 'D'],
@@ -54,6 +57,7 @@ scieval_datasets = [
         type=SciEvalDataset,
         path='OpenDFM/SciEval',
         name='default',
+        category=category, 
         reader_cfg=scieval_reader_cfg,
         infer_cfg=scieval_infer_cfg,
         eval_cfg=scieval_eval_cfg,
