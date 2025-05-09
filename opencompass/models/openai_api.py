@@ -25,7 +25,7 @@ OPENAI_API_BASE = os.path.join(
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3']
+O1_MODEL_LIST = ['o1', 'o3', 'o4']
 
 
 @MODELS.register_module()
