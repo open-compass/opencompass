@@ -1065,6 +1065,12 @@
     paper: https://arxiv.org/pdf/2402.09391
     configpath: opencompass/configs/datasets/SmolInstruct/smolinstruct_gen.py
     configpath_llmjudge: ''
+- SciKnowEval:
+    name: SciKnowEval
+    category: Science
+    paper: https://arxiv.org/abs/2406.09098
+    configpath: opencompass/configs/datasets/SciKnowEval/SciKnowEval_gen_ebe47d.py
+    configpath_llmjudge: opencompass/configs/datasets/SciKnowEval/SciKnowEval_llmjudge_gen_ebe47d.py
 - internsandbox:
     name: InternSandbox
     category: Reasoning/Code/Agent
