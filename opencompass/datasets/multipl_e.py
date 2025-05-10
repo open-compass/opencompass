@@ -132,7 +132,7 @@ class MultiplEEvaluator(CodeEvaluator):
             str: Processed code completion.
         """
         post_comp = self._extract_code(completion)
+        post_comp = self._remove_prefix(test_case['prompt'], post_comp)
         post_comp = self._stop_at_stop_token(post_comp,
                                              test_case['stop_tokens'])
-        post_comp = self._remove_prefix(test_case['prompt'], post_comp)
         return post_comp
