@@ -70,19 +70,23 @@ def get_current_time_gmt_format():
 
 
 class Yayi(BaseAPIModel):
-    """Model wrapper around SenseTime.
+    """Model wrapper around Yayi.
 
     Args:
-        path (str): The name of SenseTime model.
-            e.g. `nova-ptc-xl-v1`
-        key (str): Authorization key.
+        path (str): The name of Yayi model.
+        url (str): The base URL for the API.
+        url_path (str): The specific path for the API endpoint.
+        x_tilake_app_key (str): The application key for authentication.
+        x_tilake_app_secret (str): The application secret for authentication.
+        x_tilake_ca_sginature_method (str): The signature method for authentication.
         query_per_second (int): The maximum queries allowed per second
-            between two consecutive calls of the API. Defaults to 1.
-        max_seq_len (int): Unused here.
+            between two consecutive calls of the API. Defaults to 2.
+        max_seq_len (int): The maximum sequence length. Defaults to 8192.
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
-        retry (int): Number of retires if the API call fails. Defaults to 2.
+        retry (int): Number of retries if the API call fails. Defaults to 2.
+        temperature (float): The temperature for the model's response. Defaults to 0.0.
     """
 
     def __init__(
@@ -94,10 +98,10 @@ class Yayi(BaseAPIModel):
         x_tilake_app_secret: str,
         x_tilake_ca_sginature_method: str,
         query_per_second: int = 2,
-        max_seq_len: int = 2048,
+        max_seq_len: int = 8192,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
-        temperature: float = 0.4,
+        temperature: float = 0.0,
     ):
         super().__init__(
             path=path,
@@ -116,14 +120,8 @@ class Yayi(BaseAPIModel):
         self.model = path
 
     def generate_signature(self, method, accept, content_type, date, url_path):
-        """生成签名.
-
-        :param method:
-        :param accept:
-        :param content_type:
-        :param date:
-        :param url_path:
-        :return:
+        """
+        生成签名.
         """
         string_to_sign = (method + '\n' + accept + '\n' + content_type + '\n' +
                           date + '\n' + url_path)
@@ -134,11 +132,8 @@ class Yayi(BaseAPIModel):
         return encode_base64_string(signature)
 
     def generate_header(self, content_type, accept, date, signature):
-        """生成请求头参数.
-
-        :param content_type:
-        :param accept:
-        :return:
+        """
+        生成请求头参数.
         """
         headers = {
             'x-tilake-app-key': self.X_TILAKE_APP_KEY,
@@ -155,7 +150,7 @@ class Yayi(BaseAPIModel):
     def generate(
         self,
         inputs: List[PromptType],
-        max_out_len: int = 512,
+        max_out_len: int = 8192,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
@@ -178,7 +173,7 @@ class Yayi(BaseAPIModel):
     def _generate(
         self,
         input: PromptType,
-        max_out_len: int = 512,
+        max_out_len: int = 8192,
     ) -> str:
         """Generate results given an input.
 
@@ -199,7 +194,7 @@ class Yayi(BaseAPIModel):
             messages = []
             msg_buffer, last_role = [], None
             for item in input:
-                item['role'] = 'yayi' if item['role'] == 'BOT' else 'user'
+                item['role'] = 'assistant' if item['role'] == 'BOT' else 'user'
                 if item['role'] != last_role and last_role is not None:
                     messages.append({
                         'content': '\n'.join(msg_buffer),
@@ -218,14 +213,12 @@ class Yayi(BaseAPIModel):
         accept = '*/*'
         method = 'POST'
         data = {
-            'id': '001',  # 请求id，无需修改。
-            'model': self.model,
+            'id': "001",
             'messages': messages,
-            'max_new_tokens': max_out_len,  # max_new_tokens及以下参数可根据实际任务进行调整。
-            'temperature': self.temperature,
-            'presence_penalty': 0.85,
-            'frequency_penalty': 0.16,
-            'do_sample': True,
+            'max_new_tokens': 8192,
+            'temperature': 0.0,
+            'presence_penalty': 0.0,
+            'frequency_penalty': 0.0,
             'top_p': 1.0,
             'top_k': -1,
         }
@@ -242,6 +235,7 @@ class Yayi(BaseAPIModel):
                                            signature=signature_str)
 
             try:
+                print(data)
                 response = requests.post(self.url, json=data, headers=headers)
             except Exception as e:
                 print(e)
@@ -253,7 +247,7 @@ class Yayi(BaseAPIModel):
                 continue
             print(response)
             try:
-                return response['data']['choices'][0]['message']['content']
+                return response['choices'][0]['message']['content']
             except Exception as e:
                 print(e)
                 continue
