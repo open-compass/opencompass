@@ -274,7 +274,8 @@ class SubjectiveSizePartitioner(SubjectiveNaivePartitioner):
         dataset = build_dataset_from_cfg(dataset)
         self.dataset_size[dataset_abbr] = len(dataset.test)
 
-        mmengine.mkdir_or_exist('.cache/')
+        tmp_dir_root = osp.dirname(self.dataset_size_path)
+        mmengine.mkdir_or_exist(tmp_dir_root)
         mmengine.dump(self.dataset_size,
                       self.dataset_size_path,
                       indent=4,
