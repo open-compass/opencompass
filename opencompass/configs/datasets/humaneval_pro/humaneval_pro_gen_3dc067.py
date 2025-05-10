@@ -3,16 +3,6 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import HumanevalevalProDataset, HumanevalProEvaluator, humaneval_postprocess_v2
 
-OFFICIAL_PROMPT_WRAPPER = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
-@@ Instruction
-Write a solution of python file to the following problems, the solution of the second problem requires single or multiple calls to the first solution.
-```python
-{raw_problem}
-{new_problem}
-```
-@@ Response
-Please put the two solutions to the above problems in one Python code block.
-"""
 
 PROMPT_WRAPPER = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
 Write a solution of python file to the following problems, the solution of the second problem requires single or multiple calls to the first solution.

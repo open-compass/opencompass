@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import MBPPProDataset, MBPPProEvaluator
+from opencompass.datasets import HumanevalevalProDataset, HumanevalProEvaluator, humaneval_postprocess_v2
 
 
 PROMPT_WRAPPER = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
@@ -16,10 +16,10 @@ Please put the two solutions within the Python code block provided below, and ma
 """
 
 
-mbpppro_reader_cfg = dict(
+humanevalpro_reader_cfg = dict(
     input_columns=['raw_problem', 'new_problem'], output_column='test_code')
 
-mbpppro_infer_cfg = dict(
+humanevalpro_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(round=[
@@ -30,17 +30,19 @@ mbpppro_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
-mbpppro_eval_cfg = dict(
-    evaluator=dict(type=MBPPProEvaluator, 
-                   ip_address='https://opencompass-multiple-evaluator.hf.space'),
+humanevalpro_eval_cfg = dict(
+    evaluator=dict(type=HumanevalProEvaluator,
+                   ip_address='https://opencompass-multiple-evaluator.hf.space')
 )
 
-mbpppro_datasets = [
+humanevalpro_datasets = [
     dict(
-        abbr='mbpp_pro',
-        type=MBPPProDataset,
-        path='opencompass/mbpp_pro',
-        reader_cfg=mbpppro_reader_cfg,
-        infer_cfg=mbpppro_infer_cfg,
-        eval_cfg=mbpppro_eval_cfg)
+        abbr='humaneval_pro',
+        type=HumanevalevalProDataset,
+        path='opencompass/humaneval_pro',
+        reader_cfg=humanevalpro_reader_cfg,
+        infer_cfg=humanevalpro_infer_cfg,
+        eval_cfg=humanevalpro_eval_cfg,
+        n=5,
+        k=3)
 ]

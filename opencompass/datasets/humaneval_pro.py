@@ -1,7 +1,8 @@
+# flake8: noqa: E501s
+
 import json
 from typing import Dict, List
 
-import numpy as np
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator.code_evaluator import CodeEvaluator
@@ -9,28 +10,32 @@ from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
+PROMPT_WRAPPER = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
+Write a solution of python file to the following problems, the solution of the second problem requires single or multiple calls to the first solution.
+```python
+{raw_problem}
+{new_problem}
+```
+Please put the two solutions within the Python code block provided below, and make sure that the block contains no other unrelated content:
+```python
+```
+"""
+
 
 class HumanevalevalProDataset(BaseDataset):
 
     @staticmethod
-    def load(path, num_repeats=1, local_mode=False):
+    def load(path, local_mode=False):
         path = get_data_path(path, local_mode=local_mode)
         dataset = []
         with open(path, encoding='utf-8') as f:
             raw_data = json.load(f)
             for data in raw_data:
-                dataset.extend([data for _ in range(num_repeats)])
+                dataset.append(data)
         return Dataset.from_list(dataset)
 
 
 class HumanevalProEvaluator(CodeEvaluator):
-
-    def _process_completions(self, test_case: dict, completions: list) -> list:
-        processed_completions = []
-        for comp in completions:
-            post_comp = self._extract_code(comp)
-            processed_completions.append(post_comp)
-        return processed_completions
 
     def score(self, predictions: List, references: List,
               test_set: Dataset) -> Dict:
@@ -45,28 +50,27 @@ class HumanevalProEvaluator(CodeEvaluator):
         test_set = test_set.to_pandas()
         # Use the first column as the unique identifier
         test_set_origin = test_set.drop_duplicates(subset=test_set.columns[0])
-        num_repeats = int(len(test_set) / len(test_set_origin))
 
         # 1. Prepare data for all test cases
-        all_test_cases = []
+        all_test_cases, prompts = [], []
         for i in range(len(test_set_origin)):
             test_case = test_set_origin.iloc[i]
-            completions = predictions[i * num_repeats:(i + 1) * num_repeats]
+            completion = predictions[i]
 
             # Process code completions
-            processed_completions = self._process_completions(
-                test_case, completions)
-
+            processed_completion = self._process_completions(completion)
+            code = processed_completion + '\n' + test_case['test_code']
             sub_data_dict = {
                 'name': int(test_case['id']),
                 'language': self.language,
-                'prompt': '',
-                'tests': test_case['test_code'],
-                'processed_completions': processed_completions,
-                'completions': completions
+                'code': code,
             }
-
             all_test_cases.append(sub_data_dict)
+
+            prompt = PROMPT_WRAPPER.format(
+                raw_problem=test_case['raw_problem'],
+                new_problem=test_case['new_problem'])
+            prompts.append(prompt)
 
         # 2. Send all test cases to the evaluation service
         success, outputs, error_message = self._evaluate(all_test_cases)
@@ -74,23 +78,4 @@ class HumanevalProEvaluator(CodeEvaluator):
             return {'error': error_message}
 
         # 3. Process the returned results
-        details = []
-        total, correct = [], []
-        for output in outputs:
-            passed = [m['status'] == 'OK' for m in output['meta_data']]
-            total.append(len(passed))
-            correct.append(sum(passed))
-            details.append(output)
-        total = np.array(total)
-        correct = np.array(correct)
-
-        pass_at_k = {
-            f'pass@{k}':
-            self.estimate_pass_at_k(total, correct, k).mean() * 100
-            for k in self.k if (total >= k).all()
-        }
-
-        return {
-            **pass_at_k,
-            'details': details,
-        }
+        return self._process_results(outputs, prompts, len(test_set_origin))

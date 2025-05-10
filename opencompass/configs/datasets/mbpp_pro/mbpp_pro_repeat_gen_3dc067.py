@@ -42,5 +42,7 @@ mbpppro_datasets = [
         path='opencompass/mbpp_pro',
         reader_cfg=mbpppro_reader_cfg,
         infer_cfg=mbpppro_infer_cfg,
-        eval_cfg=mbpppro_eval_cfg)
+        eval_cfg=mbpppro_eval_cfg,
+        n=5,
+        k=3)
 ]
