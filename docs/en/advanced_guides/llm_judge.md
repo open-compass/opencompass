@@ -194,6 +194,8 @@ eval_cfg = dict(
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
     pred_role='BOT',
+    #num_gpus=1
+    #Add this in case of use local model as judge, adjust to the number of GPUs you wish to use for evaluation.
 )
 
 # Dataset configuration

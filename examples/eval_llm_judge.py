@@ -92,6 +92,7 @@ math_eval_cfg = dict(
         judge_cfg=lmdeploy_qwen2_5_14b_instruct_model[0],
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
+    num_gpus=1 # The amount of GPU used for LLM as judge evaluation
 )
 
 # Dataset configuration
