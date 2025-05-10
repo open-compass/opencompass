@@ -3,7 +3,6 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
-
 ZERO_SHOT_PROMPT = '{q4}'
 
 # Reader configuration
