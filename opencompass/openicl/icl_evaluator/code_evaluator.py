@@ -26,7 +26,7 @@ class CodeEvaluator(BaseEvaluator):
     def __init__(self,
                  language: str = 'py',
                  ip_address: str = 'localhost',
-                 retry: int = 3) -> None:
+                 retry: int = 5) -> None:
         """Initialize the CodeEvaluator.
 
         Args:
@@ -148,7 +148,7 @@ class CodeEvaluator(BaseEvaluator):
             succeed, output = self._code_eval_service(input_data)
             if not succeed:
                 num_retry += 1
-                time.sleep(10)
+                time.sleep(30)
             else:
                 break
 
