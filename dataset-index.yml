@@ -611,6 +611,12 @@
     paper: https://dl.acm.org/doi/pdf/10.1145/3580305.3599790
     configpath: opencompass/configs/datasets/humanevalx/humanevalx_gen.py
     configpath_llmjudge: ''
+- humaneval_pro:
+    name: HumanEval Pro
+    category: Code
+    paper: https://arxiv.org/abs/2412.21199
+    configpath: opencompass/configs/datasets/humaneval_pro/humaneval_pro_gen.py
+    configpath_llmjudge: ''
 - hungarian_math:
     name: Hungarian_Math
     category: Math
@@ -694,6 +700,12 @@
     category: Code
     paper: ''
     configpath: opencompass/configs/datasets/mbpp_plus/mbpp_plus_gen.py
+    configpath_llmjudge: ''
+- mbpp_pro:
+    name: MBPP Pro
+    category: Code
+    paper: https://arxiv.org/abs/2412.21199
+    configpath: opencompass/configs/datasets/mbpp_pro/mbpp_pro_gen.py
     configpath_llmjudge: ''
 - mgsm:
     name: MGSM

@@ -451,7 +451,16 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/nejmaibench/NEJM_All_Questions_And_Answers.csv",
     },
-
+    "opencompass/humaneval_pro": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/humaneval_pro/humaneval_pro.json",
+    },
+    "opencompass/mbpp_pro": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mbpp_pro/mbpp_pro.json",
+    },
 }
 
 DATASETS_URL = {
@@ -808,6 +817,13 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/nejmaibench.zip",
         "md5": "e6082cae3596b3ebea73e23ba445b99e"
-    }
-    
+    },
+    "humaneval_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/humaneval_pro.zip",
+        "md5": "4c6fe556e84e905e4f0902d699e46de5",
+    },
+    "mbpp_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_pro.zip",
+        "md5": "eac330b8a0a8687f006265c9383503ce",
+    },
 }
