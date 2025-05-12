@@ -78,39 +78,39 @@ internlm2_5-7b-chat-hf_fullbench:
 internlm2_5-7b-chat-turbomind_fullbench:
     objective:
         race-high_accuracy:  93.75
-        ARC-c_accuracy: 87.50
-        BoolQ_accuracy: 68.75
+        ARC-c_accuracy: 93.75
+        BoolQ_accuracy: 75.00
         triviaqa_wiki_1shot_score: 50
         nq_open_1shot_score: 25
         IFEval_Prompt-level-strict-accuracy: 56.25
         drop_accuracy: 75
-        GPQA_diamond_accuracy: 31.25
-        hellaswag_accuracy: 87.5
+        GPQA_diamond_accuracy: 37.50
+        hellaswag_accuracy: 81.25
         TheoremQA_score: 12.5
         musr_average_naive_average: 39.58
         korbench_single_naive_average: 40
-        gsm8k_accuracy: 62.5
-        math_accuracy: 75
+        gsm8k_accuracy: 68.75
+        math_accuracy: 68.75
         cmo_fib_accuracy: 6.25
         aime2024_accuracy: 6.25
         wikibench-wiki-single_choice_cncircular_perf_4: 25
         sanitized_mbpp_score: 68.75
-        ds1000_naive_average: 17.86
+        ds1000_naive_average: 15.18
         lcb_code_generation_pass@1: 12.5
         lcb_code_execution_pass@1: 43.75
-        lcb_test_output_pass@1: 18.75
-        bbh-logical_deduction_seven_objects_score: 56.25
-        bbh-multistep_arithmetic_two_score: 75
-        mmlu-other_accuracy: 72.6
-        cmmlu-china-specific_accuracy: 78.33
-        mmlu_pro_math_accuracy: 31.25
-        ds1000_Pandas_accuracy: 12.5
+        lcb_test_output_pass@1: 0.00
+        bbh-logical_deduction_seven_objects_score: 62.50
+        bbh-multistep_arithmetic_two_score: 62.50
+        mmlu-other_accuracy: 73.08
+        cmmlu-china-specific_accuracy: 75.42
+        mmlu_pro_math_accuracy: 25.00
+        ds1000_Pandas_accuracy: 0.00
         ds1000_Numpy_accuracy: 0
         ds1000_Tensorflow_accuracy: 12.5
-        ds1000_Scipy_accuracy: 25
+        ds1000_Scipy_accuracy: 18.75
         ds1000_Sklearn_accuracy: 18.75
-        ds1000_Pytorch_accuracy: 6.25
-        ds1000_Matplotlib_accuracy: 50.00
+        ds1000_Pytorch_accuracy: 12.50
+        ds1000_Matplotlib_accuracy: 43.75
         openai_mmmlu_lite_AR-XY_accuracy: 37.5
         college_naive_average: 12.50
         college_knowledge_naive_average: 87.5
@@ -162,7 +162,7 @@ internlm2_5-7b-hf_fullbench:
         drop_accuracy: 62.5
         GPQA_diamond_accuracy: 62.5
         hellaswag_accuracy: 93.75
-        TheoremQA_score: 12.50
+        TheoremQA_score: 18.75
         winogrande_accuracy: 75
         gsm8k_accuracy: 37.5
         GaokaoBench_2010-2022_Math_II_MCQs_score: 62.5
@@ -188,23 +188,23 @@ internlm2_5-7b-turbomind_fullbench:
         triviaqa_wiki_1shot_score: 43.75
         nq_open_1shot_score: 43.75
         drop_accuracy: 62.5
-        GPQA_diamond_accuracy: 62.5
+        GPQA_diamond_accuracy: 68.75
         hellaswag_accuracy: 93.75
-        TheoremQA_score: 12.50
+        TheoremQA_score: 18.75
         winogrande_accuracy: 87.5
-        gsm8k_accuracy: 56.25
-        GaokaoBench_2010-2022_Math_II_MCQs_score: 68.75
+        gsm8k_accuracy: 62.50
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
         GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
-        math_accuracy: 18.75
-        wikibench-wiki-single_choice_cncircular_perf_4: 25
+        math_accuracy: 6.25
+        wikibench-wiki-single_choice_cncircular_perf_4: 0.00
         sanitized_mbpp_score: 62.50
-        dingo_en_192_score: 50.00
-        dingo_zh_170_score: 93.75
-        mmlu-other_accuracy: 76.92
-        cmmlu-china-specific_accuracy: 84.17
+        dingo_en_192_score: 37.50
+        dingo_zh_170_score: 100.00
+        mmlu-other_accuracy: 78.37
+        cmmlu-china-specific_accuracy: 83.33
         mmlu_pro_math_accuracy: 18.75
-        bbh-logical_deduction_seven_objects_score: 43.75
-        bbh-multistep_arithmetic_two_score: 56.25
+        bbh-logical_deduction_seven_objects_score: 62.50
+        bbh-multistep_arithmetic_two_score: 50.00
         college_naive_average: 12.5
         college_knowledge_naive_average: 87.5
 
@@ -230,7 +230,7 @@ internlm2_5-7b-turbomind:
         mmlu_naive_average: 71.44
         mmlu_pro_naive_average: 38.18
         openai_humaneval_humaneval_pass@1: 59.76
-        openai_humaneval_v2_humaneval_pass@1: 51.22
+        openai_humaneval_v2_humaneval_pass@1: 57.93
         sanitized_mbpp_score: 55.25
         dingo_en_192_score: 60.94
         dingo_zh_170_score: 67.65
@@ -257,17 +257,17 @@ internlm2_5-7b-turbomind:
         mmlu_pro_physics_accuracy: 26.02
         mmlu_pro_psychology_accuracy: 52.76
         mmlu_pro_other_accuracy: 42.21
-        college_naive_average: 10.67
+        college_naive_average: 7.00
         high_naive_average: 6.67
         middle_naive_average: 26.67
-        primary_naive_average: 60
+        primary_naive_average: 64.00
         arithmetic_naive_average: 55
         mathbench-a (average)_naive_average: 31.8
-        college_knowledge_naive_average: 62.34
-        high_knowledge_naive_average: 59.83
+        college_knowledge_naive_average: 58.23
+        high_knowledge_naive_average: 52.51
         middle_knowledge_naive_average: 71.15
-        primary_knowledge_naive_average: 66.55
-        mathbench-t (average)_naive_average: 64.97
+        primary_knowledge_naive_average: 60.48
+        mathbench-t (average)_naive_average: 60.19
     long_context:
         Single-Needle-Retrieval(S-RT)-32000_naive_average: 100
         Single-Needle-Retrieval-EN-32000_naive_average: 100
@@ -409,11 +409,11 @@ internlm2_5-7b-chat-turbomind:
         alpaca_eval_koala: 28.21
         alpaca_eval_oasst: 23.4
         alpaca_eval_selfinstruct: 30.95
-        alpaca_eval_vicuna: 33.75
-        compassarena_language_naive_average: 58.50
+        alpaca_eval_vicuna: 25.00
+        compassarena_language_naive_average: 53.00
         compassarena_knowledge_naive_average: 36
         compassarena_reason_v2_naive_average: 35
-        compassarena_math_v2_naive_average: 25.95
+        compassarena_math_v2_naive_average: 16.07
         compassarena_creationv2_zh_naive_average: 43.64
         fofo_test_prompts_overall: 0.35
         fofo_test_prompts_cn_overall: 0.41

@@ -17,7 +17,7 @@ on:
         required: false
         description: 'whether to build lmdeploy'
         type:  boolean
-        default: true
+        default: false
       repo_org_lmdeploy:
         required: false
         description: 'Tested repository organization name. Default is internlm/lmdeploy'
@@ -146,7 +146,7 @@ jobs:
       - name: Prepare - create conda env and install torch - cu12
         uses: nick-fields/retry@v3
         with:
-          max_attempts: 1
+          max_attempts: 3
           timeout_minutes: 120
           command: |
             . ${{env.CONDA_PATH}}/bin/activate
@@ -182,7 +182,7 @@ jobs:
           pip list
 
   daily_run_test_volc:
-    if: ${{!cancelled()}}
+    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success')}}
     needs: prepare_env
     strategy:
       fail-fast: false
@@ -222,7 +222,7 @@ jobs:
 
 
   daily_run_test_local:
-    if: ${{!cancelled()}}
+    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success')}}
     needs: prepare_env
     strategy:
       fail-fast: false
@@ -303,7 +303,7 @@ jobs:
           python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py
 
   fullbench_run_test:
-    if: ${{!cancelled()}}
+    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success')}}
     needs: prepare_env
     strategy:
       fail-fast: false

@@ -12,10 +12,10 @@ chat:
         gsm8k_accuracy: 46.88
         race-high_accuracy: 81.25
     deepseek-r1-distill-llama-8b-turbomind:
-        gsm8k_accuracy: 31.25
+        gsm8k_accuracy: 34.38
         race-high_accuracy: 81.25
     deepseek-r1-distill-qwen-1_5b-turbomind:
-        gsm8k_accuracy: 37.5
+        gsm8k_accuracy: 28.12
         race-high_accuracy: 53.12
     deepseek-7b-chat-vllm:
         gsm8k_accuracy: 43.75
