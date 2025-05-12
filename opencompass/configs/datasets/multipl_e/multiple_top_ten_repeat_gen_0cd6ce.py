@@ -6,7 +6,7 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import MultiplEDataset, MultiplEEvaluator
 
 
-_TOP_TEN_LANGUAGE_ = ['cpp', 'cs', 'go', 'java', 'rb', 'js', 'php', 'r', 'rs', 'sh']
+_TOP_TEN_LANGUAGE_ = ['cpp']
 
 multiple_reader_cfg = dict(input_columns=['language', 'prompt'], output_column='tests')
 
@@ -37,6 +37,8 @@ multiple_datasets = [
         reader_cfg=multiple_reader_cfg,
         infer_cfg=multiple_infer_cfg,
         eval_cfg=multiple_eval_cfg[lang],
+        n=5,
+        k=3
     ) for lang in _TOP_TEN_LANGUAGE_
 ]
 
