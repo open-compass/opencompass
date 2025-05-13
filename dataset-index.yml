@@ -1095,3 +1095,15 @@
     paper: https://arxiv.org/pdf/2308.04709
     configpath: opencompass/configs/datasets/nejm_ai_benchmark/nejmaibench_gen.py
     configpath_llmjudge: opencompass/configs/datasets/nejm_ai_benchmark/nejmaibench_llmjudge_gen.py
+- medbullets:
+    name: Medbullets
+    category: Science /Medicine
+    paper: https://arxiv.org/pdf/2402.18060
+    configpath: opencompass/configs/datasets/Medbullets/medbullets_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/Medbullets/medbullets_llmjudge_gen.py
+- medmcqa:
+    name: medmcqa
+    category: Science /Medicine
+    paper: https://arxiv.org/pdf/2203.14371
+    configpath: opencompass/configs/datasets/medmcqa/medmcqa_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/medmcqa/medmcqa_llmjudge_gen.py

@@ -461,6 +461,12 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/mbpp_pro/mbpp_pro.json",
     },
+    "opencompass/medbullets": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/medbullets/medbullets.csv",
+    },
+
 }
 
 DATASETS_URL = {
@@ -825,5 +831,9 @@ DATASETS_URL = {
     "mbpp_pro": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_pro.zip",
         "md5": "eac330b8a0a8687f006265c9383503ce",
+    },
+    "medbullets": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/medbullets.zip",
+        "md5": "b63130999c1f28d57acba1c7852639f8",
     },
 }
