@@ -2,7 +2,7 @@
 
 from mmengine.config import read_base
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.utils.text_postprocessors import match_answer_pattern
 from opencompass.evaluator import GenericLLMEvaluator
@@ -78,7 +78,7 @@ for name in SciEval_lifescience_subsets:
                 ]
             )
         ),
-        retriever=dict(type=ZeroRetriever),
+        retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
         inferencer=dict(type=GenInferencer),
     )
 
