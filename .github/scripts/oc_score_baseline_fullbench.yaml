@@ -309,7 +309,7 @@ internlm2_5-7b-chat-turbomind:
         GaokaoBench_weighted_average: 78.6
         math_accuracy: 61
         cmo_fib_accuracy: 11
-        aime2024_accuracy: 6.67
+        aime2024_accuracy: 3.33
         Mathbench_naive_average: 64.23
         wikibench-wiki-single_choice_cncircular_perf_4: 31.32
         cmmlu_naive_average: 74.3
@@ -322,7 +322,7 @@ internlm2_5-7b-chat-turbomind:
         lcb_code_generation_pass@1: 17.75
         lcb_code_execution_pass@1: 32.57
         lcb_test_output_pass@1: 26.13
-        bigcodebench_hard_instruct_pass@1: 8.45
+        bigcodebench_hard_instruct_pass@1: 3.38
         bigcodebench_hard_complete_pass@1: 5.06
         teval_naive_average: 80
         SciCode_sub_accuracy: 5.56
@@ -384,7 +384,7 @@ internlm2_5-7b-chat-turbomind:
         college_knowledge_naive_average: 67.1
         high_knowledge_naive_average: 70
         middle_knowledge_naive_average: 80
-        primary_knowledge_naive_average: 87
+        primary_knowledge_naive_average: 90.12
         mathbench-t (average)_naive_average: 76
     subjective:
         alignment_bench_v1_1_总分: 5.68
@@ -524,7 +524,7 @@ qwen2.5-7b-instruct-turbomind:
         humanevalx-python_pass@1: 50
         humanevalx-cpp_pass@1: 42.07
         humanevalx-go_pass@1: 0
-        humanevalx-java_pass@1: 74.39
+        humanevalx-java_pass@1: 53.05
         humanevalx-js_pass@1: 75
         ds1000_Pandas_accuracy: 14.09
         ds1000_Numpy_accuracy: 8.18
@@ -548,7 +548,7 @@ qwen2.5-7b-instruct-turbomind:
         openai_mmmlu_lite_SW-KE_accuracy: 36.42
         openai_mmmlu_lite_YO-NG_accuracy: 32.14
         openai_mmmlu_lite_ZH-CN_accuracy: 69.61
-        college_naive_average: 48
+        college_naive_average: 44.33
         high_naive_average: 59
         middle_naive_average: 78
         primary_naive_average: 85.67
@@ -658,7 +658,7 @@ internlm2_5-7b-chat-pytorch:
         college_naive_average: 21
         high_naive_average: 47
         middle_naive_average: 59.67
-        primary_naive_average: 76
+        primary_naive_average: 72.33
         arithmetic_naive_average: 62
         mathbench-a (average)_naive_average: 53.13
         college_knowledge_naive_average: 68.99
@@ -688,7 +688,7 @@ qwen2.5-7b-instruct-pytorch:
         gsm8k_accuracy: 91.66
         GaokaoBench_weighted_average: 80.02
         math_accuracy: 73.74
-        cmo_fib_accuracy: 26.44
+        cmo_fib_accuracy: 22.60
         aime2024_accuracy: 13.33
         Mathbench_naive_average: 77.08
         wikibench-wiki-single_choice_cncircular_perf_4: 34
@@ -793,8 +793,8 @@ internlm3-8b-instruct-turbomind:
         gsm8k_accuracy: 91.28
         GaokaoBench_weighted_average: 86.59
         math_accuracy: 76.96
-        cmo_fib_accuracy: 35.1
-        aime2024_accuracy: 16.67
+        cmo_fib_accuracy: 38.46
+        aime2024_accuracy: 13.33
         Mathbench_naive_average: 78.96
         wikibench-wiki-single_choice_cncircular_perf_4: 37.45
         cmmlu_naive_average: 83.33
@@ -841,7 +841,7 @@ internlm3-8b-instruct-turbomind:
         humanevalx-python_pass@1: 43.9
         humanevalx-cpp_pass@1: 20.12
         humanevalx-go_pass@1: 0
-        humanevalx-java_pass@1: 74.39
+        humanevalx-java_pass@1: 40.85
         humanevalx-js_pass@1: 65.24
         ds1000_Pandas_accuracy: 16.49
         ds1000_Numpy_accuracy: 34.09
@@ -907,7 +907,7 @@ internlm3-8b-instruct-pytorch:
         mmlu_pro_naive_average: 58.16
         openai_humaneval_humaneval_pass@1: 82.32
         sanitized_mbpp_score: 70.04
-        humanevalx_naive_average: 39.76
+        humanevalx_naive_average: 25.49
         ds1000_naive_average: 27.84
         lcb_code_generation_pass@1: 34.5
         lcb_code_execution_pass@1: 48.02
@@ -946,7 +946,7 @@ internlm3-8b-instruct-pytorch:
         humanevalx-python_pass@1: 42.68
         humanevalx-cpp_pass@1: 19.51
         humanevalx-go_pass@1: 0
-        humanevalx-java_pass@1: 72.56
+        humanevalx-java_pass@1: 0.00
         humanevalx-js_pass@1: 64.02
         ds1000_Pandas_accuracy: 14.09
         ds1000_Numpy_accuracy: 35
