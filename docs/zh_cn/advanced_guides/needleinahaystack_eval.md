@@ -16,6 +16,9 @@
 
 - **祖先追溯挑战(Ancestral Trace Challenge, ATC)**：通过设计“亲属关系针”，测试LLM处理真实长文本中多层逻辑挑战的能力。在ATC任务中，通过一系列逻辑推理问题，检验模型对长文本中每个细节的记忆和分析能力，在此任务中，我们去掉了无关文本(Haystack)的设定，而是将所有文本设计为关键信息，LLM必须综合运用长文本中的所有内容和推理才能准确回答问题。
 
+> **补充说明**：目前NeedleBench（v2）在数据集构建和任务细节等方面做了一些小的优化和调整。如果您想了解新旧版本的具体差异和详细更新内容，请参考 [opencompass/configs/datasets/needlebench_v2/readme.md](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/needlebench_v2/readme.md)。
+
+
 ## 评估步骤
 
 > 注意：在最新的OpenCompass代码中，NeedleBench数据集会自动从[Huggingface接口](https://huggingface.co/datasets/opencompass/NeedleBench)加载，无需手动下载或配置数据集，您可以直接运行评测命令。
@@ -32,7 +35,7 @@ pip install -e .
 
 ### 配置数据集
 
-我们在`opencompass/configs/datasets/needlebench`中已经预先配置好了关于常见长度区间(4k, 8k, 32k, 128k, 200k, 1000k)的长文本测试设定，您可以通过在配置文件中定义相关参数，以灵活地创建适合您需求的数据集。
+我们在`opencompass/configs/datasets/needlebench_v2`中已经预先配置好了关于常见长度区间(4k, 8k, 32k, 128k, 200k, 1000k)的长文本测试设定，您可以通过在配置文件中定义相关参数，以灵活地创建适合您需求的数据集。
 
 ### 评估示例
 
@@ -46,7 +49,7 @@ pip install -e .
 
 ```bash
 # 本地评估
-python run.py --dataset needlebench_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_128k_summarizer
+python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer
 ```
 
 ##### 在Slurm集群上评估
@@ -55,7 +58,7 @@ python run.py --dataset needlebench_128k --models vllm_qwen2_5_7b_instruct_128k 
 
 ```bash
 # Slurm评估
-python run.py --dataset needlebench_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 ##### 只评估子数据集
@@ -63,13 +66,13 @@ python run.py --dataset needlebench_128k --models vllm_qwen2_5_7b_instruct_128k 
 如果只想测试原始的大海捞针任务设定，比如可以更换数据集的参数为`needlebench_single_128k`，这对应于128k长度下的单针版本的大海捞针测试：
 
 ```bash
-python run.py --dataset needlebench_single_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_128k/needlebench_zh_datasets`，仅仅进行中文版本的单针128k长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`opencompass/configs/datasets/needlebench/needlebench_128k/needlebench_single_128k.py`中找到可选的子数据集变量，如：
+您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_128k/needlebench_zh_datasets`，仅仅进行中文版本的单针128k长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`opencompass/configs/datasets/needlebench_v2/needlebench_v2_128k/needlebench_v2_single_128k.py`中找到可选的子数据集变量，如：
 
 ```bash
-python run.py --dataset needlebench_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 注意在评估前预先安装[VLLM](https://docs.vllm.ai/en/latest/getting_started/installation/gpu.html)工具
@@ -85,42 +88,12 @@ pip install vllm
 
 #### 评估其他`Huggingface`模型
 
-对于其他模型，我们建议额外书写一个运行的配置文件以便对模型的`max_seq_len`, `max_out_len`参数进行修改，以便模型可以接收到完整的长文本内容。如这里的的`examples/eval_needlebench.py`文件。完整内容如下
-
-```python
-from mmengine.config import read_base
-# we use mmengine.config to import other config files
-
-with read_base():
-    from opencompass.configs.models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
-
-    # Evaluate needlebench_32k, adjust the configuration to use 4k, 32k, 128k, 200k, or 1000k if necessary.
-    # from .datasets.needlebench.needlebench_32k.needlebench_32k import needlebench_datasets
-    # from .summarizers.needlebench import needlebench_32k_summarizer as summarizer
-
-    # only eval original "needle in a haystack test" in needlebench_32k
-    from opencompass.configs.datasets.needlebench.needlebench_32k.needlebench_single_32k import needlebench_zh_datasets, needlebench_en_datasets
-    from opencompass.configs.summarizers.needlebench import needlebench_32k_summarizer as summarizer
-
-    # eval Ancestral Tracing Challenge(ATC)
-    # from .datasets.needlebench.atc.atc_0shot_nocot_2_power_en import needlebench_datasets
-    # ATC use default summarizer thus no need to import summarizer
-
-datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
-
-for m in internlm2_chat_7b:
-    m['max_seq_len'] = 32768 # 保证InternLM2-7B模型能接收到完整的长文本，其他模型需要根据各自支持的最大序列长度修改。
-    m['max_out_len'] = 4096
-
-models = internlm2_chat_7b
-
-work_dir = './outputs/needlebench'
-```
+对于其他模型，我们建议额外书写一个运行的配置文件以便对模型的`max_seq_len`, `max_out_len`参数进行修改，以便模型可以接收到完整的长文本内容。如`examples/eval_needlebench_v2.py`文件。
 
 当书写好测试的`config`文件后，我们可以命令行中通过`run.py`文件传入对应的config文件路径，例如：
 
 ```bash
-python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py configs/eval_needlebench_v2.py  --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 注意，此时我们不需传入`--dataset, --models, --summarizer `等参数，因为我们已经在config文件中定义了这些配置。你可以自己手动调节`--max-num-workers`的设定以调节并行工作的workers的数量。
@@ -135,14 +108,14 @@ python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved
 
 ```bibtex
 
-@misc{li2024needlebenchllmsretrievalreasoning,
-      title={NeedleBench: Can LLMs Do Retrieval and Reasoning in 1 Million Context Window?},
-      author={Mo Li and Songyang Zhang and Yunxin Liu and Kai Chen},
-      year={2024},
+@misc{li2025needlebenchllmsretrievalreasoning,
+      title={NeedleBench: Can LLMs Do Retrieval and Reasoning in Information-Dense Context?}, 
+      author={Mo Li and Songyang Zhang and Taolin Zhang and Haodong Duan and Yunxin Liu and Kai Chen},
+      year={2025},
       eprint={2407.11963},
       archivePrefix={arXiv},
       primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2407.11963},
+      url={https://arxiv.org/abs/2407.11963}, 
 }
 
 @misc{2023opencompass,

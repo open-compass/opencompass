@@ -16,6 +16,9 @@ Within the `OpenCompass` framework, under `NeedleBench`, we designed a series of
 
 - **Ancestral Trace Challenge (ATC)**: Tests LLMs' capabilities in handling multi-layer logical challenges within realistic long-text contexts through "kinship trace needles." In the ATC task, no irrelevant (haystack) texts are added; every piece of text is critical, and models must reason through all details for accurate answers.
 
+> **Note:** NeedleBench (v2) includes several optimizations and adjustments in dataset construction and task details. For a detailed comparison between the old and new versions, as well as a summary of updates, please refer to [opencompass/configs/datasets/needlebench_v2/readme.md](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/needlebench_v2/readme.md).
+
+
 ## Evaluation Steps
 
 > Note: In the latest `OpenCompass` codebase, the NeedleBench dataset is automatically loaded from the [Huggingface interface](https://huggingface.co/datasets/opencompass/NeedleBench), with no need for manual download or configuration.
@@ -32,7 +35,7 @@ pip install -e .
 
 ### Dataset Configuration
 
-We have pre-configured various long-context settings (4k, 8k, 32k, 128k, 200k, 1000k) in `opencompass/configs/datasets/needlebench`, and you can flexibly define your parameters by adjusting the configuration files.
+We have pre-configured various long-context settings (4k, 8k, 32k, 128k, 200k, 1000k) in `opencompass/configs/datasets/needlebench_v2`, and you can flexibly define your parameters by adjusting the configuration files.
 
 ### Evaluation Example
 
@@ -46,7 +49,7 @@ If evaluating locally, the command will use all available GPUs. You can control 
 
 ```bash
 # Local evaluation
-python run.py --dataset needlebench_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_128k_summarizer
+python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer
 ```
 
 ##### Evaluation on Slurm Cluster
@@ -55,7 +58,7 @@ For Slurm environments, you can add options like `--slurm -p partition_name -q r
 
 ```bash
 # Slurm evaluation
-python run.py --dataset needlebench_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 ##### Evaluating Specific Subsets
@@ -63,13 +66,13 @@ python run.py --dataset needlebench_128k --models vllm_qwen2_5_7b_instruct_128k 
 If you only want to test the original Needle In A Haystack task (e.g., single-needle 128k), adjust the dataset parameter:
 
 ```bash
-python run.py --dataset needlebench_single_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 To evaluate only Chinese versions, specify the subset dataset after `/`:
 
 ```bash
-python run.py --dataset needlebench_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 Ensure `VLLM` is installed beforehand:
@@ -82,42 +85,12 @@ pip install vllm
 
 #### Evaluating Other `Huggingface` Models
 
-For other models, it's recommended to create a custom config file to adjust `max_seq_len` and `max_out_len`, ensuring the model can process the full context. Here is an example (`examples/eval_needlebench.py`):
-
-```python
-from mmengine.config import read_base
-# we use mmengine.config to import other config files
-
-with read_base():
-    from opencompass.configs.models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
-
-    # Evaluate needlebench_32k, adjust the configuration to use 4k, 32k, 128k, 200k, or 1000k if necessary.
-    # from .datasets.needlebench.needlebench_32k.needlebench_32k import needlebench_datasets
-    # from .summarizers.needlebench import needlebench_32k_summarizer as summarizer
-
-    # only eval original "needle in a haystack test" in needlebench_32k
-    from opencompass.configs.datasets.needlebench.needlebench_32k.needlebench_single_32k import needlebench_zh_datasets, needlebench_en_datasets
-    from opencompass.configs.summarizers.needlebench import needlebench_32k_summarizer as summarizer
-
-    # eval Ancestral Tracing Challenge(ATC)
-    # from .datasets.needlebench.atc.atc_0shot_nocot_2_power_en import needlebench_datasets
-    # ATC use default summarizer thus no need to import summarizer
-
-datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
-
-for m in internlm2_chat_7b:
-    m['max_seq_len'] = 32768 # 保证InternLM2-7B模型能接收到完整的长文本，其他模型需要根据各自支持的最大序列长度修改。
-    m['max_out_len'] = 4096
-
-models = internlm2_chat_7b
-
-work_dir = './outputs/needlebench'
-```
+For other models, it is recommended to write your own config file (such as `examples/eval_needlebench_v2.py`) to adjust `max_seq_len` and `max_out_len`, so that the model can process the full context.
 
 You can then run evaluation with:
 
 ```bash
-python run.py configs/eval_needlebench.py --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py configs/eval_needlebench_v2.py --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 No need to manually specify `--dataset`, `--models`, or `--summarizer` again.
@@ -131,14 +104,14 @@ NeedleBench's latest version has built-in visualization integrated into the summ
 If you use NeedleBench, please cite us:
 
 ```bibtex
-@misc{li2024needlebenchllmsretrievalreasoning,
-      title={NeedleBench: Can LLMs Do Retrieval and Reasoning in 1 Million Context Window?},
-      author={Mo Li and Songyang Zhang and Yunxin Liu and Kai Chen},
-      year={2024},
+@misc{li2025needlebenchllmsretrievalreasoning,
+      title={NeedleBench: Can LLMs Do Retrieval and Reasoning in Information-Dense Context?}, 
+      author={Mo Li and Songyang Zhang and Taolin Zhang and Haodong Duan and Yunxin Liu and Kai Chen},
+      year={2025},
       eprint={2407.11963},
       archivePrefix={arXiv},
       primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2407.11963},
+      url={https://arxiv.org/abs/2407.11963}, 
 }
 
 @misc{2023opencompass,
