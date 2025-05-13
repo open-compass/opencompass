@@ -1,28 +1,26 @@
 from mmengine.config import read_base
+# we use mmengine.config to import other config files
 
 with read_base():
-    # Evaluate needlebench_4k, adjust the configuration to use 8k, 32k, 128k, 200k, or 1000k if necessary.
-    # from opencompass.configs.datasets.needlebench.needlebench_4k.needlebench_4k import needlebench_datasets
-    # from opencompass.configs.summarizers.needlebench import needlebench_4k_summarizer as summarizer
-    # only eval original "needle in a haystack test" in needlebench_4k
-    from opencompass.configs.datasets.needlebench.needlebench_4k.needlebench_single_4k import (
-        needlebench_en_datasets, needlebench_zh_datasets)
-    from opencompass.configs.models.hf_internlm.hf_internlm2_chat_7b import \
-        models as internlm2_chat_7b
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_chat_7b import \
-        models as internlm2_chat_7b_200k
-    from opencompass.configs.summarizers.needlebench import \
-        needlebench_4k_summarizer as summarizer
+    from opencompass.configs.models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
+
+    # Evaluate needlebench_32k, adjust the configuration to use 4k, 32k, 128k, 200k, or 1000k if necessary.
+    # from .datasets.needlebench.needlebench_32k.needlebench_32k import needlebench_datasets
+    # from .summarizers.needlebench import needlebench_32k_summarizer as summarizer
+
+    # only eval original "needle in a haystack test" in needlebench_32k
+    from opencompass.configs.datasets.needlebench.needlebench_32k.needlebench_single_32k import needlebench_zh_datasets, needlebench_en_datasets
+    from opencompass.configs.summarizers.needlebench import needlebench_32k_summarizer as summarizer
 
     # eval Ancestral Tracing Challenge(ATC)
-    # from opencompass.configs.datasets.needlebench.atc.atc_choice_50 import needlebench_datasets
-    # from opencompass.configs.summarizers.needlebench import atc_summarizer_50 as summarizer
+    # from .datasets.needlebench.atc.atc_0shot_nocot_2_power_en import needlebench_datasets
+    # ATC use default summarizer thus no need to import summarizer
 
 datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
 
 for m in internlm2_chat_7b:
-    m['max_seq_len'] = 32768  # Ensure InternLM2-7B model can receive the full length of long texts, adjust for other models based on their supported maximum sequence length.
-    m['max_out_len'] = 2000  # Ensure complete responses from the model in multi-needle retrieval tasks.
+    m['max_seq_len'] = 32768 # 保证InternLM2-7B模型能接收到完整的长文本，其他模型需要根据各自支持的最大序列长度修改。
+    m['max_out_len'] = 4096
 
 models = internlm2_chat_7b
 
