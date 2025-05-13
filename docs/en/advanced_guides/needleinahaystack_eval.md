@@ -18,7 +18,6 @@ Within the `OpenCompass` framework, under `NeedleBench`, we designed a series of
 
 > **Note:** NeedleBench (v2) includes several optimizations and adjustments in dataset construction and task details. For a detailed comparison between the old and new versions, as well as a summary of updates, please refer to [opencompass/configs/datasets/needlebench_v2/readme.md](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/needlebench_v2/readme.md).
 
-
 ## Evaluation Steps
 
 > Note: In the latest `OpenCompass` codebase, the NeedleBench dataset is automatically loaded from the [Huggingface interface](https://huggingface.co/datasets/opencompass/NeedleBench), with no need for manual download or configuration.

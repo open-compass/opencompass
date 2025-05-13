@@ -18,7 +18,6 @@
 
 > **补充说明**：目前NeedleBench（v2）在数据集构建和任务细节等方面做了一些小的优化和调整。如果您想了解新旧版本的具体差异和详细更新内容，请参考 [opencompass/configs/datasets/needlebench_v2/readme.md](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/needlebench_v2/readme.md)。
 
-
 ## 评估步骤
 
 > 注意：在最新的OpenCompass代码中，NeedleBench数据集会自动从[Huggingface接口](https://huggingface.co/datasets/opencompass/NeedleBench)加载，无需手动下载或配置数据集，您可以直接运行评测命令。
