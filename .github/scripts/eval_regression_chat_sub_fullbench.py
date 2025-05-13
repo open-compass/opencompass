@@ -58,7 +58,7 @@ for m in models:
 
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
 
-judge_models = deepcopy(hf_internlm2_5_7b_chat_model)
+judge_models = deepcopy([models[1]])
 judge_models[0]['abbr'] = judge_models[0]['abbr'] + '-judge'
 
 eval = dict(
