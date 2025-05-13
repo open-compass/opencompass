@@ -22,7 +22,7 @@ configs/datasets/needlebench_v2/
 └── readme_zh-CN.md
 ```
 
-在每个长度配置目录下（如 `needlebench_v2_4k`），包含了专门针对该长度设置的测试任务脚本。
+在每个长度配置目录下（如 `needlebench_v2_4k`），包含了专门针对该长度设置的测试任务配置文件。
 
 ## 任务描述与长度配置
 

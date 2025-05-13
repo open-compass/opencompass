@@ -22,7 +22,7 @@ configs/datasets/needlebench_v2/
 └── readme_zh-CN.md
 ```
 
-Within each configuration directory (e.g., `needlebench_v2_4k`), there are scripts tailored for testing within that specific length setting.
+Within each configuration directory (e.g., `needlebench_v2_4k`), there are configuration files tailored for testing within that specific length setting.
 
 ## Task Descriptions and Length Configurations
 
