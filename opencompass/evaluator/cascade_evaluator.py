@@ -233,7 +233,8 @@ class CascadeEvaluator(BaseEvaluator):
                 self.llm_evaluator.dataset_cfg = None
 
                 # Apply prediction postprocessing to for LLM evaluator
-                failed_predictions = self.llm_evaluator.pred_postprocess(failed_predictions)
+                failed_predictions = self.llm_evaluator.pred_postprocess(
+                    failed_predictions)
 
                 llm_results = self.llm_evaluator.score(
                     predictions=failed_predictions,
@@ -307,6 +308,16 @@ class CascadeEvaluator(BaseEvaluator):
                 self.logger.info(
                     f'LLM evaluation: {llm_correct}/{llm_evaluated} '
                     f'correct ({llm_accuracy:.2f}%)')
+
+            # Append cascade correctness flag to each sample
+            for item in details:
+                _rule_correct = item['rule_evaluation'].get('correct', False)
+                if 'llm_evaluation' in item:
+                    _llm_correct = item['llm_evaluation'].get(
+                        'llm_correct', False)
+                else:
+                    _llm_correct = False
+                item['cascade_correct'] = _rule_correct or _llm_correct
 
             result = {
                 'accuracy': final_accuracy,

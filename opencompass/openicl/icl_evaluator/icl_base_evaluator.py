@@ -182,6 +182,10 @@ class BaseEvaluator:
                     elif example['detail'].get('is_correct', None) is not None:
                         can_calculate = True
                         c += int(example['detail']['is_correct'])
+                    elif example['detail'].get('cascade_correct',
+                                               None) is not None:
+                        can_calculate = True
+                        c += int(example['detail']['cascade_correct'])
 
                 k_list = [k] if isinstance(k, int) else k
                 if can_calculate and n > 1 and max(k_list) > 1:
