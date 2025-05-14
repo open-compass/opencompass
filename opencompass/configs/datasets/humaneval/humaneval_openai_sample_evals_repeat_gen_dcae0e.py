@@ -32,6 +32,6 @@ humaneval_datasets = [
         reader_cfg=humaneval_reader_cfg,
         infer_cfg=humaneval_infer_cfg,
         eval_cfg=humaneval_eval_cfg,
-        n=3,
-        k=2)
+        n=5,
+        k=3)
 ]
