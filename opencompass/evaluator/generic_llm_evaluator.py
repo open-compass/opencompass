@@ -26,6 +26,7 @@ class GenericLLMEvaluator(BaseEvaluator):
         judge_cfg (ConfigDict): The config for Judge LLM.
         dataset_cfg (ConfigDict): The config for dataset.
         pred_postprocessor (ConfigDict): The config for postprocessor.
+            used for the prediction results.
         dict_postprocessor (ConfigDict): The config for postprocessor,
             used for evaluation results dict.
     """
@@ -80,6 +81,11 @@ class GenericLLMEvaluator(BaseEvaluator):
             output_json_filepath=out_dir,
             output_json_filename=out_name,
         )
+
+    # def _evaluate(self):
+    #     self.pred_postprocess
+    #     self.score
+    #     self.post_process 
 
     def score(
         self,

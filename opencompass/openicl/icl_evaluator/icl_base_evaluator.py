@@ -96,7 +96,7 @@ class BaseEvaluator:
         if self.pred_postprocessor is None:
             return predictions
         else:
-            kwargs = self.pred_postprocessor
+            kwargs = deepcopy(self.pred_postprocessor)
             proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
             return [proc(pred, **kwargs) for pred in predictions]
 
@@ -116,9 +116,11 @@ class BaseEvaluator:
                 raise ValueError(
                     'Predictions and references must have the same length')
 
-        real_size = len(original_dataset) // n
+        real_size = len(original_dataset) // n  # dataset size of each replica
         all_details = []
         all_results = []
+
+        # Run evaluation for each replica
         for i in range(n):
             self._dataset_replica_idx = i
             logger.info(f'Running {i}-th replica of evaluation')
@@ -136,8 +138,9 @@ class BaseEvaluator:
                 for key, value in score_kwargs.items()
             }
 
+            current_params['predictions'] = self.pred_postprocess(
+                current_params['predictions'])
             results = self.score(**current_params)
-
             details = results.pop('details', None)
             if details is not None:
                 if isinstance(details, Dict):
@@ -146,11 +149,11 @@ class BaseEvaluator:
             all_results.append(results)
 
         eval_results = {}
-        for single_results in all_results:
-            for key in single_results:
+        for single_replica_results in all_results:
+            for key in single_replica_results:
                 if key not in eval_results:
                     eval_results[key] = []
-                eval_results[key].append(single_results[key])
+                eval_results[key].append(single_replica_results[key])
         for key in deepcopy(eval_results):
             if isinstance(eval_results[key][0], float) or isinstance(
                     eval_results[key][0], int):
@@ -161,6 +164,7 @@ class BaseEvaluator:
                 else:
                     eval_results[key] = np.mean(eval_results[key])
 
+        # Calculate the additional metrics
         grouped_examples = self.group(n, all_details, original_dataset)
         can_calculate = False
         if len(all_details) != 0:

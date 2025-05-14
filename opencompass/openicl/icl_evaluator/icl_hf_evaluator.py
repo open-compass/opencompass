@@ -43,7 +43,7 @@ class HuggingfaceEvaluator(BaseEvaluator):
             dict: preprocessed results.
         """
         return {
-            'predictions': self.pred_postprocess(predictions),
+            'predictions': predictions,
             'references': references,
         }
 

@@ -146,6 +146,9 @@ class CascadeEvaluator(BaseEvaluator):
                 test_item = test_set[i]
             else:
                 test_item = None
+            # Apply prediction postprocessing for each sample
+            [pred] = self.rule_evaluator.pred_postprocess([pred])
+
             result = self.sample_score(pred, ref, test_item)
             result['evaluation_method'] = 'rule'
             details.append({'rule_evaluation': result})
@@ -228,6 +231,9 @@ class CascadeEvaluator(BaseEvaluator):
                 self.llm_evaluator._dataset_replica_idx = \
                     self._dataset_replica_idx
                 self.llm_evaluator.dataset_cfg = None
+
+                # Apply prediction postprocessing to for LLM evaluator
+                failed_predictions = self.llm_evaluator.pred_postprocess(failed_predictions)
 
                 llm_results = self.llm_evaluator.score(
                     predictions=failed_predictions,
