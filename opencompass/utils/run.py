@@ -156,6 +156,7 @@ def get_config_from_arg(args) -> Config:
         for _dataset in datasets:
             logger.warning(f"The default num runs of {_dataset['abbr']} is: {_dataset['n']}, changed into: {args.dataset_num_runs}")
             _dataset['n'] = args.dataset_num_runs
+            _dataset['k'] = args.dataset_num_runs
 
     # parse model args
     if not args.models and not args.hf_path:
