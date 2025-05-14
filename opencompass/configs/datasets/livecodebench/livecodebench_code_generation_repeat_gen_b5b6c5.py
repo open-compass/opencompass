@@ -60,8 +60,8 @@ LCBCodeGeneration_dataset = dict(
     reader_cfg=lcb_code_generation_reader_cfg,
     infer_cfg=lcb_code_generation_infer_cfg,
     eval_cfg=lcb_code_generation_eval_cfg,
-    n=3,
-    k=2
+    n=5,
+    k=3
 )
 
 # Code Execution Dataset
