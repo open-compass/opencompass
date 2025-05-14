@@ -47,7 +47,7 @@ def create_summarizer(context_lengths, depths, dataset_size,
 
     for language in languages:
         names_list = [
-            f'Length{length}Depth{int(depth)}_origin_{language}_{dataset_size}'
+            [f'Length{length}_parallel_{language}_{dataset_size}', 'average_score']
             for length in context_lengths
             for depth in depths
         ]
