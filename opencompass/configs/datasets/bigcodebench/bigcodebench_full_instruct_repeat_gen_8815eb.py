@@ -40,6 +40,6 @@ bigcodebench_full_instruct_datasets = [
          infer_cfg=bigcodebench_full_infer_cfg,
          eval_cfg=bigcodebench_full_eval_cfg,
          release_version='v0.1.2',
-         n=3,
-         k=2)
+         n=5,
+         k=3)
 ]

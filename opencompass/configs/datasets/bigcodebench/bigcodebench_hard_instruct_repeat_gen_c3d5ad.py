@@ -42,7 +42,7 @@ bigcodebench_hard_instruct_datasets = [
         eval_cfg=bigcodebench_hard_eval_cfg,
         release_version='v0.1.2',
         dataset_version='hard',
-        n=3,
-        k=2
+        n=5,
+        k=3
     )
 ]
