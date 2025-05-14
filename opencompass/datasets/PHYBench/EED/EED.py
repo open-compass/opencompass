@@ -130,11 +130,6 @@ def remove_command(s, command, keep_inside=False):
 
 
 def convert_latex_fractions(latex_str):
-    """Convert non-standard fraction like \frac\alpha2 to its standard-
-    convertable \frac{\alpha}{2}.
-
-    We support single letter, number or standard form.
-    """
     pattern = (r'\\frac((?:\\[a-zA-Z]+|\d|[a-zA-Z]|{[^{}]*}))'
                r'((?:\\[a-zA-Z]+|\d|[a-zA-Z]|{[^{}]*}))')
 
