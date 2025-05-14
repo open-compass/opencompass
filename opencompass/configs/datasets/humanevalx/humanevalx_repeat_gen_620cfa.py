@@ -37,7 +37,7 @@ humanevalx_datasets = [
         reader_cfg=humanevalx_reader_cfg,
         infer_cfg=humanevalx_infer_cfg,
         eval_cfg=humanevalx_eval_cfg_dict[lang],
-        n=3,
-        k=2)
+        n=5,
+        k=3)
     for lang in ['python', 'cpp', 'go', 'java', 'js']
 ]
