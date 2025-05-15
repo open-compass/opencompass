@@ -64,6 +64,7 @@ from .hle import *  # noqa: F401, F403
 from .huggingface import *  # noqa: F401, F403
 from .humaneval import *  # noqa: F401, F403
 from .humaneval_multi import *  # noqa: F401, F403
+from .humaneval_pro import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .hungarian_math import *  # noqa: F401, F403
 from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
@@ -96,9 +97,12 @@ from .math401 import *  # noqa: F401, F403
 from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
+from .mbpp_pro import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
+from .Medbullets import *  # noqa: F401, F403
 from .MedCalc_Bench import MedCalc_BenchDataset  # noqa: F401
 from .MedCalc_Bench import MedCalcOfficial_Evaluator  # noqa: F401
+from .medmcqa import *  # noqa: F401, F403
 from .MedQA import *  # noqa: F401, F403
 from .MedXpertQA import *  # noqa: F401, F403
 from .mgsm import *  # noqa: F401, F403
@@ -134,6 +138,8 @@ from .ruler import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403
 from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
 from .scicode import *  # noqa: F401, F403
+from .SciEval import SciEvalDataset  # noqa: F401
+from .SciKnowEval import *  # noqa: F401, F403
 from .simpleqa import *  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403
 from .smolinstruct import *  # noqa: F401, F403

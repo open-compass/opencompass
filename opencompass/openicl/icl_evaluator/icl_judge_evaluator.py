@@ -352,7 +352,7 @@ class Judgerbenchv2Evaluator(BaseEvaluator):
         total_normalized_diff = sum(normalized_diffs.values()) / len(
             normalized_diffs.values()) * 100
         acc = 100 * correct / count
-        final_score = acc - total_normalized_diff
+        final_score = (acc - total_normalized_diff + 100) / 2
         result = {
             'accuracy': acc,
             'rank_diff': total_rank_diff,
