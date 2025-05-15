@@ -82,11 +82,6 @@ class GenericLLMEvaluator(BaseEvaluator):
             output_json_filename=out_name,
         )
 
-    # def _evaluate(self):
-    #     self.pred_postprocess
-    #     self.score
-    #     self.post_process 
-
     def score(
         self,
         predictions,
