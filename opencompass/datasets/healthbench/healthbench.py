@@ -1,16 +1,14 @@
 import json
 import re
 
-from datasets import Dataset, load_dataset
+from datasets import load_dataset
 
 from opencompass.openicl import BaseEvaluator
-from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-from opencompass.utils import get_logger
+from opencompass.registry import LOAD_DATASET
 
 from ..base import BaseDataset
 from . import common
-from .healthbench_eval import HealthBenchEval, RubricItem
-from .healthbench_meta_eval import HealthBenchMetaEval
+from .healthbench_eval import RubricItem
 from .sampler.chat_completion_sampler import ChatCompletionSampler
 from .types import SingleEvalResult
 
