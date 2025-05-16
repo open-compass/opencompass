@@ -15,20 +15,20 @@ with read_base():
         bigcodebench_hard_instruct_datasets
     )
     # livecodebench code generation lite v5
-    from opencompass.configs.datasets.livecodebench.livecodebench_time_split_gen import (
+    from opencompass.configs.datasets.livecodebench.livecodebench_time_split_gen_a4f90b import (
         LCB_datasets
     )
-    # huamneval
+    # huamneval series
     from opencompass.configs.datasets.humaneval.humaneval_openai_sample_evals_gen_dcae0e import (
         humaneval_datasets
     )
-    from opencompass.configs.datasets.humaneval import (
+    from opencompass.configs.datasets.humaneval_pro.humaneval_pro_gen import (
         humanevalpro_datasets
     )
     from opencompass.configs.datasets.humanevalx.humanevalx_gen_620cfa import (
         humanevalx_datasets
     )
-    # mbpp
+    # mbpp series
     from opencompass.configs.datasets.mbpp.mbpp_gen import (
         mbpp_datasets
     )
@@ -36,7 +36,7 @@ with read_base():
         mbpppro_datasets
     )
     # multipl-e
-    from opencompass.configs.datasets.multipl_e.multiple_top_ten_gen import (
+    from opencompass.configs.datasets.multipl_e.multiple_gen import (
         multiple_datasets
     )
     # ds1000
@@ -47,9 +47,6 @@ with read_base():
     # Models Part
     from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
         models as lmdeploy_qwen2_5_7b_instruct_model,
-    )
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import (
-        models as lmdeploy_internlm3_8b_instruct_model,
     )
 
     # Summary Groups
