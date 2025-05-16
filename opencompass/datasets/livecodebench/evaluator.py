@@ -248,6 +248,28 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
             end_date=end_date)['test']
         self.extractor_version = extractor_version
 
+    def _build_results(self, extracted_predictions, metrics, eval_results,
+                       final_metadata):
+        results = {}
+        results['pass@1'] = metrics.get('pass@1', 0.0)
+        details = []
+        # Safely get the details list from metrics
+        r = metrics.get('details', {}).get('pass@1', [])
+        for i, (ep, er, fm) in enumerate(
+                zip(extracted_predictions.values(), eval_results.values(),
+                    final_metadata)):
+            detail = {
+                'extracted_prediction':
+                ep[0] if isinstance(ep, list) and ep else ep,
+                'eval_result': er[0] if isinstance(er, list) and er else er,
+                'final_metadata': fm[0] if isinstance(fm, list) and fm else fm
+            }
+            # Use r[i] if available, otherwise fallback to False
+            detail['correct'] = bool(r[i] == 100.0) if i < len(r) else False
+            details.append(detail)
+        results['details'] = details
+        return results
+
     def score(self, predictions, references):
         if len(predictions) != len(references):
             return {
@@ -295,13 +317,14 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
             num_process_evaluate=self.num_process_evaluate,
             timeout=self.timeout,
         )
-        results = {
-            'extracted_predictions': extracted_predictions,
-            'eval_results': eval_results
-        }
-        results.update(metrics)
+        # results = {
+        #     'extracted_predictions': extracted_predictions,
+        #     'eval_results': eval_results
+        # }
+        # results.update(metrics)
 
-        return results
+        return self._build_results(extracted_predictions, metrics,
+                                   eval_results, final_metadata)
 
 
 def evaluate_score(args) -> list[bool]:
