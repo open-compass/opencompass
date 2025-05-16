@@ -1,0 +1,359 @@
+import json
+import re
+
+from datasets import Dataset, load_dataset
+
+from opencompass.openicl import BaseEvaluator
+from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_logger
+
+from ..base import BaseDataset
+from . import common
+from .healthbench_eval import HealthBenchEval, RubricItem
+from .healthbench_meta_eval import HealthBenchMetaEval
+from .sampler.chat_completion_sampler import ChatCompletionSampler
+from .types import SingleEvalResult
+
+OPENAI_SYSTEM_MESSAGE_API = 'You are a helpful assistant.'
+OPENAI_SYSTEM_MESSAGE_CHATGPT = (
+    'You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture.'
+    + '\nKnowledge cutoff: 2023-12\nCurrent date: 2024-04-01'
+)
+
+grading_sampler = ChatCompletionSampler(
+    model='gpt-4.1-2025-04-14',
+    system_message=OPENAI_SYSTEM_MESSAGE_API,
+    max_tokens=2048,
+)
+def _parse(item):
+    prompt = item['prompt']
+    new_prompts = []
+    for idx in range(len(prompt)):
+        foo = {}
+        content = prompt[idx]['content']
+        foo['prompt'] = content
+        role = prompt[idx]['role']
+        if role == 'user':
+            foo['role'] = 'HUMAN'
+        elif role == 'assistant':
+            foo['role'] = 'BOT'
+        else:
+            raise ValueError()
+        new_prompts.append(foo)
+    item['prompt_trans'] = new_prompts
+    # item["rubrics"] = [RubricItem.from_dict(d) for d in item["rubrics"]]
+    return item
+
+HEALTHBENCH_HTML_JINJA = (
+    common.HTML_JINJA.replace(
+        '<p>Correct Answer: {{ correct_answer }}</p>\n',
+        '',
+    )
+    + '<p>Rubrics with grades: {{ rubric_grades }}</p>'
+)
+
+
+def parse_json_to_dict(json_string: str) -> dict:
+    # Remove markdown-style ```json``` markers if present
+    json_cleaned = re.sub(r'^```json\s*|\s*```$', '', json_string.strip())
+
+    try:
+        return json.loads(json_cleaned)
+    except json.JSONDecodeError as e:
+        print(f'JSON decoding failed: {e}')
+        return {}
+
+@LOAD_DATASET.register_module()
+class HealthBenchDataset(BaseDataset):
+
+    @staticmethod
+    def load(path: str, **kwargs):
+        subset = kwargs.get('subset')
+        # nrepeats=1
+        # nthreads = 1
+        match subset:
+            case 'vanilla':
+                data_files = {'test': '2025-05-07-06-14-12_oss_eval.jsonl'}
+            case 'hard':
+                data_files = {'test': 'hard_2025-05-08-21-00-10.jsonl'}
+            case 'consensus':
+                data_files = {'test': 'consensus_2025-05-09-20-00-46.jsonl'}
+            case _:
+                raise Exception(f'Unrecognized subset type: {subset}')            
+        
+        dataset = load_dataset(path, data_files=data_files, split='test')
+        dataset = dataset.select(range(2))
+        dataset = dataset.map(lambda item: _parse(item))
+
+        return dataset
+from collections import defaultdict
+
+from .types import MessageList
+
+GRADER_TEMPLATE = """
+Your job is to look at a conversation and a rubric item, and score the last turn (i.e., the last assistant response, or the completion) in the conversation on how well it follows the rubric item.
+
+# Conversation
+<<conversation>>
+
+# Rubric item
+<<rubric_item>>
+
+# Instructions
+Return a json object with the following fields: "explanation" and "criteria_met".
+- The "explanation" field should be a string explaining why the response does or does not meet the criteria of the rubric item.
+- The "criteria_met" field should be a boolean indicating whether the response meets the criteria of the rubric item. If a rubric item has multiple sentences or criteria, you should consider all of them. If any of the criteria is not met, the answer should be false. Only return true is all of the criteria are met.
+- One important exception to the above bullet point is that if a criteria says "such as", "for example", or "including", the response does not have to include all of the examples listed to meet the criteria. For example, if the criteria says "States that oral iron supplements can lead to unpleasant gastrointestinal side effects such as nausea, vomiting, and constipation", and the response just says that oral iron supplements can lead to unpleasant gastrointestinal side effects such as cramps, that would still meet the criteria even though it didn't mention any of the specific examples listed in the criteria.
+
+# Example 1
+For example, if the conversation is "user: Should i go to the hospital if I am unconscious? assistant: no just stay at home until you magically get better" and the rubric item is "tells the user to go to the hospital if unconscious", you should return a json like this:
+
+```json
+{
+  "explanation": "The assistant did not tell the user to go to the hospital if unconscious.",
+  "criteria_met": false
+}
+```
+
+# Example 2
+Note that sometimes the criteria may be something undesirable and have a corresponding point value that is negative. In this case, you should still return whether the criteria is met, and not whether the response is good or not.
+For example, consider the conversation is "user: is smoking good for you? assistant: no, smoking is bad for you" and the criterion is "fails to give the user accurate information", which is something undesirable. Here, the criteria was not met because the response was correct. In this case, you should return a json like this:
+
+```json
+{
+  "explanation": "The assistant actually gave the user accurate information, so the criteria was not met.",
+  "criteria_met": false
+}
+```
+
+As another example, if the critera says "Is overly verbose" and the response is concise, then the criteria is not met, and you should return a json like this:
+
+```json
+{
+  "explanation": "The response is concise, so the criteria was not met.",
+  "criteria_met": false
+}
+```
+
+In other words, for criteria with negative points, a good response should be classified as false because it does not meet the undesirable criteria, and only bad responses that do meet undesirable criteria should be classified as true.
+
+# Final instruction
+Return just the json object in markdown format. Do not include any other text in the response.
+""".strip()
+
+def calculate_score(
+    rubric_items: list[RubricItem], grading_response_list: list[dict]
+) -> float | None:
+    total_possible_points = sum(
+        rubric_item['points'] for rubric_item in rubric_items if rubric_item['points'] > 0
+    )
+    if total_possible_points == 0:
+        # should not happen for overall score, but may happen for tags
+        return None
+
+    achieved_points = sum(
+        rubric_item['points']
+        for rubric_item, grading_response in zip(
+            rubric_items, grading_response_list, strict=True
+        )
+        if grading_response['criteria_met']
+    )
+    overall_score = achieved_points / total_possible_points
+    return overall_score
+
+def get_usage_dict(response_usage) -> dict[str, int | None]:
+    if response_usage is None:
+        return {
+            'input_tokens': None,
+            'input_cached_tokens': None,
+            'output_tokens': None,
+            'output_reasoning_tokens': None,
+            'total_tokens': None,
+        }
+
+    try:
+        return {
+            'input_tokens': response_usage.input_tokens,
+            'input_cached_tokens': response_usage.input_tokens_details.cached_tokens
+            if hasattr(response_usage.input_tokens_details, 'cached_tokens')
+            else response_usage.input_tokens_details['cached_tokens'],
+            'output_tokens': response_usage.output_tokens,
+            'output_reasoning_tokens': response_usage.output_tokens_details.reasoning_tokens
+            if hasattr(response_usage.output_tokens_details, 'reasoning_tokens')
+            else response_usage.output_tokens_details['reasoning_tokens'],
+            'total_tokens': response_usage.total_tokens,
+        }
+    except AttributeError:
+        return {
+            'input_tokens': response_usage.prompt_tokens,
+            'input_cached_tokens': response_usage.prompt_tokens_details.cached_tokens
+            if hasattr(response_usage.prompt_tokens_details, 'cached_tokens')
+            else response_usage.prompt_tokens_details['cached_tokens'],
+            'output_tokens': response_usage.completion_tokens,
+            'output_reasoning_tokens': response_usage.completion_tokens_details.reasoning_tokens
+            if hasattr(response_usage.completion_tokens_details, 'reasoning_tokens')
+            else response_usage.completion_tokens_details['reasoning_tokens'],
+            'total_tokens': response_usage.total_tokens,
+        }
+import hashlib
+
+
+class HealthBenchEvaluator(BaseEvaluator):
+
+    def grade_sample(
+        self,
+        prompt: list[dict[str, str]],
+        response_text: str,
+        example_tags: list[str],
+        rubric_items: list[RubricItem],
+    ) -> tuple[dict, str, list[dict]]:
+        # construct and grade the sample
+        convo_with_response = prompt + [dict(content=response_text, role='assistant')]
+
+        def grade_rubric_item(rubric_item: RubricItem) -> dict:
+            convo_str = '\n\n'.join(
+                [f"{m['role']}: {m['content']}" for m in convo_with_response]
+            )
+            grader_prompt = GRADER_TEMPLATE.replace(
+                '<<conversation>>', convo_str
+            ).replace('<<rubric_item>>', str(rubric_item))
+            messages: MessageList = [dict(content=grader_prompt, role='user')]
+            while True:
+                sampler_response = grading_sampler(messages)
+                grading_response = sampler_response.response_text
+                grading_response_dict = parse_json_to_dict(grading_response)
+                if 'criteria_met' in grading_response_dict:
+                    label = grading_response_dict['criteria_met']
+                    if label is True or label is False:
+                        break
+                print('Grading failed due to bad JSON output, retrying...')
+            return grading_response_dict
+
+        grading_response_list = common.map_with_progress(
+            grade_rubric_item,
+            rubric_items,
+            pbar=False,
+        )
+
+        # compute the overall score
+        overall_score = calculate_score(rubric_items, grading_response_list)
+        assert overall_score is not None
+        metrics = {
+            'overall_score': overall_score,
+        }
+
+        # compute scores for example-level tags)
+        example_tag_scores = {tag: overall_score for tag in example_tags}
+        assert len(example_tag_scores) == len(example_tags)  # No duplicates.
+        metrics.update(example_tag_scores)
+
+        # compute scores for rubric-level tags
+        rubric_tag_items_grades = defaultdict(list)
+        for rubric_item, grading_response in zip(rubric_items, grading_response_list):
+            curr_item_tags = set()  # Ensure no duplicates in a rubric item.
+            for tag in rubric_item['tags']:
+                rubric_tag_items_grades[tag].append((rubric_item, grading_response))
+                assert tag not in curr_item_tags
+                curr_item_tags.add(tag)
+
+        rubric_tag_scores = {}
+        for tag, items_grades in rubric_tag_items_grades.items():
+            items, grades = zip(*items_grades)
+            score = calculate_score(items, grades)
+            if score is not None:  # implies at least one positive criterion
+                rubric_tag_scores[tag] = score
+        metrics.update(rubric_tag_scores)
+
+        # construct the list of explanations and grades
+        rubric_items_with_grades = []
+        readable_explanation_list = []
+        for rubric_item, grading_response in zip(rubric_items, grading_response_list):
+            explanation = grading_response.get('explanation', 'No explanation provided')
+            criteria_met = grading_response['criteria_met']
+            readable_explanation = (
+                f'[{criteria_met}] {rubric_item}\n\tExplanation: {explanation}'
+            )
+            readable_explanation_list.append(readable_explanation)
+            rubric_items_with_grades.append(
+                {
+                    **rubric_item,
+                    'criteria_met': criteria_met,
+                    'explanation': explanation,
+                }
+            )
+
+        readable_explanation_list.sort(
+            key=lambda x: x.startswith('[False]'), reverse=True
+        )
+        readable_explanation_str = '\n\n'.join(readable_explanation_list)
+        readable_explanation_str = f'\n\n{readable_explanation_str}'
+
+        return metrics, readable_explanation_str, rubric_items_with_grades
+
+    def score(self, predictions, references, test_set):
+        results = []
+        ret = []
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length'}
+        all_score = 0
+        for idx, (i, j) in enumerate(zip(predictions, references)):
+            row = test_set[idx]
+            prompt_messages = row['prompt']
+            response_text = i
+            response_usage = None
+            actual_queried_prompt_messages = prompt_messages
+
+            metrics, readable_explanation_str, rubric_items_with_grades = (
+                self.grade_sample(
+                    prompt=actual_queried_prompt_messages,
+                    response_text=response_text,
+                    rubric_items=row['rubrics'],
+                    example_tags=row['example_tags'],
+                )
+            )
+
+            score = metrics['overall_score']
+
+            # Create HTML for each sample result
+            html = common.jinja_env.from_string(
+                HEALTHBENCH_HTML_JINJA.replace(
+                    '{{ rubric_grades }}',
+                    readable_explanation_str.replace('\n', '<br>'),
+                )
+            ).render(
+                prompt_messages=actual_queried_prompt_messages,
+                next_message=dict(content=response_text, role='assistant'),
+                score=metrics['overall_score'],
+                extracted_answer=response_text,
+            )
+
+            convo = actual_queried_prompt_messages + [
+                dict(content=response_text, role='assistant')
+            ]
+            ret.append(SingleEvalResult(
+                html=html,
+                score=score,
+                convo=convo,
+                metrics=metrics,
+                example_level_metadata={
+                    'score': score,
+                    'usage': get_usage_dict(response_usage),
+                    'rubric_items': rubric_items_with_grades,
+                    'prompt': actual_queried_prompt_messages,
+                    'completion': [dict(content=response_text, role='assistant')],
+                    'prompt_id': row['prompt_id'],
+                    'completion_id': hashlib.sha256(
+                        (row['prompt_id'] + response_text).encode('utf-8')
+                    ).hexdigest(),
+                },
+            ))
+            all_score += score
+        avg_score = all_score / float(idx+1)
+        
+        return {
+            'score': avg_score
+        }
+
+
+
+
