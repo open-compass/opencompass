@@ -109,7 +109,7 @@ summarizer = dict(
         ['mbpp', 'score'],
         ['humaneval_pro', 'pass@1'],
         ['mbpp_pro', 'pass@1'],
-        ['humaneval_plus', 'pass@1'],
+        ['humaneval_plus', 'humaneval_plus_pass@1'],
         ['multiple', 'naive_average'],
         ['humanevalx', 'naive_average'],
         ['ds1000', 'naive_average'],
