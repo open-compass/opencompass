@@ -303,7 +303,7 @@
     category: Examination
     paper: https://huggingface.co/datasets/Maxwell-Jia/AIME_2024
     configpath: opencompass/configs/datasets/aime2024/aime2024_gen.py
-    configpath_llmjudge: opencompass/configs/datasets/aime2024/aime2024_llm_judge_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/aime2024/aime2024_llmjudge_gen.py
 - anli:
     name: Adversarial NLI
     category: Reasoning

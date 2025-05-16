@@ -277,7 +277,7 @@ OpenCompass还提供了级联评估器`CascadeEvaluator`，它结合了规则式
 
 ```python
 # 定义规则式评估器
-rule_evaluator = dict(type=MATHEvaluator)
+rule_evaluator = dict(type=MATHVerifyEvaluator)
 
 # 定义LLM评判器
 llm_judge_evaluator = dict(

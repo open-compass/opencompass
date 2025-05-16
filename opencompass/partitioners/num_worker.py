@@ -26,6 +26,7 @@ class NumWorkerPartitioner(BasePartitioner):
         dataset_size_path (str): The path to the dataset size cache file.
         keep_keys (list[str]): The keys to be kept from the experiment config
             to the task config.
+        force_rebuild (bool): Whether to force rebuild dataset to get size.
     """
 
     def __init__(self,
@@ -35,7 +36,8 @@ class NumWorkerPartitioner(BasePartitioner):
                  min_task_size: int = 16,
                  strategy: str = 'heuristic',
                  dataset_size_path: str = '.cache/dataset_size.json',
-                 keep_keys: Optional[List[str]] = None):
+                 keep_keys: Optional[List[str]] = None,
+                 force_rebuild: bool = False):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
         if strategy == 'split' and num_worker is not None:
             self.logger.warning('num_worker is ignored with split.')
@@ -44,6 +46,7 @@ class NumWorkerPartitioner(BasePartitioner):
         self.num_split = num_split or num_worker
         self.min_task_size = min_task_size
         self.dataset_size_path = dataset_size_path
+        self.force_rebuild = force_rebuild
         assert strategy in ('heuristic', 'split'), \
             f'Unsupported partition strategy: {strategy}. '\
             'Supported strategies are: `heuristic`, `split` .'
@@ -106,7 +109,7 @@ class NumWorkerPartitioner(BasePartitioner):
     @property
     def dataset_size(self):
         if not hasattr(self, '_dataset_size'):
-            if osp.exists(self.dataset_size_path):
+            if not self.force_rebuild and osp.exists(self.dataset_size_path):
                 self._dataset_size = mmengine.load(self.dataset_size_path)
             else:
                 self._dataset_size = {}
@@ -130,22 +133,25 @@ class NumWorkerPartitioner(BasePartitioner):
 
     def get_size(self, dataset: ConfigDict) -> int:
         dataset_abbr = dataset_abbr_from_cfg(dataset)
-
         test_range = dataset.reader_cfg.get('test_range', '')
 
-        if dataset_abbr in self.dataset_size:
+        # If not forcing rebuild and data exists in cache, use the cache
+        if not self.force_rebuild and dataset_abbr in self.dataset_size:
             actual_size = eval('len(range(self.dataset_size[dataset_abbr])'
                                f'{test_range})')
             return actual_size
 
+        # Otherwise, rebuild the dataset to get its size
         dataset = build_dataset_from_cfg(dataset)
         self.dataset_size[dataset_abbr] = len(dataset.test)
 
-        mmengine.mkdir_or_exist('.cache/')
-        mmengine.dump(self.dataset_size,
-                      self.dataset_size_path,
-                      indent=4,
-                      ensure_ascii=False)
+        # Save to cache file
+        if self.dataset_size_path:
+            mmengine.mkdir_or_exist('.cache/')
+            mmengine.dump(self.dataset_size,
+                          self.dataset_size_path,
+                          indent=4,
+                          ensure_ascii=False)
 
         actual_size = eval('len(range(self.dataset_size[dataset_abbr])'
                            f'{test_range})')

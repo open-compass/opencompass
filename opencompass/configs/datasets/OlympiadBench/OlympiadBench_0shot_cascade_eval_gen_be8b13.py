@@ -1,52 +1,31 @@
-
 from mmengine.config import read_base
-
-from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.datasets import OlympiadBenchDataset, OlympiadBenchEvaluator, olympiadbench_postprocess_v2
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.evaluator import (
     GenericLLMEvaluator,
     CascadeEvaluator,
-    MATHVerifyEvaluator,
+    MATHVerifyEvaluator
 )
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import (
-    MATHDataset,
-    math_postprocess_v2,
-    normalize_final_answer,
-)
-#######################################################################
-#                          PART 0  Essential Configs                  #
-#######################################################################
 
 with read_base():
-    # Datasets, Summarizer
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
-        models as lmdeploy_qwen2_5_7b_instruct_model,
-    )
+    from .OlympiadBench_categories import categories
 
-reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
-infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\nPlease reason step by step, and put your final answer within \\boxed{}.',
-                ),
-            ]
-        ),
-    ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+# Create prompter instance for problems
+olympiadbench_prompter_cfg = dict(
+    type='OlympiadBenchPrompter'
 )
 
-########################## Evaluator  #################################
+olympiadbench_reader_cfg = dict(
+    input_columns=[
+        'problem', 'language', 'subject', 'question_type', 
+        'answer_type', 'is_multiple_answer', 'unit', 'questions'
+    ], 
+    output_column='solution'
+)
+
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
     
@@ -72,59 +51,64 @@ GRADER_TEMPLATE = """
     Judging the correctness of candidates' answers:
 """.strip()
 
-llm_judge_evaluator =   dict(
-        type=GenericLLMEvaluator,
+
+olympiadbench_datasets = []
+for _name in categories:
+    olympiadbench_infer_cfg = dict(
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
-                    )
-                ],
-                round=[
-                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-                ],
+            type='OlympiadBenchTemplate'
+        ),
+        retriever=dict(type=ZeroRetriever),
+        inferencer=dict(type=GenInferencer),
+    )
+
+    # Evaluation configuration
+    olympiadbench_eval_cfg = dict(
+        evaluator=dict(
+            type=CascadeEvaluator,
+            rule_evaluator=dict(
+                type=MATHVerifyEvaluator,
             ),
-        ),
-        dataset_cfg=dict(
-        type=MATHDataset,
-        path='opencompass/math',
-        file_name='test_prm800k_500.json',
-        ),
-        judge_cfg=dict(),
+            llm_evaluator=dict(
+                type=GenericLLMEvaluator,
+                prompt_template=dict(
+                    type=PromptTemplate,
+                    template=dict(
+                    begin=[
+                        dict(
+                            role='SYSTEM',
+                            fallback_role='HUMAN',
+                            prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
+                    ],
+                        round=[
+                        dict(
+                            role='HUMAN',
+                            prompt = GRADER_TEMPLATE
+                        ),
+                    ]),
+                ),
+                dataset_cfg=dict(
+                    type=OlympiadBenchDataset,
+                    path='opencompass/OlympiadBench',
+                    name=_name,
+                    reader_cfg=olympiadbench_reader_cfg,
+                ),
+                judge_cfg=dict(),
+                dict_postprocessor=dict(type=generic_llmjudge_postprocess),
+            ),
+            parallel=False
+        )
     )
 
-rule_evaluator =dict(type=MATHVerifyEvaluator)
-cascade_evaluator = dict(type=CascadeEvaluator,
-                   llm_evaluator=llm_judge_evaluator,
-                   rule_evaluator=rule_evaluator,
-                   parallel=False
-                   )
-########################## #################################
-eval_cfg = dict()
-
-# eval_cfg['evaluator'] = rule_evaluator
-# eval_cfg['evaluator'] = llm_judge_evaluator
-eval_cfg['evaluator'] = cascade_evaluator 
-
-math_datasets = [
-    dict(
-        abbr='math_prm800k_500',
-        type=MATHDataset,
-        path='opencompass/math',
-        file_name='test_prm800k_500.json',
-        reader_cfg=reader_cfg,
-        infer_cfg=infer_cfg,
-        eval_cfg=eval_cfg,
+    olympiadbench_datasets.append(
+        dict(
+            type=OlympiadBenchDataset,
+            abbr=f'OlympiadBench_{_name}',
+            path='opencompass/OlympiadBench',
+            name=_name,
+            reader_cfg=olympiadbench_reader_cfg,
+            infer_cfg=olympiadbench_infer_cfg,
+            eval_cfg=olympiadbench_eval_cfg,
+            n=1,
+        )
     )
-]
-
-
-datasets = math_datasets
-models = lmdeploy_qwen2_5_7b_instruct_model
-
-
-work_dir = 'math_prm800k_500_cascade_evaluator'
