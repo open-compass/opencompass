@@ -28,6 +28,9 @@ with read_base():
     from opencompass.configs.datasets.humanevalx.humanevalx_gen_620cfa import (
         humanevalx_datasets
     )
+    from opencompass.configs.datasets.humaneval_plus.humaneval_plus_gen import (
+        humaneval_plus_datasets
+    )
     # mbpp series
     from opencompass.configs.datasets.mbpp.mbpp_gen import (
         mbpp_datasets
@@ -106,6 +109,7 @@ summarizer = dict(
         ['mbpp', 'score'],
         ['humaneval_pro', 'pass@1'],
         ['mbpp_pro', 'pass@1'],
+        ['humaneval_plus', 'pass@1'],
         ['multiple', 'naive_average'],
         ['humanevalx', 'naive_average'],
         ['ds1000', 'naive_average'],

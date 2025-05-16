@@ -25,7 +25,7 @@ mbpp_infer_cfg = dict(
         ),
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=512),
+    inferencer=dict(type=GenInferencer),
 )
 
 mbpp_eval_cfg = dict(evaluator=dict(type=MBPPEvaluator), pred_role='BOT')

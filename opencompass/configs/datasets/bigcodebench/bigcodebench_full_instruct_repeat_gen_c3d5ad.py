@@ -16,8 +16,7 @@ bigcodebench_full_infer_cfg = dict(prompt_template=dict(
             dict(role='HUMAN', prompt='{instruct_prompt}'),
         ])),
                                    retriever=dict(type=ZeroRetriever),
-                                   inferencer=dict(type=GenInferencer,
-                                                   max_out_len=8192))
+                                   inferencer=dict(type=GenInferencer))
 
 bigcodebench_full_eval_cfg = dict(
     evaluator=dict(
