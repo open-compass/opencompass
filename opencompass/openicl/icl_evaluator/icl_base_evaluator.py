@@ -93,7 +93,8 @@ class BaseEvaluator:
         return g_passk_details
 
     def pred_postprocess(self, predictions: List) -> Dict:
-        if self.pred_postprocessor is None:
+        if not hasattr(
+                self, 'pred_postprocessor') or self.pred_postprocessor is None:
             return predictions
         else:
             kwargs = deepcopy(self.pred_postprocessor)
