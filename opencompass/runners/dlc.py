@@ -221,7 +221,7 @@ class DLCRunner(BaseRunner):
             if self.aliyun_cfg['python_env_path']:
                 cmd = cmd.replace(
                     sys.executable,
-                    f'{self.aliyun_cfg['python_env_path']}/bin/python',
+                    f'{self.aliyun_cfg["python_env_path"]}/bin/python',
                 )
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')
