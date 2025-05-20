@@ -96,7 +96,7 @@ class DefaultSummarizer:
                 result.pop('details', None)
                 raw_results[model_abbr][dataset_abbr] = result
                 if 'error' in result:
-                    self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
+                    self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result['error']}')
                     continue
                 _rst, _dm = {}, []
                 for metric, score in result.items():
@@ -209,7 +209,7 @@ class DefaultSummarizer:
                     elif default_metric == 'harmonic_mean':
                         # Check for non-positive values that would cause issues in harmonic mean
                         if any(scores[metric][k] <= 0 for k in scores[metric]):
-                            self.logger.warning(f'Non-positive values found when calculating harmonic mean for {sg["name"]}')
+                            self.logger.warning(f'Non-positive values found when calculating harmonic mean for {sg['name']}')
                             # Handle non-positive values (either skip or use a small positive value)
                             numerator = len(scores[metric])
                             denominator = sum(1 / max(scores[metric][k], 1) for k in scores[metric])
@@ -363,10 +363,7 @@ class DefaultSummarizer:
             f.write(text)
         self.logger.info(f'write summary to {osp.abspath(output_path)}')
 
-        for row in table:
-            for col in row:
-                if ',' in col:
-                    col = col.replace(',', ' ')
+        table = [[col.replace(',', ' ') if isinstance(col, str) else col for col in row] for row in table]
         with open(output_csv_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
