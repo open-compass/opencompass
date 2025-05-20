@@ -60,6 +60,8 @@ env:
   COMPASS_DATA_CACHE: /fs-computility/llm/shared/llmeval/datasets/compass_data_cache
   HUGGINGFACE_HUB_CACHE: /fs-computility/llm/shared/llmeval/models/opencompass_hf_hub
   HF_HUB_CACHE: /fs-computility/llm/shared/llmeval/models/opencompass_hf_hub
+  HF_DATASETS_CACHE: /fs-computility/llm/shared/llmeval/datasets/hf_datasets_cache
+  HF_ENDPOINT: https://hf-mirror.com
   CONDA_ENV: regression_test
   export VLLM_WORKER_MULTIPROC_METHOD: spawn
 

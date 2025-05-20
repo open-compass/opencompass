@@ -45,6 +45,7 @@ class DLCRunner(BaseRunner):
         debug: bool = False,
         lark_bot_url: str = None,
         keep_tmp_file: bool = True,
+        preemptible: bool = False,
     ):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.aliyun_cfg = aliyun_cfg
@@ -53,6 +54,7 @@ class DLCRunner(BaseRunner):
 
         self.eval_with_gpu = eval_with_gpu
         self.keep_tmp_file = keep_tmp_file
+        self.preemptible = preemptible
         if lark_bot_url:
             self.lark_reporter = LarkReporter(lark_bot_url)
         else:
@@ -132,14 +134,16 @@ class DLCRunner(BaseRunner):
                 shell_cmd = (f'source {bashrc_path}; '
                              f'conda activate {conda_env_name}; ')
                 shell_cmd += f'export PYTHONPATH={pwd}:$PYTHONPATH; '
-            else:
+            elif self.aliyun_cfg.get('python_env_path') is not None:
                 # using public conda env
                 # users can also set `python_env_path` to their
                 # own env python path
-                assert self.aliyun_cfg.get('python_env_path') is not None
                 shell_cmd = (
-                    f'export PATH={self.aliyun_cfg["python_env_path"]}/bin:$PATH; '  # noqa: E501
+                    f'export PATH={self.aliyun_cfg['python_env_path']}/bin:$PATH; '  # noqa: E501
                     f'export PYTHONPATH={pwd}:$PYTHONPATH; ')
+            else:
+                # using system python
+                shell_cmd = ''
 
             huggingface_cache = self.aliyun_cfg.get('huggingface_cache')
             if huggingface_cache is not None:
@@ -188,6 +192,11 @@ class DLCRunner(BaseRunner):
             else:
                 dlc_job_cmd = 'submit pytorchjob'
                 worker_cmd = ' --workers 1'
+
+            pre_cmd = self.aliyun_cfg.get('pre_cmd')
+            if pre_cmd is not None:
+                shell_cmd = pre_cmd + ' ' + shell_cmd
+
             tmpl = (
                 f'dlc {dlc_job_cmd}'
                 f" --command '{shell_cmd}'"
@@ -201,16 +210,18 @@ class DLCRunner(BaseRunner):
                 f' --worker_gpu {num_gpus}'
                 f' --worker_memory {max(num_gpus * 128, worker_memory)}Gi'
                 f" --worker_image {self.aliyun_cfg['worker_image']}"
-                f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}")
+                f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}"
+                f" --enable_priority_preemption={self.preemptible}")
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
             cmd = get_cmd()
+
             # Use specified python env instead of sys.executable
             if self.aliyun_cfg['python_env_path']:
                 cmd = cmd.replace(
                     sys.executable,
-                    f'{self.aliyun_cfg["python_env_path"]}/bin/python',
+                    f'{self.aliyun_cfg['python_env_path']}/bin/python',
                 )
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')

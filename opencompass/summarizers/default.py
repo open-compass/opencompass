@@ -363,6 +363,10 @@ class DefaultSummarizer:
             f.write(text)
         self.logger.info(f'write summary to {osp.abspath(output_path)}')
 
+        for row in table:
+            for col in row:
+                if ',' in col:
+                    col = col.replace(',', ' ')
         with open(output_csv_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
