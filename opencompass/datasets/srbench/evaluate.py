@@ -326,3 +326,5 @@ for seed_idx in [1]:
     with open(csv_filepath, 'a', encoding='utf-8') as f:
         f.write("symbolic_accuracy:"+f'{symbolic_accuracy:.4f}')
         f.write(f"AverageR2,{average_r2:.4f}\n")
+
+    
