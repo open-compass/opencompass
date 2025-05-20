@@ -139,7 +139,7 @@ class DLCRunner(BaseRunner):
                 # users can also set `python_env_path` to their
                 # own env python path
                 shell_cmd = (
-                    f'export PATH={self.aliyun_cfg['python_env_path']}/bin:$PATH; '  # noqa: E501
+                    f'export PATH={self.aliyun_cfg["python_env_path"]}/bin:$PATH; '  # noqa: E501
                     f'export PYTHONPATH={pwd}:$PYTHONPATH; ')
             else:
                 # using system python
