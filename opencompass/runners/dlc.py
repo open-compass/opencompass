@@ -195,7 +195,7 @@ class DLCRunner(BaseRunner):
 
             pre_cmd = self.aliyun_cfg.get('pre_cmd')
             if pre_cmd is not None:
-                shell_cmd = pre_cmd + ' ' + shell_cmd
+                shell_cmd = pre_cmd + '; ' + shell_cmd
 
             tmpl = (
                 f'dlc {dlc_job_cmd}'
