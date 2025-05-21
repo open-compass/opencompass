@@ -4,7 +4,6 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import LiveReasonBenchDataset, livereasonbench_postprocess
-from opencompass.utils import xml_tag_postprocessor
 
 
 GRADER_TEMPLATE = """
@@ -97,7 +96,7 @@ livereasonbench_infer_cfg = dict(
             ],
         )),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=16384))
+    inferencer=dict(type=GenInferencer))
 
 livereasonbench_eval_cfg = dict(
     evaluator=dict(
@@ -122,23 +121,22 @@ livereasonbench_eval_cfg = dict(
             type=LiveReasonBenchDataset,
             path='opencompass/LiveReasonBench',
             reader_cfg=livereasonbench_reader_cfg,
+            version='livereasonbench-20250428',
         ),
         judge_cfg=dict(),
         dict_postprocessor=dict(type=livereasonbench_postprocess),
-        pred_postprocessor=dict(type=xml_tag_postprocessor, tag='<conclude>'),
     ),
-    pred_role='BOT',
 )
 
 livereasonbench_datasets = [
     dict(
-        abbr='LiveReasonBench-20241202',
+        abbr='LiveReasonBench-20250428',
         type=LiveReasonBenchDataset,
         path='opencompass/LiveReasonBench',
         reader_cfg=livereasonbench_reader_cfg,
         infer_cfg=livereasonbench_infer_cfg,
         eval_cfg=livereasonbench_eval_cfg,
-        version='livereasonbench-20241202',
-        mode='singlescore',
+        version='livereasonbench-20250428',
+        n=1
   )
 ]

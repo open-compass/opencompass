@@ -8,6 +8,11 @@ import numpy as np
 from datasets import Dataset
 from scipy.stats import hypergeom
 
+from opencompass.registry import TEXT_POSTPROCESSORS
+from opencompass.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 def compute_pass_at_k(n, c, k):
     if n - c < k:
@@ -39,13 +44,18 @@ def compute_mg_pass_at_k(n, c, k):
 
 class BaseEvaluator:
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, pred_postprocessor=None) -> None:
+        self.pred_postprocessor = pred_postprocessor
+        self._dataset_replica_idx = 0  # Default value for dataset_replica_idx
 
     @property
     def output_dir(self):
         # please see opencompass/opencompass/tasks/openicl_eval.py Line 197-200
         return self._out_dir
+
+    @property
+    def dataset_replica_idx(self):
+        return self._dataset_replica_idx
 
     def group(self, n: int, details: List[Dict[str, Any]],
               test_set: Dataset) -> Dict[str, Any]:
@@ -82,6 +92,15 @@ class BaseEvaluator:
                 [detail[metric] for detail in details])
         return g_passk_details
 
+    def pred_postprocess(self, predictions: List) -> Dict:
+        if not hasattr(
+                self, 'pred_postprocessor') or self.pred_postprocessor is None:
+            return predictions
+        else:
+            kwargs = deepcopy(self.pred_postprocessor)
+            proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+            return [proc(pred, **kwargs) for pred in predictions]
+
     def evaluate(
         self,
         k: Union[int, List[int]],
@@ -98,10 +117,14 @@ class BaseEvaluator:
                 raise ValueError(
                     'Predictions and references must have the same length')
 
-        real_size = len(original_dataset) // n
+        real_size = len(original_dataset) // n  # dataset size of each replica
         all_details = []
         all_results = []
+
+        # Run evaluation for each replica
         for i in range(n):
+            self._dataset_replica_idx = i
+            logger.info(f'Running {i}-th replica of evaluation')
 
             def select_fn(i, real_size, x):
                 if isinstance(x, Dataset):
@@ -111,11 +134,14 @@ class BaseEvaluator:
                 else:
                     return x
 
-            results = self.score(
-                **{
-                    key: select_fn(i, real_size, value)
-                    for key, value in score_kwargs.items()
-                })
+            current_params = {
+                key: select_fn(i, real_size, value)
+                for key, value in score_kwargs.items()
+            }
+
+            current_params['predictions'] = self.pred_postprocess(
+                current_params['predictions'])
+            results = self.score(**current_params)
             details = results.pop('details', None)
             if details is not None:
                 if isinstance(details, Dict):
@@ -124,11 +150,11 @@ class BaseEvaluator:
             all_results.append(results)
 
         eval_results = {}
-        for single_results in all_results:
-            for key in single_results:
+        for single_replica_results in all_results:
+            for key in single_replica_results:
                 if key not in eval_results:
                     eval_results[key] = []
-                eval_results[key].append(single_results[key])
+                eval_results[key].append(single_replica_results[key])
         for key in deepcopy(eval_results):
             if isinstance(eval_results[key][0], float) or isinstance(
                     eval_results[key][0], int):
@@ -138,9 +164,8 @@ class BaseEvaluator:
                     eval_results.pop(key)
                 else:
                     eval_results[key] = np.mean(eval_results[key])
-            else:
-                eval_results[key] = eval_results[key][0]
 
+        # Calculate the additional metrics
         grouped_examples = self.group(n, all_details, original_dataset)
         can_calculate = False
         if len(all_details) != 0:
@@ -158,6 +183,10 @@ class BaseEvaluator:
                     elif example['detail'].get('is_correct', None) is not None:
                         can_calculate = True
                         c += int(example['detail']['is_correct'])
+                    elif example['detail'].get('cascade_correct',
+                                               None) is not None:
+                        can_calculate = True
+                        c += int(example['detail']['cascade_correct'])
 
                 k_list = [k] if isinstance(k, int) else k
                 if can_calculate and n > 1 and max(k_list) > 1:

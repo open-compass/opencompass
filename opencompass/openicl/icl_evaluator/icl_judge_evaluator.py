@@ -16,7 +16,8 @@ class JudgeEvaluator(BaseEvaluator):
         count = 0
         details = []
         for prediction, reference in zip(predictions, references):
-            choice = prediction.split("\"Choice\": \"Model ")[-1][0]
+            choice = prediction.split("\"Choice\": \"Model ")[-1][0] if len(
+                prediction) != 0 else None
             gold_winner = reference.get('winner', '')
             detail = {
                 'pred': prediction,
@@ -75,7 +76,8 @@ class RMBEvaluator(BaseEvaluator):
         pair_harm_list = []
 
         for prediction, reference in zip(predictions, references):
-            choice = prediction.split("\"Choice\": \"Model ")[-1][0]
+            choice = prediction.split("\"Choice\": \"Model ")[-1][0] if len(
+                prediction) != 0 else None
             gold_winner = reference.get('winner', '')
             subset = reference.get('subset', '')
             goal = reference.get('goal', '')
@@ -350,7 +352,7 @@ class Judgerbenchv2Evaluator(BaseEvaluator):
         total_normalized_diff = sum(normalized_diffs.values()) / len(
             normalized_diffs.values()) * 100
         acc = 100 * correct / count
-        final_score = acc - total_normalized_diff
+        final_score = (acc - total_normalized_diff + 100) / 2
         result = {
             'accuracy': acc,
             'rank_diff': total_rank_diff,
