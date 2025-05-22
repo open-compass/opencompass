@@ -139,7 +139,7 @@ class DLCRunner(BaseRunner):
                 # users can also set `python_env_path` to their
                 # own env python path
                 shell_cmd = (
-                    f"export PATH={self.aliyun_cfg['python_env_path']}/bin:$PATH; "  # noqa: E501
+                    f'''export PATH={self.aliyun_cfg['python_env_path']}/bin:$PATH; '''  # noqa: E501
                     f'export PYTHONPATH={pwd}:$PYTHONPATH; ')
             else:
                 # using system python
@@ -182,8 +182,9 @@ class DLCRunner(BaseRunner):
             task_priority = self.aliyun_cfg.get('priority', 1)
             worker_cpu = self.aliyun_cfg.get('worker_cpu', 12)
             worker_memory = self.aliyun_cfg.get('worker_memory', 192)
-            config_path = (f" --config {self.aliyun_cfg['dlc_config_path']}"
-                           if 'dlc_config_path' in self.aliyun_cfg else '')
+            config_path = (
+                f''' --config {self.aliyun_cfg['dlc_config_path']}'''
+                if 'dlc_config_path' in self.aliyun_cfg else '')
 
             # Different dlc versions has different commands
             if self.aliyun_cfg.get('dlc_job_cmd') == 'create':
@@ -199,19 +200,19 @@ class DLCRunner(BaseRunner):
 
             tmpl = (
                 f'dlc {dlc_job_cmd}'
-                f" --command '{shell_cmd}'"
+                f''' --command '{shell_cmd}' '''
                 f' --name {task_name[:512]}'
                 f'{config_path}'
-                f" --workspace_id {self.aliyun_cfg['workspace_id']}"
-                f" --resource_id={self.aliyun_cfg['resource_id']}"
+                f''' --workspace_id {self.aliyun_cfg['workspace_id']}'''
+                f''' --resource_id={self.aliyun_cfg['resource_id']}'''
                 f' --priority {task_priority}'
                 f'{worker_cmd}'
                 f' --worker_cpu {max(num_gpus * 8, worker_cpu)}'
                 f' --worker_gpu {num_gpus}'
                 f' --worker_memory {max(num_gpus * 128, worker_memory)}Gi'
-                f" --worker_image {self.aliyun_cfg['worker_image']}"
-                f" --data_sources={','.join(self.aliyun_cfg['data_sources'])}"
-                f" --enable_priority_preemption={self.preemptible}")
+                f''' --worker_image {self.aliyun_cfg['worker_image']}'''
+                f''' --data_sources={','.join(self.aliyun_cfg['data_sources'])}'''
+                f''' --enable_priority_preemption={self.preemptible}''')
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
@@ -221,7 +222,7 @@ class DLCRunner(BaseRunner):
             if self.aliyun_cfg['python_env_path']:
                 cmd = cmd.replace(
                     sys.executable,
-                    f"{self.aliyun_cfg['python_env_path']}/bin/python",
+                    f'''{self.aliyun_cfg['python_env_path']}/bin/python''',
                 )
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')
@@ -265,7 +266,7 @@ class DLCRunner(BaseRunner):
                 pri_time = None
                 initial_time = datetime.datetime.now()
 
-                url = f"https://pai.console.aliyun.com/?regionId=cn-wulanchabu&workspaceId={self.aliyun_cfg['workspace_id']}#/dlc/jobs/{job_id}"  # noqa: E501
+                url = f'''https://pai.console.aliyun.com/?regionId=cn-wulanchabu&workspaceId={self.aliyun_cfg['workspace_id']}#/dlc/jobs/{job_id}'''  # noqa: E501
                 logger = get_logger()
                 logger.debug('\n' + '*' * 168 + '\n' + url + '\n' + '*' * 168)
 
