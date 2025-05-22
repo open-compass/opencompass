@@ -139,7 +139,7 @@ class DLCRunner(BaseRunner):
                 # users can also set `python_env_path` to their
                 # own env python path
                 shell_cmd = (
-                    f'export PATH={self.aliyun_cfg["python_env_path"]}/bin:$PATH; '  # noqa: E501
+                    f"export PATH={self.aliyun_cfg['python_env_path']}/bin:$PATH; "  # noqa: E501
                     f'export PYTHONPATH={pwd}:$PYTHONPATH; ')
             else:
                 # using system python
@@ -221,7 +221,7 @@ class DLCRunner(BaseRunner):
             if self.aliyun_cfg['python_env_path']:
                 cmd = cmd.replace(
                     sys.executable,
-                    f'{self.aliyun_cfg["python_env_path"]}/bin/python',
+                    f"{self.aliyun_cfg['python_env_path']}/bin/python",
                 )
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')
