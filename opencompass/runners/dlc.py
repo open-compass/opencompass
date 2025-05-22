@@ -211,7 +211,7 @@ class DLCRunner(BaseRunner):
                 f' --worker_gpu {num_gpus}'
                 f' --worker_memory {max(num_gpus * 128, worker_memory)}Gi'
                 f''' --worker_image {self.aliyun_cfg['worker_image']}'''
-                f''' --data_sources={','.join(self.aliyun_cfg['data_sources'])}'''
+                f''' --data_sources={','.join(self.aliyun_cfg['data_sources'])}'''  # noqa: E501
                 f''' --enable_priority_preemption={self.preemptible}''')
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
