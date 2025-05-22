@@ -54,12 +54,14 @@ env:
   LMDEPLOY_USE_MODELSCOPE: false
   HF_HUB_OFFLINE: 1
   OUTPUT_FOLDER: cuda12.1_dist_${{ github.run_id }}
-  CONDA_PATH: /fs-computility/llm/qa-llm-cicd/miniconda3
-  PIP_CACHE_PATH: /fs-computility/llm/qa-llm-cicd/.cache/pip
-  REPORT_ROOT: /fs-computility/llm/qa-llm-cicd/eval_report/regression
-  COMPASS_DATA_CACHE: /fs-computility/llm/shared/llmeval/datasets/compass_data_cache
-  HUGGINGFACE_HUB_CACHE: /fs-computility/llm/shared/llmeval/models/opencompass_hf_hub
-  HF_HUB_CACHE: /fs-computility/llm/shared/llmeval/models/opencompass_hf_hub
+  CONDA_PATH: ${{ secrets.WORKSPACE_PREFIX }}/miniconda3
+  PIP_CACHE_PATH: ${{ secrets.WORKSPACE_PREFIX }}/.cache/pip
+  REPORT_ROOT: ${{ secrets.WORKSPACE_PREFIX }}/eval_report/regression
+  COMPASS_DATA_CACHE: ${{ secrets.SHARESPACE_PREFIX }}/datasets/compass_data_cache
+  HUGGINGFACE_HUB_CACHE: ${{ secrets.SHARESPACE_PREFIX }}/models/opencompass_hf_hub
+  HF_HUB_CACHE:  ${{ secrets.SHARESPACE_PREFIX }}/models/opencompass_hf_hub
+  HF_DATASETS_CACHE:  ${{ secrets.SHARESPACE_PREFIX }}/datasets/hf_datasets_cache
+  HF_ENDPOINT: https://hf-mirror.com
   CONDA_ENV: regression_test
   export VLLM_WORKER_MULTIPROC_METHOD: spawn
 
@@ -140,7 +142,7 @@ jobs:
       - name:  Remove Conda Env
         if: always()
         run: |
-          . /fs-computility/llm/qa-llm-cicd/miniconda3/bin/activate
+          . ${{ secrets.WORKSPACE_PREFIX }}/miniconda3/bin/activate
           conda env remove -y --name ${{env.CONDA_ENV}}
           conda info --envs
       - name: Prepare - create conda env and install torch - cu12
@@ -152,14 +154,14 @@ jobs:
             . ${{env.CONDA_PATH}}/bin/activate
             conda create -y --name ${{env.CONDA_ENV}} python=3.10
             conda activate ${{env.CONDA_ENV}}
-            pip install -r /fs-computility/llm/qa-llm-cicd/config/requirements.txt --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install -r ${{ secrets.WORKSPACE_PREFIX }}/config/requirements.txt --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[full] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[api] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --cache-dir ${{env.PIP_CACHE_PATH}}
-            FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /fs-computility/llm/qa-llm-cicd/packages/flash_attn-2.7.0.post2+cu12torch2.5cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+            FLASH_ATTENTION_FORCE_BUILD=TRUE pip install ${{ secrets.WORKSPACE_PREFIX }}/packages/flash_attn-2.7.0.post2+cu12torch2.5cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             pip install xformers --index-url https://download.pytorch.org/whl/cu121 --cache-dir ${{env.PIP_CACHE_PATH}}
             cp -r /root/nltk_data ${{env.CONDA_PATH}}/envs/${{env.CONDA_ENV}}/nltk_data
       - name: Prepare - reinstall lmdeploy - cu12
@@ -205,8 +207,8 @@ jobs:
       - name:  modify config
         if: matrix.regression_func != 'chat_sub_fullbench'
         run: |
-          cp -r /fs-computility/llm/qa-llm-cicd/ocplayground/template/configs_cluster/volc.py .
-          cat /fs-computility/llm/qa-llm-cicd/config/test_config.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
+          cp -r ${{ secrets.WORKSPACE_PREFIX }}/ocplayground/template/configs_cluster/volc.py .
+          cat ${{ secrets.WORKSPACE_PREFIX }}/config/test_config.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
       - name:  Run test
         uses: nick-fields/retry@v3
         with:
@@ -245,8 +247,8 @@ jobs:
       - name:  modify config
         if: matrix.regression_func == 'chat_sub_fullbench'
         run: |
-          cp -r /fs-computility/llm/qa-llm-cicd/ocplayground/template/configs_cluster/volc.py .
-          cat /fs-computility/llm/qa-llm-cicd/config/test_config_sub.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
+          cp -r ${{ secrets.WORKSPACE_PREFIX }}/ocplayground/template/configs_cluster/volc.py .
+          cat ${{ secrets.WORKSPACE_PREFIX }}/config/test_config_sub.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
       - name:  Run command testcase
         if: matrix.regression_func == 'cmd'
         run: |
@@ -292,7 +294,7 @@ jobs:
       - name:  Run testcase
         if: matrix.regression_func == 'chat_sub_fullbench'
         env:
-          COMPASS_DATA_CACHE: /fs-computility/llm/shared/llmeval/datasets/compass_data_cache_subset
+          COMPASS_DATA_CACHE: ${{ secrets.SHARESPACE_PREFIX }}/datasets/compass_data_cache_subset
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
@@ -333,7 +335,7 @@ jobs:
             conda activate ${{env.CONDA_ENV}}
             conda info --envs
             export from_tf=TRUE
-            opencompass /fs-computility/llm/qa-llm-cicd/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
+            opencompass ${{ secrets.WORKSPACE_PREFIX }}/ocplayground/template/regression/eval_${{ matrix.function_type }}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }} --reuse
             rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{ matrix.function_type }}/*/summary regression_result_daily
             python -m pytest -m ${{ matrix.function_type }} -s -v --color=yes .github/scripts/oc_score_assert.py
 
