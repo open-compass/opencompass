@@ -1,46 +1,32 @@
 from opencompass.datasets import HealthBenchDataset, HealthBenchEvaluator
-from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import HealthBenchTemplate
+from opencompass.openicl.icl_inferencer import ChatInferencer
+from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 
 # Reader configuration
 reader_cfg = dict(
     input_columns=[
-        'example_tags', 'ideal_completions_data', 'prompt', 'prompt_id', 'rubrics', 'canary'
+        'prompt_trans'
     ],
     output_column='prompt_id', # useless
 )
 
-# Inference configuration
 infer_cfg = dict(
     prompt_template=dict(
-        type=HealthBenchTemplate,
-        key='prompt_trans',
+        type=PromptTemplate,
+        template=dict(
+            round=[
+                dict(
+                    role='HUMAN',
+                    prompt='{prompt}', # prompt mode: zero-shot
+                ),
+            ],
+        ),
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+    inferencer=dict(type=ChatInferencer),
 )
-
-# infer_cfg = dict(
-#     prompt_template=dict(
-#         type=PromptTemplate,
-#         template=dict(
-#             round=[
-#                 dict(
-#                     role='HUMAN',
-#                     prompt='{prompt_id}', # prompt mode: zero-shot
-#                 ),
-#                 dict(
-#                     role='BOT',
-#                     prompt='{prompt_id}', # prompt mode: zero-shot
-#                 ),
-#             ],
-#         ),
-#     ),
-#     retriever=dict(type=ZeroRetriever),
-#     inferencer=dict(type=GenInferencer),
-# )
 
 # Evaluation configuration
 eval_cfg = dict(
