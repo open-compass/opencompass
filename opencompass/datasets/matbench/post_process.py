@@ -127,7 +127,7 @@ def numerical_llmjudge_postprocess(
             except KeyError:
                 get_logger().warning(
                     f'No gold answer for {k}, use empty string as reference!')
-                references.append('')
+                references.append(0) #looks like when creating the dataset object the False and 0 value will not be assign a gold value, likely does not inflence the LLM judge, here we just restore the 0 value here.
     results = get_numerical_final_results(judged_answers, references, origial_responses)
     # results['details'] = output
     return results
