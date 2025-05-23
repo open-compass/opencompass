@@ -257,3 +257,22 @@ class PromptTemplate:
             prompt.append(dict(section='end', pos='end'))
 
         return prompt
+
+
+class HealthBenchTemplate:
+
+    def __init__(
+        self,
+        key: Union[Dict, str],
+    ) -> None:
+        self.key = key
+
+    def generate_item(self, entry: Dict, **kwargs):
+        template = [{'section': 'round', 'pos': 'begin'}]
+        end_template = [{'section': 'round', 'pos': 'end'}]
+        mid = entry[self.key]
+        template = template + mid + end_template
+        ret = PromptList()
+        for item in template:
+            ret.append(item)
+        return ret
