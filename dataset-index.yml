@@ -1113,3 +1113,9 @@
     paper: https://arxiv.org/pdf/2203.14371
     configpath: opencompass/configs/datasets/medmcqa/medmcqa_gen.py
     configpath_llmjudge: opencompass/configs/datasets/medmcqa/medmcqa_llmjudge_gen.py
+- grand_physics:
+    name: GrandPhysics
+    category: Science
+    paper: ''
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/GrandPhysics/GrandPhysics_llm_judge_gen.py
