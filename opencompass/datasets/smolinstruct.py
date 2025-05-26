@@ -20,7 +20,7 @@ class SmolInstructDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         dataset = DatasetDict()
-        raw_dataset = load_dataset(path)
+        raw_dataset = load_dataset(path, trust_remote_code=True)
         for split in ['validation', 'test']:
             raw_data = []
             for data in raw_dataset[split]:
@@ -31,10 +31,22 @@ class SmolInstructDataset(BaseDataset):
 
 
 def extract_chemical_data(text):
+    other_patterns = [
+        "reactants and reagents are:\n```\n",
+        "reactants and reagents:\n```\n",
+        "Reactants and Reagents:**\n```\n",
+        "Reactants and Reagents SMILES:**\n```\n",
+        "Reactants and Reagents:**  \n`"
+    ]
+
     pattern = re.compile(r'<(MOLFORMULA|SMILES|IUPAC)>(.*?)</\1>', re.DOTALL)
     matches = pattern.findall(text)
     if not matches:
-        return []
+        for other_pattern in other_patterns:
+            if other_pattern in text:
+                text = text.split(other_pattern)[-1].split("\n")[0]
+                break
+        return [text]
     return [match[1].strip() for match in matches]
 
 
@@ -110,9 +122,9 @@ def calculate_single_element_match_for_list(predictions, references):
     ele_invalid_labels = []
     details = []
     for pred_formula, gold_formula in zip(predictions, references):
-        gold_formula = gold_formula[0]
+        gold_formula = gold_formula[-1]
         if pred_formula:
-            pred_formula = pred_formula[0]
+            pred_formula = pred_formula[-1]
         detail = {'pred': [pred_formula], 'answer': gold_formula}
         if not pred_formula or not pred_formula:
             ele_invalid_labels.append(False)
@@ -158,9 +170,9 @@ def calculate_single_element_match(predictions, references):
     ele_invalid_labels = []
     details = []
     for pred_formula, gold_formula in zip(predictions, references):
-        gold_formula = gold_formula[0]
+        gold_formula = gold_formula[-1]
         if pred_formula:
-            pred_formula = pred_formula[0]
+            pred_formula = pred_formula[-1]
         detail = {'pred': pred_formula, 'answer': gold_formula}
         if not pred_formula or not pred_formula:
             ele_invalid_labels.append(False)
@@ -208,7 +220,7 @@ class NCElementMatchEvaluator(BaseEvaluator):
         if len(predictions) != len(references):
             return {
                 'error': 'predictions and references have different '
-                'length'
+                         'length'
             }
 
         # topk的prediction，要拆开
@@ -259,7 +271,7 @@ class NCExactMatchEvaluator(BaseEvaluator):
         if len(predictions) != len(references):
             return {
                 'error': 'predictions and references have different '
-                'length'
+                         'length'
             }
         predictions = [
             extract_chemical_data(prediction) for prediction in predictions
@@ -272,9 +284,9 @@ class NCExactMatchEvaluator(BaseEvaluator):
         valid_cnt = 0
         details = []
         for pred, ans in zip(predictions, references):
-            ans = ans[0]
+            ans = ans[-1]
             if pred:
-                pred = pred[0]
+                pred = pred[-1]
                 valid_cnt += 1
             detail = {'pred': pred, 'answer': ans}
             if pred and pred.strip() == ans.strip():
@@ -291,7 +303,9 @@ class NCExactMatchEvaluator(BaseEvaluator):
 
 
 def extract_number(text):
-    pattern = re.compile(r'<NUMBER>\s*(-?\d*\.?\d+)\s*</NUMBER>')
+    pattern = re.compile(
+        r'(?:<NUMBER>\s*|\\boxed\{)\s*(-?\d*\.?\d+)\s*(?:</NUMBER>|\})'
+    )
     matches = pattern.findall(text)
     return [float(match) for match in matches]
 
@@ -307,7 +321,7 @@ class RMSEEvaluator(BaseEvaluator):
         if len(predictions) != len(references):
             return {
                 'error': 'predictions and references have different '
-                'length'
+                         'length'
             }
 
         avg_score = 0
@@ -324,7 +338,7 @@ class RMSEEvaluator(BaseEvaluator):
             except:
                 raise ValueError(f'ans: {reference}')
             detail = {'pred': pred, 'answer': ans}
-            rmse_score = np.sqrt(np.mean((np.array(pred) - np.array(ans))**2))
+            rmse_score = np.sqrt(np.mean((np.array(pred) - np.array(ans)) ** 2))
             detail['score'] = rmse_score
             avg_score += rmse_score
             details.append(detail)
@@ -345,7 +359,7 @@ class FTSEvaluator(BaseEvaluator):
         if len(predictions) != len(references):
             return {
                 'error': 'predictions and references have different '
-                'length'
+                         'length'
             }
 
         predictions = [
@@ -359,12 +373,12 @@ class FTSEvaluator(BaseEvaluator):
         valid_cnt = 0
         details = []
         for pred, ans in zip(predictions, references):
-            ans = ans[0]
+            ans = ans[-1]
             if not pred:
                 detail = {'pred': '', 'answer': ans, 'score': 0}
                 details.append(detail)
                 continue
-            pred = pred[0]
+            pred = pred[-1]
             detail = {'pred': pred, 'answer': ans}
             # 将 SMILES 转换为 RDKit 分子对象
             from rdkit import Chem
@@ -405,7 +419,7 @@ class MeteorEvaluator(BaseEvaluator):
         if len(predictions) != len(references):
             return {
                 'error': 'predictions and references have different '
-                'length'
+                         'length'
             }
         avg_score = 0
         details = []
@@ -433,3 +447,31 @@ def smolinstruct_acc_postprocess(text: str) -> str:
         return '<BOOLEAN> Yes </BOOLEAN>'
     elif 'no' in text.lower():
         return '<BOOLEAN> No </BOOLEAN>'
+
+
+@TEXT_POSTPROCESSORS.register_module('smolinstruct-acc-0shot')
+def smolinstruct_acc_0shot_postprocess(text: str) -> str:
+    if text.strip().lower() == 'yes':
+        return "<BOOLEAN> Yes </BOOLEAN>"
+    elif text.strip().lower() == 'no':
+        return "<BOOLEAN> No </BOOLEAN>"
+
+    # Define regex patterns to match various formats of "yes" or "no"
+    patterns = [
+        r'\\boxed\{\s*(yes|no)\s*\}',
+        r'[Th]he\s+answer\s+is\s*[\.:\'"“‘’\-]*\s*(yes|no)[\s\.,!?:;\'"”’\-]*',
+        r'[Aa]nswer:\s*(yes|no)\b',
+        r'\*\*[Aa]nswer:\*\*\s*(yes|no)\b',
+        r'\*\*[Aa]nswer\*\*:\s*(yes|no)\b',
+        r'<BOOLEAN>\s*(yes|no)\s*</BOOLEAN>'
+    ]
+    for pattern in patterns:
+        text = text.strip()
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            answer = match.group(1)  # modified
+            if answer.lower() == 'yes' or answer.lower() == 'yes.':
+                return "<BOOLEAN> Yes </BOOLEAN>"
+            elif answer.lower() == 'no' or answer.lower() == 'no.':
+                return "<BOOLEAN> No </BOOLEAN>"
+    return ""
