@@ -29,8 +29,20 @@ def _parse(item, template, prompt_mode):
 class SuperGPQADataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, prompt_mode: str, **kwargs):
+    def load(path: str,
+             prompt_mode: str,
+             discipline: str = None,
+             field: str = None,
+             subfield: str = None,
+             **kwargs):
         dataset = load_dataset(path, split='train')
+
+        if discipline is not None:
+            dataset = dataset.filter(lambda x: x['discipline'] == discipline)
+        if field is not None:
+            dataset = dataset.filter(lambda x: x['field'] == field)
+        if subfield is not None:
+            dataset = dataset.filter(lambda x: x['subfield'] == subfield)
 
         # get prompt template
         template_path = None

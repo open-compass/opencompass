@@ -90,7 +90,7 @@ repos:
           - linkify-it-py
         exclude: configs/
   - repo: https://gitee.com/openmmlab/mirrors-docformatter
-    rev: v1.3.1
+    rev: v1.7.7
     hooks:
       - id: docformatter
         args: ["--in-place", "--wrap-descriptions", "79"]
