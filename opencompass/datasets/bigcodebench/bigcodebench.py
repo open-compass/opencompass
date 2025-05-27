@@ -71,7 +71,7 @@ class BigCodeBenchEvaluator(BaseEvaluator):
             self,
             release_version='v0.1.2',
             eval_type='instruct',
-            remote_execute_api='https://bigcode-bigcodebench-evaluator.hf.space/',  # noqa
+            remote_execute_api='https://bigcode-bigcodebench-evaluator.hf.space/', 
             dataset_version: str = 'full',
             local_mode: bool = False,
             path: str = 'opencompass/bigcodebench',

@@ -50,7 +50,6 @@ class PromptTemplate:
                       for key in ('begin', 'round', 'end'))
             self.prompt_type = 'meta' if ctr == len(
                 self.template.keys()) else 'origin'
-
             # Check if token exists in values of tp_dict
             for tp_dict_val in self.template.values():
                 if not isinstance(tp_dict_val, (str, list, dict)):

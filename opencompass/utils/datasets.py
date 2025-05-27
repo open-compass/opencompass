@@ -7,7 +7,7 @@ USER_HOME = os.path.expanduser("~")
 DEFAULT_DATA_FOLDER = os.path.join(USER_HOME, '.cache/opencompass/')
 
 
-def get_data_path(dataset_id: str, local_mode: bool = False):
+def get_data_path(dataset_id: str, local_mode: bool = True):
     """return dataset id when getting data from ModelScope/HuggingFace repo, otherwise just
     return local path as is.
 
