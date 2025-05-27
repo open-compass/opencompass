@@ -446,6 +446,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/ChemBench4K",
     },
+    "opencompass/srbench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/srbench",
+    },
 
 }
 
