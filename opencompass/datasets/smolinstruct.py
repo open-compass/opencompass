@@ -451,6 +451,11 @@ def smolinstruct_acc_postprocess(text: str) -> str:
 
 @TEXT_POSTPROCESSORS.register_module('smolinstruct-acc-0shot')
 def smolinstruct_acc_0shot_postprocess(text: str) -> str:
+    # Remove <think> tags if they exist
+    if "</think>" in text:
+        text = text.split("</think>")[-1].strip()
+
+    # Check for exact "yes" or "no" responses
     if text.strip().lower() == 'yes':
         return "<BOOLEAN> Yes </BOOLEAN>"
     elif text.strip().lower() == 'no':
@@ -475,4 +480,13 @@ def smolinstruct_acc_0shot_postprocess(text: str) -> str:
                 return "<BOOLEAN> Yes </BOOLEAN>"
             elif answer.lower() == 'no':
                 return "<BOOLEAN> No </BOOLEAN>"
+
+    # If no patterns matched, check for simple "yes" or "no"
+    text = text.strip().lower()
+    if text.startswith('yes') or text.endswith('yes'):
+        return "<BOOLEAN> Yes </BOOLEAN>"
+    elif text.startswith('no') or text.endswith('no'):
+        return "<BOOLEAN> No </BOOLEAN>"
+
+    # If no patterns matched, return an empty string
     return ""
