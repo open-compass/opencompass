@@ -285,6 +285,7 @@ class MultiModelSummarizer:
     def summarize(self):
         """Format in self.table [ ['dataset', 'version', 'metric', 'mode',
         'model_name'], ['--------- 考试 Exam ---------', '-', '-', '-', '-'],
+
         ['ARC-c', '1e0de5', 'accuracy', 'gen', '79.32'], ['ARC-e', '1e0de5',
         'accuracy', 'gen', '85.36'], ['--------- 语言 Language ---------', '-',
         '-', '-', '-'], ['WiC', 'd06864', 'accuracy', 'gen', '55.64'], ['chid-
