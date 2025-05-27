@@ -10,7 +10,7 @@ import mmengine
 import numpy as np
 from datasets import Dataset, load_dataset
 
-from opencompass.datasets.math import MATHAgentEvaluator, math_postprocess_v2
+from opencompass.datasets.math2 import MATHAgentEvaluator, math_postprocess_v2
 from opencompass.models import OpenAISDK
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.openicl.icl_inferencer.icl_base_inferencer import \

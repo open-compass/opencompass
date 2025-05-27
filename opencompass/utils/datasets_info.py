@@ -466,6 +466,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/medbullets/medbullets.csv",
     },
+    "opencompass/srbench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "url_to_srebnch_dataset",
+    } 
 
 }
 
