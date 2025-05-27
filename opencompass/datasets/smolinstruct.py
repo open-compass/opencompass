@@ -463,15 +463,16 @@ def smolinstruct_acc_0shot_postprocess(text: str) -> str:
         r'[Aa]nswer:\s*(yes|no)\b',
         r'\*\*[Aa]nswer:\*\*\s*(yes|no)\b',
         r'\*\*[Aa]nswer\*\*:\s*(yes|no)\b',
-        r'<BOOLEAN>\s*(yes|no)\s*</BOOLEAN>'
+        r'<BOOLEAN>\s*(yes|no)\s*</BOOLEAN>',
+        r'^\s*(yes|no)[\.\?!]?\s*$'
     ]
     for pattern in patterns:
         text = text.strip()
         match = re.search(pattern, text, flags=re.IGNORECASE)
         if match:
             answer = match.group(1)  # modified
-            if answer.lower() == 'yes' or answer.lower() == 'yes.':
+            if answer.lower() == 'yes':
                 return "<BOOLEAN> Yes </BOOLEAN>"
-            elif answer.lower() == 'no' or answer.lower() == 'no.':
+            elif answer.lower() == 'no':
                 return "<BOOLEAN> No </BOOLEAN>"
     return ""
