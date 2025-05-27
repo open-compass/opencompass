@@ -66,8 +66,8 @@ def codeexecute_check_correctness(check_program, timeout=3):
     """Evaluates the functional correctness of a completion by running the test
     suite provided in the problem.
 
-    :param completion_id: an optional completion ID so we can match
-        the results later even if execution finishes asynchronously.
+    :param completion_id: an optional completion ID so we can match the results
+        later even if execution finishes asynchronously.
     """
     manager = multiprocessing.Manager()
     result = manager.list()

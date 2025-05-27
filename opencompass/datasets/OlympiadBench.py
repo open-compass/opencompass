@@ -422,11 +422,9 @@ class MathJudger:
         expression2: str,
         include_percentage: bool = True,
     ):
-        """
-        (默认 expression1 为 Ground_Truth)
-        函数: 判读两个数值是否在误差允许范围内相等
-        步骤1: 将可能出现的百分号的情况包含进来
-        步骤2: 使用 math.isclose 函数判断是否相等
+        """(默认 expression1 为 Ground_Truth) 函数: 判读两个数值是否在误差允许范围内相等 步骤1:
+
+        将可能出现的百分号的情况包含进来 步骤2: 使用 math.isclose 函数判断是否相等.
         """
         reference = float(expression1)
         prediction = float(expression2)
@@ -442,12 +440,8 @@ class MathJudger:
         return False
 
     def expression_equal(self, exp1, exp2):
-        """
-        (默认 expression1 为 Ground_Truth)
-        函数: 判断两个表达式是否在数学意义上等价
-        步骤1: 提取表达式, 防止有的模型会给出"x=1"而不是"1"
-        步骤2: 使用 sympy 库进行等价判断
-        """
+        """(默认 expression1 为 Ground_Truth) 函数: 判断两个表达式是否在数学意义上等价 步骤1: 提取表达式,
+        防止有的模型会给出"x=1"而不是"1" 步骤2: 使用 sympy 库进行等价判断."""
 
         # 只提取等号右边的表达式
         def extract_expression(expression):
