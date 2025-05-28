@@ -3,6 +3,7 @@ import json
 import re
 
 from opencompass.utils import get_logger
+from opencompass.datasets.generic import _generic_llmjudge_postprocess
 
 def parse_think(respons):
     index = respons.find("</think>")
@@ -95,15 +96,9 @@ def get_numerical_final_results(judged_answers,
 
     return result
 
-def _generic_llmjudge_postprocess(judgement: str):
-    judgement = parse_think(judgement)
-    match = re.search(r'(A|B)', judgement)
-    grade_letter = (match.group(0) if match else 'unknown'
-                    )  # Return 'unknown' if no match
-    return grade_letter
 
 def _numerical_postprocess(judgement: str):
-    judgement = parse_think(judgement)
+    # judgement = parse_think(judgement)
     match = re.search(r'[-+]?\d*\.\d+|\d+\.\d*|\d+', judgement)
     numerical_answer = (match.group(0) if match else 0
                     )  # Return 0 if no match
