@@ -3,13 +3,9 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets.matbench.matbench import MatbenchDataset, MatbenchEvaluator_regression, MatbenchEvaluator_classification, MatbenchEvaluator_classification_glass
 
-
-
-
 matbench_reader_cfg = dict(
     input_columns=['problem'], output_column='answer')
 
-# matbench_reader_cfg['test_range'] = '[0:8]'
 
 matbench_tasks =  ['matbench_steels','matbench_expt_gap', 'matbench_expt_is_metal','matbench_glass']
 
