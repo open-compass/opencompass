@@ -25,11 +25,7 @@ langs_dict = {
 
 
 def extract_choice(gen, lang):
-    r"""
-    {
-        "answer": "A|B|C|D"
-    }
-    """
+    r"""{ "answer": "A|B|C|D" }"""
     patterns = [
         r"\{\s*?\"answer\"\s*?\:\s*?\"?(A|B|C|D).*?\"?\s*?\}",
         r"\{\s*?[\'\"]answer[\'\"]\s*?\:\s*?[\'\"](A|B|C|D).*?[\'\"]\s*?\}",

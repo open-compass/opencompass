@@ -115,7 +115,7 @@ repos:
         args:
           - --root_folder
           - opencompass/configs/datasets
-  - repo: https://github.com/gitleaks/gitleaks
+  - repo: https://gitee.com/mirrors/gitleaks
     rev: v8.23.1
     hooks:
     -   id: gitleaks

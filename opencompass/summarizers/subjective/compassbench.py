@@ -50,7 +50,6 @@ MAP = {
         'language/compassbench_v2501_language_en_nlp_sub',
         'language/compassbench_v2501_language_en_creation_sub',
     ],
-
     'code': [
         '总分',
         '中文总分',
