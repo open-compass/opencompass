@@ -330,7 +330,11 @@ class MBPPEvaluator(BaseEvaluator):
             r"'(.*)'\s*\[DONE\]",
         ]
         for p in patterns:
-            match = re.search(p, text, re.DOTALL, timeout=10.0)
+            try:
+                match = re.search(p, text, re.DOTALL, timeout=10.0)
+            except TimeoutError:
+                match = None
+
             if match:
                 text = match.group(1)
                 break
