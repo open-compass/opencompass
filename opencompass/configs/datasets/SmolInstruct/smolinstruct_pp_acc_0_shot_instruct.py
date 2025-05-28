@@ -22,10 +22,10 @@ pp_acc_hint_dict = {
 }
 
 name_dict = {
-    'BBBP': "property_prediction-bbbp",
-    'ClinTox': "property_prediction-clintox",
-    'HIV': "property_prediction-hiv",
-    'SIDER': "property_prediction-sider",
+    'BBBP': 'property_prediction-bbbp',
+    'ClinTox': 'property_prediction-clintox',
+    'HIV': 'property_prediction-hiv',
+    'SIDER': 'property_prediction-sider',
 }
 
 pp_acc_datasets_0shot_instruct = []
