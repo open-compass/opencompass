@@ -1,6 +1,10 @@
+import hashlib
 import json
 import re
+from collections import defaultdict
+from typing import Literal
 
+import numpy as np
 from datasets import load_dataset
 
 from opencompass.openicl import BaseEvaluator
@@ -8,136 +12,116 @@ from opencompass.registry import LOAD_DATASET
 
 from ..base import BaseDataset
 from . import common
-from .healthbench_eval import RubricItem
 from .sampler.chat_completion_sampler import ChatCompletionSampler
-from .types import SingleEvalResult
+from .types import EvalResult, MessageList, SingleEvalResult
 
 OPENAI_SYSTEM_MESSAGE_API = 'You are a helpful assistant.'
-OPENAI_SYSTEM_MESSAGE_CHATGPT = (
-    'You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture.'
-    + '\nKnowledge cutoff: 2023-12\nCurrent date: 2024-04-01'
-)
+max_tokens_judge = 2048
 
-grading_sampler = ChatCompletionSampler(
-    model='gpt-4.1-2025-04-14',
-    system_message=OPENAI_SYSTEM_MESSAGE_API,
-    max_tokens=2048,
-)
+
+class RubricItem:
+    def __init__(self, criterion: str, points: float, tags: list[str]):
+        self.criterion = criterion
+        self.points = points
+        self.tags = tags
+
+    def __str__(self):
+        return f'[{self.points}] {self.criterion}'
+
+    def to_dict(self):
+        return {
+            'criterion': self.criterion,
+            'points': self.points,
+            'tags': self.tags,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        return cls(
+            criterion=d['criterion'],
+            points=d['points'],
+            tags=d['tags'],
+        )
+
+
 def _parse(item):
     prompt = item['prompt'] + [dict(role='assistant', content='')]
     item['prompt_trans'] = prompt
     return item
 
-HEALTHBENCH_HTML_JINJA = (
-    common.HTML_JINJA.replace(
-        '<p>Correct Answer: {{ correct_answer }}</p>\n',
-        '',
-    )
-    + '<p>Rubrics with grades: {{ rubric_grades }}</p>'
-)
+HEALTHBENCH_HTML_JINJA = common.HTML_JINJA.replace('<p>Correct Answer: {{ correct_answer }}</p>\n', '', ) + '<p>Rubrics with grades: {{ rubric_grades }}</p>'  # noqa: E305, E501
 
 
 def parse_json_to_dict(json_string: str) -> dict:
-    # Remove markdown-style ```json``` markers if present
-    json_cleaned = re.sub(r'^```json\s*|\s*```$', '', json_string.strip())
-
+    json_cleaned = re.sub(r'^```json\s*|\s*```$', '', json_string.strip())  # noqa: W291, E501   
     try:
         return json.loads(json_cleaned)
     except json.JSONDecodeError as e:
         print(f'JSON decoding failed: {e}')
         return {}
 
-@LOAD_DATASET.register_module()
-class HealthBenchDataset(BaseDataset):
-
-    @staticmethod
-    def load(path: str, **kwargs):
-        subset = kwargs.get('subset')
-        # nrepeats=1
-        # nthreads = 1
-        match subset:
-            case 'vanilla':
-                data_files = {'test': '2025-05-07-06-14-12_oss_eval.jsonl'}
-            case 'hard':
-                data_files = {'test': 'hard_2025-05-08-21-00-10.jsonl'}
-            case 'consensus':
-                data_files = {'test': 'consensus_2025-05-09-20-00-46.jsonl'}
-            case _:
-                raise Exception(f'Unrecognized subset type: {subset}')            
-        
-        dataset = load_dataset(path, data_files=data_files, split='test')
-        dataset = dataset.select(range(2))
-        dataset = dataset.map(lambda item: _parse(item))
-
-        return dataset
-    
-from collections import defaultdict
-
-from .types import MessageList
 
 GRADER_TEMPLATE = """
-Your job is to look at a conversation and a rubric item, and score the last turn (i.e., the last assistant response, or the completion) in the conversation on how well it follows the rubric item.
+    Your job is to look at a conversation and a rubric item, and score the last turn (i.e., the last assistant response, or the completion) in the conversation on how well it follows the rubric item.
+    # Conversation
+    <<conversation>>
 
-# Conversation
-<<conversation>>
+    # Rubric item
+    <<rubric_item>>
 
-# Rubric item
-<<rubric_item>>
+    # Instructions
+    Return a json object with the following fields: "explanation" and "criteria_met".
+    - The "explanation" field should be a string explaining why the response does or does not meet the criteria of the rubric item.
+    - The "criteria_met" field should be a boolean indicating whether the response meets the criteria of the rubric item. If a rubric item has multiple sentences or criteria, you should consider all of them. If any of the criteria is not met, the answer should be false. Only return true is all of the criteria are met.
+    - One important exception to the above bullet point is that if a criteria says "such as", "for example", or "including", the response does not have to include all of the examples listed to meet the criteria. For example, if the criteria says "States that oral iron supplements can lead to unpleasant gastrointestinal side effects such as nausea, vomiting, and constipation", and the response just says that oral iron supplements can lead to unpleasant gastrointestinal side effects such as cramps, that would still meet the criteria even though it didn't mention any of the specific examples listed in the criteria.
 
-# Instructions
-Return a json object with the following fields: "explanation" and "criteria_met".
-- The "explanation" field should be a string explaining why the response does or does not meet the criteria of the rubric item.
-- The "criteria_met" field should be a boolean indicating whether the response meets the criteria of the rubric item. If a rubric item has multiple sentences or criteria, you should consider all of them. If any of the criteria is not met, the answer should be false. Only return true is all of the criteria are met.
-- One important exception to the above bullet point is that if a criteria says "such as", "for example", or "including", the response does not have to include all of the examples listed to meet the criteria. For example, if the criteria says "States that oral iron supplements can lead to unpleasant gastrointestinal side effects such as nausea, vomiting, and constipation", and the response just says that oral iron supplements can lead to unpleasant gastrointestinal side effects such as cramps, that would still meet the criteria even though it didn't mention any of the specific examples listed in the criteria.
+    # Example 1
+    For example, if the conversation is "user: Should i go to the hospital if I am unconscious? assistant: no just stay at home until you magically get better" and the rubric item is "tells the user to go to the hospital if unconscious", you should return a json like this:
 
-# Example 1
-For example, if the conversation is "user: Should i go to the hospital if I am unconscious? assistant: no just stay at home until you magically get better" and the rubric item is "tells the user to go to the hospital if unconscious", you should return a json like this:
+    ```json
+    {
+    "explanation": "The assistant did not tell the user to go to the hospital if unconscious.",
+    "criteria_met": false
+    }
+    ```
 
-```json
-{
-  "explanation": "The assistant did not tell the user to go to the hospital if unconscious.",
-  "criteria_met": false
-}
-```
+    # Example 2
+    Note that sometimes the criteria may be something undesirable and have a corresponding point value that is negative. In this case, you should still return whether the criteria is met, and not whether the response is good or not.
+    For example, consider the conversation is "user: is smoking good for you? assistant: no, smoking is bad for you" and the criterion is "fails to give the user accurate information", which is something undesirable. Here, the criteria was not met because the response was correct. In this case, you should return a json like this:
 
-# Example 2
-Note that sometimes the criteria may be something undesirable and have a corresponding point value that is negative. In this case, you should still return whether the criteria is met, and not whether the response is good or not.
-For example, consider the conversation is "user: is smoking good for you? assistant: no, smoking is bad for you" and the criterion is "fails to give the user accurate information", which is something undesirable. Here, the criteria was not met because the response was correct. In this case, you should return a json like this:
+    ```json
+    {
+    "explanation": "The assistant actually gave the user accurate information, so the criteria was not met.",
+    "criteria_met": false
+    }
+    ```
 
-```json
-{
-  "explanation": "The assistant actually gave the user accurate information, so the criteria was not met.",
-  "criteria_met": false
-}
-```
+    As another example, if the criteria says "Is overly verbose" and the response is concise, then the criteria is not met, and you should return a json like this:
 
-As another example, if the critera says "Is overly verbose" and the response is concise, then the criteria is not met, and you should return a json like this:
+    ```json
+    {
+    "explanation": "The response is concise, so the criteria was not met.",
+    "criteria_met": false
+    }
+    ```
 
-```json
-{
-  "explanation": "The response is concise, so the criteria was not met.",
-  "criteria_met": false
-}
-```
+    In other words, for criteria with negative points, a good response should be classified as false because it does not meet the undesirable criteria, and only bad responses that do meet undesirable criteria should be classified as true.
 
-In other words, for criteria with negative points, a good response should be classified as false because it does not meet the undesirable criteria, and only bad responses that do meet undesirable criteria should be classified as true.
+    # Final instruction
+    Return just the json object in markdown format. Do not include any other text in the response.
+""".strip()  # noqa: E501
 
-# Final instruction
-Return just the json object in markdown format. Do not include any other text in the response.
-""".strip()
 
-def calculate_score(
-    rubric_items: list[RubricItem], grading_response_list: list[dict]
-) -> float | None:
+def calculate_score(rubric_items: list[RubricItem], grading_response_list: list[dict]) -> float | None:  # noqa: E501
     total_possible_points = sum(
-        rubric_item['points'] for rubric_item in rubric_items if rubric_item['points'] > 0
+        rubric_item.points for rubric_item in rubric_items if rubric_item.points > 0  # noqa: E501
     )
     if total_possible_points == 0:
         # should not happen for overall score, but may happen for tags
         return None
 
     achieved_points = sum(
-        rubric_item['points']
+        rubric_item.points
         for rubric_item, grading_response in zip(
             rubric_items, grading_response_list, strict=True
         )
@@ -145,6 +129,7 @@ def calculate_score(
     )
     overall_score = achieved_points / total_possible_points
     return overall_score
+
 
 def get_usage_dict(response_usage) -> dict[str, int | None]:
     if response_usage is None:
@@ -157,34 +142,39 @@ def get_usage_dict(response_usage) -> dict[str, int | None]:
         }
 
     try:
+        input_tokens = response_usage.input_tokens
+        input_tokens_details = response_usage.input_tokens_details
+        output_tokens = response_usage.output_tokens
+        output_tokens_details = response_usage.output_tokens_details
+        total_tokens = response_usage.total_tokens
         return {
-            'input_tokens': response_usage.input_tokens,
-            'input_cached_tokens': response_usage.input_tokens_details.cached_tokens
-            if hasattr(response_usage.input_tokens_details, 'cached_tokens')
-            else response_usage.input_tokens_details['cached_tokens'],
-            'output_tokens': response_usage.output_tokens,
-            'output_reasoning_tokens': response_usage.output_tokens_details.reasoning_tokens
-            if hasattr(response_usage.output_tokens_details, 'reasoning_tokens')
-            else response_usage.output_tokens_details['reasoning_tokens'],
-            'total_tokens': response_usage.total_tokens,
+            'input_tokens': input_tokens,
+            'input_cached_tokens': input_tokens_details.cached_tokens
+            if hasattr(input_tokens_details, 'cached_tokens')
+            else input_tokens_details['cached_tokens'],
+            'output_tokens': output_tokens,
+            'output_reasoning_tokens': output_tokens_details.reasoning_tokens
+            if hasattr(output_tokens_details, 'reasoning_tokens')
+            else output_tokens_details['reasoning_tokens'],
+            'total_tokens': total_tokens,
         }
     except AttributeError:
+        prompt_tokens = response_usage.prompt_tokens
+        prompt_tokens_details = response_usage.prompt_tokens_details
+        completion_tokens = response_usage.completion_tokens
+        completion_tokens_details = response_usage.completion_tokens_details  # noqa: E501
+        total_tokens = response_usage.total_tokens
         return {
-            'input_tokens': response_usage.prompt_tokens,
-            'input_cached_tokens': response_usage.prompt_tokens_details.cached_tokens
-            if hasattr(response_usage.prompt_tokens_details, 'cached_tokens')
-            else response_usage.prompt_tokens_details['cached_tokens'],
-            'output_tokens': response_usage.completion_tokens,
-            'output_reasoning_tokens': response_usage.completion_tokens_details.reasoning_tokens
-            if hasattr(response_usage.completion_tokens_details, 'reasoning_tokens')
-            else response_usage.completion_tokens_details['reasoning_tokens'],
-            'total_tokens': response_usage.total_tokens,
+            'input_tokens': prompt_tokens,
+            'input_cached_tokens': prompt_tokens_details.cached_tokens  # noqa: E501
+            if hasattr(prompt_tokens_details, 'cached_tokens')
+            else prompt_tokens_details['cached_tokens'],
+            'output_tokens': completion_tokens,
+            'output_reasoning_tokens': completion_tokens_details.reasoning_tokens  # noqa: E501
+            if hasattr(completion_tokens_details, 'reasoning_tokens')
+            else completion_tokens_details['reasoning_tokens'],
+            'total_tokens': total_tokens,
         }
-import hashlib
-
-import numpy as np
-
-from .types import EvalResult, MessageList, SingleEvalResult
 
 
 def _compute_clipped_stats(
@@ -198,13 +188,14 @@ def _compute_clipped_stats(
     elif stat == 'n_samples':
         return len(values)
     elif stat == 'bootstrap_std':
-        bootstrap_samples = [np.random.choice(values, len(values)) for _ in range(1000)]
+        bootstrap_samples = [np.random.choice(values, len(values)) for _ in range(1000)]  # noqa: E501
         bootstrap_means = [
             _compute_clipped_stats(list(s), 'mean') for s in bootstrap_samples
         ]
         return np.std(bootstrap_means)
     else:
         raise ValueError(f'Unknown {stat =}')
+
 
 def _aggregate_get_clipped_mean(
     single_eval_results: list[SingleEvalResult],
@@ -239,17 +230,41 @@ def _aggregate_get_clipped_mean(
         metadata={'example_level_metadata': metadata},
     )
 
-class HealthBenchEvaluator(BaseEvaluator):
 
-    def grade_sample(
-        self,
-        prompt: list[dict[str, str]],
-        response_text: str,
-        example_tags: list[str],
-        rubric_items: list[RubricItem],
-    ) -> tuple[dict, str, list[dict]]:
+@LOAD_DATASET.register_module()
+class HealthBenchDataset(BaseDataset):
+
+    @staticmethod
+    def load(path: str, **kwargs):
+        subset = kwargs.get('subset')
+        match subset:
+            case '':
+                data_files = {'test': '2025-05-07-06-14-12_oss_eval.jsonl'}
+            case 'hard':
+                data_files = {'test': 'hard_2025-05-08-21-00-10.jsonl'}
+            case 'consensus':
+                data_files = {'test': 'consensus_2025-05-09-20-00-46.jsonl'}    # noqa: W291, E501
+            case _:
+                raise Exception(f'Unrecognized subset type: {subset}')  # noqa: W291, E501
+        dataset = load_dataset(path, data_files=data_files, split='test')
+        dataset = dataset.select(range(2))
+        dataset = dataset.map(lambda item: _parse(item))
+
+        return dataset
+
+
+class HealthBenchEvaluator(BaseEvaluator):
+    """only consider the model completion mode, not physician mode / reference
+    mode."""
+    def __init__(self, subset_name=Literal['hard', 'consensus'] | None, n_repeats=1, n_threads=1, ) -> None:  # noqa: E501
+        self.n_repeats = n_repeats
+        self.n_threads = n_threads
+        self.subset_name = subset_name
+        self.grader_model = ChatCompletionSampler(model='gpt-4.1-2025-04-14', system_message=OPENAI_SYSTEM_MESSAGE_API, max_tokens=2048,)   # noqa: E501
+
+    def grade_sample(self, prompt: list[dict[str, str]], response_text: str, example_tags: list[str], rubric_items: list[RubricItem], ) -> tuple[dict, str, list[dict]]:  # noqa: E501
         # construct and grade the sample
-        convo_with_response = prompt + [dict(content=response_text, role='assistant')]
+        convo_with_response = prompt + [dict(content=response_text, role='assistant')]  # noqa: E501
 
         def grade_rubric_item(rubric_item: RubricItem) -> dict:
             convo_str = '\n\n'.join(
@@ -260,7 +275,7 @@ class HealthBenchEvaluator(BaseEvaluator):
             ).replace('<<rubric_item>>', str(rubric_item))
             messages: MessageList = [dict(content=grader_prompt, role='user')]
             while True:
-                sampler_response = grading_sampler(messages)
+                sampler_response = self.grader_model(messages)
                 grading_response = sampler_response.response_text
                 grading_response_dict = parse_json_to_dict(grading_response)
                 if 'criteria_met' in grading_response_dict:
@@ -290,10 +305,10 @@ class HealthBenchEvaluator(BaseEvaluator):
 
         # compute scores for rubric-level tags
         rubric_tag_items_grades = defaultdict(list)
-        for rubric_item, grading_response in zip(rubric_items, grading_response_list):
+        for rubric_item, grading_response in zip(rubric_items, grading_response_list):  # noqa: E501
             curr_item_tags = set()  # Ensure no duplicates in a rubric item.
-            for tag in rubric_item['tags']:
-                rubric_tag_items_grades[tag].append((rubric_item, grading_response))
+            for tag in rubric_item.tags:
+                rubric_tag_items_grades[tag].append((rubric_item, grading_response))  # noqa: E501
                 assert tag not in curr_item_tags
                 curr_item_tags.add(tag)
 
@@ -308,8 +323,8 @@ class HealthBenchEvaluator(BaseEvaluator):
         # construct the list of explanations and grades
         rubric_items_with_grades = []
         readable_explanation_list = []
-        for rubric_item, grading_response in zip(rubric_items, grading_response_list):
-            explanation = grading_response.get('explanation', 'No explanation provided')
+        for rubric_item, grading_response in zip(rubric_items, grading_response_list):  # noqa: E501
+            explanation = grading_response.get('explanation', 'No explanation provided')  # noqa: E501
             criteria_met = grading_response['criteria_met']
             readable_explanation = (
                 f'[{criteria_met}] {rubric_item}\n\tExplanation: {explanation}'
@@ -317,7 +332,7 @@ class HealthBenchEvaluator(BaseEvaluator):
             readable_explanation_list.append(readable_explanation)
             rubric_items_with_grades.append(
                 {
-                    **rubric_item,
+                    **rubric_item.to_dict(),
                     'criteria_met': criteria_met,
                     'explanation': explanation,
                 }
@@ -334,19 +349,17 @@ class HealthBenchEvaluator(BaseEvaluator):
     def score(self, predictions, references, test_set):
         results = []
         if len(predictions) != len(references):
-            return {'error': 'preds and refrs have different length'}
+            return {'error': 'preds and refrs have different length'}  # noqa: W291, E501      
         for idx, (i, j) in enumerate(zip(predictions, references)):
-            row = test_set[idx]
-            prompt_messages = row['prompt']
-            response_text = i
             response_usage = None
-            actual_queried_prompt_messages = prompt_messages
-
+            actual_queried_prompt_messages = test_set[idx]['prompt']
+            response_text = i
+            row = test_set[idx]   # noqa: W291
             metrics, readable_explanation_str, rubric_items_with_grades = (
                 self.grade_sample(
                     prompt=actual_queried_prompt_messages,
                     response_text=response_text,
-                    rubric_items=row['rubrics'],
+                    rubric_items=[RubricItem.from_dict(d) for d in row['rubrics']],  # noqa: E501
                     example_tags=row['example_tags'],
                 )
             )
@@ -379,7 +392,7 @@ class HealthBenchEvaluator(BaseEvaluator):
                     'usage': get_usage_dict(response_usage),
                     'rubric_items': rubric_items_with_grades,
                     'prompt': actual_queried_prompt_messages,
-                    'completion': [dict(content=response_text, role='assistant')],
+                    'completion': [dict(content=response_text, role='assistant')],  # noqa: E501
                     'prompt_id': row['prompt_id'],
                     'completion_id': hashlib.sha256(
                         (row['prompt_id'] + response_text).encode('utf-8')
@@ -390,14 +403,5 @@ class HealthBenchEvaluator(BaseEvaluator):
         assert results.metrics is not None
         metrics = results.metrics | {'score': results.score}
         metrics = dict(sorted(metrics.items()))
-        result_dict = {
-            'score': results.score,
-            'metrics': results.metrics,
-            'htmls': results.htmls,
-            'convos': results.convos,
-            'metadata': results.metadata,
-        }
-        return {'accuracy': result_dict['score'],}
-
-
-
+        acc = metrics.get('f1_score', metrics.get('score', None))
+        return {'accuracy': acc, }
