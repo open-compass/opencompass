@@ -1,4 +1,4 @@
-from opencompass.datasets import HealthBenchDataset, HealthBenchEvaluator, HealthBenchDatasetMeta
+from opencompass.datasets import HealthBenchDataset, HealthBenchEvaluator
 from opencompass.openicl.icl_inferencer import ChatInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
@@ -11,6 +11,7 @@ reader_cfg = dict(
     ],
     output_column='prompt_id', # useless
 )
+
 
 infer_cfg = dict(
     prompt_template=dict(
