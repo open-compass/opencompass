@@ -466,6 +466,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/medbullets/medbullets.csv",
     },
+    "opencompass/GrandPhysics": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/GrandPhysics/GrandPhysics_50_questions.json",
+    },
 
 }
 
