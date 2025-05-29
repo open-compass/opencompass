@@ -92,8 +92,8 @@ def get_config_from_arg(args) -> Config:
     2. args.models and args.datasets
     3. Huggingface parameter groups and args.datasets
     """
-    # Set to None if config is an empty or whitespace-only string
-    self.config = None if self.config is not None and not str(self.config).strip()
+    # set to None if config is an empty or whitespace-only string
+    args.config = None if args.config is not None and not str(args.config).strip() else args.config
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
