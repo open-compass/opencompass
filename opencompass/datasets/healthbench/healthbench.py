@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import re
 from collections import defaultdict
 from typing import Literal
@@ -260,7 +261,7 @@ class HealthBenchEvaluator(BaseEvaluator):
         self.n_repeats = n_repeats
         self.n_threads = n_threads
         self.subset_name = subset_name
-        self.grader_model = ChatCompletionSampler(model='gpt-4.1-2025-04-14', system_message=OPENAI_SYSTEM_MESSAGE_API, max_tokens=2048,)   # noqa: E501
+        self.grader_model = ChatCompletionSampler(model=os.environ['OC_JUDGE_MODEL'], system_message=OPENAI_SYSTEM_MESSAGE_API, max_tokens=2048,)   # noqa: E501
 
     def grade_sample(self, prompt: list[dict[str, str]], response_text: str, example_tags: list[str], rubric_items: list[RubricItem], ) -> tuple[dict, str, list[dict]]:  # noqa: E501
         # construct and grade the sample
