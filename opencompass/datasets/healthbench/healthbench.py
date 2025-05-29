@@ -247,7 +247,7 @@ class HealthBenchDataset(BaseDataset):
             case _:
                 raise Exception(f'Unrecognized subset type: {subset}')  # noqa: W291, E501
         dataset = load_dataset(path, data_files=data_files, split='test')
-        dataset = dataset.select(range(2))
+        # dataset = dataset.select(range(2))
         dataset = dataset.map(lambda item: _parse(item))
 
         return dataset
