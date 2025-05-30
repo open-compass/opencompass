@@ -57,21 +57,19 @@ class SRbenchDataset(BaseDataset):
         return dataset
 
 def mydataset_postprocess(formula_str):
-    # 1. 删除 Markdown 残留符号
+
     formula_str = formula_str.replace('×', '*').replace('·', '*').replace('÷', '/')
     formula_str = formula_str.replace('−', '-').replace('^', '**')
     formula_str = formula_str.replace('“', '"').replace('”', '"').replace('’', "'")
 
-    # 2. 去除 markdown 反引号 ``` 和 $ 符号
+
     formula_str = formula_str.replace('`', '').replace('$', '').strip()
 
-    # 3. 提取第一行公式（防止有多行解释性输出）
+
     formula_str = formula_str.split('\n')[0].strip()
 
-    # 4. 用正则去除非合法字符（保留基本数学表达式）
     formula_str = re.sub(r'[^\w\s\+\-\*/\^\=\.\(\)]', '', formula_str)
 
-    # 5. 确保左右去空格
     return formula_str.strip()
 
 class SRbenchDatasetEvaluator(BaseEvaluator):
@@ -122,7 +120,7 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
             'R2': pd.Series(dtype=float),
             'SymbolicMatch': pd.Series(dtype=bool)
         })
-        # 结构评分（用 LLM）
+
         for row in range(len(references)):
             #metrics['LLM_Score'] = float(self.llm_evaluate(predictions[row], references[row], mllm='gpt-4o'))
             n_var=self.dataset[row]["n_var"]
