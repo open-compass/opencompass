@@ -13,7 +13,7 @@ INFER_TEMPLATE = f'''
             Based on the above data, please infer the possible formula. Ensure that your inference applies to all the provided data points, and consider both linear and nonlinear combinations.
             Verify whether your formula applies to the following new data point and adjust it to ensure accuracy:
             {{prompt2}}
-            Finally, please output only the formula string you inferred (e.g. z=x_0 * x_1), without any additional information.
+            Finally, please output only the formula string you inferred (e.g. y=x_0 * x_1), without any additional information.
         '''
 
 srbench_reader_cfg = dict(input_columns=["prompt1","prompt2"], output_column='Formula')
