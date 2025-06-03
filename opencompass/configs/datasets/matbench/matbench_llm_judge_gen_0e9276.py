@@ -91,6 +91,7 @@ for task in matbench_tasks:
                     task=task,
                     reader_cfg=matbench_reader_cfg,
                 ),
+                judge_cfg=dict(),
                 dict_postprocessor=dict(type=generic_llmjudge_postprocess),  
             ),
         )
@@ -128,6 +129,7 @@ for task in matbench_tasks:
                     task=task,
                     reader_cfg=matbench_reader_cfg,
                 ),
+                judge_cfg=dict(),
                 dict_postprocessor=dict(type=numerical_llmjudge_postprocess),
             ),
         )
