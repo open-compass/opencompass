@@ -1,4 +1,5 @@
 import json
+import os
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
@@ -6,13 +7,17 @@ from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 from opencompass.datasets.matbench.post_process import parse_float_answer, parse_true_false_answer, parse_has_hasnot_answer
+from opencompass.utils import get_data_path
+
 from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
 class MatbenchDataset(BaseDataset):
     @staticmethod
-    def load(path):
+    def load(path, task):
+        path = get_data_path(path)
+        path = os.path.join(path, f'matbench_base_fold_0_{task}_test.json')
         dataset = []
         with open(path, 'r', encoding='utf-8') as file:
             data = json.load(file)

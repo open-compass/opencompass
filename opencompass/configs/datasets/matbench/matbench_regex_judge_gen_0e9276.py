@@ -18,7 +18,7 @@ for task in matbench_tasks:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role='HUMAN', prompt=f"{{problem}}")])),
+                round=[dict(role='HUMAN', prompt=f'{{problem}}')])),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer))
 
@@ -31,7 +31,7 @@ for task in matbench_tasks:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role='HUMAN', prompt=f"{{problem}}")])),
+                round=[dict(role='HUMAN', prompt=f'{{problem}}')])),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer))
 
@@ -45,7 +45,7 @@ for task in matbench_tasks:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                round=[dict(role='HUMAN', prompt=f"{{problem}}")])),
+                round=[dict(role='HUMAN', prompt=f'{{problem}}')])),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer))
 
@@ -56,8 +56,9 @@ for task in matbench_tasks:
     matbench_datasets.append(
         dict(
             type=MatbenchDataset,
-            path=f'opencompass/Matbench/{task}.json',
+            path='opencompass/Matbench',
             abbr=task,
+            task=task,
             reader_cfg=matbench_reader_cfg,
             infer_cfg=matbench_infer_cfg,
             eval_cfg=matbench_eval_cfg))
