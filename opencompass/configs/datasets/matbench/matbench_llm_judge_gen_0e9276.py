@@ -2,18 +2,9 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets.matbench.matbench import MatbenchDataset
-from opencompass.datasets.matbench.post_process import generic_llmjudge_postprocess, numerical_llmjudge_postprocess
+from opencompass.datasets import generic_llmjudge_postprocess
+from opencompass.datasets.matbench.post_process import numerical_llmjudge_postprocess
 from opencompass.evaluator.generic_llm_evaluator import GenericLLMEvaluator
-
-# with read_base():
-#     from opencompass.configs.models.qwen3.qwen3_4B import (
-#         models as judge_model,
-#     )
-
-with read_base():
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import (
-        models as judge_model,
-    )
 
 JUDGE_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
@@ -100,7 +91,6 @@ for task in matbench_tasks:
                     task=task,
                     reader_cfg=matbench_reader_cfg,
                 ),
-                judge_cfg=judge_model[0],  
                 dict_postprocessor=dict(type=generic_llmjudge_postprocess),  
             ),
         )
@@ -138,7 +128,6 @@ for task in matbench_tasks:
                     task=task,
                     reader_cfg=matbench_reader_cfg,
                 ),
-                judge_cfg=judge_model[0],
                 dict_postprocessor=dict(type=numerical_llmjudge_postprocess),
             ),
         )
