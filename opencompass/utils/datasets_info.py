@@ -450,7 +450,7 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/srbench",
-    }
+    },
     "opencompass/nejmaibench": {
         "ms_id": "",
         "hf_id": "",
