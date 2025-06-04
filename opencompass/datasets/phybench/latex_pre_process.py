@@ -1,7 +1,6 @@
 # flake8: noqa
 #This file is used to pre-process input latex expressions
 #You only need a "master_convert()"
-from latex2sympy2_extended import *
 from sympy import simplify
 
 
@@ -522,7 +521,11 @@ def master_convert(s):
     preprocessed_stage1 = first_pre_process(s)
 
     preprocessed_stage2 = second_pre_process(preprocessed_stage1)
-
+    try:
+        from latex2sympy2_extended import *
+    except ImportError:
+        print("latex2sympy2_extended is not installed. Please install it using 'pip install latex2sympy2_extended'.")
+        return None
     Sym = latex2sympy(preprocessed_stage2,
                       normalization_config=MyNormalization(),
                       conversion_config=MyConfig())
