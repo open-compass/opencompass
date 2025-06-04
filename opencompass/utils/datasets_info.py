@@ -450,6 +450,7 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/srbench",
+    }
     "opencompass/nejmaibench": {
         "ms_id": "",
         "hf_id": "",
@@ -827,7 +828,7 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/srbench.zip",
         "md5": "ab6c5308f7930ac9fbc516ab757feef1"
-    }
+    },
     "nejmaibench": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/nejmaibench.zip",
