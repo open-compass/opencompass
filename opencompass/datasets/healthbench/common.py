@@ -1,7 +1,6 @@
 import io
 import os
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing.pool import ThreadPool
 from typing import Any, Callable
 
@@ -13,7 +12,7 @@ from tqdm import tqdm
 from .types import EvalResult, Message, SamplerBase, SingleEvalResult
 
 QUERY_TEMPLATE_MULTICHOICE = """
-Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering.
+Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering. 
 
 {Question}
 
@@ -21,7 +20,7 @@ A) {A}
 B) {B}
 C) {C}
 D) {D}
-""".strip()
+""".strip()  # noqa E501
 
 ANSWER_PATTERN_MULTICHOICE = r'(?i)Answer[ \t]*:[ \t]*\$?([A-D])\$?'
 ANSWER_PATTERN = r'(?i)Answer\s*:\s*([^\n]+)'
@@ -29,52 +28,52 @@ MULTILINGUAL_ANSWER_PATTERN_TEMPLATE = (
     '(?i){}[ \t]*([A-D]|[أ-د]|[অ]|[ব]|[ড]|[ঢ]|[Ａ]|[Ｂ]|[Ｃ]|[Ｄ])')
 # All the different ways "Answer" is written in different languages
 MULTILINGUAL_ANSWER_REGEXES = [
-    'Answer\s*:',
-    'Answer\s*:​​​​​​',  # Korean invisible character
-    'উত্তর\s*:',
-    'उत्तर\s*:',
-    'উত্তরঃ',
-    'উত্তর\s*:',
-    'Antwort\s*:',
-    '답변\s*:',
-    '정답\s*:',
-    '답\s*:',
-    '答案\s*：',
-    '答案\s*:',
-    '答\s*：',
-    '答\s*:',
-    '答复\s*：',
-    '答曰\s*：',
-    'الإجابة:',
-    'الجواب:',
-    'إجابة:',
-    'الإجابة النهائية:',
-    'الإجابة الصحيحة:',
-    'الإجابة الصحيحة هي:',
-    'الإجابة هي:',
-    'الجواب النهائي:',
-    'Respuesta\s*:',
-    'Risposta\s*:',
-    '答え\s*:',
-    '答え\s*：',
-    '回答\s*:',
-    '回答\s*：',
-    '解答\s*:',
-    'Jawaban\s*:',
-    'Réponse\s*:',
-    'Resposta\s*:',
-    'Jibu\s*:',
-    'Idahun\s*:',
-    'Ìdáhùn\s*:',
-    'Idáhùn\s*:',
-    'Àmọ̀nà\s*:',
-    'Àdáhùn\s*:',
-    'Ànúgọ\s*:',
-    'Àṣàyàn\s*:',
+    'Answer\s*:',  # noqa: W605
+    'Answer\s*:​​​​​​',  # Korean invisible character    # noqa: W605
+    'উত্তর\s*:',  # noqa: W605
+    'उत्तर\s*:',  # noqa: W605
+    'উত্তরঃ',  # noqa: W605
+    'উত্তর\s*:',  # noqa: W605
+    'Antwort\s*:',  # noqa: W605
+    '답변\s*:',  # noqa: W605
+    '정답\s*:',  # noqa: W605
+    '답\s*:',  # noqa: W605
+    '答案\s*：',  # noqa: W605
+    '答案\s*:',  # noqa: W605
+    '答\s*：',  # noqa: W605
+    '答\s*:',  # noqa: W605
+    '答复\s*：',  # noqa: W605
+    '答曰\s*：',  # noqa: W605
+    'الإجابة:',  # noqa: W605
+    'الجواب:',  # noqa: W605
+    'إجابة:',  # noqa: W605
+    'الإجابة النهائية:',  # noqa: W605
+    'الإجابة الصحيحة:',  # noqa: W605
+    'الإجابة الصحيحة هي:',  # noqa: W605
+    'الإجابة هي:',  # noqa: W605
+    'الجواب النهائي:',  # noqa: W605
+    'Respuesta\s*:',  # noqa: W605
+    'Risposta\s*:',  # noqa: W605
+    '答え\s*:',  # noqa: W605
+    '答え\s*：',  # noqa: W605
+    '回答\s*:',  # noqa: W605
+    '回答\s*：',  # noqa: W605
+    '解答\s*:',  # noqa: W605
+    'Jawaban\s*:',  # noqa: W605
+    'Réponse\s*:',  # noqa: W605
+    'Resposta\s*:',  # noqa: W605
+    'Jibu\s*:',  # noqa: W605
+    'Idahun\s*:',  # noqa: W605
+    'Ìdáhùn\s*:',  # noqa: W605
+    'Idáhùn\s*:',  # noqa: W605
+    'Àmọ̀nà\s*:',  # noqa: W605
+    'Àdáhùn\s*:',  # noqa: W605
+    'Ànúgọ\s*:',  # noqa: W605
+    'Àṣàyàn\s*:',  # noqa: W605
 ]
 
 EQUALITY_TEMPLATE = r"""
-Look at the following two expressions (answers to a math problem) and judge whether they are equivalent. Only perform trivial simplifications
+Look at the following two expressions (answers to a math problem) and judge whether they are equivalent. Only perform trivial simplifications  # noqa: E501
 
 Examples:
 
@@ -102,7 +101,7 @@ Yes
     Expression 2: 649
 
 No
-(these are actually equal, don't mark them equivalent if you need to do nontrivial simplifications)
+(these are actually equal, don't mark them equivalent if you need to do nontrivial simplifications)  # noqa: E501
 
     Expression 1: 2/(-3)
     Expression 2: -2/3
@@ -354,18 +353,19 @@ def normalize_response(response: str) -> str:
 
 def normalize_extracted_answer(extracted_answer: str) -> str:
     return (
-        # In arabic these are the letters used for A-D in multiple choice questions
+        # In arabic these are the letters used for A-D in multiple choice questions  # noqa E501
         extracted_answer.replace('أ', ' A').replace('ب', ' B').replace(
             'ج', ' C').replace('د', ' D')
-        # In Bengali these are the letters used for A-D in multiple choice questions
+        # In Bengali these are the letters used for A-D in multiple choice questions  # noqa: E501
         .replace('অ', ' A').replace('ব',
                                     ' B').replace('ড',
                                                   ' C').replace('ঢ', ' D')
-        # In Japanese these are the letters sometimes used for A-D in multiple choice questions
+        # In Japanese these are the letters sometimes used for A-D in multiple choice questions  # noqa: E501
         .replace('Ａ', ' A').replace('Ｂ',
                                     ' B').replace('Ｃ',
                                                   ' C').replace('Ｄ',
-                                                                ' D').strip())
+                                                                ' D').strip()
+    )  # noqa: E501
 
 
 def url_to_fileobj(url: str, binary=False) -> Any:
