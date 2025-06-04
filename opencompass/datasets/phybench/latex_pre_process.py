@@ -522,9 +522,11 @@ def master_convert(s):
 
     preprocessed_stage2 = second_pre_process(preprocessed_stage1)
     try:
-        from latex2sympy2_extended import *
+        from latex2sympy2_extended import latex2sympy
     except ImportError:
-        print("latex2sympy2_extended is not installed. Please install it using 'pip install latex2sympy2_extended'.")
+        print(
+            "latex2sympy2_extended is not installed. Please install it using 'pip install latex2sympy2_extended'."
+        )
         return None
     Sym = latex2sympy(preprocessed_stage2,
                       normalization_config=MyNormalization(),
