@@ -466,7 +466,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/medbullets/medbullets.csv",
     },
-
+    "opencompass/PHYBench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/phybench",
+    },
 }
 
 DATASETS_URL = {
@@ -835,5 +839,9 @@ DATASETS_URL = {
     "medbullets": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/medbullets.zip",
         "md5": "b63130999c1f28d57acba1c7852639f8",
+    },
+    "/phybench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/phybench.zip",
+        "md5": "a4209b820f6384f69ec88fa816db9e4b",
     },
 }
