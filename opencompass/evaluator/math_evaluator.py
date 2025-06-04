@@ -3,9 +3,9 @@ from opencompass.registry import ICL_EVALUATORS
 
 
 @ICL_EVALUATORS.register_module()
-class MATHEvaluator(BaseEvaluator):
+class MATHVerifyEvaluator(BaseEvaluator):
 
-    def score(self, predictions, references):
+    def score(self, predictions, references, test_set=None):
         try:
             from latex2sympy2_extended import NormalizationConfig
             from math_verify import (ExprExtractionConfig,

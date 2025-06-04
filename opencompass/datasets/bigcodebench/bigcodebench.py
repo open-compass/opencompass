@@ -188,7 +188,9 @@ class BigCodeBenchEvaluator(BaseEvaluator):
         while True:
             try:
                 eval_client = Client(self.remote_execute_api,
-                                     httpx_kwargs=dict(proxies=proxies))
+                                     httpx_kwargs=dict(
+                                         proxies=proxies,
+                                         timeout=httpx.Timeout(100.0)))
                 results, pass_at_k = eval_client.predict(
                     split=self.eval_type,
                     samples=handle_file(submitted_contents_path),
@@ -196,7 +198,7 @@ class BigCodeBenchEvaluator(BaseEvaluator):
                     **self.eval_kwargs)
                 break
             except (httpx.ReadTimeout, CancelledError):
-                logger.info('Read timeout error. Retrying in 4s...')
+                logger.info('Read timeout error. Retrying in 10s...')
                 time.sleep(10)
 
         if 'pass@1' in pass_at_k.keys():

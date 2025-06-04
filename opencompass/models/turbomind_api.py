@@ -10,7 +10,7 @@ PromptType = Union[PromptList, str]
 
 
 def valid_str(string, coding='utf-8'):
-    """decode text according to its encoding type."""
+    """Decode text according to its encoding type."""
     invalid_chars = [b'\xef\xbf\xbd']
     bstr = bytes(string, coding)
     for invalid_char in invalid_chars:

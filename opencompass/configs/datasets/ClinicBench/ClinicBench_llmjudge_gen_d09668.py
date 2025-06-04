@@ -1,29 +1,22 @@
+from mmengine.config import read_base
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import Aime2024Dataset, MATHEvaluator, math_postprocess_v2
-from opencompass.openicl.icl_evaluator import LMEvaluator
+from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
-
-aime2024_reader_cfg = dict(
-    input_columns=['question'], 
-    output_column='answer'
-)
+from opencompass.datasets.ClinicBench import ClinicBenchDataset
 
 
-aime2024_infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(role='HUMAN', prompt='{question}\nRemember to put your final answer within \\boxed{}.'),
-            ],
-        )
-    ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=2048)
-)
+QUERY_TEMPLATE = """
+Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of Options(e.g. one of ABCDEFGHIJKLMNOP). Think step by step before answering.
 
+Question:\n
+{question}
+
+Options:\n
+{choices}
+
+""".strip()
 
 GRADER_TEMPLATE = """
     Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly. 
@@ -33,7 +26,6 @@ GRADER_TEMPLATE = """
     2. Because the candidate's answer may be different from the standard answer in the form of expression, before making a judgment, please understand the question and the standard answer first, and then judge whether the candidate's answer is correct, but be careful not to try to answer the original question.
     3. Some answers may contain multiple items, such as multiple-choice questions, multiple-select questions, fill-in-the-blank questions, etc. As long as the answer is the same as the standard answer, it is enough. For multiple-select questions and multiple-blank fill-in-the-blank questions, the candidate needs to answer all the corresponding options or blanks correctly to be considered correct.
     4. Some answers may be expressed in different ways, such as some answers may be a mathematical expression, some answers may be a textual description, as long as the meaning expressed is the same. And some formulas are expressed in different ways, but they are equivalent and correct.
-    5. If the prediction is given with \\boxed{}, please ignore the \\boxed{} and only judge whether the candidate's answer is consistent with the standard answer.
 
     Please judge whether the following answers are consistent with the standard answer based on the above criteria. Grade the predicted answer of this new question as one of:
     A: CORRECT 
@@ -42,46 +34,67 @@ GRADER_TEMPLATE = """
 
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
-
-    <Original Question Begin>: \n{question}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
+    <Original Question Begin>: {question}\n {choices} \n<Original Question End>\n\n
+    <Gold Target Begin>: \n{label}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
-    
     Judging the correctness of candidates' answers:
 """.strip()
 
-aime2024_eval_cfg = dict(
+ClinicBench_datasets = []
+
+ClinicBench_reader_cfg = dict(
+    input_columns=['question', 'choices'],
+    output_column='label',
+)
+
+ClinicBench_infer_cfg = dict(
+    prompt_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            round=[
+                dict(role='HUMAN', prompt=QUERY_TEMPLATE),
+            ],
+        ),
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer),
+)
+
+ClinicBench_eval_cfg = dict(
     evaluator=dict(
-        type=LMEvaluator,
+        type=GenericLLMEvaluator,
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-            begin=[
-                dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
-            ],
+                begin=[
+                    dict(
+                        role='SYSTEM',
+                        fallback_role='HUMAN',
+                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
+                    )
+                ],
                 round=[
-                dict(
-                    role='HUMAN',
-                    prompt = GRADER_TEMPLATE
-                ),
-            ]),
+                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
+                ],
+            ),
         ),
+        dataset_cfg=dict(
+            type=ClinicBenchDataset,
+            path='xuxuxuxuxu/Pharmacology-QA',
+            reader_cfg=ClinicBench_reader_cfg,
+        ),
+        judge_cfg=dict(),
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
-    pred_role='BOT',
 )
 
-aime2024_datasets = [
+ClinicBench_datasets.append(
     dict(
-        abbr='aime2024',
-        type=Aime2024Dataset,
-        path='opencompass/aime2024',
-        reader_cfg=aime2024_reader_cfg,
-        infer_cfg=aime2024_infer_cfg,
-        eval_cfg=aime2024_eval_cfg,
-        mode='singlescore',
+        abbr=f'ClinicBench',
+        type=ClinicBenchDataset,
+        path='xuxuxuxuxu/Pharmacology-QA',
+        reader_cfg=ClinicBench_reader_cfg,
+        infer_cfg=ClinicBench_infer_cfg,
+        eval_cfg=ClinicBench_eval_cfg,
     )
-]
+)
