@@ -254,7 +254,7 @@ class CascadeEvaluator(BaseEvaluator):
                 llm_details_iter = llm_details.values()
             else:
                 llm_details_iter = llm_details
-                
+
             # Initialize counters for accuracy calculation
             final_correct = initial_correct if not self.parallel else 0
             llm_correct = 0
