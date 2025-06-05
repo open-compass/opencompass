@@ -60,7 +60,7 @@
 - **\[2025.04.01\]** OpenCompass 现已支持 `CascadeEvaluator`，允许多个评估器按顺序工作，可以为更复杂的评估场景创建自定义评估流程，查看[文档](docs/zh_cn/advanced_guides/llm_judge.md)了解具体用法！🔥🔥🔥
 - **\[2025.03.11\]** 现已支持 `SuperGPQA`  覆盖285 个研究生学科的知识能力评测，欢迎尝试！🔥🔥🔥
 - **\[2025.02.28\]** 我们为 `DeepSeek-R1` 系列模型添加了教程，请查看 [评估推理模型](docs/zh_cn/user_guides/deepseek_r1.md) 了解更多详情！🔥🔥🔥
-- **\[2025.02.15\]** 我们新增了两个实用的评测工具：用于LLM作为评判器的`GenericLLMEvaluator`和用于数学推理评估的`MATHEvaluator`。查看[LLM评判器](docs/zh_cn/advanced_guides/llm_judge.md)和[数学能力评测](docs/zh_cn/advanced_guides/general_math.md)文档了解更多详情！🔥🔥🔥
+- **\[2025.02.15\]** 我们新增了两个实用的评测工具：用于LLM作为评判器的`GenericLLMEvaluator`和用于数学推理评估的`MATHVerifyEvaluator`。查看[LLM评判器](docs/zh_cn/advanced_guides/llm_judge.md)和[数学能力评测](docs/zh_cn/advanced_guides/general_math.md)文档了解更多详情！🔥🔥🔥
 - **\[2025.01.16\]** 我们现已支持 [InternLM3-8B-Instruct](https://huggingface.co/internlm/internlm3-8b-instruct) 模型，该模型在推理、知识类任务上取得同量级最优性能，欢迎尝试。
 - **\[2024.12.17\]** 我们提供了12月CompassAcademic学术榜单评估脚本 [CompassAcademic](configs/eval_academic_leaderboard_202412.py)，你可以通过简单地配置复现官方评测结果。
 - **\[2024.10.14\]** 现已支持OpenAI多语言问答数据集[MMMLU](https://huggingface.co/datasets/openai/MMMLU)，欢迎尝试! 🔥🔥🔥
@@ -237,7 +237,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
   opencompass --datasets aime2024_gen --models hf_internlm2_5_1_8b_chat
 
   # 基于LLM Judge的推荐配置
-  opencompass --datasets aime2024_llm_judge_gen --models hf_internlm2_5_1_8b_chat
+  opencompass --datasets aime2024_llmjudge_gen --models hf_internlm2_5_1_8b_chat
   ```
 
   此外，如果你想在多块 GPU 上使用模型进行推理，您可以使用 `--max-num-worker` 参数。

@@ -135,7 +135,7 @@ def get_generic_question_template_test_completion(question_content,
                                                   testcase_input: str):
 
     def format_testcase_func_name_input(function_name, testcase):
-        """use the form of "assert func_name(input) == "."""
+        """Use the form of "assert func_name(input) == "."""
         # TODO should there be a space after the == ?
         input_str = ', '.join(testcase.split('\n'))
         return f'assert {function_name}({input_str}) == # TODO'

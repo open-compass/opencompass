@@ -40,10 +40,7 @@ def get_current_time(format='%Y-%m-%d %H:%M:%S'):
 
 
 def get_current_timestamp():
-    """
-    获取当前时间时间戳
-    :return:
-    """
+    """获取当前时间时间戳 :return:"""
     timestamp_str = int(round(time.time() * 1000))
     return str(timestamp_str)
 
@@ -59,10 +56,7 @@ def encode_base64_string(s):
 
 
 def get_current_time_gmt_format():
-    """
-    获取当前时间的GMT 时间
-    :return:
-    """
+    """获取当前时间的GMT 时间 :return:"""
     GMT_FORMAT = '%a, %d %b %Y %H:%M:%SGMT+00:00'
     now = datetime.now()
     time_str = now.strftime(GMT_FORMAT)
