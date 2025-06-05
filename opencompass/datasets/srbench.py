@@ -71,8 +71,9 @@ def mydataset_postprocess(formula_str):
     formula_str = formula_str.replace('×', '*').replace('·',
                                                         '*').replace('÷', '/')
     formula_str = formula_str.replace('−', '-').replace('^', '**')
-    formula_str = formula_str.replace('“', '"').replace('”',
-                                                        '"').replace('’', "'")
+    formula_str = formula_str.replace('\“',
+                                      '"').replace('\”',
+                                                   '"').replace('’', "'")
 
     formula_str = formula_str.replace('`', '').replace('$', '').strip()
 
@@ -144,12 +145,29 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
             y_true = data_sample[:, -1]
             func = self.parse_formula(predictions[row], n_var=n_var)
             if func is not None:
-                x_vars = [x[:, i] for i in range(n_var)]
-                y_pred = func(*x_vars)
-                if np.isscalar(y_pred):
-                    y_pred = np.full_like(y_true, y_pred)
-                metrics['RMSE'] = root_mean_squared_error(y_true, y_pred)
-                metrics['R2'] = r2_score(y_true, y_pred)
+                try:
+                    x_vars = [x[:, i] for i in range(n_var)]
+                    y_pred = func(*x_vars)
+                    # 确保y_pred是数值类型
+                    if hasattr(y_pred, 'is_number') and not y_pred.is_number:
+                        raise TypeError('Expression is not a number')
+                    if np.isscalar(y_pred):
+                        y_pred = np.full_like(y_true, y_pred)
+                    # 过滤掉 NaN
+                    y_true = np.array(y_true, dtype=np.float64)
+                    y_pred = np.array(y_pred, dtype=np.float64)
+                    mask = ~np.isnan(y_true) & ~np.isnan(y_pred)
+                    if np.any(mask):
+                        metrics['RMSE'] = root_mean_squared_error(
+                            y_true[mask], y_pred[mask])
+                        metrics['R2'] = r2_score(y_true[mask], y_pred[mask])
+                    else:
+                        metrics['RMSE'] = np.inf
+                        metrics['R2'] = 0
+                except (TypeError, ValueError, ZeroDivisionError) as e:
+                    print(f'Error evaluating formula: {e}')
+                    metrics['RMSE'] = np.inf
+                    metrics['R2'] = 0
             else:
                 metrics['R2'] = 0
                 metrics['RMSE'] = np.inf
@@ -167,8 +185,11 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
 
         if not result.empty:
             symbolic_accuracy = result['SymbolicMatch'].sum() / len(result)
-            R2_out = result['R2'].sum() / len(result)
-            RMSE_out = result['RMSE'].sum() / len(result)
+            # 排除inf值计算平均值
+            valid_r2 = result['R2'][~np.isinf(result['R2'])]
+            valid_rmse = result['RMSE'][~np.isinf(result['RMSE'])]
+            R2_out = valid_r2.mean() if len(valid_r2) > 0 else 0
+            RMSE_out = valid_rmse.mean() if len(valid_rmse) > 0 else np.inf
 
         metrics_out = {
             'RMSE': RMSE_out,
