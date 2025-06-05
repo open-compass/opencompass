@@ -11,7 +11,7 @@ chem_competition_reader_cfg = dict(
     output_column='output'
 )
 
-chem_competition_hint = "Answer the following chemistry question. Please reason step by step, and put your final answer within \\boxed{}."
+chem_competition_hint = 'Answer the following chemistry question. Please reason step by step, and put your final answer within \\boxed{}.'
 
 chem_competition_infer_cfg = dict(
     prompt_template=dict(
@@ -70,10 +70,10 @@ chem_competition_eval_cfg = dict(
             reader_cfg=chem_competition_reader_cfg,
         ),
         judge_cfg=dict(
-            abbr="DeepSeek-V3-0324",
+            abbr='DeepSeek-V3-0324',
             type=OpenAISDK,
-            openai_api_base="your api url",
-            path="your model path/name",
+            openai_api_base='your api url',
+            path='your model path/name',
             key='EMPTY',
             rpm_verbose=True,
             meta_template=api_meta_template,

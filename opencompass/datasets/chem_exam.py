@@ -2,6 +2,7 @@ import json
 import re
 
 from datasets import Dataset
+
 from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
@@ -9,6 +10,7 @@ from .base import BaseDataset
 
 @LOAD_DATASET.register_module()
 class ChemExamDataset(BaseDataset):
+
     @staticmethod
     def load(path: str):
         with open(path, 'r', encoding='utf-8') as f:
@@ -17,15 +19,17 @@ class ChemExamDataset(BaseDataset):
         reformat_data = []
         for line in lines:
             prompt = line['question']
-            output = ""
+            output = ''
             qa_type = []
-            if "sub_question" in line:
+            if 'sub_question' in line:
                 for i, sub_q in enumerate(line['sub_question']):
                     prompt += f"\nQ{i + 1}: {sub_q['question']}"
-                    if "sub_question" in sub_q:
+                    if 'sub_question' in sub_q:
                         for j, sub_sub_q in enumerate(sub_q['sub_question']):
-                            prompt += f"\nQ{i + 1}.{j + 1}: {sub_sub_q['question']}"
-                            output += f"\nA{i + 1}.{j + 1}: {sub_sub_q['answer']}"
+                            prompt += (f'\nQ{i + 1}.{j + 1}: '
+                                       f"{sub_sub_q['question']}")
+                            output += (f'\nA{i + 1}.{j + 1}: '
+                                       f"{sub_sub_q['answer']}")
                             qa_type.append(sub_sub_q['qa_type'])
                     else:
                         output += f"\nA{i + 1}: {sub_q['answer']}"
@@ -51,15 +55,14 @@ def chem_exam_score_llmjudge_postprocess(output, output_path, dataset):
         origin_dataset.append(item)
 
     pattern = re.compile(
-        r'(?:<NUMBER>\s*|\\boxed\{)\s*(-?\d*\.?\d+)\s*(?:</NUMBER>|\})'
-    )
+        r'(?:<NUMBER>\s*|\\boxed\{)\s*(-?\d*\.?\d+)\s*(?:</NUMBER>|\})')
     details = []
     for k, v in output.items():
         idx = int(k)
 
         # Get original item from dataset
         sample = origin_dataset[idx]
-        print(f"Processing item {idx}: {sample}")
+        print(f'Processing item {idx}: {sample}')
 
         # Extract the prediction from the output
         prediction = v['prediction']
@@ -79,7 +82,8 @@ def chem_exam_score_llmjudge_postprocess(output, output_path, dataset):
             'has_img': sample['has_img'],
         })
 
-    final_score = round(100 * sum(item['score'] for item in details) / len(details), 2)
+    final_score = round(
+        100 * sum(item['score'] for item in details) / len(details), 2)
     results = {
         'final_score': final_score,
         'details': details,
