@@ -71,8 +71,8 @@ def mydataset_postprocess(formula_str):
     formula_str = formula_str.replace('×', '*').replace('·',
                                                         '*').replace('÷', '/')
     formula_str = formula_str.replace('−', '-').replace('^', '**')
-    formula_str = formula_str.replace('"', '"').replace('"',
-                                                        '"').replace('"', "'")
+    formula_str = formula_str.replace('\“', '"').replace('\”',
+                                                        '"').replace('’', "'")
 
     formula_str = formula_str.replace('`', '').replace('$', '').strip()
 
