@@ -172,7 +172,7 @@ class SuperGPQAEvaluator(BaseEvaluator):
                     'pred': sample['pred'],
                     'answer': sample['answer'],
                     'parsed_answer': sample['extracted_answer'],
-                    'correct': True if sample['status'] else False,
+                    'correct': True if sample['status'] == 'correct' else False,
                 })
 
         return {
