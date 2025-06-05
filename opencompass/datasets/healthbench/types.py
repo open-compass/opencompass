@@ -1,3 +1,4 @@
+# flake8: noqa
 from dataclasses import dataclass, field
 from typing import Any, Literal, overload
 

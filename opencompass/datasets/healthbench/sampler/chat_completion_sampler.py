@@ -1,3 +1,4 @@
+# flake8: noqa
 import time
 from typing import Any
 
@@ -80,7 +81,7 @@ class ChatCompletionSampler(SamplerBase):
                     response_metadata={'usage': response.usage},
                     actual_queried_message_list=message_list,
                 )
-            # NOTE: BadRequestError is triggered once for MMMU, please uncomment if you are reruning MMMU
+            # NOTE: BadRequestError is triggered once for MMMU, please uncomment if you are rerunning MMMU
             except openai.BadRequestError as e:
                 print('Bad Request Error', e)
                 return SamplerResponse(

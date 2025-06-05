@@ -81,4 +81,4 @@ healthbench_consensus_dataset = dict(
 #     ),
 # )
 
-healthbench_all_datasets = [healthbench_dataset, healthbench_hard_dataset, healthbench_consensus_dataset, ] # healthbench_meta_dataset ]
+healthbench_datasets = [healthbench_dataset, healthbench_hard_dataset, healthbench_consensus_dataset] #, healthbench_meta_dataset ]
