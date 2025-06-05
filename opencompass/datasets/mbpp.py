@@ -387,6 +387,7 @@ class MBPPEvaluator2(MBPPEvaluator):
             text = text[1:]
         return text
 
+
 def _execution(programs, timeout, key):
     try:
         # Add exec globals to prevent the exec to raise
@@ -403,6 +404,7 @@ def _execution(programs, timeout, key):
     except BaseException as e:
         print(e)
         key.append('failed')
+
 
 def execution(programs, task_id, timeout):
     """Execution function for running generation code.
