@@ -15,7 +15,7 @@ RBench_datasets = []
 
 systemp_prompt_en = "Answer the following single choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of Options(e.g. one of ABCDEF). Think step by step before answering."
 
-systemp_prompt_zh = "回答以下单选题。答案的最后一行应采用以下格式：“答案是$LETTER”（不带引号），其中 LETTER 是选项之一（例如 ABCDEF 之一）。回答前请逐步思考。"
+systemp_prompt_zh = '回答以下单选题。答案的最后一行应采用以下格式：“答案是$LETTER”（不带引号），其中 LETTER 是选项之一（例如 ABCDEF 之一）。回答前请逐步思考。'
 
 RBench_infer_en_cfg = dict(
     prompt_template=dict(
