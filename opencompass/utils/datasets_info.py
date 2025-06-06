@@ -471,6 +471,16 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/medbullets/medbullets.csv",
     },
+    "opencompass/Chem_exam_gaokao":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/test_set/gaokao.jsonl"
+    },
+    "opencompass/Chem_exam_competition":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/test_set/icho.jsonl"
+    },
     "opencompass/PHYBench": {
         "ms_id": "",
         "hf_id": "",
