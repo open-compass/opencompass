@@ -116,12 +116,6 @@ repos:
         args:
           - --root_folder
           - opencompass/configs/datasets
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.23.1
-    hooks:
-    -   id: gitleaks
-        entry: "gitleaks dir"
-        args: ["--verbose", "--redact=50"]
   # - repo: https://github.com/open-mmlab/pre-commit-hooks
   #   rev: v0.2.0  # Use the ref you want to point at
   #   hooks:

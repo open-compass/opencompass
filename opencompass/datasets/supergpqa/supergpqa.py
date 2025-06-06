@@ -169,10 +169,14 @@ class SuperGPQAEvaluator(BaseEvaluator):
                 count += 1
                 count_difficulty[difficulty] += 1
                 details.append({
-                    'pred': sample['pred'],
-                    'answer': sample['answer'],
-                    'parsed_answer': sample['extracted_answer'],
-                    'correct': True if sample['status'] else False,
+                    'pred':
+                    sample['pred'],
+                    'answer':
+                    sample['answer'],
+                    'parsed_answer':
+                    sample['extracted_answer'],
+                    'correct':
+                    True if sample['status'] == 'correct' else False,
                 })
 
         return {
