@@ -235,6 +235,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/race",
         "local": "./data/race/",
     },
+    # R-Bench
+    "opencompass/R-Bench": {
+        "ms_id": "R-Bench/R-Bench",
+        "hf_id": "R-Bench/R-Bench",
+        "local": "./data/R-Bench",
+    },
     # SIQA
     "opencompass/siqa": {
         "ms_id": "opencompass/siqa",
