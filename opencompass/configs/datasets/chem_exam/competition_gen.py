@@ -66,34 +66,19 @@ chem_competition_eval_cfg = dict(
         ),
         dataset_cfg=dict(
             type=ChemExamDataset,
-            path='test_set/icho.jsonl',
+            path='opencompass/Chem_exam_competition',
             reader_cfg=chem_competition_reader_cfg,
         ),
-        judge_cfg=dict(
-            abbr='DeepSeek-V3-0324',
-            type=OpenAISDK,
-            openai_api_base='your api url',
-            path='your model path/name',
-            key='EMPTY',
-            rpm_verbose=True,
-            meta_template=api_meta_template,
-            query_per_second=16,
-            max_out_len=16384,
-            max_seq_len=32768,
-            temperature=0.01,
-            batch_size=64,
-            retry=20,
-            mode='rear'
-        ),
+        judge_cfg=dict(),
         dict_postprocessor=dict(type=chem_exam_score_llmjudge_postprocess),
     ),
 )
 
-chem_competition_instruct_dataset = [
+chem_competition_instruct_datasets = [
     dict(
         abbr=f'Chem_exam-competition',
         type=ChemExamDataset,
-        path='test_set/icho.jsonl',
+        path='opencompass/Chem_exam_competition',
         reader_cfg=chem_competition_reader_cfg,
         infer_cfg=chem_competition_infer_cfg,
         eval_cfg=chem_competition_eval_cfg,
