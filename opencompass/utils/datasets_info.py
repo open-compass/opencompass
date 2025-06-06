@@ -744,7 +744,7 @@ DATASETS_URL = {
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/test_generation.zip",
         "md5": "918a6ea2b1eee6f2b1314db3c21cb4c7",
     },
-    "/aime2024": {
+    "/aime.jsonl": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aime.zip",
         "md5": "fbe2d0577fc210962a549f8cea1a00c8",
