@@ -250,14 +250,17 @@ class CascadeEvaluator(BaseEvaluator):
                 llm_details = llm_results['details']
             else:
                 llm_details = llm_results
+            if isinstance(llm_details, dict):
+                llm_details_iter = llm_details.values()
+            else:
+                llm_details_iter = llm_details
 
             # Initialize counters for accuracy calculation
             final_correct = initial_correct if not self.parallel else 0
             llm_correct = 0
             llm_evaluated = 0
-
             # Update the details for samples that were evaluated by LLM
-            for i, llm_detail in enumerate(llm_details.values()):
+            for i, llm_detail in enumerate(llm_details_iter):
                 # Add dataset replica index to LLM evaluation result
                 llm_detail['dataset_replica_idx'] = self.dataset_replica_idx
 
