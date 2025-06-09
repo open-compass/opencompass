@@ -27,10 +27,9 @@ class SamplerBase:
 @dataclass
 class EvalResult:
     """Result of running an evaluation (usually consisting of many samples)"""
-
     score: float | None  # top-line metric
     metrics: dict[str, float] | None  # other metrics
-    htmls: list[str]  # strings of valid HTML
+    htmls: list[str | None]  # strings of valid HTML
     convos: list[MessageList]  # sampled conversations
     metadata: dict[str,
                    Any] | None  # Extra data such as rubric scores or sollen
@@ -39,7 +38,6 @@ class EvalResult:
 @dataclass
 class SingleEvalResult:
     """Result of evaluating a single sample."""
-
     score: float | None
     metrics: dict[str, float] = field(default_factory=dict)
     html: str | None = None

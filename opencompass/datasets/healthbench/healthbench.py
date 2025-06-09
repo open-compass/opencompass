@@ -3,10 +3,12 @@ import json
 import os
 import re
 from collections import defaultdict
-from typing import Literal
+from multiprocessing.pool import ThreadPool
+from typing import Any, Callable, Literal
 
 import numpy as np
 from datasets import load_dataset
+from tqdm import tqdm
 
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
@@ -15,6 +17,23 @@ from ..base import BaseDataset
 from . import common
 from .sampler.chat_completion_sampler import ChatCompletionSampler
 from .types import EvalResult, MessageList, SingleEvalResult
+
+
+def map_with_progress(
+    f: Callable,
+    xs: list[Any],
+    num_threads: int = os.cpu_count() or 10,
+    pbar: bool = True,
+):
+    """Apply f to each element of xs, using a ThreadPool, and show progress."""
+    pbar_fn = tqdm if pbar else lambda x, *args, **kwargs: x
+
+    if os.getenv('debug'):
+        return list(map(f, pbar_fn(xs, total=len(xs))))
+    else:
+        with ThreadPool(min(num_threads, len(xs))) as pool:
+            return list(pbar_fn(pool.imap(f, xs), total=len(xs)))
+
 
 OPENAI_SYSTEM_MESSAGE_API = 'You are a helpful assistant.'
 max_tokens_judge = 2048
@@ -68,11 +87,6 @@ In other words, for criteria with negative points, a good response should be cla
 # Final instruction
 Return just the json object in markdown format. Do not include any other text in the response.
 """.strip()  # noqa: E501
-
-HEALTHBENCH_HTML_JINJA = common.HTML_JINJA.replace(
-    '<p>Correct Answer: {{ correct_answer }}</p>\n',
-    '',
-) + '<p>Rubrics with grades: {{ rubric_grades }}</p>'  # noqa: E305, E501
 
 
 class RubricItem:
@@ -398,25 +412,12 @@ class HealthBenchEvaluator(BaseEvaluator):
                 ))
 
             score = metrics['overall_score']
-
-            # Create HTML for each sample result
-            html = common.jinja_env.from_string(
-                HEALTHBENCH_HTML_JINJA.replace(
-                    '{{ rubric_grades }}',
-                    readable_explanation_str.replace('\n', '<br>'),
-                )).render(
-                    prompt_messages=actual_queried_prompt_messages,
-                    next_message=dict(content=response_text, role='assistant'),
-                    score=metrics['overall_score'],
-                    extracted_answer=response_text,
-                )
-
             convo = actual_queried_prompt_messages + [
                 dict(content=response_text, role='assistant')
             ]
             results.append(
                 SingleEvalResult(
-                    html=html,
+                    html=None,
                     score=score,
                     convo=convo,
                     metrics=metrics,
