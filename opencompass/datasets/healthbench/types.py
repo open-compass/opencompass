@@ -6,7 +6,6 @@ Message = dict[str, Any]  # keys role, content
 MessageList = list[Message]
 
 
-
 @dataclass
 class SamplerResponse:
     """Response from a sampler."""
@@ -14,12 +13,13 @@ class SamplerResponse:
     actual_queried_message_list: MessageList
     response_metadata: dict[str, Any]
 
+
 class SamplerBase:
     """Base class for defining a sampling model, which can be evaluated, or
     used as part of the grading process."""
 
     def __call__(
-        self, 
+        self,
         message_list: MessageList,
     ) -> SamplerResponse:
         raise NotImplementedError
@@ -33,7 +33,8 @@ class EvalResult:
     metrics: dict[str, float] | None  # other metrics
     htmls: list[str]  # strings of valid HTML
     convos: list[MessageList]  # sampled conversations
-    metadata: dict[str, Any] | None  # Extra data such as rubric scores or sollen
+    metadata: dict[str,
+                   Any] | None  # Extra data such as rubric scores or sollen
 
 
 @dataclass
