@@ -20,6 +20,7 @@ from .CARDBiomedBench import CARDBiomedBenchDataset  # noqa: F401
 from .cb import *  # noqa: F401, F403
 from .ceval import *  # noqa: F401, F403
 from .charm import *  # noqa: F401, F403
+from .chem_exam import *  # noqa: F401, F403
 from .chembench import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
 from .chinese_simpleqa import *  # noqa: F401, F403
