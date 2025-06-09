@@ -4,8 +4,6 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 
-
-# Reader configuration
 reader_cfg = dict(
     input_columns=[
         'prompt_trans',
@@ -68,17 +66,5 @@ healthbench_consensus_dataset = dict(
         pred_role='BOT',
     ),
 )
-# healthbench_meta_dataset = dict(
-#     type=HealthBenchDatasetMeta,
-#     abbr='healthbench_meta',
-#     path='huihuixu/healthbench',
-#     subset='meta',
-#     reader_cfg=reader_cfg,
-#     infer_cfg=infer_cfg,
-#     eval_cfg=dict(
-#         evaluator=dict(type=HealthBenchEvaluator, n_repeats=1, n_threads=1, subset_name=''),
-#         pred_role='BOT',
-#     ),
-# )
 
-healthbench_datasets = [healthbench_dataset, healthbench_hard_dataset, healthbench_consensus_dataset] #, healthbench_meta_dataset ]
+healthbench_datasets = [healthbench_dataset, healthbench_hard_dataset, healthbench_consensus_dataset]
