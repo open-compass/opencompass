@@ -1,4 +1,4 @@
-# flake8: noqa
+import os
 import time
 from typing import Any
 
@@ -9,10 +9,8 @@ from ..types import MessageList, SamplerBase, SamplerResponse
 
 OPENAI_SYSTEM_MESSAGE_API = 'You are a helpful assistant.'
 OPENAI_SYSTEM_MESSAGE_CHATGPT = (
-    'You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture.'
+    'You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture.'  # noqa: E501
     + '\nKnowledge cutoff: 2023-12\nCurrent date: 2024-04-01')
-
-import os
 
 
 class ChatCompletionSampler(SamplerBase):
@@ -29,9 +27,7 @@ class ChatCompletionSampler(SamplerBase):
         self.client = OpenAI(
             base_url=os.getenv('OC_JUDGE_API_BASE'),
             api_key=os.getenv('OC_JUDGE_API_KEY'),
-            # OC_JUDGE_MODEL
         )
-        # using api_key=os.environ.get("OPENAI_API_KEY")  # please set your API_KEY
         self.model = model
         self.system_message = system_message
         self.temperature = temperature
@@ -81,7 +77,6 @@ class ChatCompletionSampler(SamplerBase):
                     response_metadata={'usage': response.usage},
                     actual_queried_message_list=message_list,
                 )
-            # NOTE: BadRequestError is triggered once for MMMU, please uncomment if you are rerunning MMMU
             except openai.BadRequestError as e:
                 print('Bad Request Error', e)
                 return SamplerResponse(
@@ -92,9 +87,8 @@ class ChatCompletionSampler(SamplerBase):
             except Exception as e:
                 exception_backoff = 2**trial  # expontial back off
                 print(
-                    f'Rate limit exception so wait and retry {trial} after {exception_backoff} sec',
+                    f'Rate limit exception so wait and retry {trial} after {exception_backoff} sec',  # noqa: E501
                     e,
                 )
                 time.sleep(exception_backoff)
                 trial += 1
-            # unknown error shall throw exception
