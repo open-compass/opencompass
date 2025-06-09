@@ -4,7 +4,6 @@ import itertools
 import json
 import multiprocessing
 import os.path as osp
-import regex as re
 import signal
 import tempfile
 from collections import defaultdict
@@ -13,6 +12,7 @@ from os import environ
 from typing import List, Sequence, Union
 
 import numpy as np
+import regex as re
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
