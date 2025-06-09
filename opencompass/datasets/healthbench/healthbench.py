@@ -14,7 +14,6 @@ from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 
 from ..base import BaseDataset
-from . import common
 from .sampler.chat_completion_sampler import ChatCompletionSampler
 from .types import EvalResult, MessageList, SingleEvalResult
 
@@ -327,7 +326,7 @@ class HealthBenchEvaluator(BaseEvaluator):
                 print('Grading failed due to bad JSON output, retrying...')
             return grading_response_dict
 
-        grading_response_list = common.map_with_progress(
+        grading_response_list = map_with_progress(
             grade_rubric_item,
             rubric_items,
             pbar=False,
