@@ -1,4 +1,4 @@
-from opencompass.datasets import Earth_Silver_MCQDataset, earth_silver_llmjudge_postprocess
+from opencompass.datasets import Earth_Silver_MCQDataset, generic_llmjudge_postprocess
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
@@ -80,10 +80,10 @@ eval_cfg = dict(
             reader_cfg=reader_cfg,
         ),
         judge_cfg=dict(),
-        dict_postprocessor=dict(type=earth_silver_llmjudge_postprocess),
+        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
 )
-earth_silver_mcq = dict(
+earth_silver_mcq_dataset = dict(
     type=Earth_Silver_MCQDataset,
     abbr='earth_silver_mcq',
     path='ai-earth/Earth-Silver',
@@ -94,4 +94,4 @@ earth_silver_mcq = dict(
 
 )
 
-earth_silver_mcqs = [earth_silver_mcq]
+earth_silver_mcq_datasets = [earth_silver_mcq_dataset]
