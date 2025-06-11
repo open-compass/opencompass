@@ -22,12 +22,12 @@ class RJOBRunner(BaseRunner):
 
     Args:
         task (ConfigDict): Task type config.
-        rjob_cfg (ConfigDict): rjob相关配置。
-        max_num_workers (int): 最大并发数。
-        retry (int): 失败重试次数。
-        debug (bool): 是否debug模式。
-        lark_bot_url (str): Lark通知。
-        keep_tmp_file (bool): 是否保留临时文件。
+        rjob_cfg (ConfigDict): rjob related configuration.
+        max_num_workers (int): Maximum number of concurrent workers.
+        retry (int): Number of retries on failure.
+        debug (bool): Whether in debug mode.
+        lark_bot_url (str): Lark notification URL.
+        keep_tmp_file (bool): Whether to keep temporary files.
     """
 
     def __init__(
@@ -46,22 +46,6 @@ class RJOBRunner(BaseRunner):
         self.retry = retry
         self.keep_tmp_file = keep_tmp_file
 
-    # def normalize_task_name(self, name, max_length=60):
-    #     import re
-    #     # 只保留字母、数字、-，其他都替换成 -
-    #     name = re.sub(r'[^a-zA-Z0-9-]', '-', name)
-    #     # 去掉连续的 -
-    #     name = re.sub(r'-+', '-', name)
-    #     # 去掉开头和结尾的 -
-    #     name = name.strip('-')
-    #     # 控制长度
-    #     if len(name) > max_length:
-    #         name = name[:max_length]
-    #     # 保证长度至少为 1
-    #     if not name:
-    #         name = 'task'
-    #     return name.lower()
-
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
         """Launch multiple tasks."""
         if not self.debug:
@@ -76,7 +60,7 @@ class RJOBRunner(BaseRunner):
         return status
 
     def _run_task(self, task_name, log_path, poll_interval=60):
-        """轮询 rjob 状态，直到 active 和 pending 都为 0 时 break。如果没有 dict 行，直接 break。"""
+        """Poll rjob status until both active and pending are 0. Break if no dict line is found."""
         import ast
         logger = get_logger()
         status = None
@@ -116,15 +100,13 @@ class RJOBRunner(BaseRunner):
             random_sleep = self.max_num_workers > 32
         task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
-        # 合法化 task_name
-        # task_name = model_abbr_from_cfg(self.)
-        # task_name = self.normalize_task_name(task.name)
+        # Normalize task name
         import uuid
         task_name = "opencompass-" + str(uuid.uuid4())
         logger = get_logger()
         logger.info(f'Task name: {task_name}')
 
-        # 生成临时参数文件
+        # Generate temporary parameter file
         pwd = os.getcwd()
         mmengine.mkdir_or_exist('tmp/')
 
@@ -133,9 +115,9 @@ class RJOBRunner(BaseRunner):
         try:
             cfg.dump(param_file)
 
-            # 拼接 rjob submit 命令参数
+            # Construct rjob submit command arguments
             args = []
-            # 基本参数
+            # Basic parameters
             args.append(f'--name={task_name}')
             if num_gpus > 0:
                 args.append(f'--gpu={num_gpus}')
@@ -152,7 +134,7 @@ class RJOBRunner(BaseRunner):
             if self.rjob_cfg.get('private_machine'):
                 args.append(f'--private-machine={self.rjob_cfg["private_machine"]}')
             if self.rjob_cfg.get('mount'):
-                # 支持多个 mount
+                # Support multiple mounts
                 mounts = self.rjob_cfg['mount']
                 if isinstance(mounts, str):
                     mounts = [mounts]
@@ -164,7 +146,7 @@ class RJOBRunner(BaseRunner):
                 args.append(f'-P {self.rjob_cfg["replicas"]}')
             if self.rjob_cfg.get('host_network'):
                 args.append(f'--host-network={self.rjob_cfg["host_network"]}')
-            # 环境变量
+            # Environment variables
             envs = self.rjob_cfg.get('env', {})
             if isinstance(envs, dict):
                 for k, v in envs.items():
@@ -172,22 +154,22 @@ class RJOBRunner(BaseRunner):
             elif isinstance(envs, list):
                 for e in envs:
                     args.append(f'-e {e}')
-            # 额外参数
+            # Additional arguments
             if self.rjob_cfg.get('extra_args'):
                 args.extend(self.rjob_cfg['extra_args'])
 
-            # 启动命令通过 task.get_command 得到，兼容 template
+            # Get launch command through task.get_command, compatible with template
             tmpl = '{task_cmd}'
             get_cmd = partial(task.get_command, cfg_path=param_file, template=tmpl)
             entry_cmd = get_cmd()
             entry_cmd = f'bash -c "cd {pwd} && {entry_cmd}"'
-            # 拼接完整命令
+            # Construct complete command
             cmd = f"rjob submit {' '.join(args)} -- {entry_cmd}"
 
             logger = get_logger()
             logger.info(f'Running command: {cmd}')
 
-            # 日志输出
+            # Log output
             if self.debug:
                 out_path = None
             else:
@@ -199,7 +181,7 @@ class RJOBRunner(BaseRunner):
 
             retry = self.retry
             while retry > 0:
-                # 只 submit，不轮询
+                # Only submit, no polling
                 result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
                 logger.info(f'Command output: {result.stdout}')
                 if result.stderr:
@@ -210,10 +192,10 @@ class RJOBRunner(BaseRunner):
                 retry -= 1
                 time.sleep(2)
             if result.returncode != 0:
-                # submit失败，直接返回
+                # Submit failed, return directly
                 return task_name, result.returncode
 
-            # submit成功，进入轮询
+            # Submit successful, start polling
             status = self._run_task(task_name, out_path)
             output_paths = task.get_output_paths()
             returncode = 0 if status == 'FINISHED' else 1
