@@ -18,7 +18,8 @@ from .base import BaseRunner
 
 @RUNNERS.register_module()
 class RJOBRunner(BaseRunner):
-    """Runner for submitting jobs via rjob bash script. Structure similar to DLC/VOLC runners.
+    """Runner for submitting jobs via rjob bash script. Structure similar to
+    DLC/VOLC runners.
 
     Args:
         task (ConfigDict): Task type config.
@@ -60,32 +61,41 @@ class RJOBRunner(BaseRunner):
         return status
 
     def _run_task(self, task_name, log_path, poll_interval=60):
-        """Poll rjob status until both active and pending are 0. Break if no dict line is found."""
+        """Poll rjob status until both active and pending are 0.
+
+        Break if no dict line is found.
+        """
         import ast
         logger = get_logger()
         status = None
         time.sleep(10)
         while True:
-            get_cmd = f"rjob get {task_name}"
-            get_result = subprocess.run(get_cmd, shell=True, text=True, capture_output=True)
+            get_cmd = f'rjob get {task_name}'
+            get_result = subprocess.run(get_cmd,
+                                        shell=True,
+                                        text=True,
+                                        capture_output=True)
             output = get_result.stdout
             if log_path:
                 with open(log_path, 'a', encoding='utf-8') as f:
-                    f.write(f"\n[rjob get] {output}\n")
+                    f.write(f'\n[rjob get] {output}\n')
 
             found_dict = False
             for line in output.splitlines():
                 if '{' in line and '}' in line:
                     try:
-                        d = ast.literal_eval(line[line.index('{'):line.index('}')+1])
+                        d = ast.literal_eval(
+                            line[line.index('{'):line.index('}') + 1])
                         found_dict = True
                         if d.get('active', 0) != 0 or d.get('pending', 0) != 0:
                             break
                         else:
                             status = 'FINISHED'
-                            logger.info(f'[RJOB] Final status returned: {status}')
+                            logger.info(
+                                f'[RJOB] Final status returned: {status}')
                             return status
                     except Exception as e:
+                        logger.error(f'Error parsing rjob output: {e}')
                         pass
             if found_dict:
                 time.sleep(poll_interval)
@@ -102,7 +112,7 @@ class RJOBRunner(BaseRunner):
         num_gpus = task.num_gpus
         # Normalize task name
         import uuid
-        task_name = "opencompass-" + str(uuid.uuid4())
+        task_name = 'opencompass-' + str(uuid.uuid4())
         logger = get_logger()
         logger.info(f'Task name: {task_name}')
 
@@ -130,9 +140,11 @@ class RJOBRunner(BaseRunner):
             elif self.rjob_cfg.get('cpu', 16):
                 args.append(f'--cpu={self.rjob_cfg["cpu"]}')
             if self.rjob_cfg.get('charged_group'):
-                args.append(f'--charged-group={self.rjob_cfg["charged_group"]}')
+                args.append(
+                    f'--charged-group={self.rjob_cfg["charged_group"]}')
             if self.rjob_cfg.get('private_machine'):
-                args.append(f'--private-machine={self.rjob_cfg["private_machine"]}')
+                args.append(
+                    f'--private-machine={self.rjob_cfg["private_machine"]}')
             if self.rjob_cfg.get('mount'):
                 # Support multiple mounts
                 mounts = self.rjob_cfg['mount']
@@ -158,9 +170,12 @@ class RJOBRunner(BaseRunner):
             if self.rjob_cfg.get('extra_args'):
                 args.extend(self.rjob_cfg['extra_args'])
 
-            # Get launch command through task.get_command, compatible with template
+            # Get launch command through task.get_command
+            # compatible with template
             tmpl = '{task_cmd}'
-            get_cmd = partial(task.get_command, cfg_path=param_file, template=tmpl)
+            get_cmd = partial(task.get_command,
+                              cfg_path=param_file,
+                              template=tmpl)
             entry_cmd = get_cmd()
             entry_cmd = f'bash -c "cd {pwd} && {entry_cmd}"'
             # Construct complete command
@@ -182,7 +197,10 @@ class RJOBRunner(BaseRunner):
             retry = self.retry
             while retry > 0:
                 # Only submit, no polling
-                result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+                result = subprocess.run(cmd,
+                                        shell=True,
+                                        text=True,
+                                        capture_output=True)
                 logger.info(f'Command output: {result.stdout}')
                 if result.stderr:
                     logger.error(f'Command error: {result.stderr}')
