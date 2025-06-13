@@ -9,9 +9,9 @@ from .base import BaseDataset
 class RBenchDataset(BaseDataset):
 
     @staticmethod
-    def load_single(subset='en'):
+    def load_single(path, subset='en'):
         raw_data = []
-        ds = load_dataset('R-Bench/R-Bench', f'rbench-t_{subset}')
+        ds = load_dataset(path, f'rbench-t_{subset}')
 
         for data in ds['test']:
             raw_data.append({
@@ -27,8 +27,8 @@ class RBenchDataset(BaseDataset):
         return Dataset.from_list(raw_data)
 
     @staticmethod
-    def load(subset='en', **kwargs):
-        test_dataset = RBenchDataset.load_single(subset=subset)
+    def load(path, subset='en', **kwargs):
+        test_dataset = RBenchDataset.load_single(path=path, subset=subset)
         return test_dataset
 
 

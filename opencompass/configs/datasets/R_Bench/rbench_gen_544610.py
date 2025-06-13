@@ -55,7 +55,7 @@ RBench_datasets.append(
     dict(
         abbr=f'R-Bench_en',
         type=RBenchDataset,
-        path='opencompass/R-Bench',
+        path='R-Bench/R-Bench',
         name='R-Bench',
         subset='en',
         reader_cfg=RBench_reader_cfg,
@@ -67,7 +67,7 @@ RBench_datasets.append(
     dict(
         abbr=f'R-Bench_zh',
         type=RBenchDataset,
-        path='opencompass/R-Bench',
+        path='R-Bench/R-Bench',
         name='R-Bench',
         subset='zh',
         reader_cfg=RBench_reader_cfg,
