@@ -7,14 +7,14 @@ from opencompass.datasets.livemathbench import LiveMathBenchDataset, LiveMathBen
 
 livemathbench_dataset = dict(
     type=LiveMathBenchDataset,
-    path='',
-    k=1,
-    n=1,
-    dataset_splits=['CNMO', 'CCEE', 'AMC', 'WLPMC'],
-    dataset_languages=['cn', 'en'],
+    path='opencompass/LiveMathBench',
+    k=16,
+    n=48,
+    dataset_splits=['all'],
+    dataset_languages=['en'],
     cot=True,
-    version='202412',
-    abbr='LiveMathBench-v202412',
+    version='202505',
+    abbr='LiveMathBench-v202505',
     reader_cfg=dict(
         input_columns=['prompt'], 
         output_column='answer'

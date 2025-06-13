@@ -4,17 +4,16 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 
 from opencompass.datasets.livemathbench import LiveMathBenchDataset, LiveMathBenchEvaluator
 
-
 livemathbench_dataset = dict(
     type=LiveMathBenchDataset,
-    path='',
+    path='opencompass/LiveMathBench',
     k=1,
     n=1,
-    dataset_splits=['CNMO', 'CCEE', 'AMC', 'WLPMC'],
-    dataset_languages=['cn', 'en'],
+    dataset_splits=['hard'],
+    dataset_languages=['en'],
     cot=True,
-    version='202412',
-    abbr='LiveMathBench-v202412',
+    version='202505',
+    abbr='LiveMathBench-v202505-Hard',
     reader_cfg=dict(
         input_columns=['prompt'], 
         output_column='answer'
@@ -30,8 +29,7 @@ livemathbench_dataset = dict(
         ),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(
-            type=GenInferencer, 
-            max_out_len=8192
+            type=GenInferencer
         ),
     ),
     eval_cfg=dict(
