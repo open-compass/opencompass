@@ -32,7 +32,7 @@ on:
         required: true
         description: 'regression functions'
         type: string
-        default: "['chat_models','base_models', 'chat_obj_fullbench', 'base_fullbench']"
+        default: "['chat_models','base_models','chat_obj_fullbench_v5','chat_obj_fullbench_v6','chat_obj_fullbench_v7','base_fullbench']"
       regression_func_local:
         required: true
         description: 'regression functions'
@@ -90,7 +90,7 @@ jobs:
           name: my-artifact-${{ github.run_id }}
 
   build-pypi-lmdeploy:
-    if: ${{!cancelled() && (github.event_name == 'schedule' || inputs.build_lmdeploy)}}
+    if: ${{!cancelled() && (!github.event_name == 'schedule' || inputs.build_lmdeploy)}}
     strategy:
       matrix:
         pyver: [py310]
@@ -189,7 +189,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench","base_fullbench"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench_v5","chat_obj_fullbench_v6","chat_obj_fullbench_v7","base_fullbench"]')}}
     runs-on: volc_cu12_daily
     timeout-minutes: 180 #3hours
     steps:
@@ -310,7 +310,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '["base_objective","chat_objective","chat_subjective","base_long_context","chat_long_context"]')}}
+        function_type: ${{fromJSON(github.event.inputs.fullbench_eval || '[]')}}
     runs-on: volc_cu12
     timeout-minutes: 480 #6hours
     steps:

@@ -99,7 +99,7 @@ class TestBase:
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores_fullbench')
-@pytest.mark.chat_obj_fullbench
+@pytest.mark.chat_obj_fullbench_v5
 class TestChatObjFullbench:
     """Test cases for chat model."""
 
