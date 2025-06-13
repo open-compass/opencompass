@@ -19,41 +19,28 @@ class SRbenchDataset(BaseDataset):
     @staticmethod
     def load(path: str,local_mode=True):
         base_path = get_data_path(path,local_mode=local_mode) 
-        formula_csv_path = os.path.join(base_path, f'FeynmanEquation_23.csv')
-        data_files_base_dir = os.path.join(base_path, 'Feynman_with_units')
-        dataset = load_dataset('csv', data_files=formula_csv_path)['train']
+        formula_data_path=os.path.join(base_path, f'formula_data.json')
+        dataset = load_dataset('json', data_files=formula_data_path)['train']
+
         sample_data=[]
         prompt_1_out=[]
         prompt_2_out=[]
         for row in dataset:
-            true_formula = str(row["Formula"])
-            n_var=int(row["n_variables"])
-            data_filename = str(row['Filename'])
+            data = row['data']
+            rand_idx = np.random.choice(len(data), 300, replace=False)
+            points = np.array(data)[rand_idx]
+            sample_data.append(points.tolist())
+   
+            length_data = points.shape[0]
+            split_idx = int(length_data * 0.97)
 
-            data_file_path = os.path.join(data_files_base_dir, data_filename)
-            full_dataset = np.loadtxt(data_file_path)
-            rand_idx = np.random.choice(full_dataset.shape[0], 100, replace=False)
-            sampled_data_i = full_dataset[rand_idx]
-            if isinstance(sampled_data_i, np.ndarray):
-                sample_data.append(sampled_data_i.tolist())
-            else:
-                sample_data.append(sampled_data_i)
-            # x = dataset[:, :n_var]
-            # y_true = dataset[:, -1]
-            if n_var==2:
-                prompt_1 = '\n'.join([f'x0={x1:.4f}, x1={x2:.4f}, y={y:.4f}' for x1, x2, y in sampled_data_i[:-1]])
-                prompt_2=f'x0={sampled_data_i[-1, 0]:.4f}, x1={sampled_data_i[-1, 1]:.4f}, y={sampled_data_i[-1, 2]:.4f}'
-            else:
-                prompt_1 = '\n'.join([f'x0={x1:.4f}, x1={x2:.4f}, x2={x3:.4f},y={y:.4f}' for x1, x2,x3, y in sampled_data_i[:-1]])
-                prompt_2=f'x0={sampled_data_i[-1, 0]:.4f}, x1={sampled_data_i[-1, 1]:.4f},x3={sampled_data_i[-1, 2]:.4f}, y={sampled_data_i[-1, 3]:.4f}'
-
-
+            prompt_1=change_data_to_prompt(points[:split_idx, :])
+            prompt_2=change_data_to_prompt(points[split_idx:, :])
             prompt_1_out.append(prompt_1)
             prompt_2_out.append(prompt_2)
         dataset=dataset.add_column(name="prompt1",column=prompt_1_out)
         dataset=dataset.add_column(name="prompt2",column=prompt_2_out)
         dataset=dataset.add_column(name="data_samples_list",column=sample_data)
-        dataset = dataset.rename_column('n_variables', 'n_var')
         return dataset
 
 def mydataset_postprocess(formula_str):
@@ -61,37 +48,76 @@ def mydataset_postprocess(formula_str):
     formula_str = formula_str.replace('×', '*').replace('·', '*').replace('÷', '/')
     formula_str = formula_str.replace('−', '-').replace('^', '**')
     formula_str = formula_str.replace('“', '"').replace('”', '"').replace('’', "'")
-
     # 2. 去除 markdown 反引号 ``` 和 $ 符号
     formula_str = formula_str.replace('`', '').replace('$', '').strip()
-
     # 3. 提取第一行公式（防止有多行解释性输出）
     formula_str = formula_str.split('\n')[0].strip()
-
     # 4. 用正则去除非合法字符（保留基本数学表达式）
     formula_str = re.sub(r'[^\w\s\+\-\*/\^\=\.\(\)]', '', formula_str)
-
     # 5. 确保左右去空格
     return formula_str.strip()
+
+def change_data_to_prompt(points):
+    data_prompt = ""
+    for i in range(points.shape[0]):  # TODO 这行要根据变量数量改
+        if points.shape[1] == 2:
+            data_prompt += f"""x0={points[i, 0]:.5f}, y={points[i, 1]:.5f}\n"""
+        elif points.shape[1] == 3:
+            data_prompt += f"""x0={points[i, 0]:.5f}, x1={points[i, 1]:.5f}, y={points[i, 2]:.5f}\n"""
+        elif points.shape[1] == 4:
+            data_prompt += f"""x0={points[i, 0]:.5f}, x1={points[i, 1]:.5f}, x2={points[i, 2]:.5f}, y={points[i, 3]:.5f}\n"""
+        elif points.shape[1] == 5:
+            data_prompt += f"""x0={points[i, 0]:.5f}, x1={points[i, 1]:.5f}, x2={points[i, 2]:.5f}, x3={points[i, 3]:.5f}, y={points[i, 4]:.5f}\n"""
+    return data_prompt
 
 class SRbenchDatasetEvaluator(BaseEvaluator):
     def __init__(self,
             local_mode: bool = True,path=""):
             self.dataset=SRbenchDataset.load(path,local_mode=local_mode)
-    def parse_formula(self,formula_str, n_var=2):
+
+    def parse_formula(self,formula_str: str):
         try:
             if '=' in formula_str:
-                _, expr_str = formula_str.split('=', 1)
+                expr_str = formula_str.split('=', 1)[1].strip()
             else:
-                expr_str = formula_str
-            variables = [sp.Symbol(f'x{i}') for i in range(n_var)]
-            expr = sp.sympify(expr_str)
-            func = sp.lambdify(variables, expr, modules='numpy')
-            return func
+                expr_str = formula_str.strip()
+
+            if not expr_str:
+                print(f"[Parse Error] 公式字符串为空或剥离后为空: '{formula_str}'")
+                return None
+
+            local_dict = {"sin": sp.sin, "cos": sp.cos, "exp": sp.exp, "sqrt": sp.sqrt, "log": sp.log,
+                        "arccos": sp.acos, "arcsin": sp.asin, "tan": sp.tan, "pi": sp.pi}
+            expr = sp.sympify(expr_str, locals=local_dict)
+            # 生成定义域
+            variable_names = sorted([str(sym) for sym in expr.free_symbols])
+            symbols = [sp.Symbol(name) for name in variable_names]
+            for sym in symbols:
+                local_dict[str(sym)] = sym
+            # 转换为 numpy 表达式
+            numpy_modules = ['numpy', {'sqrt': np.sqrt, 'exp': np.exp, 'sin': np.sin, 'cos': np.cos, 'log': np.log,
+                                        'arcsin': np.arcsin, 'arccos': np.arccos, 'tan': np.tan, 'pi': np.pi}]
+            func = sp.lambdify(symbols, expr, modules=numpy_modules)
+            return func, variable_names
+        except (SyntaxError, TypeError, AttributeError, sp.SympifyError) as e:
+            print(f'[Parse Error] 无法解析公式 "{formula_str}": {e}')
+            return None
         except Exception as e:
-            print(f'[Parse Error] {formula_str}\n{e}')
+            print(f'[Parse Error] 解析公式 "{formula_str}" 时发生意外错误: {e}')
             return None
     
+    def generate_samples(self,x0_range=(-10, 10), x1_range=(-10, 10), num_points=1000):
+        """
+        返回在定义域内的样本点 (x0, x1)
+        """
+        x0_range = np.linspace(x0_range[0], x0_range[1], num_points)
+        x1_range = np.linspace(x1_range[0], x1_range[1], num_points)
+        x0, x1 = np.meshgrid(x0_range, x1_range)
+        x0_vals = x0.flatten()
+        x1_vals = x1.flatten()
+        return x0_vals, x1_vals
+
+
     def is_symbolically_equivalent(self,formula1, formula2, n_var=2):
         try:
             x = [sp.Symbol(f'x{i}') for i in range(n_var)]
@@ -104,62 +130,88 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
     
     def score(self, predictions, references) -> dict:
         metrics = {
-        'LLM_Score': None,
-        'RMSE': None,
+        'RMSE': 100000.0,
+        'NMSE': 100000.0,   # 新增：Normalized MSE
         'SymbolicMatch': False,
-        'R2': 0}
+        'R2': -100000.0,}
+
         metrics_out={
-        'LLM_Score': None,
-        'RMSE': None,
-        'Accuray': False,
-        'R2': 0 
-        }
+        "name":"all",
+        "mean_RMSE":0,
+        "mean_NMSE":0,
+        "mean_R2":0,
+        "SymbolicMatch":0,}
+
         result = pd.DataFrame({
             'GT': pd.Series(dtype=str),
             'Pred': pd.Series(dtype=str),
-            'Score': pd.Series(dtype=float),
             'RMSE': pd.Series(dtype=float),
+            'NMSE': pd.Series(dtype=float),
             'R2': pd.Series(dtype=float),
             'SymbolicMatch': pd.Series(dtype=bool)
         })
+
         # 结构评分（用 LLM）
         for row in range(len(references)):
             #metrics['LLM_Score'] = float(self.llm_evaluate(predictions[row], references[row], mllm='gpt-4o'))
-            n_var=self.dataset[row]["n_var"]
-            data_sample=self.dataset[row]["data_samples_list"]
-            data_sample = np.array(data_sample)
-            x=data_sample[:,:n_var]
-            y_true=data_sample[:,-1]
-            func = self.parse_formula(predictions[row], n_var=n_var)
-            if func is not None:
-                x_vars = [x[:, i] for i in range(n_var)]
-                y_pred = func(*x_vars)
-                if np.isscalar(y_pred):
-                    y_pred = np.full_like(y_true, y_pred)
-                metrics['RMSE'] = root_mean_squared_error(y_true, y_pred)
-                metrics['R2'] = r2_score(y_true, y_pred)
-            else:
-                metrics["R2"]=0
-                metrics["RMSE"]= np.inf
-            metrics['SymbolicMatch'] = self.is_symbolically_equivalent(predictions[row], references[row], n_var)
-            result = result._append({
+            dataset=self.dataset
+            data=self.dataset[row]["data_samples_list"]
+            data = np.array(data)
+            func_pred, variable_names = self.parse_formula(predictions[row])
+            func_gt, variable_names = self.parse_formula(references[row])
+            var_num = len(variable_names)
+            x, y_true = data[:, :var_num], data[:, -1]
+
+            if func_pred is not None:
+                try:
+                    x_vars = [x[:, i] for i in range(var_num)]
+                    y_pred = func_pred(*x_vars)
+                    if np.isscalar(y_pred):
+                        y_pred = np.full_like(y_true, y_pred)
+                    
+                    valid_mask = np.isfinite(y_true) & np.isfinite(y_pred)
+                    y_true, y_pred = y_true[valid_mask], y_pred[valid_mask]
+
+                    metrics['RMSE'] = root_mean_squared_error(y_true, y_pred)
+                    metrics['R2'] = r2_score(y_true, y_pred)
+                    metrics['NMSE'] = np.mean((y_true - y_pred) ** 2) / np.var(y_true)
+                except Exception as e:
+                    print(f"Exception: {e}")
+                    try:
+                        x0_vals, x1_vals = self.generate_samples()
+                        gt_vals = func_gt(x0_vals, x1_vals)
+                        pred_vals = func_pred(x0_vals, x1_vals)
+                        valid_mask = np.isfinite(gt_vals) & np.isfinite(pred_vals)
+                        gt_valid = gt_vals[valid_mask]
+                        pred_valid = pred_vals[valid_mask]
+                        metrics['RMSE'] = np.sqrt(np.mean((gt_valid - pred_valid) ** 2))
+                        # 计算 R2 值
+                        metrics['R2'] = 1 - np.sum((gt_valid - pred_valid) ** 2) / np.var(gt_valid)
+                        metrics['NMSE'] = np.mean((gt_valid - pred_valid) ** 2) / np.var(gt_valid)
+                    except Exception as e:
+                        print(e)
+
+            metrics['SymbolicMatch'] = self.is_symbolically_equivalent(predictions[row], references[row], var_num)
+
+            result=result._append({
             'GT': references[row],
             'Pred': predictions[row],
             'RMSE': metrics['RMSE'],
+            'NMSE': metrics['NMSE'],
             'R2': metrics['R2'],
             'SymbolicMatch': bool(metrics['SymbolicMatch'])
         }, ignore_index=True)
 
-        if not result.empty:
-            symbolic_accuracy = result['SymbolicMatch'].sum() / len(result)
-            R2_out = result['R2'].sum() / len(result)
-            RMSE_out = result['RMSE'].sum() / len(result)
+        for i in range(len(result)):
+            metrics_out['mean_RMSE'] += result[i]['RMSE']
+            metrics_out['mean_NMSE'] += result[i]['NMSE']
+            metrics_out['mean_R2'] += result[i]['R2']
+            metrics_out['SymbolicMatch'] += result[i]['SymbolicMatch']
 
-        metrics_out={
-        'RMSE': RMSE_out,
-        'R2': R2_out,
-        "Accuracy":symbolic_accuracy
-        }
+        for key in metrics_out:
+            if key != 'name':
+                metrics_out[key] /= len(result)
 
+        #result = [metrics_out, dict_Nguyen, dict_Constant, dict_Rset, dict_Feynman, dict_Keijzer]
         return metrics_out
 
