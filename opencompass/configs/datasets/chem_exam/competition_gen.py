@@ -40,9 +40,11 @@ Now, please compare the student's answer with the standard answer. Assume the qu
 Evaluation criteria:
 1. Only consider whether the final result of each sub-question matches the standard answer. Equivalent chemical expressions or formats should be accepted.
 2. Do not focus on the student's method, only the correctness of the final result.
-3. If a student's answer is vague, unclear, or appears to be guessed, mark it as incorrect.
+3. If the correct answer is a chemical formula and the student provides a description instead, the description must be specific and fully correspond to the chemical formula. Vague or imprecise descriptions are incorrect.
+4. If a student's answer is vague, unclear, or appears to be guessed, mark it as incorrect.
+5. If a sub-question contains multiple parts or answers, award partial credit based on how many parts of the answer are correct. Each correct part within a sub-question should be given partial credit.
 
-Return a single score: the proportion of correctly answered sub-questions (number of correct answers divided by the total number of sub-questions).
+Return a single score: the proportion of correctly answered sub-questions (number of correct answers (might be float number) divided by the total number of sub-questions).
 
 Format your final answer as: \\boxed{{score}}, where score is a decimal between 0 and 1."""
 
