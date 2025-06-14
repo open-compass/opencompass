@@ -4,7 +4,6 @@ import itertools
 import json
 import multiprocessing
 import os.path as osp
-import re
 import signal
 import tempfile
 from collections import defaultdict
@@ -13,6 +12,7 @@ from os import environ
 from typing import List, Sequence, Union
 
 import numpy as np
+import regex as re
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
@@ -330,7 +330,11 @@ class MBPPEvaluator(BaseEvaluator):
             r"'(.*)'\s*\[DONE\]",
         ]
         for p in patterns:
-            match = re.search(p, text, re.DOTALL)
+            try:
+                match = re.search(p, text, re.DOTALL, timeout=10.0)
+            except TimeoutError:
+                match = None
+
             if match:
                 text = match.group(1)
                 break
@@ -384,6 +388,24 @@ class MBPPEvaluator2(MBPPEvaluator):
         return text
 
 
+def _execution(programs, timeout, key):
+    try:
+        # Add exec globals to prevent the exec to raise
+        # unnecessary NameError for correct answer
+        exec_globals = {}
+        with swallow_io():
+            with time_limit(timeout):
+                exec(programs, exec_globals)
+        key.append('pass')
+    except TimeOutException:
+        key.append('timeout')
+    except AssertionError:
+        key.append('wrong_answer')
+    except BaseException as e:
+        print(e)
+        key.append('failed')
+
+
 def execution(programs, task_id, timeout):
     """Execution function for running generation code.
 
@@ -400,29 +422,12 @@ def execution(programs, task_id, timeout):
     control the process.
     """
 
-    def _execution(programs, timeout):
-        try:
-            # Add exec globals to prevent the exec to raise
-            # unnecessary NameError for correct answer
-            exec_globals = {}
-            with swallow_io():
-                with time_limit(timeout):
-                    exec(programs, exec_globals)
-            key.append('pass')
-        except TimeOutException:
-            key.append('timeout')
-        except AssertionError:
-            key.append('wrong_answer')
-        except BaseException as e:
-            print(e)
-            key.append('failed')
-
     manager = multiprocessing.Manager()
     key = manager.list()
     # `signal` cannot be used in child thread, therefore, we
     # need to create a process in the thread.
     p = multiprocessing.Process(target=_execution,
-                                args=(programs, timeout - 1))
+                                args=(programs, timeout - 1, key))
     p.start()
     p.join(timeout=timeout)
     if p.is_alive():
