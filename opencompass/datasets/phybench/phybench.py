@@ -9,6 +9,7 @@ from opencompass.datasets.phybench.EED import EED
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from opencompass.utils import get_data_path
+from opencompass.datasets.phybench.box_extract import extract_boxed_latex
 
 
 @LOAD_DATASET.register_module()
@@ -34,6 +35,7 @@ class MathEEDEvaluator(BaseEvaluator):
     def score(self, predictions, references):
         scores = []
         for pred, ref in zip(predictions, references):
-            score, _, _, _ = EED(ref, pred)
+            pred_clean = extract_boxed_latex(pred)
+            score, _, _, _ = EED(ref, pred_clean)
             scores.append(score)
         return {'accuracy': sum(scores) / len(scores)}
