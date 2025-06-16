@@ -1,4 +1,5 @@
 from .icl_agent_evaluator import *  # noqa
+from .icl_aider_evaluator import AiderEvaluator  # noqa
 from .icl_aucroc_evaluator import AUCROCEvaluator  # noqa
 from .icl_base_evaluator import BaseEvaluator  # noqa
 from .icl_bpc_evaluator import BPCEvaluator  # noqa
