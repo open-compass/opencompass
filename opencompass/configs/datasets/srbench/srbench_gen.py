@@ -18,6 +18,7 @@ INFER_TEMPLATE = f'''
 
 srbench_reader_cfg = dict(input_columns=['prompt1','prompt2'], output_column='formula')
 
+
 srbench_datasets = []
 
 srbench_infer_cfg = dict(
