@@ -32,7 +32,7 @@ class SRbenchDataset(BaseDataset):
             length_data = points.shape[0]
             split_idx = int(length_data * 0.97)
 
-            prompt_1=change_data_to_prompt(points[:split_idx, :])Add commentMore actions
+            prompt_1=change_data_to_prompt(points[:split_idx, :])
             prompt_2=change_data_to_prompt(points[split_idx:, :])
             prompt_1_out.append(prompt_1)
             prompt_2_out.append(prompt_2)
@@ -209,16 +209,13 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
 
         for i in range(len(result)):
             metrics_out['mean_RMSE'] += result[i]['RMSE']
-            metrics_out['mean_NMSE'] += result[i]['NMSE']Add commentMore actions
+            metrics_out['mean_NMSE'] += result[i]['NMSE']
             metrics_out['mean_R2'] += result[i]['R2']
             metrics_out['SymbolicMatch'] += result[i]['SymbolicMatch']
 
         for key in metrics_out:
             if key != 'name':
                 metrics_out[key] /= len(result)
-
-
-
         #result = [metrics_out, dict_Nguyen, dict_Constant, dict_Rset, dict_Feynman, dict_Keijzer]
         return metrics_out
 
