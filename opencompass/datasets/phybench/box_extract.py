@@ -1,13 +1,11 @@
 def extract_boxed_latex(prediction: str) -> str:
-    """
-    提取 \\boxed{...} 中的表达式（支持嵌套括号）。
-    """
-    start = prediction.find("\\boxed{")
+    """提取 \\boxed{...} 中的表达式（支持嵌套括号）。"""
+    start = prediction.find('\\boxed{')
     if start == -1:
         lines = prediction.strip().split('\n')
         return lines[-1].strip() if lines else prediction.strip()
 
-    idx = start + len("\\boxed{")
+    idx = start + len('\\boxed{')
     brace_count = 1
     content = []
 
