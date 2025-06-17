@@ -173,7 +173,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         input_tokens = [output.input_token_len for output in outputs]
         output_tokens = [output.generate_token_len for output in outputs]
         results = [output.text for output in outputs]
-        self.logger.info(f'duration {duration:.2f}: requests {len(inputs)}, input_tokens {sum(input_tokens)}, '
+        self.logger.info(f'duration {duration:.2f}s, requests {len(inputs)}, input_tokens {sum(input_tokens)}, '
                          f'output_tokens {sum(output_tokens)}')
 
         for s in stop_words:
