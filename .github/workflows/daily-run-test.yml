@@ -38,6 +38,11 @@ on:
         description: 'regression functions'
         type: string
         default: "['cmd', 'api', 'chat_sub_fullbench']"
+      vllm_version:
+        required: true
+        description: 'vllm version'
+        type: string
+        default: "0.8.4"
       fullbench_eval:
         required: true
         description: 'fullbench volc functions'
@@ -155,6 +160,7 @@ jobs:
             conda create -y --name ${{env.CONDA_ENV}} python=3.10
             conda activate ${{env.CONDA_ENV}}
             pip install -r ${{ secrets.WORKSPACE_PREFIX }}/config/requirements.txt --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install vllm==${{env.vllm_version}} --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
