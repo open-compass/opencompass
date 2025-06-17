@@ -449,7 +449,7 @@ DATASETS_MAPPING = {
     "opencompass/srbench": {
         "ms_id": "",
         "hf_id": "",
-        "local": "./data/srbench",
+        "local": "./data/SRBENCH",
     },
     "opencompass/nejmaibench": {
         "ms_id": "",
@@ -838,11 +838,12 @@ DATASETS_URL = {
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ChemBench4K.zip",
         "md5": "fc23fd21b2566a5dbbebfa4601d7779c"
     },
-    "/srbench": {
+    "SRBENCH": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/srbench.zip",
-        "md5": "ab6c5308f7930ac9fbc516ab757feef1"
+        "md5": "384537d681dceb1c76ba52e4004c5714"
     },
+    
     "nejmaibench": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/nejmaibench.zip",
