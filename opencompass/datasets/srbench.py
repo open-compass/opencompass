@@ -201,14 +201,14 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
             data = self.dataset[row]['data_samples_list']
             data = np.array(data)
             parse_result = self.parse_formula(predictions[row])
-            
+
             # Initialize metrics for this prediction
             metrics['RMSE'] = 100000.0
             metrics['NMSE'] = 100000.0
             metrics['R2'] = -100000.0
             metrics['SymbolicMatch'] = False
             is_valid = False
-            
+
             if parse_result is not None:
                 func_pred, variable_names = parse_result
                 func_gt, variable_names = self.parse_formula(references[row])
@@ -225,7 +225,8 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
                         valid_mask = np.isfinite(y_true) & np.isfinite(y_pred)
                         y_true, y_pred = y_true[valid_mask], y_pred[valid_mask]
 
-                        metrics['RMSE'] = root_mean_squared_error(y_true, y_pred)
+                        metrics['RMSE'] = root_mean_squared_error(
+                            y_true, y_pred)
                         metrics['R2'] = r2_score(y_true, y_pred)
                         metrics['NMSE'] = np.mean(
                             (y_true - y_pred)**2) / np.var(y_true)
@@ -271,18 +272,26 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
         valid_count = 0
         for i in range(len(result)):
             metrics_out['details'].append({
-                'index': i,
-                'ground_truth': result.iloc[i]['GT'],
-                'prediction': result.iloc[i]['Pred'],
-                'RMSE': float(result.iloc[i]['RMSE']),
-                'NMSE': float(result.iloc[i]['NMSE']),
-                'R2': float(result.iloc[i]['R2']),
-                'SymbolicMatch': bool(result.iloc[i]['SymbolicMatch']),
-                'is_valid': result.iloc[i]['is_valid']
+                'index':
+                i,
+                'ground_truth':
+                result.iloc[i]['GT'],
+                'prediction':
+                result.iloc[i]['Pred'],
+                'RMSE':
+                float(result.iloc[i]['RMSE']),
+                'NMSE':
+                float(result.iloc[i]['NMSE']),
+                'R2':
+                float(result.iloc[i]['R2']),
+                'SymbolicMatch':
+                bool(result.iloc[i]['SymbolicMatch']),
+                'is_valid':
+                result.iloc[i]['is_valid']
             })
-            
+
             # Only count valid predictions in the final score
-            if result.iloc[i]['is_valid']: 
+            if result.iloc[i]['is_valid']:
                 metrics_out['mean_RMSE'] += result.iloc[i]['RMSE']
                 metrics_out['mean_NMSE'] += result.iloc[i]['NMSE']
                 metrics_out['mean_R2'] += result.iloc[i]['R2']
@@ -292,7 +301,7 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
         # Calculate averages only for valid predictions
         if valid_count > 0:
             for key in metrics_out:
-                if key != 'name' and key != 'details': 
+                if key != 'name' and key != 'details':
                     metrics_out[key] /= valid_count
         else:
             # If no valid predictions, set all metrics to default values
@@ -300,5 +309,5 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
             metrics_out['mean_NMSE'] = 100000.0
             metrics_out['mean_R2'] = -100000.0
             metrics_out['SymbolicMatch'] = 0
-            
+
         return metrics_out
