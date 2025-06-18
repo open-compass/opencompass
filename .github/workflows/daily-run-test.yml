@@ -75,6 +75,9 @@ env:
 jobs:
   build-pypi:
     runs-on: ubuntu-latest
+    env:
+      http_proxy: ''
+      https_proxy: ''
     steps:
       - uses: actions/checkout@v2
         with:
