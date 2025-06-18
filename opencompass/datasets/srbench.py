@@ -192,55 +192,69 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
             'RMSE': pd.Series(dtype=float),
             'NMSE': pd.Series(dtype=float),
             'R2': pd.Series(dtype=float),
-            'SymbolicMatch': pd.Series(dtype=bool)
+            'SymbolicMatch': pd.Series(dtype=bool),
+            'is_valid': pd.Series(dtype=bool)  # Add flag for valid predictions
         })
 
         # 结构评分（用 LLM）
         for row in range(len(references)):
             data = self.dataset[row]['data_samples_list']
             data = np.array(data)
-            func_pred, variable_names = self.parse_formula(predictions[row])
-            func_gt, variable_names = self.parse_formula(references[row])
-            var_num = len(variable_names)
-            x, y_true = data[:, :var_num], data[:, -1]
+            parse_result = self.parse_formula(predictions[row])
+            
+            # Initialize metrics for this prediction
+            metrics['RMSE'] = 100000.0
+            metrics['NMSE'] = 100000.0
+            metrics['R2'] = -100000.0
+            metrics['SymbolicMatch'] = False
+            is_valid = False
+            
+            if parse_result is not None:
+                func_pred, variable_names = parse_result
+                func_gt, variable_names = self.parse_formula(references[row])
+                var_num = len(variable_names)
+                x, y_true = data[:, :var_num], data[:, -1]
 
-            if func_pred is not None:
-                try:
-                    x_vars = [x[:, i] for i in range(var_num)]
-                    y_pred = func_pred(*x_vars)
-                    if np.isscalar(y_pred):
-                        y_pred = np.full_like(y_true, y_pred)
-
-                    valid_mask = np.isfinite(y_true) & np.isfinite(y_pred)
-                    y_true, y_pred = y_true[valid_mask], y_pred[valid_mask]
-
-                    metrics['RMSE'] = root_mean_squared_error(y_true, y_pred)
-                    metrics['R2'] = r2_score(y_true, y_pred)
-                    metrics['NMSE'] = np.mean(
-                        (y_true - y_pred)**2) / np.var(y_true)
-                except Exception as e:
-                    print(f'Exception: {e}')
+                if func_pred is not None:
                     try:
-                        x0_vals, x1_vals = self.generate_samples()
-                        gt_vals = func_gt(x0_vals, x1_vals)
-                        pred_vals = func_pred(x0_vals, x1_vals)
-                        valid_mask = np.isfinite(gt_vals) & np.isfinite(
-                            pred_vals)
-                        gt_valid = gt_vals[valid_mask]
-                        pred_valid = pred_vals[valid_mask]
-                        metrics['RMSE'] = np.sqrt(
-                            np.mean((gt_valid - pred_valid)**2))
-                        # 计算 R2 值
-                        metrics['R2'] = 1 - np.sum(
-                            (gt_valid - pred_valid)**2) / np.var(gt_valid)
+                        x_vars = [x[:, i] for i in range(var_num)]
+                        y_pred = func_pred(*x_vars)
+                        if np.isscalar(y_pred):
+                            y_pred = np.full_like(y_true, y_pred)
+
+                        valid_mask = np.isfinite(y_true) & np.isfinite(y_pred)
+                        y_true, y_pred = y_true[valid_mask], y_pred[valid_mask]
+
+                        metrics['RMSE'] = root_mean_squared_error(y_true, y_pred)
+                        metrics['R2'] = r2_score(y_true, y_pred)
                         metrics['NMSE'] = np.mean(
-                            (gt_valid - pred_valid)**2) / np.var(gt_valid)
+                            (y_true - y_pred)**2) / np.var(y_true)
+                        is_valid = True
                     except Exception as e:
-                        print(e)
+                        print(f'Exception: {e}')
+                        try:
+                            x0_vals, x1_vals = self.generate_samples()
+                            gt_vals = func_gt(x0_vals, x1_vals)
+                            pred_vals = func_pred(x0_vals, x1_vals)
+                            valid_mask = np.isfinite(gt_vals) & np.isfinite(
+                                pred_vals)
+                            gt_valid = gt_vals[valid_mask]
+                            pred_valid = pred_vals[valid_mask]
+                            metrics['RMSE'] = np.sqrt(
+                                np.mean((gt_valid - pred_valid)**2))
+                            # 计算 R2 值
+                            metrics['R2'] = 1 - np.sum(
+                                (gt_valid - pred_valid)**2) / np.var(gt_valid)
+                            metrics['NMSE'] = np.mean(
+                                (gt_valid - pred_valid)**2) / np.var(gt_valid)
+                            is_valid = True
+                        except Exception as e:
+                            print(e)
 
-            metrics['SymbolicMatch'] = self.is_symbolically_equivalent(
-                predictions[row], references[row], var_num)
+                metrics['SymbolicMatch'] = self.is_symbolically_equivalent(
+                    predictions[row], references[row], var_num)
 
+            # Add to result DataFrame regardless of validity
             result = result._append(
                 {
                     'GT': references[row],
@@ -248,34 +262,43 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
                     'RMSE': metrics['RMSE'],
                     'NMSE': metrics['NMSE'],
                     'R2': metrics['R2'],
-                    'SymbolicMatch': bool(metrics['SymbolicMatch'])
+                    'SymbolicMatch': bool(metrics['SymbolicMatch']),
+                    'is_valid': is_valid
                 },
                 ignore_index=True)
 
         # 添加每条数据的详细指标
+        valid_count = 0
         for i in range(len(result)):
             metrics_out['details'].append({
-                'index':
-                i,
-                'ground_truth':
-                result.iloc[i]['GT'],
-                'prediction':
-                result.iloc[i]['Pred'],
-                'RMSE':
-                float(result.iloc[i]['RMSE']),
-                'NMSE':
-                float(result.iloc[i]['NMSE']),
-                'R2':
-                float(result.iloc[i]['R2']),
-                'SymbolicMatch':
-                bool(result.iloc[i]['SymbolicMatch'])
+                'index': i,
+                'ground_truth': result.iloc[i]['GT'],
+                'prediction': result.iloc[i]['Pred'],
+                'RMSE': float(result.iloc[i]['RMSE']),
+                'NMSE': float(result.iloc[i]['NMSE']),
+                'R2': float(result.iloc[i]['R2']),
+                'SymbolicMatch': bool(result.iloc[i]['SymbolicMatch']),
+                'is_valid': result.iloc[i]['is_valid']
             })
-            metrics_out['mean_RMSE'] += result.iloc[i]['RMSE']
-            metrics_out['mean_NMSE'] += result.iloc[i]['NMSE']
-            metrics_out['mean_R2'] += result.iloc[i]['R2']
-            metrics_out['SymbolicMatch'] += result.iloc[i]['SymbolicMatch']
+            
+            # Only count valid predictions in the final score
+            if result.iloc[i]['is_valid']: 
+                metrics_out['mean_RMSE'] += result.iloc[i]['RMSE']
+                metrics_out['mean_NMSE'] += result.iloc[i]['NMSE']
+                metrics_out['mean_R2'] += result.iloc[i]['R2']
+                metrics_out['SymbolicMatch'] += result.iloc[i]['SymbolicMatch']
+                valid_count += 1
 
-        for key in metrics_out:
-            if key != 'name' and key != 'details':  # 排除非数值类型的字段
-                metrics_out[key] /= len(result)
+        # Calculate averages only for valid predictions
+        if valid_count > 0:
+            for key in metrics_out:
+                if key != 'name' and key != 'details': 
+                    metrics_out[key] /= valid_count
+        else:
+            # If no valid predictions, set all metrics to default values
+            metrics_out['mean_RMSE'] = 100000.0
+            metrics_out['mean_NMSE'] = 100000.0
+            metrics_out['mean_R2'] = -100000.0
+            metrics_out['SymbolicMatch'] = 0
+            
         return metrics_out
