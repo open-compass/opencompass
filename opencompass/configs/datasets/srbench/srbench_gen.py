@@ -16,7 +16,8 @@ INFER_TEMPLATE = f'''
             Finally, please output only the formula string you inferred (e.g. y=x_0 * x_1), without any additional information.
         '''
 
-srbench_reader_cfg = dict(input_columns=['prompt1','prompt2'], output_column='Formula')
+srbench_reader_cfg = dict(input_columns=['prompt1','prompt2'], output_column='formula')
+
 
 srbench_datasets = []
 

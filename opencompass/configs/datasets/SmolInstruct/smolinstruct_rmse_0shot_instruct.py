@@ -27,7 +27,10 @@ for _name in name_dict:
     pp_rmse_0shot_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
-            template=f'{_hint}\nQuestion: {{input}}\nAnswer: ',
+            template=dict(round=[
+                dict(role='HUMAN', prompt=f'{_hint}\nQuestion: {{input}}\nAnswer: '),
+                dict(role='BOT', prompt='{output}\n')
+            ]),
             # template=f'<s>[INST] {{input}} [/INST]',
         ),
         retriever=dict(type=ZeroRetriever),
