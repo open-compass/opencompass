@@ -68,7 +68,9 @@ env:
   HF_DATASETS_CACHE:  ${{ secrets.SHARESPACE_PREFIX }}/datasets/hf_datasets_cache
   HF_ENDPOINT: https://hf-mirror.com
   CONDA_ENV: regression_test
-  export VLLM_WORKER_MULTIPROC_METHOD: spawn
+  VLLM_WORKER_MULTIPROC_METHOD: spawn
+  http_proxy: ${{ secrets.PROXY }}
+  https_proxy: ${{ secrets.PROXY }}
 
 jobs:
   build-pypi:
