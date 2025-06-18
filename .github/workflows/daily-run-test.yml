@@ -160,7 +160,7 @@ jobs:
             conda create -y --name ${{env.CONDA_ENV}} python=3.10
             conda activate ${{env.CONDA_ENV}}
             pip install -r ${{ secrets.WORKSPACE_PREFIX }}/config/requirements.txt --cache-dir ${{env.PIP_CACHE_PATH}}
-            pip install vllm==${{env.vllm_version}} --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install vllm==${{github.event.inputs.vllm_version}} --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
