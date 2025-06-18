@@ -17,12 +17,18 @@ with read_base():
         bigcodebench_hard_complete_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bigcodebench.bigcodebench_hard_instruct_gen_c3d5ad import \
         bigcodebench_hard_instruct_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.chem_exam.competition_gen import \
+        chem_competition_instruct_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.chem_exam.gaokao_gen import \
+        chem_gaokao_instruct_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ChemBench.ChemBench_llmjudge_gen_c584cf import \
         chembench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ClimaQA.ClimaQA_Gold_llm_judge_gen_f15343 import \
         climaqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmmlu.cmmlu_llmjudge_gen_e1cd9a import \
         cmmlu_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.Earth_Silver.Earth_Silver_llmjudge_gen import \
+        earth_silver_mcq_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.gpqa.gpqa_cascade_eval_gen_772ea0 import \
         gpqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.HLE.hle_llmverify_gen_6ff468 import \
@@ -61,6 +67,8 @@ with read_base():
         physics_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ProteinLMBench.ProteinLMBench_llmjudge_gen_a67965 import \
         proteinlmbench_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.R_Bench.rbench_llmjudge_gen_c89350 import \
+        RBench_datasets  # noqa: F401, E501
     #     # Academic
     from opencompass.configs.datasets.SmolInstruct.smolinstruct_0shot_instruct_gen import \
         smolinstruct_datasets_0shot_instruct as \
