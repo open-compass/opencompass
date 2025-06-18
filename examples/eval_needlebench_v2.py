@@ -19,7 +19,7 @@ with read_base():
 datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
 
 for m in internlm2_chat_7b:
-    m['max_seq_len'] = 32768 # 保证InternLM2-7B模型能接收到完整的长文本，其他模型需要根据各自支持的最大序列长度修改。
+    m['max_seq_len'] = 32768 # Ensure InternLM2-7B model can receive the full long text; for other models, adjust according to their supported maximum sequence length.
     m['max_out_len'] = 4096
 
 models = internlm2_chat_7b

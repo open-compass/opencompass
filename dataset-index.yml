@@ -165,10 +165,16 @@
     configpath: opencompass/configs/datasets/musr/musr_gen.py
     configpath_llmjudge: opencompass/configs/datasets/musr/musr_llm_judge_gen.py
 - needlebench:
-    name: NeedleBench
+    name: NeedleBench V1 (Deprecated)
     category: Long Context
-    paper: https://arxiv.org/pdf/2407.11963
+    paper: https://arxiv.org/abs/2407.11963v1
     configpath: opencompass/configs/datasets/needlebench
+    configpath_llmjudge: ''
+- needlebench_v2:
+    name: NeedleBench V2
+    category: Long Context
+    paper: https://arxiv.org/abs/2407.11963v2
+    configpath: opencompass/configs/datasets/needlebench_v2
     configpath_llmjudge: ''
 - ruler:
     name: RULER
