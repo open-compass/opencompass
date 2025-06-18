@@ -611,6 +611,12 @@
     paper: https://dl.acm.org/doi/pdf/10.1145/3580305.3599790
     configpath: opencompass/configs/datasets/humanevalx/humanevalx_gen.py
     configpath_llmjudge: ''
+- humaneval_pro:
+    name: HumanEval Pro
+    category: Code
+    paper: https://arxiv.org/abs/2412.21199
+    configpath: opencompass/configs/datasets/humaneval_pro/humaneval_pro_gen.py
+    configpath_llmjudge: ''
 - hungarian_math:
     name: Hungarian_Math
     category: Math
@@ -695,6 +701,12 @@
     paper: ''
     configpath: opencompass/configs/datasets/mbpp_plus/mbpp_plus_gen.py
     configpath_llmjudge: ''
+- mbpp_pro:
+    name: MBPP Pro
+    category: Code
+    paper: https://arxiv.org/abs/2412.21199
+    configpath: opencompass/configs/datasets/mbpp_pro/mbpp_pro_gen.py
+    configpath_llmjudge: ''
 - mgsm:
     name: MGSM
     category: Language / Math
@@ -707,6 +719,12 @@
     paper: https://arxiv.org/pdf/2009.03300
     configpath: opencompass/configs/datasets/mmlu/mmlu_gen.py
     configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
+- SciEval:
+    name: SciEval
+    category: Understanding
+    paper: https://arxiv.org/pdf/2308.13149
+    configpath: opencompass/configs/datasets/SciEval/SciEval_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/SciEval/SciEval_llm_judge_gen.py
 - mmlu_cf:
     name: MMLU-CF
     category: Understanding
@@ -1065,6 +1083,12 @@
     paper: https://arxiv.org/pdf/2402.09391
     configpath: opencompass/configs/datasets/SmolInstruct/smolinstruct_gen.py
     configpath_llmjudge: ''
+- SciKnowEval:
+    name: SciKnowEval
+    category: Science
+    paper: https://arxiv.org/abs/2406.09098
+    configpath: opencompass/configs/datasets/SciKnowEval/SciKnowEval_gen_ebe47d.py
+    configpath_llmjudge: opencompass/configs/datasets/SciKnowEval/SciKnowEval_llmjudge_gen_ebe47d.py
 - internsandbox:
     name: InternSandbox
     category: Reasoning/Code/Agent
@@ -1077,3 +1101,15 @@
     paper: https://arxiv.org/pdf/2308.04709
     configpath: opencompass/configs/datasets/nejm_ai_benchmark/nejmaibench_gen.py
     configpath_llmjudge: opencompass/configs/datasets/nejm_ai_benchmark/nejmaibench_llmjudge_gen.py
+- medbullets:
+    name: Medbullets
+    category: Science /Medicine
+    paper: https://arxiv.org/pdf/2402.18060
+    configpath: opencompass/configs/datasets/Medbullets/medbullets_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/Medbullets/medbullets_llmjudge_gen.py
+- medmcqa:
+    name: medmcqa
+    category: Science /Medicine
+    paper: https://arxiv.org/pdf/2203.14371
+    configpath: opencompass/configs/datasets/medmcqa/medmcqa_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/medmcqa/medmcqa_llmjudge_gen.py
