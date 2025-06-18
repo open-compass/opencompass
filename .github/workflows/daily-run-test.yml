@@ -69,8 +69,6 @@ env:
   HF_ENDPOINT: https://hf-mirror.com
   CONDA_ENV: regression_test
   VLLM_WORKER_MULTIPROC_METHOD: spawn
-  http_proxy: ${{ secrets.PROXY }}
-  https_proxy: ${{ secrets.PROXY }}
 
 jobs:
   build-pypi:
