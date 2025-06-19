@@ -16,37 +16,11 @@
 
 - **祖先追溯挑战(Ancestral Trace Challenge, ATC)**：通过设计“亲属关系针”，测试LLM处理真实长文本中多层逻辑挑战的能力。在ATC任务中，通过一系列逻辑推理问题，检验模型对长文本中每个细节的记忆和分析能力，在此任务中，我们去掉了无关文本(Haystack)的设定，而是将所有文本设计为关键信息，LLM必须综合运用长文本中的所有内容和推理才能准确回答问题。
 
-### 评估步骤
+> **补充说明**：目前NeedleBench（v2）在数据集构建和任务细节等方面做了一些小的优化和调整。如果您想了解新旧版本的具体差异和详细更新内容，请参考 [opencompass/configs/datasets/needlebench_v2/readme.md](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/needlebench_v2/readme.md)。
 
-> 注意：在最新代码中，OpenCompass已经设置数据集从[Huggingface的接口](https://huggingface.co/datasets/opencompass/NeedleBench)中自动加载，可以直接跳过下面的手动下载安放数据集。
+## 评估步骤
 
-1. 从[这里](https://github.com/open-compass/opencompass/files/14741330/needlebench.zip)下载数据集。
-
-2. 将下载的文件放置于`opencompass/data/needlebench/`目录下。`needlebench`目录中预期的文件结构如下所示：
-
-```
-opencompass/
-├── configs
-├── docs
-├── data
-│   └── needlebench
-│       ├── multi_needle_reasoning_en.json
-│       ├── multi_needle_reasoning_zh.json
-│       ├── names.json
-│       ├── needles.jsonl
-│       ├── PaulGrahamEssays.jsonl
-│       ├── zh_finance.jsonl
-│       ├── zh_game.jsonl
-│       ├── zh_government.jsonl
-│       ├── zh_movie.jsonl
-│       ├── zh_tech.jsonl
-│       ├── zh_general.jsonl
-├── LICENSE
-├── opencompass
-├── outputs
-├── run.py
-├── more...
-```
+> 注意：在最新的OpenCompass代码中，NeedleBench数据集会自动从[Huggingface接口](https://huggingface.co/datasets/opencompass/NeedleBench)加载，无需手动下载或配置数据集，您可以直接运行评测命令。
 
 ### `OpenCompass`环境配置
 
@@ -60,13 +34,13 @@ pip install -e .
 
 ### 配置数据集
 
-我们在`configs/datasets/needlebench`中已经预先配置好了关于常见长度区间(4k, 8k, 32k, 128k, 200k, 1000k)的长文本测试设定，您可以通过在配置文件中定义相关参数，以灵活地创建适合您需求的数据集。
+我们在`opencompass/configs/datasets/needlebench_v2`中已经预先配置好了关于常见长度区间(4k, 8k, 32k, 128k, 200k, 1000k)的长文本测试设定，您可以通过在配置文件中定义相关参数，以灵活地创建适合您需求的数据集。
 
 ### 评估示例
 
-#### 使用`LMDeploy`部署的 `InternLM2-7B` 模型进行评估
+#### 使用`VLLM`部署的 `Qwen2-5-7B` 模型进行评估
 
-例如，使用`LMDeploy`部署的 `InternLM2-7B` 模型进行评估NeedleBench-4K的所有任务，可以在命令行中直接使用以下命令，该命令会调用预定义好的模型、数据集配置文件，而无需额外书写配置文件：
+例如，使用`VLLM`部署的 `Qwen2-5-7B` 模型进行评估NeedleBench-128K的所有任务，可以在命令行中直接使用以下命令，该命令会调用预定义好的模型、数据集配置文件，而无需额外书写配置文件：
 
 ##### 本地评估
 
@@ -74,7 +48,7 @@ pip install -e .
 
 ```bash
 # 本地评估
-python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer
+python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer
 ```
 
 ##### 在Slurm集群上评估
@@ -83,70 +57,42 @@ python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --su
 
 ```bash
 # Slurm评估
-python run.py --dataset needlebench_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 ##### 只评估子数据集
 
-如果只想测试原始的大海捞针任务设定，比如可以更换数据集的参数为`needlebench_single_4k`，这对应于4k长度下的单针版本的大海捞针测试：
+如果只想测试原始的大海捞针任务设定，比如可以更换数据集的参数为`needlebench_single_128k`，这对应于128k长度下的单针版本的大海捞针测试：
 
 ```bash
-python run.py --dataset needlebench_single_4k --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_4k/needlebench_zh_datasets`，仅仅进行中文版本的单针4K长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`configs/datasets/needlebench/needlebench_4k/needlebench_single_4k.py`中找到可选的子数据集变量，如：
+您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_128k/needlebench_zh_datasets`，仅仅进行中文版本的单针128k长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`opencompass/configs/datasets/needlebench_v2/needlebench_v2_128k/needlebench_v2_single_128k.py`中找到可选的子数据集变量，如：
 
 ```bash
-python run.py --dataset needlebench_single_4k/needlebench_zh_datasets --models lmdeploy_internlm2_chat_7b  --summarizer needlebench/needlebench_4k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --dataset needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-注意在评估前预先安装[LMDeploy](https://github.com/InternLM/lmdeploy)工具
+注意在评估前预先安装[VLLM](https://docs.vllm.ai/en/latest/getting_started/installation/gpu.html)工具
 
 ```bash
-pip install lmdeploy
+# Install vLLM with CUDA 12.4.
+# For other CUDA versions, please refer to the [official documentation](https://docs.vllm.ai/en/latest/getting_started/installation/gpu.html)
+pip install vllm 
+
 ```
 
-这个命令将启动评估流程，参数 `-p partition_name -q auto` 和 `--max-num-workers 32` 用于指定 Slurm 分区名称和最大工作进程数。
+这个命令将启动评估流程，其中参数 `-p partition_name` 用于指定 Slurm 分区名称，`-q auto` 用于指定 quota type（资源队列类型，例如 auto、reserved 等），`--max-num-workers 32` 用于设置最大工作进程数。
 
 #### 评估其他`Huggingface`模型
 
-对于其他模型，我们建议额外书写一个运行的配置文件以便对模型的`max_seq_len`, `max_out_len`参数进行修改，以便模型可以接收到完整的长文本内容。如我们预先写好的`configs/eval_needlebench.py`文件。完整内容如下
-
-```python
-from mmengine.config import read_base
-# 我们使用mmengine.config来import其他的配置文件中的变量
-
-with read_base():
-    # from .models.hf_internlm.lmdeploy_internlm2_chat_7b import models as internlm2_chat_7b_200k
-    from .models.hf_internlm.hf_internlm2_chat_7b import models as internlm2_chat_7b
-
-    # Evaluate needlebench_4k, adjust the configuration to use 8k, 32k, 128k, 200k, or 1000k if necessary.
-    # from .datasets.needlebench.needlebench_4k.needlebench_4k import needlebench_datasets
-    # from .summarizers.needlebench import needlebench_4k_summarizer as summarizer
-
-    # only eval original "needle in a haystack test" in needlebench_4k
-    from .datasets.needlebench.needlebench_4k.needlebench_single_4k import needlebench_zh_datasets, needlebench_en_datasets
-    from .summarizers.needlebench import needlebench_4k_summarizer as summarizer
-
-    # eval Ancestral Tracing Challenge(ATC)
-    # from .datasets.needlebench.atc.atc_choice_50 import needlebench_datasets
-    # from .summarizers.needlebench import atc_summarizer_50 as summarizer
-
-datasets = sum([v for k, v in locals().items() if ('datasets' in k)], [])
-
-for m in internlm2_chat_7b:
-    m['max_seq_len'] = 30768 # 保证InternLM2-7B模型能接收到完整的长文本，其他模型需要根据各自支持的最大序列长度修改。
-    m['max_out_len'] = 2000 # 保证在多针召回任务中能接收到模型完整的回答
-
-models = internlm2_chat_7b
-
-work_dir = './outputs/needlebench'
-```
+对于其他模型，我们建议额外书写一个运行的配置文件以便对模型的`max_seq_len`, `max_out_len`参数进行修改，以便模型可以接收到完整的长文本内容。如`examples/eval_needlebench_v2.py`文件。
 
 当书写好测试的`config`文件后，我们可以命令行中通过`run.py`文件传入对应的config文件路径，例如：
 
 ```bash
-python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py configs/eval_needlebench_v2.py  --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 注意，此时我们不需传入`--dataset, --models, --summarizer `等参数，因为我们已经在config文件中定义了这些配置。你可以自己手动调节`--max-num-workers`的设定以调节并行工作的workers的数量。
@@ -155,18 +101,20 @@ python run.py configs/eval_needlebench.py  --slurm -p partition_name -q reserved
 
 我们已经在最新的代码中将结果可视化内置到`summarizer`实现中，您在对应的output文件夹的plots目录下可以看到相应的可视化。而不需要自己手动可视化各个深度和长度下的分数。
 
+### 引用
+
 如果使用了该方法，请添加引用:
 
 ```bibtex
 
-@misc{li2024needlebenchllmsretrievalreasoning,
-      title={NeedleBench: Can LLMs Do Retrieval and Reasoning in 1 Million Context Window?},
-      author={Mo Li and Songyang Zhang and Yunxin Liu and Kai Chen},
-      year={2024},
+@misc{li2025needlebenchllmsretrievalreasoning,
+      title={NeedleBench: Can LLMs Do Retrieval and Reasoning in Information-Dense Context?}, 
+      author={Mo Li and Songyang Zhang and Taolin Zhang and Haodong Duan and Yunxin Liu and Kai Chen},
+      year={2025},
       eprint={2407.11963},
       archivePrefix={arXiv},
       primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2407.11963},
+      url={https://arxiv.org/abs/2407.11963}, 
 }
 
 @misc{2023opencompass,

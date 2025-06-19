@@ -35,7 +35,10 @@ for _name in pp_acc_hint_dict:
     pp_acc_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
-            template=f'{_hint}\nQuestion: {{input}}\nAnswer: ',
+            template=dict(round=[
+                dict(role='HUMAN', prompt=f'{_hint}\nQuestion: {{input}}\nAnswer: '),
+                dict(role='BOT', prompt='{output}\n')
+            ]),
             # template=f'<s>[INST] {{input}} [/INST]',
         ),
         retriever=dict(type=ZeroRetriever),
