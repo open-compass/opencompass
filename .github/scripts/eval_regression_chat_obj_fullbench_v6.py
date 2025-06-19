@@ -86,3 +86,12 @@ summary_groups.append(
         'name': 'Mathbench',
         'subsets': ['mathbench-a (average)', 'mathbench-t (average)'],
     }, )
+
+models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
+for m in models:
+    m['abbr'] = m['abbr'] + '_fullbench'
+    if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
+        m['engine_config']['max_batch_size'] = 1
+        m['batch_size'] = 1
+
+models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
