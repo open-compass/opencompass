@@ -59,6 +59,11 @@ with read_base():
         summarizer as musr_summarizer
     from opencompass.configs.summarizers.mmmlu_lite import \
         mmmlu_summary_groups  # noqa: F401, E501
+    
+    from opencompass.configs.models.hf_internlm.hf_internlm3_8b_instruct import \
+        models as hf_internlm3_8b_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import \
+        models as lmdeploy_internlm3_8b_instruct_model  # noqa: F401, E501
 
     from ...volc import infer as volc_infer  # noqa: F401, E501
 
