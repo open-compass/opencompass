@@ -150,6 +150,13 @@ def get_config_from_arg(args) -> Config:
             dataset['meta_path'] = args.custom_dataset_meta_path
         dataset = make_custom_dataset_config(dataset)
         datasets.append(dataset)
+    ## apply the dataset repeat runs
+    if len(datasets) > 0 and args.dataset_num_runs > 1:
+        logger.warning(f'User has set the --dataset-num-runs, the datasets will be evaluated with {args.dataset_num_runs} runs.')
+        for _dataset in datasets:
+            logger.warning(f"The default num runs of {_dataset['abbr']} is: {_dataset['n']}, changed into: {args.dataset_num_runs}")
+            _dataset['n'] = args.dataset_num_runs
+            _dataset['k'] = args.dataset_num_runs
 
     # parse model args
     if not args.models and not args.hf_path:
@@ -204,7 +211,6 @@ def get_config_from_arg(args) -> Config:
     summarizers_dir = [
         os.path.join(args.config_dir, 'summarizers'),
         os.path.join(default_configs_dir, './summarizers'),
-
     ]
 
     # Check if summarizer_arg contains '/'
@@ -308,7 +314,7 @@ def change_accelerator(models, accelerator):
                     model_kwargs=model_kwargs,
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
-                    batch_size=16,
+                    batch_size=model.get('batch_size', 16),
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
@@ -335,7 +341,7 @@ def change_accelerator(models, accelerator):
                     gen_config=gen_config,
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
-                    batch_size=16,
+                    batch_size=model.get('batch_size', 16),
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )

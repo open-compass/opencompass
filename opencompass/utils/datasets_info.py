@@ -446,7 +446,46 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/ChemBench4K",
     },
-
+    "opencompass/srbench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SRBENCH",
+    },
+    "opencompass/nejmaibench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/nejmaibench/NEJM_All_Questions_And_Answers.csv",
+    },
+    "opencompass/humaneval_pro": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/humaneval_pro/humaneval_pro.json",
+    },
+    "opencompass/mbpp_pro": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/mbpp_pro/mbpp_pro.json",
+    },
+    "opencompass/medbullets": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/medbullets/medbullets.csv",
+    },
+    "opencompass/Chem_exam_gaokao":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/test_set/gaokao.jsonl"
+    },
+    "opencompass/Chem_exam_competition":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/test_set/icho.jsonl"
+    },
+    "opencompass/PHYBench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/phybench",
+    },
 }
 
 DATASETS_URL = {
@@ -715,7 +754,7 @@ DATASETS_URL = {
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/test_generation.zip",
         "md5": "918a6ea2b1eee6f2b1314db3c21cb4c7",
     },
-    "/aime2024": {
+    "/aime.jsonl": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aime.zip",
         "md5": "fbe2d0577fc210962a549f8cea1a00c8",
@@ -798,6 +837,32 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ChemBench4K.zip",
         "md5": "fc23fd21b2566a5dbbebfa4601d7779c"
-    }
+    },
+    "SRBENCH": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/srbench.zip",
+        "md5": "384537d681dceb1c76ba52e4004c5714"
+    },
     
+    "nejmaibench": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/nejmaibench.zip",
+        "md5": "e6082cae3596b3ebea73e23ba445b99e"
+    },
+    "humaneval_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/humaneval_pro.zip",
+        "md5": "4c6fe556e84e905e4f0902d699e46de5",
+    },
+    "mbpp_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_pro.zip",
+        "md5": "eac330b8a0a8687f006265c9383503ce",
+    },
+    "medbullets": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/medbullets.zip",
+        "md5": "b63130999c1f28d57acba1c7852639f8",
+    },
+    "/phybench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/phybench.zip",
+        "md5": "a4209b820f6384f69ec88fa816db9e4b",
+    },
 }

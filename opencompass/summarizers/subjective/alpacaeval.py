@@ -19,7 +19,8 @@ from .utils import get_judgeanswer_and_reference, get_outdir
 
 
 def post_process_alpacav1(completion: str):
-    r"""Parse a completion that contains a list of dictionary and returns the rank of the model1.
+    r"""Parse a completion that contains a list of dictionary and returns the
+    rank of the model1.
 
     Examples
     --------
@@ -47,7 +48,8 @@ def post_process_alpacav1(completion: str):
 
 
 def post_process_alpacav2(completion: str):
-    r"""Parse a completion that contains 'm' or 'M' and returns the rank of the model1.
+    r"""Parse a completion that contains 'm' or 'M' and returns the rank of the
+    model1.
 
     Examples
     --------

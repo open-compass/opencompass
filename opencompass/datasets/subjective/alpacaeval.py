@@ -42,7 +42,8 @@ class AlpacaEvalDataset(BaseDataset):
 
 
 def post_process_alpacav2(completion: str):
-    r"""Parse a completion that contains 'm' or 'M' and returns the rank of the model1.
+    r"""Parse a completion that contains 'm' or 'M' and returns the rank of the
+    model1.
 
     Examples
     --------

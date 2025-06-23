@@ -358,7 +358,7 @@ class InternTrain(BaseModel):
         output_text = self.batch_decode(
             outputs,
             eos_token_ids=self.generator.eos_token_id,
-            stopping_criteria=stopping_criteria)
+            stopping_criteria=stopping_criteria)  # gitleaks:allow
 
         return output_text
 

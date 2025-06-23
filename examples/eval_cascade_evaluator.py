@@ -7,9 +7,12 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.evaluator import GenericLLMEvaluator, CascadeEvaluator
+from opencompass.evaluator import (
+    GenericLLMEvaluator,
+    CascadeEvaluator,
+    MATHVerifyEvaluator,
+)
 from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.openicl.icl_evaluator import MATHEvaluator
 from opencompass.datasets import (
     MATHDataset,
     math_postprocess_v2,
@@ -94,7 +97,7 @@ llm_judge_evaluator =   dict(
         judge_cfg=dict(),
     )
 
-rule_evaluator =dict(type=MATHEvaluator)
+rule_evaluator =dict(type=MATHVerifyEvaluator)
 cascade_evaluator = dict(type=CascadeEvaluator,
                    llm_evaluator=llm_judge_evaluator,
                    rule_evaluator=rule_evaluator,
