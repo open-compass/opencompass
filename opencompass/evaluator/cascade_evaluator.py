@@ -110,6 +110,9 @@ class CascadeEvaluator(BaseEvaluator):
         if 'prediction' in llm_detail:
             response = llm_detail['prediction'].strip().upper()
             return response == 'A' or response.startswith('CORRECT')
+        elif 'llm_judge' in llm_detail:
+            response = llm_detail['llm_judge'].strip().upper()
+            return response == 'A' or response.startswith('CORRECT')
         elif 'correct' in llm_detail:
             return llm_detail['correct']
         elif 'score' in llm_detail:
