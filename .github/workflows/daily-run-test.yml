@@ -32,7 +32,7 @@ on:
         required: true
         description: 'regression functions'
         type: string
-        default: "['chat_models','base_models','chat_obj_fullbench_v5','chat_obj_fullbench_v6','chat_obj_fullbench_v7','base_fullbench']"
+        default: "['chat_models','base_models','chat_obj_fullbench_v5','chat_obj_fullbench_v6','chat_obj_fullbench_v7','base_fullbench','base_longtext_fullbench','chat_longtext_fullbench']"
       regression_func_local:
         required: true
         description: 'regression functions'
@@ -199,7 +199,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench_v5","chat_obj_fullbench_v6","chat_obj_fullbench_v7","base_fullbench"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench_v5","chat_obj_fullbench_v6","chat_obj_fullbench_v7","base_fullbench","base_longtext_fullbench","chat_longtext_fullbench"]')}}
     runs-on: volc_cu12_daily
     timeout-minutes: 180 #3hours
     steps:

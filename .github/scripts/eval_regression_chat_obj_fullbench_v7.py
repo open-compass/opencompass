@@ -101,7 +101,6 @@ with read_base():
     from opencompass.configs.summarizers.groups.supergpqa import \
         supergpqa_summary_groups  # noqa: F401, E501
 
-    from ...volc import eval  # noqa: F401, E501
     from ...volc import infer  # noqa: F401, E501
 
 # Add lattest LCB version
