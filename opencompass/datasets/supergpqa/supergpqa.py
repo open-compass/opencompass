@@ -286,7 +286,7 @@ def supergpqa_llmjudge_postprocess(
                 'question': sample['question'],
                 'options': sample['options'],
                 'origin_prompt': v['origin_prompt'],
-                'prediction': processed_judge, # llm_judge
+                'prediction': processed_judge,  # llm_judge
                 'gold': gold,
                 'is_correct': is_correct,
                 'discipline': discipline,
