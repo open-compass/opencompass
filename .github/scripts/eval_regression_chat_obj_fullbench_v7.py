@@ -1,5 +1,3 @@
-import copy
-
 from mmengine.config import read_base
 
 with read_base():
@@ -104,19 +102,12 @@ with read_base():
     from ...volc import infer  # noqa: F401, E501
 
 # Add lattest LCB version
-LCBCodeGeneration_v6_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
+LCBCodeGeneration_v6_datasets = LCBCodeGeneration_dataset
 LCBCodeGeneration_v6_datasets['abbr'] = 'lcb_code_generation_v6'
 LCBCodeGeneration_v6_datasets['release_version'] = 'v6'
 LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
     'release_version'] = 'v6'
 LCBCodeGeneration_v6_datasets = [LCBCodeGeneration_v6_datasets]
-
-LCBCodeGeneration_v5_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
-LCBCodeGeneration_v5_datasets['abbr'] = 'lcb_code_generation_v5'
-LCBCodeGeneration_v5_datasets['release_version'] = 'v5'
-LCBCodeGeneration_v5_datasets['eval_cfg']['evaluator'][
-    'release_version'] = 'v5'
-LCBCodeGeneration_v5_datasets = [LCBCodeGeneration_v5_datasets]
 
 repeated_info = [
     (math_datasets, 4),
