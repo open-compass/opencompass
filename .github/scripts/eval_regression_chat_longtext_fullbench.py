@@ -21,7 +21,7 @@ with read_base():
     from opencompass.configs.summarizers.needlebench import \
         needlebench_128k_summarizer  # noqa: F401, E501
 
-    from ...volc import infer as volc_infer  # noqa: F401, E501
+    from ...volc import infer  # noqa: F401, E501
 
 needlebench_128k_summary_groups = needlebench_128k_summarizer['summary_groups']
 summary_groups = sum(

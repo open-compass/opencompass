@@ -16,7 +16,7 @@ with read_base():
         needlebench_internal_32k_summarizer,
         needlebench_internal_100k_summarizer)
 
-    from ...volc import infer as volc_infer  # noqa: F401, E501
+    from ...volc import infer  # noqa: F401, E501
 
 needlebench_internal_32k_summary_groups = needlebench_internal_32k_summarizer[
     'summary_groups']
