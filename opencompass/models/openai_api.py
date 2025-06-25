@@ -704,6 +704,12 @@ class OpenAISDK(OpenAI):
                             'and stop reason is <stop>, '
                             'the input query is: %s', query_data)
                         return ''
+                    if responses.choices[0].finish_reason == 'content_filter':
+                        self.logger.info(
+                            'The answer for this question is filted,'
+                            'the stop reason is <content_filter>, '
+                            'the input query is: %s', query_data)
+                        return ''
                     self.logger.error(
                         'Failed to extract content from the responses. '
                         'Please check the API response for detail information.'
