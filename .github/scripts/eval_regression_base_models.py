@@ -102,7 +102,7 @@ with read_base():
     from opencompass.configs.models.yi.lmdeploy_yi_1_5_9b import \
         models as lmdeploy_yi_1_5_9b_model  # noqa: F401, E501
 
-    from ...volc import infer as volc_infer  # noqa: F401, E501
+    from ...volc import infer  # noqa: F401, E501
 
 race_datasets = [race_datasets[1]]
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])

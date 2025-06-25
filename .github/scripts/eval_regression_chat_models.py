@@ -155,7 +155,7 @@ with read_base():
     from opencompass.configs.models.yi.lmdeploy_yi_1_5_34b_chat import \
         models as lmdeploy_yi_1_5_34b_chat_model  # noqa: F401, E501
 
-    from ...volc import infer as volc_infer  # noqa: F401, E501
+    from ...volc import infer  # noqa: F401, E501
 
 hf_glm4_9b_chat_model[0]['path'] = 'THUDM/glm-4-9b-chat-hf'
 
