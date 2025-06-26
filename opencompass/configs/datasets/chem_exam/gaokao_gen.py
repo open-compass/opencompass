@@ -16,7 +16,14 @@ chem_gaokao_hint = 'Answer the following chemistry question. Please reason step 
 chem_gaokao_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=f'{chem_gaokao_hint}\n\nQuestion: {{prompt}}\nAnswer: ',
+        template=dict(
+            round=[
+                dict(
+                    role='HUMAN',
+                    prompt=f'{chem_gaokao_hint}\n\nQuestion: {{prompt}}\nAnswer: ',
+                ),
+            ],
+        ),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
