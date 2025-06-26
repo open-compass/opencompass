@@ -42,6 +42,8 @@ with read_base():
         models as hf_internlm3_8b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import \
         models as lmdeploy_internlm3_8b_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_32b_instruct import \
+        models as lmdeploy_qwen2_5_32b_instruct  # noqa: F401, E501
     # Summary Groups
     from opencompass.configs.summarizers.groups.bbeh import \
         bbeh_summary_groups  # noqa: F401, E501
@@ -67,14 +69,15 @@ with read_base():
     from ...volc import infer  # noqa: F401, E501
 
 datasets = [
-    v[0] for k, v in locals().items()
-    if k.endswith('_datasets') and 'scicode' not in k.lower()
-    and 'dingo' not in k.lower() and isinstance(v, list) and len(v) > 0
+    v[0] for k, v in locals().items() if k.endswith('_datasets')
+    and 'scicode' not in k.lower() and 'dingo' not in k.lower()
+    and 'arc_prize' not in k.lower() and isinstance(v, list) and len(v) > 0
 ]
 
 dingo_datasets[0]['abbr'] = 'qa_dingo_cn'
 dingo_datasets[0]['path'] = 'data/qabench/history_prompt_case_cn.csv'
 datasets.append(dingo_datasets[0])
+datasets += arc_prize_public_evaluation_datasets
 
 musr_summary_groups = musr_summarizer['summary_groups']
 summary_groups = sum(
@@ -97,3 +100,11 @@ for m in models:
         m['batch_size'] = 1
 
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
+
+for d in datasets:
+    if 'judge_cfg' in d['eval_cfg']['evaluator']:
+        d['eval_cfg']['evaluator']['judge_cfg'] = lmdeploy_qwen2_5_32b_instruct
+    if 'llm_evaluator' in d['eval_cfg']['evaluator'] and 'judge_cfg' in d[
+            'eval_cfg']['evaluator']['llm_evaluator']:
+        d['eval_cfg']['evaluator']['llm_evaluator'][
+            'judge_cfg'] = lmdeploy_qwen2_5_32b_instruct

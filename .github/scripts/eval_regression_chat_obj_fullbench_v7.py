@@ -79,6 +79,8 @@ with read_base():
         models as hf_internlm3_8b_instruct_model  # noqa: F401, E501
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import \
         models as lmdeploy_internlm3_8b_instruct_model  # noqa: F401, E501
+    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_32b_instruct import \
+        models as lmdeploy_qwen2_5_32b_instruct  # noqa: F401, E501
     # Summary Groups
     from opencompass.configs.summarizers.groups.bbeh import \
         bbeh_summary_groups  # noqa: F401, E501
@@ -144,3 +146,11 @@ for m in models:
         m['batch_size'] = 1
 
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
+
+for d in datasets:
+    if 'judge_cfg' in d['eval_cfg']['evaluator']:
+        d['eval_cfg']['evaluator']['judge_cfg'] = lmdeploy_qwen2_5_32b_instruct
+    if 'llm_evaluator' in d['eval_cfg']['evaluator'] and 'judge_cfg' in d[
+            'eval_cfg']['evaluator']['llm_evaluator']:
+        d['eval_cfg']['evaluator']['llm_evaluator'][
+            'judge_cfg'] = lmdeploy_qwen2_5_32b_instruct
