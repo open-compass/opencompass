@@ -22,6 +22,7 @@ internlm2_5-7b-chat-hf_fullbench:
         lcb_code_generation_pass@1: 12.5
         lcb_code_execution_pass@1: 43.75
         lcb_test_output_pass@1: 18.75
+        teval_naive_average: 75.52
         bbh-logical_deduction_seven_objects_score: 50
         bbh-multistep_arithmetic_two_score: 68.75
         mmlu-other_accuracy: 72.6
@@ -99,6 +100,7 @@ internlm2_5-7b-chat-turbomind_fullbench:
         lcb_code_generation_pass@1: 12.5
         lcb_code_execution_pass@1: 43.75
         lcb_test_output_pass@1: 0.00
+        teval_naive_average: 75.73
         bbh-logical_deduction_seven_objects_score: 62.50
         bbh-multistep_arithmetic_two_score: 62.50
         mmlu-other_accuracy: 73.08
