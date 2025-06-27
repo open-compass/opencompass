@@ -586,6 +586,7 @@ class OpenAISDK(OpenAI):
                  verbose: bool = False,
                  http_client_cfg: dict = {},
                  status_code_mappings: dict = {},
+                 max_workers: Optional[int] = None,
                  think_tag: str = '</think>'):
         super().__init__(
             path,
@@ -607,6 +608,12 @@ class OpenAISDK(OpenAI):
             verbose=verbose,
         )
         from openai import OpenAI
+
+        if max_workers is None:
+            cpu_count = os.cpu_count() or 1
+            self.max_workers = min(32, (cpu_count + 5) * 2)
+        else:
+            self.max_workers = max_workers
 
         # support multiple api_base for acceleration
         if isinstance(openai_api_base, List):
