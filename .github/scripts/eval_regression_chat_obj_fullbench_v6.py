@@ -101,10 +101,14 @@ for m in models:
 
 models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
 
+obj_judge_model = lmdeploy_internlm3_8b_instruct_model[0]
+obj_judge_model['engine_config']['max_batch_size'] = 1
+obj_judge_model['batch_size'] = 1
+
 for d in datasets:
     if 'judge_cfg' in d['eval_cfg']['evaluator']:
-        d['eval_cfg']['evaluator']['judge_cfg'] = lmdeploy_qwen2_5_32b_instruct
+        d['eval_cfg']['evaluator']['judge_cfg'] = obj_judge_model
     if 'llm_evaluator' in d['eval_cfg']['evaluator'] and 'judge_cfg' in d[
             'eval_cfg']['evaluator']['llm_evaluator']:
         d['eval_cfg']['evaluator']['llm_evaluator'][
-            'judge_cfg'] = lmdeploy_qwen2_5_32b_instruct
+            'judge_cfg'] = obj_judge_model

@@ -5,8 +5,8 @@ with read_base():
         longbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.needlebench.needlebench_base.needlebench_base_gen import \
         needlebench_datasets  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b import \
-        models as lmdeploy_internlm2_5_7b_model  # noqa: F401, E501
+    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat_1m import \
+        models as lmdeploy_internlm2_5_7b_chat_1m_model  # noqa: F401, E501
     # summarizer
     from opencompass.configs.summarizers.groups.longbench import \
         longbench_summary_groups  # noqa: F401, E501
@@ -33,10 +33,3 @@ datasets = [
 
 for d in datasets:
     d['reader_cfg']['test_range'] = '[0:16]'
-
-for m in models:
-    m['abbr'] = m['abbr'] + '_fullbench'
-    if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
-        m['engine_config']['max_batch_size'] = 1
-        m['batch_size'] = 1
-        m['engine_config']['tp'] = 4

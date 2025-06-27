@@ -112,8 +112,6 @@ with read_base():
         models as vllm_mistral_7b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.mistral.vllm_mistral_7b_instruct_v0_2 import \
         models as vllm_mistral_7b_instruct_v0_2_model  # noqa: F401, E501
-    from opencompass.configs.models.mistral.vllm_mixtral_8x22b_instruct_v0_1 import \
-        models as vllm_mixtral_8x22b_instruct_v0_1_model  # noqa: F401, E501
     from opencompass.configs.models.nvidia.lmdeploy_nemotron_70b_instruct_hf import \
         models as lmdeploy_nemotron_70b_instruct_hf_model  # noqa: F401, E501
     from opencompass.configs.models.phi.hf_phi_4 import \
