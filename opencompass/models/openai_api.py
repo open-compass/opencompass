@@ -586,8 +586,9 @@ class OpenAISDK(OpenAI):
                  verbose: bool = False,
                  http_client_cfg: dict = {},
                  status_code_mappings: dict = {},
+                 think_tag: str = '</think>',
                  max_workers: Optional[int] = None,
-                 think_tag: str = '</think>'):
+                 ):
         super().__init__(
             path,
             max_seq_len,
@@ -605,8 +606,8 @@ class OpenAISDK(OpenAI):
             temperature,
             tokenizer_path,
             extra_body,
-            max_workers,
             verbose=verbose,
+            max_workers=max_workers,
         )
         from openai import OpenAI
 
