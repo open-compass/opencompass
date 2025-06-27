@@ -605,6 +605,7 @@ class OpenAISDK(OpenAI):
             temperature,
             tokenizer_path,
             extra_body,
+            max_workers,
             verbose=verbose,
         )
         from openai import OpenAI
