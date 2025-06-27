@@ -42,7 +42,7 @@ on:
         required: true
         description: 'vllm version'
         type: string
-        default: "0.8.4"
+        default: "0.7.2"
       fullbench_eval:
         required: true
         description: 'fullbench volc functions'
@@ -308,7 +308,7 @@ jobs:
         run: |
           kill -15 "$restful_pid"
       - name:  Run testcase
-        if: matrix.regression_func == 'chat_sub_fullbench'
+        if: matrix.regression_func == 'chat_sub_fullbench' || matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7'
         env:
           COMPASS_DATA_CACHE: ${{ secrets.SHARESPACE_PREFIX }}/datasets/compass_data_cache_subset
         run: |
