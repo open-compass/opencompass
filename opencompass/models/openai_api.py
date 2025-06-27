@@ -71,6 +71,9 @@ class OpenAI(BaseAPIModel):
             the request
         think_tag (str, optional): The tag to use for reasoning content.
             Defaults to '</think>'.
+        max_workers (int, optional): Maximum number of worker threads for
+            concurrent API requests. For I/O-intensive API calls, recommended
+            value is 10-20. Defaults to None (uses CPU count * 2).
     """
 
     is_api: bool = True
@@ -95,6 +98,7 @@ class OpenAI(BaseAPIModel):
         extra_body: Optional[Dict] = None,
         verbose: bool = False,
         think_tag: str = '</think>',
+        max_workers: Optional[int] = None,
     ):
 
         super().__init__(
@@ -118,6 +122,12 @@ class OpenAI(BaseAPIModel):
         self.hf_tokenizer = None
         self.extra_body = extra_body
         self.think_tag = think_tag
+
+        if max_workers is None:
+            cpu_count = os.cpu_count() or 1
+            self.max_workers = min(32, (cpu_count + 5) * 2)
+        else:
+            self.max_workers = max_workers
 
         if isinstance(key, str):
             if key == 'ENV':
@@ -175,7 +185,7 @@ class OpenAI(BaseAPIModel):
         if self.temperature is not None:
             temperature = self.temperature
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             results = list(
                 tqdm(
                     executor.map(
