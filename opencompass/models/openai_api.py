@@ -122,10 +122,10 @@ class OpenAI(BaseAPIModel):
         self.hf_tokenizer = None
         self.extra_body = extra_body
         self.think_tag = think_tag
-        
+
         if max_workers is None:
             cpu_count = os.cpu_count() or 1
-            self.max_workers = min(32, (cpu_count + 5)* 2)
+            self.max_workers = min(32, (cpu_count + 5) * 2)
         else:
             self.max_workers = max_workers
 
