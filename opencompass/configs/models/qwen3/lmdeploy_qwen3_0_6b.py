@@ -1,7 +1,7 @@
 from opencompass.models import TurboMindModelwithChatTemplate
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
-model = [
+models = [
     dict(
         type=TurboMindModelwithChatTemplate,
         abbr='qwen_3_0.6b_thinking-turbomind',
