@@ -4,6 +4,7 @@ import os
 import os.path as osp
 import re
 import subprocess
+import sys
 
 import h5py
 import numpy as np
@@ -258,11 +259,11 @@ class SciCodeEvaluator(BaseEvaluator):
 
     def run_script(self, script_path):
         try:
-            subprocess.run(['python', script_path],
+            subprocess.run([sys.executable, script_path],
                            check=True,
                            capture_output=True,
                            text=True,
-                           timeout=60)
+                           timeout=120)
             return 0
         except subprocess.CalledProcessError:
             return 1
