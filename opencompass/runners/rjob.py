@@ -5,7 +5,7 @@ import subprocess
 import time
 from functools import partial
 from typing import Any, Dict, List, Optional, Tuple
-
+import uuid
 import mmengine
 from mmengine.config import ConfigDict
 from mmengine.utils import track_parallel_progress
@@ -86,6 +86,10 @@ class RJOBRunner(BaseRunner):
                     status = 'Starting'
                     found_dict = True
                     break
+                if 'Pending' in line:
+                    status = 'Pending'
+                    found_dict = True
+                    break
                 if '{' in line and '}' in line:
                     try:
                         d = ast.literal_eval(
@@ -109,16 +113,19 @@ class RJOBRunner(BaseRunner):
         return status
 
     def _launch(self, cfg: ConfigDict, random_sleep: Optional[bool] = None):
+
         """Launch a single task via rjob bash script."""
         if random_sleep is None:
             random_sleep = self.max_num_workers > 32
         task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
         # Normalize task name
-        import uuid
-        task_name = 'opencompass-' + str(uuid.uuid4())
         logger = get_logger()
+        logger.info(f'Task config: {cfg}')
+        logger.info(f'Rjob config: {self.rjob_cfg}')
+        task_name = f'oc-{self.task_cfg["phase"]}-{self.rjob_cfg["task_id"]}-{str(uuid.uuid4())[:8]}'
         logger.info(f'Task name: {task_name}')
+        
 
         # Generate temporary parameter file
         pwd = os.getcwd()
