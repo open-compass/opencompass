@@ -14,12 +14,12 @@ INFER_TEMPLATE = f'''
             {{prompt2}}
             Finally, please output only the formula string you inferred (e.g. z=x_0 * x_1), without any additional information.
         '''
-SYSTEM_PROMPT=f"You are an exceptional symbolic regression assistant. Your specialty lies in analyzing numerical relationships among data and variables. When provided with mathematical questions or data from humans, you carefully comprehend the essence of the problem, methodically clarify relationships among variables, and meticulously derive the solution step by step. Ultimately, you output a precise, concise, and interpretable mathematical formula. Each step of your reasoning should be clear and explicit, aiding humans in gaining a deeper understanding of the problem."
-srbench_reader_cfg = dict(input_columns=["prompt1","prompt2"], output_column='formula')
+SYSTEM_PROMPT=f'''You are an exceptional symbolic regression assistant. Your specialty lies in analyzing numerical relationships among data and variables. When provided with mathematical questions or data from humans, you carefully comprehend the essence of the problem, methodically clarify relationships among variables, and meticulously derive the solution step by step. Ultimately, you output a precise, concise, and interpretable mathematical formula. Each step of your reasoning should be clear and explicit, aiding humans in gaining a deeper understanding of the problem.'''
+srbench_reader_cfg = dict(input_columns=['prompt1','prompt2'], output_column='formula')
 
 srbench_datasets=[]
 
-path = ["Constant.json","Keijzer.json","Feynman.json","Nguyen.json","R.json"]
+path = ['Constant.json','Keijzer.json','Feynman.json','Nguyen.json','R.json']
 for task in path:
     srbench_infer_cfg = dict(
         prompt_template=dict(
