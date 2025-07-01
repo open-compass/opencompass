@@ -45,9 +45,9 @@ on:
         default: "0.7.2"
       fullbench_eval:
         required: true
-        description: 'fullbench volc functions'
+        description: "fullbench volc functions ['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
         type: string
-        default: "['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
+        default: "[]"
   schedule:
     - cron:  '15 14 * * 0,3'
 
