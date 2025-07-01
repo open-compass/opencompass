@@ -82,6 +82,10 @@ class RJOBRunner(BaseRunner):
 
             found_dict = False
             for line in output.splitlines():
+                if 'Starting' in line:
+                    status = 'Starting'
+                    found_dict = True
+                    break
                 if '{' in line and '}' in line:
                     try:
                         d = ast.literal_eval(

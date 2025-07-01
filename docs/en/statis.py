@@ -55,6 +55,12 @@ def table_format(data_list):
                 elif index == 'configpath_llmjudge':
                     if i[j][index] == '':
                         table_format_list_sub.append(i[j][index])
+                    elif isinstance(i[j][index], list):
+                        sub_list_text = ''
+                        for k in i[j][index]:
+                            sub_list_text += (link_token + GITHUB_PREFIX + k +
+                                              ') / ')
+                        table_format_list_sub.append(sub_list_text[:-2])
                     else:
                         table_format_list_sub.append(link_token +
                                                      GITHUB_PREFIX +
