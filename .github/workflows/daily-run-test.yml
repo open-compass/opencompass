@@ -164,15 +164,15 @@ jobs:
             conda activate ${{env.CONDA_ENV}}
             unset HTTP_PROXY;unset HTTPS_PROXY;unset http_proxy;unset https_proxy;
             pip install -r ${{ secrets.WORKSPACE_PREFIX }}/config/requirements.txt --cache-dir ${{env.PIP_CACHE_PATH}}
-            pip install vllm==${{github.event.inputs.vllm_version}} --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass*.whl --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[lmdeploy] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[vllm] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[full] --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install opencompass[api] --cache-dir ${{env.PIP_CACHE_PATH}}
-            pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --cache-dir ${{env.PIP_CACHE_PATH}}
-            FLASH_ATTENTION_FORCE_BUILD=TRUE pip install ${{ secrets.WORKSPACE_PREFIX }}/packages/flash_attn-2.7.0.post2+cu12torch2.5cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             pip install xformers --index-url https://download.pytorch.org/whl/cu121 --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install vllm==${{github.event.inputs.vllm_version}} --cache-dir ${{env.PIP_CACHE_PATH}} --no-deps
+            pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --cache-dir ${{env.PIP_CACHE_PATH}}
+            FLASH_ATTENTION_FORCE_BUILD=TRUE pip install ${{ secrets.WORKSPACE_PREFIX }}/packages/flash_attn-2.7.2.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             cp -r ${{secrets.WORKSPACE_PREFIX}}/nltk_data ${{env.CONDA_PATH}}/envs/${{env.CONDA_ENV}}/nltk_data
       - name: Prepare - reinstall lmdeploy - cu12
         if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
