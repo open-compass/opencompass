@@ -14,7 +14,7 @@ Built with domain experts, SeedBench features **2,264 expert-validated questions
 ## 🔎 Dataset Details
 
 - **Corpus**: 308,727 publications cleaned to 1.1 billion tokens; 279 segments from 113 documents.
-- **Questions**: 2,264 across 11 task types, bilingual (English/Chinese), expert-validated.
+- **Questions**: 4,336 across 11 task types, bilingual (English/Chinese), expert-validated.
 - **Focus**: Rice breeding as a representative case.
 
   **Types and metrics:**
@@ -25,18 +25,18 @@ Built with domain experts, SeedBench features **2,264 expert-validated questions
   | Type ID | Question Type              | Metric   | Count |
   |---------|----------------------------|----------|-------|
   | **Q&A** |                            |          |       |
-  | QA-1    | Multiple Choice            | Accuracy | 200   |
-  | QA-2    | Multiple Answer            | Macro-F1 | 187   |
-  | QA-3    | Fill-in-the-Blank          | ROUGE-L  | 224   |
-  | QA-4    | Generation                 | ROUGE-L  | 242   |
+  | QA-1    | Multiple Choice            | Accuracy | 354   |
+  | QA-2    | Multiple Answer            | Macro-F1 | 291   |
+  | QA-3    | Fill-in-the-Blank          | ROUGE-L  | 426   |
+  | QA-4    | Generation                 | ROUGE-L  | 403   |
   | **Summarization** |                  |          |       |
-  | SUM-1   | Simple Summarization       | ROUGE-L  | 225   |
-  | SUM-2   | Key Information Extraction | ROUGE-L  | 225   |
+  | SUM-1   | Simple Summarization       | ROUGE-L  | 638   |
+  | SUM-2   | Key Information Extraction | ROUGE-L  | 638   |
   | **Reading Comprehension** |          |          |       |
-  | RC-1    | Multiple Choice            | Accuracy | 113   |
-  | RC-2    | Multiple Answer            | Macro-F1 | 108   |
-  | RC-3    | Fill-in-the-Blank          | ROUGE-L  | 221   |
-  | RC-4    | Generation                 | ROUGE-L  | 240   |
+  | RC-1    | Multiple Choice            | Accuracy | 268   |
+  | RC-2    | Multiple Answer            | Macro-F1 | 212   |
+  | RC-3    | Fill-in-the-Blank          | ROUGE-L  | 424   |
+  | RC-4    | Generation                 | ROUGE-L  | 403   |
   | RC-5    | Subcategory Classification | Accuracy | 279   |
 
   </div>
