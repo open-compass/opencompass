@@ -126,10 +126,7 @@ class LCEvaluator(BaseEvaluator):
             futures = []
             for i, (refer, pred) in enumerate(zip(references, predictions)):
 
-                print('this prediction:' + pred)
                 code_blocks = self._process_answer(pred)
-                print('this code_blocks:')
-                print(code_blocks)
 
                 # Try each code block until one passes
                 for code_idx, code_block in enumerate(code_blocks):
