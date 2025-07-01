@@ -23,38 +23,6 @@ with read_base():
 
     from ...volc import infer  # noqa: F401, E501
 
-needlebench_128k_summary_groups = needlebench_128k_summarizer['summary_groups']
-summary_groups = sum(
-    [v for k, v in locals().items() if k.endswith('_summary_groups')], [])
-
-summarizer = dict(
-    dataset_abbrs=[
-        ['ruler_8k', 'naive_average'],
-        ['ruler_32k', 'naive_average'],
-        ['ruler_128k', 'naive_average'],
-        ['NeedleBench-Overall-Score-8K', 'weighted_average'],
-        ['NeedleBench-Overall-Score-32K', 'weighted_average'],
-        ['NeedleBench-Overall-Score-128K', 'weighted_average'],
-        ['longbench', 'naive_average'],
-        ['longbench_zh', 'naive_average'],
-        ['longbench_en', 'naive_average'],
-        ['babilong_0k', 'naive_average'],
-        ['babilong_4k', 'naive_average'],
-        ['babilong_16k', 'naive_average'],
-        ['babilong_32k', 'naive_average'],
-        ['babilong_128k', 'naive_average'],
-        ['babilong_256k', 'naive_average'],
-        '',
-        'longbench_single-document-qa',
-        'longbench_multi-document-qa',
-        'longbench_summarization',
-        'longbench_few-shot-learning',
-        'longbench_synthetic-tasks',
-        'longbench_code-completion',
-    ],
-    summary_groups=summary_groups,
-)
-
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 datasets = [
     v[0] for k, v in locals().items()
