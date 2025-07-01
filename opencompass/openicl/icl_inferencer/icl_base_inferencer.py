@@ -46,8 +46,8 @@ class BaseInferencer:
 
         self.model = model
 
-        self.max_seq_len = int(max_seq_len)
-        self.batch_size = int(batch_size)
+        self.max_seq_len = max_seq_len
+        self.batch_size = batch_size
         self.output_json_filepath = output_json_filepath
         self.output_json_filename = output_json_filename
         self.is_main_process = is_main_process()
