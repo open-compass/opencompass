@@ -456,6 +456,9 @@ internlm2_5-7b-chat-1m-turbomind:
         longbench_few-shot-learning_score: 51.67
         longbench_synthetic-tasks_score: 66.83
         longbench_code-completion_score: 45.99
+    base_long_context:
+        LongBench_2wikimqa: 32.81
+        Length32000Depth0_origin_en_32000: 100
 
 
 qwen2.5-7b-instruct-turbomind:
@@ -983,10 +986,4 @@ internlm3-8b-instruct-pytorch:
         middle_knowledge_naive_average: 88.92
         primary_knowledge_naive_average: 92.96
         mathbench-t (average)_naive_average: 86.16
-
-
-internlm2_5-7b-chat-1m-turbomind:
-    base_long_context:
-        LongBench_2wikimqa: 32.81
-        Length32000Depth0_origin_en_32000: 100
 
