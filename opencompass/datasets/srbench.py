@@ -268,7 +268,7 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
         except Exception:
             return False
 
-    def bfgs(self,pred_str, X, y, NMSE, n_restarts=1):
+    def bfgs(self,pred_str, X, y, NMSE, n_restarts=10):
         idx_remove = True
         pred_str_raw = pred_str
         # pred_str = add_constant_to_formula(pred_str, model, tokenizer)
