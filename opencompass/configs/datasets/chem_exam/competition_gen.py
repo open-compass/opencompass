@@ -16,7 +16,14 @@ chem_competition_hint = 'Answer the following chemistry question. Please reason 
 chem_competition_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template=f'{chem_competition_hint}\n\nQuestion: {{prompt}}\nAnswer: ',
+        template=dict(
+            round=[
+                dict(
+                    role='HUMAN',
+                    prompt=f'{chem_competition_hint}\n\nQuestion: {{prompt}}\nAnswer: ',
+                ),
+            ],
+        ),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
