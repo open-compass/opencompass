@@ -24,8 +24,8 @@ class SRbenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        base_path = get_data_path(path)
-        formula_data_path = os.path.join(base_path, 'formula_data.json')
+        formula_data_path = get_data_path(path)
+        #formula_data_path = os.path.join(base_path, 'formula_data.json')
         
         dataset = load_dataset('json', data_files=formula_data_path)['train']
         sample_data = []
@@ -56,6 +56,7 @@ class SRbenchDataset(BaseDataset):
 
 def mydataset_postprocess(formula_str):
     # 1. 删除 Markdown 残留符号
+
     formula_str = formula_str.replace('×', '*').replace('·',
                                                         '*').replace('÷', '/')
     formula_str = formula_str.replace('−', '-').replace('^', '**')
@@ -201,10 +202,12 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
     def __init__(self, path=''):
         self.dataset = SRbenchDataset.load(path)
 
+
     def parse_formula(self, formula_str: str):
         try:
             if '=' in formula_str:
                 expr_str = formula_str.split('=', 1)[1].strip()
+
             else:
                 expr_str = formula_str.strip()
 
@@ -248,48 +251,7 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
         except (SyntaxError, TypeError, AttributeError, sp.SympifyError) as e:
             print(f'[Parse Error] 无法解析公式 "{formula_str}": {e}')
             return None
-                expr_str = formula_str.strip()
 
-            if not expr_str:
-                print(f"[Parse Error] 公式字符串为空或剥离后为空: '{formula_str}'")
-                return None
-
-            local_dict = {
-                'sin': sp.sin,
-                'cos': sp.cos,
-                'exp': sp.exp,
-                'sqrt': sp.sqrt,
-                'log': sp.log,
-                'arccos': sp.acos,
-                'arcsin': sp.asin,
-                'tan': sp.tan,
-                'pi': sp.pi
-            }
-            expr = sp.sympify(expr_str, locals=local_dict)
-            # 生成定义域
-            variable_names = sorted([str(sym) for sym in expr.free_symbols])
-            symbols = [sp.Symbol(name) for name in variable_names]
-            for sym in symbols:
-                local_dict[str(sym)] = sym
-            # 转换为 numpy 表达式
-            numpy_modules = [
-                'numpy', {
-                    'sqrt': np.sqrt,
-                    'exp': np.exp,
-                    'sin': np.sin,
-                    'cos': np.cos,
-                    'log': np.log,
-                    'arcsin': np.arcsin,
-                    'arccos': np.arccos,
-                    'tan': np.tan,
-                    'pi': np.pi
-                }
-            ]
-            func = sp.lambdify(symbols, expr, modules=numpy_modules)
-            return func, variable_names
-        except (SyntaxError, TypeError, AttributeError, sp.SympifyError) as e:
-            print(f'[Parse Error] 无法解析公式 "{formula_str}": {e}')
-            return None
         except Exception as e:
             print(f'[Parse Error] 解析公式 "{formula_str}" 时发生意外错误: {e}')
             return None
@@ -306,7 +268,7 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
         except Exception:
             return False
 
-    def bfgs(self,pred_str, X, y, NMSE, n_restarts=10):
+    def bfgs(self,pred_str, X, y, NMSE, n_restarts=1):
         idx_remove = True
         pred_str_raw = pred_str
         # pred_str = add_constant_to_formula(pred_str, model, tokenizer)
