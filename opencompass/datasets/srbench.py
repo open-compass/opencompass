@@ -56,7 +56,6 @@ class SRbenchDataset(BaseDataset):
 
 def mydataset_postprocess(formula_str):
     # 1. 删除 Markdown 残留符号
-    # 1. 删除 Markdown 残留符号
     formula_str = formula_str.replace('×', '*').replace('·',
                                                         '*').replace('÷', '/')
     formula_str = formula_str.replace('−', '-').replace('^', '**')
@@ -66,19 +65,19 @@ def mydataset_postprocess(formula_str):
                                                         '"').replace('"', "'")
 
     # 2. 去除 markdown 反引号 ``` 和 $ 符号
-    # 2. 去除 markdown 反引号 ``` 和 $ 符号
+
     formula_str = formula_str.replace('`', '').replace('$', '').strip()
 
     # 3. 提取第一行公式（防止有多行解释性输出）
-    # 3. 提取第一行公式（防止有多行解释性输出）
+
     formula_str = formula_str.split('\n')[0].strip()
 
     # 4. 用正则去除非合法字符（保留基本数学表达式）
-    # 4. 用正则去除非合法字符（保留基本数学表达式）
+
     formula_str = re.sub(r'[^\w\s\+\-\*/\^\=\.\(\)]', '', formula_str)
 
     # 5. 确保左右去空格
-    # 5. 确保左右去空格
+
     return formula_str.strip()
 
 
@@ -203,10 +202,8 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
         self.dataset = SRbenchDataset.load(path)
 
     def parse_formula(self, formula_str: str):
-    def parse_formula(self, formula_str: str):
         try:
             if '=' in formula_str:
-                expr_str = formula_str.split('=', 1)[1].strip()
                 expr_str = formula_str.split('=', 1)[1].strip()
             else:
                 expr_str = formula_str.strip()
@@ -294,7 +291,6 @@ class SRbenchDatasetEvaluator(BaseEvaluator):
             print(f'[Parse Error] 无法解析公式 "{formula_str}": {e}')
             return None
         except Exception as e:
-            print(f'[Parse Error] 解析公式 "{formula_str}" 时发生意外错误: {e}')
             print(f'[Parse Error] 解析公式 "{formula_str}" 时发生意外错误: {e}')
             return None
 
