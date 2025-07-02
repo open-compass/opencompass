@@ -457,9 +457,13 @@ internlm2_5-7b-chat-1m-turbomind:
         longbench_synthetic-tasks_score: 66.83
         longbench_code-completion_score: 45.99
     base_long_context:
-        LongBench_2wikimqa: 32.81
-        Length32000Depth0_origin_en_32000: 100
-
+        LongBench_2wikimqa_score: 32.81
+        Length32000Depth0_origin_en_32000_score: 100
+    chat_long_context:
+        babilong_qa1_256k_score: 25
+        LongBench_2wikimqa_score: 32.81
+        Length16000Depth0_2needle_en_128k_score: 100
+        ruler_cwe_128k_score: 0
 
 qwen2.5-7b-instruct-turbomind:
     objective:

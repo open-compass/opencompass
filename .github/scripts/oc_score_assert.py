@@ -170,6 +170,24 @@ class TestBaseLongFullbench:
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score, dataset)
 
+@pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores_fullbench')
+@pytest.mark.chat_longtext_fullbench
+class TestChatLongFullbench:
+    """Test cases for chat model."""
+
+    @pytest.mark.parametrize(
+        'model, dataset',
+        [(p1, p2) for p1 in
+         ['internlm2_5-7b-chat-1m-turbomind']
+         for p2 in dataset_list('internlm2_5-7b-chat-1m-turbomind', 'chat_long_context')])
+    def test_model_dataset_score(self, baseline_scores_fullbench,
+                                 result_scores, model, dataset):
+        base_score = baseline_scores_fullbench.get(model).get('chat_long_context').get(
+            dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model, result_score, base_score, dataset)
+
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores')
