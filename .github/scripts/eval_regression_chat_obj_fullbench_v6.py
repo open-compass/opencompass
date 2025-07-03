@@ -109,6 +109,7 @@ models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
 
 obj_judge_model = lmdeploy_internlm3_8b_instruct_model[0]
 obj_judge_model['engine_config']['max_batch_size'] = 1
+obj_judge_model['engine_config']['cache_max_entry_count'] = 0.6
 obj_judge_model['batch_size'] = 1
 
 for d in datasets:
