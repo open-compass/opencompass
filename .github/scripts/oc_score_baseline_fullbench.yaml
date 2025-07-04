@@ -465,6 +465,7 @@ internlm2_5-7b-chat-1m-turbomind:
         Length16000Depth0_2needle_en_128k_score: 100
         ruler_cwe_128k_score: 0
 
+
 qwen2.5-7b-instruct-turbomind:
     objective:
         race-high_accuracy: 84.99
@@ -991,3 +992,252 @@ internlm3-8b-instruct-pytorch:
         primary_knowledge_naive_average: 92.96
         mathbench-t (average)_naive_average: 86.16
 
+internlm3-8b-instruct-hf_fullbench:
+    objective_v6: 
+        aime2024_accuracy: 12.5
+        aime2024_f1: 0.12
+        aime2024_accuracy_given_attempted: 12.5
+        aime2024_attempted_ratio: 100
+        aime2024_correct_count: 2
+        aime2024_incorrect_count: 14
+        aime2024_not_attempted_count: 0
+        aime2025_accuracy: 6.25
+        aime2025_f1: 0.06
+        aime2025_accuracy_given_attempted: 6.25
+        aime2025_attempted_ratio: 100
+        aime2025_correct_count: 1
+        aime2025_incorrect_count: 15
+        aime2025_not_attempted_count: 0
+        bbh-temporal_sequences_score: 87.5
+        bbh-temporal_sequences_score_given_attempted: 87.5
+        bbh-temporal_sequences_attempted_ratio: 100
+        bbh-temporal_sequences_correct_count: 14
+        bbh-temporal_sequences_incorrect_count: 2
+        bbh-temporal_sequences_not_attempted_count: 0
+        cmo_fib_accuracy: 31.25
+        drop_accuracy: 100
+        drop_f1: 1
+        drop_accuracy_given_attempted: 100
+        drop_attempted_ratio: 100
+        drop_correct_count: 16
+        drop_incorrect_count: 0
+        drop_not_attempted_count: 0
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
+        GPQA_diamond_accuracy: 56.25
+        GPQA_diamond_f1: 0.56
+        GPQA_diamond_accuracy_given_attempted: 56.25
+        GPQA_diamond_attempted_ratio: 100
+        GPQA_diamond_correct_count: 9
+        GPQA_diamond_incorrect_count: 7
+        GPQA_diamond_not_attempted_count: 0
+        gsm8k_accuracy: 93.75
+        hellaswag_accuracy: 68.75
+        hellaswag_f1: 0.69
+        hellaswag_accuracy_given_attempted: 68.75
+        hellaswag_attempted_ratio: 100
+        hellaswag_correct_count: 11
+        hellaswag_incorrect_count: 5
+        hellaswag_not_attempted_count: 0
+        korbench_cipher_accuracy: 37.5
+        korbench_cipher_f1: 0.38
+        korbench_cipher_accuracy_given_attempted: 37.5
+        korbench_cipher_attempted_ratio: 100
+        korbench_cipher_correct_count: 6
+        korbench_cipher_incorrect_count: 10
+        korbench_cipher_not_attempted_count: 0
+        math_prm800k_500-llmjudge_accuracy: 56.25
+        math_prm800k_500-llmjudge_f1: 0.56
+        math_prm800k_500-llmjudge_accuracy_given_attempted: 56.25
+        math_prm800k_500-llmjudge_attempted_ratio: 100
+        math_prm800k_500-llmjudge_correct_count: 9
+        math_prm800k_500-llmjudge_incorrect_count: 7
+        math_prm800k_500-llmjudge_not_attempted_count: 0
+        mathbench-college-single_choice_cn_acc_4: 75
+        mathbench-college-single_choice_cn_acc_1: 75
+        mathbench-college-single_choice_cn_more_1_0: 100
+        mathbench-college-single_choice_cn_more_1_1: 75
+        mathbench-college-single_choice_cn_more_4_0: 100
+        mathbench-college-single_choice_cn_more_4_1: 100
+        mathbench-college-single_choice_cn_more_4_2: 75
+        mathbench-college-single_choice_cn_more_4_3: 75
+        mathbench-college-single_choice_cn_more_4_4: 50
+        mathbench-college-single_choice_cn_perf_1: 75
+        mathbench-college-single_choice_cn_perf_4: 50
+        mathbench-college-single_choice_cn_vote_4: 75
+        mathbench-college-single_choice_cn_vote_1: 75
+        mathbench-college-single_choice_cn_prior_A: 18.75
+        mathbench-college-single_choice_cn_prior_B: 18.75
+        mathbench-college-single_choice_cn_prior_C: 31.25
+        mathbench-college-single_choice_cn_prior_D: 31.25
+        mathbench-college-single_choice_cn_prior_-: 0
+        musr_murder_mysteries_accuracy: 100
+        musr_murder_mysteries_f1: 1
+        musr_murder_mysteries_accuracy_given_attempted: 100
+        musr_murder_mysteries_attempted_ratio: 100
+        musr_murder_mysteries_correct_count: 16
+        musr_murder_mysteries_incorrect_count: 0
+        musr_murder_mysteries_not_attempted_count: 0
+        supergpqa_accuracy: 37.5
+        supergpqa_total_correct: 6
+        supergpqa_total_count: 16
+        supergpqa_SuperGPQA-Engineering: 40
+        supergpqa_SuperGPQA-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine: 50
+        supergpqa_SuperGPQA-Economics: 50
+        supergpqa_SuperGPQA-Science: 33.33
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine: 0
+        supergpqa_SuperGPQA-Economics-Applied Economics: 100
+        supergpqa_SuperGPQA-Science-Mathematics: 20
+        supergpqa_SuperGPQA-Science-Physics: 100
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering: 50
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering: 0
+        supergpqa_SuperGPQA-Economics-Theoretical Economics: 0
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology-Circuits and Systems: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy-Philosophical Aesthetics: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine-Traditional Chinese Medicine Theory: 0
+        supergpqa_SuperGPQA-Economics-Applied Economics-Finance: 100
+        supergpqa_SuperGPQA-Science-Mathematics-Combinatorial Mathematics: 100
+        supergpqa_SuperGPQA-Science-Physics-Particle and Nuclear Physics: 100
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine-Internal Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology-Computer Architecture: 0
+        supergpqa_SuperGPQA-Science-Mathematics-Ordinary Differential Equations: 0
+        supergpqa_SuperGPQA-Science-Mathematics-Mathematical Analysis: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering-Signal and Information Processing: 50
+        supergpqa_SuperGPQA-Science-Mathematics-Advanced Algebra: 0
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering-Control Theory and Control Engineering: 0
+        supergpqa_SuperGPQA-Economics-Theoretical Economics-Political Economy: 0
+        triviaqa_wiki_1shot_score: 43.75
+        qa_dingo_cn_score: 100
+        qa_dingo_cn_num_good: 16
+        qa_dingo_cn_num_bad: 0
+        qa_dingo_cn_total: 16
+
+
+internlm3-8b-instruct-turbomind_fullbench:
+    objective_v6: 
+        aime2024_accuracy: 25
+        aime2024_f1: 0.25
+        aime2024_accuracy_given_attempted: 25
+        aime2024_attempted_ratio: 100
+        aime2024_correct_count: 4
+        aime2024_incorrect_count: 12
+        aime2024_not_attempted_count: 0
+        aime2025_accuracy: 6.25
+        aime2025_f1: 0.06
+        aime2025_accuracy_given_attempted: 6.25
+        aime2025_attempted_ratio: 100
+        aime2025_correct_count: 1
+        aime2025_incorrect_count: 15
+        aime2025_not_attempted_count: 0
+        bbh-temporal_sequences_score: 87.5
+        bbh-temporal_sequences_score_given_attempted: 87.5
+        bbh-temporal_sequences_attempted_ratio: 100
+        bbh-temporal_sequences_correct_count: 14
+        bbh-temporal_sequences_incorrect_count: 2
+        bbh-temporal_sequences_not_attempted_count: 0
+        cmo_fib_accuracy: 31.25
+        drop_accuracy: 100
+        drop_f1: 1
+        drop_accuracy_given_attempted: 100
+        drop_attempted_ratio: 100
+        drop_correct_count: 16
+        drop_incorrect_count: 0
+        drop_not_attempted_count: 0
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
+        GPQA_diamond_accuracy: 68.75
+        GPQA_diamond_f1: 0.69
+        GPQA_diamond_accuracy_given_attempted: 68.75
+        GPQA_diamond_attempted_ratio: 100
+        GPQA_diamond_correct_count: 11
+        GPQA_diamond_incorrect_count: 5
+        GPQA_diamond_not_attempted_count: 0
+        gsm8k_accuracy: 87.5
+        hellaswag_accuracy: 68.75
+        hellaswag_f1: 0.69
+        hellaswag_accuracy_given_attempted: 68.75
+        hellaswag_attempted_ratio: 100
+        hellaswag_correct_count: 11
+        hellaswag_incorrect_count: 5
+        hellaswag_not_attempted_count: 0
+        korbench_cipher_accuracy: 50
+        korbench_cipher_f1: 0.5
+        korbench_cipher_accuracy_given_attempted: 50
+        korbench_cipher_attempted_ratio: 100
+        korbench_cipher_correct_count: 8
+        korbench_cipher_incorrect_count: 8
+        korbench_cipher_not_attempted_count: 0
+        math_prm800k_500-llmjudge_accuracy: 62.5
+        math_prm800k_500-llmjudge_f1: 0.62
+        math_prm800k_500-llmjudge_accuracy_given_attempted: 62.5
+        math_prm800k_500-llmjudge_attempted_ratio: 100
+        math_prm800k_500-llmjudge_correct_count: 10
+        math_prm800k_500-llmjudge_incorrect_count: 6
+        math_prm800k_500-llmjudge_not_attempted_count: 0
+        mathbench-college-single_choice_cn_acc_4: 75
+        mathbench-college-single_choice_cn_acc_1: 75
+        mathbench-college-single_choice_cn_more_1_0: 100
+        mathbench-college-single_choice_cn_more_1_1: 75
+        mathbench-college-single_choice_cn_more_4_0: 100
+        mathbench-college-single_choice_cn_more_4_1: 100
+        mathbench-college-single_choice_cn_more_4_2: 75
+        mathbench-college-single_choice_cn_more_4_3: 75
+        mathbench-college-single_choice_cn_more_4_4: 50
+        mathbench-college-single_choice_cn_perf_1: 75
+        mathbench-college-single_choice_cn_perf_4: 50
+        mathbench-college-single_choice_cn_vote_4: 75
+        mathbench-college-single_choice_cn_vote_1: 75
+        mathbench-college-single_choice_cn_prior_A: 18.75
+        mathbench-college-single_choice_cn_prior_B: 18.75
+        mathbench-college-single_choice_cn_prior_C: 31.25
+        mathbench-college-single_choice_cn_prior_D: 31.25
+        mathbench-college-single_choice_cn_prior_-: 0
+        musr_murder_mysteries_accuracy: 100
+        musr_murder_mysteries_f1: 1
+        musr_murder_mysteries_accuracy_given_attempted: 100
+        musr_murder_mysteries_attempted_ratio: 100
+        musr_murder_mysteries_correct_count: 16
+        musr_murder_mysteries_incorrect_count: 0
+        musr_murder_mysteries_not_attempted_count: 0
+        supergpqa_accuracy: 43.75
+        supergpqa_total_correct: 7
+        supergpqa_total_count: 16
+        supergpqa_SuperGPQA-Engineering: 40
+        supergpqa_SuperGPQA-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine: 50
+        supergpqa_SuperGPQA-Economics: 50
+        supergpqa_SuperGPQA-Science: 50
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine: 0
+        supergpqa_SuperGPQA-Economics-Applied Economics: 100
+        supergpqa_SuperGPQA-Science-Mathematics: 40
+        supergpqa_SuperGPQA-Science-Physics: 100
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering: 50
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering: 0
+        supergpqa_SuperGPQA-Economics-Theoretical Economics: 0
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology-Circuits and Systems: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy-Philosophical Aesthetics: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine-Traditional Chinese Medicine Theory: 0
+        supergpqa_SuperGPQA-Economics-Applied Economics-Finance: 100
+        supergpqa_SuperGPQA-Science-Mathematics-Combinatorial Mathematics: 100
+        supergpqa_SuperGPQA-Science-Physics-Particle and Nuclear Physics: 100
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine-Internal Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology-Computer Architecture: 0
+        supergpqa_SuperGPQA-Science-Mathematics-Ordinary Differential Equations: 50
+        supergpqa_SuperGPQA-Science-Mathematics-Mathematical Analysis: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering-Signal and Information Processing: 50
+        supergpqa_SuperGPQA-Science-Mathematics-Advanced Algebra: 0
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering-Control Theory and Control Engineering: 0
+        supergpqa_SuperGPQA-Economics-Theoretical Economics-Political Economy: 0
+        triviaqa_wiki_1shot_score: 50
+        qa_dingo_cn_score: 100
+        qa_dingo_cn_num_good: 16
+        qa_dingo_cn_num_bad: 0
+        qa_dingo_cn_total: 16
+        ARC_Prize_Public_Evaluation_accuracy: 0
