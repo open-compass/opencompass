@@ -1424,7 +1424,6 @@ internlm3-8b-instruct-turbomind_fullbench:
         hle_llmjudge_correct_count: 3
         hle_llmjudge_incorrect_count: 13
         hle_llmjudge_not_attempted_count: 0
-        openai_humaneval_-: -
         IFEval_Prompt-level-strict-accuracy: 68.75
         IFEval_Inst-level-strict-accuracy: 75
         IFEval_Prompt-level-loose-accuracy: 75
