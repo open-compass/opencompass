@@ -1244,9 +1244,9 @@ internlm3-8b-instruct-hf_fullbench:
         R-Bench_en_not_attempted_count: 0
         NC-I2F-0shot-instruct_score: 6.25
         NC-I2F-0shot-instruct_valid_score: 12.5
-        srbench_mean_RMSE: 5.77109E+37
-        srbench_mean_NMSE: 3.38092E+59
-        srbench_mean_R2: -3.38092E+59
+        srbench_mean_RMSE: 57710886695619397134702536427057446912
+        srbench_mean_NMSE: 338091963580478408122294741660108748512869195760521575399424
+        srbench_mean_R2: -338091963580478408122294741660108748512869195760521575399424
         srbench_SymbolicMatch: 0
         supergpqa_Electronic_Science_and_Technology_accuracy: 43.75
         lcb_code_generation_v6_pass@1: 37.5
