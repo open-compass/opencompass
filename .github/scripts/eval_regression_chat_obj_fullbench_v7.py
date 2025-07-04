@@ -110,14 +110,14 @@ LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
 LCBCodeGeneration_v6_datasets = [LCBCodeGeneration_v6_datasets]
 
 repeated_info = [
-    (math_datasets, 2),
-    (gpqa_datasets, 2),
-    (aime2024_datasets, 4),
-    (aime2025_datasets, 4),
+    (math_datasets, 1),
+    (gpqa_datasets, 1),
+    (aime2024_datasets, 1),
+    (aime2025_datasets, 1),
     (olympiadbench_datasets, 1),
-    (livemathbench_datasets, 4),
-    (olymmath_datasets, 4),
-    (korbench_0shot_single_datasets, 4),
+    (livemathbench_datasets, 1),
+    (olymmath_datasets, 1),
+    (korbench_0shot_single_datasets, 1),
 ]
 
 for datasets_, num in repeated_info:
