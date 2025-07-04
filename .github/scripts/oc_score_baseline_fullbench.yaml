@@ -1115,6 +1115,8 @@ internlm3-8b-instruct-hf_fullbench:
         qa_dingo_cn_num_good: 16
         qa_dingo_cn_num_bad: 0
         qa_dingo_cn_total: 16
+    objective_v7: 
+        aime2024_accuracy: 12.5
 
 
 internlm3-8b-instruct-turbomind_fullbench:
@@ -1241,3 +1243,5 @@ internlm3-8b-instruct-turbomind_fullbench:
         qa_dingo_cn_num_bad: 0
         qa_dingo_cn_total: 16
         ARC_Prize_Public_Evaluation_accuracy: 0
+    objective_v7: 
+        aime2024_accuracy: 25
