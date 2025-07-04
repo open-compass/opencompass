@@ -34,7 +34,7 @@ with read_base():
     from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import \
         models as lmdeploy_internlm2_5_7b_chat_model  # noqa: F401, E501
 
-    from ...volc import infer as volc_infer  # noqa: F401, E501
+    from ...volc import infer  # noqa: F401, E501
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')
                 and 'mtbench101' not in k and 'wildbench' not in k), [])

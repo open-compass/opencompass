@@ -25,8 +25,8 @@ internlm3-8b-instruct_hf-lmdeploy:
 
 internlm3-8b-instruct_hf-vllm:
     demo_gsm8k_accuracy: 78.12
-    race-middle_accuracy: 92.20
-    race-high_accuracy: 89.88
+    race-middle_accuracy: 92.27
+    race-high_accuracy: 89.91
 
 internlm2_5-7b-chat_hf:
     demo_gsm8k_accuracy: 87.50
@@ -34,6 +34,6 @@ internlm2_5-7b-chat_hf:
     race-high_accuracy: 90.48
 
 lmdeploy-api-test:
-    gsm8k_accuracy: 68.75
+    gsm8k_accuracy: 62.5
     race-middle_accuracy: 93.75
     race-high_accuracy: 93.75

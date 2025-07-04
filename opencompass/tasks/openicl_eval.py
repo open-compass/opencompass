@@ -41,7 +41,10 @@ class OpenICLEvalTask(BaseTask):
                 c.get('eval_cfg', {}).get('num_gpus', 0),
                 c.get('eval_cfg', {}).get('evaluator', {}).get(
                     'judge_cfg', {}).get('run_cfg', {}).get('num_gpus', 0),
-            ) for c in sum(self.dataset_cfgs, []))
+                c.get('eval_cfg', {}).get('evaluator', {}).get(
+                    'llm_evaluator', {}).get('judge_cfg', {}).get(
+                        'run_cfg', {}).get('num_gpus', 0))
+            for c in sum(self.dataset_cfgs, []))
         self.num_procs = max(
             c.get('eval_cfg', {}).get('evaluator', {}).get(
                 'judge_cfg', {}).get('run_cfg', {}).get('num_procs', 1)
@@ -462,4 +465,4 @@ if __name__ == '__main__':
     inferencer = OpenICLEvalTask(cfg)
     inferencer.run()
     end_time = time.time()
-    get_logger().info(f'time elapsed: {end_time - start_time:.2f}s')
+    get_logger().info(f'time elapsed: {end_time - start_time: .2f}s')
