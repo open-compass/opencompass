@@ -1428,7 +1428,7 @@ internlm3-8b-instruct-turbomind_fullbench:
         IFEval_Inst-level-strict-accuracy: 75
         IFEval_Prompt-level-loose-accuracy: 75
         IFEval_Inst-level-loose-accuracy: 79.17
-        korbench_cipher_accuracy: -
+        korbench_cipher_accuracy: 50
         livemathbench_hard_custom_hard_cn_accuracy: 25
         matbench_steels_mae: 1132.58
         math_prm800k_500_accuracy: 62.5
