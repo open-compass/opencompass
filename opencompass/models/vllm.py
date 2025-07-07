@@ -36,6 +36,7 @@ class VLLM(BaseModel):
         assert LLM, ('Please install VLLM with `pip install vllm`. '
                      'note: torch==2.1.2 is required.')
         self.logger = get_logger()
+        model_kwargs['seed'] = generation_kwargs['seed']
         self._load_model(path, model_kwargs)
         self.tokenizer = self.model.get_tokenizer()
         self.generation_kwargs = generation_kwargs

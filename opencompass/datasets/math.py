@@ -166,6 +166,14 @@ class MATHDataset(BaseDataset):
                     extract_boxed_answer(data[i]['solution'])
                 })
         dataset['test'] = Dataset.from_list(raw_data)
+        # 加载训练集
+        raw_data = []
+        file_path = os.path.join(path, "math_train.jsonl")
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = json.loads(line.strip())   
+                line['lable'] = extract_boxed_answer(line['solution']) 
+                raw_data.append(line)
         dataset['train'] = Dataset.from_list(raw_data)
         return dataset
 
@@ -204,11 +212,7 @@ def math_postprocess_v2(text: str) -> str:
 @ICL_EVALUATORS.register_module()
 class MATHEvaluator(BaseEvaluator):
 
-    def __init__(self,
-                 version='v1',
-                 pred_postprocessor=None):  # 可能需要接收父类__init__的参数
-        super().__init__(
-            pred_postprocessor=pred_postprocessor)  # 调用父类的__init__
+    def __init__(self, version='v1'):
         assert version in ['v1', 'v2']
         self.version = version
 
@@ -512,7 +516,7 @@ class MATHEvaluator(BaseEvaluator):
 
 @ICL_EVALUATORS.register_module()
 class MATHAgentEvaluator(MATHEvaluator):
-    """Math agent evaluator for soft condition.
+    """math agent evaluator for soft condition.
 
     Args:
         action (str): Action for catching internal prediction.

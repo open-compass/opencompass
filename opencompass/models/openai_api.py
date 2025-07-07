@@ -25,7 +25,7 @@ OPENAI_API_BASE = os.path.join(
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3', 'o4']
+O1_MODEL_LIST = ['o1', 'o3']
 
 
 @MODELS.register_module()
@@ -69,11 +69,6 @@ class OpenAI(BaseAPIModel):
             Defaults to None.
         extra_body (Dict, optional): Add additional JSON properties to
             the request
-        think_tag (str, optional): The tag to use for reasoning content.
-            Defaults to '</think>'.
-        max_workers (int, optional): Maximum number of worker threads for
-            concurrent API requests. For I/O-intensive API calls, recommended
-            value is 10-20. Defaults to None (uses CPU count * 2).
     """
 
     is_api: bool = True
@@ -97,8 +92,6 @@ class OpenAI(BaseAPIModel):
         tokenizer_path: Optional[str] = None,
         extra_body: Optional[Dict] = None,
         verbose: bool = False,
-        think_tag: str = '</think>',
-        max_workers: Optional[int] = None,
     ):
 
         super().__init__(
@@ -121,13 +114,6 @@ class OpenAI(BaseAPIModel):
         self.tokenizer_path = tokenizer_path
         self.hf_tokenizer = None
         self.extra_body = extra_body
-        self.think_tag = think_tag
-
-        if max_workers is None:
-            cpu_count = os.cpu_count() or 1
-            self.max_workers = min(32, (cpu_count + 5) * 2)
-        else:
-            self.max_workers = max_workers
 
         if isinstance(key, str):
             if key == 'ENV':
@@ -185,7 +171,7 @@ class OpenAI(BaseAPIModel):
         if self.temperature is not None:
             temperature = self.temperature
 
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+        with ThreadPoolExecutor() as executor:
             results = list(
                 tqdm(
                     executor.map(
@@ -333,28 +319,7 @@ class OpenAI(BaseAPIModel):
                 if self.logprobs:
                     return response['choices']
                 else:
-                    # Extract content and reasoning_content from response
-                    message = response['choices'][0]['message']
-                    content = message.get('content', '') or ''
-                    reasoning_content = message.get('reasoning_content',
-                                                    '') or ''
-
-                    # Handle reasoning_content similar to OpenAISDK
-                    if reasoning_content:
-                        if self.verbose:
-                            self.logger.info(
-                                'Extracting reasoning content and tags.'
-                                'Reasoning Content: %s, \n'
-                                'Tags: %s, \n'
-                                'Content: %s', reasoning_content,
-                                self.think_tag, content)
-
-                        if content:
-                            return reasoning_content + self.think_tag + content
-                        else:
-                            return reasoning_content
-                    else:
-                        return content.strip()
+                    return response['choices'][0]['message']['content'].strip()
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
@@ -585,10 +550,8 @@ class OpenAISDK(OpenAI):
         tokenizer_path: str | None = None,
         extra_body: Dict | None = None,
         verbose: bool = False,
-        http_client_cfg: dict = {},
         status_code_mappings: dict = {},
         think_tag: str = '</think>',
-        max_workers: Optional[int] = None,
     ):
         super().__init__(
             path,
@@ -608,7 +571,6 @@ class OpenAISDK(OpenAI):
             tokenizer_path,
             extra_body,
             verbose=verbose,
-            max_workers=max_workers,
         )
         from openai import OpenAI
 
@@ -618,20 +580,20 @@ class OpenAISDK(OpenAI):
         else:
             self.openai_api_base = openai_api_base
 
-        if self.proxy_url or http_client_cfg:
-            if self.proxy_url:
-                http_client_cfg['proxies'] = {
-                    'http://': self.proxy_url,
-                    'https://': self.proxy_url,
-                }
+        if self.proxy_url is None:
+            self.openai_client = OpenAI(base_url=self.openai_api_base,
+                                        api_key=key)
+        else:
+            proxies = {
+                'http://': self.proxy_url,
+                'https://': self.proxy_url,
+            }
 
-        self.openai_client = OpenAI(
-            base_url=self.openai_api_base,
-            api_key=key,
-            http_client=httpx.Client(
-                **http_client_cfg) if http_client_cfg else None,
-        )
-
+            self.openai_client = OpenAI(
+                base_url=self.openai_api_base,
+                api_key=key,
+                http_client=httpx.Client(proxies=proxies),
+            )
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
@@ -692,17 +654,16 @@ class OpenAISDK(OpenAI):
             try:
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
-
                 responses = self.openai_client.chat.completions.create(
                     **query_data, timeout=timeout)  # timeout in seconds
                 if self.verbose:
                     self.logger.info(
-                        'Successfully get response from OpenAI API '
-                        'with query: %s', query_data)
+                        'Successfully get response from OpenAI API')
                     try:
                         self.logger.info(responses)
                     except Exception:
                         pass  # noqa F841
+
                 # Check if response is empty or content is empty
                 if (not responses.choices or not responses.choices[0].message
                         or
@@ -711,19 +672,6 @@ class OpenAISDK(OpenAI):
                         'reasoning_content',
                         '',
                     ))):  # noqa: E125
-                    # There is case that server does not return any content
-                    if responses.choices[0].finish_reason == 'stop':
-                        self.logger.info(
-                            'Server does not return any content '
-                            'and stop reason is <stop>, '
-                            'the input query is: %s', query_data)
-                        return ''
-                    if responses.choices[0].finish_reason == 'content_filter':
-                        self.logger.info(
-                            'The answer for this question is filted,'
-                            'the stop reason is <content_filter>, '
-                            'the input query is: %s', query_data)
-                        return ''
                     self.logger.error(
                         'Failed to extract content from the responses. '
                         'Please check the API response for detail information.'

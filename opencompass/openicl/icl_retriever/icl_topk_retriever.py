@@ -49,11 +49,11 @@ class TopkRetriever(BaseRetriever):
                  dataset,
                  ice_separator: Optional[str] = '\n',
                  ice_eos_token: Optional[str] = '\n',
-                 ice_num: Optional[int] = 1,
+                 ice_num: Optional[int] = 8,
                  sentence_transformers_model_name: Optional[
                      str] = 'all-mpnet-base-v2',
                  tokenizer_name: Optional[str] = 'gpt2-xl',
-                 batch_size: Optional[int] = 1) -> None:
+                 batch_size: Optional[int] = 10) -> None:
         super().__init__(dataset, ice_separator, ice_eos_token, ice_num)
         from sentence_transformers import SentenceTransformer
 
@@ -145,12 +145,14 @@ class TopkRetriever(BaseRetriever):
 
 
 class ListWrapper:
-
     def __init__(self, data: List[Any]):
         self.data = data
 
     def to(self, device):
         return self.data
+
+    def __iter__(self):
+        return iter(self.data)
 
 
 def ignore_pad_dict(features):

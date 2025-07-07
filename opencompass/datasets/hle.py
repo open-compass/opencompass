@@ -9,12 +9,9 @@ from .base import BaseDataset
 class HLEDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, category: str | None = None):
+    def load(path: str):
         dataset = load_dataset(path)
-        ds = dataset['test'].filter(lambda x: x['image'] == '')
-        if category:
-            ds = ds.filter(lambda x: x['category'] == category)
-        ds = ds.rename_column('question', 'problem')
-        dataset['train'] = ds
-        dataset['test'] = ds
+        dataset['test'] = dataset['test'].filter(lambda x: x['image'] == '')
+        dataset['test'] = dataset['test'].rename_column('question', 'problem')
+        dataset['train'] = dataset['test']
         return dataset

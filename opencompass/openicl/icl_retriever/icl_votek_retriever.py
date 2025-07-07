@@ -27,8 +27,8 @@ class VotekRetriever(TopkRetriever):
                  sentence_transformers_model_name: Optional[
                      str] = 'all-mpnet-base-v2',
                  tokenizer_name: Optional[str] = 'gpt2-xl',
-                 batch_size: Optional[int] = 1,
-                 votek_k: Optional[int] = 3) -> None:
+                 batch_size: Optional[int] = 10,
+                 votek_k: Optional[int] = 5) -> None:
         super().__init__(dataset, ice_separator, ice_eos_token, ice_num,
                          sentence_transformers_model_name, tokenizer_name,
                          batch_size)

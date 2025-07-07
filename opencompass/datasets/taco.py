@@ -292,7 +292,7 @@ class Capturing(list):
 
 
 def run_test(sample, test=None, debug=False):
-    """If test(generated_code) is not None it'll try to run the code.
+    """if test(generated_code) is not None it'll try to run the code.
 
     otherwise it'll just return an input and output pair.
     """

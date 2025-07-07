@@ -29,20 +29,8 @@ def _parse(item, template, prompt_mode):
 class SuperGPQADataset(BaseDataset):
 
     @staticmethod
-    def load(path: str,
-             prompt_mode: str,
-             discipline: str = None,
-             field: str = None,
-             subfield: str = None,
-             **kwargs):
+    def load(path: str, prompt_mode: str, **kwargs):
         dataset = load_dataset(path, split='train')
-
-        if discipline is not None:
-            dataset = dataset.filter(lambda x: x['discipline'] == discipline)
-        if field is not None:
-            dataset = dataset.filter(lambda x: x['field'] == field)
-        if subfield is not None:
-            dataset = dataset.filter(lambda x: x['subfield'] == subfield)
 
         # get prompt template
         template_path = None
@@ -169,14 +157,10 @@ class SuperGPQAEvaluator(BaseEvaluator):
                 count += 1
                 count_difficulty[difficulty] += 1
                 details.append({
-                    'pred':
-                    sample['pred'],
-                    'answer':
-                    sample['answer'],
-                    'parsed_answer':
-                    sample['extracted_answer'],
-                    'correct':
-                    True if sample['status'] == 'correct' else False,
+                    'pred': sample['pred'],
+                    'answer': sample['answer'],
+                    'parsed_answer': sample['extracted_answer'],
+                    'correct': True if sample['status'] else False,
                 })
 
         return {
@@ -286,7 +270,7 @@ def supergpqa_llmjudge_postprocess(
                 'question': sample['question'],
                 'options': sample['options'],
                 'origin_prompt': v['origin_prompt'],
-                'prediction': processed_judge,  # llm_judge
+                'llm_judge': processed_judge,
                 'gold': gold,
                 'is_correct': is_correct,
                 'discipline': discipline,

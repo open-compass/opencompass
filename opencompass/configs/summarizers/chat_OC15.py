@@ -53,18 +53,22 @@ summarizer = dict(
         ['sanitized_mbpp', 'score'],
         ['GPQA_diamond', 'accuracy'],
         ['IFEval', 'Prompt-level-strict-accuracy'],
+
         '',
+
         'mmlu',
         'mmlu-stem',
         'mmlu-social-science',
         'mmlu-humanities',
         'mmlu-other',
+
         'cmmlu',
         'cmmlu-stem',
         'cmmlu-social-science',
         'cmmlu-humanities',
         'cmmlu-other',
         'cmmlu-china-specific',
+
         'ceval',
         'ceval-stem',
         'ceval-social-science',

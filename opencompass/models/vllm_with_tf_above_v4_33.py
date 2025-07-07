@@ -43,6 +43,7 @@ class VLLMwithChatTemplate(BaseModel):
 
             self.tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
         else:
+            model_kwargs['seed'] = generation_kwargs['seed']
             self._load_model(path, model_kwargs)
             self.tokenizer = self.model.get_tokenizer()
 

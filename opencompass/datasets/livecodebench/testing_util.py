@@ -79,7 +79,7 @@ def combined_int_check(val):
 
 
 def run_test(sample, test=None, debug=False, timeout=6):
-    """If test(generated_code) is not None it'll try to run the code.
+    """if test(generated_code) is not None it'll try to run the code.
 
     otherwise it'll just return an input and output pair.
     """

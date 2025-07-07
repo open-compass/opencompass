@@ -239,7 +239,7 @@ class ChatInferencer(BaseInferencer):
                 index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
-        dataloader = self.get_dataloader(chat_list[index:], batch_size=1)
+        dataloader = self.get_dataloader(chat_list[index:], batch_size=100000) 
 
         # 5. Inference for prompts in each batch
         logger.info('Starting inference process...')

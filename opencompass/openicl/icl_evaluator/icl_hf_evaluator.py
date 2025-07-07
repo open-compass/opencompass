@@ -1,11 +1,10 @@
 import os
 import random
-from typing import List, Optional
+from typing import List
 
 import evaluate
 import numpy as np
 from datasets import Dataset
-from mmengine.config import ConfigDict
 
 from opencompass.registry import ICL_EVALUATORS
 
@@ -20,17 +19,12 @@ class HuggingfaceEvaluator(BaseEvaluator):
         seed (int): There exists some randomness during the calculation of some
             metrics, thus we set a fixed random seed for reproducing. Defaults
             to 0.
-        pred_postprocessor (optional): Function or configuration for prediction
-            post-processing.
     """
 
-    def __init__(self,
-                 metric: str,
-                 seed: int = 0,
-                 pred_postprocessor=None) -> None:
+    def __init__(self, metric: str, seed: int = 0) -> None:
         self.metric = metric
         self.seed = seed
-        super().__init__(pred_postprocessor=pred_postprocessor)
+        super().__init__()
 
     def _preprocess(self, predictions: List, references: List) -> dict:
         """Preprocess the final predictions and references to needed format.
@@ -58,10 +52,7 @@ class HuggingfaceEvaluator(BaseEvaluator):
         """
         return scores
 
-    def score(self,
-              predictions: List,
-              references: List,
-              test_set=None) -> dict:
+    def score(self, predictions: List, references: List) -> dict:
         """Calculate scores.
 
         Args:
@@ -101,15 +92,10 @@ class HuggingfaceEvaluator(BaseEvaluator):
 class AccEvaluator(HuggingfaceEvaluator):
     """Accuracy evaluator."""
 
-    def __init__(self,
-                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
-        super().__init__(metric='accuracy',
-                         pred_postprocessor=pred_postprocessor)
+    def __init__(self) -> None:
+        super().__init__(metric='accuracy')
 
-    def _preprocess(self,
-                    predictions: List,
-                    references: List,
-                    test_set=None) -> dict:
+    def _preprocess(self, predictions: List, references: List) -> dict:
         """Preprocess the final predictions and references to needed format.
 
         Args:
@@ -201,9 +187,8 @@ class RougeEvaluator(HuggingfaceEvaluator):
     Note: this evaluator is not suitable for chinese datasets.
     """
 
-    def __init__(self,
-                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
-        super().__init__(metric='rouge', pred_postprocessor=pred_postprocessor)
+    def __init__(self) -> None:
+        super().__init__(metric='rouge')
 
     def _postprocess(self, scores: dict) -> dict:
         """Postprocess for final scores.
@@ -221,10 +206,8 @@ class RougeEvaluator(HuggingfaceEvaluator):
 class BleuEvaluator(HuggingfaceEvaluator):
     """Bleu evaluator."""
 
-    def __init__(self,
-                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
-        super().__init__(metric='sacrebleu',
-                         pred_postprocessor=pred_postprocessor)
+    def __init__(self) -> None:
+        super().__init__(metric='sacrebleu')
 
 
 class BleuFloresEvaluator(HuggingfaceEvaluator):

@@ -1,7 +1,6 @@
 # flake8: noqa
 # yapf: disable
 import copy
-import time
 from typing import Dict, List, Optional, Union
 
 from opencompass.models.base import BaseModel
@@ -17,7 +16,7 @@ PromptType = Union[PromptList, str]
 
 
 def valid_str(string, coding='utf-8'):
-    """Decode text according to its encoding type."""
+    """decode text according to its encoding type."""
     invalid_chars = [b'\xef\xbf\xbd']
     bstr = bytes(string, coding)
     for invalid_char in invalid_chars:
@@ -167,14 +166,9 @@ class TurboMindModelwithChatTemplate(BaseModel):
         self.logger.info(gen_config)
 
         results = []
-        start = time.perf_counter()
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
-        duration = time.perf_counter() - start
-        input_tokens = [output.input_token_len for output in outputs]
-        output_tokens = [output.generate_token_len for output in outputs]
-        results = [output.text for output in outputs]
-        self.logger.info(f'duration {duration:.2f}s, requests {len(inputs)}, input_tokens {sum(input_tokens)}, '
-                         f'output_tokens {sum(output_tokens)}')
+        for output in outputs:
+            results.append(output.text)
 
         for s in stop_words:
             results = [r.split(s)[0] for r in results]

@@ -26,12 +26,12 @@ class DPPRetriever(TopkRetriever):
                  dataset,
                  ice_separator: Optional[str] = '\n',
                  ice_eos_token: Optional[str] = '\n',
-                 ice_num: Optional[int] = 1,
+                 ice_num: Optional[int] = 8,
                  sentence_transformers_model_name: Optional[
                      str] = 'all-mpnet-base-v2',
                  tokenizer_name: Optional[str] = 'gpt2-xl',
-                 batch_size: Optional[int] = 1,
-                 candidate_num: Optional[int] = 1,
+                 batch_size: Optional[int] = 10,
+                 candidate_num: Optional[int] = 24,
                  seed: Optional[int] = 1,
                  scale_factor: Optional[float] = 0.1) -> None:
         super().__init__(dataset, ice_separator, ice_eos_token, ice_num,
@@ -54,17 +54,15 @@ class DPPRetriever(TopkRetriever):
             embed = np.expand_dims(entry['embed'], axis=0)
             near_ids = np.array(
                 self.index.search(embed, self.candidate_num)[1][0].tolist())
-
             # DPP stage
             near_reps, rel_scores, kernel_matrix = self.get_kernel(
                 embed, near_ids.tolist())
 
             # MAP inference
             samples_ids = fast_map_dpp(kernel_matrix, self.ice_num)
-
             # ordered by relevance score
             samples_scores = np.array([rel_scores[i] for i in samples_ids])
-            samples_ids = samples_ids[(-samples_scores).argsort()].tolist()
+            samples_ids = np.array(samples_ids)[(-samples_scores).argsort()].tolist()
             rtr_sub_list = [int(near_ids[i]) for i in samples_ids]
 
             rtr_idx_list[idx] = rtr_sub_list
@@ -108,6 +106,8 @@ def fast_map_dpp(kernel_matrix, max_length):
     Recommendation Diversity
     """
     item_size = kernel_matrix.shape[0]
+    # 确保 max_length 不超过 item_size
+    max_length = min(max_length, item_size)
     cis = np.zeros((max_length, item_size))
     di2s = np.copy(np.diag(kernel_matrix))
     selected_items = list()
@@ -116,7 +116,11 @@ def fast_map_dpp(kernel_matrix, max_length):
     while len(selected_items) < max_length:
         k = len(selected_items) - 1
         ci_optimal = cis[:k, selected_item]
-        di_optimal = math.sqrt(di2s[selected_item])
+        # 使用 np.sqrt 代替 math.sqrt
+        di_optimal = np.sqrt(di2s[selected_item])
+        # 处理 di_optimal 为零的情况
+        if di_optimal == 0:
+            di_optimal = 1e-10  # 避免除零错误
         elements = kernel_matrix[selected_item, :]
         eis = (elements - np.dot(ci_optimal, cis[:k, :])) / di_optimal
         cis[k, :] = eis

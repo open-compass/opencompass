@@ -1,6 +1,5 @@
 import os
 import os.path as osp
-from copy import deepcopy
 from typing import Dict, List, Optional
 
 import mmengine
@@ -15,8 +14,6 @@ from opencompass.registry import (DICT_POSTPROCESSORS, ICL_PROMPT_TEMPLATES,
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
 
-logger = get_logger(__name__)
-
 
 class GenericLLMEvaluator(BaseEvaluator):
     """Generic LLM evaluator.
@@ -26,7 +23,6 @@ class GenericLLMEvaluator(BaseEvaluator):
         judge_cfg (ConfigDict): The config for Judge LLM.
         dataset_cfg (ConfigDict): The config for dataset.
         pred_postprocessor (ConfigDict): The config for postprocessor.
-            used for the prediction results.
         dict_postprocessor (ConfigDict): The config for postprocessor,
             used for evaluation results dict.
     """
@@ -40,7 +36,8 @@ class GenericLLMEvaluator(BaseEvaluator):
         dict_postprocessor: Optional[ConfigDict] = None,
         keep_predictions: bool = False,
     ) -> None:
-        super().__init__(pred_postprocessor=pred_postprocessor)
+
+        self.logger = get_logger()
         # If judge_cfg is not provided, fall back to the default configuration
         if not judge_cfg:
             self.judge_cfg = self.default_judge_cfg
@@ -57,14 +54,14 @@ class GenericLLMEvaluator(BaseEvaluator):
         self.dict_postprocessor = dict_postprocessor
         self.pred_postprocessor = pred_postprocessor
 
-    def build_inferencer(self):
+    def build_inferencer(self, ):
         """Build LLM Inference."""
+        output_path = self._out_dir
+        self.output_path = f'{output_path}.json'
+        out_dir, out_name = osp.split(output_path)
+        out_name = f'{out_name}.json'
 
-        self.output_path = f'{self._out_dir}_replica{self.dataset_replica_idx}.json'  # noqa
-        logger.info(f'LLM judge details will be saved at:{self.output_path}')
-        out_dir, out_name = osp.split(self.output_path)
-
-        logger.info(
+        self.logger.info(
             f'Set self.output_path to {self.output_path} for current task')
         assert self.output_path is not None, 'output_path is None'
 
@@ -101,6 +98,7 @@ class GenericLLMEvaluator(BaseEvaluator):
 
         # -------------- Build Inferencer ----------------
         self.build_inferencer()
+
         # ---------------- Process Predictions ------------------
         predictions = self.pred_postprocess(predictions)
 
@@ -180,7 +178,7 @@ class GenericLLMEvaluator(BaseEvaluator):
         if self.dict_postprocessor is None:
             return output
         else:
-            kwargs = deepcopy(self.dict_postprocessor)
+            kwargs = self.dict_postprocessor
             proc = DICT_POSTPROCESSORS.get(kwargs.pop('type'))
             sig = inspect.signature(proc)
             if 'dataset' in sig.parameters:
@@ -194,8 +192,7 @@ class GenericLLMEvaluator(BaseEvaluator):
     @property
     def default_judge_cfg(self):
         from opencompass.models import OpenAISDK
-        logger.info('Please set your judge model in `OC_JUDGE_MODEL`, \
-            `OC_JUDGE_API_KEY`, `OC_JUDGE_API_BASE` environment variables.')
+
         DEFAULT_JUDGE_CFG = dict(
             type=OpenAISDK,
             path=os.environ['OC_JUDGE_MODEL'],
