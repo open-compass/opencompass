@@ -11,7 +11,7 @@ models = [
     dict(
         type=VLLMwithChatTemplate,
         abbr="gemma-2-2b-instruct-vllm",
-        path="/mnt/pfs-gv8sxa/tts/dhg/workspace-ruc/chengxiang/datas/models/gemma2-2B-it",
+        path="chengxiang/datas/models/gemma2-2B-it",
         model_kwargs=dict(tensor_parallel_size=4,max_model_len=8192,gpu_memory_utilization=0.9),
         max_out_len=4096,
         max_seq_len=8192,

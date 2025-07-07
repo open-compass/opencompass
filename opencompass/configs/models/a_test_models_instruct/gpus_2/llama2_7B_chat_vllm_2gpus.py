@@ -15,7 +15,7 @@ models = [
     dict(
         type=VLLMwithChatTemplate,
         abbr="llama-2-7b-chat-vllm",
-        path="/mnt/pfs-gv8sxa/tts/dhg/workspace-ruc/chengxiang/datas/models/llama2-7B-chat",
+        path="chengxiang/datas/models/llama2-7B-chat",
         model_kwargs=dict(tensor_parallel_size=2, max_model_len=4096,gpu_memory_utilization=0.9),
         max_out_len=2048,
         max_seq_len=4096,

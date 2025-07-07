@@ -16,7 +16,7 @@ models = [
     dict(
         type=VLLMwithChatTemplate,
         abbr="qwen-2.5-14b-instruct-vllm",
-        path="/mnt/pfs-gv8sxa/tts/dhg/workspace-ruc/chengxiang/datas/models/Qwen2.5-14B-instruct",
+        path="chengxiang/datas/models/Qwen2.5-14B-instruct",
         model_kwargs=dict(tensor_parallel_size=8, max_model_len=32768,gpu_memory_utilization=0.9),
         max_out_len=4096,
         max_seq_len=32768,
