@@ -29,6 +29,7 @@ class RJOBRunner(BaseRunner):
         debug (bool): Whether in debug mode.
         lark_bot_url (str): Lark notification URL.
         keep_tmp_file (bool): Whether to keep temporary files.
+        phase (str): Task phase.
     """
 
     def __init__(
@@ -40,12 +41,14 @@ class RJOBRunner(BaseRunner):
         debug: bool = False,
         lark_bot_url: str = None,
         keep_tmp_file: bool = True,
+        phase: str = 'unknown',
     ):
         super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
         self.rjob_cfg = rjob_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
         self.keep_tmp_file = keep_tmp_file
+        self.phase = phase
 
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
         """Launch multiple tasks."""
@@ -123,7 +126,10 @@ class RJOBRunner(BaseRunner):
         logger = get_logger()
         logger.info(f'Task config: {cfg}')
         logger.info(f'Rjob config: {self.rjob_cfg}')
-        task_name = f'oc-{self.task_cfg["phase"]}-{self.rjob_cfg["task_id"]}-{str(uuid.uuid4())[:8]}'
+        
+        # 安全地获取phase和task_id，如果不存在则使用默认值
+        task_id = self.rjob_cfg.get('task_id', 'unknown')
+        task_name = f'oc-{self.phase}-{task_id}-{str(uuid.uuid4())[:8]}'
         logger.info(f'Task name: {task_name}')
         
 
