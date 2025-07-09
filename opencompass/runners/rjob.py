@@ -3,9 +3,10 @@ import os.path as osp
 import random
 import subprocess
 import time
+import uuid
 from functools import partial
 from typing import Any, Dict, List, Optional, Tuple
-import uuid
+
 import mmengine
 from mmengine.config import ConfigDict
 from mmengine.utils import track_parallel_progress
@@ -116,7 +117,6 @@ class RJOBRunner(BaseRunner):
         return status
 
     def _launch(self, cfg: ConfigDict, random_sleep: Optional[bool] = None):
-
         """Launch a single task via rjob bash script."""
         if random_sleep is None:
             random_sleep = self.max_num_workers > 32
@@ -126,22 +126,17 @@ class RJOBRunner(BaseRunner):
         logger = get_logger()
         logger.info(f'Task config: {cfg}')
         logger.info(f'Rjob config: {self.rjob_cfg}')
-        
         # 安全地获取phase和task_id，如果不存在则使用默认值
         task_id = self.rjob_cfg.get('task_id', 'unknown')
         task_name = f'oc-{self.phase}-{task_id}-{str(uuid.uuid4())[:8]}'
         logger.info(f'Task name: {task_name}')
-        
-
         # Generate temporary parameter file
         pwd = os.getcwd()
         mmengine.mkdir_or_exist('tmp/')
-
         uuid_str = str(uuid.uuid4())
         param_file = f'{pwd}/tmp/{uuid_str}_params.py'
         try:
             cfg.dump(param_file)
-
             # Construct rjob submit command arguments
             args = []
             # Basic parameters
@@ -186,7 +181,6 @@ class RJOBRunner(BaseRunner):
             # Additional arguments
             if self.rjob_cfg.get('extra_args'):
                 args.extend(self.rjob_cfg['extra_args'])
-
             # Get launch command through task.get_command
             # compatible with template
             tmpl = '{task_cmd}'
@@ -197,10 +191,8 @@ class RJOBRunner(BaseRunner):
             entry_cmd = f'bash -c "cd {pwd} && {entry_cmd}"'
             # Construct complete command
             cmd = f"rjob submit {' '.join(args)} -- {entry_cmd}"
-
             logger = get_logger()
             logger.info(f'Running command: {cmd}')
-
             # Log output
             if self.debug:
                 out_path = None
