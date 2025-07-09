@@ -12,7 +12,6 @@ on:
   schedule:
     - cron:  '56 22 * * *'
 
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -117,7 +116,6 @@ jobs:
     needs: [pr_run_test]
     timeout-minutes: 5
     runs-on: self-hosted
-    environment: 'prod'
     steps:
       - name: notify
         run: |
