@@ -107,7 +107,7 @@ with read_base():
     from opencompass.configs.summarizers.mmmlu_lite import \
         mmmlu_summary_groups  # noqa: F401, E501
 
-    from ...volc import infer as volc_infer  # noqa: F401, E501
+    from ...volc import infer  # noqa: F401, E501
 
 # For HumanEval-X Evaluation
 # Apply the evaluator ip_address and port
