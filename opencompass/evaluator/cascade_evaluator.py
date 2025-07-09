@@ -150,9 +150,9 @@ class CascadeEvaluator(BaseEvaluator):
             else:
                 test_item = None
             # Apply prediction postprocessing for each sample
-            [pred] = self.rule_evaluator.pred_postprocess([pred])
+            [pred_rule] = self.rule_evaluator.pred_postprocess([pred])
 
-            result = self.sample_score(pred, ref, test_item)
+            result = self.sample_score(pred_rule, ref, test_item)
             result['evaluation_method'] = 'rule'
             details.append({'rule_evaluation': result})
 
