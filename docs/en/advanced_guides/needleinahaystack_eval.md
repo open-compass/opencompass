@@ -48,7 +48,7 @@ If evaluating locally, the command will use all available GPUs. You can control 
 
 ```bash
 # Local evaluation
-python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer
+python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer
 ```
 
 ##### Evaluation on Slurm Cluster
@@ -57,7 +57,7 @@ For Slurm environments, you can add options like `--slurm -p partition_name -q r
 
 ```bash
 # Slurm evaluation
-python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 ##### Evaluating Specific Subsets
@@ -65,13 +65,13 @@ python run.py --dataset needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_12
 If you only want to test the original Needle In A Haystack task (e.g., single-needle 128k), adjust the dataset parameter:
 
 ```bash
-python run.py --dataset needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --datasets needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 To evaluate only Chinese versions, specify the subset dataset after `/`:
 
 ```bash
-python run.py --dataset needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py --datasets needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 Ensure `VLLM` is installed beforehand:
@@ -92,7 +92,7 @@ You can then run evaluation with:
 python run.py configs/eval_needlebench_v2.py --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-No need to manually specify `--dataset`, `--models`, or `--summarizer` again.
+No need to manually specify `--datasets`, `--models`, or `--summarizer` again.
 
 ### Visualization
 
