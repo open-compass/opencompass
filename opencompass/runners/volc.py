@@ -36,6 +36,9 @@ class VOLCRunner(BaseRunner):
         retry (int): Number of retries when job failed. Default: 2.
         debug (bool): Whether to run in debug mode. Default: False.
         lark_bot_url (str): Lark bot url. Default: None.
+        keep_tmp_file (bool): Whether to keep the temporary file. Default:
+            False.
+        tmp_dir (str): The directory to store temporary files. Default: 'tmp'.
     """
 
     def __init__(self,
@@ -48,8 +51,12 @@ class VOLCRunner(BaseRunner):
                  retry: int = 2,
                  debug: bool = False,
                  lark_bot_url: str = None,
-                 keep_tmp_file: bool = True):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+                 keep_tmp_file: bool = True,
+                 tmp_dir: str = 'tmp'):
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.volcano_cfg = volcano_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
@@ -101,13 +108,15 @@ class VOLCRunner(BaseRunner):
         # Build up VCC command
         pwd = os.getcwd()
         # Dump task config to file
-        mmengine.mkdir_or_exist('tmp/')
+        mmengine.mkdir_or_exist(self.tmp_dir)
         # Using uuid to avoid filename conflict
         import uuid
         uuid_str = str(uuid.uuid4())
-        param_file = f'{pwd}/tmp/{uuid_str}_params.py'
+        param_file = f'{uuid_str}_params.py'
+        param_file = osp.join(self.tmp_dir, param_file)
 
-        volc_cfg_file = f'{pwd}/tmp/{uuid_str}_cfg.yaml'
+        volc_cfg_file = f'{uuid_str}_cfg.yaml'
+        volc_cfg_file = osp.join(self.tmp_dir, volc_cfg_file)
         volc_cfg = self._choose_flavor(num_gpus)
         with open(volc_cfg_file, 'w') as fp:
             yaml.dump(volc_cfg, fp, sort_keys=False)

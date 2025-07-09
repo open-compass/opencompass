@@ -40,8 +40,12 @@ class RJOBRunner(BaseRunner):
         debug: bool = False,
         lark_bot_url: str = None,
         keep_tmp_file: bool = True,
+        tmp_dir: str = 'tmp',
     ):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.rjob_cfg = rjob_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
