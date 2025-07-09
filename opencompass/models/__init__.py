@@ -5,6 +5,7 @@ from .baichuan_api import BaiChuan  # noqa: F401
 from .baidu_api import ERNIEBot  # noqa: F401
 from .bailing_api_oc import BailingAPI  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa: F401
+from .bluelm_api import BlueLMAPI  # noqa: F401
 from .base_api import APITemplateParser, BaseAPIModel  # noqa: F401
 from .bytedance_api import ByteDance  # noqa: F401
 from .claude_allesapin import ClaudeAllesAPIN  # noqa: F401
