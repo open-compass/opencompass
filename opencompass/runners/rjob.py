@@ -126,7 +126,7 @@ class RJOBRunner(BaseRunner):
         logger = get_logger()
         logger.info(f'Task config: {cfg}')
         logger.info(f'Rjob config: {self.rjob_cfg}')
-        # 安全地获取phase和task_id，如果不存在则使用默认值
+        # Obtain task_id in safe way, if not exist, use default value
         task_id = self.rjob_cfg.get('task_id', 'unknown')
         task_name = f'oc-{self.phase}-{task_id}-{str(uuid.uuid4())[:8]}'
         logger.info(f'Task name: {task_name}')
