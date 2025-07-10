@@ -19,7 +19,7 @@ OpenCompass currently supports most datasets that use `GenInferencer` for infere
 
 ### Step One: Building Evaluation Configurations, Using MATH as an Example
 
-Below is the Config for evaluating the MATH dataset with JudgeLLM, with the evaluation model being *Llama3-8b-instruct* and the JudgeLLM being *Llama3-70b-instruct*. For more detailed config settings, please refer to `configs/eval_math_llm_judge.py`. The following is a brief version of the annotations to help users understand the meaning of the configuration file.
+Below is the Config for evaluating the MATH dataset with JudgeLLM, with the evaluation model being *Llama3-8b-instruct* and the JudgeLLM being *Llama3-70b-instruct*. For more detailed config settings, please refer to `examples/eval_math_llm_judge.py`. The following is a brief version of the annotations to help users understand the meaning of the configuration file.
 
 ```python
 # Most of the code in this file is copied from https://github.com/openai/simple-evals/blob/main/math_eval.py
