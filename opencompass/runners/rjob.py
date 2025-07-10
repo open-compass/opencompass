@@ -61,7 +61,7 @@ class RJOBRunner(BaseRunner):
                 keep_order=False,
             )
         else:
-            status = [self._launch(task, random_sleep=False) for task in tasks]
+            status = [self._launch(task, random_sleep=True) for task in tasks]
         return status
 
     def _run_task(self, task_name, log_path, poll_interval=60):
@@ -119,7 +119,9 @@ class RJOBRunner(BaseRunner):
     def _launch(self, cfg: ConfigDict, random_sleep: Optional[bool] = None):
         """Launch a single task via rjob bash script."""
         if random_sleep is None:
-            random_sleep = self.max_num_workers > 32
+            random_sleep = self.max_num_workers > 16
+        if random_sleep:
+            time.sleep(random.randint(0, 10))
         task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
         # Normalize task name
@@ -199,9 +201,6 @@ class RJOBRunner(BaseRunner):
             else:
                 out_path = task.get_log_path(file_extension='out')
                 mmengine.mkdir_or_exist(osp.split(out_path)[0])
-
-            if random_sleep:
-                time.sleep(random.randint(0, 10))
 
             retry = self.retry
             while retry > 0:
