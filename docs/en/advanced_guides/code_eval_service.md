@@ -62,7 +62,7 @@ When the model inference and code evaluation services are running on the same ho
 
 ### Configuration File
 
-We provide [the configuration file](https://github.com/open-compass/opencompass/blob/main/configs/eval_codegeex2.py) of using `humanevalx` for evaluation on `codegeex2` as reference.
+We provide [the configuration file](https://github.com/open-compass/opencompass/blob/main/examples/eval_codegeex2.py) of using `humanevalx` for evaluation on `codegeex2` as reference.
 
 The dataset and related post-processing configurations files can be found at this [link](https://github.com/open-compass/opencompass/tree/main/configs/datasets/humanevalx) with attention paid to the `evaluator` field in the humanevalx_eval_cfg_dict.
 

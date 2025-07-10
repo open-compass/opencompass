@@ -89,7 +89,7 @@ For other models, it is recommended to write your own config file (such as `exam
 You can then run evaluation with:
 
 ```bash
-python run.py configs/eval_needlebench_v2.py --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py examples/eval_needlebench_v2.py --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 No need to manually specify `--dataset`, `--models`, or `--summarizer` again.
