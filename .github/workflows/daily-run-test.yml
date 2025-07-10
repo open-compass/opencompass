@@ -129,7 +129,7 @@ jobs:
           if-no-files-found: error
           path: builder/manywheel/${{ env.OUTPUT_FOLDER }}
           retention-days: 1
-          name: my-artifact-${{ github.run_id }}-${{ matrix.pyver }}
+          name: my-artifact-${{ github.run_id }}
 
 
   prepare_env:
