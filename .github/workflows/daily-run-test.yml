@@ -178,7 +178,7 @@ jobs:
         if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
         uses: actions/download-artifact@v4
         with:
-          name: my-artifact-${{ github.run_id }}-py310
+          name: my-artifact-${{ github.run_id }}
       - name: Prepare - reinstall lmdeploy - cu12
         if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
         run: |
