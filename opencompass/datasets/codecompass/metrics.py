@@ -1,3 +1,5 @@
+# metric.py
+
 import numpy as np
 
 
@@ -28,9 +30,20 @@ def compute_metrics_from_results(results: dict, k_list=[1]):
     total = []
     correct = []
 
+    if not results:
+        metrics = {}
+        for k in k_list:
+            metrics[f"pass@{k}"] = 0.0
+        if 1 in k_list or not k_list:
+            metrics['details'] = {'pass@1': []}
+        return metrics
+
     for problem_idx in sorted(results.keys()):
         problem_results = results[problem_idx]
-        if not problem_results: continue
+        if not problem_results:
+            total.append(0)
+            correct.append(0)
+            continue
 
         total.append(len(problem_results))
 
@@ -45,11 +58,18 @@ def compute_metrics_from_results(results: dict, k_list=[1]):
     correct_arr = np.array(correct)
 
     metrics = {}
+    # For details, a problem is "correct" if at least one generation passed.
+    pass_1_details = (correct_arr > 0).astype(float).tolist()
+
     for k in k_list:
         if np.all(total_arr >= k):
             pass_k_mean = estimate_pass_at_k(total_arr, correct_arr, k).mean()
             metrics[f'pass@{k}'] = pass_k_mean
         else:
             metrics[f'pass@{k}'] = np.nan
+
+    # Add the detailed pass@1 results for building the final report
+    if 1 in k_list or not k_list:
+        metrics['details'] = {'pass@1': pass_1_details}
 
     return metrics

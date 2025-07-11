@@ -1,3 +1,5 @@
+# evaluator.py
+
 import json
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Any, Dict, List
@@ -40,9 +42,47 @@ class CodeCompassEvaluator(BaseEvaluator):
             for item in full_dataset
         }
 
+    def _build_results(self, extracted_predictions: Dict[int, List[str]],
+                       metrics: Dict[str, float],
+                       eval_results: Dict[int, List[List[int]]],
+                       final_metadata: List[Dict]) -> Dict:
+        """Builds the final results dictionary with detailed information."""
+        results = {}
+        results['pass@1'] = metrics.get('pass@1', 0.0)
+        details = []
+
+        pass_1_correctness = metrics.get('details', {}).get('pass@1', [])
+        problem_indices = sorted(extracted_predictions.keys())
+
+        for i, problem_idx in enumerate(problem_indices):
+            if i >= len(final_metadata) or i >= len(pass_1_correctness):
+                continue
+
+            ep = extracted_predictions[problem_idx]
+            er = eval_results.get(problem_idx, [])
+            fm = final_metadata[i]
+
+            detail = {
+                'extracted_prediction':
+                ep[0] if isinstance(ep, list) and ep else ep,
+                'eval_result':
+                er[0] if isinstance(er, list) and er else er,
+                'final_metadata':
+                fm
+            }
+            detail['correct'] = bool(pass_1_correctness[i] == 1.0)
+            details.append(detail)
+
+        results['details'] = details
+        return results
+
     def score(self, predictions: List[Any],
               references: List[Any]) -> Dict[str, float]:
         tasks = []
+        extracted_predictions_dict = {}
+        final_metadata_list = []
+        problem_counter = 0
+
         for i, (pred, metadata) in enumerate(zip(predictions, references)):
             try:
                 question_id = metadata.get('question_id')
@@ -60,7 +100,6 @@ class CodeCompassEvaluator(BaseEvaluator):
                     continue
 
                 sample = {'evaluation_sample': eval_sample}
-
                 timeout = metadata.get('time_limit_s', self.default_timeout)
                 mem_limit_mb = metadata.get('memory_limit_mb', 256)
 
@@ -71,10 +110,17 @@ class CodeCompassEvaluator(BaseEvaluator):
                     if isinstance(code, str)
                 ]
                 if not any(extracted_codes):
+                    # Even if no code is extracted, we might want to record a failure.
+                    # For now, we follow the original logic of skipping.
                     continue
 
                 tasks.append((sample, extracted_codes, timeout, mem_limit_mb,
                               self.temp_base_dir))
+
+                # Store data for building results later, using a consistent index
+                extracted_predictions_dict[problem_counter] = extracted_codes
+                final_metadata_list.append(metadata)
+                problem_counter += 1
 
             except Exception as e:
                 print(
@@ -83,19 +129,28 @@ class CodeCompassEvaluator(BaseEvaluator):
                 continue
 
         if not tasks:
-            return {f'pass@{k}': 0.0 for k in self.k_list}
+            return self._build_results({}, {'pass@1': 0.0}, {}, [])
 
+        # Run evaluation in parallel
         results_list = self._run_parallel_evaluation(tasks)
-        final_results = {i: results_list[i] for i in range(len(results_list))}
-        metrics = compute_metrics_from_results(final_results,
+
+        # Create a dictionary from the results list for easier lookup
+        eval_results_dict = {
+            i: results_list[i]
+            for i in range(len(results_list))
+        }
+
+        # Compute metrics (pass@k and details)
+        metrics = compute_metrics_from_results(eval_results_dict,
                                                k_list=self.k_list)
 
-        return metrics
+        # Build the final, detailed result structure
+        return self._build_results(extracted_predictions_dict, metrics,
+                                   eval_results_dict, final_metadata_list)
 
     def _prepare_sample(self, reference: Any, idx: int = -1) -> Dict[str, Any]:
-
+        # This method remains unchanged
         try:
-
             if idx <= 2:
                 if isinstance(reference, dict):
                     print(f'Reference keys: {list(reference.keys())}')
@@ -121,34 +176,28 @@ class CodeCompassEvaluator(BaseEvaluator):
                     test_cases = reference['test_cases']
                     if isinstance(test_cases, str):
                         test_cases = json.loads(test_cases)
-
                     inputs = [case.get('input', '') for case in test_cases]
                     outputs = [case.get('output', '') for case in test_cases]
-
                     eval_sample = {
                         'inputs': inputs,
                         'outputs': outputs,
                         'fn_name': reference.get('fn_name')
                     }
                     return {'evaluation_sample': eval_sample}
-
                 elif 'cases' in reference:
                     cases_str = reference['cases']
                     if isinstance(cases_str, str):
                         cases_list = json.loads(cases_str)
                     else:
                         cases_list = cases_str
-
                     inputs = [case.get('input', '') for case in cases_list]
                     outputs = [case.get('output', '') for case in cases_list]
-
                     eval_sample = {
                         'inputs': inputs,
                         'outputs': outputs,
                         'fn_name': reference.get('fn_name')
                     }
                     return {'evaluation_sample': eval_sample}
-
                 elif 'inputs' in reference and 'outputs' in reference:
                     eval_sample = {
                         'inputs': reference['inputs'],
@@ -156,21 +205,17 @@ class CodeCompassEvaluator(BaseEvaluator):
                         'fn_name': reference.get('fn_name')
                     }
                     return {'evaluation_sample': eval_sample}
-
                 elif 'input' in reference and 'output' in reference:
-
                     inputs = [reference['input']] if isinstance(
                         reference['input'], str) else reference['input']
                     outputs = [reference['output']] if isinstance(
                         reference['output'], str) else reference['output']
-
                     eval_sample = {
                         'inputs': inputs,
                         'outputs': outputs,
                         'fn_name': reference.get('fn_name')
                     }
                     return {'evaluation_sample': eval_sample}
-
                 else:
                     print(
                         f'Warning: Trying to use entire reference as evaluation_sample for sample {idx}'
@@ -181,7 +226,6 @@ class CodeCompassEvaluator(BaseEvaluator):
                 f'Cannot handle reference format: {type(reference)} for sample {idx}'
             )
             return None
-
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             print(f'Error preparing sample {idx}: {e}')
             import traceback
@@ -190,8 +234,8 @@ class CodeCompassEvaluator(BaseEvaluator):
 
     def _run_parallel_evaluation(self,
                                  tasks: List[tuple]) -> List[List[List[int]]]:
+        # This method remains unchanged
         results_list = [[] for _ in range(len(tasks))]
-
         with ProcessPoolExecutor(
                 max_workers=self.num_process_evaluate) as executor:
             with tqdm(total=len(tasks),
@@ -200,7 +244,6 @@ class CodeCompassEvaluator(BaseEvaluator):
                     executor.submit(run_test_for_cpp_problem, *task): i
                     for i, task in enumerate(tasks)
                 }
-
                 for future in as_completed(future_to_idx):
                     idx = future_to_idx[future]
                     try:
@@ -208,14 +251,8 @@ class CodeCompassEvaluator(BaseEvaluator):
                         results_list[idx] = result
                     except Exception as e:
                         print(f'FATAL ERROR in task {idx}: {e}')
-
                         num_gens = len(tasks[idx][1])
                         results_list[idx] = [[-3] * 100] * num_gens
                     finally:
                         pbar.update(1)
-
         return results_list
-
-
-# 为了向后兼容，保留原有的类名
-CodeCompassCppEvaluator = CodeCompassEvaluator
