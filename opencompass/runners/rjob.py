@@ -119,9 +119,12 @@ class RJOBRunner(BaseRunner):
     def _launch(self, cfg: ConfigDict, random_sleep: Optional[bool] = None):
         """Launch a single task via rjob bash script."""
         if random_sleep is None:
-            random_sleep = self.max_num_workers > 16
+            random_sleep = self.max_num_workers > 8
         if random_sleep:
-            time.sleep(random.randint(0, 10))
+            sleep_time = random.randint(0, 60)
+            logger = get_logger()
+            logger.info(f'Sleeping for {sleep_time} seconds to launch task')
+            time.sleep(sleep_time)
         task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
         # Normalize task name
