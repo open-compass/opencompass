@@ -107,8 +107,11 @@ class RJOBRunner(BaseRunner):
                     status = 'Running'
                     found_dict = True
                     break
-                if 'Finished' in line:
+                if 'Succeeded' in line:
                     status = 'FINISHED'
+                    break
+                if 'Stopped' in line:
+                    status = 'STOPPED'
                     break
                 if 'Failed' in line or 'failed' in line:
                     status = 'FAILED'
