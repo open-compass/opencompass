@@ -84,8 +84,17 @@ class RJOBRunner(BaseRunner):
                 with open(log_path, 'a', encoding='utf-8') as f:
                     f.write(f'\n[rjob get] {output}\n')
 
+            # check if the command is executed successfully
+            if get_result.returncode != 0:
+                logger.error(f'rjob get command failed with return code: {get_result.returncode}-{get_result.stderr}')
+                logger.info(f'retrying...')
+                status = 'ERROR'
+                continue
+
             found_dict = False
             for line in output.splitlines():
+                if 'rjob oc-infer' not in line:
+                    continue
                 if 'Starting' in line:
                     status = 'Starting'
                     found_dict = True
@@ -94,25 +103,24 @@ class RJOBRunner(BaseRunner):
                     status = 'Pending'
                     found_dict = True
                     break
-                if '{' in line and '}' in line:
-                    try:
-                        d = ast.literal_eval(
-                            line[line.index('{'):line.index('}') + 1])
-                        found_dict = True
-                        if d.get('active', 0) != 0 or d.get('pending', 0) != 0:
-                            break
-                        else:
-                            status = 'FINISHED'
-                            logger.info(
-                                f'[RJOB] Final status returned: {status}')
-                            return status
-                    except Exception as e:
-                        logger.error(f'Error parsing rjob output: {e}')
-                        pass
+                if 'Running' in line:
+                    status = 'Running'
+                    found_dict = True
+                    break
+                if 'Finished' in line:
+                    status = 'FINISHED'
+                    break
+                if 'Failed' in line or 'failed' in line:
+                    status = 'FAILED'
+                    break
             if found_dict:
                 time.sleep(poll_interval)
                 continue
-            break
+            else:
+                # 如果没有找到任何匹配的状态，记录输出并跳出循环
+                logger.warning(f'No recognized status found in rjob output: {output}')
+                logger.info('Breaking polling loop as no recognized status found')
+                break
         logger.info(f'[RJOB] Final status returned: {status}')
         return status
 
