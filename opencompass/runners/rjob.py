@@ -95,6 +95,7 @@ class RJOBRunner(BaseRunner):
             for line in output.splitlines():
                 if 'rjob oc-infer' not in line:
                     continue
+            
                 if 'Starting' in line:
                     status = 'Starting'
                     found_dict = True
@@ -121,6 +122,10 @@ class RJOBRunner(BaseRunner):
                     break
                 if 'Suspended' in line:
                     status = 'Suspended'
+                    found_dict = True
+                    break
+                if 'Submitted' in line:
+                    status = 'Submitted'
                     found_dict = True
                     break
                 if 'Succeeded' in line:
