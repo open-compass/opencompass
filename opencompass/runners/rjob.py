@@ -86,7 +86,7 @@ class RJOBRunner(BaseRunner):
             # check if the command is executed successfully
             if get_result.returncode != 0:
                 logger.error(
-                    f'rjob get command failed: {get_result.returncode}-{get_result.stderr}'
+                    f'rjob get command failed: {get_result.stderr}'
                 )
                 logger.info('retrying...')
                 status = 'ERROR'
@@ -140,7 +140,7 @@ class RJOBRunner(BaseRunner):
                 if 'Cancelled' in line:
                     status = 'CANCELLED'
                     break
-                logger.warning(f'No recognized status found in rjob output: {output}')
+                logger.warning(f'Unrecognized status in: {output}')
             if found_dict:
                 time.sleep(poll_interval)
                 continue
