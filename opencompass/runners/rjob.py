@@ -69,7 +69,6 @@ class RJOBRunner(BaseRunner):
 
         Break if no dict line is found.
         """
-        import ast
         logger = get_logger()
         status = None
         time.sleep(10)
@@ -86,8 +85,10 @@ class RJOBRunner(BaseRunner):
 
             # check if the command is executed successfully
             if get_result.returncode != 0:
-                logger.error(f'rjob get command failed with return code: {get_result.returncode}-{get_result.stderr}')
-                logger.info(f'retrying...')
+                logger.error(
+                    f'rjob get command failed: {get_result.returncode}-{get_result.stderr}'
+                )
+                logger.info('retrying...')
                 status = 'ERROR'
                 continue
 
@@ -95,7 +96,6 @@ class RJOBRunner(BaseRunner):
             for line in output.splitlines():
                 if 'rjob oc-infer' not in line:
                     continue
-            
                 if 'Starting' in line:
                     status = 'Starting'
                     found_dict = True
