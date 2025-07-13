@@ -140,14 +140,11 @@ class RJOBRunner(BaseRunner):
                 if 'Cancelled' in line:
                     status = 'CANCELLED'
                     break
+                logger.warning(f'No recognized status found in rjob output: {output}')
             if found_dict:
                 time.sleep(poll_interval)
                 continue
-            else:
-                # 如果没有找到任何匹配的状态，记录输出并跳出循环
-                logger.warning(f'No recognized status found in rjob output: {output}')
-                logger.info('Breaking polling loop as no recognized status found')
-                break
+            break
         logger.info(f'[RJOB] Final status returned: {status}')
         return status
 
