@@ -107,6 +107,22 @@ class RJOBRunner(BaseRunner):
                     status = 'Running'
                     found_dict = True
                     break
+                if 'Timeout' in line:
+                    status = 'Timeout'
+                    found_dict = True
+                    break
+                if 'Restarting' in line:
+                    status = 'Restarting'
+                    found_dict = True
+                    break
+                if 'Queued' in line:
+                    status = 'Queued'
+                    found_dict = True
+                    break
+                if 'Suspended' in line:
+                    status = 'Suspended'
+                    found_dict = True
+                    break
                 if 'Succeeded' in line:
                     status = 'FINISHED'
                     break
@@ -115,6 +131,9 @@ class RJOBRunner(BaseRunner):
                     break
                 if 'Failed' in line or 'failed' in line:
                     status = 'FAILED'
+                    break
+                if 'Cancelled' in line:
+                    status = 'CANCELLED'
                     break
             if found_dict:
                 time.sleep(poll_interval)
