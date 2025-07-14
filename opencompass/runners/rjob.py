@@ -85,16 +85,15 @@ class RJOBRunner(BaseRunner):
 
             # check if the command is executed successfully
             if get_result.returncode != 0:
-                logger.error(
-                    f'rjob get command failed: {get_result.stderr}'
-                )
+                logger.error(f'rjob get command failed: {get_result.stderr}')
                 logger.info('retrying...')
                 status = 'ERROR'
                 continue
 
             found_dict = False
             for line in output.splitlines():
-                if 'rjob oc-infer' not in line:
+                logger.info(f'line: {line}')
+                if 'rjob oc-infer' not in line and 'rjob oc-eval' not in line:
                     continue
                 if 'Starting' in line:
                     status = 'Starting'
