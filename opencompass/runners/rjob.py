@@ -38,7 +38,7 @@ class RJOBRunner(BaseRunner):
         task: ConfigDict,
         rjob_cfg: ConfigDict,
         max_num_workers: int = 32,
-        retry: int = 2,
+        retry: int = 10,
         debug: bool = False,
         lark_bot_url: str = None,
         keep_tmp_file: bool = True,
