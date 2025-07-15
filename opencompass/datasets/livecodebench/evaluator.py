@@ -19,21 +19,22 @@ from .livecodebench import LCBCodeGenerationDataset
 from .pass_k_utils import compute_metrics_from_results
 
 
+def _temp_run(sample, generation, debug, result, metadata_list, timeout):
+    from .testing_util import run_test
+    res, metadata = run_test(sample,
+                             test=generation,
+                             debug=debug,
+                             timeout=timeout)
+    result.append(res)
+    metadata_list.append(metadata)
+
+
 def codegen_check_correctness(sample, generation, timeout, debug=True):
     """Check correctness of code generation with a global timeout.
 
     The global timeout is to catch some extreme/rare cases not handled by the
     timeouts inside `run_test`
     """
-
-    def _temp_run(sample, generation, debug, result, metadata_list, timeout):
-        from .testing_util import run_test
-        res, metadata = run_test(sample,
-                                 test=generation,
-                                 debug=debug,
-                                 timeout=timeout)
-        result.append(res)
-        metadata_list.append(metadata)
 
     manager = multiprocessing.Manager()
     result = manager.list()
@@ -337,7 +338,7 @@ def evaluate_score(args) -> list[bool]:
         else:
             code_to_execute = f'{BASE_IMPORTS}\n{c}\nassert {o} == {g}'
             execution_results.append(
-                codeexecute_check_correctness(code_to_execute, 3))
+                codeexecute_check_correctness(code_to_execute, 30))
     if len(execution_results) == 0:
         execution_results = [False] * len(gs)
     return execution_results
