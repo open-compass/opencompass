@@ -38,7 +38,7 @@ class RJOBRunner(BaseRunner):
         task: ConfigDict,
         rjob_cfg: ConfigDict,
         max_num_workers: int = 32,
-        retry: int = 10,
+        retry: int = 100,
         debug: bool = False,
         lark_bot_url: str = None,
         keep_tmp_file: bool = True,
@@ -237,20 +237,24 @@ class RJOBRunner(BaseRunner):
                 mmengine.mkdir_or_exist(osp.split(out_path)[0])
 
             retry = self.retry
+            if retry == 0:
+                retry = 100
             while retry > 0:
                 # Only submit, no polling
                 result = subprocess.run(cmd,
                                         shell=True,
                                         text=True,
                                         capture_output=True)
+                logger.info(f'CMD: {cmd}')
                 logger.info(f'Command output: {result.stdout}')
-                if result.stderr:
-                    logger.error(f'Command error: {result.stderr}')
+                logger.error(f'Command error: {result.stderr}')
                 logger.info(f'Return code: {result.returncode}')
                 if result.returncode == 0:
                     break
                 retry -= 1
-                time.sleep(2)
+                retry_time = random.randint(5, 60)  
+                logger.info(f"The {retry}'s retry in {retry_time} seconds")
+                time.sleep(retry_time)
             if result.returncode != 0:
                 # Submit failed, return directly
                 return task_name, result.returncode
