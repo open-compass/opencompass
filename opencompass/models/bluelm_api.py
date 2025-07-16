@@ -1,9 +1,9 @@
 import time
+import json
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
 import requests
-import json
 from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
@@ -48,7 +48,7 @@ class BlueLMAPI(BaseAPIModel):
                          retry=retry,
                          generation_kwargs=generation_kwargs)
         self.headers = {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         }
         self.url = url
         self.model = path
@@ -83,18 +83,15 @@ class BlueLMAPI(BaseAPIModel):
         for chunk in response.iter_lines(chunk_size=4096,
                                          decode_unicode=False):
             if chunk:
-                data = json.loads(chunk.decode("utf-8"))
-                output = data.get("result")
+                data = json.loads(chunk.decode('utf-8'))
+                output = data.get('result')
                 yield output
 
     def split_think(self, text: str) -> str:
-        """
-        提取think后的内容
-        """
-        if "</think>" in text:
-            answer = text.split("</think>")[1]
+        if '</think>' in text:
+            answer = text.split('</think>')[1]
         else:
-            if "<think>" in text:
+            if '<think>' in text:
                 return 'Thinking mode too long to extract answer'
             return text
         return answer
@@ -131,7 +128,7 @@ class BlueLMAPI(BaseAPIModel):
                     pass
                 messages.append(msg)
 
-        data = {'text': messages, "key": self.key, "stream": self.stream}
+        data = {'text': messages, 'key': self.key, 'stream': self.stream}
         data.update(self.generation_kwargs)
         max_num_retries = 0
         while max_num_retries < self.retry:
@@ -147,10 +144,10 @@ class BlueLMAPI(BaseAPIModel):
                         final_text = h
                 else:
                     response = raw_response.json()
-                    final_text = response.get("result", "")
+                    final_text = response.get('result', '')
 
             except Exception as err:
-                self.logger.error('Request Error:{}'.format(err))
+                self.logger.error(f'Request Error:{err}')
                 time.sleep(1)
                 continue
 
@@ -162,7 +159,7 @@ class BlueLMAPI(BaseAPIModel):
                 return msg
 
             else:
-                self.logger.error('Request Error:{}'.format(raw_response))
+                self.logger.error(f'Request Error:{raw_response}')
                 time.sleep(1)
 
             max_num_retries += 1
