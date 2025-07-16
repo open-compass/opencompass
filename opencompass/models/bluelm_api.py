@@ -81,11 +81,12 @@ class BlueLMAPI(BaseAPIModel):
 
     def get_streaming_response(self, response: requests.Response):
         for chunk in response.iter_lines(chunk_size=4096,
-                                        decode_unicode=False):
+                                         decode_unicode=False):
             if chunk:
                 data = json.loads(chunk.decode("utf-8"))
                 output = data.get("result")
                 yield output
+
     def split_think(self, text: str) -> str:
         """
         提取think后的内容
@@ -97,6 +98,7 @@ class BlueLMAPI(BaseAPIModel):
                 return 'Thinking mode too long to extract answer'
             return text
         return answer
+
     def _generate(
         self,
         input: PromptType,
@@ -129,10 +131,8 @@ class BlueLMAPI(BaseAPIModel):
                     pass
                 messages.append(msg)
 
-        data = {'text': messages, "key": self.key, "stream":self.stream}
-        
+        data = {'text': messages, "key": self.key, "stream": self.stream}
         data.update(self.generation_kwargs)
-
         max_num_retries = 0
         while max_num_retries < self.retry:
             self.acquire()
@@ -144,16 +144,15 @@ class BlueLMAPI(BaseAPIModel):
                 final_text = None
                 if self.stream:
                     for h in self.get_streaming_response(raw_response):
-                            final_text = h
+                        final_text = h
                 else:
                     response = raw_response.json()
                     final_text = response.get("result", "")
-                            
+
             except Exception as err:
                 self.logger.error('Request Error:{}'.format(err))
                 time.sleep(1)
                 continue
-
 
             if raw_response.status_code == 200:
                 # msg = json.load(response.text)
