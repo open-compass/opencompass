@@ -486,6 +486,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/phybench",
     },
+    "opencompass/IPhO2024": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/ipho2024_processed.jsonl",
+    },
 }
 
 DATASETS_URL = {
