@@ -304,7 +304,6 @@ class MultiCascadeEvaluator(BaseEvaluator):
             # Initialize counters for accuracy calculation
 
             # final_correct = initial_correct if not self.parallel else 0
-            breakpoint()
 
             # Update the details for samples that were evaluated by LLM
             for i, llm_detail in enumerate(llm_details_iter):
