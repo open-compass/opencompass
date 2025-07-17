@@ -12,19 +12,17 @@ from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 #######################################################################
 with read_base():
     # Datasets
-    from opencompass.configs.datasets.aime2025.aime2025_llmjudge_gen_5e9f4f import \
+    from opencompass.configs.datasets.aime2025.aime2025_llmjudge_academic import \
         aime2025_datasets
-    from opencompass.configs.datasets.gpqa.gpqa_cascade_eval_gen_772ea0 import \
+    from opencompass.configs.datasets.gpqa.gpqa_cascade_eval_academic import \
         gpqa_datasets
-    from opencompass.configs.datasets.humaneval.humaneval_openai_sample_evals_gen_dcae0e import \
-        humaneval_datasets
     from opencompass.configs.datasets.IFEval.IFEval_gen_353ae7 import \
         ifeval_datasets
-    from opencompass.configs.datasets.livecodebench.livecodebench_code_generation_repeat_gen_b5b6c5 import \
+    from opencompass.configs.datasets.livecodebench.livecodebench_v6_academic import \
         LCBCodeGeneration_dataset
     from opencompass.configs.datasets.mmlu_pro.mmlu_pro_0shot_cot_gen_08c1de import \
         mmlu_pro_datasets
-    from opencompass.configs.datasets.HLE.hle_llmverify_gen_6ff468 import \
+    from opencompass.configs.datasets.HLE.hle_llmverify_academic import \
         hle_datasets
 
     # Summary Groups
@@ -40,11 +38,6 @@ with read_base():
 #######################################################################
 # datasets list for evaluation
 # Only take LCB generation for evaluation
-
-aime2025_datasets[0]['n'] = 32
-gpqa_datasets[0]['n'] = 4
-LCBCodeGeneration_dataset['n'], LCBCodeGeneration_dataset['k'], LCBCodeGeneration_dataset['release_version'] = 6, 1, 'v6'
-LCBCodeGeneration_dataset['eval_cfg']['evaluator']['release_version'], LCBCodeGeneration_dataset['eval_cfg']['evaluator']['extractor_version'] = 'v6', 'v2'
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')),
                []) + [LCBCodeGeneration_dataset]
@@ -70,7 +63,7 @@ core_summary_groups = [
         'subsets': [
             ['IFEval', 'Prompt-level-strict-accuracy'],
             ['hle_llmjudge', 'accuracy'],
-            ['aime2025', 'accuracy (32 runs average)'],
+            ['aime2025_repeat_32', 'accuracy (32 runs average)'],
             ['GPQA_diamond_repeat_4', 'accuracy (4 runs average)'],
             ['mmlu_pro', 'naive_average'],
             ['openai_humaneval', 'humaneval_pass@1'],
@@ -91,7 +84,7 @@ summarizer = dict(
         ['GPQA_diamond_repeat_4', 'accuracy (4 runs average)'],
         '',
         'Math Calculation',
-        ['aime2025', 'accuracy (32 runs average)'],
+        ['aime2025_repeat_32', 'accuracy (32 runs average)'],
         '',
         'Knowledge',
         ['mmlu_pro', 'naive_average'],
@@ -114,7 +107,7 @@ models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 #                 PART 4  Inference/Evaluation Configuaration         #
 #######################################################################
 
-# Local Runner
+# infer with local runner
 infer = dict(
     partitioner=dict(type=NumWorkerPartitioner, num_worker=8),
     runner=dict(
