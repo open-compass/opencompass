@@ -147,7 +147,8 @@ class NumWorkerPartitioner(BasePartitioner):
 
         # Save to cache file
         if self.dataset_size_path:
-            mmengine.mkdir_or_exist('.cache/')
+            tmp_dir_root = osp.dirname(self.dataset_size_path)
+            mmengine.mkdir_or_exist(tmp_dir_root)
             mmengine.dump(self.dataset_size,
                           self.dataset_size_path,
                           indent=4,
