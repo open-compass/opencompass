@@ -13,13 +13,13 @@ models = [
         key='your-api-key-here',  # Set your API key here
         meta_template=api_meta_template,
         query_per_second=1,
-        openai_api_base="https://api.moonshot.cn/v1",
+        openai_api_base='https://api.moonshot.cn/v1',
         batch_size=1,
         temperature=1,
         max_seq_len=131072,
         retry=10,
-        stream=True,  # 启用流式输出
-        verbose=True,  # 启用详细日志，可以看到实时流式输出
-        stream_chunk_size=1,  # 流式输出块大小
+        stream=True,  # Enable streaming output
+        verbose=True,  # Enable detailed logging to see real-time streaming output
+        stream_chunk_size=1,  # Streaming chunk size
         ),
 ] 
