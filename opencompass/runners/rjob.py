@@ -252,7 +252,7 @@ class RJOBRunner(BaseRunner):
                 if result.returncode == 0:
                     break
                 retry -= 1
-                retry_time = random.randint(5, 60)  
+                retry_time = random.randint(5, 60)
                 logger.info(f"The {retry}'s retry in {retry_time} seconds")
                 time.sleep(retry_time)
             if result.returncode != 0:
