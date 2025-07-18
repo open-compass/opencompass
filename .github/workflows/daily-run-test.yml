@@ -180,12 +180,12 @@ jobs:
             FLASH_ATTENTION_FORCE_BUILD=TRUE pip install ${{ secrets.WORKSPACE_PREFIX }}/packages/flash_attn-2.7.2.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             cp -r ${{secrets.WORKSPACE_PREFIX}}/nltk_data ${{env.CONDA_PATH}}/envs/${{env.CONDA_ENV}}/nltk_data
       - name: Prepare - reinstall lmdeploy - cu12
-        if: ${{github.event_name != 'schedule' || inputs.build_lmdeploy}}
+        if: ${{github.event_name != 'schedule' && inputs.build_lmdeploy}}
         uses: actions/download-artifact@v4
         with:
           name: my-artifact-${{ github.run_id }}
       - name: Prepare - reinstall lmdeploy - cu12
-        if: ${{github.event_name != 'schedule' || inputs.build_lmdeploy}}
+        if: ${{github.event_name != 'schedule' && inputs.build_lmdeploy}}
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
