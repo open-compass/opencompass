@@ -10,8 +10,8 @@ def compare_results(folder1, folder2, results_ignore_list=None):
         results_ignore_list = []
 
     # Verify that both folders exist
-    assert os.path.isdir(folder1), f"Folder does not exist: {folder1}"
-    assert os.path.isdir(folder2), f"Folder does not exist: {folder2}"
+    assert os.path.isdir(folder1), f'Folder does not exist: {folder1}'
+    assert os.path.isdir(folder2), f'Folder does not exist: {folder2}'
 
     sub_folder1 = get_all_subpaths(folder1)[0]
     sub_folder2 = get_all_subpaths(folder2)[0]
@@ -26,7 +26,7 @@ def compare_results(folder1, folder2, results_ignore_list=None):
 
 
 def compare_folders(folder1, folder2, results_ignore_list=None):
-    """
+    '''
     Compare the contents of files with the same name in two folders
     and their subfolders,
     ignoring files specified in the ignore_list.
@@ -36,14 +36,14 @@ def compare_folders(folder1, folder2, results_ignore_list=None):
     (e.g., ['temp.txt', '.DS_Store'])
     :raises: AssertionError if any non-ignored files are missing or
     have different content
-    """
+    '''
     # Initialize ignore_list if not provided
     if results_ignore_list is None:
         results_ignore_list = []
 
     # Verify that both folders exist
-    assert os.path.isdir(folder1), f"Folder does not exist: {folder1}"
-    assert os.path.isdir(folder2), f"Folder does not exist: {folder2}"
+    assert os.path.isdir(folder1), f'Folder does not exist: {folder1}'
+    assert os.path.isdir(folder2), f'Folder does not exist: {folder2}'
 
     # List to store differences found
     diff_files = []
@@ -84,24 +84,24 @@ def compare_folders(folder1, folder2, results_ignore_list=None):
     # Raise AssertionError if any differences were found
     if diff_files:
         error_msg = 'Found differences in files:\n'
-        error_msg += '\n'.join(f"{path}: {reason}"
+        error_msg += '\n'.join(f'{path}: {reason}'
                                for path, reason in diff_files)
         raise AssertionError(error_msg)
 
 
 def get_all_subpaths(directory):
-    """
+    '''
     Get all subpaths (files and directories) within a given directory.
     Args:
         directory (str): The root directory path to search
     Returns:
         list: A list of all complete subpaths
-    """
+    '''
     subpaths = []
 
     # Verify the directory exists
     if not os.path.isdir(directory):
-        raise ValueError(f"Directory does not exist: {directory}")
+        raise ValueError(f'Directory does not exist: {directory}')
 
     # Walk through the directory tree
     for root, dirs, files in os.walk(directory):
