@@ -66,7 +66,6 @@ core_summary_groups = [
             ['aime2025_repeat_32', 'accuracy (32 runs average)'],
             ['GPQA_diamond_repeat_4', 'accuracy (4 runs average)'],
             ['mmlu_pro', 'naive_average'],
-            ['openai_humaneval', 'humaneval_pass@1'],
             ['lcb_code_generation_repeat_6', 'pass@1 (6 runs average)'],
         ],
     },
@@ -90,7 +89,6 @@ summarizer = dict(
         ['mmlu_pro', 'naive_average'],
         '',
         'Code',
-        ['openai_humaneval', 'humaneval_pass@1'],
         ['lcb_code_generation_repeat_6', 'pass@1 (6 runs average)'],
     ],
     summary_groups=sum(
