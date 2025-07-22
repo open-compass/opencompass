@@ -1,12 +1,14 @@
 # flake8: noqa
 # yapf: disable
 import copy
+import os
 import time
 from typing import Dict, List, Optional, Union
 
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
+from mmengine.config.config import ConfigDict
 
 from .huggingface_above_v4_33 import (_convert_chat_messages,
                                       _format_with_fast_chat_template,
@@ -32,7 +34,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         path: str,
         tokenizer_only: bool = False,
         backend: str = 'turbomind',
-        engine_config: Dict = {},
+        engine_config: Dict|ConfigDict = {},
         gen_config: Dict = {},
         max_seq_len: int = None,
         meta_template: Optional[Dict] = None,
@@ -54,7 +56,14 @@ class TurboMindModelwithChatTemplate(BaseModel):
         if not tokenizer_only:
             DEFAULT_ENGING_CONFIG = {'session_len': self.max_seq_len}
             _engine_config = DEFAULT_ENGING_CONFIG.copy()
-            _engine_config.update(engine_config)
+            if isinstance(engine_config, ConfigDict):
+                _engine_config.update(engine_config.to_dict())
+            elif isinstance(engine_config, Dict):
+                _engine_config.update(engine_config)
+            else:
+                raise ValueError(f'expected Dict or ConfigDict engine_config but got {type(engine_config)}')
+            
+            _engine_config.update(engine_config.to_dict())
             self.pipe = self._build_pipe(path, backend, _engine_config)
         else:
             self.pipe = None
@@ -206,4 +215,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         else:
             filtered = {k: v for k, v in engine_config.items() if hasattr(PytorchEngineConfig, k)}
             backend_config = PytorchEngineConfig(**filtered)
-        return pipeline(model_path, backend_config=backend_config, log_level='WARNING')
+
+        log_level = os.getenv('LMDEPLOY_LOG_LEVEL', 'WARNING')
+        max_log_len = os.getenv('LMDEPLOY_MAX_LOG_LEN', 10)
+        return pipeline(model_path, backend_config=backend_config, log_level=log_level, max_log_len=max_log_len)
