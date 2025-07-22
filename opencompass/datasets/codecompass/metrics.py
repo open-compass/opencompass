@@ -1,5 +1,3 @@
-# metric.py
-
 import numpy as np
 
 
@@ -33,7 +31,7 @@ def compute_metrics_from_results(results: dict, k_list=[1]):
     if not results:
         metrics = {}
         for k in k_list:
-            metrics[f"pass@{k}"] = 0.0
+            metrics[f'pass@{k}'] = 0.0
         if 1 in k_list or not k_list:
             metrics['details'] = {'pass@1': []}
         return metrics
@@ -49,7 +47,8 @@ def compute_metrics_from_results(results: dict, k_list=[1]):
 
         num_correct_generations = 0
         for gen_result in problem_results:
-            if not gen_result: continue
+            if not gen_result:
+                continue
             if all(res > 0 for res in gen_result):
                 num_correct_generations += 1
         correct.append(num_correct_generations)

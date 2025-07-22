@@ -9,9 +9,8 @@ def run_test_for_cpp_problem(sample: dict,
                              memory_limit_mb: int,
                              temp_base_dir='tmp') -> list:
     pid = os.getpid()
-    print(
-        f'\n--- [DEBUG][PID:{pid}] Subprocess started. Timeout: {timeout}s, MemLimit: {memory_limit_mb}MB ---'
-    )
+    print(f'\n--- [DEBUG][PID:{pid}] Subprocess started. '
+          f'Timeout: {timeout}s, MemLimit: {memory_limit_mb}MB ---')
 
     try:
         eval_data = sample['evaluation_sample']
@@ -20,7 +19,7 @@ def run_test_for_cpp_problem(sample: dict,
 
         inputs = eval_data.get('inputs', [])
         outputs = eval_data.get('outputs', [])
-    except Exception as e:
+    except Exception:
         return [[-4] * 100 for _ in generations]
 
     executor = LocalExecutor(timeout=timeout,
@@ -58,7 +57,7 @@ def run_test_for_cpp_problem(sample: dict,
 
             all_results.append(results_for_this_gen)
 
-        except Exception as e:
+        except Exception:
             all_results.append([-3] * len(inputs))
 
     return all_results

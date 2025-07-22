@@ -32,7 +32,7 @@ class LocalExecutor:
             mem_bytes = self.memory_limit_mb * 1024 * 1024
             # Set both soft and hard limits for virtual memory
             resource.setrlimit(resource.RLIMIT_AS, (mem_bytes, mem_bytes))
-        except Exception as e:
+        except Exception:
             # This runs in the child process, printing might be tricky.
             # The failure will manifest as memory limits not being enforced.
             # We add a warning in the main init for non-Unix systems.

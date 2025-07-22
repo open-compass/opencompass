@@ -65,10 +65,8 @@ class CodeCompassEvaluator(BaseEvaluator):
             detail = {
                 'extracted_prediction':
                 ep[0] if isinstance(ep, list) and ep else ep,
-                'eval_result':
-                er[0] if isinstance(er, list) and er else er,
-                'final_metadata':
-                fm
+                'eval_result': er[0] if isinstance(er, list) and er else er,
+                'final_metadata': fm
             }
             detail['correct'] = bool(pass_1_correctness[i] == 1.0)
             details.append(detail)
@@ -87,16 +85,14 @@ class CodeCompassEvaluator(BaseEvaluator):
             try:
                 question_id = metadata.get('question_id')
                 if not question_id:
-                    print(
-                        f"Warning: 'question_id' not found in metadata at index {i}. Skipping."
-                    )
+                    print(f"Warning: 'question_id' not found in metadata at "
+                          f'index {i}. Skipping.')
                     continue
 
                 eval_sample = self.test_cases_lookup.get(question_id)
                 if not eval_sample:
-                    print(
-                        f"Warning: Could not find test cases for question_id '{question_id}', skipping."
-                    )
+                    print(f'Warning: Could not find test cases for '
+                          f"question_id '{question_id}', skipping.")
                     continue
 
                 sample = {'evaluation_sample': eval_sample}
@@ -110,22 +106,23 @@ class CodeCompassEvaluator(BaseEvaluator):
                     if isinstance(code, str)
                 ]
                 if not any(extracted_codes):
-                    # Even if no code is extracted, we might want to record a failure.
-                    # For now, we follow the original logic of skipping.
+                    # Even if no code is extracted, we might want to record a
+                    # failure. For now, we follow the original logic of
+                    # skipping.
                     continue
 
                 tasks.append((sample, extracted_codes, timeout, mem_limit_mb,
                               self.temp_base_dir))
 
-                # Store data for building results later, using a consistent index
+                # Store data for building results later, using a consistent
+                # index
                 extracted_predictions_dict[problem_counter] = extracted_codes
                 final_metadata_list.append(metadata)
                 problem_counter += 1
 
             except Exception as e:
-                print(
-                    f"Error preparing task for question_id '{question_id}': {e}"
-                )
+                print(f"Error preparing task for question_id '{question_id}': "
+                      f'{e}')
                 continue
 
         if not tasks:
@@ -155,8 +152,8 @@ class CodeCompassEvaluator(BaseEvaluator):
                 if isinstance(reference, dict):
                     print(f'Reference keys: {list(reference.keys())}')
                     for key, value in reference.items():
-                        print(
-                            f'  {key}: {type(value)} - {str(value)[:100]}...')
+                        print(f'  {key}: {type(value)} - '
+                              f'{str(value)[:100]}...')
                 else:
                     print(f'Reference value: {str(reference)[:200]}...')
 
@@ -217,14 +214,12 @@ class CodeCompassEvaluator(BaseEvaluator):
                     }
                     return {'evaluation_sample': eval_sample}
                 else:
-                    print(
-                        f'Warning: Trying to use entire reference as evaluation_sample for sample {idx}'
-                    )
+                    print(f'Warning: Trying to use entire reference as '
+                          f'evaluation_sample for sample {idx}')
                     return {'evaluation_sample': reference}
 
-            print(
-                f'Cannot handle reference format: {type(reference)} for sample {idx}'
-            )
+            print(f'Cannot handle reference format: {type(reference)} '
+                  f'for sample {idx}')
             return None
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             print(f'Error preparing sample {idx}: {e}')

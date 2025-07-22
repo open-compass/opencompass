@@ -20,18 +20,23 @@ except ImportError:
 
 class CodeCompassCodeGenerationDataset(BaseDataset):
 
-    DEFAULT_SYSTEM_PROMPT = """[[Instruction]]
-You are an expert C++ programmer. You will be given a question in the format of an Online Judge (OJ) problem. You must generate a correct, self-contained C++ program that solves the problem and reads from standard input and writes to standard output. You will NOT return anything except for the program. Put your fixed program within code delimiters, for example:
-```cpp
-#include <iostream>
-using namespace std;
-
-int main() {
-    // YOUR CODE HERE
-    return 0;
-}
-```
-"""
+    DEFAULT_SYSTEM_PROMPT = (
+        '[[Instruction]]\n'
+        'You are an expert C++ programmer.'
+        'You will be given a question in the format '
+        'of an Online Judge (OJ) problem. You must generate a correct, '
+        'self-contained C++ program that solves the problem and reads from '
+        'standard input and writes to standard output. You will NOT return '
+        'anything except for the program. Put your fixed program within code '
+        'delimiters, for example:\n'
+        '```cpp\n'
+        '#include <iostream>\n'
+        'using namespace std;\n\n'
+        'int main() {\n'
+        '    // YOUR CODE HERE\n'
+        '    return 0;\n'
+        '}\n'
+        '```\n')
 
     DEFAULT_PROBLEM_TEMPLATE = """
 [[Problem begin]]
@@ -58,25 +63,28 @@ int main() {
             raise
 
         if system_prompt is None:
-            system_prompt = CodeCompassCodeGenerationDataset.DEFAULT_SYSTEM_PROMPT
+            system_prompt = (
+                CodeCompassCodeGenerationDataset.DEFAULT_SYSTEM_PROMPT)
+
         if problem_template is None:
-            problem_template = CodeCompassCodeGenerationDataset.DEFAULT_PROBLEM_TEMPLATE
+            problem_template = (
+                CodeCompassCodeGenerationDataset.DEFAULT_PROBLEM_TEMPLATE)
 
         processed_data = []
         failed_count = 0
 
         for item in tqdm(raw_dataset, desc='Processing samples'):
             try:
-                processed_item = CodeCompassCodeGenerationDataset._process_item(
-                    item, system_prompt, problem_template)
+                processed_item = (
+                    CodeCompassCodeGenerationDataset._process_item(
+                        item, system_prompt, problem_template))
                 if processed_item is not None:
                     processed_data.append(processed_item)
                 else:
                     failed_count += 1
             except Exception as e:
-                print(
-                    f"Error processing item {item.get('question_id', 'unknown')}: {e}"
-                )
+                question_id = item.get('question_id', 'unknown')
+                print(f'Error processing item {question_id}: {e}')
                 failed_count += 1
 
         final_dataset = Dataset.from_list(processed_data)
@@ -92,9 +100,9 @@ int main() {
             try:
                 limits['time_limit_s'] = float(time_match.group(1))
             except ValueError:
-                print(
-                    f'Warning: Could not parse time limit value: {time_match.group(1)}'
-                )
+                time_value = time_match.group(1)
+                print(f'Warning: Could not parse time limit value: '
+                      f'{time_value}')
 
         mem_match = re.search(r'Memory Limit:\s*(\d+)\s*MB', problem_text,
                               re.IGNORECASE)
@@ -102,9 +110,9 @@ int main() {
             try:
                 limits['memory_limit_mb'] = int(mem_match.group(1))
             except ValueError:
-                print(
-                    f'Warning: Could not parse memory limit value: {mem_match.group(1)}'
-                )
+                mem_value = mem_match.group(1)
+                print(f'Warning: Could not parse memory limit value: '
+                      f'{mem_value}')
 
         return limits
 
@@ -116,21 +124,20 @@ int main() {
 
             problem_content = item.get('problem', '')
             if not problem_content:
-                print(
-                    f"Warning: Empty problem for question_id {item.get('question_id')}"
-                )
+                question_id = item.get('question_id')
+                print(f'Warning: Empty problem for question_id {question_id}')
                 return None
 
             full_prompt = system_prompt + problem_template.format(
                 problem=problem_content)
             new_item['prompt'] = full_prompt
 
-            evaluation_sample = CodeCompassCodeGenerationDataset._create_evaluation_sample(
-                item)
+            evaluation_sample = (CodeCompassCodeGenerationDataset.
+                                 _create_evaluation_sample(item))
             if evaluation_sample is None:
-                print(
-                    f"Warning: Cannot create evaluation_sample for question_id {item.get('question_id')}"
-                )
+                question_id = item.get('question_id')
+                print(f'Warning: Cannot create evaluation_sample for '
+                      f'question_id {question_id}')
                 return None
 
             new_item['evaluation_sample'] = evaluation_sample
@@ -138,22 +145,18 @@ int main() {
             limits = CodeCompassCodeGenerationDataset._extract_limits(
                 problem_content)
 
+            eval_inputs = evaluation_sample.get('inputs', [])
+            num_test_cases = (len(eval_inputs) if isinstance(
+                evaluation_sample, dict) else 0)
+
             new_item['metadata'] = {
-                'question_id':
-                item.get('question_id'),
-                'difficulty':
-                item.get('difficulty', 'Unknown'),
-                'source':
-                item.get('source', 'Unknown'),
-                'problem_length':
-                len(problem_content),
-                'num_test_cases':
-                len(evaluation_sample.get('inputs', [])) if isinstance(
-                    evaluation_sample, dict) else 0,
-                'time_limit_s':
-                limits['time_limit_s'],
-                'memory_limit_mb':
-                limits['memory_limit_mb']
+                'question_id': item.get('question_id'),
+                'difficulty': item.get('difficulty', 'Unknown'),
+                'source': item.get('source', 'Unknown'),
+                'problem_length': len(problem_content),
+                'num_test_cases': num_test_cases,
+                'time_limit_s': limits['time_limit_s'],
+                'memory_limit_mb': limits['memory_limit_mb']
             }
 
             new_item['original_problem'] = problem_content
@@ -208,9 +211,10 @@ int main() {
                     return None
 
                 if len(inputs) != len(outputs):
-                    print(
-                        f'Warning: Input/output count mismatch: {len(inputs)} vs {len(outputs)}'
-                    )
+                    input_count = len(inputs)
+                    output_count = len(outputs)
+                    print(f'Warning: Input/output count mismatch: '
+                          f'{input_count} vs {output_count}')
                     return None
 
                 return {
@@ -230,9 +234,10 @@ int main() {
                     return None
 
                 if len(inputs) != len(outputs):
-                    print(
-                        f'Warning: Input/output count mismatch: {len(inputs)} vs {len(outputs)}'
-                    )
+                    input_count = len(inputs)
+                    output_count = len(outputs)
+                    print(f'Warning: Input/output count mismatch: '
+                          f'{input_count} vs {output_count}')
                     return None
 
                 return {
@@ -287,7 +292,8 @@ int main() {
                 print('Error: evaluation_sample missing inputs/outputs')
                 return False
 
-            print(f'Dataset validation passed: {len(test_dataset)} samples')
+            sample_count = len(test_dataset)
+            print(f'Dataset validation passed: {sample_count} samples')
             return True
 
         except Exception as e:
