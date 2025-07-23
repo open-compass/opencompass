@@ -108,4 +108,4 @@ summarizer = dict(
 )
 ```
 
-更多复杂的评测案例可以参考这个样例代码: https://github.com/open-compass/opencompass/tree/main/configs/eval_circular.py
+更多复杂的评测案例可以参考这个样例代码: https://github.com/open-compass/opencompass/tree/main/examples/eval_circular.py

@@ -11,7 +11,7 @@ BABILong paper provides in total 20 tasks, we provide 10 tasks configurations in
 Opencompass provides a demo for evaluating language models on the BABILong dataset.
 
 ```bash
-opencompass configs/eval_babilong.py
+opencompass examples/eval_babilong.py
 ```
 OpenCompass provides the results of some models on the BABILong dataset. The evaluation results are run with LMDeploy with default model settings.
 

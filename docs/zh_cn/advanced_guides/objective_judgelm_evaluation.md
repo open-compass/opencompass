@@ -19,7 +19,7 @@
 
 ### 第一步：构建评测配置，以MATH为例
 
-下面是对MATH数据集进行JudgeLLM评测的Config，评测模型为*Llama3-8b-instruct*，JudgeLLM为*Llama3-70b-instruct*。更详细的config setting请参考 `configs/eval_math_llm_judge.py`，下面我们提供了部分简略版的注释，方便用户理解配置文件的含义。
+下面是对MATH数据集进行JudgeLLM评测的Config，评测模型为*Llama3-8b-instruct*，JudgeLLM为*Llama3-70b-instruct*。更详细的config setting请参考 `examples/eval_math_llm_judge.py`，下面我们提供了部分简略版的注释，方便用户理解配置文件的含义。
 
 ```python
 # Most of the code in this file is copied from https://github.com/openai/simple-evals/blob/main/math_eval.py
