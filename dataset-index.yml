@@ -545,6 +545,12 @@
     paper: https://aclanthology.org/D19-1632.pdf
     configpath: opencompass/configs/datasets/flores/flores_gen.py
     configpath_llmjudge: ''
+- gaia:
+    name: GAIA
+    category: Tool Utilization
+    paper: https://arxiv.org/abs/2311.12983
+    configpath: opencompass/configs/datasets/GAIA/gaia_gen.py
+    configpath_llmjudge: ''
 - game24:
     name: Game24
     category: Math
