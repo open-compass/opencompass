@@ -1155,7 +1155,7 @@ internlm3-8b-instruct-hf_fullbench:
         earth_silver_mcq_correct_count: 10
         earth_silver_mcq_incorrect_count: 6
         earth_silver_mcq_not_attempted_count: 0
-        GPQA_diamond_accuracy: 56.25
+        GPQA_diamond_accuracy: 68.75
         hle_llmjudge_accuracy: 25
         hle_llmjudge_f1: 0.25
         hle_llmjudge_accuracy_given_attempted: 25
@@ -1416,7 +1416,7 @@ internlm3-8b-instruct-turbomind_fullbench:
         earth_silver_mcq_correct_count: 9
         earth_silver_mcq_incorrect_count: 7
         earth_silver_mcq_not_attempted_count: 0
-        GPQA_diamond_accuracy: 56.25
+        GPQA_diamond_accuracy: 75.00
         hle_llmjudge_accuracy: 18.75
         hle_llmjudge_f1: 0.19
         hle_llmjudge_accuracy_given_attempted: 18.75

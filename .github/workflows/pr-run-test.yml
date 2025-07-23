@@ -12,7 +12,6 @@ on:
   schedule:
     - cron:  '56 22 * * *'
 
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -35,7 +34,6 @@ env:
 jobs:
   pr_run_test:
     runs-on: volc_cu12_local
-    environment: 'prod'
     timeout-minutes: 30
     steps:
       - name: Checkout repository
@@ -54,15 +52,34 @@ jobs:
           conda info --envs
           pip list
           lmdeploy check_env
-      - name:  Run test
-        run: |
-          . ${{env.CONDA_PATH}}/bin/activate
-          conda activate ${{env.CONDA_ENV}}
-          conda info --envs
-          rm -rf regression_result
-          opencompass --models hf_internlm2_5_20b_chat --datasets demo_gsm8k_chat_gen --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result1 --debug
-          opencompass --models hf_internlm2_5_7b_chat --datasets demo_gsm8k_chat_gen --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result2 --debug --max-num-workers 2
-          opencompass --models hf_internlm2_5_7b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result3 --debug --max-num-workers 2
+      - name: Run test
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 30
+          command: |
+            . ${{env.CONDA_PATH}}/bin/activate
+            conda activate ${{env.CONDA_ENV}}
+            conda info --envs
+            rm -rf regression_result
+            LOG=$(opencompass --models hf_internlm2_5_20b_chat --datasets demo_gsm8k_chat_gen --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result1 --debug 2>&1)
+            echo "$LOG"
+            if echo "$LOG" | grep -q "CUDA out of memory"; then
+              sleep 300
+              exit 1  # 触发重试
+            fi
+            LOG=$(opencompass --models hf_internlm2_5_7b_chat --datasets demo_gsm8k_chat_gen --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result2 --debug --max-num-workers 2 2>&1)
+            echo "$LOG"
+            if echo "$LOG" | grep -q "CUDA out of memory"; then
+              sleep 300
+              exit 1  # 触发重试
+            fi
+            LOG=$(opencompass --models hf_internlm2_5_7b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result3 --debug --max-num-workers 2 2>&1)
+            echo "$LOG"
+            if echo "$LOG" | grep -q "CUDA out of memory"; then
+              sleep 300
+              exit 1  # 触发重试
+            fi
       - name:  Get result
         run: |
           score=$(sed -n '$p' ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result1/*/summary/*.csv | awk -F ',' '{print $NF}')
@@ -99,7 +116,6 @@ jobs:
     needs: [pr_run_test]
     timeout-minutes: 5
     runs-on: self-hosted
-    environment: 'prod'
     steps:
       - name: notify
         run: |
