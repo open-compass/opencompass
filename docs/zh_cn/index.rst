@@ -89,6 +89,7 @@ OpenCompass 上手路线
    :caption: 其他说明
 
    notes/contribution_guide.md
+   notes/academic.md
 
 索引与表格
 ==================
