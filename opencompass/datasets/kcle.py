@@ -1,9 +1,13 @@
 import json
-import datasets
 from typing import List
-from .base import BaseDataset
-from opencompass.registry import LOAD_DATASET
+
+import datasets
+
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.registry import LOAD_DATASET
+
+from .base import BaseDataset
+
 
 @LOAD_DATASET.register_module()
 class KCLEDataset(BaseDataset):
@@ -19,10 +23,12 @@ class KCLEDataset(BaseDataset):
                 dataset.append(line)
         return datasets.Dataset.from_list(dataset)
 
+
 class KCLEEvaluator(BaseEvaluator):
 
     def score(self, predictions: List, references: List) -> dict:
         pass
+
 
 def kcle_postprocess(text: str) -> str:
     pass
