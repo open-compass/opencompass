@@ -1,5 +1,5 @@
 import os
-import resource
+
 import subprocess
 import tempfile
 import time
@@ -27,15 +27,13 @@ class LocalExecutor:
             self.temp_base_dir = Path(tempfile.gettempdir())
 
     def _set_resource_limits(self):
+        import resource
         """This function is called in the child process right before exec."""
         try:
             mem_bytes = self.memory_limit_mb * 1024 * 1024
             # Set both soft and hard limits for virtual memory
             resource.setrlimit(resource.RLIMIT_AS, (mem_bytes, mem_bytes))
         except Exception:
-            # This runs in the child process, printing might be tricky.
-            # The failure will manifest as memory limits not being enforced.
-            # We add a warning in the main init for non-Unix systems.
             pass
 
     def _compile_cpp(self, source_file: Path, temp_dir: Path) -> tuple:
