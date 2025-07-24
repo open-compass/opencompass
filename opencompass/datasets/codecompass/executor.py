@@ -27,7 +27,9 @@ class LocalExecutor:
             self.temp_base_dir = Path(tempfile.gettempdir())
 
     def _set_resource_limits(self):
+        # isort: off
         import resource
+        # isort: on
         """This function is called in the child process right before exec."""
         try:
             mem_bytes = self.memory_limit_mb * 1024 * 1024
