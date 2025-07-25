@@ -81,7 +81,7 @@ kcle_eval_cfg = dict(
         ),
         dataset_cfg=dict(
             type=KCLEDataset,
-            path='/cpfs01/shared/llm_ddd/gaoxuan/code/tests/oc/kcle_v1_enzh_annotation_part1_qa_sampled.jsonl',
+            path='opencompass/kcle',
             reader_cfg=kcle_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -94,7 +94,7 @@ kcle_datasets = [
     dict(
         type=KCLEDataset, # CustomDataset
         abbr='kcle',
-        path='/cpfs01/shared/llm_ddd/gaoxuan/code/tests/oc/kcle_v1_enzh_annotation_part1_qa_sampled.jsonl',
+        path='opencompass/kcle',
         reader_cfg=kcle_reader_cfg,
         infer_cfg=kcle_infer_cfg,
         eval_cfg=kcle_eval_cfg,
