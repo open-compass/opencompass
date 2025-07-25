@@ -89,6 +89,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :caption: Notes
 
    notes/contribution_guide.md
+   notes/academic.md
 
 Indexes & Tables
 ==================
