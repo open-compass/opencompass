@@ -167,4 +167,4 @@ eval = dict(
 #                      PART 5  Utils Configuaration                   #
 #######################################################################
 
-work_dir = './outputs/oc_new_full_bench'
+work_dir = './outputs/oc_bench_intern_s1'
