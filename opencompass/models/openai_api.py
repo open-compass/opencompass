@@ -69,6 +69,8 @@ class OpenAI(BaseAPIModel):
             Defaults to None.
         extra_body (Dict, optional): Add additional JSON properties to
             the request
+        think_tag (str, optional): The tag to use for reasoning content.
+            Defaults to '</think>'.
         max_workers (int, optional): Maximum number of worker threads for
             concurrent API requests. For I/O-intensive API calls, recommended
             value is 10-20. Defaults to None (uses CPU count * 2).
@@ -617,21 +619,20 @@ class OpenAISDK(OpenAI):
         else:
             self.openai_api_base = openai_api_base
 
-        if self.proxy_url is None:
-            self.openai_client = OpenAI(base_url=self.openai_api_base,
-                                        api_key=key,
-                                        http_client=httpx.Client(verify=False))
-        else:
-            proxies = {
-                'http://': self.proxy_url,
-                'https://': self.proxy_url,
-            }
+        if self.proxy_url or http_client_cfg:
+            if self.proxy_url:
+                http_client_cfg['proxies'] = {
+                    'http://': self.proxy_url,
+                    'https://': self.proxy_url,
+                }
 
-            self.openai_client = OpenAI(
-                base_url=self.openai_api_base,
-                api_key=key,
-                http_client=httpx.Client(proxies=proxies, verify=False),
-            )
+        self.openai_client = OpenAI(
+            base_url=self.openai_api_base,
+            api_key=key,
+            http_client=httpx.Client(
+                **http_client_cfg) if http_client_cfg else None,
+        )
+
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
@@ -679,7 +680,6 @@ class OpenAISDK(OpenAI):
                     n=1,
                     messages=messages,
                     extra_body=self.extra_body,
-                    response_format=self.response_format,
                 )
             else:
                 query_data = dict(
@@ -689,7 +689,6 @@ class OpenAISDK(OpenAI):
                     temperature=self.temperature,
                     messages=messages,
                     extra_body=self.extra_body,
-                    response_format=self.response_format,
                 )
 
             if self.openai_extra_kwargs:
@@ -698,16 +697,32 @@ class OpenAISDK(OpenAI):
             try:
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
+
                 responses = self.openai_client.chat.completions.create(
                     **query_data, timeout=timeout)  # timeout in seconds
                 if self.verbose:
                     self.logger.info(
-                        'Successfully get response from OpenAI API')
+                        'Successfully get response from OpenAI API '
+                        'with query: %s', query_data)
                     try:
                         self.logger.info(responses)
                     except Exception:
                         pass  # noqa F841
-                if not responses.choices:
+                # Check if response is empty or content is empty
+                if (not responses.choices or not responses.choices[0].message
+                        or
+                    (not responses.choices[0].message.content and not getattr(
+                        responses.choices[0].message,
+                        'reasoning_content',
+                        '',
+                    ))):  # noqa: E125
+                    # There is case that server does not return any content
+                    if responses.choices[0].finish_reason == 'stop':
+                        self.logger.info(
+                            'Server does not return any content '
+                            'and stop reason is <stop>, '
+                            'the input query is: %s', query_data)
+                        return ''
                     if responses.choices[0].finish_reason == 'content_filter':
                         self.logger.info(
                             'The answer for this question is filted,'
@@ -715,10 +730,38 @@ class OpenAISDK(OpenAI):
                             'the input query is: %s', query_data)
                         return ''
                     self.logger.error(
-                        'Response is empty, it is an internal server error \
-                            from the API provider.')
+                        'Failed to extract content from the responses. '
+                        'Please check the API response for detail information.'
+                        'API responses: %s',
+                        responses,
+                    )
+                    num_retries += 1
+                    continue
 
-                return responses.choices[0].message.content
+                reasoning_content = (getattr(responses.choices[0].message,
+                                             'reasoning_content', '') or '')
+                content = responses.choices[0].message.content or ''
+                # Concat Reasoning Content and tags to content
+                if reasoning_content:
+                    if self.verbose:
+                        self.logger.info(
+                            'Follow'
+                            'vllm/reasoning/deepseek_r1_reasoning_parser'
+                            'to parse the reasoning content and tags'
+                            'Reasoning Content: %s, \n'
+                            'Tags: %s, \n'
+                            'Content: %s',
+                            reasoning_content,
+                            self.think_tag,
+                            content,
+                        )
+                    if content:
+                        return reasoning_content + self.think_tag + content
+                    else:
+                        return reasoning_content
+
+                else:
+                    return content
 
             except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status
