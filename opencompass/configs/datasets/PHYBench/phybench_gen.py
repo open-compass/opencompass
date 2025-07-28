@@ -15,7 +15,7 @@ phybench_infer_cfg = dict(
             round=[
                 dict(
                     role='HUMAN',
-                    prompt=f'Solve the following physics problem and return only the final result as a clean LaTeX expression. No explanation. No text.\n\nQuestion: {{input}}\nAnswer: ',
+                    prompt='Solve the following physics problem and return only the final result as a clean LaTeX expression.Remember to put your final answer within \\boxed{}.\n\nQuestion: {{input}}\nAnswer: ',
                 ),
             ],
         ),

@@ -66,7 +66,7 @@ with read_base():
     from opencompass.configs.summarizers.groups.mmlu_pro import \
         mmlu_pro_summary_groups  # noqa: F401, E501
 
-    from ...volc import infer as volc_infer  # noqa: F401, E501
+    from ...volc import infer  # noqa: F401, E501
 
 race_datasets = [race_datasets[1]]  # Only take RACE-High
 humaneval_v2_datasets[0]['abbr'] = 'openai_humaneval_v2'

@@ -25,7 +25,7 @@ OPENAI_API_BASE = os.path.join(
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3']
+O1_MODEL_LIST = ['o1', 'o3', 'o4']
 
 
 @MODELS.register_module()
@@ -69,6 +69,9 @@ class OpenAI(BaseAPIModel):
             Defaults to None.
         extra_body (Dict, optional): Add additional JSON properties to
             the request
+        max_workers (int, optional): Maximum number of worker threads for
+            concurrent API requests. For I/O-intensive API calls, recommended
+            value is 10-20. Defaults to None (uses CPU count * 2).
     """
 
     is_api: bool = True
@@ -92,6 +95,8 @@ class OpenAI(BaseAPIModel):
         tokenizer_path: Optional[str] = None,
         extra_body: Optional[Dict] = None,
         verbose: bool = False,
+        think_tag: str = '</think>',
+        max_workers: Optional[int] = None,
     ):
 
         super().__init__(
@@ -114,6 +119,13 @@ class OpenAI(BaseAPIModel):
         self.tokenizer_path = tokenizer_path
         self.hf_tokenizer = None
         self.extra_body = extra_body
+        self.think_tag = think_tag
+
+        if max_workers is None:
+            cpu_count = os.cpu_count() or 1
+            self.max_workers = min(32, (cpu_count + 5) * 2)
+        else:
+            self.max_workers = max_workers
 
         if isinstance(key, str):
             if key == 'ENV':
@@ -171,7 +183,7 @@ class OpenAI(BaseAPIModel):
         if self.temperature is not None:
             temperature = self.temperature
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             results = list(
                 tqdm(
                     executor.map(
@@ -319,7 +331,28 @@ class OpenAI(BaseAPIModel):
                 if self.logprobs:
                     return response['choices']
                 else:
-                    return response['choices'][0]['message']['content'].strip()
+                    # Extract content and reasoning_content from response
+                    message = response['choices'][0]['message']
+                    content = message.get('content', '') or ''
+                    reasoning_content = message.get('reasoning_content',
+                                                    '') or ''
+
+                    # Handle reasoning_content similar to OpenAISDK
+                    if reasoning_content:
+                        if self.verbose:
+                            self.logger.info(
+                                'Extracting reasoning content and tags.'
+                                'Reasoning Content: %s, \n'
+                                'Tags: %s, \n'
+                                'Content: %s', reasoning_content,
+                                self.think_tag, content)
+
+                        if content:
+                            return reasoning_content + self.think_tag + content
+                        else:
+                            return reasoning_content
+                    else:
+                        return content.strip()
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
@@ -399,7 +432,7 @@ class OpenAI(BaseAPIModel):
                 self.logger.info(
                     f'Successfully load default tiktoken tokenizer: '
                     f' {default_tokenizer}')
-            return len(enc.encode(prompt))
+            return len(enc.encode(prompt, disallowed_special=()))
 
     def _bin_trim(self, prompt: str, num_token: int, mode: str) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.
@@ -550,8 +583,11 @@ class OpenAISDK(OpenAI):
         tokenizer_path: str | None = None,
         extra_body: Dict | None = None,
         verbose: bool = False,
+        http_client_cfg: dict = {},
         status_code_mappings: dict = {},
-        response_format: Dict | None = None,
+        think_tag: str = '</think>',
+        max_workers: Optional[int] = None,
+        openai_extra_kwargs: Dict | None = None,
     ):
         super().__init__(
             path,
@@ -571,6 +607,7 @@ class OpenAISDK(OpenAI):
             tokenizer_path,
             extra_body,
             verbose=verbose,
+            max_workers=max_workers,
         )
         from openai import OpenAI
 
@@ -598,14 +635,16 @@ class OpenAISDK(OpenAI):
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
+        self.think_tag = think_tag
+        self.openai_extra_kwargs = openai_extra_kwargs
 
-        self.response_format = response_format
-
-    def _generate(self,
-                  input: PromptList | str,
-                  max_out_len: int,
-                  temperature: float,
-                  timeout: int = 3600) -> str:
+    def _generate(
+        self,
+        input: PromptList | str,
+        max_out_len: int,
+        temperature: float,
+        timeout: int = 3600,
+    ) -> str:
         """Generate results given a list of inputs.
 
         Args:
@@ -653,6 +692,9 @@ class OpenAISDK(OpenAI):
                     response_format=self.response_format,
                 )
 
+            if self.openai_extra_kwargs:
+                query_data.update(self.openai_extra_kwargs)
+
             try:
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
@@ -666,6 +708,12 @@ class OpenAISDK(OpenAI):
                     except Exception:
                         pass  # noqa F841
                 if not responses.choices:
+                    if responses.choices[0].finish_reason == 'content_filter':
+                        self.logger.info(
+                            'The answer for this question is filted,'
+                            'the stop reason is <content_filter>, '
+                            'the input query is: %s', query_data)
+                        return ''
                     self.logger.error(
                         'Response is empty, it is an internal server error \
                             from the API provider.')
