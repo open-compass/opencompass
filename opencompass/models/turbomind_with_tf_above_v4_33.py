@@ -5,10 +5,11 @@ import os
 import time
 from typing import Dict, List, Optional, Union
 
+from mmengine.config.config import ConfigDict
+
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
 from opencompass.utils.prompt import PromptList
-from mmengine.config.config import ConfigDict
 
 from .huggingface_above_v4_33 import (_convert_chat_messages,
                                       _format_with_fast_chat_template,
@@ -62,7 +63,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
                 _engine_config.update(engine_config)
             else:
                 raise ValueError(f'expected Dict or ConfigDict engine_config but got {type(engine_config)}')
-            
+
             _engine_config.update(engine_config.to_dict())
             self.pipe = self._build_pipe(path, backend, _engine_config)
         else:
