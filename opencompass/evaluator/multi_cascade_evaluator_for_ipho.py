@@ -185,7 +185,7 @@ class MultiCascadeEvaluator(BaseEvaluator):
             for j in range(len(details[i])):
                 this_score_list.append(
                     details[i][j]['rule_evaluation'].get('correct', False) *
-                    test_set[i]['extra_info']['points'][j])
+                    1 / len(details[i]))
             sum_score_list.append(this_score_list)
         score_sum = sum([sum(i) for i in sum_score_list])
 
