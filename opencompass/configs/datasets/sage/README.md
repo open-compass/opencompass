@@ -5,6 +5,8 @@
 ```python
 with read_base():
     from opencompass.configs.datasets.sage.sage_gen import sage_datasets
+    # for test split
+    from opencompass.configs.datasets.sage.sage_test_gen_dee47e import sage_datasets
 
 # update your judge model information
 sage_datasets[0]["eval_cfg"]["evaluator"]["judge_cfg"]["judgers"][0].update(dict(
@@ -14,6 +16,8 @@ sage_datasets[0]["eval_cfg"]["evaluator"]["judge_cfg"]["judgers"][0].update(dict
     key="YOUR_API_KEY",
 ))
 ```
+
+> The `test` split is only supported for infer, which means you should set `-m infer` for oc command.
 
 ### Performance
 
