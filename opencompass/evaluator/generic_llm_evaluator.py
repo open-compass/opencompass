@@ -168,7 +168,7 @@ class GenericLLMEvaluator(BaseEvaluator):
         if self.pred_postprocessor is None:
             return predictions
         else:
-            kwargs = self.pred_postprocessor
+            kwargs = deepcopy(self.pred_postprocessor)
             proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
             return [proc(pred, **kwargs) for pred in predictions]
 
