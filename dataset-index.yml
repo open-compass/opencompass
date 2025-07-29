@@ -1131,3 +1131,9 @@
     paper: https://arxiv.org/abs/2504.16074
     configpath: opencompass/configs/datasets/PHYBench/phybench_gen.py
     configpath_llmjudge: ''
+- eese:
+    name: EESE
+    category: Science
+    paper: https://arxiv.org/abs/2507.16514
+    configpath: opencompass/configs/datasets/eese/eese_judge_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/eese/eese_judge_gen.py
