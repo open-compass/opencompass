@@ -111,6 +111,12 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/clozeTest-maxmin/python/answers.txt",
     },
+    # eese
+    "opencompass/eese": {
+        "ms_id": None,
+        "hf_id": "opencompass/eese",
+        "local": "./data/eese/",
+    },
     # Flores
     "opencompass/flores": {
         "ms_id": "opencompass/flores",
