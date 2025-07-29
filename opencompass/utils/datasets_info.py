@@ -3,7 +3,7 @@ DATASETS_MAPPING = {
     "opencompass/kcle":{
         "ms_id": None,
         "hf_id": None,
-        "local": "./data/kcle_sampled.jsonl",
+        "local": "./data/kcle_diamond.jsonl",
     },
     # ADVGLUE Datasets
     "opencompass/advglue-dev": {
