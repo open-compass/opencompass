@@ -1,17 +1,6 @@
 # flake8: noqa
 
-import json
 import re
-
-
-def load_jsonl_data(file_path):
-    """Load the data in JSONL format"""
-    data = []
-    with open(file_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            if line.strip():
-                data.append(json.loads(line))
-    return data
 
 
 def extract_first_numeric_score(score_text):

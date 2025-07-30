@@ -1,3 +1,4 @@
+import json
 import os.path as osp
 from os import environ
 
@@ -5,7 +6,6 @@ from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
-from .utils import load_jsonl_data
 
 
 @LOAD_DATASET.register_module()
@@ -34,7 +34,11 @@ class EESEDataset(BaseDataset):
             for split in ['test']:
                 raw_data = []
                 filename = osp.join(path, split, f'{file_name}')
-                raw_data = load_jsonl_data(filename)
+                raw_data = []
+                with open(filename, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        if line.strip():
+                            raw_data.append(json.loads(line))
             dataset['test'] = Dataset.from_list(raw_data)
             dataset['train'] = Dataset.from_list(raw_data)
 
