@@ -1135,5 +1135,5 @@
     name: EESE
     category: Science
     paper: https://arxiv.org/abs/2507.16514
-    configpath: opencompass/configs/datasets/eese/eese_judge_gen.py
-    configpath_llmjudge: opencompass/configs/datasets/eese/eese_judge_gen.py
+    configpath: opencompass/configs/datasets/eese/eese_llm_judge_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/eese/eese_llm_judge_gen.py

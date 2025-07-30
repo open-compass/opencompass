@@ -1,4 +1,4 @@
-from opencompass.datasets.eese.eese import EESEDataset
+from opencompass.datasets import EESEDataset
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer

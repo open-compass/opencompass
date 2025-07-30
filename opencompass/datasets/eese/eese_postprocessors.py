@@ -1,5 +1,7 @@
-from opencompass.registry import TEXT_POSTPROCESSORS, DICT_POSTPROCESSORS
+# flake8: noqa
+
 from opencompass.datasets.eese.utils import extract_first_numeric_score
+from opencompass.registry import DICT_POSTPROCESSORS, TEXT_POSTPROCESSORS
 
 
 @DICT_POSTPROCESSORS.register_module('eese_score_postprocess_dict')
@@ -22,15 +24,12 @@ def eese_score_postprocess_dict(output: dict, output_path: str) -> dict:
                     value['score'] = 0
                 else:
                     value['score'] = 0  # 默认返回0分
-    
+
     # 计算总体分数
     scores = [value.get('score', 0) for value in output.values()]
     if scores:
-        overall_score = sum(scores) / (10*len(scores))
+        overall_score = sum(scores) / (10 * len(scores))
     else:
         overall_score = 0
-    
-    return {
-        'overall_score': overall_score,
-        'details': output
-    }
+
+    return {'overall_score': overall_score, 'details': output}
