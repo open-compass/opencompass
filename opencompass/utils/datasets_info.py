@@ -114,7 +114,7 @@ DATASETS_MAPPING = {
     # eese
     "opencompass/eese": {
         "ms_id": None,
-        "hf_id": "opencompass/eese",
+        "hf_id": "AIBench/EESE",
         "local": "./data/eese/",
     },
     # Flores
