@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 import mmengine
 from datasets import Dataset
+from nltk import accuracy
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
@@ -91,6 +92,7 @@ class MultiCascadeEvaluator(BaseEvaluator):
             # the score method with single-element lists
             result = self.rule_evaluator.score([prediction], [reference],
                                                [test_set])
+            return {'accuracy': 0.0, 'details': [{'correct': False}]}
             if 'details' in result and len(result['details']) > 0:
                 return result['details'][0]
             else:
@@ -212,6 +214,7 @@ class MultiCascadeEvaluator(BaseEvaluator):
 
             ###################################
             new_data = []
+            same_origin_flag = 0
             for i in range(len(failed_subset)):
                 item = failed_subset[i]
 
@@ -220,7 +223,6 @@ class MultiCascadeEvaluator(BaseEvaluator):
                 # attribute_points = item["extra_info"]["points"]
 
                 n = len(attribute_predictions)
-
                 for j in range(n):
                     new_item = {key: value for key, value in item.items()}
 
@@ -228,8 +230,10 @@ class MultiCascadeEvaluator(BaseEvaluator):
                     new_item['answer'] = attribute_references[j]
                     new_item['reference'] = attribute_references[j]
                     new_item['points'] = 1 / n
+                    new_item['same_origin_flag'] = same_origin_flag
 
                     new_data.append(new_item)
+                same_origin_flag += 1
 
             failed_subset = Dataset.from_list(new_data)
             ###################################
@@ -306,10 +310,13 @@ class MultiCascadeEvaluator(BaseEvaluator):
             # final_correct = initial_correct if not self.parallel else 0
 
             # Update the details for samples that were evaluated by LLM
+
+            correct_list = []
             for i, llm_detail in enumerate(llm_details_iter):
 
                 # Add dataset replica index to LLM evaluation result
                 is_correct = self._get_llm_correctness(llm_detail)
+                correct_list.append(is_correct)
                 score_sum += is_correct * failed_subset[i]['points']
                 self.logger.info(
                     f'this question: \n{failed_subset[i]["prediction"]} \n{failed_subset[i]["reference"]} \n{failed_subset[i]["points"]} \n{is_correct}'
@@ -319,6 +326,31 @@ class MultiCascadeEvaluator(BaseEvaluator):
 
             self.logger.info(f'Final evaluation score: {score_sum}')
 
-            result = {'score': score_sum, 'accuracy': ''}
+            accuracy_list = []
+            group_start_index = 0
+            current_index = failed_subset[0]['same_origin_flag']
+            for i in range(len(failed_subset)):
+                if failed_subset[i]['same_origin_flag'] != current_index:
+                    group = correct_list[group_start_index:i]
+                    print(group)
+                    if True in group:
+                        accuracy_list.append(True)
+                    else:
+                        accuracy_list.append(False)
+                    group_start_index = i
+                    current_index = failed_subset[i]['same_origin_flag']
+            group = correct_list[group_start_index:]
+            if True in group:
+                accuracy_list.append(True)
+            else:
+                accuracy_list.append(False)
+
+            accuracy = 0
+            for i in accuracy_list:
+                if i is True:
+                    accuracy += 1
+
+            accuracy /= len(predictions)
+            result = {'score': score_sum / 4, 'accuracy': accuracy * 100}
 
             return result
