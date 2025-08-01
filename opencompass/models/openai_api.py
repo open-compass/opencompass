@@ -589,6 +589,7 @@ class OpenAISDK(OpenAI):
         status_code_mappings: dict = {},
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
+        openai_extra_kwargs: Dict | None = None,
     ):
         super().__init__(
             path,
@@ -636,6 +637,7 @@ class OpenAISDK(OpenAI):
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
         self.think_tag = think_tag
+        self.openai_extra_kwargs = openai_extra_kwargs
 
     def _generate(
         self,
@@ -688,6 +690,9 @@ class OpenAISDK(OpenAI):
                     messages=messages,
                     extra_body=self.extra_body,
                 )
+
+            if self.openai_extra_kwargs:
+                query_data.update(self.openai_extra_kwargs)
 
             try:
                 if self.verbose:

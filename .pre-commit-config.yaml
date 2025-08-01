@@ -58,7 +58,7 @@ repos:
                 examples/
             )
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         exclude: |
@@ -90,11 +90,11 @@ repos:
           - mdformat_frontmatter
           - linkify-it-py
         exclude: configs/
-  - repo: https://github.com/myint/docformatter
-    rev: v1.3.1
-    hooks:
-      - id: docformatter
-        args: ["--in-place", "--wrap-descriptions", "79"]
+  # - repo: https://github.com/myint/docformatter
+  #   rev: v1.3.1
+  #   hooks:
+  #     - id: docformatter
+  #       args: ["--in-place", "--wrap-descriptions", "79"]
   - repo: local
     hooks:
     -   id: update-dataset-suffix
