@@ -92,7 +92,7 @@ pip install vllm
 当书写好测试的`config`文件后，我们可以命令行中通过`run.py`文件传入对应的config文件路径，例如：
 
 ```bash
-python run.py configs/eval_needlebench_v2.py  --slurm -p partition_name -q reserved --max-num-workers 16
+python run.py examples/eval_needlebench_v2.py  --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 注意，此时我们不需传入`--datasets, --models, --summarizer `等参数，因为我们已经在config文件中定义了这些配置。你可以自己手动调节`--max-num-workers`的设定以调节并行工作的workers的数量。

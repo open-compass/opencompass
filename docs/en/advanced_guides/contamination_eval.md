@@ -72,7 +72,7 @@ will report the accuracy or perplexity of ceval on subsets composed of these thr
 
 - If the performance of the three is relatively close, the contamination level of the model on that test set is light; otherwise, it is heavy.
 
-The following configuration file can be referenced [link](https://github.com/open-compass/opencompass/blob/main/configs/eval_contamination.py):
+The following configuration file can be referenced [link](https://github.com/open-compass/opencompass/blob/main/examples/eval_contamination.py):
 
 ```python
 from mmengine.config import read_base
