@@ -247,6 +247,12 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/race",
         "local": "./data/race/",
     },
+    # SeedBench
+    "opencompass/seedbench": {
+        "ms_id": "y12869741/SeedBench",
+        "hf_id": "yj12869741/SeedBench",
+        "local": "./data/SeedBench",
+    },
     # SIQA
     "opencompass/siqa": {
         "ms_id": "opencompass/siqa",
