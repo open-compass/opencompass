@@ -57,6 +57,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2025.07.26\]** OpenCompass 现已支持Intern-S1相关的通用及科学评测基准，请参阅[Intern-S1相关评测配置文件](examples/eval_bench_intern_s1.py)了解详情！🔥🔥🔥
 - **\[2025.04.01\]** OpenCompass 现已支持 `CascadeEvaluator`，允许多个评估器按顺序工作，可以为更复杂的评估场景创建自定义评估流程，查看[文档](docs/zh_cn/advanced_guides/llm_judge.md)了解具体用法！🔥🔥🔥
 - **\[2025.03.11\]** 现已支持 `SuperGPQA`  覆盖285 个研究生学科的知识能力评测，欢迎尝试！🔥🔥🔥
 - **\[2025.02.28\]** 我们为 `DeepSeek-R1` 系列模型添加了教程，请查看 [评估推理模型](docs/zh_cn/user_guides/deepseek_r1.md) 了解更多详情！🔥🔥🔥
