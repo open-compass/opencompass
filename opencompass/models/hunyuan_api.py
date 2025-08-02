@@ -141,12 +141,21 @@ class Hunyuan(BaseAPIModel):
                     time.sleep(5)
                     continue
                 else:
-                    print(e)
-                    from IPython import embed
-                    embed()
-                    exit()
+                    self.logger.error(f'Unhandled TencentCloudSDKException: {e}')
+                    retry_counter += 1
+                    continue
+
+            except (KeyError, IndexError, json.JSONDecodeError) as e:
+                self.logger.error(f'Response parsing error: {e}')
+                retry_counter += 1
+                continue
+            
+            except Exception as e:
+                self.logger.error(f'Unexpected error in Hunyuan API call: {e}')
+                retry_counter += 1
+                continue
 
             self.logger.debug(f'Generated: {answer}')
             return answer
         self.logger.debug(f'Failed to generate answer for query: {input}')
-        raise RuntimeError(f'Failed to respond in {self.retry} retrys')
+        raise RuntimeError(f'Failed to respond in {self.retry} retries')
