@@ -341,4 +341,21 @@ class CascadeEvaluator(BaseEvaluator):
                 'details': details,
             }
 
-            return result
+        else:
+            result = {
+                'accuracy': initial_accuracy,
+                'cascade_stats': {
+                    'total_samples': len(predictions),
+                    'rule_correct': initial_correct,
+                    'rule_accuracy': initial_accuracy,
+                    'llm_evaluated': 0,
+                    'llm_correct': 0,
+                    'llm_accuracy': 0.0,
+                    'final_correct': initial_correct,
+                    'final_accuracy': initial_accuracy,
+                    'parallel_mode': self.parallel,
+                },
+                'details': details,
+            }
+
+        return result
