@@ -62,7 +62,7 @@ telnet your_service_ip_address your_service_port
 
 ### 配置文件
 
-我们已经提供了 huamaneval-x 在 codegeex2 上评估的\[配置文件\]作为参考(https://github.com/open-compass/opencompass/blob/main/configs/eval_codegeex2.py)。
+我们已经提供了 huamaneval-x 在 codegeex2 上评估的\[配置文件\]作为参考(https://github.com/open-compass/opencompass/blob/main/examples/eval_codegeex2.py)。
 其中数据集以及相关后处理的配置文件为这个[链接](https://github.com/open-compass/opencompass/tree/main/configs/datasets/humanevalx)， 需要注意 humanevalx_eval_cfg_dict 中的evaluator 字段。
 
 ```python

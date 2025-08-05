@@ -63,7 +63,7 @@ else:
 ### 第二步: 使用 OpenCompass 评测上述模型
 
 ```shell
-python run.py configs/eval_lightllm.py
+python run.py examples/eval_lightllm.py
 ```
 
 当模型完成推理和指标计算后，我们便可获得模型的评测结果。

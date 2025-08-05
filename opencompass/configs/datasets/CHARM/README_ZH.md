@@ -93,11 +93,11 @@ ln -snf ${path_to_CHARM_repo}/data/CHARM ./data/CHARM
 ```bash
 cd ${path_to_opencompass}
 
-# 修改配置文件`configs/eval_charm_rea.py`: 将现有的模型取消注释，或者添加你想评测的模型
-python run.py configs/eval_charm_rea.py -r --dump-eval-details
+# 修改配置文件`examples/eval_charm_rea.py`: 将现有的模型取消注释，或者添加你想评测的模型
+python run.py examples/eval_charm_rea.py -r --dump-eval-details
 
-# 修改配置文件`configs/eval_charm_mem.py`: 将现有的模型取消注释，或者添加你想评测的模型
-python run.py configs/eval_charm_mem.py -r --dump-eval-details
+# 修改配置文件`examples/eval_charm_mem.py`: 将现有的模型取消注释，或者添加你想评测的模型
+python run.py examples/eval_charm_mem.py -r --dump-eval-details
 ```
 推理和评测的结果位于路径`${path_to_opencompass}/outputs`, 如下所示:
 ```bash

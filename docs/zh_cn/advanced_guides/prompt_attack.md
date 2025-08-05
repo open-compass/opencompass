@@ -90,7 +90,7 @@ attack = dict(
 请当运行攻击实验的时候请使用 `--mode infer` 选项，并需要指定`PYTHONPATH`。
 
 ```shell
-python run.py configs/eval_attack.py --mode infer
+python run.py examples/eval_attack.py --mode infer
 ```
 
 所有结果都将保存在名为“attack”的文件夹中。
