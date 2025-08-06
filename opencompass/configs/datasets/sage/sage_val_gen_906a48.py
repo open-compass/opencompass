@@ -4,7 +4,9 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import CustomDataset
 from opencompass.models import OpenAISDK
 
-from opencompass.datasets.sage.prompt import SAGE_INFER_TEMPLATE, SAGE_EVAL_TEMPLATE
+from mmengine import read_base
+with read_base():
+    from opencompass.datasets.sage.prompt import SAGE_INFER_TEMPLATE, SAGE_EVAL_TEMPLATE
 from opencompass.datasets.sage.dataset_loader import SAGEDataset
 from opencompass.datasets.sage.evaluation import SAGELLMEvaluator, sage_judge_postprocess, sage_pred_postprocess
 

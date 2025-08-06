@@ -2,7 +2,9 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 
-from opencompass.datasets.sage.prompt import SAGE_INFER_TEMPLATE
+from mmengine import read_base
+with read_base():
+    from opencompass.datasets.sage.prompt import SAGE_INFER_TEMPLATE
 from opencompass.datasets.sage.dataset_loader import SAGEDataset
 
 
