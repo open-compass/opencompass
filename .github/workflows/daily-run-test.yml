@@ -43,11 +43,6 @@ on:
         description: 'vllm version'
         type: string
         default: "0.7.2"
-      transformers_version:
-        required: true
-        description: 'transformers version'
-        type: string
-        default: "4.51.3"
       baseline_result:
         required: true
         description: 'baseline result'
@@ -182,7 +177,7 @@ jobs:
             pip install xformers --index-url https://download.pytorch.org/whl/cu121 --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install vllm==${{github.event.inputs.vllm_version}} --cache-dir ${{env.PIP_CACHE_PATH}} --no-deps
             pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --cache-dir ${{env.PIP_CACHE_PATH}}
-            pip install transformers==${{github.event.inputs.transformers_version}} --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install transformers==4.51.3 --cache-dir ${{env.PIP_CACHE_PATH}}
             FLASH_ATTENTION_FORCE_BUILD=TRUE pip install ${{ secrets.WORKSPACE_PREFIX }}/packages/flash_attn-2.7.2.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             cp -r ${{secrets.WORKSPACE_PREFIX}}/nltk_data ${{env.CONDA_PATH}}/envs/${{env.CONDA_ENV}}/nltk_data
       - name: Prepare - reinstall lmdeploy - cu12
