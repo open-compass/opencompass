@@ -1,10 +1,9 @@
 from opencompass.models import VLLMwithChatTemplate
 
-
 models = [
     dict(
         type=VLLMwithChatTemplate,
-        abbr='mixtral-large-instruct-2407-vllm',
+        abbr='mistral-large-instruct-2407-vllm',
         path='mistralai/Mistral-Large-Instruct-2407',
         model_kwargs=dict(tensor_parallel_size=8),
         max_out_len=256,
