@@ -35,7 +35,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         path: str,
         tokenizer_only: bool = False,
         backend: str = 'turbomind',
-        engine_config: Dict|ConfigDict = {},
+        engine_config: Dict | ConfigDict = {},
         gen_config: Dict = {},
         max_seq_len: int = None,
         meta_template: Optional[Dict] = None,
@@ -126,7 +126,8 @@ class TurboMindModelwithChatTemplate(BaseModel):
                 # Reserve space for max_out_len in max_seq_len
                 effective_max_len = self.max_seq_len - max_out_len
                 if len(input_ids) > effective_max_len:
-                    self.logger.info(f'Input length {original_len} exceeds effective sequence length {effective_max_len} (max_seq_len {self.max_seq_len} - max_out_len {max_out_len}), truncating...')
+                    self.logger.info(
+                        f'Input length {original_len} exceeds effective sequence length {effective_max_len} (max_seq_len {self.max_seq_len} - max_out_len {max_out_len}), truncating...')
                     input_ids = input_ids[:effective_max_len //
                                           2] + input_ids[-effective_max_len //
                                                          2:]
@@ -142,14 +143,20 @@ class TurboMindModelwithChatTemplate(BaseModel):
             messages = _format_with_fast_chat_template(messages, self.fastchat_template)
         else:
             # NOTE: DeepSeek-R1 series model's chat template will add <think> after the
-            messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
+            if 'enable_thinking' in self.gen_config:
+                messages = [self.tokenizer.apply_chat_template(
+                    m, add_generation_prompt=True, tokenize=False, enable_thinking=self.gen_config['enable_thinking']) for m in messages]
+            else:
+                messages = [self.tokenizer.apply_chat_template(
+                    m, add_generation_prompt=True, tokenize=False) for m in messages]
             # LMDeploy tokenize prompts by AutoTokenizer with its default parameter "add_special_token=True"
             # OC add bos_token in the prompt, which requires tokenizing prompts using "add_speicial_token=False"
             # But LMDeploy doesn't have "add_speicial_token" in the pipeline API. So, we remove bos_token
             # from messages as a workaround
             if self.tokenizer.bos_token:
                 bos_token = self.tokenizer.bos_token
-                messages = [message.removeprefix(bos_token) if message.startswith(bos_token) else message for message in messages]
+                messages = [message.removeprefix(bos_token) if message.startswith(
+                    bos_token) else message for message in messages]
         stop_words = list(set(self.stop_words + stopping_criteria))
 
         DEFAULT_GEN_CONFIG = {
@@ -164,7 +171,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
             gen_config['max_new_tokens'] = max_out_len
         if min_out_len is not None:
             gen_config['min_new_tokens'] = min_out_len
-        if not(do_sample or ('do_sample' in self.gen_config and self.gen_config['do_sample'])):
+        if not (do_sample or ('do_sample' in self.gen_config and self.gen_config['do_sample'])):
             if self.version_info >= (0, 6, 0):
                 gen_config['do_sample'] = False
             else:
@@ -208,7 +215,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
                               pipeline)
 
         assert backend in ['pytorch', 'turbomind'], \
-                f'unsupported backend type: {backend}'
+            f'unsupported backend type: {backend}'
 
         if backend == 'turbomind':
             filtered = {k: v for k, v in engine_config.items() if hasattr(TurbomindEngineConfig, k)}
