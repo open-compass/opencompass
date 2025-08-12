@@ -52,9 +52,8 @@ sage_datasets = [
                 ),
                 dataset_cfg=dict(
                     type=SAGEDataset,
-                    n=4,
-                    abbr='sage-test',
-                    split='test',
+                    abbr='sage-val',
+                    split='val',
                     reader_cfg=compass_agi4s_reader_cfg,
                 ),
                 judge_cfg=dict(
