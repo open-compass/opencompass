@@ -32,7 +32,7 @@ compass_agi4s_infer_cfg = dict(
 sage_datasets = [
     dict(
         type=SAGEDataset,
-        n=4,
+        n=1,
         abbr='sage-test',
         split='test',
         reader_cfg=compass_agi4s_reader_cfg,
