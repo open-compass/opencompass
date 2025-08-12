@@ -35,6 +35,7 @@ from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
 from .cmo_fib import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
+from .coinflip import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .commonsenseqa_cn import *  # noqa: F401, F403
 from .copa import *  # noqa: F401, F403
@@ -82,6 +83,7 @@ from .judge import *  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .korbench import *  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
+from .last_letters import * # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
