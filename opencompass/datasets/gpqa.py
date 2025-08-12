@@ -113,3 +113,16 @@ def GPQA_Simple_Eval_postprocess(text: str) -> str:
     if match:
         return match.group(1)
     return None
+
+
+@TEXT_POSTPROCESSORS.register_module()
+def GPQA_Eval_postprocess(text: str) -> str:
+    ANSWER_PATTERN = r'(?i)ANSWER\s*:\s*([A-D])'
+    match = re.search(ANSWER_PATTERN, text)
+    if match:
+        return match.group(1)
+    BOX_PATTERN = r'\\boxed\{(.*?)\}'
+    box_matches = re.findall(BOX_PATTERN, text)
+    if box_matches:
+        return box_matches[-1]
+    return None

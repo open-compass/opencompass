@@ -3,7 +3,7 @@ import os
 import re
 from os import environ
 
-from datasets import Dataset, DatasetDict
+from datasets import Dataset, DatasetDict, load_dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
@@ -168,6 +168,21 @@ class MATHDataset(BaseDataset):
         dataset['test'] = Dataset.from_list(raw_data)
         dataset['train'] = Dataset.from_list(raw_data)
         return dataset
+
+
+@LOAD_DATASET.register_module()
+class MATH500Dataset(BaseDataset):
+
+    @staticmethod
+    def load():
+        hf_dataset = load_dataset('HuggingFaceH4/MATH-500', split='test')
+        dataset = []
+        for example in hf_dataset:
+            dataset.append({
+                'question': example['problem'],
+                'answer': example['answer'],
+            })
+        return Dataset.from_list(dataset)
 
 
 @TEXT_POSTPROCESSORS.register_module('math_postprocess')
