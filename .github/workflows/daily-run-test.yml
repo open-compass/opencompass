@@ -43,6 +43,16 @@ on:
         description: 'vllm version'
         type: string
         default: "0.7.2"
+      transformers_version:
+        required: true
+        description: 'transformers version'
+        type: string
+        default: "4.51.3"
+      baseline_result:
+        required: true
+        description: 'baseline result'
+        type: string
+        default: "16439300433-baseline"
       fullbench_eval:
         required: true
         description: "fullbench volc functions ['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
@@ -129,7 +139,7 @@ jobs:
           if-no-files-found: error
           path: builder/manywheel/${{ env.OUTPUT_FOLDER }}
           retention-days: 1
-          name: my-artifact-${{ github.run_id }}-${{ matrix.pyver }}
+          name: my-artifact-${{ github.run_id }}
 
 
   prepare_env:
@@ -172,15 +182,16 @@ jobs:
             pip install xformers --index-url https://download.pytorch.org/whl/cu121 --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install vllm==${{github.event.inputs.vllm_version}} --cache-dir ${{env.PIP_CACHE_PATH}} --no-deps
             pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install transformers==${{github.event.inputs.transformers_version}} --cache-dir ${{env.PIP_CACHE_PATH}}
             FLASH_ATTENTION_FORCE_BUILD=TRUE pip install ${{ secrets.WORKSPACE_PREFIX }}/packages/flash_attn-2.7.2.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             cp -r ${{secrets.WORKSPACE_PREFIX}}/nltk_data ${{env.CONDA_PATH}}/envs/${{env.CONDA_ENV}}/nltk_data
       - name: Prepare - reinstall lmdeploy - cu12
-        if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
+        if: ${{github.event_name != 'schedule' && inputs.build_lmdeploy}}
         uses: actions/download-artifact@v4
         with:
-          name: my-artifact-${{ github.run_id }}-py310
+          name: my-artifact-${{ github.run_id }}
       - name: Prepare - reinstall lmdeploy - cu12
-        if: ${{github.event_name == 'schedule' || inputs.build_lmdeploy}}
+        if: ${{github.event_name != 'schedule' && inputs.build_lmdeploy}}
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
@@ -199,7 +210,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench_v5","chat_obj_fullbench_v6","chat_obj_fullbench_v7","base_fullbench","base_longtext_fullbench","chat_longtext_fullbench"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_volc || '["chat_models","base_models","chat_obj_fullbench_v5","base_fullbench","base_longtext_fullbench","chat_longtext_fullbench"]')}}
     runs-on: volc_cu12_daily
     timeout-minutes: 180 #3hours
     steps:
@@ -231,7 +242,8 @@ jobs:
             unset HTTP_PROXY;unset HTTPS_PROXY;unset http_proxy;unset https_proxy;
             opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse --dump-eval-details
             rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}}/*/summary regression_result_daily
-            python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py
+            python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py || true
+            python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} ${{env.REPORT_ROOT}}/${{github.event.inputs.baseline_result}}/${{matrix.regression_func}}
 
 
   daily_run_test_local:
@@ -319,7 +331,8 @@ jobs:
           unset HTTP_PROXY;unset HTTPS_PROXY;unset http_proxy;unset https_proxy;
           opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}}/*/summary regression_result_daily
-          python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py || true
+          python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} ${{env.REPORT_ROOT}}/${{github.event.inputs.baseline_result}}/${{matrix.regression_func}}
       - name:  Run testcase
         if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7'
         run: |
@@ -330,7 +343,8 @@ jobs:
           unset HTTP_PROXY;unset HTTPS_PROXY;unset http_proxy;unset https_proxy;
           opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse --dump-eval-details
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}}/*/summary regression_result_daily
-          python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py
+          python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py || true
+          python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} ${{env.REPORT_ROOT}}/${{github.event.inputs.baseline_result}}/${{matrix.regression_func}}
 
   fullbench_run_test:
     if: ${{!cancelled() && contains(needs.prepare_env.result, 'success')}}
