@@ -53,7 +53,7 @@ models = [
 注意：`num_return_sequences` 必须大于等于k，本身pass@k是计算的概率估计。
 
 具体可以参考以下配置文件
-[configs/eval_code_passk.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_code_passk.py)
+[examples/eval_code_passk.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk.py)
 
 ### 模型不支持多回复
 
@@ -103,4 +103,4 @@ models = [
 另外我们需要模型的回复有随机性，同步需要设置`generation_kwargs`参数。
 
 具体可以参考以下配置文件
-[configs/eval_code_passk_repeat_dataset.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_code_passk_repeat_dataset.py)
+[examples/eval_code_passk_repeat_dataset.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk_repeat_dataset.py)

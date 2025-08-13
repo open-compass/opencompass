@@ -63,7 +63,7 @@ else:
 ### Step-2: Evaluate the above model using OpenCompass.
 
 ```shell
-python run.py configs/eval_lightllm.py
+python run.py examples/eval_lightllm.py
 ```
 
 You are expected to get the evaluation results after the inference and evaluation.

@@ -82,7 +82,7 @@
 
 我们将陆续提供开源模型和 API 模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
 
-你也可以参考[CompassAcademic](configs/eval_academic_leaderboard_202412.py)，快速地复现榜单的结果，目前选取的数据集包括 综合知识推理 (MMLU-Pro/GPQA Diamond) ,逻辑推理 (BBH) ,数学推理 (MATH-500, AIME) ,代码生成 (LiveCodeBench, HumanEval) ,指令跟随 (IFEval) 。
+你也可以参考[学术榜单精度复现教程](https://opencompass.readthedocs.io/zh-cn/latest/academic.html)，快速地复现榜单的结果。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
