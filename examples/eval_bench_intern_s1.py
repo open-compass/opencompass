@@ -57,6 +57,7 @@ datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')),
 judge_cfg = dict()
 
 for item in datasets:
+    item['infer_cfg']['inferencer']['max_out_len'] = 64000
     if 'judge_cfg' in item['eval_cfg']['evaluator']:
         item['eval_cfg']['evaluator']['judge_cfg'] = judge_cfg
     if 'llm_evaluator' in item['eval_cfg']['evaluator'].keys() and 'judge_cfg' in item['eval_cfg']['evaluator']['llm_evaluator']:
