@@ -41,8 +41,8 @@ with read_base():
     )
 
     # Models
-    from opencompass.configs.models.qwen3.lmdeploy_qwen3_0_6b import \
-        models as qwen3_model
+    from opencompass.configs.models.interns1.intern_s1 import \
+        models as interns1_model
 
 #######################################################################
 #                          PART 1  Datasets List                      #
@@ -51,7 +51,7 @@ with read_base():
 # Only take LCB generation for evaluation
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')),
-               []) + [LCBCodeGeneration_dataset]
+               [])
 
 # LLM judge config: using LLM to evaluate predictions
 judge_cfg = dict()
