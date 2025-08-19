@@ -892,7 +892,7 @@
 - seedbench:
     name: SeedBench
     category: Knowledge
-    paper: ''
+    paper: 'https://aclanthology.org/2025.acl-long.1516.pdf'
     configpath: opencompass/configs/datasets/SeedBench/seedbench_gen.py
 - simpleqa:
     name: SimpleQA
