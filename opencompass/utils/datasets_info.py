@@ -1,4 +1,10 @@
 DATASETS_MAPPING = {
+    # KLCE Datasets
+    "opencompass/kcle":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/kcle_diamond.jsonl",
+    },
     # ADVGLUE Datasets
     "opencompass/advglue-dev": {
         "ms_id": None,
@@ -110,6 +116,12 @@ DATASETS_MAPPING = {
         "ms_id": None,
         "hf_id": None,
         "local": "./data/clozeTest-maxmin/python/answers.txt",
+    },
+    # eese
+    "opencompass/eese": {
+        "ms_id": None,
+        "hf_id": "AIBench/EESE",
+        "local": "./data/eese/",
     },
     # Flores
     "opencompass/flores": {

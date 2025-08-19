@@ -25,7 +25,7 @@ OPENAI_API_BASE = os.path.join(
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3', 'o4']
+OAI_REASONING_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
 
 
 @MODELS.register_module()
@@ -255,7 +255,8 @@ class OpenAI(BaseAPIModel):
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
             try:
-                if any(model in self.path for model in O1_MODEL_LIST):
+                if any(model in self.path
+                       for model in OAI_REASONING_MODEL_LIST):
                     self.logger.warning(
                         f"'max_token' is unsupported for model {self.path}")
                     self.logger.warning(
@@ -589,6 +590,7 @@ class OpenAISDK(OpenAI):
         status_code_mappings: dict = {},
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
+        openai_extra_kwargs: Dict | None = None,
     ):
         super().__init__(
             path,
@@ -636,6 +638,7 @@ class OpenAISDK(OpenAI):
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
         self.think_tag = think_tag
+        self.openai_extra_kwargs = openai_extra_kwargs
 
     def _generate(
         self,
@@ -667,7 +670,7 @@ class OpenAISDK(OpenAI):
         num_retries = 0
         while num_retries < self.retry:
             self.wait()
-            if any(model in self.path for model in O1_MODEL_LIST):
+            if any(model in self.path for model in OAI_REASONING_MODEL_LIST):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
                 self.logger.warning(
@@ -688,6 +691,9 @@ class OpenAISDK(OpenAI):
                     messages=messages,
                     extra_body=self.extra_body,
                 )
+
+            if self.openai_extra_kwargs:
+                query_data.update(self.openai_extra_kwargs)
 
             try:
                 if self.verbose:

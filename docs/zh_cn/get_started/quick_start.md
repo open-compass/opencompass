@@ -12,7 +12,7 @@
 
 **可视化**：评估完成后，OpenCompass 将结果整理成易读的表格，并将其保存为 CSV 和 TXT 文件。你也可以激活飞书状态上报功能，此后可以在飞书客户端中及时获得评测状态报告。
 
-接下来，我们将展示 OpenCompass 的基础用法，展示基座模型模型 [InternLM2-1.8B](https://huggingface.co/internlm/internlm2-1_8b) 和对话模型 [InternLM2-Chat-1.8B](https://huggingface.co/internlm/internlm2-chat-1_8b)、[Qwen2-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2-1.5B-Instruct) 在 [GSM8K](https://github.com/openai/grade-school-math) 和 [MATH](https://github.com/hendrycks/math) 下采样数据集上的评估。它们的配置文件可以在 [configs/eval_chat_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_chat_demo.py) 和 [configs/eval_base_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_base_demo.py) 中找到。
+接下来，我们将展示 OpenCompass 的基础用法，展示基座模型模型 [InternLM2-1.8B](https://huggingface.co/internlm/internlm2-1_8b) 和对话模型 [InternLM2-Chat-1.8B](https://huggingface.co/internlm/internlm2-chat-1_8b)、[Qwen2-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2-1.5B-Instruct) 在 [GSM8K](https://github.com/openai/grade-school-math) 和 [MATH](https://github.com/hendrycks/math) 下采样数据集上的评估。它们的配置文件可以在 [examples/eval_chat_demo.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_chat_demo.py) 和 [examples/eval_base_demo.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_base_demo.py) 中找到。
 
 在运行此实验之前，请确保您已在本地安装了 OpenCompass。这个例子 (应该) 可以在一台 _GTX-1660-6G_ GPU 下成功运行。
 
@@ -136,7 +136,7 @@ python tools/list_configs.py llama mmlu
 
 除了通过命令行配置实验外，OpenCompass 还允许用户在配置文件中编写实验的完整配置，并通过 `run.py` 直接运行它。配置文件是以 Python 格式组织的，并且必须包括 `datasets` 和 `models` 字段。
 
-本次测试配置在 [configs/eval_chat_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_chat_demo.py) 中。此配置通过 [继承机制](../user_guides/config.md#继承机制) 引入所需的数据集和模型配置，并以所需格式组合 `datasets` 和 `models` 字段。
+本次测试配置在 [examples/eval_chat_demo.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_chat_demo.py) 中。此配置通过 [继承机制](../user_guides/config.md#继承机制) 引入所需的数据集和模型配置，并以所需格式组合 `datasets` 和 `models` 字段。
 
 ```python
 from mmengine.config import read_base
@@ -154,7 +154,7 @@ models = hf_qwen2_1_5b_instruct_models + hf_internlm2_chat_1_8b_models
 运行任务时，我们只需将配置文件的路径传递给 `run.py`：
 
 ```bash
-python run.py configs/eval_chat_demo.py --debug
+python run.py examples/eval_chat_demo.py --debug
 ```
 
 :::{dropdown} 关于 `models`
@@ -190,7 +190,7 @@ models = [
 
 与模型类似，数据集的配置文件也提供在 `configs/datasets` 下。用户可以在命令行中使用 `--datasets`，或通过继承在配置文件中导入相关配置
 
-下面是来自 `configs/eval_chat_demo.py` 的与数据集相关的配置片段：
+下面是来自 `examples/eval_chat_demo.py` 的与数据集相关的配置片段：
 
 ```python
 from mmengine.config import read_base  # 使用 mmengine.read_base() 读取基本配置
@@ -270,7 +270,7 @@ python run.py \
 
 除了通过命令行配置实验外，OpenCompass 还允许用户在配置文件中编写实验的完整配置，并通过 `run.py` 直接运行它。配置文件是以 Python 格式组织的，并且必须包括 `datasets` 和 `models` 字段。
 
-本次测试配置在 [configs/eval_base_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_base_demo.py) 中。此配置通过 [继承机制](../user_guides/config.md#继承机制) 引入所需的数据集和模型配置，并以所需格式组合 `datasets` 和 `models` 字段。
+本次测试配置在 [examples/eval_base_demo.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_base_demo.py) 中。此配置通过 [继承机制](../user_guides/config.md#继承机制) 引入所需的数据集和模型配置，并以所需格式组合 `datasets` 和 `models` 字段。
 
 ```python
 from mmengine.config import read_base
@@ -288,7 +288,7 @@ models = hf_qwen2_1_5b_models + hf_internlm2_1_8b_models
 运行任务时，我们只需将配置文件的路径传递给 `run.py`：
 
 ```bash
-python run.py configs/eval_base_demo.py --debug
+python run.py examples/eval_base_demo.py --debug
 ```
 
 :::{dropdown} 关于 `models`
@@ -324,7 +324,7 @@ models = [
 
 与模型类似，数据集的配置文件也提供在 `configs/datasets` 下。用户可以在命令行中使用 `--datasets`，或通过继承在配置文件中导入相关配置
 
-下面是来自 `configs/eval_base_demo.py` 的与数据集相关的配置片段：
+下面是来自 `examples/eval_base_demo.py` 的与数据集相关的配置片段：
 
 ```python
 from mmengine.config import read_base  # 使用 mmengine.read_base() 读取基本配置
@@ -358,7 +358,7 @@ OpenCompass 通常假定运行环境网络是可用的。如果您遇到网络�
 由于 OpenCompass 默认并行启动评估过程，我们可以在第一次运行时以 `--debug` 模式启动评估，并检查是否存在问题。包括在前述的所有文档中，我们都使用了 `--debug` 开关。在 `--debug` 模式下，任务将按顺序执行，并实时打印输出。
 
 ```bash
-python run.py configs/eval_chat_demo.py -w outputs/demo --debug
+python run.py examples/eval_chat_demo.py -w outputs/demo --debug
 ```
 
 对话默写 'internlm/internlm2-chat-1_8b' 和 'Qwen/Qwen2-1.5B-Instruct' 将在首次运行期间从 HuggingFace 自动下载。
@@ -371,7 +371,7 @@ python run.py configs/eval_chat_demo.py -w outputs/demo --debug
 然后，您可以按 `Ctrl+C` 中断程序，并以正常模式运行以下命令：
 
 ```bash
-python run.py configs/eval_chat_demo.py -w outputs/demo
+python run.py examples/eval_chat_demo.py -w outputs/demo
 ```
 
 在正常模式下，评估任务将在后台并行执行，其输出将被重定向到输出目录 `outputs/demo/{TIMESTAMP}`。前端的进度条只指示已完成任务的数量，而不考虑其成功或失败。**任何后端任务失败都只会在终端触发警告消息。**

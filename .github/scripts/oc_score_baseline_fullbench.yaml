@@ -22,6 +22,7 @@ internlm2_5-7b-chat-hf_fullbench:
         lcb_code_generation_pass@1: 12.5
         lcb_code_execution_pass@1: 43.75
         lcb_test_output_pass@1: 18.75
+        teval_naive_average: 75.52
         bbh-logical_deduction_seven_objects_score: 50
         bbh-multistep_arithmetic_two_score: 68.75
         mmlu-other_accuracy: 72.6
@@ -99,6 +100,7 @@ internlm2_5-7b-chat-turbomind_fullbench:
         lcb_code_generation_pass@1: 12.5
         lcb_code_execution_pass@1: 43.75
         lcb_test_output_pass@1: 0.00
+        teval_naive_average: 75.73
         bbh-logical_deduction_seven_objects_score: 62.50
         bbh-multistep_arithmetic_two_score: 62.50
         mmlu-other_accuracy: 73.08
@@ -454,6 +456,14 @@ internlm2_5-7b-chat-1m-turbomind:
         longbench_few-shot-learning_score: 51.67
         longbench_synthetic-tasks_score: 66.83
         longbench_code-completion_score: 45.99
+    base_long_context:
+        LongBench_2wikimqa_score: 32.81
+        Length32000Depth0_origin_en_32000_score: 100
+    chat_long_context:
+        babilong_qa1_256k_score: 25
+        LongBench_2wikimqa_score: 32.81
+        Length16000Depth0_2needle_en_128k_score: 100
+        ruler_cwe_128k_score: 0
 
 
 qwen2.5-7b-instruct-turbomind:
@@ -981,3 +991,523 @@ internlm3-8b-instruct-pytorch:
         middle_knowledge_naive_average: 88.92
         primary_knowledge_naive_average: 92.96
         mathbench-t (average)_naive_average: 86.16
+
+internlm3-8b-instruct-hf_fullbench:
+    objective_v6: 
+        aime2024_accuracy: 12.5
+        aime2024_f1: 0.12
+        aime2024_accuracy_given_attempted: 12.5
+        aime2024_attempted_ratio: 100
+        aime2024_correct_count: 2
+        aime2024_incorrect_count: 14
+        aime2024_not_attempted_count: 0
+        aime2025_accuracy: 6.25
+        aime2025_f1: 0.06
+        aime2025_accuracy_given_attempted: 6.25
+        aime2025_attempted_ratio: 100
+        aime2025_correct_count: 1
+        aime2025_incorrect_count: 15
+        aime2025_not_attempted_count: 0
+        bbh-temporal_sequences_score: 87.5
+        bbh-temporal_sequences_score_given_attempted: 87.5
+        bbh-temporal_sequences_attempted_ratio: 100
+        bbh-temporal_sequences_correct_count: 14
+        bbh-temporal_sequences_incorrect_count: 2
+        bbh-temporal_sequences_not_attempted_count: 0
+        cmo_fib_accuracy: 31.25
+        drop_accuracy: 100
+        drop_f1: 1
+        drop_accuracy_given_attempted: 100
+        drop_attempted_ratio: 100
+        drop_correct_count: 16
+        drop_incorrect_count: 0
+        drop_not_attempted_count: 0
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
+        GPQA_diamond_accuracy: 56.25
+        GPQA_diamond_f1: 0.56
+        GPQA_diamond_accuracy_given_attempted: 56.25
+        GPQA_diamond_attempted_ratio: 100
+        GPQA_diamond_correct_count: 9
+        GPQA_diamond_incorrect_count: 7
+        GPQA_diamond_not_attempted_count: 0
+        gsm8k_accuracy: 93.75
+        hellaswag_accuracy: 68.75
+        hellaswag_f1: 0.69
+        hellaswag_accuracy_given_attempted: 68.75
+        hellaswag_attempted_ratio: 100
+        hellaswag_correct_count: 11
+        hellaswag_incorrect_count: 5
+        hellaswag_not_attempted_count: 0
+        korbench_cipher_accuracy: 37.5
+        korbench_cipher_f1: 0.38
+        korbench_cipher_accuracy_given_attempted: 37.5
+        korbench_cipher_attempted_ratio: 100
+        korbench_cipher_correct_count: 6
+        korbench_cipher_incorrect_count: 10
+        korbench_cipher_not_attempted_count: 0
+        math_prm800k_500-llmjudge_accuracy: 56.25
+        math_prm800k_500-llmjudge_f1: 0.56
+        math_prm800k_500-llmjudge_accuracy_given_attempted: 56.25
+        math_prm800k_500-llmjudge_attempted_ratio: 100
+        math_prm800k_500-llmjudge_correct_count: 9
+        math_prm800k_500-llmjudge_incorrect_count: 7
+        math_prm800k_500-llmjudge_not_attempted_count: 0
+        mathbench-college-single_choice_cn_acc_4: 75
+        mathbench-college-single_choice_cn_acc_1: 75
+        mathbench-college-single_choice_cn_more_1_0: 100
+        mathbench-college-single_choice_cn_more_1_1: 75
+        mathbench-college-single_choice_cn_more_4_0: 100
+        mathbench-college-single_choice_cn_more_4_1: 100
+        mathbench-college-single_choice_cn_more_4_2: 75
+        mathbench-college-single_choice_cn_more_4_3: 75
+        mathbench-college-single_choice_cn_more_4_4: 50
+        mathbench-college-single_choice_cn_perf_1: 75
+        mathbench-college-single_choice_cn_perf_4: 50
+        mathbench-college-single_choice_cn_vote_4: 75
+        mathbench-college-single_choice_cn_vote_1: 75
+        mathbench-college-single_choice_cn_prior_A: 18.75
+        mathbench-college-single_choice_cn_prior_B: 18.75
+        mathbench-college-single_choice_cn_prior_C: 31.25
+        mathbench-college-single_choice_cn_prior_D: 31.25
+        mathbench-college-single_choice_cn_prior_-: 0
+        musr_murder_mysteries_accuracy: 100
+        musr_murder_mysteries_f1: 1
+        musr_murder_mysteries_accuracy_given_attempted: 100
+        musr_murder_mysteries_attempted_ratio: 100
+        musr_murder_mysteries_correct_count: 16
+        musr_murder_mysteries_incorrect_count: 0
+        musr_murder_mysteries_not_attempted_count: 0
+        supergpqa_accuracy: 37.5
+        supergpqa_total_correct: 6
+        supergpqa_total_count: 16
+        supergpqa_SuperGPQA-Engineering: 40
+        supergpqa_SuperGPQA-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine: 50
+        supergpqa_SuperGPQA-Economics: 50
+        supergpqa_SuperGPQA-Science: 33.33
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine: 0
+        supergpqa_SuperGPQA-Economics-Applied Economics: 100
+        supergpqa_SuperGPQA-Science-Mathematics: 20
+        supergpqa_SuperGPQA-Science-Physics: 100
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering: 50
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering: 0
+        supergpqa_SuperGPQA-Economics-Theoretical Economics: 0
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology-Circuits and Systems: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy-Philosophical Aesthetics: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine-Traditional Chinese Medicine Theory: 0
+        supergpqa_SuperGPQA-Economics-Applied Economics-Finance: 100
+        supergpqa_SuperGPQA-Science-Mathematics-Combinatorial Mathematics: 100
+        supergpqa_SuperGPQA-Science-Physics-Particle and Nuclear Physics: 100
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine-Internal Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology-Computer Architecture: 0
+        supergpqa_SuperGPQA-Science-Mathematics-Ordinary Differential Equations: 0
+        supergpqa_SuperGPQA-Science-Mathematics-Mathematical Analysis: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering-Signal and Information Processing: 50
+        supergpqa_SuperGPQA-Science-Mathematics-Advanced Algebra: 0
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering-Control Theory and Control Engineering: 0
+        supergpqa_SuperGPQA-Economics-Theoretical Economics-Political Economy: 0
+        triviaqa_wiki_1shot_score: 43.75
+        qa_dingo_cn_score: 100
+        qa_dingo_cn_num_good: 16
+        qa_dingo_cn_num_bad: 0
+        qa_dingo_cn_total: 16
+    objective_v7: 
+        aime2024_accuracy: 12.5
+        aime2025_accuracy: 6.25
+        bbeh_boolean_expressions_accuracy: 37.5
+        bbeh_boolean_expressions_f1: 0.38
+        bbeh_boolean_expressions_accuracy_given_attempted: 37.5
+        bbeh_boolean_expressions_attempted_ratio: 100
+        bbeh_boolean_expressions_correct_count: 6
+        bbeh_boolean_expressions_incorrect_count: 10
+        bbeh_boolean_expressions_not_attempted_count: 0
+        Chem_exam-competition_final_score: 55.95
+        Chem_exam-gaokao_final_score: 57.29
+        ChemBench_Name_Conversion_accuracy: 68.75
+        ChemBench_Name_Conversion_f1: 0.69
+        ChemBench_Name_Conversion_accuracy_given_attempted: 68.75
+        ChemBench_Name_Conversion_attempted_ratio: 100
+        ChemBench_Name_Conversion_correct_count: 11
+        ChemBench_Name_Conversion_incorrect_count: 5
+        ChemBench_Name_Conversion_not_attempted_count: 0
+        ClimaQA_Gold_mcq_accuracy: 81.25
+        ClimaQA_Gold_mcq_f1: 0.81
+        ClimaQA_Gold_mcq_accuracy_given_attempted: 81.25
+        ClimaQA_Gold_mcq_attempted_ratio: 100
+        ClimaQA_Gold_mcq_correct_count: 13
+        ClimaQA_Gold_mcq_incorrect_count: 3
+        ClimaQA_Gold_mcq_not_attempted_count: 0
+        cmmlu-agronomy_accuracy: 81.25
+        cmmlu-agronomy_f1: 0.81
+        cmmlu-agronomy_accuracy_given_attempted: 81.25
+        cmmlu-agronomy_attempted_ratio: 100
+        cmmlu-agronomy_correct_count: 13
+        cmmlu-agronomy_incorrect_count: 3
+        cmmlu-agronomy_not_attempted_count: 0
+        earth_silver_mcq_accuracy: 62.5
+        earth_silver_mcq_f1: 0.62
+        earth_silver_mcq_accuracy_given_attempted: 62.5
+        earth_silver_mcq_attempted_ratio: 100
+        earth_silver_mcq_correct_count: 10
+        earth_silver_mcq_incorrect_count: 6
+        earth_silver_mcq_not_attempted_count: 0
+        GPQA_diamond_accuracy: 68.75
+        hle_llmjudge_accuracy: 25
+        hle_llmjudge_f1: 0.25
+        hle_llmjudge_accuracy_given_attempted: 25
+        hle_llmjudge_attempted_ratio: 100
+        hle_llmjudge_correct_count: 4
+        hle_llmjudge_incorrect_count: 12
+        hle_llmjudge_not_attempted_count: 0
+        IFEval_Prompt-level-strict-accuracy: 68.75
+        IFEval_Inst-level-strict-accuracy: 79.17
+        IFEval_Prompt-level-loose-accuracy: 75
+        IFEval_Inst-level-loose-accuracy: 83.33
+        korbench_cipher_accuracy: 62.5
+        livemathbench_hard_custom_hard_cn_accuracy: 25
+        matbench_steels_mae: 1213.07
+        math_prm800k_500_accuracy: 62.5
+        sanitized_mbpp_score: 75
+        sanitized_mbpp_pass: 12
+        sanitized_mbpp_timeout: 0
+        sanitized_mbpp_failed: 0
+        sanitized_mbpp_wrong_answer: 4
+        medxpertqa_accuracy: 56.25
+        medxpertqa_total_correct: 9
+        medxpertqa_total_count: 16
+        medxpertqa_MedXpertQA-Basic Science: 50
+        medxpertqa_MedXpertQA-Diagnosis: 37.5
+        medxpertqa_MedXpertQA-Treatment: 100
+        medxpertqa_MedXpertQA-Skeletal: 33.33
+        medxpertqa_MedXpertQA-Muscular: 100
+        medxpertqa_MedXpertQA-Respiratory: 33.33
+        medxpertqa_MedXpertQA-Endocrine: 100
+        medxpertqa_MedXpertQA-Cardiovascular: 0
+        medxpertqa_MedXpertQA-Lymphatic: 100
+        medxpertqa_MedXpertQA-Nervous: 100
+        medxpertqa_MedXpertQA-Reproductive: 0
+        medxpertqa_MedXpertQA-Reasoning: 57.14
+        medxpertqa_MedXpertQA-Understanding: 50
+        lukaemon_mmlu_college_biology_accuracy: 100
+        lukaemon_mmlu_college_biology_f1: 1
+        lukaemon_mmlu_college_biology_accuracy_given_attempted: 100
+        lukaemon_mmlu_college_biology_attempted_ratio: 100
+        lukaemon_mmlu_college_biology_correct_count: 16
+        lukaemon_mmlu_college_biology_incorrect_count: 0
+        lukaemon_mmlu_college_biology_not_attempted_count: 0
+        mmlu_pro_math_accuracy: 62.5
+        mmlu_pro_math_f1: 0.62
+        mmlu_pro_math_accuracy_given_attempted: 62.5
+        mmlu_pro_math_attempted_ratio: 100
+        mmlu_pro_math_correct_count: 10
+        mmlu_pro_math_incorrect_count: 6
+        mmlu_pro_math_not_attempted_count: 0
+        olymmath_llmjudge_en-hard_accuracy: 12.5
+        olymmath_llmjudge_en-hard_f1: 0.12
+        olymmath_llmjudge_en-hard_accuracy_given_attempted: 12.5
+        olymmath_llmjudge_en-hard_attempted_ratio: 100
+        olymmath_llmjudge_en-hard_correct_count: 2
+        olymmath_llmjudge_en-hard_incorrect_count: 14
+        olymmath_llmjudge_en-hard_not_attempted_count: 0
+        OlympiadBench_OE_TO_maths_en_COMP_accuracy: 25
+        OlympiadBench_OE_TO_maths_en_COMP_f1: 0.25
+        OlympiadBench_OE_TO_maths_en_COMP_accuracy_given_attempted: 25
+        OlympiadBench_OE_TO_maths_en_COMP_attempted_ratio: 100
+        OlympiadBench_OE_TO_maths_en_COMP_correct_count: 4
+        OlympiadBench_OE_TO_maths_en_COMP_incorrect_count: 12
+        OlympiadBench_OE_TO_maths_en_COMP_not_attempted_count: 0
+        phybench-eed_accuracy: 3.67
+        PHYSICS_atomic_dataset_textonly_accuracy: 18.75
+        PHYSICS_atomic_dataset_textonly_f1: 0.19
+        PHYSICS_atomic_dataset_textonly_accuracy_given_attempted: 18.75
+        PHYSICS_atomic_dataset_textonly_attempted_ratio: 100
+        PHYSICS_atomic_dataset_textonly_correct_count: 3
+        PHYSICS_atomic_dataset_textonly_incorrect_count: 13
+        PHYSICS_atomic_dataset_textonly_not_attempted_count: 0
+        ProteinLMBench_accuracy: 75
+        ProteinLMBench_f1: 0.75
+        ProteinLMBench_accuracy_given_attempted: 75
+        ProteinLMBench_attempted_ratio: 100
+        ProteinLMBench_correct_count: 12
+        ProteinLMBench_incorrect_count: 4
+        ProteinLMBench_not_attempted_count: 0
+        R-Bench_en_accuracy: 50
+        R-Bench_en_f1: 0.5
+        R-Bench_en_accuracy_given_attempted: 50
+        R-Bench_en_attempted_ratio: 100
+        R-Bench_en_correct_count: 8
+        R-Bench_en_incorrect_count: 8
+        R-Bench_en_not_attempted_count: 0
+        NC-I2F-0shot-instruct_score: 6.25
+        NC-I2F-0shot-instruct_valid_score: 12.5
+        srbench_mean_RMSE: 57710886695619397134702536427057446912
+        srbench_mean_NMSE: 338091963580478408122294741660108748512869195760521575399424
+        srbench_mean_R2: -338091963580478408122294741660108748512869195760521575399424
+        srbench_SymbolicMatch: 0
+        supergpqa_Electronic_Science_and_Technology_accuracy: 43.75
+        lcb_code_generation_v6_pass@1: 37.5
+
+
+internlm3-8b-instruct-turbomind_fullbench:
+    objective_v6: 
+        aime2024_accuracy: 25
+        aime2024_f1: 0.25
+        aime2024_accuracy_given_attempted: 25
+        aime2024_attempted_ratio: 100
+        aime2024_correct_count: 4
+        aime2024_incorrect_count: 12
+        aime2024_not_attempted_count: 0
+        aime2025_accuracy: 6.25
+        aime2025_f1: 0.06
+        aime2025_accuracy_given_attempted: 6.25
+        aime2025_attempted_ratio: 100
+        aime2025_correct_count: 1
+        aime2025_incorrect_count: 15
+        aime2025_not_attempted_count: 0
+        bbh-temporal_sequences_score: 87.5
+        bbh-temporal_sequences_score_given_attempted: 87.5
+        bbh-temporal_sequences_attempted_ratio: 100
+        bbh-temporal_sequences_correct_count: 14
+        bbh-temporal_sequences_incorrect_count: 2
+        bbh-temporal_sequences_not_attempted_count: 0
+        cmo_fib_accuracy: 31.25
+        drop_accuracy: 100
+        drop_f1: 1
+        drop_accuracy_given_attempted: 100
+        drop_attempted_ratio: 100
+        drop_correct_count: 16
+        drop_incorrect_count: 0
+        drop_not_attempted_count: 0
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
+        GPQA_diamond_accuracy: 68.75
+        GPQA_diamond_f1: 0.69
+        GPQA_diamond_accuracy_given_attempted: 68.75
+        GPQA_diamond_attempted_ratio: 100
+        GPQA_diamond_correct_count: 11
+        GPQA_diamond_incorrect_count: 5
+        GPQA_diamond_not_attempted_count: 0
+        gsm8k_accuracy: 87.5
+        hellaswag_accuracy: 68.75
+        hellaswag_f1: 0.69
+        hellaswag_accuracy_given_attempted: 68.75
+        hellaswag_attempted_ratio: 100
+        hellaswag_correct_count: 11
+        hellaswag_incorrect_count: 5
+        hellaswag_not_attempted_count: 0
+        korbench_cipher_accuracy: 50
+        korbench_cipher_f1: 0.5
+        korbench_cipher_accuracy_given_attempted: 50
+        korbench_cipher_attempted_ratio: 100
+        korbench_cipher_correct_count: 8
+        korbench_cipher_incorrect_count: 8
+        korbench_cipher_not_attempted_count: 0
+        math_prm800k_500-llmjudge_accuracy: 62.5
+        math_prm800k_500-llmjudge_f1: 0.62
+        math_prm800k_500-llmjudge_accuracy_given_attempted: 62.5
+        math_prm800k_500-llmjudge_attempted_ratio: 100
+        math_prm800k_500-llmjudge_correct_count: 10
+        math_prm800k_500-llmjudge_incorrect_count: 6
+        math_prm800k_500-llmjudge_not_attempted_count: 0
+        mathbench-college-single_choice_cn_acc_4: 75
+        mathbench-college-single_choice_cn_acc_1: 75
+        mathbench-college-single_choice_cn_more_1_0: 100
+        mathbench-college-single_choice_cn_more_1_1: 75
+        mathbench-college-single_choice_cn_more_4_0: 100
+        mathbench-college-single_choice_cn_more_4_1: 100
+        mathbench-college-single_choice_cn_more_4_2: 75
+        mathbench-college-single_choice_cn_more_4_3: 75
+        mathbench-college-single_choice_cn_more_4_4: 50
+        mathbench-college-single_choice_cn_perf_1: 75
+        mathbench-college-single_choice_cn_perf_4: 50
+        mathbench-college-single_choice_cn_vote_4: 75
+        mathbench-college-single_choice_cn_vote_1: 75
+        mathbench-college-single_choice_cn_prior_A: 18.75
+        mathbench-college-single_choice_cn_prior_B: 18.75
+        mathbench-college-single_choice_cn_prior_C: 31.25
+        mathbench-college-single_choice_cn_prior_D: 31.25
+        mathbench-college-single_choice_cn_prior_-: 0
+        musr_murder_mysteries_accuracy: 100
+        musr_murder_mysteries_f1: 1
+        musr_murder_mysteries_accuracy_given_attempted: 100
+        musr_murder_mysteries_attempted_ratio: 100
+        musr_murder_mysteries_correct_count: 16
+        musr_murder_mysteries_incorrect_count: 0
+        musr_murder_mysteries_not_attempted_count: 0
+        supergpqa_accuracy: 43.75
+        supergpqa_total_correct: 7
+        supergpqa_total_count: 16
+        supergpqa_SuperGPQA-Engineering: 40
+        supergpqa_SuperGPQA-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine: 50
+        supergpqa_SuperGPQA-Economics: 50
+        supergpqa_SuperGPQA-Science: 50
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine: 0
+        supergpqa_SuperGPQA-Economics-Applied Economics: 100
+        supergpqa_SuperGPQA-Science-Mathematics: 40
+        supergpqa_SuperGPQA-Science-Physics: 100
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering: 50
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering: 0
+        supergpqa_SuperGPQA-Economics-Theoretical Economics: 0
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology-Circuits and Systems: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy-Philosophical Aesthetics: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine-Traditional Chinese Medicine Theory: 0
+        supergpqa_SuperGPQA-Economics-Applied Economics-Finance: 100
+        supergpqa_SuperGPQA-Science-Mathematics-Combinatorial Mathematics: 100
+        supergpqa_SuperGPQA-Science-Physics-Particle and Nuclear Physics: 100
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine-Internal Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology-Computer Architecture: 0
+        supergpqa_SuperGPQA-Science-Mathematics-Ordinary Differential Equations: 50
+        supergpqa_SuperGPQA-Science-Mathematics-Mathematical Analysis: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering-Signal and Information Processing: 50
+        supergpqa_SuperGPQA-Science-Mathematics-Advanced Algebra: 0
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering-Control Theory and Control Engineering: 0
+        supergpqa_SuperGPQA-Economics-Theoretical Economics-Political Economy: 0
+        triviaqa_wiki_1shot_score: 50
+        qa_dingo_cn_score: 100
+        qa_dingo_cn_num_good: 16
+        qa_dingo_cn_num_bad: 0
+        qa_dingo_cn_total: 16
+        ARC_Prize_Public_Evaluation_accuracy: 0
+    objective_v7: 
+        aime2024_accuracy: 25
+        aime2025_accuracy: 6.25
+        bbeh_boolean_expressions_accuracy: 37.5
+        bbeh_boolean_expressions_f1: 0.38
+        bbeh_boolean_expressions_accuracy_given_attempted: 37.5
+        bbeh_boolean_expressions_attempted_ratio: 100
+        bbeh_boolean_expressions_correct_count: 6
+        bbeh_boolean_expressions_incorrect_count: 10
+        bbeh_boolean_expressions_not_attempted_count: 0
+        Chem_exam-competition_final_score: 43.61
+        Chem_exam-gaokao_final_score: 65.62
+        ChemBench_Name_Conversion_accuracy: 75
+        ChemBench_Name_Conversion_f1: 0.75
+        ChemBench_Name_Conversion_accuracy_given_attempted: 75
+        ChemBench_Name_Conversion_attempted_ratio: 100
+        ChemBench_Name_Conversion_correct_count: 12
+        ChemBench_Name_Conversion_incorrect_count: 4
+        ChemBench_Name_Conversion_not_attempted_count: 0
+        ClimaQA_Gold_mcq_accuracy: 81.25
+        ClimaQA_Gold_mcq_f1: 0.81
+        ClimaQA_Gold_mcq_accuracy_given_attempted: 81.25
+        ClimaQA_Gold_mcq_attempted_ratio: 100
+        ClimaQA_Gold_mcq_correct_count: 13
+        ClimaQA_Gold_mcq_incorrect_count: 3
+        ClimaQA_Gold_mcq_not_attempted_count: 0
+        cmmlu-agronomy_accuracy: 75
+        cmmlu-agronomy_f1: 0.75
+        cmmlu-agronomy_accuracy_given_attempted: 75
+        cmmlu-agronomy_attempted_ratio: 100
+        cmmlu-agronomy_correct_count: 12
+        cmmlu-agronomy_incorrect_count: 4
+        cmmlu-agronomy_not_attempted_count: 0
+        earth_silver_mcq_accuracy: 56.25
+        earth_silver_mcq_f1: 0.56
+        earth_silver_mcq_accuracy_given_attempted: 56.25
+        earth_silver_mcq_attempted_ratio: 100
+        earth_silver_mcq_correct_count: 9
+        earth_silver_mcq_incorrect_count: 7
+        earth_silver_mcq_not_attempted_count: 0
+        GPQA_diamond_accuracy: 75.00
+        hle_llmjudge_accuracy: 18.75
+        hle_llmjudge_f1: 0.19
+        hle_llmjudge_accuracy_given_attempted: 18.75
+        hle_llmjudge_attempted_ratio: 100
+        hle_llmjudge_correct_count: 3
+        hle_llmjudge_incorrect_count: 13
+        hle_llmjudge_not_attempted_count: 0
+        IFEval_Prompt-level-strict-accuracy: 68.75
+        IFEval_Inst-level-strict-accuracy: 75
+        IFEval_Prompt-level-loose-accuracy: 75
+        IFEval_Inst-level-loose-accuracy: 79.17
+        korbench_cipher_accuracy: 50
+        livemathbench_hard_custom_hard_cn_accuracy: 25
+        matbench_steels_mae: 1132.58
+        math_prm800k_500_accuracy: 62.5
+        sanitized_mbpp_score: 75
+        sanitized_mbpp_pass: 12
+        sanitized_mbpp_timeout: 0
+        sanitized_mbpp_failed: 0
+        sanitized_mbpp_wrong_answer: 4
+        medxpertqa_accuracy: 62.5
+        medxpertqa_total_correct: 10
+        medxpertqa_total_count: 16
+        medxpertqa_MedXpertQA-Basic Science: 50
+        medxpertqa_MedXpertQA-Diagnosis: 50
+        medxpertqa_MedXpertQA-Treatment: 100
+        medxpertqa_MedXpertQA-Skeletal: 33.33
+        medxpertqa_MedXpertQA-Muscular: 100
+        medxpertqa_MedXpertQA-Respiratory: 33.33
+        medxpertqa_MedXpertQA-Endocrine: 100
+        medxpertqa_MedXpertQA-Cardiovascular: 50
+        medxpertqa_MedXpertQA-Lymphatic: 100
+        medxpertqa_MedXpertQA-Nervous: 100
+        medxpertqa_MedXpertQA-Reproductive: 0
+        medxpertqa_MedXpertQA-Reasoning: 64.29
+        medxpertqa_MedXpertQA-Understanding: 50
+        lukaemon_mmlu_college_biology_accuracy: 100
+        lukaemon_mmlu_college_biology_f1: 1
+        lukaemon_mmlu_college_biology_accuracy_given_attempted: 100
+        lukaemon_mmlu_college_biology_attempted_ratio: 100
+        lukaemon_mmlu_college_biology_correct_count: 16
+        lukaemon_mmlu_college_biology_incorrect_count: 0
+        lukaemon_mmlu_college_biology_not_attempted_count: 0
+        mmlu_pro_math_accuracy: 75
+        mmlu_pro_math_f1: 0.75
+        mmlu_pro_math_accuracy_given_attempted: 75
+        mmlu_pro_math_attempted_ratio: 100
+        mmlu_pro_math_correct_count: 12
+        mmlu_pro_math_incorrect_count: 4
+        mmlu_pro_math_not_attempted_count: 0
+        olymmath_llmjudge_en-hard_accuracy: 6.25
+        olymmath_llmjudge_en-hard_f1: 0.06
+        olymmath_llmjudge_en-hard_accuracy_given_attempted: 6.25
+        olymmath_llmjudge_en-hard_attempted_ratio: 100
+        olymmath_llmjudge_en-hard_correct_count: 1
+        olymmath_llmjudge_en-hard_incorrect_count: 15
+        olymmath_llmjudge_en-hard_not_attempted_count: 0
+        OlympiadBench_OE_TO_maths_en_COMP_accuracy: 25
+        OlympiadBench_OE_TO_maths_en_COMP_f1: 0.25
+        OlympiadBench_OE_TO_maths_en_COMP_accuracy_given_attempted: 25
+        OlympiadBench_OE_TO_maths_en_COMP_attempted_ratio: 100
+        OlympiadBench_OE_TO_maths_en_COMP_correct_count: 4
+        OlympiadBench_OE_TO_maths_en_COMP_incorrect_count: 12
+        OlympiadBench_OE_TO_maths_en_COMP_not_attempted_count: 0
+        phybench-eed_accuracy: 6.39
+        PHYSICS_atomic_dataset_textonly_accuracy: 25
+        PHYSICS_atomic_dataset_textonly_f1: 0.25
+        PHYSICS_atomic_dataset_textonly_accuracy_given_attempted: 25
+        PHYSICS_atomic_dataset_textonly_attempted_ratio: 100
+        PHYSICS_atomic_dataset_textonly_correct_count: 4
+        PHYSICS_atomic_dataset_textonly_incorrect_count: 12
+        PHYSICS_atomic_dataset_textonly_not_attempted_count: 0
+        ProteinLMBench_accuracy: 81.25
+        ProteinLMBench_f1: 0.81
+        ProteinLMBench_accuracy_given_attempted: 81.25
+        ProteinLMBench_attempted_ratio: 100
+        ProteinLMBench_correct_count: 13
+        ProteinLMBench_incorrect_count: 3
+        ProteinLMBench_not_attempted_count: 0
+        R-Bench_en_accuracy: 62.5
+        R-Bench_en_f1: 0.62
+        R-Bench_en_accuracy_given_attempted: 62.5
+        R-Bench_en_attempted_ratio: 100
+        R-Bench_en_correct_count: 10
+        R-Bench_en_incorrect_count: 6
+        R-Bench_en_not_attempted_count: 0
+        NC-I2F-0shot-instruct_score: 6.25
+        NC-I2F-0shot-instruct_valid_score: 12.5
+        srbench_mean_RMSE: inf
+        srbench_mean_NMSE: inf
+        srbench_mean_R2: -inf
+        srbench_SymbolicMatch: 0
+        supergpqa_Electronic_Science_and_Technology_accuracy: 43.75
+        lcb_code_generation_v6_pass@1: 37.5
