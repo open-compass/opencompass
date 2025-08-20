@@ -6,7 +6,7 @@ OpenCompass now provides the necessary configs for evaluating Intern-S1. Please 
 
 The Intern-S1 now has been open-sourced, which can be downloaded from [Huggingface](https://huggingface.co/internlm/Intern-S1).
 After completing the model download, it is recommended to deploy it as an API service for calling.
-You can deploy it based on LMdeploy/vlLM/sglang according to [Huggingface Page](https://huggingface.co/internlm/Intern-S1).
+You can deploy it based on LMdeploy/vlLM/sglang according to [this page](https://github.com/InternLM/Intern-S1/blob/main/README.md#Serving).
 
 ## Evaluation Configs
 
