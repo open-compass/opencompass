@@ -30,7 +30,7 @@ models = [
         max_out_len=64000,
         max_seq_len=65536,
         openai_extra_kwargs={
-            'top_p': 1.0,
+            'top_p': 0.95,
         },
         retry=10,
         extra_body={
