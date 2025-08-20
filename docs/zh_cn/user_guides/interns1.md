@@ -5,7 +5,7 @@ OpenCompass现已提供评测Intern-S1所需的相关模型配置与数据集配
 ## 模型下载与部署
 
 Intern-S1的模型权重现已开源，请从[Huggingface](https://huggingface.co/internlm/Intern-S1)获取。
-完成模型下载后，推荐将其部署为API服务形式进行调用。可根据[Huggingface](https://huggingface.co/internlm/Intern-S1)页面上提供的LMdeploy/vLLM/sglang形式进行部署。
+完成模型下载后，推荐将其部署为API服务形式进行调用。可根据[此页面](https://github.com/InternLM/Intern-S1/blob/main/README.md#Serving)上提供的LMdeploy/vLLM/sglang形式进行部署。
 
 ## 评测配置
 
