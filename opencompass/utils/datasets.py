@@ -45,7 +45,7 @@ def get_data_path(dataset_id: str, local_mode: bool = False):
         return hf_id
     else:
         # for the local path
-        local_path = DATASETS_MAPPING[dataset_id]['local']
+        local_path = dataset_id
         local_path = os.path.join(cache_dir, local_path)
         
         if not os.path.exists(local_path):
