@@ -50,6 +50,7 @@ class OpenAISDKStreaming(OpenAISDK):
                  http_client_cfg: dict = {},
                  status_code_mappings: dict = {},
                  think_tag: str = '</think>',
+                 openai_extra_kwargs: Dict | None = None,
                  stream: bool = True,
                  stream_chunk_size: int = 1):
 
@@ -76,6 +77,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
         self.stream = stream
         self.stream_chunk_size = stream_chunk_size
+        self.openai_extra_kwargs = openai_extra_kwargs
 
     def _create_fresh_client(self):
         """Create a fresh OpenAI client for each request to avoid
@@ -172,6 +174,9 @@ class OpenAISDKStreaming(OpenAISDK):
                     extra_body=self.extra_body,
                     stream=self.stream,  # Enable streaming
                 )
+
+            if self.openai_extra_kwargs:
+                query_data.update(self.openai_extra_kwargs)
 
             try:
                 if self.verbose:
