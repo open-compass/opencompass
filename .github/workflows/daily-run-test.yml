@@ -47,7 +47,7 @@ on:
         required: true
         description: 'baseline result'
         type: string
-        default: "16439300433-baseline"
+        default: "17125187480-baseline"
       fullbench_eval:
         required: true
         description: "fullbench volc functions ['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
