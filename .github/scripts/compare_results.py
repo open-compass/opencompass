@@ -25,7 +25,7 @@ def compare_results(folder1, folder2, results_ignore_list=None):
                     os.path.join(sub_folder2, 'results'),
                     results_ignore_list=[
                         'dingo_en_192.json', 'dingo_zh_170.json',
-                        'qa_dingo_cn.json'
+                        'qa_dingo_cn.json', 'srbench.json'
                     ])
 
 

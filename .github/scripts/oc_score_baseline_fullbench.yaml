@@ -1167,13 +1167,13 @@ internlm3-8b-instruct-hf_fullbench:
         IFEval_Inst-level-strict-accuracy: 79.17
         IFEval_Prompt-level-loose-accuracy: 75
         IFEval_Inst-level-loose-accuracy: 83.33
-        kcle-accuracy: 18.75
-        kcle-f1: 0.19
-        kcle-accuracy_given_attempted: 18.75
-        kcle-attempted_ratio: 100
-        kcle-correct_count: 3
-        kcle-incorrect_count: 13
-        kcle-not_attempted_count: 0
+        kcle_accuracy: 18.75
+        kcle_f1: 0.19
+        kcle_accuracy_given_attempted: 18.75
+        kcle_attempted_ratio: 100
+        kcle_correct_count: 3
+        kcle_incorrect_count: 13
+        kcle_not_attempted_count: 0
         korbench_cipher_accuracy: 62.5
         livemathbench_hard_custom_hard_cn_accuracy: 25
         matbench_steels_mae: 1213.07
@@ -1435,13 +1435,13 @@ internlm3-8b-instruct-turbomind_fullbench:
         IFEval_Inst-level-strict-accuracy: 75
         IFEval_Prompt-level-loose-accuracy: 75
         IFEval_Inst-level-loose-accuracy: 79.17
-        kcle-accuracy: 6.25
-        kcle-f1: 0.06
-        kcle-accuracy_given_attempted: 6.25
-        kcle-attempted_ratio: 100
-        kcle-correct_count: 1
-        kcle-incorrect_count: 15
-        kcle-not_attempted_count: 0
+        kcle_accuracy: 6.25
+        kcle_f1: 0.06
+        kcle_accuracy_given_attempted: 6.25
+        kcle_attempted_ratio: 100
+        kcle_correct_count: 1
+        kcle_incorrect_count: 15
+        kcle_not_attempted_count: 0
         korbench_cipher_accuracy: 50
         livemathbench_hard_custom_hard_cn_accuracy: 25
         matbench_steels_mae: 1132.58
