@@ -57,7 +57,9 @@ class MATHVerifyEvaluator(BaseEvaluator):
                     extraction_mode='first_match',
                 ) for i in preds]
 
-                answer_correct = sum([float(verify(i, gold_parsed)) for i in answer_parsed]) / len(preds)
+                answer_correct = sum(
+                    [float(verify(i, gold_parsed)) for i in answer_parsed]
+                ) / len(preds)
                 correct += answer_correct
                 detail = {
                     'pred': str(answer_parsed),
@@ -72,7 +74,6 @@ class MATHVerifyEvaluator(BaseEvaluator):
 if __name__ == '__main__':
     import sympy
     from math_verify import parse
-
     test_cases = [
         # 1. Basic arithmetic operations
         r'Simple fraction: \boxed{\frac{1}{2}}',
@@ -107,7 +108,6 @@ if __name__ == '__main__':
         r'Nested: \boxed{\boxed{1}}',  # Nested boxed
     ]
 
-
     def print_result(expr: str, result: list):
         print('\n' + '=' * 50)
         print(f'Input: {expr}')
@@ -123,7 +123,6 @@ if __name__ == '__main__':
                         print(f'Evaluated: {item.evalf()}')
                     except Exception as e:
                         print(f'Cannot evaluate: {e}')
-
 
     # Test all cases
     for test_expr in test_cases:
@@ -154,8 +153,10 @@ if __name__ == '__main__':
 
     print('\n' + '=' * 50 + '\nMultiple predictions Tests:')
     evaluator = MATHVerifyEvaluator()
-    param_dict_list = [{'predictions': [r'the answer is \boxed{100}.'], 'references': ['100', ]},
-                       {'predictions': [[r'the answer is \boxed{100}.', 'Okay, so I need']], 'references': ['100', ]},
+    param_dict_list = [{'predictions': [r'the answer is \boxed{100}.'],
+                        'references': ['100', ]},
+                       {'predictions': [[r'the answer is \boxed{100}.', 'Okay, so I need']],
+                        'references': ['100', ]},
                        {'predictions': [[r'the answer is \boxed{99}.', r'the answer is \boxed{99}.'],
                                         [r'the answer is \boxed{99}.', r'the answer is \boxed{99}.']],
                         'references': ['100', '99']}]
