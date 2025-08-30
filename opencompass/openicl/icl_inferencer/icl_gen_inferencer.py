@@ -153,18 +153,25 @@ class GenInferencer(BaseInferencer):
                 results = self.model.generate_from_template(
                     entry, max_out_len=self.max_out_len, **extra_gen_kwargs)
                 generated = results
+                if isinstance(generated, tuple):
+                    api_prompts_list = parsed_entries
+                    prompts, generated = generated
+                else:
+                    api_prompts_list = [None] * len(generated)
+                    prompts = parsed_entries
 
             num_return_sequences = getattr(self.model, 'generation_kwargs',
                                            {}).get('num_return_sequences', 1)
             # 5-3. Save current output
-            for prompt, prediction, gold in zip(
-                    parsed_entries, batched(generated, num_return_sequences),
-                    golds):
+            for api_prompts, prompt, prediction, gold in zip(
+                    api_prompts_list, prompts,
+                    batched(generated, num_return_sequences), golds):
                 if num_return_sequences == 1:
                     prediction = prediction[0]
                 output_handler.save_results(prompt,
                                             prediction,
                                             index,
+                                            api_prompts=api_prompts,
                                             gold=gold)
                 index = index + 1
 
