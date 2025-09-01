@@ -82,6 +82,7 @@ from .jsonl import JsonlDataset  # noqa: F401, F403
 from .judge import *  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .korbench import *  # noqa: F401, F403
+from .reasonzoo import * # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
