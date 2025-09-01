@@ -142,7 +142,6 @@ def initialize_config(config_path):
 
 
 def get_config_wrapper():
-    global config_wrapper
     if config_wrapper is None:
         raise RuntimeError(
             'ConfigWrapper not initialized. Call initialize_config first.')
@@ -587,8 +586,11 @@ def evaluate_response_vs_answer(response, answer, question_type, rule_id, idx):
 
     def _judge(resp, ans):
         text = (resp or '').replace('\n', ' ')
-        combo_pat = r'(\\boxed\s*\{\s*.*?\s*\})|(\[\[\s*.*?\s*\]\])|(\[\s*.*?\s*\])'
-        matches = [m.group(0) for m in re.finditer(combo_pat, text, flags=re.DOTALL)]
+        combo_pat = (r'(\\boxed\s*\{\s*.*?\s*\})|(\[\[\s*.*?\s*\]\])|'
+                     r'(\[\s*.*?\s*\])')
+        matches = [
+            m.group(0) for m in re.finditer(combo_pat, text, flags=re.DOTALL)
+        ]
         if not matches:
             return _normalize(ans) in _normalize(text)
         last_raw = matches[-1]
@@ -620,7 +622,8 @@ def evaluate_response_vs_answer(response, answer, question_type, rule_id, idx):
             if numbers_in_answer[i] == 0:
                 if abs(numbers_in_response[i] - numbers_in_answer[i]) > 0.1:
                     return False
-            elif abs(numbers_in_response[i] - numbers_in_answer[i]) / abs(numbers_in_answer[i]) > 0.1:
+            elif abs(numbers_in_response[i] - numbers_in_answer[i]) / abs(
+                    numbers_in_answer[i]) > 0.1:
                 return False
         return True
 
@@ -642,10 +645,14 @@ def evaluate_response_vs_answer(response, answer, question_type, rule_id, idx):
     if question_type == 'formal_language':
         response_nums = re.findall(r't\d+', str(response))
         answer_nums = re.findall(r't\d+', str(answer))
-        return bool(response_nums) and bool(answer_nums) and (response_nums[-1] in answer_nums)
+        return bool(response_nums) and bool(answer_nums) and (response_nums[-1]
+                                                              in answer_nums)
 
-    # 4) operation_research and related: numeric tolerant comparison, else robust text judge
-    if question_type in ['operation_research', 'puzzle_and_code', 'cipher_and_code', 'zebra']:
+    # 4) operation_research and related: numeric tolerant comparison,
+    # else robust text judge
+    if question_type in [
+            'operation_research', 'puzzle_and_code', 'cipher_and_code', 'zebra'
+    ]:
         response_text = extract_text_from_brackets(response, 'clean')
         answer_text = extract_text_from_brackets(answer, 'clean')
 
@@ -693,17 +700,20 @@ def evaluate_response_vs_answer(response, answer, question_type, rule_id, idx):
     if question_type == 'logic_calculation':
         response_text = extract_text_from_brackets(response, 'clean')
         answer_text = extract_text_from_brackets(answer, 'clean')
-        normalized_response = re.sub(r'[^A-Za-z0-9]', '', response_text).lower()
+        normalized_response = re.sub(r'[^A-Za-z0-9]', '',
+                                     response_text).lower()
         normalized_answer = re.sub(r'[^A-Za-z0-9]', '', answer_text).lower()
         normalized_response_special = remove_non_alphanumeric(
             str(response).replace('[[', '[').replace(']]', ']'))
         normalized_answer_special = remove_non_alphanumeric(
             str(answer).replace('[[', '[').replace(']]', ']'))
-        number_norm_answer_special = re.sub(r'[^0-9]', '', normalized_answer_special)
-        number_norm_response_special = re.sub(r'[^0-9]', '', normalized_response_special)
-        if (normalized_answer == normalized_response or
-                normalized_answer_special == normalized_response_special or
-                number_norm_answer_special == number_norm_response_special):
+        number_norm_answer_special = re.sub(r'[^0-9]', '',
+                                            normalized_answer_special)
+        number_norm_response_special = re.sub(r'[^0-9]', '',
+                                              normalized_response_special)
+        if (normalized_answer == normalized_response
+                or normalized_answer_special == normalized_response_special
+                or number_norm_answer_special == number_norm_response_special):
             return True
         else:
             return False
@@ -801,7 +811,7 @@ def evaluate_responses(data, mode, base_path=None):
         latex_expr = re.sub(r'\s+', ' ', latex_expr).strip()
         return latex_expr
 
-    def _extract_text_from_brackets(text, clean_level="basic"):
+    def _extract_text_from_brackets(text, clean_level='basic'):
         text = '' if text is None else str(text)
         matches = re.findall(r'\[\[\s*(.*?)\s*\]\]', text, re.DOTALL)
         if not matches:
@@ -827,7 +837,8 @@ def evaluate_responses(data, mode, base_path=None):
                     r'Maximum Profit:?\s*\$?([\d,\.]+)',
                     r'Total Profit:?\s*\$?([\d,\.]+)',
                     r'Profit:?\s*\$?([\d,\.]+)',
-                    r'(?:result|answer|value|optimal|solution)(?:\s+is)?:?\s*\$?([\d,\.]+)'
+                    r'(?:result|answer|value|optimal|solution)'
+                    r'(?:\s+is)?:?\s*\$?([\d,\.]+)'
             ]:
                 matches = re.findall(pat, text, re.DOTALL | re.IGNORECASE)
                 if matches:
@@ -836,30 +847,34 @@ def evaluate_responses(data, mode, base_path=None):
         if matches:
             match_str = matches[-1].strip()
             if clean_level == 'clean':
-                match_str = (match_str.replace('"', '').replace('\n', '').replace(
-                    ' ', '').replace('[', '').replace(']', '').replace('\\',
-                                                                        '').replace(
-                                                                            "'",
-                                                                            '').replace(
-                                                                                ',',
-                                                                                ' '))
+                match_str = (match_str.replace('"', '').replace(
+                    '\n', '').replace(' ', '').replace('[', '').replace(
+                        ']', '').replace('\\',
+                                         '').replace("'",
+                                                     '').replace(',', ' '))
             elif clean_level == 'logic':
-                match_str = match_str.replace('"', '').replace('\n', '').replace(
-                    ' ', '').replace('.', '')
+                match_str = match_str.replace('"',
+                                              '').replace('\n', '').replace(
+                                                  ' ', '').replace('.', '')
             elif clean_level == 'math':
-                match_str = match_str.replace('"', '').replace('\n', '').replace(
-                    '[', '').replace(']', '').replace('$', '')
+                match_str = match_str.replace('"', '').replace(
+                    '\n', '').replace('[', '').replace(']',
+                                                       '').replace('$', '')
                 match_str = f'{_clean_latex(match_str)}'
             return match_str
-        # As a last resort, return the cleaned latex of the whole text if math-like
-        if '\\frac{' in text or '\\pi' in text or '\\left(' in text or '\\right)' in text:
+        # As a last resort, return the cleaned latex of the whole text
+        # if math-like
+        if ('\\frac{' in text or '\\pi' in text or '\\left(' in text
+                or '\\right)' in text):
             return _clean_latex(text)
         return text
 
     def _judge(response_text, answer_text):
         text = (response_text or '').replace('\n', ' ')
-        combo_pat = r'(\\boxed\s*\{\s*.*?\s*\})|(\[\[\s*.*?\s*\]\])|(\[\s*.*?\s*\])'
-        matches = [(m.start(), m.group(0)) for m in re.finditer(combo_pat, text, flags=re.DOTALL)]
+        combo_pat = (r'(\\boxed\s*\{\s*.*?\s*\})|(\[\[\s*.*?\s*\]\])|'
+                     r'(\[\s*.*?\s*\])')
+        matches = [(m.start(), m.group(0))
+                   for m in re.finditer(combo_pat, text, flags=re.DOTALL)]
         if not matches:
             return _normalize(answer_text) in _normalize(text)
         last_raw = matches[-1][1]
@@ -887,8 +902,10 @@ def evaluate_responses(data, mode, base_path=None):
 
         # Specialized numeric tolerance for ops-research-like tasks
         if question_type in ['operation_research']:
-            resp_nums = _extract_numbers(_extract_text_from_brackets(response, 'clean')) or []
-            ans_clean = re.sub(r'[^0-9.]', '', _extract_text_from_brackets(answer, 'clean'))
+            resp_nums = _extract_numbers(
+                _extract_text_from_brackets(response, 'clean')) or []
+            ans_clean = re.sub(r'[^0-9.]', '',
+                               _extract_text_from_brackets(answer, 'clean'))
             try:
                 ans_num = float(ans_clean) if ans_clean else None
             except Exception:
@@ -910,8 +927,10 @@ def evaluate_responses(data, mode, base_path=None):
             a_txt = _extract_text_from_brackets(answer, 'clean')
             r_norm = re.sub(r'[^A-Za-z0-9]', '', r_txt).lower()
             a_norm = re.sub(r'[^A-Za-z0-9]', '', a_txt).lower()
-            r_spec = _remove_non_alnum(response.replace('[[', '[').replace(']]', ']'))
-            a_spec = _remove_non_alnum(answer.replace('[[', '[').replace(']]', ']'))
+            r_spec = _remove_non_alnum(
+                response.replace('[[', '[').replace(']]', ']'))
+            a_spec = _remove_non_alnum(
+                answer.replace('[[', '[').replace(']]', ']'))
             if r_norm == a_norm or r_spec == a_spec:
                 return True
             # Fallback: judge by final bracketed

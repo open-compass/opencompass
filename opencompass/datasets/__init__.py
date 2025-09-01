@@ -82,7 +82,6 @@ from .jsonl import JsonlDataset  # noqa: F401, F403
 from .judge import *  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .korbench import *  # noqa: F401, F403
-from .reasonzoo import * # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
 from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
@@ -141,6 +140,7 @@ from .race import *  # noqa: F401, F403
 from .rbench import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
 from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
+from .reasonzoo import *  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .ruler import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403

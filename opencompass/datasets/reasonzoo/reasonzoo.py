@@ -2,9 +2,10 @@ import os
 
 from datasets import Dataset
 
-from opencompass.datasets.reasonzoo.reasonzoo_utils import (
-    evaluate_responses, find_file, load_json_or_jsonl,
-    load_json_or_jsonl_with_idx, load_yaml)
+from opencompass.datasets.reasonzoo.reasonzoo_utils import (evaluate_responses,
+                                                            find_file,
+                                                            load_json_or_jsonl,
+                                                            load_yaml)
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from opencompass.utils import get_data_path
