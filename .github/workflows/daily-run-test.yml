@@ -37,7 +37,7 @@ on:
         required: true
         description: 'regression functions'
         type: string
-        default: "['cmd', 'api', 'chat_sub_fullbench', 'chat_obj_fullbench_v6', 'chat_obj_fullbench_v7']"
+        default: "['cmd', 'api', 'chat_sub_fullbench', 'chat_obj_fullbench_v6', 'chat_obj_fullbench_v7', 'chat_obj_fullbench_other']"
       vllm_version:
         required: true
         description: 'vllm version'
@@ -247,7 +247,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_sub_fullbench","chat_obj_fullbench_v6","chat_obj_fullbench_v7"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_sub_fullbench","chat_obj_fullbench_v6","chat_obj_fullbench_v7", "chat_obj_fullbench_other"]')}}
     runs-on: volc_cu12_local
     timeout-minutes: 480 #6hours
     steps:

@@ -1,6 +1,7 @@
 from mmengine.config import read_base
 
 from opencompass.models.openai_api import OpenAISDK
+from opencompass.models.openai_streaming import OpenAISDKStreaming
 
 with read_base():
     # choose a list of datasets
@@ -34,6 +35,23 @@ models = [
         max_seq_len=4096,
         temperature=0.01,
         batch_size=128,
+        retry=20,
+    ),
+    dict(
+        abbr='lmdeploy-api-streaming-test',
+        type=OpenAISDKStreaming,
+        key='EMPTY',
+        openai_api_base='http://localhost:23333/v1',
+        path='internlm3',
+        tokenizer_path='internlm/internlm3-8b-instruct',
+        rpm_verbose=True,
+        meta_template=api_meta_template,
+        query_per_second=128,
+        max_out_len=1024,
+        max_seq_len=4096,
+        temperature=0.01,
+        batch_size=128,
+        stream=True,
         retry=20,
     )
 ]
