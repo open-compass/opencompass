@@ -268,7 +268,7 @@ jobs:
           cp -r ${{ secrets.WORKSPACE_PREFIX }}/ocplayground/template/configs_cluster/volc.py .
           cat ${{ secrets.WORKSPACE_PREFIX }}/config/test_config_sub.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
       - name:  modify config
-        if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7' 
+        if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7' || matrix.regression_func == 'chat_obj_fullbench_other'
         run: |
           cp -r ${{ secrets.WORKSPACE_PREFIX }}/ocplayground/template/configs_cluster/volc.py .
           cat ${{ secrets.WORKSPACE_PREFIX }}/config/test_config.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
@@ -329,7 +329,7 @@ jobs:
           python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py || true
           python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} ${{env.REPORT_ROOT}}/${{github.event.inputs.baseline_result}}/${{matrix.regression_func}}
       - name:  Run testcase
-        if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7'
+        if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7' || matrix.regression_func == 'chat_obj_fullbench_other'
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
