@@ -330,6 +330,8 @@ jobs:
           python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} ${{env.REPORT_ROOT}}/${{github.event.inputs.baseline_result}}/${{matrix.regression_func}}
       - name:  Run testcase
         if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7' || matrix.regression_func == 'chat_obj_fullbench_other'
+        env:
+          DATSET_SOURCE: HF
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
