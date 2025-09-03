@@ -1258,7 +1258,7 @@ internlm3-8b-instruct-hf_fullbench:
         supergpqa_Electronic_Science_and_Technology_accuracy: 43.75
         lcb_code_generation_v6_pass@1: 37.5
     objective_other: 
-        eese: 0
+        eese-llmjudge_overall_score: 0.56
 
 
 internlm3-8b-instruct-turbomind_fullbench:
@@ -1528,4 +1528,4 @@ internlm3-8b-instruct-turbomind_fullbench:
         supergpqa_Electronic_Science_and_Technology_accuracy: 43.75
         lcb_code_generation_v6_pass@1: 37.5
     objective_other: 
-        eese: 0
+        eese-llmjudge_overall_score: 0.5
