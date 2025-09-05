@@ -155,6 +155,25 @@ class TestChatObjFullbenchV7:
 
 @pytest.mark.usefixtures('result_scores')
 @pytest.mark.usefixtures('baseline_scores_fullbench')
+@pytest.mark.chat_obj_fullbench_other
+class TestChatObjFullbenchOther:
+    """Test cases for chat model."""
+
+    @pytest.mark.parametrize('model, dataset', [(p1, p2) for p1 in [
+        'internlm3-8b-instruct-hf_fullbench',
+        'internlm3-8b-instruct-turbomind_fullbench'
+    ] for p2 in dataset_list('internlm3-8b-instruct-hf_fullbench',
+                             'objective_other')])
+    def test_model_dataset_score(self, baseline_scores_fullbench,
+                                 result_scores, model, dataset):
+        base_score = baseline_scores_fullbench.get(model).get(
+            'objective_other').get(dataset)
+        result_score = result_scores.get(model).get(dataset)
+        assert_score(model, result_score, base_score, dataset)
+
+
+@pytest.mark.usefixtures('result_scores')
+@pytest.mark.usefixtures('baseline_scores_fullbench')
 @pytest.mark.chat_sub_fullbench
 class TestChatSubFullbench:
     """Test cases for chat model."""
@@ -235,10 +254,14 @@ class TestChatLongFullbench:
 class TestApibench:
     """Test cases for chat model."""
 
-    @pytest.mark.parametrize('model, dataset',
-                             [('lmdeploy-api-test', 'race-middle_accuracy'),
-                              ('lmdeploy-api-test', 'race-high_accuracy'),
-                              ('lmdeploy-api-test', 'gsm8k_accuracy')])
+    @pytest.mark.parametrize(
+        'model, dataset',
+        [('lmdeploy-api-test', 'race-middle_accuracy'),
+         ('lmdeploy-api-test', 'race-high_accuracy'),
+         ('lmdeploy-api-test', 'gsm8k_accuracy'),
+         ('lmdeploy-api-streaming-test', 'race-middle_accuracy'),
+         ('lmdeploy-api-streaming-test', 'race-high_accuracy'),
+         ('lmdeploy-api-streaming-test', 'gsm8k_accuracy')])
     def test_api(self, baseline_scores, result_scores, model, dataset):
         base_score = baseline_scores.get(model).get(dataset)
         result_score = result_scores.get(model).get(dataset)
