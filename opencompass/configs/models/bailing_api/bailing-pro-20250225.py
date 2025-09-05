@@ -10,7 +10,7 @@ api_meta_template = dict(
 
 models = [
     dict(
-        path='Bailing-Lite-1116',
+        path='Bailing-Pro-20250225',
         token='',  # set your key here or in environment variable BAILING_API_KEY
         url='https://bailingchat.alipay.com/chat/completions',
         type=BailingAPI,
