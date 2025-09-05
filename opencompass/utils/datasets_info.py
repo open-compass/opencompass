@@ -181,6 +181,12 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/korbench",
     },
+    #ReasonZoo
+    "opencompass/reasonzoo": {
+        "ms_id": "opencompass/ReasonZoo",
+        "hf_id": "opencompass/ReasonZoo",
+        "local": "./data/reasonzoo",
+    },
     # Lambada
     "opencompass/lambada": {
         "ms_id": "opencompass/lambada",
