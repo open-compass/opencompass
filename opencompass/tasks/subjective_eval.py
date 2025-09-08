@@ -4,6 +4,7 @@ import copy
 import fnmatch
 import os.path as osp
 import random
+import sys
 import time
 from typing import List, Optional, Union
 
@@ -72,7 +73,8 @@ class SubjectiveEvalTask(BaseTask):
                        f'--nproc_per_node {self.num_procs} '
                        f'{script_path} {cfg_path}')
         else:
-            command = f'python {script_path} {cfg_path}'
+            python = sys.executable
+            command = f'{python} {script_path} {cfg_path}'
 
         return template.format(task_cmd=command)
 

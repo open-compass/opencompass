@@ -238,7 +238,7 @@ class RJOBRunner(BaseRunner):
 
             retry = self.retry
             if retry == 0:
-                retry = 100
+                retry = 20
             while retry > 0:
                 # Only submit, no polling
                 result = subprocess.run(cmd,
