@@ -95,6 +95,10 @@ class RJOBRunner(BaseRunner):
                 logger.info(f'line: {line}')
                 if 'rjob oc-infer' not in line and 'rjob oc-eval' not in line:
                     continue
+                if 'Unknown' in line:
+                    status = 'Unknown'
+                    found_dict = True
+                    break
                 if 'Starting' in line:
                     status = 'Starting'
                     found_dict = True
