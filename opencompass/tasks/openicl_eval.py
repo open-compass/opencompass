@@ -57,13 +57,14 @@ class OpenICLEvalTask(BaseTask):
     def get_command(self, cfg_path, template):
         sys.path.append(os.getcwd())
         script_path = __file__
+        python = sys.executable
         if self.num_gpus > 1:
             port = random.randint(12000, 32000)
-            command = (f'torchrun --master_port={port} '
-                       f'--nproc_per_node {self.num_procs} '
-                       f'{script_path} {cfg_path}')
+            command = (
+                f'{python} -m torch.distributed.run --master_port={port} '
+                f'--nproc_per_node {self.num_procs} '
+                f'{script_path} {cfg_path}')
         else:
-            python = sys.executable
             command = f'{python} {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
