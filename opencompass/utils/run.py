@@ -96,6 +96,7 @@ def get_config_from_arg(args) -> Config:
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
+
         # set infer accelerator if needed
         if args.accelerator in ['vllm', 'lmdeploy']:
             config['models'] = change_accelerator(config['models'], args.accelerator)
