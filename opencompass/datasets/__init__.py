@@ -131,6 +131,7 @@ from .OpenFinData import *  # noqa: F401, F403
 from .phybench import *  # noqa: F401, F403
 from .physics import *  # noqa: F401, F403
 from .piqa import *  # noqa: F401, F403
+from .ProcessBench import *  # noqa: F401, F403
 from .ProteinLMBench import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
