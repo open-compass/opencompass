@@ -38,7 +38,7 @@ processbench_eval_cfg = dict(
     )
 )
 
-subsets = ['gsm8k', 'math'] #, , 'olympiadbench', 'omnimath']
+subsets = ['gsm8k', 'math', 'olympiadbench', 'omnimath']
 
 processbench_datasets = []
 
