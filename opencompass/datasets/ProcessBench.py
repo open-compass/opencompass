@@ -55,18 +55,11 @@ class ProcessBenchEvaluator(BaseEvaluator):
         if len(predictions) != len(references):
             return {'error': 'preds and refrs have different length'}
 
-        print('Debug for predictions: ', predictions)
-        print('Debug for references: ', references)
-
         res_data = []
         for i in range(len(predictions)):
             d = {}
             generated_critique = predictions[i]
             pred = extract_answer(generated_critique)
-
-            print('Debug for generated_critique: ', generated_critique)
-            print('Debug for pred: ', pred)
-            print('Debug for references[i]: ', references[i])
 
             # Convert reference to int if possible for comparison
             try:
