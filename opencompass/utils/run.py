@@ -102,7 +102,6 @@ def get_config_from_arg(args) -> Config:
             chatobj_custom_datasets = consturct_chatobj_custom_datasets(config['chatobj_custom_datasets'])
             config['datasets'] += chatobj_custom_datasets
 
-        breakpoint()
         # set infer accelerator if needed
         if args.accelerator in ['vllm', 'lmdeploy']:
             config['models'] = change_accelerator(config['models'], args.accelerator)
@@ -510,7 +509,8 @@ def consturct_chatobj_custom_datasets(custom_cfg: List[Dict[str, Any]]):
         dataset_cfg = deepcopy(chatobj_custom_dataset)
         del dataset_cfg['infer_cfg']
         del dataset_cfg['eval_cfg']
-        del dataset_cfg['n']
+        if 'n' in dataset_cfg:
+            del dataset_cfg['n']
 
         if dataset['evaluator']['type'] == 'llm_evaluator':
             chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg'] = dataset_cfg
