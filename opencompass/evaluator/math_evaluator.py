@@ -21,7 +21,9 @@ class MATHVerifyEvaluator(BaseEvaluator):
         count = 0
         details = []
         for preds, j in zip(predictions, references):
-            count += 1
+            if not isinstance(preds, list):
+                preds = [preds]
+            count += len(preds)
             j_with_env = f'${j}$'
             gold_parsed = parse(
                 j_with_env,
@@ -35,8 +37,6 @@ class MATHVerifyEvaluator(BaseEvaluator):
             if len(gold_parsed) != 0:
                 # We require the answer to be provided in correct
                 # latex (no malformed operators)
-                if not isinstance(preds, list):
-                    preds = [preds]
                 answer_parsed = [parse(
                     i,
                     extraction_config=[
@@ -57,9 +57,7 @@ class MATHVerifyEvaluator(BaseEvaluator):
                     extraction_mode='first_match',
                 ) for i in preds]
 
-                answer_correct = sum(
-                    [float(verify(i, gold_parsed)) for i in answer_parsed]
-                ) / len(preds)
+                answer_correct = sum([float(verify(i, gold_parsed)) for i in answer_parsed])
                 correct += answer_correct
                 detail = {
                     'pred': str(answer_parsed),
