@@ -440,7 +440,7 @@ def consturct_chatobj_custom_datasets(custom_cfg: List[Dict[str, Any]]):
     for dataset in custom_cfg:
 
         # assert input format
-        assert all(key in dataset for key in ['abbr', 'path', 'input_columns', 'output_column', 'evaluator'])
+        assert all(key in dataset for key in ['abbr', 'path', 'evaluator'])
 
         # general cfg
         chatobj_custom_dataset = dict()
@@ -451,13 +451,13 @@ def consturct_chatobj_custom_datasets(custom_cfg: List[Dict[str, Any]]):
             chatobj_custom_dataset['n'] = dataset['n']
 
         # reader_cfg
-        chatobj_custom_reader_cfg['input_columns'] = dataset['input_columns']
-        chatobj_custom_reader_cfg['output_column'] = dataset['output_column']
+        # chatobj_custom_reader_cfg['input_columns'] = dataset['input_columns']
+        # chatobj_custom_reader_cfg['output_column'] = dataset['output_column']
         chatobj_custom_dataset['reader_cfg'] = chatobj_custom_reader_cfg
 
         # infer_cfg
-        if 'input_prompt' in dataset:
-            chatobj_custom_infer_cfg['prompt_template']['template']['round'][0]['prompt'] = dataset['input_prompt']
+        # if 'input_prompt' in dataset:
+        #     chatobj_custom_infer_cfg['prompt_template']['template']['round'][0]['prompt'] = dataset['input_prompt']
         chatobj_custom_dataset['infer_cfg'] = chatobj_custom_infer_cfg
 
         # eval_cfg
@@ -507,8 +507,10 @@ def consturct_chatobj_custom_datasets(custom_cfg: List[Dict[str, Any]]):
         # append datasets
         chatobj_custom_dataset = chatobj_custom_dataset | chatobj_custom_datasets
         dataset_cfg = deepcopy(chatobj_custom_dataset)
-        del dataset_cfg['infer_cfg']
-        del dataset_cfg['eval_cfg']
+        if 'infer_cfg' in dataset_cfg:
+            del dataset_cfg['infer_cfg']
+        if 'eval_cfg' in dataset_cfg:
+            del dataset_cfg['eval_cfg']
         if 'n' in dataset_cfg:
             del dataset_cfg['n']
 

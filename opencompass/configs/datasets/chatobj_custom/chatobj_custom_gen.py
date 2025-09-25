@@ -18,16 +18,23 @@ chatobj_custom_infer_cfg = dict(
     prompt_template=dict(
         type='PromptTemplate',
         template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{question}\nRemember to put your final answer within \\boxed{}.',
-                ),
-            ],
+        #     begin=[
+        #         dict(
+        #             role='SYSTEM',
+        #             fallback_role='HUMAN',
+        #             prompt="You are ChatGPT",
+        #         ),
+        #     ],
+        #     round=[
+        #         dict(
+        #             role='HUMAN',
+        #             prompt='{question}\nRemember to put your final answer within \\boxed{}.',
+        #         ),
+        #     ],
         ),
     ),
     retriever=dict(type='ZeroRetriever'),
-    inferencer=dict(type='GenInferencer'),
+    inferencer=dict(type='ChatMLInferencer'),
 )
 
 GRADER_TEMPLATE = """
@@ -100,5 +107,5 @@ chatobj_custom_eval_cfg = dict()
 
 
 chatobj_custom_datasets = dict(
-    type='CustomDataset',
+    type='ChatMLDataset',
 )
