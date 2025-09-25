@@ -23,8 +23,11 @@ MODELS = Registry('model', locations=['opencompass.models'])
 LOAD_DATASET = Registry('load_dataset', locations=['opencompass.datasets'])
 TEXT_POSTPROCESSORS = Registry(
     'text_postprocessors', locations=['opencompass.utils.text_postprocessors'])
-DICT_POSTPROCESSORS = Registry(
-    'dict_postprocessors', locations=['opencompass.utils.dict_postprocessors'])
+DICT_POSTPROCESSORS = Registry('dict_postprocessors',
+                               locations=[
+                                   'opencompass.utils.dict_postprocessors',
+                                   'opencompass.datasets.generic'
+                               ])
 
 EVALUATORS = Registry('evaluators', locations=['opencompass.evaluators'])
 
@@ -38,8 +41,9 @@ ICL_DATASET_READERS = Registry(
 ICL_PROMPT_TEMPLATES = Registry(
     'icl_prompt_templates',
     locations=['opencompass.openicl.icl_prompt_template'])
-ICL_EVALUATORS = Registry('icl_evaluators',
-                          locations=['opencompass.openicl.icl_evaluator'])
+ICL_EVALUATORS = Registry(
+    'icl_evaluators',
+    locations=['opencompass.openicl.icl_evaluator', 'opencompass.evaluator'])
 METRICS = Registry('metric',
                    parent=MMENGINE_METRICS,
                    locations=['opencompass.metrics'])

@@ -1,5 +1,6 @@
 import re
 
+from opencompass.registry import DICT_POSTPROCESSORS
 from opencompass.utils import get_logger
 
 
@@ -64,6 +65,7 @@ def _generic_llmjudge_postprocess(judgement: str):
     return grade_letter
 
 
+@DICT_POSTPROCESSORS.register_module()
 def generic_llmjudge_postprocess(
     output: dict,
     output_path: str,
