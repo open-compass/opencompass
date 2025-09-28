@@ -1,37 +1,10 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import CustomDataset
-from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.evaluator import (
-    CascadeEvaluator,
-    GenericLLMEvaluator,
-    MATHVerifyEvaluator,
-)
-from opencompass.utils.text_postprocessors import match_answer_pattern
 
-
-chatobj_custom_reader_cfg = dict(input_columns=['question'], output_column='answer')
+chatobj_custom_reader_cfg = dict(input_columns=['extracted_question'], output_column='extracted_answer')
 
 chatobj_custom_infer_cfg = dict(
     prompt_template=dict(
         type='PromptTemplate',
-        template=dict(
-        #     begin=[
-        #         dict(
-        #             role='SYSTEM',
-        #             fallback_role='HUMAN',
-        #             prompt="You are ChatGPT",
-        #         ),
-        #     ],
-        #     round=[
-        #         dict(
-        #             role='HUMAN',
-        #             prompt='{question}\nRemember to put your final answer within \\boxed{}.',
-        #         ),
-        #     ],
-        ),
+        template=dict(),
     ),
     retriever=dict(type='ZeroRetriever'),
     inferencer=dict(type='ChatMLInferencer'),
@@ -54,9 +27,8 @@ GRADER_TEMPLATE = """
 
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
-
-    <Original Question Begin>: \n{question}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
+    <Original Question Begin>: \n{extracted_question}\n<Original Question End>\n\n
+    <Gold Target Begin>: \n{extracted_answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
 
     Judging the correctness of candidates' answers:
@@ -102,9 +74,7 @@ cascade_evaluator = dict(
 ),
 )
 
-
 chatobj_custom_eval_cfg = dict()
-
 
 chatobj_custom_datasets = dict(
     type='ChatMLDataset',
