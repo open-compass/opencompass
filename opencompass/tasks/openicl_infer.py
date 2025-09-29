@@ -116,7 +116,7 @@ class OpenICLInferTask(BaseTask):
         self._set_default_value(inferencer_cfg, 'batch_size', self.batch_size)
         inferencer_cfg['max_seq_len'] = self.model_cfg.get('max_seq_len')
         inferencer = ICL_INFERENCERS.build(inferencer_cfg)
-
+        print(f'------------------------tpye: {type(inferencer)}')
         out_path = get_infer_output_path(
             self.model_cfg, self.dataset_cfg,
             osp.join(self.work_dir, 'predictions'))
