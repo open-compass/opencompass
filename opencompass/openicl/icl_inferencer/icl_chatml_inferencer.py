@@ -77,7 +77,7 @@ class ChatMLInferencer(BaseInferencer):
         for i in range(len(origin_prompt)):
             new_prompt_template = dict()
             new_prompt_template['round'] = []
-            for question_round in origin_prompt['question'][i]:
+            for question_round in origin_prompt['chatml_question'][i]:
                 if question_round['role'] == 'system':
                     this_system_prompt = question_round['content']
                     new_prompt_template['begin'] = [
@@ -112,7 +112,7 @@ class ChatMLInferencer(BaseInferencer):
             prompt_list += this_prompt
 
         gold_ans = []
-        for i in origin_prompt['answer']:
+        for i in origin_prompt['chatml_answer']:
             gold_ans.append(i[0])
         prompt_list = list(zip(prompt_list, gold_ans))
         # 3.1 Fetch and zip prompt & gold answer if output column exists

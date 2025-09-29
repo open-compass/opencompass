@@ -1,5 +1,5 @@
 
-chatobj_custom_reader_cfg = dict(input_columns=['extracted_question'], output_column='extracted_answer')
+chatobj_custom_reader_cfg = dict(input_columns=['question'], output_column='answer')
 
 chatobj_custom_infer_cfg = dict(
     prompt_template=dict(
@@ -27,8 +27,8 @@ GRADER_TEMPLATE = """
 
     Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
-    <Original Question Begin>: \n{extracted_question}\n<Original Question End>\n\n
-    <Gold Target Begin>: \n{extracted_answer}\n<Gold Target End>\n\n
+    <Original Question Begin>: \n{question}\n<Original Question End>\n\n
+    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
 
     Judging the correctness of candidates' answers:
@@ -61,7 +61,7 @@ llm_evaluator = dict(
         ),
     ),
     dataset_cfg=dict(
-        type='CustomDataset',
+        type='ChatMLDataset',
     ),
     judge_cfg=dict(),
     dict_postprocessor=dict(type='generic_llmjudge_postprocess'),

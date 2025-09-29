@@ -1,3 +1,4 @@
+# flake8: noqa
 import json
 
 from datasets import Dataset
@@ -14,7 +15,7 @@ class ChatMLDataset(BaseDataset):
     @staticmethod
     def load(path, file_name=None, local_mode=False):
 
-        path = get_data_path(path, local_mode=local_mode)
+        path = get_data_path(path, local_mode=True)
         with open(path, 'r', encoding='utf-8-sig') as f:
             data = [json.loads(line) for line in f]
 
@@ -35,6 +36,10 @@ class ChatMLDataset(BaseDataset):
                     data[i]['question'][j]['content'] += input_prompt
 
         extracted_data = []
+        data_final = Dataset.from_list(data)
+        data_final = data_final.rename_column('question', 'chatml_question')
+        data_final = data_final.rename_column('answer', 'chatml_answer')
+
         for item in data:
             user_content = next(
                 (q['content']
@@ -43,23 +48,14 @@ class ChatMLDataset(BaseDataset):
 
             if user_content:
                 extracted_data.append({
-                    'extracted_question': user_content,
-                    'extracted_answer': first_answer
+                    'question': user_content,
+                    'answer': first_answer
                 })
 
-        data_final = Dataset.from_list(data)
+        extracted_questions = [item['question'] for item in extracted_data]
+        extracted_answers = [item['answer'] for item in extracted_data]
 
-        extracted_questions = [
-            item['extracted_question'] for item in extracted_data
-        ]
-        extracted_answers = [
-            item['extracted_answer'] for item in extracted_data
-        ]
-
-        # 将两列数据添加到原数据集
-        data_final = data_final.add_column('extracted_question',
-                                           extracted_questions)
-        data_final = data_final.add_column('extracted_answer',
-                                           extracted_answers)
+        data_final = data_final.add_column('question', extracted_questions)
+        data_final = data_final.add_column('answer', extracted_answers)
 
         return data_final

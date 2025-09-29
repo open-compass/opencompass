@@ -98,9 +98,9 @@ def get_config_from_arg(args) -> Config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
 
-        if 'chatobj_custom_datasets' in config.keys():
-            chatobj_custom_datasets = consturct_chatobj_custom_datasets(config['chatobj_custom_datasets'])
-            config['datasets'] += chatobj_custom_datasets
+        if 'chatml_datasets' in config.keys():
+            chatml_datasets = consturct_chatml_datasets(config['chatml_datasets'])
+            config['datasets'] += chatml_datasets
 
         # set infer accelerator if needed
         if args.accelerator in ['vllm', 'lmdeploy']:
@@ -418,7 +418,7 @@ def fill_eval_cfg(cfg, args):
             'max_workers_per_gpu'] = args.max_workers_per_gpu
     cfg.merge_from_dict(new_cfg)
 
-def consturct_chatobj_custom_datasets(custom_cfg: List[Dict[str, Any]]):
+def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
 
     """All parameter used in your chat_custom_dataset configs.
 
@@ -502,7 +502,7 @@ def consturct_chatobj_custom_datasets(custom_cfg: List[Dict[str, Any]]):
         else:
             eval_cfg = func_eval_cfg(dataset['evaluator'])
         chatobj_custom_dataset['eval_cfg'] = dict()
-        chatobj_custom_dataset['eval_cfg']['evaluator'] = eval_cfg
+        chatobj_custom_dataset['eval_cfg']['evaluator'] = deepcopy(eval_cfg)
 
         # append datasets
         chatobj_custom_dataset = chatobj_custom_dataset | chatobj_custom_datasets
@@ -515,9 +515,9 @@ def consturct_chatobj_custom_datasets(custom_cfg: List[Dict[str, Any]]):
             del dataset_cfg['n']
 
         if dataset['evaluator']['type'] == 'llm_evaluator':
-            chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg'] = dataset_cfg
+            chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg'] = deepcopy(dataset_cfg)
         if dataset['evaluator']['type'] == 'cascade_evaluator':
-            chatobj_custom_dataset['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'] = dataset_cfg
+            chatobj_custom_dataset['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'] = deepcopy(dataset_cfg)
 
         chatobj_custom_dataset_list.append(chatobj_custom_dataset)
 
