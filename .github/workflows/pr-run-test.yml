@@ -64,7 +64,8 @@ jobs:
 
           for i in {1..300}; do
               current_status=$(rjob get pr-test-${{ github.run_id }}-${{ github.run_attempt }} | grep -oP 'rjob [^:]+: \K[^ ]+')
-              if [[ "$current_status" == "Succeeded" && "$current_status" == "Failed" && "$current_status" == "Stopped" ]]; then
+              echo "Current status: $current_status"
+              if [[ $current_status == "Succeeded" && $current_status == "Failed" && $current_status == "Stopped" ]]; then
                   echo "Current status: $current_status, stop checking"
                   break
               fi
