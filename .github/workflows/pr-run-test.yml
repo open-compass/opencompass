@@ -44,7 +44,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           python3 -m pip uninstall opencompass -y
-          python3 -m pip install -e ".[full]"
+          python3 -m pip install .[full]
           conda info --envs
       - name: conda env
         run: |
