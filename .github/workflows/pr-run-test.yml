@@ -31,6 +31,8 @@ env:
   COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
   HF_DATASETS_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/hf_cache
   HF_HUB_CACHE: /mnt/shared-storage-user/large-model-center-share-weights/hf_hub
+  KUBEBRAIN_CLUSTER_ENTRY: 
+  KUBEBRAIN_NAMESPACE: ailab-opencompass
 
 jobs:
   pr_run_test:
