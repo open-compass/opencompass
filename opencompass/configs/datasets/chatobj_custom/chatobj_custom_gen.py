@@ -39,7 +39,7 @@ optional_evaluator = dict(
 math_evaluator = dict(
     type='MATHVerifyEvaluator'
 ),
-rule_evaluator = dict(
+mcq_rule_evaluator = dict(
     type='AccEvaluator',
     pred_postprocessor=dict(type='match_answer_pattern', answer_pattern=r'(?i)ANSWER\s*:\s*([A-D])'),
 ),

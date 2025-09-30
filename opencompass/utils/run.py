@@ -451,13 +451,9 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
             chatobj_custom_dataset['n'] = dataset['n']
 
         # reader_cfg
-        # chatobj_custom_reader_cfg['input_columns'] = dataset['input_columns']
-        # chatobj_custom_reader_cfg['output_column'] = dataset['output_column']
         chatobj_custom_dataset['reader_cfg'] = chatobj_custom_reader_cfg
 
         # infer_cfg
-        # if 'input_prompt' in dataset:
-        #     chatobj_custom_infer_cfg['prompt_template']['template']['round'][0]['prompt'] = dataset['input_prompt']
         chatobj_custom_dataset['infer_cfg'] = chatobj_custom_infer_cfg
 
         # eval_cfg
@@ -465,7 +461,7 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
             eval_cfg = optional_evaluator['math_evaluator']
             return eval_cfg
 
-        def init_rule_evaluator(evalcfg):
+        def init_mcq_rule_evaluator(evalcfg):
             eval_cfg = optional_evaluator['rule_evaluator']
             if 'answer_pattern' in evalcfg.keys():
                 eval_cfg['pred_postprocessor']['answer_pattern'] = evalcfg['answer_pattern']

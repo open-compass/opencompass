@@ -11,6 +11,55 @@ from ..base import BaseDataset
 
 @LOAD_DATASET.register_module()
 class ChatMLDataset(BaseDataset):
+    """The Dataset class based on ChatML template that is only used to parse
+    .jsonl files that conform to the following template format.
+
+    {
+        "question":[
+            {
+                "role": "system",
+                "content": Str,
+            },
+            {
+                "role": "user",
+                "content": Str or List
+                [
+                    {
+                        "type": Str, # "image"
+                        "image_url": Str,
+                    },
+                    ...
+                    {
+                        "type": Str, # "text"
+                        "text": Str,
+                    },
+                ]
+            },
+            {
+                "role": "assistant",
+                "content": Str
+            },
+            {
+                "role": "user",
+                "content": Str or List
+            },
+            ...
+        ],
+        "answer":[
+            Str,
+            Str,
+            ...
+        ]
+    }
+    {
+        ...
+    }
+    ...
+
+    Please use tools/chatml_format_test.py to check
+    the format of your dataset files.
+
+    """
 
     @staticmethod
     def load(path, file_name=None, local_mode=False):
