@@ -1,15 +1,17 @@
-# 使用 vLLM 或 LMDeploy 来一键式加速评测推理
+# 使用 vLLM、LMDeploy、SGLang 或 OpenAI 来一键式加速评测推理
 
 ## 背景
 
-在 OpenCompass 评测过程中，默认使用 Huggingface 的 transformers 库进行推理，这是一个非常通用的方案，但在某些情况下，我们可能需要更高效的推理方法来加速这一过程，比如借助 VLLM 或 LMDeploy。
+在 OpenCompass 评测过程中，默认使用 Huggingface 的 transformers 库进行推理，这是一个非常通用的方案，但在某些情况下，我们可能需要更高效的推理方法来加速这一过程，比如借助 VLLM、LMDeploy、SGLang 或 OpenAI 兼容的 API。
 
 - [LMDeploy](https://github.com/InternLM/lmdeploy) 是一个用于压缩、部署和服务大型语言模型（LLM）的工具包，由 [MMRazor](https://github.com/open-mmlab/mmrazor) 和 [MMDeploy](https://github.com/open-mmlab/mmdeploy) 团队开发。
 - [vLLM](https://github.com/vllm-project/vllm) 是一个快速且易于使用的 LLM 推理和服务库，具有先进的服务吞吐量、高效的 PagedAttention 内存管理、连续批处理请求、CUDA/HIP 图的快速模型执行、量化技术（如 GPTQ、AWQ、SqueezeLLM、FP8 KV Cache）以及优化的 CUDA 内核。
+- [SGLang](https://github.com/sgl-project/sglang) 是一个为大型语言模型（LLM）设计的结构化生成语言。它使您与模型的交互更快、更可控。
+- **OpenAI 兼容 API** 允许您使用任何 OpenAI 兼容的端点进行模型推理，包括官方 OpenAI 模型或自托管的具有 OpenAI 兼容 API 接口的模型。
 
 ## 加速前准备
 
-首先，请检查您要评测的模型是否支持使用 vLLM 或 LMDeploy 进行推理加速。其次，请确保您已经安装了 vLLM 或 LMDeploy，具体安装方法请参考它们的官方文档，下面是参考的安装方法：
+首先，请检查您要评测的模型是否支持使用 vLLM、LMDeploy、SGLang 或 OpenAI 兼容 API 进行推理加速。其次，请确保您已经安装了所需的后端，具体安装方法请参考它们的官方文档，下面是参考的安装方法：
 
 ### LMDeploy 安装方法
 
@@ -27,11 +29,27 @@ pip install lmdeploy
 pip install vllm
 ```
 
-## 评测时使用 VLLM 或 LMDeploy
+### SGLang 安装方法
+
+使用 pip 或从 [源码](https://github.com/sgl-project/sglang) 安装 SGLang：
+
+```bash
+pip install sglang
+```
+
+### OpenAI API 设置
+
+对于 OpenAI 兼容的 API，您只需要安装 openai 包：
+
+```bash
+pip install openai
+```
+
+## 评测时使用 VLLM、LMDeploy、SGLang 或 OpenAI
 
 ### 方法1：使用命令行参数来变更推理后端
 
-OpenCompass 提供了一键式的评测加速，可以在评测过程中自动将 Huggingface 的 transformers 模型转化为 VLLM 或 LMDeploy 的模型，以便在评测过程中使用。以下是使用默认 Huggingface 版本的 llama3-8b-instruct 模型评测 GSM8k 数据集的样例代码：
+OpenCompass 提供了一键式的评测加速，可以在评测过程中自动将 Huggingface 的 transformers 模型转化为 VLLM、LMDeploy、SGLang 或 OpenAI 的模型，以便在评测过程中使用。以下是使用默认 Huggingface 版本的 llama3-8b-instruct 模型评测 GSM8k 数据集的样例代码：
 
 ```python
 # eval_gsm8k.py
@@ -68,21 +86,33 @@ models = [
 python run.py config/eval_gsm8k.py
 ```
 
-如果需要使用 vLLM 或 LMDeploy 进行加速评测，可以使用下面的脚本：
+如果需要使用 vLLM、LMDeploy、SGLang 或 OpenAI 进行加速评测，可以使用下面的脚本：
 
+**使用 vLLM：**
 ```bash
 python run.py config/eval_gsm8k.py -a vllm
 ```
 
-或
-
+**使用 LMDeploy：**
 ```bash
 python run.py config/eval_gsm8k.py -a lmdeploy
 ```
 
+**使用 SGLang：**
+```bash
+python run.py config/eval_gsm8k.py -a sglang
+```
+
+**使用 OpenAI API：**
+```bash
+python run.py config/eval_gsm8k.py -a openai
+```
+
+注意：对于 OpenAI 后端，您可能需要在模型配置中配置额外的参数，如 `openai_api_base` 和 `api_key`。
+
 ### 方法2：通过部署推理加速服务API来加速评测
 
-OpenCompass 还支持通过部署vLLM或LMDeploy的推理加速服务 API 来加速评测，参考步骤如下：
+OpenCompass 还支持通过部署 vLLM、LMDeploy 或 SGLang 的推理加速服务 API 来加速评测，参考步骤如下:
 
 1. 安装openai包：
 
@@ -90,7 +120,7 @@ OpenCompass 还支持通过部署vLLM或LMDeploy的推理加速服务 API 来加
 pip install openai
 ```
 
-2. 部署 vLLM 或 LMDeploy 的推理加速服务 API，具体部署方法请参考它们的官方文档，下面以LMDeploy为例：
+2. 部署 vLLM、LMDeploy 或 SGLang 的推理加速服务 API，具体部署方法请参考它们的官方文档，下面以 LMDeploy 为例：
 
 ```bash
 lmdeploy serve api_server meta-llama/Meta-Llama-3-8B-Instruct --model-name Meta-Llama-3-8B-Instruct --server-port 23333

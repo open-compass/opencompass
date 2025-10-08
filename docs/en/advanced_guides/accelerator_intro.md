@@ -1,15 +1,17 @@
-# Accelerate Evaluation Inference with vLLM or LMDeploy
+# Accelerate Evaluation Inference with vLLM, LMDeploy, SGLang, or OpenAI
 
 ## Background
 
-During the OpenCompass evaluation process, the Huggingface transformers library is used for inference by default. While this is a very general solution, there are scenarios where more efficient inference methods are needed to speed up the process, such as leveraging VLLM or LMDeploy.
+During the OpenCompass evaluation process, the Huggingface transformers library is used for inference by default. While this is a very general solution, there are scenarios where more efficient inference methods are needed to speed up the process, such as leveraging VLLM, LMDeploy, SGLang, or OpenAI-compatible APIs.
 
 - [LMDeploy](https://github.com/InternLM/lmdeploy) is a toolkit designed for compressing, deploying, and serving large language models (LLMs), developed by the [MMRazor](https://github.com/open-mmlab/mmrazor) and [MMDeploy](https://github.com/open-mmlab/mmdeploy) teams.
 - [vLLM](https://github.com/vllm-project/vllm) is a fast and user-friendly library for LLM inference and serving, featuring advanced serving throughput, efficient PagedAttention memory management, continuous batching of requests, fast model execution via CUDA/HIP graphs, quantization techniques (e.g., GPTQ, AWQ, SqueezeLLM, FP8 KV Cache), and optimized CUDA kernels.
+- [SGLang](https://github.com/sgl-project/sglang) is a structured generation language designed for large language models (LLMs). It makes your interaction with models faster and more controllable.
+- **OpenAI-compatible APIs** allow you to use any OpenAI-compatible endpoint for model inference, including official OpenAI models or self-hosted models with OpenAI-compatible API interfaces.
 
 ## Preparation for Acceleration
 
-First, check whether the model you want to evaluate supports inference acceleration using vLLM or LMDeploy. Additionally, ensure you have installed vLLM or LMDeploy as per their official documentation. Below are the installation methods for reference:
+First, check whether the model you want to evaluate supports inference acceleration using vLLM, LMDeploy, SGLang, or OpenAI-compatible APIs. Additionally, ensure you have installed the required backend as per their official documentation. Below are the installation methods for reference:
 
 ### LMDeploy Installation Method
 
@@ -27,11 +29,27 @@ Install vLLM using pip or from [source](https://vllm.readthedocs.io/en/latest/ge
 pip install vllm
 ```
 
-## Accelerated Evaluation Using VLLM or LMDeploy
+### SGLang Installation Method
+
+Install SGLang using pip or from [source](https://github.com/sgl-project/sglang):
+
+```bash
+pip install sglang
+```
+
+### OpenAI API Setup
+
+For OpenAI-compatible APIs, you only need to install the openai package:
+
+```bash
+pip install openai
+```
+
+## Accelerated Evaluation Using VLLM, LMDeploy, SGLang, or OpenAI
 
 ### Method 1: Using Command Line Parameters to Change the Inference Backend
 
-OpenCompass offers one-click evaluation acceleration. During evaluation, it can automatically convert Huggingface transformer models to VLLM or LMDeploy models for use. Below is an example code for evaluating the GSM8k dataset using the default Huggingface version of the llama3-8b-instruct model:
+OpenCompass offers one-click evaluation acceleration. During evaluation, it can automatically convert Huggingface transformer models to VLLM, LMDeploy, SGLang, or OpenAI models for use. Below is an example code for evaluating the GSM8k dataset using the default Huggingface version of the llama3-8b-instruct model:
 
 ```python
 # eval_gsm8k.py
@@ -68,21 +86,33 @@ To evaluate the GSM8k dataset using the default Huggingface version of the llama
 python run.py config/eval_gsm8k.py
 ```
 
-To accelerate the evaluation using vLLM or LMDeploy, you can use the following script:
+To accelerate the evaluation using vLLM, LMDeploy, SGLang, or OpenAI, you can use the following script:
 
+**Using vLLM:**
 ```bash
 python run.py config/eval_gsm8k.py -a vllm
 ```
 
-or
-
+**Using LMDeploy:**
 ```bash
 python run.py config/eval_gsm8k.py -a lmdeploy
 ```
 
+**Using SGLang:**
+```bash
+python run.py config/eval_gsm8k.py -a sglang
+```
+
+**Using OpenAI API:**
+```bash
+python run.py config/eval_gsm8k.py -a openai
+```
+
+Note: For OpenAI backend, you may need to configure additional parameters in your model config, such as `openai_api_base` and `api_key`.
+
 ### Method 2: Accelerating Evaluation via Deployed Inference Acceleration Service API
 
-OpenCompass also supports accelerating evaluation by deploying vLLM or LMDeploy inference acceleration service APIs. Follow these steps:
+OpenCompass also supports accelerating evaluation by deploying vLLM, LMDeploy, or SGLang inference acceleration service APIs. Follow these steps:
 
 1. Install the openai package:
 
