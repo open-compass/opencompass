@@ -12,6 +12,6 @@ from .icl_misc_evaluator import AverageInferencePPLEvaluator  # noqa
 from .icl_misc_evaluator import AverageMinKEvaluator  # noqa
 from .icl_misc_evaluator import AveragePPLEvaluator  # noqa
 from .icl_plugin_evaluator import TEvalEvaluator  # noqa
-from .pi_llm_evaluator import PILLMEvaluator  # noqa
 from .icl_toxic_evaluator import ToxicEvaluator  # noqa
 from .lm_evaluator import LMEvaluator  # noqa
+from .pi_llm_evaluator import PILLMEvaluator  # noqa
