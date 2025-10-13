@@ -27,7 +27,7 @@ for subset in subset_list:
         datasets.append(
             dict(
                 abbr=f'UGPhysics_{subset}_{language}',
-                path=f'./data/UGPhysics/{subset}/{language}.jsonl',
+                path=f'./data/ugphysics/{subset}/{language}.jsonl',
                 evaluator=dict(
                     type='cascade_evaluator',
                     rule_evaluator=dict(

@@ -16,7 +16,7 @@ for subset in subset_list:
         datasets.append(
             dict(
                 abbr=f'CS-Bench_{language}_{subset}',
-                path=f'./data/CS-Bench/{language}/{subset}.jsonl',
+                path=f'./data/csbench/CSBench-{language}/{subset}.jsonl',
                 evaluator=dict(
                     type='llm_evaluator',
                     judge_cfg=dict(),
