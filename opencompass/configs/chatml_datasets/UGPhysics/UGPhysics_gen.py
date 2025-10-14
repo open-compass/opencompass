@@ -29,14 +29,8 @@ for subset in subset_list:
                 abbr=f'UGPhysics_{subset}_{language}',
                 path=f'./data/ugphysics/{subset}/{language}.jsonl',
                 evaluator=dict(
-                    type='cascade_evaluator',
-                    rule_evaluator=dict(
-                        type='math_evaluator',
-                    ),
-                    llm_evaluator=dict(
-                        type='llm_evaluator',
-                        judge_cfg=dict(),
-                    )
+                    type='llm_evaluator',
+                    judge_cfg=dict(),
                 ),
             )
         )
