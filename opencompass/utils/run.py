@@ -1,7 +1,8 @@
 # flake8: noqa
 # yapf: disable
 import os
-from typing import List, Tuple, Union
+from copy import deepcopy
+from typing import Any, Dict, List, Tuple, Union
 
 import tabulate
 from mmengine.config import Config
@@ -96,6 +97,11 @@ def get_config_from_arg(args) -> Config:
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
+
+        if 'chatml_datasets' in config.keys():
+            chatml_datasets = consturct_chatml_datasets(config['chatml_datasets'])
+            config['datasets'] += chatml_datasets
+
         # set infer accelerator if needed
         if args.accelerator in ['vllm', 'lmdeploy']:
             config['models'] = change_accelerator(config['models'], args.accelerator)
@@ -411,3 +417,104 @@ def fill_eval_cfg(cfg, args):
         new_cfg['eval']['runner'][
             'max_workers_per_gpu'] = args.max_workers_per_gpu
     cfg.merge_from_dict(new_cfg)
+
+def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
+
+    """All parameter used in your chat_custom_dataset configs.
+
+    1.abbr: str
+    2.path: str
+    3.input_columns: List
+    4.output_column: str
+    5.input_prompt(Inferencer: PromptTemplate + ZeroRetriever + GenInferencer): str
+    6.evaluator: Dict
+
+    """
+
+    from opencompass.configs.datasets.chatobj_custom.chatobj_custom_gen import (
+        chatobj_custom_datasets, chatobj_custom_infer_cfg,
+        chatobj_custom_reader_cfg, optional_evaluator)
+
+    chatobj_custom_dataset_list = []
+
+    for dataset in custom_cfg:
+
+        # assert input format
+        assert all(key in dataset for key in ['abbr', 'path', 'evaluator'])
+
+        # general cfg
+        chatobj_custom_dataset = dict()
+        chatobj_custom_dataset['abbr'] = dataset['abbr']
+        chatobj_custom_dataset['path'] = dataset['path']
+
+        if 'n' in dataset:
+            chatobj_custom_dataset['n'] = dataset['n']
+
+        # reader_cfg
+        chatobj_custom_dataset['reader_cfg'] = chatobj_custom_reader_cfg
+
+        # infer_cfg
+        chatobj_custom_dataset['infer_cfg'] = chatobj_custom_infer_cfg
+
+        # eval_cfg
+        def init_math_evaluator(evalcfg):
+            eval_cfg = optional_evaluator['math_evaluator']
+            return eval_cfg
+
+        def init_mcq_rule_evaluator(evalcfg):
+            eval_cfg = optional_evaluator['rule_evaluator']
+            if 'answer_pattern' in evalcfg.keys():
+                eval_cfg['pred_postprocessor']['answer_pattern'] = evalcfg['answer_pattern']
+            return eval_cfg
+
+        def init_llm_evaluator(evalcfg):
+            eval_cfg = optional_evaluator['llm_evaluator']
+            assert 'judge_cfg' in evalcfg.keys()
+            eval_cfg['judge_cfg'] = evalcfg['judge_cfg']
+            if 'prompt' in evalcfg.keys():
+                eval_cfg['prompt_template']['template']['round'][0]['prompt'] = evalcfg['prompt']
+            return eval_cfg
+
+        def init_cascade_evaluator(evalcfg, func_locals):
+            rule_func_eval_type = f"init_{evalcfg['rule_evaluator']['type']}"
+            llm_func_eval_type = f"init_{evalcfg['llm_evaluator']['type']}"
+            assert 'rule_evaluator' in evalcfg.keys() and 'llm_evaluator' in evalcfg.keys() and \
+                   rule_func_eval_type in func_locals and callable(func_locals[rule_func_eval_type]) and \
+                   llm_func_eval_type in func_locals and callable(func_locals[llm_func_eval_type])
+
+            eval_cfg = optional_evaluator['cascade_evaluator']
+            rule_func_eval_cfg = func_locals[rule_func_eval_type]
+            llm_func_eval_cfg = func_locals[llm_func_eval_type]
+            eval_cfg['rule_evaluator'] = rule_func_eval_cfg(evalcfg['rule_evaluator'])
+            eval_cfg['llm_evaluator'] = llm_func_eval_cfg(evalcfg['llm_evaluator'])
+            return eval_cfg
+
+        func_eval_type = f"init_{dataset['evaluator']['type']}"
+        func_locals = locals().copy()
+        assert func_eval_type in func_locals and callable(func_locals[func_eval_type])
+        func_eval_cfg = func_locals[func_eval_type]
+        if func_eval_type == 'init_cascade_evaluator':
+            eval_cfg = func_eval_cfg(dataset['evaluator'], func_locals)
+        else:
+            eval_cfg = func_eval_cfg(dataset['evaluator'])
+        chatobj_custom_dataset['eval_cfg'] = dict()
+        chatobj_custom_dataset['eval_cfg']['evaluator'] = deepcopy(eval_cfg)
+
+        # append datasets
+        chatobj_custom_dataset = chatobj_custom_dataset | chatobj_custom_datasets
+        dataset_cfg = deepcopy(chatobj_custom_dataset)
+        if 'infer_cfg' in dataset_cfg:
+            del dataset_cfg['infer_cfg']
+        if 'eval_cfg' in dataset_cfg:
+            del dataset_cfg['eval_cfg']
+        if 'n' in dataset_cfg:
+            del dataset_cfg['n']
+
+        if dataset['evaluator']['type'] == 'llm_evaluator':
+            chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg'] = deepcopy(dataset_cfg)
+        if dataset['evaluator']['type'] == 'cascade_evaluator':
+            chatobj_custom_dataset['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'] = deepcopy(dataset_cfg)
+
+        chatobj_custom_dataset_list.append(chatobj_custom_dataset)
+
+    return chatobj_custom_dataset_list
