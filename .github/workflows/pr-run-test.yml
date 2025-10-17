@@ -25,8 +25,6 @@ env:
   LMDEPLOY_USE_MODELSCOPE: false
   HF_HUB_OFFLINE: 1
   CONDA_PATH: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/miniconda3
-  TMPDIR: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/tmpdir_pr
-  PIP_CACHE_DIR: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/pip_cache
   REPORT_ROOT: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/eval_report/prtest
   COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
   HF_DATASETS_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/hf_cache
@@ -47,7 +45,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           rm -rf ${{env.TMPDIR}} && mkdir ${{env.TMPDIR}}
           python3 -m pip uninstall opencompass -y
-          python3 -m pip install .[full] -i https://pkg.pjlab.org.cn/repository/pypi-proxy/simple/ --trusted-host pkg.pjlab.org.cn --no-cache-dir
+          python3 -m pip install . -i https://pkg.pjlab.org.cn/repository/pypi-proxy/simple/ --trusted-host pkg.pjlab.org.cn --no-cache-dir --no-deps
           conda info --envs
       - name: conda env
         run: |
