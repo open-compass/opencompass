@@ -1137,6 +1137,12 @@
     paper: https://arxiv.org/abs/2504.16074
     configpath: opencompass/configs/datasets/PHYBench/phybench_gen.py
     configpath_llmjudge: ''
+- beyondaime:
+    name: BeyondAIME
+    category: Math
+    paper: ''
+    configpath: opencompass/configs/datasets/BeyondAIME/beyondaime_gen.py
+    configpath_llmjudge: ''
 - eese:
     name: EESE
     category: Science
