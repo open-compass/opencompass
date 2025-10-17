@@ -44,7 +44,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           python3 -m pip uninstall opencompass -y
-          python3 -m pip install . -i https://pkg.pjlab.org.cn/repository/pypi-proxy/simple/ --trusted-host pkg.pjlab.org.cn --no-cache-dir --no-deps
+          python3 -m pip install .[full] -i https://pkg.pjlab.org.cn/repository/pypi-proxy/simple/ --trusted-host pkg.pjlab.org.cn --no-cache-dir
           conda info --envs
       - name: conda env
         run: |
