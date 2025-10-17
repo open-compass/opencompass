@@ -70,7 +70,7 @@ gsm8k-ref-ppl    f729ba     average_ppl  unknown              1.55          1.2 
 
 - 若三者性能较为接近，则模型在该测试集上的污染程度较轻；反之则污染程度较重。
 
-我们可以参考使用以下配置文件 [link](https://github.com/open-compass/opencompass/blob/main/configs/eval_contamination.py)：
+我们可以参考使用以下配置文件 [link](https://github.com/open-compass/opencompass/blob/main/examples/eval_contamination.py)：
 
 ```python
 from mmengine.config import read_base

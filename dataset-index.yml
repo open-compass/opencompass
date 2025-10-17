@@ -889,6 +889,12 @@
     paper: https://arxiv.org/pdf/2407.13168
     configpath: opencompass/configs/datasets/scicode/scicode_gen.py
     configpath_llmjudge: ''
+- seedbench:
+    name: SeedBench
+    category: Knowledge
+    paper: 'https://aclanthology.org/2025.acl-long.1516.pdf'
+    configpath: opencompass/configs/datasets/SeedBench/seedbench_gen.py
+    configpath_llmjudge: ''
 - simpleqa:
     name: SimpleQA
     category: Knowledge
@@ -1137,3 +1143,9 @@
     paper: ''
     configpath: opencompass/configs/datasets/BeyondAIME/beyondaime_gen.py
     configpath_llmjudge: ''
+- eese:
+    name: EESE
+    category: Science
+    paper: https://arxiv.org/abs/2507.16514
+    configpath: opencompass/configs/datasets/eese/eese_llm_judge_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/eese/eese_llm_judge_gen.py

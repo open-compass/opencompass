@@ -57,6 +57,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 ## 🚀 What's New <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2025.07.26\]** OpenCompass now supports Intern-S1 related general and scientific evaluation benchmarks. Please check [Tutorial for Evaluating Intern-S1](https://opencompass.readthedocs.io/en/latest/user_guides/interns1.html) for more details! 🔥🔥🔥
 - **\[2025.04.01\]** OpenCompass now supports `CascadeEvaluator`, a flexible evaluation mechanism that allows multiple evaluators to work in sequence. This enables creating customized evaluation pipelines for complex assessment scenarios. Check out the [documentation](docs/en/advanced_guides/llm_judge.md) for more details! 🔥🔥🔥
 - **\[2025.03.11\]** We have supported evaluation for `SuperGPQA` which is a great benchmark for measuring LLM knowledge ability 🔥🔥🔥
 - **\[2025.02.28\]** We have added a tutorial for `DeepSeek-R1` series model, please check [Evaluating Reasoning Model](docs/en/user_guides/deepseek_r1.md) for more details! 🔥🔥🔥
@@ -84,7 +85,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 We provide [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
-You can also refer to [CompassAcademic](configs/eval_academic_leaderboard_202412.py) to quickly reproduce the leaderboard results. The currently selected datasets include Knowledge Reasoning (MMLU-Pro/GPQA Diamond), Logical Reasoning (BBH), Mathematical Reasoning (MATH-500, AIME), Code Generation (LiveCodeBench, HumanEval), and Instruction Following (IFEval)."
+You can also refer to [Guide to Reproducing CompassAcademic Leaderboard Results](https://opencompass.readthedocs.io/zh-cn/latest/academic.html) to quickly reproduce the leaderboard results.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 

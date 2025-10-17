@@ -41,7 +41,10 @@ class OpenICLEvalTask(BaseTask):
                 c.get('eval_cfg', {}).get('num_gpus', 0),
                 c.get('eval_cfg', {}).get('evaluator', {}).get(
                     'judge_cfg', {}).get('run_cfg', {}).get('num_gpus', 0),
-            ) for c in sum(self.dataset_cfgs, []))
+                c.get('eval_cfg', {}).get('evaluator', {}).get(
+                    'llm_evaluator', {}).get('judge_cfg', {}).get(
+                        'run_cfg', {}).get('num_gpus', 0))
+            for c in sum(self.dataset_cfgs, []))
         self.num_procs = max(
             c.get('eval_cfg', {}).get('evaluator', {}).get(
                 'judge_cfg', {}).get('run_cfg', {}).get('num_procs', 1)
@@ -54,13 +57,14 @@ class OpenICLEvalTask(BaseTask):
     def get_command(self, cfg_path, template):
         sys.path.append(os.getcwd())
         script_path = __file__
+        python = sys.executable
         if self.num_gpus > 1:
             port = random.randint(12000, 32000)
-            command = (f'torchrun --master_port={port} '
-                       f'--nproc_per_node {self.num_procs} '
-                       f'{script_path} {cfg_path}')
+            command = (
+                f'{python} -m torch.distributed.run --master_port={port} '
+                f'--nproc_per_node {self.num_procs} '
+                f'{script_path} {cfg_path}')
         else:
-            python = sys.executable
             command = f'{python} {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
@@ -462,4 +466,4 @@ if __name__ == '__main__':
     inferencer = OpenICLEvalTask(cfg)
     inferencer.run()
     end_time = time.time()
-    get_logger().info(f'time elapsed: {end_time - start_time:.2f}s')
+    get_logger().info(f'time elapsed: {end_time - start_time: .2f}s')

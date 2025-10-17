@@ -1,4 +1,10 @@
 DATASETS_MAPPING = {
+    # KLCE Datasets
+    "opencompass/kcle":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/kcle_diamond.jsonl",
+    },
     # ADVGLUE Datasets
     "opencompass/advglue-dev": {
         "ms_id": None,
@@ -110,6 +116,12 @@ DATASETS_MAPPING = {
         "ms_id": None,
         "hf_id": None,
         "local": "./data/clozeTest-maxmin/python/answers.txt",
+    },
+    # eese
+    "opencompass/eese": {
+        "ms_id": None,
+        "hf_id": "AIBench/EESE",
+        "local": "./data/eese/",
     },
     # Flores
     "opencompass/flores": {
@@ -234,6 +246,12 @@ DATASETS_MAPPING = {
         "ms_id": "opencompass/race",
         "hf_id": "opencompass/race",
         "local": "./data/race/",
+    },
+    # SeedBench
+    "opencompass/seedbench": {
+        "ms_id": "y12869741/SeedBench",
+        "hf_id": "yj12869741/SeedBench",
+        "local": "./data/SeedBench",
     },
     # SIQA
     "opencompass/siqa": {
