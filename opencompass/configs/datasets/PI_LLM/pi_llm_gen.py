@@ -67,6 +67,7 @@ for config in dataset_configs:
         dict(type=PILLMDataset,
              abbr=config['abbr'],
              subset=config['subset'],
+             path='giantfish-fly/pi-llm',
              experiment_filter=config.get('experiment_filter'),
              max_samples=config.get('max_samples'),
              reader_cfg=pi_llm_reader_cfg,

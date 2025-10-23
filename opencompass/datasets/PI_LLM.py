@@ -4,9 +4,11 @@ from datasets import Dataset, load_dataset
 
 from opencompass.registry import LOAD_DATASET
 
+from .base import BaseDataset
+
 
 @LOAD_DATASET.register_module()
-class PILLMDataset:
+class PILLMDataset(BaseDataset):
     """
     PI-LLM: Context (Proactive) Interference in Large Language Models
 
@@ -51,7 +53,7 @@ class PILLMDataset:
         max_samples = kwargs.get('max_samples', None)
 
         # Load from HuggingFace (parquet format supported natively)
-        dataset = load_dataset('giantfish-fly/pi-llm', subset)
+        dataset = load_dataset(kwargs.get('path', None), subset)
 
         # Extract test split
         data = dataset['test'].to_list()
