@@ -16,7 +16,7 @@ ltp
 # Math
 math-verify[antlr4_11_0]
 # Taco, apps Dataset
-pyext
+git+https://github.com/ShaohonChen/PyExt.git@a95f488490fc57ec17d0c00a99c6bc0a4726824f
 # Law Bench
 pypinyin
 # Smolinstruct
