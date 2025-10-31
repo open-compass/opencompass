@@ -24,7 +24,7 @@ def fix_json_slash(s: str) -> str:
     return re.sub(r'(?<!\\)\\(?![\\/\"bfnrtu])', r'\\\\', s)
 
 
-def sage_pred_postprocess(
+def atlas_pred_postprocess(
     prediction: str, think_tags: Tuple[str,
                                        str] = ('<think>', '</think>')) -> str:
     if prediction is None:
@@ -161,7 +161,7 @@ def process_judge_output(
     return origial_judges, parsed_judges, references
 
 
-def sage_judge_postprocess(
+def atlas_judge_postprocess(
     output: List[Dict],
     output_path: str,
     think_tags: Tuple[str, str] = ('<think>', '</think>')
@@ -185,7 +185,7 @@ def sage_judge_postprocess(
 
 
 @ICL_EVALUATORS.register_module()
-class SAGELLMEvaluator(BaseEvaluator):
+class ATLASLLMEvaluator(BaseEvaluator):
     """Generic LLM evaluator using majority voting.
 
     Arguments:
