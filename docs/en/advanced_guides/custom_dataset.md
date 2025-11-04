@@ -1,14 +1,132 @@
-# Custom Dataset Tutorial
+# Dataset Quick Evaluation Tutorial
 
-This tutorial is intended for temporary and informal use of datasets. If the dataset requires long-term use or has specific needs for custom reading/inference/evaluation, it is strongly recommended to implement it according to the methods described in [new_dataset.md](./new_dataset.md).
+OpenCompass provides two paths for quickly evaluating the provided data, the data format protocol based on ChatMLDataset and the data format protocol based on CustomDataset.
+Compared to the complete dataset integration process in [new_dataset.md](./new_dataset.md), these two evaluation paths are more convenient and efficient, being able to directly enter the evaluation process without adding new configuration files.
+But if you have specific needs for custom reading/inference/evaluation, it is recommended to still follow the complete integration process to add a new dataset.
 
-In this tutorial, we will introduce how to test a new dataset without implementing a config or modifying the OpenCompass source code. We support two types of tasks: multiple choice (`mcq`) and question & answer (`qa`). For `mcq`, both ppl and gen inferences are supported; for `qa`, gen inference is supported.
+## Data Format Protocol and Fast Evaluation Based on ChatMLDataset
 
-## Dataset Format
+OpenCompass has recently launched a dataset evaluation mode based on the ChatML dialogue template, which allow users to provide a dataset .json file that conforms to the ChatML dialogue template, and simply set the dataset information config like model configs to start evaluating directly.
+
+### Format Requirements for Data Files
+
+This evaluation method only supports data files in `.json` format, and each sample must comply with the following format:
+
+The format of a text-only dataset with a simple structure:
+
+```jsonl
+{
+    "question":[
+        {
+            "role": "system" # Omittable
+            "content": Str
+        },
+        {    
+            "role": "user",
+            "content": Str
+        }
+    ],
+    "answer":[
+        Str
+    ]
+}
+{
+    ...
+}
+...
+```
+
+The format of multiple rounds and multiple modes datasets:
+
+```jsonl
+{
+    "question":[
+        {
+            "role": "system", 
+            "content": Str,
+        },
+        {    
+            "role": "user",
+            "content": Str or List
+            [
+                {
+                    "type": Str, # "image" 
+                    "image_url": Str,
+                },
+                ...
+                {
+                    "type": Str, # "text"
+                    "text": Str,
+                },
+            ]
+        },
+        {
+            "role": "assistant",
+            "content": Str
+        },
+        {
+            "role": "user",
+            "content": Str or List
+        },
+        ...
+    ],
+    "answer":[
+        Str,
+        Str,
+        ...
+    ]
+}
+{
+    ...
+}
+...
+```
+
+(As OpenCompass currently does not support multi-mode evaluation, the template above is for reference only.)
+
+When ChatMLDataset reading `.json` files, it will use `pydantic` to perform simple format validation on the files.
+You can use `tools/chatml_fformat_test.py` to check your provided data file.
+
+After format checking, please add a config dictionary named `chatml_datasets` in your running config file to convert the data file into an OpenCompass dataset at runtime.
+An example is as follows:
+
+```python
+chatml_datasets = [
+    dict(
+        abbr='YOUR_DATASET_NAME',
+        path='YOUR_DATASET_PATH',
+        evaluator=dict(
+            type='cascade_evaluator',
+            rule_evaluator=dict(
+                type='math_evaluator',
+            ),
+            llm_evaluator=dict(
+                type='llm_evaluator',
+                prompt="YOUR_JUDGE_PROMPT",
+                judge_cfg=dict(), # YOUR Judge Model Config
+            )
+        ),
+        n=1, # Repeat Number
+    ),
+]
+```
+
+The ChatML evaluation module currently provides four preset evaluators, `mcq_rule_evaluator` used for MCQ evaluation, `math_evaluator` used for latex mathematical formula evaluation, `llm_evaluator` used for evaluating answers that are open-ended or difficult to extract), and `cascade_evaluator`, an evaluation mode composed of rule and LLM evaluators cascaded together.
+
+In addition, if you have a long-term need to use datasets based on ChatML templates, you can contribute your dataset config to `opencompass/config/chatml_datasets`.
+An eval example of calling these dataset configs is provided in `examples/evalchat_datasets.py`.
+
+## Data Format Protocol and Fast Evaluation Based on CustomsDataset
+
+(This module is no longer being updated, but it can still be used if there is a need for cli- quick evaluation.)
+
+This module support two types of tasks: multiple choice (`mcq`) and question & answer (`qa`). For `mcq`, both ppl and gen inferences are supported; for `qa`, gen inference is supported.
+
+### Dataset Format
 
 We support datasets in both `.jsonl` and `.csv` formats.
 
-### Multiple Choice (`mcq`)
+#### Multiple Choice (`mcq`)
 
 For `mcq` datasets, the default fields are as follows:
 
@@ -37,7 +155,7 @@ question,A,B,C,answer
 504+811+870+445=,2615,2630,2750,B
 ```
 
-### Question & Answer (`qa`)
+#### Question & Answer (`qa`)
 
 For `qa` datasets, the default fields are as follows:
 
@@ -65,7 +183,7 @@ question,answer
 649+215+412+495+220+738+989+452=,4170
 ```
 
-## Command Line List
+### Command Line List
 
 Custom datasets can be directly called for evaluation through the command line.
 
@@ -92,7 +210,7 @@ set them based on the following logic:
 - If options like `A`, `B`, `C`, etc., can be parsed from the dataset file, it is considered an `mcq` dataset; otherwise, it is considered a `qa` dataset.
 - The default `infer_method` is `gen`.
 
-## Configuration File
+### Configuration File
 
 In the original configuration file, simply add a new item to the `datasets` variable. Custom datasets can be mixed with regular datasets.
 
@@ -103,7 +221,7 @@ datasets = [
 ]
 ```
 
-## Supplemental Information for Dataset `.meta.json`
+### Supplemental Information for Dataset `.meta.json`
 
 OpenCompass will try to parse the input dataset file by default, so in most cases, the `.meta.json` file is **not necessary**. However, if the dataset field names are not the default ones, or custom prompt words are required, it should be specified in the `.meta.json` file.
 

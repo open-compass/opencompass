@@ -1,14 +1,128 @@
-# 自定义数据集
+# 快速评测数据集
 
-本教程仅供临时性的、非正式的数据集使用，如果所用数据集需要长期使用，或者存在定制化读取 / 推理 / 评测需求的，强烈建议按照 [new_dataset.md](./new_dataset.md) 中介绍的方法进行实现。
+OpenCompass提供了两种快速对提供的数据进行评测的路径，即基于ChatMLDataset的数据格式协议和基于CustomDataset的数据格式协议。
+相较于 [new_dataset.md](./new_dataset.md) 中的完整数据集集成流程，这两种快速评测路径更加方便快捷，能够在免于增加新配置文件的前提下直接进入评测任务阶段。但如果您存在定制化读取 / 推理 / 评测需求的，建议仍按照完整的集成流程加入新数据集。
 
-在本教程中，我们将会介绍如何在不实现 config，不修改 OpenCompass 源码的情况下，对一新增数据集进行测试的方法。我们支持的任务类型包括选择 (`mcq`) 和问答 (`qa`) 两种，其中 `mcq` 支持 `ppl` 推理和 `gen` 推理；`qa` 支持 `gen` 推理。
+## 基于ChatMLDataset的数据格式协议和快速评测
 
-## 数据集格式
+OpenCompass最新推出的基于ChatML对话模板的数据集评测模式，允许用户提供一个符合ChatML对话模板的数据集.jsonl文件，并像配置模型一样对数据集信息进行简单配置后即可直接开始评测任务。
+
+### 数据集文件的格式要求
+
+本评测方式仅支持`.jsonl`格式的数据集文件，且其中的每条数据均需遵守以下格式：
+
+较简易结构的文本数据集：
+
+```jsonl
+{
+    "question":[
+        {
+            "role": "system" # 可省略
+            "content": Str
+        },
+        {    
+            "role": "user",
+            "content": Str
+        }
+    ],
+    "answer":[
+        Str
+    ]
+}
+{
+    ...
+}
+...
+```
+
+多轮多模等复杂情况的数据集：（由于OpenCompass暂未支持多模评测，因此此处模板仅供参考）
+
+```jsonl
+{
+    "question":[
+        {
+            "role": "system", 
+            "content": Str,
+        },
+        {    
+            "role": "user",
+            "content": Str or List
+            [
+                {
+                    "type": Str, # "image" 
+                    "image_url": Str,
+                },
+                ...
+                {
+                    "type": Str, # "text"
+                    "text": Str,
+                },
+            ]
+        },
+        {
+            "role": "assistant",
+            "content": Str
+        },
+        {
+            "role": "user",
+            "content": Str or List
+        },
+        ...
+    ],
+    "answer":[
+        Str,
+        Str,
+        ...
+    ]
+}
+{
+    ...
+}
+...
+```
+
+`ChatMLDataset`在读取.jsonl文件时，会使用`pydantic`库对文件进行简易的格式校验。
+您可以使用`tools/chatml_format_test.py`对提供的数据文件进行检查。
+
+完成数据检查后，需要在运行配置文件中加入字段名为`chatml_datasets`的配置字典，以在运行时将数据文件转化为OpenCompass的数据集。示例如下：
+
+```python
+chatml_datasets = [
+    dict(
+        abbr='YOUR_DATASET_NAME',
+        path='YOUR_DATASET_PATH',
+        evaluator=dict(
+            type='cascade_evaluator',
+            rule_evaluator=dict(
+                type='math_evaluator',
+            ),
+            llm_evaluator=dict(
+                type='llm_evaluator',
+                prompt="YOUR_JUDGE_PROMPT",
+                judge_cfg=dict(), # YOUR Judge Model Config
+            )
+        ),
+        n=1, # Repeat Number
+    ),
+]
+```
+
+目前，ChatML模块内提供了四种预设的Evaluator，分别是`mcq_rule_evaluator`（用于选择题评估）、`math_evaluator`（用于latex数学公式评估）、`llm_evaluator`（用于评估难以提取答案的题目或开放式题目）、`cascade_evaluator`（规则式和LLM评估器级联组成的评估模式）。
+
+此外，如果您有基于ChatML模板长期使用数据集的需求，可以将配置添加到`opencompass/configs/chatml_datasets`中。
+在`examples/eval_chat_datasets.py`中也给出了调用这类数据集配置的评测示例。
+
+## 基于CustomDataset的数据格式协议和快速评测
+
+(此模块已不再进行更新，但若存在命令行快速运行评测等需求，仍可以使用此模块。)
+
+基于CustomDataset的数据格式协议支持的任务类型包括选择 (`mcq`) 和问答 (`qa`) 两种，其中 `mcq` 支持 `ppl` 推理和 `gen` 推理；`qa` 支持 `gen` 推理。
+
+### 数据集格式
 
 我们支持 `.jsonl` 和 `.csv` 两种格式的数据集。
 
-### 选择题 (`mcq`)
+#### 选择题 (`mcq`)
 
 对于选择 (`mcq`) 类型的数据，默认的字段如下：
 
@@ -37,7 +151,7 @@ question,A,B,C,answer
 504+811+870+445=,2615,2630,2750,B
 ```
 
-### 问答题 (`qa`)
+#### 问答题 (`qa`)
 
 对于问答 (`qa`) 类型的数据，默认的字段如下：
 
@@ -65,7 +179,7 @@ question,answer
 649+215+412+495+220+738+989+452=,4170
 ```
 
-## 命令行列表
+### 命令行列表
 
 自定义数据集可直接通过命令行来调用开始评测。
 
@@ -90,7 +204,7 @@ python run.py \
 - 如果从数据集文件中可以解析出选项，如 `A`, `B`, `C` 等，则认定该数据集为 `mcq`，否则认定为 `qa`。
 - 默认 `infer_method` 为 `gen`。
 
-## 配置文件
+### 配置文件
 
 在原配置文件中，直接向 `datasets` 变量中添加新的项即可即可。自定义数据集亦可与普通数据集混用。
 
@@ -101,7 +215,7 @@ datasets = [
 ]
 ```
 
-## 数据集补充信息 `.meta.json`
+### 数据集补充信息 `.meta.json`
 
 OpenCompass 会默认尝试对输入的数据集文件进行解析，因此在绝大多数情况下，`.meta.json` 文件都是 **不需要** 的。但是，如果数据集的字段名不是默认的字段名，或者需要自定义提示词，则需要在 `.meta.json` 文件中进行指定。
 
