@@ -119,6 +119,7 @@ def check_network_connectivity(
 def check_url_accessibility(
         url: str,
         timeout: float = 3,
+        headers: dict[str, str] | None = None,
         proxies: Optional[Dict[str,
                                str]] = None) -> Tuple[bool, Optional[int]]:
     """Check if a specific URL is accessible through optional proxy.
@@ -135,7 +136,7 @@ def check_url_accessibility(
         Tuple[bool, Optional[int]]: (is_accessible, status_code)
     """
     try:
-        response = requests.get(url, timeout=timeout, proxies=proxies)
+        response = requests.get(url, timeout=timeout, proxies=proxies, headers=headers)
         return True, response.status_code
     except requests.RequestException as e:
         logger.error(f'Failed to access URL {url}: {str(e)}')
