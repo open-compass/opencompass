@@ -136,7 +136,10 @@ def check_url_accessibility(
         Tuple[bool, Optional[int]]: (is_accessible, status_code)
     """
     try:
-        response = requests.get(url, timeout=timeout, proxies=proxies, headers=headers)
+        response = requests.get(url,
+                                timeout=timeout,
+                                proxies=proxies,
+                                headers=headers)
         return True, response.status_code
     except requests.RequestException as e:
         logger.error(f'Failed to access URL {url}: {str(e)}')
