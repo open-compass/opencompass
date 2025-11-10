@@ -223,6 +223,7 @@ class OpenAISDKStreaming(OpenAISDK):
                     self.logger.error(
                         f'error occurs at {self.openai_api_base}')
                     self.logger.error(e)
+                    return ""
             except Exception as e:
                 thread_id = threading.get_ident()
                 self.logger.error(f'[Thread {thread_id}] error occurs at '
@@ -282,6 +283,10 @@ class OpenAISDKStreaming(OpenAISDK):
                 if (hasattr(delta, 'reasoning_content')
                         and delta.reasoning_content):
                     reasoning_content += delta.reasoning_content
+                    if self.verbose:
+                        # Print streaming output in real-time with complete
+                        # content
+                        print(delta.reasoning_content, end='', flush=True)
 
                 # Handle regular content
                 if delta.content:
