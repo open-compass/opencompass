@@ -223,7 +223,6 @@ class OpenAISDKStreaming(OpenAISDK):
                     self.logger.error(
                         f'error occurs at {self.openai_api_base}')
                     self.logger.error(e)
-                    return ""
             except Exception as e:
                 thread_id = threading.get_ident()
                 self.logger.error(f'[Thread {thread_id}] error occurs at '
