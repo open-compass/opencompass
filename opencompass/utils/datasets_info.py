@@ -760,7 +760,7 @@ DATASETS_URL = {
     "/code_generation_lite": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/code_generation_lite.zip",
-        "md5": "ebcf8db56f5c817ca8202a542be30cb4",
+        "md5": "d301829ca76ec42edabfe31581388da6",
     },
     "/execution-v2": {
         "url":
