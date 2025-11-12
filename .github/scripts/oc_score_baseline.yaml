@@ -37,3 +37,8 @@ lmdeploy-api-test:
     gsm8k_accuracy: 62.5
     race-middle_accuracy: 93.75
     race-high_accuracy: 93.75
+
+lmdeploy-api-streaming-test:
+    gsm8k_accuracy: 62.5
+    race-middle_accuracy: 93.75
+    race-high_accuracy: 93.75

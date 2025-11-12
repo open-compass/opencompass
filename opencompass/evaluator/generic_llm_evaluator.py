@@ -10,14 +10,15 @@ from mmengine.config import ConfigDict
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.registry import (DICT_POSTPROCESSORS, ICL_PROMPT_TEMPLATES,
-                                  TEXT_POSTPROCESSORS)
+from opencompass.registry import (DICT_POSTPROCESSORS, ICL_EVALUATORS,
+                                  ICL_PROMPT_TEMPLATES, TEXT_POSTPROCESSORS)
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
 
+@ICL_EVALUATORS.register_module()
 class GenericLLMEvaluator(BaseEvaluator):
     """Generic LLM evaluator.
 

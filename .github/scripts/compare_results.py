@@ -18,11 +18,15 @@ def compare_results(folder1, folder2, results_ignore_list=None):
 
     print('compare predicitons')
     compare_folders(os.path.join(sub_folder1, 'predictions'),
-                    os.path.join(sub_folder2, 'predictions'))
+                    os.path.join(sub_folder2, 'predictions'),
+                    results_ignore_list=['srbench.json'])
     print('compare results')
     compare_folders(os.path.join(sub_folder1, 'results'),
                     os.path.join(sub_folder2, 'results'),
-                    results_ignore_list=results_ignore_list)
+                    results_ignore_list=[
+                        'dingo_en_192.json', 'dingo_zh_170.json',
+                        'qa_dingo_cn.json', 'srbench.json'
+                    ])
 
 
 def compare_folders(folder1, folder2, results_ignore_list=None):

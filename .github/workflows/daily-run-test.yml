@@ -37,22 +37,17 @@ on:
         required: true
         description: 'regression functions'
         type: string
-        default: "['cmd', 'api', 'chat_sub_fullbench', 'chat_obj_fullbench_v6', 'chat_obj_fullbench_v7']"
+        default: "['cmd', 'api', 'chat_sub_fullbench', 'chat_obj_fullbench_v6', 'chat_obj_fullbench_v7', 'chat_obj_fullbench_other']"
       vllm_version:
         required: true
         description: 'vllm version'
         type: string
         default: "0.7.2"
-      transformers_version:
-        required: true
-        description: 'transformers version'
-        type: string
-        default: "4.51.3"
       baseline_result:
         required: true
         description: 'baseline result'
         type: string
-        default: "16439300433-baseline"
+        default: "17125187480-baseline"
       fullbench_eval:
         required: true
         description: "fullbench volc functions ['base_objective','chat_objective','chat_subjective','base_long_context','chat_long_context']"
@@ -182,7 +177,7 @@ jobs:
             pip install xformers --index-url https://download.pytorch.org/whl/cu121 --cache-dir ${{env.PIP_CACHE_PATH}}
             pip install vllm==${{github.event.inputs.vllm_version}} --cache-dir ${{env.PIP_CACHE_PATH}} --no-deps
             pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --cache-dir ${{env.PIP_CACHE_PATH}}
-            pip install transformers==${{github.event.inputs.transformers_version}} --cache-dir ${{env.PIP_CACHE_PATH}}
+            pip install transformers==4.51.3 --cache-dir ${{env.PIP_CACHE_PATH}}
             FLASH_ATTENTION_FORCE_BUILD=TRUE pip install ${{ secrets.WORKSPACE_PREFIX }}/packages/flash_attn-2.7.2.post1+cu12torch2.6cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             cp -r ${{secrets.WORKSPACE_PREFIX}}/nltk_data ${{env.CONDA_PATH}}/envs/${{env.CONDA_ENV}}/nltk_data
       - name: Prepare - reinstall lmdeploy - cu12
@@ -252,7 +247,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_sub_fullbench","chat_obj_fullbench_v6","chat_obj_fullbench_v7"]')}}
+        regression_func: ${{fromJSON(github.event.inputs.regression_func_local || '["cmd","api","chat_sub_fullbench","chat_obj_fullbench_v6","chat_obj_fullbench_v7", "chat_obj_fullbench_other"]')}}
     runs-on: volc_cu12_local
     timeout-minutes: 480 #6hours
     steps:
@@ -273,7 +268,7 @@ jobs:
           cp -r ${{ secrets.WORKSPACE_PREFIX }}/ocplayground/template/configs_cluster/volc.py .
           cat ${{ secrets.WORKSPACE_PREFIX }}/config/test_config_sub.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
       - name:  modify config
-        if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7' 
+        if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7' || matrix.regression_func == 'chat_obj_fullbench_other'
         run: |
           cp -r ${{ secrets.WORKSPACE_PREFIX }}/ocplayground/template/configs_cluster/volc.py .
           cat ${{ secrets.WORKSPACE_PREFIX }}/config/test_config.txt >> .github/scripts/eval_regression_${{matrix.regression_func}}.py
@@ -334,7 +329,9 @@ jobs:
           python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py || true
           python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} ${{env.REPORT_ROOT}}/${{github.event.inputs.baseline_result}}/${{matrix.regression_func}}
       - name:  Run testcase
-        if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7'
+        if: matrix.regression_func == 'chat_obj_fullbench_v6' || matrix.regression_func == 'chat_obj_fullbench_v7' || matrix.regression_func == 'chat_obj_fullbench_other'
+        env:
+          DATASET_SOURCE: HF
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}

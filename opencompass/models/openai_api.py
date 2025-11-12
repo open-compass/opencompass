@@ -565,6 +565,7 @@ class OpenAI(BaseAPIModel):
         return messages, max_out_len
 
 
+@MODELS.register_module()
 class OpenAISDK(OpenAI):
 
     def __init__(

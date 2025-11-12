@@ -93,50 +93,59 @@ class RJOBRunner(BaseRunner):
             found_dict = False
             for line in output.splitlines():
                 logger.info(f'line: {line}')
+                line = line.lower()
                 if 'rjob oc-infer' not in line and 'rjob oc-eval' not in line:
                     continue
-                if 'Starting' in line:
+                if 'inqueue' in line:
+                    status = 'Inqueue'
+                    found_dict = True
+                    break
+                if 'unknown' in line:
+                    status = 'Unknown'
+                    found_dict = True
+                    break
+                if 'starting' in line:
                     status = 'Starting'
                     found_dict = True
                     break
-                if 'Pending' in line:
+                if 'pending' in line:
                     status = 'Pending'
                     found_dict = True
                     break
-                if 'Running' in line:
+                if 'running' in line:
                     status = 'Running'
                     found_dict = True
                     break
-                if 'Timeout' in line:
+                if 'timeout' in line:
                     status = 'Timeout'
                     found_dict = True
                     break
-                if 'Restarting' in line:
+                if 'restarting' in line:
                     status = 'Restarting'
                     found_dict = True
                     break
-                if 'Queued' in line:
+                if 'queued' in line:
                     status = 'Queued'
                     found_dict = True
                     break
-                if 'Suspended' in line:
+                if 'suspended' in line:
                     status = 'Suspended'
                     found_dict = True
                     break
-                if 'Submitted' in line:
+                if 'submitted' in line:
                     status = 'Submitted'
                     found_dict = True
                     break
-                if 'Succeeded' in line:
+                if 'succeeded' in line:
                     status = 'FINISHED'
                     break
-                if 'Stopped' in line:
+                if 'stopped' in line:
                     status = 'STOPPED'
                     break
-                if 'Failed' in line or 'failed' in line:
+                if 'failed' in line or 'failed' in line:
                     status = 'FAILED'
                     break
-                if 'Cancelled' in line:
+                if 'cancelled' in line:
                     status = 'CANCELLED'
                     break
                 logger.warning(f'Unrecognized status in: {output}')
@@ -171,6 +180,7 @@ class RJOBRunner(BaseRunner):
         mmengine.mkdir_or_exist('tmp/')
         uuid_str = str(uuid.uuid4())
         param_file = f'{pwd}/tmp/{uuid_str}_params.py'
+
         try:
             cfg.dump(param_file)
             # Construct rjob submit command arguments
@@ -179,14 +189,17 @@ class RJOBRunner(BaseRunner):
             args.append(f'--name={task_name}')
             if num_gpus > 0:
                 args.append(f'--gpu={num_gpus}')
-            if hasattr(task, 'memory'):
-                args.append(f'--memory={getattr(task, "memory")}')
-            elif self.rjob_cfg.get('memory', 300000):
-                args.append(f'--memory={self.rjob_cfg["memory"]}')
-            if hasattr(task, 'cpu'):
-                args.append(f'--cpu={getattr(task, "cpu")}')
-            elif self.rjob_cfg.get('cpu', 16):
-                args.append(f'--cpu={self.rjob_cfg["cpu"]}')
+                args.append(f'--memory={num_gpus * 160000}')
+                args.append(f'--cpu={num_gpus * 16}')
+            else:
+                if hasattr(task, 'memory'):
+                    args.append(f'--memory={getattr(task, "memory")}')
+                elif self.rjob_cfg.get('memory', 300000):
+                    args.append(f'--memory={self.rjob_cfg["memory"]}')
+                if hasattr(task, 'cpu'):
+                    args.append(f'--cpu={getattr(task, "cpu")}')
+                elif self.rjob_cfg.get('cpu', 16):
+                    args.append(f'--cpu={self.rjob_cfg["cpu"]}')
             if self.rjob_cfg.get('charged_group'):
                 args.append(
                     f'--charged-group={self.rjob_cfg["charged_group"]}')
@@ -238,7 +251,7 @@ class RJOBRunner(BaseRunner):
 
             retry = self.retry
             if retry == 0:
-                retry = 100
+                retry = 20
             while retry > 0:
                 # Only submit, no polling
                 result = subprocess.run(cmd,
