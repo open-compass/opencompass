@@ -116,15 +116,15 @@ class GenInferencerOutputHandler:
                      prediction,
                      idx,
                      gold=None,
-                     length=None):
+                     res_length=None):
         self.results_dict[str(idx)] = {
             'origin_prompt': origin_prompt,
             'prediction': prediction,
         }
         if gold:
             self.results_dict[str(idx)]['gold'] = gold
-        if length:
-            self.results_dict[str(idx)]['length'] = length
+        if res_length:
+            self.results_dict[str(idx)]['res_length'] = res_length
 
 
 class PPLInferencerOutputHandler:
