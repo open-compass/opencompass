@@ -438,7 +438,6 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
     chatobj_custom_dataset_list = []
 
     for dataset in custom_cfg:
-
         # assert input format
         assert all(key in dataset for key in ['abbr', 'path', 'evaluator'])
 
@@ -452,6 +451,9 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
 
         # reader_cfg
         chatobj_custom_dataset['reader_cfg'] = chatobj_custom_reader_cfg
+        if 'test_range' in dataset:
+            chatobj_custom_dataset['reader_cfg']['test_range'] = dataset['test_range']
+
 
         # infer_cfg
         chatobj_custom_dataset['infer_cfg'] = chatobj_custom_infer_cfg
@@ -514,6 +516,16 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
             chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg'] = deepcopy(dataset_cfg)
         if dataset['evaluator']['type'] == 'cascade_evaluator':
             chatobj_custom_dataset['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'] = deepcopy(dataset_cfg)
+
+        if 'test_range' in dataset and 'llm_evaluator' in chatobj_custom_dataset['eval_cfg']['evaluator'] and 'dataset_cfg' in chatobj_custom_dataset[
+            'eval_cfg']['evaluator']['llm_evaluator']:
+            chatobj_custom_dataset['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
+            'reader_cfg']['test_range'] = dataset['test_range']
+
+        if 'test_range' in dataset and 'dataset_cfg' in chatobj_custom_dataset['eval_cfg']['evaluator'] and 'reader_cfg' in chatobj_custom_dataset[
+            'eval_cfg']['evaluator']['dataset_cfg']:
+            chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
+            'test_range'] = '[0:16]'
 
         chatobj_custom_dataset_list.append(chatobj_custom_dataset)
 
