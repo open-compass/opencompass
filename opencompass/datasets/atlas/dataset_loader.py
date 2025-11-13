@@ -13,7 +13,9 @@ class ATLASDataset(BaseDataset):
         dataset = []
         for example in hf_dataset:
             dataset.append({
-                'problem': str(example['question']),
-                'answer': str(example.get('refined_standard_answer', ''))
+                'problem':
+                str(example['question']),
+                'answer':
+                str(example.get('refined_standard_answer', ''))
             })
         return Dataset.from_list(dataset)
