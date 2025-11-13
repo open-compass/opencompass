@@ -111,13 +111,20 @@ class GenInferencerOutputHandler:
         """Dump the result to a json file."""
         dump_results_dict(self.results_dict, Path(save_dir) / filename)
 
-    def save_results(self, origin_prompt, prediction, idx, gold=None):
+    def save_results(self,
+                     origin_prompt,
+                     prediction,
+                     idx,
+                     gold=None,
+                     res_length=None):
         self.results_dict[str(idx)] = {
             'origin_prompt': origin_prompt,
             'prediction': prediction,
         }
         if gold:
             self.results_dict[str(idx)]['gold'] = gold
+        if res_length:
+            self.results_dict[str(idx)]['res_length'] = res_length
 
 
 class PPLInferencerOutputHandler:
