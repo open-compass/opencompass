@@ -165,19 +165,23 @@ class GenInferencer(BaseInferencer):
                     prediction = prediction[0]
 
                 if self.dump_res_length:
+                    input_length = self.model.get_token_len(prompt)
                     if num_return_sequences == 1:
-                        res_length = self.model.get_token_len(prediction)
+                        output_length = self.model.get_token_len(prediction)
                     else:
-                        res_length = [
+                        output_length = [
                             self.model.get_token_len(pred)
                             for pred in prediction
                         ]
-
+                    length = {
+                        'input_length': input_length,
+                        'output_length': output_length,
+                    }
                     output_handler.save_results(prompt,
                                                 prediction,
                                                 index,
                                                 gold=gold,
-                                                res_length=res_length)
+                                                length=length)
                 else:
                     output_handler.save_results(prompt,
                                                 prediction,
