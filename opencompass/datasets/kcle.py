@@ -18,9 +18,10 @@ class KCLEDataset(BaseDataset):
         with open(path, 'r') as f:
             for line in f:
                 line = json.loads(line)
-                line['input'] = line['input']
-                line['target'] = line['target']
-                dataset.append(line)
+                data = {}
+                data['input'] = line['input']
+                data['target'] = line['target']
+                dataset.append(data)
         return datasets.Dataset.from_list(dataset)
 
 
