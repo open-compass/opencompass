@@ -3,7 +3,12 @@ DATASETS_MAPPING = {
     "opencompass/kcle":{
         "ms_id": None,
         "hf_id": None,
-        "local": "/cpfs01/shared/llm_ddd/gaoxuan/code/tests/oc/kcle_v1_enzh_annotation_part1_qa_sampled.jsonl",
+        "local": "./data/kcle_v1_enzh_annotation_part1_qa_sampled.jsonl",
+    },
+    "opencompass/kcle_fix": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/kcle_v1_enzh_annotation_part1_qa_sampled.jsonl",
     },
     # ADVGLUE Datasets
     "opencompass/advglue-dev": {
