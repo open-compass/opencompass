@@ -81,7 +81,7 @@ kcle_eval_cfg = dict(
         ),
         dataset_cfg=dict(
             type=KCLEDataset,
-            path='./data/kcle_diamond_fix_251029.jsonl',
+            path='opencompass/kcle_fix',
             reader_cfg=kcle_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -93,8 +93,8 @@ kcle_eval_cfg = dict(
 kcle_datasets = [
     dict(
         type=KCLEDataset, # CustomDataset
-        abbr='kcle',
-        path='./data/kcle_diamond_fix_251029.jsonl',
+        abbr='kcle_fix',
+        path='opencompass/kcle_fix',
         reader_cfg=kcle_reader_cfg,
         infer_cfg=kcle_infer_cfg,
         eval_cfg=kcle_eval_cfg,
