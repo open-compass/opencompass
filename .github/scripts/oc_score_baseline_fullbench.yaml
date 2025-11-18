@@ -1,1028 +1,88 @@
-internlm2_5-7b-chat-hf_fullbench:
-    objective:
-        race-high_accuracy: 93.75
-        ARC-c_accuracy: 93.75
-        BoolQ_accuracy: 81.25
-        triviaqa_wiki_1shot_score: 50
-        nq_open_1shot_score: 25
-        IFEval_Prompt-level-strict-accuracy: 50
-        drop_accuracy: 81.25
-        GPQA_diamond_accuracy: 25
-        hellaswag_accuracy: 87.5
-        TheoremQA_score: 12.50
-        musr_average_naive_average: 39.58
-        korbench_single_naive_average: 40
-        gsm8k_accuracy: 62.50
-        math_accuracy: 75
-        cmo_fib_accuracy: 6.25
-        aime2024_accuracy: 6.25
-        wikibench-wiki-single_choice_cncircular_perf_4: 50
-        sanitized_mbpp_score: 68.75
-        ds1000_naive_average: 16.96
-        lcb_code_generation_pass@1: 12.5
-        lcb_code_execution_pass@1: 43.75
-        lcb_test_output_pass@1: 18.75
-        teval_naive_average: 75.52
-        bbh-logical_deduction_seven_objects_score: 50
-        bbh-multistep_arithmetic_two_score: 68.75
-        mmlu-other_accuracy: 72.6
-        cmmlu-china-specific_accuracy: 76.25
-        mmlu_pro_math_accuracy: 25
-        ds1000_Pandas_accuracy: 12.5
-        ds1000_Numpy_accuracy: 0
-        ds1000_Tensorflow_accuracy: 12.5
-        ds1000_Scipy_accuracy: 18.75
-        ds1000_Sklearn_accuracy: 18.75
-        ds1000_Pytorch_accuracy: 12.5
-        ds1000_Matplotlib_accuracy: 43.75
-        openai_mmmlu_lite_AR-XY_accuracy: 37.5
-        college_naive_average: 12.5
-        college_knowledge_naive_average: 87.5
-    subjective:
-        alignment_bench_v1_1_总分: 0.66
-        alpaca_eval_total: 20.00
-        arenahard_score: 56.82
-        Followbench_naive_average: 1
-        CompassArena_naive_average: 43
-        mtbench101_avg: 7.60
-        wildbench_average: -14.58
-        simpleqa_accuracy_given_attempted: 1.00
-        chinese_simpleqa_given_attempted_accuracy: 0.90
-        alignment_bench_v1_1_专业能力: 7.90
-        alignment_bench_v1_1_数学计算: 0
-        alignment_bench_v1_1_基本任务: 0
-        alignment_bench_v1_1_逻辑推理: 0
-        alignment_bench_v1_1_中文理解: 0
-        alignment_bench_v1_1_文本写作: 0
-        alignment_bench_v1_1_角色扮演: 0
-        alignment_bench_v1_1_综合问答: 0
-        alpaca_eval_helpful_base: 20.00
-        compassarena_language_naive_average: 35
-        compassarena_knowledge_naive_average: 60.00
-        compassarena_reason_v2_naive_average: 40
-        compassarena_math_v2_naive_average: 50.00
-        compassarena_creationv2_zh_naive_average: 30
-        followbench_llmeval_en_HSR_AVG: 1
-        followbench_llmeval_en_SSR_AVG: 1
-        followbench_llmeval_en_HSR_L1: 1
-        followbench_llmeval_en_HSR_L2: 1
-        followbench_llmeval_en_HSR_L3: 1
-        followbench_llmeval_en_HSR_L4: 1
-        followbench_llmeval_en_HSR_L5: 1
-        followbench_llmeval_en_SSR_L1: 1
-        followbench_llmeval_en_SSR_L2: 1
-        followbench_llmeval_en_SSR_L3: 1
-        followbench_llmeval_en_SSR_L4: 1
-        followbench_llmeval_en_SSR_L5: 1
-        simpleqa_f1: 0.12
-
-internlm2_5-7b-chat-turbomind_fullbench:
-    objective:
-        race-high_accuracy:  93.75
-        ARC-c_accuracy: 93.75
-        BoolQ_accuracy: 75.00
-        triviaqa_wiki_1shot_score: 50
-        nq_open_1shot_score: 25
-        IFEval_Prompt-level-strict-accuracy: 56.25
-        drop_accuracy: 75
-        GPQA_diamond_accuracy: 37.50
-        hellaswag_accuracy: 81.25
-        TheoremQA_score: 12.5
-        musr_average_naive_average: 39.58
-        korbench_single_naive_average: 40
-        gsm8k_accuracy: 68.75
-        math_accuracy: 68.75
-        cmo_fib_accuracy: 6.25
+qwen-3-8b-hf-fullbench:
+    objective_other:
+        C-MHChem_accuracy: 81.25
+        C-MHChem_f1: 0.81
+        C-MHChem_accuracy_given_attempted: 81.25
+        C-MHChem_attempted_ratio: 100
+        C-MHChem_correct_count: 13
+        C-MHChem_incorrect_count: 3
+        C-MHChem_not_attempted_count: 0
+        CPsyExam_accuracy: 87.5
+        CPsyExam_f1: 0.88
+        CPsyExam_accuracy_given_attempted: 87.5
+        CPsyExam_attempted_ratio: 100
+        CPsyExam_correct_count: 14
+        CPsyExam_incorrect_count: 2
+        CPsyExam_not_attempted_count: 0
+        MaScQA_accuracy: 75
+        MaScQA_f1: 0.75
+        MaScQA_accuracy_given_attempted: 75
+        MaScQA_attempted_ratio: 100
+        MaScQA_correct_count: 12
+        MaScQA_incorrect_count: 4
+        MaScQA_not_attempted_count: 0
+        UGPhysics_AtomicPhysics_zh_accuracy: 56.25
+    objective_v5:
+        race-high_accuracy: 87.5
+        ARC-c_accuracy: 100
+        BoolQ_accuracy: 93.75
+        triviaqa_wiki_1shot_score: 0
+        nq_open_1shot_score: 0
+        IFEval_Prompt-level-strict-accuracy: 87.50
+        drop_accuracy: 93.75
+        GPQA_diamond_accuracy: 62.50
+        hellaswag_accuracy: 75
+        TheoremQA_score: 6.25
+        musr_average_naive_average: 14.58
+        korbench_single_naive_average: 75.00
+        gsm8k_accuracy: 75
+        math_accuracy: 93.75
+        cmo_fib_accuracy: 0
         aime2024_accuracy: 6.25
         wikibench-wiki-single_choice_cncircular_perf_4: 25
-        sanitized_mbpp_score: 68.75
-        ds1000_naive_average: 15.18
-        lcb_code_generation_pass@1: 12.5
-        lcb_code_execution_pass@1: 43.75
-        lcb_test_output_pass@1: 0.00
-        teval_naive_average: 75.73
-        bbh-logical_deduction_seven_objects_score: 62.50
-        bbh-multistep_arithmetic_two_score: 62.50
-        mmlu-other_accuracy: 73.08
-        cmmlu-china-specific_accuracy: 75.42
-        mmlu_pro_math_accuracy: 25.00
-        ds1000_Pandas_accuracy: 0.00
-        ds1000_Numpy_accuracy: 0
-        ds1000_Tensorflow_accuracy: 12.5
-        ds1000_Scipy_accuracy: 18.75
-        ds1000_Sklearn_accuracy: 18.75
-        ds1000_Pytorch_accuracy: 12.50
-        ds1000_Matplotlib_accuracy: 43.75
-        openai_mmmlu_lite_AR-XY_accuracy: 37.5
-        college_naive_average: 12.50
-        college_knowledge_naive_average: 87.5
-    subjective:
-        alignment_bench_v1_1_总分: 0.72
-        alpaca_eval_total: 20.00
-        arenahard_score: 55.77
-        Followbench_naive_average: 1
-        CompassArena_naive_average: 39.00
-        mtbench101_avg: 7.90
-        wildbench_average: 0.00
-        simpleqa_accuracy_given_attempted: 1.00
-        chinese_simpleqa_given_attempted_accuracy: 1
-        alignment_bench_v1_1_专业能力: 8.70
-        alignment_bench_v1_1_数学计算: 0
-        alignment_bench_v1_1_基本任务: 0
-        alignment_bench_v1_1_逻辑推理: 0
-        alignment_bench_v1_1_中文理解: 0
-        alignment_bench_v1_1_文本写作: 0
-        alignment_bench_v1_1_角色扮演: 0
-        alignment_bench_v1_1_综合问答: 0
-        alpaca_eval_helpful_base: 20.00
-        compassarena_language_naive_average: 25.00
-        compassarena_knowledge_naive_average: 55.00
-        compassarena_reason_v2_naive_average: 35.00
-        compassarena_math_v2_naive_average: 55.00
-        compassarena_creationv2_zh_naive_average: 25.00
-        followbench_llmeval_en_HSR_AVG: 1
-        followbench_llmeval_en_SSR_AVG: 1
-        followbench_llmeval_en_HSR_L1: 1
-        followbench_llmeval_en_HSR_L2: 1
-        followbench_llmeval_en_HSR_L3: 1
-        followbench_llmeval_en_HSR_L4: 1
-        followbench_llmeval_en_HSR_L5: 1
-        followbench_llmeval_en_SSR_L1: 1
-        followbench_llmeval_en_SSR_L2: 1
-        followbench_llmeval_en_SSR_L3: 1
-        followbench_llmeval_en_SSR_L4: 1
-        followbench_llmeval_en_SSR_L5: 1
-        simpleqa_f1: 0.12
-
-internlm2_5-7b-hf_fullbench:
-    objective:
-        race-high_accuracy: 100
-        ARC-c_accuracy: 68.75
-        BoolQ_accuracy: 87.5
-        triviaqa_wiki_1shot_score: 43.75
-        nq_open_1shot_score: 43.75
-        drop_accuracy: 62.5
-        GPQA_diamond_accuracy: 62.5
-        hellaswag_accuracy: 93.75
-        TheoremQA_score: 18.75
-        winogrande_accuracy: 75
-        gsm8k_accuracy: 37.5
-        GaokaoBench_2010-2022_Math_II_MCQs_score: 62.5
-        GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
-        math_accuracy: 12.5
-        wikibench-wiki-single_choice_cncircular_perf_4: 25
-        sanitized_mbpp_score: 56.25
-        dingo_en_192_score: 37.5
-        dingo_zh_170_score: 100
-        mmlu-other_accuracy: 76.92
-        cmmlu-china-specific_accuracy: 84.17
-        mmlu_pro_math_accuracy: 18.75
-        bbh-logical_deduction_seven_objects_score: 43.75
-        bbh-multistep_arithmetic_two_score: 56.25
-        college_naive_average: 12.5
-        college_knowledge_naive_average: 87.5
-
-internlm2_5-7b-turbomind_fullbench:
-    objective:
-        race-high_accuracy: 100
-        ARC-c_accuracy: 68.75
-        BoolQ_accuracy: 87.5
-        triviaqa_wiki_1shot_score: 43.75
-        nq_open_1shot_score: 43.75
-        drop_accuracy: 62.5
-        GPQA_diamond_accuracy: 68.75
-        hellaswag_accuracy: 93.75
-        TheoremQA_score: 18.75
-        winogrande_accuracy: 87.5
-        gsm8k_accuracy: 62.50
-        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
-        GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
-        math_accuracy: 6.25
-        wikibench-wiki-single_choice_cncircular_perf_4: 0.00
-        sanitized_mbpp_score: 62.50
-        dingo_en_192_score: 37.50
-        dingo_zh_170_score: 100.00
-        mmlu-other_accuracy: 78.37
-        cmmlu-china-specific_accuracy: 83.33
-        mmlu_pro_math_accuracy: 18.75
-        bbh-logical_deduction_seven_objects_score: 62.50
-        bbh-multistep_arithmetic_two_score: 50.00
-        college_naive_average: 12.5
-        college_knowledge_naive_average: 87.5
-
-internlm2_5-7b-turbomind:
-    objective:
-        race-high_accuracy: 89.28
-        ARC-c_accuracy: 52.2
-        BoolQ_accuracy: 89.72
-        triviaqa_wiki_1shot_score: 65.88
-        nq_open_1shot_score: 34.82
-        drop_accuracy: 68.1
-        bbh_naive_average: 72.15
-        GPQA_diamond_accuracy: 32.83
-        hellaswag_accuracy: 88.36
-        TheoremQA_score: 25
-        winogrande_accuracy: 81.29
-        gsm8k_accuracy: 74.68
-        GaokaoBench_weighted_average: 58.19
-        math_accuracy: 33.98
-        Mathbench_naive_average: 48.38
-        wikibench-wiki-single_choice_cncircular_perf_4: 29.1
-        cmmlu_naive_average: 78.94
-        mmlu_naive_average: 71.44
-        mmlu_pro_naive_average: 38.18
-        openai_humaneval_humaneval_pass@1: 59.76
-        openai_humaneval_v2_humaneval_pass@1: 57.93
-        sanitized_mbpp_score: 55.25
-        dingo_en_192_score: 60.94
-        dingo_zh_170_score: 67.65
-        mmlu-stem_accuracy: 63.72
-        mmlu-social-science_accuracy: 80.15
-        mmlu-humanities_accuracy: 74.27
-        mmlu-other_accuracy: 71.85
-        cmmlu-stem_accuracy: 67.07
-        cmmlu-social-science_accuracy: 81.49
-        cmmlu-humanities_accuracy: 85.84
-        cmmlu-other_accuracy: 82.69
-        cmmlu-china-specific_accuracy: 79.88
-        mmlu_pro_biology_accuracy: 58.58
-        mmlu_pro_business_accuracy: 28.01
-        mmlu_pro_chemistry_accuracy: 22.79
-        mmlu_pro_computer_science_accuracy: 39.02
-        mmlu_pro_economics_accuracy: 53.08
-        mmlu_pro_engineering_accuracy: 25.7
-        mmlu_pro_health_accuracy: 46.94
-        mmlu_pro_history_accuracy: 43.04
-        mmlu_pro_law_accuracy: 29.7
-        mmlu_pro_math_accuracy: 24.2
-        mmlu_pro_philosophy_accuracy: 42.48
-        mmlu_pro_physics_accuracy: 26.02
-        mmlu_pro_psychology_accuracy: 52.76
-        mmlu_pro_other_accuracy: 42.21
-        college_naive_average: 7.00
-        high_naive_average: 6.67
-        middle_naive_average: 26.67
-        primary_naive_average: 64.00
-        arithmetic_naive_average: 55
-        mathbench-a (average)_naive_average: 31.8
-        college_knowledge_naive_average: 58.23
-        high_knowledge_naive_average: 52.51
-        middle_knowledge_naive_average: 71.15
-        primary_knowledge_naive_average: 60.48
-        mathbench-t (average)_naive_average: 60.19
-    long_context:
-        Single-Needle-Retrieval(S-RT)-32000_naive_average: 100
-        Single-Needle-Retrieval-EN-32000_naive_average: 100
-        Single-Needle-Retrieval-ZH-32000_naive_average: 100
-        Single-Needle-Retrieval(S-RT)-100000_naive_average: 100
-        Single-Needle-Retrieval-EN-100000_naive_average: 100
-        Single-Needle-Retrieval-ZH-100000_naive_average: 100
-        Single-Needle-Retrieval(S-RT)-200000_naive_average: 100
-        Single-Needle-Retrieval-EN-200000_naive_average: 100
-        Single-Needle-Retrieval-ZH-200000_naive_average: 100
-        longbench_naive_average: 46.19
-        longbench_zh_naive_average: 49.3
-        longbench_en_naive_average: 43.97
-        longbench_single-document-qa_score: 42.84
-        longbench_multi-document-qa_score: 41.25
-        longbench_summarization_score: 23.21
-        longbench_few-shot-learning_score: 61.67
-        longbench_synthetic-tasks_score: 60.05
-        longbench_code-completion_score: 52.09
-
-internlm2_5-7b-chat-turbomind:
-    objective:
-        race-high_accuracy: 86.16
-        ARC-c_accuracy: 90.17
-        BoolQ_accuracy: 87.89
-        triviaqa_wiki_1shot_score: 64.91
-        nq_open_1shot_score: 22.69
-        mmmlu_lite_naive_average: 44.96
-        IFEval_Prompt-level-strict-accuracy: 58.04
-        drop_accuracy: 77.68
-        bbh_naive_average: 73.14
-        GPQA_diamond_accuracy: 31.06
-        hellaswag_accuracy: 94.79
-        TheoremQA_score: 22.25
-        musr_average_naive_average: 50.89
-        korbench_single_naive_average: 32.16
-        ARC_Prize_Public_Evaluation_accuracy: 0.02
-        gsm8k_accuracy: 86.73
-        GaokaoBench_weighted_average: 78.6
-        math_accuracy: 61
-        cmo_fib_accuracy: 11
-        aime2024_accuracy: 3.33
-        Mathbench_naive_average: 64.23
-        wikibench-wiki-single_choice_cncircular_perf_4: 31.32
-        cmmlu_naive_average: 74.3
-        mmlu_naive_average: 70.84
-        mmlu_pro_naive_average: 44.98
-        openai_humaneval_humaneval_pass@1: 69.8
-        sanitized_mbpp_score: 64.4
-        humanevalx_naive_average: 33.35
-        ds1000_naive_average: 14.15
-        lcb_code_generation_pass@1: 17.75
-        lcb_code_execution_pass@1: 32.57
-        lcb_test_output_pass@1: 26.13
-        bigcodebench_hard_instruct_pass@1: 3.38
-        bigcodebench_hard_complete_pass@1: 5.06
-        teval_naive_average: 80
-        SciCode_sub_accuracy: 5.56
-        qa_dingo_cn_score: 99.01
-        mmlu-stem_accuracy: 68.2
-        mmlu-social-science_accuracy: 75.8
-        mmlu-humanities_accuracy: 69.3
-        mmlu-other_accuracy: 71.3
-        cmmlu-stem_accuracy: 66.64
-        cmmlu-social-science_accuracy: 76
-        cmmlu-humanities_accuracy: 77.9
-        cmmlu-other_accuracy: 77.25
-        cmmlu-china-specific_accuracy: 73.6
-        mmlu_pro_biology_accuracy: 66.67
-        mmlu_pro_business_accuracy: 47.91
-        mmlu_pro_chemistry_accuracy: 35
-        mmlu_pro_computer_science_accuracy: 48.9
-        mmlu_pro_economics_accuracy: 55.87
-        mmlu_pro_engineering_accuracy: 29.62
-        mmlu_pro_health_accuracy: 45
-        mmlu_pro_history_accuracy: 40.8
-        mmlu_pro_law_accuracy: 25.79
-        mmlu_pro_math_accuracy: 53.48
-        mmlu_pro_philosophy_accuracy: 38.38
-        mmlu_pro_physics_accuracy: 37.79
-        mmlu_pro_psychology_accuracy: 58.39
-        mmlu_pro_other_accuracy: 46.27
-        humanevalx-python_pass@1: 53.66
-        humanevalx-cpp_pass@1: 22.56
-        humanevalx-go_pass@1: 0
-        humanevalx-js_pass@1: 54.88
-        ds1000_Pandas_accuracy: 10.65
-        ds1000_Numpy_accuracy: 3.63
-        ds1000_Tensorflow_accuracy: 13.33
-        ds1000_Scipy_accuracy: 8.96
-        ds1000_Sklearn_accuracy: 6.96
-        ds1000_Pytorch_accuracy: 6.62
-        ds1000_Matplotlib_accuracy: 49.35
-        openai_mmmlu_lite_AR-XY_accuracy: 17.19
-        openai_mmmlu_lite_BN-BD_accuracy: 26.78
-        openai_mmmlu_lite_DE-DE_accuracy: 51.27
-        openai_mmmlu_lite_ES-LA_accuracy: 56.94
-        openai_mmmlu_lite_FR-FR_accuracy: 58.22
-        openai_mmmlu_lite_HI-IN_accuracy: 30.75
-        openai_mmmlu_lite_ID-ID_accuracy: 50.6
-        openai_mmmlu_lite_IT-IT_accuracy: 50.6
-        openai_mmmlu_lite_JA-JP_accuracy: 51.13
-        openai_mmmlu_lite_KO-KR_accuracy: 45
-        openai_mmmlu_lite_PT-BR_accuracy: 57.68
-        openai_mmmlu_lite_SW-KE_accuracy: 32.56
-        openai_mmmlu_lite_YO-NG_accuracy: 32.42
-        openai_mmmlu_lite_ZH-CN_accuracy: 65.4
-        college_naive_average: 19.17
-        high_naive_average: 46.5
-        middle_naive_average: 61.34
-        primary_naive_average: 73.34
-        arithmetic_naive_average: 61.67
-        mathbench-a (average)_naive_average: 52.58
-        college_knowledge_naive_average: 67.1
-        high_knowledge_naive_average: 70
-        middle_knowledge_naive_average: 80
-        primary_knowledge_naive_average: 90.12
-        mathbench-t (average)_naive_average: 76
-    subjective:
-        alignment_bench_v1_1_总分: 5.68
-        alpaca_eval_total: 25.96
-        arenahard_score: 17.15
-        Followbench_naive_average: 0.81
-        CompassArena_naive_average: 39.49
-        FoFo_naive_average: 0.38
-        mtbench101_avg: 8.01
-        wildbench_average: -10.49
-        simpleqa_accuracy_given_attempted: 0.04
-        chinese_simpleqa_given_attempted_accuracy: 0.34
-        alignment_bench_v1_1_专业能力: 6.05
-        alignment_bench_v1_1_数学计算: 5.87
-        alignment_bench_v1_1_基本任务: 6.01
-        alignment_bench_v1_1_逻辑推理: 4.48
-        alignment_bench_v1_1_中文理解: 6.17
-        alignment_bench_v1_1_文本写作: 6.06
-        alignment_bench_v1_1_角色扮演: 6.3
-        alignment_bench_v1_1_综合问答: 6.45
-        alpaca_eval_helpful_base: 17.83
-        alpaca_eval_koala: 28.21
-        alpaca_eval_oasst: 23.4
-        alpaca_eval_selfinstruct: 30.95
-        alpaca_eval_vicuna: 25.00
-        compassarena_language_naive_average: 53.00
-        compassarena_knowledge_naive_average: 36
-        compassarena_reason_v2_naive_average: 35
-        compassarena_math_v2_naive_average: 16.07
-        compassarena_creationv2_zh_naive_average: 43.64
-        fofo_test_prompts_overall: 0.35
-        fofo_test_prompts_cn_overall: 0.41
-        followbench_llmeval_en_HSR_AVG: 0.73
-        followbench_llmeval_en_SSR_AVG: 0.88
-        followbench_llmeval_en_HSR_L1: 0.94
-        followbench_llmeval_en_HSR_L2: 0.77
-        followbench_llmeval_en_HSR_L3: 0.73
-        followbench_llmeval_en_HSR_L4: 0.68
-        followbench_llmeval_en_HSR_L5: 0.54
-        followbench_llmeval_en_SSR_L1: 0.94
-        followbench_llmeval_en_SSR_L2: 0.88
-        followbench_llmeval_en_SSR_L3: 0.87
-        followbench_llmeval_en_SSR_L4: 0.87
-        followbench_llmeval_en_SSR_L5: 0.85
-        simpleqa_f1: 0.04
-
-internlm2_5-7b-chat-1m-turbomind:
-    long_context:
-        ruler_8k_naive_average: 88.53
-        ruler_32k_naive_average: 83.84
-        ruler_128k_naive_average: 70.94
-        NeedleBench-Overall-Score-8K_weighted_average: 91.89
-        NeedleBench-Overall-Score-32K_weighted_average: 91.42
-        NeedleBench-Overall-Score-128K_weighted_average: 88.57
-        longbench_naive_average: 46.44
-        longbench_zh_naive_average: 45.19
-        longbench_en_naive_average: 45.71
-        babilong_0k_naive_average: 79.3
-        babilong_4k_naive_average: 67
-        babilong_16k_naive_average: 52.7
-        babilong_32k_naive_average: 48.9
-        babilong_128k_naive_average: 40.8
-        babilong_256k_naive_average: 23.5
-        longbench_single-document-qa_score: 43.56
-        longbench_multi-document-qa_score: 46.24
-        longbench_summarization_score: 24.32
-        longbench_few-shot-learning_score: 51.67
-        longbench_synthetic-tasks_score: 66.83
-        longbench_code-completion_score: 45.99
-    base_long_context:
-        LongBench_2wikimqa_score: 32.81
-        Length32000Depth0_origin_en_32000_score: 100
-    chat_long_context:
-        babilong_qa1_256k_score: 25
-        LongBench_2wikimqa_score: 32.81
-        Length16000Depth0_2needle_en_128k_score: 100
-        ruler_cwe_128k_score: 0
-
-
-qwen2.5-7b-instruct-turbomind:
-    objective:
-        race-high_accuracy: 84.99
-        ARC-c_accuracy: 92.2
-        BoolQ_accuracy: 86.7
-        triviaqa_wiki_1shot_score: 53.06
-        nq_open_1shot_score: 17.51
-        mmmlu_lite_naive_average: 54.96
-        IFEval_Prompt-level-strict-accuracy: 71.53
-        drop_accuracy: 80.07
-        bbh_naive_average: 68.81
-        GPQA_diamond_accuracy: 34.34
-        hellaswag_accuracy: 85.42
-        TheoremQA_score: 18.38
-        musr_average_naive_average: 43.44
-        korbench_single_naive_average: 39.44
-        ARC_Prize_Public_Evaluation_accuracy: 0
-        gsm8k_accuracy: 92.57
-        GaokaoBench_weighted_average: 80.14
-        math_accuracy: 73.58
-        cmo_fib_accuracy: 25
-        aime2024_accuracy: 16.67
-        Mathbench_naive_average: 77.33
-        wikibench-wiki-single_choice_cncircular_perf_4: 34.9
-        cmmlu_naive_average: 75.97
-        mmlu_naive_average: 76.01
-        mmlu_pro_naive_average: 56.12
-        openai_humaneval_humaneval_pass@1: 83.54
-        sanitized_mbpp_score: 74.71
-        humanevalx_naive_average: 48.29
-        ds1000_naive_average: 18.66
-        lcb_code_generation_pass@1: 39.5
-        lcb_code_execution_pass@1: 42.38
-        lcb_test_output_pass@1: 50.68
-        bigcodebench_hard_instruct_pass@1: 16.22
-        bigcodebench_hard_complete_pass@1: 11.49
-        teval_naive_average: 79.72
-        SciCode_sub_accuracy: 10.76
-        qa_dingo_cn_score: 99.01
-        mmlu_accuracy: 76.01
-        mmlu-stem_accuracy: 77.59
-        mmlu-social-science_accuracy: 79.02
-        mmlu-humanities_accuracy: 72.07
-        mmlu-other_accuracy: 74.86
-        cmmlu_accuracy: 75.97
-        cmmlu-stem_accuracy: 73.09
-        cmmlu-social-science_accuracy: 75.95
-        cmmlu-humanities_accuracy: 76.53
-        cmmlu-other_accuracy: 78.79
-        cmmlu-china-specific_accuracy: 73.17
-        mmlu_pro_accuracy: 56.12
-        mmlu_pro_biology_accuracy: 71.41
-        mmlu_pro_business_accuracy: 67.68
-        mmlu_pro_chemistry_accuracy: 54.59
-        mmlu_pro_computer_science_accuracy: 58.29
-        mmlu_pro_economics_accuracy: 66.82
-        mmlu_pro_engineering_accuracy: 42.41
-        mmlu_pro_health_accuracy: 55.87
-        mmlu_pro_history_accuracy: 46.46
-        mmlu_pro_law_accuracy: 28.97
-        mmlu_pro_math_accuracy: 73.13
-        mmlu_pro_philosophy_accuracy: 44.89
-        mmlu_pro_physics_accuracy: 58.43
-        mmlu_pro_psychology_accuracy: 63.16
-        mmlu_pro_other_accuracy: 53.57
-        humanevalx-python_pass@1: 50
-        humanevalx-cpp_pass@1: 42.07
-        humanevalx-go_pass@1: 0
-        humanevalx-java_pass@1: 53.05
-        humanevalx-js_pass@1: 75
-        ds1000_Pandas_accuracy: 14.09
-        ds1000_Numpy_accuracy: 8.18
-        ds1000_Tensorflow_accuracy: 17.78
-        ds1000_Scipy_accuracy: 15.09
-        ds1000_Sklearn_accuracy: 10.43
-        ds1000_Pytorch_accuracy: 4.41
-        ds1000_Matplotlib_accuracy: 60.65
-        mmmlu_lite_accuracy: 54.96
-        openai_mmmlu_lite_AR-XY_accuracy: 42.32
-        openai_mmmlu_lite_BN-BD_accuracy: 42.25
-        openai_mmmlu_lite_DE-DE_accuracy: 59.93
-        openai_mmmlu_lite_ES-LA_accuracy: 66.53
-        openai_mmmlu_lite_FR-FR_accuracy: 66.88
-        openai_mmmlu_lite_HI-IN_accuracy: 49.26
-        openai_mmmlu_lite_ID-ID_accuracy: 61.26
-        openai_mmmlu_lite_IT-IT_accuracy: 65.47
-        openai_mmmlu_lite_JA-JP_accuracy: 61.54
-        openai_mmmlu_lite_KO-KR_accuracy: 60.28
-        openai_mmmlu_lite_PT-BR_accuracy: 55.51
-        openai_mmmlu_lite_SW-KE_accuracy: 36.42
-        openai_mmmlu_lite_YO-NG_accuracy: 32.14
-        openai_mmmlu_lite_ZH-CN_accuracy: 69.61
-        college_naive_average: 44.33
-        high_naive_average: 59
-        middle_naive_average: 78
-        primary_naive_average: 85.67
-        arithmetic_naive_average: 75.67
-        mathbench-a (average)_naive_average: 69.27
-        college_knowledge_naive_average: 83.86
-        high_knowledge_naive_average: 80.29
-        middle_knowledge_naive_average: 84.26
-        primary_knowledge_naive_average: 93.16
-        mathbench-t (average)_naive_average: 85.39
-
-
-
-
-internlm2_5-7b-chat-pytorch:
-    objective:
-        race-high_accuracy: 86.39
-        ARC-c_accuracy: 90.51
-        BoolQ_accuracy: 88.01
-        triviaqa_wiki_1shot_score: 64.77
-        nq_open_1shot_score: 22.71
-        mmmlu_lite_naive_average: 45.02
-        IFEval_Prompt-level-strict-accuracy: 56.56
-        drop_accuracy: 75.46
-        bbh_naive_average: 73.34
-        GPQA_diamond_accuracy: 32.83
-        hellaswag_accuracy: 94.81
-        TheoremQA_score: 23.88
-        musr_average_naive_average: 51.31
-        korbench_single_naive_average: 32
-        ARC_Prize_Public_Evaluation_accuracy: 0.01
-        gsm8k_accuracy: 86.96
-        GaokaoBench_weighted_average: 78.05
-        math_accuracy: 60.34
-        cmo_fib_accuracy: 12.98
-        aime2024_accuracy: 3.33
-        Mathbench_naive_average: 64.82
-        wikibench-wiki-single_choice_cncircular_perf_4: 31.7
-        cmmlu_naive_average: 74.24
-        mmlu_naive_average: 70.2
-        mmlu_pro_naive_average: 45.39
-        openai_humaneval_humaneval_pass@1: 70.12
-        sanitized_mbpp_score: 64.59
-        humanevalx_naive_average: 38.78
-        ds1000_naive_average: 14.19
-        lcb_code_generation_pass@1: 16.5
-        lcb_code_execution_pass@1: 33.82
-        lcb_test_output_pass@1: 22.62
-        bigcodebench_hard_instruct_pass@1: 6.08
-        bigcodebench_hard_complete_pass@1: 6.76
-        teval_naive_average: 79.73
-        SciCode_sub_accuracy: 3.47
-        qa_dingo_cn_score: 100
-        mmlu_accuracy: 70.2
-        mmlu-stem_accuracy: 67.73
-        mmlu-social-science_accuracy: 75.49
-        mmlu-humanities_accuracy: 68.56
-        mmlu-other_accuracy: 70.58
-        cmmlu_accuracy: 74.24
-        cmmlu-stem_accuracy: 66.7
-        cmmlu-social-science_accuracy: 75.88
-        cmmlu-humanities_accuracy: 77.56
-        cmmlu-other_accuracy: 77.52
-        cmmlu-china-specific_accuracy: 73.46
-        mmlu_pro_accuracy: 45.39
-        mmlu_pro_biology_accuracy: 65.83
-        mmlu_pro_business_accuracy: 51.96
-        mmlu_pro_chemistry_accuracy: 36.84
-        mmlu_pro_computer_science_accuracy: 48.29
-        mmlu_pro_economics_accuracy: 56.16
-        mmlu_pro_engineering_accuracy: 29.1
-        mmlu_pro_health_accuracy: 44.5
-        mmlu_pro_history_accuracy: 42.26
-        mmlu_pro_law_accuracy: 24.98
-        mmlu_pro_math_accuracy: 54.85
-        mmlu_pro_philosophy_accuracy: 39.28
-        mmlu_pro_physics_accuracy: 37.41
-        mmlu_pro_psychology_accuracy: 58.27
-        mmlu_pro_other_accuracy: 45.78
-        humanevalx-python_pass@1: 56.1
-        humanevalx-cpp_pass@1: 20.73
-        humanevalx-go_pass@1: 0
-        humanevalx-java_pass@1: 59.15
-        humanevalx-js_pass@1: 57.93
-        ds1000_Pandas_accuracy: 8.93
-        ds1000_Numpy_accuracy: 4.09
-        ds1000_Tensorflow_accuracy: 11.11
-        ds1000_Scipy_accuracy: 7.55
-        ds1000_Sklearn_accuracy: 7.83
-        ds1000_Pytorch_accuracy: 8.82
-        ds1000_Matplotlib_accuracy: 50.97
-        mmmlu_lite_accuracy: 45.02
-        openai_mmmlu_lite_AR-XY_accuracy: 18.6
-        openai_mmmlu_lite_BN-BD_accuracy: 27.58
-        openai_mmmlu_lite_DE-DE_accuracy: 51.23
-        openai_mmmlu_lite_ES-LA_accuracy: 56.63
-        openai_mmmlu_lite_FR-FR_accuracy: 58.11
-        openai_mmmlu_lite_HI-IN_accuracy: 33.82
-        openai_mmmlu_lite_ID-ID_accuracy: 50.39
-        openai_mmmlu_lite_IT-IT_accuracy: 50.39
-        openai_mmmlu_lite_JA-JP_accuracy: 50.95
-        openai_mmmlu_lite_KO-KR_accuracy: 45.05
-        openai_mmmlu_lite_PT-BR_accuracy: 57.89
-        openai_mmmlu_lite_SW-KE_accuracy: 32.14
-        openai_mmmlu_lite_YO-NG_accuracy: 32.14
-        openai_mmmlu_lite_ZH-CN_accuracy: 65.33
-        college_naive_average: 21
-        high_naive_average: 47
-        middle_naive_average: 59.67
-        primary_naive_average: 72.33
-        arithmetic_naive_average: 62
-        mathbench-a (average)_naive_average: 53.13
-        college_knowledge_naive_average: 68.99
-        high_knowledge_naive_average: 70.06
-        middle_knowledge_naive_average: 78.53
-        primary_knowledge_naive_average: 88.49
-        mathbench-t (average)_naive_average: 76.51
-
-
-qwen2.5-7b-instruct-pytorch:
-    objective:
-        race-high_accuracy: 85.16
-        ARC-c_accuracy: 90.85
-        BoolQ_accuracy: 86.61
-        triviaqa_wiki_1shot_score: 52.96
-        nq_open_1shot_score: 17.62
-        mmmlu_lite_naive_average: 54.7
-        IFEval_Prompt-level-strict-accuracy: 71.35
-        drop_accuracy: 80.23
-        bbh_naive_average: 68.88
-        GPQA_diamond_accuracy: 36.36
-        hellaswag_accuracy: 85.49
-        TheoremQA_score: 18.38
-        musr_average_naive_average: 43.3
-        korbench_single_naive_average: 39.44
-        ARC_Prize_Public_Evaluation_accuracy: 0
-        gsm8k_accuracy: 91.66
-        GaokaoBench_weighted_average: 80.02
-        math_accuracy: 73.74
-        cmo_fib_accuracy: 22.60
-        aime2024_accuracy: 13.33
-        Mathbench_naive_average: 77.08
-        wikibench-wiki-single_choice_cncircular_perf_4: 34
-        cmmlu_naive_average: 75.9
-        mmlu_naive_average: 76.27
-        mmlu_pro_naive_average: 56.14
-        openai_humaneval_humaneval_pass@1: 84.76
-        sanitized_mbpp_score: 74.71
-        humanevalx_naive_average: 48.17
-        ds1000_naive_average: 18.57
-        lcb_code_generation_pass@1: 38.75
-        lcb_code_execution_pass@1: 42.38
-        lcb_test_output_pass@1: 50.45
-        bigcodebench_hard_instruct_pass@1: 16.89
-        bigcodebench_hard_complete_pass@1: 12.16
-        teval_naive_average: 79.46
-        SciCode_sub_accuracy: 10.42
-        qa_dingo_cn_score: 100
-        mmlu_accuracy: 76.27
-        mmlu-stem_accuracy: 77.75
-        mmlu-social-science_accuracy: 78.65
-        mmlu-humanities_accuracy: 73.12
-        mmlu-other_accuracy: 75.05
-        cmmlu_accuracy: 75.9
-        cmmlu-stem_accuracy: 73.41
-        cmmlu-social-science_accuracy: 75.97
-        cmmlu-humanities_accuracy: 76.42
-        cmmlu-other_accuracy: 78.15
-        cmmlu-china-specific_accuracy: 73.27
-        mmlu_pro_accuracy: 56.14
-        mmlu_pro_biology_accuracy: 72.25
-        mmlu_pro_business_accuracy: 66.16
-        mmlu_pro_chemistry_accuracy: 55.65
-        mmlu_pro_computer_science_accuracy: 60.24
-        mmlu_pro_economics_accuracy: 66.82
-        mmlu_pro_engineering_accuracy: 41.38
-        mmlu_pro_health_accuracy: 54.89
-        mmlu_pro_history_accuracy: 46.46
-        mmlu_pro_law_accuracy: 29.06
-        mmlu_pro_math_accuracy: 73.58
-        mmlu_pro_philosophy_accuracy: 44.89
-        mmlu_pro_physics_accuracy: 60.05
-        mmlu_pro_psychology_accuracy: 61.9
-        mmlu_pro_other_accuracy: 52.6
-        humanevalx-python_pass@1: 51.83
-        humanevalx-cpp_pass@1: 42.68
-        humanevalx-go_pass@1: 0
-        humanevalx-java_pass@1: 73.78
-        humanevalx-js_pass@1: 72.56
-        ds1000_Pandas_accuracy: 14.09
-        ds1000_Numpy_accuracy: 8.64
-        ds1000_Tensorflow_accuracy: 17.78
-        ds1000_Scipy_accuracy: 15.09
-        ds1000_Sklearn_accuracy: 8.7
-        ds1000_Pytorch_accuracy: 4.41
-        ds1000_Matplotlib_accuracy: 61.29
-        mmmlu_lite_accuracy: 54.7
-        openai_mmmlu_lite_AR-XY_accuracy: 42.32
-        openai_mmmlu_lite_BN-BD_accuracy: 42.18
-        openai_mmmlu_lite_DE-DE_accuracy: 60
-        openai_mmmlu_lite_ES-LA_accuracy: 66.18
-        openai_mmmlu_lite_FR-FR_accuracy: 66.88
-        openai_mmmlu_lite_HI-IN_accuracy: 48.63
-        openai_mmmlu_lite_ID-ID_accuracy: 61.26
-        openai_mmmlu_lite_IT-IT_accuracy: 65.26
-        openai_mmmlu_lite_JA-JP_accuracy: 60.7
-        openai_mmmlu_lite_KO-KR_accuracy: 60.63
-        openai_mmmlu_lite_PT-BR_accuracy: 54.46
-        openai_mmmlu_lite_SW-KE_accuracy: 36
-        openai_mmmlu_lite_YO-NG_accuracy: 31.86
-        openai_mmmlu_lite_ZH-CN_accuracy: 69.4
-        college_naive_average: 48.33
-        high_naive_average: 59.33
-        middle_naive_average: 76.67
-        primary_naive_average: 86.67
-        arithmetic_naive_average: 74.33
-        mathbench-a (average)_naive_average: 69.07
-        college_knowledge_naive_average: 83.54
-        high_knowledge_naive_average: 80.82
-        middle_knowledge_naive_average: 83.79
-        primary_knowledge_naive_average: 92.22
-        mathbench-t (average)_naive_average: 85.1
-
-
-internlm3-8b-instruct-turbomind:
-    objective:
-        race-high_accuracy: 89.22
-        ARC-c_accuracy: 92.54
-        BoolQ_accuracy: 86.45
-        triviaqa_wiki_1shot_score: 60.72
-        nq_open_1shot_score: 20.25
-        mmmlu_lite_naive_average: 41.82
-        IFEval_Prompt-level-strict-accuracy: 77.45
-        drop_accuracy: 83.27
-        bbh_naive_average: 55.22
-        GPQA_diamond_accuracy: 37.88
-        hellaswag_accuracy: 91.28
-        TheoremQA_score: 20.12
-        musr_average_naive_average: 36.86
-        korbench_single_naive_average: 41.2
-        ARC_Prize_Public_Evaluation_accuracy: 0.06
-        gsm8k_accuracy: 91.28
-        GaokaoBench_weighted_average: 86.59
-        math_accuracy: 76.96
-        cmo_fib_accuracy: 38.46
-        aime2024_accuracy: 13.33
-        Mathbench_naive_average: 78.96
-        wikibench-wiki-single_choice_cncircular_perf_4: 37.45
-        cmmlu_naive_average: 83.33
-        mmlu_naive_average: 76.21
-        mmlu_pro_naive_average: 57.96
-        openai_humaneval_humaneval_pass@1: 81.71
-        sanitized_mbpp_score: 69.65
-        humanevalx_naive_average: 40.73
-        ds1000_naive_average: 27.23
-        lcb_code_generation_pass@1: 34.75
-        lcb_code_execution_pass@1: 49.9
-        lcb_test_output_pass@1: 48.19
-        bigcodebench_hard_instruct_pass@1: 13.51
-        bigcodebench_hard_complete_pass@1: 15.54
-        teval_naive_average: 82.86
-        SciCode_sub_accuracy: 11.11
-        qa_dingo_cn_score: 100
-        mmlu_accuracy: 76.21
-        mmlu-stem_accuracy: 77.7
-        mmlu-social-science_accuracy: 80.98
-        mmlu-humanities_accuracy: 70.83
-        mmlu-other_accuracy: 75.01
-        cmmlu_accuracy: 83.33
-        cmmlu-stem_accuracy: 79.66
-        cmmlu-social-science_accuracy: 83.39
-        cmmlu-humanities_accuracy: 84.73
-        cmmlu-other_accuracy: 86.2
-        cmmlu-china-specific_accuracy: 81.77
-        mmlu_pro_accuracy: 57.96
-        mmlu_pro_biology_accuracy: 75.45
-        mmlu_pro_business_accuracy: 64.64
-        mmlu_pro_chemistry_accuracy: 59.81
-        mmlu_pro_computer_science_accuracy: 60.24
-        mmlu_pro_economics_accuracy: 68.6
-        mmlu_pro_engineering_accuracy: 44.79
-        mmlu_pro_health_accuracy: 58.31
-        mmlu_pro_history_accuracy: 49.87
-        mmlu_pro_law_accuracy: 32.43
-        mmlu_pro_math_accuracy: 70.17
-        mmlu_pro_philosophy_accuracy: 46.89
-        mmlu_pro_physics_accuracy: 59.58
-        mmlu_pro_psychology_accuracy: 66.29
-        mmlu_pro_other_accuracy: 54.33
-        humanevalx-python_pass@1: 43.9
-        humanevalx-cpp_pass@1: 20.12
-        humanevalx-go_pass@1: 0
-        humanevalx-java_pass@1: 40.85
-        humanevalx-js_pass@1: 65.24
-        ds1000_Pandas_accuracy: 16.49
-        ds1000_Numpy_accuracy: 34.09
-        ds1000_Tensorflow_accuracy: 26.67
-        ds1000_Scipy_accuracy: 17.92
-        ds1000_Sklearn_accuracy: 20.87
-        ds1000_Pytorch_accuracy: 19.12
-        ds1000_Matplotlib_accuracy: 55.48
-        mmmlu_lite_accuracy: 41.82
-        openai_mmmlu_lite_AR-XY_accuracy: 32.56
-        openai_mmmlu_lite_BN-BD_accuracy: 4.56
-        openai_mmmlu_lite_DE-DE_accuracy: 24.91
-        openai_mmmlu_lite_ES-LA_accuracy: 51.09
-        openai_mmmlu_lite_FR-FR_accuracy: 61.68
-        openai_mmmlu_lite_HI-IN_accuracy: 24.98
-        openai_mmmlu_lite_ID-ID_accuracy: 44.56
-        openai_mmmlu_lite_IT-IT_accuracy: 52.35
-        openai_mmmlu_lite_JA-JP_accuracy: 51.02
-        openai_mmmlu_lite_KO-KR_accuracy: 47.93
-        openai_mmmlu_lite_PT-BR_accuracy: 53.89
-        openai_mmmlu_lite_SW-KE_accuracy: 33.47
-        openai_mmmlu_lite_YO-NG_accuracy: 33.47
-        openai_mmmlu_lite_ZH-CN_accuracy: 69.05
-        college_naive_average: 45.67
-        high_naive_average: 64.67
-        middle_naive_average: 82.33
-        primary_naive_average: 90.33
-        arithmetic_naive_average: 74
-        mathbench-a (average)_naive_average: 71.4
-        college_knowledge_naive_average: 85.28
-        high_knowledge_naive_average: 79.43
-        middle_knowledge_naive_average: 87.9
-        primary_knowledge_naive_average: 93.42
-        mathbench-t (average)_naive_average: 86.51
-
-
-internlm3-8b-instruct-pytorch:
-    objective:
-        race-high_accuracy: 89.02
-        ARC-c_accuracy: 93.56
-        BoolQ_accuracy: 86.67
-        triviaqa_wiki_1shot_score: 60.54
-        nq_open_1shot_score: 20.3
-        mmmlu_lite_naive_average: 42.6
-        IFEval_Prompt-level-strict-accuracy: 79.11
-        drop_accuracy: 83.32
-        bbh_naive_average: 54.76
-        GPQA_diamond_accuracy: 33.84
-        hellaswag_accuracy: 91.31
-        TheoremQA_score: 18
-        musr_average_naive_average: 36.62
-        korbench_single_naive_average: 41.84
-        ARC_Prize_Public_Evaluation_accuracy: 0.06
-        gsm8k_accuracy: 90.67
-        GaokaoBench_weighted_average: 86.27
-        math_accuracy: 76.68
-        cmo_fib_accuracy: 33.65
-        aime2024_accuracy: 10
-        Mathbench_naive_average: 78.92
-        wikibench-wiki-single_choice_cncircular_perf_4: 37.35
-        cmmlu_naive_average: 83.11
-        mmlu_naive_average: 76.23
-        mmlu_pro_naive_average: 58.16
-        openai_humaneval_humaneval_pass@1: 82.32
-        sanitized_mbpp_score: 70.04
-        humanevalx_naive_average: 25.49
-        ds1000_naive_average: 27.84
-        lcb_code_generation_pass@1: 34.5
-        lcb_code_execution_pass@1: 48.02
-        lcb_test_output_pass@1: 47.74
-        bigcodebench_hard_instruct_pass@1: 12.84
-        bigcodebench_hard_complete_pass@1: 15.54
-        teval_naive_average: 82.86
-        SciCode_sub_accuracy: 9.38
-        qa_dingo_cn_score: 100
-        mmlu_accuracy: 76.23
-        mmlu-stem_accuracy: 78.08
-        mmlu-social-science_accuracy: 80.31
-        mmlu-humanities_accuracy: 71.38
-        mmlu-other_accuracy: 74.63
-        cmmlu_accuracy: 83.11
-        cmmlu-stem_accuracy: 79.42
-        cmmlu-social-science_accuracy: 83.34
-        cmmlu-humanities_accuracy: 83.95
-        cmmlu-other_accuracy: 86.22
-        cmmlu-china-specific_accuracy: 81.5
-        mmlu_pro_accuracy: 58.16
-        mmlu_pro_biology_accuracy: 74.62
-        mmlu_pro_business_accuracy: 65.02
-        mmlu_pro_chemistry_accuracy: 60.69
-        mmlu_pro_computer_science_accuracy: 61.46
-        mmlu_pro_economics_accuracy: 68.25
-        mmlu_pro_engineering_accuracy: 45.3
-        mmlu_pro_health_accuracy: 60.15
-        mmlu_pro_history_accuracy: 50.66
-        mmlu_pro_law_accuracy: 31.7
-        mmlu_pro_math_accuracy: 70.32
-        mmlu_pro_philosophy_accuracy: 47.7
-        mmlu_pro_physics_accuracy: 59.51
-        mmlu_pro_psychology_accuracy: 65.41
-        mmlu_pro_other_accuracy: 53.46
-        humanevalx-python_pass@1: 42.68
-        humanevalx-cpp_pass@1: 19.51
-        humanevalx-go_pass@1: 0
-        humanevalx-java_pass@1: 0.00
-        humanevalx-js_pass@1: 64.02
-        ds1000_Pandas_accuracy: 14.09
-        ds1000_Numpy_accuracy: 35
-        ds1000_Tensorflow_accuracy: 24.44
-        ds1000_Scipy_accuracy: 20.75
-        ds1000_Sklearn_accuracy: 21.74
-        ds1000_Pytorch_accuracy: 22.06
-        ds1000_Matplotlib_accuracy: 56.77
-        mmmlu_lite_accuracy: 42.6
-        openai_mmmlu_lite_AR-XY_accuracy: 32.84
-        openai_mmmlu_lite_BN-BD_accuracy: 10.46
-        openai_mmmlu_lite_DE-DE_accuracy: 24.56
-        openai_mmmlu_lite_ES-LA_accuracy: 50.95
-        openai_mmmlu_lite_FR-FR_accuracy: 61.05
-        openai_mmmlu_lite_HI-IN_accuracy: 30.6
-        openai_mmmlu_lite_ID-ID_accuracy: 45.89
-        openai_mmmlu_lite_IT-IT_accuracy: 51.79
-        openai_mmmlu_lite_JA-JP_accuracy: 51.65
-        openai_mmmlu_lite_KO-KR_accuracy: 48.77
-        openai_mmmlu_lite_PT-BR_accuracy: 52.7
-        openai_mmmlu_lite_SW-KE_accuracy: 32.91
-        openai_mmmlu_lite_YO-NG_accuracy: 32.84
-        openai_mmmlu_lite_ZH-CN_accuracy: 69.33
-        college_naive_average: 47
-        high_naive_average: 66.67
-        middle_naive_average: 81.67
-        primary_naive_average: 89.33
-        arithmetic_naive_average: 73.67
-        mathbench-a (average)_naive_average: 71.67
-        college_knowledge_naive_average: 82.91
-        high_knowledge_naive_average: 79.86
-        middle_knowledge_naive_average: 88.92
-        primary_knowledge_naive_average: 92.96
-        mathbench-t (average)_naive_average: 86.16
-
-internlm3-8b-instruct-hf_fullbench:
-    objective_v6: 
-        aime2024_accuracy: 12.5
-        aime2024_f1: 0.12
-        aime2024_accuracy_given_attempted: 12.5
+        sanitized_mbpp_score: 6.25
+        lcb_code_generation_pass@1: 6.25
+        lcb_code_execution_pass@1: 50
+        lcb_test_output_pass@1: 0
+        teval_naive_average: 69.16
+        bbh-logical_deduction_seven_objects_score: 12.5
+        bbh-multistep_arithmetic_two_score: 0
+        mmlu-other_accuracy: 77.88
+        cmmlu-china-specific_accuracy: 74.17
+        mmlu_pro_math_accuracy: 81.25
+        openai_mmmlu_lite_AR-XY_accuracy: 50
+        college_naive_average: 37.5
+        college_knowledge_naive_average: 50
+    objective_v6:
+        aime2024_accuracy: 87.5
+        aime2024_f1: 0.88
+        aime2024_accuracy_given_attempted: 87.5
         aime2024_attempted_ratio: 100
-        aime2024_correct_count: 2
-        aime2024_incorrect_count: 14
+        aime2024_correct_count: 14
+        aime2024_incorrect_count: 2
         aime2024_not_attempted_count: 0
-        aime2025_accuracy: 6.25
-        aime2025_f1: 0.06
-        aime2025_accuracy_given_attempted: 6.25
+        aime2025_accuracy: 56.25
+        aime2025_f1: 0.56
+        aime2025_accuracy_given_attempted: 56.25
         aime2025_attempted_ratio: 100
-        aime2025_correct_count: 1
-        aime2025_incorrect_count: 15
+        aime2025_correct_count: 9
+        aime2025_incorrect_count: 7
         aime2025_not_attempted_count: 0
-        bbh-temporal_sequences_score: 87.5
-        bbh-temporal_sequences_score_given_attempted: 87.5
+        bbh-temporal_sequences_score: 75
+        bbh-temporal_sequences_score_given_attempted: 75
         bbh-temporal_sequences_attempted_ratio: 100
-        bbh-temporal_sequences_correct_count: 14
-        bbh-temporal_sequences_incorrect_count: 2
+        bbh-temporal_sequences_correct_count: 12
+        bbh-temporal_sequences_incorrect_count: 4
         bbh-temporal_sequences_not_attempted_count: 0
         cmo_fib_accuracy: 31.25
-        drop_accuracy: 100
-        drop_f1: 1
-        drop_accuracy_given_attempted: 100
+        drop_accuracy: 56.25
+        drop_f1: 0.56
+        drop_accuracy_given_attempted: 56.25
         drop_attempted_ratio: 100
-        drop_correct_count: 16
-        drop_incorrect_count: 0
+        drop_correct_count: 9
+        drop_incorrect_count: 7
         drop_not_attempted_count: 0
-        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 100
         GPQA_diamond_accuracy: 56.25
         GPQA_diamond_f1: 0.56
         GPQA_diamond_accuracy_given_attempted: 56.25
@@ -1031,486 +91,213 @@ internlm3-8b-instruct-hf_fullbench:
         GPQA_diamond_incorrect_count: 7
         GPQA_diamond_not_attempted_count: 0
         gsm8k_accuracy: 93.75
-        hellaswag_accuracy: 68.75
-        hellaswag_f1: 0.69
-        hellaswag_accuracy_given_attempted: 68.75
+        hellaswag_accuracy: 100
+        hellaswag_f1: 1
+        hellaswag_accuracy_given_attempted: 100
         hellaswag_attempted_ratio: 100
-        hellaswag_correct_count: 11
-        hellaswag_incorrect_count: 5
+        hellaswag_correct_count: 16
+        hellaswag_incorrect_count: 0
         hellaswag_not_attempted_count: 0
-        korbench_cipher_accuracy: 37.5
-        korbench_cipher_f1: 0.38
-        korbench_cipher_accuracy_given_attempted: 37.5
+        korbench_cipher_accuracy: 93.75
+        korbench_cipher_f1: 0.94
+        korbench_cipher_accuracy_given_attempted: 93.75
         korbench_cipher_attempted_ratio: 100
-        korbench_cipher_correct_count: 6
-        korbench_cipher_incorrect_count: 10
+        korbench_cipher_correct_count: 15
+        korbench_cipher_incorrect_count: 1
         korbench_cipher_not_attempted_count: 0
-        math_prm800k_500-llmjudge_accuracy: 56.25
-        math_prm800k_500-llmjudge_f1: 0.56
-        math_prm800k_500-llmjudge_accuracy_given_attempted: 56.25
+        math_prm800k_500-llmjudge_accuracy: 93.75
+        math_prm800k_500-llmjudge_f1: 0.94
+        math_prm800k_500-llmjudge_accuracy_given_attempted: 93.75
         math_prm800k_500-llmjudge_attempted_ratio: 100
-        math_prm800k_500-llmjudge_correct_count: 9
-        math_prm800k_500-llmjudge_incorrect_count: 7
+        math_prm800k_500-llmjudge_correct_count: 15
+        math_prm800k_500-llmjudge_incorrect_count: 1
         math_prm800k_500-llmjudge_not_attempted_count: 0
-        mathbench-college-single_choice_cn_acc_4: 75
+        mathbench-college-single_choice_cn_acc_4: 87.5
         mathbench-college-single_choice_cn_acc_1: 75
         mathbench-college-single_choice_cn_more_1_0: 100
         mathbench-college-single_choice_cn_more_1_1: 75
         mathbench-college-single_choice_cn_more_4_0: 100
         mathbench-college-single_choice_cn_more_4_1: 100
-        mathbench-college-single_choice_cn_more_4_2: 75
-        mathbench-college-single_choice_cn_more_4_3: 75
+        mathbench-college-single_choice_cn_more_4_2: 100
+        mathbench-college-single_choice_cn_more_4_3: 100
         mathbench-college-single_choice_cn_more_4_4: 50
         mathbench-college-single_choice_cn_perf_1: 75
         mathbench-college-single_choice_cn_perf_4: 50
-        mathbench-college-single_choice_cn_vote_4: 75
+        mathbench-college-single_choice_cn_vote_4: 100
         mathbench-college-single_choice_cn_vote_1: 75
-        mathbench-college-single_choice_cn_prior_A: 18.75
-        mathbench-college-single_choice_cn_prior_B: 18.75
-        mathbench-college-single_choice_cn_prior_C: 31.25
-        mathbench-college-single_choice_cn_prior_D: 31.25
-        mathbench-college-single_choice_cn_prior_-: 0
-        musr_murder_mysteries_accuracy: 100
-        musr_murder_mysteries_f1: 1
-        musr_murder_mysteries_accuracy_given_attempted: 100
+        mathbench-college-single_choice_cn_prior_A: 31.25
+        mathbench-college-single_choice_cn_prior_B: 12.5
+        mathbench-college-single_choice_cn_prior_C: 25
+        mathbench-college-single_choice_cn_prior_D: 25
+        mathbench-college-single_choice_cn_prior_-: 6.25
+        musr_murder_mysteries_accuracy: 68.75
+        musr_murder_mysteries_f1: 0.69
+        musr_murder_mysteries_accuracy_given_attempted: 68.75
         musr_murder_mysteries_attempted_ratio: 100
-        musr_murder_mysteries_correct_count: 16
-        musr_murder_mysteries_incorrect_count: 0
+        musr_murder_mysteries_correct_count: 11
+        musr_murder_mysteries_incorrect_count: 5
         musr_murder_mysteries_not_attempted_count: 0
-        supergpqa_accuracy: 37.5
-        supergpqa_total_correct: 6
+        supergpqa_accuracy: 68.75
+        supergpqa_total_correct: 11
         supergpqa_total_count: 16
-        supergpqa_SuperGPQA-Engineering: 40
+        supergpqa_SuperGPQA-Engineering: 80
         supergpqa_SuperGPQA-Philosophy: 0
-        supergpqa_SuperGPQA-Medicine: 50
+        supergpqa_SuperGPQA-Medicine: 100
         supergpqa_SuperGPQA-Economics: 50
-        supergpqa_SuperGPQA-Science: 33.33
+        supergpqa_SuperGPQA-Science: 66.67
         supergpqa_SuperGPQA-Engineering-Electronic Science and Technology: 100
         supergpqa_SuperGPQA-Philosophy-Philosophy: 0
-        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine: 0
-        supergpqa_SuperGPQA-Economics-Applied Economics: 100
-        supergpqa_SuperGPQA-Science-Mathematics: 20
-        supergpqa_SuperGPQA-Science-Physics: 100
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine: 100
+        supergpqa_SuperGPQA-Economics-Applied Economics: 0
+        supergpqa_SuperGPQA-Science-Mathematics: 80
+        supergpqa_SuperGPQA-Science-Physics: 0
         supergpqa_SuperGPQA-Medicine-Clinical Medicine: 100
-        supergpqa_SuperGPQA-Engineering-Computer Science and Technology: 0
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology: 100
         supergpqa_SuperGPQA-Engineering-Information and Communication Engineering: 50
-        supergpqa_SuperGPQA-Engineering-Control Science and Engineering: 0
-        supergpqa_SuperGPQA-Economics-Theoretical Economics: 0
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering: 100
+        supergpqa_SuperGPQA-Economics-Theoretical Economics: 100
         supergpqa_SuperGPQA-Engineering-Electronic Science and Technology-Circuits and Systems: 100
         supergpqa_SuperGPQA-Philosophy-Philosophy-Philosophical Aesthetics: 0
-        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine-Traditional Chinese Medicine Theory: 0
-        supergpqa_SuperGPQA-Economics-Applied Economics-Finance: 100
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine-Traditional Chinese Medicine Theory: 100
+        supergpqa_SuperGPQA-Economics-Applied Economics-Finance: 0
         supergpqa_SuperGPQA-Science-Mathematics-Combinatorial Mathematics: 100
-        supergpqa_SuperGPQA-Science-Physics-Particle and Nuclear Physics: 100
+        supergpqa_SuperGPQA-Science-Physics-Particle and Nuclear Physics: 0
         supergpqa_SuperGPQA-Medicine-Clinical Medicine-Internal Medicine: 100
-        supergpqa_SuperGPQA-Engineering-Computer Science and Technology-Computer Architecture: 0
-        supergpqa_SuperGPQA-Science-Mathematics-Ordinary Differential Equations: 0
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology-Computer Architecture: 100
+        supergpqa_SuperGPQA-Science-Mathematics-Ordinary Differential Equations: 100
         supergpqa_SuperGPQA-Science-Mathematics-Mathematical Analysis: 0
         supergpqa_SuperGPQA-Engineering-Information and Communication Engineering-Signal and Information Processing: 50
-        supergpqa_SuperGPQA-Science-Mathematics-Advanced Algebra: 0
-        supergpqa_SuperGPQA-Engineering-Control Science and Engineering-Control Theory and Control Engineering: 0
-        supergpqa_SuperGPQA-Economics-Theoretical Economics-Political Economy: 0
-        triviaqa_wiki_1shot_score: 43.75
-        qa_dingo_cn_score: 100
-        qa_dingo_cn_num_good: 16
-        qa_dingo_cn_num_bad: 0
-        qa_dingo_cn_total: 16
-    objective_v7: 
-        aime2024_accuracy: 12.5
-        aime2025_accuracy: 6.25
-        bbeh_boolean_expressions_accuracy: 37.5
-        bbeh_boolean_expressions_f1: 0.38
-        bbeh_boolean_expressions_accuracy_given_attempted: 37.5
+        supergpqa_SuperGPQA-Science-Mathematics-Advanced Algebra: 100
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering-Control Theory and Control Engineering: 100
+        supergpqa_SuperGPQA-Economics-Theoretical Economics-Political Economy: 100
+        triviaqa_wiki_1shot_score: 50
+        ARC_Prize_Public_Evaluation_accuracy: 0.06
+    objective_v7:
+        aime2024_accuracy: 50
+        aime2025_accuracy: 25
+        bbeh_boolean_expressions_accuracy: 75
+        bbeh_boolean_expressions_f1: 0.75
+        bbeh_boolean_expressions_accuracy_given_attempted: 75
         bbeh_boolean_expressions_attempted_ratio: 100
-        bbeh_boolean_expressions_correct_count: 6
-        bbeh_boolean_expressions_incorrect_count: 10
+        bbeh_boolean_expressions_correct_count: 12
+        bbeh_boolean_expressions_incorrect_count: 4
         bbeh_boolean_expressions_not_attempted_count: 0
-        Chem_exam-competition_final_score: 55.95
-        Chem_exam-gaokao_final_score: 57.29
-        ChemBench_Name_Conversion_accuracy: 68.75
-        ChemBench_Name_Conversion_f1: 0.69
-        ChemBench_Name_Conversion_accuracy_given_attempted: 68.75
+        Chem_exam-competition_final_score: 40.39
+        Chem_exam-gaokao_final_score: 78.12
+        ChemBench_Name_Conversion_accuracy: 93.75
+        ChemBench_Name_Conversion_f1: 0.94
+        ChemBench_Name_Conversion_accuracy_given_attempted: 93.75
         ChemBench_Name_Conversion_attempted_ratio: 100
-        ChemBench_Name_Conversion_correct_count: 11
-        ChemBench_Name_Conversion_incorrect_count: 5
+        ChemBench_Name_Conversion_correct_count: 15
+        ChemBench_Name_Conversion_incorrect_count: 1
         ChemBench_Name_Conversion_not_attempted_count: 0
-        ClimaQA_Gold_mcq_accuracy: 81.25
-        ClimaQA_Gold_mcq_f1: 0.81
-        ClimaQA_Gold_mcq_accuracy_given_attempted: 81.25
+        ClimaQA_Gold_mcq_accuracy: 87.5
+        ClimaQA_Gold_mcq_f1: 0.88
+        ClimaQA_Gold_mcq_accuracy_given_attempted: 87.5
         ClimaQA_Gold_mcq_attempted_ratio: 100
-        ClimaQA_Gold_mcq_correct_count: 13
-        ClimaQA_Gold_mcq_incorrect_count: 3
+        ClimaQA_Gold_mcq_correct_count: 14
+        ClimaQA_Gold_mcq_incorrect_count: 2
         ClimaQA_Gold_mcq_not_attempted_count: 0
-        cmmlu-agronomy_accuracy: 81.25
-        cmmlu-agronomy_f1: 0.81
-        cmmlu-agronomy_accuracy_given_attempted: 81.25
+        cmmlu-agronomy_accuracy: 87.5
+        cmmlu-agronomy_f1: 0.88
+        cmmlu-agronomy_accuracy_given_attempted: 87.5
         cmmlu-agronomy_attempted_ratio: 100
-        cmmlu-agronomy_correct_count: 13
-        cmmlu-agronomy_incorrect_count: 3
+        cmmlu-agronomy_correct_count: 14
+        cmmlu-agronomy_incorrect_count: 2
         cmmlu-agronomy_not_attempted_count: 0
-        earth_silver_mcq_accuracy: 62.5
-        earth_silver_mcq_f1: 0.62
-        earth_silver_mcq_accuracy_given_attempted: 62.5
+        earth_silver_mcq_accuracy: 75
+        earth_silver_mcq_f1: 0.75
+        earth_silver_mcq_accuracy_given_attempted: 75
         earth_silver_mcq_attempted_ratio: 100
-        earth_silver_mcq_correct_count: 10
-        earth_silver_mcq_incorrect_count: 6
+        earth_silver_mcq_correct_count: 12
+        earth_silver_mcq_incorrect_count: 4
         earth_silver_mcq_not_attempted_count: 0
-        GPQA_diamond_accuracy: 68.75
-        hle_llmjudge_accuracy: 25
-        hle_llmjudge_f1: 0.25
-        hle_llmjudge_accuracy_given_attempted: 25
+        GPQA_diamond_accuracy: 56.25
+        hle_llmjudge_accuracy: 56.25
+        hle_llmjudge_f1: 0.56
+        hle_llmjudge_accuracy_given_attempted: 56.25
         hle_llmjudge_attempted_ratio: 100
-        hle_llmjudge_correct_count: 4
-        hle_llmjudge_incorrect_count: 12
+        hle_llmjudge_correct_count: 9
+        hle_llmjudge_incorrect_count: 7
         hle_llmjudge_not_attempted_count: 0
-        IFEval_Prompt-level-strict-accuracy: 68.75
-        IFEval_Inst-level-strict-accuracy: 79.17
-        IFEval_Prompt-level-loose-accuracy: 75
-        IFEval_Inst-level-loose-accuracy: 83.33
-        kcle_accuracy: 18.75
-        kcle_f1: 0.19
-        kcle_accuracy_given_attempted: 18.75
+        IFEval_Prompt-level-strict-accuracy: 87.5
+        IFEval_Inst-level-strict-accuracy: 91.67
+        IFEval_Prompt-level-loose-accuracy: 87.5
+        IFEval_Inst-level-loose-accuracy: 91.67
+        kcle_accuracy: 62.5
+        kcle_f1: 0.62
+        kcle_accuracy_given_attempted: 62.5
         kcle_attempted_ratio: 100
-        kcle_correct_count: 3
-        kcle_incorrect_count: 13
+        kcle_correct_count: 10
+        kcle_incorrect_count: 6
         kcle_not_attempted_count: 0
-        korbench_cipher_accuracy: 62.5
-        livemathbench_hard_custom_hard_cn_accuracy: 25
-        matbench_steels_mae: 1213.07
-        math_prm800k_500_accuracy: 62.5
-        sanitized_mbpp_score: 75
-        sanitized_mbpp_pass: 12
+        korbench_cipher_accuracy: 87.5
+        livemathbench_hard_custom_hard_cn_accuracy: 18.75
+        matbench_steels_mae: 635.88
+        math_prm800k_500_accuracy: 93.75
+        sanitized_mbpp_score: 6.25
+        sanitized_mbpp_pass: 1
         sanitized_mbpp_timeout: 0
-        sanitized_mbpp_failed: 0
-        sanitized_mbpp_wrong_answer: 4
-        medxpertqa_accuracy: 56.25
-        medxpertqa_total_correct: 9
+        sanitized_mbpp_failed: 15
+        sanitized_mbpp_wrong_answer: 0
+        medxpertqa_accuracy: 50
+        medxpertqa_total_correct: 8
         medxpertqa_total_count: 16
         medxpertqa_MedXpertQA-Basic Science: 50
         medxpertqa_MedXpertQA-Diagnosis: 37.5
-        medxpertqa_MedXpertQA-Treatment: 100
+        medxpertqa_MedXpertQA-Treatment: 75
         medxpertqa_MedXpertQA-Skeletal: 33.33
         medxpertqa_MedXpertQA-Muscular: 100
-        medxpertqa_MedXpertQA-Respiratory: 33.33
-        medxpertqa_MedXpertQA-Endocrine: 100
-        medxpertqa_MedXpertQA-Cardiovascular: 0
-        medxpertqa_MedXpertQA-Lymphatic: 100
-        medxpertqa_MedXpertQA-Nervous: 100
-        medxpertqa_MedXpertQA-Reproductive: 0
-        medxpertqa_MedXpertQA-Reasoning: 57.14
-        medxpertqa_MedXpertQA-Understanding: 50
-        lukaemon_mmlu_college_biology_accuracy: 100
-        lukaemon_mmlu_college_biology_f1: 1
-        lukaemon_mmlu_college_biology_accuracy_given_attempted: 100
-        lukaemon_mmlu_college_biology_attempted_ratio: 100
-        lukaemon_mmlu_college_biology_correct_count: 16
-        lukaemon_mmlu_college_biology_incorrect_count: 0
-        lukaemon_mmlu_college_biology_not_attempted_count: 0
-        mmlu_pro_math_accuracy: 62.5
-        mmlu_pro_math_f1: 0.62
-        mmlu_pro_math_accuracy_given_attempted: 62.5
-        mmlu_pro_math_attempted_ratio: 100
-        mmlu_pro_math_correct_count: 10
-        mmlu_pro_math_incorrect_count: 6
-        mmlu_pro_math_not_attempted_count: 0
-        olymmath_llmjudge_en-hard_accuracy: 12.5
-        olymmath_llmjudge_en-hard_f1: 0.12
-        olymmath_llmjudge_en-hard_accuracy_given_attempted: 12.5
-        olymmath_llmjudge_en-hard_attempted_ratio: 100
-        olymmath_llmjudge_en-hard_correct_count: 2
-        olymmath_llmjudge_en-hard_incorrect_count: 14
-        olymmath_llmjudge_en-hard_not_attempted_count: 0
-        OlympiadBench_OE_TO_maths_en_COMP_accuracy: 25
-        OlympiadBench_OE_TO_maths_en_COMP_f1: 0.25
-        OlympiadBench_OE_TO_maths_en_COMP_accuracy_given_attempted: 25
-        OlympiadBench_OE_TO_maths_en_COMP_attempted_ratio: 100
-        OlympiadBench_OE_TO_maths_en_COMP_correct_count: 4
-        OlympiadBench_OE_TO_maths_en_COMP_incorrect_count: 12
-        OlympiadBench_OE_TO_maths_en_COMP_not_attempted_count: 0
-        phybench-eed_accuracy: 3.67
-        PHYSICS_atomic_dataset_textonly_accuracy: 18.75
-        PHYSICS_atomic_dataset_textonly_f1: 0.19
-        PHYSICS_atomic_dataset_textonly_accuracy_given_attempted: 18.75
-        PHYSICS_atomic_dataset_textonly_attempted_ratio: 100
-        PHYSICS_atomic_dataset_textonly_correct_count: 3
-        PHYSICS_atomic_dataset_textonly_incorrect_count: 13
-        PHYSICS_atomic_dataset_textonly_not_attempted_count: 0
-        ProteinLMBench_accuracy: 75
-        ProteinLMBench_f1: 0.75
-        ProteinLMBench_accuracy_given_attempted: 75
-        ProteinLMBench_attempted_ratio: 100
-        ProteinLMBench_correct_count: 12
-        ProteinLMBench_incorrect_count: 4
-        ProteinLMBench_not_attempted_count: 0
-        R-Bench_en_accuracy: 50
-        R-Bench_en_f1: 0.5
-        R-Bench_en_accuracy_given_attempted: 50
-        R-Bench_en_attempted_ratio: 100
-        R-Bench_en_correct_count: 8
-        R-Bench_en_incorrect_count: 8
-        R-Bench_en_not_attempted_count: 0
-        NC-I2F-0shot-instruct_score: 6.25
-        NC-I2F-0shot-instruct_valid_score: 12.5
-        srbench_mean_RMSE: 57710886695619397134702536427057446912
-        srbench_mean_NMSE: 338091963580478408122294741660108748512869195760521575399424
-        srbench_mean_R2: -338091963580478408122294741660108748512869195760521575399424
-        srbench_SymbolicMatch: 0
-        supergpqa_Electronic_Science_and_Technology_accuracy: 43.75
-        lcb_code_generation_v6_pass@1: 37.5
-    objective_other: 
-        eese-llmjudge_overall_score: 0.56
-
-
-internlm3-8b-instruct-turbomind_fullbench:
-    objective_v6: 
-        aime2024_accuracy: 25
-        aime2024_f1: 0.25
-        aime2024_accuracy_given_attempted: 25
-        aime2024_attempted_ratio: 100
-        aime2024_correct_count: 4
-        aime2024_incorrect_count: 12
-        aime2024_not_attempted_count: 0
-        aime2025_accuracy: 6.25
-        aime2025_f1: 0.06
-        aime2025_accuracy_given_attempted: 6.25
-        aime2025_attempted_ratio: 100
-        aime2025_correct_count: 1
-        aime2025_incorrect_count: 15
-        aime2025_not_attempted_count: 0
-        bbh-temporal_sequences_score: 87.5
-        bbh-temporal_sequences_score_given_attempted: 87.5
-        bbh-temporal_sequences_attempted_ratio: 100
-        bbh-temporal_sequences_correct_count: 14
-        bbh-temporal_sequences_incorrect_count: 2
-        bbh-temporal_sequences_not_attempted_count: 0
-        cmo_fib_accuracy: 31.25
-        drop_accuracy: 100
-        drop_f1: 1
-        drop_accuracy_given_attempted: 100
-        drop_attempted_ratio: 100
-        drop_correct_count: 16
-        drop_incorrect_count: 0
-        drop_not_attempted_count: 0
-        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
-        GPQA_diamond_accuracy: 68.75
-        GPQA_diamond_f1: 0.69
-        GPQA_diamond_accuracy_given_attempted: 68.75
-        GPQA_diamond_attempted_ratio: 100
-        GPQA_diamond_correct_count: 11
-        GPQA_diamond_incorrect_count: 5
-        GPQA_diamond_not_attempted_count: 0
-        gsm8k_accuracy: 87.5
-        hellaswag_accuracy: 68.75
-        hellaswag_f1: 0.69
-        hellaswag_accuracy_given_attempted: 68.75
-        hellaswag_attempted_ratio: 100
-        hellaswag_correct_count: 11
-        hellaswag_incorrect_count: 5
-        hellaswag_not_attempted_count: 0
-        korbench_cipher_accuracy: 50
-        korbench_cipher_f1: 0.5
-        korbench_cipher_accuracy_given_attempted: 50
-        korbench_cipher_attempted_ratio: 100
-        korbench_cipher_correct_count: 8
-        korbench_cipher_incorrect_count: 8
-        korbench_cipher_not_attempted_count: 0
-        math_prm800k_500-llmjudge_accuracy: 62.5
-        math_prm800k_500-llmjudge_f1: 0.62
-        math_prm800k_500-llmjudge_accuracy_given_attempted: 62.5
-        math_prm800k_500-llmjudge_attempted_ratio: 100
-        math_prm800k_500-llmjudge_correct_count: 10
-        math_prm800k_500-llmjudge_incorrect_count: 6
-        math_prm800k_500-llmjudge_not_attempted_count: 0
-        mathbench-college-single_choice_cn_acc_4: 75
-        mathbench-college-single_choice_cn_acc_1: 75
-        mathbench-college-single_choice_cn_more_1_0: 100
-        mathbench-college-single_choice_cn_more_1_1: 75
-        mathbench-college-single_choice_cn_more_4_0: 100
-        mathbench-college-single_choice_cn_more_4_1: 100
-        mathbench-college-single_choice_cn_more_4_2: 75
-        mathbench-college-single_choice_cn_more_4_3: 75
-        mathbench-college-single_choice_cn_more_4_4: 50
-        mathbench-college-single_choice_cn_perf_1: 75
-        mathbench-college-single_choice_cn_perf_4: 50
-        mathbench-college-single_choice_cn_vote_4: 75
-        mathbench-college-single_choice_cn_vote_1: 75
-        mathbench-college-single_choice_cn_prior_A: 18.75
-        mathbench-college-single_choice_cn_prior_B: 18.75
-        mathbench-college-single_choice_cn_prior_C: 31.25
-        mathbench-college-single_choice_cn_prior_D: 31.25
-        mathbench-college-single_choice_cn_prior_-: 0
-        musr_murder_mysteries_accuracy: 100
-        musr_murder_mysteries_f1: 1
-        musr_murder_mysteries_accuracy_given_attempted: 100
-        musr_murder_mysteries_attempted_ratio: 100
-        musr_murder_mysteries_correct_count: 16
-        musr_murder_mysteries_incorrect_count: 0
-        musr_murder_mysteries_not_attempted_count: 0
-        supergpqa_accuracy: 43.75
-        supergpqa_total_correct: 7
-        supergpqa_total_count: 16
-        supergpqa_SuperGPQA-Engineering: 40
-        supergpqa_SuperGPQA-Philosophy: 0
-        supergpqa_SuperGPQA-Medicine: 50
-        supergpqa_SuperGPQA-Economics: 50
-        supergpqa_SuperGPQA-Science: 50
-        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology: 100
-        supergpqa_SuperGPQA-Philosophy-Philosophy: 0
-        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine: 0
-        supergpqa_SuperGPQA-Economics-Applied Economics: 100
-        supergpqa_SuperGPQA-Science-Mathematics: 40
-        supergpqa_SuperGPQA-Science-Physics: 100
-        supergpqa_SuperGPQA-Medicine-Clinical Medicine: 100
-        supergpqa_SuperGPQA-Engineering-Computer Science and Technology: 0
-        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering: 50
-        supergpqa_SuperGPQA-Engineering-Control Science and Engineering: 0
-        supergpqa_SuperGPQA-Economics-Theoretical Economics: 0
-        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology-Circuits and Systems: 100
-        supergpqa_SuperGPQA-Philosophy-Philosophy-Philosophical Aesthetics: 0
-        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine-Traditional Chinese Medicine Theory: 0
-        supergpqa_SuperGPQA-Economics-Applied Economics-Finance: 100
-        supergpqa_SuperGPQA-Science-Mathematics-Combinatorial Mathematics: 100
-        supergpqa_SuperGPQA-Science-Physics-Particle and Nuclear Physics: 100
-        supergpqa_SuperGPQA-Medicine-Clinical Medicine-Internal Medicine: 100
-        supergpqa_SuperGPQA-Engineering-Computer Science and Technology-Computer Architecture: 0
-        supergpqa_SuperGPQA-Science-Mathematics-Ordinary Differential Equations: 50
-        supergpqa_SuperGPQA-Science-Mathematics-Mathematical Analysis: 0
-        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering-Signal and Information Processing: 50
-        supergpqa_SuperGPQA-Science-Mathematics-Advanced Algebra: 0
-        supergpqa_SuperGPQA-Engineering-Control Science and Engineering-Control Theory and Control Engineering: 0
-        supergpqa_SuperGPQA-Economics-Theoretical Economics-Political Economy: 0
-        triviaqa_wiki_1shot_score: 50
-        qa_dingo_cn_score: 100
-        qa_dingo_cn_num_good: 16
-        qa_dingo_cn_num_bad: 0
-        qa_dingo_cn_total: 16
-        ARC_Prize_Public_Evaluation_accuracy: 0
-    objective_v7: 
-        aime2024_accuracy: 25
-        aime2025_accuracy: 6.25
-        bbeh_boolean_expressions_accuracy: 37.5
-        bbeh_boolean_expressions_f1: 0.38
-        bbeh_boolean_expressions_accuracy_given_attempted: 37.5
-        bbeh_boolean_expressions_attempted_ratio: 100
-        bbeh_boolean_expressions_correct_count: 6
-        bbeh_boolean_expressions_incorrect_count: 10
-        bbeh_boolean_expressions_not_attempted_count: 0
-        Chem_exam-competition_final_score: 43.61
-        Chem_exam-gaokao_final_score: 65.62
-        ChemBench_Name_Conversion_accuracy: 75
-        ChemBench_Name_Conversion_f1: 0.75
-        ChemBench_Name_Conversion_accuracy_given_attempted: 75
-        ChemBench_Name_Conversion_attempted_ratio: 100
-        ChemBench_Name_Conversion_correct_count: 12
-        ChemBench_Name_Conversion_incorrect_count: 4
-        ChemBench_Name_Conversion_not_attempted_count: 0
-        ClimaQA_Gold_mcq_accuracy: 81.25
-        ClimaQA_Gold_mcq_f1: 0.81
-        ClimaQA_Gold_mcq_accuracy_given_attempted: 81.25
-        ClimaQA_Gold_mcq_attempted_ratio: 100
-        ClimaQA_Gold_mcq_correct_count: 13
-        ClimaQA_Gold_mcq_incorrect_count: 3
-        ClimaQA_Gold_mcq_not_attempted_count: 0
-        cmmlu-agronomy_accuracy: 75
-        cmmlu-agronomy_f1: 0.75
-        cmmlu-agronomy_accuracy_given_attempted: 75
-        cmmlu-agronomy_attempted_ratio: 100
-        cmmlu-agronomy_correct_count: 12
-        cmmlu-agronomy_incorrect_count: 4
-        cmmlu-agronomy_not_attempted_count: 0
-        earth_silver_mcq_accuracy: 56.25
-        earth_silver_mcq_f1: 0.56
-        earth_silver_mcq_accuracy_given_attempted: 56.25
-        earth_silver_mcq_attempted_ratio: 100
-        earth_silver_mcq_correct_count: 9
-        earth_silver_mcq_incorrect_count: 7
-        earth_silver_mcq_not_attempted_count: 0
-        GPQA_diamond_accuracy: 75.00
-        hle_llmjudge_accuracy: 18.75
-        hle_llmjudge_f1: 0.19
-        hle_llmjudge_accuracy_given_attempted: 18.75
-        hle_llmjudge_attempted_ratio: 100
-        hle_llmjudge_correct_count: 3
-        hle_llmjudge_incorrect_count: 13
-        hle_llmjudge_not_attempted_count: 0
-        IFEval_Prompt-level-strict-accuracy: 68.75
-        IFEval_Inst-level-strict-accuracy: 75
-        IFEval_Prompt-level-loose-accuracy: 75
-        IFEval_Inst-level-loose-accuracy: 79.17
-        kcle_accuracy: 6.25
-        kcle_f1: 0.06
-        kcle_accuracy_given_attempted: 6.25
-        kcle_attempted_ratio: 100
-        kcle_correct_count: 1
-        kcle_incorrect_count: 15
-        kcle_not_attempted_count: 0
-        korbench_cipher_accuracy: 50
-        livemathbench_hard_custom_hard_cn_accuracy: 25
-        matbench_steels_mae: 1132.58
-        math_prm800k_500_accuracy: 62.5
-        sanitized_mbpp_score: 75
-        sanitized_mbpp_pass: 12
-        sanitized_mbpp_timeout: 0
-        sanitized_mbpp_failed: 0
-        sanitized_mbpp_wrong_answer: 4
-        medxpertqa_accuracy: 62.5
-        medxpertqa_total_correct: 10
-        medxpertqa_total_count: 16
-        medxpertqa_MedXpertQA-Basic Science: 50
-        medxpertqa_MedXpertQA-Diagnosis: 50
-        medxpertqa_MedXpertQA-Treatment: 100
-        medxpertqa_MedXpertQA-Skeletal: 33.33
-        medxpertqa_MedXpertQA-Muscular: 100
-        medxpertqa_MedXpertQA-Respiratory: 33.33
+        medxpertqa_MedXpertQA-Respiratory: 0
         medxpertqa_MedXpertQA-Endocrine: 100
         medxpertqa_MedXpertQA-Cardiovascular: 50
-        medxpertqa_MedXpertQA-Lymphatic: 100
+        medxpertqa_MedXpertQA-Lymphatic: 0
         medxpertqa_MedXpertQA-Nervous: 100
         medxpertqa_MedXpertQA-Reproductive: 0
-        medxpertqa_MedXpertQA-Reasoning: 64.29
+        medxpertqa_MedXpertQA-Reasoning: 50
         medxpertqa_MedXpertQA-Understanding: 50
-        lukaemon_mmlu_college_biology_accuracy: 100
-        lukaemon_mmlu_college_biology_f1: 1
-        lukaemon_mmlu_college_biology_accuracy_given_attempted: 100
+        lukaemon_mmlu_college_biology_accuracy: 81.25
+        lukaemon_mmlu_college_biology_f1: 0.81
+        lukaemon_mmlu_college_biology_accuracy_given_attempted: 81.25
         lukaemon_mmlu_college_biology_attempted_ratio: 100
-        lukaemon_mmlu_college_biology_correct_count: 16
-        lukaemon_mmlu_college_biology_incorrect_count: 0
+        lukaemon_mmlu_college_biology_correct_count: 13
+        lukaemon_mmlu_college_biology_incorrect_count: 3
         lukaemon_mmlu_college_biology_not_attempted_count: 0
-        mmlu_pro_math_accuracy: 75
-        mmlu_pro_math_f1: 0.75
-        mmlu_pro_math_accuracy_given_attempted: 75
+        mmlu_pro_math_accuracy: 81.25
+        mmlu_pro_math_f1: 0.81
+        mmlu_pro_math_accuracy_given_attempted: 81.25
         mmlu_pro_math_attempted_ratio: 100
-        mmlu_pro_math_correct_count: 12
-        mmlu_pro_math_incorrect_count: 4
+        mmlu_pro_math_correct_count: 13
+        mmlu_pro_math_incorrect_count: 3
         mmlu_pro_math_not_attempted_count: 0
-        olymmath_llmjudge_en-hard_accuracy: 6.25
-        olymmath_llmjudge_en-hard_f1: 0.06
-        olymmath_llmjudge_en-hard_accuracy_given_attempted: 6.25
+        olymmath_llmjudge_en-hard_accuracy: 68.75
+        olymmath_llmjudge_en-hard_f1: 0.69
+        olymmath_llmjudge_en-hard_accuracy_given_attempted: 68.75
         olymmath_llmjudge_en-hard_attempted_ratio: 100
-        olymmath_llmjudge_en-hard_correct_count: 1
-        olymmath_llmjudge_en-hard_incorrect_count: 15
+        olymmath_llmjudge_en-hard_correct_count: 11
+        olymmath_llmjudge_en-hard_incorrect_count: 5
         olymmath_llmjudge_en-hard_not_attempted_count: 0
-        OlympiadBench_OE_TO_maths_en_COMP_accuracy: 25
-        OlympiadBench_OE_TO_maths_en_COMP_f1: 0.25
-        OlympiadBench_OE_TO_maths_en_COMP_accuracy_given_attempted: 25
+        OlympiadBench_OE_TO_maths_en_COMP_accuracy: 50
+        OlympiadBench_OE_TO_maths_en_COMP_f1: 0.5
+        OlympiadBench_OE_TO_maths_en_COMP_accuracy_given_attempted: 50
         OlympiadBench_OE_TO_maths_en_COMP_attempted_ratio: 100
-        OlympiadBench_OE_TO_maths_en_COMP_correct_count: 4
-        OlympiadBench_OE_TO_maths_en_COMP_incorrect_count: 12
+        OlympiadBench_OE_TO_maths_en_COMP_correct_count: 8
+        OlympiadBench_OE_TO_maths_en_COMP_incorrect_count: 8
         OlympiadBench_OE_TO_maths_en_COMP_not_attempted_count: 0
-        phybench-eed_accuracy: 6.39
-        PHYSICS_atomic_dataset_textonly_accuracy: 25
-        PHYSICS_atomic_dataset_textonly_f1: 0.25
-        PHYSICS_atomic_dataset_textonly_accuracy_given_attempted: 25
+        phybench-eed_accuracy: 6.25
+        PHYSICS_atomic_dataset_textonly_accuracy: 81.25
+        PHYSICS_atomic_dataset_textonly_f1: 0.81
+        PHYSICS_atomic_dataset_textonly_accuracy_given_attempted: 81.25
         PHYSICS_atomic_dataset_textonly_attempted_ratio: 100
-        PHYSICS_atomic_dataset_textonly_correct_count: 4
-        PHYSICS_atomic_dataset_textonly_incorrect_count: 12
+        PHYSICS_atomic_dataset_textonly_correct_count: 13
+        PHYSICS_atomic_dataset_textonly_incorrect_count: 3
         PHYSICS_atomic_dataset_textonly_not_attempted_count: 0
-        ProteinLMBench_accuracy: 81.25
-        ProteinLMBench_f1: 0.81
-        ProteinLMBench_accuracy_given_attempted: 81.25
+        ProteinLMBench_accuracy: 62.5
+        ProteinLMBench_f1: 0.62
+        ProteinLMBench_accuracy_given_attempted: 62.5
         ProteinLMBench_attempted_ratio: 100
-        ProteinLMBench_correct_count: 13
-        ProteinLMBench_incorrect_count: 3
+        ProteinLMBench_correct_count: 10
+        ProteinLMBench_incorrect_count: 6
         ProteinLMBench_not_attempted_count: 0
         R-Bench_en_accuracy: 62.5
         R-Bench_en_f1: 0.62
@@ -1519,13 +306,456 @@ internlm3-8b-instruct-turbomind_fullbench:
         R-Bench_en_correct_count: 10
         R-Bench_en_incorrect_count: 6
         R-Bench_en_not_attempted_count: 0
-        NC-I2F-0shot-instruct_score: 6.25
-        NC-I2F-0shot-instruct_valid_score: 12.5
-        srbench_mean_RMSE: inf
-        srbench_mean_NMSE: inf
-        srbench_mean_R2: -inf
-        srbench_SymbolicMatch: 0
-        supergpqa_Electronic_Science_and_Technology_accuracy: 43.75
+        NC-I2F-0shot-instruct_score: 0
+        NC-I2F-0shot-instruct_valid_score: 68.75
+        srbench_mean_RMSE: 30057.14
+        srbench_mean_NMSE: 29.42
+        srbench_mean_R2: -28.42
+        srbench_SymbolicMatch: 0.18
+        supergpqa_Electronic_Science_and_Technology_accuracy: 68.75
         lcb_code_generation_v6_pass@1: 37.5
-    objective_other: 
-        eese-llmjudge_overall_score: 0.5
+    chat_subjective:
+        alignment_bench_v1_1_总分: 0.46
+        arenahard_score: 100
+        Followbench_naive_average: 1
+        mtbench101_avg: 9
+        wildbench_average: 66.72
+        simpleqa_accuracy_given_attempted: 0.73
+        chinese_simpleqa_given_attempted_accuracy: 0.5
+        alignment_bench_v1_1_专业能力: 5.56
+        alignment_bench_v1_1_数学计算: 0
+        alignment_bench_v1_1_基本任务: 0
+        alignment_bench_v1_1_逻辑推理: 0
+        alignment_bench_v1_1_中文理解: 0
+        alignment_bench_v1_1_文本写作: 0
+        alignment_bench_v1_1_角色扮演: 0
+        alignment_bench_v1_1_综合问答: 0
+        compassarena_language_naive_average: 52.63
+        compassarena_knowledge_naive_average: 85
+        compassarena_reason_v2_naive_average: 50
+        compassarena_creationv2_zh_naive_average: 95
+        followbench_llmeval_en_HSR_AVG: 1
+        followbench_llmeval_en_SSR_AVG: 1
+        followbench_llmeval_en_HSR_L1: 1
+        followbench_llmeval_en_HSR_L2: 1
+        followbench_llmeval_en_HSR_L3: 1
+        followbench_llmeval_en_HSR_L4: 1
+        followbench_llmeval_en_HSR_L5: 1
+        followbench_llmeval_en_SSR_L1: 1
+        followbench_llmeval_en_SSR_L2: 1
+        followbench_llmeval_en_SSR_L3: 1
+        followbench_llmeval_en_SSR_L4: 1
+        followbench_llmeval_en_SSR_L5: 1
+        simpleqa_f1: 0.62
+
+qwen-3-8b-fullbench:
+    objective_other:
+        C-MHChem_accuracy: 75
+        C-MHChem_f1: 0.75
+        C-MHChem_accuracy_given_attempted: 75
+        C-MHChem_attempted_ratio: 100
+        C-MHChem_correct_count: 12
+        C-MHChem_incorrect_count: 4
+        C-MHChem_not_attempted_count: 0
+        CPsyExam_accuracy: 93.75
+        CPsyExam_f1: 0.94
+        CPsyExam_accuracy_given_attempted: 93.75
+        CPsyExam_attempted_ratio: 100
+        CPsyExam_correct_count: 15
+        CPsyExam_incorrect_count: 1
+        CPsyExam_not_attempted_count: 0
+        MaScQA_accuracy: 81.25
+        MaScQA_f1: 0.81
+        MaScQA_accuracy_given_attempted: 81.25
+        MaScQA_attempted_ratio: 100
+        MaScQA_correct_count: 13
+        MaScQA_incorrect_count: 3
+        MaScQA_not_attempted_count: 0
+        UGPhysics_AtomicPhysics_zh_accuracy: 68.75
+    objective_v5:
+        race-high_accuracy: 81.25
+        ARC-c_accuracy: 100
+        BoolQ_accuracy: 87.5
+        triviaqa_wiki_1shot_score: 0
+        nq_open_1shot_score: 0
+        IFEval_Prompt-level-strict-accuracy: 87.50
+        drop_accuracy: 93.75
+        GPQA_diamond_accuracy: 75
+        hellaswag_accuracy: 87.5
+        TheoremQA_score: 6.25
+        musr_average_naive_average: 20.83
+        korbench_single_naive_average: 72.5
+        gsm8k_accuracy: 68.75
+        math_accuracy: 93.75
+        cmo_fib_accuracy: 0
+        aime2024_accuracy: 0
+        wikibench-wiki-single_choice_cncircular_perf_4: 50
+        sanitized_mbpp_score: 6.25
+        lcb_code_generation_pass@1: 6.25
+        lcb_code_execution_pass@1: 68.75
+        lcb_test_output_pass@1: 0
+        teval_naive_average: 67.43
+        bbh-logical_deduction_seven_objects_score: 6.25
+        bbh-multistep_arithmetic_two_score: 0
+        mmlu-other_accuracy: 81.25
+        cmmlu-china-specific_accuracy: 75.83
+        mmlu_pro_math_accuracy: 87.5
+        openai_mmmlu_lite_AR-XY_accuracy: 43.75
+        college_naive_average: 25
+        college_knowledge_naive_average: 37.5
+    objective_v6:
+        aime2024_accuracy: 68.75
+        aime2024_f1: 0.69
+        aime2024_accuracy_given_attempted: 68.75
+        aime2024_attempted_ratio: 100
+        aime2024_correct_count: 11
+        aime2024_incorrect_count: 5
+        aime2024_not_attempted_count: 0
+        aime2025_accuracy: 56.25
+        aime2025_f1: 0.56
+        aime2025_accuracy_given_attempted: 56.25
+        aime2025_attempted_ratio: 100
+        aime2025_correct_count: 9
+        aime2025_incorrect_count: 7
+        aime2025_not_attempted_count: 0
+        bbh-temporal_sequences_score: 75
+        bbh-temporal_sequences_score_given_attempted: 75
+        bbh-temporal_sequences_attempted_ratio: 100
+        bbh-temporal_sequences_correct_count: 12
+        bbh-temporal_sequences_incorrect_count: 4
+        bbh-temporal_sequences_not_attempted_count: 0
+        cmo_fib_accuracy: 75
+        drop_accuracy: 56.25
+        drop_f1: 0.56
+        drop_accuracy_given_attempted: 56.25
+        drop_attempted_ratio: 100
+        drop_correct_count: 9
+        drop_incorrect_count: 7
+        drop_not_attempted_count: 0
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 100
+        GPQA_diamond_accuracy: 62.5
+        GPQA_diamond_f1: 0.62
+        GPQA_diamond_accuracy_given_attempted: 62.5
+        GPQA_diamond_attempted_ratio: 100
+        GPQA_diamond_correct_count: 10
+        GPQA_diamond_incorrect_count: 6
+        GPQA_diamond_not_attempted_count: 0
+        gsm8k_accuracy: 100
+        hellaswag_accuracy: 100
+        hellaswag_f1: 1
+        hellaswag_accuracy_given_attempted: 100
+        hellaswag_attempted_ratio: 100
+        hellaswag_correct_count: 16
+        hellaswag_incorrect_count: 0
+        hellaswag_not_attempted_count: 0
+        korbench_cipher_accuracy: 93.75
+        korbench_cipher_f1: 0.94
+        korbench_cipher_accuracy_given_attempted: 93.75
+        korbench_cipher_attempted_ratio: 100
+        korbench_cipher_correct_count: 15
+        korbench_cipher_incorrect_count: 1
+        korbench_cipher_not_attempted_count: 0
+        math_prm800k_500-llmjudge_accuracy: 100
+        math_prm800k_500-llmjudge_f1: 1
+        math_prm800k_500-llmjudge_accuracy_given_attempted: 100
+        math_prm800k_500-llmjudge_attempted_ratio: 100
+        math_prm800k_500-llmjudge_correct_count: 16
+        math_prm800k_500-llmjudge_incorrect_count: 0
+        math_prm800k_500-llmjudge_not_attempted_count: 0
+        mathbench-college-single_choice_cn_acc_4: 93.75
+        mathbench-college-single_choice_cn_acc_1: 75
+        mathbench-college-single_choice_cn_more_1_0: 100
+        mathbench-college-single_choice_cn_more_1_1: 75
+        mathbench-college-single_choice_cn_more_4_0: 100
+        mathbench-college-single_choice_cn_more_4_1: 100
+        mathbench-college-single_choice_cn_more_4_2: 100
+        mathbench-college-single_choice_cn_more_4_3: 100
+        mathbench-college-single_choice_cn_more_4_4: 75
+        mathbench-college-single_choice_cn_perf_1: 75
+        mathbench-college-single_choice_cn_perf_4: 75
+        mathbench-college-single_choice_cn_vote_4: 100
+        mathbench-college-single_choice_cn_vote_1: 75
+        mathbench-college-single_choice_cn_prior_A: 31.25
+        mathbench-college-single_choice_cn_prior_B: 18.75
+        mathbench-college-single_choice_cn_prior_C: 25
+        mathbench-college-single_choice_cn_prior_D: 25
+        mathbench-college-single_choice_cn_prior_-: 0
+        musr_murder_mysteries_accuracy: 75
+        musr_murder_mysteries_f1: 0.75
+        musr_murder_mysteries_accuracy_given_attempted: 75
+        musr_murder_mysteries_attempted_ratio: 100
+        musr_murder_mysteries_correct_count: 12
+        musr_murder_mysteries_incorrect_count: 4
+        musr_murder_mysteries_not_attempted_count: 0
+        supergpqa_accuracy: 75
+        supergpqa_total_correct: 12
+        supergpqa_total_count: 16
+        supergpqa_SuperGPQA-Engineering: 80
+        supergpqa_SuperGPQA-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine: 100
+        supergpqa_SuperGPQA-Economics: 100
+        supergpqa_SuperGPQA-Science: 66.67
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine: 100
+        supergpqa_SuperGPQA-Economics-Applied Economics: 100
+        supergpqa_SuperGPQA-Science-Mathematics: 80
+        supergpqa_SuperGPQA-Science-Physics: 0
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology: 100
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering: 50
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering: 100
+        supergpqa_SuperGPQA-Economics-Theoretical Economics: 100
+        supergpqa_SuperGPQA-Engineering-Electronic Science and Technology-Circuits and Systems: 100
+        supergpqa_SuperGPQA-Philosophy-Philosophy-Philosophical Aesthetics: 0
+        supergpqa_SuperGPQA-Medicine-Traditional Chinese Medicine-Traditional Chinese Medicine Theory: 100
+        supergpqa_SuperGPQA-Economics-Applied Economics-Finance: 100
+        supergpqa_SuperGPQA-Science-Mathematics-Combinatorial Mathematics: 100
+        supergpqa_SuperGPQA-Science-Physics-Particle and Nuclear Physics: 0
+        supergpqa_SuperGPQA-Medicine-Clinical Medicine-Internal Medicine: 100
+        supergpqa_SuperGPQA-Engineering-Computer Science and Technology-Computer Architecture: 100
+        supergpqa_SuperGPQA-Science-Mathematics-Ordinary Differential Equations: 100
+        supergpqa_SuperGPQA-Science-Mathematics-Mathematical Analysis: 0
+        supergpqa_SuperGPQA-Engineering-Information and Communication Engineering-Signal and Information Processing: 50
+        supergpqa_SuperGPQA-Science-Mathematics-Advanced Algebra: 100
+        supergpqa_SuperGPQA-Engineering-Control Science and Engineering-Control Theory and Control Engineering: 100
+        supergpqa_SuperGPQA-Economics-Theoretical Economics-Political Economy: 100
+        triviaqa_wiki_1shot_score: 50
+        ARC_Prize_Public_Evaluation_accuracy: 0.06
+    objective_v7:
+        aime2024_accuracy: 75
+        aime2025_accuracy: 56.25
+        bbeh_boolean_expressions_accuracy: 68.75
+        bbeh_boolean_expressions_f1: 0.69
+        bbeh_boolean_expressions_accuracy_given_attempted: 68.75
+        bbeh_boolean_expressions_attempted_ratio: 100
+        bbeh_boolean_expressions_correct_count: 11
+        bbeh_boolean_expressions_incorrect_count: 5
+        bbeh_boolean_expressions_not_attempted_count: 0
+        Chem_exam-competition_final_score: 42.29
+        Chem_exam-gaokao_final_score: 71.88
+        ChemBench_Name_Conversion_accuracy: 100.00
+        ChemBench_Name_Conversion_f1: 1.00
+        ChemBench_Name_Conversion_accuracy_given_attempted: 100
+        ChemBench_Name_Conversion_attempted_ratio: 100.00
+        ChemBench_Name_Conversion_correct_count: 16.00
+        ChemBench_Name_Conversion_incorrect_count: 0
+        ChemBench_Name_Conversion_not_attempted_count: 0
+        ClimaQA_Gold_mcq_accuracy: 87.5
+        ClimaQA_Gold_mcq_f1: 0.88
+        ClimaQA_Gold_mcq_accuracy_given_attempted: 87.5
+        ClimaQA_Gold_mcq_attempted_ratio: 100
+        ClimaQA_Gold_mcq_correct_count: 14
+        ClimaQA_Gold_mcq_incorrect_count: 2
+        ClimaQA_Gold_mcq_not_attempted_count: 0
+        cmmlu-agronomy_accuracy: 87.50
+        cmmlu-agronomy_f1: 0.88
+        cmmlu-agronomy_accuracy_given_attempted: 87.50
+        cmmlu-agronomy_attempted_ratio: 100.00
+        cmmlu-agronomy_correct_count: 14.00
+        cmmlu-agronomy_incorrect_count: 2
+        cmmlu-agronomy_not_attempted_count: 0.00
+        earth_silver_mcq_accuracy: 81.25
+        earth_silver_mcq_f1: 0.81
+        earth_silver_mcq_accuracy_given_attempted: 81.25
+        earth_silver_mcq_attempted_ratio: 100
+        earth_silver_mcq_correct_count: 13
+        earth_silver_mcq_incorrect_count: 3
+        earth_silver_mcq_not_attempted_count: 0
+        GPQA_diamond_accuracy: 68.75
+        hle_llmjudge_accuracy: 43.75
+        hle_llmjudge_f1: 0.43
+        hle_llmjudge_accuracy_given_attempted: 43.75
+        hle_llmjudge_attempted_ratio: 100.00
+        hle_llmjudge_correct_count: 7.00
+        hle_llmjudge_incorrect_count: 9.00
+        hle_llmjudge_not_attempted_count: 0.00
+        IFEval_Prompt-level-strict-accuracy: 87.5
+        IFEval_Inst-level-strict-accuracy: 91.67
+        IFEval_Prompt-level-loose-accuracy: 87.5
+        IFEval_Inst-level-loose-accuracy: 91.67
+        kcle_accuracy: 75.00
+        kcle_f1: 0.75
+        kcle_accuracy_given_attempted: 75.00
+        kcle_attempted_ratio: 100.00
+        kcle_correct_count: 12
+        kcle_incorrect_count: 4
+        kcle_not_attempted_count: 0
+        korbench_cipher_accuracy: 81.25
+        livemathbench_hard_custom_hard_cn_accuracy: 25
+        matbench_steels_mae: 816.50
+        math_prm800k_500_accuracy: 100
+        sanitized_mbpp_score: 6.25
+        sanitized_mbpp_pass: 1
+        sanitized_mbpp_timeout: 0
+        sanitized_mbpp_failed: 15
+        sanitized_mbpp_wrong_answer: 0
+        medxpertqa_accuracy: 62.5
+        medxpertqa_total_correct: 10
+        medxpertqa_total_count: 16
+        medxpertqa_MedXpertQA-Basic Science: 75
+        medxpertqa_MedXpertQA-Diagnosis: 50
+        medxpertqa_MedXpertQA-Treatment: 75
+        medxpertqa_MedXpertQA-Skeletal: 66.67
+        medxpertqa_MedXpertQA-Muscular: 100
+        medxpertqa_MedXpertQA-Respiratory: 33.33
+        medxpertqa_MedXpertQA-Endocrine: 66.67
+        medxpertqa_MedXpertQA-Cardiovascular: 100
+        medxpertqa_MedXpertQA-Lymphatic: 0
+        medxpertqa_MedXpertQA-Nervous: 100
+        medxpertqa_MedXpertQA-Reproductive: 0
+        medxpertqa_MedXpertQA-Reasoning: 64.29
+        medxpertqa_MedXpertQA-Understanding: 50
+        lukaemon_mmlu_college_biology_accuracy: 81.25
+        lukaemon_mmlu_college_biology_f1: 0.81
+        lukaemon_mmlu_college_biology_accuracy_given_attempted: 81.25
+        lukaemon_mmlu_college_biology_attempted_ratio: 100
+        lukaemon_mmlu_college_biology_correct_count: 13
+        lukaemon_mmlu_college_biology_incorrect_count: 3
+        lukaemon_mmlu_college_biology_not_attempted_count: 0
+        mmlu_pro_math_accuracy: 68.75
+        mmlu_pro_math_f1: 0.69
+        mmlu_pro_math_accuracy_given_attempted: 68.75
+        mmlu_pro_math_attempted_ratio: 100
+        mmlu_pro_math_correct_count: 11
+        mmlu_pro_math_incorrect_count: 5
+        mmlu_pro_math_not_attempted_count: 0
+        olymmath_llmjudge_en-hard_accuracy: 68.75
+        olymmath_llmjudge_en-hard_f1: 0.69
+        olymmath_llmjudge_en-hard_accuracy_given_attempted: 68.75
+        olymmath_llmjudge_en-hard_attempted_ratio: 100.00
+        olymmath_llmjudge_en-hard_correct_count: 11
+        olymmath_llmjudge_en-hard_incorrect_count: 5
+        olymmath_llmjudge_en-hard_not_attempted_count: 0
+        OlympiadBench_OE_TO_maths_en_COMP_accuracy: 43.75
+        OlympiadBench_OE_TO_maths_en_COMP_f1: 0.44
+        OlympiadBench_OE_TO_maths_en_COMP_accuracy_given_attempted: 43.75
+        OlympiadBench_OE_TO_maths_en_COMP_attempted_ratio: 100.00
+        OlympiadBench_OE_TO_maths_en_COMP_correct_count: 7
+        OlympiadBench_OE_TO_maths_en_COMP_incorrect_count: 9
+        OlympiadBench_OE_TO_maths_en_COMP_not_attempted_count: 0
+        phybench-eed_accuracy: 27.94
+        PHYSICS_atomic_dataset_textonly_accuracy: 93.75
+        PHYSICS_atomic_dataset_textonly_f1: 0.94
+        PHYSICS_atomic_dataset_textonly_accuracy_given_attempted: 93.75
+        PHYSICS_atomic_dataset_textonly_attempted_ratio: 100
+        PHYSICS_atomic_dataset_textonly_correct_count: 15
+        PHYSICS_atomic_dataset_textonly_incorrect_count: 1
+        PHYSICS_atomic_dataset_textonly_not_attempted_count: 0
+        ProteinLMBench_accuracy: 68.75
+        ProteinLMBench_f1: 0.69
+        ProteinLMBench_accuracy_given_attempted: 68.75
+        ProteinLMBench_attempted_ratio: 100
+        ProteinLMBench_correct_count: 11
+        ProteinLMBench_incorrect_count: 5
+        ProteinLMBench_not_attempted_count: 0
+        R-Bench_en_accuracy: 50.00
+        R-Bench_en_f1: 0.50
+        R-Bench_en_accuracy_given_attempted: 50.00
+        R-Bench_en_attempted_ratio: 100.00
+        R-Bench_en_correct_count: 8
+        R-Bench_en_incorrect_count: 8
+        R-Bench_en_not_attempted_count: 0
+        NC-I2F-0shot-instruct_score: 12.5
+        NC-I2F-0shot-instruct_valid_score: 75
+        srbench_mean_RMSE: 61339597.01
+        srbench_mean_NMSE: 83.61
+        srbench_mean_R2: -82.61
+        srbench_SymbolicMatch: 0.14
+        supergpqa_Electronic_Science_and_Technology_accuracy: 56.25
+        lcb_code_generation_v6_pass@1: 50
+    chat_longtext: 
+        babilong_qa1_256k_score: 0.00
+        LongBench_2wikimqa_score: 5.43
+        Length16000Depth0_2needle_en_128k_score: 100.00
+        ruler_cwe_128k_score: 0.00
+    chat_subjective:
+        alignment_bench_v1_1_总分: 0.48
+        arenahard_score: 92.07
+        Followbench_naive_average: 1
+        mtbench101_avg: 8.7
+        wildbench_average: 75.17
+        simpleqa_accuracy_given_attempted: 0.55
+        chinese_simpleqa_given_attempted_accuracy: 0.64
+        alignment_bench_v1_1_专业能力: 5.81
+        alignment_bench_v1_1_数学计算: 0
+        alignment_bench_v1_1_基本任务: 0
+        alignment_bench_v1_1_逻辑推理: 0
+        alignment_bench_v1_1_中文理解: 0
+        alignment_bench_v1_1_文本写作: 0
+        alignment_bench_v1_1_角色扮演: 0
+        alignment_bench_v1_1_综合问答: 0
+        compassarena_language_naive_average: 55
+        compassarena_knowledge_naive_average: 100
+        compassarena_reason_v2_naive_average: 78.95
+        compassarena_creationv2_zh_naive_average: 100
+        followbench_llmeval_en_HSR_AVG: 1
+        followbench_llmeval_en_SSR_AVG: 1
+        followbench_llmeval_en_HSR_L1: 1
+        followbench_llmeval_en_HSR_L2: 1
+        followbench_llmeval_en_HSR_L3: 1
+        followbench_llmeval_en_HSR_L4: 1
+        followbench_llmeval_en_HSR_L5: 1
+        followbench_llmeval_en_SSR_L1: 1
+        followbench_llmeval_en_SSR_L2: 1
+        followbench_llmeval_en_SSR_L3: 1
+        followbench_llmeval_en_SSR_L4: 1
+        followbench_llmeval_en_SSR_L5: 1
+        simpleqa_f1: 0.46
+
+qwen3-8b-base-turbomind:
+    base_longtext: 
+        LongBench_2wikimqa_score: 26.98
+        Length32000Depth0_origin_en_32000_score: 100.00
+
+qwen-3-8b-base-hf-fullbench:
+    objective_base:
+        race-high_accuracy: 87.5
+        ARC-c_accuracy: 75
+        BoolQ_accuracy: 75
+        triviaqa_wiki_1shot_score: 37.5
+        nq_open_1shot_score: 6.25
+        drop_accuracy: 75
+        GPQA_diamond_accuracy: 81.25
+        hellaswag_accuracy: 81.25
+        TheoremQA_score: 18.75
+        winogrande_accuracy: 81.25
+        gsm8k_accuracy: 81.25
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 93.75
+        GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
+        math_accuracy: 87.5
+        wikibench-wiki-single_choice_cncircular_perf_4: 50
+        sanitized_mbpp_score: 93.75
+        mmlu-other_accuracy: 76.44
+        cmmlu-china-specific_accuracy: 82.5
+        mmlu_pro_math_accuracy: 50
+        bbh-logical_deduction_seven_objects_score: 37.5
+        bbh-multistep_arithmetic_two_score: 0
+        college_naive_average: 37.5
+        college_knowledge_naive_average: 87.5
+
+qwen-3-8b-base-fullbench:
+    objective_base:
+        race-high_accuracy: 87.5
+        ARC-c_accuracy: 75
+        BoolQ_accuracy: 81.25
+        triviaqa_wiki_1shot_score: 37.5
+        nq_open_1shot_score: 6.25
+        drop_accuracy: 81.25
+        GPQA_diamond_accuracy: 81.25
+        hellaswag_accuracy: 75
+        TheoremQA_score: 18.75
+        winogrande_accuracy: 81.25
+        gsm8k_accuracy: 81.25
+        GaokaoBench_2010-2022_Math_II_MCQs_score: 100
+        GaokaoBench_2010-2022_Math_II_Fill-in-the-Blank_score: 0
+        math_accuracy: 81.25
+        wikibench-wiki-single_choice_cncircular_perf_4: 50
+        sanitized_mbpp_score: 93.75
+        mmlu-other_accuracy: 75.48
+        cmmlu-china-specific_accuracy: 83.75
+        mmlu_pro_math_accuracy: 50
+        bbh-logical_deduction_seven_objects_score: 62.5
+        bbh-multistep_arithmetic_two_score: 100
+        college_naive_average: 37.5
+        college_knowledge_naive_average: 87.5
