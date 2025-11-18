@@ -130,6 +130,10 @@ def parse_args():
         default=True,
         type=lambda x: False if x and x.lower() == 'false' else True
     )
+    parser.add_argument('--dump-res-length',
+                        help='dump the length of model responses',
+                        action='store_true',
+                        default=False)
     parser.add_argument(
         '--dump-extract-rate',
         help='Whether to dump the evaluation details, including the '
@@ -351,6 +355,9 @@ def main():
             for task in tasks:
                 cfg.attack.dataset = task.datasets[0][0].abbr
                 task.attack = cfg.attack
+        if args.dump_res_length:
+            for task in tasks:
+                task.dump_res_length = True
         runner(tasks)
 
     # evaluate
