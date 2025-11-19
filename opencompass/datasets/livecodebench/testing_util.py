@@ -16,6 +16,7 @@ from io import StringIO
 from unittest.mock import mock_open, patch
 
 import numpy as np
+
 try:
     from pyext import RuntimeModule
 except ImportError:
