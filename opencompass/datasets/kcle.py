@@ -1,10 +1,9 @@
 import json
-from typing import List
 
 import datasets
 
-from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -14,22 +13,13 @@ class KCLEDataset(BaseDataset):
 
     @staticmethod
     def load(path, **kwargs) -> datasets.Dataset:
+        path = get_data_path(path)
         dataset = []
         with open(path, 'r') as f:
             for line in f:
+                line_data = {}
                 line = json.loads(line)
-                data = {}
-                data['input'] = line['input']
-                data['target'] = line['target']
-                dataset.append(data)
+                line_data['input'] = line['input']
+                line_data['target'] = line['target']
+                dataset.append(line_data)
         return datasets.Dataset.from_list(dataset)
-
-
-class KCLEEvaluator(BaseEvaluator):
-
-    def score(self, predictions: List, references: List) -> dict:
-        pass
-
-
-def kcle_postprocess(text: str) -> str:
-    pass

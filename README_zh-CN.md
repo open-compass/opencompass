@@ -57,6 +57,7 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2025.07.26\]** OpenCompass 现已支持Intern-S1相关的通用及科学评测基准，请参阅[Intern-S1评测教程](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/interns1.html)了解详情！🔥🔥🔥
 - **\[2025.04.01\]** OpenCompass 现已支持 `CascadeEvaluator`，允许多个评估器按顺序工作，可以为更复杂的评估场景创建自定义评估流程，查看[文档](docs/zh_cn/advanced_guides/llm_judge.md)了解具体用法！🔥🔥🔥
 - **\[2025.03.11\]** 现已支持 `SuperGPQA`  覆盖285 个研究生学科的知识能力评测，欢迎尝试！🔥🔥🔥
 - **\[2025.02.28\]** 我们为 `DeepSeek-R1` 系列模型添加了教程，请查看 [评估推理模型](docs/zh_cn/user_guides/deepseek_r1.md) 了解更多详情！🔥🔥🔥
@@ -82,7 +83,7 @@
 
 我们将陆续提供开源模型和 API 模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
 
-你也可以参考[CompassAcademic](configs/eval_academic_leaderboard_202412.py)，快速地复现榜单的结果，目前选取的数据集包括 综合知识推理 (MMLU-Pro/GPQA Diamond) ,逻辑推理 (BBH) ,数学推理 (MATH-500, AIME) ,代码生成 (LiveCodeBench, HumanEval) ,指令跟随 (IFEval) 。
+你也可以参考[学术榜单精度复现教程](https://opencompass.readthedocs.io/zh-cn/latest/academic.html)，快速地复现榜单的结果。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 

@@ -6,6 +6,7 @@ from .baidu_api import ERNIEBot  # noqa: F401
 from .bailing_api_oc import BailingAPI  # noqa: F401
 from .base import BaseModel, LMTemplateParser  # noqa: F401
 from .base_api import APITemplateParser, BaseAPIModel  # noqa: F401
+from .bluelm_api import BlueLMAPI  # noqa: F401
 from .bytedance_api import ByteDance  # noqa: F401
 from .claude_allesapin import ClaudeAllesAPIN  # noqa: F401
 from .claude_api import Claude  # noqa: F401
@@ -33,6 +34,7 @@ from .moonshot_api import MoonShot  # noqa: F401
 from .nanbeige_api import Nanbeige  # noqa: F401
 from .openai_api import OpenAI  # noqa: F401
 from .openai_api import OpenAISDK  # noqa: F401
+from .openai_streaming import OpenAISDKStreaming  # noqa: F401
 from .pangu_api import PanGu  # noqa: F401
 from .qwen_api import Qwen  # noqa: F401
 from .rendu_api import Rendu  # noqa: F401

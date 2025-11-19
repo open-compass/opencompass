@@ -56,7 +56,7 @@ After inference by the judge model in the evaluation stage, we fit a Bradley-Ter
 
 2. Evaluation config:
 
-    - `configs/eval_compassarena_subjectivebench_bradleyterry.py`
+    - `examples/eval_compassarena_subjectivebench_bradleyterry.py`
 
 ## Evaluation Results
 

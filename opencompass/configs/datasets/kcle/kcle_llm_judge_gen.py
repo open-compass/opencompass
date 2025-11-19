@@ -8,8 +8,6 @@ from opencompass.datasets import CustomDataset
 from mmengine.config import read_base
 
 QUERY_TEMPLATE = """
-Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes). 
-
 {input}
 """.strip()
 

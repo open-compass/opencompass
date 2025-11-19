@@ -52,7 +52,7 @@ We also need model responses with randomness, thus setting the `generation_kwarg
 
 Note: `num_return_sequences` must be greater than or equal to k, as pass@k itself is a probability estimate.
 
-You can specifically refer to the following configuration file [configs/eval_code_passk.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_code_passk.py)
+You can specifically refer to the following configuration file [examples/eval_code_passk.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk.py)
 
 ### For Models That Do Not Support Multiple Responses
 
@@ -101,4 +101,4 @@ For `mbpp`, modify the `type`, `eval_cfg.evaluator.type`, `reader_cfg.output_col
 
 We also need model responses with randomness, thus setting the `generation_kwargs` parameter is necessary.
 
-You can specifically refer to the following configuration file [configs/eval_code_passk_repeat_dataset.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_code_passk_repeat_dataset.py)
+You can specifically refer to the following configuration file [examples/eval_code_passk_repeat_dataset.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk_repeat_dataset.py)

@@ -84,9 +84,9 @@ We provide three evaluation methods.
     ```
 
 
-- Step3: configuration your launch in configs/eval_chinese_simpleqa.py, set your models to be evaluated, set your judge model (we recommend to use gpt4o) and launch it!
+- Step3: configuration your launch in examples/eval_chinese_simpleqa.py, set your models to be evaluated, set your judge model (we recommend to use gpt4o) and launch it!
   ```
-  python run.py configs/eval_chinese_simpleqa.py
+  python run.py examples/eval_chinese_simpleqa.py
   ```
 
 
