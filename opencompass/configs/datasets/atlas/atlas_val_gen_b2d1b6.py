@@ -1,15 +1,14 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import CustomDataset
 from opencompass.models import OpenAISDK
 
-from opencompass.datasets.sage.dataset_loader import SAGEDataset
-from opencompass.datasets.sage.evaluation import SAGELLMEvaluator, sage_judge_postprocess, sage_pred_postprocess
+from opencompass.datasets.atlas.dataset_loader import ATLASDataset
+from opencompass.datasets.atlas.evaluation import ATLASLLMEvaluator, atlas_judge_postprocess, atlas_pred_postprocess
 
 
-SAGE_INFER_TEMPLATE = """
-**Problem:**
+ATLAS_INFER_TEMPLATE = """
+**Problem:** 
 
 ```
 {problem}
@@ -36,7 +35,7 @@ At the end, output **only** the final answers in the following format:
 * **Do** put the JSON list in the block of ```json ... ```.
 """.strip()
 
-SAGE_EVAL_TEMPLATE = """
+ATLAS_EVAL_TEMPLATE = """
 You are an expert answer grader. Your task is to evaluate whether the candidate's **final answer** matches the **provided standard answer**. Follow the grading protocol strictly and **do not generate or modify answers**. Only compare the candidate's response to the given standard.
 
 ---
@@ -174,7 +173,7 @@ compass_agi4s_infer_cfg = dict(
             round=[
                 dict(
                     role='HUMAN',
-                    prompt=SAGE_INFER_TEMPLATE,
+                    prompt=ATLAS_INFER_TEMPLATE,
                 ),
             ]
         ),
@@ -183,28 +182,28 @@ compass_agi4s_infer_cfg = dict(
     inferencer=dict(type=GenInferencer),
 )
 
-sage_datasets = [
+atlas_datasets = [
     dict(
-        type=SAGEDataset,
+        type=ATLASDataset,
         n=4,
-        abbr='sage-val',
+        abbr='atlas-val',
         split='val',
         reader_cfg=compass_agi4s_reader_cfg,
         infer_cfg=compass_agi4s_infer_cfg,
         eval_cfg=dict(
             evaluator=dict(
-                type=SAGELLMEvaluator,
+                type=ATLASLLMEvaluator,
                 prompt_template=dict(
                     type=PromptTemplate,
                     template=dict(
                         round=[
-                            dict(role='HUMAN', prompt=SAGE_EVAL_TEMPLATE),
+                            dict(role='HUMAN', prompt=ATLAS_EVAL_TEMPLATE),
                         ],
                     ),
                 ),
                 dataset_cfg=dict(
-                    type=SAGEDataset,
-                    abbr='sage-val',
+                    type=ATLASDataset,
+                    abbr='atlas-val',
                     split='val',
                     reader_cfg=compass_agi4s_reader_cfg,
                 ),
@@ -236,11 +235,11 @@ sage_datasets = [
                     num_gpus=0,
                 ),
                 pred_postprocessor=dict(
-                    type=sage_pred_postprocess,
+                    type=atlas_pred_postprocess,
                     think_tags=('<think>', '</think>'),
                 ),
                 dict_postprocessor=dict(
-                    type=sage_judge_postprocess,
+                    type=atlas_judge_postprocess,
                     think_tags=('<think>', '</think>'),
                 )
             ),
@@ -248,4 +247,4 @@ sage_datasets = [
     )
 ]
 
-datasets = sage_datasets
+datasets = atlas_datasets
