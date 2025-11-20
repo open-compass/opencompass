@@ -5,6 +5,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/kcle_diamond.jsonl",
     },
+    "opencompass/kcle_fix": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/kcle_diamond_fix_251029.jsonl",
+    },
     # ADVGLUE Datasets
     "opencompass/advglue-dev": {
         "ms_id": None,
