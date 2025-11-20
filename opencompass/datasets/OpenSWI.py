@@ -14,6 +14,7 @@ from .base import BaseDataset
 
 @LOAD_DATASET.register_module()
 class OpenSWIDataset(BaseDataset):
+
     @staticmethod
     def load(path: str):
         new_data = []
@@ -35,14 +36,14 @@ class OpenSWIDataset(BaseDataset):
 
 def extract_list(text):
     # 使用正则提取 ```python\n[ ... ]``` 中的 list 内容
-    matches = re.findall(r"(\[.*?\])", text, re.DOTALL)
+    matches = re.findall(r'(\[.*?\])', text, re.DOTALL)
     if matches:
         raw_list_str = matches[-1]
         # 将字符串安全地转换为 Python 列表对象
         try:
             question_list = ast.literal_eval(raw_list_str)
             return question_list
-        except:
+        except Exception:
             return None
     else:
         return None
@@ -59,7 +60,7 @@ class OpenSWIMSEEvaluator(BaseEvaluator):
         if len(predictions) != len(references):
             return {
                 'error': 'predictions and references have different '
-                         'length'
+                'length'
             }
 
         avg_score = 0
@@ -69,7 +70,7 @@ class OpenSWIMSEEvaluator(BaseEvaluator):
             pred = extract_list(prediction)
             ans = reference
 
-            if not pred or all(isinstance(x, float) for x in pred) == False:
+            if not pred or all(isinstance(x, float) for x in pred) is False:
                 detail = {'pred': None, 'answer': ans, 'valid': False}
                 pred = [0] * len(ans)
             else:
@@ -81,7 +82,7 @@ class OpenSWIMSEEvaluator(BaseEvaluator):
                 detail['valid'] = False
                 pred = pred[:len(ans)]
             avg_valid.append(detail['valid'])
-            squared_errors = [(a - p) ** 2 for a, p in zip(ans, pred)]
+            squared_errors = [(a - p)**2 for a, p in zip(ans, pred)]
             rmse_score = math.sqrt(sum(squared_errors) / len(squared_errors))
             detail['score'] = rmse_score
             avg_score += rmse_score
@@ -90,4 +91,4 @@ class OpenSWIMSEEvaluator(BaseEvaluator):
         score = avg_score / len(predictions)
         valid = sum(avg_valid) / len(avg_valid)
 
-        return {'score': score, "valid": valid * 100, 'details': details}
+        return {'score': score, 'valid': valid * 100, 'details': details}
