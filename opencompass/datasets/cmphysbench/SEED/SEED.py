@@ -1,7 +1,7 @@
 # flake8: noqa
 import re
 
-import pint  # NEW: For physical unit conversion and comparison
+# import pint  # NEW: For physical unit conversion and comparison
 import timeout_decorator
 from sympy import *  # noqa: F401, F403
 from sympy import Derivative
@@ -535,10 +535,6 @@ def extract_tuple(latex):
     return {str(i): v for i, v in enumerate(values)}
 
 
-# Unit processing related functions
-ureg = pint.UnitRegistry()
-
-
 def clean_latex_unit(unit_str):
     r"""
     Clean LaTeX unit string for pint parsing
@@ -600,6 +596,9 @@ def convert_and_output_general(latex_qty1, latex_qty2, target_unit=None):
     and output the result.
     If target_unit is empty, convert to the unit of the first quantity.
     """
+    import pint
+    ureg = pint.UnitRegistry()
+
     n1, u1 = parse_latex_quantity_general(latex_qty1)
     n2, u2 = parse_latex_quantity_general(latex_qty2)
 
