@@ -2,11 +2,11 @@ import re
 
 from datasets import Dataset, load_dataset
 
-from opencompass.dataset.cmphysbench.SEED.SEED import SEED
+from opencompass.datasets.cmphysbench.SEED.SEED import SEED
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
-from .base import BaseDataset
+from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()
