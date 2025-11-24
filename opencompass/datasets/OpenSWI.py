@@ -8,6 +8,7 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -16,8 +17,9 @@ from .base import BaseDataset
 class OpenSWIDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
+    def load(path: str, name: str):
         new_data = []
+        path = os.path.join(get_data_path(path), name)
         for file in os.listdir(path):
             if file.endswith('.jsonl'):
                 final_path = os.path.join(path, file)

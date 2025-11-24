@@ -36,7 +36,8 @@ for _name in name_set:
         dict(
             abbr=f'OpenSWI-{_name}-1k',
             type=OpenSWIDataset,
-            path=f'/path/{_name}',
+            name=_name,
+            path='opencompass/openswi',
             reader_cfg=openswi_reader_cfg,
             infer_cfg=openswi_infer_cfg,
             eval_cfg=openswi_eval_cfg,

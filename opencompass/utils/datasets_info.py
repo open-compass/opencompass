@@ -1,4 +1,10 @@
 DATASETS_MAPPING = {
+    # OpenSWI
+    "opencompass/openswi":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/OpenSWI-1k-v1",
+    },
     # KLCE Datasets
     "opencompass/kcle":{
         "ms_id": None,
