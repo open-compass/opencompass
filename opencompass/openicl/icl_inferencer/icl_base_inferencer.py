@@ -127,7 +127,7 @@ class GenInferencerOutputHandler:
         if res_length:
             self.results_dict[str(idx)]['res_length'] = res_length
         if input_length:
-            self.results_dict[str(idx)]['input_length'] = input_length
+            self.results_dict[str(idx)]['all_input_length'] = input_length
 
 
 class PPLInferencerOutputHandler:
