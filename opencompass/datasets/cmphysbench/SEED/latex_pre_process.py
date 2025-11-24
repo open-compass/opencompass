@@ -4,7 +4,8 @@
 import re
 
 import timeout_decorator
-from latex2sympy2_extended import *  # noqa: F401, F403
+
+# from latex2sympy2_extended import *  # noqa: F401, F403
 
 
 def convert_caret_to_derivative(latex_str):
@@ -932,6 +933,7 @@ def replace_derivative_frac_preserve_frac(expr: str) -> str:
 
 @timeout_decorator.timeout(10, timeout_exception=TimeoutError)
 def master_convert_with_timeout(s, t):
+    from latex2sympy2_extended import latex2sympy
     """Master convert with timeout protection"""
     s = re.sub(r'~', '', s)
     preprocessed_stage1 = first_pre_process(s, t)
