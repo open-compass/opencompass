@@ -13,6 +13,7 @@ from .bbeh import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
 from .beyondaime import *  # noqa: F401, F403
 from .bigcodebench import *  # noqa: F401, F403
+from .biodata import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403

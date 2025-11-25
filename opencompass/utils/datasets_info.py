@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    # Bio Task Data
+    "opencompass/biology-instruction":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/biology-instruction",
     # OpenSWI
     "opencompass/openswi":{
         "ms_id": None,
