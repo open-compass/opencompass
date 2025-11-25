@@ -4,6 +4,7 @@ DATASETS_MAPPING = {
         "ms_id": None,
         "hf_id": None,
         "local": "./data/biology-instruction",
+    },
     # OpenSWI
     "opencompass/openswi":{
         "ms_id": None,
