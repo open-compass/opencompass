@@ -13,7 +13,9 @@ from .bbeh import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
 from .beyondaime import *  # noqa: F401, F403
 from .bigcodebench import *  # noqa: F401, F403
+from .bio_instruction import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
+from .bulk_modulus_material import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
 from .calm import *  # noqa: F401, F403
@@ -40,6 +42,7 @@ from .cmrc import *  # noqa: F401, F403
 from .codecompass import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .commonsenseqa_cn import *  # noqa: F401, F403
+from .composition_material import *  # noqa: F401, F403
 from .copa import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
 from .crowspairs_cn import *  # noqa: F401, F403
@@ -65,6 +68,7 @@ from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
+from .GUE import *  # noqa: F401, F403
 from .healthbench.healthbench import *  # noqa: F401, F403
 from .hellaswag import *  # noqa: F401, F403
 from .hle import *  # noqa: F401, F403
@@ -93,6 +97,8 @@ from .livecodebench import *  # noqa: F401, F403
 from .livemathbench import *  # noqa: F401, F403
 from .livereasonbench import *  # noqa: F401, F403
 from .livestembench import *  # noqa: F401, F403
+from .LLM4Chem import *  # noqa: F401, F403
+from .LLM4Mat import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .longbenchv2 import *  # noqa: F401, F403
@@ -118,6 +124,7 @@ from .mmlu_cf import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403
+from .Mol_Instructions import *  # noqa: F401, F403
 from .multipl_e import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .musr import *  # noqa: F401, F403
@@ -130,6 +137,8 @@ from .obqa import *  # noqa: F401, F403
 from .olymmath import *  # noqa: F401, F403
 from .OlympiadBench import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
+from .opi import *  # noqa: F401, F403
+from .PEER import *  # noqa: F401, F403
 from .phybench import *  # noqa: F401, F403
 from .physics import *  # noqa: F401, F403
 from .PI_LLM import PILLMDataset  # noqa: F401
@@ -172,6 +181,10 @@ from .triviaqa import *  # noqa: F401, F403
 from .triviaqarc import *  # noqa: F401, F403
 from .truthfulqa import *  # noqa: F401, F403
 from .tydiqa import *  # noqa: F401, F403
+from .uncond_material import *  # noqa: F401, F403
+from .uncond_RNA import *  # noqa: F401, F403
+from .unconditional_molecule_generation import *  # noqa: F401, F403
+from .unconditional_protein_generation import *  # noqa: F401, F403
 from .wic import *  # noqa: F401, F403
 from .wikibench import *  # noqa: F401, F403
 from .winograd import *  # noqa: F401, F403
