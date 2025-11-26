@@ -28,7 +28,7 @@ pip install https://github.com/InternLM/lmdeploy/releases/download/v${LMDEPLOY_V
 
 When evaluating a model, it is necessary to prepare an evaluation configuration that specifies information such as the evaluation dataset, the model, and inference parameters.
 
-Taking [internlm2-chat-7b](https://huggingface.co/internlm/internlm2-chat-7b) as an example, the evaluation config is as follows:
+Taking [Qwen3-0.6B]([https://huggingface.co/internlm/internlm2-chat-7b](https://huggingface.co/Qwen/Qwen3-0.6B)) as an example, the evaluation config is as follows:
 
 ```python
 # configure the dataset
@@ -47,42 +47,31 @@ with read_base():
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
-# configure lmdeploy
 from opencompass.models import TurboMindModelwithChatTemplate
+from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
-
-
-# configure the model
 models = [
     dict(
         type=TurboMindModelwithChatTemplate,
-        abbr=f'internlm2-chat-7b-lmdeploy',
-        # model path, which can be the address of a model repository on the Hugging Face Hub or a local path
-        path='internlm/internlm2-chat-7b',
-        # inference backend of LMDeploy. It can be either 'turbomind' or 'pytorch'.
-        # If the model is not supported by 'turbomind', it will fallback to
-        # 'pytorch'
-        backend='turbomind',
-        # For the detailed engine config and generation config, please refer to
-        # https://github.com/InternLM/lmdeploy/blob/main/lmdeploy/messages.py
-        engine_config=dict(tp=1),
-        gen_config=dict(do_sample=False),
-        # the max size of the context window
-        max_seq_len=7168,
-        # the max number of new tokens
-        max_out_len=1024,
-        # the max number of prompts that LMDeploy receives
-        # in `generate` function
-        batch_size=5000,
+        abbr='qwen_3_0.6b_thinking-turbomind',
+        path='Qwen/Qwen3-0.6B',
+        engine_config=dict(session_len=32768, max_batch_size=16, tp=1),
+        gen_config=dict(
+            top_k=20, temperature=0.6, top_p=0.95, do_sample=True, enable_thinking=True
+        ),
+        max_seq_len=32768,
+        max_out_len=32000,
+        batch_size=16,
         run_cfg=dict(num_gpus=1),
-    )
+        pred_postprocessor=dict(type=extract_non_reasoning_content)
+    ),
 ]
 ```
 
-Place the aforementioned configuration in a file, such as "configs/eval_internlm2_lmdeploy.py". Then, in the home folder of OpenCompass, start evaluation by the following command:
+Place the aforementioned configuration in a file, such as "configs/models/qwen3/lmdeploy_qwen3_0_6b.py". Then, in the home folder of OpenCompass, start evaluation by the following command:
 
 ```shell
-python run.py configs/eval_internlm2_lmdeploy.py -w outputs
+python run.py configs/models/qwen3/lmdeploy_qwen3_0_6b.py -w outputs
 ```
 
 You are expected to get the evaluation results after the inference and evaluation.
