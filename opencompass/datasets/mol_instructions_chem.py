@@ -1,5 +1,6 @@
 # flake8: noqa: W605
 import json
+import os
 import re
 
 from datasets import Dataset
@@ -7,7 +8,7 @@ from nltk.translate.meteor_score import meteor_score
 
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
-from opencompass.utils import get_logger
+from opencompass.utils import get_data_path, get_logger
 
 from .base import BaseDataset
 
@@ -16,8 +17,9 @@ from .base import BaseDataset
 class MolInstructionsDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
+    def load(path: str, name: str):
         test_data = []
+        path = os.path.join(get_data_path(path), name)
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 ins = json.loads(line)

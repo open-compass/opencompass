@@ -1,4 +1,10 @@
 DATASETS_MAPPING = {
+    # Mol Instructions
+    "opencompass/mol-instructions": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mol-instructions",
+    },
     # KLCE Datasets
     "opencompass/kcle":{
         "ms_id": None,
