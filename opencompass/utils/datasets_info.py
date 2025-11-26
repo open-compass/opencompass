@@ -5,11 +5,28 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/mol-instructions",
     },
+    # Bio Task Data
+    "opencompass/biology-instruction":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/biology-instruction",
+    },
+    # OpenSWI
+    "opencompass/openswi":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/OpenSWI-1k-v1",
+    },
     # KLCE Datasets
     "opencompass/kcle":{
         "ms_id": None,
         "hf_id": None,
         "local": "./data/kcle_diamond.jsonl",
+    },
+    "opencompass/kcle_fix": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/kcle_diamond_fix_251029.jsonl",
     },
     # ADVGLUE Datasets
     "opencompass/advglue-dev": {
