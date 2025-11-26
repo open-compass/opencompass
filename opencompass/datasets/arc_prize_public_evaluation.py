@@ -150,7 +150,6 @@ class ARCPrizeDataset(BaseDataset):
             '80a900e0.json', '981571dc.json', 'f560132c.json', 'e87109e9.json',
             '38007db0.json', '36a08778.json', 'c4d067a0.json', '7b3084d4.json'
         ],
-
     }
 
     @staticmethod
