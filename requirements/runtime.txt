@@ -24,7 +24,7 @@ opencv-python-headless
 pandas<2.0.0
 prettytable
 protobuf
-pyext
+# pyext
 python-Levenshtein
 rank_bm25==0.2.2
 rapidfuzz
