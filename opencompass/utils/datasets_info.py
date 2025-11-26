@@ -411,6 +411,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/arc_prize_public_evaluation",
     },
+    "opencompass/arc_agi_2_public_evaluation": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arc_agi_2_public_evaluation",
+    },
     "opencompass/simpleqa": {
         "ms_id": "",
         "hf_id": "",
