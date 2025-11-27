@@ -1,4 +1,10 @@
 DATASETS_MAPPING = {
+    # Mol Instructions
+    "opencompass/mol-instructions": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mol-instructions",
+    },
     # Bio Task Data
     "opencompass/biology-instruction":{
         "ms_id": None,
