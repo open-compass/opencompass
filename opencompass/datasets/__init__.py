@@ -13,6 +13,7 @@ from .bbeh import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
 from .beyondaime import *  # noqa: F401, F403
 from .bigcodebench import *  # noqa: F401, F403
+from .biodata import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
@@ -36,6 +37,7 @@ from .cmb import *  # noqa: F401, F403
 from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
 from .cmo_fib import *  # noqa: F401, F403
+from .cmphysbench import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
 from .codecompass import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
@@ -131,6 +133,7 @@ from .obqa import *  # noqa: F401, F403
 from .olymmath import *  # noqa: F401, F403
 from .OlympiadBench import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
+from .OpenSWI import *  # noqa: F401, F403
 from .phybench import *  # noqa: F401, F403
 from .physics import *  # noqa: F401, F403
 from .PI_LLM import PILLMDataset  # noqa: F401

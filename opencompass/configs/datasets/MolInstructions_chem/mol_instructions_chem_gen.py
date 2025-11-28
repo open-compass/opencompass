@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets.mol_instructions import FTSEvaluator, MeteorEvaluator, MAEEvaluator
+from opencompass.datasets.mol_instructions_chem import FTSEvaluator, MeteorEvaluator, MAEEvaluator
 from opencompass.datasets import MolInstructionsDataset
 
 mol_gen_reader_cfg = dict(
@@ -42,11 +42,14 @@ for _name in name_dict:
     mol_gen_selfies_0shot_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
-            template=dict(round=[
-                dict(role='SYSTEM', prompt=f'{_system.format(mol_type="SELFIES")}'),
-                dict(role='HUMAN', prompt=f'{_hint.format(mol_type="SELFIES")}\nQuestion: {{input}}\nAnswer: '),
-                dict(role='BOT', prompt='{output}\n')
-            ]),
+            template=dict(
+                begin=[
+                    dict(role='SYSTEM', fallback_role='HUMAN', prompt=f'{_system.format(mol_type="SELFIES")}'),
+                ],
+                round=[
+                    dict(role='HUMAN', prompt=f'{_hint.format(mol_type="SELFIES")}\nQuestion: {{input}}\nAnswer: '),
+                ]
+            ),
         ),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer),
@@ -67,7 +70,8 @@ for _name in name_dict:
         dict(
             abbr=f'{_name}-selfies',
             type=MolInstructionsDataset,
-            path=f'/path/{name_dict[_name]}.jsonl',
+            path='opencompass/mol-instructions',
+            name=f'{name_dict[_name]}.jsonl',
             reader_cfg=mol_gen_reader_cfg,
             infer_cfg=mol_gen_selfies_0shot_infer_cfg,
             eval_cfg=mol_gen_eval_cfg,
