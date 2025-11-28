@@ -20,7 +20,7 @@ mol_gen_system = {
 
 mol_gen_hint_dict = {
     'RP': """Your reply should contain the {mol_type} representation of the predicted reagents only, enclosed together within a single pair of <{mol_type}> and </{mol_type}> tags and separated by ".".""",
-    'MG': """TYour reply should contain the potential {mol_type} representation of the molecule wrapped in <{mol_type}> and </{mol_type}> tags.""",
+    'MG': """Your reply should contain the potential {mol_type} representation of the molecule wrapped in <{mol_type}> and </{mol_type}> tags.""",
     'FS': """Your reply should contain the {mol_type} representation of the predicted product wrapped in <{mol_type}> and </{mol_type}> tags.""",
     'RS': """Your reply should contain the {mol_type} representation of both reactants and reagents, and all reactants and reagents should be enclosed **together** within a single pair of <{mol_type}> and </{mol_type}> tags, separated by ".".""",
     'PP': """Your reply should contain the requested numeric value wrapped in \\boxed{{}}.""",
