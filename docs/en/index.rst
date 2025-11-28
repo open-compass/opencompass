@@ -40,6 +40,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    user_guides/experimentation.md
    user_guides/metrics.md
    user_guides/deepseek_r1.md
+   user_guides/interns1.md
 
 .. _Prompt:
 .. toctree::
@@ -89,6 +90,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
    :caption: Notes
 
    notes/contribution_guide.md
+   notes/academic.md
 
 Indexes & Tables
 ==================

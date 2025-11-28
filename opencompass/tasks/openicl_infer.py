@@ -34,6 +34,7 @@ class OpenICLInferTask(BaseTask):
         self.num_gpus = run_cfg.get('num_gpus', 0)
         self.num_procs = run_cfg.get('num_procs', 1)
         self.logger = get_logger()
+        self.dump_res_length = cfg.get('dump_res_length', False)
 
     def get_command(self, cfg_path, template):
         """Get the command template for the task.
@@ -50,13 +51,14 @@ class OpenICLInferTask(BaseTask):
             key in str(self.model_cfgs[0].get('type', ''))
             or key in str(self.model_cfgs[0].get('llm', {}).get('type', ''))
             for key in backend_keys)
+        python = sys.executable
         if self.num_gpus > 1 and not use_backend:
             port = random.randint(12000, 32000)
-            command = (f'torchrun --master_port={port} '
-                       f'--nproc_per_node {self.num_procs} '
-                       f'{script_path} {cfg_path}')
+            command = (
+                f'{python} -m torch.distributed.run --master_port={port} '
+                f'--nproc_per_node {self.num_procs} '
+                f'{script_path} {cfg_path}')
         else:
-            python = sys.executable
             command = f'{python} {script_path} {cfg_path}'
 
         return template.format(task_cmd=command)
@@ -115,6 +117,7 @@ class OpenICLInferTask(BaseTask):
                                 self.min_out_len)
         self._set_default_value(inferencer_cfg, 'batch_size', self.batch_size)
         inferencer_cfg['max_seq_len'] = self.model_cfg.get('max_seq_len')
+        inferencer_cfg['dump_res_length'] = self.dump_res_length
         inferencer = ICL_INFERENCERS.build(inferencer_cfg)
 
         out_path = get_infer_output_path(

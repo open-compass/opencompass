@@ -25,7 +25,7 @@ We support the use of GPT-4 (or other JudgeLLM) for the subjective evaluation of
 
 ## Initiating Subjective Evaluation
 
-Similar to existing objective evaluation methods, you can configure related settings in `configs/eval_subjective.py`.
+Similar to existing objective evaluation methods, you can configure related settings in `examples/eval_subjective.py`.
 
 ### Basic Parameters: Specifying models, datasets, and judgemodels
 

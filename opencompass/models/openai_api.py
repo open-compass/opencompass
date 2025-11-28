@@ -25,7 +25,7 @@ OPENAI_API_BASE = os.path.join(
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3', 'o4']
+OAI_REASONING_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
 
 
 @MODELS.register_module()
@@ -255,7 +255,8 @@ class OpenAI(BaseAPIModel):
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
             try:
-                if any(model in self.path for model in O1_MODEL_LIST):
+                if any(model in self.path
+                       for model in OAI_REASONING_MODEL_LIST):
                     self.logger.warning(
                         f"'max_token' is unsupported for model {self.path}")
                     self.logger.warning(
@@ -564,6 +565,7 @@ class OpenAI(BaseAPIModel):
         return messages, max_out_len
 
 
+@MODELS.register_module()
 class OpenAISDK(OpenAI):
 
     def __init__(
@@ -669,7 +671,7 @@ class OpenAISDK(OpenAI):
         num_retries = 0
         while num_retries < self.retry:
             self.wait()
-            if any(model in self.path for model in O1_MODEL_LIST):
+            if any(model in self.path for model in OAI_REASONING_MODEL_LIST):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
                 self.logger.warning(

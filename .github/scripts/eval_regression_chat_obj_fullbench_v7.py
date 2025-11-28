@@ -1,5 +1,9 @@
 from mmengine.config import read_base
 
+from opencompass.models import (HuggingFacewithChatTemplate,
+                                TurboMindModelwithChatTemplate)
+from opencompass.utils.text_postprocessors import extract_non_reasoning_content
+
 with read_base():
     # Datasets
     # Instruct Following
@@ -32,10 +36,10 @@ with read_base():
     from opencompass.configs.datasets.HLE.hle_llmverify_gen_6ff468 import \
         hle_datasets  # noqa: F401, E501
     # # Coding
-    from opencompass.configs.datasets.humaneval.humaneval_openai_sample_evals_gen_dcae0e import \
-        humaneval_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.IFEval.IFEval_gen_353ae7 import \
         ifeval_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.kcle.kcle_llm_judge_gen import \
+        kcle_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.korbench.korbench_single_0shot_cascade_eval_gen_56cf43 import \
         korbench_0shot_single_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.livecodebench.livecodebench_gen_a4f90b import \
@@ -75,10 +79,6 @@ with read_base():
         srbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.supergpqa.supergpqa_cascade_gen_1545c1 import \
         supergpqa_datasets  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.hf_internlm3_8b_instruct import \
-        models as hf_internlm3_8b_instruct_model  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm3_8b_instruct import \
-        models as lmdeploy_internlm3_8b_instruct_model  # noqa: F401, E501
     # Summary Groups
     from opencompass.configs.summarizers.groups.bbeh import \
         bbeh_summary_groups  # noqa: F401, E501
@@ -99,7 +99,7 @@ with read_base():
     from opencompass.configs.summarizers.groups.supergpqa import \
         supergpqa_summary_groups  # noqa: F401, E501
 
-    from ...volc import infer  # noqa: F401, E501
+    from ...rjob import eval, infer  # noqa: F401, E501
 
 # Add lattest LCB version
 LCBCodeGeneration_v6_datasets = LCBCodeGeneration_dataset
@@ -126,8 +126,9 @@ for datasets_, num in repeated_info:
         dataset_['k'] = num
 
 datasets = [
-    v[0] for k, v in locals().items() if k.endswith('_datasets')
-    and 'bigcode' not in k.lower() and isinstance(v, list) and len(v) > 0
+    v[0] for k, v in locals().items()
+    if k.endswith('_datasets') and 'bigcode' not in k.lower()
+    and 'humaneval' not in k.lower() and isinstance(v, list) and len(v) > 0
 ]
 
 datasets += bigcodebench_hard_instruct_datasets
@@ -144,19 +145,38 @@ for d in datasets:
         d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
             'reader_cfg']['test_range'] = '[0:16]'
 
-models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
-for m in models:
-    m['abbr'] = m['abbr'] + '_fullbench'
-    if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
-        m['engine_config']['max_batch_size'] = 1
-        m['batch_size'] = 1
+hf_model = dict(type=HuggingFacewithChatTemplate,
+                abbr='qwen-3-8b-hf-fullbench',
+                path='Qwen/Qwen3-8B',
+                max_out_len=8192,
+                batch_size=8,
+                run_cfg=dict(num_gpus=1),
+                pred_postprocessor=dict(type=extract_non_reasoning_content))
 
-models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
+tm_model = dict(type=TurboMindModelwithChatTemplate,
+                abbr='qwen-3-8b-fullbench',
+                path='Qwen/Qwen3-8B',
+                engine_config=dict(session_len=32768, max_batch_size=1, tp=1),
+                gen_config=dict(do_sample=False, enable_thinking=True),
+                max_seq_len=32768,
+                max_out_len=32768,
+                batch_size=1,
+                run_cfg=dict(num_gpus=1),
+                pred_postprocessor=dict(type=extract_non_reasoning_content))
 
-obj_judge_model = lmdeploy_internlm3_8b_instruct_model[0]
-obj_judge_model['engine_config']['max_batch_size'] = 1
-obj_judge_model['engine_config']['cache_max_entry_count'] = 0.6
-obj_judge_model['batch_size'] = 1
+models = [hf_model, tm_model]
+
+obj_judge_model = dict(type=TurboMindModelwithChatTemplate,
+                       abbr='qwen-3-8b-fullbench',
+                       path='Qwen/Qwen3-8B',
+                       engine_config=dict(session_len=46000,
+                                          max_batch_size=1,
+                                          tp=1),
+                       gen_config=dict(do_sample=False, enable_thinking=False),
+                       max_seq_len=46000,
+                       max_out_len=46000,
+                       batch_size=1,
+                       run_cfg=dict(num_gpus=1))
 
 for d in datasets:
     if 'judge_cfg' in d['eval_cfg']['evaluator']:

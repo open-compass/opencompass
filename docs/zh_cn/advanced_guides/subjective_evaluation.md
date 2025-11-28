@@ -25,7 +25,7 @@
 
 ## 启动主观评测
 
-类似于已有的客观评测方式，可以在configs/eval_subjective.py中进行相关配置
+类似于已有的客观评测方式，可以在examples/eval_subjective.py中进行相关配置
 
 ### 基本参数models, datasets 和 judgemodels的指定
 
@@ -134,7 +134,7 @@ judgemodel通常被设置为GPT4等强力模型，可以直接按照config文件
 ### 第三步 启动评测并输出评测结果
 
 ```shell
-python run.py configs/eval_subjective.py -r
+python run.py examples/eval_subjective.py -r
 ```
 
 - `-r` 参数支持复用模型推理和评估结果。
