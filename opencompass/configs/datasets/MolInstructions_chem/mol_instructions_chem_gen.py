@@ -43,11 +43,10 @@ for _name in name_dict:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(
-                begin=[
-                    dict(role='SYSTEM', fallback_role='HUMAN', prompt=f'{_system.format(mol_type="SELFIES")}'),
-                ],
                 round=[
+                    dict(role='SYSTEM', prompt=f'{_system.format(mol_type="SELFIES")}'),
                     dict(role='HUMAN', prompt=f'{_hint.format(mol_type="SELFIES")}\nQuestion: {{input}}\nAnswer: '),
+                    dict(role='BOT', prompt='{output}\n')
                 ]
             ),
         ),
