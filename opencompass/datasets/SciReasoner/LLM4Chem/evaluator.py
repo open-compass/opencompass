@@ -7,10 +7,10 @@ import re
 from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
 
+from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
-from ..base import BaseDataset
 from .config import TASK_TAGS, TASKS_WITH_SEMICOLON_REPLACE
 from .utils.metrics import (calculate_boolean_metrics,
                             calculate_formula_metrics,

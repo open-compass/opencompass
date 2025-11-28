@@ -16,9 +16,8 @@ from sklearn.metrics import (accuracy_score, matthews_corrcoef,
 from tqdm import tqdm
 from transformers import pipeline
 
+from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
-
-from ..base import BaseDataset
 
 current_working_directory = os.getcwd()
 path_bioinstruction = os.path.join(current_working_directory, 'opencompass',

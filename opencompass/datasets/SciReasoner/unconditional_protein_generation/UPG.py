@@ -2,10 +2,9 @@ import re
 
 from datasets import Dataset, DatasetDict
 
+from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-
-from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()

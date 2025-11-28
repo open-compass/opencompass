@@ -3,10 +3,9 @@ import re
 from datasets import Dataset, DatasetDict
 from rdkit import Chem
 
+from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
-
-from ..base import BaseDataset
 
 
 @LOAD_DATASET.register_module()

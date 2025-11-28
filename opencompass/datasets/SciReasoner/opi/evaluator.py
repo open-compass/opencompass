@@ -6,10 +6,10 @@ import re
 from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
 
+from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
-from ..base import BaseDataset
 from .utils.metrics4all import calculate_metrics, calculate_rouge_l
 
 
