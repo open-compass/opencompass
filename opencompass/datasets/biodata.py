@@ -14,6 +14,7 @@ from sklearn.metrics import (matthews_corrcoef, mean_absolute_error,
 
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -537,7 +538,7 @@ class BiodataECNumberEvaluator(BaseEvaluator):
 class BiodataTaskDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
+    def load(path: str, task: str):
         hint_dict = {
             'cls':
             'Please use "yes" or "no" as your answer, '
@@ -559,6 +560,9 @@ class BiodataTaskDataset(BaseDataset):
             ' Please put your final answer within \\boxed{},'
             ' split by "," if there are multiple answers.',
         }
+
+        path = get_data_path(path)
+        path = os.path.join(path, f'{task}.jsonl')
 
         with open(path, 'r', encoding='utf-8') as f:
             data = [json.loads(line) for line in f]

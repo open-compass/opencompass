@@ -108,7 +108,8 @@ for metric, task in tasks.items():
             dict(
                 abbr=f'{t}-sample_1k',
                 type=BiodataTaskDataset,
-                path=f'/path/{t}.jsonl',
+                path='opencompass/biology-instruction',
+                task=t,
                 reader_cfg=biodata_reader_cfg,
                 infer_cfg=biodata_infer_cfg,
                 eval_cfg=biodata_eval_cfg,
