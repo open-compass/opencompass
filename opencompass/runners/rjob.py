@@ -186,7 +186,7 @@ class RJOBRunner(BaseRunner):
             # Construct rjob submit command arguments
             args = []
             # Basic parameters
-            args.append(f'--name={task_name}')
+            args.append(f'--metadata-name={task_name}')
             if num_gpus > 0:
                 args.append(f'--gpu={num_gpus}')
                 args.append(f'--memory={num_gpus * 160000}')
