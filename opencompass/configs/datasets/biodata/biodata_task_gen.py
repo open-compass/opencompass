@@ -56,6 +56,8 @@ for metric, task in tasks.items():
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(round=[
+                dict(role='SYSTEM',
+                     prompt='You are a professional biology research expert, proficient in integrating **theory, data, and computation** to analyze and solve problems. Provide answers that are **accurate, evidence-based, and quantitatively rigorous**, clearly separating facts, assumptions, and uncertainties.'),
                 dict(role='HUMAN', prompt=f'{{prompt}}'),
                 dict(role='BOT', prompt='{ground_truth}\n')
             ]),
