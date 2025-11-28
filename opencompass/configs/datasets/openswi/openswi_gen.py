@@ -20,6 +20,7 @@ for _name in name_set:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(round=[
+                dict(role='SYSTEM', prompt='You are a professional geophysical inversion expert, proficient in utilizing surface wave dispersion data to infer subsurface S-wave velocity structures. Based on the provided surface wave dispersion data, perform nonlinear inversion to obtain an S-wave velocity (Vs) sequence at specified depth points.'),
                 dict(role='HUMAN',
                      prompt='{prompt}\nPlease think step by step, and put your final answer using python list.'),
                 dict(role='BOT', prompt='{ground_truth}\n')
