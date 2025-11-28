@@ -28,12 +28,12 @@ MuSR dataset is publicly available, with instructions provided on the [GitHub Pr
 ### Evaluation
 
 1. Install dependencies and configure the environment.
-2. Run evaluations using `opencompass configs/eval_musr.py` to assess LLM performance.
+2. Run evaluations using `opencompass examples/eval_musr.py` to assess LLM performance.
 3. Analyze results against human performance benchmarks.
 
 ### Example Command
 ```bash
-opencompass configs/eval_musr.py
+opencompass examples/eval_musr.py
 ```
 
 ## Baselines and Results

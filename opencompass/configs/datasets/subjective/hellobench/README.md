@@ -36,7 +36,7 @@ cd ~/opencompass
 pip install -e .
 ```
 
-4. configuration your launch in configs/eval_hellobench.py
+4. configuration your launch in examples/eval_hellobench.py
 
 - set your models to be evaluated
 
@@ -45,7 +45,7 @@ pip install -e .
 5. launch it!
 
 ```
-python run.py configs/eval_hellobench.py
+python run.py examples/eval_hellobench.py
 ```
 
 6. After that, you could find the results in outputs/hellobench/xxx/summary

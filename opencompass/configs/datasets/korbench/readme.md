@@ -29,12 +29,12 @@ KOR-Bench is publicly available with detailed usage instructions in the [GitHub 
 ### Evaluation
 
 1. Install dependencies and configure your environment.
-2. Run evaluations using `opencompass configs/eval_korbench.py` to assess LLM performance.
+2. Run evaluations using `opencompass examples/eval_korbench.py` to assess LLM performance.
 3. Analyze model performance across various reasoning tasks.
 
 ### Example Command
 ```bash
-opencompass configs/eval_korbench.py
+opencompass examples/eval_korbench.py
 ```
 
 ## Baselines and Results

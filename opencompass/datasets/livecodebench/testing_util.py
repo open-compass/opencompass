@@ -16,7 +16,11 @@ from io import StringIO
 from unittest.mock import mock_open, patch
 
 import numpy as np
-from pyext import RuntimeModule
+
+try:
+    from pyext import RuntimeModule
+except ImportError:
+    RuntimeModule = None
 
 
 def truncatefn(s, length=300):

@@ -1,11 +1,9 @@
-from copy import deepcopy
-
 from mmengine.config import read_base
 
-from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
-from opencompass.runners import LocalRunner
+from opencompass.models import (HuggingFacewithChatTemplate,
+                                TurboMindModelwithChatTemplate)
 from opencompass.summarizers import DefaultSubjectiveSummarizer
-from opencompass.tasks.subjective_eval import SubjectiveEvalTask
+from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
 with read_base():
     # read hf models - chat models
@@ -22,19 +20,14 @@ with read_base():
         arenahard_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.compassarena.compassarena_compare_new import \
         compassarena_datasets  # noqa: F401, E501
-    # from opencompass.configs.datasets.subjective.fofo.fofo_bilingual_judge_new import fofo_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.followbench.followbench_llmeval_new import \
         followbench_llmeval_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.multiround.mtbench101_judge_new import \
         mtbench101_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.wildbench.wildbench_pair_judge_new import \
         wildbench_datasets  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.hf_internlm2_5_7b_chat import \
-        models as hf_internlm2_5_7b_chat_model  # noqa: F401, E501
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import \
-        models as lmdeploy_internlm2_5_7b_chat_model  # noqa: F401, E501
 
-    from ...volc import infer  # noqa: F401, E501
+    from ...rjob import infer, sub_eval  # noqa: F401, E501
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')
                 and 'mtbench101' not in k and 'wildbench' not in k), [])
@@ -49,28 +42,42 @@ api_meta_template = dict(
     reserved_roles=[dict(role='SYSTEM', api_role='SYSTEM')],
 )
 
-models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
-for m in models:
-    m['abbr'] = m['abbr'] + '_fullbench'
-    if 'turbomind' in m['abbr'] or 'lmdeploy' in m['abbr']:
-        m['engine_config']['max_batch_size'] = 1
-        m['batch_size'] = 1
+hf_model = dict(type=HuggingFacewithChatTemplate,
+                abbr='qwen-3-8b-hf-fullbench',
+                path='Qwen/Qwen3-8B',
+                max_out_len=8192,
+                batch_size=8,
+                run_cfg=dict(num_gpus=1),
+                pred_postprocessor=dict(type=extract_non_reasoning_content))
 
-models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
+tm_model = dict(type=TurboMindModelwithChatTemplate,
+                abbr='qwen-3-8b-fullbench',
+                path='Qwen/Qwen3-8B',
+                engine_config=dict(session_len=32768, max_batch_size=1, tp=1),
+                gen_config=dict(do_sample=False, enable_thinking=True),
+                max_seq_len=32768,
+                max_out_len=32768,
+                batch_size=1,
+                run_cfg=dict(num_gpus=1),
+                pred_postprocessor=dict(type=extract_non_reasoning_content))
 
-judge_models = deepcopy([models[1]])
-judge_models[0]['abbr'] = judge_models[0]['abbr'] + '-judge'
+models = [hf_model, tm_model]
 
-eval = dict(
-    partitioner=dict(
-        type=SubjectiveNaivePartitioner,
-        models=models,
-        judge_models=judge_models,
-    ),
-    runner=dict(type=LocalRunner,
-                max_num_workers=16,
-                task=dict(type=SubjectiveEvalTask)),
-)
+judge_models = [
+    dict(type=TurboMindModelwithChatTemplate,
+         abbr='qwen-3-8b-judger',
+         path='Qwen/Qwen3-8B',
+         engine_config=dict(session_len=46000, max_batch_size=1, tp=1),
+         gen_config=dict(do_sample=False, enable_thinking=False),
+         max_seq_len=46000,
+         max_out_len=46000,
+         batch_size=1,
+         run_cfg=dict(num_gpus=1),
+         pred_postprocessor=dict(type=extract_non_reasoning_content))
+]
+
+sub_eval['partitioner']['judge_models'] = judge_models
+eval = sub_eval
 
 summary_groups = []
 summary_groups.append({

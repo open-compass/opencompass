@@ -41,6 +41,7 @@ OpenCompass 上手路线
    user_guides/experimentation.md
    user_guides/metrics.md
    user_guides/deepseek_r1.md
+   user_guides/interns1.md
 
 .. _提示词:
 .. toctree::
@@ -89,6 +90,7 @@ OpenCompass 上手路线
    :caption: 其他说明
 
    notes/contribution_guide.md
+   notes/academic.md
 
 索引与表格
 ==================
