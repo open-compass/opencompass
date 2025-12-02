@@ -15,6 +15,7 @@ from sklearn.metrics import (accuracy_score, matthews_corrcoef,
                              precision_score, recall_score, roc_auc_score)
 from tqdm import tqdm
 from transformers import pipeline
+from opencompass.utils import get_data_path
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
@@ -34,20 +35,24 @@ classifier = pipeline('zero-shot-classification',
 class Bioinstruction_Dataset(BaseDataset):
 
     @staticmethod
-    def load(path, train_path, test_path, mini_set=False, hf_hub=False):
-        if (hf_hub is True):
-            # load from huggingface hub
-            train_data = []
-            repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
-            train_path = train_path.split(repo_id + '/')[1]
-            test_path = test_path.split(repo_id + '/')[1]
-            train_path = hf_hub_download(repo_id,
-                                         train_path,
-                                         repo_type='dataset')
-            test_path = hf_hub_download(repo_id,
-                                        test_path,
-                                        repo_type='dataset')
+    def load(path, task, mini_set=False, hf_hub=False):
+        # if (hf_hub is True):
+        #     # load from huggingface hub
+        #     train_data = []
+        #     repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
+        #     train_path = train_path.split(repo_id + '/')[1]
+        #     test_path = test_path.split(repo_id + '/')[1]
+        #     train_path = hf_hub_download(repo_id,
+        #                                  train_path,
+        #                                  repo_type='dataset')
+        #     test_path = hf_hub_download(repo_id,
+        #                                 test_path,
+        #                                 repo_type='dataset')
 
+        path = get_data_path(path)
+        breakpoint()
+        train_path = os.path.join(path, f'{task}/dev/data.json')
+        test_path = os.path.join(path, f'{task}/test/data.json')
         with open(train_path, 'r', encoding='utf-8') as f:
             train_data = json.load(f)
             train_data = train_data[:5]
@@ -1283,9 +1288,11 @@ def preprocess_input_data(input_file_path, prediction, mini_set=False):
 
 class bio_instruction_Evaluator(BaseEvaluator):
 
-    def __init__(self, path, model_name, mini_set=False, *args, **kwargs):
+    def __init__(self, path, task, model_name, mini_set=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.dataset_path = path
+
+        path = get_data_path(path)
+        self.dataset_path = os.path.join(path, f'{task}/test/data.json')
         self.model_name = model_name
         self.mini_set = mini_set
 

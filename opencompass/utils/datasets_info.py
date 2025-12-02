@@ -509,6 +509,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/phybench",
     },
+    "opencompass/SciReasoner-bio_instruction":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner/bio_instruction",
+    }
 }
 
 DATASETS_URL = {

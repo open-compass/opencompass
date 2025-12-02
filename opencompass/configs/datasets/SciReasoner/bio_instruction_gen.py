@@ -12,6 +12,7 @@ reader_cfg = dict(
 MODEL_NAME = r'model'
 
 bio_instruction_datasets = []
+mini_bio_instruction_datasets = []
 
 path = ['antibody_antigen', 'rna_protein_interaction', 'emp', 'enhancer_activity', 'tf_m', 'Isoform', 'Modification',
         'MeanRibosomeLoading', 'ProgrammableRNASwitches',
@@ -33,14 +34,16 @@ for task in path:
 
     eval_cfg = dict(
         evaluator=dict(type=bio_instruction_Evaluator,
-                       path=f'/path/bio_instruction/{task}/test/data.json',
+                       path='opencompass/SciReasoner-bio_instruction',
+                       task=task,
                        model_name=MODEL_NAME),
         pred_role='BOT',
         num_gpus=1
     )
     eval_mini_cfg = dict(
         evaluator=dict(type=bio_instruction_Evaluator,
-                       path=f'/path/bio_instruction/{task}/test/data.json',
+                       path='opencompass/SciReasoner-bio_instruction',
+                       task=task,
                        mini_set=True,
                        model_name=MODEL_NAME),
         pred_role='BOT',
@@ -50,10 +53,9 @@ for task in path:
     bio_instruction_datasets.append(
         dict(
             type=Bioinstruction_Dataset,
-            path=task,
-            train_path=f'/path/bio_instruction/{task}/dev/data.json',
-            test_path=f'/path/bio_instruction/{task}/test/data.json',
-            hf_hub=False,
+            abbr=f'SciReasoner-bio_instruction-{task}',
+            path='opencompass/SciReasoner-bio_instruction',
+            task=task,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
             eval_cfg=eval_cfg,
@@ -62,11 +64,10 @@ for task in path:
     mini_bio_instruction_datasets.append(
         dict(
             type=Bioinstruction_Dataset,
-            path=f'{task}-mini',
+            abbr=f'SciReasoner-bio_instruction-{task}-mini',
+            path='opencompass/SciReasoner-bio_instruction',
+            task=task,
             mini_set=True,
-            train_path=f'/path/bio_instruction/{task}/dev/data.json',
-            test_path=f'/path/bio_instruction/{task}/test/data.json',
-            hf_hub=False,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
             eval_cfg=eval_mini_cfg,

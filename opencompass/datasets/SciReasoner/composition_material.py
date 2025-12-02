@@ -5,7 +5,6 @@ from typing import Union
 
 from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
-from smact.screening import smact_validity
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
@@ -137,6 +136,8 @@ class composition_Evaluator(BaseEvaluator):
         return ''.join(f"{el}{cnt or ''}" for el, cnt in tokens)
 
     def score(self, predictions):
+        from smact.screening import smact_validity
+
         total = len(predictions)
         format_valid = 0
         smact_valid = 0
