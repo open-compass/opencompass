@@ -5,15 +5,17 @@ from opencompass.registry import LOAD_DATASET
 
 
 @LOAD_DATASET.register_module()
-class SAGEDataset(BaseDataset):
+class ATLASDataset(BaseDataset):
 
     @staticmethod
     def load(split: str = 'val'):
-        hf_dataset = load_dataset('opencompass/SAGE', split=split)
+        hf_dataset = load_dataset('opencompass/ATLAS', split=split)
         dataset = []
         for example in hf_dataset:
             dataset.append({
-                'problem': example['question'],
-                'answer': example.get('standard_answer', '')
+                'problem':
+                str(example['question']),
+                'answer':
+                str(example.get('refined_standard_answer', ''))
             })
         return Dataset.from_list(dataset)

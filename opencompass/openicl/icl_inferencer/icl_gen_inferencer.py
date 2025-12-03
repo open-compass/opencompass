@@ -74,6 +74,7 @@ class GenInferencer(BaseInferencer):
         self.min_out_len = min_out_len
         self.stopping_criteria = stopping_criteria
         self.dump_timer = kwargs.get('dump_timer', False)
+        self.dump_res_length = kwargs.get('dump_res_length', False)
 
         if self.model.is_api and save_every is None:
             save_every = 1
@@ -162,10 +163,36 @@ class GenInferencer(BaseInferencer):
                     golds):
                 if num_return_sequences == 1:
                     prediction = prediction[0]
-                output_handler.save_results(prompt,
-                                            prediction,
-                                            index,
-                                            gold=gold)
+
+                if self.dump_res_length:
+                    input_length = 0
+                    if isinstance(prompt, str):
+                        input_length = self.model.get_token_len(prompt)
+                    elif isinstance(prompt, list):
+                        for i in range(len(prompt)):
+                            prompt[i][
+                                'input_length'] = self.model.get_token_len(
+                                    prompt[i]['prompt'])
+                            input_length += prompt[i]['input_length']
+
+                    if num_return_sequences == 1:
+                        res_length = self.model.get_token_len(prediction)
+                    else:
+                        res_length = [
+                            self.model.get_token_len(pred)
+                            for pred in prediction
+                        ]
+                    output_handler.save_results(prompt,
+                                                prediction,
+                                                index,
+                                                gold=gold,
+                                                res_length=res_length,
+                                                input_length=input_length)
+                else:
+                    output_handler.save_results(prompt,
+                                                prediction,
+                                                index,
+                                                gold=gold)
                 index = index + 1
 
             # 5-4. Save intermediate results

@@ -93,54 +93,59 @@ class RJOBRunner(BaseRunner):
             found_dict = False
             for line in output.splitlines():
                 logger.info(f'line: {line}')
+                line = line.lower()
                 if 'rjob oc-infer' not in line and 'rjob oc-eval' not in line:
                     continue
-                if 'Unknown' in line:
+                if 'inqueue' in line:
+                    status = 'Inqueue'
+                    found_dict = True
+                    break
+                if 'unknown' in line:
                     status = 'Unknown'
                     found_dict = True
                     break
-                if 'Starting' in line:
+                if 'starting' in line:
                     status = 'Starting'
                     found_dict = True
                     break
-                if 'Pending' in line:
+                if 'pending' in line:
                     status = 'Pending'
                     found_dict = True
                     break
-                if 'Running' in line:
+                if 'running' in line:
                     status = 'Running'
                     found_dict = True
                     break
-                if 'Timeout' in line:
+                if 'timeout' in line:
                     status = 'Timeout'
                     found_dict = True
                     break
-                if 'Restarting' in line:
+                if 'restarting' in line:
                     status = 'Restarting'
                     found_dict = True
                     break
-                if 'Queued' in line:
+                if 'queued' in line:
                     status = 'Queued'
                     found_dict = True
                     break
-                if 'Suspended' in line:
+                if 'suspended' in line:
                     status = 'Suspended'
                     found_dict = True
                     break
-                if 'Submitted' in line:
+                if 'submitted' in line:
                     status = 'Submitted'
                     found_dict = True
                     break
-                if 'Succeeded' in line:
+                if 'succeeded' in line:
                     status = 'FINISHED'
                     break
-                if 'Stopped' in line:
+                if 'stopped' in line:
                     status = 'STOPPED'
                     break
-                if 'Failed' in line or 'failed' in line:
+                if 'failed' in line or 'failed' in line:
                     status = 'FAILED'
                     break
-                if 'Cancelled' in line:
+                if 'cancelled' in line:
                     status = 'CANCELLED'
                     break
                 logger.warning(f'Unrecognized status in: {output}')
@@ -181,7 +186,7 @@ class RJOBRunner(BaseRunner):
             # Construct rjob submit command arguments
             args = []
             # Basic parameters
-            args.append(f'--name={task_name}')
+            args.append(f'--metadata-name={task_name}')
             if num_gpus > 0:
                 args.append(f'--gpu={num_gpus}')
                 args.append(f'--memory={num_gpus * 160000}')
