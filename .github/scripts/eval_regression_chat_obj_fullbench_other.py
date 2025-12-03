@@ -14,8 +14,18 @@ with read_base():
         datasets as MaScQA_chatml_datasets  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.UGPhysics.UGPhysics_gen import \
         datasets as UGPhysics_chatml_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.atlas.atlas_val_gen_b2d1b6 import \
+        atlas_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.biodata.biodata_task_gen import \
+        biodata_task_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.CMPhysBench.cmphysbench_gen import \
+        cmphysbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.eese.eese_llm_judge_gen import \
         eese_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.MolInstructions_chem.mol_instructions_chem_gen import \
+        mol_gen_selfies_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.openswi.openswi_gen import \
+        openswi_datasets  # noqa: F401, E501
 
     from ...rjob import eval, infer  # noqa: F401, E501
 
@@ -82,6 +92,9 @@ obj_judge_model = dict(
 
 for d in datasets:
     if 'eval_cfg' in d and 'evaluator' in d['eval_cfg']:
+        if 'atlas' in d['abbr'] and 'judge_cfg' in d['eval_cfg']['evaluator']:
+            d['eval_cfg']['evaluator']['judge_cfg'] = dict(
+                judgers=[obj_judge_model])
         if 'judge_cfg' in d['eval_cfg']['evaluator']:
             d['eval_cfg']['evaluator']['judge_cfg'] = obj_judge_model
         if 'llm_evaluator' in d['eval_cfg']['evaluator'] and 'judge_cfg' in d[
