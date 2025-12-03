@@ -8,10 +8,22 @@ with read_base():
     # Datasets
     from opencompass.configs.datasets.atlas.atlas_val_gen_b2d1b6 import \
         atlas_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.biodata.biodata_task_gen import \
+        biodata_task_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.CMPhysBench.cmphysbench_gen import \
+        cmphysbench_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.MolInstructions_chem.mol_instructions_chem_gen import \
+        mol_gen_selfies_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.openswi.openswi_gen import \
+        openswi_datasets  # noqa: F401, E501
 
-    # from ...rjob import eval, infer  # noqa: F401, E501
+    from ...rjob import eval, infer  # noqa: F401, E501
 
-datasets = [*atlas_datasets]
+
+datasets = [*atlas_datasets, *biodata_task_datasets, *cmphysbench_datasets, *mol_gen_selfies_datasets, *openswi_datasets]
+
+for d in chatml_datasets:
+    d['test_range'] = '[0:16]'
 
 for d in datasets:
     if 'reader_cfg' in d:
@@ -75,3 +87,10 @@ for d in datasets:
                 'eval_cfg']['evaluator']['llm_evaluator']:
             d['eval_cfg']['evaluator']['llm_evaluator'][
                 'judge_cfg'] = obj_judge_model
+
+for d in chatml_datasets:
+    if 'judge_cfg' in d['evaluator']:
+        d['evaluator']['judge_cfg'] = obj_judge_model
+    if 'llm_evaluator' in d['evaluator'] and 'judge_cfg' in d['evaluator'][
+            'llm_evaluator']:
+        d['evaluator']['llm_evaluator']['judge_cfg'] = obj_judge_model
