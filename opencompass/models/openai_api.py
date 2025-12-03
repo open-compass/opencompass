@@ -869,7 +869,6 @@ class OpenAISDKRollout(OpenAI):
         self.status_code_mappings = status_code_mappings
         self.think_tag = think_tag
         self.openai_extra_kwargs = openai_extra_kwargs
-        self.dump_rollout_inf = dump_rollout_inf
 
     def _generate(
         self,
@@ -930,20 +929,25 @@ class OpenAISDKRollout(OpenAI):
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
 
-                if self.dump_rollout_inf:
-                    responses = self.openai_client.chat.completions.create(
-                        **query_data, timeout=timeout, logprobs=True)  # timeout in seconds
-                    breakpoint()
-                    if not responses.choices[0].logprobs or not responses.choices[0].logprobs.content:
-                        token_logprobs = None
-                    token_logprobs = [c.logprob for c in responses.choices[0].logprobs.content]
-                    sum_neg_logprob = -float(sum(token_logprobs))
-                    num_tokens = len(token_logprobs)
-                else:
-                    responses = self.openai_client.chat.completions.create(
-                        **query_data, timeout=timeout)  # timeout in seconds
+                responses = self.openai_client.chat.completions.create(
+                    **query_data, timeout=timeout,
+                    logprobs=True)  # timeout in seconds
 
-                breakpoint()
+                if not responses.choices[0].logprobs or not responses.choices[
+                        0].logprobs.content:
+                    token_logprobs = None
+                token_logprobs = [
+                    c.logprob for c in responses.choices[0].logprobs.content
+                ]
+                sum_neg_logprob = -float(sum(token_logprobs))
+                num_tokens = len(token_logprobs)
+                finish_reason = responses.choices[0].finish_reason
+                rollout = dict(
+                    token_logprobs=token_logprobs,
+                    sum_neg_logprob=sum_neg_logprob,
+                    num_tokens=num_tokens,
+                    finish_reason=finish_reason,
+                )
 
                 if self.verbose:
                     self.logger.info(
@@ -1001,12 +1005,14 @@ class OpenAISDKRollout(OpenAI):
                             content,
                         )
                     if content:
-                        return reasoning_content + self.think_tag + content
+                        return dict(output=reasoning_content + self.think_tag +
+                                    content,
+                                    rollout=rollout)
                     else:
-                        return reasoning_content
+                        return dict(output=reasoning_content, rollout=rollout)
 
                 else:
-                    return content
+                    return dict(output=content, rollout=rollout)
 
             except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status
@@ -1023,7 +1029,11 @@ class OpenAISDKRollout(OpenAI):
                     self.logger.info(f'Status Code: {status_code}, \n'
                                      f'Original Error Message: {e}, \n'
                                      f'Return Message: {error_message} ')
-                    return error_message
+                    rollout_error = dict(token_logprobs=[None],
+                                         sum_neg_logprob=0.0,
+                                         num_tokens=0,
+                                         finish_reason='error')
+                    return dict(output=error_message, rollout=rollout_error)
                 else:
                     self.logger.error(
                         f'error occurs at {self.openai_api_base}')
