@@ -53,6 +53,8 @@ arc_agi_2_public_evaluation_datasets = [
         path='opencompass/arc_agi_2_public_evaluation',
         reader_cfg=arc_agi_2_public_evaluation_reader_cfg,
         infer_cfg=arc_agi_2_public_evaluation_infer_cfg,
-        eval_cfg=arc_agi_2_public_evaluation_eval_cfg
+        eval_cfg=arc_agi_2_public_evaluation_eval_cfg,
+        n=2,
+        k=2,
     )
 ]
