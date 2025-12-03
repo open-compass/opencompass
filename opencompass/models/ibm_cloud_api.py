@@ -60,7 +60,7 @@ class IBMGranite(BaseAPIModel):
         retry: int = 2,
         parameters: Optional[Dict] = None,
         iam_url: str = 'https://iam.cloud.ibm.com/identity/token',
-        timeout: float = 60.0,
+        timeout: float = 120.0,
         max_workers: Optional[int] = None,
         generation_kwargs: Optional[Dict] = None,
         verbose: bool = False,
@@ -110,26 +110,34 @@ class IBMGranite(BaseAPIModel):
     def generate(
         self,
         inputs: List[PromptType],
-        max_out_len: int = 1024,
+        max_out_len: int = 2046,
         **kwargs,
     ) -> List[str]:
+        if kwargs:
+            request_overrides = [dict(kwargs) for _ in inputs]
+        else:
+            request_overrides = [{} for _ in inputs]
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             results = list(
                 executor.map(
                     self._generate,
                     inputs,
                     [max_out_len] * len(inputs),
+                    request_overrides,
                 ))
         self.flush()
         return results
 
-    def _generate(self, input: PromptType, max_out_len: int) -> str:
+    def _generate(
+        self, input: PromptType, max_out_len: int, request_overrides: Dict,
+    ) -> str:
         assert isinstance(input, (str, PromptList))
         prompt = self._convert_prompt(input)
         payload = {
             'model_id': self.path,
             'input': prompt,
-            'parameters': self._build_parameters(max_out_len),
+            'parameters': self._build_parameters(
+                max_out_len, request_overrides),
         }
         if self.project_id:
             payload['project_id'] = self.project_id
@@ -231,11 +239,22 @@ class IBMGranite(BaseAPIModel):
                 segments.append(content)
         return '\n'.join(segments)
 
-    def _build_parameters(self, max_out_len: int) -> Dict:
+    def _build_parameters(
+        self, max_out_len: int, request_overrides: Optional[Dict] = None,
+    ) -> Dict:
         params = dict(self.parameters)
         params.update(self.generation_kwargs)
+        if request_overrides:
+            params.update({
+                key: value for key, value in request_overrides.items()
+                if value is not None
+            })
         if max_out_len is not None and 'max_new_tokens' not in params:
             params['max_new_tokens'] = max_out_len
+        params.setdefault('decoding_method', 'greedy')
+        if params.get('decoding_method') == 'greedy':
+            params.pop('temperature', None)
+            params.pop('top_p', None)
         return params
 
     def _get_token(self) -> str:
