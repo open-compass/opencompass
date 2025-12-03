@@ -34,7 +34,10 @@ chatml_datasets = [
     if k.endswith('_chatml_datasets') and isinstance(v, list) and len(v) > 0
 ]
 
-datasets = [eese_datasets[0]]
+datasets = chatml_datasets + [
+    eese_datasets[0], *atlas_datasets, *biodata_task_datasets,
+    *cmphysbench_datasets, *mol_gen_selfies_datasets, *openswi_datasets
+]
 
 for d in chatml_datasets:
     d['test_range'] = '[0:16]'
@@ -95,10 +98,11 @@ for d in datasets:
         if 'atlas' in d['abbr'] and 'judge_cfg' in d['eval_cfg']['evaluator']:
             d['eval_cfg']['evaluator']['judge_cfg'] = dict(
                 judgers=[obj_judge_model])
-        if 'judge_cfg' in d['eval_cfg']['evaluator']:
+        elif 'judge_cfg' in d['eval_cfg']['evaluator']:
             d['eval_cfg']['evaluator']['judge_cfg'] = obj_judge_model
-        if 'llm_evaluator' in d['eval_cfg']['evaluator'] and 'judge_cfg' in d[
-                'eval_cfg']['evaluator']['llm_evaluator']:
+        elif 'llm_evaluator' in d['eval_cfg'][
+                'evaluator'] and 'judge_cfg' in d[  # noqa: E501
+                    'eval_cfg']['evaluator']['llm_evaluator']:
             d['eval_cfg']['evaluator']['llm_evaluator'][
                 'judge_cfg'] = obj_judge_model
 
