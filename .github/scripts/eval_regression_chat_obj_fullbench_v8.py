@@ -22,9 +22,6 @@ with read_base():
 
 datasets = [*atlas_datasets, *biodata_task_datasets, *cmphysbench_datasets, *mol_gen_selfies_datasets, *openswi_datasets]
 
-for d in chatml_datasets:
-    d['test_range'] = '[0:16]'
-
 for d in datasets:
     if 'reader_cfg' in d:
         d['reader_cfg']['test_range'] = '[0:16]'
