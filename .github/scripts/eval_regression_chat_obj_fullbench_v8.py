@@ -87,10 +87,4 @@ for d in datasets:
                 'eval_cfg']['evaluator']['llm_evaluator']:
             d['eval_cfg']['evaluator']['llm_evaluator'][
                 'judge_cfg'] = obj_judge_model
-
-for d in chatml_datasets:
-    if 'judge_cfg' in d['evaluator']:
-        d['evaluator']['judge_cfg'] = obj_judge_model
-    if 'llm_evaluator' in d['evaluator'] and 'judge_cfg' in d['evaluator'][
-            'llm_evaluator']:
-        d['evaluator']['llm_evaluator']['judge_cfg'] = obj_judge_model
+            
