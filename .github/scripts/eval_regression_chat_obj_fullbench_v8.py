@@ -19,10 +19,14 @@ with read_base():
 
     from ...rjob import eval, infer  # noqa: F401, E501
 
-
-datasets = [*atlas_datasets, *biodata_task_datasets, *cmphysbench_datasets, *mol_gen_selfies_datasets, *openswi_datasets]
+datasets = [
+    *atlas_datasets, *biodata_task_datasets, *cmphysbench_datasets,
+    *mol_gen_selfies_datasets, *openswi_datasets
+]
 
 for d in datasets:
+    if 'n' in d:
+        d['n'] = 1
     if 'reader_cfg' in d:
         d['reader_cfg']['test_range'] = '[0:16]'
     else:
@@ -80,8 +84,8 @@ for d in datasets:
                 judgers=[obj_judge_model])
         elif 'judge_cfg' in d['eval_cfg']['evaluator']:
             d['eval_cfg']['evaluator']['judge_cfg'] = obj_judge_model
-        elif 'llm_evaluator' in d['eval_cfg']['evaluator'] and 'judge_cfg' in d[
-                'eval_cfg']['evaluator']['llm_evaluator']:
+        elif 'llm_evaluator' in d['eval_cfg'][
+                'evaluator'] and 'judge_cfg' in d[  # noqa
+                    'eval_cfg']['evaluator']['llm_evaluator']:  # noqa
             d['eval_cfg']['evaluator']['llm_evaluator'][
                 'judge_cfg'] = obj_judge_model
-            
