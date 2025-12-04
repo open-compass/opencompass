@@ -22,6 +22,7 @@ name_dict = {
 }
 
 pp_rmse_0shot_instruct_datasets = []
+mini_pp_rmse_0shot_instruct_datasets = []
 for _name in name_dict:
     _hint = pp_rmse_hint_dict[_name]
     pp_rmse_0shot_infer_cfg = dict(
@@ -45,6 +46,17 @@ for _name in name_dict:
         dict(
             abbr=f'PP-{_name}-0shot-instruct',
             type=SmolInstructDataset,
+            path='osunlp/SMolInstruct',
+            name=name_dict[_name],
+            reader_cfg=pp_rmse_0shot_reader_cfg,
+            infer_cfg=pp_rmse_0shot_infer_cfg,
+            eval_cfg=pp_rmse_0shot_eval_cfg,
+        ))
+    mini_pp_rmse_0shot_instruct_datasets.append(
+        dict(
+            abbr=f'PP-{_name}-0shot-instruct-mini',
+            type=SmolInstructDataset,
+            mini_set=True,
             path='osunlp/SMolInstruct',
             name=name_dict[_name],
             reader_cfg=pp_rmse_0shot_reader_cfg,

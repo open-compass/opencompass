@@ -25,6 +25,7 @@ name_dict = {
 }
 
 fts_0shot_instruct_datasets = []
+mini_fts_0shot_instruct_datasets = []
 for _name in name_dict:
     _hint = fts_hint_dict[_name]
     fts_0shot_infer_cfg = dict(
@@ -48,6 +49,17 @@ for _name in name_dict:
         dict(
             abbr=f'{_name}-0shot-instruct',
             type=SmolInstructDataset,
+            path='osunlp/SMolInstruct',
+            name=name_dict[_name],
+            reader_cfg=fts_0shot_reader_cfg,
+            infer_cfg=fts_0shot_infer_cfg,
+            eval_cfg=fts_0shot_eval_cfg,
+        ))
+    mini_fts_0shot_instruct_datasets.append(
+        dict(
+            abbr=f'{_name}-0shot-instruct-mini',
+            type=SmolInstructDataset,
+            mini_set=True,
             path='osunlp/SMolInstruct',
             name=name_dict[_name],
             reader_cfg=fts_0shot_reader_cfg,
