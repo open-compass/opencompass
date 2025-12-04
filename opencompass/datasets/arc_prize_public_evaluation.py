@@ -185,7 +185,7 @@ class ARCPrizeEvaluator(BaseEvaluator):
             is_correct, correct_percentage = compare_solutions_with_padding(
                 pred, refer, pad_value=-1)
             details.append({
-                'solved': True if is_correct else False,
+                'correct': 1 if is_correct else 0,
                 'correct_percentage': correct_percentage,
                 'generated_solution': pred
             })
