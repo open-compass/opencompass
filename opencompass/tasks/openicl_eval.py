@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import argparse
 import copy
 import math
@@ -7,10 +9,12 @@ import random
 import statistics
 import sys
 import time
+from collections import defaultdict
 from inspect import signature
-from typing import List
+from typing import Iterable, List
 
 import mmengine
+from datasets import Dataset
 from mmengine.config import Config, ConfigDict
 from mmengine.utils import mkdir_or_exist
 
@@ -94,18 +98,32 @@ class OpenICLEvalTask(BaseTask):
         # Load predictions
         pred_dicts, pred_strs = self._load_predictions()
 
-        # Process predictions
-        pred_strs = self._process_predictions(pred_strs)
+        if all(
+                isinstance(item, dict) and 'rollout' in item
+                for item in pred_strs):
+            # Sum rollout
+            result = self._sum_rollout(
+                pred_strs,
+                test_set,
+                pred_dicts,
+            )
 
-        # Evaluate predictions
-        result = self._evaluate_predictions(
-            pred_strs,
-            test_set,
-            pred_dicts,
-        )
+            # Save results
+            self._save_results(result)
 
-        # Save results
-        self._save_results(result)
+        else:
+            # Process predictions
+            pred_strs = self._process_predictions(pred_strs)
+
+            # Evaluate predictions
+            result = self._evaluate_predictions(
+                pred_strs,
+                test_set,
+                pred_dicts,
+            )
+
+            # Save results
+            self._save_results(result)
 
     def _load_and_preprocess_test_data(self):
         """Load test dataset and apply postprocessing if needed."""
@@ -319,6 +337,82 @@ class OpenICLEvalTask(BaseTask):
                     self.logger.warning(f'Skip dumping details due to: {e}.')
         else:
             result.pop('details', None)
+        return result
+
+    def _sum_rollout(
+        self,
+        pred_strs,
+        test_set,
+        pred_dicts,
+    ):
+
+        # breakpoint()
+        n = self.dataset_cfg.get('n', 1)
+        real_size = len(test_set) // n
+
+        def select_fn(i, real_size, x):
+            if isinstance(x, Dataset):
+                return x.select(range(i * real_size, (i + 1) * real_size))
+            elif isinstance(x, Iterable):
+                return x[i * real_size:(i + 1) * real_size]
+            else:
+                return x
+
+        total_neg_logprob = 0.0
+        total_tokens = 0
+        finish_counts = defaultdict(int)
+        successful_samples = 0
+
+        result = {}
+
+        for i in range(n):
+            replica_pred_strs = select_fn(i, real_size, pred_strs)
+            replica_total_neg_logprob = 0.0
+            replica_total_tokens = 0
+            replica_finish_counts = defaultdict(int)
+            replica_successful_samples = 0
+
+            for pred_sample in replica_pred_strs:
+                replica_total_neg_logprob += pred_sample['rollout'][
+                    'sum_neg_logprob']
+                replica_total_tokens += pred_sample['rollout']['num_tokens']
+                replica_finish_counts[pred_sample['rollout']
+                                      ['finish_reason']] += 1
+                if pred_sample['rollout']['num_tokens'] > 0:
+                    replica_successful_samples += 1
+
+            replica_entropy_nats = replica_total_neg_logprob / replica_total_tokens
+            replica_avg_length = replica_total_tokens / replica_successful_samples if replica_successful_samples > 0 else 0.0
+
+            result[f'{i}_th rollout results'] = dict(
+                total_neg_logprob=replica_total_neg_logprob,
+                total_tokens=replica_total_tokens,
+                finish_reason=replica_finish_counts,
+                successful_samples=replica_successful_samples,
+                entropy_nats=replica_entropy_nats,
+                replica_avg_length=replica_avg_length,
+            )
+
+            total_neg_logprob += replica_total_neg_logprob
+            total_tokens += replica_total_tokens
+            for reason, count in replica_finish_counts.items():
+                finish_counts[reason] += count
+            successful_samples += replica_successful_samples
+
+        entropy_nats = total_neg_logprob / total_tokens
+        avg_length = total_tokens / successful_samples if successful_samples > 0 else 0.0
+
+        result['total rollout results'] = dict(
+            total_neg_logprob=total_neg_logprob,
+            total_tokens=total_tokens,
+            finish_reason=finish_counts,
+            successful_samples=successful_samples,
+            entropy_nats=entropy_nats,
+            replica_avg_length=avg_length,
+        )
+
+        result['total predictions'] = pred_dicts
+
         return result
 
     def _save_results(self, result):
