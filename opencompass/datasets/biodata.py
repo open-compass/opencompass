@@ -140,7 +140,7 @@ class BiodataRMSEEvaluator(BaseEvaluator):
             pred = extract_number(prediction)
             ans = reference
             detail = {'pred': pred, 'answer': ans}
-            if not pred:
+            if pred is None:
                 pred = 0
             rmse_score = np.sqrt(np.mean((np.array(pred) - np.array(ans))**2))
             detail['score'] = rmse_score
@@ -960,7 +960,7 @@ class BiodataSpearmanEvaluator(BaseEvaluator):
                 pred = pred.split('</think>')[-1]
             pred = extract_number(pred)
             detail = {'pred': pred, 'answer': ans}
-            if not pred:
+            if pred is None:
                 pred = np.inf
             y_true.append(ans)
             y_pred.append(pred)
@@ -993,7 +993,7 @@ class BiodataMixedScoreEvaluator(BaseEvaluator):
                 pred = pred.split('</think>')[-1]
             pred = extract_number(pred)
             detail = {'pred': pred, 'answer': ans}
-            if not pred:
+            if pred is None:
                 pred = 0
             y_true.append(ans)
             y_pred.append(pred)
@@ -1071,7 +1071,7 @@ class BiodataR2Evaluator(BaseEvaluator):
                     pred = pred.split('</think>')[-1]
                 pred = extract_number(pred)
                 detail = {'pred': pred, 'answer': ans}
-                if not pred:
+                iif pred is None:
                     pred = np.inf
                 y_true.append(ans)
                 y_pred.append(pred)
