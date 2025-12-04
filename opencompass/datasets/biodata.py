@@ -1071,7 +1071,7 @@ class BiodataR2Evaluator(BaseEvaluator):
                     pred = pred.split('</think>')[-1]
                 pred = extract_number(pred)
                 detail = {'pred': pred, 'answer': ans}
-                iif pred is None:
+                if pred is None:
                     pred = np.inf
                 y_true.append(ans)
                 y_pred.append(pred)
