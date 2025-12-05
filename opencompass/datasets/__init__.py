@@ -130,6 +130,7 @@ from .natural_question_cn import *  # noqa: F401, F403
 from .nejmaibench import *  # noqa: F401, F403
 from .NPHardEval import *  # noqa: F401, F403
 from .obqa import *  # noqa: F401, F403
+from .ojbench import OJBenchDataset  # noqa: F401, F403
 from .olymmath import *  # noqa: F401, F403
 from .OlympiadBench import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
