@@ -314,6 +314,44 @@ qwen-3-8b-hf-fullbench:
         srbench_SymbolicMatch: 0.18
         supergpqa_Electronic_Science_and_Technology_accuracy: 68.75
         lcb_code_generation_v6_pass@1: 37.5
+    objective_v8:
+        atlas-val_accuracy: 0
+        DNA-cpd-sample_1k_mcc: -46.67
+        DNA-emp-sample_1k_mcc: -65.47
+        DNA-pd-sample_1k_mcc: -59.19
+        DNA-tf-h-sample_1k_mcc: -9.76
+        DNA-tf-m-sample_1k_mcc: -7.27
+        Multi_sequence-antibody_antigen-sample_1k_mcc: -15.29
+        Multi_sequence-promoter_enhancer_interaction-sample_1k_mcc: -38.3
+        Multi_sequence-rna_protein_interaction-sample_1k_mcc: -48.8
+        DNA-enhancer_activity-sample_1k_pcc: 7.27
+        RNA-CRISPROnTarget-sample_1k_spearman: nan
+        Protein-Fluorescence-sample_1k_spearman: 19.29
+        Protein-Stability-sample_1k_spearman: 28.66
+        Protein-Thermostability-sample_1k_spearman: 0
+        RNA-Isoform-sample_1k_r^2: 17.19
+        RNA-MeanRibosomeLoading-sample_1k_r^2: inf
+        RNA-ProgrammableRNASwitches-sample_1k_r^2: 0.54
+        RNA-Modification-sample_1k_auc: 50.91
+        Protein-Solubility-sample_1k_acc: 12.5
+        RNA-NoncodingRNAFamily-sample_1k_acc: 12.5
+        Protein-FunctionEC-sample_1k_score: 3
+        Multi_sequence-sirnaEfficiency-sample_1k_Mixed: 33.4
+        CMPhysBench-fix_prompt_score: 30.16
+        RP-selfies_score: 3.2
+        RP-selfies_valid_score: 50
+        MG-selfies_score: 0.8
+        MG-selfies_valid_score: 25
+        FS-selfies_score: 30.13
+        FS-selfies_valid_score: 87.5
+        RS-selfies_score: 12.09
+        RS-selfies_valid_score: 50
+        PP-selfies_score: 3.64
+        MC-selfies_score: 0.14
+        OpenSWI-shallow-1k_score: 394.16
+        OpenSWI-shallow-1k_valid: 18.75
+        OpenSWI-deep-1k_score: 1069.07
+        OpenSWI-deep-1k_valid: 6.25
     chat_subjective:
         alignment_bench_v1_1_总分: 0.46
         arenahard_score: 100
@@ -664,6 +702,44 @@ qwen-3-8b-fullbench:
         srbench_SymbolicMatch: 0.14
         supergpqa_Electronic_Science_and_Technology_accuracy: 56.25
         lcb_code_generation_v6_pass@1: 50
+    objective_v8:
+        atlas-val_accuracy: 12.5
+        DNA-cpd-sample_1k_mcc: -28.94
+        DNA-emp-sample_1k_mcc: -42.86
+        DNA-pd-sample_1k_mcc: -52.22
+        DNA-tf-h-sample_1k_mcc: -46.67
+        DNA-tf-m-sample_1k_mcc: 5.1
+        Multi_sequence-antibody_antigen-sample_1k_mcc: -41.82
+        Multi_sequence-promoter_enhancer_interaction-sample_1k_mcc: -15.29
+        Multi_sequence-rna_protein_interaction-sample_1k_mcc: -33.33
+        DNA-enhancer_activity-sample_1k_pcc: 28.51
+        RNA-CRISPROnTarget-sample_1k_spearman: -23.84
+        Protein-Fluorescence-sample_1k_spearman: nan
+        Protein-Stability-sample_1k_spearman: 3.94
+        Protein-Thermostability-sample_1k_spearman: 12.27
+        RNA-Isoform-sample_1k_r^2: 11.37
+        RNA-MeanRibosomeLoading-sample_1k_r^2: 8.09
+        RNA-ProgrammableRNASwitches-sample_1k_r^2: 21.69
+        RNA-Modification-sample_1k_auc: 40.67
+        Protein-Solubility-sample_1k_acc: 31.25
+        RNA-NoncodingRNAFamily-sample_1k_acc: 6.25
+        Protein-FunctionEC-sample_1k_score: 2.73
+        Multi_sequence-sirnaEfficiency-sample_1k_Mixed: 30.69
+        CMPhysBench-fix_prompt_score: 59.22
+        RP-selfies_score: 2.86
+        RP-selfies_valid_score: 68.75
+        MG-selfies_score: 1.31
+        MG-selfies_valid_score: 25
+        FS-selfies_score: 27.68
+        FS-selfies_valid_score: 93.75
+        RS-selfies_score: 16.55
+        RS-selfies_valid_score: 75
+        PP-selfies_score: 4.43
+        MC-selfies_score: 0.13
+        OpenSWI-shallow-1k_score: 284.37
+        OpenSWI-shallow-1k_valid: 6.25
+        OpenSWI-deep-1k_score: 861.96
+        OpenSWI-deep-1k_valid: 0
     chat_longtext: 
         babilong_qa1_256k_score: 0.00
         LongBench_2wikimqa_score: 5.43
