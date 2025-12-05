@@ -14,18 +14,8 @@ with read_base():
         datasets as MaScQA_chatml_datasets  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.UGPhysics.UGPhysics_gen import \
         datasets as UGPhysics_chatml_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.atlas.atlas_val_gen_b2d1b6 import \
-        atlas_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.biodata.biodata_task_gen import \
-        biodata_task_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.CMPhysBench.cmphysbench_gen import \
-        cmphysbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.eese.eese_llm_judge_gen import \
         eese_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.MolInstructions_chem.mol_instructions_chem_gen import \
-        mol_gen_selfies_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.openswi.openswi_gen import \
-        openswi_datasets  # noqa: F401, E501
 
     from ...rjob import eval, infer  # noqa: F401, E501
 
@@ -34,10 +24,7 @@ chatml_datasets = [
     if k.endswith('_chatml_datasets') and isinstance(v, list) and len(v) > 0
 ]
 
-datasets = chatml_datasets + [
-    eese_datasets[0], *atlas_datasets, *biodata_task_datasets,
-    *cmphysbench_datasets, *mol_gen_selfies_datasets, *openswi_datasets
-]
+datasets = [eese_datasets[0]]
 
 for d in chatml_datasets:
     d['test_range'] = '[0:16]'
