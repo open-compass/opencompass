@@ -48,6 +48,7 @@ arc_prize_public_evaluation_datasets = [
     dict(
         abbr='ARC_Prize_Public_Evaluation',
         type=ARCPrizeDataset,
+        version='arc_agi_1',
         path='opencompass/arc_prize_public_evaluation',
         reader_cfg=arc_prize_public_evaluation_reader_cfg,
         infer_cfg=arc_prize_public_evaluation_infer_cfg,
