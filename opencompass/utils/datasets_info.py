@@ -9,7 +9,7 @@ DATASETS_MAPPING = {
     "opencompass/biology-instruction":{
         "ms_id": None,
         "hf_id": None,
-        "local": "./data/biology-instruction",
+        "local": "./data/biology-instruction-fixed",
     },
     # OpenSWI
     "opencompass/openswi":{
