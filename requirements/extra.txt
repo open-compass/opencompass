@@ -15,13 +15,15 @@ langdetect
 ltp
 # Math
 math-verify[antlr4_11_0]
+# CMPhyBench
+pint
 # Taco, apps Dataset
 pyext
 # Law Bench
 pypinyin
-# Academic Datasets
+# Smolinstruct
 rdkit
-pint
+# Molinstructions
 selfies
 # RULER
 wonderwords
