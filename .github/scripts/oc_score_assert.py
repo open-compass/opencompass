@@ -337,7 +337,7 @@ class TestCmdCase:
 
 
 def assert_score(model_type, score, baseline, dataset: str = ''):
-    if baseline is None:
+    if baseline is None and (score == 'nan' or score == ''):
         assert True, 'baseline is none'
     if score is None or score == '-':
         assert False, 'value is none'
