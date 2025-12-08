@@ -82,14 +82,10 @@ obj_judge_model = dict(
 
 for d in datasets:
     if 'eval_cfg' in d and 'evaluator' in d['eval_cfg']:
-        if 'atlas' in d['abbr'] and 'judge_cfg' in d['eval_cfg']['evaluator']:
-            d['eval_cfg']['evaluator']['judge_cfg'] = dict(
-                judgers=[obj_judge_model])
-        elif 'judge_cfg' in d['eval_cfg']['evaluator']:
+        if 'judge_cfg' in d['eval_cfg']['evaluator']:
             d['eval_cfg']['evaluator']['judge_cfg'] = obj_judge_model
-        elif 'llm_evaluator' in d['eval_cfg'][
-                'evaluator'] and 'judge_cfg' in d[  # noqa: E501
-                    'eval_cfg']['evaluator']['llm_evaluator']:
+        if 'llm_evaluator' in d['eval_cfg']['evaluator'] and 'judge_cfg' in d[
+                'eval_cfg']['evaluator']['llm_evaluator']:
             d['eval_cfg']['evaluator']['llm_evaluator'][
                 'judge_cfg'] = obj_judge_model
 

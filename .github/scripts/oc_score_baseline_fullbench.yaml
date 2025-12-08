@@ -325,7 +325,7 @@ qwen-3-8b-hf-fullbench:
         Multi_sequence-promoter_enhancer_interaction-sample_1k_mcc: -38.3
         Multi_sequence-rna_protein_interaction-sample_1k_mcc: -48.8
         DNA-enhancer_activity-sample_1k_pcc: 7.27
-        RNA-CRISPROnTarget-sample_1k_spearman: nan
+        RNA-CRISPROnTarget-sample_1k_spearman: 
         Protein-Fluorescence-sample_1k_spearman: 19.29
         Protein-Stability-sample_1k_spearman: 28.66
         Protein-Thermostability-sample_1k_spearman: 0
@@ -714,7 +714,7 @@ qwen-3-8b-fullbench:
         Multi_sequence-rna_protein_interaction-sample_1k_mcc: -33.33
         DNA-enhancer_activity-sample_1k_pcc: 28.51
         RNA-CRISPROnTarget-sample_1k_spearman: -23.84
-        Protein-Fluorescence-sample_1k_spearman: nan
+        Protein-Fluorescence-sample_1k_spearman: 
         Protein-Stability-sample_1k_spearman: 3.94
         Protein-Thermostability-sample_1k_spearman: 12.27
         RNA-Isoform-sample_1k_r^2: 11.37
