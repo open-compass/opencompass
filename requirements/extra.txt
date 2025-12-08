@@ -19,7 +19,9 @@ math-verify[antlr4_11_0]
 pyext
 # Law Bench
 pypinyin
-# Smolinstruct
+# Academic Datasets
 rdkit
+pint
+selfies
 # RULER
 wonderwords
