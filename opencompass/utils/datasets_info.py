@@ -1,4 +1,14 @@
 DATASETS_MAPPING = {
+    "opencompass/lcb_pro": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/lcb_pro/lcb_pro_706.jsonl",
+    },
+    "opencompass/ojbench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/ojbench/ojbench_464.jsonl",
+    },
     # Mol Instructions
     "opencompass/mol-instructions": {
         "ms_id": None,
@@ -9,7 +19,7 @@ DATASETS_MAPPING = {
     "opencompass/biology-instruction":{
         "ms_id": None,
         "hf_id": None,
-        "local": "./data/biology-instruction",
+        "local": "./data/biology-instruction-fixed",
     },
     # OpenSWI
     "opencompass/openswi":{
