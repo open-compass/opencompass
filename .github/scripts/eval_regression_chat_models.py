@@ -44,7 +44,7 @@ Qwen3_0_6B_FP8_vllm = dict(
     generation_kwargs=dict(do_sample=False),  # greedy
     max_seq_len=32768,
     max_out_len=16384,
-    batch_size=16,
+    batch_size=1,
     run_cfg=dict(num_gpus=1),
 )
 
