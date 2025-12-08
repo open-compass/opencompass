@@ -82,7 +82,7 @@ models = [
 Place the aforementioned configuration in a file, such as "configs/eval_internlm2_lmdeploy.py". Then, in the home folder of OpenCompass, start evaluation by the following command:
 
 ```shell
-python run.py configs/eval_internlm2_lmdeploy.py -w outputs
+python run.py opencompass/configs/eval_internlm2_lmdeploy.py -w outputs
 ```
 
 You are expected to get the evaluation results after the inference and evaluation.
