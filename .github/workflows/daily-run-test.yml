@@ -256,7 +256,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        regression_func: ["api","api_rollout"]
+        regression_func: ["api","api-rollout"]
     timeout-minutes: 240 #4hours
     steps:
       - name: Clean workdir
