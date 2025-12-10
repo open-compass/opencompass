@@ -328,7 +328,7 @@ qwen-3-8b-hf-fullbench:
         RNA-CRISPROnTarget-sample_1k_spearman: null
         Protein-Fluorescence-sample_1k_spearman: 20.00
         Protein-Stability-sample_1k_spearman: 28.53
-        Protein-Thermostability-sample_1k_spearman: 18.45
+        Protein-Thermostability-sample_1k_spearman: -18.45
         RNA-Isoform-sample_1k_r^2: 6.64
         RNA-MeanRibosomeLoading-sample_1k_r^2: 20.35
         RNA-ProgrammableRNASwitches-sample_1k_r^2: 9.23
@@ -706,7 +706,7 @@ qwen-3-8b-fullbench:
         atlas-val_accuracy: 12.5
         DNA-cpd-sample_1k_mcc: -28.94
         DNA-emp-sample_1k_mcc: -42.86
-        DNA-pd-sample_1k_mcc: -52.22
+        DNA-pd-sample_1k_mcc: -51.64
         DNA-tf-h-sample_1k_mcc: -46.67
         DNA-tf-m-sample_1k_mcc: 5.1
         Multi_sequence-antibody_antigen-sample_1k_mcc: -41.82
@@ -718,7 +718,7 @@ qwen-3-8b-fullbench:
         Protein-Stability-sample_1k_spearman: 11.09
         Protein-Thermostability-sample_1k_spearman: 31.25
         RNA-Isoform-sample_1k_r^2: 2.72
-        RNA-MeanRibosomeLoading-sample_1k_r^2: 39.35
+        RNA-MeanRibosomeLoading-sample_1k_r^2: 30.35
         RNA-ProgrammableRNASwitches-sample_1k_r^2: 
         RNA-Modification-sample_1k_auc: 46.15
         Protein-Solubility-sample_1k_acc: 37.5
@@ -742,7 +742,7 @@ qwen-3-8b-fullbench:
         OpenSWI-deep-1k_valid: 0
     chat_longtext: 
         babilong_qa1_256k_score: 0.00
-        LongBench_2wikimqa_score: 5.41
+        LongBench_2wikimqa_score: 5.43
         Length16000Depth0_2needle_en_128k_score: 100.00
         ruler_cwe_128k_score: 0.00
     chat_subjective:
