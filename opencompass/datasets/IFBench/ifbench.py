@@ -61,6 +61,10 @@ class IFBenchEvaluator(BaseEvaluator):
             }
 
         results = {
+            'score': ((prompt_strict_correct / prompt_strict_total * 100) +
+                      (inst_strict_correct / inst_strict_total * 100) +
+                      (prompt_loose_correct / prompt_loose_total * 100) +
+                      (inst_loose_correct / inst_loose_total * 100)) / 4,
             'Prompt-level-strict-accuracy':
             prompt_strict_correct / prompt_strict_total * 100,
             'Inst-level-strict-accuracy':
