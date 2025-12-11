@@ -76,6 +76,7 @@ from .humaneval_multi import *  # noqa: F401, F403
 from .humaneval_pro import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .hungarian_math import *  # noqa: F401, F403
+from .IFBench.ifbench import IFBenchEvaluator  # noqa: F401, F403
 from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
 from .inference_ppl import InferencePPLDataset  # noqa: F401, F403
 from .infinitebench import *  # noqa: F401, F403
