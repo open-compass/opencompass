@@ -592,6 +592,7 @@ class OpenAISDK(OpenAI):
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Dict | None = None,
+        timeout: int = 3600,
     ):
         super().__init__(
             path,
@@ -634,7 +635,7 @@ class OpenAISDK(OpenAI):
             http_client=httpx.Client(
                 **http_client_cfg) if http_client_cfg else None,
         )
-
+        self.timeout = timeout
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
@@ -646,7 +647,7 @@ class OpenAISDK(OpenAI):
         input: PromptList | str,
         max_out_len: int,
         temperature: float,
-        timeout: int = 3600,
+        # timeout: int = 3600,
     ) -> str:
         """Generate results given a list of inputs.
 
@@ -701,7 +702,7 @@ class OpenAISDK(OpenAI):
                     self.logger.info('Start calling OpenAI API')
 
                 responses = self.openai_client.chat.completions.create(
-                    **query_data, timeout=timeout)  # timeout in seconds
+                    **query_data, timeout=self.timeout)  # timeout in seconds
                 if self.verbose:
                     self.logger.info(
                         'Successfully get response from OpenAI API '
