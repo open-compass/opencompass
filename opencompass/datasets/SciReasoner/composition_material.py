@@ -10,6 +10,8 @@ from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
+from opencompass.utils import get_data_path
+import os
 
 def extract_elements_from_prompt(prompt: str) -> list:
     """
@@ -59,20 +61,25 @@ def composition_precision(elements: list[str], prediction: str) -> float:
 class Composition_material_Dataset(BaseDataset):
 
     @staticmethod
-    def load(train_path, test_path, mini_set=False, hf_hub=False):
-        if (hf_hub is True):
-            # load from huggingface hub
-            train_data = []
-            repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
-            train_path = train_path.split(repo_id + '/')[1]
-            test_path = test_path.split(repo_id + '/')[1]
+    def load(path, mini_set=False):
 
-            train_path = hf_hub_download(repo_id,
-                                         train_path,
-                                         repo_type='dataset')
-            test_path = hf_hub_download(repo_id,
-                                        test_path,
-                                        repo_type='dataset')
+        # if (hf_hub is True):
+        #     # load from huggingface hub
+        #     train_data = []
+        #     repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
+        #     train_path = train_path.split(repo_id + '/')[1]
+        #     test_path = test_path.split(repo_id + '/')[1]
+        #
+        #     train_path = hf_hub_download(repo_id,
+        #                                  train_path,
+        #                                  repo_type='dataset')
+        #     test_path = hf_hub_download(repo_id,
+        #                                 test_path,
+        #                                 repo_type='dataset')
+
+        path = get_data_path(path)
+        train_path = os.path.join(path, f'conditional_generation/composition_material/dev/data.json')
+        test_path = os.path.join(path, f'conditional_generation/composition_material/test/data.json')
 
         # load from local json file
         with open(train_path, 'r', encoding='utf-8') as f:
@@ -111,7 +118,7 @@ class composition_Evaluator(BaseEvaluator):
 
     def __init__(self, data_path, tuning_data=None, **kwargs):
         super().__init__()
-        self.data_path = data_path
+        self.data_path = os.path.join(get_data_path(data_path), 'conditional_generation/composition_material/test/data.json')
         self.prompts = []
         self.gt_materials = set()
 

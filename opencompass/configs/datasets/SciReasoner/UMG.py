@@ -7,15 +7,6 @@ INFER_TEMPLATE = '''Generate a molecule with <SMILES>'''
 
 reader_cfg = dict(input_columns=['input'], output_column='output')
 
-generation_kwargs = dict(
-    num_return_sequences=1,
-    do_sample=True,
-    top_k=50,
-    top_p=0.95,
-    temperature=0.95,
-    # eos_token_id=[151643, 151645], 
-)
-
 infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
@@ -29,7 +20,7 @@ infer_cfg = dict(
         ),
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, generation_kwargs=generation_kwargs),
+    inferencer=dict(type=GenInferencer),
 )
 
 eval_cfg = dict(
@@ -40,7 +31,7 @@ eval_cfg = dict(
 
 UMG_Datasets = [
     dict(
-        abbr='unconditional_molecule_generation',
+        abbr='SciReasoner-unconditional_molecule_generation',
         type=UMG_Dataset,
         # max_cut=20,  # Optionally limit the maximum number of samples
         reader_cfg=reader_cfg,
@@ -49,7 +40,7 @@ UMG_Datasets = [
 ]
 mini_UMG_Datasets = [
     dict(
-        abbr='unconditional_molecule_generation-mini',
+        abbr='SciReasoner-unconditional_molecule_generation-mini',
         type=UMG_Dataset,
         max_cut=150,  # Optionally limit the maximum number of samples
         reader_cfg=reader_cfg,

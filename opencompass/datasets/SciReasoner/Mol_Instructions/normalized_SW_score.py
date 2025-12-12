@@ -1,8 +1,5 @@
 import math
 
-from Bio.Align import PairwiseAligner, substitution_matrices
-
-
 def normalized_smith_waterman(seq1,
                               seq2,
                               matrix_name='BLOSUM45',
@@ -20,6 +17,9 @@ def normalized_smith_waterman(seq1,
     Returns:
         float: Normalized score between 0.0 and 1.0
     """
+
+    from Bio.Align import PairwiseAligner, substitution_matrices
+
     # Initialize aligner
     aligner = PairwiseAligner()
     aligner.mode = 'local'  # Smith-Waterman algorithm

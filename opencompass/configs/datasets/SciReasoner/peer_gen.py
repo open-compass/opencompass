@@ -54,23 +54,21 @@ for task in TASKS:
     if task != 'stability':
         PEER_datasets.append(
             dict(
-                abbr=task,
+                abbr=f'SciReasoner-PEER_{task}',
                 type=PEER_Dataset,
-                train_path=f'/path/PEER-test/{task}/dev/data.json',
-                test_path=f'/path/PEER-test/{task}/test/data.json',
-                hf_hub=False,
+                path='opencompass/SciReasoner-PEER',
+                task=task,
                 reader_cfg=reader_cfg,
                 infer_cfg=infer_cfg,
                 eval_cfg=eval_llm_cfg),
         )
         mini_PEER_datasets.append(
             dict(
-                abbr=f'{task}-mini',
+                abbr=f'SciReasoner-PEER_{task}-mini',
                 type=PEER_Dataset,
-                train_path=f'/path/PEER-test/{task}/dev/data.json',
-                test_path=f'/path/PEER-test/{task}/test/data.json',
+                path='opencompass/SciReasoner-PEER',
+                task=task,
                 mini_set=True,
-                hf_hub=False,
                 reader_cfg=reader_cfg,
                 infer_cfg=infer_cfg,
                 eval_cfg=eval_llm_cfg),
@@ -78,23 +76,21 @@ for task in TASKS:
     else:
         PEER_datasets.append(
             dict(
-                abbr=task,
+                abbr=f'SciReasoner-PEER_{task}',
                 type=PEER_Dataset,
-                train_path=f'/path/PEER-test/{task}/dev/data.json',
-                test_path=f'/path/PEER-test/{task}/test/data.json',
-                hf_hub=False,
+                path='opencompass/SciReasoner-PEER',
+                task=task,
                 reader_cfg=reader_cfg,
                 infer_cfg=infer_cfg,
                 eval_cfg=eval_stability_cfg),
         )
         mini_PEER_datasets.append(
             dict(
-                abbr=f'{task}-mini',
+                abbr=f'SciReasoner-PEER_{task}-mini',
                 type=PEER_Dataset,
-                train_path=f'/path/PEER-test/{task}/dev/data.json',
-                test_path=f'/path/PEER-test/{task}/test/data.json',
+                path='opencompass/SciReasoner-PEER',
+                task=task,
                 mini_set=True,
-                hf_hub=False,
                 reader_cfg=reader_cfg,
                 infer_cfg=infer_cfg,
                 eval_cfg=eval_stability_cfg),

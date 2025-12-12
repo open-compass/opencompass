@@ -6,15 +6,19 @@ import re
 from functools import partial
 from typing import Union
 
-from rdkit import Chem, RDLogger
+try:
+    from rdkit import Chem, RDLogger
+except Exception:
+    Chem, RDLogger = None, None
+
 from tqdm import tqdm
 
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import TEXT_POSTPROCESSORS
 
 # 关闭 RDKit 的冗余日志输出
-lg = RDLogger.logger()
-lg.setLevel(RDLogger.CRITICAL)
+# lg = RDLogger.logger()
+# lg.setLevel(RDLogger.CRITICAL)
 
 # ----------------------------------------------------------------------
 # 1. 复用原脚本的核心函数

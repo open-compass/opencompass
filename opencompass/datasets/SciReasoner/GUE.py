@@ -10,24 +10,31 @@ from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
+from opencompass.utils import get_data_path
+import os
+
 
 @LOAD_DATASET.register_module()
 class GUE_Dataset(BaseDataset):
 
     @staticmethod
-    def load(train_path, test_path, mini_set=False, hf_hub=False):
+    def load(path, task, mini_set=False):
 
-        if (hf_hub is True):
-            repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
-            train_path = train_path.split(repo_id + '/')[1]
-            test_path = test_path.split(repo_id + '/')[1]
+        # if (hf_hub is True):
+        #     repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
+        #     train_path = train_path.split(repo_id + '/')[1]
+        #     test_path = test_path.split(repo_id + '/')[1]
+        #
+        #     train_path = hf_hub_download(repo_id,
+        #                                  train_path,
+        #                                  repo_type='dataset')
+        #     test_path = hf_hub_download(repo_id,
+        #                                 test_path,
+        #                                 repo_type='dataset')
 
-            train_path = hf_hub_download(repo_id,
-                                         train_path,
-                                         repo_type='dataset')
-            test_path = hf_hub_download(repo_id,
-                                        test_path,
-                                        repo_type='dataset')
+        path = get_data_path(path)
+        train_path = os.path.join(path, f'{task}/dev/data.json')
+        test_path = os.path.join(path, f'{task}/test/data.json')
 
         with open(train_path, 'r', encoding='utf-8') as f:
             train_data = json.load(f)

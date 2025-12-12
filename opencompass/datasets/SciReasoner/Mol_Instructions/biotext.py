@@ -5,7 +5,6 @@ import json
 import re
 from typing import List
 
-from bert_score import score
 from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
 from sklearn.metrics import precision_recall_fscore_support
@@ -13,6 +12,9 @@ from sklearn.metrics import precision_recall_fscore_support
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+
+from opencompass.utils import get_data_path
+import os
 
 
 def CER_calculate_f1_score(true_entities, predicted_entities):
@@ -183,21 +185,25 @@ def multi_choice_question_calculate_accuracy_(predictions, references):
 class Mol_Instructions_Dataset_BioText(BaseDataset):
 
     @staticmethod
-    def load(train_path, test_path, max_cut=-1, mini_set=False, hf_hub=False):
+    def load(path, task, max_cut=-1, mini_set=False, hf_hub=False):
 
-        if (hf_hub is True):
-            # load from huggingface hub
-            train_data = []
-            repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
-            train_path = train_path.split(repo_id + '/')[1]
-            test_path = test_path.split(repo_id + '/')[1]
+        # if (hf_hub is True):
+        #     # load from huggingface hub
+        #     train_data = []
+        #     repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
+        #     train_path = train_path.split(repo_id + '/')[1]
+        #     test_path = test_path.split(repo_id + '/')[1]
+        #
+        #     train_path = hf_hub_download(repo_id,
+        #                                  train_path,
+        #                                  repo_type='dataset')
+        #     test_path = hf_hub_download(repo_id,
+        #                                 test_path,
+        #                                 repo_type='dataset')
 
-            train_path = hf_hub_download(repo_id,
-                                         train_path,
-                                         repo_type='dataset')
-            test_path = hf_hub_download(repo_id,
-                                        test_path,
-                                        repo_type='dataset')
+        path = get_data_path(path)
+        train_path = os.path.join(path, f'{task}/dev/data.json')
+        test_path = os.path.join(path, f'{task}/test/data.json')
 
         with open(train_path, 'r', encoding='utf-8') as f:
             train_data = json.load(f)
@@ -212,7 +218,7 @@ class Mol_Instructions_Dataset_BioText(BaseDataset):
         if mini_set:
             import random
             random.seed(1024)
-            test_data = random.sample(test_data, 150)
+            test_data = random.sample(test_data, 50)
             random.seed()
 
         dataset = DatasetDict({
@@ -304,6 +310,7 @@ class Mol_Instructions_Evaluator_BioText(BaseEvaluator):
                     predictions, references),
             }
         elif self.task == 'open_question':
+            from bert_score import score
             correct_answers = [ref[0] for ref in references]
             my_answers = [pred[0] for pred in predictions]
             P, R, F1 = score(my_answers,

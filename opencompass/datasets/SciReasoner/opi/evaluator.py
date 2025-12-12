@@ -11,28 +11,34 @@ from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
 from .utils.metrics4all import calculate_metrics, calculate_rouge_l
+from opencompass.utils import get_data_path
+import os
 
 
 @LOAD_DATASET.register_module()
-class opiDataset(BaseDataset):
+class OpiDataset(BaseDataset):
 
     @staticmethod
-    def load(train_path, test_path, max_cut=-1, mini_set=False, hf_hub=False):
-        if (hf_hub is True):
-            # load from huggingface hub
-            train_data = []
-            repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
-            train_path = train_path.split(repo_id + '/')[1]
-            test_path = test_path.split(repo_id + '/')[1]
+    def load(path, task, max_cut=-1, mini_set=False, hf_hub=False):
 
-            train_path = hf_hub_download(repo_id,
-                                         train_path,
-                                         repo_type='dataset')
-            test_path = hf_hub_download(repo_id,
-                                        test_path,
-                                        repo_type='dataset')
+        # if (hf_hub is True):
+        #     # load from huggingface hub
+        #     train_data = []
+        #     repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
+        #     train_path = train_path.split(repo_id + '/')[1]
+        #     test_path = test_path.split(repo_id + '/')[1]
+        #
+        #     train_path = hf_hub_download(repo_id,
+        #                                  train_path,
+        #                                  repo_type='dataset')
+        #     test_path = hf_hub_download(repo_id,
+        #                                 test_path,
+        #                                 repo_type='dataset')
 
-        # load from local json file
+        path = get_data_path(path)
+        train_path = os.path.join(path, f'{task}/dev/data.json')
+        test_path = os.path.join(path, f'{task}/test/data.json')
+
         with open(train_path, 'r', encoding='utf-8') as f:
             train_data = json.load(f)
         with open(test_path, 'r', encoding='utf-8') as f:
@@ -44,7 +50,7 @@ class opiDataset(BaseDataset):
         if mini_set:
             import random
             random.seed(1024)
-            test_data = random.sample(test_data, 150)
+            test_data = random.sample(test_data, 50)
             random.seed()
 
         dataset = DatasetDict({
@@ -87,7 +93,7 @@ def opi_postprocess(text, task, *args, **kwargs):
     return text
 
 
-class opi_Evaluator(BaseEvaluator):
+class Opi_Evaluator(BaseEvaluator):
 
     def __init__(self, task, *args, **kwargs):
         super().__init__(*args, **kwargs)

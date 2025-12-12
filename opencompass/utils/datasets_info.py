@@ -509,11 +509,48 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/phybench",
     },
+
+    # SciReasoner
     "opencompass/SciReasoner-bio_instruction":{
         "ms_id": "",
         "hf_id": "",
         "local": "./data/SciReasoner/bio_instruction",
-    }
+    },
+    "opencompass/SciReasoner-Conditional_generation":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner/Conditional_generation",
+    },
+    "opencompass/SciReasoner-GUE":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner/GUE-test",
+    },
+    "opencompass/SciReasoner-LLM4Mat":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner/LLM4Mat-test",
+    },
+    "opencompass/SciReasoner-Mol_Instructions":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner/Mol-Instructions-test",
+    },
+    "opencompass/SciReasoner-OPI":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner/OPI_test",
+    },
+    "opencompass/SciReasoner-PEER":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner/PEER-test",
+    },
+    "opencompass/SciReasoner-smol":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner/smol-test",
+    },
 }
 
 DATASETS_URL = {

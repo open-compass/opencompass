@@ -51,17 +51,6 @@ all_datasets = []
 mini_all_datasets = []
 
 for task in TASKS:
-    generation_kwargs = dict(
-        num_return_sequences=1 if task in TASKS_single else 5,
-        num_beams=1 if task in TASKS_single else 5,
-        do_sample=False,
-        # do_sample=True,
-        # top_p=0.90,
-        # temperature=0.90,
-        # top_k=50,
-        # "<|endoftext|>": 151643 "<|im_end|>": 151645
-        # eos_token_id=[151643, 151645],  # for custom models
-    )
 
     reader_cfg = dict(input_columns=['input'], output_column='output')
 
@@ -98,8 +87,6 @@ for task in TASKS:
         ),
         inferencer=dict(
             type=GenInferencer,
-            # max_out_len=2048,
-            generation_kwargs=generation_kwargs,
         ))
 
     eval_cfg = dict(
@@ -110,24 +97,24 @@ for task in TASKS:
 
     all_datasets.append(
         dict(
-            abbr='smol_' + task,
+            abbr='SciReasoner-smol_' + task,
             type=LLM4ChemDataset,
-            train_path=f'/path/smol-test/{task}/dev/data.json',
-            test_path=f'/path/smol-test/{task}/test/data.json',
-            hf_hub=False,
+            path='opencompass/SciReasoner-smol',
+            task=task,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
-            eval_cfg=eval_cfg).copy()
+            eval_cfg=eval_cfg
+        )
     )
     mini_all_datasets.append(
         dict(
-            abbr='smol_' + task + '-mini',
+            abbr='SciReasoner-smol_' + task + '-mini',
             type=LLM4ChemDataset,
-            train_path=f'/path/smol-test/{task}/dev/data.json',
-            test_path=f'/path/smol-test/{task}/test/data.json',
+            path='opencompass/SciReasoner-smol',
+            task=task,
             mini_set=True,
-            hf_hub=False,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
-            eval_cfg=eval_cfg).copy()
+            eval_cfg=eval_cfg
+        )
     )

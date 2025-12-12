@@ -38,7 +38,7 @@ for task in path:
                        task=task,
                        model_name=MODEL_NAME),
         pred_role='BOT',
-        num_gpus=1
+        # num_gpus=1
     )
     eval_mini_cfg = dict(
         evaluator=dict(type=bio_instruction_Evaluator,
@@ -47,7 +47,7 @@ for task in path:
                        mini_set=True,
                        model_name=MODEL_NAME),
         pred_role='BOT',
-        num_gpus=1
+        # num_gpus=1
     )
 
     bio_instruction_datasets.append(

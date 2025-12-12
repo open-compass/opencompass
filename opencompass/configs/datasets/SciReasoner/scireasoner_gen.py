@@ -41,4 +41,12 @@ with read_base():
 #     mini_mol_biotext_datasets + mini_mol_mol_datasets + mini_mol_protein_datasets + mini_opi_datasets + mini_PEER_datasets + \
 #     mini_uncond_material_datasets + mini_uncond_RNA_datasets + mini_uncond_protein_datasets + mini_UMG_Datasets
 
-scireasoner_datasets_mini = mini_bio_instruction_datasets
+scireasoner_mini_datasets =\
+    (
+    mini_bio_instruction_datasets +
+    mini_composition_material_datasets +
+    mini_modulus_material_datasets +
+    mini_GUE_datasets +
+    mini_LLM4Mat_datasets +
+    mini_mol_biotext_datasets + mini_mol_mol_datasets + mini_mol_protein_datasets + mini_opi_datasets + mini_Retrosynthesis_uspto50k_datasets + mini_smol_datasets
+    )

@@ -5,17 +5,7 @@ from opencompass.datasets import RetrosynthesisEvaluator, Retrosynthesis_postpro
 
 reader_cfg = dict(input_columns=['input'], output_column='output')
 
-generation_kwargs = dict(
-    num_return_sequences = 3,
-    num_beams=3,
-    do_sample=False,
-    # do_sample=True,
-    # top_p=0.90,
-    # temperature=0.90,
-    # top_k=50,
-    # "<|endoftext|>": 151643 "<|im_end|>": 151645
-    # eos_token_id=[151643, 151645], # for custom models
-)
+
 
 infer_cfg = dict(
     prompt_template=dict(
@@ -37,7 +27,6 @@ infer_cfg = dict(
         template = dict(
             round = [
                 dict(role='HUMAN', prompt='{input}'),
-                dict(role='BOT', prompt='{output}'),
             ]
         )
     ),
@@ -49,8 +38,6 @@ infer_cfg = dict(
     ),
     inferencer=dict(
         type=GenInferencer,
-        # max_out_len=2048,
-        generation_kwargs=generation_kwargs,
     ),
 )
 
@@ -64,11 +51,10 @@ task = 'retrosynthesis_uspto50k'
 
 Retrosynthesis_datasets = [
     dict(
-        abbr='retrosynthesis_USPTO_50K',
+        abbr='SciReasoner-retrosynthesis_USPTO_50K',
         type=LLM4ChemDataset,
-        train_path = f'/path/smol-test/{task}/dev/data.json',
-        test_path=f'/path/smol-test/{task}/test/data.json',
-        hf_hub=False,
+        path='opencompass/SciReasoner-smol',
+        task=task,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
         eval_cfg= eval_cfg,
@@ -76,12 +62,11 @@ Retrosynthesis_datasets = [
 ]
 mini_Retrosynthesis_datasets = [
     dict(
-        abbr='retrosynthesis_USPTO_50K-mini',
+        abbr='SciReasoner-retrosynthesis_USPTO_50K-mini',
         type=LLM4ChemDataset,
-        train_path = f'/path/smol-test/{task}/dev/data.json',
-        test_path=f'/path/smol-test/{task}/test/data.json',
+        path='opencompass/SciReasoner-smol',
+        task=task,
         mini_set=True,
-        hf_hub=False,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
         eval_cfg= eval_cfg,

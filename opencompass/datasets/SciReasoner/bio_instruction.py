@@ -9,7 +9,10 @@ import pandas as pd
 import torch
 from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
-from scipy.stats import pearsonr, spearmanr
+try:
+    from scipy.stats import pearsonr, spearmanr
+except Exception:
+    pearsonr, spermanr = None, None
 from sklearn.metrics import (accuracy_score, matthews_corrcoef,
                              mean_absolute_error, mean_squared_error,
                              precision_score, recall_score, roc_auc_score)
@@ -20,16 +23,9 @@ from opencompass.utils import get_data_path
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 
-current_working_directory = os.getcwd()
-path_bioinstruction = os.path.join(current_working_directory, 'opencompass',
-                                   'datasets', 'bioinstruction')
-
-print(torch.cuda.is_available())
-
-classifier = pipeline('zero-shot-classification',
-                      model='facebook/bart-large-mnli',
-                      device=0)
-
+# current_working_directory = os.getcwd()
+# path_bioinstruction = os.path.join(current_working_directory, 'OpenCompass_SciReasoner_extra_data',
+#                                    'datasets', 'bioinstruction')
 
 # @LOAD_DATASET.register_module()
 class Bioinstruction_Dataset(BaseDataset):
@@ -50,7 +46,6 @@ class Bioinstruction_Dataset(BaseDataset):
         #                                 repo_type='dataset')
 
         path = get_data_path(path)
-        breakpoint()
         train_path = os.path.join(path, f'{task}/dev/data.json')
         test_path = os.path.join(path, f'{task}/test/data.json')
         with open(train_path, 'r', encoding='utf-8') as f:
@@ -169,6 +164,11 @@ def classify_by_sentiment_model(text):
         'This protein is expected to dissolve in water',
         'This protein is not expected to dissolve in water'
     ]
+
+    classifier = pipeline('zero-shot-classification',
+                          model='facebook/bart-large-mnli',
+                          device=0)
+
     outputs = classifier(text, candidate_labels, batch_size=64)
     processed_results = []
     for output in outputs:
@@ -240,14 +240,15 @@ def classify_by_keywords(text):
 
 
 # Save the processed data for each task in a separate file
-def save_processed_data(model_name, task_name, task_processed_data):
-    dir_path = path_bioinstruction + f'/processed_data/{model_name}'
-    file_path = f'{dir_path}/{task_name}_processed_data.json'
-    os.makedirs(dir_path, exist_ok=True)
-    with open(file_path, 'w') as outfile:
-        json.dump(task_processed_data, outfile, indent=4)
-
-    print(f'Task {task_name} procssed data saved in {file_path}')
+# def save_processed_data(model_name, task_name, task_processed_data):
+#
+#     dir_path = path_bioinstruction + f'/processed_data/{model_name}'
+#     file_path = f'{dir_path}/{task_name}_processed_data.json'
+#     os.makedirs(dir_path, exist_ok=True)
+#     with open(file_path, 'w') as outfile:
+#         json.dump(task_processed_data, outfile, indent=4)
+#
+#     print(f'Task {task_name} procssed data saved in {file_path}')
 
 
 # Process regression task
@@ -307,7 +308,7 @@ def process_regression_task(task_name, task_entries, model_name):
             entry['model_output'],
         })
 
-    save_processed_data(model_name, task_name, task_processed_data)
+    # save_processed_data(model_name, task_name, task_processed_data)
     print('over_len: ', over_len)
     print('miss_len: ', miss_len)
     return label_values, result_values
@@ -589,7 +590,7 @@ def compute_R2_for_ProgrammableRNASwitches_task(task_name, task_entries,
         })
 
     # Save the processed task data
-    save_processed_data(model_name, task_name, task_processed_data)
+    # save_processed_data(model_name, task_name, task_processed_data)
 
     # Convert to numpy arrays for easier manipulation
     on_result_values = np.array(on_result_values)
@@ -722,7 +723,7 @@ def compute_PCC_for_enhancer_activity_task(task_name, task_entries,
         })
 
     # Save the processed task data
-    save_processed_data(model_name, task_name, task_processed_data)
+    # save_processed_data(model_name, task_name, task_processed_data)
 
     # Convert to numpy arrays for easier manipulation
     hk_result_values = np.array(hk_result_values)
@@ -866,7 +867,7 @@ def process_binary_classification_task(task_name, task_entries, model_name):
     print('miss_len:', miss_len)
     print('over_len:', over_len)
 
-    save_processed_data(model_name, task_name, task_processed_data)
+    # save_processed_data(model_name, task_name, task_processed_data)
 
     return label_classes, result_classes
 
@@ -951,7 +952,7 @@ def compute_Acc_for_NoncodingRNAFamily_task(task_name, task_entries,
             entry['model_output']
         })
 
-    save_processed_data(model_name, task_name, task_processed_data)
+    # save_processed_data(model_name, task_name, task_processed_data)
     print('over_len:', over_len)
     print('miss_len:', miss_len)
     # Calculate accuracy
@@ -1057,7 +1058,7 @@ def compute_AUC_for_Modification_task(task_name, task_entries, model_name):
         print('label', entry['label'])
         print('predication', predicted_modifications)
 
-    save_processed_data(model_name, task_name, task_processed_data)
+    # save_processed_data(model_name, task_name, task_processed_data)
     print('over_len:', over_len)
     print('miss_len: ', miss_len)
     # Compute the AUC for each class, then average the AUC across all classes
@@ -1201,7 +1202,7 @@ def compute_Fmax_for_FunctionEC_task(task_name, task_entries, ec_labels,
         print('label_ec', label_ec)
         print('result_ec', result_ec)
 
-    save_processed_data(model_name, task_name, task_processed_data)
+    # save_processed_data(model_name, task_name, task_processed_data)
 
     # # Stack the predictions and targets for batch processing
     all_preds = torch.stack(all_preds)
@@ -1417,13 +1418,13 @@ class bio_instruction_Evaluator(BaseEvaluator):
             metrics_grouped_by_omics[omics][task_name] = scaled_metrics
 
             # Save the metrics (results) to a new JSON file
-            metrics_file_path = (
-                path_bioinstruction + f'/metrics_result/{omics}/' +
-                f'metrics_result_{self.model_name}_{task_name}.json')
-            output_directory = os.path.dirname(metrics_file_path)
-            os.makedirs(output_directory, exist_ok=True)
-            with open(metrics_file_path, 'w') as outfile:
-                json.dump(metrics_grouped_by_omics[omics], outfile, indent=4)
-            print(f'Metrics saved to {metrics_file_path}')
+            # metrics_file_path = (
+            #     path_bioinstruction + f'/metrics_result/{omics}/' +
+            #     f'metrics_result_{self.model_name}_{task_name}.json')
+            # output_directory = os.path.dirname(metrics_file_path)
+            # os.makedirs(output_directory, exist_ok=True)
+            # with open(metrics_file_path, 'w') as outfile:
+            #     json.dump(metrics_grouped_by_omics[omics], outfile, indent=4)
+            # print(f'Metrics saved to {metrics_file_path}')
 
         return metrics_grouped_by_omics[omics][task_name]

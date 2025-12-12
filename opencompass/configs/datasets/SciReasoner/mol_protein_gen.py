@@ -21,7 +21,7 @@ infer_cfg = dict(
         template='{input}\n{output}',
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=32000))
+    inferencer=dict(type=GenInferencer))
 
 eval_cfg = dict(
     evaluator=dict(type=Mol_Instructions_Evaluator_Protein),
@@ -41,22 +41,20 @@ mini_mol_protein_datasets = []
 for task in TASKS:
     mol_protein_datasets.append(
         dict(
-            abbr=f'mol_instruction_{task}',
+            abbr=f'SciReasoner-mol_instruction_{task}',
             type=Mol_Instructions_Dataset,
-            train_path=f'/path/Mol-Instructions-test/{task}/dev/data.json',
-            test_path=f'/path/Mol-Instructions-test/{task}/test/data.json',
-            hf_hub=False,
+            path='opencompass/SciReasoner-Mol_Instructions',
+            task=task,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
             eval_cfg=eval_cfg))
     mini_mol_protein_datasets.append(
         dict(
-            abbr=f'mol_instruction_{task}-mini',
+            abbr=f'SciReasoner-mol_instruction_{task}-mini',
             type=Mol_Instructions_Dataset,
-            train_path=f'/path/Mol-Instructions-test/{task}/dev/data.json',
-            test_path=f'/path/Mol-Instructions-test/{task}/test/data.json',
+            path='opencompass/SciReasoner-Mol_Instructions',
+            task=task,
             mini_set=True,
-            hf_hub=False,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
             eval_cfg=eval_cfg))
@@ -64,22 +62,20 @@ for task in TASKS:
 task = 'protein_design'
 mol_protein_datasets.append(
     dict(
-        abbr='mol_instruction_protein_design',
+        abbr='SciReasoner-mol_instruction_protein_design',
         type=Mol_Instructions_Dataset_Protein_Design,
-        train_path=f'/path/Mol-Instructions-test/{task}/dev/data.json',
-        test_path=f'/path/Mol-Instructions-test/{task}/test/data.json',
-        hf_hub=False,
+        path='opencompass/SciReasoner-Mol_Instructions',
+        task=task,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
         eval_cfg=eval_cfg_protein_design))
 mini_mol_protein_datasets.append(
     dict(
-        abbr='mol_instruction_protein_design-mini',
+        abbr='SciReasoner-mol_instruction_protein_design-mini',
         type=Mol_Instructions_Dataset_Protein_Design,
-        train_path=f'/path/Mol-Instructions-test/{task}/dev/data.json',
-        test_path=f'/path/Mol-Instructions-test/{task}/test/data.json',
+        path='opencompass/SciReasoner-Mol_Instructions',
+        task=task,
         mini_set=True,
-        hf_hub=False,
         reader_cfg=reader_cfg,
         infer_cfg=infer_cfg,
         eval_cfg=eval_cfg_protein_design))

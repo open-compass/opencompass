@@ -2,9 +2,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import opi_postprocess, opi_Evaluator, opiDataset
+from opencompass.datasets import opi_postprocess, Opi_Evaluator, OpiDataset
 
-import os
 
 all_datasets = []
 mini_all_datasets = []
@@ -33,16 +32,6 @@ subtask_dirs = [
 
 for subtask_name in subtask_dirs:
     # Common configs for inference
-    generation_kwargs = dict(
-        temperature=0.7,
-        top_k=50,
-        top_p=0.8,
-        num_beams=1,
-        # max_new_tokens=1024,
-        do_sample=True,
-        # use_cache=True,
-        # eos_token_id=[151643, 151645],  # for custom models
-    )
 
     reader_cfg = dict(input_columns=['input'], output_column='output')
 
@@ -54,8 +43,6 @@ for subtask_name in subtask_dirs:
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(
             type=GenInferencer,
-            # max_out_len=2048,
-            generation_kwargs=generation_kwargs,
         )
     )
 
@@ -63,23 +50,18 @@ for subtask_name in subtask_dirs:
     task_type = subtask_name.split('_')[0]
 
     eval_cfg = dict(
-        evaluator=dict(type=opi_Evaluator, task=task_type),
+        evaluator=dict(type=Opi_Evaluator, task=task_type),
         pred_postprocessor=dict(type=opi_postprocess, task=task_type),
         dataset_postprocessor=dict(type=opi_postprocess, task=task_type),
     )
 
-    # Construct paths assuming a dev/data.json and test/data.json structure
-    train_path = os.path.join(root_dir, subtask_name, 'dev', 'data.json')
-    test_path = os.path.join(root_dir, subtask_name, 'test', 'data.json')
-
     # Create the dataset dictionary for the current subtask
     all_datasets.append(
         dict(
-            abbr=subtask_name,
-            type=opiDataset,
-            train_path=train_path,
-            test_path=test_path,
-            hf_hub=False,
+            abbr=f'SciReasoner-Opi_{subtask_name}',
+            type=OpiDataset,
+            path='opencompass/SciReasoner-OPI',
+            task=subtask_name,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
             eval_cfg=eval_cfg
@@ -87,12 +69,11 @@ for subtask_name in subtask_dirs:
     )
     mini_all_datasets.append(
         dict(
-            abbr=f'{subtask_name}-mini',
-            type=opiDataset,
-            train_path=train_path,
-            test_path=test_path,
+            abbr=f'SciReasoner-Opi_{subtask_name}-mini',
+            type=OpiDataset,
+            path='opencompass/SciReasoner-OPI',
+            task=subtask_name,
             mini_set=True,
-            hf_hub=False,
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
             eval_cfg=eval_cfg

@@ -25,7 +25,7 @@ infer_cfg = dict(
         template='{input}\n{output}',
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=32000))
+    inferencer=dict(type=GenInferencer))
 
 infer_cfg_true_or_false = dict(
     prompt_template=dict(
@@ -33,7 +33,7 @@ infer_cfg_true_or_false = dict(
         template="{input}Your answer should start with 'Yes' or 'Maybe' or 'No'.\n{output}",
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=32000))
+    inferencer=dict(type=GenInferencer))
 
 infer_cfg_CER = dict(
     prompt_template=dict(
@@ -59,7 +59,6 @@ infer_cfg_CER = dict(
             round=[
                 dict(role='HUMAN', prompt='Query: {input}'),
                 dict(role='BOT', prompt='{output}'),
-
             ]
         )
     ),
@@ -67,7 +66,7 @@ infer_cfg_CER = dict(
         type=FixKRetriever,
         fix_id_list=[0, ],  # 使用前1个示例
     ),
-    inferencer=dict(type=GenInferencer, max_out_len=8192)
+    inferencer=dict(type=GenInferencer)
 )
 
 for task in TASKS:
@@ -86,23 +85,21 @@ for task in TASKS:
 
     mol_biotext_datasets.append(
         dict(
-            abbr=f'mol_instruction_{task}',
+            abbr=f'SciReasoner-mol_instruction_{task}',
             type=Mol_Instructions_Dataset_BioText,
-            train_path=f'/path/Mol-Instructions-test/{task}/dev/data.json',
-            test_path=f'/path/Mol-Instructions-test/{task}/test/data.json',
-            hf_hub=False,
+            path='opencompass/SciReasoner-Mol_Instructions',
+            task=task,
             reader_cfg=reader_cfg,
             infer_cfg=apply_infer_cfg,
             eval_cfg=eval_cfg)
     )
     mini_mol_biotext_datasets.append(
         dict(
-            abbr=f'mol_instruction_{task}-mini',
+            abbr=f'SciReasoner-mol_instruction_{task}-mini',
             type=Mol_Instructions_Dataset_BioText,
-            train_path=f'/path/Mol-Instructions-test/{task}/dev/data.json',
-            test_path=f'/path/Mol-Instructions-test/{task}/test/data.json',
+            path='opencompass/SciReasoner-Mol_Instructions',
+            task=task,
             mini_set=True,
-            hf_hub=False,
             reader_cfg=reader_cfg,
             infer_cfg=apply_infer_cfg,
             eval_cfg=eval_cfg)

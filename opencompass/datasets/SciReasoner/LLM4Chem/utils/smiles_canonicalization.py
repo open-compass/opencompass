@@ -1,6 +1,9 @@
-from rdchiral.chiral import copy_chirality
-from rdkit import Chem, RDLogger
-from rdkit.Chem.AllChem import AssignStereochemistry
+
+try:
+    from rdkit import Chem, RDLogger
+    from rdkit.Chem.AllChem import AssignStereochemistry
+except Exception:
+    Chem, RDLogger, AssignStereochemistry = None, None, None
 
 RDLogger.DisableLog('rdApp.*')
 
@@ -29,6 +32,8 @@ def canonicalize(smiles, isomeric=False, canonical=True, kekulize=False):
         return new_atom
 
     def copy_edit_mol(mol):
+        from rdchiral.chiral import copy_chirality
+
         new_mol = Chem.RWMol(Chem.MolFromSmiles(''))
         for atom in mol.GetAtoms():
             new_atom = copy_atom(atom)

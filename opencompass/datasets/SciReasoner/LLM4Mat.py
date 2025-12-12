@@ -12,6 +12,9 @@ from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
+from opencompass.utils import get_data_path
+import os
+
 
 @LOAD_DATASET.register_module()
 class LLM4MatDataset(BaseDataset):
@@ -20,20 +23,19 @@ class LLM4MatDataset(BaseDataset):
     def load(path,
              property,
              train_path,
-             mini_set=False,
-             hf_hub=False) -> DatasetDict:
+             test_path,
+             mini_set=False) -> DatasetDict:
 
-        def load_single_dataset(path, property, hf_hub, num=None):
+        def load_single_dataset(path, property, num=None):
 
-            if (hf_hub is True):
-                repo_id = path.split('/')[0] + '/' + path.split('/')[1]
-                path = path.split(repo_id + '/')[1]
-
-                path = hf_hub_download(repo_id, path, repo_type='dataset')
+            # if (hf_hub is True):
+            #     repo_id = path.split('/')[0] + '/' + path.split('/')[1]
+            #     path = path.split(repo_id + '/')[1]
+            #
+            #     path = hf_hub_download(repo_id, path, repo_type='dataset')
 
             with open(path, 'r', encoding='utf-8') as f:
                 raw_data = json.load(f)
-
             if isinstance(raw_data, dict):
                 raw_data = [raw_data]
 
@@ -52,15 +54,19 @@ class LLM4MatDataset(BaseDataset):
                 dataset = Dataset.from_list(processed)
             return dataset
 
+        path = get_data_path(path)
+        train_path = os.path.join(path, train_path)
+        test_path = os.path.join(path, test_path)
+
         if mini_set:
             test_num = 150
         else:
             test_num = None
         dataset = DatasetDict({
             'train':
-            load_single_dataset(train_path, property, hf_hub, num=5),
+            load_single_dataset(train_path, property, num=5),
             'test':
-            load_single_dataset(path, property, hf_hub, num=test_num)
+            load_single_dataset(test_path, property, num=test_num)
         })
         return dataset
 

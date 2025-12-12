@@ -5,31 +5,36 @@ from typing import List, Union
 
 from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
-from smact.screening import smact_validity
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 
+from opencompass.utils import get_data_path
+import os
 
 @LOAD_DATASET.register_module()
 class Bulk_modulus_material_Dataset(BaseDataset):
 
     @staticmethod
-    def load(train_path, test_path, mini_set=False, hf_hub=False):
-        if (hf_hub is True):
-            # load from huggingface hub
-            train_data = []
-            repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
-            train_path = train_path.split(repo_id + '/')[1]
-            test_path = test_path.split(repo_id + '/')[1]
+    def load(path, mini_set=False):
+        # if (hf_hub is True):
+        #     # load from huggingface hub
+        #     train_data = []
+        #     repo_id = test_path.split('/')[0] + '/' + test_path.split('/')[1]
+        #     train_path = train_path.split(repo_id + '/')[1]
+        #     test_path = test_path.split(repo_id + '/')[1]
+        #
+        #     train_path = hf_hub_download(repo_id,
+        #                                  train_path,
+        #                                  repo_type='dataset')
+        #     test_path = hf_hub_download(repo_id,
+        #                                 test_path,
+        #                                 repo_type='dataset')
 
-            train_path = hf_hub_download(repo_id,
-                                         train_path,
-                                         repo_type='dataset')
-            test_path = hf_hub_download(repo_id,
-                                        test_path,
-                                        repo_type='dataset')
+        path = get_data_path(path)
+        train_path = os.path.join(path, f'bulk_modulus_material/dev/data.json')
+        test_path = os.path.join(path, f'bulk_modulus_material/test/data.json')
 
         # load from local json file
         with open(train_path, 'r', encoding='utf-8') as f:
@@ -74,7 +79,8 @@ class material_Evaluator(BaseEvaluator):
 
     def __init__(self, data_path=None, **kwargs):
         super().__init__()
-        self.data_path = data_path
+        self.data_path = os.path.join(get_data_path(data_path),
+                                      'bulk_modulus_material/test/data.json')
         self.prompt_elements_list = []  # 从 gt 提取的元素
         self.reference_materials = []  # exact match 的参考答案
 
@@ -102,6 +108,9 @@ class material_Evaluator(BaseEvaluator):
         return ''.join(f"{el}{cnt or ''}" for el, cnt in tokens)
 
     def score(self, predictions: List[dict]):
+
+        from smact.screening import smact_validity
+
         total = len(predictions)
         format_valid = 0
         smact_valid = 0

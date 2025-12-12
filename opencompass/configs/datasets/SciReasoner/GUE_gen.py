@@ -26,13 +26,7 @@ GUE_reader_cfg = dict(input_columns=['input'], output_column='output')
 GUE_datasets = []
 mini_GUE_datasets = []
 
-generation_kwargs = dict(
-    do_sample=False,
-)
-
 for name in GUE_sub_tasks:
-    train_path = f'/path/GUE-test/{name}/dev/data.json'
-    test_path = f'/path/GUE-test/{name}/test/data.json'
 
     GUE_infer_cfg = dict(
         prompt_template=dict(
@@ -40,14 +34,13 @@ for name in GUE_sub_tasks:
             template=dict(
                 round=[
                     dict(role='HUMAN', prompt='{input}'),
-                    dict(role='BOT', prompt=''),
                 ]
             ),
         ),
         retriever=dict(
             type=ZeroRetriever
         ),
-        inferencer=dict(type=GenInferencer, generation_kwargs=generation_kwargs),
+        inferencer=dict(type=GenInferencer),
     )
 
     GUE_eval_cfg = dict(
@@ -61,11 +54,10 @@ for name in GUE_sub_tasks:
 
     GUE_datasets.append(
         dict(
-            abbr=name,
+            abbr=f'SciReasoner-Gue_{name}',
             type=GUE_Dataset,
-            train_path=train_path,
-            test_path=test_path,
-            hf_hub=False,
+            path='opencompass/SciReasoner-GUE',
+            task=name,
             reader_cfg=GUE_reader_cfg,
             infer_cfg=GUE_infer_cfg,
             eval_cfg=GUE_eval_cfg,
@@ -73,12 +65,11 @@ for name in GUE_sub_tasks:
     )
     mini_GUE_datasets.append(
         dict(
-            abbr=f'{name}-mini',
+            abbr=f'SciReasoner-Gue_{name}-mini',
             type=GUE_Dataset,
-            train_path=train_path,
-            test_path=test_path,
+            path='opencompass/SciReasoner-GUE',
+            task=name,
             mini_set=True,
-            hf_hub=False,
             reader_cfg=GUE_reader_cfg,
             infer_cfg=GUE_infer_cfg,
             eval_cfg=GUE_eval_cfg,

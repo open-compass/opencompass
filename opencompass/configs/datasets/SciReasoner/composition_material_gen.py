@@ -3,9 +3,6 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.datasets import Composition_material_Dataset, composition_Evaluator, material_postprocessor
 
-composition_train_path = '/path/Conditional_generation/conditional_generation/composition_material/dev/data.json'
-composition_test_path = '/path/Conditional_generation/conditional_generation/composition_material/test/data.json'
-
 generation_kwargs = dict(
     do_sample=True,
     # top_p=0.8,
@@ -32,15 +29,13 @@ composition_material_infer_cfg = dict(
         ),
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, generation_kwargs=generation_kwargs),
-    save_input=True,
-    
+    inferencer=dict(type=GenInferencer),
 )
 
 composition_material_eval_cfg = dict(
     evaluator=dict(
         type=composition_Evaluator,
-        data_path=composition_test_path,
+        data_path='opencompass/SciReasoner-Conditional_generation',
     ),
     pred_postprocessor=dict(type=material_postprocessor),
 )
@@ -48,11 +43,9 @@ composition_material_eval_cfg = dict(
 
 composition_material_datasets = [
     dict(
-        abbr='composition_to_material_generation',
+        abbr='SciReasoner-composition_to_material_generation',
         type=Composition_material_Dataset,
-        train_path=composition_train_path,
-        test_path=composition_test_path,
-        hf_hub=False,
+        path='opencompass/SciReasoner-Conditional_generation',
         reader_cfg=composition_material_reader,
         infer_cfg=composition_material_infer_cfg,
         eval_cfg=composition_material_eval_cfg,
@@ -60,12 +53,10 @@ composition_material_datasets = [
 ]
 mini_composition_material_datasets = [
     dict(
-        abbr='composition_to_material_generation-mini',
+        abbr='SciReasoner-composition_to_material_generation-mini',
         type=Composition_material_Dataset,
-        train_path=composition_train_path,
-        test_path=composition_test_path,
+        path='opencompass/SciReasoner-Conditional_generation',
         mini_set=True,
-        hf_hub=False,
         reader_cfg=composition_material_reader,
         infer_cfg=composition_material_infer_cfg,
         eval_cfg=composition_material_eval_cfg,

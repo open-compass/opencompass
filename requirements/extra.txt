@@ -23,3 +23,5 @@ pypinyin
 rdkit
 # RULER
 wonderwords
+# Scireasoner Composition Material
+smact
