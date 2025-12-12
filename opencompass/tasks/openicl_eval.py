@@ -47,7 +47,12 @@ class OpenICLEvalTask(BaseTask):
                     'judge_cfg', {}).get('run_cfg', {}).get('num_gpus', 0),
                 c.get('eval_cfg', {}).get('evaluator', {}).get(
                     'llm_evaluator', {}).get('judge_cfg', {}).get(
-                        'run_cfg', {}).get('num_gpus', 0))
+                        'run_cfg', {}).get('num_gpus', 0),
+                next(
+                    iter(
+                        c.get('eval_cfg', {}).get('evaluator', {}).get(
+                            'judge_cfg', {}).get('judgers', [])), {}).get(
+                                'run_cfg', {}).get('num_gpus', 0))
             for c in sum(self.dataset_cfgs, []))
         self.num_procs = max(
             c.get('eval_cfg', {}).get('evaluator', {}).get(

@@ -38,7 +38,7 @@ models = [
         model_kwargs=dict(tensor_parallel_size=1, gpu_memory_utilization=0.6),
         max_seq_len=8192,
         max_out_len=2048,
-        batch_size=16,
+        batch_size=1,
         generation_kwargs=dict(temperature=0),
         run_cfg=dict(num_gpus=1),
     ),
