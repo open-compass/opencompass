@@ -22,7 +22,9 @@ mini_mol_biotext_datasets = []
 infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template='{input}\n{output}',
+        template=dict(round=[
+            dict(role='HUMAN', prompt='{input}')
+        ]),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
@@ -30,7 +32,9 @@ infer_cfg = dict(
 infer_cfg_true_or_false = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template="{input}Your answer should start with 'Yes' or 'Maybe' or 'No'.\n{output}",
+        template=dict(round=[
+            dict(role='HUMAN', prompt="{input}Your answer should start with 'Yes' or 'Maybe' or 'No'")
+        ]),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
