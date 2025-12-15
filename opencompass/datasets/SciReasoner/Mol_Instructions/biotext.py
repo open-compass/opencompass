@@ -1,7 +1,9 @@
+# flake8: noqa
 # molecule task
 # https://github.com/zjunlp/Mol-Instructions/tree/main/evaluation/molecule
 
 import json
+import os
 import re
 from typing import List
 
@@ -12,9 +14,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-
 from opencompass.utils import get_data_path
-import os
 
 
 def CER_calculate_f1_score(true_entities, predicted_entities):

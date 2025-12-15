@@ -1,7 +1,9 @@
+# flake8: noqa
 # NC-I2S NC-S2I task
 # https://github.com/OSU-NLP-Group/LLM4Chem
 
 import json
+import os
 import re
 
 from datasets import Dataset, DatasetDict
@@ -10,6 +12,7 @@ from huggingface_hub import hf_hub_download
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .config import TASK_TAGS, TASKS_WITH_SEMICOLON_REPLACE
 from .utils.metrics import (calculate_boolean_metrics,
@@ -17,8 +20,6 @@ from .utils.metrics import (calculate_boolean_metrics,
                             calculate_number_metrics, calculate_smiles_metrics,
                             calculate_text_metrics)
 
-from opencompass.utils import get_data_path
-import os
 
 @LOAD_DATASET.register_module()
 class LLM4ChemDataset(BaseDataset):

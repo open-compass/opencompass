@@ -1,7 +1,9 @@
+# flake8: noqa
 # dataset: PEER
 # task : solubility prediction
 
 import json
+import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -16,9 +18,7 @@ from sklearn.metrics import f1_score, precision_score, recall_score
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-
 from opencompass.utils import get_data_path
-import os
 
 
 @LOAD_DATASET.register_module()

@@ -1,4 +1,7 @@
+# flake8: noqa
+
 import json
+import os
 import re
 from collections import Counter
 from typing import Union
@@ -9,9 +12,8 @@ from huggingface_hub import hf_hub_download
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-
 from opencompass.utils import get_data_path
-import os
+
 
 def extract_elements_from_prompt(prompt: str) -> list:
     """
@@ -78,8 +80,11 @@ class Composition_material_Dataset(BaseDataset):
         #                                 repo_type='dataset')
 
         path = get_data_path(path)
-        train_path = os.path.join(path, f'conditional_generation/composition_material/dev/data.json')
-        test_path = os.path.join(path, f'conditional_generation/composition_material/test/data.json')
+        train_path = os.path.join(
+            path, f'conditional_generation/composition_material/dev/data.json')
+        test_path = os.path.join(
+            path,
+            f'conditional_generation/composition_material/test/data.json')
 
         # load from local json file
         with open(train_path, 'r', encoding='utf-8') as f:
@@ -118,7 +123,9 @@ class composition_Evaluator(BaseEvaluator):
 
     def __init__(self, data_path, tuning_data=None, **kwargs):
         super().__init__()
-        self.data_path = os.path.join(get_data_path(data_path), 'conditional_generation/composition_material/test/data.json')
+        self.data_path = os.path.join(
+            get_data_path(data_path),
+            'conditional_generation/composition_material/test/data.json')
         self.prompts = []
         self.gt_materials = set()
 

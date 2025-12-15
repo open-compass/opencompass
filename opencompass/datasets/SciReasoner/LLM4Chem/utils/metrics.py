@@ -1,11 +1,18 @@
+# flake8: noqa
+
 import re
 from collections import defaultdict
 
 import numpy as np
 from nltk.translate.bleu_score import corpus_bleu
 from nltk.translate.meteor_score import meteor_score
-from rdkit import Chem, DataStructs, RDLogger
-from rdkit.Chem import AllChem, MACCSkeys
+
+try:
+    from rdkit import Chem, DataStructs, RDLogger
+    from rdkit.Chem import AllChem, MACCSkeys
+except Exception:
+    Chem, DataStructs, RDLogger, AllChem, MACCSkeys = None, None, None, None, None
+
 from rouge_score import rouge_scorer
 from sklearn.metrics import (f1_score, matthews_corrcoef, precision_score,
                              recall_score, roc_auc_score)
@@ -15,7 +22,7 @@ from transformers import BertTokenizerFast
 from .smiles_canonicalization import (canonicalize_molecule_smiles,
                                       get_molecule_id)
 
-RDLogger.DisableLog('rdApp.*')
+# RDLogger.DisableLog('rdApp.*')
 
 
 def convert_smiles_list_into_mol_list(smiles_list,

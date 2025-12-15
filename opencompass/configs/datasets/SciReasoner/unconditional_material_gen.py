@@ -5,13 +5,6 @@ from opencompass.datasets import Uncond_material_Dataset, uncond_material_Evalua
 
 uncond_material_reader_cfg = dict(input_columns=['input'], output_column='output')
 
-generation_kwargs = dict(
-    do_sample=True,
-    top_p=1,
-    temperature=1.8,
-    top_k=80,
-)
-
 uncond_material_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
@@ -25,7 +18,7 @@ uncond_material_infer_cfg = dict(
         ),
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, generation_kwargs=generation_kwargs),
+    inferencer=dict(type=GenInferencer),
 )
 
 uncond_material_eval_cfg = dict(
@@ -35,7 +28,7 @@ uncond_material_eval_cfg = dict(
 
 uncond_material_datasets = [
     dict(
-        abbr='unconditional_material_generation',
+        abbr='SciReasoner-unconditional_material_generation',
         type=Uncond_material_Dataset,
         num=5000,
         prompt='Produce a material that has any bulk modulus or composition',
@@ -46,7 +39,7 @@ uncond_material_datasets = [
 ]
 mini_uncond_material_datasets = [
     dict(
-        abbr='unconditional_material_generation-mini',
+        abbr='SciReasoner-unconditional_material_generation-mini',
         type=Uncond_material_Dataset,
         num=150,
         prompt='Produce a material that has any bulk modulus or composition',

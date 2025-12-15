@@ -1,3 +1,4 @@
+# flake8: noqa
 # molecule task
 # https://github.com/zjunlp/Mol-Instructions/tree/main/evaluation/molecule
 
@@ -5,7 +6,6 @@ import json
 import re
 
 import numpy as np
-
 from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
 from Levenshtein import distance as lev
@@ -23,6 +23,8 @@ try:
 except Exception:
     sf = None
 
+import os
+
 from rouge_score import rouge_scorer
 from sklearn.metrics import mean_absolute_error
 from transformers import BertTokenizerFast
@@ -31,9 +33,9 @@ from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 from opencompass.utils import get_data_path
-import os
 
 # RDLogger.DisableLog('rdApp.*')
+
 
 @LOAD_DATASET.register_module()
 class Mol_Instructions_Dataset(BaseDataset):

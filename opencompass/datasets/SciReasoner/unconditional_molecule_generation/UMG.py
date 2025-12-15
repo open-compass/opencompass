@@ -1,7 +1,11 @@
 import re
 
 from datasets import Dataset, DatasetDict
-from rdkit import Chem
+
+try:
+    from rdkit import Chem
+except Exception:
+    Chem = None
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
@@ -12,7 +16,7 @@ from opencompass.registry import LOAD_DATASET
 class UMG_Dataset(BaseDataset):
 
     @staticmethod
-    def load(train_path='', test_path='', max_cut=-1):
+    def load(max_cut=-1):
         gen_inst = 'Generate a molecule with <SMILES> '
 
         output_samples = [

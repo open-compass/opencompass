@@ -11,7 +11,7 @@ from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 class UPGDataset(BaseDataset):
 
     @staticmethod
-    def load(train_path='', test_path='', tag_bool=True, max_cut=-1):
+    def load(tag_bool=True, max_cut=-1):
         if tag_bool:
             gen_inst = 'Generate a protein sequence with <protein> </protein>.'
         else:

@@ -1,4 +1,7 @@
+# flake8: noqa
+
 import json
+import os
 import re
 from typing import Union
 
@@ -11,9 +14,7 @@ from sklearn.metrics import (mean_absolute_error, mean_squared_error,
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-
 from opencompass.utils import get_data_path
-import os
 
 
 @LOAD_DATASET.register_module()

@@ -1,11 +1,10 @@
-
 try:
     from rdkit import Chem, RDLogger
     from rdkit.Chem.AllChem import AssignStereochemistry
 except Exception:
     Chem, RDLogger, AssignStereochemistry = None, None, None
 
-RDLogger.DisableLog('rdApp.*')
+# RDLogger.DisableLog('rdApp.*')
 
 
 def canonicalize(smiles, isomeric=False, canonical=True, kekulize=False):

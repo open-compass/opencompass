@@ -5,16 +5,6 @@ from opencompass.datasets import UPGDataset, UPG_postprocess, UPG_Evaluator
 
 reader_cfg = dict(input_columns=['input'], output_column='output')
 
-generation_kwargs = dict(
-    num_return_sequences=1,
-    do_sample=True,
-    top_p=0.90,
-    temperature=0.90,
-    top_k=50,
-    # "<|endoftext|>": 151643 "<|im_end|>": 151645
-    # eos_token_id=[151643, 151645], # for custom models
-)
-
 infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
@@ -46,8 +36,6 @@ infer_cfg = dict(
     ),
     inferencer=dict(
         type=GenInferencer,
-        max_out_len=2048,
-        generation_kwargs=generation_kwargs,
     ),
 )
 
@@ -57,12 +45,11 @@ eval_cfg = dict(
     ),
     pred_postprocessor=dict(type=UPG_postprocess),
     dataset_postprocessor=dict(type=UPG_postprocess),
-    num_gpus=1,
 )
 
 UPG_datasets = [
     dict(
-        abbr='unconditional_protein_generation',
+        abbr='SciReasoner-unconditional_protein_generation',
         type=UPGDataset,
         # max_cut=20,  # Optionally limit the maximum number of samples
         reader_cfg=reader_cfg,
@@ -71,7 +58,7 @@ UPG_datasets = [
 ]
 mini_UPG_datasets = [
     dict(
-        abbr='unconditional_protein_generation-mini',
+        abbr='SciReasoner-unconditional_protein_generation-mini',
         type=UPGDataset,
         max_cut=150,  # Optionally limit the maximum number of samples
         reader_cfg=reader_cfg,

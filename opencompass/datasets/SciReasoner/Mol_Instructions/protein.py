@@ -1,7 +1,9 @@
+# flake8: noqa
 # molecule task
 # https://github.com/zjunlp/Mol-Instructions/tree/main/evaluation/molecule
 
 import json
+import os
 import re
 from typing import List, Optional
 
@@ -15,7 +17,6 @@ from opencompass.datasets.SciReasoner.Mol_Instructions.normalized_SW_score impor
 from opencompass.openicl import BaseEvaluator, RougeEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 from opencompass.utils import get_data_path
-import os
 
 
 @LOAD_DATASET.register_module()

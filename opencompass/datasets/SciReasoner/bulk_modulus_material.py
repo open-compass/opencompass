@@ -1,4 +1,7 @@
+# flake8: noqa
+
 import json
+import os
 import re
 from collections import Counter
 from typing import List, Union
@@ -9,9 +12,8 @@ from huggingface_hub import hf_hub_download
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
-
 from opencompass.utils import get_data_path
-import os
+
 
 @LOAD_DATASET.register_module()
 class Bulk_modulus_material_Dataset(BaseDataset):

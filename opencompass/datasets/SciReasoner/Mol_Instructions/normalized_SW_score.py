@@ -1,5 +1,6 @@
 import math
 
+
 def normalized_smith_waterman(seq1,
                               seq2,
                               matrix_name='BLOSUM45',

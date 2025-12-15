@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import json
 import os
 import re
@@ -9,6 +11,7 @@ import pandas as pd
 import torch
 from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
+
 try:
     from scipy.stats import pearsonr, spearmanr
 except Exception:
@@ -18,14 +21,15 @@ from sklearn.metrics import (accuracy_score, matthews_corrcoef,
                              precision_score, recall_score, roc_auc_score)
 from tqdm import tqdm
 from transformers import pipeline
-from opencompass.utils import get_data_path
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl import BaseEvaluator
+from opencompass.utils import get_data_path
 
 # current_working_directory = os.getcwd()
 # path_bioinstruction = os.path.join(current_working_directory, 'OpenCompass_SciReasoner_extra_data',
 #                                    'datasets', 'bioinstruction')
+
 
 # @LOAD_DATASET.register_module()
 class Bioinstruction_Dataset(BaseDataset):
@@ -1289,7 +1293,13 @@ def preprocess_input_data(input_file_path, prediction, mini_set=False):
 
 class bio_instruction_Evaluator(BaseEvaluator):
 
-    def __init__(self, path, task, model_name, mini_set=False, *args, **kwargs):
+    def __init__(self,
+                 path,
+                 task,
+                 model_name,
+                 mini_set=False,
+                 *args,
+                 **kwargs):
         super().__init__(*args, **kwargs)
 
         path = get_data_path(path)

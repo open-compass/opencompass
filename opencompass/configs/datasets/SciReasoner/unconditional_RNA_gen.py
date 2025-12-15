@@ -5,12 +5,6 @@ from opencompass.datasets import Uncond_RNA_Dataset, RNA_Evaluator, RNA_postproc
 
 uncond_RNA_reader_cfg = dict(input_columns=['input'], output_column='output')
 
-generation_kwargs = dict(
-    do_sample=True,
-    top_p=1,
-    temperature=1.8,
-    top_k=80,
-)
 
 uncond_RNA_infer_cfg = dict(
     prompt_template=dict(
@@ -25,7 +19,7 @@ uncond_RNA_infer_cfg = dict(
         ),
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, generation_kwargs=generation_kwargs),
+    inferencer=dict(type=GenInferencer),
 )
 
 uncond_RNA_eval_cfg = dict(
@@ -35,7 +29,7 @@ uncond_RNA_eval_cfg = dict(
 
 uncond_RNA_datasets = [
     dict(
-        abbr='unconditional_RNA_generation',
+        abbr='SciReasoner-unconditional_RNA_generation',
         type=Uncond_RNA_Dataset,
         num=5000,
         prompt='Please generate a novel RNA sequence. <rna>',
@@ -46,7 +40,7 @@ uncond_RNA_datasets = [
 ]
 mini_uncond_RNA_datasets = [
     dict(
-        abbr='unconditional_RNA_generation-mini',
+        abbr='SciReasoner-unconditional_RNA_generation-mini',
         type=Uncond_RNA_Dataset,
         num=150,
         prompt='Please generate a novel RNA sequence. <rna>',

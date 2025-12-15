@@ -2,6 +2,9 @@
 alpaca-eval==0.6
 # OlympiadBench
 antlr4-python3-runtime==4.11
+# UPG
+Bio
+# OlympiadBench
 cn2an
 # Dingo
 dingo-python==1.5.0
@@ -19,9 +22,11 @@ math-verify[antlr4_11_0]
 pyext
 # Law Bench
 pypinyin
+# LLM4Chem
+rdchiral
 # Smolinstruct
 rdkit
-# RULER
-wonderwords
 # Scireasoner Composition Material
 smact
+# RULER
+wonderwords
