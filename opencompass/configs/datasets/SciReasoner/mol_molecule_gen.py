@@ -21,7 +21,9 @@ mini_mol_mol_datasets = []
 infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template='{input}\n{output}',
+        template=dict(round=[
+            dict(role='HUMAN', prompt='{input}'),
+        ]),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
