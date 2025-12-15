@@ -135,13 +135,14 @@ class OpenICLEvalTask(BaseTask):
         test_set = build_dataset_from_cfg(self.dataset_cfg).test
         # Postprocess dataset if necessary
         if 'dataset_postprocessor' in self.eval_cfg:
-            proc = self.eval_cfg['dataset_postprocessor']['type']
+            kwargs = copy.deepcopy(self.eval_cfg['dataset_postprocessor'])
+            proc = kwargs.pop('type')
             if isinstance(proc, str):
                 proc = TEXT_POSTPROCESSORS.get(proc)
 
             def postprocess(sample):
                 s = sample[self.output_column]
-                sample[self.output_column] = proc(s)
+                sample[self.output_column] = proc(s, **kwargs)
                 return sample
 
             test_set = test_set.map(postprocess)
