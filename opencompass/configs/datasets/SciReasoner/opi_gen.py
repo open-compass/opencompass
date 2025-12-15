@@ -38,7 +38,9 @@ for subtask_name in subtask_dirs:
     infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
-            template='{input}\n{output}',
+            template=dict(round=[
+                dict(role='HUMAN', prompt='{input}'),
+            ]),
         ),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(
