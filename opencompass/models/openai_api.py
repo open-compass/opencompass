@@ -821,7 +821,6 @@ class OpenAISDKRollout(OpenAI):
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Dict | None = None,
-        dump_rollout_inf: bool = False,
     ):
         super().__init__(
             path,
@@ -931,18 +930,28 @@ class OpenAISDKRollout(OpenAI):
                     self.logger.info('Start calling OpenAI API')
 
                 responses = self.openai_client.chat.completions.create(
-                    **query_data, timeout=timeout,
-                    logprobs=True)  # timeout in seconds
+                    **query_data,
+                    timeout=timeout,
+                    logprobs=True,
+                    top_logprobs=self.top_logprobs)  # timeout in seconds
 
                 if not responses.choices[0].logprobs or not responses.choices[
                         0].logprobs.content:
                     token_logprobs = None
-                token_logprobs = [
-                    c.logprob for c in responses.choices[0].logprobs.content
-                ]
-                sum_neg_logprob = -float(sum(token_logprobs))
-                num_tokens = len(token_logprobs)
-                finish_reason = responses.choices[0].finish_reason
+                    sum_neg_logprob = 0.0
+                    num_tokens = 0
+                else:
+                    token_logprobs = [
+                        c.logprob
+                        for c in responses.choices[0].logprobs.content
+                    ]
+                    sum_neg_logprob = -float(sum(token_logprobs))
+                    num_tokens = len(token_logprobs)
+
+                if not responses.choices[0].finish_reason:
+                    finish_reason = 'error'
+                else:
+                    finish_reason = responses.choices[0].finish_reason
                 rollout = dict(
                     token_logprobs=token_logprobs,
                     sum_neg_logprob=sum_neg_logprob,
@@ -1006,14 +1015,15 @@ class OpenAISDKRollout(OpenAI):
                             content,
                         )
                     if content:
-                        return dict(output=reasoning_content + self.think_tag +
-                                    content,
+                        return dict(prediction=reasoning_content +
+                                    self.think_tag + content,
                                     rollout=rollout)
                     else:
-                        return dict(output=reasoning_content, rollout=rollout)
+                        return dict(prediction=reasoning_content,
+                                    rollout=rollout)
 
                 else:
-                    return dict(output=content, rollout=rollout)
+                    return dict(prediction=content, rollout=rollout)
 
             except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status
