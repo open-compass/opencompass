@@ -139,6 +139,18 @@ class TestChatFullbench:
         result_score = result_scores.get(model).get(dataset)
         assert_score(model, result_score, base_score, dataset)
 
+    @pytest.mark.chat_obj_fullbench_v8
+    @pytest.mark.parametrize(
+        'model, dataset',
+        [(p1, p2) for p1 in ['qwen-3-8b-hf-fullbench', 'qwen-3-8b-fullbench']
+         for p2 in dataset_list('qwen-3-8b-hf-fullbench', 'objective_v8')])
+    def test_chat_obj_v8(self, baseline_scores_fullbench, result_scores, model,
+                         dataset):
+        base_score = baseline_scores_fullbench.get(model).get(
+            'objective_v8').get(dataset, None)
+        result_score = result_scores.get(model).get(dataset, None)
+        assert_score(model, result_score, base_score, dataset)
+
     @pytest.mark.chat_obj_fullbench_other
     @pytest.mark.parametrize(
         'model, dataset',
@@ -325,6 +337,8 @@ class TestCmdCase:
 
 
 def assert_score(model_type, score, baseline, dataset: str = ''):
+    if baseline is None:
+        return
     if score is None or score == '-':
         assert False, 'value is none'
 

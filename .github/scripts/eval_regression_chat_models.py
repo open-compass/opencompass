@@ -41,10 +41,10 @@ Qwen3_0_6B_FP8_vllm = dict(
     abbr='qwen3-0_6b-fp8-vllm',
     path='Qwen/Qwen3-0.6B-FP8',
     model_kwargs=dict(tensor_parallel_size=1),
-    generation_kwargs=dict(do_sample=False),  # greedy
+    generation_kwargs=dict(temperature=0),  # greedy
     max_seq_len=32768,
     max_out_len=16384,
-    batch_size=16,
+    batch_size=1,
     run_cfg=dict(num_gpus=1),
 )
 

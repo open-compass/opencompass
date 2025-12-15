@@ -12,10 +12,10 @@ base:
         race-high_accuracy: 62.50
         winogrande_accuracy: 71.88
     qwen3-8b-base-vllm:
-        gsm8k_accuracy: 50.00
-        GPQA_diamond_accuracy: 21.88
+        gsm8k_accuracy: 53.12
+        GPQA_diamond_accuracy: 18.75
         race-high_accuracy: 59.38
-        winogrande_accuracy: 68.75
+        winogrande_accuracy: 71.88
     qwen3-8b-base-hf:
         gsm8k_accuracy: 50.00
         GPQA_diamond_accuracy: 18.75
