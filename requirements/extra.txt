@@ -30,10 +30,10 @@ pypinyin
 rdchiral
 # Smolinstruct
 rdkit
-# Scireasoner Composition Material
-smact
 # Molinstructions
 selfies
+# Scireasoner Composition Material
+smact
 # IFBench
 syllapy
 # RULER
