@@ -8,6 +8,8 @@ Bio
 cn2an
 # Dingo
 dingo-python==1.5.0
+# IFBench
+emoji
 # Icl topk retriever
 faiss_gpu==1.7.2
 # Humaneval, Humaneval X
@@ -18,6 +20,8 @@ langdetect
 ltp
 # Math
 math-verify[antlr4_11_0]
+# CMPhyBench
+pint
 # Taco, apps Dataset
 pyext
 # Law Bench
@@ -28,5 +32,9 @@ rdchiral
 rdkit
 # Scireasoner Composition Material
 smact
+# Molinstructions
+selfies
+# IFBench
+syllapy
 # RULER
 wonderwords

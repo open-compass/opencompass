@@ -19,6 +19,7 @@ name_dict = {
 }
 
 meteor_0shot_instruct_datasets = []
+mini_meteor_0shot_instruct_datasets = []
 for _name in name_dict:
     _hint = meteor_hint_dict[_name]
     meteor_0shot_infer_cfg = dict(
@@ -42,6 +43,17 @@ for _name in name_dict:
         dict(
             abbr=f'{_name}-0shot-instruct',
             type=SmolInstructDataset,
+            path='osunlp/SMolInstruct',
+            name=name_dict[_name],
+            reader_cfg=meteor_0shot_reader_cfg,
+            infer_cfg=meteor_0shot_infer_cfg,
+            eval_cfg=meteor_0shot_eval_cfg,
+        ))
+    mini_meteor_0shot_instruct_datasets.append(
+        dict(
+            abbr=f'{_name}-0shot-instruct-mini',
+            type=SmolInstructDataset,
+            mini_set=True,
             path='osunlp/SMolInstruct',
             name=name_dict[_name],
             reader_cfg=meteor_0shot_reader_cfg,

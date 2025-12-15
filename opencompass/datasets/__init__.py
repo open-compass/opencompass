@@ -13,6 +13,7 @@ from .bbeh import *  # noqa: F401, F403
 from .bbh import *  # noqa: F401, F403
 from .beyondaime import *  # noqa: F401, F403
 from .bigcodebench import *  # noqa: F401, F403
+from .biodata import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
@@ -36,6 +37,7 @@ from .cmb import *  # noqa: F401, F403
 from .cmmlu import *  # noqa: F401, F403
 from .cmnli import *  # noqa: F401, F403
 from .cmo_fib import *  # noqa: F401, F403
+from .cmphysbench import *  # noqa: F401, F403
 from .cmrc import *  # noqa: F401, F403
 from .codecompass import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
@@ -74,6 +76,7 @@ from .humaneval_multi import *  # noqa: F401, F403
 from .humaneval_pro import *  # noqa: F401, F403
 from .humanevalx import *  # noqa: F401, F403
 from .hungarian_math import *  # noqa: F401, F403
+from .IFBench.ifbench import IFBenchEvaluator  # noqa: F401, F403
 from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
 from .inference_ppl import InferencePPLDataset  # noqa: F401, F403
 from .infinitebench import *  # noqa: F401, F403
@@ -118,6 +121,7 @@ from .mmlu_cf import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403
+from .mol_instructions_chem import *  # noqa: F401, F403
 from .multipl_e import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .musr import *  # noqa: F401, F403
@@ -127,9 +131,11 @@ from .natural_question_cn import *  # noqa: F401, F403
 from .nejmaibench import *  # noqa: F401, F403
 from .NPHardEval import *  # noqa: F401, F403
 from .obqa import *  # noqa: F401, F403
+from .ojbench import OJBenchDataset  # noqa: F401, F403
 from .olymmath import *  # noqa: F401, F403
 from .OlympiadBench import *  # noqa: F401, F403
 from .OpenFinData import *  # noqa: F401, F403
+from .OpenSWI import *  # noqa: F401, F403
 from .phybench import *  # noqa: F401, F403
 from .physics import *  # noqa: F401, F403
 from .PI_LLM import PILLMDataset  # noqa: F401

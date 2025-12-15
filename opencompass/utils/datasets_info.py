@@ -1,4 +1,32 @@
 DATASETS_MAPPING = {
+    "opencompass/lcb_pro": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/lcb_pro/lcb_pro_706.jsonl",
+    },
+    "opencompass/ojbench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/ojbench/ojbench_464.jsonl",
+    },
+    # Mol Instructions
+    "opencompass/mol-instructions": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mol-instructions",
+    },
+    # Bio Task Data
+    "opencompass/biology-instruction":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/biology-instruction-fixed",
+    },
+    # OpenSWI
+    "opencompass/openswi":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/OpenSWI-1k-v1",
+    },
     # KLCE Datasets
     "opencompass/kcle":{
         "ms_id": None,
@@ -398,6 +426,11 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/arc_prize_public_evaluation",
+    },
+    "opencompass/arc_agi_2_public_evaluation": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arc_agi_2_public_evaluation",
     },
     "opencompass/simpleqa": {
         "ms_id": "",

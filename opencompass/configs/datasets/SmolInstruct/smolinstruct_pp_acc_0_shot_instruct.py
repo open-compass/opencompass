@@ -29,6 +29,7 @@ name_dict = {
 }
 
 pp_acc_datasets_0shot_instruct = []
+mini_pp_acc_datasets_0shot_instruct = []
 for _name in pp_acc_hint_dict:
     _hint = pp_acc_hint_dict[_name]
 
@@ -54,6 +55,17 @@ for _name in pp_acc_hint_dict:
         dict(
             abbr=f'PP-{_name}-0shot-instruct',
             type=SmolInstructDataset,
+            path='osunlp/SMolInstruct',
+            name=name_dict[_name],
+            reader_cfg=pp_acc_reader_cfg,
+            infer_cfg=pp_acc_infer_cfg,
+            eval_cfg=pp_acc_eval_cfg,
+        ))
+    mini_pp_acc_datasets_0shot_instruct.append(
+        dict(
+            abbr=f'PP-{_name}-0shot-instruct-mini',
+            type=SmolInstructDataset,
+            mini_set=True,
             path='osunlp/SMolInstruct',
             name=name_dict[_name],
             reader_cfg=pp_acc_reader_cfg,
