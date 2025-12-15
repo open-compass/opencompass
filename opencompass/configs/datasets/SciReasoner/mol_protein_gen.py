@@ -18,7 +18,9 @@ reader_cfg = dict(input_columns=['input'], output_column='output')
 infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
-        template='{input}\n{output}',
+        template=dict(round=[
+            dict(role='HUMAN', prompt='{input}'),
+        ]),
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
