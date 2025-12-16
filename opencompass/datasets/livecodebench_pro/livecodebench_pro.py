@@ -2,8 +2,9 @@ import json
 
 from datasets import Dataset
 
-from ..base import BaseDataset
 from opencompass.utils import get_data_path  # noqa: F401, F403
+
+from ..base import BaseDataset
 
 
 class LCBProDataset(BaseDataset):

@@ -26,19 +26,19 @@ def extract_longest_cpp_code(text):
     # -------------------------------
     # 1. First match all fenced code blocks starting with ```cpp at the beginning of a line
     # -------------------------------
-    fenced_pattern = r"(?m)^```cpp\s*\n(.*?)\n```"
+    fenced_pattern = r'(?m)^```cpp\s*\n(.*?)\n```'
     fenced_blocks = re.findall(fenced_pattern, text, flags=re.DOTALL)
     if fenced_blocks:
         # Search from the last one backwards, return the first block containing "#include"
         for block in reversed(fenced_blocks):
-            if "#include" in block:
+            if '#include' in block:
                 return block.strip()
     # -------------------------------
     # 2. If no suitable fenced code blocks are found, extract code blocks based on main occurrence position
     #    Start from the last main and work backwards, only return if conditions are met
     # -------------------------------
     cleaned_text = text  # Keep original text unchanged
-    main_matches = list(re.finditer(r"int\s+main\s*\(", cleaned_text))
+    main_matches = list(re.finditer(r'int\s+main\s*\(', cleaned_text))
     if main_matches:
         # Traverse backwards from the last main
         for main in reversed(main_matches):
@@ -46,7 +46,7 @@ def extract_longest_cpp_code(text):
             main_end_pos = main.end()
 
             # From main_end_pos, find the start of main's internal code block: the first left brace '{'
-            brace_start = cleaned_text.find("{", main_end_pos)
+            brace_start = cleaned_text.find('{', main_end_pos)
             if brace_start == -1:
                 # Cannot find left brace, skip this main
                 continue
@@ -56,9 +56,9 @@ def extract_longest_cpp_code(text):
             text_len = len(cleaned_text)
             while idx < text_len:
                 ch = cleaned_text[idx]
-                if ch == "{":
+                if ch == '{':
                     brace_count += 1
-                elif ch == "}":
+                elif ch == '}':
                     brace_count -= 1
                     if brace_count == 0:
                         idx += 1  # Include the closing brace
@@ -85,21 +85,19 @@ def extract_longest_cpp_code(text):
             # Scan upwards for consecutive "#include" lines (including consecutive #include lines above the main line)
             include_line_index = None
             for i in range(main_line_index, -1, -1):
-                if re.match(r"^\s*#include", lines[i]):
+                if re.match(r'^\s*#include', lines[i]):
                     include_line_index = i
                 else:
                     # Once a non-#include line is encountered and #include lines have been found before, stop scanning
                     if include_line_index is not None:
                         break
 
-            candidate_start = (
-                line_start_indices[include_line_index]
-                if include_line_index is not None
-                else line_start_indices[main_line_index]
-            )
+            candidate_start = (line_start_indices[include_line_index]
+                               if include_line_index is not None else
+                               line_start_indices[main_line_index])
 
             candidate_code = cleaned_text[candidate_start:func_end].strip()
-            if "#include" in candidate_code:
+            if '#include' in candidate_code:
                 return candidate_code
 
     return None
@@ -120,7 +118,7 @@ def extract_longest_python_code(text):
     # -------------------------------
     # 1. First match all fenced code blocks starting with ```python
     # -------------------------------
-    fenced_pattern = r"(?m)^```python\s*\n(.*?)\n```"
+    fenced_pattern = r'(?m)^```python\s*\n(.*?)\n```'
     fenced_blocks = re.findall(fenced_pattern, text, flags=re.DOTALL)
 
     if fenced_blocks:
@@ -133,7 +131,7 @@ def extract_longest_python_code(text):
     # -------------------------------
 
     # Pattern to match Python function/class definitions
-    def_class_pattern = r"(def\s+\w+|class\s+\w+)"
+    def_class_pattern = r'(def\s+\w+|class\s+\w+)'
     def_class_matches = list(re.finditer(def_class_pattern, text))
 
     if def_class_matches:
@@ -151,7 +149,7 @@ def extract_longest_python_code(text):
                     block_start = i
                     break
                 # Check if encountering blank line (two consecutive newlines)
-                elif i >= 1 and text[i-1:i+1] == '\n\n':
+                elif i >= 1 and text[i - 1:i + 1] == '\n\n':
                     block_start = i + 1  # Start after blank line
                     break
 
@@ -162,12 +160,12 @@ def extract_longest_python_code(text):
                     block_end = len(text)
                     break
                 # Check if encountering blank line
-                elif i < len(text) - 1 and text[i:i+2] == '\n\n':
+                elif i < len(text) - 1 and text[i:i + 2] == '\n\n':
                     block_end = i + 1  # Include the first newline
                     break
 
             code_block = text[block_start:block_end].strip()
-            if code_block and ("def " in code_block or "class " in code_block):
+            if code_block and ('def ' in code_block or 'class ' in code_block):
                 code_blocks.append(code_block)
 
         if code_blocks:
@@ -177,8 +175,9 @@ def extract_longest_python_code(text):
     # -------------------------------
     # 3. If no function/class definitions, look for import statements
     # -------------------------------
-    import_pattern = r"(^import\s+\w+|^from\s+\w+\s+import)"
-    import_matches = list(re.finditer(import_pattern, text, flags=re.MULTILINE))
+    import_pattern = r'(^import\s+\w+|^from\s+\w+\s+import)'
+    import_matches = list(re.finditer(import_pattern, text,
+                                      flags=re.MULTILINE))
 
     if import_matches:
         # Extract code around import statements
@@ -193,7 +192,7 @@ def extract_longest_python_code(text):
                 if i == 0:
                     block_start = i
                     break
-                elif i >= 1 and text[i-1:i+1] == '\n\n':
+                elif i >= 1 and text[i - 1:i + 1] == '\n\n':
                     block_start = i + 1
                     break
 
@@ -202,12 +201,13 @@ def extract_longest_python_code(text):
                 if i == len(text) - 1:
                     block_end = len(text)
                     break
-                elif i < len(text) - 1 and text[i:i+2] == '\n\n':
+                elif i < len(text) - 1 and text[i:i + 2] == '\n\n':
                     block_end = i + 1
                     break
 
             import_block = text[block_start:block_end].strip()
-            if import_block and ("import " in import_block or "from " in import_block):
+            if import_block and ('import ' in import_block
+                                 or 'from ' in import_block):
                 import_blocks.append(import_block)
 
         if import_blocks:
@@ -233,8 +233,9 @@ class LCBProEvaluator(BaseEvaluator):
 
     def __init__(
         self,
-        submit_url: str = "http://lightcpverifier.ailab.ailab.ai/submit",
-        result_url: str = "http://lightcpverifier.ailab.ailab.ai/result/{submission_id}",
+        submit_url: str = 'http://lightcpverifier.ailab.ailab.ai/submit',
+        result_url:
+        str = 'http://lightcpverifier.ailab.ailab.ai/result/{submission_id}',
         timeout: int = 10,
         poll_interval: int = 10,
         max_retries: int = 3,
@@ -262,28 +263,28 @@ class LCBProEvaluator(BaseEvaluator):
             Exception: If submission fails after retries
         """
         payload = {
-            "pid": pid,
-            "lang": lang,
-            "code": code,
+            'pid': pid,
+            'lang': lang,
+            'code': code,
         }
-        no_proxy = {"http": None, "https": None}
+        no_proxy = {'http': None, 'https': None}
 
         for attempt in range(self.max_retries):
             try:
-                response = requests.post(
-                    self.submit_url,
-                    json=payload,
-                    timeout=self.timeout,
-                    proxies=no_proxy
-                )
+                response = requests.post(self.submit_url,
+                                         json=payload,
+                                         timeout=self.timeout,
+                                         proxies=no_proxy)
                 response.raise_for_status()
                 return response.json()['sid']
             except Exception as e:
                 if attempt == self.max_retries - 1:
-                    raise Exception(f"Failed to submit code after {self.max_retries} attempts: {e}")
+                    raise Exception(
+                        f'Failed to submit code after {self.max_retries} attempts: {e}'
+                    )
                 time.sleep(1)
 
-        raise Exception("Should not reach here")
+        raise Exception('Should not reach here')
 
     def _get_result(self, submission_id: int) -> str:
         """Get evaluation result for a submission.
@@ -295,22 +296,24 @@ class LCBProEvaluator(BaseEvaluator):
             str: Result status ('Judging', 'Accepted', 'Judge Failed', etc.)
         """
         url = self.result_url.format(submission_id=submission_id)
-        no_proxy = {"http": None, "https": None}
+        no_proxy = {'http': None, 'https': None}
 
         try:
-            response = requests.get(url, proxies=no_proxy, timeout=self.timeout)
+            response = requests.get(url,
+                                    proxies=no_proxy,
+                                    timeout=self.timeout)
             if response.status_code == 404:
-                return "Judging"
+                return 'Judging'
             response.raise_for_status()
             info = response.json()
-            status = info.get("status", "")
-            if status in ("queued", "running", "pending"):
-                return "Judging"
-            if status == "error":
-                return "Judge Failed"
-            return info.get("result", "Unknown")
+            status = info.get('status', '')
+            if status in ('queued', 'running', 'pending'):
+                return 'Judging'
+            if status == 'error':
+                return 'Judge Failed'
+            return info.get('result', 'Unknown')
         except Exception as e:
-            return f"Error: {e}"
+            return f'Error: {e}'
 
     def _extract_code(self, text: str) -> tuple:
         """Extract code from model output.
@@ -346,7 +349,8 @@ class LCBProEvaluator(BaseEvaluator):
 
         return None, None
 
-    def score(self, predictions: List, references: List, test_set: Dataset) -> Dict:
+    def score(self, predictions: List, references: List,
+              test_set: Dataset) -> Dict:
         """Score code generation predictions against references.
 
         Args:
@@ -377,7 +381,7 @@ class LCBProEvaluator(BaseEvaluator):
 
         # Step 1: Extract code and submit
         from tqdm import tqdm
-        print("Submitting code to evaluation service...")
+        print('Submitting code to evaluation service...')
         for i in tqdm(range(len(predictions))):
             prediction = predictions[i]
             problem_id = references[i]
@@ -418,7 +422,7 @@ class LCBProEvaluator(BaseEvaluator):
                     })
 
         # Step 2: Poll for results
-        print("Polling for evaluation results...")
+        print('Polling for evaluation results...')
         total_count = len(submissions)
         accepted_count = 0
 
@@ -426,11 +430,16 @@ class LCBProEvaluator(BaseEvaluator):
             if submission['sid'] is None:
                 # Submission failed
                 details.append({
-                    'problem_id': submission['problem_id'],
-                    'correct': False,
-                    'result': submission.get('error', 'Unknown error'),
-                    'code': submission.get('code'),
-                    'lang': submission.get('lang'),
+                    'problem_id':
+                    submission['problem_id'],
+                    'correct':
+                    False,
+                    'result':
+                    submission.get('error', 'Unknown error'),
+                    'code':
+                    submission.get('code'),
+                    'lang':
+                    submission.get('lang'),
                 })
                 continue
 
@@ -438,7 +447,7 @@ class LCBProEvaluator(BaseEvaluator):
             sid = submission['sid']
             while True:
                 result = self._get_result(sid)
-                if result != "Judging":
+                if result != 'Judging':
                     if 'Accepted' in result:
                         accepted_count += 1
                         details.append({
