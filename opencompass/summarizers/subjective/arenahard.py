@@ -307,7 +307,7 @@ class ArenaHardSummarizer:
                         model_preds = load_model_preds(file_name)
                         pred_length = 0
                         for model_pred in model_preds:
-                            pred_length += len(tiktoken.encoding_for_model('gpt-3.5-turbo').encode(model_pred, disallowed_special=()))
+                            pred_length += len(tiktoken.encoding_for_model('gpt-4').encode(model_pred, disallowed_special=()))
                         pred_length /= len(model_preds)
                         stats.at[i, 'avg_tokens'] = pred_length
                     stats.at[i, 'results'] = bootstrap_elo_lu[model].tolist()

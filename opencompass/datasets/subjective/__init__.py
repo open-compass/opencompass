@@ -5,6 +5,7 @@ from .alpacaeval import AlpacaEvalDataset  # noqa: F401, F403
 from .alpacaeval import alpacaeval_bradleyterry_postprocess  # noqa: F401, F403
 from .alpacaeval import alpacaeval_postprocess  # noqa: F401, F403
 from .arena_hard import ArenaHardDataset  # noqa: F401, F403
+from .arena_hard import ArenaHardV2Dataset  # noqa: F401, F403
 from .arena_hard import arenahard_bradleyterry_postprocess  # noqa: F401, F403
 from .arena_hard import arenahard_postprocess  # noqa: F401, F403
 from .commonbench import commonbench_postprocess
