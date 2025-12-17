@@ -14,6 +14,8 @@ with read_base():
         cmphysbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.IFBench.IFBench_gen import \
         ifbench_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.livecodebench_pro.livecodebench_pro_gen import \
+        lcb_pro_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.MolInstructions_chem.mol_instructions_chem_gen import \
         mol_gen_selfies_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.openswi.openswi_gen import \
