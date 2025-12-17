@@ -84,6 +84,12 @@
     paper: https://arxiv.org/pdf/2403.07974
     configpath: opencompass/configs/datasets/livecodebench/livecodebench_gen.py
     configpath_llmjudge: ''
+- livecodebench_pro:
+    name: LiveCodeBench Pro
+    category: Code
+    paper: https://arxiv.org/pdf/2506.11928
+    configpath: opencompass/configs/datasets/livecodebench_pro/livecodebench_pro_gen.py
+    configpath_llmjudge: ''
 - livemathbench:
     name: LiveMathBench
     category: Math
