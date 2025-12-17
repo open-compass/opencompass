@@ -2,6 +2,9 @@
 alpaca-eval==0.6
 # OlympiadBench
 antlr4-python3-runtime==4.11
+# UPG
+Bio
+# OlympiadBench
 cn2an
 # Dingo
 dingo-python==1.5.0
@@ -23,10 +26,14 @@ pint
 pyext
 # Law Bench
 pypinyin
+# LLM4Chem
+rdchiral
 # Smolinstruct
 rdkit
 # Molinstructions
 selfies
+# Scireasoner Composition Material
+smact
 # IFBench
 syllapy
 # RULER

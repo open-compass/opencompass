@@ -157,6 +157,7 @@ from .scibench import ScibenchDataset, scibench_postprocess  # noqa: F401, F403
 from .scicode import *  # noqa: F401, F403
 from .SciEval import SciEvalDataset  # noqa: F401
 from .SciKnowEval import *  # noqa: F401, F403
+from .SciReasoner import *  # noqa: F401, F403
 from .SeedBench import *  # noqa: F401, F403
 from .simpleqa import *  # noqa: F401, F403
 from .siqa import *  # noqa: F401, F403

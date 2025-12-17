@@ -22,7 +22,7 @@ on:
         required: true
         description: 'regression functions'
         type: string
-        default: "['chat_models','base_models','chat_obj_fullbench_v5', 'chat_obj_fullbench_v6', 'chat_obj_fullbench_v7', 'chat_obj_fullbench_other','chat_sub_fullbench','base_fullbench','base_longtext_fullbench','chat_longtext_fullbench']"
+        default: "['chat_models','base_models','chat_obj_fullbench_v5', 'chat_obj_fullbench_v6', 'chat_obj_fullbench_v7', 'chat_obj_fullbench_v8', 'chat_obj_fullbench_other','chat_sub_fullbench','base_fullbench','base_longtext_fullbench','chat_longtext_fullbench']"
       baseline_result:
         required: true
         description: 'baseline result'
@@ -88,6 +88,8 @@ jobs:
     runs-on: yidian_cu12_daily
     timeout-minutes: 180 #3hours
     steps:
+      - name: Clean workdir
+        run: sudo git clean -ffdx
       - name: Clone repository
         uses: actions/checkout@v5
         with:
@@ -142,6 +144,8 @@ jobs:
     runs-on: yidian_cu12_daily
     timeout-minutes: 240 #4hours
     steps:
+      - name: Clean workdir
+        run: sudo git clean -ffdx
       - name: Clone repository
         uses: actions/checkout@v5
         with:
@@ -163,7 +167,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse
+          opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse --dump-res-length
       - name: Run test - other
         if: matrix.regression_func == 'chat_obj_fullbench_other'
         env: 
@@ -173,7 +177,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse
+          opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse --dump-res-length
       - name: Run test - other
         if: matrix.regression_func == 'chat_sub_fullbench'
         env: 
@@ -183,7 +187,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse
+          opencompass .github/scripts/eval_regression_${{matrix.regression_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} --reuse --dump-res-length
       - name: Assert result
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
@@ -192,10 +196,6 @@ jobs:
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}}/*/summary regression_result_daily
           python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py || true
           python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.regression_func}}
-      - name: Change code permission
-        if: always()
-        run: |
-          sudo chmod -R 777 .
 
 
   daily_run_cmd:
@@ -204,6 +204,8 @@ jobs:
     runs-on: yidian_cu12_daily
     timeout-minutes: 240 #4hours
     steps:
+      - name: Clean workdir
+        run: sudo git clean -ffdx
       - name: Clone repository
         uses: actions/checkout@v5
         with:
@@ -220,7 +222,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          rjob submit --name=cmd-${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-user/large-model-center-share-weights/hf_hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc '/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/daily_cmd_test.sh ${{env.REPORT_ROOT}}/${{ github.run_id }}'
+          rjob submit --metadata-name=cmd-${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-user/large-model-center-share-weights/hf_hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc '/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/daily_cmd_test.sh ${{env.REPORT_ROOT}}/${{ github.run_id }}'
 
           for i in {1..300}; do
             current_status=$(rjob get cmd-${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
@@ -246,17 +248,19 @@ jobs:
           python -m pytest -m case4 -s -v --color=yes .github/scripts/oc_score_assert.py
           rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/cmd5/*/summary regression_result_daily
           python -m pytest -m case5 -s -v --color=yes .github/scripts/oc_score_assert.py
-      - name: Change code permission
-        if: always()
-        run: |
-          sudo chmod -R 777 .
 
   daily_run_api:
     if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'api'))}}
     needs: prepare_env
     runs-on: yidian_cu12_daily
+    strategy:
+      fail-fast: false
+      matrix:
+        regression_func: ["api","api-rollout"]
     timeout-minutes: 240 #4hours
     steps:
+      - name: Clean workdir
+        run: sudo git clean -ffdx
       - name: Clone repository
         uses: actions/checkout@v5
         with:
@@ -273,13 +277,13 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          rjob submit --name=api-${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-user/large-model-center-share-weights/hf_hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc '/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/daily_api_test.sh ${{env.REPORT_ROOT}}/${{ github.run_id }} ${{env.WORK_PATH}}'
+          rjob submit --metadata-name=${{matrix.regression_func}}-${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=1 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-user/large-model-center-share-weights/hf_hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc '/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/daily_${{matrix.regression_func}}_test.sh ${{env.REPORT_ROOT}}/${{ github.run_id }} ${{env.WORK_PATH}}'
 
           for i in {1..300}; do
-            current_status=$(rjob get api-${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
+            current_status=$(rjob get ${{matrix.regression_func}}-${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
             if [[ $current_status == "Succeeded" || $current_status == "Failed" || $current_status == "Stopped" ]]; then
                 echo "Current status: $current_status, stop checking"
-                rjob logs job api-${{ env.JOB_NAME }}
+                rjob logs job ${{matrix.regression_func}}-${{ env.JOB_NAME }}
                 break
             fi
             sleep 6
@@ -289,9 +293,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/api/*/summary regression_result_daily
-          python -m pytest -m api -s -v --color=yes .github/scripts/oc_score_assert.py
-      - name: Change code permission
-        if: always()
-        run: |
-          sudo chmod -R 777 .
+          rm regression_result_daily -f && ln -s ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}}/*/summary regression_result_daily
+          python -m pytest -m ${{matrix.regression_func}} -s -v --color=yes .github/scripts/oc_score_assert.py
+          python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.regression_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.regression_func}}
+
