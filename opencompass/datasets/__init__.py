@@ -93,6 +93,7 @@ from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
 from .livecodebench import *  # noqa: F401, F403
+from .livecodebench_pro import *  # noqa: F401, F403
 from .livemathbench import *  # noqa: F401, F403
 from .livereasonbench import *  # noqa: F401, F403
 from .livestembench import *  # noqa: F401, F403
@@ -140,6 +141,7 @@ from .phybench import *  # noqa: F401, F403
 from .physics import *  # noqa: F401, F403
 from .PI_LLM import PILLMDataset  # noqa: F401
 from .piqa import *  # noqa: F401, F403
+from .ProcessBench import *  # noqa: F401, F403
 from .ProteinLMBench import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
