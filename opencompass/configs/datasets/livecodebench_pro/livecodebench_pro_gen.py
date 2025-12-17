@@ -3,6 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import (
     LCBProDataset,
+    LCBProEvaluator,
 )
 
 lcb_pro_reader_cfg = dict(
@@ -29,7 +30,14 @@ lcb_pro_infer_cfg = dict(
 )
 
 lcb_pro_eval_cfg = dict(
-    evaluator=dict()
+    evaluator=dict(
+        type=LCBProEvaluator,
+        submit_url='http://lightcpverifier.ailab.ailab.ai/submit',
+        result_url='http://lightcpverifier.ailab.ailab.ai/result/{submission_id}',
+        timeout=10,
+        poll_interval=10,
+        max_retries=3,
+    )
 )
 
 lcb_pro_datasets = [

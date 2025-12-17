@@ -93,6 +93,7 @@ from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
 from .livecodebench import *  # noqa: F401, F403
+from .livecodebench_pro import *  # noqa: F401, F403
 from .livemathbench import *  # noqa: F401, F403
 from .livereasonbench import *  # noqa: F401, F403
 from .livestembench import *  # noqa: F401, F403
