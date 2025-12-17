@@ -42,7 +42,7 @@ env:
   CONDA_PATH: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/miniconda3
   REPORT_ROOT: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/eval_report/regression_test
   COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
-  HF_DATASETS_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/qa-llm-cicd/hf_cache
+  HF_DATASETS_CACHE: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache
   HF_HUB_CACHE: /mnt/shared-storage-user/large-model-center-share-weights/hf_hub
   HF_ENDPOINT: https://hf-mirror.com
   TMPDIR: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/tmpdir
