@@ -222,7 +222,7 @@ class HuggingFace(BaseModel):
 
     def generate(self,
                  inputs: List[str],
-                 max_out_len: int,
+                 max_out_len: Optional[int],
                  min_out_len: Optional[int] = None,
                  stopping_criteria: List[str] = [],
                  **kwargs) -> List[str]:
@@ -230,7 +230,7 @@ class HuggingFace(BaseModel):
 
         Args:
             inputs (List[str]): A list of strings.
-            max_out_len (int): The maximum length of the output.
+            max_out_len (Optional[int]): The maximum length of the output.
             min_out_len (Optional[int]): The minimum length of the output.
 
         Returns:
@@ -255,7 +255,7 @@ class HuggingFace(BaseModel):
 
     def _batch_generate(self,
                         inputs: List[str],
-                        max_out_len: int,
+                        max_out_len: Optional[int],
                         min_out_len: Optional[int] = None,
                         stopping_criteria: List[str] = [],
                         **kwargs) -> List[str]:
@@ -263,7 +263,7 @@ class HuggingFace(BaseModel):
 
         Args:
             inputs (List[str]): A list of strings.
-            max_out_len (int): The maximum length of the output.
+            max_out_len (Optional[int]): The maximum length of the output.
 
         Returns:
             List[str]: A list of generated strings.
@@ -315,8 +315,10 @@ class HuggingFace(BaseModel):
             kwargs['min_new_tokens'] = min_out_len
 
         # step-2: conduct model forward to generate output
+        # Handle max_out_len being None
+        effective_max_out_len = max_out_len if max_out_len is not None else 512
         outputs = self.model.generate(**tokens,
-                                      max_new_tokens=max_out_len,
+                                      max_new_tokens=effective_max_out_len,
                                       **kwargs)
 
         if not self.extract_pred_after_decode:
@@ -339,7 +341,7 @@ class HuggingFace(BaseModel):
 
     def _single_generate(self,
                          inputs: List[str],
-                         max_out_len: int,
+                         max_out_len: Optional[int],
                          min_out_len: Optional[int] = None,
                          stopping_criteria: List[str] = [],
                          **kwargs) -> List[str]:
@@ -347,7 +349,7 @@ class HuggingFace(BaseModel):
 
         Args:
             inputs (List[str]): A list of strings.
-            max_out_len (int): The maximum length of the output.
+            max_out_len (Optional[int]): The maximum length of the output.
 
         Returns:
             List[str]: A list of generated strings.
@@ -371,8 +373,10 @@ class HuggingFace(BaseModel):
         if self.mode == 'mid':
             input_ids = self.tokenizer(inputs, truncation=False)['input_ids']
             input_ids = torch.tensor(input_ids, device=self.model.device)
-            if len(input_ids[0]) > self.max_seq_len - max_out_len:
-                half = int((self.max_seq_len - max_out_len) / 2)
+            effective_max_out_len = (max_out_len if max_out_len is not None
+                                     else 0)
+            if len(input_ids[0]) > self.max_seq_len - effective_max_out_len:
+                half = int((self.max_seq_len - effective_max_out_len) / 2)
                 inputs = [
                     self.tokenizer.decode(input_ids[0][:half],
                                           skip_special_tokens=True) +
@@ -380,10 +384,11 @@ class HuggingFace(BaseModel):
                                           skip_special_tokens=True)
                 ]
 
+        effective_max_out_len = max_out_len if max_out_len is not None else 0
         input_ids = self.tokenizer(inputs,
                                    truncation=True,
                                    max_length=self.max_seq_len -
-                                   max_out_len)['input_ids']
+                                   effective_max_out_len)['input_ids']
         input_ids = torch.tensor(input_ids, device=self.model.device)
         origin_stopping_criteria = stopping_criteria
         if stopping_criteria:
@@ -406,8 +411,10 @@ class HuggingFace(BaseModel):
 
         # To accommodate the PeftModel, parameters should be passed in
         # key-value format for generate.
+        # Handle max_out_len being None
+        effective_max_out_len = max_out_len if max_out_len is not None else 512
         outputs = self.model.generate(input_ids=input_ids,
-                                      max_new_tokens=max_out_len,
+                                      max_new_tokens=effective_max_out_len,
                                       **kwargs)
 
         if not self.extract_pred_after_decode:
