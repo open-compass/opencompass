@@ -113,7 +113,7 @@ def extract_strict_value(text: str, property: str) -> str:
     except Exception:
         pass
 
-    pattern = rf'\{{[^{{}}]*"?{re.escape(property)}"?\s*:\s*(.*?)\s*\}}'
+    pattern = rf'\{{[^{{}}]*["\']?{re.escape(property)}["\']?\s*:\s*["\']?(.*?)["\']?\s*\}}'
     match = re.search(pattern, text_clean, flags=re.DOTALL | re.IGNORECASE)
     if not match:
         return ''
