@@ -79,6 +79,7 @@ non_numeric_props_options = {
     'is_gap_direct': [True, False],
     'is_stable': [True, False],
 }
+true_false_dict = {'true': {'true', 'yes'}, 'false': {'false', 'no'}}
 
 
 def remove_think_tags(text: str) -> str:
@@ -104,7 +105,8 @@ def extract_strict_value(text: str, property: str) -> str:
                 options = non_numeric_props_options[property]
                 for opt in options:
                     if isinstance(opt, bool):
-                        if str(raw_value).lower() == str(opt).lower():
+                        if str(raw_value).lower() in true_false_dict[str(
+                                opt).lower()]:
                             return str(opt)
                     elif str(raw_value).lower() == str(opt).lower():
                         return opt
@@ -122,7 +124,7 @@ def extract_strict_value(text: str, property: str) -> str:
         options = non_numeric_props_options[property]
         for opt in options:
             if isinstance(opt, bool):
-                if raw_value.lower() == str(opt).lower():
+                if str(raw_value).lower() in true_false_dict[str(opt).lower()]:
                     return str(opt)
             elif raw_value.lower() == opt.lower():
                 return opt
