@@ -38,6 +38,7 @@ from .openai_api import OpenAISDKRollout  # noqa: F401
 from .openai_streaming import OpenAISDKStreaming  # noqa: F401
 from .pangu_api import PanGu  # noqa: F401
 from .qwen_api import Qwen  # noqa: F401
+from .ola_model import OlaModel  # noqa: F401
 from .rendu_api import Rendu  # noqa: F401
 from .sensetime_api import SenseTime  # noqa: F401
 from .stepfun_api import StepFun  # noqa: F401
