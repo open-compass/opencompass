@@ -12,6 +12,10 @@ with read_base():
         biodata_task_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.CMPhysBench.cmphysbench_gen import \
         cmphysbench_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.IFBench.IFBench_gen import \
+        ifbench_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.livecodebench_pro.livecodebench_pro_gen import \
+        lcb_pro_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.MolInstructions_chem.mol_instructions_chem_gen import \
         mol_gen_selfies_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.openswi.openswi_gen import \
@@ -19,10 +23,7 @@ with read_base():
 
     from ...rjob import eval, infer  # noqa: F401, E501
 
-datasets = [
-    *atlas_datasets, *biodata_task_datasets, *cmphysbench_datasets,
-    *mol_gen_selfies_datasets, *openswi_datasets
-]
+datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
 for d in datasets:
     if 'n' in d:

@@ -352,6 +352,13 @@ qwen-3-8b-hf-fullbench:
         OpenSWI-shallow-1k_valid: 18.75
         OpenSWI-deep-1k_score: 1069.07
         OpenSWI-deep-1k_valid: 6.25
+        IFBench_score: 25
+        IFBench_Prompt-level-strict-accuracy: 25
+        IFBench_Inst-level-strict-accuracy: 25
+        IFBench_Prompt-level-loose-accuracy: 25
+        IFBench_Inst-level-loose-accuracy: 25
+        lcb_pro_accuracy: 25
+        lcb_pro_pass@1: 25
     chat_subjective:
         alignment_bench_v1_1_总分: 0.46
         arenahard_score: 100
@@ -740,6 +747,13 @@ qwen-3-8b-fullbench:
         OpenSWI-shallow-1k_valid: 6.25
         OpenSWI-deep-1k_score: 861.96
         OpenSWI-deep-1k_valid: 0
+        IFBench_score: 25
+        IFBench_Prompt-level-strict-accuracy: 25
+        IFBench_Inst-level-strict-accuracy: 25
+        IFBench_Prompt-level-loose-accuracy: 25
+        IFBench_Inst-level-loose-accuracy: 25
+        lcb_pro_accuracy: 37.5
+        lcb_pro_pass@1: 37.5
     chat_longtext: 
         babilong_qa1_256k_score: 0.00
         LongBench_2wikimqa_score: 5.43
