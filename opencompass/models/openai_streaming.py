@@ -12,7 +12,7 @@ PromptType = Union[PromptList, str]
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3', 'o4']
+O1_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
 
 
 @MODELS.register_module()
@@ -52,28 +52,32 @@ class OpenAISDKStreaming(OpenAISDK):
                  think_tag: str = '</think>',
                  openai_extra_kwargs: Dict | None = None,
                  stream: bool = True,
-                 stream_chunk_size: int = 1):
+                 stream_chunk_size: int = 1,
+                 max_workers: Optional[int] = None):
 
-        super().__init__(path=path,
-                         max_seq_len=max_seq_len,
-                         query_per_second=query_per_second,
-                         rpm_verbose=rpm_verbose,
-                         retry=retry,
-                         key=key,
-                         org=org,
-                         meta_template=meta_template,
-                         openai_api_base=openai_api_base,
-                         openai_proxy_url=openai_proxy_url,
-                         mode=mode,
-                         logprobs=logprobs,
-                         top_logprobs=top_logprobs,
-                         temperature=temperature,
-                         tokenizer_path=tokenizer_path,
-                         extra_body=extra_body,
-                         verbose=verbose,
-                         http_client_cfg=http_client_cfg,
-                         status_code_mappings=status_code_mappings,
-                         think_tag=think_tag)
+        super().__init__(
+            path=path,
+            max_seq_len=max_seq_len,
+            query_per_second=query_per_second,
+            rpm_verbose=rpm_verbose,
+            retry=retry,
+            key=key,
+            org=org,
+            meta_template=meta_template,
+            openai_api_base=openai_api_base,
+            openai_proxy_url=openai_proxy_url,
+            mode=mode,
+            logprobs=logprobs,
+            top_logprobs=top_logprobs,
+            temperature=temperature,
+            tokenizer_path=tokenizer_path,
+            extra_body=extra_body,
+            verbose=verbose,
+            http_client_cfg=http_client_cfg,
+            status_code_mappings=status_code_mappings,
+            think_tag=think_tag,
+            max_workers=max_workers,
+        )
 
         self.stream = stream
         self.stream_chunk_size = stream_chunk_size
