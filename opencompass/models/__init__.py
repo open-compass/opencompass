@@ -42,7 +42,7 @@ from .rendu_api import Rendu  # noqa: F401
 from .sensetime_api import SenseTime  # noqa: F401
 from .stepfun_api import StepFun  # noqa: F401
 from .telechat_api import TeleChat  # noqa: F401
-from .telechat_api import TeleChatStream
+from .telechat_api import TeleChatStream  # noqa: F401
 from .turbomind import TurboMindModel  # noqa: F401
 from .turbomind_with_tf_above_v4_33 import \
     TurboMindModelwithChatTemplate  # noqa: F401

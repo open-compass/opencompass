@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
@@ -12,6 +14,7 @@ from .telechat_auth_sdk import Authorization
 
 PromptType = Union[PromptList, str]
 import time
+
 
 class TeleChat(BaseAPIModel):
     """
@@ -28,16 +31,15 @@ class TeleChat(BaseAPIModel):
         retry (int): Number of retires if the API call fails. Defaults to 5.
     """
 
-    def __init__(
-        self,
-        path: str,
-        url: str = "",
-        key: Union[str, List[str]] = 'ENV',
-        query_per_second: int = 2,
-        max_seq_len: int = 2048,
-        meta_template: Optional[Dict] = None,
-        retry: int = 5,
-        generation_kwargs=None):
+    def __init__(self,
+                 path: str,
+                 url: str = '',
+                 key: Union[str, List[str]] = 'ENV',
+                 query_per_second: int = 2,
+                 max_seq_len: int = 2048,
+                 meta_template: Optional[Dict] = None,
+                 retry: int = 5,
+                 generation_kwargs=None):
         if generation_kwargs is None:
             generation_kwargs = {
                 'temperature': 0.6,
@@ -78,17 +80,16 @@ class TeleChat(BaseAPIModel):
         auth = Authorization()
         url_path = auth.generate_canonical_uri(self.url)
         sign = auth.generate_signature_all(self.app_id, self.sec_key, 'BJ',
-                                           str(int(time.time())), '259200', 'POST', url_path, header)
+                                           str(int(time.time())), '259200',
+                                           'POST', url_path, header)
         header['Authorization'] = sign
         return header
 
-    def generate(
-        self,
-        inputs: List[PromptType],
-        max_out_len: int = 512,
-        temperature: float = 0.7,
-        **kwargs
-    ) -> List[str]:
+    def generate(self,
+                 inputs: List[PromptType],
+                 max_out_len: int = 512,
+                 temperature: float = 0.7,
+                 **kwargs) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
@@ -105,10 +106,9 @@ class TeleChat(BaseAPIModel):
                 tqdm(
                     executor.map(self._generate, inputs,
                                  [max_out_len] * len(inputs)),
-                    total = len(inputs),
-                    desc = 'Inferencing',
-                )
-            )
+                    total=len(inputs),
+                    desc='Inferencing',
+                ))
         self.flush()
         return results
 
@@ -158,7 +158,10 @@ class TeleChat(BaseAPIModel):
             max_num_retries += 1
             self.acquire()
             try:
-                raw_response = requests.request('POST',url=self.url,headers=self.headers,json=data)
+                raw_response = requests.request('POST',
+                                                url=self.url,
+                                                headers=self.headers,
+                                                json=data)
             except Exception as e:
                 self.release()
                 self.logger.error(e)
@@ -177,23 +180,27 @@ class TeleChat(BaseAPIModel):
                 max_num_retries += 1
                 continue
             if raw_response.status_code == 200:
-                if "code" not in response:
-                    msg = ""
-                    msg_content = response.get("choices",[{}])[0].get("message",{}).get("content","")
-                    msg_reason = response.get("choices",[{}])[0].get("message",{}).get("reasoning_content","")
+                if 'code' not in response:
+                    msg = ''
+                    msg_content = response.get('choices', [{}])[0].get(
+                        'message', {}).get('content', '')
+                    msg_reason = response.get('choices', [{}])[0].get(
+                        'message', {}).get('reasoning_content', '')
                     if msg_reason:
                         if len(msg_reason) > 0:
-                            msg += ("<think>" + msg_reason + "</think>")
+                            msg += ('<think>' + msg_reason + '</think>')
                     if msg_content:
                         if len(msg_content) > 0:
                             msg += msg_content
                     if msg:
                         if len(msg) > 0:
                             return msg
-                    self.logger.error('Find error message in response: ', raw_response.text)
+                    self.logger.error('Find error message in response: ',
+                                      raw_response.text)
                     continue
                 else:
-                    self.logger.error('Find error message in response: ',raw_response.text)
+                    self.logger.error('Find error message in response: ',
+                                      raw_response.text)
                     continue
             if raw_response.status_code != 200:
                 self.logger.error(raw_response.status_code)
@@ -201,4 +208,6 @@ class TeleChat(BaseAPIModel):
                                   str(response))
                 continue
 
-        raise RuntimeError(f"Current issue: {data}, has reached the maximum retry limit, but still cannot obtain the result.")
+        raise RuntimeError(
+            f'Current issue: {data}, has reached the maximum retry limit, but still cannot obtain the result.'
+        )

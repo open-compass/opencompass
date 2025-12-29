@@ -1,6 +1,8 @@
+# flake8: noqa
+
+import json
 import os
 import time
-import json
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -8,6 +10,7 @@ import requests
 from tqdm import tqdm
 
 from opencompass.utils.prompt import PromptList
+
 from ..base_api import BaseAPIModel
 from .telechat_auth_sdk import Authorization
 
@@ -22,7 +25,7 @@ class TeleChatStream(BaseAPIModel):
     def __init__(
         self,
         path: str,
-        url: str = "",
+        url: str = '',
         key: Union[str, List[str]] = 'ENV',
         query_per_second: int = 2,
         max_seq_len: int = 2048,
@@ -91,8 +94,7 @@ class TeleChatStream(BaseAPIModel):
                     ),
                     total=len(inputs),
                     desc='Inferencing',
-                )
-            )
+                ))
         self.flush()
         return results
 
@@ -135,7 +137,9 @@ class TeleChatStream(BaseAPIModel):
                 self.release()
                 self.logger.error(f'SSE parse failed: {e}')
 
-        raise RuntimeError(f"Current issue: {payload}, has reached the maximum retry limit, but still cannot obtain the result.")
+        raise RuntimeError(
+            f'Current issue: {payload}, has reached the maximum retry limit, but still cannot obtain the result.'
+        )
 
     def _build_messages(self, input: PromptType) -> List[Dict]:
         if isinstance(input, str):
@@ -143,11 +147,8 @@ class TeleChatStream(BaseAPIModel):
 
         messages = []
         for item in input:
-            role = (
-                'user' if item['role'] == 'HUMAN'
-                else 'assistant' if item['role'] == 'BOT'
-                else 'system'
-            )
+            role = ('user' if item['role'] == 'HUMAN' else
+                    'assistant' if item['role'] == 'BOT' else 'system')
             messages.append({'role': role, 'content': item['prompt']})
         return messages
 
@@ -187,20 +188,21 @@ class TeleChatStream(BaseAPIModel):
         return self._merge_output(content_buf, reasoning_buf)
 
     def _sse_event_iterator(self, response: requests.Response):
-        buffer = ""
-        for chunk in response.iter_content(chunk_size=None, decode_unicode=True):
+        buffer = ''
+        for chunk in response.iter_content(chunk_size=None,
+                                           decode_unicode=True):
             if not chunk:
                 continue
             buffer += chunk
-            while "\n\n" in buffer:
-                event, buffer = buffer.split("\n\n", 1)
+            while '\n\n' in buffer:
+                event, buffer = buffer.split('\n\n', 1)
                 yield event
         if buffer.strip():
             yield buffer
 
     def _merge_output(self, content, reasoning):
-        result = ""
+        result = ''
         if reasoning:
-            result += "<think>" + "".join(reasoning) + "</think>"
-        result += "".join(content)
+            result += '<think>' + ''.join(reasoning) + '</think>'
+        result += ''.join(content)
         return result
