@@ -2,7 +2,8 @@
 
 ```bash
 python3 run.py --models hf_internlm2_7b --datasets mmlu_ppl_ac766d --debug
-python3 run.py --models hf_internlm2_chat_7b --datasets mmlu_gen_4d595a --debug
+python3 run.py --models hf_internlm2_chat_7b --datasets mmlu_gen_4d595a --debug # 5shot
+python3 run.py --models hf_internlm2_chat_7b --datasets mmlu_gen --debug # 0shot
 ```
 
 ## Base Models
