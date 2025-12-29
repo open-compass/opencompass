@@ -7,7 +7,7 @@ import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 from datasets import Dataset, DatasetDict
@@ -469,3 +469,76 @@ class PEER_Evaluator(BaseEvaluator):
         }
 
         return metrics
+
+
+class PEERRuleEvaluator(BaseEvaluator):
+
+    def score(self,
+              predictions: List,
+              references: List,
+              test_set: Optional[List] = None) -> Dict:
+        if len(predictions) != len(references):
+            return {
+                'error': 'predictions and references have different length'
+            }
+
+        if not isinstance(predictions[0], list):
+            predictions = [[pred] for pred in predictions]
+        if not isinstance(references[0], list):
+            references = [[ref] for ref in references]
+
+        details = []
+        correct_count = 0
+
+        for i, (pred_list, ref_list) in enumerate(zip(predictions,
+                                                      references)):
+            raw_pred = pred_list[0] if isinstance(pred_list,
+                                                  list) else pred_list
+            raw_ref = ref_list[0] if isinstance(ref_list, list) else ref_list
+
+            clean_pred = PEER_postprocess(raw_pred).strip().lower()
+            clean_ref = PEER_postprocess(raw_ref).strip().lower()
+
+            is_correct = False
+
+            if clean_pred in ['yes', 'no'] and clean_ref in ['yes', 'no']:
+                if clean_pred == clean_ref:
+                    is_correct = True
+
+            if is_correct:
+                correct_count += 1
+
+            details.append({
+                'pred': raw_pred,
+                'answer': raw_ref,
+                'clean_pred': clean_pred,
+                'clean_ref': clean_ref,
+                'correct': is_correct
+            })
+
+        return {
+            'accuracy': correct_count / len(predictions) * 100,
+            'details': details
+        }
+
+
+def peer_llm_judge_postprocess(output: Dict, output_path: str) -> Dict:
+    new_details = []
+    for prediction_id, result in output.items():
+        content = result.get('prediction', '').strip().upper()
+
+        is_correct = False
+        if 'TRUE' in content:
+            is_correct = True
+        elif 'FALSE' in content:
+            is_correct = False
+        else:
+            is_correct = False
+
+        new_details.append({
+            'prediction': content,
+            'correct': is_correct,
+            'llm_judge': content
+        })
+
+    return {'details': new_details}

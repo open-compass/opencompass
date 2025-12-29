@@ -64,8 +64,9 @@ class RNA_Evaluator(BaseEvaluator):
             mfe_values = self.parse_mfe(mfe_file)
             avg_mfe = sum(mfe_values) / len(mfe_values) if mfe_values else None
 
-            rfam_cm = 'Rfam/Rfam.cm'
-            rfam_clanin = 'Rfam/Rfam.clanin'
+            cache_dir = os.environ.get('COMPASS_DATA_CACHE', '')
+            rfam_cm = os.path.join(cache_dir, 'Rfam/Rfam.cm')
+            rfam_clanin = os.path.join(cache_dir, 'Rfam/Rfam.clanin')
             rfam_tblout = self.run_cmscan(fasta_path, tmpdir, rfam_cm,
                                           rfam_clanin)
             rfam_families = self.parse_unique_families(rfam_tblout)
