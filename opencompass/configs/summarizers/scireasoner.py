@@ -199,10 +199,18 @@ class SciReasonerSummarizer(DefaultSummarizer):
                 available_metrics, missing_metrics = [], []
                 for i in sg['subsets']:
                     if isinstance(i, (list, tuple)):
+                        # 自动修复输出无效的子集分数，默认设为0
                         if i[0] in parsed_results[model_abbr] and i[1] in parsed_results[model_abbr][i[0]]:
                             available_metrics.append(i)
                         else:
-                            missing_metrics.append(i)
+                            self.logger.warning(
+                                f'Missing metric {i[1]} for dataset {i[0]} in model {model_abbr}, setting default value 0.')
+                            parsed_results[model_abbr][i[0]] = {i[1]: 0.0}
+                            available_metrics.append(i)
+                        if not isinstance(parsed_results[model_abbr][i[0]][i[1]], (int, float)):
+                            self.logger.warning(
+                                f'Non-numeric metric {i[1]} for dataset {i[0]} in model {model_abbr}, setting default value 0.')
+                            parsed_results[model_abbr][i[0]][i[1]] = 0.0
                     else:
                         if i in parsed_results[model_abbr]:
                             available_metrics.append(i)
