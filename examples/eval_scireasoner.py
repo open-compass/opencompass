@@ -2,7 +2,7 @@ from mmengine.config import read_base
 
 with read_base():
     # scireasoner
-    from opencompass.configs.datasets.SciReasoner.scireasoner_gen import scireasoner_datasets_full, scireasoner_datasets_mini
+    from opencompass.configs.datasets.SciReasoner.scireasoner_gen import scireasoner_full_datasets, scireasoner_mini_datasets
 from opencompass.configs.summarizers.scireasoner import SciReasonerSummarizer
 
 summarizer = dict(
