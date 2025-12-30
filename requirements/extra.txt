@@ -2,6 +2,8 @@
 alpaca-eval==0.6
 # OlympiadBench
 antlr4-python3-runtime==4.11
+# Scireasoner Mol_Instructions
+bert_score
 # UPG
 Bio
 # OlympiadBench
