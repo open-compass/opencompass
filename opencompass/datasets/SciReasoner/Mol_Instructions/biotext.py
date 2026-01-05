@@ -218,7 +218,7 @@ class Mol_Instructions_Dataset_BioText(BaseDataset):
         if mini_set:
             import random
             random.seed(1024)
-            test_data = random.sample(test_data, 50)
+            test_data = random.sample(test_data, min(len(test_data), 150))
             random.seed()
 
         dataset = DatasetDict({

@@ -111,28 +111,48 @@ for task in TASKS:
         dataset_postprocessor=dict(type=PEER_postprocess_default),
     )
 
-
-
-
-    PEER_datasets.append(
-        dict(
-            abbr=f'SciReasoner-PEER_{task}',
-            type=PEER_Dataset,
-            path='opencompass/SciReasoner-PEER',
-            task=task,
-            reader_cfg=reader_cfg,
-            infer_cfg=infer_cfg,
-            eval_cfg=cascade_eval_llm_cfg),
-    )
-    mini_PEER_datasets.append(
-        dict(
-            abbr=f'SciReasoner-PEER_{task}-mini',
-            type=PEER_Dataset,
-            path='opencompass/SciReasoner-PEER',
-            task=task,
-            mini_set=True,
-            reader_cfg=reader_cfg,
-            infer_cfg=infer_cfg,
-            eval_cfg=cascade_eval_llm_cfg),
-    )
+    if task != 'stability':
+        PEER_datasets.append(
+            dict(
+                abbr=f'SciReasoner-PEER_{task}',
+                type=PEER_Dataset,
+                path='opencompass/SciReasoner-PEER',
+                task=task,
+                reader_cfg=reader_cfg,
+                infer_cfg=infer_cfg,
+                eval_cfg=cascade_eval_llm_cfg),
+        )
+        mini_PEER_datasets.append(
+            dict(
+                abbr=f'SciReasoner-PEER_{task}-mini',
+                type=PEER_Dataset,
+                path='opencompass/SciReasoner-PEER',
+                task=task,
+                mini_set=True,
+                reader_cfg=reader_cfg,
+                infer_cfg=infer_cfg,
+                eval_cfg=cascade_eval_llm_cfg),
+        )
+    else:
+        PEER_datasets.append(
+            dict(
+                abbr=f'SciReasoner-PEER_{task}',
+                type=PEER_Dataset,
+                path='opencompass/SciReasoner-PEER',
+                task=task,
+                reader_cfg=reader_cfg,
+                infer_cfg=infer_cfg,
+                eval_cfg=eval_stability_cfg),
+        )
+        mini_PEER_datasets.append(
+            dict(
+                abbr=f'SciReasoner-PEER_{task}-mini',
+                type=PEER_Dataset,
+                path='opencompass/SciReasoner-PEER',
+                task=task,
+                mini_set=True,
+                reader_cfg=reader_cfg,
+                infer_cfg=infer_cfg,
+                eval_cfg=eval_stability_cfg),
+        )
 
