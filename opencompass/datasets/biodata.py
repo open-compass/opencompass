@@ -157,6 +157,8 @@ def extract_dict_text(text):
     matches = pattern.findall(text)
     if not matches:
         return None
+    if [match for match in matches][-1] == '{...}':
+        return None
     return [match for match in matches][-1]
 
 
