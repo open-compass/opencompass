@@ -65,7 +65,9 @@ class OpenICLInferTask(BaseTask):
 
     def run(self, cur_model=None, cur_model_abbr=None):
         self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
+        model_index, dataset_index = 0, 0
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
+            model_index += 1
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
             self.min_out_len = model_cfg.get('min_out_len', None)
@@ -75,6 +77,15 @@ class OpenICLInferTask(BaseTask):
                 self.model = build_model_from_cfg(model_cfg)
 
             for dataset_cfg in dataset_cfgs:
+                dataset_index += 1
+                total_model_len = len(self.model_cfgs[0]) if isinstance(
+                    self.model_cfgs[0], list) else len(self.model_cfgs)
+                total_dataset_len = len(self.dataset_cfgs[0]) if isinstance(
+                    self.dataset_cfgs[0], list) else len(self.dataset_cfgs)
+                self.logger.info(
+                    f'The Progress of This Task --> '
+                    f'Models: {model_index}/{total_model_len}, '
+                    f'Datasets: {dataset_index}/{total_dataset_len}')
                 self.model_cfg = model_cfg
                 self.dataset_cfg = dataset_cfg
                 self.infer_cfg = self.dataset_cfg['infer_cfg']
