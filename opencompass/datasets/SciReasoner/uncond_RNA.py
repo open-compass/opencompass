@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import os
 import re
 import subprocess
@@ -27,9 +29,16 @@ def RNA_postprocessor(text: Union[str, None]) -> str:
 
     text = text.replace('T', 'U').replace('t', 'u')
 
-    match = re.search(r'<rna>(.*?)</rna>', text, re.DOTALL | re.IGNORECASE)
-    if match:
-        return match.group(1).strip()
+    m = re.search(r'<rna>(.*?)</rna>', text, flags=re.DOTALL | re.IGNORECASE)
+    if m:
+        return m.group(1).strip()
+
+    m = re.search(r'^(.*?)</rna>', text, flags=re.DOTALL | re.IGNORECASE)
+    if m:
+        before = m.group(1)
+        # 从 before 中提取最后一段连续的 A/C/G/U（可按需求改成最长一段）
+        chunks = re.findall(r'[ACGU]+', before, flags=re.IGNORECASE)
+        return (chunks[-1].upper() if chunks else '').strip()
 
     return ''
 
@@ -54,7 +63,6 @@ class RNA_Evaluator(BaseEvaluator):
                     overlength_count += 1
 
         with TemporaryDirectory() as tmpdir:
-            tmpdir = 'tmp'
             fasta_path = os.path.join(tmpdir, 'valid_sequences.fasta')
             with open(fasta_path, 'w') as f:
                 for seq_id, seq in valid_rnas:
@@ -84,7 +92,7 @@ class RNA_Evaluator(BaseEvaluator):
         output_file = os.path.join(output_dir, 'mfe_results.txt')
         cmd = (
             f'cd {output_dir} && RNAfold < '
-            f'{os.path.abspath(input_fasta)} > {os.path.basename(output_file)}'
+            f'{os.path.abspath(input_fasta)} > {os.path.basename(output_file)} --noPS'
         )
         ret = subprocess.run(cmd, shell=True)
         if ret.returncode != 0:
