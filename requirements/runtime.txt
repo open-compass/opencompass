@@ -21,7 +21,7 @@ numpy>=1.23.4,<2.0.0
 openai
 OpenCC
 opencv-python-headless
-pandas<2.0.0
+pandas
 prettytable
 protobuf
 # pyext

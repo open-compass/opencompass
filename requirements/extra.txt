@@ -35,7 +35,7 @@ rdkit
 # Molinstructions
 selfies
 # Scireasoner Composition Material
-smact
+smact==3.0.2
 # IFBench
 syllapy
 # RULER
