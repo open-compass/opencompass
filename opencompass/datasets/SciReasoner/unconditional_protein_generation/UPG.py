@@ -138,6 +138,15 @@ class UPG_Evaluator(BaseEvaluator):
         predictions = [
             pred for pred in predictions if not (pred.strip() == '')
         ]
+
+        if len(predictions) == 0:
+            return {
+                'average_length': 0,
+                'diversity': 0,
+                'average_plddt': 0,
+                'info': 'Input predictions list is empty.'
+            }
+
         valid_rate = len(predictions) / ori_len
 
         # --- 1. Compute Average Length ---
