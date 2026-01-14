@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.10']
@@ -63,7 +63,7 @@ jobs:
           python run.py --models hf_opt_125m --datasets siqa_gen winograd_ppl --dry-run
 
   build_cu117:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04
     strategy:
