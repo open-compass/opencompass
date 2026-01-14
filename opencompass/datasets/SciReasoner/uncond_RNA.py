@@ -68,8 +68,8 @@ class RNA_Evaluator(BaseEvaluator):
                 'invalid_prediction_count': invalid_count,
                 'overlength_prediction_count': overlength_count,
                 'valid_sequence_count': len(valid_rnas),
-                'average_mfe': None,
-                'retrieved_rfam_family_count': None,
+                'average_mfe': 0,
+                'retrieved_rfam_family_count': 0,
             }
 
         with TemporaryDirectory() as tmpdir:
