@@ -62,6 +62,16 @@ class RNA_Evaluator(BaseEvaluator):
                 if len(seq) > 1024:
                     overlength_count += 1
 
+        if len(predictions) == invalid_count:
+            return {
+                'total_samples': len(predictions),
+                'invalid_prediction_count': invalid_count,
+                'overlength_prediction_count': overlength_count,
+                'valid_sequence_count': len(valid_rnas),
+                'average_mfe': 0,
+                'retrieved_rfam_family_count': 0,
+            }
+
         with TemporaryDirectory() as tmpdir:
             fasta_path = os.path.join(tmpdir, 'valid_sequences.fasta')
             with open(fasta_path, 'w') as f:
