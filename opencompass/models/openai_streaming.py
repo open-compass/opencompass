@@ -53,6 +53,7 @@ class OpenAISDKStreaming(OpenAISDK):
                  openai_extra_kwargs: Dict | None = None,
                  stream: bool = True,
                  stream_chunk_size: int = 1,
+                 timeout: int = 3600,
                  max_workers: Optional[int] = None):
 
         super().__init__(
@@ -82,6 +83,7 @@ class OpenAISDKStreaming(OpenAISDK):
         self.stream = stream
         self.stream_chunk_size = stream_chunk_size
         self.openai_extra_kwargs = openai_extra_kwargs
+        self.timeout = timeout
 
     def _create_fresh_client(self):
         """Create a fresh OpenAI client for each request to avoid
@@ -116,18 +118,17 @@ class OpenAISDKStreaming(OpenAISDK):
         return OpenAI(
             base_url=self.openai_api_base,
             api_key=current_key,
-            http_client=httpx.Client(
-                **http_client_cfg,
-                timeout=httpx.Timeout(3600.0)  # 1 hour timeout
-            ) if http_client_cfg or True else None,
+            http_client=httpx.Client(**http_client_cfg,
+                                     timeout=httpx.Timeout(self.timeout))
+            if http_client_cfg or True else None,
         )
 
     def _generate(
-            self,
-            input: PromptList | str,
-            max_out_len: int,
-            temperature: float,
-            timeout: int = 3600,  # Set timeout to 1 hour
+        self,
+        input: PromptList | str,
+        max_out_len: int,
+        temperature: float,
+        # timeout: int = 3600,  # Set timeout to 1 hour
     ) -> str:
         """Generate results with streaming support.
 
@@ -196,7 +197,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
                     # Handle streaming response with shorter timeout
                     response_stream = fresh_client.chat.completions.create(
-                        **query_data, timeout=timeout)
+                        **query_data, timeout=self.timeout)
 
                     result = self._handle_stream_response(
                         response_stream, thread_id if self.verbose else None)
@@ -210,7 +211,7 @@ class OpenAISDKStreaming(OpenAISDK):
                 else:
                     # Fallback to non-streaming (use parent method)
                     return super()._generate(input, max_out_len, temperature,
-                                             timeout)
+                                             self.timeout)
 
             except (BadRequestError, APIStatusError) as e:
                 status_code = e.status_code
@@ -250,6 +251,7 @@ class OpenAISDKStreaming(OpenAISDK):
         Returns:
             str: Complete generated text from all chunks
         """
+        finish_reason = None
         completion_chunks = []
         reasoning_content = ''
         chunk_count = 0
@@ -269,8 +271,7 @@ class OpenAISDKStreaming(OpenAISDK):
                 current_time = time.time()
 
                 # Add timeout check for stuck streams
-                # 1 hour timeout for streaming
-                if current_time - start_time > 3600:
+                if current_time - start_time > self.timeout:
                     log_with_thread(
                         f'Streaming timeout after '
                         f'{current_time - start_time:.1f}s, '
@@ -301,6 +302,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
                 # Check if streaming is finished
                 if chunk.choices[0].finish_reason is not None:
+                    finish_reason = chunk.choices[0].finish_reason
                     if self.verbose:
                         print()  # Add newline after streaming complete
                         elapsed = current_time - start_time
@@ -333,6 +335,18 @@ class OpenAISDKStreaming(OpenAISDK):
 
         # Combine reasoning content and regular content
         complete_content = ''.join(completion_chunks)
+
+        if finish_reason is None:
+            elapsed = time.time() - start_time
+            log_with_thread(
+                f'Stream ended without finish_reason (possible truncation). '
+                f'elapsed={elapsed:.1f}s chunks={chunk_count} '
+                f'content_len={sum(len(x) for x in completion_chunks)} '
+                f'reasoning_len={len(reasoning_content)}',
+                'error',
+            )
+            raise RuntimeError(
+                'Streaming ended without finish_reason (truncated).')
 
         if self.verbose:
             log_with_thread(f'Stream processing complete. Content length: '
