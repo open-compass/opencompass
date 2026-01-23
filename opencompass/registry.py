@@ -43,7 +43,7 @@ ICL_PROMPT_TEMPLATES = Registry(
     locations=['opencompass.openicl.icl_prompt_template'])
 ICL_EVALUATORS = Registry(
     'icl_evaluators',
-    locations=['opencompass.openicl.icl_evaluator', 'opencompass.evaluator'])
+    locations=['opencompass.openicl.icl_evaluator', 'opencompass.evaluator', 'opencompass.datasets'])
 METRICS = Registry('metric',
                    parent=MMENGINE_METRICS,
                    locations=['opencompass.metrics'])
