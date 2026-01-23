@@ -1,0 +1,21 @@
+ dataset-index.yml                                                                   |    6 [32m+[m
+ examples/eval_reasonzoo.py                                                          |    9 [32m+[m
+ opencompass/configs/datasets/reasonzoo/readme.md                                    |  139 [32m++++++[m
+ opencompass/configs/datasets/reasonzoo/reasonzoo_gen.py                             |    4 [32m+[m
+ opencompass/configs/datasets/reasonzoo/reasonzoo_llm_judge_gen.py                   |    4 [32m+[m
+ opencompass/configs/datasets/reasonzoo/reasonzoo_single_0_shot_gen.py               |   60 [32m+++[m
+ opencompass/configs/datasets/reasonzoo/reasonzoo_single_0shot_genericllmeval_gen.py |  117 [32m+++++[m
+ opencompass/configs/datasets/reasonzoo/reasonzoo_single_0shot_llmjudge_gen.py       |  109 [32m+++++[m
+ opencompass/configs/summarizers/groups/reasonzoo.py                                 |    3 [32m+[m
+ opencompass/datasets/__init__.py                                                    |    1 [32m+[m
+ opencompass/datasets/reasonzoo/__init__.py                                          |    0
+ opencompass/datasets/reasonzoo/eval_standard_utils.py                               | 1398 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ opencompass/datasets/reasonzoo/reasonzoo.py                                         |  142 [32m++++++[m
+ opencompass/datasets/reasonzoo/reasonzoo_dataset_config/__init__.py                 |    0
+ opencompass/datasets/reasonzoo/reasonzoo_dataset_config/config.yaml                 |   15 [32m+[m
+ opencompass/datasets/reasonzoo/reasonzoo_dataset_config/config_wrapper.py           |   90 [32m++++[m
+ opencompass/datasets/reasonzoo/reasonzoo_dataset_config/prompt/0_shot.yaml          |  139 [32m++++++[m
+ opencompass/datasets/reasonzoo/reasonzoo_dataset_config/prompt/__init__.py          |    0
+ opencompass/datasets/reasonzoo/reasonzoo_utils.py                                   |  944 [32m++++++++++++++++++++++++++++++++++++++[m
+ opencompass/utils/datasets_info.py                                                  |    6 [32m+[m
+ 20 files changed, 3186 insertions(+)
