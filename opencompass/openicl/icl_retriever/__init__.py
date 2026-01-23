@@ -8,3 +8,4 @@ from .icl_sliding_k_retriever import SlidingWindowRetriever  # noqa
 from .icl_topk_retriever import TopkRetriever  # noqa
 from .icl_votek_retriever import VotekRetriever  # noqa
 from .icl_zero_retriever import ZeroRetriever  # noqa
+from .icl_knowledge_retriever import KnowledgeRetriever
