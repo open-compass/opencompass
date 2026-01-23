@@ -915,7 +915,7 @@ class OpenAISDKRollout(OpenAI):
             else:
                 query_data = dict(
                     model=self.path,
-                    max_tokens=max_out_len,
+                    max_completion_tokens=max_out_len,
                     n=1,
                     temperature=self.temperature,
                     messages=messages,
