@@ -191,3 +191,7 @@ from .xcopa import *  # noqa: F401, F403
 from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
 from .xlsum import *  # noqa: F401, F403
 from .xsum import *  # noqa: F401, F403
+from .xhumaneval import xHumanevalDataset  # noqa: F401, F403
+from .xIFEval.ifeval import xIFEvalDataset, xIFEvaluator  # noqa: F401, F403
+from .xlivecodebench import xLCBCodeGenerationDataset, xLCBCodeGenerationEvaluator
+from .xmgsm import *  # noqa: F401, F403
