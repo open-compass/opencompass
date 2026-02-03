@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10.10']
+        python-version: ['3.10']
         include:
           - torch: 2.9.0
     steps:
@@ -68,7 +68,7 @@ jobs:
       image: nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04
     strategy:
       matrix:
-        python-version: ['3.10']
+        python-version: ['3.10.10']
     steps:
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
