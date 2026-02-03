@@ -15,10 +15,10 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10']
+        python-version: ['3.10.10']
         include:
           - torch: 2.9.0
     steps:
