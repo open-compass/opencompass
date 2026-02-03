@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 
 from mmengine.config import ConfigDict
 
-
 try:
     from opencompass.summarizers.default import DefaultSummarizer
     DEFAULT_SUMMARIZER_AVAILABLE = True
@@ -20,7 +19,8 @@ class TestDefaultSummarizer(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.config = ConfigDict({
-            'work_dir': tempfile.mkdtemp(),
+            'work_dir':
+            tempfile.mkdtemp(),
             'models': [ConfigDict({'abbr': 'test_model'})],
             'datasets': [ConfigDict({'abbr': 'test_dataset'})]
         })
@@ -28,8 +28,8 @@ class TestDefaultSummarizer(unittest.TestCase):
     def test_initialization(self):
         """Test DefaultSummarizer initialization."""
         if not DEFAULT_SUMMARIZER_AVAILABLE:
-            self.skipTest("DefaultSummarizer not available")
-        
+            self.skipTest('DefaultSummarizer not available')
+
         summarizer = DefaultSummarizer(config=self.config)
         self.assertEqual(summarizer.cfg, self.config)
         self.assertIsNotNone(summarizer.logger)
@@ -37,44 +37,38 @@ class TestDefaultSummarizer(unittest.TestCase):
     def test_initialization_with_dataset_abbrs(self):
         """Test DefaultSummarizer initialization with dataset_abbrs."""
         if not DEFAULT_SUMMARIZER_AVAILABLE:
-            self.skipTest("DefaultSummarizer not available")
-        
+            self.skipTest('DefaultSummarizer not available')
+
         dataset_abbrs = ['dataset1', 'dataset2']
-        summarizer = DefaultSummarizer(
-            config=self.config,
-            dataset_abbrs=dataset_abbrs
-        )
+        summarizer = DefaultSummarizer(config=self.config,
+                                       dataset_abbrs=dataset_abbrs)
         self.assertEqual(summarizer.dataset_abbrs, dataset_abbrs)
 
     def test_initialization_with_summary_groups(self):
         """Test DefaultSummarizer initialization with summary_groups."""
         if not DEFAULT_SUMMARIZER_AVAILABLE:
-            self.skipTest("DefaultSummarizer not available")
-        
+            self.skipTest('DefaultSummarizer not available')
+
         summary_groups = [{
             'name': 'test_group',
             'subsets': ['dataset1', 'dataset2']
         }]
-        summarizer = DefaultSummarizer(
-            config=self.config,
-            summary_groups=summary_groups
-        )
+        summarizer = DefaultSummarizer(config=self.config,
+                                       summary_groups=summary_groups)
         self.assertEqual(summarizer.summary_groups, summary_groups)
 
     def test_initialization_deprecates_prompt_db(self):
         """Test that prompt_db parameter is deprecated."""
         if not DEFAULT_SUMMARIZER_AVAILABLE:
-            self.skipTest("DefaultSummarizer not available")
-        
-        with patch('opencompass.summarizers.default.get_logger') as mock_logger:
+            self.skipTest('DefaultSummarizer not available')
+
+        with patch(
+                'opencompass.summarizers.default.get_logger') as mock_logger:
             mock_log = MagicMock()
             mock_logger.return_value = mock_log
-            
-            summarizer = DefaultSummarizer(
-                config=self.config,
-                prompt_db='deprecated_value'
-            )
-            
+
+            DefaultSummarizer(config=self.config, prompt_db='deprecated_value')
+
             # Should log a warning about prompt_db being deprecated
             mock_log.warning.assert_called()
 

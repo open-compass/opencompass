@@ -21,12 +21,14 @@ Dataset unit tests should cover the following aspects:
 ### 1. Dataset Loader Tests
 
 Test the dataset's `load` static method to ensure:
+
 - Data can be loaded correctly
 - Data format meets expectations
 - Column names and data structure are correct
 - Edge cases are handled (empty data, invalid paths, etc.)
 
 **Example test points:**
+
 - Test that `load` method returns the correct `Dataset` or `DatasetDict`
 - Test that dataset column names meet expectations
 - Test dataset sample count
@@ -35,6 +37,7 @@ Test the dataset's `load` static method to ensure:
 ### 2. Dataset Reader Tests
 
 Test the initialization and usage of `DatasetReader`:
+
 - Test `input_columns` and `output_column` configuration
 - Test that reader can correctly read the dataset
 - Test train/test split handling
@@ -42,6 +45,7 @@ Test the initialization and usage of `DatasetReader`:
 ### 3. Postprocessor Tests (if applicable)
 
 If the dataset has a `postprocess` function, test:
+
 - Handling of various input formats
 - Edge cases (empty strings, special characters, etc.)
 - Correctness of output format
@@ -51,6 +55,7 @@ Refer to `test_humaneval.py` for postprocessor test examples.
 ### 4. Evaluator Tests (if custom Evaluator exists)
 
 If the dataset has a custom `Evaluator`, test:
+
 - Correctness of the `score` method
 - Prediction and reference value matching logic
 - Edge case handling
@@ -60,6 +65,7 @@ If the dataset has a custom `Evaluator`, test:
 - **Details completeness**: Verify that details array matches the number of samples
 
 For datasets using `CascadeEvaluator` (e.g., AIME2025), test:
+
 - Rule-based evaluator results (e.g., `MATHVerifyEvaluator`)
 - LLM evaluator results (e.g., `GenericLLMEvaluator`)
 - Cascade mode vs parallel mode behavior
@@ -69,6 +75,7 @@ For datasets using `CascadeEvaluator` (e.g., AIME2025), test:
 ### 5. Integration Tests
 
 Test integration of dataset with reader, inferencer, and evaluator:
+
 - Test complete data flow (load -> read -> infer -> eval)
 - Test correctness of configuration files
 

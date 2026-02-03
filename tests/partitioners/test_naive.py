@@ -2,10 +2,9 @@
 
 import tempfile
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-from mmengine.config import Config, ConfigDict
-
+from mmengine.config import ConfigDict
 
 try:
     from opencompass.partitioners.naive import NaivePartitioner
@@ -34,8 +33,8 @@ class TestNaivePartitioner(unittest.TestCase):
     def test_initialization(self):
         """Test NaivePartitioner initialization."""
         if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest("NaivePartitioner not available")
-        
+            self.skipTest('NaivePartitioner not available')
+
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=1)
         self.assertEqual(partitioner.out_dir, self.temp_dir)
         self.assertEqual(partitioner.n, 1)
@@ -43,8 +42,8 @@ class TestNaivePartitioner(unittest.TestCase):
     def test_initialization_with_custom_n(self):
         """Test NaivePartitioner initialization with custom n."""
         if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest("NaivePartitioner not available")
-        
+            self.skipTest('NaivePartitioner not available')
+
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=5)
         self.assertEqual(partitioner.n, 5)
 
@@ -52,23 +51,22 @@ class TestNaivePartitioner(unittest.TestCase):
     def test_partition_creates_tasks(self, mock_exists):
         """Test that partition method creates tasks correctly."""
         if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest("NaivePartitioner not available")
-        
+            self.skipTest('NaivePartitioner not available')
+
         mock_exists.return_value = False
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=1)
-        
+
         model_dataset_combinations = [{
             'models': [self.model_cfg],
             'datasets': [self.dataset_cfg]
         }]
-        
+
         tasks = partitioner.partition(
             model_dataset_combinations=model_dataset_combinations,
             work_dir=self.temp_dir,
             out_dir=self.temp_dir,
-            add_cfg={}
-        )
-        
+            add_cfg={})
+
         self.assertIsInstance(tasks, list)
         self.assertGreater(len(tasks), 0)
         self.assertIn('models', tasks[0])
@@ -79,30 +77,31 @@ class TestNaivePartitioner(unittest.TestCase):
     def test_partition_with_n_greater_than_one(self, mock_exists):
         """Test partition with n > 1 groups datasets."""
         if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest("NaivePartitioner not available")
-        
+            self.skipTest('NaivePartitioner not available')
+
         mock_exists.return_value = False
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=2)
-        
+
         # Create multiple datasets
-        datasets = [ConfigDict({
-            'abbr': f'test_dataset_{i}',
-            'type': 'TestDataset',
-            'path': 'test_path'
-        }) for i in range(5)]
-        
+        datasets = [
+            ConfigDict({
+                'abbr': f'test_dataset_{i}',
+                'type': 'TestDataset',
+                'path': 'test_path'
+            }) for i in range(5)
+        ]
+
         model_dataset_combinations = [{
             'models': [self.model_cfg],
             'datasets': datasets
         }]
-        
+
         tasks = partitioner.partition(
             model_dataset_combinations=model_dataset_combinations,
             work_dir=self.temp_dir,
             out_dir=self.temp_dir,
-            add_cfg={}
-        )
-        
+            add_cfg={})
+
         # Should create tasks with at most n datasets each
         self.assertIsInstance(tasks, list)
         for task in tasks:
@@ -112,53 +111,59 @@ class TestNaivePartitioner(unittest.TestCase):
     def test_partition_skips_existing_files(self, mock_exists):
         """Test that partition skips tasks with existing output files."""
         if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest("NaivePartitioner not available")
-        
+            self.skipTest('NaivePartitioner not available')
+
         # First call returns True (file exists), second returns False
         mock_exists.side_effect = [True, False]
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=1)
-        
+
         datasets = [
-            ConfigDict({'abbr': 'dataset1', 'type': 'TestDataset', 'path': 'test_path'}),
-            ConfigDict({'abbr': 'dataset2', 'type': 'TestDataset', 'path': 'test_path'})
+            ConfigDict({
+                'abbr': 'dataset1',
+                'type': 'TestDataset',
+                'path': 'test_path'
+            }),
+            ConfigDict({
+                'abbr': 'dataset2',
+                'type': 'TestDataset',
+                'path': 'test_path'
+            })
         ]
-        
+
         model_dataset_combinations = [{
             'models': [self.model_cfg],
             'datasets': datasets
         }]
-        
+
         tasks = partitioner.partition(
             model_dataset_combinations=model_dataset_combinations,
             work_dir=self.temp_dir,
             out_dir=self.temp_dir,
-            add_cfg={}
-        )
-        
+            add_cfg={})
+
         # Should only create task for dataset2 (dataset1 output exists)
         self.assertEqual(len(tasks), 1)
 
     def test_partition_with_add_cfg(self):
         """Test that partition includes add_cfg in tasks."""
         if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest("NaivePartitioner not available")
-        
+            self.skipTest('NaivePartitioner not available')
+
         with patch('os.path.exists', return_value=False):
             partitioner = NaivePartitioner(out_dir=self.temp_dir, n=1)
-            
+
             add_cfg = {'custom_key': 'custom_value'}
             model_dataset_combinations = [{
                 'models': [self.model_cfg],
                 'datasets': [self.dataset_cfg]
             }]
-            
+
             tasks = partitioner.partition(
                 model_dataset_combinations=model_dataset_combinations,
                 work_dir=self.temp_dir,
                 out_dir=self.temp_dir,
-                add_cfg=add_cfg
-            )
-            
+                add_cfg=add_cfg)
+
             self.assertIn('custom_key', tasks[0])
             self.assertEqual(tasks[0]['custom_key'], 'custom_value')
 

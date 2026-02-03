@@ -1,11 +1,10 @@
-import unittest
 import re
+import unittest
+
 
 # Implement humaneval_postprocess function for testing
-# This is based on the logic from opencompass.models.claude_api.postprocessors.humaneval_postprocess
 def humaneval_postprocess(text: str) -> str:
-    """Postprocess function for HumanEval completions.
-    
+    """Postprocess function for HumanEval completions. 
     This function:
     1. Extracts code blocks from markdown-style code fences
     2. Removes function definitions and imports
@@ -32,14 +31,15 @@ def humaneval_postprocess(text: str) -> str:
         # Check if there's a function definition in the text
         # If so, only keep content before the function definition
         # BUT: Don't do this if text starts with import/from (we'll handle it later)
-        if not (text.strip().startswith('from') or text.strip().startswith('import')):
+        if not (text.strip().startswith('from')
+                or text.strip().startswith('import')):
             def_idx = text.find('\ndef ')
             if def_idx == -1:
                 def_idx = text.find('\ndef\t')
             if def_idx != -1:
                 # Keep only the part before the function definition
                 text = text[:def_idx].strip()
-    
+
     # Remove imports and function definitions (check before removing first line)
     # If text starts with import/from, find the def and extract only the function body
     if text.strip().startswith('from') or text.strip().startswith('import'):
@@ -54,11 +54,15 @@ def humaneval_postprocess(text: str) -> str:
                 stripped = line.strip()
                 if stripped.startswith('def '):
                     # Found def, extract everything after this line
-                    text = '\n'.join(lines[i+1:])
+                    text = '\n'.join(lines[i + 1:])
                     break
             else:
                 # No def found, remove all imports and return empty or remaining content
-                text = '\n'.join([line for line in lines if not (line.strip().startswith('import') or line.strip().startswith('from'))])
+                text = '\n'.join([
+                    line for line in lines
+                    if not (line.strip().startswith('import')
+                            or line.strip().startswith('from'))
+                ])
                 text = text.strip()
         else:
             # Found def on a new line, extract everything after the def line
@@ -68,10 +72,12 @@ def humaneval_postprocess(text: str) -> str:
             if len(lines) > 2:
                 text = '\n'.join(lines[2:])
             elif len(lines) > 1:
-                text = '\n'.join(lines[1:])  # Fallback: include def line, will be processed next
+                text = '\n'.join(
+                    lines[1:]
+                )  # Fallback: include def line, will be processed next
             else:
                 text = ''
-    
+
     # Remove function definitions (including docstrings) - check before removing first line
     if text.strip().startswith('def'):
         lines = text.split('\n')
@@ -84,7 +90,7 @@ def humaneval_postprocess(text: str) -> str:
             if line.strip():
                 first_non_empty_idx = i
                 break
-        
+
         if first_non_empty_idx is not None:
             first_line = lines[first_non_empty_idx].strip()
             # Check if it's a docstring opening
@@ -113,12 +119,12 @@ def humaneval_postprocess(text: str) -> str:
                 text = '\n'.join(lines[1:]).strip()
             else:
                 text = text.strip()
-    
+
     # Ensure proper indentation (4 spaces)
     # If text is empty, return empty string
     if not text:
         return text
-    
+
     # Check if text already has proper indentation
     if not text.startswith('    '):
         # If text starts with some spaces but not 4, normalize to 4
@@ -128,7 +134,7 @@ def humaneval_postprocess(text: str) -> str:
         else:
             # No leading spaces at all, add 4 spaces to all lines
             text = '\n'.join(['    ' + line for line in text.split('\n')])
-    
+
     return text
 
 

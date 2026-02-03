@@ -6,20 +6,20 @@ If you encounter import errors, ensure all dependencies are installed:
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from datasets import Dataset
 
-# Try to import BeyondAIMEDataset, but if it fails, we'll test the load method directly
 try:
     from opencompass.datasets.beyondaime import BeyondAIMEDataset
     BEYONDAIME_AVAILABLE = True
 except ImportError:
     # If import fails, we'll create a mock class for testing
     BEYONDAIME_AVAILABLE = False
-    
+
     class BeyondAIMEDataset:
         """Mock BeyondAIMEDataset for testing when full import is not available."""
+
         @staticmethod
         def load(path, **kwargs):
             from datasets import load_dataset
@@ -28,7 +28,7 @@ except ImportError:
             if 'problem' in dataset.column_names:
                 dataset = dataset.rename_column('problem', 'question')
             return dataset
-        
+
         def __init__(self, **kwargs):
             """Mock __init__ for testing initialization."""
             from datasets import Dataset, concatenate_datasets
@@ -39,7 +39,10 @@ except ImportError:
                 dataset = dataset.map(lambda x, idx: {
                     'subdivision': abbr,
                     'idx': idx
-                }, with_indices=True, writer_batch_size=16, load_from_cache_file=False)
+                },
+                                      with_indices=True,
+                                      writer_batch_size=16,
+                                      load_from_cache_file=False)
                 dataset = concatenate_datasets([dataset] * 1)
             self.dataset = dataset
             # Create a mock reader instead of importing DatasetReader
@@ -55,16 +58,13 @@ class TestBeyondAIMEDataset(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.test_data = [
-            {
-                'problem': 'What is 2+2?',
-                'answer': '4'
-            },
-            {
-                'problem': 'Solve for x: x^2 = 4',
-                'answer': 'x = 2 or x = -2'
-            }
-        ]
+        self.test_data = [{
+            'problem': 'What is 2+2?',
+            'answer': '4'
+        }, {
+            'problem': 'Solve for x: x^2 = 4',
+            'answer': 'x = 2 or x = -2'
+        }]
 
     @patch('opencompass.datasets.beyondaime.load_dataset')
     def test_load_renames_problem_to_question(self, mock_load_dataset):
@@ -77,7 +77,8 @@ class TestBeyondAIMEDataset(unittest.TestCase):
         result = BeyondAIMEDataset.load(path='test_path')
 
         # Verify load_dataset was called correctly
-        mock_load_dataset.assert_called_once_with(path='test_path', split='test')
+        mock_load_dataset.assert_called_once_with(path='test_path',
+                                                  split='test')
 
         # Verify column was renamed
         self.assertIn('question', result.column_names)
@@ -99,14 +100,12 @@ class TestBeyondAIMEDataset(unittest.TestCase):
     @patch('opencompass.datasets.beyondaime.load_dataset')
     def test_load_preserves_other_columns(self, mock_load_dataset):
         """Test that load method preserves columns other than 'problem'."""
-        extended_data = [
-            {
-                'problem': 'Test question',
-                'answer': 'Test answer',
-                'difficulty': 'hard',
-                'category': 'algebra'
-            }
-        ]
+        extended_data = [{
+            'problem': 'Test question',
+            'answer': 'Test answer',
+            'difficulty': 'hard',
+            'category': 'algebra'
+        }]
         mock_dataset = Dataset.from_list(extended_data)
         mock_load_dataset.return_value = mock_dataset
 
@@ -125,7 +124,8 @@ class TestBeyondAIMEDataset(unittest.TestCase):
         # Create empty dataset with 'problem' column to test rename logic
         empty_dataset = Dataset.from_list([])
         # Add 'problem' column structure even if empty
-        if len(empty_dataset) == 0 and 'problem' not in empty_dataset.column_names:
+        if len(empty_dataset
+               ) == 0 and 'problem' not in empty_dataset.column_names:
             # For empty dataset without columns, we'll skip the rename test
             # as it's not a realistic scenario
             empty_dataset = Dataset.from_dict({'problem': [], 'answer': []})
@@ -162,25 +162,26 @@ class TestBeyondAIMEDataset(unittest.TestCase):
         if BEYONDAIME_AVAILABLE:
             try:
                 # Initialize dataset with reader config
-                dataset = BeyondAIMEDataset(
-                    path='test_path',
-                    abbr='beyondaime_test',
-                    reader_cfg=dict(input_columns=['question'], output_column='answer')
-                )
+                dataset = BeyondAIMEDataset(path='test_path',
+                                            abbr='beyondaime_test',
+                                            reader_cfg=dict(
+                                                input_columns=['question'],
+                                                output_column='answer'))
 
                 # Verify dataset was created
                 self.assertIsNotNone(dataset.dataset)
                 self.assertIsNotNone(dataset.reader)
             except (ImportError, ModuleNotFoundError):
                 # Skip if dependencies are not available
-                self.skipTest("Skipping test due to missing dependencies (e.g., torch)")
+                self.skipTest(
+                    'Skipping test due to missing dependencies (e.g., torch)')
         else:
             # For mock class, test that it can be instantiated
-            dataset = BeyondAIMEDataset(
-                path='test_path',
-                abbr='beyondaime_test',
-                reader_cfg=dict(input_columns=['question'], output_column='answer')
-            )
+            dataset = BeyondAIMEDataset(path='test_path',
+                                        abbr='beyondaime_test',
+                                        reader_cfg=dict(
+                                            input_columns=['question'],
+                                            output_column='answer'))
             self.assertIsNotNone(dataset.dataset)
             self.assertIsNotNone(dataset.reader)
 
@@ -191,28 +192,25 @@ class TestBeyondAIMEDataset(unittest.TestCase):
         mock_load.return_value = mock_dataset
 
         reader_cfg = dict(input_columns=['question'], output_column='answer')
-        
+
         if BEYONDAIME_AVAILABLE:
             try:
-                dataset = BeyondAIMEDataset(
-                    path='test_path',
-                    abbr='beyondaime_test',
-                    reader_cfg=reader_cfg
-                )
+                dataset = BeyondAIMEDataset(path='test_path',
+                                            abbr='beyondaime_test',
+                                            reader_cfg=reader_cfg)
 
                 # Verify reader configuration
                 self.assertEqual(dataset.reader.input_columns, ['question'])
                 self.assertEqual(dataset.reader.output_column, 'answer')
             except (ImportError, ModuleNotFoundError):
                 # Skip if dependencies are not available
-                self.skipTest("Skipping test due to missing dependencies (e.g., torch)")
+                self.skipTest(
+                    'Skipping test due to missing dependencies (e.g., torch)')
         else:
             # For mock class, test that it can be instantiated
-            dataset = BeyondAIMEDataset(
-                path='test_path',
-                abbr='beyondaime_test',
-                reader_cfg=reader_cfg
-            )
+            dataset = BeyondAIMEDataset(path='test_path',
+                                        abbr='beyondaime_test',
+                                        reader_cfg=reader_cfg)
             # Verify reader configuration
             self.assertEqual(dataset.reader.input_columns, ['question'])
             self.assertEqual(dataset.reader.output_column, 'answer')

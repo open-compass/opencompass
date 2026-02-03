@@ -23,12 +23,14 @@ tests/
 ### 1. Dataset Loader 测试
 
 测试数据集的 `load` 静态方法，确保：
+
 - 能够正确加载数据
 - 数据格式符合预期
 - 列名和数据结构正确
 - 处理边界情况（空数据、异常路径等）
 
 **示例测试点：**
+
 - 测试 `load` 方法返回正确的 `Dataset` 或 `DatasetDict`
 - 测试数据集的列名是否符合预期
 - 测试数据集的样本数量
@@ -37,6 +39,7 @@ tests/
 ### 2. Dataset Reader 测试
 
 测试 `DatasetReader` 的初始化和使用：
+
 - 测试 `input_columns` 和 `output_column` 配置
 - 测试 reader 能够正确读取数据集
 - 测试 train/test split 的处理
@@ -44,6 +47,7 @@ tests/
 ### 3. Postprocessor 测试（如果存在）
 
 如果数据集有 `postprocess` 函数，应测试：
+
 - 各种输入格式的处理
 - 边界情况（空字符串、特殊字符等）
 - 输出格式的正确性
@@ -53,6 +57,7 @@ tests/
 ### 4. Evaluator 测试（如果存在自定义 Evaluator）
 
 如果数据集有自定义的 `Evaluator`，应测试：
+
 - `score` 方法的正确性
 - 预测和参考值的匹配逻辑
 - 边界情况处理
@@ -62,6 +67,7 @@ tests/
 - **详细信息完整性**：验证 details 数组与样本数量匹配
 
 对于使用 `CascadeEvaluator` 的数据集（如 AIME2025），应测试：
+
 - Rule-based evaluator 结果（如 `MATHVerifyEvaluator`）
 - LLM evaluator 结果（如 `GenericLLMEvaluator`）
 - Cascade 模式 vs parallel 模式的行为
@@ -71,6 +77,7 @@ tests/
 ### 5. 集成测试
 
 测试数据集与 reader、inferencer、evaluator 的集成：
+
 - 测试完整的数据流（load -> read -> infer -> eval）
 - 测试配置文件的正确性
 
