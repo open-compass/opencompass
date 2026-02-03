@@ -5,46 +5,30 @@ If you encounter import errors, ensure all dependencies are installed:
     pip install -r requirements.txt
 """
 
+import importlib.util
+import sys
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from datasets import Dataset
 
 
-class BeyondAIMEDataset:
-    """Mock BeyondAIMEDataset for testing when full import is not available."""
+def _load_beyondaime_module():
+    module_name = 'opencompass.datasets.beyondaime'
+    if module_name in sys.modules:
+        return sys.modules[module_name]
 
-    @staticmethod
-    def load(path, **kwargs):
-        from datasets import load_dataset
-        dataset = load_dataset(path=path, split='test')
-        # Only rename if 'problem' column exists
-        if 'problem' in dataset.column_names:
-            dataset = dataset.rename_column('problem', 'question')
-        return dataset
+    root_dir = Path(__file__).resolve().parents[2]
+    module_path = root_dir / 'opencompass' / 'datasets' / 'beyondaime.py'
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
 
-    def __init__(self, **kwargs):
-        """Mock __init__ for testing initialization."""
-        from datasets import Dataset, concatenate_datasets
-        reader_cfg = kwargs.pop('reader_cfg', {})
-        abbr = kwargs.pop('abbr', 'dataset')
-        dataset = self.load(**kwargs)
-        if isinstance(dataset, Dataset):
-            dataset = dataset.map(lambda x, idx: {
-                'subdivision': abbr,
-                'idx': idx
-            },
-                                    with_indices=True,
-                                    writer_batch_size=16,
-                                    load_from_cache_file=False)
-            dataset = concatenate_datasets([dataset] * 1)
-        self.dataset = dataset
-        # Create a mock reader instead of importing DatasetReader
-        from unittest.mock import MagicMock
-        mock_reader = MagicMock()
-        mock_reader.input_columns = reader_cfg.get('input_columns', [])
-        mock_reader.output_column = reader_cfg.get('output_column', None)
-        self.reader = mock_reader
+
+BeyondAIMEDataset = _load_beyondaime_module().BeyondAIMEDataset
 
 
 class TestBeyondAIMEDataset(unittest.TestCase):

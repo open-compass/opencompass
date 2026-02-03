@@ -174,7 +174,6 @@ class TestAime2025Dataset(unittest.TestCase):
         temp_file = self._create_temp_jsonl_file(self.test_data)
 
         try:
-            if AIME2025_AVAILABLE:
             # Initialize dataset with reader config
             # Use absolute path to avoid DATASETS_MAPPING lookup
             dataset = CustomDataset(path=temp_file,
@@ -186,16 +185,6 @@ class TestAime2025Dataset(unittest.TestCase):
             # Verify dataset was created
             self.assertIsNotNone(dataset.dataset)
             self.assertIsNotNone(dataset.reader)
-                
-            else:
-                # For mock class, test that it can be instantiated
-                dataset = CustomDataset(path=temp_file,
-                                        abbr='aime2025_test',
-                                        reader_cfg=dict(
-                                            input_columns=['question'],
-                                            output_column='answer'))
-                self.assertIsNotNone(dataset.dataset)
-                self.assertIsNotNone(dataset.reader)
         finally:
             import os
             if os.path.exists(temp_file):
@@ -261,14 +250,11 @@ class TestAime2025Dataset(unittest.TestCase):
             pytest.skip('COMPASS_DATA_CACHE not set, skipping real data test')
 
         # Check if CustomDataset is available
-        if not AIME2025_AVAILABLE:
-            pytest.skip('CustomDataset not available, skipping real data test')
-
         try:
             # Try to load the real dataset
             # The path 'opencompass/aime2025' should be resolved by get_data_path
             # which will look in COMPASS_DATA_CACHE
-            dataset = CustomDataset.load(path='opencompass/aime2025')
+            dataset = CustomDataset.load(path=f'{cache_dir}/data/aime2025/aime2025.jsonl')
 
             # Verify dataset was loaded
             self.assertIsInstance(dataset, Dataset)
@@ -286,7 +272,7 @@ class TestAime2025Dataset(unittest.TestCase):
             self.assertIn('answer', sample)
 
         except (FileNotFoundError, ValueError) as e:
-            pytest.skip(f"Real dataset not in COMPASS_DATA_CACHE: {e}")
+            assert False, f"Real dataset not in COMPASS_DATA_CACHE: {e}"
 
     def test_dataset_initialization_with_real_data(self):
         """Test initializing AIME2025 dataset with real data from COMPASS_DATA_CACHE."""
@@ -297,13 +283,9 @@ class TestAime2025Dataset(unittest.TestCase):
         if not cache_dir:
             pytest.skip('COMPASS_DATA_CACHE not set, skipping real data test')
 
-        # Check if CustomDataset is available
-        if not AIME2025_AVAILABLE:
-            pytest.skip('CustomDataset not available, skipping real data test')
-
         try:
             # Initialize dataset with real data
-            dataset = CustomDataset(path='opencompass/aime2025',
+            dataset = CustomDataset(path=f'{cache_dir}/data/aime2025/aime2025.jsonl',
                                     abbr='aime2025',
                                     reader_cfg=dict(input_columns=['question'],
                                                     output_column='answer'))
@@ -325,6 +307,7 @@ class TestAime2025Dataset(unittest.TestCase):
 
         except (FileNotFoundError, ValueError, ImportError,
                 ModuleNotFoundError) as e:
+            assert False, f"Real dataset not available: {e}"
             pytest.skip(f"Real dataset not available: {e}")
 
 
