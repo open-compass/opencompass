@@ -45,7 +45,8 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           pip list
-          pytest tests -s -vv
+          coverage run --include="**/opencompass/**/*.py" -m pytest tests -s -vv
+          coverage report -m
       - name:  Uninstall opencompass
         if: always()
         run: |
