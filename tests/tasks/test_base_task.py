@@ -24,17 +24,17 @@ class TestExtractRolePred(unittest.TestCase):
 
         # Verify the fix is present (using .strip() instead of re.match)
         if 'begin_str.strip()' not in source:
-            self.fail(f"Function should use begin_str.strip(). "
-                      f"Module loaded from: {module_path}. "
-                      f"Source: {source[:200]}")
+            self.fail(f'Function should use begin_str.strip(). '
+                      f'Module loaded from: {module_path}. '
+                      f'Source: {source[:200]}')
         if 'end_str.strip()' not in source:
-            self.fail(f"Function should use end_str.strip(). "
-                      f"Module loaded from: {module_path}")
+            self.fail(f'Function should use end_str.strip(). '
+                      f'Module loaded from: {module_path}')
 
         # Verify old buggy code is not present
-        if "re.match(r'\\s*', begin_str)" in source:
-            self.fail(f"Function should not use the buggy re.match check. "
-                      f"Module loaded from: {module_path}")
+        if "re.match(r'\\s*', begin_str)" in source:  # noqa
+            self.fail(f'Function should not use the buggy re.match check. '
+                      f'Module loaded from: {module_path}')
 
     def test_extract_role_pred_with_begin_and_end(self):
         """Test extract_role_pred with begin and end strings."""
@@ -45,7 +45,7 @@ class TestExtractRolePred(unittest.TestCase):
                                    end_str=' SUFFIX')
         # Verify that extraction works correctly
         self.assertEqual(result, 'test answer',
-                         f"Expected 'test answer', got {repr(result)}")
+                         f'Expected \'test answer\', got {repr(result)}')
 
     def test_extract_role_pred_with_begin_only(self):
         """Test extract_role_pred with begin string only."""
@@ -54,7 +54,7 @@ class TestExtractRolePred(unittest.TestCase):
         result = extract_role_pred(text, begin_str='ANSWER: ', end_str=None)
         # Verify that extraction works correctly
         self.assertEqual(result, 'test answer',
-                         f"Expected 'test answer', got {repr(result)}")
+                         f'Expected \'test answer\', got {repr(result)}')
 
     def test_extract_role_pred_with_end_only(self):
         """Test extract_role_pred with end string only."""
@@ -63,7 +63,7 @@ class TestExtractRolePred(unittest.TestCase):
         result = extract_role_pred(text, begin_str=None, end_str=' SUFFIX')
         # Verify that extraction works correctly
         self.assertEqual(result, 'test answer',
-                         f"Expected 'test answer', got {repr(result)}")
+                         f'Expected \'test answer\', got {repr(result)}')
 
     def test_extract_role_pred_without_markers(self):
         """Test extract_role_pred without begin/end markers."""
