@@ -25,19 +25,21 @@ def extract_role_pred(s: str, begin_str: Optional[str],
     start = 0
     end = len(s)
 
-    if begin_str and re.match(r'\s*', begin_str) is None:
+    # Extract beginning position
+    if begin_str is not None and begin_str.strip():
         begin_idx = s.find(begin_str)
         if begin_idx != -1:
             start = begin_idx + len(begin_str)
 
-    if end_str and re.match(r'\s*', end_str) is None:
+    # Extract ending position
+    if end_str is not None and end_str.strip():
         # TODO: Support calling tokenizer for the accurate eos token
         # and avoid such hardcode
         end_idx = s.find(end_str, start)
         if end_idx != -1:
             end = end_idx
 
-    return s[start:end]
+    return s[start:end].strip()
 
 
 class BaseTask:

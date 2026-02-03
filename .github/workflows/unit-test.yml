@@ -1,0 +1,55 @@
+name: unit_test
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'README_zh-CN.md'
+      - 'docs/**'
+      - 'configs/**'
+      - 'tools/**'
+  workflow_dispatch:
+  schedule:
+    - cron:  '56 22 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CONDA_ENV: unit_test
+  CONDA_PATH: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/miniconda3
+  COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
+  KUBEBRAIN_CLUSTER_ENTRY: https://h.pjlab.org.cn
+  KUBEBRAIN_NAMESPACE: ailab-opencompass
+  JOB_NAME: unit-test-${{ github.run_id }}-${{ github.run_attempt }}
+
+jobs:
+  unit_test:
+    runs-on: yidian_cu12_ut
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Prepare - Install opencompass
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          python3 -m pip uninstall opencompass -y
+          python3 -m pip install .[full]
+          conda info --envs 
+          pip list
+          lmdeploy check_env
+      - name: Run test
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          pip list
+          pytest tests -s -vv
+      - name:  Uninstall opencompass
+        if: always()
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          python3 -m pip uninstall opencompass -y
+          conda info --envs
