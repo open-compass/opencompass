@@ -1,12 +1,7 @@
 import unittest
 
-try:
-    from opencompass.models.base import LMTemplateParser
-    from opencompass.utils.prompt import PromptList
-except (ImportError, ModuleNotFoundError) as e:
-    import pytest
-    pytest.skip(f"Skipping tests due to import error: {e}",
-                allow_module_level=True)
+from opencompass.models.base import LMTemplateParser
+from opencompass.utils.prompt import PromptList
 
 
 class TestLMTemplateParser(unittest.TestCase):

@@ -3,11 +3,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-try:
-    from opencompass.models.base import BaseModel
-    BASE_MODEL_AVAILABLE = True
-except ImportError:
-    BASE_MODEL_AVAILABLE = False
+from opencompass.models.base import BaseModel
 
 
 class TestBaseModel(unittest.TestCase):
@@ -15,16 +11,10 @@ class TestBaseModel(unittest.TestCase):
 
     def test_is_api_attribute(self):
         """Test that BaseModel has is_api attribute."""
-        if not BASE_MODEL_AVAILABLE:
-            self.skipTest('BaseModel not available')
-
         self.assertFalse(BaseModel.is_api)
 
     def test_initialization_signature(self):
         """Test BaseModel initialization signature."""
-        if not BASE_MODEL_AVAILABLE:
-            self.skipTest('BaseModel not available')
-
         # Check that BaseModel has expected initialization parameters
         import inspect
         sig = inspect.signature(BaseModel.__init__)
@@ -41,9 +31,6 @@ class TestBaseModel(unittest.TestCase):
     @patch('opencompass.models.base.LMTemplateParser')
     def test_initialization_with_meta_template(self, mock_parser):
         """Test BaseModel initialization with meta_template."""
-        if not BASE_MODEL_AVAILABLE:
-            self.skipTest('BaseModel not available')
-
         # BaseModel is abstract, so we can't instantiate it directly
         # But we can test the structure
         mock_parser_instance = MagicMock()

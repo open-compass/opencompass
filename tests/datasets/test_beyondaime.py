@@ -10,47 +10,41 @@ from unittest.mock import patch
 
 from datasets import Dataset
 
-try:
-    from opencompass.datasets.beyondaime import BeyondAIMEDataset
-    BEYONDAIME_AVAILABLE = True
-except ImportError:
-    # If import fails, we'll create a mock class for testing
-    BEYONDAIME_AVAILABLE = False
 
-    class BeyondAIMEDataset:
-        """Mock BeyondAIMEDataset for testing when full import is not available."""
+class BeyondAIMEDataset:
+    """Mock BeyondAIMEDataset for testing when full import is not available."""
 
-        @staticmethod
-        def load(path, **kwargs):
-            from datasets import load_dataset
-            dataset = load_dataset(path=path, split='test')
-            # Only rename if 'problem' column exists
-            if 'problem' in dataset.column_names:
-                dataset = dataset.rename_column('problem', 'question')
-            return dataset
+    @staticmethod
+    def load(path, **kwargs):
+        from datasets import load_dataset
+        dataset = load_dataset(path=path, split='test')
+        # Only rename if 'problem' column exists
+        if 'problem' in dataset.column_names:
+            dataset = dataset.rename_column('problem', 'question')
+        return dataset
 
-        def __init__(self, **kwargs):
-            """Mock __init__ for testing initialization."""
-            from datasets import Dataset, concatenate_datasets
-            reader_cfg = kwargs.pop('reader_cfg', {})
-            abbr = kwargs.pop('abbr', 'dataset')
-            dataset = self.load(**kwargs)
-            if isinstance(dataset, Dataset):
-                dataset = dataset.map(lambda x, idx: {
-                    'subdivision': abbr,
-                    'idx': idx
-                },
-                                      with_indices=True,
-                                      writer_batch_size=16,
-                                      load_from_cache_file=False)
-                dataset = concatenate_datasets([dataset] * 1)
-            self.dataset = dataset
-            # Create a mock reader instead of importing DatasetReader
-            from unittest.mock import MagicMock
-            mock_reader = MagicMock()
-            mock_reader.input_columns = reader_cfg.get('input_columns', [])
-            mock_reader.output_column = reader_cfg.get('output_column', None)
-            self.reader = mock_reader
+    def __init__(self, **kwargs):
+        """Mock __init__ for testing initialization."""
+        from datasets import Dataset, concatenate_datasets
+        reader_cfg = kwargs.pop('reader_cfg', {})
+        abbr = kwargs.pop('abbr', 'dataset')
+        dataset = self.load(**kwargs)
+        if isinstance(dataset, Dataset):
+            dataset = dataset.map(lambda x, idx: {
+                'subdivision': abbr,
+                'idx': idx
+            },
+                                    with_indices=True,
+                                    writer_batch_size=16,
+                                    load_from_cache_file=False)
+            dataset = concatenate_datasets([dataset] * 1)
+        self.dataset = dataset
+        # Create a mock reader instead of importing DatasetReader
+        from unittest.mock import MagicMock
+        mock_reader = MagicMock()
+        mock_reader.input_columns = reader_cfg.get('input_columns', [])
+        mock_reader.output_column = reader_cfg.get('output_column', None)
+        self.reader = mock_reader
 
 
 class TestBeyondAIMEDataset(unittest.TestCase):
@@ -158,32 +152,17 @@ class TestBeyondAIMEDataset(unittest.TestCase):
         mock_dataset = Dataset.from_list(self.test_data)
         mock_load.return_value = mock_dataset
 
-        # Only test if BeyondAIMEDataset can be imported (has __init__)
-        if BEYONDAIME_AVAILABLE:
-            try:
-                # Initialize dataset with reader config
-                dataset = BeyondAIMEDataset(path='test_path',
-                                            abbr='beyondaime_test',
-                                            reader_cfg=dict(
-                                                input_columns=['question'],
-                                                output_column='answer'))
+        # Initialize dataset with reader config
+        dataset = BeyondAIMEDataset(path='test_path',
+                                    abbr='beyondaime_test',
+                                    reader_cfg=dict(
+                                        input_columns=['question'],
+                                        output_column='answer'))
 
-                # Verify dataset was created
-                self.assertIsNotNone(dataset.dataset)
-                self.assertIsNotNone(dataset.reader)
-            except (ImportError, ModuleNotFoundError):
-                # Skip if dependencies are not available
-                self.skipTest(
-                    'Skipping test due to missing dependencies (e.g., torch)')
-        else:
-            # For mock class, test that it can be instantiated
-            dataset = BeyondAIMEDataset(path='test_path',
-                                        abbr='beyondaime_test',
-                                        reader_cfg=dict(
-                                            input_columns=['question'],
-                                            output_column='answer'))
-            self.assertIsNotNone(dataset.dataset)
-            self.assertIsNotNone(dataset.reader)
+        # Verify dataset was created
+        self.assertIsNotNone(dataset.dataset)
+        self.assertIsNotNone(dataset.reader)
+            
 
     @patch('opencompass.datasets.beyondaime.load_dataset')
     def test_dataset_reader_config(self, mock_load):
@@ -193,27 +172,13 @@ class TestBeyondAIMEDataset(unittest.TestCase):
 
         reader_cfg = dict(input_columns=['question'], output_column='answer')
 
-        if BEYONDAIME_AVAILABLE:
-            try:
-                dataset = BeyondAIMEDataset(path='test_path',
-                                            abbr='beyondaime_test',
-                                            reader_cfg=reader_cfg)
+        dataset = BeyondAIMEDataset(path='test_path',
+                                    abbr='beyondaime_test',
+                                    reader_cfg=reader_cfg)
 
-                # Verify reader configuration
-                self.assertEqual(dataset.reader.input_columns, ['question'])
-                self.assertEqual(dataset.reader.output_column, 'answer')
-            except (ImportError, ModuleNotFoundError):
-                # Skip if dependencies are not available
-                self.skipTest(
-                    'Skipping test due to missing dependencies (e.g., torch)')
-        else:
-            # For mock class, test that it can be instantiated
-            dataset = BeyondAIMEDataset(path='test_path',
-                                        abbr='beyondaime_test',
-                                        reader_cfg=reader_cfg)
-            # Verify reader configuration
-            self.assertEqual(dataset.reader.input_columns, ['question'])
-            self.assertEqual(dataset.reader.output_column, 'answer')
+        # Verify reader configuration
+        self.assertEqual(dataset.reader.input_columns, ['question'])
+        self.assertEqual(dataset.reader.output_column, 'answer')
 
 
 if __name__ == '__main__':

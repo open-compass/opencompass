@@ -6,11 +6,7 @@ from unittest.mock import MagicMock, patch
 
 from mmengine.config import ConfigDict
 
-try:
-    from opencompass.summarizers.default import DefaultSummarizer
-    DEFAULT_SUMMARIZER_AVAILABLE = True
-except ImportError:
-    DEFAULT_SUMMARIZER_AVAILABLE = False
+from opencompass.summarizers.default import DefaultSummarizer
 
 
 class TestDefaultSummarizer(unittest.TestCase):
@@ -27,18 +23,12 @@ class TestDefaultSummarizer(unittest.TestCase):
 
     def test_initialization(self):
         """Test DefaultSummarizer initialization."""
-        if not DEFAULT_SUMMARIZER_AVAILABLE:
-            self.skipTest('DefaultSummarizer not available')
-
         summarizer = DefaultSummarizer(config=self.config)
         self.assertEqual(summarizer.cfg, self.config)
         self.assertIsNotNone(summarizer.logger)
 
     def test_initialization_with_dataset_abbrs(self):
         """Test DefaultSummarizer initialization with dataset_abbrs."""
-        if not DEFAULT_SUMMARIZER_AVAILABLE:
-            self.skipTest('DefaultSummarizer not available')
-
         dataset_abbrs = ['dataset1', 'dataset2']
         summarizer = DefaultSummarizer(config=self.config,
                                        dataset_abbrs=dataset_abbrs)
@@ -46,9 +36,6 @@ class TestDefaultSummarizer(unittest.TestCase):
 
     def test_initialization_with_summary_groups(self):
         """Test DefaultSummarizer initialization with summary_groups."""
-        if not DEFAULT_SUMMARIZER_AVAILABLE:
-            self.skipTest('DefaultSummarizer not available')
-
         summary_groups = [{
             'name': 'test_group',
             'subsets': ['dataset1', 'dataset2']
@@ -59,9 +46,6 @@ class TestDefaultSummarizer(unittest.TestCase):
 
     def test_initialization_deprecates_prompt_db(self):
         """Test that prompt_db parameter is deprecated."""
-        if not DEFAULT_SUMMARIZER_AVAILABLE:
-            self.skipTest('DefaultSummarizer not available')
-
         with patch(
                 'opencompass.summarizers.default.get_logger') as mock_logger:
             mock_log = MagicMock()

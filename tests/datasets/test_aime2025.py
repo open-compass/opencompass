@@ -16,50 +16,44 @@ import unittest
 
 from datasets import Dataset
 
-# Try to import CustomDataset and related modules
-try:
-    from opencompass.datasets.custom import CustomDataset
-    AIME2025_AVAILABLE = True
-except ImportError:
-    AIME2025_AVAILABLE = False
+from opencompass.datasets.custom import CustomDataset
+class CustomDataset:
+    """Mock CustomDataset for testing when full import is not available."""
 
-    class CustomDataset:
-        """Mock CustomDataset for testing when full import is not available."""
+    @staticmethod
+    def load(path, **kwargs):
+        from datasets import Dataset
 
-        @staticmethod
-        def load(path, **kwargs):
-            from datasets import Dataset
+        # Simulate loading JSONL file
+        dataset = []
+        with open(path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    dataset.append(json.loads(line))
+        return Dataset.from_list(dataset)
 
-            # Simulate loading JSONL file
-            dataset = []
-            with open(path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    if line.strip():
-                        dataset.append(json.loads(line))
-            return Dataset.from_list(dataset)
-
-        def __init__(self, **kwargs):
-            """Mock __init__ for testing initialization."""
-            from datasets import Dataset, concatenate_datasets
-            reader_cfg = kwargs.pop('reader_cfg', {})
-            abbr = kwargs.pop('abbr', 'dataset')
-            dataset = self.load(**kwargs)
-            if isinstance(dataset, Dataset):
-                dataset = dataset.map(lambda x, idx: {
-                    'subdivision': abbr,
-                    'idx': idx
-                },
-                                      with_indices=True,
-                                      writer_batch_size=16,
-                                      load_from_cache_file=False)
-                dataset = concatenate_datasets([dataset] * 1)
-            self.dataset = dataset
-            # Create a mock reader instead of importing DatasetReader
-            from unittest.mock import MagicMock
-            mock_reader = MagicMock()
-            mock_reader.input_columns = reader_cfg.get('input_columns', [])
-            mock_reader.output_column = reader_cfg.get('output_column', None)
-            self.reader = mock_reader
+    def __init__(self, **kwargs):
+        """Mock __init__ for testing initialization."""
+        from datasets import Dataset, concatenate_datasets
+        reader_cfg = kwargs.pop('reader_cfg', {})
+        abbr = kwargs.pop('abbr', 'dataset')
+        dataset = self.load(**kwargs)
+        if isinstance(dataset, Dataset):
+            dataset = dataset.map(lambda x, idx: {
+                'subdivision': abbr,
+                'idx': idx
+            },
+                                    with_indices=True,
+                                    writer_batch_size=16,
+                                    load_from_cache_file=False)
+            dataset = concatenate_datasets([dataset] * 1)
+        self.dataset = dataset
+        # Create a mock reader instead of importing DatasetReader
+        from unittest.mock import MagicMock
+        mock_reader = MagicMock()
+        mock_reader.input_columns = reader_cfg.get('input_columns', [])
+        mock_reader.output_column = reader_cfg.get('output_column', None)
+        self.reader = mock_reader
 
 
 class TestAime2025Dataset(unittest.TestCase):
@@ -181,23 +175,18 @@ class TestAime2025Dataset(unittest.TestCase):
 
         try:
             if AIME2025_AVAILABLE:
-                try:
-                    # Initialize dataset with reader config
-                    # Use absolute path to avoid DATASETS_MAPPING lookup
-                    dataset = CustomDataset(path=temp_file,
-                                            abbr='aime2025_test',
-                                            reader_cfg=dict(
-                                                input_columns=['question'],
-                                                output_column='answer'))
+            # Initialize dataset with reader config
+            # Use absolute path to avoid DATASETS_MAPPING lookup
+            dataset = CustomDataset(path=temp_file,
+                                    abbr='aime2025_test',
+                                    reader_cfg=dict(
+                                        input_columns=['question'],
+                                        output_column='answer'))
 
-                    # Verify dataset was created
-                    self.assertIsNotNone(dataset.dataset)
-                    self.assertIsNotNone(dataset.reader)
-                except (ImportError, ModuleNotFoundError):
-                    # Skip if dependencies are not available
-                    self.skipTest(
-                        'Skipping test due to missing dependencies (e.g., torch)'
-                    )
+            # Verify dataset was created
+            self.assertIsNotNone(dataset.dataset)
+            self.assertIsNotNone(dataset.reader)
+                
             else:
                 # For mock class, test that it can be instantiated
                 dataset = CustomDataset(path=temp_file,
@@ -219,31 +208,16 @@ class TestAime2025Dataset(unittest.TestCase):
         try:
             reader_cfg = dict(input_columns=['question'],
                               output_column='answer')
+            # Use absolute path to avoid DATASETS_MAPPING lookup
+            dataset = CustomDataset(path=temp_file,
+                                    abbr='aime2025_test',
+                                    reader_cfg=reader_cfg)
 
-            if AIME2025_AVAILABLE:
-                try:
-                    # Use absolute path to avoid DATASETS_MAPPING lookup
-                    dataset = CustomDataset(path=temp_file,
-                                            abbr='aime2025_test',
-                                            reader_cfg=reader_cfg)
+            # Verify reader configuration
+            self.assertEqual(dataset.reader.input_columns,
+                                ['question'])
+            self.assertEqual(dataset.reader.output_column, 'answer')
 
-                    # Verify reader configuration
-                    self.assertEqual(dataset.reader.input_columns,
-                                     ['question'])
-                    self.assertEqual(dataset.reader.output_column, 'answer')
-                except (ImportError, ModuleNotFoundError):
-                    # Skip if dependencies are not available
-                    self.skipTest(
-                        'Skipping test due to missing dependencies (e.g., torch)'
-                    )
-            else:
-                # For mock class, test that it can be instantiated
-                dataset = CustomDataset(path=temp_file,
-                                        abbr='aime2025_test',
-                                        reader_cfg=reader_cfg)
-                # Verify reader configuration
-                self.assertEqual(dataset.reader.input_columns, ['question'])
-                self.assertEqual(dataset.reader.output_column, 'answer')
         finally:
             import os
             if os.path.exists(temp_file):

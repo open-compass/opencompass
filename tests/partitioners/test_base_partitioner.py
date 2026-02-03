@@ -5,11 +5,7 @@ import unittest
 
 from mmengine.config import ConfigDict
 
-try:
-    from opencompass.partitioners.base import BasePartitioner
-    BASE_PARTITIONER_AVAILABLE = True
-except ImportError:
-    BASE_PARTITIONER_AVAILABLE = False
+from opencompass.partitioners.base import BasePartitioner
 
 
 class TestBasePartitioner(unittest.TestCase):
@@ -21,18 +17,12 @@ class TestBasePartitioner(unittest.TestCase):
 
     def test_initialization(self):
         """Test BasePartitioner initialization."""
-        if not BASE_PARTITIONER_AVAILABLE:
-            self.skipTest('BasePartitioner not available')
-
         partitioner = BasePartitioner(out_dir=self.temp_dir)
         self.assertEqual(partitioner.out_dir, self.temp_dir)
         self.assertIsNotNone(partitioner.keep_keys)
 
     def test_initialization_with_custom_keep_keys(self):
         """Test BasePartitioner initialization with custom keep_keys."""
-        if not BASE_PARTITIONER_AVAILABLE:
-            self.skipTest('BasePartitioner not available')
-
         custom_keys = ['custom.key1', 'custom.key2']
         partitioner = BasePartitioner(out_dir=self.temp_dir,
                                       keep_keys=custom_keys)
@@ -40,9 +30,6 @@ class TestBasePartitioner(unittest.TestCase):
 
     def test_parse_model_dataset_args(self):
         """Test parse_model_dataset_args method."""
-        if not BASE_PARTITIONER_AVAILABLE:
-            self.skipTest('BasePartitioner not available')
-
         partitioner = BasePartitioner(out_dir=self.temp_dir)
 
         cfg = ConfigDict({
@@ -58,8 +45,6 @@ class TestBasePartitioner(unittest.TestCase):
 
     def test_parse_model_dataset_args_with_combinations(self):
         """Test parse_model_dataset_args with model_dataset_combinations."""
-        if not BASE_PARTITIONER_AVAILABLE:
-            self.skipTest('BasePartitioner not available')
 
         # Create a partitioner that supports model_dataset_combinations
         # We'll use a mock to test the logic

@@ -6,11 +6,7 @@ from unittest.mock import patch
 
 from mmengine.config import ConfigDict
 
-try:
-    from opencompass.partitioners.naive import NaivePartitioner
-    NAIVE_PARTITIONER_AVAILABLE = True
-except ImportError:
-    NAIVE_PARTITIONER_AVAILABLE = False
+from opencompass.partitioners.naive import NaivePartitioner
 
 
 class TestNaivePartitioner(unittest.TestCase):
@@ -32,27 +28,18 @@ class TestNaivePartitioner(unittest.TestCase):
 
     def test_initialization(self):
         """Test NaivePartitioner initialization."""
-        if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest('NaivePartitioner not available')
-
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=1)
         self.assertEqual(partitioner.out_dir, self.temp_dir)
         self.assertEqual(partitioner.n, 1)
 
     def test_initialization_with_custom_n(self):
         """Test NaivePartitioner initialization with custom n."""
-        if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest('NaivePartitioner not available')
-
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=5)
         self.assertEqual(partitioner.n, 5)
 
     @patch('os.path.exists')
     def test_partition_creates_tasks(self, mock_exists):
         """Test that partition method creates tasks correctly."""
-        if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest('NaivePartitioner not available')
-
         mock_exists.return_value = False
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=1)
 
@@ -76,9 +63,6 @@ class TestNaivePartitioner(unittest.TestCase):
     @patch('os.path.exists')
     def test_partition_with_n_greater_than_one(self, mock_exists):
         """Test partition with n > 1 groups datasets."""
-        if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest('NaivePartitioner not available')
-
         mock_exists.return_value = False
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=2)
 
@@ -110,9 +94,6 @@ class TestNaivePartitioner(unittest.TestCase):
     @patch('os.path.exists')
     def test_partition_skips_existing_files(self, mock_exists):
         """Test that partition skips tasks with existing output files."""
-        if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest('NaivePartitioner not available')
-
         # First call returns True (file exists), second returns False
         mock_exists.side_effect = [True, False]
         partitioner = NaivePartitioner(out_dir=self.temp_dir, n=1)
@@ -146,9 +127,6 @@ class TestNaivePartitioner(unittest.TestCase):
 
     def test_partition_with_add_cfg(self):
         """Test that partition includes add_cfg in tasks."""
-        if not NAIVE_PARTITIONER_AVAILABLE:
-            self.skipTest('NaivePartitioner not available')
-
         with patch('os.path.exists', return_value=False):
             partitioner = NaivePartitioner(out_dir=self.temp_dir, n=1)
 
