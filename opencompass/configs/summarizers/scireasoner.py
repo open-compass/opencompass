@@ -320,5 +320,4 @@ class SciReasonerSummarizer(DefaultSummarizer):
                 parsed_results[model_abbr].setdefault(sg['name'], {}).update(result)
                 dataset_metrics.setdefault(sg['name'], []).extend(group_metrics)
                 dataset_eval_mode[sg['name']] = eval_mode
-        breakpoint()
         return raw_results, parsed_results, dataset_metrics, dataset_eval_mode
