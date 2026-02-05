@@ -1,3 +1,4 @@
+# flake8: noqa
 # Copyright LiveCodeBench @ 2024,
 
 import ast
