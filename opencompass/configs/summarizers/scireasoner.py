@@ -1,5 +1,6 @@
 from opencompass.summarizers.default import DefaultSummarizer
 import functools
+import math
 
 
 def calculate_opi(scores):
@@ -212,6 +213,8 @@ class SciReasonerSummarizer(DefaultSummarizer):
                             self.logger.warning(
                                 f'Non-numeric metric {i[1]} for dataset {i[0]} in model {model_abbr}, setting default value 0.')
                             parsed_results[model_abbr][i[0]][i[1]] = 0.0
+                        if math.isinf(parsed_results[model_abbr][i[0]][i[1]]) or math.isnan(parsed_results[model_abbr][i[0]][i[1]]):
+                            parsed_results[model_abbr][i[0]][i[1]] = 0.0
                     else:
                         if i in parsed_results[model_abbr]:
                             available_metrics.append(i)
@@ -317,5 +320,4 @@ class SciReasonerSummarizer(DefaultSummarizer):
                 parsed_results[model_abbr].setdefault(sg['name'], {}).update(result)
                 dataset_metrics.setdefault(sg['name'], []).extend(group_metrics)
                 dataset_eval_mode[sg['name']] = eval_mode
-
         return raw_results, parsed_results, dataset_metrics, dataset_eval_mode
