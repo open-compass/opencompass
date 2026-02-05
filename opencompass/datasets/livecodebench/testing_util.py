@@ -656,22 +656,56 @@ def stripped_string_compare(s1, s2):
     s2 = s2.lstrip().rstrip()
     return s1 == s2
 
+class MockStdinWithBuffer:
+    def __init__(self, inputs: str):
+        self.inputs = inputs
+        self._stringio = StringIO(inputs)
+        self.buffer = MockBuffer(inputs)
+
+    def read(self, *args):
+        return self.inputs
+
+    def readline(self, *args):
+        return self._stringio.readline(*args)
+
+    def readlines(self, *args):
+        return self.inputs.split("\n")
+
+    def __getattr__(self, name):
+        # Delegate other attributes to StringIO
+        return getattr(self._stringio, name)
+
+
+class MockBuffer:
+    def __init__(self, inputs: str):
+        self.inputs = inputs.encode("utf-8")  # Convert to bytes
+
+    def read(self, *args):
+        # Return as byte strings that can be split
+        return self.inputs
+
+    def readline(self, *args):
+        return self.inputs.split(b"\n")[0] + b"\n"
+
 
 def call_method(method, inputs):
 
     if isinstance(inputs, list):
-        inputs = '\n'.join(inputs)
+        inputs = "\n".join(inputs)
 
-    inputs_line_iterator = iter(inputs.split('\n'))
+    inputs_line_iterator = iter(inputs.split("\n"))
+
+    # Create custom stdin mock with buffer support
+    mock_stdin = MockStdinWithBuffer(inputs)
 
     # sys.setrecursionlimit(10000)
 
     # @patch('builtins.input', side_effect=inputs.split("\n"))
-    @patch('builtins.open', mock_open(read_data=inputs))
-    @patch('sys.stdin', StringIO(inputs))
-    @patch('sys.stdin.readline', lambda *args: next(inputs_line_iterator))
-    @patch('sys.stdin.readlines', lambda *args: inputs.split('\n'))
-    @patch('sys.stdin.read', lambda *args: inputs)
+    @patch("builtins.open", mock_open(read_data=inputs))
+    @patch("sys.stdin", mock_stdin)  # Use our custom mock instead of StringIO
+    @patch("sys.stdin.readline", lambda *args: next(inputs_line_iterator))
+    @patch("sys.stdin.readlines", lambda *args: inputs.split("\n"))
+    @patch("sys.stdin.read", lambda *args: inputs)
     # @patch('sys.stdout.write', print)
     def _inner_call_method(_method):
         try:
