@@ -20,7 +20,7 @@ jobs:
       matrix:
         python-version: ['3.10']
         include:
-          - torch: 2.5.1
+          - torch: 2.9.0
     steps:
       - name: Free disk space
         uses: jlumbroso/free-disk-space@main
@@ -62,10 +62,10 @@ jobs:
         run: |
           python run.py --models hf_opt_125m --datasets siqa_gen winograd_ppl --dry-run
 
-  build_cu117:
+  build_cu131:
     runs-on: ubuntu-latest
     container:
-      image: nvidia/cuda:11.7.1-cudnn8-runtime-ubuntu22.04
+      image: nvidia/cuda:13.1.1-cudnn-runtime-ubuntu24.04
     strategy:
       matrix:
         python-version: ['3.10']
