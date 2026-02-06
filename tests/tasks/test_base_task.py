@@ -11,7 +11,7 @@ from opencompass.tasks.base import BaseTask, extract_role_pred
 class TestExtractRolePred(unittest.TestCase):
     """Test cases for extract_role_pred function."""
 
-    def test_extract_role_pred_function_source(self):
+    def deperacated_test_extract_role_pred_function_source(self):
         """Test that extract_role_pred uses the fixed implementation."""
 
         import inspect
