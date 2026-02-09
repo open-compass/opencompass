@@ -2,6 +2,7 @@ exclude: |
     (?x)^(
       tests/data/|
       tests/datasets/|
+      tests/models/|
       opencompass/models/internal/|
       opencompass/utils/internal/|
       opencompass/openicl/icl_evaluator/hf_metrics/|
@@ -94,6 +95,10 @@ repos:
     hooks:
       - id: docformatter
         args: ["--in-place", "--wrap-descriptions", "79"]
+        exclude: |
+          (?x)^(
+            tests
+          )
   - repo: local
     hooks:
     -   id: update-dataset-suffix
