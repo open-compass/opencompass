@@ -4,7 +4,7 @@ import fire
 import requests
 
 
-def health_check(url: str = 'http://0.0.0.0:2333', timeout: int = 300):
+def health_check(url: str = 'http://0.0.0.0:23333', timeout: int = 300):
     for i in range(int(timeout / 5)):
         try:
             sleep(5)
