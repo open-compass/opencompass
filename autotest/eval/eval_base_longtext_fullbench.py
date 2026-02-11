@@ -1,6 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
+    from autotest.eval.models import base_models
     from opencompass.configs.datasets.longbench.longbench import \
         longbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.needlebench.needlebench_base.needlebench_base_gen import \
@@ -13,8 +14,6 @@ with read_base():
     from opencompass.configs.summarizers.needlebench import (
         needlebench_internal_32k_summarizer,
         needlebench_internal_100k_summarizer)
-
-    from .models import base_models
 
 models = base_models
 

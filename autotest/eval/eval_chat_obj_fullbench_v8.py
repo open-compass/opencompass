@@ -2,6 +2,7 @@ from mmengine.config import read_base
 
 with read_base():
     # Datasets
+    from autotest.eval.models import judge_models, models
     from opencompass.configs.datasets.atlas.atlas_val_gen_b2d1b6 import \
         atlas_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.biodata.biodata_task_gen import \
@@ -16,8 +17,6 @@ with read_base():
         mol_gen_selfies_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.openswi.openswi_gen import \
         openswi_datasets  # noqa: F401, E501
-
-    from .models import judge_models, models
 
 models = models
 

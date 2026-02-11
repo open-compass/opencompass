@@ -1,6 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
+    from autotest.eval.models import models
     from opencompass.configs.datasets.babilong.babilong_256k_gen import \
         babiLong_256k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.longbench.longbench import \
@@ -20,8 +21,6 @@ with read_base():
         ruler_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.needlebench import \
         needlebench_128k_summarizer  # noqa: F401, E501
-
-    from .models import models
 
 models = models
 

@@ -4,6 +4,7 @@ with read_base():
     # Datasets
     # Instruct Following
     # # # # Math Calculation
+    from autotest.eval.models import judge_models, models
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_gen_5e9f4f import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2025.aime2025_cascade_eval_gen_5e9f4f import \
@@ -94,8 +95,6 @@ with read_base():
         physics_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.supergpqa import \
         supergpqa_summary_groups  # noqa: F401, E501
-
-    from .models import judge_models, models
 
 models = models
 

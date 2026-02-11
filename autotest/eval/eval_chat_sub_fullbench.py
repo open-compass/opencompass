@@ -8,6 +8,7 @@ from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 with read_base():
     # read hf models - chat models
     # Dataset
+    from autotest.eval.models import judge_models, models
     from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa_gen import \
         csimpleqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.SimpleQA.simpleqa_gen_0283c3 import \
@@ -26,8 +27,6 @@ with read_base():
         mtbench101_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.wildbench.wildbench_pair_judge_new import \
         wildbench_datasets  # noqa: F401, E501
-
-    from .models import judge_models, models
 
 models = models
 

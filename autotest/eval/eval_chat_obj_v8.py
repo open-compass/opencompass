@@ -2,14 +2,13 @@ from mmengine.config import read_base
 
 with read_base():
     # Datasets
+    from autotest.eval.models import interns1_models, judge_models
     from opencompass.configs.datasets.biodata.biodata_task_gen import \
         biodata_task_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.MolInstructions_chem.mol_instructions_chem_gen import \
         mol_gen_selfies_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.SciReasoner.scireasoner_gen import \
         scireasoner_mini_datasets  # noqa: F401, E501
-
-    from .models import interns1_models, judge_models
 
 models = interns1_models
 

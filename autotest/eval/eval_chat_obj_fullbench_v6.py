@@ -1,6 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
+    from autotest.eval.models import judge_models, models
     from opencompass.configs.datasets.aime2024.aime2024_llmjudge_gen_5e9f4f import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2025.aime2025_llmjudge_gen_5e9f4f import \
@@ -59,8 +60,6 @@ with read_base():
         summarizer as musr_summarizer
     from opencompass.configs.summarizers.mmmlu_lite import \
         mmmlu_summary_groups  # noqa: F401, E501
-
-    from .models import judge_models, models
 
 models = models
 

@@ -3,6 +3,7 @@ from mmengine.config import read_base
 with read_base():
     # read hf models - chat models
     # Dataset
+    from autotest.eval.models import models
     from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.ARC_c.ARC_c_cot_gen_926652 import \
@@ -94,8 +95,6 @@ with read_base():
         teval_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.mmmlu_lite import \
         mmmlu_summary_groups  # noqa: F401, E501
-
-    from .models import models
 
 models = models
 

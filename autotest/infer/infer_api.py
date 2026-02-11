@@ -1,9 +1,8 @@
+from autotest.infer.chat_datasets import datasets
+from autotest.infer.constant import meta_template as test_meta_template
 from opencompass.models.openai_api import OpenAISDK
 from opencompass.models.openai_streaming import OpenAISDKStreaming
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
-
-from .chat_datasets import datasets
-from .constant import meta_template as test_meta_template
 
 datasets = datasets
 

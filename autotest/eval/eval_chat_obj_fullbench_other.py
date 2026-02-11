@@ -2,6 +2,7 @@ from mmengine.config import read_base
 
 with read_base():
     # Datasets
+    from autotest.eval.models import judge_models, models
     from opencompass.configs.chatml_datasets.C_MHChem.C_MHChem_gen import \
         datasets as C_MHChem_chatml_datasets  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.CPsyExam.CPsyExam_gen import \
@@ -12,8 +13,6 @@ with read_base():
         datasets as UGPhysics_chatml_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.eese.eese_llm_judge_gen import \
         eese_datasets  # noqa: F401, E501
-
-    from .models import judge_models, models
 
 models = models
 

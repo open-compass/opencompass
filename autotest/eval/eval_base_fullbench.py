@@ -1,6 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
+    from autotest.eval.models import base_models
     from opencompass.configs.datasets.ARC_c.ARC_c_few_shot_ppl import \
         ARC_c_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bbh.bbh_gen_98fba6 import \
@@ -59,8 +60,6 @@ with read_base():
         mmlu_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.mmlu_pro import \
         mmlu_pro_summary_groups  # noqa: F401, E501
-
-    from .models import base_models
 
 models = base_models
 
