@@ -28,7 +28,7 @@ env:
   REPORT_ROOT: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/eval_report/prtest
   COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
   HF_DATASETS_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/hf_cache
-  HF_HUB_CACHE: /mnt/shared-storage-user/large-model-center-share-weights/hf_hub
+  HF_HUB_CACHE: /mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub
   KUBEBRAIN_CLUSTER_ENTRY: https://h.pjlab.org.cn
   KUBEBRAIN_NAMESPACE: ailab-opencompass
   JOB_NAME: pr-test-${{ github.run_id }}-${{ github.run_attempt }}
