@@ -17,7 +17,7 @@ on:
         required: true
         description: 'regression types'
         type: string
-        default: "['infer', 'eval', 'summarize', 'all']"
+        default: "['infer', 'eval', 'cmd']"
       baseline_result:
         required: true
         description: 'baseline result'
@@ -128,7 +128,7 @@ jobs:
           pip list
 
   daily_infer_test:
-    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'infer') || contains(fromJSON(github.event.inputs.regression_type), 'all'))}}
+    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'infer'))}}
     needs: prepare_env
     strategy:
       fail-fast: false
@@ -160,19 +160,6 @@ jobs:
           conda info --envs
           echo ${{github.workspace}}
           rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate;  conda activate ${{env.CONDA_ENV}}; conda env list; lmdeploy serve api_server Qwen/Qwen3-8B --session-len 146000 --max-batch-size 1 & python autotest/utils/health_check.py; opencompass ${{github.workspace}}/autotest/infer/infer_${{matrix.infer_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} --reuse --dump-res-length'
-
-          for i in {1..300}; do
-            current_status=$(rjob get cmd-${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
-            if [[ $current_status == "Succeeded" ]]; then
-              echo "Task succeeded"
-              exit 0
-            elif [[ $current_status == "Failed" || $current_status == "Stopped" ]]; then
-              echo "Task failed or stopped, fetching logs"
-              rjob logs job ${{ env.JOB_NAME }}
-              exit 1
-            fi
-            sleep 6
-          done
       - name: Run test - other
         if: matrix.infer_func != 'api' && matrix.infer_func != 'api_rollout'
         run: |
@@ -181,9 +168,13 @@ jobs:
           conda info --envs
           echo ${{github.workspace}}
           rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate;  conda activate ${{env.CONDA_ENV}}; conda env list; opencompass ${{github.workspace}}/autotest/infer/infer_${{matrix.infer_func}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} --reuse --dump-res-length'
-
+      - name: Assert result
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          conda info --envs
           for i in {1..300}; do
-            current_status=$(rjob get cmd-${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
+            current_status=$(rjob get ${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
             if [[ $current_status == "Succeeded" ]]; then
               echo "Task succeeded"
               exit 0
@@ -194,22 +185,19 @@ jobs:
             fi
             sleep 6
           done
-      - name: Assert result
-        run: |
-          . ${{env.CONDA_PATH}}/bin/activate
-          conda activate ${{env.CONDA_ENV}}
-          conda info --envs
           python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.infer_func}}
 
 
   daily_eval_test:
-    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'eval') || contains(fromJSON(github.event.inputs.regression_type), 'all'))}}
+    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'eval'))}}
     needs: prepare_env
     strategy:
       fail-fast: false
       matrix:
         eval_func: ["chat_obj_fullbench_v5", "chat_obj_fullbench_v6", "chat_obj_fullbench_v7", "chat_obj_fullbench_v8", "eval_chat_obj_v8", "chat_obj_fullbench_other", "chat_sub_fullbench", "base_fullbench","base_longtext_fullbench","chat_longtext_fullbench"]
     runs-on: yidian_cu12_daily
+    env:
+      JOB_NAME: eval-${{ github.run_id }}-${{matrix.eval_func}}-${{ github.run_attempt }}
     timeout-minutes: 240 #4hours
     steps:
       - name: Clean workdir
@@ -252,12 +240,26 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
+          for i in {1..300}; do
+            current_status=$(rjob get ${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
+            if [[ $current_status == "Succeeded" ]]; then
+              echo "Task succeeded"
+              exit 0
+            elif [[ $current_status == "Failed" || $current_status == "Stopped" ]]; then
+              echo "Task failed or stopped, fetching logs"
+              rjob logs job ${{ env.JOB_NAME }}
+              exit 1
+            fi
+            sleep 6
+          done
           python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.eval_func}}
 
   daily_run_cmd:
     if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'cmd'))}}
     needs: prepare_env
     runs-on: yidian_cu12_daily
+    env:
+      JOB_NAME: cmd-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 240 #4hours
     steps:
       - name: Clean workdir
@@ -278,14 +280,17 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          rjob submit --metadata-name=cmd-${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc '/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/daily_cmd_test.sh ${{env.REPORT_ROOT}}/${{ github.run_id }}'
-
+          rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc '/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/daily_cmd_test.sh ${{env.REPORT_ROOT}}/${{ github.run_id }}'
+          
           for i in {1..300}; do
-            current_status=$(rjob get cmd-${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
-            if [[ $current_status == "Succeeded" || $current_status == "Failed" || $current_status == "Stopped" ]]; then
-                echo "Current status: $current_status, stop checking"
-                rjob logs job cmd-${{ env.JOB_NAME }}
-                break
+            current_status=$(rjob get ${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
+            if [[ $current_status == "Succeeded" ]]; then
+              echo "Task succeeded"
+              exit 0
+            elif [[ $current_status == "Failed" || $current_status == "Stopped" ]]; then
+              echo "Task failed or stopped, fetching logs"
+              rjob logs job ${{ env.JOB_NAME }}
+              exit 1
             fi
             sleep 6
           done
