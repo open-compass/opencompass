@@ -10,8 +10,6 @@ with read_base():
 
 datasets = datasets
 
-datasets = datasets
-
 api_meta_template = dict(
     round=[
         dict(role='HUMAN', api_role='HUMAN'),

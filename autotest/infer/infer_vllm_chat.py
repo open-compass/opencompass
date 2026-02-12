@@ -3,7 +3,7 @@ from autotest.infer.constant import meta_template as test_meta_template
 from opencompass.models import VLLMwithChatTemplate
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
-datasets = [x for x in datasets if 'InfiniteBench' not in x['abbr']]
+datasets = datasets
 
 # Base model testcase
 Qwen3_0_6B_FP8 = dict(
