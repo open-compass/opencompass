@@ -1,11 +1,7 @@
-from mmengine.config import read_base
-
+from autotest.infer.chat_datasets import datasets
+from autotest.infer.constant import meta_template as test_meta_template
 from opencompass.models import VLLMwithChatTemplate
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
-
-with read_base():
-    from autotest.infer.base_datasets import datasets
-    from autotest.infer.constant import meta_template as test_meta_template
 
 datasets = [x for x in datasets if 'InfiniteBench' not in x['abbr']]
 
