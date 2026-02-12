@@ -282,4 +282,4 @@ summarizer = dict(
 )
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:16]'
+    d['reader_cfg']['test_range'] = '[0:4]'

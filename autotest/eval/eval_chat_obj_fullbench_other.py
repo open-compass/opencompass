@@ -24,23 +24,23 @@ chatml_datasets = [
 datasets = [eese_datasets[0]]
 
 for d in chatml_datasets:
-    d['test_range'] = '[0:16]'
+    d['test_range'] = '[0:4]'
 
 for d in datasets:
     if 'reader_cfg' in d:
-        d['reader_cfg']['test_range'] = '[0:16]'
+        d['reader_cfg']['test_range'] = '[0:4]'
     else:
-        d['test_range'] = '[0:16]'
+        d['test_range'] = '[0:4]'
     if 'eval_cfg' in d and 'dataset_cfg' in d['eval_cfg'][
             'evaluator'] and 'reader_cfg' in d['eval_cfg']['evaluator'][
                 'dataset_cfg']:
         d['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
-            'test_range'] = '[0:16]'
+            'test_range'] = '[0:4]'
     if 'eval_cfg' in d and 'llm_evaluator' in d['eval_cfg'][
             'evaluator'] and 'dataset_cfg' in d['eval_cfg']['evaluator'][
                 'llm_evaluator']:
         d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
-            'reader_cfg']['test_range'] = '[0:16]'
+            'reader_cfg']['test_range'] = '[0:4]'
 
 obj_judge_model = judge_models[0]
 
