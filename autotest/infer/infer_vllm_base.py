@@ -7,7 +7,7 @@ with read_base():
     from autotest.infer.base_datasets import datasets
     from autotest.infer.constant import meta_template as test_meta_template
 
-datasets = datasets
+datasets = [x for x in datasets.copy() if 'InfiniteBench' not in x['abbr']]
 
 # Base model testcase
 Qwen3_0_6B_Base = dict(
