@@ -40,7 +40,7 @@ for d in datasets:
         d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
             'reader_cfg']['test_range'] = '[0:4]'
 
-obj_judge_model = judge_models
+obj_judge_model = judge_models[0]
 
 for d in datasets:
     if 'eval_cfg' in d and 'evaluator' in d['eval_cfg']:

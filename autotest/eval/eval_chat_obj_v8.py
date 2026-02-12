@@ -14,7 +14,7 @@ models = interns1_models
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 
-obj_judge_model = judge_models
+obj_judge_model = judge_models[0]
 
 for d in datasets:
     if 'eval_cfg' in d and 'evaluator' in d['eval_cfg']:
