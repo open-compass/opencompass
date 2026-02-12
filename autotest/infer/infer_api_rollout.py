@@ -1,6 +1,10 @@
-from .chat_datasets import datasets
+from mmengine.config import read_base
+
 from opencompass.models import OpenAISDKRollout
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
+
+with read_base():
+    from autotest.infer.base_datasets import datasets
 
 datasets = datasets
 

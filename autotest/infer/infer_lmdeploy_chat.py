@@ -1,7 +1,13 @@
-from .chat_datasets import datasets
-from .constant import meta_template as test_meta_template
+from mmengine.config import read_base
+
 from opencompass.models import TurboMindModelwithChatTemplate
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
+
+with read_base():
+    from autotest.infer.base_datasets import datasets
+    from autotest.infer.constant import meta_template as test_meta_template
+
+datasets = datasets
 
 datasets = datasets
 
