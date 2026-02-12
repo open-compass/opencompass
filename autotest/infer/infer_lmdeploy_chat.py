@@ -1,5 +1,5 @@
-from autotest.infer.chat_datasets import datasets
-from autotest.infer.constant import meta_template as test_meta_template
+from .chat_datasets import datasets
+from .constant import meta_template as test_meta_template
 from opencompass.models import TurboMindModelwithChatTemplate
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
@@ -277,31 +277,24 @@ Qwen3_0_6B_FP8_LOGPROBS = dict(type=TurboMindModelwithChatTemplate,
                                run_cfg=dict(num_gpus=1))
 
 models = [
-    # Basic configurations
     Qwen3_0_6B_FP8,
     Qwen3_0_6B_FP8_PYTORCH,
     Qwen3_0_6B_FP8_BACKEND,
     Qwen3_0_6B_FP8_DROP_MIDDLE,
     Qwen3_0_6B_FP8_IGNORE_EOS,
     Qwen3_0_6B_FP8_TP2,
-    # Generation parameters - core
     Qwen3_0_6B_FP8_TEMP0,
     Qwen3_0_6B_FP8_TOPK50,
-    # Generation parameters - advanced
     Qwen3_0_6B_FP8_DO_SAMPLE,
-    # Token control
     Qwen3_0_6B_FP8_BAD_WORDS,
     Qwen3_0_6B_FP8_STOP_WORDS,
     Qwen3_0_6B_FP8_STOP_TOKEN_IDS,
     Qwen3_0_6B_FP8_BAD_TOKEN_IDS,
-    # Length control
     Qwen3_0_6B_FP8_NEW_TOKENS,
     Qwen3_0_6B_FP8_MAX_SEQ_LEN,
-    # Session and context
     Qwen3_0_6B_FP8_SESSION_LEN,
     Qwen3_0_6B_FP8_LOGPROBS,
     Qwen3_0_6B_FP8_TEMPLATE,
     Qwen3_0_6B_FP8_HF_OVER,
-    # Combined and advanced
     Qwen3_0_6B_FP8_COMBINED,
 ]

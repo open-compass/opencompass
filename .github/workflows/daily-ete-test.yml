@@ -118,7 +118,7 @@ jobs:
             pip install xformers
             pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0
             pip install transformers==4.56.0 vllm==0.11.0 lmdeploy==0.11.0
-            pip install fire
+            pip install fire pyyaml pytest
             FLASH_ATTENTION_FORCE_BUILD=TRUE pip install /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/packages/flash_attn-2.8.3+cu12torch2.8cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
             cp -r /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/packages/nltk_data /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/miniconda3/envs/${{env.CONDA_ENV}}/nltk_data
       - name: conda env
@@ -415,4 +415,4 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          python .github/scripts/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/cluster ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/cluster
+          python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/cluster ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/cluster

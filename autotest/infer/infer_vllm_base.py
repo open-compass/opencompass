@@ -1,5 +1,5 @@
-from autotest.infer.base_datasets import datasets
-from autotest.infer.constant import meta_template as test_meta_template
+from .base_datasets import datasets
+from .constant import meta_template as test_meta_template
 from opencompass.models import VLLM
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
