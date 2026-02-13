@@ -26,7 +26,7 @@ ifbench_datasets = [
     dict(
         abbr='IFBench',
         type=IFEvalDataset,
-        path='data/IFBench/IFBench_test.jsonl',
+        path='opencompass/IFbench',
         reader_cfg=ifbench_reader_cfg,
         infer_cfg=ifbench_infer_cfg,
         eval_cfg=ifbench_eval_cfg)
