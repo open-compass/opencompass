@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/IFbench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/IFBench/IFBench_test.jsonl",
+    },
     "opencompass/lcb_pro": {
         "ms_id": None,
         "hf_id": None,
@@ -587,6 +592,22 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/IFbench": {
+        "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/IFBench.zip",
+        "md5":"b1c63b31e3312f929c6318977de4cdd3",
+    },
+    "/lcb_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lcb_pro.zip",
+        "md5": "ff4572e292fe27cabce3ab3b407361bd",
+    },
+    "/mol-instructions": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mol-instructions.zip",
+        "md5": "ea3db4a199222835036235b18306065a",
+    },
+    "/biology-instruction": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/biology-instruction-fixed.zip",
+        "md5": "5e9bc19f403372bed50c7c46afed8291",
+    },
     "/climaqa_gold": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/climaqa_gold.zip",
@@ -963,4 +984,8 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/phybench.zip",
         "md5": "a4209b820f6384f69ec88fa816db9e4b",
     },
+    "/SciReasoner": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SciReasoner.zip",
+        "md5": "2cf692234badc836fb80c4cf756d5160",
+    }
 }
