@@ -54,6 +54,7 @@ class OpenAISDKStreaming(OpenAISDK):
                  stream: bool = True,
                  stream_chunk_size: int = 1,
                  timeout: int = 3600,
+                 finish_reason_confirm: bool = True,
                  max_workers: Optional[int] = None):
 
         super().__init__(
@@ -84,6 +85,7 @@ class OpenAISDKStreaming(OpenAISDK):
         self.stream_chunk_size = stream_chunk_size
         self.openai_extra_kwargs = openai_extra_kwargs
         self.timeout = timeout
+        self.finish_reason_confirm = finish_reason_confirm
 
     def _create_fresh_client(self):
         """Create a fresh OpenAI client for each request to avoid
@@ -336,17 +338,18 @@ class OpenAISDKStreaming(OpenAISDK):
         # Combine reasoning content and regular content
         complete_content = ''.join(completion_chunks)
 
-        if finish_reason is None:
-            elapsed = time.time() - start_time
-            log_with_thread(
-                f'Stream ended without finish_reason (possible truncation). '
-                f'elapsed={elapsed:.1f}s chunks={chunk_count} '
-                f'content_len={sum(len(x) for x in completion_chunks)} '
-                f'reasoning_len={len(reasoning_content)}',
-                'error',
-            )
-            raise RuntimeError(
-                'Streaming ended without finish_reason (truncated).')
+        if self.finish_reason_confirm:
+            if finish_reason is None:
+                elapsed = time.time() - start_time
+                log_with_thread(
+                    f'Stream ended without finish_reason (truncated). '
+                    f'elapsed={elapsed:.1f}s chunks={chunk_count} '
+                    f'content_len={sum(len(x) for x in completion_chunks)} '
+                    f'reasoning_len={len(reasoning_content)}',
+                    'error',
+                )
+                raise RuntimeError(
+                    'Streaming ended without finish_reason (truncated).')
 
         if self.verbose:
             log_with_thread(f'Stream processing complete. Content length: '
