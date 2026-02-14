@@ -295,7 +295,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
 
           mkdir ${{env.REPORT_ROOT}}/${{ github.run_id }} -p 
-          cp -r ${{env.REPORT_ROOT}}/${{ env.BASELINE_DIR }}/predictions/eval_${{matrix.eval_func}} ${{env.REPORT_ROOT}}/${{ github.run_id }}/eval_${{matrix.eval_func}} 
+          cp -r ${{env.REPORT_ROOT}}/${{ env.BASELINE_DIR }}/predictions/eval_${{matrix.eval_func}} ${{env.REPORT_ROOT}}/${{ github.run_id }}
 
           echo ${{github.workspace}}
           
