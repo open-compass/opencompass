@@ -206,7 +206,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          python autotest/utils/compare_results.py compare_results predictions ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.infer_func}}
+          python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.infer_func}} predictions
 
 
   daily_eval_test:
@@ -321,7 +321,7 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          python autotest/utils/compare_results.py compare_results results ${{env.REPORT_ROOT}}/${{ github.run_id }}/eval_${{matrix.eval_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/eval_${{matrix.eval_func}}
+          python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/eval_${{matrix.eval_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/eval_${{matrix.eval_func}} results
 
   daily_run_cmd:
     if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'cmd'))}}
@@ -415,5 +415,5 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          python autotest/utils/compare_results.py compare_results predictions ${{env.REPORT_ROOT}}/${{ github.run_id }}/cluster ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/cluster
-          python autotest/utils/compare_results.py compare_results results ${{env.REPORT_ROOT}}/${{ github.run_id }}/cluster ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/cluster
+          python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/cluster ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/cluster predictions
+          python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/cluster ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/cluster results
