@@ -4,7 +4,13 @@ import os
 import fire
 
 
-def compare_results(folder1, folder2, results_ignore_list=None):
+def compare_results(folder1,
+                    folder2,
+                    compare_type: str = 'predictions',
+                    results_ignore_list: list = [
+                        'srbench.json', 'dingo_en_192.json',
+                        'dingo_zh_170.json', 'qa_dingo_cn.json', 'srbench.json'
+                    ]):
     # Initialize ignore_list if not provided
     if results_ignore_list is None:
         results_ignore_list = []
@@ -16,17 +22,10 @@ def compare_results(folder1, folder2, results_ignore_list=None):
     sub_folder1 = get_all_subpaths(folder1)[0]
     sub_folder2 = get_all_subpaths(folder2)[0]
 
-    print('compare predicitons')
-    compare_folders(os.path.join(sub_folder1, 'predictions'),
-                    os.path.join(sub_folder2, 'predictions'),
-                    results_ignore_list=['srbench.json'])
-    print('compare results')
-    compare_folders(os.path.join(sub_folder1, 'results'),
-                    os.path.join(sub_folder2, 'results'),
-                    results_ignore_list=[
-                        'dingo_en_192.json', 'dingo_zh_170.json',
-                        'qa_dingo_cn.json', 'srbench.json'
-                    ])
+    print(f'compare {compare_type}')
+    compare_folders(os.path.join(sub_folder1, compare_type),
+                    os.path.join(sub_folder2, compare_type),
+                    results_ignore_list=results_ignore_list)
 
 
 def compare_folders(folder1, folder2, results_ignore_list=None):
