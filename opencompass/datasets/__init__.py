@@ -151,6 +151,7 @@ from .race import *  # noqa: F401, F403
 from .rbench import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
 from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
+from .reasonzoo import *  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .ruler import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403

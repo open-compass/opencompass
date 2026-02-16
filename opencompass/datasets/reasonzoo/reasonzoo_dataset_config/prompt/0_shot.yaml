@@ -1,0 +1,139 @@
+boolean_logic_prompt_format:
+  - |
+    You are an intelligent assistant that helps with various logical calculation tasks, like set operation, finite state machine, digital logic, etc.
+
+    ### Logic Calculation Rule:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+dailylogic_prompt_format:
+  - |
+    You are an intelligent assistant specializing in solving logic grid puzzles (also known as dailylogic puzzles). Your task is to solve the given puzzle by carefully analyzing the clues and constraints provided.
+
+    ### Instructions:
+
+    1. Carefully analyze all given information about houses, occupants, and their attributes.
+    2. Use the provided clues to establish logical connections and constraints.
+    3. Present your solution in the specified JSON format.
+    4. Include clear reasoning that explains how you arrived at the solution.
+    
+
+    ### Puzzle Rule:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+communication_code_prompt_format:
+- |
+  You are an intelligent assistant that specializes in coding theory.
+  ### Instructions:
+
+  1. Identify the relevant properties and objects specified in the rule.
+  2. Follow the specified operations precisely as described in the rules.
+  3. Ensure your output is formatted according to the specified notation and symbols.
+
+  ### Cipher Rule:
+
+  {}
+
+  ### Question:
+  {}
+
+  ### Answer:
+
+operation_research_prompt_format:
+  - |
+    You are an intelligent assistant that specializes in operation research tasks.
+    ### Instructions:
+
+    1. Identify the relevant properties and objects specified in the rule.
+    2. Follow the specified operations precisely as described in the rules.
+    3. Ensure your output is formatted according to the specified notation and symbols.
+
+    ### Operation Research Rule:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    
+number_calculation_prompt_format:
+  - |
+    You are an intelligent assistant that specializes in number calculation tasks.
+    ### Instructions:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+gradeschoolmath_prompt_format:
+  - |
+    You are an intelligent assistant that specializes in solving gradeschool math puzzles.
+    ### Instructions:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+formal_language_prompt_format:
+  - |
+    You are an intelligent assistant that specializes in solving formal language tasks.
+    ### Instructions:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+physics_prompt_format:
+  - |
+    You are an intelligent assistant that specializes in solving physics tasks.
+    ### Instructions:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+puzzle_and_code_prompt_format:
+  - |
+    You are an intelligent assistant that specializes in solving puzzle tasks.
+    ### Instructions:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+  - |
+    You are an advanced mathematics problem solver specializing in Olympiad-level challenges.
+
+    ### Livemathbench Rule:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:

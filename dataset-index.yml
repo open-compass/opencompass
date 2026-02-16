@@ -64,6 +64,12 @@
     paper: https://arxiv.org/pdf/2410.06526v1
     configpath: opencompass/configs/datasets/korbench/korbench_gen.py
     configpath_llmjudge: opencompass/configs/datasets/korbench/korbench_llm_judge_gen.py
+- reasonzoo:
+    name: ReasonZoo
+    category: Reasoning
+    paper: https://arxiv.org/abs/2508.15754
+    configpath: opencompass/configs/datasets/reasonzoo/reasonzoo_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/reasonzoo/reasonzoo_llm_judge_gen.py
 - lawbench:
     name: LawBench
     category: Knowledge / Law
