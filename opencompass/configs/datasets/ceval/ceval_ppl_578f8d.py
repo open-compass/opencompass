@@ -62,7 +62,7 @@ ceval_subject_mapping = {
 ceval_all_sets = list(ceval_subject_mapping.keys())
 
 ceval_datasets = []
-for _split in ['val']:
+for _split in ['val', 'test']:
     for _name in ceval_all_sets:
         _ch_name = ceval_subject_mapping[_name][1]
         ceval_infer_cfg = dict(
