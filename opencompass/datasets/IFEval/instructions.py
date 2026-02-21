@@ -163,7 +163,7 @@ class ResponseLanguageChecker(Instruction):
 
         try:
             return langdetect.detect(value) == self._language
-        except langdetect.LangDetectException as e:
+        except langdetect.lang_detect_exception.LangDetectException as e:
             # Count as instruction is followed.
             logging.error('Unable to detect language for text %s due to %s',
                           value, e)  # refex: disable=pytotw.037
@@ -1424,7 +1424,7 @@ class CapitalLettersEnglishChecker(Instruction):
 
         try:
             return value.isupper() and langdetect.detect(value) == 'en'
-        except langdetect.LangDetectException as e:
+        except langdetect.lang_detect_exception.LangDetectException as e:
             # Count as instruction is followed.
             logging.error('Unable to detect language for text %s due to %s',
                           value, e)  # refex: disable=pytotw.037
@@ -1456,7 +1456,7 @@ class LowercaseLettersEnglishChecker(Instruction):
 
         try:
             return value.islower() and langdetect.detect(value) == 'en'
-        except langdetect.LangDetectException as e:
+        except langdetect.lang_detect_exception.LangDetectException as e:
             # Count as instruction is followed.
             logging.error('Unable to detect language for text %s due to %s',
                           value, e)  # refex: disable=pytotw.037
