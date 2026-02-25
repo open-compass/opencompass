@@ -382,6 +382,16 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/aime2025/aime2025.jsonl",
     },
+    "opencompass/aime2026": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/aime2026/aime2026.jsonl",
+    },
+    "opencompass/hmmt2026": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/hmmt2026/hmmt_feb_2026.jsonl",
+    },
     "opencompass/cmo_fib": {
         "ms_id": "",
         "hf_id": "",
@@ -882,6 +892,14 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aime2025.zip",
         "md5": "aa18cd5d2e2de246c5397f5eb1e61004",
+    },
+    "/aime2026": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aime2026.zip",
+        "md5": "4230d87b80646c811ada0e4bb2efe3a3",
+    },
+    "/hmmt2026": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hmmt_feb_2026.zip",
+        "md5": "442642baa94de9e8a67903d7d5aef44b",
     },
     "/cmo": {
         "url":
