@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/IFEval": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/ifeval/input_data.jsonl",
+    },
     "opencompass/IFbench": {
         "ms_id": None,
         "hf_id": None,
