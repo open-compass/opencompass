@@ -103,7 +103,7 @@ def get_config_from_arg(args) -> Config:
             config['datasets'] += chatml_datasets
 
         # set infer accelerator if needed
-        if args.accelerator in ['vllm', 'lmdeploy']:
+        if args.accelerator in ['vllm', 'lmdeploy', 'sglang', 'openai']:
             config['models'] = change_accelerator(config['models'], args.accelerator)
             if config.get('eval', {}).get('partitioner', {}).get('models') is not None:
                 config['eval']['partitioner']['models'] = change_accelerator(config['eval']['partitioner']['models'], args.accelerator)
@@ -207,7 +207,7 @@ def get_config_from_arg(args) -> Config:
         logger.debug(f'Using model: {model}')
         models.append(model)
     # set infer accelerator if needed
-    if args.accelerator in ['vllm', 'lmdeploy']:
+    if args.accelerator in ['vllm', 'lmdeploy', 'sglang', 'openai']:
         models = change_accelerator(models, args.accelerator)
     # parse summarizer args
     summarizer_arg = args.summarizer if args.summarizer is not None else 'example'
@@ -239,124 +239,300 @@ def get_config_from_arg(args) -> Config:
     return Config(dict(models=models, datasets=datasets, summarizer=summarizer), format_python_code=False)
 
 
+def _is_base_model(model_type):
+    """Check if the model type is a base model (non-chat)."""
+    base_model_types = [
+        HuggingFace,
+        HuggingFaceCausalLM,
+        HuggingFaceChatGLM3,
+        f'{HuggingFaceBaseModel.__module__}.{HuggingFaceBaseModel.__name__}'
+    ]
+    return model_type in base_model_types
+
+
+def _is_chat_model(model_type):
+    """Check if the model type is a chat/instruct model."""
+    chat_model_types = [
+        HuggingFacewithChatTemplate,
+        f'{HuggingFacewithChatTemplate.__module__}.{HuggingFacewithChatTemplate.__name__}'
+    ]
+    return model_type in chat_model_types
+
+
+def _extract_generation_kwargs(model):
+    """Extract and normalize generation kwargs from model config."""
+    gen_args = dict()
+    generation_kwargs = dict()
+    
+    if model.get('generation_kwargs') is not None:
+        generation_kwargs = model['generation_kwargs'].copy()
+        gen_args['temperature'] = generation_kwargs.get('temperature', 0.001)
+        gen_args['top_k'] = generation_kwargs.get('top_k', 1)
+        gen_args['top_p'] = generation_kwargs.get('top_p', 0.9)
+        gen_args['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
+        generation_kwargs['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
+        generation_kwargs.pop('eos_token_id', None)
+    else:
+        # if generation_kwargs is not provided, set default values
+        gen_args['temperature'] = 0.0
+        gen_args['top_k'] = 1
+        gen_args['top_p'] = 0.9
+        gen_args['stop_token_ids'] = None
+    
+    return gen_args, generation_kwargs
+
+
+def _update_abbr(abbr, old_backend, new_backend):
+    """Update model abbreviation with new backend name."""
+    if f'-{old_backend}' in abbr:
+        return abbr.replace(old_backend, new_backend)
+    return f'{abbr}-{new_backend}'
+
+
+def _copy_optional_fields(source, target, fields):
+    """Copy optional fields from source to target if they exist."""
+    for field in fields:
+        if source.get(field) is not None:
+            target[field] = source[field]
+
+
+def _convert_to_vllm_base(model, gen_args, generation_kwargs):
+    """Convert base model to VLLM backend."""
+    model_kwargs = dict(
+        tensor_parallel_size=model['run_cfg']['num_gpus'],
+        max_model_len=model.get('max_seq_len', None)
+    )
+    model_kwargs.update(model.get('model_kwargs', {}))
+    
+    acc_model = dict(
+        type=f'{VLLM.__module__}.{VLLM.__name__}',
+        abbr=_update_abbr(model['abbr'], 'hf', 'vllm'),
+        path=model['path'],
+        model_kwargs=model_kwargs,
+        max_out_len=model['max_out_len'],
+        max_seq_len=model.get('max_seq_len', None),
+        batch_size=model['batch_size'],
+        generation_kwargs=generation_kwargs,
+        run_cfg=model['run_cfg'],
+    )
+    _copy_optional_fields(model, acc_model, ['meta_template', 'end_str'])
+    return acc_model
+
+
+def _convert_to_vllm_chat(model):
+    """Convert chat model to VLLM backend."""
+    model_kwargs = dict(
+        tensor_parallel_size=model['run_cfg']['num_gpus'],
+        max_model_len=model.get('max_seq_len', None)
+    )
+    model_kwargs.update(model.get('model_kwargs', {}))
+    
+    mod = VLLMwithChatTemplate
+    acc_model = dict(
+        type=f'{mod.__module__}.{mod.__name__}',
+        abbr=_update_abbr(model['abbr'], 'hf', 'vllm'),
+        path=model['path'],
+        model_kwargs=model_kwargs,
+        max_seq_len=model.get('max_seq_len', None),
+        max_out_len=model['max_out_len'],
+        batch_size=model.get('batch_size', 16),
+        run_cfg=model['run_cfg'],
+        stop_words=model.get('stop_words', []),
+    )
+    return acc_model
+
+
+def _convert_to_lmdeploy_base(model, gen_args):
+    """Convert base model to LMDeploy backend."""
+    mod = TurboMindModelwithChatTemplate
+    acc_model = dict(
+        type=f'{mod.__module__}.{mod.__name__}',
+        abbr=_update_abbr(model['abbr'], 'hf', 'lmdeploy'),
+        path=model['path'],
+        engine_config=dict(
+            session_len=model['max_seq_len'],
+            max_batch_size=model['batch_size'],
+            tp=model['run_cfg']['num_gpus']
+        ),
+        gen_config=dict(
+            top_k=gen_args['top_k'],
+            temperature=gen_args['temperature'],
+            top_p=gen_args['top_p'],
+            max_new_tokens=model['max_out_len'],
+            stop_words=gen_args['stop_token_ids']
+        ),
+        max_out_len=model['max_out_len'],
+        max_seq_len=model['max_seq_len'],
+        batch_size=model['batch_size'],
+        run_cfg=model['run_cfg'],
+    )
+    _copy_optional_fields(model, acc_model, ['meta_template'])
+    return acc_model
+
+
+def _convert_to_lmdeploy_chat(model, logger):
+    """Convert chat model to LMDeploy backend."""
+    if model.get('generation_kwargs') is not None:
+        logger.warning('LMDeploy uses do_sample=False as default, and you need to set do_sample=True for sampling mode')
+        gen_config = model['generation_kwargs'].copy()
+    else:
+        logger.info('OpenCompass uses greedy decoding as default, you can set generation-kwargs for your purpose')
+        gen_config = dict(top_k=1, temperature=1e-6, top_p=0.9)
+    
+    mod = TurboMindModelwithChatTemplate
+    acc_model = dict(
+        type=f'{mod.__module__}.{mod.__name__}',
+        abbr=_update_abbr(model['abbr'], 'hf', 'lmdeploy'),
+        path=model['path'],
+        engine_config=dict(
+            max_batch_size=model.get('batch_size', 16),
+            tp=model['run_cfg']['num_gpus'],
+            session_len=model.get('max_seq_len', None),
+            max_new_tokens=model['max_out_len']
+        ),
+        gen_config=gen_config,
+        max_seq_len=model.get('max_seq_len', None),
+        max_out_len=model['max_out_len'],
+        batch_size=model.get('batch_size', 16),
+        run_cfg=model['run_cfg'],
+        stop_words=model.get('stop_words', []),
+    )
+    return acc_model
+
+
+def _convert_to_sglang(model, gen_args, generation_kwargs, is_chat=False):
+    """Convert model to SGLang backend.
+    
+    SGLang uses similar API to VLLM, so we can reuse similar conversion logic.
+    """
+    from opencompass.models import VLLM
+    
+    model_kwargs = dict(
+        tensor_parallel_size=model['run_cfg']['num_gpus'],
+        max_model_len=model.get('max_seq_len', None)
+    )
+    model_kwargs.update(model.get('model_kwargs', {}))
+    
+    # For now, use VLLM as a proxy since SGLang API is similar
+    # In the future, a dedicated SGLang model wrapper can be implemented
+    acc_model = dict(
+        type=f'{VLLM.__module__}.{VLLM.__name__}',
+        abbr=_update_abbr(model['abbr'], 'hf', 'sglang'),
+        path=model['path'],
+        model_kwargs=model_kwargs,
+        max_out_len=model['max_out_len'],
+        max_seq_len=model.get('max_seq_len', None),
+        batch_size=model.get('batch_size', 16),
+        generation_kwargs=generation_kwargs if not is_chat else {},
+        run_cfg=model['run_cfg'],
+    )
+    
+    if not is_chat:
+        _copy_optional_fields(model, acc_model, ['meta_template', 'end_str'])
+    else:
+        acc_model['stop_words'] = model.get('stop_words', [])
+    
+    return acc_model
+
+
+def _convert_to_openai(model):
+    """Convert model to OpenAI-compatible API backend."""
+    from opencompass.models import OpenAISDK
+    
+    # Extract API configuration
+    api_base = model.get('openai_api_base', 'https://api.openai.com/v1/')
+    api_key = model.get('api_key', 'ENV')
+    
+    acc_model = dict(
+        type=f'{OpenAISDK.__module__}.{OpenAISDK.__name__}',
+        abbr=_update_abbr(model['abbr'], 'hf', 'openai'),
+        path=model.get('openai_model_name', model['path']),  # Allow override of model name
+        max_seq_len=model.get('max_seq_len', 16384),
+        max_out_len=model['max_out_len'],
+        batch_size=model.get('batch_size', 1),
+        run_cfg=model['run_cfg'],
+        key=api_key,
+        openai_api_base=api_base,
+    )
+    
+    # Copy generation parameters
+    if model.get('generation_kwargs'):
+        gen_kwargs = model['generation_kwargs'].copy()
+        if 'temperature' in gen_kwargs:
+            acc_model['temperature'] = gen_kwargs['temperature']
+    
+    _copy_optional_fields(model, acc_model, ['meta_template'])
+    return acc_model
+
+
 def change_accelerator(models, accelerator):
+    """Convert HuggingFace models to specified backend accelerator.
+    
+    Args:
+        models (list): List of model configurations
+        accelerator (str): Target backend ('vllm', 'lmdeploy', 'sglang', 'openai')
+    
+    Returns:
+        list: Converted model configurations
+    """
     models = models.copy()
     logger = get_logger()
     model_accels = []
+    
+    # Define supported backends
+    SUPPORTED_BACKENDS = ['vllm', 'lmdeploy', 'sglang', 'openai']
+    
     for model in models:
+        model_type = model['type']
         logger.info(f'Transforming {model["abbr"]} to {accelerator}')
-        # change HuggingFace model to VLLM or LMDeploy
-        if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3, f'{HuggingFaceBaseModel.__module__}.{HuggingFaceBaseModel.__name__}']:
-            gen_args = dict()
-            if model.get('generation_kwargs') is not None:
-                generation_kwargs = model['generation_kwargs'].copy()
-                gen_args['temperature'] = generation_kwargs.get('temperature', 0.001)
-                gen_args['top_k'] = generation_kwargs.get('top_k', 1)
-                gen_args['top_p'] = generation_kwargs.get('top_p', 0.9)
-                gen_args['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
-                generation_kwargs['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
-                generation_kwargs.pop('eos_token_id') if 'eos_token_id' in generation_kwargs else None
-            else:
-                # if generation_kwargs is not provided, set default values
-                generation_kwargs = dict()
-                gen_args['temperature'] = 0.0
-                gen_args['top_k'] = 1
-                gen_args['top_p'] = 0.9
-                gen_args['stop_token_ids'] = None
-
-            if accelerator == 'lmdeploy':
-                logger.info(f'Transforming {model["abbr"]} to {accelerator}')
-                mod = TurboMindModelwithChatTemplate
-                acc_model = dict(
-                    type=f'{mod.__module__}.{mod.__name__}',
-                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
-                    path=model['path'],
-                    engine_config=dict(session_len=model['max_seq_len'],
-                                       max_batch_size=model['batch_size'],
-                                       tp=model['run_cfg']['num_gpus']),
-                    gen_config=dict(top_k=gen_args['top_k'],
-                                    temperature=gen_args['temperature'],
-                                    top_p=gen_args['top_p'],
-                                    max_new_tokens=model['max_out_len'],
-                                    stop_words=gen_args['stop_token_ids']),
-                    max_out_len=model['max_out_len'],
-                    max_seq_len=model['max_seq_len'],
-                    batch_size=model['batch_size'],
-                    run_cfg=model['run_cfg'],
-                )
-                for item in ['meta_template']:
-                    if model.get(item) is not None:
-                        acc_model[item] = model[item]
-            elif accelerator == 'vllm':
-                model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
-                model_kwargs.update(model.get('model_kwargs'))
-                logger.info(f'Transforming {model["abbr"]} to {accelerator}')
-
-                acc_model = dict(
-                    type=f'{VLLM.__module__}.{VLLM.__name__}',
-                    abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
-                    path=model['path'],
-                    model_kwargs=model_kwargs,
-                    max_out_len=model['max_out_len'],
-                    max_seq_len=model.get('max_seq_len', None),
-                    batch_size=model['batch_size'],
-                    generation_kwargs=generation_kwargs,
-                    run_cfg=model['run_cfg'],
-                )
-                for item in ['meta_template', 'end_str']:
-                    if model.get(item) is not None:
-                        acc_model[item] = model[item]
-            else:
-                raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
-        elif model['type'] in [HuggingFacewithChatTemplate, f'{HuggingFacewithChatTemplate.__module__}.{HuggingFacewithChatTemplate.__name__}']:
-            if accelerator == 'vllm':
-                model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
-                model_kwargs.update(model.get('model_kwargs'))
-                mod = VLLMwithChatTemplate
-                acc_model = dict(
-                    type=f'{mod.__module__}.{mod.__name__}',
-                    abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
-                    path=model['path'],
-                    model_kwargs=model_kwargs,
-                    max_seq_len=model.get('max_seq_len', None),
-                    max_out_len=model['max_out_len'],
-                    batch_size=model.get('batch_size', 16),
-                    run_cfg=model['run_cfg'],
-                    stop_words=model.get('stop_words', []),
-                )
-            elif accelerator == 'lmdeploy':
-
-                if model.get('generation_kwargs') is not None:
-                    logger.warning(f'LMDeploy uses do_sample=False as default, and you need to set do_sample=True for sampling mode')
-                    gen_config = model['generation_kwargs'].copy()
-                else:
-                    logger.info('OpenCompass uses greedy decoding as default, you can set generation-kwargs for your purpose')
-                    gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9)
-
-                mod = TurboMindModelwithChatTemplate
-                acc_model = dict(
-                    type=f'{mod.__module__}.{mod.__name__}',
-                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
-                    path=model['path'],
-                    engine_config=dict(
-                        max_batch_size=model.get('batch_size', 16),
-                        tp=model['run_cfg']['num_gpus'],
-                        session_len=model.get('max_seq_len', None),
-                        max_new_tokens=model['max_out_len']
-                    ),
-                    gen_config=gen_config,
-                    max_seq_len=model.get('max_seq_len', None),
-                    max_out_len=model['max_out_len'],
-                    batch_size=model.get('batch_size', 16),
-                    run_cfg=model['run_cfg'],
-                    stop_words=model.get('stop_words', []),
-                )
-            else:
-                raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
-        else:
+        
+        # Check if model is HuggingFace-based
+        is_base = _is_base_model(model_type)
+        is_chat = _is_chat_model(model_type)
+        
+        if not (is_base or is_chat):
+            # Not a HuggingFace model, keep as is
             acc_model = model
-            logger.warning(f'Unsupported model type {model["type"]}, will keep the original model.')
-        model_accels.append(acc_model)
+            logger.warning(f'Unsupported model type {model_type}, will keep the original model.')
+            model_accels.append(acc_model)
+            continue
+        
+        # Validate accelerator
+        if accelerator not in SUPPORTED_BACKENDS:
+            raise ValueError(f'Unsupported accelerator {accelerator}. Supported: {SUPPORTED_BACKENDS}')
+        
+        # Extract generation parameters for base models
+        gen_args = {}
+        generation_kwargs = {}
+        if is_base:
+            gen_args, generation_kwargs = _extract_generation_kwargs(model)
+        
+        # Convert based on backend and model type
+        try:
+            if accelerator == 'vllm':
+                if is_base:
+                    acc_model = _convert_to_vllm_base(model, gen_args, generation_kwargs)
+                else:  # is_chat
+                    acc_model = _convert_to_vllm_chat(model)
+            
+            elif accelerator == 'lmdeploy':
+                if is_base:
+                    acc_model = _convert_to_lmdeploy_base(model, gen_args)
+                else:  # is_chat
+                    acc_model = _convert_to_lmdeploy_chat(model, logger)
+            
+            elif accelerator == 'sglang':
+                acc_model = _convert_to_sglang(model, gen_args, generation_kwargs, is_chat=is_chat)
+            
+            elif accelerator == 'openai':
+                acc_model = _convert_to_openai(model)
+            
+            model_accels.append(acc_model)
+            
+        except Exception as e:
+            logger.error(f'Failed to convert model {model["abbr"]} to {accelerator}: {str(e)}')
+            raise
+    
     return model_accels
 
 
