@@ -14,3 +14,5 @@ from .network import *  # noqa
 from .prompt import *  # noqa
 from .result_station import *  # noqa
 from .text_postprocessors import *  # noqa
+from .heartbeat import HeartBeatManager
+from .infer_status import InferStatusManager
