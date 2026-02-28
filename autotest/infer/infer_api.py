@@ -87,7 +87,7 @@ API_MAXLEN = dict(
 API_MAXLEN_MID = dict(
     **BASE_API,
     abbr='lmdeploy-api-test-maxlen-mid',
-    max_out_len=3948,
+    max_out_len=3896,
     max_seq_len=4096,
     temperature=0.01,
     mode='mid',
