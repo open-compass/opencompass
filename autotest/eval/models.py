@@ -3,7 +3,7 @@ from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
 models = [
     dict(type=TurboMindModelwithChatTemplate,
-         abbr='qwen-3-8b-fullbench',
+         abbr='qwen3-8b-fullbench',
          path='Qwen/Qwen3-8B',
          engine_config=dict(session_len=32768, max_batch_size=1, tp=1),
          gen_config=dict(do_sample=False, enable_thinking=True),
@@ -29,7 +29,7 @@ interns1_models = [
 
 judge_models = [
     dict(type=TurboMindModelwithChatTemplate,
-         abbr='qwen-3-8b-fullbench',
+         abbr='qwen3-8b-fullbench',
          path='Qwen/Qwen3-8B',
          engine_config=dict(session_len=46000, max_batch_size=1, tp=1),
          gen_config=dict(do_sample=False, enable_thinking=True),
@@ -43,7 +43,7 @@ judge_models = [
 base_models = [
     dict(
         type=TurboMindModel,
-        abbr='qwen-3-8b-base-fullbench',
+        abbr='qwen3-8b-base-fullbench',
         path='Qwen/Qwen3-8B-Base',
         engine_config=dict(session_len=32768, max_batch_size=1, tp=1),
         gen_config=dict(top_k=1,
