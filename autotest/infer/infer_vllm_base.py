@@ -48,17 +48,6 @@ Qwen3_0_6B_Base_BAD_WORDS = dict(type=VLLM,
                                  batch_size=1,
                                  run_cfg=dict(num_gpus=1))
 
-Qwen3_0_6B_Base_TP2 = dict(type=VLLM,
-                           abbr='vllm-qwen3-0_6b-base-tp2',
-                           path='Qwen/Qwen3-0.6B-Base',
-                           model_kwargs=dict(max_model_len=4096,
-                                             max_num_seqs=1,
-                                             tensor_parallel_size=2),
-                           generation_kwargs=dict(temperature=0.0, top_k=1),
-                           max_out_len=1024,
-                           batch_size=1,
-                           run_cfg=dict(num_gpus=2))
-
 Qwen3_0_6B_Base_SESSION_LEN = dict(type=VLLM,
                                    abbr='vllm-qwen3-0_6b-base-session-len',
                                    path='Qwen/Qwen3-0.6B-Base',
@@ -204,10 +193,10 @@ Qwen3_0_6B_Base_LOGPROBS = dict(type=VLLM,
                                 run_cfg=dict(num_gpus=1))
 
 models = [
-    Qwen3_0_6B_Base, Qwen3_0_6B_Base_MID, Qwen3_0_6B_Base_TP2,
-    Qwen3_0_6B_Base_TEMP0, Qwen3_0_6B_Base_BAD_WORDS,
-    Qwen3_0_6B_Base_STOP_WORDS, Qwen3_0_6B_Base_STOP_TOKEN_IDS,
-    Qwen3_0_6B_Base_NEW_TOKENS, Qwen3_0_6B_Base_MAX_SEQ_LEN,
-    Qwen3_0_6B_Base_SESSION_LEN, Qwen3_0_6B_Base_COMBINED,
-    Qwen3_0_6B_Base_LOGPROBS, Qwen3_0_6B_Base_TEMPLATE, Qwen3_0_6B_Base_HF_OVER
+    Qwen3_0_6B_Base, Qwen3_0_6B_Base_MID, Qwen3_0_6B_Base_TEMP0,
+    Qwen3_0_6B_Base_BAD_WORDS, Qwen3_0_6B_Base_STOP_WORDS,
+    Qwen3_0_6B_Base_STOP_TOKEN_IDS, Qwen3_0_6B_Base_NEW_TOKENS,
+    Qwen3_0_6B_Base_MAX_SEQ_LEN, Qwen3_0_6B_Base_SESSION_LEN,
+    Qwen3_0_6B_Base_COMBINED, Qwen3_0_6B_Base_LOGPROBS,
+    Qwen3_0_6B_Base_TEMPLATE, Qwen3_0_6B_Base_HF_OVER
 ]

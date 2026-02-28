@@ -90,6 +90,19 @@ API_ROLLOUT_IGNORE_EOS = dict(
     },
 )
 
+API_ROLLOUT_NO_THINK = dict(
+    **BASE_ROLLOUT,
+    abbr='lmdeploy-api-test-rollout-no-think',
+    max_out_len=128,
+    max_seq_len=4096,
+    temperature=0.2,
+    logprobs=True,
+    top_logprobs=5,
+    extra_body={
+        'enable_thinking': False,
+    },
+)
+
 API_ROLLOUT_LONG_OUTPUT_128K = dict(
     **BASE_ROLLOUT,
     abbr='lmdeploy-api-test-rollout-long-output-128k',
@@ -105,5 +118,6 @@ models = [
     API_ROLLOUT_STOP,
     API_ROLLOUT_COMBINE,
     API_ROLLOUT_IGNORE_EOS,
+    API_ROLLOUT_NO_THINK,
     API_ROLLOUT_LONG_OUTPUT_128K,
 ]

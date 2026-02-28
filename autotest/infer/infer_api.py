@@ -87,7 +87,7 @@ API_MAXLEN = dict(
 API_MAXLEN_MID = dict(
     **BASE_API,
     abbr='lmdeploy-api-test-maxlen-mid',
-    max_out_len=4048,
+    max_out_len=3948,
     max_seq_len=4096,
     temperature=0.01,
     mode='mid',
@@ -102,9 +102,7 @@ API_NOTHINK = dict(
     openai_extra_kwargs={
         'top_p': 0.95,
     },
-    extra_body={'chat_template_kwargs': {
-        'enable_thinking': False
-    }},
+    extra_body={'enable_thinking': False},
 )
 
 API_IGNORE_EOS = dict(
@@ -127,9 +125,7 @@ API_CHAT_TEMPLATE = dict(
     openai_extra_kwargs={
         'top_p': 0.95,
     },
-    extra_body={'chat_template_kwargs': {
-        'enable_thinking': False
-    }},
+    extra_body={'enable_thinking': False},
 )
 
 API_CHAT_TEMPLATE['meta_template'] = test_meta_template
