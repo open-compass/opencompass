@@ -94,6 +94,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           python3 -m pip uninstall opencompass -y
           conda info --envs
+          rjob stop job ${{ env.JOB_NAME }}
 
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
