@@ -31,6 +31,9 @@ BASE_ROLLOUT = dict(
     query_per_second=128,
     batch_size=128,
     retry=20,
+    openai_extra_kwargs={
+        'do_sample': False,
+    },
     pred_postprocessor=dict(type=extract_non_reasoning_content),
 )
 
@@ -43,7 +46,7 @@ API_ROLLOUT_BASIC = dict(
     logprobs=True,
     top_logprobs=5,
     extra_body=dict(top_k=20),
-    openai_extra_kwargs=dict(top_p=0.95),
+    openai_extra_kwargs=dict(top_p=0.95, do_sample=False),
 )
 
 API_ROLLOUT_STOP = dict(
@@ -57,6 +60,7 @@ API_ROLLOUT_STOP = dict(
     openai_extra_kwargs=dict(
         stop=[' and', '</think>', ' to', '\n\n', 'Question:', 'Answer:'],
         top_p=0.9,
+        do_sample=False,
     ),
 )
 
@@ -74,6 +78,7 @@ API_ROLLOUT_COMBINE = dict(
         top_p=0.85,
         seed=42,
         user='opencompass-regression',
+        do_sample=False,
     ),
 )
 
