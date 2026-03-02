@@ -1,4 +1,14 @@
 DATASETS_MAPPING = {
+    "opencompass/IFEval": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/ifeval/input_data.jsonl",
+    },
+    "opencompass/IFbench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/IFBench/IFBench_test.jsonl",
+    },
     "opencompass/lcb_pro": {
         "ms_id": None,
         "hf_id": None,
@@ -377,6 +387,16 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/aime2025/aime2025.jsonl",
     },
+    "opencompass/aime2026": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/aime2026/aime2026.jsonl",
+    },
+    "opencompass/hmmt2026": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/hmmt2026/hmmt_feb_2026.jsonl",
+    },
     "opencompass/cmo_fib": {
         "ms_id": "",
         "hf_id": "",
@@ -587,6 +607,22 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/IFbench": {
+        "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/IFBench.zip",
+        "md5":"b1c63b31e3312f929c6318977de4cdd3",
+    },
+    "/lcb_pro": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lcb_pro.zip",
+        "md5": "ff4572e292fe27cabce3ab3b407361bd",
+    },
+    "/mol-instructions": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mol-instructions.zip",
+        "md5": "ea3db4a199222835036235b18306065a",
+    },
+    "/biology-instruction": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/biology-instruction-fixed.zip",
+        "md5": "5e9bc19f403372bed50c7c46afed8291",
+    },
     "/climaqa_gold": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/climaqa_gold.zip",
@@ -862,6 +898,14 @@ DATASETS_URL = {
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aime2025.zip",
         "md5": "aa18cd5d2e2de246c5397f5eb1e61004",
     },
+    "/aime2026": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aime2026.zip",
+        "md5": "4230d87b80646c811ada0e4bb2efe3a3",
+    },
+    "/hmmt2026": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hmmt_feb_2026.zip",
+        "md5": "442642baa94de9e8a67903d7d5aef44b",
+    },
     "/cmo": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmo.zip",
@@ -963,4 +1007,8 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/phybench.zip",
         "md5": "a4209b820f6384f69ec88fa816db9e4b",
     },
+    "/SciReasoner": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SciReasoner.zip",
+        "md5": "2cf692234badc836fb80c4cf756d5160",
+    }
 }
