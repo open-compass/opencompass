@@ -81,17 +81,6 @@ Qwen3_0_6B_Base_BAD_WORDS = dict(type=TurboMindModel,
                                  batch_size=1,
                                  run_cfg=dict(num_gpus=1))
 
-Qwen3_0_6B_Base_TP2 = dict(type=TurboMindModel,
-                           abbr='lmdeploy-qwen3-0_6b-base-tp2',
-                           path='Qwen/Qwen3-0.6B-Base',
-                           engine_config=dict(session_len=4096,
-                                              max_batch_size=1,
-                                              tp=2),
-                           gen_config=dict(temperature=0.0, do_sample=False),
-                           max_out_len=1024,
-                           batch_size=1,
-                           run_cfg=dict(num_gpus=2))
-
 Qwen3_0_6B_Base_SESSION_LEN = dict(type=TurboMindModel,
                                    abbr='lmdeploy-qwen3-0_6b-base-session-len',
                                    path='Qwen/Qwen3-0.6B-Base',
@@ -259,7 +248,7 @@ Qwen3_0_6B_Base_ENDSTR = dict(type=TurboMindModel,
 models = [
     Qwen3_0_6B_Base, Qwen3_0_6B_Base_PYTORCH, Qwen3_0_6B_Base_BACKEND,
     Qwen3_0_6B_Base_DROP_MIDDLE, Qwen3_0_6B_Base_IGNORE_EOS,
-    Qwen3_0_6B_Base_TP2, Qwen3_0_6B_Base_TEMP0, Qwen3_0_6B_Base_DO_SAMPLE,
+    Qwen3_0_6B_Base_TEMP0, Qwen3_0_6B_Base_DO_SAMPLE,
     Qwen3_0_6B_Base_BAD_WORDS, Qwen3_0_6B_Base_STOP_WORDS,
     Qwen3_0_6B_Base_STOP_TOKEN_IDS, Qwen3_0_6B_Base_BAD_TOKEN_IDS,
     Qwen3_0_6B_Base_NEW_TOKENS, Qwen3_0_6B_Base_MAX_SEQ_LEN,
