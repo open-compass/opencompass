@@ -85,6 +85,17 @@ Qwen3_0_6B_FP8_BAD_WORDS = dict(type=TurboMindModelwithChatTemplate,
                                 batch_size=1,
                                 run_cfg=dict(num_gpus=1))
 
+Qwen3_0_6B_FP8_TP2 = dict(type=TurboMindModelwithChatTemplate,
+                          abbr='lmdeploy-qwen3-0_6b-fp8-tp2',
+                          path='Qwen/Qwen3-0.6B-FP8',
+                          engine_config=dict(session_len=4096,
+                                             max_batch_size=1,
+                                             tp=2),
+                          gen_config=dict(temperature=0.0, do_sample=False),
+                          max_out_len=1024,
+                          batch_size=1,
+                          run_cfg=dict(num_gpus=2))
+
 Qwen3_0_6B_FP8_SESSION_LEN = dict(type=TurboMindModelwithChatTemplate,
                                   abbr='lmdeploy-qwen3-0_6b-fp8-session-len',
                                   path='Qwen/Qwen3-0.6B-FP8',
@@ -275,6 +286,7 @@ models = [
     Qwen3_0_6B_FP8_BACKEND,
     Qwen3_0_6B_FP8_DROP_MIDDLE,
     Qwen3_0_6B_FP8_IGNORE_EOS,
+    Qwen3_0_6B_FP8_TP2,
     Qwen3_0_6B_FP8_TEMP0,
     Qwen3_0_6B_FP8_TOPK50,
     Qwen3_0_6B_FP8_DO_SAMPLE,
