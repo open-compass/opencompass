@@ -32,9 +32,7 @@ BASE_API = dict(
     query_per_second=128,
     batch_size=128,
     retry=20,
-    openai_extra_kwargs={
-        'do_sample': False,
-    },
+    openai_extra_kwargs=dict(do_sample=False, ),
     pred_postprocessor=dict(type=extract_non_reasoning_content),
 )
 
@@ -133,9 +131,8 @@ API_OPENAI_STOP = dict(
     max_out_len=512,
     max_seq_len=4096,
     temperature=0.2,
-    openai_extra_kwargs={
-        'stop': [' and', '</think>', ' to', '\n\n', 'Question:', 'Answer:'],
-    },
+    openai_extra_kwargs=dict(
+        stop=[' and', '</think>', ' to', '\n\n', 'Question:', 'Answer:'], ),
 )
 
 API_OPENAI_LOGPROBS = dict(
@@ -144,10 +141,10 @@ API_OPENAI_LOGPROBS = dict(
     max_out_len=256,
     max_seq_len=4096,
     temperature=0.2,
-    openai_extra_kwargs={
-        'logprobs': True,
-        'top_logprobs': 5,
-    },
+    openai_extra_kwargs=dict(
+        logprobs=True,
+        top_logprobs=5,
+    ),
 )
 
 API_OPENAI_COMBINE = dict(
@@ -156,13 +153,13 @@ API_OPENAI_COMBINE = dict(
     max_out_len=512,
     max_seq_len=4096,
     temperature=0.2,
-    openai_extra_kwargs={
-        'presence_penalty': 0.3,
-        'frequency_penalty': 0.2,
-        'top_p': 0.85,
-        'seed': 42,
-        'user': 'opencompass-regression',
-    },
+    openai_extra_kwargs=dict(
+        presence_penalty=0.3,
+        frequency_penalty=0.2,
+        top_p=0.85,
+        seed=42,
+        user='opencompass-regression',
+    ),
 )
 API_LONG_OUTPUT_128K = dict(
     **BASE_API,
@@ -189,6 +186,6 @@ models = [
 
 for m in models:
     if 'openai_extra_kwargs' not in m:
-        m['openai_extra_kwargs'] = {'do_sample': False}
+        m['openai_extra_kwargs'] = dict(do_sample=False)
     else:
         m['openai_extra_kwargs']['do_sample'] = False
