@@ -2,9 +2,13 @@ from mmengine.config import read_base
 
 with read_base():
     # Datasets
-    from autotest.eval.models import interns1_models, judge_models
+    from autotest.eval.models import judge_models, test_models
+    from opencompass.configs.datasets.aime2026.aime2026_cascade_eval_gen_6ff468 import \
+        aime2026_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.biodata.biodata_task_gen import \
         biodata_task_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.hmmt2026.hmmt2026_cascade_eval_gen_6ff468 import \
+        hmmt2026_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.MolInstructions_chem.mol_instructions_chem_gen import \
         mol_gen_selfies_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.SciReasoner.scireasoner_gen import (  # noqa: F401, E501
@@ -43,7 +47,7 @@ datasets += [
     x['abbr'] or 'property_prediction-bbbp' in x['abbr']
 ]
 
-models = interns1_models
+models = test_models
 
 datasets = sum((v for k, v in locals().items() if k.endswith('_datasets')), [])
 

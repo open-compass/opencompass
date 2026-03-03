@@ -102,9 +102,6 @@ API_NOTHINK = dict(
     max_out_len=4096,
     max_seq_len=4096,
     temperature=0.01,
-    openai_extra_kwargs={
-        'top_p': 0.95,
-    },
     extra_body={'enable_thinking': False},
 )
 
@@ -125,9 +122,6 @@ API_CHAT_TEMPLATE = dict(
     max_out_len=1024,
     max_seq_len=1024,
     temperature=0.01,
-    openai_extra_kwargs={
-        'top_p': 0.95,
-    },
     extra_body={'enable_thinking': False},
 )
 
