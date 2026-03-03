@@ -27,6 +27,8 @@ OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
 
 OAI_REASONING_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
 
+CHATML_ROLE = ['system', 'user', 'assistant']
+
 
 @MODELS.register_module()
 class OpenAI(BaseAPIModel):
@@ -505,10 +507,14 @@ class OpenAI(BaseAPIModel):
             tuple: (processed messages list, adjusted max_out_len)
         """
         # Check input length when mode is 'none'
+        breakpoint()
+
         if mode == 'none':
-            input_len = (get_token_len_func(input) if isinstance(
+            input_len = get_token_len_func(input) if isinstance(
                 input, str) else sum(
-                    get_token_len_func(item['prompt']) for item in input))
+                    get_token_len_func(item['prompt'] if 'prompt' in
+                                       item else item['content'])
+                    for item in input)
             if input_len > max_seq_len:
                 raise ValueError(
                     f'Input length ({input_len}) exceeds max_seq_len '
@@ -522,30 +528,42 @@ class OpenAI(BaseAPIModel):
                 trim_length -= max_out_len
             return self._bin_trim(text, trim_length, mode)
 
-        if isinstance(input, str) and mode != 'none':
-            input = bin_trim_wrapper(input)
-        # Convert input to messages format
-        if isinstance(input, str):
-            messages = [{'role': 'user', 'content': input}]
-            input_len = get_token_len_func(input)
-        else:
-            messages = []
-            processed_prompts = []
-            for item in input:
-                input_content = item['prompt']
-                if mode != 'none':
-                    input_content = bin_trim_wrapper(input_content)
-                processed_prompts.append(input_content)
-                msg = {'content': input_content}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
-                elif item['role'] == 'SYSTEM':
-                    msg['role'] = 'system'
-                messages.append(msg)
+        if isinstance(input, list) and len(input) > 0 and all(
+                'role' in single_input and single_input['role'] in CHATML_ROLE
+                for single_input in input):
+
+            if mode != 'none':
+                for i in range(len(input)):
+                    input[i]['content'] = bin_trim_wrapper(input[i]['content'])
             input_len = sum(
-                get_token_len_func(prompt) for prompt in processed_prompts)
+                get_token_len_func(item['content']) for item in input)
+            messages = input
+
+        else:
+            if isinstance(input, str) and mode != 'none':
+                input = bin_trim_wrapper(input)
+            # Convert input to messages format
+            if isinstance(input, str):
+                messages = [{'role': 'user', 'content': input}]
+                input_len = get_token_len_func(input)
+            else:
+                messages = []
+                processed_prompts = []
+                for item in input:
+                    input_content = item['prompt']
+                    if mode != 'none':
+                        input_content = bin_trim_wrapper(input_content)
+                    processed_prompts.append(input_content)
+                    msg = {'content': input_content}
+                    if item['role'] == 'HUMAN':
+                        msg['role'] = 'user'
+                    elif item['role'] == 'BOT':
+                        msg['role'] = 'assistant'
+                    elif item['role'] == 'SYSTEM':
+                        msg['role'] = 'system'
+                    messages.append(msg)
+                input_len = sum(
+                    get_token_len_func(prompt) for prompt in processed_prompts)
 
         # Adjust max_out_len
         if max_out_len is not None:
@@ -662,8 +680,7 @@ class OpenAISDK(OpenAI):
             str: The generated string.
         """
         from openai import APIStatusError, BadRequestError
-
-        assert isinstance(input, (str, PromptList))
+        assert isinstance(input, (str, list, PromptList))
 
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,

@@ -1,3 +1,4 @@
+import copy
 import re
 import sys
 import threading
@@ -15,6 +16,8 @@ from opencompass.utils.prompt import PromptList
 from .base import BaseModel
 
 PromptType = Union[PromptList, str]
+
+CHATML_ROLE = ['system', 'user', 'assistant']
 
 
 class BaseAPIModel(BaseModel):
@@ -172,23 +175,30 @@ class APITemplateParser:
         self.meta_template = meta_template
         # Check meta template
         if meta_template:
-            assert 'round' in meta_template, 'round is required in meta' \
-                ' template'
-            assert isinstance(meta_template['round'], list)
-            keys_to_check = ['round']
+            if isinstance(meta_template, list):
+                assert all(
+                    isinstance(item, dict) and 'role' in item
+                    and item['role'] in {'system', 'user', 'assistant'}
+                    for item in meta_template)
+            else:
+                assert 'round' in meta_template, 'round is required in meta' \
+                    ' template'
+                assert isinstance(meta_template['round'], list)
+                keys_to_check = ['round']
 
-            if 'reserved_roles' in meta_template:
-                assert isinstance(meta_template['reserved_roles'], list)
-                keys_to_check.append('reserved_roles')
+                if 'reserved_roles' in meta_template:
+                    assert isinstance(meta_template['reserved_roles'], list)
+                    keys_to_check.append('reserved_roles')
 
-            self.roles: Dict[str, dict] = dict()  # maps role name to config
-            for meta_key in keys_to_check:
-                for item in meta_template[meta_key]:
-                    assert isinstance(item, (str, dict))
-                    if isinstance(item, dict):
-                        assert item['role'] not in self.roles, \
-                            'role in meta prompt must be unique!'
-                        self.roles[item['role']] = item.copy()
+                self.roles: Dict[str,
+                                 dict] = dict()  # maps role name to config
+                for meta_key in keys_to_check:
+                    for item in meta_template[meta_key]:
+                        assert isinstance(item, (str, dict))
+                        if isinstance(item, dict):
+                            assert item['role'] not in self.roles, \
+                                'role in meta prompt must be unique!'
+                            self.roles[item['role']] = item.copy()
 
     def parse_template(self, prompt_template: PromptType,
                        mode: str) -> PromptType:
@@ -210,6 +220,28 @@ class APITemplateParser:
             List[PromptType]: The finalized prompt or a conversation.
         """
         assert isinstance(prompt_template, (str, list, PromptList, tuple))
+
+        if isinstance(prompt_template, list) and len(prompt_template) > 0:
+            if all('role' in single_item and 'content' in single_item
+                   for single_item in prompt_template):
+                prompt_template = copy.deepcopy(prompt_template)
+                if self.meta_template and isinstance(self.meta_template, list):
+                    for role in CHATML_ROLE:
+                        for item in self.meta_template:
+                            if item['role'] == role:
+                                role_in_prompt = False
+                                for i in range(len(prompt_template)):
+                                    if prompt_template[i]['role'] == role:
+                                        prompt_template[i]['content'] = item[
+                                            'content'] + prompt_template[i][
+                                                'content']
+                                        role_in_prompt = True
+                                if not role_in_prompt:
+                                    prompt_template.append(copy.deepcopy(item))
+                    prompt_template = sorted(
+                        prompt_template,
+                        key=lambda x: CHATML_ROLE.index(x['role']))
+                return prompt_template
 
         if not isinstance(prompt_template, (str, PromptList)):
             return [self.parse_template(p, mode=mode) for p in prompt_template]
