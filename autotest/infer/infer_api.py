@@ -184,7 +184,7 @@ models = [
 ]
 
 for m in models:
-    if 'openai_extra_kwargs' not in m:
-        m['openai_extra_kwargs'] = dict(do_sample=False)
+    if 'extra_body' not in m:
+        m['extra_body'] = {'do_sample': False}
     else:
-        m['openai_extra_kwargs']['do_sample'] = False
+        m['extra_body']['do_sample'] = False
