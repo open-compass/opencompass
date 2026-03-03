@@ -50,9 +50,6 @@ BASE_STREAMING = dict(
     batch_size=128,
     stream=True,
     retry=20,
-    openai_extra_kwargs={
-        'do_sample': False,
-    },
     pred_postprocessor=dict(type=extract_non_reasoning_content),
 )
 
@@ -107,7 +104,6 @@ API_NOTHINK = dict(
     temperature=0.01,
     openai_extra_kwargs={
         'top_p': 0.95,
-        'do_sample': False,
     },
     extra_body={'enable_thinking': False},
 )
@@ -131,7 +127,6 @@ API_CHAT_TEMPLATE = dict(
     temperature=0.01,
     openai_extra_kwargs={
         'top_p': 0.95,
-        'do_sample': False,
     },
     extra_body={'enable_thinking': False},
 )
@@ -146,7 +141,6 @@ API_OPENAI_STOP = dict(
     temperature=0.2,
     openai_extra_kwargs={
         'stop': [' and', '</think>', ' to', '\n\n', 'Question:', 'Answer:'],
-        'do_sample': False,
     },
 )
 
@@ -159,7 +153,6 @@ API_OPENAI_LOGPROBS = dict(
     openai_extra_kwargs={
         'logprobs': True,
         'top_logprobs': 5,
-        'do_sample': False,
     },
 )
 
@@ -175,7 +168,6 @@ API_OPENAI_COMBINE = dict(
         'top_p': 0.85,
         'seed': 42,
         'user': 'opencompass-regression',
-        'do_sample': False,
     },
 )
 API_LONG_OUTPUT_128K = dict(
@@ -200,3 +192,9 @@ models = [
     API_OPENAI_COMBINE,
     API_LONG_OUTPUT_128K,
 ]
+
+for m in models:
+    if 'openai_extra_kwargs' not in m:
+        m['openai_extra_kwargs'] = {'do_sample': False}
+    else:
+        m['openai_extra_kwargs']['do_sample'] = False
