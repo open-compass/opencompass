@@ -61,10 +61,6 @@ with read_base():
         SciCode_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.SuperGLUE_BoolQ.SuperGLUE_BoolQ_cot_gen_1d56df import \
         BoolQ_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.teval.teval_en_gen_1ac254 import \
-        teval_datasets as teval_en_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.teval.teval_zh_gen_1ac254 import \
-        teval_datasets as teval_zh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.TheoremQA.TheoremQA_5shot_gen_6f0af8 import \
         TheoremQA_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.triviaqa.triviaqa_wiki_1shot_gen_bc5f21 import \
@@ -91,8 +87,6 @@ with read_base():
         summarizer as musr_summarizer  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.scicode import \
         scicode_summary_groups  # noqa: F401, E501
-    from opencompass.configs.summarizers.groups.teval import \
-        teval_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.mmmlu_lite import \
         mmmlu_summary_groups  # noqa: F401, E501
 
@@ -140,8 +134,6 @@ datasets = sum(
      and 'scicode' not in k.lower() and 'teval' not in k and 'human' not in k),
     [],
 )
-datasets += teval_en_datasets
-datasets += teval_zh_datasets
 datasets += humaneval_datasets
 # datasets += SciCode_datasets
 

@@ -12,9 +12,6 @@ with read_base():
         bbh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmo_fib.cmo_fib_gen_2783e5 import \
         cmo_fib_datasets  # noqa: F401, E501
-    # dingo
-    from opencompass.configs.datasets.dingo.dingo_gen import \
-        datasets as dingo_datasets  # noqa: F401, E501
     # General Reasoning
     from opencompass.configs.datasets.drop.drop_llmjudge_gen_3857b0 import \
         drop_datasets  # noqa: F401, E501
@@ -37,6 +34,10 @@ with read_base():
         musr_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.supergpqa.supergpqa_llmjudge_gen_12b8bc import \
         supergpqa_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.teval.teval_en_gen_1ac254 import \
+        teval_datasets as teval_en_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.teval.teval_zh_gen_1ac254 import \
+        teval_datasets as teval_zh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.triviaqa.triviaqa_wiki_1shot_gen_c87d61 import \
         triviaqa_datasets  # noqa: F401, E501
     # Summary Groups
@@ -58,6 +59,8 @@ with read_base():
         mmlu_pro_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.musr_average import \
         summarizer as musr_summarizer
+    from opencompass.configs.summarizers.groups.teval import \
+        teval_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.mmmlu_lite import \
         mmmlu_summary_groups  # noqa: F401, E501
 
@@ -65,14 +68,13 @@ models = models
 
 datasets = [
     v[0] for k, v in locals().items() if k.endswith('_datasets')
-    and 'scicode' not in k.lower() and 'dingo' not in k.lower()
+    and 'scicode' not in k.lower() and 'teval' not in k.lower()
     and 'arc_prize' not in k.lower() and isinstance(v, list) and len(v) > 0
 ]
 
 datasets += arc_prize_public_evaluation_datasets
-dingo_datasets[0]['abbr'] = 'qa_dingo_cn'
-dingo_datasets[0]['path'] = 'data/qabench/history_prompt_case_cn.csv'
-datasets.append(dingo_datasets[0])
+datasets += teval_en_datasets
+datasets += teval_zh_datasets
 
 musr_summary_groups = musr_summarizer['summary_groups']
 summary_groups = sum(
