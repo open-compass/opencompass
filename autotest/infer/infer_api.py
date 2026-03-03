@@ -32,7 +32,6 @@ BASE_API = dict(
     query_per_second=128,
     batch_size=128,
     retry=20,
-    openai_extra_kwargs=dict(do_sample=False, ),
     pred_postprocessor=dict(type=extract_non_reasoning_content),
 )
 
