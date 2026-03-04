@@ -147,12 +147,10 @@ def parse_args():
         type=str,
         default=None,
     )
-
     parser.add_argument('--station-overwrite',
         help='Whether to overwrite the results at station.',
         action='store_true',
     )
-
     parser.add_argument(
         '--read-from-station',
         help='Whether to save the evaluation results to the '
@@ -164,6 +162,13 @@ def parse_args():
         help='How many runs for one dataset',
         type=int,
         default=1,
+    )
+
+    parser.add_argument(
+        '--dump-only-message-path',
+        help='Where to dump message only',
+        type=str,
+        default=None,
     )
 
     # set srun args
@@ -358,6 +363,9 @@ def main():
         if args.dump_res_length:
             for task in tasks:
                 task.dump_res_length = True
+        if args.dump_only_message_path:
+            for task in tasks:
+                task.dump_only_message_path = args.dump_only_message_path
         runner(tasks)
 
     # evaluate
