@@ -160,8 +160,9 @@ class GenInferencer(BaseInferencer):
                     os.makedirs(os.path.join(self.dump_only_message_path,
                                              save_path),
                                 exist_ok=True)
-                    save_name = re.sub(r'_(\d+)(\.\w+)$', r'\2',
-                                       output_json_filename)
+                    save_name = re.sub(r'_(\d+)?(?=\.\w+$)',
+                                       '', output_json_filename).rsplit(
+                                           '.', 1)[0] + '.jsonl'
                     with open(os.path.join(self.dump_only_message_path,
                                            save_path, save_name),
                               'a',
