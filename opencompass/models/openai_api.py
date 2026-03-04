@@ -507,7 +507,6 @@ class OpenAI(BaseAPIModel):
             tuple: (processed messages list, adjusted max_out_len)
         """
         # Check input length when mode is 'none'
-
         if mode == 'none':
             input_len = get_token_len_func(input) if isinstance(
                 input, str) else sum(
