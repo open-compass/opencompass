@@ -123,11 +123,12 @@ Qwen3_0_6B_Base_STOP_WORDS = dict(
     abbr='lmdeploy-qwen3-0_6b-base-stop-words',
     path='Qwen/Qwen3-0.6B-Base',
     engine_config=dict(session_len=4096, max_batch_size=1),
-    gen_config=dict(temperature=0.0, do_sample=False),
+    gen_config=dict(temperature=0.0,
+                    do_sample=False,
+                    stopping_criteria=[' and', '</think>', ' to']),
     max_seq_len=4096,
     max_out_len=4096,
     batch_size=1,
-    stopping_criteria=[' and', '</think>', ' to'],
     run_cfg=dict(num_gpus=1))
 
 Qwen3_0_6B_Base_TEMPLATE = dict(type=TurboMindModel,
