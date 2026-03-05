@@ -167,10 +167,14 @@ class GenInferencer(BaseInferencer):
                                            save_path, save_name),
                               'a',
                               encoding='utf-8') as f:
-                        for message in parsed_entries:
+                        for i in range(len(parsed_entries)):
                             f.write(
-                                json.dumps({'message': message},
-                                           ensure_ascii=False) + '\n')
+                                json.dumps(
+                                    {
+                                        'message': parsed_entries[i],
+                                        'gold': golds[i]
+                                    },
+                                    ensure_ascii=False) + '\n')
                     logger.info('Save message successfully')
                     continue
                 results = self.model.generate_from_template(
