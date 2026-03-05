@@ -102,7 +102,7 @@ Qwen3_0_6B_FP8_TOKENIZER_ONLY = dict(type=HuggingFacewithChatTemplate,
                                      run_cfg=dict(num_gpus=1))
 
 Qwen3_0_6B_Base_MID = dict(type=HuggingFacewithChatTemplate,
-                           abbr='vllm-qwen3-0_6b-fp8-mid',
+                           abbr='hf-qwen3-0_6b-fp8-mid',
                            path='Qwen/Qwen3-0.6B-FP8',
                            generation_kwargs=dict(top_k=1),
                            max_seq_len=2048,
