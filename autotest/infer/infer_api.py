@@ -185,10 +185,7 @@ models = [
 
 for m in models:
     if 'openai_extra_kwargs' not in m:
-        m['openai_extra_kwargs'] = dict(top_k=1,
-                                        temperature=1.0,
-                                        repetition_penalty=1.0)
+        m['openai_extra_kwargs'] = dict(top_k=1, temperature=1.0)
     else:
         m['openai_extra_kwargs']['top_k'] = 1
         m['openai_extra_kwargs']['temperature'] = 1.0
-        m['openai_extra_kwargs']['repetition_penalty'] = 1.0
