@@ -17,7 +17,7 @@ on:
         required: true
         description: 'regression types'
         type: string
-        default: "['infer', 'eval', 'cmd', 'cluster']"
+        default: "['model', 'eval', 'cmd', 'cluster']"
       baseline_result:
         required: true
         description: 'baseline result'
@@ -128,13 +128,13 @@ jobs:
           conda info --envs
           pip list
 
-  daily_infer_test:
-    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'infer'))}}
+  daily_model_test:
+    if: ${{!cancelled() && contains(needs.prepare_env.result, 'success') && (github.event_name == 'schedule' || contains(fromJSON(github.event.inputs.regression_type), 'model'))}}
     needs: prepare_env
     strategy:
       fail-fast: false
       matrix:
-        infer_func: ["api", "api_rollout", "lmdeploy_base","lmdeploy_chat","vllm_chat", "vllm_base", "transformers_base", "transformers_chat"]
+        model_func: ["api", "api_rollout", "lmdeploy_base","lmdeploy_chat","vllm_chat", "vllm_base", "transformers_base", "transformers_chat"]
     runs-on: yidian_cu12_ete
     timeout-minutes: 240 #4hours
     steps:
@@ -152,17 +152,17 @@ jobs:
           conda info --envs
           pip list
       - name: Run test - api
-        if: contains(matrix.infer_func, 'api')
+        if: contains(matrix.model_func, 'api')
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           echo ${{github.workspace}}
           
-          JOB_NAME=infer-${{ github.run_id }}-${{ matrix.infer_func }}-${{ github.run_attempt }}
+          JOB_NAME=model-${{ github.run_id }}-${{ matrix.model_func }}-${{ github.run_attempt }}
           JOB_NAME=${JOB_NAME//_/-}
           
-          rjob submit --metadata-name=$JOB_NAME --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=1 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu-puyu_gpu/lmdeploy:v0.12.0-cu12.8 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate;  conda activate ${{env.CONDA_ENV}}; conda env list; cd ${{github.workspace}}; lmdeploy serve api_server ${{env.TEST_MODEL}} --session-len 146000 --max-batch-size 1 & python autotest/utils/health_check.py; opencompass autotest/infer/infer_${{matrix.infer_func}}.py -m infer --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} --reuse --dump-res-length'
+          rjob submit --metadata-name=$JOB_NAME --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=1 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu-puyu_gpu/lmdeploy:v0.12.0-cu12.8 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate;  conda activate ${{env.CONDA_ENV}}; conda env list; cd ${{github.workspace}}; lmdeploy serve api_server ${{env.TEST_MODEL}} --session-len 146000 --max-batch-size 1 & python autotest/utils/health_check.py; opencompass autotest/model/infer_${{matrix.model_func}}.py -m infer --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.model_func}} --reuse --dump-res-length'
 
           for i in {1..600}; do
             current_status=$(rjob get $JOB_NAME | grep -oP 'rjob [^:]+: \K[^ ]+')
@@ -177,17 +177,17 @@ jobs:
             sleep 10
           done
       - name: Run test - other
-        if: matrix.infer_func != 'api' && matrix.infer_func != 'api_rollout'
+        if: matrix.model_func != 'api' && matrix.model_func != 'api_rollout'
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
           echo ${{github.workspace}}
           
-          JOB_NAME=infer-${{ github.run_id }}-${{ matrix.infer_func }}-${{ github.run_attempt }}
+          JOB_NAME=model-${{ github.run_id }}-${{ matrix.model_func }}-${{ github.run_attempt }}
           JOB_NAME=${JOB_NAME//_/-}
           
-          rjob submit --metadata-name=$JOB_NAME --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu-puyu_gpu/lmdeploy:v0.12.0-cu12.8 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate; conda activate ${{env.CONDA_ENV}}; conda env list; cd ${{github.workspace}}; opencompass autotest/infer/infer_${{matrix.infer_func}}.py -m infer --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} --max-num-workers 2 --reuse --dump-res-length'
+          rjob submit --metadata-name=$JOB_NAME --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu-puyu_gpu/lmdeploy:v0.12.0-cu12.8 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=VLLM_USE_MODELSCOPE=false --env=VLLM_WORKER_MULTIPROC_METHOD=spawn --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate; conda activate ${{env.CONDA_ENV}}; conda env list; cd ${{github.workspace}}; opencompass autotest/model/infer_${{matrix.model_func}}.py -m infer --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.model_func}} --max-num-workers 2 --reuse --dump-res-length'
 
           for i in {1..600}; do
             current_status=$(rjob get $JOB_NAME | grep -oP 'rjob [^:]+: \K[^ ]+')
@@ -206,11 +206,11 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           conda info --envs
-          python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.infer_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.infer_func}} predictions
+          python autotest/utils/compare_results.py compare_results ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.model_func}} ${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.model_func}} predictions
       - name: stop job
         if: always()
         run: |
-          JOB_NAME=infer-${{ github.run_id }}-${{ matrix.infer_func }}-${{ github.run_attempt }}
+          JOB_NAME=model-${{ github.run_id }}-${{ matrix.model_func }}-${{ github.run_attempt }}
           JOB_NAME=${JOB_NAME//_/-}
           rjob stop job $JOB_NAME
 
