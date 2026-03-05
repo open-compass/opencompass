@@ -4,8 +4,8 @@ from opencompass.models import VLLMwithChatTemplate
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
 with read_base():
-    from autotest.infer.chat_datasets import datasets
-    from autotest.infer.constant import meta_template as test_meta_template
+    from autotest.model.chat_datasets import datasets
+    from autotest.model.constant import meta_template as test_meta_template
 
 datasets = [x for x in datasets.copy() if 'InfiniteBench' not in x['abbr']]
 

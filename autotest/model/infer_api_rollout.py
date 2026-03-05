@@ -4,7 +4,7 @@ from opencompass.models import OpenAISDKRollout
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
 with read_base():
-    from autotest.infer.chat_datasets import datasets
+    from autotest.model.chat_datasets import datasets
 
 datasets = datasets
 
