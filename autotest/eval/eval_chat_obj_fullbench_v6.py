@@ -1,10 +1,7 @@
 from mmengine.config import read_base
 
-from opencompass.models import (HuggingFacewithChatTemplate,
-                                TurboMindModelwithChatTemplate)
-from opencompass.utils.text_postprocessors import extract_non_reasoning_content
-
 with read_base():
+    from autotest.eval.models import judge_models, models
     from opencompass.configs.datasets.aime2024.aime2024_llmjudge_gen_5e9f4f import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2025.aime2025_llmjudge_gen_5e9f4f import \
@@ -15,9 +12,6 @@ with read_base():
         bbh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.cmo_fib.cmo_fib_gen_2783e5 import \
         cmo_fib_datasets  # noqa: F401, E501
-    # dingo
-    from opencompass.configs.datasets.dingo.dingo_gen import \
-        datasets as dingo_datasets  # noqa: F401, E501
     # General Reasoning
     from opencompass.configs.datasets.drop.drop_llmjudge_gen_3857b0 import \
         drop_datasets  # noqa: F401, E501
@@ -40,6 +34,10 @@ with read_base():
         musr_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.supergpqa.supergpqa_llmjudge_gen_12b8bc import \
         supergpqa_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.teval.teval_en_gen_1ac254 import \
+        teval_datasets as teval_en_datasets  # noqa: F401, E501
+    from opencompass.configs.datasets.teval.teval_zh_gen_1ac254 import \
+        teval_datasets as teval_zh_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.triviaqa.triviaqa_wiki_1shot_gen_c87d61 import \
         triviaqa_datasets  # noqa: F401, E501
     # Summary Groups
@@ -61,21 +59,22 @@ with read_base():
         mmlu_pro_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.groups.musr_average import \
         summarizer as musr_summarizer
+    from opencompass.configs.summarizers.groups.teval import \
+        teval_summary_groups  # noqa: F401, E501
     from opencompass.configs.summarizers.mmmlu_lite import \
         mmmlu_summary_groups  # noqa: F401, E501
 
-    from ...rjob import eval, infer  # noqa: F401, E501
+models = models
 
 datasets = [
     v[0] for k, v in locals().items() if k.endswith('_datasets')
-    and 'scicode' not in k.lower() and 'dingo' not in k.lower()
+    and 'scicode' not in k.lower() and 'teval' not in k.lower()
     and 'arc_prize' not in k.lower() and isinstance(v, list) and len(v) > 0
 ]
 
 datasets += arc_prize_public_evaluation_datasets
-dingo_datasets[0]['abbr'] = 'qa_dingo_cn'
-dingo_datasets[0]['path'] = 'data/qabench/history_prompt_case_cn.csv'
-datasets.append(dingo_datasets[0])
+datasets += teval_en_datasets
+datasets += teval_zh_datasets
 
 musr_summary_groups = musr_summarizer['summary_groups']
 summary_groups = sum(
@@ -88,50 +87,17 @@ summary_groups.append(
     }, )
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:16]'
+    d['reader_cfg']['test_range'] = '[0:4]'
     if 'dataset_cfg' in d['eval_cfg']['evaluator'] and 'reader_cfg' in d[
             'eval_cfg']['evaluator']['dataset_cfg']:
         d['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
-            'test_range'] = '[0:16]'
+            'test_range'] = '[0:4]'
     if 'llm_evaluator' in d['eval_cfg']['evaluator'] and 'dataset_cfg' in d[
             'eval_cfg']['evaluator']['llm_evaluator']:
         d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
-            'reader_cfg']['test_range'] = '[0:16]'
+            'reader_cfg']['test_range'] = '[0:4]'
 
-hf_model = dict(type=HuggingFacewithChatTemplate,
-                abbr='qwen-3-8b-hf-fullbench',
-                path='Qwen/Qwen3-8B',
-                max_out_len=8192,
-                batch_size=8,
-                run_cfg=dict(num_gpus=1),
-                pred_postprocessor=dict(type=extract_non_reasoning_content))
-
-tm_model = dict(type=TurboMindModelwithChatTemplate,
-                abbr='qwen-3-8b-fullbench',
-                path='Qwen/Qwen3-8B',
-                engine_config=dict(session_len=32768, max_batch_size=1, tp=1),
-                gen_config=dict(do_sample=False, enable_thinking=True),
-                max_seq_len=32768,
-                max_out_len=32768,
-                batch_size=1,
-                run_cfg=dict(num_gpus=1),
-                pred_postprocessor=dict(type=extract_non_reasoning_content))
-
-models = [hf_model, tm_model]
-
-models = sorted(models, key=lambda x: x['run_cfg']['num_gpus'])
-
-obj_judge_model = dict(type=TurboMindModelwithChatTemplate,
-                       abbr='qwen-3-8b-fullbench',
-                       path='Qwen/Qwen3-8B',
-                       engine_config=dict(session_len=46000,
-                                          max_batch_size=1,
-                                          tp=1),
-                       gen_config=dict(do_sample=False, enable_thinking=False),
-                       max_seq_len=46000,
-                       max_out_len=46000,
-                       batch_size=1,
-                       run_cfg=dict(num_gpus=1))
+obj_judge_model = judge_models[0]
 
 for d in datasets:
     if 'judge_cfg' in d['eval_cfg']['evaluator']:

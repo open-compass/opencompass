@@ -52,7 +52,7 @@ race_datasets = [race_datasets[1]]
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:32]'
+    d['reader_cfg']['test_range'] = '[0:4]'
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 

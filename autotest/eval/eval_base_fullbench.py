@@ -1,8 +1,7 @@
 from mmengine.config import read_base
 
-from opencompass.models import HuggingFaceBaseModel, TurboMindModel
-
 with read_base():
+    from autotest.eval.models import base_models
     from opencompass.configs.datasets.ARC_c.ARC_c_few_shot_ppl import \
         ARC_c_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.bbh.bbh_gen_98fba6 import \
@@ -62,7 +61,7 @@ with read_base():
     from opencompass.configs.summarizers.groups.mmlu_pro import \
         mmlu_pro_summary_groups  # noqa: F401, E501
 
-    from ...rjob import eval, infer  # noqa: F401, E501
+models = base_models
 
 race_datasets = [race_datasets[1]]  # Only take RACE-High
 bbh_datasets = [
@@ -192,30 +191,7 @@ summarizer = dict(
     summary_groups=summary_groups,
 )
 
-hf_model = dict(
-    type=HuggingFaceBaseModel,
-    abbr='qwen-3-8b-base-hf-fullbench',
-    path='Qwen/Qwen3-8B-Base',
-    max_out_len=8192,
-    batch_size=8,
-    run_cfg=dict(num_gpus=1),
-)
-
-tm_model = dict(
-    type=TurboMindModel,
-    abbr='qwen-3-8b-base-fullbench',
-    path='Qwen/Qwen3-8B-Base',
-    engine_config=dict(session_len=32768, max_batch_size=1, tp=1),
-    gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9, max_new_tokens=1024),
-    max_seq_len=32768,
-    max_out_len=1024,
-    batch_size=1,
-    run_cfg=dict(num_gpus=1),
-)
-
-models = [hf_model, tm_model]
-
 datasets = sum([v for k, v in locals().items() if k.endswith('_datasets')], [])
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:16]'
+    d['reader_cfg']['test_range'] = '[0:4]'
