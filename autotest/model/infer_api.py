@@ -55,7 +55,6 @@ API_BASIC = dict(
     abbr='lmdeploy-api-test',
     max_out_len=1024,
     max_seq_len=4096,
-    temperature=0.01,
 )
 
 API_STREAMING = dict(
@@ -63,7 +62,6 @@ API_STREAMING = dict(
     abbr='lmdeploy-api-streaming-test',
     max_out_len=1024,
     max_seq_len=4096,
-    temperature=0.01,
 )
 
 API_STREAMING_CHUNK = dict(
@@ -71,7 +69,6 @@ API_STREAMING_CHUNK = dict(
     abbr='lmdeploy-api-streaming-test-chunk',
     max_out_len=1024,
     max_seq_len=4096,
-    temperature=0.01,
     stream_chunk_size=10,
     verbose=True,
 )
@@ -81,7 +78,6 @@ API_MAXLEN = dict(
     abbr='lmdeploy-api-test-maxlen',
     max_out_len=4096,
     max_seq_len=4096,
-    temperature=0.01,
 )
 
 API_MAXLEN_MID = dict(
@@ -89,7 +85,6 @@ API_MAXLEN_MID = dict(
     abbr='lmdeploy-api-test-maxlen-mid',
     max_out_len=3896,
     max_seq_len=4096,
-    temperature=0.01,
     mode='mid',
 )
 
@@ -98,7 +93,6 @@ API_NOTHINK = dict(
     abbr='lmdeploy-api-test-nothink',
     max_out_len=4096,
     max_seq_len=4096,
-    temperature=0.01,
     extra_body={'enable_thinking': False},
 )
 
@@ -107,7 +101,6 @@ API_IGNORE_EOS = dict(
     abbr='lmdeploy-api-test-ignore-eos',
     max_out_len=128,
     max_seq_len=4096,
-    temperature=0.2,
     extra_body={
         'ignore_eos': True,
     },
@@ -118,7 +111,6 @@ API_CHAT_TEMPLATE = dict(
     abbr='lmdeploy-api-test-chat-template',
     max_out_len=1024,
     max_seq_len=1024,
-    temperature=0.01,
     extra_body={'enable_thinking': False},
 )
 
@@ -129,7 +121,6 @@ API_OPENAI_STOP = dict(
     abbr='lmdeploy-api-test-openai-stop',
     max_out_len=512,
     max_seq_len=4096,
-    temperature=0.2,
     openai_extra_kwargs=dict(
         stop=[' and', '</think>', ' to', '\n\n', 'Question:', 'Answer:'], ),
 )
@@ -139,7 +130,6 @@ API_OPENAI_LOGPROBS = dict(
     abbr='lmdeploy-api-test-openai-logprobs',
     max_out_len=256,
     max_seq_len=4096,
-    temperature=0.2,
     openai_extra_kwargs=dict(
         logprobs=True,
         top_logprobs=5,
@@ -151,7 +141,6 @@ API_OPENAI_COMBINE = dict(
     abbr='lmdeploy-api-test-openai-combine',
     max_out_len=512,
     max_seq_len=4096,
-    temperature=0.2,
     openai_extra_kwargs=dict(
         presence_penalty=0.3,
         frequency_penalty=0.2,
@@ -165,7 +154,6 @@ API_LONG_OUTPUT_128K = dict(
     abbr='lmdeploy-api-test-long-output-128k',
     max_out_len=4096,
     max_seq_len=131072,
-    temperature=0.01,
 )
 
 models = [
@@ -184,8 +172,4 @@ models = [
 ]
 
 for m in models:
-    if 'openai_extra_kwargs' not in m:
-        m['openai_extra_kwargs'] = dict(top_k=1, temperature=1.0)
-    else:
-        m['openai_extra_kwargs']['top_k'] = 1
-        m['openai_extra_kwargs']['temperature'] = 1.0
+    m['temperature'] = 0
