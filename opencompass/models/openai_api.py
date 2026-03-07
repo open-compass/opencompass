@@ -138,6 +138,7 @@ class OpenAI(BaseAPIModel):
                 self.keys = [key]
         else:
             self.keys = key
+        self._key_lock = Lock()
 
         # record invalid keys and skip them when requesting API
         # - keys have insufficient_quota
@@ -159,6 +160,23 @@ class OpenAI(BaseAPIModel):
             self.proxy_url = openai_proxy_url
 
         self.path = path
+
+    def _next_valid_key(self):
+        with self._key_lock:
+            if len(self.invalid_keys) == len(self.keys):
+                raise RuntimeError('All keys have insufficient quota.')
+
+            # find the next valid key
+            while True:
+                self.key_ctr += 1
+                if self.key_ctr == len(self.keys):
+                    self.key_ctr = 0
+
+                if self.keys[self.key_ctr] not in self.invalid_keys:
+                    break
+
+            key = self.keys[self.key_ctr]
+        return key
 
     def generate(
         self,
@@ -184,6 +202,10 @@ class OpenAI(BaseAPIModel):
         """
         if self.temperature is not None:
             temperature = self.temperature
+
+        if len(inputs) == 1:
+            # Forget multi-thread for single inference.
+            return [self._generate(inputs[0], max_out_len, temperature)]
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             results = list(
@@ -224,22 +246,7 @@ class OpenAI(BaseAPIModel):
 
         max_num_retries = 0
         while max_num_retries < self.retry:
-            self.wait()
-
-            with Lock():
-                if len(self.invalid_keys) == len(self.keys):
-                    raise RuntimeError('All keys have insufficient quota.')
-
-                # find the next valid key
-                while True:
-                    self.key_ctr += 1
-                    if self.key_ctr == len(self.keys):
-                        self.key_ctr = 0
-
-                    if self.keys[self.key_ctr] not in self.invalid_keys:
-                        break
-
-                key = self.keys[self.key_ctr]
+            key = self._next_valid_key()
 
             header = {
                 'Authorization': f'Bearer {key}',
@@ -254,6 +261,7 @@ class OpenAI(BaseAPIModel):
                         self.org_ctr = 0
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
+            self.acquire()
             try:
                 if any(model in self.path
                        for model in OAI_REASONING_MODEL_LIST):
@@ -314,23 +322,13 @@ class OpenAI(BaseAPIModel):
                         self.logger.debug(
                             f'Get response from {self.proxy_url}')
 
-            except requests.ConnectionError:
-                self.logger.error('Got connection error, retrying...')
-                continue
-            try:
                 if raw_response.status_code != 200:
                     self.logger.error(f'Request failed with status code '
                                       f'{raw_response.status_code}, response: '
                                       f'{raw_response.content.decode()}')
                     continue
                 response = raw_response.json()
-            except requests.JSONDecodeError:
-                self.logger.error(f'JsonDecode error, got status code '
-                                  f'{raw_response.status_code}, response: '
-                                  f'{raw_response.content.decode()}')
-                continue
-            self.logger.debug(str(response))
-            try:
+                self.logger.debug(str(response))
                 if self.logprobs:
                     return response['choices']
                 else:
@@ -356,6 +354,12 @@ class OpenAI(BaseAPIModel):
                             return reasoning_content
                     else:
                         return content.strip()
+            except requests.ConnectionError:
+                self.logger.error('Got connection error, retrying...')
+            except requests.JSONDecodeError:
+                self.logger.error(f'JsonDecode error, got status code '
+                                  f'{raw_response.status_code}, response: '
+                                  f'{raw_response.content.decode()}')
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
@@ -377,6 +381,8 @@ class OpenAI(BaseAPIModel):
                         'Find error message in response: ',
                         str(response['error']),
                     )
+            finally:
+                self.release()
             max_num_retries += 1
 
         raise RuntimeError('Calling OpenAI failed after retrying for '
@@ -575,7 +581,7 @@ class OpenAISDK(OpenAI):
         query_per_second: int = 1,
         rpm_verbose: bool = False,
         retry: int = 2,
-        key: str | List[str] = 'ENV',
+        key: str = 'ENV',
         org: str | List[str] | None = None,
         meta_template: Dict | None = None,
         openai_api_base: str | List[str] = OPENAISDK_API_BASE,
@@ -671,7 +677,6 @@ class OpenAISDK(OpenAI):
 
         num_retries = 0
         while num_retries < self.retry:
-            self.wait()
             if any(model in self.path for model in OAI_REASONING_MODEL_LIST):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
@@ -697,6 +702,7 @@ class OpenAISDK(OpenAI):
             if self.openai_extra_kwargs:
                 query_data.update(self.openai_extra_kwargs)
 
+            self.acquire()
             try:
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
@@ -789,6 +795,8 @@ class OpenAISDK(OpenAI):
             except Exception as e:
                 self.logger.error(f'error occurs at {self.openai_api_base}')
                 self.logger.error(e)
+            finally:
+                self.release()
             num_retries += 1
         raise RuntimeError('Calling OpenAI API failed after retrying for '
                            f'{self.retry} times. Check the logs for details.')
@@ -925,6 +933,7 @@ class OpenAISDKRollout(OpenAI):
             if self.openai_extra_kwargs:
                 query_data.update(self.openai_extra_kwargs)
 
+            self.acquire()
             try:
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
@@ -1052,6 +1061,8 @@ class OpenAISDKRollout(OpenAI):
             except Exception as e:
                 self.logger.error(f'error occurs at {self.openai_api_base}')
                 self.logger.error(e)
+            finally:
+                self.release()
             num_retries += 1
         raise RuntimeError('Calling OpenAI API failed after retrying for '
                            f'{self.retry} times. Check the logs for details.')
