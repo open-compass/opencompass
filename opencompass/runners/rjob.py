@@ -71,7 +71,6 @@ class RJOBRunner(BaseRunner):
         """
         logger = get_logger()
         status = None
-        time.sleep(10)
         while True:
             get_cmd = f'rjob get {task_name}'
             get_result = subprocess.run(get_cmd,
@@ -161,7 +160,7 @@ class RJOBRunner(BaseRunner):
         if random_sleep is None:
             random_sleep = self.max_num_workers > 8
         if random_sleep:
-            sleep_time = random.randint(0, 60)
+            sleep_time = random.randint(0, 10)
             logger = get_logger()
             logger.info(f'Sleeping for {sleep_time} seconds to launch task')
             time.sleep(sleep_time)
