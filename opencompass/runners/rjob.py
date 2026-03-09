@@ -71,6 +71,7 @@ class RJOBRunner(BaseRunner):
         """
         logger = get_logger()
         status = None
+        time.sleep(1)
         while True:
             get_cmd = f'rjob get {task_name}'
             get_result = subprocess.run(get_cmd,
