@@ -100,6 +100,7 @@ class OpenAISDKStreaming(OpenAISDK):
                                    timeout=httpx.Timeout(self.timeout),
                                    limits=limits)
 
+        self.key = self._next_valid_key()
         self.openai_client = OpenAI(
             base_url=self.openai_api_base,
             api_key=self.key,

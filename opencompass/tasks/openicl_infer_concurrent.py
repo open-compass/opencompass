@@ -58,7 +58,7 @@ class _RunningTask:
 
 
 @TASKS.register_module()
-class OpenICLInferTaskConcurrent(BaseTask):
+class OpenICLInferConcurrentTask(BaseTask):
     """Concurrent OpenICL Inference Task for API models."""
 
     name_prefix = 'OpenICLInferConcurrent'
@@ -329,7 +329,7 @@ if __name__ == '__main__':
     args = parse_args()
     cfg = Config.fromfile(args.config)
     start_time = time.time()
-    inferencer = OpenICLInferTaskConcurrent(cfg)
+    inferencer = OpenICLInferConcurrentTask(cfg)
     inferencer.run()
     end_time = time.time()
     get_logger().info(f'time elapsed: {end_time - start_time:.2f}s')
