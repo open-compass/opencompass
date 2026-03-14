@@ -102,7 +102,6 @@ class OpenAI(BaseAPIModel):
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
     ):
-
         super().__init__(
             path=path,
             max_seq_len=max_seq_len,
@@ -112,18 +111,19 @@ class OpenAI(BaseAPIModel):
             retry=retry,
             verbose=verbose,
         )
-        import tiktoken
-
-        self.tiktoken = tiktoken
-        self.temperature = temperature
         assert mode in ['none', 'front', 'mid', 'rear']
+        self.path = path
+        self.temperature = temperature
         self.mode = mode
         self.logprobs = logprobs
         self.top_logprobs = top_logprobs
-        self.tokenizer_path = tokenizer_path
-        self.hf_tokenizer = None
         self.extra_body = extra_body
         self.think_tag = think_tag
+        # Fallback to gpt-4 as default tokenizer.
+        self.tokenizer_path = tokenizer_path or path or 'gpt-4'
+        self.tokenizer = None
+        self.tokenizer_type = None
+        self._init_tokenizer()
 
         if max_workers is None:
             cpu_count = os.cpu_count() or 1
@@ -160,8 +160,6 @@ class OpenAI(BaseAPIModel):
             self.proxy_url = os.getenv('OPENAI_PROXY_URL')
         else:
             self.proxy_url = openai_proxy_url
-
-        self.path = path
 
     def _next_valid_key(self):
         with self._key_lock:
@@ -391,6 +389,50 @@ class OpenAI(BaseAPIModel):
                            f'{max_num_retries} times. Check the logs for '
                            'details.')
 
+    def _init_tokenizer(self):
+        import tiktoken
+
+        # Try to load tiktoken encoder at first.
+        if self.tokenizer_path in tiktoken.model.MODEL_TO_ENCODING:
+            try:
+                if self.verbose:
+                    self.logger.info(
+                        f'Start load tiktoken encoding: {self.tokenizer_path}')
+                self.tokenizer = tiktoken.encoding_for_model(
+                    self.tokenizer_path)
+                self.tokenizer_type = 'tiktoken'
+                if self.verbose:
+                    self.logger.info(
+                        f'Successfully load tiktoken encoding: {self.tokenizer_path}'
+                    )
+                return
+            except Exception as e:
+                self.logger.warn(f'Failed to load tiktoken encoder: {repr(e)}')
+
+        # Try to load hf tokenizer then.
+        from transformers import AutoTokenizer
+        try:
+            if self.verbose:
+                self.logger.info(
+                    f'Start load hf tokenizer: {self.tokenizer_path}')
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.tokenizer_path, trust_remote_code=True)
+            self.tokenizer_type = 'hf'
+            if self.verbose:
+                self.logger.info(
+                    f'Successfully load hf tokenizer: {self.tokenizer_path}')
+            return
+        except Exception as e:
+            self.logger.warn(f'Failed to load hf tokenizer: {repr(e)}')
+
+        # Fallback to gpt-4 tokenizer
+        if self.verbose:
+            self.logger.info('Start load tiktoken encoding: gpt-4')
+        self.tokenizer = tiktoken.encoding_for_model('gpt-4')
+        self.tokenizer_type = 'tiktoken'
+        if self.verbose:
+            self.logger.info('Successfully load tiktoken encoding: gpt-4')
+
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese
         characters are counted for now. Users are encouraged to override this
@@ -402,48 +444,12 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        assert self.tokenizer_path or self.path
-        try:
-            if self.verbose:
-                self.logger.info(f'Used tokenizer_path: {self.tokenizer_path}')
-            tokenizer_path = (self.tokenizer_path
-                              if self.tokenizer_path else self.path)
-            try:
-                if self.verbose:
-                    self.logger.info(
-                        f'Start load tiktoken encoding: {tokenizer_path}')
-                enc = self.tiktoken.encoding_for_model(tokenizer_path)
-                if self.verbose:
-                    self.logger.info(
-                        f'Successfully tiktoken encoding: {tokenizer_path}')
-                return len(enc.encode(prompt, disallowed_special=()))
-            except Exception as e:
-                self.logger.warn(f'{e}, tiktoken encoding cannot load '
-                                 f'{tokenizer_path}')
-                from transformers import AutoTokenizer
-
-                if self.hf_tokenizer is None:
-                    if self.verbose:
-                        self.logger.info(
-                            f'Start load hf tokenizer: {tokenizer_path}')
-                    self.hf_tokenizer = AutoTokenizer.from_pretrained(
-                        tokenizer_path, trust_remote_code=True)
-                    self.logger.info(
-                        f'Successfully load HF Tokenizer from {tokenizer_path}'
-                    )
-                return len(self.hf_tokenizer(prompt).input_ids)
-        except Exception:
-            self.logger.warn(
-                'Can not get tokenizer automatically, '
-                'will use default tokenizer gpt-4 for length calculation.')
-            default_tokenizer = 'gpt-4'
-
-            enc = self.tiktoken.encoding_for_model(default_tokenizer)
-            if self.verbose:
-                self.logger.info(
-                    f'Successfully load default tiktoken tokenizer: '
-                    f' {default_tokenizer}')
-            return len(enc.encode(prompt, disallowed_special=()))
+        if self.tokenizer_type == 'tiktoken':
+            return len(self.tokenizer.encode(prompt, disallowed_special=()))
+        elif self.tokenizer_type == 'hf':
+            return len(self.tokenizer(prompt).input_ids)
+        else:
+            raise RuntimeError('No tokenizer to get token length.')
 
     def _bin_trim(self, prompt: str, num_token: int, mode: str) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.

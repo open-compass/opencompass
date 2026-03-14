@@ -90,7 +90,9 @@ class ParallelChatInferencer(ChatInferencer):
                 pass
             else:
                 output_handler.results_dict = tmp_result_dict
-                todo = [i for i in todo if str(i) not in tmp_result_dict.keys()]
+                todo = [
+                    i for i in todo if str(i) not in tmp_result_dict.keys()
+                ]
         if self.progress_tracker is not None:
             self.progress_tracker.set_completed(total_samples - len(todo))
 

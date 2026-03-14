@@ -222,7 +222,7 @@ class OpenICLInferConcurrentTask(BaseTask):
         except Exception as e:
             import traceback
             status.update(status='fail')
-            trace = "\n".join(traceback.format_exception(e))
+            trace = '\n'.join(traceback.format_exception(e))
             self.logger.error(f'Infer failed with\n{trace}')
         else:
             status.update(status='done')
@@ -267,12 +267,15 @@ class OpenICLInferConcurrentTask(BaseTask):
                         finished.append(item)
                         self.logger.info(f'Finished dataset task {item.name}')
                 if finished:
-                    running = [item for item in running if item not in finished]
+                    running = [
+                        item for item in running if item not in finished
+                    ]
 
                 # Start next sub task
                 # Load next dataset with 5% overhead.
                 max_pending_samples = max(1, int(max_workers * 1.05))
-                remaining_total = self._remaining_total(running, max_pending_samples)
+                remaining_total = self._remaining_total(
+                    running, max_pending_samples)
                 while pending and remaining_total < max_pending_samples:
                     dataset_cfg = pending.pop(0)
                     task_name = task_abbr_from_cfg({

@@ -7,6 +7,8 @@ from .dependency import *  # noqa
 from .dict_postprocessors import *  # noqa
 from .file import *  # noqa
 from .fileio import *  # noqa
+from .heartbeat import HeartBeatManager
+from .infer_status import InferStatusManager
 from .lark import *  # noqa
 from .logging import *  # noqa
 from .menu import *  # noqa
@@ -14,5 +16,3 @@ from .network import *  # noqa
 from .prompt import *  # noqa
 from .result_station import *  # noqa
 from .text_postprocessors import *  # noqa
-from .heartbeat import HeartBeatManager
-from .infer_status import InferStatusManager

@@ -74,7 +74,8 @@ class InferStatusManager:
     def write_task_status(self):
         payload = self.infer_status.copy()
         payload['updated_at'] = datetime.now().isoformat()
-        self.safe_write(self.status_path, json.dumps(payload, indent=2, ensure_ascii=False))
+        self.safe_write(self.status_path,
+                        json.dumps(payload, indent=2, ensure_ascii=False))
 
     def get_task_status(self) -> dict[str, InferStatus]:
         stem = self.status_path.stem

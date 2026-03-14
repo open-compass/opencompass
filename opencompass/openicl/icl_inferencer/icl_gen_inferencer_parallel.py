@@ -10,7 +10,6 @@ from typing import List, Optional
 
 import mmengine
 
-from opencompass.models.openai_api import OpenAISDK
 from opencompass.registry import ICL_INFERENCERS
 from opencompass.utils import batched
 
@@ -111,7 +110,9 @@ class ParallelGenInferencer(GenInferencer):
                 pass
             else:
                 output_handler.results_dict = tmp_result_dict
-                todo = [i for i in todo if str(i) not in tmp_result_dict.keys()]
+                todo = [
+                    i for i in todo if str(i) not in tmp_result_dict.keys()
+                ]
         if self.progress_tracker is not None:
             self.progress_tracker.set_completed(total_samples - len(todo))
 
@@ -145,8 +146,7 @@ class ParallelGenInferencer(GenInferencer):
             if num_return_sequences == 1:
                 prediction = generated[0]
             else:
-                prediction = list(batched(generated,
-                                          num_return_sequences))[0]
+                prediction = list(batched(generated, num_return_sequences))[0]
 
             if self.dump_res_length:
                 input_length = 0
@@ -154,8 +154,9 @@ class ParallelGenInferencer(GenInferencer):
                     input_length = self.model.get_token_len(parsed_entry)
                 elif isinstance(parsed_entry, list):
                     for i in range(len(parsed_entry)):
-                        parsed_entry[i]['input_length'] = self.model.get_token_len(
-                            parsed_entry[i]['prompt'])
+                        parsed_entry[i][
+                            'input_length'] = self.model.get_token_len(
+                                parsed_entry[i]['prompt'])
                         input_length += parsed_entry[i]['input_length']
 
                 pred_str = copy.deepcopy(prediction)
