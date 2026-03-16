@@ -139,6 +139,7 @@ class GenInferencer(BaseInferencer):
 
         start_time_stamp = time.time()
         num_sample = 0
+        first_dump = True
         for datum in tqdm(dataloader, disable=not self.is_main_process):
             if ds_reader.output_column:
                 entry, golds = list(zip(*datum))
@@ -165,7 +166,7 @@ class GenInferencer(BaseInferencer):
                                            '.', 1)[0] + '.jsonl'
                     with open(os.path.join(self.dump_only_message_path,
                                            save_path, save_name),
-                              'w',
+                              'w' if first_dump else 'a',
                               encoding='utf-8') as f:
                         for i in range(len(parsed_entries)):
                             f.write(
@@ -175,6 +176,7 @@ class GenInferencer(BaseInferencer):
                                         'gold': golds[i]
                                     },
                                     ensure_ascii=False) + '\n')
+                    first_dump = False
                     logger.info('Save message successfully')
                     continue
                 results = self.model.generate_from_template(
