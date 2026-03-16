@@ -165,7 +165,7 @@ class GenInferencer(BaseInferencer):
                                            '.', 1)[0] + '.jsonl'
                     with open(os.path.join(self.dump_only_message_path,
                                            save_path, save_name),
-                              'a',
+                              'w',
                               encoding='utf-8') as f:
                         for i in range(len(parsed_entries)):
                             f.write(
