@@ -1,4 +1,5 @@
 import json
+import threading
 from datetime import datetime
 from functools import partial
 from pathlib import Path
@@ -39,6 +40,7 @@ class InferStatusManager:
         self.model_cfg = model_cfg
         self.dataset_cfg = dataset_cfg
         self.work_dir = Path(work_dir)
+        self._lock = threading.Lock()
         self.infer_status = dict(status='pending', completed=0, total=None)
         self.status_path = Path(
             get_infer_output_path(
@@ -57,14 +59,15 @@ class InferStatusManager:
         total: int | None = None,
         completed: int | None = None,
     ):
-        new_status = self.infer_status.copy()
-        if status is not None:
-            new_status['status'] = status
-        if total is not None:
-            new_status['total'] = total
-        if completed is not None:
-            new_status['completed'] = completed
-        self._maybe_write(new_status)
+        with self._lock:
+            new_status = self.infer_status.copy()
+            if status is not None:
+                new_status['status'] = status
+            if total is not None:
+                new_status['total'] = total
+            if completed is not None:
+                new_status['completed'] = completed
+            self._maybe_write(new_status)
 
     def _maybe_write(self, entry: dict) -> None:
         if self.infer_status != entry:

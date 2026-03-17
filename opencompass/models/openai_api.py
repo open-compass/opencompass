@@ -402,9 +402,8 @@ class OpenAI(BaseAPIModel):
                     self.tokenizer_path)
                 self.tokenizer_type = 'tiktoken'
                 if self.verbose:
-                    self.logger.info(
-                        f'Successfully load tiktoken encoding: {self.tokenizer_path}'
-                    )
+                    self.logger.info('Successfully load tiktoken '
+                                     f'encoding: {self.tokenizer_path}')
                 return
             except Exception as e:
                 self.logger.warn(f'Failed to load tiktoken encoder: {repr(e)}')

@@ -1,6 +1,5 @@
 import os
 import time
-from threading import Lock
 from typing import Dict, List, Optional, Union
 
 from opencompass.registry import MODELS
@@ -175,11 +174,11 @@ class OpenAISDKStreaming(OpenAISDK):
 
                 if self.stream:
                     # Handle streaming response with shorter timeout
-                    response_stream = self.openai_client.chat.completions.create(
+                    stream = self.openai_client.chat.completions.create(
                         **query_data, timeout=self.timeout)
 
                     result = self._handle_stream_response(
-                        response_stream, thread_id if self.verbose else None)
+                        stream, thread_id if self.verbose else None)
 
                     return result
                 else:
