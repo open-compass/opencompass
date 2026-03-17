@@ -364,17 +364,17 @@ class OpenAI(BaseAPIModel):
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
                         time.sleep(10)
-                        self.logger.warn('Rate limit exceeded, retrying...')
+                        self.logger.warning('Rate limit exceeded, retrying...')
                         continue
                     elif response['error']['code'] == 'insufficient_quota':
                         self.invalid_keys.add(key)
-                        self.logger.warn(f'insufficient_quota key: {key}')
+                        self.logger.warning(f'insufficient_quota key: {key}')
                         continue
                     elif response['error']['code'] == 'invalid_prompt':
-                        self.logger.warn('Invalid prompt:', str(input))
+                        self.logger.warning('Invalid prompt:', str(input))
                         return ''
                     elif response['error']['type'] == 'invalid_prompt':
-                        self.logger.warn('Invalid prompt:', str(input))
+                        self.logger.warning('Invalid prompt:', str(input))
                         return ''
 
                     self.logger.error(
@@ -422,7 +422,7 @@ class OpenAI(BaseAPIModel):
                     f'Successfully load hf tokenizer: {self.tokenizer_path}')
             return
         except Exception as e:
-            self.logger.warn(f'Failed to load hf tokenizer: {repr(e)}')
+            self.logger.warning(f'Failed to load hf tokenizer: {repr(e)}')
 
         # Fallback to gpt-4 tokenizer
         if self.verbose:
@@ -641,33 +641,46 @@ class OpenAISDK(OpenAI):
             verbose=verbose,
             max_workers=max_workers,
         )
-        from openai import OpenAI
-
         # support multiple api_base for acceleration
         if isinstance(openai_api_base, List):
             self.openai_api_base = random.choice(openai_api_base)
         else:
             self.openai_api_base = openai_api_base
 
-        if self.proxy_url or http_client_cfg:
-            if self.proxy_url:
-                http_client_cfg['proxies'] = {
-                    'http://': self.proxy_url,
-                    'https://': self.proxy_url,
-                }
-
-        self.openai_client = OpenAI(
-            base_url=self.openai_api_base,
-            api_key=key,
-            http_client=httpx.Client(
-                **http_client_cfg) if http_client_cfg else None,
-        )
         self.timeout = timeout
+        self.http_client_cfg = http_client_cfg
+        self.openai_client = self._create_fresh_client()
+
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
         self.think_tag = think_tag
         self.openai_extra_kwargs = openai_extra_kwargs
+
+    def _create_fresh_client(self):
+        """Create a fresh OpenAI client."""
+        import httpx
+        from openai import OpenAI
+
+        # Get current key (with key rotation)
+        current_key = self._next_valid_key()
+
+        # Create fresh client with current key
+        http_client_cfg = self.http_client_cfg.copy()
+        if self.proxy_url:
+            http_client_cfg['proxies'] = {
+                'http://': self.proxy_url,
+                'https://': self.proxy_url,
+            }
+        limits = httpx.Limits(max_keepalive_connections=2048,
+                              max_connections=4096)
+        http_client = httpx.Client(**http_client_cfg,
+                                   timeout=httpx.Timeout(self.timeout),
+                                   limits=limits)
+
+        return OpenAI(base_url=self.openai_api_base,
+                      api_key=current_key,
+                      http_client=http_client)
 
     def _generate(
         self,

@@ -55,9 +55,6 @@ class OpenAISDKStreaming(OpenAISDK):
                  timeout: int = 3600,
                  finish_reason_confirm: bool = True,
                  max_workers: Optional[int] = None):
-        import httpx
-        from openai import OpenAI
-
         super().__init__(
             path=path,
             max_seq_len=max_seq_len,
@@ -79,32 +76,14 @@ class OpenAISDKStreaming(OpenAISDK):
             http_client_cfg=http_client_cfg,
             status_code_mappings=status_code_mappings,
             think_tag=think_tag,
+            openai_extra_kwargs=openai_extra_kwargs,
             max_workers=max_workers,
         )
 
         self.stream = stream
         self.stream_chunk_size = stream_chunk_size
-        self.openai_extra_kwargs = openai_extra_kwargs
         self.timeout = timeout
         self.finish_reason_confirm = finish_reason_confirm
-
-        if self.proxy_url:
-            http_client_cfg['proxies'] = {
-                'http://': self.proxy_url,
-                'https://': self.proxy_url,
-            }
-        limits = httpx.Limits(max_keepalive_connections=2048,
-                              max_connections=4096)
-        http_client = httpx.Client(**http_client_cfg,
-                                   timeout=httpx.Timeout(self.timeout),
-                                   limits=limits)
-
-        self.key = self._next_valid_key()
-        self.openai_client = OpenAI(
-            base_url=self.openai_api_base,
-            api_key=self.key,
-            http_client=http_client,
-        )
 
     def _generate(
         self,

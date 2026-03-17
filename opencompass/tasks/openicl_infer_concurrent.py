@@ -157,9 +157,14 @@ class OpenICLInferConcurrentTask(BaseTask):
         elif inferencer_type == 'ChatMLInferencer':
             inferencer_cfg['type'] = ParallelChatMLInferencer
 
-        if inferencer_type not in ('ChatInferencer', 'GenInferencer',
-                                   'ParallelChatInferencer',
-                                   'ParallelGenInferencer'):
+        if inferencer_type not in (
+                'ChatInferencer',
+                'GenInferencer',
+                'ChatMLInferencer',
+                'ParallelChatInferencer',
+                'ParallelGenInferencer',
+                'ParallelChatMLInferencer',
+        ):
             raise NotImplementedError(
                 f'Unsupported inferencer type `{inferencer_type}` '
                 'for OpenICLInferTaskConcurrent')
