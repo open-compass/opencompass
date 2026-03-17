@@ -4,6 +4,7 @@ import inspect
 import json
 import os
 import os.path as osp
+import re
 import time
 from typing import List, Optional
 
@@ -75,6 +76,8 @@ class GenInferencer(BaseInferencer):
         self.stopping_criteria = stopping_criteria
         self.dump_timer = kwargs.get('dump_timer', False)
         self.dump_res_length = kwargs.get('dump_res_length', False)
+        self.dump_only_message_path = kwargs.get('dump_only_message_path',
+                                                 None)
 
         if self.model.is_api and save_every is None:
             save_every = 1
@@ -136,6 +139,7 @@ class GenInferencer(BaseInferencer):
 
         start_time_stamp = time.time()
         num_sample = 0
+        first_dump = True
         for datum in tqdm(dataloader, disable=not self.is_main_process):
             if ds_reader.output_column:
                 entry, golds = list(zip(*datum))
@@ -151,6 +155,30 @@ class GenInferencer(BaseInferencer):
                 extra_gen_kwargs['min_out_len'] = self.min_out_len
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
+                if self.dump_only_message_path:
+                    save_path = os.path.basename(
+                        output_json_filepath.rstrip('/'))
+                    os.makedirs(os.path.join(self.dump_only_message_path,
+                                             save_path),
+                                exist_ok=True)
+                    save_name = re.sub(r'_(\d+)?(?=\.\w+$)',
+                                       '', output_json_filename).rsplit(
+                                           '.', 1)[0] + '.jsonl'
+                    with open(os.path.join(self.dump_only_message_path,
+                                           save_path, save_name),
+                              'w' if first_dump else 'a',
+                              encoding='utf-8') as f:
+                        for i in range(len(parsed_entries)):
+                            f.write(
+                                json.dumps(
+                                    {
+                                        'message': parsed_entries[i],
+                                        'gold': golds[i]
+                                    },
+                                    ensure_ascii=False) + '\n')
+                    first_dump = False
+                    logger.info('Save message successfully')
+                    continue
                 results = self.model.generate_from_template(
                     entry, max_out_len=self.max_out_len, **extra_gen_kwargs)
                 generated = results
@@ -206,6 +234,9 @@ class GenInferencer(BaseInferencer):
             num_sample += len(datum)
 
         end_time_stamp = time.time()
+
+        if self.dump_only_message_path:
+            return []
 
         # 6. Output
         if self.is_main_process:

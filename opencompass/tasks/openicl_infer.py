@@ -35,6 +35,7 @@ class OpenICLInferTask(BaseTask):
         self.num_procs = run_cfg.get('num_procs', 1)
         self.logger = get_logger()
         self.dump_res_length = cfg.get('dump_res_length', False)
+        self.dump_only_message_path = cfg.get('dump_only_message_path', None)
 
     def get_command(self, cfg_path, template):
         """Get the command template for the task.
@@ -129,6 +130,7 @@ class OpenICLInferTask(BaseTask):
         self._set_default_value(inferencer_cfg, 'batch_size', self.batch_size)
         inferencer_cfg['max_seq_len'] = self.model_cfg.get('max_seq_len')
         inferencer_cfg['dump_res_length'] = self.dump_res_length
+        inferencer_cfg['dump_only_message_path'] = self.dump_only_message_path
         inferencer = ICL_INFERENCERS.build(inferencer_cfg)
 
         out_path = get_infer_output_path(
