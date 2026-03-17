@@ -1,12 +1,11 @@
-# flake8: noqa
 import inspect
 import json
 import os
 import os.path as osp
 import time
+from pathlib import Path
 from typing import List, Optional
 
-import mmengine
 import torch
 from tqdm import tqdm
 
@@ -57,23 +56,16 @@ class ChatMLInferencer(BaseInferencer):
             save_every = 1
         self.save_every = save_every
 
-    def inference(self,
-                  retriever: BaseRetriever,
-                  ice_template: Optional[PromptTemplate] = None,
-                  prompt_template: Optional[PromptTemplate] = None,
-                  output_json_filepath: Optional[str] = None,
-                  output_json_filename: Optional[str] = None) -> List:
-        # 1. Preparation for output logs
-        output_handler = GenInferencerOutputHandler()
-        if output_json_filepath is None:
-            output_json_filepath = self.output_json_filepath
-        if output_json_filename is None:
-            output_json_filename = self.output_json_filename
-
-        # 2. Get results of retrieval process
+    def _get_prompt_list_and_gold_ans(
+            self,
+            retriever: BaseRetriever,
+            ice_template: Optional[PromptTemplate] = None,
+            prompt_template: Optional[PromptTemplate] = None):
         ice_idx_list = retriever.retrieve()
         prompt_list = []
         origin_prompt = retriever.dataset_reader['test']
+        get_prompt_list = (
+            self.get_generation_prompt_list_from_retriever_indices)
         for i in range(len(origin_prompt)):
             new_prompt_template = dict()
             new_prompt_template['round'] = []
@@ -102,38 +94,51 @@ class ChatMLInferencer(BaseInferencer):
                             prompt=this_assistant_prompt,
                         ), )
             prompt_template.template = new_prompt_template
-            this_prompt = self.get_generation_prompt_list_from_retriever_indices(
-                [ice_idx_list[i]],
-                retriever,
-                self.gen_field_replace_token,
-                max_seq_len=self.max_seq_len,
-                ice_template=ice_template,
-                prompt_template=prompt_template)
+            this_prompt = get_prompt_list([ice_idx_list[i]],
+                                          retriever,
+                                          self.gen_field_replace_token,
+                                          max_seq_len=self.max_seq_len,
+                                          ice_template=ice_template,
+                                          prompt_template=prompt_template)
             prompt_list += this_prompt
 
         gold_ans = []
         for i in origin_prompt['chatml_answer']:
             gold_ans.append(i[0])
+
+        return prompt_list, gold_ans
+
+    def inference(self,
+                  retriever: BaseRetriever,
+                  ice_template: Optional[PromptTemplate] = None,
+                  prompt_template: Optional[PromptTemplate] = None,
+                  output_json_filepath: Optional[str] = None,
+                  output_json_filename: Optional[str] = None) -> List:
+        # 1. Preparation for output logs
+        output_handler = GenInferencerOutputHandler()
+
+        if output_json_filepath is None:
+            output_json_filepath = self.output_json_filepath
+        if output_json_filename is None:
+            output_json_filename = self.output_json_filename
+
+        prompt_list, gold_ans = self._get_prompt_list_and_gold_ans(
+            retriever,
+            ice_template=ice_template,
+            prompt_template=prompt_template)
         prompt_list = list(zip(prompt_list, gold_ans))
         # 3.1 Fetch and zip prompt & gold answer if output column exists
         ds_reader = retriever.dataset_reader
-        # if ds_reader.output_column:
-        #     gold_ans = ds_reader.dataset['test'][ds_reader.output_column]
-        #     prompt_list = list(zip(prompt_list, gold_ans))
 
         # Create tmp json file for saving intermediate results and future
         # resuming
         index = 0
-        tmp_json_filepath = os.path.join(output_json_filepath,
-                                         'tmp_' + output_json_filename)
-        if osp.exists(tmp_json_filepath):
-            try:
-                tmp_result_dict = mmengine.load(tmp_json_filepath)
-            except Exception:
-                pass
-            else:
-                output_handler.results_dict = tmp_result_dict
-                index = len(tmp_result_dict)
+        tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
+            '.jsonl').name
+        tmp_jsonl_filepath = Path(output_json_filepath) / tmp_jsonl_filename
+        tmp_result_dict = output_handler.restore_from_jsonl(
+            output_json_filepath, tmp_jsonl_filename)
+        index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         logger.info('Starting build dataloader')
@@ -180,8 +185,8 @@ class ChatMLInferencer(BaseInferencer):
             # 5-4. Save intermediate results
             if (self.save_every is not None and index % self.save_every == 0
                     and self.is_main_process):
-                output_handler.write_to_json(output_json_filepath,
-                                             'tmp_' + output_json_filename)
+                output_handler.write_to_jsonl(output_json_filepath,
+                                              tmp_jsonl_filename)
             num_sample += len(datum)
 
         end_time_stamp = time.time()
@@ -191,8 +196,8 @@ class ChatMLInferencer(BaseInferencer):
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
                                          output_json_filename)
-            if osp.exists(tmp_json_filepath):
-                os.remove(tmp_json_filepath)
+            if osp.exists(tmp_jsonl_filepath):
+                os.remove(tmp_jsonl_filepath)
 
         if self.dump_timer and self.is_main_process:
             timer_filepath = os.path.join(output_json_filepath, 'timer',

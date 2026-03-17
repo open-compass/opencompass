@@ -2,9 +2,8 @@
 import os
 import os.path as osp
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List, Optional
-
-import mmengine
+from pathlib import Path
+from typing import Optional
 
 from opencompass.registry import ICL_INFERENCERS
 
@@ -81,18 +80,12 @@ class ParallelChatInferencer(ChatInferencer):
             self.progress_tracker.set_total(total_samples)
 
         todo = list(range(total_samples))
-        tmp_json_filepath = os.path.join(output_json_filepath,
-                                         'tmp_' + output_json_filename)
-        if osp.exists(tmp_json_filepath):
-            try:
-                tmp_result_dict = mmengine.load(tmp_json_filepath)
-            except Exception:
-                pass
-            else:
-                output_handler.results_dict = tmp_result_dict
-                todo = [
-                    i for i in todo if str(i) not in tmp_result_dict.keys()
-                ]
+        tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
+            '.jsonl').name
+        tmp_jsonl_filepath = Path(output_json_filepath) / tmp_jsonl_filename
+        tmp_result_dict = output_handler.restore_from_jsonl(
+            output_json_filepath, tmp_jsonl_filename)
+        todo = [i for i in todo if str(i) not in tmp_result_dict.keys()]
         if self.progress_tracker is not None:
             self.progress_tracker.set_completed(total_samples - len(todo))
 
@@ -126,14 +119,14 @@ class ParallelChatInferencer(ChatInferencer):
                 if (self.save_every is not None
                         and completed % self.save_every == 0
                         and self.is_main_process):
-                    output_handler.write_to_json(output_json_filepath,
-                                                 'tmp_' + output_json_filename)
+                    output_handler.write_to_jsonl(output_json_filepath,
+                                                  tmp_jsonl_filename)
 
         if self.is_main_process:
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
                                          output_json_filename)
-            if osp.exists(tmp_json_filepath):
-                os.remove(tmp_json_filepath)
+            if osp.exists(tmp_jsonl_filepath):
+                os.remove(tmp_jsonl_filepath)
 
         return output_handler.results_dict

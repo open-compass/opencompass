@@ -1,5 +1,4 @@
-"""Parallel Generation Inferencer."""
-import copy
+"""Parallel ChatML Inferencer."""
 import inspect
 import json
 import os
@@ -16,14 +15,14 @@ from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
 from ..utils.logging import get_logger
 from .icl_base_inferencer import GenInferencerOutputHandler
-from .icl_gen_inferencer import GenInferencer
+from .icl_chatml_inferencer import ChatMLInferencer
 
 logger = get_logger(__name__)
 
 
 @ICL_INFERENCERS.register_module()
-class ParallelGenInferencer(GenInferencer):
-    """Parallel generation inferencer with thread pool over samples."""
+class ParallelChatMLInferencer(ChatMLInferencer):
+    """Parallel ChatML inferencer with thread pool over samples."""
 
     def __init__(
             self,
@@ -80,20 +79,10 @@ class ParallelGenInferencer(GenInferencer):
         if output_json_filename is None:
             output_json_filename = self.output_json_filename
 
-        ice_idx_list = retriever.retrieve()
-
-        prompt_list = self.get_generation_prompt_list_from_retriever_indices(
-            ice_idx_list,
+        prompt_list, gold_ans = self._get_prompt_list_and_gold_ans(
             retriever,
-            self.gen_field_replace_token,
-            max_seq_len=self.max_seq_len,
             ice_template=ice_template,
             prompt_template=prompt_template)
-
-        ds_reader = retriever.dataset_reader
-        gold_ans = None
-        if ds_reader.output_column:
-            gold_ans = ds_reader.dataset['test'][ds_reader.output_column]
 
         total_samples = len(prompt_list)
         if self.progress_tracker is not None:
@@ -110,10 +99,7 @@ class ParallelGenInferencer(GenInferencer):
             self.progress_tracker.set_completed(total_samples - len(todo))
 
         entries = [prompt_list[i] for i in todo]
-        if gold_ans is not None:
-            golds = [gold_ans[i] for i in todo]
-        else:
-            golds = [None for _ in range(len(entries))]
+        golds = [gold_ans[i] for i in todo]
 
         logger.info('Starting parallel inference process...')
 
@@ -141,37 +127,12 @@ class ParallelGenInferencer(GenInferencer):
             else:
                 prediction = list(batched(generated, num_return_sequences))[0]
 
-            res_dict = dict(
+            return dict(
                 origin_prompt=parsed_entry,
                 prediction=prediction,
                 idx=idx,
                 gold=gold,
             )
-
-            if self.dump_res_length:
-                input_length = 0
-                if isinstance(parsed_entry, str):
-                    input_length = self.model.get_token_len(parsed_entry)
-                elif isinstance(parsed_entry, list):
-                    for i in range(len(parsed_entry)):
-                        parsed_entry[i][
-                            'input_length'] = self.model.get_token_len(
-                                parsed_entry[i]['prompt'])
-                        input_length += parsed_entry[i]['input_length']
-
-                pred_str = copy.deepcopy(prediction)
-                if isinstance(pred_str, dict):
-                    pred_str = pred_str['prediction']
-
-                if num_return_sequences == 1:
-                    res_length = self.model.get_token_len(pred_str)
-                else:
-                    res_length = [
-                        self.model.get_token_len(pred) for pred in pred_str
-                    ]
-                res_dict['res_length'] = res_length
-                res_dict['input_length'] = input_length
-            return res_dict
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [

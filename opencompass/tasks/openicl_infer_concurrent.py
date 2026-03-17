@@ -14,6 +14,7 @@ from mmengine.utils import mkdir_or_exist
 
 import opencompass.datasets  # noqa: F401
 from opencompass.openicl.icl_inferencer import (ParallelChatInferencer,
+                                                ParallelChatMLInferencer,
                                                 ParallelGenInferencer)
 from opencompass.registry import (ICL_INFERENCERS, ICL_PROMPT_TEMPLATES,
                                   ICL_RETRIEVERS, TASKS)
@@ -74,7 +75,7 @@ class OpenICLInferConcurrentTask(BaseTask):
         self.dump_res_length = cfg.get('dump_res_length', False)
         self.dump_only_message_path = cfg.get('dump_only_message_path', None)
         self.poll_interval = cfg.get('poll_interval', 1.0)
-        self.log_interval = cfg.get('log_interval', 10.0)
+        self.log_interval = cfg.get('log_interval', 30.0)
 
     def get_command(self, cfg_path, template):
         sys.path.append(os.getcwd())
@@ -153,6 +154,8 @@ class OpenICLInferConcurrentTask(BaseTask):
             inferencer_cfg['type'] = ParallelGenInferencer
         elif inferencer_type == 'ChatInferencer':
             inferencer_cfg['type'] = ParallelChatInferencer
+        elif inferencer_type == 'ChatMLInferencer':
+            inferencer_cfg['type'] = ParallelChatMLInferencer
 
         if inferencer_type not in ('ChatInferencer', 'GenInferencer',
                                    'ParallelChatInferencer',
@@ -272,8 +275,8 @@ class OpenICLInferConcurrentTask(BaseTask):
                     ]
 
                 # Start next sub task
-                # Load next dataset with 5% overhead.
-                max_pending_samples = max(1, int(max_workers * 1.05))
+                # Load next dataset with 100% overhead.
+                max_pending_samples = max(1, int(max_workers * 2))
                 remaining_total = self._remaining_total(
                     running, max_pending_samples)
                 while pending and remaining_total < max_pending_samples:
@@ -302,11 +305,13 @@ class OpenICLInferConcurrentTask(BaseTask):
 
                 now = time.time()
                 if now - last_log >= self.log_interval and running:
-                    status = ', '.join(
-                        f'{item.name}:{item.progress.completed}/'
-                        f'{item.progress.total if item.progress.total is not None else "?"}'
-                        for item in running)
-                    self.logger.info(f'Running tasks: {status}')
+                    status = []
+                    for item in running:
+                        total = (item.progress.total
+                                 if item.progress.total is not None else '?')
+                        status.append(
+                            f'{item.name}:{item.progress.completed}/{total}')
+                    self.logger.info(f'Running tasks: {", ".join(status)}')
                     last_log = now
 
                 for item in finished + running:

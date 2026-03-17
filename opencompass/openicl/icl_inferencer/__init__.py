@@ -4,6 +4,7 @@ from .icl_base_inferencer import BaseInferencer  # noqa
 from .icl_chat_inferencer import ChatInferencer  # noqa
 from .icl_chat_inferencer_parallel import ParallelChatInferencer  # noqa
 from .icl_chatml_inferencer import ChatMLInferencer  # noqa
+from .icl_chatml_inferencer_parallel import ParallelChatMLInferencer  # noqa
 from .icl_clp_inferencer import CLPInferencer  # noqa
 from .icl_gen_inferencer import GenInferencer  # noqa
 from .icl_gen_inferencer_parallel import ParallelGenInferencer  # noqa
