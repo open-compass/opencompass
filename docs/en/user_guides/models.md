@@ -86,6 +86,7 @@ models = [
         # Parameters for `OpenAI` initialization
         path='gpt-4',                            # Specify the model type
         key='YOUR_OPENAI_KEY',                   # OpenAI API Key
+        use_azure_identity=True,                 # Use Azure Managed Identity for authentication instead of OPENAI key
         max_seq_len=2048,                        # The max input number of tokens
         # Common parameters shared by various models, not specific to `OpenAI` initialization.
         abbr='GPT-4',                            # Model abbreviation used for result display.
@@ -100,6 +101,8 @@ We have provided several examples for API-based models. Please refer to
 
 ```bash
 configs
+├── eval_api_demo.py
+├── eval_api_azure_openai_demo.py
 ├── eval_zhipu.py
 ├── eval_xunfei.py
 └── eval_minimax.py
