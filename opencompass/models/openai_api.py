@@ -12,6 +12,7 @@ import jieba
 import requests
 from tqdm import tqdm
 
+from azure.identity import DefaultAzureCredential
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
@@ -76,6 +77,10 @@ class OpenAI(BaseAPIModel):
         max_workers (int, optional): Maximum number of worker threads for
             concurrent API requests. For I/O-intensive API calls, recommended
             value is 10-20. Defaults to None (uses CPU count * 2).
+        use_azure_identity (bool, optional): Use Azure DefaultAzureCredential
+            for authentication instead of API key. When enabled, tokens are
+            obtained from Azure identity. Requires azure-identity package.
+            Defaults to False.
     """
 
     is_api: bool = True
@@ -101,6 +106,7 @@ class OpenAI(BaseAPIModel):
         verbose: bool = False,
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
+        use_azure_identity: bool = False,
     ):
 
         super().__init__(
@@ -124,6 +130,8 @@ class OpenAI(BaseAPIModel):
         self.hf_tokenizer = None
         self.extra_body = extra_body
         self.think_tag = think_tag
+        self.use_azure_identity = use_azure_identity
+        self.azure_credential = None
 
         if max_workers is None:
             cpu_count = os.cpu_count() or 1
@@ -131,7 +139,12 @@ class OpenAI(BaseAPIModel):
         else:
             self.max_workers = max_workers
 
-        if isinstance(key, str):
+        # Handle Azure Identity authentication
+        if use_azure_identity:
+            self.azure_credential = DefaultAzureCredential()
+            # Use dummy key for compatibility, actual token will be generated
+            self.keys = ['AZURE_TOKEN']
+        elif isinstance(key, str):
             if key == 'ENV':
                 if 'OPENAI_API_KEY' not in os.environ:
                     raise ValueError('OpenAI API key is not set.')
@@ -228,20 +241,28 @@ class OpenAI(BaseAPIModel):
         while max_num_retries < self.retry:
             self.wait()
 
-            with Lock():
-                if len(self.invalid_keys) == len(self.keys):
-                    raise RuntimeError('All keys have insufficient quota.')
+            # Get authentication token
+            if self.use_azure_identity:
+                # Get fresh token from Azure
+                token = self.azure_credential.get_token(
+                    'https://cognitiveservices.azure.com/.default'
+                )
+                key = token.token
+            else:
+                with Lock():
+                    if len(self.invalid_keys) == len(self.keys):
+                        raise RuntimeError('All keys have insufficient quota.')
 
-                # find the next valid key
-                while True:
-                    self.key_ctr += 1
-                    if self.key_ctr == len(self.keys):
-                        self.key_ctr = 0
+                    # find the next valid key
+                    while True:
+                        self.key_ctr += 1
+                        if self.key_ctr == len(self.keys):
+                            self.key_ctr = 0
 
-                    if self.keys[self.key_ctr] not in self.invalid_keys:
-                        break
+                        if self.keys[self.key_ctr] not in self.invalid_keys:
+                            break
 
-                key = self.keys[self.key_ctr]
+                    key = self.keys[self.key_ctr]
 
             header = {
                 'Authorization': f'Bearer {key}',
@@ -327,9 +348,17 @@ class OpenAI(BaseAPIModel):
                     continue
                 response = raw_response.json()
             except requests.JSONDecodeError:
-                self.logger.error(f'JsonDecode error, got status code '
-                                  f'{raw_response.status_code}, response: '
-                                  f'{raw_response.content.decode()}')
+                response_text = raw_response.content.decode()
+                self.logger.error(
+                    f'JsonDecode error, got status code {raw_response.status_code}. '
+                    f'URL: {url}')
+                self.logger.error(
+                    f'Response preview (first 500 chars): {response_text[:500]}')
+                if self.use_azure_identity:
+                    self.logger.error(
+                        'Azure OpenAI requires a specific URL format: '
+                        'https://{resource}.openai.azure.com/openai/deployments/'
+                        '{deployment-name}/chat/completions?api-version=2024-02-15-preview')
                 continue
             self.logger.debug(str(response))
             try:
@@ -609,6 +638,7 @@ class OpenAISDK(OpenAI):
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Dict | None = None,
         timeout: int = 3600,
+        use_azure_identity: bool = False,
     ):
         super().__init__(
             path,
@@ -629,6 +659,7 @@ class OpenAISDK(OpenAI):
             extra_body,
             verbose=verbose,
             max_workers=max_workers,
+            use_azure_identity=use_azure_identity,
         )
         from openai import OpenAI
 
@@ -645,12 +676,24 @@ class OpenAISDK(OpenAI):
                     'https://': self.proxy_url,
                 }
 
-        self.openai_client = OpenAI(
-            base_url=self.openai_api_base,
-            api_key=key,
-            http_client=httpx.Client(
-                **http_client_cfg) if http_client_cfg else None,
-        )
+        # Initialize OpenAI client with appropriate authentication
+        if use_azure_identity:
+            # When using Azure identity, get token dynamically
+            # Note: The OpenAI SDK client will be updated with fresh tokens
+            # in the _generate method for each request
+            self.openai_client = OpenAI(
+                base_url=self.openai_api_base,
+                api_key='placeholder',  # Will be replaced with Azure token
+                http_client=httpx.Client(
+                    **http_client_cfg) if http_client_cfg else None,
+            )
+        else:
+            self.openai_client = OpenAI(
+                base_url=self.openai_api_base,
+                api_key=key,
+                http_client=httpx.Client(
+                    **http_client_cfg) if http_client_cfg else None,
+            )
         self.timeout = timeout
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
@@ -713,6 +756,13 @@ class OpenAISDK(OpenAI):
                 query_data.update(self.openai_extra_kwargs)
 
             try:
+                # Update API key with fresh Azure token if using Azure identity
+                if self.use_azure_identity:
+                    token = self.azure_credential.get_token(
+                        'https://cognitiveservices.azure.com/.default'
+                    )
+                    self.openai_client.api_key = token.token
+
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
 
@@ -836,6 +886,7 @@ class OpenAISDKRollout(OpenAI):
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Dict | None = None,
+        use_azure_identity: bool = False,
     ):
         super().__init__(
             path,
@@ -856,6 +907,7 @@ class OpenAISDKRollout(OpenAI):
             extra_body,
             verbose=verbose,
             max_workers=max_workers,
+            use_azure_identity=use_azure_identity,
         )
         from openai import OpenAI
 
@@ -872,19 +924,24 @@ class OpenAISDKRollout(OpenAI):
                     'https://': self.proxy_url,
                 }
 
-        self.openai_client = OpenAI(
-            base_url=self.openai_api_base,
-            api_key=key,
-            http_client=httpx.Client(
-                **http_client_cfg) if http_client_cfg else None,
-        )
-
-        if self.verbose:
-            self.logger.info(f'Used openai_client: {self.openai_client}')
-        self.status_code_mappings = status_code_mappings
-        self.think_tag = think_tag
-        self.openai_extra_kwargs = openai_extra_kwargs
-
+        # Initialize OpenAI client with appropriate authentication
+        if use_azure_identity:
+            # When using Azure identity, get token dynamically
+            # Note: The OpenAI SDK client will be updated with fresh tokens
+            # in the _generate method for each request
+            self.openai_client = OpenAI(
+                base_url=self.openai_api_base,
+                api_key='placeholder',  # Will be replaced with Azure token
+                http_client=httpx.Client(
+                    **http_client_cfg) if http_client_cfg else None,
+            )
+        else:
+            self.openai_client = OpenAI(
+                base_url=self.openai_api_base,
+                api_key=key,
+                http_client=httpx.Client(
+                    **http_client_cfg) if http_client_cfg else None,
+            )
     def _generate(
         self,
         input: PromptList | str,
@@ -941,6 +998,13 @@ class OpenAISDKRollout(OpenAI):
                 query_data.update(self.openai_extra_kwargs)
 
             try:
+                # Update API key with fresh Azure token if using Azure identity
+                if self.use_azure_identity:
+                    token = self.azure_credential.get_token(
+                        'https://cognitiveservices.azure.com/.default'
+                    )
+                    self.openai_client.api_key = token.token
+
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
 
