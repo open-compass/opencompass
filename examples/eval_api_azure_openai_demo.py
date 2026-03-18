@@ -1,7 +1,7 @@
 """
 Example configuration of using Azure OpenAI models.
 
-This demonstrates how to use Azure Managed Identity if API keys are not available for authentication.
+This demonstrates how to use Azure Managed Identity authentication if API keys are not available.
 """
 
 from mmengine.config import read_base

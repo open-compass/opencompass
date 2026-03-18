@@ -10,9 +10,9 @@ from typing import Dict, List, Optional, Union
 import httpx
 import jieba
 import requests
+from azure.identity import DefaultAzureCredential
 from tqdm import tqdm
 
-from azure.identity import DefaultAzureCredential
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
@@ -77,10 +77,9 @@ class OpenAI(BaseAPIModel):
         max_workers (int, optional): Maximum number of worker threads for
             concurrent API requests. For I/O-intensive API calls, recommended
             value is 10-20. Defaults to None (uses CPU count * 2).
-        use_azure_identity (bool, optional): Use Azure DefaultAzureCredential
+        use_azure_identity (bool, optional): Use DefaultAzureCredential
             for authentication instead of API key. When enabled, tokens are
-            obtained from Azure identity. Requires azure-identity package.
-            Defaults to False.
+            obtained from Azure identity. Defaults to False.
     """
 
     is_api: bool = True
@@ -245,8 +244,7 @@ class OpenAI(BaseAPIModel):
             if self.use_azure_identity:
                 # Get fresh token from Azure
                 token = self.azure_credential.get_token(
-                    'https://cognitiveservices.azure.com/.default'
-                )
+                    'https://cognitiveservices.azure.com/.default')
                 key = token.token
             else:
                 with Lock():
@@ -353,12 +351,14 @@ class OpenAI(BaseAPIModel):
                     f'JsonDecode error, got status code {raw_response.status_code}. '
                     f'URL: {url}')
                 self.logger.error(
-                    f'Response preview (first 500 chars): {response_text[:500]}')
+                    f'Response preview (first 500 chars): {response_text[:500]}'
+                )
                 if self.use_azure_identity:
                     self.logger.error(
                         'Azure OpenAI requires a specific URL format: '
                         'https://{resource}.openai.azure.com/openai/deployments/'
-                        '{deployment-name}/chat/completions?api-version=2024-02-15-preview')
+                        '{deployment-name}/chat/completions?api-version=2024-02-15-preview'
+                    )
                 continue
             self.logger.debug(str(response))
             try:
@@ -759,8 +759,7 @@ class OpenAISDK(OpenAI):
                 # Update API key with fresh Azure token if using Azure identity
                 if self.use_azure_identity:
                     token = self.azure_credential.get_token(
-                        'https://cognitiveservices.azure.com/.default'
-                    )
+                        'https://cognitiveservices.azure.com/.default')
                     self.openai_client.api_key = token.token
 
                 if self.verbose:
@@ -942,6 +941,7 @@ class OpenAISDKRollout(OpenAI):
                 http_client=httpx.Client(
                     **http_client_cfg) if http_client_cfg else None,
             )
+
     def _generate(
         self,
         input: PromptList | str,
@@ -1001,8 +1001,7 @@ class OpenAISDKRollout(OpenAI):
                 # Update API key with fresh Azure token if using Azure identity
                 if self.use_azure_identity:
                     token = self.azure_credential.get_token(
-                        'https://cognitiveservices.azure.com/.default'
-                    )
+                        'https://cognitiveservices.azure.com/.default')
                     self.openai_client.api_key = token.token
 
                 if self.verbose:
