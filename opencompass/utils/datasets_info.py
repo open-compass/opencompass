@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/IMO-Answer-Bench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/imo-bench-answerbench.jsonl",
+    },
     "opencompass/IFEval": {
         "ms_id": None,
         "hf_id": None,
