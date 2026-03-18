@@ -147,7 +147,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
         from openai import APIStatusError, BadRequestError
 
-        assert isinstance(input, (str, PromptList))
+        assert isinstance(input, (str, list, PromptList))
 
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,
