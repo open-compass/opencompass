@@ -49,12 +49,10 @@ llm_evaluator = dict(
     type='GenericLLMEvaluator',
     prompt_template=dict(
         type='RawPromptTemplate',
-        template=dict(
-            messages=[
-                {'role': 'system', 'content': "You are a helpful assistant who evaluates the correctness and quality of models' outputs."},
-                {'role': 'user', 'content': GRADER_TEMPLATE},
-            ],
-        ),
+        messages=[
+            {'role': 'system', 'content': "You are a helpful assistant who evaluates the correctness and quality of models' outputs."},
+            {'role': 'user', 'content': GRADER_TEMPLATE},
+        ],
     ),
     dataset_cfg=dict(
         type='ChatMLDataset',
