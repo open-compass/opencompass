@@ -76,8 +76,8 @@ with read_base():
         ds1000_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.Earth_Silver.Earth_Silver_llmjudge_gen_46140c import \
         earth_silver_mcq_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.eese.eese_llm_judge_gen import \
-        eese_datasets  # noqa: F401, E501
+    # from opencompass.configs.datasets.eese.eese_llm_judge_gen import \
+    #    eese_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.GaokaoBench.GaokaoBench_no_subjective_gen_4c31db import \
         GaokaoBench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.GaokaoBench.GaokaoBench_no_subjective_gen_d16acb import \
