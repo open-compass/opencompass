@@ -104,7 +104,6 @@ class OpenAI(BaseAPIModel):
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
     ):
-
         super().__init__(
             path=path,
             max_seq_len=max_seq_len,
@@ -114,18 +113,19 @@ class OpenAI(BaseAPIModel):
             retry=retry,
             verbose=verbose,
         )
-        import tiktoken
-
-        self.tiktoken = tiktoken
-        self.temperature = temperature
         assert mode in ['none', 'front', 'mid', 'rear']
+        self.path = path
+        self.temperature = temperature
         self.mode = mode
         self.logprobs = logprobs
         self.top_logprobs = top_logprobs
-        self.tokenizer_path = tokenizer_path
-        self.hf_tokenizer = None
         self.extra_body = extra_body
         self.think_tag = think_tag
+        # Fallback to gpt-4 as default tokenizer.
+        self.tokenizer_path = tokenizer_path or path or 'gpt-4'
+        self.tokenizer = None
+        self.tokenizer_type = None
+        self._init_tokenizer()
         self.azure_credential = None
         self.use_azure_identity = False
 
@@ -157,6 +157,7 @@ class OpenAI(BaseAPIModel):
                 self.keys = [key]
         else:
             self.keys = key
+        self._key_lock = Lock()
 
         # record invalid keys and skip them when requesting API
         # - keys have insufficient_quota
@@ -177,7 +178,28 @@ class OpenAI(BaseAPIModel):
         else:
             self.proxy_url = openai_proxy_url
 
-        self.path = path
+    def _next_valid_key(self):
+        # Get authentication token
+        if self.azure_credential:
+            token = self.azure_credential.get_token(
+                'https://cognitiveservices.azure.com/.default')
+            key = token.token
+        else:
+            with self._key_lock:
+                if len(self.invalid_keys) == len(self.keys):
+                    raise RuntimeError('All keys have insufficient quota.')
+
+                # find the next valid key
+                while True:
+                    self.key_ctr += 1
+                    if self.key_ctr == len(self.keys):
+                        self.key_ctr = 0
+
+                    if self.keys[self.key_ctr] not in self.invalid_keys:
+                        break
+
+                key = self.keys[self.key_ctr]
+        return key
 
     def generate(
         self,
@@ -203,6 +225,10 @@ class OpenAI(BaseAPIModel):
         """
         if self.temperature is not None:
             temperature = self.temperature
+
+        if len(inputs) == 1:
+            # Forget multi-thread for single inference.
+            return [self._generate(inputs[0], max_out_len, temperature)]
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             results = list(
@@ -243,28 +269,7 @@ class OpenAI(BaseAPIModel):
 
         max_num_retries = 0
         while max_num_retries < self.retry:
-            self.wait()
-
-            # Get authentication token
-            if self.azure_credential:
-                token = self.azure_credential.get_token(
-                    'https://cognitiveservices.azure.com/.default')
-                key = token.token
-            else:
-                with Lock():
-                    if len(self.invalid_keys) == len(self.keys):
-                        raise RuntimeError('All keys have insufficient quota.')
-
-                    # find the next valid key
-                    while True:
-                        self.key_ctr += 1
-                        if self.key_ctr == len(self.keys):
-                            self.key_ctr = 0
-
-                        if self.keys[self.key_ctr] not in self.invalid_keys:
-                            break
-
-                    key = self.keys[self.key_ctr]
+            key = self._next_valid_key()
 
             header = {
                 'Authorization': f'Bearer {key}',
@@ -279,6 +284,7 @@ class OpenAI(BaseAPIModel):
                         self.org_ctr = 0
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
+            self.acquire()
             try:
                 if any(model in self.path
                        for model in OAI_REASONING_MODEL_LIST):
@@ -339,33 +345,13 @@ class OpenAI(BaseAPIModel):
                         self.logger.debug(
                             f'Get response from {self.proxy_url}')
 
-            except requests.ConnectionError:
-                self.logger.error('Got connection error, retrying...')
-                continue
-            try:
                 if raw_response.status_code != 200:
                     self.logger.error(f'Request failed with status code '
                                       f'{raw_response.status_code}, response: '
                                       f'{raw_response.content.decode()}')
                     continue
                 response = raw_response.json()
-            except requests.JSONDecodeError:
-                response_text = raw_response.content.decode()
-                self.logger.error(
-                    f'JsonDecode error, got status code {raw_response.status_code}. '
-                    f'URL: {url}')
-                self.logger.error(
-                    f'Response preview (first 500 chars): {response_text[:500]}'
-                )
-                if self.use_azure_identity:
-                    self.logger.error(
-                        'Azure OpenAI requires a specific URL format: '
-                        'https://{resource}.openai.azure.com/openai/deployments/'
-                        '{deployment-name}/chat/completions?api-version=2024-02-15-preview'
-                    )
-                continue
-            self.logger.debug(str(response))
-            try:
+                self.logger.debug(str(response))
                 if self.logprobs:
                     return response['choices']
                 else:
@@ -391,32 +377,83 @@ class OpenAI(BaseAPIModel):
                             return reasoning_content
                     else:
                         return content.strip()
+            except requests.ConnectionError:
+                self.logger.error('Got connection error, retrying...')
+            except requests.JSONDecodeError:
+                self.logger.error(f'JsonDecode error, got status code '
+                                  f'{raw_response.status_code}, response: '
+                                  f'{raw_response.content.decode()}')
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
                         time.sleep(10)
-                        self.logger.warn('Rate limit exceeded, retrying...')
+                        self.logger.warning('Rate limit exceeded, retrying...')
                         continue
                     elif response['error']['code'] == 'insufficient_quota':
                         self.invalid_keys.add(key)
-                        self.logger.warn(f'insufficient_quota key: {key}')
+                        self.logger.warning(f'insufficient_quota key: {key}')
                         continue
                     elif response['error']['code'] == 'invalid_prompt':
-                        self.logger.warn('Invalid prompt:', str(input))
+                        self.logger.warning('Invalid prompt:', str(input))
                         return ''
                     elif response['error']['type'] == 'invalid_prompt':
-                        self.logger.warn('Invalid prompt:', str(input))
+                        self.logger.warning('Invalid prompt:', str(input))
                         return ''
 
                     self.logger.error(
                         'Find error message in response: ',
                         str(response['error']),
                     )
+            finally:
+                self.release()
             max_num_retries += 1
 
         raise RuntimeError('Calling OpenAI failed after retrying for '
                            f'{max_num_retries} times. Check the logs for '
                            'details.')
+
+    def _init_tokenizer(self):
+        import tiktoken
+
+        # Try to load tiktoken encoder at first.
+        if self.tokenizer_path in tiktoken.model.MODEL_TO_ENCODING:
+            try:
+                if self.verbose:
+                    self.logger.info(
+                        f'Start load tiktoken encoding: {self.tokenizer_path}')
+                self.tokenizer = tiktoken.encoding_for_model(
+                    self.tokenizer_path)
+                self.tokenizer_type = 'tiktoken'
+                if self.verbose:
+                    self.logger.info('Successfully load tiktoken '
+                                     f'encoding: {self.tokenizer_path}')
+                return
+            except Exception as e:
+                self.logger.warn(f'Failed to load tiktoken encoder: {repr(e)}')
+
+        # Try to load hf tokenizer then.
+        from transformers import AutoTokenizer
+        try:
+            if self.verbose:
+                self.logger.info(
+                    f'Start load hf tokenizer: {self.tokenizer_path}')
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.tokenizer_path, trust_remote_code=True)
+            self.tokenizer_type = 'hf'
+            if self.verbose:
+                self.logger.info(
+                    f'Successfully load hf tokenizer: {self.tokenizer_path}')
+            return
+        except Exception as e:
+            self.logger.warning(f'Failed to load hf tokenizer: {repr(e)}')
+
+        # Fallback to gpt-4 tokenizer
+        if self.verbose:
+            self.logger.info('Start load tiktoken encoding: gpt-4')
+        self.tokenizer = tiktoken.encoding_for_model('gpt-4')
+        self.tokenizer_type = 'tiktoken'
+        if self.verbose:
+            self.logger.info('Successfully load tiktoken encoding: gpt-4')
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese
@@ -429,48 +466,12 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        assert self.tokenizer_path or self.path
-        try:
-            if self.verbose:
-                self.logger.info(f'Used tokenizer_path: {self.tokenizer_path}')
-            tokenizer_path = (self.tokenizer_path
-                              if self.tokenizer_path else self.path)
-            try:
-                if self.verbose:
-                    self.logger.info(
-                        f'Start load tiktoken encoding: {tokenizer_path}')
-                enc = self.tiktoken.encoding_for_model(tokenizer_path)
-                if self.verbose:
-                    self.logger.info(
-                        f'Successfully tiktoken encoding: {tokenizer_path}')
-                return len(enc.encode(prompt, disallowed_special=()))
-            except Exception as e:
-                self.logger.warn(f'{e}, tiktoken encoding cannot load '
-                                 f'{tokenizer_path}')
-                from transformers import AutoTokenizer
-
-                if self.hf_tokenizer is None:
-                    if self.verbose:
-                        self.logger.info(
-                            f'Start load hf tokenizer: {tokenizer_path}')
-                    self.hf_tokenizer = AutoTokenizer.from_pretrained(
-                        tokenizer_path, trust_remote_code=True)
-                    self.logger.info(
-                        f'Successfully load HF Tokenizer from {tokenizer_path}'
-                    )
-                return len(self.hf_tokenizer(prompt).input_ids)
-        except Exception:
-            self.logger.warn(
-                'Can not get tokenizer automatically, '
-                'will use default tokenizer gpt-4 for length calculation.')
-            default_tokenizer = 'gpt-4'
-
-            enc = self.tiktoken.encoding_for_model(default_tokenizer)
-            if self.verbose:
-                self.logger.info(
-                    f'Successfully load default tiktoken tokenizer: '
-                    f' {default_tokenizer}')
-            return len(enc.encode(prompt, disallowed_special=()))
+        if self.tokenizer_type == 'tiktoken':
+            return len(self.tokenizer.encode(prompt, disallowed_special=()))
+        elif self.tokenizer_type == 'hf':
+            return len(self.tokenizer(prompt).input_ids)
+        else:
+            raise RuntimeError('No tokenizer to get token length.')
 
     def _bin_trim(self, prompt: str, num_token: int, mode: str) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.
@@ -626,7 +627,7 @@ class OpenAISDK(OpenAI):
         query_per_second: int = 1,
         rpm_verbose: bool = False,
         retry: int = 2,
-        key: str | List[str] = 'ENV',
+        key: str = 'ENV',
         org: str | List[str] | None = None,
         meta_template: Dict | None = None,
         openai_api_base: str | List[str] = OPENAISDK_API_BASE,
@@ -668,8 +669,6 @@ class OpenAISDK(OpenAI):
             verbose=verbose,
             max_workers=max_workers,
         )
-        from openai import OpenAI, AzureOpenAI
-
         # support multiple api_base for acceleration
         if isinstance(openai_api_base, List):
             self.openai_api_base = random.choice(openai_api_base)
@@ -679,31 +678,10 @@ class OpenAISDK(OpenAI):
         self.azure_endpoint = azure_endpoint
         self.azure_api_version = azure_api_version
 
-        if self.proxy_url or http_client_cfg:
-            if self.proxy_url:
-                http_client_cfg['proxies'] = {
-                    'http://': self.proxy_url,
-                    'https://': self.proxy_url,
-                }
-
-        # Initialize OpenAI client with appropriate authentication
-        if azure_endpoint:
-            self.openai_client = AzureOpenAI(
-                azure_endpoint=self.azure_endpoint,
-                api_key=key if not self.azure_credential else None,
-                api_version=self.azure_api_version,
-                azure_ad_token_provider = get_bearer_token_provider(DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default") if self.azure_credential else None,
-                http_client=httpx.Client(
-                    **http_client_cfg) if http_client_cfg else None,
-            )
-        else:
-            self.openai_client = OpenAI(
-                base_url=self.openai_api_base,
-                api_key=key,
-                http_client=httpx.Client(
-                    **http_client_cfg) if http_client_cfg else None,
-            )
         self.timeout = timeout
+        self.http_client_cfg = http_client_cfg
+        self.openai_client = self._create_fresh_client()
+
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
         self.status_code_mappings = status_code_mappings
@@ -717,6 +695,43 @@ class OpenAISDK(OpenAI):
                 f'Invalid reasoning_effort: {reasoning_effort}. '
                 f'Must be one of {self.VALID_REASONING_EFFORTS}')
         self.reasoning_effort = reasoning_effort
+
+    def _create_fresh_client(self):
+        """Create a fresh OpenAI client."""
+        import httpx
+        from openai import OpenAI, AzureOpenAI
+
+        # Get current key (with key rotation)
+        current_key = self._next_valid_key()
+
+        # Create fresh client with current key
+        http_client_cfg = self.http_client_cfg.copy()
+        if self.proxy_url:
+            http_client_cfg['proxies'] = {
+                'http://': self.proxy_url,
+                'https://': self.proxy_url,
+            }
+        limits = httpx.Limits(max_keepalive_connections=2048,
+                              max_connections=4096)
+        http_client = httpx.Client(**http_client_cfg,
+                                   timeout=httpx.Timeout(self.timeout),
+                                   limits=limits)
+
+        # Initialize OpenAI client with appropriate authentication
+        if self.azure_endpoint:
+            return AzureOpenAI(
+                azure_endpoint=self.azure_endpoint,
+                api_key=key if not self.azure_credential else None,
+                api_version=self.azure_api_version,
+                azure_ad_token_provider = get_bearer_token_provider(DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default") if self.azure_credential else None,
+                http_client=http_client,
+            )
+        else:
+            return OpenAI(
+                base_url=self.openai_api_base,
+                api_key=current_key,
+                http_client=http_client,
+            )
 
     def _generate(
         self,
@@ -746,7 +761,6 @@ class OpenAISDK(OpenAI):
 
         num_retries = 0
         while num_retries < self.retry:
-            self.wait()
             if any(model in self.path for model in OAI_REASONING_MODEL_LIST):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
@@ -773,6 +787,7 @@ class OpenAISDK(OpenAI):
             if self.openai_extra_kwargs:
                 query_data.update(self.openai_extra_kwargs)
 
+            self.acquire()
             try:
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
@@ -865,6 +880,8 @@ class OpenAISDK(OpenAI):
             except Exception as e:
                 self.logger.error(f'error occurs at {self.openai_api_base}')
                 self.logger.error(e)
+            finally:
+                self.release()
             num_retries += 1
         raise RuntimeError('Calling OpenAI API failed after retrying for '
                            f'{self.retry} times. Check the logs for details.')
@@ -1020,6 +1037,7 @@ class OpenAISDKRollout(OpenAI):
             if self.openai_extra_kwargs:
                 query_data.update(self.openai_extra_kwargs)
 
+            self.acquire()
             try:
                 # Update API key with fresh Azure token if using Azure identity
                 if self.use_azure_identity:
@@ -1153,6 +1171,8 @@ class OpenAISDKRollout(OpenAI):
             except Exception as e:
                 self.logger.error(f'error occurs at {self.openai_api_base}')
                 self.logger.error(e)
+            finally:
+                self.release()
             num_retries += 1
         raise RuntimeError('Calling OpenAI API failed after retrying for '
                            f'{self.retry} times. Check the logs for details.')

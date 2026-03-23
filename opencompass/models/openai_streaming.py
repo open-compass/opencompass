@@ -1,6 +1,5 @@
 import os
 import time
-from threading import Lock
 from typing import Dict, List, Optional, Union
 
 from opencompass.registry import MODELS
@@ -35,7 +34,7 @@ class OpenAISDKStreaming(OpenAISDK):
                  query_per_second: int = 1,
                  rpm_verbose: bool = False,
                  retry: int = 2,
-                 key: str | List[str] = 'ENV',
+                 key: str = 'ENV',
                  org: str | List[str] | None = None,
                  meta_template: Dict | None = None,
                  openai_api_base: str | List[str] = OPENAISDK_API_BASE,
@@ -59,7 +58,6 @@ class OpenAISDKStreaming(OpenAISDK):
                  finish_reason_confirm: bool = True,
                  max_workers: Optional[int] = None,
                  reasoning_effort: Optional[str] = None):
-
         super().__init__(
             path=path,
             max_seq_len=max_seq_len,
@@ -83,70 +81,15 @@ class OpenAISDKStreaming(OpenAISDK):
             http_client_cfg=http_client_cfg,
             status_code_mappings=status_code_mappings,
             think_tag=think_tag,
+            openai_extra_kwargs=openai_extra_kwargs,
             max_workers=max_workers,
             reasoning_effort=reasoning_effort,
         )
 
         self.stream = stream
         self.stream_chunk_size = stream_chunk_size
-        self.openai_extra_kwargs = openai_extra_kwargs
         self.timeout = timeout
         self.finish_reason_confirm = finish_reason_confirm
-
-    def _create_fresh_client(self):
-        """Create a fresh OpenAI client for each request to avoid
-        concurrency issues."""
-        import httpx
-        from openai import OpenAI, AzureOpenAI
-        from azure.identity import DefaultAzureCredential, get_bearer_token_provider
-
-        # Get current key (with key rotation)
-        if self.azure_credential:
-            token = self.azure_credential.get_token(
-                'https://cognitiveservices.azure.com/.default')
-            current_key = token.token
-        else:
-            with Lock():
-                if len(self.invalid_keys) == len(self.keys):
-                    raise RuntimeError('All keys have insufficient quota.')
-
-                # find the next valid key
-                while True:
-                    self.key_ctr += 1
-                    if self.key_ctr == len(self.keys):
-                        self.key_ctr = 0
-
-                    if self.keys[self.key_ctr] not in self.invalid_keys:
-                        break
-
-                current_key = self.keys[self.key_ctr]
-
-        # Create fresh client with current key
-        http_client_cfg = {}
-        if self.proxy_url:
-            http_client_cfg['proxies'] = {
-                'http://': self.proxy_url,
-                'https://': self.proxy_url,
-            }
-
-        if self.azure_endpoint:
-            return AzureOpenAI(
-                azure_endpoint=self.azure_endpoint,
-                api_key=current_key if not self.azure_credential else None,
-                api_version=self.azure_api_version,
-                azure_ad_token_provider=get_bearer_token_provider(DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default") if self.azure_credential else None,
-                http_client=httpx.Client(**http_client_cfg,
-                                         timeout=httpx.Timeout(self.timeout))
-                if http_client_cfg or True else None,
-            )
-        else:
-            return OpenAI(
-                base_url=self.openai_api_base,
-                api_key=current_key,
-                http_client=httpx.Client(**http_client_cfg,
-                                        timeout=httpx.Timeout(self.timeout))
-                if http_client_cfg or True else None,
-            )
 
     def _generate(
         self,
@@ -170,7 +113,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
         from openai import APIStatusError, BadRequestError
 
-        assert isinstance(input, (str, PromptList))
+        assert isinstance(input, (str, list, PromptList))
 
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,
@@ -178,8 +121,6 @@ class OpenAISDKStreaming(OpenAISDK):
 
         num_retries = 0
         while num_retries < self.retry:
-            self.wait()
-
             if any(model in self.path for model in O1_MODEL_LIST):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
@@ -209,6 +150,7 @@ class OpenAISDKStreaming(OpenAISDK):
             if self.openai_extra_kwargs:
                 query_data.update(self.openai_extra_kwargs)
 
+            self.acquire()
             try:
                 if self.verbose:
                     thread_id = threading.get_ident()
@@ -217,21 +159,12 @@ class OpenAISDKStreaming(OpenAISDK):
                         f'with streaming enabled')
 
                 if self.stream:
-                    # Create fresh client for each request to avoid
-                    # concurrency issues
-                    fresh_client = self._create_fresh_client()
-
                     # Handle streaming response with shorter timeout
-                    response_stream = fresh_client.chat.completions.create(
+                    stream = self.openai_client.chat.completions.create(
                         **query_data, timeout=self.timeout)
 
                     result = self._handle_stream_response(
-                        response_stream, thread_id if self.verbose else None)
-
-                    # Clean up the client
-                    if (hasattr(fresh_client, '_client')
-                            and hasattr(fresh_client._client, 'close')):
-                        fresh_client._client.close()
+                        stream, thread_id if self.verbose else None)
 
                     return result
                 else:
@@ -261,6 +194,8 @@ class OpenAISDKStreaming(OpenAISDK):
                 import traceback
                 self.logger.error(f'[Thread {thread_id}] Traceback: '
                                   f'{traceback.format_exc()}')
+            finally:
+                self.release()
             num_retries += 1
 
         raise RuntimeError('Calling OpenAI API failed after retrying for '

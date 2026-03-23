@@ -6,9 +6,9 @@ import os
 import os.path as osp
 import re
 import time
+from pathlib import Path
 from typing import List, Optional
 
-import mmengine
 import torch
 from tqdm import tqdm
 
@@ -118,17 +118,12 @@ class GenInferencer(BaseInferencer):
         # Create tmp json file for saving intermediate results and future
         # resuming
         index = 0
-        tmp_json_filepath = os.path.join(output_json_filepath,
-                                         'tmp_' + output_json_filename)
-        if osp.exists(tmp_json_filepath):
-            # TODO: move resume to output handler
-            try:
-                tmp_result_dict = mmengine.load(tmp_json_filepath)
-            except Exception:
-                pass
-            else:
-                output_handler.results_dict = tmp_result_dict
-                index = len(tmp_result_dict)
+        tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
+            '.jsonl').name
+        tmp_jsonl_filepath = Path(output_json_filepath) / tmp_jsonl_filename
+        tmp_result_dict = output_handler.restore_from_jsonl(
+            output_json_filepath, tmp_jsonl_filename)
+        index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         logger.info('Starting build dataloader')
@@ -229,8 +224,8 @@ class GenInferencer(BaseInferencer):
             # 5-4. Save intermediate results
             if (self.save_every is not None and index % self.save_every == 0
                     and self.is_main_process):
-                output_handler.write_to_json(output_json_filepath,
-                                             'tmp_' + output_json_filename)
+                output_handler.write_to_jsonl(output_json_filepath,
+                                              tmp_jsonl_filename)
             num_sample += len(datum)
 
         end_time_stamp = time.time()
@@ -243,8 +238,8 @@ class GenInferencer(BaseInferencer):
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
                                          output_json_filename)
-            if osp.exists(tmp_json_filepath):
-                os.remove(tmp_json_filepath)
+            if osp.exists(tmp_jsonl_filepath):
+                os.remove(tmp_jsonl_filepath)
 
         if self.dump_timer and self.is_main_process:
             timer_filepath = os.path.join(output_json_filepath, 'timer',

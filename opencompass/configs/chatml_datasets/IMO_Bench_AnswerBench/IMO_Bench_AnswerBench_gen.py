@@ -2,7 +2,7 @@
 datasets = [
     dict(
         abbr='IMO-Bench-AnswerBench',
-        path='./data/imo-bench-answerbench.jsonl',
+        path='opencompass/IMO-Answer-Bench',
         evaluator=dict(
             type='llm_evaluator',
             judge_cfg=dict(),

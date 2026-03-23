@@ -1,12 +1,15 @@
 """Basic Inferencer."""
 import json
 import os
+import shutil
 from pathlib import Path
 from typing import List, Optional
 
 import numpy as np
 from mmengine.dist import is_main_process
 from torch.utils.data import DataLoader
+
+from opencompass.utils import get_logger
 
 from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
@@ -106,6 +109,45 @@ class GenInferencerOutputHandler:
 
     def __init__(self) -> None:
         self.results_dict = {}
+        self.dumped_indices = set()
+
+    def write_to_jsonl(self, save_dir: str, filename: str):
+        filename = Path(save_dir) / filename
+        with open(filename, 'a', encoding='utf-8') as json_file:
+            new_lines = []
+            for idx, result in self.results_dict.items():
+                if idx in self.dumped_indices:
+                    continue
+                new_lines.append(
+                    json.dumps({
+                        'idx': idx,
+                        **result
+                    }, ensure_ascii=False))
+                self.dumped_indices.add(idx)
+            if new_lines:
+                json_file.write('\n'.join(new_lines) + '\n')
+
+    def restore_from_jsonl(self, save_dir: str, filename: str) -> dict:
+        logger = get_logger()
+
+        path = Path(save_dir) / filename
+        if path.exists():
+            try:
+                result_dict = {}
+                for line in path.read_text().splitlines():
+                    if line.strip():
+                        item = json.loads(line)
+                        idx = item.pop('idx')
+                        result_dict[idx] = item
+            except Exception:
+                bak_file = path.with_name(path.name + '.bak')
+                shutil.move(path, bak_file)
+                logger.warning(f'Failed to load {path}, '
+                               f'move to {bak_file} to avoid error.')
+            else:
+                self.results_dict = result_dict
+                self.dumped_indices.update(result_dict.keys())
+        return self.results_dict
 
     def write_to_json(self, save_dir: str, filename: str):
         """Dump the result to a json file."""
@@ -128,6 +170,84 @@ class GenInferencerOutputHandler:
             self.results_dict[str(idx)]['res_length'] = res_length
         if input_length:
             self.results_dict[str(idx)]['all_input_length'] = input_length
+
+
+class ChatOutputHandler:
+
+    def __init__(self) -> None:
+        self.results_dict = {}
+        self.dumped_indices = set()
+
+    def write_to_jsonl(self, save_dir: str, filename: str):
+        filename = Path(save_dir) / filename
+        with open(filename, 'a', encoding='utf-8') as json_file:
+            new_lines = []
+            for idx, result in self.results_dict.items():
+                if idx in self.dumped_indices:
+                    continue
+                new_lines.append(
+                    json.dumps({
+                        'idx': idx,
+                        **result
+                    }, ensure_ascii=False))
+                self.dumped_indices.add(idx)
+            if new_lines:
+                json_file.write('\n'.join(new_lines) + '\n')
+
+    def restore_from_jsonl(self, save_dir: str, filename: str) -> dict:
+        logger = get_logger()
+
+        path = Path(save_dir) / filename
+        if path.exists():
+            try:
+                result_dict = {}
+                for line in path.read_text().splitlines():
+                    if line.strip():
+                        item = json.loads(line)
+                        idx = item.pop('idx')
+                        result_dict[idx] = item
+            except Exception:
+                bak_file = path.with_name(path.name + '.bak')
+                shutil.move(path, bak_file)
+                logger.warning(f'Failed to load {path}, '
+                               f'move to {bak_file} to avoid error.')
+            else:
+                self.results_dict = result_dict
+                self.dumped_indices.update(result_dict.keys())
+        return self.results_dict
+
+    def write_to_json(self, save_dir: str, filename: str):
+        """Dump the result to a json file."""
+        dump_results_dict(self.results_dict, Path(save_dir) / filename)
+
+    def save_results(self,
+                     origin_prompt: list,
+                     prediction: str,
+                     idx: int,
+                     gold: str = None):
+        result_dict = {}
+        if gold:
+            result_dict['gold'] = gold
+        result_dict.update({
+            'prediction': prediction,
+            'origin_prompt': origin_prompt,
+        })
+        self.results_dict[str(idx)] = result_dict
+
+    def save_multiround_results(self,
+                                origin_prompt: list,
+                                prediction: str,
+                                idx: int,
+                                gold: str = None):
+        result_dict = self.results_dict.get(str(idx), {
+            'gold': [],
+            'prediction': [],
+            'origin_prompt': [],
+        })
+        result_dict['gold'].append(gold)
+        result_dict['prediction'].append(prediction)
+        result_dict['origin_prompt'].append(origin_prompt)
+        self.results_dict[str(idx)] = result_dict
 
 
 class PPLInferencerOutputHandler:
