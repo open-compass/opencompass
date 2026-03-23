@@ -1,7 +1,8 @@
 """
 Example configuration of using Azure OpenAI models.
 
-This demonstrates how to use Azure Managed Identity authentication if API keys are not available.
+If OPENAI_API_KEY is not set, Azure Managed Identity (DefaultAzureCredential)
+is used automatically as a fallback.
 """
 
 from mmengine.config import read_base
@@ -25,7 +26,6 @@ models = [
         abbr='Azure-GPT-5.1',
         type=OpenAI,
         path='gpt-5.1',
-        use_azure_identity=True,  # Enable Azure identity authentication
         tokenizer_path='gpt-5',
         # Azure OpenAI endpoint format:
         openai_api_base='https://{resource-name}.openai.azure.com/openai/deployments/{deployment-name}/chat/completions?api-version=2024-12-01-preview',
@@ -40,10 +40,10 @@ models = [
         abbr='Azure-GPT-5.1-SDK',
         type=OpenAISDK,
         path='gpt-5.1',
-        use_azure_identity=True,  # Enable Azure identity authentication
         tokenizer_path='gpt-5',
         # Azure OpenAI endpoint format:
-        openai_api_base='https://{resource-name}.openai.azure.com/openai/v1/',
+        azure_endpoint='https://{resource-name}.openai.azure.com',
+        azure_api_version='2024-12-01-preview',
         meta_template=api_meta_template,
         query_per_second=1,
         max_out_len=2048,

@@ -39,6 +39,8 @@ class OpenAISDKStreaming(OpenAISDK):
                  org: str | List[str] | None = None,
                  meta_template: Dict | None = None,
                  openai_api_base: str | List[str] = OPENAISDK_API_BASE,
+                 azure_endpoint: Optional[str] = None,
+                 azure_api_version: Optional[str] = '2024-12-01-preview',
                  openai_proxy_url: Optional[str] = None,
                  mode: str = 'none',
                  logprobs: bool | None = False,
@@ -55,7 +57,8 @@ class OpenAISDKStreaming(OpenAISDK):
                  stream_chunk_size: int = 1,
                  timeout: int = 3600,
                  finish_reason_confirm: bool = True,
-                 max_workers: Optional[int] = None):
+                 max_workers: Optional[int] = None,
+                 reasoning_effort: Optional[str] = None):
 
         super().__init__(
             path=path,
@@ -67,6 +70,8 @@ class OpenAISDKStreaming(OpenAISDK):
             org=org,
             meta_template=meta_template,
             openai_api_base=openai_api_base,
+            azure_endpoint=azure_endpoint,
+            azure_api_version=azure_api_version,
             openai_proxy_url=openai_proxy_url,
             mode=mode,
             logprobs=logprobs,
@@ -79,6 +84,7 @@ class OpenAISDKStreaming(OpenAISDK):
             status_code_mappings=status_code_mappings,
             think_tag=think_tag,
             max_workers=max_workers,
+            reasoning_effort=reasoning_effort,
         )
 
         self.stream = stream
@@ -91,23 +97,29 @@ class OpenAISDKStreaming(OpenAISDK):
         """Create a fresh OpenAI client for each request to avoid
         concurrency issues."""
         import httpx
-        from openai import OpenAI
+        from openai import OpenAI, AzureOpenAI
+        from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
         # Get current key (with key rotation)
-        with Lock():
-            if len(self.invalid_keys) == len(self.keys):
-                raise RuntimeError('All keys have insufficient quota.')
+        if self.azure_credential:
+            token = self.azure_credential.get_token(
+                'https://cognitiveservices.azure.com/.default')
+            current_key = token.token
+        else:
+            with Lock():
+                if len(self.invalid_keys) == len(self.keys):
+                    raise RuntimeError('All keys have insufficient quota.')
 
-            # find the next valid key
-            while True:
-                self.key_ctr += 1
-                if self.key_ctr == len(self.keys):
-                    self.key_ctr = 0
+                # find the next valid key
+                while True:
+                    self.key_ctr += 1
+                    if self.key_ctr == len(self.keys):
+                        self.key_ctr = 0
 
-                if self.keys[self.key_ctr] not in self.invalid_keys:
-                    break
+                    if self.keys[self.key_ctr] not in self.invalid_keys:
+                        break
 
-            current_key = self.keys[self.key_ctr]
+                current_key = self.keys[self.key_ctr]
 
         # Create fresh client with current key
         http_client_cfg = {}
@@ -117,13 +129,24 @@ class OpenAISDKStreaming(OpenAISDK):
                 'https://': self.proxy_url,
             }
 
-        return OpenAI(
-            base_url=self.openai_api_base,
-            api_key=current_key,
-            http_client=httpx.Client(**http_client_cfg,
-                                     timeout=httpx.Timeout(self.timeout))
-            if http_client_cfg or True else None,
-        )
+        if self.azure_endpoint:
+            return AzureOpenAI(
+                azure_endpoint=self.azure_endpoint,
+                api_key=current_key if not self.azure_credential else None,
+                api_version=self.azure_api_version,
+                azure_ad_token_provider=get_bearer_token_provider(DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default") if self.azure_credential else None,
+                http_client=httpx.Client(**http_client_cfg,
+                                         timeout=httpx.Timeout(self.timeout))
+                if http_client_cfg or True else None,
+            )
+        else:
+            return OpenAI(
+                base_url=self.openai_api_base,
+                api_key=current_key,
+                http_client=httpx.Client(**http_client_cfg,
+                                        timeout=httpx.Timeout(self.timeout))
+                if http_client_cfg or True else None,
+            )
 
     def _generate(
         self,
@@ -170,6 +193,7 @@ class OpenAISDKStreaming(OpenAISDK):
                     extra_body=self.extra_body,
                     stream=self.stream,  # Enable streaming
                 )
+                query_data['reasoning_effort'] = self.reasoning_effort
             else:
                 query_data = dict(
                     model=self.path,

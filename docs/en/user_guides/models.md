@@ -86,13 +86,74 @@ models = [
         # Parameters for `OpenAI` initialization
         path='gpt-4',                            # Specify the model type
         key='YOUR_OPENAI_KEY',                   # OpenAI API Key
-        use_azure_identity=True,                 # Use Azure Managed Identity for authentication instead of OPENAI key
         max_seq_len=2048,                        # The max input number of tokens
         # Common parameters shared by various models, not specific to `OpenAI` initialization.
         abbr='GPT-4',                            # Model abbreviation used for result display.
         max_out_len=512,                         # Maximum number of generated tokens.
         batch_size=1,                            # The size of a batch during inference.
         run_cfg=dict(num_gpus=0),                # Resource requirements (no GPU needed)
+    ),
+]
+```
+
+### Authentication
+
+The `key` parameter defaults to `'ENV'`, which reads from the `OPENAI_API_KEY` environment variable.
+If `OPENAI_API_KEY` is not set, the model will attempt to fallback to
+Azure Managed Identity (`DefaultAzureCredential`) — no extra configuration is needed.
+
+You can also pass a key directly:
+
+```python
+key='sk-...',           # Explicit API key
+key='ENV',              # Read from OPENAI_API_KEY env var (default); falls back to Azure Managed Identity
+```
+
+### Azure OpenAI
+
+To use Azure OpenAI endpoints, set `azure_endpoint` and `azure_api_version` to reference your Azure resource.
+Authentication: if `OPENAI_API_KEY` is set it will be used,
+otherwise Azure Managed Identity is used as a fallback.
+
+```python
+from opencompass.models import OpenAISDK
+
+models = [
+    dict(
+        type=OpenAISDK,
+        path='gpt-4',
+        azure_endpoint='https://{resource-name}.openai.azure.com',
+        azure_api_version='2024-12-01-preview',
+        tokenizer_path='gpt-4',
+        meta_template=dict(round=[
+            dict(role='HUMAN', api_role='HUMAN'),
+            dict(role='BOT', api_role='BOT', generate=True),
+        ]),
+        query_per_second=1,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=8,
+    ),
+]
+```
+
+### Reasoning Effort
+
+For OpenAI reasoning models (o1, o3, o4, gpt-5), you can control the amount of reasoning
+with the `reasoning_effort` parameter. Valid values are `'low'`, `'medium'`, and `'high'`
+(case-insensitive). Defaults to `None` (use the model's default behavior).
+
+```python
+from opencompass.models import OpenAISDK
+
+models = [
+    dict(
+        type=OpenAISDK,
+        path='o3',
+        reasoning_effort='high',
+        openai_api_base='https://api.openai.com/v1/',
+        max_out_len=4096,
+        max_seq_len=32768,
     ),
 ]
 ```
