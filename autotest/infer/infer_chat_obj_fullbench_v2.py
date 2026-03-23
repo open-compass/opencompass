@@ -7,7 +7,7 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferConcurrentTask
 
 with read_base():
-    # Datasets
+    from autotest.infer.models import models  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.AMO_Bench.AMO_Bench_gen import \
         datasets as AMO_Bench_chatml  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.C_MHChem.C_MHChem_gen import \
@@ -64,7 +64,7 @@ with read_base():
     from opencompass.configs.datasets.gpqa.gpqa_cascade_eval_academic import \
         gpqa_datasets as CompassAcademic_gpqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.gpqa.gpqa_cascade_eval_rawprompt_gen_706039 import \
-        gpqa_datasets
+        gpqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.HLE.hle_llmverify_academic import \
         hle_datasets as CompassAcademic_hle_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.HLE.hle_llmverify_rawprompt_gen_0970dd import \
@@ -128,6 +128,8 @@ with read_base():
         srbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.supergpqa.supergpqa_cascade_rawprompt_gen_ca8345 import \
         supergpqa_datasets  # noqa: F401, E501
+
+models = models
 
 LCBCodeGeneration_v6_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
 LCBCodeGeneration_v6_datasets['abbr'] = 'lcb_code_generation_v6'

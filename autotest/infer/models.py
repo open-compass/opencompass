@@ -23,7 +23,7 @@ models = [
         max_seq_len=4096,
         query_per_second=128,
         temperature=0,
-        max_worker=128,
+        max_workers=128,
         mode='mid',
         retry=20,
         pred_postprocessor=dict(type=extract_non_reasoning_content),

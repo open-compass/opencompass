@@ -5,8 +5,6 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLInferConcurrentTask
 
 with read_base():
-    # read hf models - chat models
-    # Dataset
     from autotest.infer.models import models
     from opencompass.configs.datasets.babilong.babilong_0k_gen import \
         babiLong_0k_datasets  # noqa: F401, E501
