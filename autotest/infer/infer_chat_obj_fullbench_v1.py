@@ -1,5 +1,3 @@
-import copy
-
 from mmengine.config import read_base
 
 from opencompass.partitioners import NumWorkerPartitioner
@@ -217,22 +215,7 @@ with read_base():
 
 models = models
 
-# Add lattest LCB version
-LCBCodeGeneration_v4_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
-LCBCodeGeneration_v4_datasets['abbr'] = 'lcb_code_generation_v4'
-LCBCodeGeneration_v4_datasets['release_version'] = 'v4'
-LCBCodeGeneration_v4_datasets['eval_cfg']['evaluator'][
-    'release_version'] = 'v4'
-LCBCodeGeneration_v4_datasets = [LCBCodeGeneration_v4_datasets]
-
-LCBCodeGeneration_v5_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
-LCBCodeGeneration_v5_datasets['abbr'] = 'lcb_code_generation_v5'
-LCBCodeGeneration_v5_datasets['release_version'] = 'v5'
-LCBCodeGeneration_v5_datasets['eval_cfg']['evaluator'][
-    'release_version'] = 'v5'
-LCBCodeGeneration_v5_datasets = [LCBCodeGeneration_v5_datasets]
-
-LCBCodeGeneration_v6_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
+LCBCodeGeneration_v6_datasets = LCBCodeGeneration_dataset
 LCBCodeGeneration_v6_datasets['abbr'] = 'lcb_code_generation_v6'
 LCBCodeGeneration_v6_datasets['release_version'] = 'v6'
 LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
@@ -240,7 +223,7 @@ LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
 LCBCodeGeneration_v6_datasets = [LCBCodeGeneration_v6_datasets]
 
 CompassAcademic_LCBCodeGeneration_datasets = [
-    copy.deepcopy(CompassAcademic_LCBCodeGeneration_dataset)
+    CompassAcademic_LCBCodeGeneration_dataset
 ]
 
 cmphysbench_datasets[0]['abbr'] = cmphysbench_datasets[0]['abbr'] + '_repeat_8'
@@ -277,31 +260,28 @@ for acadatasets in compassacademic_dataset_list:
         acadataset['abbr'] = 'CompassAcademic_' + acadataset['abbr']
 
 gen_datasets = [
-    aime2024_gen_datasets,
-    bbh_gen_datasets,
+    *aime2024_gen_datasets,
+    *bbh_gen_datasets,
 ]
 
-for temp_datasets in gen_datasets:
-    for temp_dataset in temp_datasets:
-        temp_dataset['abbr'] = temp_dataset['abbr'] + '_gen'
+for temp_dataset in gen_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_gen'
 
 llmjudge_datasets = [
-    aime2024_llmjudge_datasets, aime2025_llmjudge_datasets,
-    bbh_llmjudge_datasets, cmmlu_llmjudge_datasets, drop_llmjudge_datasets,
-    hellaswag_llmjudge_datasets, korbench_llmjudge_datasets,
-    math_llmjudge_datasets, mmlu_llmjudge_datasets,
-    supergpqa_llmjudge_datasets, musr_llmjudge_datasets
+    *aime2024_llmjudge_datasets, *aime2025_llmjudge_datasets,
+    *bbh_llmjudge_datasets, *cmmlu_llmjudge_datasets, *drop_llmjudge_datasets,
+    *hellaswag_llmjudge_datasets, *korbench_llmjudge_datasets,
+    *math_llmjudge_datasets, *mmlu_llmjudge_datasets,
+    *supergpqa_llmjudge_datasets, *musr_llmjudge_datasets
 ]
 
-for temp_datasets in llmjudge_datasets:
-    for temp_dataset in temp_datasets:
-        temp_dataset['abbr'] = temp_dataset['abbr'] + '_llmjudge'
+for temp_dataset in llmjudge_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_llmjudge'
 
-cascade_datasets = [korbench_cascade_datasets, supergpqa_cascade_datasets]
+cascade_datasets = [*korbench_cascade_datasets, *supergpqa_cascade_datasets]
 
-for temp_datasets in cascade_datasets:
-    for temp_dataset in temp_datasets:
-        temp_dataset['abbr'] = temp_dataset['abbr'] + '_cascade'
+for temp_dataset in cascade_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_cascade'
 
 for temp_dataset in arc_prize_public_evaluation_872059_datasets:
     temp_dataset['abbr'] = temp_dataset['abbr'] + '_872059'

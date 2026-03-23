@@ -8,24 +8,6 @@ from opencompass.tasks import OpenICLInferConcurrentTask
 
 with read_base():
     from autotest.infer.models import models  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.AMO_Bench.AMO_Bench_gen import \
-        datasets as AMO_Bench_chatml  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.C_MHChem.C_MHChem_gen import \
-        datasets as C_MHChem_chatml  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.CPsyExam.CPsyExam_gen import \
-        datasets as CPsyExam_chatml  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.CS_Bench.CS_Bench_gen import \
-        datasets as CS_Bench_chatml  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.HMMT2025.HMMT2025_gen import \
-        datasets as HMMT2025_chatml  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.IMO_Bench_AnswerBench.IMO_Bench_AnswerBench_gen import \
-        datasets as IMO_Bench_AnswerBench_chatml  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.MaScQA.MaScQA_gen import \
-        datasets as MaScQA_chatml  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.UGD_hard.UGD_hard_gen import \
-        datasets as UGD_hard_chatml  # noqa: F401, E501
-    from opencompass.configs.chatml_datasets.UGPhysics.UGPhysics_gen import \
-        datasets as UGPhysics_chatml  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_rawprompt_gen_2f2c96 import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2025.aime2025_cascade_eval_rawprompt_gen_2f2c96 import \
@@ -184,11 +166,6 @@ for datasets_, num in repeated_info:
 
 datasets = sum(
     (v for k, v in locals().items() if k.endswith('_datasets')),
-    [],
-)
-
-chatml_datasets = sum(
-    (v for k, v in locals().items() if k.endswith('_chatml')),
     [],
 )
 
