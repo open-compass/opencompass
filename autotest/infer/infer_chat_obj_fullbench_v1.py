@@ -281,9 +281,9 @@ gen_datasets = [
     bbh_gen_datasets,
 ]
 
-for m in gen_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_gen'
+for temp_datasets in gen_datasets:
+    for temp_dataset in temp_datasets:
+        temp_dataset['abbr'] = temp_dataset['abbr'] + '_gen'
 
 llmjudge_datasets = [
     aime2024_llmjudge_datasets, aime2025_llmjudge_datasets,
@@ -293,63 +293,51 @@ llmjudge_datasets = [
     supergpqa_llmjudge_datasets, musr_llmjudge_datasets
 ]
 
-for m in llmjudge_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_llmjudge'
-
-for m in arc_prize_public_evaluation_872059_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_872059'
-
-for m in bigcodebench_hard_complete_faf748_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_faf748'
-
-for m in bigcodebench_hard_instruct_8815eb_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_8815eb'
-
-for m in cmo_fib_ace24b_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_ace24b'
-
-for m in GaokaoBench_d16acb_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_d16acb'
-
-for m in gsm8k_17d799_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_17d799'
-
-for m in kcle_fix_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_fix'
-
-for m in mathbench_50a320_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_50a320'
-
-for m in gpqa_simple_evals_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_simple_evals'
-
-for m in mmlu_pro_cot_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_cot'
-
-for m in triviaqa_c87d61_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_c87d61'
-
-for m in math_0shot_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_0shot'
+for temp_datasets in llmjudge_datasets:
+    for temp_dataset in temp_datasets:
+        temp_dataset['abbr'] = temp_dataset['abbr'] + '_llmjudge'
 
 cascade_datasets = [korbench_cascade_datasets, supergpqa_cascade_datasets]
 
-for m in cascade_datasets:
-    for n in m:
-        n['abbr'] = n['abbr'] + '_cascade'
+for temp_datasets in cascade_datasets:
+    for temp_dataset in temp_datasets:
+        temp_dataset['abbr'] = temp_dataset['abbr'] + '_cascade'
+
+for temp_dataset in arc_prize_public_evaluation_872059_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_872059'
+
+for temp_dataset in bigcodebench_hard_complete_faf748_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_faf748'
+
+for temp_dataset in bigcodebench_hard_instruct_8815eb_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_8815eb'
+
+for temp_dataset in cmo_fib_ace24b_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_ace24b'
+
+for temp_dataset in GaokaoBench_d16acb_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_d16acb'
+
+for temp_dataset in gsm8k_17d799_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_17d799'
+
+for temp_dataset in kcle_fix_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_fix'
+
+for temp_dataset in mathbench_50a320_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_50a320'
+
+for temp_dataset in gpqa_simple_evals_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_simple_evals'
+
+for temp_dataset in mmlu_pro_cot_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_cot'
+
+for temp_dataset in triviaqa_c87d61_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_c87d61'
+
+for temp_dataset in math_0shot_datasets:
+    temp_dataset['abbr'] = temp_dataset['abbr'] + '_0shot'
 
 datasets = sum(
     (v for k, v in locals().items()
