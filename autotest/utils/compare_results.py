@@ -1,7 +1,37 @@
 import filecmp
+import json
 import os
 
 import fire
+
+
+def _canonicalize(obj):
+    """Normalize JSON-like structures for equality.
+
+    - dict: key order ignored (sorted by key).
+    - list: element order ignored when elements are mutually sortable after
+      canonicalization; otherwise order is preserved.
+    """
+    if isinstance(obj, dict):
+        return tuple(sorted((k, _canonicalize(v)) for k, v in obj.items()))
+    if isinstance(obj, list):
+        elems = [_canonicalize(x) for x in obj]
+        try:
+            return tuple(sorted(elems))
+        except TypeError:
+            return tuple(elems)
+    return obj
+
+
+def _json_files_semantically_equal(path1, path2):
+    with open(path1, encoding='utf-8') as f1, open(path2, encoding='utf-8') as f2:
+        left = json.load(f1)
+        right = json.load(f2)
+    return _canonicalize(left) == _canonicalize(right)
+
+
+def _is_json_file(name):
+    return name.lower().endswith('.json')
 
 
 def compare_results(folder1,
@@ -68,8 +98,16 @@ def compare_folders(folder1, folder2, results_ignore_list=None):
                 diff_files.append((rel_path, 'File missing in second folder'))
                 continue
 
-            # Compare file content (shallow=False for content comparison)
-            if not filecmp.cmp(os.path.join(root, file), file2, shallow=False):
+            path1 = os.path.join(root, file)
+            if _is_json_file(file):
+                try:
+                    same = _json_files_semantically_equal(path1, file2)
+                except json.JSONDecodeError as e:
+                    diff_files.append((rel_path, f'Invalid JSON: {e}'))
+                    continue
+                if not same:
+                    diff_files.append((rel_path, 'JSON content differs (semantic)'))
+            elif not filecmp.cmp(path1, file2, shallow=False):
                 diff_files.append((rel_path, 'Content differs'))
 
     # Check for files in folder2 that don't exist in folder1
