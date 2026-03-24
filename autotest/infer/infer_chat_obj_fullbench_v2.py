@@ -1,7 +1,6 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import infer  # noqa: F401, E501
     from autotest.infer.config import \
         raw_template_models as models  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_rawprompt_gen_2f2c96 import \
