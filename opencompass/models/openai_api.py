@@ -586,13 +586,29 @@ class OpenAI(BaseAPIModel):
                     if mode != 'none':
                         input_content = bin_trim_wrapper(input_content)
                     processed_prompts.append(input_content)
-                    msg = {'content': input_content}
+                    msg = {}
                     if item['role'] == 'HUMAN':
                         msg['role'] = 'user'
                     elif item['role'] == 'BOT':
                         msg['role'] = 'assistant'
                     elif item['role'] == 'SYSTEM':
                         msg['role'] = 'system'
+                    # Build multi-part content when images are present
+                    images = [
+                        img for img in item.get('image', []) if img
+                    ]
+                    if images:
+                        content_parts = [
+                            {'type': 'text', 'text': input_content}
+                        ]
+                        for img_url in images:
+                            content_parts.append({
+                                'type': 'image_url',
+                                'image_url': {'url': img_url},
+                            })
+                        msg['content'] = content_parts
+                    else:
+                        msg['content'] = input_content
                     messages.append(msg)
                 input_len = sum(
                     get_token_len_func(prompt) for prompt in processed_prompts)
