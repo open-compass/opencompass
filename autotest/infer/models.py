@@ -9,7 +9,7 @@ api_meta_template = dict(round=[
     dict(role='SYSTEM', api_role='SYSTEM'),
     dict(role='HUMAN', api_role='HUMAN'),
     dict(role='BOT', api_role='BOT', generate=True),
-]),
+])
 
 models = [
     dict(
