@@ -58,6 +58,7 @@ raw_template_models = [
             },
         ],
         temperature=0,
+        batch_size=1024,
         max_workers=1024,
         mode='mid',
         retry=20,
