@@ -7,9 +7,6 @@ with read_base():
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2025.aime2025_cascade_eval_rawprompt_gen_2f2c96 import \
         aime2025_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.aime2025.aime2025_llmjudge_academic import \
-        aime2025_datasets as \
-        CompassAcademic_aime2025_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2026.aime2026_cascade_eval_rawprompt_gen_0970dd import \
         aime2026_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.atlas.atlas_val_rawprompt_gen_277bee import \
@@ -38,12 +35,8 @@ with read_base():
         cmphysbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.Earth_Silver.Earth_Silver_llmjudge_rawprompt_gen_a84bc6 import \
         earth_silver_mcq_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.gpqa.gpqa_cascade_eval_academic import \
-        gpqa_datasets as CompassAcademic_gpqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.gpqa.gpqa_cascade_eval_rawprompt_gen_706039 import \
         gpqa_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.HLE.hle_llmverify_academic import \
-        hle_datasets as CompassAcademic_hle_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.HLE.hle_llmverify_rawprompt_gen_0970dd import \
         hle_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.hmmt2026.hmmt2026_cascade_eval_rawprompt_gen_0970dd import \
@@ -60,9 +53,6 @@ with read_base():
         korbench_0shot_single_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.livecodebench.livecodebench_rawprompt_gen_c09673 import \
         LCBCodeGeneration_dataset  # noqa: F401, E501
-    from opencompass.configs.datasets.livecodebench.livecodebench_v6_academic import \
-        LCBCodeGeneration_dataset as \
-        CompassAcademic_LCBCodeGeneration_dataset  # noqa: F401, E501
     from opencompass.configs.datasets.livecodebench_pro.livecodebench_pro_rawprompt_gen import \
         lcb_pro_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.livemathbench.livemathbench_hard_custom_cascade_eval_rawprompt_gen_e1ce64 import \
@@ -115,23 +105,7 @@ LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
     'release_version'] = 'v6'
 LCBCodeGeneration_v6_datasets = [LCBCodeGeneration_v6_datasets]
 
-CompassAcademic_LCBCodeGeneration_datasets = [
-    CompassAcademic_LCBCodeGeneration_dataset
-]
-
 cmphysbench_datasets[0]['abbr'] = cmphysbench_datasets[0]['abbr'] + '_repeat_8'
-
-# CompassAcademic Extended Process
-
-compassacademic_dataset_list = [
-    CompassAcademic_aime2025_datasets,
-    CompassAcademic_gpqa_datasets,
-    CompassAcademic_LCBCodeGeneration_datasets,
-    CompassAcademic_hle_datasets,
-]
-for acadatasets in compassacademic_dataset_list:
-    for acadataset in acadatasets:
-        acadataset['abbr'] = 'CompassAcademic_' + acadataset['abbr']
 
 repeated_info = [
     (math_datasets, 4),
