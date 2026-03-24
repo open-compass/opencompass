@@ -1,11 +1,8 @@
 from mmengine.config import read_base
 
-from opencompass.partitioners import NumWorkerPartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLInferConcurrentTask
-
 with read_base():
-    from autotest.infer.models import models  # noqa: F401, E501
+    from autotest.infer.config import infer  # noqa: F401, E501
+    from autotest.infer.config import models  # noqa: F401, E501
     from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa_gen import \
         csimpleqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.SimpleQA.simpleqa_gen_0283c3 import \
@@ -38,13 +35,3 @@ datasets += wildbench_datasets
 
 datasets.append(mtbench101_datasets[0])  # noqa: F401, E501
 datasets.append(wildbench_datasets[0])  # noqa: F401, E501
-
-infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=64,
-        retry=0,
-        task=dict(type=OpenICLInferConcurrentTask),
-    ),
-)

@@ -1,11 +1,8 @@
 from mmengine.config import read_base
 
-from opencompass.partitioners import NumWorkerPartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLInferConcurrentTask
-
 with read_base():
-    from autotest.infer.models import models  # noqa: F401, E501
+    from autotest.infer.config import infer  # noqa: F401, E501
+    from autotest.infer.config import models  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_gen_5e9f4f import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import \
@@ -76,8 +73,6 @@ with read_base():
         ds1000_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.Earth_Silver.Earth_Silver_llmjudge_gen_46140c import \
         earth_silver_mcq_datasets  # noqa: F401, E501
-    # from opencompass.configs.datasets.eese.eese_llm_judge_gen import \
-    #    eese_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.GaokaoBench.GaokaoBench_no_subjective_gen_4c31db import \
         GaokaoBench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.GaokaoBench.GaokaoBench_no_subjective_gen_d16acb import \
@@ -329,13 +324,3 @@ datasets = sum(
 datasets += teval_en_datasets
 datasets += teval_zh_datasets
 datasets += SciCode_datasets
-
-infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=64,
-        retry=0,
-        task=dict(type=OpenICLInferConcurrentTask),
-    ),
-)

@@ -1,11 +1,7 @@
 from mmengine.config import read_base
 
-from opencompass.partitioners import NumWorkerPartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLInferConcurrentTask
-
 with read_base():
-    from autotest.infer.models import models
+    from autotest.infer.config import infer, models  # noqa: F401, E501
     from opencompass.configs.datasets.babilong.babilong_0k_gen import \
         babiLong_0k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.babilong.babilong_4k_gen import \
@@ -39,19 +35,7 @@ with read_base():
     from opencompass.configs.datasets.ruler.ruler_512k_gen import \
         ruler_datasets as ruler_512k_datasets  # noqa: F401, E501
 
-models = models
-
 datasets = sum(
     (v for k, v in locals().items() if k.endswith('_datasets')),
     [],
-)
-
-infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=64,
-        retry=0,
-        task=dict(type=OpenICLInferConcurrentTask),
-    ),
 )

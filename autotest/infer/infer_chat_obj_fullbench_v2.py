@@ -1,13 +1,9 @@
-import copy
-
 from mmengine.config import read_base
 
-from opencompass.partitioners import NumWorkerPartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLInferConcurrentTask
-
 with read_base():
-    from autotest.infer.models import models  # noqa: F401, E501
+    from autotest.infer.config import infer  # noqa: F401, E501
+    from autotest.infer.config import \
+        raw_template_models as models  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_rawprompt_gen_2f2c96 import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2025.aime2025_cascade_eval_rawprompt_gen_2f2c96 import \
@@ -113,22 +109,15 @@ with read_base():
 
 models = models
 
-LCBCodeGeneration_v6_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
+LCBCodeGeneration_v6_datasets = LCBCodeGeneration_dataset
 LCBCodeGeneration_v6_datasets['abbr'] = 'lcb_code_generation_v6'
 LCBCodeGeneration_v6_datasets['release_version'] = 'v6'
 LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
     'release_version'] = 'v6'
 LCBCodeGeneration_v6_datasets = [LCBCodeGeneration_v6_datasets]
 
-LCBCodeGeneration_v5_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
-LCBCodeGeneration_v5_datasets['abbr'] = 'lcb_code_generation_v5'
-LCBCodeGeneration_v5_datasets['release_version'] = 'v5'
-LCBCodeGeneration_v5_datasets['eval_cfg']['evaluator'][
-    'release_version'] = 'v5'
-LCBCodeGeneration_v5_datasets = [LCBCodeGeneration_v5_datasets]
-
 CompassAcademic_LCBCodeGeneration_datasets = [
-    copy.deepcopy(CompassAcademic_LCBCodeGeneration_dataset)
+    CompassAcademic_LCBCodeGeneration_dataset
 ]
 
 cmphysbench_datasets[0]['abbr'] = cmphysbench_datasets[0]['abbr'] + '_repeat_8'
@@ -167,14 +156,4 @@ for datasets_, num in repeated_info:
 datasets = sum(
     (v for k, v in locals().items() if k.endswith('_datasets')),
     [],
-)
-
-infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=64,
-        retry=0,
-        task=dict(type=OpenICLInferConcurrentTask),
-    ),
 )
