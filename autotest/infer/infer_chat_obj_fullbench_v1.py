@@ -1,7 +1,8 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import infer  # noqa: F401, E501
+    from autotest.infer.config import \
+        concurrent_infer as infer  # noqa: F401, E501
     from autotest.infer.config import models  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_gen_5e9f4f import \
         aime2024_datasets  # noqa: F401, E501
@@ -209,8 +210,6 @@ with read_base():
         triviaqa_datasets as triviaqa_c87d61_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.wikibench.wikibench_gen_0978ad import \
         wikibench_datasets  # noqa: F401, E501
-
-models = models
 
 LCBCodeGeneration_v6_datasets = LCBCodeGeneration_dataset
 LCBCodeGeneration_v6_datasets['abbr'] = 'lcb_code_generation_v6'

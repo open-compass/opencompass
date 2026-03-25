@@ -96,8 +96,6 @@ with read_base():
     from opencompass.configs.datasets.supergpqa.supergpqa_cascade_rawprompt_gen_ca8345 import \
         supergpqa_datasets  # noqa: F401, E501
 
-models = models
-
 LCBCodeGeneration_v6_datasets = LCBCodeGeneration_dataset
 LCBCodeGeneration_v6_datasets['abbr'] = 'lcb_code_generation_v6'
 LCBCodeGeneration_v6_datasets['release_version'] = 'v6'

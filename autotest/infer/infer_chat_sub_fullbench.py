@@ -1,7 +1,8 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import infer  # noqa: F401, E501
+    from autotest.infer.config import \
+        concurrent_infer as infer  # noqa: F401, E501
     from autotest.infer.config import models  # noqa: F401, E501
     from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa_gen import \
         csimpleqa_datasets  # noqa: F401, E501
@@ -21,8 +22,6 @@ with read_base():
         mtbench101_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.subjective.wildbench.wildbench_pair_judge_new import \
         wildbench_datasets  # noqa: F401, E501
-
-models = models
 
 datasets = sum(
     (v for k, v in locals().items() if k.endswith('_datasets')

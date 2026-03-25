@@ -1,7 +1,9 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import infer, models  # noqa: F401, E501
+    from autotest.infer.config import \
+        concurrent_infer as infer  # noqa: F401, E501
+    from autotest.infer.config import models  # noqa: F401, E501
     from opencompass.configs.datasets.babilong.babilong_0k_gen import \
         babiLong_0k_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.babilong.babilong_4k_gen import \

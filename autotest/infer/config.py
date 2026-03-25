@@ -1,7 +1,7 @@
 from opencompass.models import OpenAISDK
 from opencompass.partitioners import NumWorkerPartitioner
 from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLInferConcurrentTask
+from opencompass.tasks import OpenICLInferConcurrentTask, OpenICLInferTask
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
 API_BASE = 'http://localhost:23333/v1'
@@ -39,24 +39,13 @@ raw_template_models = [
         path=MODEL_PATH,
         tokenizer_path=TOKENIZER_PATH,
         rpm_verbose=True,
-        meta_template=[
-            {
-                'content': 'Extra test system prompt1.',
-                'role': 'system'
-            },
-            {
-                'content': 'Extra test system prompt2.',
-                'role': 'system'
-            },
-            {
-                'content': 'Extra test user prompt1.',
-                'role': 'user'
-            },
-            {
-                'content': 'Extra test user prompt2.',
-                'role': 'user'
-            },
-        ],
+        meta_template=[{
+            'content': 'Extra test system prompt.',
+            'role': 'system'
+        }, {
+            'content': 'Extra test user prompt.',
+            'role': 'user'
+        }],
         temperature=0,
         batch_size=1024,
         max_workers=1024,
@@ -66,7 +55,7 @@ raw_template_models = [
     )
 ]
 
-infer = dict(
+concurrent_infer = dict(
     partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
     runner=dict(
         type=LocalRunner,
@@ -74,4 +63,11 @@ infer = dict(
         retry=0,
         task=dict(type=OpenICLInferConcurrentTask),
     ),
+)
+
+common_infer = dict(
+    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
+    runner=dict(type=LocalRunner,
+                task=dict(type=OpenICLInferTask),
+                max_num_workers=128),
 )
