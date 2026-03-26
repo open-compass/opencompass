@@ -193,9 +193,17 @@ class GenInferencer(BaseInferencer):
                         input_length = self.model.get_token_len(prompt)
                     elif isinstance(prompt, list):
                         for i in range(len(prompt)):
-                            prompt[i][
-                                'input_length'] = self.model.get_token_len(
-                                    prompt[i]['prompt'])
+                            if 'prompt' in prompt[i]:
+                                prompt[i][
+                                    'input_length'] = self.model.get_token_len(
+                                        prompt[i]['prompt'])
+                            elif 'content' in prompt[i]:
+                                prompt[i][
+                                    'input_length'] = self.model.get_token_len(
+                                        prompt[i]['content'])
+                            else:
+                                logger.error(
+                                    'Cannot find prompt field in the message!')
                             input_length += prompt[i]['input_length']
 
                     pred_str = copy.deepcopy(prediction)
