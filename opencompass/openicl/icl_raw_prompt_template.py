@@ -148,4 +148,4 @@ class RawPromptTemplate:
         return self.generate_item(entry)
 
     def __repr__(self):
-        return f'RawPromptTemplate(messages={self.messages}, ice_token={self.ice_token})' # noqa
+        return f'RawPromptTemplate(messages={self.messages}, ice_token={self.ice_token})'  # noqa
