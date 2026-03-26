@@ -25,7 +25,7 @@ models = [
         temperature=0,
         max_workers=1024,
         mode='mid',
-        retry=20,
+        retry=3,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
     )
 ]
@@ -49,8 +49,9 @@ raw_template_models = [
         temperature=0,
         batch_size=1024,
         max_workers=1024,
+        query_per_second=128,
         mode='mid',
-        retry=20,
+        retry=3,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
     )
 ]
