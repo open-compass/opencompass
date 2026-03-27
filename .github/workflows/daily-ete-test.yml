@@ -17,7 +17,7 @@ on:
         required: true
         description: 'regression types'
         type: string
-        default: "['infer', 'model', 'eval', 'cmd', 'cluster']"
+        default: "['infer', 'model', 'eval', 'cmd', 'cluster', 'all']"
       baseline_result:
         required: true
         description: 'baseline result'
