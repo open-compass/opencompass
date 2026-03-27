@@ -474,7 +474,9 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
             assert 'judge_cfg' in evalcfg.keys()
             eval_cfg['judge_cfg'] = evalcfg['judge_cfg']
             if 'prompt' in evalcfg.keys():
-                eval_cfg['prompt_template']['template']['round'][0]['prompt'] = evalcfg['prompt']
+                for i in range(len(eval_cfg['prompt_template']['messages'])):
+                    if isinstance(eval_cfg['prompt_template']['messages'][i], dict) and eval_cfg['prompt_template']['messages'][i]['role'] == 'user':
+                        eval_cfg['prompt_template']['messages'][i]['content'] = evalcfg['prompt']
             return eval_cfg
 
         def init_cascade_evaluator(evalcfg, func_locals):
