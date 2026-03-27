@@ -52,7 +52,7 @@ olympiadbench_datasets = []
 for _name in categories:
     olympiadbench_infer_cfg = dict(
         prompt_template=dict(
-            type='OlympiadBenchTemplate'
+            type='OlympiadBenchRawTemplate'
         ),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer),
