@@ -1,8 +1,6 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import \
-        raw_template_models as models  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_rawprompt_gen_2f2c96 import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2025.aime2025_cascade_eval_rawprompt_gen_2f2c96 import \
@@ -75,8 +73,8 @@ with read_base():
         mol_gen_selfies_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.OlymMATH.olymmath_llmverify_rawprompt_gen_9d3a8e import \
         olymmath_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.OlympiadBench.OlympiadBench_0shot_llmverify_rawprompt_gen_be8b13 import \
-        olympiadbench_datasets  # noqa: F401, E501
+    # from opencompass.configs.datasets.OlympiadBench.OlympiadBench_0shot_llmverify_rawprompt_gen_be8b13 import \
+    #    olympiadbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.openswi.openswi_rawprompt_gen import \
         openswi_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.PHYBench.phybench_rawprompt_gen import \
@@ -127,4 +125,46 @@ for datasets_, num in repeated_info:
 datasets = sum(
     (v for k, v in locals().items() if k.endswith('_datasets')),
     [],
+)
+
+from opencompass.models import OpenAISDK
+from opencompass.partitioners import NumWorkerPartitioner
+from opencompass.runners import LocalRunner
+from opencompass.tasks import OpenICLInferTask
+from opencompass.utils.text_postprocessors import extract_non_reasoning_content
+
+API_BASE = 'http://localhost:23333/v1'
+MODEL_PATH = 'Qwen/Qwen3-8B'
+TOKENIZER_PATH = 'Qwen/Qwen3-8B'
+
+models = [
+    dict(
+        abbr='raw_template_mock_test',
+        type=OpenAISDK,
+        key='EMPTY',
+        openai_api_base=API_BASE,
+        path=MODEL_PATH,
+        tokenizer_path=TOKENIZER_PATH,
+        rpm_verbose=True,
+        meta_template=[{
+            'content': 'Extra test system prompt.',
+            'role': 'system'
+        }, {
+            'content': 'Extra test user prompt.',
+            'role': 'user'
+        }],
+        temperature=0,
+        batch_size=1024,
+        max_workers=1024,
+        mode='mid',
+        retry=20,
+        pred_postprocessor=dict(type=extract_non_reasoning_content),
+    )
+]
+
+infer = dict(
+    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
+    runner=dict(type=LocalRunner,
+                task=dict(type=OpenICLInferTask),
+                max_num_workers=128),
 )
