@@ -96,10 +96,74 @@ models = [
 ]
 ```
 
+### Authentication
+
+The `key` parameter defaults to `'ENV'`, which reads from the `OPENAI_API_KEY` environment variable.
+If `OPENAI_API_KEY` is not set, the model will attempt to fallback to
+Azure Managed Identity (`DefaultAzureCredential`) — no extra configuration is needed.
+
+You can also pass a key directly:
+
+```python
+key='sk-...',           # Explicit API key
+key='ENV',              # Read from OPENAI_API_KEY env var (default); falls back to Azure Managed Identity
+```
+
+### Azure OpenAI
+
+To use Azure OpenAI endpoints, set `azure_endpoint` and `azure_api_version` to reference your Azure resource.
+Authentication: if `OPENAI_API_KEY` is set it will be used,
+otherwise Azure Managed Identity is used as a fallback.
+
+```python
+from opencompass.models import OpenAISDK
+
+models = [
+    dict(
+        type=OpenAISDK,
+        path='gpt-4',
+        azure_endpoint='https://{resource-name}.openai.azure.com',
+        azure_api_version='2024-12-01-preview',
+        tokenizer_path='gpt-4',
+        meta_template=dict(round=[
+            dict(role='HUMAN', api_role='HUMAN'),
+            dict(role='BOT', api_role='BOT', generate=True),
+        ]),
+        query_per_second=1,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=8,
+    ),
+]
+```
+
+### Reasoning Effort
+
+For OpenAI reasoning models (o1, o3, o4, gpt-5), you can control the amount of reasoning
+with the `reasoning_effort` parameter. Valid values are `'low'`, `'medium'`, and `'high'`
+(case-insensitive). Defaults to `None` (use the model's default behavior).
+
+```python
+from opencompass.models import OpenAISDK
+
+models = [
+    dict(
+        type=OpenAISDK,
+        path='o3',
+        reasoning_effort='high',
+        openai_api_base='https://api.openai.com/v1/',
+        max_out_len=4096,
+        max_seq_len=32768,
+    ),
+]
+```
+
 We have provided several examples for API-based models. Please refer to
 
 ```bash
 configs
+├── eval_api_demo.py
+├── eval_api_azure_openai_demo.py
 ├── eval_zhipu.py
 ├── eval_xunfei.py
 └── eval_minimax.py

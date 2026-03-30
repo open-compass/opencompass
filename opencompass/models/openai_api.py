@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Union
 import httpx
 import jieba
 import requests
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from tqdm import tqdm
 
 from opencompass.registry import MODELS
@@ -44,9 +45,10 @@ class OpenAI(BaseAPIModel):
         retry (int): Number of retires if the API call fails. Defaults to 2.
         key (str or List[str]): OpenAI key(s). In particular, when it
             is set to "ENV", the key will be fetched from the environment
-            variable $OPENAI_API_KEY, as how openai defaults to be. If it's a
-            list, the keys will be used in round-robin manner. Defaults to
-            'ENV'.
+            variable $OPENAI_API_KEY. If the variable is not set, Azure
+            Managed Identity (DefaultAzureCredential) will be used as a
+            fallback. If it's a list, the keys will be used in round-robin
+            manner. Defaults to 'ENV'.
         org (str or List[str], optional): OpenAI organization(s). If not
             specified, OpenAI uses the default organization bound to each API
             key. If specified, the orgs will be posted with each request in
@@ -124,6 +126,8 @@ class OpenAI(BaseAPIModel):
         self.tokenizer = None
         self.tokenizer_type = None
         self._init_tokenizer()
+        self.azure_credential = None
+        self.use_azure_identity = False
 
         if max_workers is None:
             cpu_count = os.cpu_count() or 1
@@ -131,11 +135,24 @@ class OpenAI(BaseAPIModel):
         else:
             self.max_workers = max_workers
 
+        # Resolve API keys: try explicit key, then env var, then Azure identity
         if isinstance(key, str):
             if key == 'ENV':
-                if 'OPENAI_API_KEY' not in os.environ:
-                    raise ValueError('OpenAI API key is not set.')
-                self.keys = os.getenv('OPENAI_API_KEY').split(',')
+                if 'OPENAI_API_KEY' in os.environ:
+                    self.keys = os.getenv('OPENAI_API_KEY').split(',')
+                else:
+                    self.logger.warning(
+                        'OPENAI_API_KEY is not set. Will try to use Azure Managed Identity for authentication.'
+                    )
+                    try:
+                        self.azure_credential = DefaultAzureCredential()
+                        self.use_azure_identity = self.azure_credential is not None
+                        self.keys = ['AZURE_TOKEN']  # placeholder to indicate Azure token usage
+                    except Exception as e:
+                        self.logger.warning(
+                            f'Azure Managed Identity is not available: {e}. '
+                            'OPENAI_API_KEY and managed identity are unavailable.')
+                        raise ValueError('OpenAI API key is not set and Azure Managed Identity is not provided.')
             else:
                 self.keys = [key]
         else:
@@ -162,20 +179,26 @@ class OpenAI(BaseAPIModel):
             self.proxy_url = openai_proxy_url
 
     def _next_valid_key(self):
-        with self._key_lock:
-            if len(self.invalid_keys) == len(self.keys):
-                raise RuntimeError('All keys have insufficient quota.')
+        # Get authentication token
+        if self.azure_credential:
+            token = self.azure_credential.get_token(
+                'https://cognitiveservices.azure.com/.default')
+            key = token.token
+        else:
+            with self._key_lock:
+                if len(self.invalid_keys) == len(self.keys):
+                    raise RuntimeError('All keys have insufficient quota.')
 
-            # find the next valid key
-            while True:
-                self.key_ctr += 1
-                if self.key_ctr == len(self.keys):
-                    self.key_ctr = 0
+                # find the next valid key
+                while True:
+                    self.key_ctr += 1
+                    if self.key_ctr == len(self.keys):
+                        self.key_ctr = 0
 
-                if self.keys[self.key_ctr] not in self.invalid_keys:
-                    break
+                    if self.keys[self.key_ctr] not in self.invalid_keys:
+                        break
 
-            key = self.keys[self.key_ctr]
+                key = self.keys[self.key_ctr]
         return key
 
     def generate(
@@ -563,13 +586,29 @@ class OpenAI(BaseAPIModel):
                     if mode != 'none':
                         input_content = bin_trim_wrapper(input_content)
                     processed_prompts.append(input_content)
-                    msg = {'content': input_content}
+                    msg = {}
                     if item['role'] == 'HUMAN':
                         msg['role'] = 'user'
                     elif item['role'] == 'BOT':
                         msg['role'] = 'assistant'
                     elif item['role'] == 'SYSTEM':
                         msg['role'] = 'system'
+                    # Build multi-part content when images are present
+                    images = [
+                        img for img in item.get('image', []) if img
+                    ]
+                    if images:
+                        content_parts = [
+                            {'type': 'text', 'text': input_content}
+                        ]
+                        for img_url in images:
+                            content_parts.append({
+                                'type': 'image_url',
+                                'image_url': {'url': img_url},
+                            })
+                        msg['content'] = content_parts
+                    else:
+                        msg['content'] = input_content
                     messages.append(msg)
                 input_len = sum(
                     get_token_len_func(prompt) for prompt in processed_prompts)
@@ -595,6 +634,8 @@ class OpenAI(BaseAPIModel):
 @MODELS.register_module()
 class OpenAISDK(OpenAI):
 
+    VALID_REASONING_EFFORTS = {None, 'low', 'medium', 'high'}
+
     def __init__(
         self,
         path: str = 'gpt-3.5-turbo',
@@ -606,6 +647,8 @@ class OpenAISDK(OpenAI):
         org: str | List[str] | None = None,
         meta_template: Dict | None = None,
         openai_api_base: str | List[str] = OPENAISDK_API_BASE,
+        azure_endpoint: Optional[str] = None,
+        azure_api_version: Optional[str] = '2024-12-01-preview',
         openai_proxy_url: Optional[str] = None,
         mode: str = 'none',
         logprobs: bool | None = False,
@@ -620,6 +663,7 @@ class OpenAISDK(OpenAI):
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Dict | None = None,
         timeout: int = 3600,
+        reasoning_effort: Optional[str] = None,
     ):
         super().__init__(
             path,
@@ -646,6 +690,9 @@ class OpenAISDK(OpenAI):
             self.openai_api_base = random.choice(openai_api_base)
         else:
             self.openai_api_base = openai_api_base
+        
+        self.azure_endpoint = azure_endpoint
+        self.azure_api_version = azure_api_version
 
         self.timeout = timeout
         self.http_client_cfg = http_client_cfg
@@ -657,10 +704,18 @@ class OpenAISDK(OpenAI):
         self.think_tag = think_tag
         self.openai_extra_kwargs = openai_extra_kwargs
 
+        if reasoning_effort:
+            reasoning_effort = reasoning_effort.lower()
+        if reasoning_effort not in self.VALID_REASONING_EFFORTS:
+            raise ValueError(
+                f'Invalid reasoning_effort: {reasoning_effort}. '
+                f'Must be one of {self.VALID_REASONING_EFFORTS}')
+        self.reasoning_effort = reasoning_effort
+
     def _create_fresh_client(self):
         """Create a fresh OpenAI client."""
         import httpx
-        from openai import OpenAI
+        from openai import OpenAI, AzureOpenAI
 
         # Get current key (with key rotation)
         current_key = self._next_valid_key()
@@ -678,9 +733,21 @@ class OpenAISDK(OpenAI):
                                    timeout=httpx.Timeout(self.timeout),
                                    limits=limits)
 
-        return OpenAI(base_url=self.openai_api_base,
-                      api_key=current_key,
-                      http_client=http_client)
+        # Initialize OpenAI client with appropriate authentication
+        if self.azure_endpoint:
+            return AzureOpenAI(
+                azure_endpoint=self.azure_endpoint,
+                api_key=key if not self.azure_credential else None,
+                api_version=self.azure_api_version,
+                azure_ad_token_provider = get_bearer_token_provider(DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default") if self.azure_credential else None,
+                http_client=http_client,
+            )
+        else:
+            return OpenAI(
+                base_url=self.openai_api_base,
+                api_key=current_key,
+                http_client=http_client,
+            )
 
     def _generate(
         self,
@@ -722,6 +789,7 @@ class OpenAISDK(OpenAI):
                     messages=messages,
                     extra_body=self.extra_body,
                 )
+                query_data['reasoning_effort'] = self.reasoning_effort
             else:
                 query_data = dict(
                     model=self.path,
@@ -838,6 +906,8 @@ class OpenAISDK(OpenAI):
 @MODELS.register_module()
 class OpenAISDKRollout(OpenAI):
 
+    VALID_REASONING_EFFORTS = {None, 'low', 'medium', 'high'}
+
     def __init__(
         self,
         path: str = 'gpt-3.5-turbo',
@@ -849,6 +919,8 @@ class OpenAISDKRollout(OpenAI):
         org: str | List[str] | None = None,
         meta_template: Dict | None = None,
         openai_api_base: str | List[str] = OPENAISDK_API_BASE,
+        azure_endpoint: Optional[str] = None,
+        azure_api_version: Optional[str] = '2024-12-01-preview',
         openai_proxy_url: Optional[str] = None,
         mode: str = 'none',
         logprobs: bool | None = False,
@@ -862,6 +934,7 @@ class OpenAISDKRollout(OpenAI):
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Dict | None = None,
+        reasoning_effort: Optional[str] = None,
     ):
         super().__init__(
             path,
@@ -883,7 +956,7 @@ class OpenAISDKRollout(OpenAI):
             verbose=verbose,
             max_workers=max_workers,
         )
-        from openai import OpenAI
+        from openai import OpenAI, AzureOpenAI
 
         # support multiple api_base for acceleration
         if isinstance(openai_api_base, List):
@@ -898,18 +971,31 @@ class OpenAISDKRollout(OpenAI):
                     'https://': self.proxy_url,
                 }
 
-        self.openai_client = OpenAI(
-            base_url=self.openai_api_base,
-            api_key=key,
-            http_client=httpx.Client(
-                **http_client_cfg) if http_client_cfg else None,
-        )
+        # Initialize OpenAI client with appropriate authentication
+        if azure_endpoint:
+            self.openai_client = AzureOpenAI(
+                azure_endpoint=self.azure_endpoint,
+                api_key=key if not self.azure_credential else None,
+                api_version=azure_api_version,
+                token_provider = get_bearer_token_provider(DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default") if self.azure_credential else None,
+                http_client=httpx.Client(
+                    **http_client_cfg) if http_client_cfg else None,
+            )
+        else:
+            self.openai_client = OpenAI(
+                base_url=self.openai_api_base,
+                api_key=key,
+                http_client=httpx.Client(
+                    **http_client_cfg) if http_client_cfg else None,
+            )
 
-        if self.verbose:
-            self.logger.info(f'Used openai_client: {self.openai_client}')
-        self.status_code_mappings = status_code_mappings
-        self.think_tag = think_tag
-        self.openai_extra_kwargs = openai_extra_kwargs
+        if reasoning_effort is not None:
+            reasoning_effort = reasoning_effort.lower()
+        if reasoning_effort not in self.VALID_REASONING_EFFORTS:
+            raise ValueError(
+                f'Invalid reasoning_effort: {reasoning_effort}. '
+                f'Must be one of {self.VALID_REASONING_EFFORTS}')
+        self.reasoning_effort = reasoning_effort
 
     def _generate(
         self,
@@ -953,6 +1039,7 @@ class OpenAISDKRollout(OpenAI):
                     messages=messages,
                     extra_body=self.extra_body,
                 )
+                query_data['reasoning_effort'] = self.reasoning_effort
             else:
                 query_data = dict(
                     model=self.path,
@@ -968,6 +1055,12 @@ class OpenAISDKRollout(OpenAI):
 
             self.acquire()
             try:
+                # Update API key with fresh Azure token if using Azure identity
+                if self.use_azure_identity:
+                    token = self.azure_credential.get_token(
+                        'https://cognitiveservices.azure.com/.default')
+                    self.openai_client.api_key = token.token
+
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
 

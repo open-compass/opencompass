@@ -99,6 +99,11 @@ class PromptList(list):
                 new_item = deepcopy(item)
                 if 'prompt' in item:
                     new_item['prompt'] = safe_format(item['prompt'], **kwargs)
+                if 'image' in item:
+                    new_item['image'] = [
+                        safe_format(img, **kwargs)
+                        for img in item['image']
+                    ]
                 new_list.append(new_item)
             else:
                 new_list.append(safe_format(item, **kwargs))
