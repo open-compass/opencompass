@@ -91,6 +91,7 @@ OpenCompass 上手路线
 
    notes/contribution_guide.md
    notes/academic.md
+   notes/rawprompttemplate.md
 
 索引与表格
 ==================
