@@ -179,22 +179,30 @@ class APITemplateParser:
                 assert all(
                     isinstance(item, dict) and 'role' in item
                     and item['role'] in {'system', 'user', 'assistant'}
-                    for item in meta_template)
+                    for item in meta_template
+                ), f'meta_template is {meta_template}, not a list of dicts'
             else:
                 assert 'round' in meta_template, 'round is required in meta' \
-                    ' template'
-                assert isinstance(meta_template['round'], list)
+                    f' template, currently is {meta_template}'
+                assert isinstance(
+                    meta_template['round'], list
+                ), f'currently round is {meta_template["round"]}, not a list'
                 keys_to_check = ['round']
 
                 if 'reserved_roles' in meta_template:
-                    assert isinstance(meta_template['reserved_roles'], list)
+                    assert isinstance(
+                        meta_template['reserved_roles'], list
+                    ), f'reserved_roles is {meta_template["reserved_roles"]}, not a list'  # noqa: E501
                     keys_to_check.append('reserved_roles')
 
                 self.roles: Dict[str,
                                  dict] = dict()  # maps role name to config
                 for meta_key in keys_to_check:
                     for item in meta_template[meta_key]:
-                        assert isinstance(item, (str, dict))
+                        assert isinstance(
+                            item,
+                            (str, dict
+                             )), f'currently item is {item}, not a str or dict'
                         if isinstance(item, dict):
                             assert item['role'] not in self.roles, \
                                 'role in meta prompt must be unique!'
