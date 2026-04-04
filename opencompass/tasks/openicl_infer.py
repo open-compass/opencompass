@@ -132,7 +132,7 @@ class OpenICLInferTask(BaseTask):
         inferencer_cfg['dump_res_length'] = self.dump_res_length
         inferencer_cfg['dump_only_message_path'] = self.dump_only_message_path
         inferencer = ICL_INFERENCERS.build(inferencer_cfg)
-
+        print(f'------------------------tpye: {type(inferencer)}')
         out_path = get_infer_output_path(
             self.model_cfg, self.dataset_cfg,
             osp.join(self.work_dir, 'predictions'))
