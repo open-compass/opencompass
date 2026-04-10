@@ -13,7 +13,9 @@ from .utils import are_same_molecular_formula, parse_natural_language_property
 _NUMERIC_TOLERANCE = 1e-6
 
 
-def _parse_json_with_duplicate_check(text: str) -> Tuple[Optional[Dict[str, Any]], bool]:
+def _parse_json_with_duplicate_check(
+    text: str,
+) -> Tuple[Optional[Dict[str, Any]], bool]:
     """Parse JSON and detect if duplicate keys exist.
 
     Returns:
@@ -60,7 +62,9 @@ def _coerce_numeric(value: Any) -> Optional[float]:
     return None
 
 
-def _parse_dict_like(data: Union[str, Dict[str, Any]]) -> Tuple[Optional[Dict[str, Any]], bool]:
+def _parse_dict_like(
+    data: Union[str, Dict[str, Any]],
+) -> Tuple[Optional[Dict[str, Any]], bool]:
     """Parse inputs that should represent dictionaries.
 
     Returns:
@@ -87,10 +91,10 @@ def _parse_dict_like(data: Union[str, Dict[str, Any]]) -> Tuple[Optional[Dict[st
         seen_keys: set = set()
         has_duplicates = False
 
-        for segment in re.split(r'[;,\n]', text):
-            if ':' not in segment:
+        for segment in re.split(r"[;,\n]", text):
+            if ":" not in segment:
                 continue
-            key, value = segment.split(':', 1)
+            key, value = segment.split(":", 1)
             key = key.strip()
             value = value.strip()
             if key:
@@ -108,7 +112,9 @@ def _parse_dict_like(data: Union[str, Dict[str, Any]]) -> Tuple[Optional[Dict[st
     return None, False
 
 
-def _normalize_count_dict(raw_dict: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], bool]:
+def _normalize_count_dict(
+    raw_dict: Dict[str, Any],
+) -> Tuple[Optional[Dict[str, Any]], bool]:
     """Normalize dictionary keys using natural language mappings.
 
     Returns:
@@ -122,7 +128,10 @@ def _normalize_count_dict(raw_dict: Dict[str, Any]) -> Tuple[Optional[Dict[str, 
         normalized_key = parse_natural_language_property(str(key)).strip()
 
         # Check for duplicate normalized keys from different raw keys
-        if normalized_key in seen_raw_keys and seen_raw_keys[normalized_key] != key:
+        if (
+            normalized_key in seen_raw_keys
+            and seen_raw_keys[normalized_key] != key
+        ):
             return None, True  # Different raw keys normalize to same key
         seen_raw_keys[normalized_key] = key
         normalized[normalized_key] = value
@@ -130,7 +139,9 @@ def _normalize_count_dict(raw_dict: Dict[str, Any]) -> Tuple[Optional[Dict[str, 
     return normalized, False
 
 
-def _values_match(target_value: Any, predicted_value: Any, property_name: str = "") -> bool:
+def _values_match(
+    target_value: Any, predicted_value: Any, property_name: str = ""
+) -> bool:
     """Compare count values with numeric tolerance and special handling for molecular formulas.
 
     Args:
@@ -139,7 +150,7 @@ def _values_match(target_value: Any, predicted_value: Any, property_name: str = 
         property_name: The normalized property name (used to detect molecular formula)
     """
     # Special handling for molecular formulas
-    if 'molecular_formula' in property_name:
+    if "molecular_formula" in property_name:
         target_str = str(target_value).strip()
         predicted_str = str(predicted_value).strip()
         # Use the normalized comparison that handles different orders and formats
@@ -173,7 +184,7 @@ def _extract_single_count_value(
 
     if isinstance(predicted, str):
         # For molecular formula properties, treat the string as the value directly
-        if 'molecular_formula' in target_key:
+        if "molecular_formula" in target_key:
             # First try to parse as dict
             parsed, has_duplicates = _parse_dict_like(predicted)
             if has_duplicates:
@@ -208,7 +219,7 @@ def _extract_single_count_value(
 
 
 def _parse_multi_count_prediction(
-    predicted: Union[str, Dict[str, Any]]
+    predicted: Union[str, Dict[str, Any]],
 ) -> Tuple[Optional[Dict[str, Any]], bool]:
     """Parse predictions for multi-count tasks into a normalized dictionary.
 
@@ -242,7 +253,7 @@ def multi_count_dict_reward(
     predicted: Union[str, int, float, Dict],
     target: Union[str, Dict],
     *,
-    return_details: bool = False
+    return_details: bool = False,
 ) -> Union[float, Dict[str, Any]]:
     """
     Reward function for both single-count and multi-count tasks.
@@ -283,28 +294,38 @@ def multi_count_dict_reward(
     """
     target_dict_raw, _ = _parse_dict_like(target)
     if target_dict_raw is None:
-        return 0.0 if not return_details else {
-            "reward": 0.0,
-            "details": {},
-            "matched": 0,
-            "total": 0,
-            "extra_predictions": {}
-        }
+        return (
+            0.0
+            if not return_details
+            else {
+                "reward": 0.0,
+                "details": {},
+                "matched": 0,
+                "total": 0,
+                "extra_predictions": {},
+            }
+        )
 
     norm_target, _ = _normalize_count_dict(target_dict_raw)
     if not norm_target:
-        return 0.0 if not return_details else {
-            "reward": 0.0,
-            "details": {},
-            "matched": 0,
-            "total": 0,
-            "extra_predictions": {}
-        }
+        return (
+            0.0
+            if not return_details
+            else {
+                "reward": 0.0,
+                "details": {},
+                "matched": 0,
+                "total": 0,
+                "extra_predictions": {},
+            }
+        )
 
     # Single-count tasks
     if len(norm_target) == 1:
         target_key, target_value = next(iter(norm_target.items()))
-        pred_value, has_pred_duplicates = _extract_single_count_value(predicted, target_key)
+        pred_value, has_pred_duplicates = _extract_single_count_value(
+            predicted, target_key
+        )
 
         # Duplicate keys in prediction - return 0
         if has_pred_duplicates:
@@ -315,12 +336,12 @@ def multi_count_dict_reward(
                         target_key: {
                             "target": target_value,
                             "predicted": None,
-                            "match": False
+                            "match": False,
                         }
                     },
                     "matched": 0,
                     "total": 1,
-                    "extra_predictions": {}
+                    "extra_predictions": {},
                 }
             return 0.0
 
@@ -335,7 +356,7 @@ def multi_count_dict_reward(
                 target_key: {
                     "target": target_value,
                     "predicted": pred_value,
-                    "match": match
+                    "match": match,
                 }
             }
             # Capture extra predictions when dict-like input contains other keys
@@ -351,7 +372,7 @@ def multi_count_dict_reward(
                 "details": details,
                 "matched": 1 if match else 0,
                 "total": 1,
-                "extra_predictions": extra_predictions
+                "extra_predictions": extra_predictions,
             }
 
         return reward
@@ -363,11 +384,7 @@ def multi_count_dict_reward(
     if has_pred_duplicates:
         if return_details:
             details = {
-                key: {
-                    "target": value,
-                    "predicted": None,
-                    "match": False
-                }
+                key: {"target": value, "predicted": None, "match": False}
                 for key, value in norm_target.items()
             }
             return {
@@ -375,18 +392,14 @@ def multi_count_dict_reward(
                 "details": details,
                 "matched": 0,
                 "total": len(norm_target),
-                "extra_predictions": {}
+                "extra_predictions": {},
             }
         return 0.0
 
     if not norm_pred:
         if return_details:
             details = {
-                key: {
-                    "target": value,
-                    "predicted": None,
-                    "match": False
-                }
+                key: {"target": value, "predicted": None, "match": False}
                 for key, value in norm_target.items()
             }
             return {
@@ -394,7 +407,7 @@ def multi_count_dict_reward(
                 "details": details,
                 "matched": 0,
                 "total": len(norm_target),
-                "extra_predictions": {}
+                "extra_predictions": {},
             }
         return 0.0
 
@@ -403,16 +416,15 @@ def multi_count_dict_reward(
 
     for key, target_value in norm_target.items():
         predicted_value = norm_pred.get(key)
-        match = (
-            predicted_value is not None
-            and _values_match(target_value, predicted_value, key)
+        match = predicted_value is not None and _values_match(
+            target_value, predicted_value, key
         )
         if match:
             matched += 1
         details[key] = {
             "target": target_value,
             "predicted": predicted_value,
-            "match": match
+            "match": match,
         }
 
     reward = 1.0 if matched == len(norm_target) else 0.0
@@ -428,7 +440,7 @@ def multi_count_dict_reward(
             "details": details,
             "matched": matched,
             "total": len(norm_target),
-            "extra_predictions": extra_predictions
+            "extra_predictions": extra_predictions,
         }
 
     return reward
@@ -439,7 +451,7 @@ def single_count_reward(
     predicted: Union[str, int, float],
     target: Dict,
     *,
-    return_details: bool = False
+    return_details: bool = False,
 ) -> Union[float, Dict[str, Any]]:
     """
     Wrapper for single count tasks that proxies to ``multi_count_dict_reward``.
@@ -454,7 +466,5 @@ def single_count_reward(
         Union[float, Dict[str, Any]]: Binary reward or detail dictionary.
     """
     return multi_count_dict_reward(
-        predicted,
-        target,
-        return_details=return_details
+        predicted, target, return_details=return_details
     )

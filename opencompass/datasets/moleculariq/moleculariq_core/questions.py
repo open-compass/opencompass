@@ -42,8 +42,6 @@ For MULTIPLE INDEX tasks with key hints:
 For CONSTRAINT GENERATION tasks:
 - Return a JSON object with "smiles" as the key
 - Example: <answer>{"smiles": "CC(=O)CC(O)C"}</answer>""",
-
-
     "concise": """You are an expert chemist. Answer molecular property, understanding, structural analysis and molecular generation questions precisely and accurately.
 
 CRITICAL: Only content within <answer></answer> tags will be extracted. ALWAYS return JSON format.
@@ -75,7 +73,7 @@ Multiple properties (keys from question: "ring_count", "halogen_indices"):
 Constraint generation:
 <answer>{"smiles": "CC(O)C"}</answer>
 
-Include ALL requested properties. Never null or omit."""
+Include ALL requested properties. Never null or omit.""",
 }
 
 TASKS = {
@@ -118,8 +116,8 @@ TASKS = {
             "Output any valid molecule honoring {constraint}.",
             "Provide one SMILES for a molecule achieving {constraint}.",
             "Yield a chemical species consistent with {constraint}.",
-            "Come up with a compound that matches {constraint}."
-        ]
+            "Come up with a compound that matches {constraint}.",
+        ],
     },
     "single_count": {
         "task_name": "single_count",
@@ -159,8 +157,8 @@ TASKS = {
             "Quantify the {count_type} present in {smiles}.",
             "Give the exact count of {count_type} in {smiles}.",
             "Determine and output the number of {count_type} in {smiles}.",
-            "Return a tally of {count_type} in the compound {smiles}."
-        ]
+            "Return a tally of {count_type} in the compound {smiles}.",
+        ],
     },
     "multi_count": {
         "task_name": "multi_count",
@@ -201,8 +199,8 @@ TASKS = {
             "Determine and return how many of each {count_types} are in compound {smiles}.",
             "Summarize the counts for {count_types} detected in {smiles}.",
             "Produce the counts for all requested features {count_types} in {smiles}.",
-            "Calculate the count for each item in {count_types} for {smiles}."
-        ]
+            "Calculate the count for each item in {count_types} for {smiles}.",
+        ],
     },
     "single_index_identification": {
         "task_name": "single_index_identification",
@@ -243,8 +241,8 @@ TASKS = {
             "Extract the indices associated with {index_type} in {smiles}.",
             "Identify and return indices for {index_type} across {smiles}.",
             "Point out which atom indices represent {index_type} for {smiles}.",
-            "Provide all indices referring to {index_type} in {smiles}."
-        ]
+            "Provide all indices referring to {index_type} in {smiles}.",
+        ],
     },
     "multi_index_identification": {
         "task_name": "multi_index_identification",
@@ -285,7 +283,7 @@ TASKS = {
             "Locate indices matching {index_types} across the structure {smiles}.",
             "Provide the index sets for {index_types} present in {smiles}.",
             "List the indices for each of {index_types} in {smiles}.",
-            "Return atom positions (indices) for all {index_types} in {smiles}."
-        ]
-    }
+            "Return atom positions (indices) for all {index_types} in {smiles}.",
+        ],
+    },
 }

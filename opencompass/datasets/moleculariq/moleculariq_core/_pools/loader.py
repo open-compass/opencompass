@@ -19,12 +19,12 @@ _HIDDEN_POOLS = {"val_easy", "val_hard", "test", "validation"}
 
 class MoleculePoolHiddenError(Exception):
     """Raised when attempting to access a hidden molecule pool."""
+
     pass
 
 
 def load_molecule_pool(
-    pool_name: str,
-    cache_dir: Optional[str] = None
+    pool_name: str, cache_dir: Optional[str] = None
 ) -> List[str]:
     """
     Load a molecule pool by name.
@@ -73,7 +73,9 @@ def load_molecule_pool(
     return _load_from_huggingface(pool_name_lower, cache_dir)
 
 
-def _load_from_huggingface(pool_name: str, cache_dir: Optional[str]) -> List[str]:
+def _load_from_huggingface(
+    pool_name: str, cache_dir: Optional[str]
+) -> List[str]:
     """Load a pool from HuggingFace datasets."""
     try:
         from datasets import load_dataset
@@ -84,11 +86,7 @@ def _load_from_huggingface(pool_name: str, cache_dir: Optional[str]) -> List[str
         )
 
     # The train pool is uploaded as a single dataset (default "train" split)
-    dataset = load_dataset(
-        _HF_DATASET_ID,
-        split="train",
-        cache_dir=cache_dir
-    )
+    dataset = load_dataset(_HF_DATASET_ID, split="train", cache_dir=cache_dir)
 
     return list(dataset["smiles"])
 

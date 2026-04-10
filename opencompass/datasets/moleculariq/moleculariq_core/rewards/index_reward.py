@@ -20,15 +20,15 @@ def parse_indices_string(s: str) -> Optional[List[int]]:
     Returns:
         List of integer indices, or None if invalid format
     """
-    if not s or s.lower() in ['none', 'empty', '[]', '()', '{}', '']:
+    if not s or s.lower() in ["none", "empty", "[]", "()", "{}", ""]:
         return []
 
     # Remove brackets
     s = s.strip()
-    if not s or s.lower() in ['none', 'empty', '[]', '()', '{}', '']:
+    if not s or s.lower() in ["none", "empty", "[]", "()", "{}", ""]:
         return []
 
-    s = re.sub(r'^\[|\]$|^\(|\)$|^\{|\}$', '', s.strip())
+    s = re.sub(r"^\[|\]$|^\(|\)$|^\{|\}$", "", s.strip())
 
     # After removing brackets, check if empty
     if not s:
@@ -36,7 +36,7 @@ def parse_indices_string(s: str) -> Optional[List[int]]:
 
     try:
         # Split and validate ALL parts are numeric
-        parts = [x.strip() for x in s.split(',') if x.strip()]
+        parts = [x.strip() for x in s.split(",") if x.strip()]
 
         if not parts:
             return []
@@ -54,7 +54,9 @@ def parse_indices_string(s: str) -> Optional[List[int]]:
         return None
 
 
-def _normalize_index_dict(raw: Dict[str, Any]) -> Optional[Dict[str, List[int]]]:
+def _normalize_index_dict(
+    raw: Dict[str, Any],
+) -> Optional[Dict[str, List[int]]]:
     """Normalize index dictionary keys.
 
     Returns None if different raw keys normalize to the same canonical key
@@ -66,10 +68,15 @@ def _normalize_index_dict(raw: Dict[str, Any]) -> Optional[Dict[str, List[int]]]
     seen_raw_keys: Dict[str, str] = {}  # normalized_key -> original raw key
 
     for key, indices in raw.items():
-        normalized_key = canonicalize_property_name(parse_natural_language(key.lower()))
+        normalized_key = canonicalize_property_name(
+            parse_natural_language(key.lower())
+        )
 
         # Check for duplicate normalized keys from different raw keys
-        if normalized_key in seen_raw_keys and seen_raw_keys[normalized_key] != key:
+        if (
+            normalized_key in seen_raw_keys
+            and seen_raw_keys[normalized_key] != key
+        ):
             return None  # Different raw keys normalize to same key
         seen_raw_keys[normalized_key] = key
 
@@ -94,7 +101,7 @@ def multi_index_identification_reward(
     predicted: Union[str, List, Dict],
     target: Union[str, Dict],
     *,
-    return_details: bool = False
+    return_details: bool = False,
 ) -> Union[float, Dict[str, Any]]:
     """
     Reward for both single-index and multi-index identification tasks.
@@ -123,38 +130,48 @@ def multi_index_identification_reward(
             target = json.loads(target)
         except (json.JSONDecodeError, ValueError):
             target_dict = {}
-            for item in target.split(';'):
-                if ':' in item:
-                    prop, indices = item.strip().split(':', 1)
+            for item in target.split(";"):
+                if ":" in item:
+                    prop, indices = item.strip().split(":", 1)
                     parsed = parse_indices_string(indices)
                     if parsed is not None:
                         target_dict[prop.strip()] = parsed
             target = target_dict
 
     if not isinstance(target, dict):
-        return 0.0 if not return_details else {
-            "reward": 0.0,
-            "details": {},
-            "matched": 0,
-            "total": 0,
-            "extra_predictions": {}
-        }
+        return (
+            0.0
+            if not return_details
+            else {
+                "reward": 0.0,
+                "details": {},
+                "matched": 0,
+                "total": 0,
+                "extra_predictions": {},
+            }
+        )
 
     normalized_target_full = _normalize_index_dict(target)
 
     # Target normalization failed (e.g., duplicates) - shouldn't happen but handle gracefully
     if normalized_target_full is None:
-        return 0.0 if not return_details else {
-            "reward": 0.0,
-            "details": {},
-            "matched": 0,
-            "total": 0,
-            "extra_predictions": {}
-        }
+        return (
+            0.0
+            if not return_details
+            else {
+                "reward": 0.0,
+                "details": {},
+                "matched": 0,
+                "total": 0,
+                "extra_predictions": {},
+            }
+        )
 
     # Check if single index task (target has exactly one key)
     if len(normalized_target_full) == 1:
-        target_key, target_indices_list = next(iter(normalized_target_full.items()))
+        target_key, target_indices_list = next(
+            iter(normalized_target_full.items())
+        )
         target_set = set(target_indices_list)
 
         # Handle single index predicted formats
@@ -183,8 +200,8 @@ def multi_index_identification_reward(
                         pred_indices = list(pred_data.values())[0]
                 except (json.JSONDecodeError, ValueError):
                     # Try semicolon format
-                    if ':' in predicted:
-                        parts = predicted.split(':', 1)
+                    if ":" in predicted:
+                        parts = predicted.split(":", 1)
                         if len(parts) == 2:
                             parsed = parse_indices_string(parts[1])
                             if parsed is not None:
@@ -196,37 +213,45 @@ def multi_index_identification_reward(
 
         # Validate and compare
         if pred_indices is None:
-            return 0.0 if not return_details else {
-                "reward": 0.0,
-                "details": {
-                    target_key: {
-                        "target": sorted(target_set),
-                        "predicted": None,
-                        "match": False
-                    }
-                },
-                "matched": 0,
-                "total": 1,
-                "extra_predictions": {}
-            }
+            return (
+                0.0
+                if not return_details
+                else {
+                    "reward": 0.0,
+                    "details": {
+                        target_key: {
+                            "target": sorted(target_set),
+                            "predicted": None,
+                            "match": False,
+                        }
+                    },
+                    "matched": 0,
+                    "total": 1,
+                    "extra_predictions": {},
+                }
+            )
 
         if isinstance(pred_indices, str):
             pred_indices = parse_indices_string(pred_indices)
 
         if not isinstance(pred_indices, list):
-            return 0.0 if not return_details else {
-                "reward": 0.0,
-                "details": {
-                    target_key: {
-                        "target": sorted(target_set),
-                        "predicted": None,
-                        "match": False
-                    }
-                },
-                "matched": 0,
-                "total": 1,
-                "extra_predictions": {}
-            }
+            return (
+                0.0
+                if not return_details
+                else {
+                    "reward": 0.0,
+                    "details": {
+                        target_key: {
+                            "target": sorted(target_set),
+                            "predicted": None,
+                            "match": False,
+                        }
+                    },
+                    "matched": 0,
+                    "total": 1,
+                    "extra_predictions": {},
+                }
+            )
 
         # Filter out invalid indices
         pred_set = set()
@@ -255,12 +280,12 @@ def multi_index_identification_reward(
                     target_key: {
                         "target": sorted(target_set),
                         "predicted": sorted(pred_set),
-                        "match": match
+                        "match": match,
                     }
                 },
                 "matched": 1 if match else 0,
                 "total": 1,
-                "extra_predictions": extra_predictions
+                "extra_predictions": extra_predictions,
             }
 
         return reward
@@ -279,9 +304,9 @@ def multi_index_identification_reward(
         except (json.JSONDecodeError, ValueError):
             # Try semicolon-separated format
             pred_dict = {}
-            for item in predicted.split(';'):
-                if ':' in item:
-                    prop, indices = item.strip().split(':', 1)
+            for item in predicted.split(";"):
+                if ":" in item:
+                    prop, indices = item.strip().split(":", 1)
                     parsed = parse_indices_string(indices)
                     if parsed is not None:
                         pred_dict[prop.strip()] = parsed
@@ -290,9 +315,11 @@ def multi_index_identification_reward(
         if return_details:
             details = {
                 key: {
-                    "target": sorted(set(indices)) if isinstance(indices, list) else [],
+                    "target": sorted(set(indices))
+                    if isinstance(indices, list)
+                    else [],
                     "predicted": None,
-                    "match": False
+                    "match": False,
                 }
                 for key, indices in target.items()
             }
@@ -301,13 +328,12 @@ def multi_index_identification_reward(
                 "details": details,
                 "matched": 0,
                 "total": len(details),
-                "extra_predictions": {}
+                "extra_predictions": {},
             }
         return 0.0
 
     norm_target = {
-        key: set(value)
-        for key, value in normalized_target_full.items()
+        key: set(value) for key, value in normalized_target_full.items()
     }
 
     # Normalize prediction - check for duplicate keys
@@ -317,9 +343,11 @@ def multi_index_identification_reward(
         if return_details:
             details = {
                 key: {
-                    "target": sorted(set(indices)) if isinstance(indices, list) else [],
+                    "target": sorted(set(indices))
+                    if isinstance(indices, list)
+                    else [],
                     "predicted": None,
-                    "match": False
+                    "match": False,
                 }
                 for key, indices in target.items()
             }
@@ -328,14 +356,11 @@ def multi_index_identification_reward(
                 "details": details,
                 "matched": 0,
                 "total": len(details),
-                "extra_predictions": {}
+                "extra_predictions": {},
             }
         return 0.0
 
-    norm_pred = {
-        key: set(value)
-        for key, value in normalized_pred.items()
-    }
+    norm_pred = {key: set(value) for key, value in normalized_pred.items()}
 
     if not norm_target:
         if return_details:
@@ -345,8 +370,9 @@ def multi_index_identification_reward(
                 "matched": 0,
                 "total": 0,
                 "extra_predictions": {
-                    key: sorted(list(value)) for key, value in norm_pred.items()
-                }
+                    key: sorted(list(value))
+                    for key, value in norm_pred.items()
+                },
             }
         return 0.0
 
@@ -360,8 +386,10 @@ def multi_index_identification_reward(
             matched += 1
         details[key] = {
             "target": sorted(list(target_set)),
-            "predicted": sorted(list(pred_set)) if pred_set is not None else None,
-            "match": match
+            "predicted": sorted(list(pred_set))
+            if pred_set is not None
+            else None,
+            "match": match,
         }
 
     reward = 1.0 if matched == len(norm_target) else 0.0
@@ -377,7 +405,7 @@ def multi_index_identification_reward(
             "details": details,
             "matched": matched,
             "total": len(norm_target),
-            "extra_predictions": extra_predictions
+            "extra_predictions": extra_predictions,
         }
 
     return reward
@@ -388,7 +416,7 @@ def single_index_reward(
     predicted: Union[str, List, Dict],
     target: Dict,
     *,
-    return_details: bool = False
+    return_details: bool = False,
 ) -> Union[float, Dict[str, Any]]:
     """
     Wrapper for single index tasks.
@@ -402,7 +430,5 @@ def single_index_reward(
         float: 1.0 if match, 0.0 otherwise
     """
     return multi_index_identification_reward(
-        predicted,
-        target,
-        return_details=return_details
+        predicted, target, return_details=return_details
     )

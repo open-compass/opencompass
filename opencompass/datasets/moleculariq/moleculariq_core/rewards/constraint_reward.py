@@ -50,13 +50,15 @@ _SOLVER = SymbolicSolver()
 _UNSUPPORTED = object()
 
 
-def _extract_smiles_prediction(predicted: Union[str, Dict[str, Any], List[Any]]) -> str:
+def _extract_smiles_prediction(
+    predicted: Union[str, Dict[str, Any], List[Any]],
+) -> str:
     """Normalize the predicted result into a SMILES string."""
 
     def _from_dict(data: Dict[str, Any]) -> Any:
         # Prefer explicit 'smiles' key (case insensitive)
         for key in data.keys():
-            if key.lower() == 'smiles':
+            if key.lower() == "smiles":
                 return data[key]
         # Fallback: if single entry, return its value
         if len(data) == 1:
@@ -65,7 +67,7 @@ def _extract_smiles_prediction(predicted: Union[str, Dict[str, Any], List[Any]])
 
     def _from_list(items: List[Any]) -> Any:
         if not items:
-            return ''
+            return ""
         if len(items) == 1:
             return items[0]
         return items
@@ -84,7 +86,7 @@ def _extract_smiles_prediction(predicted: Union[str, Dict[str, Any], List[Any]])
             return text
 
         # Try JSON object
-        if text.startswith('{') and text.endswith('}'):
+        if text.startswith("{") and text.endswith("}"):
             try:
                 parsed = json.loads(text)
                 return _extract_smiles_prediction(parsed)
@@ -93,13 +95,13 @@ def _extract_smiles_prediction(predicted: Union[str, Dict[str, Any], List[Any]])
 
         # Try "smiles: ..." pattern
         lower = text.lower()
-        if lower.startswith('smiles:'):
-            return text.split(':', 1)[1].strip()
+        if lower.startswith("smiles:"):
+            return text.split(":", 1)[1].strip()
 
         return text
 
     # Fallback to string conversion
-    return '' if current is None else str(current)
+    return "" if current is None else str(current)
 
 
 @lru_cache(maxsize=128)
@@ -139,18 +141,20 @@ def _reaction_template_count(smiles: str, template_name: str) -> int:
     if template_name in data:
         entry = data[template_name]
         if isinstance(entry, dict):
-            return entry.get('count', 0)
+            return entry.get("count", 0)
         elif isinstance(entry, (int, float)):
             return int(entry)
 
     # Try with full prefix if not already present
-    if not template_name.startswith('template_based_reaction_prediction_'):
-        full_key = f'template_based_reaction_prediction_{template_name}_count'
+    if not template_name.startswith("template_based_reaction_prediction_"):
+        full_key = f"template_based_reaction_prediction_{template_name}_count"
         if full_key in data:
             return data[full_key]
 
         # Also try success key (for constraint checking)
-        success_key = f'template_based_reaction_prediction_{template_name}_success'
+        success_key = (
+            f"template_based_reaction_prediction_{template_name}_success"
+        )
         if success_key in data:
             return data[success_key]
 
@@ -172,11 +176,11 @@ def _resolve_constraint_value(smiles: str, constraint: Dict[str, Any]) -> Any:
     # Import the mapping
     from .property_solver_mapping import (
         get_solver_mapping,
-        is_string_valued_property
+        is_string_valued_property,
     )
 
     # Get property name from either 'type' or 'property' field
-    raw_type = constraint.get('type', constraint.get('property', ''))
+    raw_type = constraint.get("type", constraint.get("property", ""))
     if not raw_type:
         return _UNSUPPORTED
 
@@ -190,7 +194,7 @@ def _resolve_constraint_value(smiles: str, constraint: Dict[str, Any]) -> Any:
 
     # Check if this is a string-valued property
     if is_string_valued_property(normalized):
-        expected = constraint.get('value')
+        expected = constraint.get("value")
         if expected is None:
             return None
 
@@ -204,7 +208,7 @@ def _resolve_constraint_value(smiles: str, constraint: Dict[str, Any]) -> Any:
                 return {
                     "kind": "string",
                     "value": actual,
-                    "expected": expected
+                    "expected": expected,
                 }
         return _UNSUPPORTED
 
@@ -215,36 +219,39 @@ def _resolve_constraint_value(smiles: str, constraint: Dict[str, Any]) -> Any:
 
         # Special handling for functional groups (they return dictionaries)
         if method_name == "get_functional_group_count_and_indices":
-            group_name = params.get('group_name')
+            group_name = params.get("group_name")
             if group_name:
                 return {
                     "kind": "numeric",
-                    "value": float(_functional_group_instances(smiles, group_name))
+                    "value": float(
+                        _functional_group_instances(smiles, group_name)
+                    ),
                 }
 
         # Special handling for reaction templates (they return dictionaries)
         if method_name == "get_reaction_counts_and_indices":
-            template_name = params.get('template_name')
+            template_name = params.get("template_name")
             if template_name:
                 # For success constraints, we need to check the success value
-                if '_success' in normalized:
+                if "_success" in normalized:
                     # Get the full success key
-                    if not template_name.startswith('template_based_reaction_prediction_'):
-                        success_key = f'template_based_reaction_prediction_{template_name}_success'
+                    if not template_name.startswith(
+                        "template_based_reaction_prediction_"
+                    ):
+                        success_key = f"template_based_reaction_prediction_{template_name}_success"
                     else:
                         success_key = template_name
 
                     data = _reaction_data(smiles)
                     value = data.get(success_key, 0)
-                    return {
-                        "kind": "numeric",
-                        "value": float(value)
-                    }
+                    return {"kind": "numeric", "value": float(value)}
                 else:
                     # For count constraints
                     return {
                         "kind": "numeric",
-                        "value": float(_reaction_template_count(smiles, template_name))
+                        "value": float(
+                            _reaction_template_count(smiles, template_name)
+                        ),
                     }
 
         # Regular numeric properties
@@ -253,10 +260,7 @@ def _resolve_constraint_value(smiles: str, constraint: Dict[str, Any]) -> Any:
             try:
                 result = method(smiles, **params)
                 if result is not None:
-                    return {
-                        "kind": "numeric",
-                        "value": float(result)
-                    }
+                    return {"kind": "numeric", "value": float(result)}
             except Exception as e:
                 # Log error but don't crash
                 print(f"Error calling {method_name} for {normalized}: {e}")
@@ -271,7 +275,7 @@ def multi_constraint_generation_reward(
     constraints: Union[str, List[Dict]],
     *,
     return_details: bool = False,
-    **kwargs
+    **kwargs,
 ) -> Union[float, Dict[str, Any]]:
     """
     Check if generated molecule satisfies multiple constraints simultaneously.
@@ -295,12 +299,11 @@ def multi_constraint_generation_reward(
         try:
             constraints = json.loads(constraints)
         except (json.JSONDecodeError, ValueError):
-            return 0.0 if not return_details else {
-                "reward": 0.0,
-                "details": [],
-                "supported": 0,
-                "total": 0
-            }
+            return (
+                0.0
+                if not return_details
+                else {"reward": 0.0, "details": [], "supported": 0, "total": 0}
+            )
 
     # Handle empty constraints
     if not constraints:
@@ -308,21 +311,25 @@ def multi_constraint_generation_reward(
             return 1.0
         # For empty constraints, still validate the SMILES
         smiles_valid = valid_smiles(predicted)
-        molecule_reasonable = is_reasonable_molecule(predicted) if smiles_valid else False
+        molecule_reasonable = (
+            is_reasonable_molecule(predicted) if smiles_valid else False
+        )
         return {
             "reward": 1.0 if (smiles_valid and molecule_reasonable) else 0.0,
             "valid_smiles": smiles_valid,
             "reasonable_molecule": molecule_reasonable,
             "details": [],
             "supported": 0,
-            "total": 0
+            "total": 0,
         }
 
     normalized_smiles = _extract_smiles_prediction(predicted)
 
     # Basic validity checks
     smiles_valid = valid_smiles(normalized_smiles)
-    molecule_reasonable = is_reasonable_molecule(normalized_smiles) if smiles_valid else False
+    molecule_reasonable = (
+        is_reasonable_molecule(normalized_smiles) if smiles_valid else False
+    )
 
     if not smiles_valid or not molecule_reasonable:
         if not return_details:
@@ -333,7 +340,7 @@ def multi_constraint_generation_reward(
             "reasonable_molecule": molecule_reasonable,
             "details": [],
             "supported": 0,
-            "total": len(constraints)
+            "total": len(constraints),
         }
 
     supported_constraints = 0
@@ -341,28 +348,34 @@ def multi_constraint_generation_reward(
 
     for constraint in constraints:
         if not isinstance(constraint, dict):
-            details.append({
-                "constraint": constraint,
-                "supported": False,
-                "satisfied": False,
-                "reason": "constraint is not a dictionary"
-            })
+            details.append(
+                {
+                    "constraint": constraint,
+                    "supported": False,
+                    "satisfied": False,
+                    "reason": "constraint is not a dictionary",
+                }
+            )
             continue
 
         result = _resolve_constraint_value(normalized_smiles, constraint)
 
         if result is _UNSUPPORTED:
-            details.append({
-                "constraint": constraint,
-                "supported": False,
-                "satisfied": False,
-                "reason": "constraint type not supported"
-            })
+            details.append(
+                {
+                    "constraint": constraint,
+                    "supported": False,
+                    "satisfied": False,
+                    "reason": "constraint type not supported",
+                }
+            )
             continue
 
         supported_constraints += 1
 
-        normalized_type = parse_natural_language_property(str(constraint.get('type', '')))
+        normalized_type = parse_natural_language_property(
+            str(constraint.get("type", ""))
+        )
 
         entry: Dict[str, Any] = {
             "constraint": constraint,
@@ -380,8 +393,14 @@ def multi_constraint_generation_reward(
                 entry["actual"] = actual_value
                 entry["expected"] = expected_value
                 # For molecular formulas, use normalized comparison
-                if normalized_type in ['molecular_formula', 'molecular_formula_count', 'molecular_formula_value']:
-                    satisfied = are_same_molecular_formula(actual_value, expected_value)
+                if normalized_type in [
+                    "molecular_formula",
+                    "molecular_formula_count",
+                    "molecular_formula_value",
+                ]:
+                    satisfied = are_same_molecular_formula(
+                        actual_value, expected_value
+                    )
                 else:
                     satisfied = actual_value == expected_value
             elif kind == "numeric":
@@ -423,7 +442,7 @@ def multi_constraint_generation_reward(
                     "reasonable_molecule": True,  # Already validated at the beginning
                     "details": details,
                     "supported": supported_constraints,
-                    "total": len(constraints)
+                    "total": len(constraints),
                 }
             return 0.0
 
@@ -437,7 +456,7 @@ def multi_constraint_generation_reward(
             "reasonable_molecule": True,  # Always True here since we passed the validity check
             "details": details,
             "supported": supported_constraints,
-            "total": len(constraints)
+            "total": len(constraints),
         }
 
     return reward
@@ -449,7 +468,7 @@ def constraint_reward(
     constraints: Union[str, List[Dict]] = None,
     *,
     return_details: bool = False,
-    **kwargs
+    **kwargs,
 ) -> Union[float, Dict[str, Any]]:
     """
     Wrapper for constraint checking - same as multi_constraint_generation_reward.
@@ -463,8 +482,5 @@ def constraint_reward(
         float: 1.0 if all constraints satisfied, 0.0 otherwise
     """
     return multi_constraint_generation_reward(
-        predicted,
-        constraints,
-        return_details=return_details,
-        **kwargs
+        predicted, constraints, return_details=return_details, **kwargs
     )

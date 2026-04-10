@@ -66,14 +66,13 @@ class MolecularIQD:
         seed: Optional[int] = None,
         enable_random_phrasing: bool = True,
         cache_properties: bool = True,
-        system_prompt_style: str = "with_key_hints"
+        system_prompt_style: str = "with_key_hints",
     ):
         self.seed = seed
         self.rng = random.Random(seed)
         self.solver = SymbolicSolver()
         self.formatter = NaturalLanguageFormatter(
-            rng=self.rng,
-            enable_random_phrasing=enable_random_phrasing
+            rng=self.rng, enable_random_phrasing=enable_random_phrasing
         )
         self.cache_properties = cache_properties
         self.system_prompt = SYSTEM_PROMPTS.get(
@@ -84,41 +83,56 @@ class MolecularIQD:
     def _get_solver_method(self, property_name: str):
         """Get the solver method for a given property name."""
         if property_name.startswith("functional_group_"):
+
             def get_functional_group_property(smiles: str) -> Any:
-                all_props = self.solver.functional_group_solver.get_counts_and_indices(smiles)
+                all_props = (
+                    self.solver.functional_group_solver.get_counts_and_indices(
+                        smiles
+                    )
+                )
                 return all_props.get(
                     property_name,
-                    0 if "_count" in property_name or "_nbrInstances" in property_name else []
+                    0
+                    if "_count" in property_name
+                    or "_nbrInstances" in property_name
+                    else [],
                 )
+
             return get_functional_group_property
 
         if property_name.startswith("template_based_reaction_prediction_"):
-            reaction_name = property_name.replace("template_based_reaction_prediction_", "")
+            reaction_name = property_name.replace(
+                "template_based_reaction_prediction_", ""
+            )
             if "_success" in reaction_name:
                 reaction_name = reaction_name.replace("_success", "")
-                return lambda smiles: self.solver.reaction_solver.predict_reaction_success(
-                    smiles, reaction_name
+                return lambda smiles: (
+                    self.solver.reaction_solver.predict_reaction_success(
+                        smiles, reaction_name
+                    )
                 )
             else:
-                return lambda smiles: self.solver.reaction_solver.predict_reaction(
-                    smiles, reaction_name
+                return lambda smiles: (
+                    self.solver.reaction_solver.predict_reaction(
+                        smiles, reaction_name
+                    )
                 )
 
         method_name = f"get_{property_name}"
         if hasattr(self.solver, method_name):
             return getattr(self.solver, method_name)
 
-        if property_name.endswith('_index'):
+        if property_name.endswith("_index"):
             method_name = f"get_{property_name}ices"
             if hasattr(self.solver, method_name):
                 return getattr(self.solver, method_name)
 
-            plural_prop = property_name.replace('_index', '_indices')
+            plural_prop = property_name.replace("_index", "_indices")
             method_name = f"get_{plural_prop}"
             if hasattr(self.solver, method_name):
                 return getattr(self.solver, method_name)
 
-        base_name = property_name.replace('_count', '').replace('_index', '')
+        base_name = property_name.replace("_count", "").replace("_index", "")
         method_name = f"get_{base_name}"
         if hasattr(self.solver, method_name):
             return getattr(self.solver, method_name)
@@ -151,7 +165,9 @@ class MolecularIQD:
 
         return result
 
-    def compute_properties(self, smiles: str, property_names: List[str]) -> Dict[str, Any]:
+    def compute_properties(
+        self, smiles: str, property_names: List[str]
+    ) -> Dict[str, Any]:
         """
         Compute multiple properties for a molecule.
 
@@ -162,14 +178,17 @@ class MolecularIQD:
         Returns:
             Dictionary mapping property names to their values
         """
-        return {prop: self.compute_property(smiles, prop) for prop in property_names}
+        return {
+            prop: self.compute_property(smiles, prop)
+            for prop in property_names
+        }
 
     def generate_count_question(
         self,
         smiles: str,
         count_properties: Union[str, List[str]],
         template: Optional[str] = None,
-        include_key_hint: bool = True
+        include_key_hint: bool = True,
     ) -> Tuple[str, Dict[str, int], Dict[str, Any]]:
         """
         Generate a count question for the given molecule.
@@ -195,7 +214,9 @@ class MolecularIQD:
         key_names = [get_alias(prop) for prop in count_properties]
 
         if template is None:
-            task_type = "single_count" if len(count_properties) == 1 else "multi_count"
+            task_type = (
+                "single_count" if len(count_properties) == 1 else "multi_count"
+            )
             template = self.rng.choice(TASKS[task_type]["question_templates"])
 
         count_types_natural = [
@@ -203,14 +224,15 @@ class MolecularIQD:
             for prop in count_properties
         ]
         count_types_str = (
-            count_types_natural[0] if len(count_types_natural) == 1
+            count_types_natural[0]
+            if len(count_types_natural) == 1
             else ", ".join(count_types_natural)
         )
 
         question = template.format(
             smiles=smiles,
             count_type=count_types_str,
-            count_types=count_types_str
+            count_types=count_types_str,
         )
 
         if include_key_hint:
@@ -223,11 +245,13 @@ class MolecularIQD:
         }
 
         metadata = {
-            "task_type": "single_count" if len(count_properties) == 1 else "multi_count",
+            "task_type": "single_count"
+            if len(count_properties) == 1
+            else "multi_count",
             "smiles": smiles,
             "properties": count_properties,
             "key_names": key_names,
-            "system_prompt": self.system_prompt
+            "system_prompt": self.system_prompt,
         }
 
         return question, ground_truth, metadata
@@ -237,7 +261,7 @@ class MolecularIQD:
         smiles: str,
         index_properties: Union[str, List[str]],
         template: Optional[str] = None,
-        include_key_hint: bool = True
+        include_key_hint: bool = True,
     ) -> Tuple[str, Dict[str, List[int]], Dict[str, Any]]:
         """
         Generate an index identification question for the given molecule.
@@ -275,14 +299,15 @@ class MolecularIQD:
             for prop in index_properties
         ]
         index_types_str = (
-            index_types_natural[0] if len(index_types_natural) == 1
+            index_types_natural[0]
+            if len(index_types_natural) == 1
             else ", ".join(index_types_natural)
         )
 
         question = template.format(
             smiles=smiles,
             index_type=index_types_str,
-            index_types=index_types_str
+            index_types=index_types_str,
         )
 
         if include_key_hint:
@@ -305,7 +330,7 @@ class MolecularIQD:
             "smiles": smiles,
             "properties": index_properties,
             "key_names": key_names,
-            "system_prompt": self.system_prompt
+            "system_prompt": self.system_prompt,
         }
 
         return question, ground_truth, metadata
@@ -314,7 +339,7 @@ class MolecularIQD:
         self,
         constraints: List[Dict[str, Any]],
         template: Optional[str] = None,
-        include_key_hint: bool = True
+        include_key_hint: bool = True,
     ) -> Tuple[str, Dict[str, Any]]:
         """
         Generate a constraint-based molecule generation question.
@@ -341,7 +366,7 @@ class MolecularIQD:
             formatted_constraint = {
                 "type": constraint.get("property", constraint.get("type", "")),
                 "operator": constraint.get("operator", "="),
-                "value": constraint.get("value")
+                "value": constraint.get("value"),
             }
             if "min_value" in constraint:
                 formatted_constraint["min_value"] = constraint["min_value"]
@@ -349,10 +374,14 @@ class MolecularIQD:
                 formatted_constraint["max_value"] = constraint["max_value"]
             formatted_constraints.append(formatted_constraint)
 
-        constraint_nl = self.formatter.format_constraints_list(formatted_constraints)
+        constraint_nl = self.formatter.format_constraints_list(
+            formatted_constraints
+        )
 
         if template is None:
-            template = self.rng.choice(TASKS["constraint_generation"]["question_templates"])
+            template = self.rng.choice(
+                TASKS["constraint_generation"]["question_templates"]
+            )
 
         question = template.format(constraint=constraint_nl)
 
@@ -364,7 +393,7 @@ class MolecularIQD:
             "task_type": "constraint_generation",
             "constraints": constraints,
             "constraint_natural_language": constraint_nl,
-            "system_prompt": self.system_prompt
+            "system_prompt": self.system_prompt,
         }
 
         return question, metadata
@@ -374,7 +403,7 @@ class MolecularIQD:
         smiles: str,
         predicted_answer: Dict[str, int],
         ground_truth: Optional[Dict[str, int]] = None,
-        return_details: bool = False
+        return_details: bool = False,
     ) -> Union[float, Dict[str, Any]]:
         """
         Validate a count answer against ground truth.
@@ -389,7 +418,9 @@ class MolecularIQD:
             Score (1.0 = correct, 0.0 = incorrect), or details dict if requested
         """
         if ground_truth is None:
-            property_names = [canonicalize_property_name(k) for k in predicted_answer.keys()]
+            property_names = [
+                canonicalize_property_name(k) for k in predicted_answer.keys()
+            ]
             ground_truth = self.compute_properties(smiles, property_names)
             ground_truth = {
                 k: ground_truth[canonicalize_property_name(k)]
@@ -405,7 +436,7 @@ class MolecularIQD:
         smiles: str,
         predicted_answer: Dict[str, List[int]],
         ground_truth: Optional[Dict[str, List[int]]] = None,
-        return_details: bool = False
+        return_details: bool = False,
     ) -> Union[float, Dict[str, Any]]:
         """
         Validate an index identification answer against ground truth.
@@ -420,7 +451,9 @@ class MolecularIQD:
             Score (1.0 = correct, 0.0 = incorrect), or details dict if requested
         """
         if ground_truth is None:
-            property_names = [canonicalize_property_name(k) for k in predicted_answer.keys()]
+            property_names = [
+                canonicalize_property_name(k) for k in predicted_answer.keys()
+            ]
             ground_truth = self.compute_properties(smiles, property_names)
             ground_truth = {
                 k: ground_truth[canonicalize_property_name(k)]
@@ -435,7 +468,7 @@ class MolecularIQD:
         self,
         predicted_smiles: str,
         constraints: List[Dict[str, Any]],
-        return_details: bool = False
+        return_details: bool = False,
     ) -> Union[float, Tuple[float, Dict[str, Any]]]:
         """
         Validate a generated molecule against constraints.
@@ -450,9 +483,7 @@ class MolecularIQD:
             or (score, details_dict) if return_details=True
         """
         return multi_constraint_generation_reward(
-            predicted_smiles,
-            constraints,
-            return_details=return_details
+            predicted_smiles, constraints, return_details=return_details
         )
 
     def generate_paired_question(
@@ -461,7 +492,7 @@ class MolecularIQD:
         count_property: str,
         template_count: Optional[str] = None,
         template_index: Optional[str] = None,
-        include_key_hint: bool = True
+        include_key_hint: bool = True,
     ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Generate paired count and index questions for the same property.
@@ -493,7 +524,7 @@ class MolecularIQD:
 
         return (
             {"question": count_q, "answer": count_a, "metadata": count_m},
-            {"question": index_q, "answer": index_a, "metadata": index_m}
+            {"question": index_q, "answer": index_a, "metadata": index_m},
         )
 
     def get_available_count_properties(self) -> List[str]:

@@ -13,19 +13,16 @@ Optionally, count tasks can return detailed per-property feedback by supplying
 from typing import Any, Dict, Union
 
 # Import main reward functions
-from .count_reward import (
-    multi_count_dict_reward,
-    single_count_reward
-)
+from .count_reward import multi_count_dict_reward, single_count_reward
 
 from .index_reward import (
     multi_index_identification_reward,
-    single_index_reward
+    single_index_reward,
 )
 
 from .constraint_reward import (
     multi_constraint_generation_reward,
-    constraint_reward
+    constraint_reward,
 )
 
 # Import utilities
@@ -33,8 +30,9 @@ from .utils import (
     valid_smiles,
     is_reasonable_molecule,
     evaluate_numeric_constraint,
-    parse_natural_language_property
+    parse_natural_language_property,
 )
+
 
 def chemical_reward(
     task_type: str,
@@ -43,7 +41,7 @@ def chemical_reward(
     constraints=None,
     *,
     return_details: bool = False,
-    **kwargs
+    **kwargs,
 ) -> Union[float, Dict[str, Any]]:
     """
     Unified dispatcher for chemical rewards based on task type.
@@ -72,83 +70,85 @@ def chemical_reward(
         for count tasks when ``return_details`` is ``True``.
     """
     # Normalize task type
-    task_type = task_type.lower().replace('-', '_')
+    task_type = task_type.lower().replace("-", "_")
 
     # Route to appropriate reward function
-    if task_type in ['single_count']:
+    if task_type in ["single_count"]:
         if target is None:
             raise ValueError("Target required for count tasks")
         return single_count_reward(
-            predicted,
-            target,
-            return_details=return_details
+            predicted, target, return_details=return_details
         )
 
-    elif task_type in ['multi_count', 'multi_count_dict', 'multiple_count', 'count']:
+    elif task_type in [
+        "multi_count",
+        "multi_count_dict",
+        "multiple_count",
+        "count",
+    ]:
         if target is None:
             raise ValueError("Target required for multi-count tasks")
         return multi_count_dict_reward(
-            predicted,
-            target,
-            return_details=return_details
+            predicted, target, return_details=return_details
         )
 
-    elif task_type in ['single_index', 'single_index_identification']:
+    elif task_type in ["single_index", "single_index_identification"]:
         if target is None:
             raise ValueError("Target required for index tasks")
         return single_index_reward(
-            predicted,
-            target,
-            return_details=return_details
+            predicted, target, return_details=return_details
         )
 
-    elif task_type in ['multi_index', 'multi_index_identification', 'multiple_index', 'index']:
+    elif task_type in [
+        "multi_index",
+        "multi_index_identification",
+        "multiple_index",
+        "index",
+    ]:
         if target is None:
             raise ValueError("Target required for multi-index tasks")
         return multi_index_identification_reward(
-            predicted,
-            target,
-            return_details=return_details
+            predicted, target, return_details=return_details
         )
 
-    elif task_type in ['constraint_generation', 'constraint', 'generation',
-                        'multi_constraint_generation', 'multi_constraint']:
+    elif task_type in [
+        "constraint_generation",
+        "constraint",
+        "generation",
+        "multi_constraint_generation",
+        "multi_constraint",
+    ]:
         # For constraint tasks, constraints can be in target or constraints param
         constraint_list = constraints if constraints is not None else target
         if constraint_list is None:
             raise ValueError("Constraints required for generation tasks")
         return multi_constraint_generation_reward(
-            predicted,
-            constraint_list,
-            return_details=return_details,
-            **kwargs
+            predicted, constraint_list, return_details=return_details, **kwargs
         )
 
     else:
-        raise ValueError(f"Unknown task type: {task_type}. Supported types: "
-                        "single_count, multi_count, single_index, multi_index, constraint_generation")
+        raise ValueError(
+            f"Unknown task type: {task_type}. Supported types: "
+            "single_count, multi_count, single_index, multi_index, constraint_generation"
+        )
 
 
 # Define what's exported
 __all__ = [
     # Main dispatcher
-    'chemical_reward',
-
+    "chemical_reward",
     # Count rewards
-    'multi_count_dict_reward',
-    'single_count_reward',
-
+    "multi_count_dict_reward",
+    "single_count_reward",
     # Index rewards
-    'multi_index_identification_reward',
-    'single_index_reward',
-
+    "multi_index_identification_reward",
+    "single_index_reward",
     # Constraint rewards
-    'multi_constraint_generation_reward',
-    'constraint_reward',
-
+    "multi_constraint_generation_reward",
+    "constraint_reward",
     # Utilities
-    'valid_smiles',
-    'is_reasonable_molecule',
-    'evaluate_numeric_constraint',
-    'parse_natural_language_property'
+    "valid_smiles",
+    "is_reasonable_molecule",
+    "evaluate_numeric_constraint",
+    "parse_natural_language_property",
 ]

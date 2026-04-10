@@ -10,6 +10,7 @@ from rdkit import Chem
 from rdkit.Chem import SanitizeMol
 from .._nlp.mappings import parse_natural_language
 
+
 def valid_smiles(smiles: str) -> bool:
     """
     Check if SMILES string is valid using RDKit.
@@ -47,7 +48,9 @@ def is_reasonable_molecule(smiles: str) -> bool:
     return valid_smiles(smiles)
 
 
-def evaluate_numeric_constraint(actual_value: float, constraint: Dict[str, Any]) -> bool:
+def evaluate_numeric_constraint(
+    actual_value: float, constraint: Dict[str, Any]
+) -> bool:
     """
     Evaluate if a numeric value satisfies a constraint.
 
@@ -61,10 +64,10 @@ def evaluate_numeric_constraint(actual_value: float, constraint: Dict[str, Any])
     Returns:
         bool: True if constraint satisfied, False otherwise
     """
-    operator = constraint.get('operator', '=')
+    operator = constraint.get("operator", "=")
 
-    if operator == '=':
-        target = constraint.get('value')
+    if operator == "=":
+        target = constraint.get("value")
         if target is None:
             return False
         # For integers, use exact comparison
@@ -73,33 +76,33 @@ def evaluate_numeric_constraint(actual_value: float, constraint: Dict[str, Any])
         # For floats, use tolerance
         return abs(actual_value - target) < 1e-6
 
-    elif operator == '>=':
-        min_val = constraint.get('min_value', constraint.get('value'))
+    elif operator == ">=":
+        min_val = constraint.get("min_value", constraint.get("value"))
         if min_val is None:
             return False
         return actual_value >= min_val
 
-    elif operator == '<=':
-        max_val = constraint.get('max_value', constraint.get('value'))
+    elif operator == "<=":
+        max_val = constraint.get("max_value", constraint.get("value"))
         if max_val is None:
             return False
         return actual_value <= max_val
 
-    elif operator == '>':
-        min_val = constraint.get('min_value', constraint.get('value'))
+    elif operator == ">":
+        min_val = constraint.get("min_value", constraint.get("value"))
         if min_val is None:
             return False
         return actual_value > min_val
 
-    elif operator == '<':
-        max_val = constraint.get('max_value', constraint.get('value'))
+    elif operator == "<":
+        max_val = constraint.get("max_value", constraint.get("value"))
         if max_val is None:
             return False
         return actual_value < max_val
 
-    elif operator in ['range', '-']:
-        min_val = constraint.get('min_value', float('-inf'))
-        max_val = constraint.get('max_value', float('inf'))
+    elif operator in ["range", "-"]:
+        min_val = constraint.get("min_value", float("-inf"))
+        max_val = constraint.get("max_value", float("inf"))
         return min_val <= actual_value <= max_val
 
     else:
@@ -121,7 +124,7 @@ def parse_natural_language_property(name: str) -> str:
     try:
         technical = parse_natural_language(name)
     except ImportError:
-        technical = name.lower().replace(' ', '_')
+        technical = name.lower().replace(" ", "_")
 
     return canonicalize_property_name(technical)
 
@@ -173,7 +176,7 @@ def parse_molecular_formula(formula: str) -> Dict[str, int]:
 
     # Pattern to match element symbols (case-insensitive) and optional counts
     # This handles both proper case (Ca) and lowercase (ca, CA)
-    pattern = r'([A-Z][a-z]?|[a-z]+)(\d*)'
+    pattern = r"([A-Z][a-z]?|[a-z]+)(\d*)"
 
     elements = {}
     matches = re.findall(pattern, formula, re.IGNORECASE)
@@ -216,7 +219,9 @@ def are_same_molecular_formula(formula1: str, formula2: str) -> bool:
         if set(elements1.keys()) != set(elements2.keys()):
             return False
 
-        return all(elements1[element] == elements2[element] for element in elements1)
+        return all(
+            elements1[element] == elements2[element] for element in elements1
+        )
     except:
         # If parsing fails, fall back to string comparison
         return formula1 == formula2
