@@ -6,8 +6,13 @@ import re
 from typing import Dict, Any
 
 from ..properties import canonicalize_property_name
-from rdkit import Chem
-from rdkit.Chem import SanitizeMol
+
+try:
+    from rdkit import Chem
+    from rdkit.Chem import SanitizeMol
+except Exception:
+    Chem, SanitizeMol = None, None
+    
 from .._nlp.mappings import parse_natural_language
 
 
