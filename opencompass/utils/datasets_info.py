@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/MolecularIQ":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/MolecularIQ/test_task",
+    },
     "opencompass/IMO-Answer-Bench": {
         "ms_id": None,
         "hf_id": None,
