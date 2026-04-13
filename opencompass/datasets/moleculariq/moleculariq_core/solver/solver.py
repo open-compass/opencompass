@@ -7,15 +7,18 @@ values for count and indices tasks.
 # Imports
 from .functional_group_solver import FunctionalGroupSolver
 from .template_based_reaction_solver import TemplateBasedReactionSolver
-
 from typing import List, Tuple, Dict
-from rdkit import Chem
-from rdkit.Chem import rdMolDescriptors as rdmd
-from rdkit.Chem import Descriptors
-from rdkit.Chem import BRICS
-from rdkit.Chem import Lipinski
-from rdkit.Chem import AllChem
-from collections import deque
+
+try:
+    from rdkit import Chem
+    from rdkit.Chem import rdMolDescriptors as rdmd
+    from rdkit.Chem import Descriptors
+    from rdkit.Chem import BRICS
+    from rdkit.Chem import Lipinski
+    from rdkit.Chem import AllChem
+except Exception:
+    Chem, rdmd, Descriptors, BRICS, Lipinski, AllChem = None, None, None, None, None, None
+
 # ---------------------------------------------------------------------------------------
 # Class definitions
 
