@@ -22,8 +22,13 @@ class TemplateBasedReactionSolverConfig:
 # ---------------------------------------------------------------------------------------
 # Imports
 from typing import Optional, Dict
-from rdkit import Chem
-from rdkit.Chem import AllChem
+
+try:
+    from rdkit import Chem
+    from rdkit.Chem import AllChem
+except Exception:
+    Chem, AllChem = None, None
+
 # ---------------------------------------------------------------------------------------
 # Class definitions
 
