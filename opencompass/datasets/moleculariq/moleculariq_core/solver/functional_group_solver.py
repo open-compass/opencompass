@@ -19,7 +19,12 @@ class FunctionalGroupSolverConfig:
 # ---------------------------------------------------------------------------------------
 # Imports
 from typing import List, Tuple, Dict
-from rdkit import Chem
+
+try:
+    from rdkit import Chem
+except Exception:
+    Chem = None
+
 # ---------------------------------------------------------------------------------------
 # Class definitions
 
