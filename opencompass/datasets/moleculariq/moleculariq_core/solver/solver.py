@@ -16,11 +16,6 @@ try:
     from rdkit.Chem import BRICS
     from rdkit.Chem import Lipinski
     from rdkit.Chem import AllChem
-except Exception:
-    Chem, rdmd, Descriptors, BRICS, Lipinski, AllChem = None, None, None, None, None, None
-
-
-class SymbolicSolver:
 
     STRICT_ROTATABLE_BOND_SMARTS = (
         "[!$(*#*)&!D1&!$(C(F)(F)F)&!$(C(Cl)(Cl)Cl)&!$(C(Br)(Br)Br)"
@@ -34,6 +29,12 @@ class SymbolicSolver:
         STRICT_ROTATABLE_BOND_SMARTS
     )
 
+except Exception:
+    Chem, rdmd, Descriptors, BRICS, Lipinski, AllChem = None, None, None, None, None, None
+    STRICT_ROTATABLE_BOND_SMARTS, STRICT_ROTATABLE_BOND_PATTERN = None, None
+
+
+class SymbolicSolver:
     def __init__(self):
         self.functional_group_solver = FunctionalGroupSolver()
         self.reaction_solver = TemplateBasedReactionSolver()
