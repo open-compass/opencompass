@@ -45,8 +45,11 @@ from .utils import (
 
 from ..solver.solver import SymbolicSolver
 
+try:
+    _SOLVER = SymbolicSolver()
+except Exception:
+    _SOLVER = None
 
-_SOLVER = SymbolicSolver()
 _UNSUPPORTED = object()
 
 
