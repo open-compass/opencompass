@@ -1,0 +1,169 @@
+# SMARTS Patterns for Functional Group Substructure Detection
+# Format: Name:Rank:SMARTS
+# Rank indicates priority (lower = higher priority) for overlapping patterns
+# Balanced between specificity and generality for substructure index detection
+
+# Carbonyl Groups
+aldehyde:100:[CH,CH2]=[O]
+ketone:101:[#6][CX3](=[OX1])[#6]
+carboxylic_acid:102:[CX3](=O)[OH]
+ester:103:[CX3](=[OX1])[OX2][#6]
+amide:104:[CX3](=[OX1])[NX3]
+lactone:105:[#6][#6X3R](=[OX1])[#8X2][#6;!$(C=[O,N,S])]
+lactam:106:[#6R][#6X3R](=[OX1])[#7X3]
+acyl_chloride:107:[CX3](=[OX1])[ClX1]
+acyl_bromide:108:[CX3](=[OX1])[BrX1]
+acyl_fluoride:109:[CX3](=[OX1])[FX1]
+acyl_iodide:110:[CX3](=[OX1])[IX1]
+anhydride:111:[CX3](=[OX1])[OX2][CX3](=[OX1])
+
+# Nitrogen Groups
+primary_amine:200:[NH2]
+secondary_amine:201:[NH]([#6])[#6]
+tertiary_amine:202:[NX3]([#6])([#6])[#6]
+quaternary_ammonium:203:[NX4H0+]
+imine:204:[NX2]=[CX3]
+nitrile:205:[NX1]#[CX2]
+nitro:206:[$([NX3](=O)=O),$([NX3+](=O)[O-])]
+nitroso:207:[NX2]=[OX1]
+azide:208:[NX1]~[NX2]~[NX2,NX1]
+hydrazine:209:[NX3][NX3]
+hydrazone:210:[NX3][NX2]=[CX3]
+oxime:211:[NX2]=[CX3][OX2H]
+isocyanate:212:[NX2]=[CX2]=[OX1]
+isothiocyanate:213:[NX2]=[CX2]=[SX1]
+carbodiimide:214:[NX2]=[CX2]=[NX2]
+urea:215:[NX3][CX3](=[OX1])[NX3]
+thiourea:216:[NX3][CX3](=[SX1])[NX3]
+guanidine:217:[NX3][CX3](=[NX2])[NX3]
+
+# Oxygen Groups
+alcohol:300:[OX2H][CX4]
+phenol:301:[OX2H]c
+ether:302:[CX4][OX2][CX4]
+aryl_ether:303:c[OX2]c
+epoxide:304:[OX2r3,OX2r4]
+peroxide:305:[OX2][OX2]
+hydroperoxide:306:[OX2H][OX2]
+enol:307:[OX2H][CX3]=[CX3]
+hemiacetal:308:[OX2H][CX4][OX2][#6]
+hemiketal:309:[OX2H][CX4]([#6])([#6])[OX2][#6]
+acetal:310:[CX4]([OX2][#6])([OX2][#6])
+ketal:311:[CX4]([#6])([#6])([OX2][#6])([OX2][#6])
+
+# Sulfur Groups
+thiol:400:[SX2H]
+thioether:401:[#6][SX2][#6]
+disulfide:402:[SX2][SX2]
+sulfoxide:403:[$([SX3]=[OX1]),$([SX3+][OX1-])]
+sulfone:404:[$([SX4](=[OX1])(=[OX1])),$([SX4+2]([OX1-])([OX1-]))]
+sulfonic_acid:405:[SX4](=[OX1])(=[OX1])[OX2H,OX1-]
+sulfonamide:406:[SX4](=[OX1])(=[OX1])[NX3]
+sulfonic_ester:407:[SX4](=[OX1])(=[OX1])[OX2][#6]
+thioketone:408:[#6][CX3](=[SX1])[#6]
+thioaldehyde:409:[CX3H]=[SX1]
+
+# Halogen Groups
+alkyl_fluoride:500:[CX4][F]
+alkyl_chloride:501:[CX4][Cl]
+alkyl_bromide:502:[CX4][Br]
+alkyl_iodide:503:[CX4][I]
+aryl_fluoride:504:c[F]
+aryl_chloride:505:c[Cl]
+aryl_bromide:506:c[Br]
+aryl_iodide:507:c[I]
+vinyl_halide:508:[FX1,ClX1,BrX1,IX1][CX3]=[CX3]
+trifluoromethyl:509:C(F)(F)(F)
+perfluoroalkyl:510:[CX4](F)(F)[CX4](F)(F)
+
+# Phosphorus Groups
+phosphine:600:[PX3]
+phosphine_oxide:601:[PX4]=[OX1]
+phosphonium:602:[PX4+]
+phosphonic_acid:603:[PX4](=[OX1])([OX2H,OX1-])[OX2H,OX1-]
+phosphate:604:[PX4](=[OX1])([OX2])([OX2])[OX2]
+phosphonate:605:[PX4](=[OX1])([OX2][#6])[OX2]
+phosphoramide:606:[PX4](=[OX1])([NX3])[NX3]
+
+# Carbon-Carbon Multiple Bonds
+alkene:700:[CX3]=[CX3]
+alkyne:701:[CX2]#[CX2]
+allene:702:[CX3]=[CX2]=[CX3]
+aromatic:703:[aR]
+conjugated_system:704:[#6]=[#6]-[#6]=[#6]
+
+# Special Structural Features
+enamine:800:[NX3][CX3]=[CX3]
+enol_ether:801:[OX2][CX3]=[CX3]
+ketene:802:[CX3]=[CX2]=[OX1]
+carbene:803:[CX2]
+michael_acceptor:804:[CX3]=[CX3][CX3](=[OX1])
+alpha_beta_unsaturated:805:[CX3]=[CX3][CX3]=[OX1,NX2,SX1]
+
+# Ring Systems and Structural Motifs
+benzene:900:c1ccccc1
+naphthalene:901:c1ccc2ccccc2c1
+pyridine:902:n1ccccc1
+pyrrole:903:[nH]1cccc1
+furan:904:o1cccc1
+thiophene:905:s1cccc1
+imidazole:906:n1cc[nH]c1
+pyrazole:907:n1[nH]ccc1
+oxazole:908:n1cocc1
+thiazole:909:n1cscc1
+pyrimidine:910:n1cnccc1
+indole:911:[nH]1c2ccccc2cc1
+quinoline:912:n1c2ccccc2ccc1
+isoquinoline:913:c1nc2ccccc2cc1
+
+# Carbon Substitution Patterns
+methyl:1000:[CX4H3]
+ethyl:1001:[CX4H3][CX4H2]
+propyl:1002:[CX4H3][CX4H2][CX4H2]
+isopropyl:1003:[CX4H3][CX4H]([CX4H3])
+butyl:1004:[CX4H3][CX4H2][CX4H2][CX4H2]
+isobutyl:1005:[CX4H3][CX4H]([CX4H3])[CX4H2]
+sec_butyl:1006:[CX4H3][CX4H2][CX4H]([CX4H3])
+tert_butyl:1007:[CX4]([CX4H3])([CX4H3])([CX4H3])
+primary_carbon:1008:[CX4H3][#6]
+secondary_carbon:1009:[CX4H2,CX4H1]([#6])[#6]
+tertiary_carbon:1010:[CX4H1,CX4H0]([#6])([#6])[#6]
+quaternary_carbon:1011:[CX4]([#6])([#6])([#6])[#6]
+
+# Protecting Groups (commonly used in synthesis)
+boc:1100:CC(C)(C)OC(=O)N
+cbz:1101:c1ccccc1COC(=O)N
+fmoc:1102:C1c2ccccc2Cc3c1cccc3OC(=O)N
+tosyl:1103:Cc1ccc(cc1)S(=O)(=O)
+mesyl:1104:CS(=O)(=O)
+triflate:1105:C(F)(F)(F)S(=O)(=O)O
+
+# Additional Common Functional Groups
+carbonate:1200:[#6][OX2]C(=O)[OX2][#6]
+carbamate:1201:[#6][OX2]C(=O)[NX3]
+thioester:1202:[CX3](=O)[SX2][#6]
+imide:1203:[CX3](=O)[NX3][CX3](=O)
+sulfonyl_chloride:1204:[SX4](=O)(=O)[Cl]
+isonitrile:1205:[N+]#[C-]
+n_oxide:1206:[$([NX3](=O)),$([N+][O-]),$([n+][O-])]
+hydroxylamine:1207:[NX3][OX2H]
+diazo:1208:[#6]=[NX2+]=[NX1-]
+nitrone:1209:[#6]=[N+]([#6])[O-]
+aziridine:1210:C1CN1
+
+# Silicon Compounds
+silyl_ether:1300:[Si]([#6])([#6])([#6])[OX2][#6]
+silane:1301:[Si]([#6])([#6])([#6])
+silyl_enol_ether:1302:[Si]([#6])([#6])([#6])[OX2][CX3]=[CX3]
+
+# Boron Compounds
+boronic_acid:1400:[#5]([OH])([OH])
+boronic_ester:1401:[#5]([OX2][#6])([OX2][#6])
+borate:1402:[#5]([OX2])([OX2])[OX2]
+
+# Common Reactive Groups
+vinyl_ether:1500:[#6][OX2][CX3]=[CX3]
+orthoester:1501:[CX4]([OX2][#6])([OX2][#6])[OX2][#6]
+allyl:1502:[CX3]=[CX3][CX4]
+benzyl:1503:c[CX4H2,CX4H3]
+propargyl:1504:[CX2]#[CX2][CX4]
