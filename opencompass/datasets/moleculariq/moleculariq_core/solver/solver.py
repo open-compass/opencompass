@@ -19,22 +19,21 @@ try:
 except Exception:
     Chem, rdmd, Descriptors, BRICS, Lipinski, AllChem = None, None, None, None, None, None
 
-# ---------------------------------------------------------------------------------------
-# Class definitions
-
-STRICT_ROTATABLE_BOND_SMARTS = (
-    "[!$(*#*)&!D1&!$(C(F)(F)F)&!$(C(Cl)(Cl)Cl)&!$(C(Br)(Br)Br)"
-    "&!$(C([CH3])([CH3])[CH3])&!$([CD3](=[N,O,S])-!@[#7,O,S!D1])"
-    "&!$([#7,O,S!D1]-!@[CD3]=[N,O,S])&!$([CD3](=[N+])-!@[#7!D1])"
-    "&!$([#7!D1]-!@[CD3]=[N+])]-,:;!@[!$(*#*)&!D1&!$(C(F)(F)F)"
-    "&!$(C(Cl)(Cl)Cl)&!$(C(Br)(Br)Br)&!$(C([CH3])([CH3])[CH3])]"
-)
-STRICT_ROTATABLE_BOND_PATTERN = Chem.MolFromSmarts(
-    STRICT_ROTATABLE_BOND_SMARTS
-)
-
 
 class SymbolicSolver:
+
+    STRICT_ROTATABLE_BOND_SMARTS = (
+        "[!$(*#*)&!D1&!$(C(F)(F)F)&!$(C(Cl)(Cl)Cl)&!$(C(Br)(Br)Br)"
+        "&!$(C([CH3])([CH3])[CH3])&!$([CD3](=[N,O,S])-!@[#7,O,S!D1])"
+        "&!$([#7,O,S!D1]-!@[CD3]=[N,O,S])&!$([CD3](=[N+])-!@[#7!D1])"
+        "&!$([#7!D1]-!@[CD3]=[N+])]-,:;!@[!$(*#*)&!D1&!$(C(F)(F)F)"
+        "&!$(C(Cl)(Cl)Cl)&!$(C(Br)(Br)Br)&!$(C([CH3])([CH3])[CH3])]"
+    )
+
+    STRICT_ROTATABLE_BOND_PATTERN = Chem.MolFromSmarts(
+        STRICT_ROTATABLE_BOND_SMARTS
+    )
+
     def __init__(self):
         self.functional_group_solver = FunctionalGroupSolver()
         self.reaction_solver = TemplateBasedReactionSolver()
