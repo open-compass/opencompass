@@ -72,7 +72,7 @@ class BaseRetriever:
 
     def generate_ice(self,
                      idx_list: List[int],
-                     ice_template: Optional[PromptTemplate] = None) -> str:
+                     ice_template: Optional[PromptTemplate] = None):
         """Generate the in-context example for one test example. If
         `ice_template` is an instance of `PromptTemplate`, the `ice_separator`
         and `ice_eos_token` will be set as empty.
@@ -82,11 +82,28 @@ class BaseRetriever:
                 test example.
             ice_template (`Optional[PromptTemplate]`): The template for
                 in-context example. Defaults to None.
+
+        Returns:
+            Union[str, List[Dict]]: If ice_template is RawPromptTemplate,
+            returns a messages list; otherwise returns a string.
         """
         if ice_template is None:
             assert len(
                 idx_list
             ) == 0, 'You have not specified ice_template while retrieving examples from train set! Please either specify ice_template or use `ZeroRetriever`.'  # noqa
+
+        is_raw_messages = (ice_template is not None
+                           and hasattr(ice_template, 'prompt_type')
+                           and ice_template.prompt_type == 'raw_messages')
+
+        if is_raw_messages:
+            generated_ice = []
+            for idx in idx_list:
+                ice_messages = ice_template.generate_ice_item(
+                    self.index_ds[idx],
+                    self.index_ds[idx][self.dataset_reader.output_column])
+                generated_ice.extend(ice_messages)
+            return generated_ice
 
         if ice_template is not None and ice_template.prompt_type == 'meta':
             ice_separator, ice_eos_token = '', ''
