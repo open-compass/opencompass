@@ -286,7 +286,13 @@ class GenInferencer(BaseInferencer):
             if max_seq_len is not None:
                 prompt_token_num = self.model.get_token_len_from_template(
                     prompt, mode='gen')
-                while len(ice_idx) > 0 and prompt_token_num > max_seq_len:
+                
+                if isinstance(prompt_token_num, list):
+                    total_prompt_token_num = sum(prompt_token_num)
+                else:
+                    total_prompt_token_num = prompt_token_num
+                    
+                while len(ice_idx) > 0 and total_prompt_token_num > max_seq_len:
                     ice_idx = ice_idx[:-1]
                     ice = retriever.generate_ice(ice_idx,
                                                  ice_template=ice_template)
@@ -298,6 +304,12 @@ class GenInferencer(BaseInferencer):
                         prompt_template=prompt_template)
                     prompt_token_num = self.model.get_token_len_from_template(
                         prompt, mode='gen')
+                    
+                    if isinstance(prompt_token_num, list):
+                        total_prompt_token_num = sum(prompt_token_num)
+                    else:
+                        total_prompt_token_num = prompt_token_num
+
             prompt_list.append(prompt)
         return prompt_list
 
