@@ -467,6 +467,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/simpleqa/simple_qa_test_set.csv",
     },
+    "opencompass/simpleqa-verified": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/simpleqa/simpleqa_verified.csv",
+    },
     "opencompass/chinese_simpleqa": {
         "ms_id": "",
         "hf_id": "",
@@ -681,7 +686,7 @@ DATASETS_URL = {
     "/simpleqa": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa.zip",
-        "md5": "1d83fc2e15798d39cb265c9a3cb5195a",
+        "md5": "82af3e1378031c249cd169ed10cc2e91",
     },
     "/chinese_simpleqa": {
         "url":
