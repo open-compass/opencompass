@@ -69,10 +69,7 @@ class TestRawPromptTemplate(unittest.TestCase):
     def test_validation_item_not_dict_or_str(self):
         """测试 messages 元素不是字典或字符串的情况"""
         with self.assertRaises(TypeError) as ctx:
-            RawPromptTemplate([{
-                'role': 'user',
-                'content': 'hello'
-            }, 1])
+            RawPromptTemplate([{'role': 'user', 'content': 'hello'}, 1])
         self.assertIn('must be a dict or str', str(ctx.exception))
 
     def test_validation_missing_role(self):
