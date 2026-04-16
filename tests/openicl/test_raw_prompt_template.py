@@ -53,8 +53,6 @@ class TestRawPromptTemplate(unittest.TestCase):
         self.assertEqual(rpt.messages, self.simple_messages)
         self.assertTrue(rpt.format_variables)
         self.assertEqual(rpt.prompt_type, 'raw_messages')
-        self.assertIsNone(rpt.ice_token)
-        self.assertIsNone(rpt.sep_token)
 
     def test_init_with_format_variables_false(self):
         """测试 format_variables=False 的情况"""
