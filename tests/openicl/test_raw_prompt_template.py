@@ -53,8 +53,6 @@ class TestRawPromptTemplate(unittest.TestCase):
         self.assertEqual(rpt.messages, self.simple_messages)
         self.assertTrue(rpt.format_variables)
         self.assertEqual(rpt.prompt_type, 'raw_messages')
-        self.assertIsNone(rpt.ice_token)
-        self.assertIsNone(rpt.sep_token)
 
     def test_init_with_format_variables_false(self):
         """测试 format_variables=False 的情况"""
@@ -68,14 +66,11 @@ class TestRawPromptTemplate(unittest.TestCase):
             RawPromptTemplate('not a list')
         self.assertIn('must be a list', str(ctx.exception))
 
-    def test_validation_item_not_dict(self):
-        """测试 messages 元素不是字典的情况"""
+    def test_validation_item_not_dict_or_str(self):
+        """测试 messages 元素不是字典或字符串的情况"""
         with self.assertRaises(TypeError) as ctx:
-            RawPromptTemplate([{
-                'role': 'user',
-                'content': 'hello'
-            }, 'not a dict'])
-        self.assertIn('must be a dict', str(ctx.exception))
+            RawPromptTemplate([{'role': 'user', 'content': 'hello'}, 1])
+        self.assertIn('must be a dict or str', str(ctx.exception))
 
     def test_validation_missing_role(self):
         """测试缺少 role 字段的情况"""

@@ -234,21 +234,52 @@ class APITemplateParser:
                    for single_item in prompt_template):
                 prompt_template = copy.deepcopy(prompt_template)
                 if self.meta_template and isinstance(self.meta_template, list):
-                    for role in CHATML_ROLE:
-                        for item in self.meta_template:
-                            if item['role'] == role:
-                                role_in_prompt = False
-                                for i in range(len(prompt_template)):
-                                    if prompt_template[i]['role'] == role:
-                                        prompt_template[i]['content'] = item[
-                                            'content'] + prompt_template[i][
-                                                'content']
-                                        role_in_prompt = True
-                                if not role_in_prompt:
-                                    prompt_template.append(copy.deepcopy(item))
-                    prompt_template = sorted(
-                        prompt_template,
-                        key=lambda x: CHATML_ROLE.index(x['role']))
+                    result = []
+                    meta_idx = 0
+                    prompt_idx = 0
+                    while meta_idx < len(self.meta_template):
+                        if prompt_idx < len(prompt_template) and \
+                                self.meta_template[meta_idx]['role'] == \
+                                prompt_template[prompt_idx]['role']:
+                            # Same role at same position -> merge
+                            merged = copy.deepcopy(prompt_template[prompt_idx])
+                            merged['content'] = (
+                                self.meta_template[meta_idx]['content'] +
+                                merged['content'])
+                            result.append(merged)
+                            meta_idx += 1
+                            prompt_idx += 1
+                        elif prompt_idx < len(prompt_template):
+                            # Check if meta role exists later in prompt
+                            found = any(prompt_template[j]['role'] ==
+                                        self.meta_template[meta_idx]['role']
+                                        for j in range(prompt_idx,
+                                                       len(prompt_template)))
+                            if not found:
+                                # Meta role not in remaining prompt ->
+                                # insert meta item
+                                result.append(
+                                    copy.deepcopy(
+                                        self.meta_template[meta_idx]))
+                                meta_idx += 1
+                            else:
+                                # Meta role exists later ->
+                                # keep current prompt item
+                                result.append(
+                                    copy.deepcopy(prompt_template[prompt_idx]))
+                                prompt_idx += 1
+                        else:
+                            # No more prompt items ->
+                            # insert remaining meta items
+                            result.append(
+                                copy.deepcopy(self.meta_template[meta_idx]))
+                            meta_idx += 1
+                    # Append remaining prompt items
+                    while prompt_idx < len(prompt_template):
+                        result.append(
+                            copy.deepcopy(prompt_template[prompt_idx]))
+                        prompt_idx += 1
+                    prompt_template = result
                 return prompt_template
 
         if not isinstance(prompt_template, (str, PromptList)):
