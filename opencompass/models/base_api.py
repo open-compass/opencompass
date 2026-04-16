@@ -242,43 +242,42 @@ class APITemplateParser:
                                 self.meta_template[meta_idx]['role'] == \
                                 prompt_template[prompt_idx]['role']:
                             # Same role at same position -> merge
-                            merged = copy.deepcopy(
-                                prompt_template[prompt_idx])
+                            merged = copy.deepcopy(prompt_template[prompt_idx])
                             merged['content'] = (
-                                self.meta_template[meta_idx]['content']
-                                + merged['content'])
+                                self.meta_template[meta_idx]['content'] +
+                                merged['content'])
                             result.append(merged)
                             meta_idx += 1
                             prompt_idx += 1
                         elif prompt_idx < len(prompt_template):
                             # Check if meta role exists later in prompt
-                            found = any(
-                                prompt_template[j]['role'] ==
-                                self.meta_template[meta_idx]['role']
-                                for j in range(prompt_idx,
-                                               len(prompt_template)))
+                            found = any(prompt_template[j]['role'] ==
+                                        self.meta_template[meta_idx]['role']
+                                        for j in range(prompt_idx,
+                                                       len(prompt_template)))
                             if not found:
                                 # Meta role not in remaining prompt ->
                                 # insert meta item
-                                result.append(copy.deepcopy(
-                                    self.meta_template[meta_idx]))
+                                result.append(
+                                    copy.deepcopy(
+                                        self.meta_template[meta_idx]))
                                 meta_idx += 1
                             else:
                                 # Meta role exists later ->
                                 # keep current prompt item
-                                result.append(copy.deepcopy(
-                                    prompt_template[prompt_idx]))
+                                result.append(
+                                    copy.deepcopy(prompt_template[prompt_idx]))
                                 prompt_idx += 1
                         else:
                             # No more prompt items ->
                             # insert remaining meta items
-                            result.append(copy.deepcopy(
-                                self.meta_template[meta_idx]))
+                            result.append(
+                                copy.deepcopy(self.meta_template[meta_idx]))
                             meta_idx += 1
                     # Append remaining prompt items
                     while prompt_idx < len(prompt_template):
-                        result.append(copy.deepcopy(
-                            prompt_template[prompt_idx]))
+                        result.append(
+                            copy.deepcopy(prompt_template[prompt_idx]))
                         prompt_idx += 1
                     prompt_template = result
                 return prompt_template
