@@ -349,6 +349,9 @@ class APITemplateParser:
             for item in prompt[1:]:
                 if item['role'] == last_role:
                     new_prompt[-1]['prompt'] += '\n' + item['prompt']
+                    if item.get('image'):
+                        existing = new_prompt[-1].get('image', [])
+                        new_prompt[-1]['image'] = existing + item['image']
                 else:
                     last_role = item['role']
                     new_prompt.append(item)
@@ -491,6 +494,8 @@ class APITemplateParser:
         res['prompt'] = merged_prompt.get('begin', '')
         res['prompt'] += merged_prompt.get('prompt', '')
         res['prompt'] += merged_prompt.get('end', '')
+        if merged_prompt.get('image'):
+            res['image'] = merged_prompt['image']
         return res, True
 
 

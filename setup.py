@@ -134,7 +134,7 @@ def do_setup():
         },
         license='Apache License 2.0',
         include_package_data=True,
-        packages=find_packages(),
+        packages=find_packages(exclude=['autotest', 'autotest.*']),
         keywords=[
             'AI',
             'NLP',
