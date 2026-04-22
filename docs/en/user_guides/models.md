@@ -70,6 +70,7 @@ model = HuggingFaceCausalLM(
 Currently, OpenCompass supports API-based model inference for the following:
 
 - OpenAI (`opencompass.models.OpenAI`)
+- LiteLLM - unified gateway to 100+ providers (`opencompass.models.LiteLLMAPI`)
 - ChatGLM (`opencompass.models.ZhiPuAI`)
 - ABAB-Chat from MiniMax (`opencompass.models.MiniMax`)
 - XunFei from XunFei (`opencompass.models.XunFei`)
