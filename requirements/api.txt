@@ -8,7 +8,7 @@ openai
 spark_ai_python
 sseclient-py==1.7.2
 # LiteLLM AI gateway (routes to 100+ providers via litellm.completion)
-litellm
+litellm>=1.55,<1.85
 # tecent
 tencentcloud-sdk-python
 # bytedance

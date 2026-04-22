@@ -174,9 +174,11 @@ class LiteLLMAPI(BaseAPIModel):
     def _build_call_kwargs(self, messages: List[Dict[str, str]],
                            max_out_len: int) -> Dict:
         call_kwargs: Dict = {
+            **self.extra_body,
             'model': self.path,
             'messages': messages,
             'max_tokens': max_out_len,
+            'drop_params': True,
         }
         if self.temperature is not None:
             call_kwargs['temperature'] = self.temperature
@@ -186,7 +188,6 @@ class LiteLLMAPI(BaseAPIModel):
             call_kwargs['api_base'] = self.api_base
         if self.api_version is not None:
             call_kwargs['api_version'] = self.api_version
-        call_kwargs.update(self.extra_body)
         return call_kwargs
 
     def _generate(self, input: PromptType, max_out_len: int) -> str:

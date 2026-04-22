@@ -81,6 +81,27 @@ class TestLiteLLMAPIInit(unittest.TestCase):
         self.assertNotIn('api_version', kwargs)
         self.assertNotIn('temperature', kwargs)
 
+    def test_drop_params_default_true(self):
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        kwargs = model._build_call_kwargs(
+            messages=[{'role': 'user', 'content': 'hi'}],
+            max_out_len=128,
+        )
+        self.assertTrue(kwargs['drop_params'])
+
+    def test_extra_body_cannot_override_core_params(self):
+        """extra_body should not override model, messages, or max_tokens."""
+        model = LiteLLMAPI(
+            path='openai/gpt-4o-mini',
+            extra_body={'model': 'WRONG', 'max_tokens': 999},
+        )
+        kwargs = model._build_call_kwargs(
+            messages=[{'role': 'user', 'content': 'hi'}],
+            max_out_len=128,
+        )
+        self.assertEqual(kwargs['model'], 'openai/gpt-4o-mini')
+        self.assertEqual(kwargs['max_tokens'], 128)
+
 
 class TestLiteLLMAPIMessages(unittest.TestCase):
     """Input-to-OpenAI-messages translation."""
