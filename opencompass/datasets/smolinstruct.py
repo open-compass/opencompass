@@ -1,4 +1,6 @@
 # flake8: noqa: W605
+import json
+import random
 import re
 from collections import defaultdict
 
@@ -25,6 +27,15 @@ class SmolInstructDataset(BaseDataset):
             raw_data = []
             for data in raw_dataset[split]:
                 if data['task'] == name:
+                    # Some subsets (e.g., property_prediction-sider) store
+                    # 'output' as a multi-label dict instead of a plain string,
+                    # which causes a casting error when building the Dataset.
+                    # Serialize dict outputs to a JSON string so the 'output'
+                    # column has a uniform string type across all subsets.
+                    if isinstance(data.get('output'), dict):
+                        data = dict(data)
+                        data['output'] = json.dumps(data['output'],
+                                                    ensure_ascii=False)
                     raw_data.append(data)
             if mini_set and split == 'test':
                 random.seed(1024)
