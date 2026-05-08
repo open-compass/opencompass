@@ -33,6 +33,7 @@ class Claude(BaseAPIModel):
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
+        extra_headers: Optional[Dict] = None,
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -45,7 +46,7 @@ class Claude(BaseAPIModel):
             raise ImportError('Import anthropic failed. Please install it '
                               'with "pip install anthropic" and try again.')
 
-        self.anthropic = Anthropic(api_key=key)
+        self.anthropic = Anthropic(api_key=key, default_headers=extra_headers or {})
         self.model = path
         self.human_prompt = HUMAN_PROMPT
         self.ai_prompt = AI_PROMPT
