@@ -35,6 +35,7 @@ class ClaudeSDK(BaseAPIModel):
         temperature: Optional[float] = 0.0,
         thinking: Optional[Dict] = None,
         retry: int = 2,
+        extra_headers: Optional[Dict] = None,
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -47,7 +48,7 @@ class ClaudeSDK(BaseAPIModel):
             raise ImportError('Import anthropic failed. Please install it '
                               'with "pip install anthropic" and try again.')
 
-        self.anthropic = Anthropic(api_key=key)
+        self.anthropic = Anthropic(api_key=key, default_headers=extra_headers or {})
         self.model = path
         self.temperature = temperature
         self.thinking = thinking
