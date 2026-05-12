@@ -19,8 +19,8 @@ with read_base():
         datasets as CS_Bench_chatml  # noqa: F401
     from opencompass.configs.chatml_datasets.HMMT2025.HMMT2025_repeat32_gen import \
         datasets as HMMT2025_chatml  # noqa: E501, F401
-    from opencompass.configs.chatml_datasets.IMO_Bench_AnswerBench.IMO_Bench_AnswerBench_gen import \
-        datasets as IMO_Bench_AnswerBench_chatml  # noqa: E501, F401
+    # from opencompass.configs.chatml_datasets.IMO_Bench_AnswerBench.IMO_Bench_AnswerBench_gen import \  # noqa: E501, F401
+    #    datasets as IMO_Bench_AnswerBench_chatml  # noqa: E501, F401
     from opencompass.configs.chatml_datasets.MaScQA.MaScQA_gen import \
         datasets as MaScQA_chatml  # noqa: F401
     from opencompass.configs.chatml_datasets.UGD_hard.UGD_hard_repeat8_gen import \
