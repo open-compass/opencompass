@@ -1,9 +1,9 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import \
+    from autotest.all.config import \
         concurrent_infer as infer  # noqa: F401, E501
-    from autotest.infer.config import models  # noqa: F401, E501
+    from autotest.all.config import models  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_gen_5e9f4f import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import \

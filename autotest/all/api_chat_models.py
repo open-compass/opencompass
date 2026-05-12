@@ -10,8 +10,8 @@ with read_base():
     from opencompass.configs.datasets.race.race_gen import \
         race_datasets  # noqa: F401, E501
 
-API_BASE = 'http://localhost:26333/v1'
-MODEL_PATH = 'mock_test'
+API_BASE = 'http://localhost:23333/v1'
+MODEL_PATH = 'Qwen/Qwen3-8B'
 TOKENIZER_PATH = 'Qwen/Qwen3-8B'
 
 models = [

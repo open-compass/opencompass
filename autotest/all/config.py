@@ -1,3 +1,5 @@
+import os
+
 from opencompass.models import OpenAISDK
 from opencompass.partitioners import NumWorkerPartitioner
 from opencompass.runners import LocalRunner
@@ -5,7 +7,7 @@ from opencompass.tasks import OpenICLInferConcurrentTask, OpenICLInferTask
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
 API_BASE = 'http://localhost:26333/v1'
-MODEL_PATH = 'Qwen/Qwen3-8B'
+MODEL_PATH = 'mock_test'
 TOKENIZER_PATH = 'Qwen/Qwen3-8B'
 
 models = [
@@ -56,8 +58,16 @@ raw_template_models = [
     )
 ]
 
+# NumWorkerPartitioner cache; {config.fullbench_version} is filled at runtime.
+_dataset_size_root = os.environ.get('REPORT_DIR', '.').rstrip('/')
+dataset_size_path = (_dataset_size_root + '/dataset_size.json')
+
 concurrent_infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
+    partitioner=dict(
+        type=NumWorkerPartitioner,
+        num_worker=1,
+        dataset_size_path=dataset_size_path,
+    ),
     runner=dict(
         type=LocalRunner,
         max_num_workers=64,
@@ -67,7 +77,11 @@ concurrent_infer = dict(
 )
 
 common_infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
+    partitioner=dict(
+        type=NumWorkerPartitioner,
+        num_worker=1,
+        dataset_size_path=dataset_size_path,
+    ),
     runner=dict(type=LocalRunner,
                 task=dict(type=OpenICLInferTask),
                 max_num_workers=128),

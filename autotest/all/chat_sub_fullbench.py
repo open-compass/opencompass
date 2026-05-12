@@ -1,9 +1,9 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import \
+    from autotest.all.config import \
         concurrent_infer as infer  # noqa: F401, E501
-    from autotest.infer.config import models  # noqa: F401, E501
+    from autotest.all.config import models  # noqa: F401, E501
     from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa_gen import \
         csimpleqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.SimpleQA.simpleqa_gen_0283c3 import \

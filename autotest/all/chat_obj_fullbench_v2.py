@@ -2,10 +2,9 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import common_infer as infer  # noqa: F401, E501
-    from autotest.infer.config import \
-        models as judge_models  # noqa: F401, E501
-    from autotest.infer.config import \
+    from autotest.all.config import common_infer as infer  # noqa: F401, E501
+    from autotest.all.config import models as judge_models  # noqa: F401, E501
+    from autotest.all.config import \
         raw_template_models as models  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.AMO_Bench.AMO_Bench_gen import \
         datasets as AMO_Bench_chatml  # noqa: F401, E501
