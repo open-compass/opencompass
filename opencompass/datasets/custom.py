@@ -216,7 +216,8 @@ class CircularCustomDataset(CustomDataset, metaclass=CircularDatasetMeta):
 
 def stringfy_types(obj):
     for k, v in obj.items():
-        if k == 'type':
+        # Real classes only; configs may use type='...' or ConfigDict.
+        if k == 'type' and isinstance(v, type):
             obj[k] = f'{v.__module__}.{v.__name__}'
         elif isinstance(v, dict):
             stringfy_types(v)
