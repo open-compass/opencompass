@@ -225,7 +225,6 @@ chatml_datasets = sum(
     (v for k, v in locals().items() if k.endswith('_chatml')),
     [],
 )
-datasets = datasets + chatml_datasets
 
 summary_groups = sum(
     [v for k, v in locals().items() if k.endswith('_summary_groups')],
@@ -344,8 +343,8 @@ for item in datasets:
     except Exception:
         pass
 
-for dataset in chatml_datasets:
-    if dataset['evaluator']['type'] == 'llm_evaluator':
-        dataset['evaluator']['judge_cfg'] = obj_llm_judge_cfg
-    if dataset['evaluator']['type'] == 'cascade_evaluator':
-        dataset['evaluator']['llm_evaluator']['judge_cfg'] = obj_llm_judge_cfg
+for item in chatml_datasets:
+    if item['evaluator']['type'] == 'llm_evaluator':
+        item['evaluator']['judge_cfg'] = obj_llm_judge_cfg
+    if item['evaluator']['type'] == 'cascade_evaluator':
+        item['evaluator']['llm_evaluator']['judge_cfg'] = obj_llm_judge_cfg
