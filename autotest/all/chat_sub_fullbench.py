@@ -1,5 +1,9 @@
 from mmengine.config import read_base
 
+from opencompass.partitioners.sub_naive import SubjectiveNaivePartitioner
+from opencompass.runners import LocalRunner
+from opencompass.tasks.subjective_eval import SubjectiveEvalTask
+
 with read_base():
     from autotest.all.config import \
         concurrent_infer as infer  # noqa: F401, E501
@@ -32,5 +36,13 @@ datasets = sum(
 datasets += mtbench101_datasets
 datasets += wildbench_datasets
 
-datasets.append(mtbench101_datasets[0])  # noqa: F401, E501
-datasets.append(wildbench_datasets[0])  # noqa: F401, E501
+judge_models = models
+
+eval = dict(
+    partitioner=dict(type=SubjectiveNaivePartitioner,
+                     models=models,
+                     judge_models=judge_models),
+    runner=dict(type=LocalRunner,
+                max_num_workers=16,
+                task=dict(type=SubjectiveEvalTask)),
+)
