@@ -38,6 +38,7 @@ with read_base():
         ruler_datasets as ruler_512k_datasets  # noqa: F401, E501
 
 datasets = sum(
-    (v for k, v in locals().items() if k.endswith('_datasets')),
+    ([v[0]] if v else [] for k, v in locals().items()
+     if k.endswith('_datasets')),
     [],
 )
