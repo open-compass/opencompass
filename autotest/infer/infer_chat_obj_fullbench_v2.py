@@ -1,14 +1,9 @@
 """Infer config: chat_objective rawprompt + chatml datasets."""
-import copy
-
 from mmengine.config import read_base
 
 with read_base():
     from autotest.infer.config import common_infer as infer  # noqa: F401, E501
-    from autotest.infer.config import \
-        models as judge_models  # noqa: F401, E501
-    from autotest.infer.config import \
-        raw_template_models as models  # noqa: F401, E501
+    from autotest.infer.config import models  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.AMO_Bench.AMO_Bench_gen import \
         datasets as AMO_Bench_chatml  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.C_MHChem.C_MHChem_gen import \
@@ -160,8 +155,11 @@ with read_base():
     from opencompass.configs.summarizers.groups.supergpqa import \
         supergpqa_summary_groups  # noqa: F401
 
-# LiveCodeBench v5 / v6 (deepcopy so base LCB config is not mutated)
-LCBCodeGeneration_v6_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
+# LiveCodeBench v5 / v6 (deepcopy so base LCB config is not mutated).
+# Avoid `import copy`: mmengine cfg.dump() serializes top-level names; a
+# `copy` module binding becomes invalid Python in the dumped config.
+LCBCodeGeneration_v6_datasets = __import__('copy').deepcopy(
+    LCBCodeGeneration_dataset)
 LCBCodeGeneration_v6_datasets['abbr'] = 'lcb_code_generation_v6'
 LCBCodeGeneration_v6_datasets['release_version'] = 'v6'
 LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
@@ -170,7 +168,8 @@ LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
     'extractor_version'] = 'v2'
 LCBCodeGeneration_v6_datasets = [LCBCodeGeneration_v6_datasets]
 
-LCBCodeGeneration_v5_datasets = copy.deepcopy(LCBCodeGeneration_dataset)
+LCBCodeGeneration_v5_datasets = __import__('copy').deepcopy(
+    LCBCodeGeneration_dataset)
 LCBCodeGeneration_v5_datasets['abbr'] = 'lcb_code_generation_v5'
 LCBCodeGeneration_v5_datasets['release_version'] = 'v5'
 LCBCodeGeneration_v5_datasets['eval_cfg']['evaluator'][
@@ -180,7 +179,7 @@ LCBCodeGeneration_v5_datasets['eval_cfg']['evaluator'][
 LCBCodeGeneration_v5_datasets = [LCBCodeGeneration_v5_datasets]
 
 CompassAcademic_LCBCodeGeneration_datasets = [
-    copy.deepcopy(CompassAcademic_LCBCodeGeneration_dataset),
+    __import__('copy').deepcopy(CompassAcademic_LCBCodeGeneration_dataset),
 ]
 
 cmphysbench_datasets[0]['abbr'] = cmphysbench_datasets[0]['abbr'] + '_repeat8'
@@ -328,7 +327,7 @@ summary_groups.extend([
     },
 ])
 
-obj_llm_judge_cfg = judge_models[0]
+obj_llm_judge_cfg = models[0]
 
 for item in datasets:
     try:
