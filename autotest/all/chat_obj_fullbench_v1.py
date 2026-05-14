@@ -325,3 +325,21 @@ datasets = sum(
 datasets += teval_en_datasets
 datasets += teval_zh_datasets
 datasets += SciCode_datasets
+
+for d in datasets:
+    if 'n' in d:
+        d['n'] = 1
+    if 'reader_cfg' in d:
+        d['reader_cfg']['test_range'] = '[0:4]'
+    else:
+        d['test_range'] = '[0:4]'
+    if 'eval_cfg' in d and 'dataset_cfg' in d['eval_cfg'][
+            'evaluator'] and 'reader_cfg' in d['eval_cfg']['evaluator'][
+                'dataset_cfg']:
+        d['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
+            'test_range'] = '[0:4]'
+    if 'eval_cfg' in d and 'llm_evaluator' in d['eval_cfg'][
+            'evaluator'] and 'dataset_cfg' in d['eval_cfg']['evaluator'][
+                'llm_evaluator']:
+        d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
+            'reader_cfg']['test_range'] = '[0:4]'

@@ -3,9 +3,9 @@ from mmengine.config import read_base
 
 with read_base():
     from autotest.all.config import common_infer as infer  # noqa: F401, E501
-    from autotest.all.config import models as judge_models  # noqa: F401, E501
-    from autotest.all.config import \
-        raw_template_models as models  # noqa: F401, E501
+    # Infer with dict(round=...) meta_template; list meta (raw_template_models)
+    # breaks GenInferencer + API parse_template on rawprompt datasets.
+    from autotest.all.config import models  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.AMO_Bench.AMO_Bench_gen import \
         datasets as AMO_Bench_chatml  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.C_MHChem.C_MHChem_gen import \
@@ -328,7 +328,7 @@ summary_groups.extend([
     },
 ])
 
-obj_llm_judge_cfg = judge_models[0]
+obj_llm_judge_cfg = models[0]
 
 for item in datasets:
     try:
