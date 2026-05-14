@@ -265,7 +265,7 @@
 - buysidefinbench:
     name: BuySideFinBench
     category: Knowledge / Finance
-    paper: https://github.com/cindy90/BuySideFinBench
+    paper: https://huggingface.co/datasets/cindy90/BuySideFinBench
     configpath: opencompass/configs/datasets/BuySideFinBench/BuySideFinBench_gen.py
     configpath_llmjudge: ''
 - finalceiq:
