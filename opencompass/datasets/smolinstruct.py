@@ -12,6 +12,7 @@ from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
 from opencompass.utils import get_logger
 
 from .base import BaseDataset
+import random
 
 
 @LOAD_DATASET.register_module()
