@@ -61,11 +61,9 @@ python run.py --datasets BuySideFinBench_dcf_gen --models <your_model>
 
 ```
 configs/datasets/BuySideFinBench/
-├── README.md                              # This file
-├── BuySideFinBench_gen.py                 # Main entry config (all 12 subsets)
-├── BuySideFinBench_zh_gen.py              # Chinese-only config
-├── BuySideFinBench_en_gen.py              # English-only config
-└── BuySideFinBench_{subject}_gen.py       # Per-subject configs
+├── README.md                         # This file
+├── BuySideFinBench_gen.py            # Entry point (imports the sized variant)
+└── BuySideFinBench_gen_5f8a1c.py     # Main config: 12 subsets, 5-shot, gen
 ```
 
 Dataset hosting: [`huggingface.co/datasets/cindy90/BuySideFinBench`](https://huggingface.co/datasets/cindy90/BuySideFinBench)
