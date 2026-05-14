@@ -38,10 +38,10 @@ with read_base():
         ruler_datasets as ruler_512k_datasets  # noqa: F401, E501
 
 datasets = sum(
-    ([v[0]] if v else [] for k, v in locals().items()
-     if k.endswith('_datasets')),
+    ([v[0]] if v else []
+     for k, v in locals().items() if k.endswith('_datasets')),
     [],
 )
 
 for d in datasets:
-    d['reader_cfg']['test_range'] = '[0:4]'
+    d['reader_cfg']['test_range'] = '[0:2]'

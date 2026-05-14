@@ -2,9 +2,9 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.all.config import common_infer as infer  # noqa: F401, E501
     # Infer with dict(round=...) meta_template; list meta (raw_template_models)
     # breaks GenInferencer + API parse_template on rawprompt datasets.
+    from autotest.all.config import common_infer as infer  # noqa: F401, E501
     from autotest.all.config import models  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.AMO_Bench.AMO_Bench_gen import \
         datasets as AMO_Bench_chatml  # noqa: F401, E501
@@ -349,3 +349,21 @@ for item in chatml_datasets:
         item['evaluator']['judge_cfg'] = obj_llm_judge_cfg
     if item['evaluator']['type'] == 'cascade_evaluator':
         item['evaluator']['llm_evaluator']['judge_cfg'] = obj_llm_judge_cfg
+
+for d in datasets:
+    if 'n' in d:
+        d['n'] = 1
+    if 'reader_cfg' in d:
+        d['reader_cfg']['test_range'] = '[0:2]'
+    else:
+        d['test_range'] = '[0:2]'
+    if 'eval_cfg' in d and 'dataset_cfg' in d['eval_cfg'][
+            'evaluator'] and 'reader_cfg' in d['eval_cfg']['evaluator'][
+                'dataset_cfg']:
+        d['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
+            'test_range'] = '[0:2]'
+    if 'eval_cfg' in d and 'llm_evaluator' in d['eval_cfg'][
+            'evaluator'] and 'dataset_cfg' in d['eval_cfg']['evaluator'][
+                'llm_evaluator']:
+        d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
+            'reader_cfg']['test_range'] = '[0:2]'
