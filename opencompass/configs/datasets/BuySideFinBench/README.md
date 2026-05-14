@@ -47,14 +47,9 @@ No proprietary research, paywalled databases, or licensed material is included. 
 ## Usage
 
 ```bash
-# Full benchmark (12 subsets)
+# Run the full benchmark (12 subsets, bilingual)
 python run.py --datasets BuySideFinBench_gen --models <your_model>
-
-# Chinese subsets only
-python run.py --datasets BuySideFinBench_zh_gen --models <your_model>
-
-# Single subject across both languages (e.g., DCF Valuation)
-python run.py --datasets BuySideFinBench_dcf_gen --models <your_model>
+```
 ```
 
 ## File Structure
