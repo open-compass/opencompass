@@ -10,9 +10,9 @@ matbench_summary_groups = [{
     'subsets': categories,
     'transforms': {
         'matbench_expt_gap': '((2 - x) / 2) * 100',
-        'matbench_steels': 'x',
+        'matbench_steels': '((2000 - x) / 2000) * 100',
         'matbench_expt_is_metal': 'x',
-        'matbench_glass': '((2000 - x) / 2000) * 100',
+        'matbench_glass': 'x',
     },
     },
 ]
