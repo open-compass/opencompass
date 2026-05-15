@@ -200,6 +200,17 @@ class DefaultSummarizer:
                                 scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = \
                                 parsed_results[model_abbr][dataset_abbr][metric]
                                 eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
+
+                # Apply per-subset transforms before aggregation
+                transforms = sg.get('transforms', {})
+                if transforms:
+                    for metric in scores:
+                        for key in list(scores[metric].keys()):
+                            subset_name = key.split('@')[0]
+                            if subset_name in transforms:
+                                x = scores[metric][key]
+                                scores[metric][key] = eval(transforms[subset_name])
+
                 result = {}
                 for metric in scores:
                     if default_metric == 'standard_deviation':
