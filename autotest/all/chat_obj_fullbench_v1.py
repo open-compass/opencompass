@@ -316,30 +316,26 @@ for temp_dataset in math_0shot_datasets:
     temp_dataset['abbr'] = temp_dataset['abbr'] + '_0shot'
 
 datasets = sum(
-    (v for k, v in locals().items()
+    ([v[0]] if v else [] for k, v in locals().items()
      if k.endswith('_datasets') and 'scicode' not in k.lower()
      and 'teval' not in k.lower() and 'dingo' not in k.lower()),
     [],
 )
 
-datasets += teval_en_datasets
-datasets += teval_zh_datasets
-datasets += SciCode_datasets
+datasets += [teval_en_datasets[0], teval_zh_datasets[0], SciCode_datasets[0]]
 
-for d in datasets:
-    if 'n' in d:
-        d['n'] = 1
-    if 'reader_cfg' in d:
-        d['reader_cfg']['test_range'] = '[0:2]'
-    else:
-        d['test_range'] = '[0:2]'
-    if 'eval_cfg' in d and 'dataset_cfg' in d['eval_cfg'][
-            'evaluator'] and 'reader_cfg' in d['eval_cfg']['evaluator'][
-                'dataset_cfg']:
-        d['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
-            'test_range'] = '[0:2]'
-    if 'eval_cfg' in d and 'llm_evaluator' in d['eval_cfg'][
-            'evaluator'] and 'dataset_cfg' in d['eval_cfg']['evaluator'][
-                'llm_evaluator']:
-        d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
-            'reader_cfg']['test_range'] = '[0:2]'
+obj_llm_judge_cfg = models[0]
+
+for item in datasets:
+    try:
+        if 'atlas' in item['abbr'] and 'judge_cfg' in item['eval_cfg'][
+                'evaluator']:
+            item['eval_cfg']['evaluator']['judge_cfg'] = dict(
+                judgers=[obj_llm_judge_cfg])
+        elif 'judge_cfg' in item['eval_cfg']['evaluator']:
+            item['eval_cfg']['evaluator']['judge_cfg'] = obj_llm_judge_cfg
+        elif 'judge_cfg' in item['eval_cfg']['evaluator']['llm_evaluator']:
+            item['eval_cfg']['evaluator']['llm_evaluator'][
+                'judge_cfg'] = obj_llm_judge_cfg
+    except Exception:
+        pass
