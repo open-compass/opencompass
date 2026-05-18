@@ -339,3 +339,7 @@ for item in datasets:
                 'judge_cfg'] = obj_llm_judge_cfg
     except Exception:
         pass
+
+for d in datasets:
+    if d['n'] is None or d['n'] <= 1:
+        d['reader_cfg']['test_range'] = '[0:1]'

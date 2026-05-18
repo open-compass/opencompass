@@ -349,3 +349,7 @@ for item in chatml_datasets:
         item['evaluator']['judge_cfg'] = obj_llm_judge_cfg
     if item['evaluator']['type'] == 'cascade_evaluator':
         item['evaluator']['llm_evaluator']['judge_cfg'] = obj_llm_judge_cfg
+
+for d in datasets:
+    if d['n'] is None or d['n'] <= 1:
+        d['reader_cfg']['test_range'] = '[0:1]'
