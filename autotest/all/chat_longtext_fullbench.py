@@ -42,3 +42,6 @@ datasets = sum(
      for k, v in locals().items() if k.endswith('_datasets')),
     [],
 )
+
+for d in datasets:
+    d['reader_cfg']['test_range'] = '[0:2]'

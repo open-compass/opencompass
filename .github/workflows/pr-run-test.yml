@@ -26,6 +26,8 @@ env:
   HF_HUB_OFFLINE: 1
   CONDA_PATH: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/miniconda3
   REPORT_ROOT: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/eval_report/prtest
+  # Golden predictions for mock_api_test (under REPORT_ROOT).
+  BASELINE_DIR: mock-api-baseline
   COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
   HF_DATASETS_CACHE: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache
   HF_HUB_CACHE: /mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub
@@ -104,7 +106,7 @@ jobs:
   
   mock_api_test:
     runs-on: yidian_cu12
-    timeout-minutes: 45
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -160,29 +162,25 @@ jobs:
             fi
             sleep 6
           done
-      - name:  Get result
+      - name: Compare predictions with baseline
         run: |
-          score=$(sed -n '$p' ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result1/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 75 && ${score%.*} <= 80 )); then
-             echo "score is $score between 75 and 80"
-          else
-             echo "score is $score not between 75 and 80"
-             exit 1
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          CURRENT="${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.func_type}}"
+          BASELINE="${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.func_type}}"
+          echo "Current run: $CURRENT"
+          echo "Baseline:    $BASELINE"
+          if [[ ! -d "$CURRENT" ]]; then
+            echo "Current run output not found: $CURRENT"
+            exit 1
           fi
-          score=$(sed -n '$p' ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result2/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 75 && ${score%.*} <= 80 )); then
-             echo "score is $score between 75 and 80"
-          else
-             echo "score is $score not between 75 and 80"
-             exit 1
+          if [[ ! -d "$BASELINE" ]]; then
+            echo "Baseline not found: $BASELINE"
+            echo "Upload golden predictions to REPORT_ROOT/BASELINE_DIR/<func_type> on shared storage."
+            exit 1
           fi
-          score=$(sed -n '$p' ${{env.REPORT_ROOT}}/${{ github.run_id }}/regression_result3/*/summary/*.csv | awk -F ',' '{print $NF}')
-          if (( ${score%.*} >= 75 && ${score%.*} <= 80 )); then
-             echo "score is $score between 75 and 80"
-          else
-             echo "score is $score not between 75 and 80"
-             exit 1
-          fi
+          python autotest/utils/compare_results.py compare_results \
+            "$CURRENT" "$BASELINE" predictions
       - name:  Uninstall opencompass
         if: always()
         run: |
