@@ -341,5 +341,14 @@ for item in datasets:
         pass
 
 for d in datasets:
-    if d['n'] is None or d['n'] <= 1:
+    if 'n' not in d or d['n'] is None or d['n'] > 1:
         d['reader_cfg']['test_range'] = '[0:1]'
+        if 'dataset_cfg' in d['eval_cfg']['evaluator'] and 'reader_cfg' in d[
+                'eval_cfg']['evaluator']['dataset_cfg']:
+            d['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
+                'test_range'] = '[0:1]'
+        if 'llm_evaluator' in d['eval_cfg'][
+                'evaluator'] and 'dataset_cfg' in d[  # noqa: E501
+                    'eval_cfg']['evaluator']['llm_evaluator']:
+            d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
+                'reader_cfg']['test_range'] = '[0:1]'
