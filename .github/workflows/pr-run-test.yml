@@ -78,7 +78,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           pip list
 
-          rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=0 --cpu=${{ matrix.cpu }} --memory=${{ matrix.memory }} --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu-puyu_gpu/lmdeploy:v0.12.0-cu12.8 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=${{env.HF_DATASETS_CACHE}} --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate; conda activate ${{env.CONDA_ENV}}; conda env list; cd ${{github.workspace}}; ln -s /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache/data .; python /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/mock_chat_api.py --type choice --port 26333 > mock_${{matrix.name}}.log 2>&1 & sleep 3; WORK_DIR=/tmp/oc-mock-${{matrix.func_type}}-${{github.run_id}}; export REPORT_DIR="${WORK_DIR}"; rm -rf "${WORK_DIR}"; mkdir -p "${WORK_DIR}"; opencompass autotest/all/${{matrix.func_type}}.py --work-dir "${WORK_DIR}" --reuse; CURRENT="${WORK_DIR}"; BASELINE="${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.func_type}}"; if [[ ! -d "${BASELINE}" ]]; then echo "Baseline not found: ${BASELINE}"; exit 1; fi; if ! python autotest/utils/compare_results.py compare_results "${CURRENT}" "${BASELINE}" predictions; then FAILED_DEST="${{env.REPORT_ROOT}}/${{github.run_id}}/${{matrix.func_type}}"; echo "Compare failed, copying artifacts to ${FAILED_DEST}"; mkdir -p "${FAILED_DEST}"; cp -a "${WORK_DIR}/." "${FAILED_DEST}/"; exit 1; fi; echo "Compare passed";'
+          rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=0 --cpu=${{ matrix.cpu }} --memory=${{ matrix.memory }} --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu-puyu_gpu/lmdeploy:v0.12.0-cu12.8 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=${{env.HF_DATASETS_CACHE}} --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=REPORT_DIR=${{env.REPORT_ROOT}} --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate; conda activate ${{env.CONDA_ENV}}; conda env list; cd ${{github.workspace}}; ln -s /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache/data .; python /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/mock_chat_api.py --type choice --port 26333 > mock_${{matrix.name}}.log 2>&1 & sleep 3; opencompass autotest/all/${{matrix.func_type}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.func_type}} --reuse;'
 
           for i in {1..300}; do
             current_status=$(rjob get ${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
@@ -93,6 +93,25 @@ jobs:
             fi
             sleep 6
           done
+      - name: Compare predictions with baseline
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          CURRENT="${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.func_type}}"
+          BASELINE="${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.func_type}}"
+          echo "Current run: $CURRENT"
+          echo "Baseline:    $BASELINE"
+          if [[ ! -d "$CURRENT" ]]; then
+            echo "Current run output not found: $CURRENT"
+            exit 1
+          fi
+          if [[ ! -d "$BASELINE" ]]; then
+            echo "Baseline not found: $BASELINE"
+            echo "Upload golden predictions to REPORT_ROOT/BASELINE_DIR/<func_type> on shared storage."
+            exit 1
+          fi
+          python autotest/utils/compare_results.py compare_results \
+            "$CURRENT" "$BASELINE" predictions
       - name:  Uninstall opencompass
         if: always()
         run: |
@@ -104,7 +123,7 @@ jobs:
 
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
-    needs: [mock_api_test]
+    needs: [cmd_test, mock_api_test]
     timeout-minutes: 5
     runs-on: self-hosted
     steps:
