@@ -247,7 +247,7 @@ def match_answer_pattern(response_text: str, answer_pattern: str):
 
 @TEXT_POSTPROCESSORS.register_module('extract-non-reasoning-content')
 def extract_non_reasoning_content(
-    text: str,
+    text: Optional[str],
     think_start_token: str = '<think>',
     think_end_token: str = '</think>',
 ) -> str:
@@ -275,6 +275,9 @@ def extract_non_reasoning_content(
         >>> extract_non_reasoning_content(text)
         'Start End'
     """
+    if text is None:
+        return ''
+        
     # If text contains only end token, split by end token and take the last part
     if think_start_token not in text and think_end_token in text:
         return text.split(think_end_token)[-1].strip()
