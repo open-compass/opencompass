@@ -61,6 +61,7 @@ jobs:
             cpu: 16
     env:
       JOB_NAME: pr-test-${{ github.run_id }}-api-${{ matrix.name }}-${{ github.run_attempt }}
+      CHAT_TYPE: ${{ matrix.func_type }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2

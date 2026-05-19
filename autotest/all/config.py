@@ -62,7 +62,8 @@ raw_template_models = [
 
 # NumWorkerPartitioner cache; {config.fullbench_version} is filled at runtime.
 _dataset_size_root = os.environ.get('REPORT_DIR', '.').rstrip('/')
-dataset_size_path = (_dataset_size_root + '/dataset_size.json')
+_dataset_type = os.environ.get('CHAT_TYPE', 'default').rstrip('/')
+dataset_size_path = (f'{_dataset_size_root}/dataset_size_{_dataset_type}.json')
 
 concurrent_infer = dict(
     partitioner=dict(
