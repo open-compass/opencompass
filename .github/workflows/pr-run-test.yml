@@ -44,7 +44,8 @@ jobs:
         include:
           - func_type: chat_obj_fullbench_v1
             name: chat-v1
-            memory: 10240
+            # memory: 10240
+            memory: 32568
             cpu: 16
           - func_type: chat_obj_fullbench_v2
             name: chat-v2
@@ -52,7 +53,8 @@ jobs:
             cpu: 16
           - func_type: chat_sub_fullbench
             name: chat-sub
-            memory: 3072
+            # memory: 3072
+            memory: 32568
             cpu: 2
           - func_type: chat_longtext_fullbench
             name: chat-longtext
