@@ -176,8 +176,6 @@ class OpenICLInferConcurrentTask(BaseTask):
                                 model_cfg.get('max_out_len', None))
         self._set_default_value(inferencer_cfg, 'min_out_len',
                                 model_cfg.get('min_out_len', None))
-        self._set_default_value(inferencer_cfg, 'save_every',
-                                self.cfg.get('save_every'))
         inferencer_cfg['max_seq_len'] = model_cfg.get('max_seq_len')
         inferencer_cfg['dump_res_length'] = self.dump_res_length
         inferencer_cfg['dump_only_message_path'] = self.dump_only_message_path

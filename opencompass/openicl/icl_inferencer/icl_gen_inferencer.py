@@ -7,7 +7,7 @@ import os.path as osp
 import re
 import time
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import torch
 from tqdm import tqdm
@@ -22,41 +22,6 @@ from ..utils.logging import get_logger
 from .icl_base_inferencer import BaseInferencer, GenInferencerOutputHandler
 
 logger = get_logger(__name__)
-
-
-def _zip_prompts_with_gold(prompt_list: List, gold_ans) -> List[Tuple]:
-    """Pair prompts with gold answers.
-
-    When the test split has a single row, HF may return a scalar string; using
-    that directly in zip(prompt_list, gold_ans) iterates characters.
-    """
-    try:
-        n_gold = len(gold_ans)
-    except TypeError:
-        return list(zip(prompt_list, [gold_ans]))
-    if n_gold == 1 and isinstance(gold_ans, str):
-        return list(zip(prompt_list, [gold_ans]))
-    return list(zip(prompt_list, gold_ans))
-
-
-def _unpack_prompt_gold_batch(datum: List) -> Tuple[List, List]:
-    """Unpack a collated batch into parallel prompt and gold lists.
-
-    batch_size=1 yields datum=[[prompt, gold]] or [(prompt, gold)]; zip(*datum)
-    on the former raises ValueError when unpacking into entry, golds.
-    """
-    if len(datum) == 1:
-        item = datum[0]
-        if isinstance(item, tuple) and len(item) == 2:
-            return [item[0]], [item[1]]
-        if (isinstance(item, list) and len(item) == 2
-                and not isinstance(item[0], tuple)):
-            return [item[0]], [item[1]]
-    pairs = list(zip(*datum))
-    if len(pairs) != 2:
-        raise ValueError('Expected batch of (prompt, gold) pairs, got datum '
-                         f'with length {len(datum)}: {datum!r}')
-    return pairs[0], pairs[1]
 
 
 @ICL_INFERENCERS.register_module()
@@ -148,7 +113,7 @@ class GenInferencer(BaseInferencer):
         ds_reader = retriever.dataset_reader
         if ds_reader.output_column:
             gold_ans = ds_reader.dataset['test'][ds_reader.output_column]
-            prompt_list = _zip_prompts_with_gold(prompt_list, gold_ans)
+            prompt_list = list(zip(prompt_list, gold_ans))
 
         # Create tmp json file for saving intermediate results and future
         # resuming
@@ -172,7 +137,7 @@ class GenInferencer(BaseInferencer):
         first_dump = True
         for datum in tqdm(dataloader, disable=not self.is_main_process):
             if ds_reader.output_column:
-                entry, golds = _unpack_prompt_gold_batch(datum)
+                entry, golds = list(zip(*datum))
             else:
                 entry = datum
                 golds = [None for _ in range(len(entry))]

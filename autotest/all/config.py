@@ -9,7 +9,6 @@ from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 API_BASE = 'http://localhost:26333/v1'
 MODEL_PATH = 'mock_test'
 TOKENIZER_PATH = 'Qwen/Qwen3-8B'
-save_every = 1000
 
 models = [
     dict(
@@ -70,7 +69,6 @@ concurrent_infer = dict(
         type=NumWorkerPartitioner,
         num_worker=1,
         dataset_size_path=dataset_size_path,
-        keep_keys=['save_every'],
     ),
     runner=dict(
         type=LocalRunner,
@@ -85,7 +83,6 @@ common_infer = dict(
         type=NumWorkerPartitioner,
         num_worker=1,
         dataset_size_path=dataset_size_path,
-        keep_keys=['save_every'],
     ),
     runner=dict(type=LocalRunner,
                 task=dict(type=OpenICLInferTask),
