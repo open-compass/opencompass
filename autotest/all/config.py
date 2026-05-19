@@ -9,6 +9,7 @@ from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 API_BASE = 'http://localhost:26333/v1'
 MODEL_PATH = 'mock_test'
 TOKENIZER_PATH = 'Qwen/Qwen3-8B'
+save_every = 1000
 
 models = [
     dict(
@@ -17,7 +18,7 @@ models = [
         key='EMPTY',
         openai_api_base=API_BASE,
         path=MODEL_PATH,
-        tokenizer_path=TOKENIZER_PATH,
+        # tokenizer_path=TOKENIZER_PATH,
         rpm_verbose=True,
         meta_template=dict(round=[
             dict(role='SYSTEM', api_role='SYSTEM'),
@@ -29,6 +30,7 @@ models = [
         max_seq_len=258561,
         mode='none',
         retry=3,
+        save_every=save_every,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
     )
 ]
@@ -40,7 +42,7 @@ raw_template_models = [
         key='EMPTY',
         openai_api_base=API_BASE,
         path=MODEL_PATH,
-        tokenizer_path=TOKENIZER_PATH,
+        # tokenizer_path=TOKENIZER_PATH,
         rpm_verbose=True,
         meta_template=[{
             'content': 'Extra test system prompt.',
@@ -56,6 +58,7 @@ raw_template_models = [
         query_per_second=128,
         mode='none',
         retry=3,
+        save_every=save_every,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
     )
 ]
