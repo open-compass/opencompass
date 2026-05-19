@@ -25,6 +25,7 @@ models = [
             dict(role='BOT', api_role='BOT', generate=True),
         ]),
         temperature=0,
+        batch_size=1024,
         max_workers=1024,
         max_seq_len=524288,
         mode='none',
