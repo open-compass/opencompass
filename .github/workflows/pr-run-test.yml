@@ -123,7 +123,7 @@ jobs:
 
   notify_to_feishu:
     if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
-    needs: [cmd_test, mock_api_test]
+    needs: [mock_api_test]
     timeout-minutes: 5
     runs-on: self-hosted
     steps:
