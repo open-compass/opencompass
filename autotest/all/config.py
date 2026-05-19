@@ -30,7 +30,6 @@ models = [
         max_seq_len=258561,
         mode='none',
         retry=3,
-        save_every=save_every,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
     )
 ]
@@ -58,7 +57,6 @@ raw_template_models = [
         query_per_second=128,
         mode='none',
         retry=3,
-        save_every=save_every,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
     )
 ]
@@ -72,6 +70,7 @@ concurrent_infer = dict(
         type=NumWorkerPartitioner,
         num_worker=1,
         dataset_size_path=dataset_size_path,
+        keep_keys=['save_every'],
     ),
     runner=dict(
         type=LocalRunner,
@@ -86,6 +85,7 @@ common_infer = dict(
         type=NumWorkerPartitioner,
         num_worker=1,
         dataset_size_path=dataset_size_path,
+        keep_keys=['save_every'],
     ),
     runner=dict(type=LocalRunner,
                 task=dict(type=OpenICLInferTask),
