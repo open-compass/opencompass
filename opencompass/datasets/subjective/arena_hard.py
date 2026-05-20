@@ -188,6 +188,14 @@ def arenahard_postprocess(
         references,
     )
 
+    if battles.empty or 'model_a' not in battles.columns:
+        return {
+            'warning':
+            'no valid arena-hard judgements (expect [[A>B]] etc. in judge output)',
+            'score': 0,
+            'details': output,
+        }
+
     bootstrap_online_elo = compute_mle_elo(battles)
 
     np.random.seed(42)

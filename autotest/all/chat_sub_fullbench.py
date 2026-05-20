@@ -33,10 +33,8 @@ datasets = sum(
     [],
 )
 
-# MTBench101 / WildBench 的 judge 后处理依赖固定格式（[[score]]、"choice": "A++" 等），
-# mock --type choice 只返回 "A"，无法解析 → 空 references / ZeroDivisionError。
-# datasets += mtbench101_datasets
-# datasets += wildbench_datasets
+datasets += mtbench101_datasets
+datasets += wildbench_datasets
 
 eval = dict(
     partitioner=dict(type=SubjectiveNaivePartitioner,
