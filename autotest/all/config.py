@@ -26,8 +26,31 @@ models = [
         ]),
         temperature=0,
         batch_size=1024,
-        query_per_second=256,
         max_workers=1024,
+        max_seq_len=524288,
+        mode='none',
+        retry=3,
+        pred_postprocessor=dict(type=extract_non_reasoning_content),
+    )
+]
+
+judge_models = [
+    dict(
+        abbr='mock_test',
+        type=OpenAISDK,
+        key='EMPTY',
+        openai_api_base=API_BASE,
+        path=MODEL_PATH,
+        # tokenizer_path=TOKENIZER_PATH,
+        rpm_verbose=True,
+        meta_template=dict(round=[
+            dict(role='SYSTEM', api_role='SYSTEM'),
+            dict(role='HUMAN', api_role='HUMAN'),
+            dict(role='BOT', api_role='BOT', generate=True),
+        ]),
+        temperature=0,
+        batch_size=1024,
+        query_per_second=256,
         max_seq_len=524288,
         mode='none',
         retry=3,
@@ -55,7 +78,6 @@ raw_template_models = [
         batch_size=1024,
         query_per_second=256,
         max_seq_len=524288,
-        max_workers=1024,
         query_per_second=128,
         mode='none',
         retry=3,

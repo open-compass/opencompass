@@ -7,7 +7,7 @@ from opencompass.tasks.subjective_eval import SubjectiveEvalTask
 with read_base():
     from autotest.all.config import \
         concurrent_infer as infer  # noqa: F401, E501
-    from autotest.all.config import models  # noqa: F401, E501
+    from autotest.all.config import judge_models, models  # noqa: F401, E501
     from opencompass.configs.datasets.chinese_simpleqa.chinese_simpleqa_gen import \
         csimpleqa_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.SimpleQA.simpleqa_gen_0283c3 import \
@@ -35,8 +35,6 @@ datasets = sum(
 
 datasets += mtbench101_datasets
 datasets += wildbench_datasets
-
-judge_models = models
 
 eval = dict(
     partitioner=dict(type=SubjectiveNaivePartitioner,
