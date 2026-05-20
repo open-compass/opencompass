@@ -5,7 +5,8 @@ with read_base():
     # Infer with dict(round=...) meta_template; list meta (raw_template_models)
     # breaks GenInferencer + API parse_template on rawprompt datasets.
     from autotest.all.config import common_infer as infer  # noqa: F401, E501
-    from autotest.all.config import models  # noqa: F401, E501
+    from autotest.all.config import \
+        raw_template_models as models  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.AMO_Bench.AMO_Bench_gen import \
         datasets as AMO_Bench_chatml  # noqa: F401, E501
     from opencompass.configs.chatml_datasets.C_MHChem.C_MHChem_gen import \
