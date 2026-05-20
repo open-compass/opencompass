@@ -78,7 +78,6 @@ raw_template_models = [
         batch_size=1024,
         query_per_second=256,
         max_seq_len=524288,
-        query_per_second=128,
         mode='none',
         retry=3,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
