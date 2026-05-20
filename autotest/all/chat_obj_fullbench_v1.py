@@ -321,8 +321,8 @@ datasets = sum(
      and 'teval' not in k.lower() and 'dingo' not in k.lower()),
     [],
 )
-teval_en_datasets[0]['teval_eval_cfg']['num_gpus'] = 0
-teval_zh_datasets[0]['teval_eval_cfg']['num_gpus'] = 0
+teval_en_datasets[0]['eval_cfg']['num_gpus'] = 0
+teval_zh_datasets[0]['eval_cfg']['num_gpus'] = 0
 datasets += [teval_en_datasets[0], teval_zh_datasets[0], SciCode_datasets[0]]
 
 obj_llm_judge_cfg = models[0]
