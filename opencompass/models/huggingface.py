@@ -238,6 +238,16 @@ class HuggingFace(BaseModel):
         """
         generation_kwargs = kwargs.copy()
         generation_kwargs.update(self.generation_kwargs)
+
+        if max_out_len is None:
+            max_out_len = generation_kwargs.pop('max_new_tokens', None)
+        else:
+            generation_kwargs.pop('max_new_tokens', None)
+
+        if max_out_len is None:
+            raise ValueError(
+                '`max_out_len` is required when `max_new_tokens` is not '
+                'set in `generation_kwargs`.')
         if self.batch_padding and len(inputs) > 1:
             return self._batch_generate(inputs=inputs,
                                         max_out_len=max_out_len,
@@ -729,11 +739,12 @@ class HuggingFaceChatGLM3(HuggingFace):
         # used to compensate for #tokens occupied by sth like system prompt
         self.num_extra_tokens = num_extra_tokens
 
-    def generate(self,
-                 inputs: List[PromptType],
-                 max_out_len: int = 512,
-                 skip_overlength=False,
-                 **kwargs) -> str:
+        def generate(self,
+                     inputs: List[str],
+                     max_out_len: Optional[int] = None,
+                     min_out_len: Optional[int] = None,
+                     stopping_criteria: List[str] = [],
+                     **kwargs) -> List[str]:
         """Generate response from input prompt.
 
         Args:
