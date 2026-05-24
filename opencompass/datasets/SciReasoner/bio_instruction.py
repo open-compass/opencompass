@@ -1012,6 +1012,21 @@ def compute_AUC_for_Modification_task(task_name, task_entries, model_name):
                 over_len += 1
             else:
                 miss_len += 1
+        if not entry['model_output'].strip():
+            y_true.append(convert_to_binary_vector(entry['label'].split(',')))
+            y_pred.append(convert_to_binary_vector([]))
+            task_processed_data.append({
+                'input':
+                entry['input'],
+                'label':
+                entry['label'],
+                'processed_model_ouput': [],
+                'original_model_output':
+                entry['model_output']
+            })
+            print('label', entry['label'])
+            print('predication', [])
+            continue
         predicted_modifications = extract_modifications(entry['model_output'])
         # print(predicted_modifications)
         true_modifications = entry['label'].split(',')
