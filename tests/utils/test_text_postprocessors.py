@@ -72,6 +72,9 @@ class TestTextPostprocessors(unittest.TestCase):
                          'How are you?')
         text = 'Start<think>reasoning</think> End'
         self.assertEqual(tp.extract_non_reasoning_content(text), 'Start End')
+    
+    def test_extract_non_reasoning_content_with_none(self):
+        self.assertEqual(tp.extract_non_reasoning_content(None), '')
 
 
 if __name__ == '__main__':
