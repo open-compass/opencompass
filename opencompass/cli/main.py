@@ -16,6 +16,7 @@ from opencompass.summarizers import DefaultSummarizer
 from opencompass.utils import (HeartBeatManager, LarkReporter, get_logger,
                                pretty_print_config, read_from_station,
                                save_to_station)
+from opencompass.utils.repeat_analysis import analyze_repeat_predictions
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
 
@@ -149,6 +150,10 @@ def parse_args():
     )
     parser.add_argument('--dump-res-length',
                         help='dump the length of model responses',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('--analysis-repeat',
+                        help='Analyze repeated predictions in viz stage.',
                         action='store_true',
                         default=False)
     parser.add_argument(
@@ -500,6 +505,13 @@ def main():
             summarizer = build_from_cfg(summarizer_cfg)
             summarizer.summarize(time_str=cfg_time_str)
 
+        if args.analysis_repeat:
+            output_path = analyze_repeat_predictions(
+                cfg,
+                time_str=cfg_time_str,
+                show_progress=True,
+                print_summary=True)
+            logger.info(f'write repeat analysis to {osp.abspath(output_path)}')
 
 
 if __name__ == '__main__':
