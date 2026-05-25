@@ -47,6 +47,36 @@ class ArenaHardDataset(BaseDataset):
         return dataset
 
 
+@LOAD_DATASET.register_module()
+class ArenaHardV2Dataset(BaseDataset):
+
+    def load(self, path: str, name: str, *args, **kwargs):
+        path = get_data_path(path, local_mode=True)
+        filename = osp.join(path, f'{name}.jsonl')
+        dataset = DatasetDict()
+        raw_data = []
+        with open(filename, 'r', encoding='utf-8') as file:
+            for line in file:
+                problem = json.loads(line)
+                question_id = problem['uid']
+                category = problem['category']
+                subcategory = problem['subcategory']
+                question = problem['prompt']
+                raw_data.append({
+                    'question': question,
+                    'category': category,
+                    'subcategory': subcategory,
+                    'judge': {
+                        'category': category,
+                        'subcategory': subcategory,
+                        'question': question,
+                        'question_id': question_id,
+                    },
+                })
+        dataset = Dataset.from_list(raw_data)
+        return dataset
+
+
 def post_process_arenahard(completion):
     s = completion['prediction']
     if result := re.findall('\[\[([AB<>=]+)\]\]', s):
@@ -90,7 +120,11 @@ def get_battles_from_judgment(judged_answers, references, WEIGHT=3):
     return arena_hard_battles
 
 
-def compute_mle_elo(df, SCALE=400, BASE=10, INIT_RATING=1000):
+def compute_mle_elo(df,
+                    SCALE=400,
+                    BASE=10,
+                    INIT_RATING=1000,
+                    base_model_name='gpt4-0314'):
     models = pd.concat([df['model_a'], df['model_b']]).unique()
     models = pd.Series(np.arange(len(models)), index=models)
 
@@ -120,8 +154,8 @@ def compute_mle_elo(df, SCALE=400, BASE=10, INIT_RATING=1000):
     elo_scores = SCALE * lr.coef_[0] + INIT_RATING
 
     # set anchor as gpt4-0314 = 1000
-    if 'gpt4-0314' in models.index:
-        elo_scores += 1000 - elo_scores[models['gpt4-0314']]
+    if base_model_name in models.index:
+        elo_scores += 1000 - elo_scores[models[base_model_name]]
     return pd.Series(elo_scores,
                      index=models.index).sort_values(ascending=False)
 
@@ -176,6 +210,7 @@ def get_win_rate_column(df, column, baseline='gpt4-0314'):
 def arenahard_postprocess(
     output: dict,
     output_path: str,
+    base_model_name: str = 'gpt4-0314',
 ) -> dict:
     judged_answers, references = get_judgeanswer_and_reference(
         output, output_path, post_process_arenahard)
@@ -188,7 +223,8 @@ def arenahard_postprocess(
         references,
     )
 
-    bootstrap_online_elo = compute_mle_elo(battles)
+    bootstrap_online_elo = compute_mle_elo(battles,
+                                           base_model_name=base_model_name)
 
     np.random.seed(42)
     bootstrap_elo_lu = get_bootstrap_result(battles, compute_mle_elo, 100)
@@ -204,10 +240,11 @@ def arenahard_postprocess(
         # stats.at[i, 'upper'] = np.percentile(bootstrap_elo_lu[model], 97.5)
         # stats.at[i, 'results'] = bootstrap_elo_lu[model].tolist()
 
-    stats['score'] = get_win_rate_column(stats, 'score', 'gpt4-0314').tolist()
+    stats['score'] = get_win_rate_column(stats, 'score',
+                                         base_model_name).tolist()
     models = stats['model']
     scores = stats['score']
-    if models[0] == 'gpt4-0314':
+    if models[0] == base_model_name:
         score = scores[1]
     else:
         score = scores[0]
