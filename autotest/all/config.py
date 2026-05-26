@@ -3,7 +3,7 @@ import os
 from opencompass.models import OpenAISDK
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import LocalRunner
-from opencompass.tasks import (OpenICLEvalWatchTask,
+from opencompass.tasks import (OpenICLEvalTask, OpenICLEvalWatchTask,
                                OpenICLInferConcurrentTask, OpenICLInferTask)
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
@@ -120,4 +120,11 @@ concurrent_eval = dict(
     runner=dict(type=LocalRunner,
                 max_num_workers=64,
                 task=dict(type=OpenICLEvalWatchTask)),
+)
+
+common_eval = dict(
+    partitioner=dict(type=NaivePartitioner, n=64),
+    runner=dict(type=LocalRunner,
+                max_num_workers=64,
+                task=dict(type=OpenICLEvalTask)),
 )

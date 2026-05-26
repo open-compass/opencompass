@@ -138,7 +138,7 @@ def json_semantic_diff_lines(
     label1: str = 'file1',
     label2: str = 'file2',
 ) -> List[str]:
-    """Lines describing where semantic equality fails (shallow key/index level)."""  # noqa: F401, E501
+    """Lines describing where semantic equality fails (recursive paths)."""  # noqa: F401, E501
     lines: List[str] = []
     emit = _emit_factory(lines, max_lines, path_prefix)
 
@@ -150,12 +150,28 @@ def json_semantic_diff_lines(
         for k in _sort_keys_for_report(set(left) | set(right)):
             if len(lines) >= max_lines:
                 break
+            sub = f'{path_prefix}.{k}' if path_prefix else str(k)
             if k not in left:
                 emit(f'key {k!r} only in {label2}')
             elif k not in right:
                 emit(f'key {k!r} only in {label1}')
             elif not _semantic_equal(left[k], right[k]):
-                emit(f'key {k!r} differs (semantic)')
+                if isinstance(left[k], (dict, list)) and isinstance(
+                        right[k], (dict, list)):
+                    before = len(lines)
+                    lines.extend(
+                        json_semantic_diff_lines(
+                            left[k],
+                            right[k],
+                            max_lines=max_lines - len(lines),
+                            path_prefix=sub,
+                            label1=label1,
+                            label2=label2,
+                        ))
+                    if len(lines) == before and len(lines) < max_lines:
+                        lines.append(f'{sub}: value differs (semantic)')
+                elif len(lines) < max_lines:
+                    lines.append(f'{sub}: value differs (semantic)')
         return lines
 
     if isinstance(left, list):
@@ -164,8 +180,24 @@ def json_semantic_diff_lines(
         for i in range(min(len(left), len(right))):
             if len(lines) >= max_lines:
                 break
+            sub = f'{path_prefix}[{i}]' if path_prefix else f'[{i}]'
             if not _semantic_equal(left[i], right[i]):
-                emit(f'index {i} differs (semantic)')
+                if isinstance(left[i], (dict, list)) and isinstance(
+                        right[i], (dict, list)):
+                    before = len(lines)
+                    lines.extend(
+                        json_semantic_diff_lines(
+                            left[i],
+                            right[i],
+                            max_lines=max_lines - len(lines),
+                            path_prefix=sub,
+                            label1=label1,
+                            label2=label2,
+                        ))
+                    if len(lines) == before and len(lines) < max_lines:
+                        lines.append(f'{sub}: value differs (semantic)')
+                elif len(lines) < max_lines:
+                    lines.append(f'{sub}: value differs (semantic)')
         if len(left) > len(right) and len(lines) < max_lines:
             emit(f'indices {len(right)}..{len(left) - 1} only in {label1}')
         elif len(right) > len(left) and len(lines) < max_lines:

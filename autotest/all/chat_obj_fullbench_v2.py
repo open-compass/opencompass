@@ -4,6 +4,7 @@ from mmengine.config import read_base
 with read_base():
     # Infer with dict(round=...) meta_template; list meta (raw_template_models)
     # breaks GenInferencer + API parse_template on rawprompt datasets.
+    from autotest.all.config import common_eval as eval  # noqa: F401, E501
     from autotest.all.config import common_infer as infer  # noqa: F401, E501
     from autotest.all.config import \
         raw_template_models as models  # noqa: F401, E501
