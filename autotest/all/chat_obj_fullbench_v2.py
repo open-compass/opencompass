@@ -48,8 +48,8 @@ with read_base():
         bigcodebench_hard_instruct_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.biodata.biodata_task_rawprompt_gen import \
         biodata_task_datasets  # noqa: F401, E501
-    from opencompass.configs.datasets.CARDBiomedBench.CARDBiomedBench_llmjudge_rawprompt_gen_b4d90c import \
-        cardbiomedbench_datasets  # noqa: F401, E501
+    # from opencompass.configs.datasets.CARDBiomedBench.CARDBiomedBench_llmjudge_rawprompt_gen_b4d90c import \ # noqa: F401, E501
+    #    cardbiomedbench_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.chem_exam.competition_rawprompt_gen import \
         chem_competition_instruct_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.chem_exam.gaokao_rawprompt_gen import \
@@ -206,6 +206,9 @@ compassacademic_dataset_list = [
 for acadatasets in compassacademic_dataset_list:
     for acadataset in acadatasets:
         acadataset['abbr'] = acadataset['abbr'] + '_CompassAcademic'
+        acadataset['n'] = 2
+
+HMMT2025_chatml['n'] = 2
 
 repeated_info = [
     (math_datasets, 2),
