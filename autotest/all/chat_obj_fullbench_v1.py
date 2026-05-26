@@ -1,6 +1,7 @@
 from mmengine.config import read_base
 
 with read_base():
+    from autotest.all.config import concurrent_eval as eval  # noqa: F401, E501
     from autotest.all.config import \
         concurrent_infer as infer  # noqa: F401, E501
     from autotest.all.config import models  # noqa: F401, E501

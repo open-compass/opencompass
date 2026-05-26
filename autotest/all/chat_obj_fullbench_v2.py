@@ -192,9 +192,9 @@ CompassAcademic_LCBCodeGeneration_datasets = [
     __import__('copy').deepcopy(CompassAcademic_LCBCodeGeneration_dataset),
 ]
 
-cmphysbench_datasets[0]['abbr'] = cmphysbench_datasets[0]['abbr'] + '_repeat8'
-UGD_hard_chatml[0]['abbr'] = 'UGD_hard_repeat8'
-HMMT2025_chatml[0]['abbr'] = 'HMMT2025_repeat32'
+cmphysbench_datasets[0]['abbr'] = cmphysbench_datasets[0]['abbr'] + '_repeat2'
+UGD_hard_chatml[0]['abbr'] = 'UGD_hard_repeat2'
+HMMT2025_chatml[0]['abbr'] = 'HMMT2025_repeat2'
 math_datasets[0]['abbr'] = 'math500_prm800k'
 
 compassacademic_dataset_list = [
@@ -208,26 +208,48 @@ for acadatasets in compassacademic_dataset_list:
         acadataset['abbr'] = acadataset['abbr'] + '_CompassAcademic'
 
 repeated_info = [
-    (math_datasets, 4),
-    (gpqa_datasets, 8),
-    (aime2024_datasets, 32),
-    (aime2025_datasets, 32),
+    (math_datasets, 2),
+    (gpqa_datasets, 2),
+    (aime2024_datasets, 2),
+    (aime2025_datasets, 2),
     (olympiadbench_datasets, 1),
-    (livemathbench_datasets, 32),
-    (olymmath_datasets, 4),
-    (korbench_0shot_single_datasets, 4),
-    (cmphysbench_datasets, 8),
-    (aime2026_datasets, 32),
-    (hmmt2026_datasets, 32),
+    (livemathbench_datasets, 2),
+    (olymmath_datasets, 2),
+    (korbench_0shot_single_datasets, 2),
+    (cmphysbench_datasets, 2),
+    (aime2026_datasets, 2),
+    (hmmt2026_datasets, 2),
 ]
 
 for datasets_, num in repeated_info:
     for dataset_ in datasets_:
-        dataset_['n'] = 1
-        dataset_['k'] = 1
+        dataset_['n'] = num
+        dataset_['k'] = num
+
+# Multi-subject *_datasets: mock/CI only keep the first subset.
+_FIRST_SUBSET_ONLY_DATASETS = frozenset({
+    'mmlu_datasets',
+    'mmlu_pro_datasets',
+    'cmmlu_datasets',
+    'chembench_datasets',
+    'bbeh_datasets',
+    'matbench_datasets',
+    'climaqa_datasets',
+    'cardbiomedbench_datasets',
+    'supergpqa_datasets',
+    'medmcqa_datasets',
+    'medxpertqa_datasets',
+    'proteinlmbench_datasets',
+    'moleculariq_datasets',
+    'physics_datasets',
+    'RBench_datasets',
+    'earth_silver_mcq_datasets',
+    'korbench_0shot_single_datasets',
+})
 
 datasets = sum(
-    (v for k, v in locals().items() if k.endswith('_datasets')),
+    ([v[0]] if v else [] if k in _FIRST_SUBSET_ONLY_DATASETS else v
+     for k, v in locals().items() if k.endswith('_datasets')),
     [],
 )
 chatml_datasets = sum(
