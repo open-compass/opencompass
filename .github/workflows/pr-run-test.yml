@@ -26,7 +26,6 @@ env:
   HF_HUB_OFFLINE: 1
   CONDA_PATH: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/miniconda3
   REPORT_ROOT: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/eval_report/prtest
-  # Golden predictions for mock_api_test (under REPORT_ROOT).
   BASELINE_DIR: mock-api-baseline
   COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
   HF_DATASETS_CACHE: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache
@@ -194,13 +193,3 @@ jobs:
           python3 -m pip uninstall opencompass -y
           conda info --envs
           rjob stop job ${{ env.JOB_NAME }}
-
-  notify_to_feishu:
-    if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
-    needs: [mock_api_test]
-    timeout-minutes: 5
-    runs-on: self-hosted
-    steps:
-      - name: notify
-        run: |
-          curl -X POST -H "Content-Type: application/json" -d '{"msg_type":"post","content":{"post":{"zh_cn":{"title":"Opencompass- pr test failed","content":[[{"tag":"text","text":"branch: ${{github.ref_name}}, run action: ${{github.workflow}} failed. "},{"tag":"a","text":"Please click here for details ","href":"https://github.com/'${{ github.repository }}'/actions/runs/'${GITHUB_RUN_ID}'"},{"tag":"at","user_id":"'${{ secrets.USER_ID }}'"}]]}}}}'  ${{ secrets.WEBHOOK_URL }}
