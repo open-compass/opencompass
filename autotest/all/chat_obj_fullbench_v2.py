@@ -194,6 +194,7 @@ CompassAcademic_LCBCodeGeneration_datasets = [
 
 cmphysbench_datasets[0]['abbr'] = cmphysbench_datasets[0]['abbr'] + '_repeat2'
 UGD_hard_chatml[0]['abbr'] = 'UGD_hard_repeat2'
+HMMT2025_chatml[0]['n'] = 2
 HMMT2025_chatml[0]['abbr'] = 'HMMT2025_repeat2'
 math_datasets[0]['abbr'] = 'math500_prm800k'
 
@@ -207,8 +208,6 @@ for acadatasets in compassacademic_dataset_list:
     for acadataset in acadatasets:
         acadataset['abbr'] = acadataset['abbr'] + '_CompassAcademic'
         acadataset['n'] = 2
-
-HMMT2025_chatml['n'] = 2
 
 repeated_info = [
     (math_datasets, 2),
