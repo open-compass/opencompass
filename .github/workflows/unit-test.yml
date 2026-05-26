@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Prepare - Install opencompass
         run: |
           . ${{env.CONDA_PATH}}/bin/activate

@@ -41,7 +41,7 @@ jobs:
       JOB_NAME: pr-test-${{ github.run_id }}-cmd-${{ github.run_attempt }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Prepare - Install opencompass
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
@@ -131,7 +131,7 @@ jobs:
       JOB_NAME: pr-test-${{ github.run_id }}-api-${{ matrix.name }}-${{ github.run_attempt }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Prepare - Install opencompass
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
