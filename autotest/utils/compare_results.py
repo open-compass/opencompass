@@ -368,12 +368,7 @@ def compare_results(
 ) -> Optional[List[Tuple[str, str]]]:
     """Entry for scripts: take first subpath under each root, then compare compare_type."""  # noqa: F401, E501
     if results_ignore_list is None:
-        results_ignore_list = [
-            'srbench.json',
-            'dingo_en_192.json',
-            'dingo_zh_170.json',
-            'qa_dingo_cn.json',
-        ]
+        results_ignore_list = []
 
     assert os.path.isdir(folder1), f'Folder does not exist: {folder1}'
     assert os.path.isdir(folder2), f'Folder does not exist: {folder2}'
