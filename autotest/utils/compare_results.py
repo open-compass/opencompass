@@ -1,9 +1,14 @@
 import filecmp
 import json
 import os
-from typing import Any, List, Optional, Tuple
+import re
+from collections import defaultdict
+from typing import Any, Dict, List, Optional, Tuple
 
 import fire
+
+_SUMMARY_TS_RE = re.compile(r'summary_(\d{8}_\d{6})', re.IGNORECASE)
+_SUMMARY_COMPARE_EXTS = ('csv', 'md')
 
 
 def _load_json(path: str) -> Any:
@@ -266,6 +271,93 @@ def _is_json_file(name: str) -> bool:
     return name.lower().endswith('.json')
 
 
+def _summary_file_sort_key(filename: str, filepath: str) -> Tuple[str, float]:
+    """Sort key: embedded summary timestamp, else file mtime."""
+    match = _SUMMARY_TS_RE.search(filename)
+    if match:
+        return (match.group(1), 0.0)
+    return ('', os.path.getmtime(filepath))
+
+
+def _latest_summary_files_by_dir(root: str) -> Dict[str, Dict[str, str]]:
+    """Per relative dir, pick newest summary_*.{csv,md} by timestamp suffix."""
+    latest: Dict[str, Dict[str, Tuple[Tuple[str, float],
+                                      str]]] = defaultdict(dict)
+    for dirpath, _dirs, files in os.walk(root):
+        rel_dir = os.path.relpath(dirpath, root)
+        if rel_dir == '.':
+            rel_dir = ''
+        for name in files:
+            lower = name.lower()
+            if not lower.startswith('summary_'):
+                continue
+            ext = lower.rsplit('.', 1)[-1] if '.' in lower else ''
+            if ext not in _SUMMARY_COMPARE_EXTS:
+                continue
+            full_path = os.path.join(dirpath, name)
+            sort_key = _summary_file_sort_key(name, full_path)
+            prev = latest[rel_dir].get(ext)
+            if prev is None or sort_key > prev[0]:
+                latest[rel_dir][ext] = (sort_key, full_path)
+    return {
+        rel_dir: {ext: path
+                  for ext, (_key, path) in exts.items()}
+        for rel_dir, exts in latest.items()
+    }
+
+
+def compare_summary_folders(
+    folder1: str,
+    folder2: str,
+    raise_on_diff: bool = True,
+) -> Optional[List[Tuple[str, str]]]:
+    """Compare only the newest summary_*.csv and summary_*.md in subdir."""
+    assert os.path.isdir(folder1), f'Folder does not exist: {folder1}'
+    assert os.path.isdir(folder2), f'Folder does not exist: {folder2}'
+
+    latest1 = _latest_summary_files_by_dir(folder1)
+    latest2 = _latest_summary_files_by_dir(folder2)
+    all_dirs = sorted(set(latest1) | set(latest2))
+
+    diff_files: List[Tuple[str, str]] = []
+    for rel_dir in all_dirs:
+        dir_label = rel_dir or '.'
+        files1 = latest1.get(rel_dir, {})
+        files2 = latest2.get(rel_dir, {})
+        for ext in _SUMMARY_COMPARE_EXTS:
+            path1 = files1.get(ext)
+            path2 = files2.get(ext)
+            rel_name = f'{dir_label}/latest.summary.{ext}'
+            if path1 is None and path2 is None:
+                continue
+            if path1 is None:
+                diff_files.append(
+                    (rel_name, f'No summary_*.{ext} in first folder'))
+                continue
+            if path2 is None:
+                diff_files.append(
+                    (rel_name, f'No summary_*.{ext} in second folder'))
+                continue
+            rel_path1 = os.path.relpath(path1, folder1)
+            rel_path2 = os.path.relpath(path2, folder2)
+            if not filecmp.cmp(path1, path2, shallow=False):
+                diff_files.append((
+                    rel_name,
+                    f'Content differs ({rel_path1} vs {rel_path2})',
+                ))
+
+    if diff_files:
+        header = (
+            'Summary compare uses newest summary_*.{csv,md} per directory; '
+            'timestamped .txt and older files are ignored.\n')
+        error_msg = header + 'Found differences:\n' + '\n'.join(
+            f'{path}: {reason}' for path, reason in diff_files)
+        if raise_on_diff:
+            raise AssertionError(error_msg)
+        return diff_files
+    return [] if not raise_on_diff else None
+
+
 def compare_results(
     folder1: str,
     folder2: str,
@@ -290,9 +382,17 @@ def compare_results(
     sub_folder2 = get_all_subpaths(folder2)[0]
 
     print(f'compare {compare_type}')
+    target1 = os.path.join(sub_folder1, compare_type)
+    target2 = os.path.join(sub_folder2, compare_type)
+    if compare_type == 'summary':
+        return compare_summary_folders(
+            target1,
+            target2,
+            raise_on_diff=raise_on_diff,
+        )
     return compare_folders(
-        os.path.join(sub_folder1, compare_type),
-        os.path.join(sub_folder2, compare_type),
+        target1,
+        target2,
         results_ignore_list=results_ignore_list,
         raise_on_diff=raise_on_diff,
         json_diff_max_lines=json_diff_max_lines,
