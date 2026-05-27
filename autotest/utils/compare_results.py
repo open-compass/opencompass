@@ -9,6 +9,9 @@ import fire
 
 _SUMMARY_TS_RE = re.compile(r'summary_(\d{8}_\d{6})', re.IGNORECASE)
 _SUMMARY_COMPARE_EXTS = ('csv', 'md')
+_LCB_PATH_MARKERS = ('lcb', 'livecodebench', 'livecodebench_pro')
+_TRACEBACK_OBJ_RE = re.compile(r'<traceback object at 0x[0-9a-fA-F]+>')
+_MEM_ADDR_RE = re.compile(r'0x[0-9a-fA-F]+')
 
 
 def _load_json(path: str) -> Any:
@@ -40,6 +43,55 @@ def _path_uses_do_sample(rel_path: str) -> bool:
     """True if rel_path triggers key-shape-only JSON compare (ignore leaf values)."""  # noqa: F401, E501
     normalized = rel_path.lower().replace('-', '_')
     return 'do_sample' in normalized
+
+
+def _path_is_lcb_results(rel_path: str, compare_type: str) -> bool:
+    if compare_type != 'results':
+        return False
+    normalized = rel_path.lower().replace('-', '_')
+    return any(marker in normalized for marker in _LCB_PATH_MARKERS)
+
+
+def _normalize_trace_text(text: str) -> str:
+    text = _TRACEBACK_OBJ_RE.sub('<traceback>', text)
+    return _MEM_ADDR_RE.sub('0x0', text)
+
+
+def _normalize_final_metadata(value: Any) -> Any:
+    """Drop volatile traceback addresses from LCB final_metadata blobs."""
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped.startswith('{'):
+            try:
+                return _normalize_final_metadata(json.loads(stripped))
+            except json.JSONDecodeError:
+                pass
+        return _normalize_trace_text(value)
+    if isinstance(value, dict):
+        normalized = {}
+        for key, item in value.items():
+            if key == 'error' and isinstance(item, str):
+                normalized[key] = _normalize_trace_text(item)
+            elif key in ('error_code', 'error_message'):
+                normalized[key] = item
+            else:
+                normalized[key] = _normalize_final_metadata(item)
+        return normalized
+    if isinstance(value, list):
+        return [_normalize_final_metadata(item) for item in value]
+    return value
+
+
+def _normalize_lcb_results(obj: Any) -> Any:
+    if isinstance(obj, dict):
+        return {
+            key: (_normalize_final_metadata(val)
+                  if key == 'final_metadata' else _normalize_lcb_results(val))
+            for key, val in obj.items()
+        }
+    if isinstance(obj, list):
+        return [_normalize_lcb_results(item) for item in obj]
+    return obj
 
 
 def _sort_keys_for_report(keys):
@@ -218,6 +270,7 @@ def _json_pair_compare_reason(
     path2: str,
     rel_path: str,
     json_diff_max_lines: int,
+    compare_type: str = '',
 ) -> Optional[str]:
     """None if pair matches; else multi-line reason (with header). Loads each file once."""  # noqa: F401, E501
     try:
@@ -227,6 +280,10 @@ def _json_pair_compare_reason(
         return f'Invalid JSON: {e}'
     except OSError as e:
         return f'Could not read JSON file: {e}'
+
+    if _path_is_lcb_results(rel_path, compare_type):
+        left = _normalize_lcb_results(left)
+        right = _normalize_lcb_results(right)
 
     label1, label2 = os.path.basename(path1), os.path.basename(path2)
     do_sample = _path_uses_do_sample(rel_path)
@@ -391,6 +448,7 @@ def compare_results(
         results_ignore_list=results_ignore_list,
         raise_on_diff=raise_on_diff,
         json_diff_max_lines=json_diff_max_lines,
+        compare_type=compare_type,
     )
 
 
@@ -400,6 +458,7 @@ def compare_folders(
     results_ignore_list: Optional[list] = None,
     raise_on_diff: bool = True,
     json_diff_max_lines: int = 10,
+    compare_type: str = '',
 ) -> Optional[List[Tuple[str, str]]]:
     """
     Walk both trees; same rel_path must match (JSON per module rules, else binary). # noqa: F401, E501
@@ -431,8 +490,13 @@ def compare_folders(
                 continue
 
             if _is_json_file(file):
-                reason = _json_pair_compare_reason(path1, path2, rel_path,
-                                                   json_diff_max_lines)
+                reason = _json_pair_compare_reason(
+                    path1,
+                    path2,
+                    rel_path,
+                    json_diff_max_lines,
+                    compare_type=compare_type,
+                )
                 if reason is not None:
                     diff_files.append((rel_path, reason))
             elif not filecmp.cmp(path1, path2, shallow=False):
