@@ -91,7 +91,7 @@ simpleqa_infer_cfg = dict(
     prompt_template=dict(
         type=RawPromptTemplate,
         messages=[
-            {'role': 'user', 'content': "Question: {problem}\nLet's think step by step:"}
+            {'role': 'user', 'content': "{problem}"}
         ],
     ),
     retriever=dict(type=ZeroRetriever),
