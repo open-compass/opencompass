@@ -312,6 +312,13 @@ def wildbench_postprocess(
         post_process=post_process_wildbench_pair,
     )
 
+    if not references:
+        return {
+            'warning':
+            'no valid wildbench judgements extracted (check judge output format)',
+            'details': output,
+        }
+
     if 'base_models' in references[0]:
         base_models = references[0]['base_models']
     else:

@@ -367,6 +367,8 @@ def get_final_results(judged_answers, references):
         task: sum(scores) / len(scores) if scores else 0
         for task, scores in task_scores.items()
     }
+    if not final_task_scores:
+        return {'avg': 0.0}
     average_score = round(
         sum(final_task_scores.values()) / len(final_task_scores), 3)
 
@@ -379,6 +381,13 @@ def mtbench101_postprocess(output: dict,
                            ) -> dict:
     judged_answers, references = get_judgeanswer_and_reference(
         output, output_path, post_process_mtbench101)
+
+    if not judged_answers:
+        return {
+            'warning':
+            'no valid mtbench101 judgements extracted (expect [[score]] in output)',
+            'details': output,
+        }
 
     results = get_final_results(judged_answers, references)
     results['details'] = output

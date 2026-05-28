@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CONDA_ENV: pr_test
+  CONDA_ENV: pr_regression
   HF_DATASETS_OFFLINE: 1
   HF_EVALUATE_OFFLINE: 1
   TRANSFORMERS_OFFLINE: 1
@@ -26,20 +26,22 @@ env:
   HF_HUB_OFFLINE: 1
   CONDA_PATH: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/miniconda3
   REPORT_ROOT: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/eval_report/prtest
+  BASELINE_DIR: mock-api-baseline
   COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
-  HF_DATASETS_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/hf_cache
+  HF_DATASETS_CACHE: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/hf_cache
   HF_HUB_CACHE: /mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub
   KUBEBRAIN_CLUSTER_ENTRY: https://h.pjlab.org.cn
   KUBEBRAIN_NAMESPACE: ailab-opencompass
-  JOB_NAME: pr-test-${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:
-  pr_run_test:
+  cmd_test:
     runs-on: yidian_cu12
     timeout-minutes: 45
+    env:
+      JOB_NAME: pr-test-${{ github.run_id }}-cmd-${{ github.run_attempt }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Prepare - Install opencompass
         run: |
           . ${{env.CONDA_PATH}}/bin/activate
@@ -54,13 +56,18 @@ jobs:
           . ${{env.CONDA_PATH}}/bin/activate
           conda activate ${{env.CONDA_ENV}}
           pip list
-          rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/hf_cache --env=HF_HUB_CACHE=/mnt/shared-storage-user/large-model-center-share-weights/hf_hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc '/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/pr_test.sh ${{env.REPORT_ROOT}}/${{ github.run_id }}'
+          rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=${{env.HF_DATASETS_CACHE}} --env=HF_HUB_CACHE=/mnt/shared-storage-user/large-model-center-share-weights/hf_hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights --host-network=True -- bash -exc '/mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/pr_test_new.sh ${{env.REPORT_ROOT}}/${{ github.run_id }}'
 
           for i in {1..300}; do
             current_status=$(rjob get ${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
-            if [[ $current_status == "Succeeded" || $current_status == "Failed" || $current_status == "Stopped" ]]; then
-                echo "Current status: $current_status, stop checking"
-                break
+            if [[ $current_status == "Succeeded" ]]; then
+              echo "Task succeeded"
+              rjob logs job ${{ env.JOB_NAME }} -n 100
+              exit 0
+            elif [[ $current_status == "Failed" || $current_status == "Stopped" ]]; then
+              echo "Task failed or stopped, fetching logs"
+              rjob logs job ${{ env.JOB_NAME }} -n 100
+              exit 1
             fi
             sleep 6
           done
@@ -96,12 +103,93 @@ jobs:
           conda info --envs
           rjob stop job ${{ env.JOB_NAME }}
 
-  notify_to_feishu:
-    if: ${{ always() && !cancelled() && contains(needs.*.result, 'failure') && (github.ref_name == 'develop' || github.ref_name == 'main') }}
-    needs: [pr_run_test]
-    timeout-minutes: 5
-    runs-on: self-hosted
+  mock_api_test:
+    runs-on: yidian_cu12
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - func_type: chat_obj_fullbench_v1
+            name: chat-v1
+            memory: 32568
+            cpu: 16
+          - func_type: chat_obj_fullbench_v2
+            name: chat-v2
+            memory: 32568
+            cpu: 16
+          - func_type: chat_sub_fullbench
+            name: chat-sub
+            # memory: 3072
+            memory: 32568
+            cpu: 2
+          - func_type: chat_longtext_fullbench
+            name: chat-longtext
+            memory: 65136
+            cpu: 16
+    env:
+      JOB_NAME: pr-test-${{ github.run_id }}-api-${{ matrix.name }}-${{ github.run_attempt }}
     steps:
-      - name: notify
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Prepare - Install opencompass
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{"msg_type":"post","content":{"post":{"zh_cn":{"title":"Opencompass- pr test failed","content":[[{"tag":"text","text":"branch: ${{github.ref_name}}, run action: ${{github.workflow}} failed. "},{"tag":"a","text":"Please click here for details ","href":"https://github.com/'${{ github.repository }}'/actions/runs/'${GITHUB_RUN_ID}'"},{"tag":"at","user_id":"'${{ secrets.USER_ID }}'"}]]}}}}'  ${{ secrets.WEBHOOK_URL }}
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          python3 -m pip uninstall opencompass -y
+          python3 -m pip install .[full]
+          conda info --envs
+          pip list
+          lmdeploy check_env
+      - name: Run test
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          pip list
+
+          rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=opencompass_gpu --private-machine=group --group=opencompass_gpu --gpu=0 --cpu=${{ matrix.cpu }} --memory=${{ matrix.memory }} --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu-puyu_gpu/lmdeploy:v0.12.0-cu12.8 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=${{env.HF_DATASETS_CACHE}} --env=HF_HUB_CACHE=/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --env=REPORT_DIR=${{env.REPORT_ROOT}} --env=CHAT_TYPE=${{matrix.func_type}} --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public --host-network=True -- bash -exc 'source ${{env.CONDA_PATH}}/bin/activate; conda activate ${{env.CONDA_ENV}}; conda env list; cd ${{github.workspace}}; ln -s /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache/data .; python /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/mock_chat_api.py --type winrate --port 26333 > mock_${{matrix.name}}.log 2>&1 & sleep 3; opencompass autotest/all/${{matrix.func_type}}.py --work-dir ${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.func_type}} --reuse;'
+
+          for i in {1..300}; do
+            current_status=$(rjob get ${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+')
+            if [[ $current_status == "Succeeded" ]]; then
+              echo "Task succeeded"
+              rjob logs job ${{ env.JOB_NAME }} -n 100
+              exit 0
+            elif [[ $current_status == "Failed" || $current_status == "Stopped" ]]; then
+              echo "Task failed or stopped, fetching logs"
+              rjob logs job ${{ env.JOB_NAME }} -n 100
+              exit 1
+            fi
+            sleep 6
+          done
+      - name: Compare predictions with baseline
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          CURRENT="${{env.REPORT_ROOT}}/${{ github.run_id }}/${{matrix.func_type}}"
+          BASELINE="${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/${{matrix.func_type}}"
+          echo "Current run: $CURRENT"
+          echo "Baseline:    $BASELINE"
+          if [[ ! -d "$CURRENT" ]]; then
+            echo "Current run output not found: $CURRENT"
+            exit 1
+          fi
+          if [[ ! -d "$BASELINE" ]]; then
+            echo "Baseline not found: $BASELINE"
+            echo "Upload golden predictions to REPORT_ROOT/BASELINE_DIR/<func_type> on shared storage."
+            exit 1
+          fi
+          python autotest/utils/compare_results.py compare_results \
+            "$CURRENT" "$BASELINE" predictions
+          python autotest/utils/compare_results.py compare_results \
+            "$CURRENT" "$BASELINE" results
+          python autotest/utils/compare_results.py compare_results \
+            "$CURRENT" "$BASELINE" summary
+      - name:  Uninstall opencompass
+        if: always()
+        run: |
+          . ${{env.CONDA_PATH}}/bin/activate
+          conda activate ${{env.CONDA_ENV}}
+          python3 -m pip uninstall opencompass -y
+          conda info --envs
+          rjob stop job ${{ env.JOB_NAME }}

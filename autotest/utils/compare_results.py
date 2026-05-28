@@ -1,9 +1,17 @@
 import filecmp
 import json
 import os
-from typing import Any, List, Optional, Tuple
+import re
+from collections import defaultdict
+from typing import Any, Dict, List, Optional, Tuple
 
 import fire
+
+_SUMMARY_TS_RE = re.compile(r'summary_(\d{8}_\d{6})', re.IGNORECASE)
+_SUMMARY_COMPARE_EXTS = ('csv', 'md')
+_LCB_PATH_MARKERS = ('lcb', 'livecodebench', 'livecodebench_pro')
+_TRACEBACK_OBJ_RE = re.compile(r'<traceback object at 0x[0-9a-fA-F]+>')
+_MEM_ADDR_RE = re.compile(r'0x[0-9a-fA-F]+')
 
 
 def _load_json(path: str) -> Any:
@@ -35,6 +43,55 @@ def _path_uses_do_sample(rel_path: str) -> bool:
     """True if rel_path triggers key-shape-only JSON compare (ignore leaf values)."""  # noqa: F401, E501
     normalized = rel_path.lower().replace('-', '_')
     return 'do_sample' in normalized
+
+
+def _path_is_lcb_results(rel_path: str, compare_type: str) -> bool:
+    if compare_type != 'results':
+        return False
+    normalized = rel_path.lower().replace('-', '_')
+    return any(marker in normalized for marker in _LCB_PATH_MARKERS)
+
+
+def _normalize_trace_text(text: str) -> str:
+    text = _TRACEBACK_OBJ_RE.sub('<traceback>', text)
+    return _MEM_ADDR_RE.sub('0x0', text)
+
+
+def _normalize_final_metadata(value: Any) -> Any:
+    """Drop volatile traceback addresses from LCB final_metadata blobs."""
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped.startswith('{'):
+            try:
+                return _normalize_final_metadata(json.loads(stripped))
+            except json.JSONDecodeError:
+                pass
+        return _normalize_trace_text(value)
+    if isinstance(value, dict):
+        normalized = {}
+        for key, item in value.items():
+            if key == 'error' and isinstance(item, str):
+                normalized[key] = _normalize_trace_text(item)
+            elif key in ('error_code', 'error_message'):
+                normalized[key] = item
+            else:
+                normalized[key] = _normalize_final_metadata(item)
+        return normalized
+    if isinstance(value, list):
+        return [_normalize_final_metadata(item) for item in value]
+    return value
+
+
+def _normalize_lcb_results(obj: Any) -> Any:
+    if isinstance(obj, dict):
+        return {
+            key: (_normalize_final_metadata(val)
+                  if key == 'final_metadata' else _normalize_lcb_results(val))
+            for key, val in obj.items()
+        }
+    if isinstance(obj, list):
+        return [_normalize_lcb_results(item) for item in obj]
+    return obj
 
 
 def _sort_keys_for_report(keys):
@@ -138,7 +195,7 @@ def json_semantic_diff_lines(
     label1: str = 'file1',
     label2: str = 'file2',
 ) -> List[str]:
-    """Lines describing where semantic equality fails (shallow key/index level)."""  # noqa: F401, E501
+    """Lines describing where semantic equality fails (recursive paths)."""  # noqa: F401, E501
     lines: List[str] = []
     emit = _emit_factory(lines, max_lines, path_prefix)
 
@@ -150,12 +207,28 @@ def json_semantic_diff_lines(
         for k in _sort_keys_for_report(set(left) | set(right)):
             if len(lines) >= max_lines:
                 break
+            sub = f'{path_prefix}.{k}' if path_prefix else str(k)
             if k not in left:
                 emit(f'key {k!r} only in {label2}')
             elif k not in right:
                 emit(f'key {k!r} only in {label1}')
             elif not _semantic_equal(left[k], right[k]):
-                emit(f'key {k!r} differs (semantic)')
+                if isinstance(left[k], (dict, list)) and isinstance(
+                        right[k], (dict, list)):
+                    before = len(lines)
+                    lines.extend(
+                        json_semantic_diff_lines(
+                            left[k],
+                            right[k],
+                            max_lines=max_lines - len(lines),
+                            path_prefix=sub,
+                            label1=label1,
+                            label2=label2,
+                        ))
+                    if len(lines) == before and len(lines) < max_lines:
+                        lines.append(f'{sub}: value differs (semantic)')
+                elif len(lines) < max_lines:
+                    lines.append(f'{sub}: value differs (semantic)')
         return lines
 
     if isinstance(left, list):
@@ -164,8 +237,24 @@ def json_semantic_diff_lines(
         for i in range(min(len(left), len(right))):
             if len(lines) >= max_lines:
                 break
+            sub = f'{path_prefix}[{i}]' if path_prefix else f'[{i}]'
             if not _semantic_equal(left[i], right[i]):
-                emit(f'index {i} differs (semantic)')
+                if isinstance(left[i], (dict, list)) and isinstance(
+                        right[i], (dict, list)):
+                    before = len(lines)
+                    lines.extend(
+                        json_semantic_diff_lines(
+                            left[i],
+                            right[i],
+                            max_lines=max_lines - len(lines),
+                            path_prefix=sub,
+                            label1=label1,
+                            label2=label2,
+                        ))
+                    if len(lines) == before and len(lines) < max_lines:
+                        lines.append(f'{sub}: value differs (semantic)')
+                elif len(lines) < max_lines:
+                    lines.append(f'{sub}: value differs (semantic)')
         if len(left) > len(right) and len(lines) < max_lines:
             emit(f'indices {len(right)}..{len(left) - 1} only in {label1}')
         elif len(right) > len(left) and len(lines) < max_lines:
@@ -181,6 +270,7 @@ def _json_pair_compare_reason(
     path2: str,
     rel_path: str,
     json_diff_max_lines: int,
+    compare_type: str = '',
 ) -> Optional[str]:
     """None if pair matches; else multi-line reason (with header). Loads each file once."""  # noqa: F401, E501
     try:
@@ -190,6 +280,10 @@ def _json_pair_compare_reason(
         return f'Invalid JSON: {e}'
     except OSError as e:
         return f'Could not read JSON file: {e}'
+
+    if _path_is_lcb_results(rel_path, compare_type):
+        left = _normalize_lcb_results(left)
+        right = _normalize_lcb_results(right)
 
     label1, label2 = os.path.basename(path1), os.path.basename(path2)
     do_sample = _path_uses_do_sample(rel_path)
@@ -234,6 +328,93 @@ def _is_json_file(name: str) -> bool:
     return name.lower().endswith('.json')
 
 
+def _summary_file_sort_key(filename: str, filepath: str) -> Tuple[str, float]:
+    """Sort key: embedded summary timestamp, else file mtime."""
+    match = _SUMMARY_TS_RE.search(filename)
+    if match:
+        return (match.group(1), 0.0)
+    return ('', os.path.getmtime(filepath))
+
+
+def _latest_summary_files_by_dir(root: str) -> Dict[str, Dict[str, str]]:
+    """Per relative dir, pick newest summary_*.{csv,md} by timestamp suffix."""
+    latest: Dict[str, Dict[str, Tuple[Tuple[str, float],
+                                      str]]] = defaultdict(dict)
+    for dirpath, _dirs, files in os.walk(root):
+        rel_dir = os.path.relpath(dirpath, root)
+        if rel_dir == '.':
+            rel_dir = ''
+        for name in files:
+            lower = name.lower()
+            if not lower.startswith('summary_'):
+                continue
+            ext = lower.rsplit('.', 1)[-1] if '.' in lower else ''
+            if ext not in _SUMMARY_COMPARE_EXTS:
+                continue
+            full_path = os.path.join(dirpath, name)
+            sort_key = _summary_file_sort_key(name, full_path)
+            prev = latest[rel_dir].get(ext)
+            if prev is None or sort_key > prev[0]:
+                latest[rel_dir][ext] = (sort_key, full_path)
+    return {
+        rel_dir: {ext: path
+                  for ext, (_key, path) in exts.items()}
+        for rel_dir, exts in latest.items()
+    }
+
+
+def compare_summary_folders(
+    folder1: str,
+    folder2: str,
+    raise_on_diff: bool = True,
+) -> Optional[List[Tuple[str, str]]]:
+    """Compare only the newest summary_*.csv and summary_*.md in subdir."""
+    assert os.path.isdir(folder1), f'Folder does not exist: {folder1}'
+    assert os.path.isdir(folder2), f'Folder does not exist: {folder2}'
+
+    latest1 = _latest_summary_files_by_dir(folder1)
+    latest2 = _latest_summary_files_by_dir(folder2)
+    all_dirs = sorted(set(latest1) | set(latest2))
+
+    diff_files: List[Tuple[str, str]] = []
+    for rel_dir in all_dirs:
+        dir_label = rel_dir or '.'
+        files1 = latest1.get(rel_dir, {})
+        files2 = latest2.get(rel_dir, {})
+        for ext in _SUMMARY_COMPARE_EXTS:
+            path1 = files1.get(ext)
+            path2 = files2.get(ext)
+            rel_name = f'{dir_label}/latest.summary.{ext}'
+            if path1 is None and path2 is None:
+                continue
+            if path1 is None:
+                diff_files.append(
+                    (rel_name, f'No summary_*.{ext} in first folder'))
+                continue
+            if path2 is None:
+                diff_files.append(
+                    (rel_name, f'No summary_*.{ext} in second folder'))
+                continue
+            rel_path1 = os.path.relpath(path1, folder1)
+            rel_path2 = os.path.relpath(path2, folder2)
+            if not filecmp.cmp(path1, path2, shallow=False):
+                diff_files.append((
+                    rel_name,
+                    f'Content differs ({rel_path1} vs {rel_path2})',
+                ))
+
+    if diff_files:
+        header = (
+            'Summary compare uses newest summary_*.{csv,md} per directory; '
+            'timestamped .txt and older files are ignored.\n')
+        error_msg = header + 'Found differences:\n' + '\n'.join(
+            f'{path}: {reason}' for path, reason in diff_files)
+        if raise_on_diff:
+            raise AssertionError(error_msg)
+        return diff_files
+    return [] if not raise_on_diff else None
+
+
 def compare_results(
     folder1: str,
     folder2: str,
@@ -244,12 +425,7 @@ def compare_results(
 ) -> Optional[List[Tuple[str, str]]]:
     """Entry for scripts: take first subpath under each root, then compare compare_type."""  # noqa: F401, E501
     if results_ignore_list is None:
-        results_ignore_list = [
-            'srbench.json',
-            'dingo_en_192.json',
-            'dingo_zh_170.json',
-            'qa_dingo_cn.json',
-        ]
+        results_ignore_list = ['srbench.json']
 
     assert os.path.isdir(folder1), f'Folder does not exist: {folder1}'
     assert os.path.isdir(folder2), f'Folder does not exist: {folder2}'
@@ -258,12 +434,21 @@ def compare_results(
     sub_folder2 = get_all_subpaths(folder2)[0]
 
     print(f'compare {compare_type}')
+    target1 = os.path.join(sub_folder1, compare_type)
+    target2 = os.path.join(sub_folder2, compare_type)
+    if compare_type == 'summary':
+        return compare_summary_folders(
+            target1,
+            target2,
+            raise_on_diff=raise_on_diff,
+        )
     return compare_folders(
-        os.path.join(sub_folder1, compare_type),
-        os.path.join(sub_folder2, compare_type),
+        target1,
+        target2,
         results_ignore_list=results_ignore_list,
         raise_on_diff=raise_on_diff,
         json_diff_max_lines=json_diff_max_lines,
+        compare_type=compare_type,
     )
 
 
@@ -273,6 +458,7 @@ def compare_folders(
     results_ignore_list: Optional[list] = None,
     raise_on_diff: bool = True,
     json_diff_max_lines: int = 10,
+    compare_type: str = '',
 ) -> Optional[List[Tuple[str, str]]]:
     """
     Walk both trees; same rel_path must match (JSON per module rules, else binary). # noqa: F401, E501
@@ -304,8 +490,13 @@ def compare_folders(
                 continue
 
             if _is_json_file(file):
-                reason = _json_pair_compare_reason(path1, path2, rel_path,
-                                                   json_diff_max_lines)
+                reason = _json_pair_compare_reason(
+                    path1,
+                    path2,
+                    rel_path,
+                    json_diff_max_lines,
+                    compare_type=compare_type,
+                )
                 if reason is not None:
                     diff_files.append((rel_path, reason))
             elif not filecmp.cmp(path1, path2, shallow=False):
