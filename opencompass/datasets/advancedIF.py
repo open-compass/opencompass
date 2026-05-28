@@ -1,7 +1,7 @@
 import json
 import re
 
-from datasets import Dataset, DatasetDict, load_dataset
+from datasets import Dataset, load_dataset
 
 from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
 from opencompass.utils import get_logger
@@ -36,8 +36,8 @@ class AdvancedIFDataset(BaseDataset):
             # full_conversation: conversation_history with the last user
             # turn removed, serialized as JSON string
             if last_user_idx >= 0:
-                truncated_history = (conversation_history[:last_user_idx]
-                                     + conversation_history[last_user_idx + 1:])
+                truncated_history = (conversation_history[:last_user_idx] +
+                                     conversation_history[last_user_idx + 1:])
             else:
                 truncated_history = conversation_history
             full_conversation = json.dumps(truncated_history,
@@ -91,9 +91,8 @@ def _extract_rubric_judgement(prediction: str) -> dict:
     json_match = re.search(r'\{[\s\S]*?"SATISFIED_ALL_REQUIREMENTS"[\s\S]*\}',
                            prediction, re.DOTALL)
     if not json_match:
-        json_match = re.search(
-            r'\{[^{}]*"SATISFIED_ALL_REQUIREMENTS"[^{}]*\}',
-            prediction, re.DOTALL)
+        json_match = re.search(r'\{[^{}]*"SATISFIED_ALL_REQUIREMENTS"[^{}]*\}',
+                               prediction, re.DOTALL)
 
     if json_match:
         try:
@@ -112,8 +111,8 @@ def _extract_rubric_judgement(prediction: str) -> dict:
 
     # Fallback: look for YES/NO near SATISFIED_ALL_REQUIREMENTS
     satisfied_match = re.search(
-        r'"SATISFIED_ALL_REQUIREMENTS"\s*:\s*"(YES|NO)"',
-        prediction, re.IGNORECASE)
+        r'"SATISFIED_ALL_REQUIREMENTS"\s*:\s*"(YES|NO)"', prediction,
+        re.IGNORECASE)
     if satisfied_match:
         result['satisfied'] = satisfied_match.group(1).upper()
 
@@ -155,7 +154,8 @@ def advancedif_rubric_postprocess(output: dict, output_path: str) -> dict:
         # Rubric-question-level: count individual rubric passes
         for question_key, decision_value in rubrics_check.items():
             total_rubrics += 1
-            if isinstance(decision_value, str) and 'yes' in decision_value.lower():
+            if isinstance(decision_value,
+                          str) and 'yes' in decision_value.lower():
                 passed_rubrics += 1
 
         details.append({
@@ -169,8 +169,7 @@ def advancedif_rubric_postprocess(output: dict, output_path: str) -> dict:
     accuracy = (correct_count / total * 100) if total > 0 else 0
     micro_pass_rate = (passed_rubrics / total_rubrics *
                        100) if total_rubrics > 0 else 0
-    parse_error_rate = (parse_error_count / total *
-                        100) if total > 0 else 0
+    parse_error_rate = (parse_error_count / total * 100) if total > 0 else 0
 
     result = {
         'accuracy': accuracy,
