@@ -1,9 +1,7 @@
 from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.evaluator import (
-    GenericLLMEvaluator,
-)
+from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import SimpleQADataset, simpleqa_postprocess
 
 GRADER_TEMPLATE = """
@@ -85,45 +83,38 @@ Predicted answer: {prediction}
 ```
 """.strip()
 
-
 simpleqa_reader_cfg = dict(input_columns=['problem'], output_column='answer')
 
 simpleqa_infer_cfg = dict(
     prompt_template=dict(
         type=RawPromptTemplate,
         messages=[
-            {'role': 'user', 'content': "Question: {problem}\nLet's think step by step:"}
+            {'role': 'user', 'content': '{problem}'},
         ],
-    ),
+        ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer)
-)
+    inferencer=dict(type=GenInferencer))
 
 simpleqa_eval_cfg = dict(
     evaluator=dict(
-        type=GenericLLMEvaluator,
+        type=LMEvaluator,
         prompt_template=dict(
             type=RawPromptTemplate,
             messages=[
                 {'role': 'system', 'content': "You are a helpful assistant who evaluates the correctness and quality of models' outputs."},
-                {'role': 'user', 'content': GRADER_TEMPLATE},
+                {'role': 'user', 'content': GRADER_TEMPLATE}
             ],
         ),
-        dataset_cfg=dict(
-            type=SimpleQADataset,
-            path='opencompass/simpleqa-verified',
-            reader_cfg=simpleqa_reader_cfg,
-        ),
         dict_postprocessor=dict(type=simpleqa_postprocess),
-        judge_cfg=dict(),
-    )
+    ),
+    pred_role='BOT',
 )
 
-simpleqa_verified_datasets = [
+simpleqa_datasets = [
     dict(
-        abbr='simpleqa-verified',
+        abbr='simpleqa',
         type=SimpleQADataset,
-        path='opencompass/simpleqa-verified',
+        path='opencompass/simpleqa',
         reader_cfg=simpleqa_reader_cfg,
         infer_cfg=simpleqa_infer_cfg,
         eval_cfg=simpleqa_eval_cfg,
