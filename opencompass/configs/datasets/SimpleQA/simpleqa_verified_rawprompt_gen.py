@@ -85,14 +85,13 @@ Predicted answer: {prediction}
 ```
 """.strip()
 
-
 simpleqa_reader_cfg = dict(input_columns=['problem'], output_column='answer')
 
 simpleqa_infer_cfg = dict(
     prompt_template=dict(
         type=RawPromptTemplate,
         messages=[
-            {'role': 'user', 'content': 'Question: {problem}\nLet\'s think step by step:'}
+            {'role': 'user', 'content': '{problem}'}
         ],
     ),
     retriever=dict(type=ZeroRetriever),
@@ -105,7 +104,7 @@ simpleqa_eval_cfg = dict(
         prompt_template=dict(
             type=RawPromptTemplate,
             messages=[
-                {'role': 'system', 'content': 'You are a helpful assistant who evaluates the correctness and quality of models\' outputs.'},
+                {'role': 'system', 'content': "You are a helpful assistant who evaluates the correctness and quality of models' outputs."},
                 {'role': 'user', 'content': GRADER_TEMPLATE},
             ],
         ),
