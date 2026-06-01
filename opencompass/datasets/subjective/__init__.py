@@ -29,10 +29,12 @@ from .judgerbench import JudgerBenchDataset  # noqa: F401, F403
 from .judgerbench import JudgerBenchEvaluator  # noqa: F401, F403
 from .mtbench import MTBenchDataset, mtbench_postprocess  # noqa: F401, F403
 from .mtbench101 import MTBench101Dataset  # noqa: F401, F403
+from .mtbench101 import MTBench101WithRawPromptDataset  # noqa: F401, F403
 from .mtbench101 import mtbench101_postprocess
 from .multiround import MultiroundDataset  # noqa: F401, F403
 from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403
 from .wildbench import WildBenchDataset  # noqa: F401, F403
+from .wildbench import WildBenchWithRawPromptDataset  # noqa: F401, F403
 from .wildbench import wildbench_bradleyterry_postprocess  # noqa: F401, F403
 from .wildbench import wildbench_postprocess  # noqa: F401, F403
 from .writingbench import *

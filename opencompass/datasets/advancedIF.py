@@ -119,6 +119,30 @@ def _extract_rubric_judgement(prediction: str) -> dict:
     return result
 
 
+def _get_expected_rubric_count(rubrics_text: str) -> int:
+    """Parse rubrics_text to get the expected number of rubrics.
+
+    rubrics_text is a JSON string like:
+        '["Did the model ...?", "Did the model ...?"]'
+    or could be empty / unparsable.
+
+    Returns:
+        The number of rubric questions, or 0 if parsing fails.
+    """
+    if not rubrics_text or not isinstance(rubrics_text, str):
+        return 0
+    rubrics_text = rubrics_text.strip()
+    if not rubrics_text:
+        return 0
+    try:
+        rubrics_list = json.loads(rubrics_text)
+        if isinstance(rubrics_list, list):
+            return len(rubrics_list)
+    except (json.JSONDecodeError, TypeError):
+        pass
+    return 0
+
+
 @DICT_POSTPROCESSORS.register_module()
 def advancedif_rubric_postprocess(output: dict, output_path: str) -> dict:
     """Postprocess the rubric judge output.
@@ -127,7 +151,11 @@ def advancedif_rubric_postprocess(output: dict, output_path: str) -> dict:
     SATISFIED_ALL_REQUIREMENTS and rubrics_check, then computes:
     - accuracy: sample-level pass rate (SATISFIED_ALL_REQUIREMENTS == YES)
     - micro_pass_rate: rubric-question-level pass rate (total passed
-      questions / total questions across all samples)
+      questions / total expected questions across all samples).
+      Follows the original AdvancedIF logic:
+      - Extra rubrics from judge (beyond expected count) are skipped.
+      - Missing rubrics are implicitly treated as failures.
+      - Denominator is always the expected rubric count.
     """
     details = []
     correct_count = 0
@@ -151,12 +179,31 @@ def advancedif_rubric_postprocess(output: dict, output_path: str) -> dict:
         elif satisfied == 'PARSE_ERROR':
             parse_error_count += 1
 
-        # Rubric-question-level: count individual rubric passes
+        # Get expected rubric count from the gold (rubrics_text)
+        expected_count = _get_expected_rubric_count(gold)
+        total_rubrics += max(expected_count, 1)
+
+        # Rubric-question-level: count individual rubric passes,
+        # skipping rubrics that exceed the expected count.
+        sample_passed = 0
         for question_key, decision_value in rubrics_check.items():
-            total_rubrics += 1
+            # Skip rubrics beyond expected count (judge output too many)
+            try:
+                idx = int(question_key.split('_')[1]) - 1
+                if idx >= expected_count:
+                    logger.warning(
+                        f'Sample {k}: rubric {question_key} exceeds '
+                        f'expected count {expected_count}, skipping')
+                    continue
+            except (ValueError, IndexError):
+                logger.warning(f'Sample {k}: non-workable question_key '
+                               f'{question_key}, skipping')
+                continue
+
             if isinstance(decision_value,
                           str) and 'yes' in decision_value.lower():
-                passed_rubrics += 1
+                sample_passed += 1
+        passed_rubrics += sample_passed
 
         details.append({
             'prediction': prediction,
