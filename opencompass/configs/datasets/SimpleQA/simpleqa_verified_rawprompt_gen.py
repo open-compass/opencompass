@@ -92,7 +92,7 @@ simpleqa_infer_cfg = dict(
     prompt_template=dict(
         type=RawPromptTemplate,
         messages=[
-            {'role': 'user', 'content': "Question: {problem}\nLet's think step by step:"}
+            {'role': 'user', 'content': 'Question: {problem}\nLet\'s think step by step:'}
         ],
     ),
     retriever=dict(type=ZeroRetriever),
@@ -105,7 +105,7 @@ simpleqa_eval_cfg = dict(
         prompt_template=dict(
             type=RawPromptTemplate,
             messages=[
-                {'role': 'system', 'content': "You are a helpful assistant who evaluates the correctness and quality of models' outputs."},
+                {'role': 'system', 'content': 'You are a helpful assistant who evaluates the correctness and quality of models\' outputs.'},
                 {'role': 'user', 'content': GRADER_TEMPLATE},
             ],
         ),
