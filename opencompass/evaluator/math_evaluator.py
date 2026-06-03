@@ -3,18 +3,27 @@ import re
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
 
-# Patterns that may cause sympy to hang during parse/verify.
-# If any pattern is detected in the prediction, skip evaluation for this item.
-_UNSAFE_PATTERNS = [
-    r'Sum\(',
-    r'Product\(',
-    r'binomial\(',
-    r'factorial\(',
+# LaTeX patterns that may cause latex2sympy2_extended to hang during parse().
+# If any pattern is detected in the raw prediction, skip parse() for this item.
+_UNSAFE_LATEX_PATTERNS = [
+    r'\\sum\b',
+    r'\\prod\b',
+    r'\\binom\b',
+    r'\\choose\b',
+    r'!',
 ]
 
 
-def _is_unsafe(pred: str) -> bool:
-    return any(re.search(p, pred) for p in _UNSAFE_PATTERNS)
+def _extract_boxed(text: str) -> str:
+    """Extract content from the last \\boxed{...} to end of text."""
+    idx = text.rfind('\\boxed')
+    if idx == -1:
+        return text
+    return text[idx + len('\\boxed'):]
+
+
+def _is_unsafe_latex(pred: str) -> bool:
+    return any(re.search(p, pred) for p in _UNSAFE_LATEX_PATTERNS)
 
 
 @ICL_EVALUATORS.register_module()
@@ -48,6 +57,20 @@ class MATHVerifyEvaluator(BaseEvaluator):
             )
 
             if len(gold_parsed) != 0:
+                # Check for unsafe LaTeX patterns BEFORE parse(),
+                # as parse() itself can hang on certain expressions.
+                if _is_unsafe_latex(_extract_boxed(i)):
+                    answer_correct = 0
+                    meta_info = 'skipped: unsafe pattern detected'
+                    detail = {
+                        'pred': i,
+                        'answer': str(gold_parsed),
+                        'correct': False,
+                        'meta_info': meta_info,
+                    }
+                    details.append(detail)
+                    continue
+
                 # We require the answer to be provided in correct
                 # latex (no malformed operators)
                 answer_parsed = parse(
@@ -70,12 +93,8 @@ class MATHVerifyEvaluator(BaseEvaluator):
                     extraction_mode='first_match',
                 )
 
-                if _is_unsafe(str(answer_parsed)):
-                    answer_correct = 0
-                    meta_info = 'skipped: unsafe pattern detected'
-                else:
-                    answer_correct = float(verify(answer_parsed, gold_parsed))
-                    meta_info = 'regular math evaluate'
+                answer_correct = float(verify(answer_parsed, gold_parsed))
+                meta_info = 'regular math evaluate'
                 correct += answer_correct
                 detail = {
                     'pred': str(answer_parsed),
