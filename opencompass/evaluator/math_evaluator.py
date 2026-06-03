@@ -1,5 +1,20 @@
+import re
+
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
+
+# Patterns that may cause sympy to hang during parse/verify.
+# If any pattern is detected in the prediction, skip evaluation for this item.
+_UNSAFE_PATTERNS = [
+    r'Sum\(',
+    r'Product\(',
+    r'binomial\(',
+    r'factorial\(',
+]
+
+
+def _is_unsafe(pred: str) -> bool:
+    return any(re.search(p, pred) for p in _UNSAFE_PATTERNS)
 
 
 @ICL_EVALUATORS.register_module()
@@ -55,12 +70,18 @@ class MATHVerifyEvaluator(BaseEvaluator):
                     extraction_mode='first_match',
                 )
 
-                answer_correct = float(verify(answer_parsed, gold_parsed))
+                if _is_unsafe(str(answer_parsed)):
+                    answer_correct = 0
+                    meta_info = 'skipped: unsafe pattern detected'
+                else:
+                    answer_correct = float(verify(answer_parsed, gold_parsed))
+                    meta_info = 'regular math evaluate'
                 correct += answer_correct
                 detail = {
                     'pred': str(answer_parsed),
                     'answer': str(gold_parsed),
                     'correct': True if answer_correct else False,
+                    'meta_info': meta_info,
                 }
                 details.append(detail)
         result = {'accuracy': 100 * correct / count, 'details': details}
