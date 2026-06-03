@@ -20,8 +20,10 @@ class MATHVerifyEvaluator(BaseEvaluator):
         correct = 0
         count = 0
         details = []
-        for i, j in zip(predictions, references):
-            count += 1
+        for preds, j in zip(predictions, references):
+            if not isinstance(preds, list):
+                preds = [preds]
+            count += len(preds)
             j_with_env = f'${j}$'
             gold_parsed = parse(
                 j_with_env,
@@ -35,7 +37,7 @@ class MATHVerifyEvaluator(BaseEvaluator):
             if len(gold_parsed) != 0:
                 # We require the answer to be provided in correct
                 # latex (no malformed operators)
-                answer_parsed = parse(
+                answer_parsed = [parse(
                     i,
                     extraction_config=[
                         LatexExtractionConfig(
@@ -53,9 +55,9 @@ class MATHVerifyEvaluator(BaseEvaluator):
                         )
                     ],
                     extraction_mode='first_match',
-                )
+                ) for i in preds]
 
-                answer_correct = float(verify(answer_parsed, gold_parsed))
+                answer_correct = sum([float(verify(i, gold_parsed)) for i in answer_parsed])
                 correct += answer_correct
                 detail = {
                     'pred': str(answer_parsed),
@@ -146,3 +148,20 @@ if __name__ == '__main__':
                 print(f'Numerical value: {float(expr.evalf())}')
         except Exception as e:
             print(f'\nError in numerical test {test_expr}: {e}')
+
+    print('\n' + '=' * 50 + '\nMultiple predictions Tests:')
+    evaluator = MATHVerifyEvaluator()
+    param_dict_list = [{'predictions': [r'the answer is \boxed{100}.'],
+                        'references': ['100', ]},
+                       {'predictions': [[r'the answer is \boxed{100}.', 'Okay, so I need']],
+                        'references': ['100', ]},
+                       {'predictions': [[r'the answer is \boxed{99}.', r'the answer is \boxed{99}.'],
+                                        [r'the answer is \boxed{99}.', r'the answer is \boxed{99}.']],
+                        'references': ['100', '99']}]
+    for test_expr in param_dict_list:
+        try:
+            result = evaluator.score(**test_expr)
+            print(f'\nExpression: {test_expr}')
+            print(f'Accuracy: {result["accuracy"]}')
+        except Exception as e:
+            print(f'\nError in multiple predictions test {test_expr}: {e}')
