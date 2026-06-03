@@ -21,7 +21,7 @@ class MiniMax(BaseAPIModel):
     .. deprecated::
         Use :class:`MiniMaxAPI` instead, which supports the latest
         OpenAI-compatible ``/v1/chat/completions`` endpoint and newer
-        models (MiniMax-M2.7, MiniMax-M2.5, etc.).
+        models (MiniMax-M3, MiniMax-M2.7, etc.).
 
     Documentation: https://platform.minimaxi.com/document/guides/chat-pro
 
@@ -370,16 +370,16 @@ class MiniMaxChatCompletionV2(BaseAPIModel):
 class MiniMaxAPI(BaseAPIModel):
     """Model wrapper around MiniMax's OpenAI-compatible API.
 
-    Supports the latest MiniMax models including MiniMax-M2.7,
-    MiniMax-M2.5, and MiniMax-M2.5-highspeed via the
+    Supports the latest MiniMax models including MiniMax-M3,
+    MiniMax-M2.7, and MiniMax-M2.7-highspeed via the
     ``/v1/chat/completions`` endpoint.
 
     Documentation: https://platform.minimaxi.com/document/ChatCompletion%20v2
 
     Args:
         path (str): The name of MiniMax model.
-            e.g. ``MiniMax-M2.7``, ``MiniMax-M2.5``,
-            ``MiniMax-M2.5-highspeed``
+            e.g. ``MiniMax-M3``, ``MiniMax-M2.7``,
+            ``MiniMax-M2.7-highspeed``
         key (str or List[str]): Authorization key(s). When set to
             ``'ENV'``, the key will be fetched from the environment
             variable ``$MINIMAX_API_KEY``. If it's a list, the keys
@@ -389,7 +389,7 @@ class MiniMaxAPI(BaseAPIModel):
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 2.
         max_seq_len (int): The maximum sequence length. Defaults to
-            204800 (MiniMax supports up to 204K context).
+            524288 (MiniMax-M3 supports up to 512K context).
         meta_template (Dict, optional): The model's meta prompt
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
@@ -407,11 +407,11 @@ class MiniMaxAPI(BaseAPIModel):
 
     def __init__(
         self,
-        path: str = 'MiniMax-M2.7',
+        path: str = 'MiniMax-M3',
         key: Union[str, List[str]] = 'ENV',
         url: str = MINIMAX_API_BASE,
         query_per_second: int = 2,
-        max_seq_len: int = 204800,
+        max_seq_len: int = 524288,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
         temperature: Optional[float] = None,

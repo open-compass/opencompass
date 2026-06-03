@@ -7,9 +7,9 @@ api_meta_template = dict(round=[
 
 models = [
     dict(
-        abbr='MiniMax-M2.5-highspeed',
+        abbr='MiniMax-M2.7-highspeed',
         type=MiniMaxAPI,
-        path='MiniMax-M2.5-highspeed',
+        path='MiniMax-M2.7-highspeed',
         key='ENV',
         meta_template=api_meta_template,
         query_per_second=2,

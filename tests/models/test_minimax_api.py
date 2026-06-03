@@ -17,14 +17,14 @@ class TestMiniMaxAPI(unittest.TestCase):
     def test_initialization_basic(self):
         """Test basic initialization with ENV key."""
         model = MiniMaxAPI(
-            path='MiniMax-M2.7',
-            max_seq_len=204800,
+            path='MiniMax-M3',
+            max_seq_len=524288,
             query_per_second=2,
         )
 
-        self.assertEqual(model.path, 'MiniMax-M2.7')
-        self.assertEqual(model.model, 'MiniMax-M2.7')
-        self.assertEqual(model.max_seq_len, 204800)
+        self.assertEqual(model.path, 'MiniMax-M3')
+        self.assertEqual(model.model, 'MiniMax-M3')
+        self.assertEqual(model.max_seq_len, 524288)
         self.assertEqual(model.url, MINIMAX_API_BASE)
         self.assertEqual(model.keys, ['test-key'])
         self.assertIsNone(model.temperature)
@@ -32,7 +32,7 @@ class TestMiniMaxAPI(unittest.TestCase):
     @patch.dict('os.environ', {'MINIMAX_API_KEY': 'key1,key2,key3'})
     def test_initialization_multiple_keys(self):
         """Test initialization with multiple comma-separated keys."""
-        model = MiniMaxAPI(path='MiniMax-M2.7')
+        model = MiniMaxAPI(path='MiniMax-M3')
 
         self.assertEqual(len(model.keys), 3)
         self.assertEqual(model.keys[0], 'key1')
@@ -42,7 +42,7 @@ class TestMiniMaxAPI(unittest.TestCase):
     def test_initialization_with_direct_key(self):
         """Test initialization with a direct API key."""
         model = MiniMaxAPI(
-            path='MiniMax-M2.5',
+            path='MiniMax-M2.7',
             key='my-direct-key',
         )
 
@@ -51,7 +51,7 @@ class TestMiniMaxAPI(unittest.TestCase):
     def test_initialization_with_key_list(self):
         """Test initialization with a list of keys."""
         model = MiniMaxAPI(
-            path='MiniMax-M2.5',
+            path='MiniMax-M2.7',
             key=['key-a', 'key-b'],
         )
 
@@ -63,14 +63,14 @@ class TestMiniMaxAPI(unittest.TestCase):
     def test_initialization_missing_env_key(self):
         """Test that missing MINIMAX_API_KEY raises ValueError."""
         with self.assertRaises(ValueError) as ctx:
-            MiniMaxAPI(path='MiniMax-M2.7', key='ENV')
+            MiniMaxAPI(path='MiniMax-M3', key='ENV')
         self.assertIn('MINIMAX_API_KEY', str(ctx.exception))
 
     @patch.dict('os.environ', {'MINIMAX_API_KEY': 'test-key'})
     def test_initialization_with_temperature(self):
         """Test initialization with temperature."""
         model = MiniMaxAPI(
-            path='MiniMax-M2.7',
+            path='MiniMax-M3',
             temperature=0.7,
         )
 
@@ -81,7 +81,7 @@ class TestMiniMaxAPI(unittest.TestCase):
         """Test initialization with custom URL."""
         custom_url = 'https://custom.minimax.io/v1/chat/completions'
         model = MiniMaxAPI(
-            path='MiniMax-M2.7',
+            path='MiniMax-M3',
             url=custom_url,
         )
 
@@ -89,16 +89,17 @@ class TestMiniMaxAPI(unittest.TestCase):
 
     @patch.dict('os.environ', {'MINIMAX_API_KEY': 'test-key'})
     def test_default_model(self):
-        """Test that default model is MiniMax-M2.7."""
+        """Test that default model is MiniMax-M3."""
         model = MiniMaxAPI()
 
-        self.assertEqual(model.model, 'MiniMax-M2.7')
+        self.assertEqual(model.model, 'MiniMax-M3')
+        self.assertEqual(model.max_seq_len, 524288)
 
     @patch.dict('os.environ', {'MINIMAX_API_KEY': 'test-key'})
     def test_key_rotation(self):
         """Test round-robin key rotation."""
         model = MiniMaxAPI(
-            path='MiniMax-M2.7',
+            path='MiniMax-M3',
             key=['key-1', 'key-2', 'key-3'],
         )
 
@@ -465,11 +466,11 @@ class TestMiniMaxChatCompletionV2(unittest.TestCase):
     def test_initialization(self):
         """Test basic initialization."""
         model = MiniMaxChatCompletionV2(
-            path='MiniMax-M2.5',
+            path='MiniMax-M2.7',
             key='test-key',
         )
 
-        self.assertEqual(model.model, 'MiniMax-M2.5')
+        self.assertEqual(model.model, 'MiniMax-M2.7')
         self.assertEqual(model.url, MINIMAX_API_BASE)
 
     def test_initialization_with_custom_url(self):
@@ -499,7 +500,7 @@ class TestMiniMaxChatCompletionV2(unittest.TestCase):
         mock_requests.request.return_value = mock_response
 
         model = MiniMaxChatCompletionV2(
-            path='MiniMax-M2.5',
+            path='MiniMax-M2.7',
             key='test-key',
         )
         results = model.generate(['Hi'], max_out_len=100)
@@ -515,9 +516,9 @@ class TestMiniMaxAPIIntegration(unittest.TestCase):
         __import__('os').environ.get('MINIMAX_API_KEY'),
         'MINIMAX_API_KEY not set')
     def test_real_api_call(self):
-        """Test a real API call to MiniMax."""
+        """Test a real API call to MiniMax-M3 (the default model)."""
         model = MiniMaxAPI(
-            path='MiniMax-M2.7',
+            path='MiniMax-M3',
             key='ENV',
             retry=2,
         )
@@ -531,15 +532,15 @@ class TestMiniMaxAPIIntegration(unittest.TestCase):
     @unittest.skipUnless(
         __import__('os').environ.get('MINIMAX_API_KEY'),
         'MINIMAX_API_KEY not set')
-    def test_real_api_m2_5_highspeed(self):
-        """Test a real API call with MiniMax-M2.5-highspeed."""
+    def test_real_api_m2_7_highspeed(self):
+        """Test a real API call with MiniMax-M2.7-highspeed."""
         model = MiniMaxAPI(
-            path='MiniMax-M2.5-highspeed',
+            path='MiniMax-M2.7-highspeed',
             key='ENV',
             retry=2,
         )
 
-        # Use higher max_out_len since M2.5-highspeed includes
+        # Use higher max_out_len since highspeed models may include
         # inline <think>...</think> reasoning tokens
         results = model.generate(['What is 2+2? Answer with just the number.'],
                                  max_out_len=500)
@@ -552,7 +553,7 @@ class TestMiniMaxAPIIntegration(unittest.TestCase):
     def test_real_api_with_temperature(self):
         """Test a real API call with temperature setting."""
         model = MiniMaxAPI(
-            path='MiniMax-M2.7',
+            path='MiniMax-M3',
             key='ENV',
             temperature=0.1,
             retry=2,
