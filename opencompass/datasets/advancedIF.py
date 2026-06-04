@@ -15,11 +15,26 @@ logger = get_logger()
 class AdvancedIFDataset(BaseDataset):
 
     @staticmethod
-    def load(path, **kwargs):
+    def load(path, name=None, **kwargs):
+        """Load AdvancedIF dataset.
+
+        Args:
+            path: HuggingFace dataset path.
+            name: Optional benchmark_name filter. One of
+                'complex_if_single_turn_v5',
+                'carried_context_multi_turn_eval_v5',
+                'system_steerability_v2', or None for all.
+        """
         raw_dataset = load_dataset(path)
 
         dataset = []
         for item in raw_dataset['train']:
+            benchmark_name = item.get('benchmark_name', '')
+
+            # Filter by subset name if specified
+            if name is not None and benchmark_name != name:
+                continue
+
             # Parse conversation_history from JSON string
             conversation_history = json.loads(item['conversation_history'])
 
@@ -33,15 +48,30 @@ class AdvancedIFDataset(BaseDataset):
                     last_user_idx = i
                     break
 
-            # full_conversation: conversation_history with the last user
-            # turn removed, serialized as JSON string
+            # Build truncated history (without last user turn) for judge prompt
             if last_user_idx >= 0:
                 truncated_history = (conversation_history[:last_user_idx] +
                                      conversation_history[last_user_idx + 1:])
             else:
                 truncated_history = conversation_history
-            full_conversation = json.dumps(truncated_history,
-                                           ensure_ascii=False)
+
+            # Extract system prompt (first message with role='system')
+            system_prompt = ''
+            if (conversation_history
+                    and conversation_history[0].get('role') == 'system'):
+                system_prompt = conversation_history[0].get('content', '')
+
+            # Format truncated history as readable text (matching original
+            # AdvancedIF repo's _format_conversation_history)
+            conv_lines = []
+            turn = 1
+            for msg in truncated_history:
+                role = msg.get('role', '')
+                content = msg.get('content', '')
+                conv_lines.append(f'{role} [{turn}]: {content}')
+                if role == 'assistant':
+                    turn += 1
+            full_conversation_text = '\n'.join(conv_lines)
 
             # Extract rubrics from prompt_metadata
             # prompt_metadata is a JSON string like {"rubrics": "[...]"}
@@ -60,9 +90,11 @@ class AdvancedIFDataset(BaseDataset):
 
             dataset.append({
                 'conversation_history': conversation_history,
-                'full_conversation': full_conversation,
+                'full_conversation_text': full_conversation_text,
                 'last_user_question': last_user_question,
+                'system_prompt': system_prompt,
                 'rubrics_text': rubrics_text,
+                'benchmark_name': benchmark_name,
             })
 
         test_dataset = Dataset.from_list(dataset)
@@ -119,43 +151,19 @@ def _extract_rubric_judgement(prediction: str) -> dict:
     return result
 
 
-def _get_expected_rubric_count(rubrics_text: str) -> int:
-    """Parse rubrics_text to get the expected number of rubrics.
-
-    rubrics_text is a JSON string like:
-        '["Did the model ...?", "Did the model ...?"]'
-    or could be empty / unparsable.
-
-    Returns:
-        The number of rubric questions, or 0 if parsing fails.
-    """
-    if not rubrics_text or not isinstance(rubrics_text, str):
-        return 0
-    rubrics_text = rubrics_text.strip()
-    if not rubrics_text:
-        return 0
-    try:
-        rubrics_list = json.loads(rubrics_text)
-        if isinstance(rubrics_list, list):
-            return len(rubrics_list)
-    except (json.JSONDecodeError, TypeError):
-        pass
-    return 0
-
-
 @DICT_POSTPROCESSORS.register_module()
 def advancedif_rubric_postprocess(output: dict, output_path: str) -> dict:
     """Postprocess the rubric judge output.
 
-    Parses the JSON blob from each judge prediction, extracts
-    SATISFIED_ALL_REQUIREMENTS and rubrics_check, then computes:
-    - accuracy: sample-level pass rate (SATISFIED_ALL_REQUIREMENTS == YES)
-    - micro_pass_rate: rubric-question-level pass rate (total passed
-      questions / total expected questions across all samples).
-      Follows the original AdvancedIF logic:
-      - Extra rubrics from judge (beyond expected count) are skipped.
-      - Missing rubrics are implicitly treated as failures.
-      - Denominator is always the expected rubric count.
+    Follows the original AdvancedIF repo's _calculate_stats logic:
+
+    - accuracy (overall_pass_rate): samples with SATISFIED_ALL_REQUIREMENTS
+      == YES / total samples. Failed/parse-error samples count as wrong
+      (pull down the rate but still in denominator).
+    - micro_pass_rate: total passed rubric questions / total rubric
+      questions. Only successfully parsed samples contribute to numerator
+      and denominator. Within each sample, ALL rubrics_check items are
+      counted without idx filtering or expected-count capping.
     """
     details = []
     correct_count = 0
@@ -166,7 +174,6 @@ def advancedif_rubric_postprocess(output: dict, output_path: str) -> dict:
 
     for k, v in output.items():
         prediction = v.get('prediction', '')
-        gold = v.get('gold', '')
         judgement = _extract_rubric_judgement(prediction)
         satisfied = judgement['satisfied']
         rubrics_check = judgement['rubrics_check']
@@ -179,35 +186,19 @@ def advancedif_rubric_postprocess(output: dict, output_path: str) -> dict:
         elif satisfied == 'PARSE_ERROR':
             parse_error_count += 1
 
-        # Get expected rubric count from the gold (rubrics_text)
-        expected_count = _get_expected_rubric_count(gold)
-        total_rubrics += max(expected_count, 1)
-
-        # Rubric-question-level: count individual rubric passes,
-        # skipping rubrics that exceed the expected count.
-        sample_passed = 0
-        for question_key, decision_value in rubrics_check.items():
-            # Skip rubrics beyond expected count (judge output too many)
-            try:
-                idx = int(question_key.split('_')[1]) - 1
-                if idx >= expected_count:
-                    logger.warning(
-                        f'Sample {k}: rubric {question_key} exceeds '
-                        f'expected count {expected_count}, skipping')
-                    continue
-            except (ValueError, IndexError):
-                logger.warning(f'Sample {k}: non-workable question_key '
-                               f'{question_key}, skipping')
-                continue
-
-            if isinstance(decision_value,
-                          str) and 'yes' in decision_value.lower():
-                sample_passed += 1
-        passed_rubrics += sample_passed
+        # Micro-level: only count rubrics from successfully parsed
+        # samples (equivalent to original's `if r.success and
+        # r.judgement`). No idx filtering — all rubrics_check items
+        # participate in numerator and denominator.
+        if satisfied in ('YES', 'NO'):
+            for _question_key, decision_value in rubrics_check.items():
+                total_rubrics += 1
+                if isinstance(decision_value, str) \
+                        and 'yes' in decision_value.lower():
+                    passed_rubrics += 1
 
         details.append({
             'prediction': prediction,
-            'gold': gold,
             'satisfied': satisfied,
             'rubrics_check': rubrics_check,
             'correct': satisfied == 'YES',

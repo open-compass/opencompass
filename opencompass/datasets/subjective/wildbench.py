@@ -472,7 +472,6 @@ class WildBenchWithRawPromptDataset(BaseDataset):
                     'role': conversation[-1]['role'],
                     'content': conversation[-1]['content'],
                 })
-                chat_round.append({'role': 'assistant', 'content': ''})
 
                 # Build prompt (same logic as WildBenchDataset)
                 checklist_mardkdown = ''
