@@ -442,11 +442,18 @@ class MTBench101WithRawPromptDataset(BaseDataset):
 
                 pre_dia_copy = copy.deepcopy(pre_dia)
 
+                # Strip last assistant message so the model doesn't see
+                # the gold answer (matches old ChatInferencer.infer_last).
+                if pre_dia_copy and pre_dia_copy[-1]['role'] == 'assistant':
+                    dialogue_for_infer = pre_dia_copy[:-1]
+                else:
+                    dialogue_for_infer = pre_dia_copy
+
                 system_prompt, prompt_template = eval_prompt_construct(
                     task, pre_dia, history)
 
                 raw_data.append({
-                    'dialogue': pre_dia_copy,
+                    'dialogue': dialogue_for_infer,
                     'task': task,
                     'multi_id': current_multi_id,
                     'turn_id': turn_id,
