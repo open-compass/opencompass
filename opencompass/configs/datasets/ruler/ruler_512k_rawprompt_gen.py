@@ -3,11 +3,11 @@ import os
 from mmengine.config import read_base
 
 with read_base():
-    from .ruler_cwe_gen import cwe_datasets as cwe  # CWE
-    from .ruler_fwe_gen import fwe_datasets as fwe  # FWE
-    from .ruler_niah_gen import niah_datasets as niah  # Niah
-    from .ruler_qa_gen import qa_datasets as qa  # QA
-    from .ruler_vt_gen import vt_datasets as vt  # VT
+    from .ruler_cwe_rawprompt_gen import cwe_datasets as cwe  # CWE
+    from .ruler_fwe_rawprompt_gen import fwe_datasets as fwe  # FWE
+    from .ruler_niah_rawprompt_gen import niah_datasets as niah  # Niah
+    from .ruler_qa_rawprompt_gen import qa_datasets as qa  # QA
+    from .ruler_vt_rawprompt_gen import vt_datasets as vt  # VT
 
 
 import_ds = sum((cwe, fwe, niah, qa, vt), [])
@@ -16,8 +16,8 @@ import_ds = sum((cwe, fwe, niah, qa, vt), [])
 NUM_SAMPLES = 100  # Change to the number of samples you need
 tokenizer_model = os.environ.get('TOKENIZER_MODEL', 'gpt-4')
 # Change the context lengths to be tested
-max_seq_lens = [1024 * 64]
-abbr_suffixs = ['64k']
+max_seq_lens = [1024 * 512]
+abbr_suffixs = ['512k']
 
 ruler_datasets = []
 
