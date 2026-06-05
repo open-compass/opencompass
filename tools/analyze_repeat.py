@@ -30,6 +30,9 @@ def parse_args():
                         type=str,
                         help='Think tag to split reasoning and content.')
     parser.add_argument('--out', type=Path, help='output file path')
+    parser.add_argument('--no-progress',
+                        action='store_true',
+                        help='Disable benchmark progress bars.')
     args = parser.parse_args()
     return args
 
@@ -140,7 +143,7 @@ def main():
         print(f'\n[{benchmark}] ({len(records)} samples)')
 
         stats = _analyze_benchmark(records, {model_abbr: tokenizer},
-                                   show_progress=True,
+                                   show_progress=not args.no_progress,
                                    batch_size=args.batch_size,
                                    think_tag=args.think_tag)
         benchmark_stats[benchmark] = stats
