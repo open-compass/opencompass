@@ -3,7 +3,7 @@ from opencompass.datasets.s2_tomg_bench import (
     S2TOMGBenchEvaluator,
 )
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 
@@ -36,11 +36,11 @@ for _name, _family, _subtask in [
 ]:
     s2_tomg_bench_infer_cfg = dict(
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(round=[
-                dict(role='SYSTEM', prompt=SYSTEM_PROMPT),
-                dict(role='HUMAN', prompt='{prompt}'),
-            ]),
+            type=RawPromptTemplate,
+            messages=[
+                {'role': 'system', 'content': SYSTEM_PROMPT},
+                {'role': 'user', 'content': '{prompt}'},
+            ],
         ),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer),
@@ -52,7 +52,7 @@ for _name, _family, _subtask in [
         dict(
             abbr=f'S2-TOMG-Bench-{_name}',
             type=S2TOMGBenchDataset,
-            path='phenixace/S2-TOMG-Bench',
+            path='opencompass/S2-TOMG-Bench',
             name=_name,
             task_family=_family,
             subtask=_subtask,
@@ -64,7 +64,7 @@ for _name, _family, _subtask in [
         dict(
             abbr=f'S2-TOMG-Bench-{_name}-mini',
             type=S2TOMGBenchDataset,
-            path='phenixace/S2-TOMG-Bench-mini',
+            path='opencompass/S2-TOMG-Bench-mini',
             name=_name,
             task_family=_family,
             subtask=_subtask,

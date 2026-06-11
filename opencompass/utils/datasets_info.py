@@ -1,4 +1,14 @@
 DATASETS_MAPPING = {
+    "opencompass/S2-TOMG-Bench":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/S2-TOMG-Bench",
+    },
+    "opencompass/S2-TOMG-Bench-mini":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/S2-TOMG-Bench-mini",
+    },   
     "opencompass/MolecularIQ":{
         "ms_id": None,
         "hf_id": None,
