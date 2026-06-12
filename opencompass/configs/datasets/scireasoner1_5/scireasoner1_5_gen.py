@@ -8,13 +8,12 @@ from opencompass.datasets.SciReasoner1_5 import (
     SciReasoner15TMScoreEvaluator,
 )
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 
-SCIREASONER15_DATA_ROOT = 'SciReasoner/test-1.5'
-SCIREASONER15_MINI_SAMPLE_SIZE = int(
-    os.environ.get('SCIREASONER15_MINI_SAMPLE_SIZE', '150'))
+SCIREASONER15_DATA_ROOT = 'opencompass/SciReasoner1.5'
+SCIREASONER15_MINI_SAMPLE_SIZE = 150
 
 scireasoner1_5_reader_cfg = dict(
     input_columns=['prompt'],
@@ -23,10 +22,10 @@ scireasoner1_5_reader_cfg = dict(
 
 scireasoner1_5_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[
-            dict(role='HUMAN', prompt='{prompt}'),
-        ]),
+        type=RawPromptTemplate,
+        messages=[
+            {'role': 'user', 'content': '{prompt}'},
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
