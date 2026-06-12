@@ -629,6 +629,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/SciReasoner/smol-test",
     },
+    "opencompass/SciReasoner1.5":{
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/SciReasoner1.5/test-1.5",
+    },
 }
 
 DATASETS_URL = {
