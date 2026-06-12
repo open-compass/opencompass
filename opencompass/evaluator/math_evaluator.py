@@ -1,29 +1,83 @@
-import re
+# flake8: noqa
+
+import multiprocessing
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
 
-# LaTeX patterns that may cause latex2sympy2_extended to hang during parse().
-# If any pattern is detected in the raw prediction, skip parse() for this item.
-_UNSAFE_LATEX_PATTERNS = [
-    r'\\sum\b',
-    r'\\prod\b',
-    r'\\binom\b',
-    r'\\choose\b',
-    r'!',
-]
+
+def _verify_worker(pred, ref, queue):
+    """Run parse + verify inside a subprocess, put result into *queue*."""
+    try:
+        from latex2sympy2_extended import NormalizationConfig
+        from math_verify import (ExprExtractionConfig, LatexExtractionConfig,
+                                 parse, verify)
+
+        j_with_env = f'${ref}$'
+        gold_parsed = parse(
+            j_with_env,
+            extraction_mode='first_match',
+            extraction_config=[
+                LatexExtractionConfig(),
+                ExprExtractionConfig(),
+            ],
+        )
+
+        if len(gold_parsed) == 0:
+            queue.put(('empty', ))
+            return
+
+        answer_parsed = parse(
+            pred,
+            extraction_config=[
+                LatexExtractionConfig(
+                    normalization_config=NormalizationConfig(
+                        nits=False,
+                        malformed_operators=False,
+                        basic_latex=True,
+                        equations=True,
+                        boxed='all',
+                        units=True,
+                    ),
+                    boxed_match_priority=0,
+                    try_extract_without_anchor=False,
+                )
+            ],
+            extraction_mode='first_match',
+        )
+
+        answer_correct = float(verify(answer_parsed, gold_parsed))
+        queue.put(('ok', answer_correct, str(answer_parsed), str(gold_parsed)))
+    except Exception as e:
+        queue.put(('error', str(e)))
 
 
-def _extract_boxed(text: str) -> str:
-    """Extract content from the last \\boxed{...} to end of text."""
-    idx = text.rfind('\\boxed')
-    if idx == -1:
-        return text
-    return text[idx + len('\\boxed'):]
+def _verify_with_timeout(pred, ref, timeout=10):
+    """Wrap ``_verify_worker`` with a subprocess-level timeout."""
+    queue = multiprocessing.Queue()
+    p = multiprocessing.Process(target=_verify_worker, args=(pred, ref, queue))
+    p.start()
+    p.join(timeout)
 
+    if p.is_alive():
+        p.terminate()
+        p.join()
+        return {'timed_out': True}
 
-def _is_unsafe_latex(pred: str) -> bool:
-    return any(re.search(p, pred) for p in _UNSAFE_LATEX_PATTERNS)
+    if queue.empty():
+        return {'error': True}
+
+    result = queue.get_nowait()
+    if result[0] == 'empty':
+        return {'skipped': True}
+    elif result[0] == 'error':
+        return {'error': True, 'msg': result[1]}
+    else:
+        return {
+            'answer_correct': result[1],
+            'answer_parsed': result[2],
+            'gold_parsed': result[3],
+        }
 
 
 @ICL_EVALUATORS.register_module()
@@ -46,63 +100,29 @@ class MATHVerifyEvaluator(BaseEvaluator):
         details = []
         for i, j in zip(predictions, references):
             count += 1
-            j_with_env = f'${j}$'
-            gold_parsed = parse(
-                j_with_env,
-                extraction_mode='first_match',
-                extraction_config=[
-                    LatexExtractionConfig(),
-                    ExprExtractionConfig(),
-                ],
-            )
+            result = _verify_with_timeout(i, j, timeout=10)
 
-            if len(gold_parsed) != 0:
-                # Check for unsafe LaTeX patterns BEFORE parse(),
-                # as parse() itself can hang on certain expressions.
-                if _is_unsafe_latex(_extract_boxed(i)):
-                    answer_correct = 0
-                    meta_info = 'skipped: unsafe pattern detected'
-                    detail = {
-                        'pred': i,
-                        'answer': str(gold_parsed),
-                        'correct': False,
-                        'meta_info': meta_info,
-                    }
-                    details.append(detail)
-                    continue
-
-                # We require the answer to be provided in correct
-                # latex (no malformed operators)
-                answer_parsed = parse(
-                    i,
-                    extraction_config=[
-                        LatexExtractionConfig(
-                            normalization_config=NormalizationConfig(
-                                nits=False,
-                                malformed_operators=False,
-                                basic_latex=True,
-                                equations=True,
-                                boxed='all',
-                                units=True,
-                            ),
-                            # Ensures that boxed is tried first
-                            boxed_match_priority=0,
-                            try_extract_without_anchor=False,
-                        )
-                    ],
-                    extraction_mode='first_match',
-                )
-
-                answer_correct = float(verify(answer_parsed, gold_parsed))
-                meta_info = 'regular math evaluate'
-                correct += answer_correct
+            if result.get('timed_out') or result.get('error'):
                 detail = {
-                    'pred': str(answer_parsed),
-                    'answer': str(gold_parsed),
-                    'correct': True if answer_correct else False,
-                    'meta_info': meta_info,
+                    'pred':
+                    i if result.get('timed_out') else result.get('msg', ''),
+                    'answer': j,
+                    'correct': False,
                 }
                 details.append(detail)
+                continue
+
+            if result.get('skipped'):
+                continue
+
+            answer_correct = result['answer_correct']
+            correct += answer_correct
+            detail = {
+                'pred': result['answer_parsed'],
+                'answer': result['gold_parsed'],
+                'correct': True if answer_correct else False,
+            }
+            details.append(detail)
         result = {'accuracy': 100 * correct / count, 'details': details}
         return result
 
