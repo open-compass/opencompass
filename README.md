@@ -98,11 +98,17 @@ Below are the steps for quick installation and datasets preparation.
 ### 💻 Environment Setup
 
 We highly recommend using conda to manage your python environment.
+OpenCompass supports Python 3.12 for regular and full installation. If
+your evaluation depends on `pyext`-backed code execution datasets, use
+Python 3.10 instead: `pyext==0.7` is skipped on Python >=3.11 because it
+relies on `inspect.getargspec`, which was removed in Python 3.11.
+Without `pyext`, APPS (`apps`, `apps_mini`), TACO, and LiveCodeBench Code
+Generation are unavailable.
 
 - #### Create your virtual environment
 
   ```bash
-  conda create --name opencompass python=3.10 -y
+  conda create --name opencompass python=3.12 -y
   conda activate opencompass
   ```
 
