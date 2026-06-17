@@ -14,6 +14,18 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 
 SCIREASONER15_DATA_ROOT = 'opencompass/SciReasoner1.5'
 SCIREASONER15_MINI_SAMPLE_SIZE = 150
+SCIREASONER15_OUTPUT_INSTRUCTIONS = {
+    'go_bp':
+    'Return only Gene Ontology biological process terms separated by '
+    'semicolons. Do not include explanations, numbering, bullets, or extra '
+    'text.',
+    'tmscore':
+    'Return only one float between 0 and 1. Do not include units or '
+    'explanation.',
+    'dude_count':
+    'Return only one similarity/probability score between 0 and 1. Do not '
+    'include units or explanation.',
+}
 
 scireasoner1_5_reader_cfg = dict(
     input_columns=['prompt'],
@@ -30,6 +42,22 @@ scireasoner1_5_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
 )
+
+
+def _make_infer_cfg(output_instruction=None):
+    if not output_instruction:
+        return scireasoner1_5_infer_cfg
+    return dict(
+        prompt_template=dict(
+            type=RawPromptTemplate,
+            messages=[{
+                'role': 'user',
+                'content': '{prompt}\n\n' + output_instruction,
+            }],
+        ),
+        retriever=dict(type=ZeroRetriever),
+        inferencer=dict(type=GenInferencer),
+    )
 
 MATERIAL_TASKS = [
     ('OQMD-bandgap', 'oqmd', 'bandgap'),
@@ -105,7 +133,8 @@ def _make_simple_dataset(display_name, task_type, evaluator, mini_set=False):
         mini_set=mini_set,
         sample_size=sample_size,
         reader_cfg=scireasoner1_5_reader_cfg,
-        infer_cfg=scireasoner1_5_infer_cfg,
+        infer_cfg=_make_infer_cfg(
+            SCIREASONER15_OUTPUT_INSTRUCTIONS.get(task_type)),
         eval_cfg=dict(evaluator=dict(type=evaluator)),
     )
 
