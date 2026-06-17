@@ -46,8 +46,7 @@ def parse_requirements(fname='requirements.txt', with_version=True):
                 'depends on inspect.getargspec, which was removed in '
                 'Python 3.11. Code execution evaluation for these '
                 'datasets will be unavailable: APPS (apps, apps_mini), '
-                'TACO, and LiveCodeBench Code Generation.',
-                RuntimeWarning)
+                'TACO, and LiveCodeBench Code Generation.', RuntimeWarning)
 
     def parse_line(line):
         """Parse information from a line in a requirements text file."""
