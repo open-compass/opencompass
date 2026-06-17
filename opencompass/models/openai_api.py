@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 import random
@@ -28,6 +29,27 @@ OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
 OAI_REASONING_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
 
 CHATML_ROLE = ['system', 'user', 'assistant']
+
+
+def set_proxy_cfg(http_client_cfg: Dict,
+                  proxy_url: Optional[str] = None) -> None:
+    """Set proxy config without clobbering user-provided httpx kwargs."""
+    if (not proxy_url or 'proxy' in http_client_cfg
+            or 'proxies' in http_client_cfg):
+        return
+
+    try:
+        client_params = inspect.signature(httpx.Client).parameters
+    except (TypeError, ValueError):
+        client_params = {}
+
+    if 'proxy' in client_params:
+        http_client_cfg['proxy'] = proxy_url
+    else:
+        http_client_cfg['proxies'] = {
+            'http://': proxy_url,
+            'https://': proxy_url,
+        }
 
 
 @MODELS.register_module()
@@ -667,11 +689,7 @@ class OpenAISDK(OpenAI):
 
         # Create fresh client with current key
         http_client_cfg = self.http_client_cfg.copy()
-        if self.proxy_url:
-            http_client_cfg['proxies'] = {
-                'http://': self.proxy_url,
-                'https://': self.proxy_url,
-            }
+        set_proxy_cfg(http_client_cfg, self.proxy_url)
         limits = httpx.Limits(max_keepalive_connections=2048,
                               max_connections=4096)
         http_client = httpx.Client(**http_client_cfg,
