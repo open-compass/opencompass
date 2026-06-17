@@ -13,7 +13,8 @@ dingo-python==1.5.0
 # IFBench
 emoji
 # Icl topk retriever
-faiss_gpu==1.7.2
+faiss_gpu==1.7.2; python_version < "3.10"
+faiss-gpu==1.14.3; python_version >= "3.10"
 # Humaneval, Humaneval X
 -e git+https://github.com/open-compass/human-eval.git#egg=human-eval
 # IFEval
@@ -25,7 +26,7 @@ math-verify[antlr4_11_0]
 # CMPhyBench
 pint
 # Taco, apps Dataset
-pyext
+pyext==0.7; python_version < "3.11"
 # Law Bench
 pypinyin
 # LLM4Chem
