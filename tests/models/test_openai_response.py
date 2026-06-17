@@ -1,4 +1,4 @@
-"""Unit tests for OpenAIResponse."""
+"""Unit tests for OpenAISDKResponse."""
 
 import sys
 import types
@@ -6,7 +6,7 @@ import unittest
 from contextlib import contextmanager
 from unittest.mock import MagicMock, patch
 
-from opencompass.models.openai_response import OpenAIResponse
+from opencompass.models.openai_response import OpenAISDKResponse
 
 
 class FakeAPIStatusError(Exception):
@@ -40,7 +40,7 @@ def setup_tiktoken_mock(mock_tiktoken):
     return mock_enc
 
 
-class TestOpenAIResponse(unittest.TestCase):
+class TestOpenAISDKResponse(unittest.TestCase):
 
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('httpx.Client')
@@ -55,7 +55,7 @@ class TestOpenAIResponse(unittest.TestCase):
         mock_httpx_client.return_value = MagicMock()
 
         with fake_openai_module(mock_client):
-            model = OpenAIResponse(path='gpt-4.1', max_seq_len=16384)
+            model = OpenAISDKResponse(path='gpt-4.1', max_seq_len=16384)
             results = model.generate(['Hello'], max_out_len=100)
 
         self.assertEqual(results, ['Generated response'])
@@ -93,7 +93,7 @@ class TestOpenAIResponse(unittest.TestCase):
         }]
 
         with fake_openai_module(mock_client):
-            model = OpenAIResponse(
+            model = OpenAISDKResponse(
                 path='gpt-4.1',
                 openai_extra_kwargs={
                     'metadata': {
@@ -132,7 +132,7 @@ class TestOpenAIResponse(unittest.TestCase):
         mock_httpx_client.return_value = MagicMock()
 
         with fake_openai_module(mock_client):
-            model = OpenAIResponse(
+            model = OpenAISDKResponse(
                 path='gpt-4.1',
                 logprobs=True,
                 top_logprobs=3,
@@ -168,7 +168,7 @@ class TestOpenAIResponse(unittest.TestCase):
         mock_httpx_client.return_value = MagicMock()
 
         with fake_openai_module(mock_client):
-            model = OpenAIResponse(path='gpt-4.1')
+            model = OpenAISDKResponse(path='gpt-4.1')
             results = model.generate(['Hello'], max_out_len=100)
 
         self.assertEqual(results, ['Generated from output'])
@@ -199,7 +199,7 @@ class TestOpenAIResponse(unittest.TestCase):
         mock_httpx_client.return_value = MagicMock()
 
         with fake_openai_module(mock_client):
-            model = OpenAIResponse(
+            model = OpenAISDKResponse(
                 path='gpt-4.1',
                 include_reasoning_content=True,
                 think_tag='</think>',
@@ -221,7 +221,7 @@ class TestOpenAIResponse(unittest.TestCase):
         mock_httpx_client.return_value = MagicMock()
 
         with fake_openai_module(mock_client):
-            model = OpenAIResponse(
+            model = OpenAISDKResponse(
                 path='gpt-4.1',
                 status_code_mappings={400: 'blocked'},
             )
@@ -251,7 +251,7 @@ class TestOpenAIResponse(unittest.TestCase):
         mock_httpx_client.return_value = MagicMock()
 
         with fake_openai_module(mock_client):
-            model = OpenAIResponse(path='gpt-4.1', retry=2)
+            model = OpenAISDKResponse(path='gpt-4.1', retry=2)
             results = model.generate(['Hello'], max_out_len=100)
 
         self.assertEqual(results, ['After retry'])
@@ -270,8 +270,8 @@ class TestOpenAIResponse(unittest.TestCase):
         mock_client.responses.create.return_value = mock_response
 
         with fake_openai_module(mock_client):
-            OpenAIResponse(path='gpt-4.1',
-                           openai_proxy_url='http://proxy.example')
+            OpenAISDKResponse(path='gpt-4.1',
+                              openai_proxy_url='http://proxy.example')
 
         http_client_kwargs = mock_httpx_client.call_args[1]
         self.assertTrue('proxy' in http_client_kwargs

@@ -14,7 +14,7 @@ LOGPROBS_INCLUDE = 'message.output_text.logprobs'
 
 
 @MODELS.register_module()
-class OpenAIResponse(OpenAI):
+class OpenAISDKResponse(OpenAI):
     """OpenAI Responses API model wrapper.
 
     This class keeps the OpenCompass generation interface while calling

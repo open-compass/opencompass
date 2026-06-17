@@ -35,7 +35,7 @@ from .nanbeige_api import Nanbeige  # noqa: F401
 from .openai_api import OpenAI  # noqa: F401
 from .openai_api import OpenAISDK  # noqa: F401
 from .openai_api import OpenAISDKRollout  # noqa: F401
-from .openai_response import OpenAIResponse  # noqa: F401
+from .openai_response import OpenAISDKResponse  # noqa: F401
 from .openai_streaming import OpenAISDKStreaming  # noqa: F401
 from .pangu_api import PanGu  # noqa: F401
 from .qwen_api import Qwen  # noqa: F401
