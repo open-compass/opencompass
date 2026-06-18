@@ -278,5 +278,81 @@ class TestOpenAISDKResponse(unittest.TestCase):
                         or 'proxies' in http_client_kwargs)
 
 
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_streaming_collects_text_deltas(self, mock_httpx_client,
+                                                     mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+
+        mock_client = MagicMock()
+        mock_client.responses.create.return_value = [
+            {
+                'type': 'response.output_text.delta',
+                'delta': 'Hello'
+            },
+            {
+                'type': 'response.output_text.delta',
+                'delta': ' world'
+            },
+            {
+                'type': 'response.completed',
+                'response': {
+                    'status': 'completed',
+                    'output': []
+                }
+            },
+        ]
+        mock_httpx_client.return_value = MagicMock()
+
+        with fake_openai_module(mock_client):
+            model = OpenAISDKResponse(path='gpt-4.1', stream=True)
+            results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Hello world'])
+        call_args = mock_client.responses.create.call_args[1]
+        self.assertTrue(call_args['stream'])
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_streaming_can_include_reasoning_content(
+            self, mock_httpx_client, mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+
+        mock_client = MagicMock()
+        mock_client.responses.create.return_value = [
+            {
+                'type': 'response.reasoning_summary_text.delta',
+                'delta': 'Thinking process'
+            },
+            {
+                'type': 'response.output_text.delta',
+                'delta': 'Final answer'
+            },
+            {
+                'type': 'response.completed',
+                'response': {
+                    'status': 'completed',
+                    'output': []
+                }
+            },
+        ]
+        mock_httpx_client.return_value = MagicMock()
+
+        with fake_openai_module(mock_client):
+            model = OpenAISDKResponse(
+                path='gpt-4.1',
+                stream=True,
+                include_reasoning_content=True,
+                think_tag='</think>',
+            )
+            results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Thinking process</think>Final answer'])
+        call_args = mock_client.responses.create.call_args[1]
+        self.assertTrue(call_args['stream'])
+
+
 if __name__ == '__main__':
     unittest.main()

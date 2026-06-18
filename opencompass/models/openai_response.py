@@ -45,6 +45,7 @@ class OpenAISDKResponse(OpenAI):
             keyword arguments.
         response_kwargs (Dict, optional): Direct ``responses.create`` keyword
             arguments. Kept as an alias for ``openai_extra_kwargs``.
+        stream (bool): Whether to call Responses API with ``stream=True``.
         include_reasoning_content (bool): If true, attempt to include exposed
             reasoning text before the final answer.
         timeout (int): Request timeout in seconds.
@@ -77,6 +78,7 @@ class OpenAISDKResponse(OpenAI):
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Optional[Dict] = None,
         response_kwargs: Optional[Dict] = None,
+        stream: bool = False,
         include_reasoning_content: bool = False,
         timeout: int = 3600,
     ):
@@ -113,6 +115,7 @@ class OpenAISDKResponse(OpenAI):
             self.openai_extra_kwargs.update(openai_extra_kwargs)
         # Backward-compatible alias for configs using the first implementation.
         self.response_kwargs = self.openai_extra_kwargs
+        self.stream = stream
         self.include_reasoning_content = include_reasoning_content
         self.timeout = timeout
         self.openai_client = self._create_fresh_client()
@@ -170,7 +173,10 @@ class OpenAISDKResponse(OpenAI):
                         self.logger.info(response)
                     except Exception:
                         pass
-                text = self._extract_response_text(response)
+                if self.stream:
+                    text, response = self._extract_stream_response(response)
+                else:
+                    text = self._extract_response_text(response)
 
                 if text:
                     return text
@@ -311,6 +317,7 @@ class OpenAISDKResponse(OpenAI):
             self._append_include(query_data, LOGPROBS_INCLUDE)
         if self.top_logprobs is not None and 'top_logprobs' not in query_data:
             query_data['top_logprobs'] = self.top_logprobs
+        query_data['stream'] = self.stream
         return query_data
 
     def _messages_to_response_input(self, messages: List[Dict[str,
@@ -390,6 +397,85 @@ class OpenAISDKResponse(OpenAI):
             return reasoning_text
         return message_text
 
+    def _extract_stream_response(self, stream: Any) -> Tuple[str, Any]:
+        """Collect final text from a Responses API event stream."""
+        reasoning_chunks = []
+        message_chunks = []
+        final_response = None
+
+        for event in stream:
+            event_type = self._get_value(event, 'type')
+
+            if event_type in {
+                    'response.output_text.delta',
+                    'response.refusal.delta',
+            }:
+                delta = self._get_value(event, 'delta')
+                if isinstance(delta, str):
+                    message_chunks.append(delta)
+                continue
+
+            if event_type in {
+                    'response.reasoning_text.delta',
+                    'response.reasoning_summary_text.delta',
+            }:
+                delta = self._get_value(event, 'delta')
+                if isinstance(delta, str):
+                    reasoning_chunks.append(delta)
+                continue
+
+            if event_type in {
+                    'response.output_text.done',
+                    'response.refusal.done',
+            } and not message_chunks:
+                text = self._get_value(event, 'text')
+                if text is None:
+                    text = self._get_value(event, 'refusal')
+                if isinstance(text, str):
+                    message_chunks.append(text)
+                continue
+
+            if event_type in {
+                    'response.reasoning_text.done',
+                    'response.reasoning_summary_text.done',
+            } and not reasoning_chunks:
+                text = self._get_value(event, 'text')
+                if isinstance(text, str):
+                    reasoning_chunks.append(text)
+                continue
+
+            if (event_type == 'response.output_item.done'
+                    and not message_chunks):
+                item = self._get_value(event, 'item')
+                if self._get_value(item, 'type') == 'message':
+                    message_chunks.extend(self._extract_content_text(item))
+                elif self._get_value(item, 'type') == 'reasoning':
+                    reasoning_chunks.extend(self._extract_reasoning_text(item))
+                continue
+
+            if event_type in {
+                    'response.completed',
+                    'response.incomplete',
+                    'response.failed',
+            }:
+                final_response = self._get_value(event, 'response')
+
+        reasoning_text = ''.join(reasoning_chunks)
+        message_text = ''.join(message_chunks)
+        if self.include_reasoning_content and reasoning_text:
+            if message_text:
+                return reasoning_text + self.think_tag + message_text, \
+                    final_response
+            return reasoning_text, final_response
+
+        if message_text:
+            return message_text, final_response
+
+        if final_response is not None:
+            return self._extract_response_text(final_response), final_response
+
+        return '', final_response
+
     def _extract_output_items(self, response: Any) -> Tuple[str, str]:
         output = self._get_value(response, 'output', []) or []
         reasoning_chunks = []
@@ -444,6 +530,8 @@ class OpenAISDKResponse(OpenAI):
 
     @staticmethod
     def _get_value(obj: Any, key: str, default: Any = None) -> Any:
+        if obj is None:
+            return default
         if isinstance(obj, dict):
             return obj.get(key, default)
         return getattr(obj, key, default)
