@@ -211,8 +211,14 @@ class TestOpenAISDK(unittest.TestCase):
         mock_signature.return_value = type(
             'Signature', (), {'parameters': {'proxy': object()}})()
 
-        OpenAISDK(path='gpt-3.5-turbo',
-                  openai_proxy_url='http://proxy.example')
+        OpenAISDK(
+            path='gpt-3.5-turbo',
+            openai_proxy_url='http://proxy.example',
+            http_client_cfg={
+                'proxy': 'http://old-proxy.example',
+                'proxies': {'http://': 'http://old-proxy.example'},
+            },
+        )
 
         http_client_kwargs = mock_httpx_client.call_args[1]
         self.assertEqual(http_client_kwargs['proxy'],

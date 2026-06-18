@@ -33,10 +33,12 @@ CHATML_ROLE = ['system', 'user', 'assistant']
 
 def set_proxy_cfg(http_client_cfg: Dict,
                   proxy_url: Optional[str] = None) -> None:
-    """Set proxy config without clobbering user-provided httpx kwargs."""
-    if (not proxy_url or 'proxy' in http_client_cfg
-            or 'proxies' in http_client_cfg):
+    """Set proxy config with explicit openai_proxy_url taking precedence."""
+    if not proxy_url:
         return
+
+    http_client_cfg.pop('proxy', None)
+    http_client_cfg.pop('proxies', None)
 
     try:
         client_params = inspect.signature(httpx.Client).parameters
