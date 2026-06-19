@@ -111,6 +111,7 @@ from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .mbpp_pro import *  # noqa: F401, F403
+from .mp20 import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
 from .Medbullets import *  # noqa: F401, F403
 from .MedCalc_Bench import MedCalc_BenchDataset  # noqa: F401
