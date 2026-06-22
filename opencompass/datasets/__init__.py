@@ -32,6 +32,7 @@ from .chinese_simpleqa import *  # noqa: F401, F403
 from .cibench import *  # noqa: F401, F403
 from .circular import *  # noqa: F401, F403
 from .civilcomments import *  # noqa: F401, F403
+from .clbench import *  # noqa: F401, F403
 from .climaqa import *  # noqa: F401, F403
 from .clozeTest_maxmin import *  # noqa: F401, F403
 from .cluewsc import *  # noqa: F401, F403
