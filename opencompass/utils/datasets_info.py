@@ -1040,5 +1040,10 @@ DATASETS_URL = {
     "/SciReasoner": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SciReasoner.zip",
         "md5": "2cf692234badc836fb80c4cf756d5160",
-    }
+    },
+    "sun1245/PerspectiveGap": {
+        "ms_id": None,
+        "hf_id": "sun1245/PerspectiveGap",
+        "local": None,
+    },
 }
