@@ -95,12 +95,16 @@
 
 ### 💻 环境搭建
 
-我们强烈建议使用 `conda` 来管理您的 Python 环境。
+我们强烈建议使用 `conda` 来管理您的 Python 环境。OpenCompass 的常规安装和完整安装已经支持
+Python 3.12。如果您的评测依赖基于 `pyext` 的代码执行类数据集，请改用 Python 3.10：
+`pyext==0.7` 会在 Python >=3.11 时被跳过，因为它依赖的 `inspect.getargspec` 已在
+Python 3.11 中移除。缺少 `pyext` 时，APPS（`apps`、`apps_mini`）、TACO 和
+LiveCodeBench Code Generation 将不可用。
 
 - #### 创建虚拟环境
 
   ```bash
-  conda create --name opencompass python=3.10 -y
+  conda create --name opencompass python=3.12 -y
   conda activate opencompass
   ```
 
