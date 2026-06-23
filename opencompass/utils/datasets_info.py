@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/mp20":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mp20/mp20_test.jsonl",
+    },
     "opencompass/S2-TOMG-Bench":{
         "ms_id": None,
         "hf_id": None,

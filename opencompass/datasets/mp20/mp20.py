@@ -1,8 +1,7 @@
+import ast
 import itertools
 import json
 import re
-import ast
-from collections import Counter
 from multiprocessing import Pool
 from multiprocessing import TimeoutError as MPTimeoutError
 
@@ -42,7 +41,8 @@ class MP20Dataset(BaseDataset):
         return Dataset.from_list(samples)
 
 
-# ─── JSON extraction helpers ─────────────────────────────────────────────────
+# JSON extraction helpers
+
 
 def _extract_last_large_json(text, min_length=100):
     decoder = json.JSONDecoder()
@@ -65,8 +65,10 @@ def _extract_last_large_json(text, min_length=100):
 
 
 def _robust_parse_json(text):
-    for tag in ['<lattice>', '</lattice>', '<sites>', '</sites>',
-                '<material>', '</material>', '</think>']:
+    for tag in [
+            '<lattice>', '</lattice>', '<sites>', '</sites>', '<material>',
+            '</material>', '</think>'
+    ]:
         text = text.replace(tag, '')
 
     start_idx = text.find('{')
@@ -82,7 +84,7 @@ def _robust_parse_json(text):
 
     match = re.search(r'\{.*\}', clean_text, re.DOTALL)
     if not match:
-        raise ValueError("Cannot find braces structure")
+        raise ValueError('Cannot find braces structure')
     fallback_text = match.group(0)
 
     try:
@@ -98,13 +100,15 @@ def _robust_parse_json(text):
         parsed_obj, _ = json.JSONDecoder().raw_decode(fixed)
         return parsed_obj
     except Exception as e:
-        raise ValueError(f"Parse failed: {e}\n{clean_text[:100]}...")
+        raise ValueError(f'Parse failed: {e}\n{clean_text[:100]}...')
 
 
 def _lattice_params_to_matrix(a, b, c, alpha, beta, gamma):
-    alpha_r, beta_r, gamma_r = np.radians(alpha), np.radians(beta), np.radians(gamma)
-    val = (np.cos(alpha_r) - np.cos(beta_r) * np.cos(gamma_r)) / np.sin(gamma_r)
-    z_val_sq = max(0.0, 1 - np.cos(beta_r) ** 2 - val ** 2)
+    alpha_r, beta_r, gamma_r = np.radians(alpha), np.radians(beta), np.radians(
+        gamma)
+    val = (np.cos(alpha_r) -
+           np.cos(beta_r) * np.cos(gamma_r)) / np.sin(gamma_r)
+    z_val_sq = max(0.0, 1 - np.cos(beta_r)**2 - val**2)
     return [
         [a, 0, 0],
         [b * np.cos(gamma_r), b * np.sin(gamma_r), 0],
@@ -125,7 +129,7 @@ def _extract_prediction(raw_output):
     if not m1 and not m2 and not m3:
         raw_material_text = _extract_last_large_json(raw_output, min_length=50)
         if raw_material_text is None:
-            raise ValueError("No extractable JSON")
+            raise ValueError('No extractable JSON')
     else:
         raw_material_text = m1.group(1) if m1 else None
         if m2:
@@ -135,7 +139,7 @@ def _extract_prediction(raw_output):
 
     pred_dict = _robust_parse_json(raw_material_text)
     if not isinstance(pred_dict, dict):
-        raise ValueError("Parsed object is not a dict")
+        raise ValueError('Parsed object is not a dict')
 
     lat = pred_dict.get('lattice_parameters', {})
     a = float(lat.get('a', 0))
@@ -147,11 +151,13 @@ def _extract_prediction(raw_output):
     pred_lattice = _lattice_params_to_matrix(a, b, c, alpha, beta, gamma)
 
     pred_sites = pred_dict.get('atomic_sites', [])
-    pred_coords = [[float(x) for x in site['coordinate']] for site in pred_sites]
+    pred_coords = [[float(x) for x in site['coordinate']]
+                   for site in pred_sites]
     return pred_lattice, pred_coords
 
 
-# ─── Validity helpers ─────────────────────────────────────────────────────────
+# Validity helpers
+
 
 def _smact_validity(comp, count, use_pauling_test=True, include_alloys=True):
     import smact
@@ -168,8 +174,10 @@ def _smact_validity(comp, count, use_pauling_test=True, include_alloys=True):
     threshold = np.max(count)
     compositions = []
     for ox_states in itertools.product(*ox_combos):
-        stoichs = [(c,) for c in count]
-        cn_e, cn_r = smact.neutral_ratios(ox_states, stoichs=stoichs, threshold=threshold)
+        stoichs = [(c, ) for c in count]
+        cn_e, cn_r = smact.neutral_ratios(ox_states,
+                                          stoichs=stoichs,
+                                          threshold=threshold)
         if cn_e:
             if use_pauling_test:
                 try:
@@ -187,12 +195,11 @@ def _smact_validity(comp, count, use_pauling_test=True, include_alloys=True):
 
 def _structure_validity(crystal, cutoff=0.5):
     dist_mat = crystal.distance_matrix + np.diag(
-        np.ones(crystal.distance_matrix.shape[0]) * (cutoff + 10.0)
-    )
+        np.ones(crystal.distance_matrix.shape[0]) * (cutoff + 10.0))
     return dist_mat.min() >= cutoff and crystal.volume >= 0.1
 
 
-# ─── RMS distance with subprocess timeout ─────────────────────────────────────
+# RMS distance with subprocess timeout
 
 _worker_pool = None
 
@@ -204,7 +211,8 @@ def _get_worker_pool():
     return _worker_pool
 
 
-def _rms_dist_worker(pred_lattice, pred_coords, gt_lattice, species, gt_frac_coords):
+def _rms_dist_worker(pred_lattice, pred_coords, gt_lattice, species,
+                     gt_frac_coords):
     from pymatgen.analysis.structure_matcher import StructureMatcher
     from pymatgen.core.lattice import Lattice
     from pymatgen.core.structure import Structure
@@ -215,7 +223,11 @@ def _rms_dist_worker(pred_lattice, pred_coords, gt_lattice, species, gt_frac_coo
     return None if result is None else result[0]
 
 
-def _get_rms_dist_safe(pred_lattice, pred_coords, gt_lattice, species, gt_frac_coords,
+def _get_rms_dist_safe(pred_lattice,
+                       pred_coords,
+                       gt_lattice,
+                       species,
+                       gt_frac_coords,
                        timeout_sec=10):
     global _worker_pool
     pool = _get_worker_pool()
@@ -233,7 +245,8 @@ def _get_rms_dist_safe(pred_lattice, pred_coords, gt_lattice, species, gt_frac_c
         return None
 
 
-# ─── Evaluator ────────────────────────────────────────────────────────────────
+# Evaluator
+
 
 class MP20Evaluator(BaseEvaluator):
 
@@ -279,7 +292,8 @@ class MP20Evaluator(BaseEvaluator):
 
         return {
             'match_rate': round(match_rate, 4),
-            'mean_rms_dist': round(mean_rms, 4) if not np.isnan(mean_rms) else None,
+            'mean_rms_dist':
+            round(mean_rms, 4) if not np.isnan(mean_rms) else None,
             'matched': len(matched),
             'total': total,
         }

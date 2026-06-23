@@ -1,1 +1,1 @@
-from .mp20_gen_8ccb53 import *  # noqa: F401, F403
+from .mp20_rawprompt_gen import *  # noqa: F401, F403

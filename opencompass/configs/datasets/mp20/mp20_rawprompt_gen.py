@@ -1,5 +1,5 @@
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.datasets import MP20Dataset, MP20Evaluator
 
@@ -10,18 +10,14 @@ mp20_reader_cfg = dict(
 
 mp20_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            begin=[
-                dict(role='SYSTEM', fallback_role='HUMAN', prompt='{system_prompt}'),
-            ],
-            round=[
-                dict(role='HUMAN', prompt='{user_input}'),
-            ],
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            {'role': 'system', 'content': '{system_prompt}'},
+            {'role': 'user', 'content': '{user_input}'},
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=16000),
+    inferencer=dict(type=GenInferencer),
 )
 
 mp20_eval_cfg = dict(
@@ -33,7 +29,7 @@ mp20_datasets = [
     dict(
         abbr='mp20',
         type=MP20Dataset,
-        path='data/mp20/mp20_test.jsonl',
+        path='opencompass/mp20',
         reader_cfg=mp20_reader_cfg,
         infer_cfg=mp20_infer_cfg,
         eval_cfg=mp20_eval_cfg,

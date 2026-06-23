@@ -111,7 +111,6 @@ from .math_intern import *  # noqa: F401, F403
 from .mathbench import *  # noqa: F401, F403
 from .mbpp import *  # noqa: F401, F403
 from .mbpp_pro import *  # noqa: F401, F403
-from .mp20 import *  # noqa: F401, F403
 from .medbench import *  # noqa: F401, F403
 from .Medbullets import *  # noqa: F401, F403
 from .MedCalc_Bench import MedCalc_BenchDataset  # noqa: F401
@@ -127,6 +126,7 @@ from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403
 from .mol_instructions_chem import *  # noqa: F401, F403
 from .moleculariq import *  # noqa: F401, F403
+from .mp20 import *  # noqa: F401, F403
 from .mrcr import *  # noqa: F401, F403
 from .multipl_e import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
