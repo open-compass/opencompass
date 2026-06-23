@@ -16,15 +16,14 @@ api_meta_template = dict(round=[
 
 models = [
     dict(
-        abbr='deepseek-v4-flash',
+        abbr='deepseek-v4-pro',
         type=OpenAISDK,
-        path='deepseek-v4-flash',
+        path='deepseek-v4-pro',
         key='ENV',
         meta_template=api_meta_template,
         query_per_second=5,
         openai_api_base='https://api.deepseek.com/v1',
         batch_size=16,
-        temperature=0,
         max_seq_len=65536,
         retry=5,
     ),
