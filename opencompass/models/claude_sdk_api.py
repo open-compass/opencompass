@@ -2,6 +2,8 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Tuple, Union
 
+from tqdm import tqdm
+
 from opencompass.registry import MODELS
 from opencompass.utils import PromptList
 
@@ -171,10 +173,18 @@ class ClaudeSDK(BaseAPIModel):
         Returns:
             List[str]: A list of generated strings.
         """
+        if len(inputs) == 1:
+            # Forget multi-thread for single inference.
+            return [self._generate(inputs[0], max_out_len)]
+
         with ThreadPoolExecutor() as executor:
             results = list(
-                executor.map(self._generate, inputs,
-                             [max_out_len] * len(inputs)))
+                tqdm(
+                    executor.map(self._generate, inputs,
+                                 [max_out_len] * len(inputs)),
+                    total=len(inputs),
+                    desc='Inferencing',
+                ))
         return results
 
     def _generate(

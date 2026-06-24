@@ -213,6 +213,31 @@ class TestClaudeSDK(unittest.TestCase):
 
         self.assertTrue(api_params['stream'])
 
+    @patch.dict('os.environ', {}, clear=True)
+    def test_generate_multiple_inputs_uses_progress_bar(self):
+        """Test batched generation displays the same progress bar as OpenAI."""
+        model, _, _ = self.build_model()
+
+        with patch('opencompass.models.claude_sdk_api.tqdm') as mock_tqdm:
+            mock_tqdm.side_effect = lambda iterable, **kwargs: iterable
+
+            self.assertEqual(model.generate(['hello', 'world'], 64),
+                             ['OK', 'OK'])
+
+        tqdm_kwargs = mock_tqdm.call_args.kwargs
+        self.assertEqual(tqdm_kwargs['total'], 2)
+        self.assertEqual(tqdm_kwargs['desc'], 'Inferencing')
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_generate_single_input_skips_progress_bar(self):
+        """Test single-input generation follows OpenAI's direct path."""
+        model, _, _ = self.build_model()
+
+        with patch('opencompass.models.claude_sdk_api.tqdm') as mock_tqdm:
+            self.assertEqual(model.generate(['hello'], 64), ['OK'])
+
+        mock_tqdm.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()
