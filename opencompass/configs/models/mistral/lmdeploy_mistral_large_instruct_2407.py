@@ -3,8 +3,8 @@ from opencompass.models import TurboMindModelwithChatTemplate
 models = [
     dict(
         type=TurboMindModelwithChatTemplate,
-        abbr='mistral-large-instruct-2411-turbomind',
-        path='mistralai/Mistral-Large-Instruct-2411',
+        abbr='mistral-large-instruct-2407-turbomind',
+        path='mistralai/Mistral-Large-Instruct-2407',
         engine_config=dict(
             session_len=32768,
             max_batch_size=16,
