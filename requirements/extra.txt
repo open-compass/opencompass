@@ -23,6 +23,8 @@ langdetect
 ltp
 # Math
 math-verify[antlr4_11_0]
+# PerspectiveGap 0.1.0
+perspective-gap @ git+https://github.com/WhymustIhaveaname/PerspectiveGap.git@9c6921b3337ff3e6a6a453f68d117a8c1663135e ; python_version not in "3.8 3.9"
 # CMPhyBench
 pint
 # Taco, apps Dataset

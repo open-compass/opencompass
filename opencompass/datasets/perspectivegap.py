@@ -1,5 +1,4 @@
 import json
-import re
 
 from datasets import Dataset, load_dataset
 
@@ -9,6 +8,7 @@ from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from .base import BaseDataset
 
 _HF_DATASET = 'sun1245/PerspectiveGap'
+_HF_DATA_FILE = 'evaluations.jsonl'
 
 
 def _strip_think_tags(text: str) -> str:
@@ -19,18 +19,39 @@ def _strip_think_tags(text: str) -> str:
     return text.strip()
 
 
+def _resolve_data_file(path: str) -> str:
+    path = path or _HF_DATASET
+    if path.endswith('.jsonl') or path.startswith(('http://', 'https://')):
+        return path
+    return ('https://huggingface.co/datasets/'
+            f'{path}/resolve/main/{_HF_DATA_FILE}')
+
+
+def _reference_need_sets(row: dict) -> dict:
+    raw = row['reference_need_sets']
+    roles = row.get('roles') or raw.keys()
+    return {
+        role: raw[role]
+        for role in roles if isinstance(raw.get(role), list)
+    }
+
+
 @LOAD_DATASET.register_module()
 class PerspectiveGapDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
-        ds = load_dataset(_HF_DATASET, split='test')
+        ds = load_dataset('json',
+                          data_files={'test': _resolve_data_file(path)},
+                          split='test')
         rows = []
         for row in ds:
             rows.append({
-                'input': row[f'{name}_prompt'],
-                'reference_data': json.dumps({
-                    'reference_need_sets': row['reference_need_sets'],
+                'input':
+                row[f'{name}_prompt'],
+                'reference_data':
+                json.dumps({
+                    'reference_need_sets': _reference_need_sets(row),
                     'distractor_id': row['distractor_id'],
                     'fragments': row['fragments'],
                 }),

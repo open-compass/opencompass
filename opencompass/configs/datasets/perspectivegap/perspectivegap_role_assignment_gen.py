@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.datasets import (PerspectiveGapDataset,
                                   PerspectiveGapRoleAssignmentEvaluator)
@@ -11,13 +11,13 @@ perspectivegap_role_assignment_reader_cfg = dict(
 
 perspectivegap_role_assignment_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[dict(role='HUMAN', prompt='{input}')],
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            dict(role='user', content='{input}'),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=8192),
+    inferencer=dict(type=GenInferencer),
 )
 
 perspectivegap_role_assignment_eval_cfg = dict(
