@@ -16,7 +16,7 @@ LongBenchv2_infer_cfg = dict(
             round=[
                 dict(
                     role='HUMAN',
-                    prompt='Please read the following text and answer the questions below.\n <text> \n {context} \n </text> \n \n What is the correct answer to this question: {question} \n \n Choices: \n (A) {choice_A} \n (B) {choice_B} \n (C) {choice_C} \n (D) {choice_D} \n Let’s think step by step. Based on the above, what is the single, most likely answer choice? Format your response as follows: "The correct answer is (insert answer here)',
+                    prompt='Please read the following text and answer the questions below.\n <text> \n {context} \n </text> \n \n What is the correct answer to this question: {question} \n \n Choices: \n (A) {choice_A} \n (B) {choice_B} \n (C) {choice_C} \n (D) {choice_D} \n Let’s think step by step. Based on the above, what is the single, most likely answer choice? Format your response as follows: "The correct answer is (insert answer here)".',
                 ),
             ],
         ),
