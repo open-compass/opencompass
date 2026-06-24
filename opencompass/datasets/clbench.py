@@ -1,11 +1,12 @@
 import json
 import re
 from collections import defaultdict
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 from datasets import Dataset, DatasetDict, load_dataset
 
-from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
+from opencompass.registry import (DICT_POSTPROCESSORS, LOAD_DATASET,
+                                  TEXT_POSTPROCESSORS)
 
 from .base import BaseDataset
 
@@ -53,6 +54,21 @@ def build_clbench_rubrics_text(rubrics: Iterable[Any]) -> str:
         if criteria:
             lines.append(f'{i}. {criteria}')
     return '\n'.join(lines) if lines else 'No specific rubrics provided.'
+
+
+@TEXT_POSTPROCESSORS.register_module()
+def clbench_pred_postprocess(
+    prediction: Any,
+    max_chars: Optional[int] = None,
+) -> str:
+    """Clean CLBench model outputs before sending them to the judge."""
+    if prediction is None:
+        return ''
+
+    prediction = str(prediction).rstrip()
+    if max_chars is not None and max_chars > 0 and len(prediction) > max_chars:
+        prediction = prediction[:max_chars]
+    return prediction
 
 
 def _strip_json_fence(text: str) -> str:

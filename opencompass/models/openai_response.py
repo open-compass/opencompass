@@ -6,7 +6,8 @@ import httpx
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
-from .openai_api import OPENAISDK_API_BASE, OpenAI, set_proxy_cfg
+from .openai_api import (OAI_REASONING_MODEL_LIST, OPENAISDK_API_BASE, OpenAI,
+                         set_proxy_cfg)
 
 PromptType = Union[PromptList, str, List[Dict[str, Any]]]
 RESPONSE_ROLE = {'system', 'user', 'assistant', 'developer'}
@@ -307,7 +308,7 @@ class OpenAISDKResponse(OpenAI):
         )
         if max_out_len is not None:
             query_data['max_output_tokens'] = max_out_len
-        if temperature is not None:
+        if temperature is not None and not self._is_reasoning_model():
             query_data['temperature'] = temperature
         if self.extra_body:
             query_data['extra_body'] = self.extra_body
@@ -319,6 +320,9 @@ class OpenAISDKResponse(OpenAI):
             query_data['top_logprobs'] = self.top_logprobs
         query_data['stream'] = self.stream
         return query_data
+
+    def _is_reasoning_model(self) -> bool:
+        return any(model in self.path for model in OAI_REASONING_MODEL_LIST)
 
     def _messages_to_response_input(self, messages: List[Dict[str,
                                                               Any]]) -> List:

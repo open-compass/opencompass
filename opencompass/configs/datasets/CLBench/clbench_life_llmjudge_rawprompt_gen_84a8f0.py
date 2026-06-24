@@ -1,13 +1,14 @@
-from opencompass.datasets import CLBenchDataset, clbench_llmjudge_postprocess
+from opencompass.datasets import (CLBenchDataset, clbench_llmjudge_postprocess,
+                                  clbench_pred_postprocess)
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
-CLBENCH_DATA_PATH = 'tencent/CL-bench'
-CLBENCH_DATA_SPLIT = 'train'
+CLBENCH_LIFE_DATA_PATH = 'tencent/CL-bench-Life'
+CLBENCH_LIFE_DATA_SPLIT = 'train'
 
-clbench_reader_cfg = dict(
+clbench_life_reader_cfg = dict(
     input_columns=[
         'messages',
         'rubrics',
@@ -18,7 +19,7 @@ clbench_reader_cfg = dict(
     output_column='rubrics_text',
 )
 
-clbench_infer_cfg = dict(
+clbench_life_infer_cfg = dict(
     prompt_template=dict(
         type=RawPromptTemplate,
         messages=[
@@ -32,7 +33,7 @@ clbench_infer_cfg = dict(
     inferencer=dict(type=GenInferencer),
 )
 
-CLBENCH_GRADER_TEMPLATE = (
+CLBENCH_LIFE_GRADER_TEMPLATE = (
     'Starting now, you are a rigorous instruction-following grading teacher. Your task is to accurately grade and score student answers based on the 【Rubrics】.\n\n'
     'Grading Criteria\n'
     'This is a strict, all-or-nothing grading system. The final score is binary.\n'
@@ -66,7 +67,7 @@ CLBENCH_GRADER_TEMPLATE = (
     '  "Overall Score": 0 or 1\n'
     '}\n')
 
-clbench_eval_cfg = dict(
+clbench_life_eval_cfg = dict(
     evaluator=dict(
         type=GenericLLMEvaluator,
         prompt_template=dict(
@@ -74,30 +75,31 @@ clbench_eval_cfg = dict(
             messages=[
                 {
                     'role': 'user',
-                    'content': CLBENCH_GRADER_TEMPLATE
+                    'content': CLBENCH_LIFE_GRADER_TEMPLATE
                 },
             ],
         ),
         dataset_cfg=dict(
             type=CLBenchDataset,
-            path=CLBENCH_DATA_PATH,
-            split=CLBENCH_DATA_SPLIT,
-            reader_cfg=clbench_reader_cfg,
+            path=CLBENCH_LIFE_DATA_PATH,
+            split=CLBENCH_LIFE_DATA_SPLIT,
+            reader_cfg=clbench_life_reader_cfg,
         ),
         judge_cfg=dict(),
         dict_postprocessor=dict(type=clbench_llmjudge_postprocess),
+        pred_postprocessor=dict(type=clbench_pred_postprocess),
     ),
 )
 
-clbench_datasets = [
+clbench_life_datasets = [
     dict(
         type=CLBenchDataset,
-        abbr='clbench',
-        path=CLBENCH_DATA_PATH,
-        split=CLBENCH_DATA_SPLIT,
-        reader_cfg=clbench_reader_cfg,
-        infer_cfg=clbench_infer_cfg,
-        eval_cfg=clbench_eval_cfg,
+        abbr='clbench-life',
+        path=CLBENCH_LIFE_DATA_PATH,
+        split=CLBENCH_LIFE_DATA_SPLIT,
+        reader_cfg=clbench_life_reader_cfg,
+        infer_cfg=clbench_life_infer_cfg,
+        eval_cfg=clbench_life_eval_cfg,
         n=1,
     )
 ]
