@@ -1,4 +1,5 @@
 import json
+import warnings
 
 from datasets import Dataset, load_dataset
 
@@ -9,6 +10,10 @@ from .base import BaseDataset
 
 _HF_DATASET = 'sun1245/PerspectiveGap'
 _HF_DATA_FILE = 'evaluations.jsonl'
+_SCORER_INSTALL_CMD = (
+    'pip install "perspective-gap @ '
+    'git+https://github.com/WhymustIhaveaname/PerspectiveGap.git'
+    '@9c6921b3337ff3e6a6a453f68d117a8c1663135e"')
 
 
 def _strip_think_tags(text: str) -> str:
@@ -34,6 +39,21 @@ def _reference_need_sets(row: dict) -> dict:
         role: raw[role]
         for role in roles if isinstance(raw.get(role), list)
     }
+
+
+def _load_scorer(name: str):
+    try:
+        from perspective_gap import scoring
+    except ImportError:
+        warnings.warn(
+            'Evaluating the PerspectiveGap dataset requires the '
+            'optional `perspective-gap` dependency. Install it with: '
+            f'{_SCORER_INSTALL_CMD}',
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        raise
+    return getattr(scoring, name)
 
 
 @LOAD_DATASET.register_module()
@@ -63,7 +83,7 @@ class PerspectiveGapDataset(BaseDataset):
 class PerspectiveGapRoleAssignmentEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
-        from perspective_gap.scoring import score_role_assignment
+        score_role_assignment = _load_scorer('score_role_assignment')
 
         details = []
         cnt = 0
@@ -92,7 +112,7 @@ class PerspectiveGapRoleAssignmentEvaluator(BaseEvaluator):
 class PerspectiveGapPromptWritingEvaluator(BaseEvaluator):
 
     def score(self, predictions, references):
-        from perspective_gap.scoring import score_prompt_writing
+        score_prompt_writing = _load_scorer('score_prompt_writing')
 
         details = []
         cnt = 0
