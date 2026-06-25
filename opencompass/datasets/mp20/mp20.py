@@ -287,7 +287,7 @@ class MP20Evaluator(BaseEvaluator):
 
         total = len(rms_dists)
         matched = [r for r in rms_dists if r is not None]
-        match_rate = len(matched) / total if total else 0.0
+        match_rate = len(matched) / total * 100 if total else 0.0
         mean_rms = float(np.mean(matched)) if matched else float('nan')
 
         return {
