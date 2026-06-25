@@ -1165,5 +1165,5 @@
     name: ZebraLogic
     category: Reasoning
     paper: https://arxiv.org/abs/2502.01100
-    configpath: opencompass/configs/datasets/ZebraLogic/zebralogic_gen.py
+    configpath: opencompass/configs/datasets/ZebraLogic/zebralogic_rawprompt_gen_9446ef.py
     configpath_llmjudge: ''

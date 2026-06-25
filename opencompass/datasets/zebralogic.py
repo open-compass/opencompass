@@ -32,8 +32,8 @@ class ZebraLogicDataset(BaseDataset):
                 labels = 'ABCDEFGHIJ'
                 choices = example['choices']
                 answer = example['answer']
-                formatted_choices = ' '.join(
-                    f'({labels[i]}) {c}' for i, c in enumerate(choices))
+                formatted_choices = ' '.join(f'({labels[i]}) {c}'
+                                             for i, c in enumerate(choices))
                 # Find the label for the correct answer
                 if answer in choices:
                     answer_label = labels[choices.index(answer)]
@@ -68,7 +68,7 @@ class ZebraLogicMCEvaluator(BaseEvaluator):
 
         for pred, ref in zip(predictions, references):
             extracted = _extract_mc_answer(pred)
-            correct = extracted.upper() == ref.upper()
+            correct = extracted.upper() == str(ref).upper()
             details.append({
                 'pred': pred,
                 'extracted': extracted,
@@ -86,10 +86,9 @@ class ZebraLogicGridEvaluator(BaseEvaluator):
     """Evaluator for ZebraLogic grid_mode.
 
     Computes cell-level accuracy: what fraction of cells in the solution
-    table the model gets correct.  The expected reference format is a
-    JSON-serialised dict with keys ``header`` (list of column names) and
-    ``rows`` (list of lists), which is the ``solution`` field stored as a
-    string in the dataset.
+    table the model gets correct.  The expected reference format is a dict
+    or JSON-serialised dict with keys ``header`` (list of column names) and
+    ``rows`` (list of lists), matching the dataset ``solution`` field.
     """
 
     def score(self, predictions, references):
@@ -104,8 +103,9 @@ class ZebraLogicGridEvaluator(BaseEvaluator):
         details = []
 
         for pred, ref in zip(predictions, references):
+            pred_text = str(pred)
             gold_rows = _parse_grid_reference(ref)
-            pred_rows = _extract_grid_from_text(pred)
+            pred_rows = _extract_grid_from_text(pred_text)
 
             if gold_rows is None:
                 continue
@@ -113,17 +113,21 @@ class ZebraLogicGridEvaluator(BaseEvaluator):
             sample_total = sum(len(row) for row in gold_rows)
             sample_correct = 0
 
+            if (pred_rows is not None and len(pred_rows) == len(gold_rows) + 1
+                    and _is_header_row(pred_rows[0])):
+                pred_rows = pred_rows[1:]
+
             if pred_rows is not None and len(pred_rows) == len(gold_rows):
                 for gold_row, pred_row in zip(gold_rows, pred_rows):
-                    for g, p in zip(gold_row,
-                                    pred_row[:len(gold_row)]):
-                        if g.strip().lower() == p.strip().lower():
+                    for g, p in zip(gold_row, pred_row[:len(gold_row)]):
+                        if _normalize_cell(g) == _normalize_cell(p):
                             sample_correct += 1
             else:
                 # Try cell-by-cell matching with flattened text
                 flat_gold = [c for row in gold_rows for c in row]
                 for cell in flat_gold:
-                    if re.search(re.escape(cell), pred, re.IGNORECASE):
+                    if re.search(re.escape(str(cell)), pred_text,
+                                 re.IGNORECASE):
                         sample_correct += 1
 
             total_cells += sample_total
@@ -132,8 +136,8 @@ class ZebraLogicGridEvaluator(BaseEvaluator):
             is_perfect = sample_correct == sample_total
             fully_correct += int(is_perfect)
             details.append({
-                'pred': pred[:200],
-                'answer': ref[:200],
+                'pred': pred_text[:200],
+                'answer': str(ref)[:200],
                 'cell_accuracy': sample_acc,
                 'correct': is_perfect,
             })
@@ -152,6 +156,7 @@ class ZebraLogicGridEvaluator(BaseEvaluator):
 # Helper functions
 # ---------------------------------------------------------------------------
 
+
 def _extract_mc_answer(text: str) -> str:
     """Extract the answer letter from model output.
 
@@ -160,9 +165,10 @@ def _extract_mc_answer(text: str) -> str:
     2. Last occurrence of a lone letter (A-J) on its own line
     3. The first letter found inside parentheses: (X)
     """
+    text = str(text)
+
     # Pattern 1: explicit prefix
-    m = re.search(
-        r'[Tt]he (?:final )?answer is[:\s]+\(?([A-Ja-j])\)?', text)
+    m = re.search(r'[Tt]he (?:final )?answer is[:\s]+\(?([A-Ja-j])\)?', text)
     if m:
         return m.group(1).upper()
 
@@ -187,11 +193,14 @@ def _extract_mc_answer(text: str) -> str:
 
 
 def _parse_grid_reference(ref: str):
-    """Parse the solution field stored as a string.
+    """Parse the solution field stored as a dict or string.
 
-    The field is a dict-like string with 'rows' key containing a 2-D list.
-    Returns a list of lists of strings, or None on failure.
+    The field has a 'rows' key containing a 2-D list. Returns a list of lists
+    of strings, or None on failure.
     """
+    if isinstance(ref, dict):
+        return ref.get('rows', None)
+
     import ast
     try:
         data = ast.literal_eval(ref)
@@ -205,6 +214,16 @@ def _parse_grid_reference(ref: str):
         return data.get('rows', None)
     except Exception:
         return None
+
+
+def _normalize_cell(cell) -> str:
+    return str(cell).strip().lower()
+
+
+def _is_header_row(row) -> bool:
+    if not row:
+        return False
+    return _normalize_cell(row[0]) in {'house', 'houses', 'home', 'position'}
 
 
 def _extract_grid_from_text(text: str):

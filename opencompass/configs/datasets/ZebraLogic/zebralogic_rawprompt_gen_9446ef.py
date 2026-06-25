@@ -1,4 +1,4 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import ZebraLogicDataset
@@ -31,13 +31,13 @@ _MC_PROMPT = (
 
 zebralogic_mc_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[
-            dict(role='HUMAN', prompt=_MC_PROMPT),
-        ]),
+        type=RawPromptTemplate,
+        messages=[
+            dict(role='user', content=_MC_PROMPT),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=4096),
+    inferencer=dict(type=GenInferencer),
 )
 
 zebralogic_mc_eval_cfg = dict(
@@ -70,13 +70,13 @@ _GRID_PROMPT = (
 
 zebralogic_grid_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[
-            dict(role='HUMAN', prompt=_GRID_PROMPT),
-        ]),
+        type=RawPromptTemplate,
+        messages=[
+            dict(role='user', content=_GRID_PROMPT),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=8192),
+    inferencer=dict(type=GenInferencer),
 )
 
 zebralogic_grid_eval_cfg = dict(
