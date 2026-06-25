@@ -218,8 +218,8 @@ class TestOpenAISDKResponse(unittest.TestCase):
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
-    def test_generate_can_include_reasoning_content(self, mock_httpx_client,
-                                                    mock_tiktoken):
+    def test_generate_includes_reasoning_content_when_returned(
+            self, mock_httpx_client, mock_tiktoken):
         setup_tiktoken_mock(mock_tiktoken)
 
         mock_client = MagicMock()
@@ -243,12 +243,90 @@ class TestOpenAISDKResponse(unittest.TestCase):
         with fake_openai_module(mock_client):
             model = OpenAISDKResponse(
                 path='gpt-4.1',
-                include_reasoning_content=True,
                 think_tag='</think>',
             )
             results = model.generate(['Hello'], max_out_len=100)
 
         self.assertEqual(results, ['Thinking process</think>Final answer'])
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_reasoning_content_takes_priority_over_summary(
+            self, mock_httpx_client, mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.output_text = 'Final answer'
+        mock_response.output = [{
+            'type': 'reasoning',
+            'summary': [{
+                'text': 'Thinking summary'
+            }],
+            'content': [{
+                'text': 'Raw reasoning'
+            }]
+        }, {
+            'type': 'message',
+            'content': [{
+                'type': 'output_text',
+                'text': 'Final answer'
+            }]
+        }]
+        mock_client.responses.create.return_value = mock_response
+        mock_httpx_client.return_value = MagicMock()
+
+        with fake_openai_module(mock_client):
+            model = OpenAISDKResponse(
+                path='gpt-4.1',
+                think_tag='</think>',
+            )
+            results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Raw reasoning</think>Final answer'])
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_reasoning_model_requests_summary(
+            self, mock_httpx_client, mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.output_text = 'Final answer'
+        mock_response.output = [{
+            'type': 'reasoning',
+            'summary': [{
+                'text': 'Thinking process'
+            }]
+        }, {
+            'type': 'message',
+            'content': [{
+                'type': 'output_text',
+                'text': 'Final answer'
+            }]
+        }]
+        mock_client.responses.create.return_value = mock_response
+        mock_httpx_client.return_value = MagicMock()
+        extra_kwargs = {'reasoning': {'effort': 'high'}}
+
+        with fake_openai_module(mock_client):
+            model = OpenAISDKResponse(
+                path='gpt-5.1',
+                openai_extra_kwargs=extra_kwargs,
+            )
+            results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Thinking process</think>Final answer'])
+        call_args = mock_client.responses.create.call_args[1]
+        self.assertEqual(call_args['reasoning'], {
+            'effort': 'high',
+            'summary': 'auto',
+        })
+        self.assertNotIn('temperature', call_args)
+        self.assertEqual(extra_kwargs, {'reasoning': {'effort': 'high'}})
 
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('httpx.Client')
@@ -358,7 +436,7 @@ class TestOpenAISDKResponse(unittest.TestCase):
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
-    def test_generate_streaming_can_include_reasoning_content(
+    def test_generate_streaming_includes_reasoning_content_when_returned(
             self, mock_httpx_client, mock_tiktoken):
         setup_tiktoken_mock(mock_tiktoken)
 
@@ -386,7 +464,6 @@ class TestOpenAISDKResponse(unittest.TestCase):
             model = OpenAISDKResponse(
                 path='gpt-4.1',
                 stream=True,
-                include_reasoning_content=True,
                 think_tag='</think>',
             )
             results = model.generate(['Hello'], max_out_len=100)
@@ -394,6 +471,47 @@ class TestOpenAISDKResponse(unittest.TestCase):
         self.assertEqual(results, ['Thinking process</think>Final answer'])
         call_args = mock_client.responses.create.call_args[1]
         self.assertTrue(call_args['stream'])
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_streaming_reasoning_text_takes_priority_over_summary(
+            self, mock_httpx_client, mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+
+        mock_client = MagicMock()
+        mock_client.responses.create.return_value = [
+            {
+                'type': 'response.reasoning_summary_text.delta',
+                'delta': 'Thinking summary'
+            },
+            {
+                'type': 'response.reasoning_text.delta',
+                'delta': 'Raw reasoning'
+            },
+            {
+                'type': 'response.output_text.delta',
+                'delta': 'Final answer'
+            },
+            {
+                'type': 'response.completed',
+                'response': {
+                    'status': 'completed',
+                    'output': []
+                }
+            },
+        ]
+        mock_httpx_client.return_value = MagicMock()
+
+        with fake_openai_module(mock_client):
+            model = OpenAISDKResponse(
+                path='gpt-4.1',
+                stream=True,
+                think_tag='</think>',
+            )
+            results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Raw reasoning</think>Final answer'])
 
 
 if __name__ == '__main__':
