@@ -1,7 +1,7 @@
 from opencompass.datasets import HFDataset
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 _DOMAINS = [
@@ -17,29 +17,38 @@ _DOMAINS = [
 _RELEASES = ['2024b', '2025a', '2026a']
 _TASK_TYPES = ['s', 'c', 'p']
 
-_SC_PROMPT = """You are evaluating an ArxivRollBench sequencing or cloze task.
-Choose the correct option and answer only with Selection 1, Selection 2, Selection 3, or Selection 4.
-
+_S_PROMPT = """## Instruction:
+ Given a **shuffled text** composed of sentences A, B, and C, your task is to select the correct order from four available selections. Avoid providing any additional information (such as explanations of your choice) or restating the sentences in your answer. Simply provide your selection: Selection 1, Selection 2, Selection 3, or Selection 4.
+## Shuffled text:
 {shuffled_text}
-
-Selection 1: {A}
-Selection 2: {B}
-Selection 3: {C}
-Selection 4: {D}
-
+## Choice:
+**Selection 1** {A}
+**Selection 2** {B}
+**Selection 3** {C}
+**Selection 4** {D}
 Answer:"""
 
-_P_PROMPT = """You are evaluating an ArxivRollBench prediction task.
-Choose the correct option and answer only with A, B, C, or D.
+_C_PROMPT = """## Instruction:
+ Given a **masked paragraph** with three masked sentences marked as '<|MaskedSentence|>' and candidate sentences labeled A, B, and C, your task is to fill in the correct sentences to the masked positions by selecting the appropriate answers from four provided selections. Avoid providing any additional information (such as explanations of your choice) or restating the sentences in your answer. Simply provide your selection: Selection 1, Selection 2, Selection 3, or Selection 4.
+## Masked paragraph:
+{text_with_holes}
+## {text_candidates}
+ ## Choice:
+**Selection 1** {A}
+**Selection 2** {B}
+**Selection 3** {C}
+**Selection 4** {D}
+Answer:"""
 
-Context:
+_P_PROMPT = """## Instruction:
+ Given a context, and four choices marked as A, B, C, and D, your task is to select the correct text which is the next sequence of the provided context. Avoid providing any additional information (such as explanations of your choice) or restating the choice in your answer. Simply provide one of the four letters: A, B, C, or D.
+## Context:
 {context}
-
-A. {A}
-B. {B}
-C. {C}
-D. {D}
-
+## Choice:
+**A** {A}
+**B** {B}
+**C** {C}
+**D** {D}
 Answer:"""
 
 
@@ -52,9 +61,17 @@ def _dataset_path(release, hf_domain, task_type, compact=True):
 
 
 def _reader_cfg(task_type):
-    if task_type in ['s', 'c']:
+    if task_type == 's':
         return dict(
             input_columns=['shuffled_text', 'A', 'B', 'C', 'D'],
+            output_column='label',
+            train_split='train',
+            test_split='train',
+        )
+    if task_type == 'c':
+        return dict(
+            input_columns=['text_with_holes', 'text_candidates', 'A', 'B',
+                           'C', 'D'],
             output_column='label',
             train_split='train',
             test_split='train',
@@ -68,14 +85,16 @@ def _reader_cfg(task_type):
 
 
 def _infer_cfg(task_type):
-    prompt = _SC_PROMPT if task_type in ['s', 'c'] else _P_PROMPT
+    prompt = dict(s=_S_PROMPT, c=_C_PROMPT, p=_P_PROMPT)[task_type]
     return dict(
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(round=[dict(role='HUMAN', prompt=prompt)]),
+            type=RawPromptTemplate,
+            messages=[
+                dict(role='user', content=prompt),
+            ],
         ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_out_len=50),
+        inferencer=dict(type=GenInferencer),
     )
 
 
