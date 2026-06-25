@@ -1,4 +1,5 @@
 import random
+from copy import deepcopy
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import httpx
@@ -47,8 +48,9 @@ class OpenAISDKResponse(OpenAI):
         response_kwargs (Dict, optional): Direct ``responses.create`` keyword
             arguments. Kept as an alias for ``openai_extra_kwargs``.
         stream (bool): Whether to call Responses API with ``stream=True``.
-        include_reasoning_content (bool): If true, attempt to include exposed
-            reasoning text before the final answer.
+        include_reasoning_content (bool): If true, include exposed reasoning
+            text before the final answer. When raw reasoning text is absent,
+            fall back to reasoning summaries from reasoning models.
         timeout (int): Request timeout in seconds.
     """
 
@@ -313,7 +315,8 @@ class OpenAISDKResponse(OpenAI):
         if self.extra_body:
             query_data['extra_body'] = self.extra_body
         if self.openai_extra_kwargs:
-            query_data.update(self.openai_extra_kwargs)
+            query_data.update(deepcopy(self.openai_extra_kwargs))
+        self._maybe_request_reasoning_summary(query_data)
         if self.logprobs:
             self._append_include(query_data, LOGPROBS_INCLUDE)
         if self.top_logprobs is not None and 'top_logprobs' not in query_data:
@@ -323,6 +326,20 @@ class OpenAISDKResponse(OpenAI):
 
     def _is_reasoning_model(self) -> bool:
         return any(model in self.path for model in OAI_REASONING_MODEL_LIST)
+
+    def _maybe_request_reasoning_summary(self, query_data: Dict[str,
+                                                                Any]) -> None:
+        """Ask reasoning models for readable summaries when requested."""
+        if not (self.include_reasoning_content and self._is_reasoning_model()):
+            return
+
+        reasoning = query_data.get('reasoning')
+        if reasoning is None:
+            query_data['reasoning'] = {'summary': 'auto'}
+        elif isinstance(reasoning, dict):
+            reasoning = reasoning.copy()
+            reasoning.setdefault('summary', 'auto')
+            query_data['reasoning'] = reasoning
 
     def _messages_to_response_input(self, messages: List[Dict[str,
                                                               Any]]) -> List:
@@ -403,7 +420,9 @@ class OpenAISDKResponse(OpenAI):
 
     def _extract_stream_response(self, stream: Any) -> Tuple[str, Any]:
         """Collect final text from a Responses API event stream."""
-        reasoning_chunks = []
+        reasoning_content_chunks = []
+        reasoning_summary_chunks = []
+        reasoning_item_chunks = []
         message_chunks = []
         final_response = None
 
@@ -419,13 +438,16 @@ class OpenAISDKResponse(OpenAI):
                     message_chunks.append(delta)
                 continue
 
-            if event_type in {
-                    'response.reasoning_text.delta',
-                    'response.reasoning_summary_text.delta',
-            }:
+            if event_type == 'response.reasoning_text.delta':
                 delta = self._get_value(event, 'delta')
                 if isinstance(delta, str):
-                    reasoning_chunks.append(delta)
+                    reasoning_content_chunks.append(delta)
+                continue
+
+            if event_type == 'response.reasoning_summary_text.delta':
+                delta = self._get_value(event, 'delta')
+                if isinstance(delta, str):
+                    reasoning_summary_chunks.append(delta)
                 continue
 
             if event_type in {
@@ -439,13 +461,18 @@ class OpenAISDKResponse(OpenAI):
                     message_chunks.append(text)
                 continue
 
-            if event_type in {
-                    'response.reasoning_text.done',
-                    'response.reasoning_summary_text.done',
-            } and not reasoning_chunks:
+            if (event_type == 'response.reasoning_text.done'
+                    and not reasoning_content_chunks):
                 text = self._get_value(event, 'text')
                 if isinstance(text, str):
-                    reasoning_chunks.append(text)
+                    reasoning_content_chunks.append(text)
+                continue
+
+            if (event_type == 'response.reasoning_summary_text.done'
+                    and not reasoning_summary_chunks):
+                text = self._get_value(event, 'text')
+                if isinstance(text, str):
+                    reasoning_summary_chunks.append(text)
                 continue
 
             if (event_type == 'response.output_item.done'
@@ -454,7 +481,8 @@ class OpenAISDKResponse(OpenAI):
                 if self._get_value(item, 'type') == 'message':
                     message_chunks.extend(self._extract_content_text(item))
                 elif self._get_value(item, 'type') == 'reasoning':
-                    reasoning_chunks.extend(self._extract_reasoning_text(item))
+                    reasoning_item_chunks.extend(
+                        self._extract_reasoning_text(item))
                 continue
 
             if event_type in {
@@ -464,7 +492,11 @@ class OpenAISDKResponse(OpenAI):
             }:
                 final_response = self._get_value(event, 'response')
 
-        reasoning_text = ''.join(reasoning_chunks)
+        reasoning_text = ''.join(reasoning_content_chunks)
+        if not reasoning_text:
+            reasoning_text = ''.join(reasoning_item_chunks)
+        if not reasoning_text:
+            reasoning_text = ''.join(reasoning_summary_chunks)
         message_text = ''.join(message_chunks)
         if self.include_reasoning_content and reasoning_text:
             if message_text:
@@ -512,16 +544,21 @@ class OpenAISDKResponse(OpenAI):
         return chunks
 
     def _extract_reasoning_text(self, item: Any) -> List[str]:
+        content_chunks = self._extract_reasoning_field_text(item, 'content')
+        if content_chunks:
+            return content_chunks
+        return self._extract_reasoning_field_text(item, 'summary')
+
+    def _extract_reasoning_field_text(self, item: Any,
+                                      field: str) -> List[str]:
         chunks = []
-        for field in ('summary', 'content'):
-            value = self._get_value(item, field, []) or []
-            if isinstance(value, str):
-                chunks.append(value)
-                continue
-            for part in value:
-                text = self._get_value(part, 'text')
-                if isinstance(text, str):
-                    chunks.append(text)
+        value = self._get_value(item, field, []) or []
+        if isinstance(value, str):
+            return [value]
+        for part in value:
+            text = self._get_value(part, 'text')
+            if isinstance(text, str):
+                chunks.append(text)
         return chunks
 
     def _get_nested_value(self, obj: Any, *keys: str) -> Any:
