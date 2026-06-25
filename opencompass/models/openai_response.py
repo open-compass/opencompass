@@ -48,9 +48,6 @@ class OpenAISDKResponse(OpenAI):
         response_kwargs (Dict, optional): Direct ``responses.create`` keyword
             arguments. Kept as an alias for ``openai_extra_kwargs``.
         stream (bool): Whether to call Responses API with ``stream=True``.
-        include_reasoning_content (bool): If true, include exposed reasoning
-            text before the final answer. When raw reasoning text is absent,
-            fall back to reasoning summaries from reasoning models.
         timeout (int): Request timeout in seconds.
     """
 
@@ -82,7 +79,6 @@ class OpenAISDKResponse(OpenAI):
         openai_extra_kwargs: Optional[Dict] = None,
         response_kwargs: Optional[Dict] = None,
         stream: bool = False,
-        include_reasoning_content: bool = False,
         timeout: int = 3600,
     ):
         super().__init__(
@@ -119,7 +115,6 @@ class OpenAISDKResponse(OpenAI):
         # Backward-compatible alias for configs using the first implementation.
         self.response_kwargs = self.openai_extra_kwargs
         self.stream = stream
-        self.include_reasoning_content = include_reasoning_content
         self.timeout = timeout
         self.openai_client = self._create_fresh_client()
         if self.verbose:
@@ -329,8 +324,8 @@ class OpenAISDKResponse(OpenAI):
 
     def _maybe_request_reasoning_summary(self, query_data: Dict[str,
                                                                 Any]) -> None:
-        """Ask reasoning models for readable summaries when requested."""
-        if not (self.include_reasoning_content and self._is_reasoning_model()):
+        """Ask reasoning models for readable summaries when supported."""
+        if not self._is_reasoning_model():
             return
 
         reasoning = query_data.get('reasoning')
@@ -405,14 +400,12 @@ class OpenAISDKResponse(OpenAI):
     def _extract_response_text(self, response: Any) -> str:
         """Extract final answer text from a Responses API response object."""
         output_text = self._get_value(response, 'output_text')
-        if isinstance(output_text, str) and not self.include_reasoning_content:
-            return output_text
 
         reasoning_text, message_text = self._extract_output_items(response)
         if not message_text and isinstance(output_text, str):
             message_text = output_text
 
-        if self.include_reasoning_content and reasoning_text:
+        if reasoning_text:
             if message_text:
                 return reasoning_text + self.think_tag + message_text
             return reasoning_text
@@ -498,7 +491,7 @@ class OpenAISDKResponse(OpenAI):
         if not reasoning_text:
             reasoning_text = ''.join(reasoning_summary_chunks)
         message_text = ''.join(message_chunks)
-        if self.include_reasoning_content and reasoning_text:
+        if reasoning_text:
             if message_text:
                 return reasoning_text + self.think_tag + message_text, \
                     final_response

@@ -218,8 +218,8 @@ class TestOpenAISDKResponse(unittest.TestCase):
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
-    def test_generate_can_include_reasoning_content(self, mock_httpx_client,
-                                                    mock_tiktoken):
+    def test_generate_includes_reasoning_content_when_returned(
+            self, mock_httpx_client, mock_tiktoken):
         setup_tiktoken_mock(mock_tiktoken)
 
         mock_client = MagicMock()
@@ -243,7 +243,6 @@ class TestOpenAISDKResponse(unittest.TestCase):
         with fake_openai_module(mock_client):
             model = OpenAISDKResponse(
                 path='gpt-4.1',
-                include_reasoning_content=True,
                 think_tag='</think>',
             )
             results = model.generate(['Hello'], max_out_len=100)
@@ -281,7 +280,6 @@ class TestOpenAISDKResponse(unittest.TestCase):
         with fake_openai_module(mock_client):
             model = OpenAISDKResponse(
                 path='gpt-4.1',
-                include_reasoning_content=True,
                 think_tag='</think>',
             )
             results = model.generate(['Hello'], max_out_len=100)
@@ -291,7 +289,7 @@ class TestOpenAISDKResponse(unittest.TestCase):
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
-    def test_reasoning_model_requests_summary_when_including_reasoning(
+    def test_reasoning_model_requests_summary(
             self, mock_httpx_client, mock_tiktoken):
         setup_tiktoken_mock(mock_tiktoken)
 
@@ -317,7 +315,6 @@ class TestOpenAISDKResponse(unittest.TestCase):
         with fake_openai_module(mock_client):
             model = OpenAISDKResponse(
                 path='gpt-5.1',
-                include_reasoning_content=True,
                 openai_extra_kwargs=extra_kwargs,
             )
             results = model.generate(['Hello'], max_out_len=100)
@@ -439,7 +436,7 @@ class TestOpenAISDKResponse(unittest.TestCase):
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
-    def test_generate_streaming_can_include_reasoning_content(
+    def test_generate_streaming_includes_reasoning_content_when_returned(
             self, mock_httpx_client, mock_tiktoken):
         setup_tiktoken_mock(mock_tiktoken)
 
@@ -467,7 +464,6 @@ class TestOpenAISDKResponse(unittest.TestCase):
             model = OpenAISDKResponse(
                 path='gpt-4.1',
                 stream=True,
-                include_reasoning_content=True,
                 think_tag='</think>',
             )
             results = model.generate(['Hello'], max_out_len=100)
@@ -511,7 +507,6 @@ class TestOpenAISDKResponse(unittest.TestCase):
             model = OpenAISDKResponse(
                 path='gpt-4.1',
                 stream=True,
-                include_reasoning_content=True,
                 think_tag='</think>',
             )
             results = model.generate(['Hello'], max_out_len=100)
