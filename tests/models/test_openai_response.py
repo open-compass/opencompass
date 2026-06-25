@@ -70,6 +70,48 @@ class TestOpenAISDKResponse(unittest.TestCase):
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_reasoning_model_omits_temperature(self, mock_httpx_client,
+                                               mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.output_text = 'Generated response'
+        mock_client.responses.create.return_value = mock_response
+        mock_httpx_client.return_value = MagicMock()
+
+        with fake_openai_module(mock_client):
+            model = OpenAISDKResponse(path='gpt-5.1', max_seq_len=16384)
+            results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Generated response'])
+        call_args = mock_client.responses.create.call_args[1]
+        self.assertNotIn('temperature', call_args)
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_non_reasoning_model_passes_temperature(self, mock_httpx_client,
+                                                    mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.output_text = 'Generated response'
+        mock_client.responses.create.return_value = mock_response
+        mock_httpx_client.return_value = MagicMock()
+
+        with fake_openai_module(mock_client):
+            model = OpenAISDKResponse(path='gpt-4.1', max_seq_len=16384)
+            results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Generated response'])
+        call_args = mock_client.responses.create.call_args[1]
+        self.assertEqual(call_args['temperature'], 0.7)
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_with_messages_and_extra_kwargs(
             self, mock_httpx_client, mock_tiktoken):
         setup_tiktoken_mock(mock_tiktoken)
