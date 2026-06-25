@@ -8,7 +8,7 @@ def _longbenchv2_prompt():
     repo_root = Path(__file__).resolve().parents[2]
     config_path = (
         repo_root /
-        'opencompass/configs/datasets/longbenchv2/longbenchv2_gen_75fbba.py'
+        'opencompass/configs/datasets/longbenchv2/longbenchv2_gen_bd9437.py'
     )
     tree = ast.parse(config_path.read_text(encoding='utf-8'))
     for node in ast.walk(tree):
