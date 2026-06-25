@@ -164,6 +164,37 @@ class TestClaudeSDK(unittest.TestCase):
         self.assertNotIn('stream', api_params)
 
     @patch.dict('os.environ', {}, clear=True)
+    def test_generate_with_thinking_content(self):
+        """Test non-streaming thinking content is preserved."""
+        thinking = {'type': 'enabled', 'budget_tokens': 1024}
+        model, _, client = self.build_model(thinking=thinking)
+        client.messages.create.return_value = types.SimpleNamespace(content=[
+            types.SimpleNamespace(type='thinking', thinking='Thinking process'),
+            types.SimpleNamespace(type='text', text='Final answer'),
+        ])
+
+        self.assertEqual(model._generate('hello', max_out_len=64),
+                         'Thinking process</think>Final answer')
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_generate_with_dict_thinking_content(self):
+        """Test dict response blocks with thinking content are supported."""
+        model, _, client = self.build_model()
+        client.messages.create.return_value = types.SimpleNamespace(content=[
+            {
+                'type': 'thinking',
+                'thinking': 'Thinking process'
+            },
+            {
+                'type': 'text',
+                'text': 'Final answer'
+            },
+        ])
+
+        self.assertEqual(model._generate('hello', max_out_len=64),
+                         'Thinking process</think>Final answer')
+
+    @patch.dict('os.environ', {}, clear=True)
     def test_claude_extra_kwargs_are_merged_into_request(self):
         """Test claude_extra_kwargs are passed to Anthropic SDK requests."""
         extra_kwargs = {
@@ -188,7 +219,7 @@ class TestClaudeSDK(unittest.TestCase):
 
     @patch.dict('os.environ', {}, clear=True)
     def test_stream_true_uses_streaming_response(self):
-        """Test stream=True passes stream and accumulates text deltas."""
+        """Test stream=True accumulates thinking and text deltas."""
         model, _, client = self.build_model(stream=True)
         client.messages.create.return_value = iter([
             types.SimpleNamespace(type='message_start'),
@@ -203,12 +234,13 @@ class TestClaudeSDK(unittest.TestCase):
             types.SimpleNamespace(
                 type='content_block_delta',
                 delta=types.SimpleNamespace(type='thinking_delta',
-                                            thinking='ignored'),
+                                            thinking='Thinking process'),
             ),
             types.SimpleNamespace(type='message_stop'),
         ])
 
-        self.assertEqual(model._generate('hello', max_out_len=64), 'HELLO')
+        self.assertEqual(model._generate('hello', max_out_len=64),
+                         'Thinking process</think>HELLO')
         api_params = client.messages.create.call_args.kwargs
 
         self.assertTrue(api_params['stream'])

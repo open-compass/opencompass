@@ -41,6 +41,8 @@ class ClaudeSDK(BaseAPIModel):
             use ANTHROPIC_BASE_URL from environment.
         stream (bool): Whether to use streaming response. Defaults to False.
         retry (int): Number of retires if the API call fails. Defaults to 2.
+        think_tag (str): Separator used between thinking content and final
+            text. Defaults to '</think>'.
         claude_extra_kwargs (Dict, optional): Extra keyword arguments passed
             to anthropic.messages.create.
     """
@@ -57,6 +59,7 @@ class ClaudeSDK(BaseAPIModel):
         base_url: Optional[str] = None,
         stream: bool = False,
         retry: int = 2,
+        think_tag: str = '</think>',
         claude_extra_kwargs: Optional[Dict] = None,
     ):
         super().__init__(path=path,
@@ -87,6 +90,7 @@ class ClaudeSDK(BaseAPIModel):
         self.thinking = thinking
         self.base_url = base_url
         self.stream = stream
+        self.think_tag = think_tag
         self.claude_extra_kwargs = claude_extra_kwargs
 
     @staticmethod
@@ -131,31 +135,71 @@ class ClaudeSDK(BaseAPIModel):
         return messages, system_prompts
 
     @staticmethod
-    def _parse_stream_response(responses) -> str:
-        """Accumulate text deltas from an Anthropic streaming response."""
+    def _block_attr(block, name: str, default=None):
+        """Read a value from an Anthropic SDK object or dict block."""
+        if isinstance(block, dict):
+            return block.get(name, default)
+        return getattr(block, name, default)
+
+    @staticmethod
+    def _merge_thinking_and_text(thinking: str, text: str,
+                                 think_tag: str) -> str:
+        """Join Claude thinking content with final text when available."""
+        if thinking:
+            if text:
+                return thinking + think_tag + text
+            return thinking
+        return text
+
+    @classmethod
+    def _parse_stream_response(cls, responses, think_tag: str) -> str:
+        """Accumulate thinking/text deltas from a streaming response."""
+        thinking_chunks = []
         text_chunks = []
         for event in responses:
             if isinstance(event, dict):
                 delta = event.get('delta') or {}
                 text = delta.get('text') if isinstance(delta, dict) else None
+                thinking = (delta.get('thinking')
+                            if isinstance(delta, dict) else None)
             else:
                 delta = getattr(event, 'delta', None)
                 text = getattr(delta, 'text', None)
+                thinking = getattr(delta, 'thinking', None)
 
+            if thinking:
+                thinking_chunks.append(thinking)
             if text:
                 text_chunks.append(text)
-        return ''.join(text_chunks)
+        return cls._merge_thinking_and_text(''.join(thinking_chunks),
+                                            ''.join(text_chunks), think_tag)
 
-    @staticmethod
-    def _parse_response(responses) -> str:
-        """Extract text from a non-streaming Anthropic response."""
+    @classmethod
+    def _parse_response(cls, responses, think_tag: str) -> str:
+        """Extract thinking/text from a non-streaming Anthropic response."""
+        thinking_chunks = []
+        text_chunks = []
         for content in responses.content:
-            if content.type == 'text':
-                return content.text
+            content_type = cls._block_attr(content, 'type')
+            if content_type == 'thinking':
+                thinking = cls._block_attr(content, 'thinking')
+                if thinking:
+                    thinking_chunks.append(thinking)
+            elif content_type == 'text':
+                text = cls._block_attr(content, 'text')
+                if text:
+                    text_chunks.append(text)
+
+        if thinking_chunks or text_chunks:
+            return cls._merge_thinking_and_text(''.join(thinking_chunks),
+                                                ''.join(text_chunks),
+                                                think_tag)
 
         # If no text type content is found, return the first content
         # (backward compatibility).
-        return responses.content[0].text
+        first_content = responses.content[0]
+        return (cls._block_attr(first_content, 'text')
+                or cls._block_attr(first_content, 'thinking') or '')
 
     def generate(
         self,
@@ -236,8 +280,9 @@ class ClaudeSDK(BaseAPIModel):
                 responses = self.anthropic.messages.create(**api_params)
 
                 if api_params.get('stream'):
-                    return self._parse_stream_response(responses)
-                return self._parse_response(responses)
+                    return self._parse_stream_response(responses,
+                                                       self.think_tag)
+                return self._parse_response(responses, self.think_tag)
             except Exception as e:
                 self.logger.error(e)
             num_retries += 1
