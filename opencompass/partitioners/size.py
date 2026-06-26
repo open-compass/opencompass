@@ -185,6 +185,39 @@ class SizePartitioner(BasePartitioner):
 
         return factor
 
+    def _get_actual_size(self, test_range, total_size: int) -> int:
+        """Compute the actual number of test samples after applying test_range.
+
+        This mirrors the slicing logic in
+        :func:`opencompass.openicl.icl_dataset_reader.load_partial_dataset`
+        so that :meth:`get_cost` returns an accurate estimate without
+        loading the dataset into memory.
+
+        Args:
+            test_range: The ``test_range`` value from the dataset reader
+                config.  May be ``None``, an empty string, an ``int``, a
+                ``float``, or a slice string such as ``"[:100]"``.
+            total_size (int): The full size of the dataset.
+
+        Returns:
+            int: The number of samples that will actually be evaluated.
+        """
+        if not test_range:
+            return total_size
+
+        if isinstance(test_range, (int, float)):
+            if test_range <= 0 or test_range >= total_size:
+                return total_size
+            if isinstance(test_range, float) and test_range < 1:
+                return int(test_range * total_size)
+            return int(test_range)
+
+        if isinstance(test_range, str):
+            index_list = list(range(total_size))
+            return len(eval(f'index_list{test_range}'))
+
+        return total_size
+
     def get_cost(self,
                  dataset: ConfigDict,
                  get_raw_factors: bool = False) -> Union[int, Tuple[int, int]]:
@@ -205,8 +238,8 @@ class SizePartitioner(BasePartitioner):
         factor = self.get_factor(dataset)
 
         if dataset_abbr in self.dataset_size:
-            actual_size = eval('len(range(self.dataset_size[dataset_abbr])'
-                               f'{test_range})')
+            actual_size = self._get_actual_size(
+                test_range, self.dataset_size[dataset_abbr])
             if get_raw_factors:
                 return actual_size, factor
             return factor * actual_size
@@ -220,8 +253,8 @@ class SizePartitioner(BasePartitioner):
                       indent=4,
                       ensure_ascii=False)
 
-        actual_size = eval('len(range(self.dataset_size[dataset_abbr])'
-                           f'{test_range})')
+        actual_size = self._get_actual_size(
+            test_range, self.dataset_size[dataset_abbr])
         if get_raw_factors:
             return actual_size, factor
         return factor * actual_size
