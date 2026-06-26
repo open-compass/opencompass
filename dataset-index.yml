@@ -1363,33 +1363,9 @@
     paper: https://arxiv.org/abs/2407.03942
     configpath: opencompass/configs/datasets/dingo/dingo_gen.py
     configpath_llmjudge: ''
-- compassbench_v1_3:
-    name: CompassBench v1.3
-    category: Comprehensive
-    paper: https://github.com/open-compass/CompassBench/tree/main/v1_3_data
-    configpath: opencompass/configs/datasets/compassbench_v1_3
-    configpath_llmjudge: ''
-- compass_arena_subjective_bench:
-    name: CompassArena SubjectiveBench
-    category: Subjective / Chatbot
-    paper: https://arxiv.org/abs/2403.04132
-    configpath: opencompass/configs/datasets/subjective/compass_arena_subjective_bench
-    configpath_llmjudge: ''
-- compassarena:
-    name: CompassArena
-    category: Subjective / Chatbot
-    paper: https://opencompass.org.cn/arena
-    configpath: opencompass/configs/datasets/subjective/compassarena
-    configpath_llmjudge: ''
-- compassbench_subjective:
-    name: CompassBench Subjective
-    category: Subjective / Alignment
-    paper: https://github.com/open-compass/CompassBench/tree/main/v1_3_data
-    configpath: opencompass/configs/datasets/subjective/compassbench
-    configpath_llmjudge: ''
 - hmmt2026:
     name: HMMT2026
     category: Math
-    paper: https://arxiv.org/abs/2605.19338
+    paper: https://proceedings.neurips.cc/paper_files/paper/2025/file/1d27c01ebd3e3aebe226b44fc970d803-Paper-Datasets_and_Benchmarks_Track.pdf
     configpath: opencompass/configs/datasets/hmmt2026/hmmt2026_cascade_eval_gen_6ff468.py
     configpath_llmjudge: ''
