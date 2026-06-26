@@ -86,6 +86,47 @@ class TestHuggingFace(unittest.TestCase):
 
     @patch('transformers.AutoTokenizer')
     @patch('transformers.AutoModelForCausalLM')
+    @patch('opencompass.models.huggingface.torch')
+    def test_generate_uses_max_new_tokens_when_max_out_len_is_none(
+            self, mock_torch, mock_model_class, mock_tokenizer_class):
+        """Test max_new_tokens is used when max_out_len is None."""
+        mock_tokenizer = MagicMock()
+        mock_tokenizer.pad_token_id = 0
+        mock_tokenizer.eos_token = None
+        mock_tokenizer.return_value = {'input_ids': [[1, 2, 3]]}
+        mock_tokenizer.batch_decode.return_value = ['Generated response']
+        mock_tokenizer_class.from_pretrained.return_value = mock_tokenizer
+
+        mock_input_tensor = MagicMock()
+        mock_input_tensor.shape = [1, 3]
+        mock_torch.tensor.return_value = mock_input_tensor
+
+        mock_model = MagicMock()
+        mock_model.device = 'cpu'
+        mock_output = MagicMock()
+        mock_output.__getitem__.return_value = mock_output
+        mock_model.generate.return_value = mock_output
+        mock_model_class.from_pretrained.return_value = mock_model
+
+        model = HuggingFace(
+            path='test/model/path',
+            max_seq_len=2048,
+            model_kwargs=dict(device_map='cpu'),
+            generation_kwargs=dict(max_new_tokens=32, temperature=0.0),
+        )
+
+        results = model.generate(['Hello'], max_out_len=None)
+
+        self.assertEqual(results, ['Generated response'])
+        mock_tokenizer.assert_called_with(
+            ['Hello'], padding=False, truncation=True, max_length=2016)
+
+        generate_kwargs = mock_model.generate.call_args.kwargs
+        self.assertEqual(generate_kwargs['max_new_tokens'], 32)
+        self.assertEqual(generate_kwargs['temperature'], 0.0)
+
+    @patch('transformers.AutoTokenizer')
+    @patch('transformers.AutoModelForCausalLM')
     def test_get_token_len(self, mock_model_class, mock_tokenizer_class):
         """Test get_token_len method."""
         mock_tokenizer = MagicMock()
