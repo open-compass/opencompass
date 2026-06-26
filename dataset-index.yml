@@ -1152,7 +1152,7 @@
 - beyondaime:
     name: BeyondAIME
     category: Math
-    paper: https://huggingface.co/datasets/ByteDance-Seed/BeyondAIME
+    paper: ''
     configpath: opencompass/configs/datasets/BeyondAIME/beyondaime_gen.py
     configpath_llmjudge: ''
 - eese:
