@@ -88,10 +88,70 @@ models = [
 ]
 ```
 
+### 认证方式
+
+`key` 参数默认为 `'ENV'`，会从环境变量 `OPENAI_API_KEY` 中读取。如果未设置 `OPENAI_API_KEY`，
+模型会自动回退到 Azure 托管身份（`DefaultAzureCredential`）进行认证，无需额外配置。
+
+你也可以直接传入密钥：
+
+```python
+key='sk-...',           # 直接指定 API Key
+key='ENV',              # 从 OPENAI_API_KEY 环境变量读取（默认）；未设置时自动回退到 Azure 托管身份
+```
+
+### Azure OpenAI
+
+使用 Azure OpenAI 时，将 `openai_api_base` 指向你的 Azure 资源即可。
+认证方式自动处理：如果设置了 `OPENAI_API_KEY` 则使用该密钥，否则自动回退到 Azure 托管身份。
+
+```python
+from opencompass.models import OpenAISDK
+
+models = [
+    dict(
+        type=OpenAISDK,
+        path='gpt-4',
+        azure_endpoint='https://{resource-name}.openai.azure.com',
+        azure_api_version='2024-12-01-preview',
+        tokenizer_path='gpt-4',
+        meta_template=dict(round=[
+            dict(role='HUMAN', api_role='HUMAN'),
+            dict(role='BOT', api_role='BOT', generate=True),
+        ]),
+        query_per_second=1,
+        max_out_len=2048,
+        max_seq_len=4096,
+        batch_size=8,
+    ),
+]
+```
+
+### 推理力度（Reasoning Effort）
+
+对于 OpenAI 推理模型（o1、o3、o4、gpt-5），可以通过 `reasoning_effort` 参数控制推理深度。
+有效值为 `'low'`、`'medium'`、`'high'`（不区分大小写）。默认为 `None`（使用模型的默认行为）。
+
+```python
+from opencompass.models import OpenAISDK
+
+models = [
+    dict(
+        type=OpenAISDK,
+        path='o3',
+        reasoning_effort='high',                 # 控制推理深度
+        openai_api_base='https://api.openai.com/v1/',
+        max_out_len=4096,
+        max_seq_len=32768,
+    ),
+]
+```
+
 我们也提供了API模型的评测示例，请参考
 
 ```bash
 configs
+├── eval_api_azure_openai_demo.py
 ├── eval_zhipu.py
 ├── eval_xunfei.py
 └── eval_minimax.py
