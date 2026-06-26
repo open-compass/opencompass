@@ -359,6 +359,12 @@
     paper: https://arcprize.org/guide#private
     configpath: opencompass/configs/datasets/ARC_Prize_Public_Evaluation/arc_prize_public_evaluation_gen.py
     configpath_llmjudge: ''
+- arxivrollbench:
+    name: ArxivRollBench
+    category: Reasoning / Robustness
+    paper: https://ojs.aaai.org/index.php/AAAI/article/view/41098
+    configpath: opencompass/configs/datasets/arxivrollbench/arxivrollbench_gen.py
+    configpath_llmjudge: ''
 - ax:
     name: SuperGLUE / AX
     category: Reasoning
