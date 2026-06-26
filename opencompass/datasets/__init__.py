@@ -9,6 +9,7 @@ from .anthropics_evals import *  # noqa: F401, F403
 from .apps import *  # noqa: F401, F403
 from .arc import *  # noqa: F401, F403
 from .arc_prize_public_evaluation import *  # noqa: F401, F403
+from .arxivrollbench import *  # noqa: F401, F403
 from .ax import *  # noqa: F401, F403
 from .babilong import *  # noqa: F401, F403
 from .bbeh import *  # noqa: F401, F403
@@ -200,3 +201,5 @@ from .xcopa import *  # noqa: F401, F403
 from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
 from .xlsum import *  # noqa: F401, F403
 from .xsum import *  # noqa: F401, F403
+from .zebralogic import (ZebraLogicDataset, ZebraLogicMCEvaluator,  # noqa: F401
+                         ZebraLogicGridEvaluator)

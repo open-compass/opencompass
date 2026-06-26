@@ -359,6 +359,12 @@
     paper: https://arcprize.org/guide#private
     configpath: opencompass/configs/datasets/ARC_Prize_Public_Evaluation/arc_prize_public_evaluation_gen.py
     configpath_llmjudge: ''
+- arxivrollbench:
+    name: ArxivRollBench
+    category: Reasoning / Robustness
+    paper: https://ojs.aaai.org/index.php/AAAI/article/view/41098
+    configpath: opencompass/configs/datasets/arxivrollbench/arxivrollbench_gen.py
+    configpath_llmjudge: ''
 - ax:
     name: SuperGLUE / AX
     category: Reasoning
@@ -1368,4 +1374,10 @@
     category: Math
     paper: https://matharena.ai/
     configpath: opencompass/configs/datasets/hmmt2026/hmmt2026_cascade_eval_gen_6ff468.py
+    configpath_llmjudge: ''
+- zebralogic:
+    name: ZebraLogic
+    category: Reasoning
+    paper: https://arxiv.org/abs/2502.01100
+    configpath: opencompass/configs/datasets/ZebraLogic/zebralogic_rawprompt_gen_9446ef.py
     configpath_llmjudge: ''
