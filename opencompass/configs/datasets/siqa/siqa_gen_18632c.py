@@ -27,8 +27,9 @@ siqa_infer_cfg = dict(
 )
 
 siqa_eval_cfg = dict(
-            evaluator=dict(type=AccEvaluator),
-            pred_postprocessor=dict(type=first_option_postprocess, options='ABC')
+    evaluator=dict(type=AccEvaluator),
+    pred_postprocessor=dict(
+        type=first_option_postprocess, options='ABC', cushion=False)
 )
 
 siqa_datasets = [
