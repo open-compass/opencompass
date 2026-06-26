@@ -319,7 +319,7 @@
 - aime2024:
     name: AIME2024
     category: Examination
-    paper: https://huggingface.co/datasets/Maxwell-Jia/AIME_2024
+    paper: https://matharena.ai/
     configpath: opencompass/configs/datasets/aime2024/aime2024_gen.py
     configpath_llmjudge: opencompass/configs/datasets/aime2024/aime2024_llmjudge_gen.py
 - anli:
@@ -1152,7 +1152,7 @@
 - beyondaime:
     name: BeyondAIME
     category: Math
-    paper: ''
+    paper: https://huggingface.co/datasets/ByteDance-Seed/BeyondAIME
     configpath: opencompass/configs/datasets/BeyondAIME/beyondaime_gen.py
     configpath_llmjudge: ''
 - eese:
@@ -1232,13 +1232,13 @@
 - aime2025:
     name: AIME2025
     category: Math
-    paper: https://huggingface.co/datasets/opencompass/aime2025
+    paper: https://matharena.ai/
     configpath: opencompass/configs/datasets/aime2025/aime2025_cascade_eval_gen_5e9f4f.py
     configpath_llmjudge: opencompass/configs/datasets/aime2025/aime2025_llmjudge_gen_5e9f4f.py
 - aime2026:
     name: AIME2026
     category: Math
-    paper: https://arxiv.org/abs/2605.00674
+    paper: https://matharena.ai/
     configpath: opencompass/configs/datasets/aime2026/aime2026_cascade_eval_gen_6ff468.py
     configpath_llmjudge: ''
 - atlas:
@@ -1366,6 +1366,6 @@
 - hmmt2026:
     name: HMMT2026
     category: Math
-    paper: https://proceedings.neurips.cc/paper_files/paper/2025/file/1d27c01ebd3e3aebe226b44fc970d803-Paper-Datasets_and_Benchmarks_Track.pdf
+    paper: https://matharena.ai/
     configpath: opencompass/configs/datasets/hmmt2026/hmmt2026_cascade_eval_gen_6ff468.py
     configpath_llmjudge: ''
