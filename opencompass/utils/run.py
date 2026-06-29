@@ -450,27 +450,28 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
             chatobj_custom_dataset['n'] = dataset['n']
 
         # reader_cfg
-        chatobj_custom_dataset['reader_cfg'] = chatobj_custom_reader_cfg
+        chatobj_custom_dataset['reader_cfg'] = deepcopy(
+            chatobj_custom_reader_cfg)
         if 'test_range' in dataset:
             chatobj_custom_dataset['reader_cfg']['test_range'] = dataset['test_range']
 
 
         # infer_cfg
-        chatobj_custom_dataset['infer_cfg'] = chatobj_custom_infer_cfg
+        chatobj_custom_dataset['infer_cfg'] = deepcopy(chatobj_custom_infer_cfg)
 
         # eval_cfg
         def init_math_evaluator(evalcfg):
-            eval_cfg = optional_evaluator['math_evaluator']
+            eval_cfg = deepcopy(optional_evaluator['math_evaluator'])
             return eval_cfg
 
         def init_mcq_rule_evaluator(evalcfg):
-            eval_cfg = optional_evaluator['rule_evaluator']
+            eval_cfg = deepcopy(optional_evaluator['mcq_rule_evaluator'])
             if 'answer_pattern' in evalcfg.keys():
                 eval_cfg['pred_postprocessor']['answer_pattern'] = evalcfg['answer_pattern']
             return eval_cfg
 
         def init_llm_evaluator(evalcfg):
-            eval_cfg = optional_evaluator['llm_evaluator']
+            eval_cfg = deepcopy(optional_evaluator['llm_evaluator'])
             assert 'judge_cfg' in evalcfg.keys()
             eval_cfg['judge_cfg'] = evalcfg['judge_cfg']
             if 'prompt' in evalcfg.keys():
@@ -486,7 +487,7 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
                    rule_func_eval_type in func_locals and callable(func_locals[rule_func_eval_type]) and \
                    llm_func_eval_type in func_locals and callable(func_locals[llm_func_eval_type])
 
-            eval_cfg = optional_evaluator['cascade_evaluator']
+            eval_cfg = deepcopy(optional_evaluator['cascade_evaluator'])
             rule_func_eval_cfg = func_locals[rule_func_eval_type]
             llm_func_eval_cfg = func_locals[llm_func_eval_type]
             eval_cfg['rule_evaluator'] = rule_func_eval_cfg(evalcfg['rule_evaluator'])
@@ -505,7 +506,8 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
         chatobj_custom_dataset['eval_cfg']['evaluator'] = deepcopy(eval_cfg)
 
         # append datasets
-        chatobj_custom_dataset = chatobj_custom_dataset | chatobj_custom_datasets
+        chatobj_custom_dataset = chatobj_custom_dataset | deepcopy(
+            chatobj_custom_datasets)
         dataset_cfg = deepcopy(chatobj_custom_dataset)
         if 'infer_cfg' in dataset_cfg:
             del dataset_cfg['infer_cfg']
