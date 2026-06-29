@@ -45,7 +45,7 @@ with read_base():
     from ..ARC_c.ARC_c_gen_1e0de5 import ARC_c_datasets
     from ..commonsenseqa.commonsenseqa_gen_c946f2 import commonsenseqa_datasets
     from ..piqa.piqa_gen_1194eb import piqa_datasets
-    from ..siqa.siqa_gen_e78df3 import siqa_datasets
+    from ..siqa.siqa_gen_18632c import siqa_datasets
     from ..strategyqa.strategyqa_gen_1180a7 import strategyqa_datasets
     from ..winogrande.deprecated_winogrande_gen_a9ede5 import winogrande_datasets
     from ..obqa.obqa_gen_9069e4 import obqa_datasets
