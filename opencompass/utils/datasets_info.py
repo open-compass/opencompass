@@ -705,8 +705,8 @@ DATASETS_URL = {
     },
     "/simpleqa": {
         "url":
-        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa.zip",
-        "md5": "82af3e1378031c249cd169ed10cc2e91",
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa_repacked_20260630_cli.zip",
+        "md5": "e29a3a24980b3267e43f0f8f44d0c12d",
     },
     "/chinese_simpleqa": {
         "url":
