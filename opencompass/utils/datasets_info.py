@@ -646,6 +646,26 @@ DATASETS_URL = {
         "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/IFBench.zip",
         "md5":"b1c63b31e3312f929c6318977de4cdd3",
     },
+    "/NPHardEval/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/NPHardEval.zip",
+        "md5": "3264fd3a3d2952bb6b3a12e4a3054d3a",
+    },
+    "openfindata_release": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/openfindata_release.zip",
+        "md5": "8b2f4e20846dd5f65da8b4d53301dcbf",
+    },
+    "/lawbench/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lawbench.zip",
+        "md5": "c36401070e3b7f9e6764828b1c455ee3",
+    },
+    "/AGIEval/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/AGIEval.zip",
+        "md5": "8ceb494a0e3066b8156711377906378a",
+    },
     "/lcb_pro": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lcb_pro.zip",
         "md5": "ff4572e292fe27cabce3ab3b407361bd",
