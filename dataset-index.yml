@@ -212,6 +212,12 @@
     paper: https://lmsys.org/blog/2024-04-19-arena-hard/
     configpath: opencompass/configs/datasets/subjective/arena_hard
     configpath_llmjudge: ''
+- elbench:
+    name: ELBench
+    category: Subjective / Education
+    paper: https://github.com/ZeroLoss-Lab/ELBench
+    configpath: opencompass/configs/datasets/subjective/elbench/elbench_gen.py
+    configpath_llmjudge: ''
 - flames:
     name: FLAMES
     category: Subjective / Alignment
