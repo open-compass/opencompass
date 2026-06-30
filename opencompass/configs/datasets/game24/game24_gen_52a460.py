@@ -27,7 +27,7 @@ game24_datasets = [
     dict(
         abbr='game24',
         type=Game24Dataset,
-        path='./data/game24/game24.csv',
+        path='test-time-compute/game-of-24',
         reader_cfg=game24_reader_cfg,
         infer_cfg=game24_infer_cfg,
         eval_cfg=game24_eval_cfg)
