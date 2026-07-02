@@ -1,4 +1,4 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import (ELBenchChoiceEvaluator,
@@ -12,17 +12,17 @@ elbench_omni_reader_cfg = dict(
 
 elbench_omni_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[
-            dict(
-                role='HUMAN',
-                prompt='{question}\n\n请在回答的最后单独一行用“ANSWER: X”的格式给出'
+        type=RawPromptTemplate,
+        messages=[
+            {
+                'role': 'user',
+                'content': '{question}\n\n请在回答的最后单独一行用“ANSWER: X”的格式给出'
                 '正确选项（若有多个正确选项，用逗号分隔，例如 ANSWER: A, C）。',
-            ),
-        ]),
+            },
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=2048),
+    inferencer=dict(type=GenInferencer),
 )
 
 elbench_omni_eval_cfg = dict(evaluator=dict(type=ELBenchChoiceEvaluator))

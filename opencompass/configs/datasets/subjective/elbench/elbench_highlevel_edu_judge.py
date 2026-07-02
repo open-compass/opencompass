@@ -1,7 +1,7 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import LMEvaluator
+from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import (ELBenchHighLevelEduDataset,
                                   elbench_highlevel_edu_postprocess)
 
@@ -24,27 +24,33 @@ base_prompt = """你是一名资深的教育专家评审。下面给出一道面
 
 subjective_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[
-            dict(role='HUMAN', prompt='{question}'),
-        ]),
+        type=RawPromptTemplate,
+        messages=[
+            {'role': 'user', 'content': '{question}'},
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=2048),
+    inferencer=dict(type=GenInferencer),
 )
 
 subjective_eval_cfg = dict(
     evaluator=dict(
-        type=LMEvaluator,
+        type=GenericLLMEvaluator,
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(round=[
-                dict(role='HUMAN', prompt=base_prompt),
-            ]),
+            type=RawPromptTemplate,
+            messages=[
+                {'role': 'user', 'content': base_prompt},
+            ],
         ),
+        dataset_cfg=dict(
+            type=ELBenchHighLevelEduDataset,
+            path='高阶育人/edu',
+            name='高阶育人-edu',
+            reader_cfg=subjective_reader_cfg,
+        ),
+        judge_cfg=dict(),
         dict_postprocessor=dict(type=elbench_highlevel_edu_postprocess),
     ),
-    pred_role='BOT',
 )
 
 elbench_highlevel_edu_datasets = [

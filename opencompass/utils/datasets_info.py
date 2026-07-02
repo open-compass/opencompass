@@ -7,7 +7,7 @@ DATASETS_MAPPING = {
     "opencompass/ELBench": {
         "ms_id": "ZeroLoss-Lab/ELBench",
         "hf_id": "ZeroLoss-Lab/ELBench",
-        "local": "./data/elbench/benchmark_root",
+        "local": "./data/elbench",
     },
     "opencompass/S2-TOMG-Bench":{
         "ms_id": None,

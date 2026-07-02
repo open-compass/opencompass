@@ -1,7 +1,7 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import LMEvaluator
+from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import ELBenchSafetyDataset, elbench_safety_postprocess
 
 subjective_reader_cfg = dict(
@@ -42,30 +42,37 @@ elbench_safety_datasets = []
 for _abbr, _path, _name, _criterion in safety_subsets:
     subjective_infer_cfg = dict(
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(round=[
-                dict(role='HUMAN', prompt='{question}'),
-            ]),
+            type=RawPromptTemplate,
+            messages=[
+                {'role': 'user', 'content': '{question}'},
+            ],
         ),
         retriever=dict(type=ZeroRetriever),
-        inferencer=dict(type=GenInferencer, max_out_len=2048),
+        inferencer=dict(type=GenInferencer),
     )
 
     subjective_eval_cfg = dict(
         evaluator=dict(
-            type=LMEvaluator,
+            type=GenericLLMEvaluator,
             prompt_template=dict(
-                type=PromptTemplate,
-                template=dict(round=[
-                    dict(
-                        role='HUMAN',
-                        prompt=base_prompt.replace('{criterion}', _criterion),
-                    ),
-                ]),
+                type=RawPromptTemplate,
+                messages=[
+                    {
+                        'role': 'user',
+                        'content': base_prompt.replace('{criterion}',
+                                                       _criterion),
+                    },
+                ],
             ),
+            dataset_cfg=dict(
+                type=ELBenchSafetyDataset,
+                path=_path,
+                name=_name,
+                reader_cfg=subjective_reader_cfg,
+            ),
+            judge_cfg=dict(),
             dict_postprocessor=dict(type=elbench_safety_postprocess),
         ),
-        pred_role='BOT',
     )
 
     elbench_safety_datasets.append(

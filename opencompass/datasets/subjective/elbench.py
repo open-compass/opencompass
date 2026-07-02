@@ -23,13 +23,13 @@ import os
 import os.path as osp
 import re
 from collections import defaultdict
-from glob import glob
 
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import (DICT_POSTPROCESSORS, ICL_EVALUATORS,
                                   LOAD_DATASET)
+from opencompass.utils.datasets import get_data_path
 from opencompass.utils.logging import get_logger
 
 from ..base import BaseDataset
@@ -38,80 +38,50 @@ from .utils import get_judgeanswer_and_reference
 # ---------------------------------------------------------------------------
 # Data resolution.
 #
-# ELBench keeps all benchmark files under ``benchmark_root`` with their original
-# (Chinese) names. The files are published as a public dataset on HuggingFace /
-# ModelScope; no data is committed to OpenCompass. We download the dataset
-# snapshot once, cache it, and read the original files in place.
+# ELBench ships its files under a data root that holds the four original
+# Chinese top-level module directories: 安全可信 / 通用 / 高阶育人 / 基本教育.
+# The same layout is published on HuggingFace / ModelScope
+# (ZeroLoss-Lab/ELBench) and registered in ``datasets_info.py`` as
+# ``opencompass/ELBench`` -> ``./data/elbench``.
 #
-# Resolution order:
-#   1. ``$ELBENCH_DATA_ROOT`` if it points at a ``benchmark_root`` directory;
-#   2. ``<COMPASS_DATA_CACHE>/data/elbench/benchmark_root`` if already present;
-#   3. otherwise download the dataset snapshot from ModelScope (when
-#      ``DATASET_SOURCE=ModelScope``) or HuggingFace (default) and cache it.
+# Resolution mirrors ChemBench and other OC datasets:
+#   * ``DATASET_SOURCE=ModelScope`` -> download the ModelScope snapshot;
+#   * ``DATASET_SOURCE=HF``          -> download the HuggingFace snapshot;
+#   * otherwise (default)            -> local mode, data must already be at
+#                                        ``$COMPASS_DATA_CACHE/data/elbench``.
+# No ELBench-specific env var is needed.
 # ---------------------------------------------------------------------------
-
-ELBENCH_HF_ID = 'ZeroLoss-Lab/ELBench'
-ELBENCH_MS_ID = 'ZeroLoss-Lab/ELBench'
-
-# Top-level module directories ELBench ships with (original Chinese names).
-_ELBENCH_MODULE_DIRS = ('安全可信', '通用', '高阶育人', '基本教育')
 
 _ELBENCH_DATA_ROOT = None
 
 
-def _locate_benchmark_root(base):
-    # Explicit ``benchmark_root`` wrapper (used by the local data package).
-    if osp.isdir(osp.join(base, 'benchmark_root')):
-        return osp.join(base, 'benchmark_root')
-    # The snapshot root itself holds the module directories (HF/MS layout).
-    if any(osp.isdir(osp.join(base, d)) for d in _ELBENCH_MODULE_DIRS):
-        return base
-    matches = glob(osp.join(base, '**', 'benchmark_root'), recursive=True)
-    if matches:
-        return matches[0]
-    # Last resort: locate the parent of any known module directory.
-    for d in _ELBENCH_MODULE_DIRS:
-        hits = glob(osp.join(base, '**', d), recursive=True)
-        if hits:
-            return osp.dirname(hits[0])
-    return None
-
-
 def _elbench_data_root():
-    """Return the local path to ELBench's ``benchmark_root`` directory."""
+    """Return the local path to ELBench's data root directory."""
     global _ELBENCH_DATA_ROOT
     if _ELBENCH_DATA_ROOT and osp.isdir(_ELBENCH_DATA_ROOT):
         return _ELBENCH_DATA_ROOT
     logger = get_logger()
 
-    env_root = os.environ.get('ELBENCH_DATA_ROOT')
-    if env_root and osp.isdir(env_root):
-        _ELBENCH_DATA_ROOT = env_root
-        return env_root
+    dataset_source = os.environ.get('DATASET_SOURCE')
+    resolved = get_data_path('opencompass/ELBench')
 
-    cache_dir = os.environ.get('COMPASS_DATA_CACHE', '')
-    local_root = osp.join(cache_dir, 'data', 'elbench', 'benchmark_root')
-    if osp.isdir(local_root):
-        _ELBENCH_DATA_ROOT = local_root
-        return local_root
-
-    if os.environ.get('DATASET_SOURCE') == 'ModelScope':
+    if dataset_source == 'ModelScope':
         from modelscope import dataset_snapshot_download
-        logger.info(
-            f'Downloading ELBench data from ModelScope {ELBENCH_MS_ID}')
-        snapshot = dataset_snapshot_download(ELBENCH_MS_ID)
-    else:
+        logger.info(f'ELBench: downloading from ModelScope {resolved}')
+        root = dataset_snapshot_download(resolved)
+    elif dataset_source == 'HF':
         from huggingface_hub import snapshot_download
-        logger.info(
-            f'Downloading ELBench data from HuggingFace {ELBENCH_HF_ID}')
-        snapshot = snapshot_download(repo_id=ELBENCH_HF_ID,
-                                     repo_type='dataset')
+        logger.info(f'ELBench: downloading from HuggingFace {resolved}')
+        root = snapshot_download(repo_id=resolved, repo_type='dataset')
+    else:
+        # Local mode: ``resolved`` is already a filesystem path.
+        root = resolved
 
-    root = _locate_benchmark_root(snapshot)
-    if root is None:
+    if not osp.isdir(root):
         raise FileNotFoundError(
-            f'Could not locate benchmark_root in the ELBench dataset snapshot '
-            f'({snapshot}).')
+            f'ELBench data root not found: "{root}". '
+            f'Set COMPASS_DATA_CACHE to the parent of ``data/elbench``, or '
+            f'use DATASET_SOURCE=HF/ModelScope to download automatically.')
     _ELBENCH_DATA_ROOT = root
     return root
 
