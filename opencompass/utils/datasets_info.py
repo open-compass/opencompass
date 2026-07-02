@@ -1045,5 +1045,9 @@ DATASETS_URL = {
     "/SciReasoner": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/SciReasoner.zip",
         "md5": "2cf692234badc836fb80c4cf756d5160",
+    },
+    "/imo-bench-answerbench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/imo-bench-answerbench.zip",
+        "md5": "34b814c97344016d5b597d75a8fff7be",
     }
 }
