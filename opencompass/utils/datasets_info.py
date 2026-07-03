@@ -4,6 +4,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/mp20/mp20_test.jsonl",
     },
+    "opencompass/ELBench": {
+        "ms_id": "ZeroLoss-Lab/ELBench",
+        "hf_id": "ZeroLoss-Lab/ELBench",
+        "local": "./data/elbench",
+    },
     "opencompass/S2-TOMG-Bench":{
         "ms_id": None,
         "hf_id": None,

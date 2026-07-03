@@ -201,6 +201,4 @@ from .xcopa import *  # noqa: F401, F403
 from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
 from .xlsum import *  # noqa: F401, F403
 from .xsum import *  # noqa: F401, F403
-from .zebralogic import ZebraLogicDataset  # noqa: F401
-from .zebralogic import ZebraLogicGridEvaluator  # noqa: F401
-from .zebralogic import ZebraLogicMCEvaluator  # noqa: F401
+from .zebralogic import *  # noqa: F401, F403
