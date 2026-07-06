@@ -154,7 +154,12 @@ class HeliumMarketResolutionDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, mini: bool = False):
-        ds = load_dataset(path, split='test')
+        try:
+            ds = load_dataset(path,
+                              data_files='data/items.jsonl',
+                              split='train')
+        except Exception:
+            ds = load_dataset(path, split='test')
 
         def prep(example):
             gt = example['ground_truth']

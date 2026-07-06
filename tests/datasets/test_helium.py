@@ -71,6 +71,7 @@ class TestHeliumMarketResolution(unittest.TestCase):
                 'task': 'relative_iv',
                 'prompt': 'Reply A or B.',
                 'ground_truth': '{"answer":"A"}',
+                'regime': 'high_vol',
                 'scoring_tier': 'core',
             }
         ])
@@ -79,9 +80,11 @@ class TestHeliumMarketResolution(unittest.TestCase):
         item = loaded['test'][0]
         reference = json.loads(item['reference'])
 
-        mock_load_dataset.assert_called_once_with('test_path', split='test')
+        mock_load_dataset.assert_called_once_with(
+            'test_path', data_files='data/items.jsonl', split='train')
         self.assertEqual(reference['task'], 'relative_iv')
         self.assertEqual(reference['ground_truth'], {'answer': 'A'})
+        self.assertEqual(reference['regime'], 'high_vol')
         self.assertEqual(reference['scoring_tier'], 'core')
 
 
