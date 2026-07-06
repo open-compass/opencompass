@@ -184,7 +184,11 @@ class BigCodeBenchEvaluator(BaseEvaluator):
         if not is_accessible:
             logger.error(f'Failed to connect to {self.remote_execute_api} '
                          f'with status code {status_code}')
-            return False
+            return {
+                'error': 'remote evaluator unreachable',
+                'pass@1': 0.0,
+                'details': [],
+            }
 
         while True:
             try:

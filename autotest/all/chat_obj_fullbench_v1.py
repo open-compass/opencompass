@@ -1,9 +1,10 @@
 from mmengine.config import read_base
 
 with read_base():
-    from autotest.infer.config import \
+    from autotest.all.config import concurrent_eval as eval  # noqa: F401, E501
+    from autotest.all.config import \
         concurrent_infer as infer  # noqa: F401, E501
-    from autotest.infer.config import models  # noqa: F401, E501
+    from autotest.all.config import models  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_gen_5e9f4f import \
         aime2024_datasets  # noqa: F401, E501
     from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import \
@@ -240,8 +241,8 @@ repeated_info = [
 
 for datasets_, num in repeated_info:
     for dataset_ in datasets_:
-        dataset_['n'] = num
-        dataset_['k'] = num
+        dataset_['n'] = 1
+        dataset_['k'] = 1
 
 # CompassAcademic Extended Process
 
@@ -316,12 +317,39 @@ for temp_dataset in math_0shot_datasets:
     temp_dataset['abbr'] = temp_dataset['abbr'] + '_0shot'
 
 datasets = sum(
-    (v for k, v in locals().items()
+    ([v[0]] if v else [] for k, v in locals().items()
      if k.endswith('_datasets') and 'scicode' not in k.lower()
      and 'teval' not in k.lower() and 'dingo' not in k.lower()),
     [],
 )
+teval_en_datasets[0]['eval_cfg']['num_gpus'] = 0
+teval_zh_datasets[0]['eval_cfg']['num_gpus'] = 0
+datasets += [teval_en_datasets[0], teval_zh_datasets[0], SciCode_datasets[0]]
 
-datasets += teval_en_datasets
-datasets += teval_zh_datasets
-datasets += SciCode_datasets
+obj_llm_judge_cfg = models[0]
+
+for item in datasets:
+    try:
+        if 'atlas' in item['abbr'] and 'judge_cfg' in item['eval_cfg'][
+                'evaluator']:
+            item['eval_cfg']['evaluator']['judge_cfg'] = dict(
+                judgers=[obj_llm_judge_cfg])
+        elif 'judge_cfg' in item['eval_cfg']['evaluator']:
+            item['eval_cfg']['evaluator']['judge_cfg'] = obj_llm_judge_cfg
+        elif 'judge_cfg' in item['eval_cfg']['evaluator']['llm_evaluator']:
+            item['eval_cfg']['evaluator']['llm_evaluator'][
+                'judge_cfg'] = obj_llm_judge_cfg
+    except Exception:
+        pass
+
+for d in datasets:
+    d['reader_cfg']['test_range'] = '[0:2]'
+    if 'dataset_cfg' in d['eval_cfg']['evaluator'] and 'reader_cfg' in d[
+            'eval_cfg']['evaluator']['dataset_cfg']:
+        d['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
+            'test_range'] = '[0:2]'
+    if 'llm_evaluator' in d['eval_cfg'][
+            'evaluator'] and 'dataset_cfg' in d[  # noqa: E501
+                'eval_cfg']['evaluator']['llm_evaluator']:
+        d['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
+            'reader_cfg']['test_range'] = '[0:2]'

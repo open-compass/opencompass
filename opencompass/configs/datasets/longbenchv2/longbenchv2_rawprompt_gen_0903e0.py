@@ -1,4 +1,4 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import LongBenchv2Dataset, LongBenchv2Evaluator
@@ -11,24 +11,19 @@ LongBenchv2_reader_cfg = dict(
 
 LongBenchv2_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='Please read the following text and answer the questions below.\n <text> \n {context} \n </text> \n \n What is the correct answer to this question: {question} \n \n Choices: \n (A) {choice_A} \n (B) {choice_B} \n (C) {choice_C} \n (D) {choice_D} \n Let’s think step by step. Based on the above, what is the single, most likely answer choice? Format your response as follows: "The correct answer is (insert answer here)',
-                ),
-            ],
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            {'role': 'user', 'content': 'Please read the following text and answer the questions below.\n <text> \n {context} \n </text> \n \n What is the correct answer to this question: {question} \n \n Choices: \n (A) {choice_A} \n (B) {choice_B} \n (C) {choice_C} \n (D) {choice_D} \n Let\'s think step by step. Based on the above, what is the single, most likely answer choice? Format your response as follows: "The correct answer is (insert answer here)'},
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
 )
 
 LongBenchv2_eval_cfg = dict(
-    evaluator=dict(type=LongBenchv2Evaluator),  
+    evaluator=dict(type=LongBenchv2Evaluator),
     pred_role='BOT',
-    pred_postprocessor=dict(type=first_option_postprocess, options='ABCD')  
+    pred_postprocessor=dict(type=first_option_postprocess, options='ABCD')
 )
 
 LongBenchv2_datasets = [

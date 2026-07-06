@@ -37,6 +37,17 @@ def parse_requirements(fname='requirements.txt', with_version=True):
 
     require_fpath = fname
 
+    def warn_for_skipped_pyext():
+        if (require_fpath.replace('\\', '/').endswith('requirements/extra.txt')
+                and sys.version_info >= (3, 11)):
+            import warnings
+            warnings.warn(
+                'pyext==0.7 is skipped on Python >=3.11 because it '
+                'depends on inspect.getargspec, which was removed in '
+                'Python 3.11. Code execution evaluation for these '
+                'datasets will be unavailable: APPS (apps, apps_mini), '
+                'TACO, and LiveCodeBench Code Generation.', RuntimeWarning)
+
     def parse_line(line):
         """Parse information from a line in a requirements text file."""
         if line.startswith('-r '):
@@ -93,6 +104,7 @@ def parse_requirements(fname='requirements.txt', with_version=True):
                 item = ''.join(parts)
                 yield item
 
+    warn_for_skipped_pyext()
     packages = list(gen_packages_items())
     return packages
 
@@ -148,6 +160,7 @@ def do_setup():
             'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.12',
             'Intended Audience :: Developers',
             'Intended Audience :: Education',
             'Intended Audience :: Science/Research',

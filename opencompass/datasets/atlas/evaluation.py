@@ -232,7 +232,7 @@ class ATLASLLMEvaluator(BaseEvaluator):
         self.inferencer = []
         for _judge_cfg in self.judge_cfg:
             output_path = f'{self._out_dir}_replica{self.dataset_replica_idx}_{_judge_cfg["path"].split("/")[-1]}.json'  # noqa
-            logger.info(f'LLM judge details will be saved at:{output_path}')
+            logger.info(f'LLM judge details will be saved at: {output_path}')
             out_dir, out_name = osp.split(output_path)
 
             logger.info(
@@ -356,7 +356,8 @@ class ATLASLLMEvaluator(BaseEvaluator):
             mmengine.dump(output, f'{self._out_dir}'
                           f'_replica{self.dataset_replica_idx}'
                           f'_combine.json',
-                          indent=4)
+                          indent=4,
+                          ensure_ascii=False)
         return self.output_postprocess(output, dataset)
 
     def output_postprocess(self, output: Dict, dataset=None) -> Dict:

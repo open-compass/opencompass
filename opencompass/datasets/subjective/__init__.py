@@ -20,6 +20,14 @@ from .compassbench_control_length_bias import \
     CompassBenchControlLengthBiasDataset  # noqa: F401, F403
 from .corev2 import Corev2Dataset  # noqa: F401, F403
 from .creationbench import CreationBenchDataset  # noqa: F401, F403
+from .elbench import ELBenchChoiceEvaluator  # noqa: F401, F403
+from .elbench import ELBenchGeneralDataset  # noqa: F401, F403
+from .elbench import ELBenchHighLevelEduDataset  # noqa: F401, F403
+from .elbench import ELBenchHighLevelOmniDataset  # noqa: F401, F403
+from .elbench import ELBenchMathEvaluator  # noqa: F401, F403
+from .elbench import ELBenchSafetyDataset  # noqa: F401, F403
+from .elbench import elbench_highlevel_edu_postprocess  # noqa: F401, F403
+from .elbench import elbench_safety_postprocess  # noqa: F401, F403
 from .flames import FlamesDataset  # noqa: F401, F403
 from .fofo import FofoDataset, fofo_postprocess  # noqa: F401, F403
 from .followbench import FollowBenchDataset  # noqa: F401, F403
@@ -29,10 +37,12 @@ from .judgerbench import JudgerBenchDataset  # noqa: F401, F403
 from .judgerbench import JudgerBenchEvaluator  # noqa: F401, F403
 from .mtbench import MTBenchDataset, mtbench_postprocess  # noqa: F401, F403
 from .mtbench101 import MTBench101Dataset  # noqa: F401, F403
+from .mtbench101 import MTBench101WithRawPromptDataset  # noqa: F401, F403
 from .mtbench101 import mtbench101_postprocess
 from .multiround import MultiroundDataset  # noqa: F401, F403
 from .subjective_cmp import SubjectiveCmpDataset  # noqa: F401, F403
 from .wildbench import WildBenchDataset  # noqa: F401, F403
+from .wildbench import WildBenchWithRawPromptDataset  # noqa: F401, F403
 from .wildbench import wildbench_bradleyterry_postprocess  # noqa: F401, F403
 from .wildbench import wildbench_postprocess  # noqa: F401, F403
 from .writingbench import *

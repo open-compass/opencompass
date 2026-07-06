@@ -195,6 +195,36 @@ class TestOpenAISDK(unittest.TestCase):
         self.assertEqual(model.max_seq_len, 16384)
         self.assertEqual(model.openai_client, mock_client)
 
+    @patch('opencompass.models.openai_api.inspect.signature')
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_proxy_config_is_passed_to_http_client(
+            self, mock_httpx_client, mock_openai_class, mock_tiktoken,
+            mock_signature):
+        """Test OpenAISDK proxy configuration with modern httpx."""
+        mock_enc = MagicMock()
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+        mock_openai_class.return_value = MagicMock()
+        mock_httpx_client.return_value = MagicMock()
+        mock_signature.return_value = type(
+            'Signature', (), {'parameters': {'proxy': object()}})()
+
+        OpenAISDK(
+            path='gpt-3.5-turbo',
+            openai_proxy_url='http://proxy.example',
+            http_client_cfg={
+                'proxy': 'http://old-proxy.example',
+                'proxies': {'http://': 'http://old-proxy.example'},
+            },
+        )
+
+        http_client_kwargs = mock_httpx_client.call_args[1]
+        self.assertEqual(http_client_kwargs['proxy'],
+                         'http://proxy.example')
+        self.assertNotIn('proxies', http_client_kwargs)
+
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('openai.OpenAI')
     @patch('httpx.Client')

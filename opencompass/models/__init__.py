@@ -14,6 +14,7 @@ from .claude_sdk_api import ClaudeSDK  # noqa: F401
 from .deepseek_api import DeepseekAPI  # noqa: F401
 from .doubao_api import Doubao  # noqa: F401
 from .gemini_api import Gemini  # noqa: F401
+from .gemini_sdk_api import GeminiSDK  # noqa: F401
 from .glm import GLM130B  # noqa: F401
 from .huggingface import HuggingFace  # noqa: F401
 from .huggingface import HuggingFaceCausalLM  # noqa: F401
@@ -35,6 +36,7 @@ from .nanbeige_api import Nanbeige  # noqa: F401
 from .openai_api import OpenAI  # noqa: F401
 from .openai_api import OpenAISDK  # noqa: F401
 from .openai_api import OpenAISDKRollout  # noqa: F401
+from .openai_response import OpenAISDKResponse  # noqa: F401
 from .openai_streaming import OpenAISDKStreaming  # noqa: F401
 from .pangu_api import PanGu  # noqa: F401
 from .qwen_api import Qwen  # noqa: F401
