@@ -9,31 +9,31 @@ from opencompass.datasets.helium import HeliumMarketResolutionEvaluator
 # Methodology: https://heliumtrades.com/benchmarks/
 
 helium_mr_reader_cfg = dict(
-    input_columns=["prompt"],
-    output_column="reference",
+    input_columns=['prompt'],
+    output_column='reference',
 )
 
 helium_mr_infer_cfg = dict(
     prompt_template=dict(
         type=RawPromptTemplate,
         messages=[
-            dict(role="user", content="{prompt}"),
+            dict(role='user', content='{prompt}'),
         ],
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=256),
+    inferencer=dict(type=GenInferencer),
 )
 
 helium_mr_eval_cfg = dict(
     evaluator=dict(type=HeliumMarketResolutionEvaluator),
-    pred_role="BOT",
+    pred_role='BOT',
 )
 
 helium_market_resolution_datasets = [
     dict(
         type=HeliumMarketResolutionDataset,
-        abbr="helium_mr",
-        path="HeliumTrades/helium-market-resolution-benchmark",
+        abbr='helium_mr',
+        path='HeliumTrades/helium-market-resolution-benchmark',
         mini=False,
         reader_cfg=helium_mr_reader_cfg,
         infer_cfg=helium_mr_infer_cfg,
@@ -41,8 +41,8 @@ helium_market_resolution_datasets = [
     ),
     dict(
         type=HeliumMarketResolutionDataset,
-        abbr="helium_mr_mini",
-        path="HeliumTrades/helium-market-resolution-benchmark",
+        abbr='helium_mr_mini',
+        path='HeliumTrades/helium-market-resolution-benchmark',
         mini=True,
         reader_cfg=helium_mr_reader_cfg,
         infer_cfg=helium_mr_infer_cfg,
