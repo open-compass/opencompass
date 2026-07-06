@@ -157,7 +157,7 @@ class SizePartitioner(BasePartitioner):
             cfg = copy.deepcopy(dataset_cfg)
             cfg['abbr'] = abbr + f'_{part}'
             test_range = cfg['reader_cfg'].get('test_range', '')
-            cfg['reader_cfg']['test_range'] = f'{test_range}[{i}:{i+step}]'
+            cfg['reader_cfg']['test_range'] = f'{test_range}[{i}: {i + step}]'
             split_configs.append(cfg)
         return split_configs
 
@@ -185,7 +185,8 @@ class SizePartitioner(BasePartitioner):
 
         return factor
 
-    def _get_actual_size(self, test_range, total_size: int) -> int:
+    def _get_actual_size(self, test_range: Optional[Union[int, float, str]],
+                         total_size: int) -> int:
         """Compute the actual number of test samples after applying test_range.
 
         This mirrors the slicing logic in
@@ -213,8 +214,7 @@ class SizePartitioner(BasePartitioner):
             return int(test_range)
 
         if isinstance(test_range, str):
-            index_list = list(range(total_size))
-            return len(eval(f'index_list{test_range}'))
+            return len(eval(f'range(total_size){test_range}'))
 
         return total_size
 
@@ -253,8 +253,8 @@ class SizePartitioner(BasePartitioner):
                       indent=4,
                       ensure_ascii=False)
 
-        actual_size = self._get_actual_size(
-            test_range, self.dataset_size[dataset_abbr])
+        actual_size = self._get_actual_size(test_range,
+                                            self.dataset_size[dataset_abbr])
         if get_raw_factors:
             return actual_size, factor
         return factor * actual_size
