@@ -4,6 +4,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/mp20/mp20_test.jsonl",
     },
+    "opencompass/SVAMP": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/svamp/SVAMP.jsonl",
+    },
     "opencompass/ELBench": {
         "ms_id": "ZeroLoss-Lab/ELBench",
         "hf_id": "ZeroLoss-Lab/ELBench",
@@ -732,6 +737,11 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/simpleqa.zip",
         "md5": "82af3e1378031c249cd169ed10cc2e91",
+    },
+    "/svamp/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/svamp.zip",
+        "md5": "2be740eadca6123d6bb686c9e6e00ef6",
     },
     "/chinese_simpleqa": {
         "url":
