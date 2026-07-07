@@ -23,6 +23,8 @@ langdetect
 ltp
 # Math
 math-verify[antlr4_11_0]
+# Lawbench 2-1 (wsjd), requires C++ build via CMake; pure-Python alternative: opencc-python-reimplemented
+OpenCC
 # CMPhyBench
 pint
 # Taco, apps Dataset
