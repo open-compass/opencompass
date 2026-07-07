@@ -739,12 +739,11 @@ class HuggingFaceChatGLM3(HuggingFace):
         # used to compensate for #tokens occupied by sth like system prompt
         self.num_extra_tokens = num_extra_tokens
 
-        def generate(self,
-                     inputs: List[str],
-                     max_out_len: Optional[int] = None,
-                     min_out_len: Optional[int] = None,
-                     stopping_criteria: List[str] = [],
-                     **kwargs) -> List[str]:
+    def generate(self,
+                 inputs: List[PromptType],
+                 max_out_len: int = 512,
+                 skip_overlength=False,
+                 **kwargs) -> str:
         """Generate response from input prompt.
 
         Args:

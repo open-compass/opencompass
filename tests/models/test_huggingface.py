@@ -118,12 +118,35 @@ class TestHuggingFace(unittest.TestCase):
         results = model.generate(['Hello'], max_out_len=None)
 
         self.assertEqual(results, ['Generated response'])
-        mock_tokenizer.assert_called_with(
-            ['Hello'], padding=False, truncation=True, max_length=2016)
+        mock_tokenizer.assert_called_with(['Hello'],
+                                          truncation=True,
+                                          max_length=2016)
 
         generate_kwargs = mock_model.generate.call_args.kwargs
         self.assertEqual(generate_kwargs['max_new_tokens'], 32)
         self.assertEqual(generate_kwargs['temperature'], 0.0)
+
+    @patch('transformers.AutoTokenizer')
+    @patch('transformers.AutoModelForCausalLM')
+    def test_generate_requires_length_when_max_out_len_is_none(
+            self, mock_model_class, mock_tokenizer_class):
+        """Test a clear error is raised when no output length is provided."""
+        mock_tokenizer = MagicMock()
+        mock_tokenizer.pad_token_id = 0
+        mock_tokenizer_class.from_pretrained.return_value = mock_tokenizer
+
+        mock_model = MagicMock()
+        mock_model.device = 'cpu'
+        mock_model_class.from_pretrained.return_value = mock_model
+
+        model = HuggingFace(
+            path='test/model/path',
+            max_seq_len=2048,
+            model_kwargs=dict(device_map='cpu'),
+        )
+
+        with self.assertRaisesRegex(ValueError, '`max_out_len` is required'):
+            model.generate(['Hello'], max_out_len=None)
 
     @patch('transformers.AutoTokenizer')
     @patch('transformers.AutoModelForCausalLM')
