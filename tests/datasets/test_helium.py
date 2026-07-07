@@ -81,7 +81,9 @@ class TestHeliumMarketResolution(unittest.TestCase):
         reference = json.loads(item['reference'])
 
         mock_load_dataset.assert_called_once_with(
-            'test_path', data_files='data/items.jsonl', split='train')
+            'test_path',
+            data_files={'test': 'data/items.jsonl'},
+            split='test')
         self.assertEqual(reference['task'], 'relative_iv')
         self.assertEqual(reference['ground_truth'], {'answer': 'A'})
         self.assertEqual(reference['regime'], 'high_vol')

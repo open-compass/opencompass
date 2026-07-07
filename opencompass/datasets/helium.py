@@ -156,8 +156,8 @@ class HeliumMarketResolutionDataset(BaseDataset):
     def load(path: str, mini: bool = False):
         try:
             ds = load_dataset(path,
-                              data_files='data/items.jsonl',
-                              split='train')
+                              data_files={'test': 'data/items.jsonl'},
+                              split='test')
         except Exception:
             ds = load_dataset(path, split='test')
 
