@@ -22,11 +22,25 @@ def _install_litellm_stub():
     return fake.completion
 
 
-def _fake_response(content='hi'):
+def _fake_response(content='hi', reasoning_content=None,
+                   thinking_blocks=None):
     """Build a minimal OpenAI-shaped ``ModelResponse`` stand-in."""
     message = SimpleNamespace(content=content, role='assistant')
+    if reasoning_content is not None:
+        message.reasoning_content = reasoning_content
+    if thinking_blocks is not None:
+        message.thinking_blocks = thinking_blocks
     choice = SimpleNamespace(message=message, finish_reason='stop', index=0)
     return SimpleNamespace(choices=[choice], id='cmpl-test', model='test')
+
+
+def _fake_stream_chunk(content='hi', reasoning_content=None):
+    """Build a minimal LiteLLM streaming chunk stand-in."""
+    delta = SimpleNamespace(content=content)
+    if reasoning_content is not None:
+        delta.reasoning_content = reasoning_content
+    choice = SimpleNamespace(delta=delta, finish_reason=None, index=0)
+    return SimpleNamespace(choices=[choice])
 
 
 class TestLiteLLMAPIInit(unittest.TestCase):
@@ -89,11 +103,35 @@ class TestLiteLLMAPIInit(unittest.TestCase):
         )
         self.assertTrue(kwargs['drop_params'])
 
+    def test_stream_default_omits_stream_kwarg(self):
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        kwargs = model._build_call_kwargs(
+            messages=[{'role': 'user', 'content': 'hi'}],
+            max_out_len=128,
+        )
+        self.assertNotIn('stream', kwargs)
+
+    def test_stream_true_forwards_stream_kwarg(self):
+        model = LiteLLMAPI(path='openai/gpt-4o-mini', stream=True)
+        kwargs = model._build_call_kwargs(
+            messages=[{'role': 'user', 'content': 'hi'}],
+            max_out_len=128,
+        )
+        self.assertTrue(kwargs['stream'])
+
+    def test_think_tag_default(self):
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        self.assertEqual(model.think_tag, '</think>')
+
     def test_extra_body_cannot_override_core_params(self):
-        """extra_body should not override model, messages, or max_tokens."""
+        """extra_body should not override core request fields."""
         model = LiteLLMAPI(
             path='openai/gpt-4o-mini',
-            extra_body={'model': 'WRONG', 'max_tokens': 999},
+            extra_body={
+                'model': 'WRONG',
+                'max_tokens': 999,
+                'stream': True,
+            },
         )
         kwargs = model._build_call_kwargs(
             messages=[{'role': 'user', 'content': 'hi'}],
@@ -101,6 +139,32 @@ class TestLiteLLMAPIInit(unittest.TestCase):
         )
         self.assertEqual(kwargs['model'], 'openai/gpt-4o-mini')
         self.assertEqual(kwargs['max_tokens'], 128)
+        self.assertNotIn('stream', kwargs)
+
+    def test_gen_kwargs_forwarded_without_overriding_core_params(self):
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        messages = [{'role': 'user', 'content': 'hi'}]
+        kwargs = model._build_call_kwargs(
+            messages=messages,
+            max_out_len=128,
+            gen_kwargs={
+                'model': 'WRONG',
+                'messages': [{'role': 'user', 'content': 'WRONG'}],
+                'max_tokens': 999,
+                'drop_params': False,
+                'stream': True,
+                'top_p': 0.9,
+                'seed': 42,
+            },
+        )
+
+        self.assertEqual(kwargs['model'], 'openai/gpt-4o-mini')
+        self.assertEqual(kwargs['messages'], messages)
+        self.assertEqual(kwargs['max_tokens'], 128)
+        self.assertTrue(kwargs['drop_params'])
+        self.assertNotIn('stream', kwargs)
+        self.assertEqual(kwargs['top_p'], 0.9)
+        self.assertEqual(kwargs['seed'], 42)
 
 
 class TestLiteLLMAPIMessages(unittest.TestCase):
@@ -147,6 +211,23 @@ class TestLiteLLMAPIMessages(unittest.TestCase):
                 'role': 'assistant',
                 'content': 'Hello!'
             },
+            {
+                'role': 'user',
+                'content': 'What is 2+2?'
+            },
+        ])
+
+    def test_opencompass_native_plain_list(self):
+        """Parallel inferencers may pass a plain list instead of PromptList."""
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        prompt_list = [
+            {
+                'role': 'HUMAN',
+                'prompt': 'What is 2+2?'
+            },
+        ]
+        messages = model._build_messages(prompt_list)
+        self.assertEqual(messages, [
             {
                 'role': 'user',
                 'content': 'What is 2+2?'
@@ -223,6 +304,124 @@ class TestLiteLLMAPIGenerate(unittest.TestCase):
                          }])
         self.assertEqual(kwargs['max_tokens'], 32)
         self.assertEqual(kwargs['api_key'], 'sk-test')
+
+    def test_generate_forwards_gen_kwargs(self):
+        completion = _install_litellm_stub()
+        completion.return_value = _fake_response('pong')
+
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        results = model.generate(['ping'],
+                                 max_out_len=32,
+                                 top_p=0.9,
+                                 seed=42)
+
+        self.assertEqual(results, ['pong'])
+        kwargs = completion.call_args.kwargs
+        self.assertEqual(kwargs['top_p'], 0.9)
+        self.assertEqual(kwargs['seed'], 42)
+
+    def test_generate_stream_response(self):
+        completion = _install_litellm_stub()
+        completion.return_value = iter([
+            _fake_stream_chunk('Lite'),
+            _fake_stream_chunk(None),
+            _fake_stream_chunk('LLM'),
+            _fake_stream_chunk(' OK'),
+        ])
+
+        model = LiteLLMAPI(path='openai/gpt-4o-mini', stream=True)
+        results = model.generate(['ping'], max_out_len=32)
+
+        self.assertEqual(results, ['LiteLLM OK'])
+        kwargs = completion.call_args.kwargs
+        self.assertTrue(kwargs['stream'])
+
+    def test_generate_with_reasoning_content(self):
+        completion = _install_litellm_stub()
+        completion.return_value = _fake_response(
+            'Final answer',
+            reasoning_content='Thinking process',
+        )
+
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        results = model.generate(['ping'], max_out_len=32)
+
+        self.assertEqual(results, ['Thinking process</think>Final answer'])
+
+    def test_generate_with_custom_think_tag(self):
+        completion = _install_litellm_stub()
+        completion.return_value = _fake_response(
+            'Final answer',
+            reasoning_content='Thinking process',
+        )
+
+        model = LiteLLMAPI(path='openai/gpt-4o-mini',
+                           think_tag='<THINK_END>')
+        results = model.generate(['ping'], max_out_len=32)
+
+        self.assertEqual(results,
+                         ['Thinking process<THINK_END>Final answer'])
+
+    def test_generate_with_thinking_blocks_fallback(self):
+        completion = _install_litellm_stub()
+        completion.return_value = _fake_response(
+            'Final answer',
+            thinking_blocks=[{
+                'type': 'thinking',
+                'thinking': 'Thinking process',
+                'signature': 'test',
+            }],
+        )
+
+        model = LiteLLMAPI(path='anthropic/claude-sonnet-4')
+        results = model.generate(['ping'], max_out_len=32)
+
+        self.assertEqual(results, ['Thinking process</think>Final answer'])
+
+    def test_generate_stream_response_with_reasoning_content(self):
+        completion = _install_litellm_stub()
+        completion.return_value = iter([
+            _fake_stream_chunk(None, reasoning_content='Thinking'),
+            _fake_stream_chunk(None, reasoning_content=' process'),
+            _fake_stream_chunk('Answer'),
+        ])
+
+        model = LiteLLMAPI(path='openai/gpt-4o-mini', stream=True)
+        results = model.generate(['ping'], max_out_len=32)
+
+        self.assertEqual(results, ['Thinking process</think>Answer'])
+
+    def test_generate_adjusts_max_out_len_by_max_seq_len(self):
+        completion = _install_litellm_stub()
+        completion.return_value = _fake_response('pong')
+
+        model = LiteLLMAPI(path='openai/gpt-4o-mini', max_seq_len=105)
+        results = model.generate(['one two three'], max_out_len=10)
+
+        self.assertEqual(results, ['pong'])
+        kwargs = completion.call_args.kwargs
+        self.assertEqual(kwargs['max_tokens'], 2)
+
+    def test_generate_raises_when_prompt_exceeds_max_seq_len(self):
+        completion = _install_litellm_stub()
+        completion.return_value = _fake_response('pong')
+
+        model = LiteLLMAPI(path='openai/gpt-4o-mini', max_seq_len=2)
+        with self.assertRaisesRegex(ValueError, 'exceeds max_seq_len'):
+            model.generate(['one two three'], max_out_len=1)
+
+        completion.assert_not_called()
+
+    def test_generate_raises_when_no_output_room_remains(self):
+        completion = _install_litellm_stub()
+        completion.return_value = _fake_response('pong')
+
+        model = LiteLLMAPI(path='openai/gpt-4o-mini', max_seq_len=102)
+        with self.assertRaisesRegex(ValueError,
+                                    'less than or equal to 0'):
+            model.generate(['one two three'], max_out_len=10)
+
+        completion.assert_not_called()
 
     def test_generate_preserves_batch_order(self):
         completion = _install_litellm_stub()
