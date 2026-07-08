@@ -73,6 +73,11 @@ def think_pred_postprocess(
 def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     """Find first valid option for text."""
 
+    text = re.sub(r"^Answer:\s*Let's think step by step\.\s*",
+                  '',
+                  text.strip(),
+                  flags=re.IGNORECASE)
+
     # yapf: disable
     # flake8: noqa: W605
     patterns = [
@@ -138,7 +143,6 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     if cushion:
         patterns.extend(cushion_patterns)
     for pattern in patterns:
-        text = text.strip()
         match = re.search(pattern, text, re.DOTALL)
         if match:
             if match.group(1) is not None and match.group(1) != '':

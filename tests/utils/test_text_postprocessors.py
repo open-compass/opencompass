@@ -39,6 +39,10 @@ class TestTextPostprocessors(unittest.TestCase):
         text = '答案是 B'
         self.assertEqual(tp.first_option_postprocess(text, 'ABCD'), 'B')
 
+        text = "Answer: Let's think step by step. Therefore, B."
+        self.assertEqual(tp.first_option_postprocess(text, 'ABCDEFGHIJKLMNOP'),
+                         'B')
+
     def test_last_option_postprocess(self):
         text = 'A then C then B'
         self.assertEqual(tp.last_option_postprocess(text, 'ABC'), 'B')
