@@ -1,9 +1,9 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import BuySideFinBenchDataset
-from opencompass.utils.text_postprocessors import first_capital_postprocess
+from opencompass.utils.text_postprocessors import first_option_postprocess
 
 # Subject mapping: file_name -> (Chinese display name, English display name)
 BuySideFinBench_subject_mapping = {
@@ -47,14 +47,18 @@ for _name in BuySideFinBench_all_sets:
 
     _infer_cfg = dict(
         ice_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin='</E>',
-                round=[
-                    dict(role='HUMAN', prompt=_prompt),
-                    dict(role='BOT', prompt=_answer_prefix),
-                ]),
-            ice_token='</E>',
+            type=RawPromptTemplate,
+            messages=[
+                dict(role='user', content=_prompt),
+                dict(role='assistant', content=_answer_prefix),
+            ],
+        ),
+        prompt_template=dict(
+            type=RawPromptTemplate,
+            messages=[
+                '</E>',
+                dict(role='user', content=_prompt),
+            ],
         ),
         retriever=dict(type=FixKRetriever, fix_id_list=[0, 1, 2, 3, 4]),
         inferencer=dict(type=GenInferencer),
@@ -62,12 +66,12 @@ for _name in BuySideFinBench_all_sets:
 
     _eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
-        pred_postprocessor=dict(type=first_capital_postprocess))
+        pred_postprocessor=dict(type=first_option_postprocess, options='ABCD'))
 
     BuySideFinBench_datasets.append(
         dict(
             type=BuySideFinBenchDataset,
-            path='./data/BuySideFinBench/',
+            path='cindy90/BuySideFinBench',
             name=_name,
             abbr=f'BuySideFinBench-{_name}',
             reader_cfg=dict(

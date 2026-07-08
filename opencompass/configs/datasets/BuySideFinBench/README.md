@@ -58,7 +58,7 @@ python run.py --datasets BuySideFinBench_gen --models <your_model>
 configs/datasets/BuySideFinBench/
 ├── README.md                         # This file
 ├── BuySideFinBench_gen.py            # Entry point (imports the sized variant)
-└── BuySideFinBench_gen_5f8a1c.py     # Main config: 12 subsets, 5-shot, gen
+└── BuySideFinBench_gen_ca1704.py     # Main config: 12 subsets, 5-shot, gen
 ```
 
 Dataset hosting: [`huggingface.co/datasets/cindy90/BuySideFinBench`](https://huggingface.co/datasets/cindy90/BuySideFinBench)
