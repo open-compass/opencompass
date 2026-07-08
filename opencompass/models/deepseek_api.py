@@ -27,6 +27,8 @@ class DeepseekAPI(BaseAPIModel):
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
         retry (int): Number of retires if the API call fails. Defaults to 2.
+        timeout (float, optional): Request timeout in seconds. Defaults to
+            3600.
     """
 
     def __init__(
@@ -39,6 +41,7 @@ class DeepseekAPI(BaseAPIModel):
         meta_template: Optional[Dict] = None,
         retry: int = 2,
         system_prompt: str = '',
+        timeout: Optional[float] = 3600,
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -52,6 +55,7 @@ class DeepseekAPI(BaseAPIModel):
         self.url = url
         self.model = path
         self.system_prompt = system_prompt
+        self.timeout = timeout
 
     def generate(
         self,
@@ -118,27 +122,43 @@ class DeepseekAPI(BaseAPIModel):
             system = {'role': 'system', 'content': self.system_prompt}
             messages.insert(0, system)
 
-        data = {'model': self.model, 'messages': messages}
+        data = {
+            'model': self.model,
+            'messages': messages,
+            'max_tokens': max_out_len,
+        }
 
         max_num_retries = 0
+        raw_response = None
+        last_error = None
         while max_num_retries < self.retry:
+            request_error = None
+            response = None
             self.acquire()
             try:
-                raw_response = requests.request('POST',
-                                                url=self.url,
-                                                headers=self.headers,
-                                                json=data)
-            except Exception as err:
-                print('Request Error:{}'.format(err))
+                try:
+                    raw_response = requests.request('POST',
+                                                    url=self.url,
+                                                    headers=self.headers,
+                                                    json=data,
+                                                    timeout=self.timeout)
+                except Exception as err:
+                    request_error = err
+                    last_error = err
+                    print('Request Error:{}'.format(err))
+                else:
+                    try:
+                        response = raw_response.json()
+                    except Exception as err:
+                        last_error = err
+                        print('Response Error:{}'.format(err))
+            finally:
+                self.release()
+
+            if request_error is not None:
+                max_num_retries += 1
                 time.sleep(2)
                 continue
-
-            try:
-                response = raw_response.json()
-            except Exception as err:
-                print('Response Error:{}'.format(err))
-                response = None
-            self.release()
 
             if response is None:
                 print('Connection error, reconnect.')
@@ -146,6 +166,7 @@ class DeepseekAPI(BaseAPIModel):
                 # continuous unstable network, therefore wait here
                 # to slow down the request
                 self.wait()
+                max_num_retries += 1
                 continue
 
             if raw_response.status_code == 200:
@@ -157,7 +178,6 @@ class DeepseekAPI(BaseAPIModel):
 
             if raw_response.status_code == 401:
                 print('请求被拒绝 api_key错误')
-                continue
             elif raw_response.status_code == 400:
                 print(messages, response)
                 print('请求失败，状态码:', raw_response)
@@ -167,7 +187,6 @@ class DeepseekAPI(BaseAPIModel):
                 print(messages, response)
                 print('请求失败，状态码:', raw_response)
                 time.sleep(5)
-                continue
             else:
                 print(messages, response)
                 print('请求失败，状态码:', raw_response)
@@ -175,4 +194,4 @@ class DeepseekAPI(BaseAPIModel):
 
             max_num_retries += 1
 
-        raise RuntimeError(raw_response)
+        raise RuntimeError(last_error or raw_response)
