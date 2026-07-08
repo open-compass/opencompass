@@ -163,7 +163,8 @@ class DefaultSubjectiveSummarizer:
             dataset_abbr = dataset_abbr_from_cfg(dataset)
             if 'GenInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'gen'
-            elif 'PPLInferencer' in inferencer:
+            elif ('PPLInferencer' in inferencer
+                  or 'PPLOnlyInferencer' in inferencer):
                 dataset_eval_mode[dataset_abbr] = 'ppl'
             elif 'LLInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'll'
