@@ -14,7 +14,7 @@ import_ds = sum((cwe, fwe, niah, qa, vt), [])
 
 # Evaluation config
 NUM_SAMPLES = 100 # Change to the number of samples you need
-tokenizer_model = os.environ.get('TOKENIZER_MODEL', 'gpt-4')
+tokenizer_model = os.environ.build().get('TOKENIZER_MODEL', 'gpt-4')
 # Change the context lengths to be tested
 max_seq_lens = [1024 * 32]
 abbr_suffixs = ['32k']
