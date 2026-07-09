@@ -70,13 +70,15 @@ def think_pred_postprocess(
         return prediction
 
 
-def first_option_postprocess(text: str, options: str, cushion=True) -> str:
+def first_option_postprocess(text: str,
+                             options: str,
+                             cushion=True,
+                             ignore_text_pattern: Optional[str] = None) -> str:
     """Find first valid option for text."""
 
-    text = re.sub(r"^Answer:\s*Let's think step by step\.\s*",
-                  '',
-                  text.strip(),
-                  flags=re.IGNORECASE)
+    text = text.strip()
+    if ignore_text_pattern is not None:
+        text = re.sub(ignore_text_pattern, '', text)
 
     # yapf: disable
     # flake8: noqa: W605

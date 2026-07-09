@@ -44,7 +44,10 @@ for category in categories:
 
     mmlu_pro_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
-        pred_postprocessor=dict(type=first_option_postprocess, options='ABCDEFGHIJKLMNOP'),
+        pred_postprocessor=dict(
+            type=first_option_postprocess,
+            options='ABCDEFGHIJKLMNOP',
+            ignore_text_pattern=r"\s*Let's think step by step\.\s*"),
     )
 
     mmlu_pro_datasets.append(
