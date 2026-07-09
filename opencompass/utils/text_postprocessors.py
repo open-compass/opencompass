@@ -76,7 +76,6 @@ def first_option_postprocess(text: str,
                              ignore_text_pattern: Optional[str] = None) -> str:
     """Find first valid option for text."""
 
-    text = text.strip()
     if ignore_text_pattern is not None:
         text = re.sub(ignore_text_pattern, '', text)
 
@@ -145,6 +144,7 @@ def first_option_postprocess(text: str,
     if cushion:
         patterns.extend(cushion_patterns)
     for pattern in patterns:
+        text = text.strip()
         match = re.search(pattern, text, re.DOTALL)
         if match:
             if match.group(1) is not None and match.group(1) != '':
