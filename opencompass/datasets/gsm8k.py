@@ -43,10 +43,11 @@ def gsm8k_dataset_postprocess(text: str) -> str:
 @TEXT_POSTPROCESSORS.register_module('gsm8k')
 def gsm8k_postprocess(text: str) -> str:
     text = text.split('Question:')[0]
-    numbers = re.findall(r'-?\d[\d,].?\d', text)
+    numbers = re.findall(r'-?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)',
+                         text)
     if not numbers:
-    return 'NULL'
-    return numbers[-1].replace(",","")
+        return 'NULL'
+    return numbers[-1].replace(',', '')
 
 
 class Gsm8kEvaluator(BaseEvaluator):
