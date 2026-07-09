@@ -13,7 +13,7 @@ with read_base():
     # Datasets Part
     # Knowledge
     # Math
-    from opencompass.configs.datasets.aime2024.aime2024_gen_17d799 import \
+    from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import \
         aime2024_datasets
     from opencompass.configs.datasets.bbh.bbh_0shot_nocot_gen_925fc4 import \
         bbh_datasets
