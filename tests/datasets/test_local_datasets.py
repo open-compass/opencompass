@@ -23,7 +23,7 @@ def reload_datasets():
     with read_base():
         from opencompass.configs.datasets.aime2024.aime2024_cascade_eval_gen_5e9f4f import \
             aime2024_datasets  # noqa: F401, E501
-        from opencompass.configs.datasets.aime2024.aime2024_gen_6e39a4 import \
+        from opencompass.configs.datasets.aime2024.aime2024_gen_17d799 import \
             aime2024_datasets  # noqa: F401, E501
         from opencompass.configs.datasets.aime2024.aime2024_llmjudge_gen_5e9f4f import \
             aime2024_datasets  # noqa: F401, E501

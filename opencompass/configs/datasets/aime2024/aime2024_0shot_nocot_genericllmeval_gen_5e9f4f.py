@@ -21,7 +21,7 @@ aime2024_infer_cfg = dict(
         )
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=2048)
+    inferencer=dict(type=GenInferencer)
 )
 
 
