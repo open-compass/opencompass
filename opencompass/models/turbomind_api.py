@@ -174,8 +174,8 @@ class TurboMindAPIModel(BaseModel):
 
     def _get_ppl(self, prompt: Union[str, List[int]]) -> float:
         assert type(prompt) is str or (
-            type(prompt) is list and all(type(token_id) is int
-                                         for token_id in prompt)
+            type(prompt) is list
+            and all(type(token_id) is int for token_id in prompt)
         ), 'We only support string or token ids for TurboMind RPC API'
 
         raw_response = requests.post(self.ppl_addr,
@@ -222,8 +222,8 @@ class TurboMindAPIModel(BaseModel):
         ]
         input_ids, input_lengths = self.chatbot.encode(inputs,
                                                        do_preprocess=False)
-        context_ids, context_lengths = self.chatbot.encode(
-            context_inputs, do_preprocess=False)
+        context_ids, context_lengths = self.chatbot.encode(context_inputs,
+                                                           do_preprocess=False)
 
         with ThreadPoolExecutor() as executor:
             ppl_results = list(
