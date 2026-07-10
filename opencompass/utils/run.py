@@ -20,6 +20,34 @@ from opencompass.utils import get_logger, match_files
 
 logger = get_logger()
 
+
+def _get_generation_kwargs(model: Dict) -> Dict:
+    generation_kwargs = model.get('generation_kwargs')
+    if generation_kwargs is None:
+        generation_kwargs = model.get('gen_config')
+    return (generation_kwargs.copy()
+            if generation_kwargs is not None else dict())
+
+
+def _to_vllm_generation_kwargs(generation_kwargs: Dict) -> Dict:
+    generation_kwargs = generation_kwargs.copy()
+    generation_kwargs.pop('do_sample', None)
+    generation_kwargs.pop('max_new_tokens', None)
+    if 'min_new_tokens' in generation_kwargs:
+        generation_kwargs['min_tokens'] = generation_kwargs.pop(
+            'min_new_tokens')
+    if 'eos_token_id' in generation_kwargs:
+        generation_kwargs['stop_token_ids'] = generation_kwargs.pop(
+            'eos_token_id')
+    return generation_kwargs
+
+
+def _preserve_model_task_cfg(model: Dict, acc_model: Dict) -> None:
+    for item in ['pred_postprocessor', 'min_out_len', 'summarizer_abbr']:
+        if model.get(item) is not None:
+            acc_model[item] = model[item]
+
+
 def match_cfg_file(workdir: Union[str, List[str]],
                    pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
     """Match the config file in workdir recursively given the pattern.
@@ -248,8 +276,8 @@ def change_accelerator(models, accelerator):
         # change HuggingFace model to VLLM or LMDeploy
         if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3, f'{HuggingFaceBaseModel.__module__}.{HuggingFaceBaseModel.__name__}']:
             gen_args = dict()
-            if model.get('generation_kwargs') is not None:
-                generation_kwargs = model['generation_kwargs'].copy()
+            generation_kwargs = _get_generation_kwargs(model)
+            if generation_kwargs:
                 gen_args['temperature'] = generation_kwargs.get('temperature', 0.001)
                 gen_args['top_k'] = generation_kwargs.get('top_k', 1)
                 gen_args['top_p'] = generation_kwargs.get('top_p', 0.9)
@@ -289,7 +317,8 @@ def change_accelerator(models, accelerator):
                         acc_model[item] = model[item]
             elif accelerator == 'vllm':
                 model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
-                model_kwargs.update(model.get('model_kwargs'))
+                model_kwargs.update(model.get('model_kwargs') or {})
+                generation_kwargs = _to_vllm_generation_kwargs(generation_kwargs)
                 logger.info(f'Transforming {model["abbr"]} to {accelerator}')
 
                 acc_model = dict(
@@ -311,7 +340,8 @@ def change_accelerator(models, accelerator):
         elif model['type'] in [HuggingFacewithChatTemplate, f'{HuggingFacewithChatTemplate.__module__}.{HuggingFacewithChatTemplate.__name__}']:
             if accelerator == 'vllm':
                 model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
-                model_kwargs.update(model.get('model_kwargs'))
+                model_kwargs.update(model.get('model_kwargs') or {})
+                generation_kwargs = _to_vllm_generation_kwargs(_get_generation_kwargs(model))
                 mod = VLLMwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
@@ -321,6 +351,7 @@ def change_accelerator(models, accelerator):
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
                     batch_size=model.get('batch_size', 16),
+                    generation_kwargs=generation_kwargs,
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
@@ -356,6 +387,7 @@ def change_accelerator(models, accelerator):
         else:
             acc_model = model
             logger.warning(f'Unsupported model type {model["type"]}, will keep the original model.')
+        _preserve_model_task_cfg(model, acc_model)
         model_accels.append(acc_model)
     return model_accels
 
