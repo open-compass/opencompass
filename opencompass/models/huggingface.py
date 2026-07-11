@@ -144,7 +144,19 @@ class HuggingFace(BaseModel):
                 self.logger.warning(
                     'pad_token_id is not consistent with the tokenizer. Using '
                     f'{self.pad_token_id} as pad_token_id')
-            self.tokenizer.pad_token_id = self.pad_token_id
+            try:
+                self.tokenizer.pad_token_id = self.pad_token_id
+            except AttributeError:
+                # Some tokenizers (e.g. ChatGLM3's ChatGLMTokenizer)
+                # expose pad_token_id as a read-only @property without a
+                # setter. Fall back to the tokenizer's existing
+                # pad_token_id instead of crashing.
+                # See https://github.com/open-compass/opencompass/issues/725
+                self.logger.warning(
+                    f'Cannot set pad_token_id on '
+                    f'{type(self.tokenizer).__name__} (read-only property).'
+                    f' Falling back to the tokenizer default '
+                    f'pad_token_id {self.tokenizer.pad_token_id}.')
         elif self.tokenizer.pad_token_id is None:
             self.logger.warning('pad_token_id is not set for the tokenizer.')
             if self.tokenizer.eos_token is not None:

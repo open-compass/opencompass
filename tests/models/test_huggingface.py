@@ -7,6 +7,20 @@ from unittest.mock import MagicMock, patch
 from opencompass.models.huggingface import HuggingFace
 
 
+class _ReadOnlyPadTokenizer:
+    """Mimic ChatGLM3's ChatGLMTokenizer whose ``pad_token_id`` is a
+    read-only ``@property`` without a setter. See issue #725.
+    """
+
+    vocab_size = 65024
+
+    @property
+    def pad_token_id(self):
+        # Returns a value different from what the user requested, so the
+        # "not consistent" warning branch in _load_tokenizer is exercised.
+        return 0
+
+
 class TestHuggingFace(unittest.TestCase):
     """Test cases for HuggingFace."""
 
@@ -308,6 +322,69 @@ class TestHuggingFace(unittest.TestCase):
 
             self.assertEqual(len(results), 1)
             self.assertIsInstance(results[0], (float, np.floating))
+
+    @patch('transformers.AutoTokenizer')
+    @patch('transformers.AutoModelForCausalLM')
+    def test_pad_token_id_read_only_property_issue_725(
+            self, mock_model_class, mock_tokenizer_class):
+        """Regression test for issue #725.
+
+        Some tokenizers (e.g. ChatGLM3's ``ChatGLMTokenizer``) expose
+        ``pad_token_id`` as a read-only ``@property`` without a setter.
+        Assigning to it previously raised
+        ``AttributeError: can't set attribute 'pad_token_id'`` during
+        ``_load_tokenizer``. The fix catches this and falls back to the
+        tokenizer's existing ``pad_token_id`` with a warning instead of
+        crashing model initialization.
+        """
+        mock_tokenizer = _ReadOnlyPadTokenizer()
+        mock_tokenizer_class.from_pretrained.return_value = mock_tokenizer
+        mock_model = MagicMock()
+        mock_model.device = 'cpu'
+        mock_model_class.from_pretrained.return_value = mock_model
+
+        # Before the fix this raised:
+        #   AttributeError: can't set attribute 'pad_token_id'
+        model = HuggingFace(
+            path='test/model/path',
+            max_seq_len=2048,
+            pad_token_id=151643,
+            model_kwargs=dict(device_map='cpu'),
+        )
+
+        # The user-requested value is preserved on the wrapper; the
+        # tokenizer's read-only value remains unchanged.
+        self.assertEqual(model.pad_token_id, 151643)
+        self.assertEqual(model.tokenizer.pad_token_id, 0)
+
+    @patch('transformers.AutoTokenizer')
+    @patch('transformers.AutoModelForCausalLM')
+    def test_pad_token_id_negative_with_read_only_property_issue_725(
+            self, mock_model_class, mock_tokenizer_class):
+        """Edge case for issue #725: negative pad_token_id with a
+        read-only property tokenizer.
+
+        A negative ``pad_token_id`` is normalized via
+        ``self.pad_token_id += tokenizer.vocab_size`` *before* the
+        assignment. The read-only-property guard must still catch the
+        subsequent ``AttributeError``.
+        """
+        mock_tokenizer = _ReadOnlyPadTokenizer()
+        mock_tokenizer_class.from_pretrained.return_value = mock_tokenizer
+        mock_model = MagicMock()
+        mock_model.device = 'cpu'
+        mock_model_class.from_pretrained.return_value = mock_model
+
+        model = HuggingFace(
+            path='test/model/path',
+            max_seq_len=2048,
+            pad_token_id=-1,
+            model_kwargs=dict(device_map='cpu'),
+        )
+
+        # -1 + vocab_size(65024) = 65023, preserved on the wrapper
+        self.assertEqual(model.pad_token_id, 65023)
+        self.assertEqual(model.tokenizer.pad_token_id, 0)
 
 
 if __name__ == '__main__':
