@@ -781,6 +781,11 @@ DATASETS_URL = {
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmmlu.zip",
         "md5": "a59f4003d6918509a719ce3bc2a5d5bc",
     },
+    "/ceval/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ceval.zip",
+        "md5": "3889202085aebd28b596b98bee43e1aa",
+    },
     "/math/": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/math.zip",
