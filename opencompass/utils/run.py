@@ -113,6 +113,13 @@ def try_fill_in_custom_cfgs(config):
     return config
 
 
+def _normalize_config_arg(config):
+    if not isinstance(config, str):
+        return config
+    config = config.strip()
+    return config or None
+
+
 def get_config_from_arg(args) -> Config:
     """Get the config object given args.
 
@@ -122,6 +129,7 @@ def get_config_from_arg(args) -> Config:
     3. Huggingface parameter groups and args.datasets
     """
 
+    args.config = _normalize_config_arg(args.config)
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
