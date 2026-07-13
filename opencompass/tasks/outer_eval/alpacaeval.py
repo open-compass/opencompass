@@ -60,14 +60,18 @@ class PredictionMerger:
             print('length mismatch')
             return
 
-        with open(
-                osp.realpath(osp.join(self.dataset_cfg['path'],
-                                      'example.json')), 'r') as f:
-            data_format = json.load(f)
-
+        data_format = []
         for idx in range(len(preds)):
-            data_format[idx]['output'] = preds[str(idx)]['prediction']
-            data_format[idx]['generator'] = self.model_cfg['abbr']
+            sample = dataset.test[idx]
+            data = dict(
+                instruction=sample['question'],
+                output=preds[str(idx)]['prediction'],
+                generator=self.model_cfg['abbr'],
+                datasplit='eval',
+            )
+            data['dataset'] = sample.get('capability',
+                                         self.dataset_cfg.get('abbr', ''))
+            data_format.append(data)
 
         print(f'Convert to {alpaca_format_filename}')
         with open(alpaca_format_filename, 'w', encoding='utf-8') as f:
