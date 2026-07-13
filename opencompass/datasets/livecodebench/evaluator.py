@@ -18,20 +18,28 @@ from .extract_utils import (extract_code_execution, extract_code_generation,
 from .livecodebench import LCBCodeGenerationDataset
 from .pass_k_utils import compute_metrics_from_results
 
+DEFAULT_MEMORY_LIMIT_BYTES = 4 * 1024 * 1024 * 1024
 
-def codegen_check_correctness(sample, generation, timeout, debug=True):
+
+def codegen_check_correctness(sample,
+                              generation,
+                              timeout,
+                              debug=True,
+                              memory_limit_bytes=DEFAULT_MEMORY_LIMIT_BYTES):
     """Check correctness of code generation with a global timeout.
 
     The global timeout is to catch some extreme/rare cases not handled by the
     timeouts inside `run_test`
     """
 
-    def _temp_run(sample, generation, debug, result, metadata_list, timeout):
+    def _temp_run(sample, generation, debug, result, metadata_list, timeout,
+                  memory_limit_bytes):
         from .testing_util import run_test
         res, metadata = run_test(sample,
                                  test=generation,
                                  debug=debug,
-                                 timeout=timeout)
+                                 timeout=timeout,
+                                 memory_limit_bytes=memory_limit_bytes)
         result.append(res)
         metadata_list.append(metadata)
 
@@ -40,17 +48,25 @@ def codegen_check_correctness(sample, generation, timeout, debug=True):
     metadata_list = manager.list()
     p = multiprocessing.Process(
         target=_temp_run,
-        args=(sample, generation, debug, result, metadata_list, timeout),
+        args=(sample, generation, debug, result, metadata_list, timeout,
+              memory_limit_bytes),
     )
     p.start()
     p.join(timeout=(timeout + 1) *
            len(json.loads(sample['input_output'])['inputs']) + 5)
     if p.is_alive():
         p.kill()
+        p.join()
     if not result:
         in_outs = json.loads(sample['input_output'])
         # consider that all tests failed
         result = [[-1 for i in range(len(in_outs['inputs']))]]
+        metadata_list.append({
+            'error_code':
+            -3,
+            'error_message':
+            'Global Timeout or Memory Limit Exceeded',
+        })
         if debug:
             logger = get_logger()
             logger.info('global timeout')
@@ -58,7 +74,8 @@ def codegen_check_correctness(sample, generation, timeout, debug=True):
 
 
 def evaluate_generations_by_problem(problem_generations: list, sample: list,
-                                    debug: bool, timeout: int):
+                                    debug: bool, timeout: int,
+                                    memory_limit_bytes: int):
     """Evaluate each problem.
 
     Args:
@@ -79,7 +96,11 @@ def evaluate_generations_by_problem(problem_generations: list, sample: list,
         curr_res = [-2]
         try:
             curr_res, curr_metadata = codegen_check_correctness(
-                sample, o, timeout=timeout, debug=debug)
+                sample,
+                o,
+                timeout=timeout,
+                debug=debug,
+                memory_limit_bytes=memory_limit_bytes)
             if debug:
                 logger.info(f'\nSuccessful compilation of task {o_idx}!')
             fixed = []
@@ -120,6 +141,7 @@ def evaluate_generations(
     debug: bool = False,
     num_process_evaluate: int = 16,
     timeout=6,
+    memory_limit_bytes=DEFAULT_MEMORY_LIMIT_BYTES,
 ):
     """We take the list of code generations and try to compile them and the run
     their corresponding unit tests which are retrieved from the APPS dataset.
@@ -139,8 +161,9 @@ def evaluate_generations(
 
     # generations are code generations in the same order of the dataset
 
-    inputs = [[(generations_list[index], samples_list[index], debug, timeout),
-               index] for index in range(len(generations_list))]
+    inputs = [[(generations_list[index], samples_list[index], debug, timeout,
+                memory_limit_bytes), index]
+              for index in range(len(generations_list))]
 
     with tqdm(total=len(inputs)) as pbar:
         with ProcessPoolExecutor(
@@ -151,9 +174,10 @@ def evaluate_generations(
                     problem_generations,
                     sample,
                     debug,
-                    timeout): index
-                for (problem_generations, sample, debug,
-                     timeout), index in inputs
+                    timeout,
+                    memory_limit_bytes): index
+                for (problem_generations, sample, debug, timeout,
+                     memory_limit_bytes), index in inputs
             }
 
             results = {}
@@ -163,8 +187,9 @@ def evaluate_generations(
                 results[index], metadata[index] = future.result()
                 pbar.update(1)
 
-    assert len(results) == len(
-        inputs), f'results = {len(results)} inputs = {len(inputs)} {results=}'
+    assert len(results) == len(inputs), (
+        f'results = {len(results)} inputs = {len(inputs)} '
+        f'results = {results}')
     # results = {i: r for r, (_, i) in zip(results, inputs)}
 
     return results, metadata
@@ -177,6 +202,7 @@ def codegen_metrics(
     num_process_evaluate=16,
     timeout=6,
     debug=False,
+    memory_limit_bytes=DEFAULT_MEMORY_LIMIT_BYTES,
 ):
     logger = get_logger()
 
@@ -203,6 +229,7 @@ def codegen_metrics(
         debug=debug,
         num_process_evaluate=num_process_evaluate,
         timeout=timeout,
+        memory_limit_bytes=memory_limit_bytes,
     )
 
     for idx, sub_results in sorted(results_linear.items(), key=lambda x: x[0]):
@@ -223,8 +250,8 @@ def codegen_metrics(
         else:
             final_metadata[i] = [json.dumps(x) for x in final_metadata[i]]
 
-        assert len(final_metadata[i]) == len(
-            generations_list[0]), f'{len(final_metadata[i])=}'
+        assert len(final_metadata[i]) == len(generations_list[0]), (
+            f'len(final_metadata[i]) = {len(final_metadata[i])}')
 
     return [metrics, results, final_metadata]
 
@@ -238,10 +265,12 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
                  release_version='release_v1',
                  extractor_version='v1',
                  start_date=None,
-                 end_date=None):
+                 end_date=None,
+                 memory_limit_bytes=DEFAULT_MEMORY_LIMIT_BYTES):
         super().__init__()
         self.num_process_evaluate = num_process_evaluate
         self.timeout = timeout
+        self.memory_limit_bytes = memory_limit_bytes
         self.dataset = LCBCodeGenerationDataset.load(
             release_version=release_version,
             start_date=start_date,
@@ -316,6 +345,7 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
             k_list=[1],
             num_process_evaluate=self.num_process_evaluate,
             timeout=self.timeout,
+            memory_limit_bytes=self.memory_limit_bytes,
         )
         # results = {
         #     'extracted_predictions': extracted_predictions,
