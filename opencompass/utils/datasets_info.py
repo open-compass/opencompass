@@ -680,6 +680,10 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lcb_pro.zip",
         "md5": "ff4572e292fe27cabce3ab3b407361bd",
     },
+    "/lambada/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lambada.zip",
+        "md5": "d001d2125743c8aa4d770d4dd1718f29",
+    },
     "/mol-instructions": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mol-instructions.zip",
         "md5": "ea3db4a199222835036235b18306065a",
@@ -752,6 +756,10 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gpqa.zip",
         "md5": "2e9657959030a765916f1f2aca29140d",
+    },
+    "/piqa": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/piqa.zip",
+        "md5": "39374924aec45f2f7efdffb1977ce2ba",
     },
     "/CHARM/": {
         "url":
