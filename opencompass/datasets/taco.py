@@ -19,6 +19,7 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 from datasets import Dataset, DatasetDict, load_from_disk
+from huggingface_hub import hf_hub_download
 
 try:
     from pyext import RuntimeModule
@@ -32,6 +33,23 @@ from opencompass.utils import get_data_path
 from .base import BaseDataset
 
 TIMEOUT = 10
+HF_TACO_PATHS = {'BAAI/TACO', 'opencompass/TACO'}
+
+
+def _load_taco_dataset(path: str):
+    if path in HF_TACO_PATHS:
+        data_file = hf_hub_download(
+            repo_id='BAAI/TACO',
+            repo_type='dataset',
+            filename='test/data-00000-of-00001.arrow',
+        )
+        return DatasetDict({'test': Dataset.from_file(data_file)})
+
+    path = get_data_path(path, local_mode=True)
+    dataset = load_from_disk(path)
+    if isinstance(dataset, Dataset):
+        return DatasetDict({'test': dataset})
+    return dataset
 
 
 @LOAD_DATASET.register_module()
@@ -39,8 +57,7 @@ class TACODataset(BaseDataset):
 
     @staticmethod
     def load(path: str, num_repeats: int = 1, difficulty='ALL'):
-        path = get_data_path(path, local_mode=True)
-        dataset = load_from_disk(path)
+        dataset = _load_taco_dataset(path)
         new_dataset = DatasetDict()
         # add new column "starter" in the prompt
         for split in dataset.keys():
@@ -504,7 +521,7 @@ def run_test(sample, test=None, debug=False):
                         nl = '\n'
                         if not isinstance(inputs, list):
                             print(
-                                f"not passed output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl,' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
+                                f"not passed output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl, ' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
                             )
                         else:
                             print(
@@ -583,7 +600,7 @@ def run_test(sample, test=None, debug=False):
                     nl = '\n'
                     if not isinstance(inputs, list):
                         print(
-                            f"output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl,' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
+                            f"output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl, ' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
                         )
                     else:
                         print(
@@ -688,7 +705,7 @@ def run_test(sample, test=None, debug=False):
                     nl = '\n'
                     if not isinstance(inputs, list):
                         print(
-                            f"output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl,' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
+                            f"output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl, ' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
                         )
                     else:
                         print(
