@@ -62,6 +62,7 @@ class TurboMindAPIModel(BaseModel):
         if meta_template and 'eos_token_id' in meta_template:
             self.eos_token_id = meta_template['eos_token_id']
         self.api_addr = api_addr
+        self.encode_addr = f'{api_addr.rstrip("/")}/v1/encode'
         self.ppl_addr = f'{api_addr.rstrip("/")}/get_ppl'
         self.end_str = end_str
         self.temperature = temperature
@@ -102,8 +103,32 @@ class TurboMindAPIModel(BaseModel):
                              [self.end_str] * len(inputs)))
         return results
 
+    def _encode(self, text):
+        """Encode text or list of texts to token ids via /v1/encode.
+
+        Bypasses lmdeploy's APIClient.encode to include ``model`` field
+        in the request body, which is required by some API proxies.
+        """
+        if isinstance(text, list):
+            all_ids, all_lens = [], []
+            for t in text:
+                ids, lens = self._encode(t)
+                all_ids.append(ids)
+                all_lens.append(lens)
+            return all_ids, all_lens
+        resp = requests.post(self.encode_addr,
+                             headers=self.chatbot.headers,
+                             json={
+                                 'input': text,
+                                 'do_preprocess': False,
+                                 'add_bos': True,
+                                 'model': self.model_name
+                             })
+        output = resp.json()
+        return output['input_ids'], output['length']
+
     def get_token_len(self, prompt: str) -> int:
-        input_ids, length = self.chatbot.encode(prompt)
+        _, length = self._encode(prompt)
         return length
 
     def wait(self):
@@ -180,7 +205,10 @@ class TurboMindAPIModel(BaseModel):
 
         raw_response = requests.post(self.ppl_addr,
                                      headers=self.chatbot.headers,
-                                     json={'input': prompt},
+                                     json={
+                                         'input': prompt,
+                                         'model': self.model_name
+                                     },
                                      stream=False)
 
         if not raw_response.ok:
@@ -220,10 +248,8 @@ class TurboMindAPIModel(BaseModel):
         context_inputs = [
             text.replace(cont, '') for text, cont in zip(inputs, conts)
         ]
-        input_ids, input_lengths = self.chatbot.encode(inputs,
-                                                       do_preprocess=False)
-        context_ids, context_lengths = self.chatbot.encode(context_inputs,
-                                                           do_preprocess=False)
+        input_ids, input_lengths = self._encode(inputs)
+        context_ids, context_lengths = self._encode(context_inputs)
 
         with ThreadPoolExecutor() as executor:
             ppl_results = list(
