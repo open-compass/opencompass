@@ -239,6 +239,81 @@ class TestConstructChatMLDatasets(unittest.TestCase):
         self.assertEqual(datasets[0]['reader_cfg']['test_range'], '[0:1]')
         self.assertNotIn('test_range', datasets[1]['reader_cfg'])
 
+    def test_change_accelerator_vllm_preserves_generation_kwargs(self):
+        model = dict(
+            type=self.run_module.HuggingFacewithChatTemplate,
+            abbr='chat-hf',
+            path='test/model',
+            max_seq_len=4096,
+            max_out_len=1024,
+            model_kwargs=dict(dtype='auto'),
+            generation_kwargs=dict(
+                do_sample=True,
+                temperature=0.6,
+                top_p=0.95,
+                max_new_tokens=1024,
+                min_new_tokens=8,
+                eos_token_id=[1, 2],
+            ),
+            batch_size=8,
+            run_cfg=dict(num_gpus=2),
+            stop_words=['<stop>'],
+            min_out_len=4,
+            summarizer_abbr='chat-summary',
+        )
+
+        converted = self.run_module.change_accelerator([model], 'vllm')[0]
+
+        self.assertEqual(converted['abbr'], 'chat-vllm')
+        self.assertEqual(converted['model_kwargs'], {
+            'tensor_parallel_size': 2,
+            'max_model_len': 4096,
+            'dtype': 'auto',
+        })
+        self.assertEqual(
+            converted['generation_kwargs'], {
+                'temperature': 0.6,
+                'top_p': 0.95,
+                'min_tokens': 8,
+                'stop_token_ids': [1, 2],
+            })
+        self.assertEqual(converted['stop_words'], ['<stop>'])
+        self.assertEqual(converted['min_out_len'], 4)
+        self.assertEqual(converted['summarizer_abbr'], 'chat-summary')
+
+    def test_change_accelerator_vllm_accepts_gen_config_alias(self):
+        model = dict(
+            type=self.run_module.HuggingFacewithChatTemplate,
+            abbr='deepseek-r1-distill-qwen-1.5b-hf',
+            path='hf_models/DeepSeek-R1-Distill-Qwen-1.5B',
+            max_seq_len=33792,
+            max_out_len=32768,
+            gen_config=dict(
+                do_sample=True,
+                temperature=0.6,
+                top_p=0.95,
+                max_new_tokens=32768,
+            ),
+            batch_size=64,
+            run_cfg=dict(num_gpus=1),
+            pred_postprocessor=dict(type='extract_non_reasoning_content'),
+        )
+
+        converted = self.run_module.change_accelerator([model], 'vllm')[0]
+
+        self.assertEqual(converted['abbr'],
+                         'deepseek-r1-distill-qwen-1.5b-vllm')
+        self.assertEqual(converted['model_kwargs'], {
+            'tensor_parallel_size': 1,
+            'max_model_len': 33792,
+        })
+        self.assertEqual(converted['generation_kwargs'], {
+            'temperature': 0.6,
+            'top_p': 0.95,
+        })
+        self.assertEqual(converted['pred_postprocessor'],
+                         dict(type='extract_non_reasoning_content'))
+
 
 if __name__ == '__main__':
     unittest.main()

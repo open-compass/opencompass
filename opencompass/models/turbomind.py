@@ -220,11 +220,11 @@ class TurboMindModel(BaseModel):
             for text, cont in zip(inputs, conts):
                 input_ids = self.tokenizer.encode(text)
                 res = self.pipe.get_ppl(input_ids)
-                logit_sum = res * len(input_ids)
+                logit_sum = res[0] * len(input_ids)
                 input_ids = self.tokenizer.encode(text.replace(cont, ''))
                 res = self.pipe.get_ppl(input_ids)
-                logit_part = res * len(input_ids)
-                results.append(-(logit_sum[0] - logit_part[0]))
+                logit_part = res[0] * len(input_ids)
+                results.append(-(logit_sum - logit_part))
             results = np.array(results)
         return results
 

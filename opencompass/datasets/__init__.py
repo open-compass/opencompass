@@ -19,6 +19,7 @@ from .bigcodebench import *  # noqa: F401, F403
 from .biodata import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
+from .BuySideFinBench import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
 from .calm import *  # noqa: F401, F403
 from .CARDBiomedBench import CARDBiomedBenchDataset  # noqa: F401
@@ -85,6 +86,9 @@ from .IFEval.ifeval import IFEvalDataset, IFEvaluator  # noqa: F401, F403
 from .inference_ppl import InferencePPLDataset  # noqa: F401, F403
 from .infinitebench import *  # noqa: F401, F403
 from .internsandbox import *  # noqa: F401, F403
+from .inverse_ifeval import InverseIFEvalDataset  # noqa: F401
+from .inverse_ifeval import InverseIFEvalJudgePromptTemplate  # noqa: F401
+from .inverse_ifeval import inverse_ifeval_judge_postprocess  # noqa: F401
 from .iwslt2017 import *  # noqa: F401, F403
 from .jigsawmultilingual import *  # noqa: F401, F403
 from .jsonl import JsonlDataset  # noqa: F401, F403

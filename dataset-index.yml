@@ -4,6 +4,12 @@
     paper: https://arxiv.org/pdf/2311.07911
     configpath: opencompass/configs/datasets/IFEval/IFEval_gen.py
     configpath_llmjudge: ''
+- inverse_ifeval:
+    name: Inverse IFEval
+    category: Instruction Following
+    paper: https://arxiv.org/abs/2509.04292
+    configpath: opencompass/configs/datasets/InverseIFEval/InverseIFEval_gen.py
+    configpath_llmjudge: ''
 - nphard:
     name: NPHardEval
     category: Reasoning
@@ -267,6 +273,12 @@
     configpath:
       - opencompass/configs/datasets/teval/teval_en_gen.py
       - opencompass/configs/datasets/teval/teval_zh_gen.py
+    configpath_llmjudge: ''
+- buysidefinbench:
+    name: BuySideFinBench
+    category: Knowledge / Finance
+    paper: https://huggingface.co/datasets/cindy90/BuySideFinBench
+    configpath: opencompass/configs/datasets/BuySideFinBench/BuySideFinBench_gen.py
     configpath_llmjudge: ''
 - finalceiq:
     name: FinanceIQ
