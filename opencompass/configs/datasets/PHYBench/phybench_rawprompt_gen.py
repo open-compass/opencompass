@@ -12,7 +12,7 @@ phybench_infer_cfg = dict(
     prompt_template=dict(
         type=RawPromptTemplate,
         messages=[
-            {'role': 'user', 'content': 'Solve the following physics problem and return only the final result as a clean LaTeX expression.Remember to put your final answer within \\boxed{}.\n\nQuestion: {{input}}\nAnswer: '},
+            {'role': 'user', 'content': 'Solve the following physics problem and return only the final result as a clean LaTeX expression. Remember to put your final answer within \\boxed{}.\n\nQuestion: {{input}}\nAnswer: '},
         ],
     ),
     retriever=dict(type=ZeroRetriever),
