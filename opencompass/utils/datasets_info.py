@@ -234,6 +234,11 @@ DATASETS_MAPPING = {
         "hf_id": "reasoning-machines/gsm-hard",
         "local": "./data/gsm-hard/test.jsonl",
     },
+    "opencompass/mgsm": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mgsm/",
+    },
     # HellaSwag
     "opencompass/hellaswag": {
         "ms_id": "opencompass/hellaswag",
@@ -817,6 +822,11 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/gsm-hard.zip",
         "md5": "5feff99c4087d34313e226da0358f08a",
+    },
+    "/mgsm/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mgsm.zip",
+        "md5": "fd7029c19604b944ef891dd1c411e60a",
     },
     "/LCBench2023/": {
         "url":
