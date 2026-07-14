@@ -44,7 +44,7 @@ class TurboMindAPIModel(BaseModel):
             lmdeploy server. Defaults to 0.8, matching the historical wrapper
             behavior.
         top_k (int, optional): Top-k sampling parameter passed to the lmdeploy
-            server. Defaults to 1 for deterministic evaluation.
+            server. Defaults to 50, matching the historical wrapper behavior.
         gen_config (Dict, optional): Extra generation parameters passed to
             lmdeploy's completion API, such as ``random_seed``. Values in
             ``gen_config`` override ``top_p`` and ``top_k`` defaults.
@@ -61,7 +61,7 @@ class TurboMindAPIModel(BaseModel):
                  end_str: Optional[str] = None,
                  temperature: float = None,
                  top_p: Optional[float] = 0.8,
-                 top_k: Optional[int] = 1,
+                 top_k: Optional[int] = 50,
                  gen_config: Optional[Dict] = None,
                  **kwargs):
         super().__init__(path='',

@@ -40,7 +40,7 @@ def make_turbomind_api_model(client, **kwargs):
 
 class TestTurboMindAPIModel(unittest.TestCase):
 
-    def test_default_generation_kwargs_are_deterministic(self):
+    def test_default_generation_kwargs_keep_legacy_sampling(self):
         client = FakeAPIClient()
         model = make_turbomind_api_model(client)
 
@@ -52,7 +52,7 @@ class TestTurboMindAPIModel(unittest.TestCase):
         self.assertEqual(client.calls[0]['max_tokens'], 16)
         self.assertEqual(client.calls[0]['temperature'], 0.7)
         self.assertEqual(client.calls[0]['top_p'], 0.8)
-        self.assertEqual(client.calls[0]['top_k'], 1)
+        self.assertEqual(client.calls[0]['top_k'], 50)
         self.assertIn('session_id', client.calls[0])
 
     def test_gen_config_is_forwarded_to_lmdeploy_client(self):
@@ -77,6 +77,17 @@ class TestTurboMindAPIModel(unittest.TestCase):
         self.assertEqual(client.calls[0]['top_p'], 0.95)
         self.assertEqual(client.calls[0]['top_k'], 50)
         self.assertEqual(client.calls[0]['random_seed'], 42)
+
+    def test_constructor_top_k_override_is_forwarded(self):
+        client = FakeAPIClient()
+        model = make_turbomind_api_model(client, top_k=1, top_p=1.0)
+
+        result = model._generate('Hello', max_out_len=16, temperature=0.7,
+                                 end_str=None)
+
+        self.assertEqual(result, 'OK')
+        self.assertEqual(client.calls[0]['top_p'], 1.0)
+        self.assertEqual(client.calls[0]['top_k'], 1)
 
 
 if __name__ == '__main__':
