@@ -63,9 +63,13 @@ def get_final_results(judged_answers,
 def _generic_llmjudge_postprocess(judgement: str,
                                   true_tag: str = 'A',
                                   false_tag: str = 'B'):
-    match = re.search(rf'({re.escape(true_tag)}|{re.escape(false_tag)})',
-                      judgement)
-    grade_letter = match.group(0) if match else 'unknown'
+    # Security: take the LAST match, not the first. The model-under-test's
+    # output is interpolated verbatim into the judge prompt, so an early
+    # injected verdict tag (e.g. "A. ") echoed in the judge's response would
+    # win over the judge's actual final verdict with first-match re.search.
+    matches = re.findall(rf'({re.escape(true_tag)}|{re.escape(false_tag)})',
+                         judgement)
+    grade_letter = matches[-1] if matches else 'unknown'
     return grade_letter
 
 
