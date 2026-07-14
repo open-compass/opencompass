@@ -14,6 +14,12 @@ def fake_verify(prediction, reference, timeout=10):
     }
 
 
+def fake_verify_with_skipped(prediction, reference, timeout=10):
+    if prediction == 'skip':
+        return {'skipped': True}
+    return fake_verify(prediction, reference, timeout)
+
+
 class TestMathVerifyEvaluator(unittest.TestCase):
 
     def _mock_math_verify_deps(self):
@@ -66,6 +72,23 @@ class TestMathVerifyEvaluator(unittest.TestCase):
                 'correct': False,
             },
         ])
+
+    def test_multi_prediction_details_match_scores_when_skipped(self):
+        with self._mock_math_verify_deps(), patch(
+                'opencompass.evaluator.math_evaluator._verify_with_timeout',
+                side_effect=fake_verify_with_skipped):
+            result = MATHVerifyEvaluator().score([['4', 'skip']], ['4'])
+
+        detail = result['details'][0]
+        self.assertEqual(result['accuracy'], 50.0)
+        self.assertEqual(detail['pass_at_1'], 0.5)
+        self.assertEqual(len(detail['candidate_details']), 2)
+        self.assertEqual(detail['candidate_details'][1], {
+            'pred': 'skip',
+            'answer': '4',
+            'correct': False,
+            'skipped': True,
+        })
 
 
 if __name__ == '__main__':

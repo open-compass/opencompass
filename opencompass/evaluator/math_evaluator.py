@@ -99,7 +99,12 @@ class MATHVerifyEvaluator(BaseEvaluator):
             return 0.0, detail
 
         if result.get('skipped'):
-            return 0.0, None
+            return 0.0, {
+                'pred': prediction,
+                'answer': reference,
+                'correct': False,
+                'skipped': True,
+            }
 
         answer_correct = result['answer_correct']
         detail = {
