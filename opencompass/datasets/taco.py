@@ -18,7 +18,7 @@ from io import StringIO
 from unittest.mock import mock_open, patch
 
 import numpy as np
-from datasets import Dataset, DatasetDict, load_from_disk
+from datasets import Dataset, DatasetDict
 from huggingface_hub import hf_hub_download
 
 try:
@@ -28,28 +28,22 @@ except ImportError:
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
-from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 TIMEOUT = 10
-HF_TACO_PATHS = {'BAAI/TACO', 'opencompass/TACO'}
+HF_TACO_PATH = 'BAAI/TACO'
 
 
 def _load_taco_dataset(path: str):
-    if path in HF_TACO_PATHS:
-        data_file = hf_hub_download(
-            repo_id='BAAI/TACO',
-            repo_type='dataset',
-            filename='test/data-00000-of-00001.arrow',
-        )
-        return DatasetDict({'test': Dataset.from_file(data_file)})
-
-    path = get_data_path(path, local_mode=True)
-    dataset = load_from_disk(path)
-    if isinstance(dataset, Dataset):
-        return DatasetDict({'test': dataset})
-    return dataset
+    assert path == HF_TACO_PATH, \
+        f'TACODataset only supports the Hugging Face dataset {HF_TACO_PATH}.'
+    data_file = hf_hub_download(
+        repo_id=HF_TACO_PATH,
+        repo_type='dataset',
+        filename='test/data-00000-of-00001.arrow',
+    )
+    return DatasetDict({'test': Dataset.from_file(data_file)})
 
 
 @LOAD_DATASET.register_module()

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from datasets import Dataset, DatasetDict
+from datasets import Dataset
 
 from opencompass.datasets.taco import TACODataset
 
@@ -37,22 +37,10 @@ class TestTACODataset(unittest.TestCase):
         self.assertEqual(dataset['test'][0]['starter'],
                          '\\nUse Standard Input format')
 
-    @patch('opencompass.datasets.taco.load_from_disk')
-    @patch('opencompass.datasets.taco.get_data_path')
-    def test_local_path_keeps_local_download_flow(self, mock_get_data_path,
-                                                  mock_load_from_disk):
-        mock_get_data_path.return_value = '/tmp/BAAI-TACO'
-        mock_load_from_disk.return_value = DatasetDict(
-            {'test': Dataset.from_list([make_sample(starter_code='def f():')])}
-        )
-
-        dataset = TACODataset.load('./data/BAAI-TACO')
-
-        mock_get_data_path.assert_called_once_with('./data/BAAI-TACO',
-                                                   local_mode=True)
-        mock_load_from_disk.assert_called_once_with('/tmp/BAAI-TACO')
-        self.assertEqual(dataset['test'][0]['starter'],
-                         'def f():\\nUse Call-Based format')
+    def test_local_path_is_not_supported(self):
+        with self.assertRaisesRegex(AssertionError,
+                                    'only supports the Hugging Face dataset'):
+            TACODataset.load('./data/BAAI-TACO')
 
 
 if __name__ == '__main__':
