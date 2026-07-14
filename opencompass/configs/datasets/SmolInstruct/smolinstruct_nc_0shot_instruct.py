@@ -29,6 +29,7 @@ name_dict = {
 }
 
 nc_0shot_instruct_datasets = []
+mini_nc_0shot_instruct_datasets = []
 for _name in name_dict:
     _hint = nc_hint_dict[_name]
     nc_0shot_infer_cfg = dict(
@@ -62,5 +63,17 @@ for _name in name_dict:
             infer_cfg=nc_0shot_infer_cfg,
             eval_cfg=nc_0shot_eval_cfg,
         ))
+    mini_nc_0shot_instruct_datasets.append(
+        dict(
+            abbr=f'NC-{_name}-0shot-instruct-mini',
+            type=SmolInstructDataset,
+            mini_set=True,
+            path='osunlp/SMolInstruct',
+            name=name_dict[_name],
+            reader_cfg=nc_0shot_reader_cfg,
+            infer_cfg=nc_0shot_infer_cfg,
+            eval_cfg=nc_0shot_eval_cfg,
+        )
+    )
 
 del _name

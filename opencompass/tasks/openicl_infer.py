@@ -34,6 +34,8 @@ class OpenICLInferTask(BaseTask):
         self.num_gpus = run_cfg.get('num_gpus', 0)
         self.num_procs = run_cfg.get('num_procs', 1)
         self.logger = get_logger()
+        self.dump_res_length = cfg.get('dump_res_length', False)
+        self.dump_only_message_path = cfg.get('dump_only_message_path', None)
 
     def get_command(self, cfg_path, template):
         """Get the command template for the task.
@@ -50,20 +52,23 @@ class OpenICLInferTask(BaseTask):
             key in str(self.model_cfgs[0].get('type', ''))
             or key in str(self.model_cfgs[0].get('llm', {}).get('type', ''))
             for key in backend_keys)
+        python = sys.executable
         if self.num_gpus > 1 and not use_backend:
             port = random.randint(12000, 32000)
-            command = (f'torchrun --master_port={port} '
-                       f'--nproc_per_node {self.num_procs} '
-                       f'{script_path} {cfg_path}')
+            command = (
+                f'{python} -m torch.distributed.run --master_port={port} '
+                f'--nproc_per_node {self.num_procs} '
+                f'{script_path} {cfg_path}')
         else:
-            python = sys.executable
             command = f'{python} {script_path} {cfg_path}'
 
         return template.format(task_cmd=command)
 
     def run(self, cur_model=None, cur_model_abbr=None):
         self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
+        model_index, dataset_index = 0, 0
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
+            model_index += 1
             self.max_out_len = model_cfg.get('max_out_len', None)
             self.batch_size = model_cfg.get('batch_size', None)
             self.min_out_len = model_cfg.get('min_out_len', None)
@@ -73,6 +78,15 @@ class OpenICLInferTask(BaseTask):
                 self.model = build_model_from_cfg(model_cfg)
 
             for dataset_cfg in dataset_cfgs:
+                dataset_index += 1
+                total_model_len = len(self.model_cfgs[0]) if isinstance(
+                    self.model_cfgs[0], list) else len(self.model_cfgs)
+                total_dataset_len = len(self.dataset_cfgs[0]) if isinstance(
+                    self.dataset_cfgs[0], list) else len(self.dataset_cfgs)
+                self.logger.info(
+                    f'The Progress of This Task --> '
+                    f'Models: {model_index}/{total_model_len}, '
+                    f'Datasets: {dataset_index}/{total_dataset_len}')
                 self.model_cfg = model_cfg
                 self.dataset_cfg = dataset_cfg
                 self.infer_cfg = self.dataset_cfg['infer_cfg']
@@ -115,8 +129,10 @@ class OpenICLInferTask(BaseTask):
                                 self.min_out_len)
         self._set_default_value(inferencer_cfg, 'batch_size', self.batch_size)
         inferencer_cfg['max_seq_len'] = self.model_cfg.get('max_seq_len')
+        inferencer_cfg['dump_res_length'] = self.dump_res_length
+        inferencer_cfg['dump_only_message_path'] = self.dump_only_message_path
         inferencer = ICL_INFERENCERS.build(inferencer_cfg)
-        print(f'------------------------tpye: {type(inferencer)}')
+
         out_path = get_infer_output_path(
             self.model_cfg, self.dataset_cfg,
             osp.join(self.work_dir, 'predictions'))

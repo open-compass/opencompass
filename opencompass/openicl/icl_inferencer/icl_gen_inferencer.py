@@ -1,13 +1,14 @@
 """Direct Generation Inferencer."""
-
+import copy
 import inspect
 import json
 import os
 import os.path as osp
+import re
 import time
+from pathlib import Path
 from typing import List, Optional
 
-import mmengine
 import torch
 from tqdm import tqdm
 
@@ -74,6 +75,9 @@ class GenInferencer(BaseInferencer):
         self.min_out_len = min_out_len
         self.stopping_criteria = stopping_criteria
         self.dump_timer = kwargs.get('dump_timer', False)
+        self.dump_res_length = kwargs.get('dump_res_length', False)
+        self.dump_only_message_path = kwargs.get('dump_only_message_path',
+                                                 None)
 
         if self.model.is_api and save_every is None:
             save_every = 1
@@ -114,17 +118,12 @@ class GenInferencer(BaseInferencer):
         # Create tmp json file for saving intermediate results and future
         # resuming
         index = 0
-        tmp_json_filepath = os.path.join(output_json_filepath,
-                                         'tmp_' + output_json_filename)
-        if osp.exists(tmp_json_filepath):
-            # TODO: move resume to output handler
-            try:
-                tmp_result_dict = mmengine.load(tmp_json_filepath)
-            except Exception:
-                pass
-            else:
-                output_handler.results_dict = tmp_result_dict
-                index = len(tmp_result_dict)
+        tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
+            '.jsonl').name
+        tmp_jsonl_filepath = Path(output_json_filepath) / tmp_jsonl_filename
+        tmp_result_dict = output_handler.restore_from_jsonl(
+            output_json_filepath, tmp_jsonl_filename)
+        index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         logger.info('Starting build dataloader')
@@ -135,6 +134,7 @@ class GenInferencer(BaseInferencer):
 
         start_time_stamp = time.time()
         num_sample = 0
+        first_dump = True
         for datum in tqdm(dataloader, disable=not self.is_main_process):
             if ds_reader.output_column:
                 entry, golds = list(zip(*datum))
@@ -150,6 +150,30 @@ class GenInferencer(BaseInferencer):
                 extra_gen_kwargs['min_out_len'] = self.min_out_len
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
+                if self.dump_only_message_path:
+                    save_path = os.path.basename(
+                        output_json_filepath.rstrip('/'))
+                    os.makedirs(os.path.join(self.dump_only_message_path,
+                                             save_path),
+                                exist_ok=True)
+                    save_name = re.sub(r'_(\d+)?(?=\.\w+$)',
+                                       '', output_json_filename).rsplit(
+                                           '.', 1)[0] + '.jsonl'
+                    with open(os.path.join(self.dump_only_message_path,
+                                           save_path, save_name),
+                              'w' if first_dump else 'a',
+                              encoding='utf-8') as f:
+                        for i in range(len(parsed_entries)):
+                            f.write(
+                                json.dumps(
+                                    {
+                                        'message': parsed_entries[i],
+                                        'gold': golds[i]
+                                    },
+                                    ensure_ascii=False) + '\n')
+                    first_dump = False
+                    logger.info('Save message successfully')
+                    continue
                 results = self.model.generate_from_template(
                     entry, max_out_len=self.max_out_len, **extra_gen_kwargs)
                 generated = results
@@ -162,28 +186,68 @@ class GenInferencer(BaseInferencer):
                     golds):
                 if num_return_sequences == 1:
                     prediction = prediction[0]
-                output_handler.save_results(prompt,
-                                            prediction,
-                                            index,
-                                            gold=gold)
+
+                if self.dump_res_length:
+                    input_length = 0
+                    if isinstance(prompt, str):
+                        input_length = self.model.get_token_len(prompt)
+                    elif isinstance(prompt, list):
+                        for i in range(len(prompt)):
+                            if 'prompt' in prompt[i]:
+                                prompt[i][
+                                    'input_length'] = self.model.get_token_len(
+                                        prompt[i]['prompt'])
+                            elif 'content' in prompt[i]:
+                                prompt[i][
+                                    'input_length'] = self.model.get_token_len(
+                                        prompt[i]['content'])
+                            else:
+                                logger.error(
+                                    'Cannot find prompt field in the message!')
+                            input_length += prompt[i]['input_length']
+
+                    pred_str = copy.deepcopy(prediction)
+                    if isinstance(pred_str, dict):
+                        pred_str = pred_str['prediction']
+
+                    if num_return_sequences == 1:
+                        res_length = self.model.get_token_len(pred_str)
+                    else:
+                        res_length = [
+                            self.model.get_token_len(pred) for pred in pred_str
+                        ]
+                    output_handler.save_results(prompt,
+                                                prediction,
+                                                index,
+                                                gold=gold,
+                                                res_length=res_length,
+                                                input_length=input_length)
+                else:
+                    output_handler.save_results(prompt,
+                                                prediction,
+                                                index,
+                                                gold=gold)
                 index = index + 1
 
             # 5-4. Save intermediate results
             if (self.save_every is not None and index % self.save_every == 0
                     and self.is_main_process):
-                output_handler.write_to_json(output_json_filepath,
-                                             'tmp_' + output_json_filename)
+                output_handler.write_to_jsonl(output_json_filepath,
+                                              tmp_jsonl_filename)
             num_sample += len(datum)
 
         end_time_stamp = time.time()
+
+        if self.dump_only_message_path:
+            return []
 
         # 6. Output
         if self.is_main_process:
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
                                          output_json_filename)
-            if osp.exists(tmp_json_filepath):
-                os.remove(tmp_json_filepath)
+            if osp.exists(tmp_jsonl_filepath):
+                os.remove(tmp_jsonl_filepath)
 
         if self.dump_timer and self.is_main_process:
             timer_filepath = os.path.join(output_json_filepath, 'timer',
@@ -222,7 +286,14 @@ class GenInferencer(BaseInferencer):
             if max_seq_len is not None:
                 prompt_token_num = self.model.get_token_len_from_template(
                     prompt, mode='gen')
-                while len(ice_idx) > 0 and prompt_token_num > max_seq_len:
+
+                if isinstance(prompt_token_num, list):
+                    total_prompt_token_num = sum(prompt_token_num)
+                else:
+                    total_prompt_token_num = prompt_token_num
+
+                while len(
+                        ice_idx) > 0 and total_prompt_token_num > max_seq_len:
                     ice_idx = ice_idx[:-1]
                     ice = retriever.generate_ice(ice_idx,
                                                  ice_template=ice_template)
@@ -234,6 +305,12 @@ class GenInferencer(BaseInferencer):
                         prompt_template=prompt_template)
                     prompt_token_num = self.model.get_token_len_from_template(
                         prompt, mode='gen')
+
+                    if isinstance(prompt_token_num, list):
+                        total_prompt_token_num = sum(prompt_token_num)
+                    else:
+                        total_prompt_token_num = prompt_token_num
+
             prompt_list.append(prompt)
         return prompt_list
 

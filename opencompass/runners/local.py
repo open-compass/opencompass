@@ -119,7 +119,7 @@ class LocalRunner(BaseRunner):
                     tmpl = get_command_template(all_gpu_ids[:num_gpus])
                     cmd = task.get_command(cfg_path=param_file, template=tmpl)
                     # run in subprocess if starts with torchrun etc.
-                    if 'python3 ' in cmd or 'python ' in cmd:
+                    if 'python3' in cmd or 'python ' in cmd:
                         # If it is an infer type task do not reload if
                         # the current model has already been loaded.
                         if 'infer' in self.task_cfg.type.lower():

@@ -1,3 +1,5 @@
+# flake8: noqa
+
 import argparse
 import copy
 import math
@@ -7,10 +9,12 @@ import random
 import statistics
 import sys
 import time
+from collections import defaultdict
 from inspect import signature
-from typing import List
+from typing import Iterable, List
 
 import mmengine
+from datasets import Dataset
 from mmengine.config import Config, ConfigDict
 from mmengine.utils import mkdir_or_exist
 
@@ -43,7 +47,12 @@ class OpenICLEvalTask(BaseTask):
                     'judge_cfg', {}).get('run_cfg', {}).get('num_gpus', 0),
                 c.get('eval_cfg', {}).get('evaluator', {}).get(
                     'llm_evaluator', {}).get('judge_cfg', {}).get(
-                        'run_cfg', {}).get('num_gpus', 0))
+                        'run_cfg', {}).get('num_gpus', 0),
+                next(
+                    iter(
+                        c.get('eval_cfg', {}).get('evaluator', {}).get(
+                            'judge_cfg', {}).get('judgers', [])), {}).get(
+                                'run_cfg', {}).get('num_gpus', 0))
             for c in sum(self.dataset_cfgs, []))
         self.num_procs = max(
             c.get('eval_cfg', {}).get('evaluator', {}).get(
@@ -57,13 +66,14 @@ class OpenICLEvalTask(BaseTask):
     def get_command(self, cfg_path, template):
         sys.path.append(os.getcwd())
         script_path = __file__
+        python = sys.executable
         if self.num_gpus > 1:
             port = random.randint(12000, 32000)
-            command = (f'torchrun --master_port={port} '
-                       f'--nproc_per_node {self.num_procs} '
-                       f'{script_path} {cfg_path}')
+            command = (
+                f'{python} -m torch.distributed.run --master_port={port} '
+                f'--nproc_per_node {self.num_procs} '
+                f'{script_path} {cfg_path}')
         else:
-            python = sys.executable
             command = f'{python} {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
@@ -93,31 +103,46 @@ class OpenICLEvalTask(BaseTask):
         # Load predictions
         pred_dicts, pred_strs = self._load_predictions()
 
-        # Process predictions
-        pred_strs = self._process_predictions(pred_strs)
+        if all(
+                isinstance(item, dict) and 'rollout' in item
+                for item in pred_strs):
+            # Sum rollout
+            result = self._sum_rollout(
+                pred_strs,
+                test_set,
+                pred_dicts,
+            )
 
-        # Evaluate predictions
-        result = self._evaluate_predictions(
-            pred_strs,
-            test_set,
-            pred_dicts,
-        )
+            # Save results
+            self._save_results(result)
 
-        # Save results
-        self._save_results(result)
+        else:
+            # Process predictions
+            pred_strs = self._process_predictions(pred_strs)
+
+            # Evaluate predictions
+            result = self._evaluate_predictions(
+                pred_strs,
+                test_set,
+                pred_dicts,
+            )
+
+            # Save results
+            self._save_results(result)
 
     def _load_and_preprocess_test_data(self):
         """Load test dataset and apply postprocessing if needed."""
         test_set = build_dataset_from_cfg(self.dataset_cfg).test
         # Postprocess dataset if necessary
         if 'dataset_postprocessor' in self.eval_cfg:
-            proc = self.eval_cfg['dataset_postprocessor']['type']
+            kwargs = copy.deepcopy(self.eval_cfg['dataset_postprocessor'])
+            proc = kwargs.pop('type')
             if isinstance(proc, str):
                 proc = TEXT_POSTPROCESSORS.get(proc)
 
             def postprocess(sample):
                 s = sample[self.output_column]
-                sample[self.output_column] = proc(s)
+                sample[self.output_column] = proc(s, **kwargs)
                 return sample
 
             test_set = test_set.map(postprocess)
@@ -318,6 +343,82 @@ class OpenICLEvalTask(BaseTask):
                     self.logger.warning(f'Skip dumping details due to: {e}.')
         else:
             result.pop('details', None)
+        return result
+
+    def _sum_rollout(
+        self,
+        pred_strs,
+        test_set,
+        pred_dicts,
+    ):
+
+        # breakpoint()
+        n = self.dataset_cfg.get('n', 1)
+        real_size = len(test_set) // n
+
+        def select_fn(i, real_size, x):
+            if isinstance(x, Dataset):
+                return x.select(range(i * real_size, (i + 1) * real_size))
+            elif isinstance(x, Iterable):
+                return x[i * real_size:(i + 1) * real_size]
+            else:
+                return x
+
+        total_neg_logprob = 0.0
+        total_tokens = 0
+        finish_counts = defaultdict(int)
+        successful_samples = 0
+
+        result = {}
+
+        for i in range(n):
+            replica_pred_strs = select_fn(i, real_size, pred_strs)
+            replica_total_neg_logprob = 0.0
+            replica_total_tokens = 0
+            replica_finish_counts = defaultdict(int)
+            replica_successful_samples = 0
+
+            for pred_sample in replica_pred_strs:
+                replica_total_neg_logprob += pred_sample['rollout'][
+                    'sum_neg_logprob']
+                replica_total_tokens += pred_sample['rollout']['num_tokens']
+                replica_finish_counts[pred_sample['rollout']
+                                      ['finish_reason']] += 1
+                if pred_sample['rollout']['num_tokens'] > 0:
+                    replica_successful_samples += 1
+
+            replica_entropy_nats = replica_total_neg_logprob / replica_total_tokens
+            replica_avg_length = replica_total_tokens / replica_successful_samples if replica_successful_samples > 0 else 0.0
+
+            result[f'{i}_th rollout results'] = dict(
+                total_neg_logprob=replica_total_neg_logprob,
+                total_tokens=replica_total_tokens,
+                finish_reason=replica_finish_counts,
+                successful_samples=replica_successful_samples,
+                entropy_nats=replica_entropy_nats,
+                replica_avg_length=replica_avg_length,
+            )
+
+            total_neg_logprob += replica_total_neg_logprob
+            total_tokens += replica_total_tokens
+            for reason, count in replica_finish_counts.items():
+                finish_counts[reason] += count
+            successful_samples += replica_successful_samples
+
+        entropy_nats = total_neg_logprob / total_tokens
+        avg_length = total_tokens / successful_samples if successful_samples > 0 else 0.0
+
+        result['total rollout results'] = dict(
+            total_neg_logprob=total_neg_logprob,
+            total_tokens=total_tokens,
+            finish_reason=finish_counts,
+            successful_samples=successful_samples,
+            entropy_nats=entropy_nats,
+            replica_avg_length=avg_length,
+        )
+
+        result['total predictions'] = pred_dicts
+
         return result
 
     def _save_results(self, result):

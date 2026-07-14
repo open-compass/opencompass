@@ -19,6 +19,11 @@ except ImportError:
 
 
 class VLLMwithChatTemplate(BaseModel):
+    """vLLM model wrapper with chat template support.
+
+    This class extends the base vLLM wrapper to automatically apply chat templates
+    using tokenizer.apply_chat_template(), and supports LoRA adapters.
+    """
 
     def __init__(
         self,
@@ -30,7 +35,27 @@ class VLLMwithChatTemplate(BaseModel):
         meta_template: Optional[Dict] = None,
         fastchat_template: Optional[str] = None,
         stop_words: List[str] = [],
+        lora_path: Optional[str] = None,
+        chat_template_kwargs: Optional[dict] = None,
     ):
+        """Initialize the VLLMwithChatTemplate model.
+
+        Args:
+            path (str): Path to the base model.
+            model_kwargs (dict): Additional kwargs for vLLM model initialization.
+            tokenizer_only (bool): Whether to only load the tokenizer.
+            generation_kwargs (dict): Default generation parameters.
+            max_seq_len (int): Maximum sequence length.
+            meta_template (Dict): Meta template for prompt formatting.
+            fastchat_template (str): Optional fastchat template name.
+            stop_words (List[str]): Additional stop words for generation.
+            lora_path (str): Path to LoRA adapter weights. If provided, the model
+                will use the LoRA adapter during generation.
+            chat_template_kwargs (dict): Additional kwargs to pass to
+                tokenizer.apply_chat_template(). For example, for Qwen3 models,
+                you can pass {'enable_thinking': True/False} to control the
+                thinking mode.
+        """
         assert LLM, ('Please install VLLM with `pip install vllm`. note: torch==2.1.2 is required.')
 
         self.logger = get_logger()
@@ -50,6 +75,8 @@ class VLLMwithChatTemplate(BaseModel):
         self.generation_kwargs.pop('do_sample', None)
         self.fastchat_template = fastchat_template
         self.stop_words = list(set(stop_words + self._get_potential_stop_words(path)))
+        self.lora_path = lora_path
+        self.chat_template_kwargs = chat_template_kwargs or {}
 
     def _load_model(self, path: str, added_model_kwargs: dict = dict()):
         import ray
@@ -97,7 +124,7 @@ class VLLMwithChatTemplate(BaseModel):
         if self.fastchat_template:
             messages = _format_with_fast_chat_template(messages, self.fastchat_template)
         else:
-            messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
+            messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False, **self.chat_template_kwargs) for m in messages]
             # vLLM tokenize prompts by AutoTokenizer with its default parameter "add_special_token=True"
             # OC add bos_token in the prompt, which requires tokenizing prompts using "add_speicial_token=False"
             # But vLLM doesn't have "add_speicial_token" in the pipeline API. So, we remove bos_token
@@ -117,7 +144,14 @@ class VLLMwithChatTemplate(BaseModel):
         self.logger.info('Sampling Params of vLLM: ')
         self.logger.info(sampling_kwargs)
 
-        outputs = self.model.generate(messages, sampling_kwargs)
+        if self.lora_path:
+            try:
+                from vllm.lora.request import LoRARequest
+            except ImportError:
+                raise ImportError('Please install vLLM with LoRA support to use lora_path parameter.')
+            outputs = self.model.generate(messages, sampling_kwargs, lora_request=LoRARequest('lora_adapter', 1, self.lora_path))
+        else:
+            outputs = self.model.generate(messages, sampling_kwargs)
 
         prompt_list, output_strs = [], []
         for output in outputs:

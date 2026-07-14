@@ -1,9 +1,9 @@
 """Chat Inferencer."""
 import os
 import os.path as osp
+from pathlib import Path
 from typing import List, Optional, Union
 
-import mmengine
 from mmengine import is_list_of
 from tqdm import tqdm
 
@@ -16,7 +16,7 @@ from opencompass.utils.prompt import PromptList
 from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
 from ..utils.logging import get_logger
-from .icl_base_inferencer import BaseInferencer, dump_results_dict
+from .icl_base_inferencer import BaseInferencer, ChatOutputHandler
 
 logger = get_logger(__name__)
 
@@ -123,45 +123,6 @@ class APITemplateParser:
         return PromptList(prompt)
 
 
-class ChatOutputHandler:
-
-    def __init__(self) -> None:
-        self.results_dict = {}
-
-    def write_to_json(self, save_dir: str, filename: str):
-        """Dump the result to a json file."""
-        dump_results_dict(self.results_dict, osp.join(save_dir, filename))
-
-    def save_results(self,
-                     origin_prompt: list,
-                     prediction: str,
-                     idx: int,
-                     gold: str = None):
-        result_dict = {}
-        if gold:
-            result_dict['gold'] = gold
-        result_dict.update({
-            'prediction': prediction,
-            'origin_prompt': origin_prompt,
-        })
-        self.results_dict[str(idx)] = result_dict
-
-    def save_multiround_results(self,
-                                origin_prompt: list,
-                                prediction: str,
-                                idx: int,
-                                gold: str = None):
-        result_dict = self.results_dict.get(str(idx), {
-            'gold': [],
-            'prediction': [],
-            'origin_prompt': [],
-        })
-        result_dict['gold'].append(gold)
-        result_dict['prediction'].append(prediction)
-        result_dict['origin_prompt'].append(origin_prompt)
-        self.results_dict[str(idx)] = result_dict
-
-
 @ICL_INFERENCERS.register_module()
 class ChatInferencer(BaseInferencer):
     HandlerType = ChatOutputHandler
@@ -226,17 +187,12 @@ class ChatInferencer(BaseInferencer):
         # Create tmp json file for saving intermediate results and future
         # resuming
         index = 0
-        tmp_json_filepath = os.path.join(output_json_filepath,
-                                         'tmp_' + output_json_filename)
-        if osp.exists(tmp_json_filepath):
-            # TODO: move resume to output handler
-            try:
-                tmp_result_dict = mmengine.load(tmp_json_filepath)
-            except Exception:
-                pass
-            else:
-                output_handler.results_dict = tmp_result_dict
-                index = len(tmp_result_dict)
+        tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
+            '.jsonl').name
+        tmp_jsonl_filepath = Path(output_json_filepath) / tmp_jsonl_filename
+        tmp_result_dict = output_handler.restore_from_jsonl(
+            output_json_filepath, tmp_jsonl_filename)
+        index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         dataloader = self.get_dataloader(chat_list[index:], batch_size=1)
@@ -264,8 +220,8 @@ class ChatInferencer(BaseInferencer):
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
                                          output_json_filename)
-            if osp.exists(tmp_json_filepath):
-                os.remove(tmp_json_filepath)
+            if osp.exists(tmp_jsonl_filepath):
+                os.remove(tmp_jsonl_filepath)
 
         return output_handler.results_dict
 

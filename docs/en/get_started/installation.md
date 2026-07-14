@@ -128,6 +128,7 @@ unzip OpenCompassData-core-20240207.zip
 If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download and `unzip` it using the following command:
 
 ```bash
+# For proxy and resumable downloads, try `aria2c -x16 -s16 -k1M "http://ghfast.top/https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip" `
 wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip
 unzip OpenCompassData-complete-20240207.zip
 cd ./data

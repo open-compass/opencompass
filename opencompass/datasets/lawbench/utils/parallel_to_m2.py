@@ -7,13 +7,16 @@ from tqdm import tqdm
 import torch
 from collections import defaultdict
 from multiprocessing import Pool
-from opencc import OpenCC
+try:
+    from opencc import OpenCC
+except ImportError:
+    OpenCC = None
 import timeout_decorator
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 annotator, sentence_to_tokenized = None, None
-cc = OpenCC("t2s")
+cc = OpenCC("t2s") if OpenCC is not None else None
 
 @timeout_decorator.timeout(10)
 def annotate_with_time_out(line):

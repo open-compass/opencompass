@@ -91,6 +91,7 @@ We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
 
    notes/contribution_guide.md
    notes/academic.md
+   notes/rawprompttemplate.md
 
 Indexes & Tables
 ==================

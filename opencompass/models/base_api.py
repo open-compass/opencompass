@@ -1,3 +1,4 @@
+import copy
 import re
 import sys
 import threading
@@ -15,6 +16,8 @@ from opencompass.utils.prompt import PromptList
 from .base import BaseModel
 
 PromptType = Union[PromptList, str]
+
+CHATML_ROLE = ['system', 'user', 'assistant']
 
 
 class BaseAPIModel(BaseModel):
@@ -172,23 +175,38 @@ class APITemplateParser:
         self.meta_template = meta_template
         # Check meta template
         if meta_template:
-            assert 'round' in meta_template, 'round is required in meta' \
-                ' template'
-            assert isinstance(meta_template['round'], list)
-            keys_to_check = ['round']
+            if isinstance(meta_template, list):
+                assert all(
+                    isinstance(item, dict) and 'role' in item
+                    and item['role'] in {'system', 'user', 'assistant'}
+                    for item in meta_template
+                ), f'meta_template is {meta_template}, not a list of dicts'
+            else:
+                assert 'round' in meta_template, 'round is required in meta' \
+                    f' template, currently is {meta_template}'
+                assert isinstance(
+                    meta_template['round'], list
+                ), f'currently round is {meta_template["round"]}, not a list'
+                keys_to_check = ['round']
 
-            if 'reserved_roles' in meta_template:
-                assert isinstance(meta_template['reserved_roles'], list)
-                keys_to_check.append('reserved_roles')
+                if 'reserved_roles' in meta_template:
+                    assert isinstance(
+                        meta_template['reserved_roles'], list
+                    ), f'reserved_roles is {meta_template["reserved_roles"]}, not a list'  # noqa: E501
+                    keys_to_check.append('reserved_roles')
 
-            self.roles: Dict[str, dict] = dict()  # maps role name to config
-            for meta_key in keys_to_check:
-                for item in meta_template[meta_key]:
-                    assert isinstance(item, (str, dict))
-                    if isinstance(item, dict):
-                        assert item['role'] not in self.roles, \
-                            'role in meta prompt must be unique!'
-                        self.roles[item['role']] = item.copy()
+                self.roles: Dict[str,
+                                 dict] = dict()  # maps role name to config
+                for meta_key in keys_to_check:
+                    for item in meta_template[meta_key]:
+                        assert isinstance(
+                            item,
+                            (str, dict
+                             )), f'currently item is {item}, not a str or dict'
+                        if isinstance(item, dict):
+                            assert item['role'] not in self.roles, \
+                                'role in meta prompt must be unique!'
+                            self.roles[item['role']] = item.copy()
 
     def parse_template(self, prompt_template: PromptType,
                        mode: str) -> PromptType:
@@ -210,6 +228,59 @@ class APITemplateParser:
             List[PromptType]: The finalized prompt or a conversation.
         """
         assert isinstance(prompt_template, (str, list, PromptList, tuple))
+
+        if isinstance(prompt_template, list) and len(prompt_template) > 0:
+            if all('role' in single_item and 'content' in single_item
+                   for single_item in prompt_template):
+                prompt_template = copy.deepcopy(prompt_template)
+                if self.meta_template and isinstance(self.meta_template, list):
+                    result = []
+                    meta_idx = 0
+                    prompt_idx = 0
+                    while meta_idx < len(self.meta_template):
+                        if prompt_idx < len(prompt_template) and \
+                                self.meta_template[meta_idx]['role'] == \
+                                prompt_template[prompt_idx]['role']:
+                            # Same role at same position -> merge
+                            merged = copy.deepcopy(prompt_template[prompt_idx])
+                            merged['content'] = (
+                                self.meta_template[meta_idx]['content'] +
+                                merged['content'])
+                            result.append(merged)
+                            meta_idx += 1
+                            prompt_idx += 1
+                        elif prompt_idx < len(prompt_template):
+                            # Check if meta role exists later in prompt
+                            found = any(prompt_template[j]['role'] ==
+                                        self.meta_template[meta_idx]['role']
+                                        for j in range(prompt_idx,
+                                                       len(prompt_template)))
+                            if not found:
+                                # Meta role not in remaining prompt ->
+                                # insert meta item
+                                result.append(
+                                    copy.deepcopy(
+                                        self.meta_template[meta_idx]))
+                                meta_idx += 1
+                            else:
+                                # Meta role exists later ->
+                                # keep current prompt item
+                                result.append(
+                                    copy.deepcopy(prompt_template[prompt_idx]))
+                                prompt_idx += 1
+                        else:
+                            # No more prompt items ->
+                            # insert remaining meta items
+                            result.append(
+                                copy.deepcopy(self.meta_template[meta_idx]))
+                            meta_idx += 1
+                    # Append remaining prompt items
+                    while prompt_idx < len(prompt_template):
+                        result.append(
+                            copy.deepcopy(prompt_template[prompt_idx]))
+                        prompt_idx += 1
+                    prompt_template = result
+                return prompt_template
 
         if not isinstance(prompt_template, (str, PromptList)):
             return [self.parse_template(p, mode=mode) for p in prompt_template]

@@ -1,7 +1,8 @@
 exclude: |
     (?x)^(
       tests/data/|
-      tests/dataset/|
+      tests/datasets/|
+      tests/models/|
       opencompass/models/internal/|
       opencompass/utils/internal/|
       opencompass/openicl/icl_evaluator/hf_metrics/|
@@ -11,12 +12,13 @@ exclude: |
       opencompass/datasets/matbench/|
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
+      opencompass/datasets/moleculariq/moleculariq_core/|
       opencompass/datasets/TheoremQA|
       opencompass/datasets/subjective/mtbench101.py|
       docs/zh_cn/advanced_guides/compassbench_intro.md |
       docs/zh_cn/advanced_guides/compassbench_v2_0.md |
       opencompass/utils/datasets.py |
-      opencompass/utils/datasets_info.py
+      opencompass/utils/datasets_info.py 
     )
 repos:
   - repo: https://github.com/PyCQA/flake8

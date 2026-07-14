@@ -1,6 +1,5 @@
 import os
 import time
-from threading import Lock
 from typing import Dict, List, Optional, Union
 
 from opencompass.registry import MODELS
@@ -12,7 +11,7 @@ PromptType = Union[PromptList, str]
 OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
-O1_MODEL_LIST = ['o1', 'o3', 'o4']
+O1_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
 
 
 @MODELS.register_module()
@@ -35,7 +34,7 @@ class OpenAISDKStreaming(OpenAISDK):
                  query_per_second: int = 1,
                  rpm_verbose: bool = False,
                  retry: int = 2,
-                 key: str | List[str] = 'ENV',
+                 key: str = 'ENV',
                  org: str | List[str] | None = None,
                  meta_template: Dict | None = None,
                  openai_api_base: str | List[str] = OPENAISDK_API_BASE,
@@ -52,78 +51,46 @@ class OpenAISDKStreaming(OpenAISDK):
                  think_tag: str = '</think>',
                  openai_extra_kwargs: Dict | None = None,
                  stream: bool = True,
-                 stream_chunk_size: int = 1):
-
-        super().__init__(path=path,
-                         max_seq_len=max_seq_len,
-                         query_per_second=query_per_second,
-                         rpm_verbose=rpm_verbose,
-                         retry=retry,
-                         key=key,
-                         org=org,
-                         meta_template=meta_template,
-                         openai_api_base=openai_api_base,
-                         openai_proxy_url=openai_proxy_url,
-                         mode=mode,
-                         logprobs=logprobs,
-                         top_logprobs=top_logprobs,
-                         temperature=temperature,
-                         tokenizer_path=tokenizer_path,
-                         extra_body=extra_body,
-                         verbose=verbose,
-                         http_client_cfg=http_client_cfg,
-                         status_code_mappings=status_code_mappings,
-                         think_tag=think_tag)
+                 stream_chunk_size: int = 1,
+                 timeout: int = 3600,
+                 finish_reason_confirm: bool = True,
+                 max_workers: Optional[int] = None):
+        super().__init__(
+            path=path,
+            max_seq_len=max_seq_len,
+            query_per_second=query_per_second,
+            rpm_verbose=rpm_verbose,
+            retry=retry,
+            key=key,
+            org=org,
+            meta_template=meta_template,
+            openai_api_base=openai_api_base,
+            openai_proxy_url=openai_proxy_url,
+            mode=mode,
+            logprobs=logprobs,
+            top_logprobs=top_logprobs,
+            temperature=temperature,
+            tokenizer_path=tokenizer_path,
+            extra_body=extra_body,
+            verbose=verbose,
+            http_client_cfg=http_client_cfg,
+            status_code_mappings=status_code_mappings,
+            think_tag=think_tag,
+            openai_extra_kwargs=openai_extra_kwargs,
+            max_workers=max_workers,
+        )
 
         self.stream = stream
         self.stream_chunk_size = stream_chunk_size
-        self.openai_extra_kwargs = openai_extra_kwargs
-
-    def _create_fresh_client(self):
-        """Create a fresh OpenAI client for each request to avoid
-        concurrency issues."""
-        import httpx
-        from openai import OpenAI
-
-        # Get current key (with key rotation)
-        with Lock():
-            if len(self.invalid_keys) == len(self.keys):
-                raise RuntimeError('All keys have insufficient quota.')
-
-            # find the next valid key
-            while True:
-                self.key_ctr += 1
-                if self.key_ctr == len(self.keys):
-                    self.key_ctr = 0
-
-                if self.keys[self.key_ctr] not in self.invalid_keys:
-                    break
-
-            current_key = self.keys[self.key_ctr]
-
-        # Create fresh client with current key
-        http_client_cfg = {}
-        if self.proxy_url:
-            http_client_cfg['proxies'] = {
-                'http://': self.proxy_url,
-                'https://': self.proxy_url,
-            }
-
-        return OpenAI(
-            base_url=self.openai_api_base,
-            api_key=current_key,
-            http_client=httpx.Client(
-                **http_client_cfg,
-                timeout=httpx.Timeout(3600.0)  # 1 hour timeout
-            ) if http_client_cfg or True else None,
-        )
+        self.timeout = timeout
+        self.finish_reason_confirm = finish_reason_confirm
 
     def _generate(
-            self,
-            input: PromptList | str,
-            max_out_len: int,
-            temperature: float,
-            timeout: int = 3600,  # Set timeout to 1 hour
+        self,
+        input: PromptList | str,
+        max_out_len: int,
+        temperature: float,
+        # timeout: int = 3600,  # Set timeout to 1 hour
     ) -> str:
         """Generate results with streaming support.
 
@@ -140,7 +107,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
         from openai import APIStatusError, BadRequestError
 
-        assert isinstance(input, (str, PromptList))
+        assert isinstance(input, (str, list, PromptList))
 
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,
@@ -148,8 +115,6 @@ class OpenAISDKStreaming(OpenAISDK):
 
         num_retries = 0
         while num_retries < self.retry:
-            self.wait()
-
             if any(model in self.path for model in O1_MODEL_LIST):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
@@ -178,6 +143,7 @@ class OpenAISDKStreaming(OpenAISDK):
             if self.openai_extra_kwargs:
                 query_data.update(self.openai_extra_kwargs)
 
+            self.acquire()
             try:
                 if self.verbose:
                     thread_id = threading.get_ident()
@@ -186,27 +152,18 @@ class OpenAISDKStreaming(OpenAISDK):
                         f'with streaming enabled')
 
                 if self.stream:
-                    # Create fresh client for each request to avoid
-                    # concurrency issues
-                    fresh_client = self._create_fresh_client()
-
                     # Handle streaming response with shorter timeout
-                    response_stream = fresh_client.chat.completions.create(
-                        **query_data, timeout=timeout)
+                    stream = self.openai_client.chat.completions.create(
+                        **query_data, timeout=self.timeout)
 
                     result = self._handle_stream_response(
-                        response_stream, thread_id if self.verbose else None)
-
-                    # Clean up the client
-                    if (hasattr(fresh_client, '_client')
-                            and hasattr(fresh_client._client, 'close')):
-                        fresh_client._client.close()
+                        stream, thread_id if self.verbose else None)
 
                     return result
                 else:
                     # Fallback to non-streaming (use parent method)
                     return super()._generate(input, max_out_len, temperature,
-                                             timeout)
+                                             self.timeout)
 
             except (BadRequestError, APIStatusError) as e:
                 status_code = e.status_code
@@ -230,6 +187,8 @@ class OpenAISDKStreaming(OpenAISDK):
                 import traceback
                 self.logger.error(f'[Thread {thread_id}] Traceback: '
                                   f'{traceback.format_exc()}')
+            finally:
+                self.release()
             num_retries += 1
 
         raise RuntimeError('Calling OpenAI API failed after retrying for '
@@ -246,6 +205,7 @@ class OpenAISDKStreaming(OpenAISDK):
         Returns:
             str: Complete generated text from all chunks
         """
+        finish_reason = None
         completion_chunks = []
         reasoning_content = ''
         chunk_count = 0
@@ -265,8 +225,7 @@ class OpenAISDKStreaming(OpenAISDK):
                 current_time = time.time()
 
                 # Add timeout check for stuck streams
-                # 1 hour timeout for streaming
-                if current_time - start_time > 3600:
+                if current_time - start_time > self.timeout:
                     log_with_thread(
                         f'Streaming timeout after '
                         f'{current_time - start_time:.1f}s, '
@@ -282,6 +241,10 @@ class OpenAISDKStreaming(OpenAISDK):
                 if (hasattr(delta, 'reasoning_content')
                         and delta.reasoning_content):
                     reasoning_content += delta.reasoning_content
+                    if self.verbose:
+                        # Print streaming output in real-time with complete
+                        # content
+                        print(delta.reasoning_content, end='', flush=True)
 
                 # Handle regular content
                 if delta.content:
@@ -293,6 +256,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
                 # Check if streaming is finished
                 if chunk.choices[0].finish_reason is not None:
+                    finish_reason = chunk.choices[0].finish_reason
                     if self.verbose:
                         print()  # Add newline after streaming complete
                         elapsed = current_time - start_time
@@ -325,6 +289,19 @@ class OpenAISDKStreaming(OpenAISDK):
 
         # Combine reasoning content and regular content
         complete_content = ''.join(completion_chunks)
+
+        if self.finish_reason_confirm:
+            if finish_reason is None:
+                elapsed = time.time() - start_time
+                log_with_thread(
+                    f'Stream ended without finish_reason (truncated). '
+                    f'elapsed={elapsed:.1f}s chunks={chunk_count} '
+                    f'content_len={sum(len(x) for x in completion_chunks)} '
+                    f'reasoning_len={len(reasoning_content)}',
+                    'error',
+                )
+                raise RuntimeError(
+                    'Streaming ended without finish_reason (truncated).')
 
         if self.verbose:
             log_with_thread(f'Stream processing complete. Content length: '

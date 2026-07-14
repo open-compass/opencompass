@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 import random
@@ -26,6 +27,31 @@ OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
                                     'https://api.openai.com/v1/')
 
 OAI_REASONING_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
+
+CHATML_ROLE = ['system', 'user', 'assistant']
+
+
+def set_proxy_cfg(http_client_cfg: Dict,
+                  proxy_url: Optional[str] = None) -> None:
+    """Set proxy config with explicit openai_proxy_url taking precedence."""
+    if not proxy_url:
+        return
+
+    http_client_cfg.pop('proxy', None)
+    http_client_cfg.pop('proxies', None)
+
+    try:
+        client_params = inspect.signature(httpx.Client).parameters
+    except (TypeError, ValueError):
+        client_params = {}
+
+    if 'proxy' in client_params:
+        http_client_cfg['proxy'] = proxy_url
+    else:
+        http_client_cfg['proxies'] = {
+            'http://': proxy_url,
+            'https://': proxy_url,
+        }
 
 
 @MODELS.register_module()
@@ -100,7 +126,6 @@ class OpenAI(BaseAPIModel):
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
     ):
-
         super().__init__(
             path=path,
             max_seq_len=max_seq_len,
@@ -110,18 +135,19 @@ class OpenAI(BaseAPIModel):
             retry=retry,
             verbose=verbose,
         )
-        import tiktoken
-
-        self.tiktoken = tiktoken
-        self.temperature = temperature
         assert mode in ['none', 'front', 'mid', 'rear']
+        self.path = path
+        self.temperature = temperature
         self.mode = mode
         self.logprobs = logprobs
         self.top_logprobs = top_logprobs
-        self.tokenizer_path = tokenizer_path
-        self.hf_tokenizer = None
         self.extra_body = extra_body
         self.think_tag = think_tag
+        # Fallback to gpt-4 as default tokenizer.
+        self.tokenizer_path = tokenizer_path or path or 'gpt-4'
+        self.tokenizer = None
+        self.tokenizer_type = None
+        self._init_tokenizer()
 
         if max_workers is None:
             cpu_count = os.cpu_count() or 1
@@ -138,6 +164,7 @@ class OpenAI(BaseAPIModel):
                 self.keys = [key]
         else:
             self.keys = key
+        self._key_lock = Lock()
 
         # record invalid keys and skip them when requesting API
         # - keys have insufficient_quota
@@ -158,7 +185,22 @@ class OpenAI(BaseAPIModel):
         else:
             self.proxy_url = openai_proxy_url
 
-        self.path = path
+    def _next_valid_key(self):
+        with self._key_lock:
+            if len(self.invalid_keys) == len(self.keys):
+                raise RuntimeError('All keys have insufficient quota.')
+
+            # find the next valid key
+            while True:
+                self.key_ctr += 1
+                if self.key_ctr == len(self.keys):
+                    self.key_ctr = 0
+
+                if self.keys[self.key_ctr] not in self.invalid_keys:
+                    break
+
+            key = self.keys[self.key_ctr]
+        return key
 
     def generate(
         self,
@@ -184,6 +226,10 @@ class OpenAI(BaseAPIModel):
         """
         if self.temperature is not None:
             temperature = self.temperature
+
+        if len(inputs) == 1:
+            # Forget multi-thread for single inference.
+            return [self._generate(inputs[0], max_out_len, temperature)]
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             results = list(
@@ -224,22 +270,7 @@ class OpenAI(BaseAPIModel):
 
         max_num_retries = 0
         while max_num_retries < self.retry:
-            self.wait()
-
-            with Lock():
-                if len(self.invalid_keys) == len(self.keys):
-                    raise RuntimeError('All keys have insufficient quota.')
-
-                # find the next valid key
-                while True:
-                    self.key_ctr += 1
-                    if self.key_ctr == len(self.keys):
-                        self.key_ctr = 0
-
-                    if self.keys[self.key_ctr] not in self.invalid_keys:
-                        break
-
-                key = self.keys[self.key_ctr]
+            key = self._next_valid_key()
 
             header = {
                 'Authorization': f'Bearer {key}',
@@ -254,6 +285,7 @@ class OpenAI(BaseAPIModel):
                         self.org_ctr = 0
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
+            self.acquire()
             try:
                 if any(model in self.path
                        for model in OAI_REASONING_MODEL_LIST):
@@ -314,23 +346,13 @@ class OpenAI(BaseAPIModel):
                         self.logger.debug(
                             f'Get response from {self.proxy_url}')
 
-            except requests.ConnectionError:
-                self.logger.error('Got connection error, retrying...')
-                continue
-            try:
                 if raw_response.status_code != 200:
                     self.logger.error(f'Request failed with status code '
                                       f'{raw_response.status_code}, response: '
                                       f'{raw_response.content.decode()}')
                     continue
                 response = raw_response.json()
-            except requests.JSONDecodeError:
-                self.logger.error(f'JsonDecode error, got status code '
-                                  f'{raw_response.status_code}, response: '
-                                  f'{raw_response.content.decode()}')
-                continue
-            self.logger.debug(str(response))
-            try:
+                self.logger.debug(str(response))
                 if self.logprobs:
                     return response['choices']
                 else:
@@ -356,32 +378,83 @@ class OpenAI(BaseAPIModel):
                             return reasoning_content
                     else:
                         return content.strip()
+            except requests.ConnectionError:
+                self.logger.error('Got connection error, retrying...')
+            except requests.JSONDecodeError:
+                self.logger.error(f'JsonDecode error, got status code '
+                                  f'{raw_response.status_code}, response: '
+                                  f'{raw_response.content.decode()}')
             except KeyError:
                 if 'error' in response:
                     if response['error']['code'] == 'rate_limit_exceeded':
                         time.sleep(10)
-                        self.logger.warn('Rate limit exceeded, retrying...')
+                        self.logger.warning('Rate limit exceeded, retrying...')
                         continue
                     elif response['error']['code'] == 'insufficient_quota':
                         self.invalid_keys.add(key)
-                        self.logger.warn(f'insufficient_quota key: {key}')
+                        self.logger.warning(f'insufficient_quota key: {key}')
                         continue
                     elif response['error']['code'] == 'invalid_prompt':
-                        self.logger.warn('Invalid prompt:', str(input))
+                        self.logger.warning('Invalid prompt:', str(input))
                         return ''
                     elif response['error']['type'] == 'invalid_prompt':
-                        self.logger.warn('Invalid prompt:', str(input))
+                        self.logger.warning('Invalid prompt:', str(input))
                         return ''
 
                     self.logger.error(
                         'Find error message in response: ',
                         str(response['error']),
                     )
+            finally:
+                self.release()
             max_num_retries += 1
 
         raise RuntimeError('Calling OpenAI failed after retrying for '
                            f'{max_num_retries} times. Check the logs for '
                            'details.')
+
+    def _init_tokenizer(self):
+        import tiktoken
+
+        # Try to load tiktoken encoder at first.
+        if self.tokenizer_path in tiktoken.model.MODEL_TO_ENCODING:
+            try:
+                if self.verbose:
+                    self.logger.info(
+                        f'Start load tiktoken encoding: {self.tokenizer_path}')
+                self.tokenizer = tiktoken.encoding_for_model(
+                    self.tokenizer_path)
+                self.tokenizer_type = 'tiktoken'
+                if self.verbose:
+                    self.logger.info('Successfully load tiktoken '
+                                     f'encoding: {self.tokenizer_path}')
+                return
+            except Exception as e:
+                self.logger.warn(f'Failed to load tiktoken encoder: {repr(e)}')
+
+        # Try to load hf tokenizer then.
+        from transformers import AutoTokenizer
+        try:
+            if self.verbose:
+                self.logger.info(
+                    f'Start load hf tokenizer: {self.tokenizer_path}')
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.tokenizer_path, trust_remote_code=True)
+            self.tokenizer_type = 'hf'
+            if self.verbose:
+                self.logger.info(
+                    f'Successfully load hf tokenizer: {self.tokenizer_path}')
+            return
+        except Exception as e:
+            self.logger.warning(f'Failed to load hf tokenizer: {repr(e)}')
+
+        # Fallback to gpt-4 tokenizer
+        if self.verbose:
+            self.logger.info('Start load tiktoken encoding: gpt-4')
+        self.tokenizer = tiktoken.encoding_for_model('gpt-4')
+        self.tokenizer_type = 'tiktoken'
+        if self.verbose:
+            self.logger.info('Successfully load tiktoken encoding: gpt-4')
 
     def get_token_len(self, prompt: str) -> int:
         """Get lengths of the tokenized string. Only English and Chinese
@@ -394,48 +467,12 @@ class OpenAI(BaseAPIModel):
         Returns:
             int: Length of the input tokens
         """
-        assert self.tokenizer_path or self.path
-        try:
-            if self.verbose:
-                self.logger.info(f'Used tokenizer_path: {self.tokenizer_path}')
-            tokenizer_path = (self.tokenizer_path
-                              if self.tokenizer_path else self.path)
-            try:
-                if self.verbose:
-                    self.logger.info(
-                        f'Start load tiktoken encoding: {tokenizer_path}')
-                enc = self.tiktoken.encoding_for_model(tokenizer_path)
-                if self.verbose:
-                    self.logger.info(
-                        f'Successfully tiktoken encoding: {tokenizer_path}')
-                return len(enc.encode(prompt, disallowed_special=()))
-            except Exception as e:
-                self.logger.warn(f'{e}, tiktoken encoding cannot load '
-                                 f'{tokenizer_path}')
-                from transformers import AutoTokenizer
-
-                if self.hf_tokenizer is None:
-                    if self.verbose:
-                        self.logger.info(
-                            f'Start load hf tokenizer: {tokenizer_path}')
-                    self.hf_tokenizer = AutoTokenizer.from_pretrained(
-                        tokenizer_path, trust_remote_code=True)
-                    self.logger.info(
-                        f'Successfully load HF Tokenizer from {tokenizer_path}'
-                    )
-                return len(self.hf_tokenizer(prompt).input_ids)
-        except Exception:
-            self.logger.warn(
-                'Can not get tokenizer automatically, '
-                'will use default tokenizer gpt-4 for length calculation.')
-            default_tokenizer = 'gpt-4'
-
-            enc = self.tiktoken.encoding_for_model(default_tokenizer)
-            if self.verbose:
-                self.logger.info(
-                    f'Successfully load default tiktoken tokenizer: '
-                    f' {default_tokenizer}')
-            return len(enc.encode(prompt, disallowed_special=()))
+        if self.tokenizer_type == 'tiktoken':
+            return len(self.tokenizer.encode(prompt, disallowed_special=()))
+        elif self.tokenizer_type == 'hf':
+            return len(self.tokenizer(prompt).input_ids)
+        else:
+            raise RuntimeError('No tokenizer to get token length.')
 
     def _bin_trim(self, prompt: str, num_token: int, mode: str) -> str:
         """Get a suffix of prompt which is no longer than num_token tokens.
@@ -506,9 +543,11 @@ class OpenAI(BaseAPIModel):
         """
         # Check input length when mode is 'none'
         if mode == 'none':
-            input_len = (get_token_len_func(input) if isinstance(
+            input_len = get_token_len_func(input) if isinstance(
                 input, str) else sum(
-                    get_token_len_func(item['prompt']) for item in input))
+                    get_token_len_func(item['prompt'] if 'prompt' in
+                                       item else item['content'])
+                    for item in input)
             if input_len > max_seq_len:
                 raise ValueError(
                     f'Input length ({input_len}) exceeds max_seq_len '
@@ -522,30 +561,42 @@ class OpenAI(BaseAPIModel):
                 trim_length -= max_out_len
             return self._bin_trim(text, trim_length, mode)
 
-        if isinstance(input, str) and mode != 'none':
-            input = bin_trim_wrapper(input)
-        # Convert input to messages format
-        if isinstance(input, str):
-            messages = [{'role': 'user', 'content': input}]
-            input_len = get_token_len_func(input)
-        else:
-            messages = []
-            processed_prompts = []
-            for item in input:
-                input_content = item['prompt']
-                if mode != 'none':
-                    input_content = bin_trim_wrapper(input_content)
-                processed_prompts.append(input_content)
-                msg = {'content': input_content}
-                if item['role'] == 'HUMAN':
-                    msg['role'] = 'user'
-                elif item['role'] == 'BOT':
-                    msg['role'] = 'assistant'
-                elif item['role'] == 'SYSTEM':
-                    msg['role'] = 'system'
-                messages.append(msg)
+        if isinstance(input, list) and len(input) > 0 and all(
+                'role' in single_input and single_input['role'] in CHATML_ROLE
+                for single_input in input):
+
+            if mode != 'none':
+                for i in range(len(input)):
+                    input[i]['content'] = bin_trim_wrapper(input[i]['content'])
             input_len = sum(
-                get_token_len_func(prompt) for prompt in processed_prompts)
+                get_token_len_func(item['content']) for item in input)
+            messages = input
+
+        else:
+            if isinstance(input, str) and mode != 'none':
+                input = bin_trim_wrapper(input)
+            # Convert input to messages format
+            if isinstance(input, str):
+                messages = [{'role': 'user', 'content': input}]
+                input_len = get_token_len_func(input)
+            else:
+                messages = []
+                processed_prompts = []
+                for item in input:
+                    input_content = item['prompt']
+                    if mode != 'none':
+                        input_content = bin_trim_wrapper(input_content)
+                    processed_prompts.append(input_content)
+                    msg = {'content': input_content}
+                    if item['role'] == 'HUMAN':
+                        msg['role'] = 'user'
+                    elif item['role'] == 'BOT':
+                        msg['role'] = 'assistant'
+                    elif item['role'] == 'SYSTEM':
+                        msg['role'] = 'system'
+                    messages.append(msg)
+                input_len = sum(
+                    get_token_len_func(prompt) for prompt in processed_prompts)
 
         # Adjust max_out_len
         if max_out_len is not None:
@@ -565,7 +616,247 @@ class OpenAI(BaseAPIModel):
         return messages, max_out_len
 
 
+@MODELS.register_module()
 class OpenAISDK(OpenAI):
+
+    def __init__(
+        self,
+        path: str = 'gpt-3.5-turbo',
+        max_seq_len: int = 16384,
+        query_per_second: int = 1,
+        rpm_verbose: bool = False,
+        retry: int = 2,
+        key: str = 'ENV',
+        org: str | List[str] | None = None,
+        meta_template: Dict | None = None,
+        openai_api_base: str | List[str] = OPENAISDK_API_BASE,
+        openai_proxy_url: Optional[str] = None,
+        mode: str = 'none',
+        logprobs: bool | None = False,
+        top_logprobs: int | None = None,
+        temperature: float | None = None,
+        tokenizer_path: str | None = None,
+        extra_body: Dict | None = None,
+        verbose: bool = False,
+        http_client_cfg: dict = {},
+        status_code_mappings: dict = {},
+        think_tag: str = '</think>',
+        max_workers: Optional[int] = None,
+        openai_extra_kwargs: Dict | None = None,
+        timeout: int = 3600,
+    ):
+        super().__init__(
+            path,
+            max_seq_len,
+            query_per_second,
+            rpm_verbose,
+            retry,
+            key,
+            org,
+            meta_template,
+            openai_api_base,
+            openai_proxy_url,
+            mode,
+            logprobs,
+            top_logprobs,
+            temperature,
+            tokenizer_path,
+            extra_body,
+            verbose=verbose,
+            max_workers=max_workers,
+        )
+        # support multiple api_base for acceleration
+        if isinstance(openai_api_base, List):
+            self.openai_api_base = random.choice(openai_api_base)
+        else:
+            self.openai_api_base = openai_api_base
+
+        self.timeout = timeout
+        self.http_client_cfg = http_client_cfg
+        self.openai_client = self._create_fresh_client()
+
+        if self.verbose:
+            self.logger.info(f'Used openai_client: {self.openai_client}')
+        self.status_code_mappings = status_code_mappings
+        self.think_tag = think_tag
+        self.openai_extra_kwargs = openai_extra_kwargs
+
+    def _create_fresh_client(self):
+        """Create a fresh OpenAI client."""
+        import httpx
+        from openai import OpenAI
+
+        # Get current key (with key rotation)
+        current_key = self._next_valid_key()
+
+        # Create fresh client with current key
+        http_client_cfg = self.http_client_cfg.copy()
+        set_proxy_cfg(http_client_cfg, self.proxy_url)
+        limits = httpx.Limits(max_keepalive_connections=2048,
+                              max_connections=4096)
+        http_client = httpx.Client(**http_client_cfg,
+                                   timeout=httpx.Timeout(self.timeout),
+                                   limits=limits)
+
+        return OpenAI(base_url=self.openai_api_base,
+                      api_key=current_key,
+                      http_client=http_client)
+
+    def _generate(
+        self,
+        input: PromptList | str,
+        max_out_len: int,
+        temperature: float,
+        # timeout: int = 3600,
+    ) -> str:
+        """Generate results given a list of inputs.
+
+        Args:
+            input (PromptType): A string or PromptDict.
+            max_out_len (int): The maximum length of the output.
+            temperature (float): What sampling temperature to use.
+            timeout (int, optional): Timeout in seconds for the API call.
+                Defaults to 3600 (60 minutes).
+
+        Returns:
+            str: The generated string.
+        """
+        from openai import APIStatusError, BadRequestError
+        assert isinstance(input, (str, list, PromptList))
+
+        messages, max_out_len = self._preprocess_messages(
+            input, max_out_len, self.max_seq_len, self.mode,
+            self.get_token_len)
+
+        num_retries = 0
+        while num_retries < self.retry:
+            if any(model in self.path for model in OAI_REASONING_MODEL_LIST):
+                self.logger.warning(
+                    f"'max_token' is unsupported for model {self.path}")
+                self.logger.warning(
+                    f'We use max_out_len: {max_out_len} for this query')
+                query_data = dict(
+                    model=self.path,
+                    max_completion_tokens=max_out_len,
+                    n=1,
+                    messages=messages,
+                    extra_body=self.extra_body,
+                )
+            else:
+                query_data = dict(
+                    model=self.path,
+                    max_tokens=max_out_len,
+                    n=1,
+                    temperature=self.temperature,
+                    messages=messages,
+                    extra_body=self.extra_body,
+                )
+
+            if self.openai_extra_kwargs:
+                query_data.update(self.openai_extra_kwargs)
+
+            self.acquire()
+            try:
+                if self.verbose:
+                    self.logger.info('Start calling OpenAI API')
+
+                responses = self.openai_client.chat.completions.create(
+                    **query_data, timeout=self.timeout)  # timeout in seconds
+                if self.verbose:
+                    self.logger.info(
+                        'Successfully get response from OpenAI API '
+                        'with query: %s', query_data)
+                    try:
+                        self.logger.info(responses)
+                    except Exception:
+                        pass  # noqa F841
+                # Check if response is empty or content is empty
+                if (not responses.choices or not responses.choices[0].message
+                        or
+                    (not responses.choices[0].message.content and not getattr(
+                        responses.choices[0].message,
+                        'reasoning_content',
+                        '',
+                    ))):  # noqa: E125
+                    # There is case that server does not return any content
+                    if responses.choices[0].finish_reason == 'stop':
+                        self.logger.info(
+                            'Server does not return any content '
+                            'and stop reason is <stop>, '
+                            'the input query is: %s', query_data)
+                        return ''
+                    if responses.choices[0].finish_reason == 'content_filter':
+                        self.logger.info(
+                            'The answer for this question is filtered,'
+                            'the stop reason is <content_filter>, '
+                            'the input query is: %s', query_data)
+                        return ''
+                    self.logger.error(
+                        'Failed to extract content from the responses. '
+                        'Please check the API response for detail information.'
+                        'API responses: %s',
+                        responses,
+                    )
+                    num_retries += 1
+                    continue
+
+                reasoning_content = (getattr(responses.choices[0].message,
+                                             'reasoning_content', '') or '')
+                content = responses.choices[0].message.content or ''
+                # Concat Reasoning Content and tags to content
+                if reasoning_content:
+                    if self.verbose:
+                        self.logger.info(
+                            'Follow'
+                            'vllm/reasoning/deepseek_r1_reasoning_parser'
+                            'to parse the reasoning content and tags'
+                            'Reasoning Content: %s, \n'
+                            'Tags: %s, \n'
+                            'Content: %s',
+                            reasoning_content,
+                            self.think_tag,
+                            content,
+                        )
+                    if content:
+                        return reasoning_content + self.think_tag + content
+                    else:
+                        return reasoning_content
+
+                else:
+                    return content
+
+            except (BadRequestError, APIStatusError) as e:
+                # Handle BadRequest status
+                # You can specify self.status_code_mappings to bypass \
+                # API sensitivity blocks
+                # For example: status_code_mappings={400: 'Input data \
+                # may contain inappropriate content.'}
+                status_code = e.status_code
+                if (status_code is not None
+                        and status_code in self.status_code_mappings):
+                    error_message = self.status_code_mappings[status_code]
+                    self.logger.error(
+                        f'error occurs at {self.openai_api_base}')
+                    self.logger.info(f'Status Code: {status_code}, \n'
+                                     f'Original Error Message: {e}, \n'
+                                     f'Return Message: {error_message} ')
+                    return error_message
+                else:
+                    self.logger.error(
+                        f'error occurs at {self.openai_api_base}')
+                    self.logger.error(e)
+            except Exception as e:
+                self.logger.error(f'error occurs at {self.openai_api_base}')
+                self.logger.error(e)
+            finally:
+                self.release()
+            num_retries += 1
+        raise RuntimeError('Calling OpenAI API failed after retrying for '
+                           f'{self.retry} times. Check the logs for details.')
+
+
+@MODELS.register_module()
+class OpenAISDKRollout(OpenAI):
 
     def __init__(
         self,
@@ -695,12 +986,41 @@ class OpenAISDK(OpenAI):
             if self.openai_extra_kwargs:
                 query_data.update(self.openai_extra_kwargs)
 
+            self.acquire()
             try:
                 if self.verbose:
                     self.logger.info('Start calling OpenAI API')
 
                 responses = self.openai_client.chat.completions.create(
-                    **query_data, timeout=timeout)  # timeout in seconds
+                    **query_data,
+                    timeout=timeout,
+                    logprobs=True,
+                    top_logprobs=self.top_logprobs)  # timeout in seconds
+
+                if not responses.choices[0].logprobs or not responses.choices[
+                        0].logprobs.content:
+                    token_logprobs = None
+                    sum_neg_logprob = 0.0
+                    num_tokens = 0
+                else:
+                    token_logprobs = [
+                        c.logprob
+                        for c in responses.choices[0].logprobs.content
+                    ]
+                    sum_neg_logprob = -float(sum(token_logprobs))
+                    num_tokens = len(token_logprobs)
+
+                if not responses.choices[0].finish_reason:
+                    finish_reason = 'error'
+                else:
+                    finish_reason = responses.choices[0].finish_reason
+                rollout = dict(
+                    token_logprobs=token_logprobs,
+                    sum_neg_logprob=sum_neg_logprob,
+                    num_tokens=num_tokens,
+                    finish_reason=finish_reason,
+                )
+
                 if self.verbose:
                     self.logger.info(
                         'Successfully get response from OpenAI API '
@@ -726,7 +1046,7 @@ class OpenAISDK(OpenAI):
                         return ''
                     if responses.choices[0].finish_reason == 'content_filter':
                         self.logger.info(
-                            'The answer for this question is filted,'
+                            'The answer for this question is filtered,'
                             'the stop reason is <content_filter>, '
                             'the input query is: %s', query_data)
                         return ''
@@ -757,12 +1077,15 @@ class OpenAISDK(OpenAI):
                             content,
                         )
                     if content:
-                        return reasoning_content + self.think_tag + content
+                        return dict(prediction=reasoning_content +
+                                    self.think_tag + content,
+                                    rollout=rollout)
                     else:
-                        return reasoning_content
+                        return dict(prediction=reasoning_content,
+                                    rollout=rollout)
 
                 else:
-                    return content
+                    return dict(prediction=content, rollout=rollout)
 
             except (BadRequestError, APIStatusError) as e:
                 # Handle BadRequest status
@@ -779,7 +1102,11 @@ class OpenAISDK(OpenAI):
                     self.logger.info(f'Status Code: {status_code}, \n'
                                      f'Original Error Message: {e}, \n'
                                      f'Return Message: {error_message} ')
-                    return error_message
+                    rollout_error = dict(token_logprobs=[None],
+                                         sum_neg_logprob=0.0,
+                                         num_tokens=0,
+                                         finish_reason='error')
+                    return dict(output=error_message, rollout=rollout_error)
                 else:
                     self.logger.error(
                         f'error occurs at {self.openai_api_base}')
@@ -787,6 +1114,8 @@ class OpenAISDK(OpenAI):
             except Exception as e:
                 self.logger.error(f'error occurs at {self.openai_api_base}')
                 self.logger.error(e)
+            finally:
+                self.release()
             num_retries += 1
         raise RuntimeError('Calling OpenAI API failed after retrying for '
                            f'{self.retry} times. Check the logs for details.')

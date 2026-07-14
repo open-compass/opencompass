@@ -64,7 +64,6 @@ class TurboMindModelwithChatTemplate(BaseModel):
             else:
                 raise ValueError(f'expected Dict or ConfigDict engine_config but got {type(engine_config)}')
 
-            _engine_config.update(engine_config.to_dict())
             self.pipe = self._build_pipe(path, backend, _engine_config)
         else:
             self.pipe = None
