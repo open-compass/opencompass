@@ -27,7 +27,7 @@ for difficulty in TACO_difficulties_list:
         dict(
             type=TACODataset,
             abbr='TACO-' + difficulty,
-            path='./data/BAAI-TACO',
+            path='BAAI/TACO',
             difficulty=difficulty,
             reader_cfg=TACO_reader_cfg,
             infer_cfg=TACO_infer_cfg,
