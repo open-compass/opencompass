@@ -13,6 +13,12 @@ from .math_equivalence import is_equiv
 from .post_process import parse_math_answer
 
 
+def _format_label(label):
+    if isinstance(label, list):
+        return ''.join(map(str, label))
+    return label if label is None else str(label)
+
+
 @LOAD_DATASET.register_module()
 class AGIEvalDataset(BaseDataset):
 
@@ -56,10 +62,9 @@ class AGIEvalDataset_v2(BaseDataset):
                         label = eval(item['label'])
                     except Exception:
                         label = item['label']
-                    if isinstance(label, list):
-                        label = ''.join(label)
                 else:
                     label = item['answer']
+                label = _format_label(label)
                 d = {'question': question, 'options': options, 'label': label}
                 dataset.append(d)
             dataset = Dataset.from_list(dataset)
@@ -73,12 +78,10 @@ class AGIEvalDataset_v2(BaseDataset):
                 question = passage + item['question']
                 options = '\n'.join(item['options']) if item['options'] else ''
                 if item['label']:
-                    if isinstance(item['label'], list):
-                        label = ''.join(item['label'])
-                    else:
-                        label = item['label']
+                    label = item['label']
                 else:
                     label = item['answer']
+                label = _format_label(label)
                 d = {'question': question, 'options': options, 'label': label}
                 dataset.append(d)
             dataset = Dataset.from_list(dataset)
