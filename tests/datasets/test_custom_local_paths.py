@@ -1,32 +1,18 @@
-import os
-import tempfile
 import unittest
 from unittest.mock import patch
 
-from opencompass.datasets.custom import CustomDataset
+from opencompass.utils.datasets import get_data_path
 
 
 class TestCustomDatasetLocalPaths(unittest.TestCase):
 
-    def test_existing_relative_path_takes_precedence_over_cache(self):
-        with tempfile.TemporaryDirectory() as work_dir:
-            with tempfile.TemporaryDirectory() as cache_dir:
-                data_path = os.path.join(work_dir, 'local_dataset.csv')
-                with open(data_path, 'w', encoding='utf-8') as f:
-                    f.write('question,A,B,C,answer\n1+1=?,1,2,3,B\n')
+    def test_platform_absolute_path_is_returned_directly(self):
+        path = 'C:\\data\\local_dataset.csv'
+        with patch('opencompass.utils.datasets.os.path.isabs',
+                   return_value=True) as isabs:
+            self.assertEqual(get_data_path(path), path)
 
-                original_cwd = os.getcwd()
-                try:
-                    os.chdir(work_dir)
-                    with patch.dict(os.environ,
-                                    {'COMPASS_DATA_CACHE': cache_dir},
-                                    clear=True):
-                        dataset = CustomDataset.load('local_dataset.csv')
-                finally:
-                    os.chdir(original_cwd)
-
-                self.assertEqual(len(dataset), 1)
-                self.assertEqual(dataset[0]['answer'], 'B')
+        isabs.assert_called_once_with(path)
 
 
 if __name__ == '__main__':

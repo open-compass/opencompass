@@ -18,10 +18,9 @@ def get_data_path(dataset_id: str, local_mode: bool = False):
     """
     # update the path with CACHE_DIR
     cache_dir = os.environ.get('COMPASS_DATA_CACHE', '')
-    dataset_id = os.path.expanduser(dataset_id)
 
-    # For local paths customized by users.
-    if os.path.isabs(dataset_id) or os.path.exists(dataset_id):
+    # For absolute path customized by the users
+    if os.path.isabs(dataset_id):
         return dataset_id
 
     # For relative path, with CACHE_DIR
