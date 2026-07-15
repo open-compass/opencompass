@@ -88,8 +88,11 @@ class BaseInferencer:
         raise NotImplementedError("Method hasn't been implemented yet")
 
     @staticmethod
-    def get_dataloader(datalist: List[List], batch_size: int) -> DataLoader:
+    def get_dataloader(datalist: List[List],
+                       batch_size: Optional[int]) -> DataLoader:
         """Return a dataloader of the input data list."""
+        if batch_size is None:
+            batch_size = 1
         dataloader = DataLoader(datalist,
                                 batch_size=batch_size,
                                 collate_fn=lambda x: x)
