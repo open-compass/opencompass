@@ -3,7 +3,7 @@ from copy import deepcopy
 from mmengine.config import read_base
 
 with read_base():
-    from opencompass.configs.datasets.agieval.agieval_gen_64afd3 import \
+    from opencompass.configs.datasets.agieval.agieval_gen_f84832 import \
         agieval_datasets
     from opencompass.configs.datasets.bbh.bbh_gen_5b92b0 import bbh_datasets
     from opencompass.configs.datasets.gsm8k.gsm8k_gen_1d7fe4 import \
