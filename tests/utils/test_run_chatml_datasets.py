@@ -314,6 +314,13 @@ class TestConstructChatMLDatasets(unittest.TestCase):
         self.assertEqual(converted['pred_postprocessor'],
                          dict(type='extract_non_reasoning_content'))
 
+    def test_normalize_config_arg_treats_whitespace_as_missing(self):
+        self.assertIsNone(self.run_module._normalize_config_arg(' '))
+        self.assertIsNone(self.run_module._normalize_config_arg('\t\n'))
+        self.assertEqual(self.run_module._normalize_config_arg(' config.py '),
+                         'config.py')
+        self.assertIsNone(self.run_module._normalize_config_arg(None))
+
 
 if __name__ == '__main__':
     unittest.main()
