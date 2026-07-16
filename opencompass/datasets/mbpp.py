@@ -149,23 +149,6 @@ class SanitizedMBPPDataset(BaseDataset):
 class MBPPPlusDataset(BaseDataset):
 
     @staticmethod
-    def _extract_text_from_prompt(prompt: str) -> str:
-        prompt = prompt.strip()
-        for quote in ('"""', "'''"):
-            if prompt.startswith(quote) and prompt.endswith(quote):
-                prompt = prompt[len(quote):-len(quote)].strip()
-                break
-
-        lines = []
-        for line in prompt.splitlines():
-            line = line.strip()
-            if line.startswith('assert '):
-                break
-            if line:
-                lines.append(line)
-        return '\n'.join(lines) if lines else prompt
-
-    @staticmethod
     def load(path: str, num_repeats: int = 1):
         """Load mbpp dataset for pass k mode. Note that you can use
         num_repeats.
@@ -187,29 +170,12 @@ class MBPPPlusDataset(BaseDataset):
         path = get_data_path(path)
 
         def processing_test(example):
-            if 'text' in example:
-                text = example['text']
-            else:
-                text = MBPPPlusDataset._extract_text_from_prompt(
-                    example['prompt'])
-
-            if 'test_list' in example:
-                test_list = example['test_list']
-            else:
-                test_list = example['assertion']
-            if isinstance(test_list, str):
-                test_list = [
-                    line.strip() for line in test_list.splitlines()
-                    if line.strip()
-                ]
-            test_list_text = '\n'.join(test_list)
-            return dict(task_id=example['task_id'],
-                        text=text,
-                        test_case=test_list,
-                        test_list=test_list_text,
-                        test_list_2=test_list_text,
-                        test_column=dict(test_list_2=test_list_text,
-                                         task_id=example['task_id']))
+            example['test_case'] = example['test_list']
+            example['test_list'] = '\n'.join(example['test_list'])
+            example['test_list_2'] = example['test_list']
+            example['test_column'] = dict(test_list_2=example['test_list'],
+                                          task_id=example['task_id'])
+            return example
 
         dataset = []
         with open(path, 'r', encoding='utf-8') as f:

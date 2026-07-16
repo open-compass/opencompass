@@ -771,7 +771,7 @@ DATASETS_URL = {
     "/mbpp_plus/": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_plus.zip",
-        "md5": "37ffeb7ec08b5b8b2e1efa45863fa32f",
+        "md5": "a1a2207e449462849024660b29e67dde",
     },
     "/mbpp/": {
         "url":
