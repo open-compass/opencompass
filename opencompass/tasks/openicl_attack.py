@@ -126,25 +126,18 @@ class OpenICLAttackTask(BaseTask):
         out_dir, out_file = osp.split(out_path)
         mkdir_or_exist(out_dir)
 
-        from config import LABEL_SET
-        from prompt_attack.attack import create_attack
-        from prompt_attack.goal_function import PromptGoalFunction
+        from promptbench.prompt_attack import LABEL_SET, Attack, attack_config
 
         inferencer.retriever = retriever
         inferencer.prompt_template = prompt_template
         inferencer.ice_template = ice_template
         inferencer.output_json_filepath = out_dir
         inferencer.output_json_filename = out_file
-        goal_function = PromptGoalFunction(
-            inference=inferencer,
-            query_budget=self.cfg['attack'].query_budget,
-            logger=self.logger,
-            model_wrapper=None,
-            verbose='True')
         if self.cfg['attack']['dataset'] not in LABEL_SET:
             # set default
             self.cfg['attack']['dataset'] = 'mmlu'
-        attack = create_attack(self.cfg['attack'], goal_function)
+        attack_config['goal_function']['query_budget'] = self.cfg[
+            'attack'].query_budget
 
         prompts = self.infer_cfg['inferencer']['original_prompt_list']
         sorted_prompts = self.prompt_selection(inferencer, prompts)
@@ -160,8 +153,17 @@ class OpenICLAttackTask(BaseTask):
         for init_prompt, init_acc in sorted_prompts[:self.cfg['attack'].
                                                     prompt_topk]:
             if init_acc > 0:
-                init_acc, attacked_prompt, attacked_acc, dropped_acc = attack.attack(  # noqa
-                    init_prompt)
+                attack = Attack(
+                    model=self.model,
+                    attack_name=self.cfg['attack'].attack,
+                    dataset=self.cfg['attack'].dataset,
+                    prompt=init_prompt,
+                    eval_func=lambda prompt, _, __: inferencer.predict(prompt),
+                    verbose=True)
+                attack_result = attack.attack()
+                attacked_prompt = attack_result['attacked prompt']
+                attacked_acc = attack_result['attacked score']
+                dropped_acc = init_acc - attacked_acc
                 self.logger.info('Original prompt: {}'.format(init_prompt))
                 self.logger.info('Attacked prompt: {}'.format(
                     attacked_prompt.encode('utf-8')))
