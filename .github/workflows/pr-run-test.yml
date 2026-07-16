@@ -101,7 +101,7 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           python3 -m pip uninstall opencompass -y
           conda info --envs
-          rjob stop job --namespace=ailab-llmeval ${{ env.JOB_NAME }}
+          rjob stop --namespace=ailab-llmeval ${{ env.JOB_NAME }}
 
   mock_api_test:
     runs-on: yidian_cu12
@@ -192,4 +192,4 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           python3 -m pip uninstall opencompass -y
           conda info --envs
-          rjob stop job --namespace=ailab-llmeval ${{ env.JOB_NAME }}
+          rjob stop --namespace=ailab-llmeval ${{ env.JOB_NAME }}
