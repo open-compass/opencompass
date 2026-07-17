@@ -125,6 +125,7 @@ class OpenICLAttackTask(BaseTask):
                                          osp.join(self.work_dir, 'attack'))
         out_dir, out_file = osp.split(out_path)
         mkdir_or_exist(out_dir)
+        attack_log_path = osp.join(out_dir, 'attacklog.txt')
 
         from promptbench.prompt_attack import LABEL_SET, Attack, attack_config
 
@@ -146,7 +147,7 @@ class OpenICLAttackTask(BaseTask):
             for prompt, acc in sorted_prompts:
                 self.logger.info('Prompt: {}, acc: {:.2f}%\n'.format(
                     prompt, acc * 100))
-                with open(out_dir + 'attacklog.txt', 'a+') as f:
+                with open(attack_log_path, 'a+') as f:
                     f.write('Prompt: {}, acc: {:.2f}%\n'.format(
                         prompt, acc * 100))
 
@@ -171,7 +172,7 @@ class OpenICLAttackTask(BaseTask):
                     'Original acc: {:.2f}%, attacked acc: {:.2f}%, dropped acc: {:.2f}%'  # noqa
                     .format(init_acc * 100, attacked_acc * 100,
                             dropped_acc * 100))
-                with open(out_dir + 'attacklog.txt', 'a+') as f:
+                with open(attack_log_path, 'a+') as f:
                     f.write('Original prompt: {}\n'.format(init_prompt))
                     f.write('Attacked prompt: {}\n'.format(
                         attacked_prompt.encode('utf-8')))
@@ -180,7 +181,7 @@ class OpenICLAttackTask(BaseTask):
                         .format(init_acc * 100, attacked_acc * 100,
                                 dropped_acc * 100))
             else:
-                with open(out_dir + 'attacklog.txt', 'a+') as f:
+                with open(attack_log_path, 'a+') as f:
                     f.write('Init acc is 0, skip this prompt\n')
                     f.write('Original prompt: {}\n'.format(init_prompt))
                     f.write('Original acc: {:.2f}% \n\n'.format(init_acc *
@@ -206,4 +207,4 @@ if __name__ == '__main__':
     inferencer = OpenICLAttackTask(cfg)
     inferencer.run()
     end_time = time.time()
-    get_logger().info(f'time elapsed: {end_time - start_time:.2f}s')
+    get_logger().info('time elapsed: {:.2f}s'.format(end_time - start_time))
