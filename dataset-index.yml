@@ -40,6 +40,12 @@
     paper: https://arxiv.org/pdf/2406.10149
     configpath: opencompass/configs/datasets/babilong
     configpath_llmjudge: ''
+- aa_lcr:
+    name: AA-LCR
+    category: Long Context
+    paper: https://huggingface.co/datasets/ArtificialAnalysis/AA-LCR
+    configpath: opencompass/configs/datasets/aa_lcr/aa_lcr_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/aa_lcr/aa_lcr_gen.py
 - bigcodebench:
     name: BigCodeBench
     category: Code
