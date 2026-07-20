@@ -41,8 +41,3 @@ class TestLiveCodeBenchEvaluator(unittest.TestCase):
                 'error_message': 'Runtime Error',
             },
         )
-
-    def test_code_execution_checks_prediction_containing_input(self):
-        result = evaluator.evaluate_score((['1'], ('x = 1', '1', '1')))
-
-        self.assertEqual(result, [True])

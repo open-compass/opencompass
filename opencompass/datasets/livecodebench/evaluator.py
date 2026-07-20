@@ -340,9 +340,14 @@ def evaluate_score(args) -> list[bool]:
 
     execution_results = []
     for g in gs:
-        code_to_execute = f'{BASE_IMPORTS}\n{c}\nassert {o} == {g}'
-        execution_results.append(
-            codeexecute_check_correctness(code_to_execute, 3))
+        if i in g:
+            pass
+        else:
+            code_to_execute = f'{BASE_IMPORTS}\n{c}\nassert {o} == {g}'
+            execution_results.append(
+                codeexecute_check_correctness(code_to_execute, 3))
+    if len(execution_results) == 0:
+        execution_results = [False] * len(gs)
     return execution_results
 
 
