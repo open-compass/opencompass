@@ -63,6 +63,7 @@ model = HuggingFaceCausalLM(
 OpenCompass 目前支持以下基于 API 的模型推理：
 
 - OpenAI（`opencompass.models.OpenAI`）
+- LiteLLM - 100+ 供应商统一网关 (`opencompass.models.LiteLLMAPI`)
 - ChatGLM@智谱清言 (`opencompass.models.ZhiPuAI`)
 - ABAB-Chat@MiniMax (`opencompass.models.MiniMax`)
 - XunFei@科大讯飞 (`opencompass.models.XunFei`)

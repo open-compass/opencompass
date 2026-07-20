@@ -18,7 +18,8 @@ from io import StringIO
 from unittest.mock import mock_open, patch
 
 import numpy as np
-from datasets import Dataset, DatasetDict, load_from_disk
+from datasets import Dataset, DatasetDict
+from huggingface_hub import hf_hub_download
 
 try:
     from pyext import RuntimeModule
@@ -27,11 +28,22 @@ except ImportError:
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
-from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
 TIMEOUT = 10
+HF_TACO_PATH = 'BAAI/TACO'
+
+
+def _load_taco_dataset(path: str):
+    assert path == HF_TACO_PATH, \
+        f'TACODataset only supports the Hugging Face dataset {HF_TACO_PATH}.'
+    data_file = hf_hub_download(
+        repo_id=HF_TACO_PATH,
+        repo_type='dataset',
+        filename='test/data-00000-of-00001.arrow',
+    )
+    return DatasetDict({'test': Dataset.from_file(data_file)})
 
 
 @LOAD_DATASET.register_module()
@@ -39,8 +51,7 @@ class TACODataset(BaseDataset):
 
     @staticmethod
     def load(path: str, num_repeats: int = 1, difficulty='ALL'):
-        path = get_data_path(path, local_mode=True)
-        dataset = load_from_disk(path)
+        dataset = _load_taco_dataset(path)
         new_dataset = DatasetDict()
         # add new column "starter" in the prompt
         for split in dataset.keys():
@@ -504,7 +515,7 @@ def run_test(sample, test=None, debug=False):
                         nl = '\n'
                         if not isinstance(inputs, list):
                             print(
-                                f"not passed output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl,' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
+                                f"not passed output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl, ' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
                             )
                         else:
                             print(
@@ -583,7 +594,7 @@ def run_test(sample, test=None, debug=False):
                     nl = '\n'
                     if not isinstance(inputs, list):
                         print(
-                            f"output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl,' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
+                            f"output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl, ' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
                         )
                     else:
                         print(
@@ -688,7 +699,7 @@ def run_test(sample, test=None, debug=False):
                     nl = '\n'
                     if not isinstance(inputs, list):
                         print(
-                            f"output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl,' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
+                            f"output = {output}, test outputs = {in_outs['outputs'][index]}, inputs = {inputs.replace(nl, ' new-line ')}, {type(inputs)}, {output == [in_outs['outputs'][index]]}"  # noqa: E501
                         )
                     else:
                         print(
