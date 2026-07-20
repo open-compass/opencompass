@@ -62,6 +62,7 @@ from .ds1000_interpreter import *  # noqa: F401, F403
 from .Earth_Silver import *  # noqa: F401, F403
 from .eese.eese import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
+from .fake_alignment import *  # noqa: F401, F403
 from .FinanceIQ import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
