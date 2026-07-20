@@ -69,14 +69,12 @@ class MultiIFEvaluator(BaseEvaluator):
 
             for pred_list, refer in zip(predictions, references):
                 response = pred_list[t - 1]
-                kwargs = [
-                    {k: v for k, v in kw.items() if v is not None}
-                    for kw in refer[f'turn_{t}_kwargs']
-                ]
+                kwargs = [{k: v
+                           for k, v in kw.items() if v is not None}
+                          for kw in refer[f'turn_{t}_kwargs']]
                 inp = InputExample(
                     key=0,
-                    instruction_id_list=refer[
-                        f'turn_{t}_instruction_id_list'],
+                    instruction_id_list=refer[f'turn_{t}_instruction_id_list'],
                     prompt=refer[f'turn_{t}_prompt'],
                     kwargs=kwargs,
                 )
