@@ -270,6 +270,7 @@ class OpenAI(BaseAPIModel):
 
         max_num_retries = 0
         while max_num_retries < self.retry:
+            max_num_retries += 1
             key = self._next_valid_key()
 
             header = {
@@ -407,7 +408,6 @@ class OpenAI(BaseAPIModel):
                     )
             finally:
                 self.release()
-            max_num_retries += 1
 
         raise RuntimeError('Calling OpenAI failed after retrying for '
                            f'{max_num_retries} times. Check the logs for '

@@ -169,6 +169,29 @@ class TestOpenAI(unittest.TestCase):
         self.assertEqual(results[0], 'Generated response')
         self.assertEqual(mock_requests.post.call_count, 2)
 
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('opencompass.models.openai_api.requests.post')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_stops_after_retry_limit(self, mock_post,
+                                              mock_tiktoken):
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        rate_limited = MagicMock()
+        rate_limited.status_code = 429
+        rate_limited.content.decode.return_value = 'rate limited'
+        mock_post.side_effect = [
+            rate_limited,
+            rate_limited,
+            AssertionError('request exceeded retry limit'),
+        ]
+
+        model = OpenAI(path='gpt-3.5-turbo', retry=2)
+
+        with self.assertRaisesRegex(RuntimeError, 'after retrying for 2'):
+            model.generate(['Hello'], max_out_len=100)
+
 
 class TestOpenAISDK(unittest.TestCase):
     """Test cases for OpenAISDK."""
