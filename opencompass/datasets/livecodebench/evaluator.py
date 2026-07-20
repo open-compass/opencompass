@@ -45,16 +45,23 @@ def codegen_check_correctness(sample, generation, timeout, debug=True):
     p.start()
     p.join(timeout=(timeout + 1) *
            len(json.loads(sample['input_output'])['inputs']) + 5)
+    timed_out = p.is_alive()
     if p.is_alive():
         p.kill()
     if not result:
         in_outs = json.loads(sample['input_output'])
         # consider that all tests failed
-        result = [[-1 for i in range(len(in_outs['inputs']))]]
+        result = [-1 for i in range(len(in_outs['inputs']))]
+        metadata = {
+            'error_code': -3 if timed_out else -4,
+            'error_message':
+            ('Global Timeout' if timed_out else 'Runtime Error'),
+        }
         if debug:
             logger = get_logger()
-            logger.info('global timeout')
-    return result[0], metadata_list[0]
+            logger.info(metadata['error_message'])
+        return result, metadata
+    return result[0], metadata_list[0] if metadata_list else {}
 
 
 def evaluate_generations_by_problem(problem_generations: list, sample: list,
@@ -163,8 +170,9 @@ def evaluate_generations(
                 results[index], metadata[index] = future.result()
                 pbar.update(1)
 
-    assert len(results) == len(
-        inputs), f'results = {len(results)} inputs = {len(inputs)} {results=}'
+    assert len(results) == len(inputs), (
+        f'results = {len(results)} inputs = {len(inputs)} '
+        f'results = {results!r}')
     # results = {i: r for r, (_, i) in zip(results, inputs)}
 
     return results, metadata
@@ -223,8 +231,8 @@ def codegen_metrics(
         else:
             final_metadata[i] = [json.dumps(x) for x in final_metadata[i]]
 
-        assert len(final_metadata[i]) == len(
-            generations_list[0]), f'{len(final_metadata[i])=}'
+        assert len(final_metadata[i]) == len(generations_list[0]), (
+            f'len(final_metadata[i]) = {len(final_metadata[i])}')
 
     return [metrics, results, final_metadata]
 
