@@ -1,3 +1,4 @@
+import copy
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
@@ -37,6 +38,16 @@ class TurboMindAPIModel(BaseModel):
         end_str (str, optional): Whether to trim generated strings with end_str
             if the model has special ending strings that are not handled well.
             Defaults to None.
+        temperature (float, optional): What sampling temperature to use. If
+            set, overrides the temperature passed to ``generate``.
+        top_p (float, optional): Nucleus sampling parameter passed to the
+            lmdeploy server. Defaults to 0.8, matching the historical wrapper
+            behavior.
+        top_k (int, optional): Top-k sampling parameter passed to the lmdeploy
+            server. Defaults to 50, matching the historical wrapper behavior.
+        gen_config (Dict, optional): Extra generation parameters passed to
+            lmdeploy's completion API, such as ``random_seed``. Values in
+            ``gen_config`` override ``top_p`` and ``top_k`` defaults.
     """
 
     is_api: bool = True
@@ -49,6 +60,9 @@ class TurboMindAPIModel(BaseModel):
                  meta_template: Optional[Dict] = None,
                  end_str: Optional[str] = None,
                  temperature: float = None,
+                 top_p: Optional[float] = 0.8,
+                 top_k: Optional[int] = 50,
+                 gen_config: Optional[Dict] = None,
                  **kwargs):
         super().__init__(path='',
                          max_seq_len=max_seq_len,
@@ -66,6 +80,9 @@ class TurboMindAPIModel(BaseModel):
         self.ppl_addr = f'{api_addr.rstrip("/")}/get_ppl'
         self.end_str = end_str
         self.temperature = temperature
+        self.top_p = top_p
+        self.top_k = top_k
+        self.gen_config = dict(gen_config or {})
 
     def generate(
         self,
@@ -138,6 +155,19 @@ class TurboMindAPIModel(BaseModel):
         """
         return self.token_bucket.get_token()
 
+    def _get_generation_kwargs(self, max_out_len: int,
+                               temperature: float) -> tuple[int, Dict]:
+        gen_config = copy.deepcopy(self.gen_config)
+        gen_config.setdefault('temperature', temperature)
+        if self.top_p is not None:
+            gen_config.setdefault('top_p', self.top_p)
+        if self.top_k is not None:
+            gen_config.setdefault('top_k', self.top_k)
+        gen_config.setdefault('session_id', threading.current_thread().ident)
+        max_tokens = gen_config.pop(
+            'max_tokens', gen_config.pop('max_new_tokens', max_out_len))
+        return max_tokens, gen_config
+
     def _generate(self, prompt: PromptType, max_out_len: int,
                   temperature: float, end_str: str) -> str:
         """Generate results given a list of inputs.
@@ -158,15 +188,14 @@ class TurboMindAPIModel(BaseModel):
         assert type(
             prompt) is str, 'We only support string for TurboMind RPC API'
 
+        max_tokens, gen_kwargs = self._get_generation_kwargs(
+            max_out_len, temperature)
         response = ''
         for output in self.chatbot.completions_v1(
                 prompt=prompt,
                 model=self.model_name,
-                max_tokens=max_out_len,
-                temperature=temperature,
-                top_p=0.8,
-                top_k=50,
-                session_id=threading.currentThread().ident,
+                max_tokens=max_tokens,
+                **gen_kwargs,
         ):
             response += output['choices'][0]['text']
         response = valid_str(response)
