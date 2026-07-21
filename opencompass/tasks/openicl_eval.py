@@ -103,7 +103,7 @@ class OpenICLEvalTask(BaseTask):
         # Load predictions
         pred_dicts, pred_strs = self._load_predictions()
 
-        if all(
+        if pred_strs is not None and all(
                 isinstance(item, dict) and 'rollout' in item
                 for item in pred_strs):
             # Sum rollout
@@ -194,6 +194,9 @@ class OpenICLEvalTask(BaseTask):
 
     def _process_predictions(self, pred_strs):
         """Apply various processing steps to predictions."""
+        if pred_strs is None:
+            return pred_strs
+
         # Check if we're dealing with a list of lists (pred_list_flag)
         pred_list_flag = pred_strs is not None and isinstance(
             pred_strs[0], list)
@@ -317,7 +320,7 @@ class OpenICLEvalTask(BaseTask):
         if self.dump_details:
             # Get detailed results if available
             details = result.get('details', None)
-            if details is None:
+            if details is None and pred_strs is not None:
                 self.logger.info(
                     'Details is not give by evaluator, try to format it')
                 try:

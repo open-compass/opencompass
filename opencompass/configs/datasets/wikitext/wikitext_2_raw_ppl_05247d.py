@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.openicl.icl_inferencer import PPLOnlyInferencer
+from opencompass.openicl.icl_evaluator import AveragePPLEvaluator
 from opencompass.datasets import HFDataset
 
 
@@ -11,10 +11,10 @@ wikitext_infer_cfg = dict(
         template={0: '{text}'}
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer), # need a new ppl inferencer
+    inferencer=dict(type=PPLOnlyInferencer),
 )
 
-wikitext_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
+wikitext_eval_cfg = dict(evaluator=dict(type=AveragePPLEvaluator), )
 
 wikitext_2_raw_datasets = []
 for _split in ['validation', 'test']:
