@@ -312,6 +312,13 @@ def wildbench_postprocess(
         post_process=post_process_wildbench_pair,
     )
 
+    if not references:
+        return {
+            'warning':
+            'no valid wildbench judgements extracted (check judge output format)',
+            'details': output,
+        }
+
     if 'base_models' in references[0]:
         base_models = references[0]['base_models']
     else:
@@ -435,3 +442,64 @@ def wildbench_bradleyterry_postprocess(
     # results["details"] = output
 
     return results
+
+
+@LOAD_DATASET.register_module()
+class WildBenchWithRawPromptDataset(BaseDataset):
+
+    def load(self, path: str, K=-1, eval_mode='pair', *args, **kwargs):
+        path = get_data_path(path, local_mode=True)
+        raw_data = []
+        with open(path, 'r', encoding='utf-8') as file:
+            for line in file:
+                item = json.loads(line)
+                conversation = item['turn']
+
+                # Build dialogue with OpenAI-standard roles
+                chat_round = []
+                history = ''
+                for x in conversation[:-1]:
+                    if x['role'] == 'user':
+                        history += 'USER: ' + x['content'] + '\n\n'
+                    elif x['role'] == 'assistant':
+                        history += 'ASSISTANT: ' + x['content'] + '\n\n'
+                    chat_round.append({
+                        'role': x['role'],
+                        'content': x['content'],
+                    })
+                last_query = conversation[-1]['content']
+                chat_round.append({
+                    'role': conversation[-1]['role'],
+                    'content': conversation[-1]['content'],
+                })
+
+                # Build prompt (same logic as WildBenchDataset)
+                checklist_mardkdown = ''
+                for checklist_item in item['checklist']:
+                    checklist_mardkdown += f'- {checklist_item}\n'
+
+                if eval_mode == 'single':
+                    prompt = score_prompt
+                elif eval_mode == 'pair':
+                    prompt = pair_prompt
+                else:
+                    assert NotImplementedError(
+                        f'Eval mode {eval_mode} not in single or pair.')
+
+                prompt = prompt.replace('{history}', history)
+                prompt = prompt.replace('{user_query}', last_query)
+                prompt = prompt.replace('{checklist}', checklist_mardkdown)
+
+                raw_data.append({
+                    'dialogue': chat_round,
+                    'history': history,
+                    'prompt': prompt,
+                    'judge': {
+                        'other': None,
+                        'primary_tag': item['primary_tag'],
+                        'secondary_tag': item['secondary_tag'],
+                        'question_id': item['session_id'],
+                    },
+                })
+        dataset = Dataset.from_list(raw_data)
+        return dataset

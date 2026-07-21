@@ -10,7 +10,7 @@ CompassBench（官方自建榜单）经历了多次更新迭代，从2024年7月
 
 | 能力     | 任务介绍                                                                               | 评测方式            | 示例数据地址                                                                   |
 | -------- | -------------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------ |
-| 语言     | 评测模型在信息抽取、信息抽取、内容总结、对话、创作等多种任务上的能力                   | 主观评测            | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/language      |
+| 语言     | 评测模型在信息抽取、内容总结、对话、创作等多种任务上的能力                             | 主观评测            | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/language      |
 | 推理     | 评测模型在逻辑推理、常识推理、表格推理等多种日常推理任务上的能力                       | 主观评测            | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/reasoning     |
 | 知识     | 评测模型在理科、工科、人文社科等多个领域的知识水平                                     | 客观评测            | https://github.com/open-compass/CompassBench/tree/main/v1_3_data/knowledge     |
 | 数学     | 评测模型在数值计算、高中及大学难度的数学问题上的能力                                   | 客观评测            |  https://github.com/open-compass/CompassBench/tree/main/v1_3_data/math          |

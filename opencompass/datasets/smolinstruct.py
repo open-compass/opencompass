@@ -1,4 +1,5 @@
 # flake8: noqa: W605
+import random
 import re
 from collections import defaultdict
 

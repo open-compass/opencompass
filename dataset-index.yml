@@ -4,6 +4,12 @@
     paper: https://arxiv.org/pdf/2311.07911
     configpath: opencompass/configs/datasets/IFEval/IFEval_gen.py
     configpath_llmjudge: ''
+- inverse_ifeval:
+    name: Inverse IFEval
+    category: Instruction Following
+    paper: https://arxiv.org/abs/2509.04292
+    configpath: opencompass/configs/datasets/InverseIFEval/InverseIFEval_gen.py
+    configpath_llmjudge: ''
 - nphard:
     name: NPHardEval
     category: Reasoning
@@ -23,10 +29,10 @@
     configpath: opencompass/configs/datasets/PI_LLM/pi_llm_gen.py
     configpath_llmjudge: ''
 - theoremqa:
-    name: TheroremQA
+    name: TheoremQA
     category: Reasoning
     paper: https://arxiv.org/pdf/2305.12524
-    configpath: opencompass/configs/datasets/TheroremQA/TheoremQA_gen.py
+    configpath: opencompass/configs/datasets/TheoremQA/TheoremQA_gen.py
     configpath_llmjudge: ''
 - agieval:
     name: AGIEval
@@ -140,12 +146,12 @@
     paper: https://arxiv.org/abs/2406.12036
     configpath: opencompass/configs/datasets/MedCalc_Bench/MedCalcBench_official_gen_a5155f.py
     configpath_llmjudge: ''
-- MedXpertQA:
+- MedQA:
     name: MedQA
     category: Knowledge / Medicine
     paper: https://arxiv.org/abs/2009.13081
-    configpath: opencompass/configs/datasets/MedQA/MedQA_gen.py
-    configpath_llmjudge: opencompass/configs/datasets/MedQA/MedQA_llmjudge_gen.py
+    configpath: opencompass/configs/datasets/MedQA/MedQA_gen_3bf756.py
+    configpath_llmjudge: opencompass/configs/datasets/MedQA/MedQA_llmjudge_gen_3bf756.py
 - MedXpertQA:
     name: MedXpertQA
     category: Knowledge / Medicine
@@ -204,13 +210,19 @@
     name: AlpacaEval
     category: Subjective / Instruction Following
     paper: https://github.com/tatsu-lab/alpaca_eval
-    configpath: opencompass/configs/datasets/subjective/aplaca_eval
+    configpath: opencompass/configs/datasets/subjective/alpaca_eval
     configpath_llmjudge: ''
 - arenahard:
     name: Arena-Hard
     category: Subjective / Chatbot
     paper: https://lmsys.org/blog/2024-04-19-arena-hard/
     configpath: opencompass/configs/datasets/subjective/arena_hard
+    configpath_llmjudge: ''
+- elbench:
+    name: ELBench
+    category: Subjective / Education
+    paper: https://github.com/ZeroLoss-Lab/ELBench
+    configpath: opencompass/configs/datasets/subjective/elbench/elbench_gen.py
     configpath_llmjudge: ''
 - flames:
     name: FLAMES
@@ -262,6 +274,12 @@
       - opencompass/configs/datasets/teval/teval_en_gen.py
       - opencompass/configs/datasets/teval/teval_zh_gen.py
     configpath_llmjudge: ''
+- buysidefinbench:
+    name: BuySideFinBench
+    category: Knowledge / Finance
+    paper: https://huggingface.co/datasets/cindy90/BuySideFinBench
+    configpath: opencompass/configs/datasets/BuySideFinBench/BuySideFinBench_gen.py
+    configpath_llmjudge: ''
 - finalceiq:
     name: FinanceIQ
     category: Knowledge / Finance
@@ -305,10 +323,10 @@
     configpath:
     - opencompass/configs/datasets/adv_glue/adv_glue_mnli/adv_glue_mnli_gen.py
     - opencompass/configs/datasets/adv_glue/adv_glue_mnli_mm/adv_glue_mnli_mm_gen.py
-    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_qnli/adv_glue_qnli_gen.py
-    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_qqp/adv_glue_qqp_gen.py
-    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_rte/adv_glue_rte_gen.py
-    - opencompass/configs/datasets/adv_glue/adv_glue_mnli_sst2/adv_glue_sst2_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_qnli/adv_glue_qnli_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_qqp/adv_glue_qqp_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_rte/adv_glue_rte_gen.py
+    - opencompass/configs/datasets/adv_glue/adv_glue_sst2/adv_glue_sst2_gen.py
     configpath_llmjudge: ''
 - afqmcd:
     name: CLUE / AFQMC
@@ -319,7 +337,7 @@
 - aime2024:
     name: AIME2024
     category: Examination
-    paper: https://huggingface.co/datasets/Maxwell-Jia/AIME_2024
+    paper: https://matharena.ai/
     configpath: opencompass/configs/datasets/aime2024/aime2024_gen.py
     configpath_llmjudge: opencompass/configs/datasets/aime2024/aime2024_llmjudge_gen.py
 - anli:
@@ -358,6 +376,12 @@
     category: ARC-AGI
     paper: https://arcprize.org/guide#private
     configpath: opencompass/configs/datasets/ARC_Prize_Public_Evaluation/arc_prize_public_evaluation_gen.py
+    configpath_llmjudge: ''
+- arxivrollbench:
+    name: ArxivRollBench
+    category: Reasoning / Robustness
+    paper: https://ojs.aaai.org/index.php/AAAI/article/view/41098
+    configpath: opencompass/configs/datasets/arxivrollbench/arxivrollbench_gen.py
     configpath_llmjudge: ''
 - ax:
     name: SuperGLUE / AX
@@ -699,7 +723,7 @@
     name: MathBench
     category: Math
     paper: https://arxiv.org/pdf/2405.12209
-    configpath: opencompass/configs/datasets/mathbench/mathbench_gen.py
+    configpath: opencompass/configs/datasets/MathBench/mathbench_gen.py
     configpath_llmjudge: ''
 - mbpp:
     name: MBPP
@@ -741,8 +765,8 @@
     name: SciEval
     category: Understanding
     paper: https://arxiv.org/pdf/2308.13149
-    configpath: opencompass/configs/datasets/SciEval/SciEval_gen.py
-    configpath_llmjudge: opencompass/configs/datasets/SciEval/SciEval_llm_judge_gen.py
+    configpath: opencompass/configs/datasets/SciEval/SciEval_5shot_gen_4043d4.py
+    configpath_llmjudge: opencompass/configs/datasets/SciEval/SciEval_5shot_llmjudge_gen_b7b684.py
 - mmlu_cf:
     name: MMLU-CF
     category: Understanding
@@ -815,8 +839,8 @@
     name: ProteinLMBench
     category: Knowledge / Biology (Protein)
     paper: https://arxiv.org/abs/2406.05540
-    configpath: opencompass/configs/datasets/ProteinLMBench/ProteinLMBench_gen.py
-    configpath_llmjudge: opencompass/configs/datasets/ProteinLMBench/ProteinLMBench_llmjudge_gen.py
+    configpath: opencompass/configs/datasets/ProteinLMBench/ProteinLMBench_gen_a67965.py
+    configpath_llmjudge: opencompass/configs/datasets/ProteinLMBench/ProteinLMBench_llmjudge_gen_a67965.py
 - py150:
     name: py150
     category: Code
@@ -845,8 +869,8 @@
     name: R-Bench
     category: Reasoning
     paper: https://arxiv.org/pdf/2505.02018
-    configpath: opencompass/configs/datasets/R-Bench/rbench_gen_37cbaf8.py
-    configpath_llmjudge: ''
+    configpath: opencompass/configs/datasets/R_Bench/rbench_gen_544610.py
+    configpath_llmjudge: opencompass/configs/datasets/R_Bench/rbench_llmjudge_gen_c89350.py
 - realtoxicprompts:
     name: RealToxicPrompts
     category: Safety
@@ -1099,8 +1123,8 @@
     paper: https://arxiv.org/pdf/2410.16701
     configpath: ''
     configpath_llmjudge:
-        - opencompass/configs/datasets/ClimaQA/ClimaQA_Gold_llm_judge.py
-        - opencompass/configs/datasets/ClimaQA/ClimaQA_Silver_llm_judge.py
+        - opencompass/configs/datasets/ClimaQA/ClimaQA_Gold_llm_judge_gen.py
+        - opencompass/configs/datasets/ClimaQA/ClimaQA_Silver_llm_judge_gen.py
 - physics:
     name: PHYSICS
     category: Science
@@ -1152,7 +1176,7 @@
 - beyondaime:
     name: BeyondAIME
     category: Math
-    paper: ''
+    paper: https://huggingface.co/datasets/ByteDance-Seed/BeyondAIME
     configpath: opencompass/configs/datasets/BeyondAIME/beyondaime_gen.py
     configpath_llmjudge: ''
 - eese:
@@ -1161,3 +1185,217 @@
     paper: https://arxiv.org/abs/2507.16514
     configpath: opencompass/configs/datasets/eese/eese_llm_judge_gen.py
     configpath_llmjudge: opencompass/configs/datasets/eese/eese_llm_judge_gen.py
+- clbench:
+    name: CL-bench
+    category: Long Context
+    paper: https://arxiv.org/abs/2602.03587
+    configpath: ''
+    configpath_llmjudge:
+      - opencompass/configs/datasets/CLBench/clbench_llmjudge_rawprompt_gen_84a8f0.py
+      - opencompass/configs/datasets/CLBench/clbench_life_llmjudge_rawprompt_gen_84a8f0.py
+- cmphysbench:
+    name: CMPhysBench
+    category: Science /Physics
+    paper: https://arxiv.org/abs/2508.18124
+    configpath: opencompass/configs/datasets/CMPhysBench/cmphysbench_gen.py
+    configpath_llmjudge: ''
+- earth_silver:
+    name: Earth-Silver
+    category: Science
+    paper: https://arxiv.org/abs/2505.17139
+    configpath: opencompass/configs/datasets/Earth_Silver/Earth_Silver_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/Earth_Silver/Earth_Silver_llmjudge_gen.py
+- healthbench:
+    name: HealthBench
+    category: Knowledge / Medicine
+    paper: https://arxiv.org/abs/2505.08775
+    configpath: opencompass/configs/datasets/HealthBench/healthbench_gen_831613.py
+    configpath_llmjudge: ''
+- ifbench:
+    name: IFBench
+    category: Instruction Following
+    paper: https://arxiv.org/abs/2507.02833
+    configpath: opencompass/configs/datasets/IFBench/IFBench_gen.py
+    configpath_llmjudge: ''
+- molinstructions_chem:
+    name: Mol-Instructions (Chem)
+    category: Knowledge / Chemistry
+    paper: https://arxiv.org/abs/2306.08018
+    configpath: opencompass/configs/datasets/MolInstructions_chem/mol_instructions_chem_gen.py
+    configpath_llmjudge: ''
+- olympiadbench:
+    name: OlympiadBench
+    category: Math
+    paper: https://arxiv.org/abs/2402.14008
+    configpath: opencompass/configs/datasets/OlympiadBench/OlympiadBench_0shot_gen_be8b13.py
+    configpath_llmjudge: opencompass/configs/datasets/OlympiadBench/OlympiadBench_0shot_llmverify_gen_be8b13.py
+- processbench:
+    name: ProcessBench
+    category: Math
+    paper: https://arxiv.org/abs/2412.06559
+    configpath: opencompass/configs/datasets/ProcessBench/processbench_gen.py
+    configpath_llmjudge: ''
+- scireasoner:
+    name: SciReasoner
+    category: Science
+    paper: https://arxiv.org/abs/2509.21320
+    configpath: opencompass/configs/datasets/SciReasoner
+    configpath_llmjudge: ''
+- scireasoner1_5:
+    name: SciReasoner1.5
+    category: Science
+    paper: https://arxiv.org/abs/2509.21320
+    configpath: opencompass/configs/datasets/scireasoner1_5/scireasoner1_5_gen.py
+    configpath_llmjudge: ''
+- advancedif:
+    name: AdvancedIF
+    category: Instruction Following
+    paper: https://arxiv.org/abs/2511.10507
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/advancedIF/advancedIF_rawprompt_gen.py
+- aime2025:
+    name: AIME2025
+    category: Math
+    paper: https://matharena.ai/
+    configpath: opencompass/configs/datasets/aime2025/aime2025_cascade_eval_gen_5e9f4f.py
+    configpath_llmjudge: opencompass/configs/datasets/aime2025/aime2025_llmjudge_gen_5e9f4f.py
+- aime2026:
+    name: AIME2026
+    category: Math
+    paper: https://matharena.ai/
+    configpath: opencompass/configs/datasets/aime2026/aime2026_cascade_eval_gen_6ff468.py
+    configpath_llmjudge: ''
+- atlas:
+    name: ATLAS
+    category: Science
+    paper: https://arxiv.org/abs/2511.14366
+    configpath: opencompass/configs/datasets/atlas/atlas_gen.py
+    configpath_llmjudge: ''
+- codecompass:
+    name: CodeCompass
+    category: Code
+    paper: https://arxiv.org/abs/2507.06920
+    configpath: opencompass/configs/datasets/codecompass/codecompass_gen_079a6c.py
+    configpath_llmjudge: ''
+- judgebench:
+    name: JudgeBench
+    category: Subjective / Alignment
+    paper: https://arxiv.org/abs/2410.12784
+    configpath: opencompass/configs/datasets/judge/judgebench.py
+    configpath_llmjudge: ''
+- judgerbenchv2:
+    name: JudgerBenchV2
+    category: Subjective / Alignment
+    paper: https://arxiv.org/abs/2507.09104
+    configpath: opencompass/configs/datasets/judge/judgerbenchv2.py
+    configpath_llmjudge: ''
+- rewardbench:
+    name: RewardBench
+    category: Subjective / Alignment
+    paper: https://arxiv.org/abs/2403.13787
+    configpath: opencompass/configs/datasets/judge/rewardbench.py
+    configpath_llmjudge: ''
+- rmb:
+    name: RMB
+    category: Subjective / Alignment
+    paper: https://arxiv.org/abs/2410.09893
+    configpath: opencompass/configs/datasets/judge/rmb.py
+    configpath_llmjudge: ''
+- moleculariq:
+    name: MolecularIQ
+    category: Science /Chemistry
+    paper: https://arxiv.org/abs/2601.15279
+    configpath: opencompass/configs/datasets/molculariq/molculariq_gen.py
+    configpath_llmjudge: ''
+- mp20:
+    name: MP-20
+    category: Science / Material
+    paper: https://arxiv.org/abs/2110.06197
+    configpath: opencompass/configs/datasets/mp20/mp20_gen.py
+    configpath_llmjudge: ''
+- mrcr:
+    name: MRCR
+    category: Long Context
+    paper: https://arxiv.org/abs/2409.12640
+    configpath: opencompass/configs/datasets/mrcr
+    configpath_llmjudge: ''
+- ojbench:
+    name: OJBench
+    category: Code
+    paper: https://arxiv.org/abs/2506.16395
+    configpath: opencompass/configs/datasets/ojbench/ojbench_gen.py
+    configpath_llmjudge: ''
+- openswi:
+    name: OpenSWI
+    category: Science
+    paper: https://arxiv.org/abs/2508.10749
+    configpath: opencompass/configs/datasets/openswi/openswi_gen.py
+    configpath_llmjudge: ''
+- perspectivegap:
+    name: PerspectiveGap
+    category: Reasoning/Code/Agent
+    paper: https://arxiv.org/abs/2606.08878
+    configpath:
+      - opencompass/configs/datasets/perspectivegap/perspectivegap_prompt_writing_gen_0f36c7.py
+      - opencompass/configs/datasets/perspectivegap/perspectivegap_role_assignment_gen_0f36c7.py
+    configpath_llmjudge: ''
+- promptbench:
+    name: PromptBench
+    category: Safety
+    paper: https://arxiv.org/abs/2312.07910
+    configpath: opencompass/configs/datasets/promptbench
+    configpath_llmjudge: ''
+- s2_tomg_bench:
+    name: S2-TOMG-Bench
+    category: Science /Chemistry
+    paper: https://arxiv.org/abs/2412.14642
+    configpath: opencompass/configs/datasets/s2_tomg_bench/s2_tomg_bench_gen.py
+    configpath_llmjudge: ''
+- srbench:
+    name: SRBench
+    category: Science
+    paper: https://arxiv.org/abs/2107.14351
+    configpath: opencompass/configs/datasets/srbench/srbench_gen.py
+    configpath_llmjudge: ''
+- wikitext:
+    name: WikiText
+    category: Language
+    paper: https://arxiv.org/abs/1609.07843
+    configpath: opencompass/configs/datasets/wikitext
+    configpath_llmjudge: ''
+- winograd:
+    name: Winograd Schema Challenge
+    category: Language / WSC
+    paper: https://cdn.aaai.org/ocs/4492/4492-21843-1-PB.pdf
+    configpath: opencompass/configs/datasets/winograd/winograd_ppl.py
+    configpath_llmjudge: ''
+- writingbench:
+    name: WritingBench
+    category: Subjective / Writing
+    paper: https://arxiv.org/abs/2503.05244
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/subjective/writingbench/writingbench_judge.py
+- biodata:
+    name: Biology Instructions
+    category: Knowledge / Biology
+    paper: https://arxiv.org/abs/2412.19191
+    configpath: opencompass/configs/datasets/biodata/biodata_task_gen.py
+    configpath_llmjudge: ''
+- dingo:
+    name: DINGO
+    category: Instruction Following
+    paper: https://arxiv.org/abs/2407.03942
+    configpath: opencompass/configs/datasets/dingo/dingo_gen.py
+    configpath_llmjudge: ''
+- hmmt2026:
+    name: HMMT2026
+    category: Math
+    paper: https://matharena.ai/
+    configpath: opencompass/configs/datasets/hmmt2026/hmmt2026_cascade_eval_gen_6ff468.py
+    configpath_llmjudge: ''
+- zebralogic:
+    name: ZebraLogic
+    category: Reasoning
+    paper: https://arxiv.org/abs/2502.01100
+    configpath: opencompass/configs/datasets/ZebraLogic/zebralogic_rawprompt_gen_9446ef.py
+    configpath_llmjudge: ''

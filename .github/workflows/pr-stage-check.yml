@@ -23,7 +23,7 @@ jobs:
           - torch: 2.9.0
     steps:
       - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # main
         with:
           # This might remove tools that are actually needed, if set to "true" but frees about 6 GB
           tool-cache: false
@@ -52,6 +52,7 @@ jobs:
       - name: Install opencompass dependencies
         run: |
           python -m pip install -r requirements.txt
+          python -m pip install huggingface-hub==1.15.0
       - name: Build and install
         run: python -m pip install -e .
       - name: Prepare dataset
@@ -71,7 +72,7 @@ jobs:
         python-version: ['3.10']
     steps:
       - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # main
         with:
           # This might remove tools that are actually needed, if set to "true" but frees about 6 GB
           tool-cache: false
@@ -105,6 +106,7 @@ jobs:
       - name: Install opencompass dependencies
         run: |
           python -m pip install -r requirements.txt
+          python -m pip install huggingface-hub==1.15.0
       - name: Build and install
         run: python -m pip install -e .
       - name: Prepare dataset
@@ -134,6 +136,7 @@ jobs:
       - name: Install opencompass dependencies
         run: |
           pip install -r requirements.txt
+          pip install huggingface-hub==1.15.0
       - name: Build and install
         run: pip install -e .
       - name: Prepare dataset

@@ -20,6 +20,34 @@ from opencompass.utils import get_logger, match_files
 
 logger = get_logger()
 
+
+def _get_generation_kwargs(model: Dict) -> Dict:
+    generation_kwargs = model.get('generation_kwargs')
+    if generation_kwargs is None:
+        generation_kwargs = model.get('gen_config')
+    return (generation_kwargs.copy()
+            if generation_kwargs is not None else dict())
+
+
+def _to_vllm_generation_kwargs(generation_kwargs: Dict) -> Dict:
+    generation_kwargs = generation_kwargs.copy()
+    generation_kwargs.pop('do_sample', None)
+    generation_kwargs.pop('max_new_tokens', None)
+    if 'min_new_tokens' in generation_kwargs:
+        generation_kwargs['min_tokens'] = generation_kwargs.pop(
+            'min_new_tokens')
+    if 'eos_token_id' in generation_kwargs:
+        generation_kwargs['stop_token_ids'] = generation_kwargs.pop(
+            'eos_token_id')
+    return generation_kwargs
+
+
+def _preserve_model_task_cfg(model: Dict, acc_model: Dict) -> None:
+    for item in ['pred_postprocessor', 'min_out_len', 'summarizer_abbr']:
+        if model.get(item) is not None:
+            acc_model[item] = model[item]
+
+
 def match_cfg_file(workdir: Union[str, List[str]],
                    pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
     """Match the config file in workdir recursively given the pattern.
@@ -85,6 +113,13 @@ def try_fill_in_custom_cfgs(config):
     return config
 
 
+def _normalize_config_arg(config):
+    if not isinstance(config, str):
+        return config
+    config = config.strip()
+    return config or None
+
+
 def get_config_from_arg(args) -> Config:
     """Get the config object given args.
 
@@ -94,6 +129,7 @@ def get_config_from_arg(args) -> Config:
     3. Huggingface parameter groups and args.datasets
     """
 
+    args.config = _normalize_config_arg(args.config)
     if args.config:
         config = Config.fromfile(args.config, format_python_code=False)
         config = try_fill_in_custom_cfgs(config)
@@ -248,8 +284,8 @@ def change_accelerator(models, accelerator):
         # change HuggingFace model to VLLM or LMDeploy
         if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3, f'{HuggingFaceBaseModel.__module__}.{HuggingFaceBaseModel.__name__}']:
             gen_args = dict()
-            if model.get('generation_kwargs') is not None:
-                generation_kwargs = model['generation_kwargs'].copy()
+            generation_kwargs = _get_generation_kwargs(model)
+            if generation_kwargs:
                 gen_args['temperature'] = generation_kwargs.get('temperature', 0.001)
                 gen_args['top_k'] = generation_kwargs.get('top_k', 1)
                 gen_args['top_p'] = generation_kwargs.get('top_p', 0.9)
@@ -289,7 +325,8 @@ def change_accelerator(models, accelerator):
                         acc_model[item] = model[item]
             elif accelerator == 'vllm':
                 model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
-                model_kwargs.update(model.get('model_kwargs'))
+                model_kwargs.update(model.get('model_kwargs') or {})
+                generation_kwargs = _to_vllm_generation_kwargs(generation_kwargs)
                 logger.info(f'Transforming {model["abbr"]} to {accelerator}')
 
                 acc_model = dict(
@@ -311,7 +348,8 @@ def change_accelerator(models, accelerator):
         elif model['type'] in [HuggingFacewithChatTemplate, f'{HuggingFacewithChatTemplate.__module__}.{HuggingFacewithChatTemplate.__name__}']:
             if accelerator == 'vllm':
                 model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
-                model_kwargs.update(model.get('model_kwargs'))
+                model_kwargs.update(model.get('model_kwargs') or {})
+                generation_kwargs = _to_vllm_generation_kwargs(_get_generation_kwargs(model))
                 mod = VLLMwithChatTemplate
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
@@ -321,6 +359,7 @@ def change_accelerator(models, accelerator):
                     max_seq_len=model.get('max_seq_len', None),
                     max_out_len=model['max_out_len'],
                     batch_size=model.get('batch_size', 16),
+                    generation_kwargs=generation_kwargs,
                     run_cfg=model['run_cfg'],
                     stop_words=model.get('stop_words', []),
                 )
@@ -356,6 +395,7 @@ def change_accelerator(models, accelerator):
         else:
             acc_model = model
             logger.warning(f'Unsupported model type {model["type"]}, will keep the original model.')
+        _preserve_model_task_cfg(model, acc_model)
         model_accels.append(acc_model)
     return model_accels
 
@@ -450,27 +490,28 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
             chatobj_custom_dataset['n'] = dataset['n']
 
         # reader_cfg
-        chatobj_custom_dataset['reader_cfg'] = chatobj_custom_reader_cfg
+        chatobj_custom_dataset['reader_cfg'] = deepcopy(
+            chatobj_custom_reader_cfg)
         if 'test_range' in dataset:
             chatobj_custom_dataset['reader_cfg']['test_range'] = dataset['test_range']
 
 
         # infer_cfg
-        chatobj_custom_dataset['infer_cfg'] = chatobj_custom_infer_cfg
+        chatobj_custom_dataset['infer_cfg'] = deepcopy(chatobj_custom_infer_cfg)
 
         # eval_cfg
         def init_math_evaluator(evalcfg):
-            eval_cfg = optional_evaluator['math_evaluator']
+            eval_cfg = deepcopy(optional_evaluator['math_evaluator'])
             return eval_cfg
 
         def init_mcq_rule_evaluator(evalcfg):
-            eval_cfg = optional_evaluator['rule_evaluator']
+            eval_cfg = deepcopy(optional_evaluator['mcq_rule_evaluator'])
             if 'answer_pattern' in evalcfg.keys():
                 eval_cfg['pred_postprocessor']['answer_pattern'] = evalcfg['answer_pattern']
             return eval_cfg
 
         def init_llm_evaluator(evalcfg):
-            eval_cfg = optional_evaluator['llm_evaluator']
+            eval_cfg = deepcopy(optional_evaluator['llm_evaluator'])
             assert 'judge_cfg' in evalcfg.keys()
             eval_cfg['judge_cfg'] = evalcfg['judge_cfg']
             if 'prompt' in evalcfg.keys():
@@ -486,7 +527,7 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
                    rule_func_eval_type in func_locals and callable(func_locals[rule_func_eval_type]) and \
                    llm_func_eval_type in func_locals and callable(func_locals[llm_func_eval_type])
 
-            eval_cfg = optional_evaluator['cascade_evaluator']
+            eval_cfg = deepcopy(optional_evaluator['cascade_evaluator'])
             rule_func_eval_cfg = func_locals[rule_func_eval_type]
             llm_func_eval_cfg = func_locals[llm_func_eval_type]
             eval_cfg['rule_evaluator'] = rule_func_eval_cfg(evalcfg['rule_evaluator'])
@@ -505,7 +546,8 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
         chatobj_custom_dataset['eval_cfg']['evaluator'] = deepcopy(eval_cfg)
 
         # append datasets
-        chatobj_custom_dataset = chatobj_custom_dataset | chatobj_custom_datasets
+        chatobj_custom_dataset = chatobj_custom_dataset | deepcopy(
+            chatobj_custom_datasets)
         dataset_cfg = deepcopy(chatobj_custom_dataset)
         if 'infer_cfg' in dataset_cfg:
             del dataset_cfg['infer_cfg']
