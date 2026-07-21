@@ -1,16 +1,162 @@
 import ast
 import json
 import os
-from typing import Dict, List
+import re
+from collections import defaultdict
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
+from opencompass.utils.prompt import PromptList
 
 from .base import BaseDataset
+
+OWNER_PROMPT_TEMPLATE = """You are participating in a puzzle solving competition. You are an expert at solving puzzles.
+Below is a list of input and output pairs with a pattern. Your goal is to identify the pattern or transformation in the training examples that maps the input to the output, then apply that pattern to the test input to give a final output.
+
+Respond in the format of the training output examples
+
+--Training Examples--
+
+{training_examples}
+
+--End of Training Examples--
+
+--Test Input--
+
+{test_input}
+
+--End of Test Input--
+
+Your response:"""
+
+SECOND_PASS_EXTRACTION_PROMPT = """You are a helpful assistant.
+Extract only the JSON array of arrays from the following response.
+Do not include any explanation, formatting, or additional text.
+Return ONLY the valid JSON array of arrays with integers.
+
+Response:
+{response}
+
+Example of expected output format:
+[[1, 2, 3], [4, 5, 6]]
+
+IMPORTANT: Return ONLY the array, with no additional text, quotes, or formatting.
+"""
+
+
+def build_owner_prompt(training_pairs: List[Dict],
+                       test_input: List[List[int]]) -> str:
+    """Render the current ARC Prize baseline prompt byte-for-byte in JSON form."""
+    training_examples = ''
+    for index, pair in enumerate(training_pairs):
+        training_examples += f'--Example {index}-- \n\n INPUT: \n\n'
+        training_examples += json.dumps(pair['input']) + '\n\n'
+        training_examples += 'OUTPUT: \n\n'
+        training_examples += json.dumps(pair['output']) + '\n\n'
+    return OWNER_PROMPT_TEMPLATE.format(
+        training_examples=training_examples,
+        test_input=json.dumps(test_input),
+    )
+
+
+class ARCPrizeGenInferencer(GenInferencer):
+    """Run the ARC Prize extraction retry with the evaluated model.
+
+    The official benchmarking harness asks the same model to extract a JSON
+    grid only when the primary response cannot be parsed. Keeping this retry
+    inside inference makes the behavior work for both local and API models and
+    avoids depending on a separately configured endpoint during evaluation.
+    """
+
+    def __init__(self,
+                 *args,
+                 enable_second_pass: bool = True,
+                 second_pass_max_out_len: int = 4096,
+                 **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.enable_second_pass = enable_second_pass
+        self.second_pass_max_out_len = second_pass_max_out_len
+
+    @staticmethod
+    def _prediction_text(prediction) -> Optional[str]:
+        if isinstance(prediction, str):
+            return prediction
+        if isinstance(prediction, dict):
+            value = prediction.get('prediction')
+            return value if isinstance(value, str) else None
+        return None
+
+    @staticmethod
+    def _replace_prediction_text(prediction, text):
+        if not isinstance(prediction, dict):
+            return text
+        updated = prediction.copy()
+        updated['prediction'] = text
+        return updated
+
+    def _generate_with_second_pass(self, generate, templates, max_out_len,
+                                   **kwargs):
+        predictions = list(
+            generate(templates, max_out_len=max_out_len, **kwargs))
+        if not self.enable_second_pass:
+            return predictions
+
+        failed_indexes = []
+        extraction_prompts = []
+        for index, prediction in enumerate(predictions):
+            prediction_text = self._prediction_text(prediction)
+            if prediction_text is None or extract_solution(
+                    prediction_text) is not None:
+                continue
+            failed_indexes.append(index)
+            extraction_prompts.append(
+                PromptList([
+                    dict(
+                        role='HUMAN',
+                        prompt=SECOND_PASS_EXTRACTION_PROMPT.format(
+                            response=prediction_text),
+                    )
+                ]))
+
+        if not extraction_prompts:
+            return predictions
+
+        extracted_responses = generate(
+            extraction_prompts,
+            max_out_len=self.second_pass_max_out_len,
+            **kwargs,
+        )
+        for index, response in zip(failed_indexes, extracted_responses):
+            response_text = self._prediction_text(response)
+            parsed = _parse_second_pass_response(response_text)
+            if parsed is None:
+                continue
+            predictions[index] = self._replace_prediction_text(
+                predictions[index], json.dumps(parsed))
+        return predictions
+
+    def inference(self, *args, **kwargs):
+        generate = self.model.generate_from_template
+
+        def generate_with_second_pass(templates, max_out_len, **gen_kwargs):
+            return self._generate_with_second_pass(
+                generate,
+                templates,
+                max_out_len,
+                **gen_kwargs,
+            )
+
+        self.model.generate_from_template = generate_with_second_pass
+        try:
+            return super().inference(*args, **kwargs)
+        finally:
+            self.model.generate_from_template = generate
 
 
 @LOAD_DATASET.register_module()
@@ -153,67 +299,405 @@ class ARCPrizeDataset(BaseDataset):
     }
 
     @staticmethod
-    def load(path: str, version: str):
+    def load(
+        path: str,
+        version: str,
+        task_ids: Optional[List[str]] = None,
+        protocol: str = 'legacy',
+    ):
+        if protocol not in ('legacy', 'owner'):
+            raise ValueError('protocol must be either "legacy" or "owner"')
         task_file_dir = get_data_path(path)
 
         dataset = []
 
         task_file_name_list = os.listdir(task_file_dir)
+        if protocol == 'owner':
+            task_file_name_list = sorted(task_file_name_list)
         for task_file_name in task_file_name_list:
             if task_file_name not in ARCPrizeDataset.task_file_names[version]:
+                continue
+            task_id = os.path.splitext(task_file_name)[0]
+            if task_ids is not None and task_id not in task_ids:
                 continue
             with open(os.path.join(task_file_dir, task_file_name),
                       'r') as file:
                 task = json.load(file)
-                task = {
-                    'training_data': task['train'],
-                    'input_test_data': task['test'][0]['input'],
-                    'output_test_data': task['test'][0]['output']
-                }
-                dataset.append(task)
+                if protocol == 'legacy':
+                    test_pair = task['test'][0]
+                    dataset.append({
+                        'training_data': task['train'],
+                        'input_test_data': test_pair['input'],
+                        'output_test_data': test_pair['output'],
+                    })
+                    continue
+
+                # Owner protocol keeps every test pair as an inference row and
+                # retains task identity for task-level pair aggregation.
+                for pair_index, test_pair in enumerate(task['test']):
+                    reference = {
+                        'task_id': task_id,
+                        'pair_index': pair_index,
+                        'num_pairs': len(task['test']),
+                        'output': test_pair['output'],
+                    }
+                    dataset.append({
+                        'task_id':
+                        task_id,
+                        'pair_index':
+                        pair_index,
+                        'training_data':
+                        task['train'],
+                        'input_test_data':
+                        test_pair['input'],
+                        'output_test_data':
+                        reference,
+                        'prompt':
+                        build_owner_prompt(task['train'], test_pair['input']),
+                    })
 
         return Dataset.from_list(dataset)
 
 
 class ARCPrizeEvaluator(BaseEvaluator):
 
-    def score(self, predictions: List[str],
-              references: List[List[int]]) -> Dict:
+    def __init__(
+        self,
+        protocol: str = 'legacy',
+        attempt_aggregation: str = 'mean',
+        attempts_per_pair: Optional[int] = None,
+    ) -> None:
+        if protocol not in ('legacy', 'owner'):
+            raise ValueError('protocol must be either "legacy" or "owner"')
+        if attempt_aggregation not in ('mean', 'any'):
+            raise ValueError(
+                'attempt_aggregation must be either "mean" or "any"')
+        if attempts_per_pair is not None and attempts_per_pair < 1:
+            raise ValueError('attempts_per_pair must be positive')
+        if protocol == 'legacy' and (attempt_aggregation != 'mean'
+                                     or attempts_per_pair is not None):
+            raise ValueError('attempt aggregation requires owner protocol')
+        self.protocol = protocol
+        self.attempt_aggregation = attempt_aggregation
+        self.attempts_per_pair = attempts_per_pair
+
+    def evaluate(
+        self,
+        k: int,
+        n: int,
+        original_dataset: Dataset,
+        **score_kwargs,
+    ) -> Dict:
+        """Evaluate replicas as independent runs or owner-style attempts.
+
+        OpenCompass normally evaluates each of the ``n`` dataset replicas
+        independently and averages their scores. ARC-AGI-2 instead treats the
+        replicas as attempts for the same test pair: the pair is correct when
+        any attempt exactly matches, then pair scores are averaged within each
+        task. Keep the default BaseEvaluator behavior for ARC-AGI-1 and legacy
+        configs, and opt into owner attempt aggregation explicitly.
+        """
+        if self.protocol == 'legacy' or self.attempt_aggregation != 'any':
+            return super().evaluate(k, n, original_dataset, **score_kwargs)
+
+        if self.attempts_per_pair is not None and n != self.attempts_per_pair:
+            raise ValueError(
+                f'expected {self.attempts_per_pair} attempts per pair, got {n}'
+            )
+        if n < 1 or len(original_dataset) % n != 0:
+            raise ValueError(
+                'replicated ARC dataset size must be divisible by n')
+
+        predictions = score_kwargs.get('predictions')
+        references = score_kwargs.get('references')
+        if predictions is None or references is None:
+            raise ValueError(
+                'owner attempt aggregation requires predictions and references'
+            )
+        if len(predictions) != len(references):
+            raise ValueError(
+                'Predictions and references must have the same length')
+        if len(predictions) != len(original_dataset):
+            raise ValueError(
+                'Predictions must cover every replicated dataset row')
+
+        real_size = len(original_dataset) // n
+        for replica_index in range(1, n):
+            start = replica_index * real_size
+            for row_index in range(real_size):
+                if references[start + row_index] != references[row_index]:
+                    raise ValueError(
+                        'ARC attempt replicas must preserve reference order')
+
+        processed_predictions = self.pred_postprocess(predictions)
+        attempt_result = self.score(
+            predictions=processed_predictions,
+            references=references,
+        )
+        attempt_details = attempt_result.pop('details')
+        if len(attempt_details) != n * real_size:
+            raise ValueError('ARC attempt details do not match dataset size')
+
+        task_pair_scores = defaultdict(list)
+        pair_details = []
+        for row_index in range(real_size):
+            attempts = [
+                attempt_details[replica_index * real_size + row_index]
+                for replica_index in range(n)
+            ]
+            task_id = attempts[0]['task_id']
+            pair_index = attempts[0]['pair_index']
+            if any(detail['task_id'] != task_id
+                   or detail['pair_index'] != pair_index
+                   for detail in attempts):
+                raise ValueError(
+                    'ARC attempt replicas must preserve task and pair identity'
+                )
+
+            pair_correct = int(any(detail['correct'] for detail in attempts))
+            task_pair_scores[task_id].append(pair_correct)
+            pair_details.append({
+                'task_id':
+                task_id,
+                'pair_index':
+                pair_index,
+                'correct':
+                pair_correct,
+                'correct_percentage':
+                max(detail['correct_percentage'] for detail in attempts),
+                'attempt_count':
+                n,
+                'attempt_correct': [detail['correct'] for detail in attempts],
+                'attempt_parse_success':
+                [detail['parse_success'] for detail in attempts],
+                'attempt_empty_list_prediction':
+                [detail['empty_list_prediction'] for detail in attempts],
+                'generated_solution':
+                [detail['generated_solution'] for detail in attempts],
+                'raw_prediction':
+                [detail['raw_prediction'] for detail in attempts],
+            })
+
+        task_scores = [np.mean(scores) for scores in task_pair_scores.values()]
+        pair_scores = [detail['correct'] for detail in pair_details]
+        return {
+            'accuracy': float(np.mean(task_scores)) if task_scores else 0.0,
+            'pair_accuracy':
+            (float(np.mean(pair_scores)) if pair_scores else 0.0),
+            'task_count': len(task_scores),
+            'pair_count': len(pair_scores),
+            'attempt_count': len(attempt_details),
+            'attempts_per_pair': n,
+            'parse_success_rate': attempt_result['parse_success_rate'],
+            'details': pair_details,
+        }
+
+    def score(self, predictions: List[str], references: List[Any]) -> Dict:
+        if self.protocol == 'legacy':
+            return self._score_legacy(predictions, references)
+
+        parsed_predictions = [extract_solution(text) for text in predictions]
+
+        task_pair_scores = defaultdict(list)
+        details = []
+        for index, (raw_prediction,
+                    reference) in enumerate(zip(predictions, references)):
+            prediction = parsed_predictions[index]
+            if isinstance(reference, dict):
+                task_id = reference['task_id']
+                pair_index = reference['pair_index']
+                expected = reference['output']
+            else:
+                # Backward compatibility for archived configs/results.
+                task_id = str(len(details))
+                pair_index = 0
+                expected = reference
+
+            is_correct = prediction == expected
+            if _is_grid(prediction):
+                _, correct_percentage = compare_solutions_with_padding(
+                    prediction, expected, pad_value=-1)
+            else:
+                correct_percentage = 0.0
+            task_pair_scores[task_id].append(1 if is_correct else 0)
+            details.append({
+                'task_id': task_id,
+                'pair_index': pair_index,
+                'correct': 1 if is_correct else 0,
+                'correct_percentage': correct_percentage,
+                'parse_success': prediction is not None,
+                'empty_list_prediction': prediction == [],
+                'generated_solution': prediction,
+                'raw_prediction': raw_prediction,
+            })
+
+        task_scores = [np.mean(scores) for scores in task_pair_scores.values()]
+        pair_scores = [detail['correct'] for detail in details]
+        return {
+            'accuracy':
+            float(np.mean(task_scores)) if task_scores else 0.0,
+            'pair_accuracy':
+            (float(np.mean(pair_scores)) if pair_scores else 0.0),
+            'task_count':
+            len(task_scores),
+            'pair_count':
+            len(pair_scores),
+            'parse_success_rate':
+            float(np.mean([detail['parse_success']
+                           for detail in details])) if details else 0.0,
+            'details':
+            details,
+        }
+
+    @staticmethod
+    def _score_legacy(
+        predictions: List[str],
+        references: List[List[int]],
+    ) -> Dict:
+        """Preserve the pre-MR parser, reference schema, and output fields."""
         accuracy = []
         details = []
-        for pred, refer in zip(map(extract_solution, predictions), references):
+        for prediction, reference in zip(
+                map(_extract_solution_legacy, predictions),
+                references,
+        ):
             is_correct, correct_percentage = compare_solutions_with_padding(
-                pred, refer, pad_value=-1)
+                prediction,
+                reference,
+                pad_value=-1,
+            )
             details.append({
                 'correct': 1 if is_correct else 0,
                 'correct_percentage': correct_percentage,
-                'generated_solution': pred
+                'generated_solution': prediction,
             })
             accuracy.append(1 if is_correct else 0)
-
         return {'accuracy': np.mean(accuracy), 'details': details}
 
 
-def extract_solution(text):
+def _is_grid(value) -> bool:
+    return (isinstance(value, list) and len(value) > 0
+            and all(isinstance(row, list) and len(row) > 0 for row in value)
+            and len({len(row)
+                     for row in value}) == 1 and all(
+                         type(cell) is int and 0 <= cell <= 9 for row in value
+                         for cell in row))
+
+
+def _is_owner_list_of_lists(value, require_non_empty: bool = False) -> bool:
+    """Use the structure checks in the ARC Prize baseline parser."""
+    return (isinstance(value, list) and (not require_non_empty or bool(value))
+            and all(isinstance(row, list) for row in value))
+
+
+def _extract_boxed_grid(text: str) -> Optional[List[List[int]]]:
+    """Match the owner's first-pass ``\\boxed{...}`` response parser."""
+    match = re.search(r'\\boxed\{(.*?)\}', text, re.DOTALL)
+    if not match:
+        return None
     try:
-        # Find the part of the text that looks like a nested list
+        value = json.loads(match.group(1).strip())
+    except json.JSONDecodeError:
+        return None
+    return value if _is_owner_list_of_lists(value) else None
+
+
+def _backscan_json_grid(text: str) -> Optional[List[List[int]]]:
+    """Backscan the response for its final complete JSON value."""
+    last_bracket_index = -1
+    closing_bracket = None
+    for index in range(len(text) - 1, -1, -1):
+        if text[index] in (']', '}'):
+            last_bracket_index = index
+            closing_bracket = text[index]
+            break
+    if last_bracket_index == -1:
+        return None
+
+    opening_bracket = '[' if closing_bracket == ']' else '{'
+    bracket_counter = 1
+    start_index = -1
+    for index in range(last_bracket_index - 1, -1, -1):
+        if text[index] == closing_bracket:
+            bracket_counter += 1
+        elif text[index] == opening_bracket:
+            bracket_counter -= 1
+            if bracket_counter == 0:
+                start_index = index
+                break
+    if start_index == -1:
+        return None
+
+    try:
+        value = json.loads(text[start_index:last_bracket_index + 1])
+    except json.JSONDecodeError:
+        return None
+    return value if _is_owner_list_of_lists(value,
+                                            require_non_empty=True) else None
+
+
+def _extract_solution_legacy(text: str) -> List[List[int]]:
+    """Preserve the parser used by archived ARC configs before this MR."""
+    try:
         start = text.index('[[')
         end = text.index(']]', start) + 2
-        array_str = text[start:end]
-
-        # Use ast.literal_eval to safely evaluate the
-        # string as a Python expression
-        array = ast.literal_eval(array_str)
-        # Check if the result is a list of lists
-        if all(isinstance(i, list) for i in array):
-            if all(all(isinstance(i, int) for i in j) for j in array):
-                return array
-            else:
-                return [[0]]
-        else:
-            return [[0]]
+        value = ast.literal_eval(text[start:end])
+        if (all(isinstance(row, list) for row in value) and all(
+                all(isinstance(cell, int) for cell in row) for row in value)):
+            return value
     except (ValueError, SyntaxError):
-        return [[0]]
+        pass
+    return [[0]]
+
+
+def extract_solution(text: str) -> Optional[List[List[int]]]:
+    """Apply the current ARC Prize baseline response-parser order."""
+    if not isinstance(text, str):
+        return None
+    boxed_grid = _extract_boxed_grid(text)
+    if boxed_grid is not None:
+        return boxed_grid
+    return _backscan_json_grid(text)
+
+
+def _parse_second_pass_response(
+        assistant_content: str) -> Optional[List[List[int]]]:
+    """Mirror the owner's OpenAI adapter postprocessing after call two."""
+    if not isinstance(assistant_content, str):
+        return None
+
+    if '```' in assistant_content:
+        for block in assistant_content.split('```'):
+            if block.strip() and not block.strip().startswith('json'):
+                assistant_content = block.strip()
+                break
+    assistant_content = assistant_content.strip()
+
+    if assistant_content and not assistant_content.startswith('['):
+        start_index = assistant_content.find('[[')
+        if start_index >= 0:
+            end_index = assistant_content.rfind(']]') + 2
+            if end_index > start_index:
+                assistant_content = assistant_content[start_index:end_index]
+
+    try:
+        value = json.loads(assistant_content)
+    except json.JSONDecodeError:
+        pattern = (r'\[\s*\[\s*\d+(?:\s*,\s*\d+)*\s*\]'
+                   r'(?:\s*,\s*\[\s*\d+(?:\s*,\s*\d+)*\s*\])*\s*\]')
+        match = re.search(pattern, assistant_content)
+        if not match:
+            return None
+        try:
+            value = json.loads(match.group(0))
+        except json.JSONDecodeError:
+            return None
+
+    if isinstance(value, list) and _is_owner_list_of_lists(value):
+        return value
+    if isinstance(value, dict) and 'response' in value:
+        return value.get('response')
+    return None
 
 
 def pad_array_with_value(array, target_shape, pad_value):
@@ -226,6 +710,8 @@ def pad_array_with_value(array, target_shape, pad_value):
 def compare_solutions_with_padding(generated_output: List[int],
                                    correct_output: List[int],
                                    pad_value=-1):
+    if not generated_output or not correct_output:
+        return False, 0.0
     max_rows = max(len(generated_output), len(correct_output))
     max_cols = max(max(map(len, generated_output)),
                    max(map(len, correct_output)))
