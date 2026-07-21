@@ -1,6 +1,7 @@
 import ast
 import json
 import os
+import random
 import re
 from collections import defaultdict
 
@@ -540,7 +541,7 @@ class BiodataECNumberEvaluator(BaseEvaluator):
 class BiodataTaskDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, task: str):
+    def load(path: str, task: str, mini_set=False):
         hint_dict = {
             'cls':
             'Please use "yes" or "no" as your answer, '
@@ -589,6 +590,12 @@ class BiodataTaskDataset(BaseDataset):
                 new_ins['prompt'] = new_ins['prompt'] + '\n' + hint_dict[
                     ins['meta_data']['task']]
             new_data.append(new_ins)
+
+        if mini_set:
+            random.seed(1024)
+            sample_size = max(1, len(new_data) // 10)
+            new_data = random.sample(new_data, sample_size)
+            random.seed(0)
 
         dataset = Dataset.from_list(new_data)
         return dataset
