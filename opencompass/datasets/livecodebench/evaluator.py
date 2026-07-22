@@ -10,6 +10,7 @@ from tqdm import tqdm
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
 from opencompass.utils import get_logger
+from opencompass.utils.code_execution import TYPE_AWARE_EQUAL_NAME
 
 from .execute_utils import BASE_IMPORTS, codeexecute_check_correctness
 from .extract_utils import (extract_code_execution, extract_code_generation,
@@ -335,7 +336,8 @@ def evaluate_score(args) -> list[bool]:
         if i in g:
             pass
         else:
-            code_to_execute = f'{BASE_IMPORTS}\n{c}\nassert {o} == {g}'
+            code_to_execute = (f'{BASE_IMPORTS}\n{c}',
+                               f'assert {TYPE_AWARE_EQUAL_NAME}({o}, {g})')
             execution_results.append(
                 codeexecute_check_correctness(code_to_execute, 3))
     if len(execution_results) == 0:

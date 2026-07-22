@@ -18,6 +18,8 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 
+from opencompass.utils.code_execution import type_aware_equal
+
 try:
     from pyext import RuntimeModule
 except ImportError:
@@ -281,11 +283,12 @@ def run_test(sample, test=None, debug=False, timeout=6):
                     if isinstance(output, tuple):
                         output = list(output)
 
-                    tmp_result = output == in_outs['outputs'][index]
+                    tmp_result = type_aware_equal(output,
+                                                  in_outs['outputs'][index])
                     if (isinstance(in_outs['outputs'][index], list)
                             and in_outs['outputs'][index]):
-                        tmp_result = tmp_result or (
-                            output == in_outs['outputs'][index][0])
+                        tmp_result = tmp_result or type_aware_equal(
+                            output, in_outs['outputs'][index][0])
 
                     # ground truth sequences are not tuples
                     try:
