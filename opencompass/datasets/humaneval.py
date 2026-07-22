@@ -191,6 +191,55 @@ def humaneval_postprocess_v3(text: str) -> str:
         text = blocks[-1]
     return text.lstrip()
 
+def humaneval_chat_postprocess(text: str) -> str:
+    """Postprocess chat model outputs for HumanEval.
+
+    Some chat/API models return reasoning before the final code, or emit an
+    opening Markdown code fence that is never closed because the generation is
+    truncated. The regular ``humaneval_postprocess_v2`` intentionally keeps
+    non-fenced text unchanged; this variant first tries to recover a Python
+    code block or a clear top-level Python snippet from chatty responses.
+    """
+    code = _extract_first_code_fence(text)
+    if code is not None:
+        return _trim_to_compilable_prefix(code).lstrip()
+
+    code = _extract_python_snippet(text)
+    if code is not None:
+        return _trim_to_compilable_prefix(code).lstrip()
+
+    return text.lstrip()
+
+def _extract_first_code_fence(text: str):
+    match = re.search(r'```\w*\n(.*?)(?:```|$)', text, re.DOTALL)
+    if match is None:
+        return None
+    return match.group(1)
+
+def _extract_python_snippet(text: str):
+    pattern = re.compile(
+        r'(?m)^\s*(?:from\s+\S+\s+import\s+|import\s+|def\s+|class\s+|@\w)')
+    match = pattern.search(text)
+    if match is None:
+        return None
+    return text[match.start():]
+
+def _trim_to_compilable_prefix(text: str) -> str:
+    stripped = text.lstrip()
+    if not re.match(r'^(?:from\s+\S+\s+import\s+|import\s+|def\s+|class\s+|@\w)',
+                    stripped):
+        return text
+
+    lines = text.splitlines()
+    for end in range(len(lines), 0, -1):
+        candidate = '\n'.join(lines[:end]) + '\n'
+        try:
+            compile(candidate, '<humaneval_postprocess>', 'exec')
+        except SyntaxError:
+            continue
+        return candidate.rstrip() + '\n'
+    return text
+
 def humaneval_internal_v2_postprocess(text: str):
     if text.startswith('   ') and not text.startswith('    '):
         text = ' ' + text
