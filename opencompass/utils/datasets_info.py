@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/MultiIF":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/MultiIF/multiIF_20241018.csv",
+    },
     "opencompass/mp20":{
         "ms_id": None,
         "hf_id": None,
