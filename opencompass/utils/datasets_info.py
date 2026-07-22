@@ -66,6 +66,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/biology-instruction-fixed",
     },
+    "opencompass/MedFailBench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/MedFailBench/medfailbench_safety_layer_docs_v0_1.jsonl",
+    },
     # OpenSWI
     "opencompass/openswi":{
         "ms_id": None,
