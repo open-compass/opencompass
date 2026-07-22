@@ -1,3 +1,4 @@
+from .aa_lcr import AALCRDataset, aa_lcr_llmjudge_postprocess  # noqa: F401
 from .advancedIF import AdvancedIFDataset  # noqa: F401
 from .advancedIF import advancedif_rubric_postprocess  # noqa: F401
 from .advglue import *  # noqa: F401, F403
