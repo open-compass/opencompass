@@ -28,14 +28,14 @@ def check_correctness(answer: str, ground_truth, calid, upper_limit,
             correctness = 0
     elif calid in [69]:
         # Output Type: integer (A, B)
-        match = re.search(
+        gt_match = re.search(
             r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,?"
             r"\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?", ground_truth)
-        ground_truth = f'({match.group(1)}, {match.group(3)})'
         match = re.search(
             r"\(?[\"\']?(\d+)\s*(weeks?)?[\"\']?,?"
             r"\s*[\"\']?(\d+)\s*(days?)?[\"\']?\s*\)?", answer)
-        if match:
+        if gt_match and match:
+            ground_truth = f'({gt_match.group(1)}, {gt_match.group(3)})'
             weeks = match.group(1)
             days = match.group(3)
             answer = f'({weeks}, {days})'
