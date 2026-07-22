@@ -15,6 +15,9 @@ from datasets import DatasetDict, concatenate_datasets, load_dataset
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from opencompass.utils import get_data_path
+from opencompass.utils.code_execution import (TYPE_AWARE_EQUAL_NAME,
+                                              make_assertions_type_aware,
+                                              type_aware_equal)
 
 from .base import BaseDataset
 
@@ -130,21 +133,18 @@ class LCEvaluator(BaseEvaluator):
 
                 # Try each code block until one passes
                 for code_idx, code_block in enumerate(code_blocks):
-                    test_programs = self._process_test(refer, code_block)
-
-                    # Submit each test program variant for execution
-                    for prog_idx, program in enumerate(test_programs):
-                        future = executor.submit(
-                            execution,
-                            program,
-                            (
-                                i,
-                                code_idx,
-                                prog_idx,
-                            ),  # Pass indices for tracking
-                            3,
-                        )
-                        futures.append(future)
+                    test_program = self._process_test(refer, code_block)
+                    future = executor.submit(
+                        execution,
+                        test_program,
+                        (
+                            i,
+                            code_idx,
+                            0,
+                        ),
+                        3,
+                    )
+                    futures.append(future)
 
         from tqdm import tqdm
 
@@ -291,10 +291,7 @@ class LCEvaluator(BaseEvaluator):
                 # Use the modified test
                 test_case = modified_test
 
-        formatted = code + '\n'
-        formatted += test_case
-        # breakpoint()
-        return formatted
+        return code, make_assertions_type_aware(test_case)
 
 
 def execution(programs, task_ids, timeout):
@@ -313,10 +310,13 @@ def execution(programs, task_ids, timeout):
         try:
             # Add exec globals to prevent the exec to raise
             # unnecessary NameError for correct answer
+            code, test_case = programs
             exec_globals = {}
             with swallow_io():
                 with time_limit(timeout):
-                    exec(programs, exec_globals)
+                    exec(code, exec_globals)
+                    exec_globals[TYPE_AWARE_EQUAL_NAME] = type_aware_equal
+                    exec(test_case, exec_globals)
             key.append('pass')
         except TimeOutException:
             key.append('timeout')
