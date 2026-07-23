@@ -1,7 +1,8 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets import GPQADataset, GPQA_Simple_Eval_postprocess, GPQAEvaluator
+from opencompass.datasets import GPQADataset, GPQAEvaluator
+from opencompass.utils.text_postprocessors import match_answer_pattern
 
 # openai_simple_eval prompt
 align_prompt = """
@@ -30,7 +31,9 @@ gpqa_infer_cfg = dict(
     inferencer=dict(type=GenInferencer))
 
 gpqa_eval_cfg = dict(evaluator=dict(type=GPQAEvaluator),
-                     pred_postprocessor=dict(type=GPQA_Simple_Eval_postprocess))
+                     pred_postprocessor=dict(
+                         type=match_answer_pattern,
+                         answer_pattern=r'(?i)ANSWER\s*:\s*([A-D])'))
 
 gpqa_datasets = []
 gpqa_subsets = {
