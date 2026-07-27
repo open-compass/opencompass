@@ -1,3 +1,4 @@
+import inspect
 import os
 from typing import Any, Callable, Dict, List, Optional
 
@@ -86,8 +87,13 @@ class CascadeEvaluator(BaseEvaluator):
         else:
             # Use rule_evaluator to evaluate a single sample by calling
             # the score method with single-element lists
-            result = self.rule_evaluator.score([prediction], [reference],
-                                               [test_set])
+            score_params = inspect.signature(
+                self.rule_evaluator.score).parameters
+            if 'test_set' in score_params:
+                result = self.rule_evaluator.score([prediction], [reference],
+                                                   test_set=[test_set])
+            else:
+                result = self.rule_evaluator.score([prediction], [reference])
             if 'details' in result and len(result['details']) > 0:
                 return result['details'][0]
             else:
