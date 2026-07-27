@@ -44,6 +44,16 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/IFBench/IFBench_test.jsonl",
     },
+    "opencompass/fake_alignment/safety.jsonl": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/fake_alignment/safety.jsonl",
+    },
+    "opencompass/fake_alignment/dna_training_set.jsonl": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/fake_alignment/dna_training_set.jsonl",
+    },
     "opencompass/lcb_pro": {
         "ms_id": None,
         "hf_id": None,
@@ -670,6 +680,11 @@ DATASETS_URL = {
     "/IFbench": {
         "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/IFBench.zip",
         "md5":"b1c63b31e3312f929c6318977de4cdd3",
+    },
+    "/fake_alignment/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/fake_alignment.zip",
+        "md5": "5172cf0d86f8fb9ab36cec003a86ff3a",
     },
     "/NPHardEval/": {
         "url":
