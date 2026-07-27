@@ -190,17 +190,20 @@ class GenInferencer(BaseInferencer):
             num_return_sequences = getattr(self.model, 'generation_kwargs',
                                            {}).get('num_return_sequences', 1)
             # 5-3. Save current output
-            for prompt, prediction, gold in zip(
-                    parsed_entries, batched(generated, num_return_sequences),
-                    golds):
+            for batch_idx, (prompt, prediction, gold) in enumerate(
+                    zip(parsed_entries, batched(generated,
+                                                num_return_sequences), golds)):
                 if num_return_sequences == 1:
                     prediction = prediction[0]
 
                 if self.dump_res_length:
-                    input_length = 0
-                    if isinstance(prompt, str):
+                    if self.multiround and isinstance(prompt, list):
+                        input_length = self._compute_multiround_input_lengths(
+                            entry[batch_idx])
+                    elif isinstance(prompt, str):
                         input_length = self.model.get_token_len(prompt)
                     elif isinstance(prompt, list):
+                        input_length = 0
                         for i in range(len(prompt)):
                             if 'prompt' in prompt[i]:
                                 prompt[i][
@@ -274,6 +277,29 @@ class GenInferencer(BaseInferencer):
             sample['prediction']
             for sample in output_handler.results_dict.values()
         ]
+
+    def _compute_multiround_input_lengths(self, chat: List) -> List[int]:
+        """Compute cumulative input token length at each generation turn.
+
+        Expects ``chat`` to be the filled multi-round conversation where
+        assistant slots already contain the generated responses. Returns a
+        list of cumulative token counts, one per generation turn, i.e. the
+        input length the model actually sees when generating each turn.
+        """
+        input_lengths = []
+        cumulative = 0
+        for msg in chat:
+            if isinstance(msg, dict):
+                role = msg.get('role', '')
+                content = msg.get('content', msg.get('prompt', ''))
+            else:
+                role, content = '', msg
+            if not isinstance(content, str):
+                content = str(content)
+            if role == 'assistant':
+                input_lengths.append(cumulative)
+            cumulative += self.model.get_token_len(content)
+        return input_lengths
 
     def _generate_multiround(self, entry: List,
                              extra_gen_kwargs: dict) -> List[List[str]]:
