@@ -7,9 +7,7 @@ We support prompt attack following the idea of [PromptBench](https://github.com/
 Some components are necessary to prompt attack experiment, therefore we need to set up environments.
 
 ```shell
-git clone https://github.com/microsoft/promptbench.git
-pip install textattack==0.3.8
-export PYTHONPATH=$PYTHONPATH:promptbench/
+pip install promptbench==0.0.4 textattack==0.3.8 lru-dict
 ```
 
 ## How to attack
@@ -87,7 +85,7 @@ attack = dict(
 
 ### Run the experiment
 
-Please use `--mode infer` when run the attack experiment, and set `PYTHONPATH` env.
+Please use `--mode infer` when running the attack experiment.
 
 ```shell
 python run.py examples/eval_attack.py --mode infer
