@@ -1,3 +1,4 @@
+import difflib
 import filecmp
 import json
 import os
@@ -12,6 +13,8 @@ _SUMMARY_COMPARE_EXTS = ('csv', 'md')
 _LCB_PATH_MARKERS = ('lcb', 'livecodebench', 'livecodebench_pro')
 _TRACEBACK_OBJ_RE = re.compile(r'<traceback object at 0x[0-9a-fA-F]+>')
 _MEM_ADDR_RE = re.compile(r'0x[0-9a-fA-F]+')
+_VALUE_PREVIEW_MAX = 512
+_TEXT_DIFF_MAX_LINES = 2
 
 
 def _load_json(path: str) -> Any:
@@ -114,6 +117,71 @@ def _emit_factory(lines: List[str], max_lines: int, path_prefix: str):
     return emit
 
 
+def _preview_value(value: Any, max_len: int = _VALUE_PREVIEW_MAX) -> str:
+    """Compact single-line preview of a value for diff messages."""
+    if isinstance(value, str):
+        text = value.replace('\n', '\\n').replace('\r', '\\r')
+    else:
+        try:
+            text = json.dumps(value, ensure_ascii=False, sort_keys=True)
+        except (TypeError, ValueError):
+            text = repr(value)
+        text = text.replace('\n', ' ')
+    if len(text) > max_len:
+        return text[:max_len - 3] + '...'
+    return text
+
+
+def _append_value_diff(
+    lines: List[str],
+    max_lines: int,
+    path: str,
+    left: Any,
+    right: Any,
+    note: str = 'value differs',
+) -> None:
+    """Append path note plus up to two preview lines (-left / +right)."""
+    if len(lines) >= max_lines:
+        return
+    lines.append(f'{path}: {note}' if path else note)
+    if len(lines) < max_lines:
+        lines.append(f'  - {_preview_value(left)}')
+    if len(lines) < max_lines:
+        lines.append(f'  + {_preview_value(right)}')
+
+
+def _text_diff_snippet(
+    path1: str,
+    path2: str,
+    max_diff_lines: int = _TEXT_DIFF_MAX_LINES,
+) -> str:
+    """Short unified-diff style snippet for two text files (1-2 +/- lines)."""
+    try:
+        with open(path1, encoding='utf-8', errors='replace') as f1:
+            lines1 = f1.read().splitlines()
+        with open(path2, encoding='utf-8', errors='replace') as f2:
+            lines2 = f2.read().splitlines()
+    except OSError as e:
+        return f'Content differs (could not read for diff: {e})'
+
+    if lines1 == lines2:
+        return 'Content differs (byte-level; text lines equal)'
+
+    diff_lines: List[str] = []
+    for line in difflib.unified_diff(lines1, lines2, lineterm='', n=0):
+        if line.startswith(('+++', '---', '@@')):
+            continue
+        if line.startswith(('+', '-')):
+            preview = line if len(line) <= _VALUE_PREVIEW_MAX else (
+                line[:_VALUE_PREVIEW_MAX - 3] + '...')
+            diff_lines.append(preview)
+            if len(diff_lines) >= max_diff_lines:
+                break
+    if not diff_lines:
+        return 'Content differs'
+    return 'Content differs:\n' + '\n'.join(diff_lines)
+
+
 def _key_structure_equal(a: Any, b: Any) -> bool:
     """True if types, dict keys, and list lengths match recursively; ignore leaves."""  # noqa: F401, E501
     if type(a) != type(b):
@@ -201,6 +269,10 @@ def json_semantic_diff_lines(
 
     if type(left) != type(right):
         emit(f'type mismatch {type(left).__name__} vs {type(right).__name__}')
+        if len(lines) < max_lines:
+            lines.append(f'  - {_preview_value(left)}')
+        if len(lines) < max_lines:
+            lines.append(f'  + {_preview_value(right)}')
         return lines
 
     if isinstance(left, dict):
@@ -225,10 +297,12 @@ def json_semantic_diff_lines(
                             label1=label1,
                             label2=label2,
                         ))
-                    if len(lines) == before and len(lines) < max_lines:
-                        lines.append(f'{sub}: value differs (semantic)')
-                elif len(lines) < max_lines:
-                    lines.append(f'{sub}: value differs (semantic)')
+                    if len(lines) == before:
+                        _append_value_diff(
+                            lines, max_lines, sub, left[k], right[k])
+                else:
+                    _append_value_diff(
+                        lines, max_lines, sub, left[k], right[k])
         return lines
 
     if isinstance(left, list):
@@ -251,17 +325,26 @@ def json_semantic_diff_lines(
                             label1=label1,
                             label2=label2,
                         ))
-                    if len(lines) == before and len(lines) < max_lines:
-                        lines.append(f'{sub}: value differs (semantic)')
-                elif len(lines) < max_lines:
-                    lines.append(f'{sub}: value differs (semantic)')
+                    if len(lines) == before:
+                        _append_value_diff(
+                            lines, max_lines, sub, left[i], right[i])
+                else:
+                    _append_value_diff(
+                        lines, max_lines, sub, left[i], right[i])
         if len(left) > len(right) and len(lines) < max_lines:
             emit(f'indices {len(right)}..{len(left) - 1} only in {label1}')
         elif len(right) > len(left) and len(lines) < max_lines:
             emit(f'indices {len(left)}..{len(right) - 1} only in {label2}')
         return lines
 
-    emit('scalar / leaf value differs under canonicalization')
+    _append_value_diff(
+        lines,
+        max_lines,
+        path_prefix,
+        left,
+        right,
+        note='scalar / leaf value differs',
+    )
     return lines
 
 
@@ -398,9 +481,10 @@ def compare_summary_folders(
             rel_path1 = os.path.relpath(path1, folder1)
             rel_path2 = os.path.relpath(path2, folder2)
             if not filecmp.cmp(path1, path2, shallow=False):
+                snippet = _text_diff_snippet(path1, path2)
                 diff_files.append((
                     rel_name,
-                    f'Content differs ({rel_path1} vs {rel_path2})',
+                    f'{snippet} ({rel_path1} vs {rel_path2})',
                 ))
 
     if diff_files:
@@ -500,7 +584,7 @@ def compare_folders(
                 if reason is not None:
                     diff_files.append((rel_path, reason))
             elif not filecmp.cmp(path1, path2, shallow=False):
-                diff_files.append((rel_path, 'Content differs'))
+                diff_files.append((rel_path, _text_diff_snippet(path1, path2)))
 
     for root, _dirs, files in os.walk(folder2):
         for file in files:
