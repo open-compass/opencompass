@@ -58,9 +58,7 @@ class TestOpenAI(unittest.TestCase):
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_basic(self, mock_requests, mock_tiktoken):
         """Test basic generate functionality."""
-        mock_enc = MagicMock()
-        mock_enc.encode.return_value = [1, 2, 3]
-        mock_tiktoken.encoding_for_model.return_value = mock_enc
+        setup_tiktoken_mock(mock_tiktoken)
 
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -105,9 +103,7 @@ class TestOpenAI(unittest.TestCase):
     def test_generate_with_reasoning_content(self, mock_requests,
                                              mock_tiktoken):
         """Test generate with reasoning content."""
-        mock_enc = MagicMock()
-        mock_enc.encode.return_value = [1, 2, 3]
-        mock_tiktoken.encoding_for_model.return_value = mock_enc
+        setup_tiktoken_mock(mock_tiktoken)
 
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -137,9 +133,7 @@ class TestOpenAI(unittest.TestCase):
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_with_retry(self, mock_requests, mock_tiktoken):
         """Test generate with retry on failure."""
-        mock_enc = MagicMock()
-        mock_enc.encode.return_value = [1, 2, 3]
-        mock_tiktoken.encoding_for_model.return_value = mock_enc
+        setup_tiktoken_mock(mock_tiktoken)
 
         # First call fails, second succeeds
         mock_response_fail = MagicMock()
@@ -260,6 +254,47 @@ class TestOpenAISDK(unittest.TestCase):
     @patch('openai.OpenAI')
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_multimodal_messages(self, mock_httpx_client,
+                                          mock_openai_class, mock_tiktoken):
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = 'A'
+        mock_response.choices[0].message.reasoning_content = None
+        mock_client.chat.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDK(path='gpt-4o', max_seq_len=16384)
+        model.generate([[
+            dict(role='user',
+                 content=[
+                     dict(type='text', text='Question'),
+                     dict(type='image',
+                          image_url='data:image/png;base64,AAAA')
+                 ])
+        ]],
+                       max_out_len=100)
+
+        messages = mock_client.chat.completions.create.call_args[1][
+            'messages']
+        self.assertEqual(messages[0]['content'][0],
+                         dict(type='text', text='Question'))
+        self.assertEqual(messages[0]['content'][1], {
+            'type': 'image_url',
+            'image_url': {
+                'url': 'data:image/png;base64,AAAA'
+            }
+        })
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_with_reasoning_content(self, mock_httpx_client,
                                              mock_openai_class, mock_tiktoken):
         """Test generate with reasoning content."""
@@ -365,6 +400,31 @@ class TestOpenAISDK(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Generated response')
         self.assertEqual(mock_client.chat.completions.create.call_count, 2)
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_returns_failure_message(self, mock_httpx_client,
+                                              mock_openai_class,
+                                              mock_tiktoken):
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.side_effect = RuntimeError('boom')
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDK(path='gpt-3.5-turbo',
+                          max_seq_len=16384,
+                          retry=1,
+                          failure_message='Failed to obtain answer via API.')
+
+        results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Failed to obtain answer via API.'])
 
 
 if __name__ == '__main__':
