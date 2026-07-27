@@ -507,17 +507,18 @@ def compare_results(
     raise_on_diff: bool = True,
     json_diff_max_lines: int = 10,
 ) -> Optional[List[Tuple[str, str]]]:
-    """Entry for scripts: take first subpath under each root, then compare compare_type."""  # noqa: F401, E501
+    """Pick a stable workdir under each root, then compare compare_type."""
     if results_ignore_list is None:
         results_ignore_list = ['srbench.json']
 
     assert os.path.isdir(folder1), f'Folder does not exist: {folder1}'
     assert os.path.isdir(folder2), f'Folder does not exist: {folder2}'
 
-    sub_folder1 = get_all_subpaths(folder1)[0]
-    sub_folder2 = get_all_subpaths(folder2)[0]
-
+    sub_folder1 = pick_compare_workdir(folder1)
+    sub_folder2 = pick_compare_workdir(folder2)
     print(f'compare {compare_type}')
+    print(f'  workdir1: {sub_folder1}')
+    print(f'  workdir2: {sub_folder2}')
     target1 = os.path.join(sub_folder1, compare_type)
     target2 = os.path.join(sub_folder2, compare_type)
     if compare_type == 'summary':
@@ -616,6 +617,43 @@ def get_all_subpaths(directory: str) -> List[str]:
         for file_name in files:
             subpaths.append(os.path.join(root, file_name))
     return subpaths
+
+
+_WORKDIR_MARKERS = ('predictions', 'results', 'summary')
+
+
+def _has_compare_markers(path: str) -> bool:
+    return any(
+        os.path.isdir(os.path.join(path, marker))
+        for marker in _WORKDIR_MARKERS)
+
+
+def pick_compare_workdir(root: str) -> str:
+    """Pick OpenCompass workdir under root for predictions/results/summary.
+
+    Prefers immediate child dirs that contain predictions/results/summary.
+    If several match, choose the newest by mtime. If root itself already has
+    markers, use root. Falls back to newest immediate subdirectory.
+    """
+    if not os.path.isdir(root):
+        raise ValueError(f'Directory does not exist: {root}')
+    if _has_compare_markers(root):
+        return root
+
+    children = [
+        os.path.join(root, name) for name in os.listdir(root)
+        if os.path.isdir(os.path.join(root, name))
+        and not name.startswith('.')
+        and not name.endswith('.bak')
+        and '.bak_' not in name
+    ]
+    marked = [p for p in children if _has_compare_markers(p)]
+    pool = marked or children
+    if not pool:
+        raise ValueError(
+            f'No workdir with {_WORKDIR_MARKERS} under {root}')
+    pool.sort(key=lambda p: (os.path.getmtime(p), p))
+    return pool[-1]
 
 
 if __name__ == '__main__':
