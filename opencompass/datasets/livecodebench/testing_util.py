@@ -83,13 +83,17 @@ def combined_int_check(val):
     return only_int_check(val) or string_int_check(val)
 
 
-def run_test(sample, test=None, debug=False, timeout=6):
+def run_test(sample,
+             test=None,
+             debug=False,
+             timeout=6,
+             memory_limit_bytes=None):
     """If test(generated_code) is not None it'll try to run the code.
 
     otherwise it'll just return an input and output pair.
     """
     # Disable functionalities that can make destructive changes to the test.
-    reliability_guard()
+    reliability_guard(maximum_memory_bytes=memory_limit_bytes)
 
     if debug:
         print(f'start = {datetime.now().time()}')
