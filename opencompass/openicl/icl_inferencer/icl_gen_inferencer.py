@@ -6,6 +6,7 @@ import os
 import os.path as osp
 import re
 import time
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from pathlib import Path
 from typing import List, Optional
 
@@ -60,6 +61,7 @@ class GenInferencer(BaseInferencer):
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
             save_every: Optional[int] = 1,
+            multiround: bool = False,
             **kwargs) -> None:
         super().__init__(
             model=model,
@@ -74,6 +76,7 @@ class GenInferencer(BaseInferencer):
         self.max_out_len = max_out_len
         self.min_out_len = min_out_len
         self.stopping_criteria = stopping_criteria
+        self.multiround = multiround
         self.dump_timer = kwargs.get('dump_timer', False)
         self.dump_res_length = kwargs.get('dump_res_length', False)
         self.dump_only_message_path = kwargs.get('dump_only_message_path',
@@ -174,9 +177,15 @@ class GenInferencer(BaseInferencer):
                     first_dump = False
                     logger.info('Save message successfully')
                     continue
-                results = self.model.generate_from_template(
-                    entry, max_out_len=self.max_out_len, **extra_gen_kwargs)
-                generated = results
+                if self.multiround:
+                    generated = self._generate_multiround(
+                        entry, extra_gen_kwargs)
+                else:
+                    results = self.model.generate_from_template(
+                        entry,
+                        max_out_len=self.max_out_len,
+                        **extra_gen_kwargs)
+                    generated = results
 
             num_return_sequences = getattr(self.model, 'generation_kwargs',
                                            {}).get('num_return_sequences', 1)
@@ -210,7 +219,7 @@ class GenInferencer(BaseInferencer):
                     if isinstance(pred_str, dict):
                         pred_str = pred_str['prediction']
 
-                    if num_return_sequences == 1:
+                    if isinstance(pred_str, str):
                         res_length = self.model.get_token_len(pred_str)
                     else:
                         res_length = [
@@ -264,6 +273,81 @@ class GenInferencer(BaseInferencer):
         return [
             sample['prediction']
             for sample in output_handler.results_dict.values()
+        ]
+
+    def _generate_multiround(self, entry: List,
+                             extra_gen_kwargs: dict) -> List[List[str]]:
+        """Multi-turn generation with dynamic turn-level scheduling.
+
+        All chats advance through their turns independently. A shared
+        ThreadPoolExecutor (max_workers from model) ensures concurrency
+        matches non-multiround mode. No turn-level synchronization barrier.
+        """
+        max_workers = self.batch_size
+
+        chat_gen_indices = []
+        for chat in entry:
+            gen_indices = [
+                i for i, msg in enumerate(chat)
+                if isinstance(msg, dict) and msg.get('role') == 'assistant'
+                and not msg.get('content', '')
+            ]
+            chat_gen_indices.append(gen_indices)
+
+        def _gen_turn(chat_idx, step):
+            msg_idx = chat_gen_indices[chat_idx][step]
+            history = entry[chat_idx][:msg_idx]
+            output = self.model.generate_from_template(
+                [history],
+                max_out_len=self.max_out_len,
+                **extra_gen_kwargs,
+            )[0]
+            entry[chat_idx][msg_idx]['content'] = output
+
+        next_step = [0] * len(entry)
+        in_flight = {}
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            for chat_idx in range(len(entry)):
+                if chat_gen_indices[chat_idx]:
+                    in_flight[executor.submit(_gen_turn, chat_idx,
+                                              0)] = chat_idx
+                    next_step[chat_idx] = 1
+
+            while in_flight:
+                done, _ = wait(set(in_flight), return_when=FIRST_COMPLETED)
+                for f in done:
+                    chat_idx = in_flight.pop(f)
+                    f.result()
+                    ns = next_step[chat_idx]
+                    if ns < len(chat_gen_indices[chat_idx]):
+                        in_flight[executor.submit(_gen_turn, chat_idx,
+                                                  ns)] = chat_idx
+                        next_step[chat_idx] = ns + 1
+
+        return [[
+            msg['content'] for msg in chat
+            if isinstance(msg, dict) and msg.get('role') == 'assistant'
+        ] for chat in entry]
+
+    def _fill_single_chat_turns(self, chat: List,
+                                extra_gen_kwargs: dict) -> List[str]:
+        """Fill all empty assistant slots in a single chat, sequentially."""
+        gen_indices = [
+            i for i, msg in enumerate(chat) if isinstance(msg, dict)
+            and msg.get('role') == 'assistant' and not msg.get('content', '')
+        ]
+        for i in gen_indices:
+            history = chat[:i]
+            output = self.model.generate_from_template(
+                [history],
+                max_out_len=self.max_out_len,
+                **extra_gen_kwargs,
+            )[0]
+            chat[i]['content'] = output
+        return [
+            msg['content'] for msg in chat
+            if isinstance(msg, dict) and msg.get('role') == 'assistant'
         ]
 
     def get_generation_prompt_list_from_retriever_indices(
