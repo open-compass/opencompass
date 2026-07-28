@@ -1,3 +1,4 @@
+from .aa_lcr import AALCRDataset, aa_lcr_llmjudge_postprocess  # noqa: F401
 from .advancedIF import AdvancedIFDataset  # noqa: F401
 from .advancedIF import advancedif_rubric_postprocess  # noqa: F401
 from .advglue import *  # noqa: F401, F403
@@ -62,6 +63,7 @@ from .ds1000_interpreter import *  # noqa: F401, F403
 from .Earth_Silver import *  # noqa: F401, F403
 from .eese.eese import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
+from .fake_alignment import *  # noqa: F401, F403
 from .FinanceIQ import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
@@ -134,6 +136,7 @@ from .mol_instructions_chem import *  # noqa: F401, F403
 from .moleculariq import *  # noqa: F401, F403
 from .mp20 import *  # noqa: F401, F403
 from .mrcr import *  # noqa: F401, F403
+from .MultiIF import MultiIFDataset, MultiIFEvaluator  # noqa: F401, F403
 from .multipl_e import *  # noqa: F401, F403
 from .multirc import *  # noqa: F401, F403
 from .musr import *  # noqa: F401, F403

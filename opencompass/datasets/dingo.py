@@ -47,10 +47,56 @@ class DingoLongDataset(BaseDataset):
 @ICL_EVALUATORS.register_module()
 class DingoEvaluator(BaseEvaluator):
 
+    @staticmethod
+    def _build_input_args(input_path: str):
+        try:
+            from dingo.io import InputArgs
+        except ImportError:
+            from dingo.config import InputArgs
+
+            return InputArgs(
+                input_path=input_path,
+                output_path='./outputs/dingo/',
+                dataset={
+                    'source': 'local',
+                    'format': 'jsonl',
+                    'field': {
+                        'prompt': 'prompt',
+                        'content': 'prediction',
+                    },
+                },
+                executor={
+                    'eval_group': 'llm_base',
+                    'result_save': {
+                        'bad': True,
+                    },
+                },
+            )
+
+        return InputArgs(
+            eval_group='llm_base',
+            input_path=input_path,
+            output_path='./outputs/dingo/',
+            save_data=True,
+            dataset='local',
+            data_format='jsonl',
+            column_prompt='prompt',
+            column_content='prediction',
+        )
+
+    @staticmethod
+    def _summary_to_dict(result):
+        if isinstance(result, list):
+            result = result[0]
+        if hasattr(result, 'to_dict'):
+            return result.to_dict()
+        if hasattr(result, 'model_dump'):
+            return result.model_dump()
+        return dict(result)
+
     def score(self, origin_prompt: List, predictions: List) -> dict:
         try:
             from dingo.exec import Executor
-            from dingo.io import InputArgs
         except Exception:
             raise ModuleNotFoundError(
                 '=========== '
@@ -67,21 +113,11 @@ class DingoEvaluator(BaseEvaluator):
             for d in file_data:
                 json.dump(d, f, ensure_ascii=False)
                 f.write('\n')
-        input_data = {
-            'eval_group': 'llm_base',
-            'input_path': file_name,
-            'output_path': './outputs/dingo/',
-            'save_data': True,
-            'dataset': 'local',
-            'data_format': 'jsonl',
-            'column_prompt': 'prompt',
-            'column_content': 'prediction',
-        }
         try:
-            input_args = InputArgs(**input_data)
+            input_args = self._build_input_args(file_name)
             executor = Executor.exec_map['local'](input_args)
             result = executor.execute()
-            summary = result[0].to_dict()
+            summary = self._summary_to_dict(result)
         except Exception:
             raise
         finally:

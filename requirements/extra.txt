@@ -9,7 +9,7 @@ Bio
 # OlympiadBench
 cn2an
 # Dingo
-dingo-python==1.5.0
+dingo-python==1.11.1
 # IFBench
 emoji
 # Icl topk retriever

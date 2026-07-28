@@ -139,8 +139,9 @@ class BaseEvaluator:
                 for key, value in score_kwargs.items()
             }
 
-            current_params['predictions'] = self.pred_postprocess(
-                current_params['predictions'])
+            if 'predictions' in current_params:
+                current_params['predictions'] = self.pred_postprocess(
+                    current_params['predictions'])
             results = self.score(**current_params)
             details = results.pop('details', None)
             if details is not None:

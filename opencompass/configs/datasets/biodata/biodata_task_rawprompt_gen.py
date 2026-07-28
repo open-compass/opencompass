@@ -51,6 +51,7 @@ tasks = {
 }
 
 biodata_task_datasets = []
+mini_biodata_task_datasets = []
 for metric, task in tasks.items():
     biodata_infer_cfg = dict(
         prompt_template=dict(
@@ -110,6 +111,18 @@ for metric, task in tasks.items():
                 type=BiodataTaskDataset,
                 path='opencompass/biology-instruction',
                 task=t,
+                reader_cfg=biodata_reader_cfg,
+                infer_cfg=biodata_infer_cfg,
+                eval_cfg=biodata_eval_cfg,
+            )
+        )
+        mini_biodata_task_datasets.append(
+            dict(
+                abbr=f'{t}-sample_1k-mini',
+                type=BiodataTaskDataset,
+                path='opencompass/biology-instruction',
+                task=t,
+                mini_set=True,
                 reader_cfg=biodata_reader_cfg,
                 infer_cfg=biodata_infer_cfg,
                 eval_cfg=biodata_eval_cfg,

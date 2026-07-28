@@ -3,7 +3,7 @@ from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import AGIEvalDataset_v2, AGIEvalEvaluator
-from opencompass.utils.text_postprocessors import first_option_postprocess, first_capital_postprocess_multi
+from opencompass.utils.text_postprocessors import first_capital_postprocess, first_capital_postprocess_multi
 
 agieval_reader_cfg = dict(
     input_columns=['question', 'options'], output_column='label')
@@ -15,6 +15,7 @@ agieval_single_choice_sets = [
     'gaokao-history',
     'gaokao-biology',
     'gaokao-chemistry',
+    'gaokao-physics',
     'gaokao-mathqa',
     'logiqa-zh',
     'lsat-ar',
@@ -27,7 +28,6 @@ agieval_single_choice_sets = [
     'aqua-rat',
 ]
 agieval_multiple_choices_sets = [
-    'gaokao-physics',
     'jec-qa-kd',
     'jec-qa-ca',
 ]
@@ -43,8 +43,6 @@ agieval_chinese_sets = [
     'gaokao-mathqa',
     'logiqa-zh',
     'gaokao-mathcloze',
-    'jec-qa-kd',
-    'jec-qa-ca',
 ]
 agieval_english_sets = [
     'lsat-ar',
@@ -78,16 +76,14 @@ for _name in agieval_single_choice_sets:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(round=[
-                dict(
-                    role='HUMAN', prompt=f'{{question}}\n{{options}}\n{_hint}')
+                dict(role='HUMAN', prompt=f'{{question}}\n{{options}}\n{_hint}')
             ])),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer, max_out_len=1024))
 
     agieval_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
-        pred_postprocessor=dict(
-            type=first_option_postprocess, options='ABCDE'))
+        pred_postprocessor=dict(type=first_capital_postprocess))
 
     agieval_datasets.append(
         dict(
@@ -109,8 +105,7 @@ for _name in agieval_multiple_choices_sets:
         prompt_template=dict(
             type=PromptTemplate,
             template=dict(round=[
-                dict(
-                    role='HUMAN', prompt=f'{{question}}\n{{options}}\n{_hint}')
+                dict(role='HUMAN', prompt=f'{{question}}\n{{options}}\n{_hint}')
             ])),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer, max_out_len=1024))
@@ -200,7 +195,7 @@ for _item in agieval_datasets:
         'gaokao-mathcloze':
         '以下是一道中国高考数学填空题，请填入正确的答案。',
         'math':
-        'The following is a Math question. Please select the correct answer.',
+        'The following is a Math question. Please give the correct answer.',
     }[_name]
     _templates = _item['infer_cfg']['prompt_template']['template']
     _templates['round'][0][

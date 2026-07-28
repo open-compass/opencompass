@@ -204,7 +204,7 @@ for _item in agieval_datasets:
         'gaokao-mathcloze':
         '以下是一道中国高考数学填空题，请填入正确的答案。',
         'math':
-        'The following is a Math question. Please select the correct answer.',
+        'The following is a Math question. Please give the correct answer.',
     }[_name]
     _templates = _item['infer_cfg']['prompt_template']['template']
 
