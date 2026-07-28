@@ -107,7 +107,7 @@ def extract_answer(answer, calid):
             month = int(match.group(1))
             day = int(match.group(2))
             year = match.group(3)
-            answer = f'{month:02}/{day:02}/{year}'
+            answer = f'{str(month).zfill(2)}/{str(day).zfill(2)}/{year}'
         else:
             answer = 'N/A'
 
