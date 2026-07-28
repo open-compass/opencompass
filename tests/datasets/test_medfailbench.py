@@ -1,3 +1,4 @@
+import ast
 import json
 import tempfile
 import unittest
@@ -61,6 +62,35 @@ class TestMedFailBenchDataset(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, 'patient-data-free'):
                 MedFailBenchDataset.load(str(path))
+
+    def test_infer_config_uses_official_raw_prompt(self):
+        config_path = Path(
+            'opencompass/configs/datasets/MedFailBench/'
+            'medfailbench_llmjudge_gen.py')
+        config_text = config_path.read_text(encoding='utf-8')
+        tree = ast.parse(config_text)
+        query_template = None
+
+        for node in tree.body:
+            if isinstance(node, ast.Assign):
+                targets = [t.id for t in node.targets if isinstance(t, ast.Name)]
+                if 'QUERY_TEMPLATE' in targets:
+                    query_template = ast.literal_eval(node.value)
+                    break
+
+        self.assertEqual(query_template, '{question}')
+        self.assertIn('RawPromptTemplate', config_text)
+        self.assertIn("dict(role='user', content=QUERY_TEMPLATE)",
+                      config_text)
+        self.assertNotIn('Respond in Turkish', config_text)
+
+    def test_readme_discloses_opencompass_judge_boundary(self):
+        readme = Path('opencompass/configs/datasets/MedFailBench/README.md')
+        text = readme.read_text(encoding='utf-8')
+
+        self.assertIn('not equivalent', text)
+        self.assertIn('official MedFailBench leaderboard scoring pipeline',
+                      text)
 
 
 if __name__ == '__main__':

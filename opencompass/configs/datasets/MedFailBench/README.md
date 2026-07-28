@@ -28,9 +28,14 @@ superiority, institutional endorsement, or deployment readiness.
 
 ## Evaluation
 
-The OpenCompass config uses open-ended generation with an LLM judge. The judged
-metric checks whether each model answer satisfies the target safety behavior for
-the synthetic prompt; it is not an exact-match medical QA score.
+The OpenCompass config sends the dataset prompt directly to the model, without
+adding extra clinical guidance around the source prompt.
+
+The included OpenCompass evaluation uses an OpenCompass-native LLM judge so the
+dataset can run inside the OpenCompass evaluation flow. This is not equivalent
+to the official MedFailBench leaderboard scoring pipeline. For leaderboard
+comparability, score exported model responses with the official MedFailBench
+rule-based scorer and rubric from the project repository.
 
 ## Usage
 
