@@ -298,11 +298,11 @@ def json_semantic_diff_lines(
                             label2=label2,
                         ))
                     if len(lines) == before:
-                        _append_value_diff(
-                            lines, max_lines, sub, left[k], right[k])
+                        _append_value_diff(lines, max_lines, sub, left[k],
+                                           right[k])
                 else:
-                    _append_value_diff(
-                        lines, max_lines, sub, left[k], right[k])
+                    _append_value_diff(lines, max_lines, sub, left[k],
+                                       right[k])
         return lines
 
     if isinstance(left, list):
@@ -326,11 +326,11 @@ def json_semantic_diff_lines(
                             label2=label2,
                         ))
                     if len(lines) == before:
-                        _append_value_diff(
-                            lines, max_lines, sub, left[i], right[i])
+                        _append_value_diff(lines, max_lines, sub, left[i],
+                                           right[i])
                 else:
-                    _append_value_diff(
-                        lines, max_lines, sub, left[i], right[i])
+                    _append_value_diff(lines, max_lines, sub, left[i],
+                                       right[i])
         if len(left) > len(right) and len(lines) < max_lines:
             emit(f'indices {len(right)}..{len(left) - 1} only in {label1}')
         elif len(right) > len(left) and len(lines) < max_lines:
@@ -642,16 +642,13 @@ def pick_compare_workdir(root: str) -> str:
 
     children = [
         os.path.join(root, name) for name in os.listdir(root)
-        if os.path.isdir(os.path.join(root, name))
-        and not name.startswith('.')
-        and not name.endswith('.bak')
-        and '.bak_' not in name
+        if os.path.isdir(os.path.join(root, name)) and not name.startswith('.')
+        and not name.endswith('.bak') and '.bak_' not in name
     ]
     marked = [p for p in children if _has_compare_markers(p)]
     pool = marked or children
     if not pool:
-        raise ValueError(
-            f'No workdir with {_WORKDIR_MARKERS} under {root}')
+        raise ValueError(f'No workdir with {_WORKDIR_MARKERS} under {root}')
     pool.sort(key=lambda p: (os.path.getmtime(p), p))
     return pool[-1]
 

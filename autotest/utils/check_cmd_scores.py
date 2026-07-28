@@ -59,7 +59,8 @@ def check_cmd_scores(
 
 def main(argv: List[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('run_dir', help='REPORT_ROOT/<run_id> with regression_result*')
+    p.add_argument('run_dir',
+                   help='REPORT_ROOT/<run_id> with regression_result*')
     p.add_argument('--min', dest='score_min', type=float, default=75.0)
     p.add_argument('--max', dest='score_max', type=float, default=80.0)
     p.add_argument('--count', type=int, default=3)

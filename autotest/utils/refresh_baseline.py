@@ -57,8 +57,10 @@ def refresh_baseline(
 
 def main(argv: List[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('src', help='Good run dir: REPORT_ROOT/<run_id>/<func_type>')
-    p.add_argument('dst', help='Baseline dir: REPORT_ROOT/mock-api-baseline/<func_type>')
+    p.add_argument('src',
+                   help='Good run dir: REPORT_ROOT/<run_id>/<func_type>')
+    p.add_argument(
+        'dst', help='Baseline dir: REPORT_ROOT/mock-api-baseline/<func_type>')
     p.add_argument('--no-backup', action='store_true')
     p.add_argument('--no-verify', action='store_true')
     args = p.parse_args(argv)
