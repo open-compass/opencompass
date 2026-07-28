@@ -39,6 +39,8 @@ class ClaudeSDK(BaseAPIModel):
             wrapping of any meta instructions.
         base_url (str, optional): Anthropic-compatible base URL. If omitted,
             use ANTHROPIC_BASE_URL from environment.
+        extra_headers (Dict, optional): Extra default HTTP headers passed to
+            the Anthropic SDK client.
         stream (bool): Whether to use streaming response. Defaults to False.
         retry (int): Number of retires if the API call fails. Defaults to 2.
         think_tag (str): Separator used between thinking content and final
@@ -59,6 +61,7 @@ class ClaudeSDK(BaseAPIModel):
         base_url: Optional[str] = None,
         stream: bool = False,
         retry: int = 2,
+        extra_headers: Optional[Dict[str, str]] = None,
         think_tag: str = '</think>',
         claude_extra_kwargs: Optional[Dict] = None,
     ):
@@ -83,6 +86,8 @@ class ClaudeSDK(BaseAPIModel):
         client_kwargs = {'api_key': key}
         if base_url:
             client_kwargs['base_url'] = base_url
+        if extra_headers is not None:
+            client_kwargs['default_headers'] = extra_headers
 
         self.anthropic = Anthropic(**client_kwargs)
         self.model = path
