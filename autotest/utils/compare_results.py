@@ -17,6 +17,17 @@ _VALUE_PREVIEW_MAX = 512
 _TEXT_DIFF_MAX_LINES = 2
 
 
+def _file_pair_abs_paths(path1: str, path2: str) -> str:
+    """Absolute paths for a compared pair (for manual inspection)."""
+    return (f'  left:  {os.path.abspath(path1)}\n'
+            f'  right: {os.path.abspath(path2)}')
+
+
+def _with_file_paths(message: str, path1: str, path2: str) -> str:
+    """Append absolute paths of both files under a diff/mismatch message."""
+    return f'{message}\n{_file_pair_abs_paths(path1, path2)}'
+
+
 def _load_json(path: str) -> Any:
     """Load UTF-8 JSON from disk."""
     with open(path, encoding='utf-8') as f:
@@ -145,9 +156,9 @@ def _append_value_diff(
         return
     lines.append(f'{path}: {note}' if path else note)
     if len(lines) < max_lines:
-        lines.append(f'  - {_preview_value(left)}')
+        lines.append('  - ' + _preview_value(left))
     if len(lines) < max_lines:
-        lines.append(f'  + {_preview_value(right)}')
+        lines.append('  + ' + _preview_value(right))
 
 
 def _text_diff_snippet(
@@ -162,10 +173,12 @@ def _text_diff_snippet(
         with open(path2, encoding='utf-8', errors='replace') as f2:
             lines2 = f2.read().splitlines()
     except OSError as e:
-        return f'Content differs (could not read for diff: {e})'
+        return _with_file_paths(
+            f'Content differs (could not read for diff: {e})', path1, path2)
 
     if lines1 == lines2:
-        return 'Content differs (byte-level; text lines equal)'
+        return _with_file_paths(
+            'Content differs (byte-level; text lines equal)', path1, path2)
 
     diff_lines: List[str] = []
     for line in difflib.unified_diff(lines1, lines2, lineterm='', n=0):
@@ -178,8 +191,9 @@ def _text_diff_snippet(
             if len(diff_lines) >= max_diff_lines:
                 break
     if not diff_lines:
-        return 'Content differs'
-    return 'Content differs:\n' + '\n'.join(diff_lines)
+        return _with_file_paths('Content differs', path1, path2)
+    return _with_file_paths('Content differs:\n' + '\n'.join(diff_lines),
+                            path1, path2)
 
 
 def _key_structure_equal(a: Any, b: Any) -> bool:
@@ -270,9 +284,9 @@ def json_semantic_diff_lines(
     if type(left) != type(right):
         emit(f'type mismatch {type(left).__name__} vs {type(right).__name__}')
         if len(lines) < max_lines:
-            lines.append(f'  - {_preview_value(left)}')
+            lines.append('  - ' + _preview_value(left))
         if len(lines) < max_lines:
-            lines.append(f'  + {_preview_value(right)}')
+            lines.append('  + ' + _preview_value(right))
         return lines
 
     if isinstance(left, dict):
@@ -360,9 +374,9 @@ def _json_pair_compare_reason(
         left = _load_json(path1)
         right = _load_json(path2)
     except json.JSONDecodeError as e:
-        return f'Invalid JSON: {e}'
+        return _with_file_paths(f'Invalid JSON: {e}', path1, path2)
     except OSError as e:
-        return f'Could not read JSON file: {e}'
+        return _with_file_paths(f'Could not read JSON file: {e}', path1, path2)
 
     if _path_is_lcb_results(rel_path, compare_type):
         left = _normalize_lcb_results(left)
@@ -387,7 +401,7 @@ def _json_pair_compare_reason(
         header = (
             'JSON key/shape mismatch (do_sample path; leaf values ignored). '
             'Details:\n')
-        return header + '\n'.join(detail)
+        return _with_file_paths(header + '\n'.join(detail), path1, path2)
 
     if _semantic_equal(left, right):
         return None
@@ -403,7 +417,11 @@ def _json_pair_compare_reason(
         detail = [
             '(no per-key diff lines; structure may be non-dict/non-list)'
         ]
-    return 'JSON semantic mismatch. Details:\n' + '\n'.join(detail)
+    return _with_file_paths(
+        'JSON semantic mismatch. Details:\n' + '\n'.join(detail),
+        path1,
+        path2,
+    )
 
 
 def _is_json_file(name: str) -> bool:
@@ -471,21 +489,28 @@ def compare_summary_folders(
             if path1 is None and path2 is None:
                 continue
             if path1 is None:
-                diff_files.append(
-                    (rel_name, f'No summary_*.{ext} in first folder'))
-                continue
-            if path2 is None:
-                diff_files.append(
-                    (rel_name, f'No summary_*.{ext} in second folder'))
-                continue
-            rel_path1 = os.path.relpath(path1, folder1)
-            rel_path2 = os.path.relpath(path2, folder2)
-            if not filecmp.cmp(path1, path2, shallow=False):
-                snippet = _text_diff_snippet(path1, path2)
                 diff_files.append((
                     rel_name,
-                    f'{snippet} ({rel_path1} vs {rel_path2})',
+                    _with_file_paths(
+                        f'No summary_*.{ext} in first folder',
+                        os.path.join(folder1, rel_dir or '.'),
+                        path2,
+                    ),
                 ))
+                continue
+            if path2 is None:
+                diff_files.append((
+                    rel_name,
+                    _with_file_paths(
+                        f'No summary_*.{ext} in second folder',
+                        path1,
+                        os.path.join(folder2, rel_dir or '.'),
+                    ),
+                ))
+                continue
+            if not filecmp.cmp(path1, path2, shallow=False):
+                snippet = _text_diff_snippet(path1, path2)
+                diff_files.append((rel_name, snippet))
 
     if diff_files:
         header = (
@@ -571,7 +596,11 @@ def compare_folders(
             path2 = os.path.join(folder2, rel_path)
 
             if not os.path.exists(path2):
-                diff_files.append((rel_path, 'File missing in second folder'))
+                diff_files.append((
+                    rel_path,
+                    _with_file_paths('File missing in second folder', path1,
+                                     path2),
+                ))
                 continue
 
             if _is_json_file(file):
@@ -593,8 +622,13 @@ def compare_folders(
                 continue
             rel_path = os.path.relpath(os.path.join(root, file), folder2)
             path1 = os.path.join(folder1, rel_path)
+            path2 = os.path.join(root, file)
             if not os.path.exists(path1):
-                diff_files.append((rel_path, 'File missing in first folder'))
+                diff_files.append((
+                    rel_path,
+                    _with_file_paths('File missing in first folder', path1,
+                                     path2),
+                ))
 
     if diff_files:
         error_msg = 'Found differences in files:\n' + '\n'.join(
