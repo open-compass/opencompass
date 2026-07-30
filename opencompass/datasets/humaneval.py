@@ -154,27 +154,33 @@ class HumanEvalPlusEvaluator(BaseEvaluator):
                 test_details=0.2,
                 min_time_limit=0.2,
                 gt_time_limit_factor=4.0,
-                mini=None,
+                mini=False,
             )
-            score = evaluate(flags)
+            evaluate(**flags)
             results_path = osp.join(tmp_dir, 'human_eval_eval_results.json')
             with open(results_path, 'r') as f:
-                results = json.load(f)
+                eval_results = json.load(f)
             details = {}
+            n_total = 0
+            n_plus_pass = 0
             for index in range(len(predictions)):
-                r = results['eval'][references[index]]
-
+                task_results = eval_results['eval'][references[index]]
+                r = task_results[0]
+                n_total += 1
+                if r['base_status'] == 'pass' and r.get('plus_status') == 'pass':
+                    n_plus_pass += 1
                 details[str(index)] = {
                     'prompt': prompts[index],
                     'prediction': predictions[index],
                     'reference': references[index],
-                    'base_result': r['base'][0][0],
-                    'plus_result': r['plus'][0][0],
-                    'is_correct': r['base'][0][0] == 'success' and r['plus'][0][0] == 'success',
+                    'base_result': r['base_status'],
+                    'plus_result': r.get('plus_status'),
+                    'is_correct': r['base_status'] == 'pass' and r.get('plus_status') == 'pass',
                 }
-                if r['nfiles'] > 1:
+                if len(task_results) > 1:
                     details[str(index)]['warning'] = 'Multiple files in the solution. Details may be wrong.'
-        results = {f'humaneval_plus_{k}': score[k] * 100 for k in score}
+        pass_at_1 = n_plus_pass / n_total * 100 if n_total > 0 else 0.0
+        results = {'humaneval_plus_pass@1': pass_at_1}
         results['details'] = details
         return results
 

@@ -197,7 +197,11 @@ class TurboMindAPIModel(BaseModel):
                 max_tokens=max_tokens,
                 **gen_kwargs,
         ):
-            response += output['choices'][0]['text']
+            if 'choices' in output and output['choices']:
+                response += output['choices'][0]['text']
+            elif self.logger:
+                self.logger.warning(
+                    f'Unexpected API response (no choices): {output}')
         response = valid_str(response)
         if end_str:
             response = response.split(end_str)[0]

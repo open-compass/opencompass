@@ -305,9 +305,18 @@ class MBPPEvaluator(BaseEvaluator):
                              test_details=0.2,
                              min_time_limit=0.2,
                              gt_time_limit_factor=4.0,
-                             mini=None)
-                score = self.eval(flags)
-                return {f'mbpp_plus_{k}': score[k] * 100 for k in score}
+                             mini=False)
+                self.eval(**flags)
+                results_path = out_dir.replace('.jsonl', '_eval_results.json')
+                with open(results_path, 'r') as f:
+                    eval_results = json.load(f)
+                n_total = len(eval_results['eval'])
+                n_plus_pass = sum(
+                    1 for tid in eval_results['eval']
+                    if eval_results['eval'][tid] and eval_results['eval'][tid]
+                    [0].get('plus_status') == 'pass')
+                pass_at_1 = n_plus_pass / n_total * 100 if n_total > 0 else 0.0
+                return {'mbpp_plus_pass@1': pass_at_1}
 
     def _process_answer(self, text):
         patterns = [
