@@ -6,6 +6,7 @@ import multiprocessing
 import os.path as osp
 import signal
 import tempfile
+from argparse import Namespace
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from os import environ
@@ -305,8 +306,9 @@ class MBPPEvaluator(BaseEvaluator):
                              test_details=0.2,
                              min_time_limit=0.2,
                              gt_time_limit_factor=4.0,
-                             mini=False)
-                self.eval(**flags)
+                             mini=False,
+                             noextreme=False)
+                self.eval(Namespace(**flags))
                 results_path = out_dir.replace('.jsonl', '_eval_results.json')
                 with open(results_path, 'r') as f:
                     eval_results = json.load(f)

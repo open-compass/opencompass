@@ -5,6 +5,7 @@ import json
 import os.path as osp
 import re
 import tempfile
+from argparse import Namespace
 from os import environ
 from typing import List
 
@@ -155,8 +156,9 @@ class HumanEvalPlusEvaluator(BaseEvaluator):
                 min_time_limit=0.2,
                 gt_time_limit_factor=4.0,
                 mini=False,
+                noextreme=False,
             )
-            evaluate(**flags)
+            evaluate(Namespace(**flags))
             results_path = osp.join(tmp_dir, 'human_eval_eval_results.json')
             with open(results_path, 'r') as f:
                 eval_results = json.load(f)
