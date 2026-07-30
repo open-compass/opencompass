@@ -295,6 +295,14 @@ class MBPPEvaluator(BaseEvaluator):
                 for pred in preds:
                     pred = self._process_answer(pred)
                     mbpp_preds.append({'task_id': refer, 'solution': pred})
+
+            # Pad missing problems with empty solutions to satisfy
+            # evalplus's assertion that all problems have samples
+            from evalplus.data import get_mbpp_plus
+            all_task_ids = set(get_mbpp_plus().keys())
+            existing_task_ids = {p['task_id'] for p in mbpp_preds}
+            for tid in all_task_ids - existing_task_ids:
+                mbpp_preds.append({'task_id': tid, 'solution': ''})
             with tempfile.TemporaryDirectory() as tmp_dir:
                 out_dir = osp.join(tmp_dir, 'mbpp_eval.jsonl')
                 self.write_jsonl(out_dir, mbpp_preds)
@@ -312,7 +320,7 @@ class MBPPEvaluator(BaseEvaluator):
                 results_path = out_dir.replace('.jsonl', '_eval_results.json')
                 with open(results_path, 'r') as f:
                     eval_results = json.load(f)
-                n_total = len(eval_results['eval'])
+                n_total = len(predictions)
                 n_plus_pass = sum(
                     1 for tid in eval_results['eval']
                     if eval_results['eval'][tid] and eval_results['eval'][tid]
