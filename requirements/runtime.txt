@@ -44,6 +44,6 @@ tokenizers>=0.13.3
 torch>=1.13.1
 tqdm>=4.64.1
 transformers>=4.29.1
-tree-sitter==0.22.0
+tree-sitter==0.21.3
 tree_sitter_languages>=1.10.2
 typer

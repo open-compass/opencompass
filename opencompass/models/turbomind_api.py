@@ -195,6 +195,7 @@ class TurboMindAPIModel(BaseModel):
                 prompt=prompt,
                 model=self.model_name,
                 max_tokens=max_tokens,
+                max_completion_tokens=max_tokens,
                 **gen_kwargs,
         ):
             response += output['choices'][0]['text']
