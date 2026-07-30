@@ -68,7 +68,7 @@ class TurboMindAPIModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.serve.openai.api_client import APIClient
-        self.chatbot = APIClient(api_addr, api_key)
+        self.chatbot = APIClient(api_addr.rstrip('/'), api_key)
         self.model_name = model_name
         self.logger = get_logger()
         self.template_parser = LMTemplateParser(meta_template)
@@ -197,11 +197,7 @@ class TurboMindAPIModel(BaseModel):
                 max_tokens=max_tokens,
                 **gen_kwargs,
         ):
-            if 'choices' in output and output['choices']:
-                response += output['choices'][0]['text']
-            elif self.logger:
-                self.logger.warning(
-                    f'Unexpected API response (no choices): {output}')
+            response += output['choices'][0]['text']
         response = valid_str(response)
         if end_str:
             response = response.split(end_str)[0]
