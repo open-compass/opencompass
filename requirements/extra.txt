@@ -12,6 +12,8 @@ cn2an
 dingo-python==1.11.1
 # IFBench
 emoji
+# HumanEval+, MBPP+
+evalplus==0.2.1
 # Icl topk retriever
 faiss-gpu==1.14.3; python_version >= "3.10"
 faiss_gpu==1.7.2; python_version < "3.10"
