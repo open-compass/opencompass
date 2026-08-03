@@ -90,7 +90,7 @@ class TestHuggingFacewithChatTemplate(unittest.TestCase):
         mock_input_ids.shape = [1, 3]  # batch_size=1, seq_len=3
         mock_attention_mask = MagicMock()
         mock_attention_mask.to.return_value = mock_attention_mask
-        mock_tokenizer.batch_encode_plus.return_value = {
+        mock_tokenizer.return_value = {
             'input_ids': mock_input_ids,
             'attention_mask': mock_attention_mask
         }
@@ -125,6 +125,13 @@ class TestHuggingFacewithChatTemplate(unittest.TestCase):
 
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Generated response')
+        mock_tokenizer.assert_called_once_with(
+            ['Formatted prompt'],
+            return_tensors='pt',
+            padding=True,
+            truncation=True,
+            add_special_tokens=False,
+            max_length=2048)
         mock_model.generate.assert_called_once()
 
     @patch('transformers.AutoTokenizer')
@@ -214,7 +221,7 @@ class TestHuggingFaceBaseModel(unittest.TestCase):
         mock_input_ids.to.return_value = mock_input_ids
         mock_attention_mask = MagicMock()
         mock_attention_mask.to.return_value = mock_attention_mask
-        mock_tokenizer.batch_encode_plus.return_value = {
+        mock_tokenizer.return_value = {
             'input_ids': mock_input_ids,
             'attention_mask': mock_attention_mask
         }
@@ -242,6 +249,13 @@ class TestHuggingFaceBaseModel(unittest.TestCase):
 
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Generated response')
+        mock_tokenizer.assert_called_once_with(
+            ['Hello'],
+            return_tensors='pt',
+            padding=True,
+            truncation=True,
+            add_special_tokens=True,
+            max_length=2048)
         mock_model.generate.assert_called_once()
 
     @patch('transformers.AutoTokenizer')

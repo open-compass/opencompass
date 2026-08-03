@@ -295,11 +295,11 @@ class HuggingFace(BaseModel):
                 conv.append_message(conv.roles[1], None)
                 inputs[i] = conv.get_prompt()
 
-        # step-1: tokenize the input with batch_encode_plus
-        tokens = self.tokenizer.batch_encode_plus(inputs,
-                                                  padding=True,
-                                                  truncation=True,
-                                                  max_length=self.max_seq_len)
+        # step-1: tokenize the batched inputs
+        tokens = self.tokenizer(inputs,
+                                padding=True,
+                                truncation=True,
+                                max_length=self.max_seq_len)
         tokens = {
             k: torch.tensor(np.array(tokens[k]), device=self.model.device)
             for k in tokens if k in ['input_ids', 'attention_mask']

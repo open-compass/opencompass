@@ -238,7 +238,7 @@ class TestHuggingFace(unittest.TestCase):
         """Test generate with batch_padding=True."""
         mock_tokenizer = MagicMock()
         mock_tokenizer.pad_token_id = 0
-        mock_tokenizer.batch_encode_plus.return_value = {
+        mock_tokenizer.return_value = {
             'input_ids': [[1, 2, 3], [4, 5, 6]],
             'attention_mask': [[1, 1, 1], [1, 1, 1]]
         }
@@ -268,6 +268,10 @@ class TestHuggingFace(unittest.TestCase):
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0], 'Response 1')
         self.assertEqual(results[1], 'Response 2')
+        mock_tokenizer.assert_called_once_with(['Hello', 'Hi'],
+                                               padding=True,
+                                               truncation=True,
+                                               max_length=2048)
         mock_model.generate.assert_called_once()
 
     @patch('transformers.AutoTokenizer')
