@@ -109,6 +109,9 @@ class OpenAISDKStreaming(OpenAISDK):
 
         assert isinstance(input, (str, list, PromptList))
 
+        if not self.stream:
+            return super()._generate(input, max_out_len, temperature)
+
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,
             self.get_token_len)
@@ -151,19 +154,14 @@ class OpenAISDKStreaming(OpenAISDK):
                         f'[Thread {thread_id}] Start calling OpenAI API '
                         f'with streaming enabled')
 
-                if self.stream:
-                    # Handle streaming response with shorter timeout
-                    stream = self.openai_client.chat.completions.create(
-                        **query_data, timeout=self.timeout)
+                # Handle streaming response with shorter timeout
+                stream = self.openai_client.chat.completions.create(
+                    **query_data, timeout=self.timeout)
 
-                    result = self._handle_stream_response(
-                        stream, thread_id if self.verbose else None)
+                result = self._handle_stream_response(
+                    stream, thread_id if self.verbose else None)
 
-                    return result
-                else:
-                    # Fallback to non-streaming (use parent method)
-                    return super()._generate(input, max_out_len, temperature,
-                                             self.timeout)
+                return result
 
             except (BadRequestError, APIStatusError) as e:
                 status_code = e.status_code

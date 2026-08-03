@@ -65,6 +65,42 @@ class TestOpenAISDKStreaming(unittest.TestCase):
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('openai.OpenAI')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_with_stream_false(self, mock_openai_class,
+                                        mock_tiktoken):
+        """Test stream=False delegates to the non-streaming SDK request."""
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = 'Generated response'
+        mock_response.choices[0].message.reasoning_content = None
+
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+
+        with patch.object(OpenAISDKStreaming,
+                          '_create_fresh_client',
+                          return_value=mock_client):
+            model = OpenAISDKStreaming(path='gpt-3.5-turbo',
+                                       max_seq_len=16384,
+                                       stream=False)
+
+        model.acquire = MagicMock()
+        model.release = MagicMock()
+
+        results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Generated response'])
+        call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertNotIn('stream', call_kwargs)
+        self.assertEqual(call_kwargs['temperature'], 0.7)
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_with_streaming(self, mock_openai_class, mock_tiktoken):
         """Test generate with streaming enabled."""
         mock_enc = MagicMock()
