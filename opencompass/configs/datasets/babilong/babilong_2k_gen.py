@@ -29,7 +29,7 @@ for task in tasks:
                 ),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer， max_seq_len=max_seq_len),
+            inferencer=dict(type=GenInferencer, max_seq_len=max_seq_len),
         ),
         'eval_cfg': dict(
             evaluator=dict(type=BabiLongEvaluator),
