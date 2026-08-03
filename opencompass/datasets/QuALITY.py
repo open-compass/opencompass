@@ -56,6 +56,10 @@ class QuALITYEvaluator(BaseEvaluator):
                 easy.append(answer)
             else:
                 hard.append(answer)
-        return dict(easy_acc=sum(easy) / len(easy) * 100,
-                    hard_acc=sum(hard) / len(easy) * 100,
-                    all_acc=sum(all) / len(all) * 100)
+
+        def accuracy(answers):
+            return sum(answers) / len(answers) * 100 if answers else 0.0
+
+        return dict(easy_acc=accuracy(easy),
+                    hard_acc=accuracy(hard),
+                    all_acc=accuracy(all))
