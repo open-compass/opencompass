@@ -8,7 +8,6 @@ from opencompass.utils.datasets_info import DATASETS_MAPPING
 
 from .base import BaseDataset
 
-
 MEDFAILBENCH_DATA_URL = (
     'https://raw.githubusercontent.com/goktugozkanmd/'
     'medical-ai-failure-atlas/'
