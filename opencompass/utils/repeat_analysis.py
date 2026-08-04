@@ -367,8 +367,10 @@ def _collect_predictions_by_benchmark(
                         raw_res_length = sample.get('res_length', None)
                         if raw_res_length is not None:
                             if isinstance(raw_res_length, list):
-                                res_length = (raw_res_length[0]
-                                              if raw_res_length else 0)
+                                # Multi-turn: each turn's response is joined
+                                # by _prediction_to_text with '\n', so sum
+                                # across turns to match the combined text.
+                                res_length = sum(raw_res_length)
                             else:
                                 res_length = raw_res_length
                     else:

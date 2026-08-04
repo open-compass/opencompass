@@ -169,9 +169,9 @@ class GenInferencerOutputHandler:
         }
         if gold:
             self.results_dict[str(idx)]['gold'] = gold
-        if res_length:
+        if res_length is not None:
             self.results_dict[str(idx)]['res_length'] = res_length
-        if input_length:
+        if input_length is not None:
             self.results_dict[str(idx)]['all_input_length'] = input_length
 
 
