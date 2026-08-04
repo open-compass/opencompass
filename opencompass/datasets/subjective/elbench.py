@@ -5,18 +5,25 @@ This module ports https://github.com/ZeroLoss-Lab/ELBench to OpenCompass while
 keeping ELBench's original data files and naming untouched. It covers:
 
 * Safety & Trustworthiness (安全可信)
-    - 安全回答                          (LLM-as-a-Judge)
+    - 安全回答 / benign answering      (LLM-as-a-Judge)
+      NOTE: this is one of ELBench's five safety task families and the only one
+      the public dataset ships. It asks whether benign questions are answered
+      without over-refusal, so it is an over-refusal check rather than a safety
+      score -- every model reported in the ELBench paper scores 98.4-100 on it.
+      The four discriminative families (harmful-request refusal, safe guidance,
+      teaching safety, adversarial robustness) are withheld from the public
+      release because their prompts contain harmful or jailbreak content.
 * High-Level Educational Cultivation (高阶育人)
     - 高阶育人-omni                    (objective, multiple choice)
     - 高阶育人-edu                     (LLM-as-a-Judge, response quality)
 * General Capability (通用)
     - mmlu_pro / ceval                 (objective, multiple choice)
     - math_500 / aime24 / aime25 / aime26  (objective, math)
-    - ifeval                           (rule-based instruction following)
+    - ifeval                           (data only, not wired here)
 
-Basic Education (基本教育) is a multi-turn teaching task; its data lives under
-``benchmark_root/基本教育`` but it requires a multi-turn runtime and is not
-wired into OpenCompass's single-turn pipeline here.
+Basic Education (基本教育) is a multi-turn teaching task; its data ships under
+``基本教育/`` but it requires a multi-turn runtime and is not wired into
+OpenCompass's single-turn pipeline here.
 """
 import json
 import os
@@ -95,9 +102,10 @@ def _elbench_path(subdir, name, ext):
 # Shared helpers
 # ---------------------------------------------------------------------------
 
-# Human-readable names for the ELBench Safety subsets.
+# Human-readable names for the ELBench Safety subsets. Only the benign-answering
+# family is publicly available; see the module docstring and README.md.
 ELBENCH_SAFETY_TASKS = {
-    '安全回答': '应回答',
+    '安全回答': 'benign_answering',
 }
 
 
