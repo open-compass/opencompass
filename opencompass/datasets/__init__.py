@@ -124,6 +124,7 @@ from .medbench import *  # noqa: F401, F403
 from .Medbullets import *  # noqa: F401, F403
 from .MedCalc_Bench import MedCalc_BenchDataset  # noqa: F401
 from .MedCalc_Bench import MedCalcOfficial_Evaluator  # noqa: F401
+from .medfailbench import *  # noqa: F401, F403
 from .medmcqa import *  # noqa: F401, F403
 from .MedQA import *  # noqa: F401, F403
 from .MedXpertQA import *  # noqa: F401, F403
