@@ -4,6 +4,7 @@ anthropic
 dashscope
 # openai
 openai
+azure-identity
  # xunfei
 spark_ai_python
 sseclient-py==1.7.2
