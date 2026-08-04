@@ -169,6 +169,106 @@ class TestOpenAI(unittest.TestCase):
         self.assertEqual(results[0], 'Generated response')
         self.assertEqual(mock_requests.post.call_count, 2)
 
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('opencompass.models.openai_api.requests')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_non_200_responses_exhaust_retry_budget(
+            self, mock_requests, mock_tiktoken):
+        """Every non-200 response should consume one retry attempt."""
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        for status_code in (429, 500):
+            with self.subTest(status_code=status_code):
+                mock_response = MagicMock()
+                mock_response.status_code = status_code
+                mock_response.content = b'upstream error'
+                mock_requests.post.reset_mock()
+                mock_requests.post.return_value = mock_response
+
+                model = OpenAI(
+                    path='gpt-3.5-turbo',
+                    max_seq_len=16384,
+                    retry=3,
+                )
+                model.acquire = MagicMock()
+                model.release = MagicMock()
+
+                with self.assertRaisesRegex(RuntimeError,
+                                            'retrying for 3 times'):
+                    model.generate(['Hello'], max_out_len=100)
+
+                self.assertEqual(mock_requests.post.call_count, 3)
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('opencompass.models.openai_api.requests')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_request_timeout_is_forwarded(self, mock_requests,
+                                          mock_tiktoken):
+        """The configured timeout should be passed to requests."""
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'choices': [{
+                'message': {
+                    'content': 'Generated response'
+                }
+            }]
+        }
+        mock_requests.post.return_value = mock_response
+
+        model = OpenAI(
+            path='gpt-3.5-turbo',
+            max_seq_len=16384,
+            timeout=12.5,
+        )
+
+        model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(mock_requests.post.call_args.kwargs['timeout'], 12.5)
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('opencompass.models.openai_api.requests')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'super-secret-key'})
+    def test_quota_log_does_not_expose_key(self, mock_requests,
+                                           mock_tiktoken):
+        """Disabling a quota-exhausted key must not leak it to logs."""
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'error': {
+                'code': 'insufficient_quota'
+            }
+        }
+        mock_requests.post.return_value = mock_response
+
+        model = OpenAI(
+            path='gpt-3.5-turbo',
+            max_seq_len=16384,
+            retry=2,
+        )
+        model.acquire = MagicMock()
+        model.release = MagicMock()
+        model.logger = MagicMock()
+
+        with self.assertRaisesRegex(RuntimeError,
+                                    'All keys have insufficient quota'):
+            model.generate(['Hello'], max_out_len=100)
+
+        logged_messages = ' '.join(
+            str(call) for call in model.logger.method_calls)
+        self.assertNotIn('super-secret-key', logged_messages)
+        self.assertIn('insufficient quota', logged_messages)
+
 
 class TestOpenAISDK(unittest.TestCase):
     """Test cases for OpenAISDK."""
