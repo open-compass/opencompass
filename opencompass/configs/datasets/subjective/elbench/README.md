@@ -2,10 +2,10 @@
 
 ## Introduction
 
-[ELBench](https://github.com/ZeroLoss-Lab/ELBench) is a multi-dimensional
-benchmark for **education-facing** large language models. This directory ports
-ELBench to OpenCompass while keeping ELBench's **original data files and naming**
-(Chinese filenames and directory layout) unchanged.
+[ELBench](https://huggingface.co/datasets/ZeroLoss-Lab/ELBench) is a
+multi-dimensional benchmark for **education-facing** large language models. This
+directory ports ELBench to OpenCompass while keeping ELBench's **original data
+files and naming** (Chinese filenames and directory layout) unchanged.
 
 ## Modules and subsets
 
@@ -57,11 +57,15 @@ datasets:
 | `DATASET_SOURCE` | Behaviour |
 |:-----------------|:----------|
 | `HF` | download [`ZeroLoss-Lab/ELBench`](https://huggingface.co/datasets/ZeroLoss-Lab/ELBench) from HuggingFace |
-| `ModelScope` | download the ModelScope snapshot of the same dataset |
+| `ModelScope` | download the ModelScope mirror — **not published yet**, use `HF` |
 | unset (default) | **local mode** — read `$COMPASS_DATA_CACHE/data/elbench`, no download |
 
 In the default local mode the data must already be on disk, otherwise the loader
-raises `FileNotFoundError`. Set `DATASET_SOURCE` explicitly to download.
+raises `FileNotFoundError`. Set `DATASET_SOURCE=HF` to download.
+
+`datasets_info.py` registers `ms_id: ZeroLoss-Lab/ELBench`, but that dataset does
+not exist on ModelScope at the time of writing, so `DATASET_SOURCE=ModelScope`
+currently fails. HuggingFace is the only working source.
 
 ## How to run
 
@@ -101,6 +105,6 @@ not need a judge model.
   title  = {ELBench: A Multi-dimensional Benchmark for Education-facing Large Language Models},
   author = {ZeroLoss Lab},
   year   = {2026},
-  howpublished = {\url{https://github.com/ZeroLoss-Lab/ELBench}}
+  howpublished = {\url{https://huggingface.co/datasets/ZeroLoss-Lab/ELBench}}
 }
 ```

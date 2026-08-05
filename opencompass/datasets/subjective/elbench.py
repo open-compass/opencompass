@@ -1,8 +1,9 @@
 # flake8: noqa
 """ELBench: a multi-dimensional benchmark for education-facing LLMs.
 
-This module ports https://github.com/ZeroLoss-Lab/ELBench to OpenCompass while
-keeping ELBench's original data files and naming untouched. It covers:
+This module ports https://huggingface.co/datasets/ZeroLoss-Lab/ELBench to
+OpenCompass while keeping ELBench's original data files and naming untouched.
+It covers:
 
 * Safety & Trustworthiness (安全可信)
     - 安全回答 / benign answering      (LLM-as-a-Judge)
@@ -47,9 +48,10 @@ from .utils import get_judgeanswer_and_reference
 #
 # ELBench ships its files under a data root that holds the four original
 # Chinese top-level module directories: 安全可信 / 通用 / 高阶育人 / 基本教育.
-# The same layout is published on HuggingFace / ModelScope
-# (ZeroLoss-Lab/ELBench) and registered in ``datasets_info.py`` as
-# ``opencompass/ELBench`` -> ``./data/elbench``.
+# The same layout is published on HuggingFace (ZeroLoss-Lab/ELBench) and
+# registered in ``datasets_info.py`` as ``opencompass/ELBench`` ->
+# ``./data/elbench``. Note that the registered ``ms_id`` does not resolve on
+# ModelScope yet, so ``DATASET_SOURCE=ModelScope`` currently fails; use ``HF``.
 #
 # Resolution mirrors ChemBench and other OC datasets:
 #   * ``DATASET_SOURCE=ModelScope`` -> download the ModelScope snapshot;
