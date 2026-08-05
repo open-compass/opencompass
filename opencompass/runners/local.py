@@ -17,6 +17,7 @@ from tqdm import tqdm
 
 from opencompass.registry import RUNNERS, TASKS
 from opencompass.utils import get_logger, model_abbr_from_cfg
+from opencompass.utils.device import is_supa_available
 
 from .base import BaseRunner
 
@@ -25,6 +26,9 @@ def get_command_template(gpu_ids: List[int]) -> str:
     """Format command template given available gpu ids."""
     if is_npu_available():
         tmpl = 'ASCEND_RT_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
+        tmpl += ' {task_cmd}'
+    elif is_supa_available():
+        tmpl = 'SUPA_VISIBLE_DEVICES=' + ','.join(str(i) for i in gpu_ids)
         tmpl += ' {task_cmd}'
     elif sys.platform == 'win32':  # Always return win32 for Windows
         # use command in Windows format
@@ -83,6 +87,9 @@ class LocalRunner(BaseRunner):
         if is_npu_available():
             visible_devices = 'ASCEND_RT_VISIBLE_DEVICES'
             device_nums = torch.npu.device_count()
+        elif is_supa_available():
+            visible_devices = 'SUPA_VISIBLE_DEVICES'
+            device_nums = torch.supa.device_count()
         else:
             visible_devices = 'CUDA_VISIBLE_DEVICES'
             device_nums = torch.cuda.device_count()
