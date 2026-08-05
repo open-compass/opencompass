@@ -140,7 +140,7 @@ class GenInferencerOutputHandler:
                 for line in path.read_text().splitlines():
                     if line.strip():
                         item = json.loads(line)
-                        idx = item.pop('idx')
+                        idx = str(item.pop('idx'))
                         result_dict[idx] = item
             except Exception:
                 bak_file = path.with_name(path.name + '.bak')

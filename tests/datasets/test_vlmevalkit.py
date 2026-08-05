@@ -856,6 +856,145 @@ class TestVLMEvalKitUpstreamParity(unittest.TestCase):
 
 class TestVLMEvalKitEndToEnd(unittest.TestCase):
 
+    def test_gen_inferencer_uses_prebuilt_vlmeval_prompts(self):
+        fake = FakeVLMEvalDataset()
+
+        class SnapshotModel(FakeModel):
+
+            def __init__(self):
+                super().__init__()
+                self.build_prompt_snapshots = []
+
+            def generate_from_template(self, entries, max_out_len, **kwargs):
+                self.build_prompt_snapshots.append(
+                    list(fake.build_prompt_calls))
+                return super().generate_from_template(entries, max_out_len,
+                                                      **kwargs)
+
+        model = SnapshotModel()
+        with tempfile.TemporaryDirectory() as temp_dir, patch(
+                'opencompass.datasets.vlmevalkit.dataset.'
+                'build_vlmeval_dataset',
+                return_value=fake):
+            dataset = VLMEvalKitDataset(
+                abbr='MMBench_DEV_EN',
+                dataset_name='MMBench_DEV_EN',
+                reader_cfg=dict(input_columns=['prompt'],
+                                output_column='answer'))
+            retriever = ZeroRetriever(dataset)
+            template = RawPromptTemplate(
+                messages=[dict(expand_column='prompt')],
+                format_variables=False)
+            inferencer = GenInferencer(model=model,
+                                       max_out_len=16,
+                                       batch_size=1,
+                                       output_json_filepath=temp_dir,
+                                       output_json_filename='predictions.json')
+            inferencer.inference(retriever, prompt_template=template)
+
+        self.assertEqual(model.build_prompt_snapshots, [[101, 202],
+                                                        [101, 202]])
+
+    def test_gen_inferencer_resume_uses_prebuilt_vlmeval_prompts(self):
+        fake = FakeVLMEvalDataset()
+        model = FakeModel()
+        with tempfile.TemporaryDirectory() as temp_dir, patch(
+                'opencompass.datasets.vlmevalkit.dataset.'
+                'build_vlmeval_dataset',
+                return_value=fake):
+            checkpoint = dict(idx=0,
+                              origin_prompt='saved prompt',
+                              prediction='A',
+                              gold='A')
+            (Path(temp_dir) / 'tmp_predictions.jsonl').write_text(
+                json.dumps(checkpoint) + '\n', encoding='utf-8')
+            dataset = VLMEvalKitDataset(
+                abbr='MMBench_DEV_EN',
+                dataset_name='MMBench_DEV_EN',
+                reader_cfg=dict(input_columns=['prompt'],
+                                output_column='answer'))
+            retriever = ZeroRetriever(dataset)
+            template = RawPromptTemplate(
+                messages=[dict(expand_column='prompt')],
+                format_variables=False)
+            inferencer = GenInferencer(model=model,
+                                       max_out_len=16,
+                                       batch_size=1,
+                                       output_json_filepath=temp_dir,
+                                       output_json_filename='predictions.json')
+            predictions = inferencer.inference(retriever,
+                                               prompt_template=template)
+
+        self.assertEqual(fake.build_prompt_calls, [101, 202])
+        self.assertEqual(len(model.inputs), 1)
+        self.assertEqual(predictions, ['A', 'B'])
+
+    def test_gen_inferencer_sparse_resume_retries_failed_samples(self):
+        fake = FakeVLMEvalDataset()
+
+        class SkipFailedModel(FakeModel):
+
+            def generate_from_template(self, entries, max_out_len, **kwargs):
+                self.inputs.extend(entries)
+                return [
+                    RuntimeError('mock timeout')
+                    if 'first question' in str(entry) else 'B'
+                    for entry in entries
+                ]
+
+        with tempfile.TemporaryDirectory() as temp_dir, patch(
+                'opencompass.datasets.vlmevalkit.dataset.'
+                'build_vlmeval_dataset',
+                return_value=fake):
+            dataset = VLMEvalKitDataset(
+                abbr='MMBench_DEV_EN',
+                dataset_name='MMBench_DEV_EN',
+                reader_cfg=dict(input_columns=['prompt'],
+                                output_column='answer'))
+            retriever = ZeroRetriever(dataset)
+            template = RawPromptTemplate(
+                messages=[dict(expand_column='prompt')],
+                format_variables=False)
+
+            first_model = SkipFailedModel()
+            inferencer = GenInferencer(model=first_model,
+                                       max_out_len=16,
+                                       batch_size=2,
+                                       output_json_filepath=temp_dir,
+                                       output_json_filename='predictions.json')
+            predictions = inferencer.inference(
+                retriever, prompt_template=template)
+
+            self.assertIsInstance(predictions[0], RuntimeError)
+            self.assertEqual(str(predictions[0]), 'mock timeout')
+            self.assertEqual(predictions[1], 'B')
+            self.assertFalse((Path(temp_dir) / 'predictions.json').exists())
+            checkpoint = [
+                json.loads(line) for line in
+                (Path(temp_dir) / 'tmp_predictions.jsonl').read_text(
+                    encoding='utf-8').splitlines()
+            ]
+            self.assertEqual([item['idx'] for item in checkpoint], ['1'])
+
+            resumed_model = FakeModel()
+            inferencer = GenInferencer(model=resumed_model,
+                                       max_out_len=16,
+                                       batch_size=2,
+                                       output_json_filepath=temp_dir,
+                                       output_json_filename='predictions.json')
+            predictions = inferencer.inference(
+                retriever, prompt_template=template)
+
+            artifact = json.loads(
+                (Path(temp_dir) /
+                 'predictions.json').read_text(encoding='utf-8'))
+            self.assertEqual(predictions, ['A', 'B'])
+            self.assertEqual(len(resumed_model.inputs), 1)
+            self.assertIn('first question', str(resumed_model.inputs[0]))
+            self.assertEqual(list(artifact), ['0', '1'])
+            self.assertFalse(
+                (Path(temp_dir) / 'tmp_predictions.jsonl').exists())
+
     def test_existing_opencompass_inference_to_vlmeval_evaluate(self):
         fake = FakeVLMEvalDataset()
         model = FakeModel()

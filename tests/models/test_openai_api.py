@@ -426,6 +426,43 @@ class TestOpenAISDK(unittest.TestCase):
 
         self.assertEqual(results, ['Failed to obtain answer via API.'])
 
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_skips_failed_request(self, mock_httpx_client,
+                                           mock_openai_class, mock_tiktoken):
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.side_effect = RuntimeError('boom')
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDK(path='gpt-3.5-turbo',
+                          max_seq_len=16384,
+                          retry=1,
+                          skip_failed=True)
+
+        results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertIsInstance(results[0], RuntimeError)
+        self.assertEqual(str(results[0]), 'boom')
+
+        def generate(input, max_out_len, temperature):
+            if input == 'bad':
+                raise RuntimeError('request failed')
+            return 'ok'
+
+        with patch.object(model, '_generate', side_effect=generate):
+            results = model.generate(['bad', 'good'], max_out_len=100)
+
+        self.assertIsInstance(results[0], RuntimeError)
+        self.assertEqual(str(results[0]), 'request failed')
+        self.assertEqual(results[1], 'ok')
+
 
 if __name__ == '__main__':
     unittest.main()
