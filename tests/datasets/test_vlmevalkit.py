@@ -233,9 +233,8 @@ class TestVLMEvalKitDataset(unittest.TestCase):
         evaluator = config.datasets[0]['eval_cfg']['evaluator']
         self.assertEqual(evaluator['dataset_name'], 'MMMU_Pro_10c')
         self.assertEqual(evaluator['sample_limit'], 4)
-        self.assertEqual(config.models[0]['path'], 'Intern-S2-Preview-FP8')
 
-    def test_examples_use_batch_inference_with_failure_message(self):
+    def test_examples_use_native_openicl_inference(self):
         examples = Path(__file__).resolve().parents[2] / 'examples'
         mmbench = Config.fromfile(examples / 'eval_mmbench_vlmevalkit.py')
         mmmu_pro = Config.fromfile(examples / 'eval_mmmu_pro_vlmevalkit.py')
@@ -247,10 +246,14 @@ class TestVLMEvalKitDataset(unittest.TestCase):
             self.assertNotIn(
                 'prediction_fields',
                 config.datasets[0]['infer_cfg']['inferencer'])
-            self.assertEqual(config.models[0]['failure_message'],
-                             'Failed to obtain answer via API.')
-        self.assertEqual(mmbench.infer, mmmu_pro.infer)
-        self.assertEqual(mmbench.eval, mmmu_pro.eval)
+            self.assertEqual(config.infer.runner.task.type.__name__,
+                             'OpenICLInferTask')
+            self.assertEqual(config.eval.runner.task.type.__name__,
+                             'OpenICLEvalTask')
+        self.assertEqual(mmbench.models[0]['failure_message'],
+                         'Failed to obtain answer via API.')
+        self.assertTrue(mmmu_pro.models[0]['skip_failed'])
+        self.assertNotIn('failure_message', mmmu_pro.models[0])
 
     def test_full_config_applies_sample_limit(self):
         path = (Path(__file__).resolve().parents[2] / 'examples' /
