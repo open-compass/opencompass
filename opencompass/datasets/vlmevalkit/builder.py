@@ -58,4 +58,15 @@ def build_vlmeval_dataset(dataset_name, data_root=None, **kwargs):
         raise NotImplementedError(
             f'VLMEvalKit dataset {dataset_name!r} requires multi-turn '
             'inference, which is not supported by this single-turn bridge.')
+    data = getattr(dataset, 'data', None)
+    if data is None or 'index' not in data:
+        raise ValueError(
+            f'VLMEvalKit dataset {dataset_name!r} has no `index` column.')
+    if data['index'].isna().any():
+        raise ValueError(
+            f'VLMEvalKit dataset {dataset_name!r} has null `index` values.')
+    if data['index'].map(str).duplicated().any():
+        raise ValueError(
+            f'VLMEvalKit dataset {dataset_name!r} has duplicate `index` '
+            'values.')
     return dataset

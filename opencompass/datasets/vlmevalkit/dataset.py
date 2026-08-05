@@ -32,11 +32,20 @@ def _python_value(value):
 @LOAD_DATASET.register_module()
 class VLMEvalKitDataset(BaseDataset):
 
+    def __init__(self, reader_cfg=None, **kwargs):
+        reader_cfg = dict(reader_cfg or {})
+        test_range = reader_cfg.get('test_range')
+        if isinstance(test_range, str):
+            reader_cfg.pop('test_range')
+            kwargs['test_range'] = test_range
+        super().__init__(reader_cfg=reader_cfg, **kwargs)
+
     @staticmethod
     def load(dataset_name='MMBench_DEV_EN',
              data_root=None,
              dataset_kwargs=None,
-             sample_limit=None):
+             sample_limit=None,
+             test_range=None):
         if sample_limit is not None and sample_limit <= 0:
             raise ValueError('VLMEvalKit sample_limit must be positive.')
         dataset_kwargs = dict(dataset_kwargs or {})
@@ -47,6 +56,9 @@ class VLMEvalKitDataset(BaseDataset):
         data = vlm_dataset.data
         if sample_limit is not None:
             data = data.iloc[:sample_limit]
+        if test_range:
+            scope = {'index_list': list(range(len(data)))}
+            data = data.iloc[eval(f'index_list{test_range}', scope)]
         with _lmu_data_root(data_root):
             for _, row in data.iterrows():
                 raw_sample = {

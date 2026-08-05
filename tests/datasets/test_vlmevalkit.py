@@ -349,28 +349,38 @@ class TestVLMEvalKitDataset(unittest.TestCase):
                     'opencompass.datasets.vlmevalkit.builder.'
                     '_load_build_dataset',
                     return_value=build_dataset):
-                first = VLMEvalKitDataset.load('MMBench_DEV_EN', temp_dir)
-                second = VLMEvalKitDataset.load('MMBench_DEV_EN', temp_dir)
+                first = VLMEvalKitDataset(
+                    abbr='MMBench_DEV_EN',
+                    dataset_name='MMBench_DEV_EN',
+                    data_root=temp_dir,
+                    reader_cfg=dict(input_columns=['prompt'],
+                                    output_column='answer'))
+                second = VLMEvalKitDataset(
+                    abbr='MMBench_DEV_EN',
+                    dataset_name='MMBench_DEV_EN',
+                    data_root=temp_dir,
+                    reader_cfg=dict(input_columns=['prompt'],
+                                    output_column='answer'))
 
         self.assertEqual(roots, [('MMBench_DEV_EN', {}, temp_dir),
                                  ('MMBench_DEV_EN', {}, temp_dir)])
         self.assertEqual(os.environ.get('LMUData'), old_root)
         self.assertEqual(fake.build_prompt_calls, [101, 202, 101, 202])
         self.assertEqual(fake.build_prompt_roots, [temp_dir] * 4)
-        self.assertEqual(first['sample_id'], second['sample_id'])
-        self.assertEqual(first[0]['sample_id'], 'MMBench_DEV_EN:101')
-        self.assertEqual(first[0]['vlmeval_index'], 101)
-        raw_sample = json.loads(first[0]['raw_sample'])
+        self.assertEqual(first.test['sample_id'], second.test['sample_id'])
+        self.assertEqual(first.test[0]['sample_id'], 'MMBench_DEV_EN:101')
+        self.assertEqual(first.test[0]['vlmeval_index'], 101)
+        raw_sample = json.loads(first.test[0]['raw_sample'])
         self.assertEqual(raw_sample['question'], 'first question')
         self.assertEqual(raw_sample['A'], 'one')
         self.assertEqual(raw_sample['answer'], 'A')
         self.assertNotIn('image', raw_sample)
-        content = first[0]['prompt'][0]['content']
+        content = first.test[0]['prompt'][0]['content']
         self.assertEqual([item['type'] for item in content], ['image', 'text'])
         self.assertEqual(content[0]['image_url'], '/images/101.jpg')
         self.assertEqual(content[1]['text'],
                          'Question: first question\nOptions:\nA. one\nB. two')
-        json.dumps(first[0]['prompt'])
+        json.dumps(first.test[0]['prompt'])
 
     def test_mmmu_pro_multimage_prompt_and_raw_fields(self):
         fake = FakeMMMUProDataset()
@@ -378,25 +388,33 @@ class TestVLMEvalKitDataset(unittest.TestCase):
                 'opencompass.datasets.vlmevalkit.dataset.'
                 'build_vlmeval_dataset',
                 return_value=fake):
-            first = VLMEvalKitDataset.load('MMMU_Pro_10c')
-            second = VLMEvalKitDataset.load('MMMU_Pro_10c')
+            first = VLMEvalKitDataset(
+                abbr='MMMU_Pro_10c',
+                dataset_name='MMMU_Pro_10c',
+                reader_cfg=dict(input_columns=['prompt'],
+                                output_column='answer'))
+            second = VLMEvalKitDataset(
+                abbr='MMMU_Pro_10c',
+                dataset_name='MMMU_Pro_10c',
+                reader_cfg=dict(input_columns=['prompt'],
+                                output_column='answer'))
 
         self.assertEqual(fake.build_prompt_calls, [7, 9, 7, 9])
-        self.assertEqual(first['sample_id'], second['sample_id'])
-        self.assertEqual(first[0]['sample_id'], 'MMMU_Pro_10c:7')
-        raw_sample = json.loads(first[0]['raw_sample'])
+        self.assertEqual(first.test['sample_id'], second.test['sample_id'])
+        self.assertEqual(first.test[0]['sample_id'], 'MMMU_Pro_10c:7')
+        raw_sample = json.loads(first.test[0]['raw_sample'])
         self.assertEqual(raw_sample['id'], 'history-7')
         self.assertEqual(raw_sample['image_path'], ['a.png', 'b.png'])
         self.assertEqual(raw_sample['topic_difficulty'], 'hard')
         self.assertNotIn('image', raw_sample)
         self.assertEqual(
-            json.loads(first[1]['raw_sample'])['image_path'], 'c.png')
-        content = first[0]['prompt'][0]['content']
+            json.loads(first.test[1]['raw_sample'])['image_path'], 'c.png')
+        content = first.test[0]['prompt'][0]['content']
         self.assertEqual([item['type'] for item in content],
                          ['text', 'image', 'text', 'image', 'text'])
         self.assertEqual(content[1]['image_url'], '/images/a.png')
         self.assertEqual(content[3]['image_url'], '/images/b.png')
-        json.dumps(first[0]['prompt'])
+        json.dumps(first.test[0]['prompt'])
 
     def test_sample_limit_builds_only_requested_prompts(self):
         fake = FakeVLMEvalDataset()
@@ -404,11 +422,58 @@ class TestVLMEvalKitDataset(unittest.TestCase):
                 'opencompass.datasets.vlmevalkit.dataset.'
                 'build_vlmeval_dataset',
                 return_value=fake):
-            dataset = VLMEvalKitDataset.load('MMBench_DEV_EN', sample_limit=1)
+            dataset = VLMEvalKitDataset(
+                abbr='MMBench_DEV_EN',
+                dataset_name='MMBench_DEV_EN',
+                sample_limit=1,
+                reader_cfg=dict(input_columns=['prompt'],
+                                output_column='answer'))
 
-        self.assertEqual(len(dataset), 1)
-        self.assertEqual(dataset[0]['sample_id'], 'MMBench_DEV_EN:101')
+        self.assertEqual(len(dataset.test), 1)
+        self.assertEqual(dataset.test[0]['sample_id'], 'MMBench_DEV_EN:101')
         self.assertEqual(fake.build_prompt_calls, [101])
+        self.assertIn('prompt', dataset.test.column_names)
+
+    def test_test_range_builds_only_partition_prompts(self):
+        for test_range in ('[1:2]', '[:2][1:2]'):
+            with self.subTest(test_range=test_range):
+                fake = FakeVLMEvalDataset()
+                reader_cfg = dict(input_columns=['prompt'],
+                                  output_column='answer',
+                                  test_range=test_range)
+                with patch(
+                        'opencompass.datasets.vlmevalkit.dataset.'
+                        'build_vlmeval_dataset',
+                        return_value=fake):
+                    dataset = VLMEvalKitDataset(
+                        abbr='MMBench_DEV_EN_1',
+                        dataset_name='MMBench_DEV_EN',
+                        reader_cfg=reader_cfg)
+
+                self.assertEqual(reader_cfg['test_range'], test_range)
+                self.assertEqual(fake.build_prompt_calls, [202])
+                self.assertEqual(dataset.test['vlmeval_index'], [202])
+                self.assertIn('prompt', dataset.test.column_names)
+
+    def test_index_contract_fails_fast(self):
+        cases = [
+            (FakeVLMEvalDataset().data.drop(columns='index'),
+             'no `index` column'),
+            (FakeVLMEvalDataset().data.assign(index=[101, None]),
+             'null `index` values'),
+            (FakeVLMEvalDataset().data.assign(index=[101, '101']),
+             'duplicate `index` values'),
+        ]
+        for data, message in cases:
+            with self.subTest(message=message):
+                fake = FakeVLMEvalDataset()
+                fake.data = data
+                with patch(
+                        'opencompass.datasets.vlmevalkit.builder.'
+                        '_load_build_dataset',
+                        return_value=lambda name, **kwargs: fake):
+                    with self.assertRaisesRegex(ValueError, message):
+                        build_vlmeval_dataset('MMBench_DEV_EN')
 
     def test_prompt_conversion_preserves_role_and_order(self):
         prompt = [
