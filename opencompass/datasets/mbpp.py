@@ -6,6 +6,7 @@ import multiprocessing
 import os.path as osp
 import signal
 import tempfile
+from argparse import Namespace
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from os import environ
@@ -18,6 +19,9 @@ from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 from opencompass.utils import get_data_path
+from opencompass.utils.code_execution import (TYPE_AWARE_EQUAL_NAME,
+                                              make_assertions_type_aware,
+                                              type_aware_equal)
 
 from .base import BaseDataset
 
@@ -291,9 +295,29 @@ class MBPPEvaluator(BaseEvaluator):
                 for pred in preds:
                     pred = self._process_answer(pred)
                     mbpp_preds.append({'task_id': refer, 'solution': pred})
+
             with tempfile.TemporaryDirectory() as tmp_dir:
                 out_dir = osp.join(tmp_dir, 'mbpp_eval.jsonl')
                 self.write_jsonl(out_dir, mbpp_preds)
+
+                # Filter evalplus problems to only those we have predictions
+                # for, so its internal assertion (samples == problems) passes
+                import evalplus.evaluate as evalplus_eval
+                from evalplus.data import get_mbpp_plus
+                existing_task_ids = {p['task_id'] for p in mbpp_preds}
+
+                def _filtered_get_mbpp_plus(*args, **kwargs):
+                    all_problems = get_mbpp_plus(*args, **kwargs)
+                    return {
+                        k: v
+                        for k, v in all_problems.items()
+                        if k in existing_task_ids
+                    }
+
+                # Patch in evaluate module's namespace (where it was imported)
+                _orig = evalplus_eval.get_mbpp_plus
+                evalplus_eval.get_mbpp_plus = _filtered_get_mbpp_plus
+
                 flags = dict(dataset='mbpp',
                              samples=out_dir,
                              base_only=None,
@@ -302,9 +326,21 @@ class MBPPEvaluator(BaseEvaluator):
                              test_details=0.2,
                              min_time_limit=0.2,
                              gt_time_limit_factor=4.0,
-                             mini=None)
-                score = self.eval(flags)
-                return {f'mbpp_plus_{k}': score[k] * 100 for k in score}
+                             mini=False,
+                             noextreme=False)
+                self.eval(Namespace(**flags))
+                evalplus_eval.get_mbpp_plus = _orig
+
+                results_path = out_dir.replace('.jsonl', '_eval_results.json')
+                with open(results_path, 'r') as f:
+                    eval_results = json.load(f)
+                n_total = len(eval_results['eval'])
+                n_plus_pass = sum(
+                    1 for tid in eval_results['eval']
+                    if eval_results['eval'][tid] and eval_results['eval'][tid]
+                    [0].get('plus_status') == 'pass')
+                pass_at_1 = n_plus_pass / n_total * 100 if n_total > 0 else 0.0
+                return {'mbpp_plus_pass@1': pass_at_1}
 
     def _process_answer(self, text):
         patterns = [
@@ -345,9 +381,7 @@ class MBPPEvaluator(BaseEvaluator):
         return text
 
     def _process_test(self, test_case, pred):
-        formatted = pred + '\n'
-        formatted += test_case
-        return formatted
+        return pred, make_assertions_type_aware(test_case)
 
 
 @ICL_EVALUATORS.register_module()
@@ -392,10 +426,13 @@ def _execution(programs, timeout, key):
     try:
         # Add exec globals to prevent the exec to raise
         # unnecessary NameError for correct answer
+        code, test_case = programs
         exec_globals = {}
         with swallow_io():
             with time_limit(timeout):
-                exec(programs, exec_globals)
+                exec(code, exec_globals)
+                exec_globals[TYPE_AWARE_EQUAL_NAME] = type_aware_equal
+                exec(test_case, exec_globals)
         key.append('pass')
     except TimeOutException:
         key.append('timeout')

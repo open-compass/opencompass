@@ -2,7 +2,7 @@
 
 import copy
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import torch
@@ -144,20 +144,10 @@ class TopkRetriever(BaseRetriever):
         return self.knn_search(self.ice_num)
 
 
-class ListWrapper:
-
-    def __init__(self, data: List[Any]):
-        self.data = data
-
-    def to(self, device):
-        return self.data
-
-
 def ignore_pad_dict(features):
     res_dict = {}
     if 'metadata' in features[0]:
-        res_dict['metadata'] = ListWrapper(
-            [x.pop('metadata') for x in features])
+        res_dict['metadata'] = [x.pop('metadata') for x in features]
     return res_dict
 
 
@@ -197,9 +187,9 @@ class DataCollatorWithPaddingAndCuda:
 
         if has_labels:
             batch['labels'] = labels.input_ids
-        batch.update(res_dict)
 
         if self.device:
             batch = batch.to(self.device)
 
+        batch.update(res_dict)
         return batch

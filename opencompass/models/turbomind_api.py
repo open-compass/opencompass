@@ -68,7 +68,7 @@ class TurboMindAPIModel(BaseModel):
                          max_seq_len=max_seq_len,
                          meta_template=meta_template)
         from lmdeploy.serve.openai.api_client import APIClient
-        self.chatbot = APIClient(api_addr, api_key)
+        self.chatbot = APIClient(api_addr.rstrip('/'), api_key)
         self.model_name = model_name
         self.logger = get_logger()
         self.template_parser = LMTemplateParser(meta_template)
@@ -195,6 +195,7 @@ class TurboMindAPIModel(BaseModel):
                 prompt=prompt,
                 model=self.model_name,
                 max_tokens=max_tokens,
+                max_completion_tokens=max_tokens,
                 **gen_kwargs,
         ):
             response += output['choices'][0]['text']
