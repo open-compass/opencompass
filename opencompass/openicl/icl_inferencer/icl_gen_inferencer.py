@@ -120,19 +120,17 @@ class GenInferencer(BaseInferencer):
 
         # Create tmp json file for saving intermediate results and future
         # resuming
+        index = 0
         tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
             '.jsonl').name
         tmp_jsonl_filepath = Path(output_json_filepath) / tmp_jsonl_filename
         tmp_result_dict = output_handler.restore_from_jsonl(
             output_json_filepath, tmp_jsonl_filename)
-        completed_indices = {int(index) for index in tmp_result_dict}
-        pending_prompts = [(index, prompt)
-                           for index, prompt in enumerate(prompt_list)
-                           if index not in completed_indices]
+        index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         logger.info('Starting build dataloader')
-        dataloader = self.get_dataloader(pending_prompts, self.batch_size)
+        dataloader = self.get_dataloader(prompt_list[index:], self.batch_size)
 
         # 5. Inference for prompts in each batch
         logger.info('Starting inference process...')
@@ -140,14 +138,11 @@ class GenInferencer(BaseInferencer):
         start_time_stamp = time.time()
         num_sample = 0
         first_dump = True
-        failed_predictions = {}
         for datum in tqdm(dataloader, disable=not self.is_main_process):
-            indices, samples = zip(*datum)
-            samples = list(samples)
             if ds_reader.output_column:
-                entry, golds = list(zip(*samples))
+                entry, golds = list(zip(*datum))
             else:
-                entry = samples
+                entry = datum
                 golds = [None for _ in range(len(entry))]
             # 5-1. Inference with local model
             extra_gen_kwargs = {}
@@ -195,20 +190,11 @@ class GenInferencer(BaseInferencer):
             num_return_sequences = getattr(self.model, 'generation_kwargs',
                                            {}).get('num_return_sequences', 1)
             # 5-3. Save current output
-            for index, prompt, prediction, gold in zip(
-                    indices, parsed_entries,
-                    batched(generated, num_return_sequences), golds):
-
+            for batch_idx, (prompt, prediction, gold) in enumerate(
+                    zip(parsed_entries, batched(generated,
+                                                num_return_sequences), golds)):
                 if num_return_sequences == 1:
                     prediction = prediction[0]
-
-                if prediction is None:
-                    prediction = RuntimeError('Model returned no prediction.')
-                if isinstance(prediction, BaseException):
-                    failed_predictions[index] = prediction
-                    logger.error('Inference failed for sample %d: %s', index,
-                                 prediction)
-                    continue
 
                 if self.dump_res_length:
                     if self.multiround and isinstance(prompt, list):
@@ -253,14 +239,14 @@ class GenInferencer(BaseInferencer):
                                                 prediction,
                                                 index,
                                                 gold=gold)
+                index = index + 1
 
             # 5-4. Save intermediate results
-            num_sample += len(datum)
-            if (self.save_every is not None
-                    and num_sample % self.save_every == 0
+            if (self.save_every is not None and index % self.save_every == 0
                     and self.is_main_process):
                 output_handler.write_to_jsonl(output_json_filepath,
                                               tmp_jsonl_filename)
+            num_sample += len(datum)
 
         end_time_stamp = time.time()
 
@@ -270,26 +256,10 @@ class GenInferencer(BaseInferencer):
         # 6. Output
         if self.is_main_process:
             os.makedirs(output_json_filepath, exist_ok=True)
-            output_handler.write_to_jsonl(output_json_filepath,
-                                          tmp_jsonl_filename)
-            missing_indices = [
-                index for index in range(len(prompt_list))
-                if str(index) not in output_handler.results_dict
-            ]
-            if missing_indices:
-                logger.error(
-                    'Inference finished with %d failed samples. '
-                    'The final prediction file was not written.',
-                    len(missing_indices))
-            else:
-                output_handler.results_dict = {
-                    str(index): output_handler.results_dict[str(index)]
-                    for index in range(len(prompt_list))
-                }
-                output_handler.write_to_json(output_json_filepath,
-                                             output_json_filename)
-                if osp.exists(tmp_jsonl_filepath):
-                    os.remove(tmp_jsonl_filepath)
+            output_handler.write_to_json(output_json_filepath,
+                                         output_json_filename)
+            if osp.exists(tmp_jsonl_filepath):
+                os.remove(tmp_jsonl_filepath)
 
         if self.dump_timer and self.is_main_process:
             timer_filepath = os.path.join(output_json_filepath, 'timer',
@@ -304,9 +274,8 @@ class GenInferencer(BaseInferencer):
                 f.write(json.dumps(time_dict) + '\n')
 
         return [
-            failed_predictions[index] if index in failed_predictions else
-            output_handler.results_dict.get(str(index), {}).get('prediction')
-            for index in range(len(prompt_list))
+            sample['prediction']
+            for sample in output_handler.results_dict.values()
         ]
 
     def _compute_multiround_input_lengths(self, chat: List) -> List[int]:

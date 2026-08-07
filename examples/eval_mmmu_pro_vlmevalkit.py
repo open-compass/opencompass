@@ -44,7 +44,6 @@ models = [
         image_format='JPEG',
         image_min_edge=100,
         include_reasoning_content=False,
-        skip_failed=True,
         max_seq_len=128000,
         max_out_len=40960,
         batch_size=40,

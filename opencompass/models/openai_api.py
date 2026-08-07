@@ -235,19 +235,15 @@ class OpenAI(BaseAPIModel):
         if self.temperature is not None:
             temperature = self.temperature
 
-        generate = self._generate
-        if getattr(self, 'skip_failed', False):
-            generate = self._generate_or_error
-
         if len(inputs) == 1:
             # Forget multi-thread for single inference.
-            return [generate(inputs[0], max_out_len, temperature)]
+            return [self._generate(inputs[0], max_out_len, temperature)]
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             results = list(
                 tqdm(
                     executor.map(
-                        generate,
+                        self._generate,
                         inputs,
                         [max_out_len] * len(inputs),
                         [temperature] * len(inputs),
@@ -256,13 +252,6 @@ class OpenAI(BaseAPIModel):
                     desc='Inferencing',
                 ))
         return results
-
-    def _generate_or_error(self, input: PromptType, max_out_len: int,
-                           temperature: float):
-        try:
-            return self._generate(input, max_out_len, temperature)
-        except Exception as error:
-            return error
 
     def _generate(self, input: PromptType, max_out_len: int,
                   temperature: float) -> str:
@@ -764,12 +753,7 @@ class OpenAISDK(OpenAI):
         image_format: str | None = None,
         image_min_edge: int | None = None,
         include_reasoning_content: bool = True,
-        failure_message: str | None = None,
-        skip_failed: bool = False,
     ):
-        if skip_failed and failure_message is not None:
-            raise ValueError(
-                'skip_failed and failure_message cannot be used together.')
         super().__init__(
             path,
             max_seq_len,
@@ -808,8 +792,6 @@ class OpenAISDK(OpenAI):
         self.think_tag = think_tag
         self.openai_extra_kwargs = openai_extra_kwargs
         self.include_reasoning_content = include_reasoning_content
-        self.failure_message = failure_message
-        self.skip_failed = skip_failed
 
     def _create_fresh_client(self):
         """Create a fresh OpenAI client."""
@@ -860,7 +842,6 @@ class OpenAISDK(OpenAI):
         messages = self._messages_to_chat_completions(messages)
 
         num_retries = 0
-        last_error = None
         while num_retries < self.retry:
             if any(model in self.path for model in OAI_REASONING_MODEL_LIST):
                 self.logger.warning(
@@ -965,7 +946,6 @@ class OpenAISDK(OpenAI):
                     return content
 
             except (BadRequestError, APIStatusError) as e:
-                last_error = e
                 # Handle BadRequest status
                 # You can specify self.status_code_mappings to bypass \
                 # API sensitivity blocks
@@ -986,23 +966,13 @@ class OpenAISDK(OpenAI):
                         f'error occurs at {self.openai_api_base}')
                     self.logger.error(e)
             except Exception as e:
-                last_error = e
                 self.logger.error(f'error occurs at {self.openai_api_base}')
                 self.logger.error(e)
             finally:
                 self.release()
             num_retries += 1
-        error = ('Calling OpenAI API failed after retrying for '
-                 f'{self.retry} times. Check the logs for details.')
-        if self.failure_message is not None:
-            self.logger.error('%s Returning failure message: %s', error,
-                              self.failure_message)
-            return self.failure_message
-        if self.skip_failed and last_error is not None:
-            raise last_error
-        if last_error is not None:
-            raise RuntimeError(error) from last_error
-        raise RuntimeError(error)
+        raise RuntimeError('Calling OpenAI API failed after retrying for '
+                           f'{self.retry} times. Check the logs for details.')
 
 
 @MODELS.register_module()
