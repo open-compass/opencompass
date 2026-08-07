@@ -260,7 +260,14 @@ class RJOBRunner(BaseRunner):
                                         capture_output=True)
                 logger.info(f'CMD: {cmd}')
                 logger.info(f'Command output: {result.stdout}')
-                logger.error(f'Command error: {result.stderr}')
+                if result.returncode != 0:
+                    error_msg = (
+                        f'Command failed with return code {result.returncode}')
+                    if result.stderr:
+                        error_msg += f': {result.stderr}'
+                    logger.error(error_msg)
+                elif result.stderr:
+                    logger.warning(f'Command stderr: {result.stderr}')
                 logger.info(f'Return code: {result.returncode}')
                 if result.returncode == 0:
                     break
@@ -271,6 +278,7 @@ class RJOBRunner(BaseRunner):
             if result.returncode != 0:
                 # Submit failed, return directly
                 return task_name, result.returncode
+            logger.info(f'RJob submitted: {task_name}')
 
             # Submit successful, start polling
             status = self._run_task(task_name, out_path)
