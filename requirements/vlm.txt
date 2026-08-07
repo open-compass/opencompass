@@ -1,0 +1,2 @@
+google-genai==1.2.0
+litellm==1.83.0
