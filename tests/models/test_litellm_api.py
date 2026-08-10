@@ -95,6 +95,14 @@ class TestLiteLLMAPIInit(unittest.TestCase):
         self.assertNotIn('api_version', kwargs)
         self.assertNotIn('temperature', kwargs)
 
+    def test_call_kwargs_omits_max_tokens_when_unset(self):
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        kwargs = model._build_call_kwargs(
+            messages=[{'role': 'user', 'content': 'hi'}],
+            max_out_len=None,
+        )
+        self.assertNotIn('max_tokens', kwargs)
+
     def test_drop_params_default_true(self):
         model = LiteLLMAPI(path='openai/gpt-4o-mini')
         kwargs = model._build_call_kwargs(
@@ -251,6 +259,30 @@ class TestLiteLLMAPIMessages(unittest.TestCase):
         ]
         messages = model._build_messages(chatml)
         self.assertEqual(messages, chatml)
+
+    def test_multimodal_chatml_normalizes_image_content(self):
+        model = LiteLLMAPI(path='openai/gpt-4o-mini')
+        chatml = [{
+            'role': 'user',
+            'content': [
+                {
+                    'type': 'image',
+                    'image_url': 'https://example.com/image.png',
+                },
+                {
+                    'type': 'text',
+                    'text': 'What is shown?',
+                },
+            ],
+        }]
+        messages = model._build_messages(chatml)
+        self.assertEqual(messages[0]['content'][0], {
+            'type': 'image_url',
+            'image_url': {
+                'url': 'https://example.com/image.png'
+            },
+        })
+        self.assertEqual(model._get_messages_token_len(messages), 3)
 
     def test_system_prompt_prepended_when_absent(self):
         model = LiteLLMAPI(path='openai/gpt-4o-mini',

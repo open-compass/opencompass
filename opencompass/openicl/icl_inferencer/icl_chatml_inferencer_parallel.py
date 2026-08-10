@@ -27,7 +27,7 @@ class ParallelChatMLInferencer(ChatMLInferencer):
     def __init__(
             self,
             model,
-            max_out_len: int,
+            max_out_len: Optional[int] = None,
             stopping_criteria: List[str] = [],
             max_seq_len: Optional[int] = None,
             min_out_len: Optional[int] = None,

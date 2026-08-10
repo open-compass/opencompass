@@ -128,7 +128,26 @@ class LiteLLMAPI(BaseAPIModel):
         self.flush()
         return results
 
-    def _build_messages(self, input: PromptType) -> List[Dict[str, str]]:
+    @staticmethod
+    def _normalize_content(content: Any) -> Any:
+        if not isinstance(content, list):
+            return content
+
+        normalized = []
+        for item in content:
+            if not isinstance(item, dict) or item.get('type') != 'image':
+                normalized.append(item)
+                continue
+            image_url = item.get('image_url', '')
+            if isinstance(image_url, str):
+                image_url = {'url': image_url}
+            normalized.append({
+                'type': 'image_url',
+                'image_url': image_url,
+            })
+        return normalized
+
+    def _build_messages(self, input: PromptType) -> List[Dict[str, Any]]:
         """Convert an OpenCompass input into OpenAI-shaped messages.
 
         Handles three cases:
@@ -149,8 +168,11 @@ class LiteLLMAPI(BaseAPIModel):
                 and item['role'] in CHATML_ROLE for item in input)):
             # Already CHATML-shaped, assume ``content`` key is populated.
             messages = [{
-                'role': item['role'],
-                'content': item.get('content', item.get('prompt', '')),
+                'role':
+                item['role'],
+                'content':
+                self._normalize_content(
+                    item.get('content', item.get('prompt', ''))),
             } for item in input]
         else:
             messages = []
@@ -162,7 +184,8 @@ class LiteLLMAPI(BaseAPIModel):
                     messages.append({'role': 'user', 'content': item})
                     continue
                 role = item.get('role', '')
-                content = item.get('prompt', item.get('content', ''))
+                content = self._normalize_content(
+                    item.get('prompt', item.get('content', '')))
                 if role == 'HUMAN':
                     messages.append({'role': 'user', 'content': content})
                 elif role == 'BOT':
@@ -182,19 +205,29 @@ class LiteLLMAPI(BaseAPIModel):
 
         return messages
 
-    def _get_messages_token_len(self, messages: List[Dict[str, str]]) -> int:
-        return sum(
-            self.get_token_len(str(message.get('content', '')))
-            for message in messages)
+    def _get_messages_token_len(self, messages: List[Dict[str, Any]]) -> int:
+        text_segments = []
+        for message in messages:
+            content = message.get('content', '')
+            if isinstance(content, list):
+                text_segments.extend(
+                    str(item.get('text', '')) for item in content
+                    if isinstance(item, dict) and item.get('type') == 'text')
+            else:
+                text_segments.append(str(content))
+        return sum(self.get_token_len(text) for text in text_segments)
 
-    def _adjust_max_out_len(self, messages: List[Dict[str, str]],
-                            max_out_len: int) -> int:
+    def _adjust_max_out_len(self, messages: List[Dict[str, Any]],
+                            max_out_len: Optional[int]) -> Optional[int]:
         input_len = self._get_messages_token_len(messages)
         if input_len > self.max_seq_len:
             raise ValueError(
                 f'Input length ({input_len}) exceeds max_seq_len '
                 f'({self.max_seq_len}). Please increase max_seq_len or '
                 'shorten the prompt.')
+
+        if max_out_len is None:
+            return None
 
         available_out_len = (self.max_seq_len - input_len -
                              RESERVED_OUTPUT_TOKENS)
@@ -213,8 +246,8 @@ class LiteLLMAPI(BaseAPIModel):
         return adjusted_max_out_len
 
     def _build_call_kwargs(self,
-                           messages: List[Dict[str, str]],
-                           max_out_len: int,
+                           messages: List[Dict[str, Any]],
+                           max_out_len: Optional[int],
                            gen_kwargs: Optional[Dict] = None) -> Dict:
         gen_kwargs = gen_kwargs or {}
         blocked_kwargs = sorted(set(gen_kwargs) & CORE_CALL_KWARGS)
@@ -236,9 +269,10 @@ class LiteLLMAPI(BaseAPIModel):
             **safe_gen_kwargs,
             'model': self.path,
             'messages': messages,
-            'max_tokens': max_out_len,
             'drop_params': True,
         }
+        if max_out_len is not None:
+            call_kwargs['max_tokens'] = max_out_len
         if self.temperature is not None:
             call_kwargs['temperature'] = self.temperature
         if self.key is not None:
@@ -302,7 +336,7 @@ class LiteLLMAPI(BaseAPIModel):
 
     def _generate(self,
                   input: PromptType,
-                  max_out_len: int,
+                  max_out_len: Optional[int],
                   gen_kwargs: Optional[Dict] = None) -> str:
         try:
             import litellm

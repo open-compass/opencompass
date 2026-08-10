@@ -27,7 +27,7 @@ class ChatMLInferencer(BaseInferencer):
     def __init__(
             self,
             model: BaseModel,
-            max_out_len: int,
+            max_out_len: Optional[int] = None,
             stopping_criteria: List[str] = [],
             max_seq_len: Optional[int] = None,
             min_out_len: Optional[int] = None,
@@ -67,9 +67,16 @@ class ChatMLInferencer(BaseInferencer):
         get_prompt_list = (
             self.get_generation_prompt_list_from_retriever_indices)
         for i in range(len(origin_prompt)):
+            chatml_question = origin_prompt['chatml_question'][i]
+            if any(
+                    isinstance(message.get('content'), list)
+                    for message in chatml_question):
+                prompt_list.append(chatml_question)
+                continue
+
             new_prompt_template = dict()
             new_prompt_template['round'] = []
-            for question_round in origin_prompt['chatml_question'][i]:
+            for question_round in chatml_question:
                 if question_round['role'] == 'system':
                     this_system_prompt = question_round['content']
                     new_prompt_template['begin'] = [

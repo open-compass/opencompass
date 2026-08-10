@@ -1,3 +1,9 @@
+- c4_bench:
+    name: C4 Bench
+    category: Understanding
+    paper: https://arxiv.org/abs/2608.06501
+    configpath: opencompass/configs/datasets/c4_bench/c4_bench_gen.py
+    configpath_llmjudge: ''
 - ifeval:
     name: IFEval
     category: Instruction Following

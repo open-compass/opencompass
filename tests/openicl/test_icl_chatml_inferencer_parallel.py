@@ -41,6 +41,44 @@ class TestParallelChatMLInferencer(unittest.TestCase):
         self.assertIsNone(inferencer.max_infer_workers)
         self.assertIsNone(inferencer.progress_tracker)
 
+    def test_multimodal_messages_are_forwarded_without_flattening(self):
+        inferencer = ParallelChatMLInferencer(model=self.mock_model)
+        messages = [{
+            'role':
+            'user',
+            'content': [
+                {
+                    'type': 'image',
+                    'image_url': 'https://example.com/image.png',
+                },
+                {
+                    'type': 'text',
+                    'text': 'Question',
+                },
+            ],
+        }]
+        retriever = MagicMock()
+        retriever.retrieve.return_value = [[0]]
+
+        class _OriginPrompt:
+
+            def __len__(self):
+                return 1
+
+            def __getitem__(self, key):
+                return {
+                    'chatml_question': [messages],
+                    'chatml_answer': [['answer']],
+                }[key]
+
+        retriever.dataset_reader = {'test': _OriginPrompt()}
+
+        prompts, answers = inferencer._get_prompt_list_and_gold_ans(retriever)
+
+        self.assertEqual(prompts, [messages])
+        self.assertEqual(answers, ['answer'])
+        self.assertIsNone(inferencer.max_out_len)
+
     def test_resolve_max_workers_from_config(self):
         """Test _resolve_max_workers uses max_infer_workers."""
         inferencer = ParallelChatMLInferencer(model=self.mock_model,

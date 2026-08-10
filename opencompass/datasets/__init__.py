@@ -22,6 +22,7 @@ from .boolq import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
 from .BuySideFinBench import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
+from .c4_bench import C4BenchDataset, C4BenchEvaluator  # noqa: F401
 from .calm import *  # noqa: F401, F403
 from .CARDBiomedBench import CARDBiomedBenchDataset  # noqa: F401
 from .cb import *  # noqa: F401, F403

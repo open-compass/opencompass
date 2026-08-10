@@ -81,6 +81,9 @@ OpenCompass最新推出的基于ChatML对话模板的数据集评测模式，允
 ...
 ```
 
+支持图像内容的模型后端可以直接使用结构化多模态消息，例如配置视觉语言模型的
+`LiteLLMAPI`。
+
 `ChatMLDataset`在读取.jsonl文件时，会使用`pydantic`库对文件进行简易的格式校验。
 您可以使用`tools/chatml_format_test.py`对提供的数据文件进行检查。
 

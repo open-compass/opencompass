@@ -82,7 +82,8 @@ The format of multiple rounds and multiple modes datasets:
 ...
 ```
 
-(As OpenCompass currently does not support multi-mode evaluation, the template above is for reference only.)
+Structured multimodal messages are supported by model backends that accept
+image content, such as `LiteLLMAPI` configured with a vision-language model.
 
 When ChatMLDataset reading `.json` files, it will use `pydantic` to perform simple format validation on the files.
 You can use `tools/chatml_fformat_test.py` to check your provided data file.
