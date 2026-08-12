@@ -35,7 +35,7 @@ for subset in mrcr_128k_subsets:
 
     mrcr_128k_datasets.append(
         dict(
-            abbr=f'mrcr_v2_{subset}',
+            abbr=f'mrcr_v2_{subset}_128k',
             type=MRCRDataset,
             path='giulio98/MRCR_v2_common',
             subset=subset,
