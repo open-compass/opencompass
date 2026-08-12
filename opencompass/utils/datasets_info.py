@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/QASPER":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/QASPER/qasper-dev-v0.3.json",
+    },
     "opencompass/MultiIF":{
         "ms_id": None,
         "hf_id": None,
