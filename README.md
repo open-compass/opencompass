@@ -37,8 +37,8 @@ English | [简体中文](README_zh-CN.md)
 <details>
   <summary><kbd>Star History</kbd></summary>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&theme=dark&type=Date">
-    <img width="100%" src="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&type=Date">
+    <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=open-compass%2Fopencompass&theme=dark&type=Date">
+    <img width="100%" src="https://star-history.dera.page/svg?repos=open-compass%2Fopencompass&type=Date">
   </picture>
 </details>
 
