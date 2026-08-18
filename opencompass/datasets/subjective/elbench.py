@@ -1,7 +1,7 @@
 # flake8: noqa
 """ELBench: a multi-dimensional benchmark for education-facing LLMs.
 
-This module ports https://huggingface.co/datasets/ZeroLoss-Lab/ELBench to
+This module ports https://github.com/ZeroLoss-Lab/ELBench to
 OpenCompass while keeping ELBench's original data files and naming untouched.
 It covers:
 

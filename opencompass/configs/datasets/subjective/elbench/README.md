@@ -2,7 +2,7 @@
 
 ## Introduction
 
-[ELBench](https://huggingface.co/datasets/ZeroLoss-Lab/ELBench) is a
+[ELBench](https://github.com/ZeroLoss-Lab/ELBench) is a
 multi-dimensional benchmark for **education-facing** large language models. This
 directory ports ELBench to OpenCompass while keeping ELBench's **original data
 files and naming** (Chinese filenames and directory layout) unchanged.
@@ -105,6 +105,6 @@ not need a judge model.
   title  = {ELBench: A Multi-dimensional Benchmark for Education-facing Large Language Models},
   author = {ZeroLoss Lab},
   year   = {2026},
-  howpublished = {\url{https://huggingface.co/datasets/ZeroLoss-Lab/ELBench}}
+  howpublished = {\url{https://github.com/ZeroLoss-Lab/ELBench}}
 }
 ```
