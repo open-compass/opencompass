@@ -146,6 +146,10 @@ def do_setup():
         },
         license='Apache License 2.0',
         include_package_data=True,
+        package_data={
+            'opencompass.datasets.leval': ['*.jsonl'],
+            'opencompass.datasets.medbench': ['*.jsonl'],
+        },
         packages=find_packages(),
         keywords=[
             'AI',
