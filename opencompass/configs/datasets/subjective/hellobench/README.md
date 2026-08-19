@@ -1,8 +1,8 @@
 # Guideline for evaluating HelloBench on Diverse LLMs
 
-HelloBench is a comprehenvise, in-the-wild, and open-ended benchmark to evaluate LLMs' performance in generating long text. More details could be found in [🌐Github Repo](https://github.com/Quehry/HelloBench) and [📖Paper](https://arxiv.org/abs/2409.16191).
+HelloBench is a comprehensive, in-the-wild, and open-ended benchmark to evaluate LLMs' performance in generating long text. More details could be found in [🌐Github Repo](https://github.com/Quehry/HelloBench) and [📖Paper](https://arxiv.org/abs/2409.16191).
 
-## Detailed instructions to evalute HelloBench in Opencompass
+## Detailed instructions to evaluate HelloBench in Opencompass
 
 1. Git clone Opencompass
 
