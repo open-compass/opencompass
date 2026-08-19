@@ -1,0 +1,15 @@
+# Necessary
+response_key: 'response'
+error_key: 'error'
+id_key:
+  - 'idx'
+  - 'step'
+prompt_key: 'prompt'
+
+# Optional
+history_key: 'history'
+status_key: 'status'
+
+save_prompt: True
+max_tokens: 2000
+max_rounds: 5
