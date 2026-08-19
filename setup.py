@@ -143,6 +143,9 @@ def do_setup():
             'full':
             parse_requirements('requirements/extra.txt') +
             parse_requirements('requirements/runtime.txt'),
+            'juryeval':
+            parse_requirements('requirements/juryeval.txt') +
+            parse_requirements('requirements/runtime.txt'),
         },
         license='Apache License 2.0',
         include_package_data=True,
