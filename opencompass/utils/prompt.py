@@ -76,6 +76,38 @@ def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
     return hash_object.hexdigest()
 
 
+def compute_origin_prompt_hash(prompt, dataset_abbr=None) -> str:
+    """Compute a dataset-qualified sha256 ID for a dataset-side prompt.
+
+    The hash is taken over the prompt *as produced by the dataset side*
+    (template + in-context examples), before any model-config-side
+    ``meta_template`` / API role formatting is applied. This is meant to be a
+    cross-benchmark identifier of a question.
+
+    Args:
+        prompt: a ``str`` (plain-string template) or a ``PromptList`` /
+            ``list`` (chat-style prompt of role dicts).
+        dataset_abbr: Dataset abbreviation prepended to the digest. When it is
+            not supplied (for example, outside a benchmark inference task),
+            the function keeps the legacy digest-only return value.
+
+    Returns:
+        str: ``<dataset_abbr>_<sha256>`` when ``dataset_abbr`` is provided,
+        otherwise a 64-character hexadecimal sha256 digest.
+    """
+    if isinstance(prompt, str):
+        payload = prompt
+    else:
+        payload = json.dumps(prompt,
+                             sort_keys=True,
+                             ensure_ascii=False,
+                             default=str)
+    digest = hashlib.sha256(payload.encode('utf-8')).hexdigest()
+    if dataset_abbr:
+        return f'{dataset_abbr}_{digest}'
+    return digest
+
+
 class PromptList(list):
     """An enhanced list, used for intermidate representation of a prompt."""
 
