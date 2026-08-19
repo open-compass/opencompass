@@ -100,6 +100,8 @@ class OpenAI(BaseAPIModel):
         max_workers (int, optional): Maximum number of worker threads for
             concurrent API requests. For I/O-intensive API calls, recommended
             value is 10-20. Defaults to None (uses CPU count * 2).
+        timeout (float, optional): Timeout in seconds for each HTTP request.
+            Defaults to 3600.
     """
 
     is_api: bool = True
@@ -125,6 +127,7 @@ class OpenAI(BaseAPIModel):
         verbose: bool = False,
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
+        timeout: float = 3600,
     ):
         super().__init__(
             path=path,
@@ -143,6 +146,7 @@ class OpenAI(BaseAPIModel):
         self.top_logprobs = top_logprobs
         self.extra_body = extra_body
         self.think_tag = think_tag
+        self.timeout = timeout
         # Fallback to gpt-4 as default tokenizer.
         self.tokenizer_path = tokenizer_path or path or 'gpt-4'
         self.tokenizer = None
@@ -271,6 +275,9 @@ class OpenAI(BaseAPIModel):
         max_num_retries = 0
         while max_num_retries < self.retry:
             key = self._next_valid_key()
+            # Count attempts before issuing the request so every early
+            # ``continue`` below is still bounded by ``self.retry``.
+            max_num_retries += 1
 
             header = {
                 'Authorization': f'Bearer {key}',
@@ -326,7 +333,8 @@ class OpenAI(BaseAPIModel):
                 if self.proxy_url is None:
                     raw_response = requests.post(url,
                                                  headers=header,
-                                                 data=json.dumps(data))
+                                                 data=json.dumps(data),
+                                                 timeout=self.timeout)
                 else:
                     proxies = {
                         'http': self.proxy_url,
@@ -340,6 +348,7 @@ class OpenAI(BaseAPIModel):
                         headers=header,
                         data=json.dumps(data),
                         proxies=proxies,
+                        timeout=self.timeout,
                     )
 
                     if self.verbose:
@@ -392,7 +401,9 @@ class OpenAI(BaseAPIModel):
                         continue
                     elif response['error']['code'] == 'insufficient_quota':
                         self.invalid_keys.add(key)
-                        self.logger.warning(f'insufficient_quota key: {key}')
+                        self.logger.warning('An OpenAI API key has '
+                                            'insufficient quota and will be '
+                                            'skipped.')
                         continue
                     elif response['error']['code'] == 'invalid_prompt':
                         self.logger.warning('Invalid prompt:', str(input))
@@ -407,7 +418,6 @@ class OpenAI(BaseAPIModel):
                     )
             finally:
                 self.release()
-            max_num_retries += 1
 
         raise RuntimeError('Calling OpenAI failed after retrying for '
                            f'{max_num_retries} times. Check the logs for '
