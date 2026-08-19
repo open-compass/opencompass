@@ -38,6 +38,8 @@ class OpenAISDKStreaming(OpenAISDK):
                  org: str | List[str] | None = None,
                  meta_template: Dict | None = None,
                  openai_api_base: str | List[str] = OPENAISDK_API_BASE,
+                 azure_endpoint: Optional[str] = None,
+                 azure_api_version: Optional[str] = '2024-12-01-preview',
                  openai_proxy_url: Optional[str] = None,
                  mode: str = 'none',
                  logprobs: bool | None = False,
@@ -54,7 +56,8 @@ class OpenAISDKStreaming(OpenAISDK):
                  stream_chunk_size: int = 1,
                  timeout: int = 3600,
                  finish_reason_confirm: bool = True,
-                 max_workers: Optional[int] = None):
+                 max_workers: Optional[int] = None,
+                 reasoning_effort: Optional[str] = None):
         super().__init__(
             path=path,
             max_seq_len=max_seq_len,
@@ -65,6 +68,8 @@ class OpenAISDKStreaming(OpenAISDK):
             org=org,
             meta_template=meta_template,
             openai_api_base=openai_api_base,
+            azure_endpoint=azure_endpoint,
+            azure_api_version=azure_api_version,
             openai_proxy_url=openai_proxy_url,
             mode=mode,
             logprobs=logprobs,
@@ -78,6 +83,7 @@ class OpenAISDKStreaming(OpenAISDK):
             think_tag=think_tag,
             openai_extra_kwargs=openai_extra_kwargs,
             max_workers=max_workers,
+            reasoning_effort=reasoning_effort,
         )
 
         self.stream = stream
@@ -128,6 +134,7 @@ class OpenAISDKStreaming(OpenAISDK):
                     extra_body=self.extra_body,
                     stream=self.stream,  # Enable streaming
                 )
+                query_data['reasoning_effort'] = self.reasoning_effort
             else:
                 query_data = dict(
                     model=self.path,
