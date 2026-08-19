@@ -260,6 +260,69 @@ class TestOpenAISDK(unittest.TestCase):
     @patch('openai.OpenAI')
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_forwards_call_temperature(
+            self, mock_httpx_client, mock_openai_class, mock_tiktoken):
+        """Test default and per-call temperatures reach the SDK request."""
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = 'Generated response'
+        mock_response.choices[0].message.reasoning_content = None
+        mock_client.chat.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDK(path='gpt-3.5-turbo', max_seq_len=16384)
+        model.acquire = MagicMock()
+        model.release = MagicMock()
+
+        model.generate(['Hello'], max_out_len=100)
+        call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertEqual(call_kwargs['temperature'], 0.7)
+
+        model.generate(['Hello'], max_out_len=100, temperature=0.2)
+        call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertEqual(call_kwargs['temperature'], 0.2)
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_constructor_temperature_overrides_call_temperature(
+            self, mock_httpx_client, mock_openai_class, mock_tiktoken):
+        """Test constructor temperature keeps precedence over call values."""
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        mock_response.choices[0].message.content = 'Generated response'
+        mock_response.choices[0].message.reasoning_content = None
+        mock_client.chat.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDK(path='gpt-3.5-turbo',
+                          max_seq_len=16384,
+                          temperature=0.1)
+        model.acquire = MagicMock()
+        model.release = MagicMock()
+
+        model.generate(['Hello'], max_out_len=100, temperature=0.8)
+
+        call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        self.assertEqual(call_kwargs['temperature'], 0.1)
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_with_reasoning_content(self, mock_httpx_client,
                                              mock_openai_class, mock_tiktoken):
         """Test generate with reasoning content."""

@@ -747,7 +747,7 @@ class OpenAISDK(OpenAI):
                     model=self.path,
                     max_tokens=max_out_len,
                     n=1,
-                    temperature=self.temperature,
+                    temperature=temperature,
                     messages=messages,
                     extra_body=self.extra_body,
                 )
