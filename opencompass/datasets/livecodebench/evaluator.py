@@ -22,6 +22,18 @@ from .pass_k_utils import compute_metrics_from_results
 DEFAULT_MEMORY_LIMIT_BYTES = 4 * 1024 * 1024 * 1024
 
 
+def _run_test_in_subprocess(sample, generation, debug, result, metadata_list,
+                            timeout, memory_limit_bytes):
+    from .testing_util import run_test
+    res, metadata = run_test(sample,
+                             test=generation,
+                             debug=debug,
+                             timeout=timeout,
+                             memory_limit_bytes=memory_limit_bytes)
+    result.append(res)
+    metadata_list.append(metadata)
+
+
 def codegen_check_correctness(sample,
                               generation,
                               timeout,
@@ -32,23 +44,11 @@ def codegen_check_correctness(sample,
     The global timeout is to catch some extreme/rare cases not handled by the
     timeouts inside `run_test`
     """
-
-    def _temp_run(sample, generation, debug, result, metadata_list, timeout,
-                  memory_limit_bytes):
-        from .testing_util import run_test
-        res, metadata = run_test(sample,
-                                 test=generation,
-                                 debug=debug,
-                                 timeout=timeout,
-                                 memory_limit_bytes=memory_limit_bytes)
-        result.append(res)
-        metadata_list.append(metadata)
-
     manager = multiprocessing.Manager()
     result = manager.list()
     metadata_list = manager.list()
     p = multiprocessing.Process(
-        target=_temp_run,
+        target=_run_test_in_subprocess,
         args=(sample, generation, debug, result, metadata_list, timeout,
               memory_limit_bytes),
     )

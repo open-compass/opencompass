@@ -1,9 +1,17 @@
 import json
+import multiprocessing
 import resource
+import sys
 import unittest
 from unittest.mock import patch
 
 from opencompass.datasets.livecodebench import evaluator, testing_util
+
+
+def _record_spawn_result(sample, generation, debug, result, metadata_list,
+                         timeout, memory_limit_bytes):
+    result.append([True])
+    metadata_list.append({'start_method': 'spawn'})
 
 
 class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
@@ -28,6 +36,8 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         mock_reliability_guard.assert_called_once_with(
             maximum_memory_bytes=123456)
 
+    @unittest.skipUnless('fork' in multiprocessing.get_all_start_methods(),
+                         'requires the fork start method')
     def test_codegen_check_correctness_passes_memory_limit_to_worker(self):
 
         def fake_run_test(sample,
@@ -46,7 +56,9 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
             })
         }
 
-        with patch.object(testing_util, 'run_test', fake_run_test):
+        fork_process = multiprocessing.get_context('fork').Process
+        with patch.object(testing_util, 'run_test', fake_run_test), patch.object(
+                evaluator.multiprocessing, 'Process', fork_process):
             result, metadata = evaluator.codegen_check_correctness(
                 sample,
                 'unused generation',
@@ -57,6 +69,10 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         self.assertEqual(result, [True])
         self.assertEqual(metadata['memory_limit_bytes'], 123456)
 
+    @unittest.skipUnless('fork' in multiprocessing.get_all_start_methods(),
+                         'requires the fork start method')
+    @unittest.skipIf(sys.platform == 'darwin',
+                     'macOS rejects limits below current virtual memory')
     def test_reliability_guard_sets_address_space_limit(self):
         child_memory_limit = 256 * 1024 * 1024
 
@@ -80,7 +96,9 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
             })
         }
 
-        with patch.object(testing_util, 'run_test', fake_run_test):
+        fork_process = multiprocessing.get_context('fork').Process
+        with patch.object(testing_util, 'run_test', fake_run_test), patch.object(
+                evaluator.multiprocessing, 'Process', fork_process):
             result, metadata = evaluator.codegen_check_correctness(
                 sample,
                 'unused generation',
@@ -92,6 +110,8 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         self.assertEqual(metadata['rlimit_as'],
                          [child_memory_limit, child_memory_limit])
 
+    @unittest.skipUnless('fork' in multiprocessing.get_all_start_methods(),
+                         'requires the fork start method')
     def test_codegen_check_correctness_returns_metadata_when_worker_exits(
             self):
 
@@ -111,7 +131,9 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
             })
         }
 
-        with patch.object(testing_util, 'run_test', fake_run_test):
+        fork_process = multiprocessing.get_context('fork').Process
+        with patch.object(testing_util, 'run_test', fake_run_test), patch.object(
+                evaluator.multiprocessing, 'Process', fork_process):
             result, metadata = evaluator.codegen_check_correctness(
                 sample,
                 'unused generation',
@@ -122,6 +144,31 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         self.assertEqual(result, [-1])
         self.assertEqual(metadata['error_message'],
                          'Global Timeout or Memory Limit Exceeded')
+
+    def test_codegen_check_correctness_supports_spawn_workers(self):
+        sample = {
+            'input_output':
+            json.dumps({
+                'inputs': ['1'],
+                'outputs': ['1'],
+                'fn_name': 'identity',
+            })
+        }
+
+        spawn_process = multiprocessing.get_context('spawn').Process
+        with patch.object(evaluator, '_run_test_in_subprocess',
+                          _record_spawn_result), patch.object(
+                              evaluator.multiprocessing, 'Process',
+                              spawn_process):
+            result, metadata = evaluator.codegen_check_correctness(
+                sample,
+                'unused generation',
+                timeout=20,
+                debug=False,
+                memory_limit_bytes=None)
+
+        self.assertEqual(result, [True])
+        self.assertEqual(metadata['start_method'], 'spawn')
 
 
 if __name__ == '__main__':
