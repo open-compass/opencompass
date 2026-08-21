@@ -752,7 +752,6 @@ class OpenAISDK(OpenAI):
         timeout: int = 3600,
         image_format: str | None = None,
         image_min_edge: int | None = None,
-        include_reasoning_content: bool = True,
     ):
         super().__init__(
             path,
@@ -791,7 +790,6 @@ class OpenAISDK(OpenAI):
         self.status_code_mappings = status_code_mappings
         self.think_tag = think_tag
         self.openai_extra_kwargs = openai_extra_kwargs
-        self.include_reasoning_content = include_reasoning_content
 
     def _create_fresh_client(self):
         """Create a fresh OpenAI client."""
@@ -888,17 +886,8 @@ class OpenAISDK(OpenAI):
                 content = getattr(message, 'content', '') or ''
                 reasoning_content = getattr(message, 'reasoning_content',
                                             '') or ''
-                has_content = content or (self.include_reasoning_content
-                                          and reasoning_content)
+                has_content = content or reasoning_content
                 if not message or not has_content:
-                    if not self.include_reasoning_content:
-                        self.logger.error(
-                            'OpenAI response has no message.content '
-                            '(finish_reason=%s, reasoning_content_chars=%s).',
-                            getattr(choice, 'finish_reason', None),
-                            len(reasoning_content))
-                        num_retries += 1
-                        continue
                     # There is case that server does not return any content
                     if choice and choice.finish_reason == 'stop':
                         self.logger.info(
@@ -921,8 +910,6 @@ class OpenAISDK(OpenAI):
                     num_retries += 1
                     continue
 
-                if not self.include_reasoning_content:
-                    return content.strip()
                 # Concat Reasoning Content and tags to content
                 if reasoning_content:
                     if self.verbose:

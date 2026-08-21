@@ -194,7 +194,6 @@ class TestVLMEvalKitDataset(unittest.TestCase):
         self.assertEqual(config.models[0]['key'], 'ENV')
         self.assertEqual(config.models[0]['openai_api_base'],
                          'https://token.pjlab.org.cn/v1')
-        self.assertFalse(config.models[0]['include_reasoning_content'])
         self.assertEqual(config.models[0]['max_out_len'], 32768)
         self.assertEqual(config.models[0]['batch_size'], 64)
         self.assertEqual(config.models[0]['max_workers'], 4)

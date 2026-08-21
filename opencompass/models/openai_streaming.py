@@ -1,16 +1,11 @@
-import os
 import time
 from typing import Dict, List, Optional
 
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
-from .openai_api import OpenAISDK, PromptType
-
-OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
-                                    'https://api.openai.com/v1/')
-
-O1_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
+from .openai_api import (OAI_REASONING_MODEL_LIST, OPENAISDK_API_BASE,
+                         OpenAISDK, PromptType)
 
 
 @MODELS.register_module()
@@ -119,7 +114,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
         num_retries = 0
         while num_retries < self.retry:
-            if any(model in self.path for model in O1_MODEL_LIST):
+            if any(model in self.path for model in OAI_REASONING_MODEL_LIST):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
                 self.logger.warning(

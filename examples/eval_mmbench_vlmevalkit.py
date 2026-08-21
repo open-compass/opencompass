@@ -35,7 +35,6 @@ models = [
          tokenizer_path='gpt-4',
          image_format='JPEG',
          image_min_edge=100,
-         include_reasoning_content=False,
          max_seq_len=128000,
          max_out_len=32768,
          batch_size=64,
