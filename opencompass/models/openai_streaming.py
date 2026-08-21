@@ -1,17 +1,11 @@
-import os
 import time
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
-from .openai_api import OpenAISDK
-
-PromptType = Union[PromptList, str]
-OPENAISDK_API_BASE = os.environ.get('OPENAI_BASE_URL',
-                                    'https://api.openai.com/v1/')
-
-O1_MODEL_LIST = ['o1', 'o3', 'o4', 'gpt-5']
+from .openai_api import (OAI_REASONING_MODEL_LIST, OPENAISDK_API_BASE,
+                         OpenAISDK, PromptType)
 
 
 @MODELS.register_module()
@@ -54,7 +48,9 @@ class OpenAISDKStreaming(OpenAISDK):
                  stream_chunk_size: int = 1,
                  timeout: int = 3600,
                  finish_reason_confirm: bool = True,
-                 max_workers: Optional[int] = None):
+                 max_workers: Optional[int] = None,
+                 image_format: str | None = None,
+                 image_min_edge: int | None = None):
         super().__init__(
             path=path,
             max_seq_len=max_seq_len,
@@ -78,6 +74,8 @@ class OpenAISDKStreaming(OpenAISDK):
             think_tag=think_tag,
             openai_extra_kwargs=openai_extra_kwargs,
             max_workers=max_workers,
+            image_format=image_format,
+            image_min_edge=image_min_edge,
         )
 
         self.stream = stream
@@ -87,7 +85,7 @@ class OpenAISDKStreaming(OpenAISDK):
 
     def _generate(
         self,
-        input: PromptList | str,
+        input: PromptType,
         max_out_len: int,
         temperature: float,
         # timeout: int = 3600,  # Set timeout to 1 hour
@@ -112,10 +110,11 @@ class OpenAISDKStreaming(OpenAISDK):
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,
             self.get_token_len)
+        messages = self._messages_to_chat_completions(messages)
 
         num_retries = 0
         while num_retries < self.retry:
-            if any(model in self.path for model in O1_MODEL_LIST):
+            if any(model in self.path for model in OAI_REASONING_MODEL_LIST):
                 self.logger.warning(
                     f"'max_token' is unsupported for model {self.path}")
                 self.logger.warning(
