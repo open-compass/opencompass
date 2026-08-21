@@ -44,8 +44,10 @@ def convert_vlmeval_prompt(prompt):
                 raise ValueError(
                     f'Unsupported VLMEvalKit prompt role: {role!r}.')
             messages.append({
-                'role': role,
-                'content': _convert_vlmeval_content(item['content'])
+                'role':
+                role,
+                'content':
+                _convert_vlmeval_content(item['content'])
             })
         return messages
     raise TypeError(
