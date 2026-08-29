@@ -131,7 +131,7 @@ We support datasets in both `.jsonl` and `.csv` formats.
 For `mcq` datasets, the default fields are as follows:
 
 - `question`: The stem of the multiple-choice question.
-- `A`, `B`, `C`, ...: Single uppercase letters representing the options, with no limit on the number. Defaults to parsing consecutive letters strating from `A` as options.
+- `A`, `B`, `C`, ...: Single uppercase letters representing the options, with no limit on the number. Defaults to parsing consecutive letters starting from `A` as options.
 - `answer`: The correct answer to the multiple-choice question, which must be one of the options used above, such as `A`, `B`, `C`, etc.
 
 Non-default fields will be read in but are not used by default. To use them, specify in the `.meta.json` file.
