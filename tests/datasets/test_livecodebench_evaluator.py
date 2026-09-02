@@ -57,18 +57,28 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         self.assertEqual(result, [True])
         self.assertEqual(metadata['memory_limit_bytes'], 123456)
 
-    def test_reliability_guard_sets_address_space_limit(self):
+    def test_reliability_guard_adds_memory_limit_to_current_vmsize(self):
         child_memory_limit = 256 * 1024 * 1024
+        baseline_vmsize_bytes = 64 * 1024 * 1024 * 1024
 
         def fake_run_test(sample,
                           test=None,
                           debug=False,
                           timeout=6,
                           memory_limit_bytes=None):
+            rlimit_data_before = resource.getrlimit(resource.RLIMIT_DATA)
+            rlimit_stack_before = resource.getrlimit(resource.RLIMIT_STACK)
             testing_util.reliability_guard(
                 maximum_memory_bytes=memory_limit_bytes)
+            rlimit_data_unchanged = (resource.getrlimit(
+                resource.RLIMIT_DATA) == rlimit_data_before)
+            rlimit_stack_unchanged = (resource.getrlimit(
+                resource.RLIMIT_STACK) == rlimit_stack_before)
             return [True], {
-                'rlimit_as': list(resource.getrlimit(resource.RLIMIT_AS))
+                'baseline_vmsize_bytes': baseline_vmsize_bytes,
+                'rlimit_as': list(resource.getrlimit(resource.RLIMIT_AS)),
+                'rlimit_data_unchanged': rlimit_data_unchanged,
+                'rlimit_stack_unchanged': rlimit_stack_unchanged,
             }
 
         sample = {
@@ -80,7 +90,10 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
             })
         }
 
-        with patch.object(testing_util, 'run_test', fake_run_test):
+        with patch.object(testing_util,
+                          '_get_current_vmsize_bytes',
+                          return_value=baseline_vmsize_bytes), patch.object(
+                              testing_util, 'run_test', fake_run_test):
             result, metadata = evaluator.codegen_check_correctness(
                 sample,
                 'unused generation',
@@ -89,8 +102,12 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
                 memory_limit_bytes=child_memory_limit)
 
         self.assertEqual(result, [True])
+        effective_limit = (metadata['baseline_vmsize_bytes'] +
+                           child_memory_limit)
         self.assertEqual(metadata['rlimit_as'],
-                         [child_memory_limit, child_memory_limit])
+                         [effective_limit, effective_limit])
+        self.assertTrue(metadata['rlimit_data_unchanged'])
+        self.assertTrue(metadata['rlimit_stack_unchanged'])
 
     def test_codegen_check_correctness_returns_metadata_when_worker_exits(
             self):
