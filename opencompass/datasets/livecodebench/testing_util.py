@@ -756,13 +756,20 @@ def reliability_guard(maximum_memory_bytes=None):
     """
 
     if maximum_memory_bytes is not None:
-        import resource
+        if platform.uname().system != 'Linux':
+            import warnings
 
-        effective_memory_limit_bytes = (_get_current_vmsize_bytes() +
-                                        maximum_memory_bytes)
-        resource.setrlimit(
-            resource.RLIMIT_AS,
-            (effective_memory_limit_bytes, effective_memory_limit_bytes))
+            warnings.warn(
+                'Memory limit is only supported on Linux; skipping setup.',
+                RuntimeWarning)
+        else:
+            import resource
+
+            effective_memory_limit_bytes = (_get_current_vmsize_bytes() +
+                                            maximum_memory_bytes)
+            resource.setrlimit(
+                resource.RLIMIT_AS,
+                (effective_memory_limit_bytes, effective_memory_limit_bytes))
 
     faulthandler.disable()
 
