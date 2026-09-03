@@ -49,6 +49,7 @@ from .codecompass import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .commonsenseqa_cn import *  # noqa: F401, F403
 from .copa import *  # noqa: F401, F403
+from .critpt import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
 from .crowspairs_cn import *  # noqa: F401, F403
 from .cruxeval import *  # noqa: F401, F403
@@ -70,6 +71,8 @@ from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
 from .gaokao_math import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
+from .general365 import General365Dataset  # noqa: F401
+from .general365 import general365_llmjudge_postprocess  # noqa: F401
 from .generic import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
@@ -199,6 +202,7 @@ from .triviaqa import *  # noqa: F401, F403
 from .triviaqarc import *  # noqa: F401, F403
 from .truthfulqa import *  # noqa: F401, F403
 from .tydiqa import *  # noqa: F401, F403
+from .vlmevalkit import VLMEvalKitDataset  # noqa: F401
 from .wic import *  # noqa: F401, F403
 from .wikibench import *  # noqa: F401, F403
 from .winograd import *  # noqa: F401, F403

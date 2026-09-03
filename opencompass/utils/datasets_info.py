@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/AA-LCR":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/aa_lcr",
+    },
     "opencompass/QASPER":{
         "ms_id": None,
         "hf_id": None,
@@ -687,6 +692,10 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/AA-LCR": {
+        "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aa_lcr.zip",
+        "md5":"d795853a0897f69afa23df955ea8f68f",
+    },
     "/IFbench": {
         "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/IFBench.zip",
         "md5":"b1c63b31e3312f929c6318977de4cdd3",

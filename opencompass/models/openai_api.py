@@ -1,12 +1,16 @@
+import base64
 import inspect
 import json
+import mimetypes
 import os
 import random
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
+from pathlib import Path
 from threading import Lock
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import httpx
 import jieba
@@ -18,7 +22,7 @@ from opencompass.utils.prompt import PromptList
 
 from .base_api import BaseAPIModel
 
-PromptType = Union[PromptList, str]
+PromptType = Union[List[Dict], PromptList, str]
 OPENAI_API_BASE = os.path.join(
     os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1/'),
     'chat/completions',
@@ -125,6 +129,8 @@ class OpenAI(BaseAPIModel):
         verbose: bool = False,
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
+        image_format: Optional[str] = None,
+        image_min_edge: Optional[int] = None,
     ):
         super().__init__(
             path=path,
@@ -143,6 +149,8 @@ class OpenAI(BaseAPIModel):
         self.top_logprobs = top_logprobs
         self.extra_body = extra_body
         self.think_tag = think_tag
+        self.image_format = image_format
+        self.image_min_edge = image_min_edge
         # Fallback to gpt-4 as default tokenizer.
         self.tokenizer_path = tokenizer_path or path or 'gpt-4'
         self.tokenizer = None
@@ -262,11 +270,12 @@ class OpenAI(BaseAPIModel):
         Returns:
             str: The generated string.
         """
-        assert isinstance(input, (str, PromptList))
+        assert isinstance(input, (str, list, PromptList))
 
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,
             self.get_token_len)
+        messages = self._messages_to_chat_completions(messages)
 
         max_num_retries = 0
         while max_num_retries < self.retry:
@@ -522,7 +531,7 @@ class OpenAI(BaseAPIModel):
 
     def _preprocess_messages(
         self,
-        input: Union[str, PromptList],
+        input: PromptType,
         max_out_len: int,
         max_seq_len: int,
         mode: str,
@@ -545,8 +554,9 @@ class OpenAI(BaseAPIModel):
         if mode == 'none':
             input_len = get_token_len_func(input) if isinstance(
                 input, str) else sum(
-                    get_token_len_func(item['prompt'] if 'prompt' in
-                                       item else item['content'])
+                    self._content_token_len(
+                        item['prompt'] if 'prompt' in
+                        item else item['content'], get_token_len_func)
                     for item in input)
             if input_len > max_seq_len:
                 raise ValueError(
@@ -567,9 +577,11 @@ class OpenAI(BaseAPIModel):
 
             if mode != 'none':
                 for i in range(len(input)):
-                    input[i]['content'] = bin_trim_wrapper(input[i]['content'])
+                    input[i]['content'] = self._trim_message_content(
+                        input[i]['content'], bin_trim_wrapper)
             input_len = sum(
-                get_token_len_func(item['content']) for item in input)
+                self._content_token_len(item['content'], get_token_len_func)
+                for item in input)
             messages = input
 
         else:
@@ -615,6 +627,100 @@ class OpenAI(BaseAPIModel):
 
         return messages, max_out_len
 
+    @staticmethod
+    def _content_token_len(content: Any, get_token_len_func) -> int:
+        if isinstance(content, str):
+            return get_token_len_func(content)
+        if isinstance(content, list):
+            total = 0
+            for part in content:
+                if isinstance(part, str):
+                    total += get_token_len_func(part)
+                elif isinstance(part, dict) and isinstance(
+                        part.get('text'), str):
+                    total += get_token_len_func(part['text'])
+            return total
+        return 0
+
+    @staticmethod
+    def _trim_message_content(content: Any, trim_func) -> Any:
+        if isinstance(content, str):
+            return trim_func(content)
+        if isinstance(content, list):
+            output = []
+            for part in content:
+                if isinstance(part, dict) and isinstance(
+                        part.get('text'), str):
+                    part = part.copy()
+                    part['text'] = trim_func(part['text'])
+                output.append(part)
+            return output
+        return content
+
+    def _messages_to_chat_completions(
+            self, messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        output = []
+        for message in messages:
+            message = message.copy()
+            content = message.get('content')
+            if not isinstance(content, list):
+                output.append(message)
+                continue
+            parts = []
+            for part in content:
+                if not isinstance(part, dict):
+                    parts.append(part)
+                    continue
+                part_type = part.get('type')
+                if part_type == 'text':
+                    parts.append(dict(type='text', text=part['text']))
+                elif part_type == 'image':
+                    parts.append(
+                        dict(type='image_url',
+                             image_url=dict(
+                                 url=self._chat_image_url(part['image_url']))))
+                elif part_type == 'image_url':
+                    image_url = part['image_url']
+                    if isinstance(image_url, dict):
+                        image_url = image_url.copy()
+                        image_url['url'] = self._chat_image_url(
+                            image_url['url'])
+                    else:
+                        image_url = dict(url=self._chat_image_url(image_url))
+                    parts.append(dict(type='image_url', image_url=image_url))
+                else:
+                    parts.append(part.copy())
+            message['content'] = parts
+            output.append(message)
+        return output
+
+    def _chat_image_url(self, image_url: str) -> str:
+        if image_url.startswith(('http://', 'https://', 'data:')):
+            return image_url
+        image_path = Path(image_url)
+        if self.image_format:
+            from PIL import Image
+
+            image = Image.open(image_path)
+            if image.mode in ('RGBA', 'P', 'LA'):
+                image = image.convert('RGB')
+            if self.image_min_edge and min(image.size) < self.image_min_edge:
+                factor = self.image_min_edge / min(image.size)
+                image = image.resize(
+                    (int(image.width * factor), int(image.height * factor)))
+            buffer = BytesIO()
+            image_format = self.image_format.upper()
+            image.save(buffer, format=image_format)
+            encoded = base64.b64encode(buffer.getvalue()).decode('ascii')
+            mime_type = Image.MIME[image_format]
+            return f'data:{mime_type};base64,{encoded}'
+
+        mime_type = mimetypes.guess_type(str(image_path))[0]
+        if mime_type is None or not mime_type.startswith('image/'):
+            raise ValueError(f'Cannot determine image type for {image_url}')
+        encoded = base64.b64encode(image_path.read_bytes()).decode('ascii')
+        return f'data:{mime_type};base64,{encoded}'
+
 
 @MODELS.register_module()
 class OpenAISDK(OpenAI):
@@ -644,6 +750,8 @@ class OpenAISDK(OpenAI):
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Dict | None = None,
         timeout: int = 3600,
+        image_format: str | None = None,
+        image_min_edge: int | None = None,
     ):
         super().__init__(
             path,
@@ -664,6 +772,8 @@ class OpenAISDK(OpenAI):
             extra_body,
             verbose=verbose,
             max_workers=max_workers,
+            image_format=image_format,
+            image_min_edge=image_min_edge,
         )
         # support multiple api_base for acceleration
         if isinstance(openai_api_base, List):
@@ -704,7 +814,7 @@ class OpenAISDK(OpenAI):
 
     def _generate(
         self,
-        input: PromptList | str,
+        input: PromptType,
         max_out_len: int,
         temperature: float,
         # timeout: int = 3600,
@@ -727,6 +837,7 @@ class OpenAISDK(OpenAI):
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,
             self.get_token_len)
+        messages = self._messages_to_chat_completions(messages)
 
         num_retries = 0
         while num_retries < self.retry:
@@ -770,22 +881,21 @@ class OpenAISDK(OpenAI):
                         self.logger.info(responses)
                     except Exception:
                         pass  # noqa F841
-                # Check if response is empty or content is empty
-                if (not responses.choices or not responses.choices[0].message
-                        or
-                    (not responses.choices[0].message.content and not getattr(
-                        responses.choices[0].message,
-                        'reasoning_content',
-                        '',
-                    ))):  # noqa: E125
+                choice = responses.choices[0] if responses.choices else None
+                message = choice.message if choice else None
+                content = getattr(message, 'content', '') or ''
+                reasoning_content = getattr(message, 'reasoning_content',
+                                            '') or ''
+                has_content = content or reasoning_content
+                if not message or not has_content:
                     # There is case that server does not return any content
-                    if responses.choices[0].finish_reason == 'stop':
+                    if choice and choice.finish_reason == 'stop':
                         self.logger.info(
                             'Server does not return any content '
                             'and stop reason is <stop>, '
                             'the input query is: %s', query_data)
                         return ''
-                    if responses.choices[0].finish_reason == 'content_filter':
+                    if choice and choice.finish_reason == 'content_filter':
                         self.logger.info(
                             'The answer for this question is filtered,'
                             'the stop reason is <content_filter>, '
@@ -800,9 +910,6 @@ class OpenAISDK(OpenAI):
                     num_retries += 1
                     continue
 
-                reasoning_content = (getattr(responses.choices[0].message,
-                                             'reasoning_content', '') or '')
-                content = responses.choices[0].message.content or ''
                 # Concat Reasoning Content and tags to content
                 if reasoning_content:
                     if self.verbose:
