@@ -43,10 +43,10 @@
 
 两层组件的分工：
 
-| 层 | 组件 | 负责什么 |
-| --- | --- | --- |
-| Task 层 | `OpenICLInferConcurrentTask` | 跨数据集：一个进程管多个数据集、共享请求预算、写状态文件 |
-| Inferencer 层 | `ParallelGenInferencer` 等 | 数据集内：样本级并发请求、增量落盘、进度回调 |
+| 层            | 组件                         | 负责什么                                                 |
+| ------------- | ---------------------------- | -------------------------------------------------------- |
+| Task 层       | `OpenICLInferConcurrentTask` | 跨数据集：一个进程管多个数据集、共享请求预算、写状态文件 |
+| Inferencer 层 | `ParallelGenInferencer` 等   | 数据集内：样本级并发请求、增量落盘、进度回调             |
 
 并发任务在运行时**自动**把数据集配置里的 `GenInferencer`/`ChatInferencer`/`ChatMLInferencer` 替换成对应的 Parallel 版本，并传入 `max_infer_workers` 与进度回调；除这三种之外的推理器（如 `PPLInferencer`、`SCInferencer`）暂时还不支持，会直接报错。
 
@@ -115,5 +115,3 @@ eval = dict(
 ```
 
 `watch_interval`、`heartbeat_timeout`、`log_interval` 写在 `eval.runner.task` 内部；并发推理任务的 `poll_interval`、`log_interval` 同名参数默认值即可满足多数场景。
-
-

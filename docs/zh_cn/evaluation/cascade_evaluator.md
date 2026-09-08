@@ -27,12 +27,12 @@
 
 `CascadeEvaluator` 的参数：
 
-| 参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `llm_evaluator` | dict，必填 | LLM 评判器配置，通常是 `GenericLLMEvaluator` |
-| `rule_evaluator` | dict | 规则评测器配置，如 `MATHVerifyEvaluator` |
-| `sample_score_fn` | Callable | 自定义单样本打分函数，返回含 `correct` 的 dict 或布尔值 |
-| `parallel` | bool，默认 `True` | `False` 为级联模式，`True` 为并行模式 |
+| 参数              | 类型              | 说明                                                    |
+| ----------------- | ----------------- | ------------------------------------------------------- |
+| `llm_evaluator`   | dict，必填        | LLM 评判器配置，通常是 `GenericLLMEvaluator`            |
+| `rule_evaluator`  | dict              | 规则评测器配置，如 `MATHVerifyEvaluator`                |
+| `sample_score_fn` | Callable          | 自定义单样本打分函数，返回含 `correct` 的 dict 或布尔值 |
+| `parallel`        | bool，默认 `True` | `False` 为级联模式，`True` 为并行模式                   |
 
 `rule_evaluator` 与 `sample_score_fn` 至少提供一个（否则初始化即报错）；但评分流程还会调用规则评测器的 `pred_postprocess`，因此实际使用中应始终提供 `rule_evaluator`。
 

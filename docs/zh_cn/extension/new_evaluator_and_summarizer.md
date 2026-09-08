@@ -69,14 +69,14 @@ class MyEvaluator(BaseEvaluator):
 
 ### summary group 的字段
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `name` | str | 分组名，汇总表中作为一行出现 |
-| `subsets` | list | 子集列表，元素为数据集 abbr 字符串或 `[abbr, metric]` 二元组，**两种写法不能混用** |
-| `metric` | str | 显式指定参与聚合的指标名 |
-| `weights` | dict | `{子集 abbr: 权重}`，启用加权平均（见下文） |
-| `std` / `sum` / `harmonic_mean` | bool | 分别改为标准差、求和、调和平均 |
-| `transforms` | dict | `{子集 abbr: '表达式'}`，聚合前对该子集的分数做变换，表达式中的 `x` 代表原值 |
+| 字段                            | 类型 | 说明                                                                               |
+| ------------------------------- | ---- | ---------------------------------------------------------------------------------- |
+| `name`                          | str  | 分组名，汇总表中作为一行出现                                                       |
+| `subsets`                       | list | 子集列表，元素为数据集 abbr 字符串或 `[abbr, metric]` 二元组，**两种写法不能混用** |
+| `metric`                        | str  | 显式指定参与聚合的指标名                                                           |
+| `weights`                       | dict | `{子集 abbr: 权重}`，启用加权平均（见下文）                                        |
+| `std` / `sum` / `harmonic_mean` | bool | 分别改为标准差、求和、调和平均                                                     |
+| `transforms`                    | dict | `{子集 abbr: '表达式'}`，聚合前对该子集的分数做变换，表达式中的 `x` 代表原值       |
 
 聚合方式的判定顺序：显式 `metric` > `std` / `sum` / `weights` / `harmonic_mean` 对应的方式 > 默认的简单平均（宏平均）。
 

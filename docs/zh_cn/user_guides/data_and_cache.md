@@ -4,11 +4,11 @@ OpenCompass 没有一个覆盖所有数据集的统一下载器。实际读取�
 
 ## 两类常见缓存变量
 
-| 变量 | 使用者 | 典型作用 |
-| --- | --- | --- |
-| `COMPASS_DATA_CACHE` | OpenCompass 的 `get_data_path()` | 为相对的 OpenCompass 数据路径添加缓存根目录 |
-| `HF_DATASETS_CACHE` | Hugging Face `datasets` | 存放 `load_dataset()` 下载和生成的 Arrow 缓存 |
-| `HF_HOME` | Hugging Face Hub 生态 | 统一模型、Hub 和数据集缓存根目录 |
+| 变量                 | 使用者                           | 典型作用                                      |
+| -------------------- | -------------------------------- | --------------------------------------------- |
+| `COMPASS_DATA_CACHE` | OpenCompass 的 `get_data_path()` | 为相对的 OpenCompass 数据路径添加缓存根目录   |
+| `HF_DATASETS_CACHE`  | Hugging Face `datasets`          | 存放 `load_dataset()` 下载和生成的 Arrow 缓存 |
+| `HF_HOME`            | Hugging Face Hub 生态            | 统一模型、Hub 和数据集缓存根目录              |
 
 例如配置传入 `./data/fold`，并由 Dataset 类调用 `get_data_path()` 时，设置 `COMPASS_DATA_CACHE=/cache/compass` 后会尝试读取 `/cache/compass/./data/fold`。如果目标不存在，OpenCompass 只会在内置下载映射能够识别该数据集时自动下载；否则会报错。
 
